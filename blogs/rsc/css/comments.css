@@ -11,6 +11,9 @@ form.bComment /* New comment form */
 	padding: 0 1ex;
 	border: 1px dotted #999;
 }
+#comment_preview {
+	background-color: #eee;
+}
 div.bCommentTitle {
 	margin: 1ex 0;
 	font-weight: bold;
@@ -23,4 +26,12 @@ div.bCommentSmallPrint {
 	clear: both;
 	font-size: 78%;
 	margin: 1ex 0;
+}
+
+div.moderation_msg
+{
+	margin: 1ex 2ex;
+	padding: 0 1ex;
+	border: 1px dotted #fa9;
+	color: #e70;
 }

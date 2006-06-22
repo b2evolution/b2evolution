@@ -57,6 +57,7 @@ span.bIcons
 {
 	float: right;
 	border: 0px;
+	margin: 0 0 0 1em;
 }
 
 span.NonExistentWikiWord {

@@ -623,9 +623,9 @@ class User extends DataObject
 			// Load now:
 			// echo 'loading allowed statuses';
 			$query = "SELECT *
-								FROM T_coll_user_perms
-								WHERE bloguser_blog_ID = $perm_target_blog
-								  AND bloguser_user_ID = $this->ID";
+								  FROM T_coll_user_perms
+								 WHERE bloguser_blog_ID = $perm_target_blog
+								       AND bloguser_user_ID = $this->ID";
 			// echo $query, '<br />';
 			$row = $DB->get_row( $query, ARRAY_A );
 
@@ -1043,6 +1043,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2006/06/22 21:58:34  fplanque
+ * enhanced comment moderation
+ *
  * Revision 1.19  2006/06/19 20:59:37  fplanque
  * noone should die anonymously...
  *

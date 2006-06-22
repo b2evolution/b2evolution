@@ -41,9 +41,7 @@ if( ! ($disp_comments || $disp_comment_form || $disp_trackbacks || $disp_trackba
 	return false;
 }
 
-?>
-<a name="feedbacks"></a>
-<?php
+echo '<a name="feedbacks"></a>';
 
 $type_list = array();
 $disp_title = array();
@@ -58,41 +56,27 @@ if( $disp_comments )
 	{ // Use cannot see comments
 		$disp_comments = false;
 	}
-	?>
-	<a name="comments"></a>
-	<?php
+	echo '<a name="comments"></a>';
 }
 if( $disp_trackbacks )
 {
 	$type_list[] = "'trackback'";
-	$disp_title[] = T_("Trackbacks"); ?>
-	<a name="trackbacks"></a>
-	<?php
+	$disp_title[] = T_("Trackbacks");
+	echo '<a name="trackbacks">';
 }
 if( $disp_pingbacks )
 {
 	$type_list[] = "'pingback'";
-	$disp_title[] = T_("Pingbacks"); ?>
-	<a name="pingbacks"></a>
-	<?php
+	$disp_title[] = T_("Pingbacks");
+	echo '<a name="pingbacks"></a>';
 }
 
 if( $disp_trackback_url )
 { // We want to display the trackback URL:
 	?>
 	<h4><?php echo T_('Trackback address for this post:') ?></h4>
-
+	<code><?php $Item->trackback_url() ?></code>
 	<?php
-	/*
-	Trigger plugin event, which could display a captcha form, before generating a whitelisted URL:
-	*/
-	if( ! $Plugins->trigger_event_first_true( 'DisplayTrackbackAddr',
-			array('Item' => & $Item, 'template' => '<code>%url%</code>') ) )
-	{ // No plugin displayed a payload, so we just display the default:
-		?>
-		<code><?php $Item->trackback_url() ?></code>
-		<?php
-	}
 }
 
 
@@ -146,14 +130,29 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 			</div>
 			<div class="bCommentSmallPrint">
 				<?php	$Comment->permanent_link( '#', '#', 'permalink_right' ); ?>
+
+				<?php $Comment->edit_link( '', '', '#', '#', 'permalink_right' ); /* Link to backoffice for editing */ ?>
+				<?php $Comment->delete_link( '', '', '#', '#', 'permalink_right' ); /* Link to backoffice for deleting */ ?>
+
 				<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
-				<?php $Comment->edit_link( ' &middot; ' ); /* Link to backoffice for editing */ ?>
-				<?php $Comment->delete_link( ' &middot; ' ); /* Link to backoffice for deleting */ ?>
 			</div>
 		</div>
 		<!-- ========== END of a COMMENT/TB/PB ========== -->
 		<?php
-	}
+	}	// End of comment list loop.
+
+
+	// _______________________________________________________________
+
+
+	// Display count of comments to be moderated:
+	$Item->feedback_moderation( 'feedbacks', '<div class="moderation_msg"><p>', '</p></div>',
+												T_('This post has no feedback awaiting moderation...'),
+												T_('This post has 1 feedback awaiting moderation... %s'),
+												T_('This post has %d feedbacks awaiting moderation... %s') );
+
+
+	// _______________________________________________________________
 
 
 	// Comment form:
@@ -175,10 +174,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 			{ // display PREVIEW:
 				?>
 				<div class="bComment" id="comment_preview">
-					<p><strong><?php echo T_('PREVIEW').':' ?></strong></p>
 					<div class="bCommentTitle">
 					<?php
-						echo T_('Comment from:').' ';
+						echo T_('PREVIEW Comment from:').' ';
 						$preview_Comment->author();
 						$preview_Comment->msgform_link( $Blog->get('msgformurl') );
 						$preview_Comment->author_url( '', ' &middot; ', '' );
@@ -188,10 +186,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 						<?php $preview_Comment->content() ?>
 					</div>
 					<div class="bCommentSmallPrint">
-						<?php $preview_Comment->permanent_link( '#', '#', 'permalink_right' ); ?>
 						<?php $preview_Comment->date() ?> @ <?php $preview_Comment->time( 'H:i' ) ?>
-						<?php $preview_Comment->edit_link( ' &middot; ' ); /* Link to backoffice for editing */ ?>
-						<?php $preview_Comment->delete_link( ' &middot; ' ); /* Link to backoffice for deleting */ ?>
 					</div>
 				</div>
 
@@ -304,6 +299,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.67  2006/06/22 21:58:34  fplanque
+ * enhanced comment moderation
+ *
  * Revision 1.66  2006/06/22 18:37:47  fplanque
  * fixes
  *

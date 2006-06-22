@@ -1312,21 +1312,22 @@ class Item extends DataObject
 	 * @param string Link text to display when there is 1 comment
 	 * @param string Link text to display when there are >1 comments (include %d for # of comments)
 	 * @param string Link title
+	 * @param string Status of feedbacks to count
 	 * @param boolean true to use a popup windows ('#' to use if comments_popup_windows() is there)
 	 * @param boolean true to hide if no feedback ('#' for default)
-	 * @param string 'pid' or 'title'
+	 * @param string 'pid' or 'title'; 'none' for NO LINK
 	 * @param string url to use
 	 */
 	function feedback_link( $type = 'feedbacks', $before = '', $after = '',
-													$zero='#', $one='#', $more='#', $title='#',
-													$use_popup = '#',	$hideifnone = '#', $mode = '', $blogurl='' )
+													$zero = '#', $one = '#', $more = '#', $title='#', $status = 'published',
+													$use_popup = '#',	$hideifnone = '#', $mode = '', $blogurl = '' )
 	{
 		global $b2commentsjavascript;
 
 		switch( $type )
 		{
 			case 'feedbacks':
-				if( $hideifnone == '#' ) $hideifnone = false;
+				if( $hideifnone === '#' ) $hideifnone = false;
 				if( $title == '#' ) $title = T_('Display feedback / Leave a comment');
 				if( $zero == '#' ) $zero = T_('Send feedback');
 				if( $one == '#' ) $one = T_('1 feedback');
@@ -1336,7 +1337,7 @@ class Item extends DataObject
 			case 'comments':
 				if( ! $this->can_see_comments() )
 					return false;
-				if( $hideifnone == '#' )
+				if( $hideifnone === '#' )
 				{
 					if( $this->can_comment( NULL ) ) // NULL, because we do not want to display errors here!
 						$hideifnone = false;
@@ -1355,7 +1356,7 @@ class Item extends DataObject
 				{ // Trackbacks not allowed on this blog:
 					return;
 				}
-				if( $hideifnone == '#' ) $hideifnone = false;
+				if( $hideifnone === '#' ) $hideifnone = false;
 				if( $title == '#' ) $title = T_('Display trackbacks / Get trackback address for this post');
 				if( $zero == '#' ) $zero = T_('Trackback (0)');
 				if( $one == '#' ) $one = T_('Trackback (1)');
@@ -1368,7 +1369,7 @@ class Item extends DataObject
 				{ // Pingbacks not allowed on this blog:
 					return;
 				}
-				if( $hideifnone == '#' ) $hideifnone = true;
+				if( $hideifnone === '#' ) $hideifnone = true;
 				if( $title == '#' ) $title = T_('Display pingbacks');
 				if( $zero == '#' ) $zero = T_('Pingback (0)');
 				if( $one == '#' ) $one = T_('Pingback (1)');
@@ -1384,24 +1385,31 @@ class Item extends DataObject
 			$use_popup = $b2commentsjavascript;
 		}
 
-		$number = generic_ctp_number($this->ID, $type);
+		$number = generic_ctp_number( $this->ID, $type, $status );
 
 		if( ($number == 0) && $hideifnone )
 			return false;
 
-		$url = $this->get_permanent_url( $mode, $blogurl, true );
-		if( $use_popup )
-		{ // We need to tell b2evo to use the popup template
-			$url = url_add_param( $url, 'template=popup' );
+		if( $mode != 'none' )
+		{ // We want a link:
+			$url = $this->get_permanent_url( $mode, $blogurl, true );
+			if( $use_popup )
+			{ // We need to tell b2evo to use the popup template
+				$url = url_add_param( $url, 'template=popup' );
+			}
 		}
+
 
 		echo $before;
 
-		echo '<a href="', $url;
-		echo '#', $type, '" ';	// Position on feedback
-		echo 'title="', $title, '"';
-		if( $use_popup ) echo ' onclick="b2open(this.href); return false"';
-		echo '>';
+		if( !empty( $url ) )
+		{
+			echo '<a href="'.$url;
+			echo '#'.$type.'" ';	// Position on feedback
+			echo 'title="'.$title.'"';
+			if( $use_popup ) echo ' onclick="b2open(this.href); return false"';
+			echo '>';
+		}
 
 		if( $number == 0 )
 			echo $zero;
@@ -1410,10 +1418,60 @@ class Item extends DataObject
 		elseif( $number > 1 )
 			echo str_replace( '%d', $number, $more );
 
-		echo '</a>';
+		if( !empty( $url ) )
+		{
+			echo '</a>';
+		}
 
 		echo $after;
 	}
+
+
+
+	/**
+	 * Template function: Displays feeback moderation info
+	 *
+	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
+	 * @param string String to display before the link (if comments are to be displayed)
+	 * @param string String to display after the link (if comments are to be displayed)
+	 * @param string Link text to display when there are 0 comments
+	 * @param string Link text to display when there is 1 comment
+	 * @param string Link text to display when there are >1 comments (include %d for # of comments)
+	 * @param string Link
+	 * @param boolean true to hide if no feedback
+	 */
+	function feedback_moderation( $type = 'feedbacks', $before = '', $after = '',
+													$zero = '#', $one = '#', $more = '#', $edit_comments_link = '#',
+													$hideifnone = true )
+	{
+		/**
+		 * @var User
+		 */
+		global $current_User;
+
+		if( isset($current_User) && $current_User->check_perm( 'blog_comments', 'any', false,	$this->blog_ID ) )
+		{	// We jave permission to edit comments:
+			if( $edit_comments_link == '#' )
+			{	// Use default link:
+				global $admin_url;
+				$edit_comments_link = '<a href="'.$admin_url.'?ctrl=browse&amp;tab=posts&amp;p='.$this->ID.'&amp;c=1&amp;tb=1&amp;pb=1" title="'.T_('Moderate these feedbacks').'">'.get_icon( 'edit' ).' '.T_('Moderate...').'</a>';
+			}
+		}
+		else
+		{ // User has no right to edit comments:
+			$edit_comments_link = '';
+		}
+
+		// Inject Edit/moderate link as relevant:
+		$zero = str_replace( '%s', $edit_comments_link, $zero );
+		$one = str_replace( '%s', $edit_comments_link, $one );
+		$more = str_replace( '%s', $edit_comments_link, $more );
+
+		$this->feedback_link( $type, $before, $after, $zero, $one, $more, '', 'draft', '#',	$hideifnone, 'none' );
+
+
+	}
+
 
 
 	/**
@@ -2712,6 +2770,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.64  2006/06/22 21:58:34  fplanque
+ * enhanced comment moderation
+ *
  * Revision 1.63  2006/06/22 18:37:47  fplanque
  * fixes
  *

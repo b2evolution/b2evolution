@@ -43,7 +43,7 @@ require_once dirname(__FILE__).'/_comment.class.php';
  * @param integer
  * @param string what to count
  */
-function generic_ctp_number( $post_id, $mode = 'comments' )
+function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published' )
 {
 	global $DB, $debug, $postdata, $cache_ctp_number, $preview;
 
@@ -63,30 +63,32 @@ function generic_ctp_number( $post_id, $mode = 'comments' )
 
 		foreach( $postIDarray as $tmp_post_id)
 		{	// Initializes each post to nocount!
-			$cache_ctp_number[$tmp_post_id] = array( 'comments' => 0, 'trackbacks' => 0, 'pingbacks' => 0, 'ctp' => 0);
+			$cache_ctp_number[$tmp_post_id] = array(
+					'comments' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
+					'trackbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
+					'pingbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
+					'feedbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 )
+				);
 		}
-		$query = "SELECT comment_post_ID, comment_type, COUNT(*) AS type_count
-							FROM T_comments
-							WHERE comment_post_ID IN ($postIDlist)
-							GROUP BY comment_post_ID, comment_type";
+
+		$query = "SELECT comment_post_ID, comment_type, comment_status, COUNT(*) AS type_count
+							  FROM T_comments
+							 WHERE comment_post_ID IN ($postIDlist)
+							 GROUP BY comment_post_ID, comment_type, comment_status";
 
 		foreach( $DB->get_results( $query ) as $row )
 		{
-			switch( $row->comment_type )
-			{
-				case 'comment';
-					$cache_ctp_number[$row->comment_post_ID]['comments'] = $row->type_count;
-					break;
+			// detail by status, tyep and post:
+			$cache_ctp_number[$row->comment_post_ID][$row->comment_type.'s'][$row->comment_status] = $row->type_count;
 
-				case 'trackback';
-					$cache_ctp_number[$row->comment_post_ID]['trackbacks'] = $row->type_count;
-					break;
+			// Total for type on post:
+			$cache_ctp_number[$row->comment_post_ID][$row->comment_type.'s']['total'] += $row->type_count;
 
-				case 'pingback';
-					$cache_ctp_number[$row->comment_post_ID]['pingbacks'] = $row->type_count;
-					break;
-			}
-			$cache_ctp_number[$row->comment_post_ID]['ctp'] += $row->type_count;
+			// Total for status on post:
+			$cache_ctp_number[$row->comment_post_ID]['feedbacks'][$row->comment_status] += $row->type_count;
+
+			// Total for post:
+			$cache_ctp_number[$row->comment_post_ID]['feedbacks']['total'] += $row->type_count;
 		}
 	}
 	/*	else
@@ -98,42 +100,49 @@ function generic_ctp_number( $post_id, $mode = 'comments' )
 	if( !isset($cache_ctp_number[$post_id]) )
 	{ // this should be extremely rare...
 		// echo "CACHE not set for $post_id";
-		$post_id = intval($post_id);
-		$query = "SELECT comment_post_ID, comment_type, COUNT(*) AS type_count
-							FROM T_comments
-							WHERE comment_post_ID = $post_id
-							GROUP BY comment_post_ID, comment_type";
+
+		// Initializes post to nocount!
+		$cache_ctp_number[intval($post_id)] = array(
+				'comments' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
+				'trackbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
+				'pingbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
+				'feedbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 )
+			);
+
+		$query = 'SELECT comment_post_ID, comment_type, comment_status, COUNT(*) AS type_count
+							  FROM T_comments
+							 WHERE comment_post_ID = '.intval($post_id).'
+							 GROUP BY comment_post_ID, comment_type, comment_status';
 
 		foreach( $DB->get_results( $query ) as $row )
 		{
-			switch( $row->comment_type )
-			{
-				case 'comment';
-					$cache_ctp_number[$row->comment_post_ID]['comments'] = $row->type_count;
-					break;
+			// detail by status, tyep and post:
+			$cache_ctp_number[$row->comment_post_ID][$row->comment_type.'s'][$row->comment_status] = $row->type_count;
 
-				case 'trackback';
-					$cache_ctp_number[$row->comment_post_ID]['trackbacks'] = $row->type_count;
-					break;
+			// Total for type on post:
+			$cache_ctp_number[$row->comment_post_ID][$row->comment_type.'s']['total'] += $row->type_count;
 
-				case 'pingback';
-					$cache_ctp_number[$row->comment_post_ID]['pingbacks'] = $row->type_count;
-					break;
-			}
-			$cache_ctp_number[$row->comment_post_ID]['ctp'] += $row->type_count;
+			// Total for status on post:
+			$cache_ctp_number[$row->comment_post_ID]['feedbacks'][$row->comment_status] += $row->type_count;
+
+			// Total for post:
+			$cache_ctp_number[$row->comment_post_ID]['feedbacks']['total'] += $row->type_count;
 		}
-	}
-	else
-	{
-		$ctp_number = $cache_ctp_number[$post_id];
 	}
 
 	if( ($mode != 'comments') && ($mode != 'trackbacks') && ($mode != 'pingbacks') )
 	{
-		$mode = 'ctp';
+		$mode = 'feedbacks';
 	}
 
-	return $ctp_number[$mode];
+	if( ($status != 'published') && ($status != 'draft') && ($status != 'deprecated') )
+	{
+		$status = 'total';
+	}
+
+	// pre_dump( $cache_ctp_number[$post_id] );
+
+	return $cache_ctp_number[$post_id][$mode][$status];
 }
 
 
@@ -313,6 +322,9 @@ function comment_author_url_basedomain( $disp = true )
 
 /*
  * $Log$
+ * Revision 1.5  2006/06/22 21:58:34  fplanque
+ * enhanced comment moderation
+ *
  * Revision 1.4  2006/05/04 03:08:12  blueyed
  * todo
  *
