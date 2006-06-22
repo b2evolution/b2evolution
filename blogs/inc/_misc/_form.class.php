@@ -183,6 +183,7 @@ class Form extends Widget
 				$this->labelend = "</td>\n";
 				$this->labelempty = '<td class="label">&nbsp;</td>'."\n";
 				$this->inputstart = '<td class="input">';
+				$this->infostart = '<td class="info">';
 				$this->inputend = "</td>\n";
 				$this->fieldend = "</tr>\n\n";
 				$this->buttonsstart = '<tr class="buttons"><td colspan="2">';
@@ -199,6 +200,7 @@ class Form extends Widget
 				$this->labelend = "</div>\n";
 				$this->labelempty = '';
 				$this->inputstart = '<div class="input">';
+				$this->infostart = '<div class="info">';
 				$this->inputend = "</div>\n";
 				$this->fieldend = "</fieldset>\n\n";
 				$this->buttonsstart = '<fieldset><div class="input">';
@@ -215,6 +217,7 @@ class Form extends Widget
 				$this->labelend = "\n";
 				$this->labelempty = '';
 				$this->inputstart = '';
+				$this->infostart = '';
 				$this->inputend = "\n";
 				$this->fieldend = "</span>\n";
 				$this->buttonsstart = '';
@@ -231,6 +234,7 @@ class Form extends Widget
 				$this->labelend = "\n";
 				$this->labelempty = '';
 				$this->inputstart = '';
+				$this->infostart = '';
 				$this->inputend = "\n";
 				$this->fieldend = '</span>'.get_icon( 'pixel' )."\n";
 				$this->buttonsstart = '';
@@ -248,6 +252,7 @@ class Form extends Widget
 				$this->labelend = "\n";
 				$this->labelempty = '';
 				$this->inputstart = '';
+				$this->infostart = '';
 				$this->inputend = "\n";
 				$this->fieldend = "\n";
 				$this->buttonsstart = '';
@@ -1785,6 +1790,7 @@ class Form extends Widget
 		{
 			$format_info = 'htmlbody';
 		}
+
 		if( !isset($field_params['note_format']) )
 		{ // Default field_note for info:
 			$field_params['note_format'] = ' <small class="notes">%s</small>';
@@ -1805,7 +1811,7 @@ class Form extends Widget
 			$r .= $this->labelempty;
 		}
 
-		$r .= $this->inputstart;
+		$r .= $this->infostart;
 
 		// PAYLOAD:
 		$r .= format_to_output( $field_info, $format_info );
@@ -2564,6 +2570,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.16  2006/06/22 18:24:00  fplanque
+ * fixed info fields
+ *
  * Revision 1.15  2006/06/13 22:07:34  blueyed
  * Merged from 1.8 branch
  *
