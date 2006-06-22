@@ -59,6 +59,11 @@ $Results = new Results( '
 	SELECT plug_status, plug_ID, plug_priority, plug_code, plug_apply_rendering FROM T_plugins',
 	'plug_', '--A', 0 );
 
+$Results->Cache = & $admin_Plugins;
+
+/*
+ * STATUS TD:
+ */
 function plugin_results_td_status( $plug_status, $plug_ID )
 {
 	global $admin_Plugins;
@@ -83,12 +88,6 @@ function plugin_results_td_status( $plug_status, $plug_ID )
 		return get_icon('disabled', 'imgtag', array('title'=>T_('The plugin is disabled.')) );
 	}
 }
-
-$Results->Cache = & $admin_Plugins;
-
-/*
- * STATUS TD:
- */
 $Results->cols[0] = array(
 		'th' => /* TRANS: shortcut for enabled */ T_('En'),
 		'order' => 'plug_status',
@@ -348,6 +347,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.24  2006/06/22 19:53:06  blueyed
+ * minor
+ *
  * Revision 1.23  2006/06/20 23:24:14  blueyed
  * Added "order_callback" support for Results; made "name" and "desc" columns in Plugins list sortable
  *
