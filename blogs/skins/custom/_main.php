@@ -116,6 +116,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			echo ' ';
 			$Item->issue_time();
 			echo ', by ';
+			// Load Item's creator User:
 			$Item->author();
 			$Item->msgform_link( $Blog->get('msgformurl') );
 			echo ', ';

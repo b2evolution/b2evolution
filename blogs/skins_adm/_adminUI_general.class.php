@@ -944,7 +944,7 @@ class AdminUI_general
 			// TODO: add default settings for 'table', 'fieldset', etc...
 
 			default:
-				die( 'Unknown $name for AdminUI::get_menu_template(): '.var_export($name, true) /* PHP 4.2 ! */ );
+				debug_die( 'Unknown $name for AdminUI::get_menu_template(): '.var_export($name, true) /* PHP 4.2 ! */ );
 		}
 	}
 
@@ -1287,6 +1287,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.17  2006/06/22 18:37:48  fplanque
+ * fixes
+ *
  * Revision 1.16  2006/06/14 17:03:59  fplanque
  * A little better logout from admin... useful for bozos.
  *

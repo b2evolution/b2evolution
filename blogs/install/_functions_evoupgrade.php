@@ -761,6 +761,7 @@ function upgrade_b2evo_tables()
 	}
 
 	// TODO: convert time_difference! See http://dev.b2evolution.net/admin/b2browse.php?tab=posts&blog=7&p=87654&c=1&tb=1&pb=1
+	// TODO: mark all members of "Administrators" group as validated
 	// TODO: "If a user has permission to edit a blog, he should be able to put files in the media folder for that blog." - see http://forums.b2evolution.net/viewtopic.php?p=36417#36417
 
 
@@ -841,8 +842,8 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
- * Revision 1.147  2006/06/18 01:22:01  blueyed
- * Admin user and users of the admin group do not need to validate their email address.
+ * Revision 1.148  2006/06/22 18:37:47  fplanque
+ * fixes
  *
  * Revision 1.146  2006/05/30 21:53:06  blueyed
  * Replaced $EvoConfig->DB with $db_config

@@ -200,7 +200,7 @@ while( $Item = & $ItemList->get_item() )
 						</div>
 				</fieldset>
 			<?php
-			$Form->textarea( 'comment', '', 12, T_('Comment text'),
+			$Form->textarea( 'p', '', 12, T_('Comment text'),
 												T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)), 40, 'bComment' );
 
 			if(substr($comments_use_autobr,0,4) == 'opt-')
@@ -257,6 +257,9 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.15  2006/06/22 18:37:47  fplanque
+ * fixes
+ *
  * Revision 1.14  2006/06/19 20:07:22  fplanque
  * minor
  *

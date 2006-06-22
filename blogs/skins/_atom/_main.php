@@ -83,4 +83,9 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 	}
 	?>
 </feed>
-<?php $Hit->log(); // log the hit on this page ?>
+<?php
+	$Hit->log(); // log the hit on this page
+
+	// This is a self contained XML document, make sure there is no additional output:
+	exit();
+?>

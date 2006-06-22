@@ -233,16 +233,13 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 		}
 		else
 		{ // User is not logged in:
-
       // Note: we use funky field names to defeat the most basic guestbook spam bots
-
 			$Form->text( 'u', $comment_author, 40, T_('Name'), '', 100, 'bComment' );
-
 			$Form->text( 'i', $comment_author_email, 40, T_('Email'), T_('Your email address will <strong>not</strong> be displayed on this site.'), 100, 'bComment' );
-
 			$Form->text( 'o', $comment_author_url, 40, T_('Site/Url'), T_('Your URL will be displayed.'), 100, 'bComment' );
 		}
 
+		// Message field:
 		$Form->textarea( 'p', $comment_content, 10, T_('Comment text'),
 										T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)), 40, 'bComment' );
 
@@ -285,18 +282,14 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 		$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
 
 		$Form->begin_fieldset();
-			?>
-			<div class="input">
-			<?php
+			echo '<div class="input">';
+
 			$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit', 'value' => T_('Send comment'), 'tabindex' => 10 ) );
 			$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview', 'value' => T_('Preview'), 'tabindex' => 9 ) );
 
 			$Plugins->trigger_event( 'DisplayCommentFormButton', array( 'Form' => & $Form, 'Item' => & $Item ) );
-			?>
 
-			</div>
-
-			<?php
+			echo '</div>';
 		$Form->end_fieldset();
 		?>
 
@@ -311,6 +304,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.66  2006/06/22 18:37:47  fplanque
+ * fixes
+ *
  * Revision 1.65  2006/06/16 20:34:20  fplanque
  * basic spambot defeating
  *

@@ -243,6 +243,18 @@ class Hit
 	// fp> when does it run? I don't feel comfortable removing this.
 		// What if it's not installed?
 		//	return;
+/*
+Now what we have is:
+1) the blacklist is handled by the core
+2) the detection is handled by the core
+3) we would need to wait for an optional plugin to instanciate before we abort.
+
+Feels bloated.
+
+Unless I'm not seeing clearly here I'd say: get that referer spam "detection" (should be abortion) code out of the plugin and leave it where it was.
+
+If you want the abortion to be optional, you can put a checkbox into Settings>Antispam.
+*/
 
 			// This is most probably referer spam,
 			// In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
@@ -603,6 +615,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.20  2006/06/22 18:37:47  fplanque
+ * fixes
+ *
  * Revision 1.19  2006/06/01 18:36:10  fplanque
  * no message
  *

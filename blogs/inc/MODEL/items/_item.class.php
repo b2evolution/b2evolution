@@ -1704,6 +1704,9 @@ class Item extends DataObject
 
 		$atLeastOneRenderer = false;
 
+		$item_renderers = $this->get_renderers();
+		// pre_dump( $item_renderers );
+
 		foreach( $Plugins->get_list_by_events( array('RenderItem', 'RenderItemAsHtml', 'RenderItemAsXml') ) as $loop_RendererPlugin )
 		{ // Go through whole list of renders
 			// echo ' ',$loop_RendererPlugin->code;
@@ -1727,8 +1730,6 @@ class Item extends DataObject
 			echo '" id="renderer_';
 			$loop_RendererPlugin->code();
 			echo '"';
-
-			$item_renderers = $this->get_renderers();
 
 			switch( $loop_RendererPlugin->apply_rendering )
 			{
@@ -2711,6 +2712,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.63  2006/06/22 18:37:47  fplanque
+ * fixes
+ *
  * Revision 1.62  2006/06/19 20:59:37  fplanque
  * noone should die anonymously...
  *

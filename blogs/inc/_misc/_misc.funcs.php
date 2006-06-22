@@ -2209,7 +2209,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word
 		}
 		if( isset($popup_size) )
 		{
-			$popup_js .= 'win.setSize( '.$link_attribs['use_js_size'].' ); ';
+			$popup_js .= 'win.setSize( '.$popup_size.' ); ';
 		}
 		$popup_js .= 'win.showPopup(\''.$link_attribs['id'].'\'); return false;';
 
@@ -2952,6 +2952,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.66  2006/06/22 18:37:47  fplanque
+ * fixes
+ *
  * Revision 1.65  2006/06/19 21:06:55  blueyed
  * Moved ETag- and GZip-support into transport optimizer plugin.
  *

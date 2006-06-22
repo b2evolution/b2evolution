@@ -495,7 +495,7 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( $text == '#' ) $text = get_icon( 'edit' ).' '.T_('Edit');
+		if( $text == '#' ) $text = get_icon( 'edit' ).' '.T_('Edit...');
 		if( $title == '#' ) $title = T_('Edit this comment');
 
 		echo $before;
@@ -1160,6 +1160,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2006/06/22 18:37:47  fplanque
+ * fixes
+ *
  * Revision 1.35  2006/05/30 20:32:56  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
  *
