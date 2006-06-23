@@ -215,7 +215,7 @@ $AdminUI->add_menu_entries(
 
 			'files' => array(
 				'text' => T_('Files'),
-				'title' => T_('File Management'),
+				'title' => T_('File management'),
 				'href' => 'admin.php?ctrl=files',
 				'perm_eval' => 'global $Settings; return $Settings->get( \'fm_enabled\' ) && $current_User->check_perm( \'files\', \'view\' );'
 			),
@@ -225,7 +225,7 @@ $AdminUI->add_menu_entries(
 				'title'=>T_('User management'),
 				'perm_name'=>'users',
 				'perm_level'=>'view',
-				'text_noperm'=>T_('User Profile'),	// displayed if perm not granted
+				'text_noperm'=>T_('My Profile'),	// displayed if perm not granted
 				'href' => 'admin.php?ctrl=users',
 			),
 
@@ -248,14 +248,14 @@ $AdminUI->add_menu_entries(
 						'text' => T_('Files'),
 						'href' => 'admin.php?ctrl=fileset' ),
 					'filetypes' => array(
-						'text' => T_('File types'),
+						'text' => T_('File Types'),
 						'href' => 'admin.php?ctrl=filetypes' ),
 					'statuses' => array(
-						'text' => T_('Post statuses'),
+						'text' => T_('Post Statuses'),
 						'title' => T_('Post statuses management'),
 						'href' => 'admin.php?ctrl=itemstatuses'),
 					'types' => array(
-						'text' => T_('Post types'),
+						'text' => T_('Post Types'),
 						'title' => T_('Post types management'),
 						'href' => 'admin.php?ctrl=itemtypes'),
 					'plugins' => array(
@@ -294,6 +294,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.8  2006/06/23 19:41:20  fplanque
+ * no message
+ *
  * Revision 1.7  2006/06/13 21:49:14  blueyed
  * Merged from 1.8 branch
  *

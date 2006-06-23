@@ -299,6 +299,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.68  2006/06/23 19:41:20  fplanque
+ * no message
+ *
  * Revision 1.67  2006/06/22 21:58:34  fplanque
  * enhanced comment moderation
  *
@@ -307,9 +310,6 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
  *
  * Revision 1.65  2006/06/16 20:34:20  fplanque
  * basic spambot defeating
- *
- * Revision 1.64  2006/06/10 19:16:17  blueyed
- * DisplayTrackbackAddr event
  *
  * Revision 1.63  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.

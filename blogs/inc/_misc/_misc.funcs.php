@@ -1998,6 +1998,11 @@ function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
 
 	$NL = "\n";
 
+	if( is_windows() )
+	{	// fplanque: Windows XP, Apache 1.3, PHP 4.4, MS SMTP : will not accept "nice" addresses.
+		$to = preg_replace( '/^.*?<(.+?)>$/', '$1', $to );
+	}
+
 	if( !is_array( $headers ) )
 	{ // Make sure $headers is an array
 		$headers = array( $headers );
@@ -2952,6 +2957,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.68  2006/06/23 19:41:20  fplanque
+ * no message
+ *
  * Revision 1.67  2006/06/22 22:30:04  blueyed
  * htsrv url for sensible scripts (login, register and profile update)
  *
