@@ -1192,7 +1192,7 @@ class Form extends Widget
 			$r .= '<script type="text/javascript">
 								if( typeof bozo == "object" )
 								{	// If Bozo validator is active:
-									bozo.confirm_mess = "'.sprintf(T_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to loose your edits.\nAre you sure?' ), $this->title ).'";
+									bozo.confirm_mess = "'.sprintf(T_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' ), $this->title ).'";
 								}
 						</script>';
 		}
@@ -2570,6 +2570,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.17  2006/06/24 05:05:47  smpdawg
+ * Fixed typo
+ *
  * Revision 1.16  2006/06/22 18:24:00  fplanque
  * fixed info fields
  *
