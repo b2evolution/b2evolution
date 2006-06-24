@@ -50,9 +50,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	?>
 	<script type="text/javascript">
 		// Paths used by JS fucntions:
-		imgpath_expand = '<?php echo get_icon( 'expand', 'url' ); ?>';
-		imgpath_collapse = '<?php echo get_icon( 'collapse', 'url' ); ?>';
-		htsrv_url = '<?php echo $htsrv_url ?>';
+//JEM
+		var imgpath_expand = '<?php echo get_icon( 'expand', 'url' ); ?>';
+		var imgpath_collapse = '<?php echo get_icon( 'collapse', 'url' ); ?>';
+		var htsrv_url = '<?php echo $htsrv_url ?>';
 	</script>
 
 	<!-- script allowing to check and uncheck all boxes in forms -->
@@ -88,6 +89,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		?>
 		<script type="text/javascript">
 		<!--
+		  //JEM
+		  var allchecked = Array();
+		  var idprefix;
+
 			<?php
 			switch( $this->get_path(0) )
 			{
@@ -354,12 +359,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			function initcheckall( htmlid, init )
 			{
 				// initialize array
+				//JEM
 				allchecked = Array();
 				idprefix = typeof(htmlid) == 'undefined' ? 'checkallspan' : htmlid;
 
-				for( lform = 0; lform < document.forms.length; lform++ )
+				for( var lform = 0; lform < document.forms.length; lform++ )
 				{
-					for( lelem = 0; lelem < document.forms[lform].elements.length; lelem++ )
+					for( var lelem = 0; lelem < document.forms[lform].elements.length; lelem++ )
 					{
 						if( document.forms[lform].elements[lelem].id.indexOf( idprefix ) == 0 )
 						{

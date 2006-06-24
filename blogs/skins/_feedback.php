@@ -17,6 +17,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+//JEM
+$c = isset($c) ? $c : '';
+$tb = isset($tb) ? $tb : '';
+$pb = isset($pb) ? $pb : '';
+
 // --- //
 
 if( ! $c )
@@ -299,6 +304,11 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.69  2006/06/24 05:19:39  smpdawg
+ * Fixed various javascript warnings and errors.
+ * Spelling corrections.
+ * Fixed PHP warnings.
+ *
  * Revision 1.68  2006/06/23 19:41:20  fplanque
  * no message
  *

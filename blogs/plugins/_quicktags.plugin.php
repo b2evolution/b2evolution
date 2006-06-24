@@ -259,7 +259,8 @@ class quicktags_plugin extends Plugin
 
 		function b2evoToolbar() {
 			document.write('<div>');
-			for (i = 0; i < b2evoButtons.length; i++) {
+//JEM
+			for (var i = 0; i < b2evoButtons.length; i++) {
 				b2evoShowButton(b2evoButtons[i], i);
 			}
 			document.write('<input type="button" id="b2evo_close" class="quicktags" onclick="b2evoCloseAllTags();" title="<?php echo T_('Close all tags') ?>" value="X" />');
@@ -419,6 +420,11 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.17  2006/06/24 05:19:39  smpdawg
+ * Fixed various javascript warnings and errors.
+ * Spelling corrections.
+ * Fixed PHP warnings.
+ *
  * Revision 1.16  2006/06/16 21:30:57  fplanque
  * Started clean numbering of plugin versions (feel free do add dots...)
  *

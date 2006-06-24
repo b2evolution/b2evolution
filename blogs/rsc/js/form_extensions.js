@@ -246,7 +246,8 @@ function clear_form( object )
  */	
 function focus_on_first_input()
 {
-	if( first_form = document.forms[0] )
+//JEM
+	if( (first_form = document.forms[0] ) != false)
 	{	// There is a form in the document, so we get all inputs of the first form
 		all_inputs = first_form.getElementsByTagName( 'input' );
 

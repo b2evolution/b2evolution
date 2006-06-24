@@ -316,6 +316,8 @@ function CP_showYearNavigation() { this.isShowYearNavigation = (arguments.length
 function CP_setDisplayType(type) {
 	if (type!="date"&&type!="week-end"&&type!="month"&&type!="quarter"&&type!="year") { alert("Invalid display type! Must be one of: date,week-end,month,quarter,year"); return false; }
 	this.displayType=type;
+//JEM
+	return false;
 	}
 
 // How many years back to start by default for year display
