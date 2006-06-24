@@ -71,8 +71,9 @@ switch( $edited_Blog->get( 'access_type' ) )
 ?>
 <script type="text/javascript">
 	<!--
-	blog_baseurl = '<?php $edited_Blog->disp( 'baseurl', 'formvalue' ); ?>';
-	blog_urlappend = '<?php echo str_replace( "'", "\'", $blog_urlappend ) ?>';
+  //JEM JS fixes
+	var blog_baseurl = '<?php $edited_Blog->disp( 'baseurl', 'formvalue' ); ?>';
+	var blog_urlappend = '<?php echo str_replace( "'", "\'", $blog_urlappend ) ?>';
 
 	function update_urlpreview( base, append )
 	{
