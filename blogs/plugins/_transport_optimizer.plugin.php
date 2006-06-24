@@ -52,17 +52,17 @@ class transport_optimizer_plugin extends Plugin
 	function GetDefaultSettings()
 	{
 		return array(
-			'use_gzipcompression' => array(
-					'label' => T_('GZip compression'),
-					'type' => 'checkbox',
-					'defaultvalue' => '1',
-					'note' => T_('If enabled, PHP will buffer the output and compress it before sending it to the browser.'),
-				),
 			'use_etags' => array(
 					'label' => T_('ETag header'),
 					'type' => 'checkbox',
 					'defaultvalue' => '1',
 					'note' => T_('This will send an ETag header with every page, so we can say "Not Modified." if exactly the same page had been sent before.'),
+				),
+			'use_gzipcompression' => array(
+					'label' => T_('GZip compression'),
+					'type' => 'checkbox',
+					'defaultvalue' => '1',
+					'note' => T_('If enabled, the plugin will buffer the output and compress it before sending it to the browser. It is recommened to use the php.ini option zlib.output_compression or a webserver module instead.'),
 				),
 			'send_last_modified' => array(
 					'label' => T_('Last-Modified'),
@@ -158,6 +158,7 @@ class transport_optimizer_plugin extends Plugin
 
 		// GZIP encoding
 		if( $this->use_gzipcompression
+			&& ! headers_sent() // we need to send the header! As it seems, Apache2 will send all headers on flush(), though no content gets sent.. (PHP_BUG?)
 			&& isset($_SERVER['HTTP_ACCEPT_ENCODING'])
 			&& strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') )
 		{ // requested/accepted by browser:
@@ -175,6 +176,9 @@ class transport_optimizer_plugin extends Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.2  2006/06/24 00:03:47  blueyed
+ * Fixes
+ *
  * Revision 1.1  2006/06/19 21:06:55  blueyed
  * Moved ETag- and GZip-support into transport optimizer plugin.
  *
