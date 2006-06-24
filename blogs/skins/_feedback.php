@@ -80,8 +80,18 @@ if( $disp_trackback_url )
 { // We want to display the trackback URL:
 	?>
 	<h4><?php echo T_('Trackback address for this post:') ?></h4>
-	<code><?php $Item->trackback_url() ?></code>
+
 	<?php
+	/*
+	Trigger plugin event, which could display a captcha form, before generating a whitelisted URL:
+	*/
+	if( ! $Plugins->trigger_event_first_true( 'DisplayTrackbackAddr',
+			array('Item' => & $Item, 'template' => '<code>%url%</code>') ) )
+	{ // No plugin displayed a payload, so we just display the default:
+		?>
+		<code><?php $Item->trackback_url() ?></code>
+		<?php
+	}
 }
 
 
@@ -304,6 +314,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.70  2006/06/24 12:07:16  blueyed
+ * fixed merge error
+ *
  * Revision 1.69  2006/06/24 05:19:39  smpdawg
  * Fixed various javascript warnings and errors.
  * Spelling corrections.
@@ -320,6 +333,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
  *
  * Revision 1.65  2006/06/16 20:34:20  fplanque
  * basic spambot defeating
+ *
+ * Revision 1.64  2006/06/10 19:16:17  blueyed
+ * DisplayTrackbackAddr event
  *
  * Revision 1.63  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
