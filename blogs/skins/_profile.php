@@ -87,8 +87,11 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.30  2006/06/25 23:23:38  blueyed
+ * wording
+ *
  * Revision 1.29  2006/06/22 22:30:04  blueyed
- * htsrv url for sensible scripts (login, register and profile update)
+ * htsrv url for password related scripts (login, register and profile update)
  *
  * Revision 1.28  2006/04/11 21:22:26  fplanque
  * partial cleanup

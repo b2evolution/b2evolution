@@ -69,8 +69,11 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.5  2006/06/25 23:23:38  blueyed
+ * wording
+ *
  * Revision 1.4  2006/06/22 22:30:04  blueyed
- * htsrv url for sensible scripts (login, register and profile update)
+ * htsrv url for password related scripts (login, register and profile update)
  *
  * Revision 1.3  2006/04/27 21:49:55  blueyed
  * todo

@@ -350,8 +350,11 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.62  2006/06/25 23:23:38  blueyed
+ * wording
+ *
  * Revision 1.61  2006/06/22 22:30:04  blueyed
- * htsrv url for sensible scripts (login, register and profile update)
+ * htsrv url for password related scripts (login, register and profile update)
  *
  * Revision 1.60  2006/05/19 18:15:04  blueyed
  * Merged from v-1-8 branch

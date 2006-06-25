@@ -2957,11 +2957,14 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.69  2006/06/25 23:23:38  blueyed
+ * wording
+ *
  * Revision 1.68  2006/06/23 19:41:20  fplanque
  * no message
  *
  * Revision 1.67  2006/06/22 22:30:04  blueyed
- * htsrv url for sensible scripts (login, register and profile update)
+ * htsrv url for password related scripts (login, register and profile update)
  *
  * Revision 1.66  2006/06/22 18:37:47  fplanque
  * fixes

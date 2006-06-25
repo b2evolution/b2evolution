@@ -1043,8 +1043,11 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2006/06/25 23:23:38  blueyed
+ * wording
+ *
  * Revision 1.21  2006/06/22 22:30:04  blueyed
- * htsrv url for sensible scripts (login, register and profile update)
+ * htsrv url for password related scripts (login, register and profile update)
  *
  * Revision 1.20  2006/06/22 21:58:34  fplanque
  * enhanced comment moderation

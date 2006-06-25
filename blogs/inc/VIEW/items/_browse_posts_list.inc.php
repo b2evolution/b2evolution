@@ -210,8 +210,11 @@ if( $MainList->get_total_num_posts() )
 <?php
 /*
  * $Log$
+ * Revision 1.11  2006/06/25 23:23:38  blueyed
+ * wording
+ *
  * Revision 1.10  2006/06/22 22:30:04  blueyed
- * htsrv url for sensible scripts (login, register and profile update)
+ * htsrv url for password related scripts (login, register and profile update)
  *
  * Revision 1.9  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.

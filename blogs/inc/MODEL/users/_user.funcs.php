@@ -485,8 +485,11 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.9  2006/06/25 23:23:38  blueyed
+ * wording
+ *
  * Revision 1.8  2006/06/22 22:30:04  blueyed
- * htsrv url for sensible scripts (login, register and profile update)
+ * htsrv url for password related scripts (login, register and profile update)
  *
  * Revision 1.7  2006/04/20 22:13:48  blueyed
  * Display "Register..." link in login form also if user is logged in already.

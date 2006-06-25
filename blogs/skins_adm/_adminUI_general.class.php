@@ -1287,8 +1287,11 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.20  2006/06/25 23:23:38  blueyed
+ * wording
+ *
  * Revision 1.19  2006/06/22 22:30:05  blueyed
- * htsrv url for sensible scripts (login, register and profile update)
+ * htsrv url for password related scripts (login, register and profile update)
  *
  * Revision 1.18  2006/06/22 19:23:01  blueyed
  * Text for fotter, if no LIMIT
