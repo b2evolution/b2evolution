@@ -1082,6 +1082,10 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		// $Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($GLOBALS[$var], true).']!', 'params' );
 	}
 
+	if( isset($io_charset) && $io_charset != $evo_charset )
+	{ // the INPUT/OUTPUT charset differs from the internal one (this also means mb_convert_encoding is available)
+		mb_convert_variables( $evo_charset, $io_charset, $GLOBALS[$var] );
+	}
 
 	/*
 	 * STEP 2: make sure the data fits the expected type
@@ -2957,6 +2961,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.71  2006/06/25 23:42:47  blueyed
+ * merge error(?)
+ *
  * Revision 1.70  2006/06/25 23:34:15  blueyed
  * wording pt2
  *
