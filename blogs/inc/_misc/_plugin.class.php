@@ -406,7 +406,7 @@ class Plugin
 	 *               This way you can make sure that the hooks you need are implemented
 	 *               in the core.
 	 *
-	 * @see test_plugin
+	 * @see test_plugin::GetDependencies()
 	 * @return array
 	 */
 	function GetDependencies()
@@ -2323,6 +2323,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.65  2006/06/25 23:43:34  blueyed
+ * doc
+ *
  * Revision 1.64  2006/06/19 20:59:14  blueyed
  * minor
  *
