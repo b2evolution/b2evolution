@@ -38,7 +38,7 @@ require dirname(__FILE__).'/_header.php';
 Log::display( '', '', T_('A link to change your password will be sent to you by email.'), 'note' );
 
 
-$Form = & new Form( $htsrv_url_sensible.'login.php', '', 'post', 'fieldset' );
+$Form = & new Form( $htsrv_url_sensitive.'login.php', '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
@@ -61,6 +61,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.7  2006/06/25 23:34:15  blueyed
+ * wording pt2
+ *
  * Revision 1.6  2006/06/25 23:23:38  blueyed
  * wording
  *

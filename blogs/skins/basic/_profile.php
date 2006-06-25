@@ -26,7 +26,7 @@
 ?>
 
 	<!-- form to add a comment -->
-	<form action="<?php echo $htsrv_url_sensible ?>profile_update.php" method="post">
+	<form action="<?php echo $htsrv_url_sensitive ?>profile_update.php" method="post">
 
 	<input type="hidden" name="checkuser_id" value="<?php $current_User->ID() ?>" />
 

@@ -389,7 +389,7 @@ $htsrv_url = $baseurl.$htsrv_subdir;     // You should not need to change this
  *
  * @global string
  */
-$htsrv_url_sensible = $htsrv_url;
+$htsrv_url_sensitive = $htsrv_url;
 
 /**
  * Location of the XML SeRVices folder.

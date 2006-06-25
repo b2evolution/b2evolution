@@ -35,8 +35,8 @@ $page_icon = 'icon_login.gif';
 require dirname(__FILE__).'/_header.php';
 
 
-// The login form has to point back to itself, in case $htsrv_url_sensible is a "https" link and $redirect_to is not!
-$Form = & new Form( $htsrv_url_sensible.'login.php', '', 'post', 'fieldset' );
+// The login form has to point back to itself, in case $htsrv_url_sensitive is a "https" link and $redirect_to is not!
+$Form = & new Form( $htsrv_url_sensitive.'login.php', '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
@@ -95,7 +95,7 @@ $Form->end_form();
 <div class="login_actions" style="text-align:right">
 	<?php user_register_link( '', ' &middot; ', '', '#', true /*disp_when_logged_in*/ )?>
 
-	<a href="<?php echo $htsrv_url_sensible.'login.php?action=lostpassword'
+	<a href="<?php echo $htsrv_url_sensitive.'login.php?action=lostpassword'
 		.'&amp;redirect_to='.rawurlencode( $redirect_to );
 		if( !empty($login) )
 		{
@@ -118,6 +118,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.10  2006/06/25 23:34:15  blueyed
+ * wording pt2
+ *
  * Revision 1.9  2006/06/25 23:23:38  blueyed
  * wording
  *

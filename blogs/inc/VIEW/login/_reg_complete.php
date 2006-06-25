@@ -35,7 +35,7 @@ $page_icon = 'icon_register.gif';
 require dirname(__FILE__).'/_header.php';
 
 
-$Form =& new Form( $htsrv_url_sensible.'login.php', 'login', 'post', 'fieldset' );
+$Form =& new Form( $htsrv_url_sensitive.'login.php', 'login', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
@@ -57,6 +57,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.5  2006/06/25 23:34:15  blueyed
+ * wording pt2
+ *
  * Revision 1.4  2006/06/25 23:23:38  blueyed
  * wording
  *

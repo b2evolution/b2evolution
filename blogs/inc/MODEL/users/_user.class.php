@@ -796,7 +796,7 @@ class User extends DataObject
 	 */
 	function send_validate_email()
 	{
-		global $app_name, $htsrv_url_sensible, $Session;
+		global $app_name, $htsrv_url_sensitive, $Session;
 
 		$request_id = generate_random_key(22);
 
@@ -805,7 +805,7 @@ class User extends DataObject
 			.T_('Login:')." $this->login\n"
 			.sprintf( /* TRANS: %s gets replaced by $app_name (normally "b2evolution") */ T_('Link to validate your %s account:'), $app_name )
 			."\n"
-			.$htsrv_url_sensible.'login.php?action=validatemail'
+			.$htsrv_url_sensitive.'login.php?action=validatemail'
 				.'&reqID='.$request_id
 				.'&sessID='.$Session->ID  // used to detect cookie problems
 			."\n\n"
@@ -1043,6 +1043,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2006/06/25 23:34:15  blueyed
+ * wording pt2
+ *
  * Revision 1.22  2006/06/25 23:23:38  blueyed
  * wording
  *

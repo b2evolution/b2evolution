@@ -49,7 +49,7 @@ $redirect_to = param( 'redirect_to', 'string', '' );
 /**
  * @var Form form to update the profile
  */
-$ProfileForm = & new Form( $htsrv_url_sensible.'profile_update.php', 'ProfileForm' );
+$ProfileForm = & new Form( $htsrv_url_sensitive.'profile_update.php', 'ProfileForm' );
 
 $ProfileForm->begin_form( 'bComment' );
 $ProfileForm->hidden( 'checkuser_id', $current_User->ID );
@@ -87,6 +87,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.31  2006/06/25 23:34:15  blueyed
+ * wording pt2
+ *
  * Revision 1.30  2006/06/25 23:23:38  blueyed
  * wording
  *

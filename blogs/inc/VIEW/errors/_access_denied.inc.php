@@ -20,7 +20,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<p><?php echo T_('Sorry, you have no permission to access this section.') ?></p>
 	</div>
 	<p style="text-align:center;"><?php
-		echo '<a href="'.$htsrv_url_sensible.'login.php?action=logout&amp;redirect_to='.$ReqHost.$ReqURI.'">'.T_('Logout').'</a>
+		echo '<a href="'.$htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.$ReqHost.$ReqURI.'">'.T_('Logout').'</a>
 					&bull;
 					<a href="'.$baseurl.'">'.T_('Exit to blogs').'</a>';
 	?></p>

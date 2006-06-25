@@ -2583,7 +2583,7 @@ function header_nocache()
  */
 function header_redirect( $redirect_to = NULL )
 {
-	global $Hit, $baseurl, $Blog, $htsrv_url_sensible, $Request;
+	global $Hit, $baseurl, $Blog, $htsrv_url_sensitive, $Request;
 
 	if( empty($redirect_to) )
 	{
@@ -2608,7 +2608,7 @@ function header_redirect( $redirect_to = NULL )
 
 	$redirect_to = str_replace('&amp;', '&', $redirect_to);
 
-	if( strpos($redirect_to, $htsrv_url_sensible) === 0 /* we're going somewhere on $htsrv_url_sensible */
+	if( strpos($redirect_to, $htsrv_url_sensitive) === 0 /* we're going somewhere on $htsrv_url_sensible */
 	 || strpos($redirect_to, $baseurl) === 0   /* we're going somewhere on $baseurl */ )
 	{
 		// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
@@ -2957,6 +2957,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.70  2006/06/25 23:34:15  blueyed
+ * wording pt2
+ *
  * Revision 1.69  2006/06/25 23:23:38  blueyed
  * wording
  *

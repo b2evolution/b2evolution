@@ -115,7 +115,7 @@ switch( $action )
 				.T_('Login:')." $login\n"
 				.T_('Link to change your password:')
 				."\n"
-				.$htsrv_url_sensible.'login.php?action=changepwd'
+				.$htsrv_url_sensitive.'login.php?action=changepwd'
 					.'&login='.rawurlencode( $ForgetfulUser->login )
 					.'&reqID='.$request_id
 					.'&sessID='.$Session->ID  // used to detect cookie problems
@@ -168,7 +168,7 @@ switch( $action )
 			$Messages->add( T_('Invalid password change request!'), 'error' );
 			$Messages->add(
 				sprintf( T_('You can <a href="%s">send yourself a new link</a>.'),
-				$htsrv_url_sensible.'login.php?action=retrievepassword&amp;login='.rawurlencode($login) ), 'note' );
+				$htsrv_url_sensitive.'login.php?action=retrievepassword&amp;login='.rawurlencode($login) ), 'note' );
 
 			$login_required = true; // Do not display "Without login.." link on the form
 			break;
@@ -281,7 +281,7 @@ switch( $action )
 			$Messages->add( T_('Invalid email address validation request!'), 'error' );
 			$Messages->add(
 				sprintf( T_('You can <a href="%s">send yourself a new link</a>.'),
-				$htsrv_url_sensible.'login.php?action=req_validatemail' ), 'note' );
+				$htsrv_url_sensitive.'login.php?action=req_validatemail' ), 'note' );
 
 			$login_required = true; // Do not display "Without login.." link on the form
 			break;
@@ -350,6 +350,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.63  2006/06/25 23:34:15  blueyed
+ * wording pt2
+ *
  * Revision 1.62  2006/06/25 23:23:38  blueyed
  * wording
  *
