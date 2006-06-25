@@ -40,7 +40,6 @@ require_once $misc_inc_path.'_form.funcs.php';
 require_once $model_path.'users/_user.funcs.php';
 require_once $misc_inc_path.'_timer.class.php';
 require_once $misc_inc_path.'_plugins.class.php';
-require_once $misc_inc_path.'_results.class.php'; // needed to install default plugins
 require_once dirname(__FILE__).'/_functions_install.php';
 require_once dirname(__FILE__).'/_functions_create.php';
 
@@ -602,6 +601,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.106  2006/06/25 23:41:58  blueyed
+ * The archive plugin requires Results itself now.
+ *
  * Revision 1.105  2006/06/19 20:59:38  fplanque
  * noone should die anonymously...
  *
