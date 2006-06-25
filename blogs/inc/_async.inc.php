@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the main dispatcher for the admin interface.
+ * This is ...
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -58,6 +58,9 @@ if( !empty($set_target) )
 
 /*
  * $Log$
+ * Revision 1.4  2006/06/25 20:04:06  blueyed
+ * doc/todo
+ *
  * Revision 1.3  2006/06/25 17:42:46  fplanque
  * better use of Results class (mainly for filtering)
  *
