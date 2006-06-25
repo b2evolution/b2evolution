@@ -334,10 +334,10 @@ class Request
 	 * @param mixed Default to use.
 	 * @return string
 	 */
-	function param_action( $default = '' )
+	function param_action( $default = '', $memorize = false )
 	{
 		#$this->param( 'action', 'string', NULL, true ); // blueyed>> is there a reason to remember? (taken from files.php)
-		$action = $this->param( 'action', 'string', NULL );
+		$action = $this->param( 'action', 'string', NULL, $memorize );
 
 		if( is_null($action) )
 		{ // Check $actionArray
@@ -1006,6 +1006,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.16  2006/06/25 21:09:37  fplanque
+ * minor
+ *
  * Revision 1.15  2006/06/19 20:04:48  fplanque
  * fixed param()
  *

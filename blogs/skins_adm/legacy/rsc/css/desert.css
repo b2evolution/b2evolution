@@ -181,11 +181,17 @@ div.PostActionsArea input {
 	background-color: #e1ddce;
 	border: 1px solid #ccc5aa;
 }
+input.filter {
+	background-image: url(../img/desert-button.gif);
+	background-color: #e1ddce;
+	border: 1px solid #ccc5aa;
+}
 div.edit_actions input,
 div.PostActionsArea input {
 	margin: 1px 1px;
 }
 input.search:hover,
+input.filter:hover,
 input.ActionButton:hover,
 input.DeleteButton:hover,
 input.CancelButton:hover,
@@ -242,6 +248,15 @@ table.filelist {
 table.grouped {
 	border: 1px solid #9e9286;
 }
+
+/* Table Filters: */
+table.grouped tr.filters td {
+	border-bottom: 1px solid #9e9286;
+	border-left: 1px solid #9e9286;
+	border-right: 1px solid #9e9286;
+	background-color: #e3dfd0;
+}
+
 table.grouped tr,
 table.filelist tr {
 	background-color: #f5f3ef;

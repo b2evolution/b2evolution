@@ -42,7 +42,6 @@ var bozo = {
 	'nb_changes' : 0, 			// Total changes number
 
 	// If no translated message has been provided, use this default:
-	//JEM Spelling Fixed
 	'confirm_mess' : bozo_confirm_mess ? bozo_confirm_mess : 'You have modified this form but you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?',
 
 	/**

@@ -15,6 +15,29 @@ table.grouped {
 	/* clear:both; */
 }
 
+/* Table Filters: */
+table.grouped tr.filters td {
+	border-bottom: 1px solid #bbb;
+	border-left: 1px solid #bbb;
+	border-right: 1px solid #bbb;
+	background-color: #ddd;
+	font-size: 84%;
+}
+a.filters_title {
+	text-decoration:none;
+}
+a.filters_title:hover {
+	text-decoration:underline;
+}
+tr.filters div {
+	margin-left: 15px;
+}
+input.filter {
+	padding: 0;
+	margin: 0 0 1px .5ex;
+	float:right;
+}
+
 /* Table rows: */
 table.grouped tr {
 	background-color: #eee;

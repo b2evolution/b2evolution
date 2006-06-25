@@ -287,6 +287,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.15  2006/06/25 21:13:17  fplanque
+ * minor
+ *
  * Revision 1.14  2006/06/13 21:49:16  blueyed
  * Merged from 1.8 branch
  *
@@ -369,50 +372,5 @@ $this->disp_payload_end();
  *
  * Revision 1.68  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
- *
- * Revision 1.67  2005/09/29 15:07:29  fplanque
- * spelling
- *
- * Revision 1.66  2005/09/06 17:13:53  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.65  2005/08/22 18:42:25  fplanque
- * minor
- *
- * Revision 1.64  2005/08/11 19:41:10  fplanque
- * no message
- *
- * Revision 1.63  2005/08/10 21:14:34  blueyed
- * Enhanced $demo_mode (user editing); layout fixes; some function names normalized
- *
- * Revision 1.62  2005/07/12 17:10:55  blueyed
- * replaced Form::text() with Form::text_input(), Form::password() with Form::password_input()
- *
- * Revision 1.61  2005/07/11 22:18:07  blueyed
- * Added info about password min length, fixed display of readonly profiles and password note.
- *
- * Revision 1.60  2005/06/20 17:40:13  fplanque
- * minor
- *
- * Revision 1.59  2005/06/10 18:25:42  fplanque
- * refactoring
- *
- * Revision 1.58  2005/06/03 20:14:38  fplanque
- * started input validation framework
- *
- * Revision 1.57  2005/05/24 18:46:26  fplanque
- * implemented blog email subscriptions (part 1)
- *
- * Revision 1.56  2005/04/06 13:33:28  fplanque
- * minor changes
- *
- * Revision 1.55  2005/03/22 16:36:00  fplanque
- * refactoring, standardization
- * fixed group creation bug
- *
- * Revision 1.54  2005/03/21 18:57:22  fplanque
- * user management refactoring (towards new evocore coding guidelines)
- * WARNING: some pre-existing bugs have not been fixed here
- *
  */
 ?>

@@ -2092,8 +2092,28 @@ class Results extends Widget
 }
 
 
+// _________________ Helper callback functions __________________
+
+function conditional( $condition, $on_true, $on_false = '' )
+{
+	if( $condition )
+	{
+		return $on_true;
+	}
+	else
+	{
+		return $on_false;
+	}
+}
+
+
+
+
 /*
  * $Log$
+ * Revision 1.16  2006/06/25 21:13:17  fplanque
+ * minor
+ *
  * Revision 1.15  2006/06/20 23:24:14  blueyed
  * Added "order_callback" support for Results; made "name" and "desc" columns in Plugins list sortable
  *

@@ -222,6 +222,15 @@ div.edit_actions input.DeleteButton:hover {
 table.grouped {
 	border: 1px solid #9e9286;
 }
+
+/* Table Filters: */
+table.grouped tr.filters td {
+	border-bottom: 1px solid #9e9286;
+	border-left: 1px solid #9e9286;
+	border-right: 1px solid #9e9286;
+	background-color: #e3dfd0;
+}
+
 table.grouped tr {
 	background-color: #f5f3ef;
 }

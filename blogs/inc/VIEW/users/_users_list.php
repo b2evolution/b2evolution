@@ -146,20 +146,6 @@ $Results->grp_cols[] = array(
 /*
  * Data columns:
  */
-
-function conditional( $condition, $on_true, $on_false = '' )
-{
-	if( $condition )
-	{
-		return $on_true;
-	}
-	else
-	{
-		return $on_false;
-	}
-}
-
-
 $Results->cols[] = array(
 						'th' => T_('ID'),
 						'th_class' => 'shrinkwrap',
@@ -251,6 +237,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2006/06/25 21:13:17  fplanque
+ * minor
+ *
  * Revision 1.7  2006/06/25 17:42:47  fplanque
  * better use of Results class (mainly for filtering)
  *
