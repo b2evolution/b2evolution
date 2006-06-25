@@ -49,49 +49,68 @@ $usedgroups = $DB->get_col( 'SELECT grp_ID
 															 FROM T_groups INNER JOIN T_users ON user_grp_ID = grp_ID
 															GROUP BY grp_ID');
 
-// get the userlist
-if( !empty( $filteron ) )
-{
-	$filtered = true;
-	$afilter = split(' ', $filteron);
-	$swhere = '';
-	foreach ($afilter as $sfilter)
-	{
-		$swhere .= 'concat( user_login, \' \', user_firstname, \' \', user_lastname, \' \', user_nickname, \' \', user_email) like "%' . $DB->escape($sfilter) . '%" and ';
-	}
-	$sql = "SELECT T_users.*, grp_ID, grp_name
-						FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
-					 WHERE $swhere 1
-					 ORDER BY grp_name, *";
-}
-else
-{
-	$filteron = '';
-	$filtered = false;
-	$sql = "SELECT T_users.*, grp_ID, grp_name
-						FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
-					 ORDER BY grp_name, *";
-}
+/*
+ * Query user list:
+ */
+$keywords = $Request->param( 'keywords', 'string', '', true );
 
-function conditional( $condition, $on_true, $on_false = '' )
+$where_clause = '';
+
+if( !empty( $keywords ) )
 {
-	if( $condition )
+	$kw_array = split( ' ', $keywords );
+	foreach( $kw_array as $kw )
 	{
-		return $on_true;
-	}
-	else
-	{
-		return $on_false;
+		$where_clause .= 'CONCAT( user_login, \' \', user_firstname, \' \', user_lastname, \' \', user_nickname, \' \', user_email) LIKE "%'.$DB->escape($kw).'%" AND ';
 	}
 }
 
+$sql = "SELECT T_users.*, grp_ID, grp_name
+					FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
+				 WHERE $where_clause 1
+				 ORDER BY grp_name, *";
 
-$Results = & new Results( $sql, 'cont_', '-A' );
+
+$Results = & new Results( $sql, 'user_', '-A' );
 
 $Results->title = T_('Groups & Users');
 
+/*
+ * Table icons:
+ */
+if( $current_User->check_perm( 'users', 'edit', false ) )
+{ // create new user link
+	$Results->global_icon( T_('Add a user...'), 'new', '?ctrl=users&amp;action=new_user', T_('Add user'), 3, 4  );
+	$Results->global_icon( T_('Add a group...'), 'new', '?ctrl=users&amp;action=new_group', T_('Add group'), 3, 4  );
+}
+
+
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_userlist( & $Form )
+{
+	global $Request;
+
+	$Form->text( 'keywords', $Request->get('keywords'), 20, T_('Keywords'), T_('Separate with space'), 50 );
+}
+$Results->filter_area = array(
+	'callback' => 'filter_userlist',
+	'url_ignore' => 'results_user_page,keywords',
+	'presets' => array(
+		'all' => array( T_('All users'), '?ctrl=users' ),
+		)
+	);
+
+
+/*
+ * Grouping params:
+ */
 $Results->group_by = 'grp_ID';
 $Results->ID_col = 'user_ID';
+
 
 /*
  * Group columns:
@@ -127,6 +146,20 @@ $Results->grp_cols[] = array(
 /*
  * Data columns:
  */
+
+function conditional( $condition, $on_true, $on_false = '' )
+{
+	if( $condition )
+	{
+		return $on_true;
+	}
+	else
+	{
+		return $on_false;
+	}
+}
+
+
 $Results->cols[] = array(
 						'th' => T_('ID'),
 						'th_class' => 'shrinkwrap',
@@ -180,6 +213,7 @@ if( ! $current_User->check_perm( 'users', 'edit', false ) )
 						'th' => T_('Level'),
 						'td_class' => 'right',
 						'order' => 'user_level',
+						'default_dir' => 'D',
 						'td' => '$user_level$',
 					);
 }
@@ -189,6 +223,7 @@ else
 						'th' => T_('Level'),
 						'td_class' => 'right',
 						'order' => 'user_level',
+						'default_dir' => 'D',
 						'td' => '¤conditional( (#user_level# > 0), \''
 											.action_icon( TS_('Decrease user level'), 'decrease',
 												'%regenerate_url( \'action\', \'action=promote&amp;prom=down&amp;user_ID=$user_ID$\' )%' ).'\' )¤'
@@ -210,29 +245,15 @@ else
 }
 
 
-if( $current_User->check_perm( 'users', 'edit', false ) )
-{ // create new user link
-	$Results->global_icon( T_('Add a user...'), 'new', '?ctrl=users&amp;action=new_user', T_('Add user'), 3, 4  );
-	$Results->global_icon( T_('Add a group...'), 'new', '?ctrl=users&amp;action=new_group', T_('Add group'), 3, 4  );
-}
-
-// Display filter/search block
-// TODO: should use Results callback
-echo '<div class="center">';
-$Form = & new Form( NULL, 'filter', 'get', '' );
-$Form->begin_form('fform');
-$Form->hidden_ctrl();
-$Form->text( 'filteron', $filteron, 30, '', '', 80 );
-$Form->end_form( array(
-		array( 'type' => 'submit', 'name' => 'filter[on]', 'value' => T_('Filter'), 'class' => 'SaveButton' ),
-		array( 'type' => 'submit', 'name' => 'filter[off]', 'value' => T_('Clear'), 'class' => 'SaveButton' ) ) );
-echo '</div>';
-
 // Display result :
 $Results->display();
 
+
 /*
  * $Log$
+ * Revision 1.7  2006/06/25 17:42:47  fplanque
+ * better use of Results class (mainly for filtering)
+ *
  * Revision 1.6  2006/06/13 21:49:16  blueyed
  * Merged from 1.8 branch
  *

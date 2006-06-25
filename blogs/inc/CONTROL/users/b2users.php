@@ -48,15 +48,6 @@ $AdminUI->set_path( 'users' );
 
 $Request->param_action( 'list' );
 
-param( 'filteron', 'string', '', true );
-param( 'filter', 'array', array() );
-
-if( isset($filter['off']) )
-{
-	unset( $filteron );
-	forget_param( 'filteron' );
-}
-
 param( 'user_ID', 'integer', NULL );	// Note: should NOT be memorized (would kill navigation/sorting) use memorize_param() if needed
 param( 'grp_ID', 'integer', NULL );		// Note: should NOT be memorized:    -- " --
 
@@ -689,6 +680,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2006/06/25 17:42:46  fplanque
+ * better use of Results class (mainly for filtering)
+ *
  * Revision 1.23  2006/06/19 20:59:37  fplanque
  * noone should die anonymously...
  *

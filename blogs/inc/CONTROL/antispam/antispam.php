@@ -347,144 +347,24 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 	$Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveButton' ) ) );
 	echo '</div>';
 }
-?>
 
 
-<div class="panelblock">
-	<h2><?php echo T_('Banned domains blacklist') ?></h2>
-	<p class="center"><?php echo T_('Any URL containing one of the following keywords will be banned from posts, comments and logs.');
-	if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-	{
-		echo '<br />'.T_( 'If a keyword restricts legitimate domains, click on the green tick to stop banning with this keyword.');
-	}
-	?></p>
-
-	<?php
-	// Build sql string with filter
-	if( !empty( $filteron ) )
-	{
-		$filtered = true;
-		$afilter = split(' ', $filteron);
-		$swhere = '';
-		foreach ($afilter as $sfilter)
-		{
-
-			$swhere .= 'aspm_string like "%' . $DB->escape($sfilter) . '%" and ';
-		}
-		$sql = 'SELECT aspm_ID, aspm_string, aspm_source
-															FROM T_antispam
-															WHERE ' . $swhere . ' 1';
-	}
-	else
-	{
-		$filteron = '';
-		$filtered = false;
-		$sql = 'SELECT aspm_ID, aspm_string, aspm_source
-															FROM T_antispam';
-	}
-
-	// Create result set:
-	$Results = & new Results( $sql );
-
-	$Results->title = T_('Banned domains blacklist');
-
-	$Results->cols[] = array(
-							'th' => T_('Keyword'),
-							'order' => 'aspm_string',
-							'td' => '%htmlspecialchars(#aspm_string#)%',
-						);
-
-	// Set columns:
-	function antispam_source2( & $row )
-	{
-		static $aspm_sources = NULL;
-
-		if( $aspm_sources === NULL )
-		{
-			/**
-			 * @var the antispam sources
-			 * @static
-			 */
-			$aspm_sources = array (
-				'local' => T_('Local'),
-				'reported' => T_('Reported'),
-				'central' => T_('Central'),
-			);
-		}
-
-		return $aspm_sources[$row->aspm_source];
-	}
-	$Results->cols[] = array(
-							'th' => T_('Source'),
-							'order' => 'aspm_source',
-							'td' => '%antispam_source2({row})%',
-						);
-
-	// Check if we need to display more:
-	if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-	{ // User can edit, spamlist: add controls to output columns:
-
-		// Add this before results:
-		?>
-
-		<p class="center">
-			[<a href="?ctrl=antispam&amp;action=poll"><?php echo T_('Request abuse update from centralized blacklist!') ?></a>]
-			[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
-		</p>
-
-		<?php
-
-		// Add CHECK to 1st column:
-		$Results->cols[0]['td'] = action_icon( TS_('Allow keyword back (Remove it from the blacklist)'), 'allowback',
-																 '?ctrl=antispam&amp;action=remove&amp;hit_ID=$aspm_ID$' )
-																 .$Results->cols[0]['td'];
-
-		// Add a column for actions:
-		function antispam_actions( & $row )
-		{
-			$output = '';
-
-			if( $row->aspm_source == 'local' )
-			{
-				$output .= '[<a href="?ctrl=antispam&amp;action=report&amp;keyword='.
-										rawurlencode( $row->aspm_string ).'" title="'.
-										T_('Report abuse to centralized ban blacklist!').'">'.
-										T_('Report').'</a>]';
-			}
-
-			return $output.'[<a href="?ctrl=antispam&amp;action=ban&amp;keyword='.
-										rawurlencode( $row->aspm_string ).'" title="'.
-										T_('Check hit-logs and comments for this keyword!').'">'.
-										T_('Re-check').'</a>]';
-		}
-		$Results->cols[] = array(
-								'th' => T_('Actions'),
-								'td' => '%antispam_actions({row})%',
-							);
-	}
-
-	// Display filter/search block
-	// TODO: should get handled by Results class
-	echo '<div class="center">';
-	$Form = & new Form( NULL, 'filter', 'post', 'none' ); // use POST or you'll generate a GET URL including a spam keyword!!
-	$Form->begin_form('fform');
-	$Form->hidden_ctrl();
-	$Form->text( 'filteron', $filteron, 30, '', '', 80 );
-	$Form->end_form( array(
-			array( 'type' => 'submit', 'name' => 'filter[on]', 'value' => T_('Filter'), 'class' => 'SaveButton' ),
-			array( 'type' => 'submit', 'name' => 'filter[off]', 'value' => T_('Clear'), 'class' => 'SaveButton' ) ) );
-	echo '</div>';
-
-	// Display results:
-	$Results->display();
-	?>
-</div>
-
-<?php
+echo '<div class="panelblock">';
+// Display blacklist:
+$AdminUI->disp_view( 'antispam/_blacklist.inc.php' );
+echo '</div>';
 
 // End payload block:
 $AdminUI->disp_payload_end();
 
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
+
+
+/*
+ * $Log$
+ * Revision 1.5  2006/06/25 17:42:46  fplanque
+ * better use of Results class (mainly for filtering)
+ *
+ */
 ?>

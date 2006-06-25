@@ -42,7 +42,9 @@ if( !empty($set_target) )
 {
 	switch( $set_target )
 	{
+		case 'antispam_filters':
 		case 'crontab_filters':
+		case 'user_filters':
 			// We have a valid value:
 			$Session->set( $set_target, $set_status );
 			break;
@@ -56,6 +58,9 @@ if( !empty($set_target) )
 
 /*
  * $Log$
+ * Revision 1.3  2006/06/25 17:42:46  fplanque
+ * better use of Results class (mainly for filtering)
+ *
  * Revision 1.2  2006/06/13 21:52:44  blueyed
  * Added files from 1.8 branch
  *
