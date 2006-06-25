@@ -54,16 +54,16 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-param( 'tab', 'string', 'general' );
+param( 'tab', 'string', 'general', true );
 $AdminUI->set_path( 'blogs' );
 
-param( 'action', 'string', '' );
+$Request->param_action( '', true );
 param( 'blogtemplate', 'integer', -1 );
 
 
-if( $action == 'edit' || $action == 'update' || $action == 'delete' || $action == 'GenStatic' )
+if( $action == 'edit' || $action == 'filter1' || $action == 'filter2' || $action == 'update' || $action == 'delete' || $action == 'GenStatic' )
 { // we need the blog param
-	param( 'blog', 'integer', true );
+	param( 'blog', 'integer', true, true );
 	$edited_Blog = & $BlogCache->get_by_ID( $blog );
 
 	$Blog = & $edited_Blog; // used for "Exit to blogs.." link
@@ -214,6 +214,8 @@ switch( $action )
 
 	case 'update':
 	case 'edit':
+	case 'filter1':
+	case 'filter2':
 		$AdminUI->append_path_level( $tab );
 		$AdminUI->append_path_level( 'blog', array( 'text' => '&laquo;'.$edited_Blog->dget('shortname').'&raquo;' ) );
 
@@ -430,6 +432,8 @@ switch($action)
 
 
 	case 'edit':
+	case 'filter1':
+	case 'filter2':
 		// ---------- Edit blog form ----------
 		if( $action == 'edit' )
 		{ // permissions have not been checked on update:
@@ -579,6 +583,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2006/06/25 21:15:03  fplanque
+ * Heavy refactoring of the user blog perms so it stays manageable with a large number of users...
+ *
  * Revision 1.14  2006/06/19 20:59:37  fplanque
  * noone should die anonymously...
  *

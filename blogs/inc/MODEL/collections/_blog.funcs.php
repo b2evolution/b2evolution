@@ -116,9 +116,16 @@ function blog_create(
 function blog_update_user_perms( $blog )
 {
 	global $DB;
-	// Delete old perms for this blog:
-	$DB->query( 'DELETE FROM T_coll_user_perms
-								WHERE bloguser_blog_ID = '.$blog );
+
+	$user_IDs = param( 'user_IDs', '/^[0-9]+(,[0-9]+)*$/', '' );
+	// pre_dump( $user_IDs );
+	if( !empty( $user_IDs ) )
+	{
+		// Delete old perms for this blog:
+		$DB->query( 'DELETE FROM T_coll_user_perms
+									WHERE bloguser_user_ID IN ('.$user_IDs.')
+												AND bloguser_blog_ID = '.$blog );
+	}
 
 	// Now we need a full user list:
 	$inserted_values = array();
@@ -324,6 +331,72 @@ function blogperms_get_easy( $perms, $context='user' )
 
 	$perms_admin =   (int)$perms['blog'.$context.'_perm_properties']
 									+(int)$perms['blog'.$context.'_perm_cats'];
+
+	if( $perms_editor == 10 )
+	{ // has full editor rights
+		switch( $perms_admin )
+		{
+			case 0: return 'editor'; break;
+			case 1: return 'custom'; break;
+			case 2: return 'admin'; break;
+		}
+	}
+	elseif( $perms_editor == 0 )
+	{
+		if( $perms_admin )
+		{
+			return 'custom';
+		}
+		else
+		{
+			return 'member';
+		}
+	}
+	else
+	{
+		return 'custom';
+	}
+}
+
+/**
+ * Translates an given array of permissions to an "easy group".
+ *
+ * USES OBJECT ROW
+ *
+ * - nomember
+ * - member
+ * - editor (member+edit posts+delete+edit comments+all filemanager rights)
+ * - administrator (editor+edit cats+edit blog)
+ * - custom
+ *
+ * @param array indexed, as the result row from "SELECT * FROM T_coll_user_perms"
+ * @return string one of the five groups (nomember, member, editor, admin, custom)
+ */
+function blogperms_get_easy2( $perms, $context='user' )
+{
+	if( !isset($perms->{'blog'.$context.'_ismember'}) )
+	{
+		return 'nomember';
+	}
+
+	if( !empty( $perms->{'blog'.$context.'_perm_poststatuses'} ) )
+	{
+		$perms_post = count( explode( ',', $perms->{'blog'.$context.'_perm_poststatuses'} ) );
+	}
+	else
+	{
+		$perms_post = 0;
+	}
+
+	$perms_editor =  $perms_post
+									+(int)$perms->{'blog'.$context.'_perm_delpost'}
+									+(int)$perms->{'blog'.$context.'_perm_comments'}
+									+(int)$perms->{'blog'.$context.'_perm_media_upload'}
+									+(int)$perms->{'blog'.$context.'_perm_media_browse'}
+									+(int)$perms->{'blog'.$context.'_perm_media_change'};
+
+	$perms_admin =   (int)$perms->{'blog'.$context.'_perm_properties'}
+									+(int)$perms->{'blog'.$context.'_perm_cats'};
 
 	if( $perms_editor == 10 )
 	{ // has full editor rights
@@ -634,6 +707,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.7  2006/06/25 21:15:03  fplanque
+ * Heavy refactoring of the user blog perms so it stays manageable with a large number of users...
+ *
  * Revision 1.6  2006/06/19 20:07:46  fplanque
  * minor
  *
