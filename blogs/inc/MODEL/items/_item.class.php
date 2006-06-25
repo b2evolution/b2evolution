@@ -1454,7 +1454,7 @@ class Item extends DataObject
 			if( $edit_comments_link == '#' )
 			{	// Use default link:
 				global $admin_url;
-				$edit_comments_link = '<a href="'.$admin_url.'?ctrl=browse&amp;tab=posts&amp;p='.$this->ID.'&amp;c=1&amp;tb=1&amp;pb=1" title="'.T_('Moderate these feedbacks').'">'.get_icon( 'edit' ).' '.T_('Moderate...').'</a>';
+				$edit_comments_link = '<a href="'.$admin_url.'?ctrl=browse&amp;tab=posts&amp;blog='.$this->blog_ID.'&amp;p='.$this->ID.'&amp;c=1&amp;tb=1&amp;pb=1#comments" title="'.T_('Moderate these feedbacks').'">'.get_icon( 'edit' ).' '.T_('Moderate...').'</a>';
 			}
 		}
 		else
@@ -2770,6 +2770,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.65  2006/06/25 17:33:39  fplanque
+ * fixed moderation link
+ *
  * Revision 1.64  2006/06/22 21:58:34  fplanque
  * enhanced comment moderation
  *
