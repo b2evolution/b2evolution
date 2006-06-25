@@ -517,7 +517,7 @@ class Form extends Widget
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function text( $field_name, $field_value, $field_size, $field_label, $field_note = '',
-											$field_maxlength = 0 , $field_class = '', $inputtype = 'text', $force_to = '' )
+											$field_maxlength = 0, $field_class = '', $inputtype = 'text', $force_to = '' )
 	{
 		$field_params = array();
 
@@ -2570,6 +2570,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.18  2006/06/25 17:31:57  fplanque
+ * minor
+ *
  * Revision 1.17  2006/06/24 05:05:47  smpdawg
  * Fixed typo
  *
