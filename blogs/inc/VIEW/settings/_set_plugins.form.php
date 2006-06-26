@@ -55,9 +55,13 @@ global $inc_path;
 require_once $inc_path.'_misc/_plugin.funcs.php';
 
 
+// Store/retrieve order from UserSettings:
+$UserSettings->param_Request( 'results_plug_order', 'string', '--A', true );
+
+
 $Results = new Results( '
 	SELECT plug_status, plug_ID, plug_priority, plug_code, plug_apply_rendering FROM T_plugins',
-	'plug_', '--A', 0 );
+	'plug_', '--A', 0 /* no limit */ );
 
 $Results->Cache = & $admin_Plugins;
 
@@ -83,6 +87,10 @@ function plugin_results_td_status( $plug_status, $plug_ID )
 					: '' )
 			) );
 	}
+	elseif( $plug_status == 'install' )
+	{
+		return get_icon('disabled', 'imgtag', array('title'=>T_('The plugin is not installed completely.')) );
+	}
 	else
 	{
 		return get_icon('disabled', 'imgtag', array('title'=>T_('The plugin is disabled.')) );
@@ -105,7 +113,7 @@ function plugin_results_td_name( $Plugin )
 
 	if( $current_User->check_perm( 'options', 'edit', false ) )
 	{ // Wrap in "edit settings" link:
-		$r = '<a href="admin.php?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$Plugin->ID
+		$r = '<a href="'.regenerate_url( '', 'action=edit_settings&amp;plugin_ID='.$Plugin->ID )
 			.'" title="'.T_('Edit plugin settings!').'">'.$r.'</a>';
 	}
 	return $r;
@@ -347,6 +355,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.25  2006/06/26 21:43:18  blueyed
+ * small enhancements
+ *
  * Revision 1.24  2006/06/22 19:53:06  blueyed
  * minor
  *
