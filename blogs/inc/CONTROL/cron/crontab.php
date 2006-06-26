@@ -32,13 +32,83 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 
+$cron_job_names = array(
+		'test' => T_('Basic test job'),
+		'error' => T_('Error test job'),
+		'anstispam_poll' => T_('Poll the antispam blacklist'),
+	);
+$cron_job_params = array(
+		'test' => array(
+			'ctrl' => 'cron/_test.job.php',
+			'params' => NULL ),
+		'error' => array(
+			'ctrl' => 'cron/_error_test.job.php',
+			'params' => NULL ),
+		'anstispam_poll' => array(
+			'ctrl' => 'cron/_antispam_poll.job.php',
+			'params' => NULL ),
+	);
+
 
 $AdminUI->set_path( 'cron' );
 
 param( 'action', 'string', 'list' );
 
+// We want to remember these params from page to page:
+param( 'ctst_pending', 'integer', 0, true );
+param( 'ctst_started', 'integer', 0, true );
+param( 'ctst_timeout', 'integer', 0, true );
+param( 'ctst_error', 'integer', 0, true );
+param( 'ctst_finished', 'integer', 0, true );
+param( 'results_crontab_order', 'string', '-A', true );
+param( 'results_crontab_page', 'integer', 1, true );
+
+
 switch( $action )
 {
+	case 'new':
+		// Check that we have permission to edit options:
+		$current_User->check_perm( 'options', 'edit', true, NULL );
+		break;
+
+	case 'create':
+		// Check that we have permission to edit options:
+		$current_User->check_perm( 'options', 'edit', true, NULL );
+
+		// TODO: Use Cronjob object
+
+		$cjob_type = $Request->param( 'cjob_type', 'string', true );
+		if( !isset( $cron_job_params[$cjob_type] ) )
+		{
+			$Request->param_error( 'cjob_type', T_('Invalid job type') );
+		}
+		$Request->param_date( 'cjob_date', T_('Please enter a valid date.'), true );
+		$Request->param_time( 'cjob_time' );
+		$cjob_datetime = form_date( $Request->get( 'cjob_date' ), $Request->get( 'cjob_time' ) );
+
+		// duration -> end date (deadline)
+		$cjob_repeat_after_days = $Request->param( 'cjob_repeat_after_days', 'integer', 0 );
+		$cjob_repeat_after_hours = $Request->param( 'cjob_repeat_after_hours', 'integer', 0 );
+		$cjob_repeat_after_minutes = $Request->param( 'cjob_repeat_after_minutes', 'integer', 0 );
+		$cjob_repeat_after = ( ( ($cjob_repeat_after_days*24) + $cjob_repeat_after_hours )*60 + $cjob_repeat_after_minutes)*60; // seconds
+		if( $cjob_repeat_after == 0 )
+		{
+			$cjob_repeat_after = NULL;
+		}
+
+		if( ! $Request->validation_errors() )
+		{	// No errors
+      $sql = 'INSERT INTO T_cron__task( ctsk_start_datetime, ctsk_repeat_after, ctsk_name, ctsk_controller, ctsk_params )
+							VALUES( '.$DB->quote($cjob_datetime).', '.$DB->null($cjob_repeat_after).' , '.$DB->quote($cron_job_names[$cjob_type]).', '
+												.$DB->quote($cron_job_params[$cjob_type]['ctrl']).', '.$DB->quote(serialize($cron_job_params[$cjob_type]['params'])).' )';
+			$DB->query( $sql, 'Insert test task' );
+
+			$Messages->add( T_('New job has been scheduled.'), 'success' );
+
+			$action = 'list';
+		}
+		break;
+
 	case 'delete':
 		// Make sure we got an ord_ID:
 		param( 'ctsk_ID', 'integer', true );
@@ -81,6 +151,20 @@ switch( $action )
 		break;
 
 
+	case 'view':
+		$cjob_ID = $Request->param( 'cjob_ID', 'integer', true );
+
+		$sql =  'SELECT *
+							 FROM T_cron__task LEFT JOIN T_cron__log ON ctsk_ID = clog_ctsk_ID
+							WHERE ctsk_ID = '.$cjob_ID;
+		$cjob_row = $DB->get_row( $sql, OBJECT, 0, 'Get cron job and log' );
+		if( empty( $cjob_row ) )
+		{
+ 			$Messages->add( sprintf( T_('Job #%d does not exist any longer.'), $cjob_ID ), 'error' );
+			$action = 'list';
+		}
+		break;
+
 	case 'list':
 		// Detect timed out tasks:
 		$sql = ' UPDATE T_cron__log
@@ -102,8 +186,23 @@ $AdminUI->disp_body_top();
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
-// Display VIEW:
-$AdminUI->disp_view( 'cron/_crontab.list.php' );
+switch( $action )
+{
+	case 'new':
+	case 'create':
+		// Display VIEW:
+		$AdminUI->disp_view( 'cron/_cronjob.form.php' );
+		break;
+
+	case 'view':
+		// Display VIEW:
+		$AdminUI->disp_view( 'cron/_cronjob.sheet.php' );
+		break;
+
+	default:
+		// Display VIEW:
+		$AdminUI->disp_view( 'cron/_crontab.list.php' );
+}
 
 // End payload block:
 $AdminUI->disp_payload_end();

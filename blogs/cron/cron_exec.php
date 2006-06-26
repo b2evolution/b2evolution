@@ -40,7 +40,7 @@ if( ! $is_cli )
 
 // Get next task to run in queue which has not started execution yet:
 $sql = 'SELECT *
-					FROM T_cron__task LEFT JOIN gsb_cron__log ON ctsk_ID = clog_ctsk_ID
+					FROM T_cron__task LEFT JOIN T_cron__log ON ctsk_ID = clog_ctsk_ID
 				 WHERE clog_ctsk_ID IS NULL
 					 AND ctsk_start_datetime <= '.$DB->quote( date2mysql($localtimenow) ).'
 				 ORDER BY ctsk_start_datetime ASC, ctsk_ID ASC
@@ -72,6 +72,23 @@ else
 	}
 	else
 	{
+		if( !empty( $task->ctsk_repeat_after ) )
+		{	// This task wants to be repeated:
+			// Note: we use the current time for 2 reasons: 1) prevent scheduling something in the past AND 2) introduce variety so that everyone doesn't run his repeated tasks at the same exact time, especially pings, pollings...
+			if( $task->ctsk_controller == 'cron/_antispam_poll.job.php' )
+			{	// THIS IS A HACK. Guess why we need that!? :P  Please do not override or you'll kill our server :(
+				$new_start_datetime = $localtimenow + rand( 43200, 86400 ); // 12 to 24 hours
+			}
+			else
+			{	// Normal
+				$new_start_datetime = $localtimenow + $task->ctsk_repeat_after;
+			}
+			$sql = 'INSERT INTO T_cron__task( ctsk_start_datetime, ctsk_repeat_after, ctsk_name, ctsk_controller, ctsk_params )
+							VALUES( '.$DB->quote(date2mysql($new_start_datetime)).', '.$DB->quote($task->ctsk_repeat_after).', '
+												.$DB->quote($ctsk_name).', '.$DB->quote($task->ctsk_controller).', '.$DB->quote($task->ctsk_params).' )';
+			$DB->query( $sql, 'Schedule repeated task.' );
+		}
+
 	 	$DB->show_errors = true;
 	 	$DB->halt_on_error = true;
 		cron_log( 'Stating task #'.$ctsk_ID.' ['.$ctsk_name.'] at '.date( 'H:i:s', $localtimenow ).'.' );

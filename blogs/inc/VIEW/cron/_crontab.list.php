@@ -25,13 +25,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
 // Get filters:
 global $ctst_pending, $ctst_started, $ctst_timeout, $ctst_error, $ctst_finished;
-param( 'ctst_pending', 'integer', 0, true );
-param( 'ctst_started', 'integer', 0, true );
-param( 'ctst_timeout', 'integer', 0, true );
-param( 'ctst_error', 'integer', 0, true );
-param( 'ctst_finished', 'integer', 0, true );
 if( !$ctst_pending && !$ctst_started && !$ctst_timeout && !$ctst_error && !$ctst_finished )
 {	// Set default status filters:
 	$ctst_pending = 1;
@@ -44,7 +40,7 @@ if( !$ctst_pending && !$ctst_started && !$ctst_timeout && !$ctst_error && !$ctst
  * Create result set :
  */
 $SQL = & new SQL();
-$SQL->SELECT( 'ctsk_ID, ctsk_start_datetime, ctsk_name, IFNULL( clog_status, "pending" ) as status' );
+$SQL->SELECT( 'ctsk_ID, ctsk_start_datetime, ctsk_name, ctsk_repeat_after, IFNULL( clog_status, "pending" ) as status' );
 $SQL->FROM( 'T_cron__task LEFT JOIN T_cron__log ON ctsk_ID = clog_ctsk_ID' );
 if( $ctst_pending )
 {
@@ -70,9 +66,14 @@ $SQL->ORDER_BY( '*, ctsk_ID' );
 
 $Results = & new Results( $SQL->get(), 'crontab_', '-A' );
 
-$Results->title = T_('Scheduled tasks');
+$Results->title = T_('Scheduled jobs') . get_web_help_link('scheduler');
+
 
 $Results->global_icon( T_('Refresh'), 'new', regenerate_url(), T_('Refresh'), 0, 5 );
+if( $current_User->check_perm( 'options', 'edit', false, NULL ) )
+{	// Permission to edit settings:
+	$Results->global_icon( T_('Refresh'), 'new', regenerate_url( 'action,cjob_ID', 'action=new' ), T_('Add job'), 3, 4 );
+}
 
 /**
  * Callback to add filters on top of the result set
@@ -118,7 +119,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Name'),
 						'order' => 'ctsk_name',
-						'td' => '$ctsk_name$',
+						'td' => '<a href="%regenerate_url(\'action,cjob_ID\',\'action=view&amp;cjob_ID=$ctsk_ID$\')%">$ctsk_name$</a>',
 					);
 
 $Results->cols[] = array(
@@ -128,6 +129,12 @@ $Results->cols[] = array(
 						'td' => '$status$',
 					);
 
+$Results->cols[] = array(
+						'th' => T_('Repeat'),
+						'order' => 'ctsk_repeat_after',
+						'td_class' => 'shrinkwrap',
+						'td' => '$ctsk_repeat_after$',
+					);
 
 function crontab_actions( $ctsk_ID, $status )
 {
@@ -155,9 +162,15 @@ $Results->cols[] = array(
 $Results->display();
 
 
+global $cron_url;
+echo '<p>[<a href="'.$cron_url.'cron_exec.php" onclick="return pop_up_window( \''.$cron_url.'cron_exec.php\', \'evo_cron\', \'width=400,height=300,scrollbars=yes,status=yes,resizable=yes\' )" target="evo_cron">'.T_('Execute pending tasks in a popup window now!').'</a>]</p>';
+
 
 /*
  * $Log$
+ * Revision 1.4  2006/06/26 23:09:34  fplanque
+ * Really working cronjob environment :)
+ *
  * Revision 1.3  2006/06/16 21:32:02  fplanque
  * no message
  *

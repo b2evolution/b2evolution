@@ -459,6 +459,16 @@ $plugins_path = $basepath.$plugins_subdir;  // You should not need to change thi
 $plugins_url = $baseurl.$plugins_subdir;    // You should not need to change this
 
 /**
+ * Location of the cron folder.
+ *
+ * Note: Depebding on how you will set up cron execution, this folder may or may not NEED to be accessible by PHP through HTTP.
+ *
+ * @global string $cron_subdir
+ */
+$cron_subdir = 'cron/';   		             	// Subdirectory relative to base
+$cron_url = $baseurl.$cron_subdir;    // You should not need to change this
+
+/**
  * Location of the install folder.
  * @global string $install_subdir
  */

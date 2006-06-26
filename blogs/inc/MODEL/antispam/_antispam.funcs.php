@@ -181,6 +181,7 @@ function antispam_report_abuse( $abuse_string )
  * Request abuse list from central blacklist.
  *
  * @param boolean Display while fetching it?
+ * @return boolean true = success, false = error
  */
 function antispam_poll_abuse()
 {
@@ -306,6 +307,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.10  2006/06/26 23:09:34  fplanque
+ * Really working cronjob environment :)
+ *
  * Revision 1.9  2006/05/30 21:59:46  blueyed
  * Fixed E_FATAL with polling of blacklist..
  *
