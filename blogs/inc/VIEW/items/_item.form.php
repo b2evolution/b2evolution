@@ -101,7 +101,6 @@ if( isset($Blog) )
 		form.submit();
 		form.attributes.getNamedItem('action').value = saved_action;
 		form.target = '_self';
-//JEM
 		return false;
 	}
 	/*
@@ -198,7 +197,6 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	<script type="text/javascript" language="JavaScript">
 		<!--
 		// This is for toolbar plugins
-//JEM
 		var b2evoCanvas = document.getElementById('itemform_post_content');
 		//-->
 	</script>
@@ -428,6 +426,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.12  2006/06/26 23:10:24  fplanque
+ * minor / doc
+ *
  * Revision 1.11  2006/06/24 05:19:39  smpdawg
  * Fixed various javascript warnings and errors.
  * Spelling corrections.

@@ -52,7 +52,6 @@ function addEvent( elm, evType, fn, useCapture )
 	{ // "dirty" way (IE Mac for example):
 		// Will overwrite any previous handler! :((
 		elm['on'+evType] = fn;
-//JEM
 		return false;
 	}
 }

@@ -509,7 +509,7 @@ class Log
 	/**
 	 * Counts messages of a given category
 	 *
-	 * @param string the category
+	 * @param string|array the category, NULL=default, 'all' = all
 	 * @return number of messages
 	 */
 	function count( $category = NULL )
@@ -544,7 +544,7 @@ class Log
 	 * <code>get_messages( array('error', 'note', 'all') )</code> would return
 	 * 'errors', 'notes' and the remaining messages, in that order.
 	 *
-	 * @param string the category
+	 * @param string|array the category, NULL=default, 'all' = all
 	 * @param boolean if true will use subarrays for each category
 	 * @return array the messages, one or two dimensions (depends on second param)
 	 */
@@ -693,6 +693,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.9  2006/06/26 23:10:24  fplanque
+ * minor / doc
+ *
  * Revision 1.8  2006/04/19 23:08:58  blueyed
  * Added all public methods from Log to Log_noop.
  *

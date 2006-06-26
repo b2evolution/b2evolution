@@ -50,7 +50,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	?>
 	<script type="text/javascript">
 		// Paths used by JS fucntions:
-//JEM
 		var imgpath_expand = '<?php echo get_icon( 'expand', 'url' ); ?>';
 		var imgpath_collapse = '<?php echo get_icon( 'collapse', 'url' ); ?>';
 		var htsrv_url = '<?php echo $htsrv_url ?>';
@@ -89,7 +88,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		?>
 		<script type="text/javascript">
 		<!--
-		  //JEM
 		  var allchecked = Array();
 		  var idprefix;
 
@@ -103,7 +101,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 					 *
 					 * @param form the form
 					 * @param integer the checkbox group id
-					 * @param integer force set/unset
+					 * @param integer optional force set/unset
 					 */
 					function toggleall_wide( the_form, id, set )
 					{
@@ -359,7 +357,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			function initcheckall( htmlid, init )
 			{
 				// initialize array
-				//JEM
 				allchecked = Array();
 				idprefix = typeof(htmlid) == 'undefined' ? 'checkallspan' : htmlid;
 

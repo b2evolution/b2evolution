@@ -71,7 +71,6 @@ switch( $edited_Blog->get( 'access_type' ) )
 ?>
 <script type="text/javascript">
 	<!--
-  //JEM JS fixes
 	var blog_baseurl = '<?php $edited_Blog->disp( 'baseurl', 'formvalue' ); ?>';
 	var blog_urlappend = '<?php echo str_replace( "'", "\'", $blog_urlappend ) ?>';
 

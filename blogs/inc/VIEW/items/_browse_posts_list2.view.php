@@ -141,7 +141,7 @@ function item_visibility( $Item )
 $ItemList->cols[] = array(
 						'th' => T_('Visibility'),
 						'order' => 'status',
-						'td_class' => 'center',
+						'td_class' => 'shrinkwrap',
 						'td' => '%item_visibility( {Obj} )%',
 				);
 $ItemList->cols[] = array(
@@ -202,6 +202,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.10  2006/06/26 23:10:24  fplanque
+ * minor / doc
+ *
  * Revision 1.9  2006/06/13 21:49:15  blueyed
  * Merged from 1.8 branch
  *

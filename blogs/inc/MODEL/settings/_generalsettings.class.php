@@ -97,6 +97,8 @@ class GeneralSettings extends AbstractSettings
 		'upload_maxkb' => '100',
 		'user_minpwdlen' => '5',
 		'what_to_show' => 'posts',
+
+		'webhelp_enabled' => '1',
 	);
 
 
@@ -149,6 +151,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.14  2006/06/26 23:10:24  fplanque
+ * minor / doc
+ *
  * Revision 1.13  2006/06/22 19:47:06  blueyed
  * "Block spam referers" as global option
  *

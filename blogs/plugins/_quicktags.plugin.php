@@ -259,7 +259,6 @@ class quicktags_plugin extends Plugin
 
 		function b2evoToolbar() {
 			document.write('<div>');
-//JEM
 			for (var i = 0; i < b2evoButtons.length; i++) {
 				b2evoShowButton(b2evoButtons[i], i);
 			}
@@ -420,6 +419,9 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.18  2006/06/26 23:10:24  fplanque
+ * minor / doc
+ *
  * Revision 1.17  2006/06/24 05:19:39  smpdawg
  * Fixed various javascript warnings and errors.
  * Spelling corrections.

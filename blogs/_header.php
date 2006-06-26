@@ -108,9 +108,9 @@ $AdminUI->add_menu_entries(
 			),
 
 			'edit' => array(
-				'text'=>T_('Browse'),
-				'href'=>'admin.php?ctrl=browse&amp;blog='.$blog.'&amp;filter=restore',
-				'style'=>'font-weight: bold;',
+				'text' => T_('Posts'),
+				'href' => 'admin.php?ctrl=browse&amp;blog='.$blog.'&amp;filter=restore',
+				'style' => 'font-weight: bold;',
 				'entries' => array(
 					// NOTE: the following entries are defaults in case of the DHTML drop down menu,
 					// they will be overridden in the browse controller
@@ -143,25 +143,25 @@ $AdminUI->add_menu_entries(
 					)
 			),
 
-			'cats' => array(
-				'text'=>T_('Categories'),
-				'href'=>'admin.php?ctrl=chapters&amp;blog='.$blog
+			'cats' => array(	// TODO: move this to 'blog settings>chapters'
+				'text' => T_('Categories'),
+				'href' => 'admin.php?ctrl=chapters&amp;blog='.$blog
 			),
 
 			'blogs' => array(
-				'text'=>T_('Blogs'),
-				'href'=>'admin.php?ctrl=collections',
+				'text' => T_('Blog settings'),
+				'href' => 'admin.php?ctrl=collections',
 				'entries' => array(
 					'general' => array(
 						'text' => T_('General'),
 						'href' => 'admin.php?ctrl=collections&amp;tab=general&amp;action=edit&amp;blog='.$blog,
 						'perm_eval' => 'return $GLOBALS["blog"];' ), // hack!?
 					'perm' => array(
-						'text' => T_('User Permissions'),
+						'text' => T_('User permissions'),
 						'href' => 'admin.php?ctrl=collections&amp;tab=perm&amp;action=edit&amp;blog='.$blog,
 						'perm_eval' => 'return $GLOBALS["blog"];' ), // hack!?
 					'permgroup' => array(
-						'text' => T_('Group Permissions'),
+						'text' => T_('Group permissions'),
 						'href' => 'admin.php?ctrl=collections&amp;tab=permgroup&amp;action=edit&amp;blog='.$blog,
 						'perm_eval' => 'return $GLOBALS["blog"];' ), // hack!?
 					'advanced' => array(
@@ -172,44 +172,44 @@ $AdminUI->add_menu_entries(
 			),
 
 			'stats' => array(
-				'text'=>T_('Stats'),
-				'perm_name'=>'stats',
-				'perm_level'=>'view',
-				'href'=>'admin.php?ctrl=stats',
+				'text' => T_('Stats'),
+				'perm_name' => 'stats',
+				'perm_level' => 'view',
+				'href' => 'admin.php?ctrl=stats',
 				'entries' => array(
 					'summary' => array(
 						'text' => T_('Summary'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;blog='.$blog ),
 					'other' => array(
-						'text' => T_('Direct Accesses'),
+						'text' => T_('Direct accesses'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=other&amp;blog='.$blog ),
 					'referers' => array(
 						'text' => T_('Referers'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=referers&amp;blog='.$blog ),
 					'refsearches' => array(
-						'text' => T_('Refering Searches'),
+						'text' => T_('Refering searches'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;blog='.$blog ),
 					'syndication' => array(
 						'text' => T_('Syndication'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=syndication&amp;blog='.$blog ),
 					'useragents' => array(
-						'text' => T_('User Agents'),
+						'text' => T_('User agents'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=useragents&amp;blog='.$blog ),
 				)
 			),
 
-			'antispam' => array(
-				'text'=>T_('Antispam'),
-				'perm_name'=>'spamblacklist',
-				'perm_level'=>'view',
-				'href'=>'admin.php?ctrl=antispam'
+			'antispam' => array( // TODO: move this as the default submenu of Tools?
+				'text' => T_('Antispam'),
+				'perm_name' => 'spamblacklist',
+				'perm_level' => 'view',
+				'href' => 'admin.php?ctrl=antispam'
 			),
 
 			'templates' => array(
-				'text'=>T_('Templates'),
+				'text' => T_('Templates'),
 				'title' => T_('Custom skin template editing'),
-				'perm_name'=>'templates',
-				'perm_level'=>'any',
+				'perm_name' => 'templates',
+				'perm_level' => 'any',
 				'href'=>'admin.php?ctrl=templates'
 			),
 
@@ -222,15 +222,15 @@ $AdminUI->add_menu_entries(
 
 			'users' => array(
 				'text' => T_('Users'),
-				'title'=>T_('User management'),
-				'perm_name'=>'users',
-				'perm_level'=>'view',
-				'text_noperm'=>T_('My Profile'),	// displayed if perm not granted
+				'title' => T_('User management'),
+				'perm_name' => 'users',
+				'perm_level' => 'view',
+				'text_noperm' => T_('My profile'),	// displayed if perm not granted
 				'href' => 'admin.php?ctrl=users',
 			),
 
 			'options' => array(
-				'text' => T_('Settings'),
+				'text' => T_('App settings'),
 				'perm_name' => 'options',
 				'perm_level' => 'view',
 				'href' => 'admin.php?ctrl=settings',
@@ -248,14 +248,14 @@ $AdminUI->add_menu_entries(
 						'text' => T_('Files'),
 						'href' => 'admin.php?ctrl=fileset' ),
 					'filetypes' => array(
-						'text' => T_('File Types'),
+						'text' => T_('File types'),
 						'href' => 'admin.php?ctrl=filetypes' ),
 					'statuses' => array(
-						'text' => T_('Post Statuses'),
+						'text' => T_('Post statuses'),
 						'title' => T_('Post statuses management'),
 						'href' => 'admin.php?ctrl=itemstatuses'),
 					'types' => array(
-						'text' => T_('Post Types'),
+						'text' => T_('Post types'),
 						'title' => T_('Post types management'),
 						'href' => 'admin.php?ctrl=itemtypes'),
 					'plugins' => array(
@@ -268,8 +268,8 @@ $AdminUI->add_menu_entries(
 			),
 
 			'tools' => array(
-				'text'=>T_('Tools'),
-				'href'=>'admin.php?ctrl=tools'
+				'text' => T_('Tools'),
+				'href' => 'admin.php?ctrl=tools'
 			),
 		)
 	);
@@ -294,6 +294,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.9  2006/06/26 23:10:24  fplanque
+ * minor / doc
+ *
  * Revision 1.8  2006/06/23 19:41:20  fplanque
  * no message
  *

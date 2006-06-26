@@ -936,7 +936,7 @@ class Form extends Widget
 	 * @param string initial value (seconds)
 	 * @param string label displayed in front of the field
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
-	 *              nothing yet.
+	 *              - minutes_step ( default = 15 );
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function duration_input( $field_prefix, $duration, $field_label, $field_params = array() )
@@ -957,18 +957,20 @@ class Form extends Widget
 		$hours = floor( $duration / 3600 ) % 24;
 		$r .= "\n".'<select name="'.$field_prefix.'_hours" id="'.$this->get_valid_id($field_prefix).'_hours">';
 		$r .= '<option value="0"'.( 0 == $hours ? ' selected="selected"' : '' ).">---</option>\n";
-		for( $i = 1; $i <= 24; $i++ )
+		for( $i = 1; $i <= 23; $i++ )
 		{
 			$r .= '<option value="'.$i.'"'.( $i == $hours ? ' selected="selected"' : '' ).'>'.$i."</option>\n";
 		}
 		$r .= '</select>'.T_('hours')."\n";
 
 		$minutes = floor( $duration / 60 ) % 60;
+		$minutes_step = ( empty($field_params['minutes_step']) ? 15 : $field_params['minutes_step'] );
 		$r .= "\n".'<select name="'.$field_prefix.'_minutes" id="'.$this->get_valid_id($field_prefix).'_minutes">';
-		$r .= '<option value="0"'.( ($minutes<15) ? ' selected="selected"' : '' ).">00</option>\n";
-		$r .= '<option value="15"'.( ($minutes>=15 && $minutes<30) ? ' selected="selected"' : '' ).">15</option>\n";
-		$r .= '<option value="30"'.( ($minutes>=30 && $minutes<45) ? ' selected="selected"' : '' ).">30</option>\n";
-		$r .= '<option value="45"'.( ($minutes>=45) ? ' selected="selected"' : '' ).">45</option>\n";
+		for( $i = 0; $i <= 59 ; $i += $minutes_step )
+		{
+			$r .= '<option value="'.$i.'"'.( ($minutes>=$i && $minutes<($i+$minutes_step)) ? ' selected="selected"' : '' ).'>'
+						.($i == 0 ? '---' : substr('0'.$i,-2))."</option>\n";
+		}
 		$r .= '</select>'.T_('minutes')."\n";
 
 		$r .= $this->end_field();
@@ -2570,6 +2572,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.19  2006/06/26 23:10:24  fplanque
+ * minor / doc
+ *
  * Revision 1.18  2006/06/25 17:31:57  fplanque
  * minor
  *

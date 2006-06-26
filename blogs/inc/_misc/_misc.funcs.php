@@ -793,6 +793,7 @@ function xmlrpc_displayresult( $result, $display = true, $log = '' )
  *
  * @param object XMLRPC response object
  * @param Log object to add messages to
+ * @return boolean true = success, false = error
  */
 function xmlrpc_logresult( $result, & $message_Log )
 {
@@ -2961,6 +2962,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.72  2006/06/26 23:10:24  fplanque
+ * minor / doc
+ *
  * Revision 1.71  2006/06/25 23:42:47  blueyed
  * merge error(?)
  *

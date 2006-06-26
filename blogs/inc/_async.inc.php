@@ -1,6 +1,6 @@
 <?php
 /**
- * This is ...
+ * This is the handler/dispatcher for asynchronous calls (both AJax calls and HTTP GET fallbacks)
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -58,6 +58,9 @@ if( !empty($set_target) )
 
 /*
  * $Log$
+ * Revision 1.5  2006/06/26 23:10:24  fplanque
+ * minor / doc
+ *
  * Revision 1.4  2006/06/25 20:04:06  blueyed
  * doc/todo
  *
