@@ -340,6 +340,11 @@ class Plugins
 			{
 				$Plugin = & $this->get_by_ID( $plugin_ID );
 
+				if( ! $Plugin )
+				{
+					continue;
+				}
+
 				$extra_events = $Plugin->GetExtraEvents();
 				if( is_array($extra_events) )
 				{
@@ -2748,6 +2753,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.58  2006/06/27 15:39:23  blueyed
+ * fix
+ *
  * Revision 1.57  2006/06/20 00:16:54  blueyed
  * Transformed Plugins table into Results object, so some columns are sortable.
  *
