@@ -983,11 +983,15 @@ function balanceTags($text)
  * Clean up the mess PHP has created with its funky quoting everything!
  *
  * @param mixed string or array (function is recursive)
+ * @return mixed
  */
-function remove_magic_quotes( $mixed )
+if( ini_get('magic_quotes_sybase') ) // overrides "magic_quotes_gpc" and only replaces single quotes with themselves ( "'" => "''" )
 {
-	if( get_magic_quotes_gpc() )
-	{ // That stupid PHP behaviour consisting of adding slashes everywhere is unfortunately on
+	/**
+	 * @ignore
+	 */
+	function remove_magic_quotes( $mixed )
+	{
 		if( is_array( $mixed ) )
 		{
 			foreach($mixed as $k => $v)
@@ -995,13 +999,42 @@ function remove_magic_quotes( $mixed )
 				$mixed[$k] = remove_magic_quotes( $v );
 			}
 		}
-		else
+		elseif( is_string($mixed) )
+		{
+			// echo 'Removing slashes ';
+			$mixed = str_replace( '\'\'', '\'', $mixed );
+		}
+		return $mixed;
+	}
+}
+elseif( ini_get('magic_quotes_gpc') )
+{ // That stupid PHP behaviour consisting of adding slashes everywhere is unfortunately on
+	function remove_magic_quotes( $mixed )
+	{
+		if( is_array( $mixed ) )
+		{
+			foreach($mixed as $k => $v)
+			{
+				$mixed[$k] = remove_magic_quotes( $v );
+			}
+		}
+		elseif( is_string($mixed) )
 		{
 			// echo 'Removing slashes ';
 			$mixed = stripslashes( $mixed );
 		}
+		return $mixed;
 	}
-	return $mixed;
+}
+else
+{
+	/**
+	 * @ignore
+	 */
+	function remove_magic_quotes( $mixed )
+	{
+		return $mixed;
+	}
 }
 
 
@@ -2962,6 +2995,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.73  2006/06/27 11:28:33  blueyed
+ * Fixed/optimized remove_magic_quotes()
+ *
  * Revision 1.72  2006/06/26 23:10:24  fplanque
  * minor / doc
  *
