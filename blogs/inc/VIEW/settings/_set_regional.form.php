@@ -154,6 +154,61 @@ else
 		echo '<div class="error">' . T_('Note: default locale is not enabled.') . '</div>';
 	}
 
+	// JavaScript function to calculate time difference: {{{
+	$d = split(':',date( 'H:i', $servertimenow ));
+	?>
+	<script type="text/javascript">
+	function calc_TimeDifference(min_dif) {
+		if ( ntd == null ) {
+			var ntd = document.getElementById('newtime_difference');
+
+			var server_hours    = <?php echo $d[0]; ?>-1;
+			var server_mins    = <?php echo $d[1]; ?>;
+
+			var user_date       = new Date();
+			var user_hours       = user_date.getHours();
+			var user_mins       = user_date.getMinutes();
+		}
+
+		//alert('Server Hours: '+server_hours+'\r\nUser Time: '+user_hours);
+
+		var result = 0;
+		if( user_hours < server_hours ) {
+
+			// We times by -1, because there is a negative difference
+			result = server_hours - user_hours;
+			// We do the following because if the time difference is greater than 12 then we are in a different day
+			if( result > 12 ) result = -1*(24-result);
+			result *= -1; // Just simplifies things.
+
+		} else if( user_hours > server_hours ) {
+
+			// We times by -1, because there is a negative difference
+			result = user_hours - server_hours;
+			// We do the following because if the time difference is greater than 12 then we are in a different day
+			if( result > 12 ) result = -1*(24-result);
+
+		}
+
+		//alert('Time Difference: '+result);
+
+		if( min_dif && ! ( user_mins < server_mins+30 && user_mins > server_mins-30 ) ) {
+			if( user_mins < server_mins )
+				result--;
+			else
+				result++;
+			//alert('Time Difference: '+result+'\r\nMinute Difference Applied');
+		}
+
+		//alert('Server Time: '+server_hours+'\r\nUser Time: '+user_hours+'\r\nTime Difference: '+result);
+
+		// Apply the calculated time difference
+		ntd.value = result;
+	}
+	</script>
+
+	<?php // }}}
+
 	$Form = & new Form( $pagenow, 'loc_checkchanges' );
 
 	$Form->begin_form( 'fform', T_('Regional Settings') );
@@ -164,13 +219,14 @@ else
 
 	$Form->begin_fieldset( T_('Regional settings') );
 	$Form->text_input( 'newtime_difference', $Settings->get('time_difference'), 3, T_('Time difference'),
-				array( 'note'=>sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 'maxlength'=> 3, 'required'=>true ) );
+				array( 'note'=>sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) )
+					.' <a href="#" onclick="calc_TimeDifference(); return false;">'.T_('Calculate time difference').'</a>',
+					'maxlength'=> 3, 'required'=>true ) );
 	$Form->select( 'newdefault_locale', $Settings->get('default_locale'), 'locale_options_return', T_('Default locale'), T_('Overridden by browser config, user locale or blog locale (in this order).'));
 	$Form->end_fieldset();
 
+
 	$Form->begin_fieldset( T_('Available locales') );
-
-
 
 	echo '<p class="center">';
 	if( $loc_transinfo )
@@ -411,6 +467,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.7  2006/06/30 18:35:38  blueyed
+ * Applied "calculate time difference" by balupton (http://forums.b2evolution.net//viewtopic.php?t=8317).
+ *
  * Revision 1.6  2006/06/19 20:59:37  fplanque
  * noone should die anonymously...
  *
