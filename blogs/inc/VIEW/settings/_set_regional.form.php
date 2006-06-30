@@ -162,7 +162,7 @@ else
 		if ( ntd == null ) {
 			var ntd = document.getElementById('newtime_difference');
 
-			var server_hours    = <?php echo $d[0]; ?>-1;
+			var server_hours    = <?php echo $d[0]; ?>;
 			var server_mins    = <?php echo $d[1]; ?>;
 
 			var user_date       = new Date();
@@ -467,6 +467,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.8  2006/06/30 19:12:00  blueyed
+ * Removed test for JS-calculation.. :/
+ *
  * Revision 1.7  2006/06/30 18:35:38  blueyed
  * Applied "calculate time difference" by balupton (http://forums.b2evolution.net//viewtopic.php?t=8317).
  *
