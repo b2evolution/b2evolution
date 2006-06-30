@@ -15,7 +15,7 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible to {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '1.8-dev';
+$app_version = '1.9-dev';
 
 /**
  * Is displayed on the login screen:
