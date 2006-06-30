@@ -570,66 +570,8 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale
 }
 
 
-/**
- * @global string The INPUT/OUTPUT charset (from the locale MESSAGES). MAY be overriden in _blog_main.inc.php.
- */
-$io_charset = locale_charset(false);
-
-
-// Check and adjust $evo_charset if needed:
-if( empty($evo_charset) )
-{ // Internal encoding follows INPUT/OUTPUT encoding:
-	$evo_charset = $io_charset;
-}
-elseif( $evo_charset != $io_charset )
-{ // we have to convert for I/O, which requires mbstrings extension
-	if( ! function_exists('mb_convert_encoding') )
-	{
-		$Debuglog->add( '$evo_charset differs from $io_charset, but mbstrings does not seem to be installed.', array('errors','locale') );
-		$evo_charset = $io_charset; // we cannot convert I/O to internal charset
-	}
-	else
-	{ // check if the encodings are supported:
-		if( function_exists('mb_list_encodings') ) // PHP5
-		{
-			$mb_encodings = mb_list_encodings();
-		}
-		else
-		{
-			$mb_encodings = NULL;
-		}
-
-		if( isset($mb_encodings) && ! in_array( strtoupper($io_charset), $mb_encodings ) )
-		{
-			$Debuglog->add( 'Cannot I/O convert because I/O charset ['.$io_charset.'] is not in mb_list_encodings()!', array('errors','locale') );
-			$evo_charset = $io_charset;
-		}
-		elseif( isset($mb_encodings) && ! in_array( strtoupper($evo_charset), $mb_encodings ) )
-		{
-			$Debuglog->add( 'Cannot I/O convert because $evo_charset='.$evo_charset.' is not in mb_list_encodings()!', array('errors','locale') );
-			$evo_charset = $io_charset;
-		}
-		else
-		{
-			mb_http_output( $io_charset );
-			ob_start( 'mb_output_handler' ); // NOTE: this will send a Content-Type header by itself for "text/..."
-			$mb_output_handler_started = true; // remember it for _blog_main.inc.php
-		}
-		unset($mb_encodings);
-	}
-}
-
-// Tell mbstrings what the internal encoding is:
-if( function_exists('mb_internal_encoding') )
-{
-	mb_internal_encoding( $evo_charset );
-}
-
-// Set encoding for MySQL connection:
-$DB->set_connection_charset( $evo_charset, true );
-
-$Debuglog->add( 'evo_charset (_main.inc.php): '.$evo_charset, 'locale' );
-$Debuglog->add( 'io_charset (_main.inc.php): '.$io_charset, 'locale' );
+// Init charset handling:
+init_charsets( $current_charset );
 
 
 /**
@@ -664,6 +606,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.33  2006/06/30 22:58:13  blueyed
+ * Abstracted charset conversation, not much tested.
+ *
  * Revision 1.32  2006/06/19 21:13:52  blueyed
  * todo comment
  *

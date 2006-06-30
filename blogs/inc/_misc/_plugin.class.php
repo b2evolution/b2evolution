@@ -1814,11 +1814,9 @@ class Plugin
 			return T_( $string, $req_locale );
 		}
 
-		if( $messages_charset != $evo_charset
-			  && ! empty($evo_charset) // this extra check is needed, because $evo_charset may not yet be determined.. :/
-			)
-		{ // the INPUT/OUTPUT charset differs from the internal one (this also means mb_convert_encoding is available)
-			mb_convert_variables( $evo_charset, $messages_charset, $r );
+		if( ! empty($evo_charset) ) // this extra check is needed, because $evo_charset may not yet be determined.. :/
+		{
+			$r = convert_charset( $r, $evo_charset, $messages_charset );
 		}
 
 		return $r;
@@ -2323,6 +2321,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.66  2006/06/30 22:58:13  blueyed
+ * Abstracted charset conversation, not much tested.
+ *
  * Revision 1.65  2006/06/25 23:43:34  blueyed
  * doc
  *

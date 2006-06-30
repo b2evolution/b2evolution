@@ -162,6 +162,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
 	if( $autobr )
 	{ // Auto <br />:
 		// may put brs in the middle of multiline tags...
+		// TODO: this may create "<br />" tags in "<UL>" (outside of <LI>) and make the HTML invalid!
 		$content = autobrize($content);
 	}
 
@@ -1116,9 +1117,9 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		// $Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($GLOBALS[$var], true).']!', 'params' );
 	}
 
-	if( isset($io_charset) && $io_charset != $evo_charset )
-	{ // the INPUT/OUTPUT charset differs from the internal one (this also means mb_convert_encoding is available)
-		mb_convert_variables( $evo_charset, $io_charset, $GLOBALS[$var] );
+	if( isset($io_charset) )
+	{
+		$GLOBALS[$var] = convert_charset( $GLOBALS[$var], $evo_charset, $io_charset );
 	}
 
 	/*
@@ -2097,10 +2098,7 @@ function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
 	$message = str_replace( array( "\r\n", "\r" ), $NL, $message );
 
 	// Convert encoding of message (from internal encoding to the one of the message):
-	if( $evo_charset != $current_charset && ! empty($evo_charset) && function_exists('mb_convert_encoding') )
-	{
-		mb_convert_variables( $current_charset, $evo_charset, $message );
-	}
+	$message = convert_charset( $message, $current_charset, $evo_charset );
 
 	if( $debug > 1 )
 	{	// We agree to die for debugging...
@@ -2995,6 +2993,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.74  2006/06/30 22:58:13  blueyed
+ * Abstracted charset conversation, not much tested.
+ *
  * Revision 1.73  2006/06/27 11:28:33  blueyed
  * Fixed/optimized remove_magic_quotes()
  *

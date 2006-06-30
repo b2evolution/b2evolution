@@ -85,11 +85,9 @@ if( ($use_l10n == 1) && function_exists('_') )
 			}
 		}
 
-		if( $messages_charset != $evo_charset
-			  && ! empty($evo_charset) // this extra check is needed, because $evo_charset may not yet be determined.. :/
-			)
-		{ // the INPUT/OUTPUT charset differs from the internal one (this also means mb_convert_encoding is available)
-			mb_convert_variables( $evo_charset, $messages_charset, $r );
+		if( ! empty($evo_charset) ) // this extra check is needed, because $evo_charset may not yet be determined.. :/
+		{
+			$r = convert_charset( $r, $evo_charset, $messages_charset );
 		}
 
 		return $r;
@@ -169,11 +167,9 @@ elseif( $use_l10n == 2 )
 			$messages_charset = 'iso-8859-1'; // our .php file encoding
 		}
 
-		if( $messages_charset != $evo_charset
-			  && ! empty($evo_charset) // this extra check is needed, because $evo_charset may not yet be determined.. :/
-			)
-		{ // the INPUT/OUTPUT charset differs from the internal one (this also means mb_convert_encoding is available)
-			mb_convert_variables( $evo_charset, $messages_charset, $r );
+		if( ! empty($evo_charset) ) // this extra check is needed, because $evo_charset may not yet be determined.. :/
+		{
+			$r = convert_charset( $r, $evo_charset, $messages_charset );
 		}
 
 		return $r;
@@ -768,8 +764,118 @@ function locale_updateDB()
 }
 
 
+/**
+ * Convert a string from one charset to another.
+ *
+ * @todo Implement iconv and PHP mapping tables
+ *
+ * @param string String to convert
+ * @param string Target charset (TO)
+ * @param string Source charset (FROM)
+ */
+function convert_charset( $string, $dest_charset, $src_charset )
+{
+	if( $dest_charset == $src_charset )
+	{
+		return $string;
+	}
+
+	if( ! function_exists('mb_convert_variables') )
+	{ // cannot convert encoding using mbstrings
+		return $string;
+	}
+
+	mb_convert_variables( $dest_charset, $src_charset, $string );
+
+	return $string;
+}
+
+
+/**
+ * Init charset handling.
+ *
+ * Check and possibly adjust {@link $evo_charset}.
+ *
+ * @param string I/O (input/output) charset to use
+ */
+function init_charsets( $io )
+{
+	global $io_charset, $evo_charset, $mb_output_handler_started, $Debuglog, $DB;
+
+	if( $io == $io_charset )
+	{ // no conversation needed
+		return;
+	}
+
+	if( $io_charset == $io )
+	{ // already set
+		return;
+	}
+
+	$io_charset = $io;
+
+	if( empty($evo_charset) )
+	{ // empty evo_charset follows I/O charset:
+		$Debuglog->add( '$evo_charset follows $io_charset ('.$io_charset.').', array('locale') );
+		$evo_charset = $io_charset;
+	}
+	elseif( $evo_charset != $io_charset )
+	{ // we have to convert for I/O
+		if( ! function_exists('mb_convert_encoding') )
+		{
+			$Debuglog->add( '$evo_charset differs from $io_charset, but mbstrings is not available - cannot convert I/O to internal charset!', array('errors','locale') );
+			$evo_charset = $io_charset; // we cannot convert I/O to internal charset
+		}
+		else
+		{ // check if the encodings are supported:
+			if( function_exists('mb_list_encodings') ) // PHP5
+			{
+				$mb_encodings = mb_list_encodings();
+			}
+			else
+			{
+				$mb_encodings = NULL;
+			}
+
+			if( isset($mb_encodings) && ! in_array( strtoupper($io_charset), $mb_encodings ) )
+			{
+				$Debuglog->add( 'Cannot I/O convert because I/O charset ['.$io_charset.'] is not in mb_list_encodings()!', array('errors','locale') );
+				$evo_charset = $io_charset;
+			}
+			elseif( isset($mb_encodings) && ! in_array( strtoupper($evo_charset), $mb_encodings ) )
+			{
+				$Debuglog->add( 'Cannot I/O convert because $evo_charset='.$evo_charset.' is not in mb_list_encodings()!', array('errors','locale') );
+				$evo_charset = $io_charset;
+			}
+			else
+			{
+				mb_http_output( $io_charset );
+				ob_start( 'mb_output_handler' ); // NOTE: this will send a Content-Type header by itself for "text/..."
+				$mb_output_handler_started = true; // remember it for _blog_main.inc.php
+			}
+			unset($mb_encodings);
+		}
+	}
+
+	// Tell mbstrings what the internal encoding is:
+	if( $mb_output_handler_started )
+	{
+		mb_internal_encoding( $evo_charset );
+	}
+
+	// Set encoding for MySQL connection:
+	$DB->set_connection_charset( $evo_charset, true );
+
+	$Debuglog->add( 'evo_charset: '.$evo_charset, 'locale' );
+	$Debuglog->add( 'io_charset: '.$io_charset, 'locale' );
+}
+
+
 /*
  * $Log$
+ * Revision 1.9  2006/06/30 22:58:13  blueyed
+ * Abstracted charset conversation, not much tested.
+ *
  * Revision 1.8  2006/06/01 18:36:10  fplanque
  * no message
  *
