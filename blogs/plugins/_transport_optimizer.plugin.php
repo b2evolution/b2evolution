@@ -125,12 +125,12 @@ class transport_optimizer_plugin extends Plugin
 	*/
 	function obhandler( $output )
 	{
-		global $localtimenow;
+		global $localtimenow, $current_User;
 
 		if( $this->use_etags )
 		{ // Generating ETAG
 			// prefix with PUB (public page) or AUT (private page).
-			$ETag = is_logged_in() ? '"AUT' : '"PUB';
+			$ETag = isset($current_User) ? '"AUT' : '"PUB'; // is_logged_in() may not be available
 			$ETag .= md5( $output ).'"';
 			header( 'ETag: '.$ETag );
 
@@ -176,6 +176,9 @@ class transport_optimizer_plugin extends Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.3  2006/06/30 17:48:16  blueyed
+ * Fix
+ *
  * Revision 1.2  2006/06/24 00:03:47  blueyed
  * Fixes
  *
