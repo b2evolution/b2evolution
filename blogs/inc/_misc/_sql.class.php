@@ -317,6 +317,8 @@ class SQL
 	 */
 	function WHERE_keyword( $search, $search_kw_combine )
 	{
+		global $DB;
+	
 		// Concat the list of search fields ( concat(' ',field1,field2,field3...) )
 		if (count( $this->search_field ) > 1)
 		{
@@ -339,20 +341,20 @@ class SQL
 				// Loop on all keywords
 				foreach($keyword_array as $keyword)
 				{
-					$twhere[] = '( '.$search_field.' like \'%'.$keyword.'%\''.$this->WHERE_regexp( $keyword, $search_kw_combine ).' )';
+					$twhere[] = '( '.$search_field.' LIKE \'%'.$DB->escape( $keyword ).'%\''.$this->WHERE_regexp( $keyword, $search_kw_combine ).' )';
 				}
 				$where = implode( ' '.$search_kw_combine.' ', $twhere);
 				break;
 
 			case 'PHRASE':
-					$where = $search_field.' like "%'.$search.'%"'.$this->WHERE_regexp( $search, $search_kw_combine );
+					$where = $search_field.' LIKE "%'.$DB->escape( $search ).'%"'.$this->WHERE_regexp( $search, $search_kw_combine );
 					break;
 
 			case 'BEGINWITH':
 				$twhere = array();
 				foreach( $this->search_field as $field )
 				{
-					$twhere[] = $field." LIKE '".$search."%'";
+					$twhere[] = $field." LIKE '".$DB->escape( $search )."%'";
 				}
 				$where = implode( ' OR ', $twhere ).$this->WHERE_regexp( $search, $search_kw_combine);
 				break;
@@ -385,11 +387,11 @@ class SQL
 						case 'AND':
 						case 'OR':
 						case 'PHRASE':
-							$where .= ' OR '.$field.' like \'%'.$search_reg_exp.'%\'';
+							$where .= ' OR '.$field.' LIKE \'%'.$DB->escape( $search_reg_exp ).'%\'';
 							break;
 
 						case 'BEGINWITH':
-							$where .= ' OR '.$field.' like \''.$search_reg_exp.'%\'';
+							$where .= ' OR '.$field.' LIKE \''.$DB->escape( $search_reg_exp ).'%\'';
 							break;
 					}
 				}
@@ -402,6 +404,9 @@ class SQL
 
 /*
  * $Log$
+ * Revision 1.8  2006/07/01 22:41:37  fplanque
+ * security
+ *
  * Revision 1.7  2006/06/19 20:59:38  fplanque
  * noone should die anonymously...
  *
