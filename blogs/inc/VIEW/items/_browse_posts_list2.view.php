@@ -54,7 +54,7 @@ $ItemList->title = T_('Task list');
 
 // Issue date:
 $ItemList->cols[] = array(
-		'th' => T_('Issue date'),
+		'th' => T_('Date'),
 		'order' => 'datestart',
 		'default_dir' => 'D',
 		'th_class' => 'nowrap',
@@ -202,6 +202,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.11  2006/07/01 23:49:12  fplanque
+ * made date column narrower
+ *
  * Revision 1.10  2006/06/26 23:10:24  fplanque
  * minor / doc
  *
