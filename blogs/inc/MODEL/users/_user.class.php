@@ -535,9 +535,10 @@ class User extends DataObject
 		// echo "<br>Checking user perm $permname:$permlevel:$perm_target";
 		$Debuglog->add( "User perm $permname:$permlevel:$perm_target => ".($perm?'granted':'DENIED'), 'perms' );
 
-		if( !$perm && $assert )
+		if( ! $perm && $assert )
 		{ // We can't let this go on!
-			debug_die( T_('Permission denied!')." ($permname:$permlevel:$perm_target)" );
+			global $app_name;
+			debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name )." ($permname:$permlevel:$perm_target)" );
 		}
 
 		return $perm;
@@ -1043,6 +1044,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2006/07/01 17:05:30  blueyed
+ * Made check_perm() more clear.
+ *
  * Revision 1.23  2006/06/25 23:34:15  blueyed
  * wording pt2
  *
