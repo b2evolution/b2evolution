@@ -92,6 +92,7 @@ switch( $action )
 		{ // Then all banned comments
 			$r = $DB->query('DELETE FROM T_comments
 			                  WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
+			                     OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
 			                     OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
 			                     OR comment_content LIKE '.$DB->quote('%'.$keyword.'%') );
 			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'success' );
@@ -232,12 +233,13 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 		// Check for potentially affected comments:
 		$sql = 'SELECT comment_ID, comment_date, comment_author, comment_author_url,
 										comment_author_IP, comment_content
-						FROM T_comments
-						WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
-							 OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
-    				   OR comment_content LIKE '.$DB->quote('%'.$keyword.'%').'
-						ORDER BY comment_date ASC';
-		$res_affected_comments = $DB->get_results( $sql, ARRAY_A );
+						  FROM T_comments
+						 WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
+									 OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
+							 		 OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
+    				   		 OR comment_content LIKE '.$DB->quote('%'.$keyword.'%').'
+						 ORDER BY comment_date ASC';
+		$res_affected_comments = $DB->get_results( $sql, ARRAY_A, 'Find matching comments' );
 		if( $DB->num_rows == 0 )
 		{ // No matching hits.
 			printf( '<p><strong>'.T_('No comments match the keyword [%s].').'</strong></p>', htmlspecialchars($keyword) );
@@ -363,6 +365,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2006/07/01 23:27:30  fplanque
+ * rolled back unnecessary changes
+ *
  * Revision 1.5  2006/06/25 17:42:46  fplanque
  * better use of Results class (mainly for filtering)
  *
