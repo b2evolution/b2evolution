@@ -495,7 +495,7 @@ switch( $AdminUI->get_path(1) )
 				}
 				$Results->cols[] = array(
 						'th' => /* TRANS: Abbrev. for Spam */ T_('S'),
-						'td' => '%referer_ban_link( #hit_referer# )%', // we use hit_referer, because unlike dom_name it includes more info (especially any subdomain)
+						'td' => '%referer_ban_link( #dom_name# )%',
 					);
 			}
 
@@ -682,8 +682,7 @@ switch( $AdminUI->get_path(1) )
 						<?php
 						if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 						{ // user can ban:
-							echo '<td><a href="?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain( trim($row_stats['hit_referer']) ) ) // we use hit_referer, because unlike dom_name it includes more info (especially any subdomain)
-								.'" title="'.T_('Ban this domain!').'">'.get_icon('ban').'</a></td>';
+							echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'action,keyword', 'action=ban&amp;keyword='.rawurlencode( get_ban_domain(stats_basedomain(false)) ) ) ).'</td>';
 						}
 						?>
 						<td class="right"><?php stats_hit_count() ?></td>
@@ -1061,6 +1060,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2006/07/01 23:12:45  fplanque
+ * rolled back unnecessary changes
+ *
  * Revision 1.18  2006/06/05 17:10:17  blueyed
  * doc
  *
