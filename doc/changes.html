@@ -10,18 +10,6 @@
 	<h1>Changelog</h1>
 	<p>Only public releases are listed here.</p>
 
-	<h2>CVS</h2>
-	<ul>
-		<li>
-			Plugins
-			<ul>
-				<li>Plugins can get localized/translated (blueyed)</li>
-			</ul>
-		</li>
-		<li>Added $htsrv_url_sensible config variable which gets used where password are involved</li>
-	</ul>
-
-
 	<h2>1.8 &quot;Phoenix Alpha 2 &quot; - CVS </h2>
 <ul>
 	<li>Validation of email address to activate user's account on registration (enabled by default) (blueyed)</li>
@@ -41,20 +29,21 @@
 	<li>
 		Antispam:
 		<ul>
+			<li>Basic guesbook spambot defeating techniques -- basic spambots account for over 90% of the comment spam!! (fplanque)</li>
 			<li>Comment moderation (enabled for each blog by default) (fplanque)</li>
+			<li>Broadened keyword matching (fplanque)</li>
 			<li>Publish/Delete comments based on spam karma threshold, reported by plugins (blueyed)</li>
 			<li>
 				"Basic Antispam Plugin":
 				<ul>
 					<li>Double-checking referers moved there (blueyed)</li>
+					<li>Blocking requests where the referer has been detected as spam moved here. It does not block requests to the backoffice any longer and can be simply disabled completely. (blueyed)</li>
 					<li>Option to check content in trackbacks about link to your blog; enabled by default (blueyed)</li>
 					<li><a href="http://en.wikipedia.org/wiki/Nofollow">rel="nofollow"</a> is now optional and used for 48 hours by default (blueyed)</li>
 					<li>Option to disable feedback from anonymous visitors (blueyed)</li>
 				</ul>
 			</li>
 			<li>DNS Blacklist antispam plugin (blueyed)</li>
-			<li>Additional basic guestbook spambot defeating techniques (fplanque)</li>
-			<li>Blocking requests where the referer has been detected as spam is now optional. Also it does not block requests to the backoffice any longer. (blueyed)</li>
 		</ul>
 	</li>
 
@@ -73,8 +62,11 @@
 		</ul>
 	</li>
 
-	<li>Scheduled tasks (cron) framework (fplanque)</li>
-
+	<li>Scheduled tasks (cron) framework (fplanque)
+	  <ul>
+	    <li>Automatic retrieval of antispam blacklist (fplanque) </li>
+    </ul>
+	</li>
 	<li>db_delta() functionality that allows easier upgrading (blueyed)</li>
 
 	<li>MySQL 5 strict mode compatibility (blueyed)</li>

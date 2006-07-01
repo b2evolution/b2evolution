@@ -68,6 +68,9 @@ code {
 	white-space: nowrap;
 }
 
+a.discrete {
+	text-decoration: none;
+}
 /*
 {{{ Messages
 */
