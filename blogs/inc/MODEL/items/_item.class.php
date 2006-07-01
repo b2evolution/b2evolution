@@ -2624,7 +2624,7 @@ class Item extends DataObject
 
 					// Footer:
 					."\n-- \n"
-					.T_('Edit/Delete').': '.$admin_url.'?ctrl=browse&amp;blog='.$this->blog_ID.'&p='.$this->ID."\n\n"
+					.T_('Edit/Delete').': '.$admin_url.'?ctrl=browse&blog='.$this->blog_ID.'&p='.$this->ID."\n\n"
 
 					.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
 
@@ -2770,6 +2770,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.66  2006/07/01 17:07:56  blueyed
+ * Fixed Edit/Delete link for item notifications
+ *
  * Revision 1.65  2006/06/25 17:33:39  fplanque
  * fixed moderation link
  *
