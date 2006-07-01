@@ -44,7 +44,7 @@ $Form->begin_form( 'fform' );
 	$Form->hidden( 'redirect_to', $redirect_to );
 
 	if( !empty($mode) )
-	{ // We're in the process of bookmarkletting something, we don't want to loose it:
+	{ // We're in the process of bookmarkletting something, we don't want to lose it:
 		param( 'text', 'html', '' );
 		param( 'popupurl', 'html', '' );
 		param( 'popuptitle', 'html', '' );
@@ -118,6 +118,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.11  2006/07/01 23:49:59  fplanque
+ * wording
+ *
  * Revision 1.10  2006/06/25 23:34:15  blueyed
  * wording pt2
  *
