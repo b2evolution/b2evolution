@@ -770,6 +770,8 @@ class ItemList2 extends DataObjectList2
 		}
 
 		//echo $DB->format_query( $this->sql );
+
+		// fp>> how do I reproduce this:?
     if (is_null($this->order_field_list))
       $this->order_field_list = '';  //smpdawg - This prevents the extra field name from being added to the ORDER BY clause that was happening on the 'Post List' and 'Tracker' tabs.
 
@@ -1419,6 +1421,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.12  2006/07/01 23:40:17  fplanque
+ * no message
+ *
  * Revision 1.11  2006/06/26 01:29:55  smpdawg
  * Fixed error when a user picked the Browse/Post List or Browse/Tracker tabs in the admin area.
  *

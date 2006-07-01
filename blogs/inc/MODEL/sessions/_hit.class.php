@@ -446,6 +446,7 @@ class Hit
 		$Debuglog->add( 'log(): Recording the hit.', 'hit' );
 
     //JEMBEGIN Added this test because the admin screen would cause an error when you navigated to something that wasn't attached to a blog.
+		// fp>> how do we reproduce??
     if (isset($Blog)) {
 		  // insert hit into DB table:
 		  $sql = '
@@ -605,6 +606,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.23  2006/07/01 23:43:15  fplanque
+ * no message
+ *
  * Revision 1.22  2006/06/24 05:19:39  smpdawg
  * Fixed various javascript warnings and errors.
  * Spelling corrections.
