@@ -40,10 +40,10 @@ $Form->begin_form( 'fform', T_('New scheduled job') );
 
 		$Form->select_input_array( 'cjob_type', $cron_job_names, T_('Job type') );
 
-		$Form->date_input( 'cjob_date', date( locale_datefmt(), $localtimenow ), T_('Schedule date'), array(
+		$Form->date_input( 'cjob_date', date2mysql( $localtimenow ), T_('Schedule date'), array(
 							 'required' => true ) );
 
-		$Form->time_input( 'cjob_time', '2000-01-01 '.date( locale_timefmt(), $localtimenow ), T_('Schedule time'), array(
+		$Form->time_input( 'cjob_time', date2mysql( $localtimenow ), T_('Schedule time'), array(
 							 'required' => true ) );
 
 		$Form->duration_input( 'cjob_repeat_after', 0, T_('Repeat every'), array( 'minutes_step' => 1 ) );
@@ -58,6 +58,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.2  2006/07/01 23:47:42  fplanque
+ * fixed dirty bug
+ *
  * Revision 1.1  2006/06/26 23:09:34  fplanque
  * Really working cronjob environment :)
  *
