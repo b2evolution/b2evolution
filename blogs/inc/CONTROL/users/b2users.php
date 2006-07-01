@@ -680,6 +680,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2006/07/01 23:32:58  fplanque
+ * minor
+ *
  * Revision 1.24  2006/06/25 17:42:46  fplanque
  * better use of Results class (mainly for filtering)
  *
@@ -819,27 +822,5 @@ $AdminUI->disp_global_footer();
  *
  * Revision 1.109  2005/11/01 23:50:55  blueyed
  * UI to set the admin_skin for a user. If the user changes his own profile, we reload the page and save $Messages before, so he gets his "User updated" note.. :)
- *
- * Revision 1.108  2005/10/31 23:20:45  fplanque
- * keeping things straight...
- *
- * Revision 1.107  2005/10/31 06:13:02  blueyed
- * Finally merged my work on $Session in.
- *
- * Revision 1.106  2005/10/31 00:21:27  blueyed
- * Made links like "?action=" more explicit by refering to the page (.php file) they link to. This fixes a problem reported by a user. I could not reproduce it, but it was browser independent. He used a mobile card with a laptop (t-online, no wlan).
- *
- * Revision 1.105  2005/10/28 20:08:46  blueyed
- * Normalized AdminUI
- *
- * Revision 1.104  2005/10/20 16:35:18  halton
- * added search / filtering to user list
- *
- * Revision 1.103  2005/10/05 11:22:48  yabs
- * minor changes - correcting ID to user_ID
- *
- * Revision 1.102  2005/10/03 17:26:43  fplanque
- * synched upgrade with fresh DB;
- * renamed user_ID field
  */
 ?>
