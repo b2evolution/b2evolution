@@ -278,14 +278,18 @@ function antispam_poll_abuse()
  *
  * {@internal This function gets tested in _misc.funcs.simpletest.php}}
  *
- * @param string URL
+ * @param string URL or domain
  * @return string|false the pattern to match this domain in the blacklist; false if we could not extract the base domain
  */
 function get_ban_domain( $url )
 {
-	// Remove
-	$domain = preg_replace( '~^[a-z]+://~i', '', $url );
-	$domain = preg_replace( '~(:[1-9]+)?/.*~i', '', $domain );
+	// Remove junk around domain name:
+	$domain = preg_replace( '~^([a-z]+://)?([^:/]+)(.*)$~i', '\\2', $url );
+
+	if( preg_match( '~^[0-9.]+$~', $domain ) )
+	{	// All numeric = IP address, don't try to cut it any further
+		return '//'.$domain;
+	}
 
 	// Get the base domain (without any subdomains):
 	$base_domain = preg_replace( '~(.*\.)([^.]+\.[^.]+)~', '\\2', $domain );
@@ -307,6 +311,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.11  2006/07/01 23:27:49  fplanque
+ * better base domain isolation
+ *
  * Revision 1.10  2006/06/26 23:09:34  fplanque
  * Really working cronjob environment :)
  *
