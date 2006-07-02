@@ -110,6 +110,7 @@ else
 }
 if( $edited_User->get('ID') != 1 && $current_User->check_perm( 'users', 'edit' ) )
 {	// This is not Admin and we're not restricted: we're allowed to change the user group:
+	$edited_User->get_Group();
 	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get('newusers_grp_ID') : $edited_User->Group->get('ID');
 	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group') );
 }
@@ -287,6 +288,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.16  2006/07/02 19:53:58  blueyed
+ * Fixed display of user's group
+ *
  * Revision 1.15  2006/06/25 21:13:17  fplanque
  * minor
  *
