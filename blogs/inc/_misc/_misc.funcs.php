@@ -2644,7 +2644,7 @@ function header_redirect( $redirect_to = NULL )
 
 	$redirect_to = str_replace('&amp;', '&', $redirect_to);
 
-	if( strpos($redirect_to, $htsrv_url_sensitive) === 0 /* we're going somewhere on $htsrv_url_sensible */
+	if( strpos($redirect_to, $htsrv_url_sensitive) === 0 /* we're going somewhere on $htsrv_url_sensitive */
 	 || strpos($redirect_to, $baseurl) === 0   /* we're going somewhere on $baseurl */ )
 	{
 		// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
@@ -2993,6 +2993,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.75  2006/07/02 21:32:09  blueyed
+ * minor
+ *
  * Revision 1.74  2006/06/30 22:58:13  blueyed
  * Abstracted charset conversation, not much tested.
  *
