@@ -863,8 +863,11 @@ function init_charsets( $io )
 		mb_internal_encoding( $evo_charset );
 	}
 
-	// Set encoding for MySQL connection:
-	$DB->set_connection_charset( $evo_charset, true );
+	if( isset($DB) ) // not available in /install/index.php
+	{
+		// Set encoding for MySQL connection:
+		$DB->set_connection_charset( $evo_charset, true );
+	}
 
 	$Debuglog->add( 'evo_charset: '.$evo_charset, 'locale' );
 	$Debuglog->add( 'io_charset: '.$io_charset, 'locale' );
@@ -873,6 +876,9 @@ function init_charsets( $io )
 
 /*
  * $Log$
+ * Revision 1.10  2006/07/02 21:50:50  blueyed
+ * Fixed charset init for install
+ *
  * Revision 1.9  2006/06/30 22:58:13  blueyed
  * Abstracted charset conversation, not much tested.
  *

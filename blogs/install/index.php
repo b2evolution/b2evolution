@@ -59,7 +59,8 @@ else
 }
 // Activate default locale:
 locale_activate( $default_locale );
-$io_charset = locale_charset(false);
+
+init_charsets($current_charset);
 
 $timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
 
@@ -601,6 +602,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.107  2006/07/02 21:50:50  blueyed
+ * Fixed charset init for install
+ *
  * Revision 1.106  2006/06/25 23:41:58  blueyed
  * The archive plugin requires Results itself now.
  *
