@@ -155,55 +155,41 @@ else
 	}
 
 	// JavaScript function to calculate time difference: {{{
-	$d = split(':',date( 'H:i', $servertimenow ));
 	?>
 	<script type="text/javascript">
+
+	var server_Date = new Date();
+	server_Date.setTime( <?php echo $servertimenow.'000' ?> ); // milliseconds
+	var user_Date = new Date();
+
 	function calc_TimeDifference(min_dif) {
-		if ( ntd == null ) {
-			var ntd = document.getElementById('newtime_difference');
+		var ntd = user_Date.getTime() - server_Date.getTime();
+		ntd = ntd / 1000; // to seconds
 
-			var server_hours    = <?php echo $d[0]; ?>;
-			var server_mins    = <?php echo $d[1]; ?>;
+		ntd = ntd - 2; // assume that it takes 2 seconds from writing server_Date time into the source until the browser sets user_Date
 
-			var user_date       = new Date();
-			var user_hours       = user_date.getHours();
-			var user_mins       = user_date.getMinutes();
+		var neg = ( ntd < 0 );
+		ntd = Math.abs(ntd);
+
+		var hours = Math.floor(ntd/3600);
+		var mins = Math.floor( (ntd%3600)/60 );
+		//var secs = Math.round( (ntd%3600)%60 );
+
+		//alert( server_Date+"\n"+user_Date+"\n"+ntd+"\nhours: "+hours+"\nmins: "+mins );
+
+		if( mins == 0 )
+		{
+			ntd = hours;
+		}
+		else
+		{
+			ntd = hours+':'+mins;
 		}
 
-		//alert('Server Hours: '+server_hours+'\r\nUser Time: '+user_hours);
-
-		var result = 0;
-		if( user_hours < server_hours ) {
-
-			// We times by -1, because there is a negative difference
-			result = server_hours - user_hours;
-			// We do the following because if the time difference is greater than 12 then we are in a different day
-			if( result > 12 ) result = -1*(24-result);
-			result *= -1; // Just simplifies things.
-
-		} else if( user_hours > server_hours ) {
-
-			// We times by -1, because there is a negative difference
-			result = user_hours - server_hours;
-			// We do the following because if the time difference is greater than 12 then we are in a different day
-			if( result > 12 ) result = -1*(24-result);
-
-		}
-
-		//alert('Time Difference: '+result);
-
-		if( min_dif && ! ( user_mins < server_mins+30 && user_mins > server_mins-30 ) ) {
-			if( user_mins < server_mins )
-				result--;
-			else
-				result++;
-			//alert('Time Difference: '+result+'\r\nMinute Difference Applied');
-		}
-
-		//alert('Server Time: '+server_hours+'\r\nUser Time: '+user_hours+'\r\nTime Difference: '+result);
+		if( neg && ntd != '0' ) ntd = '-'+ntd;
 
 		// Apply the calculated time difference
-		ntd.value = result;
+		document.getElementById('newtime_difference').value = ntd;
 	}
 	</script>
 
@@ -218,10 +204,33 @@ else
 	$Form->hidden( 'loc_transinfo', $loc_transinfo );
 
 	$Form->begin_fieldset( T_('Regional settings') );
-	$Form->text_input( 'newtime_difference', $Settings->get('time_difference'), 3, T_('Time difference'),
-				array( 'note'=>sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) )
+
+	// Time difference:
+	$td_value = $Settings->get('time_difference');
+	$neg = ( $td_value < 0 );
+	$td_value = abs($td_value);
+	if( $td_value % 3600 != 0 )
+	{ // we have minutes
+		if( $td_value % 60 != 0 )
+		{ // we have seconds (hh:mm:ss)
+			$td_value = floor($td_value/3600).':'.sprintf( '%02d', ($td_value % 3600)/60 ).':'.sprintf( '%02d', ($td_value%60) );
+		}
+		else
+		{ // hh:mm
+			$td_value = floor($td_value/3600).':'.sprintf( '%02d', ($td_value % 3600)/60 );
+		}
+	}
+	else
+	{ // just full hours:
+		$td_value = $td_value/3600;
+	}
+	if($neg) { $td_value = '-'.$td_value; }
+
+	$Form->text_input( 'newtime_difference', $td_value, 8 /* hh:mm:ss */, T_('Time difference'),
+			array( 'note'=>sprintf( '['. T_('in hours, e.g. "1", "1:30" or "1.5"'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), '<span id="cur_servertime">'.date_i18n( locale_timefmt(), $servertimenow ).'</span>' )
 					.' <a href="#" onclick="calc_TimeDifference(); return false;">'.T_('Calculate time difference').'</a>',
-					'maxlength'=> 3, 'required'=>true ) );
+					'maxlength'=> 8, 'required'=>true ) );
+
 	$Form->select( 'newdefault_locale', $Settings->get('default_locale'), 'locale_options_return', T_('Default locale'), T_('Overridden by browser config, user locale or blog locale (in this order).'));
 	$Form->end_fieldset();
 
@@ -467,6 +476,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.9  2006/07/02 21:53:31  blueyed
+ * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
+ *
  * Revision 1.8  2006/06/30 19:12:00  blueyed
  * Removed test for JS-calculation.. :/
  *

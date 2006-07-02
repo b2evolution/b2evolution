@@ -271,8 +271,8 @@ class ItemQuery extends SQL
 			$this->WHERE_and( $this->dbprefix.'assigned_user_ID IN ('.$assignees.')' );
 		}
 	}
-	
-	
+
+
   /**
 	 * Restrict to specific assignee or author
 	 *
@@ -286,11 +286,11 @@ class ItemQuery extends SQL
 		{
 			return;
 		}
-		
+
 		$this->WHERE_and( '( '.$this->dbprefix.'creator_user_ID = '. $author_assignee.' OR '.
 											$this->dbprefix.'assigned_user_ID = '.$author_assignee.' )' );
 	}
-	
+
 
   /**
 	 * Restrict to specific (exetnded) statuses
@@ -341,7 +341,7 @@ class ItemQuery extends SQL
 	 */
 	function where_datestart( $m = '', $w = '', $dstart = '', $dstop = '', $timestamp_min = '', $timestamp_max = 'now' )
 	{
-		global $Settings;
+		global $time_difference;
 
 		$this->m = $m;
 		$this->w = $w;
@@ -466,7 +466,7 @@ class ItemQuery extends SQL
 		if( !empty($timestamp_min) )
 		{ // Hide posts before
 			// echo 'hide before '.$timestamp_min;
-			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
+			$date_min = date('Y-m-d H:i:s', $timestamp_min + $time_difference );
 			$this->WHERE_and( $this->dbprefix.'datestart >= \''. $date_min.'\'' );
 		}
 
@@ -478,7 +478,7 @@ class ItemQuery extends SQL
 		if( !empty($timestamp_max) )
 		{ // Hide posts after
 			// echo 'after';
-			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
+			$date_max = date('Y-m-d H:i:s', $timestamp_max + $time_difference );
 			$this->WHERE_and( $this->dbprefix.'datestart <= \''. $date_max.'\'' );
 		}
 
@@ -552,6 +552,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.7  2006/07/02 21:53:31  blueyed
+ * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
+ *
  * Revision 1.6  2006/06/19 20:59:37  fplanque
  * noone should die anonymously...
  *

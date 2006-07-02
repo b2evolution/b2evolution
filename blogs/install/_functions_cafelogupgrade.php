@@ -36,7 +36,7 @@ function upgrade_cafelog_tables()
 
 	create_default_settings( array( // overrides:
 		'archive_mode' => $q->archive_mode,
-		'time_difference' => $q->time_difference,
+		'time_difference' => ( $q->time_difference*3600 ),
 		'AutoBR' => $q->AutoBR,
 		) );
 
@@ -156,6 +156,9 @@ function upgrade_cafelog_tables()
 
 /*
  * $Log$
+ * Revision 1.40  2006/07/02 21:53:31  blueyed
+ * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
+ *
  * Revision 1.39  2006/03/12 23:09:26  fplanque
  * doc cleanup
  *

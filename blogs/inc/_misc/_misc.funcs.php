@@ -473,7 +473,7 @@ function mysql2date( $dateformatstring, $mysqlstring, $useGM = false )
 function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 {
 	global $month, $month_abbrev, $weekday, $weekday_abbrev, $weekday_letter;
-	global $Settings, $localtimenow;
+	global $localtimenow, $time_difference;
 
 	if( $dateformatstring == 'isoZ' )
 	{ // full ISO 8601 format
@@ -482,7 +482,7 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 
 	if( $useGM )
 	{ // We want a Greenwich Meridian time:
-		$r = gmdate($dateformatstring, $unixtimestamp - ($Settings->get('time_difference') * 3600));
+		$r = gmdate($dateformatstring, ($unixtimestamp - $time_difference));
 	}
 	else
 	{ // We want default timezone time:
@@ -2993,6 +2993,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.76  2006/07/02 21:53:31  blueyed
+ * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
+ *
  * Revision 1.75  2006/07/02 21:32:09  blueyed
  * minor
  *

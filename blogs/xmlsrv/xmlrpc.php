@@ -154,7 +154,7 @@ function b2newpost($m)
 	}
 	else
 	{
-		$now = date('Y-m-d H:i:s', (time() + ($Settings->get('time_difference') * 3600)));
+		$now = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
 	}
 
 	// CHECK and FORMAT content
@@ -404,7 +404,7 @@ function bloggernewpost( $m )
 	// cleanup content from extra tags like <category> and <title>:
 	$content = xmlrpc_removepostdata( $content );
 
-	$now = date('Y-m-d H:i:s', (time() + ($Settings->get('time_difference') * 3600)));
+	$now = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
 
 	// CHECK and FORMAT content
 	$post_title = format_to_post($post_title,0,0);
@@ -1706,7 +1706,7 @@ function mwnewpost($m)
 //	}
 //	else
 //	{
-		$now = date('Y-m-d H:i:s', (time() + ($Settings->get('time_difference') * 3600)));
+		$now = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
 //	}
 	logIO("O","finished checking dates ...".$now);
 	// CHECK and FORMAT content - error occur after this line
@@ -1807,7 +1807,7 @@ function mt_setPostCategories($m) {
 			}
 			else
 			{
-				$now = date('Y-m-d H:i:s', (time() + ($Settings->get('time_difference') * 3600)));
+				$now = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
 			}
 			logIO("O","finished checking dates ...".$now);
 		}
@@ -2020,7 +2020,7 @@ function mweditpost($m)
 	}
 	else
 	{
-		$now = date('Y-m-d H:i:s', (time() + ($Settings->get('time_difference') * 3600)));
+		$now = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
 	}
 	logIO("O","finished checking dates ...>".$now);
 	$post_title = $title;
@@ -2496,6 +2496,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.95  2006/07/02 21:53:31  blueyed
+ * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
+ *
  * Revision 1.94  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
  *

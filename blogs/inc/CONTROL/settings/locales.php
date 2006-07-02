@@ -58,7 +58,34 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 			$Request->param( 'newdefault_locale', 'string', true);
 			$Settings->set( 'default_locale', $newdefault_locale );
 
-			$Request->param_integer_range( 'newtime_difference', -23, 23, T_('Time difference must be between %d and %d.') );
+			$Request->param( 'newtime_difference', 'string', '' );
+			$newtime_difference = trim($newtime_difference);
+			if( $newtime_difference == '' )
+			{
+				$newtime_difference = 0;
+			}
+			if( strpos($newtime_difference, ':') !== false )
+			{ // hh:mm:ss format:
+				$ntd = explode(':', $newtime_difference);
+				if( count($ntd) > 3 )
+				{
+					$Request->param_error( 'newtime_difference', T_('Invalid time format.') );
+				}
+				else
+				{
+					$newtime_difference = $ntd[0]*3600 + ($ntd[1]*60);
+
+					if( count($ntd) == 3 )
+					{ // add seconds:
+						$newtime_difference += $ntd[2];
+					}
+				}
+			}
+			else
+			{ // just hours:
+				$newtime_difference = $newtime_difference*3600;
+			}
+
 			$Settings->set( 'time_difference', $newtime_difference );
 
 			if( ! $Messages->count('error') )
@@ -385,6 +412,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2006/07/02 21:53:31  blueyed
+ * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
+ *
  * Revision 1.4  2006/04/19 20:13:49  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

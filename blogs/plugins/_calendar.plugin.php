@@ -728,7 +728,7 @@ class Calendar
 				else
 				{ // This day is in this month
 					$k = $k + 1;
-					$calendartoday = (date('Ymd',$i) == date('Ymd', (time() + ($Settings->get('time_difference') * 3600))));
+					$calendartoday = (date('Ymd',$i) == date('Ymd', (time() + $Settings->get('time_difference'))));
 
 					if( isset($daysinmonthwithposts[ date('j', $i) ]) )
 					{
@@ -984,6 +984,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.20  2006/07/02 21:53:31  blueyed
+ * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
+ *
  * Revision 1.19  2006/06/16 21:30:57  fplanque
  * Started clean numbering of plugin versions (feel free do add dots...)
  *

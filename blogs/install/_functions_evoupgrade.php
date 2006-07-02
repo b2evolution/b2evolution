@@ -760,12 +760,35 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9200' );
 	}
 
-	// TODO: convert time_difference! See http://dev.b2evolution.net/admin/b2browse.php?tab=posts&blog=7&p=87654&c=1&tb=1&pb=1
-	// TODO: mark all members of "Administrators" group as validated
-	// TODO: "If a user has permission to edit a blog, he should be able to put files in the media folder for that blog." - see http://forums.b2evolution.net/viewtopic.php?p=36417#36417
-
-
 	if( $old_db_version < 9300 )
+	{
+		global $Settings;
+		echo 'Converting time_difference from hours to seconds... ';
+		$DB->query( 'UPDATE T_settings SET set_value = set_value*3600 WHERE set_name = "time_difference"' );
+		echo "OK.<br />\n";
+
+		echo 'Marking administrator account as validated... ';
+		$DB->query( 'UPDATE T_users SET user_validated = 1 WHERE user_ID = 1' );
+		echo "OK.<br />\n";
+	}
+
+
+	// TODO: "If a user has permission to edit a blog, he should be able to put files in the media folder for that blog." - see http://forums.b2evolution.net/viewtopic.php?p=36417#36417
+	/*
+	// blueyed>> I've came up with the following, but it's too generic IMHO
+	if( $old_db_version < 9300 )
+	{
+		echo 'Setting automatic media perms on blogs (members can upload)... ';
+		$users = $DB->query( '
+				UPDATE T_users
+				   SET bloguser_perm_media_upload = 1
+				 WHERE bloguser_ismember = 1' );
+		echo "OK.<br />\n";
+	}
+	*/
+
+
+	if( $old_db_version < 9400 )
 	{
 		/*
 		 * TODO: the following paragraph needs to be rephrased probably. I've not understand it before anyway.. :p
@@ -842,6 +865,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.149  2006/07/02 21:53:31  blueyed
+ * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
+ *
  * Revision 1.148  2006/06/22 18:37:47  fplanque
  * fixes
  *

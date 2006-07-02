@@ -210,7 +210,7 @@ $UserSettings = & new UserSettings();
  */
 $servertimenow = time();
 
-$time_difference = $Settings->get('time_difference') * 3600;
+$time_difference = $Settings->get('time_difference');
 
 /**
  * Corrected Unix timestamp to match server timezone
@@ -606,6 +606,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.34  2006/07/02 21:53:30  blueyed
+ * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
+ *
  * Revision 1.33  2006/06/30 22:58:13  blueyed
  * Abstracted charset conversation, not much tested.
  *
