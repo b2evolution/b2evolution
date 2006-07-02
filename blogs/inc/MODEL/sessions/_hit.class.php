@@ -444,9 +444,12 @@ class Hit
 		$referer_basedomain = get_base_domain( $this->referer );
 
 		$Debuglog->add( 'log(): Recording the hit.', 'hit' );
-
     //JEMBEGIN Added this test because the admin screen would cause an error when you navigated to something that wasn't attached to a blog.
 		// fp>> how do we reproduce??
+    // jm>> It seems that something else has changed and removed the need for this.  It had happened because hit logging was
+    // jm>> taking place in the backend.  So when a user clicked on a tab like "Blog Settings" there was no initialized $Blog variable
+    // jm>> because no blog was currently selected and an error would be thrown but on the same tab if you then selected a blog to edit the
+    // jm>> the error would not occur.  It looks like this code may no longer be needed.
     if (isset($Blog)) {
 		  // insert hit into DB table:
 		  $sql = '
@@ -606,6 +609,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.24  2006/07/02 22:32:34  smpdawg
+ * *** empty log message ***
+ *
  * Revision 1.23  2006/07/01 23:43:15  fplanque
  * no message
  *

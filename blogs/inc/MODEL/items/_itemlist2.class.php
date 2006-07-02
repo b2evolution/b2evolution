@@ -772,6 +772,24 @@ class ItemList2 extends DataObjectList2
 		//echo $DB->format_query( $this->sql );
 
 		// fp>> how do I reproduce this:?
+    // jm>> Specifically because this variable was null, the query method would try to include its own ORDER BY.
+    // jm>> It can be duplicated on a default install with sample data and no additional plugins.  If you comment these two lines
+    // jm>> and then go to the Posts tab in admin and select either "Post List" or "Tracker" you will see a database error like the one shown below.
+/*    
+    Additional information about this error:
+
+MySQL error!
+
+Unknown column 'priority' in 'order clause'(Errno=1054)
+
+Your query:
+
+SELECT *
+                    
+FROM evo_posts 
+WHERE post_ID IN (1,2,18,19,20,21)  
+ORDER BY post_priority ASC, post_ID ASC, priority ASC
+*/
     if (is_null($this->order_field_list))
       $this->order_field_list = '';  //smpdawg - This prevents the extra field name from being added to the ORDER BY clause that was happening on the 'Post List' and 'Tracker' tabs.
 
@@ -1421,6 +1439,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.13  2006/07/02 22:32:34  smpdawg
+ * *** empty log message ***
+ *
  * Revision 1.12  2006/07/01 23:40:17  fplanque
  * no message
  *
