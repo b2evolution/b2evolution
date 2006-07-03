@@ -322,7 +322,8 @@ $schema_queries = array(
 			agnt_ID        INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			agnt_signature VARCHAR(250) NOT NULL,
 			agnt_type      ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL ,
-			PRIMARY KEY (agnt_ID)
+			PRIMARY KEY (agnt_ID),
+			INDEX agnt_type ( agnt_type )
 		)" ),
 
 	'T_hitlog' => array(
@@ -339,6 +340,7 @@ $schema_queries = array(
 			hit_remote_addr    VARCHAR(40) DEFAULT NULL,
 			hit_agnt_ID        INT UNSIGNED NULL,
 			PRIMARY KEY (hit_ID),
+			INDEX hit_agnt_ID ( hit_agnt_ID ),
 			INDEX hit_datetime ( hit_datetime ),
 			INDEX hit_blog_ID (hit_blog_ID)
 		)" ), // TODO: more indexes?
@@ -628,6 +630,9 @@ function install_insert_default_data( $old_db_version )
 
 /*
  * $Log$
+ * Revision 1.21  2006/07/03 19:19:14  blueyed
+ * Added indices
+ *
  * Revision 1.20  2006/06/13 21:49:16  blueyed
  * Merged from 1.8 branch
  *
