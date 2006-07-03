@@ -810,14 +810,21 @@ switch( $AdminUI->get_path(1) )
 			<?php
 			// Create result set:
 			$Results = & new Results( "
-					SELECT COUNT(*) AS hit_count, hit_referer, agnt_signature, hit_blog_ID, blog_shortname
+					SELECT COUNT(*) AS hit_count, hit_referer, hit_blog_ID, agnt_signature
 					  FROM T_hitlog INNER JOIN T_useragents
-					    ON hit_agnt_ID = agnt_ID LEFT JOIN T_blogs
-					    ON hit_blog_ID = blog_ID
+					    ON hit_agnt_ID = agnt_ID "
+					.( empty($blog) ? '' : "LEFT JOIN T_blogs ON hit_blog_ID = blog_ID " )."
 					 WHERE agnt_type = 'robot' "
 					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
-					 GROUP BY agnt_signature', 'topidx', 'D', 20 );
-					 #'SELECT COUNT(*) FROM T_hitlog );
+					 GROUP BY agnt_signature', 'topidx', '-D', 20 );
+
+			$total_hit_count = $DB->get_var( "
+					SELECT COUNT(*)
+					  FROM T_hitlog INNER JOIN T_useragents
+					    ON hit_agnt_ID = agnt_ID "
+					.( empty($blog) ? '' : "LEFT JOIN T_blogs ON hit_blog_ID = blog_ID " )."
+					 WHERE agnt_type = 'robot' "
+					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ) );
 
 			$Results->title = T_('Top Indexing Robots');
 
@@ -862,27 +869,8 @@ switch( $AdminUI->get_path(1) )
 			$Results->cols[] = array(
 					'th' => T_('Hit %'),
 					'order' => 'hit_count',
-					'td' => '', // gets set below (uses total_hit_count)
+					'td' => '%percentage( #hit_count#, '.$total_hit_count.' )%',
 				);
-
-			// Target Blog:
-			if( empty($blog) )
-			{
-				$Results->cols[] = array(
-						'th' => T_('Target Blog'),
-						'order' => 'hit_blog_ID',
-						'td' => '$blog_shortname$',
-					);
-			}
-
-			$Results->display_init();
-
-			$total_hit_count = 0;
-			foreach( $Results->rows as $l_row )
-			{
-				$total_hit_count += $l_row->hit_count;
-			}
-			$Results->cols[2]['td'] = '%percentage( #hit_count#, '.$total_hit_count.' )%';
 
 			// Display results:
 			$Results->display();
@@ -1061,6 +1049,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2006/07/03 18:58:56  blueyed
+ * Optimized "top indexing robots" better (previous commit reverted)
+ *
  * Revision 1.20  2006/07/03 18:25:55  blueyed
  * Optimized expensive count query away ("refsearches")
  *
