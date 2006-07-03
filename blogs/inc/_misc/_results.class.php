@@ -604,6 +604,8 @@ class Results extends Widget
 	 *
 	 * This is the meat of this class!
 	 *
+	 * @param array|NULL
+	 * @param array Fadeout settings (column key => crit (array))
 	 * @return int # of rows displayed
 	 */
 	function display( $display_params = NULL, $fadeout = array() )
@@ -2111,6 +2113,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.17  2006/07/03 23:25:29  blueyed
+ * doc
+ *
  * Revision 1.16  2006/06/25 21:13:17  fplanque
  * minor
  *
