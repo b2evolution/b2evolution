@@ -2203,8 +2203,8 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  * Create IMG tag for an action icon.
  *
  * @param string TITLE text (IMG and A link)
- * @param string icon code, see {@link $map_iconfiles}
  * @param string icon code for {@link get_icon()}
+ * @param string URL where the icon gets linked to (empty to not wrap the icon in a link)
  * @param string word to be displayed after icon
  * @param integer 1-5: weight of the icon. the icon will be displayed only if its weight is >= than the user setting threshold
  * @param integer 1-5: weight of the word. the word will be displayed only if its weight is >= than the user setting threshold
@@ -2266,8 +2266,15 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word
 		unset($link_attribs['use_js_size']);
 	}
 
-	// NOTE: We do not use format_to_output with get_field_attribs_as_string() here, because it interferes with the Results class (eval() fails on entitied quotes..) (blueyed)
-	$r = '<a '.get_field_attribs_as_string( $link_attribs, false ).'>';
+	if( ! empty($link_attribs['href']) )
+	{ // Use a link:
+		// NOTE: We do not use format_to_output with get_field_attribs_as_string() here, because it interferes with the Results class (eval() fails on entitied quotes..) (blueyed)
+		$r = '<a '.get_field_attribs_as_string( $link_attribs, false ).'>';
+	}
+	else
+	{ // only the icon:
+		$r = '';
+	}
 
 	$display_icon = ($icon_weight >= $UserSettings->get('action_icon_threshold'));
 	$display_word = ($word_weight >= $UserSettings->get('action_word_threshold'));
@@ -2299,7 +2306,10 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word
 		}
 	}
 
-	$r .= '</a>';
+	if( ! empty($link_attribs['href']) )
+	{ // Use a link:
+		$r .= '</a>';
+	}
 
 	return $r;
 }
@@ -2993,6 +3003,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.77  2006/07/03 22:01:23  blueyed
+ * Support empty url in action_icon() (=> no A tag)
+ *
  * Revision 1.76  2006/07/02 21:53:31  blueyed
  * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
  *
