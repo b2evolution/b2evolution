@@ -929,7 +929,7 @@ switch( $action )
 
 			$Form->global_icon( T_('Cancel installation!'), 'close', regenerate_url() );
 
-			$Form->begin_form( 'fform', sprintf( /* %d is ID, %d name */ T_('Database setup for plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
+			$Form->begin_form( 'fform', sprintf( /* %d is ID, %d name */ T_('Finish setup of plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
 
 			echo '<p>'.T_('The plugin needs the following database changes.').'</p>';
 
