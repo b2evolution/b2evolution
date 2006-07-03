@@ -546,7 +546,7 @@ switch( $action )
 				$admin_Plugins->unregister( $edit_Plugin );
 
 				$Messages->add( /* %s = plugin's classname, %d = plugin's ID */
-					sprintf( T_('Uninstalled plugin %s (#%d).'), $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
+					sprintf( T_('The &laquo;%s&raquo; plugin (#%d) has been uninstalled.'), $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
 				break;
 			}
 		}
@@ -616,7 +616,7 @@ switch( $action )
 		// apply_rendering:
 		if( $admin_Plugins->set_apply_rendering( $edit_Plugin->ID, $edited_plugin_apply_rendering ) )
 		{
-			$Messages->add( T_('Plugin rendering appliance updated.'), 'success' );
+			$Messages->add( T_('Plugin rendering updated.'), 'success' );
 		}
 
 		// Settings:
@@ -767,7 +767,7 @@ switch( $action )
 		// apply_rendering:
 		if( $admin_Plugins->set_apply_rendering( $edit_Plugin->ID, $edited_plugin_apply_rendering ) )
 		{
-			$Messages->add( T_('Plugin rendering appliance updated.'), 'success' );
+			$Messages->add( T_('Plugin rendering updated.'), 'success' );
 		}
 
 		// PluginSettings:
@@ -929,7 +929,7 @@ switch( $action )
 
 			$Form->global_icon( T_('Cancel installation!'), 'close', regenerate_url() );
 
-			$Form->begin_form( 'fform', sprintf( /* %d is ID, %d name */ T_('Setup database for plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
+			$Form->begin_form( 'fform', sprintf( /* %d is ID, %d name */ T_('Database setup for plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
 
 			echo '<p>'.T_('The plugin needs the following database changes.').'</p>';
 

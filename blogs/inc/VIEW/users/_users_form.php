@@ -221,7 +221,7 @@ $Form->begin_fieldset( T_('Features') );
 	$Form->checkbox( 'edited_user_legend', $UserSettings->get( 'display_icon_legend', $edited_User->ID ), T_('Display icon legend'), T_('Display a legend at the bottom of every page including all action icons used on that page.') );
 
 	// To activate or deactivate bozo validator:
-	$Form->checkbox( 'edited_user_bozo', $UserSettings->get( 'control_form_abortions', $edited_User->ID ), T_('Use anti-bozo form validator'), T_('This will alert you if you fill in data into a form and try to leave the form before submitting the data.') );
+	$Form->checkbox( 'edited_user_bozo', $UserSettings->get( 'control_form_abortions', $edited_User->ID ), T_('Control form closing'), T_('This will alert you if you fill in data into a form and try to leave the form before submitting the data.') );
 
 	// To activate focus on first form input text
 	$Form->checkbox( 'edited_user_focusonfirst', $UserSettings->get( 'focus_on_first_input', $edited_User->ID ), T_('Focus on first input text field'), T_('The focus will automatically go to the first input text field.') );
@@ -288,6 +288,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.17  2006/07/03 21:04:50  fplanque
+ * translation cleanup
+ *
  * Revision 1.16  2006/07/02 19:53:58  blueyed
  * Fixed display of user's group
  *

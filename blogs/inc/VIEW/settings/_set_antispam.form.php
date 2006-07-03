@@ -47,8 +47,8 @@ $Form->hiddens_by_key( get_memorized() );
 $Form->hidden( 'action', 'update' );
 
 $Form->begin_fieldset( T_('Comments/Feedback') );
-	$Form->text( 'antispam_threshold_publish', $Settings->get('antispam_threshold_publish'), 3, T_('Publishing threshold'), T_("(-100 - 100). Automatically publish feedbacks with a spam karma below this value.") );
-	$Form->text( 'antispam_threshold_delete', $Settings->get('antispam_threshold_delete'), 3, T_('Deletion threshold'), T_("(-100 - 100). Automatically delete feedbacks with a spam karma over this value.") );
+	$Form->text( 'antispam_threshold_publish', $Settings->get('antispam_threshold_publish'), 3, T_('Publishing threshold'), T_("(-100 to 100). Automatically publish feedbacks with a spam karma below this value.") );
+	$Form->text( 'antispam_threshold_delete', $Settings->get('antispam_threshold_delete'), 3, T_('Deletion threshold'), T_("(-100 to 100). Automatically delete feedbacks with a spam karma over this value.") );
 
 	$Form->info( '', sprintf( /* TRANS: %s gets replaced by the translation for this setting */ T_('Feedbacks with a spam karma between these two thresholds will get the default status of the blog ("%s").'), T_('New feedback status') ) );
 $Form->end_fieldset();
@@ -90,6 +90,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.5  2006/07/03 21:04:49  fplanque
+ * translation cleanup
+ *
  * Revision 1.4  2006/06/22 19:47:06  blueyed
  * "Block spam referers" as global option
  *

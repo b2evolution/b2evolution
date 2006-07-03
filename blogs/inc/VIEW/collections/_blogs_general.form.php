@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  * Parts of this file are copyright (c)2005 by Jason Edgecombe.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
@@ -178,7 +178,7 @@ $Form->begin_fieldset( T_('Blog URL parameters') );
 			),
 		), T_('Preferred access type'), true );
 
-	$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL blog name'), T_('Used to uniquely identify this blog. Appears in URLs when using extra-path info and gets used as default for the media location (see the advanced tab).'), $maxlength_urlname_stub );
+	$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL blog name'), T_('Used to uniquely identify this blog. Appears in URLs when using extra-path info. Also gets used as default for the media location (see the advanced tab).'), $maxlength_urlname_stub );
 
 	$Form->info( T_('URL preview'), '<span id="urlpreview">'.$edited_Blog->dget( 'baseurl', 'entityencoded' ).$blog_urlappend.'</span>' );
 $Form->end_fieldset();

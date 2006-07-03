@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link https://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -69,7 +69,7 @@ class dnsbl_antispam_plugin extends Plugin
 				'defaultvalue' => "list.dsbl.org\nsbl-xbl.spamhaus.org",
 				'type' => 'textarea',
 				'size' => '50',
-				'note' => T_('The list of DNS blacklists to check, separated by whitespace.'),
+				'note' => T_('The list of DNS blacklists to query, separated by whitespace.'),
 			),
 			'use_whitelisting' => array(
 				'label' => T_('Whitelisting'),
@@ -685,6 +685,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.28  2006/07/03 21:04:51  fplanque
+ * translation cleanup
+ *
  * Revision 1.27  2006/06/16 21:30:57  fplanque
  * Started clean numbering of plugin versions (feel free do add dots...)
  *

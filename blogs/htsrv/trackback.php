@@ -167,8 +167,8 @@ $Comment->dbinsert();
 
 if( $Comment->ID == 0 )
 {
-	// fp>TODO: exit silently! You don't want to give an easy tool to try and pass the filters
-	trackback_response( 1, T_('Sorry, your trackback has been deleted, because it has been detected as spam.') );
+	// Exit silently! Wz don't want to give an easy tool to try and pass the filters.
+	trackback_response( 0, 'ok' );
 }
 
 
@@ -191,6 +191,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.54  2006/07/03 21:04:48  fplanque
+ * translation cleanup
+ *
  * Revision 1.53  2006/05/30 00:15:11  blueyed
  * Do not use Item::can_comment here.
  *

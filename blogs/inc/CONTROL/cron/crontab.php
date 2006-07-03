@@ -129,7 +129,7 @@ switch( $action )
 		{
 			$DB->rollback();
 
-			$Messages->add(  sprintf( T_('Task #%d is currently running. It cannot be deleted.'), $ctsk_ID ), 'error' );
+			$Messages->add(  sprintf( T_('Job #%d is currently running. It cannot be deleted.'), $ctsk_ID ), 'error' );
 		}
 		else
 		{

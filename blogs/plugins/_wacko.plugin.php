@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package plugins
  * @ignore
@@ -70,13 +70,13 @@ class wacko_plugin extends Plugin
 	function wacko_plugin()
 	{
 		$this->short_desc = T_('Wacko style formatting');
-		$this->long_desc = T_('Formats possibles:<br />
+		$this->long_desc = T_('Accepted formats:<br />
 			== h2 ==<br />
 			=== h3 ===<br />
 			==== h4 ====<br />
 			===== h5 =====<br />
 			====== h6 ======<br />
-			--- (horinzal rule)<br />
+			--- (horinzontal rule)<br />
 			%%%codeblock%%%<br />');
 	}
 
@@ -172,6 +172,9 @@ class wacko_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.11  2006/07/03 21:04:51  fplanque
+ * translation cleanup
+ *
  * Revision 1.10  2006/06/16 21:30:57  fplanque
  * Started clean numbering of plugin versions (feel free do add dots...)
  *

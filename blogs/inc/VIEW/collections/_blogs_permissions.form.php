@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
  *
@@ -385,7 +385,7 @@ function simple_coll_perm_radios( $row )
 	return $r;
 }
 $Results->cols[] = array(
-						'th' => T_('Rôle'),
+						'th' => T_('Role'),
 						'td' => '%simple_coll_perm_radios( {row} )%',
 					);
 
@@ -413,6 +413,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.3  2006/07/03 21:04:49  fplanque
+ * translation cleanup
+ *
  * Revision 1.2  2006/06/25 21:15:03  fplanque
  * Heavy refactoring of the user blog perms so it stays manageable with a large number of users...
  *
