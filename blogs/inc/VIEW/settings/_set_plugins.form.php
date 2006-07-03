@@ -249,14 +249,6 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 	echo '<p class="center"><a href="'.regenerate_url( 'plugins_disp_avail', 'plugins_disp_avail=1' ).'">'.T_('Display available plugins.').'</a></p>';
 	return;
 }
-
-if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) // may have been instantiated for action='info'
-{
-	// Discover available plugins:
-	$AvailablePlugins = & new Plugins_no_DB(); // do not load registered plugins/events from DB
-	$AvailablePlugins->discover();
-	$AvailablePlugins->sort('name');
-}
 ?>
 
 <fieldset>
@@ -358,6 +350,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.27  2006/07/03 23:35:24  blueyed
+ * Performance: Only load AvailablePlugins if used!
+ *
  * Revision 1.26  2006/07/03 23:24:57  blueyed
  * info / feedback
  *

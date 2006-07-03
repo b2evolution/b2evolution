@@ -303,7 +303,7 @@ switch( $action )
 		// we call $Plugins(!) here: the Plugin gets disabled on the current page already and it should not get (un)registered on $Plugins_admin!
 		$Plugins->set_Plugin_status( $edit_Plugin, 'disabled' ); // sets $edit_Plugin->status
 
-		$Messages->add( sprintf( T_('Disabled plugin #%d.'), $edit_Plugin->ID ), 'success' );
+		$Messages->add( /* TRANS: plugin name, class name and ID */ sprintf( T_('Disabled plugin "%s" (%s, #%d).'), $edit_Plugin->name, $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
 
 		break;
 
@@ -325,7 +325,7 @@ switch( $action )
 		}
 		if( $edit_Plugin->status == 'enabled' )
 		{
-			$Messages->add( sprintf( T_( 'The plugin with ID %d is already enabled.' ), $plugin_ID ), 'note' );
+			$Messages->add( /* TRANS: plugin name, class name and ID */ sprintf( T_( 'The plugin "%s" (%s, #%d) is already enabled.' ), $edit_Plugin->name, $edit_Plugin->classname, $plugin_ID ), 'note' );
 			break;
 		}
 		if( $edit_Plugin->status == 'broken' )
@@ -358,7 +358,7 @@ switch( $action )
 			// we call $Plugins(!) here: the Plugin gets active on the current page already and it should not get (un)registered on $Plugins_admin!
 			$Plugins->set_Plugin_status( $edit_Plugin, 'enabled' ); // sets $edit_Plugin->status
 
-			$Messages->add( sprintf( T_('Enabled plugin #%d.'), $edit_Plugin->ID ), 'success' );
+			$Messages->add( /* TRANS: plugin name, class name and ID */ sprintf( T_('Enabled plugin "%s" (%s, #%d).'), $edit_Plugin->name, $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
 		}
 		else
 		{
@@ -451,7 +451,7 @@ switch( $action )
 		}
 
 		$msg = sprintf( T_('Installed plugin &laquo;%s&raquo;.'), $edit_Plugin->classname );
-		if( $edit_settings_icon = $edit_Plugin->get_edit_settings_link()
+		if( ($edit_settings_icon = $edit_Plugin->get_edit_settings_link())
 			&& $edit_Plugin->GetDefaultSettings() /* It provides settings apart from default code and priority */ )
 		{
 			$msg .= ' '.$edit_settings_icon;
@@ -853,7 +853,6 @@ switch( $action )
 
 		break;
 
-
 }
 
 /*
@@ -1079,10 +1078,14 @@ switch( $action )
 
 if( $action == 'list' )
 {
-	// Discover available plugins:
-	$AvailablePlugins = & new Plugins_no_DB(); // do not load registered plugins/events from DB
-	$AvailablePlugins->discover();
-	$AvailablePlugins->sort('name');
+	if( $UserSettings->get('plugins_disp_avail')
+			&& ( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) // may have been instantiated for action 'info'
+		)
+	{ // We want to display available plugins:
+		$AvailablePlugins = & new Plugins_no_DB(); // do not load registered plugins/events from DB
+		$AvailablePlugins->discover();
+		$AvailablePlugins->sort('name');
+	}
 
 	// Display VIEW:
 	$AdminUI->disp_view( 'settings/_set_plugins.form.php' );
