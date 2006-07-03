@@ -64,14 +64,13 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	}
 	elseif( $edit_Plugin->status == 'broken' )
 	{
-		$Form->global_icon('warning', 'imgtag', array(
-			'title' => T_('The plugin is broken.')
+		$icon_title = T_('The plugin is broken.')
 				.// Display load error from Plugins::register() (if any):
 				( isset( $admin_Plugins->plugin_errors[$edit_Plugin->ID] )
 					&& ! empty($admin_Plugins->plugin_errors[$edit_Plugin->ID]['register'])
 					? ' '.$admin_Plugins->plugin_errors[$edit_Plugin->ID]['register']
-					: '' )
-			) );
+					: '' );
+		$Form->global_icon( $icon_title, 'warning', '' );
 	}
 	else
 	{
@@ -197,6 +196,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.15  2006/07/03 22:02:18  blueyed
+ * Fixed warning/broken icon (which is just an icon, without action/url)
+ *
  * Revision 1.14  2006/06/22 19:50:51  blueyed
  * Plugin action icons (status and uninstall) with the settings form.
  *
