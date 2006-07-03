@@ -244,18 +244,18 @@ class Plugins
 				'AdminToolAction' => '',
 				'AdminToolPayload' => '',
 
-				'AdminBeforeItemEditCreate' => T_('This gets called before a new item gets created.'),
-				'AdminBeforeItemEditUpdate' => T_('This gets called before an existing item gets updated.'),
+				'AdminBeforeItemEditCreate' => 'This gets called before a new item gets created.',
+				'AdminBeforeItemEditUpdate' => 'This gets called before an existing item gets updated.',
 
 				'AdminBeginPayload' => '',
 
-				'CacheObjects' => T_('Cache data objects.'),
-				'CachePageContent' => T_('Cache page content.'),
-				'CacheIsCollectingContent' => T_('Gets asked for if we are generating cached content.'),
+				'CacheObjects' => 'Cache data objects.',
+				'CachePageContent' => 'Cache page content.',
+				'CacheIsCollectingContent' => 'Gets asked for if we are generating cached content.',
 
-				'AfterCommentDelete' => T_('Gets called after a comment has been deleted from the database.'),
-				'AfterCommentInsert' => T_('Gets called after a comment has been inserted into the database.'),
-				'AfterCommentUpdate' => T_('Gets called after a comment has been updated in the database.'),
+				'AfterCommentDelete' => 'Gets called after a comment has been deleted from the database.',
+				'AfterCommentInsert' => 'Gets called after a comment has been inserted into the database.',
+				'AfterCommentUpdate' => 'Gets called after a comment has been updated in the database.',
 
 				'AfterItemDelete' => '',
 				'PrependItemInsertTransact' => '',
@@ -264,69 +264,69 @@ class Plugins
 				'AfterItemUpdate' => '',
 				'AppendItemPreviewTransact' => '',
 
-				'RenderItemAsHtml' => T_('Renders content when generated as HTML.'),
-				'RenderItemAsXml' => T_('Renders content when generated as XML.'),
-				'RenderItem' => T_('Renders content when not generated as HTML or XML.'),
+				'RenderItemAsHtml' => 'Renders content when generated as HTML.',
+				'RenderItemAsXml' => 'Renders content when generated as XML.',
+				'RenderItem' => 'Renders content when not generated as HTML or XML.',
 
-				'FilterCommentAuthor' => T_('Filters the comment author.'),
-				'FilterCommentAuthorUrl' => T_('Filters the URL of the comment author.'),
-				'FilterCommentContent' => T_('Filters the content of a comment.'),
+				'FilterCommentAuthor' => 'Filters the comment author.',
+				'FilterCommentAuthorUrl' => 'Filters the URL of the comment author.',
+				'FilterCommentContent' => 'Filters the content of a comment.',
 
 				/*
 				not used yet..
-				'DisplayItemAsHtml' => T_('Called on an item when it gets displayed as HTML.'),
-				'DisplayItemAsXml' => T_('Called on an item when it gets displayed as XML.'),
-				'DisplayItem' => T_('Called on an item when it gets not displayed as HTML or XML.'),
+				'DisplayItemAsHtml' => 'Called on an item when it gets displayed as HTML.',
+				'DisplayItemAsXml' => 'Called on an item when it gets displayed as XML.',
+				'DisplayItem' => 'Called on an item when it gets not displayed as HTML or XML.',
 				*/
-				'DisplayItemAllFormats' => T_('Called on an item when it gets displayed.'),
+				'DisplayItemAllFormats' => 'Called on an item when it gets displayed.',
 
-				'FilterIpAddress' => T_('Called when displaying an IP address.'),
+				'FilterIpAddress' => 'Called when displaying an IP address.',
 
-				'ItemViewsIncreased' => T_('Called when the view counter of an item got increased.'),
-				'ItemCanComment' => T_('Asks the plugin if an item can receive comments/feedback.'),
+				'ItemViewsIncreased' => 'Called when the view counter of an item got increased.',
+				'ItemCanComment' => 'Asks the plugin if an item can receive comments/feedback.',
 
 				'SkinTag' => '',
 
-				'AppendHitLog' => T_('Called when a hit gets logged, but before it gets recorded.'),
+				'AppendHitLog' => 'Called when a hit gets logged, but before it gets recorded.',
 
 				'DisplayCommentFormButton' => '',
 				'DisplayCommentFormFieldset' => '',
 				'DisplayMessageFormButton' => '',
 				'DisplayMessageFormFieldset' => '',
-				'DisplayLoginFormFieldset' => T_('Called when displaying the "Login" form.'),
-				'DisplayRegisterFormFieldset' => T_('Called when displaying the "Register" form.'),
-				'DisplayValidateAccountFormFieldset' => T_('Called when displaying the "Validate account" form.'),
+				'DisplayLoginFormFieldset' => 'Called when displaying the "Login" form.',
+				'DisplayRegisterFormFieldset' => 'Called when displaying the "Register" form.',
+				'DisplayValidateAccountFormFieldset' => 'Called when displaying the "Validate account" form.',
 
-				'BeforeCommentFormInsert' => T_('Called before a comment gets recorded through the public comment form.'),
-				'AfterCommentFormInsert' => T_('Called after a comment has been added through public form.'),
+				'BeforeCommentFormInsert' => 'Called before a comment gets recorded through the public comment form.',
+				'AfterCommentFormInsert' => 'Called after a comment has been added through public form.',
 
-				'BeforeTrackbackInsert' => T_('Gets called before a trackback gets recorded.'),
-				'AfterTrackbackInsert' => T_('Gets called after a trackback has been recorded.'),
+				'BeforeTrackbackInsert' => 'Gets called before a trackback gets recorded.',
+				'AfterTrackbackInsert' => 'Gets called after a trackback has been recorded.',
 
-				'LoginAttempt' => T_('Called when a user tries to login.'),
+				'LoginAttempt' => 'Called when a user tries to login.',
 				'AlternateAuthentication' => '',
-				'MessageFormSent' => T_('Called when the "Message to user" form has been submitted.'),
-				'MessageFormSentCleanup' => T_('Called after a email message has been sent through public form.'),
+				'MessageFormSent' => 'Called when the "Message to user" form has been submitted.',
+				'MessageFormSentCleanup' => 'Called after a email message has been sent through public form.',
 
-				'GetSpamKarmaForComment' => T_('Asks plugin for the spam karma of a comment/trackback.'),
+				'GetSpamKarmaForComment' => 'Asks plugin for the spam karma of a comment/trackback.',
 
 				// Other Plugins can use this:
-				'CaptchaValidated' => T_('Validate the test from CaptchaPayload to detect humans.'),
-				'CaptchaValidatedCleanup' => T_('Cleanup data used for CaptchaValidated.'),
-				'CaptchaPayload' => T_('Provide a turing test to detect humans.'),
+				'CaptchaValidated' => 'Validate the test from CaptchaPayload to detect humans.',
+				'CaptchaValidatedCleanup' => 'Cleanup data used for CaptchaValidated.',
+				'CaptchaPayload' => 'Provide a turing test to detect humans.',
 
-				'RegisterFormSent' => T_('Called when the "Register" form has been submitted.'),
-				'ValidateAccountFormSent' => T_('Called when the "Validate account" form has been submitted.'),
-				'AppendUserRegistrTransact' => T_('Gets appended to the transaction that creates a new user on registration.'),
-				'AfterUserRegistration' => T_('Gets called after a new user has registered.'),
+				'RegisterFormSent' => 'Called when the "Register" form has been submitted.',
+				'ValidateAccountFormSent' => 'Called when the "Validate account" form has been submitted.',
+				'AppendUserRegistrTransact' => 'Gets appended to the transaction that creates a new user on registration.',
+				'AfterUserRegistration' => 'Gets called after a new user has registered.',
 
 				'SessionLoaded' => '', // gets called after $Session is initialized, quite early.
 
-				'AfterLoginAnonymousUser' => T_('Gets called at the end of the login procedure for anonymous visitors.'),
-				'AfterLoginRegisteredUser' => T_('Gets called at the end of the login procedure for registered users.'),
+				'AfterLoginAnonymousUser' => 'Gets called at the end of the login procedure for anonymous visitors.',
+				'AfterLoginRegisteredUser' => 'Gets called at the end of the login procedure for registered users.',
 
-				'BeforeBlogDisplay' => T_('Gets called before a (part of the blog) gets displayed.'),
-				'SkinBeginHtmlHead' => T_('Gets called at the top of the HTML HEAD section in a skin.'),
+				'BeforeBlogDisplay' => 'Gets called before a (part of the blog) gets displayed.',
+				'SkinBeginHtmlHead' => 'Gets called at the top of the HTML HEAD section in a skin.',
 				'DisplayTrackbackAddr' => '',
 			);
 
@@ -1003,7 +1003,7 @@ class Plugins
 		{ // the given class does not exist
 			if( $must_exists )
 			{
-				$r = sprintf( /* TRANS: First %s is the (class)name */ T_('Plugin class for &laquo;%s&raquo; in file &laquo;%s&raquo; not defined - it must match the filename.'), $classname, rel_path_to_base($classfile_path) );
+				$r = sprintf( 'Plugin class for &laquo;%s&raquo; in file &laquo;%s&raquo; not defined - it must match the filename.', $classname, rel_path_to_base($classfile_path) );
 				$Debuglog->add( $r, array( 'plugins', 'error' ) );
 
 				// Get the Plugin object (must not exist)
@@ -2753,6 +2753,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.59  2006/07/03 20:59:00  fplanque
+ * too much translation/memory overhead. Geeks and devs can read English.
+ *
  * Revision 1.58  2006/06/27 15:39:23  blueyed
  * fix
  *
