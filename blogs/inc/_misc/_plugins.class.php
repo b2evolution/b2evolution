@@ -60,11 +60,6 @@ class Plugins
 	var $api_version = array( 1, 0 );
 
 	/**
-	 * Array of loaded plugins.
-	 */
-	var $Plugins = array();
-
-	/**
 	 * Index: plugin_code => Plugin
 	 */
 	var $index_code_Plugins = array();
@@ -795,7 +790,7 @@ class Plugins
 			return array();
 		}
 
-		foreach( $deps as $class => $dep_list )
+		foreach( $deps as $class => $dep_list ) // class: "requires" or "recommends"
 		{
 			if( ! is_array($dep_list) )
 			{ // Invalid format: "throw" error (needs not translation)
@@ -813,7 +808,7 @@ class Plugins
 							if( ! is_array($sub_param) )
 							{ // Invalid format: "throw" error (needs not translation)
 								return array(
-										'error' => array( 'GetDependencies() did not return array of arrays for events_by_one. Please contact the plugin developer.' )
+										'error' => array( 'GetDependencies() did not return array of arrays for "events_by_one". Please contact the plugin developer.' )
 									);
 							}
 							if( ! $this->are_events_available( $sub_param, true ) )
@@ -845,6 +840,12 @@ class Plugins
 						break;
 
 					case 'plugins':
+						if( ! is_array($type_params) )
+						{ // Invalid format: "throw" error (needs not translation)
+							return array(
+									'error' => array( 'GetDependencies() did not return array of arrays for "plugins". Please contact the plugin developer.' )
+								);
+						}
 						foreach( $type_params as $plugin_req )
 						{
 							if( ! is_array($plugin_req) )
@@ -1073,8 +1074,6 @@ class Plugins
 
 		$Plugin->Plugins = & $this;
 
-		// Memorizes Plugin in sequential array:
-		$this->Plugins[] = & $Plugin;
 		// Memorizes Plugin in code hash array:
 		if( ! empty($this->index_code_ID[ $Plugin->code ]) && $this->index_code_ID[ $Plugin->code ] != $Plugin->ID )
 		{ // The plugin's default code is already in use!
@@ -1207,17 +1206,6 @@ class Plugins
 		unset( $this->sorted_IDs[$sort_key] );
 		$this->sorted_IDs = array_values( $this->sorted_IDs );
 
-		// Unset from $Plugins array.. this should not be necessary really, but keeps things clean
-		foreach( $this->Plugins as $l_key => $l_Plugin )
-		{
-			if( $l_Plugin->ID == $Plugin->ID )
-			{
-				unset( $this->Plugins[$l_key] );
-				// Note: No need to re-arrange Plugins array..
-				break;
-			}
-		}
-
 		if( $this->current_idx >= $sort_key )
 		{ // We have removed a file before or at the $sort_key'th position
 			$this->current_idx--;
@@ -1316,7 +1304,7 @@ class Plugins
 	 *
 	 * @return boolean|integer
 	 *   true, if already set to same value.
-	 *   false if another Plugin uses that code already.
+	 *   false if another Plugin uses that priority already.
 	 *   1 in case of setting it into DB.
 	 */
 	function set_priority( $plugin_ID, $priority )
@@ -2181,7 +2169,7 @@ class Plugins
 
 			#pre_dump( 'get_by_ID(), index_ID_rows', $this->index_ID_rows );
 
-			if( ! isset( $this->index_ID_rows[$plugin_ID] ) || !$this->index_ID_rows[$plugin_ID] )
+			if( ! isset( $this->index_ID_rows[$plugin_ID] ) || ! $this->index_ID_rows[$plugin_ID] )
 			{ // no plugin rows cached
 				#debug_die( 'Cannot instantiate Plugin (ID '.$plugin_ID.') without DB information.' );
 				$Debuglog->add( 'get_by_ID(): Plugin (ID '.$plugin_ID.') not registered/enabled in DB!', array( 'plugins', 'error' ) );
@@ -2205,6 +2193,28 @@ class Plugins
 		}
 
 		return $this->index_ID_Plugins[ $plugin_ID ];
+	}
+
+
+	/**
+	 * Get a plugin by its classname.
+	 *
+	 * @return Plugin|false
+	 */
+	function & get_by_classname($classname)
+	{
+		$this->load_plugins_table(); // We use index_ID_rows (no own index yet)
+
+		foreach( $this->index_ID_rows as $plug_ID => $row )
+		{
+			if( $row['plug_classname'] == $classname )
+			{
+				return $this->get_by_ID($plug_ID);
+			}
+		}
+
+		$r = false;
+		return $r;
 	}
 
 
@@ -2433,7 +2443,11 @@ class Plugins
 
 		$plugin_class_methods = array(); // Return value
 
-		$classfile_contents = file_get_contents( $Plugin->classfile_path );
+		$classfile_contents = @file_get_contents( $Plugin->classfile_path );
+		if( empty($classfile_contents) )
+		{
+			return array();
+		}
 
 		$token_buffer = '';
 		$classname = '';
@@ -2518,7 +2532,10 @@ class Plugins
 		$r = false;
 
 		$saved_events = array();
-		foreach( $DB->get_results( 'SELECT pevt_event, pevt_enabled FROM T_pluginevents WHERE pevt_plug_ID = '.$Plugin->ID ) as $l_row )
+		foreach( $DB->get_results( '
+				SELECT pevt_event, pevt_enabled
+				  FROM T_pluginevents
+				 WHERE pevt_plug_ID = '.$Plugin->ID ) as $l_row )
 		{
 			$saved_events[$l_row->pevt_event] = $l_row->pevt_enabled;
 		}
@@ -2753,6 +2770,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.60  2006/07/03 23:36:00  blueyed
+ * Cleanup
+ *
  * Revision 1.59  2006/07/03 20:59:00  fplanque
  * too much translation/memory overhead. Geeks and devs can read English.
  *
