@@ -766,10 +766,6 @@ function upgrade_b2evo_tables()
 		echo 'Converting time_difference from hours to seconds... ';
 		$DB->query( 'UPDATE T_settings SET set_value = set_value*3600 WHERE set_name = "time_difference"' );
 		echo "OK.<br />\n";
-
-		echo 'Marking administrator account as validated... ';
-		$DB->query( 'UPDATE T_users SET user_validated = 1 WHERE user_ID = 1' );
-		echo "OK.<br />\n";
 	}
 
 
@@ -841,6 +837,14 @@ function upgrade_b2evo_tables()
 	install_make_db_schema_current( true );
 
 
+	if( $old_db_version < 9300 )
+	{ // This has to go here, because it uses fields, that are created through install_make_db_schema_current():
+		echo 'Marking administrator account as validated... ';
+		$DB->query( 'UPDATE T_users SET user_validated = 1 WHERE user_ID = 1' );
+		echo "OK.<br />\n";
+	}
+
+
 	// Insert default values, but only those since Phoenix-Alpha:
 	// TODO: cleanup/move previous upgrade instructions (data inserts) from above to install_insert_default_data()?!
 	$db_version_ge_8999 = ( $old_db_version >= 8999 ? $old_db_version : 8999 );
@@ -865,6 +869,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.150  2006/07/03 19:27:48  blueyed
+ * Fixed install (user_validated)
+ *
  * Revision 1.149  2006/07/02 21:53:31  blueyed
  * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
  *
