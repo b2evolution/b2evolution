@@ -51,7 +51,7 @@ global $AvailablePlugins;
  */
 global $UserSettings;
 
-global $inc_path;
+global $inc_path, $edit_Plugin;
 require_once $inc_path.'_misc/_plugin.funcs.php';
 
 
@@ -231,7 +231,10 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 <fieldset>
 	<legend><?php echo T_('Installed plugins') ?></legend>
 	<?php
-	$Results->display();
+	// if there happened something with a plugin_ID, apply fadeout to the row:
+	$highlight_fadeout = empty($edit_Plugin) ? array() : array( 'plug_ID'=>array($edit_Plugin->ID) );
+
+	$Results->display( NULL, $highlight_fadeout );
 	?>
 	<p class="center">
 		<a href="admin.php?ctrl=plugins&amp;action=reload_plugins"><?php echo T_('Reload events and codes for installed plugins.') ?></a>
@@ -355,6 +358,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.26  2006/07/03 23:24:57  blueyed
+ * info / feedback
+ *
  * Revision 1.25  2006/06/26 21:43:18  blueyed
  * small enhancements
  *

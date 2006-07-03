@@ -1034,6 +1034,8 @@ switch( $action )
 			$Form->info_field( T_('ID'), $edit_Plugin->ID );
 		}
 		$Form->info_field( T_('Version'), $edit_Plugin->version );
+		$Form->info_field( T_('Classname'), $edit_Plugin->classname );
+		$Form->info_field( T_('Class file'), rel_path_to_base($edit_Plugin->classfile_path ) );
 
 		// Help icons (to homepage and README.html), if available:
 		$help_icons = array();
