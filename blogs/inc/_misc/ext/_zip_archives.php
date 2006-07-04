@@ -12,7 +12,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @author Devin Doucette - darksnoopy@shaw.ca
  *
@@ -708,6 +708,9 @@ class zip_file extends archive
 
 /*
  * $Log$
+ * Revision 1.2  2006/07/04 17:32:30  fplanque
+ * no message
+ *
  * Revision 1.1  2006/02/23 21:12:33  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

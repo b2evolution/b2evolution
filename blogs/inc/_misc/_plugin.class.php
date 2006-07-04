@@ -2319,8 +2319,11 @@ class Plugin
 }
 
 
-/* {{{ Revision log:
+/*
  * $Log$
+ * Revision 1.67  2006/07/04 17:32:30  fplanque
+ * no message
+ *
  * Revision 1.66  2006/06/30 22:58:13  blueyed
  * Abstracted charset conversation, not much tested.
  *
@@ -2596,6 +2599,5 @@ class Plugin
  * Revision 1.9  2004/10/12 16:12:18  fplanque
  * Edited code documentation.
  *
- * }}}
  */
 ?>

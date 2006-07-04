@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -426,6 +426,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.13  2006/07/04 17:32:30  fplanque
+ * no message
+ *
  * Revision 1.12  2006/06/26 23:10:24  fplanque
  * minor / doc
  *

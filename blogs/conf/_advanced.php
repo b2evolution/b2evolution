@@ -518,6 +518,14 @@ $force_regexp_dirname = '';
 
 
 /**
+ * Experimental
+ */
+$sponsored_links = array(
+	array( 'http://plusjamaisseul.net/', 'Plus jamais seul?' ),
+);
+
+
+/**
  * Set this to 1 to disable using PHP's {@link register_shutdown_function()},
  * but not everywhere.
  *
@@ -536,7 +544,6 @@ $debug_no_register_shutdown = 0;
  * Seconds after which a scheduled task is considered to be timed out.
  */
 $cron_timeout_delay = 1800; // 30 minutes
-
 
 
 // ----- CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING! -----

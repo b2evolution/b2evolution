@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package install
  */
@@ -602,6 +602,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.108  2006/07/04 17:32:30  fplanque
+ * no message
+ *
  * Revision 1.107  2006/07/02 21:50:50  blueyed
  * Fixed charset init for install
  *

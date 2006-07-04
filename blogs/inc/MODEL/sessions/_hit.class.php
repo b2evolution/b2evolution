@@ -444,26 +444,19 @@ class Hit
 		$referer_basedomain = get_base_domain( $this->referer );
 
 		$Debuglog->add( 'log(): Recording the hit.', 'hit' );
-    //JEMBEGIN Added this test because the admin screen would cause an error when you navigated to something that wasn't attached to a blog.
-		// fp>> how do we reproduce??
-    // jm>> It seems that something else has changed and removed the need for this.  It had happened because hit logging was
-    // jm>> taking place in the backend.  So when a user clicked on a tab like "Blog Settings" there was no initialized $Blog variable
-    // jm>> because no blog was currently selected and an error would be thrown but on the same tab if you then selected a blog to edit the
-    // jm>> the error would not occur.  It looks like this code may no longer be needed.
-    if (isset($Blog)) {
-		  // insert hit into DB table:
-		  $sql = '
-		  	INSERT INTO T_hitlog(
-  				hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
-  				hit_referer, hit_referer_dom_ID, hit_blog_ID, hit_remote_addr, hit_agnt_ID )
-  			VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($ReqURI).'", "'.$this->referer_type
-  				.'", "'.$DB->escape($this->referer).'", "'.$this->referer_domain_ID.'", '.$DB->quote($Blog->ID).', "'.$DB->escape( $this->IP ).'", '.$this->agent_ID.'
-  			)';
 
-  		$DB->query( $sql, 'Record the hit' );
-  		$this->ID = $DB->insert_id;
-    }
-    //JEMEND
+		// insert hit into DB table:
+		$sql = '
+			INSERT INTO T_hitlog(
+				hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
+				hit_referer, hit_referer_dom_ID, hit_blog_ID, hit_remote_addr, hit_agnt_ID )
+			VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($ReqURI).'", "'.$this->referer_type
+				.'", "'.$DB->escape($this->referer).'", "'.$this->referer_domain_ID.'", '.$DB->quote($Blog->ID).', "'.$DB->escape( $this->IP ).'", '.$this->agent_ID.'
+			)';
+
+		$DB->query( $sql, 'Record the hit' );
+		$this->ID = $DB->insert_id;
+
 		require_once( dirname(__FILE__).'/_hitlist.class.php' );
 		Hitlist::dbprune(); // will prune once per day, according to Settings
 	}
@@ -609,16 +602,8 @@ class Hit
 
 /*
  * $Log$
- * Revision 1.24  2006/07/02 22:32:34  smpdawg
- * *** empty log message ***
- *
- * Revision 1.23  2006/07/01 23:43:15  fplanque
+ * Revision 1.25  2006/07/04 17:32:29  fplanque
  * no message
- *
- * Revision 1.22  2006/06/24 05:19:39  smpdawg
- * Fixed various javascript warnings and errors.
- * Spelling corrections.
- * Fixed PHP warnings.
  *
  * Revision 1.21  2006/06/22 19:47:06  blueyed
  * "Block spam referers" as global option

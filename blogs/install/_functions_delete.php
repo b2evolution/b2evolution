@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package install
  */
@@ -104,6 +104,9 @@ function db_delete()
 
 /*
  * $Log$
+ * Revision 1.29  2006/07/04 17:32:30  fplanque
+ * no message
+ *
  * Revision 1.28  2006/03/01 23:43:30  blueyed
  * T_pluginusersettings
  *

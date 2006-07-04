@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)1999 by CDI (cdi@thewebmasters.net).
  * Parts of this file are copyright (c)1999-2002 by The SquirrelMail Project Team.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
@@ -734,6 +734,9 @@ class POP3 {
 
 /*
  * $Log$
+ * Revision 1.5  2006/07/04 17:32:30  fplanque
+ * no message
+ *
  * Revision 1.4  2006/05/16 21:45:52  blueyed
  * Use stream/socket timeout for data!
  *

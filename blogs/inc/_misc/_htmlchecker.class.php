@@ -7,7 +7,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2003 by Nobuo SAKIYAMA - {@link http://www.sakichan.org/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -288,6 +288,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.8  2006/07/04 17:32:30  fplanque
+ * no message
+ *
  * Revision 1.7  2006/05/17 09:56:56  blueyed
  * Handle default (empty) "encoding" better
  *

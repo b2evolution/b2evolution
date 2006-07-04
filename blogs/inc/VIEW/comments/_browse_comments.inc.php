@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -54,6 +54,9 @@ require dirname(__FILE__).'/inc/_comment_list.inc.php';
 <?php
 /*
  * $Log$
+ * Revision 1.12  2006/07/04 17:32:29  fplanque
+ * no message
+ *
  * Revision 1.11  2006/04/18 19:29:52  fplanque
  * basic comment status implementation
  *

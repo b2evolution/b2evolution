@@ -790,8 +790,8 @@ FROM evo_posts
 WHERE post_ID IN (1,2,18,19,20,21)  
 ORDER BY post_priority ASC, post_ID ASC, priority ASC
 */
-    if (is_null($this->order_field_list))
-      $this->order_field_list = '';  //smpdawg - This prevents the extra field name from being added to the ORDER BY clause that was happening on the 'Post List' and 'Tracker' tabs.
+//    if (is_null($this->order_field_list))
+//      $this->order_field_list = '';  //smpdawg - This prevents the extra field name from being added to the ORDER BY clause that was happening on the 'Post List' and 'Tracker' tabs.
 
 		parent::query( $this->sql, false, false );
 	}
@@ -1439,6 +1439,9 @@ ORDER BY post_priority ASC, post_ID ASC, priority ASC
 
 /*
  * $Log$
+ * Revision 1.14  2006/07/04 17:32:29  fplanque
+ * no message
+ *
  * Revision 1.13  2006/07/02 22:32:34  smpdawg
  * *** empty log message ***
  *

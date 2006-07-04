@@ -12,7 +12,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
  */
@@ -590,6 +590,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2006/07/04 17:32:28  fplanque
+ * no message
+ *
  * Revision 1.13  2006/05/30 20:32:56  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
  *

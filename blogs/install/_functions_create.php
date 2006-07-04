@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}
  * Parts of this file are copyright (c)2005 by Jason EDGECOMBE
  *
@@ -919,6 +919,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.190  2006/07/04 17:32:30  fplanque
+ * no message
+ *
  * Revision 1.189  2006/06/18 01:14:03  blueyed
  * lazy instantiate user's group; normalisation
  *
