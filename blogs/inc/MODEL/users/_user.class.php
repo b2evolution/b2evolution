@@ -817,7 +817,13 @@ class User extends DataObject
 
 		if( $r )
 		{ // save request_id into Session
-			$Session->set( 'core.validatemail.request_id', $request_id, 86400 * 2 ); // expires in two days (or when clicked)
+			$request_ids = $Session->get( 'core.validatemail.request_ids' );
+			if( ! is_array($request_ids) )
+			{
+				$request_ids = array();
+			}
+			$request_ids[] = $request_id;
+			$Session->set( 'core.validatemail.request_ids', $request_ids, 86400 * 2 ); // expires in two days (or when clicked)
 			$Session->dbsave(); // save immediately
 		}
 
@@ -1044,6 +1050,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2006/07/04 23:38:11  blueyed
+ * Validate email: admin user (#1) has an extra button to validate him/herself through the form; store multiple req_validatemail keys in the user's session.
+ *
  * Revision 1.24  2006/07/01 17:05:30  blueyed
  * Made check_perm() more clear.
  *

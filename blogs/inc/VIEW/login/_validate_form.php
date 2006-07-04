@@ -55,6 +55,23 @@ $Form->begin_fieldset();
 
 // TODO: the form submit value is too wide (in Konqueror and most probably in IE!)
 $Form->end_form( array(array( 'name'=>'form_validatemail_submit', 'value'=>T_('Request email to activate my account!'), 'class'=>'ActionButton' )) ); // display hidden fields etc
+
+
+if( $current_User->ID == 1 )
+{ // allow admin user to validate him/herself by a single click:
+	$Form = & new Form( $htsrv_url_sensitive.'login.php', 'form_validatemail', 'post', 'fieldset' );
+	$Form->begin_form( 'fform' );
+
+	$Form->hidden( 'action', 'validatemail');
+	$Form->hidden( 'redirect_to', $redirect_to );
+	$Form->hidden( 'reqID', 1 );
+	$Form->hidden( 'sessID', $Session->ID );
+
+	$Form->begin_fieldset();
+	echo '<p>'.sprintf( T_('Since you are the admin user, you can validate your email address (%s) by a single click.' ), $current_User->email ).'</p>';
+	// TODO: the form submit value is too wide (in Konqueror and most probably in IE!)
+	$Form->end_form( array(array( 'name'=>'form_validatemail_admin_submit', 'value'=>T_('Activate my account!'), 'class'=>'ActionButton' )) ); // display hidden fields etc
+}
 ?>
 
 <div style="text-align:right">
@@ -69,6 +86,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.7  2006/07/04 23:38:11  blueyed
+ * Validate email: admin user (#1) has an extra button to validate him/herself through the form; store multiple req_validatemail keys in the user's session.
+ *
  * Revision 1.6  2006/06/25 23:34:15  blueyed
  * wording pt2
  *

@@ -497,8 +497,6 @@ unset($pass);
 if( ! empty($current_User)
 		&& ! $current_User->validated
 		&& $Settings->get('newusers_mustvalidate')
-		&& $current_User->ID != 1       /* not admin user: this is BAD: it makes it look like the validation doesn't work */
-		&& $current_User->group_ID != 1 /* not admin group */
 		&& $Request->param('action', 'string', '') != 'logout' )
 {
 	if( $action != 'req_validatemail' && $action != 'validatemail' )
@@ -606,6 +604,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.35  2006/07/04 23:38:10  blueyed
+ * Validate email: admin user (#1) has an extra button to validate him/herself through the form; store multiple req_validatemail keys in the user's session.
+ *
  * Revision 1.34  2006/07/02 21:53:30  blueyed
  * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
  *

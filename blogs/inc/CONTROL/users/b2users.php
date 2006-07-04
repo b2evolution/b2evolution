@@ -229,8 +229,10 @@ if( !$Messages->count('error') )
 				$edited_User->set( 'level', $edited_user_level );
 
 				$Request->param( 'edited_user_validated', 'integer', 0 );
-				$edited_User->set( 'validated', $edited_user_validated );
-
+				if( $edited_User->set( 'validated', $edited_user_validated ) && $edited_User->ID == $current_User->ID )
+				{ // validated value has changed for the current user
+					$reload_page = true;
+				}
 				param( 'edited_user_grp_ID', 'integer', true );
 				$edited_user_Group = $GroupCache->get_by_ID( $edited_user_grp_ID );
 				$edited_User->set_Group( $edited_user_Group );
@@ -680,6 +682,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.26  2006/07/04 23:38:11  blueyed
+ * Validate email: admin user (#1) has an extra button to validate him/herself through the form; store multiple req_validatemail keys in the user's session.
+ *
  * Revision 1.25  2006/07/01 23:32:58  fplanque
  * minor
  *

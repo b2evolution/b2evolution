@@ -276,7 +276,9 @@ switch( $action )
 		}
 
 		// Validate provided reqID against the one stored in the user's session
-		if( $Session->get( 'core.validatemail.request_id' ) != $reqID )
+		$request_ids = $Session->get( 'core.validatemail.request_ids' );
+		if( ( ! is_array($request_ids) || ! in_array( $reqID, $request_ids ) )
+			&& ! ( $current_User->ID == 1 && $reqID == 1 /* admin can validate himself by a button click */ ) )
 		{
 			$Messages->add( T_('Invalid email address validation request!'), 'error' );
 			$Messages->add(
@@ -290,7 +292,7 @@ switch( $action )
 		$current_User->set( 'validated', 1 );
 		$current_User->dbupdate();
 
-		$Session->delete( 'core.validatemail.request_id' );
+		$Session->delete( 'core.validatemail.request_ids' );
 
 		$Messages->add( T_( 'Your email address has been validated.' ), 'success' );
 
@@ -350,6 +352,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.64  2006/07/04 23:38:08  blueyed
+ * Validate email: admin user (#1) has an extra button to validate him/herself through the form; store multiple req_validatemail keys in the user's session.
+ *
  * Revision 1.63  2006/06/25 23:34:15  blueyed
  * wording pt2
  *
