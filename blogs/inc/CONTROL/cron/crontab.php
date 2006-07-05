@@ -143,7 +143,7 @@ switch( $action )
 
 			$DB->commit();
 
-			$Messages->add(  sprintf( T_('Scheduled task #%d deleted.'), $ctsk_ID ), 'success' );
+			$Messages->add(  sprintf( T_('Scheduled job #%d deleted.'), $ctsk_ID ), 'success' );
 		}
 
 		forget_param( 'ctsk_ID' );
