@@ -840,7 +840,11 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 9300 )
 	{ // This has to go here, because it uses fields, that are created through install_make_db_schema_current():
 // TODO: this will FAIL eventually because there will be an upgrade checkpoint created earlier. It would be better to manually add the field and do everything above.
-// Problem is: at which version exactly? 
+// Problem is: at which version exactly?
+// dh> I don't get it.. the upgrade checkpoint gets created below...
+//     IMHO it only adds complexity to have two db_version pointers.
+//     Manually adding the DB field before calling install_make_db_schema_current() seems to be the cleanest solution,
+//     so this extra block here is not needed.
 // Alternative: having 2 db_version pointers, one for pre-processing and one for post-processing.
 		echo 'Marking administrator account as validated... ';
 		$DB->query( 'UPDATE T_users SET user_validated = 1 WHERE user_ID = 1' );
@@ -872,6 +876,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.153  2006/07/05 20:07:07  blueyed
+ * discussion
+ *
  * Revision 1.152  2006/07/05 18:26:01  fplanque
  * no message
  *
