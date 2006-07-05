@@ -7,7 +7,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 $trans['fr_FR'] = array(
-	'' => "Project-Id-Version: b2evolution 0.9\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2006-07-03 22:53+0200\nPO-Revision-Date: 2006-07-03 22:38+0100\nLast-Translator: Francois PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\nX-Poedit-Language: French\nX-Poedit-Country: FRANCE\nX-Poedit-SourceCharset: iso-8859-1\n",
+	'' => "Project-Id-Version: b2evolution 0.9\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2006-07-05 20:13+0200\nPO-Revision-Date: 2006-07-05 20:14+0100\nLast-Translator: Francois PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\nX-Poedit-Language: French\nX-Poedit-Country: FRANCE\nX-Poedit-SourceCharset: iso-8859-1\n",
 	'Selected' => "Sélectionné",
 	'Categories' => "Catégories",
 	'Recently' => "Récemment",
@@ -1171,7 +1171,7 @@ $trans['fr_FR'] = array(
 	'Add job' => "Ajouter tâche",
 	'Pending' => "en attente",
 	'Started' => "Démarrée",
-	'Timeout' => "Délai d'expiration",
+	'Timed out' => "Expiré",
 	'Error' => "Erreur",
 	'Finished' => "Terminé",
 	'Schedule' => "Planning",
@@ -1629,7 +1629,7 @@ $trans['fr_FR'] = array(
 	'U - seconds since the epoch' => "U - Temps UNIX; secondes depuis l'epoch",
 	'w - day of the week, numeric, i.e. "0" (Sunday) to "6" (Saturday)' => "w - jour de la semaine, numérique, c-a-d \"0\" (Dimanche) à \"6\" (Samedi)",
 	'W - ISO-8601 week number of year, weeks starting on Monday; i.e. "42"' => "W - Numéro de semaine dans l'année selon la norme ISO-8601, semaines commençant le Lundi; ex: \"42\"",
-	'Y - year, 4 digits; i.e. "1999"' => "y - année, 4 chiffres; ex: \"1999\"",
+	'Y - year, 4 digits; i.e. "1999"' => "Y - année, 4 chiffres; ex: \"1999\"",
 	'y - year, 2 digits; i.e. "99"' => "y - année, 2 chiffres; ex: \"99\"",
 	'z - day of the year; i.e. "0" to "365"' => "z - jour de l'année; c-a-d \"0\" à \"365\"",
 	'Z - timezone offset in seconds (i.e. "-43200" to "43200"). The offset for timezones west of UTC is always negative, and for those east of UTC is always positive.' => "Z - écart de fuseau horaire en secondes (c-a-d \"-43200\" à \"43200\"). L'écart pour les fuseaux horaires à l'ouest du temps UTC est toujours négatif, l'écart pour les fuseaux à l'est de UTC est toujours positif.",
@@ -2076,6 +2076,7 @@ $trans['fr_FR'] = array(
 	'in seconds. How long should a session be whitelisted?' => "en secondes. Pendant combien de temps une session peut elle être autorisée?",
 	'Statistics' => "Statistiques",
 	'Enable statistics. This generates a small overhead, but will show you how effective it is.' => "Activer les statistiques. Ceci prend un peu plus de temps mais permet de voir l'efficacité du plugin.",
+	'Timeout' => "Délai d'expiration",
 	'Checking for &laquo;%s&raquo; in DNS blacklists.' => "Vérification de &laquo;%s&raquo; dans les DNS liste noire.",
 	'Cleared statitics.' => "Statistiques remises à zéro.",
 	'Check' => "Vérifier",

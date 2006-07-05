@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2006-07-03 22:53+0200\n"
+"POT-Creation-Date: 2006-07-05 20:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,25 +43,25 @@ msgstr ""
 #: ..\..\..\a_noskin.php:215 ..\..\..\a_noskin.php:216
 #: ..\..\..\skins\bluesky\_main.php:159
 #: ..\..\..\skins\bluesky\_main.php:160
-#: ..\..\..\skins\custom\_main.php:221
-#: ..\..\..\skins\custom\_main.php:222
+#: ..\..\..\skins\custom\_main.php:230
+#: ..\..\..\skins\custom\_main.php:231
 #: ..\..\..\skins\guadeloupe\_main.php:159
 #: ..\..\..\skins\guadeloupe\_main.php:160
-#: ..\..\..\skins\natural_pink\_main.php:165
-#: ..\..\..\skins\nifty_corners\_main.php:187
+#: ..\..\..\skins\natural_pink\_main.php:174
+#: ..\..\..\skins\nifty_corners\_main.php:197
 msgid "Recently"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:215
 #: ..\..\..\skins\bluesky\_main.php:159
-#: ..\..\..\skins\custom\_main.php:221
+#: ..\..\..\skins\custom\_main.php:230
 #: ..\..\..\skins\guadeloupe\_main.php:159
 msgid "(cached)"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:216
 #: ..\..\..\skins\bluesky\_main.php:160
-#: ..\..\..\skins\custom\_main.php:222
+#: ..\..\..\skins\custom\_main.php:231
 #: ..\..\..\skins\guadeloupe\_main.php:160
 msgid "(no cache)"
 msgstr ""
@@ -70,10 +70,10 @@ msgstr ""
 #: ..\..\..\inc\_misc\_obsolete092.php:1483
 #: ..\..\..\inc\_misc\_template.funcs.php:75
 #: ..\..\..\skins\bluesky\_main.php:163
-#: ..\..\..\skins\custom\_main.php:223
+#: ..\..\..\skins\custom\_main.php:232
 #: ..\..\..\skins\guadeloupe\_main.php:163
-#: ..\..\..\skins\natural_pink\_main.php:167
-#: ..\..\..\skins\nifty_corners\_main.php:189
+#: ..\..\..\skins\natural_pink\_main.php:176
+#: ..\..\..\skins\nifty_corners\_main.php:199
 msgid "Last comments"
 msgstr ""
 
@@ -81,39 +81,39 @@ msgstr ""
 #: ..\..\..\inc\VIEW\items\_browse_posts_sidebar.inc.php:70
 #: ..\..\..\inc\VIEW\items\_browse_posts_sidebar.inc.php:255
 #: ..\..\..\skins\bluesky\_main.php:185
-#: ..\..\..\skins\custom\_main.php:239
-#: ..\..\..\skins\custom\_main.php:245
-#: ..\..\..\skins\natural_pink\_main.php:172
-#: ..\..\..\skins\natural_pink\_main.php:178
-#: ..\..\..\skins\nifty_corners\_main.php:194
-#: ..\..\..\skins\nifty_corners\_main.php:200
-#: ..\..\..\skins\originalb2\_main.php:207
-#: ..\..\..\skins\wpc_aubmach\_main.php:153
-#: ..\..\..\skins\wpc_aubmach\_main.php:157
-#: ..\..\..\skins\wpc_default\_main.php:156
-#: ..\..\..\skins\wpc_default\_main.php:160
+#: ..\..\..\skins\custom\_main.php:248
+#: ..\..\..\skins\custom\_main.php:254
+#: ..\..\..\skins\natural_pink\_main.php:181
+#: ..\..\..\skins\natural_pink\_main.php:187
+#: ..\..\..\skins\nifty_corners\_main.php:204
+#: ..\..\..\skins\nifty_corners\_main.php:210
+#: ..\..\..\skins\originalb2\_main.php:208
+#: ..\..\..\skins\wpc_aubmach\_main.php:163
+#: ..\..\..\skins\wpc_aubmach\_main.php:167
+#: ..\..\..\skins\wpc_default\_main.php:166
+#: ..\..\..\skins\wpc_default\_main.php:170
 msgid "Search"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:233
-#: ..\..\..\skins\custom\_main.php:242
-#: ..\..\..\skins\natural_pink\_main.php:175
-#: ..\..\..\skins\nifty_corners\_main.php:197
+#: ..\..\..\skins\custom\_main.php:251
+#: ..\..\..\skins\natural_pink\_main.php:184
+#: ..\..\..\skins\nifty_corners\_main.php:207
 msgid "All Words"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:234
-#: ..\..\..\skins\custom\_main.php:243
-#: ..\..\..\skins\natural_pink\_main.php:176
-#: ..\..\..\skins\nifty_corners\_main.php:198
+#: ..\..\..\skins\custom\_main.php:252
+#: ..\..\..\skins\natural_pink\_main.php:185
+#: ..\..\..\skins\nifty_corners\_main.php:208
 msgid "Some Word"
 msgstr ""
 
 #: ..\..\..\a_noskin.php:235
 #: ..\..\..\inc\VIEW\items\_browse_posts_sidebar.inc.php:134
-#: ..\..\..\skins\custom\_main.php:244
-#: ..\..\..\skins\natural_pink\_main.php:177
-#: ..\..\..\skins\nifty_corners\_main.php:199
+#: ..\..\..\skins\custom\_main.php:253
+#: ..\..\..\skins\natural_pink\_main.php:186
+#: ..\..\..\skins\nifty_corners\_main.php:209
 msgid "Entire phrase"
 msgstr ""
 
@@ -131,11 +131,11 @@ msgstr ""
 #: ..\..\..\skins\basic\_main.php:172
 #: ..\..\..\skins\bluesky\_main.php:214
 #: ..\..\..\skins\guadeloupe\_main.php:214
-#: ..\..\..\skins\natural_pink\_main.php:166
-#: ..\..\..\skins\nifty_corners\_main.php:188
-#: ..\..\..\skins\originalb2\_main.php:216
-#: ..\..\..\skins\wpc_aubmach\_main.php:167
-#: ..\..\..\skins\wpc_default\_main.php:171
+#: ..\..\..\skins\natural_pink\_main.php:175
+#: ..\..\..\skins\nifty_corners\_main.php:198
+#: ..\..\..\skins\originalb2\_main.php:217
+#: ..\..\..\skins\wpc_aubmach\_main.php:177
+#: ..\..\..\skins\wpc_default\_main.php:181
 msgid "Archives"
 msgstr ""
 
@@ -145,10 +145,10 @@ msgstr ""
 
 #: ..\..\..\a_noskin.php:269 ..\..\..\multiblogs.php:275
 #: ..\..\..\skins\bluesky\_main.php:219
-#: ..\..\..\skins\custom\_main.php:290
+#: ..\..\..\skins\custom\_main.php:299
 #: ..\..\..\skins\guadeloupe\_main.php:219
-#: ..\..\..\skins\natural_pink\_main.php:211
-#: ..\..\..\skins\nifty_corners\_main.php:233
+#: ..\..\..\skins\natural_pink\_main.php:220
+#: ..\..\..\skins\nifty_corners\_main.php:243
 msgid "Misc"
 msgstr ""
 
@@ -282,18 +282,18 @@ msgstr ""
 #: ..\..\..\skins\_profile.php:60
 #: ..\..\..\skins\_subscriptions.php:68
 #: ..\..\..\skins\basic\_profile.php:50
-#: ..\..\..\skins\custom\_main.php:309
-#: ..\..\..\skins\custom\_main.php:314
-#: ..\..\..\skins\custom\_main.php:319
-#: ..\..\..\skins\custom\_main.php:324
-#: ..\..\..\skins\natural_pink\_main.php:229
-#: ..\..\..\skins\natural_pink\_main.php:234
-#: ..\..\..\skins\natural_pink\_main.php:239
-#: ..\..\..\skins\natural_pink\_main.php:244
-#: ..\..\..\skins\nifty_corners\_main.php:251
-#: ..\..\..\skins\nifty_corners\_main.php:256
+#: ..\..\..\skins\custom\_main.php:318
+#: ..\..\..\skins\custom\_main.php:323
+#: ..\..\..\skins\custom\_main.php:328
+#: ..\..\..\skins\custom\_main.php:333
+#: ..\..\..\skins\natural_pink\_main.php:238
+#: ..\..\..\skins\natural_pink\_main.php:243
+#: ..\..\..\skins\natural_pink\_main.php:248
+#: ..\..\..\skins\natural_pink\_main.php:253
 #: ..\..\..\skins\nifty_corners\_main.php:261
 #: ..\..\..\skins\nifty_corners\_main.php:266
+#: ..\..\..\skins\nifty_corners\_main.php:271
+#: ..\..\..\skins\nifty_corners\_main.php:276
 msgid "Posts"
 msgstr ""
 
@@ -320,18 +320,18 @@ msgstr ""
 #: ..\..\..\skins\_feedback.php:53
 #: ..\..\..\skins\_subscriptions.php:69
 #: ..\..\..\skins\basic\_feedback.php:56
-#: ..\..\..\skins\custom\_main.php:310
-#: ..\..\..\skins\custom\_main.php:315
-#: ..\..\..\skins\custom\_main.php:320
-#: ..\..\..\skins\custom\_main.php:325
-#: ..\..\..\skins\natural_pink\_main.php:230
-#: ..\..\..\skins\natural_pink\_main.php:235
-#: ..\..\..\skins\natural_pink\_main.php:240
-#: ..\..\..\skins\natural_pink\_main.php:245
-#: ..\..\..\skins\nifty_corners\_main.php:252
-#: ..\..\..\skins\nifty_corners\_main.php:257
+#: ..\..\..\skins\custom\_main.php:319
+#: ..\..\..\skins\custom\_main.php:324
+#: ..\..\..\skins\custom\_main.php:329
+#: ..\..\..\skins\custom\_main.php:334
+#: ..\..\..\skins\natural_pink\_main.php:239
+#: ..\..\..\skins\natural_pink\_main.php:244
+#: ..\..\..\skins\natural_pink\_main.php:249
+#: ..\..\..\skins\natural_pink\_main.php:254
 #: ..\..\..\skins\nifty_corners\_main.php:262
 #: ..\..\..\skins\nifty_corners\_main.php:267
+#: ..\..\..\skins\nifty_corners\_main.php:272
+#: ..\..\..\skins\nifty_corners\_main.php:277
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:56
 #: ..\..\..\skins\wpc_default\_feedback.php:56
 msgid "Comments"
@@ -750,8 +750,8 @@ msgstr ""
 
 #: ..\..\..\conf\_icons.php:424
 #: ..\..\..\conf\_icons.php:429
-#: ..\..\..\inc\_misc\_results.class.php:1672
-#: ..\..\..\inc\_misc\_results.class.php:1682
+#: ..\..\..\inc\_misc\_results.class.php:1673
+#: ..\..\..\inc\_misc\_results.class.php:1683
 msgid "Sort by order"
 msgstr ""
 
@@ -3314,7 +3314,7 @@ msgstr ""
 
 #: ..\..\..\inc\CONTROL\settings\plugins.php:1010
 #: ..\..\..\inc\VIEW\settings\_set_plugins.form.php:113
-#: ..\..\..\inc\_misc\_plugin.class.php:2156
+#: ..\..\..\inc\_misc\_plugin.class.php:2168
 msgid "Edit plugin settings!"
 msgstr ""
 
@@ -5788,8 +5788,7 @@ msgid "Started"
 msgstr ""
 
 #: ..\..\..\inc\VIEW\cron\_crontab.list.php:89
-#: ..\..\..\plugins\_dnsbl_antispam.plugin.php:107
-msgid "Timeout"
+msgid "Timed out"
 msgstr ""
 
 #: ..\..\..\inc\VIEW\cron\_crontab.list.php:90
@@ -6578,14 +6577,14 @@ msgstr ""
 
 #. TRANS: previous page (of posts)
 #: ..\..\..\inc\VIEW\items\_browse_posts_exp.inc.php:53
-#: ..\..\..\skins\custom\_main.php:215
+#: ..\..\..\skins\custom\_main.php:224
 #: ..\..\..\skins_adm\_adminUI_general.class.php:922
 msgid "Previous"
 msgstr ""
 
 #. TRANS: next page (of posts)
 #: ..\..\..\inc\VIEW\items\_browse_posts_exp.inc.php:54
-#: ..\..\..\skins\custom\_main.php:216
+#: ..\..\..\skins\custom\_main.php:225
 #: ..\..\..\skins_adm\_adminUI_general.class.php:923
 msgid "Next"
 msgstr ""
@@ -7527,7 +7526,7 @@ msgid "Install"
 msgstr ""
 
 #: ..\..\..\inc\VIEW\settings\_set_plugins_editsettings.form.php:58
-#: ..\..\..\inc\_misc\_plugin.class.php:2096
+#: ..\..\..\inc\_misc\_plugin.class.php:2108
 msgid "Local documentation of the plugin"
 msgstr ""
 
@@ -8594,7 +8593,7 @@ msgstr ""
 msgid "My Tab"
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugin.class.php:2062
+#: ..\..\..\inc\_misc\_plugin.class.php:2074
 msgid "Homepage of the plugin"
 msgstr ""
 
@@ -8640,87 +8639,87 @@ msgstr ""
 msgid "The value is invalid. It must be greater than %s."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:519
+#: ..\..\..\inc\_misc\_plugins.class.php:520
 msgid "The plugin cannot be installed again."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:527
+#: ..\..\..\inc\_misc\_plugins.class.php:528
 msgid "The installation of the plugin failed."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:548
+#: ..\..\..\inc\_misc\_plugins.class.php:549
 msgid "Some plugin dependencies are not fulfilled:"
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:729
+#: ..\..\..\inc\_misc\_plugins.class.php:730
 #, possible-php-format
 msgid "The events %s are required by %s (ID %d)."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:743
+#: ..\..\..\inc\_misc\_plugins.class.php:744
 #, possible-php-format
 msgid "The event %s is required by %s (ID %d)."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:758
+#: ..\..\..\inc\_misc\_plugins.class.php:759
 #, possible-php-format
 msgid "The plugin is required by the following plugins: %s."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:798
+#: ..\..\..\inc\_misc\_plugins.class.php:799
 #, possible-php-format
 msgid "The plugin recommends a plugin which provides all of the following events: %s."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:802
+#: ..\..\..\inc\_misc\_plugins.class.php:803
 #, possible-php-format
 msgid "The plugin requires a plugin which provides all of the following events: %s."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:813
+#: ..\..\..\inc\_misc\_plugins.class.php:814
 #, possible-php-format
 msgid "The plugin recommends plugins which provide the events: %s."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:817
+#: ..\..\..\inc\_misc\_plugins.class.php:818
 #, possible-php-format
 msgid "The plugin requires plugins which provide the events: %s."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:848
+#: ..\..\..\inc\_misc\_plugins.class.php:849
 #, possible-php-format
 msgid "The plugin requires at least version %s of the plugin %s, but you have %s."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:866
+#: ..\..\..\inc\_misc\_plugins.class.php:867
 #, possible-php-format
 msgid "The plugin requires the plugins: %s."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:871
+#: ..\..\..\inc\_misc\_plugins.class.php:872
 #, possible-php-format
 msgid "The plugin recommends to install the plugins: %s."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:887
+#: ..\..\..\inc\_misc\_plugins.class.php:888
 #, possible-php-format
 msgid "The plugin recommends version %s of the plugin API (%s is installed). Think about upgrading your %s installation."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:891
+#: ..\..\..\inc\_misc\_plugins.class.php:892
 #, possible-php-format
 msgid "The plugin requires version %s of the plugin API, but %s is installed. You will probably have to upgrade your %s installation."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:1242
+#: ..\..\..\inc\_misc\_plugins.class.php:1243
 msgid "The maximum length of a plugin code is 32 characters."
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:1248
+#: ..\..\..\inc\_misc\_plugins.class.php:1249
 msgid "The plugin code cannot include a dot!"
 msgstr ""
 
-#: ..\..\..\inc\_misc\_plugins.class.php:1259
+#: ..\..\..\inc\_misc\_plugins.class.php:1260
 msgid "The plugin code is already in use by another plugin."
 msgstr ""
 
@@ -8753,32 +8752,32 @@ msgstr ""
 msgid "Descending order"
 msgstr ""
 
-#: ..\..\..\inc\_misc\_results.class.php:1630
+#: ..\..\..\inc\_misc\_results.class.php:1631
 msgid "Move up!"
 msgstr ""
 
-#: ..\..\..\inc\_misc\_results.class.php:1635
+#: ..\..\..\inc\_misc\_results.class.php:1636
 msgid "Move down! (reverse sort)"
 msgstr ""
 
-#: ..\..\..\inc\_misc\_results.class.php:1650
+#: ..\..\..\inc\_misc\_results.class.php:1651
 msgid "Move down!"
 msgstr ""
 
-#: ..\..\..\inc\_misc\_results.class.php:1655
+#: ..\..\..\inc\_misc\_results.class.php:1656
 msgid "Move up! (reverse sort)"
 msgstr ""
 
-#: ..\..\..\inc\_misc\_results.class.php:1929
+#: ..\..\..\inc\_misc\_results.class.php:1930
 msgid "Pages"
 msgstr ""
 
 #. TRANS: Pages x _to_ y
-#: ..\..\..\inc\_misc\_results.class.php:1929
+#: ..\..\..\inc\_misc\_results.class.php:1930
 msgid "to"
 msgstr ""
 
-#: ..\..\..\inc\_misc\_results.class.php:1975
+#: ..\..\..\inc\_misc\_results.class.php:1976
 msgid "Sorry, there is nothing to display..."
 msgstr ""
 
@@ -9869,6 +9868,10 @@ msgstr ""
 msgid "How often should a slow list be retried? (0 to deactivate slow list handling)"
 msgstr ""
 
+#: ..\..\..\plugins\_dnsbl_antispam.plugin.php:107
+msgid "Timeout"
+msgstr ""
+
 #: ..\..\..\plugins\_dnsbl_antispam.plugin.php:109
 msgid "in seconds. When is a DNSBL considered to be too slow?"
 msgstr ""
@@ -10542,25 +10545,25 @@ msgstr ""
 msgid "Choose a skin"
 msgstr ""
 
-#: ..\..\..\skins\custom\_main.php:271
-#: ..\..\..\skins\natural_pink\_main.php:200
-#: ..\..\..\skins\nifty_corners\_main.php:222
-#: ..\..\..\skins\wpc_aubmach\_main.php:194
-#: ..\..\..\skins\wpc_default\_main.php:198
+#: ..\..\..\skins\custom\_main.php:280
+#: ..\..\..\skins\natural_pink\_main.php:209
+#: ..\..\..\skins\nifty_corners\_main.php:232
+#: ..\..\..\skins\wpc_aubmach\_main.php:204
+#: ..\..\..\skins\wpc_default\_main.php:208
 msgid "Choose skin"
 msgstr ""
 
-#: ..\..\..\skins\custom\_main.php:305
-#: ..\..\..\skins\natural_pink\_main.php:225
-#: ..\..\..\skins\nifty_corners\_main.php:247
+#: ..\..\..\skins\custom\_main.php:314
+#: ..\..\..\skins\natural_pink\_main.php:234
+#: ..\..\..\skins\nifty_corners\_main.php:257
 msgid "XML Feeds"
 msgstr ""
 
-#: ..\..\..\skins\custom\_main.php:328
+#: ..\..\..\skins\custom\_main.php:337
 msgid "What is RSS?"
 msgstr ""
 
-#: ..\..\..\skins\custom\_main.php:338
+#: ..\..\..\skins\custom\_main.php:347
 msgid "Who's Online?"
 msgstr ""
 
@@ -10568,9 +10571,9 @@ msgstr ""
 msgid "Browse all posts by this author"
 msgstr ""
 
-#: ..\..\..\skins\originalb2\_main.php:198
-#: ..\..\..\skins\wpc_aubmach\_main.php:147
-#: ..\..\..\skins\wpc_default\_main.php:150
+#: ..\..\..\skins\originalb2\_main.php:199
+#: ..\..\..\skins\wpc_aubmach\_main.php:157
+#: ..\..\..\skins\wpc_default\_main.php:160
 msgid "categories"
 msgstr ""
 
@@ -10621,65 +10624,65 @@ msgstr ""
 msgid "Filed under:"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:204
-#: ..\..\..\skins\wpc_default\_main.php:208
+#: ..\..\..\skins\wpc_aubmach\_main.php:214
+#: ..\..\..\skins\wpc_default\_main.php:218
 msgid "Other"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:216
-#: ..\..\..\skins\wpc_default\_main.php:220
+#: ..\..\..\skins\wpc_aubmach\_main.php:226
+#: ..\..\..\skins\wpc_default\_main.php:230
 msgid "Meta"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:218
-#: ..\..\..\skins\wpc_default\_main.php:222
+#: ..\..\..\skins\wpc_aubmach\_main.php:228
+#: ..\..\..\skins\wpc_default\_main.php:232
 msgid "Syndicate this site using RSS"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:218
-#: ..\..\..\skins\wpc_default\_main.php:222
+#: ..\..\..\skins\wpc_aubmach\_main.php:228
+#: ..\..\..\skins\wpc_default\_main.php:232
 msgid "<abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:219
-#: ..\..\..\skins\wpc_default\_main.php:223
+#: ..\..\..\skins\wpc_aubmach\_main.php:229
+#: ..\..\..\skins\wpc_default\_main.php:233
 msgid "The latest comments to all posts in RSS"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:219
-#: ..\..\..\skins\wpc_default\_main.php:223
+#: ..\..\..\skins\wpc_aubmach\_main.php:229
+#: ..\..\..\skins\wpc_default\_main.php:233
 msgid "Comments <abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:220
-#: ..\..\..\skins\wpc_default\_main.php:224
+#: ..\..\..\skins\wpc_aubmach\_main.php:230
+#: ..\..\..\skins\wpc_default\_main.php:234
 msgid "This page validates as XHTML 1.0 Transitional"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:220
-#: ..\..\..\skins\wpc_default\_main.php:224
+#: ..\..\..\skins\wpc_aubmach\_main.php:230
+#: ..\..\..\skins\wpc_default\_main.php:234
 msgid "Valid <abbr title=\"eXtensible HyperText Markup Language\">XHTML</abbr>"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:221
 #: ..\..\..\skins\wpc_aubmach\_main.php:231
-#: ..\..\..\skins\wpc_default\_main.php:225
+#: ..\..\..\skins\wpc_aubmach\_main.php:241
 #: ..\..\..\skins\wpc_default\_main.php:235
+#: ..\..\..\skins\wpc_default\_main.php:245
 msgid "Powered by b2evolution; multilingual multiuser multi-blog engine."
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:232
-#: ..\..\..\skins\wpc_default\_main.php:236
+#: ..\..\..\skins\wpc_aubmach\_main.php:242
+#: ..\..\..\skins\wpc_default\_main.php:246
 msgid "This skin features a CSS file originally designed for WordPress (See design credits in style.css)."
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:233
-#: ..\..\..\skins\wpc_default\_main.php:237
+#: ..\..\..\skins\wpc_aubmach\_main.php:243
+#: ..\..\..\skins\wpc_default\_main.php:247
 msgid "Original design credits for this skin:"
 msgstr ""
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:234
-#: ..\..\..\skins\wpc_default\_main.php:238
+#: ..\..\..\skins\wpc_aubmach\_main.php:244
+#: ..\..\..\skins\wpc_default\_main.php:248
 msgid "In order to ensure maximum compatibility with WP CSS files, most b2evolution features that do not exist in WP are hidden from this generic wpc_* skin."
 msgstr ""
 

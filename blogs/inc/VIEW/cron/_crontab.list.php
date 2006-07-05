@@ -86,7 +86,7 @@ function filter_crontab( & $Form )
 
 	$Form->checkbox( 'ctst_pending', $ctst_pending, T_('Pending') );
 	$Form->checkbox( 'ctst_started', $ctst_started, T_('Started') );
-	$Form->checkbox( 'ctst_timeout', $ctst_timeout, T_('Timeout') );
+	$Form->checkbox( 'ctst_timeout', $ctst_timeout, T_('Timed out') );
 	$Form->checkbox( 'ctst_error', $ctst_error, T_('Error') );
 	$Form->checkbox( 'ctst_finished', $ctst_finished, T_('Finished') );
 }
@@ -168,6 +168,9 @@ echo '<p>[<a href="'.$cron_url.'cron_exec.php" onclick="return pop_up_window( \'
 
 /*
  * $Log$
+ * Revision 1.5  2006/07/05 18:26:33  fplanque
+ * no message
+ *
  * Revision 1.4  2006/06/26 23:09:34  fplanque
  * Really working cronjob environment :)
  *
