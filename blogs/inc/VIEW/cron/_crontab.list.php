@@ -144,7 +144,7 @@ function crontab_actions( $ctsk_ID, $status )
 
 	if( $status != 'started' && $current_User->check_perm( 'options', 'edit', false, NULL ) )
 	{	// User can edit options:
-    $col = action_icon( T_('Delete this task!'), 'delete',
+    $col = action_icon( T_('Delete this job!'), 'delete',
 												regenerate_url( 'action', 'ctsk_ID='.$ctsk_ID.'&amp;action=delete') );
 	}
 
@@ -163,11 +163,14 @@ $Results->display();
 
 
 global $cron_url;
-echo '<p>[<a href="'.$cron_url.'cron_exec.php" onclick="return pop_up_window( \''.$cron_url.'cron_exec.php\', \'evo_cron\', \'width=400,height=300,scrollbars=yes,status=yes,resizable=yes\' )" target="evo_cron">'.T_('Execute pending tasks in a popup window now!').'</a>]</p>';
+echo '<p>[<a href="'.$cron_url.'cron_exec.php" onclick="return pop_up_window( \''.$cron_url.'cron_exec.php\', \'evo_cron\', \'width=400,height=300,scrollbars=yes,status=yes,resizable=yes\' )" target="evo_cron">'.T_('Execute pending jobs in a popup window now!').'</a>]</p>';
 
 
 /*
  * $Log$
+ * Revision 1.6  2006/07/05 22:13:10  blueyed
+ * trans consistency
+ *
  * Revision 1.5  2006/07/05 18:26:33  fplanque
  * no message
  *
