@@ -166,7 +166,7 @@ function antispam_report_abuse( $abuse_string )
 	{ // Remote operation successful:
 		antispam_update_source( $abuse_string, 'reported' );
 
-		$Messages->add( T_('Reporting abuse to').' '.$antispamsrv_host.'...', 'success' );
+		$Messages->add( sprintf( T_('Reported abuse to %s.'), $antispamsrv_host ), 'success' );
 	}
 	else
 	{
@@ -311,6 +311,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.13  2006/07/05 21:56:01  blueyed
+ * trans
+ *
  * Revision 1.12  2006/07/04 17:32:29  fplanque
  * no message
  *
