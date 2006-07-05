@@ -210,7 +210,7 @@ function antispam_poll_abuse()
 								)
 							);
 
-	$Messages->add( T_('Requesting abuse list from').' '.$antispamsrv_host.'...', 'note' );
+	$Messages->add( sprintf( T_('Requesting abuse list from %s...'), $antispamsrv_host ), 'note' );
 
 	$result = $client->send($message);
 
@@ -311,6 +311,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.14  2006/07/05 21:57:20  blueyed
+ * trans
+ *
  * Revision 1.13  2006/07/05 21:56:01  blueyed
  * trans
  *
