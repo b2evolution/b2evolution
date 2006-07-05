@@ -105,17 +105,34 @@ class auto_p_plugin extends Plugin
 				$text_in_tag = $after_match[1];
 				$closing_tag = $after_match[2];
 
-				$new_text .= $this->autop( $text_in_tag, array( 'tag' => $tag ) );
+				if( substr($text_in_tag, 0, 1) == "\n" )
+				{
+					$NL_before = "\n";
+					$text_in_tag = substr($text_in_tag, 1);
+				}
+				else
+				{
+					$NL_before = '';
+				}
+				if( substr($text_in_tag, -1) == "\n" )
+				{
+					$NL_after = "\n";
+					$text_in_tag = substr($text_in_tag, 0, -1);
+				}
+				else
+				{
+					$NL_after = '';
+				}
+
+				// Recurse:
+				$new_text .= $NL_before.$this->autop( $text_in_tag, array( 'tag' => $tag ) ).$NL_after;
 
 				$new_text .= $closing_tag;
 
-				$text_after_tag = substr( $text_after_tag, strlen($text_in_tag)+strlen($closing_tag) );
+				$text_after_tag = substr( $text_after_tag, strlen($NL_before.$text_in_tag.$NL_after)+strlen($closing_tag) );
 			}
 
-			if( trim($text_after_tag) != '' )
-			{
-				$new_text = $new_text.$this->autop( $text_after_tag );
-			}
+			$new_text .= $this->autop( $text_after_tag );
 		}
 		else
 		{
@@ -148,7 +165,7 @@ class auto_p_plugin extends Plugin
 		// "Split" lines into leading whitespace, text and 2+ newlines (or end):
 		preg_match_all( '~(\s*)(.+?)(\n\s*\n+|\z)~s', $text, $text_lines, PREG_SET_ORDER );
 
-		if( count($text_lines) == 1 && empty($text_lines[0][3]) /* eof */
+		if( count($text_lines) == 1 && empty($text_lines[0][1]) && empty($text_lines[0][3]) /* "eof" */
 				&& ! ( ! isset($recurse_info['tag']) || strtoupper($recurse_info['tag']) == 'BLOCKQUOTE' ) )
 		{ // single block (without two or more newlines at the end): peeify, if it's in a blockquote or on the outer level:
 			return $text;
@@ -156,12 +173,11 @@ class auto_p_plugin extends Plugin
 
 		// More than one line:
 		$new_text = '';
-
 		foreach( $text_lines as $k => $text_line )
 		{
-			if( trim($text_line[2]) != '' )
-			{
-				$new_text .= $text_line[1].'<p>'.$this->autobr( $text_line[2] ).'</p>'.$text_line[3];
+			$new_text .= preg_replace( array('~^\n(?!\n)~', '~\n\n~'), array("<p></p>\n", "\n<p></p>\n"), $text_line[1] );
+			$new_text .= '<p>'.$this->autobr( $text_line[2] ).'</p>';
+			$new_text .= preg_replace( '~(?<=\n)\n\n~', "\n<p></p>\n", $text_line[3] );
 			}
 		}
 
@@ -191,6 +207,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.16  2006/07/05 19:54:02  blueyed
+ * Auto-P-plugin: respect newlines to create empty paragraphs
+ *
  * Revision 1.15  2006/06/19 19:25:28  blueyed
  * Fixed auto-p plugin: <code> is an inline element
  *
