@@ -147,8 +147,8 @@ class AutoPPluginTestCase extends UnitTestCase
 		$this->assertEqual( "<table><tr><td>\n<p></p>\n<p>foo\n</p>\n</td></tr></table>",
 			$this->render( "<table><tr><td>\n\nfoo\n\n</td></tr></table>" ) );
 
-		$this->assertEqual( '',
-			$this->render_wo_space( "\n\n\n\n\n" ) );
+		$this->assertEqual( "<p></p>\n\n<p></p>\n\n<p></p>\n",
+			$this->render( "\n\n\n\n\n" ) );
 
 		$this->assertEqual( '<p>foo<ahref="">Link</a>bar</p>',
 			$this->render_wo_space( "foo <a href=\"\">Link</a> bar" ) );
@@ -187,8 +187,14 @@ class AutoPPluginTestCase extends UnitTestCase
 		$this->assertEqual( "<p></p>\n<p>foo</p>",
 			$this->render( "\nfoo" ) );
 
-		$this->assertEqual( "\n<p></p>\n\n<p></p>\n\n<p></p>\n<p>foo</p>",
+		$this->assertEqual( "<p></p>\n\n<p></p>\n\n<p></p>\n\n<p>foo</p>",
 			$this->render( "\n\n\n\n\n\nfoo" ) );
+
+		$this->assertEqual( "<p></p>\n<div>FOO</div>\n",
+			$this->render( "\n<div>FOO</div>\n" ) );
+
+		$this->assertEqual( "<p></p>\n\n<div>FOO</div>\n<p>BAR\n</p>",
+			$this->render( "\n\n<div>FOO</div>\nBAR\n" ) );
 
 	}
 

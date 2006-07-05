@@ -69,6 +69,17 @@ class auto_p_plugin extends Plugin
 
 		$content = preg_replace( "~(\r\n|\r)~", "\n", $content ); // cross-platform newlines
 
+		if( substr($content, 0, 1) == "\n" )
+		{ // a leading newline is always a paragraph:
+			if( substr($content, 0, 2) == "\n\n" )
+			{ // two newlines are a full-ass paragraph:
+				$content = "<p></p>\n\n".substr($content, 2);
+			}
+			else
+			{
+				$content = "<p></p>\n".substr($content, 1);
+			}
+		}
 		$content = callback_on_non_matching_blocks( $content, '~<\s*(pre)[^>]*>.*?<\s*/\s*pre\s*>~is', array( &$this, 'autop' ) );
 
 		return true;
@@ -86,9 +97,9 @@ class auto_p_plugin extends Plugin
 
 		if( preg_match( '~^(.*?)(<\s*('.$this->block_tags.')\b[^>]*>)~is', $text, $match ) )
 		{
+			#$new_text .= '[('.$tag.')';
 			$before_tag = $match[1];
 			$tag = $match[3];
-
 			if( ! empty($before_tag) )
 			{
 				$new_text .= $this->autop_text( $before_tag, $recurse_info );
@@ -98,9 +109,8 @@ class auto_p_plugin extends Plugin
 			$new_text .= $match[2];
 
 			$text_after_tag = substr( $text, strlen($match[0]) );
-
 			// Find closing tag:
-			if( preg_match( '~^(.*?)(<\s*/\s*'.$tag.'\s*>)~is', $text_after_tag, $after_match ) )
+			if( preg_match( '~^(.*?)(<\s*/\s*'.$tag.'\s*>\n?)~is', $text_after_tag, $after_match ) )
 			{
 				$text_in_tag = $after_match[1];
 				$closing_tag = $after_match[2];
@@ -132,7 +142,8 @@ class auto_p_plugin extends Plugin
 				$text_after_tag = substr( $text_after_tag, strlen($NL_before.$text_in_tag.$NL_after)+strlen($closing_tag) );
 			}
 
-			$new_text .= $this->autop( $text_after_tag );
+			$new_text .= $this->autop( $text_after_tag, $recurse_info );
+			#$new_text .= '('.$tag.')]';
 		}
 		else
 		{
@@ -157,13 +168,11 @@ class auto_p_plugin extends Plugin
 			return $text;
 		}
 
-		if( trim($text) == '' )
-		{ // If the text is only whitespace or empty at all, do nothing:
-			return $text;
-		}
-
 		// "Split" lines into leading whitespace, text and 2+ newlines (or end):
-		preg_match_all( '~(\s*)(.+?)(\n\s*\n+|\z)~s', $text, $text_lines, PREG_SET_ORDER );
+		if( ! preg_match_all( '~(\s*)(\S.*?)(\n\s*\n+|\z)~s', $text, $text_lines, PREG_SET_ORDER ) )
+		{
+			return str_replace( "\n\n", "\n<p></p>\n", $text );
+		}
 
 		if( count($text_lines) == 1 && empty($text_lines[0][1]) && empty($text_lines[0][3]) /* "eof" */
 				&& ! ( ! isset($recurse_info['tag']) || strtoupper($recurse_info['tag']) == 'BLOCKQUOTE' ) )
@@ -175,7 +184,7 @@ class auto_p_plugin extends Plugin
 		$new_text = '';
 		foreach( $text_lines as $k => $text_line )
 		{
-			$new_text .= preg_replace( array('~^\n(?!\n)~', '~\n\n~'), array("<p></p>\n", "\n<p></p>\n"), $text_line[1] );
+			$new_text .= preg_replace( array('~^\n(?!\n)~', '~\n\n~'), array("<p></p>\n".'$1', "\n<p></p>\n"), $text_line[1] );
 			$new_text .= '<p>'.$this->autobr( $text_line[2] ).'</p>';
 			$new_text .= preg_replace( '~(?<=\n)\n\n~', "\n<p></p>\n", $text_line[3] );
 		}
@@ -206,6 +215,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.18  2006/07/05 21:41:17  blueyed
+ * fixes
+ *
  * Revision 1.17  2006/07/05 20:10:17  blueyed
  * Merge/Parse error fixed
  *
