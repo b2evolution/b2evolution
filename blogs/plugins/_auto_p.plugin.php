@@ -178,7 +178,6 @@ class auto_p_plugin extends Plugin
 			$new_text .= preg_replace( array('~^\n(?!\n)~', '~\n\n~'), array("<p></p>\n", "\n<p></p>\n"), $text_line[1] );
 			$new_text .= '<p>'.$this->autobr( $text_line[2] ).'</p>';
 			$new_text .= preg_replace( '~(?<=\n)\n\n~', "\n<p></p>\n", $text_line[3] );
-			}
 		}
 
 		return $new_text;
@@ -207,6 +206,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.17  2006/07/05 20:10:17  blueyed
+ * Merge/Parse error fixed
+ *
  * Revision 1.16  2006/07/05 19:54:02  blueyed
  * Auto-P-plugin: respect newlines to create empty paragraphs
  *
