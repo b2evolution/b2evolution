@@ -250,17 +250,23 @@ class dnsbl_antispam_plugin extends Plugin
 
 		$Form->begin_fieldset();
 		$Form->text_input( 'check_for', $this->param_check_for, 0, T_('Check') );
-		$Form->buttons( array(
+
+		$buttons = array(
 				array(
 					'name' => 'dnsblaction[checklist]',
 					'value' => T_('Check my lists'),
-				),
+				), );
+
+		if( $url_ext_query = $this->Settings->get('url_ext_query') )
+		{
+			$buttons[] =
 				array(
 					'name' => 'dnsblaction[checkopenrbl]',
-					'value' => T_('Check at openrbl.org'),
-					'onclick' => 'return pop_up_window( "'.str_replace( '%IP%', '"+document.getElementById("check_for").value+"', $this->Settings->get('url_ext_query') ).'", "dnsbl_check" );',
-				)
-			) );
+					'value' => sprintf( /* %s gets replaced by the configured web lookup service */T_('Check at %s'), get_base_domain($url_ext_query) ),
+					'onclick' => 'return pop_up_window( "'.str_replace( '%IP%', '"+document.getElementById("check_for").value+"', $url_ext_query ).'", "dnsbl_check" );',
+				);
+		}
+		$Form->buttons( $buttons );
 		$Form->end_fieldset();
 		$Form->end_form();
 
@@ -685,6 +691,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.29  2006/07/05 23:09:59  blueyed
+ * trans/fix
+ *
  * Revision 1.28  2006/07/03 21:04:51  fplanque
  * translation cleanup
  *
