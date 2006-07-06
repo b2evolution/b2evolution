@@ -254,16 +254,34 @@ class Plugin
 	/**
 	 * Constructor.
 	 *
-	 * Should set name and description in a localizable fashion.
-	 * NOTE FOR PLUGIN DEVELOPPERS UNFAMILIAR WITH OBJECT ORIENTED DEV:
-	 * This function has the same name as the class, this makes it a "constructor".
-	 * This means that this function will be called automagically by PHP when this
-	 * plugin class is instantiated ("loaded").
+	 * You should not use a constructor with your plugin, but the PluginInit() method instead!
 	 */
 	function Plugin()
 	{
+	}
+
+
+	/**
+	 * Init the Plugin after it has been registered/instantiated.
+	 *
+	 * Should set name and description in a localizable fashion.
+	 *
+	 * Event handler: Called at the event of registering/instantiating the Plugin
+	 * (in {@link Plugins::register()}).
+	 *
+	 * Use this to validate Settings/requirements and/or cache them into class properties.
+	 *
+	 * @param array Associative array of parameters.
+	 *              'db_row': an array with the columns of the plugin DB entry (in T_plugins).
+	 *                        E.g., 'plug_version' might be interesting to compare again "$this->version".
+	 * @return boolean If this method returns false, the Plugin gets unregistered (for the current request only).
+	 */
+	function PluginInit()
+	{
 		$this->short_desc = $this->T_('No desc available');
 		$this->long_desc = $this->T_('No description available');
+
+		return true;
 	}
 
 
@@ -736,15 +754,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called at the event of registering/instantiating the Plugin
-	 * (in {@link Plugins::register()}).
-	 *
-	 * Use this to validate Settings/requirements and/or cache them into class properties.
-	 *
-	 * @param array Associative array of parameters.
-	 *              'db_row': an array with the columns of the plugin DB entry (in T_plugins).
-	 *                        E.g., 'plug_version' might be interesting to compare again "$this->version".
-	 * @return boolean If this method returns false, the Plugin gets unregistered (for the current request only).
+	 * @deprecated since 1.9. Use {@link Plugin::PluginInit()} instead.
 	 */
 	function AppendPluginRegister( & $params )
 	{
@@ -2321,6 +2331,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.68  2006/07/06 21:38:45  blueyed
+ * Deprecated plugin constructor. Renamed AppendPluginRegister() to PluginInit().
+ *
  * Revision 1.67  2006/07/04 17:32:30  fplanque
  * no message
  *

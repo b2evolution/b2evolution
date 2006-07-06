@@ -16,6 +16,7 @@
 			Plugins
 			<ul>
 				<li>Plugins can get localized/translated (blueyed)</li>
+				<li>Plugins should not use a constructor anymore, but the PluginInit() method instead. The previous AppendPluginRegister() method has been renamed to PluginInit(). (blueyed)</li>
 			</ul>
 		</li>
 		<li>Added $htsrv_url_sensitive config variable which gets used where password are involved</li>

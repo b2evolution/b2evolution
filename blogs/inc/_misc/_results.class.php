@@ -1013,11 +1013,13 @@ class Results extends Widget
 						{	// The cell is a th_group
 							$th_title = $this->cols[$key]['th_group'];
 							$col_order = isset( $this->cols[$key]['order_group'] );
+							$col_order = isset( $this->cols[$key]['order_group'] ) ? $this->cols[$key]['order_group'] : '';
 						}
 						else
 						{	// The cell is a th
 							$th_title = $this->cols[$key]['th'] ;
 							$col_order = isset( $this->cols[$key]['order'] ) || isset( $this->cols[$key]['order_callback'] );
+							$col_order = isset( $this->cols[$key]['order'] ) ? $this->cols[$key]['order'] : '';
 						}
 
 
@@ -1592,6 +1594,7 @@ class Results extends Widget
 				foreach( $this->cols as $col )
 				{
 					if( isset( $col['order'] ) || isset( $col['order_callback'] ) )
+					if( isset( $col['order'] ) )
 					{ // We have found the first orderable column:
 						$this->order .= 'A';
 						break;
@@ -2113,6 +2116,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.18  2006/07/06 21:38:45  blueyed
+ * Deprecated plugin constructor. Renamed AppendPluginRegister() to PluginInit().
+ *
  * Revision 1.17  2006/07/03 23:25:29  blueyed
  * doc
  *

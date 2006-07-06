@@ -199,7 +199,6 @@ class Plugins
 	 * Additional to the returned event methods (which can be disabled), there are internal
 	 * ones which just get called on the plugin (and get not remembered in T_pluginevents), e.g.:
 	 *  - AfterInstall
-	 *  - AppendPluginRegister
 	 *  - BeforeEnable
 	 *  - BeforeDisable
 	 *  - BeforeInstall
@@ -208,6 +207,7 @@ class Plugins
 	 *  - GetDefaultSettings
 	 *  - GetDefaultUserSettings
 	 *  - GetHtsrvMethods
+	 *  - PluginInit
 	 *  - PluginSettingsUpdateAction (Called as action before updating the plugin's settings)
 	 *  - PluginSettingsEditAction (Called as action before editing the plugin's settings)
 	 *  - PluginSettingsEditDisplayAfter (Called after standard plugin settings are displayed for editing)
@@ -621,9 +621,9 @@ class Plugins
 
 		$tmp_params = array('db_row' => $this->index_ID_rows[$Plugin->ID]);
 
-		if( ! $Plugin->AppendPluginRegister( $tmp_params ) && ! $this->is_admin_class )
+		if( ! $Plugin->PluginInit( $tmp_params ) && ! $this->is_admin_class )
 		{
-			$Debuglog->add( 'Unregistered plugin, because AppendPluginRegister returned false.', 'plugins' );
+			$Debuglog->add( 'Unregistered plugin, because PluginInit returned false.', 'plugins' );
 			$this->unregister( $Plugin );
 			$Plugin = '';
 		}
@@ -1004,7 +1004,7 @@ class Plugins
 		{ // the given class does not exist
 			if( $must_exists )
 			{
-				$r = sprintf( 'Plugin class for &laquo;%s&raquo; in file &laquo;%s&raquo; not defined - it must match the filename.', $classname, rel_path_to_base($classfile_path) );
+				$r = sprintf( 'Plugin class for &laquo;%s&raquo; in file &laquo;%s&raquo; not defined.', $classname, rel_path_to_base($classfile_path) );
 				$Debuglog->add( $r, array( 'plugins', 'error' ) );
 
 				// Get the Plugin object (must not exist)
@@ -1099,9 +1099,9 @@ class Plugins
 			$this->instantiate_Settings( $Plugin, 'UserSettings' );
 
 			$tmp_params = array('db_row'=>$this->index_ID_rows[$Plugin->ID]);
-			if( ! $Plugin->AppendPluginRegister( $tmp_params ) && ! $this->is_admin_class )
+			if( ! $Plugin->PluginInit( $tmp_params ) && ! $this->is_admin_class )
 			{
-				$Debuglog->add( 'Unregistered plugin, because AppendPluginRegister returned false.', 'plugins' );
+				$Debuglog->add( 'Unregistered plugin, because PluginInit returned false.', 'plugins' );
 				$this->unregister( $Plugin );
 				$Plugin = '';
 			}
@@ -1217,7 +1217,7 @@ class Plugins
 	 * Forget the events a Plugin has registered.
 	 *
 	 * This gets used when {@link unregister() unregistering} a Plugin or if
-	 * {@link Plugin::AppendPluginRegister()} returned false, which means
+	 * {@link Plugin::PluginInit()} returned false, which means
 	 * "do not use it for subsequent events in the request".
 	 */
 	function forget_events( $plugin_ID )
@@ -2771,6 +2771,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.62  2006/07/06 21:38:45  blueyed
+ * Deprecated plugin constructor. Renamed AppendPluginRegister() to PluginInit().
+ *
  * Revision 1.61  2006/07/06 18:54:15  fplanque
  * cleanup
  *

@@ -36,13 +36,20 @@ class transport_optimizer_plugin extends Plugin
 
 
 	/**
-	 * Constructor
+	 * Init Plugin.
 	 */
-	function transport_optimizer_plugin()
+	function PluginInit()
 	{
 		$this->name = T_('Transport optimizer');
 		$this->short_desc = T_('Save bandwidth on your server.');
 		$this->long_desc = T_('By providing support of ETag headers and GZip compression it saves bandwidth on the server and optimizes the transport to the browser.');
+
+		// Store in properties, because AbstractSettings::get() uses var_export(), which does not work in an output buffer:
+		$this->use_gzipcompression = $this->Settings->get('use_gzipcompression');
+		$this->use_etags = $this->Settings->get('use_etags');
+		$this->send_last_modified = $this->Settings->get('send_last_modified');
+
+		return true;
 	}
 
 
@@ -71,20 +78,6 @@ class transport_optimizer_plugin extends Plugin
 					'note' => T_('This will send a Last-Modified header with the current time.'),
 				),
 			);
-	}
-
-
-	/**
-	 *
-	 */
-	function AppendPluginRegister()
-	{
-		// Store in properties, because AbstractSettings::get() uses var_export(), which does not work in an output buffer:
-		$this->use_gzipcompression = $this->Settings->get('use_gzipcompression');
-		$this->use_etags = $this->Settings->get('use_etags');
-		$this->send_last_modified = $this->Settings->get('send_last_modified');
-
-		return true;
 	}
 
 
@@ -176,6 +169,9 @@ class transport_optimizer_plugin extends Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.4  2006/07/06 21:38:45  blueyed
+ * Deprecated plugin constructor. Renamed AppendPluginRegister() to PluginInit().
+ *
  * Revision 1.3  2006/06/30 17:48:16  blueyed
  * Fix
  *

@@ -47,12 +47,18 @@ class dnsbl_antispam_plugin extends Plugin
 
 
 	/**
-	 * Constructor
+	 * Get $use_whitelisting property, if not set before (e.g. in {@link Install()}).
 	 */
-	function dnsbl_antispam_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_("Checks the user's IP address against a list of DNS blacklists.");
 		$this->long_desc = T_('If the IP address is blacklisted, the request is canceled early and the user can (optionally) whitelist his session through a Captcha plugin.');
+
+		if( ! isset($this->use_whitelisting) )
+		{
+			$this->use_whitelisting = $this->Settings->get('use_whitelisting');
+		}
+		return true;
 	}
 
 
@@ -377,19 +383,6 @@ class dnsbl_antispam_plugin extends Plugin
 
 
 	/**
-	 * Get $use_whitelisting property, if not set before (e.g. in {@link Install()}).
-	 */
-	function AppendPluginRegister()
-	{
-		if( ! isset($this->use_whitelisting) )
-		{
-			$this->use_whitelisting = $this->Settings->get('use_whitelisting');
-		}
-		return true;
-	}
-
-
-	/**
 	 * Plugin's main action hook.
 	 *
 	 * It checks if the remote IP is in the list of DNS Blacklists and
@@ -691,6 +684,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.30  2006/07/06 21:38:45  blueyed
+ * Deprecated plugin constructor. Renamed AppendPluginRegister() to PluginInit().
+ *
  * Revision 1.29  2006/07/05 23:09:59  blueyed
  * trans/fix
  *
