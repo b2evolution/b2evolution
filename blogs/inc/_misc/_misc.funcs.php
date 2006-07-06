@@ -1062,7 +1062,9 @@ else
  * @param boolean Do we need to memorize this to regenerate the URL for this page?
  * @param boolean Override if variable already set
  * @param boolean Force setting of variable to default if no param is sent and var wasn't set before
- * @param mixed true will refuse illegal values, false will try to convert illegal to legal values, 'allow_empty' will refuse illegale values but will always accept empty values (This helps blocking dirty spambots or borked index bots. Saves a lot of processor time by killing invalid requests)
+ * @param mixed true will refuse illegal values,
+ *              false will try to convert illegal to legal values,
+ *              'allow_empty' will refuse illegal values but will always accept empty values (This helps blocking dirty spambots or borked index bots. Saves a lot of processor time by killing invalid requests)
  * @return mixed Final value of Variable, or false if we don't force setting and did not set
  */
 function param( $var, $type = '', $default = '', $memorize = false,
@@ -1170,11 +1172,18 @@ function param( $var, $type = '', $default = '', $memorize = false,
 				}
 				elseif( $GLOBALS[$var] === '' )
 				{
-					// fplanque> note: there might be side effects to this, but we need
-					// this to distinguish between 0 and 'no input'
-					// Note: we do this after regexps because we may or may not want to allow empty strings in regexps
-					$GLOBALS[$var] = NULL;
-					$Debuglog->add( 'param(-): <strong>'.$var.'</strong> set to NULL', 'params' );
+					if( $strict_typing === false && $use_default )
+					{	// ADDED BY FP 2006-07-06
+						$GLOBALS[$var] = $default;
+					}
+					else
+					{
+						// fplanque> note: there might be side effects to this, but we need
+						// this to distinguish between 0 and 'no input'
+						// Note: we do this after regexps because we may or may not want to allow empty strings in regexps
+						$GLOBALS[$var] = NULL;
+						$Debuglog->add( 'param(-): <strong>'.$var.'</strong> set to NULL', 'params' );
+					}
 				}
 				else
 				{
@@ -2266,15 +2275,8 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word
 		unset($link_attribs['use_js_size']);
 	}
 
-	if( ! empty($link_attribs['href']) )
-	{ // Use a link:
-		// NOTE: We do not use format_to_output with get_field_attribs_as_string() here, because it interferes with the Results class (eval() fails on entitied quotes..) (blueyed)
-		$r = '<a '.get_field_attribs_as_string( $link_attribs, false ).'>';
-	}
-	else
-	{ // only the icon:
-		$r = '';
-	}
+	// NOTE: We do not use format_to_output with get_field_attribs_as_string() here, because it interferes with the Results class (eval() fails on entitied quotes..) (blueyed)
+	$r = '<a '.get_field_attribs_as_string( $link_attribs, false ).'>';
 
 	$display_icon = ($icon_weight >= $UserSettings->get('action_icon_threshold'));
 	$display_word = ($word_weight >= $UserSettings->get('action_word_threshold'));
@@ -2306,10 +2308,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word
 		}
 	}
 
-	if( ! empty($link_attribs['href']) )
-	{ // Use a link:
-		$r .= '</a>';
-	}
+	$r .= '</a>';
 
 	return $r;
 }
@@ -2567,9 +2566,15 @@ function get_ip_list( $firstOnly = false )
  */
 function get_base_domain( $url )
 {
-	$base_domain = preg_replace( '~^[a-z]+://~i', '', $url );
-	$base_domain = preg_replace( '/^www\./i', '', $base_domain );
-	$base_domain = preg_replace( '~(:[1-9]+)?/.*~i', '', $base_domain );
+	$domain = preg_replace( '~^([a-z]+://)?([^:/]+)(.*)$~i', '\\2', $url );
+
+	if( preg_match( '~^[0-9.]+$~', $domain ) )
+	{	// All numeric = IP address, don't try to cut it any further
+		return $domain;
+	}
+
+	// Get the base domain (without any subdomains):
+	$base_domain = preg_replace( '~(.*\.)([^.]+\.[^.]+)~', '\\2', $domain );
 
 	return $base_domain;
 }
@@ -3003,6 +3008,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.78  2006/07/06 18:50:42  fplanque
+ * cleanup
+ *
  * Revision 1.77  2006/07/03 22:01:23  blueyed
  * Support empty url in action_icon() (=> no A tag)
  *

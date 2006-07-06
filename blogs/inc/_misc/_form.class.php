@@ -2159,7 +2159,7 @@ class Form extends Widget
 	 *
 	 * @param string The name of the radio options
 	 * @param string The checked option
-	 * @param array of arrays The radio options (keys: 'value', 'label', 'params' (array)).
+	 * @param array of arrays The radio options (keys: 'value', 'label', 'note', 'params' (array)).
 	 *                        - 'params':
 	 *                          - 'note': Note for the option (string)
 	 *                          - 'input_suffix' (additional HTML [input field, ..])
@@ -2191,6 +2191,9 @@ class Form extends Widget
 
 		$r = $this->begin_field();
 
+		/*
+		 * Build options list:
+		 */
 		$count_options = 0; // used for unique IDs (label/radio)
 		foreach( $field_options as $loop_field_option )
 		{
@@ -2216,24 +2219,18 @@ class Form extends Widget
 				$input_params['checked'] = 'checked';
 			}
 
-			if( isset($input_params['radio_suffix']) )
-			{
-				$radio_suffix = ' '.$input_params['radio_suffix'];
-				unset($input_params['radio_suffix']); // no HTML attribute
-			}
-			else
-			{
-				$radio_suffix = '';
-			}
-
 			// build unique id:
 			$input_params['id'] = $this->get_valid_id( $field_params['name'].'_radio_'.$count_options);
 
 			$r .= $this->get_input_element( $input_params, false ) // the radio element
 				.'<label class="radiooption" for="'.$input_params['id'].'">'
 				.$loop_field_option['label']
-				.'</label>'
-				.$radio_suffix; // might be HTML!
+				.'</label>';
+
+			if( !empty($loop_field_option['note']) )
+			{ // Add a note for the current rzdio option:
+				$r .= '<span class="notes">'.$loop_field_option['note'].'</span>';
+			}
 
 			if( !empty( $loop_field_option['params']['note'] ) )
 			{ // notes for radio option
@@ -2282,10 +2279,6 @@ class Form extends Widget
 			{
 				$l_params['note'] = $l_options[2];
 			}
-			if( isset($l_options[3]) )
-			{
-				$l_params['radio_suffix'] = $l_options[3];
-			}
 			if( isset($l_options[4]) )
 			{ // Convert "inline attribs" to params array
 				preg_match_all( '#(\w+)=[\'"](.*)[\'"]#', $l_options[4], $matches, PREG_SET_ORDER );
@@ -2300,6 +2293,12 @@ class Form extends Widget
 				'value' => $l_options[0],
 				'label' => $l_options[1],
 				'params' => $l_params );
+
+			if( isset($l_options[3]) )
+			{
+				$new_field_options[$l_key]['suffix'] = $l_options[3];
+			}
+
 		}
 
 		$field_params = array( 'lines' => $field_lines, 'note' => $field_note );
@@ -2572,6 +2571,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.20  2006/07/06 18:50:42  fplanque
+ * cleanup
+ *
  * Revision 1.19  2006/06/26 23:10:24  fplanque
  * minor / doc
  *

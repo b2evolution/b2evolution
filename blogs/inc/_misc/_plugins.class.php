@@ -1854,7 +1854,8 @@ class Plugins
 			{
 				$debug_params['pass_md5'] = '-hidden-';
 			}
-			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( '.htmlspecialchars(var_export( $debug_params, true )).' )', 'plugins' );
+			// $Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( '.htmlspecialchars(var_export( $debug_params, true )).' )', 'plugins' );
+			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( )', 'plugins' );
 		}
 
 		$Timer->resume( $Plugin->classname.'_(#'.$Plugin->ID.')' );
@@ -2770,6 +2771,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.61  2006/07/06 18:54:15  fplanque
+ * cleanup
+ *
  * Revision 1.60  2006/07/03 23:36:00  blueyed
  * Cleanup
  *
