@@ -111,6 +111,7 @@ class BlogCache extends DataObjectCache
 
 		$req_url_wo_proto = substr( $req_url, strpos( $req_url, '://' ) ); // req_url without protocol, so it matches http and https below
 
+		// fp> TODO: protocol detection feels bloated. Why not used a MYSQL REGEXP ??
 		// TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
 		$sql = "
 				SELECT *
@@ -272,6 +273,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.9  2006/07/06 19:26:30  fplanque
+ * question?
+ *
  * Revision 1.8  2006/06/05 15:26:12  blueyed
  * get_by_url: detect regardless of protocol (http or https)
  *
