@@ -181,7 +181,7 @@ else
 	$Form->info( T_('Show Online'), ($edited_User->get('showonline')) ? T_('yes') : T_('no') );
 	$Form->info( T_('Locale'), $edited_User->get('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
 	$Form->info( T_('Email'), $edited_User->get('email'), $email_fieldnote );
-	$Form->info( T_('Validated'), $edited_User->get('validated'), T_('Validated'), T_('Has the user been validated (through email)?') );
+	$Form->info( T_('Validated'), $edited_User->get('validated'), T_('Has the user been validated (through email)?') );
 	$Form->info( T_('Message form'), ($edited_User->get('allow_msgform') ? T_('yes') : T_('no')) );
 	$Form->info( T_('Notifications'), ($edited_User->get('notify') ? T_('yes') : T_('no')) );
 	$Form->info( T_('URL'), $edited_User->get('url'), $url_fieldnote );
@@ -288,6 +288,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.18  2006/07/06 23:23:48  blueyed
+ * Fixed "Output format [Has the user been validated (through email)?] not supported." error.
+ *
  * Revision 1.17  2006/07/03 21:04:50  fplanque
  * translation cleanup
  *
