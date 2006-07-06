@@ -102,7 +102,9 @@ class Request
 	 * @param boolean Do we need to memorize this to regenerate the URL for this page?
 	 * @param boolean Override if variable already set
 	 * @param boolean Force setting of variable to default if no param is sent and var wasn't set before
-	 * @param mixed true will refuse illegal values, false will try to convert illegal to legal values, 'allow_empty' will refuse illegale values but will always accept empty values (This helps blocking dirty spambots or borked index bots. Saves a lot of processor time by killing invalid requests)
+	 * @param mixed true will refuse illegal values,
+	 *              false will try to convert illegal to legal values,
+	 *              'allow_empty' will refuse illegal values but will always accept empty values (This helps blocking dirty spambots or borked index bots. Saves a lot of processor time by killing invalid requests)
 	 * @return mixed Final value of Variable, or false if we don't force setting and did not set
 	 */
 	function param( $var, $type = '', $default = '', $memorize = false,
@@ -1006,6 +1008,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.17  2006/07/06 19:57:20  fplanque
+ * no message
+ *
  * Revision 1.16  2006/06/25 21:09:37  fplanque
  * minor
  *

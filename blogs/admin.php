@@ -121,9 +121,14 @@ if( !isset($ctrl_mappings[$ctrl]) )
 // Call the requested controller:
 require $control_path.$ctrl_mappings[$ctrl];
 
+// log the hit on this page (according to settings) if the admin_skin hasn't already done so:
+$Hit->log();
 
 /*
  * $Log$
+ * Revision 1.14  2006/07/06 19:56:29  fplanque
+ * no message
+ *
  * Revision 1.13  2006/06/13 21:49:14  blueyed
  * Merged from 1.8 branch
  *

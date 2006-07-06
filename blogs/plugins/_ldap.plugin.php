@@ -6,7 +6,7 @@
  *
  * Documentation can be found at {@link http://manual.b2evolution.net/Plugins/ldap_plugin}.
  *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -333,6 +333,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.27  2006/07/06 19:56:29  fplanque
+ * no message
+ *
  * Revision 1.26  2006/06/18 01:14:03  blueyed
  * lazy instantiate user's group; normalisation
  *

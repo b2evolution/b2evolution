@@ -6,7 +6,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -55,6 +55,9 @@ $Plugins->call_by_code( 'evo_Arch', array(
 
 /*
  * $Log$
+ * Revision 1.17  2006/07/06 19:56:29  fplanque
+ * no message
+ *
  * Revision 1.16  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

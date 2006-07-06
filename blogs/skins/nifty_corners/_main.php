@@ -165,7 +165,17 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			require( dirname(__FILE__).'/_subscriptions.php');
 			break;
 	}
-// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
+// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. -------------------
+
+
+	echo '<ul class="evo_sponsored_links">';
+	foreach( $sponsored_links as $sponsored_link )
+	{
+		echo '<li><a href="'.$sponsored_link[0].'">'.$sponsored_link[1].'</a></li>';
+	}
+	echo '</ul>';
+
+?>
 </div>
 </div>
 <!-- =================================== START OF SIDEBAR =================================== -->

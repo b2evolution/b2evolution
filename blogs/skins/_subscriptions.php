@@ -11,7 +11,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -81,6 +81,9 @@ $Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.9  2006/07/06 19:56:29  fplanque
+ * no message
+ *
  * Revision 1.8  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

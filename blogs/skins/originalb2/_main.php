@@ -9,7 +9,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2005 by Jason EDGECOMBE.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -179,7 +179,8 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 			require( dirname(__FILE__).'/_subscriptions.php');
 			break;
 	}
-// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
+// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. -------------------
+?>
 
 </div>
 <p class="center">

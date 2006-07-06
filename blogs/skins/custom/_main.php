@@ -9,7 +9,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2005 by Jason EDGECOMBE.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER.
  *
@@ -201,6 +201,15 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			break;
 	}
 	// ------------------- END OF INCLUDES FOR LAST COMMENTS, ETC. -------------------
+
+
+	echo '<ul class="evo_sponsored_links">';
+	foreach( $sponsored_links as $sponsored_link )
+	{
+		echo '<li><a href="'.$sponsored_link[0].'">'.$sponsored_link[1].'</a></li>';
+	}
+	echo '</ul>';
+
 ?>
 </div>
 <!-- =================================== START OF SIDEBAR =================================== -->

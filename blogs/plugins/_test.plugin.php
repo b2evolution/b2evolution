@@ -135,7 +135,7 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * We trigger an extra event ourself (which we also provide ourself).
+	 * We trigger an extra event ourself (which we also provide ourselves).
 	 *
 	 * @return array
 	 */
@@ -597,6 +597,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.45  2006/07/06 19:56:29  fplanque
+ * no message
+ *
  * Revision 1.44  2006/06/16 21:30:57  fplanque
  * Started clean numbering of plugin versions (feel free do add dots...)
  *

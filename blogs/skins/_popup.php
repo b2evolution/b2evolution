@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
  */
@@ -60,6 +60,9 @@ header('Content-Type: text/html; charset='.$io_charset);
 
 /*
  * $Log$
+ * Revision 1.14  2006/07/06 19:56:29  fplanque
+ * no message
+ *
  * Revision 1.13  2006/05/19 18:15:06  blueyed
  * Merged from v-1-8 branch
  *

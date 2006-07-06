@@ -303,7 +303,7 @@ switch( $action )
 		// we call $Plugins(!) here: the Plugin gets disabled on the current page already and it should not get (un)registered on $Plugins_admin!
 		$Plugins->set_Plugin_status( $edit_Plugin, 'disabled' ); // sets $edit_Plugin->status
 
-		$Messages->add( /* TRANS: plugin name, class name and ID */ sprintf( T_('Disabled plugin "%s" (%s, #%d).'), $edit_Plugin->name, $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
+		$Messages->add( /* TRANS: plugin name, class name and ID */ sprintf( T_('Disabled "%s" plugin (%s, #%d).'), $edit_Plugin->name, $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
 
 		break;
 
@@ -325,7 +325,7 @@ switch( $action )
 		}
 		if( $edit_Plugin->status == 'enabled' )
 		{
-			$Messages->add( /* TRANS: plugin name, class name and ID */ sprintf( T_( 'The plugin "%s" (%s, #%d) is already enabled.' ), $edit_Plugin->name, $edit_Plugin->classname, $plugin_ID ), 'note' );
+			$Messages->add( /* TRANS: plugin name, class name and ID */ sprintf( T_( 'The "%s" plugin (%s, #%d) is already enabled.' ), $edit_Plugin->name, $edit_Plugin->classname, $plugin_ID ), 'note' );
 			break;
 		}
 		if( $edit_Plugin->status == 'broken' )
@@ -358,7 +358,7 @@ switch( $action )
 			// we call $Plugins(!) here: the Plugin gets active on the current page already and it should not get (un)registered on $Plugins_admin!
 			$Plugins->set_Plugin_status( $edit_Plugin, 'enabled' ); // sets $edit_Plugin->status
 
-			$Messages->add( /* TRANS: plugin name, class name and ID */ sprintf( T_('Enabled plugin "%s" (%s, #%d).'), $edit_Plugin->name, $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
+			$Messages->add( /* TRANS: plugin name, class name and ID */ sprintf( T_('Enabled "%s" plugin (%s, #%d).'), $edit_Plugin->name, $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
 		}
 		else
 		{
@@ -928,7 +928,7 @@ switch( $action )
 
 			$Form->global_icon( T_('Cancel installation!'), 'close', regenerate_url() );
 
-			$Form->begin_form( 'fform', sprintf( /* %d is ID, %d name */ T_('Finish setup of plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
+			$Form->begin_form( 'fform', sprintf( /* %d is ID, %d name */ T_('Finish setup for plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
 
 			echo '<p>'.T_('The plugin needs the following database changes.').'</p>';
 
