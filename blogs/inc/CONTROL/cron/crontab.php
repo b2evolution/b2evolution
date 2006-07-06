@@ -36,6 +36,7 @@ $cron_job_names = array(
 		'test' => T_('Basic test job'),
 		'error' => T_('Error test job'),
 		'anstispam_poll' => T_('Poll the antispam blacklist'),
+		'prune_hits_sessions' => T_('Prune old hits & sessions'),
 	);
 $cron_job_params = array(
 		'test' => array(
@@ -46,6 +47,9 @@ $cron_job_params = array(
 			'params' => NULL ),
 		'anstispam_poll' => array(
 			'ctrl' => 'cron/_antispam_poll.job.php',
+			'params' => NULL ),
+		'prune_hits_sessions' => array(
+			'ctrl' => 'cron/_prune_hits_sessions.job.php',
 			'params' => NULL ),
 	);
 

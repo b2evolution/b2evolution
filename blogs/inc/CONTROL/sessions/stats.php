@@ -140,15 +140,14 @@ $AdminUI->disp_payload_begin();
 switch( $AdminUI->get_path(1) )
 {
 	case 'summary':
-		?>
-		<h2><?php echo T_('Summary') ?>:</h2>
 
-		<?php
+		echo '<h2>'.T_('Summary').'</h2>';
+
 		// fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
 		// Bug report: http://lists.mysql.com/bugs/36
 		// Solution : CAST to string
 		// TODO: I've also limited this to agnt_type "browser" here, according to the change for "referers" (Rev 1.6)
-		//       -> an RSS service that sends a referer is not a real referer (though he should be listed in the robots list)! (blueyed)
+		//       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
 		$sql = '
 			SELECT COUNT(*) AS hits, CONCAT(hit_referer_type) AS referer_type, YEAR(hit_datetime) AS year,
 			       MONTH(hit_datetime) AS month, DAYOFMONTH(hit_datetime) AS day
@@ -174,7 +173,9 @@ switch( $AdminUI->get_path(1) )
 					'direct' => 1,
 					'referer' => 2,
 					'search' => 3,
-					'blacklist' => 4,
+					'self' => 4,
+					'blacklist' => 5,
+					'admin' => 6,
 				);
 
 			$chart[ 'chart_data' ][ 0 ] = array();
@@ -182,6 +183,8 @@ switch( $AdminUI->get_path(1) )
 			$chart[ 'chart_data' ][ 2 ] = array();
 			$chart[ 'chart_data' ][ 3 ] = array();
 			$chart[ 'chart_data' ][ 4 ] = array();
+			$chart[ 'chart_data' ][ 5 ] = array();
+			$chart[ 'chart_data' ][ 6 ] = array();
 
 			$count = 0;
 			foreach( $res_hits as $row_stats )
@@ -196,6 +199,8 @@ switch( $AdminUI->get_path(1) )
 						array_unshift( $chart[ 'chart_data' ][ 2 ], 0 );
 						array_unshift( $chart[ 'chart_data' ][ 3 ], 0 );
 						array_unshift( $chart[ 'chart_data' ][ 4 ], 0 );
+						array_unshift( $chart[ 'chart_data' ][ 5 ], 0 );
+						array_unshift( $chart[ 'chart_data' ][ 6 ], 0 );
 				}
 				$col = $col_mapping[$row_stats['referer_type']];
 				$chart [ 'chart_data' ][$col][0] = $row_stats['hits'];
@@ -205,7 +210,9 @@ switch( $AdminUI->get_path(1) )
 			array_unshift( $chart[ 'chart_data' ][ 1 ], 'Direct Accesses' );	// Translations need to be UTF-8
 			array_unshift( $chart[ 'chart_data' ][ 2 ], 'Referers' );
 			array_unshift( $chart[ 'chart_data' ][ 3 ], 'Refering Searches' );
-			array_unshift( $chart[ 'chart_data' ][ 4 ], 'Blacklisted' );
+			array_unshift( $chart[ 'chart_data' ][ 4 ], 'Self referred' );
+			array_unshift( $chart[ 'chart_data' ][ 5 ], 'Blacklisted' );
+			array_unshift( $chart[ 'chart_data' ][ 6 ], 'Admin' );
 
 			$chart[ 'canvas_bg' ] = array (
 					'width'  => 780,
@@ -334,26 +341,34 @@ switch( $AdminUI->get_path(1) )
 				'direct' => 0,
 				'referer' => 0,
 				'search' => 0,
+				'self' => 0,
 				'blacklist' => 0,
+				'admin' => 0,
 			);
 			$hits_total = array(
 				'direct' => 0,
 				'referer' => 0,
 				'search' => 0,
+				'self' => 0,
 				'blacklist' => 0,
+				'admin' => 0,
 			);
 
 			$last_date = 0;
+
 			?>
+
 			<table class="grouped" cellspacing="0">
 				<tr>
 					<th class="firstcol"><?php echo T_('Date') ?></th>
 					<th><?php echo T_('Direct Accesses') ?></th>
 					<th><?php echo T_('Referers') ?></th>
 					<th><?php echo T_('Refering Searches') ?></th>
+					<th><?php echo T_('Self referred') ?></th>
 					<th><?php
 					// TODO: should be renamed for more clarity (because this is not Spam)
 					echo T_('Blacklisted') ?></th>
+					<th><?php echo T_('Admin') ?></th>
 					<th><?php echo T_('Total') ?></th>
 				</tr>
 				<?php
@@ -375,7 +390,9 @@ switch( $AdminUI->get_path(1) )
 							<td class="right"><?php echo $hits['direct'] ?></td>
 							<td class="right"><?php echo $hits['referer'] ?></td>
 							<td class="right"><?php echo $hits['search'] ?></td>
+							<td class="right"><?php echo $hits['self'] ?></td>
 							<td class="right"><?php echo $hits['blacklist'] ?></td>
+							<td class="right"><?php echo $hits['admin'] ?></td>
 							<td class="right"><?php echo array_sum($hits) ?></td>
 						</tr>
 						<?php
@@ -383,7 +400,9 @@ switch( $AdminUI->get_path(1) )
 								'direct' => 0,
 								'referer' => 0,
 								'search' => 0,
+								'self' => 0,
 								'blacklist' => 0,
+								'admin' => 0,
 							);
 							$last_date = $this_date;	// that'll be the next one
 							$count ++;
@@ -407,7 +426,9 @@ switch( $AdminUI->get_path(1) )
 						<td class="right"><?php echo $hits['direct'] ?></td>
 						<td class="right"><?php echo $hits['referer'] ?></td>
 						<td class="right"><?php echo $hits['search'] ?></td>
+						<td class="right"><?php echo $hits['self'] ?></td>
 						<td class="right"><?php echo $hits['blacklist'] ?></td>
+						<td class="right"><?php echo $hits['admin'] ?></td>
 						<td class="right"><?php echo array_sum($hits) ?></td>
 					</tr>
 					<?php
@@ -421,7 +442,9 @@ switch( $AdminUI->get_path(1) )
 				<td class="right"><?php echo $hits_total['direct'] ?></td>
 				<td class="right"><?php echo $hits_total['referer'] ?></td>
 				<td class="right"><?php echo $hits_total['search'] ?></td>
+				<td class="right"><?php echo $hits_total['self'] ?></td>
 				<td class="right"><?php echo $hits_total['blacklist'] ?></td>
+				<td class="right"><?php echo $hits_total['admin'] ?></td>
 				<td class="right"><?php echo array_sum($hits_total) ?></td>
 				</tr>
 
@@ -1049,6 +1072,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2006/07/06 19:59:08  fplanque
+ * better logs, better stats, better pruning
+ *
  * Revision 1.22  2006/07/04 17:32:28  fplanque
  * no message
  *

@@ -83,7 +83,7 @@ switch( $action )
 
 			$Settings->delete_array( array(
 				'eblog_enabled', 'eblog_method', 'eblog_server_host', 'eblog_server_port', 'eblog_username', 'eblog_password', 'eblog_default_category', 'eblog_subject_prefix',
-				'auto_prune_stats',
+				'log_public_hits', 'log_admin_hits', 'auto_prune_stats_mode', 'auto_prune_stats',
 				'timeout_sessions',
 				'webhelp_enabled' ) );
 
@@ -141,8 +141,16 @@ switch( $action )
 			$Settings->set( 'eblog_phonemail_separator', trim($eblog_phonemail_separator) );
 
 
-			// Statistics
-			$Request->param( 'auto_prune_stats', 'integer', $Settings->get_default('auto_prune_stats') );
+			// Hit & Session logs
+			$Settings->set( 'log_public_hits', $Request->param( 'log_public_hits', 'integer', 0 ) );
+			$Settings->set( 'log_admin_hits', $Request->param( 'log_admin_hits', 'integer', 0 ) );
+
+			$Request->param( 'auto_prune_stats_mode', 'string', true );
+			$Settings->set( 'auto_prune_stats_mode',  $Request->get('auto_prune_stats_mode') );
+
+			// TODO: offer to set-up cron job if mode == 'cron' and to remove cron job if mode != 'cron'
+
+			$Request->param( 'auto_prune_stats', 'integer', $Settings->get_default('auto_prune_stats'), false, false, true, false );
 			$Settings->set( 'auto_prune_stats', $Request->get('auto_prune_stats') );
 
 
@@ -196,6 +204,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2006/07/06 19:59:08  fplanque
+ * better logs, better stats, better pruning
+ *
  * Revision 1.8  2006/06/15 17:53:38  fplanque
  * minor
  *

@@ -66,6 +66,7 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 	$Form->checkbox_input( 'eblog_enabled', $Settings->get('eblog_enabled'), T_('Enable Blog by email'),
 		array( 'note' => T_('Check to enable the Blog by email feature.' ), 'onclick' => 'this.checked==true?document.getElementById("eblog_section").style.display="":document.getElementById("eblog_section").style.display="none";' ) );
 
+	// TODO: this is IMPOSSIBLE to use when you have no javascript!!! :((
 	echo '<div id="eblog_section" style="'.( $Settings->get('eblog_enabled') ? '' : 'display:none' ).'">';
 		$Form->select_input_array( 'eblog_method', array( 'pop3'=>T_('POP3'), 'pop3a'=>T_('POP3 through IMAP extension (experimental)') ), // TRANS: E-Mail retrieval method
 			T_('Retrieval method'), array('value' => $Settings->get('eblog_method'), 'note' => T_('Choose a method to retrieve the emails.') ) );
@@ -88,9 +89,9 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 		// TODO: "cron/" is supposed to not reside in the server's DocumentRoot, therefor is not necessarily accessible
 		$Form->info_field(
 			T_('Perform Server Test'),
-			' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "' . $baseurl . 'cron/getmail.php?test=1", "getmail" );\'>[ ' . T_('connection') . ' ]</a>'
-			.' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "' . $baseurl . 'cron/getmail.php?test=2", "getmail" );\'>[ ' . T_('messages') . ' ]</a>'
-			.' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "' . $baseurl . 'cron/getmail.php?test=3", "getmail" );\'>[ ' . T_('verbose') . ' ]</a>',
+			' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "'.$baseurl.'cron/getmail.php?test=1", "getmail" );\'>[ ' . T_('connection') . ' ]</a>'
+			.' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "'.$baseurl.'cron/getmail.php?test=2", "getmail" );\'>[ ' . T_('messages') . ' ]</a>'
+			.' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "'.$baseurl.'cron/getmail.php?test=3", "getmail" );\'>[ ' . T_('verbose') . ' ]</a>',
 			array() );
 
 //		$Form->info_field ('','<a id="eblog_test_email" href="#" onclick=\'return pop_up_window( "' . $htsrv_url . 'getmail.php?test=email", "getmail" );\'>' . T_('Test email') . '</a>',array());
@@ -107,8 +108,8 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 			$Form->checkbox_input( 'eblog_phonemail', $Settings->get('eblog_phonemail'), T_('Phone Email *'),
 				array( 'note' => 'Some mobile phone email services will send identical subject &amp; content on the same line. If you use such a service, check this option, and indicate a separator string when you compose your message, you\'ll type your subject then the separator string then you type your login:password, then the separator, then content.' ) );
 
-			$Form->text_input ( 'eblog_phonemail_separator', $Settings->get('eblog_phonemail_separator'),15,T_('Phonemail Separator'),
-												array( 'maxlength' => 255 )  );
+			$Form->text_input( 'eblog_phonemail_separator', $Settings->get('eblog_phonemail_separator'),15,T_('Phonemail Separator'),
+												array( 'maxlength' => 255 ) );
 
 		echo '</div>';
 
@@ -116,9 +117,23 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Hit logging') . get_web_help_link('Hit logging') );
-	$Form->text_input( 'auto_prune_stats', $Settings->get('auto_prune_stats'), 5, T_('Autoprune stats after'),
-		array( 'note' => T_('days. (0 to disable) How many days of stats do you want to keep in the database?'), 'required'=>true ) );
+$Form->begin_fieldset( T_('Hit & session logging') . get_web_help_link('Hit logging') );
+
+	$Form->checklist( array( array( 'log_public_hits', 1, T_('on every public page'), $Settings->get('log_public_hits') ),
+													array( 'log_admin_hits', 1, T_('on every admin page'), $Settings->get('log_admin_hits') ) ),
+										'log_hits', T_('Log hits') );
+
+	// TODO: draw a warning sign if set to off
+	$Form->radio_input( 'auto_prune_stats_mode', $Settings->get('auto_prune_stats_mode'), array(
+									array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('Not recommended! Your database will grow very large!!'), 'suffix' => '<br />' ),
+									array( 'value'=>'page', 'label'=>T_('On every page'), 'note'=>T_('This is guaranteed to work but uses extra resources with every page displayed.'), 'suffix' => '<br />' ),
+									array( 'value'=>'cron', 'label'=>T_('With a scheduled job'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up.') ) ),
+								T_('Auto pruning'), array( 'note' => T_('Note: Even if you don\'t log hits, you still need to prune sessions!') ) );
+
+	// TODO: hide this if mode set to off:
+	$Form->text_input( 'auto_prune_stats', $Settings->get('auto_prune_stats'), 5, T_('Prune after'),
+		array( 'note' => T_('days. How many days of hits & sessions do you want to keep in the database for stats?') ) );
+
 $Form->end_fieldset();
 
 
@@ -140,6 +155,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.7  2006/07/06 19:59:08  fplanque
+ * better logs, better stats, better pruning
+ *
  * Revision 1.6  2006/05/05 17:53:29  blueyed
  * Fixes for blog by email: made tests work and use default port, if not given
  *

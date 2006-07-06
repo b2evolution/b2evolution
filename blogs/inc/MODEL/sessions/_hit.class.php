@@ -151,29 +151,28 @@ class Hit
 		// Get the first IP in the list of REMOTE_ADDR and HTTP_X_FORWARDED_FOR
 		$this->IP = get_ip_list( true );
 
-		// Check the referer:
+		// Check the referer and determine referer_type:
 		$this->detect_referer();
-		$this->referer_basedomain = get_base_domain($this->referer);
 
+		// Check if we know the base domain:
+		$this->referer_basedomain = get_base_domain($this->referer);
 		if( $this->referer_basedomain )
-		{
+		{	// This referer has a base domain
+			// Check if we have met it before:
 			$basedomain = $DB->get_row( '
-				SELECT dom_ID, dom_status FROM T_basedomains
-				 WHERE dom_name = "'.$DB->escape($this->referer_basedomain).'"' );
-			if( $basedomain )
-			{
+				SELECT dom_ID
+				  FROM T_basedomains
+				 WHERE dom_name = '.$DB->quote($this->referer_basedomain) );
+			if( $basedomain->dom_ID )
+			{	// This basedomain has visited before:
 				$this->referer_domain_ID = $basedomain->dom_ID;
-				if( $basedomain->dom_status == 'blacklist' )
-				{
-					$this->referer_type = 'blacklist';
-				}
+				// fp> The blacklist handling that was here made no sense.
 			}
 			else
-			{
+			{	// This is the first time this base domain visits:
 				$DB->query( '
-					INSERT INTO T_basedomains (dom_name, dom_status)
-						VALUES( "'.$DB->escape($this->referer_basedomain).'",
-						"'.( $this->referer_type == 'blacklist' ? 'blacklist' : 'unknown' ).'" )' );
+					INSERT INTO T_basedomains( dom_name )
+						VALUES( '.$DB->quote($this->referer_basedomain).' )' );
 				$this->referer_domain_ID = $DB->insert_id;
 			}
 		}
@@ -188,6 +187,23 @@ class Hit
 	}
 
 
+  /**
+   * Detect admin page
+   */
+	function detect_admin_page()
+	{
+		global $Debuglog;
+
+		if( is_admin_page() )
+		{	// We are inside of admin, this supersedes 'direct' access
+			// NOTE: this is not really a referer type but more a hit type
+			$Debuglog->add( 'Referer is admin page.', 'hit' );
+			$this->referer_type = 'admin';
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Detect Referer (sic!).
 	 * Due to potential non-thread safety with getenv() (fallback), we'd better do this early.
@@ -199,7 +215,7 @@ class Hit
 		global $HTTP_REFERER; // might be set by PHP (give highest priority)
 		global $Debuglog;
 		global $comments_allowed_uri_scheme; // used to validate the Referer
-		global $blackList, $search_engines;  // used to detect $referer_type
+		global $self_referer_list, $blackList, $search_engines;  // used to detect $referer_type
 		global $view_path;
 		global $Settings;
 
@@ -220,48 +236,70 @@ class Hit
 		}
 
 		if( empty($this->referer) )
-		{
-			$this->referer_type = 'direct';
+		{	// NO referer
+			// This type may be superseeded by admin page
+			if( ! $this->detect_admin_page() )
+			{	// Not an admin page:
+				$this->referer_type = 'direct';
+			}
 			return;
 		}
 
-		if( is_admin_page() )
+
+		// ANALYZE referer...
+
+
+		// Check self referer list, see {@link $self_referer_list}
+		// fplanque: we log these (again), because if we didn't we woudln't detect
+		// reloads on these... and that would be a problem!
+		foreach( $self_referer_list as $self_referer )
 		{
-			$Debuglog->add( 'Referer is admin page.', 'hit' );
-			$this->referer_type = 'blacklist';
-			return;
-		}
-
-		// Check if the referer is valid and is not blacklisted:
-		if( $error = validate_url( $this->referer, $comments_allowed_uri_scheme ) )
-		{ // SPAM:
-			$Debuglog->add( 'detect_referer(): '.$error.' (SPAM)', 'hit');
-			$this->referer_type = 'spam'; // Hazardous
-			$this->referer = false;
-			// QUESTION: add domain to T_basedomains, type 'blacklist' ?
-
-			if( $Settings->get('antispam_block_spam_referers') )
+			if( strpos( $this->referer, $self_referer ) !== false )
 			{
-				// This is most probably referer spam,
-				// In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
-				require $view_path.'errors/_referer_spam.page.php';	// error & exit
-				exit(); // just in case.
-				// THIS IS THE END!!
+				// This type may be superseeded by admin page
+				if( ! $this->detect_admin_page() )
+				{	// Not an admin page:
+					$Debuglog->add( 'detect_referer(): self referer ('.$self_referer.')', 'hit' );
+					$this->referer_type = 'self';
+				}
+				return;
 			}
 		}
 
 
 		// Check blacklist, see {@link $blackList}
 		// NOTE: This is NOT the antispam!!
-		// fplanque: we log these again, because if we didn't we woudln't detect
+		// fplanque: we log these (again), because if we didn't we woudln't detect
 		// reloads on these... and that would be a problem!
 		foreach( $blackList as $lBlacklist )
 		{
 			if( strpos( $this->referer, $lBlacklist ) !== false )
 			{
-				$Debuglog->add( 'detect_referer(): blacklist ('.$lBlacklist.')', 'hit' );
-				$this->referer_type = 'blacklist';
+				// This type may be superseeded by admin page
+				if( ! $this->detect_admin_page() )
+				{	// Not an admin page:
+					$Debuglog->add( 'detect_referer(): blacklist ('.$lBlacklist.')', 'hit' );
+					$this->referer_type = 'blacklist';
+				}
 				return;
+			}
+		}
+
+
+		// Check if the referer is valid and does not match the antispam blacklist:
+		if( $error = validate_url( $this->referer, $comments_allowed_uri_scheme ) )
+		{ // This is most probably referer spam!!
+			$Debuglog->add( 'detect_referer(): '.$error.' (SPAM)', 'hit');
+			$this->referer_type = 'spam'; // Hazardous
+			$this->referer = false;
+			// dh> QUESTION: add domain to T_basedomains, type 'blacklist' ?
+			// fp> NO, mainly because 'blacklist' is wrong here.
+
+			if( $Settings->get('antispam_block_spam_referers') )
+			{ // In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
+				require $view_path.'errors/_referer_spam.page.php';	// error & exit
+				exit(); // just in case.
+				// THIS IS THE END!!
 			}
 		}
 
@@ -397,10 +435,23 @@ class Hit
 	 */
 	function log()
 	{
-		global $Plugins, $Debuglog;
+		global $Settings, $Plugins, $Debuglog, $is_admin_page;
 
 		if( $this->logged )
-		{
+		{	// Already logged
+			return false;
+		}
+
+		// Remember we have already attempted to log:
+		$this->logged = true;
+
+		if( $is_admin_page && ! $Settings->get('log_admin_hits') )
+		{	// We don't want to log admin hits:
+			return false;
+		}
+
+		if( ! $is_admin_page && ! $Settings->get('log_public_hits') )
+		{	// We don't want to log public hits:
 			return false;
 		}
 
@@ -422,9 +473,6 @@ class Hit
 			$this->record_the_hit();
 		}
 
-		// Remember we have logged already:
-		$this->logged = true;
-
 		return true;
 	}
 
@@ -439,9 +487,7 @@ class Hit
 	 */
 	function record_the_hit()
 	{
-		global $DB, $Session, $ReqURI, $Blog, $localtimenow, $Debuglog;
-
-		$referer_basedomain = get_base_domain( $this->referer );
+		global $DB, $Session, $Settings, $ReqURI, $Blog, $localtimenow, $Debuglog, $model_path;
 
 		$Debuglog->add( 'log(): Recording the hit.', 'hit' );
 
@@ -457,8 +503,11 @@ class Hit
 		$DB->query( $sql, 'Record the hit' );
 		$this->ID = $DB->insert_id;
 
-		require_once( dirname(__FILE__).'/_hitlist.class.php' );
-		Hitlist::dbprune(); // will prune once per day, according to Settings
+		if( $Settings->get( 'auto_prune_stats_mode' ) == 'page' )
+		{ // Autopruning is requested
+			require_once $model_path.'sessions/_hitlist.class.php';
+			Hitlist::dbprune(); // will prune once per day, according to Settings
+		}
 	}
 
 
@@ -602,8 +651,8 @@ class Hit
 
 /*
  * $Log$
- * Revision 1.25  2006/07/04 17:32:29  fplanque
- * no message
+ * Revision 1.26  2006/07/06 19:59:08  fplanque
+ * better logs, better stats, better pruning
  *
  * Revision 1.21  2006/06/22 19:47:06  blueyed
  * "Block spam referers" as global option

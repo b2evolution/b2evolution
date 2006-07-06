@@ -333,7 +333,7 @@ $schema_queries = array(
 			hit_sess_ID        INT UNSIGNED,
 			hit_datetime       DATETIME NOT NULL,
 			hit_uri            VARCHAR(250) DEFAULT NULL,
-			hit_referer_type   ENUM('search','blacklist','referer','direct') NOT NULL,
+			hit_referer_type   ENUM('search','blacklist','referer','direct','self','admin') NOT NULL,
 			hit_referer        VARCHAR(250) DEFAULT NULL,
 			hit_referer_dom_ID INT UNSIGNED DEFAULT NULL,
 			hit_blog_ID        int(11) UNSIGNED NULL DEFAULT NULL,
@@ -630,6 +630,9 @@ function install_insert_default_data( $old_db_version )
 
 /*
  * $Log$
+ * Revision 1.22  2006/07/06 19:59:08  fplanque
+ * better logs, better stats, better pruning
+ *
  * Revision 1.21  2006/07/03 19:19:14  blueyed
  * Added indices
  *

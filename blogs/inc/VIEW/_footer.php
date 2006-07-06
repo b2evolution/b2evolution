@@ -63,6 +63,10 @@ if( $this->get_path(0) == 'files'
 	<?php
 }
 
+// log the hit on this page (according to settings)
+global $Hit;
+$Hit->log();
+
 debug_info();
 
 ?>

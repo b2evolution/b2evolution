@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2004-2005 by The University of North Carolina at Charlotte as
  * contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
@@ -427,22 +427,33 @@ if( !empty( $skin ) )
 	{ // Do the main display
 		require( get_path( 'skins' ).$skin.'/_main.php' );
 	}
+
+	// log the hit on this page (in case the skin hasn't already done so)
+	$Hit->log();
 }
 else
 { // we don't want to use a skin
 	if( $template == 'popup' )
 	{ // Do the popup display
 		require( get_path( 'skins' ).'_popup.php' );
+
+		// log the hit on this page (in case the skin hasn't already done so)
+		$Hit->log();
+
 		exit();
 	}
 
 	$Debuglog->add( 'No skin or popup requested.', 'skin' );
 	// If we end up here the blog file should be a full template, not just a stub...
+	// Note: The full template SHOULD call $Hit->log();
 }
 
 
 /*
  * $Log$
+ * Revision 1.25  2006/07/06 19:59:08  fplanque
+ * better logs, better stats, better pruning
+ *
  * Revision 1.24  2006/06/30 22:58:13  blueyed
  * Abstracted charset conversation, not much tested.
  *

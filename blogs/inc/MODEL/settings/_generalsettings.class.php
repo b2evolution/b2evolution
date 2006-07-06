@@ -63,7 +63,11 @@ class GeneralSettings extends AbstractSettings
 
 		'archive_mode' => 'monthly',
 		'AutoBR' => '0',
-		'auto_prune_stats' => '30',         // days (T_hitlog and T_sessions)
+
+		'log_public_hits' => '1',
+		'log_admin_hits' => '0',
+		'auto_prune_stats_mode' => 'page',	// 'page' is the safest mode for average installs
+		'auto_prune_stats' => '15',         // days (T_hitlog and T_sessions)
 
 		'fm_enabled' => '1',
 		'fm_enable_create_dir' => '1',
@@ -151,6 +155,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.15  2006/07/06 19:59:08  fplanque
+ * better logs, better stats, better pruning
+ *
  * Revision 1.14  2006/06/26 23:10:24  fplanque
  * minor / doc
  *

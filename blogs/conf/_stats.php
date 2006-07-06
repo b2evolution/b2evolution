@@ -13,8 +13,32 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 
 /**
- * Blacklist: referrers that should be hidden in stats. This should typically include this
- * site as well as stat services, online email services, online aggregators, etc.
+ * Self referers that should not be considered as "real" referers in stats.
+ * This should typically include this site and maybe other subdomains of this site.
+ *
+ * The following substrings will be looked up in the referer http header
+ * in order to identify referers to hide in the logs
+ *
+ * WARNING: you should *NOT* use a slash at the end of simple domain names, as
+ * older Netscape browsers will not send these. For example you should list
+ * http://www.example.com instead of http://www.example.com/ .
+ *
+ * @todo move to admin interface (T_basedomains), but use for upgrading
+ *
+ * TODO: handle multiple blog roots.
+ *
+ * @global array
+ */
+$self_referer_list = array(
+	substr( $baseurl, 0, strlen($baseurl)-1 ),	// Remove tailing slash
+	'http://localhost',
+	'http://127.0.0.1',
+);
+
+
+/**
+ * Blacklist: referrers that should not be considered as "real" referers in stats.
+ * This should typically include stat services, online email services, online aggregators, etc.
  *
  * The following substrings will be looked up in the referer http header
  * in order to identify referers to hide in the logs
@@ -25,16 +49,11 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * older Netscape browsers will not send these. For example you should list
  * http://www.example.com instead of http://www.example.com/ .
  *
- * @todo move to admin interface (T_basedomains), but use for upgrading to 0.9.2
+ * @todo move to admin interface (T_basedomains), but use for upgrading
  *
- * TODO: handle multiple blog roots.
- *
- * @global array $blackList
+ * @global array
  */
 $blackList = array(
-	substr( $baseurl, 0, strlen($baseurl)-1 ),	// Remove tailing slash
-	'http://localhost',
-	'http://127.0.0.1',
 	// stat services
 	'sitemeter.com/',
 	// aggregators
