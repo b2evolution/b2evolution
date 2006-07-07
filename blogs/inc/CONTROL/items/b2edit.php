@@ -16,8 +16,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $AdminUI;
 
-$AdminUI->set_path( 'new' );
-param( 'action', 'string', 'new', true );
+$Request->param( 'tab', 'string', 'expert', true /* memorize */ );
+
+$AdminUI->set_path( 'new', $tab );
+
+$Request->param( 'action', 'string', 'new', true );
 
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
@@ -240,7 +243,17 @@ switch( $action )
 		$form_action = '?ctrl=editactions';
 		$next_action = 'create';
 		// Display VIEW:
-		$AdminUI->disp_view( 'items/_item.form.php' );
+		switch( $tab )
+		{
+			case 'simple':
+				$AdminUI->disp_view( 'items/_item_simple.form.php' );
+				break;
+
+			case 'expert':
+			default:
+				$AdminUI->disp_view( 'items/_item.form.php' );
+				break;
+		}
 }
 
 // Display body bottom, debug info and close </html>:

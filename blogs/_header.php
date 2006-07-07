@@ -8,7 +8,6 @@
  */
 
 
-
 // Get the blog from param, defaulting to the last selected one for this user:
 $user_selected_blog = (int)$UserSettings->get('selected_blog');
 param( 'blog', 'integer', $user_selected_blog, true ); // We may need this for the urls
@@ -104,7 +103,17 @@ $AdminUI->add_menu_entries(
 			'new' => array(
 				'text' => T_('Write'),
 				'href' => 'admin.php?ctrl=edit&amp;blog='.$blog,
-				'style' => 'font-weight: bold;'
+				'style' => 'font-weight: bold;',
+				'entries' => array(
+						'simple' => array(
+							'text' => T_('Simple'),
+							'href' => 'admin.php?ctrl=edit&amp;tab=simple&amp;blog='.$blog,
+							),
+						'expert' => array(
+							'text' => T_('Expert'),
+							'href' => 'admin.php?ctrl=edit&amp;tab=expert&amp;blog='.$blog,
+							),
+					)
 			),
 
 			'edit' => array(
@@ -294,6 +303,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.10  2006/07/07 23:14:57  fplanque
+ * we desperately need a simplified edit screen!!
+ *
  * Revision 1.9  2006/06/26 23:10:24  fplanque
  * minor / doc
  *

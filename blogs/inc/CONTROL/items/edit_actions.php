@@ -590,8 +590,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.14  2006/07/04 17:32:28  fplanque
- * no message
+ * Revision 1.15  2006/07/07 23:14:57  fplanque
+ * we desperately need a simplified edit screen!!
  *
  * Revision 1.13  2006/05/30 20:32:56  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
