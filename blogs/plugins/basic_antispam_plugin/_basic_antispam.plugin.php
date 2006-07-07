@@ -82,7 +82,7 @@ class basic_antispam_plugin extends Plugin
 				'max_number_of_links_feedback' => array(
 					'type' => 'integer',
 					'label' => T_('Feedback sensitivity to links'),
-					'note' => T_('If a comment has more than this number of links in it, it will get 100% spam karma. -1 to disable it.'),
+					'note' => T_('If a comment has more than this number of links in it, it will get 100 percent spam karma. -1 to disable it.'),
 					'help' => '#set_max_number_of_links',
 					'defaultvalue' => '4',
 					'size' => 3,
@@ -540,6 +540,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.21  2006/07/07 19:28:32  blueyed
+ * Trans fix. "%" would need to be escaped.. :/
+ *
  * Revision 1.20  2006/06/22 19:47:06  blueyed
  * "Block spam referers" as global option
  *
