@@ -1047,20 +1047,6 @@ switch( $fm_mode )
 					$Messages->add( sprintf( T_('Could not change permissions of &laquo;%s&raquo; to default chmod setting.'), $newFile->get_name() ), 'note' );
 				}
 
-				$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->get_name() );
-				if( $mode == 'upload' )
-				{
-					// TODO: Add plugin hook to allow generating JS insert code(s)
-					$img_tag = format_to_output( $newFile->get_tag(), 'formvalue' );
-					$success_msg .=
-						'<ul>'
-							.'<li>'.T_("Here's the code to display it:").' <input type="text" value="'.$img_tag.'" /></li>'
-							.'<li><a href="#" onclick="if( window.focus && window.opener ){ window.opener.focus(); textarea_replace_selection( window.opener.document.item_checkchanges.itemform_post_content, \''.format_to_output( $newFile->get_tag(), 'formvalue' ).'\', window.opener.document ); } return false;">'.T_('Add the code to your post !').'</a></li>'
-						.'</ul>';
-				}
-
-				$Messages->add( $success_msg, 'success' );
-
 				// Refreshes file properties (type, size, perms...)
 				$newFile->load_properties();
 
@@ -1077,6 +1063,20 @@ switch( $fm_mode )
 				{ // If a desc text has been passed... (does not happen in quick upload mode)
 					$newFile->set( 'desc', trim( strip_tags($uploadfile_desc[$lKey])) );
 				}
+
+				$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->get_name() );
+				if( $mode == 'upload' )
+				{
+					// TODO: Add plugin hook to allow generating JS insert code(s)
+					$img_tag = format_to_output( $newFile->get_tag(), 'formvalue' );
+					$success_msg .=
+						'<ul>'
+							.'<li>'.T_("Here's the code to display it:").' <input type="text" value="'.$img_tag.'" /></li>'
+							.'<li><a href="#" onclick="if( window.focus && window.opener ){ window.opener.focus(); textarea_replace_selection( window.opener.document.item_checkchanges.itemform_post_content, \''.format_to_output( $newFile->get_tag(), 'formvalue' ).'\', window.opener.document ); } return false;">'.T_('Add the code to your post !').'</a></li>'
+						.'</ul>';
+				}
+
+				$Messages->add( $success_msg, 'success' );
 
 				// Store File object into DB:
 				$newFile->dbsave();
@@ -1497,6 +1497,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.26  2006/07/07 18:42:37  blueyed
+ * After upload: First save the file properties, before generating the code to display it.
+ *
  * Revision 1.25  2006/06/19 20:59:37  fplanque
  * noone should die anonymously...
  *
