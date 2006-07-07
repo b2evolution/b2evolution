@@ -163,7 +163,7 @@ class Hit
 				SELECT dom_ID
 				  FROM T_basedomains
 				 WHERE dom_name = '.$DB->quote($this->referer_basedomain) );
-			if( $basedomain->dom_ID )
+			if( $basedomain && $basedomain->dom_ID )
 			{	// This basedomain has visited before:
 				$this->referer_domain_ID = $basedomain->dom_ID;
 				// fp> The blacklist handling that was here made no sense.
@@ -658,6 +658,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.29  2006/07/07 20:31:29  blueyed
+ * fixed possible E_NOTICE
+ *
  * Revision 1.28  2006/07/07 18:15:48  fplanque
  * fixes
  *
