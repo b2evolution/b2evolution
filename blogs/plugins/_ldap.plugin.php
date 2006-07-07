@@ -43,18 +43,17 @@ class ldap_plugin extends Plugin
 {
 	var $code = 'evo_ldap_auth';
 	var $priority = 50;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 	var $author = 'dAniel hAhler';
 
 
 	/**
-	 * Constructor.
+	 * Init
 	 */
-	function ldap_plugin()
+	function PluginInit()
 	{
 		$this->name = T_('LDAP authentication');
 		$this->short_desc = T_('Creates users if they could be authenticated through LDAP.');
-		#$this->long_desc = T_('');
 	}
 
 
@@ -333,6 +332,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.28  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.27  2006/07/06 19:56:29  fplanque
  * no message
  *

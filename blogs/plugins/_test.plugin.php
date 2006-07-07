@@ -53,7 +53,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki, in this case: http://manual.b2evolution.net/Plugins/test_plugin';
 
@@ -65,15 +65,11 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Constructor.
+	 * Init
 	 *
-	 * Should set name and description in a localizable fashion.
-	 * NOTE FOR PLUGIN DEVELOPERS UNFAMILIAR WITH OBJECT ORIENTED DEV:
-	 * This function has the same name as the class, this makes it a "constructor".
-	 * This means that this function will be called automagically by PHP when this
-	 * plugin class is instantiated ("loaded").
+	 * This gets called after a plugin has been registered/instantiated.
 	 */
-	function test_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_('Test plugin');
 		$this->long_desc = T_('This plugin responds to virtually all possible plugin events :P');
@@ -597,6 +593,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.46  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.45  2006/07/06 19:56:29  fplanque
  * no message
  *

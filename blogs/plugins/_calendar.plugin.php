@@ -50,15 +50,15 @@ class calendar_plugin extends Plugin
 	var $name = 'Calendar Skin Tag';
 	var $code = 'evo_Calr';
 	var $priority = 20;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 	var $author = 'The b2evo Group';
 
 
 
 	/**
-	 * Constructor
+	 * Init
 	 */
-	function calendar_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_('This skin tag displays a navigable calendar.');
 		$this->long_desc = T_('Days containing posts are highlighted.');
@@ -984,6 +984,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.21  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.20  2006/07/02 21:53:31  blueyed
  * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
  *

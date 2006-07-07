@@ -57,14 +57,14 @@ class archives_plugin extends Plugin
 	var $name = 'Archives Skin Tag';
 	var $code = 'evo_Arch';
 	var $priority = 50;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 	var $author = 'The b2evo Group';
 
 
 	/**
-	 * Constructor
+	 * Init
 	 */
-	function archives_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_('This skin tag displays a list of post archives.');
 		$this->long_desc = T_('Archives can be grouped monthly, daily, weekly or post by post.');
@@ -532,6 +532,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.25  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.24  2006/06/20 00:53:07  blueyed
  * require results class (through global)!
  *

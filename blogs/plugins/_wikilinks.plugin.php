@@ -22,15 +22,15 @@ class wikilinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Wiki Links';
 	var $priority = 35;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
 
 	/**
-	 * Constructor
+	 * Init
 	 */
-	function wikilinks_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_('Wiki Links converter');
 		$this->long_desc = T_('WikiWord links are created with a CamelCased WikiWord, a ((link)), or a [[link ]].<br />
@@ -257,6 +257,9 @@ class wikilinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.19  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.18  2006/07/06 19:56:29  fplanque
  * no message
  *

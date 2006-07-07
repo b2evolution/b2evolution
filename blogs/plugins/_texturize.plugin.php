@@ -17,16 +17,16 @@ class texturize_plugin extends Plugin
 	var $code = 'b2WPTxrz';
 	var $name = 'Texturize';
 	var $priority = 90;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
 
 
 	/**
-	 * Constructor
+	 * Init
 	 */
-	function texturize_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_('Smart quotes + additional typographic replacements.');
 		$this->long_desc = T_('This renderer will replace standard and double quotes with typographic quotes were appropriate.<br />
@@ -114,6 +114,9 @@ class texturize_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.12  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.11  2006/06/16 21:30:57  fplanque
  * Started clean numbering of plugin versions (feel free do add dots...)
  *

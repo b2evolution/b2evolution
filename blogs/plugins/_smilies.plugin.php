@@ -22,7 +22,7 @@ class smilies_plugin extends Plugin
 	var $code = 'b2evSmil';
 	var $name = 'Smilies';
 	var $priority = 80;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 	var $apply_rendering = 'opt-out';
 
 	/**
@@ -57,7 +57,7 @@ class smilies_plugin extends Plugin
 	/**
 	 * Constructor
 	 */
-	function smilies_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_('Graphical smileys');
 		$this->long_desc = T_('This renderer will convert text smilies like :) to graphical icons.<br />
@@ -264,6 +264,9 @@ class smilies_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.24  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.23  2006/07/06 19:56:29  fplanque
  * no message
  *

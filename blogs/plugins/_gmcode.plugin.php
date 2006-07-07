@@ -25,7 +25,7 @@ class gmcode_plugin extends Plugin
 	var $apply_rendering = 'opt-out';
 	var $short_desc;
 	var $long_desc;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 
 
 	/**
@@ -63,9 +63,9 @@ class gmcode_plugin extends Plugin
 
 
 	/**
-	 * Constructor
+	 * Init
 	 */
-	function gmcode_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_('GreyMatter style formatting');
 		$this->long_desc = T_('**bold** \\italics\\ //italics// __underline__ ##tt## %%codeblock%%');
@@ -90,6 +90,9 @@ class gmcode_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.12  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.11  2006/07/06 19:56:29  fplanque
  * no message
  *

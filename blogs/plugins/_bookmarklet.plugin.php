@@ -29,14 +29,14 @@ class bookmarklet_plugin extends Plugin
 	var $name = 'Bookmarklet';
 	var $code = 'cafeBkmk';
 	var $priority = 94;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 	var $author = 'Cafelog team';
 
 
 	/**
-	 * Constructor
+	 * Init
 	 */
-	function bookmarklet_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_('Allow bookmarklet blogging.');
 		$this->long_desc = T_('Adds a tool allowing blogging through a bookmarklet.');
@@ -96,6 +96,9 @@ class bookmarklet_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.14  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.13  2006/07/06 19:56:29  fplanque
  * no message
  *

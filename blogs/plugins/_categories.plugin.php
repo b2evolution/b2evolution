@@ -43,14 +43,14 @@ class categories_plugin extends Plugin
 	var $name = 'Categories Skin Tag';
 	var $code = 'evo_Cats';
 	var $priority = 60;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 	var $author = 'The b2evo Group';
 
 
 	/**
-	 * Constructor
+	 * Init
 	 */
-	function categories_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_('This skin tag displays the list of available categories for the blog.');
 		$this->long_desc = T_('Categories are indeed chapters and sub-chapters in the blog.');
@@ -319,6 +319,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.23  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.22  2006/06/16 21:30:57  fplanque
  * Started clean numbering of plugin versions (feel free do add dots...)
  *

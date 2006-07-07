@@ -22,12 +22,12 @@ class quicktags_plugin extends Plugin
 	var $code = 'b2evQTag';
 	var $name = 'Quick Tags';
 	var $priority = 30;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 
 	/**
-	 * Constructor
+	 * Init
 	 */
-	function quicktags_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_('Easy HTML tags inserting');
 		$this->long_desc = T_('This plugin will display a toolbar with buttons to quickly insert HTML tags around selected text in a post.');
@@ -419,6 +419,9 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.20  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.19  2006/07/06 19:56:29  fplanque
  * no message
  *

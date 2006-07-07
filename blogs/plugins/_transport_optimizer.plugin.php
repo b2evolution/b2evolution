@@ -32,7 +32,7 @@ class transport_optimizer_plugin extends Plugin
 {
 	var $code = '';
 	var $priority = 50;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 
 
 	/**
@@ -169,6 +169,9 @@ class transport_optimizer_plugin extends Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.5  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.4  2006/07/06 21:38:45  blueyed
  * Deprecated plugin constructor. Renamed AppendPluginRegister() to PluginInit().
  *

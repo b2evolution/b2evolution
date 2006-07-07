@@ -42,7 +42,7 @@ class dnsbl_antispam_plugin extends Plugin
 	var $name = 'DNSBL Antispam';
 	var $code = 'evo_dnsbl';
 	var $priority = 40;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 	var $author = 'The b2evo Group';
 
 
@@ -684,6 +684,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.31  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.30  2006/07/06 21:38:45  blueyed
  * Deprecated plugin constructor. Renamed AppendPluginRegister() to PluginInit().
  *

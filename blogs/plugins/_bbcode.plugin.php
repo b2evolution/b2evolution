@@ -21,7 +21,7 @@ class bbcode_plugin extends Plugin
 	var $code = 'b2evBBco';
 	var $name = 'BB code';
 	var $priority = 50;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
@@ -88,9 +88,9 @@ class bbcode_plugin extends Plugin
 
 
 	/**
-	 * Constructor
+	 * Init
 	 */
-	function bbcode_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_('BB formatting e-g [b]bold[/b]');
 		$this->long_desc = T_('Available tags are: [b] [i] [u] [s] [color=...] [size=...] [font=...] [code] [quote] [list=1] [list=a] [list] [*]');
@@ -127,6 +127,9 @@ class bbcode_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.14  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.13  2006/07/06 19:56:29  fplanque
  * no message
  *

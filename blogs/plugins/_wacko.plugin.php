@@ -22,7 +22,7 @@ class wacko_plugin extends Plugin
 	var $code = 'b2evWcko';
 	var $name = 'Wacko formatting';
 	var $priority = 30;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
@@ -65,9 +65,9 @@ class wacko_plugin extends Plugin
 		);
 
 	/**
-	 * Constructor
+	 * Init
 	 */
-	function wacko_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_('Wacko style formatting');
 		$this->long_desc = T_('Accepted formats:<br />
@@ -172,6 +172,9 @@ class wacko_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.12  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.11  2006/07/03 21:04:51  fplanque
  * translation cleanup
  *

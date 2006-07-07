@@ -22,7 +22,7 @@ class auto_p_plugin extends Plugin
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
 	var $priority = 70;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 	var $apply_rendering = 'opt-out';
 	var $short_desc;
 	var $long_desc;
@@ -34,9 +34,9 @@ class auto_p_plugin extends Plugin
 
 
 	/**
-	 * Constructor
+	 * Init
 	 */
-	function auto_p_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_('Automatic &lt;P&gt; and &lt;BR&gt; tags');
 		$this->long_desc = T_('This renderer will automatically detect paragraphs on double line-breaks. and mark them with appropriate HTML &lt;P&gt; tags.<br />
@@ -215,6 +215,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.19  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.18  2006/07/05 21:41:17  blueyed
  * fixes
  *

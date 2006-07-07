@@ -208,7 +208,7 @@ class textile_plugin extends Plugin
 	var $code = 'b2DATxtl';
 	var $name = 'Textile (beta)';
 	var $priority = 20;
-	var $version = '2.0 beta';
+	var $version = '2.0-beta';
 	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
@@ -226,9 +226,9 @@ class textile_plugin extends Plugin
     var $pnct;
 
 	/**
-	 * Constructor
+	 * Init
 	 */
-	function textile_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_('Humane Web Text Generator 2.0 beta');
 		$this->long_desc = T_('No description available');
@@ -1003,6 +1003,9 @@ function refs($m)
 
 /*
  * $Log$
+ * Revision 1.11  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.10  2006/05/30 19:39:55  fplanque
  * plugin cleanup
  *

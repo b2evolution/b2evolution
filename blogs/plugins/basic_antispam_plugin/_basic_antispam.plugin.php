@@ -50,14 +50,14 @@ class basic_antispam_plugin extends Plugin
 	var $name = 'Basic Antispam';
 	var $code = '';
 	var $priority = 60;
-	var $version = '1.8';
+	var $version = '1.9-dev';
 	var $author = 'The b2evo Group';
 
 
 	/**
-	 * Constructor
+	 * Init
 	 */
-	function basic_antispam_plugin()
+	function PluginInit()
 	{
 		$this->short_desc = T_('Basic antispam methods');
 		$this->long_desc = T_('This plugin provides basic methods to detect & block spam on referers, comments & trackbacks.');
@@ -540,6 +540,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.22  2006/07/07 21:26:49  blueyed
+ * Bumped to 1.9-dev
+ *
  * Revision 1.21  2006/07/07 19:28:32  blueyed
  * Trans fix. "%" would need to be escaped.. :/
  *
