@@ -109,36 +109,44 @@ class Hitlist
 	 * Note: we're using {@link $localtimenow} to log hits, so use this for pruning, too.
 	 *
 	 * @static
-	 * @return boolean true, if purged; false if not purged
+	 * @return string Empty, if ok.
 	 */
 	function dbprune()
 	{
 		global $DB, $Debuglog, $Settings, $localtimenow;
 
-		$last_prune = $Settings->get( 'auto_prune_stats_done' );
-
 		// Prune when $localtime is a NEW day (which will be the 1st request after midnight):
+		$last_prune = $Settings->get( 'auto_prune_stats_done' );
 		if( $last_prune >= date('Y-m-d', $localtimenow) )
 		{ // Already pruned today
 			return T_('Pruning has already been done today');
 		}
 
-		$datetime_prune_before = date( 'Y-m-d', ($localtimenow - ($Settings->get( 'auto_prune_stats' ) * 86400)) ); // 1 day = 86400 seconds
+		// Check, if disabled:
+		$auto_prune_stats = $Settings->get('auto_prune_stats');
+		if( $auto_prune_stats < 1 )
+		{ // Autopruning is disabled
+			return ''; /* ok */
+		}
 
-		$rows_affected = $DB->query( "
+		$time_prune_before = ($localtimenow - ($auto_prune_stats * 86400)); // 1 day = 86400 seconds
+
+		$rows_affected = $DB->query( '
 			DELETE FROM T_hitlog
-			WHERE hit_datetime < '$datetime_prune_before'", 'Autopruning hit log' );
+			WHERE hit_datetime < "'.date('Y-m-d', $time_prune_before).'"', 'Autopruning hit log' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_hitlog.', 'hit' );
 
 		// Prune sessions that have timed out and are older than auto_prune_stats
-			// TODO: the smaller of the 2 dates should be computed in PHP
+		$sess_prune_before = ($localtimenow - $Settings->get( 'timeout_sessions' ));
+		$smaller_time = min( $sess_prune_before, $time_prune_before );
+		$sess_prune_YMD = date( 'Y-m-d H:i:s', $smaller_time );
+
 		$rows_affected = $DB->query( '
 			DELETE FROM T_sessions
-			WHERE sess_lastseen < "'.date( 'Y-m-d H:i:s', ($localtimenow - $Settings->get( 'timeout_sessions' )) ).'"
-				AND sess_lastseen < "'.$datetime_prune_before.'"', 'Autoprune sessions' );
+			WHERE sess_lastseen < "'.$sess_prune_YMD.'"', 'Autoprune sessions' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'hit' );
 
-		$Settings->set( 'auto_prune_stats_done', date('Y-m-d H:i:s', $localtimenow) ); // save exact date
+		$Settings->set( 'auto_prune_stats_done', date('Y-m-d H:i:s', $localtimenow) ); // save exact datetime
 		$Settings->dbupdate();
 
 		return ''; /* ok */
