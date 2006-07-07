@@ -128,7 +128,7 @@ class Plugin
 	 *
 	 * @var string
 	 */
-	var $short_desc = '__No desc available__';
+	var $short_desc;
 
 	/**#@-*/
 
@@ -144,7 +144,7 @@ class Plugin
 	 *
 	 * @var string
 	 */
-	var $long_desc = 'No long description available';
+	var $long_desc;
 
 
 	/**
@@ -278,8 +278,24 @@ class Plugin
 	 */
 	function PluginInit()
 	{
-		$this->short_desc = $this->T_('No desc available');
-		$this->long_desc = $this->T_('No description available');
+		// NOTE: the code below is just to handle stuff that has been deprecated since
+		//       b2evolution 1.9. You don't have to include this, if you override this method.
+
+		if( is_null($this->short_desc) )
+		{ // may have been set in plugin's constructor (which is deprecated since 1.9)
+			$this->short_desc = $this->T_('No desc available');
+		}
+		if( is_null($this->long_desc) )
+		{ // may have been set in plugin's constructor (which is deprecated since 1.9)
+			$this->long_desc = $this->T_('No description available');
+		}
+
+		if( method_exists( $this, 'AppendPluginRegister' ) )
+		{ // Wrapper for deprecated AppendPluginRegister method (deprecated since 1.9)
+			$this->debug_log('Plugin uses deprecated AppendPluginRegister method. Use PluginInit instead.', array('deprecated'));
+
+			return $this->AppendPluginRegister();
+		}
 
 		return true;
 	}
@@ -2331,6 +2347,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.69  2006/07/07 21:21:16  blueyed
+ * Handle deprecated stuff.
+ *
  * Revision 1.68  2006/07/06 21:38:45  blueyed
  * Deprecated plugin constructor. Renamed AppendPluginRegister() to PluginInit().
  *
