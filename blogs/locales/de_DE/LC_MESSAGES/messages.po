@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: messages\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2006-07-05 20:13+0200\n"
-"PO-Revision-Date: 2006-07-06 01:21+0200\n"
+"PO-Revision-Date: 2006-07-07 21:47+0200\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team:  <en@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -9917,7 +9917,7 @@ msgstr "Erstellt Benutzer, wenn sie über LDAP authentifiziert werden konnten."
 
 #: ..\..\..\plugins\_ldap.plugin.php:67
 msgid "LDAP server sets"
-msgstr ""
+msgstr "LDAP Server-Sets"
 
 #: ..\..\..\plugins\_ldap.plugin.php:68
 msgid "LDAP server sets to search."
@@ -9957,7 +9957,7 @@ msgstr ""
 
 #: ..\..\..\plugins\_ldap.plugin.php:88
 msgid "Search filter"
-msgstr ""
+msgstr "Suchfilter"
 
 #: ..\..\..\plugins\_ldap.plugin.php:89
 #, php-format
@@ -10155,23 +10155,23 @@ msgstr ""
 
 #: ..\..\..\plugins\_transport_optimizer.plugin.php:43
 msgid "Transport optimizer"
-msgstr ""
+msgstr "Transport Optimierer"
 
 #: ..\..\..\plugins\_transport_optimizer.plugin.php:44
 msgid "Save bandwidth on your server."
-msgstr ""
+msgstr "Spare Bandbreite auf Deinem Server."
 
 #: ..\..\..\plugins\_transport_optimizer.plugin.php:45
 msgid "By providing support of ETag headers and GZip compression it saves bandwidth on the server and optimizes the transport to the browser."
-msgstr ""
+msgstr "Durch Unterstützung von ETag-Headern und GZip-Kompression wird Bandbreite auf dem Server gespart und der Transport zum Browser optimiert."
 
 #: ..\..\..\plugins\_transport_optimizer.plugin.php:56
 msgid "ETag header"
-msgstr ""
+msgstr "ETag-Header"
 
 #: ..\..\..\plugins\_transport_optimizer.plugin.php:59
 msgid "This will send an ETag header with every page, so we can say \"Not Modified.\" if exactly the same page had been sent before."
-msgstr ""
+msgstr "Dies sendet einen ETag-Header mit jeder Seite, so dass wir \"Nicht verändert\" sagen können, wenn die gleiche Seite schon einmal vorher gesendet worden ist."
 
 #: ..\..\..\plugins\_transport_optimizer.plugin.php:62
 msgid "GZip compression"
@@ -10179,19 +10179,19 @@ msgstr "GZip Kompression"
 
 #: ..\..\..\plugins\_transport_optimizer.plugin.php:65
 msgid "If enabled, the plugin will buffer the output and compress it before sending it to the browser. It is recommened to use the php.ini option zlib.output_compression or a webserver module instead."
-msgstr ""
+msgstr "Falls aktiviert, wird das Plugin die Ausgabe puffern und komprimieren, bevor sie zum Browser geschickt wird. Es wird empfohlen, stattdessen die php.ini-Option zlib.output_compression oder ein Webserver-Modul zu verwenden."
 
 #: ..\..\..\plugins\_transport_optimizer.plugin.php:68
 msgid "Last-Modified"
-msgstr ""
+msgstr "Last-Modified"
 
 #: ..\..\..\plugins\_transport_optimizer.plugin.php:71
 msgid "This will send a Last-Modified header with the current time."
-msgstr ""
+msgstr "Dies sendet einen Last-Modified-Header (\"zuletzt geändert\") mit der aktuellen Zeit."
 
 #: ..\..\..\plugins\_transport_optimizer.plugin.php:99
 msgid "The PHP function gzencode() is not available. GZip compression is disabled."
-msgstr ""
+msgstr "Die PHP-Funktion gzencode() ist nicht verfügbar. GZip-Kompression ist deaktiviert."
 
 #: ..\..\..\plugins\_wacko.plugin.php:72
 msgid "Wacko style formatting"
@@ -10221,11 +10221,11 @@ msgstr ""
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:62
 msgid "Basic antispam methods"
-msgstr ""
+msgstr "Grundlegende Antispam-Methoden"
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:63
 msgid "This plugin provides basic methods to detect & block spam on referers, comments & trackbacks."
-msgstr ""
+msgstr "Das Plugin bietet einfache Methoden, um Spam in Referern, Kommentaren und Trackbacks zu erkennen und zu blocken."
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:72
 msgid "Allow anonymous comments"
@@ -10233,15 +10233,15 @@ msgstr "Erlaube anonyme Kommentare"
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:73
 msgid "Allow non-registered visitors to leave comments."
-msgstr ""
+msgstr "Erlaube nicht-registrierten Benutzern Kommentare zu hinterlassen."
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:78
 msgid "Detect feedback duplicates"
-msgstr "Erkennen doppelte Feedbacks"
+msgstr "Erkenne doppelte Feedbacks"
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:79
 msgid "Check this to check comments and trackback for duplicate content."
-msgstr ""
+msgstr "Auswählen, um Kommentare und Trackbacks auf doppelten, schon vorhandenen Inhalt zu überprüfen."
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:84
 msgid "Feedback sensitivity to links"
@@ -10249,24 +10249,24 @@ msgstr "Feedback-Sensitivität für Links"
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:85
 #, php-format
-msgid "If a comment has more than this number of links in it, it will get 100% spam karma. -1 to disable it."
-msgstr ""
+msgid "If a comment has more than this number of links in it, it will get 100 percent spam karma. -1 to disable it."
+msgstr "Wenn ein Kommentar mehr als diese Anzahl an Links enthält, bekommt er 100 Prozent Spam-Karma. -1 um es zu deaktivieren."
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:92
 msgid "Apply rel=\"nofollow\""
-msgstr ""
+msgstr "Wende rel=\"nofollow\" an"
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:93
 msgid "hours. For how long should rel=\"nofollow\" be applied to comment links? (0 means never, -1 means always)"
-msgstr ""
+msgstr "Stunden. Für wie lange soll rel=\"nofollow\" für Links in Kommentaren angewendet werden? (0 heisst nie, -1 heisst immer)"
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:100
 msgid "Check referers for URL"
-msgstr ""
+msgstr "Überprüfe Referer auf URL"
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:101
 msgid "Check refering pages, if they contain our URL. This may generate a lot of additional traffic!"
-msgstr ""
+msgstr "Überprüfe verweisende Seiten, ob sie unsere URL beinhalten. Dies kann eine Menge zusätzlichen Traffic generieren!"
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:106
 msgid "Check trackbacks for URL"
@@ -10274,7 +10274,7 @@ msgstr "Überprüfe Trackbacks auf URL"
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:107
 msgid "Check trackback pages, if they contain our URL. This may generate a lot of additional traffic!"
-msgstr ""
+msgstr "Überprüfe Trackback-Seiten, ob sie unsere URL enthalten. Dies kann eine Menge zusätzlichen Traffic generieren!"
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:123
 msgid "Comments are not allowed from anonymous visitors."
@@ -10282,11 +10282,11 @@ msgstr "Kommentare von anonymen Besuchern sind nicht erlaubt."
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:195
 msgid "The trackback seems to be a duplicate."
-msgstr ""
+msgstr "Der Trackback scheint ein Duplikat zu sein."
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:201
 msgid "Could not find link to us in your URL!"
-msgstr ""
+msgstr "Konnte keinen Link zu uns in Deiner URL finden!"
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:213
 msgid "The comment seems to be a duplicate."
@@ -10306,17 +10306,17 @@ msgstr "Bisher keine %s für diesen Eintrag..."
 
 #: ..\..\..\skins\_feedback.php:150
 msgid "This post has no feedback awaiting moderation..."
-msgstr ""
+msgstr "Dieser Eintrag hat keine zu erwartende Moderation..."
 
 #: ..\..\..\skins\_feedback.php:151
 #, php-format
 msgid "This post has 1 feedback awaiting moderation... %s"
-msgstr ""
+msgstr "Der Eintrag hat ein auf Moderation wartenden Feedback... %s"
 
 #: ..\..\..\skins\_feedback.php:152
 #, php-format
 msgid "This post has %d feedbacks awaiting moderation... %s"
-msgstr ""
+msgstr "Der Eintrag hat %d auf Moderation wartende Feedbacks... %s"
 
 #: ..\..\..\skins\_feedback.php:179
 msgid "PREVIEW Comment from:"
@@ -10352,11 +10352,11 @@ msgstr "Setze Cookies für Name, E-Mail und URL"
 
 #: ..\..\..\skins\_feedback.php:259
 msgid "Allow message form"
-msgstr ""
+msgstr "Erlaube Nachrichten-Formular"
 
 #: ..\..\..\skins\_feedback.php:260
 msgid "Allow users to contact you through a message form (your email will NOT be displayed.)"
-msgstr ""
+msgstr "Erlaube Benutzern, Dich über ein Nachrichten-Formular zu kontaktieren (Deine E-Mail Adresse wird NICHT angezeigt)."
 
 #: ..\..\..\skins\_linkblog.php:31 ..\..\..\skins\custom\_linkblog.php:21
 msgid "Linkblog"
@@ -10485,7 +10485,7 @@ msgstr "Wähle Skin"
 #: ..\..\..\skins\natural_pink\_main.php:234
 #: ..\..\..\skins\nifty_corners\_main.php:257
 msgid "XML Feeds"
-msgstr ""
+msgstr "XML Feeds"
 
 #: ..\..\..\skins\custom\_main.php:337
 msgid "What is RSS?"
