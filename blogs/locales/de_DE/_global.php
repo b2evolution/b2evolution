@@ -25,7 +25,7 @@ Plural-Forms:  nplurals=2; plural=(n != 1);
 'Full posts' => 'Vollständige Einträge',
 'Comments' => 'Kommentare',
 'Categories' => 'Kategorien',
-'Blog settings' => 'Blog Einstellungen',
+'Blog settings' => 'Blogs',
 'General' => 'Generell',
 'User permissions' => 'Benutzerrechte',
 'Group permissions' => 'Gruppenrechte',

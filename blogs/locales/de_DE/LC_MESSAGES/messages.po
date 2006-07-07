@@ -91,7 +91,7 @@ msgstr "Kategorien"
 
 #: ..\..\..\_header.php:151
 msgid "Blog settings"
-msgstr "Blog Einstellungen"
+msgstr "Blogs"
 
 #: ..\..\..\_header.php:155 ..\..\..\_header.php:238
 #: ..\..\..\inc\VIEW\users\_users_groupform.php:71
