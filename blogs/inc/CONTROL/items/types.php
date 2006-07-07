@@ -38,6 +38,7 @@ $current_User->check_perm( 'options', 'view', true );
 
 $AdminUI->set_path( 'options', 'types' );
 
+$list_title = T_('Post types');
 $edited_table = 'T_itemtypes';
 $edited_table_IDcol = 'ptyp_ID';
 $edited_table_namecol = 'ptyp_name';

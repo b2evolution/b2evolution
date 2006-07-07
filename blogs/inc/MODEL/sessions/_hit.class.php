@@ -437,7 +437,7 @@ class Hit
 	 */
 	function log()
 	{
-		global $Settings, $Plugins, $Debuglog, $is_admin_page;
+		global $Settings, $Plugins, $Debuglog, $is_admin_page, $model_path;
 
 		if( $this->logged )
 		{	// Already logged
@@ -446,6 +446,17 @@ class Hit
 
 		// Remember we have already attempted to log:
 		$this->logged = true;
+
+		// Auto pruning:
+		// We need to do this now because even if we don't log anything, we stil need to prune old sessions.
+
+		if( $Settings->get( 'auto_prune_stats_mode' ) == 'page' )
+		{ // Autopruning is requested
+			require_once $model_path.'sessions/_hitlist.class.php';
+			Hitlist::dbprune(); // will prune once per day, according to Settings
+		}
+
+		// Real logging:
 
 		if( $is_admin_page && ! $Settings->get('log_admin_hits') )
 		{	// We don't want to log admin hits:
@@ -489,7 +500,7 @@ class Hit
 	 */
 	function record_the_hit()
 	{
-		global $DB, $Session, $Settings, $ReqURI, $Blog, $localtimenow, $Debuglog, $model_path;
+		global $DB, $Session, $Settings, $ReqURI, $Blog, $localtimenow, $Debuglog;
 
 		$Debuglog->add( 'log(): Recording the hit.', 'hit' );
 
@@ -504,12 +515,6 @@ class Hit
 
 		$DB->query( $sql, 'Record the hit' );
 		$this->ID = $DB->insert_id;
-
-		if( $Settings->get( 'auto_prune_stats_mode' ) == 'page' )
-		{ // Autopruning is requested
-			require_once $model_path.'sessions/_hitlist.class.php';
-			Hitlist::dbprune(); // will prune once per day, according to Settings
-		}
 	}
 
 
@@ -653,6 +658,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.28  2006/07/07 18:15:48  fplanque
+ * fixes
+ *
  * Revision 1.27  2006/07/07 18:10:25  blueyed
  * NOTE, whitespace
  *

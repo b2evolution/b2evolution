@@ -2659,6 +2659,13 @@ function header_redirect( $redirect_to = NULL )
 
 	$redirect_to = str_replace('&amp;', '&', $redirect_to);
 
+	if( substr($redirect_to, 0, 1) == '/' )
+	{ // relative URL, prepend current host:
+		global $ReqHost;
+
+		$redirect_to = $ReqHost.$redirect_to;
+	}
+
 	if( strpos($redirect_to, $htsrv_url_sensitive) === 0 /* we're going somewhere on $htsrv_url_sensitive */
 	 || strpos($redirect_to, $baseurl) === 0   /* we're going somewhere on $baseurl */ )
 	{
@@ -3008,6 +3015,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.79  2006/07/07 18:15:48  fplanque
+ * fixes
+ *
  * Revision 1.78  2006/07/06 18:50:42  fplanque
  * cleanup
  *

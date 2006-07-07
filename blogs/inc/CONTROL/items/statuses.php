@@ -38,6 +38,7 @@ $current_User->check_perm( 'options', 'view', true );
 
 $AdminUI->set_path( 'options', 'statuses' );
 
+$list_title = T_('Post statuses');
 $default_col_order = 'A';
 $edited_name_maxlen = 40;
 $perm_name = 'options';

@@ -28,7 +28,7 @@ header('Content-Type: text/html; charset=iso-8859-1');
 		<p><strong>You cannot use the application before you finish configuration and installation.</strong></p>
 		<div style="font-weight:bold; color:red;"><?php echo $error_message; ?></div>
 		<p>Please use the installer to finish your configuration/installation now.</p>
-		<p>On most installations, the installer will probably be either <a href="install/">here</a> or <a href="../install/">here</a>... (but I can't be sure since I have no config info available! :P)</p>
+		<p>On most installations, the installer will probably be either <a href="install/index.php">here</a> or <a href="../install/index.php">here</a>... (but I can't be sure since I have no config info available! :P)</p>
 	</div>
 </body>
 </html>
