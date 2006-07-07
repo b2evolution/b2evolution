@@ -180,7 +180,6 @@ switch( $action )
 		{
 			$Messages->add( T_('Category deleted.'), 'success' );
 		}
-		echo "</div>\n";
 		break;
 
 
@@ -401,6 +400,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2006/07/07 18:12:16  blueyed
+ * MFB
+ *
  * Revision 1.8  2006/06/19 20:59:37  fplanque
  * noone should die anonymously...
  *
