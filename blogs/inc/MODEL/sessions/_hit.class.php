@@ -187,9 +187,9 @@ class Hit
 	}
 
 
-  /**
-   * Detect admin page
-   */
+	/**
+	 * Detect admin page
+	 */
 	function detect_admin_page()
 	{
 		global $Debuglog;
@@ -203,6 +203,7 @@ class Hit
 		}
 		return false;
 	}
+
 
 	/**
 	 * Detect Referer (sic!).
@@ -287,6 +288,7 @@ class Hit
 
 
 		// Check if the referer is valid and does not match the antispam blacklist:
+		// NOTE: requests to admin pages should not arrive here, because they should be matched above through $self_referer_list!
 		if( $error = validate_url( $this->referer, $comments_allowed_uri_scheme ) )
 		{ // This is most probably referer spam!!
 			$Debuglog->add( 'detect_referer(): '.$error.' (SPAM)', 'hit');
@@ -651,6 +653,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.27  2006/07/07 18:10:25  blueyed
+ * NOTE, whitespace
+ *
  * Revision 1.26  2006/07/06 19:59:08  fplanque
  * better logs, better stats, better pruning
  *
