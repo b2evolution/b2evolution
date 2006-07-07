@@ -294,7 +294,8 @@ class Plugin
 		{ // Wrapper for deprecated AppendPluginRegister method (deprecated since 1.9)
 			$this->debug_log('Plugin uses deprecated AppendPluginRegister method. Use PluginInit instead.', array('deprecated'));
 
-			return $this->AppendPluginRegister();
+			$params = array();
+			return $this->AppendPluginRegister($params);
 		}
 
 		return true;
@@ -769,13 +770,10 @@ class Plugin
 	}
 
 
-	/**
-	 * @deprecated since 1.9. Use {@link Plugin::PluginInit()} instead.
+	/*
+	 * NOTE: function AppendPluginRegister( & $params ) is deprecated since 1.9.
+	 * Use Plugin::PluginInit() instead.
 	 */
-	function AppendPluginRegister( & $params )
-	{
-		return true;
-	}
 
 
 	/**
@@ -2347,6 +2345,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.70  2006/07/07 21:26:04  blueyed
+ * Should have tested it.. ;/
+ *
  * Revision 1.69  2006/07/07 21:21:16  blueyed
  * Handle deprecated stuff.
  *
