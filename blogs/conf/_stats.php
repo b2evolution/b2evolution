@@ -31,6 +31,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 $self_referer_list = array(
 	substr( $baseurl, 0, strlen($baseurl)-1 ),	// Remove tailing slash
+	// TODO: use a more general auto-entry for $baseurl, like 'www.example.com' instead of 'http://www.example.com' (https) (+ remove subdomain?)
 	'http://localhost',
 	'http://127.0.0.1',
 );
