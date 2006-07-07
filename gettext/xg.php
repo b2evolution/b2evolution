@@ -285,7 +285,9 @@ if( $action == 'convert' )
 		fwrite( $fp, "\n\$trans['".$l_locale."'] = array(" );
 		foreach( $ttrans as $msgid => $msginfo )
 		{
-			fwrite( $fp, "'".str_replace("'", "\'", $msgid)."' => '".str_replace("'", "\'", $msginfo['trans'] )."',\n" );
+			fwrite( $fp,
+				"'".str_replace( array("'", '\"'), array("\'", '"'), $msgid )
+				."' => '".str_replace( array("'", '\"', '$'), array("\'", '"', '\$'), $msginfo['trans'] )."',\n" );
 		}
 		fwrite( $fp, "\n);\n?>" );
 		fclose( $fp );
