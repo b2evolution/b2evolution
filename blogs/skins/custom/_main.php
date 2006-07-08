@@ -87,7 +87,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 <?php
 	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-	$Messages->disp( );
+	if( !isset( $preview ) ) $Messages->disp( );
 	// --------------------------------- END OF MESSAGES ---------------------------------
 ?>
 
