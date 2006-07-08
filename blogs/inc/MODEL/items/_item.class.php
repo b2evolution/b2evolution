@@ -394,7 +394,6 @@ class Item extends DataObject
 		if( $Request->param( 'item_st_ID', 'integer', NULL ) !== NULL ) {
 			$this->set_from_Request( 'st_ID', 'item_st_ID' );
 		}
-		pre_dump( $GLOBALS['item_st_ID'] );
 
 		if( $Request->param( 'item_assigned_user_ID', 'integer', NULL ) !== NULL ) {
 			$this->assign_to( $Request->get('item_assigned_user_ID') );
@@ -2792,6 +2791,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.68  2006/07/08 23:03:52  blueyed
+ * Removed debugging/test code.
+ *
  * Revision 1.67  2006/07/08 22:33:43  blueyed
  * Integrated "simple edit form".
  *
