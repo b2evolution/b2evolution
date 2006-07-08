@@ -62,17 +62,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	{
 		$Form->global_icon( T_('Disable the plugin!'), 'deactivate', 'admin.php?ctrl=plugins&amp;action=disable_plugin&amp;plugin_ID='.$edit_Plugin->ID );
 	}
-	elseif( $edit_Plugin->status == 'broken' )
-	{
-		$icon_title = T_('The plugin is broken.')
-				.// Display load error from Plugins::register() (if any):
-				( isset( $admin_Plugins->plugin_errors[$edit_Plugin->ID] )
-					&& ! empty($admin_Plugins->plugin_errors[$edit_Plugin->ID]['register'])
-					? ' '.$admin_Plugins->plugin_errors[$edit_Plugin->ID]['register']
-					: '' );
-		$Form->global_icon( $icon_title, 'warning', '' );
-	}
-	else
+	elseif( $edit_Plugin->status == 'disabled' )
 	{
 		$Form->global_icon( T_('Enable the plugin!'), 'activate', 'admin.php?ctrl=plugins&amp;action=enable_plugin&amp;plugin_ID='.$edit_Plugin->ID );
 	}
@@ -196,6 +186,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.16  2006/07/08 12:48:33  blueyed
+ * Removed "broken" icon, because it's no action icon.
+ *
  * Revision 1.15  2006/07/03 22:02:18  blueyed
  * Fixed warning/broken icon (which is just an icon, without action/url)
  *
