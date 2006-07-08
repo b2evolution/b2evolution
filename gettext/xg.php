@@ -223,7 +223,7 @@ if( $action == 'merge' )
 
 		echo 'Merging with '.$l_locale.'.. ';
 
-		if( !file_exists( $l_file_po ) )
+		if( ! file_exists( $l_file_po ) )
 		{
 			echo "PO file $l_file_po not found!\n";
 			continue;
@@ -232,6 +232,7 @@ if( $action == 'merge' )
 		system( 'msgmerge -U -F --no-wrap '.escapeshellarg($l_file_po).' '.escapeshellarg($file_pot) );
 		# delete old TRANS comments and make automatic ones valid comments:
 		system( 'sed -i -r "/^#\\s+TRANS:/d; s/^#\\. TRANS:/# TRANS:/;" '.$l_file_po );
+		echo "Written $l_file_po .\n";
 		echo "\n";
 	}
 
