@@ -218,7 +218,7 @@ class Request
 	 *
 	 * If the date is not valid, it is set to the param unchanged (unconverted).
 	 */
-	function param_date( $var, $err_msg, $required, $default )
+	function param_date( $var, $err_msg, $required, $default = '' )
 	{
 		$this->param( $var, 'string', $default );
 
@@ -1015,6 +1015,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.19  2006/07/08 23:34:36  blueyed
+ * fix
+ *
  * Revision 1.18  2006/07/08 22:52:35  blueyed
  * Integrated "simple edit form".
  *
