@@ -219,7 +219,7 @@ switch( $action )
 		// Validate provided reqID against the one stored in the user's session
 		$request_ids = $Session->get( 'core.validatemail.request_ids' );
 		if( ( ! is_array($request_ids) || ! in_array( $reqID, $request_ids ) )
-			&& ! ( $current_User->group_ID == 1 && $reqID == 1 /* admin users can validate him/herself by a button click */ ) )
+			&& ! ( $current_User->group_ID == 1 && $reqID == 1 /* admin users can validate themselves by a button click */ ) )
 		{
 			$Messages->add( T_('Invalid email address validation request!'), 'error' );
 			$action = 'req_validatemail';
@@ -354,6 +354,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.66  2006/07/08 17:04:18  fplanque
+ * minor
+ *
  * Revision 1.65  2006/07/08 13:33:54  blueyed
  * Autovalidate admin group instead of primary admin user only.
  * Also delegate to req_validatemail action on failure directly instead of providing a link.

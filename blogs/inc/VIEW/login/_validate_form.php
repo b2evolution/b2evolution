@@ -58,7 +58,7 @@ $Form->end_form( array(array( 'name'=>'form_validatemail_submit', 'value'=>T_('R
 
 
 if( $current_User->group_ID == 1 )
-{ // allow admin users to validate him/herself by a single click:
+{ // allow admin users to validate themselves by a single click:
 	$Form = & new Form( $htsrv_url_sensitive.'login.php', 'form_validatemail', 'post', 'fieldset' );
 	$Form->begin_form( 'fform' );
 
@@ -86,6 +86,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.9  2006/07/08 17:04:18  fplanque
+ * minor
+ *
  * Revision 1.8  2006/07/08 13:33:54  blueyed
  * Autovalidate admin group instead of primary admin user only.
  * Also delegate to req_validatemail action on failure directly instead of providing a link.

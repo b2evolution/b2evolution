@@ -81,6 +81,7 @@ class AdminUI_general
 
 	/**
 	 * The path of the current selected menu entry.
+	 * Array of strings.
 	 * The top level entry is at position 0. Selected submenu entries follow.
 	 *
 	 * Use {@link get_path()} or {@link get_path_range()} to access it.
@@ -93,8 +94,10 @@ class AdminUI_general
 
 	/**
 	 * The properties of the path entries.
+	 * Numbered Array of arrays.
+	 * The top level entry is at position 0. Selected submenu entries follow.
 	 *
-	 * Use {@link get_prop_for_path()} or {@link get_properties_for_path()} to access it
+ 	 * Use {@link get_prop_for_path()} or {@link get_properties_for_path()} to access it
 	 * Use {@link set_path()}, {@link append_path_level()} or {@link set_path_level()} to set it.
 	 *
 	 * @access protected
@@ -235,6 +238,8 @@ class AdminUI_general
 	/**
 	 * Get the title for the titlearea (<h1>).
 	 *
+	 * This is the current path in the site structure
+	 *
 	 * @return string
 	 */
 	function get_title_for_titlearea()
@@ -363,14 +368,15 @@ class AdminUI_general
 	 * @param array A list of properties to check, ordered by priority.
 	 * @return mixed|false The first found property or false if it does not exist
 	 */
-	function get_prop_for_path( $nr, $prop_by_pref )
+	function get_prop_for_path( $depth, $prop_by_pref )
 	{
-		if( $pathWithProps = $this->get_path( $nr, true ) )
+		if( $pathWithProps = $this->get_path( $depth, true ) )
 		{
 			foreach( $prop_by_pref as $lProp )
 			{
 				if( isset($pathWithProps['props'][$lProp]) )
 				{
+					// echo "<br>path depth $depth property $lProp = ".$pathWithProps['props'][$lProp];
 					return $pathWithProps['props'][$lProp];
 				}
 			}
@@ -600,14 +606,14 @@ class AdminUI_general
 		$templateForLevel = $this->get_menu_template( $template, $depth );
 
 		if( !( $menuEntries = $this->get_menu_entries($path) ) )
-		{
+		{	// No menu entries at this level
 			if( isset($templateForLevel['empty']) )
 			{
 				$r .= $templateForLevel['empty'];
 			}
 		}
 		else
-		{
+		{	// There are entries to display:
 			$r .= $templateForLevel['before'];
 
 			$selected = $this->get_selected($path);
@@ -1076,22 +1082,25 @@ class AdminUI_general
 		// Get the parent node (the level above this one):
 		if( $level == 0 )
 		{ // first level in menu-path: parent node is NULL
-			$parentNode = & $this->get_node_by_path(NULL);
+			$parentNode = & $this->get_node_by_path( NULL );
 		}
 		else
 		{ // parent node is the trunk from root to previous level
-			$parentNode = & $this->get_node_by_path($this->get_path_range( 0, $level-1 ));
+			$parentNode = & $this->get_node_by_path( $this->get_path_range( 0, $level-1 ) );
 		}
 		if( ! $parentNode )
 		{ // parent node does not exist:
 			return false;
 		}
+
+		// Store the selected entry name in the parent node:
 		$parentNode['selected'] = $pathKey;
 
 		$this->path[$level] = $pathKey;
-		$this->pathProps[$level] = array_merge( $parentNode, $pathProps );
+		$this->pathProps[$level] = $pathProps;
+		// FP> WHY ON EARTH would we want to do that? $this->pathProps[$level] = array_merge( $parentNode, $pathProps );
 
-		#pre_dump( 'set_path_level: ', $level, $pathKey, $pathProps );
+		// pre_dump( 'set_path_level: ', $level, $pathKey, $this->pathProps[$level] );
 
 		$perm = $this->check_perm( $pathProps );
 		if( ! $perm && empty($pathProps['text_noperm']) && $die_if_no_perm )
@@ -1288,8 +1297,8 @@ class AdminUI_general
 
 /*
  * $Log$
- * Revision 1.22  2006/07/06 19:56:30  fplanque
- * no message
+ * Revision 1.23  2006/07/08 17:04:19  fplanque
+ * minor
  *
  * Revision 1.21  2006/06/25 23:34:15  blueyed
  * wording pt2

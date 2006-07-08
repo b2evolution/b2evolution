@@ -174,6 +174,11 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 			require( dirname(__FILE__).'/_profile.php');
 			break;
 
+		case 'msgform':
+			// this includes the email form if requested
+			require( dirname(__FILE__).'/_msgform.php');
+			break;
+
 		case 'subs':
 			// this includes the subscription form if requested
 			require( dirname(__FILE__).'/_subscriptions.php');

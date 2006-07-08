@@ -1417,20 +1417,11 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.16  2006/07/08 17:04:18  fplanque
+ * minor
+ *
  * Revision 1.15  2006/07/08 12:33:50  blueyed
  * Fixed regression with Results' class adding an additional ORDER column to ItemList2's query
- *
- * Revision 1.14  2006/07/04 17:32:29  fplanque
- * no message
- *
- * Revision 1.13  2006/07/02 22:32:34  smpdawg
- * *** empty log message ***
- *
- * Revision 1.12  2006/07/01 23:40:17  fplanque
- * no message
- *
- * Revision 1.11  2006/06/26 01:29:55  smpdawg
- * Fixed error when a user picked the Browse/Post List or Browse/Tracker tabs in the admin area.
  *
  * Revision 1.10  2006/06/19 20:59:37  fplanque
  * noone should die anonymously...

@@ -115,13 +115,12 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			$Item->permanent_link( '#icon#' );
 			echo ' ';
 			$Item->issue_time();
-			echo ', by ';
-			// Load Item's creator User:
-			$Item->author();
+			echo ', '.T_('by').' ';
+			$Item->author( '<strong>', '</strong>' );
 			$Item->msgform_link( $Blog->get('msgformurl') );
 			echo ', ';
 			$Item->wordcount();
-			echo ' ', T_('words');
+			echo ' '.T_('words');
 			echo ', ';
 			$Item->views();
 			echo ' &nbsp; ';

@@ -83,11 +83,11 @@ ul.evo_sponsored_links {
 }
 
 /* Calendar: */
-caption.bCalendarCaption {
+table.bCalendarTable caption.bCalendarCaption {
 	font-size: 105%;
 	font-weight: bold;
 	margin: auto;
-	padding: .5ex 0;
+	padding: 3px 0;
 	white-space: nowrap;
 }
 table.bCalendarTable {
@@ -104,9 +104,11 @@ th.bCalendarHeaderCell {
 	font-size: 84%;
 	width: 4ex;
 }
-td.bCalendarCell {
+td.bCalendarCell,
+td.bCalendarLinkPost,
+td.bCalendarEmptyCell {
 	width: 4ex;
-	height: 3.5ex;
+	padding: 2px 0;
 }
 .bCalendarLinkPost {
 	font-weight: bold;

@@ -209,44 +209,45 @@ function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
 
 	echo 'Creating default linkblog entries... ';
 
-	// Unknown status...
+	// Insert a post into linkblog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, 'Travis', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://www.travisswicegood.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Bertrand', 'Contrib', $now, $cat_linkblog_contrib, array(), 'published',	'fr-FR', '', 0, true, '', 'http://www.epistema.com/fr/societe/weblog.php', 'disabled', array() );
+	$edited_Item->insert( 1, 'Danny', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://brendoman.com/dbc', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Jeff', 'Contrib', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://www.jeffbearer.com/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Yabba', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://www.innervisions.org.uk/babbles/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Jason', 'Contrib', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://itc.uncc.edu/blog/jwedgeco/', 'disabled', array() );
-
-	// Active! :
+	$edited_Item->insert( 1, 'Halton', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://www.squishymonkey.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Yabba', 'Debug', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://yabba.waffleson.com/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Topanga', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://www.tenderfeelings.be', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Halton', 'Contrib', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://www.squishymonkey.com/', 'disabled', array() );
+	$edited_Item->insert( 1, 'EdB', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://wonderwinds.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'dAniel', 'Development', $now, $cat_linkblog_contrib, array(), 'published',	'de-DE', '', 0, true, '', 'http://daniel.hahler.de/', 'disabled', array() );
+	$edited_Item->insert( 1, 'dAniel', '', $now, $cat_linkblog_contrib, array(), 'published',	'de-DE', '', 0, true, '', 'http://daniel.hahler.de/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Francois', 'Main dev', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 0, true, '', 'http://fplanque.net/Blog/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 0, true, '', 'http://fplanque.net/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -919,6 +920,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.191  2006/07/08 17:04:19  fplanque
+ * minor
+ *
  * Revision 1.190  2006/07/04 17:32:30  fplanque
  * no message
  *

@@ -163,7 +163,7 @@ class Hit
 				SELECT dom_ID
 				  FROM T_basedomains
 				 WHERE dom_name = '.$DB->quote($this->referer_basedomain) );
-			if( $basedomain && $basedomain->dom_ID )
+			if( !empty( $basedomain->dom_ID ) )
 			{	// This basedomain has visited before:
 				$this->referer_domain_ID = $basedomain->dom_ID;
 				// fp> The blacklist handling that was here made no sense.
@@ -659,6 +659,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.31  2006/07/08 17:04:18  fplanque
+ * minor
+ *
  * Revision 1.30  2006/07/08 02:13:38  blueyed
  * Understood the new auto_prune_modes and added conversion of previous "off" value (0).
  *

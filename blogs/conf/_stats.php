@@ -55,6 +55,8 @@ $self_referer_list = array(
  * @global array
  */
 $blackList = array(
+	// webmails
+	'.mail.yahoo.com/',
 	// stat services
 	'sitemeter.com/',
 	// aggregators

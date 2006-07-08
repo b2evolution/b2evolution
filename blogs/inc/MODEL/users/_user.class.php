@@ -813,7 +813,7 @@ class User extends DataObject
 			.T_('Please note:')
 			.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).');
 
-		$r = send_mail( $this->email, sprintf( T_('Validate your email address for %s'), $this->login ), $message );
+		$r = send_mail( $this->email, sprintf( T_('Validate your email address for "%s"'), $this->login ), $message );
 
 		if( $r )
 		{ // save request_id into Session
@@ -1050,6 +1050,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2006/07/08 17:04:18  fplanque
+ * minor
+ *
  * Revision 1.27  2006/07/07 18:47:58  blueyed
  * Don't use entities in email subject
  *
