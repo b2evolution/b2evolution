@@ -57,8 +57,8 @@ $Form->begin_fieldset();
 $Form->end_form( array(array( 'name'=>'form_validatemail_submit', 'value'=>T_('Request email to activate my account!'), 'class'=>'ActionButton' )) ); // display hidden fields etc
 
 
-if( $current_User->ID == 1 )
-{ // allow admin user to validate him/herself by a single click:
+if( $current_User->group_ID == 1 )
+{ // allow admin users to validate him/herself by a single click:
 	$Form = & new Form( $htsrv_url_sensitive.'login.php', 'form_validatemail', 'post', 'fieldset' );
 	$Form->begin_form( 'fform' );
 
@@ -68,7 +68,7 @@ if( $current_User->ID == 1 )
 	$Form->hidden( 'sessID', $Session->ID );
 
 	$Form->begin_fieldset();
-	echo '<p>'.sprintf( T_('Since you are the admin user, you can validate your email address (%s) by a single click.' ), $current_User->email ).'</p>';
+	echo '<p>'.sprintf( T_('Since you are an admin user, you can validate your email address (%s) by a single click.' ), $current_User->email ).'</p>';
 	// TODO: the form submit value is too wide (in Konqueror and most probably in IE!)
 	$Form->end_form( array(array( 'name'=>'form_validatemail_admin_submit', 'value'=>T_('Activate my account!'), 'class'=>'ActionButton' )) ); // display hidden fields etc
 }
@@ -86,6 +86,10 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.8  2006/07/08 13:33:54  blueyed
+ * Autovalidate admin group instead of primary admin user only.
+ * Also delegate to req_validatemail action on failure directly instead of providing a link.
+ *
  * Revision 1.7  2006/07/04 23:38:11  blueyed
  * Validate email: admin user (#1) has an extra button to validate him/herself through the form; store multiple req_validatemail keys in the user's session.
  *

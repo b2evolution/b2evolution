@@ -194,6 +194,66 @@ switch( $action )
 		break;
 
 
+	case 'validatemail': // Clicked "Validate email" link from a mail
+		param( 'reqID', 'string', '' );
+		param( 'sessID', 'integer', '' );
+
+		if( ! is_logged_in() )
+		{
+			$Messages->add( T_('You have to be logged in to validate your account.'), 'error' );
+			break;
+		}
+
+		if( empty($reqID) )
+		{ // This was not requested
+			$Messages->add( T_('Invalid email address validation request!'), 'error' );
+			break;
+		}
+
+		if( $sessID != $Session->ID )
+		{ // Another session ID than for requesting account validation link used!
+			$Messages->add( T_('You have to use the same session (by means of your session cookie) as when you have requested the action.'), 'error' );
+			break;
+		}
+
+		// Validate provided reqID against the one stored in the user's session
+		$request_ids = $Session->get( 'core.validatemail.request_ids' );
+		if( ( ! is_array($request_ids) || ! in_array( $reqID, $request_ids ) )
+			&& ! ( $current_User->group_ID == 1 && $reqID == 1 /* admin users can validate him/herself by a button click */ ) )
+		{
+			$Messages->add( T_('Invalid email address validation request!'), 'error' );
+			$action = 'req_validatemail';
+			$login_required = true; // Do not display "Without login.." link on the form
+			break;
+		}
+
+		$current_User->set( 'validated', 1 );
+		$current_User->dbupdate();
+
+		$Session->delete( 'core.validatemail.request_ids' );
+
+		$Messages->add( T_( 'Your email address has been validated.' ), 'success' );
+
+		if( empty($redirect_to) && $current_User->check_perm('admin') )
+		{ // User can access backoffice
+			$redirect_to = $admin_url;
+		}
+
+		$Session->set( 'Messages', $Messages );
+		$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
+
+		header_nocache();
+		header_redirect();
+		exit();
+
+		break;
+
+} // switch( $action ) (1st)
+
+
+/* For actions that other delegate to from the switch above: */
+switch( $action )
+{
 	case 'req_validatemail': // Send email validation link by mail (initial form and action)
 		if( ! $Settings->get('newusers_mustvalidate') )
 		{ // validating emails is not activated/necessary
@@ -252,65 +312,7 @@ switch( $action )
 		exit();
 		break;
 
-
-	case 'validatemail': // Clicked "Validate email" link from a mail
-		param( 'reqID', 'string', '' );
-		param( 'sessID', 'integer', '' );
-
-		if( ! is_logged_in() )
-		{
-			$Messages->add( T_('You have to be logged in to validate your account.'), 'error' );
-			break;
-		}
-
-		if( empty($reqID) )
-		{ // This was not requested
-			$Messages->add( T_('Invalid email address validation request!'), 'error' );
-			break;
-		}
-
-		if( $sessID != $Session->ID )
-		{ // Another session ID than for requesting account validation link used!
-			$Messages->add( T_('You have to use the same session (by means of your session cookie) as when you have requested the action.'), 'error' );
-			break;
-		}
-
-		// Validate provided reqID against the one stored in the user's session
-		$request_ids = $Session->get( 'core.validatemail.request_ids' );
-		if( ( ! is_array($request_ids) || ! in_array( $reqID, $request_ids ) )
-			&& ! ( $current_User->ID == 1 && $reqID == 1 /* admin can validate himself by a button click */ ) )
-		{
-			$Messages->add( T_('Invalid email address validation request!'), 'error' );
-			$Messages->add(
-				sprintf( T_('You can <a href="%s">send yourself a new link</a>.'),
-				$htsrv_url_sensitive.'login.php?action=req_validatemail' ), 'note' );
-
-			$login_required = true; // Do not display "Without login.." link on the form
-			break;
-		}
-
-		$current_User->set( 'validated', 1 );
-		$current_User->dbupdate();
-
-		$Session->delete( 'core.validatemail.request_ids' );
-
-		$Messages->add( T_( 'Your email address has been validated.' ), 'success' );
-
-		if( empty($redirect_to) && $current_User->check_perm('admin') )
-		{ // User can access backoffice
-			$redirect_to = $admin_url;
-		}
-
-		$Session->set( 'Messages', $Messages );
-		$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
-
-		header_nocache();
-		header_redirect();
-		exit();
-
-		break;
-
-} // switch
+}
 
 
 if( empty($redirect_to) )
@@ -352,6 +354,10 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.65  2006/07/08 13:33:54  blueyed
+ * Autovalidate admin group instead of primary admin user only.
+ * Also delegate to req_validatemail action on failure directly instead of providing a link.
+ *
  * Revision 1.64  2006/07/04 23:38:08  blueyed
  * Validate email: admin user (#1) has an extra button to validate him/herself through the form; store multiple req_validatemail keys in the user's session.
  *

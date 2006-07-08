@@ -846,8 +846,11 @@ function upgrade_b2evo_tables()
 //     Manually adding the DB field before calling install_make_db_schema_current() seems to be the cleanest solution,
 //     so this extra block here is not needed.
 // Alternative: having 2 db_version pointers, one for pre-processing and one for post-processing.
-		echo 'Marking administrator account as validated... ';
-		$DB->query( 'UPDATE T_users SET user_validated = 1 WHERE user_ID = 1' );
+		echo 'Marking administrator accounts as validated... ';
+		$DB->query( '
+				UPDATE T_users
+				   SET user_validated = 1
+				 WHERE user_grp_ID = 1' );
 		echo "OK.<br />\n";
 
 		echo 'Converting auto_prune_stats setting... ';
@@ -889,6 +892,10 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.155  2006/07/08 13:33:54  blueyed
+ * Autovalidate admin group instead of primary admin user only.
+ * Also delegate to req_validatemail action on failure directly instead of providing a link.
+ *
  * Revision 1.154  2006/07/08 02:13:38  blueyed
  * Understood the new auto_prune_modes and added conversion of previous "off" value (0).
  *
