@@ -1189,14 +1189,22 @@ class Form extends Widget
 						</script>';
 
 		// TODO: check if bozo validator is activated in PHP
-		if( preg_match( '#^(.*)_checkchanges#', $this->form_name ) && !empty( $this->title ) )
-		{ // This form will trigger the bozo validator and has a title, preset a localized bozo confirm message:
+		// TODO: shouldn't we use TS_() here for the javascript messages?
+		if( preg_match( '#^(.*)_checkchanges#', $this->form_name ) )
+		{ // This form will trigger the bozo validator, preset a localized bozo confirm message:
+
 			$r .= '<script type="text/javascript">
-								if( typeof bozo == "object" )
-								{	// If Bozo validator is active:
-									bozo.confirm_mess = "'.sprintf(T_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' ), $this->title ).'";
-								}
-						</script>';
+					if( typeof bozo == "object" )
+					{	// If Bozo validator is active:
+						bozo.confirm_mess = "'
+						.( empty( $this->title )
+							// No form title:
+							? T_( 'You have modified this form but you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' )
+							// with form title:
+							: sprintf(T_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' ), $this->title ) )
+						.'";
+					}
+				</script>';
 		}
 
 		return $this->display_or_return( $r );
@@ -1644,12 +1652,12 @@ class Form extends Widget
 			{	// The field is required, so update its class:
 				$input_class = ' field_required';
 			}
-			else 
+			else
 			{
 				$input_class = '';
 			}
 		}
-		
+
 
 
 		// Set onchange event on the select, when the select changes, we check the value to display or hide an input text after it
@@ -2228,7 +2236,7 @@ class Form extends Widget
 				.'</label>';
 
 			if( !empty($loop_field_option['note']) )
-			{ // Add a note for the current rzdio option:
+			{ // Add a note for the current radio option:
 				$r .= '<span class="notes">'.$loop_field_option['note'].'</span>';
 			}
 
@@ -2571,6 +2579,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.21  2006/07/08 00:22:44  blueyed
+ * Use localized bozo message also for forms without a title.
+ *
  * Revision 1.20  2006/07/06 18:50:42  fplanque
  * cleanup
  *
