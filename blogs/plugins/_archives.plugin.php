@@ -477,7 +477,7 @@ class ArchiveList extends Results
 	function restart()
 	{
 		// Make sure query has executed at least once:
-		$this->query( $this->sql );
+		$this->query();
 
 		$this->current_idx = 0;
 		$this->arc_w_last = '';
@@ -532,6 +532,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.26  2006/07/08 12:33:50  blueyed
+ * Fixed regression with Results' class adding an additional ORDER column to ItemList2's query
+ *
  * Revision 1.25  2006/07/07 21:26:49  blueyed
  * Bumped to 1.9-dev
  *

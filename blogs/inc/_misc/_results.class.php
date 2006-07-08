@@ -320,10 +320,8 @@ class Results extends Widget
 	 * Run the query now!
 	 *
 	 * Will only run if it has not executed before.
-	 *
-	 * @todo do we need that $sql param ???
 	 */
-	function query( $sql, $create_default_cols_if_needed = true, $append_limit = true )
+	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
 	{
 		if( !is_null( $this->rows ) )
 		{ // Query has already executed:
@@ -364,37 +362,38 @@ class Results extends Widget
 		}
 
 
+		// Make a copy of the SQL, that we may change and that gets executed:
+		$sql = $this->sql;
+
 		// Append ORDER clause if necessary:
-		if( $orders = $this->get_order_field_list() )
+		if( $append_order_by && ($orders = $this->get_order_field_list()) )
 		{	// We have orders to append
 
-			if( strpos( $this->sql, 'ORDER BY') === false )
+			if( strpos( $sql, 'ORDER BY') === false )
 			{ // there is no ORDER BY clause in the original SQL query
-				$this->sql .= ' ORDER BY '.$orders.' ';
+				$sql .= ' ORDER BY '.$orders.' ';
 			}
 			else
 			{	// try to insert the chosen order at an existing '*' point
-				$inserted_sql = preg_replace( '# \s ORDER \s+ BY (.+) \* #xi', ' ORDER BY $1 '.$orders, $this->sql );
+				$inserted_sql = preg_replace( '# \s ORDER \s+ BY (.+) \* #xi', ' ORDER BY $1 '.$orders, $sql );
 
-				if( $inserted_sql != $this->sql )
+				if( $inserted_sql != $sql )
 				{	// Insertion ok:
-					$this->sql = $inserted_sql;
+					$sql = $inserted_sql;
 				}
 				else
 				{	// No insert point found:
 					// the chosen order must be appended to an existing ORDER BY clause
-					$this->sql .= ', '.$orders;
+					$sql .= ', '.$orders;
 				}
 			}
 		}
 		else
 		{	// Make sure there is no * in order clause:
-			$this->sql = preg_replace( '# \s ORDER \s+ BY (.+) \* #xi', ' ORDER BY $1 ', $this->sql );
+			$sql = preg_replace( '# \s ORDER \s+ BY (.+) \* #xi', ' ORDER BY $1 ', $sql );
 		}
 
 
-		// TODO: dh> I've fixed it here, if using limit==0. I'm not sure, why we use $sql here for this part and not $this->sql (which will not include any LIMIT)..
-		$sql = $this->sql;
 		if( $append_limit && !empty($this->limit) )
 		{	// Limit lien range to requested page
 			$sql .= ' LIMIT '.max(0, ($this->page-1)*$this->limit).', '.$this->limit;
@@ -1594,7 +1593,6 @@ class Results extends Widget
 				foreach( $this->cols as $col )
 				{
 					if( isset( $col['order'] ) || isset( $col['order_callback'] ) )
-					if( isset( $col['order'] ) )
 					{ // We have found the first orderable column:
 						$this->order .= 'A';
 						break;
@@ -2116,6 +2114,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.19  2006/07/08 12:33:50  blueyed
+ * Fixed regression with Results' class adding an additional ORDER column to ItemList2's query
+ *
  * Revision 1.18  2006/07/06 21:38:45  blueyed
  * Deprecated plugin constructor. Renamed AppendPluginRegister() to PluginInit().
  *

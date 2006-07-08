@@ -130,7 +130,7 @@ class ItemList2 extends DataObjectList2
 		}
 
 		$this->page_param = $param_prefix.'paged';
-		
+
 		$this->restrict_to = $restrict_to;
 
 		// Initialize the default filter set:
@@ -193,18 +193,18 @@ class ItemList2 extends DataObjectList2
 
 		// Activate the filterset (fallback to default filter when a value is not set):
 		$this->filters = array_merge( $this->default_filters, $filters );
-		
+
 		// Activate preset filters if necessary:
 		$this->activate_preset_filters();
 
 		// set back the GLOBALS !!! needed for regenerate_url() :
-	
+
 		/*
 		 * Selected filter preset:
 		 */
 		$Request->memorize_param( $this->param_prefix.'filter_preset', 'string', $this->default_filters['filter_preset'], $this->filters['filter_preset'] );  // List of authors to restrict to
 
-		
+
 		/*
 		 * Blog & Chapters/categories restrictions:
 		 */
@@ -226,12 +226,12 @@ class ItemList2 extends DataObjectList2
 		 * Restrict to selected assignees:
 		 */
 		$Request->memorize_param( $this->param_prefix.'assgn', 'string', $this->default_filters['assignees'], $this->filters['assignees'] );  // List of assignees to restrict to
-		
-		
+
+
 		/*
 		 * Restrict to selected author OR assignee:
 		 */
-		$Request->memorize_param( $this->param_prefix.'author_assignee', 'string', $this->default_filters['author_assignee'], $this->filters['author_assignee'] ); 
+		$Request->memorize_param( $this->param_prefix.'author_assignee', 'string', $this->default_filters['author_assignee'], $this->filters['author_assignee'] );
 
 		/*
 		 * Restrict to selected statuses:
@@ -242,7 +242,7 @@ class ItemList2 extends DataObjectList2
 		 * Restrict to selected item type:
 		 */
 		$Request->memorize_param( $this->param_prefix.'item_type', 'integer', $this->default_filters['item_type'], $this->filters['item_type'] );  // List of item types to restrict to);
-			
+
 		/*
 		 * Restrict by keywords
 		 */
@@ -323,7 +323,7 @@ class ItemList2 extends DataObjectList2
 				return false;
 				/* BREAK */
 		}
-		
+
 
 		/**
 		 * Filter preset
@@ -332,7 +332,7 @@ class ItemList2 extends DataObjectList2
 
 		// Activate preset default filters if necessary:
 		$this->activate_preset_filters();
-			
+
 
 		/*
 		 * Blog & Chapters/categories restrictions:
@@ -356,11 +356,11 @@ class ItemList2 extends DataObjectList2
 		 */
 		$this->filters['assignees'] = $Request->param( $this->param_prefix.'assgn', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', $this->default_filters['assignees'], true );      // List of assignees to restrict to
 
-		
+
 		/*
 		 * Restrict to selected author or assignee:
 		 */
-		$this->filters['author_assignee'] = $Request->param( $this->param_prefix.'author_assignee', '/^[0-9]+$/', $this->default_filters['author_assignee'], true ); 
+		$this->filters['author_assignee'] = $Request->param( $this->param_prefix.'author_assignee', '/^[0-9]+$/', $this->default_filters['author_assignee'], true );
 
 
 		/*
@@ -443,8 +443,8 @@ class ItemList2 extends DataObjectList2
 
 		// Item type
 		$this->filters['item_type'] = $Request->param( $this->param_prefix.'item_type', 'integer', $this->default_filters['item_type'], true );  // List of item types to restrict to);
-			
-		
+
+
 
 
 		if( $Request->validation_errors() )
@@ -470,8 +470,8 @@ class ItemList2 extends DataObjectList2
 
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Activate preset default filters if necessary
 	 *
@@ -483,7 +483,7 @@ class ItemList2 extends DataObjectList2
 		if( empty( $filter_preset ) )
 		{ // No filter preset, there are no additional defaults to use:
 			return;
-		}	
+		}
 
 		// Override general defaults with the specific defaults for the preset:
 		$this->default_filters = array_merge( $this->default_filters, $this->preset_filters[$filter_preset] );
@@ -491,7 +491,7 @@ class ItemList2 extends DataObjectList2
 		// Save the name of the preset in order for is_filtered() to work properly:
 		$this->default_filters['filter_preset'] = $this->filters['filter_preset'];
 	}
-	
+
 
   /**
    * Save current filterset to session.
@@ -574,7 +574,7 @@ class ItemList2 extends DataObjectList2
 		// GENERATE THE QUERY:
 
 		/*
-		 * filetring stuff:
+		 * filtering stuff:
 		 */
 		$this->ItemQuery->where_chapter2( $this->Blog->ID, $this->filters['cat_array'], $this->filters['cat_modifier'] );
 
@@ -583,7 +583,7 @@ class ItemList2 extends DataObjectList2
 		$this->ItemQuery->where_assignees( $this->filters['assignees'] );
 
 		$this->ItemQuery->where_author_assignee( $this->filters['author_assignee'] );
-		
+
 		$this->ItemQuery->where_statuses( $this->filters['statuses'] );
 
 		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
@@ -615,7 +615,7 @@ class ItemList2 extends DataObjectList2
 		// Format each order param with default colum names:
 		$orderby_array = preg_replace( '#^(.+)$#', $this->Cache->dbprefix.'$1 '.$order, $orderby_array );
 
- 		// Add a parameter to make sure there is no ambiguity in ordering on similar items:
+		// Add a parameter to make sure there is no ambiguity in ordering on similar items:
 		$orderby_array[] = $this->Cache->dbIDname.' '.$order;
 
 		$order_by = implode( ', ', $orderby_array );
@@ -668,7 +668,7 @@ class ItemList2 extends DataObjectList2
 		else
 			debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->unit.' (paged mode is obsolete)' );
 
-			
+
 
 		/*
 		 * Paging limits:
@@ -734,7 +734,7 @@ class ItemList2 extends DataObjectList2
 		// GET DATA ROWS:
 
 
-  	// Results style orders:
+		// Results style orders:
 		// $this->ItemQuery->ORDER_BY_prepend( $this->get_order_field_list() );
 
 
@@ -771,29 +771,7 @@ class ItemList2 extends DataObjectList2
 
 		//echo $DB->format_query( $this->sql );
 
-		// fp>> how do I reproduce this:?
-    // jm>> Specifically because this variable was null, the query method would try to include its own ORDER BY.
-    // jm>> It can be duplicated on a default install with sample data and no additional plugins.  If you comment these two lines
-    // jm>> and then go to the Posts tab in admin and select either "Post List" or "Tracker" you will see a database error like the one shown below.
-/*    
-    Additional information about this error:
-
-MySQL error!
-
-Unknown column 'priority' in 'order clause'(Errno=1054)
-
-Your query:
-
-SELECT *
-                    
-FROM evo_posts 
-WHERE post_ID IN (1,2,18,19,20,21)  
-ORDER BY post_priority ASC, post_ID ASC, priority ASC
-*/
-//    if (is_null($this->order_field_list))
-//      $this->order_field_list = '';  //smpdawg - This prevents the extra field name from being added to the ORDER BY clause that was happening on the 'Post List' and 'Tracker' tabs.
-
-		parent::query( $this->sql, false, false );
+		parent::query( false, false, false );
 	}
 
 
@@ -1439,6 +1417,9 @@ ORDER BY post_priority ASC, post_ID ASC, priority ASC
 
 /*
  * $Log$
+ * Revision 1.15  2006/07/08 12:33:50  blueyed
+ * Fixed regression with Results' class adding an additional ORDER column to ItemList2's query
+ *
  * Revision 1.14  2006/07/04 17:32:29  fplanque
  * no message
  *
