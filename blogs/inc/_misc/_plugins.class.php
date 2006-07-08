@@ -621,7 +621,7 @@ class Plugins
 
 		$tmp_params = array('db_row' => $this->index_ID_rows[$Plugin->ID]);
 
-		if( ! $Plugin->PluginInit( $tmp_params ) && ! $this->is_admin_class )
+		if( $Plugin->PluginInit( $tmp_params ) === false && ! $this->is_admin_class )
 		{
 			$Debuglog->add( 'Unregistered plugin, because PluginInit returned false.', 'plugins' );
 			$this->unregister( $Plugin );
@@ -1099,7 +1099,7 @@ class Plugins
 			$this->instantiate_Settings( $Plugin, 'UserSettings' );
 
 			$tmp_params = array('db_row'=>$this->index_ID_rows[$Plugin->ID]);
-			if( ! $Plugin->PluginInit( $tmp_params ) && ! $this->is_admin_class )
+			if( $Plugin->PluginInit( $tmp_params ) === false && ! $this->is_admin_class )
 			{
 				$Debuglog->add( 'Unregistered plugin, because PluginInit returned false.', 'plugins' );
 				$this->unregister( $Plugin );
@@ -2771,6 +2771,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.63  2006/07/08 00:18:56  blueyed
+ * (temp) Fix for a design flaw..
+ *
  * Revision 1.62  2006/07/06 21:38:45  blueyed
  * Deprecated plugin constructor. Renamed AppendPluginRegister() to PluginInit().
  *
