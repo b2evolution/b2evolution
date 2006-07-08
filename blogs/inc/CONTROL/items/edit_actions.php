@@ -88,7 +88,16 @@ switch($action)
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
 		// Set object params:
+		// (First settin the $Request object to not add links from Log messages to field IDs)
+		$old_Request_link_log_messages_to_field_IDs = $Request->link_log_messages_to_field_IDs;
+		$Request->link_log_messages_to_field_IDs = false;  // TODO: Once errors get displayed with the item form page itself, remove this
 		$edited_Item->load_from_Request();
+		$Request->link_log_messages_to_field_IDs = $old_Request_link_log_messages_to_field_IDs;
+
+		if( empty($edited_Item->title) )
+		{ // post_title is "TEXT NOT NULL" and a title makes sense anyway
+			$Messages->add( T_('Please give a title.') );
+		}
 
 		// Post post-publishing stuff:
 		param( 'post_pingback', 'integer', 0 );
@@ -100,8 +109,14 @@ switch($action)
 		if( $Messages->count('error') )
 		{
 			echo '<div class="panelinfo">';
-			$Messages->display( T_('Cannot post, please correct these errors:'),
-				'[<a href="javascript:history.go(-1)">'.T_('Back to post editing').'</a>]' );
+			$Messages->display( T_('Cannot post, please correct these errors:') );
+
+			$Form = new Form();
+			$Form->hiddens_by_key( $_POST );
+			$Form->begin_form();
+			$Form->button( array( 'value' => T_('Back to post editing'), 'class' => 'ActionButton' ) );
+			$Form->end_form();
+
 			echo '</div>';
 			break;
 		}
@@ -590,6 +605,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2006/07/08 22:33:43  blueyed
+ * Integrated "simple edit form".
+ *
  * Revision 1.15  2006/07/07 23:14:57  fplanque
  * we desperately need a simplified edit screen!!
  *

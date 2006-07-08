@@ -57,72 +57,6 @@ global $Settings;
 global $pagenow;
 
 
-if( isset($Blog) )
-{
-?>
-<script type="text/javascript" language="javascript">
-	<!--
-	/*
-	 * Open the item in a preview window (a new window with target 'b2evo_preview'), by changing
-	 * the form's action attribute and target temporarily.
-	 *
-	 * fplanque: created
-	 */
-	function open_preview(form)
-	{
-		if( form.target == 'b2evo_preview' )
-		{ // A double-click on the Preview button
-			return false;
-		}
-		// Stupid thing: having a field called action !
-		var saved_action = form.attributes.getNamedItem('action').value;
-		form.attributes.getNamedItem('action').value = '<?php $Blog->disp( 'dynurl', 'raw' ) ?>';
-
-		// FIX for Safari (2.0.2, OS X 10.4.3), to not submit the item on "Preview"! - (Konqueror does not fail here)
-		if( form.attributes.getNamedItem('action').value == saved_action )
-		{ // Still old value: Setting form.action failed! (This is the case for Safari)
-			// NOTE: checking "form.action == saved_action" (or through document.getElementById()) does not work - Safari uses the input element then
-			{ // _Setting_ form.action however sets the form's action attribute (not the input element) on Safari
-				form.action = '<?php $Blog->disp( 'dynurl', 'raw' ) ?>';
-			}
-
-			if( form.attributes.getNamedItem('action').value == saved_action )
-			{ // Still old value, did not work.
-				alert( "Preview not supported. Sorry. (Could not set form.action for preview)" );
-				return false;
-			}
-		}
-		// END FIX for Safari
-
-		form.target = 'b2evo_preview';
-		preview_window = window.open( '', 'b2evo_preview' );
-		preview_window.focus();
-		// submit after target window is created.
-		form.submit();
-		form.attributes.getNamedItem('action').value = saved_action;
-		form.target = '_self';
-		return false;
-	}
-	/*
-	 * edit_reload()
-	 * fplanque: created
-	 */
-	function edit_reload( form, blog )
-	{
-		form.attributes.getNamedItem('action').value = '<?php echo $pagenow ?>';
-		form.blog.value = blog;
-		// form.action.value = 'reload';
-		// form.post_title.value = 'demo';
-		// alert( form.action.value + ' ' + form.post_title.value );
-		form.submit();
-		return false;
-	}
-	// End -->
-</script>
-<?php
-}
-
-
 // Begin payload block:
 $this->disp_payload_begin();
 
@@ -184,7 +118,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	// --------------------------- TOOLBARS ------------------------------------
 	echo '<div class="edit_toolbars">';
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayToolbar', array( 'target_type' => 'Item' ) );
+	$Plugins->trigger_event( 'AdminDisplayToolbar', array( 'target_type' => 'Item', 'edit_layout' => 'expert' ) );
 	echo '</div>';
 
 	// ---------------------------- TEXTAREA -------------------------------------
@@ -206,7 +140,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	if( $use_preview )
 	{ // ---------- PREVIEW ----------
-		$Form->button( array( 'button', '', T_('Preview'), '', 'open_preview(this.form);' ) );
+		$Form->button( array( 'button', '', T_('Preview'), '', 'b2edit_open_preview(this.form, \''.$Blog->get('dynurl').'\');' ) );
 	}
 
 	// ---------- SAVE ----------
@@ -235,7 +169,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	}
 
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item' ) );
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'expert' ) );
 
 	echo '</div>';
 
@@ -388,7 +322,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
 
-	$edited_Item->renderer_checkboxes();
+	$edited_Item->renderer_checkboxes( $Request->param('renderers', 'array', NULL) );
 
 	$Form->end_fieldset();
 
@@ -426,6 +360,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.14  2006/07/08 22:33:43  blueyed
+ * Integrated "simple edit form".
+ *
  * Revision 1.13  2006/07/04 17:32:30  fplanque
  * no message
  *
@@ -486,13 +423,13 @@ if( $next_action == 'update' )
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
  * Revision 1.41  2005/11/27 08:54:28  blueyed
- * open_preview(): catch double-clicks on Preview button
+ * b2edit_open_preview(): catch double-clicks on Preview button
  *
  * Revision 1.40  2005/11/25 22:45:37  fplanque
  * no message
  *
  * Revision 1.39  2005/11/25 13:14:47  blueyed
- * Javascript open_preview(): Fixed submitting item instead of preview for Safari!
+ * Javascript b2edit_open_preview(): Fixed submitting item instead of preview for Safari!
  *
  * Revision 1.38  2005/11/24 01:07:11  blueyed
  * simply using span.line again.

@@ -97,7 +97,7 @@ class AdminUI_general
 	 * Numbered Array of arrays.
 	 * The top level entry is at position 0. Selected submenu entries follow.
 	 *
- 	 * Use {@link get_prop_for_path()} or {@link get_properties_for_path()} to access it
+	 * Use {@link get_prop_for_path()} or {@link get_properties_for_path()} to access it
 	 * Use {@link set_path()}, {@link append_path_level()} or {@link set_path_level()} to set it.
 	 *
 	 * @access protected
@@ -162,6 +162,8 @@ class AdminUI_general
 	 *     'text': Text/Caption for this entry.
 	 *     'href': The link for this entry.
 	 *     'style': CSS style for this entry.
+	 *     'onclick': onclick property for this entry.
+	 *     'name': name attribute of the link/entry.
 	 *     'perm_name': permission name to check.
 	 *     'perm_level': permission level that must be granted.
 	 *     'perm_eval': This gets evaluated and must return true for the entry to be accessible.
@@ -501,7 +503,7 @@ class AdminUI_general
 	 *
 	 * @param string
 	 */
-	function disp_view( $view_name, $view_params = array() )
+	function disp_view( $view_name, $view_params = array() /* does not get used */ )
 	{
 		global $view_path;
 
@@ -518,7 +520,7 @@ class AdminUI_general
 		global $Request;
 
 
-    require $view_path.$view_name;
+		require $view_path.$view_name;
 	}
 
 
@@ -645,6 +647,14 @@ class AdminUI_general
 				if( isset($loop_details['style']) )
 				{
 					$anchor .= ' style="'.$loop_details['style'].'"';
+				}
+				if( isset($loop_details['onclick']) )
+				{
+					$anchor .= ' onclick="'.$loop_details['onclick'].'"';
+				}
+				if( isset($loop_details['name']) )
+				{
+					$anchor .= ' name="'.$loop_details['name'].'"';
 				}
 
 				$anchor .= '>'.format_to_output( $perm ? $loop_details['text'] : $loop_details['text_noperm'], 'htmlbody' )
@@ -1297,6 +1307,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.24  2006/07/08 22:33:43  blueyed
+ * Integrated "simple edit form".
+ *
  * Revision 1.23  2006/07/08 17:04:19  fplanque
  * minor
  *

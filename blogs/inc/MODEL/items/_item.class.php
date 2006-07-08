@@ -354,53 +354,70 @@ class Item extends DataObject
 	{
 		global $Request, $default_locale, $allowed_uri_scheme, $Plugins, $current_User;
 
-		$Request->param( 'post_title', 'html' );
-		$this->set( 'title', format_to_post( $Request->get('post_title'), 0, 0 ) );
+		if( $Request->param( 'post_title', 'html', NULL ) !== NULL ) {
+			$this->set( 'title', format_to_post( $Request->get('post_title'), 0, 0 ) );
+		}
 
-		$Request->param( 'post_locale', 'string', $default_locale );
-		$this->set_from_Request( 'locale' );
+		if( $Request->param( 'post_locale', 'string', NULL ) !== NULL ) {
+			$this->set_from_Request( 'locale' );
+		}
 
-		$Request->param( 'item_typ_ID', 'integer', true );
-		$this->set_from_Request( 'typ_ID', 'item_typ_ID' );
+		if( $Request->param( 'item_typ_ID', 'integer', NULL ) !== NULL ) {
+			$this->set_from_Request( 'typ_ID', 'item_typ_ID' );
+		}
 
-		$Request->param( 'post_url', 'string' );
-		$Request->param_check_url( 'post_url', $allowed_uri_scheme );
-		$this->set_from_Request( 'url' );
+		if( $Request->param( 'post_url', 'string', NULL ) !== NULL ) {
+			$Request->param_check_url( 'post_url', $allowed_uri_scheme );
+			$this->set_from_Request( 'url' );
+		}
 
-		$Request->param( 'content', 'html' );
-		$this->set( 'content', format_to_post( $Request->get('content') ) );
+		if( $Request->param( 'content', 'html', '' ) !== NULL ) {
+			$this->set( 'content', format_to_post( $Request->get('content') ) );
+		}
 
 		if( ( $force_edit_date || $Request->param( 'edit_date', 'integer', 0 ) )
 				&& $current_User->check_perm( 'edit_timestamp' ) )
 		{ // We can use user date:
-			$Request->param_date( 'item_issue_date', T_('Please enter a valid issue date.'), true );
-			$Request->param_time( 'item_issue_time' );
-			$this->set( 'issue_date', form_date( $Request->get( 'item_issue_date' ), $Request->get( 'item_issue_time' ) ) ); // TODO: cleanup...
+			$Request->param_date( 'item_issue_date', T_('Please enter a valid issue date.'), $force_edit_date /* required */ );
+			if( strlen($Request->get('item_issue_date')) )
+			{ // only set it, if a date was given:
+				$Request->param_time( 'item_issue_time' );
+				$this->set( 'issue_date', form_date( $Request->get( 'item_issue_date' ), $Request->get( 'item_issue_time' ) ) ); // TODO: cleanup...
+			}
 		}
 
-		$Request->param( 'post_urltitle', 'string', '' );
-		$this->set_from_Request( 'urltitle' );
+		if( $Request->param( 'post_urltitle', 'string', NULL ) !== NULL ) {
+			$this->set_from_Request( 'urltitle' );
+		}
 
 		// Workflow stuff:
-		$Request->param( 'item_st_ID', 'integer', true );
-		$this->set_from_Request( 'st_ID', 'item_st_ID' );
+		if( $Request->param( 'item_st_ID', 'integer', NULL ) !== NULL ) {
+			$this->set_from_Request( 'st_ID', 'item_st_ID' );
+		}
+		pre_dump( $GLOBALS['item_st_ID'] );
 
-		$Request->param( 'item_assigned_user_ID', 'integer', true );
-		$this->assign_to( $Request->get('item_assigned_user_ID') );
+		if( $Request->param( 'item_assigned_user_ID', 'integer', NULL ) !== NULL ) {
+			$this->assign_to( $Request->get('item_assigned_user_ID') );
+		}
 
-		$Request->param( 'item_priority', 'integer', true );
-		$this->set_from_Request( 'priority', 'item_priority', true );
+		if( $Request->param( 'item_priority', 'integer', NULL ) !== NULL ) {
+			$this->set_from_Request( 'priority', 'item_priority', true );
+		}
 
-		$Request->param_date( 'item_deadline', T_('Please enter a valid deadline.'), false );
-		$this->set_from_Request( 'deadline', 'item_deadline', true );
+		if( $Request->param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL ) {
+			$this->set_from_Request( 'deadline', 'item_deadline', true );
+		}
 
 		// Comment stuff:
-		$Request->param( 'post_comment_status', 'string', 'open' );		// 'open' or 'closed' or ...
-		$this->set_from_Request( 'comment_status' );
+		if( $Request->param( 'post_comment_status', 'string', NULL ) !== NULL )
+		{ // 'open' or 'closed' or ...
+			$this->set_from_Request( 'comment_status' );
+		}
 
-		$Request->param( 'renderers', 'array', array() );
-		$renderers = $Plugins->validate_list( $Request->get('renderers') );
-		$this->set( 'renderers', $renderers );
+		if( $Request->param( 'renderers', 'array', NULL ) !== NULL ) {
+			$renderers = $Plugins->validate_list( $Request->get('renderers') );
+			$this->set( 'renderers', $renderers );
+		}
 
 
 		return ! $Request->validation_errors();
@@ -1751,8 +1768,10 @@ class Item extends DataObject
 
 	/**
 	 * Template function: display checkable list of renderers
+	 *
+	 * @param array|NULL If given, assume these renderers to be checked.
 	 */
-	function renderer_checkboxes()
+	function renderer_checkboxes( $item_renderers = NULL )
 	{
 		global $Plugins, $inc_path, $admin_url;
 
@@ -1762,7 +1781,10 @@ class Item extends DataObject
 
 		$atLeastOneRenderer = false;
 
-		$item_renderers = $this->get_renderers();
+		if( is_null($item_renderers) )
+		{
+			$item_renderers = $this->get_renderers();
+		}
 		// pre_dump( $item_renderers );
 
 		foreach( $Plugins->get_list_by_events( array('RenderItem', 'RenderItemAsHtml', 'RenderItemAsXml') ) as $loop_RendererPlugin )
@@ -2770,6 +2792,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.67  2006/07/08 22:33:43  blueyed
+ * Integrated "simple edit form".
+ *
  * Revision 1.66  2006/07/01 17:07:56  blueyed
  * Fixed Edit/Delete link for item notifications
  *

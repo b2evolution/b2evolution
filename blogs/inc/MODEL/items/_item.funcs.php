@@ -747,12 +747,14 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_', $req_b
  * @todo Allow to use a dropdown (select) to switch between blogs ( CSS / JS onchange - no submit.. )
  *
  * @param boolean
- * @param boolean tru: use form fields, false: display only
+ * @param boolean true: use form fields, false: display only
  */
 function cat_select( $display_info = true, $form_fields = true )
 {
 	global $default_main_cat, $allow_cross_posting, $cache_blogs, $cache_categories,
 					$blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
+
+	global $post_extracats, $Request;
 
 	$r = '<div class="extracats">';
 
@@ -764,7 +766,10 @@ function cat_select( $display_info = true, $form_fields = true )
 	}
 
 	$cat_select_form_fields = $form_fields;
-	$default_main_cat = $edited_Item->main_cat_ID;
+
+	// Needed for tab switching in b2edit.php:
+	$default_main_cat = $Request->param( 'post_category', 'integer', $edited_Item->main_cat_ID );
+	$post_extracats = $Request->param( 'post_extracats', 'array', $post_extracats );
 
 	cat_query( 'none' ); // make sure the caches are loaded
 
@@ -931,6 +936,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.10  2006/07/08 22:33:43  blueyed
+ * Integrated "simple edit form".
+ *
  * Revision 1.9  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

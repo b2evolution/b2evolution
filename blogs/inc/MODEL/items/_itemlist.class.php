@@ -476,10 +476,10 @@ class ItemList extends DataObjectList
 		$id = 0;
 		$preview_userid = param( 'preview_userid', 'integer', true );
 		$post_status = param( 'post_status', 'string', true );
-		$post_locale = param( 'post_locale', 'string', true );
+		$post_locale = param( 'post_locale', 'string', $current_User->locale );
 		$content = param( 'content', 'html', true );
 		$post_title = param( 'post_title', 'html', true );
-		$post_url = param( 'post_url', 'string', true );
+		$post_url = param( 'post_url', 'string', '' );
 		$post_category = param( 'post_category', 'integer', true );
 		$post_views = param( 'post_views', 'integer', 0 );
 		$renderers = param( 'renderers', 'array', array() );
@@ -505,15 +505,15 @@ class ItemList extends DataObjectList
 			$item_issue_time = date( 'H:i:s' );
 		}
 
-		if( !($item_typ_ID = param( 'item_typ_ID', 'integer', true )) )
+		if( !($item_typ_ID = param( 'item_typ_ID', 'integer', NULL )) )
 			$item_typ_ID = NULL;
-		if( !($item_st_ID = param( 'item_st_ID', 'integer', true )) )
+		if( !($item_st_ID = param( 'item_st_ID', 'integer', NULL )) )
 			$item_st_ID = NULL;
-		if( !($item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', true )) )
+		if( !($item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL )) )
 			$item_assigned_user_ID = NULL;
-		if( !($item_deadline = param( 'item_deadline', 'string', true )) )
+		if( !($item_deadline = param( 'item_deadline', 'string', NULL )) )
 			$item_deadline = NULL;
-		$item_priority = param( 'item_priority', 'integer', true ); // QUESTION: can this be also empty/NULL?
+		$item_priority = param( 'item_priority', 'integer', NULL ); // QUESTION: can this be also empty/NULL?
 
 		$post_title = format_to_post( $post_title, 0 );
 		$content = format_to_post( $content );
@@ -863,6 +863,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.11  2006/07/08 22:33:43  blueyed
+ * Integrated "simple edit form".
+ *
  * Revision 1.10  2006/06/19 20:59:37  fplanque
  * noone should die anonymously...
  *

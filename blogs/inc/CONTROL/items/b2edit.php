@@ -16,7 +16,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $AdminUI;
 
-$Request->param( 'tab', 'string', 'expert', true /* memorize */ );
+// Get tab ("simple" or "expert") from Request or UserSettings:
+$UserSettings->param_Request( 'tab', 'string', 'expert', true /* memorize */ );
 
 $AdminUI->set_path( 'new', $tab );
 
@@ -117,9 +118,10 @@ switch($action)
 
 		// Generate available blogs list:
 		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_post_statuses', 'any', $pagenow.'?blog=%d', NULL, '',
-												( blog_has_cats( $blog ) ? 'return edit_reload(this.ownerDocument.forms.namedItem(\'item_checkchanges\'), %d )'
+												( blog_has_cats( $blog ) ? 'return b2edit_reload(this.ownerDocument.forms.namedItem(\'item_checkchanges\'), \''.$pagenow.'\', %d )'
 												: '' /* Current blog has no cats, we can't be posting */ ), 'switch_to_%d_nocheckchanges' );
-		// TODO: edit_reload params handling is far from complete..
+		// TODO: b2edit_reload params handling is far from complete..
+		// dh> what do you mean?
 
 		if( !$blog )
 		{

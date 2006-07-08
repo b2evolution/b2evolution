@@ -1075,7 +1075,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 
 	/*
 	 * STEP 1 : Set the variable
-   *
+	 *
 	 * Check if already set
 	 * WARNING: when PHP register globals is ON, COOKIES get priority over GET and POST with this!!!
 	 */
@@ -3031,6 +3031,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.81  2006/07/08 22:33:43  blueyed
+ * Integrated "simple edit form".
+ *
  * Revision 1.80  2006/07/08 14:13:01  blueyed
  * Added server error/warning logging to debug_die()
  *

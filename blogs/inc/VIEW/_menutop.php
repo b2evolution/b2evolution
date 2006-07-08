@@ -65,6 +65,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/rollovers.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/extracats.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/dynamic_select.js"></script>
+	<!-- General admin functions: -->
+	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/admin.js"></script>
 	<?php
 	global $UserSettings;
 	if( $UserSettings->get('control_form_abortions') <> 0 )

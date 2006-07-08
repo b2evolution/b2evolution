@@ -2037,11 +2037,22 @@ class Form extends Widget
 	 */
 	function hidden( $field_name, $field_value, $field_params = array() )
 	{
-		$field_params['name'] = $field_name;
-		$field_params['type'] = 'hidden';
-		$field_params['value'] = $field_value;
+		if( is_array( $field_value ) )
+		{ // this happens for example when we've POSTed an array (for PHP it's an array then)
+			foreach( $field_value as $l_key => $l_value )
+			{
+				// Recursion:
+				$this->hidden( $field_name.'['.$l_key.']', $l_value, $field_params );
+			}
+		}
+		else
+		{
+			$field_params['name'] = $field_name;
+			$field_params['type'] = 'hidden';
+			$field_params['value'] = $field_value;
 
-		$this->hiddens[] = $this->get_input_element( $field_params );
+			$this->hiddens[] = $this->get_input_element( $field_params );
+		}
 	}
 
 
@@ -2583,6 +2594,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.24  2006/07/08 22:33:43  blueyed
+ * Integrated "simple edit form".
+ *
  * Revision 1.23  2006/07/08 17:39:47  blueyed
  * cleanup
  *
