@@ -1788,12 +1788,28 @@ function debug_die( $additional_info = '' )
 	echo '<p><a href="'.$baseurl.'">'.T_('Go back to home page').'</a></p>';
 	echo '</div>';
 
-	if( !empty( $additional_info ) )
+	if( ! empty( $additional_info ) )
 	{
 		echo '<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">';
 		echo '<h3>'.T_('Additional information about this error:').'</h3>';
 		echo $additional_info;
 		echo '</div>';
+
+
+		// Throw error to the server, but do not display them.
+		// Therefor we temporarily set display_errors=0 and log_errors=1
+
+		// TODO: make this a configurable option?
+
+		$old_display_errors = ini_get('display_errors');
+		if( $old_display_errors ) ini_set('display_errors', 0);
+		$old_log_errors = ini_get('log_errors');
+		if( ! $old_log_errors ) ini_set('log_errors', 1);
+
+		trigger_error( $additional_info, E_USER_WARNING );
+
+		if( $old_display_errors ) ini_set('display_errors', $old_display_errors);
+		if( ! $old_log_errors ) ini_set('log_errors', 0);
 	}
 
 	if( $debug )
@@ -3015,6 +3031,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.80  2006/07/08 14:13:01  blueyed
+ * Added server error/warning logging to debug_die()
+ *
  * Revision 1.79  2006/07/07 18:15:48  fplanque
  * fixes
  *
