@@ -849,6 +849,19 @@ function upgrade_b2evo_tables()
 		echo 'Marking administrator account as validated... ';
 		$DB->query( 'UPDATE T_users SET user_validated = 1 WHERE user_ID = 1' );
 		echo "OK.<br />\n";
+
+		echo 'Converting auto_prune_stats setting... ';
+		$old_auto_prune_stats = $DB->get_var( '
+				SELECT set_value
+				  FROM T_settings
+				 WHERE set_name = "auto_prune_stats"' );
+		if( ! is_null($old_auto_prune_stats) && $old_auto_prune_stats < 1 )
+		{ // This means it has been disabled before, so set auto_prune_stats_mode to "off"!
+			$DB->query( '
+					REPLACE INTO T_settings ( set_name, set_value )
+					 VALUES ( "auto_prune_stats_mode", "off" )' );
+		}
+		echo "OK.<br />\n";
 	}
 
 
@@ -876,6 +889,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.154  2006/07/08 02:13:38  blueyed
+ * Understood the new auto_prune_modes and added conversion of previous "off" value (0).
+ *
  * Revision 1.153  2006/07/05 20:07:07  blueyed
  * discussion
  *

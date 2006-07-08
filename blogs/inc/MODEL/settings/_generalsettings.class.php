@@ -66,7 +66,7 @@ class GeneralSettings extends AbstractSettings
 
 		'log_public_hits' => '1',
 		'log_admin_hits' => '0',
-		'auto_prune_stats_mode' => 'page',	// 'page' is the safest mode for average installs
+		'auto_prune_stats_mode' => 'page',  // 'page' is the safest mode for average installs (may be "off", "page" or "cron")
 		'auto_prune_stats' => '15',         // days (T_hitlog and T_sessions)
 
 		'fm_enabled' => '1',
@@ -155,6 +155,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.16  2006/07/08 02:13:38  blueyed
+ * Understood the new auto_prune_modes and added conversion of previous "off" value (0).
+ *
  * Revision 1.15  2006/07/06 19:59:08  fplanque
  * better logs, better stats, better pruning
  *

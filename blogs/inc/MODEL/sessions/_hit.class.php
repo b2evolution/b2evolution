@@ -433,6 +433,9 @@ class Hit
 	 *
 	 * The hit will not be logged in special occasions, see {@link $ignore} and {@link is_good_hit()}.
 	 *
+	 * It will call {@link Hitlist::dbprune()} to do the automatic pruning of old hits in case
+	 * of auto_prune_stats_mode == "page".
+	 *
 	 * @return boolean true if the hit gets logged; false if not
 	 */
 	function log()
@@ -495,8 +498,6 @@ class Hit
 	 *
 	 * However, if a Plugin registers the {@link Plugin::AppendHitLog() AppendHitLog event}, it
 	 * could be necessary to call this as a shutdown function.
-	 *
-	 * It will call {@link Hitlist::dbprune()} to do the automatic pruning of old hits.
 	 */
 	function record_the_hit()
 	{
@@ -658,6 +659,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.30  2006/07/08 02:13:38  blueyed
+ * Understood the new auto_prune_modes and added conversion of previous "off" value (0).
+ *
  * Revision 1.29  2006/07/07 20:31:29  blueyed
  * fixed possible E_NOTICE
  *

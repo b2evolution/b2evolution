@@ -108,6 +108,8 @@ class Hitlist
 	 *
 	 * Note: we're using {@link $localtimenow} to log hits, so use this for pruning, too.
 	 *
+	 * NOTE: do not call this directly, but only in conjuction with auto_prune_stats_mode.
+	 *
 	 * @static
 	 * @return string Empty, if ok.
 	 */
@@ -122,14 +124,7 @@ class Hitlist
 			return T_('Pruning has already been done today');
 		}
 
-		// Check, if disabled:
-		$auto_prune_stats = $Settings->get('auto_prune_stats');
-		if( $auto_prune_stats < 1 )
-		{ // Autopruning is disabled
-			return ''; /* ok */
-		}
-
-		$time_prune_before = ($localtimenow - ($auto_prune_stats * 86400)); // 1 day = 86400 seconds
+		$time_prune_before = ($localtimenow - ($Settings->get('auto_prune_stats') * 86400)); // 1 day = 86400 seconds
 
 		$rows_affected = $DB->query( '
 			DELETE FROM T_hitlog
