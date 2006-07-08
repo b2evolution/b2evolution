@@ -1012,13 +1012,11 @@ class Results extends Widget
 						{	// The cell is a th_group
 							$th_title = $this->cols[$key]['th_group'];
 							$col_order = isset( $this->cols[$key]['order_group'] );
-							$col_order = isset( $this->cols[$key]['order_group'] ) ? $this->cols[$key]['order_group'] : '';
 						}
 						else
 						{	// The cell is a th
 							$th_title = $this->cols[$key]['th'] ;
 							$col_order = isset( $this->cols[$key]['order'] ) || isset( $this->cols[$key]['order_callback'] );
-							$col_order = isset( $this->cols[$key]['order'] ) ? $this->cols[$key]['order'] : '';
 						}
 
 
@@ -2114,6 +2112,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.20  2006/07/08 12:44:44  blueyed
+ * Removed debugging/test code.
+ *
  * Revision 1.19  2006/07/08 12:33:50  blueyed
  * Fixed regression with Results' class adding an additional ORDER column to ItemList2's query
  *
