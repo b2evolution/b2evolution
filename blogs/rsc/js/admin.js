@@ -47,6 +47,7 @@ function b2edit_open_preview(form, newaction)
 		return false;
 	}
 
+	var saved_action = form.attributes.getNamedItem('action').value;
 	if( ! set_new_form_action(form, newaction) )
 	{
 		alert( "Preview not supported. Sorry. (Could not set form.action for preview)" );
