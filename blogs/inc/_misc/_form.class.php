@@ -1189,20 +1189,24 @@ class Form extends Widget
 						</script>';
 
 		// TODO: check if bozo validator is activated in PHP
-		// TODO: shouldn't we use TS_() here for the javascript messages? fp>yes
 		if( preg_match( '#^(.*)_checkchanges#', $this->form_name ) )
 		{ // This form will trigger the bozo validator, preset a localized bozo confirm message:
 
 			$r .= '<script type="text/javascript">
 					if( typeof bozo == "object" )
 					{	// If Bozo validator is active:
-						bozo.confirm_mess = "'
-						.( empty( $this->title )
-							// No form title:  fp> insane geeky syntax. What's your problem with if/else ??
-							? T_( 'You have modified this form but you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' )
-							// with form title:
-							: sprintf(T_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' ), $this->title ) )
-						.'";
+						bozo.confirm_mess = \'';
+
+			if( empty( $this->title ) )
+			{ // No form title:
+				$r .= TS_( 'You have modified this form but you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' );
+			}
+			else
+			{ // with form title:
+				$r .= sprintf(TS_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' ), $this->title );
+			}
+
+			$r .= '\';
 					}
 				</script>';
 		}
@@ -2579,6 +2583,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.23  2006/07/08 17:39:47  blueyed
+ * cleanup
+ *
  * Revision 1.22  2006/07/08 17:04:19  fplanque
  * minor
  *
