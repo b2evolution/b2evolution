@@ -869,13 +869,6 @@ switch( $action )
 {
 	case 'edit_settings':
 		$AdminUI->append_to_titlearea( sprintf( T_('Edit plugin &laquo;%s&raquo; (ID %d)'), $edit_Plugin->name, $edit_Plugin->ID ) );
-
-		// Display load error from Plugins::register() (if any):
-		if( isset( $admin_Plugins->plugin_errors[$edit_Plugin->ID] )
-		    && ! empty($admin_Plugins->plugin_errors[$edit_Plugin->ID]['register']) )
-		{
-			$Messages->add( $admin_Plugins->plugin_errors[$edit_Plugin->ID]['register'], 'error' );
-		}
 		break;
 
 	case 'disp_help':
@@ -887,6 +880,15 @@ switch( $action )
 		$AdminUI->append_to_titlearea( $title );
 		break;
 }
+
+
+// Display load error from Plugins::register() (if any):
+if( isset($edit_Plugin) && isset( $admin_Plugins->plugin_errors[$edit_Plugin->ID] )
+		&& ! empty($admin_Plugins->plugin_errors[$edit_Plugin->ID]['register']) )
+{
+	$Messages->add( get_icon('warning').' '.$admin_Plugins->plugin_errors[$edit_Plugin->ID]['register'], 'error' );
+}
+
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
