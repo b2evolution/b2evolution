@@ -56,18 +56,18 @@ else
 	$ctsk_ID = $task->ctsk_ID;
 	$ctsk_name = $task->ctsk_name;
 
- 	cron_log( 'Requesting lock on task #'.$ctsk_ID.' ['.$ctsk_name.']' );
+	cron_log( 'Requesting lock on task #'.$ctsk_ID.' ['.$ctsk_name.']' );
 
- 	$DB->halt_on_error = false;
- 	$DB->show_errors = false;
+	$DB->halt_on_error = false;
+	$DB->show_errors = false;
 	$sql = 'INSERT INTO T_cron__log( clog_ctsk_ID, clog_realstart_datetime, clog_status)
 					VALUES( '.$ctsk_ID.', '.$DB->quote( date2mysql($localtimenow) ).', "started" )';
 	// Duplicate query for tests!
 	// $DB->query( $sql, 'Request lock' );
 	if( $DB->query( $sql, 'Request lock' ) != 1 )
 	{ // This has no affected exactly ONE row: error! (probably locked -- duplicate ket -- by a concurrent process)
-	 	$DB->show_errors = true;
-	 	$DB->halt_on_error = true;
+		$DB->show_errors = true;
+		$DB->halt_on_error = true;
 		cron_log( 'Could not lock. Task is probably handled by another process.' );
 	}
 	else
@@ -89,8 +89,8 @@ else
 			$DB->query( $sql, 'Schedule repeated task.' );
 		}
 
-	 	$DB->show_errors = true;
-	 	$DB->halt_on_error = true;
+		$DB->show_errors = true;
+		$DB->halt_on_error = true;
 		cron_log( 'Stating task #'.$ctsk_ID.' ['.$ctsk_name.'] at '.date( 'H:i:s', $localtimenow ).'.' );
 
 		if( empty($task->ctsk_params) )
@@ -102,7 +102,7 @@ else
 			$cron_params = unserialize( $task->ctsk_params );
 		}
 
-    // EXECUTE
+		// EXECUTE
 		call_job( $task->ctsk_controller, $cron_params );
 
 		// Record task as finished:
