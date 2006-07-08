@@ -39,7 +39,7 @@ else
 	if( $tab != $pref_browse_tab )
 	{	// We have chosen a different tab from the last one:
 		// Make it the new preference:
-    $UserSettings->set( 'pref_browse_tab', $tab );
+		$UserSettings->set( 'pref_browse_tab', $tab );
 		$UserSettings->dbupdate();
 	}
 
@@ -174,8 +174,8 @@ else
 					$ItemList->query();
 
 					// Old style globals for category.funcs:
-		      $postIDlist = $ItemList->get_page_ID_list();
-		      $postIDarray = $ItemList->get_page_ID_array();
+					$postIDlist = $ItemList->get_page_ID_list();
+					$postIDarray = $ItemList->get_page_ID_array();
 
 					$Request->param( 'c', 'string' );
 					$Request->param( 'tb', 'integer', 0 );
@@ -197,7 +197,7 @@ else
 
 
 		default:
-  		debug_die( 'Unhandled content; tab='.$tab );
+			debug_die( 'Unhandled content; tab='.$tab );
 	}
 }
 
