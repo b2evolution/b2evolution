@@ -193,7 +193,14 @@ class Request
 		}
 
 		// Merge values:
-		$original_values_array = empty($original_val) ? array() : explode( ',', $original_val );
+		if( empty($original_val) )
+		{
+			$original_values_array = array();
+		}
+		else
+		{
+			$original_values_array = explode( ',', $original_val );
+		}
 		$new_values = array_merge( $original_values_array, $ext_values_array );
 		$new_values = array_unique( $new_values );
 		$this->params[$var] = $prefix.implode( ',', $new_values );
@@ -206,14 +213,14 @@ class Request
 	}
 
 
-  /**
-   * Sets a date parameter by converting locale date (if valid) to ISO date.
-   *
-   * If the date is not valid, it is set to the param unchanged (unconverted).
-   */
-	function param_date( $var, $err_msg, $required )
+	/**
+	 * Sets a date parameter by converting locale date (if valid) to ISO date.
+	 *
+	 * If the date is not valid, it is set to the param unchanged (unconverted).
+	 */
+	function param_date( $var, $err_msg, $required, $default )
 	{
-		$this->param( $var, 'string', '' );
+		$this->param( $var, 'string', $default );
 
 		$iso_date = $this->param_check_date( $var, $err_msg, $required );
 
@@ -227,7 +234,7 @@ class Request
 
 
 	/**
- 	 * Sets a time parameter with the value from the request of the var argument or of the concat of the var argument_h: var argument_mn: var argument_s ,
+	 * Sets a time parameter with the value from the request of the var argument or of the concat of the var argument_h: var argument_mn: var argument_s ,
 	 * except if param is already set!
 	 *
 	 * @param string Variable to set
@@ -1008,6 +1015,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.18  2006/07/08 22:52:35  blueyed
+ * Integrated "simple edit form".
+ *
  * Revision 1.17  2006/07/06 19:57:20  fplanque
  * no message
  *

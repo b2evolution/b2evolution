@@ -108,10 +108,14 @@ $AdminUI->add_menu_entries(
 						'simple' => array(
 							'text' => T_('Simple'),
 							'href' => 'admin.php?ctrl=edit&amp;tab=simple&amp;blog='.$blog,
+							'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php?ctrl=edit&amp;tab=simple&amp;blog='.$blog.'\' );',
+							'name' => 'switch_to_simple_tab_nocheckchanges', // no bozo check
 							),
 						'expert' => array(
 							'text' => T_('Expert'),
 							'href' => 'admin.php?ctrl=edit&amp;tab=expert&amp;blog='.$blog,
+							'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php?ctrl=edit&amp;tab=expert&amp;blog='.$blog.'\' );',
+							'name' => 'switch_to_expert_tab_nocheckchanges', // no bozo check
 							),
 					)
 			),
@@ -303,6 +307,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.11  2006/07/08 22:48:23  blueyed
+ * Integrated "simple edit form".
+ *
  * Revision 1.10  2006/07/07 23:14:57  fplanque
  * we desperately need a simplified edit screen!!
  *
