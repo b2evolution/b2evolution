@@ -228,7 +228,7 @@ class textile_plugin extends Plugin
 	/**
 	 * Init
 	 */
-	function PluginInit()
+	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('Humane Web Text Generator 2.0 beta');
 		$this->long_desc = T_('No description available');
@@ -1003,6 +1003,9 @@ function refs($m)
 
 /*
  * $Log$
+ * Revision 1.12  2006/07/10 20:19:30  blueyed
+ * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
+ *
  * Revision 1.11  2006/07/07 21:26:49  blueyed
  * Bumped to 1.9-dev
  *

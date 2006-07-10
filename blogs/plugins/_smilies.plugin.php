@@ -55,9 +55,9 @@ class smilies_plugin extends Plugin
 
 
 	/**
-	 * Constructor
+	 * Init
 	 */
-	function PluginInit()
+	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('Graphical smileys');
 		$this->long_desc = T_('This renderer will convert text smilies like :) to graphical icons.<br />
@@ -264,6 +264,9 @@ class smilies_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.25  2006/07/10 20:19:30  blueyed
+ * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
+ *
  * Revision 1.24  2006/07/07 21:26:49  blueyed
  * Bumped to 1.9-dev
  *

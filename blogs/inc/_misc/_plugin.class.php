@@ -266,17 +266,19 @@ class Plugin
 	 *
 	 * Should set name and description in a localizable fashion.
 	 *
-	 * Event handler: Called at the event of registering/instantiating the Plugin
-	 * (in {@link Plugins::register()}).
+	 * This gets called on every instantiated plugin, also if it's just for
+	 * discovering the list of available plugins in the backoffice.
 	 *
 	 * Use this to validate Settings/requirements and/or cache them into class properties.
 	 *
 	 * @param array Associative array of parameters.
+	 *              'is_installed': true, if the plugin is installed; false if not (probably it got discovered then)
 	 *              'db_row': an array with the columns of the plugin DB entry (in T_plugins).
+	 *                        This is empty, if the plugin is not installed!
 	 *                        E.g., 'plug_version' might be interesting to compare again "$this->version".
 	 * @return boolean If this method returns false, the Plugin gets unregistered (for the current request only).
 	 */
-	function PluginInit()
+	function PluginInit( & $params )
 	{
 		// NOTE: the code below is just to handle stuff that has been deprecated since
 		//       b2evolution 1.9. You don't have to include this, if you override this method.
@@ -290,11 +292,10 @@ class Plugin
 			$this->long_desc = $this->T_('No description available');
 		}
 
-		if( method_exists( $this, 'AppendPluginRegister' ) )
+		if( method_exists( $this, 'AppendPluginRegister' ) && $params['is_installed'] )
 		{ // Wrapper for deprecated AppendPluginRegister method (deprecated since 1.9)
-			$this->debug_log('Plugin uses deprecated AppendPluginRegister method. Use PluginInit instead.', array('deprecated'));
+			$this->debug_log('Plugin has deprecated AppendPluginRegister method. Use PluginInit instead.', array('deprecated'));
 
-			$params = array();
 			return $this->AppendPluginRegister($params);
 		}
 
@@ -2347,6 +2348,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.72  2006/07/10 20:19:30  blueyed
+ * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
+ *
  * Revision 1.71  2006/07/10 18:53:04  blueyed
  * Fixed method def; added doc
  *

@@ -57,7 +57,7 @@ class basic_antispam_plugin extends Plugin
 	/**
 	 * Init
 	 */
-	function PluginInit()
+	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('Basic antispam methods');
 		$this->long_desc = T_('This plugin provides basic methods to detect & block spam on referers, comments & trackbacks.');
@@ -540,6 +540,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.23  2006/07/10 20:19:31  blueyed
+ * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
+ *
  * Revision 1.22  2006/07/07 21:26:49  blueyed
  * Bumped to 1.9-dev
  *

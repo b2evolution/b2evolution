@@ -1098,7 +1098,7 @@ class Plugins
 			$this->instantiate_Settings( $Plugin, 'Settings' );
 			$this->instantiate_Settings( $Plugin, 'UserSettings' );
 
-			$tmp_params = array('db_row'=>$this->index_ID_rows[$Plugin->ID]);
+			$tmp_params = array( 'db_row' => $this->index_ID_rows[$Plugin->ID], 'is_installed' => true );
 			if( $Plugin->PluginInit( $tmp_params ) === false && ! $this->is_admin_class )
 			{
 				$Debuglog->add( 'Unregistered plugin, because PluginInit returned false.', 'plugins' );
@@ -1160,6 +1160,17 @@ class Plugins
 						}
 					}
 				}
+			}
+		}
+		else
+		{ // This gets called for non-installed Plugins:
+
+			$tmp_params = array( 'db_row' => array(), 'is_installed' => false );
+			if( $Plugin->PluginInit( $tmp_params ) === false && ! $this->is_admin_class )
+			{
+				$Debuglog->add( 'Unregistered plugin, because PluginInit returned false.', 'plugins' );
+				$this->unregister( $Plugin );
+				$Plugin = '';
 			}
 		}
 
@@ -2771,6 +2782,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.64  2006/07/10 20:19:30  blueyed
+ * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
+ *
  * Revision 1.63  2006/07/08 00:18:56  blueyed
  * (temp) Fix for a design flaw..
  *

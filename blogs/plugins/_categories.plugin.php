@@ -50,18 +50,18 @@ class categories_plugin extends Plugin
 	/**
 	 * Init
 	 */
-	function PluginInit()
+	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('This skin tag displays the list of available categories for the blog.');
 		$this->long_desc = T_('Categories are indeed chapters and sub-chapters in the blog.');
 
- 		$this->dbtable = 'T_posts';
+		$this->dbtable = 'T_posts';
 		$this->dbprefix = 'post_';
 		$this->dbIDname = 'post_ID';
 	}
 
 
- 	/**
+	/**
 	 * Event handler: SkinTag
 	 *
 	 * @param array Associative array of parameters. Valid keys are:
@@ -86,7 +86,7 @@ class categories_plugin extends Plugin
 	 */
 	function SkinTag( $params )
 	{
-	 	global $cache_categories;
+		global $cache_categories;
 		/**
 		 * @todo get rid of these globals:
 		 */
@@ -132,7 +132,7 @@ class categories_plugin extends Plugin
 		if(!isset($params['coll_end'])) $params['coll_end'] = "</h4>\n";
 
 
- 		if(!isset($params['option_all'])) $params['option_all'] = T_('All');
+		if(!isset($params['option_all'])) $params['option_all'] = T_('All');
 
 
 		// Save params for others functions:
@@ -319,6 +319,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.24  2006/07/10 20:19:30  blueyed
+ * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
+ *
  * Revision 1.23  2006/07/07 21:26:49  blueyed
  * Bumped to 1.9-dev
  *

@@ -36,7 +36,7 @@ class auto_p_plugin extends Plugin
 	/**
 	 * Init
 	 */
-	function PluginInit()
+	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('Automatic &lt;P&gt; and &lt;BR&gt; tags');
 		$this->long_desc = T_('This renderer will automatically detect paragraphs on double line-breaks. and mark them with appropriate HTML &lt;P&gt; tags.<br />
@@ -215,6 +215,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.20  2006/07/10 20:19:30  blueyed
+ * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
+ *
  * Revision 1.19  2006/07/07 21:26:49  blueyed
  * Bumped to 1.9-dev
  *

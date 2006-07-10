@@ -58,7 +58,7 @@ class calendar_plugin extends Plugin
 	/**
 	 * Init
 	 */
-	function PluginInit()
+	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('This skin tag displays a navigable calendar.');
 		$this->long_desc = T_('Days containing posts are highlighted.');
@@ -69,7 +69,7 @@ class calendar_plugin extends Plugin
 	}
 
 
- 	/**
+	/**
 	 * Event handler: SkinTag
 	 *
 	 * @param array Associative array of parameters. Valid keys are:
@@ -984,6 +984,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.22  2006/07/10 20:19:30  blueyed
+ * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
+ *
  * Revision 1.21  2006/07/07 21:26:49  blueyed
  * Bumped to 1.9-dev
  *

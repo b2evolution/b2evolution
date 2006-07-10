@@ -26,7 +26,7 @@ class texturize_plugin extends Plugin
 	/**
 	 * Init
 	 */
-	function PluginInit()
+	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('Smart quotes + additional typographic replacements.');
 		$this->long_desc = T_('This renderer will replace standard and double quotes with typographic quotes were appropriate.<br />
@@ -114,6 +114,9 @@ class texturize_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.13  2006/07/10 20:19:30  blueyed
+ * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
+ *
  * Revision 1.12  2006/07/07 21:26:49  blueyed
  * Bumped to 1.9-dev
  *

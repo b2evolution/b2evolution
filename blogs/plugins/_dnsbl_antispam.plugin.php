@@ -49,12 +49,12 @@ class dnsbl_antispam_plugin extends Plugin
 	/**
 	 * Get $use_whitelisting property, if not set before (e.g. in {@link Install()}).
 	 */
-	function PluginInit()
+	function PluginInit( & $params )
 	{
 		$this->short_desc = T_("Checks the user's IP address against a list of DNS blacklists.");
 		$this->long_desc = T_('If the IP address is blacklisted, the request is canceled early and the user can (optionally) whitelist his session through a Captcha plugin.');
 
-		if( ! isset($this->use_whitelisting) )
+		if( $params['is_installed'] && ! isset($this->use_whitelisting) )
 		{
 			$this->use_whitelisting = $this->Settings->get('use_whitelisting');
 		}
@@ -684,6 +684,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.32  2006/07/10 20:19:30  blueyed
+ * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
+ *
  * Revision 1.31  2006/07/07 21:26:49  blueyed
  * Bumped to 1.9-dev
  *

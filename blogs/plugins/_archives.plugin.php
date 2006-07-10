@@ -64,7 +64,7 @@ class archives_plugin extends Plugin
 	/**
 	 * Init
 	 */
-	function PluginInit()
+	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('This skin tag displays a list of post archives.');
 		$this->long_desc = T_('Archives can be grouped monthly, daily, weekly or post by post.');
@@ -532,6 +532,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.27  2006/07/10 20:19:30  blueyed
+ * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
+ *
  * Revision 1.26  2006/07/08 12:33:50  blueyed
  * Fixed regression with Results' class adding an additional ORDER column to ItemList2's query
  *

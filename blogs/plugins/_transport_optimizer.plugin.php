@@ -38,11 +38,16 @@ class transport_optimizer_plugin extends Plugin
 	/**
 	 * Init Plugin.
 	 */
-	function PluginInit()
+	function PluginInit( & $params )
 	{
 		$this->name = T_('Transport optimizer');
 		$this->short_desc = T_('Save bandwidth on your server.');
 		$this->long_desc = T_('By providing support of ETag headers and GZip compression it saves bandwidth on the server and optimizes the transport to the browser.');
+
+		if( ! $params['is_installed'] )
+		{ // not installed: no Settings
+			return true;
+		}
 
 		// Store in properties, because AbstractSettings::get() uses var_export(), which does not work in an output buffer:
 		$this->use_gzipcompression = $this->Settings->get('use_gzipcompression');
@@ -169,6 +174,9 @@ class transport_optimizer_plugin extends Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.6  2006/07/10 20:19:30  blueyed
+ * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
+ *
  * Revision 1.5  2006/07/07 21:26:49  blueyed
  * Bumped to 1.9-dev
  *
