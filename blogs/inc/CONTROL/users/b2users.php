@@ -379,7 +379,7 @@ if( !$Messages->count('error') )
 			$UserSettings->set( 'focus_on_first_input', $edited_user_focusonfirst, $edited_User->ID );
 
 			// Update user settings:
-			$UserSettings->dbupdate();
+			if( $UserSettings->dbupdate() ) $Messages->add( T_('Your feature settings have been changed'), 'success');
 
 			// PluginUserSettings
 			$any_plugin_settings_updated = false;
@@ -682,6 +682,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.27  2006/07/10 05:39:36  yabs
+ * added "features changed" message
+ *
  * Revision 1.26  2006/07/04 23:38:11  blueyed
  * Validate email: admin user (#1) has an extra button to validate him/herself through the form; store multiple req_validatemail keys in the user's session.
  *
