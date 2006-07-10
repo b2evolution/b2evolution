@@ -248,6 +248,19 @@ class Plugin
 	 */
 	var $Plugins;
 
+	/**
+	 * The translations keyed by locale. They get loaded through include() of _global.php.
+	 * @see Plugin::T_()
+	 * @var array
+	 */
+	var $trans = array();
+
+	/**
+	 * @var boolean Has the global /locales/_global.php file (where translation for
+	 * all languages can be put into) been loaded?
+	 */
+	var $trans_loaded_global = false;
+
 	/**#@-*/
 
 
@@ -285,11 +298,11 @@ class Plugin
 
 		if( is_null($this->short_desc) )
 		{ // may have been set in plugin's constructor (which is deprecated since 1.9)
-			$this->short_desc = $this->T_('No desc available');
+			$this->short_desc = T_('No desc available');
 		}
 		if( is_null($this->long_desc) )
 		{ // may have been set in plugin's constructor (which is deprecated since 1.9)
-			$this->long_desc = $this->T_('No description available');
+			$this->long_desc = T_('No description available');
 		}
 
 		if( method_exists( $this, 'AppendPluginRegister' ) && $params['is_installed'] )
@@ -1780,15 +1793,9 @@ class Plugin
 	 */
 	function T_( $string, $req_locale = '' )
 	{
-		/**
-		 * The translations keyed by locale. They get loaded through include() of _global.php
-		 * @var array
-		 * @static
-		 */
-		static $trans = array();
-
 		global $current_locale, $locales, $Debuglog, $plugins_path, $evo_charset;
 
+		$trans = & $this->trans;
 
 		if( empty($req_locale) )
 		{ // By default we use the current locale
@@ -1800,9 +1807,9 @@ class Plugin
 			$req_locale = $current_locale;
 		}
 
-		if( !isset( $locales[$req_locale]['messages'] ) )
+		if( ! isset( $locales[$req_locale]['messages'] ) )
 		{
-			$this->debug_log( 'No messages file path for locale. $locales["'
+			$this->debug_log( 'No messages file dirname for locale. $locales["'
 											.$req_locale.'"] is '.var_export( @$locales[$req_locale], true ), 'locale' );
 			$locales[$req_locale]['messages'] = false;
 		}
@@ -1816,8 +1823,56 @@ class Plugin
 
 		if( ! isset($trans[ $messages ] ) )
 		{ // Translations for current locale have not yet been loaded:
-			// echo 'LOADING', $plugins_path.strtolower( get_class($this) ).'/locales/'.$messages.'/_global.php';
-			@include_once $plugins_path.strtolower( get_class($this) ).'/locales/'.$messages.'/_global.php';
+
+			if( ! isset($this->classfile_path) )
+			{ // ->T_() called through the plugin's constructor, which is deprecated!
+				$this->debug_log( 'T_() method called through plugin constructor!' );
+				return $string;
+			}
+
+			$locales_dir = dirname($this->classfile_path).'/';
+			if( $locales_dir == $plugins_path )
+			{
+				$locales_dir .= $this->classname.'/';
+			}
+			$locales_dir .= 'locales/';
+
+			// First load the global messages file, if existing:
+			if( ! $this->trans_loaded_global )
+			{
+				$this->trans_loaded_global = true;
+
+				$file_path = $locales_dir.'_global.php';
+				if( file_exists($file_path) )
+				{
+					if( is_readable($file_path) )
+					{
+						// echo 'LOADING GLOBAL '.$file_path;
+						include $file_path;
+					}
+					else
+					{
+						$this->debug_log( 'Global messages file '.$file_path.' is not readable!', 'locale' );
+					}
+				}
+			}
+
+			// Then load locale specific files:
+			$file_path = $locales_dir.$messages.'/_global.php';
+
+			if( file_exists($file_path) )
+			{
+				if( is_readable($file_path) )
+				{
+					// echo 'LOADING '.$file_path;
+					include $file_path;
+				}
+				else
+				{
+					$this->debug_log( 'Messages file '.$file_path.' for locale '.$req_locale.' is not readable!', 'locale' );
+				}
+			}
+
 			if( ! isset($trans[ $messages ] ) )
 			{ // Still not loaded... file doesn't exist, memorize that no translations are available
 				// echo 'file not found!';
@@ -1912,7 +1967,14 @@ class Plugin
 			$add_cats = array($add_cats);
 		}
 
-		$add_cats[] = $this->classname.'_'.$this->ID;
+		if( ! isset($this->ID, $this->classname) )
+		{ // plugin not yet instantiated. This happens, if the (deprecated) constructor of a plugin gets used.
+			$add_cats[] = get_class($this).'_?';
+		}
+		else
+		{
+			$add_cats[] = $this->classname.'_'.$this->ID;
+		}
 		$Debuglog->add( $msg, $add_cats );
 	}
 
@@ -2303,7 +2365,11 @@ class Plugin
 		// Get the language. We use $default_locale because it does not have to be activated ($current_locale)
 		$lang = substr( $default_locale, 0, 2 );
 
-		$help_dir = $plugins_path.$this->classname.'/';
+		$help_dir = dirname($this->classfile_path).'/';
+		if( $help_dir == $plugins_path )
+		{
+			$help_dir .= $this->classname.'/';
+		}
 
 		// Try help for the user's locale:
 		$help_file = $help_dir.'README.'.$lang.'.html';
@@ -2348,6 +2414,10 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.73  2006/07/10 21:05:40  blueyed
+ * Enhanced Plugin::T_():
+ * Now also uses a global _global.php file, which may hold all translations in one file.
+ *
  * Revision 1.72  2006/07/10 20:19:30  blueyed
  * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
  *
