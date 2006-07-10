@@ -2559,11 +2559,25 @@ class Item extends DataObject
 	{
 		if( is_null($this->Blog) )
 		{
-			global $BlogCache;
-			$this->Blog = & $BlogCache->get_by_ID( $this->blog_ID );
+			$this->load_Blog();
 		}
 
 		return $this->Blog;
+	}
+
+
+	/**
+	 * Load the Blog object for the Item, without returning it.
+	 *
+	 * This is needed for {@link Results} object callbacks.
+	 */
+	function load_Blog()
+	{
+		if( is_null($this->Blog) )
+		{
+			global $BlogCache;
+			$this->Blog = & $BlogCache->get_by_ID( $this->blog_ID );
+		}
 	}
 
 
@@ -2791,6 +2805,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.69  2006/07/10 15:27:45  blueyed
+ * Fixed display of Blog name in items list (at least with PHP5 it added "Object id #xx" because of the Item::get_Blog() return value).
+ *
  * Revision 1.68  2006/07/08 23:03:52  blueyed
  * Removed debugging/test code.
  *

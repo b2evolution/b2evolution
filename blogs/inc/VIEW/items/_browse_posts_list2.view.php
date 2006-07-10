@@ -70,7 +70,7 @@ if( $Blog->ID == 1 )
 			'th' => T_('Blog'),
 			'th_class' => 'nowrap',
 			'td_class' => 'nowrap',
-			'td' => '@get_Blog()@<a href="¤regenerate_url( \'blog,results_order\', \'blog=@blog_ID@\' )¤">@Blog->dget(\'shortname\')@</a>',
+			'td' => '@load_Blog()@<a href="¤regenerate_url( \'blog,results_order\', \'blog=@blog_ID@\' )¤">@Blog->dget(\'shortname\')@</a>',
 		);
 }
 
@@ -202,6 +202,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.13  2006/07/10 15:27:45  blueyed
+ * Fixed display of Blog name in items list (at least with PHP5 it added "Object id #xx" because of the Item::get_Blog() return value).
+ *
  * Revision 1.12  2006/07/04 17:32:30  fplanque
  * no message
  *
