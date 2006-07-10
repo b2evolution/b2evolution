@@ -436,6 +436,10 @@ class Plugins
 				usort( $this->sorted_IDs, array( & $this, 'sort_Plugin_name') );
 				break;
 
+			case 'group':
+				usort( $this->sorted_IDs, array( & $this, 'sort_Plugin_group') );
+				break;
+
 			default:
 				// Sort array by priority:
 				usort( $this->sorted_IDs, array( & $this, 'sort_Plugin_priority') );
@@ -471,6 +475,113 @@ class Plugins
 		$b_Plugin = & $this->get_by_ID( $b_ID );
 
 		return strcasecmp( $a_Plugin->name, $b_Plugin->name );
+	}
+
+
+	/**
+	 * Callback function to sort plugins by group, sub-group and name.
+	 *
+	 * Those, which have a group get sorted above the ones without one.
+	 *
+	 * WARNING: do NOT sort by anything else than priority unless you're handling a list of NOT-YET-INSTALLED plugins
+	 */
+	function sort_Plugin_group( & $a_ID, & $b_ID )
+	{
+		$a_Plugin = & $this->get_by_ID( $a_ID );
+		$b_Plugin = & $this->get_by_ID( $b_ID );
+
+		// first check if both have a group (-1: only A has a group; 1: only B has a group; 0: both have a group or no group):
+		$r = (int)empty($a_Plugin->group) - (int)empty($b_Plugin->group);
+		if( $r != 0 )
+		{
+			return $r;
+		}
+
+		// Compare Group
+		$r = strcasecmp( $a_Plugin->group, $b_Plugin->group );
+		if( $r != 0 )
+		{
+			return $r;
+		}
+
+		// Compare Sub Group
+		$r = strcasecmp( $a_Plugin->sub_group, $b_Plugin->sub_group );
+		if( $r != 0 )
+		{
+			return $r;
+		}
+
+		// Compare Name
+		return strcasecmp( $a_Plugin->name, $b_Plugin->name );
+	}
+
+
+	/**
+	 * Get a list of available Plugin groups.
+	 *
+	 * @return array
+	 */
+	function get_plugin_groups()
+	{
+		$result = array();
+
+		foreach( $this->sorted_IDs as $plugin_ID )
+		{
+			$Plugin = & $this->get_by_ID( $plugin_ID );
+
+			if( empty($Plugin->group) || in_array( $Plugin->group, $result ) )
+			{
+				continue;
+			}
+
+			$result[] = $Plugin->group;
+		}
+
+		return $result;
+	}
+
+
+	/**
+	 * Will return an array that contents are references to plugins that have the same group, regardless of the sub_group.
+	 *
+	 * @return array
+	 */
+	function get_Plugins_in_group( $group )
+	{
+		$result = array();
+
+		foreach( $this->sorted_IDs as $plugin_ID )
+		{
+			$Plugin = & $this->get_by_ID( $plugin_ID );
+			if( $Plugin->group == $group )
+			{
+				$result[] = & $Plugin;
+			}
+		}
+
+		return $result;
+	}
+
+
+	/**
+	 * Will return an array that contents are references to plugins that have the same group and sub_group.
+	 *
+	 * @return array
+	 */
+	function get_Plugins_in_sub_group( $group, $sub_group = '' )
+	{
+		$result = array();
+
+		foreach( $this->sorted_IDs as $plugin_ID )
+		{
+			$Plugin = & $this->get_by_ID( $plugin_ID );
+			if( $Plugin->group == $group && $Plugin->sub_group == $sub_group )
+			{
+				$result[] = & $Plugin;
+			}
+		}
+
+		return $result;
 	}
 
 
@@ -2782,6 +2893,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.65  2006/07/10 22:53:38  blueyed
+ * Grouping of plugins added, based on a patch from balupton
+ *
  * Revision 1.64  2006/07/10 20:19:30  blueyed
  * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
  *

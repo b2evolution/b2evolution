@@ -178,6 +178,22 @@ class Plugin
 	 */
 	var $number_of_installs;
 
+
+	/**
+	 * Main group of the plugin.
+	 *
+	 * @var string
+	 */
+	var $group;
+
+
+	/**
+	 * Sub-Group of the plugin.
+	 *
+	 * @var string
+	 */
+	var $sub_group;
+
 	/**#@-*/
 
 
@@ -2414,6 +2430,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.74  2006/07/10 22:53:38  blueyed
+ * Grouping of plugins added, based on a patch from balupton
+ *
  * Revision 1.73  2006/07/10 21:05:40  blueyed
  * Enhanced Plugin::T_():
  * Now also uses a global _global.php file, which may hold all translations in one file.

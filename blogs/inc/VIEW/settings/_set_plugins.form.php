@@ -96,7 +96,7 @@ function plugin_results_td_status( $plug_status, $plug_ID )
 		return get_icon('disabled', 'imgtag', array('title'=>T_('The plugin is disabled.')) );
 	}
 }
-$Results->cols[0] = array(
+$Results->cols[] = array(
 		'th' => /* TRANS: shortcut for enabled */ T_('En'),
 		'order' => 'plug_status',
 		'td' => '%plugin_results_td_status( \'$plug_status$\', $plug_ID$ )%',
@@ -124,16 +124,36 @@ function plugin_results_name_order_callback( $a, $b, $order )
 	if( $order == 'DESC' ) { $r = -$r; }
 	return $r;
 }
-$Results->cols[1] = array(
+$Results->cols[] = array(
 		'th' => T_('Plugin'),
 		'order_callback' => 'plugin_results_name_order_callback',
 		'td' => '% plugin_results_td_name( {Obj} ) %',
 	);
 
+if( count($admin_Plugins->get_plugin_groups()) )
+{
+	/*
+	 * PLUGIN GROUP TD:
+	 */
+	function plugin_results_group_order_callback( $a, $b, $order )
+	{
+		global $admin_Plugins;
+
+		$r = $admin_Plugins->sort_Plugin_group( $a->ID, $b->ID );
+		if( $order == 'DESC' ) { $r = -$r; }
+		return $r;
+	}
+	$Results->cols[] = array(
+			'th' => T_('Group'),
+			'order_callback' => 'plugin_results_group_order_callback',
+			'td' => '% {Obj}->group %',
+		);
+}
+
 /*
  * PRIORITY TD:
  */
-$Results->cols[2] = array(
+$Results->cols[] = array(
 		'th' => T_('Priority'),
 		'order' => 'plug_priority',
 		'td' => '$plug_priority$',
@@ -151,7 +171,7 @@ function plugin_results_td_apply_rendering($apply_rendering)
 	return '<span title="'.format_to_output( $apply_rendering_values[$apply_rendering], 'htmlattr' )
 			.'">'.$apply_rendering.'</span>';
 }
-$Results->cols[3] = array(
+$Results->cols[] = array(
 		'th' => T_('Apply'),
 		'th_title' => T_('When should rendering apply?'),
 		'order' => 'plug_apply_rendering',
@@ -161,7 +181,7 @@ $Results->cols[3] = array(
 /*
  * PLUGIN CODE TD:
  */
-$Results->cols[4] = array(
+$Results->cols[] = array(
 		'th' => /* TRANS: Code of a plugin */ T_('Code'),
 		'th_title' => T_('The code to call the plugin by code (SkinTag) or as Renderer.'),
 		'order' => 'plug_code',
@@ -177,7 +197,7 @@ function plugin_results_desc_order_callback( $a, $b, $order )
 	if( $order == 'DESC' ) { $r = -$r; }
 	return $r;
 }
-$Results->cols[5] = array(
+$Results->cols[] = array(
 		'th' => T_('Description'),
 		'td' => '% {Obj}->short_desc %',
 		'order_callback' => 'plugin_results_name_order_callback',
@@ -193,7 +213,7 @@ function plugin_results_td_help( $Plugin )
 		.$Plugin->get_help_link('$help_url')
 		.' '.$Plugin->get_help_link('$readme');
 }
-$Results->cols[6] = array(
+$Results->cols[] = array(
 		'th' => T_('Help'),
 		'td_class' => 'nowrap',
 		'td' => '% plugin_results_td_help( {Obj} ) %',
@@ -219,7 +239,7 @@ function plugin_results_td_actions($Plugin)
 }
 if( $current_User->check_perm( 'options', 'edit', false ) )
 {
-	$Results->cols[7] = array(
+	$Results->cols[] = array(
 			'th' => T_('Actions'),
 			'td' => '% plugin_results_td_actions( {Obj} ) %',
 			'td_class' => 'shrinkwrap',
@@ -267,13 +287,61 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 			<th><?php echo T_('Help') ?></th>
 			<th class="lastcol"><?php echo T_('Actions') ?></th>
 		</tr>
+
 		<?php
 		$AvailablePlugins->restart();	 // make sure iterator is at start position
+
+		// Sort the plugins by group
+		$AvailablePlugins->sort('group');
+		// Grouping
+		$current_group = false; // False so it does the header once
+		$current_sub_group = '';
+
+		$number_of_groups = count($AvailablePlugins->get_plugin_groups());
+
 		$count = 0;
 		while( $loop_Plugin = & $AvailablePlugins->get_next() )
 		{
+
+			if( $loop_Plugin->group !== $current_group && $number_of_groups )
+			{ // Reason why $current_group is false
+				$current_group = $loop_Plugin->group;
+				$current_sub_group = '';
+				$count = 0;
+				?>
+				<tr class="PluginsSeperator">
+					<th colspan="5"></th>
+				</tr>
+				<tr class="PluginsGroup">
+					<th colspan="5"><?php
+					if( $current_group == '' || $current_group == 'Un-Grouped' )
+					{
+						echo T_('Un-Grouped');
+					}
+					else
+					{
+						echo $current_group;
+					}
+					?></th>
+				</tr>
+				<?php
+			}
+
+			if( $loop_Plugin->sub_group != $current_sub_group )
+			{
+				$current_sub_group = $loop_Plugin->sub_group;
+				$count = 0;
+				?>
+				<tr class="PluginsSubGroup">
+					<th colspan="5"><?php echo $current_sub_group; ?></th>
+				</tr>
+				<?php
+			}
+
 		?>
-		<tr class="<?php echo (($count++ % 2) ? 'odd' : 'even') ?>">
+		<tr class="<?php echo (($count++ % 2) ? 'odd' : 'even');
+			echo ( $current_sub_group != '' ? ' PluginsSubGroup' : ' PluginsGroup' ); ?>">
+
 			<td class="firstcol">
 				<strong><a title="<?php echo T_('Display info') ?>" href="<?php echo regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID ) ?>"><?php $loop_Plugin->name(); ?></a></strong>
 			</td>
@@ -350,6 +418,9 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 <?php
 /*
  * $Log$
+ * Revision 1.28  2006/07/10 22:53:38  blueyed
+ * Grouping of plugins added, based on a patch from balupton
+ *
  * Revision 1.27  2006/07/03 23:35:24  blueyed
  * Performance: Only load AvailablePlugins if used!
  *

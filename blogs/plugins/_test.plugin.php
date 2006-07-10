@@ -62,6 +62,7 @@ class test_plugin extends Plugin
 	 */
 	var $apply_rendering = 'opt-out';
 	var $number_of_installs = 1;
+	var $group = 'test';
 
 
 	/**
@@ -593,6 +594,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.48  2006/07/10 22:53:38  blueyed
+ * Grouping of plugins added, based on a patch from balupton
+ *
  * Revision 1.47  2006/07/10 20:19:30  blueyed
  * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
  *
