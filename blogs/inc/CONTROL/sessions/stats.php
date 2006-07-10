@@ -518,7 +518,7 @@ switch( $AdminUI->get_path(1) )
 				}
 				$Results->cols[] = array(
 						'th' => /* TRANS: Abbrev. for Spam */ T_('S'),
-						'td' => '%referer_ban_link( #dom_name# )%',
+						'td' => '%referer_ban_link( #hit_referer# )%', // we use hit_referer, because unlike dom_name it includes more info (especially any subdomain)
 					);
 			}
 
@@ -705,7 +705,7 @@ switch( $AdminUI->get_path(1) )
 						<?php
 						if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 						{ // user can ban:
-							echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'action,keyword', 'action=ban&amp;keyword='.rawurlencode( get_ban_domain(stats_basedomain(false)) ) ) ).'</td>';
+							echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'action,keyword', 'action=ban&amp;keyword='.rawurlencode( get_ban_domain($row_stats['hit_referer']) ) ) ).'</td>'; // we use hit_referer, because unlike dom_name it includes more info (especially any subdomain)
 						}
 						?>
 						<td class="right"><?php stats_hit_count() ?></td>
@@ -1072,6 +1072,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2006/07/10 15:14:57  blueyed
+ * Fix for ban links for referers with subdomains (again).
+ *
  * Revision 1.23  2006/07/06 19:59:08  fplanque
  * better logs, better stats, better pruning
  *
