@@ -569,7 +569,8 @@ class Plugin
 	 * You should provide an unique html ID with your button.
 	 *
 	 * @param array Associative array of parameters.
-	 *              'target_type': either 'Comment' or 'Item'.
+	 *              - 'target_type': either 'Comment' or 'Item'.
+	 *              - 'edit_layout': "simple", "expert" (default)
 	 * @return boolean did we display a button?
 	 */
 	function AdminDisplayEditorButton( $params )
@@ -582,7 +583,8 @@ class Plugin
 	 * Event handler: Called when displaying editor toolbars.
 	 *
 	 * @param array Associative array of parameters
-	 *              'target_type': either 'Comment' or 'Item'.
+	 *              - 'target_type': either 'Comment' or 'Item'.
+	 *              - 'edit_layout': "simple", "expert" (default)
 	 * @return boolean did we display a toolbar?
 	 */
 	function AdminDisplayToolbar( & $params )
@@ -953,7 +955,7 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'Item': the related Item (by reference)
 	 */
-	function AppendItemPreviewTransact()
+	function AppendItemPreviewTransact( & $params )
 	{
 	}
 
@@ -2345,6 +2347,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.71  2006/07/10 18:53:04  blueyed
+ * Fixed method def; added doc
+ *
  * Revision 1.70  2006/07/07 21:26:04  blueyed
  * Should have tested it.. ;/
  *
