@@ -577,27 +577,36 @@ switch($action)
 		exit();
 }
 
-echo '<div class="panelinfo">';
+
 if( empty( $mode ) )
 { // Normal mode:
-	if( isset($location) )
-	{
-		echo '<p><strong>[<a href="'.$location.'">'.T_('Back to posts!').'</a>]</strong></p>';
+
+	if( ! $Messages->count('error') )
+	{ // only display, if there were no errors before:
+		echo '<div class="panelinfo">';
+
+		if( isset($location) )
+		{
+			echo '<p><strong>[<a href="'.$location.'">'.T_('Back to posts!').'</a>]</strong></p>';
+		}
+		echo '<p>' . T_('You may also want to generate static pages or view your blogs...') . '</p>';
+		echo '</div>';
+		// List the blogs:
+		// Display VIEW:
+		$AdminUI->disp_view( 'collections/_blogs_list.php' );
+
+		echo '</div>';
 	}
-	echo '<p>' . T_('You may also want to generate static pages or view your blogs...') . '</p>';
-	echo '</div>';
-	// List the blogs:
-	// Display VIEW:
-	$AdminUI->disp_view( 'collections/_blogs_list.php' );
 }
 else
 { // Special mode:
-?>
-	<p><strong>[<a href="?ctrl=edit&amp;blog=<?php echo $blog ?>&amp;mode=<?php echo $mode ?>"><?php echo T_('New post') ?></a>]</strong></p>
-<?php
+	?>
+	<div class="panelinfo">
+		<p><strong>[<a href="?ctrl=edit&amp;blog=<?php echo $blog ?>&amp;mode=<?php echo $mode ?>"><?php echo T_('New post') ?></a>]</strong></p>
+	</div>
+	<?php
 }
 
-echo '</div>';
 
 
 // Display body bottom, debug info and close </html>:
@@ -605,6 +614,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2006/07/10 18:17:09  blueyed
+ * Do not display footer with bloglist and back-to-posts link, if there were errors.
+ *
  * Revision 1.16  2006/07/08 22:33:43  blueyed
  * Integrated "simple edit form".
  *
