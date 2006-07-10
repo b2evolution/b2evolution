@@ -20,7 +20,7 @@
 $resolve_extra_path = false;	// We don't want extra path resolution on this page
 
 # Let's force the use of the RSS skin:
-$skin = '_rss2';
+$tempskin = '_rss2';
 
 # Inside that skin, let's force the use of the lastcomments display:
 $disp = 'comments';
