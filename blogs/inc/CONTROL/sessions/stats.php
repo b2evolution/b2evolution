@@ -705,7 +705,7 @@ switch( $AdminUI->get_path(1) )
 						<?php
 						if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 						{ // user can ban:
-							echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'action,keyword', 'action=ban&amp;keyword='.rawurlencode( get_ban_domain($row_stats['hit_referer']) ) ) ).'</td>'; // we use hit_referer, because unlike dom_name it includes more info (especially any subdomain)
+							echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'ctrl,action,keyword', 'ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain($row_stats['hit_referer']) ) ) ).'</td>'; // we use hit_referer, because unlike dom_name it includes more info (especially any subdomain)
 						}
 						?>
 						<td class="right"><?php stats_hit_count() ?></td>
@@ -1072,6 +1072,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2006/07/11 17:31:03  blueyed
+ * Fixed ban link in "referers" (ctrl), thanks EdB.
+ *
  * Revision 1.24  2006/07/10 15:14:57  blueyed
  * Fix for ban links for referers with subdomains (again).
  *
