@@ -45,13 +45,21 @@ function percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '.' )
 /**
  * Helper function for "Requested URI" column
  * @param integer Blog ID
+ * @param string Requested URI
  * @return string
  */
-function stats_get_blog_baseurlroot( $hit_blog_ID )
+function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
 {
 	global $BlogCache;
 	$tmp_Blog = & $BlogCache->get_by_ID( $hit_blog_ID );
-	return $tmp_Blog->get('baseurlroot');
+	$full_url = $tmp_Blog->get('baseurlroot').$hit_uri;
+
+	if( strlen($hit_uri) > $max_len )
+	{
+		$hit_uri = '...'.substr( $hit_uri, -$max_len );
+	}
+
+	return '<a href="'.$full_url.'">'.$hit_uri.'</a>';
 }
 
 
@@ -462,11 +470,10 @@ switch( $AdminUI->get_path(1) )
 			// Create result set:
 			$Results = & new Results( "
 					SELECT hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
-					  FROM T_hitlog INNER JOIN T_basedomains
-					    ON dom_ID = hit_referer_dom_ID INNER JOIN T_sessions
-					    ON hit_sess_ID = sess_ID LEFT JOIN T_blogs
-					    ON hit_blog_ID = blog_ID LEFT JOIN T_useragents
-					    ON hit_agnt_ID = agnt_ID
+					  FROM T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
+					  			INNER JOIN T_sessions ON hit_sess_ID = sess_ID
+					  			LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
+					  			LEFT JOIN T_useragents ON hit_agnt_ID = agnt_ID
 					 WHERE hit_referer_type = 'referer'
 					   AND agnt_type = 'browser'"
 					 .( empty($blog) ? '' : "AND hit_blog_ID = $blog "), 'lstref_', 'D' );
@@ -518,7 +525,7 @@ switch( $AdminUI->get_path(1) )
 				}
 				$Results->cols[] = array(
 						'th' => /* TRANS: Abbrev. for Spam */ T_('S'),
-						'td' => '%referer_ban_link( #hit_referer# )%', // we use hit_referer, because unlike dom_name it includes more info (especially any subdomain)
+						'td' => '%referer_ban_link( #hit_referer# )%', // we use hit_referer, because unlike dom_name it includes more subdomains, especially "www."
 					);
 			}
 
@@ -536,7 +543,7 @@ switch( $AdminUI->get_path(1) )
 			$Results->cols[] = array(
 					'th' => T_('Requested URI'),
 					'order' => 'hit_uri',
-					'td' => '<a href="%stats_get_blog_baseurlroot(#hit_blog_ID#)%$hit_uri$">$hit_uri$</a>',
+					'td' => '%stats_format_req_URI( #hit_blog_ID#, #hit_uri# )%',
 				);
 
 			// Remote address (IP):
@@ -705,7 +712,7 @@ switch( $AdminUI->get_path(1) )
 						<?php
 						if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 						{ // user can ban:
-							echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'ctrl,action,keyword', 'ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain($row_stats['hit_referer']) ) ) ).'</td>'; // we use hit_referer, because unlike dom_name it includes more info (especially any subdomain)
+							echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'ctrl,action,keyword', 'ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain($row_stats['hit_referer']) ) ) ).'</td>'; // we use hit_referer, because unlike dom_name it includes subdomains (especially 'www.')
 						}
 						?>
 						<td class="right"><?php stats_hit_count() ?></td>
@@ -731,9 +738,8 @@ switch( $AdminUI->get_path(1) )
 			// Create result set:
 			$Results = & new Results( "
 					SELECT hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
-					  FROM T_hitlog INNER JOIN T_basedomains
-					    ON dom_ID = hit_referer_dom_ID LEFT JOIN T_blogs
-					    ON hit_blog_ID = blog_ID
+					  FROM T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
+					  			LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
 					 WHERE hit_referer_type = 'search' "
 					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 'lstsrch', 'D' );
 
@@ -782,7 +788,7 @@ switch( $AdminUI->get_path(1) )
 			$Results->cols[] = array(
 					'th' => T_('Requested URI'),
 					'order' => 'hit_uri',
-					'td' => '<a href="%stats_get_blog_baseurlroot(#hit_blog_ID#)%$hit_uri$">$hit_uri$</a>',
+					'td' => '%stats_format_req_URI( #hit_blog_ID#, #hit_uri# )%',
 				);
 
 			// Remote address (IP):
@@ -834,18 +840,14 @@ switch( $AdminUI->get_path(1) )
 			// Create result set:
 			$Results = & new Results( "
 					SELECT COUNT(*) AS hit_count, hit_referer, hit_blog_ID, agnt_signature
-					  FROM T_hitlog INNER JOIN T_useragents
-					    ON hit_agnt_ID = agnt_ID "
-					.( empty($blog) ? '' : "LEFT JOIN T_blogs ON hit_blog_ID = blog_ID " )."
+					  FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
 					 WHERE agnt_type = 'robot' "
 					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
 					 GROUP BY agnt_signature', 'topidx', '-D', 20 );
 
 			$total_hit_count = $DB->get_var( "
 					SELECT COUNT(*)
-					  FROM T_hitlog INNER JOIN T_useragents
-					    ON hit_agnt_ID = agnt_ID "
-					.( empty($blog) ? '' : "LEFT JOIN T_blogs ON hit_blog_ID = blog_ID " )."
+					  FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
 					 WHERE agnt_type = 'robot' "
 					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ) );
 
@@ -908,8 +910,7 @@ switch( $AdminUI->get_path(1) )
 			<?php
 			$total_hit_count = $DB->get_var( "
 				SELECT COUNT(*) AS hit_count
-				  FROM T_useragents INNER JOIN T_hitlog
-				    ON agnt_ID = hit_agnt_ID
+				  FROM T_useragents INNER JOIN T_hitlog ON agnt_ID = hit_agnt_ID
 				 WHERE agnt_type = 'rss' "
 					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 0, 0, 'Get total hit count' );
 
@@ -919,8 +920,7 @@ switch( $AdminUI->get_path(1) )
 			// Create result set:
 			$Results = & new Results( "
 				SELECT agnt_signature, COUNT(*) AS hit_count
-				  FROM T_useragents INNER JOIN T_hitlog
-				    ON agnt_ID = hit_agnt_ID
+				  FROM T_useragents INNER JOIN T_hitlog ON agnt_ID = hit_agnt_ID
 				 WHERE agnt_type = 'rss' "
 					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
 				 GROUP BY agnt_ID ', 'topagg_', '--D' );
@@ -959,9 +959,8 @@ switch( $AdminUI->get_path(1) )
 			// Create result set:
 			$Results = & new Results( "
 				SELECT hit_ID, hit_datetime, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
-				  FROM T_hitlog INNER JOIN T_useragents
-				    ON hit_agnt_ID = agnt_ID
-				  LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
+				  FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
+				  		 LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
 				 WHERE hit_referer_type = 'direct'
 				   AND agnt_type = 'browser'"
 				  .( empty($blog) ? '' : "AND hit_blog_ID = $blog "), 'lstref_', 'D' );
@@ -999,7 +998,7 @@ switch( $AdminUI->get_path(1) )
 			$Results->cols[] = array(
 					'th' => T_('Requested URI'),
 					'order' => 'hit_uri',
-					'td' => '<a href="%stats_get_blog_baseurlroot(#hit_blog_ID#)%$hit_uri$">$hit_uri$</a>',
+					'td' => '%stats_format_req_URI( #hit_blog_ID#, #hit_uri# )%',
 				);
 
 			// Remote address (IP):
@@ -1021,8 +1020,7 @@ switch( $AdminUI->get_path(1) )
 			<?php
 			$total_hit_count = $DB->get_var( "
 				SELECT COUNT(*) AS hit_count
-				  FROM T_useragents INNER JOIN T_hitlog
-				    ON agnt_ID = hit_agnt_ID
+				  FROM T_useragents INNER JOIN T_hitlog ON agnt_ID = hit_agnt_ID
 				 WHERE agnt_type <> 'rss' "
 				  .( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 0, 0, 'Get total hit count' );
 
@@ -1032,8 +1030,7 @@ switch( $AdminUI->get_path(1) )
 			// Create result set:
 			$Results = & new Results( "
 				SELECT agnt_signature, COUNT(*) AS hit_count
-				  FROM T_useragents INNER JOIN T_hitlog
-				    ON agnt_ID = hit_agnt_ID
+				  FROM T_useragents INNER JOIN T_hitlog ON agnt_ID = hit_agnt_ID
 				 WHERE agnt_type <> 'rss' "
 				  .( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
 				 GROUP BY agnt_ID ', 'topua_', '--D' );
@@ -1072,6 +1069,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.26  2006/07/11 19:56:20  fplanque
+ * top indexing robots optimized some more.
+ * reformatted queries
+ *
  * Revision 1.25  2006/07/11 17:31:03  blueyed
  * Fixed ban link in "referers" (ctrl), thanks EdB.
  *
@@ -1080,9 +1081,6 @@ $AdminUI->disp_global_footer();
  *
  * Revision 1.23  2006/07/06 19:59:08  fplanque
  * better logs, better stats, better pruning
- *
- * Revision 1.22  2006/07/04 17:32:28  fplanque
- * no message
  *
  * Revision 1.21  2006/07/03 18:58:56  blueyed
  * Optimized "top indexing robots" better (previous commit reverted)
