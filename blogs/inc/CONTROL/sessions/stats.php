@@ -838,18 +838,24 @@ switch( $AdminUI->get_path(1) )
 			<p><?php echo T_('These are hits from automated robots like search engines\' indexing robots. (Robots must be listed in /conf/_stats.php)') ?></p>
 			<?php
 			// Create result set:
-			$Results = & new Results( "
-					SELECT COUNT(*) AS hit_count, hit_referer, hit_blog_ID, agnt_signature
-					  FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-					 WHERE agnt_type = 'robot' "
-					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
-					 GROUP BY agnt_signature', 'topidx', '-D', 20 );
+			$sql = 'SELECT COUNT(*) AS hit_count, agnt_signature
+							  FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
+							 WHERE agnt_type = "robot" '
+											.( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog ).'
+							 GROUP BY agnt_signature';
+
+			$count_sql = 'SELECT COUNT( DISTINCT agnt_signature )
+							  FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
+							 WHERE agnt_type = "robot" '
+											.( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog );
+
+			$Results = & new Results( $sql, 'topidx', '-D', 20, $count_sql );
 
 			$total_hit_count = $DB->get_var( "
 					SELECT COUNT(*)
 					  FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
 					 WHERE agnt_type = 'robot' "
-					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ) );
+					.( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog ) );
 
 			$Results->title = T_('Top Indexing Robots');
 
@@ -1069,6 +1075,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.27  2006/07/11 22:41:42  fplanque
+ * tweaked stats a little
+ *
  * Revision 1.26  2006/07/11 19:56:20  fplanque
  * top indexing robots optimized some more.
  * reformatted queries

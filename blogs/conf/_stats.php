@@ -30,8 +30,8 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * @global array
  */
 $self_referer_list = array(
-	substr( $baseurl, 0, strlen($baseurl)-1 ),	// Remove tailing slash
-	// TODO: use a more general auto-entry for $baseurl, like 'www.example.com' instead of 'http://www.example.com' (https) (+ remove subdomain?)
+	'://'.$basehost,			// This line will match all pages from your the host of your $baseurl
+	'://www.'.$basehost,	// This line will also match www.you_base_host in case you have no www. on your basehost
 	'http://localhost',
 	'http://127.0.0.1',
 );
@@ -159,7 +159,12 @@ $user_agents = array(
 	array('robot', 'The World as a Blog ', 'The World as a Blog' ),
 	array('robot', 'daypopbot/ ', 'DayPop' ),
 	array('robot', 'Bitacle bot/', 'Bitacle' ),
+	array('robot', 'Sphere Scout', 'Sphere Scout' ),
+	array('robot', 'Gigabot/', 'Gigablast (Gigabot)' ),
+	// Unknown robots:
+	array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:
+	array('aggregator', 'AppleSyndication/', 'Safari RSS (AppleSyndication)' ),
 	array('aggregator', 'Feedreader', 'Feedreader' ),
 	array('aggregator', 'Syndirella/',	'Syndirella' ),
 	array('aggregator', 'rssSearch Harvester/', 'rssSearch Harvester' ),
