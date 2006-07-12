@@ -73,40 +73,42 @@ class calendar_plugin extends Plugin
 	 * Event handler: SkinTag
 	 *
 	 * @param array Associative array of parameters. Valid keys are:
-	 *                - 'block_start' : (Default: '<div class="bSideItem">')
-	 *                - 'block_end' : (Default: '</div>')
-	 *                - 'title' : (Default: '<h3>'.T_('Calendar').'</h3>')
-	 *                - 'displaycaption'
-	 *                - 'monthformat'
-	 *                - 'linktomontharchive'
-	 *                - 'tablestart'
-	 *                - 'tableend'
-	 *                - 'monthstart'
-	 *                - 'monthend'
-	 *                - 'rowstart'
-	 *                - 'rowend'
-	 *                - 'headerdisplay'
-	 *                - 'headerrowstart'
-	 *                - 'headerrowend'
-	 *                - 'headercellstart'
-	 *                - 'headercellend'
-	 *                - 'cellstart'
-	 *                - 'cellend'
-	 *                - 'linkpostcellstart'
-	 *                - 'linkposttodaycellstart'
-	 *                - 'todaycellstart'
-	 *                - 'todaycellstartpost'
-	 *                - 'navigation' : Where do we want to have the navigation arrows? (Default: 'tfoot')
-	 *                - 'browseyears' : boolean  Do we want arrows to move one year at a time?
-	 *                - 'postcount_month_cell'
-	 *                - 'postcount_month_cell_one'
-	 *                - 'postcount_month_atitle'
-	 *                - 'postcount_month_atitle_one'
-	 *                - 'postcount_year_cell'
-	 *                - 'postcount_year_cell_one'
-	 *                - 'postcount_year_atitle'
-	 *                - 'postcount_year_atitle_one'
-	 *                - 'link_type' : 'canonic'|'context' (default: canonic)
+	 *      - 'block_start' : (Default: '<div class="bSideItem">')
+	 *      - 'block_end' : (Default: '</div>')
+	 *      - 'title' : (Default: '<h3>'.T_('Calendar').'</h3>')
+	 *      - 'displaycaption'
+	 *      - 'monthformat'
+	 *      - 'linktomontharchive'
+	 *      - 'tablestart'
+	 *      - 'tableend'
+	 *      - 'monthstart'
+	 *      - 'monthend'
+	 *      - 'rowstart'
+	 *      - 'rowend'
+	 *      - 'headerdisplay'
+	 *      - 'headerrowstart'
+	 *      - 'headerrowend'
+	 *      - 'headercellstart'
+	 *      - 'headercellend'
+	 *      - 'cellstart'
+	 *      - 'cellend'
+	 *      - 'linkpostcellstart'
+	 *      - 'linkposttodaycellstart'
+	 *      - 'todaycellstart'
+	 *      - 'todaycellstartpost'
+	 *      - 'navigation' : Where do we want to have the navigation arrows? (Default: 'tfoot')
+	 *      - 'browseyears' : boolean  Do we want arrows to move one year at a time?
+	 * 			- 'min_browse' : Minimum timestamp the user can browse too or 'query' (Default: 2000-01-01)
+	 * 			- 'max_browse' : Maximum timestamp the user can browse too or 'query' (Default: now + 1 year )
+	 *      - 'postcount_month_cell'
+	 *      - 'postcount_month_cell_one'
+	 *      - 'postcount_month_atitle'
+	 *      - 'postcount_month_atitle_one'
+	 *      - 'postcount_year_cell'
+	 *      - 'postcount_year_cell_one'
+	 *      - 'postcount_year_atitle'
+	 *      - 'postcount_year_atitle_one'
+	 *      - 'link_type' : 'canonic'|'context' (default: canonic)
 	 * @return boolean did we display?
 	 */
 	function SkinTag( $params )
@@ -130,9 +132,10 @@ class calendar_plugin extends Plugin
 			$params['title'] = '<h3>'.T_('Calendar').'</h3>';
 
 
-		$Calendar = & new Calendar( $m );
+		$Calendar = & new Calendar( $m, $params );
 
 		// TODO: automate with a table inside of Calendatr object. Table should also contain descriptions and default values to display in help screen.
+		// Note: minbrowse and maxbrowe already work this way.
 		if( isset($params['displaycaption']) ) $Calendar->set( 'displaycaption', $params['displaycaption'] );
 		if( isset($params['monthformat']) ) $Calendar->set( 'monthformat', $params['monthformat'] );
 		if( isset($params['linktomontharchive']) ) $Calendar->set( 'linktomontharchive', $params['linktomontharchive'] );
@@ -291,6 +294,7 @@ class Calendar
 	var $link_type;
 	var $context_isolation;
 
+	var $params = array( );
 
 	/**
 	 * Calendar::Calendar(-)
@@ -298,8 +302,11 @@ class Calendar
 	 * Constructor
 	 *
 	 * @param string Month ('YYYYMM'), year ('YYYY'), current ('')
+	 * @param array Associative array of parameters. Valid keys are:
+	 * 			- 'min_browse' : Minimum timestamp the user can browse too or 'query' (Default: 2000-01-01)
+	 * 			- 'max_browse' : Maximum timestamp the user can browse too or 'query' (Default: now + 1 year )
 	 */
-	function Calendar( $m = '' )
+	function Calendar( $m = '', $params = array() )
 	{
 		global $Settings, $localtimenow;
 
@@ -411,6 +418,19 @@ class Calendar
 		$this->link_type = 'canonic';
 		$this->context_isolation = 'm,w,p,title,unit,dstart';
 
+		// New style params:
+		$this->params = $params;
+
+		// Default values:
+		if( empty( $this->params['min_timestamp'] ) )
+		{	// 2000-01-01:
+			$this->params['min_timestamp'] = mktime( 0, 0, 0, 1, 1, 2000 );
+		}
+		if( empty( $this->params['max_timestamp'] ) )
+		{	// Now + 1 year:
+			$this->params['max_timestamp'] = mktime( 23, 59, 59, date( 'm', $localtimenow  ),  date( 'd ', $localtimenow ),  date( 'Y', $localtimenow )+1 );
+		}
+
 	}
 
 
@@ -478,34 +498,12 @@ class Calendar
 			// echo date( locale_datefmt(), $datestartofmonth );
 			$calendarblah = get_weekstartend( $datestartofmonth, locale_startofweek() );
 			$calendarfirst = $calendarblah['start'];
-/*			if(date('w', $datestartofmonth) == locale_startofweek())
-			{
-				$calendarfirst = $calendarblah['start'] + 1; // ???
-			}
-			else
-			{
-				$calendarfirst = $calendarblah['end'] - 604799; // ???
-			}
-*/
-//			pre_dump( 'calendarfirst', date('Y-m-d', $calendarfirst) );
-
 
 
 			$dateendofmonth = mktime(0, 0, 0, $this->month, $daysinmonth, $this->year);
 			// echo date( locale_datefmt(), $dateendofmonth );
 			$calendarblah = get_weekstartend( $dateendofmonth, locale_startofweek() );
 			$calendarlast = $calendarblah['end'];
-
-/*			if(date('w', $dateendofmonth) == $end_of_week)
-			{
-				$calendarlast = $calendarblah['start'] + 1;
-			}
-			else
-			{
-				$calendarlast = $calendarblah['end'] + 10000;
-			}
-*/
-//			pre_dump( 'calendarlast', date('Y-m-d', $calendarlast) );
 
 
 			// here the offset bug is corrected
@@ -828,15 +826,16 @@ class Calendar
 	/**
 	 * Get links to navigate between month / year.
 	 *
-	 * @todo fplanque>> I think there's a query-waste-fest going on inside here!
-	 * @todo fplanque>> Poor factorization.
+	 * Unless 'query' has been specified, this will not do any (time consuming!) queries to check where the posts are.
 	 *
 	 * @param string 'prev' / 'next'
 	 * @return array
 	 */
 	function getNavLinks( $direction )
 	{
-		global $DB;
+		global $DB, $localtimenow;
+
+		//pre_dump( 'get_nav_links', $direction );
 
 		$r = array();
 
@@ -856,124 +855,205 @@ class Calendar
 		switch( $direction )
 		{
 			case 'prev':
+				//pre_dump( $this->params['min_timestamp'] );
+				$r[] = '';
+
+				/*
+				 * << (PREV YEAR)
+				 */
 				if( $this->browseyears )
 				{	// We want arrows to move one year at a time
+ 					if( $this->params['min_timestamp'] == 'query' )
+					{	// Let's query to find the correct year:
+ 						if( $row = $DB->get_row(
+								'SELECT YEAR('.$this->dbprefix.'datestart) AS year,
+												MONTH('.$this->dbprefix.'datestart) AS month
+									FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
+										INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+									WHERE YEAR('.$this->dbprefix.'datestart) < '.$this->year.'
+									'.$nav_ItemQuery->get_where( ' AND ' )
+									.$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
+									ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, ABS( '.intval($this->month).' - MONTH('.$this->dbprefix.'datestart) ) ASC
+									LIMIT 1', OBJECT, 0, 'Calendar: find prev year with posts' )
+							)
+						{
+							$prev_year_year = $row->year;
+							$prev_year_month = $row->month;
+						}
+					}
+					else
+					{ // Let's see if the previous year is in the desired navigation range:
+						$prev_year_ts = mktime( 0, 0, 0, $this->month,  date( 'd ', $localtimenow ),  $this->year-1 );
+						if( $prev_year_ts >= $this->params['min_timestamp'] )
+						{
+							$prev_year_year = date( 'Y', $prev_year_ts );
+							$prev_year_month = date( 'm', $prev_year_ts );
+						}
+					}
+				}
+
+				if( !empty($prev_year_year) )
+				{	// We have a link to display:
+					$r[] = '<a href="'.$this->archive_link( $prev_year_year, ($this->mode == 'month') ? $prev_year_month : '', '', '' )
+									.'" title="'.sprintf(
+												( $this->mode == 'month'
+														? /* Calendar link title to a month in a previous year */ T_('Previous year (%04d-%02d)')
+														: /* Calendar link title to a previous year */ T_('Previous year (%04d)') ),
+												$prev_year_year, $prev_year_month )
+									.'">&lt;&lt;</a>';
+				}
+
+
+				/*
+				 * < (PREV MONTH)
+				 */
+				if( $this->mode == 'month' )
+				{ // We are browsing months, we'll display arrows to move one month at a time:
+ 					if( $this->params['min_timestamp'] == 'query' )
+					{	// Let's query to find the correct month:
+						if( $row = $DB->get_row(
+								'SELECT MONTH('.$this->dbprefix.'datestart) AS month,
+												YEAR('.$this->dbprefix.'datestart) AS year
+								FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
+									INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+								WHERE
+								(
+									YEAR('.$this->dbprefix.'datestart) < '.($this->year).'
+									OR ( YEAR('.$this->dbprefix.'datestart) = '.($this->year).'
+												AND MONTH('.$this->dbprefix.'datestart) < '.($this->month).'
+											)
+								)
+								'.$nav_ItemQuery->get_where( ' AND ' )
+								 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
+								ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, MONTH('.$this->dbprefix.'datestart) DESC
+								LIMIT 1',
+								OBJECT,
+								0,
+								'Calendar: Find prev month with posts' )
+							)
+						{
+							$prev_month_year = $row->year;
+							$prev_month_month = $row->month;
+						}
+					}
+					else
+					{ // Let's see if the previous month is in the desired navigation range:
+						$prev_month_ts = mktime( 0, 0, 0, $this->month-1,  date( 'd ', $localtimenow ),  $this->year );
+						if( $prev_month_ts >= $this->params['min_timestamp'] )
+						{
+							$prev_month_year = date( 'Y', $prev_month_ts );
+							$prev_month_month = date( 'm', $prev_month_ts );
+						}
+					}
+				}
+
+				if( !empty($prev_month_year) )
+				{	// We have a link to display:
+					$r[] = '<a href="'
+									.$this->archive_link( $prev_month_year, $prev_month_month, '', '' )
+									.'" title="'.sprintf( T_('Previous month (%04d-%02d)'), $prev_month_year, $prev_month_month ).'">&lt;</a>';
+				}
+				break;
+
+
+			case 'next':
+				//pre_dump( $this->params['max_timestamp'] );
+
+				/*
+				 * > (NEXT MONTH)
+				 */
+				if( $this->mode == 'month' )
+				{ // We are browsing months, we'll display arrows to move one month at a time:
+ 					if( $this->params['max_timestamp'] == 'query' )
+					{	// Let's query to find the correct month:
+						if( $row = $DB->get_row(
+								'SELECT MONTH('.$this->dbprefix.'datestart) AS month,
+												YEAR('.$this->dbprefix.'datestart) AS year
+								FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
+									INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+								WHERE
+								(
+									YEAR('.$this->dbprefix.'datestart) > '.($this->year).'
+									OR ( YEAR('.$this->dbprefix.'datestart) = '.($this->year).'
+												AND MONTH('.$this->dbprefix.'datestart) > '.($this->month).'
+											)
+								)
+                '.$nav_ItemQuery->get_where( ' AND ' )
+ 								 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
+								ORDER BY YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart) ASC
+								LIMIT 1',
+								OBJECT,
+								0,
+								'Calendar: Find next month with posts' )
+							)
+						{
+							$next_month_year = $row->year;
+							$next_month_month = $row->month;
+						}
+					}
+					else
+					{ // Let's see if the next month is in the desired navigation range:
+						$next_month_ts = mktime( 0, 0, 0, $this->month+1,  date( 'd ', $localtimenow ),  $this->year );
+						if( $next_month_ts <= $this->params['max_timestamp'] )
+						{
+							$next_month_year = date( 'Y', $next_month_ts );
+							$next_month_month = date( 'm', $next_month_ts );
+						}
+					}
+				}
+
+				if( !empty($next_month_year) )
+				{	// We have a link to display:
+					$r[] = '<a href="'
+									.$this->archive_link( $next_month_year, $next_month_month, '', '' )
+									.'" title="'.sprintf( T_('Next month (%04d-%02d)'), $next_month_year, $next_month_month ).'">&gt;</a>';
+				}
+
+
+				/*
+				 * >> (NEXT YEAR)
+				 */
+				if( $this->browseyears )
+				{ // We want arrows to move one year at a time
+ 					if( $this->params['max_timestamp'] == 'query' )
+					{	// Let's query to find the correct year:
 					if( $row = $DB->get_row(
 							'SELECT YEAR('.$this->dbprefix.'datestart) AS year,
 											MONTH('.$this->dbprefix.'datestart) AS month
 								FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 									INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-								WHERE YEAR('.$this->dbprefix.'datestart) < '.$this->year.'
-								'.$nav_ItemQuery->get_where( ' AND ' )
-								.$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
-								ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, ABS( '.intval($this->month).' - MONTH('.$this->dbprefix.'datestart) ) ASC
-								LIMIT 1', OBJECT, 0, 'Calendar: find prev year with posts' )
+								WHERE YEAR('.$this->dbprefix.'datestart) > '.$this->year.'
+                '.$nav_ItemQuery->get_where( ' AND ' )
+								 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
+								ORDER BY YEAR('.$this->dbprefix.'datestart) ASC, ABS( '.intval($this->month).' - MONTH('.$this->dbprefix.'datestart) ) ASC
+								LIMIT 1', OBJECT, 0, 'Calendar: find next year with posts' )
 						)
-					{
-						$r[] = '<a href="'
-										.$this->archive_link( $row->year, ($this->mode == 'month') ? $row->month : '', '', '' )
+						{
+							$next_year_year = $row->year;
+							$next_year_month = $row->month;
+						}
+					}
+					else
+					{ // Let's see if the next year is in the desired navigation range:
+						$next_year_ts = mktime( 0, 0, 0, $this->month,  date( 'd ', $localtimenow ),  $this->year+1 );
+						if( $next_year_ts <= $this->params['max_timestamp'] )
+						{
+							$next_year_year = date( 'Y', $next_year_ts );
+							$next_year_month = date( 'm', $next_year_ts );
+						}
+					}
+
+ 				if( !empty($next_year_year) )
+				{	// We have a link to display:
+						$r[] = '<a href="'.$this->archive_link( $next_year_year, ($this->mode == 'month') ? $next_year_month : '', '', '' )
 										.'" title="'.sprintf(
 																	( $this->mode == 'month'
-																			? /* Calendar link title to a month in a previous year with posts */ T_('Previous year (%04d-%02d)')
-																			: /* Calendar link title to a previous year with posts */ T_('Previous year (%04d)') ),
-																	$row->year, $row->month )
-										.'">&lt;&lt;</a>';
-					}
- 					else $r[] = '';
-				}
-				else $r[] = '';
-
-				if( $this->mode == 'month' )
-				{ // We are browsing months, we'll display arrows to move one month at a time:
-					if( $row = $DB->get_row(
-							'SELECT MONTH('.$this->dbprefix.'datestart) AS month,
-											YEAR('.$this->dbprefix.'datestart) AS year
-							FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
-								INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-							WHERE
-							(
-								YEAR('.$this->dbprefix.'datestart) < '.($this->year).'
-								OR ( YEAR('.$this->dbprefix.'datestart) = '.($this->year).'
-											AND MONTH('.$this->dbprefix.'datestart) < '.($this->month).'
-										)
-							)
-							'.$nav_ItemQuery->get_where( ' AND ' )
-							 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
-							ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, MONTH('.$this->dbprefix.'datestart) DESC
-							LIMIT 1',
-							OBJECT,
-							0,
-							'Calendar: Find prev month with posts' )
-						)
-					{
-						$r[] = '<a href="'
-										.$this->archive_link( $row->year, $row->month, '', '' )
-										.'" title="'.sprintf( T_('Previous month (%04d-%02d)'), $row->year, $row->month ).'">&lt;</a>';
-					}
-					else $r[] = '';
-				}
-				else $r[] = '';
-				break;
-
-
-			case 'next':
-				$r[] = '';
-
-				if( $this->mode == 'month' )
-				{ // We are browsing months, we'll display arrows to move one month at a time:
-					if( $row = $DB->get_row( 'SELECT MONTH('.$this->dbprefix.'datestart) AS month,
-																								YEAR('.$this->dbprefix.'datestart) AS year
-																				FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
-																					INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-																				WHERE
-																				(
-																					YEAR('.$this->dbprefix.'datestart) > '.($this->year).'
-																					OR ( YEAR('.$this->dbprefix.'datestart) = '.($this->year).'
-																								AND MONTH('.$this->dbprefix.'datestart) > '.($this->month).'
-																							)
-																				)
-                     										'.$nav_ItemQuery->get_where( ' AND ' )
- 																				 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
-																				ORDER BY YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart) ASC
-																				LIMIT 1',
-																				OBJECT,
-																				0,
-																				'Calendar: Find next month with posts' )
-						)
-					{
-						$r[] = '<a href="'
-										.$this->archive_link( $row->year, $row->month, '', '' )
-										.'" title="'.sprintf( T_('Next month (%04d-%02d)'), $row->year, $row->month ).'">&gt;</a>';
-					}
-					else $r[] = '';
-				}
-				else $r[] = '';
-
-				if( $this->browseyears )
-				{ // We want arrows to move one year at a time
-					if( $row = $DB->get_row( 'SELECT YEAR('.$this->dbprefix.'datestart) AS year,
-																							MONTH('.$this->dbprefix.'datestart) AS month
-																				FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
-																					INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-																				WHERE YEAR('.$this->dbprefix.'datestart) > '.$this->year.'
-                     										'.$nav_ItemQuery->get_where( ' AND ' )
-																				 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
-																				ORDER BY YEAR('.$this->dbprefix.'datestart) ASC, ABS( '.intval($this->month).' - MONTH('.$this->dbprefix.'datestart) ) ASC
-																				LIMIT 1', OBJECT, 0, 'Calendar: find next year with posts' )
-						)
-					{
-						$r[] = '<a href="'
-										.$this->archive_link( $row->year, ($this->mode == 'month') ? $row->month : '', '', '' )
-										.'" title="'.sprintf(
-																	( $this->mode == 'month'
-																			? /* Calendar link title to a month in a following year with posts */ T_('Next year (%04d-%02d)')
-																			: /* Calendar link title to a following year with posts */ T_('Next year (%04d)') ),
-																	$row->year, $row->month )
+																			? /* Calendar link title to a month in a following year */ T_('Next year (%04d-%02d)')
+																			: /* Calendar link title to a following year */ T_('Next year (%04d)') ),
+																	$next_year_year, $next_year_month )
 										.'">&gt;&gt;</a>';
 					}
-					else $r[] = '';
 				}
-				else $r[] = '';
 				break;
 		}
 
@@ -984,6 +1064,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.23  2006/07/12 15:40:50  fplanque
+ * save 4 expensive queries
+ *
  * Revision 1.22  2006/07/10 20:19:30  blueyed
  * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
  *
