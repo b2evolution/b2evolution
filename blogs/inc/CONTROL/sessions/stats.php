@@ -69,8 +69,8 @@ function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
 	return '<a href="'.$full_url.'">'.$hit_uri.'</a>';
 }
 
-
-$AdminUI->set_path( 'stats', param( 'tab', 'string', 'summary', true ) );
+$tab = param( 'tab', 'string', 'summary', true );
+$AdminUI->set_path( 'stats', $tab );
 $AdminUI->title = T_('View Stats for Blog:');
 
 param( 'action', 'string' );
@@ -154,6 +154,11 @@ $AdminUI->disp_payload_begin();
 
 switch( $AdminUI->get_path(1) )
 {
+	case 'sessions':
+		// Display VIEW:
+		$AdminUI->disp_view( 'sessions/_stats_sessions.view.php' );
+		break;
+
 	case 'summary':
 		// Display VIEW:
 		$AdminUI->disp_view( 'sessions/_stats_summary.view.php' );
@@ -193,6 +198,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2006/07/12 20:18:20  fplanque
+ * session stats + minor enhancements
+ *
  * Revision 1.28  2006/07/12 18:07:06  fplanque
  * splitted stats into different views
  *

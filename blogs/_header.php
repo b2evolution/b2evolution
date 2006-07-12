@@ -191,7 +191,7 @@ $AdminUI->add_menu_entries(
 				'href' => 'admin.php?ctrl=stats',
 				'entries' => array(
 					'summary' => array(
-						'text' => T_('Summary'),
+						'text' => T_('Hit summary'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;blog='.$blog ),
 					'other' => array(
 						'text' => T_('Direct accesses'),
@@ -208,6 +208,9 @@ $AdminUI->add_menu_entries(
 					'useragents' => array(
 						'text' => T_('User agents'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=useragents&amp;blog='.$blog ),
+					'sessions' => array(
+						'text' => T_('Sessions'),
+						'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;blog='.$blog ),
 				)
 			),
 
@@ -307,6 +310,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.12  2006/07/12 20:18:19  fplanque
+ * session stats + minor enhancements
+ *
  * Revision 1.11  2006/07/08 22:48:23  blueyed
  * Integrated "simple edit form".
  *

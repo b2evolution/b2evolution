@@ -310,6 +310,20 @@ table.filelist tr.listfooter td {
 	background-color: #efede0;
 }
 
+/* Table totals: tr */
+table.grouped tr.total {
+	border-bottom: 1px solid #9e9286;
+	border-left: 1px solid #9e9286;
+	border-right: 1px solid #9e9286;
+	background-color: #efede0;
+	white-space: nowrap;
+}
+
+table.grouped tr.total td{
+	border-top: 1px solid #9e9286;
+	white-space: nowrap;
+}
+
 /* / Results tables */
 
 

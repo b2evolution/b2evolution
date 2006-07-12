@@ -28,7 +28,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $blog, $admin_url;
 
 
-echo '<h2>'.T_('Summary').'</h2>';
+echo '<h2>'.T_('Hit summary').'</h2>';
 
 // fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
 // Bug report: http://lists.mysql.com/bugs/36
@@ -94,9 +94,9 @@ if( count($res_hits) )
 	}
 
 	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
-	array_unshift( $chart[ 'chart_data' ][ 1 ], 'Direct Accesses' );	// Translations need to be UTF-8
+	array_unshift( $chart[ 'chart_data' ][ 1 ], 'Direct accesses' );	// Translations need to be UTF-8
 	array_unshift( $chart[ 'chart_data' ][ 2 ], 'Referers' );
-	array_unshift( $chart[ 'chart_data' ][ 3 ], 'Refering Searches' );
+	array_unshift( $chart[ 'chart_data' ][ 3 ], 'Refering searches' );
 	array_unshift( $chart[ 'chart_data' ][ 4 ], 'Self referred' );
 	array_unshift( $chart[ 'chart_data' ][ 5 ], 'Blacklisted' );
 	array_unshift( $chart[ 'chart_data' ][ 6 ], 'Admin' );
@@ -134,7 +134,7 @@ if( count($res_hits) )
 					'y'        => 6,
 					'width'    => 700,
 					'height'   => 50,
-					'text'     => 'Access summary', // Needs UTF-8
+					'text'     => 'Hit summary', // Needs UTF-8
 					'h_align'  => "right",
 					'v_align'  => "bottom" ),
 			);
@@ -248,15 +248,15 @@ if( count($res_hits) )
 	<table class="grouped" cellspacing="0">
 		<tr>
 			<th class="firstcol"><?php echo T_('Date') ?></th>
-			<th><?php echo T_('Direct Accesses') ?></th>
+			<th><?php echo T_('Direct accesses') ?></th>
 			<th><?php echo T_('Referers') ?></th>
-			<th><?php echo T_('Refering Searches') ?></th>
+			<th><?php echo T_('Refering searches') ?></th>
 			<th><?php echo T_('Self referred') ?></th>
 			<th><?php
 			// TODO: should be renamed for more clarity (because this is not Spam)
 			echo T_('Blacklisted') ?></th>
 			<th><?php echo T_('Admin') ?></th>
-			<th><?php echo T_('Total') ?></th>
+			<th class="lastcol"><?php echo T_('Total') ?></th>
 		</tr>
 		<?php
 		$count = 0;
@@ -267,8 +267,8 @@ if( count($res_hits) )
 			if( $last_date != $this_date )
 			{ // We just hit a new day, let's display the previous one:
 				?>
-				<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
-					<td class="firstcol"><?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+				<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
+					<td class="firstcol"><?php if( $current_User->check_perm( 'stats', 'edit' ) )
 						{
 							echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog ) );
 						}
@@ -280,7 +280,7 @@ if( count($res_hits) )
 					<td class="right"><?php echo $hits['self'] ?></td>
 					<td class="right"><?php echo $hits['blacklist'] ?></td>
 					<td class="right"><?php echo $hits['admin'] ?></td>
-					<td class="right"><?php echo array_sum($hits) ?></td>
+					<td class="lastcol right"><?php echo array_sum($hits) ?></td>
 				</tr>
 				<?php
 					$hits = array(
@@ -303,7 +303,7 @@ if( count($res_hits) )
 		if( $last_date != 0 )
 		{ // We had a day pending:
 			?>
-			<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
+				<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
 				<td class="firstcol"><?php if( $current_User->check_perm( 'stats', 'edit' ) )
 					{
 						echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog ) );
@@ -316,7 +316,7 @@ if( count($res_hits) )
 				<td class="right"><?php echo $hits['self'] ?></td>
 				<td class="right"><?php echo $hits['blacklist'] ?></td>
 				<td class="right"><?php echo $hits['admin'] ?></td>
-				<td class="right"><?php echo array_sum($hits) ?></td>
+				<td class="lastcol right"><?php echo array_sum($hits) ?></td>
 			</tr>
 			<?php
 		}
@@ -332,7 +332,7 @@ if( count($res_hits) )
 		<td class="right"><?php echo $hits_total['self'] ?></td>
 		<td class="right"><?php echo $hits_total['blacklist'] ?></td>
 		<td class="right"><?php echo $hits_total['admin'] ?></td>
-		<td class="right"><?php echo array_sum($hits_total) ?></td>
+		<td class="lastcol right"><?php echo array_sum($hits_total) ?></td>
 		</tr>
 
 	</table>
@@ -341,6 +341,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.2  2006/07/12 20:18:20  fplanque
+ * session stats + minor enhancements
+ *
  * Revision 1.1  2006/07/12 18:07:06  fplanque
  * splitted stats into different views
  *
