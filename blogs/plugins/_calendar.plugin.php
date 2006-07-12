@@ -220,7 +220,7 @@ class calendar_plugin extends Plugin
 		// DISPLAY:
 		$Calendar->display( );
 
- 		echo $params['block_end'];
+		echo $params['block_end'];
 
 		return true;
 	}
@@ -428,7 +428,7 @@ class Calendar
 		}
 		if( empty( $this->params['max_timestamp'] ) )
 		{	// Now + 1 year:
-			$this->params['max_timestamp'] = mktime( 23, 59, 59, date( 'm', $localtimenow  ),  date( 'd ', $localtimenow ),  date( 'Y', $localtimenow )+1 );
+			$this->params['max_timestamp'] = mktime( 23, 59, 59, date( 'm', $localtimenow  ),  date( 'd', $localtimenow ),  date( 'Y', $localtimenow )+1 );
 		}
 
 	}
@@ -863,9 +863,9 @@ class Calendar
 				 */
 				if( $this->browseyears )
 				{	// We want arrows to move one year at a time
- 					if( $this->params['min_timestamp'] == 'query' )
+					if( $this->params['min_timestamp'] == 'query' )
 					{	// Let's query to find the correct year:
- 						if( $row = $DB->get_row(
+						if( $row = $DB->get_row(
 								'SELECT YEAR('.$this->dbprefix.'datestart) AS year,
 												MONTH('.$this->dbprefix.'datestart) AS month
 									FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
@@ -883,7 +883,7 @@ class Calendar
 					}
 					else
 					{ // Let's see if the previous year is in the desired navigation range:
-						$prev_year_ts = mktime( 0, 0, 0, $this->month,  date( 'd ', $localtimenow ),  $this->year-1 );
+						$prev_year_ts = mktime( 0, 0, 0, $this->month,  date( 'd', $localtimenow ),  $this->year-1 );
 						if( $prev_year_ts >= $this->params['min_timestamp'] )
 						{
 							$prev_year_year = date( 'Y', $prev_year_ts );
@@ -909,7 +909,7 @@ class Calendar
 				 */
 				if( $this->mode == 'month' )
 				{ // We are browsing months, we'll display arrows to move one month at a time:
- 					if( $this->params['min_timestamp'] == 'query' )
+					if( $this->params['min_timestamp'] == 'query' )
 					{	// Let's query to find the correct month:
 						if( $row = $DB->get_row(
 								'SELECT MONTH('.$this->dbprefix.'datestart) AS month,
@@ -938,7 +938,7 @@ class Calendar
 					}
 					else
 					{ // Let's see if the previous month is in the desired navigation range:
-						$prev_month_ts = mktime( 0, 0, 0, $this->month-1,  date( 'd ', $localtimenow ),  $this->year );
+						$prev_month_ts = mktime( 0, 0, 0, $this->month-1,  date( 'd', $localtimenow ),  $this->year );
 						if( $prev_month_ts >= $this->params['min_timestamp'] )
 						{
 							$prev_month_year = date( 'Y', $prev_month_ts );
@@ -964,7 +964,7 @@ class Calendar
 				 */
 				if( $this->mode == 'month' )
 				{ // We are browsing months, we'll display arrows to move one month at a time:
- 					if( $this->params['max_timestamp'] == 'query' )
+					if( $this->params['max_timestamp'] == 'query' )
 					{	// Let's query to find the correct month:
 						if( $row = $DB->get_row(
 								'SELECT MONTH('.$this->dbprefix.'datestart) AS month,
@@ -978,8 +978,8 @@ class Calendar
 												AND MONTH('.$this->dbprefix.'datestart) > '.($this->month).'
 											)
 								)
-                '.$nav_ItemQuery->get_where( ' AND ' )
- 								 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
+								'.$nav_ItemQuery->get_where( ' AND ' )
+								 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
 								ORDER BY YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart) ASC
 								LIMIT 1',
 								OBJECT,
@@ -993,7 +993,7 @@ class Calendar
 					}
 					else
 					{ // Let's see if the next month is in the desired navigation range:
-						$next_month_ts = mktime( 0, 0, 0, $this->month+1,  date( 'd ', $localtimenow ),  $this->year );
+						$next_month_ts = mktime( 0, 0, 0, $this->month+1,  date( 'd', $localtimenow ),  $this->year );
 						if( $next_month_ts <= $this->params['max_timestamp'] )
 						{
 							$next_month_year = date( 'Y', $next_month_ts );
@@ -1015,7 +1015,7 @@ class Calendar
 				 */
 				if( $this->browseyears )
 				{ // We want arrows to move one year at a time
- 					if( $this->params['max_timestamp'] == 'query' )
+					if( $this->params['max_timestamp'] == 'query' )
 					{	// Let's query to find the correct year:
 					if( $row = $DB->get_row(
 							'SELECT YEAR('.$this->dbprefix.'datestart) AS year,
@@ -1023,7 +1023,7 @@ class Calendar
 								FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 									INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 								WHERE YEAR('.$this->dbprefix.'datestart) > '.$this->year.'
-                '.$nav_ItemQuery->get_where( ' AND ' )
+								 '.$nav_ItemQuery->get_where( ' AND ' )
 								 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
 								ORDER BY YEAR('.$this->dbprefix.'datestart) ASC, ABS( '.intval($this->month).' - MONTH('.$this->dbprefix.'datestart) ) ASC
 								LIMIT 1', OBJECT, 0, 'Calendar: find next year with posts' )
@@ -1035,7 +1035,7 @@ class Calendar
 					}
 					else
 					{ // Let's see if the next year is in the desired navigation range:
-						$next_year_ts = mktime( 0, 0, 0, $this->month,  date( 'd ', $localtimenow ),  $this->year+1 );
+						$next_year_ts = mktime( 0, 0, 0, $this->month,  date( 'd', $localtimenow ),  $this->year+1 );
 						if( $next_year_ts <= $this->params['max_timestamp'] )
 						{
 							$next_year_year = date( 'Y', $next_year_ts );
@@ -1043,7 +1043,7 @@ class Calendar
 						}
 					}
 
- 				if( !empty($next_year_year) )
+				if( !empty($next_year_year) )
 				{	// We have a link to display:
 						$r[] = '<a href="'.$this->archive_link( $next_year_year, ($this->mode == 'month') ? $next_year_month : '', '', '' )
 										.'" title="'.sprintf(
@@ -1064,6 +1064,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.24  2006/07/12 22:09:49  blueyed
+ * Fixed "Notice: A non well formed numeric value encountered" notices + whitespace
+ *
  * Revision 1.23  2006/07/12 15:40:50  fplanque
  * save 4 expensive queries
  *
