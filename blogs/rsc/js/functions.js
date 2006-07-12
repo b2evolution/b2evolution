@@ -163,6 +163,11 @@ function toggle_clickopen( id, hide, displayVisible )
  */
 function textarea_replace_selection( myField, snippet, target_document )
 {
+	if( b2evo_Callbacks.trigger_callback( "insert_raw_into_"+myField.id, snippet ) )
+	{
+		return;
+	}
+
 	if (target_document.selection)
 	{ // IE support:
 		myField.focus();
