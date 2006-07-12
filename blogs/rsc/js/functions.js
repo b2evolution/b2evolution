@@ -303,3 +303,63 @@ function swapSection( data )
 		swappableSection.innerHTML = data;
 	}
 }
+
+
+/*
+ * Javascript callback handling, for helping plugins to interact in Javascript.
+ *
+ * This is, so one plugin (e.g. the tinymce_plugin) can say that it handles insertion of raw
+ * content into a specific element ("itemform_post_content" in this case):
+ *
+ * <code>
+ * if( typeof b2evo_Callbacks == "object" )
+ * { // add a callback, that lets us insert the
+ *   b2evo_Callbacks.register_callback( "insert_raw_into_itemform_post_content", function(value) {
+ *       tinyMCE.execCommand( "mceInsertRawHTML", false, value );
+ *       return true;
+ *     } );
+ * }
+ * </code>
+ *
+ * and others (e.g. the smilies_plugin or the youtube_plugin) should first try to use this
+ * callback to insert the HTML:
+ *
+ * if( typeof b2evo_Callbacks == 'object' )
+ * { // see if there's a callback registered that should handle this:
+ *   if( b2evo_Callbacks.trigger_callback("insert_raw_into_"+b2evoCanvas.id, tag) )
+ *   {
+ *     return;
+ *   }
+ * }
+ */
+function b2evo_Callbacks() {
+	this.eventHandlers = new Array();
+};
+
+b2evo_Callbacks.prototype = {
+	register_callback : function(event, f) {
+		if( typeof this.eventHandlers[event] == "undefined" )
+		{
+			this.eventHandlers[event] = new Array();
+		}
+		this.eventHandlers[event][this.eventHandlers[event].length] = f;
+	},
+
+	trigger_callback : function(event, value) {
+		if( typeof this.eventHandlers[event] == "undefined" )
+		{
+			return false;
+		}
+
+		var r = false;
+		for( var i = 0; i < this.eventHandlers[event].length; i++ )
+		{
+			var f = this.eventHandlers[event][i];
+			r = eval( "f(value);" ) || r;
+		}
+		return r;
+	},
+};
+
+var b2evo_Callbacks = new b2evo_Callbacks();
+

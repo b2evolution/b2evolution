@@ -138,6 +138,14 @@ class smilies_plugin extends Plugin
 		<script type="text/javascript">
 		function grin(tag)
 		{
+			if( typeof b2evo_Callbacks == 'object' )
+			{ // see if there's a callback registered that should handle this:
+				if( b2evo_Callbacks.trigger_callback("insert_raw_into_"+b2evoCanvas.id, tag) )
+				{
+					return;
+				}
+			}
+
 			var myField = b2evoCanvas;
 
 			if (document.selection) {
@@ -264,6 +272,9 @@ class smilies_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.26  2006/07/12 21:13:17  blueyed
+ * Javascript callback handler (e.g., for interaction of WYSIWYG editors with toolbar plugins)
+ *
  * Revision 1.25  2006/07/10 20:19:30  blueyed
  * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
  *

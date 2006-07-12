@@ -269,6 +269,25 @@ class quicktags_plugin extends Plugin
 		// insertion code
 		function b2evoInsertTag(myField, i)
 		{
+			if( typeof b2evo_Callbacks == 'object' )
+			{ // see if there's a callback registered that should handle this:
+				if (!b2evoCheckOpenTags(i) || b2evoButtons[i].tagEnd == '') {
+					if( b2evo_Callbacks.trigger_callback("insert_raw_into_"+myField.id, b2evoButtons[i].tagStart) )
+					{
+						b2evoAddTag(i);
+						return;
+					}
+				}
+				else {
+					if( b2evo_Callbacks.trigger_callback("insert_raw_into_"+myField.id, b2evoButtons[i].tagEnd) )
+					{
+						b2evoRemoveTag(i);
+						return;
+					}
+				}
+
+			}
+
 			//IE support
 			if (document.selection)
 			{
@@ -357,6 +376,14 @@ class quicktags_plugin extends Plugin
 		}
 
 		function b2evoInsertContent(myField, myValue) {
+			if( typeof b2evo_Callbacks == 'object' )
+			{ // see if there's a callback registered that should handle this:
+				if( b2evo_Callbacks.trigger_callback("insert_raw_into_"+myField.id, myValue) )
+				{
+					return;
+				}
+			}
+
 			//IE support
 			if (document.selection) {
 				myField.focus();
@@ -419,6 +446,9 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.22  2006/07/12 21:13:17  blueyed
+ * Javascript callback handler (e.g., for interaction of WYSIWYG editors with toolbar plugins)
+ *
  * Revision 1.21  2006/07/10 20:19:30  blueyed
  * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
  *
