@@ -850,10 +850,10 @@ class File extends DataObject
 			return '';
 		}
 
+		$this->load_meta();
+
 		if( $this->is_image() )
 		{ // Make an IMG link:
-			$this->load_meta();
-
 			$r = $before_image
 						.'<img src="'.$this->get_url().'" '
 						.'alt="'.$this->dget('alt', 'htmlattr').'" '
@@ -1336,6 +1336,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2006/07/12 20:17:13  fplanque
+ * minor
+ *
  * Revision 1.13  2006/07/07 22:48:26  blueyed
  * Fixed get_tag() to include meta data.
  *

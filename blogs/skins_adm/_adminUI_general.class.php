@@ -502,8 +502,9 @@ class AdminUI_general
 	 * than they ought to.
 	 *
 	 * @param string
+	 * @param array params to be used in the view (optional)
 	 */
-	function disp_view( $view_name, $view_params = array() /* does not get used */ )
+	function disp_view( $view_name, $view_params = array() )
 	{
 		global $view_path;
 
@@ -1307,6 +1308,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.25  2006/07/12 20:17:13  fplanque
+ * minor
+ *
  * Revision 1.24  2006/07/08 22:33:43  blueyed
  * Integrated "simple edit form".
  *

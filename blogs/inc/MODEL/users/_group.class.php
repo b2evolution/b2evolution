@@ -81,9 +81,9 @@ class Group extends DataObject
 			$this->set( 'name', T_('New group') );
 			$this->set( 'perm_admin', 'visible' );
 			$this->set( 'perm_blogs', 'user' );
-			$this->set( 'perm_stats', 'none' );
 			$this->set( 'perm_spamblacklist', 'none' );
 			$this->set( 'perm_templates', 0 );
+			$this->set( 'perm_stats', 'none' );
 			$this->set( 'perm_files', 'none' );
 			$this->set( 'perm_options', 'none' );
 			$this->set( 'perm_users', 'none' );
@@ -95,9 +95,9 @@ class Group extends DataObject
 			$this->name = $db_row->grp_name;
 			$this->perm_admin = $db_row->grp_perm_admin;
 			$this->perm_blogs = $db_row->grp_perm_blogs;
-			$this->perm_stats = $db_row->grp_perm_stats;
 			$this->perm_spamblacklist = $db_row->grp_perm_spamblacklist;
 			$this->perm_templates = $db_row->grp_perm_templates;
+			$this->perm_stats = $db_row->grp_perm_stats;
 			$this->perm_files = $db_row->grp_perm_files;
 			$this->perm_options = $db_row->grp_perm_options;
 			$this->perm_users = $db_row->grp_perm_users;
@@ -208,8 +208,8 @@ class Group extends DataObject
 				}
 				break;
 
-			case 'stats':
 			case 'spamblacklist':
+			case 'stats':
 			case 'options':
 			case 'files':
 			case 'users':
@@ -421,6 +421,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2006/07/12 20:17:13  fplanque
+ * minor
+ *
  * Revision 1.4  2006/04/21 17:05:08  blueyed
  * cleanup
  *
