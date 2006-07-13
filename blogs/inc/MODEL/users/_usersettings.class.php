@@ -59,6 +59,7 @@ class UserSettings extends AbstractSettings
 		'action_word_threshold' => 3,
 		'control_form_abortions' => 1,
 		'pref_browse_tab' => 'posts',
+		'pref_edit_tab' => 'expert',
 	);
 
 
@@ -139,7 +140,8 @@ class UserSettings extends AbstractSettings
 	 *
 	 * @todo Move this to _abstractsettings.class.php - the other Settings object can also make use of it!
 	 *
-	 * @param string Param and user setting name. Make sure this is unique.
+	 * @param string|array Param and user setting name (in this order, if passed as array).
+	 *                     Make sure the UserSettings name is unique!
 	 * @param string Force value type to one of:
 	 * - integer
 	 * - float
@@ -161,16 +163,27 @@ class UserSettings extends AbstractSettings
 	{
 		global $Request;
 
-		$value = $Request->param( $var, $type, NULL, $memorize, $override, false ); // we pass NULL here, to see if it got set at all
+		if( is_array($var) )
+		{
+			$param_name = $var[0];
+			$uset_name = $var[1];
+		}
+		else
+		{
+			$param_name = $var;
+			$uset_name = $var;
+		}
+
+		$value = $Request->param( $param_name, $type, NULL, $memorize, $override, false ); // we pass NULL here, to see if it got set at all
 
 		if( $value !== false )
 		{ // we got a value
-			$this->set( $var, $value );
+			$this->set( $uset_name, $value );
 			$this->dbupdate();
 		}
 		else
 		{ // get the value from user settings
-			$value = $this->get($var);
+			$value = $this->get($uset_name);
 
 			if( is_null($value) )
 			{ // it's not saved yet and there's not default defined ($_defaults)
@@ -178,14 +191,17 @@ class UserSettings extends AbstractSettings
 			}
 		}
 
-		$Request->set_param( $var, $value );
-		return $Request->get($var);
+		$Request->set_param( $param_name, $value );
+		return $Request->get($param_name);
 	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.12  2006/07/13 00:40:29  blueyed
+ * Fixed uset-name for pref. edit tab.
+ *
  * Revision 1.11  2006/04/20 17:21:46  blueyed
  * doc
  *

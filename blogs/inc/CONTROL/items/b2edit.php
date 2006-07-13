@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $AdminUI;
 
 // Get tab ("simple" or "expert") from Request or UserSettings:
-$UserSettings->param_Request( 'tab', 'string', 'expert', true /* memorize */ );
+$tab = $UserSettings->param_Request( array('tab', 'pref_edit_tab'), 'string', NULL, true /* memorize */ );
 
 $AdminUI->set_path( 'new', $tab );
 
