@@ -246,33 +246,30 @@ function clear_form( object )
  */	
 function focus_on_first_input()
 {
-	if( (first_form = document.forms[0] ) != false)
-	{	// There is a form in the document, so we get all inputs of the first form
-		all_inputs = first_form.getElementsByTagName( 'input' );
+	all_inputs = document.getElementsByTagName( 'input' );
 
-		if( all_inputs.length )
-		{ // There is at least one input
-			// Loop on all inputs to find the first input text
-			for( i = 0 ; i < all_inputs.length ; i++ )
-			{
-        	if( all_inputs[i].type == 'text'
-							&& all_inputs[i].disabled != true
-							)
-					{	// We found the first input text, so we focus on it
-						try
-						{	// Will fail in IE if element is not visible/displayed
-							all_inputs[i].focus();
-						}
-						catch( ex )
-						{
-						}
-						break;
-					}
-
+	if( all_inputs.length )
+	{ // There is at least one input
+		// Loop on all inputs to find the first input text
+		for( i = 0 ; i < all_inputs.length ; i++ )
+		{
+      if( all_inputs[i].type == 'text'
+					&& all_inputs[i].disabled != true
+					)
+			{	// We found the first input text, so we focus on it
+				try
+				{	// Will fail in IE if element is not visible/displayed
+					all_inputs[i].focus();
+				}
+				catch( ex )
+				{
+				}
+				break;
 			}
 		}
 	}
 }
+
 // This will be conditionnaly enabled by PHP:
 //addEvent( window, 'load', focus_on_first_input, false );
 
