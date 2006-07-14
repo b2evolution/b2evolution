@@ -274,6 +274,12 @@ if( empty($generating_static) )
 }
 
 
+// TODO: we need an event hook here for the transport_optimizer_plugin, which must get called, AFTER another plugin might have started an output buffer for caching already.
+//       Plugin priority is no option, because CachePageContent is a trigger_event_first_true event, for obvious reasons.
+//       Name?
+//       This must not be exactly here, but before any output.
+
+
 /**
  * Load Request class
  */
@@ -604,6 +610,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.36  2006/07/14 00:15:33  blueyed
+ * TODO
+ *
  * Revision 1.35  2006/07/04 23:38:10  blueyed
  * Validate email: admin user (#1) has an extra button to validate him/herself through the form; store multiple req_validatemail keys in the user's session.
  *
