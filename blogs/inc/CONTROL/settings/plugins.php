@@ -883,7 +883,7 @@ switch( $action )
 
 
 // Display load error from Plugins::register() (if any):
-if( isset($edit_Plugin) && isset( $admin_Plugins->plugin_errors[$edit_Plugin->ID] )
+if( isset($edit_Plugin) && is_object($edit_Plugin) && isset( $admin_Plugins->plugin_errors[$edit_Plugin->ID] )
 		&& ! empty($admin_Plugins->plugin_errors[$edit_Plugin->ID]['register']) )
 {
 	$Messages->add( get_icon('warning').' '.$admin_Plugins->plugin_errors[$edit_Plugin->ID]['register'], 'error' );
