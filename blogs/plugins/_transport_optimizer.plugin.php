@@ -31,7 +31,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class transport_optimizer_plugin extends Plugin
 {
 	var $code = '';
-	var $priority = 50;
+	/**
+	 * Low priority, so other CachePageContent plugins can override our ETag header.
+	 */
+	var $priority = 95;
 	var $version = '1.9-dev';
 
 
@@ -105,8 +108,13 @@ class transport_optimizer_plugin extends Plugin
 
 	/**
 	 * We start our output buffer here.
+	 *
+	 * TEMP FIX: CachePageContent gets used instead of SessionLoaded, because it does not conflict with caching
+	 * plugins when sending ETag header, as we have a very low priority and our ETag header can get
+	 * overridden.
+	 * TODO: this should use an event hook after CachePageContent, because this only triggers one plugin..
 	 */
-	function SessionLoaded()
+	function CachePageContent()
 	{
 		ob_start( array(&$this, 'obhandler') );
 	}
@@ -124,6 +132,11 @@ class transport_optimizer_plugin extends Plugin
 	function obhandler( $output )
 	{
 		global $localtimenow, $current_User;
+
+		if( empty($output) )
+		{ // this might be the case, if someone else said "304" already
+			return $output;
+		}
 
 		if( $this->use_etags )
 		{ // Generating ETAG
@@ -156,7 +169,7 @@ class transport_optimizer_plugin extends Plugin
 
 		// GZIP encoding
 		if( $this->use_gzipcompression
-			&& ! headers_sent() // we need to send the header! As it seems, Apache2 will send all headers on flush(), though no content gets sent.. (PHP_BUG?)
+			&& ! headers_sent() // we need to send the header (if we zip)! As it seems, Apache2 will send all headers on flush(), though no content gets sent.. (PHP_BUG?)
 			&& isset($_SERVER['HTTP_ACCEPT_ENCODING'])
 			&& strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') )
 		{ // requested/accepted by browser:
@@ -174,6 +187,9 @@ class transport_optimizer_plugin extends Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.7  2006/07/14 00:17:50  blueyed
+ * Temp fix
+ *
  * Revision 1.6  2006/07/10 20:19:30  blueyed
  * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
  *
