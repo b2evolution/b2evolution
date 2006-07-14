@@ -57,7 +57,7 @@ class Plugins
 	/**
 	 * @var array Our API version as (major, minor). A Plugin can request a check against it through {@link Plugin::GetDependencies()}.
 	 */
-	var $api_version = array( 1, 0 );
+	var $api_version = array( 1, 1 );
 
 	/**
 	 * Index: plugin_code => Plugin
@@ -1008,6 +1008,10 @@ class Plugins
 							$msgs['note'][] = sprintf( T_( 'The plugin recommends to install the plugins: %s.' ), implode_with_and( $recommends ) );
 						}
 						break;
+
+
+					// TODO: "b2evo" (version)!?
+
 
 					case 'api_min':
 						$api_min = $type_params;
@@ -2893,6 +2897,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.66  2006/07/14 00:13:48  blueyed
+ * Bumped api_version.
+ *
  * Revision 1.65  2006/07/10 22:53:38  blueyed
  * Grouping of plugins added, based on a patch from balupton
  *
