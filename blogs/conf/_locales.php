@@ -51,6 +51,9 @@ $evo_charset = '';
  * This should match the charset you are using internally in b2evolution.
  * This allows b2evo to work internally in a different charset from the database charset.
  * Example: b2evo will use latin1 whereas the database uses utf8.
+ *
+ * TODO: This gets overridden anyway with "SET NAMES $evo_charset" in init_charsets() and gets only used until that!
+ *       So, does it make sense to configure it here? Or shouldn't it get overridden, if set explicitly here?
  */
 $db_config['connection_charset'] = '';
 
