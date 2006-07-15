@@ -1922,7 +1922,7 @@ class Plugin
 
 
 	/**
-	 * Get the absolute URL to the plugin's directory.
+	 * Get the absolute URL to the plugin's directory (trailing slash included).
 	 *
 	 * This is either below {@link $plugins_url}, if no Blog is set or we're in the
 	 * backoffice, or the "plugins" directory below the Blog's URL root otherwise.
@@ -1931,7 +1931,7 @@ class Plugin
 	 */
 	function get_plugin_url()
 	{
-		global $ReqHost, $Blog, $plugins_url;
+		global $ReqHost, $Blog, $plugins_url, $plugins_path;
 
 		if( isset($Blog) && ! is_admin_page() )
 		{
@@ -1957,7 +1957,10 @@ class Plugin
 			}
 		}
 
-		return $base.$this->classname.'/';
+		// Append sub-path below $plugins_path, if any:
+		$sub_path = preg_replace( ':^'.preg_quote($plugins_path, ':').':', '', dirname($this->classfile_path).'/' );
+
+		return $base.$sub_path;
 	}
 
 
@@ -2361,6 +2364,15 @@ class Plugin
 
 
 	/**
+	 * @deprecated Backwards compatibility wrapper (for 1.8)
+	 */
+	function get_README_link()
+	{
+		return $this->get_help_link('$readme');
+	}
+
+
+	/**
 	 * Get the help file for a Plugin ID. README.LOCALE.html will take
 	 * precedence above the general (english) README.html.
 	 *
@@ -2430,6 +2442,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.75  2006/07/15 19:53:33  blueyed
+ * Re-added get_README_link() for backwards compatibility.
+ *
  * Revision 1.74  2006/07/10 22:53:38  blueyed
  * Grouping of plugins added, based on a patch from balupton
  *
