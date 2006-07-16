@@ -387,7 +387,9 @@ class Plugins
 	 */
 	function discover()
 	{
-		global $Debuglog;
+		global $Debuglog, $Timer;
+
+		$Timer->resume('plugins_discover');
 
 		$Debuglog->add( 'Discovering plugins...', 'plugins' );
 
@@ -411,6 +413,8 @@ class Plugins
 				$this->register( $classname, 0, -1, NULL, $filepath );
 			}
 		}
+
+		$Timer->pause('plugins_discover');
 	}
 
 
@@ -2897,6 +2901,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.67  2006/07/16 15:09:35  blueyed
+ * Added plugins_discover Timer.
+ *
  * Revision 1.66  2006/07/14 00:13:48  blueyed
  * Bumped api_version.
  *
