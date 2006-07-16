@@ -44,6 +44,11 @@ class quicktags_plugin extends Plugin
 	{
 		global $Hit;
 
+		if( $params['edit_layout'] == 'simple' )
+		{	// Thsi is too complex for simple mode, don't display it:
+			return false;
+		}
+
 		if( $Hit->is_lynx )
 		{ // let's deactivate quicktags on Lynx, because they don't work there.
 			return false;
@@ -446,6 +451,10 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.23  2006/07/16 23:04:05  fplanque
+ * Most plugins should keep as quiet as possible in simple mode.
+ * Smilies are about the only thing simple enough for simple mode.
+ *
  * Revision 1.22  2006/07/12 21:13:17  blueyed
  * Javascript callback handler (e.g., for interaction of WYSIWYG editors with toolbar plugins)
  *

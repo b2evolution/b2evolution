@@ -163,7 +163,8 @@ $Form->hidden( 'renderers', $Request->param('renderers', 'array', NULL) );
 	}
 
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'simple' ) );
+	// TODO: make sure plugin authors are strongly encouraged not to display their stuff on simple edit screen by default. Add returns if 'simple' to all existing plugins on the planet, tehn enable this :P
+	// $Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'simple' ) );
 
 	echo '</div>';
 
@@ -281,6 +282,10 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.3  2006/07/16 23:04:05  fplanque
+ * Most plugins should keep as quiet as possible in simple mode.
+ * Smilies are about the only thing simple enough for simple mode.
+ *
  * Revision 1.2  2006/07/08 22:33:43  blueyed
  * Integrated "simple edit form".
  *
