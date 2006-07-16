@@ -41,8 +41,6 @@ require_once dirname(__FILE__).'/_widget.class.php';
 
 /**
  * Results class
- *
- * @todo Support $cols[]['order_callback'] also if there's a LIMIT?
  */
 class Results extends Widget
 {
@@ -141,10 +139,9 @@ class Results extends Widget
 	 *     $desc is either 'ASC' or 'DESC'. The function has to return -1, 0 or 1,
 	 *     according to if the $a < $b, $a == $b or $a > $b.
 	 * - order_callback_use_rows: by default, objects get instantiated and passed to "order_callback".
-	 *     By setting this to true, the rows get passed on to "order_callback" instead.
-	 * - td_start
-	 *
-	 * A column with no def will be displayed using
+	 *     By setting this to true, the rows get passed on to "order_callback" instead. 
+	 *    fp> TODO: this is TOO DEEP/TOO COMLPLEX. Use order_rows_callback vs order_objects_callback instead. Choose one that gets priority.
+	 * -td_start. A column with no def will be displayed using
 	 * the default defs from Results::params, that is to say, one of these:
 	 *   - $this->params['col_start_first'];
 	 *   - $this->params['col_start_last'];
@@ -249,7 +246,7 @@ class Results extends Widget
 	 * @param string default ordering of columns (special syntax) if not specified in the URL params
 	 *               example: -A-- will sort in ascending order on 2nd column
 	 *               example: ---D will sort in descending order on 4th column
-	 * @param integer number of lines displayed on one page (0 to disable paging)
+	 * @param integer number of lines displayed on one page (0 to disable paging) TODO: use NULL, not 0.
 	 * @param boolean
 	 * @param NULL|string SQL query used to count the total # of rows (if NULL, we'll try to COUNT(*) by ourselves)
 	 */
@@ -2116,6 +2113,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.22  2006/07/16 23:07:19  fplanque
+ * no message
+ *
  * Revision 1.21  2006/07/16 16:44:41  blueyed
  * Fixed td_colspan for results (typo+handling of "0")
  *

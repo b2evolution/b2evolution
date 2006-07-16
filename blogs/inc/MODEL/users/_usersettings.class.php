@@ -142,6 +142,8 @@ class UserSettings extends AbstractSettings
 	 *
 	 * @param string|array Param and user setting name (in this order, if passed as array).
 	 *                     Make sure the UserSettings name is unique!
+	 * fp>> NO NO NO NO NO NO NO NO NO NO NO NO NO 
+	 * fp>> I can't believe you dare checking this in!!! Make that TWO params!!!
 	 * @param string Force value type to one of:
 	 * - integer
 	 * - float
@@ -199,6 +201,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.13  2006/07/16 23:07:19  fplanque
+ * no message
+ *
  * Revision 1.12  2006/07/13 00:40:29  blueyed
  * Fixed uset-name for pref. edit tab.
  *

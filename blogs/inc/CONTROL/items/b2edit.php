@@ -121,7 +121,7 @@ switch($action)
 												( blog_has_cats( $blog ) ? 'return b2edit_reload(this.ownerDocument.forms.namedItem(\'item_checkchanges\'), \''.$pagenow.'\', %d )'
 												: '' /* Current blog has no cats, we can't be posting */ ), 'switch_to_%d_nocheckchanges' );
 		// TODO: b2edit_reload params handling is far from complete..
-		// dh> what do you mean?
+		// dh> what do you mean?  fp> last time I checked there were some inputs that would lose their values when switching to another blog
 
 		if( !$blog )
 		{

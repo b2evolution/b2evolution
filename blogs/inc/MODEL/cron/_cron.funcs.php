@@ -44,7 +44,7 @@ function cron_log( $message )
 
 
 
-function call_job( $job_name, $job_params = array() /* gets not used! */ )
+function call_job( $job_name, $job_params = array() )
 {
 	global $DB, $control_path;
 
@@ -80,8 +80,8 @@ function call_job( $job_name, $job_params = array() /* gets not used! */ )
 
 /*
  * $Log$
- * Revision 1.3  2006/07/08 16:37:48  blueyed
- * doc/note
+ * Revision 1.4  2006/07/16 23:07:19  fplanque
+ * no message
  *
  * Revision 1.2  2006/06/13 21:52:44  blueyed
  * Added files from 1.8 branch
