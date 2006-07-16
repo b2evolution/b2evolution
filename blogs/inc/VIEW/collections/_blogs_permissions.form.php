@@ -149,7 +149,7 @@ $Results->ID_col = 'user_ID';
  * Group columns:
  */
 $Results->grp_cols[] = array(
-						'td_colpsan' => 0,  // nb_cols
+						'td_colspan' => 0,  // nb_cols
 						'td' => '¤conditional( #bloguser_ismember#, \''.TS_('Members').'\', \''.TS_('Non members').'\' )¤',
 					);
 
@@ -413,6 +413,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.4  2006/07/16 16:44:41  blueyed
+ * Fixed td_colspan for results (typo+handling of "0")
+ *
  * Revision 1.3  2006/07/03 21:04:49  fplanque
  * translation cleanup
  *

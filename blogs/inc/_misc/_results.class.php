@@ -1213,12 +1213,16 @@ class Results extends Widget
 							$output = str_replace( '$class_attrib$', 'class="'.$class.'"', $output );
 						}
 
-						if( isset( $grp_col['td_colpsan'] ) )
+						if( isset( $grp_col['td_colspan'] ) )
 						{
-							$colspan = $grp_col['td_colpsan'];
+							$colspan = $grp_col['td_colspan'];
 							if( $colspan < 0 )
 							{ // We want to substract columns from the total count
 								$colspan = $this->nb_cols + $colspan;
+							}
+							elseif( $colspan == 0 )
+							{ // use $nb_cols
+								$colspan = $this->nb_cols;
 							}
 							$output = str_replace( '$colspan_attrib$', 'colspan="'.$colspan.'"', $output );
 						}
@@ -2112,6 +2116,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.21  2006/07/16 16:44:41  blueyed
+ * Fixed td_colspan for results (typo+handling of "0")
+ *
  * Revision 1.20  2006/07/08 12:44:44  blueyed
  * Removed debugging/test code.
  *

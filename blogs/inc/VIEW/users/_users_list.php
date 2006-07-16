@@ -116,9 +116,8 @@ $Results->ID_col = 'user_ID';
  * Group columns:
  */
 $Results->grp_cols[] = array(
-					
 						'td_class' => 'firstcol'.($current_User->check_perm( 'users', 'edit', false ) ? '' : ' lastcol' ),
-						'td_colpsan' => -1,  // nb_colds - 1
+						'td_colspan' => -1,  // nb_colds - 1
 						'td' => '<a href="?ctrl=users&amp;grp_ID=$grp_ID$">$grp_name$</a>'
 										.'¤conditional( (#grp_ID# == '.$Settings->get('newusers_grp_ID').'), \' <span class="notes">('.T_('default group for new users').')</span>\' )¤',
 					);
@@ -195,7 +194,7 @@ $Results->cols[] = array(
 
 if( ! $current_User->check_perm( 'users', 'edit', false ) )
 {
- 	$Results->cols[] = array(
+	$Results->cols[] = array(
 						'th' => T_('Level'),
 						'td_class' => 'right',
 						'order' => 'user_level',
@@ -237,6 +236,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.9  2006/07/16 16:44:41  blueyed
+ * Fixed td_colspan for results (typo+handling of "0")
+ *
  * Revision 1.8  2006/06/25 21:13:17  fplanque
  * minor
  *
