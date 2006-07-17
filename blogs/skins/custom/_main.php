@@ -87,7 +87,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 <?php
 	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-	if( !isset( $preview ) ) $Messages->disp( );
+	if( empty( $preview ) ) $Messages->disp( );
 	// fp>> TODO: I think we should rather forget the messages here so they don't get displayed again.
 	// --------------------------------- END OF MESSAGES ---------------------------------
 ?>
