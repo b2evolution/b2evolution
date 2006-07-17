@@ -502,7 +502,8 @@ function form_formstart( $action, $class = '', $name = '', $method = 'get', $id 
 
 	echo '<form action="'.$action.'" method="'.$method.'"';
 
-	if( !empty($name) ) echo ' name="'.$name.'"';
+	// this is not xhtml strict, see: http://forums.b2evolution.net//viewtopic.php?t=8475
+	// if( !empty($name) ) echo ' name="'.$name.'"';
 	if( !empty($id) ) echo ' id="'.$id.'"';
 	if( !empty($class) ) echo ' class="'.$class.'"';
 
@@ -544,6 +545,9 @@ function form_submit( $submit_attribs = '' )
 
 /*
  * $Log$
+ * Revision 1.5  2006/07/17 02:07:20  blueyed
+ * form_formstart(): ignore "name" attribute, because it's not xhtml strict and makes no sense anyway IMHO
+ *
  * Revision 1.4  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
