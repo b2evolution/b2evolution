@@ -288,7 +288,7 @@ if( $action == 'convert' )
 		{
 			fwrite( $fp,
 				"'".str_replace( array("'", '\"'), array("\'", '"'), $msgid )
-				."' => '".str_replace( array("'", '\"', '$'), array("\'", '"', '\$'), $msginfo['trans'] )."',\n" );
+				."' => '".str_replace( array("'", '\"'), array("\'", '"'), $msginfo['trans'] )."',\n" );
 		}
 		fwrite( $fp, "\n);\n?>" );
 		fclose( $fp );
