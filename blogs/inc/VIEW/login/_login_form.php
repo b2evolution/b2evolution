@@ -43,7 +43,14 @@ $Form->begin_form( 'fform' );
 	$Form->hiddens_by_key( $_POST, /* exclude: */ array('login_action', 'login') ); // passthrough POSTed data (when login is required after having POSTed something)
 	$Form->hidden( 'redirect_to', $redirect_to );
 
-	if( !empty($mode) )
+	if( isset( $action, $reqID, $sessID ) && $action == 'validatemail' )
+	{ // the user clicked the link from the "validate your account" email, but has not been logged in; pass on the reölevant data:
+		$Form->hidden( 'action', 'validatemail' );
+		$Form->hidden( 'reqID', $reqID );
+		$Form->hidden( 'sessID', $sessID );
+	}
+
+	if( ! empty($mode) )
 	{ // We're in the process of bookmarkletting something, we don't want to lose it:
 		param( 'text', 'html', '' );
 		param( 'popupurl', 'html', '' );
@@ -118,6 +125,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.12  2006/07/17 01:33:13  blueyed
+ * Fixed account validation by email for users who registered themselves
+ *
  * Revision 1.11  2006/07/01 23:49:59  fplanque
  * wording
  *

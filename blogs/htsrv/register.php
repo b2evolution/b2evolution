@@ -46,7 +46,7 @@ param( 'locale', 'string', $Settings->get('default_locale') );
 
 locale_activate( $locale );
 
-if(!$Settings->get('newusers_canregister'))
+if( ! $Settings->get('newusers_canregister') )
 {
 	$action = 'disabled';
 }
@@ -78,90 +78,91 @@ switch( $action )
 		if( $UserCache->get_by_login( $login ) )
 		{ // The login is already registered
 			$Messages->add( sprintf( T_('The login &laquo;%s&raquo; is already registered, please choose another one.'), $login ), 'error' );
+		}
+
+		if( $Messages->count( 'error' ) )
+		{
 			break;
 		}
 
-		if( ! $Messages->count( 'error' ) )
+		$DB->begin();
+
+		$new_User = & new User();
+		$new_User->set( 'login', $login );
+		$new_User->set( 'pass', md5($pass1) ); // encrypted
+		$new_User->set( 'nickname', $login );
+		$new_User->set_email( $email );
+		$new_User->set( 'ip', $Hit->IP );
+		$new_User->set( 'domain', $Hit->get_remote_host( true ) );
+		$new_User->set( 'browser', $Hit->user_agent );
+		$new_User->set_datecreated( $localtimenow );
+		$new_User->set( 'locale', $locale );
+		$newusers_grp_ID = $Settings->get('newusers_grp_ID');
+		// echo $newusers_grp_ID;
+		$new_user_Group = & $GroupCache->get_by_ID( $newusers_grp_ID );
+		// echo $new_user_Group->disp('name');
+		$new_User->set_Group( $new_user_Group );
+		$new_User->dbinsert();
+
+		$new_user_ID = $new_User->ID; // we need this to "rollback" user creation if there's no DB transaction support
+
+		// TODO: Optionally auto create a blog (handle this together with the LDAP plugin)
+
+		// TODO: Optionally auto assign rights
+
+		// Actions to be appended to the user registration transaction:
+		if( $Plugins->trigger_event_first_false( 'AppendUserRegistrTransact', array( 'User' => & $new_User ) ) )
 		{
-			$DB->begin();
+			// TODO: notify the plugins that have been called before about canceling of the event?!
+			$DB->rollback();
 
-			$new_User = & new User();
-			$new_User->set( 'login', $login );
-			$new_User->set( 'pass', md5($pass1) ); // encrypted
-			$new_User->set( 'nickname', $login );
-			$new_User->set_email( $email );
-			$new_User->set( 'ip', $Hit->IP );
-			$new_User->set( 'domain', $Hit->get_remote_host( true ) );
-			$new_User->set( 'browser', $Hit->user_agent );
-			$new_User->set_datecreated( $localtimenow );
-			$new_User->set( 'locale', $locale );
-			$newusers_grp_ID = $Settings->get('newusers_grp_ID');
-			// echo $newusers_grp_ID;
-			$new_user_Group = & $GroupCache->get_by_ID( $newusers_grp_ID );
-			// echo $new_user_Group->disp('name');
-			$new_User->set_Group( $new_user_Group );
-			$new_User->dbinsert();
+			// Delete, in case there's no transaction support:
+			$new_User->dbdelete( $Debuglog );
 
-			$new_user_ID = $new_User->ID; // we need this to "rollback" user creation if there's no DB transaction support
+			$Messages->add( T_('No user account has been created!'), 'error' );
+			break; // break out to _reg_form.php
+		}
 
-			// TODO: Optionally auto create a blog (handle this together with the LDAP plugin)
+		// User created:
+		$DB->commit();
 
-			// TODO: Optionally auto assign rights
+		$UserCache->add( $new_User );
 
-			// Actions to be appended to the user registration transaction:
-			if( $Plugins->trigger_event_first_false( 'AppendUserRegistrTransact', array( 'User' => & $new_User ) ) )
+		// Send email to admin (using his locale):
+		$AdminUser = & $UserCache->get_by_ID( 1 );
+		locale_temp_switch( $AdminUser->get( 'locale' ) );
+
+		$message  = T_('New user registration on your blog').":\n"
+							."\n"
+							.T_('Login:')." $login\n"
+							.T_('Email').": $email\n"
+							."\n"
+							.T_('Edit user').': '.$admin_url.'?ctrl=users&user_ID='.$new_User->ID."\n";
+
+		send_mail( $admin_email, T_('New user registration on your blog'), $message, $notify_from );
+
+		locale_restore_previous();
+
+		$Plugins->trigger_event( 'AfterUserRegistration', array( 'User' => & $new_User ) );
+
+
+		if( $Settings->get('newusers_mustvalidate') )
+		{ // We want that the user validates his email address:
+			if( $new_User->send_validate_email($redirect_to) )
 			{
-				// TODO: notify the plugins that have been called before about canceling of the event?!
-				$DB->rollback();
-
-				// Delete, in case there's no transaction support:
-				$new_User->dbdelete( $Debuglog );
-
-				$Messages->add( T_('No user account has been created!'), 'error' );
-				break; // break out to _reg_form.php
+				$Messages->add( T_('An email has been sent to your email address. Please click on the link therein to validate your account.'), 'success' );
 			}
 			else
-			{ // User created:
-				$DB->commit();
-
-				$UserCache->add( $new_User );
-
-				// Send email to admin (using his locale):
-				$AdminUser = & $UserCache->get_by_ID( 1 );
-				locale_temp_switch( $AdminUser->get( 'locale' ) );
-
-				$message  = T_('New user registration on your blog').":\n"
-									."\n"
-									.T_('Login:')." $login\n"
-									.T_('Email').": $email\n"
-									."\n"
-									.T_('Edit user').': '.$admin_url.'?ctrl=users&user_ID='.$new_User->ID."\n";
-
-				send_mail( $admin_email, T_('New user registration on your blog'), $message, $notify_from );
-
-				locale_restore_previous();
-
-				$Plugins->trigger_event( 'AfterUserRegistration', array( 'User' => & $new_User ) );
+			{
+				$Messages->add( T_('Sorry, the email with the link to validate and activate your password could not be sent.')
+					.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
 			}
-
-			if( $Settings->get('newusers_mustvalidate') )
-			{ // We want that the user validates his email address:
-				if( $new_User->send_validate_email() )
-				{
-					$Messages->add( T_('An email has been sent to your email address. Please click on the link therein to validate your account.'), 'success' );
-				}
-				else
-				{
-					$Messages->add( T_('Sorry, the email with the link to validate and activate your password could not be sent.')
-						.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
-				}
-			}
-
-			// Display confirmation screen:
-			require $view_path.'login/_reg_complete.php';
-
-			exit();
 		}
+
+		// Display confirmation screen:
+		require $view_path.'login/_reg_complete.php';
+
+		exit();
 		break;
 
 
@@ -185,6 +186,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.71  2006/07/17 01:33:13  blueyed
+ * Fixed account validation by email for users who registered themselves
+ *
  * Revision 1.70  2006/06/18 01:14:03  blueyed
  * lazy instantiate user's group; normalisation
  *

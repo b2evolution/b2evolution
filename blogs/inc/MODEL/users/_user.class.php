@@ -849,9 +849,10 @@ class User extends DataObject
 	 *
 	 * If the email could get sent, it saves the used "request_id" into the user's Session.
 	 *
+	 * @param string URL, where to redirect the user after he clicked the validation link.
 	 * @return boolean True, if the email could get sent; false if not
 	 */
-	function send_validate_email()
+	function send_validate_email( $redirect_to_after = NULL )
 	{
 		global $app_name, $htsrv_url_sensitive, $Session;
 
@@ -880,6 +881,10 @@ class User extends DataObject
 			}
 			$request_ids[] = $request_id;
 			$Session->set( 'core.validatemail.request_ids', $request_ids, 86400 * 2 ); // expires in two days (or when clicked)
+			if( isset($redirect_to_after) )
+			{
+				$Session->set( 'core.validatemail.redirect_to', $redirect_to_after  );
+			}
 			$Session->dbsave(); // save immediately
 		}
 
@@ -1106,6 +1111,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.30  2006/07/17 01:33:13  blueyed
+ * Fixed account validation by email for users who registered themselves
+ *
  * Revision 1.29  2006/07/17 01:19:25  blueyed
  * Added events: AfterUserInsert, AfterUserUpdate, AfterUserDelete
  *

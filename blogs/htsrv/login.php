@@ -199,8 +199,8 @@ switch( $action )
 		param( 'sessID', 'integer', '' );
 
 		if( ! is_logged_in() )
-		{
-			$Messages->add( T_('You have to be logged in to validate your account.'), 'error' );
+		{ // this can happen, if a new user registers and clicks on the "validate by email" link, without logging in first
+			$Messages->add( T_('Please login to validate your account.'), 'error' );
 			break;
 		}
 
@@ -233,6 +233,8 @@ switch( $action )
 		$Session->delete( 'core.validatemail.request_ids' );
 
 		$Messages->add( T_( 'Your email address has been validated.' ), 'success' );
+
+		$redirect_to = $Session->get( 'core.validatemail.redirect_to' );
 
 		if( empty($redirect_to) && $current_User->check_perm('admin') )
 		{ // User can access backoffice
@@ -288,7 +290,7 @@ switch( $action )
 				$Messages->add( T_('Your profile has been updated.'), 'note' );
 			}
 
-			if( $current_User->send_validate_email() )
+			if( $current_User->send_validate_email($redirect_to) )
 			{
 				$Messages->add( sprintf( /* TRANS: %s gets replaced by the user's email address */ T_('An email has been sent to your email address (%s). Please click on the link therein to validate your account.'), $current_User->dget('email') ), 'success' );
 			}
@@ -354,6 +356,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.67  2006/07/17 01:33:13  blueyed
+ * Fixed account validation by email for users who registered themselves
+ *
  * Revision 1.66  2006/07/08 17:04:18  fplanque
  * minor
  *
