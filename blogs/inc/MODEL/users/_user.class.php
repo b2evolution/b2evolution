@@ -685,6 +685,46 @@ class User extends DataObject
 
 
 	/**
+	 * Insert object into DB based on previously recorded changes
+	 *
+	 * Triggers the plugin event AfterUserInsert.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbinsert()
+	{
+		global $Plugins;
+
+		if( $result = parent::dbinsert() )
+		{ // We could insert the main object..
+			$Plugins->trigger_event( 'AfterUserInsert', $params = array( 'User' => & $this ) );
+		}
+
+		return $result;
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes.
+	 *
+	 * Triggers the plugin event AfterUserUpdate.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbupdate()
+	{
+		global $DB, $Plugins;
+
+		if( $result = parent::dbupdate() )
+		{ // We could update the main object..
+			$Plugins->trigger_event( 'AfterUserUpdate', $params = array( 'User' => & $this ) );
+		}
+
+		return $result;
+	}
+
+
+	/**
 	 * Delete user and dependencies from database
 	 *
 	 * Includes WAY TOO MANY requests because we try to be compatible with MySQL 3.23, bleh!
@@ -693,7 +733,7 @@ class User extends DataObject
 	 */
 	function dbdelete( & $Log )
 	{
-		global $DB;
+		global $DB, $Plugins;
 
 		if( $this->ID == 0 ) debug_die( 'Non persistant object cannot be deleted!' );
 
@@ -727,7 +767,7 @@ class User extends DataObject
 			}
 
 			// Delete post extracats
-			$ret = $DB->query(	"DELETE FROM T_postcats
+			$ret = $DB->query( "DELETE FROM T_postcats
 													WHERE postcat_post_ID IN ($post_list)" );
 			if( is_a( $Log, 'log' ) )
 			{
@@ -744,15 +784,31 @@ class User extends DataObject
 			}
 		}
 
+		// remember ID, because parent method resets it to 0
+		$old_ID = $this->ID;
+
 		// Delete main object:
-		parent::dbdelete();
+		if( ! parent::dbdelete() )
+		{
+			$DB->rollback();
+
+			$Log->add( 'User has not been deleted.', 'error' );
+			return false;
+		}
+
+		$DB->commit();
 
 		if( is_a( $Log, 'log' ) )
 		{
 			$Log->add( 'Deleted User.', 'note' );
 		}
 
-		$DB->commit();
+		// Notify plugins:
+		$this->ID = $old_ID;
+		$Plugins->trigger_event( 'AfterUserDelete', $params = array( 'User' => & $this ) );
+		$this->ID = 0;
+
+		return true;
 	}
 
 
@@ -1050,6 +1106,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.29  2006/07/17 01:19:25  blueyed
+ * Added events: AfterUserInsert, AfterUserUpdate, AfterUserDelete
+ *
  * Revision 1.28  2006/07/08 17:04:18  fplanque
  * minor
  *

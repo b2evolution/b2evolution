@@ -1680,6 +1680,45 @@ class Plugin
 	{
 	}
 
+
+	/**
+	 * Event handler: called at the end of {@link User::dbupdate() updating
+	 * an user account in the database}, which means that it has been changed.
+	 *
+	 * @since 1.8.1
+	 * @param array Associative array of parameters
+	 *   - 'User': the related User (by reference)
+	 */
+	function AfterUserUpdate( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the end of {@link User::dbinsert() inserting
+	 * an user account into the database}, which means it has been created.
+	 *
+	 * @since 1.8.1
+	 * @param array Associative array of parameters
+	 *   - 'User': the related User (by reference)
+	 */
+	function AfterUserInsert( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the end of {@link User::dbdelete() deleting
+	 * an user from the database}.
+	 *
+	 * @since 1.8.1
+	 * @param array Associative array of parameters
+	 *   - 'User': the related User (by reference)
+	 */
+	function AfterUserDelete( & $params )
+	{
+	}
+
 	// }}}
 
 
@@ -1927,9 +1966,10 @@ class Plugin
 	 * This is either below {@link $plugins_url}, if no Blog is set or we're in the
 	 * backoffice, or the "plugins" directory below the Blog's URL root otherwise.
 	 *
+	 * @param string Get absolute URL? (or cut off $ReqHost at the beginning)
 	 * @return string
 	 */
-	function get_plugin_url()
+	function get_plugin_url( $abs = false )
 	{
 		global $ReqHost, $Blog, $plugins_url, $plugins_path;
 
@@ -1955,6 +1995,11 @@ class Plugin
 					$base = $base_fixed;
 				}
 			}
+		}
+
+		if( ! $abs && strpos( $base, $ReqHost ) === 0 )
+		{ // cut off $ReqHost if the resulting URL starts with it:
+			$base = substr($base, strlen($ReqHost));
 		}
 
 		// Append sub-path below $plugins_path, if any:
@@ -2442,6 +2487,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.76  2006/07/17 01:19:25  blueyed
+ * Added events: AfterUserInsert, AfterUserUpdate, AfterUserDelete
+ *
  * Revision 1.75  2006/07/15 19:53:33  blueyed
  * Re-added get_README_link() for backwards compatibility.
  *

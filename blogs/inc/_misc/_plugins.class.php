@@ -40,6 +40,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 require_once dirname(__FILE__).'/_plugin.class.php';
 
+
 /**
  * Plugins Class
  *
@@ -266,6 +267,10 @@ class Plugins
 				'FilterCommentAuthor' => 'Filters the comment author.',
 				'FilterCommentAuthorUrl' => 'Filters the URL of the comment author.',
 				'FilterCommentContent' => 'Filters the content of a comment.',
+
+				'AfterUserDelete' => '',
+				'AfterUserInsert' => '',
+				'AfterUserUpdate' => '',
 
 				/*
 				not used yet..
@@ -2901,6 +2906,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.68  2006/07/17 01:19:25  blueyed
+ * Added events: AfterUserInsert, AfterUserUpdate, AfterUserDelete
+ *
  * Revision 1.67  2006/07/16 15:09:35  blueyed
  * Added plugins_discover Timer.
  *
