@@ -38,7 +38,7 @@ $AdminUI->set_path( 'options', 'plugins' );
 
 $action = $Request->param_action( 'list' );
 
-$UserSettings->param_Request( 'plugins_disp_avail', 'integer', 0 );
+$UserSettings->param_Request( 'plugins_disp_avail', 'plugins_disp_avail', 'integer', 0 );
 
 // Check permission to display:
 $current_User->check_perm( 'options', 'view', true );

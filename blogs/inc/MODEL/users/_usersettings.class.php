@@ -140,10 +140,8 @@ class UserSettings extends AbstractSettings
 	 *
 	 * @todo Move this to _abstractsettings.class.php - the other Settings object can also make use of it!
 	 *
-	 * @param string|array Param and user setting name (in this order, if passed as array).
-	 *                     Make sure the UserSettings name is unique!
-	 * fp>> NO NO NO NO NO NO NO NO NO NO NO NO NO 
-	 * fp>> I can't believe you dare checking this in!!! Make that TWO params!!!
+	 * @param string Request param name
+	 * @param string User setting name. Make sure this is unique!
 	 * @param string Force value type to one of:
 	 * - integer
 	 * - float
@@ -161,20 +159,9 @@ class UserSettings extends AbstractSettings
 	 * @param boolean Override if variable already set
 	 * @return NULL|mixed NULL, if neither a param was given nor {@link $UserSettings} knows about it.
 	 */
-	function param_Request( $var, $type = '', $default = '', $memorize = false, $override = false ) // we do not force setting it..
+	function param_Request( $param_name, $uset_name, $type = '', $default = '', $memorize = false, $override = false ) // we do not force setting it..
 	{
 		global $Request;
-
-		if( is_array($var) )
-		{
-			$param_name = $var[0];
-			$uset_name = $var[1];
-		}
-		else
-		{
-			$param_name = $var;
-			$uset_name = $var;
-		}
 
 		$value = $Request->param( $param_name, $type, NULL, $memorize, $override, false ); // we pass NULL here, to see if it got set at all
 
@@ -201,6 +188,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.14  2006/07/17 01:53:12  blueyed
+ * added param to UserSettings::param_Request
+ *
  * Revision 1.13  2006/07/16 23:07:19  fplanque
  * no message
  *

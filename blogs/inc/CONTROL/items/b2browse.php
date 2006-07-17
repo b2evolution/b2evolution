@@ -34,7 +34,7 @@ else
 	$add_item_url = '?ctrl=edit&amp;blog='.$blog;
 
 	// Store/retrieve preferred tab from UserSettings:
-	$tab = $UserSettings->param_Request( array('tab', 'pref_browse_tab'), 'string', NULL, true /* memorize */ );
+	$tab = $UserSettings->param_Request( 'tab', 'pref_browse_tab', 'string', NULL, true /* memorize */ );
 
 	$Request->param( 'show_past', 'integer', '0', true );
 	$Request->param( 'show_future', 'integer', '0', true );

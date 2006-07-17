@@ -56,7 +56,7 @@ require_once $inc_path.'_misc/_plugin.funcs.php';
 
 
 // Store/retrieve order from UserSettings:
-$UserSettings->param_Request( 'results_plug_order', 'string', '--A', true );
+$UserSettings->param_Request( 'results_plug_order', 'results_plug_order', 'string', '--A', true );
 
 
 $Results = new Results( '
@@ -418,6 +418,9 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 <?php
 /*
  * $Log$
+ * Revision 1.29  2006/07/17 01:53:12  blueyed
+ * added param to UserSettings::param_Request
+ *
  * Revision 1.28  2006/07/10 22:53:38  blueyed
  * Grouping of plugins added, based on a patch from balupton
  *

@@ -188,15 +188,15 @@ if( $Messages->count('error') )
  */
 $fm_Filelist = new Filelist( $fm_FileRoot, $ads_list_path );
 
-if( $UserSettings->param_Request( 'fm_dirsnotattop', 'integer', 0 ) )
+if( $UserSettings->param_Request( 'fm_dirsnotattop', 'fm_dirsnotattop', 'integer', 0 ) )
 {
 	$fm_Filelist->_dirs_not_at_top = true;
 }
-if( $UserSettings->param_Request( 'fm_recursivedirsize', 'integer', 0 ) ) // TODO: check for permission? (Server load)
+if( $UserSettings->param_Request( 'fm_recursivedirsize', 'fm_recursivedirsize', 'integer', 0 ) ) // TODO: check for permission? (Server load)
 {
 	$fm_Filelist->_use_recursive_dirsize = true;
 }
-if( $UserSettings->param_Request( 'fm_showhidden', 'integer', 0 ) )
+if( $UserSettings->param_Request( 'fm_showhidden', 'fm_showhidden', 'integer', 0 ) )
 {
 	$fm_Filelist->_show_hidden_files = true;
 }
@@ -285,7 +285,7 @@ $fm_forceFM = NULL;
 
 
 param( 'fm_disp_browser', 'integer', 0, true );
-$UserSettings->param_Request( 'fm_hide_dirtree', 'integer', 0, true ); // The directory tree next to the files table
+$UserSettings->param_Request( 'fm_hide_dirtree', 'fm_hide_dirtree', 'integer', 0, true ); // The directory tree next to the files table
 
 
 /*
@@ -1497,6 +1497,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.27  2006/07/17 01:53:12  blueyed
+ * added param to UserSettings::param_Request
+ *
  * Revision 1.26  2006/07/07 18:42:37  blueyed
  * After upload: First save the file properties, before generating the code to display it.
  *
