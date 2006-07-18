@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2006-03-09 14:34+0100\n"
+"PO-Revision-Date: 2006-07-04 17:32+0100\n"
 "Last-Translator: Francois PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -129,8 +129,8 @@ msgid "You will find complete information on the official <a %s>b2evolution webs
 msgstr "Vous trouverez des informations complètes sur le <a %s>site web officiel</a>."
 
 #: ../../index.src.html:36
-msgid "<strong>WARNING:</strong> This is an ALPHA release. This means there are still bugs in this release and some features are incomplete. Nethertheless, we manage to use it on a daily basis despite of these limitations. So we made a release. But you have been warned: use at your own risk! :-&gt;"
-msgstr "<strong>ATTENTION:</strong> Ceci est une version ALPHA. Celà signifie qu'il y a encore des bugs et que certaines fonctions sont incomplètes. Ceci dit, nous réussissons à l'utiliser quotidiennement malgré ces limitations. Donc nous avons sorti une release. Mais vous avez été prévenus: Utilisez à vos risques et périls! :-&gt;"
+msgid "<strong>WARNING:</strong> This is a BETA release. There are still bugs we know of, but we consider the software is globally operational! :-&gt;"
+msgstr "<strong>ATTENTION:</strong> Ceci est une version BETA. Il reste des bugs identifiés, mais nous considérons que le logiciel est globalement opérationnel! :-&gt;"
 
 #: ../../index.src.html:37
 msgid "NOTE: This version is and will continue to be fully supported in the upgrading scheme and procedures."

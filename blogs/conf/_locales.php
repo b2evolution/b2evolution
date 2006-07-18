@@ -363,7 +363,7 @@ $locales = array(
 										'enabled' => 1,
 									),
 	'ru-RU' => array( 'name' => NT_('Russian (RU)'),
-										'charset' => 'utf-8',
+										'charset' => 'windows-1251',
 										'datefmt' => 'Y-m-d',
 										'timefmt' => 'H:i:s',
 										'startofweek' => 1,
