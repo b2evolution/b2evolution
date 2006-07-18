@@ -751,7 +751,7 @@ msgstr "Portugisisch (PT)"
 
 #: ..\..\..\conf\_locales.php:358
 msgid "Russian (RU)"
-msgstr "Russisch (HU)"
+msgstr "Russisch (RU)"
 
 #: ..\..\..\conf\_locales.php:366
 msgid "Slovak (SK)"

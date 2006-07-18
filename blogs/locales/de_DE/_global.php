@@ -161,7 +161,7 @@ Plural-Forms:  nplurals=2; plural=(n != 1);
 'Portuguese (BR)' => 'Portugisisch (BR)',
 'Polish utf-8 (PL)' => 'Polnisch utf-8 (PL)',
 'Portuguese (PT)' => 'Portugisisch (PT)',
-'Russian (RU)' => 'Russisch (HU)',
+'Russian (RU)' => 'Russisch (RU)',
 'Slovak (SK)' => 'Slowakisch (SK)',
 'Swedish (SE)' => 'Schwedisch (SE)',
 'Thai (TH)' => 'Thai (TH)',
