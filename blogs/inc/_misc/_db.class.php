@@ -1309,7 +1309,7 @@ class DB
 			$this->halt_on_error = false;
 			if( $this->query( 'SET NAMES '.$charset ) === false )
 			{
-				$Debuglog->add( 'Could not "SET NAMES '.$charset.'"!', array('error', 'locale') );
+				$Debuglog->add( 'Could not "SET NAMES '.$charset.'"! (MySQL error: '.strip_tags($this->last_error).')', array('error', 'locale') );
 
 				$r = false;
 			}
@@ -1330,6 +1330,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.16  2006/07/19 19:55:12  blueyed
+ * Fixed charset handling (especially windows-1251)
+ *
  * Revision 1.15  2006/07/04 17:32:30  fplanque
  * no message
  *

@@ -267,7 +267,7 @@ function convert_chars( $content, $flag='html' )
 	global $b2_htmltrans, $b2_htmltranswinuni, $evo_charset;
 
 	// Convert highbyte non ASCII/UTF-8 chars to urefs:
-	if( $evo_charset != 'utf-8' && $evo_charset != 'gb2312' )
+	if( ! in_array($evo_charset, array('utf-8', 'gb2312', 'windows-1251') ) )
 	{ // This is a single byte charset
 		$content = preg_replace_callback(
 			'/[\x80-\xff]/',
@@ -1119,7 +1119,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		// $Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($GLOBALS[$var], true).']!', 'params' );
 	}
 
-	if( isset($io_charset) )
+	if( isset($io_charset) && ! empty($evo_charset) )
 	{
 		$GLOBALS[$var] = convert_charset( $GLOBALS[$var], $evo_charset, $io_charset );
 	}
@@ -3031,6 +3031,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.82  2006/07/19 19:55:12  blueyed
+ * Fixed charset handling (especially windows-1251)
+ *
  * Revision 1.81  2006/07/08 22:33:43  blueyed
  * Integrated "simple edit form".
  *

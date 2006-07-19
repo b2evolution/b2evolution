@@ -795,12 +795,13 @@ function convert_charset( $string, $dest_charset, $src_charset )
  * Init charset handling.
  *
  * Check and possibly adjust {@link $evo_charset}.
- *
+ * @staticvar boolean Used to only start mb_output_handler once
  * @param string I/O (input/output) charset to use
  */
 function init_charsets( $io )
 {
-	global $io_charset, $evo_charset, $mb_output_handler_started, $Debuglog, $DB;
+	static $mb_output_handler_started;
+	global $io_charset, $evo_charset, $Debuglog, $DB;
 
 	if( $io == $io_charset )
 	{ // no conversation needed
@@ -828,39 +829,28 @@ function init_charsets( $io )
 		}
 		else
 		{ // check if the encodings are supported:
-			if( function_exists('mb_list_encodings') ) // PHP5
+			// NOTE: mb_internal_encoding() is the best way to find out if the encoding is supported
+			if( ! mb_internal_encoding($io_charset) )
 			{
-				$mb_encodings = mb_list_encodings();
-			}
-			else
-			{
-				$mb_encodings = NULL;
-			}
-
-			if( isset($mb_encodings) && ! in_array( strtoupper($io_charset), $mb_encodings ) )
-			{
-				$Debuglog->add( 'Cannot I/O convert because I/O charset ['.$io_charset.'] is not in mb_list_encodings()!', array('errors','locale') );
+				$Debuglog->add( 'Cannot I/O convert because I/O charset ['.$io_charset.'] is not in mb_list_encodings()!', array('error','locale') );
 				$evo_charset = $io_charset;
 			}
-			elseif( isset($mb_encodings) && ! in_array( strtoupper($evo_charset), $mb_encodings ) )
+			elseif( ! mb_internal_encoding($evo_charset) )
 			{
-				$Debuglog->add( 'Cannot I/O convert because $evo_charset='.$evo_charset.' is not in mb_list_encodings()!', array('errors','locale') );
+				$Debuglog->add( 'Cannot I/O convert because $evo_charset='.$evo_charset.' is not in mb_list_encodings()!', array('error','locale') );
 				$evo_charset = $io_charset;
 			}
 			else
 			{
 				mb_http_output( $io_charset );
-				ob_start( 'mb_output_handler' ); // NOTE: this will send a Content-Type header by itself for "text/..."
-				$mb_output_handler_started = true; // remember it for _blog_main.inc.php
+				if( ! $mb_output_handler_started )
+				{
+					ob_start( 'mb_output_handler' ); // NOTE: this will send a Content-Type header by itself for "text/..."
+					$mb_output_handler_started = true;
+					$Debuglog->add( 'Started mb_output_handler.', 'locale' );
+				}
 			}
-			unset($mb_encodings);
 		}
-	}
-
-	// Tell mbstrings what the internal encoding is:
-	if( $mb_output_handler_started )
-	{
-		mb_internal_encoding( $evo_charset );
 	}
 
 	if( isset($DB) ) // not available in /install/index.php
@@ -876,6 +866,9 @@ function init_charsets( $io )
 
 /*
  * $Log$
+ * Revision 1.11  2006/07/19 19:55:12  blueyed
+ * Fixed charset handling (especially windows-1251)
+ *
  * Revision 1.10  2006/07/02 21:50:50  blueyed
  * Fixed charset init for install
  *
