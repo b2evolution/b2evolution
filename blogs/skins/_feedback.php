@@ -17,7 +17,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-//JEM
 $c = isset($c) ? $c : '';
 $tb = isset($tb) ? $tb : '';
 $pb = isset($pb) ? $pb : '';
@@ -67,7 +66,7 @@ if( $disp_trackbacks )
 {
 	$type_list[] = "'trackback'";
 	$disp_title[] = T_("Trackbacks");
-	echo '<a name="trackbacks">';
+	echo '<a name="trackbacks"></a>';
 }
 if( $disp_pingbacks )
 {
@@ -314,6 +313,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.72  2006/07/19 20:12:31  blueyed
+ * fixed html
+ *
  * Revision 1.71  2006/07/06 19:56:29  fplanque
  * no message
  *
