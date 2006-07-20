@@ -119,8 +119,6 @@ class ldap_plugin extends Plugin
 	 * This function will check if the user is in the LDAP and create it locally if it does
 	 * not exist yet.
 	 *
-	 * @todo Plugin settings: user group and other settings
-	 *
 	 * @param array 'login', 'pass' and 'pass_md5'
 	 */
 	function LoginAttempt( $params )
@@ -206,121 +204,122 @@ class ldap_plugin extends Plugin
 				$local_User->dbupdate();
 
 				$this->debug_log( 'Updating user password locally.' );
+
+				return true;
 			}
-			else
-			{ // create this user locally
-				$NewUser = new User();
-				$NewUser->set( 'login', $params['login'] );
-				$NewUser->set( 'nickname', $params['login'] );
-				$NewUser->set( 'pass', $params['pass_md5'] );
-				$NewUser->set( 'validated', 1 ); // assume the user has been validated (through email link)
 
-				if( isset($search_info[0]['givenname'][0]) )
-				{
-					$NewUser->set( 'firstname', $search_info[0]['givenname'][0] );
-				}
-				if( isset($search_info[0]['sn'][0]) )
-				{
-					$NewUser->set( 'lastname', $search_info[0]['sn'][0] );
-				}
-				if( isset($search_info[0]['mail'][0]) )
-				{
-					$NewUser->set_email( $search_info[0]['mail'][0] );
-				}
-				$NewUser->set( 'idmode', 'namefl' );
-				$NewUser->set( 'locale', locale_from_httpaccept() ); // use the browser's locale
-				#$NewUser->set( 'url', '' );
-				#$NewUser->set( 'icq', 0 );
-				#$NewUser->set( 'aim', '' );
-				#$NewUser->set( 'msn', '' );
-				#$NewUser->set( 'yim', '' );
-				$NewUser->set( 'ip', $Hit->IP );
-				$NewUser->set( 'domain', $Hit->get_remote_host( true ) );
-				$NewUser->set( 'browser', $Hit->user_agent );
-				$NewUser->set_datecreated( $localtimenow );
-				$NewUser->set( 'level', 1 );
-				$NewUser->set( 'notify', 1 );
-				$NewUser->set( 'showonline', 1 );
+			// create this user locally (in b2evo)
+			$NewUser = new User();
+			$NewUser->set( 'login', $params['login'] );
+			$NewUser->set( 'nickname', $params['login'] );
+			$NewUser->set( 'pass', $params['pass_md5'] );
+			$NewUser->set( 'validated', 1 ); // assume the user has been validated (through email link)
 
-				$assigned_group = false;
-				if( ! empty($l_set['assign_user_to_group_by']) )
-				{
-					$this->debug_log( 'We want to assign the Group by &laquo;'.$l_set['assign_user_to_group_by'].'&raquo;' );
-					if( isset($search_info[0][$l_set['assign_user_to_group_by']])
-					    && isset($search_info[0][$l_set['assign_user_to_group_by']][0]) )
-					{ // There is info we want to assign by
-						$assign_by_value = $search_info[0][$l_set['assign_user_to_group_by']][0];
-						$this->debug_log( 'The users info has &laquo;'.$assign_by_value.'&raquo; as value given.' );
+			if( isset($search_info[0]['givenname'][0]) )
+			{
+				$NewUser->set( 'firstname', $search_info[0]['givenname'][0] );
+			}
+			if( isset($search_info[0]['sn'][0]) )
+			{
+				$NewUser->set( 'lastname', $search_info[0]['sn'][0] );
+			}
+			if( isset($search_info[0]['mail'][0]) )
+			{
+				$NewUser->set_email( $search_info[0]['mail'][0] );
+			}
+			$NewUser->set( 'idmode', 'namefl' );
+			$NewUser->set( 'locale', locale_from_httpaccept() ); // use the browser's locale
+			#$NewUser->set( 'url', '' );
+			#$NewUser->set( 'icq', 0 );
+			#$NewUser->set( 'aim', '' );
+			#$NewUser->set( 'msn', '' );
+			#$NewUser->set( 'yim', '' );
+			$NewUser->set( 'ip', $Hit->IP );
+			$NewUser->set( 'domain', $Hit->get_remote_host( true ) );
+			$NewUser->set( 'browser', $Hit->user_agent );
+			$NewUser->set_datecreated( $localtimenow );
+			$NewUser->set( 'level', 1 );
+			$NewUser->set( 'notify', 1 );
+			$NewUser->set( 'showonline', 1 );
 
-						if( $users_Group = & $GroupCache->get_by_name( $assign_by_value, false ) )
-						{ // A group with the users value returned exists.
-							$NewUser->set_Group( $users_Group );
-							$assigned_group = true;
-							$this->debug_log( 'Adding User to existing Group.' );
-						}
-						elseif( $this->Settings->get('tpl_new_grp_ID') )
-						{ // we want to create a new group matching the assign-by info
-							$this->debug_log( 'Group with that name does not exist yet.' );
+			$assigned_group = false;
+			if( ! empty($l_set['assign_user_to_group_by']) )
+			{
+				$this->debug_log( 'We want to assign the Group by &laquo;'.$l_set['assign_user_to_group_by'].'&raquo;' );
+				if( isset($search_info[0][$l_set['assign_user_to_group_by']])
+						&& isset($search_info[0][$l_set['assign_user_to_group_by']][0]) )
+				{ // There is info we want to assign by
+					$assign_by_value = $search_info[0][$l_set['assign_user_to_group_by']][0];
+					$this->debug_log( 'The users info has &laquo;'.$assign_by_value.'&raquo; as value given.' );
 
-							if( $new_Group = $GroupCache->get_by_name( $this->Settings->get('tpl_new_grp_ID'), false ) ) // COPY!! and do not halt on error
-							{ // take a copy of the Group to use as template
-								$this->debug_log( 'Using Group &laquo;'.$this->Settings->get('tpl_new_grp_ID').'&raquo; as template.' );
-								$new_Group->set( 'ID', 0 ); // unset ID (to allow inserting)
-								$new_Group->set( 'name', $assign_by_value ); // set the wanted name
-								$new_Group->dbinsert();
-								$this->debug_log( 'Created Group &laquo;'.$new_Group->get('name').'&raquo;' );
-								$this->debug_log( 'Assigned User to new Group.' );
-
-								$NewUser->set_Group( $new_Group );
-								$assigned_group = true;
-							}
-							else
-							{
-								$this->debug_log( 'Template Group &laquo;'.$this->template_group_name_for_unmatched_assign.'&raquo; not found!' );
-							}
-						}
+					if( $users_Group = & $GroupCache->get_by_name( $assign_by_value, false ) )
+					{ // A group with the users value returned exists.
+						$NewUser->set_Group( $users_Group );
+						$assigned_group = true;
+						$this->debug_log( 'Adding User to existing Group.' );
 					}
-				}
+					elseif( $this->Settings->get('tpl_new_grp_ID') )
+					{ // we want to create a new group matching the assign-by info
+						$this->debug_log( 'Group with that name does not exist yet.' );
 
-				if( ! $assigned_group )
-				{ // Default group
-					$users_Group = NULL;
-					$fallback_grp_ID = $this->Settings->get( 'fallback_grp_ID' );
+						if( $new_Group = $GroupCache->get_by_name( $this->Settings->get('tpl_new_grp_ID'), false ) ) // COPY!! and do not halt on error
+						{ // take a copy of the Group to use as template
+							$this->debug_log( 'Using Group &laquo;'.$this->Settings->get('tpl_new_grp_ID').'&raquo; as template.' );
+							$new_Group->set( 'ID', 0 ); // unset ID (to allow inserting)
+							$new_Group->set( 'name', $assign_by_value ); // set the wanted name
+							$new_Group->dbinsert();
+							$this->debug_log( 'Created Group &laquo;'.$new_Group->get('name').'&raquo;' );
+							$this->debug_log( 'Assigned User to new Group.' );
 
-					if( empty($fallback_grp_ID) )
-					{
-						$this->debug_log( 'No default/fallback group given.' );
-					}
-					else
-					{
-						$users_Group = & $GroupCache->get_by_ID($fallback_grp_ID);
-
-						if( $users_Group )
-						{ // either $this->default_group_name is not given or wrong
-							$NewUser->set_Group( $users_Group );
+							$NewUser->set_Group( $new_Group );
 							$assigned_group = true;
-
-							$this->debug_log( 'Using default/fallback group ('.$users_Group->get('name').').' );
 						}
 						else
 						{
-							$this->debug_log( 'Default/fallback group not existing ('.$fallback_grp_ID.').' );
+							$this->debug_log( 'Template Group &laquo;'.$this->template_group_name_for_unmatched_assign.'&raquo; not found!' );
 						}
 					}
-
 				}
+			}
 
-				if( $assigned_group )
+			if( ! $assigned_group )
+			{ // Default group
+				$users_Group = NULL;
+				$fallback_grp_ID = $this->Settings->get( 'fallback_grp_ID' );
+
+				if( empty($fallback_grp_ID) )
 				{
-					$NewUser->dbinsert();
-					$UserCache->add( $NewUser );
-
-					$this->debug_log( 'Created user.' );
+					$this->debug_log( 'No default/fallback group given.' );
 				}
 				else
 				{
-					$this->debug_log( 'NOT created user, because no group has been assigned.' );
+					$users_Group = & $GroupCache->get_by_ID($fallback_grp_ID);
+
+					if( $users_Group )
+					{ // either $this->default_group_name is not given or wrong
+						$NewUser->set_Group( $users_Group );
+						$assigned_group = true;
+
+						$this->debug_log( 'Using default/fallback group ('.$users_Group->get('name').').' );
+					}
+					else
+					{
+						$this->debug_log( 'Default/fallback group not existing ('.$fallback_grp_ID.').' );
+					}
 				}
+
+			}
+
+			if( $assigned_group )
+			{
+				$NewUser->dbinsert();
+				$UserCache->add( $NewUser );
+
+				$this->debug_log( 'Created user.' );
+			}
+			else
+			{
+				$this->debug_log( 'NOT created user, because no group has been assigned.' );
 			}
 			return true;
 		}
@@ -332,6 +331,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.30  2006/07/20 19:40:36  blueyed
+ * Simplified code/minor
+ *
  * Revision 1.29  2006/07/10 20:41:54  blueyed
  * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
  *
