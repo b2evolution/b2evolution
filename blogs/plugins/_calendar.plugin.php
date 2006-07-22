@@ -98,8 +98,8 @@ class calendar_plugin extends Plugin
 	 *      - 'todaycellstartpost'
 	 *      - 'navigation' : Where do we want to have the navigation arrows? (Default: 'tfoot')
 	 *      - 'browseyears' : boolean  Do we want arrows to move one year at a time?
-	 * 			- 'min_browse' : Minimum timestamp the user can browse too or 'query' (Default: 2000-01-01)
-	 * 			- 'max_browse' : Maximum timestamp the user can browse too or 'query' (Default: now + 1 year )
+	 *      - 'min_timestamp' : Minimum unix timestamp the user can browse too or 'query' (Default: 2000-01-01)
+	 *      - 'max_timestamp' : Maximum unix timestamp the user can browse too or 'query' (Default: now + 1 year )
 	 *      - 'postcount_month_cell'
 	 *      - 'postcount_month_cell_one'
 	 *      - 'postcount_month_atitle'
@@ -113,12 +113,12 @@ class calendar_plugin extends Plugin
 	 */
 	function SkinTag( $params )
 	{
-	 	global $Settings, $month;
+		global $Settings, $month;
 		global $blog, $cat, $catsel;
-	 	global $show_statuses;
-	 	global $author, $assgn, $status;
-	 	global $m, $w, $dstart, $timestamp_min, $timestamp_max;
-	 	global $s, $sentence, $exact;
+		global $show_statuses;
+		global $author, $assgn, $status;
+		global $m, $w, $dstart, $timestamp_min, $timestamp_max;
+		global $s, $sentence, $exact;
 
 		/**
 		 * Default params:
@@ -303,8 +303,8 @@ class Calendar
 	 *
 	 * @param string Month ('YYYYMM'), year ('YYYY'), current ('')
 	 * @param array Associative array of parameters. Valid keys are:
-	 * 			- 'min_browse' : Minimum timestamp the user can browse too or 'query' (Default: 2000-01-01)
-	 * 			- 'max_browse' : Maximum timestamp the user can browse too or 'query' (Default: now + 1 year )
+	 *      - 'min_timestamp' : Minimum unix timestamp the user can browse too or 'query' (Default: 2000-01-01)
+	 *      - 'max_timestamp' : Maximum unix timestamp the user can browse too or 'query' (Default: now + 1 year )
 	 */
 	function Calendar( $m = '', $params = array() )
 	{
@@ -1064,6 +1064,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.25  2006/07/22 18:21:19  blueyed
+ * Fixed doc (min_timestamp/max_timestamp)
+ *
  * Revision 1.24  2006/07/12 22:09:49  blueyed
  * Fixed "Notice: A non well formed numeric value encountered" notices + whitespace
  *
