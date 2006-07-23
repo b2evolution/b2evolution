@@ -245,7 +245,7 @@ $schema_queries = array(
 		" ),
 
 	'T_antispam' => array(
-		'Creating table for Antispam Blackist',
+		'Creating table for Antispam Blacklist',
 		"CREATE TABLE T_antispam (
 			aspm_ID bigint(11) NOT NULL auto_increment,
 			aspm_string varchar(80) NOT NULL,
@@ -630,6 +630,9 @@ function install_insert_default_data( $old_db_version )
 
 /*
  * $Log$
+ * Revision 1.23  2006/07/23 17:19:52  blueyed
+ * MFB
+ *
  * Revision 1.22  2006/07/06 19:59:08  fplanque
  * better logs, better stats, better pruning
  *
