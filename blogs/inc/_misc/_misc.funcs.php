@@ -253,8 +253,8 @@ function zeroise($number, $threshold)
 }
 
 
-/*
- * Convert all non ASCII chars (except if UTF-8 or GB2312) to &#nnnn; unicode references.
+/**
+ * Convert all non ASCII chars (except if UTF-8, GB2312 or CP1251) to &#nnnn; unicode references.
  * Also convert entities to &#nnnn; unicode references if output is not HTML (eg XML)
  *
  * Preserves < > and quotes.
@@ -1492,6 +1492,9 @@ function autoquote( & $string )
  * If that keyword appears in the URL... then the next page has a bad referer! :/
  *
  * {@internal This function gets tested in misc.funcs.simpletest.php.}}
+ *
+ * @todo For checking/validating URLs in the item form (or in general?!) relative URLs should
+ *       be allowed.
  *
  * @param string Url to validate
  * @param array Allowed URI schemes (see /conf/_formatting.php)
@@ -3031,6 +3034,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.84  2006/07/23 22:35:48  blueyed
+ * doc
+ *
  * Revision 1.83  2006/07/23 21:58:14  fplanque
  * cleanup
  *
