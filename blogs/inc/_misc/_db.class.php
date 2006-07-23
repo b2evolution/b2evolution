@@ -1250,6 +1250,8 @@ class DB
 	/**
 	 * Set the charset of the connection.
 	 *
+	 * WARNING: this will fail on MySQL 3.23
+	 * 
 	 * @staticvar array "regular charset => mysql charset map"
 	 * @param string Charset
 	 * @param boolean Use the "regular charset => mysql charset map"?
@@ -1303,13 +1305,15 @@ class DB
 		$r = true;
 		if( $charset != $this->connection_charset )
 		{
+			// SET NAMES is not supported by MySQL 3.23
+			
 			$save_show_errors = $this->show_errors;
 			$save_halt_on_error = $this->halt_on_error;
 			$this->show_errors = false;
 			$this->halt_on_error = false;
 			if( $this->query( 'SET NAMES '.$charset ) === false )
 			{
-				$Debuglog->add( 'Could not "SET NAMES '.$charset.'"! (MySQL error: '.strip_tags($this->last_error).')', array('error', 'locale') );
+				$Debuglog->add( 'Could not "SET NAMES '.$charset.'"! (MySQL error: '.strip_tags($this->last_error).')', 'locale' );
 
 				$r = false;
 			}
@@ -1330,6 +1334,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.17  2006/07/23 22:16:19  fplanque
+ * Using MySQL 3.23 is not an "error"
+ *
  * Revision 1.16  2006/07/19 19:55:12  blueyed
  * Fixed charset handling (especially windows-1251)
  *
