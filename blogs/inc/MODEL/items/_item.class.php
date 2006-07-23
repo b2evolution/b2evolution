@@ -428,7 +428,7 @@ class Item extends DataObject
 	 *
 	 * Note: This actually only returns the URL, to get a real link, use {@link Item::get_permanent_link()}
 	 *
- 	 * @todo archives modes in clean mode
+	 * @todo archives modes in clean mode
 	 *
 	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
 	 * @param string url to use
@@ -2312,7 +2312,7 @@ class Item extends DataObject
 		$Plugins->trigger_event( 'PrependItemInsertTransact', $params = array( 'Item' => & $this ) );
 
 		if( $result = parent::dbinsert() )
-		{ // We could insert the main object..
+		{ // We could insert the item object..
 
 			// Let's handle the extracats:
 			$this->insert_update_extracats( 'insert' );
@@ -2405,7 +2405,7 @@ class Item extends DataObject
 		$Plugins->trigger_event( 'PrependItemUpdateTransact', $params = array( 'Item' => & $this ) );
 
 		if( $result = parent::dbupdate() )
-		{ // We could update the main object..
+		{ // We could update the item object..
 
 			// Let's handle the extracats:
 			$this->insert_update_extracats( 'update' );
@@ -2805,6 +2805,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.70  2006/07/23 21:51:01  blueyed
+ * doc
+ *
  * Revision 1.69  2006/07/10 15:27:45  blueyed
  * Fixed display of Blog name in items list (at least with PHP5 it added "Object id #xx" because of the Item::get_Blog() return value).
  *

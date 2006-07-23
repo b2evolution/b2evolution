@@ -696,8 +696,9 @@ class User extends DataObject
 		global $Plugins;
 
 		if( $result = parent::dbinsert() )
-		{ // We could insert the main object..
-// example of what this can be used for?  what is a "main object" ???
+		{ // We could insert the user object..
+
+			// Notify plugins:
 			$Plugins->trigger_event( 'AfterUserInsert', $params = array( 'User' => & $this ) );
 		}
 
@@ -717,8 +718,9 @@ class User extends DataObject
 		global $DB, $Plugins;
 
 		if( $result = parent::dbupdate() )
-		{ // We could update the main object..
-// example of what this can be used for?  what is a "main object" ???
+		{ // We could update the user object..
+
+			// Notify plugins:
 			$Plugins->trigger_event( 'AfterUserUpdate', $params = array( 'User' => & $this ) );
 		}
 
@@ -1113,6 +1115,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2006/07/23 21:50:28  blueyed
+ * doc
+ *
  * Revision 1.31  2006/07/23 20:18:31  fplanque
  * cleanup
  *

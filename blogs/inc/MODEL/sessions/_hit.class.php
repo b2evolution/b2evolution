@@ -179,14 +179,14 @@ class Hit
 				if( $DB->query( '
 					INSERT INTO T_basedomains( dom_name )
 						VALUES( '.$DB->quote($this->referer_basedomain).' )' ) )
-				{
+				{ // INSERTed ok:
 					$this->referer_domain_ID = $DB->insert_id;
 				}
 				else
-				{
+				{ // INSERT failed: see, try to select again (may become/stay NULL)
 					$this->referer_domain_ID = $DB->get_var( '
 						SELECT dom_ID
-							FROM T_basedomains
+						  FROM T_basedomains
 						 WHERE dom_name = '.$DB->quote($this->referer_basedomain) );
 				}
 
@@ -679,6 +679,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.35  2006/07/23 21:52:31  blueyed
+ * doc
+ *
  * Revision 1.34  2006/07/23 21:44:20  blueyed
  * Fix for referer_domain_ID handling, if INSERT fails
  *
