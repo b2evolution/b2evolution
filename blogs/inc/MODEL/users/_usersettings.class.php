@@ -84,12 +84,15 @@ class UserSettings extends AbstractSettings
 		{
 			global $current_User;
 
-			return parent::get( $current_User->ID, $setting );
+			if( ! isset($current_User) )
+			{ // no current/logged in user:
+				return $this->get_default($setting);
+			}
+
+			$user_ID = $current_User->ID;
 		}
-		else
-		{
-			return parent::get( $user_ID, $setting );
-		}
+
+		return parent::get( $user_ID, $setting );
 	}
 
 
@@ -105,12 +108,16 @@ class UserSettings extends AbstractSettings
 		if( ! isset($user_ID) )
 		{
 			global $current_User;
-			return parent::set( $current_User->ID, $setting, $value );
+
+			if( ! isset($current_User) )
+			{ // no current/logged in user:
+				return false;
+			}
+
+			$user_ID = $current_User->ID;
 		}
-		else
-		{
-			return parent::set( $user_ID, $setting, $value );
-		}
+
+		return parent::set( $user_ID, $setting, $value );
 	}
 
 
@@ -125,6 +132,11 @@ class UserSettings extends AbstractSettings
 		if( ! isset($user_ID) )
 		{
 			global $current_User;
+
+			if( ! isset($current_User) )
+			{ // no current/logged in user:
+				return false;
+			}
 
 			$user_ID = $current_User->ID;
 		}
@@ -188,6 +200,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.15  2006/07/23 22:29:16  blueyed
+ * Fix for if $current_User is not set and no user_ID is given: we cannot set/delete then and get returns the default value
+ *
  * Revision 1.14  2006/07/17 01:53:12  blueyed
  * added param to UserSettings::param_Request
  *
