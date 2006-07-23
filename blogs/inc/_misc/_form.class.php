@@ -1188,8 +1188,9 @@ class Form extends Widget
 							var tab_dynamicSelects = Array();
 						</script>';
 
-		// TODO: check if bozo validator is activated in PHP
-		if( preg_match( '#^(.*)_checkchanges#', $this->form_name ) )
+		global $UserSettings;
+		if( $UserSettings->get( 'control_form_abortions' )
+			&& preg_match( '#^(.*)_checkchanges#', $this->form_name ) )
 		{ // This form will trigger the bozo validator, preset a localized bozo confirm message:
 
 			$r .= '<script type="text/javascript">
@@ -1203,7 +1204,7 @@ class Form extends Widget
 			}
 			else
 			{ // with form title:
-				$r .= sprintf(TS_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' ), $this->title );
+				$r .= sprintf( TS_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' ), $this->title );
 			}
 
 			$r .= '\';
@@ -2594,6 +2595,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.25  2006/07/23 20:18:31  fplanque
+ * cleanup
+ *
  * Revision 1.24  2006/07/08 22:33:43  blueyed
  * Integrated "simple edit form".
  *

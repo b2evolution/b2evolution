@@ -697,6 +697,7 @@ class User extends DataObject
 
 		if( $result = parent::dbinsert() )
 		{ // We could insert the main object..
+// example of what this can be used for?  what is a "main object" ???
 			$Plugins->trigger_event( 'AfterUserInsert', $params = array( 'User' => & $this ) );
 		}
 
@@ -717,6 +718,7 @@ class User extends DataObject
 
 		if( $result = parent::dbupdate() )
 		{ // We could update the main object..
+// example of what this can be used for?  what is a "main object" ???
 			$Plugins->trigger_event( 'AfterUserUpdate', $params = array( 'User' => & $this ) );
 		}
 
@@ -1111,6 +1113,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2006/07/23 20:18:31  fplanque
+ * cleanup
+ *
  * Revision 1.30  2006/07/17 01:33:13  blueyed
  * Fixed account validation by email for users who registered themselves
  *

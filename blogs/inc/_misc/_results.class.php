@@ -734,45 +734,54 @@ class Results extends Widget
 
 
 	/**
-	 * Display the filtering form
+	 * Display options area
+	 *
+	 * @param string name of the option ( ma_colselect, tsk_filter....)
+	 * @param string area name ( colselect_area, filter_area )
+	 * @param string option title
+	 * @param string submit button title
+	 * @param string default folde state when is empty in the session
+	 *
 	 */
-	function display_filters()
+	function display_option_area( $option_name, $area_name, $option_title, $submit_title, $default_folde_state = 'expanded' )
 	{
 		global $debug, $Session, $Request;
 
-		if( empty( $this->filter_area ) )
-		{	// We don't want to display a filters section:
-			return;
-		}
-
 		// Do we already have a form?
 		$create_new_form = ! isset( $this->Form );
-		// echo 'create new form='.($create_new_form ? 'yes' : 'no' );
 
 		echo $this->replace_vars( $this->params['filters_start'] );
 
-		$filter_name = $this->param_prefix.'filters';
-		$filter_fold_state = $Session->get( $filter_name );
+		$fold_state = $Session->get( $option_name );
 
-		if( $filter_fold_state == 'collapsed' )
+		if( empty( $fold_state ) )
 		{
-			echo '<a class="filters_title" href="'.regenerate_url( '', 'expand='.$filter_name ).'"
-								onclick="return toggle_filter_area(\''.$filter_name.'\');" >'
-						.get_icon( 'expand', 'imgtag', array( 'id' => 'clickimg_'.$filter_name ) );
+			$fold_state = $default_folde_state;
+		}
+
+		//__________________________________  Toogle link _______________________________________
+
+		if( $fold_state == 'collapsed' )
+		{
+			echo '<a class="filters_title" href="'.regenerate_url( '', 'expand='.$option_name ).'"
+								onclick="return toggle_filter_area(\''.$option_name.'\');" >'
+						.get_icon( 'expand', 'imgtag', array( 'id' => 'clickimg_'.$option_name ) );
 		}
 		else
 		{
-			echo '<a class="filters_title" href="'.regenerate_url( '', 'collapse='.$filter_name ).'"
-								onclick="return toggle_filter_area(\''.$filter_name.'\');" >'
-						.get_icon( 'collapse', 'imgtag', array( 'id' => 'clickimg_'.$filter_name ) );
+			echo '<a class="filters_title" href="'.regenerate_url( '', 'collapse='.$option_name ).'"
+								onclick="return toggle_filter_area(\''.$option_name.'\');" >'
+						.get_icon( 'collapse', 'imgtag', array( 'id' => 'clickimg_'.$option_name ) );
 		}
-		echo T_('Filters').'</a>:';
+		echo $option_title.'</a>:';
 
-		if( !empty( $this->filter_area['presets'] ) )
+		//_____________________________ Filters preset ___________________________________________
+
+		if( !empty( $this->{$area_name}['presets'] ) )
 		{ // We have preset filters
 			$r = array();
 			// Loop on all preset filters:
-			foreach( $this->filter_area['presets'] as $key => $preset )
+			foreach( $this->{$area_name}['presets'] as $key => $preset )
 			{
 				if( method_exists( $this, 'is_filtered' ) && !$this->is_filtered()
 							&& $Request->get( $this->param_prefix.'filter_preset' ) == $key )
@@ -788,28 +797,33 @@ class Results extends Widget
 			echo ' '.implode( ' ', $r );
 		}
 
+		//_________________________________________________________________________________________
+
 		if( $debug > 1 )
 		{
-			echo ' <span class="notes">('.$filter_name.':'.$filter_fold_state.')</span>';
+			echo ' <span class="notes">('.$option_name.':'.$fold_state.')</span>';
 			echo ' <span id="asyncResponse"></span>';
 		}
 
-		echo '<div id="clickdiv_'.$filter_name.'"';
-		if( $filter_fold_state == 'collapsed' )
+		// Begining of the div:
+		echo '<div id="clickdiv_'.$option_name.'"';
+		if( $fold_state == 'collapsed' )
 		{
 			echo ' style="display:none;"';
 		}
 		echo '>';
 
+		//_____________________________ Form and callback _________________________________________
 
-		if( !empty($this->filter_area['callback']) )
+		if( !empty($this->{$area_name}['callback']) )
 		{	// We want to display filtering form fields:
 
 			if( $create_new_form )
 			{	// We do not already have a form surrounding the whole results list:
-				if( !empty( $this->filter_area['url_ignore'] ) )
+
+				if( !empty( $this->{$area_name}['url_ignore'] ) )
 				{
-					$ignore = $this->filter_area['url_ignore'];
+					$ignore = $this->{$area_name}['url_ignore'];
 				}
 				else
 				{
@@ -821,22 +835,53 @@ class Results extends Widget
 				$this->Form->begin_form( '' );
 			}
 
-			$submit_name = empty( $this->filter_area['submit'] ) ? 'filter_submit' : $this->filter_area['submit'];
-			$this->Form->submit( array( $submit_name, T_('Filter list'), 'filter' ) );
+			$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
+			$this->Form->submit( array( $submit_name, $submit_title, 'filter' ) );
 
-			$func = $this->filter_area['callback'];
+			$func = $this->{$area_name}['callback'];
 			$func( $this->Form );
 
 			if( $create_new_form )
 			{	// We do not already have a form surrounding the whole result list:
 				$this->Form->end_form( '' );
 			}
-
 		}
 
 		echo '</div>';
 
 		echo $this->params['filters_end'];
+	}
+
+
+	/**
+	 * Display the column selection
+	 */
+	function display_colselect()
+	{
+		if( empty( $this->colselect_area ) )
+		{	// We don't want to display a col selection section:
+			return;
+		}
+
+		$option_name = $this->param_prefix.'colselect';
+
+		$this->display_option_area( $option_name, 'colselect_area', T_('Columns'), T_('Apply'), 'collapsed');
+	}
+
+
+	/**
+	 * Display the filtering form
+	 */
+	function display_filters()
+	{
+		if( empty( $this->filter_area ) )
+		{	// We don't want to display a filters section:
+			return;
+		}
+
+		$option_name = $this->param_prefix.'filters';
+
+		$this->display_option_area( $option_name, 'filter_area', T_('Filters'), T_('Filter list'), 'expanded' );
 	}
 
 
@@ -859,6 +904,10 @@ class Results extends Widget
 		{ // A title has been defined for this result set:
 			echo $this->replace_vars( $this->params['head_title'] );
 		}
+
+
+		// DISPLAY COL SELECTION
+		$this->display_colselect();
 
 
 		// DISPLAY FILTERS:
@@ -906,7 +955,7 @@ class Results extends Widget
 					if( is_null( $current_th_group_title ) || $col['th_group'] != $current_th_group_title )
 					{	// It's the begining of a th_group colspan (line0):
 
-						//Initialize current th_group colpsan to 1 (line0):
+						//Initialize current th_group colspan to 1 (line0):
 						$current_th_group_colspan = 1;
 
 						// Set colspan and rowspan colum for line0 to 1:
@@ -922,7 +971,7 @@ class Results extends Widget
 						$header_cells[0][$key]['colspan'] = 0;
 						$header_cells[0][$key]['rowspan'] = 0;
 
-						//Update current th_group colpsan to 1 (line0):
+						//Update current th_group colspan to 1 (line0):
 						$current_th_group_colspan++;
 					}
 
@@ -935,7 +984,7 @@ class Results extends Widget
 				if( is_null( $current_th_title ) || $col['th'] != $current_th_title )
 				{	// It's the begining of a th colspan (line1)
 
-					//Initialize current th colpsan to 1 (line1):
+					//Initialize current th colspan to 1 (line1):
 					$current_th_colspan = 1;
 
 					// Update current th title:
@@ -2113,6 +2162,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.23  2006/07/23 20:18:31  fplanque
+ * cleanup
+ *
  * Revision 1.22  2006/07/16 23:07:19  fplanque
  * no message
  *

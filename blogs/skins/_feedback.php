@@ -78,8 +78,8 @@ if( $disp_trackback_url )
 
 	<?php
 	/*
-	Trigger plugin event, which could display a captcha form, before generating a whitelisted URL:
-	*/
+	 * Trigger plugin event, which could display a captcha form, before generating a whitelisted URL:
+	 */
 	if( ! $Plugins->trigger_event_first_true( 'DisplayTrackbackAddr',
 			array('Item' => & $Item, 'template' => '<code>%url%</code>') ) )
 	{ // No plugin displayed a payload, so we just display the default:
@@ -309,6 +309,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.74  2006/07/23 20:18:32  fplanque
+ * cleanup
+ *
  * Revision 1.73  2006/07/23 17:19:52  blueyed
  * MFB
  *

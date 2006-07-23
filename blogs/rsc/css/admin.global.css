@@ -95,3 +95,40 @@ span.legend_element {
 	font-weight: bold;
 	color: #FF0000;
 }
+
+
+/*
+ * Grouping of plugins:
+ */
+table.grouped tr.PluginsGroup,
+table.grouped tr.PluginsSubGroup {
+	text-align:left;
+}
+
+table.grouped tr.PluginsGroup th,
+table.grouped tr.PluginsSubGroup th {
+	border-left:none;
+}
+
+table.grouped tr.PluginsSeperator th {
+	height:7px;
+	background-color: #f5f3ef;
+	border-top: 1px solid #9e9286;
+}
+
+table.grouped tr.PluginsSubGroup th {
+	border-bottom: 1px solid #9e9286;
+	border-top: 1px solid #9e9286;
+}
+
+table.grouped tr.PluginsSubGroup th {
+	background-color: #efede0;
+	color:#666666;
+}
+
+table.grouped tr.PluginsSubGroup th,
+table.grouped tr.PluginsSubGroup td.firstcol {
+	padding-left:15px;
+}
+
+/* / Grouping of plugins */

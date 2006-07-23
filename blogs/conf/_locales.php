@@ -362,7 +362,7 @@ $locales = array(
 										'messages' => 'pt_PT',
 										'enabled' => 1,
 									),
-	'ru-RU' => array( 'name' => NT_('Russian (RU)'),
+	'ru-RU-cp1251' => array( 'name' => NT_('Russian (RU)'),
 										'charset' => 'windows-1251',
 										'datefmt' => 'Y-m-d',
 										'timefmt' => 'H:i:s',

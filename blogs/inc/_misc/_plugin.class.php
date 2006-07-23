@@ -600,7 +600,7 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters.
 	 *              - 'target_type': either 'Comment' or 'Item'.
-	 *              - 'edit_layout': "simple", "expert" (default)
+	 *              - 'edit_layout': "simple", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
 	 * @return boolean did we display a button?
 	 */
 	function AdminDisplayEditorButton( $params )
@@ -614,7 +614,7 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *              - 'target_type': either 'Comment' or 'Item'.
-	 *              - 'edit_layout': "simple", "expert" (default)
+	 *              - 'edit_layout': "simple", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
 	 * @return boolean did we display a toolbar?
 	 */
 	function AdminDisplayToolbar( & $params )
@@ -1835,7 +1835,7 @@ class Plugin
 	/**
 	 * Translate a given string, in the Plugin's context.
 	 *
-	 * This means, that the translation is taken out of the Plugin's "locales" folder.
+	 * This means, that the translation is obtained from the Plugin's "locales" folder.
 	 * @link http://manual.b2evolution.net/Localization#Plugins
 	 *
 	 * It uses the global/regular {@link T_()} function as fallback.
@@ -2487,6 +2487,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.77  2006/07/23 20:18:31  fplanque
+ * cleanup
+ *
  * Revision 1.76  2006/07/17 01:19:25  blueyed
  * Added events: AfterUserInsert, AfterUserUpdate, AfterUserDelete
  *

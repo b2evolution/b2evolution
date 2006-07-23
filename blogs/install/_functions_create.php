@@ -217,12 +217,17 @@ function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
+	$edited_Item->insert( 1, 'Nate', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://www.loganelementary.com', 'disabled', array() );
+
+	// Insert a post into linkblog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
 	$edited_Item->insert( 1, 'Danny', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://brendoman.com/dbc', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Yabba', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://www.innervisions.org.uk/babbles/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Yabba', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-UK', '', 0, true, '', 'http://www.innervisions.org.uk/babbles/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -920,8 +925,8 @@ function install_basic_plugins()
 
 /*
  * $Log$
- * Revision 1.191  2006/07/08 17:04:19  fplanque
- * minor
+ * Revision 1.192  2006/07/23 20:18:31  fplanque
+ * cleanup
  *
  * Revision 1.190  2006/07/04 17:32:30  fplanque
  * no message

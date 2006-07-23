@@ -30,7 +30,7 @@ define( 'EVO_MAIN_INIT', true );
 require $misc_inc_path.'_log.class.php';
 require $misc_inc_path.'_misc.funcs.php';
 require $misc_inc_path.'_form.funcs.php';
-require dirname(__FILE__).'/_pofile.class.php';
+require dirname(__FILE__).'/pofile.class.php';
 /**#@-*/
 
 $Debuglog = new Log();

@@ -513,7 +513,7 @@ class Hit
 				hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
 				hit_referer, hit_referer_dom_ID, hit_blog_ID, hit_remote_addr, hit_agnt_ID )
 			VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($ReqURI).'", "'.$this->referer_type
-				.'", "'.$DB->escape($this->referer).'", "'.$this->referer_domain_ID.'", '.$DB->quote($blog_ID).', "'.$DB->escape( $this->IP ).'", '.$this->agent_ID.'
+				.'", "'.$DB->escape($this->referer).'", "'.$this->referer_domain_ID.'", '.$DB->null($blog_ID).', "'.$DB->escape( $this->IP ).'", '.$this->agent_ID.'
 			)';
 
 		$DB->query( $sql, 'Record the hit' );
@@ -661,6 +661,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.33  2006/07/23 20:18:31  fplanque
+ * cleanup
+ *
  * Revision 1.32  2006/07/12 23:29:15  blueyed
  * Fixed notice when logging hits on admin pages where no Blog has been selected.
  *

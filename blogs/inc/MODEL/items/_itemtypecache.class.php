@@ -76,23 +76,23 @@ class ItemTypeCache extends DataObjectCache
 	function load_col( $col_ID )
 	{
 		global $DB;
-		
-		$rows = $DB->get_results( 'SELECT * 
+
+		$rows = $DB->get_results( 'SELECT *
 																 FROM T_itemtypes
 													 INNER JOIN T_ityp_col ON ityp_ID = itco_ityp_ID
 																WHERE itco_col_ID = '.$col_ID.'
 																ORDER BY ityp_name' );
 
 		foreach( $rows as $row )
-		{	
+		{
 			// Instantiate the item type to the global cache and add it to the collections cache
-			$this->col_cache[$col_ID][] = & $this->instantiate( $row );
+			$this->col_cache[$col_ID][$row->ityp_ID] = & $this->instantiate( $row );
 
 			if( $row->itco_coldefault <> 0 )
 			{	// Item type is selected by default, so update the default item types collection
 				$this->col_default[$col_ID] = $row->ityp_ID;
 			}
-		}	
+		}
 	}
 
 
@@ -134,7 +134,7 @@ class ItemTypeCache extends DataObjectCache
 		}
 
 		$r = '';
-		
+
 		// Loop on all item types from the collection cache
 		foreach( $this->col_cache[ $col_ID ] as $loop_Obj )
 		{
@@ -148,7 +148,7 @@ class ItemTypeCache extends DataObjectCache
 		return $r;
 	}
 
-	
-	
+
+
 }
 ?>

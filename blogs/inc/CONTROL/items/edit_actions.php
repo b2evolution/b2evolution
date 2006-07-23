@@ -94,10 +94,13 @@ switch($action)
 		$edited_Item->load_from_Request();
 		$Request->link_log_messages_to_field_IDs = $old_Request_link_log_messages_to_field_IDs;
 
+		// Add a radio into blog settings > Features > Post title: () required () optional () none
+		/*
 		if( empty($edited_Item->title) )
 		{ // post_title is "TEXT NOT NULL" and a title makes sense anyway
 			$Messages->add( T_('Please give a title.') );
 		}
+		*/
 
 		// Post post-publishing stuff:
 		param( 'post_pingback', 'integer', 0 );
@@ -109,8 +112,10 @@ switch($action)
 		if( $Messages->count('error') )
 		{
 			echo '<div class="panelinfo">';
-			$Messages->display( T_('Cannot post, please correct these errors:') );
+			$Messages->display( T_('Cannot post, please correct these errors:'),
+				'[<a href="javascript:history.go(-1)">'.T_('Back to post editing').'</a>]' );
 
+			// TODO: if we the window has history-1, it should be used. Hard POST should only be used if JS fails.
 			$Form = new Form();
 			$Form->hiddens_by_key( $_POST );
 			$Form->begin_form();
@@ -614,6 +619,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2006/07/23 20:18:30  fplanque
+ * cleanup
+ *
  * Revision 1.17  2006/07/10 18:17:09  blueyed
  * Do not display footer with bloglist and back-to-posts link, if there were errors.
  *

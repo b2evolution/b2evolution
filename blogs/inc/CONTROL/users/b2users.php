@@ -540,9 +540,9 @@ if( !$Messages->count('error') )
 			$edited_Group->set( 'name', $edited_grp_name );
 
 			$edited_Group->set( 'perm_blogs', param( 'edited_grp_perm_blogs', 'string', true ) );
-			$edited_Group->set( 'perm_stats', param( 'edited_grp_perm_stats', 'string', true ) );
 			$edited_Group->set( 'perm_spamblacklist', param( 'edited_grp_perm_spamblacklist', 'string', true ) );
 			$edited_Group->set( 'perm_templates', param( 'edited_grp_perm_templates', 'integer', 0 ) );
+			$edited_Group->set( 'perm_stats', param( 'edited_grp_perm_stats', 'string', true ) );
 			$edited_Group->set( 'perm_options', param( 'edited_grp_perm_options', 'string', true ) );
 			$edited_Group->set( 'perm_files', param( 'edited_grp_perm_files', 'string', true ) );
 
@@ -682,6 +682,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.28  2006/07/23 20:18:30  fplanque
+ * cleanup
+ *
  * Revision 1.27  2006/07/10 05:39:36  yabs
  * added "features changed" message
  *

@@ -44,7 +44,7 @@ $Form->begin_form( 'fform' );
 	$Form->hidden( 'redirect_to', $redirect_to );
 
 	if( isset( $action, $reqID, $sessID ) && $action == 'validatemail' )
-	{ // the user clicked the link from the "validate your account" email, but has not been logged in; pass on the reölevant data:
+	{ // the user clicked the link from the "validate your account" email, but has not been logged in; pass on the relevant data:
 		$Form->hidden( 'action', 'validatemail' );
 		$Form->hidden( 'reqID', $reqID );
 		$Form->hidden( 'sessID', $sessID );
@@ -125,6 +125,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.13  2006/07/23 20:18:31  fplanque
+ * cleanup
+ *
  * Revision 1.12  2006/07/17 01:33:13  blueyed
  * Fixed account validation by email for users who registered themselves
  *
