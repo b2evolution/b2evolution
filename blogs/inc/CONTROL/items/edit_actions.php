@@ -94,7 +94,7 @@ switch($action)
 		$edited_Item->load_from_Request();
 		$Request->link_log_messages_to_field_IDs = $old_Request_link_log_messages_to_field_IDs;
 
-		// Add a radio into blog settings > Features > Post title: () required () optional () none
+		// TODO: Add a radio into blog settings > Features > Post title: () required () optional () none
 		/*
 		if( empty($edited_Item->title) )
 		{ // post_title is "TEXT NOT NULL" and a title makes sense anyway
@@ -112,15 +112,31 @@ switch($action)
 		if( $Messages->count('error') )
 		{
 			echo '<div class="panelinfo">';
-			$Messages->display( T_('Cannot post, please correct these errors:'),
-				'[<a href="javascript:history.go(-1)">'.T_('Back to post editing').'</a>]' );
+			$Messages->display( T_('Cannot post, please correct these errors:') );
 
-			// TODO: if we the window has history-1, it should be used. Hard POST should only be used if JS fails.
-			$Form = new Form();
+			// if we the window has a history, acessible through JS, it gets used.
+			// The "Hard POST" form below gets replaced by it.
+			// NOTE: as far as I've read in the forums, IE or the like, loses form input on history.back()..
+			$Form = new Form(NULL, 'back_to_posts_form');
 			$Form->hiddens_by_key( $_POST );
 			$Form->begin_form();
 			$Form->button( array( 'value' => T_('Back to post editing'), 'class' => 'ActionButton' ) );
 			$Form->end_form();
+
+			echo '<script type="text/javascript">
+			if( history.length > 0 )
+			{
+				var back_to_post = document.createElement("p");
+				back_to_post.appendChild( document.createTextNode("["), null );
+				var back_a = document.createElement("a");
+				back_a.href = "javascript:history.back()";
+				back_a.innerHTML = "'.T_('Back to post editing').'";
+				back_to_post.appendChild( back_a, null );
+				back_to_post.appendChild( document.createTextNode("]"), null );
+
+				document.getElementById("back_to_posts_form").parentNode.replaceChild( back_to_post, document.getElementById("back_to_posts_form") );
+			}
+			</script>';
 
 			echo '</div>';
 			break;
@@ -619,6 +635,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2006/07/23 22:44:10  blueyed
+ * Use JS history.back() if available, instead of hard POST form
+ *
  * Revision 1.18  2006/07/23 20:18:30  fplanque
  * cleanup
  *
