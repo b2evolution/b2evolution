@@ -93,7 +93,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->begin_fieldset( T_('Post contents') );
 
-	$Form->text( 'post_title', $post_title, 48, T_('Title'), '', 255 );
+	$Form->text_input( 'post_title', $post_title, 48, T_('Title'), array('maxlength'=>255, 'onkeyup'=>'document.title = document.title.replace(/:[^:]*$/, ": "+this.value);') );
 
 	echo ' <span id="itemform_post_locale">'; // allow wrapping here! (and below)
 	                                          // blueyed>> (Opera would additionally need text/&nbsp; here, but that wraps ugly)
@@ -360,6 +360,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.15  2006/07/23 23:53:33  blueyed
+ * item forms: update document title, if title gets changed (very useful in usability means)
+ *
  * Revision 1.14  2006/07/08 22:33:43  blueyed
  * Integrated "simple edit form".
  *

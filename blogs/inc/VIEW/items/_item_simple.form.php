@@ -107,7 +107,7 @@ $Form->hidden( 'renderers', $Request->param('renderers', 'array', NULL) );
 
 	$Form->begin_fieldset( T_('Post contents') );
 
-	$Form->text( 'post_title', $post_title, 48, T_('Title'), '', 255 );
+	$Form->text_input( 'post_title', $post_title, 48, T_('Title'), array('maxlength'=>255, 'onkeyup'=>'document.title = document.title.replace(/:[^:]*$/, ": "+this.value);') );
 
 	// --------------------------- TOOLBARS ------------------------------------
 	echo '<div class="edit_toolbars">';
@@ -282,6 +282,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.4  2006/07/23 23:53:33  blueyed
+ * item forms: update document title, if title gets changed (very useful in usability means)
+ *
  * Revision 1.3  2006/07/16 23:04:05  fplanque
  * Most plugins should keep as quiet as possible in simple mode.
  * Smilies are about the only thing simple enough for simple mode.
