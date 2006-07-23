@@ -1799,7 +1799,7 @@ function debug_die( $additional_info = '' )
 		// Throw error to the server, but do not display them.
 		// Therefor we temporarily set display_errors=0 and log_errors=1
 
-		// TODO: make this a configurable option?
+		// TODO: make this a configurable option? fp> YES!!! /conf/_advanced
 
 		$old_display_errors = ini_get('display_errors');
 		if( $old_display_errors ) ini_set('display_errors', 0);
@@ -3031,6 +3031,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.83  2006/07/23 21:58:14  fplanque
+ * cleanup
+ *
  * Revision 1.82  2006/07/19 19:55:12  blueyed
  * Fixed charset handling (especially windows-1251)
  *

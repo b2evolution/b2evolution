@@ -95,7 +95,7 @@ if( ($use_l10n == 1) && function_exists('_') )
 
 }
 elseif( $use_l10n == 2 )
-{ // We are going to use b2evo localization:
+{ // We are going to use evoCore localization:
 
 	/**
 	 * @ignore
@@ -866,6 +866,9 @@ function init_charsets( $io )
 
 /*
  * $Log$
+ * Revision 1.12  2006/07/23 21:58:14  fplanque
+ * cleanup
+ *
  * Revision 1.11  2006/07/19 19:55:12  blueyed
  * Fixed charset handling (especially windows-1251)
  *
@@ -873,7 +876,7 @@ function init_charsets( $io )
  * Fixed charset init for install
  *
  * Revision 1.9  2006/06/30 22:58:13  blueyed
- * Abstracted charset conversation, not much tested.
+ * Abstracted charset conversion, not much tested.
  *
  * Revision 1.8  2006/06/01 18:36:10  fplanque
  * no message
