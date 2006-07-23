@@ -41,6 +41,8 @@ require_once dirname(__FILE__).'/_widget.class.php';
 
 /**
  * Results class
+ *
+ * @todo Support $cols[]['order_rows_callback'] / order_objects_callback also if there's a LIMIT?
  */
 class Results extends Widget
 {
@@ -132,16 +134,19 @@ class Results extends Widget
 	 * - th
 	 * - td
 	 * - order: SQL column name(s) to sort by (delimited by comma)
-	 * - order_callback: a PHP callback function (can be array($Object, $method)).
+	 * - order_objects_callback: a PHP callback function (can be array($Object, $method)).
 	 *     This gets three params: $a, $b, $desc.
-	 *     $a and $b are either DB row objects or instantiated objects
-	 *     from {@link Results::Cache} (see "order_callback_use_rows").
+	 *     $a and $b are instantiated objects from {@link Results::Cache}
 	 *     $desc is either 'ASC' or 'DESC'. The function has to return -1, 0 or 1,
 	 *     according to if the $a < $b, $a == $b or $a > $b.
-	 * - order_callback_use_rows: by default, objects get instantiated and passed to "order_callback".
-	 *     By setting this to true, the rows get passed on to "order_callback" instead. 
-	 *    fp> TODO: this is TOO DEEP/TOO COMLPLEX. Use order_rows_callback vs order_objects_callback instead. Choose one that gets priority.
-	 * -td_start. A column with no def will be displayed using
+	 * - order_rows_callback: a PHP callback function (can be array($Object, $method)).
+	 *     This gets three params: $a, $b, $desc.
+	 *     $a and $b are DB row objects
+	 *     $desc is either 'ASC' or 'DESC'. The function has to return -1, 0 or 1,
+	 *     according to if the $a < $b, $a == $b or $a > $b.
+	 * - td_start
+	 *
+	 * A column with no def will be displayed using
 	 * the default defs from Results::params, that is to say, one of these:
 	 *   - $this->params['col_start_first'];
 	 *   - $this->params['col_start_last'];
@@ -217,7 +222,7 @@ class Results extends Widget
 	var $order_field_list;
 
 	/**
-	 * @var array List of sortable columns by callback ("order_callback")
+	 * @var array List of sortable columns by callback ("order_objects_callback" and "order_rows_callback")
 	 */
 	var $order_callbacks;
 
@@ -246,12 +251,11 @@ class Results extends Widget
 	 * @param string default ordering of columns (special syntax) if not specified in the URL params
 	 *               example: -A-- will sort in ascending order on 2nd column
 	 *               example: ---D will sort in descending order on 4th column
-	 * @param integer number of lines displayed on one page (0 to disable paging) TODO: use NULL, not 0.
+	 * @param integer number of lines displayed on one page (NULL to disable paging)
 	 * @param boolean
 	 * @param NULL|string SQL query used to count the total # of rows (if NULL, we'll try to COUNT(*) by ourselves)
 	 */
-	function Results( $sql, $param_prefix = '', $default_order = '', $limit = 20, $count_sql = NULL,
-									$init_page = true )
+	function Results( $sql, $param_prefix = '', $default_order = '', $limit = 20, $count_sql = NULL, $init_page = true )
 	{
 		global $DB;
 		$this->DB = & $DB;
@@ -408,7 +412,7 @@ class Results extends Widget
 		{
 			if( $append_limit && !empty($this->limit) )
 			{
-				debug_die( '"order_callback" is not supported with LIMIT.' );
+				debug_die( '"order_objects_callback"/"order_rows_callback" are not supported with LIMIT.' );
 			}
 
 			foreach( $this->order_callbacks as $order_callback )
@@ -1062,7 +1066,7 @@ class Results extends Widget
 						else
 						{	// The cell is a th
 							$th_title = $this->cols[$key]['th'] ;
-							$col_order = isset( $this->cols[$key]['order'] ) || isset( $this->cols[$key]['order_callback'] );
+							$col_order = isset( $this->cols[$key]['order'] ) || isset( $this->cols[$key]['order_objects_callback'] ) || isset( $this->cols[$key]['order_rows_callback'] );
 						}
 
 
@@ -1640,7 +1644,7 @@ class Results extends Widget
 
 				foreach( $this->cols as $col )
 				{
-					if( isset( $col['order'] ) || isset( $col['order_callback'] ) )
+					if( isset( $col['order'] ) || isset( $col['order_objects_callback'] ) || isset( $col['order_rows_callback'] ) )
 					{ // We have found the first orderable column:
 						$this->order .= 'A';
 						break;
@@ -1678,21 +1682,41 @@ class Results extends Widget
 					}
 				}
 
-				if( isset( $this->cols[$i]['order_callback'] ) )
-				{	// if column is sortable by callback:
+				if( isset( $this->cols[$i]['order_objects_callback'] ) )
+				{	// if column is sortable by object callback:
 					switch( substr( $this->order, $i, 1 ) )
 					{
 						case 'A':
 							$this->order_callbacks[] = array(
-									'callback' => $this->cols[$i]['order_callback'],
-									'use_rows' => ! empty($this->cols[$i]['order_callback_use_rows']),
+									'callback' => $this->cols[$i]['order_objects_callback'],
+									'use_rows' => false,
 									'order'=>'ASC' );
 							break;
 
 						case 'D':
 							$this->order_callbacks[] = array(
-									'callback' => $this->cols[$i]['order_callback'],
-									'use_rows' => ! empty($this->cols[$i]['order_callback_use_rows']),
+									'callback' => $this->cols[$i]['order_objects_callback'],
+									'use_rows' => false,
+									'order' => 'DESC' );
+							break;
+					}
+				}
+
+				if( isset( $this->cols[$i]['order_rows_callback'] ) )
+				{	// if column is sortable by callback:
+					switch( substr( $this->order, $i, 1 ) )
+					{
+						case 'A':
+							$this->order_callbacks[] = array(
+									'callback' => $this->cols[$i]['order_rows_callback'],
+									'use_rows' => true,
+									'order'=>'ASC' );
+							break;
+
+						case 'D':
+							$this->order_callbacks[] = array(
+									'callback' => $this->cols[$i]['order_rows_callback'],
+									'use_rows' => true,
 									'order' => 'DESC' );
 							break;
 					}
@@ -2162,6 +2186,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.24  2006/07/23 23:01:55  blueyed
+ * cleanup
+ *
  * Revision 1.23  2006/07/23 20:18:31  fplanque
  * cleanup
  *

@@ -61,7 +61,7 @@ $UserSettings->param_Request( 'results_plug_order', 'results_plug_order', 'strin
 
 $Results = new Results( '
 	SELECT plug_status, plug_ID, plug_priority, plug_code, plug_apply_rendering FROM T_plugins',
-	'plug_', '--A', 0 /* no limit */ );
+	'plug_', '--A', NULL /* no limit */ );
 
 $Results->Cache = & $admin_Plugins;
 
@@ -418,6 +418,9 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 <?php
 /*
  * $Log$
+ * Revision 1.30  2006/07/23 23:01:55  blueyed
+ * cleanup
+ *
  * Revision 1.29  2006/07/17 01:53:12  blueyed
  * added param to UserSettings::param_Request
  *
