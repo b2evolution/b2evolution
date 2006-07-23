@@ -766,19 +766,12 @@ function cat_select( $display_info = true, $form_fields = true )
 	}
 
 	$cat_select_form_fields = $form_fields;
-	// $default_main_cat = $edited_Item->main_cat_ID;
+	if( ! isset($default_main_cat) )
+	{
+		$default_main_cat = $edited_Item->main_cat_ID;
+	}
 
 	cat_query( 'none' ); // make sure the caches are loaded
-
-
-	// Needed for tab switching in b2edit.php:
-// fp> Seems like the very wrong place for this!!! this should be in b2edit.php
-	$default_main_cat = $Request->param( 'post_category', 'integer', $edited_Item->main_cat_ID );
-	if( $default_main_cat && $allow_cross_posting < 3 && get_catblog($default_main_cat) != $blog )
-	{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing: setting it to 0 uses the first cat in the list
-		$default_main_cat = 0;
-	}
-	$post_extracats = $Request->param( 'post_extracats', 'array', $post_extracats );
 
 	if( $allow_cross_posting >= 2 )
 	{ // If BLOG cross posting enabled, go through all blogs with cats:
@@ -943,6 +936,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.13  2006/07/23 23:27:07  blueyed
+ * cleanup
+ *
  * Revision 1.12  2006/07/23 20:18:30  fplanque
  * cleanup
  *
