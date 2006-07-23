@@ -4,7 +4,7 @@ echo Generate file list.
 dir /b /s ..\blogs\*.php > files.txt
 
 echo Extract strings.
-xgettext -D ../blogs/ -f files.txt --no-wrap --add-comments=TRANS --copyright-holder="Francois PLANQUE" --msgid-bugs-address=http://fplanque.net/ --output=..\blogs\locales\messages.pot --keyword=T_ --keyword=NT_
+xgettext -D ../blogs/ -f files.txt --no-wrap --add-comments=TRANS --copyright-holder="Francois PLANQUE" --msgid-bugs-address=http://fplanque.net/ --output=..\blogs\locales\messages.pot --keyword=T_ --keyword=NT_ --keyword=TS_
 
 echo Correct paths.
 xchangecl +d! ..\blogs\locales\messages.pot !D:\www\b2evo\blogs\!..\..\..\!
