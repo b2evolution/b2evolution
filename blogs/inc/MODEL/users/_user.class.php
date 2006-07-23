@@ -698,7 +698,7 @@ class User extends DataObject
 		if( $result = parent::dbinsert() )
 		{ // We could insert the user object..
 
-			// Notify plugins:
+			// Notify plugins:  fp> what for? example please!
 			$Plugins->trigger_event( 'AfterUserInsert', $params = array( 'User' => & $this ) );
 		}
 
@@ -720,7 +720,7 @@ class User extends DataObject
 		if( $result = parent::dbupdate() )
 		{ // We could update the user object..
 
-			// Notify plugins:
+			// Notify plugins:  fp> what for? example please!
 			$Plugins->trigger_event( 'AfterUserUpdate', $params = array( 'User' => & $this ) );
 		}
 
@@ -1115,6 +1115,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.33  2006/07/23 22:07:18  fplanque
+ * cleanup
+ *
  * Revision 1.32  2006/07/23 21:50:28  blueyed
  * doc
  *

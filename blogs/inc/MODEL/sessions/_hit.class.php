@@ -166,6 +166,7 @@ class Hit
 			if( !empty( $basedomain->dom_ID ) )
 			{	// This basedomain has visited before:
 				$this->referer_domain_ID = $basedomain->dom_ID;
+				// fp> The blacklist handling that was here made no sense.
 			}
 			else
 			{	// This is the first time this base domain visits:
@@ -679,6 +680,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.36  2006/07/23 22:07:18  fplanque
+ * cleanup
+ *
  * Revision 1.35  2006/07/23 21:52:31  blueyed
  * doc
  *
