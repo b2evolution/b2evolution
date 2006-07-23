@@ -1251,7 +1251,7 @@ class DB
 	 * Set the charset of the connection.
 	 *
 	 * WARNING: this will fail on MySQL 3.23
-	 * 
+	 *
 	 * @staticvar array "regular charset => mysql charset map"
 	 * @param string Charset
 	 * @param boolean Use the "regular charset => mysql charset map"?
@@ -1305,8 +1305,8 @@ class DB
 		$r = true;
 		if( $charset != $this->connection_charset )
 		{
-			// SET NAMES is not supported by MySQL 3.23
-			
+			// SET NAMES is not supported by MySQL 3.23 and for a non-supported charset even not in MySQL 5 probably..
+
 			$save_show_errors = $this->show_errors;
 			$save_halt_on_error = $this->halt_on_error;
 			$this->show_errors = false;
@@ -1334,6 +1334,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.18  2006/07/23 22:33:58  blueyed
+ * comment
+ *
  * Revision 1.17  2006/07/23 22:16:19  fplanque
  * Using MySQL 3.23 is not an "error"
  *
