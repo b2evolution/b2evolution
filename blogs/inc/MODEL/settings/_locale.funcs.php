@@ -792,28 +792,41 @@ function convert_charset( $string, $dest_charset, $src_charset )
 
 
 /**
- * Init charset handling.
+ * Init charset handling between Input/Output ($io_charset) and the internal
+ * handling ($evo_charset).
  *
  * Check and possibly adjust {@link $evo_charset}.
+ *
  * @staticvar boolean Used to only start mb_output_handler once
  * @param string I/O (input/output) charset to use
  */
-function init_charsets( $io )
+function init_charsets( $req_io_charset )
 {
 	static $mb_output_handler_started;
 	global $io_charset, $evo_charset, $Debuglog, $DB;
+	global $force_io_charset_if_accepted;
 
-	if( $io == $io_charset )
-	{ // no conversation needed
+	if( $req_io_charset == $io_charset )
+	{ // no conversation/init needed
 		return;
 	}
 
-	if( $io_charset == $io )
-	{ // already set
+	// check, if we want to force a specific charset (e.g. 'utf-8'):
+	if( ! empty($force_io_charset_if_accepted) )
+	{ // we want to force a specific charset:
+		if( ! isset($_SERVER['HTTP_ACCEPT_CHARSET']) // all allowed
+			|| preg_match( '~\b(\*|'.$force_io_charset_if_accepted.')\b' ) )
+		{
+			$req_io_charset = $force_io_charset_if_accepted; // pretend that the first one has been requested
+		}
+	}
+
+	if( $req_io_charset == $io_charset )
+	{ // no conversation/init needed
 		return;
 	}
 
-	$io_charset = $io;
+	$io_charset = $req_io_charset;
 
 	if( empty($evo_charset) )
 	{ // empty evo_charset follows I/O charset:
@@ -830,18 +843,21 @@ function init_charsets( $io )
 		else
 		{ // check if the encodings are supported:
 			// NOTE: mb_internal_encoding() is the best way to find out if the encoding is supported
+			$old_mb_internal_encoding = mb_internal_encoding();
 			if( ! mb_internal_encoding($io_charset) )
 			{
-				$Debuglog->add( 'Cannot I/O convert because I/O charset ['.$io_charset.'] is not in mb_list_encodings()!', array('error','locale') );
+				$Debuglog->add( 'Cannot I/O convert because I/O charset ['.$io_charset.'] is not supported by mbstring!', array('error','locale') );
 				$evo_charset = $io_charset;
+				mb_internal_encoding($old_mb_internal_encoding);
 			}
 			elseif( ! mb_internal_encoding($evo_charset) )
 			{
-				$Debuglog->add( 'Cannot I/O convert because $evo_charset='.$evo_charset.' is not in mb_list_encodings()!', array('error','locale') );
+				$Debuglog->add( 'Cannot I/O convert because $evo_charset='.$evo_charset.' is not supported by mbstring!', array('error','locale') );
 				$evo_charset = $io_charset;
+				mb_internal_encoding($old_mb_internal_encoding);
 			}
 			else
-			{
+			{ // we can convert between I/O
 				mb_http_output( $io_charset );
 				if( ! $mb_output_handler_started )
 				{
@@ -853,7 +869,9 @@ function init_charsets( $io )
 		}
 	}
 
-	if( isset($DB) ) // not available in /install/index.php
+	if( isset($DB) // not available in /install/index.php
+			#&& empty($db_config['connection_charset']) // do not override explicit set
+		)
 	{
 		// Set encoding for MySQL connection:
 		$DB->set_connection_charset( $evo_charset, true );
@@ -866,6 +884,9 @@ function init_charsets( $io )
 
 /*
  * $Log$
+ * Revision 1.13  2006/07/23 23:21:04  blueyed
+ * Added $force_io_charset_if_accepted global/setting
+ *
  * Revision 1.12  2006/07/23 21:58:14  fplanque
  * cleanup
  *

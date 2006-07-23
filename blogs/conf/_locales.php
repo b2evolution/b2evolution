@@ -41,6 +41,20 @@ $evo_charset = '';
 
 
 /**
+ * Set this to a specific charset, to force this as {@link $io_charset I/O charset},
+ * if the browser accepts it.
+ *
+ * Setting this to "utf-8" allows you to deliver all pages in this encoding.
+ *
+ * NOTE: make sure, that your PHP/MySQL setup supports this. You most probably need
+ *       the mbstring PHP extension and MySQL 4.1 for this to work.
+ *
+ * @global string
+ */
+$force_io_charset_if_accepted = '';
+
+
+/**
  * Request a specific charset for the client connection.
  *
  * This will issue a MySQL SET NAMES command. This must be a MySQL charset. Example: 'latin1' or 'utf8'
