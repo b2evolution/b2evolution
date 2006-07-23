@@ -76,7 +76,7 @@ class Hit
 	 *
 	 * @var integer
 	 */
-	var $referer_domain_ID = 0;
+	var $referer_domain_ID;
 
 	/**
 	 * Is this a reload?
@@ -166,14 +166,32 @@ class Hit
 			if( !empty( $basedomain->dom_ID ) )
 			{	// This basedomain has visited before:
 				$this->referer_domain_ID = $basedomain->dom_ID;
-				// fp> The blacklist handling that was here made no sense.
 			}
 			else
 			{	// This is the first time this base domain visits:
-				$DB->query( '
+
+				// The INSERT below can fail, probably if we get two simultaneous hits (seen in the demo logfiles)
+				$old_hold_on_error = $DB->halt_on_error;
+				$old_show_errors = $DB->show_errors;
+				$DB->halt_on_error = false;
+				$DB->show_errors = false;
+
+				if( $DB->query( '
 					INSERT INTO T_basedomains( dom_name )
-						VALUES( '.$DB->quote($this->referer_basedomain).' )' );
-				$this->referer_domain_ID = $DB->insert_id;
+						VALUES( '.$DB->quote($this->referer_basedomain).' )' ) )
+				{
+					$this->referer_domain_ID = $DB->insert_id;
+				}
+				else
+				{
+					$this->referer_domain_ID = $DB->get_var( '
+						SELECT dom_ID
+							FROM T_basedomains
+						 WHERE dom_name = '.$DB->quote($this->referer_basedomain) );
+				}
+
+				$DB->halt_on_error = $old_hold_on_error;
+				$DB->show_errors = $old_show_errors;
 			}
 		}
 
@@ -513,7 +531,7 @@ class Hit
 				hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
 				hit_referer, hit_referer_dom_ID, hit_blog_ID, hit_remote_addr, hit_agnt_ID )
 			VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($ReqURI).'", "'.$this->referer_type
-				.'", "'.$DB->escape($this->referer).'", "'.$this->referer_domain_ID.'", '.$DB->null($blog_ID).', "'.$DB->escape( $this->IP ).'", '.$this->agent_ID.'
+				.'", "'.$DB->escape($this->referer).'", '.$DB->null($this->referer_domain_ID).', '.$DB->null($blog_ID).', "'.$DB->escape( $this->IP ).'", '.$this->agent_ID.'
 			)';
 
 		$DB->query( $sql, 'Record the hit' );
@@ -661,6 +679,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.34  2006/07/23 21:44:20  blueyed
+ * Fix for referer_domain_ID handling, if INSERT fails
+ *
  * Revision 1.33  2006/07/23 20:18:31  fplanque
  * cleanup
  *
