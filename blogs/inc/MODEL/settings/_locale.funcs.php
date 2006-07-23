@@ -815,7 +815,7 @@ function init_charsets( $req_io_charset )
 	if( ! empty($force_io_charset_if_accepted) )
 	{ // we want to force a specific charset:
 		if( ! isset($_SERVER['HTTP_ACCEPT_CHARSET']) // all allowed
-			|| preg_match( '~\b(\*|'.$force_io_charset_if_accepted.')\b' ) )
+			|| preg_match( '~\b(\*|'.$force_io_charset_if_accepted.')\b~', $_SERVER['HTTP_ACCEPT_CHARSET'] ) )
 		{
 			$req_io_charset = $force_io_charset_if_accepted; // pretend that the first one has been requested
 		}
@@ -884,6 +884,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.14  2006/07/23 23:42:14  blueyed
+ * fix
+ *
  * Revision 1.13  2006/07/23 23:21:04  blueyed
  * Added $force_io_charset_if_accepted global/setting
  *
