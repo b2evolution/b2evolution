@@ -75,9 +75,9 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 <div class="pageHeader">
 
-	<h1 id="pageTitle"><?php $Blog->disp( 'name', 'htmlbody' ) ?></h1>
+<h1 id="pageTitle"><a href="<?php $Blog->disp( 'url', 'raw' ) ?>"><?php $Blog->disp( 'name', 'htmlbody' ) ?></a></h1>
 
-	<div class="pageSubTitle"><?php $Blog->disp( 'tagline', 'htmlbody' ) ?></div>
+<div class="pageSubtitle"><?php $Blog->disp( 'tagline', 'htmlbody' ) ?></div>
 
 </div>
 
@@ -358,6 +358,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 </div>
 <div id="pageFooter">
 	<p class="baseline">
+		<a href="<?php echo $Blog->get('msgformurl').'&amp;recipient_id=1&amp;redirect_to='.rawurlencode(regenerate_url()); ?>">Contacter l'administrateur</a>.
 		Original template design by <a href="http://fplanque.net/">Francois PLANQUE</a>.
 	</p>
 </div>

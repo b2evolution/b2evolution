@@ -24,6 +24,14 @@ a:hover {
 	color: #9ae;
 }
 
+h1#pageTitle a {
+	color: #fff;
+	text-decoration: none;
+}
+h1#pageTitle a:hover {
+	text-decoration: underline;
+}
+
 h2 {
 	color: #78a;
 	font-size: 180%;
@@ -88,7 +96,6 @@ div.pageHeader {
 }
 
 h1#pageTitle {
-	color: #fff;
 	font-size: 270%;
 	font-weight: bold;
 	margin: 0;
