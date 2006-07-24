@@ -599,20 +599,25 @@ if( $Messages->count( 'login_error' ) )
 	exit();
 }
 
-
 $Timer->pause( 'main.inc');
 
 
 /**
  * Load hacks file if it exists
  */
-$Timer->resume( 'hacks.php' );
-@include_once $conf_path.'hacks.php';
-$Timer->pause( 'hacks.php' );
+if( file_exists($conf_path.'hacks.php') )
+{
+	$Timer->resume( 'hacks.php' );
+	include_once $conf_path.'hacks.php';
+	$Timer->pause( 'hacks.php' );
+}
 
 
 /*
  * $Log$
+ * Revision 1.38  2006/07/24 01:25:05  blueyed
+ * Removed all "@include" occurrences
+ *
  * Revision 1.37  2006/07/24 01:09:30  blueyed
  * Using "@" is always bad, especially when including files, as it suppresses errors therein.
  *

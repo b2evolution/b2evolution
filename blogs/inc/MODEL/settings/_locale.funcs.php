@@ -139,7 +139,10 @@ elseif( $use_l10n == 2 )
 		if( ! isset($trans[ $messages ] ) )
 		{ // Translations for current locale have not yet been loaded:
 			// echo 'LOADING', dirname(__FILE__).'/../locales/'. $messages. '/_global.php';
-			@include_once $locales_path.$messages.'/_global.php';
+			if( file_exists($locales_path.$messages.'/_global.php') )
+			{
+				include_once $locales_path.$messages.'/_global.php';
+			}
 			if( ! isset($trans[ $messages ] ) )
 			{ // Still not loaded... file doesn't exist, memorize that no translations are available
 				// echo 'file not found!';
@@ -884,6 +887,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.15  2006/07/24 01:25:05  blueyed
+ * Removed all "@include" occurrences
+ *
  * Revision 1.14  2006/07/23 23:42:14  blueyed
  * fix
  *

@@ -159,7 +159,10 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 			// reload locales: an existing one could have been renamed
 			unset( $locales );
 			include $conf_path.'_locales.php';
-			@include $conf_path.'_overrides_TEST.php';
+			if( file_exists($conf_path.'_overrides_TEST.php') )
+			{ // also overwrite settings again:
+				include $conf_path.'_overrides_TEST.php';
+			}
 
 			break;
 
@@ -169,7 +172,10 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 			// reload locales from files
 			unset( $locales );
 			include $conf_path.'_locales.php';
-			@include $conf_path.'_overrides_TEST.php';
+			if( file_exists($conf_path.'_overrides_TEST.php') )
+			{ // also overwrite settings again:
+				include $conf_path.'_overrides_TEST.php';
+			}
 
 			// delete everything from locales table
 			$q = $DB->query( 'DELETE FROM T_locales WHERE 1' );
@@ -338,7 +344,10 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 			// reload locales
 			unset( $locales );
 			require $conf_path.'_locales.php';
-			@include $conf_path.'_overrides_TEST.php';
+			if( file_exists($conf_path.'_overrides_TEST.php') )
+			{ // also overwrite settings again:
+				include $conf_path.'_overrides_TEST.php';
+			}
 
 			break;
 
@@ -412,6 +421,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2006/07/24 01:25:05  blueyed
+ * Removed all "@include" occurrences
+ *
  * Revision 1.5  2006/07/02 21:53:31  blueyed
  * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
  *
