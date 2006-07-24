@@ -1475,6 +1475,8 @@ function autoquote( & $string )
  * If that keyword appears in the URL... then the next page has a bad referer! :/
  *
  * We do not allow relative URLs on purpose because they make no sense in RSS feeds.
+ * blueyed>> we could always make them absolute again in the RSS feeds.. I think the extra
+ *           processing involved there is worth the benefit of having relative links.
  *
  * {@internal This function gets tested in misc.funcs.simpletest.php.}}
  *
@@ -3016,6 +3018,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.86  2006/07/24 01:06:37  blueyed
+ * comment
+ *
  * Revision 1.85  2006/07/24 00:05:44  fplanque
  * cleaned up skins
  *
