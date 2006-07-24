@@ -1599,7 +1599,8 @@ function skinbase()
 /**
  * get_path(-)
  * 
- * @deprecated
+ * @deprecated since 1.9
+ * blueyed>> shouldn't we create a _obsolete_v-1-9.php file for this? Putting everything in a single file never allows us to dump it..
  */
 function get_path( $which = '' )
 {
@@ -1691,6 +1692,9 @@ $b2_version = $app_version;
 
 /*
  * $Log$
+ * Revision 1.11  2006/07/24 01:14:50  blueyed
+ * comment/TODO
+ *
  * Revision 1.10  2006/07/24 00:05:44  fplanque
  * cleaned up skins
  *
