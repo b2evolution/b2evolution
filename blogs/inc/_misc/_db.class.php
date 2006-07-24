@@ -255,7 +255,7 @@ class DB
 			$this->dbpassword = $params['password'];
 		}
 
-		// Optional parameters (Allow overriding through $params, because we cannot hack the $DB object after creation without using a "@include"):
+		// Optional parameters (Allow overriding through $params):
 		if( isset($params['name']) ) $this->dbname = $params['name'];
 		if( isset($params['host']) ) $this->dbhost = $params['host'];
 		if( isset($params['show_errors']) ) $this->show_errors = $params['show_errors'];
@@ -1334,6 +1334,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.19  2006/07/24 01:22:14  blueyed
+ * minor/doc
+ *
  * Revision 1.18  2006/07/23 22:33:58  blueyed
  * comment
  *
