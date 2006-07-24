@@ -122,55 +122,29 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		?>
 	</strong></p>
 
-<?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
-	switch( $disp )
-	{
-		case 'comments':
-			// this includes the last comments if requested:
-			require( dirname(__FILE__).'/_lastcomments.php' );
-			break;
+	<?php
+		// -------------- START OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. --------------
+		// Note: you can customize any of the sub templates included here by
+		// copying the matching php file into your skin directory.
+		$current_skin_includes_path = dirname(__FILE__).'/';
+		// Call the dispatcher:
+		require $skins_path.'_dispatch.inc.php';
+		// --------------- END OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. ---------------
+	?>
 
-		case 'arcdir':
-			// this includes the archive directory if requested
-			require( dirname(__FILE__).'/_arcdir.php');
-			break;
-
-		case 'profile':
-			// this includes the profile form if requested
-			require( dirname(__FILE__).'/_profile.php');
-			break;
-
-		case 'msgform':
-			// this includes the email form if requested
-			require( dirname(__FILE__).'/_msgform.php');
-			break;
-
-		case 'subs':
-			// this includes the subscription form if requested
-			require( dirname(__FILE__).'/_subscriptions.php');
-			break;
-	}
-
-
-	echo '<ul class="evo_sponsored_links">';
-	foreach( $sponsored_links as $sponsored_link )
-	{
-		echo '<li><a href="'.$sponsored_link[0].'">'.$sponsored_link[1].'</a></li>';
-	}
-	echo '</ul>';
-
-// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
 </div>
 <!-- =================================== START OF SIDEBAR =================================== -->
 
 <div class="bSideBar">
 
-	<?php // -------------------------- CALENDAR INCLUDED HERE -----------------------------
+	<?php 
+		// -------------------------- CALENDAR INCLUDED HERE -----------------------------
 		// Call the Calendar plugin:
 		$Plugins->call_by_code( 'evo_Calr', array(	// Params follow:
 				'title'=>'',			// No title.
 			) );
-		// -------------------------------- END OF CALENDAR ---------------------------------- ?>
+		// ----------------------------- END OF CALENDAR --------------------------------- 
+	?>
 
 	<div class="bSideItem">
 		<h3><?php $Blog->disp( 'name', 'htmlbody' ) ?></h3>

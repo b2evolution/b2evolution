@@ -414,6 +414,7 @@ $rsc_url = $baseurl.$rsc_subdir;         // You should not need to change this
  * @global string $skins_subdir
  */
 $skins_subdir = 'skins/';                // Subdirectory relative to base
+$skins_path = $basepath.$skins_subdir;   // You should not need to change this
 $skins_url = $baseurl.$skins_subdir;     // You should not need to change this
 
 

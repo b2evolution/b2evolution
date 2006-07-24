@@ -109,7 +109,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	$blog_other_name_before = '<span class="small">';
 	$blog_other_name_after = '</span>';
 	// Include the bloglist
-	require( get_path('skins').'_bloglist.php');
+	require( $skins_path.'_bloglist.php');
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 <!-- InstanceEndEditable -->
 
@@ -167,38 +167,23 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		$disp_trackbacks = 1;       // Display the trackbacks if requested
 		$disp_trackback_url = 1;    // Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;        // Display the pingbacks if requested
-		require( get_path('skins').'_feedback.php');
+		require( $skins_path.'_feedback.php');
 		// ------------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ------------------- ?>
 	</div>
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
 
 	<p class="center"><strong><?php posts_nav_link(); ?></strong></p>
 
-<?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
-	switch( $disp )
-	{
-		case 'comments':
-			// this includes the last comments if requested:
-			require( get_path('skins').'_lastcomments.php' );
-			break;
+	<?php
+		// -------------- START OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. --------------
+		// Note: you can customize any of the sub templates included here by
+		// copying the matching php file into the same directory as this file.
+		$current_skin_includes_path = dirname(__FILE__).'/';
+		// Call the dispatcher:
+		require $skins_path.'_dispatch.inc.php';
+		// --------------- END OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. ---------------
+	?>
 
-		case 'arcdir':
-			// this includes the archive directory if requested
-			require( get_path('skins').'_arcdir.php');
-			break;
-
-		case 'profile':
-			// this includes the profile form if requested
-			require( get_path('skins').'_profile.php');
-			break;
-
-		case 'subs':
-			// this includes the subscription form if requested
-			require( get_path('skins').'/_subscriptions.php');
-			break;
-
-	}
-// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
 </div>
 
 <!-- =================================== START OF SIDEBAR =================================== -->
@@ -242,7 +227,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<h3><?php echo T_('Categories') ?></h3>
 		<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ) ) ?>
 		<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
-			require( get_path('skins').'_categories.php');
+			require( $skins_path.'_categories.php');
 			// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
 		<br />
 		<input type="submit" value="<?php echo T_('Get selection') ?>" />
@@ -254,14 +239,14 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<h3><?php echo T_('Archives') ?></h3>
 		<ul>
 			<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-				require( get_path('skins').'_archives.php');
+				require( $skins_path.'_archives.php');
 				// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 				<li><a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
 		</ul>
 	</div>
 
 	<?php // -------------------------- LINKBLOG INCLUDED HERE -----------------------------
-		require( get_path('skins').'_linkblog.php' );
+		require( $skins_path.'_linkblog.php' );
 		// -------------------------------- END OF LINKBLOG ---------------------------------- ?>
 
 

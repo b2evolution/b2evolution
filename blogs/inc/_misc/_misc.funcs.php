@@ -1453,23 +1453,6 @@ function get_memorized( $ignore = '' )
 }
 
 
-/**
- * get_path(-)
- */
-function get_path( $which = '' )
-{
-	global $core_subdir, $skins_subdir, $basepath;
-
-	switch( $which )
-	{
-		case 'skins':
-			return $basepath.$skins_subdir;
-	}
-
-	return $basepath;
-}
-
-
 /*
  * autoquote(-)
  */
@@ -1491,10 +1474,9 @@ function autoquote( & $string )
  * Note: We have a problem when trying to "antispam" a keyword which is already blacklisted
  * If that keyword appears in the URL... then the next page has a bad referer! :/
  *
- * {@internal This function gets tested in misc.funcs.simpletest.php.}}
+ * We do not allow relative URLs on purpose because they make no sense in RSS feeds.
  *
- * @todo For checking/validating URLs in the item form (or in general?!) relative URLs should
- *       be allowed.
+ * {@internal This function gets tested in misc.funcs.simpletest.php.}}
  *
  * @param string Url to validate
  * @param array Allowed URI schemes (see /conf/_formatting.php)
@@ -3034,6 +3016,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.85  2006/07/24 00:05:44  fplanque
+ * cleaned up skins
+ *
  * Revision 1.84  2006/07/23 22:35:48  blueyed
  * doc
  *

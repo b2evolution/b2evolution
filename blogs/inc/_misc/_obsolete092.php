@@ -1596,6 +1596,25 @@ function skinbase()
 }
 
 
+/**
+ * get_path(-)
+ * 
+ * @deprecated
+ */
+function get_path( $which = '' )
+{
+	global $skins_path, $basepath;
+
+	switch( $which )
+	{
+		case 'skins':
+			return $skins_path;
+	}
+
+	return $basepath;
+}
+
+
 
 // globals {{{
 
@@ -1672,6 +1691,9 @@ $b2_version = $app_version;
 
 /*
  * $Log$
+ * Revision 1.10  2006/07/24 00:05:44  fplanque
+ * cleaned up skins
+ *
  * Revision 1.9  2006/07/04 17:32:30  fplanque
  * no message
  *

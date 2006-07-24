@@ -421,11 +421,11 @@ if( !empty( $skin ) )
 	// TODO: sanitize $template and allow any request on _xxx.tpl.php or sth like that.
 	if( $template == 'popup' )
 	{ // Do the popup display
-		require( get_path( 'skins' ).$skin.'/_popup.php' );
+		require( $skins_path.$skin.'/_popup.php' );
 	}
 	else
 	{ // Do the main display
-		require( get_path( 'skins' ).$skin.'/_main.php' );
+		require( $skins_path.$skin.'/_main.php' );
 	}
 
 	// log the hit on this page (in case the skin hasn't already done so)
@@ -435,7 +435,7 @@ else
 { // we don't want to use a skin
 	if( $template == 'popup' )
 	{ // Do the popup display
-		require( get_path( 'skins' ).'_popup.php' );
+		require( $skins_path.'_popup.php' );
 
 		// log the hit on this page (in case the skin hasn't already done so)
 		$Hit->log();
@@ -451,6 +451,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.26  2006/07/24 00:05:44  fplanque
+ * cleaned up skins
+ *
  * Revision 1.25  2006/07/06 19:59:08  fplanque
  * better logs, better stats, better pruning
  *

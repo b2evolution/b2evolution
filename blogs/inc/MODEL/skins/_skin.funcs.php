@@ -62,7 +62,9 @@ function skin_base_tag()
  */
 function skin_exists( $name, $filename = '_main.php' )
 {
-	return is_readable( get_path( 'skins' ).$name.'/'.$filename );
+	global $skins_path;
+	
+	return is_readable( $skins_path.$name.'/'.$filename );
 }
 
 
@@ -114,7 +116,6 @@ function skin_list_start()
 {
 	global $skin_path, $skin_dir;
 
-	$skin_path = get_path( 'skins' );
 	$skin_dir = dir( $skin_path );
 }
 
@@ -191,6 +192,9 @@ function skin_change_url( $display = true )
 
 /*
  * $Log$
+ * Revision 1.5  2006/07/24 00:05:44  fplanque
+ * cleaned up skins
+ *
  * Revision 1.4  2006/07/04 17:32:29  fplanque
  * no message
  *

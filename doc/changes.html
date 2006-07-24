@@ -10,7 +10,7 @@
 	<h1>Changelog</h1>
 	<p>Only public releases are listed here.</p>
 
-	<h2>CVS</h2>
+	<h2>1.9-dev CVS</h2>
 	<ul>
 		<li>
 			Plugins
@@ -19,16 +19,20 @@
 				<li>Plugins should not use a constructor anymore, but the PluginInit() method instead. The previous AppendPluginRegister() method has been "renamed" to PluginInit(). (blueyed)</li>
 				<li>Plugins can be grouped (see Plugin::group and Plugin::sub_group) (balupton, blueyed)</li>
 				<li>Added b2evo_Callbacks Javascript object to help plugins interact (blueyed)</li>
+			  <li>Optimized expensive queries in calendar plugin (fplanque) </li>
 			</ul>
 		</li>
 		<li>Added $htsrv_url_sensitive config variable which gets used where password are involved</li>
 		<li>"Time difference" of the server (a regional setting) gets now stored internally in seconds and you can therefor define a value of e.g. "1.5".</li>
 		<li>Different modes of hitlog/session pruning: per page, as cron job or "off" (fplanque, blueyed)</li>
-		<li>Application errors now get "thrown" to the server and should therefor appear in the server's error log (blueyed)</li>
+		<li>Application errors now get "thrown" to the server and should therefore appear in the server's error log (blueyed)</li>
+	  <li>Cleaned up skins (fplanque) </li>
+	  <li>Enhanced form abortion detection javascript (progidistri)</li>
+	  <li>Enhanced result tables (progidistri, fplanque, blueyed) </li>
 	</ul>
 
 
-	<h2>1.8.1 &quot;&quot;</h2>
+	<h2>1.8.1 &quot;Dismaynotbea Beta&quot;</h2>
 	<ul>
 		<li>Fixed feed stubs, especially for blogs that allow skin switching</li>
 		<li>Fixed validation for users who registered themselves (blueyed)</li>

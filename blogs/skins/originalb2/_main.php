@@ -80,112 +80,92 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <div id="content">
 
 
-<?php	// ----------------------------------- START OF POSTS ------------------------------------
+	<?php	// ----------------------------------- START OF POSTS ------------------------------------
 	if( isset($MainList) ) $MainList->display_if_empty();	// Display message if no post
 
-if( isset($MainList) ) while( $Item = $MainList->get_item() )
-{
-	$MainList->date_if_changed();
-	// Load Item's creator User:
-	$Item->get_creator_User();
-	locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
-?>
-<div class="storyTitle">
-	<?php $Item->anchor(); ?>
-	<?php locale_flag( $Item->locale, 'h10px' ); // Display flag for post locale ?>
-	&nbsp;
-	<?php $Item->title(); ?>
-	&nbsp;-&nbsp;
-	Categories: <?php $Item->categories() ?>
-	&nbsp;-&nbsp;
-	<span class="storyAuthor"><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>?author=<?php $Item->creator_User->ID() ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php $Item->creator_User->preferred_name() ?></a></span>
-	@ <a href="<?php $Item->permanent_url() ?>"><?php $Item->issue_time() ?></a>
-</div>
-
-<div class="storyContent">
-<?php $Item->content(); ?>
-
-<div class="rightFlush">
-<?php link_pages() ?>
-
-<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
-<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
-<?php $Item->feedback_link( 'pingbacks', ' &bull; ' ) // Link to trackbacks ?>
-
-<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
-
-<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
-
-<?php
-		// THIS is an example of how to display unmixed comments, trackbacks and pingbacks.
-		// doing it old b2 style :>>
-
-		// this includes the comments and a form to add a new comment
-		$disp_comments = 1;					// Display the comments if requested
-		$disp_comment_form = 1;			// Display the comments form if comments requested
-		$disp_trackbacks = 0;				// Display the trackbacks if requested
-		$disp_trackback_url = 0;		// Display the trackbal URL if trackbacks requested
-		$disp_pingbacks = 0;				// Display the pingbacks if requested
-		$disp_title = "Comments:";
-		require( dirname(__FILE__).'/_feedback.php' );
-
-		// this includes the trackbacks
-		$disp_comments = 0;					// Display the comments if requested
-		$disp_comment_form = 0;			// Display the comments form if comments requested
-		$disp_trackbacks = 1;				// Display the trackbacks if requested
-		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-		$disp_pingbacks = 0;				// Display the pingbacks if requested
-		$disp_title = "Trackbacks:";
-		require( dirname(__FILE__).'/_feedback.php' );
-
-		// this includes the pingbacks
-		$disp_comments = 0;					// Display the comments if requested
-		$disp_comment_form = 0;			// Display the comments form if comments requested
-		$disp_trackbacks = 0;				// Display the trackbacks if requested
-		$disp_trackback_url = 0;		// Display the trackbal URL if trackbacks requested
-		$disp_pingbacks = 1;				// Display the pingbacks if requested
-		$disp_title = "Pingbacks:";
-		require( dirname(__FILE__).'/_feedback.php' );
-?>
-
-</div>
-
-</div>
-
-<?php	locale_restore_previous();	// Restore previous locale (Blog locale) ?>
-
-<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
-
-<?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
-	switch( $disp )
+	if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	{
-		case 'comments':
-			// this includes the last comments if requested:
-			require( dirname(__FILE__).'/_lastcomments.php' );
-			break;
+		$MainList->date_if_changed();
+		// Load Item's creator User:
+		$Item->get_creator_User();
+		locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
+	?>
+	<div class="storyTitle">
+		<?php $Item->anchor(); ?>
+		<?php locale_flag( $Item->locale, 'h10px' ); // Display flag for post locale ?>
+		&nbsp;
+		<?php $Item->title(); ?>
+		&nbsp;-&nbsp;
+		Categories: <?php $Item->categories() ?>
+		&nbsp;-&nbsp;
+		<span class="storyAuthor"><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>?author=<?php $Item->creator_User->ID() ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php $Item->creator_User->preferred_name() ?></a></span>
+		@ <a href="<?php $Item->permanent_url() ?>"><?php $Item->issue_time() ?></a>
+	</div>
 
-		case 'arcdir':
-			// this includes the archive directory if requested
-			require( dirname(__FILE__).'/_arcdir.php');
-			break;
+	<div class="storyContent">
+	<?php $Item->content(); ?>
 
-		case 'profile':
-			// this includes the profile form if requested
-			require( dirname(__FILE__).'/_profile.php');
-			break;
+	<div class="rightFlush">
+	<?php link_pages() ?>
 
-		case 'msgform':
-			// this includes the email form if requested
-			require( dirname(__FILE__).'/_msgform.php');
-			break;
+	<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
+	<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
+	<?php $Item->feedback_link( 'pingbacks', ' &bull; ' ) // Link to trackbacks ?>
 
-		case 'subs':
-			// this includes the subscription form if requested
-			require( dirname(__FILE__).'/_subscriptions.php');
-			break;
-	}
-// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. -------------------
-?>
+	<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
+
+	<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
+
+	<?php
+			// THIS is an example of how to display unmixed comments, trackbacks and pingbacks.
+			// doing it old b2 style :>>
+
+			// this includes the comments and a form to add a new comment
+			$disp_comments = 1;					// Display the comments if requested
+			$disp_comment_form = 1;			// Display the comments form if comments requested
+			$disp_trackbacks = 0;				// Display the trackbacks if requested
+			$disp_trackback_url = 0;		// Display the trackbal URL if trackbacks requested
+			$disp_pingbacks = 0;				// Display the pingbacks if requested
+			$disp_title = "Comments:";
+			require( dirname(__FILE__).'/_feedback.php' );
+
+			// this includes the trackbacks
+			$disp_comments = 0;					// Display the comments if requested
+			$disp_comment_form = 0;			// Display the comments form if comments requested
+			$disp_trackbacks = 1;				// Display the trackbacks if requested
+			$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
+			$disp_pingbacks = 0;				// Display the pingbacks if requested
+			$disp_title = "Trackbacks:";
+			require( dirname(__FILE__).'/_feedback.php' );
+
+			// this includes the pingbacks
+			$disp_comments = 0;					// Display the comments if requested
+			$disp_comment_form = 0;			// Display the comments form if comments requested
+			$disp_trackbacks = 0;				// Display the trackbacks if requested
+			$disp_trackback_url = 0;		// Display the trackbal URL if trackbacks requested
+			$disp_pingbacks = 1;				// Display the pingbacks if requested
+			$disp_title = "Pingbacks:";
+			require( dirname(__FILE__).'/_feedback.php' );
+	?>
+
+	</div>
+
+	</div>
+
+	<?php	locale_restore_previous();	// Restore previous locale (Blog locale) ?>
+
+	<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
+
+	<?php
+		// -------------- START OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. --------------
+		// Note: you can customize any of the sub templates included here by
+		// copying the matching php file into your skin directory.
+		$current_skin_includes_path = dirname(__FILE__).'/';
+		$use_sponsored_links = false;
+		// Call the dispatcher:
+		require $skins_path.'_dispatch.inc.php';
+		// --------------- END OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. ---------------
+	?>
 
 </div>
 <p class="center">

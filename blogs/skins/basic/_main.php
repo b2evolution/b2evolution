@@ -142,26 +142,16 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		?>
 	<?php } // --------------------------------- END OF POSTS ----------------------------------- ?>
 
-	<?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
-		switch( $disp )
-		{
-			case 'arcdir':
-				// this includes the archive directory if requested
-				require( dirname(__FILE__).'/_arcdir.php');
-				break;
-
-			case 'profile':
-				// this includes the profile form if requested
-				require( dirname(__FILE__).'/_profile.php');
-				break;
-
-			case 'subs':
-				// this includes the subscription form if requested
-				require( dirname(__FILE__).'/_subscriptions.php');
-				break;
-
-		}
-		// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
+	<?php
+		// -------------- START OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. --------------
+		// Note: you can customize any of the sub templates included here by
+		// copying the matching php file into your skin directory.
+		$current_skin_includes_path = dirname(__FILE__).'/';
+		$use_sponsored_links = false;
+		// Call the dispatcher:
+		require $skins_path.'_dispatch.inc.php';
+		// --------------- END OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. ---------------
+	?>
 
 	<hr>
 
@@ -176,8 +166,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			user_login_link( ' [', '] ' );
 			user_register_link( ' [', '] ' );
 			user_admin_link( ' [', '] ' );
-			user_profile_link( ' [', '] ' );
-			user_subs_link( '[', ']' );
 			user_logout_link( ' [', '] ' );
 		?></p>
 	</div>

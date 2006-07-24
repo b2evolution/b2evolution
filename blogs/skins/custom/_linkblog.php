@@ -33,6 +33,6 @@
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 * all we want to do here, is call the default linkblog handler.
 	 */
-	require get_path('skins').'_linkblog.php';
+	require $skins_path.'_linkblog.php';
 
 ?>

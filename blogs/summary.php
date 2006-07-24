@@ -58,7 +58,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	$blog_other_name_before = '<span class="small">';
 	$blog_other_name_after = '</span>';
 	// Include the bloglist
-	require( get_path('skins').'_bloglist.php');
+	require( $skins_path.'_bloglist.php');
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 <!-- InstanceEndEditable -->
 

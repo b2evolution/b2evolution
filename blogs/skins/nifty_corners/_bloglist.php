@@ -44,6 +44,6 @@
 	 * We now call the default bloglist handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	require get_path('skins').'_bloglist.php';
+	require $skins_path.'_bloglist.php';
 
 ?>

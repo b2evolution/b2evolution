@@ -36,7 +36,7 @@ switch($action)
 		else
 		{
 			// Determine the edit folder:
-			$edit_folder = get_path('skins').'custom/';
+			$edit_folder = $skins_path.'custom/';
 
 			param( 'newcontent', 'html' );
 			$f = fopen( $edit_folder.$file, "w+" );
@@ -58,7 +58,7 @@ switch($action)
 		$AdminUI->disp_body_top();
 
 		// Determine the edit folder:
-		$edit_folder = get_path('skins').'custom/';
+		$edit_folder = $skins_path.'custom/';
 
 		$file = trim($file);
 		if( !empty($file))
@@ -118,7 +118,7 @@ switch($action)
 		<p><?php echo T_('You can edit any of the following files (provided it\'s writable by the server, e.g. CHMOD 766)') ?>:</p>
 		<?php
 			// Determine the edit folder:
-			if( empty($edit_folder) ) $edit_folder = get_path('skins').'custom/';
+			if( empty($edit_folder) ) $edit_folder = $skins_path.'custom/';
 			//lists all files in edit directory
 			if( !is_dir($edit_folder) )
 			{

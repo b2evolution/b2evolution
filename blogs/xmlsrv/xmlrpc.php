@@ -1057,7 +1057,7 @@ function bloggergettemplate($m)
 	}
 
 	// Determine the edit folder:
-	$edit_folder = get_path('skins').'custom/';
+	$edit_folder = $skins_path.'custom/';
 
 	if ($templateType == "main")
 	{
@@ -1138,7 +1138,7 @@ function bloggersettemplate( $m )
 	}
 
 	// Determine the edit folder:
-	$edit_folder = get_path('skins').'custom/';
+	$edit_folder = $skins_path.'custom/';
 
 	if( $templateType == 'main' )
 	{
@@ -2496,6 +2496,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.97  2006/07/24 00:05:46  fplanque
+ * cleaned up skins
+ *
  * Revision 1.96  2006/07/06 19:56:31  fplanque
  * no message
  *

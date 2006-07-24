@@ -85,7 +85,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	$blog_other_name_before = '<span class="small">';
 	$blog_other_name_after = '</span>';
 	// Include the bloglist
-	require get_path('skins').'_bloglist.php';
+	require $skins_path.'_bloglist.php';
 	// ---------------------------------- END OF BLOG LIST ---------------------------------
 	?>
 	<!-- InstanceEndEditable -->
@@ -150,7 +150,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 		$disp_trackback_url = 1;   // Disp  lay the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;       // Disp  lay the pingbacks if requested
-		require get_path('skins').'_feedback.php';
+		require $skins_path.'_feedback.php';
 		// ------------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------------
 		?>
 	</div>
@@ -160,31 +160,16 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 <p class="center"><strong><?php posts_nav_link(); ?></strong></p>
 
-<?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
-	switch( $disp )
-	{
-		case 'comments':
-			// this includes the last comments if requested:
-			require get_path('skins').'_lastcomments.php';
-			break;
+	<?php
+		// -------------- START OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. --------------
+		// Note: you can customize any of the sub templates included here by
+		// copying the matching php file into the same directory as this file.
+		$current_skin_includes_path = dirname(__FILE__).'/';
+		// Call the dispatcher:
+		require $skins_path.'_dispatch.inc.php';
+		// --------------- END OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. ---------------
+	?>
 
-		case 'arcdir':
-			// this includes the archive directory if requested
-			require get_path('skins').'_arcdir.php';
-			break;
-
-		case 'profile':
-			// this includes the profile form if requested
-			require get_path('skins').'_profile.php';
-			break;
-
-		case 'subs':
-			// this includes the subscription form if requested
-			require get_path('skins').'/_subscriptions.php';
-			break;
-	}
-// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. -------------------
-?>
 </div>
 
 <!-- =================================== START OF SIDEBAR =================================== -->
