@@ -82,6 +82,15 @@ switch($action)
 		$post_status = $edited_Item->get( 'status' );
 		// Check permission:
 		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
+
+		$post_title = $edited_Item->get( 'title' );
+		$post_urltitle = $edited_Item->get( 'urltitle' );
+		$post_url = $edited_Item->get( 'url' );
+		$content = $edited_Item->get( 'content' );
+		$post_pingback = 0;
+		$post_trackbacks = '';
+		$post_comment_status = $edited_Item->get( 'comment_status' );
+		$post_extracats = postcats_get_byID( $post );
 		break;
 
 
@@ -105,6 +114,8 @@ switch($action)
 		break;
 
 
+	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'create_switchtab': // this gets set as action by JS, when we switch tabs
 	default:
 		/*
 		 * --------------------------------------------------------------------
@@ -112,7 +123,25 @@ switch($action)
 		 */
 		param( 'blog', 'integer', 0 );
 
-		$AdminUI->title = $AdminUI->title_titlearea = T_('New post in blog:');
+		// Set AdminUI title:
+		if( $action == 'edit_switchtab' )
+		{
+			$post = $Request->param( 'post_ID', 'integer', true );
+			$edited_Item = & $ItemCache->get_by_ID($post_ID);
+
+			$Request->param( 'blog', 'integer', true );
+			$Blog = $BlogCache->get_by_ID( $blog );
+
+			$AdminUI->title = T_('Editing post').': '.$edited_Item->dget( 'title', 'htmlhead' );
+			$AdminUI->title_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, $Blog->get('name') );
+		}
+		else
+		{
+			$edited_Item = & new Item();
+
+			$AdminUI->title = T_('New post in blog:');
+			$AdminUI->title_titlearea = $AdminUI->title;
+		}
 
 		$blog = autoselect_blog( $blog, 'blog_post_statuses', 'any' );
 
@@ -160,7 +189,6 @@ switch($action)
 				$post_status = 'deprecated';
 		}
 
-		$edited_Item = & new Item();
 		$edited_Item->blog_ID = $blog;
 
 		// These are bookmarklet params:
@@ -185,6 +213,16 @@ switch($action)
 		param( 'renderers', 'array', array( 'default' ) );
 
 		param( 'edit_date', 'integer', 0 );
+
+		$default_main_cat = $Request->param( 'post_category', 'integer', $edited_Item->main_cat_ID );
+		if( $default_main_cat && $allow_cross_posting < 3 && get_catblog($default_main_cat) != $blog )
+		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing: setting it to 0 uses the first cat in the list
+			$default_main_cat = 0;
+		}
+		$post_extracats = $Request->param( 'post_extracats', 'array', $post_extracats );
+
+		break;
+
 }
 
 
@@ -203,26 +241,30 @@ switch( $action )
 	case 'nil':
 		break;
 
+	case 'edit_switchtab':
+		$creating = true; // used by cat_select_before_each()
 	case 'delete_link':
 	case 'edit':
 		/*
 		 * --------------------------------------------------------------------
 		 * Display post editing form
 		 */
-		$post_title = $edited_Item->get( 'title' );
-		$post_urltitle = $edited_Item->get( 'urltitle' );
-		$post_url = $edited_Item->get( 'url' );
-		$content = $edited_Item->get( 'content' );
-		$post_pingback = 0;
-		$post_trackbacks = '';
-		$post_comment_status = $edited_Item->get( 'comment_status' );
-		$post_extracats = postcats_get_byID( $post );
-
 		// Display edit form:
 		$form_action = '?ctrl=editactions';
 		$next_action = 'update';
+
 		// Display VIEW:
-		$AdminUI->disp_view( 'items/_item.form.php' );
+		switch( $tab )
+		{
+			case 'simple':
+				$AdminUI->disp_view( 'items/_item_simple.form.php' );
+				break;
+
+			case 'expert':
+			default:
+				$AdminUI->disp_view( 'items/_item.form.php' );
+				break;
+		}
 
 		break;
 
@@ -236,14 +278,11 @@ switch( $action )
 
 		break;
 
-	default:
-		$default_main_cat = $Request->param( 'post_category', 'integer', $edited_Item->main_cat_ID );
-		if( $default_main_cat && $allow_cross_posting < 3 && get_catblog($default_main_cat) != $blog )
-		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing: setting it to 0 uses the first cat in the list
-			$default_main_cat = 0;
-		}
-		$post_extracats = $Request->param( 'post_extracats', 'array', $post_extracats );
+		$next_action = 'update';
+		break;
 
+	case 'create_switchtab':
+	default:
 		/*
 		 * --------------------------------------------------------------------
 		 * New post form  (can be a bookmarklet form if mode == bookmarklet )
@@ -251,6 +290,8 @@ switch( $action )
 		// Display edit form:
 		$form_action = '?ctrl=editactions';
 		$next_action = 'create';
+		$creating = true; // used by cat_select_before_each()
+
 		// Display VIEW:
 		switch( $tab )
 		{

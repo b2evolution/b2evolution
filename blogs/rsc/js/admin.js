@@ -79,7 +79,15 @@ function b2edit_reload( form, newaction, blog )
 
 	if( typeof blog != 'undefined' )
 	{
-		form.blog.value = blog;
+		form.elements.blog.value = blog;
+	}
+	if( form.elements.action.value == "update" )
+	{
+		form.elements.action.value = "edit_switchtab";
+	}
+	else if( form.elements.action.value == "create" )
+	{
+		form.elements.action.value = "create_switchtab";
 	}
 
 	// form.action.value = 'reload';
