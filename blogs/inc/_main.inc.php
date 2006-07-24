@@ -332,9 +332,12 @@ require_once $model_path.'items/_itemlist.class.php';
 
 
 /**
- * Optionnaly include obsolete functions
+ * Optionally include obsolete functions
  */
-@include_once $inc_path.'_misc/_obsolete092.php';
+if( file_exists($inc_path.'_misc/_obsolete092.php') )
+{
+	include_once $inc_path.'_misc/_obsolete092.php';
+}
 
 
 // Object caches init (we're asking plugins that provide the "CacheObjects" event here first):
@@ -610,6 +613,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.37  2006/07/24 01:09:30  blueyed
+ * Using "@" is always bad, especially when including files, as it suppresses errors therein.
+ *
  * Revision 1.36  2006/07/14 00:15:33  blueyed
  * TODO
  *
