@@ -119,24 +119,9 @@ switch($action)
 			// NOTE: as far as I've read in the forums, IE or the like, loses form input on history.back().. fp> hum, it seems that it does for *some* fields. Maybe we should be conservative and use history only on browsers known to work like firefox.
 			$Form = new Form(NULL, 'back_to_posts_form');
 			$Form->hiddens_by_key( $_POST );
-			$Form->begin_form();
+			$Form->begin_form( '', '', array('onsubmit' => 'history.back(); return false;') );
 			$Form->button( array( 'value' => T_('Back to post editing'), 'class' => 'ActionButton' ) );
 			$Form->end_form();
-
-			echo '<script type="text/javascript">
-			if( history.length > 0 )
-			{ // fp> TODO: wouldn't this be way simpler by just adding an onsubmit to the form above?
-				var back_to_post = document.createElement("p");
-				back_to_post.appendChild( document.createTextNode("["), null );
-				var back_a = document.createElement("a");
-				back_a.href = "javascript:history.back()";
-				back_a.innerHTML = "'.T_('Back to post editing').'";
-				back_to_post.appendChild( back_a, null );
-				back_to_post.appendChild( document.createTextNode("]"), null );
-
-				document.getElementById("back_to_posts_form").parentNode.replaceChild( back_to_post, document.getElementById("back_to_posts_form") );
-			}
-			</script>';
 
 			echo '</div>';
 			break;
@@ -635,6 +620,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2006/07/25 21:00:37  blueyed
+ * use onsubmit for history.back() :}
+ *
  * Revision 1.20  2006/07/25 18:49:59  fplanque
  * no message
  *
