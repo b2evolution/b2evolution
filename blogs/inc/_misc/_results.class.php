@@ -144,13 +144,7 @@ class Results extends Widget
 	 *     $a and $b are DB row objects
 	 *     $desc is either 'ASC' or 'DESC'. The function has to return -1, 0 or 1,
 	 *     according to if the $a < $b, $a == $b or $a > $b.
-	 * - td_start
-	 *
-	 * A column with no def will be displayed using
-	 * the default defs from Results::params, that is to say, one of these:
-	 *   - $this->params['col_start_first'];
-	 *   - $this->params['col_start_last'];
-	 *   - $this->params['col_start'];
+	 * - td_class
 	 *
 	 */
 	var $cols;
@@ -2186,6 +2180,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.25  2006/07/25 18:49:59  fplanque
+ * no message
+ *
  * Revision 1.24  2006/07/23 23:01:55  blueyed
  * cleanup
  *

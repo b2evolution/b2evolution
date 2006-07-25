@@ -116,7 +116,7 @@ switch($action)
 
 			// if we the window has a history, acessible through JS, it gets used.
 			// The "Hard POST" form below gets replaced by it.
-			// NOTE: as far as I've read in the forums, IE or the like, loses form input on history.back()..
+			// NOTE: as far as I've read in the forums, IE or the like, loses form input on history.back().. fp> hum, it seems that it does for *some* fields. Maybe we should be conservative and use history only on browsers known to work like firefox.
 			$Form = new Form(NULL, 'back_to_posts_form');
 			$Form->hiddens_by_key( $_POST );
 			$Form->begin_form();
@@ -125,7 +125,7 @@ switch($action)
 
 			echo '<script type="text/javascript">
 			if( history.length > 0 )
-			{
+			{ // fp> TODO: wouldn't this be way simpler by just adding an onsubmit to the form above?
 				var back_to_post = document.createElement("p");
 				back_to_post.appendChild( document.createTextNode("["), null );
 				var back_a = document.createElement("a");
@@ -635,6 +635,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2006/07/25 18:49:59  fplanque
+ * no message
+ *
  * Revision 1.19  2006/07/23 22:44:10  blueyed
  * Use JS history.back() if available, instead of hard POST form
  *

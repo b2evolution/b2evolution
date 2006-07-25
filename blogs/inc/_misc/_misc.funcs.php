@@ -1477,6 +1477,7 @@ function autoquote( & $string )
  * We do not allow relative URLs on purpose because they make no sense in RSS feeds.
  * blueyed>> we could always make them absolute again in the RSS feeds.. I think the extra
  *           processing involved there is worth the benefit of having relative links.
+ * fp> ok, but we have to develop both simultaneously.
  *
  * {@internal This function gets tested in misc.funcs.simpletest.php.}}
  *
@@ -3018,6 +3019,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.87  2006/07/25 18:49:59  fplanque
+ * no message
+ *
  * Revision 1.86  2006/07/24 01:06:37  blueyed
  * comment
  *
