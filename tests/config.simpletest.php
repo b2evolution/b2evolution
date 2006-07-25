@@ -7,7 +7,10 @@
 /**
  * Create it locally and define SIMPLETEST_DIR or other constants there.
  */
-@include_once( dirname(__FILE__).'/config.simpletest.OVERRIDE.php' );
+if( file_exists(dirname(__FILE__).'/config.simpletest.OVERRIDE.php') )
+{
+	include_once( dirname(__FILE__).'/config.simpletest.OVERRIDE.php' );
+}
 
 /**
  * The global config file for all tests.

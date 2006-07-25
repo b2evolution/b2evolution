@@ -7,7 +7,10 @@
  * Create it locally and define EVODIR or other constants there.
  * You can also override array indexes of {@link $testDB_conf} there.
  */
-@include_once( dirname(__FILE__).'/config.OVERRIDE.php' );
+if( file_exists(dirname(__FILE__).'/config.OVERRIDE.php') )
+{
+	include_once( dirname(__FILE__).'/config.OVERRIDE.php' );
+}
 
 
 if( !defined( 'TESTSDIR' ) )
