@@ -114,9 +114,9 @@ function skin_options_return( $default = '' )
  */
 function skin_list_start()
 {
-	global $skin_path, $skin_dir;
+	global $skins_path, $skin_dir;
 
-	$skin_dir = dir( $skin_path );
+	$skin_dir = dir( $skins_path );
 }
 
 
@@ -130,13 +130,15 @@ function skin_list_start()
  */
 function skin_list_next()
 {
-	global $skin_path, $skin_dir, $skin_name;
+	global $skins_path, $skin_dir, $skin_name;
 
 	do
 	{ // Find next subfolder:
 		if( !($skin_name = $skin_dir->read()) )
+		{
 			return false;		// No more subfolder
-	} while( ( ! is_dir($skin_path.'/'.$skin_name) )	// skip regular files
+		}
+	} while( ( ! is_dir($skins_path.$skin_name) )	// skip regular files
 						|| ($skin_name[0] == '.')								// skip UNIX hidden files/dirs
 						|| ($skin_name[0] == '_')								// skip FRONTPAGE hidden files/dirs
 						|| ($skin_name == 'CVS' ) );						// Skip CVS directory
@@ -154,12 +156,12 @@ function skin_list_next()
  */
 function skin_list_iteminfo( $what='', $display = true )
 {
-	global $skin_path, $skin_name;
+	global $skins_path, $skin_name;
 
 	switch( $what )
 	{
 		case 'path':
-			$info = $skin_path.'/'.$skin_name;
+			$info = $skins_path.$skin_name;
 
 		case 'name':
 		default:
@@ -192,6 +194,9 @@ function skin_change_url( $display = true )
 
 /*
  * $Log$
+ * Revision 1.6  2006/07/25 18:38:38  fplanque
+ * fixed skin list
+ *
  * Revision 1.5  2006/07/24 00:05:44  fplanque
  * cleaned up skins
  *
