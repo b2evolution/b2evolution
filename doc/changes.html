@@ -26,6 +26,7 @@
 		<li>"Time difference" of the server (a regional setting) gets now stored internally in seconds and you can therefor define a value of e.g. "1.5".</li>
 		<li>Different modes of hitlog/session pruning: per page, as cron job or "off" (fplanque, blueyed)</li>
 		<li>Application errors now get "thrown" to the server and should therefore appear in the server's error log (blueyed)</li>
+		<li>Charset handling improved; added $force_io_charset_if_accepted setting (blueyed)</li>
 	  <li>Cleaned up skins (fplanque) </li>
 	  <li>Enhanced form abortion detection javascript (progidistri)</li>
 	  <li>Enhanced result tables (progidistri, fplanque, blueyed) </li>
@@ -39,7 +40,7 @@
 		<li>Members of the admin user group (not user #1 alone) can validate their account by clicking a button (blueyed)</li>
 		<li>Minor improvements to account validation through email (blueyed)</li>
 		<li>"Ban" URLs from the statistics admin were wrong</li>
-		<li>Fixed charset handling, especially for windows-1251/cp1251 (cyrillic) (blueyed)</li>
+		<li>Fixed output for windows-1251/cp1251 (cyrillic) charset (blueyed)</li>
 		<li>
 			Plugins
 			<ul>
