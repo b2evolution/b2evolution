@@ -52,7 +52,7 @@ function logout()
 
 	// Reset all global variables
 	// Note: unset is bugguy on globals
-	$current_User = false;
+	$current_User = NULL; // NULL, as we do isset() on it in several places!
 
 	$Session->logout();
 }
@@ -485,6 +485,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.11  2006/07/26 20:19:15  blueyed
+ * Set $current_User = NULL on logout (not false!)
+ *
  * Revision 1.10  2006/06/25 23:34:15  blueyed
  * wording pt2
  *

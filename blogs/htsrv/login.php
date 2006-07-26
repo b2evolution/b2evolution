@@ -59,7 +59,7 @@ $Request->param( 'redirect_to', 'string', '' ); // gets used by header_redirect(
 switch( $action )
 {
 	case 'logout':
-		logout();          // logout $Session and set $current_User = false
+		logout();          // logout $Session and set $current_User = NULL
 
 		// TODO: to give the user feedback through Messages, we would need to start a new $Session here and append $Messages to it.
 
@@ -356,6 +356,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.68  2006/07/26 20:19:15  blueyed
+ * Set $current_User = NULL on logout (not false!)
+ *
  * Revision 1.67  2006/07/17 01:33:13  blueyed
  * Fixed account validation by email for users who registered themselves
  *
