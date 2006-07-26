@@ -306,6 +306,29 @@ switch( $action )
 		}
 }
 
+
+// Add event to the item title field to update document title and init it (important when switching tabs/blogs):
+?>
+
+<script type="text/javascript">
+if( document.getElementById('post_title') )
+{
+	/**
+	 * Updates document.title according to the item title field (post_title)
+	 */
+	function b2evo_update_document_title()
+	{
+		document.title = document.title.replace(/:[^:]*$/, ": "+document.getElementById('post_title').value);
+	}
+	addEvent( document.getElementById('post_title'), 'keyup', b2evo_update_document_title, false );
+	// Init:
+	b2evo_update_document_title();
+}
+</script>
+
+<?php
+
+
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
