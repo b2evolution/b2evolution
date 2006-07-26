@@ -1257,7 +1257,7 @@ class Form extends Widget
 
 		// When the page loads, Initialize all the parent child select lists
 		$r .= '<script type="text/javascript">
-							if( typeof addEvent == "function" )
+							if( typeof addEvent == "function" && typeof init_dynamicSelect == "function" )
 							{
 								addEvent( window, "load", init_dynamicSelect, false );
 								';
@@ -2600,6 +2600,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.28  2006/07/26 19:42:45  blueyed
+ * Check if init_dynamicSelect is defined, before adding it to window.onload
+ *
  * Revision 1.27  2006/07/26 17:55:38  blueyed
  * Still use $form_name for id attribute
  *
