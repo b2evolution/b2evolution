@@ -162,7 +162,7 @@ while( $Item = & $ItemList->get_item() )
 		{ // We have request display of comments
 			?>
 			<div class="bFeedback">
-			<a name="comments"></a>
+			<a id="comments"></a>
 			<h4><?php echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks') ?>:</h4>
 			<?php
 			global $CommentList;
@@ -257,6 +257,9 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.17  2006/07/26 17:15:44  blueyed
+ * Replaced "name" attribute with "id" for anchors
+ *
  * Revision 1.16  2006/07/04 17:32:30  fplanque
  * no message
  *

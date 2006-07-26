@@ -41,7 +41,8 @@ if( ! ($disp_comments || $disp_comment_form || $disp_trackbacks || $disp_trackba
 	return false;
 }
 
-echo '<a name="feedbacks"></a>';
+// QUESTION: blueyed> is it by intention, that "feedbacks", "comments" etc anchors get places all at the top?
+echo '<a id="feedbacks"></a>';
 
 $type_list = array();
 $disp_title = array();
@@ -56,19 +57,19 @@ if( $disp_comments )
 	{ // Use cannot see comments
 		$disp_comments = false;
 	}
-	echo '<a name="comments"></a>';
+	echo '<a id="comments"></a>';
 }
 if( $disp_trackbacks )
 {
 	$type_list[] = "'trackback'";
 	$disp_title[] = T_("Trackbacks");
-	echo '<a name="trackbacks"></a>';
+	echo '<a id="trackbacks"></a>';
 }
 if( $disp_pingbacks )
 {
 	$type_list[] = "'pingback'";
 	$disp_title[] = T_("Pingbacks");
-	echo '<a name="pingbacks"></a>';
+	echo '<a id="pingbacks"></a>';
 }
 
 if( $disp_trackback_url )
@@ -309,6 +310,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.76  2006/07/26 17:15:45  blueyed
+ * Replaced "name" attribute with "id" for anchors
+ *
  * Revision 1.75  2006/07/23 23:28:54  fplanque
  * oops
  *

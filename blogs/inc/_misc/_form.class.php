@@ -1124,10 +1124,10 @@ class Form extends Widget
 		// Need to add event click on links at the form end.
 		$this->check_all = true;
 
-		return '<a name="check_all_nocheckchanges" href="'.regenerate_url().'">'
+		return '<a id="check_all_nocheckchanges" href="'.regenerate_url().'">'
 				//.T_('Check all').' '
 				.get_icon( 'check_all', 'imgtag', NULL, true )
-				.'</a> | <a name="uncheck_all_nocheckchanges" href="'.regenerate_url().'">'
+				.'</a> | <a id="uncheck_all_nocheckchanges" href="'.regenerate_url().'">'
 				//.T_('Uncheck all').' '
 				.get_icon( 'uncheck_all', 'imgtag', NULL, true ).'</a> '.'&nbsp;';
 	}
@@ -1144,7 +1144,7 @@ class Form extends Widget
 	 */
 	function begin_form( $form_class = NULL, $form_title = '', $form_params = array() )
 	{
-		$this->handle_common_params( $form_params, $this->form_name );
+		$this->handle_common_params( $form_params, NULL /* "name" attribute is deprecated in xhtml */ );
 
 		// Set non-mandatory attributes if given in $form_params
 		if( !isset($form_params['enctype']) && !empty( $this->enctype ) )
@@ -2595,6 +2595,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.26  2006/07/26 17:15:45  blueyed
+ * Replaced "name" attribute with "id" for anchors
+ *
  * Revision 1.25  2006/07/23 20:18:31  fplanque
  * cleanup
  *

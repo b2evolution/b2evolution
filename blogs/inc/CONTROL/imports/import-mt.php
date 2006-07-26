@@ -378,7 +378,7 @@ param( 'mode', 'string', 'normal' );
 		</fieldset>
 
 		<?php /*<fieldset style="padding-left:1ex"><legend>&lt;img&gt;-URL mapping</legend>
-			<a name="imgurls"><p class="notes">This lets you map found image urls (their basename) to another basename.
+			<a id="imgurls"><p class="notes">This lets you map found image urls (their basename) to another basename.
 			You probably want to put the images that you had on your MT installation into b2evo's media (fileupload) folder.<br />
 			So you would use <strong><?php echo $fileupload_url ?></strong> for replacement.<br />
 			You can leave this empty, of course and nothing will be replaced, but then you'll have probably broken images.</p></a>
@@ -408,7 +408,7 @@ param( 'mode', 'string', 'normal' );
 				$i++;
 			}
 
-			echo '<p class="center"><a name="imgurls" href="import-mt.php?tab=import&amp;singleimgurls='.( $singleimgurls ? '0' : '1' );
+			echo '<p class="center"><a id="imgurls" href="import-mt.php?tab=import&amp;singleimgurls='.( $singleimgurls ? '0' : '1' );
 			if( !empty($exportedfile) ) echo '&amp;exportedfile='.$exportedfile;
 			echo '">'.( $singleimgurls ? 'hide img urls only used once' : 'show also img urls only used once').'</a></p>';
 

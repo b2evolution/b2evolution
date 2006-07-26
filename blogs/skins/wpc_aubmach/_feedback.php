@@ -43,7 +43,7 @@
 	}
 
 	?>
-	<a name="feedbacks"></a>
+	<a id="feedbacks"></a>
 	<?php
 
 	$type_list = array();
@@ -60,17 +60,17 @@
 			$disp_comments = false;
 		}
 		?>
-		<a name="comments"></a>
+		<a id="comments"></a>
 	<?php }
 	if( $disp_trackbacks ) {
 		$type_list[] = "'trackback'";
 		$disp_title[] = T_("Trackbacks"); ?>
-		<a name="trackbacks"></a>
+		<a id="trackbacks"></a>
 	<?php }
 	if( $disp_pingbacks ) {
 		$type_list[] = "'pingback'";
 		$disp_title[] = T_("Pingbacks"); ?>
-		<a name="pingbacks"></a>
+		<a id="pingbacks"></a>
 	<?php } ?>
 
 	<?php

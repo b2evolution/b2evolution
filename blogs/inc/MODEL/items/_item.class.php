@@ -572,12 +572,12 @@ class Item extends DataObject
 			case 'archive#title': // permalink_type
 			case 'title': // explicit choice
 				$title = preg_replace( '/[^a-zA-Z0-9_\.-]/', '_', $this->title );
-				echo '<a name="'.$title.'"></a>';
+				echo '<a id="'.$title.'"></a>';
 				break;
 
 			case 'archive#id': // permalink_type
 			case 'id': // explicit choice
-				echo '<a name="'.$this->ID.'"></a>';
+				echo '<a id="'.$this->ID.'"></a>';
 				break;
 
 
@@ -2805,6 +2805,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.71  2006/07/26 17:15:44  blueyed
+ * Replaced "name" attribute with "id" for anchors
+ *
  * Revision 1.70  2006/07/23 21:51:01  blueyed
  * doc
  *

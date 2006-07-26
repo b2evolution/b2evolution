@@ -264,7 +264,7 @@ class Comment extends DataObject
 	 */
 	function anchor()
 	{
-		echo '<a name="'.$this->get_anchor().'"></a>';
+		echo '<a id="'.$this->get_anchor().'"></a>';
 	}
 
 
@@ -1160,6 +1160,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2006/07/26 17:15:44  blueyed
+ * Replaced "name" attribute with "id" for anchors
+ *
  * Revision 1.37  2006/07/04 17:32:29  fplanque
  * no message
  *
