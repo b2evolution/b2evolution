@@ -1146,6 +1146,11 @@ class Form extends Widget
 	{
 		$this->handle_common_params( $form_params, NULL /* "name" attribute is deprecated in xhtml */ );
 
+		if( ! empty($this->form_name) )
+		{
+			$form_params['id'] = $this->form_name;
+		}
+
 		// Set non-mandatory attributes if given in $form_params
 		if( !isset($form_params['enctype']) && !empty( $this->enctype ) )
 		{
@@ -2595,6 +2600,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.27  2006/07/26 17:55:38  blueyed
+ * Still use $form_name for id attribute
+ *
  * Revision 1.26  2006/07/26 17:15:45  blueyed
  * Replaced "name" attribute with "id" for anchors
  *
