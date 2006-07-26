@@ -48,7 +48,9 @@ require_once dirname(__FILE__).'/_user.class.php';
  */
 function logout()
 {
-	global $current_User, $Session;
+	global $current_User, $Session, $Plugins;
+
+	$Plugins->trigger_event( 'Logout', array( 'User' => $current_User ) );
 
 	// Reset all global variables
 	// Note: unset is bugguy on globals
@@ -485,6 +487,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.12  2006/07/26 20:48:33  blueyed
+ * Added Plugin event "Logout"
+ *
  * Revision 1.11  2006/07/26 20:19:15  blueyed
  * Set $current_User = NULL on logout (not false!)
  *

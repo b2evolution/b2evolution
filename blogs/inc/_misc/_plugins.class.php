@@ -58,7 +58,7 @@ class Plugins
 	/**
 	 * @var array Our API version as (major, minor). A Plugin can request a check against it through {@link Plugin::GetDependencies()}.
 	 */
-	var $api_version = array( 1, 1 );
+	var $api_version = array( 1, 2 );
 
 	/**
 	 * Index: plugin_code => Plugin
@@ -307,6 +307,7 @@ class Plugins
 				'AlternateAuthentication' => '',
 				'MessageFormSent' => 'Called when the "Message to user" form has been submitted.',
 				'MessageFormSentCleanup' => 'Called after a email message has been sent through public form.',
+				'Logout' => 'Called when a user logs out.',
 
 				'GetSpamKarmaForComment' => 'Asks plugin for the spam karma of a comment/trackback.',
 
@@ -739,7 +740,7 @@ class Plugins
 		$this->instantiate_Settings( $Plugin, 'Settings' );
 		$this->instantiate_Settings( $Plugin, 'UserSettings' );
 
-		$tmp_params = array('db_row' => $this->index_ID_rows[$Plugin->ID]);
+		$tmp_params = array('db_row' => $this->index_ID_rows[$Plugin->ID], 'is_installed' => false);
 
 		if( $Plugin->PluginInit( $tmp_params ) === false && ! $this->is_admin_class )
 		{
@@ -2564,6 +2565,8 @@ class Plugins
 	 * Get a list of methods that are supported as events out of the Plugin's
 	 * source file.
 	 *
+	 * @todo Extend to get list of defined classes and global functions and check this list before sourcing/including a Plugin! (prevent fatal error)
+	 *
 	 * @return array
 	 */
 	function get_registered_events( $Plugin )
@@ -2906,6 +2909,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.69  2006/07/26 20:48:34  blueyed
+ * Added Plugin event "Logout"
+ *
  * Revision 1.68  2006/07/17 01:19:25  blueyed
  * Added events: AfterUserInsert, AfterUserUpdate, AfterUserDelete
  *

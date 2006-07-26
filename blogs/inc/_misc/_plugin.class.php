@@ -1625,13 +1625,33 @@ class Plugin
 	 * Otherwise, this hook is meant to authenticate a user against some
 	 * external database (e.g. LDAP) and generate a new user.
 	 *
+	 * To check, if a user already exists in b2evo with that login/password, you might
+	 * want to use <code>user_pass_ok( $login, $pass_md5, true )</code>.
+	 *
 	 * @see Plugin::AlternateAuthentication()
+	 * @see Plugin::Logout()
 	 * @param array Associative array of parameters
 	 *   - 'login': user's login
 	 *   - 'pass': user's password
 	 *   - 'pass_md5': user's md5 password
 	 */
 	function LoginAttempt( $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called when a user logs out.
+	 *
+	 * This is meant to cleanup data, e.g. if you use the
+	 * {@link Plugin::AlternateAuthentication()} hook.
+	 *
+	 * @see Plugin::AlternateAuthentication()
+	 * @see Plugin::Logout()
+	 * @param array Associative array of parameters
+	 *   - 'User': the user object
+	 */
+	function Logout( $params )
 	{
 	}
 
@@ -1674,6 +1694,7 @@ class Plugin
 	 * either through {@link Session::set_user_ID()} or {@link Session::set_User()}.
 	 *
 	 * @see Plugin::LoginAttempt()
+	 * @see Plugin::Logout()
 	 * @return boolean True, if the user has been authentificated (set in $Session)
 	 */
 	function AlternateAuthentication( & $params )
@@ -2487,6 +2508,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.78  2006/07/26 20:48:33  blueyed
+ * Added Plugin event "Logout"
+ *
  * Revision 1.77  2006/07/23 20:18:31  fplanque
  * cleanup
  *
