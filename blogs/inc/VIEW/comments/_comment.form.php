@@ -31,7 +31,7 @@ global $edited_Comment;
  */
 global $Plugins;
 
-global $comments_use_autobr, $mode, $month;
+global $comments_use_autobr, $mode, $month, $tab;
 
 $Form = & new Form( NULL, 'post', 'post', 'linespan' );
 
@@ -59,7 +59,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	<div class="edit_toolbars">
 	<?php // --------------------------- TOOLBARS ------------------------------------
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'AdminDisplayToolbar', array( 'target_type' => 'Comment' ) );
+		$Plugins->trigger_event( 'AdminDisplayToolbar', array( 'target_type' => 'Comment', 'edit_layout' => $tab ) );
 	?>
 	</div>
 
@@ -195,6 +195,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.12  2006/07/26 20:22:12  blueyed
+ * Pass "edit_layout" param with AdminDisplayToolbar event
+ *
  * Revision 1.11  2006/07/04 17:32:29  fplanque
  * no message
  *
