@@ -2675,7 +2675,8 @@ function header_redirect( $redirect_to = NULL )
 	{
 		// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
 		// Also remove "action" get param to avoid unwanted actions
-		$redirect_to = preg_replace( '~(?<=\?|&amp;|&) (login|pwd|action) = [^&]+ (&(amp;)?|\?)?~x', '', $redirect_to );
+		// blueyed> Removed the removing of "action" here, as it is used to trigger certain views. Instead, "confirm(ed)?" gets removed now
+		$redirect_to = preg_replace( '~(?<=\?|&amp;|&) (login|pwd|confirm(ed)?) = [^&]+ (&(amp;)?|\?)?~x', '', $redirect_to );
 	}
 
 	#header('Refresh:0;url='.$redirect_to);
@@ -3019,6 +3020,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.88  2006/07/26 20:13:40  blueyed
+ * Do not strip "action" param on redirect_to when redirecting. Instead, strip "confirm" and "confirmed" (as a security measure).
+ *
  * Revision 1.87  2006/07/25 18:49:59  fplanque
  * no message
  *
