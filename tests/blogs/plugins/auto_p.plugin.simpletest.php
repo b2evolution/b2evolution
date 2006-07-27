@@ -68,7 +68,7 @@ class AutoPPluginTestCase extends UnitTestCase
 	/**
 	 * Helper method. Calls RenderItemAsHtml.
 	 *
-	 * @return
+	 * @return string
 	 */
 	function _render( $data )
 	{
