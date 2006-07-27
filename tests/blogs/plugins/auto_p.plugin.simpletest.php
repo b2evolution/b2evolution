@@ -279,13 +279,8 @@ class AutoPPluginTestCase extends UnitTestCase
 		$this->assertEqual( "<p>FOO</p><ins><hr style='' /></ins>TEST</invalid><p>BAR</p>",
 			$this->render( "FOO<ins><hr style='' /></ins>TEST</invalid>BAR" ) );
 
-		#$this->assertEqual( "",
-		#	$this->render( "<ins><hr style=\"\" /></ins>" ) );
-
-		/*
-		$this->assertEqual( "",
-			$this->render( "<div>We hope that you enjoy the story and find it useful in planning your adventure.\n\n</div>\n\n <div style=\"clear:left;\">&nbsp;</div>\n\n\n<ins><hr style=\"width:75%;color:#090;text-align:center;\" /></ins>" ) );
-		*/
+		$this->assertEqual( "<p>TEXT</p>\n\n<ins><hr /></ins>",
+			$this->render( "TEXT\n\n<ins><hr /></ins>" ) );
 	}
 
 }

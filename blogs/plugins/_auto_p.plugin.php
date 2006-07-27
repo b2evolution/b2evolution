@@ -324,6 +324,10 @@ class auto_p_plugin extends Plugin
 
 				$new_blocks_nowrap[] = $count_new_blocks+2;
 			}
+			else
+			{ // the whole block should not get wrapped!
+				$new_blocks_nowrap[] = $count_new_blocks;
+			}
 		}
 
 		#echo '<h1>new_blocks:</h1>'; pre_dump( $new_blocks, $new_blocks_nowrap );
@@ -593,6 +597,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.22  2006/07/27 21:35:54  blueyed
+ * fix
+ *
  * Revision 1.21  2006/07/27 21:17:29  blueyed
  * Fixed Auto-P plugin
  *
