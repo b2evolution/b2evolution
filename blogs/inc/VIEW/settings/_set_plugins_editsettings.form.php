@@ -114,11 +114,14 @@ if( $edit_Plugin->Settings )
 $Form->begin_fieldset( T_('Plugin variables').' ('.T_('Advanced').')', array( 'class' => 'clear' ) );
 $Form->text_input( 'edited_plugin_code', $edited_plugin_code, 15, T_('Code'), array('maxlength'=>32, 'note'=>'The code to call the plugin by code. This is also used to link renderer plugins to items.') );
 $Form->text_input( 'edited_plugin_priority', $edited_plugin_priority, 4, T_('Priority'), array( 'maxlength' => 4 ) );
+$render_note = get_web_help_link('Plugin/apply_rendering');
+if( empty( $edited_plugin_code ) )
+{
+	$render_note .= ' '.T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+}
 $Form->select_input_array( 'edited_plugin_apply_rendering', $admin_Plugins->get_apply_rendering_values(), T_('Apply rendering'), array(
 	'value' => $edited_plugin_apply_rendering,
-	'note' => empty( $edited_plugin_code )
-		? T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.')
-		: NULL )
+	'note' => $render_note )
 	);
 $Form->end_fieldset();
 
@@ -186,6 +189,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.17  2006/07/27 21:53:45  blueyed
+ * Added help link for "apply_rendering" to the manual
+ *
  * Revision 1.16  2006/07/08 12:48:33  blueyed
  * Removed "broken" icon, because it's no action icon.
  *
