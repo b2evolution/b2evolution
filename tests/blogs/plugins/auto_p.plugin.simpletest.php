@@ -67,9 +67,10 @@ class AutoPPluginTestCase extends UnitTestCase
 
 	/**
 	 * Helper method. Calls RenderItemAsHtml.
-	 * @return string
+	 *
+	 * @return
 	 */
-	function render( $data )
+	function _render( $data )
 	{
 		$params = array(
 				'data' => $data,
@@ -89,26 +90,54 @@ class AutoPPluginTestCase extends UnitTestCase
 
 
 	/**
+	 * @return string
+	 */
+	function render( $data, $p_in_block = true )
+	{
+		$this->Plugin->Settings->set('add_p_in_block', $p_in_block);
+		return $this->_render($data);
+	}
+
+
+	/**
+	 *
+	 *
+	 * @return
+	 */
+	function render_no_p_in_blocks( $data )
+	{
+		return $this->render($data, false);
+	}
+
+
+
+	/**
 	 * Test rendering of the Auto-P plugin.
 	 */
 	function test_render()
 	{
-		$this->assertWantedPattern( '~^<p>asdf</p>$~',
-			$this->render_wo_space( 'asdf' ) );
+		$this->assertEqual( "<p>asdf</p>",
+			$this->render( 'asdf' ) );
 
-		$this->assertWantedPattern( '~^<p>foo<br/>bar</p>$~',
-			$this->render_wo_space( "foo\nbar" ) );
+		$this->assertEqual( "<p>foo<br />\nbar</p>",
+			$this->render( "foo\nbar" ) );
 
-		$this->assertWantedPattern( '~^<p>foo</p><p>bar</p>\s*$~',
-			$this->render_wo_space( "foo\n\nbar" ) );
+		$this->assertEqual( "<p>foo</p>\n\n<p>bar</p>",
+			$this->render( "foo\n\nbar" ) );
 
 		// a table:
 		$this->assertEqual( "<p>foo</p><table>\n<tr>\n\n<td>foo</td>\n\n</tr>\n\n</table>\n",
 			$this->render( "foo<table>\n<tr>\n\n<td>foo</td>\n\n</tr>\n\n</table>\n" ) );
 
+		$this->assertEqual( "<table><tr><td><p>FOO<br />\nbar</p>\n\n</td></tr></table>",
+			$this->render( "<table><tr><td>FOO\nbar\n\n</td></tr></table>" ) );
+
+		$this->assertEqual( "<table><tr><td>FOO<br />\nbar<br />\n\n</td></tr></table>",
+			$this->render_no_p_in_blocks( "<table><tr><td>FOO\nbar\n\n</td></tr></table>" ) );
+
 		// <blockquote> is special:
-		$this->assertWantedPattern( '~^<blockquote><p>asdf</p></blockquote>$~',
-			$this->render_wo_space( '<blockquote>asdf</blockquote>' ) );
+		$this->assertEqual( "<blockquote><p>asdf</p></blockquote>",
+			$this->render( "<blockquote>asdf</blockquote>" ) );
 
 		$this->assertWantedPattern( '~^<p>foo</p><blockquote><p>asdf</p></blockquote>$~',
 			$this->render_wo_space( 'foo<blockquote>asdf</blockquote>' ) );
@@ -119,19 +148,20 @@ class AutoPPluginTestCase extends UnitTestCase
 		$this->assertWantedPattern( '~^<p>foo</p><blockquote><p>asdf</p></blockquote>$~',
 			$this->render_wo_space( "foo<blockquote>asdf\n</blockquote>" ) );
 
-		$this->assertWantedPattern( '~^<p>foo</p><blockquote><p>asdf_two_newlines_follow</p></blockquote>$~',
-			$this->render_wo_space( "foo<blockquote>asdf_two_newlines_follow\n\n</blockquote>" ) );
+		$this->assertEqual( "<p>foo</p><blockquote><p>asdf_two_newlines_follow</p>\n\n</blockquote>",
+			$this->render( "foo<blockquote>asdf_two_newlines_follow\n\n</blockquote>" ) );
 
-		$this->assertWantedPattern( '~^<p>foo</p><blockquote><p>asdf<br/>twolines<br/>follow</p></blockquote>$~',
-			$this->render_wo_space( "foo<blockquote>asdf\ntwolines\nfollow</blockquote>" ) );
+		$this->assertEqual( "<p>foo</p><blockquote><p>asdf<br />\ntwolines<br />\nfollow</p></blockquote>",
+			$this->render( "foo<blockquote>asdf\ntwolines\nfollow</blockquote>" ) );
 
 		// non-block in between:
 		$this->assertEqual( "<p>foo<br />\n<code>asdf</code>bar</p>",
 			$this->render( "foo\n<code>asdf</code>bar" ) );
 
 		// block element in between:
-		$this->assertWantedPattern( '~^<p>foo</p><div>asdf</div><p>bar</p>$~',
-			$this->render_wo_space( "foo\n<div>asdf</div>bar" ) );
+		$this->assertEqual( "<p>foo</p>\n<div>asdf</div><p>bar</p>",
+			$this->render( "foo\n<div>asdf</div>bar" ) );
+
 		// block element in between (without newline):
 		$this->assertWantedPattern( '~^<p>foo</p><div>asdf</div><p>bar</p>$~',
 			$this->render_wo_space( "foo<div>asdf</div>bar" ) );
@@ -141,17 +171,20 @@ class AutoPPluginTestCase extends UnitTestCase
 			$this->render_wo_space( "<table><tr><td>foo</td></tr></table>" ) );
 
 		// Invalid table:
-		$this->assertWantedPattern( '~^<table><tr><td>foo</td></td></table>$~',
-			$this->render_wo_space( "<table><tr><td>foo</td></td></table>" ) );
+		$this->assertEqual( "<table><tr><td>foo</td></td></table>",
+			$this->render( "<table><tr><td>foo</td></td></table>" ) );
 
-		$this->assertEqual( "<table><tr><td>\n<p></p>\n<p>foo\n</p>\n</td></tr></table>",
-			$this->render( "<table><tr><td>\n\nfoo\n\n</td></tr></table>" ) );
+		$this->assertEqual( "<table><tr><td>\n<p></p>\n\n<p>foo</p>\n\n\n</td></tr></table>",
+			$this->render( "<table><tr><td>\n\n\nfoo\n\n\n</td></tr></table>" ) );
 
-		$this->assertEqual( "<p></p>\n\n<p></p>\n\n<p></p>\n",
+		$this->assertEqual( "<p></p>\n\n<p></p>\n\n<p><br />\n</p>",
 			$this->render( "\n\n\n\n\n" ) );
 
-		$this->assertEqual( '<p>foo<ahref="">Link</a>bar</p>',
-			$this->render_wo_space( "foo <a href=\"\">Link</a> bar" ) );
+		$this->assertEqual( "<p></p>\n\n<p></p>\n\n<p></p>\n\n",
+			$this->render( "\n\n\n\n\n\n" ) );
+
+		$this->assertEqual( '<p>foo <a href="">Link</a> bar</p>',
+			$this->render( 'foo <a href="">Link</a> bar' ) );
 
 		// ignore PRE blocks:
 		$this->assertEqual( "<p>one paragraph</p><pre>first line\n\nsecond line</pre><p>2nd para</p>",
@@ -165,23 +198,61 @@ class AutoPPluginTestCase extends UnitTestCase
 		$this->assertEqual( "<p>one</p><hr /><p>two</p>",
 			$this->render( "one<hr />two" ) );
 
-		// P in P:
-		$this->assertEqual( "<p>one\n\ntwo</p><p>three</p>",
+		// Newline handling:
+		$this->assertEqual( "<p>T</p>\n\n",
+			$this->render( "T\n\n" ) );
+
+		$this->assertEqual( "<p>T</p>\n\n<p><br />\n</p>",
+			$this->render( "T\n\n\n" ) );
+
+		$this->assertEqual( "<p>T</p>\n\n<p>T2</p>\n\n",
+			$this->render( "T\n\nT2\n\n" ) );
+
+		$this->assertEqual( "<div><p>one</p>\n\n</div>",
+			$this->render( "<div>one\n\n</div>" ) );
+
+		$this->assertEqual( "<div>one<br />\n\n</div>",
+			$this->render_no_p_in_blocks( "<div>one\n\n</div>" ) );
+
+		$this->assertEqual( "<div><p>one</p>\n\n\n</div>",
+			$this->render( "<div>one\n\n\n</div>" ) );
+
+		$this->assertEqual( "<div>\n<p>FOO</p>\n\n</div>",
+			$this->render( "<div>\nFOO\n\n</div>" ) );
+
+		$this->assertEqual( "<div>\n\n<p>FOO</p>\n\n</div>",
+			$this->render( "<div>\n\nFOO\n\n</div>" ) );
+
+		$this->assertEqual( "<div>\n<p><br />\nFOO</p>\n\n\n</div>",
+			$this->render( "<div>\n\nFOO\n\n\n</div>" ) );
+
+		$this->assertEqual( "<div>\n<p><br />\nFOO</p>\n\n<p><br />\n</p>\n</div>",
+			$this->render( "<div>\n\nFOO\n\n\n\n</div>" ) );
+
+		$this->assertEqual( "<div>\n<p><br />\nFOO</p>\n\n<p></p>\n\n\n</div>",
+			$this->render( "<div>\n\nFOO\n\n\n\n\n</div>" ) );
+
+		$this->assertEqual( "<div>\n<p><br />\nFOO</p>\n\n<p></p>\n\n<p><br />\n</p>\n</div>",
+			$this->render( "<div>\n\nFOO\n\n\n\n\n\n</div>" ) );
+
+
+		// no P in P:
+		$this->assertEqual( "<p>one<br />\n<br />\ntwo</p><p>three</p>",
 			$this->render( "<p>one\n\ntwo</p><p>three</p>" ) );
 
-		$this->assertEqual( "<p>para</p>\n\n<p></p>\n\n<div><p><img /></p>\n\n<p></p>\n<p>para2a<br />\npara2b\n</p>\n</div><div><img /></div>",
+		$this->assertEqual( "<p>one<br />\n<br />\ntwo</p><p>three</p>",
+			$this->render( "<p>one\n\ntwo</p><p>three</p>" ) );
+
+		$this->assertEqual( "<p>para</p>\n\n<p><br />\n</p>\n<div><p><img /></p>\n\n<p><br />\npara2a<br />\npara2b<br />\n</p>\n</div><div><img /></div>",
 			$this->render( "para\n\n\n\n<div><img />\n\n\npara2a\npara2b\n\n</div><div><img /></div>" ) );
 
-		$this->assertEqual( "<p>para1</p>\n\n<p>para2 <a href=x>X</a>!</p>\n\n<div class=x><img ... /></div>",
+		$this->assertEqual( "<p>para1</p>\n\n<p>para2 <a href=x>X</a>!<br />\n</p>\n<div class=x><img ... /></div>",
 			$this->render( "para1\n\npara2 <a href=x>X</a>!\n\n<div class=x><img ... /></div>" ) );
 
 		$this->assertEqual( "<div>\npara1\n</div>",
 			$this->render( "<div>\npara1\n</div>" ) );
 
-		$this->assertEqual( "<div>\nFOO\n\n</div>",
-			$this->render( "<div>\nFOO\n\n</div>" ) );
-
-		$this->assertEqual( "<div><img /></div>\n<p></p>\n<p>Text</p>",
+		$this->assertEqual( "<div><img /></div>\n<p><br />\nText</p>",
 			$this->render( "<div><img /></div>\n\nText" ) );
 
 		$this->assertEqual( "<p></p>\n<p>foo</p>",
@@ -193,9 +264,28 @@ class AutoPPluginTestCase extends UnitTestCase
 		$this->assertEqual( "<p></p>\n<div>FOO</div>\n",
 			$this->render( "\n<div>FOO</div>\n" ) );
 
-		$this->assertEqual( "<p></p>\n\n<div>FOO</div>\n<p>BAR\n</p>",
+		$this->assertEqual( "<p></p>\n\n<div>FOO</div>\n<p>BAR<br />\n</p>",
 			$this->render( "\n\n<div>FOO</div>\nBAR\n" ) );
 
+		$this->assertEqual( "<p></p>\n<p><code>FOO<br />\nBAR<br />\n<br />\n<br />\nFOOBAR</code>\n</p>",
+			$this->render( "\n<code>FOO\nBAR\n\n\nFOOBAR</code>\n" ) );
+
+		$this->assertEqual( "<p>foo<br />\n <a>SPAN</a> bar</p>",
+			$this->render( "foo\n <a>SPAN</a> bar" ) );
+
+		$this->assertEqual( "<p>FOO</p><ins><div>DIV</div></ins><p>BAR</p>",
+			$this->render( "FOO<ins><div>DIV</div></ins>BAR" ) );
+
+		$this->assertEqual( "<p>FOO</p><ins><hr style='' /></ins>TEST</invalid><p>BAR</p>",
+			$this->render( "FOO<ins><hr style='' /></ins>TEST</invalid>BAR" ) );
+
+		#$this->assertEqual( "",
+		#	$this->render( "<ins><hr style=\"\" /></ins>" ) );
+
+		/*
+		$this->assertEqual( "",
+			$this->render( "<div>We hope that you enjoy the story and find it useful in planning your adventure.\n\n</div>\n\n <div style=\"clear:left;\">&nbsp;</div>\n\n\n<ins><hr style=\"width:75%;color:#090;text-align:center;\" /></ins>" ) );
+		*/
 	}
 
 }
