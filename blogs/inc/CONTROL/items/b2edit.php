@@ -143,6 +143,8 @@ switch($action)
 			$AdminUI->title_titlearea = $AdminUI->title;
 		}
 
+		$edited_Item->load_from_Request();
+
 		$blog = autoselect_blog( $blog, 'blog_post_statuses', 'any' );
 
 		// Generate available blogs list:
@@ -196,24 +198,10 @@ switch($action)
 		param( 'popupurl', 'string', '' );
 		param( 'text', 'html', '' );
 
-		// Params used when switching pages:
-		$edited_Item->assign_to( param( 'item_assigned_user_ID', 'integer', 0 ) );
-		param( 'post_pingback', 'integer', 0 );
-		param( 'trackback_url', 'string' );
-		$post_trackbacks = & $trackback_url;
-		param( 'content', 'html', $text );
-		param( 'post_title', 'html', $popuptitle );
-		param( 'post_urltitle', 'string', '' );
-		param( 'post_url', 'string', $popupurl );
-		param( 'item_issue_date', 'string' );
-		param( 'item_issue_time', 'string' );
-		param( 'post_comment_status', 'string', 'open' );		// 'open' or 'closed' or ...
+		// Note: most params are handled by "$edited_Item->load_from_Request();" above..
+
 		param( 'post_extracats', 'array', array() );
-		param( 'post_locale', 'string', $default_locale );
-		param( 'renderers', 'array', array( 'default' ) );
-
-		param( 'edit_date', 'integer', 0 );
-
+		param( 'edit_date', 'integer', 0 ); // checkbox
 		$default_main_cat = $Request->param( 'post_category', 'integer', $edited_Item->main_cat_ID );
 		if( $default_main_cat && $allow_cross_posting < 3 && get_catblog($default_main_cat) != $blog )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing: setting it to 0 uses the first cat in the list

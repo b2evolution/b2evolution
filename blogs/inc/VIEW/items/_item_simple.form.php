@@ -60,6 +60,7 @@ echo '<strong>EXPERIMENTAL</strong>';
 
 global $form_action, $next_action, $mode, $post_title, $post_locale, $post_title, $use_post_url, $post_url, $content;
 global $use_preview, $post_urltitle, $post_status, $post_comment_status, $post_trackbacks;
+global $edit_date;
 
 $Form = & new Form( $form_action, 'item_checkchanges', 'post', 'none' );
 $Form->fieldstart = '<span class="line">';
@@ -83,6 +84,7 @@ $Form->hidden( 'more', 1 );
 $Form->hidden( 'preview_userid', $current_User->ID );
 
 
+// Fields used in "advanced" form, but not here:
 $Form->hidden( 'post_locale', $Request->param('post_locale', 'string', '') );
 $Form->hidden( 'item_typ_ID', $Request->param('item_typ_ID', 'integer', NULL) );
 $Form->hidden( 'post_url', $Request->param('post_url', 'string', '') );
@@ -181,7 +183,7 @@ $Form->hidden( 'renderers', $Request->param('renderers', 'array', NULL) );
 		echo ' '; // allow wrapping!
 		if( $next_action == 'create' )
 		{ // If not checked, create time will be used...
-			$Form->checkbox( 'edit_date', 0, '', T_('Edit') );
+			$Form->checkbox( 'edit_date', $edit_date, '', T_('Edit') );
 		}
 		?>
 		</div>
@@ -282,6 +284,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.6  2006/07/27 23:38:30  blueyed
+ * More fixes to tabs/blogs switching while editing, mainly by using $edited_Item->load_from_Request()
+ *
  * Revision 1.5  2006/07/26 20:25:49  blueyed
  * Refactored/centralized document.title JS update for item forms; additionally init it on page load (when switching tabs/blogs).
  *

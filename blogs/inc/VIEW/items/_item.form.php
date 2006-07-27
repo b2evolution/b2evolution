@@ -62,6 +62,7 @@ $this->disp_payload_begin();
 
 global $form_action, $next_action, $mode, $post_title, $post_locale, $post_title, $use_post_url, $post_url, $content;
 global $use_preview, $post_urltitle, $post_status, $post_comment_status, $post_trackbacks;
+global $edit_date;
 
 $Form = & new Form( $form_action, 'item_checkchanges', 'post', 'none' );
 $Form->fieldstart = '<span class="line">';
@@ -191,7 +192,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		echo ' '; // allow wrapping!
 		if( $next_action == 'create' )
 		{ // If not checked, create time will be used...
-			$Form->checkbox( 'edit_date', 0, '', T_('Edit') );
+			$Form->checkbox( 'edit_date', $edit_date, '', T_('Edit') );
 		}
 		?>
 		</div>
@@ -360,6 +361,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.17  2006/07/27 23:38:30  blueyed
+ * More fixes to tabs/blogs switching while editing, mainly by using $edited_Item->load_from_Request()
+ *
  * Revision 1.16  2006/07/26 20:25:49  blueyed
  * Refactored/centralized document.title JS update for item forms; additionally init it on page load (when switching tabs/blogs).
  *
