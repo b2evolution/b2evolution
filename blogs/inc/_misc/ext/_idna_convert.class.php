@@ -226,7 +226,7 @@ class idna_convert
                         .(empty($parsed['user']) ? '' : $parsed['user'].(empty($parsed['pass']) ? '' : ':'.$parsed['pass']).'@')
                         .$parsed['host']
                         .(empty($parsed['port']) ? '' : ':'.$parsed['port'])
-                        .$parsed['path']
+                        .(empty($parsed['path']) ? '' : $parsed['path'])
                         .(empty($parsed['query']) ? '' : '?'.$parsed['query'])
                         .(empty($parsed['fragment']) ? '' : '#'.$parsed['fragment']);
             } else { // parse_url seems to have failed, try without it
