@@ -342,6 +342,7 @@ class Calendar
 				}
 				else
 				{ // highlight no month, when not current year
+					// TODO: BUG: this causes mktime() and the logic where it gets used to fail below! ()
 					$this->month = '';
 				}
 			}
@@ -1064,6 +1065,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.26  2006/07/28 15:27:47  blueyed
+ * marked BUG
+ *
  * Revision 1.25  2006/07/22 18:21:19  blueyed
  * Fixed doc (min_timestamp/max_timestamp)
  *
