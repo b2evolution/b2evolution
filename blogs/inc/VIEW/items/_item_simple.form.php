@@ -153,13 +153,13 @@ $Form->hidden( 'renderers', $Request->param('renderers', 'array', NULL) );
 	{ // ---------- UPLOAD ----------
 		if( $current_User->check_perm( 'files', 'view' ) )
 		{
-			echo '<input id="itemform_button_files" type="button" value="Files" class="ActionButton"
+			echo '<input id="itemform_button_files" type="button" value="'.format_to_output(T_('Files'), 'formvalue').'" class="ActionButton"
 			       onclick="pop_up_window( \'admin.php?ctrl=files&amp;mode=upload\', \'fileman_upload\' );" /> ';
 		}
 
 		if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) )
 		{
-			echo '<input id="itemform_button_upload" type="button" value="Upload" class="ActionButton"
+			echo '<input id="itemform_button_upload" type="button" value="'.format_to_output(T_('Upload'), 'formvalue').'" class="ActionButton"
 			       onclick="pop_up_window( \'admin.php?ctrl=files&amp;mode=upload&amp;fm_mode=file_upload\', \'fileman_upload\' );" /> ';
 		}
 	}
@@ -284,6 +284,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.7  2006/07/28 15:34:47  blueyed
+ * Translate "Upload" and "Files" buttons
+ *
  * Revision 1.6  2006/07/27 23:38:30  blueyed
  * More fixes to tabs/blogs switching while editing, mainly by using $edited_Item->load_from_Request()
  *
