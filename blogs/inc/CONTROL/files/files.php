@@ -261,6 +261,7 @@ if( $action == 'update_settings' )
 { // Updating user settings from options list
 	$UserSettings->set( 'fm_dirsnotattop',   1-param( 'option_dirsattop',        'integer', 0 ) );
 	$UserSettings->set( 'fm_permlikelsl',      param( 'option_permlikelsl',      'integer', 0 ) );
+	$UserSettings->set( 'fm_imglistpreview',   param( 'option_imglistpreview',   'integer', 0 ) );
 	$UserSettings->set( 'fm_getimagesizes',    param( 'option_getimagesizes',    'integer', 0 ) );
 	$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
 	$UserSettings->set( 'fm_showtypes',        param( 'option_showtypes',        'integer', 0 ) );
@@ -1497,6 +1498,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.29  2006/07/28 18:27:10  blueyed
+ * Basic image preview for image files in the file list
+ *
  * Revision 1.28  2006/07/28 17:30:30  blueyed
  * Refer to itemform_post_content field by ID, as its form has no name anymore
  *

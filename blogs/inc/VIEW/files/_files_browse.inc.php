@@ -205,10 +205,10 @@ $Form->end_form();
 				<input class="ActionButton" type="submit" value="'.T_('Change root').'" />
 			</noscript>
 
-      <?php
+			<?php
 		}
 
- 		/*
+		/*
 		 * Display link to display directory tree:
 		 */
 		if( $fm_hide_dirtree )
@@ -271,7 +271,7 @@ $Form->end_form();
 <?php
 
 	// ______________________________ Directory tree ______________________________
- 	if( ! $fm_hide_dirtree )
+	if( ! $fm_hide_dirtree )
 	{
 		echo '<td id="fm_dirtree">';
 
@@ -308,6 +308,12 @@ $Form->end_form();
 	{
 		echo '<th>'.$fm_Filelist->get_sort_link( 'path', /* TRANS: file/directory path */ T_('Path') ).'</th>';
 	}
+
+	if( $UserSettings->get( 'fm_imglistpreview' ) )
+	{ // Image file preview:
+		echo '<th class="nowrap">'./* TRANS: Image file preview */ T_('Preview').'</th>';;
+	}
+
 	echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'name', /* TRANS: file name */ T_('Name') ).'</th>';
 
 	if( $UserSettings->get('fm_showtypes') ) // MB UPDATE-------------
@@ -402,6 +408,18 @@ while( $lFile = & $fm_Filelist->get_next() )
 	{
 		echo '<td class="filepath">';
 		echo dirname($lFile->get_rdfs_rel_path()).'/';
+		echo '</td>';
+	}
+
+
+	/***************** Image file preview *******************/
+	if( $UserSettings->get( 'fm_imglistpreview' ) )
+	{
+		echo '<td class="fm_preview_list">';
+		if( $lFile->is_image() )
+		{
+			echo '<img src="'.$lFile->_FileRoot->ads_url.$lFile->_rdfp_rel_path.'" alt="" width="80" />';
+		}
 		echo '</td>';
 	}
 
@@ -587,7 +605,8 @@ $filetable_cols = 6
 	+ (int)$UserSettings->get('fm_showtypes')
 	+ (int)$UserSettings->get('fm_showfsperms')
 	+ (int)$UserSettings->get('fm_showfsowner')
-	+ (int)$UserSettings->get('fm_showfsgroup');
+	+ (int)$UserSettings->get('fm_showfsgroup')
+	+ (int)$UserSettings->get('fm_imglistpreview');
 
 
 if( $countFiles == 0 )
@@ -693,7 +712,7 @@ else
 	<?php
 }
 ?>
-					<tbody>
+					</tbody>
 				</table>
 				<!-- End of detailed file list -->
 
@@ -901,12 +920,13 @@ $Form = & new Form( NULL, 'fm_options_checkchanges', 'get', 'none' );
 		echo '>';
 			$Form->checkbox( 'option_dirsattop', !$UserSettings->get('fm_dirsnotattop'), T_('Sort directories at top') );
 			$Form->checkbox( 'option_showtypes', $UserSettings->get('fm_showtypes'), T_('Show file types') );
+			$Form->checkbox( 'option_imglistpreview', $UserSettings->get('fm_imglistpreview'), T_('Display thumbnails for image files') );
+			$Form->checkbox( 'option_getimagesizes', $UserSettings->get('fm_getimagesizes'), T_('Display the image size of image files') );
 			$Form->checkbox( 'option_showfsperms', $UserSettings->get('fm_showfsperms'), T_('Show file perms') );
 			$Form->checkbox( 'option_showfsowner', $UserSettings->get('fm_showfsowner'), T_('Show file owners') );
 			$Form->checkbox( 'option_showfsgroup', $UserSettings->get('fm_showfsgroup'), T_('Show file groups') );
 			$Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Show hidden files') );
 			$Form->checkbox( 'option_permlikelsl', $UserSettings->get('fm_permlikelsl'), T_('Display file permissions like "rwxr-xr-x" rather than short form') );
-			$Form->checkbox( 'option_getimagesizes', $UserSettings->get('fm_getimagesizes'), T_('Display the image size of image files') );
 			$Form->checkbox( 'option_recursivedirsize', $UserSettings->get('fm_recursivedirsize'), T_('Recursive size of directories') );
 			$Form->checkbox( 'option_forceFM', $UserSettings->get('fm_forceFM'), T_('Always show the Filemanager'), 'Display the Filemanager also in modes like upload.' );
 
@@ -926,6 +946,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.18  2006/07/28 18:27:10  blueyed
+ * Basic image preview for image files in the file list
+ *
  * Revision 1.17  2006/07/28 17:30:30  blueyed
  * Refer to itemform_post_content field by ID, as its form has no name anymore
  *

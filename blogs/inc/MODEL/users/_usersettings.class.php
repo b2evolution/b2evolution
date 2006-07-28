@@ -60,6 +60,8 @@ class UserSettings extends AbstractSettings
 		'control_form_abortions' => 1,
 		'pref_browse_tab' => 'posts',
 		'pref_edit_tab' => 'expert',
+
+		'fm_imglistpreview' => 1,
 	);
 
 
@@ -200,6 +202,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.16  2006/07/28 18:27:10  blueyed
+ * Basic image preview for image files in the file list
+ *
  * Revision 1.15  2006/07/23 22:29:16  blueyed
  * Fix for if $current_User is not set and no user_ID is given: we cannot set/delete then and get returns the default value
  *
