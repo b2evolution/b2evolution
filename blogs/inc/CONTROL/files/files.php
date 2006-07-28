@@ -1072,7 +1072,7 @@ switch( $fm_mode )
 					$success_msg .=
 						'<ul>'
 							.'<li>'.T_("Here's the code to display it:").' <input type="text" value="'.$img_tag.'" /></li>'
-							.'<li><a href="#" onclick="if( window.focus && window.opener ){ window.opener.focus(); textarea_replace_selection( window.opener.document.item_checkchanges.itemform_post_content, \''.format_to_output( $newFile->get_tag(), 'formvalue' ).'\', window.opener.document ); } return false;">'.T_('Add the code to your post !').'</a></li>'
+							.'<li><a href="#" onclick="if( window.focus && window.opener ){ window.opener.focus(); textarea_replace_selection( window.opener.document.getElementById(\'itemform_post_content\'), \''.format_to_output( $newFile->get_tag(), 'formvalue' ).'\', window.opener.document ); } return false;">'.T_('Add the code to your post !').'</a></li>'
 						.'</ul>';
 				}
 
@@ -1497,6 +1497,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.28  2006/07/28 17:30:30  blueyed
+ * Refer to itemform_post_content field by ID, as its form has no name anymore
+ *
  * Revision 1.27  2006/07/17 01:53:12  blueyed
  * added param to UserSettings::param_Request
  *

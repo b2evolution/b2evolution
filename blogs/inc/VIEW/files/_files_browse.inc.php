@@ -770,7 +770,7 @@ if( $countFiles )
 					return true;
 				}
 				window.opener.focus();
-				textarea_replace_selection( window.opener.document.item_checkchanges.itemform_post_content, snippet, window.opener.document );
+				textarea_replace_selection( window.opener.document.getElementById("itemform_post_content"), snippet, window.opener.document );
 				return true;
 			}
 		}
@@ -926,6 +926,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.17  2006/07/28 17:30:30  blueyed
+ * Refer to itemform_post_content field by ID, as its form has no name anymore
+ *
  * Revision 1.16  2006/07/17 01:53:12  blueyed
  * added param to UserSettings::param_Request
  *
