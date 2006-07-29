@@ -51,7 +51,7 @@ require_once $inc_path.'_main.inc.php';
 
 
 // Check global permission:
-if( ! $current_User->check_perm( 'admin', 'any' ) )
+if( ! $current_User || ! $current_User->check_perm( 'admin', 'any' ) )
 {	// No permission to access admin...
 	require $view_path.'errors/_access_denied.inc.php';
 }
@@ -126,6 +126,9 @@ $Hit->log();
 
 /*
  * $Log$
+ * Revision 1.15  2006/07/29 00:11:37  blueyed
+ * Fixed possible fatal error, see http://forums.b2evolution.net/viewtopic.php?t=8691
+ *
  * Revision 1.14  2006/07/06 19:56:29  fplanque
  * no message
  *
