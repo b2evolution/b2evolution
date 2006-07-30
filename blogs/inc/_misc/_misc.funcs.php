@@ -1765,10 +1765,14 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 function debug_die( $additional_info = '' )
 {
 	global $debug, $baseurl;
+	global $log_app_errors, $app_name;
 
-	// Attempt to output an error header (will not work if there is too much content already out):
+	// Attempt to output an error header (will not work if there is content already out):
 	// This should help preventing indexing robots from indexing the error :P
-	@header('HTTP/1.0 500 Internal Server Error');
+	if( ! headers_sent() )
+	{
+		header('HTTP/1.0 500 Internal Server Error');
+	}
 
 	echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
 	echo '<h3 style="color:#f00;">'.T_('An unexpected error has occured!').'</h3>';
@@ -1782,23 +1786,40 @@ function debug_die( $additional_info = '' )
 		echo '<h3>'.T_('Additional information about this error:').'</h3>';
 		echo $additional_info;
 		echo '</div>';
-
-
-		// Throw error to the server, but do not display them.
-		// Therefor we temporarily set display_errors=0 and log_errors=1
-
-		// TODO: make this a configurable option? fp> YES!!! /conf/_advanced
-
-		$old_display_errors = ini_get('display_errors');
-		if( $old_display_errors ) ini_set('display_errors', 0);
-		$old_log_errors = ini_get('log_errors');
-		if( ! $old_log_errors ) ini_set('log_errors', 1);
-
-		trigger_error( $additional_info, E_USER_WARNING );
-
-		if( $old_display_errors ) ini_set('display_errors', $old_display_errors);
-		if( ! $old_log_errors ) ini_set('log_errors', 0);
 	}
+
+
+	if( $log_app_errors )
+	{ // Log error through PHP's logging facilities:
+		$log_message = $app_name.' error: ';
+		if( ! empty($additional_info) )
+		{
+			$log_message .= $additional_info;
+		}
+		else
+		{
+			$log_message .= 'Unknown';
+		}
+
+		$file = 'Unknown';
+		$line = 'Unknown';
+		if( function_exists('debug_backtrace') /* PHP 4.3 */ )
+		{ // get the file and line
+			foreach( debug_backtrace() as $v )
+			{
+				if( isset($v['function']) && $v['function'] == 'debug_die' )
+				{
+					$file = isset($v['file']) ? $v['file'] : 'Unknown';
+					$line = isset($v['line']) ? $v['line'] : 'Unknown';
+					break;
+				}
+			}
+		}
+		$log_message .= ' in '.$file.' at line '.$line;
+
+		error_log( $log_message, 0 );
+	}
+
 
 	if( $debug )
 	{
@@ -3020,6 +3041,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.89  2006/07/30 13:50:39  blueyed
+ * Added $log_app_errors setting.
+ *
  * Revision 1.88  2006/07/26 20:13:40  blueyed
  * Do not strip "action" param on redirect_to when redirecting. Instead, strip "confirm" and "confirmed" (as a security measure).
  *

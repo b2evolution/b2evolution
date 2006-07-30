@@ -34,6 +34,16 @@ $debug = 0;
 
 
 /**
+ * Log application errors through {@link error_log() PHP's logging facilities}?
+ *
+ * This means that they will get logged according to PHP's error_log configuration directive.
+ *
+ * @global boolean Default: true
+ */
+$log_app_errors = 1;
+
+
+/**
  * Demo mode: don't allow changes to the 'demouser' and 'admin' account.
  * @global boolean Default: false
  */
