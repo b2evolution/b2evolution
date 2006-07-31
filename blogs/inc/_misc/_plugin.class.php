@@ -365,8 +365,8 @@ class Plugin
 	 *     - 'html_textarea': like textarea, but allows html
 	 *     - 'select': a drop down field; you must set 'options' for it:
 	 *       - 'options': an array of options ('value' => 'description'), see {@link Form::select_input_array()}.
-	 *     - 'select_group': a drop down field, providing all existing groups
-	 *     - 'select_user': a drop down field, providing all existing groups
+	 *     - 'select_group': a drop down field, providing all existing groups (Group ID is the value or "" if "allow_none" is true)
+	 *     - 'select_user': a drop down field, providing all existing groups (User ID is the value or "" if "allow_none" is true)
 	 *     - 'array': a subset of settings. The value gets automagically (un)serialized through get() and set().
 	 *       The following keys apply to this type:
 	 *       - 'entries': an array with the sub-settings (which can be everything from the top-level, except:
@@ -2510,6 +2510,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.81  2006/07/31 16:38:23  blueyed
+ * doc
+ *
  * Revision 1.80  2006/07/31 15:41:37  yabs
  * Modified 'allow_html' to html_input/html_textarea
  *
