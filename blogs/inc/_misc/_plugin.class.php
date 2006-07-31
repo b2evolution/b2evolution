@@ -385,6 +385,7 @@ class Plugin
 	 *                      with the keys 'pattern' and 'error' to define a custom error message.
 	 *   - 'valid_range': An array with keys 'min', 'max' and (optionally) 'error' to define
 	 *                    a custom error message. At least "min" or "max" must be given.
+	 *   - 'allow_html': if true, it allows html to be used in the settings value
 	 *   - 'help': can be:
 	 *          - '#anchor': anchor that gets appended to {@link $help_url}
 	 *          - true: the settings name/key gets transformed to an html ID and gets used as anchor to {@link $help_url}.
@@ -2508,6 +2509,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.79  2006/07/31 06:58:47  yabs
+ * Added info line to GetDefaultSettings() for : allow_html
+ *
  * Revision 1.78  2006/07/26 20:48:33  blueyed
  * Added Plugin event "Logout"
  *
