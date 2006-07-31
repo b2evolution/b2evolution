@@ -67,7 +67,7 @@ class smilies_plugin extends Plugin
 		 * Smilies configuration.
 		 * TODO: Move/transform to PluginSettings
 		 */
-		require dirname(__FILE__).'/_smilies.conf.php';
+		//require dirname(__FILE__).'/_smilies.conf.php';
 	}
 
 
@@ -85,6 +85,44 @@ class smilies_plugin extends Plugin
 					'type' => 'checkbox',
 					'note' => T_( 'This is the default setting. Users can override it in their profile.' ),
 				),
+				'render_comments_default' => array(
+					'label' => $this->T_('Render comments' ),
+					'note' => $this->T_('If enabled the smileys in comments will also be rendered'),
+					'defaultvalue' => 0,
+					'type' => 'checkbox',
+				),
+				'smiley_list' => array(
+					'label' => $this->T_( 'Smiley list list'),
+					'note' => $this->T_( 'This is the list of smileys [one per line], in the format : char sequence => image_file' ),
+					'type' => 'html_textarea', // allows smilies with "<" in them
+					'rows' => 10,
+					'cols' => 40,
+					'defaultvalue' => '=> => icon_arrow.gif
+:idea: => icon_idea.gif
+:) => icon_smile.gif
+:D => icon_biggrin.gif
+:p => icon_razz.gif
+B) => icon_cool.gif
+;) => icon_wink.gif
+:> => icon_twisted.gif
+:roll: => icon_rolleyes.gif
+:oops: => icon_redface.gif
+:| => icon_neutral.gif
+:-/ => icon_confused.gif
+:( => icon_sad.gif
+>:( => icon_mad.gif
+:\'( => icon_cry.gif
+|-| => icon_wth.gif
+:>> => icon_mrgreen.gif
+;D => graysmilewinkgrin.gif
+:P => graybigrazz.gif
+:)) => graylaugh.gif
+88| => graybigeek.gif
+:. => grayshy.gif
+XX( => graydead.gif
+:lalala: => icon_lalala.gif
+:crazy: => icon_crazy.gif',
+				),
 			);
 	}
 
@@ -100,6 +138,12 @@ class smilies_plugin extends Plugin
 				'use_toolbar' => array(
 					'label' => T_( 'Use smilies toolbar' ),
 					'defaultvalue' => $this->Settings->get('use_toolbar_default'),
+					'type' => 'checkbox',
+				),
+				'render_comments' => array(
+					'label' => $this->T_('Render comments' ),
+					'note' => $this->T_('If enabled the smileys in comments will also be rendered'),
+					'defaultvalue' => $this->Settings->get( 'render_comments_default' ),
 					'type' => 'checkbox',
 				),
 			);
@@ -119,6 +163,9 @@ class smilies_plugin extends Plugin
 			return false;
 		}
 
+		$this->PrepareSmilies();	// check smilies cached
+		global $rsc_url;
+
 		$grins = '';
 		$smiled = array();
 		foreach( $this->smilies as $smiley => $grin )
@@ -127,7 +174,7 @@ class smilies_plugin extends Plugin
 			{
 				$smiled[] = $grin;
 				$smiley = str_replace(' ', '', $smiley);
-				$grins .= '<img src="'. $this->smilies_path. '/'. $grin. '" title="'.$smiley.'" alt="'.$smiley
+				$grins .= '<img src="'. $rsc_url. 'smilies/'. $grin. '" title="'.$smiley.'" alt="'.$smiley
 									.'" class="top" onclick="grin(\''. str_replace("'","\'",$smiley). '\');" /> ';
 			}
 		}
@@ -182,6 +229,20 @@ class smilies_plugin extends Plugin
 	}
 
 
+
+	/**
+	 * Perform rendering
+	 *
+	 * @see Plugin::FilterCommentContent()
+	 */
+	function FilterCommentContent( & $params )
+	{
+		if( $this->UserSettings->get( 'render_comments' ) )
+		{
+			$this->RenderItemAsHtml( $params );
+		}
+	}
+
 	/**
 	 * Perform rendering
 	 *
@@ -189,10 +250,14 @@ class smilies_plugin extends Plugin
 	 */
 	function RenderItemAsHtml( & $params )
 	{
+		$this->PrepareSmilies();	// check smilies are already cached
+
+
 		if( ! isset( $this->search ) )
 		{	// We haven't prepared the smilies yet
 			$this->search = array();
 
+			global $basepath, $rsc_path, $skins_subdir, $skin, $rsc_url;
 
 			$tmpsmilies = $this->smilies;
 			uksort($tmpsmilies, array(&$this, 'smiliescmp'));
@@ -209,7 +274,17 @@ class smilies_plugin extends Plugin
 				// We don't use getimagesize() here until we have a mean
 				// to preprocess smilies. It takes up to much time when
 				// processing them at display time.
-				$this->replace[] = '<img src="'.$this->smilies_path.'/'.$img.'" alt="'.$smiley_masked.'" class="middle" />';
+				if( is_file( $basepath.$skins_subdir.$skin.'/smilies/'.$img ) )
+				{
+					$img = 'smilies/'.$img;	// skin has it's own smiley, use it
+				} elseif ( is_file( $rsc_path.'smilies/'.$img ) )
+				{
+					$img = $rsc_url.'smilies/'.$img; // default smiley found so use it
+				} else {
+					$img = ''; // no smiley image found, show the characters instead
+				}
+
+				$this->replace[] = ( $img ? '<img src="'.$img.'" alt="'.$smiley_masked.'" class="middle" />' : $smiley );
 			}
 		}
 
@@ -267,11 +342,39 @@ class smilies_plugin extends Plugin
 		return $diff;
 	}
 
+	/*
+	 * Initiates the smiley array if not already initiated
+	 *
+	 */
+	function PrepareSmilies()
+	{
+		if( empty( $this->smilies ) )
+		{
+			// smilies are not yet cached
+			$this->smilies = array();
+			$temp_list = explode( "\n", str_replace( array( "\r", "\t" ), '', $this->Settings->get( 'smiley_list' ) ) );
+			foreach( $temp_list as $temp_smiley )
+			{
+				$a_smiley = explode( '<->', preg_replace( '#(.+)( )=>(.+?)#', '$1<->$2',$temp_smiley ) );
+				if( isset( $a_smiley[0] ) and isset( $a_smiley[1] ) )
+					$this->smilies += array( trim( $a_smiley[0] ) => trim( $a_smiley[1] ) );
+			}
+		}
+	}
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.27  2006/07/31 16:19:04  yabs
+ * Moved settings to admin
+ * Added smilies in comments ( as user setting )
+ * Added ability for blog skins to override default smiley images
+ *
+ * *note*
+ * These changes are a tad quick 'n' dirty, I'm working on a cleaner version and will commit soon
+ *
  * Revision 1.26  2006/07/12 21:13:17  blueyed
  * Javascript callback handler (e.g., for interaction of WYSIWYG editors with toolbar plugins)
  *
