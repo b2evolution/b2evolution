@@ -85,7 +85,7 @@ class ldap_plugin extends Plugin
 					),
 					'search_filter' => array(
 						'label' => T_('Search filter'),
-						'note' => T_('The search filter used to get information about the user (%s gets replaced by the user login).').' '.sprintf( T_('E.g. &laquo;%s&raquo;'), 'rdn=%s' ),
+						'note' => T_('The search filter used to get information about the user (%s gets replaced by the user login).').' '.sprintf( T_('E.g. &laquo;%s&raquo;'), 'uid=%s' ),
 						'size' => 40,
 					),
 					'assign_user_to_group_by' => array(
@@ -340,6 +340,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.32  2006/07/31 16:53:52  blueyed
+ * better example
+ *
  * Revision 1.31  2006/07/31 16:40:03  blueyed
  * Fixed creating new group, based on template.
  *
