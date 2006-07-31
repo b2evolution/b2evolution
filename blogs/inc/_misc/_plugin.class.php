@@ -1153,7 +1153,7 @@ class Plugin
 	 *     - 'cur_count_plugins': number of Plugins that have already been asked
 	 * @return integer|NULL Spam probability (-100 - 100).
 	 *                -100 means "absolutely no spam", 100 means "absolutely spam".
-	 *                Only if you return an integer, it gets considered (e.g., "50" or false gets ignored, but 50 gets).
+	 *                Only if you return a numeric value, it gets considered (e.g., "", NULL or false get ignored).
 	 */
 	function GetSpamKarmaForComment( & $params )
 	{
@@ -2510,6 +2510,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.82  2006/07/31 20:11:28  blueyed
+ * Karma: check for "numeric" instead of "integer" return values.
+ *
  * Revision 1.81  2006/07/31 16:38:23  blueyed
  * doc
  *
