@@ -174,13 +174,13 @@ class AutoPPluginTestCase extends UnitTestCase
 		$this->assertEqual( "<table><tr><td>foo</td></td></table>",
 			$this->render( "<table><tr><td>foo</td></td></table>" ) );
 
-		$this->assertEqual( "<table><tr><td>\n<p></p>\n\n<p>foo</p>\n\n\n</td></tr></table>",
+		$this->assertEqual( "<table><tr><td>\n<p><br />\n<br />\nfoo</p>\n\n\n</td></tr></table>",
 			$this->render( "<table><tr><td>\n\n\nfoo\n\n\n</td></tr></table>" ) );
 
-		$this->assertEqual( "<p></p>\n\n<p></p>\n\n<p><br />\n</p>",
+		$this->assertEqual( "<p><br />\n<br />\n<br />\n<br />\n<br />\n</p>",
 			$this->render( "\n\n\n\n\n" ) );
 
-		$this->assertEqual( "<p></p>\n\n<p></p>\n\n<p></p>\n\n",
+		$this->assertEqual( "<p><br />\n<br />\n<br />\n<br />\n<br />\n<br />\n</p>",
 			$this->render( "\n\n\n\n\n\n" ) );
 
 		$this->assertEqual( '<p>foo <a href="">Link</a> bar</p>',
@@ -229,10 +229,10 @@ class AutoPPluginTestCase extends UnitTestCase
 		$this->assertEqual( "<div>\n<p><br />\nFOO</p>\n\n<p><br />\n</p>\n</div>",
 			$this->render( "<div>\n\nFOO\n\n\n\n</div>" ) );
 
-		$this->assertEqual( "<div>\n<p><br />\nFOO</p>\n\n<p></p>\n\n\n</div>",
+		$this->assertEqual( "<div>\n<p><br />\nFOO</p>\n\n<p><br />\n<br />\n</p>\n</div>",
 			$this->render( "<div>\n\nFOO\n\n\n\n\n</div>" ) );
 
-		$this->assertEqual( "<div>\n<p><br />\nFOO</p>\n\n<p></p>\n\n<p><br />\n</p>\n</div>",
+		$this->assertEqual( "<div>\n<p><br />\nFOO</p>\n\n<p><br />\n<br />\n<br />\n</p>\n</div>",
 			$this->render( "<div>\n\nFOO\n\n\n\n\n\n</div>" ) );
 
 
@@ -255,19 +255,31 @@ class AutoPPluginTestCase extends UnitTestCase
 		$this->assertEqual( "<div><img /></div>\n<p><br />\nText</p>",
 			$this->render( "<div><img /></div>\n\nText" ) );
 
-		$this->assertEqual( "<p></p>\n<p>foo</p>",
+		$this->assertEqual( "<p><br />\nfoo</p>",
 			$this->render( "\nfoo" ) );
 
-		$this->assertEqual( "<p></p>\n\n<p></p>\n\n<p></p>\n\n<p>foo</p>",
+		$this->assertEqual( "<p><br />\n<br />\nfoo</p>",
+			$this->render( "\n\nfoo" ) );
+
+		$this->assertEqual( "<p><br />\n<br />\n<br />\n<br />\n<br />\n<br />\nfoo</p>",
 			$this->render( "\n\n\n\n\n\nfoo" ) );
 
-		$this->assertEqual( "<p></p>\n<div>FOO</div>\n",
-			$this->render( "\n<div>FOO</div>\n" ) );
+		$this->assertEqual( "<p><br />\n<br />\n</p>\n<div>FOO</div>\n",
+			$this->render( "\n\n\n<div>FOO</div>\n" ) );
 
-		$this->assertEqual( "<p></p>\n\n<div>FOO</div>\n<p>BAR<br />\n</p>",
+		// newline at beginning
+		$this->assertEqual( "<p><br />\n</p>\n<div>FOO</div>\n<p>BAR<br />\n</p>",
 			$this->render( "\n\n<div>FOO</div>\nBAR\n" ) );
 
-		$this->assertEqual( "<p></p>\n<p><code>FOO<br />\nBAR<br />\n<br />\n<br />\nFOOBAR</code>\n</p>",
+		// newline at end
+		$this->assertEqual( "<div>FOO</div>\n<p><br />\n</p>",
+			$this->render( "<div>FOO</div>\n\n" ) );
+
+		// newline at end (nested)
+		$this->assertEqual( "<div>FOO_1</div><div>FOO_2<div>FOO_3</div>\n\n</div>\n<p><br />\n</p>",
+			$this->render( "<div>FOO_1</div><div>FOO_2<div>FOO_3</div>\n\n</div>\n\n" ) );
+
+		$this->assertEqual( "<p><br />\n<code>FOO<br />\nBAR<br />\n<br />\n<br />\nFOOBAR</code>\n</p>",
 			$this->render( "\n<code>FOO\nBAR\n\n\nFOOBAR</code>\n" ) );
 
 		$this->assertEqual( "<p>foo<br />\n <a>SPAN</a> bar</p>",
@@ -282,8 +294,11 @@ class AutoPPluginTestCase extends UnitTestCase
 		$this->assertEqual( "<p>TEXT</p>\n\n<ins><hr /></ins>",
 			$this->render( "TEXT\n\n<ins><hr /></ins>" ) );
 
-		$this->assertEqual( "<p>blah</p>\n\n<p>blah</p>",
-			$this->render( "<p>blah</p>\n\n<p>blah</p>" ) );
+		$this->assertEqual( "<p>FOO</p>\n\n<p>BAR</p>",
+			$this->render( "<p>FOO</p>\n\n<p>BAR</p>" ) );
+
+		$this->assertEqual( "<p>blah</p>\n<p><br />\n<br />\n</p>\n<p>blah</p>",
+			$this->render( "<p>blah</p>\n\n\n\n<p>blah</p>" ) );
 
 	}
 

@@ -95,24 +95,10 @@ class auto_p_plugin extends Plugin
 		$this->add_p_in_block = $this->Settings->get('add_p_in_block');
 		$this->skip_tags = preg_split( '~\s+~', $this->Settings->get('skip_tags'), -1, PREG_SPLIT_NO_EMPTY );
 
+		$this->handled_first_block = false; // used to detect first block
+
 		$content = preg_replace( "~(\r\n|\r)~", "\n", $content ); // cross-platform newlines
-
-		$pre = '';
-		if( substr($content, 0, 1) == "\n" )
-		{ // a leading newline is always a paragraph:
-			if( substr($content, 0, 2) == "\n\n" )
-			{ // two newlines are a full-ass paragraph:
-				$pre = "<p></p>\n\n";
-				$content = substr($content, 2);
-			}
-			else
-			{
-				$pre = "<p></p>\n";
-				$content = substr($content, 1);
-			}
-		}
-
-		$content = $pre.$this->handle_blocks( $content, NULL );
+		$content = $this->handle_blocks( $content );
 
 		return true;
 	}
@@ -121,11 +107,14 @@ class auto_p_plugin extends Plugin
 	/**
 	 * - Split text into blocks, using $block_tags pattern.
 	 *
+	 * @param string Text
+	 * @param string The HTML tag where $text is in
+	 * @param integer Depth (used for recursion)
 	 * @return string
 	 */
-	function handle_blocks( $text, $in_tag )
+	function handle_blocks( $text, $in_tag = '', $depth = 0 )
 	{
-		#echo '<h1>LEVEL=0 (block)</h1>'; pre_dump( $text, $in_tag );
+		#echo '<h1>HANDLE_BLOCKS</h1>'; pre_dump( $text, $in_tag, $depth );
 
 		$new_text = '';
 
@@ -147,7 +136,7 @@ class auto_p_plugin extends Plugin
 					$NL_before_tag = '';
 				}
 
-				$new_text .= $this->handle_pre_blocks( $before_tag, $in_tag );
+				$new_text .= $this->handle_pre_blocks( $before_tag, $in_tag, ($depth==0 && ! $this->handled_first_block) /* "handle all newlines" for the first pre-block */ );
 				$new_text .= $NL_before_tag;
 			}
 
@@ -162,7 +151,7 @@ class auto_p_plugin extends Plugin
 
 			if( ! empty($text_in_tag) )
 			{ // Recurse (same level):
-				$text_in_tag = $this->handle_blocks( $text_in_tag, $tag );
+				$text_in_tag = $this->handle_blocks( $text_in_tag, $tag, $depth+1 );
 			}
 
 			$new_text .= $NL_before.$text_in_tag.$NL_after;
@@ -173,14 +162,15 @@ class auto_p_plugin extends Plugin
 			{
 				#echo '<h1>RECURSE: text_after_tag (block)</h1>';
 				// Recurse (same level):
-				$new_text .= $this->handle_blocks( $text_after_tag, $in_tag );
+				$new_text .= $this->handle_blocks( $text_after_tag, $in_tag, $depth );
 			}
 		}
 		else
 		{ // No BLOCKS in this $text:
-			$new_text = $this->handle_pre_blocks($text, $in_tag);
-
+			$new_text = $this->handle_pre_blocks($text, $in_tag, ($depth==0) /* "handle all newlines", if this is the last block */);
 		}
+
+		$this->handled_first_block = true;
 
 		#pre_dump( 'HANDLE_BLOCKS return: ', $new_text, $in_tag );
 		return $new_text;
@@ -195,9 +185,12 @@ class auto_p_plugin extends Plugin
 	 * - Apply BR to blocks
 	 * - Wrap block in P
 	 *
+	 * @param string Text
+	 * @param string Tag where $text is in
+	 * @param boolean Should all Newlines get handled? (includes only-single-line-break-blocks which get ignored otherwise)
 	 * @return string
 	 */
-	function handle_pre_blocks( $text, $in_tag )
+	function handle_pre_blocks( $text, $in_tag, $handle_all_NL = false )
 	{
 		#echo '<h2>HANDLE_PRE_BLOCKS</h2>'; pre_dump( $text );
 
@@ -225,6 +218,45 @@ class auto_p_plugin extends Plugin
 		$text_lines[] = ''; // dummy
 
 		#echo '<strong>text_lines</strong><br />'; pre_dump( $text_lines, $in_tag );
+
+		if( ! $handle_all_NL && trim($text) == '' && count($text_lines) == 2 )
+		{ // there's only whitespace and only one block
+			return $text;
+		}
+
+		$new_blocks = array();
+		$count_new_blocks = 0;
+		for( $i = 0, $n = count($text_lines); $i < $n; $i = $i+2 /* every second block is a real one */ )
+		{
+			if( ! isset($new_blocks[$count_new_blocks]) )
+			{
+				$new_blocks[$count_new_blocks] = '';
+			}
+			if( $text_lines[$i] == '' )
+			{
+				$new_blocks[$count_new_blocks] .= $text_lines[$i+1];
+				$new_blocks[$count_new_blocks+1] = ''; // dummy
+				continue;
+			}
+			$new_blocks[$count_new_blocks] .= $text_lines[$i];
+			$new_blocks[$count_new_blocks+1] = $text_lines[$i+1];
+			$count_new_blocks = $count_new_blocks+2;
+		}
+
+		$text_lines = $new_blocks;
+		#echo '<strong>new text_lines</strong><br />'; pre_dump( $new_blocks );
+
+		if( trim($text) == '' )
+		{ // there's only whitespace
+
+			$text = $this->handle_br($text, $in_tag);
+			if( ! $in_tag || in_array($in_tag, $this->p_allowed_in) )
+			{
+				$text = '<p>'.$text.'</p>';
+			}
+			return $text;
+		}
+
 
 		// fix it, so no (inline) tags span across multiple blocks:
 		$new_blocks = array();
@@ -518,6 +550,7 @@ class auto_p_plugin extends Plugin
 		$loop_text = $text_after_tag;
 		while( 1 )
 		{
+			#echo '<hr />loop_text:'; pre_dump( $loop_text );
 			if( preg_match( '~^(.*?)(<\s*(/)?\s*'.$tag.'\s*(/\s*)?>\n?)~is', $loop_text, $after_match ) )
 			{
 				#pre_dump( 'after_match', $after_match );
@@ -533,6 +566,10 @@ class auto_p_plugin extends Plugin
 						$closing_tag = $found_tag;
 						break;
 					}
+					else
+					{ // this closing tag is part of the outer:
+						$text_in_tag .= $found_tag;
+					}
 				}
 				else
 				{ // found the same, but opening tag (nested)
@@ -541,7 +578,7 @@ class auto_p_plugin extends Plugin
 				}
 
 				// skip what we've matched:
-				$loop_text = substr($loop_text, strlen($after_match[0])-1 );
+				$loop_text = substr($loop_text, strlen($after_match[0]) );
 			}
 			else
 			{ // did not find the closing tag.. :/
@@ -597,6 +634,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.23  2006/07/31 22:03:01  blueyed
+ * More fixes to the Auto-P plugin
+ *
  * Revision 1.22  2006/07/27 21:35:54  blueyed
  * fix
  *
