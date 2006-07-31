@@ -321,6 +321,10 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 			$l_param_type = 'integer';
 			$l_param_default = 0;
 		}
+		elseif( isset( $l_meta[ 'allow_html' ] ) && $l_meta['allow_html'] )
+		{
+			$l_param_type = 'html';
+		}
 		else
 		{
 			$l_param_type = 'string';
@@ -405,6 +409,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.18  2006/07/31 06:58:02  yabs
+ * Added option to plugin settings : allow_html
+ *
  * Revision 1.17  2006/05/22 20:35:37  blueyed
  * Passthrough some attribute of plugin settings, allowing to use JS handlers. Also fixed submitting of disabled form elements.
  *
