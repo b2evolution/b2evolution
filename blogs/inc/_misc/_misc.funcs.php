@@ -2702,9 +2702,11 @@ function header_redirect( $redirect_to = NULL )
 	}
 
 
-	// Save Debuglog into Session, so that it's available after redirect (gets loaded by Session constructor):
-	$Session->set( 'Debuglog', $Debuglog );
-	$Session->dbsave();
+	if( $Debuglog->count('all') )
+	{ // Save Debuglog into Session, so that it's available after redirect (gets loaded by Session constructor):
+		$Session->set( 'Debuglog', $Debuglog );
+		$Session->dbsave();
+	}
 
 
 	#header('Refresh:0;url='.$redirect_to);
@@ -3048,6 +3050,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.91  2006/07/31 19:46:18  blueyed
+ * Only save Debuglog in Session, if it's not empty (what it will be mostly)
+ *
  * Revision 1.90  2006/07/31 15:39:06  blueyed
  * Save Debuglog into Session before redirect and load it from there, if available.
  *
