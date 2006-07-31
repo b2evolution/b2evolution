@@ -343,7 +343,7 @@ if( file_exists($inc_path.'_misc/_obsolete092.php') )
 // Object caches init (we're asking plugins that provide the "CacheObjects" event here first):
 $Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
 $Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
-$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', '& new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\' )' );
+$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', '& new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\' )' );
 $Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', '& new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
 $Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', '& new GenericCache( \'GenericElement\', true, \'T_itemstatuses\', \'pst_\', \'pst_ID\' )' );
 
@@ -615,6 +615,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.39  2006/07/31 16:38:09  blueyed
+ * Allow ->get_by_name() for GroupCache (again!)!
+ *
  * Revision 1.38  2006/07/24 01:25:05  blueyed
  * Removed all "@include" occurrences
  *
