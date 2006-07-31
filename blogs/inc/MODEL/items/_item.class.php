@@ -347,6 +347,8 @@ class Item extends DataObject
 	/**
 	 * Load data from Request form fields.
 	 *
+	 * This requires the blog (e.g. {@link $blog_ID} or {@link $main_cat_ID} to be set).
+	 *
 	 * @param boolean true to force edit date (as long as perms permit)
 	 * @return boolean true if loaded data seems valid.
 	 */
@@ -407,10 +409,14 @@ class Item extends DataObject
 			$this->set_from_Request( 'deadline', 'item_deadline', true );
 		}
 
-		// Comment stuff:
-		if( $Request->param( 'post_comment_status', 'string', NULL ) !== NULL )
-		{ // 'open' or 'closed' or ...
-			$this->set_from_Request( 'comment_status' );
+		// Allow comments for this item (only if set to "post_by_post" for the Blog):
+		$this->load_Blog();
+		if( $this->Blog->allowcomments == 'post_by_post' )
+		{
+			if( $Request->param( 'post_comment_status', 'string', 'open' ) !== NULL )
+			{ // 'open' or 'closed' or ...
+				$this->set_from_Request( 'comment_status' );
+			}
 		}
 
 		if( $Request->param( 'renderers', 'array', NULL ) !== NULL ) {
@@ -2805,6 +2811,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.72  2006/07/31 15:42:43  blueyed
+ * Fixed handling of post_comment_status
+ *
  * Revision 1.71  2006/07/26 17:15:44  blueyed
  * Replaced "name" attribute with "id" for anchors
  *

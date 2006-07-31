@@ -143,8 +143,6 @@ switch($action)
 			$AdminUI->title_titlearea = $AdminUI->title;
 		}
 
-		$edited_Item->load_from_Request();
-
 		$blog = autoselect_blog( $blog, 'blog_post_statuses', 'any' );
 
 		// Generate available blogs list:
@@ -198,7 +196,7 @@ switch($action)
 		param( 'popupurl', 'string', '' );
 		param( 'text', 'html', '' );
 
-		// Note: most params are handled by "$edited_Item->load_from_Request();" above..
+		// Note: most params are handled by "$edited_Item->load_from_Request();" below..
 
 		param( 'post_extracats', 'array', array() );
 		param( 'edit_date', 'integer', 0 ); // checkbox
@@ -208,6 +206,8 @@ switch($action)
 			$default_main_cat = 0;
 		}
 		$post_extracats = $Request->param( 'post_extracats', 'array', $post_extracats );
+
+		$edited_Item->load_from_Request(); // needs Blog set
 
 		break;
 
