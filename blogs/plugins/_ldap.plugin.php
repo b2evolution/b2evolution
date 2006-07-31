@@ -258,25 +258,34 @@ class ldap_plugin extends Plugin
 						$assigned_group = true;
 						$this->debug_log( 'Adding User to existing Group.' );
 					}
-					elseif( $this->Settings->get('tpl_new_grp_ID') )
-					{ // we want to create a new group matching the assign-by info
-						$this->debug_log( 'Group with that name does not exist yet.' );
+					else
+					{
+						$this->debug_log( 'Group with that name does not exist.' );
 
-						if( $new_Group = $GroupCache->get_by_name( $this->Settings->get('tpl_new_grp_ID'), false ) ) // COPY!! and do not halt on error
-						{ // take a copy of the Group to use as template
-							$this->debug_log( 'Using Group &laquo;'.$this->Settings->get('tpl_new_grp_ID').'&raquo; as template.' );
-							$new_Group->set( 'ID', 0 ); // unset ID (to allow inserting)
-							$new_Group->set( 'name', $assign_by_value ); // set the wanted name
-							$new_Group->dbinsert();
-							$this->debug_log( 'Created Group &laquo;'.$new_Group->get('name').'&raquo;' );
-							$this->debug_log( 'Assigned User to new Group.' );
+						if( $l_set['tpl_new_grp_ID'] )
+						{ // we want to create a new group matching the assign-by info
+							$this->debug_log( 'Template Group given, trying to create new group based on that.' );
 
-							$NewUser->set_Group( $new_Group );
-							$assigned_group = true;
+							if( $new_Group = $GroupCache->get_by_ID( $l_set['tpl_new_grp_ID'], false ) ) // COPY!! and do not halt on error
+							{ // take a copy of the Group to use as template
+								$this->debug_log( 'Using Group &laquo;'.$new_Group->get('name').'&raquo; (#'.$l_set['tpl_new_grp_ID'].') as template.' );
+								$new_Group->set( 'ID', 0 ); // unset ID (to allow inserting)
+								$new_Group->set( 'name', $assign_by_value ); // set the wanted name
+								$new_Group->dbinsert();
+								$this->debug_log( 'Created Group &laquo;'.$new_Group->get('name').'&raquo;' );
+								$this->debug_log( 'Assigned User to new Group.' );
+
+								$NewUser->set_Group( $new_Group );
+								$assigned_group = true;
+							}
+							else
+							{
+								$this->debug_log( 'Template Group with ID #'.$l_set['tpl_new_grp_ID'].' not found!' );
+							}
 						}
 						else
 						{
-							$this->debug_log( 'Template Group &laquo;'.$this->template_group_name_for_unmatched_assign.'&raquo; not found!' );
+							$this->debug_log( 'No template group for creating a new group configured.' );
 						}
 					}
 				}
@@ -331,6 +340,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.31  2006/07/31 16:40:03  blueyed
+ * Fixed creating new group, based on template.
+ *
  * Revision 1.30  2006/07/20 19:40:36  blueyed
  * Simplified code/minor
  *
