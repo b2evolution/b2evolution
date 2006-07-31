@@ -50,17 +50,27 @@ $xmlrpc_debug_messages = 0;		// Set to 1 if you want to enable debug messages (c
 	//$xmlrpc_htmlchecking = 0;  //Set to 1 to do HTML sanity checking as in the browser interface, set to 0 if
 							// you trust the editing tool to do this (more features than the browser interface)
 
+/**
+ * Used for logging, only if $xmlrpc_logging is true
+ *
+ * @return boolean Have we logged?
+ */
 function logIO($io,$msg)
 {
 	global $xmlrpc_logging;
-	if ($xmlrpc_logging)
+
+	if( ! $xmlrpc_logging )
 	{
-		$fp = fopen( dirname(__FILE__).'/xmlrpc.log',"a+");
-		$date = date("Datetime : Y-m-d H:i:s ");
-		$iot = ($io == "I") ? " Input: " : " Output: ";
-		fwrite($fp, "\n\n".$date.$iot.$msg);
-		fclose($fp);
+		return false;
 	}
+
+	$date = date('Y-m-d H:i:s ');
+	$iot = ($io == 'I') ? ' Input: ' : ' Output: ';
+
+	$fp = fopen( dirname(__FILE__).'/xmlrpc.log', 'a+' );
+	fwrite($fp, $date.$iot.$msg."\n");
+	fclose($fp);
+
 	return true;
 }
 
@@ -513,7 +523,7 @@ function bloggereditpost($m)
 
 	$newcontent = $m->getParam(4);
 	$newcontent = $newcontent->scalarval();
-    $newcontent = str_replace("\n",'',$newcontent); // Tor - kludge to fix bug in xmlrpc libraries
+	$newcontent = str_replace("\n",'',$newcontent); // Tor - kludge to fix bug in xmlrpc libraries
 	// WARNING: the following debug MAY produce a non valid response (XML comment containing emebedded <!-- more -->)
 	// xmlrpc_debugmsg( 'New content: '.$newcontent  );
 
@@ -746,18 +756,15 @@ function bloggergetusersblogs($m)
 	for( $curr_blog_ID=blog_list_start();
 				$curr_blog_ID!=false;
 				 $curr_blog_ID=blog_list_next() )
-
 	{
 		if( ! $current_User->check_perm( 'blog_ismember', 1, false, $curr_blog_ID ) )
 		{ // Current user is not a member of this blog...
-	logIO("O","Current user is not a member of this blog.->".$curr_blog_ID);
-
+			logIO("O","Current user is not a member of this blog.->".$curr_blog_ID);
 
 			continue;
-
 		}
-	logIO("O","Current user IS a member of this blog.".$curr_blog_ID);
 
+		logIO("O","Current user IS a member of this blog.".$curr_blog_ID);
 
 		$resp_array[] = new xmlrpcval( array(
 					"blogid" => new xmlrpcval( $curr_blog_ID ),
@@ -766,7 +773,6 @@ function bloggergetusersblogs($m)
 					"isAdmin" => new xmlrpcval( $current_User->check_perm( 'templates', 'any' ) ,'boolean')
 												), 'struct');
 	}
-
 
 	$resp = new xmlrpcval($resp_array, 'array');
 
@@ -2496,6 +2502,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.98  2006/07/31 22:28:35  blueyed
+ * Made logging a bit more decent.
+ *
  * Revision 1.97  2006/07/24 00:05:46  fplanque
  * cleaned up skins
  *
