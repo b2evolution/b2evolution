@@ -405,7 +405,7 @@ switch( $action )
 
 			<p>
 			<input type="submit" value="&nbsp; <?php echo T_('GO!')?> &nbsp;"
-				onclick="if( document.getElementById( 'deletedb' ).checked ) { return confirm( '<?php
+				onclick="var dc = document.getElementById( 'deletedb' ); if( dc && dc.checked ) { return confirm( '<?php
 					printf( TS_( 'Are you sure you want to delete your existing %s tables?\nDo you have a backup?' ), $app_name );
 					?>' ); }" />
 			</p>
@@ -602,6 +602,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.109  2006/07/31 15:37:52  blueyed
+ * Fixed JS error, if there's no "deletedb" option available.
+ *
  * Revision 1.108  2006/07/04 17:32:30  fplanque
  * no message
  *
