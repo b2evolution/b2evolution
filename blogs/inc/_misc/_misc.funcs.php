@@ -2660,6 +2660,7 @@ function header_nocache()
 function header_redirect( $redirect_to = NULL )
 {
 	global $Hit, $baseurl, $Blog, $htsrv_url_sensitive, $Request;
+	global $Session, $Debuglog;
 
 	if( empty($redirect_to) )
 	{
@@ -2699,6 +2700,12 @@ function header_redirect( $redirect_to = NULL )
 		// blueyed> Removed the removing of "action" here, as it is used to trigger certain views. Instead, "confirm(ed)?" gets removed now
 		$redirect_to = preg_replace( '~(?<=\?|&amp;|&) (login|pwd|confirm(ed)?) = [^&]+ (&(amp;)?|\?)?~x', '', $redirect_to );
 	}
+
+
+	// Save Debuglog into Session, so that it's available after redirect (gets loaded by Session constructor):
+	$Session->set( 'Debuglog', $Debuglog );
+	$Session->dbsave();
+
 
 	#header('Refresh:0;url='.$redirect_to);
 	#exit();
@@ -3041,6 +3048,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.90  2006/07/31 15:39:06  blueyed
+ * Save Debuglog into Session before redirect and load it from there, if available.
+ *
  * Revision 1.89  2006/07/30 13:50:39  blueyed
  * Added $log_app_errors setting.
  *

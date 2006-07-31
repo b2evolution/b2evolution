@@ -144,7 +144,7 @@ class Session
 					{ // Some session data has been previsouly stored:
 
 						// Unserialize session data (using an own callback that should provide class definitions):
-						// fp> TODO: that function should probably be over here; plus we'll have a php 4 class loader anyway 
+						// fp> TODO: that function should probably be over here; plus we'll have a php 4 class loader anyway
 						$old_callback = ini_get( 'unserialize_callback_func' );
 						ini_set( 'unserialize_callback_func', 'unserialize_callback' );
 						$this->_data = @unserialize($row->sess_data);
@@ -163,8 +163,16 @@ class Session
 							if( ($sess_Messages = $this->get('Messages')) && is_a( $sess_Messages, 'log' ) )
 							{
 								$Messages->add_messages( $sess_Messages->messages );
-								$this->delete( 'Messages' );
 								$Debuglog->add( 'Added Messages from session data.', 'session' );
+								$this->delete( 'Messages' );
+							}
+
+							// Load a Debuglog object from session data, if available:
+							if( ($sess_Debuglog = $this->get('Debuglog')) && is_a( $sess_Debuglog, 'log' ) )
+							{
+								$Debuglog->add_messages( $sess_Debuglog->messages );
+								$Debuglog->add( 'Added Debuglog from session data.', 'session' );
+								$this->delete( 'Debuglog' );
 							}
 						}
 					}
@@ -300,8 +308,8 @@ class Session
 
 		if( isset( $this->_data[$param] ) )
 		{
-			if( isset($this->_data[$param][1])
-			  && ( ! isset( $this->_data[$param][0] ) || $this->_data[$param][0] > $localtimenow ) ) // check for expired data
+			if( array_key_exists(1, $this->_data[$param])
+			  && ( is_null( $this->_data[$param][0] ) || $this->_data[$param][0] > $localtimenow ) ) // check for expired data
 			{
 				return $this->_data[$param][1];
 			}
@@ -434,6 +442,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.14  2006/07/31 15:39:06  blueyed
+ * Save Debuglog into Session before redirect and load it from there, if available.
+ *
  * Revision 1.13  2006/06/20 21:16:02  blueyed
  * doc/debug
  *
