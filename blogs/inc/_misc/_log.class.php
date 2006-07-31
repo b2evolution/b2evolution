@@ -9,9 +9,6 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
- *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
  *   the same folder or the closest folder above for complete license terms.
@@ -27,9 +24,11 @@
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ *
  * @package evocore
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
@@ -73,12 +72,12 @@ class Log
 	var $foot = '';
 
 	/**
-	 * @var boolean Should {@link add()} automatically output the messages?
+	 * @var boolean Should {@link Log::add()} automatically output the messages?
 	 */
 	var $dump_add = false;
 
 	/**
-	 * @var array Cache for {@link count()}
+	 * @var array Cache for {@link Log::count()}
 	 */
 	var $_count = array();
 
@@ -256,17 +255,17 @@ class Log
 	}
 
 
-  /**
-   * TEMPLATE TAG
-   *
-   * The purpose here is to have a tag which is simple yet flexible.
-   * the display function is WAAAY too bloated.
-   *
-   * @todo optimize
-   *
-   * @param string HTML to display before the log when there is something to display
-   * @param string HTML to display after the log when there is something to display
-   */
+	/**
+	 * TEMPLATE TAG
+	 *
+	 * The purpose here is to have a tag which is simple yet flexible.
+	 * the display function is WAAAY too bloated.
+	 *
+	 * @todo optimize
+	 *
+	 * @param string HTML to display before the log when there is something to display
+	 * @param string HTML to display after the log when there is something to display
+	 */
 	function disp( $before = '<div class="action_messages">', $after = '</div>' )
 	{
 		if( count($this->messages) )
@@ -509,6 +508,7 @@ class Log
 	/**
 	 * Counts messages of a given category
 	 *
+	 * @todo this seems a bit weird (not really relying on the cache ($_count) and unsetting 'all') -> write testcases to safely be able to change it.
 	 * @param string|array the category, NULL=default, 'all' = all
 	 * @return number of messages
 	 */
@@ -693,6 +693,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.10  2006/07/31 19:51:11  blueyed
+ * doc
+ *
  * Revision 1.9  2006/06/26 23:10:24  fplanque
  * minor / doc
  *
