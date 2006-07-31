@@ -58,9 +58,8 @@ class bbcode_plugin extends Plugin
 			'post_search_list' => array(
 				'label' => $this->T_( 'Search list'),
 				'note' => $this->T_( 'This is the BBcode search array for posts (one per line) ONLY CHANGE THESE IF YOU KNOW WHAT YOU\'RE DOING' ),
-				'type' => 'textarea',
+				'type' => 'html_textarea',
 				'rows' => 10,
-				'allow_html' => 1,
 				'defaultvalue' => '#\[b](.+?)\[/b]#is
 #\[i](.+?)\[/i]#is
 #\[u](.+?)\[/u]#is
@@ -79,9 +78,8 @@ class bbcode_plugin extends Plugin
 			'post_replace_list' => array(
 				'label' => $this->T_( 'Replace list'),
 				'note' => $this->T_( 'This is the replace array for posts (one per line) it must match the exact order of the search array' ),
-				'type' => 'textarea',
+				'type' => 'html_textarea',
 				'rows' => 10,
-				'allow_html' => 1,
 				'defaultvalue' => '<strong>$1</strong>
 <em>$1</em>
 <span style="text-decoration:underline">$1</span>
@@ -114,9 +112,8 @@ class bbcode_plugin extends Plugin
 			'comment_search_list' => array(
 				'label' => $this->T_( 'Search list'),
 				'note' => $this->T_( 'This is the BBcode search array for COMMENTS (one per line) ONLY CHANGE THESE IF YOU KNOW WHAT YOU\'RE DOING' ),
-				'type' => 'textarea',
+				'type' => 'html_textarea',
 				'rows' => 10,
-				'allow_html' => 1,
 				'defaultvalue' => '#\[b](.+?)\[/b]#is
 #\[i](.+?)\[/i]#is
 #\[u](.+?)\[/u]#is
@@ -135,9 +132,8 @@ class bbcode_plugin extends Plugin
 			'comment_replace_list' => array(
 				'label' => $this->T_( 'Replace list'),
 				'note' => $this->T_( 'This is the replace array for COMMENTS (one per line) it must match the exact order of the search array' ),
-				'type' => 'textarea',
+				'type' => 'html_textarea',
 				'rows' => 10,
-				'allow_html' => 1,
 				'defaultvalue' => '<strong>$1</strong>
 <em>$1</em>
 <span style="text-decoration:underline">$1</span>
@@ -215,6 +211,9 @@ class bbcode_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.17  2006/07/31 16:12:18  yabs
+ * Modified 'allow_html' to html_input/html_textarea
+ *
  * Revision 1.16  2006/07/31 07:52:03  yabs
  * Moved search and replace arrays to Settings
  * Added new Setting to enable rendering of comments
