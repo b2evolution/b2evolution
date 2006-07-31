@@ -72,9 +72,14 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 		$params['note'] = $set_meta['note'];
 	}
 
-	if( ! isset($set_meta['type']) )
+	if( ! isset($set_meta['type']) ||  $set_meta['type'] == 'html_input' )
 	{
 		$set_meta['type'] = 'text';
+	}
+
+	if( $set_meta['type'] == 'html_textarea' )
+	{
+		$set_meta['type'] = 'textarea';
 	}
 
 	if( strpos($set_meta['type'], 'select_') === 0 )
@@ -321,7 +326,7 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 			$l_param_type = 'integer';
 			$l_param_default = 0;
 		}
-		elseif( isset( $l_meta[ 'allow_html' ] ) && $l_meta['allow_html'] )
+		elseif( isset( $l_meta[ 'type' ] ) && ( $l_meta[ 'type' ] == 'html_input' ||  $l_meta[ 'type' ] == 'html_textarea' ) )
 		{
 			$l_param_type = 'html';
 		}
@@ -409,6 +414,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.19  2006/07/31 15:41:37  yabs
+ * Modified 'allow_html' to html_input/html_textarea
+ *
  * Revision 1.18  2006/07/31 06:58:02  yabs
  * Added option to plugin settings : allow_html
  *

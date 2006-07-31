@@ -354,6 +354,7 @@ class Plugin
 	 *   - 'defaultvalue': Default value for the setting, defaults to '' (empty string)
 	 *   - 'type', which can be:
 	 *     - 'text' (default): a simple string
+	 *     - 'html_input' : like text, but allows html
 	 *     - 'password': like text, but hidden during input
 	 *     - 'checkbox': either 0 or 1
 	 *     - 'integer': a number (no float, can have leading "+" or "-")
@@ -361,6 +362,7 @@ class Plugin
 	 *     - 'textarea': several lines of input. The following can be set for this type:
 	 *       - 'rows': number of rows
 	 *       - 'cols': number of columns
+	 *     - 'html_textarea': like textarea, but allows html
 	 *     - 'select': a drop down field; you must set 'options' for it:
 	 *       - 'options': an array of options ('value' => 'description'), see {@link Form::select_input_array()}.
 	 *     - 'select_group': a drop down field, providing all existing groups
@@ -385,7 +387,6 @@ class Plugin
 	 *                      with the keys 'pattern' and 'error' to define a custom error message.
 	 *   - 'valid_range': An array with keys 'min', 'max' and (optionally) 'error' to define
 	 *                    a custom error message. At least "min" or "max" must be given.
-	 *   - 'allow_html': if true, it allows html to be used in the settings value
 	 *   - 'help': can be:
 	 *          - '#anchor': anchor that gets appended to {@link $help_url}
 	 *          - true: the settings name/key gets transformed to an html ID and gets used as anchor to {@link $help_url}.
@@ -2509,6 +2510,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.80  2006/07/31 15:41:37  yabs
+ * Modified 'allow_html' to html_input/html_textarea
+ *
  * Revision 1.79  2006/07/31 06:58:47  yabs
  * Added info line to GetDefaultSettings() for : allow_html
  *
