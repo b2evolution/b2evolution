@@ -2305,7 +2305,7 @@ function _mw_get_cat_IDs($contentstruct, $blog_ID, $empty_struct_ok = false)
 		}
 		if( ! empty($categories) )
 		{
-			$sql = substr($sql, -2); // remove ', '
+			$sql = substr($sql, 0, -2); // remove ', '
 		}
 		$sql .= ' )';
 		logIO("O","sql for finding IDs ...".$sql);
@@ -2557,6 +2557,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.103  2006/08/01 22:53:31  blueyed
+ * Fix
+ *
  * Revision 1.102  2006/08/01 21:53:02  blueyed
  * Fixes
  *
