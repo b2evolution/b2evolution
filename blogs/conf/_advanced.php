@@ -552,6 +552,14 @@ $debug_no_register_shutdown = 0;
 
 
 /**
+ * XMLRPC logging. Set this to 1 to log XMLRPC calls/responses (into /xmlsrv/xmlrpc.log).
+ *
+ * @global int $debug_xmlrpc_logging Default: 0
+ */
+$debug_xmlrpc_logging = 0;
+
+
+/**
  * Seconds after which a scheduled task is considered to be timed out.
  */
 $cron_timeout_delay = 1800; // 30 minutes

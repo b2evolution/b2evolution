@@ -42,8 +42,6 @@ $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecate
 
 $post_default_title = ''; // posts submitted via the xmlrpc interface get that title
 
-$xmlrpc_logging = 0;		// Set to 1 if you want to enable logging
-
 $xmlrpc_debug_messages = 0;		// Set to 1 if you want to enable debug messages (comments inside of the XML responses)
 
 // If you want this functionality, please give it it's own config variable in the config files.
@@ -51,15 +49,15 @@ $xmlrpc_debug_messages = 0;		// Set to 1 if you want to enable debug messages (c
 							// you trust the editing tool to do this (more features than the browser interface)
 
 /**
- * Used for logging, only if $xmlrpc_logging is true
+ * Used for logging, only if {@link $debug_xmlrpc_logging} is true
  *
  * @return boolean Have we logged?
  */
 function logIO($io,$msg)
 {
-	global $xmlrpc_logging;
+	global $debug_xmlrpc_logging;
 
-	if( ! $xmlrpc_logging )
+	if( ! $debug_xmlrpc_logging )
 	{
 		return false;
 	}
@@ -2557,6 +2555,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.105  2006/08/01 23:32:45  blueyed
+ * Moved $xmlrpc_logging into /conf/_advanced.php (and renamed it to $debug_xmlrpc_logging), so it can get overridden easily.
+ *
  * Revision 1.104  2006/08/01 22:56:38  blueyed
  * Fixed "perm denied"
  *

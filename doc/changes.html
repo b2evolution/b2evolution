@@ -32,6 +32,13 @@
 		<li>Enhanced result tables (progidistri, fplanque, blueyed) </li>
 		<li>Different item edit views: simple, advanced (blueyed, fplanque)</li>
 		<li>Improved/fixed switching blogs (and item edit tabs) while editing (blueyed)</li>
+		<li>
+			Developer stuff:
+			<ul>
+				<li>Debuglog gets saved in user's session, to simplify debugging when redirects get used, e.g. when a comment gets posted (blueyed, yabba)</li>
+				<li>Moved $xmlrpc_logging param to /conf/_advanced.php (renamed to $debug_xmlrpc_logging)</li>
+			</ul>
+		</li>
 	</ul>
 
 
@@ -49,6 +56,7 @@
 				<li>API: Added Plugin::get_plugin_url() method</li>
 				<li>Added events: AfterUserInsert, AfterUserUpdate, AfterUserDelete, Logout</li>
 				<li>Fixed the Auto-P plugin again (blueyed)</li>
+				<li>LDAP plugin: Fixed creating new usergroups based on template group (blueyed)</li>
 			</ul>
 		</li>
 	</ul>
