@@ -517,6 +517,11 @@ class ItemList extends DataObjectList
 
 		$post_title = format_to_post( $post_title, 0 );
 		$content = format_to_post( $content );
+
+		if( ! is_array($renderers) )
+		{ // DEBUG: there are "Bad arguments." warnings in the demo's error logs..?!
+			debug_die('Assertion "$renderers is array" failed: $renderers is '.var_export($renderers, true));
+		}
 		$post_renderers = implode( '.', $renderers );
 
 		preg_match( '~(\d\d\d\d)-(\d\d)-(\d\d)~', $item_issue_date, $match );
@@ -863,6 +868,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.12  2006/08/01 19:47:00  blueyed
+ * debug
+ *
  * Revision 1.11  2006/07/08 22:33:43  blueyed
  * Integrated "simple edit form".
  *
