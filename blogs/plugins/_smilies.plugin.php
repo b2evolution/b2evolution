@@ -47,14 +47,6 @@ class smilies_plugin extends Plugin
 	var $smilies;
 
 	/**
-	 * Path to images
-	 *
-	 * @access private
-	 */
-	var $smilies_path;
-
-
-	/**
 	 * Init
 	 */
 	function PluginInit( & $params )
@@ -62,12 +54,6 @@ class smilies_plugin extends Plugin
 		$this->short_desc = T_('Graphical smileys');
 		$this->long_desc = T_('This renderer will convert text smilies like :) to graphical icons.<br />
 			Optionally, it will also display a toolbar for quick insertion of smilies into a post.');
-
-		/**
-		 * Smilies configuration.
-		 * TODO: Move/transform to PluginSettings
-		 */
-		//require dirname(__FILE__).'/_smilies.conf.php';
 	}
 
 
@@ -129,6 +115,7 @@ XX( => graydead.gif
 
 	/**
 	 * Allowing the user to deactivate the toolbar..
+	 * Allowing user to deactivate smilies in comments
 	 *
 	 * @return array
 	 */
@@ -149,7 +136,6 @@ XX( => graydead.gif
 			);
 	}
 
-
 	/**
 	 * Display a toolbar
 	 *
@@ -163,19 +149,18 @@ XX( => graydead.gif
 			return false;
 		}
 
-		$this->PrepareSmilies();	// check smilies cached
-		global $rsc_url;
+		$this->InitSmilies();	// check smilies cached
 
 		$grins = '';
 		$smiled = array();
-		foreach( $this->smilies as $smiley => $grin )
+		foreach( $this->smilies as $smiley )
 		{
-			if (!in_array($grin, $smiled))
+			if (!in_array($smiley[ 'image' ], $smiled))
 			{
-				$smiled[] = $grin;
-				$smiley = str_replace(' ', '', $smiley);
-				$grins .= '<img src="'. $rsc_url. 'smilies/'. $grin. '" title="'.$smiley.'" alt="'.$smiley
-									.'" class="top" onclick="grin(\''. str_replace("'","\'",$smiley). '\');" /> ';
+				$smiled[] = $smiley[ 'image'];
+				$smiley[ 'code' ] = str_replace(' ', '', $smiley[ 'code' ]);
+				$grins .= '<img src="'.$smiley[ 'image' ].'" title="'.$smiley[ 'code' ].'" alt="'.$smiley[ 'code' ]
+									.'" class="top" onclick="grin(\''. str_replace("'","\'",$smiley[ 'code' ]). '\');" /> ';
 			}
 		}
 
@@ -228,8 +213,6 @@ XX( => graydead.gif
 		return true;
 	}
 
-
-
 	/**
 	 * Perform rendering
 	 *
@@ -250,41 +233,29 @@ XX( => graydead.gif
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-		$this->PrepareSmilies();	// check smilies are already cached
+		$this->InitSmilies();	// check smilies are already cached
 
 
 		if( ! isset( $this->search ) )
 		{	// We haven't prepared the smilies yet
 			$this->search = array();
 
-			global $basepath, $rsc_path, $skins_subdir, $skin, $rsc_url;
-
 			$tmpsmilies = $this->smilies;
-			uksort($tmpsmilies, array(&$this, 'smiliescmp'));
+			usort($tmpsmilies, array(&$this, 'smiliescmp'));
 
-			foreach($tmpsmilies as $smiley => $img)
+			foreach( $tmpsmilies as $smiley )
 			{
-				$this->search[] = $smiley;
+				$this->search[] = $smiley[ 'code' ];
 				$smiley_masked = '';
-				for ($i = 0; $i < strlen($smiley); $i++ )
+				for ($i = 0; $i < strlen($smiley[ 'code' ] ); $i++ )
 				{
-					$smiley_masked .=  '&#'.ord(substr($smiley, $i, 1)).';';
+					$smiley_masked .=  '&#'.ord(substr($smiley[ 'code' ], $i, 1)).';';
 				}
 
 				// We don't use getimagesize() here until we have a mean
 				// to preprocess smilies. It takes up to much time when
 				// processing them at display time.
-				if( is_file( $basepath.$skins_subdir.$skin.'/smilies/'.$img ) )
-				{
-					$img = 'smilies/'.$img;	// skin has it's own smiley, use it
-				} elseif ( is_file( $rsc_path.'smilies/'.$img ) )
-				{
-					$img = $rsc_url.'smilies/'.$img; // default smiley found so use it
-				} else {
-					$img = ''; // no smiley image found, show the characters instead
-				}
-
-				$this->replace[] = ( $img ? '<img src="'.$img.'" alt="'.$smiley_masked.'" class="middle" />' : $smiley );
+				$this->replace[] = '<img src="'.$smiley[ 'image' ].'" alt="'.$smiley_masked.'" class="middle" />';
 			}
 		}
 
@@ -335,9 +306,9 @@ XX( => graydead.gif
 	 */
 	function smiliescmp($a, $b)
 	{
-		if(($diff = strlen($b) - strlen($a)) == 0)
+		if( ($diff = strlen( $b[ 'code' ] ) - strlen( $a[ 'code' ] ) ) == 0)
 		{
-			return strcmp($a, $b);
+			return strcmp( $a[ 'code' ], $b[ 'code' ] );
 		}
 		return $diff;
 	}
@@ -345,19 +316,57 @@ XX( => graydead.gif
 	/*
 	 * Initiates the smiley array if not already initiated
 	 *
+	 * Attempts to use skin specific smileys where available
+	 *	- skins_adm/skin/rsc/smilies/
+	 *	- skins/skin/smilies/
+	 *
+	 * Attempts to fallback to default smilies
+	 *	- rsc/smilies/
+	 *
+	 * If no image file found the smiley is not added
+	 *
+	 * @return array of available smilies( code, image url )
 	 */
-	function PrepareSmilies()
+	function InitSmilies()
 	{
 		if( empty( $this->smilies ) )
 		{
 			// smilies are not yet cached
+			global $admin_skin, $adminskins_path, $adminskins_url, $rsc_path, $rsc_url, $skin, $skins_path, $skins_url;
+
+			// set the skin path/url and the default (rsc) path/url
+			$currentskin_path = ( is_admin_page() ? $adminskins_path.$admin_skin.'/rsc' : $skins_path.$skin ).'/smilies/';
+			$currentskin_url = ( is_admin_page() ? $adminskins_url.$admin_skin.'/rsc' : $skins_url.$skin ).'/smilies/';
+			$default_path = $rsc_path.'smilies/';
+			$default_url = $rsc_url.'smilies/';
+			
 			$this->smilies = array();
 			$temp_list = explode( "\n", str_replace( array( "\r", "\t" ), '', $this->Settings->get( 'smiley_list' ) ) );
+
 			foreach( $temp_list as $temp_smiley )
 			{
 				$a_smiley = explode( '<->', preg_replace( '#(.+)( )=>(.+?)#', '$1<->$2',$temp_smiley ) );
+
 				if( isset( $a_smiley[0] ) and isset( $a_smiley[1] ) )
-					$this->smilies += array( trim( $a_smiley[0] ) => trim( $a_smiley[1] ) );
+				{
+					// lets see if the file exists
+					$temp_img = trim( $a_smiley[1] );
+					if( is_file( $currentskin_path.$temp_img ) )
+					{
+						$temp_url = $currentskin_url.$temp_img;	// skin has it's own smiley, use it
+					}
+					elseif ( is_file( $default_path.$temp_img ) )
+					{
+						$temp_url = $default_url.$temp_img; // no skin image, but default smiley found so use it
+					}
+					else
+					{
+						$temp_url = ''; // no smiley image found, so don't add the smiley
+					}
+
+					if( $temp_url )
+						$this->smilies[] = array( 'code' => trim( $a_smiley[0] ),'image' => $temp_url );
+				}
 			}
 		}
 	}
@@ -367,6 +376,10 @@ XX( => graydead.gif
 
 /*
  * $Log$
+ * Revision 1.28  2006/08/01 08:20:47  yabs
+ * Added ability for admin skins to override default smiley images
+ * Tidied up my previous code
+ *
  * Revision 1.27  2006/07/31 16:19:04  yabs
  * Moved settings to admin
  * Added smilies in comments ( as user setting )
