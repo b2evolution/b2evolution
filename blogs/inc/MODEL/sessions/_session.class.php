@@ -120,7 +120,7 @@ class Session
 					  FROM T_sessions
 					 WHERE sess_ID  = '.$DB->quote($session_id_by_cookie).'
 					   AND sess_key = '.$DB->quote($session_key_by_cookie).'
-					   AND sess_lastseen > '.($localtimenow - $DB->quote($Settings->get('timeout_sessions'))) );
+					   AND UNIX_TIMESTAMP(sess_lastseen) > '.($localtimenow - $Settings->get('timeout_sessions')) );
 				if( empty( $row ) )
 				{
 					$Debuglog->add( 'Session ID/key combination is invalid!', 'session' );
@@ -442,6 +442,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.15  2006/08/01 20:02:38  blueyed
+ * Fixed bug with sess_lastseen WHERE-clause.
+ *
  * Revision 1.14  2006/07/31 15:39:06  blueyed
  * Save Debuglog into Session before redirect and load it from there, if available.
  *
