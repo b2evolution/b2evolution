@@ -340,6 +340,8 @@ XX( => graydead.gif
 			$default_path = $rsc_path.'smilies/';
 			$default_url = $rsc_url.'smilies/';
 			
+			$skin_has_smilies = is_dir( $currentskin_path );	// check if skin has a /smilies/ folder
+
 			$this->smilies = array();
 			$temp_list = explode( "\n", str_replace( array( "\r", "\t" ), '', $this->Settings->get( 'smiley_list' ) ) );
 
@@ -351,7 +353,7 @@ XX( => graydead.gif
 				{
 					// lets see if the file exists
 					$temp_img = trim( $a_smiley[1] );
-					if( is_file( $currentskin_path.$temp_img ) )
+					if( $skin_has_smilies && is_file( $currentskin_path.$temp_img ) )
 					{
 						$temp_url = $currentskin_url.$temp_img;	// skin has it's own smiley, use it
 					}
@@ -376,6 +378,9 @@ XX( => graydead.gif
 
 /*
  * $Log$
+ * Revision 1.29  2006/08/01 08:44:31  yabs
+ * Minor change - checks if skin has /smilies/ folder before start of checking for images
+ *
  * Revision 1.28  2006/08/01 08:20:47  yabs
  * Added ability for admin skins to override default smiley images
  * Tidied up my previous code
