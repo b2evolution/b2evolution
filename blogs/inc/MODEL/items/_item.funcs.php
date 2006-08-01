@@ -243,17 +243,17 @@ function link_pages( $before='#', $after='#', $next_or_number='number', $nextpag
 
 /**
  * previous_post(-)
- *
- *
+ * @todo Move to ItemList?!
  */
 function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='no', $limitprev=1, $excluded_categories='')
 {
 	if( $previous == '#' ) $previous = T_('Previous post') . ': ';
 
 	global $DB, $postdata;
-	global $p, $posts, $s;
+	global $disp, $posts;
+	global $ItemCache, $Blog;
 
-	if(($p) || ($posts==1))
+	if( $disp == 'single' || $posts == 1 )
 	{
 
 		$current_post_date = $postdata['Date'];
@@ -284,11 +284,11 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 
 		if( $p_info = $DB->get_row( $sql ) )
 		{
-			$p_title = $p_info->post_title;
-			$p_id = $p_info->post_ID;
-			$string = '<a href="'.url_add_param( get_bloginfo('blogurl'), 'p='.$p_id.'&amp;more=1&amp;c=1').'">'.$previous;
-			if (!($title!='yes')) {
-				$string .= $p_title;
+			$Item = & $ItemCache->get_by_ID($p_info->post_ID);
+
+			$string = '<a href="'.$Item->get_permanent_url('', $Blog->get('url')).'">'.$previous;
+			if( $title == 'yes' ) {
+				$string .= $p_info->post_title;
 			}
 			$string .= '</a>';
 			$format = str_replace('%',$string,$format);
@@ -300,15 +300,17 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 
 /**
  * next_post(-)
+ * @todo Move to ItemList?!
  */
 function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $limitnext=1, $excluded_categories='')
 {
 	if( $next == '#' ) $next = T_('Next post') . ': ';
 
-	global $p, $posts, $postdata, $localtimenow, $DB;
-	if(($p) || ($posts==1))
-	{
+	global $disp, $posts, $postdata, $localtimenow, $DB;
+	global $ItemCache, $Blog;
 
+	if( $disp == 'single' || $posts == 1 )
+	{
 		$current_post_date = $postdata['Date'];
 		$current_category = $postdata['Category'];
 		$sqlcat = '';
@@ -340,11 +342,11 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 
 		if( $p_info = $DB->get_row( $sql ) )
 		{
-			$p_title = $p_info->post_title;
-			$p_id = $p_info->post_ID;
-			$string = '<a href="'.url_add_param( get_bloginfo('blogurl'), 'p='.$p_id.'&amp;more=1&amp;c=1' ).'">'.$next;
+			$Item = & $ItemCache->get_by_ID($p_info->post_ID);
+
+			$string = '<a href="'.$Item->get_permanent_url('', $Blog->get('url')).'">'.$next;
 			if ($title=='yes') {
-				$string .= $p_title;
+				$string .= $p_info->post_title;
 			}
 			$string .= '</a>';
 			$format = str_replace('%',$string,$format);
@@ -936,6 +938,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.14  2006/08/01 22:27:34  blueyed
+ * Fixed next_post()/previous_post(): use permanent URL, based on current Blog (clean URLs). Also check for disp==single instead of "p", which does not work when a post has been selected by title (param).
+ *
  * Revision 1.13  2006/07/23 23:27:07  blueyed
  * cleanup
  *
