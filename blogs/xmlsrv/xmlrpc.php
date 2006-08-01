@@ -112,8 +112,7 @@ $b2newpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrp
 function b2newpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID, $DB, $UserCache;
-	global $cafelogID;
+	global $DB, $UserCache;
 	global $Settings, $Messages;
 	global $ItemCache;					// Tor 28102005
 
@@ -179,7 +178,7 @@ function b2newpost($m)
 	// INSERT NEW POST INTO DB:
 	$edited_Item = & new Item();
 	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $now, $category, array(), 'published', $current_User->locale );
-	if( !empty($DB->last_error) )
+	if( $DB->error )
 	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
@@ -246,7 +245,7 @@ function b2getcategories( $m )
 	$sql .= "ORDER BY cat_name ASC";
 
 	$rows = $DB->get_results( $sql );
-	if( !empty($DB->last_error) )
+	if( $DB->error )
 	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
@@ -360,8 +359,7 @@ $bloggernewpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $
 function bloggernewpost( $m )
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID, $default_category, $DB;
-	global $cafelogID;
+	global $default_category, $DB;
 	global $Settings, $Messages, $UserCache;
 	global $ItemCache;					// Tor 28102005
 
@@ -429,7 +427,7 @@ function bloggernewpost( $m )
 	$edited_Item = & new Item();
 	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $now, $post_category, array( $post_category ), $status, $current_User->locale, '', 0, $publish );
 
-	if( !empty($DB->last_error) )
+	if( $DB->error )
 	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
@@ -493,8 +491,8 @@ $bloggereditpost_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $x
 function bloggereditpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID, $ItemCache;
-	global $cafelogID, $default_category, $DB;
+	global $ItemCache;
+	global $default_category, $DB;
 	global $Messages, $UserCache;
 
 	logIO('I','Called function: blogger.editPost');
@@ -592,8 +590,9 @@ function bloggereditpost($m)
 	}
 
 	// UPDATE POST IN DB:
+	// TODO: use $edited_Item->set() with only the appropriate fields and then $edited_Item->dbupdate()
 	$edited_Item->update( $post_title, $content, '', $post_category, array($post_category), $status, '#', '', 0, $pingsdone, '', '', 'open' );
-	if( !empty($DB->last_error) )
+	if( $DB->error )
 	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
@@ -654,7 +653,7 @@ $bloggerdeletepost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString
 function bloggerdeletepost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID, $DB, $UserCache;
+	global $DB, $UserCache;
 	global $ItemCache;					// Tor 28102005
 
 	$post_ID = $m->getParam(1);
@@ -680,10 +679,8 @@ function bloggerdeletepost($m)
 
 	$current_User = & $UserCache->get_by_login( $username );
 
-	$blog_ID = $edited_Item->blog_ID;
-
 	// Check permission:
-	if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $blog_ID ) )
+	if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $edited_Item->blog_ID ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
 				'Permission denied.');
@@ -691,7 +688,7 @@ function bloggerdeletepost($m)
 
 	// DELETE POST FROM DB:
 	$edited_Item->dbdelete();
-	if( !empty($DB->last_error) )
+	if( $DB->error )
 	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
@@ -930,7 +927,6 @@ $bloggergetrecentposts_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcSt
 function bloggergetrecentposts( $m )
 {
 	global $xmlrpcerruser, $DB, $show_statuses, $UserCache;
-	global $blog;
 	global $ItemCache;					// Tor 28102005
 
 	$blog_ID = $m->getParam(1);
@@ -959,8 +955,6 @@ function bloggergetrecentposts( $m )
 		return new xmlrpcresp(0, $xmlrpcerruser+2, 'Permission denied.' ); // user error 2
 	}
 
-	$blog = $blog_ID;	// Some old functions still need this!
-
 	// Getting current blog info:
 	$blogparams = get_blogparams_by_ID( $blog_ID );
 
@@ -968,7 +962,7 @@ function bloggergetrecentposts( $m )
 	$MainList = & new ItemList( $blog_ID, $show_statuses, '', '', '', '', array(), '', 'DESC', '', $numposts,
 															'', '', '', '', '', '', '', 'posts' );
 
-	if( !empty($DB->last_error) )
+	if( $DB->error )
 	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
@@ -1281,7 +1275,7 @@ function pingback_ping( $m )
 								FROM T_posts
 								WHERE post_title RLIKE '$title'";
 				$blah = $DB->get_row( $sql, ARRAY_A );
-				if( !empty($DB->last_error) )
+				if( $DB->error )
 				{ // DB error
 					return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 				}
@@ -1312,7 +1306,7 @@ function pingback_ping( $m )
 						FROM T_posts
 						WHERE post_ID = '.$post_ID;
 		$rows = $DB->get_results( $sql );
-		if( !empty($DB->last_error) )
+		if( $DB->error )
 		{ // DB error
 			return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 		}
@@ -1327,7 +1321,7 @@ function pingback_ping( $m )
 								AND comment_author_url = '".$DB->escape(preg_replace('#&([^amp\;])#is', '&amp;$1', $pagelinkedfrom))."'
 								AND comment_type = 'pingback'";
 			$rows = $DB->get_results( $sql );
-			if( !empty($DB->last_error) )
+			if( $DB->error )
 			{ // DB error
 				return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 			}
@@ -1398,7 +1392,7 @@ function pingback_ping( $m )
 														'".$DB->escape($pagelinkedfrom)."', '$now',
 														'".$DB->escape($context)."')";
 						$DB->query( $sql );
-						if( !empty($DB->last_error) )
+						if( $DB->error )
 						{ // DB error
 							return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 						}
@@ -1467,8 +1461,7 @@ function pingback_ping( $m )
 //
 //
 function mwnewMediaObj($m) {
-		global $xmlrpcerruser,$tablecategories; // import user errcode value
-		global $blog_ID;
+		global $xmlrpcerruser; // import user errcode value
 		global $Settings, $baseurl,$fileupload_realpath,$fileupload_allowedtypes;
 		global $use_fileupload;
 		logIO("O","start of _newmediaobject...");
@@ -1616,70 +1609,25 @@ $mwnewpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcS
  */
 function mwnewpost($m)
 {
-	global $xmlrpcerruser,$tablecategories; // import user errcode value
-	global $blog_ID, $DB;
-	global $cafelogID, $sleep_after_edit;
+	global $xmlrpcerruser; // import user errcode value
+	global $DB;
+	global $sleep_after_edit;
 	global $Settings, $UserCache;
 	global $ItemCache;					// Tor 28102005
+	global $default_category;
+
 	logIO("O","start of mwnewpost...");
-	$blogid = $m->getParam(0);
-	$blogid = $blogid->scalarval();
+
+	$blog_ID = $m->getParam(0);
+	$blog_ID = $blog_ID->scalarval();
+
 	$username = $m->getParam(1);
 	$username = $username->scalarval();
 	logIO("O","finished getting username ...");
 	$password = $m->getParam(2);
 	$password = $password->scalarval();
-	// logIO("O","finished getting password ...".$password);
-	$xcontent = $m->getParam(3);
-//	$xcontent = $xcontent->scalarval();
-	logIO("O","finished getting xcontent ...");
-	xmlrpc_debugmsg( 'Getting xcontent'  );
-// getParam(4) should now be a flag for publish or draft
-	$xstatus	=	$m->getParam(4);
-	$xstatus	=	$xstatus->scalarval();
-	$status = $xstatus ? 'published' : 'draft';
-	logIO('I',"Publish: $publish -> Status: $status");
-	logIO("O","finished getting xstatus ->". $xstatus);
-	$contentstruct = xmlrpc_decode($xcontent); //this does not work properly.... need better decoding
-	logIO("O","finished getting contentstruct ...");
-//	$content = format_to_post($contentstruct['description']);
-	$title = $contentstruct['title'];
-	$content = $contentstruct['description'];
-	logIO("O","finished getting title ...".$title);
-	$categories = $contentstruct['categories'];
-	logIO("O","finished getting contentstruct category...".$categories[0]);
-	xmlrpc_debugmsg( 'Category: '.$categories[0]  );
-	// Need to look up the ID of each category selected (or at least the first one)
+	logIO("O","finished getting password ...".starify($password));
 
-//------------------
-// This code is horribly inefficient, will rewrite soon - Tor dec 2004
-///
-
-//	$sql = "SELECT * FROM T_categories WHERE cat_blog_ID = $blogid AND cat_name = $categories[0] ";
-
-	$sql = "SELECT * FROM T_categories WHERE cat_blog_ID = $blogid ";
-
-		logIO("O","sql for finding ID ...".$sql);
-	$rows = $DB->get_results( $sql );
-	if( !empty($DB->last_error) )
-	{	// DB error
-		logIO("O","user error finding category info ...");
-	}
-// Tor - need to sort out default category if none supplied
-	$category = $rows[0]->cat_ID;
-	logIO("O","have temporary category ID...".$category);
-
-	foreach( $rows as $row )
-	{
-	logIO("O","finished array element category ...".$row->cat_ID.'name->'.$row->cat_name);
-	if ($row->cat_name == $categories[0]) {
-		$category = $row->cat_ID;
-	logIO("O","have category ID...".$category);
-		}
-	}
-	$postdate = $contentstruct['dateCreated'];
-	logIO("O","finished getting contentstruct dateCreated...".$postdate);
-//	$postdate = $postdate->scalarval();
 	if( ! user_pass_ok($username,$password) )
 	{
 	logIO("O","error during checking password ...");
@@ -1687,51 +1635,111 @@ function mwnewpost($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 	logIO("O","finished checking password ...");
-	$current_User = & $UserCache->get_by_login( $username );
-	logIO("O","currentuser ...". $current_User);
+
+
+	$xcontent = $m->getParam(3);
+//	$xcontent = $xcontent->scalarval();
+	logIO("O","finished getting xcontent ...");
+	xmlrpc_debugmsg( 'Getting xcontent'  );
+
+	// getParam(4) should now be a flag for publish or draft
+	$xstatus = $m->getParam(4);
+	$xstatus = $xstatus->scalarval();
+	$status = $xstatus ? 'published' : 'draft';
+	logIO('I',"Publish: $xstatus -> Status: $status");
+	logIO("O","finished getting xstatus ->". $xstatus);
+
+	$contentstruct = xmlrpc_decode($xcontent); //this does not work properly.... need better decoding
+	logIO("O","finished getting contentstruct ...");
+//	$content = format_to_post($contentstruct['description']);
+	$post_title = $contentstruct['title'];
+	$content = $contentstruct['description'];
+	logIO("O","finished getting title ...".$post_title);
+
+
+	// Categories:
+	$categories = isset($contentstruct['categories']) ? $contentstruct['categories'] : array() ; // by names(!)
+	logIO("O","finished getting contentstruct categories...".implode( ', ', $categories ) );
+
+	xmlrpc_debugmsg( 'Main category: '.$categories[0]  );
+
+	// for cross-blog-entries, the cat_blog_ID WHERE clause should be removed (but cats are given by name!)
+	$sql = "
+		SELECT cat_ID FROM T_categories
+		 WHERE cat_blog_ID = $blog_ID
+		   AND cat_name IN ( ";
+	foreach( $categories as $l_cat )
+	{
+		$sql .= $DB->quote($l_cat).', ';
+	}
+	if( ! empty($categories) )
+	{
+		$sql = substr($sql, -2); // remove ', '
+	}
+	$sql .= ' )';
+	logIO("O","sql for finding ID ...".$sql);
+
+	$cat_IDs = $DB->get_col( $sql );
+	if( $DB->error )
+	{	// DB error
+		logIO("O","user error finding categories info ...");
+	}
+	if( empty($cat_IDs) && ! empty($default_category) )
+	{ // no cats: use default
+		$cat_IDs = array($default_category);
+		logIO("O", 'fallback to $default_category ...');
+	}
+
 	// Check if category exists
-	if( get_the_category_by_ID( $category, false ) === false ) // goes wrong - as in text
-	{ // Cat does not exist:
+	if( get_the_category_by_ID( $cat_IDs[0], false ) === false )
+	{ // Main cat does not exist:
 		logIO("O","usererror 5 ...");
 		return new xmlrpcresp(0, $xmlrpcerruser+5, 'Requested category does not exist.'); // user error 5
 	}
-	logIO("O","finished checking if category exists ...".$category);
-	$blog_ID = get_catblog($category);
-	$blogparams = get_blogparams_by_ID( $blog_ID );
-	logIO("O","finished getting blogparams ...");
+	logIO("O","finished checking if main category exists ...".$cat_IDs[0]);
+
+
+	if( empty($contentstruct['dateCreated']) )
+	{
+		$postdate = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
+		logIO("O","no contentstruct dateCreated, using now...".$postdate);
+	}
+	else
+	{
+		$postdate = $contentstruct['dateCreated'];
+		logIO("O","finished getting contentstruct dateCreated...".$postdate);
+	}
+
 	// Check permission:
+	$current_User = & $UserCache->get_by_login( $username );
+	logIO("O","currentuser ...". $current_User);
+
 	if( ! $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
 	{
 		logIO("O","user error 9 ...");
 		return new xmlrpcresp(0, $xmlrpcerruser+2, 'Permission denied.'); // user error 2
 	}
 	logIO("O","finished checking permissions ...");
-//	if( $postdate != '' )
-//	{
-//		$now = $postdate;
-//	}
-//	else
-//	{
-		$now = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
-//	}
-	logIO("O","finished checking dates ...".$now);
+
 	// CHECK and FORMAT content - error occur after this line
 	//$post_title = format_to_post($post_title, 0, 0);
-	$post_title = $title;
-	logIO("O","finished converting post_title ...",$post_title);
+	//logIO("O","finished converting post_title ...",$post_title);
+
 	//$content = format_to_post($content, 0, 0);  // 25122004 tag - security !!!
-	logIO("O","finished converting content ...".$content); // error occurs before this line
-//	if( $errstring = $Messages->get_string( 'Cannot post, please correct these errors:', '' ) )
-//	{
-//		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
-//	}
-	logIO("O","finished checking if errors exists, ready to insert into DB ...");
+	//logIO("O","finished converting content ...".$content); // error occurs before this line
+
+	//	if( $errstring = $Messages->get_string( 'Cannot post, please correct these errors:', '' ) )
+	//	{
+	//		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
+	//	}
+	//logIO("O","finished checking if errors exists, ready to insert into DB ...");
+
 	// INSERT NEW POST INTO DB:
 	// Tor - comment this out to stop inserts into database
 	$edited_Item = & new Item();
-	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $now, $category, array( ), $status, $current_User->locale, '', 0, $publish );
+	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $postdate, $cat_IDs[0], $cat_IDs, $status, $current_User->locale, '', 0, ($status == 'published') );
 
-	if( !empty($DB->last_error) )
+	if( $DB->error )
 	{	// DB error
 		logIO("O","user error 9 ...");
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
@@ -1740,6 +1748,9 @@ function mwnewpost($m)
 	{
 		sleep( $sleep_after_edit );
 	}
+
+	$blogparams = get_blogparams_by_ID( $blog_ID );
+	logIO("O","finished getting blogparams ...");
 	// pingback( true, $content, $post_title, '', $post_ID, $blogparams, false); // bug here in 9.0.11
 
 //		logIO("O","Sending email notifications...");
@@ -1754,6 +1765,7 @@ function mwnewpost($m)
 //	pingBlogs( $blogparams, false );
 	logIO("O","Pinging Technorati...");
 	pingTechnorati( $blogparams, false );
+
 	return new xmlrpcresp(new xmlrpcval($post_ID));
 }
 
@@ -1763,13 +1775,19 @@ $mt_setPostCategories_doc = "Sets the categories for a post.";
 
 function mt_setPostCategories($m) {
 	global $xmlrpcerruser,$tableposts,$Settings;
-	global $tablecategories, $DB, $Messages, $UserCache,$ItemCache;
+	global $DB, $Messages, $UserCache,$ItemCache;
 	$post_ID = $m->getParam(0);
 	$post_ID = $post_ID->scalarval();
 	$username = $m->getParam(1);
 	$username = $username->scalarval();
 	$password = $m->getParam(2);
 	$password = $password->scalarval();
+
+	if( ! user_pass_ok($username,$password) )
+	{
+		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+					 'Wrong username/password combination '.$username.' / '.starify($password));
+	}
 
 // ok - pick up new category from call
 	$xcontent = $m->getParam(3); // This is now a array of structs
@@ -1785,7 +1803,7 @@ function mt_setPostCategories($m) {
 			logIO("O","finished getting - i ...>".$i); // works!
 			$struct = $xcontent->arraymem($i); // get a struct object from array
 			$tempcat = $struct->structmem('categoryId');
-    		$tempcat = $tempcat->scalarval();
+			$tempcat = $tempcat->scalarval();
 			$tempPrimary = $struct->structmem('isPrimary');// Start finding the primary category
 			$tempPrimary = $tempPrimary->scalarval();
 			if ($tempPrimary != 0)
@@ -1798,51 +1816,19 @@ function mt_setPostCategories($m) {
 			logIO("O","finished getting - categories ...".$categories[$i]);
 		}
 	}
-	if( user_pass_ok($username,$password) )
-	{
-		$postdata = get_postdata($post_ID);
-		if( $postdata['Date'] != '' )
-		{
-			$post_date = mysql2date("U", $postdata["Date"]);
-			$post_date = gmdate("Ymd", $post_date)."T".gmdate("H:i:s", $post_date);
-			$content = $postdata["Content"];
-			$post_title = $postdate["Title"];
-			if( $postdate != '' )
-			{
-				$now = $postdate;
-			}
-			else
-			{
-				$now = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
-			}
-			logIO("O","finished checking dates ...".$now);
-		}
-	}
-	else
-	{
-		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
-					 'Wrong username/password combination '.$username.' / '.starify($password));
-	}
-	// UPDATE POST IN DB:    TODO - published!! set flag correctly and open
-	logIO("O","bpost_update - category ...".$category); // works!
-	// Nb! category is the primary - categories the secondaries, first i.e. zeroeth categories ir also primary
-//	bpost_update( $post_ID, $post_title, $content, $now, $category, $categories, 'published', '#', '', 0, 'pingsdone', '', '', 'open'  );
 
+	// UPDATE POST CATEGORIES IN DB:
+	logIO("O","bpost_update - category ...".$category); // works!
 	if( ! ($edited_Item = & $ItemCache->get_by_ID( $post_ID ) ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+7, "No such post (#$post_ID)."); // user error 7
 	}
-	$edited_Item->update( $post_title, $content, '', $category, $categories, 'published', '#', '', 0, 'pingsdone', '', '', 'open' );
+	$edited_Item->set( 'main_cat_ID', $category );
+	$edited_Item->set( 'extra_cat_IDs', $categories );
+
+	$edited_Item->dbupdate();
 
 	return new xmlrpcresp(new xmlrpcval(1));
-	if( !empty($DB->last_error) )
-
-	{	// DB error
-
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-		logIO("O","bpost_update - db error occured ...".$category);
-		}
-//Return value: on success, boolean true value; on failure, fault
 }
 
 
@@ -1857,7 +1843,7 @@ $mt_getPostCategories_doc = "Returns a list of all categories to which the post 
 
 function mt_getPostCategories($m) {
 	global $xmlrpcerruser,$tableposts;
-	global $tablecategories, $DB;
+	global $DB;
 
 	$post_ID = $m->getParam(0);
 	$post_ID = $post_ID->scalarval();
@@ -1884,7 +1870,7 @@ function mt_getPostCategories($m) {
 		{
 			logIO("O","mt_getPostCategories categories  ...".$categories[$i]);
 // In database cat_ID and cat_name from tablecategories
-			$sql = "SELECT * FROM $tablecategories WHERE  cat_ID = $categories[$i] ";
+			$sql = "SELECT * FROM T_categories WHERE  cat_ID = $categories[$i] ";
 			logIO("O","mt_getgategorylist  sql...".$sql);
 			$rows = $DB->get_results( $sql );
 			foreach( $rows as $row )
@@ -1925,43 +1911,17 @@ function mt_getPostCategories($m) {
 }
 
 
-function xmlrpc_getcats($blogid)
-// 	Tor Mar 2005
-{
-	global $tablepostcats; // import user errcode value
-	global $blog_ID, $DB;
-		$sql = "SELECT * FROM $tablepostcats WHERE postcat_post_ID = $blogid ";
-		logIO("O","ready to get categories from database, blogID...".$blogid);
-		logIO("O","ready to get categories from database, sql...".$sql);
-		$rows = $DB->get_results( $sql );
-		logIO("O","Got no of rows...".count($rows));
-		$categories[]=array();
-		$i = 0;
-		foreach( $rows as $row )
-		{
-			$categories[$i] = $row->postcat_cat_ID;
-				logIO("O","have category ID...".$categories[$i]);
-			$i++;
-		}
-		$category = $categories[0];
-		logIO("O","finished getting contentstruct category...".$category);
-		return($categories);
-}
-
-
-
-
 
 
 
 $mweditpost_doc='Edits a post, blogger-api like, +title +category +postdate';
 $mweditpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcStruct,$xmlrpcBoolean));
 /**
- * mw.EditPost
+ * mw.EditPost (metaWeblog.editPost)
  *
  * mw API
  *
- * Tor - TODO - set published flag correctly
+ * Tor - TODO
  *		- Sort out sql select with blog ID
  *		- screws up posts with multiple categories
  *		  partly due to the fact that Movable Type calls to this API are different to Metaweblog API calls when handling categories.
@@ -1969,74 +1929,114 @@ $mweditpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpc
 
 function mweditpost($m)
 {
-	global $xmlrpcerruser,$tablecategories,$tablepostcats; // import user errcode value
-	global $blog_ID, $DB, $ItemCache;
-	global $cafelogID, $sleep_after_edit;
+	global $xmlrpcerruser; // import user errcode value
+	global $DB, $ItemCache;
+	global $sleep_after_edit;
 	global $Settings;
 	global $Messages, $UserCache;
+	global $xmlrpc_htmlchecking;
+	global $default_category;
+
 	logIO("O","start of mweditpost...");
-	$blogid = $m->getParam(0);
-	$blogid = $blogid->scalarval();
-	logIO("O","finished getting logid ...".$blogid);
+	$post_ID = $m->getParam(0);
+	$post_ID = $post_ID->scalarval();
+	logIO("O","finished getting post_ID ...".$post_ID);
+
+	// Username/Password
 	$username = $m->getParam(1);
 	$username = $username->scalarval();
 	logIO("O","finished getting username ...");
 	$password = $m->getParam(2);
 	$password = $password->scalarval();
 	logIO("O","finished getting password ...".$password);
-	$xcontent = $m->getParam(3);
-//	$xcontent = $xcontent->scalarval();
-	logIO("O","finished getting xcontent ...");
-	$contentstruct = xmlrpc_decode($xcontent); //this does not work properly.... need better decoding
-	logIO("O","finished getting contentstruct ...");
-//	$content = format_to_post($contentstruct['description']);
-	$title = $contentstruct['title'];
-	$content = $contentstruct['description'];
-	logIO("O","finished getting title ...".$title);
-// NB! For multiple categories they are not  encoded in the content field, but in a separate table
-		$categories = xmlrpc_getcats($blogid);
-	logIO("O","finished getting  categories...".$categories[0]);
-	$postdate = $contentstruct['dateCreated'];
-	logIO("O","finished getting contentstruct dateCreated...".$postdate);
 	if( ! user_pass_ok($username,$password) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 	logIO("O","finished checking password ...");
-	if( ! ($edited_Item = & $ItemCache->get_by_ID( $blogid ) ) )
+
+
+	// Get Item:
+	if( ! ($edited_Item = & $ItemCache->get_by_ID( $post_ID ) ) )
 	{
-		return new xmlrpcresp(0, $xmlrpcerruser+7, "No such post (#$blogid)."); // user error 7
+		return new xmlrpcresp(0, $xmlrpcerruser+7, "No such post (#$post_ID)."); // user error 7
 	}
 
+	// Check permission:
 	$User = & $UserCache->get_by_login( $username );
-	$user_ID =  $User->get('ID');
-	logIO("O","User_ID ...".$user_ID);
-	$blog_ID = $blogid;
-	logIO("O","Blog_ID ...".$blog_ID);
-	// Check permission: TOR - REINSTATE
-//	if( ! $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
-//	{
-//		return new xmlrpcresp(0, $xmlrpcerruser+2, 'Permission denied.'); // user error 2
-//	}
+	logIO("O","User ID ...".$User->get('ID'));
+	if( ! $User->check_perm( 'blog_post_statuses', $status, false, $edited_Item->blog_ID ) )
+	{
+		return new xmlrpcresp(0, $xmlrpcerruser+2, 'Permission denied.'); // user error 2
+	}
 	logIO("O","finished checking permissions ...");
-	if( $postdate != '' )
+
+
+	$xcontent = $m->getParam(3);
+//	$xcontent = $xcontent->scalarval();
+	logIO("O","finished getting xcontent ...");
+	$contentstruct = xmlrpc_decode($xcontent); //this does not work properly.... need better decoding
+	logIO("O","finished getting contentstruct ...");
+
+
+	// Categories:
+	$categories = isset($contentstruct['categories']) ? $contentstruct['categories'] : array() ; // by names(!)
+	logIO("O","finished getting contentstruct categories...".implode( ', ', $categories ) );
+
+	xmlrpc_debugmsg( 'Main category: '.$categories[0]  );
+
+	// for cross-blog-entries, the cat_blog_ID WHERE clause should be removed (but cats are given by name!)
+	$sql = "
+		SELECT cat_ID FROM T_categories
+		 WHERE cat_blog_ID = ".$edited_Item->blog_ID."
+		   AND cat_name IN ( ";
+	foreach( $categories as $l_cat )
 	{
-		$now = $postdate;
+		$sql .= $DB->quote($l_cat).', ';
 	}
-	else
+	if( ! empty($categories) )
 	{
-		$now = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
+		$sql = substr($sql, -2); // remove ', '
 	}
-	logIO("O","finished checking dates ...>".$now);
-	$post_title = $title;
-	// CHECK and FORMAT content
-	if ($xmlrpc_htmlchecking == 1) {
+	$sql .= ' )';
+	logIO("O","sql for finding ID ...".$sql);
+
+	$cat_IDs = $DB->get_col( $sql );
+	if( $DB->error )
+	{	// DB error
+		logIO("O","user error finding categories info ...");
+	}
+	if( empty($cat_IDs) && ! empty($default_category) )
+	{ // no cats: use default
+		$cat_IDs = array($default_category);
+		logIO("O", 'fallback to $default_category ...');
+	}
+
+
+	// getParam(4) should now be a flag for publish or draft
+	$xstatus = $m->getParam(4);
+	$xstatus = $xstatus->scalarval();
+	$status = $xstatus ? 'published' : 'draft';
+	logIO('I',"Publish: $xstatus -> Status: $status");
+	logIO("O","finished getting xstatus ->". $xstatus);
+
+	$post_title = $contentstruct['title'];
+	$content = $contentstruct['description'];
+	logIO("O","finished getting title ...".$post_title);
+
+	$postdate = $contentstruct['dateCreated'];
+	logIO("O","finished getting contentstruct dateCreated...".$postdate);
+
+
+	if( ! empty($xmlrpc_htmlchecking) )
+	{ // CHECK and FORMAT content
 		$post_title = format_to_post($post_title, 0, 0);
 	}
 	logIO("O","finished converting post_title ...->".$post_title);
-	if ($xmlrpc_htmlchecking == 1) {
-			$content = format_to_post($content, 0, 0);  // 25122004 tag - security issue - need to sort !!!
+	if( ! empty($xmlrpc_htmlchecking) )
+	{
+		$content = format_to_post($content, 0, 0);  // 25122004 tag - security issue - need to sort !!!
 	}
 	logIO("O","finished converting content ...".$content);
 	if( $errstring = $Messages->get_string( 'Cannot post, please correct these errors:', '' ) )
@@ -2044,12 +2044,27 @@ function mweditpost($m)
 		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
 	}
 	logIO("O","finished checking if errors exists, ready to insert into DB ...");
-	xmlrpc_debugmsg( 'blogid: '.$blogid.' category->'.$category  );
-	$status = 'published';
+	xmlrpc_debugmsg( 'post_ID: '.$post_ID  );
+
 	// UPDATE POST IN DB:
-//	bpost_update( $blogid, $post_title, $content, '', $categories[0], $categories, 'published', '#', '', 0, 'pingsdone', '', '', 'open'  );
-	$edited_Item->update( $post_title, $content, '', $categories[0], $categories, $status, '#', '', 0, 'pingsdone', '', '', 'open' );
-	if( !empty($DB->last_error) )
+	$edited_Item->set( 'title', $post_title );
+	$edited_Item->set( 'content', $content );
+	$edited_Item->set( 'status', $status );
+	if( ! empty($postdate) )
+	{
+		$edited_Item->set( 'datestart', $postdate );
+	}
+	if( ! empty($cat_IDs) )
+	{ // Update cats:
+		$edited_Item->set('main_cat_ID', $cat_IDs[0]);
+
+		if( count($cat_IDs) > 1 )
+		{ // Extra-Cats:
+			$edited_Item->set('extra_cat_IDs', $cat_IDs);
+		}
+	}
+	$edited_Item->dbupdate();
+	if( $DB->error )
 	{	// DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
@@ -2095,10 +2110,11 @@ function mweditpost($m)
 
 
 $mwgetcats_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcString,$xmlrpcString));
-$mwgetcats_doc = 'Get a post, MetaWeblog API-style';
+$mwgetcats_doc = 'Get categories of a post, MetaWeblog API-style';
 function mwgetcats( $m )
 {
-	global $xmlrpcerruser, $tablecategories, $DB;
+	global $xmlrpcerruser, $DB;
+
 	logIO('O','Start of mwgetcats');
 	$blogid = $m->getParam(0);
 	$blogid = $blogid->scalarval();
@@ -2112,12 +2128,12 @@ function mwgetcats( $m )
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
-	$sql = "SELECT *
+	$sql = "SELECT cat_ID, cat_name
 					FROM T_categories ";
 	if( $blogid > 1 ) $sql .= "WHERE cat_blog_ID = $blogid ";
 	$sql .= "ORDER BY cat_name ASC";
 	$rows = $DB->get_results( $sql );
-	if( !empty($DB->last_error) )
+	if( $DB->error )
 	{	// DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
@@ -2177,8 +2193,7 @@ function metawebloggetrecentposts( $m )
 		return new xmlrpcresp(0, $xmlrpcerruser+2, 'Permission denied.' ); // user error 2
 	}
 	logIO("O","In metawebloggetrecentposts, permissions ok...");
-	$blog = $blog_ID;	// Some old functions still need this!
-			logIO("O","In metawebloggetrecentposts, current blog is ...". $blog);
+	logIO("O","In metawebloggetrecentposts, current blog is ...". $blog_ID);
 	logIO("O","In metawebloggetrecentposts, getting current blog info...");
 	// Getting current blog info:
 	$blogparams = get_blogparams_by_ID( $blog_ID );
@@ -2186,7 +2201,7 @@ function metawebloggetrecentposts( $m )
 	// Get the posts to display:
 	$MainList = & new ItemList( $blog_ID, $show_statuses, '', '', '', '', array(), '', 'DESC', '', $numposts,
 															'', '', '', '', '', '', '', 'posts' );
-	if( !empty($DB->last_error) )
+	if( $DB->error )
 	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
@@ -2314,7 +2329,7 @@ $mt_getcategoryList_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcString,
 $mt_getcategoryList_doc = 'Get a post, MetaWeblog API-style';
 //function _mt_categoryList($blogid, $username, $password) {
 function mt_getcategoryList($m) {
-	global $xmlrpcerruser, $tablecategories, $DB;
+	global $xmlrpcerruser, $DB;
 	logIO("O","mt_getgategorylist  start");
 	$blogid = $m->getParam(0);
 	$blogid = $blogid->scalarval();
@@ -2328,14 +2343,14 @@ function mt_getcategoryList($m) {
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
-	$sql = "SELECT * FROM $tablecategories ";
+	$sql = "SELECT * FROM T_categories ";
 	if( $blogid > 1 ) $sql .= "WHERE cat_blog_ID = $blogid ";
 	$sql .= "ORDER BY cat_name ASC";
 	$rows = $DB->get_results( $sql );
-	if( !empty($DB->last_error) )
+	if( $DB->error )
 	{	// DB error
 		logIO("O","mt_getgategorylist  DBerror...");
-	return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
 	logIO("O","mt_getgategorylist  no of categories...",count($rows));
 	$data = array();
@@ -2369,8 +2384,8 @@ $s = new xmlrpc_server(
 		"metaWeblog.editPost" =>
 			array(
 				"function" => "mweditpost",
-			 "signature" => $mweditpost_sig,
-			 "docstring" => $mweditpost_doc),
+				"signature" => $mweditpost_sig,
+				"docstring" => $mweditpost_doc),
 
 		"metaWeblog.getPost" =>
 			array(
@@ -2502,8 +2517,17 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
- * Revision 1.98  2006/07/31 22:28:35  blueyed
- * Made logging a bit more decent.
+ * Revision 1.99  2006/08/01 18:24:10  blueyed
+ * Fixes:
+ *  - metaWeblog.editPost:
+ *    - respect publish/status param
+ *    - check perms
+ *    - only update relevant parts of item
+ *  - mt.setPostCategories: set only categories (keep status etc)
+ * Features:
+ *  - support categories for metaWeblog.editPost/newPost
+ * Code cleanup!
+ * Completely untested.. :/
  *
  * Revision 1.97  2006/07/24 00:05:46  fplanque
  * cleaned up skins
