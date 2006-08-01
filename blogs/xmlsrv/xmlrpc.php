@@ -1923,6 +1923,13 @@ function mweditpost($m)
 	}
 	logIO("O","finished checking password ...");
 
+	// getParam(4) should now be a flag for publish or draft
+	$xstatus = $m->getParam(4);
+	$xstatus = $xstatus->scalarval();
+	$status = $xstatus ? 'published' : 'draft';
+	logIO('I',"Publish: $xstatus -> Status: $status");
+	logIO("O","finished getting xstatus ->". $xstatus);
+
 
 	// Get Item:
 	if( ! ($edited_Item = & $ItemCache->get_by_ID( $post_ID ) ) )
@@ -1955,13 +1962,6 @@ function mweditpost($m)
 		return $cat_IDs;
 	}
 
-
-	// getParam(4) should now be a flag for publish or draft
-	$xstatus = $m->getParam(4);
-	$xstatus = $xstatus->scalarval();
-	$status = $xstatus ? 'published' : 'draft';
-	logIO('I',"Publish: $xstatus -> Status: $status");
-	logIO("O","finished getting xstatus ->". $xstatus);
 
 	$post_title = $contentstruct['title'];
 	$content = $contentstruct['description'];
@@ -2557,6 +2557,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.104  2006/08/01 22:56:38  blueyed
+ * Fixed "perm denied"
+ *
  * Revision 1.103  2006/08/01 22:53:31  blueyed
  * Fix
  *
