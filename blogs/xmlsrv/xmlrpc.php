@@ -2293,33 +2293,41 @@ function _mw_get_cat_IDs($contentstruct, $blog_ID, $empty_struct_ok = false)
 	xmlrpc_debugmsg( 'Categories: '.implode( ', ', $categories ) );
 
 	// for cross-blog-entries, the cat_blog_ID WHERE clause should be removed (but cats are given by name!)
-	$sql = "
-		SELECT cat_ID FROM T_categories
-		 WHERE cat_blog_ID = $blog_ID
-		   AND cat_name IN ( ";
-	foreach( $categories as $l_cat )
-	{
-		$sql .= $DB->quote($l_cat).', ';
-	}
 	if( ! empty($categories) )
 	{
-		$sql = substr($sql, -2); // remove ', '
-	}
-	$sql .= ' )';
-	logIO("O","sql for finding ID ...".$sql);
+		$sql = "
+			SELECT cat_ID FROM T_categories
+			 WHERE cat_blog_ID = $blog_ID
+				 AND cat_name IN ( ";
+		foreach( $categories as $l_cat )
+		{
+			$sql .= $DB->quote($l_cat).', ';
+		}
+		if( ! empty($categories) )
+		{
+			$sql = substr($sql, -2); // remove ', '
+		}
+		$sql .= ' )';
+		logIO("O","sql for finding IDs ...".$sql);
 
-	$cat_IDs = $DB->get_col( $sql );
-	if( $DB->error )
-	{	// DB error
-		logIO("O","user error finding categories info ...");
+		$cat_IDs = $DB->get_col( $sql );
+		if( $DB->error )
+		{	// DB error
+			logIO("O","user error finding categories info ...");
+		}
 	}
+	else
+	{
+		$cat_IDs = array();
+	}
+
 	if( empty($cat_IDs) && ! empty($default_category) )
 	{ // no cats: use default
 		$cat_IDs = array($default_category);
 		logIO("O", 'fallback to $default_category ...');
 	}
 
-	if( ! empty($categories) )
+	if( ! empty($cat_IDs) )
 	{ // categories requested to be set:
 
 		// Check if category exists
@@ -2331,7 +2339,7 @@ function _mw_get_cat_IDs($contentstruct, $blog_ID, $empty_struct_ok = false)
 		logIO("O","finished checking if main category exists ...".$cat_IDs[0]);
 	}
 	else
-	{
+	{ // No category given/valid - use the first for the blog:
 		logIO("O","No category for post given ...");
 		$first_cat = $DB->get_var( '
 			SELECT cat_ID
@@ -2549,6 +2557,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.102  2006/08/01 21:53:02  blueyed
+ * Fixes
+ *
  * Revision 1.101  2006/08/01 19:23:55  blueyed
  * fixes
  *
