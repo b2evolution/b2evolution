@@ -1658,45 +1658,12 @@ function mwnewpost($m)
 
 
 	// Categories:
-	$categories = isset($contentstruct['categories']) ? $contentstruct['categories'] : array() ; // by names(!)
-	logIO("O","finished getting contentstruct categories...".implode( ', ', $categories ) );
+	$cat_IDs = _mw_get_cat_IDs($contentstruct, $blog_ID);
 
-	xmlrpc_debugmsg( 'Main category: '.$categories[0]  );
-
-	// for cross-blog-entries, the cat_blog_ID WHERE clause should be removed (but cats are given by name!)
-	$sql = "
-		SELECT cat_ID FROM T_categories
-		 WHERE cat_blog_ID = $blog_ID
-		   AND cat_name IN ( ";
-	foreach( $categories as $l_cat )
-	{
-		$sql .= $DB->quote($l_cat).', ';
+	if( ! is_array($cat_IDs) )
+	{ // error:
+		return $cat_IDs;
 	}
-	if( ! empty($categories) )
-	{
-		$sql = substr($sql, -2); // remove ', '
-	}
-	$sql .= ' )';
-	logIO("O","sql for finding ID ...".$sql);
-
-	$cat_IDs = $DB->get_col( $sql );
-	if( $DB->error )
-	{	// DB error
-		logIO("O","user error finding categories info ...");
-	}
-	if( empty($cat_IDs) && ! empty($default_category) )
-	{ // no cats: use default
-		$cat_IDs = array($default_category);
-		logIO("O", 'fallback to $default_category ...');
-	}
-
-	// Check if category exists
-	if( get_the_category_by_ID( $cat_IDs[0], false ) === false )
-	{ // Main cat does not exist:
-		logIO("O","usererror 5 ...");
-		return new xmlrpcresp(0, $xmlrpcerruser+5, 'Requested category does not exist.'); // user error 5
-	}
-	logIO("O","finished checking if main category exists ...".$cat_IDs[0]);
 
 
 	if( empty($contentstruct['dateCreated']) )
@@ -1795,7 +1762,7 @@ function mt_setPostCategories($m) {
 	logIO("O","finished getting - iSize ...".$iSize); // number of categories entry has set
 
 	logIO("O","finished getting contentstruct ...");
-	$categories = '';
+	$categories = array();
 	if ($iSize > 0)
 	{
 		for ($i=0;$i<$iSize;$i++)
@@ -1981,36 +1948,11 @@ function mweditpost($m)
 
 
 	// Categories:
-	$categories = isset($contentstruct['categories']) ? $contentstruct['categories'] : array() ; // by names(!)
-	logIO("O","finished getting contentstruct categories...".implode( ', ', $categories ) );
+	$cat_IDs = _mw_get_cat_IDs($contentstruct, $blog_ID, true /* empty is ok */);
 
-	xmlrpc_debugmsg( 'Main category: '.$categories[0]  );
-
-	// for cross-blog-entries, the cat_blog_ID WHERE clause should be removed (but cats are given by name!)
-	$sql = "
-		SELECT cat_ID FROM T_categories
-		 WHERE cat_blog_ID = ".$edited_Item->blog_ID."
-		   AND cat_name IN ( ";
-	foreach( $categories as $l_cat )
-	{
-		$sql .= $DB->quote($l_cat).', ';
-	}
-	if( ! empty($categories) )
-	{
-		$sql = substr($sql, -2); // remove ', '
-	}
-	$sql .= ' )';
-	logIO("O","sql for finding ID ...".$sql);
-
-	$cat_IDs = $DB->get_col( $sql );
-	if( $DB->error )
-	{	// DB error
-		logIO("O","user error finding categories info ...");
-	}
-	if( empty($cat_IDs) && ! empty($default_category) )
-	{ // no cats: use default
-		$cat_IDs = array($default_category);
-		logIO("O", 'fallback to $default_category ...');
+	if( ! is_array($cat_IDs) )
+	{ // error:
+		return $cat_IDs;
 	}
 
 
@@ -2321,6 +2263,96 @@ function mwgetpost($m)
 }
 
 
+/**
+ *
+ * @param array struct
+ * @param integer blog ID
+ * @param boolean Return empty array (instead of error), if no cats given in struct?
+ * @return array|xmlrpcresp A list of category IDs or xmlrpcresp in case of error.
+ */
+function _mw_get_cat_IDs($contentstruct, $blog_ID, $empty_struct_ok = false)
+{
+	global $DB, $xmlrpcerruser;
+	global $default_category;
+
+	if( isset($contentstruct['categories']) )
+	{
+		$categories = $contentstruct['categories'];
+	}
+	else
+	{
+		$categories = array();
+	}
+	logIO("O","finished getting contentstruct categories...".implode( ', ', $categories ) );
+
+	if( $empty_struct_ok && empty($categories) )
+	{
+		return $categories;
+	}
+
+	xmlrpc_debugmsg( 'Categories: '.implode( ', ', $categories ) );
+
+	// for cross-blog-entries, the cat_blog_ID WHERE clause should be removed (but cats are given by name!)
+	$sql = "
+		SELECT cat_ID FROM T_categories
+		 WHERE cat_blog_ID = $blog_ID
+		   AND cat_name IN ( ";
+	foreach( $categories as $l_cat )
+	{
+		$sql .= $DB->quote($l_cat).', ';
+	}
+	if( ! empty($categories) )
+	{
+		$sql = substr($sql, -2); // remove ', '
+	}
+	$sql .= ' )';
+	logIO("O","sql for finding ID ...".$sql);
+
+	$cat_IDs = $DB->get_col( $sql );
+	if( $DB->error )
+	{	// DB error
+		logIO("O","user error finding categories info ...");
+	}
+	if( empty($cat_IDs) && ! empty($default_category) )
+	{ // no cats: use default
+		$cat_IDs = array($default_category);
+		logIO("O", 'fallback to $default_category ...');
+	}
+
+	if( ! empty($categories) )
+	{ // categories requested to be set:
+
+		// Check if category exists
+		if( get_the_category_by_ID( $cat_IDs[0], false ) === false )
+		{ // Main cat does not exist:
+			logIO("O","usererror 5 ...");
+			return new xmlrpcresp(0, $xmlrpcerruser+5, 'Requested category does not exist.'); // user error 5
+		}
+		logIO("O","finished checking if main category exists ...".$cat_IDs[0]);
+	}
+	else
+	{
+		logIO("O","No category for post given ...");
+		$first_cat = $DB->get_var( '
+			SELECT cat_ID
+			  FROM T_categories
+			 WHERE cat_blog_ID = '.$blog_ID.'
+			 ORDER BY cat_name
+			 LIMIT 1' );
+		if( empty($first_cat) )
+		{
+			logIO("O", 'No categories for this blog...');
+			return new xmlrpcresp(0, $xmlrpcerruser+5, 'No categories for this blog.'); // user error 5
+		}
+		else
+		{
+			$cat_IDs = array($first_cat);
+		}
+	}
+
+	return $cat_IDs;
+}
+
 
 
 
@@ -2517,6 +2549,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.101  2006/08/01 19:23:55  blueyed
+ * fixes
+ *
  * Revision 1.100  2006/08/01 18:43:27  blueyed
  * Removed last deprecated $table.. occurences.
  *
