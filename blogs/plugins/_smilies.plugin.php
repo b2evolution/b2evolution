@@ -313,7 +313,8 @@ XX( => graydead.gif
 		return $diff;
 	}
 
-	/*
+
+	/**
 	 * Initiates the smiley array if not already initiated
 	 *
 	 * Attempts to use skin specific smileys where available
@@ -329,46 +330,47 @@ XX( => graydead.gif
 	 */
 	function InitSmilies()
 	{
-		if( empty( $this->smilies ) )
+		if( isset( $this->smilies ) )
+		{ // smilies are already cached
+			return;
+		}
+
+		global $admin_skin, $adminskins_path, $adminskins_url, $rsc_path, $rsc_url, $skin, $skins_path, $skins_url;
+
+		// set the skin path/url and the default (rsc) path/url
+		$currentskin_path = ( is_admin_page() ? $adminskins_path.$admin_skin.'/rsc' : $skins_path.$skin ).'/smilies/';
+		$currentskin_url = ( is_admin_page() ? $adminskins_url.$admin_skin.'/rsc' : $skins_url.$skin ).'/smilies/';
+		$default_path = $rsc_path.'smilies/';
+		$default_url = $rsc_url.'smilies/';
+
+		$skin_has_smilies = is_dir( $currentskin_path );	// check if skin has a /smilies/ folder
+
+		$this->smilies = array();
+		$temp_list = explode( "\n", str_replace( array( "\r", "\t" ), '', $this->Settings->get( 'smiley_list' ) ) );
+
+		foreach( $temp_list as $temp_smiley )
 		{
-			// smilies are not yet cached
-			global $admin_skin, $adminskins_path, $adminskins_url, $rsc_path, $rsc_url, $skin, $skins_path, $skins_url;
+			$a_smiley = explode( '<->', preg_replace( '#(.+)( )=>(.+?)#', '$1<->$2',$temp_smiley ) );
 
-			// set the skin path/url and the default (rsc) path/url
-			$currentskin_path = ( is_admin_page() ? $adminskins_path.$admin_skin.'/rsc' : $skins_path.$skin ).'/smilies/';
-			$currentskin_url = ( is_admin_page() ? $adminskins_url.$admin_skin.'/rsc' : $skins_url.$skin ).'/smilies/';
-			$default_path = $rsc_path.'smilies/';
-			$default_url = $rsc_url.'smilies/';
-			
-			$skin_has_smilies = is_dir( $currentskin_path );	// check if skin has a /smilies/ folder
-
-			$this->smilies = array();
-			$temp_list = explode( "\n", str_replace( array( "\r", "\t" ), '', $this->Settings->get( 'smiley_list' ) ) );
-
-			foreach( $temp_list as $temp_smiley )
+			if( isset( $a_smiley[0] ) and isset( $a_smiley[1] ) )
 			{
-				$a_smiley = explode( '<->', preg_replace( '#(.+)( )=>(.+?)#', '$1<->$2',$temp_smiley ) );
-
-				if( isset( $a_smiley[0] ) and isset( $a_smiley[1] ) )
+				// lets see if the file exists
+				$temp_img = trim( $a_smiley[1] );
+				if( $skin_has_smilies && is_file( $currentskin_path.$temp_img ) )
 				{
-					// lets see if the file exists
-					$temp_img = trim( $a_smiley[1] );
-					if( $skin_has_smilies && is_file( $currentskin_path.$temp_img ) )
-					{
-						$temp_url = $currentskin_url.$temp_img;	// skin has it's own smiley, use it
-					}
-					elseif ( is_file( $default_path.$temp_img ) )
-					{
-						$temp_url = $default_url.$temp_img; // no skin image, but default smiley found so use it
-					}
-					else
-					{
-						$temp_url = ''; // no smiley image found, so don't add the smiley
-					}
-
-					if( $temp_url )
-						$this->smilies[] = array( 'code' => trim( $a_smiley[0] ),'image' => $temp_url );
+					$temp_url = $currentskin_url.$temp_img;	// skin has it's own smiley, use it
 				}
+				elseif ( is_file( $default_path.$temp_img ) )
+				{
+					$temp_url = $default_url.$temp_img; // no skin image, but default smiley found so use it
+				}
+				else
+				{
+					$temp_url = ''; // no smiley image found, so don't add the smiley
+				}
+
+				if( $temp_url )
+					$this->smilies[] = array( 'code' => trim( $a_smiley[0] ),'image' => $temp_url );
 			}
 		}
 	}
@@ -378,6 +380,9 @@ XX( => graydead.gif
 
 /*
  * $Log$
+ * Revision 1.30  2006/08/01 23:55:14  blueyed
+ * minor: doc; removed level of indentation
+ *
  * Revision 1.29  2006/08/01 08:44:31  yabs
  * Minor change - checks if skin has /smilies/ folder before start of checking for images
  *
