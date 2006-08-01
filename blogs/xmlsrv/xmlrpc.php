@@ -1774,7 +1774,7 @@ $mt_setPostCategories_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcStr
 $mt_setPostCategories_doc = "Sets the categories for a post.";
 
 function mt_setPostCategories($m) {
-	global $xmlrpcerruser,$tableposts,$Settings;
+	global $xmlrpcerruser,$Settings;
 	global $DB, $Messages, $UserCache,$ItemCache;
 	$post_ID = $m->getParam(0);
 	$post_ID = $post_ID->scalarval();
@@ -1842,7 +1842,7 @@ $mt_getPostCategories_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcStr
 $mt_getPostCategories_doc = "Returns a list of all categories to which the post is assigned.";
 
 function mt_getPostCategories($m) {
-	global $xmlrpcerruser,$tableposts;
+	global $xmlrpcerruser;
 	global $DB;
 
 	$post_ID = $m->getParam(0);
@@ -2517,6 +2517,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.100  2006/08/01 18:43:27  blueyed
+ * Removed last deprecated $table.. occurences.
+ *
  * Revision 1.99  2006/08/01 18:24:10  blueyed
  * Fixes:
  *  - metaWeblog.editPost:
