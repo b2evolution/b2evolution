@@ -64,7 +64,7 @@ class ItemTypeCache extends DataObjectCache
 	function ItemTypeCache()
 	{
 		// Call parent constructor:
-		parent::DataObjectCache( 'ItemType', true, 'T_itemtypes', 'ptyp_', 'ptyp_ID' );
+		parent::DataObjectCache( 'ItemType', true, 'T_itemtypes', 'ptyp_', 'ptyp_ID', 'ptyp_name' );
 	}
 
 
