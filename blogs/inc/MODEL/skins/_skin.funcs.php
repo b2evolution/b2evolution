@@ -116,6 +116,11 @@ function skin_list_start()
 {
 	global $skins_path, $skin_dir;
 
+	if( empty( $skins_path ) )
+	{	// Check if conf has been properly for version 1.9 (remove in approx 12 months)
+		debug_die( '$skins_path is not properly set in /conf/_advanced.php' );
+	}
+	
 	$skin_dir = dir( $skins_path );
 }
 
@@ -194,6 +199,9 @@ function skin_change_url( $display = true )
 
 /*
  * $Log$
+ * Revision 1.7  2006/08/02 13:00:51  fplanque
+ * detect incomplete upgrade of conf file
+ *
  * Revision 1.6  2006/07/25 18:38:38  fplanque
  * fixed skin list
  *
