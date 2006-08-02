@@ -385,9 +385,9 @@ class DataObjectCache
 						  FROM $this->dbtablename
 						 WHERE $this->name_field = ".$DB->quote($req_name);
 
-		if( $row = $DB->get_row( $sql, OBJECT, 0, 'DataObjectCache::get_by_name()' ) )
+		if( $db_row = $DB->get_row( $sql, OBJECT, 0, 'DataObjectCache::get_by_name()' ) )
 		{
-			$resolved_ID = $row->{$this->dbIDname};
+			$resolved_ID = $db_row->{$this->dbIDname};
 			$Debuglog->add( 'success; ID = '.$resolved_ID, 'dataobjects' );
 			if( ! isset( $this->cache[$resolved_ID] ) )
 			{	// Object is not already in cache:
@@ -525,6 +525,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.6  2006/08/02 16:34:16  yabs
+ * corrected $row to $db_row in function get_by_name()
+ *
  * Revision 1.5  2006/06/14 17:26:13  fplanque
  * minor
  *
