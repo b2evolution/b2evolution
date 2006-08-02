@@ -1296,7 +1296,10 @@ class Item extends DataObject
 				break;
 		}
 
-		if( $title == '#' ) $title = T_('Permanent link to full entry');
+		if( $title == '#' )
+		{ // Default title (ID is useful as info here, e.g. if you want to create a ?p=ID link to some entry)
+			$title = T_('Permanent link to full entry').' (ID #'.$this->ID.')';
+		}
 
 		$url = $this->get_permanent_url();
 
@@ -2340,16 +2343,33 @@ class Item extends DataObject
 	 * Update a post and save to DB
 	 *
 	 * This function has to handle all needed DB dependencies!
+	 *
+	 * @param string Title
+	 * @param string Content
+	 * @param string Timestamp ('Y-m-d H:i:s')
+	 * @param integer Main category ID
+	 * @param array List of extra cats
+	 * @param string Status ('published', 'deprecated', 'protected', 'private' or 'draft'). Empty to not change it.
+	 * @param string Locale. '#' to not change it.
+	 * @param mixed Not used
+	 * @param integer OBSOLETE
+	 * @param boolean Pings done?
+	 * @param string URL title
+	 * @param string URL
+	 * @param string Post comment status
+	 * @param array Renderers
+	 * @param integer Typ ID
+	 * @param integer Status(?) ID
 	 */
 	function update(
 		$post_title,
 		$post_content,
-		$post_timestamp = '',         // 'Y-m-d H:i:s'
-		$main_cat_ID = 1,             // Main cat ID
-		$extra_cat_IDs = array(),     // Table of extra cats
+		$post_timestamp = '',
+		$main_cat_ID = 1,
+		$extra_cat_IDs = array(),
 		$post_status = 'published',
 		$post_locale = '#',
-		$post_trackbacks = '',
+		$post_trackbacks = '',        // not used
 		$autobr = 0,                  // OBSOLETE
 		$pingsdone = true,
 		$post_urltitle = '',
@@ -2811,6 +2831,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.73  2006/08/02 17:06:11  blueyed
+ * added "(ID #X)" to permalink's default title; doc
+ *
  * Revision 1.72  2006/07/31 15:42:43  blueyed
  * Fixed handling of post_comment_status
  *
