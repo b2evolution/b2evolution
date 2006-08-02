@@ -1,20 +1,20 @@
 -- phpMyAdmin SQL Dump
 -- version 2.6.4-pl1-Debian-1ubuntu1.1
 -- http://www.phpmyadmin.net
--- 
+--
 -- Host: localhost
 -- Generation Time: Dec 16, 2005 at 12:53 AM
 -- Server version: 5.0.16
 -- PHP Version: 5.0.5
--- 
+--
 -- Database: `b2evolution_v-1-6`
--- 
+--
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_antispam`
--- 
+--
 
 CREATE TABLE `evo_antispam` (
   `aspm_ID` bigint(11) NOT NULL auto_increment,
@@ -24,9 +24,9 @@ CREATE TABLE `evo_antispam` (
   UNIQUE KEY `aspm_string` (`aspm_string`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=19 ;
 
--- 
+--
 -- Dumping data for table `evo_antispam`
--- 
+--
 
 INSERT INTO `evo_antispam` VALUES (1, 'penis-enlargement', 'reported');
 INSERT INTO `evo_antispam` VALUES (2, 'online-casino', 'reported');
@@ -49,9 +49,9 @@ INSERT INTO `evo_antispam` VALUES (18, 'adult-models', 'reported');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_basedomains`
--- 
+--
 
 CREATE TABLE `evo_basedomains` (
   `dom_ID` int(11) unsigned NOT NULL auto_increment,
@@ -62,16 +62,16 @@ CREATE TABLE `evo_basedomains` (
   UNIQUE KEY `dom_name` (`dom_name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
--- 
+--
 -- Dumping data for table `evo_basedomains`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_bloggroups`
--- 
+--
 
 CREATE TABLE `evo_bloggroups` (
   `bloggroup_blog_ID` int(11) unsigned NOT NULL default '0',
@@ -88,9 +88,9 @@ CREATE TABLE `evo_bloggroups` (
   PRIMARY KEY  (`bloggroup_blog_ID`,`bloggroup_group_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `evo_bloggroups`
--- 
+--
 
 INSERT INTO `evo_bloggroups` VALUES (2, 1, 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1);
 INSERT INTO `evo_bloggroups` VALUES (2, 2, 1, 'published,deprecated,protected,private,draft', 1, 1, 0, 0, 1, 1, 1);
@@ -107,9 +107,9 @@ INSERT INTO `evo_bloggroups` VALUES (4, 4, 1, '', 0, 0, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_blogs`
--- 
+--
 
 CREATE TABLE `evo_blogs` (
   `blog_ID` int(11) unsigned NOT NULL auto_increment,
@@ -150,9 +150,9 @@ CREATE TABLE `evo_blogs` (
   UNIQUE KEY `blog_urlname` (`blog_urlname`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
--- 
+--
 -- Dumping data for table `evo_blogs`
--- 
+--
 
 INSERT INTO `evo_blogs` VALUES (1, 'Blog All', 'Blog All Title', 'Tagline for Blog All', 'Short description for Blog All', 'This is the long description for the blog named ''Blog All''. <br />\n<br />\n<strong>This blog (blog #1) is actually a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by unchecking ''Include in public blog list'' in the blogs admin.</strong>', 'en-EU', 'index.php', '', 'all.html', 'all', 'all', 'Notes for Blog All', 'Keywords for Blog All', 'post_by_post', 1, 0, 1, 1, 0, 0, 1, 0, 'custom', 0, 1, 1, 4, 0, 'default', '', '', '', '');
 INSERT INTO `evo_blogs` VALUES (2, 'Blog A', 'Blog A Title', 'Tagline for Blog A', 'Short description for Blog A', 'This is the long description for the blog named ''Blog A''. ', 'en-EU', 'index.php', '', 'a.html', 'a', 'a', 'Notes for Blog A', 'Keywords for Blog A', 'post_by_post', 1, 0, 1, 1, 0, 0, 1, 0, 'custom', 0, 1, 1, 4, 0, 'default', '', '', '', '');
@@ -161,9 +161,9 @@ INSERT INTO `evo_blogs` VALUES (4, 'Linkblog', 'Linkblog Title', 'Tagline for Li
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_blogusers`
--- 
+--
 
 CREATE TABLE `evo_blogusers` (
   `bloguser_blog_ID` int(11) unsigned NOT NULL default '0',
@@ -180,16 +180,16 @@ CREATE TABLE `evo_blogusers` (
   PRIMARY KEY  (`bloguser_blog_ID`,`bloguser_user_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `evo_blogusers`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_categories`
--- 
+--
 
 CREATE TABLE `evo_categories` (
   `cat_ID` int(11) unsigned NOT NULL auto_increment,
@@ -204,9 +204,9 @@ CREATE TABLE `evo_categories` (
   KEY `cat_parent_ID` (`cat_parent_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=14 ;
 
--- 
+--
 -- Dumping data for table `evo_categories`
--- 
+--
 
 INSERT INTO `evo_categories` VALUES (1, NULL, 'Announcements [A]', 2, NULL, NULL, NULL);
 INSERT INTO `evo_categories` VALUES (2, NULL, 'News', 2, NULL, NULL, NULL);
@@ -224,9 +224,9 @@ INSERT INTO `evo_categories` VALUES (13, NULL, 'contributors', 4, NULL, NULL, NU
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_comments`
--- 
+--
 
 CREATE TABLE `evo_comments` (
   `comment_ID` int(11) unsigned NOT NULL auto_increment,
@@ -238,7 +238,7 @@ CREATE TABLE `evo_comments` (
   `comment_author_email` varchar(100) default NULL,
   `comment_author_url` varchar(100) default NULL,
   `comment_author_IP` varchar(23) NOT NULL default '',
-  `comment_date` datetime NOT NULL default '0000-00-00 00:00:00',
+  `comment_date` datetime NOT NULL default '1000-01-01 00:00:00',
   `comment_content` text NOT NULL,
   `comment_karma` int(11) NOT NULL default '0',
   PRIMARY KEY  (`comment_ID`),
@@ -247,17 +247,17 @@ CREATE TABLE `evo_comments` (
   KEY `comment_type` (`comment_type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
--- 
+--
 -- Dumping data for table `evo_comments`
--- 
+--
 
 INSERT INTO `evo_comments` VALUES (1, 1, 'comment', 'published', NULL, 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1', '2005-12-16 00:32:39', 'Hi, this is a comment.<br />To delete a comment, just log in, and view the posts'' comments, there you will have the option to edit or delete them.', 0);
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_files`
--- 
+--
 
 CREATE TABLE `evo_files` (
   `file_ID` int(11) unsigned NOT NULL auto_increment,
@@ -271,16 +271,16 @@ CREATE TABLE `evo_files` (
   UNIQUE KEY `file` (`file_root_type`,`file_root_ID`,`file_path`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
--- 
+--
 -- Dumping data for table `evo_files`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_groups`
--- 
+--
 
 CREATE TABLE `evo_groups` (
   `grp_ID` int(11) NOT NULL auto_increment,
@@ -296,9 +296,9 @@ CREATE TABLE `evo_groups` (
   PRIMARY KEY  (`grp_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
--- 
+--
 -- Dumping data for table `evo_groups`
--- 
+--
 
 INSERT INTO `evo_groups` VALUES (1, 'Administrators', 'visible', 'editall', 'edit', 'edit', 'edit', 'edit', 1, 'edit');
 INSERT INTO `evo_groups` VALUES (2, 'Privileged Bloggers', 'visible', 'viewall', 'view', 'edit', 'view', 'view', 0, 'add');
@@ -307,9 +307,9 @@ INSERT INTO `evo_groups` VALUES (4, 'Basic Users', 'none', 'user', 'none', 'none
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_hitlog`
--- 
+--
 
 CREATE TABLE `evo_hitlog` (
   `hit_ID` int(11) NOT NULL auto_increment,
@@ -326,21 +326,23 @@ CREATE TABLE `evo_hitlog` (
   KEY `hit_blog_ID` (`hit_blog_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
--- 
+--
 -- Dumping data for table `evo_hitlog`
--- 
+--
 
+# Provoke: http://todo.b2evolution.net/todo.php?title=upgrade_to_1_8_beta_fails_with_mysql_str
+INSERT INTO `evo_hitlog` VALUES (1, 1, '2005-12-16 00:30:38', '/', 'spam', NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_links`
--- 
+--
 
 CREATE TABLE `evo_links` (
   `link_ID` int(11) unsigned NOT NULL auto_increment,
-  `link_datecreated` datetime NOT NULL default '0000-00-00 00:00:00',
-  `link_datemodified` datetime NOT NULL default '0000-00-00 00:00:00',
+  `link_datecreated` datetime NOT NULL default '1000-01-01 00:00:00',
+  `link_datemodified` datetime NOT NULL default '1000-01-01 00:00:00',
   `link_creator_user_ID` int(11) unsigned NOT NULL,
   `link_lastedit_user_ID` int(11) unsigned NOT NULL,
   `link_item_ID` int(11) unsigned NOT NULL,
@@ -355,16 +357,16 @@ CREATE TABLE `evo_links` (
   KEY `link_file_ID` (`link_file_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
--- 
+--
 -- Dumping data for table `evo_links`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_locales`
--- 
+--
 
 CREATE TABLE `evo_locales` (
   `loc_locale` varchar(20) NOT NULL default '',
@@ -379,16 +381,16 @@ CREATE TABLE `evo_locales` (
   PRIMARY KEY  (`loc_locale`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='saves available locales';
 
--- 
+--
 -- Dumping data for table `evo_locales`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_plugins`
--- 
+--
 
 CREATE TABLE `evo_plugins` (
   `plug_ID` int(11) unsigned NOT NULL auto_increment,
@@ -397,9 +399,9 @@ CREATE TABLE `evo_plugins` (
   PRIMARY KEY  (`plug_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
 
--- 
+--
 -- Dumping data for table `evo_plugins`
--- 
+--
 
 INSERT INTO `evo_plugins` VALUES (1, 30, 'quicktags_plugin');
 INSERT INTO `evo_plugins` VALUES (2, 70, 'auto_p_plugin');
@@ -410,9 +412,9 @@ INSERT INTO `evo_plugins` VALUES (6, 60, 'categories_plugin');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_postcats`
--- 
+--
 
 CREATE TABLE `evo_postcats` (
   `postcat_post_ID` int(11) unsigned NOT NULL,
@@ -421,9 +423,9 @@ CREATE TABLE `evo_postcats` (
   UNIQUE KEY `catpost` (`postcat_cat_ID`,`postcat_post_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `evo_postcats`
--- 
+--
 
 INSERT INTO `evo_postcats` VALUES (1, 1);
 INSERT INTO `evo_postcats` VALUES (1, 4);
@@ -457,9 +459,9 @@ INSERT INTO `evo_postcats` VALUES (21, 11);
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_posts`
--- 
+--
 
 CREATE TABLE `evo_posts` (
   `post_ID` int(11) unsigned NOT NULL auto_increment,
@@ -499,9 +501,9 @@ CREATE TABLE `evo_posts` (
   KEY `post_pst_ID` (`post_pst_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=22 ;
 
--- 
+--
 -- Dumping data for table `evo_posts`
--- 
+--
 
 INSERT INTO `evo_posts` VALUES (1, NULL, 1, 1, NULL, '2005-12-16 00:30:40', NULL, '1970-01-01 01:00:00', '1970-01-01 01:00:00', 'published', NULL, 1, 'en-EU', '<p>This is the first post.</p>\n\n<p>It appears on both blog A and blog B.</p>', 'First Post', 'first_post', '', 1, 'pingsdone', 0, 14, 'open', NULL, 'default', NULL);
 INSERT INTO `evo_posts` VALUES (2, NULL, 1, 1, NULL, '2005-12-16 00:30:41', NULL, '1970-01-01 01:00:00', '1970-01-01 01:00:00', 'published', NULL, 1, 'en-EU', '<p>This is the second post.</p>\n\n<p>It appears on blog A only but in multiple categories.</p>', 'Second post', 'second_post', '', 2, 'pingsdone', 0, 15, 'open', NULL, 'default', NULL);
@@ -527,9 +529,9 @@ INSERT INTO `evo_posts` VALUES (21, NULL, 1, 1, NULL, '2005-12-16 00:31:00', NUL
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_poststatuses`
--- 
+--
 
 CREATE TABLE `evo_poststatuses` (
   `pst_ID` int(11) unsigned NOT NULL auto_increment,
@@ -537,16 +539,16 @@ CREATE TABLE `evo_poststatuses` (
   PRIMARY KEY  (`pst_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
--- 
+--
 -- Dumping data for table `evo_poststatuses`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_posttypes`
--- 
+--
 
 CREATE TABLE `evo_posttypes` (
   `ptyp_ID` int(11) unsigned NOT NULL auto_increment,
@@ -554,18 +556,18 @@ CREATE TABLE `evo_posttypes` (
   PRIMARY KEY  (`ptyp_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
--- 
+--
 -- Dumping data for table `evo_posttypes`
--- 
+--
 
 INSERT INTO `evo_posttypes` VALUES (1, 'Post');
 INSERT INTO `evo_posttypes` VALUES (2, 'Link');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_sessions`
--- 
+--
 
 CREATE TABLE `evo_sessions` (
   `sess_ID` int(11) unsigned NOT NULL auto_increment,
@@ -578,16 +580,16 @@ CREATE TABLE `evo_sessions` (
   PRIMARY KEY  (`sess_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
--- 
+--
 -- Dumping data for table `evo_sessions`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_settings`
--- 
+--
 
 CREATE TABLE `evo_settings` (
   `set_name` varchar(30) NOT NULL,
@@ -595,9 +597,9 @@ CREATE TABLE `evo_settings` (
   PRIMARY KEY  (`set_name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `evo_settings`
--- 
+--
 
 INSERT INTO `evo_settings` VALUES ('db_version', '9000');
 INSERT INTO `evo_settings` VALUES ('default_locale', 'en-EU');
@@ -605,9 +607,9 @@ INSERT INTO `evo_settings` VALUES ('newusers_grp_ID', '4');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_subscriptions`
--- 
+--
 
 CREATE TABLE `evo_subscriptions` (
   `sub_coll_ID` int(11) unsigned NOT NULL,
@@ -617,16 +619,16 @@ CREATE TABLE `evo_subscriptions` (
   PRIMARY KEY  (`sub_coll_ID`,`sub_user_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `evo_subscriptions`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_useragents`
--- 
+--
 
 CREATE TABLE `evo_useragents` (
   `agnt_ID` int(10) unsigned NOT NULL auto_increment,
@@ -635,16 +637,16 @@ CREATE TABLE `evo_useragents` (
   PRIMARY KEY  (`agnt_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
--- 
+--
 -- Dumping data for table `evo_useragents`
--- 
+--
 
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_users`
--- 
+--
 
 CREATE TABLE `evo_users` (
   `user_ID` int(11) unsigned NOT NULL auto_increment,
@@ -659,7 +661,7 @@ CREATE TABLE `evo_users` (
   `user_ip` varchar(15) NOT NULL,
   `user_domain` varchar(200) NOT NULL,
   `user_browser` varchar(200) NOT NULL,
-  `dateYMDhour` datetime NOT NULL default '0000-00-00 00:00:00',
+  `dateYMDhour` datetime NOT NULL default '1000-01-01 00:00:00',
   `user_level` int(10) unsigned NOT NULL default '0',
   `user_aim` varchar(50) NOT NULL,
   `user_msn` varchar(100) NOT NULL,
@@ -674,18 +676,18 @@ CREATE TABLE `evo_users` (
   KEY `user_grp_ID` (`user_grp_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
--- 
+--
 -- Dumping data for table `evo_users`
--- 
+--
 
 INSERT INTO `evo_users` VALUES (1, 'admin', 'abda0b8ba23a671ee4c9ca75b2eb72e8', '', '', 'admin', 0, 'postmaster@localhost', '', '127.0.0.1', 'localhost', '', '2005-12-16 00:30:38', 10, '', '', '', 'en-EU', 'login', 1, 1, 1);
 INSERT INTO `evo_users` VALUES (2, 'demouser', 'abda0b8ba23a671ee4c9ca75b2eb72e8', '', '', 'Mr. Demo', 0, 'postmaster@localhost', '', '127.0.0.1', 'localhost', '', '2005-12-16 00:30:39', 0, '', '', '', 'en-EU', 'login', 1, 1, 4);
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `evo_usersettings`
--- 
+--
 
 CREATE TABLE `evo_usersettings` (
   `uset_user_ID` int(11) unsigned NOT NULL,
@@ -694,7 +696,7 @@ CREATE TABLE `evo_usersettings` (
   PRIMARY KEY  (`uset_user_ID`,`uset_name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `evo_usersettings`
--- 
+--
 

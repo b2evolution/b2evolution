@@ -75,6 +75,17 @@ class UpgradeToCurrentTestCase extends InstallUnitTestCase
 		$this->createTablesFor1_6();
 		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 1.6 successful!' );
 	}
+
+
+	/**
+	 * Test upgrade from 1.6 (Phoenix Alpha) ("strict" MySQL mode)
+	 */
+	function testUpgradeFrom1_6_strict()
+	{
+		$this->createTablesFor1_6();
+		$this->test_DB->query( 'SET sql_mode = "TRADITIONAL"' );
+		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 1.6 in strict mode successful!' );
+	}
 }
 
 
