@@ -1194,7 +1194,7 @@ class Form extends Widget
 						</script>';
 
 		global $UserSettings;
-		if( $UserSettings->get( 'control_form_abortions' )
+		if( isset($UserSettings) && $UserSettings->get( 'control_form_abortions' )
 			&& preg_match( '#^(.*)_checkchanges#', $this->form_name ) )
 		{ // This form will trigger the bozo validator, preset a localized bozo confirm message:
 
@@ -2600,6 +2600,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.29  2006/08/02 23:35:02  blueyed
+ * Check if UserSettings is available
+ *
  * Revision 1.28  2006/07/26 19:42:45  blueyed
  * Check if init_dynamicSelect is defined, before adding it to window.onload
  *
