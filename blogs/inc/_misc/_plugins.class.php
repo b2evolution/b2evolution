@@ -1576,7 +1576,6 @@ class Plugins
 			elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'array' )
 			{
 				$set_Obj->_defaults[$l_name] = array();
-				$set_Obj->_defaults_to_be_serialized[] = $l_name;
 			}
 			else
 			{
@@ -2909,6 +2908,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.71  2006/08/02 22:05:37  blueyed
+ * Optimized performance of (Abstract)Settings, especially get().
+ *
  * Revision 1.70  2006/07/31 20:11:28  blueyed
  * Karma: check for "numeric" instead of "integer" return values.
  *

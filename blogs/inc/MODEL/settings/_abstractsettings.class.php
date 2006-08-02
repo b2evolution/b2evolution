@@ -34,11 +34,17 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * Class to handle the global settings.
+ * Class to handle settings in an abstract manner (to get used with either 1, 2 or 3 DB column keys).
+ *
+ * Arrays and Objects automatically get serialized and unserialized
+ * (in {@link AbstractSettings::get()} and {@link AbstractSettings::dbupdate()}).
+ *
+ * Note: I've evaluated splitting this into single classes for performance reasons, but only
+ *       get() is relevant performance-wise and we could now only get rid of the switch() therein,
+ *       which is not sufficient to split it into *_base + _X classes. (blueyed, 2006-08)
  *
  * @package evocore
  * @abstract
- * @todo For performance reasons this should get split up into AbstractSettings_X where X is the number of $colKeyNames
  * @see UserSettings, GeneralSettings, PluginSettings, CollectionSettings
  */
 class AbstractSettings
@@ -49,7 +55,7 @@ class AbstractSettings
 	 * @var string
 	 * @access protected
 	 */
-	var $dbTableName;
+	var $db_table_name;
 
 	/**
 	 * Array with DB column key names.
@@ -57,7 +63,7 @@ class AbstractSettings
 	 * @var array of strings
 	 * @access protected
 	 */
-	var $colKeyNames = array();
+	var $col_key_names = array();
 
 	/**
 	 * DB column name for the value.
@@ -65,16 +71,16 @@ class AbstractSettings
 	 * @var string
 	 * @access protected
 	 */
-	var $colValueName;
+	var $col_value_name;
 
 
 	/**
 	 * The number of column keys to cache by. This are the first x keys of
-	 * {@link $colKeyNames}. 0 means 'load all'.
+	 * {@link $col_key_names}. 0 means 'load all'.
 	 *
 	 * @var integer
 	 */
-	var $cacheByColKeys;
+	var $cache_by_col_keys;
 
 
 	/**
@@ -92,7 +98,7 @@ class AbstractSettings
 	 *
 	 * @var boolean
 	 */
-	var $allLoaded = false;
+	var $all_loaded = false;
 
 
 	/**
@@ -107,36 +113,26 @@ class AbstractSettings
 
 
 	/**
-	 * A list of last colkeyname which are meant to be serialized (array or object).
-	 * They are {@link unserialize() unserialized} once with {@link get()} and
-	 * {@link serialize() serialized} with {@link dbupdate()}.
-	 *
-	 * @var array
-	 */
-	var $_defaults_to_be_serialized = array();
-
-
-	/**
 	 * Constructor.
 	 * @param string The name of the DB table with the settings stored.
 	 * @param array List of names for the DB columns keys that reference a value.
 	 * @param string The name of the DB column that holds the value.
-	 * @param integer The number of column keys to cache by. This are the first x keys of {@link $colKeyNames}. 0 means 'load all'.
+	 * @param integer The number of column keys to cache by. This are the first x keys of {@link $col_key_names}. 0 means 'load all'.
 	 */
-	function AbstractSettings( $dbTableName, $colKeyNames, $colValueName, $cacheByColKeys = 0 )
+	function AbstractSettings( $db_table_name, $col_key_names, $col_value_name, $cache_by_col_keys = 0 )
 	{
-		$this->dbTableName = $dbTableName;
-		$this->colKeyNames = $colKeyNames;
-		$this->colValueName = $colValueName;
-		$this->cacheByColKeys = $cacheByColKeys;
+		$this->db_table_name = $db_table_name;
+		$this->col_key_names = $col_key_names;
+		$this->col_value_name = $col_value_name;
+		$this->cache_by_col_keys = $cache_by_col_keys;
 
 
 		/**
 		 * @var integer internal counter for the number of column keys
 		 */
-		$this->count_colKeyNames = count( $this->colKeyNames );
+		$this->count_col_key_names = count( $this->col_key_names );
 
-		if( $this->count_colKeyNames > 3 || $this->count_colKeyNames < 1 )
+		if( $this->count_col_key_names > 3 || $this->count_col_key_names < 1 )
 		{
 			debug_die( 'Settings keycount not supported for class '.get_class() );
 		}
@@ -145,7 +141,7 @@ class AbstractSettings
 
 	/**
 	 * Load all settings, disregarding the derived classes setting of
-	 * {@link $cacheByColKeys} - useful if you know that you want to get
+	 * {@link $cache_by_col_keys} - useful if you know that you want to get
 	 * all user settings for example.
 	 */
 	function load_all()
@@ -159,99 +155,98 @@ class AbstractSettings
 	 * when needed.
 	 *
 	 * @access protected
-	 * @param array|NULL list of key values, used for caching by keys.
+	 * @param string First column key
+	 * @param string Second column key
+	 * @param string Third column key
 	 * @return boolean always true
 	 */
-	function _load( $getArgs = NULL )
+	function _load( $arg1 = NULL, $arg2 = NULL, $arg3 = NULL )
 	{
-		if( $this->allLoaded )
+		if( $this->all_loaded )
 		{ // already all loaded
 			return true;
 		}
 		global $DB;
 
-		if( is_array($getArgs) && count($getArgs) != $this->count_colKeyNames )
-		{
-			debug_die( 'Count of arguments for AbstractSettings::get() does not match $colKeyNames (class '.get_class($this).')! '.count($args).' given, '.$this->count_colKeyNames.' expected.' );
-		}
-
 		/**
-		 * The where clause - gets filled when {@link $cacheByColKeys} is used.
+		 * The where clause - gets filled when {@link $cache_by_col_keys} is used.
 		 */
 		$whereList = array();
 
-		if( $this->cacheByColKeys && is_array($getArgs) )
+		if( $this->cache_by_col_keys && isset($arg1) )
 		{
 			$testCache = $this->cache;
+			$args = array( $arg1, $arg2, $arg3 );
 
-			for( $i = 0; $i < $this->cacheByColKeys; $i++ )
+			for( $i = 0; $i < $this->cache_by_col_keys; $i++ )
 			{
-				$whereList[] = $this->colKeyNames[$i].' = "'.$getArgs[$i].'"';
+				$whereList[] = $this->col_key_names[$i].' = "'.$args[$i].'"';
 
-				if( !is_array( $testCache )
-						|| !isset( $testCache[$getArgs[$i]] )
-						|| !($testCache = & $testCache[$getArgs[$i]]) )
+				if( ! is_array( $testCache )
+						|| is_null($args[$i])
+						|| ! isset( $testCache[$args[$i]] )
+						|| ! ($testCache = & $testCache[$args[$i]]) )
 				{
 					break;
 				}
 			}
 
-			if( $i == $this->cacheByColKeys )
+			if( $i == $this->cache_by_col_keys )
 			{ // already loaded!
 				return true;
 			}
 		}
 		else
 		{ // we're about to load everything
-			$this->allLoaded = true;
+			$this->all_loaded = true;
 		}
 
 
 		$result = $DB->get_results( '
-			SELECT '.implode( ', ', $this->colKeyNames ).', '.$this->colValueName.'
-			FROM '.$this->dbTableName.(
+			SELECT '.implode( ', ', $this->col_key_names ).', '.$this->col_value_name.'
+			FROM '.$this->db_table_name.(
 				isset( $whereList[0] )
 				? ' WHERE '.implode( ' AND ', $whereList )
 				: '' ) );
 
-		switch( $this->count_colKeyNames )
+		switch( $this->count_col_key_names )
 		{
 			case 1:
 				if( ! $result )
 				{ // Remember that we've tried it
-					$this->cache[ $getArgs[0] ] = NULL;
+					$this->cache[ $arg1 ] = NULL;
 				}
 				else foreach( $result as $loop_row )
 				{
-					$this->cache[$loop_row->{$this->colKeyNames[0]}]->value = $loop_row->{$this->colValueName};
-					$this->cache[$loop_row->{$this->colKeyNames[0]}]->dbUptodate = true;
-					$this->cache[$loop_row->{$this->colKeyNames[0]}]->dbRemove = false;
+					$this->cache[$loop_row->{$this->col_key_names[0]}]->value = $loop_row->{$this->col_value_name};
+					$this->cache[$loop_row->{$this->col_key_names[0]}]->dbUptodate = true;
+					$this->cache[$loop_row->{$this->col_key_names[0]}]->dbRemove = false;
 				}
 				break;
 
 			case 2:
 				if( ! $result )
 				{ // Remember that we've tried it
-					$this->cache[ $getArgs[0] ][ $getArgs[1] ] = NULL;
+					$this->cache[ $arg1 ][ $arg2 ] = NULL;
 				}
 				else foreach( $result as $loop_row )
 				{
-					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}]->value = $loop_row->{$this->colValueName};
-					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}]->dbUptodate = true;
-					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}]->dbRemove = false;
+					$this->cache[$loop_row->{$this->col_key_names[0]}][$loop_row->{$this->col_key_names[1]}]->value = $loop_row->{$this->col_value_name};
+					$this->cache[$loop_row->{$this->col_key_names[0]}][$loop_row->{$this->col_key_names[1]}]->dbUptodate = true;
+					$this->cache[$loop_row->{$this->col_key_names[0]}][$loop_row->{$this->col_key_names[1]}]->dbRemove = false;
 				}
 				break;
 
 			case 3:
 				if( ! $result )
 				{ // Remember that we've tried it
-					$this->cache[ $getArgs[0] ][ $getArgs[1] ][ $getArgs[2] ] = NULL;
+					$this->cache[ $arg1 ][ $arg2 ][ $arg3 ] = NULL;
 				}
 				else foreach( $result as $loop_row )
 				{
-					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}][$loop_row->{$this->colKeyNames[2]}]->value = $loop_row->{$this->colValueName};
-					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}][$loop_row->{$this->colKeyNames[2]}]->dbUptodate = true;
-					$this->cache[$loop_row->{$this->colKeyNames[0]}][$loop_row->{$this->colKeyNames[1]}][$loop_row->{$this->colKeyNames[2]}]->dbRemove = false;
+					$this->cache[$loop_row->{$this->col_key_names[0]}][$loop_row->{$this->col_key_names[1]}][$loop_row->{$this->col_key_names[2]}]->value = $loop_row->{$this->col_value_name};
+					$this->cache[$loop_row->{$this->col_key_names[0]}][$loop_row->{$this->col_key_names[1]}][$loop_row->{$this->col_key_names[2]}]->dbUptodate = true;
+					$this->cache[$loop_row->{$this->col_key_names[0]}][$loop_row->{$this->col_key_names[1]}][$loop_row->{$this->col_key_names[2]}]->dbRemove = false;
 				}
 				break;
 		}
@@ -264,87 +259,128 @@ class AbstractSettings
 	 * Get a setting from the DB settings table.
 	 *
 	 * @uses get_default()
-	 * @param string $args,... the values for the column keys (depends on
-	 *                         $this->colKeyNames and must match its count and order)
+	 * @param string First column key
+	 * @param string Second column key
+	 * @param string Third column key
 	 * @return string|false|NULL value as string on success; NULL if not found; false in case of error
 	 */
-	function get()
+	function get( $col_key1, $col_key2 = NULL, $col_key3 = NULL )
 	{
-		global $Debuglog;
+		global $debug, $Debuglog;
 
-		$args = func_get_args();
+		if( $debug )
+		{
+			$this_class = get_class($this);
+			$GLOBALS['Timer']->resume('abstractsettings_'.$this_class.'_get');
+		}
 
-		$this->_load( $args );
-
-		$debugMsg = get_class($this).'::get( '.implode( ', ', $args ).' ): ';
-
-		$r = NULL;
-
-		switch( $this->count_colKeyNames )
+		switch( $this->count_col_key_names )
 		{
 			case 1:
-				if( isset($this->cache[ $args[0] ]) )
-				{
-					if( empty($this->cache[ $args[0] ]->unserialized) && in_array( $args[0], $this->_defaults_to_be_serialized ) )
-					{ // Unserialize setting (once)
-						$this->cache[ $args[0] ]->value = @unserialize($this->cache[ $args[0] ]->value);
-						$this->cache[ $args[0] ]->unserialized = true;
-					}
+				$this->_load( $col_key1 );
 
-					$r = $this->cache[ $args[0] ]->value;
-				}
-				elseif( NULL !== ($default = $this->get_default( $args[0] )) )
+				if( isset($this->cache[ $col_key1 ]->unserialized) )
 				{
-					$r = $default;
-					$debugMsg .= '[DEFAULT]: ';
+					$r = $this->cache[ $col_key1 ]->value;
+				}
+				elseif( isset($this->cache[ $col_key1 ]) )
+				{
+					// Try to unserialize setting (once) - this is as fast as checking an array of values that should get unserialized
+					if( $r = @unserialize($this->cache[ $col_key1 ]->value) )
+					{
+						$this->cache[ $col_key1 ]->value = $r;
+					}
+					else
+					{
+						$r = $this->cache[ $col_key1 ]->value;
+					}
+					$this->cache[ $col_key1 ]->unserialized = true;
+				}
+				else
+				{
+					$r = $this->get_default( $col_key1 );
+					$this->cache[ $col_key1 ]->value = $r; // remember in cache
+					$this->cache[ $col_key1 ]->dbUptodate = true;
+					$this->cache[ $col_key1 ]->dbRemove = false;
+					$from_default = true; // for debug
 				}
 				break;
 
 			case 2:
-				if( isset($this->cache[ $args[0] ][ $args[1] ]) )
-				{
-					if( empty($this->cache[ $args[0] ][ $args[1] ]->unserialized) && in_array( $args[1], $this->_defaults_to_be_serialized ) )
-					{ // Unserialize setting (once)
-						$this->cache[ $args[0] ][ $args[1] ]->value = @unserialize($this->cache[ $args[0] ][ $args[1] ]->value);
-						$this->cache[ $args[0] ][ $args[1] ]->unserialized = true;
-					}
+				$this->_load( $col_key1, $col_key2 );
 
-					$r = $this->cache[ $args[0] ][ $args[1] ]->value;
-				}
-				elseif( NULL !== ($default = $this->get_default( $args[1] )) )
+				if( isset($this->cache[ $col_key1 ][ $col_key2 ]->unserialized) )
 				{
-					$r = $default;
-					$debugMsg .= '[DEFAULT]: ';
+					$r = $this->cache[ $col_key1 ][ $col_key2 ]->value;
+				}
+				elseif( isset($this->cache[ $col_key1 ][ $col_key2 ]) )
+				{
+					// Try to unserialize setting (once) - this is as fast as checking an array of values that should get unserialized
+					if( $r = @unserialize($this->cache[ $col_key1 ][ $col_key2 ]->value) )
+					{
+						$this->cache[ $col_key1 ][ $col_key2 ]->value = $r;
+					}
+					else
+					{
+						$r = $this->cache[ $col_key1 ][ $col_key2 ]->value;
+					}
+					$this->cache[ $col_key1 ][ $col_key2 ]->unserialized = true;
+				}
+				else
+				{
+					$r = $this->get_default( $col_key1, $col_key2 );
+					$this->cache[ $col_key1 ][ $col_key2 ]->value = $r; // remember in cache
+					$this->cache[ $col_key1 ][ $col_key2 ]->dbUptodate = true;
+					$this->cache[ $col_key1 ][ $col_key2 ]->dbRemove = false;
+					$from_default = true; // for debug
 				}
 				break;
 
 			case 3:
-				if( isset($this->cache[ $args[0] ][ $args[1] ][ $args[2] ]) )
-				{
-					if( empty($this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->unserialized) && in_array( $args[2], $this->_defaults_to_be_serialized ) )
-					{ // Unserialize setting (once)
-						$this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->value = @unserialize($this->cache[ $args[0] ][ $args[1][ $args[2] ] ]->value);
-						$this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->unserialized = true;
-					}
+				$this->_load( $col_key1, $col_key2, $col_key3 );
 
-					$r = $this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->value;
-				}
-				elseif( NULL !== ($default = $this->get_default( $args[2] )) )
+				if( isset($this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->unserialized) )
 				{
-					$r = $default;
-					$debugMsg .= '[DEFAULT]: ';
+					$r = $this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value;
+				}
+				elseif( isset($this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]) )
+				{
+					// Try to unserialize setting (once) - this is as fast as checking an array of values that should get unserialized
+					if( $r = @unserialize($this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value) )
+					{
+						$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value = $r;
+					}
+					else
+					{
+						$r = $this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value;
+					}
+					$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->unserialized = true;
+				}
+				else
+				{
+					$r = $this->get_default( $col_key1, $col_key2, $col_key3 );
+					$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value = $r; // remember in cache
+					$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->dbUptodate = true;
+					$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->dbRemove = false;
+					$from_default = true; // for debug
 				}
 				break;
 		}
 
-		$Debuglog->add( $debugMsg.var_export( $r, true ), 'settings' );
+		if( $debug )
+		{
+			$Debuglog->add( $this_class.'::get( '.$col_key1.'/'.$col_key2.'/'.$col_key3.' ): '
+				.( isset($from_default) ? '[DEFAULT]: ' : '' )
+				.var_export( $r, true ), 'settings' );
+			$GLOBALS['Timer']->pause('abstractsettings_'.$this_class.'_get');
+		}
 
 		return $r;
 	}
 
 
 	/**
-	 * Get the default for the last key of {@link $colKeyNames}
+	 * Get the default for the last key of {@link $col_key_names}
 	 *
 	 * @param string The last column key
 	 * @return NULL|mixed NULL if no default is set, otherwise the value (should be string).
@@ -365,7 +401,7 @@ class AbstractSettings
 	 * setting.
 	 *
 	 * @param mixed variable to set maybe (by reference)
-	 * @param string the values for the column keys (depends on $this->colKeyNames
+	 * @param string the values for the column keys (depends on $this->col_key_names
 	 *               and must match its count and order)
 	 * @return boolean true on success (variable was set), false if not
 	 */
@@ -391,8 +427,8 @@ class AbstractSettings
 	/**
 	 * Temporarily sets a setting ({@link dbupdate()} writes it to DB).
 	 *
-	 * @param string $args,... the values for the {@link $colKeyNames column keys}
-	 *                         and {@link $colValueName column value}. Must match order and count!
+	 * @param string $args,... the values for the {@link $col_key_names column keys}
+	 *                         and {@link $col_value_name column value}. Must match order and count!
 	 * @return boolean true, if the value has been set, false if it has not changed.
 	 */
 	function set()
@@ -402,11 +438,11 @@ class AbstractSettings
 		$args = func_get_args();
 		$value = array_pop($args);
 
-		$this->_load( $args );
+		call_user_func_array( array(&$this, '_load'), $args );
 
 		$debugMsg = get_class($this).'::set( '.implode(', ', $args ).' ): ';
 
-		switch( $this->count_colKeyNames )
+		switch( $this->count_col_key_names )
 		{
 			case 1:
 				$atCache = & $this->cache[ $args[0] ];
@@ -462,13 +498,13 @@ class AbstractSettings
 	/**
 	 * Remove a setting.
 	 *
-	 * @param array List of {@link $colKeyNames}
+	 * @param array List of {@link $col_key_names}
 	 */
 	function delete( $args )
 	{
 		$args = func_get_args();
 
-		switch( $this->count_colKeyNames )
+		switch( $this->count_col_key_names )
 		{
 			case 1:
 				$atCache = & $this->cache[ $args[0] ];
@@ -529,16 +565,17 @@ class AbstractSettings
 	 */
 	function dbupdate()
 	{
-		if( !$this->cache )
+		if( empty($this->cache) )
 		{
 			return false;
 		}
+
 		global $DB;
 
 		$query_insert = array();
 		$query_where_delete = array();
 
-		switch( $this->count_colKeyNames )
+		switch( $this->count_col_key_names )
 		{
 			case 1:
 				foreach( $this->cache as $key => $value )
@@ -549,13 +586,13 @@ class AbstractSettings
 					}
 					if( $value->dbRemove )
 					{
-						$query_where_delete[] = "{$this->colKeyNames[0]} = '$key'";
+						$query_where_delete[] = "{$this->col_key_names[0]} = '$key'";
 						unset( $this->cache[$key] );
 					}
 					elseif( isset($value->dbUptodate) && !$value->dbUptodate )
 					{
 						$value = $value->value;
-						if( in_array( $key, $this->_defaults_to_be_serialized ) )
+						if( is_array( $value ) || is_object( $value ) )
 						{
 							$value = serialize($value);
 						}
@@ -576,17 +613,17 @@ class AbstractSettings
 						}
 						if( $value2->dbRemove )
 						{
-							$query_where_delete[] = "{$this->colKeyNames[0]} = '$key' AND {$this->colKeyNames[1]} = '$key2'";
+							$query_where_delete[] = "{$this->col_key_names[0]} = '$key' AND {$this->col_key_names[1]} = '$key2'";
 							unset( $this->cache[$key][$key2] );
 						}
 						elseif( isset($value2->dbUptodate) && !$value2->dbUptodate )
 						{
-							$value = $value2->value;
-							if( in_array( $key2, $this->_defaults_to_be_serialized ) )
+							$value2 = $value2->value;
+							if( is_array( $value2 ) || is_object( $value2 ) )
 							{
-								$value = serialize($value);
+								$value2 = serialize($value2);
 							}
-							$query_insert[] = "('$key', '$key2', '".$DB->escape( $value )."')";
+							$query_insert[] = "('$key', '$key2', '".$DB->escape( $value2 )."')";
 							$this->cache[$key][$key2]->dbUptodate = true;
 						}
 					}
@@ -606,17 +643,17 @@ class AbstractSettings
 							}
 							if( $value3->dbRemove )
 							{
-								$query_where_delete[] = "{$this->colKeyNames[0]} = '$key' AND {$this->colKeyNames[1]} = '$key2' AND {$this->colKeyNames[2]} = '$key3'";
+								$query_where_delete[] = "{$this->col_key_names[0]} = '$key' AND {$this->col_key_names[1]} = '$key2' AND {$this->col_key_names[2]} = '$key3'";
 								unset( $this->cache[$key][$key2][$key3] );
 							}
 							elseif( isset($value3->dbUptodate) && !$value3->dbUptodate )
 							{
-								$value = $value3->value;
-								if( in_array( $key3, $this->_defaults_to_be_serialized ) )
+								$value3 = $value3->value;
+								if( is_array($value3) || is_object($value3) )
 								{
-									$value = serialize($value);
+									$value3 = serialize($value3);
 								}
-								$query_insert[] = "('$key', '$key2', '$key3', '".$DB->escape( $value )."')";
+								$query_insert[] = "('$key', '$key2', '$key3', '".$DB->escape( $value3 )."')";
 								$this->cache[$key][$key2][$key3]->dbUptodate = true;
 							}
 						}
@@ -631,16 +668,16 @@ class AbstractSettings
 
 		$r = false;
 
-		if( isset($query_where_delete[0]) )
+		if( ! empty($query_where_delete) )
 		{
-			$query = 'DELETE FROM '.$this->dbTableName." WHERE\n(".implode( ")\nOR (", $query_where_delete ).')';
+			$query = 'DELETE FROM '.$this->db_table_name." WHERE\n(".implode( ")\nOR (", $query_where_delete ).')';
 			$r = (boolean)$DB->query( $query );
 		}
 
 
-		if( isset($query_insert[0]) )
+		if( ! empty($query_insert) )
 		{
-			$query = 'REPLACE INTO '.$this->dbTableName.' ('.implode( ', ', $this->colKeyNames ).', '.$this->colValueName
+			$query = 'REPLACE INTO '.$this->db_table_name.' ('.implode( ', ', $this->col_key_names ).', '.$this->col_value_name
 								.') VALUES '.implode(', ', $query_insert);
 			$r = $DB->query( $query ) || $r;
 		}
@@ -658,13 +695,17 @@ class AbstractSettings
 	function reset()
 	{
 		$this->cache = NULL;
-		$this->allLoaded = false;
+		$this->all_loaded = false;
 	}
 
 }
 
+
 /*
  * $Log$
+ * Revision 1.11  2006/08/02 22:05:37  blueyed
+ * Optimized performance of (Abstract)Settings, especially get().
+ *
  * Revision 1.10  2006/05/19 18:15:05  blueyed
  * Merged from v-1-8 branch
  *
