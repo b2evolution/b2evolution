@@ -603,19 +603,6 @@ function get_available_FileRoots()
 		$r[ $user_FileRoot->ID ] = & $user_FileRoot;
 	}
 
-	if( $current_User->group_ID == 1 )
-	{
-		global $DB;
-		foreach( $DB->get_col( 'SELECT user_ID FROM T_users WHERE user_ID != '.$current_User->ID ) as $other_user_ID )
-		{
-			$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $other_user_ID );
-			if( $user_FileRoot )
-			{ // We got a user media dir:
-				$r[ $user_FileRoot->ID ] = & $user_FileRoot;
-			}
-		}
-	}
-
 	$bloglist = $BlogCache->load_user_blogs( 'browse', $current_User->ID );
 
 	// blog media dirs:
@@ -676,6 +663,7 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 		return $r;
 	}
 	// _______________________________________________________________________
+
 
 	// We'll go through files in current dir:
 	$Nodelist = new Filelist( $Root, trailing_slash($path) );
@@ -754,8 +742,8 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 /*
  * {{{ Revision log:
  * $Log$
- * Revision 1.18  2006/08/03 20:43:39  blueyed
- * Additional fix and cleanup for next_post()/previous_post()
+ * Revision 1.19  2006/08/03 20:50:25  blueyed
+ * Did not mean to commit this (display all user dirs for admin users)
  *
  * Revision 1.17  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
