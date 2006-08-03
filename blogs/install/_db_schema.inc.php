@@ -342,7 +342,8 @@ $schema_queries = array(
 			PRIMARY KEY (hit_ID),
 			INDEX hit_agnt_ID ( hit_agnt_ID ),
 			INDEX hit_datetime ( hit_datetime ),
-			INDEX hit_blog_ID (hit_blog_ID)
+			INDEX hit_blog_ID (hit_blog_ID),
+			INDEX hit_uri (hit_uri)
 		)" ), // TODO: more indexes?
 
 	'T_subscriptions' => array(
@@ -630,6 +631,9 @@ function install_insert_default_data( $old_db_version )
 
 /*
  * $Log$
+ * Revision 1.25  2006/08/03 19:39:06  blueyed
+ * hit_uri index (needed when checking for page reload)
+ *
  * Revision 1.24  2006/08/03 01:53:40  blueyed
  * whitespace
  *
