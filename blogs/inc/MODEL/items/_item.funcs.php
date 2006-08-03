@@ -249,6 +249,7 @@ function link_pages( $before='#', $after='#', $next_or_number='number', $nextpag
 function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='no', $limitprev=1, $excluded_categories='')
 {
 	global $disp, $posts;
+
 	if( $disp != 'single' && $posts != 1 )
 	{
 		return;
@@ -262,8 +263,10 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 	$current_post_date = $postdata['Date'];
 	$current_category = $postdata['Category'];
 
+	if( is_string($in_same_cat) ) { $in_same_cat = ($in_same_cat != 'no'); }
+
 	$sqlcat = '';
-	if ($in_same_cat != 'no') {
+	if( $in_same_cat ) {
 		$sqlcat = " AND post_main_cat_ID = $current_category ";
 	}
 
@@ -278,14 +281,14 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 
 	$limitprev--;
 	$sql = "SELECT post_ID, post_title
-					FROM T_posts
-					WHERE post_datestart < '$current_post_date'
-						$sqlcat
-						$sql_exclude_cats
-					ORDER BY post_datestart DESC
-					LIMIT $limitprev, 1";
+	          FROM T_posts
+	         WHERE post_datestart < '$current_post_date'
+	               $sqlcat
+	               $sql_exclude_cats
+	         ORDER BY post_datestart DESC
+	         LIMIT $limitprev, 1";
 
-	if( $p_info = $DB->get_row( $sql ) )
+	if( $p_info = $DB->get_row( $sql, OBJECT, 0, 'previous_post()' ) )
 	{
 		$Item = & $ItemCache->get_by_ID($p_info->post_ID);
 
@@ -310,11 +313,10 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 {
 	global $disp, $posts;
 
-	if( $disp != 'single' && $posts != 1 )
+	if( $disp != 'single' && $posts > 0 )
 	{
 		return;
 	}
-
 	global $postdata, $localtimenow, $DB;
 	global $ItemCache, $Blog;
 
@@ -322,9 +324,11 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 
 	$current_post_date = $postdata['Date'];
 	$current_category = $postdata['Category'];
+
+	if( is_string($in_same_cat) ) { $in_same_cat = ($in_same_cat != 'no'); }
+
 	$sqlcat = '';
-	if ($in_same_cat != 'no')
-	{
+	if( $in_same_cat ) {
 		$sqlcat = " AND post_main_cat_ID = $current_category ";
 	}
 
@@ -341,15 +345,15 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 
 	$limitnext--;
 	$sql = "SELECT post_ID, post_title
-					FROM T_posts
-					WHERE post_datestart > '$current_post_date'
-						AND post_datestart < '$now'
-						$sqlcat
-						$sql_exclude_cats
-					ORDER BY post_datestart ASC
-					LIMIT $limitnext, 1";
+	          FROM T_posts
+	         WHERE post_datestart > '$current_post_date'
+	           AND post_datestart < '$now'
+	               $sqlcat
+	               $sql_exclude_cats
+	         ORDER BY post_datestart ASC
+	          LIMIT $limitnext, 1";
 
-	if( $p_info = $DB->get_row( $sql ) )
+	if( $p_info = $DB->get_row( $sql, OBJECT, 0, 'next_post()' ) )
 	{
 		$Item = & $ItemCache->get_by_ID($p_info->post_ID);
 
@@ -945,6 +949,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.16  2006/08/03 20:43:39  blueyed
+ * Additional fix and cleanup for next_post()/previous_post()
+ *
  * Revision 1.15  2006/08/03 18:22:49  blueyed
  * next_post()/prev_post(): only use current blog URL, if "in_same_cat".
  *
