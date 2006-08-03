@@ -333,6 +333,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				. $r->serialize();
 			header('Content-Type: text/xml');
 			header('Content-Length: ' . (int)strlen($payload));
+
+			logIO( 'O', "service() response:\n".$payload );
+
 			print $payload;
 		}
 
@@ -495,6 +498,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			if (!isset($dmap[$methName]['function']))
 			{
 				// No such method
+				logIO( 'O', 'No such method:'.$methName );
 				return new xmlrpcresp(0,
 					$xmlrpcerr['unknown_method'],
 					$xmlrpcstr['unknown_method']);
@@ -508,6 +512,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				if(!$ok)
 				{
 					// Didn't match.
+					logIO( 'O', 'Invalid signature.' );
 					return new xmlrpcresp(
 						0,
 						$xmlrpcerr['incorrect_params'],

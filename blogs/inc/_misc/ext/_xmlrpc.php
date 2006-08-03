@@ -1438,7 +1438,6 @@
 					"</param>\n</params>";
 			}
 			$result .= "\n</methodResponse>";
-			logIO("O",$result);
 			return $result;
 		}
 	}
@@ -1509,7 +1508,6 @@
 		function serialize()
 		{
 			$this->createPayload();
-			logIO("O",$this->payload);
 			return $this->payload;
 		}
 
