@@ -436,7 +436,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					{
 						$items[$table_lowered][] = array(
 							'queries' => array('ALTER TABLE '.$table.' DROP COLUMN '.$tablefield->Field),
-						'note' => 'Dropped '.$table.'.<strong>'.$tablefield->Field.'</strong>',
+							'note' => 'Dropped '.$table.'.<strong>'.$tablefield->Field.'</strong>',
 							'type' => 'drop_column' );
 
 						// Unset in key indices:
@@ -489,7 +489,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					$field_to_parse = $match[5];
 
 					// The length param is optional:
-					$matches_pattern = '~^'.preg_replace( '~\((\d+)\)~', '(\($1\))?', $tablefield->Type ).'$~i';
+					$matches_pattern = '~^'.preg_replace( '~\((\d+)\)~', '(\(\d+\))?', $tablefield->Type ).'$~i';
 					$type_matches = preg_match( $matches_pattern, $fieldtype );
 				}
 				elseif( preg_match( '~^'.$tablefield->Field.'\s+(DATETIME|DATE|TIMESTAMP|TIME|YEAR|TINYBLOB|BLOB|MEDIUMBLOB|LONGBLOB|TINYTEXT|TEXT|MEDIUMTEXT|LONGTEXT) ( \s+ BINARY )? (.*)$~ix', $column_definition, $match ) )
@@ -1041,6 +1041,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.22  2006/08/03 00:56:26  blueyed
+ * Fix
+ *
  * Revision 1.21  2006/07/04 17:32:30  fplanque
  * no message
  *

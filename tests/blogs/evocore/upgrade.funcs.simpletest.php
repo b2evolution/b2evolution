@@ -874,6 +874,24 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 	}
 
 
+	function test_db_delta_ignore_length_param() // for "numbers"
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				t1 TINYINT(3),
+				t2 TINYINT
+			)" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE test_1 (
+				t1 TINYINT,
+				t2 TINYINT(2)
+			)", /* exclude defaults: */ array('drop_column', 'drop_index') );
+
+		$this->assertEqual( count($r), 0 );
+	}
+
+
 }
 
 
