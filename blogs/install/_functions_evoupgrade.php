@@ -158,7 +158,6 @@ function upgrade_b2evo_tables()
 
 		// We come here, if $old_db_version and $new_db_version are the same, but the schema needs upgrade (_db_schema.inc.php has changed)..
 		// We'll upgrade to the new schema below (at the end)..
-		echo '<p>'.T_('The version number is correct, but we have detected changes in the database schema. This can happen with CVS versions...').'</p>';
 	}
 
 
@@ -384,8 +383,8 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 
 		$query = "ALTER TABLE T_posts
-							CHANGE COLUMN post_date post_issue_date datetime NOT NULL default '0000-00-00 00:00:00',
-							ADD COLUMN post_mod_date datetime NOT NULL default '0000-00-00 00:00:00'
+							CHANGE COLUMN post_date post_issue_date datetime NOT NULL default '1000-01-01 00:00:00',
+							ADD COLUMN post_mod_date datetime NOT NULL default '1000-01-01 00:00:00'
 										AFTER post_issue_date,
 							CHANGE COLUMN post_lang post_locale varchar(20) NOT NULL default 'en-EU',
 							DROP COLUMN post_url,
@@ -533,23 +532,149 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 9000 )
-	{ // ---------------------------------- upgrade to 0.9.2 a.k.a 1.6 "phoenix ALPHA"
+	{ // ---------------------------------- upgrade to 1.6 "phoenix ALPHA"
 
 		echo 'Dropping old Hitlog table... ';
 		$DB->query( 'DROP TABLE IF EXISTS T_hitlog' );
 		echo "OK.<br />\n";
 
 		// New tables:
-		// removed by blueyed:create_b2evo_tables_phoenix();
+			echo 'Creating table for active sessions... ';
+			$DB->query( "CREATE TABLE T_sessions (
+											sess_ID        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+											sess_key       CHAR(32) NULL,
+											sess_lastseen  DATETIME NOT NULL,
+											sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
+											sess_user_ID   INT(10) DEFAULT NULL,
+											sess_agnt_ID   INT UNSIGNED NULL,
+											sess_data      TEXT DEFAULT NULL,
+											PRIMARY KEY( sess_ID )
+										)" );
+			echo "OK.<br />\n";
 
-		echo 'Creating plugins table... ';
-		$DB->query( "CREATE TABLE T_plugins (
-										plug_ID        INT(11) UNSIGNED NOT NULL auto_increment,
-										plug_priority  INT(11) NOT NULL default 50,
-										plug_classname VARCHAR(40) NOT NULL default '',
-										PRIMARY KEY ( plug_ID )
-									)");
-		echo "OK.<br />\n";
+
+			echo 'Creating user settings table... ';
+			$DB->query( "CREATE TABLE T_usersettings (
+											uset_user_ID INT(11) UNSIGNED NOT NULL,
+											uset_name    VARCHAR( 30 ) NOT NULL,
+											uset_value   VARCHAR( 255 ) NULL,
+											PRIMARY KEY ( uset_user_ID, uset_name )
+										)");
+			echo "OK.<br />\n";
+
+
+			echo 'Creating plugins table... ';
+			$DB->query( "CREATE TABLE T_plugins (
+											plug_ID        INT(11) UNSIGNED NOT NULL auto_increment,
+											plug_priority  INT(11) NOT NULL default 50,
+											plug_classname VARCHAR(40) NOT NULL default '',
+											PRIMARY KEY ( plug_ID )
+										)");
+			echo "OK.<br />\n";
+
+
+			echo 'Creating table for Post Statuses... ';
+			$query="CREATE TABLE T_itemstatuses (
+											pst_ID   int(11) unsigned not null AUTO_INCREMENT,
+											pst_name varchar(30)      not null,
+											primary key ( pst_ID )
+										)";
+			$DB->query( $query );
+			echo "OK.<br />\n";
+
+
+			echo 'Creating table for Post Types... ';
+			$query="CREATE TABLE T_itemtypes (
+											ptyp_ID   int(11) unsigned not null AUTO_INCREMENT,
+											ptyp_name varchar(30)      not null,
+											primary key (ptyp_ID)
+										)";
+			$DB->query( $query );
+			echo "OK.<br />\n";
+
+
+			echo 'Creating table for File Meta Data... ';
+			$DB->query( "CREATE TABLE T_files (
+										 file_ID        int(11) unsigned  not null AUTO_INCREMENT,
+										 file_root_type enum('absolute','user','group','collection') not null default 'absolute',
+										 file_root_ID   int(11) unsigned  not null default 0,
+										 file_path      varchar(255)      not null default '',
+										 file_title     varchar(255),
+										 file_alt       varchar(255),
+										 file_desc      text,
+										 primary key (file_ID),
+										 unique file (file_root_type, file_root_ID, file_path)
+									)" );
+			echo "OK.<br />\n";
+
+
+			echo 'Creating table for base domains... ';
+			$DB->query( "CREATE TABLE T_basedomains (
+										dom_ID     INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+										dom_name   VARCHAR(250) NOT NULL DEFAULT '',
+										dom_status ENUM('unknown','whitelist','blacklist') NOT NULL DEFAULT 'unknown',
+										dom_type   ENUM('unknown','normal','searcheng','aggregator') NOT NULL DEFAULT 'unknown',
+										PRIMARY KEY (dom_ID),
+										UNIQUE (dom_name)
+									)" );
+			echo "OK.<br />\n";
+
+
+			echo 'Creating table for user agents... ';
+			$DB->query( "CREATE TABLE T_useragents (
+										agnt_ID        INT UNSIGNED NOT NULL AUTO_INCREMENT,
+										agnt_signature VARCHAR(250) NOT NULL,
+										agnt_type      ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL ,
+										PRIMARY KEY (agnt_ID) )" );
+			echo "OK.<br />\n";
+
+
+			echo 'Creating table for Hit-Logs... ';
+			$query = "CREATE TABLE T_hitlog (
+									hit_ID             INT(11) NOT NULL AUTO_INCREMENT,
+									hit_sess_ID        INT UNSIGNED,
+									hit_datetime       DATETIME NOT NULL,
+									hit_uri            VARCHAR(250) DEFAULT NULL,
+									hit_referer_type   ENUM('search','blacklist','referer','direct','spam') NOT NULL,
+									hit_referer        VARCHAR(250) DEFAULT NULL,
+									hit_referer_dom_ID INT UNSIGNED DEFAULT NULL,
+									hit_blog_ID        int(11) UNSIGNED NULL DEFAULT NULL,
+									hit_remote_addr    VARCHAR(40) DEFAULT NULL,
+									PRIMARY KEY (hit_ID),
+									INDEX hit_datetime ( hit_datetime ),
+									INDEX hit_blog_ID (hit_blog_ID)
+								)"; // TODO: more indexes?
+			$DB->query( $query );
+			echo "OK.<br />\n";
+
+
+			echo 'Creating table for subscriptions... ';
+			$DB->query( "CREATE TABLE T_subscriptions (
+										 sub_coll_ID     int(11) unsigned    not null,
+										 sub_user_ID     int(11) unsigned    not null,
+										 sub_items       tinyint(1)          not null,
+										 sub_comments    tinyint(1)          not null,
+										 primary key (sub_coll_ID, sub_user_ID)
+										)" );
+			echo "OK.<br />\n";
+
+
+			echo 'Creating table for blog-group permissions... ';
+			$DB->query( "CREATE TABLE T_coll_group_perms (
+											bloggroup_blog_ID int(11) unsigned NOT NULL default 0,
+											bloggroup_group_ID int(11) unsigned NOT NULL default 0,
+											bloggroup_ismember tinyint NOT NULL default 0,
+											bloggroup_perm_poststatuses set('published','deprecated','protected','private','draft') NOT NULL default '',
+											bloggroup_perm_delpost tinyint NOT NULL default 0,
+											bloggroup_perm_comments tinyint NOT NULL default 0,
+											bloggroup_perm_cats tinyint NOT NULL default 0,
+											bloggroup_perm_properties tinyint NOT NULL default 0,
+											bloggroup_perm_media_upload tinyint NOT NULL default 0,
+											bloggroup_perm_media_browse tinyint NOT NULL default 0,
+											bloggroup_perm_media_change tinyint NOT NULL default 0,
+											PRIMARY KEY bloggroup_pk (bloggroup_blog_ID,bloggroup_group_ID) )" );
+			echo "OK.<br />\n";
+
 
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
@@ -749,7 +874,7 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9100' );
 	}
 
-	if( $old_db_version < 9200 )
+	if( $old_db_version < 9190 ) // Note: changed from 9200, to include the block below, if DB is not yet on 1.8
 	{	// 1.8 ALPHA (block #2)
 		echo 'Altering Posts table... ';
 		$DB->query( "ALTER TABLE T_posts
@@ -757,15 +882,172 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
-		set_upgrade_checkpoint( '9200' );
+		set_upgrade_checkpoint( '9190' );
 	}
 
+	if( $old_db_version < 9200 )
+	{ // 1.8 ALPHA (block #3) - The payload that db_delta() handled before
+
+		// This is a fix, which broke upgrade to 1.8 (from 1.6) in MySQL strict mode (inserted after 1.8 got released!):
+		if( $DB->get_row( 'SHOW COLUMNS FROM T_hitlog LIKE "hit_referer_type"' ) )
+		{ // a niiiiiiiice extra check :p
+			echo 'Deleting all "spam" hitlog entries... ';
+			$DB->query( '
+					DELETE FROM T_hitlog
+					 WHERE hit_referer_type = "spam"' );
+			echo "OK.<br />\n";
+		}
+
+		// TODO: change to "regular" output schema
+		foreach( array (
+				0 => 'ALTER TABLE T_users CHANGE COLUMN user_firstname user_firstname varchar(50) NULL',
+				1 => 'ALTER TABLE T_users CHANGE COLUMN user_lastname user_lastname varchar(50) NULL',
+				2 => 'ALTER TABLE T_users CHANGE COLUMN user_nickname user_nickname varchar(50) NULL',
+				3 => 'ALTER TABLE T_users CHANGE COLUMN user_icq user_icq int(11) unsigned NULL',
+				4 => 'ALTER TABLE T_users CHANGE COLUMN user_email user_email varchar(255) NOT NULL',
+				5 => 'ALTER TABLE T_users CHANGE COLUMN user_url user_url varchar(255) NULL',
+				6 => 'ALTER TABLE T_users CHANGE COLUMN user_ip user_ip varchar(15) NULL',
+				7 => 'ALTER TABLE T_users CHANGE COLUMN user_domain user_domain varchar(200) NULL',
+				8 => 'ALTER TABLE T_users CHANGE COLUMN user_browser user_browser varchar(200) NULL',
+				9 => 'ALTER TABLE T_users CHANGE COLUMN user_aim user_aim varchar(50) NULL',
+				10 => 'ALTER TABLE T_users CHANGE COLUMN user_msn user_msn varchar(100) NULL',
+				11 => 'ALTER TABLE T_users CHANGE COLUMN user_yim user_yim varchar(50) NULL',
+				12 => 'ALTER TABLE T_users ADD COLUMN user_allow_msgform TINYINT NOT NULL DEFAULT \'1\' AFTER user_idmode',
+				13 => 'ALTER TABLE T_users ADD COLUMN user_validated TINYINT(1) NOT NULL DEFAULT 0 AFTER user_grp_ID',
+				14 => 'ALTER TABLE T_blogs CHANGE COLUMN blog_media_subdir blog_media_subdir VARCHAR( 255 ) NULL',
+				15 => 'ALTER TABLE T_blogs CHANGE COLUMN blog_media_fullpath blog_media_fullpath VARCHAR( 255 ) NULL',
+				16 => 'ALTER TABLE T_blogs CHANGE COLUMN blog_media_url blog_media_url VARCHAR( 255 ) NULL',
+				17 => 'CREATE TABLE T_coll_settings (
+															cset_coll_ID INT(11) UNSIGNED NOT NULL,
+															cset_name    VARCHAR( 30 ) NOT NULL,
+															cset_value   VARCHAR( 255 ) NULL,
+															PRIMARY KEY ( cset_coll_ID, cset_name )
+											)',
+				18 => 'ALTER TABLE T_posts CHANGE COLUMN post_content post_content          text NULL',
+				19 => 'ALTER TABLE T_posts CHANGE COLUMN post_url post_url              VARCHAR(255) NULL DEFAULT NULL',
+				20 => 'ALTER TABLE T_posts CHANGE COLUMN post_renderers post_renderers        TEXT NOT NULL',
+				21 => 'ALTER TABLE T_comments CHANGE COLUMN comment_author_email comment_author_email varchar(255) NULL',
+				22 => 'ALTER TABLE T_comments CHANGE COLUMN comment_author_url comment_author_url varchar(255) NULL',
+				23 => 'ALTER TABLE T_comments ADD COLUMN comment_spam_karma TINYINT NULL AFTER comment_karma',
+				24 => 'ALTER TABLE T_comments ADD COLUMN comment_allow_msgform TINYINT NOT NULL DEFAULT \'0\' AFTER comment_spam_karma',
+				25 => 'ALTER TABLE T_hitlog CHANGE COLUMN hit_referer_type hit_referer_type   ENUM(\'search\',\'blacklist\',\'referer\',\'direct\') NOT NULL',
+				26 => 'ALTER TABLE T_hitlog ADD COLUMN hit_agnt_ID        INT UNSIGNED NULL AFTER hit_remote_addr',
+				27 => 'ALTER TABLE T_links ADD INDEX link_itm_ID( link_itm_ID )',
+				28 => 'ALTER TABLE T_links ADD INDEX link_dest_itm_ID (link_dest_itm_ID)',
+				29 => 'CREATE TABLE T_filetypes (
+															ftyp_ID int(11) unsigned NOT NULL auto_increment,
+															ftyp_extensions varchar(30) NOT NULL,
+															ftyp_name varchar(30) NOT NULL,
+															ftyp_mimetype varchar(50) NOT NULL,
+															ftyp_icon varchar(20) default NULL,
+															ftyp_viewtype varchar(10) NOT NULL,
+															ftyp_allowed tinyint(1) NOT NULL default 0,
+															PRIMARY KEY (ftyp_ID)
+											)',
+				30 => 'ALTER TABLE T_plugins CHANGE COLUMN plug_priority plug_priority        TINYINT NOT NULL default 50',
+				31 => 'ALTER TABLE T_plugins ADD COLUMN plug_code            VARCHAR(32) NULL AFTER plug_classname',
+				32 => 'ALTER TABLE T_plugins ADD COLUMN plug_apply_rendering ENUM( \'stealth\', \'always\', \'opt-out\', \'opt-in\', \'lazy\', \'never\' ) NOT NULL DEFAULT \'never\' AFTER plug_code',
+				33 => 'ALTER TABLE T_plugins ADD COLUMN plug_version         VARCHAR(42) NOT NULL default \'0\' AFTER plug_apply_rendering',
+				34 => 'ALTER TABLE T_plugins ADD COLUMN plug_status          ENUM( \'enabled\', \'disabled\', \'needs_config\', \'broken\' ) NOT NULL AFTER plug_version',
+				35 => 'ALTER TABLE T_plugins ADD COLUMN plug_spam_weight     TINYINT UNSIGNED NOT NULL DEFAULT 1 AFTER plug_status',
+				36 => 'ALTER TABLE T_plugins ADD UNIQUE plug_code( plug_code )',
+				37 => 'ALTER TABLE T_plugins ADD INDEX plug_status( plug_status )',
+				38 => 'CREATE TABLE T_pluginsettings (
+															pset_plug_ID INT(11) UNSIGNED NOT NULL,
+															pset_name VARCHAR( 30 ) NOT NULL,
+															pset_value TEXT NULL,
+															PRIMARY KEY ( pset_plug_ID, pset_name )
+											)',
+				39 => 'CREATE TABLE T_pluginusersettings (
+															puset_plug_ID INT(11) UNSIGNED NOT NULL,
+															puset_user_ID INT(11) UNSIGNED NOT NULL,
+															puset_name VARCHAR( 30 ) NOT NULL,
+															puset_value TEXT NULL,
+															PRIMARY KEY ( puset_plug_ID, puset_user_ID, puset_name )
+											)',
+				40 => 'CREATE TABLE T_pluginevents(
+															pevt_plug_ID INT(11) UNSIGNED NOT NULL,
+															pevt_event VARCHAR(40) NOT NULL,
+															pevt_enabled TINYINT NOT NULL DEFAULT 1,
+															PRIMARY KEY( pevt_plug_ID, pevt_event )
+											)',
+				41 => 'CREATE TABLE T_cron__task(
+												 ctsk_ID              int(10) unsigned      not null AUTO_INCREMENT,
+												 ctsk_start_datetime  datetime              not null,
+												 ctsk_repeat_after    int(10) unsigned,
+												 ctsk_name            varchar(50)           not null,
+												 ctsk_controller      varchar(50)           not null,
+												 ctsk_params          text,
+												 primary key (ctsk_ID)
+											)',
+				42 => 'CREATE TABLE T_cron__log(
+															 clog_ctsk_ID              int(10) unsigned   not null,
+															 clog_realstart_datetime   datetime           not null,
+															 clog_realstop_datetime    datetime,
+															 clog_status               enum(\'started\',\'finished\',\'error\',\'timeout\') not null default \'started\',
+															 clog_messages             text,
+															 primary key (clog_ctsk_ID)
+											)',
+
+				// This is "DEFAULT 1" in the 0.9.0.11 dump.. - changed in 0.9.2?!
+				43 => 'ALTER TABLE evo_blogs ALTER COLUMN blog_allowpingbacks SET DEFAULT 0',
+
+			) as $query )
+		{
+			$DB->query($query);
+		}
+
+		set_upgrade_checkpoint( '9200' ); // at 1.8 "Summer Beta" release
+	}
+
+
+	// 1.9:
 	if( $old_db_version < 9300 )
 	{
-		global $Settings;
+		echo 'Post-fix hit_referer_type == NULL... ';
+		// If you've upgraded from 1.6 to 1.8 and it did not break because of strict mode, there are now NULL values for what "spam" was:
+		$DB->query( '
+					DELETE FROM T_hitlog
+					 WHERE hit_referer_type IS NULL' );
+		echo "OK.<br />\n";
+
+		echo 'Marking administrator accounts as validated... ';
+		$DB->query( '
+				UPDATE T_users
+				   SET user_validated = 1
+				 WHERE user_grp_ID = 1' );
+		echo "OK.<br />\n";
+
+		echo 'Converting auto_prune_stats setting... ';
+		$old_auto_prune_stats = $DB->get_var( '
+				SELECT set_value
+				  FROM T_settings
+				 WHERE set_name = "auto_prune_stats"' );
+		if( ! is_null($old_auto_prune_stats) && $old_auto_prune_stats < 1 )
+		{ // This means it has been disabled before, so set auto_prune_stats_mode to "off"!
+			$DB->query( '
+					REPLACE INTO T_settings ( set_name, set_value )
+					 VALUES ( "auto_prune_stats_mode", "off" )' );
+		}
+		echo "OK.<br />\n";
+
 		echo 'Converting time_difference from hours to seconds... ';
 		$DB->query( 'UPDATE T_settings SET set_value = set_value*3600 WHERE set_name = "time_difference"' );
 		echo "OK.<br />\n";
+
+
+		// TODO: change to "regular" output schema
+		foreach(
+			array (
+				0 => 'ALTER TABLE T_useragents ADD INDEX agnt_type ( agnt_type )',
+				1 => 'ALTER TABLE T_hitlog CHANGE COLUMN hit_referer_type hit_referer_type   ENUM(\'search\',\'blacklist\',\'referer\',\'direct\',\'self\',\'admin\') NOT NULL',
+				2 => 'ALTER TABLE T_hitlog ADD INDEX hit_agnt_ID ( hit_agnt_ID )',
+				3 => 'ALTER TABLE T_plugins CHANGE COLUMN plug_status plug_status          ENUM( \'enabled\', \'disabled\', \'needs_config\', \'install\', \'broken\' ) NOT NULL',
+				4 => 'ALTER TABLE T_plugins ADD COLUMN plug_classpath       VARCHAR(255) NULL default NULL AFTER plug_classname',
+			) as $query )
+		{
+			$DB->query($query);
+		}
 	}
 
 
@@ -821,63 +1103,20 @@ function upgrade_b2evo_tables()
 	 */
 
 
-	/*
-	 * Since $new_db_version == 9100 (Phoenix-Beta) we alter the existing tables to match our
-	 * scheme here. (Except for renaming table column names - see above).
-	 *
-	 * It is easy:
-	 * - To change DB table layout, alter $schema_queries in /install/_db_schema.inc.php.
-	 *
-	 * - To insert default data, add it to the corresponding block in
-	 *   install_insert_default_data() (/install/_db_schema.inc.php).
-	 */
-
-	// Alter DB to match DB schema:
-	// TODO: This could be made interactive! Like "the following queries have to be done" and a possibility to abort
-	install_make_db_schema_current( true );
-
-
-	if( $old_db_version < 9300 )
-	{ // This has to go here, because it uses fields, that are created through install_make_db_schema_current():
-// TODO: this will FAIL eventually because there will be an upgrade checkpoint created earlier. It would be better to manually add the field and do everything above.
-// Problem is: at which version exactly?
-// dh> I don't get it.. the upgrade checkpoint gets created below...
-//     IMHO it only adds complexity to have two db_version pointers.
-//     Manually adding the DB field before calling install_make_db_schema_current() seems to be the cleanest solution,
-//     so this extra block here is not needed.
-// Alternative: having 2 db_version pointers, one for pre-processing and one for post-processing.
-		echo 'Marking administrator accounts as validated... ';
-		$DB->query( '
-				UPDATE T_users
-				   SET user_validated = 1
-				 WHERE user_grp_ID = 1' );
-		echo "OK.<br />\n";
-
-		echo 'Converting auto_prune_stats setting... ';
-		$old_auto_prune_stats = $DB->get_var( '
-				SELECT set_value
-				  FROM T_settings
-				 WHERE set_name = "auto_prune_stats"' );
-		if( ! is_null($old_auto_prune_stats) && $old_auto_prune_stats < 1 )
-		{ // This means it has been disabled before, so set auto_prune_stats_mode to "off"!
-			$DB->query( '
-					REPLACE INTO T_settings ( set_name, set_value )
-					 VALUES ( "auto_prune_stats_mode", "off" )' );
-		}
-		echo "OK.<br />\n";
-	}
-
-
 	// Insert default values, but only those since Phoenix-Alpha:
 	// TODO: cleanup/move previous upgrade instructions (data inserts) from above to install_insert_default_data()?!
 	$db_version_ge_8999 = ( $old_db_version >= 8999 ? $old_db_version : 8999 );
 	install_insert_default_data( $db_version_ge_8999 );
 
 
-	// Update DB schema version to $new_db_version
-	set_upgrade_checkpoint( $new_db_version );
+	if( $old_db_version != $new_db_version )
+	{
+		// Update DB schema version to $new_db_version
+		set_upgrade_checkpoint( $new_db_version );
+	}
 
 
+	// TODO: Move this!?
 	if( $old_db_version < 9100 )
 	{ // Create (EXPERIMENTAL) relations, only if upgrading to Phoenix-Beta:
 		// TODO: this should/could get handled by db_delta(), by adding it to the "normal" DB schema, if requested.
@@ -886,12 +1125,90 @@ function upgrade_b2evo_tables()
 		install_basic_plugins();
 	}
 
+
+	// Check DB schema:
+	$upgrade_db_deltas = array(); // This holds changes to make, if any (just all queries)
+
+	foreach( $schema_queries as $table => $query_info )
+	{
+		foreach( db_delta( $query_info[1], array('drop_column', 'drop_index') ) as $table => $queries )
+		{
+			foreach( $queries as $qinfo )
+			{
+				foreach( $qinfo['queries'] as $query )
+				{ // subqueries for this query (usually one, but may include required other queries)
+					$upgrade_db_deltas[] = $query;
+				}
+			}
+		}
+	}
+
+	if( ! empty($upgrade_db_deltas) )
+	{
+		// delta queries have to be confirmed or executed now..
+
+		$confirmed_db_upgrade = param('confirmed', 'integer', 0); // force confirmation
+		$upgrade_db_deltas_confirm_md5 = param( 'upgrade_db_deltas_confirm_md5', 'string', '' );
+
+		if( ! $confirmed_db_upgrade )
+		{
+			if( ! empty($upgrade_db_deltas_confirm_md5) )
+			{ // received confirmation from form
+				if( $upgrade_db_deltas_confirm_md5 != md5( implode('', $upgrade_db_deltas) ) )
+				{ // unlikely to happen
+					echo '<p class="error">'
+						.T_('The DB schema has been changed since confirmation.')
+						.'</p>';
+				}
+				else
+				{
+					$confirmed_db_upgrade = true;
+				}
+			}
+		}
+
+		if( ! $confirmed_db_upgrade )
+		{
+			global $action, $locale;
+			require_once $inc_path.'_misc/_form.class.php';
+			$Form = & new Form( NULL, '', 'post' );
+			$Form->begin_form( 'fform', T_('Upgrade database') );
+			$Form->begin_fieldset();
+			$Form->hidden( 'upgrade_db_deltas_confirm_md5', md5(implode( '', $upgrade_db_deltas )) );
+			$Form->hidden( 'action', $action );
+			$Form->hidden( 'locale', $locale );
+
+
+			echo '<p>'.T_('The version number is correct, but we have detected changes in the database schema. This can happen with CVS versions...').'</p>';
+
+			echo '<p>'.T_('The following database changes will be carried out. If you are not sure what this means, it will probably be alright.').'</p>';
+
+			echo '<ul>';
+			foreach( $upgrade_db_deltas as $l_delta )
+			{
+				#echo '<li><code>'.nl2br($l_delta).'</code></li>';
+				echo '<li><pre>'.str_replace( "\t", '  ', $l_delta ).'</pre></li>';
+			}
+			echo '</ul>';
+			$Form->submit( array( '', T_('Upgrade database!'), 'ActionButton' ) );
+			$Form->end_form();
+
+			return false;
+		}
+
+		// Alter DB to match DB schema:
+		install_make_db_schema_current( true );
+	}
+
 	return true;
 }
 
 
 /*
  * $Log$
+ * Revision 1.156  2006/08/03 01:55:24  blueyed
+ * Fixed upgrade procedure according to "the plan" (as told by François by email).
+ *
  * Revision 1.155  2006/07/08 13:33:54  blueyed
  * Autovalidate admin group instead of primary admin user only.
  * Also delegate to req_validatemail action on failure directly instead of providing a link.
