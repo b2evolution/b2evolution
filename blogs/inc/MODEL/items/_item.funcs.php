@@ -243,115 +243,124 @@ function link_pages( $before='#', $after='#', $next_or_number='number', $nextpag
 
 /**
  * previous_post(-)
- * @todo Move to ItemList?!
+ * @todo Move to ItemList or Item?! - see WP's previous_post_link() for param ideas (using $link instead of $previous and $title). Also, use booleans of course!
+ *       $in_same_blog would also be useful!
  */
 function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='no', $limitprev=1, $excluded_categories='')
 {
-	if( $previous == '#' ) $previous = T_('Previous post') . ': ';
+	global $disp, $posts;
+	if( $disp != 'single' && $posts != 1 )
+	{
+		return;
+	}
 
 	global $DB, $postdata;
-	global $disp, $posts;
 	global $ItemCache, $Blog;
 
-	if( $disp == 'single' || $posts == 1 )
+	if( $previous == '#' ) $previous = T_('Previous post') . ': ';
+
+	$current_post_date = $postdata['Date'];
+	$current_category = $postdata['Category'];
+
+	$sqlcat = '';
+	if ($in_same_cat != 'no') {
+		$sqlcat = " AND post_main_cat_ID = $current_category ";
+	}
+
+	$sql_exclude_cats = '';
+	if (!empty($excluded_categories)) {
+		$blah = explode('and', $excluded_categories);
+		foreach($blah as $category) {
+			$category = intval($category);
+			$sql_exclude_cats .= " AND post_main_cat_ID <> $category";
+		}
+	}
+
+	$limitprev--;
+	$sql = "SELECT post_ID, post_title
+					FROM T_posts
+					WHERE post_datestart < '$current_post_date'
+						$sqlcat
+						$sql_exclude_cats
+					ORDER BY post_datestart DESC
+					LIMIT $limitprev, 1";
+
+	if( $p_info = $DB->get_row( $sql ) )
 	{
+		$Item = & $ItemCache->get_by_ID($p_info->post_ID);
 
-		$current_post_date = $postdata['Date'];
-		$current_category = $postdata['Category'];
-
-		$sqlcat = '';
-		if ($in_same_cat != 'no') {
-			$sqlcat = " AND post_main_cat_ID = $current_category ";
+		$blog_url = $in_same_cat ? $Blog->get('url') : '';
+		$string = '<a href="'.$Item->get_permanent_url('', $blog_url).'">'.$previous;
+		if( $title == 'yes' ) {
+			$string .= $p_info->post_title;
 		}
-
-		$sql_exclude_cats = '';
-		if (!empty($excluded_categories)) {
-			$blah = explode('and', $excluded_categories);
-			foreach($blah as $category) {
-				$category = intval($category);
-				$sql_exclude_cats .= " AND post_main_cat_ID <> $category";
-			}
-		}
-
-		$limitprev--;
-		$sql = "SELECT post_ID, post_title
-						FROM T_posts
-						WHERE post_datestart < '$current_post_date'
-							$sqlcat
-							$sql_exclude_cats
-						ORDER BY post_datestart DESC
-						LIMIT $limitprev, 1";
-
-		if( $p_info = $DB->get_row( $sql ) )
-		{
-			$Item = & $ItemCache->get_by_ID($p_info->post_ID);
-
-			$string = '<a href="'.$Item->get_permanent_url('', $Blog->get('url')).'">'.$previous;
-			if( $title == 'yes' ) {
-				$string .= $p_info->post_title;
-			}
-			$string .= '</a>';
-			$format = str_replace('%',$string,$format);
-			echo $format;
-		}
+		$string .= '</a>';
+		$format = str_replace('%',$string,$format);
+		echo $format;
 	}
 }
 
 
 /**
  * next_post(-)
- * @todo Move to ItemList?!
+ * @todo Move to ItemList or Item?! - see WP's previous_post_link() for param ideas (using $link instead of $next and $title). Also, use booleans of course!
+ *       $in_same_blog would also be useful!
  */
 function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $limitnext=1, $excluded_categories='')
 {
-	if( $next == '#' ) $next = T_('Next post') . ': ';
+	global $disp, $posts;
 
-	global $disp, $posts, $postdata, $localtimenow, $DB;
+	if( $disp != 'single' && $posts != 1 )
+	{
+		return;
+	}
+
+	global $postdata, $localtimenow, $DB;
 	global $ItemCache, $Blog;
 
-	if( $disp == 'single' || $posts == 1 )
+	if( $next == '#' ) $next = T_('Next post') . ': ';
+
+	$current_post_date = $postdata['Date'];
+	$current_category = $postdata['Category'];
+	$sqlcat = '';
+	if ($in_same_cat != 'no')
 	{
-		$current_post_date = $postdata['Date'];
-		$current_category = $postdata['Category'];
-		$sqlcat = '';
-		if ($in_same_cat != 'no')
-		{
-			$sqlcat = " AND post_main_cat_ID = $current_category ";
+		$sqlcat = " AND post_main_cat_ID = $current_category ";
+	}
+
+	$sql_exclude_cats = '';
+	if (!empty($excluded_categories)) {
+		$blah = explode('and', $excluded_categories);
+		foreach($blah as $category) {
+			$category = intval($category);
+			$sql_exclude_cats .= " AND post_main_cat_ID != $category";
 		}
+	}
 
-		$sql_exclude_cats = '';
-		if (!empty($excluded_categories)) {
-			$blah = explode('and', $excluded_categories);
-			foreach($blah as $category) {
-				$category = intval($category);
-				$sql_exclude_cats .= " AND post_main_cat_ID != $category";
-			}
+	$now = date('Y-m-d H:i:s', $localtimenow );
+
+	$limitnext--;
+	$sql = "SELECT post_ID, post_title
+					FROM T_posts
+					WHERE post_datestart > '$current_post_date'
+						AND post_datestart < '$now'
+						$sqlcat
+						$sql_exclude_cats
+					ORDER BY post_datestart ASC
+					LIMIT $limitnext, 1";
+
+	if( $p_info = $DB->get_row( $sql ) )
+	{
+		$Item = & $ItemCache->get_by_ID($p_info->post_ID);
+
+		$blog_url = $in_same_cat ? $Blog->get('url') : '';
+		$string = '<a href="'.$Item->get_permanent_url('', $blog_url).'">'.$next;
+		if ($title=='yes') {
+			$string .= $p_info->post_title;
 		}
-
-		$now = date('Y-m-d H:i:s', $localtimenow );
-
-		$limitnext--;
-		$sql = "SELECT post_ID, post_title
-						FROM T_posts
-						WHERE post_datestart > '$current_post_date'
-							AND post_datestart < '$now'
-							$sqlcat
-							$sql_exclude_cats
-						ORDER BY post_datestart ASC
-						LIMIT $limitnext, 1";
-
-		if( $p_info = $DB->get_row( $sql ) )
-		{
-			$Item = & $ItemCache->get_by_ID($p_info->post_ID);
-
-			$string = '<a href="'.$Item->get_permanent_url('', $Blog->get('url')).'">'.$next;
-			if ($title=='yes') {
-				$string .= $p_info->post_title;
-			}
-			$string .= '</a>';
-			$format = str_replace('%',$string,$format);
-			echo $format;
-		}
+		$string .= '</a>';
+		$format = str_replace('%',$string,$format);
+		echo $format;
 	}
 }
 
@@ -756,8 +765,6 @@ function cat_select( $display_info = true, $form_fields = true )
 	global $default_main_cat, $allow_cross_posting, $cache_blogs, $cache_categories,
 					$blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
 
-	global $post_extracats, $Request;
-
 	$r = '<div class="extracats">';
 
 	if( $display_info )
@@ -938,6 +945,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.15  2006/08/03 18:22:49  blueyed
+ * next_post()/prev_post(): only use current blog URL, if "in_same_cat".
+ *
  * Revision 1.14  2006/08/01 22:27:34  blueyed
  * Fixed next_post()/previous_post(): use permanent URL, based on current Blog (clean URLs). Also check for disp==single instead of "p", which does not work when a post has been selected by title (param).
  *
