@@ -86,6 +86,17 @@ class UpgradeToCurrentTestCase extends InstallUnitTestCase
 		$this->test_DB->query( 'SET sql_mode = "TRADITIONAL"' );
 		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 1.6 in strict mode successful!' );
 	}
+
+
+	/**
+	 * Test upgrade from 1.8 (Summer Beta) ("strict" MySQL mode)
+	 */
+	function testUpgradeFrom1_8_strict()
+	{
+		$this->createTablesFor1_8();
+		$this->test_DB->query( 'SET sql_mode = "TRADITIONAL"' );
+		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 1.8 in strict mode successful!' );
+	}
 }
 
 

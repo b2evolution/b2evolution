@@ -37,7 +37,7 @@ class DbUnitTestCase extends EvoUnitTestCase
 			die( 'Please set the DB name to use for tests in /tests/config.php or /tests/config.OVERRIDE.php. See $testDB_conf there..' );
 		}
 
-		$this->test_DB = new DB( $testDB_conf );
+		$this->test_DB = new DbUnitTestCase_DB( $testDB_conf );
 		$this->test_DB->halt_on_error = false;
 	}
 
@@ -110,9 +110,16 @@ class DbUnitTestCase extends EvoUnitTestCase
 			$testDbTables = array_merge( $testDbTables, $test_tables );
 		}
 
-		$drop_query = 'DROP TABLE IF EXISTS '.implode( ', ', $testDbTables );
+		$old_fk_check = $this->test_DB->get_var( 'SELECT @@FOREIGN_KEY_CHECKS' );
+		$this->test_DB->query( 'SET FOREIGN_KEY_CHECKS = 0;' );
 
+		$drop_query = 'DROP TABLE IF EXISTS '.implode( ', ', $testDbTables );
 		$this->test_DB->query( $drop_query );
+
+		if( ! empty($old_fk_check) )
+		{
+			$this->test_DB->query( 'SET FOREIGN_KEY_CHECKS = '.$old_fk_check.';' );
+		}
 	}
 
 
@@ -142,6 +149,32 @@ class DbUnitTestCase extends EvoUnitTestCase
 	function createTablesFor1_6()
 	{
 		$this->executeQueriesFromFile( TESTSDIR.'install/sql/b2evolution_v-1-6.default.sql' );
+	}
+
+
+	/**
+	 * Creates the default tables for b2evolution 1.8.
+	 */
+	function createTablesFor1_8()
+	{
+		$this->executeQueriesFromFile( TESTSDIR.'install/sql/b2evolution_v-1-8.default.sql' );
+	}
+}
+
+
+/**
+ * Extends {@link DB} class to output backtraces in case of error
+ */
+class DbUnitTestCase_DB extends DB
+{
+	/**
+	 * Append a backtrace to any query errors.
+	 */
+	function print_error( $str = '', $query_title = '' )
+	{
+		parent::print_error($str, $query_title);
+
+		echo debug_get_backtrace(NULL, array( 'function' => 'print_error' ));
 	}
 }
 
