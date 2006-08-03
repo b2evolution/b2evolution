@@ -90,8 +90,7 @@ $timeout_online_user = 300; // Default: 5 minutes (300s).
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
 if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $baseurl, $matches ) )
 {
-	// TODO: shouldn't that include a trailing slash?:
-	$baseurlroot = $matches[1];
+	$baseurlroot = $matches[1]; // no ending slash!
 	// echo "baseurlroot=$baseurlroot <br />";
 	$basehost = $matches[2];
 	// echo "basehost=$basehost <br />";
