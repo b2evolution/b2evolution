@@ -73,10 +73,23 @@
 		<a id="pingbacks"></a>
 	<?php } ?>
 
-	<?php if( $disp_trackback_url ) {	// We want to display the trackback URL: ?>
-	<h4><?php echo T_('Trackback address for this post:') ?></h4>
-	<code><?php $Item->trackback_url() ?></code>
-	<?php } ?>
+	<?php
+	if( $disp_trackback_url )
+	{	// We want to display the trackback URL:
+		?>
+		<h4><?php echo T_('Trackback address for this post:') ?></h4>
+		<?php
+		/*
+		 * Trigger plugin event, which could display a captcha form, before generating a whitelisted URL:
+		 */
+		if( ! $Plugins->trigger_event_first_true( 'DisplayTrackbackAddr', array('Item' => & $Item, 'template' => '<code>%url%</code>') ) )
+		{ // No plugin displayed a payload, so we just display the default:
+			?>
+			<code><?php $Item->trackback_url() ?></code>
+			<?php
+		}
+	}
+	?>
 
 	<?php
 	if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )

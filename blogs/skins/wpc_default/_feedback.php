@@ -82,8 +82,20 @@
 	}
 
 	if( $disp_trackback_url )
-	{	// We want to display the trackback URL: ?>
-		<p><?php echo T_("The <acronym title=\"Uniform Resource Identifier\">URI</acronym> to TrackBack this entry is:"); ?> <em><?php $Item->trackback_url() ?></em></p>
+	{	// We want to display the trackback URL:
+		?>
+		<p><?php echo T_("The <acronym title=\"Uniform Resource Identifier\">URI</acronym> to TrackBack this entry is:");
+		/*
+		 * Trigger plugin event, which could display a captcha form, before generating a whitelisted URL:
+		 */
+		if( ! $Plugins->trigger_event_first_true( 'DisplayTrackbackAddr', array('Item' => & $Item, 'template' => '<em>%url%</em>') ) )
+		{ // No plugin displayed a payload, so we just display the default:
+			?>
+			<em><?php $Item->trackback_url() ?></em>
+			<?php
+		}
+		?>
+		</p>
 		<?php
 	}
 

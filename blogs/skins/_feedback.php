@@ -81,8 +81,7 @@ if( $disp_trackback_url )
 	/*
 	 * Trigger plugin event, which could display a captcha form, before generating a whitelisted URL:
 	 */
-	if( ! $Plugins->trigger_event_first_true( 'DisplayTrackbackAddr',
-			array('Item' => & $Item, 'template' => '<code>%url%</code>') ) )
+	if( ! $Plugins->trigger_event_first_true( 'DisplayTrackbackAddr', array('Item' => & $Item, 'template' => '<code>%url%</code>') ) )
 	{ // No plugin displayed a payload, so we just display the default:
 		?>
 		<code><?php $Item->trackback_url() ?></code>
@@ -310,6 +309,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.77  2006/08/04 23:36:33  blueyed
+ * Added DisplayTrackbackAddr hook to all skins.
+ *
  * Revision 1.76  2006/07/26 17:15:45  blueyed
  * Replaced "name" attribute with "id" for anchors
  *
