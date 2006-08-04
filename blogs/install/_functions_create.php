@@ -49,6 +49,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function create_b2evo_tables()
 {
 	global $inc_path;
+	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
+	global $DB;
 
 	require_once dirname(__FILE__).'/_db_schema.inc.php';
 	require_once $inc_path.'_misc/_upgrade.funcs.php';
@@ -57,36 +59,8 @@ function create_b2evo_tables()
 	install_make_db_schema_current( true );
 
 	// Insert all default data:
-	install_insert_default_data(0);
 
-	// Create relations:
-	create_b2evo_relations();
-
-	return true;
-}
-
-
-/**
- * Used only when upgrading to 0.8.7 or later.
- *
- * @deprecated Table layout gets handled by {@link db_delta()} and defaults are present in {@link install_insert_default_data()}.
- *
- */
-function create_antispam()
-{
-	global $DB;
-
-	echo 'Creating table for Antispam Blackist... ';
-	$query = "CREATE TABLE T_antispam (
-		aspm_ID bigint(11) NOT NULL auto_increment,
-		aspm_string varchar(80) NOT NULL,
-		aspm_source enum( 'local','reported','central' ) NOT NULL default 'reported',
-		PRIMARY KEY aspm_ID (aspm_ID),
-		UNIQUE aspm_string (aspm_string)
-	)";
-	$DB->query( $query );
-	echo "OK.<br />\n";
-
+	// upgrade to 0.8.7
 	echo 'Creating default blacklist entries... ';
 	$query = "INSERT INTO T_antispam(aspm_string) VALUES ".
 	"('penis-enlargement'), ('online-casino'), ".
@@ -97,6 +71,112 @@ function create_antispam()
 	"('paris-hilton'), ('parishilton'), ('camgirls'), ('adult-models')";
 	$DB->query( $query );
 	echo "OK.<br />\n";
+
+
+	// upgrade to 0.8.9
+	echo 'Creating default groups... ';
+	$Group_Admins = new Group(); // COPY !
+	$Group_Admins->set( 'name', 'Administrators' );
+	$Group_Admins->set( 'perm_admin', 'visible' );
+	$Group_Admins->set( 'perm_blogs', 'editall' );
+	$Group_Admins->set( 'perm_stats', 'edit' );
+	$Group_Admins->set( 'perm_spamblacklist', 'edit' );
+	$Group_Admins->set( 'perm_files', 'edit' );
+	$Group_Admins->set( 'perm_options', 'edit' );
+	$Group_Admins->set( 'perm_templates', 1 );
+	$Group_Admins->set( 'perm_users', 'edit' );
+	$Group_Admins->dbinsert();
+
+	$Group_Privileged = new Group(); // COPY !
+	$Group_Privileged->set( 'name', 'Privileged Bloggers' );
+	$Group_Privileged->set( 'perm_admin', 'visible' );
+	$Group_Privileged->set( 'perm_blogs', 'viewall' );
+	$Group_Privileged->set( 'perm_stats', 'view' );
+	$Group_Privileged->set( 'perm_spamblacklist', 'edit' );
+	$Group_Privileged->set( 'perm_files', 'add' );
+	$Group_Privileged->set( 'perm_options', 'view' );
+	$Group_Privileged->set( 'perm_templates', 0 );
+	$Group_Privileged->set( 'perm_users', 'view' );
+	$Group_Privileged->dbinsert();
+
+	$Group_Bloggers = new Group(); // COPY !
+	$Group_Bloggers->set( 'name', 'Bloggers' );
+	$Group_Bloggers->set( 'perm_admin', 'visible' );
+	$Group_Bloggers->set( 'perm_blogs', 'user' );
+	$Group_Bloggers->set( 'perm_stats', 'none' );
+	$Group_Bloggers->set( 'perm_spamblacklist', 'view' );
+	$Group_Bloggers->set( 'perm_files', 'view' );
+	$Group_Bloggers->set( 'perm_options', 'none' );
+	$Group_Bloggers->set( 'perm_templates', 0 );
+	$Group_Bloggers->set( 'perm_users', 'none' );
+	$Group_Bloggers->dbinsert();
+
+	$Group_Users = new Group(); // COPY !
+	$Group_Users->set( 'name', 'Basic Users' );
+	$Group_Users->set( 'perm_admin', 'none' );
+	$Group_Users->set( 'perm_blogs', 'user' );
+	$Group_Users->set( 'perm_stats', 'none' );
+	$Group_Users->set( 'perm_spamblacklist', 'none' );
+	$Group_Users->set( 'perm_files', 'none' );
+	$Group_Users->set( 'perm_options', 'none' );
+	$Group_Users->set( 'perm_templates', 0 );
+	$Group_Users->set( 'perm_users', 'none' );
+	$Group_Users->dbinsert();
+	echo "OK.<br />\n";
+
+
+	// Upgrade to Phoenix-Alpha
+	echo 'Creating default Post Types... ';
+	$DB->query( "
+		INSERT INTO T_itemtypes ( ptyp_ID, ptyp_name )
+		VALUES ( 1, 'Post' ),
+					 ( 2, 'Link' )" );
+	echo "OK.<br />\n";
+
+
+	// Upgrade to Phoenix-Beta
+	echo 'Creating default file types... ';
+	// Contribs: feel free to add more types here...
+	$DB->query( "INSERT INTO T_filetypes VALUES
+			(1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
+			(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 1),
+			(3, 'jpg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
+			(4, 'txt', 'Text file', 'text/plain', 'document.png', 'text', 1),
+			(5, 'htm html', 'HTML file', 'text/html', 'html.png', 'browser', 0),
+			(6, 'pdf', 'PDF file', 'application/pdf', 'pdf.png', 'browser', 1),
+			(7, 'doc', 'Microsoft Word file', 'application/msword', 'doc.gif', 'external', 1),
+			(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'xls.gif', 'external', 1),
+			(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 1),
+			(10, 'pps', 'Powerpoint slideshow', 'pps', 'pps.gif', 'external', 1),
+			(11, 'zip', 'Zip archive', 'application/zip', 'zip.gif', 'external', 1),
+			(12, 'php php3 php4 php5 php6', 'Php files', 'application/x-httpd-php', 'php.gif', 'download', 0)
+		" );
+	echo "OK.<br />\n";
+
+	echo 'Giving Administrator Group edit perms on files... ';
+	$DB->query( 'UPDATE T_groups
+							 SET grp_perm_files = "edit"
+							 WHERE grp_ID = 1' );
+	echo "OK.<br />\n";
+
+	echo 'Giving Administrator Group full perms on media for all blogs... ';
+	$DB->query( 'UPDATE T_coll_group_perms
+							 SET bloggroup_perm_media_upload = 1,
+									 bloggroup_perm_media_browse = 1,
+									 bloggroup_perm_media_change = 1
+							 WHERE bloggroup_group_ID = 1' );
+	echo "OK.<br />\n";
+
+
+
+
+
+	// NOTE: basic plugins get installed separatly for upgrade and install..
+
+	// Create relations:
+	create_b2evo_relations();
+
+	return true;
 }
 
 
@@ -925,6 +1005,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.193  2006/08/04 22:13:23  blueyed
+ * Finished de-abstraction
+ *
  * Revision 1.192  2006/07/23 20:18:31  fplanque
  * cleanup
  *

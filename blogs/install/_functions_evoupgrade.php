@@ -254,7 +254,27 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8040 )
 	{ // upgrade to 0.8.7
-		create_antispam();
+		echo 'Creating table for Antispam Blackist... ';
+		$query = "CREATE TABLE T_antispam (
+			aspm_ID bigint(11) NOT NULL auto_increment,
+			aspm_string varchar(80) NOT NULL,
+			aspm_source enum( 'local','reported','central' ) NOT NULL default 'reported',
+			PRIMARY KEY aspm_ID (aspm_ID),
+			UNIQUE aspm_string (aspm_string)
+		)";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+
+		echo 'Creating default blacklist entries... ';
+		$query = "INSERT INTO T_antispam(aspm_string) VALUES ".
+		"('penis-enlargement'), ('online-casino'), ".
+		"('order-viagra'), ('order-phentermine'), ('order-xenical'), ".
+		"('order-prophecia'), ('sexy-lingerie'), ('-porn-'), ".
+		"('-adult-'), ('-tits-'), ('buy-phentermine'), ".
+		"('order-cheap-pills'), ('buy-xenadrine'),	('xxx'), ".
+		"('paris-hilton'), ('parishilton'), ('camgirls'), ('adult-models')";
+		$DB->query( $query );
+		echo "OK.<br />\n";
 
 		echo 'Upgrading Settings table... ';
 		$query = "ALTER TABLE T_settings
@@ -338,6 +358,56 @@ function upgrade_b2evo_tables()
 							ADD COLUMN pref_newusers_level tinyint unsigned DEFAULT 1 NOT NULL,
 							ADD COLUMN pref_newusers_canregister tinyint unsigned DEFAULT 0 NOT NULL";
 		$DB->query( $query );
+		echo "OK.<br />\n";
+
+		echo 'Creating default groups... ';
+		$Group_Admins = new Group(); // COPY !
+		$Group_Admins->set( 'name', 'Administrators' );
+		$Group_Admins->set( 'perm_admin', 'visible' );
+		$Group_Admins->set( 'perm_blogs', 'editall' );
+		$Group_Admins->set( 'perm_stats', 'edit' );
+		$Group_Admins->set( 'perm_spamblacklist', 'edit' );
+		$Group_Admins->set( 'perm_files', 'edit' );
+		$Group_Admins->set( 'perm_options', 'edit' );
+		$Group_Admins->set( 'perm_templates', 1 );
+		$Group_Admins->set( 'perm_users', 'edit' );
+		$Group_Admins->dbinsert();
+
+		$Group_Privileged = new Group(); // COPY !
+		$Group_Privileged->set( 'name', 'Privileged Bloggers' );
+		$Group_Privileged->set( 'perm_admin', 'visible' );
+		$Group_Privileged->set( 'perm_blogs', 'viewall' );
+		$Group_Privileged->set( 'perm_stats', 'view' );
+		$Group_Privileged->set( 'perm_spamblacklist', 'edit' );
+		$Group_Privileged->set( 'perm_files', 'add' );
+		$Group_Privileged->set( 'perm_options', 'view' );
+		$Group_Privileged->set( 'perm_templates', 0 );
+		$Group_Privileged->set( 'perm_users', 'view' );
+		$Group_Privileged->dbinsert();
+
+		$Group_Bloggers = new Group(); // COPY !
+		$Group_Bloggers->set( 'name', 'Bloggers' );
+		$Group_Bloggers->set( 'perm_admin', 'visible' );
+		$Group_Bloggers->set( 'perm_blogs', 'user' );
+		$Group_Bloggers->set( 'perm_stats', 'none' );
+		$Group_Bloggers->set( 'perm_spamblacklist', 'view' );
+		$Group_Bloggers->set( 'perm_files', 'view' );
+		$Group_Bloggers->set( 'perm_options', 'none' );
+		$Group_Bloggers->set( 'perm_templates', 0 );
+		$Group_Bloggers->set( 'perm_users', 'none' );
+		$Group_Bloggers->dbinsert();
+
+		$Group_Users = new Group(); // COPY !
+		$Group_Users->set( 'name', 'Basic Users' );
+		$Group_Users->set( 'perm_admin', 'none' );
+		$Group_Users->set( 'perm_blogs', 'user' );
+		$Group_Users->set( 'perm_stats', 'none' );
+		$Group_Users->set( 'perm_spamblacklist', 'none' );
+		$Group_Users->set( 'perm_files', 'none' );
+		$Group_Users->set( 'perm_options', 'none' );
+		$Group_Users->set( 'perm_templates', 0 );
+		$Group_Users->set( 'perm_users', 'none' );
+		$Group_Users->dbinsert();
 		echo "OK.<br />\n";
 
 		set_upgrade_checkpoint( '8050' );
@@ -847,12 +917,31 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
+		echo 'Creating default Post Types... ';
+		$DB->query( "
+			INSERT INTO T_itemtypes ( ptyp_ID, ptyp_name )
+			VALUES ( 1, 'Post' ),
+			       ( 2, 'Link' )" );
+		echo "OK.<br />\n";
+
+
 		set_upgrade_checkpoint( '9000' );
 	}
 
 
 	if( $old_db_version < 9100 )
-	{	// 1.8 ALPHA (only column renames/drops):
+	{	// 1.8 ALPHA
+
+		echo 'Creating table for plugin events... ';
+		$DB->query( '
+			CREATE TABLE T_pluginevents(
+					pevt_plug_ID INT(11) UNSIGNED NOT NULL,
+					pevt_event VARCHAR(40) NOT NULL,
+					pevt_enabled TINYINT NOT NULL DEFAULT 1,
+					PRIMARY KEY( pevt_plug_ID, pevt_event )
+				)' );
+		echo "OK.<br />\n";
+
 
 		echo 'Altering Links table... ';
 		$DB->query( 'ALTER TABLE T_links
@@ -870,6 +959,63 @@ function upgrade_b2evo_tables()
 			$DB->query( $query );
 			echo "OK.<br />\n";
 		}
+
+		echo 'Creating table for file types... ';
+		$DB->query( '
+				CREATE TABLE T_filetypes (
+					ftyp_ID int(11) unsigned NOT NULL auto_increment,
+					ftyp_extensions varchar(30) NOT NULL,
+					ftyp_name varchar(30) NOT NULL,
+					ftyp_mimetype varchar(50) NOT NULL,
+					ftyp_icon varchar(20) default NULL,
+					ftyp_viewtype varchar(10) NOT NULL,
+					ftyp_allowed tinyint(1) NOT NULL default 0,
+					PRIMARY KEY (ftyp_ID)
+				)' );
+		echo "OK.<br />\n";
+
+		echo 'Creating default file types... ';
+		// Contribs: feel free to add more types here... (and in the block for new installs (create_b2evo_tables()))
+		$DB->query( "INSERT INTO T_filetypes VALUES
+				(1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
+				(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 1),
+				(3, 'jpg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
+				(4, 'txt', 'Text file', 'text/plain', 'document.png', 'text', 1),
+				(5, 'htm html', 'HTML file', 'text/html', 'html.png', 'browser', 0),
+				(6, 'pdf', 'PDF file', 'application/pdf', 'pdf.png', 'browser', 1),
+				(7, 'doc', 'Microsoft Word file', 'application/msword', 'doc.gif', 'external', 1),
+				(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'xls.gif', 'external', 1),
+				(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 1),
+				(10, 'pps', 'Powerpoint slideshow', 'pps', 'pps.gif', 'external', 1),
+				(11, 'zip', 'Zip archive', 'application/zip', 'zip.gif', 'external', 1),
+				(12, 'php php3 php4 php5 php6', 'Php files', 'application/x-httpd-php', 'php.gif', 'download', 0)
+			" );
+		echo "OK.<br />\n";
+
+		echo 'Giving Administrator Group edit perms on files... ';
+		$DB->query( 'UPDATE T_groups
+		             SET grp_perm_files = "edit"
+		             WHERE grp_ID = 1' );
+		echo "OK.<br />\n";
+
+		echo 'Giving Administrator Group full perms on media for all blogs... ';
+		$DB->query( 'UPDATE T_coll_group_perms
+		             SET bloggroup_perm_media_upload = 1,
+		                 bloggroup_perm_media_browse = 1,
+		                 bloggroup_perm_media_change = 1
+		             WHERE bloggroup_group_ID = 1' );
+		echo "OK.<br />\n";
+
+
+		if( $old_db_version >= 9000 )
+		{ // Uninstall all ALPHA (potentially incompatible) plugins
+			echo 'Uninstalling all existing plugins... ';
+			$DB->query( 'DELETE FROM T_plugins WHERE 1' );
+			echo "OK.<br />\n";
+		}
+
+		// NOTE: basic plugins get installed separatly for upgrade and install..
+
 
 		set_upgrade_checkpoint( '9100' );
 	}
@@ -934,16 +1080,6 @@ function upgrade_b2evo_tables()
 				26 => 'ALTER TABLE T_hitlog ADD COLUMN hit_agnt_ID        INT UNSIGNED NULL AFTER hit_remote_addr',
 				27 => 'ALTER TABLE T_links ADD INDEX link_itm_ID( link_itm_ID )',
 				28 => 'ALTER TABLE T_links ADD INDEX link_dest_itm_ID (link_dest_itm_ID)',
-				29 => 'CREATE TABLE T_filetypes (
-															ftyp_ID int(11) unsigned NOT NULL auto_increment,
-															ftyp_extensions varchar(30) NOT NULL,
-															ftyp_name varchar(30) NOT NULL,
-															ftyp_mimetype varchar(50) NOT NULL,
-															ftyp_icon varchar(20) default NULL,
-															ftyp_viewtype varchar(10) NOT NULL,
-															ftyp_allowed tinyint(1) NOT NULL default 0,
-															PRIMARY KEY (ftyp_ID)
-											)',
 				30 => 'ALTER TABLE T_plugins CHANGE COLUMN plug_priority plug_priority        TINYINT NOT NULL default 50',
 				31 => 'ALTER TABLE T_plugins ADD COLUMN plug_code            VARCHAR(32) NULL AFTER plug_classname',
 				32 => 'ALTER TABLE T_plugins ADD COLUMN plug_apply_rendering ENUM( \'stealth\', \'always\', \'opt-out\', \'opt-in\', \'lazy\', \'never\' ) NOT NULL DEFAULT \'never\' AFTER plug_code',
@@ -964,12 +1100,6 @@ function upgrade_b2evo_tables()
 															puset_name VARCHAR( 30 ) NOT NULL,
 															puset_value TEXT NULL,
 															PRIMARY KEY ( puset_plug_ID, puset_user_ID, puset_name )
-											)',
-				40 => 'CREATE TABLE T_pluginevents(
-															pevt_plug_ID INT(11) UNSIGNED NOT NULL,
-															pevt_event VARCHAR(40) NOT NULL,
-															pevt_enabled TINYINT NOT NULL DEFAULT 1,
-															PRIMARY KEY( pevt_plug_ID, pevt_event )
 											)',
 				41 => 'CREATE TABLE T_cron__task(
 												 ctsk_ID              int(10) unsigned      not null AUTO_INCREMENT,
@@ -1044,6 +1174,7 @@ function upgrade_b2evo_tables()
 				2 => 'ALTER TABLE T_hitlog ADD INDEX hit_agnt_ID ( hit_agnt_ID )',
 				3 => 'ALTER TABLE T_plugins CHANGE COLUMN plug_status plug_status          ENUM( \'enabled\', \'disabled\', \'needs_config\', \'install\', \'broken\' ) NOT NULL',
 				4 => 'ALTER TABLE T_plugins ADD COLUMN plug_classpath       VARCHAR(255) NULL default NULL AFTER plug_classname',
+				5 => 'ALTER TABLE evo_hitlog ADD INDEX hit_uri (hit_uri)',
 			) as $query )
 		{
 			$DB->query($query);
@@ -1102,11 +1233,6 @@ function upgrade_b2evo_tables()
 	 *   - The old column does not get removed
 	 */
 
-
-	// Insert default values, but only those since Phoenix-Alpha:
-	// TODO: cleanup/move previous upgrade instructions (data inserts) from above to install_insert_default_data()?!
-	$db_version_ge_8999 = ( $old_db_version >= 8999 ? $old_db_version : 8999 );
-	install_insert_default_data( $db_version_ge_8999 );
 
 
 	if( $old_db_version != $new_db_version )
@@ -1206,6 +1332,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.157  2006/08/04 22:13:23  blueyed
+ * Finished de-abstraction
+ *
  * Revision 1.156  2006/08/03 01:55:24  blueyed
  * Fixed upgrade procedure according to "the plan" (as told by François by email).
  *
