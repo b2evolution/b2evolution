@@ -285,6 +285,7 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 	         WHERE post_datestart < '$current_post_date'
 	               $sqlcat
 	               $sql_exclude_cats
+	           AND ".statuses_where_clause()."
 	         ORDER BY post_datestart DESC
 	         LIMIT $limitprev, 1";
 
@@ -313,10 +314,11 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 {
 	global $disp, $posts;
 
-	if( $disp != 'single' && $posts > 0 )
+	if( $disp != 'single' && $posts != 1 )
 	{
 		return;
 	}
+
 	global $postdata, $localtimenow, $DB;
 	global $ItemCache, $Blog;
 
@@ -350,6 +352,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 	           AND post_datestart < '$now'
 	               $sqlcat
 	               $sql_exclude_cats
+	           AND ".statuses_where_clause()."
 	         ORDER BY post_datestart ASC
 	          LIMIT $limitnext, 1";
 
@@ -949,6 +952,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.17  2006/08/04 15:24:31  blueyed
+ * Respect status in next_post()/previous_post() (Thanks, Austriaco)
+ *
  * Revision 1.16  2006/08/03 20:43:39  blueyed
  * Additional fix and cleanup for next_post()/previous_post()
  *
