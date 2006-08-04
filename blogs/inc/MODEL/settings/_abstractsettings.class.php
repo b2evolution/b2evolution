@@ -328,7 +328,7 @@ class AbstractSettings
 				}
 				else
 				{
-					$r = $this->get_default( $col_key1, $col_key2 );
+					$r = $this->get_default( $col_key2 );
 					$this->cache[ $col_key1 ][ $col_key2 ]->value = $r; // remember in cache
 					$this->cache[ $col_key1 ][ $col_key2 ]->dbUptodate = true;
 					$this->cache[ $col_key1 ][ $col_key2 ]->dbRemove = false;
@@ -358,7 +358,7 @@ class AbstractSettings
 				}
 				else
 				{
-					$r = $this->get_default( $col_key1, $col_key2, $col_key3 );
+					$r = $this->get_default( $col_key3 );
 					$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value = $r; // remember in cache
 					$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->dbUptodate = true;
 					$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->dbRemove = false;
@@ -703,6 +703,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.12  2006/08/04 23:27:03  blueyed
+ * Fixed getting default values.
+ *
  * Revision 1.11  2006/08/02 22:05:37  blueyed
  * Optimized performance of (Abstract)Settings, especially get().
  *
