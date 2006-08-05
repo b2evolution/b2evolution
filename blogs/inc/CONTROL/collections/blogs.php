@@ -271,7 +271,7 @@ switch( $action )
 				// TODO: It presently also allows to include ".php" files here!!
 				require $edited_Blog->get('dynfilepath');
 		}
-		$page = ob_get_contents();
+		$generated_static_page_html = ob_get_contents();
 		ob_end_clean();
 		unset( $generating_static );
 
@@ -287,7 +287,7 @@ switch( $action )
 		}
 		else
 		{ // file is writable
-			fwrite( $fp, $page );
+			fwrite( $fp, $generated_static_page_html );
 			fclose( $fp );
 			$Messages->add( sprintf( T_('Generated static file &laquo;%s&raquo;.'), $staticfilename ), 'success' );
 		}
@@ -583,6 +583,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2006/08/05 23:33:54  fplanque
+ * Fixed static page generation
+ *
  * Revision 1.15  2006/06/25 21:15:03  fplanque
  * Heavy refactoring of the user blog perms so it stays manageable with a large number of users...
  *
