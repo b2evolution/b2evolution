@@ -596,8 +596,7 @@ class ItemList extends DataObjectList
 		if( $LastItem = $LastPostList->get_item() )
 		{
 			// echo 'we have a last item';
-			$last_postdata = $LastPostList->get_postdata();	// will set $postdata;
-			$lastpostdate = $postdata['Date'];
+			$lastpostdate = $LastItem->issue_date;
 		}
 		else
 		{
@@ -868,6 +867,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.13  2006/08/05 19:21:04  fplanque
+ * merged from branch: fix for display by date
+ *
  * Revision 1.12  2006/08/01 19:47:00  blueyed
  * debug
  *
