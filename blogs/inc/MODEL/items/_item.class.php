@@ -151,7 +151,11 @@ class Item extends DataObject
 	 * @var string "open", "disabled" or "closed
 	 */
 	var $comment_status;
-	var $url;          // Should move
+	/**
+	 * External URL the item links to (if any).
+	 * @var string
+	 */
+	var $url;          // Should move. blueyed>> where? why?
 	var $typ_ID;
 	var $st_ID;
 	var $deadline = '';
@@ -455,6 +459,8 @@ class Item extends DataObject
 
 		if( empty( $blogurl ) )
 		{
+			// TODO: respect current Blog ($Blog), if it's assigned through an extra cat (do not switch blogs!)
+			//       Downside: we'd have several "permanent urls" and only one default one..
 			$this->get_Blog();
 			$blogurl = $this->Blog->gen_blogurl();
 		}
@@ -1347,8 +1353,6 @@ class Item extends DataObject
 													$zero = '#', $one = '#', $more = '#', $title='#', $status = 'published',
 													$use_popup = '#',	$hideifnone = '#', $mode = '', $blogurl = '' )
 	{
-		global $b2commentsjavascript;
-
 		switch( $type )
 		{
 			case 'feedbacks':
@@ -1407,6 +1411,8 @@ class Item extends DataObject
 
 		if( $use_popup == '#' )
 		{ // Use popups if javascript is included in page
+			global $b2commentsjavascript;
+
 			$use_popup = $b2commentsjavascript;
 		}
 
@@ -2831,6 +2837,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.74  2006/08/05 17:18:41  blueyed
+ * doc/todo
+ *
  * Revision 1.73  2006/08/02 17:06:11  blueyed
  * added "(ID #X)" to permalink's default title; doc
  *
