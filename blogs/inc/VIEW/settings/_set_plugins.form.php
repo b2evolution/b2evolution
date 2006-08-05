@@ -252,7 +252,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	<legend><?php echo T_('Installed plugins') ?></legend>
 	<?php
 	// if there happened something with a plugin_ID, apply fadeout to the row:
-	$highlight_fadeout = empty($edit_Plugin) ? array() : array( 'plug_ID'=>array($edit_Plugin->ID) );
+	$highlight_fadeout = empty($edit_Plugin) || ! is_object($edit_Plugin) /* may be error string */ ? array() : array( 'plug_ID'=>array($edit_Plugin->ID) );
 
 	$Results->display( NULL, $highlight_fadeout );
 	?>
@@ -418,6 +418,9 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 <?php
 /*
  * $Log$
+ * Revision 1.31  2006/08/05 15:26:06  blueyed
+ * Fixed possible E_NOTICE
+ *
  * Revision 1.30  2006/07/23 23:01:55  blueyed
  * cleanup
  *
