@@ -585,7 +585,7 @@ class ItemList extends DataObjectList
 	 */
 	function get_lastpostdate()
 	{
-		global $localtimenow, $postdata;
+		global $localtimenow;
 
 		// echo 'getting last post date';
 		$LastPostList = & new ItemList( $this->blog, $this->show_statuses, '', '', '', $this->cat, $this->catsel,
@@ -867,6 +867,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.14  2006/08/05 19:50:49  blueyed
+ * nuked unnecessary global
+ *
  * Revision 1.13  2006/08/05 19:21:04  fplanque
  * merged from branch: fix for display by date
  *
