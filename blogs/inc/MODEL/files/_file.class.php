@@ -728,6 +728,7 @@ class File extends DataObject
 	/**
 	 * Get the owner name of the file.
 	 *
+	 * @todo Can this be fixed for windows? filegroup() might only return 0 or 1 nad posix_getgrgid() is not available..
 	 * @return NULL|string
 	 */
 	function get_fsgroup_name()
@@ -754,6 +755,7 @@ class File extends DataObject
 	/**
 	 * Get the owner name of the file.
 	 *
+	 * @todo Can this be fixed for windows? fileowner() might only return 0 or 1 nad posix_getpwuid() is not available..
 	 * @return NULL|string
 	 */
 	function get_fsowner_name()
@@ -1336,6 +1338,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2006/08/05 17:17:59  blueyed
+ * todo for windows
+ *
  * Revision 1.14  2006/07/12 20:17:13  fplanque
  * minor
  *
