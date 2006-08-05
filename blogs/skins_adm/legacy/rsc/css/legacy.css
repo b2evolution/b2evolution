@@ -158,13 +158,14 @@ table.grouped tr.odd {
 	background-color: #ddd;
 }
 
-table.grouped tr.total,
-table.grouped th {
+table.grouped th,
+table.grouped tr.total td {
 	border-bottom: 1px solid #999;
 	border-left: 1px solid #999;
 	color: #fff;
 	background-color: #abc;
 }
+
 tr.group td {
 	color: #999;
 	background-color: #ccc;
