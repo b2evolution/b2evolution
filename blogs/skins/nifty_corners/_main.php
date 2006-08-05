@@ -25,8 +25,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<title><?php
 		$Blog->disp('name', 'htmlhead');
 		request_title( ' - ', '', ' - ', 'htmlhead' );
-	?>
-	</title>
+	?></title>
 	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
 	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
@@ -59,11 +58,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <div class="innerwrap">
 
 <?php
-	/**
-	 * --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	 */
-	require( dirname(__FILE__).'/_bloglist.php' );
-	// ----------------------------- END OF BLOG LIST ---------------------------- ?>
+	// --------------------------- BLOG LIST INCLUDED HERE -----------------------------
+	require dirname(__FILE__).'/_bloglist.php';
+	// ------------------------------- END OF BLOG LIST --------------------------------
+?>
 
 <div class="pageHeader">
 
@@ -119,7 +117,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 		</div>
-			<?php // ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
+		<?php
+			// ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
 			$disp_comments = 1;					// Display the comments if requested
 			$disp_comment_form = 1;			// Display the comments form if comments requested
 			$disp_trackbacks = 1;				// Display the trackbacks if requested
@@ -128,7 +127,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			$disp_pingbacks = 1;				// Display the pingbacks if requested
 			require( dirname(__FILE__).'/_feedback.php' );
 			// ---------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
-			?>
+		?>
 	</div>
 <?php
 	locale_restore_previous();	// Restore previous locale (Blog locale)
@@ -188,18 +187,22 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	</div>
 
 
-	<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
+	<?php
+		// -------------------------- CATEGORIES INCLUDED HERE -----------------------------
 		// Call the Categories plugin:
 		$Plugins->call_by_code( 'evo_Cats', array(	// Add parameters below:
 			) );
-		// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
+		// -------------------------------- END OF CATEGORIES ----------------------------------
+	?>
 
 
-	<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
+	<?php
+		// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
 		// Call the Archives plugin:
 		$Plugins->call_by_code( 'evo_Arch', array(	// Add parameters below:
 			) );
-		// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
+		// -------------------------------- END OF ARCHIVES ----------------------------------
+	?>
 
 
 	<?php if( ! $Blog->get('force_skin') )

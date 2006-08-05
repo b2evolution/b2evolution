@@ -243,10 +243,11 @@ function link_pages( $before='#', $after='#', $next_or_number='number', $nextpag
 
 /**
  * previous_post(-)
- * @todo Move to ItemList or Item?! - see WP's previous_post_link() for param ideas (using $link instead of $previous and $title). Also, use booleans of course!
+ * @todo Move to ItemList
+ * @todo dh> see WP's previous_post_link() for param ideas (using $link instead of $previous and $title). Also, use booleans of course!
  *       $in_same_blog would also be useful!
  */
-function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='no', $limitprev=1, $excluded_categories='')
+function previous_post( $format='&lt;&lt; % ', $previous='#', $title='yes', $in_same_cat='no', $limitprev=1, $excluded_categories='')
 {
 	global $disp, $posts;
 
@@ -307,10 +308,12 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 
 /**
  * next_post(-)
- * @todo Move to ItemList or Item?! - see WP's previous_post_link() for param ideas (using $link instead of $next and $title). Also, use booleans of course!
+ * 
+ * @todo Move to ItemList
+ * @todo dh> see WP's previous_post_link() for param ideas (using $link instead of $previous and $title). Also, use booleans of course!
  *       $in_same_blog would also be useful!
  */
-function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $limitnext=1, $excluded_categories='')
+function next_post( $format = '% &gt;&gt; ', $next = '#', $title = 'yes', $in_same_cat = 'no', $limitnext = 1, $excluded_categories = '' )
 {
 	global $disp, $posts;
 
@@ -330,19 +333,23 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 	if( is_string($in_same_cat) ) { $in_same_cat = ($in_same_cat != 'no'); }
 
 	$sqlcat = '';
-	if( $in_same_cat ) {
+	if( $in_same_cat ) 
+	{
 		$sqlcat = " AND post_main_cat_ID = $current_category ";
 	}
 
 	$sql_exclude_cats = '';
-	if (!empty($excluded_categories)) {
+	if (!empty($excluded_categories)) 
+	{
 		$blah = explode('and', $excluded_categories);
-		foreach($blah as $category) {
+		foreach($blah as $category) 
+		{
 			$category = intval($category);
 			$sql_exclude_cats .= " AND post_main_cat_ID != $category";
 		}
 	}
 
+	// TODO: fp> This should actually look at the min an dmax timestamp settings
 	$now = date('Y-m-d H:i:s', $localtimenow );
 
 	$limitnext--;
@@ -354,7 +361,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 	               $sql_exclude_cats
 	           AND ".statuses_where_clause()."
 	         ORDER BY post_datestart ASC
-	          LIMIT $limitnext, 1";
+	         LIMIT $limitnext, 1";
 
 	if( $p_info = $DB->get_row( $sql, OBJECT, 0, 'next_post()' ) )
 	{
@@ -952,6 +959,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.18  2006/08/05 17:59:52  fplanque
+ * minor
+ *
  * Revision 1.17  2006/08/04 15:24:31  blueyed
  * Respect status in next_post()/previous_post() (Thanks, Austriaco)
  *

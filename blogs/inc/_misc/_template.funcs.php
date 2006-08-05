@@ -100,14 +100,14 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			{	// We are requesting a specific post by ID:
 				if( $Item = & $ItemCache->get_by_ID( $p, false ) )
 				{
-					$r[] = T_('Post details').': '.$Item->get('title');
+					$r[] = $Item->get('title');
 				}
 			}
 			elseif( !empty( $title ) )
 			{	// We are requesting a specific post by title:
 				if( $Item = & $ItemCache->get_by_urltitle( $title, false ) )
 				{
-					$r[] = T_('Post details').': '.$Item->get('title');
+					$r[] = $Item->get('title');
 				}
 			}
 			else
@@ -296,6 +296,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.7  2006/08/05 17:59:52  fplanque
+ * minor
+ *
  * Revision 1.6  2006/05/12 21:36:00  blueyed
  * Fixed E_NOTICE
  *

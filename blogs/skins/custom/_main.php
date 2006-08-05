@@ -92,11 +92,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	// --------------------------------- END OF MESSAGES ---------------------------------
 ?>
 
+
 <?php
 	// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
 	request_title( '<h2>', '</h2>' );
 	// ------------------------------ END OF REQUEST TITLE -----------------------------
 ?>
+
 
 <?php
 	// ------------------------------------ START OF POSTS ----------------------------------------
@@ -104,8 +106,17 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	{
+	?>
+
+	<?php 
+		//previous_post();	// link to previous post in single page mode 
+		//next_post(); 			// link to next post in single page mode
+	?>
+
+	<?php 
 		$MainList->date_if_changed();
 	?>
+
 	<div class="bPost bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
 		<?php
 			locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
@@ -194,8 +205,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 				/* TRANS: previous page (of posts) */ '< '.T_('Previous'),
 				/* TRANS: next page (of posts) */ T_('Next').' >' );
 			?></strong></p>
-		<!--?php next_post(); // activate this if you want a link to the next post in single page mode ?-->
-		<!--?php previous_post(); // activate this if you want a link to the previous post in single page mode ?-->
 		<ul>
 			<!-- <li><a href="<?php $Blog->disp( 'staticurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(cached)') ?></span></li> -->
 			<li><a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <!-- <span class="dimmed"><?php echo T_('(no cache)') ?></span> --></li>
