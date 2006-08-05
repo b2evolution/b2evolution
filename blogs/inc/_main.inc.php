@@ -526,11 +526,17 @@ else
 
 		if( ! empty($login_action) )
 		{ // We're coming from the Login form and need to redirect to the requested page:
-			param( 'redirect_to', 'string', $baseurl );
-
 			if( $login_action == 'redirect_to_backoffice' )
 			{ // user pressed the "Log into backoffice!" button
 				$redirect_to = $admin_url;
+			}
+			else
+			{
+				param( 'redirect_to', 'string', $baseurl )
+				if( $redirect_to != $baseurl )
+				{ // taken from param, decode:
+					$redirect_to = str_replace('&amp;', '&', $redirect_to);
+				}
 			}
 
 			header_redirect( $redirect_to );
@@ -615,6 +621,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.40  2006/08/05 17:21:01  blueyed
+ * Fixed header_redirect handling: do not replace &amp; with & generally, but only when taken from request params.
+ *
  * Revision 1.39  2006/07/31 16:38:09  blueyed
  * Allow ->get_by_name() for GroupCache (again!)!
  *

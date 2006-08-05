@@ -418,7 +418,7 @@ if( !$Messages->count('error') )
 			if( $reload_page )
 			{ // save Messages and reload the current page through header redirection
 				$Session->set( 'Messages', $Messages );
-				header_redirect( regenerate_url( 'action' ) );
+				header_redirect( regenerate_url( 'action', '', '', '&' ) );
 			}
 
 			if( $user_profile_only )
@@ -682,6 +682,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2006/08/05 17:21:01  blueyed
+ * Fixed header_redirect handling: do not replace &amp; with & generally, but only when taken from request params.
+ *
  * Revision 1.28  2006/07/23 20:18:30  fplanque
  * cleanup
  *

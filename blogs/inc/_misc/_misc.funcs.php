@@ -1296,11 +1296,12 @@ function forget_param( $var )
  * This may clean it up
  * But it is also useful when generating static pages: you cannot rely on $_REQUEST[]
  *
- * @param mixed string (delimited by commas) or array of params to ignore (can be regexps in /.../)
- * @param mixed string or array of param(s) to set
- * @param mixed string Alternative URL we want to point to if not the current URL (may be absolute if BASE tag gets used)
+ * @param mixed|string (delimited by commas) or array of params to ignore (can be regexps in /.../)
+ * @param array|string Param(s) to set
+ * @param mixed|string Alternative URL we want to point to if not the current URL (may be absolute if BASE tag gets used)
+ * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
  */
-function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
+function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $moredelim = '&amp;' )
 {
 	global $Debuglog, $global_param_list, $ReqHost, $ReqPath;
 	global $base_tag_set;
@@ -1408,7 +1409,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 
 	if( !empty( $params ) )
 	{
-		$url = url_add_param( $url, implode( '&amp;', $params ) );
+		$url = url_add_param( $url, implode( $moredelim, $params ), $moredelim );
 	}
 	// $Debuglog->add( 'regenerate_url(): ['.$url.']', 'params' );
 	return $url;
@@ -2655,7 +2656,7 @@ function header_nocache()
  *
  * NOTE: This function {@link exit() exits} the php script execution.
  *
- * @param string Override detection of where we redirect to.
+ * @param string URL to redirect to (overrides detection)
  */
 function header_redirect( $redirect_to = NULL )
 {
@@ -2663,27 +2664,25 @@ function header_redirect( $redirect_to = NULL )
 	global $Session, $Debuglog;
 
 	if( empty($redirect_to) )
-	{
-		$redirect_to = $Request->param( 'redirect_to', 'string', '' );
-	}
+	{ // see if there's a redirect_to request param given (where & is encoded as &amp;):
+		$redirect_to = str_replace('&amp;', '&', $Request->param( 'redirect_to', 'string', '' ));
 
-	if( empty($redirect_to) )
-	{
-		if( ! empty($Hit->referer) )
+		if( empty($redirect_to) )
 		{
-			$redirect_to = $Hit->referer;
-		}
-		elseif( isset($Blog) && is_object($Blog) )
-		{
-			$redirect_to = $Blog->get('url');
-		}
-		else
-		{
-			$redirect_to = $baseurl;
+			if( ! empty($Hit->referer) )
+			{
+				$redirect_to = $Hit->referer;
+			}
+			elseif( isset($Blog) && is_object($Blog) )
+			{
+				$redirect_to = $Blog->get('url');
+			}
+			else
+			{
+				$redirect_to = $baseurl;
+			}
 		}
 	}
-
-	$redirect_to = str_replace('&amp;', '&', $redirect_to);
 
 	if( substr($redirect_to, 0, 1) == '/' )
 	{ // relative URL, prepend current host:
@@ -3050,6 +3049,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.92  2006/08/05 17:21:01  blueyed
+ * Fixed header_redirect handling: do not replace &amp; with & generally, but only when taken from request params.
+ *
  * Revision 1.91  2006/07/31 19:46:18  blueyed
  * Only save Debuglog in Session, if it's not empty (what it will be mostly)
  *
