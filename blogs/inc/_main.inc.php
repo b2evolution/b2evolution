@@ -532,7 +532,7 @@ else
 			}
 			else
 			{
-				param( 'redirect_to', 'string', $baseurl )
+				param( 'redirect_to', 'string', $baseurl );
 				if( $redirect_to != $baseurl )
 				{ // taken from param, decode:
 					$redirect_to = str_replace('&amp;', '&', $redirect_to);
@@ -621,6 +621,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.41  2006/08/05 17:26:25  blueyed
+ * oops
+ *
  * Revision 1.40  2006/08/05 17:21:01  blueyed
  * Fixed header_redirect handling: do not replace &amp; with & generally, but only when taken from request params.
  *
