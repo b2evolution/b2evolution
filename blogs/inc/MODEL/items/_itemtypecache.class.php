@@ -64,7 +64,7 @@ class ItemTypeCache extends DataObjectCache
 	function ItemTypeCache()
 	{
 		// Call parent constructor:
-		parent::DataObjectCache( 'ItemType', true, 'T_itemtypes', 'ptyp_', 'ptyp_ID', 'ptyp_name' );
+		parent::DataObjectCache( 'ItemType', true, 'T_itemtypes', 'ptyp_', 'ptyp_ID', 'ptyp_name', 'ptyp_ID' );
 	}
 
 
@@ -96,10 +96,12 @@ class ItemTypeCache extends DataObjectCache
 	}
 
 
-  /**
+	/**
 	 * Return the default item type ID for a given collection
- 	 *
- 	 * @param integer collection ID
+	 *
+	 * @todo dh> This does not seem to get called in evo?!
+	 *
+	 * @param integer collection ID
 	 */
 	function get_col_default_type_ID( $col_ID )
 	{
@@ -116,6 +118,8 @@ class ItemTypeCache extends DataObjectCache
 	 * Returns form option list with cache contents restricted to a collection
 	 *
 	 * Load the item types collection cache if necessary
+	 *
+	 * @todo dh> This does not seem to get called in evo?!
 	 *
 	 * @param integer selected ID
 	 * @param integer collection ID
