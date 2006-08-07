@@ -698,7 +698,8 @@ class User extends DataObject
 		if( $result = parent::dbinsert() )
 		{ // We could insert the user object..
 
-			// Notify plugins:  fp> what for? example please!
+			// Notify plugins:
+			// A user could be created also in another DB (to synchronize it with b2evo)
 			$Plugins->trigger_event( 'AfterUserInsert', $params = array( 'User' => & $this ) );
 		}
 
@@ -720,7 +721,8 @@ class User extends DataObject
 		if( $result = parent::dbupdate() )
 		{ // We could update the user object..
 
-			// Notify plugins:  fp> what for? example please!
+			// Notify plugins:
+			// Example: A authentication plugin could synchronize/update the password of the user.
 			$Plugins->trigger_event( 'AfterUserUpdate', $params = array( 'User' => & $this ) );
 		}
 
@@ -1115,6 +1117,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.34  2006/08/07 08:40:22  blueyed
+ * doc/examples
+ *
  * Revision 1.33  2006/07/23 22:07:18  fplanque
  * cleanup
  *
