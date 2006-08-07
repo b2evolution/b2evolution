@@ -156,10 +156,10 @@ switch( $action )
 
 			// Sessions
 			$timeout_sessions = $Request->param( 'timeout_sessions', 'integer', $Settings->get_default('timeout_sessions') );
-			if( $timeout_sessions < 30 )
-			{ // lower than 30 seconds: not allowed
-				$timeout_sessions = 30;
-				$Messages->add( sprintf( T_( 'You cannot set a session timeout below %d seconds.' ), 30 ), 'error' );
+			if( $timeout_sessions < 300 )
+			{ // lower than 5 minutes: not allowed
+				$timeout_sessions = 300;
+				$Messages->add( sprintf( T_( 'You cannot set a session timeout below %d seconds.' ), 300 ), 'error' );
 			}
 			elseif( $timeout_sessions < 86400 )
 			{ // lower than 1 day: notice/warning
@@ -204,6 +204,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2006/08/07 22:29:32  fplanque
+ * minor / doc
+ *
  * Revision 1.11  2006/08/07 18:28:04  blueyed
  * Allow shorter session timeout values.
  *

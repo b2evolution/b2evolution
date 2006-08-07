@@ -33,6 +33,10 @@ function NT_( $string )
 $debug = 0;
 
 
+// For severe errors, you'll probably want PHP do display the errors. In this case, uncomment the following line:
+// error_reporting( E_ALL );
+
+
 /**
  * Log application errors through {@link error_log() PHP's logging facilities}?
  *
@@ -137,8 +141,9 @@ $notify_from = $instance_name.'@'.preg_replace( '/^www\./i', '', $basehost );
  *
  * This is overly useful if you move posts or categories from one blog to another
  *
- * If this is disabled, the post will be displayed in the wrong blog template.
- * dh> it seems, that the post won't get displayed at all then (if disabled) - "Sorry, there's no post to display"
+ * If this is disabled, there are 2 possible situations:
+ * - Either the post is no longer part of the requested blog, and you get a "Sorry, nothing to display"
+ * - Or the post is still cross categorized into the requested blog and it will be displayed in that (somewhat wrong) blog template.
  *
  * @var boolean Default: false
  */

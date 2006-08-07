@@ -1802,7 +1802,7 @@ function debug_die( $additional_info = '' )
 		}
 		else
 		{
-			$log_message .= 'Unknown';
+			$log_message .= 'No info specified in debug_die()';
 		}
 
 		$file = 'Unknown';
@@ -2705,12 +2705,15 @@ function header_redirect( $redirect_to = NULL )
 	}
 
 
+/* fp> Okay I can see the use for this BUT MIXING debuf from TWO DIFFERENT pages is nonsense
+ You have to display it explicitely as "Debug from redirected page"
+	Uncomment this when display is splitted
 	if( $Debuglog->count('all') )
 	{ // Save Debuglog into Session, so that it's available after redirect (gets loaded by Session constructor):
 		$Session->set( 'Debuglog', $Debuglog );
 		$Session->dbsave();
 	}
-
+*/
 
 	#header('Refresh:0;url='.$redirect_to);
 	#exit();
@@ -3053,6 +3056,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.95  2006/08/07 22:29:33  fplanque
+ * minor / doc
+ *
  * Revision 1.94  2006/08/07 16:49:35  fplanque
  * doc
  *
