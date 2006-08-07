@@ -81,6 +81,7 @@
 		<?php
 		/*
 		 * Trigger plugin event, which could display a captcha form, before generating a whitelisted URL:
+		 * fp> What's the difference between a "whitelisted" URL and a normal trackback URL ??
 		 */
 		if( ! $Plugins->trigger_event_first_true( 'DisplayTrackbackAddr', array('Item' => & $Item, 'template' => '<code>%url%</code>') ) )
 		{ // No plugin displayed a payload, so we just display the default:

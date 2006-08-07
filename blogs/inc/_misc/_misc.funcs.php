@@ -1171,13 +1171,14 @@ function param( $var, $type = '', $default = '', $memorize = false,
 					$type = 'string';
 				}
 				elseif( $GLOBALS[$var] === '' )
-				{ // dh> what does that mean?
+				{ // Special handling of empty values.
 					if( $strict_typing === false && $use_default )
 					{	// ADDED BY FP 2006-07-06
+						// We want to consider empty values as invalid and fall back to the default value:
 						$GLOBALS[$var] = $default;
 					}
 					else
-					{
+					{	// We memorize the empty value as NULL:
 						// fplanque> note: there might be side effects to this, but we need
 						// this to distinguish between 0 and 'no input'
 						// Note: we do this after regexps because we may or may not want to allow empty strings in regexps
@@ -1770,7 +1771,7 @@ function debug_die( $additional_info = '' )
 	global $debug, $baseurl;
 	global $log_app_errors, $app_name;
 
-	// Attempt to output an error header (will not work if there is content already out):
+	// Attempt to output an error header (will not work if the output buffer has already flushed once):
 	// This should help preventing indexing robots from indexing the error :P
 	if( ! headers_sent() )
 	{
@@ -2699,6 +2700,7 @@ function header_redirect( $redirect_to = NULL )
 		// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
 		// Also remove "action" get param to avoid unwanted actions
 		// blueyed> Removed the removing of "action" here, as it is used to trigger certain views. Instead, "confirm(ed)?" gets removed now
+		// TODO: fp> action should actually not be used to trigger views. This should be changed at some point.
 		$redirect_to = preg_replace( '~(?<=\?|&amp;|&) (login|pwd|confirm(ed)?) = [^&]+ (&(amp;)?|\?)?~x', '', $redirect_to );
 	}
 
@@ -3051,6 +3053,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.94  2006/08/07 16:49:35  fplanque
+ * doc
+ *
  * Revision 1.93  2006/08/07 00:09:45  blueyed
  * marked bug
  *

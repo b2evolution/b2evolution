@@ -135,7 +135,7 @@ $notify_from = $instance_name.'@'.preg_replace( '/^www\./i', '', $basehost );
  * If a particular post is requested (by id or title) but on the wrong blog,
  * do you want to automatically redirect to the right blog?
  *
- * This is overly usefull if you move posts or categories from one blog to another
+ * This is overly useful if you move posts or categories from one blog to another
  *
  * If this is disabled, the post will be displayed in the wrong blog template.
  * dh> it seems, that the post won't get displayed at all then (if disabled) - "Sorry, there's no post to display"

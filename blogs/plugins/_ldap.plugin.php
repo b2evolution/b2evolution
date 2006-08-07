@@ -6,16 +6,16 @@
  *
  * Documentation can be found at {@link http://manual.b2evolution.net/Plugins/ldap_plugin}.
  *
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ *
  * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
- *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
- *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
  * @package plugins
  *
@@ -340,6 +340,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.34  2006/08/07 16:49:35  fplanque
+ * doc
+ *
  * Revision 1.33  2006/08/07 09:57:50  blueyed
  * doc
  *

@@ -3,6 +3,9 @@
  * This is the template that displays the feedback for a post
  * (comments, trackback, pingback...)
  *
+ * You may want to call this file multiple time in a row with different $c $tb $pb params.
+ * This allow to seprate different kinds of feedbacks instead of displaying them mixed together
+ *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the _main.php template.
  * To display a feedback, you should call a stub AND pass the right parameters
@@ -41,7 +44,6 @@ if( ! ($disp_comments || $disp_comment_form || $disp_trackbacks || $disp_trackba
 	return false;
 }
 
-// QUESTION: blueyed> is it by intention, that "feedbacks", "comments" etc anchors get places all at the top?
 echo '<a id="feedbacks"></a>';
 
 $type_list = array();
@@ -309,6 +311,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.78  2006/08/07 16:49:35  fplanque
+ * doc
+ *
  * Revision 1.77  2006/08/04 23:36:33  blueyed
  * Added DisplayTrackbackAddr hook to all skins.
  *

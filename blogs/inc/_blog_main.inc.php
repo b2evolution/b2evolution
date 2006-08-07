@@ -282,8 +282,6 @@ if( ($disp == 'posts') || ($disp == 'single') )
 		else
 			$Item = & $ItemCache->get_by_urltitle( $title, false );
 
-		// TODO: dh> shouldn't we set $p here, if the post gets set from $title?
-
 		if( ($Item !== false) && ($Item->blog_ID != $blog) )
 		{ // We're on the wrong blog (probably an old permalink) let's redirect
 			$new_permalink = $Item->get_permanent_url( '', '', false, '&' );
@@ -453,6 +451,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.28  2006/08/07 16:49:35  fplanque
+ * doc
+ *
  * Revision 1.27  2006/08/07 00:32:07  blueyed
  * Fixed previewing, if $redirect_to_postblog setting is used
  *
