@@ -6,20 +6,19 @@
  *
  * Documentation can be found at {@link http://manual.b2evolution.net/Plugins/ldap_plugin}.
  *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
- *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- *
  * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ *
  * @package plugins
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
  *
  * @version $Id$
@@ -36,6 +35,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * It will update the password locally in case it differs from the LDAP one.
  *
  * @todo Register tools tab to search in LDAP (blueyed).
+ * @todo Add setting subsets, which allow to map User object properties (dropdown) to LDAP search result entries (what's now hardcoded with "sn", "givenname" and "email")
  *
  * @package plugins
  */
@@ -126,7 +126,7 @@ class ldap_plugin extends Plugin
 		global $localtimenow;
 		global $UserCache, $GroupCache, $Settings, $Hit;
 
-		if( $local_User = & $UserCache->get_by_login( $params['login'] )
+		if( ( $local_User = & $UserCache->get_by_login( $params['login'] ) )
 				&& $local_User->pass == $params['pass_md5'] )
 		{ // User exist (with this password), do nothing
 			$this->debug_log( 'User already exists locally with this password.' );
@@ -340,6 +340,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.33  2006/08/07 09:57:50  blueyed
+ * doc
+ *
  * Revision 1.32  2006/07/31 16:53:52  blueyed
  * better example
  *

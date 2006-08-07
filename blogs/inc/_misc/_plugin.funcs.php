@@ -39,6 +39,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * This gets used for PluginSettings ("Edit plugin") and PluginUserSettings ("Edit user settings").
  *
+ * @todo dh> Allow to move setting sets up and down (order). Control goes into /inc/CONTROL/settings/plugins.php.
+ *
  * @param string Settings name (key)
  * @param array Meta data for this setting. See {@link Plugin::GetDefaultSettings()}
  * @param Plugin (by reference)
@@ -414,6 +416,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.20  2006/08/07 09:57:51  blueyed
+ * doc
+ *
  * Revision 1.19  2006/07/31 15:41:37  yabs
  * Modified 'allow_html' to html_input/html_textarea
  *
