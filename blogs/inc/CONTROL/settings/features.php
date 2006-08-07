@@ -156,10 +156,10 @@ switch( $action )
 
 			// Sessions
 			$timeout_sessions = $Request->param( 'timeout_sessions', 'integer', $Settings->get_default('timeout_sessions') );
-			if( $timeout_sessions < 3600 )
-			{ // lower than 1 hour: not allowed
-				$timeout_sessions = 3600;
-				$Messages->add( sprintf( T_( 'You cannot set a session timeout below %d seconds.' ), 3600 ), 'error' );
+			if( $timeout_sessions < 30 )
+			{ // lower than 30 seconds: not allowed
+				$timeout_sessions = 30;
+				$Messages->add( sprintf( T_( 'You cannot set a session timeout below %d seconds.' ), 30 ), 'error' );
 			}
 			elseif( $timeout_sessions < 86400 )
 			{ // lower than 1 day: notice/warning
@@ -204,6 +204,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2006/08/07 18:28:04  blueyed
+ * Allow shorter session timeout values.
+ *
  * Revision 1.10  2006/08/05 18:14:14  blueyed
  * Fixed eblog_server_port param.
  *
