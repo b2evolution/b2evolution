@@ -482,8 +482,11 @@ class ItemList extends DataObjectList
 		$post_url = param( 'post_url', 'string', '' );
 		$post_category = param( 'post_category', 'integer', true );
 		$post_views = param( 'post_views', 'integer', 0 );
-		$renderers = param( 'renderers', 'array', array() );
-
+		$renderers = param( 'renderers', 'array', array('default') );
+		if( ! is_array($renderers) )
+		{ // dh> workaround for param() bug. See rev 1.93 of /inc/_misc/_misc.funcs.php
+			$renderers = array('default');
+		}
 		$comment_Blog = & $BlogCache->get_by_ID( get_catblog( $post_category ) );
 		if( $comment_Blog->allowcomments == 'post_by_post' )
 		{ // param is required
@@ -518,10 +521,6 @@ class ItemList extends DataObjectList
 		$post_title = format_to_post( $post_title, 0 );
 		$content = format_to_post( $content );
 
-		if( ! is_array($renderers) )
-		{ // DEBUG: there are "Bad arguments." warnings in the demo's error logs..?!
-			debug_die('Assertion "$renderers is array" failed: $renderers is '.var_export($renderers, true));
-		}
 		$post_renderers = implode( '.', $renderers );
 
 		preg_match( '~(\d\d\d\d)-(\d\d)-(\d\d)~', $item_issue_date, $match );
@@ -867,6 +866,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.15  2006/08/07 00:17:11  blueyed
+ * Fixed bug with renderers in preview, when you come "stright" from the simple edit form (without using the advanced one before).
+ *
  * Revision 1.14  2006/08/05 19:50:49  blueyed
  * nuked unnecessary global
  *
