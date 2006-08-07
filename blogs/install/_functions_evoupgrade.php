@@ -1242,7 +1242,7 @@ function upgrade_b2evo_tables()
 	}
 
 
-	// TODO: Move this!? fp> plugin install may fail if the DB schema is not current. Am I right?
+	// TODO: Move this!? fp> plugin install may fail if the DB schema is not current. Am I right? dh> yes, of course.
 	if( $old_db_version < 9100 )
 	{
 
@@ -1330,6 +1330,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.159  2006/08/07 23:25:02  blueyed
+ * Answer
+ *
  * Revision 1.158  2006/08/07 21:04:12  fplanque
  * doc
  *
