@@ -168,12 +168,15 @@ class Session
 							}
 
 							// Load a Debuglog object from session data, if available:
+/* fp> Okay I can see the use for this BUT MIXING debuf from TWO DIFFERENT pages is nonsense
+ You have to display it explicitely as "Debug from redirected page"
 							if( ($sess_Debuglog = $this->get('Debuglog')) && is_a( $sess_Debuglog, 'log' ) )
 							{
 								$Debuglog->add_messages( $sess_Debuglog->messages );
 								$Debuglog->add( 'Added Debuglog from session data.', 'session' );
 								$this->delete( 'Debuglog' );
 							}
+*/
 						}
 					}
 				}
@@ -442,6 +445,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.18  2006/08/07 22:26:14  fplanque
+ * yes ok, but less than 5 minutes would not be reasonable! :)
+ *
  * Revision 1.17  2006/08/07 17:22:06  blueyed
  * *** empty log message ***
  *
