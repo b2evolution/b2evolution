@@ -299,19 +299,43 @@ switch( $action )
 ?>
 
 <script type="text/javascript">
-if( document.getElementById('post_title') )
-{
-	/**
-	 * Updates document.title according to the item title field (post_title)
-	 */
-	function b2evo_update_document_title()
+	if( post_title_elt = document.getElementById('post_title') )
 	{
-		document.title = document.title.replace(/:[^:]*$/, ": "+document.getElementById('post_title').value);
+		/**
+		 * Updates document.title according to the item title field (post_title)
+		 */
+		function evo_update_document_title()
+		{
+			document.title = document.title.replace(/:[^:]*$/, ": "+document.getElementById('post_title').value);
+		}
+		
+		addEvent( post_title_elt, 'keyup', evo_update_document_title, false );
+		
+		// Init:
+		evo_update_document_title();
 	}
-	addEvent( document.getElementById('post_title'), 'keyup', b2evo_update_document_title, false );
-	// Init:
-	b2evo_update_document_title();
-}
+	
+	
+	if( edit_date_elt = document.getElementById('edit_date') )
+	{
+		/**
+		 * If user modified date, check the checkbox:
+		 */
+		function evo_check_edit_date()
+		{
+			edit_date_elt.checked = true;
+		}
+		
+		if( item_issue_date_elt = document.getElementById('item_issue_date') )
+		{
+			addEvent( item_issue_date_elt, 'change', evo_check_edit_date, false ); // TODO: check in IE
+		}
+		if( item_issue_time_elt = document.getElementById('item_issue_time') )
+		{
+			addEvent( item_issue_time_elt, 'change', evo_check_edit_date, false ); // TODO: check in IE
+		}
+	}
+		
 </script>
 
 <?php

@@ -367,4 +367,3 @@ b2evo_Callbacks.prototype = {
 };
 
 var b2evo_Callbacks = new b2evo_Callbacks();
-
