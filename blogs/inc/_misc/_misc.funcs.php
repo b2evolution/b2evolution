@@ -1171,7 +1171,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 					$type = 'string';
 				}
 				elseif( $GLOBALS[$var] === '' )
-				{
+				{ // dh> what does that mean?
 					if( $strict_typing === false && $use_default )
 					{	// ADDED BY FP 2006-07-06
 						$GLOBALS[$var] = $default;
@@ -1184,6 +1184,8 @@ function param( $var, $type = '', $default = '', $memorize = false,
 						$GLOBALS[$var] = NULL;
 						$Debuglog->add( 'param(-): <strong>'.$var.'</strong> set to NULL', 'params' );
 					}
+
+					// TODO: dh> if a var comes in as '' but has type "array" it does not get "converted" to array type (nor gets the default used!)
 				}
 				else
 				{
@@ -3049,6 +3051,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.93  2006/08/07 00:09:45  blueyed
+ * marked bug
+ *
  * Revision 1.92  2006/08/05 17:21:01  blueyed
  * Fixed header_redirect handling: do not replace &amp; with & generally, but only when taken from request params.
  *
