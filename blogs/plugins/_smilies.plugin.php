@@ -74,7 +74,7 @@ class smilies_plugin extends Plugin
 				'render_comments_default' => array(
 					'label' => $this->T_('Render comments' ),
 					'note' => $this->T_('If enabled the smileys in comments will also be rendered'),
-					'defaultvalue' => 0,
+					'defaultvalue' => '1',
 					'type' => 'checkbox',
 				),
 				'smiley_list' => array(
@@ -84,6 +84,8 @@ class smilies_plugin extends Plugin
 					'rows' => 10,
 					'cols' => 40,
 					'defaultvalue' => '=> => icon_arrow.gif
+:!:	=> icon_exclaim.gif,
+:?: => icon_question.gif,
 :idea: => icon_idea.gif
 :) => icon_smile.gif
 :D => icon_biggrin.gif
@@ -100,17 +102,36 @@ B) => icon_cool.gif
 :\'( => icon_cry.gif
 |-| => icon_wth.gif
 :>> => icon_mrgreen.gif
+:yes:	=> grayyes.gif,
 ;D => graysmilewinkgrin.gif
 :P => graybigrazz.gif
 :)) => graylaugh.gif
 88| => graybigeek.gif
 :. => grayshy.gif
+:no: => grayno.gif,
 XX( => graydead.gif
 :lalala: => icon_lalala.gif
-:crazy: => icon_crazy.gif',
+:crazy: => icon_crazy.gif
+>:XX => icon_censored.gif',
 				),
 			);
-	}
+								//	':DD'				=> 'icon_lol.gif',
+								//	':o'				=> 'icon_surprised.gif',
+								//	'8|'				=> 'icon_eek.gif',
+								//	'>:-['			=> 'icon_evil.gif',
+								//	':)'				=> 'graysmile.gif',
+								//	':b'				=> 'grayrazz.gif',
+								//	')-o'				=> 'grayembarrassed.gif',
+								//	'U-('				=> 'grayuhoh.gif',
+								//	':('				=> 'graysad.gif',
+								//	':**:'			=> 'graysigh.gif', 			// alternative: graysighw.gif
+								//	':??:'			=> 'grayconfused.gif',  // alternative: grayconfusedw.gif
+								//	':`('				=> 'graycry.gif',
+								//	'>:-('			=> 'graymad.gif',
+								//	':##'				=> 'grayupset.gif',			// alternative: grayupsetw.gif
+								//	':zz:'			=> 'graysleep.gif', 		// alternative: graysleepw.gif
+								//	':wave:'		=> 'icon_wave.gif',
+}
 
 
 	/**
@@ -380,6 +401,9 @@ XX( => graydead.gif
 
 /*
  * $Log$
+ * Revision 1.31  2006/08/07 18:26:21  fplanque
+ * nuked obsolete smilies conf file
+ *
  * Revision 1.30  2006/08/01 23:55:14  blueyed
  * minor: doc; removed level of indentation
  *
