@@ -275,12 +275,14 @@ if( ($disp == 'posts') || ($disp == 'single') )
 { // If we are going to display posts and not something special...
 
 	// On single post requests, check if we're on the right blog!
-	if( $redirect_to_postblog && ( $disp == 'single' ) )
+	if( $redirect_to_postblog && ( $disp == 'single' ) && ! $preview )
 	{ // Yes we need to check.
 		if( !empty($p) )
 			$Item = & $ItemCache->get_by_ID( $p, false );
 		else
 			$Item = & $ItemCache->get_by_urltitle( $title, false );
+
+		// TODO: dh> shouldn't we set $p here, if the post gets set from $title?
 
 		if( ($Item !== false) && ($Item->blog_ID != $blog) )
 		{ // We're on the wrong blog (probably an old permalink) let's redirect
@@ -451,6 +453,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.27  2006/08/07 00:32:07  blueyed
+ * Fixed previewing, if $redirect_to_postblog setting is used
+ *
  * Revision 1.26  2006/07/24 00:05:44  fplanque
  * cleaned up skins
  *
