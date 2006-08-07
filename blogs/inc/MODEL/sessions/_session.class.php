@@ -311,7 +311,7 @@ class Session
 
 		if( isset( $this->_data[$param] ) )
 		{
-			if( !is_null($this->_data[$param][1])
+			if( array_key_exists(1, $this->_data[$param]) // can be NULL!
 			  && ( is_null( $this->_data[$param][0] ) || $this->_data[$param][0] > $localtimenow ) ) // check for expired data
 			{
 				return $this->_data[$param][1];
@@ -445,6 +445,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.20  2006/08/07 22:37:54  fplanque
+ * no message
+ *
  * Revision 1.19  2006/08/07 22:29:33  fplanque
  * minor / doc
  *
