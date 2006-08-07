@@ -431,7 +431,6 @@ class DB
 	 * Print SQL/DB error.
 	 *
 	 * TODO: bloated: it probably doesn't make sense to display errors if we don't stop. Any use case?
-	 *       blueyed> TESTS! Just noticed that there's no backtrace on those errors anymore. NOT useful. IIRC this was a conf setting before.
 	 */
 	function print_error( $str = '', $query_title = '' )
 	{
@@ -1335,6 +1334,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.21  2006/08/07 09:34:48  blueyed
+ * Removed comment - extended DB class instead
+ *
  * Revision 1.20  2006/08/02 23:49:29  blueyed
  * comment
  *
