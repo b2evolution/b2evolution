@@ -167,6 +167,13 @@ function textarea_replace_selection( myField, snippet, target_document )
 	{
 		return;
 	}
+	if( window.opener && ( typeof window.opener.b2evo_Callbacks != "undefined" ) )
+	{ // we're called in a popup: try that b2evo_Callbacks event
+		if( window.opener.b2evo_Callbacks.trigger_callback( "insert_raw_into_"+myField.id, snippet ) )
+		{
+			return;
+		}
+	}
 
 	if (target_document.selection)
 	{ // IE support:
