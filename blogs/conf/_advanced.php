@@ -36,6 +36,11 @@ $debug = 0;
 // For severe errors, you'll probably want PHP do display the errors. In this case, uncomment the following line:
 // error_reporting( E_ALL );
 
+// To display errors also on the webpage, ant not only in the server's error log, uncomment this:
+// ini_set( 'display_errors', 'on' );
+
+// TODO: dh> ini_set( 'memory_limit', '12M' ); by default?
+
 
 /**
  * Log application errors through {@link error_log() PHP's logging facilities}?
