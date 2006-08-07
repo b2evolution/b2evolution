@@ -1886,6 +1886,7 @@ function debug_info( $force = false )
 {
 	global $debug, $Debuglog, $DB, $obhandler_debug, $Timer, $ReqHost, $ReqPath;
 	global $cache_imgsize, $cache_File;
+	global $Session;
 
 	if( ! $debug && ! $force )
 	{ // No debug output:
@@ -1971,10 +1972,39 @@ function debug_info( $force = false )
 	}
 
 
+	// DEBUGLOG FROM SESSION, after a redirect (with list of categories at top):
+	if( ($sess_Debuglog = $Session->get('Debuglog')) && is_a( $sess_Debuglog, 'log' ) )
+	{
+		$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
+		$log_cats = array_keys($sess_Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
+		$log_container_head = '<h3 id="debug_sess_debuglog">Debug messages (before redirect)</h3>'
+			// link to real Debuglog:
+			.'<p><a href="'.$ReqHostPathQuery.'#debug_debuglog">See below for the Debuglog from the current request.</a></p>';
+		$log_head_links = array();
+		foreach( $log_cats as $l_cat )
+		{
+			$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
+		}
+		$log_container_head .= implode( ' | ', $log_head_links );
+		echo format_to_output(
+			$sess_Debuglog->display( array(
+					'container' => array( 'string' => $log_container_head, 'template' => false ),
+					'all' => array( 'string' => '<h4 id="debug_info_cat_%s">%s:</h4>', 'template' => false ) ),
+				'', false, $log_categories ),
+			'htmlbody' );
+
+		$Session->delete( 'Debuglog' );
+	}
+
+
 	// DEBUGLOG (with list of categories at top):
 	$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
 	$log_cats = array_keys($Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
-	$log_container_head = '<h3>Debug messages</h3>';
+	$log_container_head = '<h3 id="debug_debuglog">Debug messages</h3>';
+	if( $sess_Debuglog )
+	{ // link to sess_Debuglog:
+		$log_container_head .= '<p><a href="'.$ReqHostPathQuery.'#debug_sess_debuglog">See above for the Debuglog from before the redirect.</a></p>';
+	}
 	$log_head_links = array();
 	foreach( $log_cats as $l_cat )
 	{
@@ -2705,15 +2735,12 @@ function header_redirect( $redirect_to = NULL )
 	}
 
 
-/* fp> Okay I can see the use for this BUT MIXING debuf from TWO DIFFERENT pages is nonsense
- You have to display it explicitely as "Debug from redirected page"
-	Uncomment this when display is splitted
 	if( $Debuglog->count('all') )
 	{ // Save Debuglog into Session, so that it's available after redirect (gets loaded by Session constructor):
-		$Session->set( 'Debuglog', $Debuglog );
+		$Session->set( 'Debuglog', $Debuglog, 60 /* expire in 60 seconds */ );
 		$Session->dbsave();
 	}
-*/
+
 
 	#header('Refresh:0;url='.$redirect_to);
 	#exit();
@@ -3056,6 +3083,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.96  2006/08/07 23:49:52  blueyed
+ * Display Debuglog object stored in session (after redirect) separately.
+ *
  * Revision 1.95  2006/08/07 22:29:33  fplanque
  * minor / doc
  *
