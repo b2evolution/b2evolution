@@ -138,6 +138,7 @@ $notify_from = $instance_name.'@'.preg_replace( '/^www\./i', '', $basehost );
  * This is overly usefull if you move posts or categories from one blog to another
  *
  * If this is disabled, the post will be displayed in the wrong blog template.
+ * dh> it seems, that the post won't get displayed at all then (if disabled) - "Sorry, there's no post to display"
  *
  * @var boolean Default: false
  */
