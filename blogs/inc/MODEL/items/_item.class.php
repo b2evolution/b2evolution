@@ -155,7 +155,7 @@ class Item extends DataObject
 	 * External URL the item links to (if any).
 	 * @var string
 	 */
-	var $url;          // Should move. blueyed>> where? why?
+	var $url;          // fp> we may want to move this to the item links which allows multiple and diffrent types of links/urls/files etc.
 	var $typ_ID;
 	var $st_ID;
 	var $deadline = '';
@@ -436,6 +436,7 @@ class Item extends DataObject
 	/**
 	 * Generate the permalink for the item.
 	 *
+	 * Note: Each item has an unique permalink at any given time. Some admin settings may howerver change the permalinks for previous items.
 	 * Note: This actually only returns the URL, to get a real link, use {@link Item::get_permanent_link()}
 	 *
 	 * @todo archives modes in clean mode
@@ -459,8 +460,6 @@ class Item extends DataObject
 
 		if( empty( $blogurl ) )
 		{
-			// TODO: respect current Blog ($Blog), if it's assigned through an extra cat (do not switch blogs!)
-			//       Downside: we'd have several "permanent urls" and only one default one..
 			$this->get_Blog();
 			$blogurl = $this->Blog->gen_blogurl();
 		}
@@ -1302,10 +1301,7 @@ class Item extends DataObject
 				break;
 		}
 
-		if( $title == '#' )
-		{ // Default title (ID is useful as info here, e.g. if you want to create a ?p=ID link to some entry)
-			$title = T_('Permanent link to full entry').' (ID #'.$this->ID.')';
-		}
+		if( $title == '#' ) $title = T_('Permanent link to full entry');
 
 		$url = $this->get_permanent_url();
 
@@ -2370,9 +2366,9 @@ class Item extends DataObject
 	function update(
 		$post_title,
 		$post_content,
-		$post_timestamp = '',
-		$main_cat_ID = 1,
-		$extra_cat_IDs = array(),
+		$post_timestamp = '',         // 'Y-m-d H:i:s'
+		$main_cat_ID = 1,             // Main cat ID
+		$extra_cat_IDs = array(),     // Table of extra cats
 		$post_status = 'published',
 		$post_locale = '#',
 		$post_trackbacks = '',        // not used
@@ -2837,6 +2833,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.75  2006/08/07 16:33:27  fplanque
+ * Default messages should not be any more geeky then necessary.
+ *
  * Revision 1.74  2006/08/05 17:18:41  blueyed
  * doc/todo
  *
