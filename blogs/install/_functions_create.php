@@ -174,6 +174,7 @@ function create_b2evo_tables()
 	// NOTE: basic plugins get installed separatly for upgrade and install..
 
 	// Create relations:
+	// fp> These are probably not working any more. I think I'll make them part of the default install with version 2.0
 	create_b2evo_relations();
 
 	return true;
@@ -1005,6 +1006,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.194  2006/08/07 21:04:12  fplanque
+ * doc
+ *
  * Revision 1.193  2006/08/04 22:13:23  blueyed
  * Finished de-abstraction
  *

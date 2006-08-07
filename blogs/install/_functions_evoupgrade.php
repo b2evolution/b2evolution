@@ -1242,11 +1242,9 @@ function upgrade_b2evo_tables()
 	}
 
 
-	// TODO: Move this!?
+	// TODO: Move this!? fp> plugin install may fail if the DB schema is not current. Am I right?
 	if( $old_db_version < 9100 )
-	{ // Create (EXPERIMENTAL) relations, only if upgrading to Phoenix-Beta:
-		// TODO: this should/could get handled by db_delta(), by adding it to the "normal" DB schema, if requested.
-		create_b2evo_relations(); // EXPERIMENTAL!
+	{
 
 		install_basic_plugins();
 	}
@@ -1332,11 +1330,14 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.158  2006/08/07 21:04:12  fplanque
+ * doc
+ *
  * Revision 1.157  2006/08/04 22:13:23  blueyed
  * Finished de-abstraction
  *
  * Revision 1.156  2006/08/03 01:55:24  blueyed
- * Fixed upgrade procedure according to "the plan" (as told by François by email).
+ * Fixed upgrade procedure according to "the plan" (as told by Francois by email).
  *
  * Revision 1.155  2006/07/08 13:33:54  blueyed
  * Autovalidate admin group instead of primary admin user only.
