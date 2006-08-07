@@ -463,8 +463,10 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		// We do not use $cookie_user / $cookie_pass (would be set in _obsolete092.php), because it
 		//  does not harm really (cookies time out) and would allow to set arbitrary cookies through
 		//  register_globals!
-		setcookie( 'cookie'.$instance_name.'user', '', 200000000, $cookie_path, $cookie_domain );
-		setcookie( 'cookie'.$instance_name.'pass', '', 200000000, $cookie_path, $cookie_domain );
+		if( isset($_COOKIE['cookie'.$instance_name.'user']) )
+			setcookie( 'cookie'.$instance_name.'user', '', 200000000, $cookie_path, $cookie_domain );
+		if( isset($_COOKIE['cookie'.$instance_name.'pass']) )
+			setcookie( 'cookie'.$instance_name.'pass', '', 200000000, $cookie_path, $cookie_domain );
 	}
 }
 elseif( $Session->has_User() /* logged in */
@@ -621,6 +623,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.42  2006/08/07 23:08:46  blueyed
+ * Only delete deprecated cookies, if they were sent to us..
+ *
  * Revision 1.41  2006/08/05 17:26:25  blueyed
  * oops
  *
