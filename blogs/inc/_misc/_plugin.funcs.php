@@ -63,7 +63,7 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 	// Passthrough some attributes to elements:
 	foreach( $set_meta as $k => $v )
 	{
-		if( in_array( $k, array( 'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect' ) ) )
+		if( in_array( $k, array( 'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols' ) ) )
 		{
 			$params[$k] = $v;
 		}
@@ -416,6 +416,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.21  2006/08/08 10:02:26  yabs
+ * added "cols" to the list of params that are passed through to $Form
+ *
  * Revision 1.20  2006/08/07 09:57:51  blueyed
  * doc
  *
