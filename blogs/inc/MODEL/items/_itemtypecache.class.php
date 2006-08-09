@@ -99,7 +99,7 @@ class ItemTypeCache extends DataObjectCache
 	/**
 	 * Return the default item type ID for a given collection
 	 *
-	 * @todo dh> This does not seem to get called in evo?!
+	 * fp> will be used in b2evo 2.0
 	 *
 	 * @param integer collection ID
 	 */
@@ -119,7 +119,7 @@ class ItemTypeCache extends DataObjectCache
 	 *
 	 * Load the item types collection cache if necessary
 	 *
-	 * @todo dh> This does not seem to get called in evo?!
+	 * fp> will be used in b2evo 2.0
 	 *
 	 * @param integer selected ID
 	 * @param integer collection ID
@@ -152,7 +152,12 @@ class ItemTypeCache extends DataObjectCache
 		return $r;
 	}
 
-
-
 }
+
+/*
+ * $Log$
+ * Revision 1.8  2006/08/09 21:30:56  fplanque
+ * doc
+ *
+ */
 ?>
