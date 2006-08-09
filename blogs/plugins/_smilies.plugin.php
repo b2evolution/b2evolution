@@ -73,64 +73,67 @@ class smilies_plugin extends Plugin
 				),
 				'render_comments_default' => array(
 					'label' => $this->T_('Render comments' ),
-					'note' => $this->T_('If enabled the smileys in comments will also be rendered'),
+					'note' => $this->T_('This is the default setting. Users can override it in their profile'),
 					'defaultvalue' => '1',
 					'type' => 'checkbox',
 				),
+				// TODO (yabs) : Display these as images and individual inputs
 				'smiley_list' => array(
 					'label' => $this->T_( 'Smiley list list'),
-					'note' => $this->T_( 'This is the list of smileys [one per line], in the format : char sequence => image_file' ),
+					'note' => $this->T_( 'This is the list of smileys [one per line], in the format : char_sequence image_file // optional comment<br />
+							To disable a smiley, just add a comment ( # ) to the start of its setting' ),
 					'type' => 'html_textarea', // allows smilies with "<" in them
 					'rows' => 10,
-					'cols' => 40,
-					'defaultvalue' => '=> => icon_arrow.gif
-:!:	=> icon_exclaim.gif,
-:?: => icon_question.gif,
-:idea: => icon_idea.gif
-:) => icon_smile.gif
-:D => icon_biggrin.gif
-:p => icon_razz.gif
-B) => icon_cool.gif
-;) => icon_wink.gif
-:> => icon_twisted.gif
-:roll: => icon_rolleyes.gif
-:oops: => icon_redface.gif
-:| => icon_neutral.gif
-:-/ => icon_confused.gif
-:( => icon_sad.gif
->:( => icon_mad.gif
-:\'( => icon_cry.gif
-|-| => icon_wth.gif
-:>> => icon_mrgreen.gif
-:yes:	=> grayyes.gif,
-;D => graysmilewinkgrin.gif
-:P => graybigrazz.gif
-:)) => graylaugh.gif
-88| => graybigeek.gif
-:. => grayshy.gif
-:no: => grayno.gif,
-XX( => graydead.gif
-:lalala: => icon_lalala.gif
-:crazy: => icon_crazy.gif
->:XX => icon_censored.gif',
+					'cols' => 60,
+					'defaultvalue' => '
+=>       icon_arrow.gif
+:!:      icon_exclaim.gif
+:?:      icon_question.gif
+:idea:   icon_idea.gif
+:)       icon_smile.gif
+:D       icon_biggrin.gif
+:p       icon_razz.gif
+B)       icon_cool.gif
+;)       icon_wink.gif
+:>       icon_twisted.gif
+:roll:   icon_rolleyes.gif
+:oops:   icon_redface.gif
+:|       icon_neutral.gif
+:-/      icon_confused.gif
+:(       icon_sad.gif
+>:(      icon_mad.gif
+:\'(      icon_cry.gif
+|-|      icon_wth.gif
+:>>      icon_mrgreen.gif
+:yes:    grayyes.gif,
+;D       graysmilewinkgrin.gif
+:P       graybigrazz.gif
+:))      graylaugh.gif
+88|      graybigeek.gif
+:.       grayshy.gif
+:no:     grayno.gif
+XX(      graydead.gif
+:lalala: icon_lalala.gif
+:crazy:  icon_crazy.gif
+>:XX     icon_censored.gif
+#:DD     icon_lol.gif
+#:o      icon_surprised.gif
+#8|      icon_eek.gif
+#>:-[    icon_evil.gif
+#:)      graysmile.gif
+#:b      grayrazz.gif
+#)-o     grayembarrassed.gif
+#U-(     grayuhoh.gif
+#:(      graysad.gif
+#:**:    graysigh.gif     // alternative: graysighw.gif
+#:??:    grayconfused.gif // alternative: grayconfusedw.gif
+#:`(     graycry.gif
+#>:-(    graymad.gif
+#:##      grayupset.gif   // alternative: grayupsetw.gif
+#:zz:    graysleep.gif    // alternative: graysleepw.gif
+#:wave:  icon_wave.gif',
 				),
 			);
-								//	':DD'				=> 'icon_lol.gif',
-								//	':o'				=> 'icon_surprised.gif',
-								//	'8|'				=> 'icon_eek.gif',
-								//	'>:-['			=> 'icon_evil.gif',
-								//	':)'				=> 'graysmile.gif',
-								//	':b'				=> 'grayrazz.gif',
-								//	')-o'				=> 'grayembarrassed.gif',
-								//	'U-('				=> 'grayuhoh.gif',
-								//	':('				=> 'graysad.gif',
-								//	':**:'			=> 'graysigh.gif', 			// alternative: graysighw.gif
-								//	':??:'			=> 'grayconfused.gif',  // alternative: grayconfusedw.gif
-								//	':`('				=> 'graycry.gif',
-								//	'>:-('			=> 'graymad.gif',
-								//	':##'				=> 'grayupset.gif',			// alternative: grayupsetw.gif
-								//	':zz:'			=> 'graysleep.gif', 		// alternative: graysleepw.gif
-								//	':wave:'		=> 'icon_wave.gif',
 }
 
 
@@ -371,8 +374,7 @@ XX( => graydead.gif
 
 		foreach( $temp_list as $temp_smiley )
 		{
-			$a_smiley = explode( '<->', preg_replace( '#(.+)( )=>(.+?)#', '$1<->$2',$temp_smiley ) );
-
+			$a_smiley = explode( '<->',	preg_replace_callback( '#^([^\#].+?\s)(.+?)(\/\/.*?)*$#', array( $this, 'get_smiley' ),$temp_smiley ) );
 			if( isset( $a_smiley[0] ) and isset( $a_smiley[1] ) )
 			{
 				// lets see if the file exists
@@ -396,11 +398,19 @@ XX( => graydead.gif
 		}
 	}
 
+	// returns the relevant smiley parts (char_code, image_file)
+	function get_smiley( $smiley_parts )
+	{
+		return ( ( isset( $smiley_parts[1] ) && isset( $smiley_parts[2] ) ) ? $smiley_parts[1].'<->'.$smiley_parts[2] : '' );
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.32  2006/08/09 07:33:46  yabs
+ * Redid the format of smiley settings, added ability to comment out a smiley and add optional comments to the end of a definition
+ *
  * Revision 1.31  2006/08/07 18:26:21  fplanque
  * nuked obsolete smilies conf file
  *
