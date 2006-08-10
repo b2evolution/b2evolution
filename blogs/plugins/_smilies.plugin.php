@@ -64,6 +64,7 @@ class smilies_plugin extends Plugin
 	 */
 	function GetDefaultSettings()
 	{
+		global $rsc_subdir;
 		return array(
 				'use_toolbar_default' => array(
 					'label' => T_( 'Use smilies toolbar' ),
@@ -80,8 +81,9 @@ class smilies_plugin extends Plugin
 				// TODO (yabs) : Display these as images and individual inputs
 				'smiley_list' => array(
 					'label' => $this->T_( 'Smiley list list'),
-					'note' => $this->T_( 'This is the list of smileys [one per line], in the format : char_sequence image_file // optional comment<br />
-							To disable a smiley, just add a comment ( # ) to the start of its setting' ),
+					'note' => sprintf( $this->T_( 'This is the list of smileys [one per line], in the format : char_sequence image_file // optional comment<br />
+							To disable a smiley, just add one or more spaces to the start of its setting<br />
+							You can add new smiley images by uploading the images to the %s folder.' ), '<span style="font-weight:bold">'.$rsc_subdir.'smilies/</span>' ),
 					'type' => 'html_textarea', // allows smilies with "<" in them
 					'rows' => 10,
 					'cols' => 60,
@@ -116,22 +118,22 @@ XX(      graydead.gif
 :lalala: icon_lalala.gif
 :crazy:  icon_crazy.gif
 >:XX     icon_censored.gif
-#:DD     icon_lol.gif
-#:o      icon_surprised.gif
-#8|      icon_eek.gif
-#>:-[    icon_evil.gif
-#:)      graysmile.gif
-#:b      grayrazz.gif
-#)-o     grayembarrassed.gif
-#U-(     grayuhoh.gif
-#:(      graysad.gif
-#:**:    graysigh.gif     // alternative: graysighw.gif
-#:??:    grayconfused.gif // alternative: grayconfusedw.gif
-#:`(     graycry.gif
-#>:-(    graymad.gif
-#:##      grayupset.gif   // alternative: grayupsetw.gif
-#:zz:    graysleep.gif    // alternative: graysleepw.gif
-#:wave:  icon_wave.gif',
+ :DD     icon_lol.gif
+ :o      icon_surprised.gif
+ 8|      icon_eek.gif
+ >:-[    icon_evil.gif
+ :)      graysmile.gif
+ :b      grayrazz.gif
+ )-o     grayembarrassed.gif
+ U-(     grayuhoh.gif
+ :(      graysad.gif
+ :**:    graysigh.gif     // alternative: graysighw.gif
+ :??:    grayconfused.gif // alternative: grayconfusedw.gif
+ :`(     graycry.gif
+ >:-(    graymad.gif
+ :##      grayupset.gif   // alternative: grayupsetw.gif
+ :zz:    graysleep.gif    // alternative: graysleepw.gif
+ :wave:  icon_wave.gif',
 				),
 			);
 }
@@ -374,7 +376,7 @@ XX(      graydead.gif
 
 		foreach( $temp_list as $temp_smiley )
 		{
-			$a_smiley = explode( '<->',	preg_replace_callback( '#^([^\#].+?\s)(.+?)(\/\/.*?)*$#', array( $this, 'get_smiley' ),$temp_smiley ) );
+			$a_smiley = explode( '<->',	preg_replace_callback( '#^(\S.+?\s)(.+?)(\/\/.*?)*$#', array( $this, 'get_smiley' ),$temp_smiley ) );
 			if( isset( $a_smiley[0] ) and isset( $a_smiley[1] ) )
 			{
 				// lets see if the file exists
@@ -408,6 +410,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.33  2006/08/10 09:07:12  yabs
+ * minor mods + added note re smilies folder
+ *
  * Revision 1.32  2006/08/09 07:33:46  yabs
  * Redid the format of smiley settings, added ability to comment out a smiley and add optional comments to the end of a definition
  *
