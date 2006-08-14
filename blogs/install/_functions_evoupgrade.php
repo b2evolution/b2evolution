@@ -1166,19 +1166,23 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
-		// TODO: change to "regular" output schema
-		foreach(
-			array (
-				0 => 'ALTER TABLE T_useragents ADD INDEX agnt_type ( agnt_type )',
-				1 => 'ALTER TABLE T_hitlog CHANGE COLUMN hit_referer_type hit_referer_type   ENUM(\'search\',\'blacklist\',\'referer\',\'direct\',\'self\',\'admin\') NOT NULL',
-				2 => 'ALTER TABLE T_hitlog ADD INDEX hit_agnt_ID ( hit_agnt_ID )',
-				3 => 'ALTER TABLE T_plugins CHANGE COLUMN plug_status plug_status          ENUM( \'enabled\', \'disabled\', \'needs_config\', \'install\', \'broken\' ) NOT NULL',
-				4 => 'ALTER TABLE T_plugins ADD COLUMN plug_classpath       VARCHAR(255) NULL default NULL AFTER plug_classname',
-				5 => 'ALTER TABLE evo_hitlog ADD INDEX hit_uri (hit_uri)',
-			) as $query )
-		{
-			$DB->query($query);
-		}
+		echo 'Updating hitlog capabilities... ';
+		$DB->query( '
+				ALTER TABLE T_useragents ADD INDEX agnt_type ( agnt_type )' );
+		$DB->query( '
+				ALTER TABLE T_hitlog
+				  CHANGE COLUMN hit_referer_type hit_referer_type ENUM(\'search\',\'blacklist\',\'referer\',\'direct\',\'self\',\'admin\') NOT NULL
+				  ADD INDEX hit_agnt_ID ( hit_agnt_ID )
+				  ADD INDEX hit_uri (hit_uri)' );
+		echo "OK.<br />\n";
+
+		echo 'Updating plugin capabilities... ';
+		$DB->query( '
+				ALTER TABLE T_plugins 
+					MODIFY COLUMN plug_status ENUM( \'enabled\', \'disabled\', \'needs_config\', \'broken\' ) NOT NULL,
+					ADD COLUMN plug_classpath VARCHAR(255) NULL default NULL AFTER plug_classname' );
+		echo "OK.<br />\n";
+		// fp>dh please check, \'install\' was here but not in schema
 	}
 
 
@@ -1329,6 +1333,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.161  2006/08/14 20:19:52  fplanque
+ * no message
+ *
  * Revision 1.160  2006/08/09 21:30:56  fplanque
  * doc
  *
