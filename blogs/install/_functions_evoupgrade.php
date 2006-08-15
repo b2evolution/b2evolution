@@ -1182,7 +1182,6 @@ function upgrade_b2evo_tables()
 					MODIFY COLUMN plug_status ENUM( \'enabled\', \'disabled\', \'needs_config\', \'broken\' ) NOT NULL,
 					ADD COLUMN plug_classpath VARCHAR(255) NULL default NULL AFTER plug_classname' );
 		echo "OK.<br />\n";
-		// fp>dh please check, \'install\' was here but not in schema
 	}
 
 
@@ -1333,6 +1332,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.162  2006/08/15 21:54:57  blueyed
+ * ok.
+ *
  * Revision 1.161  2006/08/14 20:19:52  fplanque
  * no message
  *
