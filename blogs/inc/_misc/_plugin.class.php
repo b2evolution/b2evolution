@@ -1998,7 +1998,7 @@ class Plugin
 
 		if( isset($Blog) && ! is_admin_page() )
 		{
-			$base = $Blog->get('baseurl').'plugins/';
+			$base = $Blog->get('baseurl').$plugins_path;
 		}
 		else
 		{
@@ -2070,19 +2070,52 @@ class Plugin
 	 * Get the URL to call a plugin method through http. This links to the /htsrv/call_plugin.php
 	 * file.
 	 *
+	 * It uses the Blog's baseurl and changes "http" to "https", if needed, so that this URL can
+	 * be used in AJAX callbacks (which requires it to be on the same domain/protocol).
+	 *
 	 * @todo we might want to provide whitelisting of methods through {@link $Session} here and check for it in the htsrv handler.
 	 *
 	 * @param string Method to call. This must be listed in {@link GetHtsrvMethods()}.
 	 * @param array Array of optional parameters passed to the method.
 	 * @param string Glue for additional GET params used internally.
+	 * @param string Get absolute URL? (or cut off $ReqHost at the beginning)
 	 * @return string The URL
 	 */
-	function get_htsrv_url( $method, $params = array(), $glue = '&amp;' )
+	function get_htsrv_url( $method, $params = array(), $glue = '&amp;', $abs = false )
 	{
-		global $htsrv_url;
-		global $Session, $localtimenow;
+		global $htsrv_url, $htsrv_subdir;
+		global $ReqHost, $Blog;
 
-		$r = $htsrv_url.'call_plugin.php?plugin_ID='.$this->ID.$glue.'method='.$method;
+		if( isset($Blog) && ! is_admin_page() )
+		{
+			$base = $Blog->get('baseurl').$htsrv_subdir;
+		}
+		else
+		{
+			$base = $htsrv_url;
+		}
+
+		if( strpos( $base, $ReqHost ) !== 0 )
+		{ // the base url does not begin with the requested host:
+
+			// Fix "http:" to "https:":
+			if( strpos( $ReqHost, 'https:' ) === 0 && strpos( $base, 'http:' ) === 0 )
+			{
+				$base_fixed = 'https:'.substr( $base, 5 );
+
+				if( strpos( $base_fixed, $ReqHost ) === 0 )
+				{
+					$base = $base_fixed;
+				}
+			}
+		}
+
+		if( ! $abs && strpos( $base, $ReqHost ) === 0 )
+		{ // cut off $ReqHost if the resulting URL starts with it:
+			$base = substr($base, strlen($ReqHost));
+		}
+
+		$r = $base.'call_plugin.php?plugin_ID='.$this->ID.$glue.'method='.$method;
 		if( !empty( $params ) )
 		{
 			$r .= $glue.'params='.rawurlencode(serialize( $params ));
@@ -2510,6 +2543,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.83  2006/08/16 19:40:07  blueyed
+ * Made get_htsrv_url() also https-aware, fixes the youtube plugin.
+ *
  * Revision 1.82  2006/07/31 20:11:28  blueyed
  * Karma: check for "numeric" instead of "integer" return values.
  *
