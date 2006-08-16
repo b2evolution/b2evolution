@@ -27,12 +27,6 @@ input[type=checkbox]
 	margin:1px;
 }
 
-.notes,
-.dimmed {
-	font-size: 84%;
-	color: #999;
-	font-weight:normal;
-}
 fieldset div.notes {
 	margin: 0 0 1ex 3ex;
 }

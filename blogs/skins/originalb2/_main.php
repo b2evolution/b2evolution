@@ -161,7 +161,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.
 		$current_skin_includes_path = dirname(__FILE__).'/';
-		$use_sponsored_links = false;
 		// Call the dispatcher:
 		require $skins_path.'_dispatch.inc.php';
 		// --------------- END OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. ---------------
@@ -233,6 +232,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="../../rsc/icons/feed-icon-12x12.gif" alt="view this weblog as RSS !" width="12" height="12" class="middle" /> RSS Feed</a>
 </div>
 <?php
+	// Display additional credits (see /conf/_advanced.php):
+ 	// If you can add your own credits without removing the defaults, you'll be very cool :))
+ 	// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
+	display_list( $credit_links, '<p class="center">'.T_('Credits').': ', '</p>', '|', ' ', ' ' );
 	$Hit->log();	// log the hit on this page
 	debug_info();	// output debug info if requested
 ?>

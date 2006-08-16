@@ -539,10 +539,20 @@ $force_regexp_dirname = '';
 
 
 /**
- * Experimental
+ * Here you can give credit where credit is due ;)
+ * These will appear in the footer of all skins (if the skins are compatible)
+ * You can also add site sponsors here.
+ * 
+ * If you can add your own credits without removing the samples below, you'll be very cool :))
+ * Please leave the credits at the bottom of your pages to make sure your blog gets listed on b2evolution.net
+ * 
+ * Note: some plugins may add their own credit at the end of this array. 
+ * (Not recommended for plugins with potential security weaknesses)
  */
-$sponsored_links = array(
-	array( 'http://plusjamaisseul.net/', 'Plus jamais seul?' ),
+$credit_links = array(
+	array( 'http://b2evolution.net/', 'b2evo' ),
+	array( 'http://evocore.net/', 'evoCore' ),
+	array( 'http://plusjamaisseul.net/', 'seule' ),
 );
 
 

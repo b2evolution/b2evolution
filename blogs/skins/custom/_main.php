@@ -172,25 +172,25 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	</div>
 	<?php
 	} // ---------------------------------- END OF POSTS ------------------------------------
-	?>
+?>
 
-	<p class="center"><strong>
-		<?php posts_nav_link(); ?>
-		<?php
-			// previous_post( '<p class="center">%</p>' );
-			// next_post( '<p class="center">%</p>' );
-		?>
-	</strong></p>
-
+<p class="center"><strong>
+	<?php posts_nav_link(); ?>
 	<?php
-		// -------------- START OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. --------------
-		// Note: you can customize any of the sub templates included here by
-		// copying the matching php file into your skin directory.
-		$current_skin_includes_path = dirname(__FILE__).'/';
-		// Call the dispatcher:
-		require $skins_path.'_dispatch.inc.php';
-		// --------------- END OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. ---------------
+		// previous_post( '<p class="center">%</p>' );
+		// next_post( '<p class="center">%</p>' );
 	?>
+</strong></p>
+
+<?php
+	// -------------- START OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. --------------
+	// Note: you can customize any of the sub templates included here by
+	// copying the matching php file into your skin directory.
+	$current_skin_includes_path = dirname(__FILE__).'/';
+	// Call the dispatcher:
+	require $skins_path.'_dispatch.inc.php';
+	// --------------- END OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. ---------------
+?>
 
 </div>
 <!-- =================================== START OF SIDEBAR =================================== -->
@@ -337,8 +337,14 @@ header( 'Content-type: text/html; charset='.$io_charset );
 </div>
 <div id="pageFooter">
 	<p class="baseline">
-		<a href="<?php echo $Blog->get('msgformurl').'&amp;recipient_id=1&amp;redirect_to='.rawurlencode(regenerate_url()); ?>">Contacter l'administrateur</a>.
-		Original template design by <a href="http://fplanque.net/">Francois PLANQUE</a>.
+		<a href="<?php echo $Blog->get('msgformurl').'&amp;recipient_id=1&amp;redirect_to='.rawurlencode(regenerate_url()); ?>">Contact the admin</a>.
+		Original template design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a>.
+		<?php
+			// Display additional credits (see /conf/_advanced.php):
+ 			// If you can add your own credits without removing the defaults, you'll be very cool :))
+		 	// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
+			display_list( $credit_links, T_('Credits').': ', ' ', '|', ' ', ' ' );
+		?>
 	</p>
 </div>
 </div>

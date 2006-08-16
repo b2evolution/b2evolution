@@ -77,11 +77,6 @@ div.codeblock pre {
 	margin: 0;
 }
 
-/* Experimental */
-ul.evo_sponsored_links {
-	display: none;
-}
-
 /* Calendar: */
 table.bCalendarTable caption.bCalendarCaption {
 	font-size: 105%;

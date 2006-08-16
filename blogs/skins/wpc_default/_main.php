@@ -126,17 +126,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	?>
 </div>
 
-<?php } // ---------------------------------- END OF POSTS ------------------------------------
-
-
-echo '<ul class="evo_sponsored_links">';
-foreach( $sponsored_links as $sponsored_link )
-{
-	echo '<li><a href="'.$sponsored_link[0].'">'.$sponsored_link[1].'</a></li>';
-}
-echo '</ul>';
-
-?>
+<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
 
 </div>
 
@@ -242,7 +232,14 @@ echo '</ul>';
 
 </div>
 
-<p class="credit"><cite>powered by &nbsp;<a href="http://b2evolution.net/" title="<?php echo T_('Powered by b2evolution; multilingual multiuser multi-blog engine.'); ?>"><img src="<?php echo $rsc_url; ?>img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></cite><br />
+<p class="credit"><cite>powered by &nbsp;<a href="http://b2evolution.net/" title="<?php echo T_('Powered by b2evolution; multilingual multiuser multi-blog engine.'); ?>"><img src="<?php echo $rsc_url; ?>img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></cite>
+<?php
+	// Display additional credits (see /conf/_advanced.php):
+ 	// If you can add your own credits without removing the defaults, you'll be very cool :))
+ 	// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
+	display_list( $credit_links, T_('Credits').': ', ' ', '|', ' ', ' ' );
+?>
+<br />
 <?php echo T_('This skin features a CSS file originally designed for WordPress (See design credits in style.css).') ?><br />
 <?php echo T_('Original design credits for this skin:') ?> <a href="http://mezzoblue.com">Dave Shea</a> &amp; <a href="http://photomatt.net">Matthew Mullenweg</a><br />
 <?php echo T_('In order to ensure maximum compatibility with WP CSS files, most b2evolution features that do not exist in WP are hidden from this generic wpc_* skin.') ?>

@@ -41,19 +41,11 @@ if( $disp != 'posts' && $disp != 'single' )
 }
 
 
-// Sponsored links (if you don't mind, please don't move them):
-if( !isset( $use_sponsored_links ) || !empty( $use_sponsored_links ) )
-{
-	echo '<ul class="evo_sponsored_links">';
-	foreach( $sponsored_links as $sponsored_link )
-	{
-		echo '<li><a href="'.$sponsored_link[0].'">'.$sponsored_link[1].'</a></li>';
-	}
-	echo '</ul>';
-}
-
 /*
  * $Log$
+ * Revision 1.2  2006/08/16 23:50:17  fplanque
+ * moved credits to correct place
+ *
  * Revision 1.1  2006/07/24 00:05:44  fplanque
  * cleaned up skins
  *

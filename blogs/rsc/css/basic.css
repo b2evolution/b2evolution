@@ -52,6 +52,13 @@ code {
 	font-size: 84%;
 	color: #555;
 }
+.note,
+.notes,
+.dimmed {
+	font-size: 84%;
+	color: #999;
+	font-weight:normal;
+}
 .shrinkwrap {
 	width: 1%;
 	white-space:nowrap;

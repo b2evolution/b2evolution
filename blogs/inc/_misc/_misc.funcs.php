@@ -3080,9 +3080,46 @@ function unserialize_callback( $classname )
 }
 
 
+/**
+ * Display an array as a list:
+ */
+function display_list( $items, $list_start = '<ul>', $list_end = '<ul>', $item_separator = '', $item_start = '<li>', $item_end = '</li>' )
+{
+	if( !empty( $items ) )
+	{
+		echo $list_start;
+		$first = true;
+		foreach( $items as $item )
+		{
+			if( $first )
+			{
+				$first = false;
+			}
+			else
+			{
+				echo $item_separator;
+			}
+			echo $item_start;
+			if( is_array( $item ) )
+			{
+				echo '<a href="'.$item[0].'">'.$item[1].'</a></li>';
+			}
+			else
+			{
+				echo $item;
+			}
+			echo $item_end;
+		}
+		echo $list_end;
+	}
+}
+
 
 /*
  * $Log$
+ * Revision 1.97  2006/08/16 23:50:17  fplanque
+ * moved credits to correct place
+ *
  * Revision 1.96  2006/08/07 23:49:52  blueyed
  * Display Debuglog object stored in session (after redirect) separately.
  *
