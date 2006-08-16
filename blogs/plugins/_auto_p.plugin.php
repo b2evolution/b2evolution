@@ -118,7 +118,7 @@ class auto_p_plugin extends Plugin
 
 		$new_text = '';
 
-		if( preg_match( '~^(.*?)(<\s*('.$this->block_tags.')(\s+[^>]*)?>)~is', $text, $match ) )
+		if( preg_match( '~^(.*?)(<\s*('.$this->block_tags.')(\b[^>]*)?>)~is', $text, $match ) )
 		{ // there's a block tag:
 			$tag = $match[3];
 			$before_tag = $match[1];
@@ -140,23 +140,30 @@ class auto_p_plugin extends Plugin
 				$new_text .= $NL_before_tag;
 			}
 
-
-			// Opening tag:
-			$new_text .= $match[2];
-
 			$text_after_tag = substr( $text, strlen($match[0]) );
 
-			// Find closing tag:
-			list( $text_in_tag, $closing_tag, $NL_before, $NL_after ) = $this->split_text_for_tag($tag, $text_after_tag);
 
-			if( ! empty($text_in_tag) )
-			{ // Recurse (same level):
-				$text_in_tag = $this->handle_blocks( $text_in_tag, $tag, $depth+1 );
+			if( empty($match[4]) || strpos($match[4], '/') === false )
+			{ // No self-closing tag: handle text in tag:
+				// Opening tag:
+				$new_text .= $match[2];
+
+				// Find closing tag:
+				list( $text_in_tag, $closing_tag, $NL_before, $NL_after ) = $this->split_text_for_tag($tag, $text_after_tag);
+
+				if( ! empty($text_in_tag) )
+				{ // Recurse (same level):
+					$text_in_tag = $this->handle_blocks( $text_in_tag, $tag, $depth+1 );
+				}
+
+				$new_text .= $NL_before.$text_in_tag.$NL_after;
+
+				$new_text .= $closing_tag;
 			}
-
-			$new_text .= $NL_before.$text_in_tag.$NL_after;
-
-			$new_text .= $closing_tag;
+			else
+			{ // self-closing tag:
+				$new_text .= $match[2];
+			}
 
 			if( ! empty($text_after_tag) )
 			{
@@ -634,6 +641,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.24  2006/08/16 01:13:29  blueyed
+ * Auto-P plugin: fix for self-closing block tags
+ *
  * Revision 1.23  2006/07/31 22:03:01  blueyed
  * More fixes to the Auto-P plugin
  *
