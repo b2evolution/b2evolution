@@ -36,7 +36,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $io_charset, $rsc_url, $UserSettings, $Debuglog, $Plugins, $generating_static;
 
 if( !empty($generating_static) )
-{ // We are not generating a static page (in which case this has already been sent):
+{ // We are generating a static page (in which case this has already been sent):
 	header( 'Content-type: text/html; charset='.$io_charset );
 }
 ?>
