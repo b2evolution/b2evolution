@@ -59,7 +59,7 @@ class EvoGroupTest extends GroupTest
 	{
 		if( TextReporter::inCli() )
 		{
-			exit( parent::run( cliReporter() ) ? 0 : 1 );
+			exit( parent::run( $cliReporter ) ? 0 : 1 );
 		}
 		parent::run( $htmlReporter );
 	}
