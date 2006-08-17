@@ -1171,8 +1171,8 @@ function upgrade_b2evo_tables()
 				ALTER TABLE T_useragents ADD INDEX agnt_type ( agnt_type )' );
 		$DB->query( '
 				ALTER TABLE T_hitlog
-				  CHANGE COLUMN hit_referer_type hit_referer_type ENUM(\'search\',\'blacklist\',\'referer\',\'direct\',\'self\',\'admin\') NOT NULL
-				  ADD INDEX hit_agnt_ID ( hit_agnt_ID )
+				  CHANGE COLUMN hit_referer_type hit_referer_type ENUM(\'search\',\'blacklist\',\'referer\',\'direct\',\'self\',\'admin\') NOT NULL,
+				  ADD INDEX hit_agnt_ID ( hit_agnt_ID ),
 				  ADD INDEX hit_uri (hit_uri)' );
 		echo "OK.<br />\n";
 
@@ -1332,6 +1332,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.163  2006/08/17 20:10:23  fplanque
+ * fix syntax error
+ *
  * Revision 1.162  2006/08/15 21:54:57  blueyed
  * ok.
  *
