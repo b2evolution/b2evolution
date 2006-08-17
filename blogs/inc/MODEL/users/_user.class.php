@@ -467,7 +467,13 @@ class User extends DataObject
 	 */
 	function check_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL )
 	{
+		static $cache_perms; /* visible in all classes */
 		global $Debuglog;
+
+		if( isset($cache_perms[$this->ID][$permname][$permlevel][$perm_target]) )
+		{
+			return $cache_perms[$this->ID][$permname][$permlevel][$perm_target];
+		}
 
 		$perm = false;
 
@@ -540,6 +546,8 @@ class User extends DataObject
 			global $app_name;
 			debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name )." ($permname:$permlevel:$perm_target)" );
 		}
+
+		$cache_perms[$this->ID][$permname][$permlevel][$perm_target] = $perm;
 
 		return $perm;
 	}
@@ -1117,6 +1125,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.35  2006/08/17 22:57:16  blueyed
+ * Caching of user perms.
+ *
  * Revision 1.34  2006/08/07 08:40:22  blueyed
  * doc/examples
  *
