@@ -55,9 +55,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param string format to output, default 'htmlbody'
  * @param boolean display title? (if false: return)
  * @param boolean show the year as link to year's archive (in monthly mode)
+ * @param string params for archive link
+ * @param boolean do we want to display title for single posts
+ * @param default text to display if nothing else
  */
 function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'htmlbody',
-												$display = true, $linktoyeararchive = true, $blogurl = '', $params = '' )
+												$display = true, $linktoyeararchive = true, $blogurl = '', $params = '', 
+												$disp_single_title = true, $default = '' )
 {
 	global $cat_modifier, $cat_array, $m, $w, $month, $p, $title, $preview, $ItemCache, $disp, $s, $author;
 
@@ -90,116 +94,118 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			$r[] = T_('Send an email message');
 			break;
 
-		default:
-			// We are displaying (a) message(s)...
+		case 'single':
+			// We are displaying a single message:
 			if( $preview )
 			{	// We are requesting a post preview:
 				$r[] = T_('PREVIEW');
 			}
-			elseif( intval($p) )
-			{	// We are requesting a specific post by ID:
-				if( $Item = & $ItemCache->get_by_ID( $p, false ) )
-				{
-					$r[] = $Item->get('title');
-				}
-			}
-			elseif( !empty( $title ) )
-			{	// We are requesting a specific post by title:
-				if( $Item = & $ItemCache->get_by_urltitle( $title, false ) )
-				{
-					$r[] = $Item->get('title');
-				}
-			}
-			else
-			{	// Multiple messages...
-
-				// CATEGORIES:
-				if( !empty($cat_array) )
-				{ // We have requested specific categories...
-					$cat_names = array();
-					foreach( $cat_array as $cat_ID )
+			elseif( $disp_single_title )
+			{
+				if( intval($p) )
+				{	// We are requesting a specific post by ID:
+					if( $Item = & $ItemCache->get_by_ID( $p, false ) )
 					{
-						if( ($my_cat = get_the_category_by_ID( $cat_ID, false ) ) !== false )
-						{ // It is almost never meaningful to die over an invalid cat when generating title
-							$cat_names[] = $my_cat['cat_name'];
-						}
+						$r[] = $Item->get('title');
 					}
-					if( $cat_modifier == '*' )
+				}
+				elseif( !empty( $title ) )
+				{	// We are requesting a specific post by title:
+					if( $Item = & $ItemCache->get_by_urltitle( $title, false ) )
 					{
-						$cat_names_string = implode( ' + ', $cat_names );
+						$r[] = $Item->get('title');
+					}
+				}
+			}
+			break;		
+	
+		default:
+			// We are displaying a message list/search results...
+			// CATEGORIES:
+			if( !empty($cat_array) )
+			{ // We have requested specific categories...
+				$cat_names = array();
+				foreach( $cat_array as $cat_ID )
+				{
+					if( ($my_cat = get_the_category_by_ID( $cat_ID, false ) ) !== false )
+					{ // It is almost never meaningful to die over an invalid cat when generating title
+						$cat_names[] = $my_cat['cat_name'];
+					}
+				}
+				if( $cat_modifier == '*' )
+				{
+					$cat_names_string = implode( ' + ', $cat_names );
+				}
+				else
+				{
+					$cat_names_string = implode( ', ', $cat_names );
+				}
+				if( !empty( $cat_names_string ) )
+				{
+					if( $cat_modifier == '-' )
+					{
+						$cat_names_string = T_('All but ').$cat_names_string;
+						$r[] = T_('Categories').': '.$cat_names_string;
 					}
 					else
 					{
-						$cat_names_string = implode( ', ', $cat_names );
-					}
-					if( !empty( $cat_names_string ) )
-					{
-						if( $cat_modifier == '-' )
-						{
-							$cat_names_string = T_('All but ').$cat_names_string;
+						if( count($cat_array) > 1 )
 							$r[] = T_('Categories').': '.$cat_names_string;
-						}
 						else
-						{
-							if( count($cat_array) > 1 )
-								$r[] = T_('Categories').': '.$cat_names_string;
-							else
-								$r[] = T_('Category').': '.$cat_names_string;
-						}
+							$r[] = T_('Category').': '.$cat_names_string;
 					}
 				}
+			}
 
 
-				// TIMEFRAME:
-				if( !empty($m) )
-				{	// We have asked for a specific timeframe:
+			// TIMEFRAME:
+			if( !empty($m) )
+			{	// We have asked for a specific timeframe:
 
-					$my_year = substr($m,0,4);
-					if( strlen($m) > 4 && isset($month[substr($m,4,2)]) )
-					{ // We have requested a month too:
-						$my_month = T_($month[substr($m,4,2)]);
-					}
-					else
-					{
-						$my_month = '';
-					}
-					// Requested a day?
-					$my_day = substr($m,6,2);
-
-					if( $format == 'htmlbody' && !empty( $my_month ) && $linktoyeararchive )
-					{ // display year as link to year's archive
-						$my_year = '<a href="' . archive_link( $my_year, '', '', '', false, $blogurl, $params ) . '">' . $my_year . '</a>';
-					}
-
-					$arch = T_('Archives for').': '.$my_month.' '.$my_year;
-
-					if( !empty( $my_day ) )
-					{	// We also want to display a day
-						$arch .= ", $my_day";
-					}
-
-					if( !empty($w) && ($w>=0) ) // Note: week # can be 0
-					{	// We also want to display a week number
-						$arch .= ", week $w";
-					}
-
-					$r[] = $arch;
+				$my_year = substr($m,0,4);
+				if( strlen($m) > 4 && isset($month[substr($m,4,2)]) )
+				{ // We have requested a month too:
+					$my_month = T_($month[substr($m,4,2)]);
 				}
-
-
-				// KEYWORDS:
-				if( !empty($s) )
+				else
 				{
-					$r[] = T_('Keyword(s)').': '.$s;
+					$my_month = '';
+				}
+				// Requested a day?
+				$my_day = substr($m,6,2);
+
+				if( $format == 'htmlbody' && !empty( $my_month ) && $linktoyeararchive )
+				{ // display year as link to year's archive
+					$my_year = '<a href="' . archive_link( $my_year, '', '', '', false, $blogurl, $params ) . '">' . $my_year . '</a>';
 				}
 
+				$arch = T_('Archives for').': '.$my_month.' '.$my_year;
 
-				// AUTHORS:
-				if( !empty($author) )
-				{
-					$r[] = T_('Author(s)').': '.$author;
+				if( !empty( $my_day ) )
+				{	// We also want to display a day
+					$arch .= ", $my_day";
 				}
 
+				if( !empty($w) && ($w>=0) ) // Note: week # can be 0
+				{	// We also want to display a week number
+					$arch .= ", week $w";
+				}
+
+				$r[] = $arch;
+			}
+
+
+			// KEYWORDS:
+			if( !empty($s) )
+			{
+				$r[] = T_('Keyword(s)').': '.$s;
+			}
+
+
+			// AUTHORS:
+			if( !empty($author) )
+			{
+				$r[] = T_('Author(s)').': '.$author;
 			}
 	}
 
@@ -210,6 +216,11 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 	$additional_titles = $MainList->get_title();
 	$r = array_merge( $r, $additional_titles );
 	*/
+	
+	if( empty( $r ) && !empty( $default ) )
+	{
+		$r[] = $default;
+	}
 
 	if( !empty( $r ) )
 	{ // We have something to display:
@@ -296,6 +307,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.8  2006/08/17 16:32:29  fplanque
+ * enhanced titles
+ *
  * Revision 1.7  2006/08/05 17:59:52  fplanque
  * minor
  *
