@@ -259,8 +259,14 @@ class Blog extends DataObject
 		
 		
 		if( $Request->param( 'blog_default_skin',  'string', NULL ) != NULL )
-		{	// Default display options:
+		{	// Default blog:
 			$this->set_from_Request( 'default_skin' );
+		}
+		
+		
+		if( $Request->param( 'blog_links_blog_ID',  'integer', NULL ) != NULL )
+		{	// Default display options:
+			$this->set_from_Request( 'links_blog_ID' );
 
 			// checkboxes (will not get send, if unchecked)
 			$this->set( 'force_skin',  1-param( 'blog_force_skin',    'integer', 0 ) );
@@ -268,8 +274,6 @@ class Blog extends DataObject
 			$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
 			$this->set( 'disp_bloglist', param( 'blog_disp_bloglist', 'integer', 0 ) );
 			$this->set( 'in_bloglist',   param( 'blog_in_bloglist',   'integer', 0 ) );
-
-			$this->set( 'links_blog_ID', param( 'blog_links_blog_ID', 'integer', true ) );
 		}
 
 		
@@ -999,6 +1003,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2006/08/18 17:23:58  fplanque
+ * Visual skin selector
+ *
  * Revision 1.10  2006/08/18 00:40:35  fplanque
  * Half way through a clean blog management - too tired to continue
  * Should be working.

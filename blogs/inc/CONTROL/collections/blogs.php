@@ -177,14 +177,12 @@ switch( $action )
 				}
 				break;
 
-			case 'perm':
-				blog_update_user_perms( $blog );
-				$Messages->add( T_('The blog permissions have been updated'), 'success' );
-				break;
-
-			case 'permgroup':
-				blog_update_group_perms( $blog );
-				$Messages->add( T_('The blog permissions have been updated'), 'success' );
+			case 'skin':
+				if( $edited_Blog->load_from_Request( array() ) )
+				{ // Commit update to the DB:
+					$edited_Blog->dbupdate();
+					$Messages->add( T_('The blog skin selection has been updated'), 'success' );
+				}
 				break;
 
 			case 'advanced':
@@ -193,6 +191,16 @@ switch( $action )
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog settings have been updated'), 'success' );
 				}
+				break;
+
+			case 'perm':
+				blog_update_user_perms( $blog );
+				$Messages->add( T_('The blog permissions have been updated'), 'success' );
+				break;
+
+			case 'permgroup':
+				blog_update_group_perms( $blog );
+				$Messages->add( T_('The blog permissions have been updated'), 'success' );
 				break;
 		}
 
@@ -388,16 +396,20 @@ switch($action)
 				$AdminUI->disp_view( 'collections/_blogs_general.form.php' );
 				break;
 
+			case 'skin':
+				$AdminUI->disp_view( 'collections/_blogs_skin.form.php' );
+				break;
+
+			case 'advanced':
+				$AdminUI->disp_view( 'collections/_blogs_advanced.form.php' );
+				break;
+
 			case 'perm':
 				$AdminUI->disp_view( 'collections/_blogs_permissions.form.php' );
 				break;
 
 			case 'permgroup':
 				$AdminUI->disp_view( 'collections/_blogs_permissions_group.form.php' );
-				break;
-
-			case 'advanced':
-				$AdminUI->disp_view( 'collections/_blogs_advanced.form.php' );
 				break;
 		}
 
@@ -481,6 +493,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2006/08/18 17:23:58  fplanque
+ * Visual skin selector
+ *
  * Revision 1.17  2006/08/18 00:40:35  fplanque
  * Half way through a clean blog management - too tired to continue
  * Should be working.

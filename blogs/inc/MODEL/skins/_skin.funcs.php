@@ -161,12 +161,17 @@ function skin_list_next()
  */
 function skin_list_iteminfo( $what='', $display = true )
 {
-	global $skins_path, $skin_name;
+	global $skins_path, $skins_url, $skin_name;
 
 	switch( $what )
 	{
 		case 'path':
 			$info = $skins_path.$skin_name;
+			break;
+
+		case 'url':
+			$info = $skins_url.$skin_name;
+			break;
 
 		case 'name':
 		default:
@@ -180,7 +185,6 @@ function skin_list_iteminfo( $what='', $display = true )
 
 
 /**
- * skin_change_url(-)
  * @param boolean display (true) or return?
  */
 function skin_change_url( $display = true )
@@ -199,6 +203,9 @@ function skin_change_url( $display = true )
 
 /*
  * $Log$
+ * Revision 1.8  2006/08/18 17:23:58  fplanque
+ * Visual skin selector
+ *
  * Revision 1.7  2006/08/02 13:00:51  fplanque
  * detect incomplete upgrade of conf file
  *

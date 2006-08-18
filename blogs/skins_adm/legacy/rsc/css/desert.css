@@ -852,3 +852,15 @@ span.checkall,
 th.checkright {
 	font-size: 84%;
 }
+
+
+/*
+ * Skin selection:
+ */
+div.skinshot {
+	background-color: #efede0;
+}
+
+div.skinshot img.current {
+	border: 1px solid #d00;
+}

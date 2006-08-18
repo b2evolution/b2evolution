@@ -167,20 +167,24 @@ $AdminUI->add_menu_entries(
 				'entries' => array(
 					'general' => array(
 						'text' => T_('General'),
-						'href' => 'admin.php?ctrl=collections&amp;tab=general&amp;action=edit&amp;blog='.$blog,
-						'perm_eval' => 'return $GLOBALS["blog"];' ), // hack!?
-					'perm' => array(
-						'text' => T_('User permissions'),
-						'href' => 'admin.php?ctrl=collections&amp;tab=perm&amp;action=edit&amp;blog='.$blog,
-						'perm_eval' => 'return $GLOBALS["blog"];' ), // hack!?
-					'permgroup' => array(
-						'text' => T_('Group permissions'),
-						'href' => 'admin.php?ctrl=collections&amp;tab=permgroup&amp;action=edit&amp;blog='.$blog,
-						'perm_eval' => 'return $GLOBALS["blog"];' ), // hack!?
+						'href' => 'admin.php?ctrl=collections&amp;tab=general&amp;blog='.$blog,
+						'perm_eval' => 'global $action; return $action != "list";' ),
+					'skin' => array(
+						'text' => T_('Skin'),
+						'href' => 'admin.php?ctrl=collections&amp;tab=skin&amp;blog='.$blog,
+						'perm_eval' => 'global $action; return $action != "list";' ),
 					'advanced' => array(
 						'text' => T_('Advanced'),
-						'href' => 'admin.php?ctrl=collections&amp;tab=advanced&amp;action=edit&amp;blog='.$blog,
-						'perm_eval' => 'return $GLOBALS["blog"];' ), // hack!?
+						'href' => 'admin.php?ctrl=collections&amp;tab=advanced&amp;blog='.$blog,
+						'perm_eval' => 'global $action; return $action != "list";' ),
+					'perm' => array(
+						'text' => T_('User permissions'),
+						'href' => 'admin.php?ctrl=collections&amp;tab=perm&amp;blog='.$blog,
+						'perm_eval' => 'global $action; return $action != "list";' ),
+					'permgroup' => array(
+						'text' => T_('Group permissions'),
+						'href' => 'admin.php?ctrl=collections&amp;tab=permgroup&amp;blog='.$blog,
+						'perm_eval' => 'global $action; return $action != "list";' ),
 				)
 			),
 
@@ -310,6 +314,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.13  2006/08/18 17:23:58  fplanque
+ * Visual skin selector
+ *
  * Revision 1.12  2006/07/12 20:18:19  fplanque
  * session stats + minor enhancements
  *
