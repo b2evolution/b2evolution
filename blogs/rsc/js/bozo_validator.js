@@ -169,7 +169,7 @@ var bozo = {
 	 */
 	reset_changes: function ( e )
 	{
-		alert('reset');
+		//alert('reset');
 	
 		// Loop on the forms changes array
 		for( i in bozo.tab_changes )
@@ -236,4 +236,6 @@ var bozo = {
 addEvent( window, 'load', bozo.init, false );
 // The following does not seem to work with addEvent... !?
 // addEvent( window, 'beforeunload', bozo.validate_close, false );
+// TODO: dh> probably this would work:
+// addEvent( window.document, 'beforeunload', bozo.validate_close, false );
 window.onbeforeunload = bozo.validate_close;
