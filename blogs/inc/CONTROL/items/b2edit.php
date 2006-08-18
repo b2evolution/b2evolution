@@ -309,14 +309,14 @@ switch( $action )
 		{
 			document.title = document.title.replace(/:[^:]*$/, ": "+document.getElementById('post_title').value);
 		}
-		
+
 		addEvent( post_title_elt, 'keyup', evo_update_document_title, false );
-		
+
 		// Init:
 		evo_update_document_title();
 	}
-	
-	
+
+
 	if( edit_date_elt = document.getElementById('edit_date') )
 	{
 		/**
@@ -326,7 +326,7 @@ switch( $action )
 		{
 			edit_date_elt.checked = true;
 		}
-		
+
 		if( item_issue_date_elt = document.getElementById('item_issue_date') )
 		{
 			addEvent( item_issue_date_elt, 'change', evo_check_edit_date, false ); // TODO: check in IE
@@ -336,7 +336,7 @@ switch( $action )
 			addEvent( item_issue_time_elt, 'change', evo_check_edit_date, false ); // TODO: check in IE
 		}
 	}
-		
+
 </script>
 
 <?php
