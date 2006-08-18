@@ -1977,7 +1977,7 @@ function debug_info( $force = false )
 	{
 		$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
 		$log_cats = array_keys($sess_Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
-		$log_container_head = '<h3 id="debug_sess_debuglog">Debug messages (before redirect)</h3>'
+		$log_container_head = '<h3 id="debug_sess_debuglog" style="color:#f00;">Debug messages from redirected page</h3>'
 			// link to real Debuglog:
 			.'<p><a href="'.$ReqHostPathQuery.'#debug_debuglog">See below for the Debuglog from the current request.</a></p>';
 		$log_head_links = array();
@@ -3117,6 +3117,9 @@ function display_list( $items, $list_start = '<ul>', $list_end = '<ul>', $item_s
 
 /*
  * $Log$
+ * Revision 1.98  2006/08/18 21:02:15  fplanque
+ * minor
+ *
  * Revision 1.97  2006/08/16 23:50:17  fplanque
  * moved credits to correct place
  *

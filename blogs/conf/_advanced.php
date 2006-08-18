@@ -32,14 +32,18 @@ function NT_( $string )
  */
 $debug = 0;
 
+// Most of the time you'll want to see all errors, including notices:
+// b2evo should run notice free! (plugins too!)
+error_reporting( E_ALL );
 
-// For severe errors, you'll probably want PHP do display the errors. In this case, uncomment the following line:
-// error_reporting( E_ALL );
-
-// To display errors also on the webpage, ant not only in the server's error log, uncomment this:
+// To help debugging severe errors, you'll probably want PHP to display the errors on screen.
+// In this case, uncomment the following line:
 // ini_set( 'display_errors', 'on' );
 
-// TODO: dh> ini_set( 'memory_limit', '12M' ); by default?
+// If you get blank pages, PHP may be crashing because it doesn't have enough memory.
+// The default is 8 MB (set in php.ini)
+// Try uncommmenting the following line:
+// ini_set( 'memory_limit', '12M' );
 
 
 /**
