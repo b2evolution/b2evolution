@@ -121,7 +121,7 @@ class Form extends Widget
 	 * Constructor
 	 *
 	 * @param string the action destination of the form (NULL for pagenow)
-	 * @param string the name of the form
+	 * @param string the name of the form (will be used as an ID)
 	 * @param string the action to execute when the form is submitted
 	 * @param string the method used to send data
 	 * @param string the form layout : 'fieldset', 'table' or '' (NULL means: if there is an {@link $AdminUI} object get it from there, otherwise use 'fieldset')
@@ -715,7 +715,7 @@ class Form extends Widget
 						// -->
 					</script>\n"
 				.$this->get_input_element($field_params, false)
-				.'<a href="#" onclick="cal_'.$field_name.'.select('.$this->form_name.'.'.$field_name.",'anchor_".$field_name."', '".$js_date_format."');"
+				.'<a href="#" onclick="cal_'.$field_name.".select(document.getElementById('".$field_name."'), 'anchor_".$field_name."', '".$js_date_format."');"
 				.' return false;" name="anchor_'.$field_name.'" id="anchor_'.$this->get_valid_id($field_name).'" title="'.T_('Select date').'">'
 				.get_icon( 'calendar', 'imgtag', array( 'title'=>T_('Select date') ) ).'</a>';
 
@@ -2600,6 +2600,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.30  2006/08/18 19:18:15  fplanque
+ * fixed calendar popups
+ *
  * Revision 1.29  2006/08/02 23:35:02  blueyed
  * Check if UserSettings is available
  *
