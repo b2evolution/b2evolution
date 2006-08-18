@@ -170,6 +170,7 @@ switch( $action )
 		switch( $tab )
 		{
 			case 'general':
+			case 'display':
 				if( $edited_Blog->load_from_Request( array() ) )
 				{ // Commit update to the DB:
 					$edited_Blog->dbupdate();
@@ -333,22 +334,6 @@ switch($action)
 		echo '<div class="panelblock">';
 		echo '<h2>'.T_('New blog').':</h2>';
 
-		if( !isset( $blog_siteurl_type ) )
-		{ // determine siteurl type (if not set from update-action)
-			if( preg_match('#https?://#', $edited_Blog->get( 'siteurl' ) ) )
-			{ // absolute
-				$blog_siteurl_type = 'absolute';
-				$blog_siteurl_relative = '';
-				$blog_siteurl_absolute = $edited_Blog->get( 'siteurl' );
-			}
-			else
-			{ // relative
-				$blog_siteurl_type = 'relative';
-				$blog_siteurl_relative = $edited_Blog->get( 'siteurl' );
-				$blog_siteurl_absolute = 'http://';
-			}
-		}
-
 		$next_action = 'create';
 
 		$AdminUI->disp_view( 'collections/_blogs_general.form.php' );
@@ -371,33 +356,20 @@ switch($action)
 		$AdminUI->disp_payload_begin();
 
 
+		// Display VIEW:
 		switch( $AdminUI->get_path(1) )
 		{
 			case 'general':
-
-				if( !isset( $blog_siteurl_type ) )
-				{ // determine siteurl type (if not set from update-action)
-					if( preg_match('#https?://#', $edited_Blog->get( 'siteurl' ) ) )
-					{ // absolute
-						$blog_siteurl_type = 'absolute';
-						$blog_siteurl_relative = '';
-						$blog_siteurl_absolute = $edited_Blog->get( 'siteurl' );
-					}
-					else
-					{ // relative
-						$blog_siteurl_type = 'relative';
-						$blog_siteurl_relative = $edited_Blog->get( 'siteurl' );
-						$blog_siteurl_absolute = 'http://';
-					}
-				}
-
 				$next_action = 'update';
-				// Display VIEW:
 				$AdminUI->disp_view( 'collections/_blogs_general.form.php' );
 				break;
 
 			case 'skin':
 				$AdminUI->disp_view( 'collections/_blogs_skin.form.php' );
+				break;
+
+			case 'display':
+				$AdminUI->disp_view( 'collections/_blogs_display.form.php' );
 				break;
 
 			case 'advanced':
@@ -493,6 +465,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2006/08/18 18:29:37  fplanque
+ * Blog parameters reorganization + refactoring
+ *
  * Revision 1.18  2006/08/18 17:23:58  fplanque
  * Visual skin selector
  *

@@ -238,7 +238,10 @@ class Blog extends DataObject
 			// Preferred access type:
 			$this->set( 'access_type',   $Request->param( 'blog_access_type',   'string', true ) );
 			$this->set( 'stub',          $Request->param( 'blog_stub',          'string', true ) );
-
+			if( $this->access_type == 'stub' )
+			{	// fp> If there is a case to leave this blank, comment this out and explain the case. Thanks.
+				$Request->param_check_not_empty( 'blog_stub', T_('You must provide a stub file name, e-g: a_stub.php') );
+			}
 
 			// check urlname
 			if( $Request->param_string_not_empty( 'blog_urlname', T_('You must provide an URL blog name!') ) )
@@ -264,7 +267,7 @@ class Blog extends DataObject
 		}
 		
 		
-		if( $Request->param( 'blog_links_blog_ID',  'integer', NULL ) != NULL )
+		if( $Request->param( 'blog_links_blog_ID',  'integer', -1 ) != -1 )
 		{	// Default display options:
 			$this->set_from_Request( 'links_blog_ID' );
 
@@ -277,15 +280,31 @@ class Blog extends DataObject
 		}
 
 		
-		if( $Request->param( 'blog_description',   'string', NULL ) != NULL )
+		if( $Request->param( 'blog_description', 'string', NULL ) != NULL )
 		{	// Description:
-			$this->set_from_Request( 'description' );
-			$this->set( 'keywords',      $Request->param( 'blog_keywords',      'string', true ) );
-			$this->set( 'tagline',       format_to_post( $Request->param( 'blog_tagline',  'html', true ), 0, 0 ) );
-			$this->set( 'longdesc',      format_to_post( $Request->param( 'blog_longdesc', 'html', true ), 0, 0 ) );
-			$this->set( 'notes',         format_to_post( $Request->param( 'blog_notes',    'html', true ), 0, 0 ) );
+			$this->set_from_Request( 'shortdesc', 'blog_description' );
 		}
-
+		
+		if( $Request->param( 'blog_keywords', 'string', NULL ) != NULL )
+		{	// Keywords:
+			$this->set_from_Request( 'keywords' );
+		}
+		
+		if( $Request->param( 'blog_tagline',   'html', NULL ) != NULL )
+		{	// HTML tagline:
+			$this->set( 'tagline', format_to_post( $Request->get( 'blog_tagline' ), 0, 0 ) );
+		}
+		
+		if( $Request->param( 'blog_longdesc',   'html', NULL ) != NULL )
+		{	// HTML long description:
+			$this->set( 'longdesc', format_to_post( $Request->get( 'blog_longdesc' ), 0, 0 ) );
+		}
+		
+		if( $Request->param( 'blog_notes',   'html', NULL ) != NULL )
+		{	// HTML notes:
+			$this->set( 'notes', format_to_post( $Request->get( 'blog_notes' ), 0, 0 ) );
+		}
+		
 
 		if( $Request->param( 'blog_staticfilename', 'string', NULL ) !== NULL ) 
 		{	// Static file:
@@ -1003,6 +1022,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2006/08/18 18:29:37  fplanque
+ * Blog parameters reorganization + refactoring
+ *
  * Revision 1.11  2006/08/18 17:23:58  fplanque
  * Visual skin selector
  *

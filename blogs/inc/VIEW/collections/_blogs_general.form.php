@@ -5,20 +5,9 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
- * Parts of this file are copyright (c)2005 by Jason Edgecombe.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal Open Source relicensing agreement:
- * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
- * Jason EDGECOMBE's contributions to this file and the b2evolution project
- * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
- * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
- *
- * Jason EDGECOMBE grants Francois PLANQUE the right to license
- * Jason EDGECOMBE's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- *
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
@@ -27,9 +16,7 @@
  * @package admin
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
- * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
  * @author fplanque: Francois PLANQUE.
- * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
  *
  * @version $Id$
  */
@@ -118,7 +105,21 @@ $Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear
 $Form->end_fieldset();
 
 
-global $blog_siteurl_type, $baseurl, $blog_siteurl_relative, $blog_siteurl_absolute, $maxlength_urlname_stub;
+global $baseurl, $maxlength_urlname_stub;
+
+// determine siteurl type (if not set from update-action)
+if( preg_match('#https?://#', $edited_Blog->get( 'siteurl' ) ) )
+{ // absolute
+	$blog_siteurl_type = 'absolute';
+	$blog_siteurl_relative = '';
+	$blog_siteurl_absolute = $edited_Blog->get( 'siteurl' );
+}
+else
+{ // relative
+	$blog_siteurl_type = 'relative';
+	$blog_siteurl_relative = $edited_Blog->get( 'siteurl' );
+	$blog_siteurl_absolute = 'http://';
+}
 
 $Form->begin_fieldset( T_('Blog URL parameters') );
 
@@ -181,33 +182,27 @@ $Form->begin_fieldset( T_('Blog URL parameters') );
 	$Form->info( T_('URL preview'), '<span id="urlpreview">'.$edited_Blog->dget( 'baseurl', 'entityencoded' ).$blog_urlappend.'</span>' );
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Feedback options') );
+	$Form->radio( 'blog_allowcomments', $edited_Blog->get( 'allowcomments' ),
+						array(  array( 'always', T_('Always on all posts'), T_('Always allow comments on every posts') ),
+						array( 'post_by_post', T_('Can be disabled on a per post basis'),  T_('Comments can be disabled on each post separatly') ),
+						array( 'never', T_('No comments are allowed in this blog'), T_('Never allow any comments in this blog') ),
+					), T_('Allow comments'), true );
 
-$Form->begin_fieldset( T_('Default display options') );
-	$Form->select( 'blog_default_skin', $edited_Blog->get( 'default_skin' ), 'skin_options_return', T_('Default skin') , T_('This is the default skin that will be used to display this blog.') );
+	$status_options = array(
+			'draft'      => T_('Draft'),
+			'published'  => T_('Published'),
+			'deprecated' => T_('Deprecated')
+		);
+	$Form->select_input_array( 'new_feedback_status', $status_options, T_('New feedback status') /* gets referred to in antispam settings form */, array(
+				'value' => $edited_Blog->get_setting('new_feedback_status'),
+				'note' => T_('This status will be assigned to any new comment/trackback (unless overriden by plugins).')
+			) );
 
-	$Form->checkbox( 'blog_force_skin', 1-$edited_Blog->get( 'force_skin' ), T_('Allow skin switching'), T_('Users will be able to select another skin to view the blog (and their preferred skin will be saved in a cookie).') );
-	$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('A CSS file in the blog media directory will override the default skin stylesheet.') );
-	$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to override the blog and skin stylesheet with their own.') );
-	$Form->checkbox( 'blog_disp_bloglist', $edited_Blog->get( 'disp_bloglist' ), T_('Display public blog list'), T_('Check this if you want to display the list of all blogs on your blog page (if your skin supports this).') );
+	$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Allow trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
+	$Form->checkbox( 'blog_allowpingbacks', $edited_Blog->get( 'allowpingbacks' ), T_('Allow pingbacks'), T_('Deprecated') );
 
-	$Form->checkbox( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want this blog to be displayed in the list of all public blogs.') );
-
-	$Form->select_object( 'blog_links_blog_ID', $edited_Blog->get( 'links_blog_ID' ), $BlogCache, T_('Default linkblog'), T_('Will be displayed next to this blog (if your skin supports this).'), true );
 $Form->end_fieldset();
-
-
-$Form->begin_fieldset( T_('Description') );
-	$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is diplayed under the blog name on the blog template.'), 250 );
-
-	$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 8, T_('Long Description'), T_('This is displayed on the blog template.'), 50, 'large' );
-
-	$Form->text( 'blog_description', $edited_Blog->get( 'description' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
-
-	$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
-
-	$Form->textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 8, T_('Notes'), T_('Additional info.'), 50, 'large' );
-$Form->end_fieldset();
-
 
 $Form->buttons( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );

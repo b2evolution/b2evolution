@@ -39,12 +39,6 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'advanced' );
 $Form->hidden( 'blog',$edited_Blog->ID );
 
-
-$Form->begin_fieldset( T_('Static file generation'), array( 'class'=>'fieldset clear' ) );
-	$Form->text( 'blog_staticfilename', $edited_Blog->get( 'staticfilename' ), 30, T_('Static filename'), T_('This is the .html file that will be created when you generate a static version of the blog homepage.') );
-$Form->end_fieldset();
-
-
 $Form->begin_fieldset( T_('Media library') );
 global $basepath, $media_subdir;
 $Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
@@ -78,32 +72,21 @@ $Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('After each new post...') );
-$Form->checkbox( 'blog_pingb2evonet', $edited_Blog->get( 'pingb2evonet' ), T_('Ping b2evolution.net'), T_('to get listed on the "recently updated" list on b2evolution.net').' [<a href="http://b2evolution.net/about/terms.html">'.T_('Terms of service').'</a>]' );
-$Form->checkbox( 'blog_pingtechnorati', $edited_Blog->get( 'pingtechnorati' ), T_('Ping technorati.com'), T_('to give notice of new post.') );
-$Form->checkbox( 'blog_pingweblogs', $edited_Blog->get( 'pingweblogs' ), T_('Ping weblogs.com'), T_('to give notice of new post.') );
-$Form->checkbox( 'blog_pingblodotgs', $edited_Blog->get( 'pingblodotgs' ), T_('Ping blo.gs'), T_('to give notice of new post.') );
+	$Form->checkbox( 'blog_pingb2evonet', $edited_Blog->get( 'pingb2evonet' ), T_('Ping b2evolution.net'), T_('to get listed on the "recently updated" list on b2evolution.net').' [<a href="http://b2evolution.net/about/terms.html">'.T_('Terms of service').'</a>]' );
+	$Form->checkbox( 'blog_pingtechnorati', $edited_Blog->get( 'pingtechnorati' ), T_('Ping technorati.com'), T_('to give notice of new post.') );
+	$Form->checkbox( 'blog_pingweblogs', $edited_Blog->get( 'pingweblogs' ), T_('Ping weblogs.com'), T_('to give notice of new post.') );
+	$Form->checkbox( 'blog_pingblodotgs', $edited_Blog->get( 'pingblodotgs' ), T_('Ping blo.gs'), T_('to give notice of new post.') );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Feedback options') );
-$Form->radio( 'blog_allowcomments', $edited_Blog->get( 'allowcomments' ),
-					array(  array( 'always', T_('Always on all posts'), T_('Always allow comments on every posts') ),
-					array( 'post_by_post', T_('Can be disabled on a per post basis'),  T_('Comments can be disabled on each post separatly') ),
-					array( 'never', T_('No comments are allowed in this blog'), T_('Never allow any comments in this blog') ),
-				), T_('Allow comments'), true );
+$Form->begin_fieldset( T_('Meta data') );
+	$Form->text( 'blog_description', $edited_Blog->get( 'description' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
+	$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
+	$Form->textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 5, T_('Notes'), T_('Additional info. Appears in the backoffice.'), 50, 'large' );
+$Form->end_fieldset();
 
-$status_options = array(
-		'draft'      => T_('Draft'),
-		'published'  => T_('Published'),
-		'deprecated' => T_('Deprecated')
-	);
-$Form->select_input_array( 'new_feedback_status', $status_options, T_('New feedback status') /* gets referred to in antispam settings form */, array(
-			'value' => $edited_Blog->get_setting('new_feedback_status'),
-			'note' => T_('This status will be assigned to any new comment/trackback (unless overriden by plugins).')
-		) );
 
-$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Allow trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
-$Form->checkbox( 'blog_allowpingbacks', $edited_Blog->get( 'allowpingbacks' ), T_('Allow pingbacks'), T_('Deprecated') );
-
+$Form->begin_fieldset( T_('Static file generation'), array( 'class'=>'fieldset clear' ) );
+	$Form->text( 'blog_staticfilename', $edited_Blog->get( 'staticfilename' ), 30, T_('Static filename'), T_('This is the .html file that will be created when you generate a static version of the blog homepage.') );
 $Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
