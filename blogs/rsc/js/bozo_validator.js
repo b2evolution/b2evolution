@@ -5,7 +5,7 @@
  * Used for bozos, ask for confirmation to change the current page when he clicks on a link after having done changes on inputs forms
  *	without saving them
  *
- * Tested on Firefox (XP & Mac osx) , Ie (XP), Safari (Mac osx)
+ * Tested on Firefox (XP & Mac OSX) , IE6 (XP), Safari (Mac OSX)
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -38,19 +38,20 @@ var bozo_confirm_mess;
 
 var bozo = {
 
-	'tab_changes' : Object(), 	// array of changes numbers for each form we need to verify
-	'nb_changes' : 0, 			// Total changes number
+	// array of changes for each form we need to verify (needed to detect if another form has changed when we submit)
+	'tab_changes' : Object(), 	
+	// Total number of changes
+	'nb_changes' : 0, 					
 
 	// If no translated message has been provided, use this default:
 	'confirm_mess' : bozo_confirm_mess ? bozo_confirm_mess : 'You have modified this form but you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?',
 
 	/**
 	 *	BOZO VALIDATOR INITIALIZATION
-	 *	Add keypress event on all inputs
-	 *	Add change event on all selects
+	 * This is designed to track changes on forms whith an ID including '_checkchanges'
 	 */
 	init: function ( )
-	{	// Loop on all forms
+	{	// Loop through all forms
 		var date_deb = new Date();
 
 		// Loop through all forms:
@@ -58,7 +59,7 @@ var bozo = {
 		{ // Get the next form element:
 			var el_form = document.forms[i];
 
-			// add onsubmit event on the form to control if there are changes on others forms:
+			// add submit event on the form to control if there are changes on others forms:
 			addEvent( el_form, 'submit', bozo.validate_submit, false );
 
 			// Get all inputs for this form:
@@ -86,11 +87,12 @@ var bozo = {
 			for( var j = 0; j < all_inputs.length; j++ )
 			{	// Get the next input element:
 				var field = all_inputs[j];
+
 				if( field.className.indexOf( 'no_checkchanges' ) == -1  )
-				{	// We can add event on this field:
+				{	// We want to track changes on this field:
+
 					if( field.type == 'submit' )
 					{	// The input is a submit, so we add no event
-						//addEvent( field , 'click', bozo.validate_submit, false );
 					}
 					// TODO: handle IMAGE type
 					else if( field.type == 'reset' )
@@ -167,6 +169,8 @@ var bozo = {
 	 */
 	reset_changes: function ( e )
 	{
+		alert('reset');
+	
 		// Loop on the forms changes array
 		for( i in bozo.tab_changes )
 		{	// Reset changes number to 0
@@ -211,7 +215,7 @@ var bozo = {
 	 */
 	validate_close: function( e )
 	{
-		if ( bozo.nb_changes )
+		if( bozo.nb_changes )
 		{	// there are input changes
 			if(window.event)
 			{ // For ie:
@@ -226,26 +230,10 @@ var bozo = {
 		}
   },
 
-
-	/*
-	 *	Cancel a click event
-	 */
-	cancelClick: function( e )
-	{
-		if( window.event && window.event.returnValue )
-		{
-			window.event.returnValue = false;
-		}
-		if( e && e.preventDefault )
-		{
-			e.preventDefault();
-		}
-		return false;
-	}
 }
-addEvent( window, 'load', bozo.init, false );
 
-// Init Bozo validator when the window is loaded
-// TODO
-//addEvent( window, 'beforeunload', bozo.validate_close, false );
+// Init Bozo validator when the window is loaded:
+addEvent( window, 'load', bozo.init, false );
+// The following does not seem to work with addEvent... !?
+// addEvent( window, 'beforeunload', bozo.validate_close, false );
 window.onbeforeunload = bozo.validate_close;

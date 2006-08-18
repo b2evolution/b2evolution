@@ -1,9 +1,13 @@
-/*
+/**
  * General functions for the backoffice.
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  */
 
 
-/*
+/**
  * Set the action attribute on a form, including a Safari fix.
  *
  * This is so complicated, because the form also can have a (hidden) action value.
@@ -34,13 +38,12 @@ function set_new_form_action( form, newaction )
 	return true;
 }
 
-/*
+
+/**
  * Open the item in a preview window (a new window with target 'b2evo_preview'), by changing
  * the form's action attribute and target temporarily.
- *
- * fplanque: created
  */
-function b2edit_open_preview(form, newaction)
+function b2edit_open_preview( form, newaction )
 {
 	if( form.target == 'b2evo_preview' )
 	{ // A double-click on the Preview button
@@ -65,22 +68,20 @@ function b2edit_open_preview(form, newaction)
 }
 
 
-/*
+/**
  * Submits the form after setting its action to "newaction" and the blog value to "blog" (if given).
  *
  * This is used to switch to another blog or tab, but "keep" the input in the form.
  */
 function b2edit_reload( form, newaction, blog )
 {
+	// Set the new form action URL:
 	if( ! set_new_form_action(form, newaction) )
 	{
 		return false;
 	}
 
-	if( typeof blog != 'undefined' )
-	{
-		form.elements.blog.value = blog;
-	}
+	// Set the new form "action" HIDDEN value:
 	if( form.elements.action.value == "update" )
 	{
 		form.elements.action.value = "edit_switchtab";
@@ -90,10 +91,21 @@ function b2edit_reload( form, newaction, blog )
 		form.elements.action.value = "create_switchtab";
 	}
 
+	// Set the blog we are switching to:
+	if( typeof blog != 'undefined' )
+	{
+		form.elements.blog.value = blog;
+	}
+	
 	// form.action.value = 'reload';
 	// form.post_title.value = 'demo';
 	// alert( form.action.value + ' ' + form.post_title.value );
+
+	// disable bozo validator if active:
+	window.onbeforeunload = null;
+	
+	// Submit the form:
 	form.submit();
+
 	return false;
 }
-

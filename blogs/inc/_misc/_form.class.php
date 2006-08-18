@@ -1172,6 +1172,12 @@ class Form extends Widget
 			$form_params['action'] = $this->form_action;
 		}
 
+		if( !empty($form_params['bozo_start_modified']) )
+		{
+			$bozo_start_modified = true;
+			unset( $form_params['bozo_start_modified'] );
+		}
+
 		$r = "\n\n<form".get_field_attribs_as_string($form_params).">\n"
 					.$this->formstart;
 
@@ -1202,7 +1208,6 @@ class Form extends Widget
 					if( typeof bozo == "object" )
 					{	// If Bozo validator is active:
 						bozo.confirm_mess = \'';
-
 			if( empty( $this->title ) )
 			{ // No form title:
 				$r .= TS_( 'You have modified this form but you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' );
@@ -1212,8 +1217,20 @@ class Form extends Widget
 				$r .= sprintf( TS_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?' ), $this->title );
 			}
 
-			$r .= '\';
-					}
+			$r .= '\';';
+			
+			if(	!empty($bozo_start_modified) )
+			{
+				$r .= '
+					// Update number of changes for this form:
+					bozo.tab_changes["'.$this->form_name.'"] = 1;
+					// Update Total # of changes:
+					bozo.nb_changes++;
+				';
+			}
+
+			
+			$r .='	}
 				</script>';
 		}
 
@@ -2600,6 +2617,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.31  2006/08/18 20:37:16  fplanque
+ * Improved bozo validation on post editing
+ *
  * Revision 1.30  2006/08/18 19:18:15  fplanque
  * fixed calendar popups
  *

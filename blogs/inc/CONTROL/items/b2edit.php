@@ -147,10 +147,7 @@ switch($action)
 
 		// Generate available blogs list:
 		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_post_statuses', 'any', $pagenow.'?blog=%d', NULL, '',
-												( blog_has_cats( $blog ) ? 'return b2edit_reload(this.ownerDocument.forms.item_checkchanges, \''.$pagenow.'\', %d )'
-												: '' /* Current blog has no cats, we can't be posting */ ), 'switch_to_%d_nocheckchanges' );
-		// TODO: b2edit_reload params handling is far from complete..
-		// dh> what do you mean?  fp> last time I checked there were some inputs that would lose their values when switching to another blog
+												'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$pagenow.'\', %d )' );
 
 		if( !$blog )
 		{
@@ -230,7 +227,9 @@ switch( $action )
 		break;
 
 	case 'edit_switchtab':
+		// We come back to editing after a tab switch:
 		$creating = true; // used by cat_select_before_each()
+		$bozo_start_modified = true;	// We want to start with a form being already modified
 	case 'delete_link':
 	case 'edit':
 		/*
@@ -270,6 +269,8 @@ switch( $action )
 		break;
 
 	case 'create_switchtab':
+		// We come back to creating after a tab switch:
+		$bozo_start_modified = true;	// We want to start with a form being already modified
 	default:
 		/*
 		 * --------------------------------------------------------------------

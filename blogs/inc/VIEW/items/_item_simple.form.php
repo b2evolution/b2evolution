@@ -57,7 +57,7 @@ $this->disp_payload_begin();
 
 global $form_action, $next_action, $mode, $post_title, $post_locale, $post_title, $use_post_url, $post_url, $content;
 global $use_preview, $post_urltitle, $post_status, $post_comment_status, $post_trackbacks;
-global $edit_date;
+global $edit_date, $bozo_start_modified;
 
 $Form = & new Form( $form_action, 'item_checkchanges', 'post', 'none' );
 $Form->fieldstart = '<span class="line">';
@@ -68,7 +68,12 @@ $Form->labelend = "</strong>\n";
 
 // ================================ START OF EDIT FORM ================================
 
-$Form->begin_form( '' );
+$params = array();
+if( !empty( $bozo_start_modified ) )
+{
+	$params['bozo_start_modified'] = true;
+}
+$Form->begin_form( '', '', $params );
 
 $Form->hidden( 'action', $next_action );
 $Form->hidden( 'blog', $Blog->ID );
@@ -281,6 +286,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.9  2006/08/18 20:37:15  fplanque
+ * Improved bozo validation on post editing
+ *
  * Revision 1.8  2006/08/07 21:55:30  fplanque
  * Added JS to automatically check 'edit date' when date is modified
  *
