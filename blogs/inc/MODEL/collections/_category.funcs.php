@@ -822,7 +822,7 @@ function the_category_head( $before='', $after='' )
  * Copy the catagory structure from one blog to another
  * The four cat_copy_* functions after blog_copy_cats are required by blog_copy_cats()
  */
-function blog_copy_cats($srcblog, $destblog)
+function blog_copy_cats($srcblog, $destblog )
  {
 	global $BlogCache, $edited_Blog, $cache_categories, $cat_parents;
 
@@ -833,9 +833,9 @@ function blog_copy_cats($srcblog, $destblog)
 	$cat_parents[0]='NULL';
 
 	// run recursively through the cats
-	echo "<ul>\n";
+	// echo "<ul>\n";
 	cat_children( $cache_categories, $srcblog, NULL, 'cat_copy_before_first', 'cat_copy_before_each', 'cat_copy_after_each', 'cat_copy_after_last', 0 );
-	echo "</ul>\n";
+	// echo "</ul>\n";
 	// ----------------- END RECURSIVE CAT LIST ----------------
 }
 
@@ -853,8 +853,8 @@ function cat_copy_before_each( $cat_ID, $level )
 { // callback to display sublist element
 	global $cat_parents, $edited_Blog;
 	$cat = get_the_category_by_ID( $cat_ID );
-	echo '<li>';
-	echo ' <strong>Copying '.$cat['cat_name'].'</strong> level: ' . $level;
+	// echo '<li>';
+	// echo ' <strong>Copying '.$cat['cat_name'].'</strong> level: ' . $level;
 	$cat_parents[$level+1]=cat_create( $cat['cat_name'], $cat_parents[$level] , $edited_Blog->ID);
 }
 
@@ -965,6 +965,10 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.7  2006/08/18 00:40:35  fplanque
+ * Half way through a clean blog management - too tired to continue
+ * Should be working.
+ *
  * Revision 1.6  2006/06/19 20:59:37  fplanque
  * noone should die anonymously...
  *

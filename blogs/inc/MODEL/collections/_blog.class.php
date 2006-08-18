@@ -77,6 +77,11 @@ class Blog extends DataObject
 	var $longdesc;
 	var $locale;
 	var $access_type;
+
+	/*	
+   * ?> TODO: we should have an extra DB column that either defines type of blog_siteurl 
+   * OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
+   */
 	var $siteurl;
 	var $staticfilename;
 	var $stub;     // stub file (can be empty/virtual)
@@ -182,6 +187,156 @@ class Blog extends DataObject
 			$this->media_url = $db_row->blog_media_url;
 			$this->UID = $db_row->blog_UID;
 		}
+	}
+
+
+	/**
+	 * Load data from Request form fields.
+	 *
+	 * @param array groups of params to load
+	 * @return boolean true if loaded data seems valid.
+	 */
+	function load_from_Request( $groups = array() )
+	{
+		global $Request, $Messages, $default_locale, $DB;
+		
+		if( $Request->param( 'blog_name',   'string', NULL ) != NULL )
+		{ // General params:
+			$this->set_from_Request( 'name' );
+			$this->set( 'shortname',     $Request->param( 'blog_shortname',     'string', true ) );
+			$this->set( 'locale',        $Request->param( 'blog_locale',        'string', $default_locale ) );
+		}
+		
+
+		if( ($siteurl_type = $Request->param( 'blog_siteurl_type',   'string', NULL )) != NULL )
+		{ // Blog URL parameters:
+			// TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
+			$blog_siteurl_relative = $Request->param( 'blog_siteurl_relative', 'string', true );
+			$blog_siteurl_absolute = $Request->param( 'blog_siteurl_absolute', 'string', true );
+
+			if( $siteurl_type == 'absolute' )
+			{
+				$blog_siteurl = $blog_siteurl_absolute;
+				if( !preg_match( '#^https?://.+#', $blog_siteurl ) )
+				{
+					$Messages->add( T_('Blog Folder URL').': '
+													.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!'), 'error' );
+				}
+			}
+			else
+			{ // relative siteurl
+				$blog_siteurl = $blog_siteurl_relative;
+				if( preg_match( '#^https?://#', $blog_siteurl ) )
+				{
+					$Messages->add( T_('Blog Folder URL').': '
+													.T_('You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!'), 'error' );
+				}
+			}
+			$this->set( 'siteurl', $blog_siteurl );
+
+			
+			// Preferred access type:
+			$this->set( 'access_type',   $Request->param( 'blog_access_type',   'string', true ) );
+			$this->set( 'stub',          $Request->param( 'blog_stub',          'string', true ) );
+
+
+			// check urlname
+			if( $Request->param_string_not_empty( 'blog_urlname', T_('You must provide an URL blog name!') ) )
+			{
+				$this->set_from_Request( 'urlname' );
+
+				if( $DB->get_var( 'SELECT COUNT(*)
+														 FROM T_blogs
+														WHERE blog_urlname = '.$DB->quote($this->get( 'urlname' )).'
+														  AND blog_ID <> '.$this->ID 
+														) )
+				{ // urlname is already in use
+					$Request->param_error( 'blog_urlname', T_('This URL blog name is already in use by another blog. Please choose another name.') );
+				}
+			}
+
+		}
+		
+		
+		if( $Request->param( 'blog_default_skin',  'string', NULL ) != NULL )
+		{	// Default display options:
+			$this->set_from_Request( 'default_skin' );
+
+			// checkboxes (will not get send, if unchecked)
+			$this->set( 'force_skin',  1-param( 'blog_force_skin',    'integer', 0 ) );
+			$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
+			$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
+			$this->set( 'disp_bloglist', param( 'blog_disp_bloglist', 'integer', 0 ) );
+			$this->set( 'in_bloglist',   param( 'blog_in_bloglist',   'integer', 0 ) );
+
+			$this->set( 'links_blog_ID', param( 'blog_links_blog_ID', 'integer', true ) );
+		}
+
+		
+		if( $Request->param( 'blog_description',   'string', NULL ) != NULL )
+		{	// Description:
+			$this->set_from_Request( 'description' );
+			$this->set( 'keywords',      $Request->param( 'blog_keywords',      'string', true ) );
+			$this->set( 'tagline',       format_to_post( $Request->param( 'blog_tagline',  'html', true ), 0, 0 ) );
+			$this->set( 'longdesc',      format_to_post( $Request->param( 'blog_longdesc', 'html', true ), 0, 0 ) );
+			$this->set( 'notes',         format_to_post( $Request->param( 'blog_notes',    'html', true ), 0, 0 ) );
+		}
+
+
+		if( $Request->param( 'blog_staticfilename', 'string', NULL ) !== NULL ) 
+		{	// Static file:
+			$this->set_from_Request( 'staticfilename' );
+		}
+		
+		if( $Request->param( 'blog_media_location',  'string', NULL ) !== NULL ) 
+		{	// Media files location:
+			$this->set_from_Request( 'media_location' );
+			$this->setMediaSubDir(    $Request->param( 'blog_media_subdir',    'string', '' ) );
+			$this->setMediaFullPath(  $Request->param( 'blog_media_fullpath',  'string', '' ) );
+			$this->setMediaUrl(       $Request->param( 'blog_media_url',       'string', '' ) );
+
+			// check params
+			switch( $this->get( 'media_location' ) )
+			{
+				case 'custom': // custom path and URL
+					if( $this->get( 'media_fullpath' ) == '' )
+					{
+						$Request->param_error( 'blog_media_fullpath', T_('Media dir location').': '.T_('You must provide the full path of the media directory.') );
+					}
+					if( !preg_match( '#https?://#', $this->get( 'media_url' ) ) )
+					{
+						$Request->param_error( 'blog_media_url', T_('Media dir location').': '
+														.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!') );
+					}
+					break;
+
+				case 'subdir':
+					if( $this->get( 'media_subdir' ) == '' )
+					{
+						$Request->param_error( 'blog_media_subdir', T_('Media dir location').': '.T_('You must provide the media subdirectory.') );
+					}
+					break;
+			}
+		}
+
+		if( in_array( 'pings', $groups ) )
+		{ // we want to load the ping checkboxes:
+			$this->set( 'pingb2evonet',    $Request->param( 'blog_pingb2evonet',    'integer', 0 ) );
+			$this->set( 'pingtechnorati',  $Request->param( 'blog_pingtechnorati',  'integer', 0 ) );
+			$this->set( 'pingweblogs',     $Request->param( 'blog_pingweblogs',     'integer', 0 ) );
+			$this->set( 'pingblodotgs',    $Request->param( 'blog_pingblodotgs',    'integer', 0 ) );
+		}
+			
+		if( $Request->param( 'blog_allowcomments',   'string', NULL ) != NULL )
+		{ // Feedback options:
+			$this->set_from_Request( 'allowcomments' );
+			$this->set_setting( 'new_feedback_status',  $Request->param( 'new_feedback_status', 'string', 'draft' ) );
+			$this->set( 'allowtrackbacks', $Request->param( 'blog_allowtrackbacks', 'integer', 0 ) );
+			$this->set( 'allowpingbacks',  $Request->param( 'blog_allowpingbacks',  'integer', 0 ) );
+		}
+		
+		return ! $Request->validation_errors();
+
 	}
 
 
@@ -665,7 +820,7 @@ class Blog extends DataObject
 	 */
 	function dbdelete( $delete_stub_file = false, $delete_static_file = false, $echo = false )
 	{
-		global $DB, $cache_blogs;
+		global $DB, $cache_blogs, $Messages;
 
 		// Note: No need to localize the status messages...
 		if( $echo ) echo '<p>MySQL 3.23 compatibility mode!';
@@ -678,7 +833,7 @@ class Blog extends DataObject
 
 		if( empty( $cat_list ) )
 		{ // There are no cats to delete
-			echo 'None!';
+			if( $echo ) echo 'None!';
 		}
 		else
 		{ // Delete the cats & dependencies
@@ -691,7 +846,7 @@ class Blog extends DataObject
 
 			if( empty( $post_list ) )
 			{ // There are no posts to delete
-				echo 'None!';
+				if( $echo ) echo 'None!';
 			}
 			else
 			{ // Delete the posts & dependencies
@@ -703,13 +858,14 @@ class Blog extends DataObject
 				$ret = $DB->query(	"DELETE FROM T_postcats
 															WHERE postcat_cat_ID IN ($cat_list)" );
 				if( $echo ) printf( '(%d rows)', $ret );
-
+				$Messages->add( T_('Deleted post-categories'), 'success' );
 
 				// Delete comments
 				if( $echo ) echo '<br />Deleting comments on blog\'s posts... ';
 				$ret = $DB->query( "DELETE FROM T_comments
 														WHERE comment_post_ID IN ($post_list)" );
 				if( $echo ) printf( '(%d rows)', $ret );
+				$Messages->add( T_('Deleted comments on blog\'s posts'), 'success' );
 
 
 				// Delete posts
@@ -717,6 +873,7 @@ class Blog extends DataObject
 				$ret = $DB->query(	"DELETE FROM T_posts
 															WHERE post_ID IN ($post_list)" );
 				if( $echo ) printf( '(%d rows)', $ret );
+				$Messages->add( T_('Deleted blog\'s posts'), 'success' );
 
 			} // / are there posts?
 
@@ -725,6 +882,7 @@ class Blog extends DataObject
 			$ret = $DB->query( "DELETE FROM T_categories
 													WHERE cat_blog_ID = $this->ID" );
 			if( $echo ) printf( '(%d rows)', $ret );
+			$Messages->add( T_('Deleted blog\'s categories'), 'success' );
 
 		} // / are there cats?
 
@@ -733,18 +891,21 @@ class Blog extends DataObject
 		$ret = $DB->query( "DELETE FROM T_coll_user_perms
 												WHERE bloguser_blog_ID = $this->ID" );
 		if( $echo ) printf( '(%d rows)', $ret );
+		$Messages->add( T_('Deleted blog\'s user permissions'), 'success' );
 
 		// Delete bloggroups
 		if( $echo ) echo '<br />Deleting group-blog permissions... ';
 		$ret = $DB->query( "DELETE FROM T_coll_group_perms
 												WHERE bloggroup_blog_ID = $this->ID" );
 		if( $echo ) printf( '(%d rows)', $ret );
+		$Messages->add( T_('Deleted blog\'s group permissions'), 'success' );
 
 		// Delete subscriptions
 		if( $echo ) echo '<br />Deleting subscriptions... ';
 		$ret = $DB->query( "DELETE FROM T_subscriptions
 												WHERE sub_coll_ID = $this->ID" );
 		if( $echo ) printf( '(%d rows)', $ret );
+		$Messages->add( T_('Deleted blog\'s subscriptions'), 'success' );
 
 		// Delete hitlogs
 		if( $echo ) echo '<br />Deleting blog hitlogs... ';
@@ -752,11 +913,13 @@ class Blog extends DataObject
 												WHERE hit_blog_ID = $this->ID",
 												'Deleting blog hitlogs' );
 		if( $echo ) printf( '(%d rows)', $ret );
+		$Messages->add( T_('Deleted blog\'s hitlogs'), 'success' );
 
 		if( $delete_stub_file )
 		{ // Delete stub file
 			if( $echo ) echo '<br />Trying to delete stub file... ';
 			if( ! @unlink( $this->get('dynfilepath') ) )
+			{
 				if( $echo )
 				{
 					echo '<span class="error">';
@@ -764,8 +927,13 @@ class Blog extends DataObject
 									$this->get('dynfilepath') );
 					echo '</span>';
 				}
+				$Messages->add( sprintf( T_('Could not delete stub file [%s]'), $this->get('dynfilepath') ), 'error' );
+			}
 			else
+			{
 				if( $echo ) echo 'OK.';
+				$Messages->add( T_('Deleted blog\'s stub file'), 'success' );
+			}
 		}
 		if( $delete_static_file )
 		{ // Delete static file
@@ -779,10 +947,12 @@ class Blog extends DataObject
 									$this->get('staticfilepath') );
 					echo '</span>';
 				}
+				$Messages->add( sprintf( T_('Could not delete static file [%s]'), $this->get('staticfilepath') ), 'error' );
 			}
 			else
 			{
 				if( $echo ) echo 'OK.';
+				$Messages->add( T_('Deleted blog\'s static file'), 'success' );
 			}
 		}
 
@@ -792,7 +962,7 @@ class Blog extends DataObject
 		// Delete main (blog) object:
 		parent::dbdelete();
 
-		echo '<br />Done.</p>';
+		if( $echo ) echo '<br />Done.</p>';
 	}
 
 
@@ -829,6 +999,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2006/08/18 00:40:35  fplanque
+ * Half way through a clean blog management - too tired to continue
+ * Should be working.
+ *
  * Revision 1.9  2006/06/19 20:59:37  fplanque
  * noone should die anonymously...
  *

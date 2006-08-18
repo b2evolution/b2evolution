@@ -65,9 +65,12 @@ class Request
 	/**
 	 * If true, the internal function {@link _add_message_to_Log()} will create links to IDs
 	 * of the fields where the error occurred.
+	 * 
+	 * Useful if your forms are WAAAAYYYY too long!
+	 * 
 	 * @var boolean
 	 */
-	var $link_log_messages_to_field_IDs = true;
+	var $link_log_messages_to_field_IDs = false;	// fp> leave this OFF for b2evo.
 
 
 	/**
@@ -1015,6 +1018,10 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.20  2006/08/18 00:40:35  fplanque
+ * Half way through a clean blog management - too tired to continue
+ * Should be working.
+ *
  * Revision 1.19  2006/07/08 23:34:36  blueyed
  * fix
  *

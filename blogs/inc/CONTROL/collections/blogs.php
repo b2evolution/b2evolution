@@ -53,178 +53,187 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
-param( 'tab', 'string', 'general', true );
 $AdminUI->set_path( 'blogs' );
 
-$Request->param_action( '', true );
-param( 'blogtemplate', 'integer', -1 );
+$Request->param_action( 'list' );
+$Request->param( 'tab', 'string', 'general', true );
 
-
-if( $action == 'edit' || $action == 'filter1' || $action == 'filter2' || $action == 'update' || $action == 'delete' || $action == 'GenStatic' )
-{ // we need the blog param
-	param( 'blog', 'integer', true, true );
-	$edited_Blog = & $BlogCache->get_by_ID( $blog );
-
-	$Blog = & $edited_Blog; // used for "Exit to blogs.." link
-}
-elseif( $action == 'new' && $blogtemplate != -1 )
+if( $action != 'new' )
 {
-	$edited_Blog = & $BlogCache->get_by_ID( $blogtemplate );
+	if( !empty( $blog ) )
+	{
+		$edited_Blog = & $BlogCache->get_by_ID( $blog );
+		$Blog = & $edited_Blog; // used for "Exit to blogs.." link
+	}
 }
-else
+
+if( $action == 'list' && !empty($blog) )
 {
-	$edited_Blog = & new Blog( NULL );
+	$action = 'edit';
 }
 
 
 /**
- * TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
+ * Perform action:
  */
-function set_edited_Blog_from_params( $for )
-{
-	global $edited_Blog, $default_locale;
-	global $blog_siteurl_type, $blog_siteurl_relative, $blog_siteurl_absolute;
-	global $DB, $Messages, $locales;
-
-	switch( $for )
-	{
-		case 'new':
-		case 'general':
-			$req = ( $for != 'new' );  // are params required?
-
-			$edited_Blog->set( 'name',          param( 'blog_name',          'string', $req ? true : T_('New weblog') ) );
-			$edited_Blog->set( 'shortname',     param( 'blog_shortname',     'string', $req ? true : T_('New blog') ) );
-			$edited_Blog->set( 'locale',        param( 'blog_locale',        'string', $req ? true : $default_locale ) );
-			$edited_Blog->set( 'access_type',   param( 'blog_access_type',   'string', $req ? true : 'index.php' ) );
-			$edited_Blog->set( 'stub',          param( 'blog_stub',          'string', $req ? true : '' ) );
-
-			$edited_Blog->set( 'urlname',       param( 'blog_urlname',       'string', $req ? true : 'new' ) );
-			$edited_Blog->set( 'default_skin',  param( 'blog_default_skin',  'string', $req ? true : 'basic' ) );
-
-			// checkboxes (will not get send, if unchecked)
-			$edited_Blog->set( 'force_skin',  1-param( 'blog_force_skin',    'integer', $req ? 0 : 0 ) );
-			$edited_Blog->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', $req ? 0 : 1 ) );
-			$edited_Blog->set( 'allowusercss', param( 'blog_allowusercss', 'integer', $req ? 0 : 1 ) );
-			$edited_Blog->set( 'disp_bloglist', param( 'blog_disp_bloglist', 'integer', $req ? 0 : 1 ) );
-			$edited_Blog->set( 'in_bloglist',   param( 'blog_in_bloglist',   'integer', $req ? 0 : 1 ) );
-
-			$edited_Blog->set( 'links_blog_ID', param( 'blog_links_blog_ID', 'integer', $req ? true : '' ) );
-
-			$edited_Blog->set( 'description',   param( 'blog_description',   'string', $req ? true : '' ) );
-			$edited_Blog->set( 'keywords',      param( 'blog_keywords',      'string', $req ? true : '' ) );
-
-			// format html
-			$edited_Blog->set( 'tagline',       format_to_post( param( 'blog_tagline',  'html', $req ? true : '' ), 0, 0 ) );
-			$edited_Blog->set( 'longdesc',      format_to_post( param( 'blog_longdesc', 'html', $req ? true : '' ), 0, 0 ) );
-			$edited_Blog->set( 'notes',         format_to_post( param( 'blog_notes',    'html', $req ? true : '' ), 0, 0 ) );
-
-
-			// abstract settings (determines blog_siteurl)
-			// TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
-			param( 'blog_siteurl_type',     'string', $req ? true : 'relative' );
-			param( 'blog_siteurl_relative', 'string', $req ? true : '' );
-			param( 'blog_siteurl_absolute', 'string', $req ? true : '' );
-
-			if( $blog_siteurl_type == 'absolute' )
-			{
-				$blog_siteurl = & $blog_siteurl_absolute;
-				if( !preg_match( '#^https?://.+#', $blog_siteurl ) )
-				{
-					$Messages->add( T_('Blog Folder URL').': '
-													.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!'), 'error' );
-				}
-			}
-			else
-			{ // relative siteurl
-				$blog_siteurl = & $blog_siteurl_relative;
-				if( preg_match( '#^https?://#', $blog_siteurl ) )
-				{
-					$Messages->add( T_('Blog Folder URL').': '
-													.T_('You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!'), 'error' );
-				}
-			}
-			$edited_Blog->set( 'siteurl', $blog_siteurl );
-
-			// check urlname
-			if( '' == $edited_Blog->get( 'urlname' ) )
-			{ // urlname is empty
-				$Messages->add( T_('You must provide an URL blog name!'), 'error' );
-			}
-			elseif( $DB->get_var( 'SELECT COUNT(*)
-															FROM T_blogs
-															WHERE blog_urlname = '.$DB->quote($edited_Blog->get( 'urlname' ))
-															.( $for != 'new' ? ' AND blog_ID <> '.$edited_Blog->ID : '' )
-													) )
-			{ // urlname is already in use
-				$Messages->add( T_('This URL blog name is already in use by another blog. Please choose another name.'), 'error' );
-			}
-
-			break;
-
-		case 'advanced':
-			$edited_Blog->set( 'staticfilename',  param( 'blog_staticfilename',  'string', '' ) );
-			$edited_Blog->set( 'allowcomments',   param( 'blog_allowcomments',   'string', 'always' ) );
-			$edited_Blog->set_setting( 'new_feedback_status',  param( 'new_feedback_status', 'string', 'draft' ) );
-			$edited_Blog->set( 'allowtrackbacks', param( 'blog_allowtrackbacks', 'integer', 0 ) );
-			$edited_Blog->set( 'allowpingbacks',  param( 'blog_allowpingbacks',  'integer', 0 ) );
-			$edited_Blog->set( 'pingb2evonet',    param( 'blog_pingb2evonet',    'integer', 0 ) );
-			$edited_Blog->set( 'pingtechnorati',  param( 'blog_pingtechnorati',  'integer', 0 ) );
-			$edited_Blog->set( 'pingweblogs',     param( 'blog_pingweblogs',     'integer', 0 ) );
-			$edited_Blog->set( 'pingblodotgs',    param( 'blog_pingblodotgs',    'integer', 0 ) );
-			$edited_Blog->set( 'media_location',  param( 'blog_media_location',  'string', 'default' ) );
-			$edited_Blog->setMediaSubDir(         param( 'blog_media_subdir',    'string', '' ) );
-			$edited_Blog->setMediaFullPath(       param( 'blog_media_fullpath',  'string', '' ) );
-			$edited_Blog->setMediaUrl(            param( 'blog_media_url',       'string', '' ) );
-
-			// check params
-			switch( $edited_Blog->get( 'media_location' ) )
-			{
-				case 'custom': // custom path and URL
-					if( '' == $edited_Blog->get( 'media_fullpath' ) )
-					{
-						$Messages->add( T_('Media dir location').': '.T_('You must provide the full path of the media directory.'), 'error' );
-					}
-					if( !preg_match( '#https?://#', $edited_Blog->get( 'media_url' ) ) )
-					{
-						$Messages->add( T_('Media dir location').': '
-														.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!'), 'error' );
-					}
-					break;
-
-				case 'subdir':
-					if( '' == $edited_Blog->get( 'media_subdir' ) )
-					{
-						$Messages->add( T_('Media dir location').': '.T_('You must provide the media subdirectory.'), 'error' );
-					}
-					break;
-			}
-
-			break;
-	}
-}
-
-
 switch( $action )
 {
 	case 'new':
-	case 'create':
+		// New collection:
+		// Check permissions:
+		$current_User->check_perm( 'blogs', 'create', true );
+
 		$AdminUI->append_path_level( 'new', array( 'text' => T_('New') ) );
+
+		$edited_Blog = & new Blog( NULL );
+		$edited_Blog->set( 'name', T_('New weblog') );
+		$edited_Blog->set( 'shortname', T_('New blog') );
+		$edited_Blog->set( 'urlname', 'new' );
 		break;
 
-	case 'update':
+	case 'copy':
+		// Duplicate by prefilling form:
+		// Check permissions:
+		$current_User->check_perm( 'blogs', 'create', true );
+
+		$AdminUI->append_path_level( 'new', array( 'text' => T_('New') ) );
+
+		// handle a blog copy
+		$new_Blog = $edited_Blog;	// COPY TODO: PHP5 requires clone here / not backward compatible
+		unset( $edited_Blog );
+		$edited_Blog = & $new_Blog;
+
+		$edited_Blog->set( 'urlname', 'new' );
+		$edited_Blog->set( 'stub', '' );
+		break;	
+	
 	case 'edit':
 	case 'filter1':
 	case 'filter2':
-		$AdminUI->append_path_level( $tab );
-		$AdminUI->append_path_level( 'blog', array( 'text' => '&laquo;'.$edited_Blog->dget('shortname').'&raquo;' ) );
+		// Edit collection form (depending on tab):
+		// Check permissions:
+		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
-		// Generate available blogs list:
-		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_properties', 'edit',
-													'?ctrl=collections&amp;action=edit&amp;blog=%d&amp;tab='.$AdminUI->get_path(1),
-													T_('List'), '?ctrl=collections' );
+		$AdminUI->append_path_level( $tab );
 		break;
 
+
+	case 'create':
+		// Insert into DB:
+		// Check permissions:
+		$current_User->check_perm( 'blogs', 'create', true );
+		
+		$edited_Blog = & new Blog( NULL );
+
+		if( $edited_Blog->load_from_Request( array() ) )
+		{
+			// DB INSERT
+			$edited_Blog->dbinsert();
+
+			// Set default user permissions for this blog (All permissions for the current user)
+			// Proceed insertions:
+			$DB->query( "
+					INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
+							bloguser_perm_cats, bloguser_perm_properties,
+							bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
+					VALUES ( $edited_Blog->ID, $current_User->ID, 1,
+							'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1 )" );
+
+			// Commit changes in cache:
+			$BlogCache->add( $edited_Blog );
+
+			$Messages->add( T_('The new blog has been created.'), 'success' );
+			
+			if( param( 'blogtemplate', 'integer', -1 ) == -1 )
+			{
+				$Messages->add( sprintf( T_('You should <a %s>create categories</a> for this blog now!'),
+												'href="?ctrl=chapters&amp;action=newcat&amp;blog='.$edited_Blog->ID.'"' ), 'note' );
+			}
+			else
+			{
+				// copy the categories from $blogtemplateid to $blog
+				// TODO: checkbox on duplication form
+				blog_copy_cats($blogtemplate, $edited_Blog->ID);
+			
+				$Messages->add( T_('Categories have been duplicated.'), 'success' );
+			}
+		}
+		break;
+
+
+	case 'update':
+		// Update DB:
+		// Check permissions:
+		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		
+		switch( $tab )
+		{
+			case 'general':
+				if( $edited_Blog->load_from_Request( array() ) )
+				{ // Commit update to the DB:
+					$edited_Blog->dbupdate();
+					$Messages->add( T_('The blog settings have been updated'), 'success' );
+				}
+				break;
+
+			case 'perm':
+				blog_update_user_perms( $blog );
+				$Messages->add( T_('The blog permissions have been updated'), 'success' );
+				break;
+
+			case 'permgroup':
+				blog_update_group_perms( $blog );
+				$Messages->add( T_('The blog permissions have been updated'), 'success' );
+				break;
+
+			case 'advanced':
+				if( $edited_Blog->load_from_Request( array( 'pings' ) ) )
+				{ // Commit update to the DB:
+					$edited_Blog->dbupdate();
+					$Messages->add( T_('The blog settings have been updated'), 'success' );
+				}
+				break;
+		}
+
+		$AdminUI->append_path_level( $tab );
+		break;
+		
+		
+	case 'delete':
+		// ----------  Delete a blog from DB ----------
+		if( $blog == 1 )
+		{
+			bad_request_die( 'You can\'t delete Blog #1!' );
+		}
+
+		// Check permissions:
+		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+
+		if( param( 'confirm', 'integer', 0 ) )
+		{ // confirmed
+			// Delete from DB:
+			$msg = sprintf( T_('Blog &laquo;%s&raquo; deleted.'), $edited_Blog->dget('name') );
+
+			param( 'delete_stub_file', 'integer', 0 );
+			param( 'delete_static_file', 'integer', 0 );
+			$edited_Blog->dbdelete( $delete_stub_file, $delete_static_file, false );
+
+			$Messages->add( $msg, 'success' );			
+
+			$BlogCache->remove_by_ID( $blog );
+			unset( $edited_Blog );
+			unset( $Blog );
+			forget_param( 'blog' );
+			$blog = 0;
+			$UserSettings->delete( 'selected_blog' );	// Needed or subsequent pages may try to access the delete blog
+			$UserSettings->dbupdate();
+
+			$action = 'list';
+		}
+
+		break;
+		
 
 	case 'GenStatic':
 		// ----------  Generate static homepage for blog ----------
@@ -294,6 +303,13 @@ switch( $action )
 		break;
 }
 
+/**
+ * Display page header, menus & messages:
+ */
+$blogListButtons = $AdminUI->get_html_collection_list( 'blog_properties', 'edit',
+											'?ctrl=collections&amp;action=edit&amp;blog=%d&amp;tab='.$tab,
+											T_('List'), '?ctrl=collections&amp;blog=0' );
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -304,136 +320,39 @@ $AdminUI->disp_body_top();
 switch($action)
 {
 	case 'new':
+	case 'copy':
 		// ---------- "New blog" form ----------
-		// Check permissions:
-		$current_User->check_perm( 'blogs', 'create', true );
-
-		if ($blogtemplate == -1)
-		{
-			set_edited_Blog_from_params( 'new' );
-		}
-		else
-		{
-			// handle a blog copy
-			$edited_Blog->set( 'name',          param( 'blog_name',          'string', T_('New weblog') ) );
-			$edited_Blog->set( 'shortname',     param( 'blog_shortname',     'string', T_('New blog') ) );
-			$edited_Blog->set( 'stub',          param( 'blog_stub',          'string', '' ) );
-			$edited_Blog->set( 'urlname',       param( 'blog_urlname',       'string', 'new' ) );
-			param( 'blog_siteurl_type',     'string', 'relative' );
-			param( 'blog_siteurl_relative', 'string', '' );
-			param( 'blog_siteurl_absolute', 'string', '' );
-		}
-
 		echo '<div class="panelblock">';
 		echo '<h2>'.T_('New blog').':</h2>';
 
+		if( !isset( $blog_siteurl_type ) )
+		{ // determine siteurl type (if not set from update-action)
+			if( preg_match('#https?://#', $edited_Blog->get( 'siteurl' ) ) )
+			{ // absolute
+				$blog_siteurl_type = 'absolute';
+				$blog_siteurl_relative = '';
+				$blog_siteurl_absolute = $edited_Blog->get( 'siteurl' );
+			}
+			else
+			{ // relative
+				$blog_siteurl_type = 'relative';
+				$blog_siteurl_relative = $edited_Blog->get( 'siteurl' );
+				$blog_siteurl_absolute = 'http://';
+			}
+		}
+
 		$next_action = 'create';
+
 		$AdminUI->disp_view( 'collections/_blogs_general.form.php' );
 
 		echo '</div>';
 		break;
 
 
-	case 'create':
-		// ---------- Create new blog ----------
-		// Check permissions:
-		$current_User->check_perm( 'blogs', 'create', true );
-
-		?>
-		<div class="panelinfo">
-			<h3><?php echo T_('Creating blog...') ?></h3>
-		<?php
-
-		set_edited_Blog_from_params( 'general' );
-
-		if( !$Messages->display_cond( T_('Cannot create, please correct this error:' ), T_('Cannot create, please correct these errors:' ), '', '', true, 'error' ) )
-		{
-			// DB INSERT
-			$edited_Blog->dbinsert();
-
-			// Set default user permissions for this blog (All permissions for the current user)
-			// Proceed insertions:
-			$DB->query( "
-					INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
-							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
-							bloguser_perm_cats, bloguser_perm_properties,
-							bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
-					VALUES ( $edited_Blog->ID, $current_User->ID, 1,
-							'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1 )" );
-
-			// Commit changes in cache:
-			$BlogCache->add( $edited_Blog );
-
-			if ($blogtemplate==-1)
-			{
-				echo '<p><strong>';
-				printf( T_('You should <a %s>create categories</a> for this blog now!'),
-							'href="?ctrl=chapters&amp;action=newcat&amp;blog='.$edited_Blog->ID.'"' );
-				echo '</strong></p>';
-			}
-			else
-			{
-				// copy the categories from $blogtemplateid to $blog
-				blog_copy_cats($blogtemplate, $edited_Blog->ID);
-			}
-			echo '</div>';
-
-			// List the blogs:
-			$AdminUI->disp_view( 'collections/_blogs_list.php' );
-
-			break;
-		}
-
-
-		echo '</div>';
-		// NOTE: no break here, we go on to next form if there was an error!
-
-
-	case 'update':
-		// ---------- Update blog in DB ----------
-		// Check permissions:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
-
-		echo '<div class="panelinfo">';
-		printf( '<h3>'.T_('Updating Blog [%s]...').'</h3>', $edited_Blog->dget( 'name' ) );
-
-		switch( $AdminUI->get_path(1) )
-		{
-			case 'general':
-				set_edited_Blog_from_params( 'general' );
-				break;
-
-			case 'perm':
-				blog_update_user_perms( $blog );
-				break;
-
-			case 'permgroup':
-				blog_update_group_perms( $blog );
-				break;
-
-			case 'advanced':
-				set_edited_Blog_from_params( 'advanced' );
-				break;
-		}
-
-		// Commit changes in cache: (so that changes are not lost in the form)
-		$BlogCache->add( $edited_Blog );
-
-		if( !$Messages->display_cond( T_('Cannot update, please correct this error:' ), T_('Cannot update, please correct these errors:' ), '', '', true, 'error' ) )
-		{ // Commit update to the DB:
-			$edited_Blog->dbupdate();
-		}
-
-		// display notes
-		$Messages->display( '', '', true, 'note' );
-
-		echo '</div>';
-		// NOTE: no break here, we go on to edit!
-
-
 	case 'edit':
 	case 'filter1':
 	case 'filter2':
+	case 'update':
 		// ---------- Edit blog form ----------
 		if( $action == 'edit' )
 		{ // permissions have not been checked on update:
@@ -472,9 +391,11 @@ switch($action)
 			case 'perm':
 				$AdminUI->disp_view( 'collections/_blogs_permissions.form.php' );
 				break;
+
 			case 'permgroup':
 				$AdminUI->disp_view( 'collections/_blogs_permissions_group.form.php' );
 				break;
+
 			case 'advanced':
 				$AdminUI->disp_view( 'collections/_blogs_advanced.form.php' );
 				break;
@@ -488,84 +409,61 @@ switch($action)
 
 	case 'delete':
 		// ----------  Delete a blog from DB ----------
-		param( 'confirm', 'integer', 0 );
+		// Not confirmed
+		?>
+		<div class="panelinfo">
+			<h3><?php printf( T_('Delete blog [%s]?'), $edited_Blog->dget( 'name' ) )?></h3>
 
-		if( $blog == 1 )
-		{
-			bad_request_die( 'You can\'t delete Blog #1!' );
-		}
+			<p><?php echo T_('Deleting this blog will also delete all its categories, posts and comments!') ?></p>
 
-		// Check permissions:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+			<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 
-		if( ! $confirm )
-		{ // Not confirmed
-			?>
-			<div class="panelinfo">
-				<h3><?php printf( T_('Delete blog [%s]?'), $edited_Blog->dget( 'name' ) )?></h3>
+			<p>
 
-				<p><?php echo T_('Deleting this blog will also delete all its categories, posts and comments!') ?></p>
-
-				<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
-
-				<p>
-
-				<?php
-
-					$Form = &new Form( NULL, '', 'get', 'none' );
-
-					$Form->begin_form( 'inline' );
-
-					$Form->hidden_ctrl();
-					$Form->hidden( 'action', 'delete' );
-					$Form->hidden( 'blog', $edited_Blog->ID );
-					$Form->hidden( 'confirm', 1 );
-
-					if( is_file( $edited_Blog->get('dynfilepath') ) )
-					{
-						?>
-						<input type="checkbox" id="delete_stub_file" name="delete_stub_file" value="1" />
-						<label for="delete_stub_file"><?php printf( T_('Also try to delete stub file [<strong><a %s>%s</a></strong>]'), 'href="'.$edited_Blog->dget('dynurl').'"', $edited_Blog->dget('dynfilepath') ); ?></label><br />
-						<br />
-						<?php
-					}
-					if( is_file( $edited_Blog->get('staticfilepath') ) )
-					{
-						?>
-						<input type="checkbox" id="delete_static_file" name="delete_static_file" value="1" />
-						<label for="delete_static_file"><?php printf( T_('Also try to delete static file [<strong><a %s>%s</a></strong>]'), 'href="'.$edited_Blog->dget('staticurl').'"', $edited_Blog->dget('staticfilepath') ); ?></label><br />
-						<br />
-						<?php
-					}
-
-					$Form->submit( array( '', T_('I am sure!'), 'search' ) );
-
-					$Form->end_form();
-
-
-					$Form->begin_form( 'inline' );
-					$Form->submit( array( '', T_('CANCEL'), 'search' ) );
-					$Form->end_form();
-				?>
-
-				</p>
-
-				</div>
 			<?php
-		}
-		else
-		{ // Confirmed: Delete from DB:
-			param( 'delete_stub_file', 'integer', 0 );
-			param( 'delete_static_file', 'integer', 0 );
 
-			echo '<div class="panelinfo">
-							<h3>Deleting Blog [';
-			$edited_Blog->disp( 'name' );
-			echo ']...</h3>';
-			$edited_Blog->dbdelete( $delete_stub_file, $delete_static_file, true );
-			unset($edited_Blog);
-			echo '</div>';
-		}
+				$Form = & new Form( NULL, '', 'get', 'none' );
+
+				$Form->begin_form( 'inline' );
+
+				$Form->hidden_ctrl();
+				$Form->hidden( 'action', 'delete' );
+				$Form->hidden( 'blog', $edited_Blog->ID );
+				$Form->hidden( 'confirm', 1 );
+
+				if( is_file( $edited_Blog->get('dynfilepath') ) )
+				{
+					?>
+					<input type="checkbox" id="delete_stub_file" name="delete_stub_file" value="1" />
+					<label for="delete_stub_file"><?php printf( T_('Also try to delete stub file [<strong><a %s>%s</a></strong>]'), 'href="'.$edited_Blog->dget('dynurl').'"', $edited_Blog->dget('dynfilepath') ); ?></label><br />
+					<br />
+					<?php
+				}
+				if( is_file( $edited_Blog->get('staticfilepath') ) )
+				{
+					?>
+					<input type="checkbox" id="delete_static_file" name="delete_static_file" value="1" />
+					<label for="delete_static_file"><?php printf( T_('Also try to delete static file [<strong><a %s>%s</a></strong>]'), 'href="'.$edited_Blog->dget('staticurl').'"', $edited_Blog->dget('staticfilepath') ); ?></label><br />
+					<br />
+					<?php
+				}
+
+				$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
+
+				$Form->end_form();
+
+
+				$Form->begin_form( 'inline' );
+					$Form->hidden_ctrl();
+					$Form->hidden( 'blog', 0 );
+					$Form->submit( array( '', T_('CANCEL'), 'CancelButton' ) );
+				$Form->end_form();
+			?>
+
+			</p>
+
+			</div>
+		<?php
 		break;
 
 
@@ -583,6 +481,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2006/08/18 00:40:35  fplanque
+ * Half way through a clean blog management - too tired to continue
+ * Should be working.
+ *
  * Revision 1.16  2006/08/05 23:33:54  fplanque
  * Fixed static page generation
  *

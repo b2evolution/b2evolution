@@ -41,7 +41,7 @@ $Form->hidden( 'blog',$edited_Blog->ID );
 
 
 $Form->begin_fieldset( T_('Static file generation'), array( 'class'=>'fieldset clear' ) );
-$Form->text( 'blog_staticfilename', $edited_Blog->get( 'staticfilename' ), 30, T_('Static filename'), T_('This is the .html file that will be created when you generate a static version of the blog homepage.') );
+	$Form->text( 'blog_staticfilename', $edited_Blog->get( 'staticfilename' ), 30, T_('Static filename'), T_('This is the .html file that will be created when you generate a static version of the blog homepage.') );
 $Form->end_fieldset();
 
 
@@ -57,13 +57,22 @@ $Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 										array( 'subdir',
 														T_('Subdirectory of media folder').':',
 														'',
-														' <span class="nobr"><code>'.$basepath.$media_subdir.'</code><input type="text" name="blog_media_subdir" size="20" maxlength="255" value="'.$edited_Blog->dget( 'media_subdir', 'formvalue' ).'" /></span>', '' ),
+														' <span class="nobr"><code>'.$basepath.$media_subdir.'</code><input 
+															type="text" name="blog_media_subdir" size="20" maxlength="255" 
+															class="'.( isset($Request->err_messages['blog_media_subdir']) ? 'field_error' : '' ).'"
+															value="'.$edited_Blog->dget( 'media_subdir', 'formvalue' ).'" /></span>', '' ),
 										array( 'custom',
 														T_('Custom location').':',
 														'',
 														'<fieldset>'
-															.'<div class="label">'.T_('directory').':</div><div class="input"><input type="text" name="blog_media_fullpath" size="50" maxlength="255" value="'.$edited_Blog->dget( 'media_fullpath', 'formvalue' ).'" /></div>'
-															.'<div class="label">'.T_('URL').':</div><div class="input"><input type="text" name="blog_media_url" size="50" maxlength="255" value="'.$edited_Blog->dget( 'media_url', 'formvalue' ).'" /></div></fieldset>' )
+															.'<div class="label">'.T_('directory').':</div><div class="input"><input 
+																type="text" name="blog_media_fullpath" size="50" maxlength="255" 
+																class="'.( isset($Request->err_messages['blog_media_fullpath']) ? 'field_error' : '' ).'"
+																value="'.$edited_Blog->dget( 'media_fullpath', 'formvalue' ).'" /></div>'
+															.'<div class="label">'.T_('URL').':</div><div class="input"><input 
+																type="text" name="blog_media_url" size="50" maxlength="255" 
+																class="'.( isset($Request->err_messages['blog_media_url']) ? 'field_error' : '' ).'"
+																value="'.$edited_Blog->dget( 'media_url', 'formvalue' ).'" /></div></fieldset>' )
 									), T_('Media dir location'), true
 								);
 $Form->end_fieldset();

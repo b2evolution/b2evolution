@@ -73,7 +73,7 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 			echo '&nbsp;';
 			if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
 			{
-				$edit_url = regenerate_url( 'action', 'action=edit&amp;blog='.$curr_blog_ID );
+				$edit_url = regenerate_url( 'action', 'blog='.$curr_blog_ID );
 				echo action_icon( T_('Properties'), 'properties', $edit_url );
 				echo '&nbsp;<a href="'.$edit_url.'" title="'.T_('Properties').'">';
 				blog_list_iteminfo('shortname');
@@ -120,7 +120,7 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 		elseif( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
 		{
 			echo '<td class="shrinkwrap">';
-			echo action_icon( T_('Copy this blog!'), 'copy', regenerate_url( 'action', 'action=new&amp;template='.$curr_blog_ID ) );
+			echo action_icon( T_('Copy this blog!'), 'copy', regenerate_url( 'action', 'action=copy&amp;blog='.$curr_blog_ID ) );
 			?>
 			<a href="<?php echo regenerate_url( 'action', 'action=delete&amp;blog='.$curr_blog_ID ) ?>" style="color:red;font-weight:bold;" onclick="return confirm('<?php printf( TS_('Are you sure you want to delete blog #%d ?\\n\\nWARNING: This will delete ALL POST, COMMENTS,\\nCATEGORIES and other data related to that Blog!\\n\\nThis CANNOT be undone!'), $curr_blog_ID) ?>')"><?php echo get_icon( 'delete' ) ?></a>
 		</td>

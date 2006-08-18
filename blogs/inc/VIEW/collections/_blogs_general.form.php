@@ -96,22 +96,20 @@ switch( $edited_Blog->get( 'access_type' ) )
 
 <?php
 
-global $action, $next_action, $blogtemplate, $blog;
+global $action, $next_action, $blogtemplate, $blog, $tab;
 
-$form_action = '?ctrl=collections';
-if( $action == 'edit' )
-{ // leave the action=edit URL intact. Hidden POST-action will have priority.
-	// TODO: MAKE THIS CLEAN
-	$form_action .= '&amp;action=edit&amp;blog='.$blog;
-}
-
-$Form = new Form( $form_action, 'bloggeneral_checkchanges' );
+$Form = new Form();
 
 $Form->begin_form( 'fform' );
 
+$Form->hidden_ctrl();
 $Form->hidden( 'action', $next_action );
+$Form->hidden( 'tab', $tab );
 $Form->hidden( 'blog', $blog );
-$Form->hidden( 'blogtemplate', $blogtemplate );
+if( $action == 'copy' )
+{
+	$Form->hidden( 'blogtemplate', $blog );
+}
 
 $Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear' ) );
 	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Full Name'), T_('Will be displayed on top of the blog.') );

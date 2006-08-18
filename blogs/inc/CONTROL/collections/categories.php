@@ -211,7 +211,7 @@ $AdminUI->disp_body_top();
 /**
  * Display payload:
  */
-switch($action)
+switch( $action )
 {
 	case 'new':
 	case 'create': // in case of an error
@@ -400,6 +400,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2006/08/18 00:40:35  fplanque
+ * Half way through a clean blog management - too tired to continue
+ * Should be working.
+ *
  * Revision 1.9  2006/07/07 18:12:16  blueyed
  * MFB
  *
