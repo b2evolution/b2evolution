@@ -173,6 +173,10 @@ $AdminUI->add_menu_entries(
 						'text' => T_('Skin'),
 						'href' => 'admin.php?ctrl=collections&amp;tab=skin&amp;blog='.$blog,
 						'perm_eval' => 'global $action; return $action != "list";' ),
+					'display' => array(
+						'text' => T_('Display'),
+						'href' => 'admin.php?ctrl=collections&amp;tab=display&amp;blog='.$blog,
+						'perm_eval' => 'global $action; return $action != "list";' ),
 					'advanced' => array(
 						'text' => T_('Advanced'),
 						'href' => 'admin.php?ctrl=collections&amp;tab=advanced&amp;blog='.$blog,
@@ -314,6 +318,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.14  2006/08/18 20:36:44  fplanque
+ * no message
+ *
  * Revision 1.13  2006/08/18 17:23:58  fplanque
  * Visual skin selector
  *
