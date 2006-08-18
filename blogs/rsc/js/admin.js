@@ -102,6 +102,7 @@ function b2edit_reload( form, newaction, blog )
 	// alert( form.action.value + ' ' + form.post_title.value );
 
 	// disable bozo validator if active:
+	// TODO: dh> this seems to actually delete any events attached to beforeunload, which can cause problems if e.g. a plugin hooks this event
 	window.onbeforeunload = null;
 	
 	// Submit the form:
