@@ -467,11 +467,11 @@ class User extends DataObject
 	 */
 	function check_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL )
 	{
-		static $cache_perms; /* visible in all classes */
+		static $cache_perms; /* visible in all instances fp> make this a property of current object and you don't need an ID key */
 		global $Debuglog;
 
 		if( isset($cache_perms[$this->ID][$permname][$permlevel][$perm_target]) )
-		{
+		{ // Permission in available in Cache:
 			return $cache_perms[$this->ID][$permname][$permlevel][$perm_target];
 		}
 
@@ -1125,6 +1125,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2006/08/18 21:19:30  fplanque
+ * minor
+ *
  * Revision 1.35  2006/08/17 22:57:16  blueyed
  * Caching of user perms.
  *

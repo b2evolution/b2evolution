@@ -49,7 +49,7 @@ $task = $DB->get_row( $sql, OBJECT, 0, 'Get next task to run in queue which has 
 
 if( empty( $task ) )
 {
-	if( ! $is_cli )
+	// fp> make this an _advanced conf option      if( ! $is_cli )
 	{ // Do not be too chatty with CLI, as it would trigger cron to send this as mail always
 		cron_log( 'There is no task to execute yet.' );
 	}
