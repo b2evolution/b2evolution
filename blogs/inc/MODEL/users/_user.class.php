@@ -100,6 +100,13 @@ class User extends DataObject
 	 */
 	var $blog_post_statuses = array();
 
+	/**
+	 * Cache for perms.
+	 * @access protected
+	 * @var array
+	 */
+	var $cache_perms = array();
+
 
 	/**
 	 * Constructor
@@ -467,12 +474,11 @@ class User extends DataObject
 	 */
 	function check_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL )
 	{
-		static $cache_perms; /* visible in all instances fp> make this a property of current object and you don't need an ID key */
 		global $Debuglog;
 
-		if( isset($cache_perms[$this->ID][$permname][$permlevel][$perm_target]) )
+		if( isset($this->cache_perms[$permname][$permlevel][$perm_target]) )
 		{ // Permission in available in Cache:
-			return $cache_perms[$this->ID][$permname][$permlevel][$perm_target];
+			return $this->cache_perms[$permname][$permlevel][$perm_target];
 		}
 
 		$perm = false;
@@ -547,7 +553,7 @@ class User extends DataObject
 			debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name )." ($permname:$permlevel:$perm_target)" );
 		}
 
-		$cache_perms[$this->ID][$permname][$permlevel][$perm_target] = $perm;
+		$this->cache_perms[$permname][$permlevel][$perm_target] = $perm;
 
 		return $perm;
 	}
@@ -1125,6 +1131,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.37  2006/08/18 23:26:22  blueyed
+ * Caching of perms through member rather than static var.
+ *
  * Revision 1.36  2006/08/18 21:19:30  fplanque
  * minor
  *
