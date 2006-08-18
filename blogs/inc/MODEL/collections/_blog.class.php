@@ -78,8 +78,8 @@ class Blog extends DataObject
 	var $locale;
 	var $access_type;
 
-	/*	
-   * ?> TODO: we should have an extra DB column that either defines type of blog_siteurl 
+	/*
+   * ?> TODO: we should have an extra DB column that either defines type of blog_siteurl
    * OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
    */
 	var $siteurl;
@@ -199,14 +199,14 @@ class Blog extends DataObject
 	function load_from_Request( $groups = array() )
 	{
 		global $Request, $Messages, $default_locale, $DB;
-		
+
 		if( $Request->param( 'blog_name',   'string', NULL ) != NULL )
 		{ // General params:
 			$this->set_from_Request( 'name' );
 			$this->set( 'shortname',     $Request->param( 'blog_shortname',     'string', true ) );
 			$this->set( 'locale',        $Request->param( 'blog_locale',        'string', $default_locale ) );
 		}
-		
+
 
 		if( ($siteurl_type = $Request->param( 'blog_siteurl_type',   'string', NULL )) != NULL )
 		{ // Blog URL parameters:
@@ -234,13 +234,14 @@ class Blog extends DataObject
 			}
 			$this->set( 'siteurl', $blog_siteurl );
 
-			
+
 			// Preferred access type:
 			$this->set( 'access_type',   $Request->param( 'blog_access_type',   'string', true ) );
 			$this->set( 'stub',          $Request->param( 'blog_stub',          'string', true ) );
 			if( $this->access_type == 'stub' )
 			{	// fp> If there is a case to leave this blank, comment this out and explain the case. Thanks.
-				$Request->param_check_not_empty( 'blog_stub', T_('You must provide a stub file name, e-g: a_stub.php') );
+				// dh> I'm using it with "absolute URL" to have no "stub file" at all..
+				// $Request->param_check_not_empty( 'blog_stub', T_('You must provide a stub file name, e-g: a_stub.php') );
 			}
 
 			// check urlname
@@ -251,7 +252,7 @@ class Blog extends DataObject
 				if( $DB->get_var( 'SELECT COUNT(*)
 														 FROM T_blogs
 														WHERE blog_urlname = '.$DB->quote($this->get( 'urlname' )).'
-														  AND blog_ID <> '.$this->ID 
+														  AND blog_ID <> '.$this->ID
 														) )
 				{ // urlname is already in use
 					$Request->param_error( 'blog_urlname', T_('This URL blog name is already in use by another blog. Please choose another name.') );
@@ -259,14 +260,14 @@ class Blog extends DataObject
 			}
 
 		}
-		
-		
+
+
 		if( $Request->param( 'blog_default_skin',  'string', NULL ) != NULL )
 		{	// Default blog:
 			$this->set_from_Request( 'default_skin' );
 		}
-		
-		
+
+
 		if( $Request->param( 'blog_links_blog_ID',  'integer', -1 ) != -1 )
 		{	// Default display options:
 			$this->set_from_Request( 'links_blog_ID' );
@@ -279,39 +280,39 @@ class Blog extends DataObject
 			$this->set( 'in_bloglist',   param( 'blog_in_bloglist',   'integer', 0 ) );
 		}
 
-		
-		if( $Request->param( 'blog_description', 'string', NULL ) != NULL )
+
+		if( $Request->param( 'blog_description',   'string', NULL ) != NULL )
 		{	// Description:
 			$this->set_from_Request( 'shortdesc', 'blog_description' );
 		}
-		
+
 		if( $Request->param( 'blog_keywords', 'string', NULL ) != NULL )
 		{	// Keywords:
 			$this->set_from_Request( 'keywords' );
 		}
-		
+
 		if( $Request->param( 'blog_tagline',   'html', NULL ) != NULL )
 		{	// HTML tagline:
 			$this->set( 'tagline', format_to_post( $Request->get( 'blog_tagline' ), 0, 0 ) );
 		}
-		
+
 		if( $Request->param( 'blog_longdesc',   'html', NULL ) != NULL )
 		{	// HTML long description:
 			$this->set( 'longdesc', format_to_post( $Request->get( 'blog_longdesc' ), 0, 0 ) );
 		}
-		
+
 		if( $Request->param( 'blog_notes',   'html', NULL ) != NULL )
 		{	// HTML notes:
 			$this->set( 'notes', format_to_post( $Request->get( 'blog_notes' ), 0, 0 ) );
 		}
-		
 
-		if( $Request->param( 'blog_staticfilename', 'string', NULL ) !== NULL ) 
+
+		if( $Request->param( 'blog_staticfilename', 'string', NULL ) !== NULL )
 		{	// Static file:
 			$this->set_from_Request( 'staticfilename' );
 		}
-		
-		if( $Request->param( 'blog_media_location',  'string', NULL ) !== NULL ) 
+
+		if( $Request->param( 'blog_media_location',  'string', NULL ) !== NULL )
 		{	// Media files location:
 			$this->set_from_Request( 'media_location' );
 			$this->setMediaSubDir(    $Request->param( 'blog_media_subdir',    'string', '' ) );
@@ -349,7 +350,7 @@ class Blog extends DataObject
 			$this->set( 'pingweblogs',     $Request->param( 'blog_pingweblogs',     'integer', 0 ) );
 			$this->set( 'pingblodotgs',    $Request->param( 'blog_pingblodotgs',    'integer', 0 ) );
 		}
-			
+
 		if( $Request->param( 'blog_allowcomments',   'string', NULL ) != NULL )
 		{ // Feedback options:
 			$this->set_from_Request( 'allowcomments' );
@@ -357,7 +358,7 @@ class Blog extends DataObject
 			$this->set( 'allowtrackbacks', $Request->param( 'blog_allowtrackbacks', 'integer', 0 ) );
 			$this->set( 'allowpingbacks',  $Request->param( 'blog_allowpingbacks',  'integer', 0 ) );
 		}
-		
+
 		return ! $Request->validation_errors();
 
 	}
@@ -1022,6 +1023,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2006/08/18 23:23:03  blueyed
+ * Allow empty stub files.. +whitespace
+ *
  * Revision 1.12  2006/08/18 18:29:37  fplanque
  * Blog parameters reorganization + refactoring
  *
