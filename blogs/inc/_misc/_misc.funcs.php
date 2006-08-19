@@ -3086,7 +3086,7 @@ function unserialize_callback( $classname )
 /**
  * Display an array as a list:
  */
-function display_list( $items, $list_start = '<ul>', $list_end = '<ul>', $item_separator = '', $item_start = '<li>', $item_end = '</li>' )
+function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_separator = '', $item_start = '<li>', $item_end = '</li>' )
 {
 	if( !empty( $items ) )
 	{
@@ -3120,6 +3120,9 @@ function display_list( $items, $list_start = '<ul>', $list_end = '<ul>', $item_s
 
 /*
  * $Log$
+ * Revision 1.100  2006/08/19 08:24:08  yabs
+ * correcting display_list() parameters
+ *
  * Revision 1.99  2006/08/19 07:56:31  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *
