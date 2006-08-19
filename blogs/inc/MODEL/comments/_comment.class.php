@@ -109,8 +109,6 @@ class Comment extends DataObject
 	 */
 	function Comment( $db_row = NULL )
 	{
-		global $ItemCache, $UserCache;
-
 		// Call parent constructor:
 		parent::DataObject( 'T_comments', 'comment_', 'comment_ID' );
 
@@ -151,7 +149,7 @@ class Comment extends DataObject
 	{
 		if( isset($this->author_user_ID) && ! isset($this->author_User) )
 		{
-			global $UserCache;
+			$UserCache = & get_Cache( 'UserCache' );
 			$this->author_User = & $UserCache->get_by_ID( $this->author_user_ID );
 		}
 
@@ -168,8 +166,7 @@ class Comment extends DataObject
 	{
 		if( ! isset($this->Item) )
 		{
-			global $ItemCache;
-
+			$ItemCache = & get_Cache( 'ItemCache' );
 			$this->Item = & $ItemCache->get_by_ID( $this->item_ID );
 		}
 
@@ -1159,6 +1156,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.40  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.39  2006/08/19 02:15:07  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.

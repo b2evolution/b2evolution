@@ -75,6 +75,7 @@ switch( $action )
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
 		$login = strtolower( $login );
 
+		$UserCache = & get_Cache( 'UserCache' );
 		if( $UserCache->get_by_login( $login ) )
 		{ // The login is already registered
 			$Messages->add( sprintf( T_('The login &laquo;%s&raquo; is already registered, please choose another one.'), $login ), 'error' );
@@ -186,6 +187,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.72  2006/08/19 07:56:29  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.71  2006/07/17 01:33:13  blueyed
  * Fixed account validation by email for users who registered themselves
  *

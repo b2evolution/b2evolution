@@ -18,6 +18,10 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+	* @var User
+	*/
+global $current_User;
 
 $AdminUI->set_path( 'edit' );
 
@@ -152,11 +156,13 @@ switch($action)
 		{ // We do all the pinging now!
 			$blogparams = get_blogparams_by_ID( $blog );
 			// trackback
+			load_funcs( '_misc/_trackback.funcs.php' );
 			trackbacks( $post_trackbacks, $edited_Item->content, $edited_Item->title, $edited_Item->ID);
 
 			// Send email notifications now!
 			$edited_Item->send_email_notifications();
 
+			load_funcs( '_misc/_ping.funcs.php' );
 			pingb2evonet($blogparams, $edited_Item->ID, $edited_Item->title);
 			pingWeblogs($blogparams);
 			pingBlogs($blogparams);
@@ -196,6 +202,7 @@ switch($action)
 
 		// UPDATE POST:
 		$Request->param( 'post_ID', 'integer', true );
+		$ItemCache = & get_Cache( 'ItemCache' );
 		$edited_Item = & $ItemCache->get_by_ID( $post_ID );
 
 		// Set the params we already got:
@@ -250,6 +257,7 @@ switch($action)
 		{ // We may do some pinging now!
 
 			// trackback
+			load_funcs( '_misc/_trackback.funcs.php' );
 			trackbacks( $post_trackbacks, $edited_Item->content,  $edited_Item->title, $edited_Item->ID );
 
 			// ping ?
@@ -266,6 +274,7 @@ switch($action)
 				$edited_Item->send_email_notifications();
 
 				$blogparams = get_blogparams_by_ID( $blog );
+				load_funcs( '_misc/_ping.funcs.php' );
 				pingb2evonet( $blogparams, $edited_Item->ID, $edited_Item->title );
 				pingWeblogs( $blogparams );
 				pingBlogs( $blogparams );
@@ -282,6 +291,7 @@ switch($action)
 		 * PUBLISH POST NOW
 		 */
 		$Request->param( 'post_ID', 'integer', true );
+		$ItemCache = & get_Cache( 'ItemCache' );
 		$edited_Item = & $ItemCache->get_by_ID( $post_ID );
 
 		$post_cat = $edited_Item->main_cat_ID;
@@ -357,6 +367,7 @@ switch($action)
 				// Send email notifications now!
 				$edited_Item->send_email_notifications();
 
+				load_funcs( '_misc/_ping.funcs.php' );
 				pingb2evonet( $blogparams, $post_ID, $edited_Item->title);
 				pingWeblogs($blogparams);
 				pingBlogs($blogparams);
@@ -375,6 +386,7 @@ switch($action)
 		 * DEPRECATE POST
 		 */
 		$Request->param( 'post_ID', 'integer', true );
+		$ItemCache = & get_Cache( 'ItemCache' );
 		$edited_Item = & $ItemCache->get_by_ID( $post_ID );
 
 		$post_cat = $edited_Item->main_cat_ID;
@@ -427,7 +439,7 @@ switch($action)
 		$AdminUI->disp_body_top();
 
 		param( 'post', 'integer' );
-		// echo $post;
+		$ItemCache = & get_Cache( 'ItemCache' );
 		if( ! ($edited_Item = & $ItemCache->get_by_ID( $post, false ) ) )
 		{
 			echo '<div class="panelinfo"><p class="error">'.( T_('Oops, no post with this ID!') ).'</p></div>';
@@ -614,6 +626,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.22  2006/08/19 02:15:06  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.

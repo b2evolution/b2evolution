@@ -173,6 +173,8 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
 
 	if( $use_html_checker )
 	{ // Check the code:
+		load_class( '_misc/_htmlchecker.class.php' );
+
 		if( empty($encoding) )
 		{
 			$encoding = $io_charset;
@@ -1913,7 +1915,8 @@ function debug_info( $force = false )
 			}
 			$timer_rows[ $l_cat ] = $Timer->get_duration( $l_cat );
 		}
-		arsort( $timer_rows );
+		// arsort( $timer_rows );
+		ksort( $timer_rows );
 		echo '<table><thead>'
 			.'<tr><th colspan="4" class="center">Timers</th></tr>'
 			.'<tr><th>Category</th><th>Time</th><th>%</th><th>Count</th></tr>'
@@ -3117,6 +3120,9 @@ function display_list( $items, $list_start = '<ul>', $list_end = '<ul>', $item_s
 
 /*
  * $Log$
+ * Revision 1.99  2006/08/19 07:56:31  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.98  2006/08/18 21:02:15  fplanque
  * minor
  *

@@ -86,8 +86,7 @@ function is_logged_in()
  */
 function user_pass_ok( $login, $pass, $pass_is_md5 = false )
 {
-	global $UserCache;
-
+	$UserCache = & get_Cache( 'UserCache' );
 	$User = & $UserCache->get_by_login( $login );
 	if( !$User )
 	{
@@ -367,8 +366,7 @@ function user_subs_link( $before = '', $after = '', $link_text = '', $link_title
  */
 function user_preferredname( $user_ID )
 {
-	global $UserCache;
-
+	$UserCache = & get_Cache( 'UserCache' );
 	if( !empty( $user_ID )
 		&& ($User = & $UserCache->get_by_ID( $user_ID )) )
 	{
@@ -487,6 +485,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.13  2006/08/19 07:56:31  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.12  2006/07/26 20:48:33  blueyed
  * Added Plugin event "Logout"
  *

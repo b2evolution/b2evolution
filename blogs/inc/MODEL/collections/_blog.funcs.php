@@ -35,10 +35,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-/**
- * Includes:
- */
-require_once dirname(__FILE__).'/_blogcache.class.php';
 
 /**
  * blog_create(-)
@@ -475,7 +471,9 @@ function blogperms_from_easy( $easy_group )
  */
 function get_bloginfo( $show = '', $this_blogparams = '' )
 {
-	global $Blog, $blog, $BlogCache;
+	global $Blog, $blog;
+
+	$BlogCache = & get_Cache( 'BlogCache' );
 
 	if( empty( $this_blogparams ) )
 	{ // We want the global blog on the page
@@ -706,6 +704,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.9  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.8  2006/08/19 02:15:06  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.

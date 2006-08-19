@@ -704,7 +704,6 @@ function the_categories( $link_title = '#',				// false if you want no links
  )
 {
 	global $id, $postdata, $blog, $blogfilename, $cache_postcats, $preview;
-	global $BlogCache;
 
 	if( $link_title == '#' )
 	{ /* TRANS: When the categories for a specific post are displayed, the user can click
@@ -730,6 +729,7 @@ function the_categories( $link_title = '#',				// false if you want no links
 
 		if( $link_title && !$preview)
 		{ // we want to display links
+			$BlogCache = & get_Cache( 'BlogCache' );
 			$lBlog = & $BlogCache->get_by_ID( $cat['cat_blog_ID'] );
 			$cat_name = '<a href="'.url_add_param( $lBlog->get('blogurl'), 'cat='.$cat_ID ).'" title="'.$link_title.'">'.$cat_name.'</a>';
 		}
@@ -824,8 +824,9 @@ function the_category_head( $before='', $after='' )
  */
 function blog_copy_cats($srcblog, $destblog )
  {
-	global $BlogCache, $edited_Blog, $cache_categories, $cat_parents;
+	global $edited_Blog, $cache_categories, $cat_parents;
 
+	$BlogCache = & get_Cache( 'BlogCache' );
 	$edited_Blog = & $BlogCache->get_by_ID( $destblog );
 
 	// ----------------- START RECURSIVE CAT LIST ----------------
@@ -965,6 +966,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.8  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.7  2006/08/18 00:40:35  fplanque
  * Half way through a clean blog management - too tired to continue
  * Should be working.

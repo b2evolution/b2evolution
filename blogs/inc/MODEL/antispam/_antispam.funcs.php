@@ -147,6 +147,7 @@ function antispam_report_abuse( $abuse_string )
 	}
 
 	// Construct XML-RPC client:
+	load_funcs( '_misc/ext/_xmlrpc.php' );
 	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port);
 	$client->debug = $debug;
 
@@ -188,6 +189,7 @@ function antispam_poll_abuse()
 	global $Messages, $Settings, $baseurl, $debug, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri;
 
 	// Construct XML-RPC client:
+	load_funcs( '_misc/ext/_xmlrpc.php' );
 	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port);
 	$client->debug = $debug;
 
@@ -311,6 +313,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.15  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.14  2006/07/05 21:57:20  blueyed
  * trans
  *

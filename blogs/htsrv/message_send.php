@@ -135,6 +135,7 @@ $Comment = NULL;
 
 if( ! empty( $recipient_id ) )
 { // Get the email address for the recipient if a member.
+$UserCache = & get_Cache( 'UserCache' );
 	$recipient_User = & $UserCache->get_by_ID( $recipient_id );
 
 	if( empty($recipient_User->allow_msgform) )
@@ -257,6 +258,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.35  2006/08/19 07:56:29  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.34  2006/06/16 20:34:19  fplanque
  * basic spambot defeating
  *

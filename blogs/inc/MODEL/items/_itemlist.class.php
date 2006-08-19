@@ -178,10 +178,8 @@ class ItemList extends DataObjectList
 			$cache_name = 'ItemCache';
 		}
 
-		global $$cache_name;
-
 		$this->cache_name = $cache_name;
-		$this->DataObjectCache = & $$cache_name; // By ref!!
+		$this->DataObjectCache = & get_Cache($cache_name); // By ref!!
 
 		// Call parent constructor:
 		parent::DataObjectList( $this->DataObjectCache->dbtablename, $this->DataObjectCache->dbprefix,
@@ -471,7 +469,7 @@ class ItemList extends DataObjectList
 	 */
 	function preview_request()
 	{
-		global $DB, $localtimenow, $Messages, $current_User, $BlogCache;
+		global $DB, $localtimenow, $Messages, $current_User;
 
 		$id = 0;
 		$preview_userid = param( 'preview_userid', 'integer', true );
@@ -487,6 +485,7 @@ class ItemList extends DataObjectList
 		{ // dh> workaround for param() bug. See rev 1.93 of /inc/_misc/_misc.funcs.php
 			$renderers = array('default');
 		}
+		$BlogCache = & get_Cache( 'BlogCache' );
 		$comment_Blog = & $BlogCache->get_by_ID( get_catblog( $post_category ) );
 		if( $comment_Blog->allowcomments == 'post_by_post' )
 		{ // param is required
@@ -866,6 +865,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.16  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.15  2006/08/07 00:17:11  blueyed
  * Fixed bug with renderers in preview, when you come "stright" from the simple edit form (without using the advanced one before).
  *

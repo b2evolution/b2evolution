@@ -77,6 +77,7 @@ if( $user_profile_only )
 /*
  * Load editable objects and set $action (while checking permissions)
  */
+$UserCache = & get_Cache( 'UserCache' );
 if( ! is_null($user_ID) )
 { // User selected
 	if( $action == 'userupdate' && $user_ID == 0 )
@@ -682,6 +683,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.30  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.29  2006/08/05 17:21:01  blueyed
  * Fixed header_redirect handling: do not replace &amp; with & generally, but only when taken from request params.
  *

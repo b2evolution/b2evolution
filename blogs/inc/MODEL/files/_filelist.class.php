@@ -265,7 +265,7 @@ class Filelist
 	 */
 	function Filelist( $FileRoot, $path = NULL )
 	{
-		global $FileRootCache, $AdminUI;
+		global $AdminUI;
 
 		if( ! is_object($FileRoot) )
 		{
@@ -460,8 +460,7 @@ class Filelist
 	 */
 	function add_by_subpath( $rel_path, $mustExist = false )
 	{
-		global $FileCache;
-
+		$FileCache = & get_Cache( 'FileCache' );
 		$NewFile = & $FileCache->get_by_root_and_path( $this->_FileRoot->type, $this->_FileRoot->in_type_ID, $rel_path );
 
 		return $this->add( $NewFile, $mustExist );
@@ -1116,7 +1115,7 @@ class Filelist
 	 */
 	function load_meta()
 	{
-		global $DB, $Debuglog, $FileCache;
+		global $DB, $Debuglog;
 
 		$to_load = array();
 
@@ -1150,6 +1149,7 @@ class Filelist
 		}
 
 		// Go through rows of loaded meta data...
+		$FileCache = & get_Cache( 'FileCache' );
 		foreach( $rows as $row )
 		{
 			// Retrieve matching File object:
@@ -1208,6 +1208,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.17  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.16  2006/06/13 21:49:15  blueyed
  * Merged from 1.8 branch
  *

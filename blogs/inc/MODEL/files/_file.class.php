@@ -204,7 +204,7 @@ class File extends DataObject
 	 */
 	function File( $root_type, $root_ID, $rdfp_rel_path, $load_meta = false )
 	{
-		global $FileRootCache, $Debuglog, $FiletypeCache;
+		global $Debuglog, $FiletypeCache;
 
 		$Debuglog->add( "new File( $root_type, $root_ID, $rdfp_rel_path, load_meta=$load_meta)", 'files' );
 
@@ -216,6 +216,7 @@ class File extends DataObject
 			);
 
 		// Memorize filepath:
+		$FileRootCache = & get_Cache( 'FileRootCache' );
 		$this->_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID );
 		$this->_rdfp_rel_path = no_trailing_slash(str_replace( '\\', '/', $rdfp_rel_path ));
 		$this->_adfp_full_path = $this->_FileRoot->ads_path.$this->_rdfp_rel_path;
@@ -250,7 +251,7 @@ class File extends DataObject
 	 */
 	function load_meta( $force_creation = false, $row = NULL )
 	{
-		global $DB, $Debuglog, $FileCache;
+		global $DB, $Debuglog;
 
 		if( $this->meta == 'unknown' )
 		{ // We haven't tried loading yet:
@@ -274,6 +275,7 @@ class File extends DataObject
 				$this->desc  = $row->file_desc;
 
 				// Store this in the FileCache:
+				$FileCache = & get_Cache( 'FileCache' );
 				$FileCache->add( $this );
 			}
 			else
@@ -976,10 +978,10 @@ class File extends DataObject
 	 */
 	function move_to( $root_type, $root_ID, $rdfp_rel_path )
 	{
-		global $FileRootCache;
 		// echo "relpath= $rel_path ";
 
 		$rdfp_rel_path = str_replace( '\\', '/', $rdfp_rel_path );
+		$FileRootCache = & get_Cache( 'FileRootCache' );
 		$adfp_posix_path = $FileRootCache->get_root_dir( $root_type, $root_ID ).$rdfp_rel_path;
 
 		if( ! @rename( $this->_adfp_full_path, $adfp_posix_path ) )
@@ -1338,6 +1340,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.15  2006/08/05 17:17:59  blueyed
  * todo for windows
  *

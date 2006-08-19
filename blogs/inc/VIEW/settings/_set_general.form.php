@@ -39,10 +39,6 @@ global $Settings;
  * @var DataObjectCache
  */
 global $GroupCache;
-/**
- * @var BlogCache
- */
-global $BlogCache;
 
 
 $Form = & new Form( NULL, 'settings_checkchanges' );
@@ -76,6 +72,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Display options') );
 
+$BlogCache = & get_Cache( 'BlogCache' );
 $Form->select_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default blog to display'),
 											T_('This blog will be displayed on index.php .'), true );
 
@@ -138,6 +135,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.10  2006/08/19 07:56:31  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.9  2006/06/15 17:53:38  fplanque
  * minor
  *

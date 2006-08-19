@@ -55,7 +55,6 @@ function pingback_ping( $m )
 	global $DB, $notify_from, $xmlrpcerruser;
 	global $baseurl;
 	global $localtimenow, $Messages;
-	global $UserCache, $BlogCache;
 
 	$log = debug_fopen('./xmlrpc.log', 'w');
 
@@ -142,6 +141,7 @@ function pingback_ping( $m )
 		$blog = $postdata['Blog'];
 		xmlrpc_debugmsg( 'Blog='.$blog );
 
+		$BlogCache = & get_Cache( 'BlogCache' );
 		$tBlog = & $BlogCache->get_by_ID( $blog );
 		if( !$tBlog->get('allowpingbacks') )
 		{
@@ -248,6 +248,7 @@ function pingback_ping( $m )
 						/*
 						 * New pingback notification:
 						 */
+						$UserCache = & get_Cache( 'UserCache' );
 						$AuthorUser = & $UserCache->get_by_ID( $postdata['Author_ID'] );
 						if( $AuthorUser->get( 'notify' ) )
 						{ // Author wants to be notified:
@@ -311,7 +312,7 @@ function pingback(
 	& $blogparams,
 	$display = true)
 {
-	global $app_name, $app_version, $debug, $ItemCache;
+	global $app_name, $app_version, $debug;
 
 	if( $display )
 	{
@@ -339,6 +340,7 @@ function pingback(
 		$x_pingback_str = 'x-pingback: ';
 		$pingback_href_original_pos = 27;
 
+		$ItemCache = & get_Cache( 'ItemCache' );
 		$Item = & $ItemCache->get_by_ID( $post_ID );
 		$pagelinkedfrom = $Item->get_permanent_url();
 
@@ -519,6 +521,7 @@ function pingback(
 				if( $display )	echo T_('Page Linked From:'), " $pagelinkedfrom<br />\n";
 				debug_fwrite($log, T_('Page Linked From:').' '.$pagelinkedfrom."\n");
 
+				load_funcs( '_misc/ext/_xmlrpc.php' );
 				$client = new xmlrpc_client( $parsed_url['path'], $parsed_url['host'], $port);
 				$client->setDebug( $debug );
 				$message = new xmlrpcmsg($method, array(new xmlrpcval($pagelinkedfrom), new xmlrpcval($pagelinkedto)));

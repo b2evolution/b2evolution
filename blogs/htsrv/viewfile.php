@@ -54,6 +54,7 @@ param( 'root', 'string', true ); // the root directory from the dropdown box (us
 param( 'path', 'string', true );
 
 // Load fileroot infos
+$FileRootCache = & get_Cache( 'FileRootCache' );
 $FileRoot = & $FileRootCache->get_by_ID( $root );
 
 // Create file object
@@ -233,6 +234,9 @@ debug_info();
 <?php
 /*
  * $Log$
+ * Revision 1.10  2006/08/19 07:56:29  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.9  2006/05/19 18:15:04  blueyed
  * Merged from v-1-8 branch
  *

@@ -50,9 +50,9 @@ function percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '.' )
  */
 function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
 {
-	global $BlogCache;
 	if( !empty( $hit_blog_ID ) )
 	{
+		$BlogCache = & get_Cache( 'BlogCache' );
 		$tmp_Blog = & $BlogCache->get_by_ID( $hit_blog_ID );
 		$full_url = $tmp_Blog->get('baseurlroot').$hit_uri;
 	}
@@ -86,6 +86,7 @@ for( $curr_blog_ID = blog_list_start();
 
 if( $blog )
 {
+	$BlogCache = & get_Cache( 'BlogCache' );
 	$Blog = & $BlogCache->get_by_ID($blog); // "Exit to blogs.." link
 }
 
@@ -198,6 +199,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.30  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.29  2006/07/12 20:18:20  fplanque
  * session stats + minor enhancements
  *

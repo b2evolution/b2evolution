@@ -286,6 +286,7 @@ switch ( $Settings->get('eblog_method') )
 				continue;
 			}
 
+			$UserCache = & get_Cache( 'UserCache' );
 			$loop_User = & $UserCache->get_by_login( $user_login );
 
 			// --- get infos from content -----------
@@ -335,6 +336,7 @@ switch ( $Settings->get('eblog_method') )
 				// Send email notifications now!
 				$edited_Item->send_email_notifications( false );
 
+				load_funcs( '_misc/_ping.funcs.php' );
 				pingb2evonet( $blogparams, $post_ID, $post_title);
 				pingWeblogs($blogparams);
 				pingBlogs($blogparams);
@@ -545,7 +547,7 @@ switch ( $Settings->get('eblog_method') )
 			}
 			$content = trim($content);
 
-
+			$UserCache = & get_Cache( 'UserCache' );
 			$loop_User = & $UserCache->get_by_login( $user_login );
 
 			// --- get infos from content -----------
@@ -599,6 +601,7 @@ switch ( $Settings->get('eblog_method') )
 				// Send email notifications now!
 				$edited_Item->send_email_notifications( false );
 
+				// load_funcs( '_misc/_ping.funcs.php' );
 				// $blogparams = get_blogparams_by_ID( $blog_ID );
 				//pingb2evonet( $blogparams, $post_ID, $post_title);
 				//pingWeblogs($blogparams);

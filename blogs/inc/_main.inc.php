@@ -298,6 +298,7 @@ if( !isset( $use_html_checker ) ) { $use_html_checker = 1; }
  * Includes:
  */
 $Timer->start( '_main.inc:requires' );
+require_once $inc_path.'_misc/_class4.funcs.php';
 require_once $model_path.'dataobjects/_dataobjectcache.class.php';
 require_once $model_path.'generic/_genericelement.class.php';
 require_once $model_path.'generic/_genericcache.class.php';
@@ -308,25 +309,15 @@ require_once $model_path.'items/_item.funcs.php';
 require_once $model_path.'users/_user.funcs.php';
 require_once $inc_path.'_misc/_resultsel.class.php';
 require_once $inc_path.'_misc/_template.funcs.php';    // function to be called from templates
-require_once $model_path.'files/_filecache.class.php';
 require_once $model_path.'files/_file.class.php';
-require_once $model_path.'files/_filerootcache.class.php';
 require_once $model_path.'files/_filetype.class.php';
 require_once $model_path.'files/_filetypecache.class.php';
-require_once $model_path.'items/_itemcache.class.php';
 require_once $model_path.'items/_itemtype.class.php';
 require_once $model_path.'items/_itemtypecache.class.php';
 require_once $model_path.'items/_link.class.php';
-require_once $model_path.'items/_linkcache.class.php';
-require_once $model_path.'users/_usercache.class.php';
 require_once $model_path.'comments/_comment.funcs.php';
-if( $use_html_checker ) { require_once $inc_path.'_misc/_htmlchecker.class.php'; }
 require_once $model_path.'items/_item.funcs.php';
-require_once $inc_path.'_misc/_ping.funcs.php';
 require_once $model_path.'skins/_skin.funcs.php';
-require_once $inc_path.'_misc/_trackback.funcs.php';
-require_once $inc_path.'_misc/ext/_xmlrpc.php';
-require_once $inc_path.'_misc/ext/_xmlrpcs.php';
 require_once $model_path.'comments/_commentlist.class.php';
 require_once $model_path.'items/_itemlist.class.php';
 $Timer->pause( '_main.inc:requires' );
@@ -348,18 +339,10 @@ if( false ) // TODO: conf switch
 }
 
 // Object caches init (we're asking plugins that provide the "CacheObjects" event here first):
-$Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
 $Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
 $Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', '& new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\' )' );
 $Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', '& new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
 $Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', '& new GenericCache( \'GenericElement\', true, \'T_itemstatuses\', \'pst_\', \'pst_ID\' )' );
-
-// Caches that are not meant to be loaded in total:
-$BlogCache = & new BlogCache();
-$FileCache = & new FileCache();
-$ItemCache = & new ItemCache();
-$LinkCache = & new LinkCache();
-$UserCache = & new UserCache();
 
 
 require_once $model_path.'sessions/_hitlog.funcs.php';     // referer logging
@@ -431,6 +414,8 @@ $Debuglog->add( 'pass: '.( empty($pass) ? '' : 'not' ).' empty', 'login' );
 
 // either 'login' (normal) or 'redirect_to_backoffice' may be set here. This also helps to display the login form again, if either login or pass were empty.
 $login_action = $Request->param_arrayindex( 'login_action' );
+
+$UserCache = & get_Cache( 'UserCache' );
 
 if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 { // User is trying to login right now
@@ -630,6 +615,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.45  2006/08/19 07:56:29  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.44  2006/08/19 02:15:06  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.

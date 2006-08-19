@@ -25,6 +25,7 @@ switch( $target )
 	case 'local':
 		$test_user = 'admin';
 		$test_pass = 'testpwd';
+		load_funcs( '_misc/ext/_xmlrpc.php' );
 		$client = new xmlrpc_client('/b2evo/blogs/'.$xmlsrv_subdir.'xmlrpc.php', 'localhost', 8088);
 		break;
 		

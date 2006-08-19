@@ -52,6 +52,7 @@ function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
 	if( !preg_match( '#^http://localhost[/:]#', $baseurl) || ( $evonetsrv_host == 'localhost' ) )
 	{	// Local install can only ping to local test server
 		// Construct XML-RPC client:
+		load_funcs( '_misc/ext/_xmlrpc.php' );
 		$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
 		$client->debug = ($debug && $display);
 
@@ -96,6 +97,7 @@ function pingWeblogs( & $blogparams, $display = true )
 	}
 	if( !preg_match( '#^http://localhost[/:]#', $baseurl) )
 	{
+		load_funcs( '_misc/ext/_xmlrpc.php' );
 		$client = new xmlrpc_client("/RPC2", "rpc.weblogs.com", 80);
 		$message = new xmlrpcmsg( 'weblogUpdates.ping', array(
 															new xmlrpcval(get_bloginfo('name', $blogparams)) ,
@@ -127,6 +129,7 @@ function pingWeblogs( & $blogparams, $display = true )
 	if( !preg_match( '#^http://localhost[/:]#',$baseurl) )
 	{
 		flush();
+		load_funcs( '_misc/ext/_xmlrpc.php' );
 		$client = new xmlrpc_client('/RPC2', 'rssrpc.weblogs.com', 80);
 		$message = new xmlrpcmsg('rssUpdate', array(new xmlrpcval($blogname), new xmlrpcval($rss_url)));
 		$result = $client->send($message);
@@ -166,6 +169,7 @@ function pingBlogs( & $blogparams, $display = true )
 	{
 		flush();
 		$url = get_bloginfo('blogurl');
+		load_funcs( '_misc/ext/_xmlrpc.php' );
 		$client = new xmlrpc_client('/', 'ping.blo.gs', 80);
 		if( $use_rss )
 		{
@@ -217,6 +221,7 @@ function pingTechnorati(& $blogparams, $display = true )
 
 	if( !preg_match( '#^http://localhost[/:]#', $baseurl) )
 	{
+		load_funcs( '_misc/ext/_xmlrpc.php' );
 		$client = new xmlrpc_client("/rpc/ping", "rpc.technorati.com", 80);
 		$message = new xmlrpcmsg("weblogUpdates.ping",
 										array(new xmlrpcval(get_bloginfo('name', $blogparams)),
@@ -235,6 +240,9 @@ function pingTechnorati(& $blogparams, $display = true )
 
 /*
  * $Log$
+ * Revision 1.5  2006/08/19 07:56:31  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.4  2006/07/04 17:32:30  fplanque
  * no message
  *

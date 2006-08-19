@@ -612,9 +612,9 @@ class DataObject
 	 */
 	function history_info_icon()
 	{
-		global $UserCache;
-
 		$history = array();
+
+		$UserCache = & get_Cache( 'UserCache' );
 
 		// HANDLE CREATOR STUFF
 		if( !empty($this->creator_field) && !empty($this->{$this->creator_field}) )
@@ -664,6 +664,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.13  2006/05/30 21:53:06  blueyed
  * Replaced $EvoConfig->DB with $db_config
  *

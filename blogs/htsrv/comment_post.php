@@ -39,6 +39,7 @@ if( !isset($minimum_comment_interval) ) $minimum_comment_interval = 30;
 // Getting GET or POST parameters:
 param( 'comment_post_ID', 'integer', true ); // required
 
+$ItemCache = & get_Cache( 'ItemCache' );
 $commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
 
 if( ! $commented_Item->can_comment( NULL ) )
@@ -301,6 +302,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.84  2006/08/19 07:56:29  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.83  2006/06/16 20:34:19  fplanque
  * basic spambot defeating
  *

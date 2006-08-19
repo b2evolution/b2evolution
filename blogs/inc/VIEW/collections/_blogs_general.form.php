@@ -31,10 +31,6 @@ global $edited_Blog;
  */
 global $Settings;
 /**
- * @var BlogCache
- */
-global $BlogCache;
-/**
  * @var Log
  */
 global $Debuglog;
@@ -147,6 +143,7 @@ $Form->begin_fieldset( T_('Blog URL parameters') );
 	if( $default_blog_ID = $Settings->get('default_blog_ID') )
 	{
 		$Debuglog->add('Default blog is set to: '.$default_blog_ID);
+		$BlogCache = & get_Cache( 'BlogCache' );
 		if( $default_Blog = & $BlogCache->get_by_ID($default_blog_ID, false) )
 		{ // Default blog exists
 			$defblog = $default_Blog->dget('shortname');

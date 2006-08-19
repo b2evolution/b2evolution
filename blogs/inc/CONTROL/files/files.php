@@ -112,6 +112,8 @@ $fm_FileRoot = NULL;
 
 $available_Roots = get_available_FileRoots();
 
+$FileRootCache = & get_Cache( 'FileRootCache' );
+
 if( ! empty($root) )
 { // We have requested a root folder by string:
 	$fm_FileRoot = & $FileRootCache->get_by_ID($root);
@@ -294,6 +296,7 @@ $UserSettings->param_Request( 'fm_hide_dirtree', 'fm_hide_dirtree', 'integer', 0
  */
 if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 {
+	$LinkCache = & get_Cache( 'LinkCache' );
 	if( ($edited_Link = & $LinkCache->get_by_ID( $link_ID, false )) === false )
 	{	// We could not find the link to edit:
 		$Messages->head = T_('Cannot edit link!');
@@ -310,6 +313,7 @@ if( param( 'link_ID', 'integer', NULL, false, false, false ) )
  */
 if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 { // Load Requested iem:
+	$ItemCache = & get_Cache( 'ItemCache' );
 	if( ($edited_Item = & $ItemCache->get_by_ID( $item_ID, false )) === false )
 	{	// We could not find the contact to link:
 		$Messages->head = T_('Cannot link Item!');
@@ -410,6 +414,7 @@ switch( $action )
 		}
 
 		// Try to get File object:
+		$FileCache = & get_Cache( 'FileCache' );
 		$newFile = & $FileCache->get_by_root_and_path( $fm_Filelist->_FileRoot->type, $fm_Filelist->_FileRoot->in_type_ID, $fm_Filelist->_rds_list_path.$create_name );
 
 		if( $newFile->exists() )
@@ -450,6 +455,7 @@ switch( $action )
 		}
 
 		// Try to get File object:
+		$FileCache = & get_Cache( 'FileCache' );
 		$newFile = & $FileCache->get_by_root_and_path( $fm_Filelist->_FileRoot->type, $fm_Filelist->_FileRoot->in_type_ID, $fm_Filelist->_rds_list_path.$create_name );
 
 		if( $newFile->exists() )
@@ -1024,6 +1030,7 @@ switch( $fm_mode )
 				}
 
 				// Get File object for requested target location:
+				$FileCache = & get_Cache( 'FileCache' );
 				$newFile = & $FileCache->get_by_root_and_path( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID(), $fm_Filelist->get_rds_list_path().$newName, true );
 
 				if( $newFile->exists() )
@@ -1190,6 +1197,7 @@ switch( $fm_mode )
 			}
 
 			// Check if destination file exists:
+			$FileCache = & get_Cache( 'FileCache' );
 			if( ($dest_File = & $FileCache->get_by_root_and_path( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID(), $fm_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] ))
 							&& $dest_File->exists() )
 			{ // Target exists
@@ -1237,6 +1245,7 @@ switch( $fm_mode )
 			while( $loop_src_File = & $fm_source_Filelist->get_next() )
 			{
 				// Get a pointer on dest file
+				$FileCache = & get_Cache( 'FileCache' );
 				$dest_File = & $FileCache->get_by_root_and_path( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID(), $fm_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] );
 
 				if( $fm_mode == 'file_copy' )
@@ -1498,6 +1507,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.30  2006/08/19 07:56:29  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.29  2006/07/28 18:27:10  blueyed
  * Basic image preview for image files in the file list
  *

@@ -63,8 +63,6 @@ class FileTestCase extends FilemanUnitTestCase
 	 */
 	function testCreateAndDelete()
 	{
-		global $FileRootCache;
-
 		// create a temporary file and just delete it again:
 		$temp_path = $this->createUserFile();
 		unlink( $temp_path );

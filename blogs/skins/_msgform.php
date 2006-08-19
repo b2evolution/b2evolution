@@ -61,6 +61,7 @@ $Comment = NULL;
 
 if( ! empty($recipient_id) )
 { // If the email is to a registered user get the email address from the users table
+	$UserCache = & get_Cache( 'UserCache' );
 	$recipient_User = & $UserCache->get_by_ID( $recipient_id );
 
 	if( $recipient_User )
@@ -195,6 +196,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.29  2006/08/19 07:56:32  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.28  2006/07/06 19:56:29  fplanque
  * no message
  *

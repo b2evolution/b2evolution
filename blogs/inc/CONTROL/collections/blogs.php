@@ -62,6 +62,7 @@ if( $action != 'new' )
 {
 	if( !empty( $blog ) )
 	{
+		$BlogCache = & get_Cache( 'BlogCache' );
 		$edited_Blog = & $BlogCache->get_by_ID( $blog );
 		$Blog = & $edited_Blog; // used for "Exit to blogs.." link
 	}
@@ -141,6 +142,7 @@ switch( $action )
 							'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1 )" );
 
 			// Commit changes in cache:
+			$BlogCache = & get_Cache( 'BlogCache' );
 			$BlogCache->add( $edited_Blog );
 
 			$Messages->add( T_('The new blog has been created.'), 'success' );
@@ -465,6 +467,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2006/08/19 07:56:29  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.19  2006/08/18 18:29:37  fplanque
  * Blog parameters reorganization + refactoring
  *

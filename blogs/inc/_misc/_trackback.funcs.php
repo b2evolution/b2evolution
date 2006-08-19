@@ -76,13 +76,14 @@ function trackback(
 	$excerpt,
 	$ID) // post ID
 {
-	global $ItemCache, $app_name, $app_version;
+	global $app_name, $app_version;
 
 	echo '<p>', T_('Sending trackback to:'), ' ', htmlspecialchars($trackback_url), " ...\n";
 
 	$title = rawurlencode($title);
 	$excerpt = rawurlencode($excerpt);
 	$blog_name = rawurlencode(get_bloginfo('name'));
+	$ItemCache = & get_Cache( 'ItemCache' );
 	$Item = & $ItemCache->get_by_ID( $ID );
 	$url = rawurlencode( $Item->get_permanent_url('', '', false, '&') );
 	// dis is the trackback stuff to be sent:
@@ -186,25 +187,8 @@ function trackback(
 }
 
 
-/**
- * Send a trackback response and exits.
- *
- * @param integer Error code
- * @param string Error message
- */
-function trackback_response( $error = 0, $error_message = '' )
-{ // trackback - reply
-	echo '<?xml version="1.0" encoding="iso-8859-1"?'.">\n";
-	echo "<response>\n";
-	echo "<error>$error</error>\n";
-	echo "<message>$error_message</message>\n";
-	echo "</response>";
-	exit();
-}
-
 
 /**
- * trackback_number(-)
  * @deprecated deprecated by {@link Item::feedback_link()}
  */
 function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
@@ -234,6 +218,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.8  2006/08/19 07:56:31  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.7  2006/07/04 17:32:30  fplanque
  * no message
  *

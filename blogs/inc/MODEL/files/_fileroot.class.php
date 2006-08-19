@@ -81,8 +81,6 @@ class FileRoot
 	 */
 	function FileRoot( $root_type, $root_in_type_ID )
 	{
-		global $UserCache, $BlogCache;
-
 		// Store type:
 		$this->type = $root_type;
 		// Store ID in type:
@@ -93,6 +91,7 @@ class FileRoot
 		switch( $root_type )
 		{
 			case 'user':
+				$UserCache = & get_Cache( 'UserCache' );
 				$User = & $UserCache->get_by_ID( $root_in_type_ID );
 				$this->name = $User->get( 'preferredname' );
 				$this->ads_path = $User->get_media_dir();
@@ -100,6 +99,7 @@ class FileRoot
 				return;
 
 			case 'collection':
+				$BlogCache = & get_Cache( 'BlogCache' );
 				$Blog = & $BlogCache->get_by_ID( $root_in_type_ID );
 				$this->name = $Blog->get( 'shortname' );
 				$this->ads_path = $Blog->get_media_dir();
@@ -130,6 +130,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.6  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.5  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

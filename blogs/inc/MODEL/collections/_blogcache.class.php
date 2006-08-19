@@ -198,10 +198,11 @@ class BlogCache extends DataObjectCache
 	 */
 	function load_user_blogs( $criterion = 'member', $user_ID )
 	{
-		global $DB, $Debuglog, $UserCache;
+		global $DB, $Debuglog;
 
 		$Debuglog->add( "Loading <strong>$this->objtype(criterion: $criterion)</strong> into cache", 'dataobjects' );
 
+		$UserCache = & get_Cache( 'UserCache' );
 		$for_User = & $UserCache->get_by_ID( $user_ID );
 
 		if( !$for_User )
@@ -273,6 +274,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.10  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.9  2006/07/06 19:26:30  fplanque
  * question?
  *

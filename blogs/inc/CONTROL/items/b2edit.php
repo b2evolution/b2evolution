@@ -31,6 +31,7 @@ $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecate
  */
 if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 {
+	$LinkCache = & get_Cache( 'LinkCache' );
 	if( ($edited_Link = & $LinkCache->get_by_ID( $link_ID, false )) === false )
 	{	// We could not find the linke to edit:
 		$Messages->head = T_('Cannot edit link!');
@@ -70,6 +71,7 @@ switch($action)
 		 * Display post editing form
 		 */
 		param( 'post', 'integer', true, true );
+		$ItemCache = & get_Cache( 'ItemCache' );
 		$edited_Item = & $ItemCache->get_by_ID( $post );
 		$post_locale = $edited_Item->get( 'locale' );
 		$cat = $edited_Item->get( 'main_cat_ID' );
@@ -126,9 +128,11 @@ switch($action)
 		if( $action == 'edit_switchtab' )
 		{
 			$post = $Request->param( 'post_ID', 'integer', true );
+			$ItemCache = & get_Cache( 'ItemCache' );
 			$edited_Item = & $ItemCache->get_by_ID($post_ID);
 
 			$Request->param( 'blog', 'integer', true );
+			$BlogCache = & get_Cache( 'BlogCache' );
 			$Blog = $BlogCache->get_by_ID( $blog );
 
 			$AdminUI->title = T_('Editing post').': '.$edited_Item->dget( 'title', 'htmlhead' );

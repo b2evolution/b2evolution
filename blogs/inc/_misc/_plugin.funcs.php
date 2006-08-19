@@ -206,7 +206,7 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 			break;
 
 		case 'select_user':
-			global $UserCache;
+			$UserCache = & get_Cache( 'UserCache' );
 			$UserCache->load_all();
 			if( ! isset($params['loop_object_method']) )
 			{
@@ -416,6 +416,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.22  2006/08/19 07:56:31  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.21  2006/08/08 10:02:26  yabs
  * added "cols" to the list of params that are passed through to $Form
  *

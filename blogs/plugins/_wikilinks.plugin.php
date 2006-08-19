@@ -111,6 +111,7 @@ class wikilinks_plugin extends Plugin
 			}
 
 			// Lookup all urltitles at once in DB and preload cache:
+			$ItemCache = & get_Cache( 'ItemCache' );
 			$ItemCache->load_urltitle_array( $wikiwords );
 
 			// Construct arrays for replacing wikiwords by links:
@@ -168,6 +169,7 @@ class wikilinks_plugin extends Plugin
 		}
 
 		// Lookup all urltitles at once in DB and preload cache:
+		$ItemCache = & get_Cache( 'ItemCache' );
 		$ItemCache->load_urltitle_array( $wikiwords );
 
 		// Construct arrays for replacing wikiwords by links:
@@ -257,6 +259,9 @@ class wikilinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.21  2006/08/19 07:56:32  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.20  2006/07/10 20:19:30  blueyed
  * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
  *

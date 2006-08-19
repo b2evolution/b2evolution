@@ -124,8 +124,9 @@ class ldap_plugin extends Plugin
 	function LoginAttempt( $params )
 	{
 		global $localtimenow;
-		global $UserCache, $GroupCache, $Settings, $Hit;
+		global $GroupCache, $Settings, $Hit;
 
+		$UserCache = & get_Cache( 'UserCache' );
 		if( ( $local_User = & $UserCache->get_by_login( $params['login'] ) )
 				&& $local_User->pass == $params['pass_md5'] )
 		{ // User exist (with this password), do nothing
@@ -340,6 +341,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.35  2006/08/19 07:56:32  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.34  2006/08/07 16:49:35  fplanque
  * doc
  *

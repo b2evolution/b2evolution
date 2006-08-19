@@ -190,7 +190,8 @@ switch( $action )
 
 
 if( $blog )
-{ // for "Exit to blogs.." links
+{ // also for "Exit to blogs.." links
+	$BlogCache = & get_Cache( 'BlogCache' );
 	$Blog = & $BlogCache->get_by_ID($blog);
 }
 
@@ -389,8 +390,6 @@ switch( $action )
 			break;
 		}
 
-		// List the cats:
-		$Blog = $BlogCache->get_by_ID( $blog );
 		// Display VIEW:
 		$AdminUI->disp_view( 'collections/_cats_list.php' );
 }
@@ -400,6 +399,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2006/08/19 07:56:29  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.10  2006/08/18 00:40:35  fplanque
  * Half way through a clean blog management - too tired to continue
  * Should be working.

@@ -476,7 +476,7 @@ class User extends DataObject
 	{
 		global $Debuglog;
 
-		if( isset($this->cache_perms[$permname][$permlevel][$perm_target]) )
+		if( !is_array($perm_target) && isset($this->cache_perms[$permname][$permlevel][$perm_target]) )
 		{ // Permission in available in Cache:
 			return $this->cache_perms[$permname][$permlevel][$perm_target];
 		}
@@ -553,7 +553,11 @@ class User extends DataObject
 			debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name )." ($permname:$permlevel:$perm_target)" );
 		}
 
-		$this->cache_perms[$permname][$permlevel][$perm_target] = $perm;
+		if( !is_array($perm_target) )
+		{
+			// echo "cache_perms[$permname][$permlevel][$perm_target] = $perm;";
+			$this->cache_perms[$permname][$permlevel][$perm_target] = $perm;
+		}
 
 		return $perm;
 	}
@@ -1131,6 +1135,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2006/08/19 07:56:31  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.37  2006/08/18 23:26:22  blueyed
  * Caching of perms through member rather than static var.
  *

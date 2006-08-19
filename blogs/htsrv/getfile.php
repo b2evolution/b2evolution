@@ -50,6 +50,7 @@ param( 'root', 'string', true ); // the root directory from the dropdown box (us
 param( 'path', 'string', true );
 
 // Load fileroot info:
+$FileRootCache = & get_Cache( 'FileRootCache' );
 $FileRoot = & $FileRootCache->get_by_ID( $root );
 
 // Create file object
@@ -69,6 +70,9 @@ readfile( $File->get_full_path() );
 
 /*
  * $Log$
+ * Revision 1.8  2006/08/19 07:56:29  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.7  2006/04/19 20:13:48  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

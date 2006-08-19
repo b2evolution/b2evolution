@@ -78,6 +78,7 @@ switch( $action )
 	case 'retrievepassword': // Send passwort change request by mail
 		$login_required = true; // Do not display "Without login.." link on the form
 
+		$UserCache = & get_Cache( 'UserCache' );
 		$ForgetfulUser = & $UserCache->get_by_login( $login );
 
 		if( ! $ForgetfulUser )
@@ -148,6 +149,7 @@ switch( $action )
 		param( 'reqID', 'string', '' );
 		param( 'sessID', 'integer', '' );
 
+		$UserCache = & get_Cache( 'UserCache' );
 		$ForgetfulUser = & $UserCache->get_by_login($login);
 
 		if( ! $ForgetfulUser || empty($reqID) )
@@ -356,6 +358,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.69  2006/08/19 07:56:29  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.68  2006/07/26 20:19:15  blueyed
  * Set $current_User = NULL on logout (not false!)
  *

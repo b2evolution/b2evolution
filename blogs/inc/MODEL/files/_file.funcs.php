@@ -592,17 +592,19 @@ function rel_path_to_base( $path )
  */
 function get_available_FileRoots()
 {
-	global $FileRootCache, $BlogCache, $current_User;
+	global $current_User;
 
 	$r = array();
 
 	// The user's blog (if available) is the default/first one:
+	$FileRootCache = & get_Cache( 'FileRootCache' );
 	$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $current_User->ID );
 	if( $user_FileRoot )
 	{ // We got a user media dir:
 		$r[ $user_FileRoot->ID ] = & $user_FileRoot;
 	}
 
+	$BlogCache = & get_Cache( 'BlogCache' );
 	$bloglist = $BlogCache->load_user_blogs( 'browse', $current_User->ID );
 
 	// blog media dirs:
@@ -742,6 +744,9 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.20  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.19  2006/08/03 20:50:25  blueyed
  * Did not mean to commit this (display all user dirs for admin users)
  *

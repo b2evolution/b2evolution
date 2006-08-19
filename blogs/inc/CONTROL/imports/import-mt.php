@@ -281,6 +281,7 @@ param( 'mode', 'string', 'normal' );
 				<div class="input">
 					<select name="default_blog">
 					<?php
+					$BlogCache = & get_Cache( 'BlogCache' );
 					$BlogCache->option_list( 2 );  // use first non-all blog as default
 					?>
 					</select>
@@ -857,6 +858,7 @@ param( 'mode', 'string', 'normal' );
 
 					case 'createnew':
 						// check if the user already exists
+						$UserCache = & get_Cache( 'UserCache' );
 						if( $ExistingUser =& $UserCache->get_by_login( $usersmapped[ $post_author ][1] ) )
 						{
 							$post_author = $ExistingUser->ID;
@@ -877,6 +879,7 @@ param( 'mode', 'string', 'normal' );
 							}
 
 							// This is a bad hack, because add() would need an ID
+							$UserCache = & get_Cache( 'UserCache' );
 							$UserCache->cache_login[ $new_user->login ] = & $new_user;
 
 							$message .= '<li style="color:orange">user '.$new_user->login.' created</li>';

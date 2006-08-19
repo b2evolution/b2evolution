@@ -181,6 +181,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		// Dirty trick until we get everything into objects:
 		$saved_blog = $blog;
 		$blog = 3;	// Blog B now
+		$BlogCache = & get_Cache( 'BlogCache' );
 		$Blog_B = & $BlogCache->get_by_ID( 3 ); // Blog B
 		?>
 

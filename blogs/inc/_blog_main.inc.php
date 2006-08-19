@@ -277,6 +277,7 @@ if( ($disp == 'posts') || ($disp == 'single') )
 	// On single post requests, check if we're on the right blog!
 	if( $redirect_to_postblog && ( $disp == 'single' ) && ! $preview )
 	{ // Yes we need to check.
+		$ItemCache = & get_Cache( 'ItemCache' );
 		if( !empty($p) )
 			$Item = & $ItemCache->get_by_ID( $p, false );
 		else
@@ -456,6 +457,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.30  2006/08/19 07:56:29  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.29  2006/08/19 00:41:16  fplanque
  * planted some freaky timers!
  *

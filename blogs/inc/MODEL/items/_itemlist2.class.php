@@ -106,14 +106,12 @@ class ItemList2 extends DataObjectList2
 			$restrict_to = array()			// Restrict the item list to a position, or contact, firm.....
 		)
 	{
-		global $Settings, $$cache_name;
+		global $Settings;
 
 		// echo '<br />Instanciating ItemList2';
 
-		$DataObjectCache = & $$cache_name; // By ref!!
-
 		// Call parent constructor:
-		parent::DataObjectList2( $DataObjectCache, 20, $param_prefix, NULL );
+		parent::DataObjectList2( get_Cache($cache_name), 20, $param_prefix, NULL );
 
 		// The SQL Query object:
 		$this->ItemQuery = & new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
@@ -1417,6 +1415,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.17  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.16  2006/07/08 17:04:18  fplanque
  * minor
  *

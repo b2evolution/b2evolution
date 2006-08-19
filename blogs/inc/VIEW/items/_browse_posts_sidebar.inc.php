@@ -28,10 +28,6 @@ global $Blog;
  */
 global $Plugins;
 /**
- * @var UserCache
- */
-global $UserCache;
-/**
  * @var DataObjectCache
  */
 global $ItemStatusCache;
@@ -149,6 +145,7 @@ echo '<div class="browse_side_item">';
 		echo '<fieldset>';
 		echo '<legend>'.T_('Assignees').'</legend>';
 		// Load current blog members into cache:
+		$UserCache = & get_Cache( 'UserCache' );
 		$UserCache->load_blogmembers( $Blog->ID );
 		if( count($UserCache->cache) )
 		{
@@ -263,6 +260,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.5  2006/08/19 07:56:31  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.4  2006/07/04 17:32:30  fplanque
  * no message
  *

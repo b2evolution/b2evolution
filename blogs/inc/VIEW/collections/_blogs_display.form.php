@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Blog;
 
-global $tab, $blog, $BlogCache;
+global $tab, $blog;
 
 $Form = new Form();
 
@@ -46,6 +46,7 @@ $Form->begin_fieldset( T_('List of public blogs') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Link blog / Blogroll') );
+	$BlogCache = & get_Cache( 'BlogCache' );
 	$Form->select_object( 'blog_links_blog_ID', $edited_Blog->get( 'links_blog_ID' ), $BlogCache, T_('Default linkblog'), T_('Will be displayed next to this blog (if your skin supports this).'), true );
 $Form->end_fieldset();
 

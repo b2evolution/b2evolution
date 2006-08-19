@@ -210,7 +210,7 @@ class Item extends DataObject
 	               $datecreated_field = 'datecreated', $datemodified_field = 'datemodified',
 	               $creator_field = 'creator_user_ID', $lasteditor_field = 'lastedit_user_ID' )
 	{
-		global $UserCache, $object_def, $localtimenow, $default_locale, $current_User;
+		global $object_def, $localtimenow, $default_locale, $current_User;
 
 		$this->priorities = array(
 				1 => /* TRANS: Priority name */ T_('1 - Highest'),
@@ -297,8 +297,6 @@ class Item extends DataObject
 	 */
 	function assign_to( $user_ID, $dbupdate = true /* BLOAT!? */ )
 	{
-		global $UserCache;
-
 		// echo 'assigning user #'.$user_ID;
 		if( ! empty($user_ID) )
 		{
@@ -310,6 +308,7 @@ class Item extends DataObject
 			{
 				$this->assigned_user_ID = $user_ID;
 			}
+			$UserCache = & get_Cache( 'UserCache' );
 			$this->assigned_User = & $UserCache->get_by_ID( $user_ID );
 		}
 		else
@@ -622,8 +621,9 @@ class Item extends DataObject
 	 */
 	function assigned_user_options()
 	{
-		global $UserCache, $object_def;
+		global $object_def;
 
+		$UserCache = & get_Cache( 'UserCache' );
 		$UserCache->blog_member_list( $this->blog_ID, $this->assigned_user_ID,
 						$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
 						($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
@@ -636,8 +636,9 @@ class Item extends DataObject
 	 */
 	function get_assigned_user_options()
 	{
-		global $UserCache, $object_def;
+		global $object_def;
 
+		$UserCache = & get_Cache( 'UserCache' );
 		return $UserCache->blog_member_list( $this->blog_ID, $this->assigned_user_ID,
 							$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
 							($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
@@ -682,13 +683,14 @@ class Item extends DataObject
 		)
 	{
 		global $cache_postcats;
-		global $BlogCache;
 
 		if( $link_title == '#' )
 		{ /* TRANS: When the categories for a specific post are displayed, the user can click
 					on these cats to browse them, this is the default href title displayed there */
 			$link_title = T_('Browse category');
 		}
+
+		$BlogCache = & get_Cache( 'BlogCache' );
 
 		cat_load_postcats_cache();
 		$categoryIDs = $cache_postcats[$this->ID];
@@ -1124,7 +1126,7 @@ class Item extends DataObject
 	{
 		if( is_null( $this->Links ) )
 		{ // Links have not been loaded yet:
-			global $LinkCache;
+			$LinkCache = & get_Cache( 'LinkCache' );
 			$this->Links = & $LinkCache->get_by_item_ID( $this->ID );
 		}
 	}
@@ -2260,7 +2262,7 @@ class Item extends DataObject
 
 		// echo 'INSERTING NEW POST ';
 
-		if( isset( $UserCache ) )
+		if( isset( $UserCache ) )	// DIRTY HACK
 		{ // If not in install procedure...
 			$this->set_creator_User( $UserCache->get_by_ID( $author_user_ID ) );
 		}
@@ -2544,7 +2546,7 @@ class Item extends DataObject
 	{
 		if( ! isset($this->assigned_User) && isset($this->assigned_user_ID) )
 		{
-			global $UserCache;
+			$UserCache = & get_Cache( 'UserCache' );
 			$this->assigned_User = & $UserCache->get_by_ID( $this->assigned_user_ID );
 		}
 
@@ -2561,7 +2563,7 @@ class Item extends DataObject
 	{
 		if( is_null($this->creator_User) )
 		{
-			global $UserCache;
+			$UserCache = & get_Cache( 'UserCache' );
 			$this->creator_User = & $UserCache->get_by_ID( $this->creator_user_ID );
 			$this->Author = & $this->creator_User;  // deprecated
 		}
@@ -2595,7 +2597,7 @@ class Item extends DataObject
 	{
 		if( is_null($this->Blog) )
 		{
-			global $BlogCache;
+			$BlogCache = & get_Cache( 'BlogCache' );
 			$this->Blog = & $BlogCache->get_by_ID( $this->blog_ID );
 		}
 	}
@@ -2825,6 +2827,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.77  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.76  2006/08/19 02:15:07  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.

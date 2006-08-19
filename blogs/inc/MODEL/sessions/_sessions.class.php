@@ -73,12 +73,14 @@ class Sessions extends Widget
 		{
 			return true;
 		}
-		global $DB, $UserCache, $localtimenow, $timeout_online_user;
+		global $DB, $localtimenow, $timeout_online_user;
 
 		$this->_count_guests = 0;
 		$this->_registered_Users = array();
 
 		$timeout_YMD = date( 'Y-m-d H:i:s', ($localtimenow - $timeout_online_user) );
+
+		$UserCache = & get_Cache( 'UserCache' );
 
 		// We get all sessions that have been seen in $timeout_YMD and that have a session key.
 		// NOTE: we do not use DISTINCT here, because guest users are all "NULL".
@@ -142,7 +144,7 @@ class Sessions extends Widget
 	 */
 	function display_online_users( $beforeAll = '<ul class="onlineUsers">', $afterAll = '</ul>', $templateEach = '<li class="onlineUser">$user_preferredname$ $user_msgformlink$</li>' )
 	{
-		global $DB, $Blog, $UserCache;
+		global $DB, $Blog;
 		global $generating_static;
 		if( isset($generating_static) ) { return; }
 
@@ -255,6 +257,9 @@ class Sessions extends Widget
 
 /*
  * $Log$
+ * Revision 1.6  2006/08/19 07:56:31  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.5  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

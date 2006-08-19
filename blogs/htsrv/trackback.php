@@ -40,6 +40,22 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
+/**
+ * Send a trackback response and exits.
+ *
+ * @param integer Error code
+ * @param string Error message
+ */
+function trackback_response( $error = 0, $error_message = '' )
+{ // trackback - reply
+	echo '<?xml version="1.0" encoding="iso-8859-1"?'.">\n";
+	echo "<response>\n";
+	echo "<error>$error</error>\n";
+	echo "<message>$error_message</message>\n";
+	echo "</response>";
+	exit();
+}
+
 // statuses allowed for acting on:
 $show_statuses = array( 'published', 'protected', 'private' );
 
@@ -74,6 +90,7 @@ if( empty($url) )
 @header('Content-Type: text/xml');
 
 $comment_post_ID = $tb_id;
+$ItemCache = & get_Cache( 'ItemCache' );
 $commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
 if( !( $Blog = & $commented_Item->get_Blog() ) )
 {
@@ -191,6 +208,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.55  2006/08/19 07:56:29  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.54  2006/07/03 21:04:48  fplanque
  * translation cleanup
  *

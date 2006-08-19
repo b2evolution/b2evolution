@@ -280,8 +280,9 @@ function trackback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
  */
 function the_author_posts()
 {
-	global $postdata, $UserCache;
+	global $postdata;
 
+	$UserCache = & get_Cache( 'UserCache' );
 	$User = & $UserCache->get_by_ID($postdata['Author_ID']);
 	echo $User->get_num_posts();
 }
@@ -1357,11 +1358,13 @@ function arcdir_title( $prefix = ' ', $display = 'htmlbody' )
  */
 function single_post_title( $prefix = '#', $display = 'htmlhead' )
 {
-	global $p, $title, $preview, $ItemCache;
+	global $p, $title, $preview;
 
 	$disp_title = '';
 
 	if( $prefix == '#' ) $prefix = ' '.T_('Post details').': ';
+
+	$ItemCache = & get_Cache( 'ItemCache' );
 
 	if( $preview )
 	{
@@ -1692,6 +1695,9 @@ $b2_version = $app_version;
 
 /*
  * $Log$
+ * Revision 1.13  2006/08/19 07:56:31  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.12  2006/08/19 02:15:08  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.

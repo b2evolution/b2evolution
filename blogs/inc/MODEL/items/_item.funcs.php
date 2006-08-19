@@ -257,7 +257,7 @@ function previous_post( $format='&lt;&lt; % ', $previous='#', $title='yes', $in_
 	}
 
 	global $DB, $postdata;
-	global $ItemCache, $Blog;
+	global $Blog;
 
 	if( $previous == '#' ) $previous = T_('Previous post') . ': ';
 
@@ -292,6 +292,7 @@ function previous_post( $format='&lt;&lt; % ', $previous='#', $title='yes', $in_
 
 	if( $p_info = $DB->get_row( $sql, OBJECT, 0, 'previous_post()' ) )
 	{
+		$ItemCache = & get_Cache( 'ItemCache' );
 		$Item = & $ItemCache->get_by_ID($p_info->post_ID);
 
 		$blog_url = $in_same_cat ? $Blog->get('url') : '';
@@ -323,7 +324,7 @@ function next_post( $format = '% &gt;&gt; ', $next = '#', $title = 'yes', $in_sa
 	}
 
 	global $postdata, $localtimenow, $DB;
-	global $ItemCache, $Blog;
+	global $Blog;
 
 	if( $next == '#' ) $next = T_('Next post') . ': ';
 
@@ -365,6 +366,7 @@ function next_post( $format = '% &gt;&gt; ', $next = '#', $title = 'yes', $in_sa
 
 	if( $p_info = $DB->get_row( $sql, OBJECT, 0, 'next_post()' ) )
 	{
+		$ItemCache = & get_Cache( 'ItemCache' );
 		$Item = & $ItemCache->get_by_ID($p_info->post_ID);
 
 		$blog_url = $in_same_cat ? $Blog->get('url') : '';
@@ -959,6 +961,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.19  2006/08/19 07:56:30  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.18  2006/08/05 17:59:52  fplanque
  * minor
  *

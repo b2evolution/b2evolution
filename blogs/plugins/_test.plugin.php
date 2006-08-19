@@ -555,8 +555,9 @@ class test_plugin extends Plugin
 	{
 		if( 0 ) // you should only enable it for test purposes, because it automagically logs every user in as "demouser"!
 		{
-			global $Session, $Messages, $UserCache;
+			global $Session, $Messages;
 
+			$UserCache = & get_Cache( 'UserCache' );
 			if( $demo_User = & $UserCache->get_by_login('demouser') )
 			{ // demouser exists:
 				$Session->set_User( $demo_User );
@@ -594,6 +595,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.49  2006/08/19 07:56:32  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.48  2006/07/10 22:53:38  blueyed
  * Grouping of plugins added, based on a patch from balupton
  *

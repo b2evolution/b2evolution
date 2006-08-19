@@ -1200,29 +1200,15 @@ function upgrade_b2evo_tables()
 	*/
 
 
-	if( $old_db_version < 9400 )
+	
+	
+	if( $old_db_version < 9402 )
 	{
-		/*
-		 * TODO: the following paragraph needs to be rephrased probably. I've not understand it before anyway.. :p
-		 *       Please read through all the new comments/explanations and ask/rephrase where it's not clear. (blueyed)
-		 *
-		 * CONTRIBUTORS: If you need changes and we haven't started a block for next release yet, put them here!
-		 * Then create a new extension block, and increase db version numbers everywhere where needed in this file.
-		 */
-
-		/*
-		 * Only DB table column renames should go here.
-		 *
-		 * It gets a bit tricky with them if you cannot say using $old_db_version when the column
-		 * has been created with the original name: you probably have to use "SHOW COLUMNS FROM table"
-		 * to see if it (the original name) is there.
-		 *
-		 * Then put the generated ALTER COLUMN query here, before the schema upgrade is done (below).
-		 *
-		 * This is because we cannot detect a column rename easily.
-		 *
-		 * See below for "normal" DB upgrade.
-		 */
+		echo 'Updating blogs... ';
+		$DB->query( '
+				ALTER TABLE T_blogs
+							DROP COLUMN blog_allowpingbacks' );
+		echo "OK.<br />\n";
 	}
 
 
@@ -1332,6 +1318,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.164  2006/08/19 07:56:31  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.163  2006/08/17 20:10:23  fplanque
  * fix syntax error
  *

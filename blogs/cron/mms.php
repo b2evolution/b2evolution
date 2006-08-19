@@ -29,6 +29,7 @@ param( 'cat', 'integer', $default_category, true );
 
 if( !user_pass_ok( $login, $pass, false ) || $_SERVER['CONTENT_TYPE'] != "application/vnd.wap.mms-message" || strlen( $HTTP_RAW_POST_DATA ) == 0 ) exit;
 
+$UserCache = & get_Cache( 'UserCache' );
 $current_User = & $UserCache->get_by_login( $login );
 $post_category = $cat;
 $blog = get_catblog($post_category);
@@ -721,6 +722,7 @@ writeBackSendConf( $md );
 $edited_Item->send_email_notifications( false );
 
 $blogparams = get_blogparams_by_ID( $blog );
+load_funcs( '_misc/_ping.funcs.php' );
 pingb2evonet( $blogparams, $post_ID, $post_title, false );
 pingWeblogs( $blogparams, false );
 pingBlogs( $blogparams );
@@ -731,6 +733,9 @@ exit;
 
 /*
  * $Log$
+ * Revision 1.3  2006/08/19 07:56:29  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.2  2006/08/19 02:15:06  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.

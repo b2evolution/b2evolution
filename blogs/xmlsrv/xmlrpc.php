@@ -110,9 +110,8 @@ $b2newpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrp
 function b2newpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $DB, $UserCache;
+	global $DB;
 	global $Settings, $Messages;
-	global $ItemCache;					// Tor 28102005
 
 	$username = $m->getParam(2);
 	$username = $username->scalarval();
@@ -138,6 +137,7 @@ function b2newpost($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
+	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
 
 	// Check if category exists
@@ -185,6 +185,7 @@ function b2newpost($m)
 	logIO("O","Sending email notifications...");
 	$edited_Item->send_email_notifications( false );
 
+	load_funcs( '_misc/_ping.funcs.php' );
 	logIO("O","Pinging b2evolution.net...");
 	pingb2evonet( $blogparams, $post_ID, $post_title, false );
 	logIO("O","Pinging Weblogs...");
@@ -283,7 +284,6 @@ function b2_getPostURL($m)
 {
 	global $xmlrpcerruser;
 	global $siteurl;
-	global $ItemCache, $UserCache;
 
 	$blog_ID = $m->getParam(0);
 	$blog_ID = $blog_ID->scalarval();
@@ -303,6 +303,7 @@ function b2_getPostURL($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
+	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
 
 	// Check permission:
@@ -312,6 +313,7 @@ function b2_getPostURL($m)
 				'Permission denied.' );
 	}
 
+	$ItemCache = & get_Cache( 'ItemCache' );
 	if( ( $Item = & $ItemCache->get_by_ID( $post_ID ) ) === false )
 	{ // Post does not exist
 		return new xmlrpcresp(0, $xmlrpcerruser+7,
@@ -356,8 +358,7 @@ function bloggernewpost( $m )
 {
 	global $xmlrpcerruser; // import user errcode value
 	global $default_category, $DB;
-	global $Settings, $Messages, $UserCache;
-	global $ItemCache;					// Tor 28102005
+	global $Settings, $Messages;
 
 	logIO('I','Called function: blogger.newPost');
 
@@ -380,6 +381,7 @@ function bloggernewpost( $m )
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
+	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
 
 	if( ! ($post_category = xmlrpc_getpostcategory($content) ) )
@@ -436,6 +438,7 @@ function bloggernewpost( $m )
 		logIO("O","Sending email notifications...");
 		$edited_Item->send_email_notifications( false );
 
+		load_funcs( '_misc/_ping.funcs.php' );
 		logIO("O","Pinging b2evolution.net...");
 		pingb2evonet( $blogparams, $post_ID, $post_title, false );
 		logIO("O","Pinging Weblogs...");
@@ -485,9 +488,8 @@ $bloggereditpost_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $x
 function bloggereditpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $ItemCache;
 	global $default_category, $DB;
-	global $Messages, $UserCache;
+	global $Messages;
 
 	logIO('I','Called function: blogger.editPost');
 
@@ -508,6 +510,7 @@ function bloggereditpost($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
+	$ItemCache = & get_Cache( 'ItemCache' );
 	if( ! ($edited_Item = & $ItemCache->get_by_ID( $post_ID ) ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+7, "No such post (#$post_ID)."); // user error 7
@@ -531,6 +534,7 @@ function bloggereditpost($m)
 
 	logIO('O','Old post Title: '.$postdata['Title']);
 
+	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
 
 	if( ! ($post_category = xmlrpc_getpostcategory($newcontent) ) )
@@ -605,6 +609,7 @@ function bloggereditpost($m)
 			logIO("O","Sending email notifications...");
 			$edited_Item->send_email_notifications( false );
 
+			load_funcs( '_misc/_ping.funcs.php' );
 			logIO("O","Pinging b2evolution.net...");
 			pingb2evonet( $blogparams, $post_ID, $post_title, false );
 			logIO("O","Pinging Weblogs...");
@@ -643,8 +648,7 @@ $bloggerdeletepost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString
 function bloggerdeletepost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $DB, $UserCache;
-	global $ItemCache;					// Tor 28102005
+	global $DB;
 
 	$post_ID = $m->getParam(1);
 	$post_ID = $post_ID->scalarval();
@@ -662,11 +666,13 @@ function bloggerdeletepost($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
+	$ItemCache = & get_Cache( 'ItemCache' );
 	if( ! ($edited_Item = & $ItemCache->get_by_ID( $post_ID, false ) ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+7, 'No such post.');	// user error 7
 	}
 
+	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
 
 	// Check permission:
@@ -715,7 +721,7 @@ $bloggergetusersblogs_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcStrin
  */
 function bloggergetusersblogs($m)
 {
-	global $xmlrpcerruser, $UserCache;
+	global $xmlrpcerruser;
 	global $baseurl;
 
 	$username = $m->getParam(1);
@@ -734,6 +740,7 @@ function bloggergetusersblogs($m)
 	logIO("O","user approved.");
 
 
+	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
 	logIO("O","Got Current user.".$current_User);
 
@@ -794,7 +801,7 @@ $bloggergetuserinfo_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString,
  */
 function bloggergetuserinfo($m)
 {
-	global $xmlrpcerruser, $UserCache;
+	global $xmlrpcerruser;
 
 	$username = $m->getParam(1);
 	$username = $username->scalarval();
@@ -802,7 +809,8 @@ function bloggergetuserinfo($m)
 	$password = $m->getParam(2);
 	$password = $password->scalarval();
 
-	$User =& $UserCache->get_by_login( $username );
+	$UserCache = & get_Cache( 'UserCache' );
+	$User = & $UserCache->get_by_login( $username );
 
 	if( user_pass_ok( $username, $password) )
 	{
@@ -916,8 +924,7 @@ $bloggergetrecentposts_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcSt
  */
 function bloggergetrecentposts( $m )
 {
-	global $xmlrpcerruser, $DB, $show_statuses, $UserCache;
-	global $ItemCache;					// Tor 28102005
+	global $xmlrpcerruser, $DB, $show_statuses;
 
 	$blog_ID = $m->getParam(1);
 	$blog_ID = $blog_ID->scalarval();
@@ -937,6 +944,7 @@ function bloggergetrecentposts( $m )
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
+	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
 
 	// Check permission:
@@ -1017,7 +1025,7 @@ $bloggergettemplate_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcStrin
  */
 function bloggergettemplate($m)
 {
-	global $xmlrpcerruser, $UserCache;
+	global $xmlrpcerruser;
 
 	$blog_ID = $m->getParam(1);
 	$blog_ID = $blog_ID->scalarval();
@@ -1037,6 +1045,7 @@ function bloggergettemplate($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
+	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
 
 	// Check permission:
@@ -1095,7 +1104,7 @@ $bloggersettemplate_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcStrin
  */
 function bloggersettemplate( $m )
 {
-	global $xmlrpcerruser, $blogfilename, $UserCache;
+	global $xmlrpcerruser, $blogfilename;
 
 	$blog_ID = $m->getParam(1);
 	$blog_ID = $blog_ID->scalarval();
@@ -1118,6 +1127,7 @@ function bloggersettemplate( $m )
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
+	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
 
 	// Check permission:
@@ -1342,8 +1352,7 @@ function mwnewpost($m)
 	global $xmlrpcerruser; // import user errcode value
 	global $DB;
 	global $sleep_after_edit;
-	global $Settings, $UserCache;
-	global $ItemCache;					// Tor 28102005
+	global $Settings;
 	global $default_category;
 
 	logIO("O","start of mwnewpost...");
@@ -1408,6 +1417,7 @@ function mwnewpost($m)
 	}
 
 	// Check permission:
+	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
 	logIO("O","currentuser ...". $current_User);
 
@@ -1447,10 +1457,11 @@ function mwnewpost($m)
 	}
 
 	$blogparams = get_blogparams_by_ID( $blog_ID );
-	logIO("O","finished getting blogparams ...");
 
 //		logIO("O","Sending email notifications...");
 //		$edited_Item->send_email_notifications( false );
+
+	load_funcs( '_misc/_ping.funcs.php' );
 	logIO("O","Pinging b2evolution.net...");
 //	New error is here somewhere - and of course with ecto these functions are not needed
 // so we will need config option to opt out of all of these
@@ -1471,7 +1482,8 @@ $mt_setPostCategories_doc = "Sets the categories for a post.";
 
 function mt_setPostCategories($m) {
 	global $xmlrpcerruser,$Settings;
-	global $DB, $Messages, $UserCache,$ItemCache;
+	global $DB, $Messages;
+	
 	$post_ID = $m->getParam(0);
 	$post_ID = $post_ID->scalarval();
 	$username = $m->getParam(1);
@@ -1515,6 +1527,7 @@ function mt_setPostCategories($m) {
 
 	// UPDATE POST CATEGORIES IN DB:
 	logIO("O","bpost_update - category ...".$category); // works!
+	$ItemCache = & get_Cache( 'ItemCache' );
 	if( ! ($edited_Item = & $ItemCache->get_by_ID( $post_ID ) ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+7, "No such post (#$post_ID)."); // user error 7
@@ -1626,10 +1639,10 @@ $mweditpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpc
 function mweditpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $DB, $ItemCache;
+	global $DB;
 	global $sleep_after_edit;
 	global $Settings;
-	global $Messages, $UserCache;
+	global $Messages;
 	global $xmlrpc_htmlchecking;
 	global $default_category;
 
@@ -1661,12 +1674,14 @@ function mweditpost($m)
 
 
 	// Get Item:
+	$ItemCache = & get_Cache( 'ItemCache' );
 	if( ! ($edited_Item = & $ItemCache->get_by_ID( $post_ID ) ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+7, "No such post (#$post_ID)."); // user error 7
 	}
 
 	// Check permission:
+	$UserCache = & get_Cache( 'UserCache' );
 	$User = & $UserCache->get_by_login( $username );
 	logIO("O","User ID ...".$User->get('ID'));
 	if( ! $User->check_perm( 'blog_post_statuses', $status, false, $edited_Item->blog_ID ) )
@@ -1747,6 +1762,7 @@ function mweditpost($m)
 //
 // NB Requires a change to the _trackback library
 //
+// 			load_funcs( '_misc/_trackback.funcs.php' );
 // function trackbacks( $post_trackbacks, $content, $post_title, $post_ID )
 
 // first extract these from posting as post_trackbacks array, then rest is easy
@@ -1770,6 +1786,7 @@ function mweditpost($m)
 		if ($no_of_trackbacks > 0)
 		{
 			logIO("O","Calling Trackbacks  ...");
+			load_funcs( '_misc/_trackback.funcs.php' );
  			$result = trackbacks( $trackbacks, $content, $post_title, $post_ID );
 			logIO("O","Returned from  Trackbacks  ...");
  		}
@@ -1832,7 +1849,7 @@ $metawebloggetrecentposts_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcS
 
 function metawebloggetrecentposts( $m )
 {
-	global $xmlrpcerruser, $DB, $show_statuses, $UserCache;
+	global $xmlrpcerruser, $DB, $show_statuses;
 	global $blog;
 
 	$blog_ID = $m->getParam(0);
@@ -1856,6 +1873,7 @@ function metawebloggetrecentposts( $m )
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 	logIO("O","In metawebloggetrecentposts, user and pass ok...");
+	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
 	logIO( 'O', 'In metawebloggetrecentposts, current user is ...'.$current_User->ID );
 	// Check permission:
@@ -2136,6 +2154,9 @@ function mt_getcategoryList($m) {
 
 
 /**** SERVER FUNCTIONS ARRAY ****/
+
+require_once $inc_path.'_misc/ext/_xmlrpcs.php'; // This will add generic remote calls
+
 $s = new xmlrpc_server(
 	array(
 		"metaWeblog.newMediaObject" =>
@@ -2280,6 +2301,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.107  2006/08/19 07:56:32  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.106  2006/08/19 02:15:09  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.

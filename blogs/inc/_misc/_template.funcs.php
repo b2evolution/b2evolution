@@ -63,7 +63,7 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 												$display = true, $linktoyeararchive = true, $blogurl = '', $params = '', 
 												$disp_single_title = true, $default = '' )
 {
-	global $cat_modifier, $cat_array, $m, $w, $month, $p, $title, $preview, $ItemCache, $disp, $s, $author;
+	global $cat_modifier, $cat_array, $m, $w, $month, $p, $title, $preview, $disp, $s, $author;
 
 	$r = array();
 
@@ -102,6 +102,7 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			}
 			elseif( $disp_single_title )
 			{
+				$ItemCache = & get_Cache( 'ItemCache' );
 				if( intval($p) )
 				{	// We are requesting a specific post by ID:
 					if( $Item = & $ItemCache->get_by_ID( $p, false ) )
@@ -307,6 +308,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.9  2006/08/19 07:56:31  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.8  2006/08/17 16:32:29  fplanque
  * enhanced titles
  *

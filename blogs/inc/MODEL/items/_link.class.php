@@ -52,8 +52,6 @@ class Link extends DataObject
 	 */
 	function Link( $db_row = NULL )
 	{
-		global $ItemCache, $FileCache;
-
 		// Call parent constructor:
 		parent::DataObject( 'T_links', 'link_', 'link_ID',
 													'datecreated', 'datemodified', 'creator_user_ID', 'lastedit_user_ID' );
@@ -64,8 +62,10 @@ class Link extends DataObject
 			$this->ltype_ID = $db_row->link_ltype_ID;
 
 			// source of link:
+			$ItemCache = & get_Cache( 'ItemCache' );
 			$this->Item     = & $ItemCache->get_by_ID( $db_row->link_itm_ID );
 
+			$FileCache = & get_Cache( 'FileCache' );
 			$this->File     = & $FileCache->get_by_ID( $db_row->link_file_ID, true, false );
 		}
 		else
@@ -95,6 +95,9 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2006/08/19 07:56:31  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.3  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

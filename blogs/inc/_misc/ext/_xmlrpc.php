@@ -133,6 +133,7 @@
 		global $xmlrpcStruct;
 
 		global $xmlrpcTypes;
+		global $xmlrpc_valid_parents;
 		global $xmlEntities;
 		global $xmlrpcerr;
 		global $xmlrpcstr;
@@ -198,7 +199,7 @@
 	$xmlrpcerr['unknown_method']=1;
 	$xmlrpcstr['unknown_method']='Unknown method';
 	$xmlrpcerr['invalid_return']=2;
-	$xmlrpcstr['invalid_return']='Invalid return payload: enable debugging to examine incoming payload';
+	$xmlrpcstr['invalid_return']='Invalid return payload! enable debugging to examine incoming payload.';
 	$xmlrpcerr['incorrect_params']=3;
 	$xmlrpcstr['incorrect_params']='Incorrect parameters passed to method';
 	$xmlrpcerr['introspect_unknown']=4;

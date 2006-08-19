@@ -276,10 +276,9 @@ class Session
 	 */
 	function & get_User()
 	{
-		global $UserCache;
-
 		if( !empty($this->user_ID) )
 		{
+			$UserCache = & get_Cache( 'UserCache' );
 			return $UserCache->get_by_ID( $this->user_ID );
 		}
 
@@ -434,6 +433,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.22  2006/08/19 07:56:31  fplanque
+ * Moved a lot of stuff out of the automatic instanciation in _main.inc
+ *
  * Revision 1.21  2006/08/07 23:49:52  blueyed
  * Display Debuglog object stored in session (after redirect) separately.
  *
