@@ -12,6 +12,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+/**
+ * Import plugin funcs
+ */
 require_once $inc_path.'_misc/_plugin.funcs.php';
 
 

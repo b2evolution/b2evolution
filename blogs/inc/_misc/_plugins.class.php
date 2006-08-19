@@ -194,9 +194,6 @@ class Plugins
 	/**
 	 * Get the list of supported/available events/hooks.
 	 *
-	 * @todo Finish descriptions
-	 *
-	 * {@internal
 	 * Additional to the returned event methods (which can be disabled), there are internal
 	 * ones which just get called on the plugin (and get not remembered in T_pluginevents), e.g.:
 	 *  - AfterInstall
@@ -207,6 +204,7 @@ class Plugins
 	 *  - BeforeUninstallPayload
 	 *  - GetDefaultSettings
 	 *  - GetDefaultUserSettings
+	 *  - GetExtraEvents
 	 *  - GetHtsrvMethods
 	 *  - PluginInit
 	 *  - PluginSettingsUpdateAction (Called as action before updating the plugin's settings)
@@ -220,7 +218,8 @@ class Plugins
 	 *  - PluginVersionChanged (Called when we detect a version change)
 	 *
 	 *  The max length of event names is 40 chars (T_pluginevents.pevt_event).
-	 * }}
+	 *
+	 * @todo Finish/Complete descriptions
 	 *
 	 * @return array Name of event (key) => description (value)
 	 */
@@ -2909,6 +2908,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.75  2006/08/19 10:57:40  blueyed
+ * doc fixes.
+ *
  * Revision 1.74  2006/08/19 08:50:27  fplanque
  * moved out some more stuff from main
  *

@@ -349,52 +349,93 @@ class Plugin
 	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
 	 * and assign an array with the following keys to them (only 'label' is required):
 	 *
-	 *   - 'label': Name/Title of the param, gets displayed as label for the input field, or
+	 *   <ul><li>
+	 *   'label': Name/Title of the param, gets displayed as label for the input field, or
 	 *              as "legend" tag with types "array" and "fieldset".
-	 *   - 'defaultvalue': Default value for the setting, defaults to '' (empty string)
-	 *   - 'type', which can be:
-	 *     - 'text' (default): a simple string
-	 *     - 'html_input' : like text, but allows html
-	 *     - 'password': like text, but hidden during input
-	 *     - 'checkbox': either 0 or 1
-	 *     - 'integer': a number (no float, can have leading "+" or "-")
+	 *   </li><li>
+	 *   'defaultvalue': Default value for the setting, defaults to '' (empty string)
+	 *   </li><li>
+	 *   'type', which can be:
+	 *     <ul><li>
+	 *     'text' (default): a simple string
+	 *     </li><li>
+	 *     'html_input' : like text, but allows html
+	 *     </li><li>
+	 *     'password': like text, but hidden during input
+	 *     </li><li>
+	 *     'checkbox': either 0 or 1
+	 *     </li><li>
+	 *     'integer': a number (no float, can have leading "+" or "-")
 	 *                  (like 'text' for input, but gets validated when submitting)
-	 *     - 'textarea': several lines of input. The following can be set for this type:
-	 *       - 'rows': number of rows
-	 *       - 'cols': number of columns
-	 *     - 'html_textarea': like textarea, but allows html
-	 *     - 'select': a drop down field; you must set 'options' for it:
-	 *       - 'options': an array of options ('value' => 'description'), see {@link Form::select_input_array()}.
-	 *     - 'select_group': a drop down field, providing all existing groups (Group ID is the value or "" if "allow_none" is true)
-	 *     - 'select_user': a drop down field, providing all existing groups (User ID is the value or "" if "allow_none" is true)
-	 *     - 'array': a subset of settings. The value gets automagically (un)serialized through get() and set().
+	 *     </li><li>
+	 *     'textarea': several lines of input. The following can be set for this type:
+	 *       <ul><li>
+	 *       'rows': number of rows
+	 *       </li><li>
+	 *       'cols': number of columns
+	 *       </li></ul>
+	 *     'html_textarea': like textarea, but allows html
+	 *     </li><li>
+	 *     'select': a drop down field; you must set 'options' for it:
+	 *       <ul><li>
+	 *       'options': an array of options ('value' => 'description'), see {@link Form::select_input_array()}.
+	 *       </li></ul>
+	 *     </li><li>
+	 *     'select_group': a drop down field, providing all existing groups (Group ID is the value or "" if "allow_none" is true)
+	 *     </li><li>
+	 *     'select_user': a drop down field, providing all existing groups (User ID is the value or "" if "allow_none" is true)
+	 *     </li><li>
+	 *     'array': a subset of settings. The value gets automagically (un)serialized through get() and set().
 	 *       The following keys apply to this type:
-	 *       - 'entries': an array with the sub-settings (which can be everything from the top-level, except:
+	 *       <ul><li>
+	 *       'entries': an array with the sub-settings (which can be everything from the top-level, except:
 	 *                    "valid_pattern", "valid_range"). Note: currently there's no type forcing or checking
 	 *                    for sub-entries involved (e.g., if you have an entry of type "integer", you could get
 	 *                    a non-numeric string there).
-	 *       - 'max_count': maximum count of sets (optional, default is no restriction)
-	 *       - 'min_count': minimum count of sets (optional, default is no restriction)
-	 *   - 'note' (gets displayed as a note to the param field),
-	 *   - 'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)
-	 *   - 'maxlength': maxlength attribute for the input field (See 'size' above; defaults to no limit)
-	 *   - 'disabled': if true, it adds a 'disabled="disabled"' html attribute to the element and the value cannot be changed
-	 *   - 'no_edit': if true, the setting is not editable. This is useful for internal settings.
-	 *   - 'allow_none': set this to true to have "None" in the options list for types
+	 *       </li><li>
+	 *       'max_count': maximum count of sets (optional, default is no restriction)
+	 *       </li><li>
+	 *       'min_count': minimum count of sets (optional, default is no restriction)
+	 *       </li></ul>
+	 *     </li></ul>
+	 *   </li><li>
+	 *   'note' (gets displayed as a note to the param field),
+	 *   </li><li>
+	 *   'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)
+	 *   </li><li>
+	 *   'maxlength': maxlength attribute for the input field (See 'size' above; defaults to no limit)
+	 *   </li><li>
+	 *   'disabled': if true, it adds a 'disabled="disabled"' html attribute to the element and the value cannot be changed
+	 *   </li><li>
+	 *   'no_edit': if true, the setting is not editable. This is useful for internal settings.
+	 *   </li><li>
+	 *   'allow_none': set this to true to have "None" in the options list for types
 	 *                   'select_group' and 'select_user'.
-	 *   - 'valid_pattern': A regular expression pattern that the value must match.
+	 *   </li><li>
+	 *   'valid_pattern': A regular expression pattern that the value must match.
 	 *                      This is either just a regexp pattern as string or an array
 	 *                      with the keys 'pattern' and 'error' to define a custom error message.
-	 *   - 'valid_range': An array with keys 'min', 'max' and (optionally) 'error' to define
+	 *   </li><li>
+	 *   'valid_range': An array with keys 'min', 'max' and (optionally) 'error' to define
 	 *                    a custom error message. At least "min" or "max" must be given.
-	 *   - 'help': can be:
-	 *          - '#anchor': anchor that gets appended to {@link $help_url}
-	 *          - true: the settings name/key gets transformed to an html ID and gets used as anchor to {@link $help_url}.
-	 *          - 'http://example.com/uri': a full URL (starting with http:// or https://)
-	 *   - 'layout': Use this to visually group your settings.
+	 *   </li><li>
+	 *   'help': can be:
+	 *          <ul><li>
+	 *          '#anchor': anchor that gets appended to {@link $help_url}
+	 *          </li><li>
+	 *          true: the settings name/key gets transformed to an html ID and gets used as anchor to {@link $help_url}.
+	 *          </li><li>
+	 *          'http://example.com/uri': a full URL (starting with http:// or https://)
+	 *          </li></ul>
+	 *   </li><li>
+	 *   'layout': Use this to visually group your settings.
 	 *               Either 'begin_fieldset', 'end_fieldset' or 'separator'. You can use 'label' for 'begin_fieldset'.
-	 *   - 'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect': get passed
+	 *   </li><li>
+	 *   'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect': get passed
 	 *           through as attributes to the form/input element.
+	 *   </li></ul>
+	 *
+	 *
 	 * e.g.:
 	 * <code>
 	 * return array(
@@ -2543,6 +2584,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.84  2006/08/19 10:57:40  blueyed
+ * doc fixes.
+ *
  * Revision 1.83  2006/08/16 19:40:07  blueyed
  * Made get_htsrv_url() also https-aware, fixes the youtube plugin.
  *

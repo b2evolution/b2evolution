@@ -58,6 +58,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * Filelist
+ * fp>> TODO: When the user is viewing details for a file he should (by default) not be presented with the filelist in addition to the file properties
+ * In cases like that, we should try to avoid instanciating a Filelist.
+ */
 require_once $model_path.'files/_filelist.class.php';
 
 /**
@@ -1507,6 +1512,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.31  2006/08/19 10:57:40  blueyed
+ * doc fixes.
+ *
  * Revision 1.30  2006/08/19 07:56:29  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

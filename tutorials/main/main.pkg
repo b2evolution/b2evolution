@@ -7,7 +7,7 @@
 
  <refsynopsisdiv>
   <author>
-   François PLANQUE
+   Fran&ccedil;ois PLANQUE
    <authorblurb>
     {@link http://fplanque.net/}
    </authorblurb>
@@ -19,7 +19,7 @@
   
   <para>This is the <strong>technical</strong> documentation for {@link http://b2evolution.net b2evolution}. It is mainly aimed at contributing developpers. However, documentation for template/skin functions will also be useful to anyone customizing/desigining user interface templates/skins for b2evolution.</para>
   
-  <para>End user documentation can be found at {@link http://wiki.b2evolution.net/}.</para>
+  <para>End user documentation can be found at {@link http://manual.b2evolution.net/}.</para>
  </refsect1>
 
  <refsect1 id="{@id status}">
