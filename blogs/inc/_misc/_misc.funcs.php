@@ -3105,7 +3105,7 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 			echo $item_start;
 			if( is_array( $item ) )
 			{
-				echo '<a href="'.$item[0].'">'.$item[1].'</a></li>';
+				echo '<a href="'.$item[0].'">'.$item[1].'</a>';
 			}
 			else
 			{
@@ -3120,6 +3120,9 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 
 /*
  * $Log$
+ * Revision 1.101  2006/08/19 10:23:18  yabs
+ * correcting display_list
+ *
  * Revision 1.100  2006/08/19 08:24:08  yabs
  * correcting display_list() parameters
  *
