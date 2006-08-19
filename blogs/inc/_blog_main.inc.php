@@ -47,7 +47,7 @@
 require_once dirname(__FILE__).'/_main.inc.php';
 require_once $model_path.'items/_itemlist2.class.php';
 
-$Timer->resume( 'blog_main.inc' );
+$Timer->start( '_blog_main.inc' );
 
 // Getting GET or POST parameters:
 $Request->param( 'blog', 'integer', 0, true );  // Can't use $default_to_blog because the param must always be included in regenerate_url() when present
@@ -387,6 +387,9 @@ if( !isset( $skin ) )
 }
 
 
+$Timer->pause( '_blog_main.inc');
+
+
 // At this point $skin holds the name of the skin we want to use, or '' for no skin!
 
 // check to see if we want to display the popup or the main template
@@ -425,7 +428,9 @@ if( !empty( $skin ) )
 	}
 	else
 	{ // Do the main display
+		$Timer->start( 'skin/_main.inc' );
 		require( $skins_path.$skin.'/_main.php' );
+		$Timer->pause( 'skin/_main.inc' );
 	}
 
 	// log the hit on this page (in case the skin hasn't already done so)
@@ -451,6 +456,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.29  2006/08/19 00:41:16  fplanque
+ * planted some freaky timers!
+ *
  * Revision 1.28  2006/08/07 16:49:35  fplanque
  * doc
  *

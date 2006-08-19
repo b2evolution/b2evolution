@@ -38,6 +38,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+$Timer->start( 'skin/_main.inc:header' );
+
 header( 'Content-type: text/html; charset='.$io_charset );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -84,6 +86,12 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <div class="bPosts">
 
 <!-- =================================== START OF MAIN AREA =================================== -->
+
+<?php
+	$Timer->pause( 'skin/_main.inc:header' );
+
+	$Timer->start( 'skin/_main.inc:mainarea' );
+?>
 
 <?php
 	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
@@ -194,6 +202,12 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 </div>
 <!-- =================================== START OF SIDEBAR =================================== -->
+
+<?php
+	$Timer->pause( 'skin/_main.inc:mainarea' );
+
+	$Timer->start( 'skin/_main.inc:sidebar' );
+?>
 
 <div class="bSideBar">
 
@@ -335,6 +349,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $rsc_url; ?>img/b2evolution_logo_80.gif" alt="b2evolution" width="80" height="17" border="0" class="middle" /></a></p>
 
 </div>
+
+<?php
+	$Timer->pause( 'skin/_main.inc:sidebar' );
+
+	$Timer->start( 'skin/_main.inc:footer' );
+?>
+
 <div id="pageFooter">
 	<p class="baseline">
 		<a href="<?php echo $Blog->get('msgformurl').'&amp;recipient_id=1&amp;redirect_to='.rawurlencode(regenerate_url()); ?>">Contact the admin</a>.
@@ -351,6 +372,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <?php
 	$Hit->log();	// log the hit on this page
 	debug_info(); // output debug info if requested
+
+	$Timer->pause( 'skin/_main.inc:footer' );
 ?>
 </body>
 </html>

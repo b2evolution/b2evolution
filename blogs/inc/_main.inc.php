@@ -133,7 +133,7 @@ $Messages = & new Log( 'error' );
 require_once dirname(__FILE__).'/_misc/_timer.class.php';
 $Timer = & new Timer('total');
 
-$Timer->start( 'main.inc' );
+$Timer->start( '_main.inc' );
 
 /**
  * Load base + advanced configuration:
@@ -607,7 +607,7 @@ if( $Messages->count( 'login_error' ) )
 	exit();
 }
 
-$Timer->pause( 'main.inc');
+$Timer->pause( '_main.inc');
 
 
 /**
@@ -623,6 +623,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.43  2006/08/19 00:41:16  fplanque
+ * planted some freaky timers!
+ *
  * Revision 1.42  2006/08/07 23:08:46  blueyed
  * Only delete deprecated cookies, if they were sent to us..
  *
