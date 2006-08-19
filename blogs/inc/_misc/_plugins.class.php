@@ -2827,7 +2827,7 @@ class Plugins
 		// Cache miss, create it:
 		if( empty($eval_create_object) )
 		{
-			$GLOBALS[$objectName] = & new $objectName();
+			$GLOBALS[$objectName] = new $objectName(); // COPY (FUNC)
 		}
 		else
 		{
@@ -2909,6 +2909,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.73  2006/08/19 08:13:33  fplanque
+ * grrrr!
+ *
  * Revision 1.72  2006/08/16 19:41:35  blueyed
  * small memory opt.
  *
