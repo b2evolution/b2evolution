@@ -110,7 +110,6 @@ $schema_queries = array(
 			blog_keywords tinytext,
 			blog_allowcomments VARCHAR(20) NOT NULL default 'post_by_post',
 			blog_allowtrackbacks TINYINT(1) NOT NULL default 1,
-			blog_allowpingbacks TINYINT(1) NOT NULL default 0,
 			blog_allowblogcss TINYINT(1) NOT NULL default 1,
 			blog_allowusercss TINYINT(1) NOT NULL default 1,
 			blog_pingb2evonet TINYINT(1) NOT NULL default 0,
@@ -205,7 +204,7 @@ $schema_queries = array(
 			UNIQUE catpost ( postcat_cat_ID, postcat_post_ID )
 		)" ),
 
-	'T_comments' => array(
+	'T_comments' => array(	// Note: pingbacks no longer supported, but previous pingbacks are to be preserved in the DB
 		'Creating table for Comments',
 		"CREATE TABLE T_comments (
 			comment_ID        int(11) unsigned NOT NULL auto_increment,
@@ -478,6 +477,10 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.27  2006/08/19 02:15:08  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.26  2006/08/04 22:13:23  blueyed
  * Finished de-abstraction
  *

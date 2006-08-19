@@ -45,7 +45,7 @@ header('Content-Type: text/html; charset='.$io_charset);
 	$disp_comment_form = 1;			// Display the comments form if comments requested
 	$disp_trackbacks = 1;				// Display the trackbacks if requested
 	$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-	$disp_pingbacks = 1;				// Display the pingbacks if requested
+	$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
 	require( dirname(__FILE__).'/_feedback.php' );
 ?>
 </div>
@@ -60,6 +60,10 @@ header('Content-Type: text/html; charset='.$io_charset);
 
 /*
  * $Log$
+ * Revision 1.15  2006/08/19 02:15:08  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.14  2006/07/06 19:56:29  fplanque
  * no message
  *

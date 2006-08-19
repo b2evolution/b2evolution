@@ -58,7 +58,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<link rel="alternate" type="text/xml" title="RSS .92" href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>" />
 	<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
-	<link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
 	<link rel="stylesheet" href="custom.css" type="text/css" />
 	<?php
 		$Blog->disp( 'blog_css', 'raw');
@@ -111,7 +110,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <?php
 	// ------------------------------------ START OF POSTS ----------------------------------------
 	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
-
+	
 	if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	{
 	?>
@@ -122,6 +121,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	?>
 
 	<?php 
+		$Timer->resume( 'skin/_main.inc:mainarea:postheaders' );
+
 		$MainList->date_if_changed();
 	?>
 
@@ -147,6 +148,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			locale_flag( $Item->locale, 'h10px' );
 			echo '<br /> ', T_('Categories'), ': ';
 			$Item->categories();
+
+			$Timer->pause( 'skin/_main.inc:mainarea:postheaders' );
+
+			$Timer->resume( 'skin/_main.inc:mainarea:postcontents' );
 		?>
 		</div>
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
@@ -155,11 +160,14 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			<?php link_pages() ?>
 		</div>
 		<div class="bSmallPrint">
-			<?php $Item->permanent_link( '#', '#', 'permalink_right' ); ?>
+			<?php 	$Timer->pause( 'skin/_main.inc:mainarea:postcontents' );
+
+			$Timer->resume( 'skin/_main.inc:mainarea:postfooters' );
+
+			$Item->permanent_link( '#', '#', 'permalink_right' ); ?>
 
 			<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
 			<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
-			<?php $Item->feedback_link( 'pingbacks', ' &bull; ' ) // Link to trackbacks ?>
 			<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
 
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
@@ -171,7 +179,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			$disp_trackbacks = 1;				// Display the trackbacks if requested
 
 			$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-			$disp_pingbacks = 1;				// Display the pingbacks if requested
+			$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
 			require( dirname(__FILE__).'/_feedback.php' );
 			// -------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. --------------
 
@@ -179,7 +187,11 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		?>
 	</div>
 	<?php
+	$Timer->pause( 'skin/_main.inc:mainarea:postfooters' );
 	} // ---------------------------------- END OF POSTS ------------------------------------
+
+	$Timer->start( 'skin/_main.inc:mainarea:extradisp' );
+
 ?>
 
 <p class="center"><strong>
@@ -198,6 +210,9 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	// Call the dispatcher:
 	require $skins_path.'_dispatch.inc.php';
 	// --------------- END OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. ---------------
+
+	$Timer->pause( 'skin/_main.inc:mainarea:extradisp' );
+
 ?>
 
 </div>

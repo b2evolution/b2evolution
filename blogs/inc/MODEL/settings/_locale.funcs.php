@@ -219,7 +219,10 @@ function TS_( $string, $req_locale = '' )
  */
 function locale_temp_switch( $locale )
 {
-	global $saved_locales, $current_locale;
+	global $saved_locales, $current_locale, $Timer;
+
+	// $Timer->resume( 'locale_temp_switch' );
+
 	if( !isset( $saved_locales ) || ! is_array( $saved_locales ) )
 	{
 		$saved_locales = array();
@@ -231,6 +234,8 @@ function locale_temp_switch( $locale )
 		array_push( $saved_locales, $prev_locale );
 		return true;
 	}
+
+	// $Timer->stop( 'locale_temp_switch' );
 
 	return false;
 }
@@ -887,6 +892,10 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.16  2006/08/19 02:15:07  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.15  2006/07/24 01:25:05  blueyed
  * Removed all "@include" occurrences
  *

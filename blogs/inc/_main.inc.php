@@ -297,6 +297,7 @@ if( !isset( $use_html_checker ) ) { $use_html_checker = 1; }
 /**
  * Includes:
  */
+$Timer->start( '_main.inc:requires' );
 require_once $model_path.'dataobjects/_dataobjectcache.class.php';
 require_once $model_path.'generic/_genericelement.class.php';
 require_once $model_path.'generic/_genericcache.class.php';
@@ -321,7 +322,6 @@ require_once $model_path.'users/_usercache.class.php';
 require_once $model_path.'comments/_comment.funcs.php';
 if( $use_html_checker ) { require_once $inc_path.'_misc/_htmlchecker.class.php'; }
 require_once $model_path.'items/_item.funcs.php';
-require_once $inc_path.'_misc/_pingback.funcs.php';
 require_once $inc_path.'_misc/_ping.funcs.php';
 require_once $model_path.'skins/_skin.funcs.php';
 require_once $inc_path.'_misc/_trackback.funcs.php';
@@ -329,16 +329,23 @@ require_once $inc_path.'_misc/ext/_xmlrpc.php';
 require_once $inc_path.'_misc/ext/_xmlrpcs.php';
 require_once $model_path.'comments/_commentlist.class.php';
 require_once $model_path.'items/_itemlist.class.php';
+$Timer->pause( '_main.inc:requires' );
 
 
 /**
  * Optionally include obsolete functions
  */
-if( file_exists($inc_path.'_misc/_obsolete092.php') )
+if( false ) // TODO: conf switch
 {
-	include_once $inc_path.'_misc/_obsolete092.php';
+	if( file_exists($inc_path.'_misc/_obsolete092.php') )
+	{
+		include_once $inc_path.'_misc/_obsolete092.php';
+	}
+	if( file_exists($inc_path.'_misc/_obsolete2.php') )
+	{
+		include_once $inc_path.'_misc/_obsolete2.php';
+	}
 }
-
 
 // Object caches init (we're asking plugins that provide the "CacheObjects" event here first):
 $Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
@@ -623,6 +630,10 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.44  2006/08/19 02:15:06  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.43  2006/08/19 00:41:16  fplanque
  * planted some freaky timers!
  *

@@ -82,7 +82,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <link rel="alternate" type="text/xml" title="RSS .92" href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>" />
 <link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 <link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
-<link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
 <!-- InstanceEndEditable -->
 <link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 </head>
@@ -155,7 +154,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<div class="bSmallPrint">
 			<?php $Item->feedback_link( 'comments', '', ' &bull; ' ) // Link to comments ?>
 			<?php $Item->feedback_link( 'trackbacks', '', ' &bull; ' ) // Link to trackbacks ?>
-			<?php $Item->feedback_link( 'pingbacks', '', ' &bull; ' ) // Link to trackbacks ?>
 
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 
@@ -166,7 +164,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		$disp_comment_form = 1;     // Display the comments form if comments requested
 		$disp_trackbacks = 1;       // Display the trackbacks if requested
 		$disp_trackback_url = 1;    // Display the trackbal URL if trackbacks requested
-		$disp_pingbacks = 1;        // Display the pingbacks if requested
+		$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
 		require( $skins_path.'_feedback.php');
 		// ------------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ------------------- ?>
 	</div>

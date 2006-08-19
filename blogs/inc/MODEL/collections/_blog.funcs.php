@@ -64,7 +64,6 @@ function blog_create(
 	$blog_UID = '',
 	$blog_allowcomments = 'post_by_post',
 	$blog_allowtrackbacks = 1,
-	$blog_allowpingbacks = 0,
 	$blog_pingb2evonet = 0,
 	$blog_pingtechnorati = 0,
 	$blog_pingweblogs = 1,
@@ -79,7 +78,7 @@ function blog_create(
 	$query = "INSERT INTO T_blogs( blog_name, blog_shortname, blog_siteurl,
 						blog_stub, blog_urlname, blog_staticfilename,
 						blog_tagline, blog_description, blog_longdesc, blog_locale, blog_notes, blog_keywords,
-						blog_UID, blog_allowcomments, blog_allowtrackbacks, blog_allowpingbacks, blog_pingb2evonet,
+						blog_UID, blog_allowcomments, blog_allowtrackbacks, blog_pingb2evonet,
 						blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs, blog_disp_bloglist,
 						blog_in_bloglist, blog_links_blog_ID )
 	VALUES ( ";
@@ -97,7 +96,7 @@ function blog_create(
 	$query .= "'".$DB->escape($blog_keywords)."', ";
 	$query .= "'".$DB->escape($blog_UID)."', ";
 	$query .= "'".$DB->escape($blog_allowcomments) . "', "
-				 . "$blog_allowtrackbacks, $blog_allowpingbacks, $blog_pingb2evonet, $blog_pingtechnorati, "
+				 . "$blog_allowtrackbacks, $blog_pingb2evonet, $blog_pingtechnorati, "
 				 . "$blog_pingweblogs, $blog_pingblodotgs, $blog_disp_bloglist, $blog_in_bloglist, "
 				 . "$blog_links_blog_ID)";
 
@@ -707,6 +706,10 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.8  2006/08/19 02:15:06  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.7  2006/06/25 21:15:03  fplanque
  * Heavy refactoring of the user blog perms so it stays manageable with a large number of users...
  *

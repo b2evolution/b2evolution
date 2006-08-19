@@ -716,12 +716,11 @@ $post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $post
 writeBackSendConf( $md );
 
 /* Pinging turned off for now because of causing invalid server response
-$blogparams = get_blogparams_by_ID( $blog );
-pingback( true, $content, $post_title, '', $post_ID, $blogparams, false );
 
 // Send email notifications now!
 $edited_Item->send_email_notifications( false );
 
+$blogparams = get_blogparams_by_ID( $blog );
 pingb2evonet( $blogparams, $post_ID, $post_title, false );
 pingWeblogs( $blogparams, false );
 pingBlogs( $blogparams );
@@ -732,6 +731,10 @@ exit;
 
 /*
  * $Log$
+ * Revision 1.2  2006/08/19 02:15:06  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.1  2006/02/23 21:11:45  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

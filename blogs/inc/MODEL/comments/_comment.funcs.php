@@ -230,11 +230,11 @@ function comments_link($file='', $tb=0, $pb=0 )
 		$file = get_bloginfo('blogurl');
 	echo url_add_param( $file, 'p='. $id. '&amp;c=1' );
 	if( $tb == 1 )
-	{ // include trackback // fplanque: added
+	{ // include trackback
 		echo '&amp;tb=1';
 	}
 	if( $pb == 1 )
-	{ // include pingback // fplanque: added
+	{ // include pingback
 		echo '&amp;pb=1';
 	}
 	echo '#comments';
@@ -322,6 +322,10 @@ function comment_author_url_basedomain( $disp = true )
 
 /*
  * $Log$
+ * Revision 1.7  2006/08/19 02:15:07  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.6  2006/07/04 17:32:29  fplanque
  * no message
  *

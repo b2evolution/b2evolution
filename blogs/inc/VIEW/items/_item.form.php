@@ -234,30 +234,16 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	// ####################### ADDITIONAL ACTIONS #########################
 
-	if( isset( $Blog ) && ( $Blog->get('allowpingbacks') || $Blog->get('allowtrackbacks') ) )
+	if( isset( $Blog ) && $Blog->get('allowtrackbacks') )
 	{
 		$Form->begin_fieldset( T_('Additional actions'), array( 'id' => 'itemform_additional_actions' ) );
 
-		if( $Blog->get('allowpingbacks') )
-		{ // --------------------------- PINGBACK --------------------------------------
-			global $post_pingback;
-		?>
-		<div id="itemform_pingbacks">
-			<input type="checkbox" class="checkbox" name="post_pingback" value="1" id="post_pingback"
-				<?php	if ($post_pingback) { echo ' checked="checked"'; } ?> />
-			<label for="post_pingback"><strong><?php echo T_('Pingback') ?></strong> <span class="notes"><?php echo T_('(Send a pingback to all URLs in this post)') ?></span></label>
-		</div>
-		<?php
-		}
-
-		if( $Blog->get('allowtrackbacks') )
-		{ // --------------------------- TRACKBACK --------------------------------------
+		// --------------------------- TRACKBACK --------------------------------------
 		?>
 		<div id="itemform_trackbacks">
 			<label for="trackback_url"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" value="<?php echo format_to_output( $post_trackbacks, 'formvalue' ); ?>" />
 		</div>
 		<?php
-		}
 
 		$Form->end_fieldset();
 	}
@@ -366,6 +352,10 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.20  2006/08/19 02:15:08  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.19  2006/08/18 20:37:15  fplanque
  * Improved bozo validation on post editing
  *

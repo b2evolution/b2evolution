@@ -153,9 +153,6 @@ switch($action)
 							case 'comment_popup.php':
 								echo '- ', T_('This is the page displayed in the comment popup');
 								break;
-							case 'pingback_popup.php':
-								echo '- ', T_('This is the page displayed in the pingback popup');
-								break;
 							case 'trackback_popup.php':
 								echo '- ', T_('This is the page displayed in the trackback popup');
 								break;

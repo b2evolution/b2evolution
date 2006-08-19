@@ -1389,16 +1389,8 @@ class Item extends DataObject
 				break;
 
 			case 'pingbacks':
-				$this->get_Blog();
-				if( ! $this->Blog->get( 'allowpingbacks' ) )
-				{ // Pingbacks not allowed on this blog:
-					return;
-				}
-				if( $hideifnone === '#' ) $hideifnone = true;
-				if( $title == '#' ) $title = T_('Display pingbacks');
-				if( $zero == '#' ) $zero = T_('Pingback (0)');
-				if( $one == '#' ) $one = T_('Pingback (1)');
-				if( $more == '#' ) $more = T_('Pingbacks (%d)');
+				// Obsolete, but left for skin compatibility
+				return;
 				break;
 
 			default:
@@ -2833,6 +2825,10 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.76  2006/08/19 02:15:07  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.75  2006/08/07 16:33:27  fplanque
  * Default messages should not be any more geeky then necessary.
  *

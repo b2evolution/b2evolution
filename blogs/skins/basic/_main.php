@@ -134,7 +134,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		$disp_trackbacks = 1;				// Display the trackbacks if requested
 
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-		$disp_pingbacks = 1;				// Display the pingbacks if requested
+		$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
 		require( dirname(__FILE__).'/_feedback.php' );
 		// ----------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -----------------
 

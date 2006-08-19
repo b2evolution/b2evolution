@@ -150,7 +150,6 @@ while( $Item = & $ItemList->get_item() )
 				// TRANS: Link to comments for current post
 				comments_number(T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
 				trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'), $Item->ID);
-				pingback_number('', ' &middot; '.T_('1 Pingback'), ' &middot; '.T_('%d Pingbacks'), $Item->ID);
 				echo '</a>';
 			} ?>
 		</div>
@@ -257,6 +256,10 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.18  2006/08/19 02:15:08  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.17  2006/07/26 17:15:44  blueyed
  * Replaced "name" attribute with "id" for anchors
  *

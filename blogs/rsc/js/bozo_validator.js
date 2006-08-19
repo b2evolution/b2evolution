@@ -169,8 +169,6 @@ var bozo = {
 	 */
 	reset_changes: function ( e )
 	{
-		//alert('reset');
-	
 		// Loop on the forms changes array
 		for( i in bozo.tab_changes )
 		{	// Reset changes number to 0

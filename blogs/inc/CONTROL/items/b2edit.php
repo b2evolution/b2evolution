@@ -87,7 +87,6 @@ switch($action)
 		$post_urltitle = $edited_Item->get( 'urltitle' );
 		$post_url = $edited_Item->get( 'url' );
 		$content = $edited_Item->get( 'content' );
-		$post_pingback = 0;
 		$post_trackbacks = '';
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $post );

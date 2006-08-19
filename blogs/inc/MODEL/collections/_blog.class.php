@@ -91,7 +91,6 @@ class Blog extends DataObject
 	var $keywords;
 	var $allowcomments = 'post_by_post';
 	var $allowtrackbacks = 0;
-	var $allowpingbacks = 0;
 	var $allowblogcss = 0;
 	var $allowusercss = 0;
 	var $pingb2evonet = 0;
@@ -170,7 +169,6 @@ class Blog extends DataObject
 			$this->keywords = $db_row->blog_keywords;
 			$this->allowcomments = $db_row->blog_allowcomments;
 			$this->allowtrackbacks = $db_row->blog_allowtrackbacks;
-			$this->allowpingbacks = $db_row->blog_allowpingbacks;
 			$this->allowblogcss = $db_row->blog_allowblogcss;
 			$this->allowusercss = $db_row->blog_allowusercss;
 			$this->pingb2evonet = $db_row->blog_pingb2evonet;
@@ -356,7 +354,6 @@ class Blog extends DataObject
 			$this->set_from_Request( 'allowcomments' );
 			$this->set_setting( 'new_feedback_status',  $Request->param( 'new_feedback_status', 'string', 'draft' ) );
 			$this->set( 'allowtrackbacks', $Request->param( 'blog_allowtrackbacks', 'integer', 0 ) );
-			$this->set( 'allowpingbacks',  $Request->param( 'blog_allowpingbacks',  'integer', 0 ) );
 		}
 
 		return ! $Request->validation_errors();
@@ -730,9 +727,6 @@ class Blog extends DataObject
 			case 'comments_atom_url':
 				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_atom&amp;disp=comments' );
 
-			case 'pingback_url':
-				return $xmlsrv_url.'xmlrpc.php';
-
 			case 'admin_email':
 				return $admin_email;
 
@@ -1023,6 +1017,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2006/08/19 02:15:06  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.13  2006/08/18 23:23:03  blueyed
  * Allow empty stub files.. +whitespace
  *

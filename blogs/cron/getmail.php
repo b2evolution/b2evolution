@@ -331,7 +331,6 @@ switch ( $Settings->get('eblog_method') )
 				$post_ID = $edited_Item->insert( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale, '',	$Settings->get('AutoBR'), true );
 
 				$blogparams = get_blogparams_by_ID( $blog_ID );
-				pingback( true, $content, $post_title, '', $post_ID, $blogparams, true);
 
 				// Send email notifications now!
 				$edited_Item->send_email_notifications( false );
@@ -596,12 +595,11 @@ switch ( $Settings->get('eblog_method') )
 				$edited_Item = & new Item();
 				$post_ID = $edited_Item->insert( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale, '',	$Settings->get('AutoBR'), true );
 
-				$blogparams = get_blogparams_by_ID( $blog_ID );
-				pingback( true, $content, $post_title, '', $post_ID, $blogparams, true);
 
 				// Send email notifications now!
 				$edited_Item->send_email_notifications( false );
 
+				// $blogparams = get_blogparams_by_ID( $blog_ID );
 				//pingb2evonet( $blogparams, $post_ID, $post_title);
 				//pingWeblogs($blogparams);
 				//pingBlogs($blogparams);

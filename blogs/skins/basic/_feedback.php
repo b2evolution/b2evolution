@@ -20,20 +20,20 @@
 
 	// --- //
 
-	if( ! $c )
+	if( empty($c) )
 	{	// Comments not requested
 		$disp_comments = 0;					// DO NOT Display the comments if not requested
 		$disp_comment_form = 0;			// DO NOT Display the comments form if not requested
 	}
 
-	if( (!$tb) || (!$Blog->get( 'allowtrackbacks' )) )
+	if( empty($tb) || (!$Blog->get( 'allowtrackbacks' )) )
 	{	// Trackback not requested or not allowed
 		$disp_trackbacks = 0;				// DO NOT Display the trackbacks if not requested
 		$disp_trackback_url = 0;		// DO NOT Display the trackback URL if not requested
 	}
 
-	if( (!$pb) || (!$Blog->get( 'allowpingbacks' )) )
-	{	// Pingback not requested or not allowed
+	if( empty($pb) )
+	{	// Pingback not requested
 		$disp_pingbacks = 0;				// DO NOT Display the pingbacks if not requested
 	}
 

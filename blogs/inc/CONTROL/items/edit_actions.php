@@ -103,7 +103,6 @@ switch($action)
 		*/
 
 		// Post post-publishing stuff:
-		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = & $trackback_url;
 
@@ -146,7 +145,7 @@ switch($action)
 		if( $edited_Item->status != 'published' )
 		{
 			echo "<div class=\"panelinfo\">\n";
-			echo '<p>', T_('Post not publicly published: skipping trackback, pingback and blog pings...'), "</p>\n";
+			echo '<p>', T_('Post not publicly published: skipping trackback and blog pings...'), "</p>\n";
 			echo "</div>\n";
 		}
 		else
@@ -154,8 +153,6 @@ switch($action)
 			$blogparams = get_blogparams_by_ID( $blog );
 			// trackback
 			trackbacks( $post_trackbacks, $edited_Item->content, $edited_Item->title, $edited_Item->ID);
-			// pingback
-			pingback( $post_pingback, $edited_Item->content, $edited_Item->title, $edited_Item->url, $edited_Item->ID, $blogparams);
 
 			// Send email notifications now!
 			$edited_Item->send_email_notifications();
@@ -210,7 +207,6 @@ switch($action)
 		$edited_Item->load_from_Request( true );
 
 		// Post post-publishing stuff:
-		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = $trackback_url;
 
@@ -247,17 +243,14 @@ switch($action)
 		if( $edited_Item->status != 'published' )
 		{
 			echo "<div class=\"panelinfo\">\n";
-			echo '<p>', T_('Post not publicly published: skipping trackback, pingback and blog pings...'), "</p>\n";
+			echo '<p>', T_('Post not publicly published: skipping trackback and blog pings...'), "</p>\n";
 			echo "</div>\n";
 		}
 		else
 		{ // We may do some pinging now!
-			$blogparams = get_blogparams_by_ID( $blog );
 
 			// trackback
 			trackbacks( $post_trackbacks, $edited_Item->content,  $edited_Item->title, $edited_Item->ID );
-			// pingback
-			pingback( $post_pingback, $edited_Item->content, $edited_Item->title, $edited_Item->url, $edited_Item->ID, $blogparams);
 
 			// ping ?
 			if( $pings_already_done )
@@ -272,6 +265,7 @@ switch($action)
 				// Send email notifications now!
 				$edited_Item->send_email_notifications();
 
+				$blogparams = get_blogparams_by_ID( $blog );
 				pingb2evonet( $blogparams, $edited_Item->ID, $edited_Item->title );
 				pingWeblogs( $blogparams );
 				pingBlogs( $blogparams );
@@ -343,7 +337,7 @@ switch($action)
 		if( $edited_Item->status != 'published' )
 		{
 			echo "<div class=\"panelinfo\">\n";
-			echo '<p>', T_('Post not publicly published: skipping trackback, pingback and blog pings...'), "</p>\n";
+			echo '<p>', T_('Post not publicly published: skipping trackback and blog pings...'), "</p>\n";
 			echo "</div>\n";
 		}
 		else
@@ -620,6 +614,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2006/08/19 02:15:06  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.21  2006/07/25 21:00:37  blueyed
  * use onsubmit for history.back() :}
  *

@@ -858,8 +858,7 @@ class Comment extends DataObject
 		global $Plugins;
 
 		$comment = $this->content;
-		$comment = str_replace('<trackback />', '', $comment);
-		$comment = str_replace('<pingback />', '', $comment);
+		// fp> obsolete: $comment = str_replace('<trackback />', '', $comment);
 		$Plugins->trigger_event( 'FilterCommentContent', array( 'data' => & $comment, 'Comment' => $this ) );
 		$comment = format_to_output( $comment, $format );
 
@@ -1160,6 +1159,10 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.39  2006/08/19 02:15:07  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.38  2006/07/26 17:15:44  blueyed
  * Replaced "name" attribute with "id" for anchors
  *

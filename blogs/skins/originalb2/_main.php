@@ -60,7 +60,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<link rel="alternate" type="text/xml" title="RSS .92" href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>" />
 	<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
-	<link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
 	<?php comments_popup_script() // Include javascript to open pop up windows ?>
 	<?php
 		$Blog->disp( 'blog_css', 'raw');
@@ -110,7 +109,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
 	<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
-	<?php $Item->feedback_link( 'pingbacks', ' &bull; ' ) // Link to trackbacks ?>
 
 	<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
 
@@ -125,7 +123,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			$disp_comment_form = 1;			// Display the comments form if comments requested
 			$disp_trackbacks = 0;				// Display the trackbacks if requested
 			$disp_trackback_url = 0;		// Display the trackbal URL if trackbacks requested
-			$disp_pingbacks = 0;				// Display the pingbacks if requested
+			$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
 			$disp_title = "Comments:";
 			require( dirname(__FILE__).'/_feedback.php' );
 
@@ -134,18 +132,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			$disp_comment_form = 0;			// Display the comments form if comments requested
 			$disp_trackbacks = 1;				// Display the trackbacks if requested
 			$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-			$disp_pingbacks = 0;				// Display the pingbacks if requested
+			$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
 			$disp_title = "Trackbacks:";
 			require( dirname(__FILE__).'/_feedback.php' );
 
-			// this includes the pingbacks
-			$disp_comments = 0;					// Display the comments if requested
-			$disp_comment_form = 0;			// Display the comments form if comments requested
-			$disp_trackbacks = 0;				// Display the trackbacks if requested
-			$disp_trackback_url = 0;		// Display the trackbal URL if trackbacks requested
-			$disp_pingbacks = 1;				// Display the pingbacks if requested
-			$disp_title = "Pingbacks:";
-			require( dirname(__FILE__).'/_feedback.php' );
 	?>
 
 	</div>

@@ -20,7 +20,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-// --- //
 
 if( empty($c) )
 {	// Comments not requested
@@ -34,8 +33,8 @@ if( empty($tb) || !$Blog->get( 'allowtrackbacks' ) )
 	$disp_trackback_url = 0;		// DO NOT Display the trackback URL if not requested
 }
 
-if( empty($pb) || !$Blog->get( 'allowpingbacks' ) )
-{	// Pingback not requested or not allowed
+if( empty($pb) )
+{	// Pingback not requested
 	$disp_pingbacks = 0;				// DO NOT Display the pingbacks if not requested
 }
 
@@ -311,6 +310,10 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.79  2006/08/19 02:15:08  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.78  2006/08/07 16:49:35  fplanque
  * doc
  *

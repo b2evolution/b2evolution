@@ -95,7 +95,6 @@ $Form->hidden( 'item_priority', $Request->param('item_priority', 'integer', NULL
 $Form->hidden( 'item_assigned_user_ID', $Request->param('item_assigned_user_ID', 'integer', NULL) );
 $Form->hidden( 'item_st_ID', $Request->param('item_st_ID', 'integer', NULL) );
 $Form->hidden( 'item_deadline', $Request->param('item_deadline', 'string', NULL) );
-$Form->hidden( 'post_pingback', $Request->param('post_pingback', 'integer', NULL) );
 $Form->hidden( 'trackback_url', $Request->param('trackback_url', 'string', NULL) );
 $Form->hidden( 'renderers', $Request->param('renderers', 'array', NULL) );
 
@@ -286,6 +285,10 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.10  2006/08/19 02:15:08  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.9  2006/08/18 20:37:15  fplanque
  * Improved bozo validation on post editing
  *

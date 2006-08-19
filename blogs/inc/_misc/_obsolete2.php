@@ -1,6 +1,12 @@
 <?php
 /**
- * This file implements Pingback functions.
+ * This file implements functions that got obsolete with version 2.0.
+ *
+ * For performance reasons you should delete (or rename) this file, but if you use some
+ * of these functions in your skin or hack you'll have to leave it for obvious compatibility
+ * reasons.
+ * Of course, this file will not be (automatically) included at some point, so please
+ * upgrade your skins and hacks.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -27,6 +33,269 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+// xmlrpc:
+
+$pingback_ping_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString));
+
+$pingback_ping_doc = 'gets a pingback and registers it as a comment prefixed by &lt;pingback /&gt;';
+
+
+
+/**
+ * pingback_ping(-)
+ *
+ * This is the pingback receiver!
+ *
+ * original code by Mort (http://mort.mine.nu:8080)
+ * fplanque: every time you come here you can correct a couple of bugs...
+ */
+function pingback_ping( $m )
+{
+	global $DB, $notify_from, $xmlrpcerruser;
+	global $baseurl;
+	global $localtimenow, $Messages;
+	global $UserCache, $BlogCache;
+
+	$log = debug_fopen('./xmlrpc.log', 'w');
+
+	$title = '';
+
+	$pagelinkedfrom = $m->getParam(0);
+	$pagelinkedfrom = $pagelinkedfrom->scalarval();
+
+	$pagelinkedto = $m->getParam(1);
+	$pagelinkedto = $pagelinkedto->scalarval();
+
+	$pagelinkedfrom = str_replace('&amp;', '&', $pagelinkedfrom);
+	$pagelinkedto = preg_replace('#&([^amp\;])#is', '&amp;$1', $pagelinkedto);
+
+	debug_fwrite($log, 'BEGIN '.time().' - '.date('Y-m-d H:i:s')."\n\n");
+	debug_fwrite($log, 'Page linked from: '.$pagelinkedfrom."\n");
+	debug_fwrite($log, 'Page linked to: '.$pagelinkedto."\n");
+
+	$messages = array(
+		htmlentities("Pingback from ".$pagelinkedfrom." to ".$pagelinkedto." registered. Keep the web talking! :-)"),
+		htmlentities("We can't find the URL to the post you are trying to link to in your entry. Please check how you wrote the post's permalink in your entry."),
+		htmlentities("We can't find the post you are trying to link to. Please check the post's permalink.")
+	);
+
+	$resp_message = $messages[0];
+
+	// Check if the page linked to is in our site
+	// fplanque: TODO: coz we don't have a single siteurl any longer
+	$pos1 = strpos( $pagelinkedto, preg_replace( '#^https?://(www\.)?#', '', $baseurl ));
+	if( $pos1 !== false )
+	{
+		// let's find which post is linked to
+		$urltest = parse_url($pagelinkedto);
+		if( preg_match('#/p([0-9]+)#', $urltest['path'], $match) )
+		{ // the path defines the post_ID (yyyy/mm/dd/pXXXX)
+			$post_ID = $match[1];
+			$way = 'from the path (1)';
+		}
+		elseif (preg_match('#p/[0-9]+#', $urltest['path'], $match) )
+		{
+			// the path defines the post_ID (archives/p/XXXX)
+			$blah = explode('/', $match[0]);
+			$post_ID = $blah[1];
+			$way = 'from the path (2)';
+		}
+		elseif (preg_match('#p=[0-9]+#', $urltest['query'], $match)	 )
+		{
+			// the querystring defines the post_ID (?p=XXXX)
+			$blah = explode('=', $match[0]);
+			$post_ID = $blah[1];
+			$way = 'from the querystring';
+		}
+		elseif (isset($urltest['fragment']))
+		{
+			// an #anchor is there, it's either...
+			if (intval($urltest['fragment']))
+			{ // ...an integer #XXXX (simpliest case)
+				$post_ID = $urltest['fragment'];
+				$way = 'from the fragment (numeric)';
+			}
+			elseif (is_string($urltest['fragment']))
+			{ // ...or a string #title, a little more complicated
+				$title = preg_replace('/[^a-zA-Z0-9]/', '.', $urltest['fragment']);
+				$sql = "SELECT post_ID
+								FROM T_posts
+								WHERE post_title RLIKE '$title'";
+				$blah = $DB->get_row( $sql, ARRAY_A );
+				if( $DB->error )
+				{ // DB error
+					return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+				}
+				$post_ID = $blah['post_ID'];
+				$way = 'from the fragment (title)';
+			}
+		}
+		else
+		{
+			$post_ID = -1;
+		}
+
+		debug_fwrite($log, "Found post ID $way: $post_ID\n");
+
+		$postdata = get_postdata($post_ID);
+		$blog = $postdata['Blog'];
+		xmlrpc_debugmsg( 'Blog='.$blog );
+
+		$tBlog = & $BlogCache->get_by_ID( $blog );
+		if( !$tBlog->get('allowpingbacks') )
+		{
+			return new xmlrpcresp(new xmlrpcval('Sorry, this weblog does not allow you to pingback its posts.'));
+		}
+
+
+		// Check that post exists
+		$sql = 'SELECT post_creator_user_ID
+						FROM T_posts
+						WHERE post_ID = '.$post_ID;
+		$rows = $DB->get_results( $sql );
+		if( $DB->error )
+		{ // DB error
+			return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+		}
+
+		if(count($rows))
+		{
+			debug_fwrite($log, 'Post exists'."\n");
+
+			// Let's check that the remote site didn't already pingback this entry
+			$sql = "SELECT * FROM T_comments
+							WHERE comment_post_ID = $post_ID
+								AND comment_author_url = '".$DB->escape(preg_replace('#&([^amp\;])#is', '&amp;$1', $pagelinkedfrom))."'
+								AND comment_type = 'pingback'";
+			$rows = $DB->get_results( $sql );
+			if( $DB->error )
+			{ // DB error
+				return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+			}
+
+			xmlrpc_debugmsg( $sql.' Already found='.count($rows) );
+
+			if( ! count($rows) )
+			{
+				// very stupid, but gives time to the 'from' server to publish !
+				sleep(1);
+
+				// Let's check the remote site
+				$fp = @fopen($pagelinkedfrom, 'r');
+
+				$puntero = 4096;
+				$linea = "";
+				while($fbuffer = fread($fp, $puntero))
+				{ // fplanque: dis is da place where da bug was >:[
+					$linea .= $fbuffer;		// dis is da fix!
+				}
+				fclose($fp);
+				$linea = strip_tags($linea, '<a><title>');
+
+				preg_match('|<title>([^<]*?)</title>|is', $linea, $matchtitle);
+
+				// You never know what kind of crap you may have gotten on the web...
+				$linea = convert_chars( $linea, 'html' );
+
+				$pagelinkedto = convert_chars( $pagelinkedto, 'html' );
+				$linea = strip_all_but_one_link($linea, $pagelinkedto, $log);
+				// fplanque: removed $linea = preg_replace('#&([^amp\;])#is', '&amp;$1', $linea);
+
+				debug_fwrite($log, 'SECOND SEARCH '.$pagelinkedto.' in text block #####'.$linea."####\n\n");
+				$pos2 = strpos($linea, $pagelinkedto);
+				$pos3 = strpos($linea, str_replace('http://www.', 'http://', $pagelinkedto));
+				if (is_integer($pos2) || is_integer($pos3))
+				{
+					debug_fwrite($log, 'The page really links to us :)'."\n");
+					$pos4 = (is_integer($pos2)) ? $pos2 : $pos3;
+					$start = $pos4-100;
+					$context = substr($linea, $start, 250);
+					$context = str_replace("\n", ' ', $context);
+					$context = str_replace('&amp;', '&', $context);
+
+					global $admin_url, $comments_allowed_uri_scheme;
+
+					$pagelinkedfrom = preg_replace('#&([^amp\;])#is', '&amp;$1', $pagelinkedfrom);
+					$title = (!strlen($matchtitle[1])) ? $pagelinkedfrom : $matchtitle[1];
+					$original_context = $context;
+					$context = '[...] '.trim($context).' [...]';
+
+					// CHECK and FORMAT content
+					if( $error = validate_url( $pagelinkedfrom, $comments_allowed_uri_scheme ) )
+					{
+						$Messages->add( T_('Supplied URL is invalid: ').$error );
+					}
+					$context = format_to_post($context,1,1);
+
+					if( ! ($message = $Messages->get_string( 'Cannot insert pingback, please correct these errors:', '' )) )
+					{ // No validation error:
+						$original_pagelinkedfrom = $pagelinkedfrom;
+						$original_title = $title;
+						$title = strip_tags(trim($title));
+						$now = date('Y-m-d H:i:s', $localtimenow );
+						$sql = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author,
+																								comment_author_url, comment_date, comment_content)
+										VALUES( $post_ID, 'pingback', '".$DB->escape($title)."',
+														'".$DB->escape($pagelinkedfrom)."', '$now',
+														'".$DB->escape($context)."')";
+						$DB->query( $sql );
+						if( $DB->error )
+						{ // DB error
+							return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+						}
+
+						/*
+						 * New pingback notification:
+						 */
+						$AuthorUser = & $UserCache->get_by_ID( $postdata['Author_ID'] );
+						if( $AuthorUser->get( 'notify' ) )
+						{ // Author wants to be notified:
+							locale_temp_switch( $AuthorUser->get( 'locale' ) );
+
+							$recipient = $AuthorUser->get( 'email' );
+							$subject = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] );
+
+							$comment_Blog = & $BlogCache->get_by_ID( $blog );
+
+							$notify_message  = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] )."\n";
+							$notify_message .= url_add_param( $comment_Blog->get('blogurl'), "p=$post_ID&pb=1\n\n", '&' );
+							$notify_message .= T_('Website'). ": $original_title\n";
+							$notify_message .= T_('Url'). ": $original_pagelinkedfrom\n";
+							$notify_message .= T_('Excerpt'). ": \n[...] $original_context [...]\n\n";
+							$notify_message .= T_('Edit/Delete').': '.$admin_url.'?ctrl=browse&amp;blog='.$blog.'&p='.$post_ID."&c=1\n\n";
+
+							send_mail( $recipient, $subject, $notify_message, $notify_from );
+
+							locale_restore_previous();
+						}
+					}
+				}
+				else
+				{ // URL pattern not found - page doesn't link to us:
+					debug_fwrite($log, 'The page doesn\'t link to us!'."\n");
+					$resp_message = "Page linked to: $pagelinkedto\nPage linked from: $pagelinkedfrom\nTitle: $title\n\n".$messages[1];
+				}
+			}
+			else
+			{ // We already have a Pingback from this URL
+				$resp_message = "Sorry, you already did a pingback to $pagelinkedto from $pagelinkedfrom.";
+			}
+		}
+		else
+		{ // Post_ID not found
+			$resp_message = $messages[2];
+			debug_fwrite($log, 'Post doesn\'t exist'."\n");
+		}
+	} // / in siteurl
+
+	// xmlrpc_debugmsg( 'Okay'.$messages[0] );
+
+	return new xmlrpcresp(new xmlrpcval($resp_message));
+}
+
+
+// end xmlrpc
 
 /**
  * Sending pingback
@@ -358,64 +627,4 @@ function pingback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 
 
 /***** // Pingback tags *****/
-
-/*
- * $Log$
- * Revision 1.5  2006/07/04 17:32:30  fplanque
- * no message
- *
- * Revision 1.4  2006/05/16 21:45:52  blueyed
- * Use stream/socket timeout for data!
- *
- * Revision 1.3  2006/03/12 23:09:01  fplanque
- * doc cleanup
- *
- * Revision 1.2  2006/03/09 22:29:59  fplanque
- * cleaned up permanent urls
- *
- * Revision 1.1  2006/02/23 21:12:18  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.11  2005/12/12 19:44:09  fplanque
- * Use cached objects by reference instead of copying them!!
- *
- * Revision 1.10  2005/12/12 19:21:23  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.9  2005/12/11 19:59:51  blueyed
- * Renamed gen_permalink() to get_permalink()
- *
- * Revision 1.8  2005/12/05 18:17:19  fplanque
- * Added new browsing features for the Tracker Use Case.
- * Revision 1.7  2005/11/18 18:32:42  fplanque
- * Fixed xmlrpc logging insanity
- * (object should have been passed by reference but you can't pass NULL by ref)
- * And the code was geeky/unreadable anyway.
- *
- * Revision 1.6  2005/09/06 17:13:55  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.5  2005/02/28 09:06:33  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.4  2004/12/17 20:41:14  fplanque
- * cleanup
- *
- * Revision 1.3  2004/12/15 20:50:34  fplanque
- * heavy refactoring
- * suppressed $use_cache and $sleep_after_edit
- * code cleanup
- *
- * Revision 1.2  2004/10/14 18:31:25  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.25  2004/10/12 18:48:34  fplanque
- * Edited code documentation.
- *
- */
 ?>

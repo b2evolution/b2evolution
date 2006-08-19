@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements functions that got obsolete with version 0.9.2.
+ * This file implements functions that got obsolete with version 1.6.
  *
  * For performance reasons you should delete (or rename) this file, but if you use some
  * of these functions in your skin or hack you'll have to leave it for obvious compatibility
@@ -1692,6 +1692,10 @@ $b2_version = $app_version;
 
 /*
  * $Log$
+ * Revision 1.12  2006/08/19 02:15:08  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.11  2006/07/24 01:14:50  blueyed
  * comment/TODO
  *

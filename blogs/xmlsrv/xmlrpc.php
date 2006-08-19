@@ -181,8 +181,6 @@ function b2newpost($m)
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
 
-	// pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
-
 	// Send email notifications now!
 	logIO("O","Sending email notifications...");
 	$edited_Item->send_email_notifications( false );
@@ -434,8 +432,6 @@ function bloggernewpost( $m )
 
 	if( $publish )
 	{ // If post is publicly published:
-		// logIO("O","Doing pingbacks...");
-		// pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
 
 		logIO("O","Sending email notifications...");
 		$edited_Item->send_email_notifications( false );
@@ -605,10 +601,6 @@ function bloggereditpost($m)
 		}
 		else
 		{ // We'll ping now
-			// We have less control here as in the backoffice, so we'll actually
-			// only pingback once, at the same time we do the pings!
-			// logIO("O","Doing pingbacks...");
-			// pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
 
 			logIO("O","Sending email notifications...");
 			$edited_Item->send_email_notifications( false );
@@ -1186,266 +1178,6 @@ function strip_all_but_one_link($text, $mylink, $log)
 	return $text;
 }
 
-$pingback_ping_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString));
-
-$pingback_ping_doc = 'gets a pingback and registers it as a comment prefixed by &lt;pingback /&gt;';
-
-
-
-/**
- * pingback_ping(-)
- *
- * This is the pingback receiver!
- *
- * original code by Mort (http://mort.mine.nu:8080)
- * fplanque: every time you come here you can correct a couple of bugs...
- */
-function pingback_ping( $m )
-{
-	global $DB, $notify_from, $xmlrpcerruser;
-	global $baseurl;
-	global $localtimenow, $Messages;
-	global $UserCache, $BlogCache;
-
-	$log = debug_fopen('./xmlrpc.log', 'w');
-
-	$title = '';
-
-	$pagelinkedfrom = $m->getParam(0);
-	$pagelinkedfrom = $pagelinkedfrom->scalarval();
-
-	$pagelinkedto = $m->getParam(1);
-	$pagelinkedto = $pagelinkedto->scalarval();
-
-	$pagelinkedfrom = str_replace('&amp;', '&', $pagelinkedfrom);
-	$pagelinkedto = preg_replace('#&([^amp\;])#is', '&amp;$1', $pagelinkedto);
-
-	debug_fwrite($log, 'BEGIN '.time().' - '.date('Y-m-d H:i:s')."\n\n");
-	debug_fwrite($log, 'Page linked from: '.$pagelinkedfrom."\n");
-	debug_fwrite($log, 'Page linked to: '.$pagelinkedto."\n");
-
-	$messages = array(
-		htmlentities("Pingback from ".$pagelinkedfrom." to ".$pagelinkedto." registered. Keep the web talking! :-)"),
-		htmlentities("We can't find the URL to the post you are trying to link to in your entry. Please check how you wrote the post's permalink in your entry."),
-		htmlentities("We can't find the post you are trying to link to. Please check the post's permalink.")
-	);
-
-	$resp_message = $messages[0];
-
-	// Check if the page linked to is in our site
-	// fplanque: TODO: coz we don't have a single siteurl any longer
-	$pos1 = strpos( $pagelinkedto, preg_replace( '#^https?://(www\.)?#', '', $baseurl ));
-	if( $pos1 !== false )
-	{
-		// let's find which post is linked to
-		$urltest = parse_url($pagelinkedto);
-		if( preg_match('#/p([0-9]+)#', $urltest['path'], $match) )
-		{ // the path defines the post_ID (yyyy/mm/dd/pXXXX)
-			$post_ID = $match[1];
-			$way = 'from the path (1)';
-		}
-		elseif (preg_match('#p/[0-9]+#', $urltest['path'], $match) )
-		{
-			// the path defines the post_ID (archives/p/XXXX)
-			$blah = explode('/', $match[0]);
-			$post_ID = $blah[1];
-			$way = 'from the path (2)';
-		}
-		elseif (preg_match('#p=[0-9]+#', $urltest['query'], $match)	 )
-		{
-			// the querystring defines the post_ID (?p=XXXX)
-			$blah = explode('=', $match[0]);
-			$post_ID = $blah[1];
-			$way = 'from the querystring';
-		}
-		elseif (isset($urltest['fragment']))
-		{
-			// an #anchor is there, it's either...
-			if (intval($urltest['fragment']))
-			{ // ...an integer #XXXX (simpliest case)
-				$post_ID = $urltest['fragment'];
-				$way = 'from the fragment (numeric)';
-			}
-			elseif (is_string($urltest['fragment']))
-			{ // ...or a string #title, a little more complicated
-				$title = preg_replace('/[^a-zA-Z0-9]/', '.', $urltest['fragment']);
-				$sql = "SELECT post_ID
-								FROM T_posts
-								WHERE post_title RLIKE '$title'";
-				$blah = $DB->get_row( $sql, ARRAY_A );
-				if( $DB->error )
-				{ // DB error
-					return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-				}
-				$post_ID = $blah['post_ID'];
-				$way = 'from the fragment (title)';
-			}
-		}
-		else
-		{
-			$post_ID = -1;
-		}
-
-		debug_fwrite($log, "Found post ID $way: $post_ID\n");
-
-		$postdata = get_postdata($post_ID);
-		$blog = $postdata['Blog'];
-		xmlrpc_debugmsg( 'Blog='.$blog );
-
-		$tBlog = & $BlogCache->get_by_ID( $blog );
-		if( !$tBlog->get('allowpingbacks') )
-		{
-			return new xmlrpcresp(new xmlrpcval('Sorry, this weblog does not allow you to pingback its posts.'));
-		}
-
-
-		// Check that post exists
-		$sql = 'SELECT post_creator_user_ID
-						FROM T_posts
-						WHERE post_ID = '.$post_ID;
-		$rows = $DB->get_results( $sql );
-		if( $DB->error )
-		{ // DB error
-			return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-		}
-
-		if(count($rows))
-		{
-			debug_fwrite($log, 'Post exists'."\n");
-
-			// Let's check that the remote site didn't already pingback this entry
-			$sql = "SELECT * FROM T_comments
-							WHERE comment_post_ID = $post_ID
-								AND comment_author_url = '".$DB->escape(preg_replace('#&([^amp\;])#is', '&amp;$1', $pagelinkedfrom))."'
-								AND comment_type = 'pingback'";
-			$rows = $DB->get_results( $sql );
-			if( $DB->error )
-			{ // DB error
-				return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-			}
-
-			xmlrpc_debugmsg( $sql.' Already found='.count($rows) );
-
-			if( ! count($rows) )
-			{
-				// very stupid, but gives time to the 'from' server to publish !
-				sleep(1);
-
-				// Let's check the remote site
-				$fp = @fopen($pagelinkedfrom, 'r');
-
-				$puntero = 4096;
-				$linea = "";
-				while($fbuffer = fread($fp, $puntero))
-				{ // fplanque: dis is da place where da bug was >:[
-					$linea .= $fbuffer;		// dis is da fix!
-				}
-				fclose($fp);
-				$linea = strip_tags($linea, '<a><title>');
-
-				preg_match('|<title>([^<]*?)</title>|is', $linea, $matchtitle);
-
-				// You never know what kind of crap you may have gotten on the web...
-				$linea = convert_chars( $linea, 'html' );
-
-				$pagelinkedto = convert_chars( $pagelinkedto, 'html' );
-				$linea = strip_all_but_one_link($linea, $pagelinkedto, $log);
-				// fplanque: removed $linea = preg_replace('#&([^amp\;])#is', '&amp;$1', $linea);
-
-				debug_fwrite($log, 'SECOND SEARCH '.$pagelinkedto.' in text block #####'.$linea."####\n\n");
-				$pos2 = strpos($linea, $pagelinkedto);
-				$pos3 = strpos($linea, str_replace('http://www.', 'http://', $pagelinkedto));
-				if (is_integer($pos2) || is_integer($pos3))
-				{
-					debug_fwrite($log, 'The page really links to us :)'."\n");
-					$pos4 = (is_integer($pos2)) ? $pos2 : $pos3;
-					$start = $pos4-100;
-					$context = substr($linea, $start, 250);
-					$context = str_replace("\n", ' ', $context);
-					$context = str_replace('&amp;', '&', $context);
-
-					global $admin_url, $comments_allowed_uri_scheme;
-
-					$pagelinkedfrom = preg_replace('#&([^amp\;])#is', '&amp;$1', $pagelinkedfrom);
-					$title = (!strlen($matchtitle[1])) ? $pagelinkedfrom : $matchtitle[1];
-					$original_context = $context;
-					$context = '[...] '.trim($context).' [...]';
-
-					// CHECK and FORMAT content
-					if( $error = validate_url( $pagelinkedfrom, $comments_allowed_uri_scheme ) )
-					{
-						$Messages->add( T_('Supplied URL is invalid: ').$error );
-					}
-					$context = format_to_post($context,1,1);
-
-					if( ! ($message = $Messages->get_string( 'Cannot insert pingback, please correct these errors:', '' )) )
-					{ // No validation error:
-						$original_pagelinkedfrom = $pagelinkedfrom;
-						$original_title = $title;
-						$title = strip_tags(trim($title));
-						$now = date('Y-m-d H:i:s', $localtimenow );
-						$sql = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author,
-																								comment_author_url, comment_date, comment_content)
-										VALUES( $post_ID, 'pingback', '".$DB->escape($title)."',
-														'".$DB->escape($pagelinkedfrom)."', '$now',
-														'".$DB->escape($context)."')";
-						$DB->query( $sql );
-						if( $DB->error )
-						{ // DB error
-							return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-						}
-
-						/*
-						 * New pingback notification:
-						 */
-						$AuthorUser = & $UserCache->get_by_ID( $postdata['Author_ID'] );
-						if( $AuthorUser->get( 'notify' ) )
-						{ // Author wants to be notified:
-							locale_temp_switch( $AuthorUser->get( 'locale' ) );
-
-							$recipient = $AuthorUser->get( 'email' );
-							$subject = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] );
-
-							$comment_Blog = & $BlogCache->get_by_ID( $blog );
-
-							$notify_message  = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] )."\n";
-							$notify_message .= url_add_param( $comment_Blog->get('blogurl'), "p=$post_ID&pb=1\n\n", '&' );
-							$notify_message .= T_('Website'). ": $original_title\n";
-							$notify_message .= T_('Url'). ": $original_pagelinkedfrom\n";
-							$notify_message .= T_('Excerpt'). ": \n[...] $original_context [...]\n\n";
-							$notify_message .= T_('Edit/Delete').': '.$admin_url.'?ctrl=browse&amp;blog='.$blog.'&p='.$post_ID."&c=1\n\n";
-
-							send_mail( $recipient, $subject, $notify_message, $notify_from );
-
-							locale_restore_previous();
-						}
-					}
-				}
-				else
-				{ // URL pattern not found - page doesn't link to us:
-					debug_fwrite($log, 'The page doesn\'t link to us!'."\n");
-					$resp_message = "Page linked to: $pagelinkedto\nPage linked from: $pagelinkedfrom\nTitle: $title\n\n".$messages[1];
-				}
-			}
-			else
-			{ // We already have a Pingback from this URL
-				$resp_message = "Sorry, you already did a pingback to $pagelinkedto from $pagelinkedfrom.";
-			}
-		}
-		else
-		{ // Post_ID not found
-			$resp_message = $messages[2];
-			debug_fwrite($log, 'Post doesn\'t exist'."\n");
-		}
-	} // / in siteurl
-
-	// xmlrpc_debugmsg( 'Okay'.$messages[0] );
-
-	return new xmlrpcresp(new xmlrpcval($resp_message));
-}
-
-
-
 
 //---------- Tor Jan 2005 Metaweblog  API ----------------
 //
@@ -1716,7 +1448,6 @@ function mwnewpost($m)
 
 	$blogparams = get_blogparams_by_ID( $blog_ID );
 	logIO("O","finished getting blogparams ...");
-	// pingback( true, $content, $post_title, '', $post_ID, $blogparams, false); // bug here in 9.0.11
 
 //		logIO("O","Sending email notifications...");
 //		$edited_Item->send_email_notifications( false );
@@ -2463,7 +2194,7 @@ $s = new xmlrpc_server(
 
 		"b2.getPostURL" =>
 			array(
-				"function" => "pingback_getPostURL",
+				"function" => "b2_getPostURL",
 				"signature" => $b2_getPostURL_sig,
 				"docstring" => $b2_getPostURL_doc),
 
@@ -2521,12 +2252,6 @@ $s = new xmlrpc_server(
 				"signature" => $bloggersettemplate_sig,
 				"docstring" => $bloggersettemplate_doc),
 
-		"pingback.ping" =>
-			array(
-				"function" => "pingback_ping",
-				"signature" => $pingback_ping_sig,
-				"docstring" => $pingback_ping_doc),
-
 		"mt.getPostCategories" =>
 			array(
 				"function" => "mt_getPostCategories",
@@ -2555,6 +2280,10 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.106  2006/08/19 02:15:09  fplanque
+ * Half kille dthe pingbacks
+ * Still supported in DB in case someone wants to write a plugin.
+ *
  * Revision 1.105  2006/08/01 23:32:45  blueyed
  * Moved $xmlrpc_logging into /conf/_advanced.php (and renamed it to $debug_xmlrpc_logging), so it can get overridden easily.
  *
