@@ -15,7 +15,41 @@ require_once $inc_path .'_main.inc.php';
  */
 require_once $model_path.'cron/_cron.funcs.php';
 
-if( ! $is_cli )
+if( $is_cli )
+{ // called through Command Line Interface, handle args:
+
+	$argc = $_SERVER['argc'];
+	$argv = $_SERVER['argv'];
+
+	$quiet = 0;
+	foreach( array_slice($argv, 1) as $v )
+	{
+		switch( $v )
+		{
+			case '-h':
+			case '--help':
+				// display help:
+				echo $argv[0]." - Execute cron jobs for b2evolution\n";
+				echo "\n";
+				echo "Options:\n";
+				echo " -q --quiet: Be quiet (do not output a message, if there are no jobs).\n";
+				echo "             This is especially useful, when running as a cron job.\n";
+				exit(0);
+				break;
+
+			case '-q':
+			case '--quiet':
+				// increase quietness:
+				$quiet++;
+				break;
+
+			default:
+				echo 'Invalid option "'.$v.'". Use "-h" or "--help" for a list of options.'."\n";
+				exit(1);
+		}
+	}
+}
+else
 { // This is a web request:
 	?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -49,8 +83,8 @@ $task = $DB->get_row( $sql, OBJECT, 0, 'Get next task to run in queue which has 
 
 if( empty( $task ) )
 {
-	// fp> make this an _advanced conf option      if( ! $is_cli )
-	{ // Do not be too chatty with CLI, as it would trigger cron to send this as mail always
+	if( $quiet < 1 )
+	{
 		cron_log( 'There is no task to execute yet.' );
 	}
 }
