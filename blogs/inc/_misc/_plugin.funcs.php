@@ -201,7 +201,7 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 			break;
 
 		case 'select_group':
-			global $GroupCache;
+			$GroupCache = & get_Cache( 'GroupCache' );
 			$Form->select_input_object( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $GroupCache, $set_label, $params );
 			break;
 
@@ -416,6 +416,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.23  2006/08/19 08:50:27  fplanque
+ * moved out some more stuff from main
+ *
  * Revision 1.22  2006/08/19 07:56:31  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

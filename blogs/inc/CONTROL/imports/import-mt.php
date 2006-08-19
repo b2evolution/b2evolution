@@ -326,6 +326,7 @@ param( 'mode', 'string', 'normal' );
 			<?php
 			form_text( 'default_password', $default_password, 20, 'Password for new users', 'this will be the password for users created during migration (default is "changeme")', 30 , '', 'password' );
 			form_text( 'default_password2', $default_password, 20, 'Confirm password', 'please confirm the password', 30 , '', 'password' );
+			$GroupCache = & get_Cache( 'GroupCache' );
 			form_select_object( 'default_usergroup', $Settings->get('newusers_grp_ID'), $GroupCache, T_('User group') );
 			$field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://b2evolution.net/man/user_levels.html"' );
 			form_text( 'default_userlevel', $Settings->get('newusers_level'), 2, T_('Level'), $field_note, 2 );
@@ -870,6 +871,7 @@ param( 'mode', 'string', 'normal' );
 							$new_user->set('nickname', $usersmapped[ $post_author ][1]);
 							$new_user->set('pass', md5( $default_password ));
 							$new_user->set('level', $default_userlevel);
+							$GroupCache = & get_Cache( 'GroupCache' );
 							$new_user_Group = & $GroupCache->get_by_ID( $default_usergroup );
 							$new_user->set_Group( $new_user_Group );
 

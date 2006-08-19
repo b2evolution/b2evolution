@@ -48,10 +48,6 @@ global $AdminUI;
  */
 global $edited_User;
 /**
- * @var GroupCache
- */
-global $GroupCache;
-/**
  * @var GeneralSettings
  */
 global $Settings;
@@ -112,6 +108,7 @@ if( $edited_User->get('ID') != 1 && $current_User->check_perm( 'users', 'edit' )
 {	// This is not Admin and we're not restricted: we're allowed to change the user group:
 	$edited_User->get_Group();
 	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get('newusers_grp_ID') : $edited_User->Group->get('ID');
+	$GroupCache = & get_Cache( 'GroupCache' );
 	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group') );
 }
 else
@@ -288,6 +285,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.20  2006/08/19 08:50:26  fplanque
+ * moved out some more stuff from main
+ *
  * Revision 1.19  2006/07/06 23:26:47  blueyed
  * Use 'yes'/'no' instead of 1/0.
  *

@@ -64,13 +64,31 @@ function & get_Cache( $objectName )
 		case 'FileRootCache';
 			load_class( '/MODEL/files/_filerootcache.class.php' );
 			$Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
-			return FileRootCache;
+			return $FileRootCache;
+
+		case 'FiletypeCache';
+			load_class( '/MODEL/files/_filerootcache.class.php' );
+			$Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
+			return $FiletypeCache;
+
+		case 'GroupCache';
+			$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\' )' );
+			return $GroupCache;
 
 		case 'ItemCache';
 			load_class( '/MODEL/items/_itemcache.class.php' );
 			$ItemCache = new ItemCache(); // COPY (FUNC)
 			return $ItemCache;
 			
+		case 'ItemStatusCache';
+			$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_itemstatuses\', \'pst_\', \'pst_ID\' )' );
+			return $ItemStatusCache;
+
+		case 'ItemTypeCache';
+			load_class( '/MODEL/items/_itemtypecache.class.php' );
+			$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', 'new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
+			return $ItemTypeCache;
+
 		case 'LinkCache';
 			load_class( '/MODEL/items/_linkcache.class.php' );
 			$LinkCache = new LinkCache(); // COPY (FUNC)
@@ -88,6 +106,9 @@ function & get_Cache( $objectName )
  
 /*
  * $Log$
+ * Revision 1.2  2006/08/19 08:50:27  fplanque
+ * moved out some more stuff from main
+ *
  * Revision 1.1  2006/08/19 07:56:31  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

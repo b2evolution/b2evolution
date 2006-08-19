@@ -27,10 +27,6 @@ global $Blog;
  * @var Plugins
  */
 global $Plugins;
-/**
- * @var DataObjectCache
- */
-global $ItemStatusCache;
 
 global $tab, $show_past, $show_future, $show_status, $s, $sentence, $exact, $author, $assgn, $status;
 
@@ -196,6 +192,7 @@ echo '<div class="browse_side_item">';
 		 * Statuses
  		 * TODO: allow multiple selection
 		 */
+		$ItemStatusCache = & get_Cache( 'ItemStatusCache' );
 		$ItemStatusCache->load_all(); // TODO: load for current blog only
 		if( count($ItemStatusCache->cache) )
 		{	// We have satuses:
@@ -260,6 +257,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.6  2006/08/19 08:50:26  fplanque
+ * moved out some more stuff from main
+ *
  * Revision 1.5  2006/08/19 07:56:31  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

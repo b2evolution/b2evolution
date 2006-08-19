@@ -32,14 +32,6 @@ global $edited_Item;
  */
 global $Blog;
 /**
- * @var DataObjectCache
- */
-global $ItemTypeCache;
-/**
- * @var DataObjectCache
- */
-global $ItemStatusCache;
-/**
  * @var Plugins
  */
 global $Plugins;
@@ -285,6 +277,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.11  2006/08/19 08:50:26  fplanque
+ * moved out some more stuff from main
+ *
  * Revision 1.10  2006/08/19 02:15:08  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.

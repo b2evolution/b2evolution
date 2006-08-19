@@ -38,14 +38,6 @@ global $edited_Item;
  */
 global $Blog;
 /**
- * @var DataObjectCache
- */
-global $ItemTypeCache;
-/**
- * @var DataObjectCache
- */
-global $ItemStatusCache;
-/**
  * @var Plugins
  */
 global $Plugins;
@@ -107,6 +99,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	echo '</span>';
 
 	echo ' <span id="itemform_typ_ID">';
+	$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
 	$Form->select_object( 'item_typ_ID', $edited_Item->typ_ID, $ItemTypeCache, T_('Type') );
 	echo '</span>';
 
@@ -223,6 +216,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	echo ' '; // allow wrapping!
 
+	$ItemStatusCache = & get_Cache( 'ItemStatusCache' );
 	$Form->select_options( 'item_st_ID', $ItemStatusCache->option_list_return( $edited_Item->st_ID, true ), 	T_('Task status') );
 
 	echo ' '; // allow wrapping!
@@ -352,6 +346,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.21  2006/08/19 08:50:26  fplanque
+ * moved out some more stuff from main
+ *
  * Revision 1.20  2006/08/19 02:15:08  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.

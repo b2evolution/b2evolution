@@ -115,7 +115,7 @@ class User extends DataObject
 	 */
 	function User( $db_row = NULL )
 	{
-		global $GroupCache, $default_locale, $Settings, $localtimenow;
+		global $default_locale, $Settings, $localtimenow;
 
 		// Call parent constructor:
 		parent::DataObject( 'T_users', 'user_', 'user_ID' );
@@ -451,7 +451,7 @@ class User extends DataObject
 	{
 		if( ! isset($this->Group) )
 		{
-			global $GroupCache;
+			$GroupCache = & get_Cache( 'GroupCache' );
 			$this->Group = $GroupCache->get_by_ID($this->group_ID);
 		}
 		return $this->Group;
@@ -1135,6 +1135,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.39  2006/08/19 08:50:26  fplanque
+ * moved out some more stuff from main
+ *
  * Revision 1.38  2006/08/19 07:56:31  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

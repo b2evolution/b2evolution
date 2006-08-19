@@ -204,7 +204,7 @@ class File extends DataObject
 	 */
 	function File( $root_type, $root_ID, $rdfp_rel_path, $load_meta = false )
 	{
-		global $Debuglog, $FiletypeCache;
+		global $Debuglog;
 
 		$Debuglog->add( "new File( $root_type, $root_ID, $rdfp_rel_path, load_meta=$load_meta)", 'files' );
 
@@ -227,6 +227,7 @@ class File extends DataObject
 		// Create the filetype with the extension of the file if the extension exist in database
 		if( $ext = $this->get_ext() )
 		{ // The file has an extension, load filetype object
+			$FiletypeCache = & get_Cache( 'FiletypeCache' );
 			$this->Filetype = & $FiletypeCache->get_by_extension( strtolower( $ext ), false );
 		}
 
@@ -1340,6 +1341,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2006/08/19 08:50:26  fplanque
+ * moved out some more stuff from main
+ *
  * Revision 1.16  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

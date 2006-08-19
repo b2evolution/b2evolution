@@ -77,7 +77,10 @@ if( $user_profile_only )
 /*
  * Load editable objects and set $action (while checking permissions)
  */
+ 
 $UserCache = & get_Cache( 'UserCache' );
+$GroupCache = & get_Cache( 'GroupCache' );
+
 if( ! is_null($user_ID) )
 { // User selected
 	if( $action == 'userupdate' && $user_ID == 0 )
@@ -683,6 +686,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.31  2006/08/19 08:50:26  fplanque
+ * moved out some more stuff from main
+ *
  * Revision 1.30  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

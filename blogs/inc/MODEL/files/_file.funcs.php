@@ -472,7 +472,7 @@ function check_canonical_path( $path )
  */
 function validate_filename( $filename )
 {
-	global $Settings, $FiletypeCache, $force_regexp_filename;
+	global $Settings, $force_regexp_filename;
 
 	// Check filename
 	if( $force_regexp_filename )
@@ -493,6 +493,7 @@ function validate_filename( $filename )
 	// Check extension filename
 	if( preg_match( '#\.([a-zA-Z0-9\-_]+)$#', $filename, $match ) )
 	{ // Filename has a valid extension
+		$FiletypeCache = & get_Cache( 'FiletypeCache' );
 		if( $Filetype = & $FiletypeCache->get_by_extension( strtolower( $match[1] ) , false ) )
 		{
 			if( $Filetype->allowed )
@@ -744,6 +745,9 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.21  2006/08/19 08:50:26  fplanque
+ * moved out some more stuff from main
+ *
  * Revision 1.20  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

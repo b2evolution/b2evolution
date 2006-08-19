@@ -299,9 +299,9 @@ if( !isset( $use_html_checker ) ) { $use_html_checker = 1; }
  */
 $Timer->start( '_main.inc:requires' );
 require_once $inc_path.'_misc/_class4.funcs.php';
-require_once $model_path.'dataobjects/_dataobjectcache.class.php';
+require_once $model_path.'dataobjects/_dataobjectcache.class.php';	// Base class
 require_once $model_path.'generic/_genericelement.class.php';
-require_once $model_path.'generic/_genericcache.class.php';
+require_once $model_path.'generic/_genericcache.class.php';	// Base class
 require_once $model_path.'collections/_blog.class.php';
 require_once $model_path.'collections/_blog.funcs.php';
 require_once $model_path.'collections/_category.funcs.php';
@@ -313,15 +313,17 @@ require_once $model_path.'files/_file.class.php';
 require_once $model_path.'files/_filetype.class.php';
 require_once $model_path.'files/_filetypecache.class.php';
 require_once $model_path.'items/_itemtype.class.php';
-require_once $model_path.'items/_itemtypecache.class.php';
 require_once $model_path.'items/_link.class.php';
 require_once $model_path.'comments/_comment.funcs.php';
 require_once $model_path.'items/_item.funcs.php';
 require_once $model_path.'skins/_skin.funcs.php';
 require_once $model_path.'comments/_commentlist.class.php';
 require_once $model_path.'items/_itemlist.class.php';
-$Timer->pause( '_main.inc:requires' );
-
+require_once $model_path.'sessions/_hitlog.funcs.php';     // referer logging
+require_once dirname(__FILE__).'/_misc/_form.funcs.php';
+require_once dirname(__FILE__).'/_misc/_form.class.php';
+require_once $model_path.'items/_itemquery.class.php';
+require_once dirname(__FILE__).'/_misc/ext/_swfcharts.php';
 
 /**
  * Optionally include obsolete functions
@@ -338,23 +340,14 @@ if( false ) // TODO: conf switch
 	}
 }
 
-// Object caches init (we're asking plugins that provide the "CacheObjects" event here first):
-$Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
-$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', '& new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\' )' );
-$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', '& new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
-$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', '& new GenericCache( \'GenericElement\', true, \'T_itemstatuses\', \'pst_\', \'pst_ID\' )' );
+$Timer->pause( '_main.inc:requires' );
 
 
-require_once $model_path.'sessions/_hitlog.funcs.php';     // referer logging
-require_once dirname(__FILE__).'/_misc/_form.funcs.php';
-require_once dirname(__FILE__).'/_misc/_form.class.php';
-require_once $model_path.'items/_itemquery.class.php';
-require_once dirname(__FILE__).'/_misc/ext/_swfcharts.php';
 /**
  * Icon Legend
  */
 require_once dirname(__FILE__).'/_misc/_iconlegend.class.php';
-$IconLegend = new IconLegend();
+$IconLegend = & new IconLegend();
 
 
 /**
@@ -615,6 +608,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.46  2006/08/19 08:50:25  fplanque
+ * moved out some more stuff from main
+ *
  * Revision 1.45  2006/08/19 07:56:29  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

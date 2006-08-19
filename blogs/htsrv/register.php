@@ -100,6 +100,7 @@ switch( $action )
 		$new_User->set( 'locale', $locale );
 		$newusers_grp_ID = $Settings->get('newusers_grp_ID');
 		// echo $newusers_grp_ID;
+		$GroupCache = & get_Cache( 'GroupCache' );
 		$new_user_Group = & $GroupCache->get_by_ID( $newusers_grp_ID );
 		// echo $new_user_Group->disp('name');
 		$new_User->set_Group( $new_user_Group );
@@ -187,6 +188,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.73  2006/08/19 08:50:25  fplanque
+ * moved out some more stuff from main
+ *
  * Revision 1.72  2006/08/19 07:56:29  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

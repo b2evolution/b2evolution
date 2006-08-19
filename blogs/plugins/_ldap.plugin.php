@@ -124,7 +124,7 @@ class ldap_plugin extends Plugin
 	function LoginAttempt( $params )
 	{
 		global $localtimenow;
-		global $GroupCache, $Settings, $Hit;
+		global $Settings, $Hit;
 
 		$UserCache = & get_Cache( 'UserCache' );
 		if( ( $local_User = & $UserCache->get_by_login( $params['login'] ) )
@@ -253,6 +253,7 @@ class ldap_plugin extends Plugin
 					$assign_by_value = $search_info[0][$l_set['assign_user_to_group_by']][0];
 					$this->debug_log( 'The users info has &laquo;'.$assign_by_value.'&raquo; as value given.' );
 
+					$GroupCache = & get_Cache( 'GroupCache' );
 					if( $users_Group = & $GroupCache->get_by_name( $assign_by_value, false ) )
 					{ // A group with the users value returned exists.
 						$NewUser->set_Group( $users_Group );
@@ -303,6 +304,7 @@ class ldap_plugin extends Plugin
 				}
 				else
 				{
+					$GroupCache = & get_Cache( 'GroupCache' );
 					$users_Group = & $GroupCache->get_by_ID($fallback_grp_ID);
 
 					if( $users_Group )
@@ -341,6 +343,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.36  2006/08/19 08:50:27  fplanque
+ * moved out some more stuff from main
+ *
  * Revision 1.35  2006/08/19 07:56:32  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

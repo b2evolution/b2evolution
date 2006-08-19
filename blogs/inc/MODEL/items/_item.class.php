@@ -1935,8 +1935,9 @@ class Item extends DataObject
 	 */
 	function type( $before = '', $after = '', $format = 'htmlbody' )
 	{
-		global $ItemTypeCache, $object_def;
+		global $object_def;
 
+		$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
 		$Element = & $ItemTypeCache->get_by_ID( $this->typ_ID, true, !$object_def[$this->objtype]['allow_null']['typ_ID'] /* Do we allow NULL statuses for this object?: */ );
 		if( !$Element )
 		{ // No status:
@@ -2709,7 +2710,7 @@ class Item extends DataObject
 	 */
 	function get( $parname )
 	{
-		global $ItemTypeCache, $ItemStatusCache, $object_def, $post_statuses;
+		global $object_def, $post_statuses;
 
 		switch( $parname )
 		{
@@ -2731,6 +2732,7 @@ class Item extends DataObject
 				return T_( $post_statuses[$this->status] );
 
 			case 't_extra_status':
+				$ItemStatusCache = & get_Cache( 'ItemStatusCache' );
 				if( ! ($Element = & $ItemStatusCache->get_by_ID( $this->st_ID, true, false ) ) )
 				{ // No status:
 					return '';
@@ -2744,6 +2746,7 @@ class Item extends DataObject
 					return '';
 				}
 
+				$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
 				$type_Element = & $ItemTypeCache->get_by_ID( $this->typ_ID );
 				return $type_Element->name_return();
 
@@ -2827,6 +2830,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.78  2006/08/19 08:50:26  fplanque
+ * moved out some more stuff from main
+ *
  * Revision 1.77  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

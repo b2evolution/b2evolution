@@ -2909,8 +2909,8 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
- * Revision 1.73  2006/08/19 08:13:33  fplanque
- * grrrr!
+ * Revision 1.74  2006/08/19 08:50:27  fplanque
+ * moved out some more stuff from main
  *
  * Revision 1.72  2006/08/16 19:41:35  blueyed
  * small memory opt.

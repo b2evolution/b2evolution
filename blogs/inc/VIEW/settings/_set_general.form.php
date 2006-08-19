@@ -35,11 +35,6 @@ global $current_User;
  * @var GeneralSettings
  */
 global $Settings;
-/**
- * @var DataObjectCache
- */
-global $GroupCache;
-
 
 $Form = & new Form( NULL, 'settings_checkchanges' );
 $Form->begin_form( 'fform', T_('General Settings'),
@@ -61,6 +56,7 @@ $Form->begin_fieldset( T_('Default user rights') );
 
 	$Form->checkbox( 'newusers_revalidate_emailchg', $Settings->get('newusers_revalidate_emailchg'), T_('Validate email changes'), T_('Check to require users to re-validate when they change their email address.' ) );
 
+	$GroupCache = & get_Cache( 'GroupCache' );
 	$Form->select_object( 'newusers_grp_ID', $Settings->get('newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
 
 	$Form->text_input( 'newusers_level', $Settings->get('newusers_level'), 1, T_('Level for new users'), array( 'note'=>T_('Levels determine hierarchy of users in blogs.' ), 'maxlength'=>1, 'required'=>true ) );
@@ -135,6 +131,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.11  2006/08/19 08:50:26  fplanque
+ * moved out some more stuff from main
+ *
  * Revision 1.10  2006/08/19 07:56:31  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

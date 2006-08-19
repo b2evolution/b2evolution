@@ -44,7 +44,8 @@ $AdminUI->set_path( 'options', 'filetypes' );
 param( 'action', 'string' );
 
 if( param( 'ftyp_ID', 'integer', '', true) )
-{// Load firm/division:
+{// Load file type:
+	$FiletypeCache = & get_Cache( 'FiletypeCache' );
 	if( ($edited_Filetype = & $FiletypeCache->get_by_ID( $ftyp_ID, false )) === false )
 	{	// We could not find the file type to edit:
 		unset( $edited_Filetype );
