@@ -149,10 +149,11 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 				}
 			}
 
-			$query = "REPLACE INTO T_locales
+			$query = 'REPLACE INTO T_locales
 								( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_enabled )
-								VALUES ( '$newloc_locale', '$newloc_charset', '$newloc_datefmt',
-								'$newloc_timefmt', '$newloc_startofweek', '$newloc_name', '$newloc_messages', '1', '$newloc_enabled')";
+								VALUES ( '.$DB->quote($newloc_locale).', '.$DB->quote($newloc_charset).', '.$DB->quote($newloc_datefmt).', '
+									.$DB->quote($newloc_timefmt).', '.$DB->quote($newloc_startofweek).', '.$DB->quote($newloc_name).', '
+									.$DB->quote($newloc_messages).', "1", '.$DB->quote($newloc_enabled).' )';
 			$q = $DB->query($query);
 			$Messages->add( sprintf(T_('Saved locale &laquo;%s&raquo;.'), $newloc_locale), 'success' );
 
@@ -421,6 +422,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2006/08/20 19:29:34  blueyed
+ * Fix: quote DB values when inserting/editing locales
+ *
  * Revision 1.6  2006/07/24 01:25:05  blueyed
  * Removed all "@include" occurrences
  *

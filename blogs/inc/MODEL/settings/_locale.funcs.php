@@ -754,17 +754,17 @@ function locale_updateDB()
 		{ // if not explicit messages file is given we'll translate the locale
 			$lval['messages'] = strtr($localekey, '-', '_');
 		}
-		$query .= "(
-		'$localekey',
-		'{$lval['charset']}',
-		'{$lval['datefmt']}',
-		'{$lval['timefmt']}',
-		'{$lval['startofweek']}',
-		'{$lval['name']}',
-		'{$lval['messages']}',
-		'{$lval['priority']}',
-		'{$lval['enabled']}'
-		), ";
+		$query .= '(
+			'.$DB->quote($localekey).',
+			'.$DB->quote($lval['charset']).',
+			'.$DB->quote($lval['datefmt']).',
+			'.$DB->quote($lval['timefmt']).',
+			'.$DB->quote($lval['startofweek']).',
+			'.$DB->quote($lval['name']).',
+			'.$DB->quote($lval['messages']).',
+			'.$DB->quote($lval['priority']).',
+			'.$DB->quote($lval['enabled']).'
+		), ';
 	}
 	$query = substr($query, 0, -2);
 	$q = $DB->query($query);
@@ -893,6 +893,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.18  2006/08/20 19:29:34  blueyed
+ * Fix: quote DB values when inserting/editing locales
+ *
  * Revision 1.17  2006/08/20 13:47:25  fplanque
  * extracted param funcs from misc
  *
