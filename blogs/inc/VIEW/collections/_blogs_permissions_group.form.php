@@ -327,8 +327,7 @@ $Form->begin_fieldset( T_('Group permissions') );
 
 <?php
 // Permission note:
-echo '<p class="note center">'.T_('User group permissions override the media file permissions here!').'</p>';
-// fp> WHAT??? can you give a permission when the global setting id OFF ????
+echo '<p class="note center">'.T_('Note: General group permissions override the media folder permissions defined here.').'</p>';
 
 $Form->end_fieldset();
 // warning if a user withdraws own permission to edit the blog's properties
