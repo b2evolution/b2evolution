@@ -9,6 +9,13 @@
 	<img src="../blogs/rsc/img/b2evolution_logo_360.gif" alt="b2evolution" />
 	<h1>Changelog</h1>
 	<p>Only public releases are listed here.</p>
+
+	<h2>CVS</h2>
+	<ul>
+		<li>Removed dependency on PHP tokenizer extension (blueyed)</li>
+	</ul>
+
+
 	<h2>1.9-dev &quot;Lemon&quot; (Beta)</h2>
 	<ul>
 		<li>Different item edit views: simple, advanced (blueyed, fplanque)</li>
@@ -23,15 +30,15 @@
 		<li>Enhanced form abortion detection javascript (fplanque)</li>
 		<li>Enhanced result tables (progidistri, fplanque, blueyed) </li>
 		<li> Plugins
-        <ul>
-          <li>Enhanced smilies plugin (Yabba)</li>
-            <li>Plugins can get localized/translated (blueyed)</li>
-            <li>Plugins should not use a constructor anymore, but the PluginInit() method instead. The previous AppendPluginRegister() method has been "renamed" to PluginInit(). (blueyed)</li>
-            <li>Plugins can be grouped (see Plugin::group and Plugin::sub_group) (balupton, blueyed)</li>
-            <li>Added b2evo_Callbacks Javascript object to help plugins interact (blueyed)</li>
-            <li>Optimized expensive queries in calendar plugin (fplanque)</li>
-            <li>Added events: Logout, DisplayTrackbackAddr</li>
-        </ul>
+			<ul>
+				<li>Enhanced smilies plugin (Yabba)</li>
+					<li>Plugins can get localized/translated (blueyed)</li>
+					<li>Plugins should not use a constructor anymore, but the PluginInit() method instead. The previous AppendPluginRegister() method has been "renamed" to PluginInit(). (blueyed)</li>
+					<li>Plugins can be grouped (see Plugin::group and Plugin::sub_group) (balupton, blueyed)</li>
+					<li>Added b2evo_Callbacks Javascript object to help plugins interact (blueyed)</li>
+					<li>Optimized expensive queries in calendar plugin (fplanque)</li>
+					<li>Added events: Logout, DisplayTrackbackAddr</li>
+			</ul>
 		</li>
 		<li>
 			Developer stuff:

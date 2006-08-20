@@ -2583,72 +2583,14 @@ class Plugins
 
 		// TODO: allow optional Plugin callback to get list of methods. Like Plugin::GetRegisteredEvents().
 
-		if( ! function_exists( 'token_get_all' ) )
+		if( preg_match_all( '~^\s*function\s+(\w+)~mi', $classfile_contents, $matches ) )
 		{
-			#debug_die( 'We need the PHP Tokenizer functions to get the list of Plugin events (Enabled by default since PHP 4.3.0 and available since PHP 4.2.0).' );
-			$Debuglog->add( 'get_registered_events(): No tokenizer extension available. Using simple regexp-matching.', 'plugins' );
-
-			if( preg_match_all( '~^\s*function\s+(\w+)~mi', $classfile_contents, $matches ) )
-			{
-				$plugin_class_methods = $matches[1];
-			}
+			$plugin_class_methods = $matches[1];
 		}
 		else
 		{
-			$token_buffer = '';
-			$classname = '';
-			$in_class_name = false;
-			$in_plugin_class = false;
-			$in_function_name = false;
-
-			$tokens = token_get_all($classfile_contents);
-			unset($classfile_contents);
-			while( list($k, $l_token) = each( $tokens ) ) // needs less memory than foreach()
-			{
-				if( $l_token[0] == T_COMMENT || $l_token[0] == T_WHITESPACE )
-				{
-					continue;
-				}
-
-				if( $in_plugin_class )
-				{
-					if( $l_token[0] == T_FUNCTION )
-					{
-						$in_function_name = true;
-						$token_buffer = '';
-					}
-					elseif( $in_function_name )
-					{
-						if( $l_token[0] == T_STRING )
-						{
-							$token_buffer .= $l_token[1];
-						}
-						else
-						{
-							$plugin_class_methods[] = trim($token_buffer);
-							$in_function_name = false;
-						}
-					}
-				}
-				elseif( $in_class_name )
-				{
-					if( $l_token[0] == T_STRING )
-					{
-						$token_buffer .= $l_token[1];
-					}
-					else
-					{
-						$classname = trim($token_buffer);
-						$in_plugin_class = ( $classname == $Plugin->classname );
-						$in_class_name = false;
-					}
-				}
-				elseif( $l_token[0] == T_CLASS )
-				{
-					$in_class_name = true;
-					$token_buffer = '';
-				}
-			}
+			$Debuglog->add( 'No functions found in file "'.$Plugin->classfile_path.'".', array('plugins', 'error') );
+			return array();
 		}
 
 		$supported_events = $this->get_supported_events();
@@ -2918,7 +2860,7 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
- * Revision 1.76  2006/08/20 20:54:31  blueyed
+ * Revision 1.77  2006/08/20 21:02:56  blueyed
  * Removed dependency on tokenizer. Quite a few people don't have it.. see http://forums.b2evolution.net//viewtopic.php?t=8664
  *
  * Revision 1.75  2006/08/19 10:57:40  blueyed
