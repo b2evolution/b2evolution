@@ -106,8 +106,8 @@ switch( $action )
 
 		$edited_Blog->set( 'urlname', 'new' );
 		$edited_Blog->set( 'stub', '' );
-		break;	
-	
+		break;
+
 	case 'edit':
 	case 'filter1':
 	case 'filter2':
@@ -123,7 +123,7 @@ switch( $action )
 		// Insert into DB:
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
-		
+
 		$edited_Blog = & new Blog( NULL );
 
 		if( $edited_Blog->load_from_Request( array() ) )
@@ -146,7 +146,7 @@ switch( $action )
 			$BlogCache->add( $edited_Blog );
 
 			$Messages->add( T_('The new blog has been created.'), 'success' );
-			
+
 			if( param( 'blogtemplate', 'integer', -1 ) == -1 )
 			{
 				$Messages->add( sprintf( T_('You should <a %s>create categories</a> for this blog now!'),
@@ -157,7 +157,7 @@ switch( $action )
 				// copy the categories from $blogtemplateid to $blog
 				// TODO: checkbox on duplication form
 				blog_copy_cats($blogtemplate, $edited_Blog->ID);
-			
+
 				$Messages->add( T_('Categories have been duplicated.'), 'success' );
 			}
 		}
@@ -168,7 +168,7 @@ switch( $action )
 		// Update DB:
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
-		
+
 		switch( $tab )
 		{
 			case 'general':
@@ -209,8 +209,8 @@ switch( $action )
 
 		$AdminUI->append_path_level( $tab );
 		break;
-		
-		
+
+
 	case 'delete':
 		// ----------  Delete a blog from DB ----------
 		if( $blog == 1 )
@@ -230,7 +230,7 @@ switch( $action )
 			param( 'delete_static_file', 'integer', 0 );
 			$edited_Blog->dbdelete( $delete_stub_file, $delete_static_file, false );
 
-			$Messages->add( $msg, 'success' );			
+			$Messages->add( $msg, 'success' );
 
 			$BlogCache->remove_by_ID( $blog );
 			unset( $edited_Blog );
@@ -244,7 +244,7 @@ switch( $action )
 		}
 
 		break;
-		
+
 
 	case 'GenStatic':
 		// ----------  Generate static homepage for blog ----------
@@ -262,7 +262,8 @@ switch( $action )
 		$static_gen_saved_locale = $current_locale;
 		$generating_static = true;
 		$resolve_extra_path = false;
-		flush();
+
+		// NOTE: dh> flush() removed here, because it's a) unnecessary and b) causes notices for "headers already sent" (in skin and admin)
 		ob_start();
 		switch( $edited_Blog->access_type )
 		{
@@ -294,6 +295,8 @@ switch( $action )
 		$generated_static_page_html = ob_get_contents();
 		ob_end_clean();
 		unset( $generating_static );
+
+		// TODO: dh> Replace/Inject the <META HTTP-EQUIV="Content-Type"> tag into $generated_static_page_html
 
 		// Switch back to saved locale (the blog page may have changed it):
 		locale_activate( $static_gen_saved_locale);
@@ -467,6 +470,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2006/08/20 05:36:40  blueyed
+ * Fix: send charset in backoffice again; remove notice in generated static pages - please merge to v-1-8 and v-1-9, if ok!
+ *
  * Revision 1.20  2006/08/19 07:56:29  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

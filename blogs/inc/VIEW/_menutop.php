@@ -35,10 +35,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $io_charset, $rsc_url, $UserSettings, $Debuglog, $Plugins, $generating_static;
 
-if( !empty($generating_static) )
-{ // We are generating a static page (in which case this has already been sent):
-	header( 'Content-type: text/html; charset='.$io_charset );
-}
+header( 'Content-type: text/html; charset='.$io_charset );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
