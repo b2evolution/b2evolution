@@ -45,6 +45,7 @@ require_once dirname(__FILE__).'/_functions_create.php';
 
 $Timer = & new Timer('main');
 
+require_once $inc_path.'_misc/_param.funcs.php';
 param( 'action', 'string', 'default' );
 param( 'locale', 'string' );
 
@@ -602,6 +603,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.110  2006/08/20 13:47:26  fplanque
+ * extracted param funcs from misc
+ *
  * Revision 1.109  2006/07/31 15:37:52  blueyed
  * Fixed JS error, if there's no "deletedb" option available.
  *

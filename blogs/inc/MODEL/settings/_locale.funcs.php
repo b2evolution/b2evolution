@@ -740,6 +740,7 @@ function locale_updateDB()
 			{ // startofweek must be between 0 and 6
 				continue;
 			}
+			// fp>dh TODO: please do not use remove_magic_quotes() outside of _param.funcs
 			$templocales[ $plocale ][$lfield] = remove_magic_quotes( $pval );
 		}
 	}
@@ -892,6 +893,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.17  2006/08/20 13:47:25  fplanque
+ * extracted param funcs from misc
+ *
  * Revision 1.16  2006/08/19 02:15:07  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.

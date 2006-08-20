@@ -79,7 +79,10 @@ function refererList(
 {
 	global $DB, $res_stats, $stats_total_hits, $ReqURI;
 
-	autoquote( $type );		// In case quotes are missing
+	if( strpos( $type, "'" ) !== 0 )
+	{ // no quote at position 0
+		$type = "'".$type."'";
+	}
 
 	//if no visitURL, will show links to current page.
 	//if url given, will show links to that page.
@@ -362,6 +365,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.7  2006/08/20 13:47:25  fplanque
+ * extracted param funcs from misc
+ *
  * Revision 1.6  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

@@ -34,6 +34,21 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+
+/*
+ * autoquote(-)
+ */
+function autoquote( & $string )
+{
+	if( strpos( $string, "'" ) !== 0 )
+	{ // no quote at position 0
+		$string = "'".$string."'";
+	}
+}
+
+
+
+
 // xmlrpc:
 
 $pingback_ping_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString));

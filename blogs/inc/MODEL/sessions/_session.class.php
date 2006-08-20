@@ -104,6 +104,7 @@ class Session
 
 		if( !empty( $_COOKIE[$cookie_session] ) )
 		{ // session ID sent by cookie
+			// fp>dh TODO: please do not use remove_magic_quotes() outside of _param.funcs  ( param_get_cookie() or sth alike should do the job )
 			if( ! preg_match( '~^(\d+)_(\w+)$~', remove_magic_quotes($_COOKIE[$cookie_session]), $match ) )
 			{
 				$Debuglog->add( 'Invalid session cookie format!', 'session' );
@@ -433,6 +434,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.23  2006/08/20 13:47:25  fplanque
+ * extracted param funcs from misc
+ *
  * Revision 1.22  2006/08/19 07:56:31  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

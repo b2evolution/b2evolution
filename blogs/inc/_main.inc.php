@@ -223,6 +223,8 @@ $localtimenow = $servertimenow + $time_difference;
  * The Hit class
  */
 require_once $model_path.'sessions/_hit.class.php';
+// fp> The following constructor requires this right now, but it should not! this shoukd be loaded later.
+require_once $inc_path.'_misc/_param.funcs.php';
 /**
  * @global Hit The Hit object
  */
@@ -608,6 +610,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.47  2006/08/20 13:47:24  fplanque
+ * extracted param funcs from misc
+ *
  * Revision 1.46  2006/08/19 08:50:25  fplanque
  * moved out some more stuff from main
  *

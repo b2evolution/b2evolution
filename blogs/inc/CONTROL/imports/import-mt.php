@@ -541,6 +541,7 @@ param( 'mode', 'string', 'normal' );
 			{ // we want a new category
 				$blog_id = ($cat == '#DEFAULTBLOG#') ? $default_blog : $match[1];
 				// remember the name to create it when posts get inserted
+				// fp>dh: please use param() instead of $_POST[] (everywhere)
 				$catsmapped[ $categories[$i_cat] ] = array( 'blogid', $blog_id, remove_magic_quotes( $_POST['catmap_name'][$i_cat]) );
 			}
 			else
