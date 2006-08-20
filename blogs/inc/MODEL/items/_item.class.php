@@ -357,58 +357,58 @@ class Item extends DataObject
 	 */
 	function load_from_Request( $force_edit_date = false )
 	{
-		global $Request, $default_locale, $allowed_uri_scheme, $Plugins, $current_User;
+		global $default_locale, $allowed_uri_scheme, $Plugins, $current_User;
 
-		if( $Request->param( 'post_title', 'html', NULL ) !== NULL ) {
+		if( param( 'post_title', 'html', NULL ) !== NULL ) {
 			$this->set( 'title', format_to_post( get_param('post_title'), 0, 0 ) );
 		}
 
-		if( $Request->param( 'post_locale', 'string', NULL ) !== NULL ) {
+		if( param( 'post_locale', 'string', NULL ) !== NULL ) {
 			$this->set_from_Request( 'locale' );
 		}
 
-		if( $Request->param( 'item_typ_ID', 'integer', NULL ) !== NULL ) {
+		if( param( 'item_typ_ID', 'integer', NULL ) !== NULL ) {
 			$this->set_from_Request( 'typ_ID', 'item_typ_ID' );
 		}
 
-		if( $Request->param( 'post_url', 'string', NULL ) !== NULL ) {
-			$Request->param_check_url( 'post_url', $allowed_uri_scheme );
+		if( param( 'post_url', 'string', NULL ) !== NULL ) {
+			param_check_url( 'post_url', $allowed_uri_scheme );
 			$this->set_from_Request( 'url' );
 		}
 
-		if( $Request->param( 'content', 'html', '' ) !== NULL ) {
+		if( param( 'content', 'html', '' ) !== NULL ) {
 			$this->set( 'content', format_to_post( get_param('content') ) );
 		}
 
-		if( ( $force_edit_date || $Request->param( 'edit_date', 'integer', 0 ) )
+		if( ( $force_edit_date || param( 'edit_date', 'integer', 0 ) )
 				&& $current_User->check_perm( 'edit_timestamp' ) )
 		{ // We can use user date:
-			$Request->param_date( 'item_issue_date', T_('Please enter a valid issue date.'), $force_edit_date /* required */ );
+			param_date( 'item_issue_date', T_('Please enter a valid issue date.'), $force_edit_date /* required */ );
 			if( strlen(get_param('item_issue_date')) )
 			{ // only set it, if a date was given:
-				$Request->param_time( 'item_issue_time' );
+				param_time( 'item_issue_time' );
 				$this->set( 'issue_date', form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ) ); // TODO: cleanup...
 			}
 		}
 
-		if( $Request->param( 'post_urltitle', 'string', NULL ) !== NULL ) {
+		if( param( 'post_urltitle', 'string', NULL ) !== NULL ) {
 			$this->set_from_Request( 'urltitle' );
 		}
 
 		// Workflow stuff:
-		if( $Request->param( 'item_st_ID', 'integer', NULL ) !== NULL ) {
+		if( param( 'item_st_ID', 'integer', NULL ) !== NULL ) {
 			$this->set_from_Request( 'st_ID', 'item_st_ID' );
 		}
 
-		if( $Request->param( 'item_assigned_user_ID', 'integer', NULL ) !== NULL ) {
+		if( param( 'item_assigned_user_ID', 'integer', NULL ) !== NULL ) {
 			$this->assign_to( get_param('item_assigned_user_ID') );
 		}
 
-		if( $Request->param( 'item_priority', 'integer', NULL ) !== NULL ) {
+		if( param( 'item_priority', 'integer', NULL ) !== NULL ) {
 			$this->set_from_Request( 'priority', 'item_priority', true );
 		}
 
-		if( $Request->param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL ) {
+		if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL ) {
 			$this->set_from_Request( 'deadline', 'item_deadline', true );
 		}
 
@@ -416,13 +416,13 @@ class Item extends DataObject
 		$this->load_Blog();
 		if( $this->Blog->allowcomments == 'post_by_post' )
 		{
-			if( $Request->param( 'post_comment_status', 'string', 'open' ) !== NULL )
+			if( param( 'post_comment_status', 'string', 'open' ) !== NULL )
 			{ // 'open' or 'closed' or ...
 				$this->set_from_Request( 'comment_status' );
 			}
 		}
 
-		if( $Request->param( 'renderers', 'array', NULL ) !== NULL ) {
+		if( param( 'renderers', 'array', NULL ) !== NULL ) {
 			$renderers = $Plugins->validate_list( get_param('renderers') );
 			$this->set( 'renderers', $renderers );
 		}
@@ -2830,6 +2830,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.80  2006/08/20 22:25:21  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.79  2006/08/20 20:12:32  fplanque
  * param_() refactoring part 1
  *

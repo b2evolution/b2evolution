@@ -99,63 +99,63 @@ switch( $action )
 		else
 		{
 			// Online help
-			$Request->param( 'webhelp_enabled', 'integer', 0 );
+			param( 'webhelp_enabled', 'integer', 0 );
 			$Settings->set( 'webhelp_enabled', $webhelp_enabled );
 
 
 			// Blog by email
-			$Request->param( 'eblog_enabled', 'integer', 0 );
+			param( 'eblog_enabled', 'integer', 0 );
 			$Settings->set( 'eblog_enabled', $eblog_enabled );
 
-			$Request->param( 'eblog_method', 'string', true );
+			param( 'eblog_method', 'string', true );
 			$Settings->set( 'eblog_method', strtolower(trim($eblog_method)));
 
-			$Request->param( 'eblog_server_host', 'string', true );
+			param( 'eblog_server_host', 'string', true );
 			$Settings->set( 'eblog_server_host', strtolower(trim($eblog_server_host)));
 
-			$Request->param( 'eblog_server_port', 'integer', 0 );
+			param( 'eblog_server_port', 'integer', 0 );
 			$Settings->set( 'eblog_server_port', $eblog_server_port );
 
-			$Request->param( 'eblog_username', 'string', true );
+			param( 'eblog_username', 'string', true );
 			$Settings->set( 'eblog_username', trim($eblog_username));
 
-			$Request->param( 'eblog_password', 'string', true );
+			param( 'eblog_password', 'string', true );
 			$Settings->set( 'eblog_password', trim($eblog_password));
 
-			$Request->param( 'eblog_default_category', 'integer', 0 );
+			param( 'eblog_default_category', 'integer', 0 );
 			$Settings->set( 'eblog_default_category', $eblog_default_category );
 
-			$Request->param( 'eblog_subject_prefix', 'string', true );
+			param( 'eblog_subject_prefix', 'string', true );
 			$Settings->set( 'eblog_subject_prefix', trim($eblog_subject_prefix) );
 
-			$Request->param( 'eblog_body_terminator', 'string', true );
+			param( 'eblog_body_terminator', 'string', true );
 			$Settings->set( 'eblog_body_terminator', trim($eblog_body_terminator) );
 
-			$Request->param( 'eblog_test_mode', 'integer', 0 );
+			param( 'eblog_test_mode', 'integer', 0 );
 			$Settings->set( 'eblog_test_mode', $eblog_test_mode );
 
-			$Request->param( 'eblog_phonemail', 'integer', 0 );
+			param( 'eblog_phonemail', 'integer', 0 );
 			$Settings->set( 'eblog_phonemail', $eblog_phonemail );
 
-			$Request->param( 'eblog_phonemail_separator', 'string', true );
+			param( 'eblog_phonemail_separator', 'string', true );
 			$Settings->set( 'eblog_phonemail_separator', trim($eblog_phonemail_separator) );
 
 
 			// Hit & Session logs
-			$Settings->set( 'log_public_hits', $Request->param( 'log_public_hits', 'integer', 0 ) );
-			$Settings->set( 'log_admin_hits', $Request->param( 'log_admin_hits', 'integer', 0 ) );
+			$Settings->set( 'log_public_hits', param( 'log_public_hits', 'integer', 0 ) );
+			$Settings->set( 'log_admin_hits', param( 'log_admin_hits', 'integer', 0 ) );
 
-			$Request->param( 'auto_prune_stats_mode', 'string', true );
+			param( 'auto_prune_stats_mode', 'string', true );
 			$Settings->set( 'auto_prune_stats_mode',  get_param('auto_prune_stats_mode') );
 
 			// TODO: offer to set-up cron job if mode == 'cron' and to remove cron job if mode != 'cron'
 
-			$Request->param( 'auto_prune_stats', 'integer', $Settings->get_default('auto_prune_stats'), false, false, true, false );
+			param( 'auto_prune_stats', 'integer', $Settings->get_default('auto_prune_stats'), false, false, true, false );
 			$Settings->set( 'auto_prune_stats', get_param('auto_prune_stats') );
 
 
 			// Sessions
-			$timeout_sessions = $Request->param( 'timeout_sessions', 'integer', $Settings->get_default('timeout_sessions') );
+			$timeout_sessions = param( 'timeout_sessions', 'integer', $Settings->get_default('timeout_sessions') );
 			if( $timeout_sessions < 300 )
 			{ // lower than 5 minutes: not allowed
 				$timeout_sessions = 300;
@@ -204,6 +204,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2006/08/20 22:25:20  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.13  2006/08/20 20:12:32  fplanque
  * param_() refactoring part 1
  *

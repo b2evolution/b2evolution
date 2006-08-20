@@ -21,7 +21,7 @@ $tab = $UserSettings->param_Request( 'tab', 'pref_edit_tab', 'string', NULL, tru
 
 $AdminUI->set_path( 'new', $tab );
 
-$Request->param( 'action', 'string', 'new', true );
+param( 'action', 'string', 'new', true );
 
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
@@ -127,11 +127,11 @@ switch($action)
 		// Set AdminUI title:
 		if( $action == 'edit_switchtab' )
 		{
-			$post = $Request->param( 'post_ID', 'integer', true );
+			$post = param( 'post_ID', 'integer', true );
 			$ItemCache = & get_Cache( 'ItemCache' );
 			$edited_Item = & $ItemCache->get_by_ID($post_ID);
 
-			$Request->param( 'blog', 'integer', true );
+			param( 'blog', 'integer', true );
 			$BlogCache = & get_Cache( 'BlogCache' );
 			$Blog = $BlogCache->get_by_ID( $blog );
 
@@ -200,12 +200,12 @@ switch($action)
 
 		param( 'post_extracats', 'array', array() );
 		param( 'edit_date', 'integer', 0 ); // checkbox
-		$default_main_cat = $Request->param( 'post_category', 'integer', $edited_Item->main_cat_ID );
+		$default_main_cat = param( 'post_category', 'integer', $edited_Item->main_cat_ID );
 		if( $default_main_cat && $allow_cross_posting < 3 && get_catblog($default_main_cat) != $blog )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing: setting it to 0 uses the first cat in the list
 			$default_main_cat = 0;
 		}
-		$post_extracats = $Request->param( 'post_extracats', 'array', $post_extracats );
+		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
 
 		$edited_Item->load_from_Request(); // needs Blog set
 

@@ -57,16 +57,16 @@ switch( $action )
 
 	case 'create':
 		// INSERT new cat into db
-		$Request->param_string_not_empty( 'cat_name', T_('Please enter a category name.') );
+		param_string_not_empty( 'cat_name', T_('Please enter a category name.') );
 
-		$Request->param( 'parent_cat_ID', 'integer' );
+		param( 'parent_cat_ID', 'integer' );
 		if( !empty($parent_cat_ID) )
 		{ // We are creating a subcat
 			$cat_blog_ID = get_catblog( $parent_cat_ID );
 		}
 		else
 		{
-			$Request->param( 'cat_blog_ID', 'integer', true );
+			param( 'cat_blog_ID', 'integer', true );
 		}
 
 		// check permissions:
@@ -115,13 +115,13 @@ switch( $action )
 		//
 		// Update cat in db:
 		//
-		$Request->param_string_not_empty( 'cat_name', T_('Please enter a category name.') );
+		param_string_not_empty( 'cat_name', T_('Please enter a category name.') );
 
-		$Request->param( 'cat_ID', 'integer', true );
+		param( 'cat_ID', 'integer', true );
 		//echo $cat_ID;
 		$cat_blog_ID = get_catblog($cat_ID);
 
-		$Request->param( 'cat_parent_ID', 'string', true );
+		param( 'cat_parent_ID', 'string', true );
 		$cat_parent_ID_parts = explode( '_', $cat_parent_ID );
 		$cat_parent_ID = $cat_parent_ID_parts[0];
 		settype( $cat_parent_ID, 'integer' );
@@ -399,6 +399,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2006/08/20 22:25:20  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.11  2006/08/19 07:56:29  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

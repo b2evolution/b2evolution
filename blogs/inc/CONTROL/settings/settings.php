@@ -66,13 +66,13 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	param( 'newusers_grp_ID', 'integer', true );
 	$Settings->set( 'newusers_grp_ID', $newusers_grp_ID );
 
-	$Request->param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
+	param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
 	$Settings->set( 'newusers_level', $newusers_level );
 
 	param( 'default_blog_ID', 'integer', true );
 	$Settings->set( 'default_blog_ID', $default_blog_ID );
 
-	$Request->param_integer_range( 'posts_per_page', 1, 9999, T_('Items/days per page must be between %d and %d.') );
+	param_integer_range( 'posts_per_page', 1, 9999, T_('Items/days per page must be between %d and %d.') );
 	$Settings->set( 'posts_per_page', $posts_per_page );
 
 	param( 'what_to_show', 'string', true );
@@ -91,10 +91,10 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	param( 'permalink_type', 'string', true );
 	$Settings->set( 'permalink_type', $permalink_type );
 
-	$Request->param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimun password length must be between %d and %d.') );
+	param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimun password length must be between %d and %d.') );
 	$Settings->set( 'user_minpwdlen', $user_minpwdlen );
 
-	$Request->param_integer_range( 'reloadpage_timeout', 0, 99999, T_('Reload-page timeout must be between %d and %d.') );
+	param_integer_range( 'reloadpage_timeout', 0, 99999, T_('Reload-page timeout must be between %d and %d.') );
 	$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
 
 	if( ! $Messages->count('error') )
@@ -128,6 +128,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2006/08/20 22:25:20  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.6  2006/04/24 18:12:54  blueyed
  * Added Setting to invalidate a user account on email address change.
  *

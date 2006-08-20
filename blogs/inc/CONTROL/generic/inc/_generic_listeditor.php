@@ -230,7 +230,7 @@ switch( $action )
 	case 'sort_by_order':
 		// The list is sorted by the order column now.
 		$Results->order = '--A';
-		$Request->set_param( 'results_'.$GenericElementCache->dbprefix.'order', '--A' );
+		set_param( 'results_'.$GenericElementCache->dbprefix.'order', '--A' );
 		$action = 'list';
 		break;
 		

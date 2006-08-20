@@ -67,17 +67,17 @@ switch( $action )
 		}
 		else
 		{ // UPDATE:
-			$Request->param_integer_range( 'antispam_threshold_publish', -100, 100, T_('The threshold must be between -100 and 100.') );
+			param_integer_range( 'antispam_threshold_publish', -100, 100, T_('The threshold must be between -100 and 100.') );
 			$Settings->set( 'antispam_threshold_publish', $antispam_threshold_publish );
 
-			$Request->param_integer_range( 'antispam_threshold_delete', -100, 100, T_('The threshold must be between -100 and 100.') );
+			param_integer_range( 'antispam_threshold_delete', -100, 100, T_('The threshold must be between -100 and 100.') );
 			$Settings->set( 'antispam_threshold_delete', $antispam_threshold_delete );
 
-			$Request->param( 'antispam_block_spam_referers', 'integer', 0 );
+			param( 'antispam_block_spam_referers', 'integer', 0 );
 			$Settings->set( 'antispam_block_spam_referers', $antispam_block_spam_referers );
 
 			$changed_weight = false;
-			$Request->param( 'antispam_plugin_spam_weight', 'array', array() );
+			param( 'antispam_plugin_spam_weight', 'array', array() );
 			foreach( $antispam_plugin_spam_weight as $l_plugin_ID => $l_weight )
 			{
 				if( ! is_numeric($l_weight) )

@@ -51,7 +51,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Form, $set_type = 'Settings', $set_target = NULL, $use_value = NULL )
 {
-	global $debug, $Request;
+	global $debug;
 
 	if( ! empty($set_meta['no_edit']) )
 	{ // this setting is not editable
@@ -302,7 +302,7 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
  */
 function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_type, $set_target = NULL )
 {
-	global $Request, $Messages;
+	global $Messages;
 
 	$method = 'GetDefault'.$set_type;
 
@@ -336,7 +336,7 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 		{
 			$l_param_type = 'string';
 		}
-		$l_value = $Request->param( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $l_param_type, $l_param_default );
+		$l_value = param( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $l_param_type, $l_param_default );
 
 		if( isset($l_meta['type']) && $l_meta['type'] == 'integer' && ! preg_match( '~^[-+]?\d+$~', $l_value ) )
 		{
@@ -416,6 +416,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.25  2006/08/20 22:25:22  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.24  2006/08/20 20:12:33  fplanque
  * param_() refactoring part 1
  *

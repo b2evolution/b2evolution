@@ -55,10 +55,10 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	{ // switch between regional actions
 		// UPDATE regional settings
 		case 'update':
-			$Request->param( 'newdefault_locale', 'string', true);
+			param( 'newdefault_locale', 'string', true);
 			$Settings->set( 'default_locale', $newdefault_locale );
 
-			$Request->param( 'newtime_difference', 'string', '' );
+			param( 'newtime_difference', 'string', '' );
 			$newtime_difference = trim($newtime_difference);
 			if( $newtime_difference == '' )
 			{
@@ -422,6 +422,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2006/08/20 22:25:20  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.8  2006/08/20 20:12:32  fplanque
  * param_() refactoring part 1
  *

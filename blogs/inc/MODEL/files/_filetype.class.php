@@ -93,14 +93,14 @@ class Filetype extends DataObject
 	 */
 	function load_from_Request()
 	{
-		global $Request, $force_upload_forbiddenext;
+		global $force_upload_forbiddenext;
 
 		// Extensions
-		if( $Request->param_string_not_empty( 'ftyp_extensions', T_('Please enter file extensions separated by space.') ) )
+		if( param_string_not_empty( 'ftyp_extensions', T_('Please enter file extensions separated by space.') ) )
 		{ // Check if estensions has a valid format
-			$Request->params['ftyp_extensions'] = strtolower( trim( $Request->params['ftyp_extensions'] ) );
+			$GLOBALS['ftyp_extensions'] = strtolower( trim( $GLOBALS['ftyp_extensions'] ) );
 			$reg_exp = '/^[a-z0-9]+( [a-z0-9]+)*$/';
-			if( !preg_match( $reg_exp, $Request->params['ftyp_extensions'], $res ) ) 
+			if( !preg_match( $reg_exp, $GLOBALS['ftyp_extensions'], $res ) )
 			{ // Extensiosn has an invalid format
 				param_error( 'ftyp_extensions', T_( 'Invalid file extensions format.' ) );
 			}
@@ -108,31 +108,31 @@ class Filetype extends DataObject
 		$this->set_from_Request( 'extensions' );
 		
 		// Name
-		$Request->param_string_not_empty( 'ftyp_name', T_('Please enter a name.') );
+		param_string_not_empty( 'ftyp_name', T_('Please enter a name.') );
 		$this->set_from_Request( 'name' );
 		
 		// Mime type
-		$Request->param_string_not_empty( 'ftyp_mimetype', T_('Please enter a mime type.') );
+		param_string_not_empty( 'ftyp_mimetype', T_('Please enter a mime type.') );
 		$this->set_from_Request( 'mimetype' );
 		
 		// Icon for the mime type
-		if( $Request->param( 'ftyp_icon', 'string', '' ) )
+		if( param( 'ftyp_icon', 'string', '' ) )
 		{
-			$Request->param_check_filename( 'ftyp_icon', T_('Please enter a file name.') );
+			param_check_filename( 'ftyp_icon', T_('Please enter a file name.') );
 		}
 		$this->set_from_Request( 'icon' );
 				
 		// View type
-		$Request->param( 'ftyp_viewtype', 'string' );
+		param( 'ftyp_viewtype', 'string' );
 		$this->set_from_Request( 'viewtype' );
 
 		// Allowed to upload theses extensions
-		$Request->param( 'ftyp_allowed', 'integer', '0' );
-		if( $Request->params['ftyp_allowed'] )
+		param( 'ftyp_allowed', 'integer', '0' );
+		if( $GLOBALS['ftyp_allowed'] )
 		{
 			// Check if the extension is in the array of the not allowed extensions (_advanced.php)
 			$not_allowed = false;
-			$extensions = explode ( ' ', $Request->params['ftyp_extensions'] );
+			$extensions = explode ( ' ', $GLOBALS['ftyp_extensions'] );
 			foreach($extensions as $extension)
 			{
 				if( in_array( $extension, $force_upload_forbiddenext ) )
@@ -143,10 +143,9 @@ class Filetype extends DataObject
 			}
 			if( $not_allowed )
 			{ // this extension is not allowed
-				$Request->params['ftyp_allowed'] = 0;
+				$GLOBALS['ftyp_allowed'] = 0;
 			} 
 		}
-		$Request->params['ftyp_allowed'];
 		$this->set_from_Request( 'allowed' );
 		
 		return ! param_errors_detected();

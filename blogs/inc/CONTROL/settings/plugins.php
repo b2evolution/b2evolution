@@ -36,7 +36,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $AdminUI->set_path( 'options', 'plugins' );
 
-$action = $Request->param_action( 'list' );
+$action = param_action( 'list' );
 
 $UserSettings->param_Request( 'plugins_disp_avail', 'plugins_disp_avail', 'integer', 0 );
 
@@ -66,11 +66,11 @@ while( $loop_Plugin = & $admin_Plugins->get_next() )
  */
 function install_plugin_db_schema_action( & $Plugin )
 {
-	global $action, $Request, $inc_path, $install_db_deltas, $DB, $Messages;
+	global $action, $inc_path, $install_db_deltas, $DB, $Messages;
 
 	$action = 'list';
 	// Prepare vars for DB layout changes
-	$install_db_deltas_confirm_md5 = $Request->param( 'install_db_deltas_confirm_md5' );
+	$install_db_deltas_confirm_md5 = param( 'install_db_deltas_confirm_md5' );
 
 	$db_layout = $Plugin->GetDbLayout();
 	$install_db_deltas = array(); // This holds changes to make, if any (just all queries)
@@ -432,7 +432,7 @@ switch( $action )
 
 
 	case 'install_db_schema': // we come here from the first step ("install")
-		$Request->param( 'plugin_ID', 'integer', 0 );
+		param( 'plugin_ID', 'integer', 0 );
 
 		if( $plugin_ID )
 		{ // second step:
@@ -585,9 +585,9 @@ switch( $action )
 		}
 
 		// Params from/for form:
-		$Request->param( 'edited_plugin_code' );
-		$Request->param( 'edited_plugin_priority' );
-		$Request->param( 'edited_plugin_apply_rendering' );
+		param( 'edited_plugin_code' );
+		param( 'edited_plugin_priority' );
+		param( 'edited_plugin_apply_rendering' );
 
 		$updated = $admin_Plugins->set_code( $edit_Plugin->ID, $edited_plugin_code );
 		if( is_string( $updated ) )
@@ -600,7 +600,7 @@ switch( $action )
 			$Messages->add( T_('Plugin code updated.'), 'success' );
 		}
 
-		if( $Request->param_check_range( 'edited_plugin_priority', 0, 100, T_('Plugin priority must be numeric (0-100).'), true ) )
+		if( param_check_range( 'edited_plugin_priority', 0, 100, T_('Plugin priority must be numeric (0-100).'), true ) )
 		{
 			$updated = $admin_Plugins->set_priority( $edit_Plugin->ID, $edited_plugin_priority );
 			if( $updated === 1 )

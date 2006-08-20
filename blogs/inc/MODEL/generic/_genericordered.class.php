@@ -105,7 +105,7 @@ class GenericOrdered extends GenericElement
 	 */
 	function dbinsert()
 	{
-		global $DB, $Request;
+		global $DB, 
 
 		$DB->begin();
 	

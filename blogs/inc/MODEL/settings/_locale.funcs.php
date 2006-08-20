@@ -722,11 +722,11 @@ function locale_updateDB()
 	$templocales = $locales;
 
 	$lnr = 0;
+	// Loop through list of all HTTP POSTed params:
 	foreach( $_POST as $pkey => $pval )
 	{
 		if( preg_match('/loc_(\d+)_(.*)/', $pkey, $matches) )
-		{
-			// we know there's a POST param $pkey and want it's value:
+		{	// This is a locale related parameter, get it now:
 			$pval = param( $pkey, 'string', '' );
 
 			$lfield = $matches[2];
@@ -898,6 +898,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.22  2006/08/20 22:25:21  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.21  2006/08/20 21:13:42  blueyed
  * doc
  *
@@ -906,8 +909,6 @@ function init_charsets( $req_io_charset )
  *
  * Revision 1.19  2006/08/20 19:30:20  blueyed
  * Use param() instead of remove_magic_quotes()
- * fp> okay nice, but param() should only be used for getting params. Something uncatholic is going on here! :]
- * dh> added comment.
  *
  * Revision 1.18  2006/08/20 19:29:34  blueyed
  * Fix: quote DB values when inserting/editing locales

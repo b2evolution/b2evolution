@@ -518,7 +518,7 @@ class AdminUI_general
 		global $misc_inc_path;
 
 		global $current_User;
-		global $Request;
+
 
 
 		require $view_path.$view_name;
@@ -1308,6 +1308,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.26  2006/08/20 22:25:22  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.25  2006/07/12 20:17:13  fplanque
  * minor
  *

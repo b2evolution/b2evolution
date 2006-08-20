@@ -44,13 +44,13 @@ $Form->begin_fieldset( T_('User permissions') );
  */
 if( get_param('action') == 'filter2' )
 {
-	$keywords = $Request->param( 'keywords2', 'string', '', true );
-	$Request->set_param( 'keywords1', $keywords );
+	$keywords = param( 'keywords2', 'string', '', true );
+	set_param( 'keywords1', $keywords );
 }
 else
 {
-	$keywords = $Request->param( 'keywords1', 'string', '', true );
-	$Request->set_param( 'keywords2', $keywords );
+	$keywords = param( 'keywords1', 'string', '', true );
+	set_param( 'keywords2', $keywords );
 }
 
 $where_clause = '';
@@ -118,7 +118,7 @@ $Results->title = T_('User permissions');
  */
 function filter_colluserlist( & $Form )
 {
-	global $Request;
+
 	static $count = 0;
 
 	$count++;
@@ -420,6 +420,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.8  2006/08/20 22:25:21  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.7  2006/08/20 21:17:06  blueyed
  * doc
  *

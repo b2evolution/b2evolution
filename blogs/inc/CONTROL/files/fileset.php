@@ -80,38 +80,38 @@ switch( $action )
 		else
 		{
 			// Filemanager
-			$Request->param( 'fm_enabled', 'integer', 0 );
+			param( 'fm_enabled', 'integer', 0 );
 			$Settings->set( 'fm_enabled', $fm_enabled );
 
-			$Request->param( 'fm_enable_roots_blog', 'integer', 0 );
+			param( 'fm_enable_roots_blog', 'integer', 0 );
 			$Settings->set( 'fm_enable_roots_blog', $fm_enable_roots_blog );
 
-			// $Request->param( 'fm_enable_roots_group', 'fm_enable_roots_group', 'integer', 0 );
+			// param( 'fm_enable_roots_group', 'fm_enable_roots_group', 'integer', 0 );
 
-			$Request->param( 'fm_enable_roots_user', 'integer', 0 );
+			param( 'fm_enable_roots_user', 'integer', 0 );
 			$Settings->set( 'fm_enable_roots_user', $fm_enable_roots_user );
 
-			$Request->param( 'fm_enable_create_dir', 'integer', 0 );
+			param( 'fm_enable_create_dir', 'integer', 0 );
 			$Settings->set( 'fm_enable_create_dir', $fm_enable_create_dir );
 
-			$Request->param( 'fm_enable_create_file', 'integer', 0 );
+			param( 'fm_enable_create_file', 'integer', 0 );
 			$Settings->set( 'fm_enable_create_file', $fm_enable_create_file );
 
 			// Upload
-			$Request->param( 'upload_enabled', 'integer', 0 );
+			param( 'upload_enabled', 'integer', 0 );
 			$Settings->set( 'upload_enabled', $upload_enabled );
 
-			$Request->param_integer_range( 'upload_maxkb', 1, $upload_maxmaxkb, T_('Maximum allowed filesize must be between %d and %d KB.') );
+			param_integer_range( 'upload_maxkb', 1, $upload_maxmaxkb, T_('Maximum allowed filesize must be between %d and %d KB.') );
 			$Settings->set( 'upload_maxkb', $upload_maxkb );
 
 			// Advanced settings
-			$Request->param( 'regexp_filename', 'string', '' );
-			if( $Request->param_check_regexp( 'regexp_filename', T_('Valid filename pattern is not a regular expression!') ) )
+			param( 'regexp_filename', 'string', '' );
+			if( param_check_regexp( 'regexp_filename', T_('Valid filename pattern is not a regular expression!') ) )
 			{
 				$Settings->set( 'regexp_filename', $regexp_filename );
 			}
-			$Request->param( 'regexp_dirname', 'string', '' );
-			if( $Request->param_check_regexp( 'regexp_dirname', T_('Valid dirname pattern is not a regular expression!') ) )
+			param( 'regexp_dirname', 'string', '' );
+			if( param_check_regexp( 'regexp_dirname', T_('Valid dirname pattern is not a regular expression!') ) )
 			{
 				$Settings->set( 'regexp_dirname', $regexp_dirname );
 			}

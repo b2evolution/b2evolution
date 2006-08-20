@@ -175,9 +175,9 @@ class UserSettings extends AbstractSettings
 	 */
 	function param_Request( $param_name, $uset_name, $type = '', $default = '', $memorize = false, $override = false ) // we do not force setting it..
 	{
-		global $Request;
 
-		$value = $Request->param( $param_name, $type, NULL, $memorize, $override, false ); // we pass NULL here, to see if it got set at all
+
+		$value = param( $param_name, $type, NULL, $memorize, $override, false ); // we pass NULL here, to see if it got set at all
 
 		if( $value !== false )
 		{ // we got a value
@@ -194,7 +194,7 @@ class UserSettings extends AbstractSettings
 			}
 		}
 
-		$Request->set_param( $param_name, $value );
+		set_param( $param_name, $value );
 		return get_param($param_name);
 	}
 }
@@ -202,6 +202,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.18  2006/08/20 22:25:21  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.17  2006/08/20 20:12:33  fplanque
  * param_() refactoring part 1
  *

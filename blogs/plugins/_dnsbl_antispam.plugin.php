@@ -177,11 +177,11 @@ class dnsbl_antispam_plugin extends Plugin
 	 */
 	function AdminTabAction()
 	{
-		global $Messages, $Request, $DB;
+		global $Messages, $DB;
 
 		$this->param_check_for = param( 'check_for' );
 
-		switch( $Request->param_arrayindex( 'dnsblaction' ) )
+		switch( param_arrayindex( 'dnsblaction' ) )
 		{
 			case 'checklist':
 				if( empty($this->param_check_for) )
@@ -684,6 +684,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.33  2006/08/20 22:25:22  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.32  2006/07/10 20:19:30  blueyed
  * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
  *

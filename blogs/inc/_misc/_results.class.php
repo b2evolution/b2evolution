@@ -743,7 +743,7 @@ class Results extends Widget
 	 */
 	function display_option_area( $option_name, $area_name, $option_title, $submit_title, $default_folde_state = 'expanded' )
 	{
-		global $debug, $Session, $Request;
+		global $debug, $Session;
 
 		// Do we already have a form?
 		$create_new_form = ! isset( $this->Form );
@@ -2180,6 +2180,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.27  2006/08/20 22:25:22  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.26  2006/08/20 20:12:33  fplanque
  * param_() refactoring part 1
  *

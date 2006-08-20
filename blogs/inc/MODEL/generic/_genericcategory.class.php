@@ -80,13 +80,13 @@ class GenericCategory extends GenericProperty
 	 */
 	function load_from_request()
 	{
-		global $Request;
+
 
 		parent::load_from_Request();
 
-		if( $Request->param( $this->dbprefix.'parent_ID', 'integer', NULL ) )
+		if( param( $this->dbprefix.'parent_ID', 'integer', NULL ) )
 		{
-			$Request->param_check_number( $this->dbprefix.'parent_ID', T_('Parent ID must be a number') );
+			param_check_number( $this->dbprefix.'parent_ID', T_('Parent ID must be a number') );
 			$this->set_from_Request( 'parent_ID' );
 		}
 

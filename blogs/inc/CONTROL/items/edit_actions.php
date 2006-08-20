@@ -50,9 +50,9 @@ switch($action)
 		 * INSERT POST & more
 		 */
 		// We need early decoding of these in order to check permissions:
-		$Request->param( 'post_status', 'string', 'published' );
-		$Request->param( 'post_category', 'integer', true );
-		$Request->param( 'post_extracats', 'array', array() );
+		param( 'post_status', 'string', 'published' );
+		param( 'post_category', 'integer', true );
+		param( 'post_extracats', 'array', array() );
 		// make sure main cat is in extracat list and there are no duplicates
 		$post_extracats[] = $post_category;
 		$post_extracats = array_unique( $post_extracats );
@@ -92,11 +92,7 @@ switch($action)
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
 		// Set object params:
-		// (First settin the $Request object to not add links from Log messages to field IDs)
-		$old_Request_link_log_messages_to_field_IDs = $Request->link_log_messages_to_field_IDs;
-		$Request->link_log_messages_to_field_IDs = false;  // TODO: Once errors get displayed with the item form page itself, remove this
 		$edited_Item->load_from_Request();
-		$Request->link_log_messages_to_field_IDs = $old_Request_link_log_messages_to_field_IDs;
 
 		// TODO: Add a radio into blog settings > Features > Post title: () required () optional () none
 		/*
@@ -178,9 +174,9 @@ switch($action)
 		 * UPDATE POST
 		 */
 		// We need early decoding of these in order to check permissions:
-		$Request->param( 'post_status', 'string', 'published' );
-		$Request->param( 'post_category', 'integer', true );
-		$Request->param( 'post_extracats', 'array', array() );
+		param( 'post_status', 'string', 'published' );
+		param( 'post_category', 'integer', true );
+		param( 'post_extracats', 'array', array() );
 		// make sure main cat is in extracat list and there are no duplicates
 		$post_extracats[] = $post_category;
 		$post_extracats = array_unique( $post_extracats );
@@ -201,7 +197,7 @@ switch($action)
 
 
 		// UPDATE POST:
-		$Request->param( 'post_ID', 'integer', true );
+		param( 'post_ID', 'integer', true );
 		$ItemCache = & get_Cache( 'ItemCache' );
 		$edited_Item = & $ItemCache->get_by_ID( $post_ID );
 
@@ -290,7 +286,7 @@ switch($action)
 		 * --------------------------------------------------------------------
 		 * PUBLISH POST NOW
 		 */
-		$Request->param( 'post_ID', 'integer', true );
+		param( 'post_ID', 'integer', true );
 		$ItemCache = & get_Cache( 'ItemCache' );
 		$edited_Item = & $ItemCache->get_by_ID( $post_ID );
 
@@ -385,7 +381,7 @@ switch($action)
 		 * --------------------------------------------------------------------
 		 * DEPRECATE POST
 		 */
-		$Request->param( 'post_ID', 'integer', true );
+		param( 'post_ID', 'integer', true );
 		$ItemCache = & get_Cache( 'ItemCache' );
 		$edited_Item = & $ItemCache->get_by_ID( $post_ID );
 
@@ -478,9 +474,9 @@ switch($action)
 
 		if( ! $edited_Comment->get_author_User() )
 		{ // If this is not a member comment
-			$Request->param( 'newcomment_author', 'string', true );
-			$Request->param( 'newcomment_author_email', 'string' );
-			$Request->param( 'newcomment_author_url', 'string' );
+			param( 'newcomment_author', 'string', true );
+			param( 'newcomment_author_email', 'string' );
+			param( 'newcomment_author_url', 'string' );
 
 			// CHECK url
 			if( $error = validate_url( $newcomment_author_url, $allowed_uri_scheme ) )
@@ -488,8 +484,8 @@ switch($action)
 				$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
 			}
 		}
-		$Request->param( 'content', 'html' );
-		$Request->param( 'post_autobr', 'integer', ($comments_use_autobr == 'always')?1:0 );
+		param( 'content', 'html' );
+		param( 'post_autobr', 'integer', ($comments_use_autobr == 'always')?1:0 );
 
 
 		// CHECK and FORMAT content
@@ -510,13 +506,13 @@ switch($action)
 			$edited_Comment->set( 'author_url', $newcomment_author_url );
 		}
 
-		$Request->param( 'edit_date', 'integer', 0 );
+		param( 'edit_date', 'integer', 0 );
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
 		{ // We use user date
 			$edited_Comment->set( 'date', date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) ) );
 		}
 
-		$Request->param( 'comment_status', 'string', 'published' );
+		param( 'comment_status', 'string', 'published' );
 		$edited_Comment->set_from_Request( 'status', 'comment_status' );
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
@@ -531,7 +527,7 @@ switch($action)
 		 * --------------------------------------------------------------------
 		 * UPDATE comment status in db:
 		 */
-		$Request->param( 'comment_ID', 'integer', true );
+		param( 'comment_ID', 'integer', true );
 		$edited_Comment = Comment_get_by_ID( $comment_ID );
 		$edited_comment_Item = & $edited_Comment->get_Item();
 		$blog = $edited_comment_Item->get( 'blog_ID' );
@@ -626,6 +622,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2006/08/20 22:25:20  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.23  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

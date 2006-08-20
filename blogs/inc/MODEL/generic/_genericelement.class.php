@@ -89,9 +89,9 @@ class GenericElement extends DataObject
 	 */
 	function load_from_Request()
 	{
-		global $Request;
 
-		$Request->param_string_not_empty( $this->dbprefix.'name', T_('Please enter a name.') );
+
+		param_string_not_empty( $this->dbprefix.'name', T_('Please enter a name.') );
 		$this->set_from_Request( 'name' );
 		
 		return ! param_errors_detected();
@@ -173,6 +173,9 @@ class GenericElement extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2006/08/20 22:25:21  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.4  2006/08/20 20:12:32  fplanque
  * param_() refactoring part 1
  *

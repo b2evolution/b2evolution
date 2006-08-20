@@ -143,7 +143,7 @@ $Comment->set( 'status', $commented_Item->Blog->get_setting('new_feedback_status
 
 
 // Check if we want to PREVIEW:
-$action = $Request->param_arrayindex( 'submit_comment_post_'.$commented_Item->ID, 'save' );
+$action = param_arrayindex( 'submit_comment_post_'.$commented_Item->ID, 'save' );
 
 if( $action != 'preview' )
 {
@@ -200,7 +200,7 @@ if( $action == 'preview' )
 	$Session->set( 'core.preview_Comment', $Comment );
 	$Session->dbsave();
 
-	$Request->param( 'redirect_to', 'string', '' );
+	param( 'redirect_to', 'string', '' );
 	$redirect_to .= '#comment_preview';
 
 	header_nocache();
@@ -284,7 +284,7 @@ if( $Comment->ID )
 		$Messages->add( T_('Your comment has been submitted.'), 'success' );
 
 		// Append anchor to the redirect_to param, so the user sees his comment:
-		$Request->param( 'redirect_to', 'string', '' );
+		param( 'redirect_to', 'string', '' );
 		$redirect_to .= '#'.$Comment->get_anchor();
 	}
 	else
@@ -302,6 +302,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.85  2006/08/20 22:25:20  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.84  2006/08/19 07:56:29  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

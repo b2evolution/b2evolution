@@ -43,17 +43,17 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 
-$Request->param( 'action', 'string', '' );
-$Request->param( 'mode', 'string', '' );
+param( 'action', 'string', '' );
+param( 'mode', 'string', '' );
 // bookmarklet stuff:
-$Request->param( 'text', 'html', '' );
-$Request->param( 'popupurl', 'string', '' );
-$Request->param( 'popuptitle', 'string', '' );
+param( 'text', 'html', '' );
+param( 'popupurl', 'string', '' );
+param( 'popuptitle', 'string', '' );
 
-$Request->param( 'login', 'string', '' );
+param( 'login', 'string', '' );
 // echo 'login: ', $login;
 
-$Request->param( 'redirect_to', 'string', '' ); // gets used by header_redirect(); if appropriate (perms) we let it default to $admin_url
+param( 'redirect_to', 'string', '' ); // gets used by header_redirect(); if appropriate (perms) we let it default to $admin_url
 
 
 switch( $action )
@@ -270,12 +270,12 @@ switch( $action )
 			break;
 		}
 
-		$Request->param( 'req_validatemail_submit', 'integer', 0 ); // has the form been submitted
-		$Request->param( 'email', 'string', $current_User->email ); // the email address is editable
+		param( 'req_validatemail_submit', 'integer', 0 ); // has the form been submitted
+		param( 'email', 'string', $current_User->email ); // the email address is editable
 
 		if( $req_validatemail_submit )
 		{ // Form has been submitted
-			$Request->param_check_email( 'email', true );
+			param_check_email( 'email', true );
 
 			// Call plugin event to allow catching input in general and validating own things from DisplayRegisterFormFieldset event
 			$Plugins->trigger_event( 'ValidateAccountFormSent' );
@@ -358,6 +358,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.70  2006/08/20 22:25:20  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.69  2006/08/19 07:56:29  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

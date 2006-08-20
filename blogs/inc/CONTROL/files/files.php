@@ -108,7 +108,7 @@ else
  */
 $fm_mode = param( 'fm_mode', 'string', NULL, true );
 
-$action = $Request->param_action();
+$action = param_action();
 
 
 // Get root:
@@ -931,7 +931,7 @@ switch( $fm_mode )
 		}
 
 		// Quick mode means "just upload and leave mode when successful"
-		$Request->param( 'upload_quickmode', 'integer', 0 );
+		param( 'upload_quickmode', 'integer', 0 );
 
 		/**
 		 * @var array Remember failed files (and the error messages)
@@ -1512,6 +1512,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.33  2006/08/20 22:25:20  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.32  2006/08/20 20:12:32  fplanque
  * param_() refactoring part 1
  *

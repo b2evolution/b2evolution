@@ -55,8 +55,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $AdminUI->set_path( 'blogs' );
 
-$Request->param_action( 'list' );
-$Request->param( 'tab', 'string', 'general', true );
+param_action( 'list' );
+param( 'tab', 'string', 'general', true );
 
 if( $action != 'new' )
 {
@@ -466,6 +466,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2006/08/20 22:25:20  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.22  2006/08/20 20:12:32  fplanque
  * param_() refactoring part 1
  *

@@ -52,7 +52,7 @@ $usedgroups = $DB->get_col( 'SELECT grp_ID
 /*
  * Query user list:
  */
-$keywords = $Request->param( 'keywords', 'string', '', true );
+$keywords = param( 'keywords', 'string', '', true );
 
 $where_clause = '';
 
@@ -92,7 +92,7 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
  */
 function filter_userlist( & $Form )
 {
-	global $Request;
+
 
 	$Form->text( 'keywords', get_param('keywords'), 20, T_('Keywords'), T_('Separate with space'), 50 );
 }
@@ -236,6 +236,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.11  2006/08/20 22:25:22  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.10  2006/08/20 20:12:33  fplanque
  * param_() refactoring part 1
  *

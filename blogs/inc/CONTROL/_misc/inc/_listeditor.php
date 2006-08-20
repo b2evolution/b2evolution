@@ -63,8 +63,8 @@ switch( $action )
 			$current_User->check_perm( $perm_name, $perm_level, true );
 		}
 
-		$Request->param( 'name', 'string', true );
-		if( $Request->param_check_not_empty( 'name', T_('Please enter a string.') ) )
+		param( 'name', 'string', true );
+		if( param_check_not_empty( 'name', T_('Please enter a string.') ) )
 		{
 			$DB->begin();
 
@@ -108,8 +108,8 @@ switch( $action )
 			$current_User->check_perm( $perm_name, $perm_level, true );
 		}
 
-		$Request->param( 'ID', 'integer', true );
-		if( $Request->param_string_not_empty( 'name', T_('Please enter a string.') ) )
+		param( 'ID', 'integer', true );
+		if( param_string_not_empty( 'name', T_('Please enter a string.') ) )
 		{	// Update in database
 			$DB->query( "
 				UPDATE $edited_table
@@ -339,7 +339,7 @@ switch( $action )
 
 	case 'sort_by_order':
 		// The list is sorted by the order column now.
-		$Request->set_param( 'results_'.$edited_table_prefix.'order', '--A');
+		set_param( 'results_'.$edited_table_prefix.'order', '--A');
 		$name = '';
 		$action = 'list';
 		break;

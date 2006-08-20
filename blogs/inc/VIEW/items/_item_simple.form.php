@@ -79,16 +79,16 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 
 // Fields used in "advanced" form, but not here:
-$Form->hidden( 'post_locale', $Request->param('post_locale', 'string', '') );
-$Form->hidden( 'item_typ_ID', $Request->param('item_typ_ID', 'integer', NULL) );
-$Form->hidden( 'post_url', $Request->param('post_url', 'string', '') );
-$Form->hidden( 'post_urltitle', $Request->param('post_urltitle', 'string', '') );
-$Form->hidden( 'item_priority', $Request->param('item_priority', 'integer', NULL) );
-$Form->hidden( 'item_assigned_user_ID', $Request->param('item_assigned_user_ID', 'integer', NULL) );
-$Form->hidden( 'item_st_ID', $Request->param('item_st_ID', 'integer', NULL) );
-$Form->hidden( 'item_deadline', $Request->param('item_deadline', 'string', NULL) );
-$Form->hidden( 'trackback_url', $Request->param('trackback_url', 'string', NULL) );
-$Form->hidden( 'renderers', $Request->param('renderers', 'array', NULL) );
+$Form->hidden( 'post_locale', param('post_locale', 'string', '') );
+$Form->hidden( 'item_typ_ID', param('item_typ_ID', 'integer', NULL) );
+$Form->hidden( 'post_url', param('post_url', 'string', '') );
+$Form->hidden( 'post_urltitle', param('post_urltitle', 'string', '') );
+$Form->hidden( 'item_priority', param('item_priority', 'integer', NULL) );
+$Form->hidden( 'item_assigned_user_ID', param('item_assigned_user_ID', 'integer', NULL) );
+$Form->hidden( 'item_st_ID', param('item_st_ID', 'integer', NULL) );
+$Form->hidden( 'item_deadline', param('item_deadline', 'string', NULL) );
+$Form->hidden( 'trackback_url', param('trackback_url', 'string', NULL) );
+$Form->hidden( 'renderers', param('renderers', 'array', NULL) );
 
 
 // TODO: Form::hidden() do not add, if NULL?!
@@ -277,6 +277,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.12  2006/08/20 22:25:22  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.11  2006/08/19 08:50:26  fplanque
  * moved out some more stuff from main
  *

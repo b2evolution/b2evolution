@@ -308,7 +308,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
 
-	$edited_Item->renderer_checkboxes( $Request->param('renderers', 'array', NULL) );
+	$edited_Item->renderer_checkboxes( param('renderers', 'array', NULL) );
 
 	$Form->end_fieldset();
 
@@ -346,6 +346,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.22  2006/08/20 22:25:22  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.21  2006/08/19 08:50:26  fplanque
  * moved out some more stuff from main
  *

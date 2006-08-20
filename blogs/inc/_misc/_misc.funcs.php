@@ -2048,12 +2048,12 @@ function header_nocache()
  */
 function header_redirect( $redirect_to = NULL )
 {
-	global $Hit, $baseurl, $Blog, $htsrv_url_sensitive, $Request;
+	global $Hit, $baseurl, $Blog, $htsrv_url_sensitive;
 	global $Session, $Debuglog;
 
 	if( empty($redirect_to) )
 	{ // see if there's a redirect_to request param given (where & is encoded as &amp;):
-		$redirect_to = str_replace('&amp;', '&', $Request->param( 'redirect_to', 'string', '' ));
+		$redirect_to = str_replace('&amp;', '&', param( 'redirect_to', 'string', '' ));
 
 		if( empty($redirect_to) )
 		{
@@ -2472,6 +2472,9 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 
 /*
  * $Log$
+ * Revision 1.105  2006/08/20 22:25:22  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.104  2006/08/20 17:17:53  fplanque
  * removed potential ambiguities in auto generated passwords
  *

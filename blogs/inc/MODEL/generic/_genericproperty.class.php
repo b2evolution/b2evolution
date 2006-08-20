@@ -84,11 +84,11 @@ class GenericProperty extends GenericElement
 	 */
 	function load_from_Request()
 	{
-		global $Request;
+
 
 		parent::load_from_Request();
 
-		$Request->param( $this->dbprefix.'ext_ID', 'string', '' );
+		param( $this->dbprefix.'ext_ID', 'string', '' );
 		$this->set_from_Request( 'ext_ID' );
 
 		return ! param_errors_detected();
@@ -167,7 +167,7 @@ class GenericProperty extends GenericElement
 	 */
 	function dbupdate( )
 	{
-		global $DB, $Request;
+		global $DB;
 
 		$DB->begin();
 
@@ -200,7 +200,7 @@ class GenericProperty extends GenericElement
 	 */
 	function dbinsert()
 	{
-		global $DB, $Request;
+		global $DB;
 
 		$DB->begin();
 

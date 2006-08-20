@@ -617,7 +617,7 @@ class Form extends Widget
 	 */
 	function date_input( $field_name, $field_value, $field_label, $field_params = array() )
 	{
-		global $month, $weekday_letter, $Request;
+		global $month, $weekday_letter;
 
 		if( empty($field_params['date_format']) )
 		{	// Use locale date format:
@@ -1315,8 +1315,6 @@ class Form extends Widget
 	 */
 	function checklist( $options, $field_name, $field_label, $required = false, $add_highlight_spans = false )
 	{
-		global $Request;
-
 		$field_params = array();
 		$field_params['type'] = 'checkbox';
 		$this->handle_common_params( $field_params, $field_name, $field_label );
@@ -1667,7 +1665,7 @@ class Form extends Widget
 	 */
 	function combo_box( $field_name, $field_value, $field_options, $field_label, $field_params = array() )
 	{
-		global $Request;
+
 
 		if( param_has_error( $field_name) )
 		{	// There is an error on the combo, so we need to set the combo input text class to 'field_error'
@@ -2475,7 +2473,7 @@ class Form extends Widget
 	/**
 	 * Extract common params out of $field_params into {@link $_common_params} and unsets them in $field_params.
 	 *
-	 * Also handles adding errors from {@link $Request} to the note.
+	 * Also handles adding errors to the note.
 	 *
 	 * @access protected
 	 * @param array An array passed to a field generating function like {@link text_input()}. By reference!
@@ -2483,7 +2481,7 @@ class Form extends Widget
 	 */
 	function handle_common_params( & $field_params, $field_name = NULL, $field_label = NULL )
 	{
-		global $Request;
+
 
 		#pre_dump( 'handle_common_params (before)', $field_params );
 
@@ -2617,6 +2615,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.33  2006/08/20 22:25:22  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.32  2006/08/20 20:12:33  fplanque
  * param_() refactoring part 1
  *

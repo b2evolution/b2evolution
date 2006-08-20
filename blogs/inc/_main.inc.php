@@ -286,11 +286,6 @@ if( empty($generating_static) )
  * Load Request class
  */
 require_once dirname(__FILE__).'/_misc/_request.class.php';
-/**
- * Debug message log for debugging only (initialized here)
- * @global Request $Request
- */
-$Request = & new Request( $Messages );
 
 
 if( !isset( $use_html_checker ) ) { $use_html_checker = 1; }
@@ -408,7 +403,7 @@ $Debuglog->add( 'login: '.var_export($login, true), 'login' );
 $Debuglog->add( 'pass: '.( empty($pass) ? '' : 'not' ).' empty', 'login' );
 
 // either 'login' (normal) or 'redirect_to_backoffice' may be set here. This also helps to display the login form again, if either login or pass were empty.
-$login_action = $Request->param_arrayindex( 'login_action' );
+$login_action = param_arrayindex( 'login_action' );
 
 $UserCache = & get_Cache( 'UserCache' );
 
@@ -495,7 +490,7 @@ unset($pass);
 if( ! empty($current_User)
 		&& ! $current_User->validated
 		&& $Settings->get('newusers_mustvalidate')
-		&& $Request->param('action', 'string', '') != 'logout' )
+		&& param('action', 'string', '') != 'logout' )
 {
 	if( $action != 'req_validatemail' && $action != 'validatemail' )
 	{ // we're not in that action already:
@@ -610,6 +605,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.48  2006/08/20 22:25:20  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.47  2006/08/20 13:47:24  fplanque
  * extracted param funcs from misc
  *

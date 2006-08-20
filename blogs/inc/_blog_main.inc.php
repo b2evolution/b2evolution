@@ -50,56 +50,55 @@ require_once $model_path.'items/_itemlist2.class.php';
 $Timer->start( '_blog_main.inc' );
 
 // Getting GET or POST parameters:
-$Request->param( 'blog', 'integer', 0, true );  // Can't use $default_to_blog because the param must always be included in regenerate_url() when present
-$Request->param( 'p', 'integer', '', true );              // Specific post number to display
-$Request->param( 'title', 'string', '', true );						// urtitle of post to display
-$Request->param( 'm', 'integer', '', true );              // YearMonth(Day) to display
-$Request->param( 'w', 'integer', -1, true );              // Week number
-$Request->param( 'dstart', 'integer', '', true );         // YearMonth(Day) to start at
-$Request->param( 'unit', 'string', '', true );            // list unit: 'posts' or 'days'
+param( 'blog', 'integer', 0, true );  // Can't use $default_to_blog because the param must always be included in regenerate_url() when present
+param( 'p', 'integer', '', true );              // Specific post number to display
+param( 'title', 'string', '', true );						// urtitle of post to display
+param( 'm', 'integer', '', true );              // YearMonth(Day) to display
+param( 'w', 'integer', -1, true );              // Week number
+param( 'dstart', 'integer', '', true );         // YearMonth(Day) to start at
+param( 'unit', 'string', '', true );            // list unit: 'posts' or 'days'
 
-$Request->param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', '', true ); // List of cats to restrict to
-$Request->param( 'catsel', 'array', array(), true );  // Array of cats to restrict to
+param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', '', true ); // List of cats to restrict to
+param( 'catsel', 'array', array(), true );  // Array of cats to restrict to
 foreach( $catsel as $k => $v )
 { // make sure this are all integers, to prevent SQL injection! TODO: use param( , 'array[integer]' )
 	$catsel[$k] = (int)$v;
 }
-$Request->set_param( 'catsel', $catsel );
 // Let's compile those values right away (we use them in several different places):
 $cat_array = array();
 $cat_modifier = '';
 compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, $blog == 1 ? 0 : $blog );
 
-$Request->param( 'author', '/^-?[0-9]+(,[0-9]+)*$/', '', true );         // List of authors to restrict to
+param( 'author', '/^-?[0-9]+(,[0-9]+)*$/', '', true );         // List of authors to restrict to
 
-$Request->param( 'order', 'string', 'DESC', true );       // ASC or DESC
-$Request->param( 'orderby', 'string', '', true );         // list of fields to order by
+param( 'order', 'string', 'DESC', true );       // ASC or DESC
+param( 'orderby', 'string', '', true );         // list of fields to order by
 
-$Request->param( 'posts', 'integer', 0, true );           // # of units to display on the page
-$Request->param( 'paged', 'integer', '', true );          // List page number in paged display
+param( 'posts', 'integer', 0, true );           // # of units to display on the page
+param( 'paged', 'integer', '', true );          // List page number in paged display
 
-$Request->param( 'poststart', 'integer', '', true );      // Start results at this position
-$Request->param( 'postend', 'integer', '', true );        // End results at this position
+param( 'poststart', 'integer', '', true );      // Start results at this position
+param( 'postend', 'integer', '', true );        // End results at this position
 
-$Request->param( 's', 'string', '', true );               // Search string
-$Request->param( 'sentence', 'string', 'AND', true );     // Search for sentence or for words
-$Request->param( 'exact', 'integer', '', true );          // Require exact match of title or contents
+param( 's', 'string', '', true );               // Search string
+param( 'sentence', 'string', 'AND', true );     // Search for sentence or for words
+param( 'exact', 'integer', '', true );          // Require exact match of title or contents
 
-$Request->param( 'preview', 'integer', 0, true );         // Is this preview ?
+param( 'preview', 'integer', 0, true );         // Is this preview ?
 
-$Request->param( 'calendar', 'string', '', true );        // Display a specific month in the calendar
+param( 'calendar', 'string', '', true );        // Display a specific month in the calendar
 
-$Request->param( 'page', 'integer', '', true );
-$Request->param( 'more', 'integer', 0, true );
+param( 'page', 'integer', '', true );
+param( 'more', 'integer', 0, true );
 
-$Request->param( 'c', 'string', '', true );
-$Request->param( 'tb', 'integer', 0, true );
-$Request->param( 'pb', 'integer', 0, true );
+param( 'c', 'string', '', true );
+param( 'tb', 'integer', 0, true );
+param( 'pb', 'integer', 0, true );
 
-$Request->param( 'disp', 'string', 'posts', true );
-$Request->param( 'stats', 'integer', 0 );                 // deprecated
+param( 'disp', 'string', 'posts', true );
+param( 'stats', 'integer', 0 );                 // deprecated
 
-$Request->param( 'tempskin', 'string', '', true );
+param( 'tempskin', 'string', '', true );
 
 
 if( !isset($timestamp_min) ) $timestamp_min = '';
@@ -378,11 +377,11 @@ if( !isset( $skin ) )
 	}
 	else
 	{ // Get the saved skin in cookie or default:
-		$Request->param( $cookie_state, 'string', $default_skin, false, true ); // override (in case there has been "param($cookie_state)" before, which set it already to '')
+		param( $cookie_state, 'string', $default_skin, false, true ); // override (in case there has been "param($cookie_state)" before, which set it already to '')
 		$Debuglog->add( 'Skin after looking at cookie: '.$$cookie_state, 'skin' );
 		// Get skin by params or default to cookie
 		// (if cookie was not set, the $$cookie_state contains default skin!)
-		$Request->param( 'skin', 'string', $$cookie_state );
+		param( 'skin', 'string', $$cookie_state );
 		$Debuglog->add( 'Skin after looking at params: '.$skin, 'skin' );
 	}
 }
@@ -394,7 +393,7 @@ $Timer->pause( '_blog_main.inc');
 // At this point $skin holds the name of the skin we want to use, or '' for no skin!
 
 // check to see if we want to display the popup or the main template
-$Request->param( 'template', 'string', 'main', true );
+param( 'template', 'string', 'main', true );
 
 if( !empty( $skin ) )
 { // We want to display now:
@@ -457,6 +456,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.32  2006/08/20 22:25:20  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.31  2006/08/20 20:12:32  fplanque
  * param_() refactoring part 1
  *

@@ -58,7 +58,7 @@ global $UserSettings;
 /**
  * @var Request
  */
-global $Request;
+
 /**
  * @var Plugins
  */
@@ -285,6 +285,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.22  2006/08/20 22:25:22  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.21  2006/08/20 20:12:33  fplanque
  * param_() refactoring part 1
  *
@@ -377,16 +380,5 @@ $this->disp_payload_end();
  * Revision 1.72  2005/11/24 00:45:39  blueyed
  * demo_mode: allow the user to edit his profile, if not admin or demouser. This should work in post-phoenix already.
  *
- * Revision 1.71  2005/11/04 14:10:48  blueyed
- * Use value from $Request for edited_user_admin_skin to display in the form (in case of errors with other fields)
- *
- * Revision 1.70  2005/11/02 00:42:30  blueyed
- * Added get_admin_skins() and use it to perform additional checks (if there's a _adminUI.class.php file in there). Thinkl "CVS".. :)
- *
- * Revision 1.69  2005/11/01 23:50:55  blueyed
- * UI to set the admin_skin for a user. If the user changes his own profile, we reload the page and save $Messages before, so he gets his "User updated" note.. :)
- *
- * Revision 1.68  2005/10/28 20:08:46  blueyed
- * Normalized AdminUI
  */
 ?>

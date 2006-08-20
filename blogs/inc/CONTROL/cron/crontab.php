@@ -81,19 +81,19 @@ switch( $action )
 
 		// TODO: Use Cronjob object
 
-		$cjob_type = $Request->param( 'cjob_type', 'string', true );
+		$cjob_type = param( 'cjob_type', 'string', true );
 		if( !isset( $cron_job_params[$cjob_type] ) )
 		{
 			param_error( 'cjob_type', T_('Invalid job type') );
 		}
-		$Request->param_date( 'cjob_date', T_('Please enter a valid date.'), true );
-		$Request->param_time( 'cjob_time' );
+		param_date( 'cjob_date', T_('Please enter a valid date.'), true );
+		param_time( 'cjob_time' );
 		$cjob_datetime = form_date( get_param( 'cjob_date' ), get_param( 'cjob_time' ) );
 
 		// duration -> end date (deadline)
-		$cjob_repeat_after_days = $Request->param( 'cjob_repeat_after_days', 'integer', 0 );
-		$cjob_repeat_after_hours = $Request->param( 'cjob_repeat_after_hours', 'integer', 0 );
-		$cjob_repeat_after_minutes = $Request->param( 'cjob_repeat_after_minutes', 'integer', 0 );
+		$cjob_repeat_after_days = param( 'cjob_repeat_after_days', 'integer', 0 );
+		$cjob_repeat_after_hours = param( 'cjob_repeat_after_hours', 'integer', 0 );
+		$cjob_repeat_after_minutes = param( 'cjob_repeat_after_minutes', 'integer', 0 );
 		$cjob_repeat_after = ( ( ($cjob_repeat_after_days*24) + $cjob_repeat_after_hours )*60 + $cjob_repeat_after_minutes)*60; // seconds
 		if( $cjob_repeat_after == 0 )
 		{
@@ -156,7 +156,7 @@ switch( $action )
 
 
 	case 'view':
-		$cjob_ID = $Request->param( 'cjob_ID', 'integer', true );
+		$cjob_ID = param( 'cjob_ID', 'integer', true );
 
 		$sql =  'SELECT *
 							 FROM T_cron__task LEFT JOIN T_cron__log ON ctsk_ID = clog_ctsk_ID

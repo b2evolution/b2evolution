@@ -47,7 +47,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 /*
  * Query antispam blacklist:
  */
-$keywords = $Request->param( 'keywords', 'string', '', true );
+$keywords = param( 'keywords', 'string', '', true );
 
 $where_clause = '';
 
@@ -77,7 +77,7 @@ $Results->title = T_('Banned keywords blacklist');
  */
 function filter_antispam( & $Form )
 {
-	global $Request;
+
 
 	$Form->text( 'keywords', get_param('keywords'), 20, T_('Keywords'), T_('Separate with space'), 50 );
 }
@@ -164,6 +164,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.4  2006/08/20 22:25:21  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.3  2006/08/20 20:12:33  fplanque
  * param_() refactoring part 1
  *

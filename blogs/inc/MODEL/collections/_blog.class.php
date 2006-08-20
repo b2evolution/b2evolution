@@ -196,21 +196,21 @@ class Blog extends DataObject
 	 */
 	function load_from_Request( $groups = array() )
 	{
-		global $Request, $Messages, $default_locale, $DB;
+		global $Messages, $default_locale, $DB;
 
-		if( $Request->param( 'blog_name', 'string', NULL ) !== NULL )
+		if( param( 'blog_name', 'string', NULL ) !== NULL )
 		{ // General params:
 			$this->set_from_Request( 'name' );
-			$this->set( 'shortname',     $Request->param( 'blog_shortname',     'string', true ) );
-			$this->set( 'locale',        $Request->param( 'blog_locale',        'string', $default_locale ) );
+			$this->set( 'shortname',     param( 'blog_shortname',     'string', true ) );
+			$this->set( 'locale',        param( 'blog_locale',        'string', $default_locale ) );
 		}
 
 
-		if( ($siteurl_type = $Request->param( 'blog_siteurl_type',   'string', NULL )) !== NULL )
+		if( ($siteurl_type = param( 'blog_siteurl_type',   'string', NULL )) !== NULL )
 		{ // Blog URL parameters:
 			// TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
-			$blog_siteurl_relative = $Request->param( 'blog_siteurl_relative', 'string', true );
-			$blog_siteurl_absolute = $Request->param( 'blog_siteurl_absolute', 'string', true );
+			$blog_siteurl_relative = param( 'blog_siteurl_relative', 'string', true );
+			$blog_siteurl_absolute = param( 'blog_siteurl_absolute', 'string', true );
 
 			if( $siteurl_type == 'absolute' )
 			{
@@ -234,16 +234,16 @@ class Blog extends DataObject
 
 
 			// Preferred access type:
-			$this->set( 'access_type',   $Request->param( 'blog_access_type',   'string', true ) );
-			$this->set( 'stub',          $Request->param( 'blog_stub',          'string', true ) );
+			$this->set( 'access_type',   param( 'blog_access_type',   'string', true ) );
+			$this->set( 'stub',          param( 'blog_stub',          'string', true ) );
 			if( $this->access_type == 'stub' )
 			{	// fp> If there is a case to leave this blank, comment this out and explain the case. Thanks.
 				// dh> I'm using it with "absolute URL" to have no "stub file" at all..
-				// $Request->param_check_not_empty( 'blog_stub', T_('You must provide a stub file name, e-g: a_stub.php') );
+				// param_check_not_empty( 'blog_stub', T_('You must provide a stub file name, e-g: a_stub.php') );
 			}
 
 			// check urlname
-			if( $Request->param_string_not_empty( 'blog_urlname', T_('You must provide an URL blog name!') ) )
+			if( param_string_not_empty( 'blog_urlname', T_('You must provide an URL blog name!') ) )
 			{
 				$this->set_from_Request( 'urlname' );
 
@@ -260,13 +260,13 @@ class Blog extends DataObject
 		}
 
 
-		if( $Request->param( 'blog_default_skin',  'string', NULL ) !== NULL )
+		if( param( 'blog_default_skin',  'string', NULL ) !== NULL )
 		{	// Default blog:
 			$this->set_from_Request( 'default_skin' );
 		}
 
 
-		if( $Request->param( 'blog_links_blog_ID',  'integer', -1 ) != -1 )
+		if( param( 'blog_links_blog_ID',  'integer', -1 ) != -1 )
 		{	// Default display options:
 			$this->set_from_Request( 'links_blog_ID' );
 
@@ -286,38 +286,38 @@ class Blog extends DataObject
    		$this->set_param( 'description', 'string', $this->shortdesc );
 		}
 
-		if( $Request->param( 'blog_keywords', 'string', NULL ) !== NULL )
+		if( param( 'blog_keywords', 'string', NULL ) !== NULL )
 		{	// Keywords:
 			$this->set_from_Request( 'keywords' );
 		}
 
-		if( $Request->param( 'blog_tagline',   'html', NULL ) !== NULL )
+		if( param( 'blog_tagline',   'html', NULL ) !== NULL )
 		{	// HTML tagline:
 			$this->set( 'tagline', format_to_post( get_param( 'blog_tagline' ), 0, 0 ) );
 		}
 
-		if( $Request->param( 'blog_longdesc',   'html', NULL ) !== NULL )
+		if( param( 'blog_longdesc',   'html', NULL ) !== NULL )
 		{	// HTML long description:
 			$this->set( 'longdesc', format_to_post( get_param( 'blog_longdesc' ), 0, 0 ) );
 		}
 
-		if( $Request->param( 'blog_notes',   'html', NULL ) !== NULL )
+		if( param( 'blog_notes',   'html', NULL ) !== NULL )
 		{	// HTML notes:
 			$this->set( 'notes', format_to_post( get_param( 'blog_notes' ), 0, 0 ) );
 		}
 
 
-		if( $Request->param( 'blog_staticfilename', 'string', NULL ) !== NULL )
+		if( param( 'blog_staticfilename', 'string', NULL ) !== NULL )
 		{	// Static file:
 			$this->set_from_Request( 'staticfilename' );
 		}
 
-		if( $Request->param( 'blog_media_location',  'string', NULL ) !== NULL )
+		if( param( 'blog_media_location',  'string', NULL ) !== NULL )
 		{	// Media files location:
 			$this->set_from_Request( 'media_location' );
-			$this->setMediaSubDir(    $Request->param( 'blog_media_subdir',    'string', '' ) );
-			$this->setMediaFullPath(  $Request->param( 'blog_media_fullpath',  'string', '' ) );
-			$this->setMediaUrl(       $Request->param( 'blog_media_url',       'string', '' ) );
+			$this->setMediaSubDir(    param( 'blog_media_subdir',    'string', '' ) );
+			$this->setMediaFullPath(  param( 'blog_media_fullpath',  'string', '' ) );
+			$this->setMediaUrl(       param( 'blog_media_url',       'string', '' ) );
 
 			// check params
 			switch( $this->get( 'media_location' ) )
@@ -345,17 +345,17 @@ class Blog extends DataObject
 
 		if( in_array( 'pings', $groups ) )
 		{ // we want to load the ping checkboxes:
-			$this->set( 'pingb2evonet',    $Request->param( 'blog_pingb2evonet',    'integer', 0 ) );
-			$this->set( 'pingtechnorati',  $Request->param( 'blog_pingtechnorati',  'integer', 0 ) );
-			$this->set( 'pingweblogs',     $Request->param( 'blog_pingweblogs',     'integer', 0 ) );
-			$this->set( 'pingblodotgs',    $Request->param( 'blog_pingblodotgs',    'integer', 0 ) );
+			$this->set( 'pingb2evonet',    param( 'blog_pingb2evonet',    'integer', 0 ) );
+			$this->set( 'pingtechnorati',  param( 'blog_pingtechnorati',  'integer', 0 ) );
+			$this->set( 'pingweblogs',     param( 'blog_pingweblogs',     'integer', 0 ) );
+			$this->set( 'pingblodotgs',    param( 'blog_pingblodotgs',    'integer', 0 ) );
 		}
 
-		if( $Request->param( 'blog_allowcomments',   'string', NULL ) !== NULL )
+		if( param( 'blog_allowcomments',   'string', NULL ) !== NULL )
 		{ // Feedback options:
 			$this->set_from_Request( 'allowcomments' );
-			$this->set_setting( 'new_feedback_status',  $Request->param( 'new_feedback_status', 'string', 'draft' ) );
-			$this->set( 'allowtrackbacks', $Request->param( 'blog_allowtrackbacks', 'integer', 0 ) );
+			$this->set_setting( 'new_feedback_status',  param( 'new_feedback_status', 'string', 'draft' ) );
+			$this->set( 'allowtrackbacks', param( 'blog_allowtrackbacks', 'integer', 0 ) );
 		}
 
 		return ! param_errors_detected();
@@ -1019,6 +1019,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2006/08/20 22:25:21  fplanque
+ * param_() refactoring part 2
+ *
  * Revision 1.15  2006/08/20 20:12:32  fplanque
  * param_() refactoring part 1
  *
