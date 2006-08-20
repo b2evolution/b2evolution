@@ -428,7 +428,7 @@ class auto_p_plugin extends Plugin
 	 *
 	 * @return array array( $text, $has_p )
 	 */
-	function handle_pre_blocks_helper( $block, $in_tag, $wrap_in_p )
+	function handle_pre_blocks_helper( $block, $in_tag, $wrap_in_p, $ignore_NL = true )
 	{
 		#pre_dump( 'HANDLE_PRE_BLOCKS_HELPER begin', $block, $in_tag );
 		$has_p = NULL;
@@ -443,15 +443,18 @@ class auto_p_plugin extends Plugin
 		// Remove newlines at start and end (will get re-applied later):
 		$NL_start = '';
 		$NL_end = '';
-		while( $block{0} == "\n" )
+		if( $ignore_NL )
 		{
-			$NL_start .= $block{0};
-			$block = substr($block, 1);
-		}
-		while( substr($block, -1) == "\n" )
-		{
-			$NL_end .= substr($block, -1);
-			$block = substr($block, 0, -1);
+			while( $block{0} == "\n" )
+			{
+				$NL_start .= $block{0};
+				$block = substr($block, 1);
+			}
+			while( substr($block, -1) == "\n" )
+			{
+				$NL_end .= substr($block, -1);
+				$block = substr($block, 0, -1);
+			}
 		}
 
 		if( preg_match( '~^(.*?)(<\s*(\w+)(\s+[^>]*)?>)~is', $block, $match ) )
@@ -484,7 +487,7 @@ class auto_p_plugin extends Plugin
 			{
 				#echo '<h1>RECURSE: text_after_tag (handle_pre_blocks)</h1>';
 				// Recurse (same level):
-				list( $text_after_tag, $sub_has_p ) = $this->handle_pre_blocks_helper( $text_after_tag, $in_tag, false );
+				list( $text_after_tag, $sub_has_p ) = $this->handle_pre_blocks_helper( $text_after_tag, $in_tag, false, false );
 				$r .= $text_after_tag;
 			}
 		}
@@ -545,7 +548,7 @@ class auto_p_plugin extends Plugin
 		while( 1 )
 		{
 			#echo '<hr />loop_text:'; pre_dump( $loop_text );
-			if( preg_match( '~^(.*?)(<\s*(/)?\s*'.$tag.'\s*(/\s*)?>\n?)~is', $loop_text, $after_match ) )
+			if( preg_match( '~^(.*?)(<\s*(/)?\s*'.$tag.'\s*(/\s*)?>)~is', $loop_text, $after_match ) )
 			{
 				#pre_dump( 'after_match', $after_match );
 				$text_in_tag .= $after_match[1];
@@ -603,6 +606,7 @@ class auto_p_plugin extends Plugin
 		$text_after_tag = substr( $text_after_tag, strlen($NL_before.$text_in_tag.$NL_after)+strlen($closing_tag) );
 		$r = array( $text_in_tag, $closing_tag, $NL_before, $NL_after );
 
+		#pre_dump( 'return: ', $r, $text_after_tag );
 		return $r;
 	}
 
@@ -628,6 +632,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.26  2006/08/20 23:37:46  blueyed
+ * Fix: there were no <br /> after inline tags
+ *
  * Revision 1.25  2006/08/20 22:41:36  blueyed
  * Fixed Auto-P: "the web is not a type-writer". Split blocks by two or more newlines and do not pee <br/> everywhere.
  *
