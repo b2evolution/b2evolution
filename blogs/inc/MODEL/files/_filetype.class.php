@@ -118,7 +118,7 @@ class Filetype extends DataObject
 		// Icon for the mime type
 		if( $Request->param( 'ftyp_icon', 'string', '' ) )
 		{
-			$Request->param_isFilename( 'ftyp_icon', T_('Please enter a file name.') );
+			$Request->param_check_filename( 'ftyp_icon', T_('Please enter a file name.') );
 		}
 		$this->set_from_Request( 'icon' );
 				

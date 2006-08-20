@@ -117,19 +117,6 @@ class Request
 	}
 
 
-	/**
-	 * Sets several similar parameters at once.
-	 *
-	 * @param array
-	 */
-	function params( $vars, $type = '', $default = '', $memorize = false, $override = false, $forceset = true )
-	{
-		foreach( $vars as $var )
-		{
-			$this->param( $var, $type, $default, $memorize, $override, $forceset );
-		}
-	}
-
 
 	/**
 	 * Set the value of a param (by force! :P)
@@ -237,7 +224,8 @@ class Request
 
 
 	/**
-	 * Sets a time parameter with the value from the request of the var argument or of the concat of the var argument_h: var argument_mn: var argument_s ,
+	 * Sets a time parameter with the value from the request of the var argument 
+	 * or of the concat of the var argument_h: var argument_mn: var argument_s ,
 	 * except if param is already set!
 	 *
 	 * @param string Variable to set
@@ -1018,6 +1006,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.21  2006/08/20 18:58:32  fplanque
+ * made param_() equivs for Request class
+ *
  * Revision 1.20  2006/08/18 00:40:35  fplanque
  * Half way through a clean blog management - too tired to continue
  * Should be working.

@@ -74,7 +74,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function param( $var, $type = '', $default = '', $memorize = false,
 								$override = false, $use_default = true, $strict_typing = 'allow_empty' )
 {
-	global $global_param_list, $Debuglog, $debug, $evo_charset, $io_charset;
+	global $Debuglog, $debug, $evo_charset, $io_charset;
 	// NOTE: we use $GLOBALS[$var] instead of $$var, because otherwise it would conflict with param names which are used as function params ("var", "type", "default", ..)!
 
 	/*
@@ -246,7 +246,781 @@ function param( $var, $type = '', $default = '', $memorize = false,
 
 
 /**
- * Memorize a parameter for automatic future use in regenerate_url()
+ * Get the param from an array param's first index instead of the value.
+ *
+ * E.g., for "param[value]" as a submit button you can get the value with
+ *       <code>Request::param_arrayindex( 'param' )</code>.
+ *
+ * @see param_action()
+ * @param string Param name
+ * @param mixed Default to use
+ * @return string
+ */
+function param_arrayindex( $param_name, $default = '' )
+{
+	$array = array_keys( param( $param_name, 'array', array() ) );
+	$value = array_pop( $array );
+	if( is_string($value) )
+	{
+		$value = substr( strip_tags($value), 0, 50 );  // sanitize it
+	}
+	elseif( !empty($value) )
+	{ // this is probably a numeric index from '<input name="array[]" .. />'
+		debug_die( 'Invalid array param!' );
+	}
+	else
+	{
+		$value = $default;
+	}
+
+	return $value;
+}
+
+
+/**
+ * Get the action from params.
+ *
+ * If we got no "action" param, we'll check for an "actionArray" param
+ * ( <input type="submit" name="actionArray[real_action]" ...> ).
+ * And the real $action will be found in the first key...
+ * When there are multiple submit buttons, this is smarter than checking the value which is a translated string.
+ * When there is an image button, this allows to work around IE not sending the value (it only sends X & Y coords of the click).
+ *
+ * @param mixed Default to use.
+ * @return string
+ */
+function param_action( $default = '', $memorize = false )
+{
+	$action = param( 'action', 'string', NULL, $memorize );
+
+	if( is_null($action) )
+	{ // Check $actionArray
+		$action = param_arrayindex( 'actionArray', $default );
+
+		set_param( 'action', $action ); // always set "action"
+	}
+
+	return $action;
+}
+
+
+/**
+ * @param string param name
+ * @param string error message
+ * @param string|NULL error message for form field ($err_msg gets used if === NULL).
+ * @return boolean true if OK
+ */
+function param_string_not_empty( $var, $err_msg, $field_err_msg = NULL )
+{
+	param( $var, 'string', true );
+	return param_check_not_empty( $var, $err_msg, $field_err_msg );
+}
+
+
+/**
+ * @param string param name
+ * @param string error message
+ * @param string|NULL error message for form field ($err_msg gets used if === NULL).
+ * @return boolean true if OK
+ */
+function param_check_not_empty( $var, $err_msg, $field_err_msg = NULL )
+{
+	if( empty( $GLOBALS[$var] ) )
+	{
+		param_error( $var, $err_msg, $field_err_msg );
+		return false;
+	}
+	return true;
+}
+
+
+/**
+ * Checks if the param is a decimal number (no float, e.g. 3.14).
+ *
+ * @param string param name
+ * @param string error message
+ * @return boolean true if OK
+ */
+function param_check_number( $var, $err_msg, $required = false )
+{
+	if( empty( $GLOBALS[$var] ) && ! $required )
+	{ // empty is OK:
+		return true;
+	}
+
+	if( ! preg_match( '#^[0-9]+$#', $GLOBALS[$var] ) )
+	{
+		param_error( $var, $err_msg );
+		return false;
+	}
+	return true;
+}
+
+
+/**
+ * Gets a param and makes sure it's a decimal number (no float, e.g. 3.14) in a given range.
+ *
+ * @param string param name
+ * @param integer min value
+ * @param integer max value
+ * @param string error message
+ * @return boolean true if OK
+ */
+function param_integer_range( $var, $min, $max, $err_msg, $required = true )
+{
+	param( $var, 'integer', $required ? true : '' );
+	return param_check_range( $var, $min, $max, $err_msg, $required );
+}
+
+
+/**
+ * Checks if the param is a decimal number (no float, e.g. 3.14) in a given range.
+ *
+ * @param string param name
+ * @param integer min value
+ * @param integer max value
+ * @param string error message
+ * @return boolean true if OK
+ */
+function param_check_range( $var, $min, $max, $err_msg, $required = true )
+{
+	if( empty( $GLOBALS[$var] ) && ! $required )
+	{ // empty is OK:
+		return true;
+	}
+
+	if( ! preg_match( '~^[-+]?\d+$~', $GLOBALS[$var] ) || $GLOBALS[$var] < $min || $GLOBALS[$var] > $max )
+	{
+		param_error( $var, sprintf( $err_msg, $min, $max ) );
+		return false;
+	}
+	return true;
+}
+
+
+/**
+ * @param string param name
+ * @return boolean true if OK
+ */
+function param_check_email( $var, $required = false )
+{
+	if( empty( $GLOBALS[$var] ) && ! $required )
+	{ // empty is OK:
+		return true;
+	}
+
+	if( !is_email( $GLOBALS[$var] ) )
+	{
+		$this->param_error( $var, T_('The email address is invalid.') );
+		return false;
+	}
+	return true;
+}
+
+
+/**
+ * @param string param name
+ * @param string error message
+ * @return boolean true if OK
+ */
+function param_check_url( $var, & $uri_scheme )
+{
+	if( $error_detail = validate_url( $GLOBALS[$var], $uri_scheme ) )
+	{
+		$param_error( $var, sprintf( T_('Supplied URL is invalid. (%s)'), $error_detail ) );
+		return false;
+	}
+	return true;
+}
+
+
+/**
+ * Check if the value is a file name
+ *
+ * @param string param name
+ * @param string error message
+ * @return boolean true if OK
+ */
+function param_check_filename( $var, $err_msg )
+{
+	if( $error_filename = validate_filename( $GLOBALS[$var] ) )
+	{
+		$this->param_error( $var, $error_filename );
+		return false;
+	}
+	return true;
+}
+
+
+/**
+ * Check if the value of a param is a regular expression (syntax).
+ *
+ * @param string param name
+ * @param string error message
+ * @param string|NULL error message for form field ($err_msg gets used if === NULL).
+ * @return boolean true if OK
+ */
+function param_check_regexp( $var, $err_msg, $field_err_msg = NULL )
+{
+	if( ! is_regexp( $GLOBALS[$var] ) )
+	{
+		param_error( $var, $field_err_msg );
+		return false;
+	}
+	return true;
+}
+
+
+/**
+ * Sets a date parameter by converting locale date (if valid) to ISO date.
+ *
+ * If the date is not valid, it is set to the param unchanged (unconverted).
+ */
+function param_date( $var, $err_msg, $required, $default = '' )
+{
+	param( $var, 'string', $default );
+
+	$iso_date = param_check_date( $var, $err_msg, $required );
+
+	if( $iso_date )
+	{
+		set_param( $var, $iso_date );
+	}
+
+	return $GLOBALS[$var];
+}
+
+
+/**
+ * Check if param is an ISO date
+ *
+ * @param string param name
+ * @param string error message
+ * @param boolean Is a non-empty date required?
+ * @param string date format (php format)
+ * @return boolean|string false if not OK, ISO date if OK
+ */
+function param_check_date( $var, $err_msg, $required = false, $date_format = NULL )
+{
+	if( empty( $GLOBALS[$var] ) )
+	{ // empty is OK if not required:
+		if( $required )
+		{
+			$this->param_error( $var, $err_msg );
+			return false;
+		}
+		return '';
+	}
+
+	if( empty( $date_format ) )
+	{	// Use locale date format:
+		$date_format = locale_datefmt();
+	}
+
+	// Convert PHP date format to regexp pattern:
+	// WARNING: this is very incomplete!! Please expand as needed.
+	$date_regexp = '¤^'.preg_replace(
+		array( '/\\./', '/d/', '/m/', '/y/', '/Y/' ),
+		array( '\\.', '(\\d\\d)', '(\\d\\d)', '(\\d\\d)', '(\\d\\d\\d\\d)' ),
+		$date_format ).'$¤';
+	// echo $date_format.'...'.$date_regexp;
+
+	// Check that the numbers match the date pattern:
+	if( preg_match( $date_regexp, $GLOBALS[$var], $numbers ) )
+	{	// Date does match pattern:
+		//pre_dump( $numbers );
+
+		// Get all date pattern parts. We should get 3 parts!:
+		preg_match_all( '/[A-Za-z]/', $date_format, $parts );
+		//pre_dump( $parts );
+
+		foreach( $parts[0] as $position => $part )
+		{
+			switch( $part )
+			{
+				case 'd':
+					$day = $numbers[$position+1];
+					break;
+
+				case 'm':
+					$month = $numbers[$position+1];
+					break;
+
+				case 'y':
+				case 'Y':
+					$year = $numbers[$position+1];
+					if( $year < 50 )
+					{
+						$year = 2000 + $year;
+					}
+					elseif( $year < 100 )
+					{
+						$year = 1900 + $year;
+					}
+					break;
+			}
+		}
+
+		if( checkdate( $month, $day, $year ) )
+		{ // all clean! :)
+
+			// We convert the value to ISO:
+			$iso_date = substr( '0'.$year, -4 ).'-'.substr( '0'.$month, -2 ).'-'.substr( '0'.$day, -2 );
+
+			return $iso_date;
+		}
+	}
+
+	// Date did not pass all tests:
+
+	param_error( $var, $err_msg );
+
+	return false;
+}
+
+
+/**
+ * Sets a date parameter with values from the request or to provided default,
+ * And check we have a compact date (numbers only) ( used for URL filtering )
+ *
+ * @param string Variable to set
+ * @param mixed Default value or TRUE if user input required
+ * @param boolean memorize ( see {@link param()} )
+ * @param string error message
+ * @param boolean 'required': Is non-empty date required? Default: true.
+ *
+ * @return string the compact date value ( yyyymmdd )
+ */
+function param_compact_date( $var, $default = '', $memorize = false, $err_msg, $required = false )
+{
+	global $$var;
+
+	param( $var, 'string', $default, $memorize );
+
+	if( preg_match( '#^[0-9]{4,}$#', $$var ) )
+	{	// Valid compact date, all good.
+		return $$var;
+	}
+
+	// We do not have a compact date, try normal date matching:
+	$iso_date = $this->param_check_date( $var, $err_msg, $required );
+
+	if( $iso_date )
+	{
+		$this->set_param( $var, compact_date( $iso_date ) );
+		return $this->params[$var];
+	}
+
+	// Nothing valid found....
+	return '';
+}
+
+
+/**
+ * Sets a time parameter with the value from the request of the var argument 
+ * or of the concat of the var argument_h: var argument_mn: var argument_s ,
+ * except if param is already set!
+ *
+ * @param string Variable to set
+ * @param mixed Default value or TRUE if user input required
+ * @param boolean Do we need to memorize this to regenerate the URL for this page?
+ * @param boolean Override if variable already set
+ * @param boolean Force setting of variable to default?
+ * @return mixed Final value of Variable, or false if we don't force setting and did not set
+ */
+function param_time( $var, $default = '', $memorize = false,	$override = false, $forceset = true )
+{
+	global $$var;
+
+	$got_time = false;
+
+	if( param( $var, 'string', $default, $memorize, $override, $forceset ) )
+	{ // Got a time from text field:
+		if( preg_match( '¤^(\d\d):(\d\d)(:(\d\d))?$¤', $$var, $matches ) )
+		{
+			$time_h = $matches[1];
+			$time_mn = $matches[2];
+			$time_s = empty( $matches[4] ) ? 0 : $matches[4];
+			$got_time = true;
+		}
+	}
+	elseif( ( $time_h = param( $var.'_h', 'integer', -1 ) ) != -1
+				&& ( $time_mn = param( $var.'_mn', 'integer', -1 ) ) != -1 )
+	{	// Got a time from selects:
+		$time_s = param( $var.'_s', 'integer', 0 );
+		$$var = substr('0'.$time_h,-2).':'.substr('0'.$time_mn,-2).':'.substr('0'.$time_s,-2);
+		$got_time = true;
+	}
+
+	if( $got_time )
+	{ // We got a time...
+		// Check if ranges are correct:
+		if( $time_h >= 0 && $time_h <= 23
+			&& $time_mn >= 0 && $time_mn <= 59
+			&& $time_s >= 0 && $time_s <= 59 )
+		{
+			// Time is correct
+			return $$var;
+		}
+	}
+
+	param_error( $var, T_('Please enter a valid time.') );
+
+	return false;
+}
+
+
+/**
+ * Extend a LIST parameter with an ARRAY param.
+ *
+ * Will be used for author/authorsel[], etc.
+ * Note: cannot be used for catsel[], because catsel is NON-recursive.
+ * @see param_compile_cat_array()
+ *
+ * @param string Variable to extend
+ * @param string Name of array Variable to use as an extension
+ * @param boolean Save non numeric prefix?  ( 1 char -- can be used as a modifier, e-g: - + * )
+ */
+function param_extend_list( $var, $var_ext_array, $save_prefix = true )
+{
+	// Make sure original var exists:
+	if( !isset($GLOBALS[$var]) )
+	{
+		debug_die( 'Cannot extend non existing param : '.$var );
+	}
+	$original_val = $GLOBALS[$var];
+
+	// Get extension array:
+	$ext_values_array = param( $var_ext_array, 'array', array(), false );
+	if( empty($ext_values_array) )
+	{	// No extension required:
+		return $original_val;
+	}
+
+	// Handle prefix:
+	$prefix = '';
+	if( $save_prefix )
+	{	// We might want to save a prefix:
+		$prefix = substr( $original_val, 0, 1 );
+		if( is_numeric( $prefix ) )
+		{	// The prefix is numeric, so it's NOT a prefix
+			$prefix = '';
+		}
+		else
+		{	// We save the prefix, we must crop if off from the values:
+			$original_val = substr( $original_val, 1 );
+		}
+	}
+
+	// Merge values:
+	if( empty($original_val) )
+	{
+		$original_values_array = array();
+	}
+	else
+	{
+		$original_values_array = explode( ',', $original_val );
+	}
+	$new_values = array_merge( $original_values_array, $ext_values_array );
+	$new_values = array_unique( $new_values );
+	$GLOBALS[$var] = $prefix.implode( ',', $new_values );
+
+
+	return $GLOBALS[$var];
+}
+
+
+/**
+ * Compiles the cat array from $cat (recursive + optional modifiers) and $catsel[] (non recursive)
+ * and keeps those values available for future reference
+ */
+function param_compile_cat_array( $restrict_to_blog = 0, $cat_default = NULL, $catsel_default = array() )
+{
+	// For now, we'll also need those as globals!
+	global $cat_array, $cat_modifier;
+
+	$cat = param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', $cat_default, true ); // List of cats to restrict to
+	$catsel = param( 'catsel', 'array', $catsel_default, true );  // Array of cats to restrict to
+
+	$cat_array = array();
+	$cat_modifier = '';
+
+	compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, $restrict_to_blog );
+}
+
+
+/**
+ * @param array of param names
+ * @param string error message
+ * @param string|NULL error message for form field ($err_msg gets used if === NULL).
+ * @return boolean true if OK
+ */
+function params_check_at_least_one( $vars, $err_msg, $field_err_msg = NULL )
+{
+	foreach( $vars as $var )
+	{
+		if( !empty( $GLOBALS[$var] ) )
+		{ // Okay, we got at least one:
+			return true;
+		}
+	}
+
+	// Error!
+	param_error_multiple( $vars, $err_msg, $field_err_msg );
+	return false;
+}
+
+
+/**
+ * Sets a combo parameter with values from the request,
+ * => the value of the select option and the input text value if new is selected
+ * Display an error if the new value is selected that the input text has a value
+ *
+ * @param string Variable to set
+ * @param mixed Default value or TRUE if user input required
+ * @param boolean true: allows to select new without entring a value in the input combo text
+ * @param string error message
+ *
+ * @return string position status ID or 'new' or '' if new is seleted but not input text value
+ *
+ */
+function param_combo( $var, $default, $allow_none, $err_msg = ''  )
+{
+	param( $var, 'string', $default );
+
+	if( $GLOBALS[$var] == 'new' )
+	{	// The new option is selected in the combo select, so we need to check if we have a value in the combo input text:
+		$GLOBALS[$var.'_combo'] = param( $var.'_combo', 'string' );
+
+		if( empty( $GLOBALS[$var.'_combo'] ) )
+		{ // We have no value in the combo input text
+
+			// Set request param to null
+			$GLOBALS[$var] = NULL;
+
+			if( !$allow_none )
+			{ // it's not allowed, so display error:
+				param_error( $var, $err_msg );
+			}
+		}
+	}
+
+	return $GLOBALS[$var];
+}
+
+
+/**
+ * set a parameter with the second part(X2) of the value from request ( X1-X2 )
+ *
+ * @param string Variable to set
+ *
+ */
+function param_child_select_value( $var )
+{
+	global $$var;
+
+	if( $val = param( $var, 'string' ) )
+	{ // keep only the second part of val
+		preg_match( '/^[0-9]+-([0-9]+)$/', $val, $res );
+
+		if( isset( $res[1] ) )
+		{ //set to the var the second part of val
+			$$var = $res[1];
+			return $$var;
+		}
+	}
+	return '';
+}
+
+
+/**
+ * @param string param name
+ * @return boolean true if OK
+ */
+function param_check_phone( $var, $required = false )
+{
+	global $$var;
+
+	if( empty( $$var ) && ! $required )
+	{ // empty is OK:
+		return true;
+	}
+
+	if( ! preg_match( '|^\+?[\-*#/(). 0-9]+$|', $$var ) )
+	{
+		param_error( $var, T_('The phone number is invalid.') );
+		return false;
+	}
+	else
+	{ // Keep only 0123456789+ caracters
+		$$var = preg_replace( '#[^0-9+]#', '', $$var );
+	}
+	return true;
+}
+
+
+/**
+ * @param string param name
+ * @param string param name
+ * @param boolean Is a password required? (non-empty)
+ * @return boolean true if OK
+ */
+function param_check_passwords( $var1, $var2, $required = false )
+{
+	global $Settings;
+
+	$pass1 = $GLOBALS[$var1];
+	$pass2 = $GLOBALS[$var2];
+
+	if( empty($pass1) && empty($pass2) && ! $required )
+	{ // empty is OK:
+		return true;
+	}
+
+	if( empty($pass1) )
+	{
+		param_error( $var1, T_('Please enter your password twice.') );
+		return false;
+	}
+	if( empty($pass2) )
+	{
+		param_error( $var2, T_('Please enter your password twice.') );
+		return false;
+	}
+
+	// checking the password has been typed twice the same:
+	if( $pass1 != $pass2 )
+	{
+		param_error_multiple( array( $var1, $var2), T_('You typed two different passwords.') );
+		return false;
+	}
+
+	if( strlen($pass1) < $Settings->get('user_minpwdlen') )
+	{
+		param_error_multiple( array( $var1, $var2), sprintf( T_('The minimum password length is %d characters.'), $Settings->get('user_minpwdlen') ) );
+		return false;
+	}
+
+	return true;
+}
+
+
+/**
+ * Check if there have been validation errors
+ *
+ * We play it safe here and check for all kind of errors, not just those from this particlar class.
+ *
+ * @return integer
+ */
+function validation_errors()
+{
+	global $Messages;
+
+	return $Messages->count('error');
+}
+
+
+/**
+ * Add an error for a variable, either to the Form's field and/or the global {@link $Messages} object.
+ *
+ * @param string param name
+ * @param string|NULL error message (by using NULL you can only add an error to the field, but not the $Message object)
+ * @param string|NULL error message for form field ($err_msg gets used if === NULL).
+ */
+function param_error( $var, $err_msg, $field_err_msg = NULL )
+{
+	global $param_input_err_messages;
+
+	if( ! isset( $param_input_err_messages[$var] ) )
+	{ // We haven't already recorded an error for this field:
+		if( $field_err_msg === NULL )
+		{
+			$field_err_msg = $err_msg;
+		}
+		$param_input_err_messages[$var] = $field_err_msg;
+
+		if( isset($err_msg) )
+		{
+			param_add_message_to_Log( $var, $err_msg, 'error' );
+		}
+	}
+}
+
+
+/**
+ * Add an error for multiple variables, either to the Form's field and/or the global {@link $Messages} object.
+ *
+ * @param array of param names
+ * @param string|NULL error message (by using NULL you can only add an error to the field, but not the $Message object)
+ * @param string|NULL error message for form fields ($err_msg gets used if === NULL).
+ */
+function param_error_multiple( $vars, $err_msg, $field_err_msg = NULL )
+{
+	global $param_input_err_messages;
+
+	if( $field_err_msg === NULL )
+	{
+		$field_err_msg = $err_msg;
+	}
+
+	foreach( $vars as $var )
+	{
+		if( ! isset( $param_input_err_messages[$var] ) )
+		{ // We haven't already recorded an error for this field:
+			$param_input_err_messages[$var] = $field_err_msg;
+		}
+	}
+
+	if( isset($err_msg) )
+	{
+		param_add_message_to_Log( $var, $err_msg, 'error' );
+	}
+}
+
+
+/**
+ * This function is used by {@link param_error()} and {@link param_error_multiple()}.
+ *
+ * If {@link $link_log_messages_to_field_IDs} is true, it will link those parts of the
+ * error message that are not already links, to the html IDs of the fields with errors.
+ *
+ * @param string param name
+ * @param string error message
+ */
+function param_add_message_to_Log( $var, $err_msg, $log_category = 'error' )
+{
+	global $link_param_err_messages_to_field_IDs;
+	global $Messages;
+
+	if( !empty($link_param_err_messages_to_field_IDs) )
+	{
+		$var_id = Form::get_valid_id($var);
+		$start_link = '<a href="#'.$var_id.'" onclick="var form_elem = document.getElementById(\''.$var_id.'\'); if( form_elem ) { form_elem.select(); }">';
+
+		if( strpos( $err_msg, '<a' ) !== false )
+		{ // there is at least one link in $err_msg, link those parts that are no links
+			$err_msg = preg_replace( '~(\s*)(<a\s+[^>]+>[^<]*</a>\s*)~i', '</a>$1&raquo;$2'.$start_link, $err_msg );
+		}
+
+		if( substr($err_msg, 0, 4) == '</a>' )
+		{ // There was a link at the beginning of $err_msg: we do not prepend an emtpy link before it
+			$Messages->add( substr( $err_msg, 4 ).'</a>', $log_category );
+		}
+		else
+		{
+			$Messages->add( $start_link.$err_msg.'</a>', $log_category );
+		}
+	}
+	else
+	{
+		$Messages->add( $err_msg, $log_category );
+	}
+}
+
+
+
+/**
+ * Set a param (global) & Memorize it for automatic future use in regenerate_url()
  *
  * @param string Variable to memorize
  * @param string Type of the variable
@@ -275,23 +1049,6 @@ function memorize_param( $var, $type, $default, $value = NULL )
 
 
 /**
- * Set the value of a param (by force! :P)
- */
-function set_param( $var, $value )
-{
-	global $$var;
-	$$var = $value;
-}
-
-
-
-function get_param()
-{
-	
-}
-
-
-/**
  * Forget a param so that is will not get included in subsequent {@link regenerate_url()} calls.
  */
 function forget_param( $var )
@@ -304,6 +1061,32 @@ function forget_param( $var )
 
 }
 
+/**
+ * Set the value of a param (by force! :P)
+ * 
+ * Same as setting a global, except you don't need a global declaration in your function.
+ */
+function set_param( $var, $value )
+{
+	$GLOBALS[$var] = $value;
+}
+
+
+
+/**
+ * Get the value of a param.
+ *
+ * @return NULL|mixed The value of the param, if set. NULL otherwise.
+ */
+function get_param()
+{
+	if( ! isset($GLOBALS[$var]) )
+	{
+		return NULL;	
+	}
+	
+	return $GLOBALS[$var];
+}
 
 
 /**
@@ -698,6 +1481,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.2  2006/08/20 18:58:32  fplanque
+ * made param_() equivs for Request class
+ *
  * Revision 1.1  2006/08/20 13:47:25  fplanque
  * extracted param funcs from misc
  *
