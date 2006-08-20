@@ -399,6 +399,8 @@ echo '</div>';
 // Permission note:
 // fp> WHAT??? can you give a permission when the global setting id OFF ????
 // why is it talk about GROUPs when we are in the user perms tab?
+// dh> "user group" is different from "blog-user"!
+//     And yes, the columns for perms are always here, regardless of the user group setting.
 echo '<p class="note center">'.T_('User group permissions override the media file permissions here!').'</p>';
 
 $Form->end_fieldset();
@@ -418,6 +420,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.7  2006/08/20 21:17:06  blueyed
+ * doc
+ *
  * Revision 1.6  2006/08/20 20:12:33  fplanque
  * param_() refactoring part 1
  *
