@@ -724,6 +724,7 @@ function locale_updateDB()
 	$lnr = 0;
 	foreach( $_POST as $pkey => $pval ) if( preg_match('/loc_(\d+)_(.*)/', $pkey, $matches) )
 	{
+		$pval = param( $pkey, 'string', '' );
 		$lfield = $matches[2];
 
 		if( $matches[1] != $lnr )
@@ -740,8 +741,7 @@ function locale_updateDB()
 			{ // startofweek must be between 0 and 6
 				continue;
 			}
-			// fp>dh TODO: please do not use remove_magic_quotes() outside of _param.funcs
-			$templocales[ $plocale ][$lfield] = remove_magic_quotes( $pval );
+			$templocales[ $plocale ][$lfield] = $pval;
 		}
 	}
 
@@ -893,6 +893,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.19  2006/08/20 19:30:20  blueyed
+ * Use param() instead of remove_magic_quotes()
+ *
  * Revision 1.18  2006/08/20 19:29:34  blueyed
  * Fix: quote DB values when inserting/editing locales
  *
