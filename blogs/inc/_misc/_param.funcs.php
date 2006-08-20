@@ -1,7 +1,7 @@
 <?php
 /**
  * This file implements parameter handling functions.
- * 
+ *
  * This inlcudes:
  * - sanity checking of inputs
  * - removing PHP's stupid "magic" quotes
@@ -617,7 +617,7 @@ function param_compact_date( $var, $default = '', $memorize = false, $err_msg, $
 
 
 /**
- * Sets a time parameter with the value from the request of the var argument 
+ * Sets a time parameter with the value from the request of the var argument
  * or of the concat of the var argument_h: var argument_mn: var argument_s ,
  * except if param is already set!
  *
@@ -1063,7 +1063,7 @@ function forget_param( $var )
 
 /**
  * Set the value of a param (by force! :P)
- * 
+ *
  * Same as setting a global, except you don't need a global declaration in your function.
  */
 function set_param( $var, $value )
@@ -1082,9 +1082,9 @@ function get_param()
 {
 	if( ! isset($GLOBALS[$var]) )
 	{
-		return NULL;	
+		return NULL;
 	}
-	
+
 	return $GLOBALS[$var];
 }
 
@@ -1448,6 +1448,15 @@ if( ini_get('magic_quotes_sybase') ) // overrides "magic_quotes_gpc" and only re
 }
 elseif( ini_get('magic_quotes_gpc') )
 { // That stupid PHP behaviour consisting of adding slashes everywhere is unfortunately on
+	/**
+	 * Remove quotes from input.
+	 * This handles magic_quotes_gpc and magic_quotes_sybase PHP settings/variants.
+	 *
+	 * NOTE: you should not use it directly, but one of the param-functions or get_cookie()!
+	 *
+	 * @param mixed Value
+	 * @return mixed Value, with magic quotes removed
+	 */
 	function remove_magic_quotes( $mixed )
 	{
 		if( is_array( $mixed ) )
@@ -1481,6 +1490,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.3  2006/08/20 19:44:05  blueyed
+ * doc
+ *
  * Revision 1.2  2006/08/20 18:58:32  fplanque
  * made param_() equivs for Request class
  *
