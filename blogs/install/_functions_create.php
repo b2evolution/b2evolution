@@ -670,7 +670,7 @@ function populate_main_tables()
 	$User_Admin->set( 'login', 'admin' );
 	if( !isset( $install_password ) )
 	{
-		$random_password = generate_random_key();
+		$random_password = generate_random_key( NULL, false ); // no ambiguous chars
 	}
 	else
 	{
@@ -1006,6 +1006,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.196  2006/08/20 23:16:02  blueyed
+ * generate_random_key(): use param to not use ambiguous chars.
+ *
  * Revision 1.195  2006/08/20 17:23:35  fplanque
  * no message
  *
