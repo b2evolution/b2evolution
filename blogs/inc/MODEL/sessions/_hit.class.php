@@ -406,6 +406,7 @@ class Hit
 		/*
 		 * Detect requests for XML feeds by $skin / $tempskin param.
 		 * fp> TODO: this is WEAK! Do we really need to know before going into the skin?
+		 * dh> not necessary, but only where ->agent_type gets used (logging). Maybe move it into detect_useragent_type()?
 		 * Use $skin, if not empty (may be set in /xmlsrv/atom.php for example), otherwise $tempskin.
 		 */
 		$used_skin = empty( $skin ) ? param( 'tempskin', 'string', '', true ) : $skin;
@@ -681,6 +682,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.38  2006/08/20 19:04:16  blueyed
+ * comment
+ *
  * Revision 1.37  2006/08/20 13:47:25  fplanque
  * extracted param funcs from misc
  *
