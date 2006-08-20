@@ -396,10 +396,13 @@ $Results->display();
 
 echo '</div>';
 
+// Permission note:
+echo '<p class="note center">'.T_('User group permissions override the media file permissions here!').'</p>';
+
 $Form->end_fieldset();
 
 
-// Make a list of all displayed users:
+// Make a hidden list of all displayed users:
 $user_IDs = array();
 foreach( $Results->rows as $row )
 {
@@ -413,6 +416,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.5  2006/08/20 19:39:52  blueyed
+ * usability: Note about perms
+ *
  * Revision 1.4  2006/07/16 16:44:41  blueyed
  * Fixed td_colspan for results (typo+handling of "0")
  *

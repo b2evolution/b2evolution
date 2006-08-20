@@ -326,6 +326,9 @@ $Form->begin_fieldset( T_('Group permissions') );
 
 
 <?php
+// Permission note:
+echo '<p class="note center">'.T_('User group permissions override the media file permissions here!').'</p>';
+
 $Form->end_fieldset();
 // warning if a user withdraws own permission to edit the blog's properties
 // todo: check if user is withdrawing own group permissions
