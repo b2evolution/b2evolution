@@ -90,7 +90,7 @@ class GenericCategory extends GenericProperty
 			$this->set_from_Request( 'parent_ID' );
 		}
 
-		return ! $Request->validation_errors();
+		return ! param_errors_detected();
 	}
 
 

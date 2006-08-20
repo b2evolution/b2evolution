@@ -195,13 +195,16 @@ class UserSettings extends AbstractSettings
 		}
 
 		$Request->set_param( $param_name, $value );
-		return $Request->get($param_name);
+		return get_param($param_name);
 	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.17  2006/08/20 20:12:33  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.16  2006/07/28 18:27:10  blueyed
  * Basic image preview for image files in the file list
  *

@@ -79,7 +79,7 @@ function filter_antispam( & $Form )
 {
 	global $Request;
 
-	$Form->text( 'keywords', $Request->get('keywords'), 20, T_('Keywords'), T_('Separate with space'), 50 );
+	$Form->text( 'keywords', get_param('keywords'), 20, T_('Keywords'), T_('Separate with space'), 50 );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_antispam',
@@ -164,6 +164,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.3  2006/08/20 20:12:33  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.2  2006/07/04 17:32:29  fplanque
  * no message
  *

@@ -146,12 +146,12 @@ switch( $action )
 			$Settings->set( 'log_admin_hits', $Request->param( 'log_admin_hits', 'integer', 0 ) );
 
 			$Request->param( 'auto_prune_stats_mode', 'string', true );
-			$Settings->set( 'auto_prune_stats_mode',  $Request->get('auto_prune_stats_mode') );
+			$Settings->set( 'auto_prune_stats_mode',  get_param('auto_prune_stats_mode') );
 
 			// TODO: offer to set-up cron job if mode == 'cron' and to remove cron job if mode != 'cron'
 
 			$Request->param( 'auto_prune_stats', 'integer', $Settings->get_default('auto_prune_stats'), false, false, true, false );
-			$Settings->set( 'auto_prune_stats', $Request->get('auto_prune_stats') );
+			$Settings->set( 'auto_prune_stats', get_param('auto_prune_stats') );
 
 
 			// Sessions
@@ -204,6 +204,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2006/08/20 20:12:32  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.12  2006/08/07 22:29:32  fplanque
  * minor / doc
  *

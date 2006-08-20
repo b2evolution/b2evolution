@@ -94,7 +94,7 @@ class GenericElement extends DataObject
 		$Request->param_string_not_empty( $this->dbprefix.'name', T_('Please enter a name.') );
 		$this->set_from_Request( 'name' );
 		
-		return ! $Request->validation_errors();
+		return ! param_errors_detected();
 	}
 	
 	
@@ -173,6 +173,9 @@ class GenericElement extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2006/08/20 20:12:32  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.3  2006/06/13 21:49:15  blueyed
  * Merged from 1.8 branch
  *

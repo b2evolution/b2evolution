@@ -91,7 +91,7 @@ class GenericProperty extends GenericElement
 		$Request->param( $this->dbprefix.'ext_ID', 'string', '' );
 		$this->set_from_Request( 'ext_ID' );
 
-		return ! $Request->validation_errors();
+		return ! param_errors_detected();
 	}
 
 
@@ -181,7 +181,7 @@ class GenericProperty extends GenericElement
 
 			if( $q = $DB->get_var( $sql ) )
 			{
-				$Request->param_error( $this->dbprefix.'ext_ID', 'The external ID is already used!' );
+				param_error( $this->dbprefix.'ext_ID', 'The external ID is already used!' );
 				$DB->commit();
 				return false;
 			}
@@ -212,7 +212,7 @@ class GenericProperty extends GenericElement
 
 			if( $q = $DB->get_var( $sql ) )
 			{
-				$Request->param_error( $this->dbprefix.'ext_ID', 'The external ID is already used!' );
+				param_error( $this->dbprefix.'ext_ID', 'The external ID is already used!' );
 				$DB->commit();
 				return false;
 			}

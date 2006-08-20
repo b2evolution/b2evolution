@@ -516,7 +516,7 @@ switch( $action )
 		{
 			if( param( 'action_invoked', 'integer', 0 ) )
 			{ // Action was invoked, add "hint"
-				$Request->param_error( 'zipname', T_('Please provide the name of the archive.') );
+				param_error( 'zipname', T_('Please provide the name of the archive.') );
 			}
 			if( $selected_Filelist->count() == 1 )
 			{
@@ -587,14 +587,14 @@ switch( $action )
 				if( $error_filename = validate_filename( $new_names[$loop_src_File->get_md5_ID()] ) )
 				{ // Not a file name or not an allowed extension
 					$confirmed = 0;
-					$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $error_filename );
+					param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $error_filename );
 					continue;
 				}
 			}
 			elseif( $error_dirname = validate_dirname( $new_names[$loop_src_File->get_md5_ID()] ) )
 			{ // Not a directory name
 				$confirmed = 0;
-				$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $error_dirname );
+				param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $error_dirname );
 				continue;
 			}
 		}
@@ -835,7 +835,7 @@ switch( $action )
 
 		if( count( $use_default_perms ) && $edit_perms_default === '' )
 		{
-			$Request->param_error( 'edit_perms_default', T_('You have to give a default permission!') );
+			param_error( 'edit_perms_default', T_('You have to give a default permission!') );
 			break;
 		}
 
@@ -1208,14 +1208,14 @@ switch( $fm_mode )
 			{ // Target exists
 				if( $dest_File === $loop_src_File )
 				{
-					$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', T_('Source and target files are the same. Please choose another name or directory.') );
+					param_error( 'new_names['.$loop_src_File->get_md5_ID().']', T_('Source and target files are the same. Please choose another name or directory.') );
 					$confirm = 0;
 					continue;
 				}
 
 				if( ! isset( $overwrite[$loop_src_File->get_md5_ID()] ) )
 				{ // We have not yet asked to overwrite:
-					$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('The file &laquo;%s&raquo; already exists.'), $dest_File->get_rdfp_rel_path() ) );
+					param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('The file &laquo;%s&raquo; already exists.'), $dest_File->get_rdfp_rel_path() ) );
 					$overwrite[$loop_src_File->get_md5_ID()] = 0;
 					$confirm = 0;
 					continue;
@@ -1234,7 +1234,7 @@ switch( $fm_mode )
 				if( $Messages->count('restrict') )
 				{ // There are restrictions:
 					// TODO: work on a better output display here...
-					$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Cannot overwrite the file &laquo;%s&raquo; because of the following relations'), $dest_File->get_rdfp_rel_path() ) );
+					param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Cannot overwrite the file &laquo;%s&raquo; because of the following relations'), $dest_File->get_rdfp_rel_path() ) );
 
 					$confirm = 0;
 					break;	// stop whole file list processing
@@ -1269,7 +1269,7 @@ switch( $fm_mode )
 					}
 					else
 					{ // Failure:
-						$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
+						param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ) );
 					}
 				}
@@ -1313,7 +1313,7 @@ switch( $fm_mode )
 					}
 					else
 					{ // move failed
-						$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Could not move &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ) );
+						param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Could not move &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ) );
 						// Note: we do not rollback, since unlinking is already done on disk :'(
 					}
 
@@ -1512,6 +1512,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.32  2006/08/20 20:12:32  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.31  2006/08/19 10:57:40  blueyed
  * doc fixes.
  *

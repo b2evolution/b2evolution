@@ -724,6 +724,7 @@ function locale_updateDB()
 	$lnr = 0;
 	foreach( $_POST as $pkey => $pval ) if( preg_match('/loc_(\d+)_(.*)/', $pkey, $matches) )
 	{
+		// fp> what is this param() call supposed to do? pkey is already set.  TODO: remove dirty indentation above
 		$pval = param( $pkey, 'string', '' );
 		$lfield = $matches[2];
 
@@ -893,8 +894,12 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.20  2006/08/20 20:12:33  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.19  2006/08/20 19:30:20  blueyed
  * Use param() instead of remove_magic_quotes()
+ * fp> okay nice, but param() should only be used for getting params. Something uncatholic is going on here! :]
  *
  * Revision 1.18  2006/08/20 19:29:34  blueyed
  * Fix: quote DB values when inserting/editing locales

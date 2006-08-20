@@ -155,7 +155,7 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 	}
 
 
-	if( ( $set_value = $Request->get('edit_plugin_'.$Plugin->ID.'_set_'.$set_name) ) !== NULL )
+	if( ( $set_value = get_param('edit_plugin_'.$Plugin->ID.'_set_'.$set_name) ) !== NULL )
 	{ // use value provided with Request!
 	}
 	elseif( isset($use_value) )
@@ -179,7 +179,7 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 
 		if( $error_value )
 		{ // add error
-			$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, NULL, $error_value ); // only add the error to the field
+			param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, NULL, $error_value ); // only add the error to the field
 		}
 	}
 
@@ -340,7 +340,7 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 		if( isset($l_meta['type']) && $l_meta['type'] == 'integer' && ! preg_match( '~^[-+]?\d+$~', $l_value ) )
 		{
-			$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, sprintf( T_('The value for %s must be numeric.'), $l_name ), T_('The value must be numeric.') );
+			param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, sprintf( T_('The value for %s must be numeric.'), $l_name ), T_('The value must be numeric.') );
 			continue;
 		}
 
@@ -351,7 +351,7 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 			if( ! preg_match( $param_pattern, $l_value ) )
 			{
 				$param_error = is_array($l_meta['valid_pattern']) ? $l_meta['valid_pattern']['error'] : sprintf(T_('The value is invalid. It must match the regular expression &laquo;%s&raquo;.'), $param_pattern);
-				$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $param_error );
+				param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $param_error );
 				continue;
 			}
 		}
@@ -382,7 +382,7 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 					}
 				}
 
-				$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $param_error );
+				param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $param_error );
 				continue;
 			}
 		}
@@ -396,7 +396,7 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 		}
 		if( $error = $use_Plugins->call_method( $Plugin->ID, 'Plugin'.$set_type.'ValidateSet', $tmp_params ) )
 		{ // skip this
-			$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $error );
+			param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $error );
 			continue;
 		}
 
@@ -416,6 +416,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.24  2006/08/20 20:12:33  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.23  2006/08/19 08:50:27  fplanque
  * moved out some more stuff from main
  *

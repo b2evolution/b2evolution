@@ -252,7 +252,7 @@ if( !$Messages->count('error') )
 				   AND user_ID != '.$edited_User->ID;
 			if( $q = $DB->get_var( $query ) )
 			{
-				$Request->param_error( 'edited_user_login',
+				param_error( 'edited_user_login',
 					sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'),
 						'href="?ctrl=users&amp;user_ID='.$q.'"' ) );
 			}
@@ -536,7 +536,7 @@ if( !$Messages->count('error') )
 			             AND grp_ID != '.$edited_Group->ID;
 			if( $q = $DB->get_var( $query ) )
 			{
-				$Request->param_error( 'edited_grp_name',
+				param_error( 'edited_grp_name',
 					sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'),
 						'href="?ctrl=users&amp;grp_ID='.$q.'"' ) );
 			}
@@ -686,6 +686,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.32  2006/08/20 20:12:32  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.31  2006/08/19 08:50:26  fplanque
  * moved out some more stuff from main
  *

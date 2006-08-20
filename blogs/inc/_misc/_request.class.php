@@ -273,7 +273,7 @@ class Request
 		}
 
 
-		$this->param_error( $var, T_('Please enter a valid time.') );
+		param_error( $var, T_('Please enter a valid time.') );
 
 		return false;
 	}
@@ -315,7 +315,7 @@ class Request
 	{
 		if( $error_filename = validate_filename( $this->params[$var] ) )
 		{
-			$this->param_error( $var, $error_filename );
+			param_error( $var, $error_filename );
 			return false;
 		}
 		return true;
@@ -416,7 +416,7 @@ class Request
 	{
 		if( empty( $this->params[$var] ) )
 		{
-			$this->param_error( $var, $err_msg, $field_err_msg );
+			param_error( $var, $err_msg, $field_err_msg );
 			return false;
 		}
 		return true;
@@ -439,7 +439,7 @@ class Request
 
 		if( ! preg_match( '#^[0-9]+$#', $this->params[$var] ) )
 		{
-			$this->param_error( $var, $err_msg );
+			param_error( $var, $err_msg );
 			return false;
 		}
 		return true;
@@ -480,7 +480,7 @@ class Request
 
 		if( ! preg_match( '~^[-+]?\d+$~', $this->params[$var] ) || $this->params[$var] < $min || $this->params[$var] > $max )
 		{
-			$this->param_error( $var, sprintf( $err_msg, $min, $max ) );
+			param_error( $var, sprintf( $err_msg, $min, $max ) );
 			return false;
 		}
 		return true;
@@ -500,7 +500,7 @@ class Request
 
 		if( !is_email( $this->params[$var] ) )
 		{
-			$this->param_error( $var, T_('The email address is invalid.') );
+			param_error( $var, T_('The email address is invalid.') );
 			return false;
 		}
 		return true;
@@ -522,7 +522,7 @@ class Request
 
 		if( ! preg_match( '|^\+?[\-*#/(). 0-9]+$|', $this->params[$var] ) )
 		{
-			$this->param_error( $var, T_('The phone number is invalid.') );
+			param_error( $var, T_('The phone number is invalid.') );
 			return false;
 		}
 		else
@@ -543,7 +543,7 @@ class Request
 	{
 		if( $error_detail = validate_url( $this->params[$var], $uri_scheme ) )
 		{
-			$this->param_error( $var, sprintf( T_('Supplied URL is invalid. (%s)'), $error_detail ) );
+			param_error( $var, sprintf( T_('Supplied URL is invalid. (%s)'), $error_detail ) );
 			return false;
 		}
 		return true;
@@ -566,7 +566,7 @@ class Request
 		{ // empty is OK if not required:
 			if( $required )
 			{
-				$this->param_error( $var, $err_msg );
+				param_error( $var, $err_msg );
 				return false;
 			}
 
@@ -634,7 +634,7 @@ class Request
 
 		// Date did not pass all tests:
 
-		$this->param_error( $var, $err_msg );
+		param_error( $var, $err_msg );
 
 		return false;
 	}
@@ -699,7 +699,7 @@ class Request
 			$func_params['field_err_msg'] = NULL;
 		}
 
-		$this->param_error( $var, $err_msg, $func_params['field_err_msg'] );
+		param_error( $var, $err_msg, $func_params['field_err_msg'] );
 		return false;
 	}
 
@@ -761,7 +761,7 @@ class Request
 	{
 		if( ! is_regexp( $this->params[$var] ) )
 		{
-			$this->param_error( $var, $field_err_msg );
+			param_error( $var, $field_err_msg );
 			return false;
 		}
 		return true;
@@ -788,25 +788,25 @@ class Request
 
 		if( empty($pass1) )
 		{
-			$this->param_error( $var1, T_('Please enter your password twice.') );
+			param_error( $var1, T_('Please enter your password twice.') );
 			return false;
 		}
 		if( empty($pass2) )
 		{
-			$this->param_error( $var2, T_('Please enter your password twice.') );
+			param_error( $var2, T_('Please enter your password twice.') );
 			return false;
 		}
 
 		// checking the password has been typed twice the same:
 		if( $pass1 != $pass2 )
 		{
-			$this->param_error_multiple( array( $var1, $var2), T_('You typed two different passwords.') );
+			param_error_multiple( array( $var1, $var2), T_('You typed two different passwords.') );
 			return false;
 		}
 
 		if( strlen($pass1) < $Settings->get('user_minpwdlen') )
 		{
-			$this->param_error_multiple( array( $var1, $var2), sprintf( T_('The minimum password length is %d characters.'), $Settings->get('user_minpwdlen') ) );
+			param_error_multiple( array( $var1, $var2), sprintf( T_('The minimum password length is %d characters.'), $Settings->get('user_minpwdlen') ) );
 			return false;
 		}
 
@@ -831,7 +831,7 @@ class Request
 		}
 
 		// Error!
-		$this->param_error_multiple( $vars, $err_msg, $field_err_msg );
+		param_error_multiple( $vars, $err_msg, $field_err_msg );
 		return false;
 	}
 
@@ -865,7 +865,7 @@ class Request
 
 				if( !$allow_none )
 				{ // it's not allowed, so display error:
-					$this->param_error( $var, $err_msg );
+					param_error( $var, $err_msg );
 				}
 			}
 		}
@@ -886,98 +886,6 @@ class Request
 		return $this->Messages->count('error');
 	}
 
-
-	/**
-	 * Add an error for a variable, either to the Form's field and/or the global {@link $Messages} object.
-	 *
-	 * @param string param name
-	 * @param string|NULL error message (by using NULL you can only add an error to the field, but not the $Message object)
-	 * @param string|NULL error message for form field ($err_msg gets used if === NULL).
-	 */
-	function param_error( $var, $err_msg, $field_err_msg = NULL )
-	{
-		if( ! isset( $this->err_messages[$var] ) )
-		{ // We haven't already recorded an error for this field:
-			if( $field_err_msg === NULL )
-			{
-				$field_err_msg = $err_msg;
-			}
-			$this->err_messages[$var] = $field_err_msg;
-
-			if( isset($err_msg) )
-			{
-				$this->_add_message_to_Log( $var, $err_msg, 'error' );
-			}
-		}
-	}
-
-
-	/**
-	 * Add an error for multiple variables, either to the Form's field and/or the global {@link $Messages} object.
-	 *
-	 * @param array of param names
-	 * @param string|NULL error message (by using NULL you can only add an error to the field, but not the $Message object)
-	 * @param string|NULL error message for form fields ($err_msg gets used if === NULL).
-	 */
-	function param_error_multiple( $vars, $err_msg, $field_err_msg = NULL )
-	{
-		if( $field_err_msg === NULL )
-		{
-			$field_err_msg = $err_msg;
-		}
-
-		foreach( $vars as $var )
-		{
-			if( ! isset( $this->err_messages[$var] ) )
-			{ // We haven't already recorded an error for this field:
-				$this->err_messages[$var] = $field_err_msg;
-			}
-		}
-
-		if( isset($err_msg) )
-		{
-			$this->_add_message_to_Log( $var, $err_msg, 'error' );
-		}
-	}
-
-
-	/**
-	 * This function is used by {@link param_error()} and {@link param_error_multiple()}.
-	 *
-	 * If {@link $link_log_messages_to_field_IDs} is true, it will link those parts of the
-	 * error message that are not already links, to the html IDs of the fields with errors.
-	 *
-	 * @access protected
-	 *
-	 * @param string param name
-	 * @param string error message
-	 */
-	function _add_message_to_Log( $var, $err_msg, $log_category = 'error' )
-	{
-		if( $this->link_log_messages_to_field_IDs )
-		{
-			$var_id = Form::get_valid_id($var);
-			$start_link = '<a href="#'.$var_id.'" onclick="var form_elem = document.getElementById(\''.$var_id.'\'); if( form_elem ) { form_elem.select(); }">';
-
-			if( strpos( $err_msg, '<a' ) !== false )
-			{ // there is at least one link in $err_msg, link those parts that are no links
-				$err_msg = preg_replace( '~(\s*)(<a\s+[^>]+>[^<]*</a>\s*)~i', '</a>$1&raquo;$2'.$start_link, $err_msg );
-			}
-
-			if( substr($err_msg, 0, 4) == '</a>' )
-			{ // There was a link at the beginning of $err_msg: we do not prepend an emtpy link before it
-				$this->Messages->add( substr( $err_msg, 4 ).'</a>', $log_category );
-			}
-			else
-			{
-				$this->Messages->add( $start_link.$err_msg.'</a>', $log_category );
-			}
-		}
-		else
-		{
-			$this->Messages->add( $err_msg, $log_category );
-		}
-	}
 
 
 	/**
@@ -1006,8 +914,8 @@ class Request
 
 /*
  * $Log$
- * Revision 1.21  2006/08/20 18:58:32  fplanque
- * made param_() equivs for Request class
+ * Revision 1.22  2006/08/20 20:12:33  fplanque
+ * param_() refactoring part 1
  *
  * Revision 1.20  2006/08/18 00:40:35  fplanque
  * Half way through a clean blog management - too tired to continue

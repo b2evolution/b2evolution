@@ -638,7 +638,7 @@ class Form extends Widget
 			$date_format );
 
 
-		if( isset($Request) && isset($Request->err_messages[$field_name]) )
+		if( param_has_error( $field_name ) )
 		{ // There is an error message for this field:
 
 			// We do not try to format the date, we keep the erroneous date.
@@ -1342,7 +1342,7 @@ class Form extends Widget
 				$after_field_highlight = '';
 			}
 
-			if( isset($Request->err_messages[$field_name]))
+			if( param_has_error( $field_name ) )
 			{ // There is an error message for this field, we want to mark the checkboxes with a red border:
 				$r .= '<span class="checkbox_error">';
 				$after_field = '</span>';
@@ -1669,7 +1669,7 @@ class Form extends Widget
 	{
 		global $Request;
 
-		if ( isset( $Request ) && isset( $Request->err_messages[$field_name] ) )
+		if( param_has_error( $field_name) )
 		{	// There is an error on the combo, so we need to set the combo input text class to 'field_error'
 			$input_class = 'field_error';
 		}
@@ -2568,7 +2568,7 @@ class Form extends Widget
 		}
 
 		// Error handling:
-		if( isset($field_params['name']) && isset($Request) && isset($Request->err_messages[$field_params['name']]) )
+		if( isset($field_params['name']) && param_has_error( $field_params['name'] ) )
 		{ // There is an error message for this field:
 			if( isset($field_params['type']) && $field_params['type'] == 'checkbox' )
 			{ // checkboxes need a span
@@ -2582,7 +2582,7 @@ class Form extends Widget
 					: 'field_error';
 			}
 
-			$this->_common_params['note'] .= ' <span class="field_error">'.$Request->err_messages[$field_params['name']].'</span>';
+			$this->_common_params['note'] .= ' <span class="field_error">'.param_get_error_msg( $field_params['name'] ).'</span>';
 		}
 		elseif( isset($this->_common_params['required']) && $this->_common_params['required'])
 		{
@@ -2617,6 +2617,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.32  2006/08/20 20:12:33  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.31  2006/08/18 20:37:16  fplanque
  * Improved bozo validation on post editing
  *

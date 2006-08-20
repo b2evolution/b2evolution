@@ -42,7 +42,7 @@ $Form->begin_fieldset( T_('User permissions') );
 /*
  * Query user list:
  */
-if( $Request->get('action') == 'filter2' )
+if( get_param('action') == 'filter2' )
 {
 	$keywords = $Request->param( 'keywords2', 'string', '', true );
 	$Request->set_param( 'keywords1', $keywords );
@@ -124,7 +124,7 @@ function filter_colluserlist( & $Form )
 	$count++;
 	$Form->switch_layout( 'blockspan' );
 	// TODO: javascript update other input fields (for other layouts):
-	$Form->text( 'keywords'.$count, $Request->get('keywords'.$count), 20, T_('Keywords'), T_('Separate with space'), 50 );
+	$Form->text( 'keywords'.$count, get_param('keywords'.$count), 20, T_('Keywords'), T_('Separate with space'), 50 );
 	$Form->switch_layout( NULL ); // Restor previously saved
 }
 $Results->filter_area = array(
@@ -397,6 +397,8 @@ $Results->display();
 echo '</div>';
 
 // Permission note:
+// fp> WHAT??? can you give a permission when the global setting id OFF ????
+// why is it talk about GROUPs when we are in the user perms tab?
 echo '<p class="note center">'.T_('User group permissions override the media file permissions here!').'</p>';
 
 $Form->end_fieldset();
@@ -416,6 +418,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.6  2006/08/20 20:12:33  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.5  2006/08/20 19:39:52  blueyed
  * usability: Note about perms
  *

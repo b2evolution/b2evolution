@@ -84,11 +84,11 @@ switch( $action )
 		$cjob_type = $Request->param( 'cjob_type', 'string', true );
 		if( !isset( $cron_job_params[$cjob_type] ) )
 		{
-			$Request->param_error( 'cjob_type', T_('Invalid job type') );
+			param_error( 'cjob_type', T_('Invalid job type') );
 		}
 		$Request->param_date( 'cjob_date', T_('Please enter a valid date.'), true );
 		$Request->param_time( 'cjob_time' );
-		$cjob_datetime = form_date( $Request->get( 'cjob_date' ), $Request->get( 'cjob_time' ) );
+		$cjob_datetime = form_date( get_param( 'cjob_date' ), get_param( 'cjob_time' ) );
 
 		// duration -> end date (deadline)
 		$cjob_repeat_after_days = $Request->param( 'cjob_repeat_after_days', 'integer', 0 );
@@ -100,7 +100,7 @@ switch( $action )
 			$cjob_repeat_after = NULL;
 		}
 
-		if( ! $Request->validation_errors() )
+		if( ! param_errors_detected() )
 		{	// No errors
       $sql = 'INSERT INTO T_cron__task( ctsk_start_datetime, ctsk_repeat_after, ctsk_name, ctsk_controller, ctsk_params )
 							VALUES( '.$DB->quote($cjob_datetime).', '.$DB->null($cjob_repeat_after).' , '.$DB->quote($cron_job_names[$cjob_type]).', '

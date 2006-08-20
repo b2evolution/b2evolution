@@ -198,7 +198,7 @@ class Blog extends DataObject
 	{
 		global $Request, $Messages, $default_locale, $DB;
 
-		if( $Request->param( 'blog_name',   'string', NULL ) != NULL )
+		if( $Request->param( 'blog_name', 'string', NULL ) !== NULL )
 		{ // General params:
 			$this->set_from_Request( 'name' );
 			$this->set( 'shortname',     $Request->param( 'blog_shortname',     'string', true ) );
@@ -206,7 +206,7 @@ class Blog extends DataObject
 		}
 
 
-		if( ($siteurl_type = $Request->param( 'blog_siteurl_type',   'string', NULL )) != NULL )
+		if( ($siteurl_type = $Request->param( 'blog_siteurl_type',   'string', NULL )) !== NULL )
 		{ // Blog URL parameters:
 			// TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
 			$blog_siteurl_relative = $Request->param( 'blog_siteurl_relative', 'string', true );
@@ -253,14 +253,14 @@ class Blog extends DataObject
 														  AND blog_ID <> '.$this->ID
 														) )
 				{ // urlname is already in use
-					$Request->param_error( 'blog_urlname', T_('This URL blog name is already in use by another blog. Please choose another name.') );
+					param_error( 'blog_urlname', T_('This URL blog name is already in use by another blog. Please choose another name.') );
 				}
 			}
 
 		}
 
 
-		if( $Request->param( 'blog_default_skin',  'string', NULL ) != NULL )
+		if( $Request->param( 'blog_default_skin',  'string', NULL ) !== NULL )
 		{	// Default blog:
 			$this->set_from_Request( 'default_skin' );
 		}
@@ -279,29 +279,31 @@ class Blog extends DataObject
 		}
 
 
-		if( $Request->param( 'blog_description',   'string', NULL ) != NULL )
+		if( param( 'blog_description', 'string', NULL ) !== NULL )
 		{	// Description:
-			$this->set_from_Request( 'shortdesc', 'blog_description' );
+			$this->shortdesc = get_param( 'blog_description' );
+			// TODO: change that fieldname in DB:
+   		$this->set_param( 'description', 'string', $this->shortdesc );
 		}
 
-		if( $Request->param( 'blog_keywords', 'string', NULL ) != NULL )
+		if( $Request->param( 'blog_keywords', 'string', NULL ) !== NULL )
 		{	// Keywords:
 			$this->set_from_Request( 'keywords' );
 		}
 
-		if( $Request->param( 'blog_tagline',   'html', NULL ) != NULL )
+		if( $Request->param( 'blog_tagline',   'html', NULL ) !== NULL )
 		{	// HTML tagline:
-			$this->set( 'tagline', format_to_post( $Request->get( 'blog_tagline' ), 0, 0 ) );
+			$this->set( 'tagline', format_to_post( get_param( 'blog_tagline' ), 0, 0 ) );
 		}
 
-		if( $Request->param( 'blog_longdesc',   'html', NULL ) != NULL )
+		if( $Request->param( 'blog_longdesc',   'html', NULL ) !== NULL )
 		{	// HTML long description:
-			$this->set( 'longdesc', format_to_post( $Request->get( 'blog_longdesc' ), 0, 0 ) );
+			$this->set( 'longdesc', format_to_post( get_param( 'blog_longdesc' ), 0, 0 ) );
 		}
 
-		if( $Request->param( 'blog_notes',   'html', NULL ) != NULL )
+		if( $Request->param( 'blog_notes',   'html', NULL ) !== NULL )
 		{	// HTML notes:
-			$this->set( 'notes', format_to_post( $Request->get( 'blog_notes' ), 0, 0 ) );
+			$this->set( 'notes', format_to_post( get_param( 'blog_notes' ), 0, 0 ) );
 		}
 
 
@@ -323,11 +325,11 @@ class Blog extends DataObject
 				case 'custom': // custom path and URL
 					if( $this->get( 'media_fullpath' ) == '' )
 					{
-						$Request->param_error( 'blog_media_fullpath', T_('Media dir location').': '.T_('You must provide the full path of the media directory.') );
+						param_error( 'blog_media_fullpath', T_('Media dir location').': '.T_('You must provide the full path of the media directory.') );
 					}
 					if( !preg_match( '#https?://#', $this->get( 'media_url' ) ) )
 					{
-						$Request->param_error( 'blog_media_url', T_('Media dir location').': '
+						param_error( 'blog_media_url', T_('Media dir location').': '
 														.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!') );
 					}
 					break;
@@ -335,7 +337,7 @@ class Blog extends DataObject
 				case 'subdir':
 					if( $this->get( 'media_subdir' ) == '' )
 					{
-						$Request->param_error( 'blog_media_subdir', T_('Media dir location').': '.T_('You must provide the media subdirectory.') );
+						param_error( 'blog_media_subdir', T_('Media dir location').': '.T_('You must provide the media subdirectory.') );
 					}
 					break;
 			}
@@ -349,14 +351,14 @@ class Blog extends DataObject
 			$this->set( 'pingblodotgs',    $Request->param( 'blog_pingblodotgs',    'integer', 0 ) );
 		}
 
-		if( $Request->param( 'blog_allowcomments',   'string', NULL ) != NULL )
+		if( $Request->param( 'blog_allowcomments',   'string', NULL ) !== NULL )
 		{ // Feedback options:
 			$this->set_from_Request( 'allowcomments' );
 			$this->set_setting( 'new_feedback_status',  $Request->param( 'new_feedback_status', 'string', 'draft' ) );
 			$this->set( 'allowtrackbacks', $Request->param( 'blog_allowtrackbacks', 'integer', 0 ) );
 		}
 
-		return ! $Request->validation_errors();
+		return ! param_errors_detected();
 
 	}
 
@@ -1017,6 +1019,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2006/08/20 20:12:32  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.14  2006/08/19 02:15:06  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.

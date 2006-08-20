@@ -69,7 +69,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 				$ntd = explode(':', $newtime_difference);
 				if( count($ntd) > 3 )
 				{
-					$Request->param_error( 'newtime_difference', T_('Invalid time format.') );
+					param_error( 'newtime_difference', T_('Invalid time format.') );
 				}
 				else
 				{
@@ -422,6 +422,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2006/08/20 20:12:32  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.7  2006/08/20 19:29:34  blueyed
  * Fix: quote DB values when inserting/editing locales
  *

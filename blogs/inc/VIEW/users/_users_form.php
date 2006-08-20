@@ -192,7 +192,7 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Features') );
-	$value_admin_skin = $Request->get('edited_user_admin_skin');
+	$value_admin_skin = get_param('edited_user_admin_skin');
 	if( !$value_admin_skin )
 	{ // no value supplied through POST/GET
 		$value_admin_skin = $UserSettings->get( 'admin_skin', $edited_User->ID );
@@ -285,6 +285,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.21  2006/08/20 20:12:33  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.20  2006/08/19 08:50:26  fplanque
  * moved out some more stuff from main
  *

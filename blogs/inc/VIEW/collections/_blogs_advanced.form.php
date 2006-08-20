@@ -53,7 +53,7 @@ $Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 														'',
 														' <span class="nobr"><code>'.$basepath.$media_subdir.'</code><input 
 															type="text" name="blog_media_subdir" size="20" maxlength="255" 
-															class="'.( isset($Request->err_messages['blog_media_subdir']) ? 'field_error' : '' ).'"
+															class="'.( param_has_error('blog_media_subdir') ? 'field_error' : '' ).'"
 															value="'.$edited_Blog->dget( 'media_subdir', 'formvalue' ).'" /></span>', '' ),
 										array( 'custom',
 														T_('Custom location').':',
@@ -61,11 +61,11 @@ $Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 														'<fieldset>'
 															.'<div class="label">'.T_('directory').':</div><div class="input"><input 
 																type="text" name="blog_media_fullpath" size="50" maxlength="255" 
-																class="'.( isset($Request->err_messages['blog_media_fullpath']) ? 'field_error' : '' ).'"
+																class="'.( param_has_error('blog_media_fullpath') ? 'field_error' : '' ).'"
 																value="'.$edited_Blog->dget( 'media_fullpath', 'formvalue' ).'" /></div>'
 															.'<div class="label">'.T_('URL').':</div><div class="input"><input 
 																type="text" name="blog_media_url" size="50" maxlength="255" 
-																class="'.( isset($Request->err_messages['blog_media_url']) ? 'field_error' : '' ).'"
+																class="'.( param_has_error('blog_media_url') ? 'field_error' : '' ).'"
 																value="'.$edited_Blog->dget( 'media_url', 'formvalue' ).'" /></div></fieldset>' )
 									), T_('Media dir location'), true
 								);

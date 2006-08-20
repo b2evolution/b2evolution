@@ -360,7 +360,7 @@ class Item extends DataObject
 		global $Request, $default_locale, $allowed_uri_scheme, $Plugins, $current_User;
 
 		if( $Request->param( 'post_title', 'html', NULL ) !== NULL ) {
-			$this->set( 'title', format_to_post( $Request->get('post_title'), 0, 0 ) );
+			$this->set( 'title', format_to_post( get_param('post_title'), 0, 0 ) );
 		}
 
 		if( $Request->param( 'post_locale', 'string', NULL ) !== NULL ) {
@@ -377,17 +377,17 @@ class Item extends DataObject
 		}
 
 		if( $Request->param( 'content', 'html', '' ) !== NULL ) {
-			$this->set( 'content', format_to_post( $Request->get('content') ) );
+			$this->set( 'content', format_to_post( get_param('content') ) );
 		}
 
 		if( ( $force_edit_date || $Request->param( 'edit_date', 'integer', 0 ) )
 				&& $current_User->check_perm( 'edit_timestamp' ) )
 		{ // We can use user date:
 			$Request->param_date( 'item_issue_date', T_('Please enter a valid issue date.'), $force_edit_date /* required */ );
-			if( strlen($Request->get('item_issue_date')) )
+			if( strlen(get_param('item_issue_date')) )
 			{ // only set it, if a date was given:
 				$Request->param_time( 'item_issue_time' );
-				$this->set( 'issue_date', form_date( $Request->get( 'item_issue_date' ), $Request->get( 'item_issue_time' ) ) ); // TODO: cleanup...
+				$this->set( 'issue_date', form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ) ); // TODO: cleanup...
 			}
 		}
 
@@ -401,7 +401,7 @@ class Item extends DataObject
 		}
 
 		if( $Request->param( 'item_assigned_user_ID', 'integer', NULL ) !== NULL ) {
-			$this->assign_to( $Request->get('item_assigned_user_ID') );
+			$this->assign_to( get_param('item_assigned_user_ID') );
 		}
 
 		if( $Request->param( 'item_priority', 'integer', NULL ) !== NULL ) {
@@ -423,12 +423,12 @@ class Item extends DataObject
 		}
 
 		if( $Request->param( 'renderers', 'array', NULL ) !== NULL ) {
-			$renderers = $Plugins->validate_list( $Request->get('renderers') );
+			$renderers = $Plugins->validate_list( get_param('renderers') );
 			$this->set( 'renderers', $renderers );
 		}
 
 
-		return ! $Request->validation_errors();
+		return ! param_errors_detected();
 	}
 
 
@@ -2830,6 +2830,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.79  2006/08/20 20:12:32  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.78  2006/08/19 08:50:26  fplanque
  * moved out some more stuff from main
  *

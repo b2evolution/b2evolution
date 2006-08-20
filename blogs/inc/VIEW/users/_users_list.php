@@ -94,7 +94,7 @@ function filter_userlist( & $Form )
 {
 	global $Request;
 
-	$Form->text( 'keywords', $Request->get('keywords'), 20, T_('Keywords'), T_('Separate with space'), 50 );
+	$Form->text( 'keywords', get_param('keywords'), 20, T_('Keywords'), T_('Separate with space'), 50 );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_userlist',
@@ -236,6 +236,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.10  2006/08/20 20:12:33  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.9  2006/07/16 16:44:41  blueyed
  * Fixed td_colspan for results (typo+handling of "0")
  *

@@ -592,7 +592,7 @@ switch( $action )
 		$updated = $admin_Plugins->set_code( $edit_Plugin->ID, $edited_plugin_code );
 		if( is_string( $updated ) )
 		{
-			$Request->param_error( 'edited_plugin_code', $updated );
+			param_error( 'edited_plugin_code', $updated );
 			$action = 'edit_settings';
 		}
 		elseif( $updated === 1 )
@@ -742,7 +742,7 @@ switch( $action )
 		$updated = $admin_Plugins->set_code( $edit_Plugin->ID, $edited_plugin_code );
 		if( is_string( $updated ) )
 		{ // error message
-			$Request->param_error( 'edited_plugin_code', $updated );
+			param_error( 'edited_plugin_code', $updated );
 			$action = 'edit_settings';
 		}
 		elseif( $updated === 1 )
@@ -753,7 +753,7 @@ switch( $action )
 		// Priority:
 		if( ! preg_match( '~^1?\d?\d$~', $edited_plugin_priority ) )
 		{
-			$Request->param_error( 'edited_plugin_priority', T_('Plugin priority must be numeric (0-100).') );
+			param_error( 'edited_plugin_priority', T_('Plugin priority must be numeric (0-100).') );
 		}
 		else
 		{

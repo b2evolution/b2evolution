@@ -262,8 +262,6 @@ switch( $action )
 		$static_gen_saved_locale = $current_locale;
 		$generating_static = true;
 		$resolve_extra_path = false;
-
-		// NOTE: dh> flush() removed here, because it's a) unnecessary and b) causes notices for "headers already sent" (in skin and admin)
 		ob_start();
 		switch( $edited_Blog->access_type )
 		{
@@ -295,8 +293,6 @@ switch( $action )
 		$generated_static_page_html = ob_get_contents();
 		ob_end_clean();
 		unset( $generating_static );
-
-		// TODO: dh> Replace/Inject the <META HTTP-EQUIV="Content-Type"> tag into $generated_static_page_html
 
 		// Switch back to saved locale (the blog page may have changed it):
 		locale_activate( $static_gen_saved_locale);
@@ -470,6 +466,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2006/08/20 20:12:32  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.21  2006/08/20 05:36:40  blueyed
  * Fix: send charset in backoffice again; remove notice in generated static pages - please merge to v-1-8 and v-1-9, if ok!
  *

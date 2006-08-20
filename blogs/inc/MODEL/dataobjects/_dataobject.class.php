@@ -595,7 +595,7 @@ class DataObject
 			$var = $this->dbprefix.$parname;
 		}
 
-		return $this->set( $parname, $Request->get($var), $make_null );
+		return $this->set( $parname, get_param($var), $make_null );
 	}
 
 
@@ -664,6 +664,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2006/08/20 20:12:32  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.14  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

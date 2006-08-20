@@ -339,8 +339,8 @@ class ItemList2 extends DataObjectList2
 		$Request->compile_cat_array( $this->Blog->ID == 1 ? 0 : $this->Blog->ID,
 								$this->default_filters['cat_modifier'], $this->default_filters['cat_array'] );
 
-		$this->filters['cat_array'] = $Request->get( 'cat_array' );
-		$this->filters['cat_modifier'] = $Request->get( 'cat_modifier' );
+		$this->filters['cat_array'] = get_param( 'cat_array' );
+		$this->filters['cat_modifier'] = get_param( 'cat_modifier' );
 
 
 		/*
@@ -445,7 +445,7 @@ class ItemList2 extends DataObjectList2
 
 
 
-		if( $Request->validation_errors() )
+		if( param_errors_detected() )
 		{
 			return false;
 		}
@@ -1415,6 +1415,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.18  2006/08/20 20:12:32  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.17  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

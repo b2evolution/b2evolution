@@ -316,9 +316,9 @@ if( ($disp == 'posts') || ($disp == 'single') )
 	$postIDlist = $MainList->get_page_ID_list();
 	$postIDarray = $MainList->get_page_ID_array();
 
-	//$Request->param( 'c', 'string' );
-	//$Request->param( 'tb', 'integer', 0 );
-	//$Request->param( 'pb', 'integer', 0 );
+	//param( 'c', 'string' );
+	//param( 'tb', 'integer', 0 );
+	//param( 'pb', 'integer', 0 );
 */
 }
 
@@ -457,6 +457,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.31  2006/08/20 20:12:32  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.30  2006/08/19 07:56:29  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

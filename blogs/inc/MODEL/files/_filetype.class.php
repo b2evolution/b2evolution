@@ -102,7 +102,7 @@ class Filetype extends DataObject
 			$reg_exp = '/^[a-z0-9]+( [a-z0-9]+)*$/';
 			if( !preg_match( $reg_exp, $Request->params['ftyp_extensions'], $res ) ) 
 			{ // Extensiosn has an invalid format
-				$Request->param_error( 'ftyp_extensions', T_( 'Invalid file extensions format.' ) );
+				param_error( 'ftyp_extensions', T_( 'Invalid file extensions format.' ) );
 			}
 		}
 		$this->set_from_Request( 'extensions' );
@@ -149,7 +149,7 @@ class Filetype extends DataObject
 		$Request->params['ftyp_allowed'];
 		$this->set_from_Request( 'allowed' );
 		
-		return ! $Request->validation_errors();
+		return ! param_errors_detected();
 	}
 
 

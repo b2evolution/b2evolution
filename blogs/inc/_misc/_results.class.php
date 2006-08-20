@@ -782,7 +782,7 @@ class Results extends Widget
 			foreach( $this->{$area_name}['presets'] as $key => $preset )
 			{
 				if( method_exists( $this, 'is_filtered' ) && !$this->is_filtered()
-							&& $Request->get( $this->param_prefix.'filter_preset' ) == $key )
+							&& get_param( $this->param_prefix.'filter_preset' ) == $key )
 				{ // The list is not filtered and the filter preset is selected, so no link on:
 					$r[] = '['.$preset[0].']';
 				}
@@ -2180,6 +2180,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.26  2006/08/20 20:12:33  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.25  2006/07/25 18:49:59  fplanque
  * no message
  *

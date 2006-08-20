@@ -411,7 +411,7 @@ function param_check_email( $var, $required = false )
 
 	if( !is_email( $GLOBALS[$var] ) )
 	{
-		$this->param_error( $var, T_('The email address is invalid.') );
+		param_error( $var, T_('The email address is invalid.') );
 		return false;
 	}
 	return true;
@@ -445,7 +445,7 @@ function param_check_filename( $var, $err_msg )
 {
 	if( $error_filename = validate_filename( $GLOBALS[$var] ) )
 	{
-		$this->param_error( $var, $error_filename );
+		param_error( $var, $error_filename );
 		return false;
 	}
 	return true;
@@ -506,7 +506,7 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 	{ // empty is OK if not required:
 		if( $required )
 		{
-			$this->param_error( $var, $err_msg );
+			param_error( $var, $err_msg );
 			return false;
 		}
 		return '';
@@ -912,11 +912,40 @@ function param_check_passwords( $var1, $var2, $required = false )
  *
  * @return integer
  */
-function validation_errors()
+function param_errors_detected()
 {
 	global $Messages;
 
 	return $Messages->count('error');
+}
+
+
+/**
+ * Tell if there is an error on given field.
+ */
+function param_has_error( $var )
+{
+	global $param_input_err_messages;
+
+	return isset( $param_input_err_messages[$var] );
+}
+
+
+/**
+ * Get error message for a param
+ *
+ * @return string
+ */
+function param_get_error_msg( $var )
+{
+	global $param_input_err_messages;
+
+	if( empty( $param_input_err_messages[$var] ) )
+	{
+		return '';
+	}
+
+	return $param_input_err_messages[$var];
 }
 
 
@@ -1078,7 +1107,7 @@ function set_param( $var, $value )
  *
  * @return NULL|mixed The value of the param, if set. NULL otherwise.
  */
-function get_param()
+function get_param( $var )
 {
 	if( ! isset($GLOBALS[$var]) )
 	{
@@ -1490,6 +1519,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.4  2006/08/20 20:12:33  fplanque
+ * param_() refactoring part 1
+ *
  * Revision 1.3  2006/08/20 19:44:05  blueyed
  * doc
  *
