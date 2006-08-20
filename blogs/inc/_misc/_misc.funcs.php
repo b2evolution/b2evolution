@@ -1976,7 +1976,7 @@ function debug_info( $force = false )
 
 
 	// DEBUGLOG FROM SESSION, after a redirect (with list of categories at top):
-	if( ($sess_Debuglog = $Session->get('Debuglog')) && is_a( $sess_Debuglog, 'log' ) )
+	if( isset($Session) && ($sess_Debuglog = $Session->get('Debuglog')) && is_a( $sess_Debuglog, 'log' ) )
 	{
 		$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
 		$log_cats = array_keys($sess_Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
@@ -3120,6 +3120,9 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 
 /*
  * $Log$
+ * Revision 1.102  2006/08/20 00:01:29  blueyed
+ * fix: test if Session is set in debug_info() (may not during install)
+ *
  * Revision 1.101  2006/08/19 10:23:18  yabs
  * correcting display_list
  *
