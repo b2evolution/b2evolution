@@ -283,15 +283,6 @@ if( empty($generating_static) )
 
 
 /**
- * Load Request class
- */
-require_once dirname(__FILE__).'/_misc/_request.class.php';
-
-
-if( !isset( $use_html_checker ) ) { $use_html_checker = 1; }
-
-
-/**
  * Includes:
  */
 $Timer->start( '_main.inc:requires' );
@@ -605,6 +596,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.49  2006/08/20 22:39:31  fplanque
+ * no message
+ *
  * Revision 1.48  2006/08/20 22:25:20  fplanque
  * param_() refactoring part 2
  *
