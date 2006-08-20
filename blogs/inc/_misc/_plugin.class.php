@@ -434,6 +434,7 @@ class Plugin
 	 *   'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect': get passed
 	 *           through as attributes to the form/input element.
 	 *   </li></ul>
+	 *   </li></ul>
 	 *
 	 *
 	 * e.g.:
@@ -2584,6 +2585,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.85  2006/08/20 19:07:08  blueyed
+ * doc fix
+ *
  * Revision 1.84  2006/08/19 10:57:40  blueyed
  * doc fixes.
  *
