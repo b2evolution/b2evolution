@@ -45,7 +45,7 @@ require_once dirname(__FILE__).'/../dataobjects/_dataobject.class.php';
  *
  * @package evocore
  */
-class GenericOrdered extends GenericElement 
+class GenericOrdered extends GenericElement
 {
 	// Order object
 	var $order;
@@ -74,7 +74,7 @@ class GenericOrdered extends GenericElement
 		$Debuglog->add( "Created element <strong>$this->name</strong>", 'dataobjects' );
 	}
 
-	
+
 	/**
 	 * Set param value
 	 *
@@ -98,35 +98,35 @@ class GenericOrdered extends GenericElement
 				$this->set_param( $parname, 'string', $parvalue );
 		}
 	}
-	
-	
+
+
 	/**
 	 * Insert object into DB based on previously recorded changes
 	 */
 	function dbinsert()
 	{
-		global $DB, 
+		global $DB;
 
 		$DB->begin();
-	
-		if( $max_order = $DB->get_var( 'SELECT MAX('.$this->dbprefix.'order) 
-																			FROM '.$this->dbtablename ) ) 
+
+		if( $max_order = $DB->get_var( 'SELECT MAX('.$this->dbprefix.'order)
+																			FROM '.$this->dbtablename ) )
 		{	// The new element order must be the lastest
 			$max_order++;
 		}
-		else 
-		{ // There are no elements in the database yet, so his order is set to 1. 
+		else
+		{ // There are no elements in the database yet, so his order is set to 1.
 			$max_order = 1;
 		}
-		
+
 		// Set Object order:
 		$this->set( 'order', $max_order );
-		
+
 		parent::dbinsert();
 
 		$DB->commit();
-	}	
-		
+	}
+
 }
 
 ?>
