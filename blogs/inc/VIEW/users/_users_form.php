@@ -56,10 +56,6 @@ global $Settings;
  */
 global $UserSettings;
 /**
- * @var Request
- */
-
-/**
  * @var Plugins
  */
 global $Plugins;
@@ -285,6 +281,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.23  2006/08/20 23:14:07  blueyed
+ * doc fix
+ *
  * Revision 1.22  2006/08/20 22:25:22  fplanque
  * param_() refactoring part 2
  *
