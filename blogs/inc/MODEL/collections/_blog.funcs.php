@@ -492,54 +492,6 @@ function get_bloginfo( $show = '', $this_blogparams = '' )
 
 
 /**
- * Get blog params for specified ID
- *
- * @todo on a heavy multiblog system, cache them one by one...
- * @deprecated deprecated by {@link Blog_get_by_ID()}
- *
- * @param integer Blog ID
- */
-function get_blogparams_by_ID( $blog_ID )
-{
-	global $cache_blogs;
-
-	if( $blog_ID < 1 ) debug_die( 'No blog is selected!' );
-
-	if( empty($cache_blogs[$blog_ID]) )
-	{
-		blog_load_cache();
-	}
-	if( !isset( $cache_blogs[$blog_ID] ) ) debug_die( T_('Requested blog does not exist!') );
-	return $cache_blogs[ $blog_ID ];
-}
-
-
-/**
- * Get Blog for specified ID
- *
- * @todo on a heavy multiblog system, cache them one by one...
- * @todo move over to BlogCache?!
- *
- * @param integer ID of Blog we want
- */
-function Blog_get_by_ID( $blog_ID )
-{
-	global $cache_blogs;
-
-	if( $blog_ID < 1 ) debug_die( 'No blog is selected!' );
-
-	if( empty($cache_blogs[$blog_ID]) )
-	{
-		blog_load_cache();
-	}
-	if( !isset( $cache_blogs[$blog_ID] ) ) debug_die( T_('Requested blog does not exist!') );
-
-	return new Blog( $cache_blogs[$blog_ID] ); // COPY !
-}
-
-
-/**
- * blog_load_cache(-)
  */
 function blog_load_cache()
 {
@@ -590,7 +542,6 @@ function blog_list_start( $need = '' )
 	global $cache_blogs, $curr_blogparams, $curr_blog_ID;
 
 	blog_load_cache();
-	// echo "nb blogs=", count($cache_blogs );
 
 	$curr_blogparams = reset( $cache_blogs );
 	if( $curr_blogparams === false )
@@ -704,6 +655,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.10  2006/08/21 00:03:13  fplanque
+ * obsoleted some dirty old thing
+ *
  * Revision 1.9  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

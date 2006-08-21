@@ -233,9 +233,7 @@ switch( $action )
 		}
 		else
 		{ // We are creating a new base cat
-			$blogparams = get_blogparams_by_ID( $blog );
-
-			$Form->begin_form( 'fform', sprintf( T_('New category in blog: %s'), $blogparams->blog_name ) );
+			$Form->begin_form( 'fform', sprintf( T_('New category in blog: %s'), $Blog->dget('name') ) );
 
 			$Form->hidden( 'cat_blog_ID', $blog );
 		}
@@ -399,6 +397,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2006/08/21 00:03:12  fplanque
+ * obsoleted some dirty old thing
+ *
  * Revision 1.12  2006/08/20 22:25:20  fplanque
  * param_() refactoring part 2
  *

@@ -105,7 +105,8 @@ $subject = param( 'g', 'string', '' );
 $message = param( 'h', 'string', '' );
 
 // Getting current blog info:
-$Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
+$BlogCache = & get_Cache( 'BlogCache' );
+$Blog = & $BlogCache->get_by_ID( $blog );
 
 if( empty($sender_name) )
 {
@@ -258,6 +259,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.36  2006/08/21 00:03:12  fplanque
+ * obsoleted some dirty old thing
+ *
  * Revision 1.35  2006/08/19 07:56:29  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

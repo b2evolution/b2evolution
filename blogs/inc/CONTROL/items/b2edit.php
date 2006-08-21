@@ -76,7 +76,8 @@ switch($action)
 		$post_locale = $edited_Item->get( 'locale' );
 		$cat = $edited_Item->get( 'main_cat_ID' );
 		$blog = get_catblog($cat);
-		$Blog = Blog_get_by_ID( $blog );
+		$BlogCache = & get_Cache( 'BlogCache' );
+		$Blog = & $BlogCache->get_by_ID( $blog );
 
 		$AdminUI->title = T_('Editing post').': '.$edited_Item->dget( 'title', 'htmlhead' );
 		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, $Blog->get('name') );
@@ -107,7 +108,8 @@ switch($action)
 
 		$edited_Comment_Item = & $edited_Comment->get_Item();
 		$blog = $edited_Comment_Item->blog_ID;
-		$Blog = Blog_get_by_ID( $blog );
+		$BlogCache = & get_Cache( 'BlogCache' );
+		$Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission:
 		$current_User->check_perm( 'blog_comments', 'any', true, $blog );
@@ -160,7 +162,8 @@ switch($action)
 			break;
 		}
 
-		$Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
+		$BlogCache = & get_Cache( 'BlogCache' );
+		$Blog = & $BlogCache->get_by_ID( $blog );
 
 		if( ! blog_has_cats( $blog ) )
 		{

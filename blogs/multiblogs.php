@@ -221,7 +221,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		// Dirty trick until we get everything into objects:
 		$saved_blog = $blog;
 		$blog = 4;		// Linkblog now
-		$Blog_roll = Blog_get_by_ID( 4 ); // Blog roll
+		$Blog_roll = & $BlogCache->get_by_ID( 4 ); // Blog roll
 		?>
 		<h3>#3: <a href="<?php $Blog_roll->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog_roll->disp( 'name', 'htmlbody' ) ?></a></h3>
 		<?php

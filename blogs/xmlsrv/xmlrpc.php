@@ -147,7 +147,6 @@ function b2newpost($m)
 	}
 
 	$blog_ID = get_catblog($category);
-	$blogparams = get_blogparams_by_ID( $blog_ID );
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
@@ -181,19 +180,16 @@ function b2newpost($m)
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
 
+
+	logIO( 'O', 'Sending notifications...' );
+
 	// Send email notifications now!
-	logIO("O","Sending email notifications...");
 	$edited_Item->send_email_notifications( false );
 
+	// send outbound pings:
 	load_funcs( '_misc/_ping.funcs.php' );
-	logIO("O","Pinging b2evolution.net...");
-	pingb2evonet( $blogparams, $post_ID, $post_title, false );
-	logIO("O","Pinging Weblogs...");
-	pingWeblogs( $blogparams, false );
-	logIO("O","Pinging Blo.gs...");
-	pingBlogs( $blogparams, false );
-	logIO("O","Pinging Technorati...");
-	pingTechnorati( $blogparams, false );
+	send_outbound_pings( $edited_Item, false );
+
 
 	return new xmlrpcresp(new xmlrpcval($post_ID));
 
@@ -396,7 +392,6 @@ function bloggernewpost( $m )
 	}
 
 	$blog_ID = get_catblog($post_category);
-	$blogparams = get_blogparams_by_ID( $blog_ID );
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $blog_ID ) )
@@ -435,18 +430,15 @@ function bloggernewpost( $m )
 	if( $publish )
 	{ // If post is publicly published:
 
-		logIO("O","Sending email notifications...");
+		logIO( 'O', 'Sending notifications...' );
+
+		// Send email notifications now!
 		$edited_Item->send_email_notifications( false );
 
+		// send outbound pings:
 		load_funcs( '_misc/_ping.funcs.php' );
-		logIO("O","Pinging b2evolution.net...");
-		pingb2evonet( $blogparams, $post_ID, $post_title, false );
-		logIO("O","Pinging Weblogs...");
-		pingWeblogs( $blogparams, false );
-		logIO("O","Pinging Blo.gs...");
-		pingBlogs( $blogparams, false );
-		logIO("O","Pinging Technorati...");
-		pingTechnorati( $blogparams, false );
+		send_outbound_pings( $edited_Item, false );
+
 	}
 
 	logIO("O","All done.");
@@ -548,7 +540,6 @@ function bloggereditpost($m)
 	// return new xmlrpcresp(0, $xmlrpcerruser+50, 'post_category='.$post_category );
 
 	$blog_ID = get_catblog($post_category);
-	$blogparams = get_blogparams_by_ID( $blog_ID );
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $blog_ID ) )
@@ -606,18 +597,15 @@ function bloggereditpost($m)
 		else
 		{ // We'll ping now
 
-			logIO("O","Sending email notifications...");
+			logIO( 'O', 'Sending notifications...' );
+
+			// Send email notifications now!
 			$edited_Item->send_email_notifications( false );
 
+			// send outbound pings:
 			load_funcs( '_misc/_ping.funcs.php' );
-			logIO("O","Pinging b2evolution.net...");
-			pingb2evonet( $blogparams, $post_ID, $post_title, false );
-			logIO("O","Pinging Weblogs...");
-			pingWeblogs( $blogparams, false );
-			logIO("O","Pinging Blo.gs...");
-			pingBlogs( $blogparams, false );
-			logIO("O","Pinging Technorati...");
-			pingTechnorati( $blogparams, false );
+			send_outbound_pings( $edited_Item, false );
+
 		}
 
 	}
@@ -953,8 +941,6 @@ function bloggergetrecentposts( $m )
 		return new xmlrpcresp(0, $xmlrpcerruser+2, 'Permission denied.' ); // user error 2
 	}
 
-	// Getting current blog info:
-	$blogparams = get_blogparams_by_ID( $blog_ID );
 
 	// Get the posts to display:
 	$MainList = & new ItemList( $blog_ID, $show_statuses, '', '', '', '', array(), '', 'DESC', '', $numposts,
@@ -1456,22 +1442,14 @@ function mwnewpost($m)
 		sleep( $sleep_after_edit );
 	}
 
-	$blogparams = get_blogparams_by_ID( $blog_ID );
+	logIO( 'O', 'Sending notifications...' );
 
-//		logIO("O","Sending email notifications...");
-//		$edited_Item->send_email_notifications( false );
+	// Send email notifications now!
+	$edited_Item->send_email_notifications( false );
 
+	// send outbound pings:
 	load_funcs( '_misc/_ping.funcs.php' );
-	logIO("O","Pinging b2evolution.net...");
-//	New error is here somewhere - and of course with ecto these functions are not needed
-// so we will need config option to opt out of all of these
-	pingb2evonet( $blogparams, $post_ID, $post_title, false );
-	logIO("O","Pinging Weblogs...");
-	pingWeblogs( $blogparams, false );
-	logIO("O","Pinging Blo.gs...");
-//	pingBlogs( $blogparams, false );
-	logIO("O","Pinging Technorati...");
-	pingTechnorati( $blogparams, false );
+	send_outbound_pings( $edited_Item, false );
 
 	return new xmlrpcresp(new xmlrpcval($post_ID));
 }
@@ -1883,10 +1861,7 @@ function metawebloggetrecentposts( $m )
 	}
 	logIO("O","In metawebloggetrecentposts, permissions ok...");
 	logIO("O","In metawebloggetrecentposts, current blog is ...". $blog_ID);
-	logIO("O","In metawebloggetrecentposts, getting current blog info...");
-	// Getting current blog info:
-	$blogparams = get_blogparams_by_ID( $blog_ID );
-	logIO("O","In metawebloggetrecentposts,  current blog info...". $blogparams);
+
 	// Get the posts to display:
 	$MainList = & new ItemList( $blog_ID, $show_statuses, '', '', '', '', array(), '', 'DESC', '', $numposts,
 															'', '', '', '', '', '', '', 'posts' );
@@ -2301,6 +2276,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.108  2006/08/21 00:03:13  fplanque
+ * obsoleted some dirty old thing
+ *
  * Revision 1.107  2006/08/19 07:56:32  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

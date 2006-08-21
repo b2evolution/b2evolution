@@ -82,7 +82,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <?php
 // Select Blog #1:
 $blog = 1;
-$Blog_all = Blog_get_by_ID( 1 );
+$Blog_all = & $BlogCache->get_by_ID( 1 );
 if( $Blog_all->get( 'stub' ) != '' )
 {	// Only display if the stub is set:
 	?>

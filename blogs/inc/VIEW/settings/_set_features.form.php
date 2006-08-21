@@ -60,7 +60,15 @@ $Form->begin_fieldset( T_('Online Help') . get_web_help_link('online help'));
 	$Form->checkbox_input( 'webhelp_enabled', $Settings->get('webhelp_enabled'), T_('Online Help links'), array( 'note' => T_('Online help links provide context sensitive help to certain features.' ) ) );
 $Form->end_fieldset();
 
-// --------------------------------------------
+
+$Form->begin_fieldset( T_('After each new post...') . get_web_help_link('After each post settings'));
+	$Form->radio_input( 'outbound_notifications_mode', $Settings->get('outbound_notifications_mode'), array(
+									array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('b2evo will not send out any notification about your new content.'), 'suffix' => '<br />' ),
+									array( 'value'=>'immediate', 'label'=>T_('Immediate'), 'note'=>T_('This is guaranteed to work but may create an annoying delay after each post.'), 'suffix' => '<br />' ),
+									array( 'value'=>'cron', 'label'=>T_('With a scheduled job'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up. You could notify news every minute.') ) ),
+								T_('Outbound trackbacks, pings &amp; email notifications') );
+$Form->end_fieldset();
+
 $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') );
 
 	$Form->checkbox_input( 'eblog_enabled', $Settings->get('eblog_enabled'), T_('Enable Blog by email'),
@@ -155,6 +163,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.8  2006/08/21 00:03:13  fplanque
+ * obsoleted some dirty old thing
+ *
  * Revision 1.7  2006/07/06 19:59:08  fplanque
  * better logs, better stats, better pruning
  *

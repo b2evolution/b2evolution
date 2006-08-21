@@ -331,17 +331,14 @@ switch ( $Settings->get('eblog_method') )
 				$edited_Item = & new Item();
 				$post_ID = $edited_Item->insert( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale, '',	$Settings->get('AutoBR'), true );
 
-				$blogparams = get_blogparams_by_ID( $blog_ID );
-
 				// Send email notifications now!
 				$edited_Item->send_email_notifications( false );
 
+				// send outbound pings:
 				load_funcs( '_misc/_ping.funcs.php' );
-				pingb2evonet( $blogparams, $post_ID, $post_title);
-				pingWeblogs($blogparams);
-				pingBlogs($blogparams);
-				pingTechnorati($blogparams);
+				send_outbound_pings( $edited_Item );
 			}
+
 			echo "\n<p><strong>", T_('Posted title'), ':</strong> ', $post_title, '<br />';
 			echo "\n<strong>", T_('Posted content'), ':</strong><br /><xmp>', $content, '</xmp></p>';
 
@@ -597,17 +594,14 @@ switch ( $Settings->get('eblog_method') )
 				$edited_Item = & new Item();
 				$post_ID = $edited_Item->insert( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale, '',	$Settings->get('AutoBR'), true );
 
-
 				// Send email notifications now!
 				$edited_Item->send_email_notifications( false );
 
-				// load_funcs( '_misc/_ping.funcs.php' );
-				// $blogparams = get_blogparams_by_ID( $blog_ID );
-				//pingb2evonet( $blogparams, $post_ID, $post_title);
-				//pingWeblogs($blogparams);
-				//pingBlogs($blogparams);
-				//pingTechnorati($blogparams);
+  			// send outbound pings:
+				load_funcs( '_misc/_ping.funcs.php' );
+				send_outbound_pings( $edited_Item );
 			}
+
 			echo_message( '&bull;<b>' . T_('Post title') . ":</b> $post_title<br/>",'',3 );
 			echo_message( '&bull;<b>' . T_('Post content') . ":</b> $content<br/>",'',3 );
 			echo_message( '&bull;<b>' . T_('Blog by Email'). ':</b> ');

@@ -59,6 +59,9 @@ switch( $action )
 		{
 			/*
 			// TODO: insert some default settings rather than just delete them all, as per original configuration in the _advanced.php file:
+
+			fp>> Isn't this done in $Settings anyway?
+
 			# mailserver settings
 			$mailserver_url = 'mail.example.com';
 			$mailserver_login = 'login@example.com';
@@ -82,10 +85,10 @@ switch( $action )
 			*/
 
 			$Settings->delete_array( array(
-				'eblog_enabled', 'eblog_method', 'eblog_server_host', 'eblog_server_port', 'eblog_username', 'eblog_password', 'eblog_default_category', 'eblog_subject_prefix',
+				'eblog_enabled', 'eblog_method', 'eblog_server_host', 'eblog_server_port', 'eblog_username',
+				'eblog_password', 'eblog_default_category', 'eblog_subject_prefix',
 				'log_public_hits', 'log_admin_hits', 'auto_prune_stats_mode', 'auto_prune_stats',
-				'timeout_sessions',
-				'webhelp_enabled' ) );
+				'timeout_sessions',	'outbound_notifications_mode', 'webhelp_enabled' ) );
 
 			if( $Settings->dbupdate() )
 			{
@@ -102,6 +105,9 @@ switch( $action )
 			param( 'webhelp_enabled', 'integer', 0 );
 			$Settings->set( 'webhelp_enabled', $webhelp_enabled );
 
+			// Outbound pinging:
+ 			param( 'outbound_notifications_mode', 'string', true );
+			$Settings->set( 'outbound_notifications_mode',  get_param('outbound_notifications_mode') );
 
 			// Blog by email
 			param( 'eblog_enabled', 'integer', 0 );
@@ -204,6 +210,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2006/08/21 00:03:13  fplanque
+ * obsoleted some dirty old thing
+ *
  * Revision 1.14  2006/08/20 22:25:20  fplanque
  * param_() refactoring part 2
  *

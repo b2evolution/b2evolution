@@ -718,21 +718,22 @@ writeBackSendConf( $md );
 
 /* Pinging turned off for now because of causing invalid server response
 
-// Send email notifications now!
-$edited_Item->send_email_notifications( false );
+	// Send email notifications now!
+	$edited_Item->send_email_notifications( false );
 
-$blogparams = get_blogparams_by_ID( $blog );
-load_funcs( '_misc/_ping.funcs.php' );
-pingb2evonet( $blogparams, $post_ID, $post_title, false );
-pingWeblogs( $blogparams, false );
-pingBlogs( $blogparams );
-pingTechnorati($blogparams);
+	// send outbound pings:
+	load_funcs( '_misc/_ping.funcs.php' );
+	send_outbound_pings( $edited_Item );
+
 */
 
 exit;
 
 /*
  * $Log$
+ * Revision 1.4  2006/08/21 00:03:12  fplanque
+ * obsoleted some dirty old thing
+ *
  * Revision 1.3  2006/08/19 07:56:29  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

@@ -69,6 +69,8 @@ class GeneralSettings extends AbstractSettings
 		'auto_prune_stats_mode' => 'page',  // 'page' is the safest mode for average installs (may be "off", "page" or "cron")
 		'auto_prune_stats' => '15',         // days (T_hitlog and T_sessions)
 
+		'outbound_notifications_mode' => 'immediate', // 'immediate' is the safest mode for average installs (may be "off", "immediate" or "cron")
+
 		'fm_enabled' => '1',
 		'fm_enable_create_dir' => '1',
 		'fm_enable_create_file' => '0',
@@ -155,6 +157,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.17  2006/08/21 00:03:13  fplanque
+ * obsoleted some dirty old thing
+ *
  * Revision 1.16  2006/07/08 02:13:38  blueyed
  * Understood the new auto_prune_modes and added conversion of previous "off" value (0).
  *

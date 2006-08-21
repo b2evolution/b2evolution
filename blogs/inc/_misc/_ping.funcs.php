@@ -32,6 +32,47 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
+ * Get blog params for specified ID
+ *
+ * @todo on a heavy multiblog system, cache them one by one...
+ *
+ * @param integer Blog ID
+ */
+function get_blogparams_by_ID( $blog_ID )
+{
+	global $cache_blogs;
+
+	if( $blog_ID < 1 ) debug_die( 'No blog is selected!' );
+
+	if( empty($cache_blogs[$blog_ID]) )
+	{
+		blog_load_cache();
+	}
+	if( !isset( $cache_blogs[$blog_ID] ) ) debug_die( T_('Requested blog does not exist!') );
+	return $cache_blogs[ $blog_ID ];
+}
+/**
+ * Send outbound pings for a post
+ *
+ * Dirty temporary function
+ *
+ * @param Item
+ * @param boolean
+ */
+function send_outbound_pings( & $Item, $display = true )
+{
+	$blog = $Item->blog_ID;
+
+	$blogparams = get_blogparams_by_ID( $blog );
+
+	pingb2evonet( $blogparams, $Item->ID, $Item->title, $display);
+	pingWeblogs( $blogparams, $display);
+	pingBlogs( $blogparams, $display);
+	pingTechnorati( $blogparams, $display );
+}
+
+
+/**
  * pings b2evolution.net
  */
 function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
@@ -240,6 +281,9 @@ function pingTechnorati(& $blogparams, $display = true )
 
 /*
  * $Log$
+ * Revision 1.6  2006/08/21 00:03:13  fplanque
+ * obsoleted some dirty old thing
+ *
  * Revision 1.5  2006/08/19 07:56:31  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

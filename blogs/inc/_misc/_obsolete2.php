@@ -33,6 +33,41 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+// Blog funcs
+
+/**
+ * Get Blog for specified ID
+ *
+ * @todo on a heavy multiblog system, cache them one by one...
+ * @todo move over to BlogCache?!
+ *
+ * @param integer ID of Blog we want
+ */
+function Blog_get_by_ID( $blog_ID )
+{
+	global $cache_blogs;
+
+	if( $blog_ID < 1 ) debug_die( 'No blog is selected!' );
+
+	if( empty($cache_blogs[$blog_ID]) )
+	{
+		blog_load_cache();
+	}
+	if( !isset( $cache_blogs[$blog_ID] ) ) debug_die( T_('Requested blog does not exist!') );
+
+	return new Blog( $cache_blogs[$blog_ID] ); // COPY !
+}
+
+
+
+
+
+
+
+
+// end blog funcs
+
+
 
 
 /*

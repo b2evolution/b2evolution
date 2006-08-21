@@ -25,7 +25,8 @@ if( ! $blog  )
 }
 else
 { // We could select a valid blog which we have permission to access:
-	$Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
+	$BlogCache = & get_Cache( 'BlogCache' );
+	$Blog = & $BlogCache->get_by_ID( $blog );
 	$AdminUI->title .= ' '.$Blog->dget( 'shortname' );
 
 

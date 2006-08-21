@@ -660,7 +660,6 @@ function blog_has_cats( $blog_ID )
 function cat_query( $load_postcounts = 'none', $dbtable_items = 'T_posts', $dbprefix_items = 'post_',
 										$dbIDname_items = 'post_ID' )
 {
-	// global $cache_categories; // $cache_blogs,
 	global $blog;
 	if( $blog != 0 ) blog_load_cache();
 	cat_load_cache( $load_postcounts, $dbtable_items, $dbprefix_items, $dbIDname_items );
@@ -966,6 +965,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.9  2006/08/21 00:03:13  fplanque
+ * obsoleted some dirty old thing
+ *
  * Revision 1.8  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

@@ -127,7 +127,8 @@ if( $disp == 'stats' )
 }
 
 // Getting current blog info:
-$Blog = Blog_get_by_ID( $blog ); /* TODO: TMP: */ $blogparams = get_blogparams_by_ID( $blog );
+$BlogCache = & get_Cache( 'BlogCache' );
+$Blog = & $BlogCache->get_by_ID( $blog );
 
 
 /*
@@ -456,6 +457,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.33  2006/08/21 00:03:12  fplanque
+ * obsoleted some dirty old thing
+ *
  * Revision 1.32  2006/08/20 22:25:20  fplanque
  * param_() refactoring part 2
  *

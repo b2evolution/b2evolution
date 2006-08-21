@@ -145,12 +145,12 @@ switch($action)
 		if( $edited_Item->status != 'published' )
 		{
 			echo "<div class=\"panelinfo\">\n";
-			echo '<p>', T_('Post not publicly published: skipping trackback and blog pings...'), "</p>\n";
+			echo '<p>', T_('Post not publicly published: skipping notifications...'), "</p>\n";
 			echo "</div>\n";
 		}
 		else
 		{ // We do all the pinging now!
-			$blogparams = get_blogparams_by_ID( $blog );
+
 			// trackback
 			load_funcs( '_misc/_trackback.funcs.php' );
 			trackbacks( $post_trackbacks, $edited_Item->content, $edited_Item->title, $edited_Item->ID);
@@ -158,13 +158,12 @@ switch($action)
 			// Send email notifications now!
 			$edited_Item->send_email_notifications();
 
+			// send outbound pings:
 			load_funcs( '_misc/_ping.funcs.php' );
-			pingb2evonet($blogparams, $edited_Item->ID, $edited_Item->title);
-			pingWeblogs($blogparams);
-			pingBlogs($blogparams);
-			pingTechnorati($blogparams);
+			send_outbound_pings( $edited_Item );
 		}
-		echo '<div class="panelinfo"><p>', T_('Posting Done...'), "</p></div>\n";
+
+		echo '<div class="panelinfo"><p>'.T_('Posting Done...')."</p></div>\n";
 		break;
 
 
@@ -246,7 +245,7 @@ switch($action)
 		if( $edited_Item->status != 'published' )
 		{
 			echo "<div class=\"panelinfo\">\n";
-			echo '<p>', T_('Post not publicly published: skipping trackback and blog pings...'), "</p>\n";
+			echo '<p>', T_('Post not publicly published: skipping notifications...'), "</p>\n";
 			echo "</div>\n";
 		}
 		else
@@ -260,7 +259,7 @@ switch($action)
 			if( $pings_already_done )
 			{ // pings have been done before
 				echo "<div class=\"panelinfo\">\n";
-				echo '<p>', T_('Post had already pinged: skipping blog pings...'), "</p>\n";
+				echo '<p>', T_('Post had already pinged: skipping notifications/pings...'), "</p>\n";
 				echo "</div>\n";
 			}
 			else
@@ -269,12 +268,9 @@ switch($action)
 				// Send email notifications now!
 				$edited_Item->send_email_notifications();
 
-				$blogparams = get_blogparams_by_ID( $blog );
+				// send outbound pings:
 				load_funcs( '_misc/_ping.funcs.php' );
-				pingb2evonet( $blogparams, $edited_Item->ID, $edited_Item->title );
-				pingWeblogs( $blogparams );
-				pingBlogs( $blogparams );
-				pingTechnorati( $blogparams );
+				send_outbound_pings( $edited_Item );
 			}
 		}
 		echo '<div class="panelinfo"><p>', T_('Updating done...'), "</p></div>\n";
@@ -292,7 +288,7 @@ switch($action)
 
 		$post_cat = $edited_Item->main_cat_ID;
 		$blog = get_catblog($post_cat);
-		$blogparams = get_blogparams_by_ID( $blog );
+
 		$location = url_add_param( $admin_url, 'ctrl=browse&amp;blog='.$blog.'&amp;filter=restore' );
 
 		$AdminUI->title = T_('Updating post status...');
@@ -348,13 +344,11 @@ switch($action)
 		}
 		else
 		{ // We may do some pinging now!
-			$blogparams = get_blogparams_by_ID( $blog );
 
-			// ping ?
 			if( in_array( 'pingsdone', $post_flags ) )
 			{ // pings have been done before
 				echo "<div class=\"panelinfo\">\n";
-				echo '<p>', T_('Post had already pinged: skipping blog pings...'), "</p>\n";
+				echo '<p>', T_('Post had already pinged: skipping notifications...'), "</p>\n";
 				echo "</div>\n";
 			}
 			else
@@ -363,11 +357,9 @@ switch($action)
 				// Send email notifications now!
 				$edited_Item->send_email_notifications();
 
+				// send outbound pings:
 				load_funcs( '_misc/_ping.funcs.php' );
-				pingb2evonet( $blogparams, $post_ID, $edited_Item->title);
-				pingWeblogs($blogparams);
-				pingBlogs($blogparams);
-				pingTechnorati($blogparams);
+				send_outbound_pings( $edited_Item );
 			}
 		}
 
@@ -387,7 +379,6 @@ switch($action)
 
 		$post_cat = $edited_Item->main_cat_ID;
 		$blog = get_catblog($post_cat);
-		$blogparams = get_blogparams_by_ID( $blog );
 		$location = url_add_param( $admin_url, 'ctrl=browse&amp;blog='.$blog.'&amp;filter=restore' );
 
 		$AdminUI->title = T_('Updating post status...');
@@ -622,6 +613,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2006/08/21 00:03:12  fplanque
+ * obsoleted some dirty old thing
+ *
  * Revision 1.24  2006/08/20 22:25:20  fplanque
  * param_() refactoring part 2
  *
