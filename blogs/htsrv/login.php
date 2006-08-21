@@ -109,7 +109,7 @@ switch( $action )
 		}
 		else
 		{
-			$request_id = generate_random_key(22); // fp> why 22? ;)
+			$request_id = generate_random_key(22); // 22 to make it not too long for URL but unique/safe enough
 
 			$message = T_( 'Somebody (presumably you) has requested a password change for your account.' )
 				."\n\n"
@@ -358,6 +358,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.72  2006/08/21 19:07:52  blueyed
+ * doc
+ *
  * Revision 1.71  2006/08/21 16:07:43  fplanque
  * refactoring
  *
