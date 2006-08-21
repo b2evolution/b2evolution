@@ -15,13 +15,13 @@ require_once $inc_path .'_main.inc.php';
  */
 require_once $model_path.'cron/_cron.funcs.php';
 
+$quiet = 0;
 if( $is_cli )
 { // called through Command Line Interface, handle args:
 
 	$argc = $_SERVER['argc'];
 	$argv = $_SERVER['argv'];
 
-	$quiet = 0;
 	foreach( array_slice($argv, 1) as $v )
 	{
 		switch( $v )

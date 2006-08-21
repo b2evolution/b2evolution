@@ -65,8 +65,8 @@ $Form->begin_fieldset( T_('After each new post...') . get_web_help_link('After e
 	$Form->radio_input( 'outbound_notifications_mode', $Settings->get('outbound_notifications_mode'), array(
 									array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('b2evo will not send out any notification about your new content.'), 'suffix' => '<br />' ),
 									array( 'value'=>'immediate', 'label'=>T_('Immediate'), 'note'=>T_('This is guaranteed to work but may create an annoying delay after each post.'), 'suffix' => '<br />' ),
-									array( 'value'=>'cron', 'label'=>T_('With a scheduled job'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up. You could notify news every minute.') ) ),
-								T_('Outbound trackbacks, pings &amp; email notifications') );
+									array( 'value'=>'cron', 'label'=>T_('Asynchronous'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up. You could notify news every minute.') ) ),
+								T_('Outbound pings &amp; email notifications') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') );
@@ -163,6 +163,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.9  2006/08/21 21:33:36  fplanque
+ * scheduled pings part 1
+ *
  * Revision 1.8  2006/08/21 00:03:13  fplanque
  * obsoleted some dirty old thing
  *

@@ -2601,6 +2601,15 @@ class Item extends DataObject
 	 */
 	function handle_post_processing( $display = true )
 	{
+		global $Settings;
+
+		$notifications_mode = $Settings->get('outbound_notifications_mode');
+
+		if( $notifications_mode == 'off' )
+		{	// Exit silently
+			return false;
+		}
+
 		if( $this->notifications_status == 'finished' )
 		{ // pings have been done before
 			if( $display )
@@ -2634,14 +2643,55 @@ class Item extends DataObject
 			return false;
 		}
 
-		// Send email notifications now!
-		$this->send_email_notifications( $display );
+		if( $notifications_mode == 'immediate' )
+		{	// We want to do the post processing immediately:
+			// send outbound pings:
+			$this->send_outbound_pings( $display );
 
-		// send outbound pings:
-		$this->send_outbound_pings( $display );
+			// Send email notifications now!
+			$this->send_email_notifications( $display );
 
-		// Record that processing has been done:
-		$this->set( 'notifications_status', 'finished' );
+			// Record that processing has been done:
+			$this->set( 'notifications_status', 'finished' );
+		}
+		else
+		{	// We want asynchronous post processing:
+			if( $display )
+			{
+				echo "<div class=\"panelinfo\">\n";
+				echo '<p>'.T_('Scheduling asynchronous notifications...')."</p>\n";
+				echo "</div>\n";
+			}
+
+			// CREATE OBJECT:
+			load_class( '/MODEL/cron/_cronjob.class.php' );
+			$edited_Cronjob = & new Cronjob();
+
+			// start datetime. We do not want to ping before the post is effectively published:
+			$edited_Cronjob->set( 'start_datetime', $this->issue_date );
+
+			// no repeat.
+
+			// name:
+			$edited_Cronjob->set( 'name', sprintf( T_('Send notifications for &laquo;%s&raquo;'), strip_tags($this->title) ) );
+
+			// controller:
+			$edited_Cronjob->set( 'controller', 'cron/_post_notifications.job.php' );
+
+			// params: specify which post this job is supposed to send notifications for:
+			$edited_Cronjob->set( 'params', array( 'item_ID' => $this->ID ) );
+
+			// Save cronjob to DB:
+			$edited_Cronjob->dbinsert();
+
+			// Memorize the cron job ID which is going to handle this post:
+			$this->set( 'notifications_ctsk_ID', $edited_Cronjob->ID );
+
+			// Record that processing has been scheduled:
+			$this->set( 'notifications_status', 'todo' );
+		}
+
+		// Save the new processing status to DB
 		$this->dbupdate();
 
 		return true;
@@ -2899,6 +2949,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.82  2006/08/21 21:33:35  fplanque
+ * scheduled pings part 1
+ *
  * Revision 1.81  2006/08/21 16:07:43  fplanque
  * refactoring
  *
@@ -3169,61 +3222,5 @@ class Item extends DataObject
  *
  * Revision 1.83  2006/01/06 18:58:08  blueyed
  * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
- *
- * Revision 1.81  2005/12/30 21:39:03  blueyed
- * fix/todo
- *
- * Revision 1.79  2005/12/22 23:13:40  blueyed
- * Plugins' API changed and handling optimized
- *
- * Revision 1.77  2005/12/12 19:44:09  fplanque
- * Use cached objects by reference instead of copying them!!
- *
- * Revision 1.76  2005/12/12 19:21:22  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.75  2005/12/11 19:59:51  blueyed
- * Renamed gen_permalink() to get_permalink()
- *
- * Revision 1.74  2005/12/05 20:54:05  blueyed
- * Changed Item::views() to take $zero, $one and $more param and default to 'No views', '1 view' and '%d views' (translated). More consistent and easier on the skin.
- *
- * Revision 1.73  2005/12/05 18:17:19  fplanque
- * Added new browsing features for the Tracker Use Case.
- *
- * Revision 1.71  2005/12/01 19:03:15  blueyed
- * Use set() to set default priority to 3! Otherwise leaving it at the default setting would not call dbchange().
- *
- * Revision 1.70  2005/11/28 21:06:56  blueyed
- * Item::msgform_link_assigned() to display link to message form of the assigned User
- *
- * Revision 1.65  2005/11/05 01:01:50  blueyed
- * Fix noticed during install, when there's no $current_User. Do not assign a user in the constructor then.
- *
- * Revision 1.64  2005/11/04 22:40:01  fplanque
- * fixed pesky default renderers
- *
- * Revision 1.63  2005/11/04 21:42:22  blueyed
- * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
- *
- * Revision 1.62  2005/11/04 15:16:09  blueyed
- * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
- * This commit fixes the "foreign key constraint fails" when creating a new item during install or in edit_actions.
- *
- * Revision 1.61  2005/11/04 13:50:57  blueyed
- * Dataobject::set_param() / set(): return true if a value has been set and false if it did not change. It will not get considered for dbchange() then, too.
- *
- * Revision 1.60  2005/10/26 22:52:30  blueyed
- * Fix preview notices by fixing Itemlist::preview_request()
- *
- * Revision 1.59  2005/10/26 09:02:17  marian
- * Fixed Notice Messages on the preview screen.
- *
- * Revision 1.58  2005/10/03 18:10:07  fplanque
- * renamed post_ID field
- *
- * Revision 1.57  2005/10/03 17:26:44  fplanque
- * synched upgrade with fresh DB;
- * renamed user_ID field
  */
 ?>

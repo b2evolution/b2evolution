@@ -311,6 +311,7 @@ switch( $action )
 		/**
 		 * Updates document.title according to the item title field (post_title)
 		 */
+		/* fp> Severely bugged as soon as the tile includes ': '  ex 'hello: world'
 		function evo_update_document_title()
 		{
 			document.title = document.title.replace(/:[^:]*$/, ": "+document.getElementById('post_title').value);
@@ -320,6 +321,7 @@ switch( $action )
 
 		// Init:
 		evo_update_document_title();
+		*/
 	}
 
 

@@ -37,6 +37,7 @@ $cron_job_names = array(
 		'error' => T_('Error test job'),
 		'anstispam_poll' => T_('Poll the antispam blacklist'),
 		'prune_hits_sessions' => T_('Prune old hits & sessions'),
+		// post notifications, not user schedulable
 	);
 $cron_job_params = array(
 		'test' => array(
@@ -51,6 +52,7 @@ $cron_job_params = array(
 		'prune_hits_sessions' => array(
 			'ctrl' => 'cron/_prune_hits_sessions.job.php',
 			'params' => NULL ),
+		// post notifications, not user schedulable
 	);
 
 
@@ -79,18 +81,22 @@ switch( $action )
 		// Check that we have permission to edit options:
 		$current_User->check_perm( 'options', 'edit', true, NULL );
 
-		// TODO: Use Cronjob object
+		// CREATE OBJECT:
+		load_class( '/MODEL/cron/_cronjob.class.php' );
+		$edited_Cronjob = & new Cronjob();
 
 		$cjob_type = param( 'cjob_type', 'string', true );
 		if( !isset( $cron_job_params[$cjob_type] ) )
 		{
 			param_error( 'cjob_type', T_('Invalid job type') );
 		}
+
+		// start datetime:
 		param_date( 'cjob_date', T_('Please enter a valid date.'), true );
 		param_time( 'cjob_time' );
-		$cjob_datetime = form_date( get_param( 'cjob_date' ), get_param( 'cjob_time' ) );
+		$edited_Cronjob->set( 'start_datetime', form_date( get_param( 'cjob_date' ), get_param( 'cjob_time' ) ) );
 
-		// duration -> end date (deadline)
+		// repeat after:
 		$cjob_repeat_after_days = param( 'cjob_repeat_after_days', 'integer', 0 );
 		$cjob_repeat_after_hours = param( 'cjob_repeat_after_hours', 'integer', 0 );
 		$cjob_repeat_after_minutes = param( 'cjob_repeat_after_minutes', 'integer', 0 );
@@ -99,13 +105,22 @@ switch( $action )
 		{
 			$cjob_repeat_after = NULL;
 		}
+		$edited_Cronjob->set( 'repeat_after', $cjob_repeat_after );
+
+		// name:
+		$edited_Cronjob->set( 'name', $cron_job_names[$cjob_type] );
+
+		// controller:
+		$edited_Cronjob->set( 'controller', $cron_job_params[$cjob_type]['ctrl'] );
+
+		// params:
+		$edited_Cronjob->set( 'params', $cron_job_params[$cjob_type]['params'] );
 
 		if( ! param_errors_detected() )
 		{	// No errors
-      $sql = 'INSERT INTO T_cron__task( ctsk_start_datetime, ctsk_repeat_after, ctsk_name, ctsk_controller, ctsk_params )
-							VALUES( '.$DB->quote($cjob_datetime).', '.$DB->null($cjob_repeat_after).' , '.$DB->quote($cron_job_names[$cjob_type]).', '
-												.$DB->quote($cron_job_params[$cjob_type]['ctrl']).', '.$DB->quote(serialize($cron_job_params[$cjob_type]['params'])).' )';
-			$DB->query( $sql, 'Insert test task' );
+
+			// Save to DB:
+			$edited_Cronjob->dbinsert();
 
 			$Messages->add( T_('New job has been scheduled.'), 'success' );
 
