@@ -77,8 +77,6 @@ $Results->title = T_('Banned keywords blacklist');
  */
 function filter_antispam( & $Form )
 {
-
-
 	$Form->text( 'keywords', get_param('keywords'), 20, T_('Keywords'), T_('Separate with space'), 50 );
 }
 $Results->filter_area = array(
@@ -164,6 +162,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2006/08/21 01:02:09  blueyed
+ * whitespace
+ *
  * Revision 1.4  2006/08/20 22:25:21  fplanque
  * param_() refactoring part 2
  *

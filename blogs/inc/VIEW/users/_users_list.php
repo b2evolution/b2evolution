@@ -92,8 +92,6 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
  */
 function filter_userlist( & $Form )
 {
-
-
 	$Form->text( 'keywords', get_param('keywords'), 20, T_('Keywords'), T_('Separate with space'), 50 );
 }
 $Results->filter_area = array(
@@ -236,6 +234,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.12  2006/08/21 01:02:10  blueyed
+ * whitespace
+ *
  * Revision 1.11  2006/08/20 22:25:22  fplanque
  * param_() refactoring part 2
  *

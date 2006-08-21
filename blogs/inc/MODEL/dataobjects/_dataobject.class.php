@@ -588,8 +588,6 @@ class DataObject
 	 */
 	function set_from_Request( $parname, $var = NULL, $make_null = false )
 	{
-
-
 		if( empty($var) )
 		{
 			$var = $this->dbprefix.$parname;
@@ -664,6 +662,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2006/08/21 01:02:09  blueyed
+ * whitespace
+ *
  * Revision 1.16  2006/08/20 22:25:21  fplanque
  * param_() refactoring part 2
  *

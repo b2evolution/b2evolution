@@ -155,8 +155,13 @@ class GeneralSettings extends AbstractSettings
 
 }
 
+
+
 /*
  * $Log$
+ * Revision 1.18  2006/08/21 01:02:09  blueyed
+ * whitespace
+ *
  * Revision 1.17  2006/08/21 00:03:13  fplanque
  * obsoleted some dirty old thing
  *

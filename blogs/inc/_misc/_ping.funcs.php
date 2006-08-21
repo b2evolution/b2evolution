@@ -51,6 +51,8 @@ function get_blogparams_by_ID( $blog_ID )
 	if( !isset( $cache_blogs[$blog_ID] ) ) debug_die( T_('Requested blog does not exist!') );
 	return $cache_blogs[ $blog_ID ];
 }
+
+
 /**
  * Send outbound pings for a post
  *
@@ -281,6 +283,9 @@ function pingTechnorati(& $blogparams, $display = true )
 
 /*
  * $Log$
+ * Revision 1.7  2006/08/21 01:02:10  blueyed
+ * whitespace
+ *
  * Revision 1.6  2006/08/21 00:03:13  fplanque
  * obsoleted some dirty old thing
  *

@@ -520,7 +520,6 @@ class AdminUI_general
 		global $current_User;
 
 
-
 		require $view_path.$view_name;
 	}
 
@@ -1308,6 +1307,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.27  2006/08/21 01:02:10  blueyed
+ * whitespace
+ *
  * Revision 1.26  2006/08/20 22:25:22  fplanque
  * param_() refactoring part 2
  *

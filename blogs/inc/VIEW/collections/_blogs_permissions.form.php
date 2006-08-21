@@ -118,7 +118,6 @@ $Results->title = T_('User permissions');
  */
 function filter_colluserlist( & $Form )
 {
-
 	static $count = 0;
 
 	$count++;
@@ -416,6 +415,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.10  2006/08/21 01:02:10  blueyed
+ * whitespace
+ *
  * Revision 1.9  2006/08/20 22:33:22  fplanque
  * changed misleading note
  *
