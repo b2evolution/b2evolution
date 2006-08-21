@@ -38,9 +38,9 @@ class auto_p_plugin extends Plugin
 
 	var $br_allowed_in = array(
 		// Block level:
-		'address', 'center', 'dl', 'dir', 'div', 'fieldset', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'isindex', 'menu', 'noframes', 'noscript', 'ol', 'p', 'pre', 'ul',
+		'address', 'center', 'dl', 'dir', 'div', 'fieldset', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'isindex', 'menu', 'noframes', 'noscript', 'ol', 'p', 'pre',
 		// Inline:
-		'a', 'abbr', 'acronym', 'applet', 'b', 'basefont', 'bdo', 'big', 'button', 'cite', 'code', 'dfn', 'em', 'font', 'i', 'img', 'input', 'iframe', 'kbd', 'label', 'map', 'object', 'q', 'samp', 'script', 'select', 'small', 'span', 'strong', 'sub', 'sup', 'textarea', 'td', 'th', 'tt', 'var' );
+		'a', 'abbr', 'acronym', 'applet', 'b', 'basefont', 'bdo', 'big', 'button', 'cite', 'code', 'dfn', 'em', 'font', 'i', 'img', 'input', 'iframe', 'kbd', 'label', 'li', 'map', 'object', 'q', 'samp', 'script', 'select', 'small', 'span', 'strong', 'sub', 'sup', 'textarea', 'td', 'th', 'tt', 'var' );
 
 
 	/**
@@ -196,14 +196,7 @@ class auto_p_plugin extends Plugin
 
 			if( ! in_array($in_tag, $this->p_allowed_in) )
 			{ // we're in a tag, where no P tags are allowed, so just do the BRs:
-				if( in_array($in_tag, $this->br_allowed_in) )
-				{
-					return $this->handle_br( $text, $in_tag );
-				}
-				else
-				{
-					return $text;
-				}
+				return $this->handle_br( $text, $in_tag );
 			}
 		}
 
@@ -635,6 +628,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.28  2006/08/21 01:34:04  blueyed
+ * Auto-P: BR is not allowed in UL, but LI
+ *
  * Revision 1.27  2006/08/21 00:42:29  blueyed
  * Fix for leading and trailing newline in inline tags
  *
