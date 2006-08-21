@@ -305,6 +305,14 @@ class AutoPPluginTestCase extends UnitTestCase
 			"<p><strong>FOO</strong><br />\nBAR</p>",
 			$this->render( "<strong>FOO</strong>\nBAR" ) );
 
+		$this->assertEqual(
+			"<p><em><br />\nFOO</em></p>",
+			$this->render( "<em>\nFOO</em>" ) );
+
+		$this->assertEqual(
+			"<p><em>FOO<br />\n</em></p>",
+			$this->render( "<em>FOO\n</em>" ) );
+
 	}
 
 }

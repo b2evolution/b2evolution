@@ -424,7 +424,9 @@ class auto_p_plugin extends Plugin
 
 
 	/**
+	 * This is a helper for handling blocks from {@link handle_pre_blocks_helper()}.
 	 *
+	 * What comes here is supposed to have no block tags.
 	 *
 	 * @return array array( $text, $has_p )
 	 */
@@ -476,10 +478,10 @@ class auto_p_plugin extends Plugin
 			list( $text_in_tag, $closing_tag, $NL_before, $NL_after ) = $this->split_text_for_tag($tag, $text_after_tag);
 
 			if( ! empty($text_in_tag) )
-			{ // Recurse (same level):
-				list($text_in_tag, $sub_has_p) = $this->handle_pre_blocks_helper( $text_in_tag, $tag, false );
+			{ // Recurse (same level) - with the optional newlines at start and end, because in an inline tag every linebreak should become a BR:
+				list($text_in_tag, $sub_has_p) = $this->handle_pre_blocks_helper( $NL_before.$text_in_tag.$NL_after, $tag, false, false );
 			}
-			$r .= $NL_before.$text_in_tag.$NL_after;
+			$r .= $text_in_tag;
 
 			$r .= $closing_tag;
 
@@ -584,6 +586,7 @@ class auto_p_plugin extends Plugin
 			}
 		}
 
+		// remove newline at start and end:
 		if( substr($text_in_tag, 0, 1) == "\n" )
 		{
 			$NL_before = "\n";
@@ -632,6 +635,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.27  2006/08/21 00:42:29  blueyed
+ * Fix for leading and trailing newline in inline tags
+ *
  * Revision 1.26  2006/08/20 23:37:46  blueyed
  * Fix: there were no <br /> after inline tags
  *
