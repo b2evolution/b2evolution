@@ -218,85 +218,13 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.9  2006/08/21 16:07:44  fplanque
+ * refactoring
+ *
  * Revision 1.8  2006/08/19 07:56:31  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *
  * Revision 1.7  2006/07/04 17:32:30  fplanque
  * no message
- *
- * Revision 1.6  2006/05/16 21:45:52  blueyed
- * Use stream/socket timeout for data!
- *
- * Revision 1.5  2006/04/29 17:36:00  blueyed
- * Normalization
- *
- * Revision 1.4  2006/04/04 22:25:02  blueyed
- * Only try POST trackback, if host and path could get parsed out of URL.
- *
- * Revision 1.3  2006/03/12 23:09:01  fplanque
- * doc cleanup
- *
- * Revision 1.2  2006/03/09 22:29:59  fplanque
- * cleaned up permanent urls
- *
- * Revision 1.1  2006/02/23 21:12:18  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.15  2005/12/12 19:44:09  fplanque
- * Use cached objects by reference instead of copying them!!
- *
- * Revision 1.14  2005/12/12 19:21:23  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.13  2005/12/11 19:59:51  blueyed
- * Renamed gen_permalink() to get_permalink()
- *
- * Revision 1.12  2005/12/06 01:55:40  blueyed
- * Fix line ending for User-Agent; Also fix the infinite loop it was causing.
- * Revision 1.10  2005/12/04 00:23:11  blueyed
- * trackback(): send User-Agent header. This seems to be good behaviour.
- *
- * Revision 1.9  2005/11/20 18:03:01  blueyed
- * Fix sending wrong encoded url on trackbacks. Fix by knj (http://forums.b2evolution.net/viewtopic.php?t=5890)
- *
- * Revision 1.8  2005/10/31 05:51:06  blueyed
- * Use rawurlencode() instead of urlencode()
- *
- * Revision 1.7  2005/09/06 17:13:55  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.6  2005/02/28 09:06:34  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.5  2005/02/15 22:05:09  blueyed
- * Started moving obsolete functions to _obsolete092.php..
- *
- * Revision 1.4  2004/12/17 20:41:14  fplanque
- * cleanup
- *
- * Revision 1.3  2004/12/15 20:50:34  fplanque
- * heavy refactoring
- * suppressed $use_cache and $sleep_after_edit
- * code cleanup
- *
- * Revision 1.2  2004/10/14 18:31:25  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.33  2004/10/12 18:48:34  fplanque
- * Edited code documentation.
- *
- * Revision 1.11  004/2/7 21:27:27  vegarg
- * Trackback URLs are now 'clean' (or not 'clean') according to . (contrib by topolino)
- *
- * Revision 1.6  2003/8/29 18:25:51  sakichan
- * SECURITY: XSS vulnerability fix.
- *
- * Revision 1.1.1.1.2.1  2003/8/31 6:23:31  sakichan
- * Security fixes for various XSS vulnerability and SQL injection vulnerability
  */
 ?>

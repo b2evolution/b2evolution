@@ -60,7 +60,8 @@ $object_def['Item'] = array( // definition of the object:
 					'locale'          => 'post_locale',
 					'urltitle'        => 'post_urltitle',
 					'url'             => 'post_url',
-					'flags'           => 'post_flags',
+					'notifications_status' => 'post_notifications_status',
+					'notifications_ctsk_ID' => 'post_notifications_ctsk_ID',
 					'wordcount'       => 'post_wordcount',
 					'comment_status'  => 'post_comment_status',
 					'views'           => 'post_views',
@@ -141,7 +142,6 @@ class Item extends DataObject
 	var $content;
 	var $wordcount = 0;
 	var $main_cat_ID = 0;
-	var $flags;
 	/**
 	 * @var string The list of renderers, imploded by '.'.
 	 */
@@ -248,7 +248,7 @@ class Item extends DataObject
 				$this->set_creator_User( $current_User );
 			}
 			$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
-			$this->set( 'flags', '' );
+			$this->set( 'notifications_status', 'noreq' );
 			// Set the renderer list to 'default' will trigger all 'opt-out' renderers:
 			$this->set( 'renderers', array('default') );
 			$this->set( 'status', 'published' );
@@ -276,7 +276,8 @@ class Item extends DataObject
 			$this->locale = $db_row->$db_cols['locale'];
 			$this->urltitle = $db_row->$db_cols['urltitle'];
 			$this->wordcount = $db_row->$db_cols['wordcount'];
-			$this->flags = $db_row->$db_cols['flags'];
+			$this->notifications_status = $db_row->$db_cols['notifications_status'];
+			$this->notifications_ctsk_ID = $db_row->$db_cols['notifications_ctsk_ID'];
 			$this->comment_status = $db_row->$db_cols['comment_status'];			// Comments status
 
 			// echo 'renderers=', $db_row->post_renderers;
@@ -2192,9 +2193,6 @@ class Item extends DataObject
 			case 'deadline':
 				return $this->set_param( 'deadline', 'date', $parvalue, true );
 
-			case 'pingsdone':
-				return $this->set_param( 'flags', 'string', $parvalue ? 'pingsdone' : '' );
-
 			case 'renderers': // deprecated
 				return $this->set_renderers( $parvalue );
 
@@ -2246,9 +2244,6 @@ class Item extends DataObject
 		$extra_cat_IDs = array(),     // Table of extra cats
 		$post_status = 'published',
 		$post_locale = '#',
-		$post_trackbacks = '',
-		$autobr = 0,                  // OBSOLETE
-		$pingsdone = true,
 		$post_urltitle = '',
 		$post_url = '',
 		$post_comment_status = 'open',
@@ -2282,7 +2277,6 @@ class Item extends DataObject
 		$this->set( 'status', $post_status );
 		$this->set( 'locale', $post_locale );
 		$this->set( 'url', $post_url );
-		$this->set( 'flags', $pingsdone ? 'pingsdone' : '' );
 		$this->set( 'comment_status', $post_comment_status );
 		$this->set_renderers( $post_renderers );
 		$this->set( 'typ_ID', $item_typ_ID );
@@ -2366,9 +2360,6 @@ class Item extends DataObject
 		$extra_cat_IDs = array(),     // Table of extra cats
 		$post_status = 'published',
 		$post_locale = '#',
-		$post_trackbacks = '',        // not used
-		$autobr = 0,                  // OBSOLETE
-		$pingsdone = true,
 		$post_urltitle = '',
 		$post_url = '',
 		$post_comment_status = 'open',
@@ -2386,7 +2377,6 @@ class Item extends DataObject
 		$this->set( 'main_cat_ID', $main_cat_ID );
 		$this->set( 'extra_cat_IDs', $extra_cat_IDs );
 		$this->set( 'status', $post_status );
-		$this->set( 'flags', $pingsdone ? 'pingsdone' : '' );
 		$this->set( 'comment_status', $post_comment_status );
 		$this->set_renderers( $post_renderers );
 		$this->set( 'typ_ID', $item_typ_ID );
@@ -2605,14 +2595,73 @@ class Item extends DataObject
 
 
 	/**
+	 * Execute or schedule post(=after) processing tasks
+	 *
+	 * Includes notifications & pings
+	 */
+	function handle_post_processing( $display = true )
+	{
+		if( $this->notifications_status == 'finished' )
+		{ // pings have been done before
+			if( $display )
+			{
+				echo "<div class=\"panelinfo\">\n";
+				echo '<p>', T_('Post had already pinged: skipping notifications...'), "</p>\n";
+				echo "</div>\n";
+			}
+			return false;
+		}
+
+		if( $this->notifications_status != 'noreq' )
+		{ // pings have been done before
+			if( $display )
+			{
+				echo "<div class=\"panelinfo\">\n";
+				echo '<p>', T_('Post processing already pending...'), "</p>\n";
+				echo "</div>\n";
+			}
+			return false;
+		}
+
+		if( $this->status != 'published' )
+		{
+			if( $display )
+			{
+				echo "<div class=\"panelinfo\">\n";
+				echo '<p>', T_('Post not publicly published: skipping notifications...'), "</p>\n";
+				echo "</div>\n";
+			}
+			return false;
+		}
+
+		// Send email notifications now!
+		$this->send_email_notifications( $display );
+
+		// send outbound pings:
+		$this->send_outbound_pings( $display );
+
+		// Record that processing has been done:
+		$this->set( 'notifications_status', 'finished' );
+		$this->dbupdate();
+
+		return true;
+	}
+
+
+	/**
 	 * Send email notifications to subscribed users
 	 *
-	 * @todo shall we notify suscribers of blog were this is in extra-cat?
-	 *       blueyed>> IMHO yes.   fp>>why not but is this important?    blueyed>> Not really, just have answered.. :)
+	 * @todo fp>> shall we notify suscribers of blog were this is in extra-cat? blueyed>> IMHO yes.
 	 */
 	function send_email_notifications( $display = true )
 	{
 		global $DB, $admin_url, $debug, $Debuglog;
+
+		if( $display )
+		{
+			echo "<div class=\"panelinfo\">\n";
+			echo '<h3>', T_('Notifying subscribed users...'), "</h3>\n";
+		}
 
 		// Get list of users who want to be notfied:
 		// TODO: also use extra cats/blogs??
@@ -2632,18 +2681,16 @@ class Item extends DataObject
 
 		if( empty($notify_array) )
 		{ // No-one to notify:
+			if( $display )
+			{
+				echo '<p>', T_('No-one to notify.'), "</p>\n</div>\n";
+			}
 			return false;
 		}
 
 		/*
 		 * We have a list of email addresses to notify:
 		 */
-		if( $display )
-		{
-			echo "<div class=\"panelinfo\">\n";
-			echo '<h3>', T_('Notifying subscribed users...'), "</h3>\n";
-		}
-
 		$this->get_creator_User();
 		$mail_from = '"'.$this->creator_User->get('preferredname').'" <'.$this->creator_User->get('email').'>';
 
@@ -2702,6 +2749,27 @@ class Item extends DataObject
 	}
 
 
+  /**
+	 * Send outbound pings for a post
+	 *
+	 * Dirty temporary function
+	 *
+	 * @param Item
+	 * @param boolean
+	 */
+	function send_outbound_pings( $display = true )
+	{
+		load_funcs( '_misc/_ping.funcs.php' );
+
+		$blogparams = get_blogparams_by_ID( $this->blog_ID );
+
+		pingb2evonet( $blogparams, $this->ID, $this->title, $display);
+		pingWeblogs( $blogparams, $display);
+		pingBlogs( $blogparams, $display);
+		pingTechnorati( $blogparams, $display );
+	}
+
+
 	/**
 	 * Get a member param by its name
 	 *
@@ -2754,7 +2822,8 @@ class Item extends DataObject
 				return $this->priorities[ $this->priority ];
 
 			case 'pingsdone':
-				return ($this->flags == 'pingsdone');
+				// Deprecated by fp 2006-08-21
+				return ($this->post_notifications_status == 'finished');
 		}
 
 		return parent::get( $parname );
@@ -2830,6 +2899,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.81  2006/08/21 16:07:43  fplanque
+ * refactoring
+ *
  * Revision 1.80  2006/08/20 22:25:21  fplanque
  * param_() refactoring part 2
  *

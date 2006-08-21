@@ -655,6 +655,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.11  2006/08/21 16:07:43  fplanque
+ * refactoring
+ *
  * Revision 1.10  2006/08/21 00:03:13  fplanque
  * obsoleted some dirty old thing
  *
@@ -687,83 +690,5 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.22  2005/12/16 13:35:59  fplanque
- * no message
- *
- * Revision 1.21  2005/12/12 19:44:09  fplanque
- * Use cached objects by reference instead of copying them!!
- *
- * Revision 1.20  2005/12/12 19:21:21  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.19  2005/11/22 20:03:24  fplanque
- * no message
- *
- * Revision 1.18  2005/11/22 19:40:10  fplanque
- * bugfix
- *
- * Revision 1.17  2005/10/03 17:26:44  fplanque
- * synched upgrade with fresh DB;
- * renamed user_ID field
- *
- * Revision 1.16  2005/09/07 17:40:22  fplanque
- * enhanced antispam
- *
- * Revision 1.15  2005/09/06 17:13:54  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.14  2005/08/21 16:20:13  halton
- * Added group based blogging permissions (new tab under blog). Required schema change
- *
- * Revision 1.13  2005/05/25 17:13:33  fplanque
- * implemented email notifications on new comments/trackbacks
- *
- * Revision 1.12  2005/05/24 18:46:26  fplanque
- * implemented blog email subscriptions (part 1)
- *
- * Revision 1.11  2005/03/09 19:23:33  blueyed
- * doc
- *
- * Revision 1.10  2005/03/08 13:24:42  fplanque
- * minor
- *
- * Revision 1.9  2005/03/07 00:06:18  blueyed
- * added autoselect_blog
- *
- * Revision 1.8  2005/02/28 09:06:32  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.7  2005/02/08 19:29:24  blueyed
- * improved $DB's get_col() handling
- *
- * Revision 1.6  2005/02/08 04:45:02  blueyed
- * improved $DB get_results() handling
- *
- * Revision 1.5  2004/12/17 20:38:52  fplanque
- * started extending item/post capabilities (extra status, type)
- *
- * Revision 1.4  2004/12/15 20:50:34  fplanque
- * heavy refactoring
- * suppressed $use_cache and $sleep_after_edit
- * code cleanup
- *
- * Revision 1.3  2004/10/16 01:31:22  blueyed
- * documentation changes
- *
- * Revision 1.2  2004/10/14 18:31:24  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.55  2004/10/12 17:22:29  fplanque
- * Edited code documentation.
- *
- * Revision 1.53  2004/10/6 9:37:31  gorgeb
- * Added allowcomments, a per blog setting taking three values : always, post_by_post, never.
- *
- * Revision 1.1.1.1.2.1  2003/8/31 6:23:31  sakichan
- * Security fixes for various XSS vulnerability and SQL injection vulnerability
  */
 ?>

@@ -662,6 +662,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2006/08/21 16:07:43  fplanque
+ * refactoring
+ *
  * Revision 1.17  2006/08/21 01:02:09  blueyed
  * whitespace
  *
@@ -726,98 +729,5 @@ class DataObject
  *
  * Revision 1.34  2006/01/12 18:22:58  fplanque
  * fix tentative for integer vs '' vs NULL vs 0
- *
- * Revision 1.33  2005/12/30 20:13:39  fplanque
- * UI changes mostly (need to double check sync)
- *
- * Revision 1.32  2005/12/12 19:21:21  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.30  2005/11/28 07:39:43  blueyed
- * doc, normalization
- *
- * Revision 1.28  2005/11/09 03:28:55  blueyed
- * BUG: on dbupdate() it should not set the current_User as last editor!; minor other stuff
- *
- * Revision 1.27  2005/11/04 13:50:57  blueyed
- * Dataobject::set_param() / set(): return true if a value has been set and false if it did not change. It will not get considered for dbchange() then, too.
- *
- * Revision 1.26  2005/10/31 23:20:45  fplanque
- * keeping things straight...
- *
- * Revision 1.25  2005/10/31 02:27:31  blueyed
- * Comments; normalizing
- *
- * Revision 1.24  2005/09/29 15:07:30  fplanque
- * spelling
- *
- * Revision 1.23  2005/09/26 23:09:10  blueyed
- * Use $EvoConfig->DB for $DB parameters.
- *
- * Revision 1.22  2005/09/06 17:13:54  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.21  2005/07/26 18:57:34  fplanque
- * changed handling of empty params. We do need to differentiate between empty input ''=>NULL and 0=>0 in some situations!
- *
- * Revision 1.20  2005/06/13 19:20:54  fplanque
- * fix
- *
- * Revision 1.19  2005/06/10 18:25:43  fplanque
- * refactoring
- *
- * Revision 1.18  2005/05/25 17:13:33  fplanque
- * implemented email notifications on new comments/trackbacks
- *
- * Revision 1.17  2005/05/17 19:26:07  fplanque
- * FM: copy / move debugging
- *
- * Revision 1.16  2005/05/16 15:17:12  fplanque
- * minor
- *
- * Revision 1.15  2005/04/19 18:04:37  fplanque
- * implemented nested transactions for MySQL
- *
- * Revision 1.14  2005/02/28 09:06:32  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.13  2005/02/18 19:16:15  fplanque
- * started relation restriction/cascading handling
- *
- * Revision 1.11  2005/01/12 20:22:51  fplanque
- * started file/dataobject linking
- *
- * Revision 1.10  2005/01/03 15:17:52  fplanque
- * no message
- *
- * Revision 1.9  2004/12/21 21:18:38  fplanque
- * Finished handling of assigning posts/items to users
- *
- * Revision 1.8  2004/12/20 19:49:24  fplanque
- * cleanup & factoring
- *
- * Revision 1.7  2004/12/15 20:50:34  fplanque
- * heavy refactoring
- * suppressed $use_cache and $sleep_after_edit
- * code cleanup
- *
- * Revision 1.6  2004/12/14 21:01:06  fplanque
- * minor fixes
- *
- * Revision 1.4  2004/11/22 17:48:20  fplanque
- * skin cosmetics
- *
- * Revision 1.3  2004/11/15 18:57:05  fplanque
- * cosmetics
- *
- * Revision 1.2  2004/10/21 18:33:39  fplanque
- * NULL handling
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.23  2004/10/11 19:12:51  fplanque
- * Edited code documentation.
- *
  */
 ?>

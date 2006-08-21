@@ -141,7 +141,7 @@ function get_postdata($postid)
 	// echo "*** Loading post data! ***<br>\n";
 	// We have to load the post
 	$sql = 'SELECT post_ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_content, post_title,
-											post_main_cat_ID, post_flags, cat_blog_ID ';
+											post_main_cat_ID, cat_blog_ID ';
 	$sql .= ', post_locale, post_url, post_wordcount, post_comment_status, post_views ';
 	$sql .= '	FROM T_posts
 					 INNER JOIN T_categories ON post_main_cat_ID = cat_ID
@@ -165,7 +165,6 @@ function get_postdata($postid)
 			'Content' => $myrow->post_content,
 			'Title' => $myrow->post_title,
 			'Category' => $myrow->post_main_cat_ID,
-			'Flags' => explode( ',', $myrow->post_flags ),
 			'Locale' => $myrow->post_locale,
 			'Url' => $myrow->post_url,
 			'Wordcount' => $myrow->post_wordcount,
@@ -961,6 +960,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.20  2006/08/21 16:07:43  fplanque
+ * refactoring
+ *
  * Revision 1.19  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *
@@ -1032,145 +1034,5 @@ function cat_select_after_last( $parent_cat_ID, $level )
  *
  * Revision 1.43  2006/01/04 15:03:52  fplanque
  * enhanced list sorting capabilities
- *
- * Revision 1.42  2005/12/14 19:22:57  fplanque
- * no message
- *
- * Revision 1.41  2005/12/14 16:52:36  blueyed
- * doc
- *
- * Revision 1.40  2005/12/12 19:21:22  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.39  2005/11/24 20:40:06  blueyed
- * doc
- *
- * Revision 1.38  2005/11/21 20:51:44  fplanque
- * this is still broken! I prefer to have single domain working in all configurations.
- *
- * Revision 1.37  2005/11/06 10:43:19  marian
- * changes to make the multi-domain feature working
- *
- * Revision 1.36  2005/11/02 06:52:19  marian
- * changed regenerate_url to support multiple domains
- *
- * Revision 1.35  2005/10/31 23:20:45  fplanque
- * keeping things straight...
- *
- * Revision 1.34  2005/10/30 11:16:43  marian
- * rollback of regenerate_url
- * fixing the form-problem in skins/_feedback.php
- *
- * Revision 1.32  2005/10/27 15:47:25  marian
- * Removed $_SERVER Variables for the multi-domain feature.
- *
- * Revision 1.31  2005/10/18 18:45:58  fplanque
- * some rollbacks...
- *
- * Revision 1.30  2005/10/18 11:04:16  marian
- * Added extra functionality to support multi-domain feature.
- *
- * Revision 1.29  2005/10/03 18:10:07  fplanque
- * renamed post_ID field
- *
- * Revision 1.28  2005/09/06 17:13:55  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.27  2005/09/01 17:11:46  fplanque
- * no message
- *
- * Revision 1.26  2005/08/31 19:08:51  fplanque
- * Factorized Item query WHERE clause.
- * Fixed calendar contextual accuracy.
- *
- * Revision 1.25  2005/08/24 14:02:33  fplanque
- * minor changes
- *
- * Revision 1.24  2005/06/10 18:25:44  fplanque
- * refactoring
- *
- * Revision 1.23  2005/03/09 20:29:39  fplanque
- * added 'unit' param to allow choice between displaying x days or x posts
- * deprecated 'paged' mode (ultimately, everything should be pageable)
- *
- * Revision 1.22  2005/03/09 14:54:26  fplanque
- * refactored *_title() galore to requested_title()
- *
- * Revision 1.21  2005/03/08 20:32:07  fplanque
- * small fixes; slightly enhanced WEEK() handling
- *
- * Revision 1.20  2005/03/02 15:28:14  fplanque
- * minor
- *
- * Revision 1.19  2005/02/28 09:06:33  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.18  2005/02/17 19:36:24  fplanque
- * no message
- *
- * Revision 1.17  2005/02/16 15:48:06  fplanque
- * merged with work app :p
- *
- * Revision 1.16  2005/02/15 22:05:08  blueyed
- * Started moving obsolete functions to _obsolete092.php..
- *
- * Revision 1.15  2005/02/15 20:05:49  fplanque
- * no message
- *
- * Revision 1.14  2005/02/10 22:57:23  blueyed
- * fixed catselection
- *
- * Revision 1.13  2005/02/08 20:17:45  blueyed
- * removed obsolete $User_ID global
- *
- * Revision 1.12  2005/02/08 04:45:02  blueyed
- * improved $DB get_results() handling
- *
- * Revision 1.11  2005/02/08 00:59:16  blueyed
- * added @todo
- *
- * Revision 1.10  2005/01/25 14:41:33  fplanque
- * changed echo to return in recursive cat list
- *
- * Revision 1.9  2005/01/20 20:38:58  fplanque
- * refactoring
- *
- * Revision 1.8  2005/01/13 19:53:50  fplanque
- * Refactoring... mostly by Fabrice... not fully checked :/
- *
- * Revision 1.7  2004/12/20 19:49:24  fplanque
- * cleanup & factoring
- *
- * Revision 1.6  2004/12/15 20:50:34  fplanque
- * heavy refactoring
- * suppressed $use_cache and $sleep_after_edit
- * code cleanup
- *
- * Revision 1.5  2004/12/14 21:01:06  fplanque
- * minor fixes
- *
- * Revision 1.4  2004/12/13 21:29:58  fplanque
- * refactoring
- *
- * Revision 1.3  2004/12/10 19:45:55  fplanque
- * refactoring
- *
- * Revision 1.2  2004/10/14 18:31:25  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.94  2004/10/12 17:22:29  fplanque
- * Edited code documentation.
- *
- * Revision 1.31  2004/3/13 11:52:9  vegarg
- * Title in permalinks (idea by kiesow).
- *
- * Revision 1.26  2004/1/28 18:44:57  vegarg
- * Fixed a bug when setting the $more_file variable in link_pages(-). (it used to ignore the setting completely!)
- *
- * Revision 1.19  2003/10/10 15:10:11  tswicegood
- * Changed the_title(-) to allow for silent operation
  */
 ?>

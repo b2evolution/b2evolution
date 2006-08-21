@@ -1013,8 +1013,8 @@ param( 'mode', 'string', 'normal' );
 				if( !$simulate )
 				{
 					$edited_Item = & new Item();
-					$post_ID = $edited_Item->insert( $post_author, $post_title, $post_content,	$post_date, $post_category, $post_catids,
-													$post_status,	$post_locale,	'' /* $post_trackbacks */, $post_convert_breaks, true /* $pingsdone */,
+					$post_ID = $edited_Item->insert( $post_author, $post_title, $post_content,$post_date, $post_category, $post_catids,
+													$post_status,	$post_locale,	
 													'' /* $post_urltitle */, '' /* $post_url */, $comment_status, $post_renderers );
 				}
 

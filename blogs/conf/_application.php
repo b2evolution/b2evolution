@@ -15,7 +15,7 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible to {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '1.9-dev';
+$app_version = '2.0-dev';
 
 /**
  * Is displayed on the login screen:
@@ -30,7 +30,7 @@ $app_banner = '<a href="http://b2evolution.net/"><img src="'.$rsc_url.'img/b2evo
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 9402;
+$new_db_version = 9404;
 
 
 $admin_path_seprator = ' :: ';

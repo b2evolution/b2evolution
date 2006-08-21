@@ -100,8 +100,8 @@ function upgrade_cafelog_tables()
 
 
 	echo 'Copying Cafelog posts... ';
-	$query = "INSERT INTO T_posts( post_ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale, post_content,post_title, post_main_cat_ID, post_flags)
-	SELECT ID, post_author, post_date, post_date, 'published', '$default_locale', post_content, post_title, post_category, 'pingsdone,imported' FROM $oldtableposts";
+	$query = "INSERT INTO T_posts( post_ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale, post_content, post_title, post_main_cat_ID, post_notifications_status )
+	SELECT ID, post_author, post_date, post_date, 'published', '$default_locale', post_content, post_title, post_category, 'finished' FROM $oldtableposts";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
@@ -156,6 +156,9 @@ function upgrade_cafelog_tables()
 
 /*
  * $Log$
+ * Revision 1.42  2006/08/21 16:07:44  fplanque
+ * refactoring
+ *
  * Revision 1.41  2006/07/04 17:32:30  fplanque
  * no message
  *

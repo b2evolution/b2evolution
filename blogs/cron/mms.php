@@ -712,25 +712,20 @@ $content = format_to_post( trim( $content ), $Settings->get('AutoBR'), 0 );
 $post_date = date('Y-m-d H:i:s', $localtimenow);
 
 $edited_Item = & new Item();
-$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $post_date, $post_category, array(), 'published', $current_User->locale, '', $Settings->get('AutoBR'), true );
+$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $post_date, $post_category, array(), 'published', $current_User->locale );
 
 writeBackSendConf( $md );
 
-/* Pinging turned off for now because of causing invalid server response
-
-	// Send email notifications now!
-	$edited_Item->send_email_notifications( false );
-
-	// send outbound pings:
-	load_funcs( '_misc/_ping.funcs.php' );
-	send_outbound_pings( $edited_Item );
-
-*/
+// Execute or schedule notifications & pings:
+$edited_Item->handle_post_processing( false );
 
 exit;
 
 /*
  * $Log$
+ * Revision 1.5  2006/08/21 16:07:43  fplanque
+ * refactoring
+ *
  * Revision 1.4  2006/08/21 00:03:12  fplanque
  * obsoleted some dirty old thing
  *

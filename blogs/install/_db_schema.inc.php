@@ -158,31 +158,32 @@ $schema_queries = array(
 	'T_posts' => array(
 		'Creating table for Posts',
 		"CREATE TABLE T_posts (
-			post_ID               int(11) unsigned NOT NULL auto_increment,
-			post_parent_ID        int(11) unsigned NULL,
-			post_creator_user_ID  int(11) unsigned NOT NULL,
-			post_lastedit_user_ID int(11) unsigned NULL,
-			post_assigned_user_ID int(11) unsigned NULL,
-			post_datestart        datetime NOT NULL,
-			post_datedeadline     datetime NULL,
-			post_datecreated      datetime NULL,
-			post_datemodified     datetime NOT NULL,
-			post_status           enum('published','deprecated','protected','private','draft') NOT NULL default 'published',
-			post_pst_ID           int(11) unsigned NULL,
-			post_ptyp_ID          int(11) unsigned NULL,
-			post_locale           VARCHAR(20) NOT NULL DEFAULT 'en-EU',
-			post_content          text NULL,
-			post_title            text NOT NULL,
-			post_urltitle         VARCHAR(50) NULL DEFAULT NULL,
-			post_url              VARCHAR(255) NULL DEFAULT NULL,
-			post_main_cat_ID      int(11) unsigned NOT NULL,
-			post_flags            SET( 'pingsdone', 'imported'),
-			post_views            INT(11) UNSIGNED NOT NULL DEFAULT 0,
-			post_wordcount        int(11) default NULL,
-			post_comment_status   ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
-			post_commentsexpire   DATETIME DEFAULT NULL,
-			post_renderers        TEXT NOT NULL,
-			post_priority         int(11) unsigned null,
+			post_ID                     int(11) unsigned NOT NULL auto_increment,
+			post_parent_ID              int(11) unsigned NULL,
+			post_creator_user_ID        int(11) unsigned NOT NULL,
+			post_lastedit_user_ID       int(11) unsigned NULL,
+			post_assigned_user_ID       int(11) unsigned NULL,
+			post_datestart              datetime NOT NULL,
+			post_datedeadline           datetime NULL,
+			post_datecreated            datetime NULL,
+			post_datemodified           datetime NOT NULL,
+			post_status                 enum('published','deprecated','protected','private','draft') NOT NULL default 'published',
+			post_pst_ID                 int(11) unsigned NULL,
+			post_ptyp_ID                int(11) unsigned NULL,
+			post_locale                 VARCHAR(20) NOT NULL DEFAULT 'en-EU',
+			post_content                text NULL,
+			post_title                  text NOT NULL,
+			post_urltitle               VARCHAR(50) NULL DEFAULT NULL,
+			post_url                    VARCHAR(255) NULL DEFAULT NULL,
+			post_main_cat_ID            int(11) unsigned NOT NULL,
+			post_notifications_status   ENUM('noreq','todo','started','finished') NOT NULL DEFAULT 'noreq',
+			post_notifications_ctsk_ID  INT(10) unsigned NULL DEFAULT NULL,
+			post_views                  INT(11) UNSIGNED NOT NULL DEFAULT 0,
+			post_wordcount              int(11) default NULL,
+			post_comment_status         ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
+			post_commentsexpire         DATETIME DEFAULT NULL,
+			post_renderers              TEXT NOT NULL,
+			post_priority               int(11) unsigned null,
 			PRIMARY KEY post_ID( post_ID ),
 			UNIQUE post_urltitle( post_urltitle ),
 			INDEX post_datestart( post_datestart ),
@@ -477,6 +478,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.28  2006/08/21 16:07:44  fplanque
+ * refactoring
+ *
  * Revision 1.27  2006/08/19 02:15:08  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.

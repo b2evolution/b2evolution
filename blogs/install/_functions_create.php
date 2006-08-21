@@ -293,57 +293,57 @@ function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Travis', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://www.travisswicegood.com/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Travis', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://www.travisswicegood.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Nate', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://www.loganelementary.com', 'disabled', array() );
+	$edited_Item->insert( 1, 'Nate', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://www.loganelementary.com', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Danny', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://brendoman.com/dbc', 'disabled', array() );
+	$edited_Item->insert( 1, 'Danny', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://brendoman.com/dbc', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Yabba', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-UK', '', 0, true, '', 'http://www.innervisions.org.uk/babbles/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Yabba', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-UK', '', 'http://www.innervisions.org.uk/babbles/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Halton', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://browsermonkey.com/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Halton', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://browsermonkey.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Topanga', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://www.tenderfeelings.be', 'disabled', array() );
+	$edited_Item->insert( 1, 'Topanga', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://www.tenderfeelings.be', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'EdB', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://wonderwinds.com/', 'disabled', array() );
+	$edited_Item->insert( 1, 'EdB', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://wonderwinds.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'dAniel', '', $now, $cat_linkblog_contrib, array(), 'published',	'de-DE', '', 0, true, '', 'http://daniel.hahler.de/', 'disabled', array() );
+	$edited_Item->insert( 1, 'dAniel', '', $now, $cat_linkblog_contrib, array(), 'published',	'de-DE', '', 'http://daniel.hahler.de/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 0, true, '', 'http://fplanque.net/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 'http://fplanque.net/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'b2evolution', 'Project home', $now, $cat_linkblog_b2evo, array(), 'published',	'en-EU', '', 0, true, '', 'http://b2evolution.net/', 'disabled', array() );
+	$edited_Item->insert( 1, 'b2evolution', 'Project home', $now, $cat_linkblog_b2evo, array(), 'published',	'en-EU', '', 'http://b2evolution.net/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_('This is a sample linkblog entry'), T_("This is sample text describing the linkblog entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your linkblog entries (favorite/related sites)."), $now, $cat_linkblog_b2evo, array(), 'published',	$default_locale, '', 0, true, '', 'http://b2evolution.net/', 'disabled', array() );
+	$edited_Item->insert( 1, T_('This is a sample linkblog entry'), T_("This is sample text describing the linkblog entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your linkblog entries (favorite/related sites)."), $now, $cat_linkblog_b2evo, array(), 'published',	$default_locale, '', 'http://b2evolution.net/', 'disabled', array() );
 
 	echo "OK.<br />\n";
 }
@@ -670,7 +670,7 @@ function populate_main_tables()
 	$User_Admin->set( 'login', 'admin' );
 	if( !isset( $install_password ) )
 	{
-		$random_password = generate_random_key( NULL, false ); // no ambiguous chars
+		$random_password = generate_random_passwd(); // no ambiguous chars
 	}
 	else
 	{
@@ -1006,6 +1006,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.197  2006/08/21 16:07:44  fplanque
+ * refactoring
+ *
  * Revision 1.196  2006/08/20 23:16:02  blueyed
  * generate_random_key(): use param to not use ambiguous chars.
  *

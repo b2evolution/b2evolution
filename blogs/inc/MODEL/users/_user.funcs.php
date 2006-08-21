@@ -485,6 +485,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.14  2006/08/21 16:07:44  fplanque
+ * refactoring
+ *
  * Revision 1.13  2006/08/19 07:56:31  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *
@@ -534,115 +537,5 @@ function profile_check_params( $params, $User = NULL )
  *
  * Revision 1.37  2006/01/15 19:05:36  blueyed
  * user_admin_link(): empty default for $page, so that /admin/index.php gets respected.
- *
- * Revision 1.35  2005/12/12 19:44:09  fplanque
- * Use cached objects by reference instead of copying them!!
- *
- * Revision 1.34  2005/12/12 19:21:23  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.33  2005/12/08 22:49:18  blueyed
- * Typo
- *
- * Revision 1.32  2005/11/02 20:11:19  fplanque
- * "containing entropy"
- *
- * Revision 1.31  2005/10/31 08:33:31  blueyed
- * profile_check_params(): Allow passing a User object that can be used for additional tests (password != login/nickname)
- *
- * Revision 1.30  2005/10/31 06:13:03  blueyed
- * Finally merged my work on $Session in.
- *
- * Revision 1.29  2005/10/31 05:51:06  blueyed
- * Use rawurlencode() instead of urlencode()
- *
- * Revision 1.28  2005/09/29 15:07:30  fplanque
- * spelling
- *
- * Revision 1.27  2005/09/06 17:13:55  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.26  2005/08/26 14:17:15  fplanque
- * removed obsolete cookie cleaners
- *
- * Revision 1.25  2005/08/22 18:43:34  blueyed
- * Handle non-existing user in user_pass_ok() correctly.
- *
- * Revision 1.24  2005/06/03 15:12:33  fplanque
- * error/info message cleanup
- *
- * Revision 1.23  2005/05/24 18:46:26  fplanque
- * implemented blog email subscriptions (part 1)
- *
- * Revision 1.22  2005/05/09 19:07:05  fplanque
- * bugfixes + global access permission
- *
- * Revision 1.21  2005/03/15 19:19:49  fplanque
- * minor, moved/centralized some includes
- *
- * Revision 1.20  2005/03/09 14:54:26  fplanque
- * refactored *_title() galore to requested_title()
- *
- * Revision 1.19  2005/02/28 09:06:34  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.18  2005/02/23 04:06:16  blueyed
- * minor
- *
- * Revision 1.17  2005/02/22 02:42:21  blueyed
- * Login refactored (send password-change-request mail instead of new password)
- *
- * Revision 1.16  2005/02/20 23:21:20  blueyed
- * user pwd verifying fixed
- *
- * Revision 1.15  2005/02/20 23:03:24  blueyed
- * profile_check_params() enhanced
- *
- * Revision 1.14  2005/02/19 18:20:47  blueyed
- * obsolete functions removed
- *
- * Revision 1.13  2005/02/15 22:05:10  blueyed
- * Started moving obsolete functions to _obsolete092.php..
- *
- * Revision 1.12  2005/02/09 00:27:13  blueyed
- * Removed deprecated globals / userdata handling
- *
- * Revision 1.11  2005/02/08 20:17:57  blueyed
- * removed obsolete $User_ID global
- *
- * Revision 1.10  2005/02/08 03:06:26  blueyed
- * marked get_user_info() as deprecated
- *
- * Revision 1.7  2004/12/30 23:07:02  blueyed
- * removed obsolete $user_nickname
- *
- * Revision 1.6  2004/12/15 20:50:34  fplanque
- * heavy refactoring
- * suppressed $use_cache and $sleep_after_edit
- * code cleanup
- *
- * Revision 1.5  2004/12/10 19:45:55  fplanque
- * refactoring
- *
- * Revision 1.4  2004/11/15 18:57:05  fplanque
- * cosmetics
- *
- * Revision 1.3  2004/10/15 17:51:38  fplanque
- * added user_preferredname()
- *
- * Revision 1.2  2004/10/14 18:31:25  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.61  2004/10/12 18:48:34  fplanque
- * Edited code documentation.
- *
- * Revision 1.47  2004/5/28 17:22:31  jeffbearer
- * added the showonline case
- *
- * Revision 1.3  2003/8/28 1:48:30  jupiterx
- * Added MD5 password hashing; misc. code cleanup
  */
 ?>

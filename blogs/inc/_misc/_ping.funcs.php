@@ -54,27 +54,6 @@ function get_blogparams_by_ID( $blog_ID )
 
 
 /**
- * Send outbound pings for a post
- *
- * Dirty temporary function
- *
- * @param Item
- * @param boolean
- */
-function send_outbound_pings( & $Item, $display = true )
-{
-	$blog = $Item->blog_ID;
-
-	$blogparams = get_blogparams_by_ID( $blog );
-
-	pingb2evonet( $blogparams, $Item->ID, $Item->title, $display);
-	pingWeblogs( $blogparams, $display);
-	pingBlogs( $blogparams, $display);
-	pingTechnorati( $blogparams, $display );
-}
-
-
-/**
  * pings b2evolution.net
  */
 function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
@@ -283,6 +262,9 @@ function pingTechnorati(& $blogparams, $display = true )
 
 /*
  * $Log$
+ * Revision 1.8  2006/08/21 16:07:44  fplanque
+ * refactoring
+ *
  * Revision 1.7  2006/08/21 01:02:10  blueyed
  * whitespace
  *

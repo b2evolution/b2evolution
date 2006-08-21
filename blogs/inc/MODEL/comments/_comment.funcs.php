@@ -322,6 +322,9 @@ function comment_author_url_basedomain( $disp = true )
 
 /*
  * $Log$
+ * Revision 1.8  2006/08/21 16:07:43  fplanque
+ * refactoring
+ *
  * Revision 1.7  2006/08/19 02:15:07  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.
@@ -345,50 +348,5 @@ function comment_author_url_basedomain( $disp = true )
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.14  2005/12/12 19:21:21  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.12  2005/09/06 17:13:54  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.11  2005/04/28 20:44:20  fplanque
- * normalizing, doc
- *
- * Revision 1.10  2005/03/14 20:22:19  fplanque
- * refactoring, some cacheing optimization
- *
- * Revision 1.9  2005/03/09 14:54:26  fplanque
- * refactored *_title() galore to requested_title()
- *
- * Revision 1.8  2005/02/28 09:06:32  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.7  2005/02/16 15:48:06  fplanque
- * merged with work app :p
- *
- * Revision 1.6  2005/02/15 22:05:06  blueyed
- * Started moving obsolete functions to _obsolete092.php..
- *
- * Revision 1.5  2005/02/08 04:45:02  blueyed
- * improved $DB get_results() handling
- *
- * Revision 1.4  2004/12/17 20:41:13  fplanque
- * cleanup
- *
- * Revision 1.3  2004/12/15 20:50:34  fplanque
- * heavy refactoring
- * suppressed $use_cache and $sleep_after_edit
- * code cleanup
- *
- * Revision 1.2  2004/10/14 18:31:25  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.42  2004/10/12 17:22:29  fplanque
- * Edited code documentation.
- *
  */
 ?>

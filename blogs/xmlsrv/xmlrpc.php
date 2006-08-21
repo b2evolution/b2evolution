@@ -180,15 +180,9 @@ function b2newpost($m)
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
 
-
-	logIO( 'O', 'Sending notifications...' );
-
-	// Send email notifications now!
-	$edited_Item->send_email_notifications( false );
-
-	// send outbound pings:
-	load_funcs( '_misc/_ping.funcs.php' );
-	send_outbound_pings( $edited_Item, false );
+	logIO( 'O', 'Handling notifications...' );
+	// Execute or schedule notifications & pings:
+	$edited_Item->handle_post_processing( false );
 
 
 	return new xmlrpcresp(new xmlrpcval($post_ID));
@@ -418,7 +412,7 @@ function bloggernewpost( $m )
 
 	// INSERT NEW POST INTO DB:
 	$edited_Item = & new Item();
-	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $now, $post_category, array( $post_category ), $status, $current_User->locale, '', 0, $publish );
+	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $now, $post_category, array( $post_category ), $status, $current_User->locale );
 
 	if( $DB->error )
 	{ // DB error
@@ -427,19 +421,9 @@ function bloggernewpost( $m )
 
 	logIO('O', "Posted ! ID: $post_ID");
 
-	if( $publish )
-	{ // If post is publicly published:
-
-		logIO( 'O', 'Sending notifications...' );
-
-		// Send email notifications now!
-		$edited_Item->send_email_notifications( false );
-
-		// send outbound pings:
-		load_funcs( '_misc/_ping.funcs.php' );
-		send_outbound_pings( $edited_Item, false );
-
-	}
+	logIO( 'O', 'Handling notifications...' );
+	// Execute or schedule notifications & pings:
+	$edited_Item->handle_post_processing( false );
 
 	logIO("O","All done.");
 
@@ -563,52 +547,17 @@ function bloggereditpost($m)
 		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
 	}
 
-	// We need to check the previous flags...
-	$post_flags = $postdata['Flags'];
-	if( in_array( 'pingsdone', $post_flags ) )
-	{ // pings have been done before
-		$pingsdone = true;
-	}
-	elseif( !$publish )
-	{ // still not publishing
-		$pingsdone = false;
-	}
-	else
-	{ // We'll be pinging now
-		$pingsdone = true;
-	}
-
 	// UPDATE POST IN DB:
 	// TODO: use $edited_Item->set() with only the appropriate fields and then $edited_Item->dbupdate()
-	$edited_Item->update( $post_title, $content, '', $post_category, array($post_category), $status, '#', '', 0, $pingsdone, '', '', 'open' );
+	$edited_Item->update( $post_title, $content, '', $post_category, array($post_category), $status, '#', '', '', 'open' );
 	if( $DB->error )
 	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
 
-	if( $publish )
-	{ // If post is publicly published:
-
-		// ping ?
-		if( in_array( 'pingsdone', $post_flags ) )
-		{ // pings have been done before
-			logIO("O","pings have been done before...");
-		}
-		else
-		{ // We'll ping now
-
-			logIO( 'O', 'Sending notifications...' );
-
-			// Send email notifications now!
-			$edited_Item->send_email_notifications( false );
-
-			// send outbound pings:
-			load_funcs( '_misc/_ping.funcs.php' );
-			send_outbound_pings( $edited_Item, false );
-
-		}
-
-	}
+	logIO( 'O', 'Handling notifications...' );
+	// Execute or schedule notifications & pings:
+	$edited_Item->handle_post_processing( false );
 
 	return new xmlrpcresp(new xmlrpcval("1", "boolean"));
 }
@@ -1337,7 +1286,6 @@ function mwnewpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
 	global $DB;
-	global $sleep_after_edit;
 	global $Settings;
 	global $default_category;
 
@@ -1430,26 +1378,17 @@ function mwnewpost($m)
 	// INSERT NEW POST INTO DB:
 	// Tor - comment this out to stop inserts into database
 	$edited_Item = & new Item();
-	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $postdate, $cat_IDs[0], $cat_IDs, $status, $current_User->locale, '', 0, ($status == 'published') );
+	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $postdate, $cat_IDs[0], $cat_IDs, $status, $current_User->locale );
 
 	if( $DB->error )
 	{	// DB error
 		logIO("O","user error 9 ...");
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
-	if( isset($sleep_after_edit) && $sleep_after_edit > 0 )
-	{
-		sleep( $sleep_after_edit );
-	}
 
-	logIO( 'O', 'Sending notifications...' );
-
-	// Send email notifications now!
-	$edited_Item->send_email_notifications( false );
-
-	// send outbound pings:
-	load_funcs( '_misc/_ping.funcs.php' );
-	send_outbound_pings( $edited_Item, false );
+	logIO( 'O', 'Handling notifications...' );
+	// Execute or schedule notifications & pings:
+	$edited_Item->handle_post_processing( false );
 
 	return new xmlrpcresp(new xmlrpcval($post_ID));
 }
@@ -1618,7 +1557,6 @@ function mweditpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
 	global $DB;
-	global $sleep_after_edit;
 	global $Settings;
 	global $Messages;
 	global $xmlrpc_htmlchecking;
@@ -1732,10 +1670,7 @@ function mweditpost($m)
 	{	// DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
-	if( isset($sleep_after_edit) && $sleep_after_edit > 0 )
-	{
-		sleep( $sleep_after_edit );
-	}
+
 // Time to perform trackbacks NB NOT WORKING YET
 //
 // NB Requires a change to the _trackback library
@@ -2276,6 +2211,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.109  2006/08/21 16:07:45  fplanque
+ * refactoring
+ *
  * Revision 1.108  2006/08/21 00:03:13  fplanque
  * obsoleted some dirty old thing
  *

@@ -130,10 +130,6 @@ switch($action)
 		$Messages->display();
 
 
-		// Are we going to do the pings or not?
-		$edited_Item->set( 'pingsdone', $edited_Item->status == 'published' );
-
-
 		// INSERT NEW POST INTO DB:
 		echo '<div class="panelinfo">'."\n";
 		echo '<h3>', T_('Recording post...'), "</h3>\n";
@@ -145,23 +141,17 @@ switch($action)
 		if( $edited_Item->status != 'published' )
 		{
 			echo "<div class=\"panelinfo\">\n";
-			echo '<p>', T_('Post not publicly published: skipping notifications...'), "</p>\n";
+			echo '<p>', T_('Post not publicly published: skipping trackback...'), "</p>\n";
 			echo "</div>\n";
 		}
 		else
-		{ // We do all the pinging now!
-
-			// trackback
+		{ // trackback now:
 			load_funcs( '_misc/_trackback.funcs.php' );
 			trackbacks( $post_trackbacks, $edited_Item->content, $edited_Item->title, $edited_Item->ID);
-
-			// Send email notifications now!
-			$edited_Item->send_email_notifications();
-
-			// send outbound pings:
-			load_funcs( '_misc/_ping.funcs.php' );
-			send_outbound_pings( $edited_Item );
 		}
+
+		// Execute or schedule notifications & pings:
+		$edited_Item->handle_post_processing();
 
 		echo '<div class="panelinfo"><p>'.T_('Posting Done...')."</p></div>\n";
 		break;
@@ -228,12 +218,6 @@ switch($action)
 		$Messages->display();
 
 
-		// Check the previous ping state...
-		$pings_already_done = $edited_Item->get( 'pingsdone' );
-		// Will we have pinged in a minute?
-		$edited_Item->set( 'pingsdone', ($pings_already_done || $edited_Item->status == 'published' ) );
-
-
 		// UPDATE POST IN DB:
 		echo "<div class=\"panelinfo\">\n";
 		echo '<h3>'.T_('Updating post...')."</h3>\n";
@@ -245,34 +229,18 @@ switch($action)
 		if( $edited_Item->status != 'published' )
 		{
 			echo "<div class=\"panelinfo\">\n";
-			echo '<p>', T_('Post not publicly published: skipping notifications...'), "</p>\n";
+			echo '<p>', T_('Post not publicly published: skipping trackback...'), "</p>\n";
 			echo "</div>\n";
 		}
 		else
-		{ // We may do some pinging now!
-
-			// trackback
+		{ // trackback now:
 			load_funcs( '_misc/_trackback.funcs.php' );
 			trackbacks( $post_trackbacks, $edited_Item->content,  $edited_Item->title, $edited_Item->ID );
-
-			// ping ?
-			if( $pings_already_done )
-			{ // pings have been done before
-				echo "<div class=\"panelinfo\">\n";
-				echo '<p>', T_('Post had already pinged: skipping notifications/pings...'), "</p>\n";
-				echo "</div>\n";
-			}
-			else
-			{ // We'll ping now
-
-				// Send email notifications now!
-				$edited_Item->send_email_notifications();
-
-				// send outbound pings:
-				load_funcs( '_misc/_ping.funcs.php' );
-				send_outbound_pings( $edited_Item );
-			}
 		}
+
+		// Execute or schedule notifications & pings:
+		$edited_Item->handle_post_processing();
+
 		echo '<div class="panelinfo"><p>', T_('Updating done...'), "</p></div>\n";
 		break;
 
@@ -305,63 +273,22 @@ switch($action)
 		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
 		$current_User->check_perm( 'edit_timestamp', 'any', true ) ;
 
-		$edited_Item->set( 'status', $post_status );
-
-		$post_date = date('Y-m-d H:i:s', $localtimenow);
-
 		echo "<div class=\"panelinfo\">\n";
 		echo '<h3>'.T_('Updating post status...')."</h3>\n";
 
-		// We need to check the previous flags...
-		$post_flags = explode(',', $edited_Item->flags );
-		if( in_array( 'pingsdone', $post_flags ) )
-		{ // pings have been done before
-			$pingsdone = true;
-		}
-		elseif( $edited_Item->status != 'published' )
-		{ // still not publishing
-			$pingsdone = false;
-		}
-		else
-		{ // We'll be pinging now
-			$pingsdone = true;
-			$edited_Item->set( 'flags', 'pingsdone' );
-		}
+		$edited_Item->set( 'status', $post_status );
+
+		$post_date = date('Y-m-d H:i:s', $localtimenow);
+		$edited_Item->set( 'datestart', $post_date );
+		$edited_Item->set( 'datemodified', $post_date );
 
 		// UPDATE POST IN DB:
-		$edited_Item->set( 'datestart', $post_date );
-		$edited_Item->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
 		$edited_Item->dbupdate();
+
 		echo '<p>', T_('Done.'), "</p>\n";
 		echo "</div>\n";
 
-		// pOST POST6PUBLISHING OPERATIONS/
-		if( $edited_Item->status != 'published' )
-		{
-			echo "<div class=\"panelinfo\">\n";
-			echo '<p>', T_('Post not publicly published: skipping trackback and blog pings...'), "</p>\n";
-			echo "</div>\n";
-		}
-		else
-		{ // We may do some pinging now!
-
-			if( in_array( 'pingsdone', $post_flags ) )
-			{ // pings have been done before
-				echo "<div class=\"panelinfo\">\n";
-				echo '<p>', T_('Post had already pinged: skipping notifications...'), "</p>\n";
-				echo "</div>\n";
-			}
-			else
-			{ // We'll ping now
-
-				// Send email notifications now!
-				$edited_Item->send_email_notifications();
-
-				// send outbound pings:
-				load_funcs( '_misc/_ping.funcs.php' );
-				send_outbound_pings( $edited_Item );
-			}
-		}
+		$edited_Item->handle_post_processing();
 
 		echo '<div class="panelinfo"><p>'.T_('Updating done...').'</p></div>';
 
@@ -613,6 +540,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.26  2006/08/21 16:07:43  fplanque
+ * refactoring
+ *
  * Revision 1.25  2006/08/21 00:03:12  fplanque
  * obsoleted some dirty old thing
  *

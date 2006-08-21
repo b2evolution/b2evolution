@@ -566,7 +566,8 @@ class ItemList extends DataObjectList
 			'".$DB->escape($post_url)."' AS {$this->dbprefix}url,
 			$post_category AS {$this->dbprefix}main_cat_ID,
 			$post_views AS {$this->dbprefix}views,
-			'' AS {$this->dbprefix}flags,
+			'noreq' AS {$this->dbprefix}post_notifications_status,
+			NULL AS {$this->dbprefix}post_notifications_ctsk_ID,
 			".bpost_count_words( $content )." AS {$this->dbprefix}wordcount,
 			".$DB->quote($post_comment_status)." AS {$this->dbprefix}comment_status,
 			'".$DB->escape( $post_renderers )."' AS {$this->dbprefix}renderers,
@@ -783,7 +784,6 @@ class ItemList extends DataObjectList
 				'Category'   => $this->last_Item->main_cat_ID,
 				'Locale'     => $this->last_Item->locale,
 				'Url'        => $this->last_Item->url,
-				'Flags'      => explode( ',', $this->last_Item->flags ),
 				'Wordcount'  => $this->last_Item->wordcount,
 				'views'      => $this->last_Item->views,
 				'comment_status'   => $this->last_Item->comment_status
@@ -865,6 +865,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.17  2006/08/21 16:07:43  fplanque
+ * refactoring
+ *
  * Revision 1.16  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *
@@ -929,153 +932,5 @@ class ItemList extends DataObjectList
  *
  * Revision 1.48  2006/01/04 20:35:14  fplanque
  * no message
- *
- * Revision 1.47  2005/12/30 20:13:40  fplanque
- * UI changes mostly (need to double check sync)
- *
- * Revision 1.46  2005/12/12 19:21:22  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.44  2005/12/05 15:29:15  fplanque
- * no message
- *
- * Revision 1.43  2005/12/04 00:14:59  blueyed
- * Fix preview when the target Blog is not set to allowcomments = 'post_by_post'
- *
- * Revision 1.42  2005/11/29 13:15:59  blueyed
- * Fixed calc_max() by using DISTINCT for the query it uses.
- *
- * Revision 1.41  2005/11/26 09:52:04  blueyed
- * Fixed possible fatal error (happened on the demo site)
- *
- * Revision 1.40  2005/11/20 01:30:36  blueyed
- * Fixed preview for users that are not allowed to edit timestamps; added TODO
- *
- * Revision 1.39  2005/11/18 21:00:20  fplanque
- * extensible param (used by Progidistri)
- *
- * Revision 1.38  2005/10/27 17:16:29  blueyed
- * preview_request(): removed globals, handle item issue date/time
- *
- * Revision 1.37  2005/10/27 15:25:03  fplanque
- * Normalization; doc; comments.
- *
- * Revision 1.36  2005/10/26 22:52:30  blueyed
- * Fix preview notices by fixing Itemlist::preview_request()
- *
- * Revision 1.35  2005/10/26 09:02:17  marian
- * Fixed Notice Messages on the preview screen.
- *
- * Revision 1.34  2005/10/03 18:10:07  fplanque
- * renamed post_ID field
- *
- * Revision 1.33  2005/09/06 19:38:29  fplanque
- * bugfixes
- *
- * Revision 1.32  2005/09/06 17:13:55  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.31  2005/09/02 23:37:10  fplanque
- * Optimized ItemList querying
- *
- * Revision 1.30  2005/08/31 19:08:51  fplanque
- * Factorized Item query WHERE clause.
- * Fixed calendar contextual accuracy.
- *
- * Revision 1.29  2005/08/25 19:02:10  fplanque
- * categories plugin phase 2
- *
- * Revision 1.28  2005/08/25 16:06:45  fplanque
- * Isolated compilation of categories to use in an ItemList.
- * This was one of the oldest bugs on the list! :>
- *
- * Revision 1.27  2005/08/24 14:02:33  fplanque
- * minor changes
- *
- * Revision 1.26  2005/08/17 21:01:34  fplanque
- * Selection of multiple authors with (-) option.
- * Selection of multiple categories with (-) and (*) options.
- *
- * Revision 1.25  2005/06/22 14:51:43  blueyed
- * doc; use $this->blog after copying from $blog param
- *
- * Revision 1.24  2005/03/14 20:22:19  fplanque
- * refactoring, some cacheing optimization
- *
- * Revision 1.23  2005/03/10 16:07:20  fplanque
- * cleaned up paging
- * added dstart param
- *
- * Revision 1.22  2005/03/09 20:29:40  fplanque
- * added 'unit' param to allow choice between displaying x days or x posts
- * deprecated 'paged' mode (ultimately, everything should be pageable)
- *
- * Revision 1.21  2005/03/08 20:32:07  fplanque
- * small fixes; slightly enhanced WEEK() handling
- *
- * Revision 1.20  2005/02/28 09:06:33  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.19  2005/02/28 01:32:32  blueyed
- * Hitlog refactoring, part uno.
- *
- * Revision 1.18  2005/02/19 18:20:47  blueyed
- * obsolete functions removed
- *
- * Revision 1.17  2005/02/10 23:51:43  blueyed
- * added preview-fix todo
- *
- * Revision 1.16  2005/02/08 04:45:02  blueyed
- * improved $DB get_results() handling
- *
- * Revision 1.15  2005/01/06 19:40:13  fplanque
- * SQL injection fix
- *
- * Revision 1.14  2005/01/03 15:17:52  fplanque
- * no message
- *
- * Revision 1.13  2004/12/27 18:37:58  fplanque
- * changed class inheritence
- *
- * Revision 1.11  2004/12/20 19:49:24  fplanque
- * cleanup & factoring
- *
- * Revision 1.10  2004/12/17 20:38:52  fplanque
- * started extending item/post capabilities (extra status, type)
- *
- * Revision 1.9  2004/12/15 20:50:34  fplanque
- * heavy refactoring
- * suppressed $use_cache and $sleep_after_edit
- * code cleanup
- *
- * Revision 1.8  2004/12/14 21:01:06  fplanque
- * minor fixes
- *
- * Revision 1.7  2004/12/14 18:32:15  fplanque
- * quick optimizations
- *
- * Revision 1.6  2004/12/13 21:29:58  fplanque
- * refactoring
- *
- * Revision 1.5  2004/12/10 19:45:55  fplanque
- * refactoring
- *
- * Revision 1.4  2004/12/09 21:21:20  fplanque
- * introduced foreign key support
- *
- * Revision 1.3  2004/11/09 00:25:12  blueyed
- * minor translation changes (+MySQL spelling :/)
- *
- * Revision 1.2  2004/10/14 18:31:25  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.62  2004/10/12 16:12:18  fplanque
- * Edited code documentation.
- *
- * Revision 1.4  2003/8/22 22:12:30  jupiterx
- * Added wordcount functionality
  */
 ?>

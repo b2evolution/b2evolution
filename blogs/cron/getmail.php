@@ -329,14 +329,10 @@ switch ( $Settings->get('eblog_method') )
 
 				// INSERT NEW POST INTO DB:
 				$edited_Item = & new Item();
-				$post_ID = $edited_Item->insert( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale, '',	$Settings->get('AutoBR'), true );
+				$post_ID = $edited_Item->insert( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale );
 
-				// Send email notifications now!
-				$edited_Item->send_email_notifications( false );
-
-				// send outbound pings:
-				load_funcs( '_misc/_ping.funcs.php' );
-				send_outbound_pings( $edited_Item );
+				// Execute or schedule notifications & pings:
+				$edited_Item->handle_post_processing( false );
 			}
 
 			echo "\n<p><strong>", T_('Posted title'), ':</strong> ', $post_title, '<br />';
@@ -592,14 +588,10 @@ switch ( $Settings->get('eblog_method') )
 
 				// INSERT NEW POST INTO DB:
 				$edited_Item = & new Item();
-				$post_ID = $edited_Item->insert( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale, '',	$Settings->get('AutoBR'), true );
+				$post_ID = $edited_Item->insert( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale );
 
-				// Send email notifications now!
-				$edited_Item->send_email_notifications( false );
-
-  			// send outbound pings:
-				load_funcs( '_misc/_ping.funcs.php' );
-				send_outbound_pings( $edited_Item );
+				// Execute or schedule notifications & pings:
+				$edited_Item->handle_post_processing( false );
 			}
 
 			echo_message( '&bull;<b>' . T_('Post title') . ":</b> $post_title<br/>",'',3 );

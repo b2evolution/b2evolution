@@ -459,7 +459,7 @@ function upgrade_b2evo_tables()
 							CHANGE COLUMN post_lang post_locale varchar(20) NOT NULL default 'en-EU',
 							DROP COLUMN post_url,
 							CHANGE COLUMN post_trackbacks post_url varchar(250) NULL default NULL,
-							MODIFY COLUMN post_flags SET( 'pingsdone', 'imported'),
+							MODIFY COLUMN post_flags SET( 'pingsdone', 'imported' ),
 							ADD COLUMN post_renderers VARCHAR(179) NOT NULL default 'default',
 							DROP INDEX post_date,
 							ADD INDEX post_issue_date( post_issue_date ),
@@ -1202,13 +1202,28 @@ function upgrade_b2evo_tables()
 
 	
 	
-	if( $old_db_version < 9402 )
+	if( $old_db_version < 9404 )
 	{
 		echo 'Updating blogs... ';
 		$DB->query( '
 				ALTER TABLE T_blogs
 							DROP COLUMN blog_allowpingbacks' );
 		echo "OK.<br />\n";
+
+		echo 'Updating posts... ';
+		$DB->query( '
+      ALTER TABLE T_posts
+      	ADD COLUMN post_notifications_status   ENUM("noreq","todo","started","finished") NOT NULL DEFAULT "noreq" AFTER post_flags,
+     		ADD COLUMN post_notifications_ctsk_ID  INT(10) unsigned NULL DEFAULT NULL AFTER post_notifications_status' );
+		$DB->query( '
+      UPDATE T_posts
+         SET post_notifications_status = "finished"
+			 WHERE post_flags LIKE "%pingsdone%"' );
+		$DB->query( '
+      ALTER TABLE T_posts
+      	DROP COLUMN post_flags' );
+		echo "OK.<br />\n";
+
 	}
 
 
@@ -1318,6 +1333,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.165  2006/08/21 16:07:45  fplanque
+ * refactoring
+ *
  * Revision 1.164  2006/08/19 07:56:31  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

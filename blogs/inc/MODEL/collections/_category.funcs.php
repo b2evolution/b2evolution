@@ -965,6 +965,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.10  2006/08/21 16:07:43  fplanque
+ * refactoring
+ *
  * Revision 1.9  2006/08/21 00:03:13  fplanque
  * obsoleted some dirty old thing
  *
@@ -997,100 +1000,5 @@ function cat_req_dummy() {}
  *
  * Revision 1.30  2006/01/04 20:35:14  fplanque
  * no message
- *
- * Revision 1.29  2005/12/30 20:13:39  fplanque
- * UI changes mostly (need to double check sync)
- *
- * Revision 1.28  2005/12/12 19:44:09  fplanque
- * Use cached objects by reference instead of copying them!!
- *
- * Revision 1.27  2005/12/12 19:21:21  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.26  2005/10/03 18:10:07  fplanque
- * renamed post_ID field
- *
- * Revision 1.25  2005/09/06 19:38:29  fplanque
- * bugfixes
- *
- * Revision 1.24  2005/09/06 17:13:54  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.23  2005/09/03 00:21:48  fplanque
- * bugfixes
- *
- * Revision 1.22  2005/09/02 21:46:40  fplanque
- * doc
- *
- * Revision 1.21  2005/09/01 17:11:46  fplanque
- * no message
- *
- * Revision 1.20  2005/08/25 17:45:19  fplanque
- * started categories plugin
- *
- * Revision 1.19  2005/08/25 16:06:45  fplanque
- * Isolated compilation of categories to use in an ItemList.
- * This was one of the oldest bugs on the list! :>
- *
- * Revision 1.18  2005/06/06 17:59:39  fplanque
- * user dialog enhancements
- *
- * Revision 1.17  2005/05/10 18:35:38  fplanque
- * refactored/normalized category handling
- * (though there's still a lot to do before this gets as clean as desired...)
- *
- * Revision 1.16  2005/03/14 20:22:19  fplanque
- * refactoring, some cacheing optimization
- *
- * Revision 1.15  2005/03/09 14:54:26  fplanque
- * refactored *_title() galore to requested_title()
- *
- * Revision 1.14  2005/03/07 17:36:11  fplanque
- * made more generic
- *
- * Revision 1.13  2005/03/02 17:07:33  blueyed
- * no message
- *
- * Revision 1.12  2005/02/28 09:06:32  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.11  2005/02/15 22:05:06  blueyed
- * Started moving obsolete functions to _obsolete092.php..
- *
- * Revision 1.10  2005/02/08 04:45:02  blueyed
- * improved $DB get_results() handling
- *
- * Revision 1.9  2005/02/08 04:07:46  blueyed
- * fixed results from DB::get_var()
- *
- * Revision 1.8  2005/01/25 15:07:19  fplanque
- * cleanup
- *
- * Revision 1.7  2004/12/15 20:50:34  fplanque
- * heavy refactoring
- * suppressed $use_cache and $sleep_after_edit
- * code cleanup
- *
- * Revision 1.6  2004/12/13 21:29:13  fplanque
- * refactoring
- *
- * Revision 1.5  2004/12/06 21:45:24  jwedgeco
- * Added header info and granted Francois PLANQUE the right to relicense under the Mozilla Public License.
- *
- * Revision 1.4  2004/11/30 21:51:34  jwedgeco
- * when copying a blog, categories are copied as well.
- *
- * Revision 1.3  2004/11/09 00:25:11  blueyed
- * minor translation changes (+MySQL spelling :/)
- *
- * Revision 1.2  2004/10/14 18:31:25  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.39  2004/10/12 17:22:29  fplanque
- * Edited code documentation.
- *
  */
 ?>

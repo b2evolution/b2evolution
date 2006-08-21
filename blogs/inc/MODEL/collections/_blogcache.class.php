@@ -274,6 +274,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.11  2006/08/21 16:07:43  fplanque
+ * refactoring
+ *
  * Revision 1.10  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *
@@ -308,65 +311,5 @@ class BlogCache extends DataObjectCache
  *
  * Revision 1.19  2006/01/16 21:22:56  blueyed
  * Fix return by reference.
- *
- * Revision 1.18  2005/12/12 19:21:21  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.17  2005/11/26 07:35:20  blueyed
- * load_user_blogs(): return unique list! This fixes the blog being two times in the root list if the user has permission through his group and user.
- *
- * Revision 1.16  2005/11/24 08:43:11  blueyed
- * doc
- *
- * Revision 1.15  2005/11/22 23:46:10  blueyed
- * load_user_blogs(): we have to consider T_coll_group_perms also!
- *
- * Revision 1.14  2005/09/06 17:13:54  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.13  2005/07/13 23:44:18  blueyed
- * Fixed notice with not returning reference (since PHP 4.4.0?).
- *
- * Revision 1.12  2005/05/25 17:13:33  fplanque
- * implemented email notifications on new comments/trackbacks
- *
- * Revision 1.11  2005/05/16 15:17:12  fplanque
- * minor
- *
- * Revision 1.10  2005/05/12 18:39:24  fplanque
- * storing multi homed/relative pathnames for file meta data
- *
- * Revision 1.9  2005/05/11 13:21:38  fplanque
- * allow disabling of mediua dir for specific blogs
- *
- * Revision 1.8  2005/03/16 19:58:23  fplanque
- * small AdminUI cleanup tasks
- *
- * Revision 1.7  2005/03/02 17:07:33  blueyed
- * no message
- *
- * Revision 1.6  2005/02/28 09:06:32  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.5  2005/01/04 23:45:47  fplanque
- * bugfix
- *
- * Revision 1.4  2004/12/21 21:22:46  fplanque
- * factoring/cleanup
- *
- * Revision 1.3  2004/12/15 20:50:34  fplanque
- * heavy refactoring
- * suppressed $use_cache and $sleep_after_edit
- * code cleanup
- *
- * Revision 1.2  2004/10/14 18:31:24  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.12  2004/10/11 19:02:04  fplanque
- * Edited code documentation.
- *
  */
 ?>
