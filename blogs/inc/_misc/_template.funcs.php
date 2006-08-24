@@ -217,21 +217,25 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 	$additional_titles = $MainList->get_title();
 	$r = array_merge( $r, $additional_titles );
 	*/
-	
-	if( empty( $r ) && !empty( $default ) )
+
+	if( ! empty( $r ) )
 	{
-		$r[] = $default;
+		$r = implode( $glue, $r );
+		$r = $prefix.format_to_output( $r, $format ).$suffix;
+	}
+	elseif( !empty( $default ) )
+	{
+		$r = $default;
 	}
 
 	if( !empty( $r ) )
 	{ // We have something to display:
-		$r = implode( $glue, $r );
-		$r = $prefix.format_to_output( $r, $format ).$suffix;
 		if( $display )
 			echo $r;
 		else
 			return $r;
 	}
+
 }
 
 
@@ -308,6 +312,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.10  2006/08/24 00:38:18  fplanque
+ * allow full control over the default title
+ *
  * Revision 1.9  2006/08/19 07:56:31  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *
