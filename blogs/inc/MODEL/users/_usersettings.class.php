@@ -59,7 +59,7 @@ class UserSettings extends AbstractSettings
 		'action_word_threshold' => 3,
 		'control_form_abortions' => 1,
 		'pref_browse_tab' => 'posts',
-		'pref_edit_tab' => 'expert',
+		'pref_edit_tab' => 'simple',
 
 		'fm_imglistpreview' => 1,
 	);
@@ -202,6 +202,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.19  2006/08/24 00:42:20  fplanque
+ * minor
+ *
  * Revision 1.18  2006/08/20 22:25:21  fplanque
  * param_() refactoring part 2
  *
