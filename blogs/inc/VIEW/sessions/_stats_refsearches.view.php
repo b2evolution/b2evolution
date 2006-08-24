@@ -27,25 +27,28 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $blog, $admin_url, $rsc_url;
 
-?>
-<h2><?php echo T_('Last refering searches') ?>:</h2>
-<p><?php echo T_('These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)') ?></p>
-<?php
+echo '<h2>'.T_('Search browser hits').':</h2>';
+
+echo '<p>'.T_('These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)').'</p>';
+
 // Create result set:
 $Results = & new Results( "
-		SELECT hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
-			FROM T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
+	 	 SELECT hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
+		 	 FROM T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
+					  INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
 					  LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
-		 WHERE hit_referer_type = 'search' "
+		  WHERE hit_referer_type = 'search'
+			 			AND agnt_type = 'browser'"
 		.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 'lstsrch', 'D' );
 
-$Results->title = T_('Last refering searches');
+$Results->title = T_('Search browser hits');
 
 // datetime:
 $Results->cols[0] = array(
 		'th' => T_('Date Time'),
 		'order' => 'hit_datetime',
-		'td' => '%mysql2localedatetime( \'$hit_datetime$\' )%',
+		'td_class' => 'timestamp',
+		'td' => '%mysql2localedatetime_spans( \'$hit_datetime$\' )%',
 	);
 
 // Referer:
@@ -98,6 +101,7 @@ $Results->cols[] = array(
 $Results->display();
 
 
+
 // TOP REFERING SEARCH ENGINES
 ?>
 
@@ -129,83 +133,12 @@ if( count( $res_stats ) )
 }
 
 
-// TOP INDEXING ROBOTS
-?>
-<h3><?php echo T_('Top Indexing Robots') ?>:</h3>
-<p><?php echo T_('These are hits from automated robots like search engines\' indexing robots. (Robots must be listed in /conf/_stats.php)') ?></p>
-<?php
-// Create result set:
-$sql = 'SELECT COUNT(*) AS hit_count, agnt_signature
-					FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-				 WHERE agnt_type = "robot" '
-								.( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog ).'
-				 GROUP BY agnt_signature';
-
-$count_sql = 'SELECT COUNT( DISTINCT agnt_signature )
-					FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-				 WHERE agnt_type = "robot" '
-								.( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog );
-
-$Results = & new Results( $sql, 'topidx', '-D', 20, $count_sql );
-
-$total_hit_count = $DB->get_var( "
-		SELECT COUNT(*)
-			FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-		 WHERE agnt_type = 'robot' "
-		.( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog ) );
-
-$Results->title = T_('Top Indexing Robots');
-
-/**
- * Helper function to translate agnt_signature to a "human-friendly" version from {@link $user_agents}.
- * @return string
- */
-function translate_user_agent( $agnt_signature )
-{
-	global $user_agents;
-
-	foreach ($user_agents as $curr_user_agent)
-	{
-		if (stristr($agnt_signature, $curr_user_agent[1]))
-		{
-			return '<span title="'.htmlspecialchars($agnt_signature).'">'.htmlspecialchars($curr_user_agent[2]).'</span>';
-		}
-	}
-
-	return htmlspecialchars($agnt_signature);
-}
-
-// User agent:
-$Results->cols[] = array(
-		'th' => T_('Robot'),
-		'order' => 'hit_referer',
-		'td' =>
-			// If hit_referer is not empty, start a link
-			'¤( strlen(trim(\'$hit_referer$\')) ? \'<a href="$hit_referer$">\' : \'\' )¤'
-			.'%translate_user_agent(\'$agnt_signature$\')%'
-			.'¤( strlen(trim(\'$hit_referer$\')) ? \'</a>\' : \'\' )¤',
-	);
-
-// Hit count:
-$Results->cols[] = array(
-		'th' => T_('Hit count'),
-		'order' => 'hit_count',
-		'td' => '$hit_count$',
-	);
-
-// Hit %
-$Results->cols[] = array(
-		'th' => T_('Hit %'),
-		'order' => 'hit_count',
-		'td' => '%percentage( #hit_count#, '.$total_hit_count.' )%',
-	);
-
-// Display results:
-$Results->display();
-
 
 /*
  * $Log$
+ * Revision 1.2  2006/08/24 21:41:13  fplanque
+ * enhanced stats
+ *
  * Revision 1.1  2006/07/12 18:07:06  fplanque
  * splitted stats into different views
  *

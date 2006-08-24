@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the UI view for the general hit summary.
+ * This file implements the UI view for the browser hits summary.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -28,9 +28,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $blog, $admin_url;
 
 
-echo '<h2>'.T_('Global hits summary').'</h2>';
+echo '<h2>'.T_('Browser hits summary').'</h2>';
 
-echo '<p>'.sprintf( T_('This page includes all recorded hits, split down by <a %s>user agent</a> type.'), ' href="?ctrl=stats&tab=useragents&blog='.$blog.'"' ).'</p>';
+
+echo '<p>'.sprintf( T_('This page only includes hits identified as made by a <a %s>web browser</a>.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_browser=1&amp;blog='.$blog.'"' ).'</p>';
 
 
 // fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
@@ -39,15 +40,16 @@ echo '<p>'.sprintf( T_('This page includes all recorded hits, split down by <a %
 // TODO: I've also limited this to agnt_type "browser" here, according to the change for "referers" (Rev 1.6)
 //       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
 $sql = '
-	SELECT COUNT(*) AS hits, agnt_type, YEAR(hit_datetime) AS year,
+	SELECT COUNT(*) AS hits, CONCAT(hit_referer_type) AS referer_type, YEAR(hit_datetime) AS year,
 			   MONTH(hit_datetime) AS month, DAYOFMONTH(hit_datetime) AS day
-		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID';
+		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
+	 WHERE agnt_type = "browser"';
 if( $blog > 0 )
 {
-	$sql .= ' WHERE hit_blog_ID = '.$blog;
+	$sql .= ' AND hit_blog_ID = '.$blog;
 }
-$sql .= ' GROUP BY year, month, day, agnt_type
-					ORDER BY year DESC, month DESC, day DESC, agnt_type';
+$sql .= ' GROUP BY year, month, day, referer_type
+					ORDER BY year DESC, month DESC, day DESC, referer_type';
 $res_hits = $DB->get_results( $sql, ARRAY_A, 'Get hit summary' );
 
 
@@ -59,10 +61,12 @@ if( count($res_hits) )
 	$last_date = 0;
 
 	$col_mapping = array(
-			'browser' => 1,
-			'robot' => 2,
-			'rss' => 3,
-			'unknown' => 4,
+			'direct' => 1,
+			'referer' => 2,
+			'search' => 3,
+			'self' => 4,
+			'blacklist' => 5,
+			'admin' => 6,
 		);
 
 	$chart[ 'chart_data' ][ 0 ] = array();
@@ -70,6 +74,8 @@ if( count($res_hits) )
 	$chart[ 'chart_data' ][ 2 ] = array();
 	$chart[ 'chart_data' ][ 3 ] = array();
 	$chart[ 'chart_data' ][ 4 ] = array();
+	$chart[ 'chart_data' ][ 5 ] = array();
+	$chart[ 'chart_data' ][ 6 ] = array();
 
 	$count = 0;
 	foreach( $res_hits as $row_stats )
@@ -84,16 +90,20 @@ if( count($res_hits) )
 				array_unshift( $chart[ 'chart_data' ][ 2 ], 0 );
 				array_unshift( $chart[ 'chart_data' ][ 3 ], 0 );
 				array_unshift( $chart[ 'chart_data' ][ 4 ], 0 );
+				array_unshift( $chart[ 'chart_data' ][ 5 ], 0 );
+				array_unshift( $chart[ 'chart_data' ][ 6 ], 0 );
 		}
-		$col = $col_mapping[$row_stats['agnt_type']];
-		$chart['chart_data'][$col][0] = $row_stats['hits'];
+		$col = $col_mapping[$row_stats['referer_type']];
+		$chart [ 'chart_data' ][$col][0] = $row_stats['hits'];
 	}
 
 	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
-	array_unshift( $chart[ 'chart_data' ][ 1 ], 'Browser' );	// Translations need to be UTF-8
-	array_unshift( $chart[ 'chart_data' ][ 2 ], 'Robots' );
-	array_unshift( $chart[ 'chart_data' ][ 3 ], 'XML (RSS/Atom)' );
-	array_unshift( $chart[ 'chart_data' ][ 4 ], 'Unknown' );
+	array_unshift( $chart[ 'chart_data' ][ 1 ], 'Direct accesses' );	// Translations need to be UTF-8
+	array_unshift( $chart[ 'chart_data' ][ 2 ], 'Referers' );
+	array_unshift( $chart[ 'chart_data' ][ 3 ], 'Refering searches' );
+	array_unshift( $chart[ 'chart_data' ][ 4 ], 'Self referred' );
+	array_unshift( $chart[ 'chart_data' ][ 5 ], 'Special referrers' );
+	array_unshift( $chart[ 'chart_data' ][ 6 ], 'Admin' );
 
 	$chart[ 'canvas_bg' ] = array (
 			'width'  => 780,
@@ -128,7 +138,7 @@ if( count($res_hits) )
 					'y'        => 6,
 					'width'    => 700,
 					'height'   => 50,
-					'text'     => 'Global hits', // Needs UTF-8
+					'text'     => 'Browser hits', // Needs UTF-8
 					'h_align'  => "right",
 					'v_align'  => "bottom" ),
 			);
@@ -219,10 +229,12 @@ if( count($res_hits) )
 	 * Table:
 	 */
 	$hits = array(
-		'browser' => 0,
-		'robot' => 0,
-		'rss' => 0,
-		'unknown' => 0,
+		'direct' => 0,
+		'referer' => 0,
+		'search' => 0,
+		'self' => 0,
+		'blacklist' => 0,
+		'admin' => 0,
 	);
 	$hits_total = $hits;
 
@@ -233,10 +245,12 @@ if( count($res_hits) )
 	<table class="grouped" cellspacing="0">
 		<tr>
 			<th class="firstcol"><?php echo T_('Date') ?></th>
-			<th><?php echo T_('Browser') ?></th>
-			<th><?php echo T_('Robots') ?></th>
-			<th><?php echo T_('XML') ?></th>
-			<th><?php echo T_('Unknown') ?></th>
+			<th><?php echo T_('Direct accesses') ?></th>
+			<th><?php echo T_('Referers') ?></th>
+			<th><?php echo T_('Refering searches') ?></th>
+			<th><?php echo T_('Self referred') ?></th>
+			<th><?php	echo T_('Special referrers') ?></th>
+			<th><?php echo T_('Admin') ?></th>
 			<th class="lastcol"><?php echo T_('Total') ?></th>
 		</tr>
 		<?php
@@ -255,26 +269,30 @@ if( count($res_hits) )
 						}
 						echo date( locale_datefmt(), $last_date ) ?>
 					</td>
-					<td class="right"><?php echo $hits['browser'] ?></td>
-					<td class="right"><?php echo $hits['robot'] ?></td>
-					<td class="right"><?php echo $hits['rss'] ?></td>
-					<td class="right"><?php echo $hits['unknown'] ?></td>
+					<td class="right"><?php echo $hits['direct'] ?></td>
+					<td class="right"><?php echo $hits['referer'] ?></td>
+					<td class="right"><?php echo $hits['search'] ?></td>
+					<td class="right"><?php echo $hits['self'] ?></td>
+					<td class="right"><?php echo $hits['blacklist'] ?></td>
+					<td class="right"><?php echo $hits['admin'] ?></td>
 					<td class="lastcol right"><?php echo array_sum($hits) ?></td>
 				</tr>
 				<?php
 					$hits = array(
-						'browser' => 0,
-						'robot' => 0,
-						'rss' => 0,
-						'unknown' => 0,
+						'direct' => 0,
+						'referer' => 0,
+						'search' => 0,
+						'self' => 0,
+						'blacklist' => 0,
+						'admin' => 0,
 					);
 					$last_date = $this_date;	// that'll be the next one
 					$count ++;
 			}
 
 			// Increment hitcounter:
-			$hits[$row_stats['agnt_type']] = $row_stats['hits'];
-			$hits_total[$row_stats['agnt_type']] += $row_stats['hits'];
+			$hits[$row_stats['referer_type']] = $row_stats['hits'];
+			$hits_total[$row_stats['referer_type']] += $row_stats['hits'];
 		}
 
 		if( $last_date != 0 )
@@ -287,10 +305,12 @@ if( count($res_hits) )
 					}
 					echo date( locale_datefmt(), $this_date ) ?>
 				</td>
-				<td class="right"><?php echo $hits['browser'] ?></td>
-				<td class="right"><?php echo $hits['robot'] ?></td>
-				<td class="right"><?php echo $hits['rss'] ?></td>
-				<td class="right"><?php echo $hits['unknown'] ?></td>
+				<td class="right"><?php echo $hits['direct'] ?></td>
+				<td class="right"><?php echo $hits['referer'] ?></td>
+				<td class="right"><?php echo $hits['search'] ?></td>
+				<td class="right"><?php echo $hits['self'] ?></td>
+				<td class="right"><?php echo $hits['blacklist'] ?></td>
+				<td class="right"><?php echo $hits['admin'] ?></td>
 				<td class="lastcol right"><?php echo array_sum($hits) ?></td>
 			</tr>
 			<?php
@@ -301,10 +321,12 @@ if( count($res_hits) )
 
 		<tr class="total">
 		<td class="firstcol"><?php echo T_('Total') ?></td>
-		<td class="right"><?php echo $hits_total['browser'] ?></td>
-		<td class="right"><?php echo $hits_total['robot'] ?></td>
-		<td class="right"><?php echo $hits_total['rss'] ?></td>
-		<td class="right"><?php echo $hits_total['unknown'] ?></td>
+		<td class="right"><?php echo $hits_total['direct'] ?></td>
+		<td class="right"><?php echo $hits_total['referer'] ?></td>
+		<td class="right"><?php echo $hits_total['search'] ?></td>
+		<td class="right"><?php echo $hits_total['self'] ?></td>
+		<td class="right"><?php echo $hits_total['blacklist'] ?></td>
+		<td class="right"><?php echo $hits_total['admin'] ?></td>
 		<td class="lastcol right"><?php echo array_sum($hits_total) ?></td>
 		</tr>
 
@@ -313,15 +335,5 @@ if( count($res_hits) )
 }
 
 /*
- * $Log$
- * Revision 1.3  2006/08/24 21:41:14  fplanque
- * enhanced stats
- *
- * Revision 1.2  2006/07/12 20:18:20  fplanque
- * session stats + minor enhancements
- *
- * Revision 1.1  2006/07/12 18:07:06  fplanque
- * splitted stats into different views
- *
- */
+ nolog */
 ?>

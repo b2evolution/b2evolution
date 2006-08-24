@@ -44,6 +44,8 @@ if( !empty($set_target) )
 	{
 		case 'antispam_filters':
 		case 'crontab_filters':
+		case 'refdom_filters':	// referring domains
+		case 'uagnt_filters':	// user agents
 		case 'user_filters':
 			// We have a valid value:
 			$Session->set( $set_target, $set_status );
@@ -58,6 +60,9 @@ if( !empty($set_target) )
 
 /*
  * $Log$
+ * Revision 1.6  2006/08/24 21:41:13  fplanque
+ * enhanced stats
+ *
  * Revision 1.5  2006/06/26 23:10:24  fplanque
  * minor / doc
  *

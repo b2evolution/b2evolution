@@ -1132,7 +1132,7 @@ function upgrade_b2evo_tables()
 
 
 	// 1.9:
-	if( $old_db_version < 9300 )
+	if( $old_db_version < 9290 )
 	{
 		echo 'Post-fix hit_referer_type == NULL... ';
 		// If you've upgraded from 1.6 to 1.8 and it did not break because of strict mode, there are now NULL values for what "spam" was:
@@ -1171,17 +1171,31 @@ function upgrade_b2evo_tables()
 				ALTER TABLE T_useragents ADD INDEX agnt_type ( agnt_type )' );
 		$DB->query( '
 				ALTER TABLE T_hitlog
-				  CHANGE COLUMN hit_referer_type hit_referer_type ENUM(\'search\',\'blacklist\',\'referer\',\'direct\',\'self\',\'admin\') NOT NULL,
-				  ADD INDEX hit_agnt_ID ( hit_agnt_ID ),
-				  ADD INDEX hit_uri (hit_uri)' );
+				  CHANGE COLUMN hit_referer_type hit_referer_type ENUM(\'search\',\'blacklist\',\'referer\',\'direct\',\'self\',\'admin\') NOT NULL' );
 		echo "OK.<br />\n";
 
 		echo 'Updating plugin capabilities... ';
 		$DB->query( '
-				ALTER TABLE T_plugins 
+				ALTER TABLE T_plugins
 					MODIFY COLUMN plug_status ENUM( \'enabled\', \'disabled\', \'needs_config\', \'broken\' ) NOT NULL,
 					ADD COLUMN plug_classpath VARCHAR(255) NULL default NULL AFTER plug_classname' );
 		echo "OK.<br />\n";
+
+  	set_upgrade_checkpoint( '9290' );
+	}
+
+
+	if( $old_db_version < 9300 )
+	{
+		// This can be so long, it needs its own checkpoint protected block in case of failure
+		echo 'Updating hitlog indexes... ';
+		$DB->query( '
+				ALTER TABLE T_hitlog
+				  ADD INDEX hit_agnt_ID ( hit_agnt_ID ),
+				  ADD INDEX hit_uri (hit_uri)' );
+		echo "OK.<br />\n";
+
+  	set_upgrade_checkpoint( '9300' );
 	}
 
 
@@ -1333,6 +1347,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.166  2006/08/24 21:41:14  fplanque
+ * enhanced stats
+ *
  * Revision 1.165  2006/08/21 16:07:45  fplanque
  * refactoring
  *

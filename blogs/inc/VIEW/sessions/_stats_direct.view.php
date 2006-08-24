@@ -28,8 +28,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $blog, $admin_url, $rsc_url;
 
 ?>
-<h2><?php echo T_('Last direct accesses') ?></h2>
-<p><?php echo T_('These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)') ?></p>
+<h2><?php echo T_('Direct browser hits') ?></h2>
+<p><?php echo T_('These are browser hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)') ?></p>
 <?php
 // Create result set:
 $Results = & new Results( "
@@ -40,13 +40,14 @@ $Results = & new Results( "
 		 AND agnt_type = 'browser'"
 		.( empty($blog) ? '' : "AND hit_blog_ID = $blog "), 'lstref_', 'D' );
 
-$Results->title = T_('Last direct accesses');
+$Results->title = T_('Direct browser hits');
 
 // datetime:
 $Results->cols[] = array(
 		'th' => T_('Date Time'),
 		'order' => 'hit_datetime',
-		'td' => '%mysql2localedatetime( \'$hit_datetime$\' )%',
+		'td_class' => 'timestamp',
+		'td' => '%mysql2localedatetime_spans( \'$hit_datetime$\' )%',
 	);
 
 // Referer:
@@ -88,6 +89,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.2  2006/08/24 21:41:13  fplanque
+ * enhanced stats
+ *
  * Revision 1.1  2006/07/12 18:07:06  fplanque
  * splitted stats into different views
  *

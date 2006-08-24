@@ -155,14 +155,14 @@ $AdminUI->disp_payload_begin();
 
 switch( $AdminUI->get_path(1) )
 {
-	case 'sessions':
-		// Display VIEW:
-		$AdminUI->disp_view( 'sessions/_stats_sessions.view.php' );
-		break;
-
 	case 'summary':
 		// Display VIEW:
 		$AdminUI->disp_view( 'sessions/_stats_summary.view.php' );
+		break;
+
+	case 'browserhits':
+		// Display VIEW:
+		$AdminUI->disp_view( 'sessions/_stats_browserhits.view.php' );
 		break;
 
 	case 'other':
@@ -180,6 +180,11 @@ switch( $AdminUI->get_path(1) )
 		$AdminUI->disp_view( 'sessions/_stats_refsearches.view.php' );
 		break;
 
+	case 'robots':
+		// Display VIEW:
+		$AdminUI->disp_view( 'sessions/_stats_robots.view.php' );
+		break;
+
 	case 'syndication':
 		// Display VIEW:
 		$AdminUI->disp_view( 'sessions/_stats_syndication.view.php' );
@@ -188,6 +193,16 @@ switch( $AdminUI->get_path(1) )
 	case 'useragents':
 		// Display VIEW:
 		$AdminUI->disp_view( 'sessions/_stats_useragents.view.php' );
+		break;
+
+	case 'domains':
+		// Display VIEW:
+		$AdminUI->disp_view( 'sessions/_stats_refdomains.view.php' );
+		break;
+
+	case 'sessions':
+		// Display VIEW:
+		$AdminUI->disp_view( 'sessions/_stats_sessions.view.php' );
 		break;
 }
 
@@ -199,6 +214,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.31  2006/08/24 21:41:13  fplanque
+ * enhanced stats
+ *
  * Revision 1.30  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

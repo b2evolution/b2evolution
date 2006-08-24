@@ -28,27 +28,28 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $blog, $admin_url, $rsc_url;
 
 ?>
-<h2><?php echo T_('Last referers') ?>:</h2>
-<p><?php echo T_('These are hits from external web pages refering to this blog') ?>.</p>
+<h2><?php echo T_('Refered browser hits') ?>:</h2>
+<p><?php echo T_('These are browser hits from external web pages refering to this blog') ?>.</p>
 <?php
 // Create result set:
 $Results = & new Results( "
-		SELECT hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
-			FROM T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
+		 SELECT hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
+			 FROM T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
 					  INNER JOIN T_sessions ON hit_sess_ID = sess_ID
+					  INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
 					  LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
-					  LEFT JOIN T_useragents ON hit_agnt_ID = agnt_ID
-		 WHERE hit_referer_type = 'referer'
-			 AND agnt_type = 'browser'"
+		  WHERE hit_referer_type = 'referer'
+			 			AND agnt_type = 'browser'"
 		 .( empty($blog) ? '' : "AND hit_blog_ID = $blog "), 'lstref_', 'D' );
 
-$Results->title = T_('Last referers');
+$Results->title = T_('Refered browser hits');
 
 // datetime:
 $Results->cols[0] = array(
 		'th' => T_('Date Time'),
 		'order' => 'hit_datetime',
-		'td' => '%mysql2localedatetime( \'$hit_datetime$\' )%',
+		'td_class' => 'timestamp',
+		'td' => '%mysql2localedatetime_spans( \'$hit_datetime$\' )%',
 	);
 
 // Referer:
@@ -296,6 +297,9 @@ if( count( $res_stats ) )
 
 /*
  * $Log$
+ * Revision 1.2  2006/08/24 21:41:13  fplanque
+ * enhanced stats
+ *
  * Revision 1.1  2006/07/12 18:07:06  fplanque
  * splitted stats into different views
  *

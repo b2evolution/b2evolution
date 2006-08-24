@@ -27,36 +27,97 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $blog, $admin_url, $rsc_url;
 
-echo '<h2>'.T_('Top User Agents').'</h2>';
+global $agnt_browser, $agnt_robot, $agnt_rss, $agnt_unknown;
+
+// For the user agents list:
+param( 'agnt_browser', 'integer', 0, true );
+param( 'agnt_robot', 'integer', 0, true );
+param( 'agnt_rss', 'integer', 0, true );
+param( 'agnt_unknown', 'integer', 0, true );
+
+if( !$agnt_browser && !$agnt_robot && !$agnt_rss && !$agnt_unknown )
+{	// Set default status filters:
+	$agnt_browser = 1;
+	$agnt_robot = 1;
+	$agnt_rss = 1;
+	$agnt_unknown = 1;
+}
+
+
+echo '<h2>'.T_('User agents').'</h2>';
+
+$selected_agnt_types = array();
+if( $agnt_browser ) $selected_agnt_types[] = "'browser'";
+if( $agnt_robot ) $selected_agnt_types[] = "'robot'";
+if( $agnt_rss ) $selected_agnt_types[] = "'rss'";
+if( $agnt_unknown ) $selected_agnt_types[] = "'unknown'";
+$where_clause =  ' WHERE agnt_type IN ('.implode(',',$selected_agnt_types).')';
+
+if( !empty($blog) )
+{
+	$where_clause .= ' AND hit_blog_ID = '.$blog;
+}
 
 $total_hit_count = $DB->get_var( "
-	SELECT COUNT(*) AS hit_count
-		FROM T_useragents INNER JOIN T_hitlog ON agnt_ID = hit_agnt_ID
-	 WHERE agnt_type <> 'rss' "
-		.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 0, 0, 'Get total hit count' );
+		SELECT COUNT(*) AS hit_count
+			FROM T_useragents INNER JOIN T_hitlog ON agnt_ID = hit_agnt_ID "
+			.$where_clause, 0, 0, 'Get total hit count - hits with an UA' );
 
 
 // Create result set:
-$sql = "SELECT agnt_signature, COUNT(*) AS hit_count
-					FROM T_useragents INNER JOIN T_hitlog ON agnt_ID = hit_agnt_ID
-				 WHERE agnt_type <> 'rss' "
-								.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
+$sql = "SELECT agnt_signature, agnt_type, COUNT( * ) AS hit_count
+					FROM T_useragents LEFT JOIN T_hitlog ON agnt_ID = hit_agnt_ID "
+			.$where_clause.'
 				 GROUP BY agnt_ID ';
 
-$count_sql = "SELECT COUNT( DISTINCT agnt_signature )
-					FROM T_useragents INNER JOIN T_hitlog ON agnt_ID = hit_agnt_ID
-				 WHERE agnt_type <> 'rss' "
-								.( empty($blog) ? '' : "AND hit_blog_ID = $blog " );
+$count_sql = "SELECT COUNT( agnt_ID )
+					FROM T_useragents "
+			.$where_clause;
 
-$Results = & new Results( $sql, 'topua_', '--D', 20, $count_sql );
+$Results = & new Results( $sql, 'uagnt_', '--D', 20, $count_sql );
 
-$Results->title = T_('Top User Agents');
+
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_useragents( & $Form )
+{
+	global $blog, $agnt_browser, $agnt_robot, $agnt_rss, $agnt_unknown;
+
+	$Form->checkbox( 'agnt_browser', $agnt_browser, T_('Browsers') );
+	$Form->checkbox( 'agnt_robot', $agnt_robot, T_('Robots') );
+	$Form->checkbox( 'agnt_rss', $agnt_rss, T_('XML readers') );
+	$Form->checkbox( 'agnt_unknown', $agnt_unknown, T_('Unknown') );
+}
+$Results->filter_area = array(
+	'callback' => 'filter_useragents',
+	'url_ignore' => 'results_uagnt_page,agnt_browser,agnt_robot,agnt_rss,agnt_unknown',	// ignore page param and checkboxes
+	'presets' => array(
+			'browser' => array( T_('Browser'), '?ctrl=stats&amp;tab=useragents&amp;agnt_browser=1&amp;blog='.$blog ),
+			'robot' => array( T_('Robots'), '?ctrl=stats&amp;tab=useragents&amp;agnt_robot=1&amp;blog='.$blog ),
+			'rss' => array( T_('XML'), '?ctrl=stats&amp;tab=useragents&amp;agnt_rss=1&amp;blog='.$blog ),
+			'unknown' => array( T_('Unknown'), '?ctrl=stats&amp;tab=useragents&amp;agnt_unknown=1&amp;blog='.$blog ),
+			'all' => array( T_('All'), '?ctrl=stats&amp;tab=useragents&amp;agnt_browser=1&amp;agnt_robot=1&amp;agnt_rss=1&amp;agnt_unknown=1&amp;blog='.$blog ),
+		)
+	);
+
+
+	$Results->title = T_('User agents');
 
 $Results->cols[] = array(
 						'th' => T_('Agent signature'),
 						'order' => 'agnt_signature',
 						'td' => '²agnt_signature²',
 						'total' => '<strong>'.T_('Global total').'</strong>',
+					);
+
+$Results->cols[] = array(
+						'th' => T_('Agent type'),
+						'order' => 'agnt_type',
+						'td' => '²agnt_type²',
+						'total' => '',
 					);
 
 $Results->cols[] = array(
@@ -82,6 +143,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.2  2006/08/24 21:41:14  fplanque
+ * enhanced stats
+ *
  * Revision 1.1  2006/07/12 18:07:06  fplanque
  * splitted stats into different views
  *

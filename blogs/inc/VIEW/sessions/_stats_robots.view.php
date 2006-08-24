@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the UI view for the syndication stats.
+ * This file implements the UI view for the robot stats.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -27,21 +27,22 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $blog, $admin_url, $rsc_url;
 
-echo '<h2>'.T_('XML hits summary').'</h2>';
-echo '<p>'.sprintf( T_('These are hits from <a %s>XML readers</a>. This includes RSS &amp; Atom readers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_rss=1&amp;blog='.$blog.'"' ).'</p>';
-echo '<p>'.T_('Any user agent accessing the XML feeds will be flagged as an XML reader.').'</p>';
+echo '<h2>'.T_('Robot hits').'</h2>';
+echo '<p>'.sprintf( T_('This page only includes hits identified as made by <a %s>indexing robots</a> a.k.a. web crawlers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_robot=1&amp;blog='.$blog.'"' ).'</p>';
+echo '<p>'.T_('In order to be detected, robots must be listed in /conf/_stats.php').'</p>';
+
 $sql = '
 	SELECT COUNT(*) AS hits, YEAR(hit_datetime) AS year,
 			   MONTH(hit_datetime) AS month, DAYOFMONTH(hit_datetime) AS day
 		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-	 WHERE agnt_type = "rss"';
+	 WHERE agnt_type = "robot"';
 if( $blog > 0 )
 {
 	$sql .= ' AND hit_blog_ID = '.$blog;
 }
 $sql .= ' GROUP BY year, month, day
 					ORDER BY year DESC, month DESC, day DESC';
-$res_hits = $DB->get_results( $sql, ARRAY_A, 'Get rss summary' );
+$res_hits = $DB->get_results( $sql, ARRAY_A, 'Get robot summary' );
 
 
 /*
@@ -69,7 +70,7 @@ if( count($res_hits) )
 	}
 
 	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
-	array_unshift( $chart[ 'chart_data' ][ 1 ], 'XML (RSS/Atom) hits' );	// Translations need to be UTF-8
+	array_unshift( $chart[ 'chart_data' ][ 1 ], 'Robot hits' );	// Translations need to be UTF-8
 
 	$chart[ 'canvas_bg' ] = array (
 			'width'  => 780,
@@ -104,7 +105,7 @@ if( count($res_hits) )
 					'y'        => 6,
 					'width'    => 700,
 					'height'   => 50,
-					'text'     => 'XML hits', // Needs UTF-8
+					'text'     => 'Robot hits', // Needs UTF-8
 					'h_align'  => "right",
 					'v_align'  => "bottom" ),
 			);
@@ -192,13 +193,81 @@ if( count($res_hits) )
 
 }
 
-/*
- * $Log$
- * Revision 1.2  2006/08/24 21:41:14  fplanque
- * enhanced stats
- *
- * Revision 1.1  2006/07/12 18:07:06  fplanque
- * splitted stats into different views
- *
+
+
+// TOP INDEXING ROBOTS
+
+echo '<h2>'.T_('Top Indexing Robots').':</h2>';
+
+// Create result set:
+$sql = 'SELECT COUNT(*) AS hit_count, agnt_signature
+					FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
+				 WHERE agnt_type = "robot" '
+				 			.( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog ).'
+				 GROUP BY agnt_signature';
+
+$count_sql = 'SELECT COUNT( DISTINCT agnt_signature )
+								FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
+							 WHERE agnt_type = "robot" '
+							 .( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog );
+
+$Results = & new Results( $sql, 'topidx', '-D', 20, $count_sql );
+
+$total_hit_count = $DB->get_var( "
+		SELECT COUNT(*)
+			FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
+		 WHERE agnt_type = 'robot' "
+		.( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog ) );
+
+$Results->title = T_('Top Indexing Robots');
+
+/**
+ * Helper function to translate agnt_signature to a "human-friendly" version from {@link $user_agents}.
+ * @return string
  */
+function translate_user_agent( $agnt_signature )
+{
+	global $user_agents;
+
+	foreach ($user_agents as $curr_user_agent)
+	{
+		if (stristr($agnt_signature, $curr_user_agent[1]))
+		{
+			return '<span title="'.htmlspecialchars($agnt_signature).'">'.htmlspecialchars($curr_user_agent[2]).'</span>';
+		}
+	}
+
+	return htmlspecialchars($agnt_signature);
+}
+
+// User agent:
+$Results->cols[] = array(
+		'th' => T_('Robot'),
+		'order' => 'agnt_signature',
+		'td' => '%translate_user_agent(\'$agnt_signature$\')%',
+	);
+
+// Hit count:
+$Results->cols[] = array(
+		'th' => T_('Hit count'),
+		'order' => 'hit_count',
+		'td_class' => 'right',
+		'td' => '$hit_count$',
+	);
+
+// Hit %
+$Results->cols[] = array(
+		'th' => T_('Hit %'),
+		'order' => 'hit_count',
+		'td_class' => 'right',
+		'td' => '%percentage( #hit_count#, '.$total_hit_count.' )%',
+	);
+
+// Display results:
+$Results->display();
+
+
+
+/*
+ nolog */
 ?>

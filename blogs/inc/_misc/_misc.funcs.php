@@ -439,9 +439,23 @@ function mysql2localedate( $mysqlstring )
 	return mysql2date( locale_datefmt(), $mysqlstring );
 }
 
+function mysql2localetime( $mysqlstring )
+{
+	return mysql2date( locale_timefmt(), $mysqlstring );
+}
+
 function mysql2localedatetime( $mysqlstring )
 {
 	return mysql2date( locale_datefmt().' '.locale_timefmt(), $mysqlstring );
+}
+
+function mysql2localedatetime_spans( $mysqlstring )
+{
+	return '<span class="date">'
+					.mysql2date( locale_datefmt(), $mysqlstring )
+					.'</span> <span class="time">'
+					.mysql2date( locale_timefmt(), $mysqlstring )
+					.'</span>';
 }
 
 
@@ -2485,6 +2499,9 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 
 /*
  * $Log$
+ * Revision 1.108  2006/08/24 21:41:14  fplanque
+ * enhanced stats
+ *
  * Revision 1.107  2006/08/21 16:07:44  fplanque
  * refactoring
  *

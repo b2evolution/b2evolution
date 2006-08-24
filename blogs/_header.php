@@ -201,21 +201,30 @@ $AdminUI->add_menu_entries(
 					'summary' => array(
 						'text' => T_('Hit summary'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;blog='.$blog ),
+					'browserhits' => array(
+						'text' => T_('Browser hits'),
+						'href' => 'admin.php?ctrl=stats&amp;tab=browserhits&amp;blog='.$blog ),
 					'other' => array(
-						'text' => T_('Direct accesses'),
+						'text' => T_('Direct B-hits'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=other&amp;blog='.$blog ),
 					'referers' => array(
-						'text' => T_('Referers'),
+						'text' => T_('Referered B-hits'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=referers&amp;blog='.$blog ),
 					'refsearches' => array(
-						'text' => T_('Refering searches'),
+						'text' => T_('Search B-hits'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;blog='.$blog ),
+					'robots' => array(
+						'text' => T_('Robot hits'),
+						'href' => 'admin.php?ctrl=stats&amp;tab=robots&amp;blog='.$blog ),
 					'syndication' => array(
-						'text' => T_('Syndication'),
+						'text' => T_('XML hits'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=syndication&amp;blog='.$blog ),
 					'useragents' => array(
 						'text' => T_('User agents'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=useragents&amp;blog='.$blog ),
+					'domains' => array(
+						'text' => T_('Referring domains'),
+						'href' => 'admin.php?ctrl=stats&amp;tab=domains&amp;blog='.$blog ),
 					'sessions' => array(
 						'text' => T_('Sessions'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;blog='.$blog ),
@@ -318,6 +327,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.15  2006/08/24 21:41:13  fplanque
+ * enhanced stats
+ *
  * Revision 1.14  2006/08/18 20:36:44  fplanque
  * no message
  *

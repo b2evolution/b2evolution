@@ -165,3 +165,11 @@ div.skinshot div.actions {
 	margin: 0;
 	padding: 0;
 }
+
+
+.timestamp {
+	white-space: nowrap;
+}
+.timestamp .time {
+	font-size:84%;
+}
