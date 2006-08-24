@@ -61,6 +61,7 @@ function call_job( $job_name, $job_params = array() )
 	}
 	else
 	{
+		// INCLUDE THE JOB FILE AND RUN IT:
 		$error_code = require $controller;
 
 		if( $error_code != 1 )
@@ -80,6 +81,9 @@ function call_job( $job_name, $job_params = array() )
 
 /*
  * $Log$
+ * Revision 1.5  2006/08/24 00:43:28  fplanque
+ * scheduled pings part 2
+ *
  * Revision 1.4  2006/07/16 23:07:19  fplanque
  * no message
  *

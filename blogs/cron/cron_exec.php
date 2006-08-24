@@ -139,6 +139,9 @@ else
 			$cron_params = unserialize( $task->ctsk_params );
 		}
 
+		// The job may need to know its ID (to set logical locks for example):
+		$cron_params['ctsk_ID'] = $ctsk_ID;
+
 		// EXECUTE
 		call_job( $task->ctsk_controller, $cron_params );
 

@@ -2623,6 +2623,9 @@ class Item extends DataObject
 
 		if( $this->notifications_status != 'noreq' )
 		{ // pings have been done before
+
+			// TODO: Check if issue_date has changed and reschedule
+
 			if( $display )
 			{
 				echo "<div class=\"panelinfo\">\n";
@@ -2634,6 +2637,9 @@ class Item extends DataObject
 
 		if( $this->status != 'published' )
 		{
+
+			// TODO: discard any notification that may be pending!
+
 			if( $display )
 			{
 				echo "<div class=\"panelinfo\">\n";
@@ -2949,6 +2955,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.83  2006/08/24 00:43:28  fplanque
+ * scheduled pings part 2
+ *
  * Revision 1.82  2006/08/21 21:33:35  fplanque
  * scheduled pings part 1
  *
