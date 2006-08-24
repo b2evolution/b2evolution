@@ -95,9 +95,19 @@ class DB
 
 	var $vardump_called;
 	var $insert_id = 0;
-	var $num_rows = 0;
-	var $rows_affected = 0;
+
 	var $last_result;
+
+	/**
+	 * Number of rows in result set (after a select)
+	 */
+	var $num_rows = 0;
+
+	/**
+	 * Number of rows affected by insert, delete, update or replace
+	 */
+	var $rows_affected = 0;
+
 	/**
 	 * Aliases that will be replaced in queries:
 	 */
@@ -1334,6 +1344,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.22  2006/08/24 00:36:54  fplanque
+ * doc
+ *
  * Revision 1.21  2006/08/07 09:34:48  blueyed
  * Removed comment - extended DB class instead
  *
