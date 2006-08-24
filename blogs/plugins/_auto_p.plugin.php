@@ -22,7 +22,7 @@ class auto_p_plugin extends Plugin
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
 	var $priority = 70;
-	var $version = '1.8.1-dev';
+	var $version = '1.9';
 	var $apply_rendering = 'opt-out';
 	var $short_desc;
 	var $long_desc;
@@ -628,6 +628,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.29  2006/08/24 01:00:28  fplanque
+ * Versioning
+ *
  * Revision 1.28  2006/08/21 01:34:04  blueyed
  * Auto-P: BR is not allowed in UL, but LI
  *
