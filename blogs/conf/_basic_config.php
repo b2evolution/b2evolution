@@ -22,7 +22,7 @@
 /**
  * Maintenance mode. Set this to true in order to temporarily disable access to the application.
  *
- * Note: il is still possible to access the install script during maintenance mode.
+ * Note: it is still possible to access the install script during maintenance mode.
  */
 $maintenance_mode = false;
 
