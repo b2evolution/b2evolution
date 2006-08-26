@@ -106,8 +106,7 @@ if( ! empty( $_SERVER['PATH_INFO'] ) && $_SERVER['PATH_INFO'] != $_SERVER['PHP_S
 		$query_string = '';
 	}
 
-	header( 'HTTP/1.1 301 Moved Permanently' );
-	header( 'Location: '.url_add_param( $admin_url, 'ctrl='.$ctrl.$query_string, '&' ) );
+	header_redirect( url_add_param( $admin_url, 'ctrl='.$ctrl.$query_string, '&' ), true );
 	exit;
 }
 
@@ -126,6 +125,9 @@ $Hit->log();
 
 /*
  * $Log$
+ * Revision 1.17  2006/08/26 20:32:48  fplanque
+ * fixed redirects
+ *
  * Revision 1.16  2006/08/05 23:37:03  fplanque
  * no message
  *

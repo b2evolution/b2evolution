@@ -43,7 +43,7 @@ switch($action)
 			fwrite($f,$newcontent);
 			fclose($f);
 
-			header("Location: admin.php?ctrl=templates&file=$file&a=te");
+			header_redirect( "admin.php?ctrl=templates&file=$file&a=te" );
 			exit();
 
 			break;

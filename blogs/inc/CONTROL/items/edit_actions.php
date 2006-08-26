@@ -115,7 +115,9 @@ switch($action)
 
 			// if we the window has a history, acessible through JS, it gets used.
 			// The "Hard POST" form below gets replaced by it.
-			// NOTE: as far as I've read in the forums, IE or the like, loses form input on history.back().. fp> hum, it seems that it does for *some* fields. Maybe we should be conservative and use history only on browsers known to work like firefox.
+			// NOTE: as far as I've read in the forums, IE or the like, loses form input on history.back()..
+			// fp> hum, it seems that it does for *some* fields. Maybe we should be conservative
+			// and use history only on browsers known to work like firefox.
 			$Form = new Form(NULL, 'back_to_posts_form');
 			$Form->hiddens_by_key( $_POST );
 			$Form->begin_form( '', '', array('onsubmit' => 'history.back(); return false;') );
@@ -235,7 +237,7 @@ switch($action)
 		else
 		{ // trackback now:
 			load_funcs( '_misc/_trackback.funcs.php' );
-			trackbacks( $post_trackbacks, $edited_Item->content,  $edited_Item->title, $edited_Item->ID );
+			trackbacks( $post_trackbacks, $edited_Item->content, $edited_Item->title, $edited_Item->ID );
 		}
 
 		// Execute or schedule notifications & pings:
@@ -435,7 +437,7 @@ switch($action)
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
 		$location = url_add_param( $admin_url, 'ctrl=browse&tab=posts&blog='.$blog.'&p='.$edited_Comment->item_ID.'&c=1#comments', '&' );
-		header ("Location: $location");
+		header_redirect( $location );
 		exit();
 
 
@@ -467,7 +469,7 @@ switch($action)
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
 		$location = url_add_param( $admin_url, 'ctrl=browse&tab=posts&blog='.$blog.'&p='.$edited_Comment->item_ID.'&c=1#comments', '&' );
-		header ("Location: $location");
+		header_redirect( $location );
 		exit();
 
 
@@ -490,7 +492,7 @@ switch($action)
 		$edited_Comment->dbdelete();
 
 		$location = url_add_param( $admin_url, 'ctrl=browse&tab=posts&blog='.$blog.'&p='.$comment_post_ID.'&c=1#comments', '&' );
-		header ("Location: $location");
+		header_redirect( $location );
 		exit();
 
 
@@ -499,7 +501,7 @@ switch($action)
 		// and logs in again: he comes back here with no action parameter set.
 		// Residrect to browse
 		$location = url_add_param( $admin_url, 'ctrl=browse&blog=0', '&' );
-		header ("Location: $location");
+		header_redirect( $location );
 		exit();
 }
 
@@ -540,6 +542,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.27  2006/08/26 20:32:49  fplanque
+ * fixed redirects
+ *
  * Revision 1.26  2006/08/21 16:07:43  fplanque
  * refactoring
  *

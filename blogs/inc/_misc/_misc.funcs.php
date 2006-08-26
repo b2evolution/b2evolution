@@ -2072,8 +2072,9 @@ function header_nocache()
  * NOTE: This function {@link exit() exits} the php script execution.
  *
  * @param string URL to redirect to (overrides detection)
+ * @param boolean is this a permanent redirect? if true, sens a 301; otherwise a 303
  */
-function header_redirect( $redirect_to = NULL )
+function header_redirect( $redirect_to = NULL, $permanent = false )
 {
 	global $Hit, $baseurl, $Blog, $htsrv_url_sensitive;
 	global $Session, $Debuglog;
@@ -2099,6 +2100,7 @@ function header_redirect( $redirect_to = NULL )
 		}
 	}
 
+
 	if( substr($redirect_to, 0, 1) == '/' )
 	{ // relative URL, prepend current host:
 		global $ReqHost;
@@ -2106,12 +2108,14 @@ function header_redirect( $redirect_to = NULL )
 		$redirect_to = $ReqHost.$redirect_to;
 	}
 
+
 	if( strpos($redirect_to, $htsrv_url_sensitive) === 0 /* we're going somewhere on $htsrv_url_sensitive */
 	 || strpos($redirect_to, $baseurl) === 0   /* we're going somewhere on $baseurl */ )
 	{
 		// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
 		// Also remove "action" get param to avoid unwanted actions
 		// blueyed> Removed the removing of "action" here, as it is used to trigger certain views. Instead, "confirm(ed)?" gets removed now
+		// fp> which views please (important to list in order to remove asap)
 		// TODO: fp> action should actually not be used to trigger views. This should be changed at some point.
 		$redirect_to = preg_replace( '~(?<=\?|&amp;|&) (login|pwd|confirm(ed)?) = [^&]+ (&(amp;)?|\?)?~x', '', $redirect_to );
 	}
@@ -2123,16 +2127,16 @@ function header_redirect( $redirect_to = NULL )
 		$Session->dbsave();
 	}
 
-
-	#header('Refresh:0;url='.$redirect_to);
-	#exit();
-	// fplanque> Note: I am not sure using this is cacheing safe: header('Location: '.$redirect_to);
-	// Current "Refresh" version works fine.
-	// Please provide link to relevant material before changing it.
-	// blueyed>> The above method fails when you redirect after a POST to the same URL.
-	//   Regarding http://de3.php.net/manual/en/function.header.php#50588 and the other comments
-	//   around, I'd suggest:
-	header( 'HTTP/1.1 303 See Other' ); // see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+ 	// see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+	if( $permanent )
+	{	// This should be a permanent move redirect!
+		header( 'HTTP/1.1 301 Moved Permanently' );
+	}
+	else
+	{	// This should be a "follow up" redirect
+		// Note: Also see http://de3.php.net/manual/en/function.header.php#50588 and the other comments around
+		header( 'HTTP/1.1 303 See Other' );
+	}
 	header( 'Location: '.$redirect_to );
 	exit();
 }
@@ -2499,6 +2503,9 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 
 /*
  * $Log$
+ * Revision 1.109  2006/08/26 20:32:48  fplanque
+ * fixed redirects
+ *
  * Revision 1.108  2006/08/24 21:41:14  fplanque
  * enhanced stats
  *
