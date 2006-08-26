@@ -154,9 +154,20 @@ $notify_from = $instance_name.'@'.preg_replace( '/^www\./i', '', $basehost );
  * - Either the post is no longer part of the requested blog, and you get a "Sorry, nothing to display"
  * - Or the post is still cross categorized into the requested blog and it will be displayed in that (somewhat wrong) blog template.
  *
- * @var boolean Default: false
+ * @var boolean
  */
-$redirect_to_postblog = false;
+$redirect_to_postblog = true;
+
+/**
+ * If a particular post is requested (by title) but not the the exact same title
+ * do you want to automatically redirect to the right title?
+ *
+ * This is overly useful when using urltitles since they have changed in v 2.0 ( _ became - )
+ * May be disabled for performance if you were not using versions < 2.0
+ *
+ * @var boolean
+ */
+$redirect_to_canonical_title = true;
 
 
 // ** DB options **

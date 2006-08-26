@@ -1256,6 +1256,16 @@ function upgrade_b2evo_tables()
 	}
 
 
+	if( $old_db_version < 9405 )
+	{
+		echo 'Updating URL titles... ';
+		$DB->query( '
+      UPDATE T_posts
+         SET post_urltitle = REPLACE( post_urltitle, "_", "-" )' );
+		echo "OK.<br />\n";
+	}
+
+
 	/*
 	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 100),
 	 *       to avoid the following:
@@ -1362,6 +1372,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.169  2006/08/26 20:30:42  fplanque
+ * made URL titles Google friendly
+ *
  * Revision 1.168  2006/08/26 19:56:38  blueyed
  * Fixed SQL syntax error and whitespace
  *

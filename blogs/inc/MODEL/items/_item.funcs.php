@@ -59,36 +59,39 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	if( empty( $urltitle ) ) $urltitle = $title;
 	if( empty( $urltitle ) ) $urltitle = 'title';
 
-	// echo 'starting with: ', $urltitle, '<br />';
+	// echo 'starting with: '.$urltitle.'<br />';
 
 	// Replace HTML entities
 	$urltitle = htmlentities( $urltitle, ENT_NOQUOTES );
 	// Keep only one char in entities!
 	$urltitle = preg_replace( '/&(.).+?;/', '$1', $urltitle );
-	// Remove non acceptable chars
-	$urltitle = preg_replace( '/[^A-Za-z0-9]+/', '_', $urltitle );
-	// Remove '_' at start and end:
-	$urltitle = preg_replace( '/^_+/', '', $urltitle );
-	$urltitle = preg_replace( '/_+$/', '', $urltitle );
-	// Uppercase the first character of each word in a string
+	// Replace non acceptable chars
+	$urltitle = preg_replace( '/[^A-Za-z0-9]+/', '-', $urltitle );
+	// Remove '-' at start and end:
+	$urltitle = preg_replace( '/^-+/', '', $urltitle );
+	$urltitle = preg_replace( '/-+$/', '', $urltitle );
+	// Make everything lowercase
 	$urltitle = strtolower( $urltitle );
 
-	preg_match( '/^(.*?)(_[0-9]+)?$/', $urltitle, $matches );
-
+	// Normalize to 40 chars + a number
+	preg_match( '/^(.*?)(-[0-9]+)?$/', $urltitle, $matches );
 	$urlbase = substr( $matches[1], 0, 40 );
 	$urltitle = $urlbase;
 	if( ! empty( $matches[2] ) )
 	{
-		$urltitle = $urlbase . $matches[2];
+		$urltitle = $urlbase.$matches[2];
 	}
 
 
-	// Find all occurrences of urltitle+number in the DB:
+	// CHECK FOR UNIQUENESS:
+	// Find all occurrences of urltitle-number in the DB:
 	$sql = 'SELECT '.$dbprefix.'urltitle
-					FROM '.$dbtable.'
-					WHERE '.$dbprefix."urltitle REGEXP '^".$urlbase."(_[0-9]+)?$'";
+					  FROM '.$dbtable.'
+					 WHERE '.$dbprefix.'urltitle REGEXP "^'.$urlbase.'(-[0-9]+)?$"';
 	if( $post_ID )
-		$sql .= " AND $dbIDname <> $post_ID";
+	{	// Ignore current post
+		$sql .= ' AND '.$dbIDname.' <> '.$post_ID;
+	}
 	$exact_match = false;
 	$highest_number = 0;
 	foreach( $DB->get_results( $sql, ARRAY_A ) as $row )
@@ -99,7 +102,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 		{ // We have an exact match, we'll have to change the number.
 			$exact_match = true;
 		}
-		if( preg_match( '/_([0-9]+)$/', $existing_urltitle, $matches ) )
+		if( preg_match( '/-([0-9]+)$/', $existing_urltitle, $matches ) )
 		{ // This one has a number, we extract it:
 			$existing_number = (integer) $matches[1];
 			if( $existing_number > $highest_number )
@@ -112,7 +115,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	if( $exact_match && !$query_only )
 	{ // We got an exact match, we need to change the number:
-		$urltitle = $urlbase.'_'.($highest_number + 1);
+		$urltitle = $urlbase.'-'.($highest_number + 1);
 	}
 
 	// echo "using = $urltitle <br />";
@@ -960,6 +963,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.21  2006/08/26 20:30:42  fplanque
+ * made URL titles Google friendly
+ *
  * Revision 1.20  2006/08/21 16:07:43  fplanque
  * refactoring
  *

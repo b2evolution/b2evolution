@@ -165,12 +165,12 @@ class Item extends DataObject
 	 * Have post processing notifications been handled?
 	 * @var string
 	 */
-  var $notifications_status = 'noreq';
+  var $notifications_status;
 	/**
 	 * Which cron task is responsible for handling notifications?
 	 * @var integer
 	 */
-	var $notifications_ctsk_ID = NULL;
+	var $notifications_ctsk_ID;
 
 	/**
 	 * Derived from $main_cat_ID
@@ -2413,12 +2413,12 @@ class Item extends DataObject
 	 */
 	function dbupdate()
 	{
-		global $DB, $Plugins;
+		global $DB, $Plugins, $object_def;
 
 		$DB->begin();
 
 		// validate url title
-		if( empty($this->urltitle) || isset($this->dbchanges['urltitle']) )
+		if( empty($this->urltitle) || isset($this->dbchanges[$object_def['Item']['db_cols']['urltitle']]) )
 		{ // Url title has changed or is empty
 			// echo 'updating url title';
 			$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID,
@@ -2966,6 +2966,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.85  2006/08/26 20:30:42  fplanque
+ * made URL titles Google friendly
+ *
  * Revision 1.84  2006/08/26 16:33:50  fplanque
  * minor
  *

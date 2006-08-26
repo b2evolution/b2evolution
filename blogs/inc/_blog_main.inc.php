@@ -181,14 +181,14 @@ if( $resolve_extra_path )
 		$path_error = 0;
 		$i=0;
 		// echo $path_elements[$i];
-		if( isset( $path_elements[$i] ) && preg_match( '#.+\.php[0-9]?#', $path_elements[$i] ) ) // QUESTION: add "$" at the end of the pattern to avoid false matches?
-		{ // Ignore *.php
+		if( isset( $path_elements[$i] ) && preg_match( '#.+\.php[0-9]?$#', $path_elements[$i] ) )
+		{ // Ignore element ending with .php
 			$i++;
 			$Debuglog->add( 'Ignoring *.php in extra path info' , 'params' );
 		}
 
-		if( isset( $path_elements[$i] ) && preg_match( '#^'.$Blog->get( 'stub' ).'(\.php)?$#', $path_elements[$i] )  )
-		{ // Ignore stub file
+		if( isset( $path_elements[$i] ) && preg_match( '#^'.$Blog->get( 'stub' ).'$#', $path_elements[$i] )  )
+		{ // Ignore stub file (if it ends with .php it should aready have been filtered out above)
 			$i++;
 			$Debuglog->add( 'Ignoring stub file in extra path info' , 'params' );
 		}
@@ -252,7 +252,7 @@ if( $resolve_extra_path )
 			if( strpos( $ReqPath, '/admin/' ) === 0 )
 			{
 				// Redirect to admin url and pass request_uri as path_info, so it can be resolved by admin.php to the right menu entry:
-				header( 'Location: '.$admin_url.'/'.substr($ReqURI, 7) );
+				header_redirect( $admin_url.'/'.substr($ReqURI, 7), true );
 				exit;
 			}
 
@@ -261,38 +261,66 @@ if( $resolve_extra_path )
 	}
 }
 
-if( (!empty($p)) || (!empty($title)) || (!empty($preview)) )
-{ // We are going to display a single post
+
+if( !empty($preview) )
+{
 	$disp = 'single';
 }
+elseif( !empty($p) || !empty($title) )
+{ // We are going to display a single post
+	$disp = 'single';
 
-if( empty( $disp ) )
-{ // default display:
-	$disp = 'posts';
-}
-
-if( ($disp == 'posts') || ($disp == 'single') )
-{ // If we are going to display posts and not something special...
+	if( !empty($title) )
+	{ // Replace any non standard chars with a - (which is the new word separator in v 2.0; used to be _)
+		$old_title = $title;	// Sabve this for later comparison
+		$title = preg_replace( '/[^A-Za-z0-9]/', '-', $title );
+		if( $redirect_to_canonical_title )
+		{	// Check if we have requested the canonical title:
+			$ItemCache = & get_Cache( 'ItemCache' );
+			$Item = & $ItemCache->get_by_urltitle( $title, false );
+			if( $Item !== false && $old_title != $Item->urltitle )
+			{	// We have asked for an existing Item but not with its canonical title (probably an old permalink), redirect!
+				// fp> TODO: Note: we may be loosing a few specific params here, like page=2 for example. Not tragic, but could be better.
+				header_redirect( $Item->get_permanent_url( '', '', false, '&' ), true );
+				exit();
+			}
+		}
+	}
 
 	// On single post requests, check if we're on the right blog!
-	if( $redirect_to_postblog && ( $disp == 'single' ) && ! $preview )
+	if( $redirect_to_postblog )
 	{ // Yes we need to check.
-		$ItemCache = & get_Cache( 'ItemCache' );
 		if( !empty($p) )
+		{
+			$ItemCache = & get_Cache( 'ItemCache' );
 			$Item = & $ItemCache->get_by_ID( $p, false );
-		else
+		}
+		elseif( empty($Item) )
+		{	// Item has not been requested already for $redirect_to_canonical_title
+			$ItemCache = & get_Cache( 'ItemCache' );
 			$Item = & $ItemCache->get_by_urltitle( $title, false );
+		}
 
-		if( ($Item !== false) && ($Item->blog_ID != $blog) )
-		{ // We're on the wrong blog (probably an old permalink) let's redirect
-			$new_permalink = $Item->get_permanent_url( '', '', false, '&' );
-
-			header ("Location: $new_permalink");
+		if( $Item !== false && $Item->blog_ID != $blog )
+		{ // We're on the wrong blog (probably an old permalink) let's redirect!
+			// fp> TODO: Note: we may be loosing a few specific params here, like page=2 for example. Not tragic, but could be better.
+			header_redirect( $Item->get_permanent_url( '', '', false, '&' ), true );
 			exit();
 		}
 	}
 
-	// Note: even if we request the same post, the following will do more restrictions (dates, etc.)
+}
+elseif( empty( $disp ) )
+{ // default display:
+	$disp = 'posts';
+}
+
+
+if( ($disp == 'posts') || ($disp == 'single') )
+{ // If we are going to display posts and not something special...
+
+	// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
+
 	// TODO: There's a bug here with using $catsel (instead of $cat_array), which I've reported to dev-ML (don't remember). Francois, please look into it.
 	$MainList = & new ItemList(
 		$blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
@@ -321,6 +349,7 @@ if( ($disp == 'posts') || ($disp == 'single') )
 	//param( 'pb', 'integer', 0 );
 */
 }
+
 
 // Default display params:
 
@@ -457,6 +486,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.34  2006/08/26 20:30:42  fplanque
+ * made URL titles Google friendly
+ *
  * Revision 1.33  2006/08/21 00:03:12  fplanque
  * obsoleted some dirty old thing
  *
