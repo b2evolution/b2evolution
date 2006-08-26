@@ -279,20 +279,17 @@ class auto_p_plugin extends Plugin
 				$looking_for_close_tag = array();
 			}
 
-			if( preg_match( '~^(.*?)(<\s*(\w+)(\s+[^>]*?(\s*/\s*)?)?>)~is', $line, $match ) )
+			if( preg_match( '~^(.*?)(<\s*(\w+)(\s+[^>]*)?(\s*/\s*)?>)~is', $line, $match ) )
 			{ // a opening tag:
 				$tag = $match[3];
 				$pos_after_tag = strlen($match[0]);
-				if( ! empty($match[5]) )
+				while( ! empty($match[4]) )
 				{ // self-closing tag, find next:
 					$tag = false;
-					while( ! empty($match[5]) )
+					if( preg_match( '~^(.*?)(<\s*(\w+)(\s+[^>]*)?(\s*/\s*)?>)~is', substr($line, $pos_after_tag), $match ) )
 					{
-						if( preg_match( '~^(.*?)(<\s*(\w+)(\s+[^>]*)?(\s*/\s*)?>)~is', substr($line, $pos_after_tag), $match ) )
-						{
-							$tag = $match[3];
-							$pos_after_tag += strlen($match[0]);
-						}
+						$tag = $match[3];
+						$pos_after_tag += strlen($match[0]);
 					}
 				}
 				$text_after_tag = substr($line, $pos_after_tag);
@@ -628,6 +625,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.30  2006/08/26 15:57:39  blueyed
+ * Fixed handling of self-closing inline tags in Auto-P
+ *
  * Revision 1.29  2006/08/24 01:00:28  fplanque
  * Versioning
  *
