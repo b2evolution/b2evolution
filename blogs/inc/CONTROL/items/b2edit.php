@@ -79,7 +79,7 @@ switch($action)
 		$BlogCache = & get_Cache( 'BlogCache' );
 		$Blog = & $BlogCache->get_by_ID( $blog );
 
-		$AdminUI->title = T_('Editing post').': '.$edited_Item->dget( 'title', 'htmlhead' );
+		$AdminUI->title = T_('Editing post').': '.$edited_Item->dget( 'title', 'htmlhead' ); // gets used in evo_update_document_title()
 		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, $Blog->get('name') );
 
 		$post_status = $edited_Item->get( 'status' );
@@ -137,14 +137,14 @@ switch($action)
 			$BlogCache = & get_Cache( 'BlogCache' );
 			$Blog = $BlogCache->get_by_ID( $blog );
 
-			$AdminUI->title = T_('Editing post').': '.$edited_Item->dget( 'title', 'htmlhead' );
+			$AdminUI->title = T_('Editing post').': '.$edited_Item->dget( 'title', 'htmlhead' ); // gets used in evo_update_document_title()
 			$AdminUI->title_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, $Blog->get('name') );
 		}
 		else
 		{
 			$edited_Item = & new Item();
 
-			$AdminUI->title = T_('New post in blog:');
+			$AdminUI->title = T_('New post in blog:'); // gets used in evo_update_document_title()
 			$AdminUI->title_titlearea = $AdminUI->title;
 		}
 
@@ -311,17 +311,15 @@ switch( $action )
 		/**
 		 * Updates document.title according to the item title field (post_title)
 		 */
-		/* fp> Severely bugged as soon as the tile includes ': '  ex 'hello: world'
 		function evo_update_document_title()
 		{
-			document.title = document.title.replace(/:[^:]*$/, ": "+document.getElementById('post_title').value);
+			document.title = document.title.replace(/(<?php echo preg_quote(T_('Editing post').': ') ?>|<?php echo preg_quote(T_('New post in blog:')) ?>).*$/, '$1 '+document.getElementById('post_title').value);
 		}
 
 		addEvent( post_title_elt, 'keyup', evo_update_document_title, false );
 
 		// Init:
 		evo_update_document_title();
-		*/
 	}
 
 
