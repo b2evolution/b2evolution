@@ -576,7 +576,9 @@ class ItemList extends DataObjectList
 			".$DB->quote($item_typ_ID)." AS {$this->dbprefix}ptyp_ID,
 			".$DB->quote($item_st_ID)." AS {$this->dbprefix}pst_ID,
 			".$DB->quote($item_deadline)." AS {$this->dbprefix}datedeadline,
-			".$DB->quote($item_priority)." AS {$this->dbprefix}priority";
+			".$DB->quote($item_priority)." AS {$this->dbprefix}priority,
+			'noreq' AS post_notifications_status,
+			NULL AS post_notifications_ctsk_ID";
 	}
 
 
@@ -865,6 +867,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.18  2006/08/26 16:33:50  fplanque
+ * minor
+ *
  * Revision 1.17  2006/08/21 16:07:43  fplanque
  * refactoring
  *

@@ -162,6 +162,17 @@ class Item extends DataObject
 	var $priority;
 
 	/**
+	 * Have post processing notifications been handled?
+	 * @var string
+	 */
+  var $notifications_status = 'noreq';
+	/**
+	 * Which cron task is responsible for handling notifications?
+	 * @var integer
+	 */
+	var $notifications_ctsk_ID = NULL;
+
+	/**
 	 * Derived from $main_cat_ID
 	 *
 	 * @var integer
@@ -2955,6 +2966,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.84  2006/08/26 16:33:50  fplanque
+ * minor
+ *
  * Revision 1.83  2006/08/24 00:43:28  fplanque
  * scheduled pings part 2
  *
