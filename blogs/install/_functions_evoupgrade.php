@@ -1181,7 +1181,7 @@ function upgrade_b2evo_tables()
 					ADD COLUMN plug_classpath VARCHAR(255) NULL default NULL AFTER plug_classname' );
 		echo "OK.<br />\n";
 
-  	set_upgrade_checkpoint( '9290' );
+		set_upgrade_checkpoint( '9290' );
 	}
 
 
@@ -1192,12 +1192,12 @@ function upgrade_b2evo_tables()
 		$DB->query( '
 				ALTER TABLE T_hitlog
 				  ADD INDEX hit_agnt_ID        ( hit_agnt_ID ),
-				  ADD INDEX hit_uri            ( hit_uri ,
-          ADD INDEX hit_referer_dom_ID ( hit_referer_dom_ID )
+				  ADD INDEX hit_uri            ( hit_uri ),
+				  ADD INDEX hit_referer_dom_ID ( hit_referer_dom_ID )
 				' );
 		echo "OK.<br />\n";
 
-  	set_upgrade_checkpoint( '9300' );
+		set_upgrade_checkpoint( '9300' );
 	}
 
 
@@ -1210,7 +1210,8 @@ function upgrade_b2evo_tables()
 		$DB->query( '
 				ALTER TABLE T_basedomains  ADD INDEX dom_type (dom_type)' );
 		echo "OK.<br />\n";
-  	set_upgrade_checkpoint( '9310' );
+
+		set_upgrade_checkpoint( '9310' );
 	}
 
 
@@ -1229,8 +1230,7 @@ function upgrade_b2evo_tables()
 	*/
 
 
-	
-	
+
 	if( $old_db_version < 9404 )
 	{
 		echo 'Updating blogs... ';
@@ -1241,16 +1241,16 @@ function upgrade_b2evo_tables()
 
 		echo 'Updating posts... ';
 		$DB->query( '
-      ALTER TABLE T_posts
-      	ADD COLUMN post_notifications_status   ENUM("noreq","todo","started","finished") NOT NULL DEFAULT "noreq" AFTER post_flags,
-     		ADD COLUMN post_notifications_ctsk_ID  INT(10) unsigned NULL DEFAULT NULL AFTER post_notifications_status' );
+			ALTER TABLE T_posts
+				ADD COLUMN post_notifications_status   ENUM("noreq","todo","started","finished") NOT NULL DEFAULT "noreq" AFTER post_flags,
+				ADD COLUMN post_notifications_ctsk_ID  INT(10) unsigned NULL DEFAULT NULL AFTER post_notifications_status' );
 		$DB->query( '
-      UPDATE T_posts
-         SET post_notifications_status = "finished"
+			UPDATE T_posts
+			   SET post_notifications_status = "finished"
 			 WHERE post_flags LIKE "%pingsdone%"' );
 		$DB->query( '
-      ALTER TABLE T_posts
-      	DROP COLUMN post_flags' );
+			ALTER TABLE T_posts
+				DROP COLUMN post_flags' );
 		echo "OK.<br />\n";
 
 	}
@@ -1362,6 +1362,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.168  2006/08/26 19:56:38  blueyed
+ * Fixed SQL syntax error and whitespace
+ *
  * Revision 1.167  2006/08/26 16:33:02  fplanque
  * enhanced stats
  *
