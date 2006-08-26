@@ -16,12 +16,12 @@
 		<li>All redirects are now either 301 or 303 (No more stinkin' 302s) (fplanque)</li>
 		<li>Optimized speed (fplanque)</li>
 		<li>A lot of refactoring</li>
-		<li>Removed dependency on PHP tokenizer extension (blueyed)</li>
 	</ul>
 
 
-	<h2>1.9-dev &quot;Lemon&quot; (Beta)</h2>
+	<h2>1.9-beta &quot;Lemon&quot;</h2>
 	<ul>
+		<li>Enhanced stats (fplanque)</li>
 		<li>Different item edit views: simple, advanced (blueyed, fplanque)</li>
 		<li>Fixed previewing, if $redirect_to_postblog setting is used (blueyed)</li>
 		<li>Cleaned up blog management (fplanque) </li>
@@ -36,12 +36,13 @@
 		<li> Plugins
 			<ul>
 				<li>Enhanced smilies plugin (Yabba)</li>
-					<li>Plugins can get localized/translated (blueyed)</li>
-					<li>Plugins should not use a constructor anymore, but the PluginInit() method instead. The previous AppendPluginRegister() method has been "renamed" to PluginInit(). (blueyed)</li>
-					<li>Plugins can be grouped (see Plugin::group and Plugin::sub_group) (balupton, blueyed)</li>
-					<li>Added b2evo_Callbacks Javascript object to help plugins interact (blueyed)</li>
-					<li>Optimized expensive queries in calendar plugin (fplanque)</li>
-					<li>Added events: Logout, DisplayTrackbackAddr</li>
+				<li>Plugins can get localized/translated (blueyed)</li>
+				<li>Plugins should not use a constructor anymore, but the PluginInit() method instead. The previous AppendPluginRegister() method has been "renamed" to PluginInit(). (blueyed)</li>
+				<li>Plugins can be grouped (see Plugin::group and Plugin::sub_group) (balupton, blueyed)</li>
+				<li>Added b2evo_Callbacks Javascript object to help plugins interact (blueyed)</li>
+				<li>Optimized expensive queries in calendar plugin (fplanque)</li>
+				<li>Added events: Logout, DisplayTrackbackAddr</li>
+				<li>Removed dependency on PHP tokenizer extension (blueyed)</li>
 			</ul>
 		</li>
 		<li>
@@ -56,12 +57,14 @@
 		</li>
 	</ul>
 
+
 	<h2>1.8.2 (Final release)</h2>
 	<ul>
-	  <li>Avoid generating ambiguous passwords</li>
-    <li>Auto-P plugin fixes</li>
-    <li>Minor bug fixes </li>
+		<li>Avoid generating ambiguous passwords</li>
+		<li>Auto-P plugin fixes</li>
+		<li>Minor bug fixes </li>
 	</ul>
+
 
 	<h2>1.8.1 &quot;Milestone&quot; (Release Candidate)</h2>
 	<ul>

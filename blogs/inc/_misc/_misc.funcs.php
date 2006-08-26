@@ -2072,7 +2072,7 @@ function header_nocache()
  * NOTE: This function {@link exit() exits} the php script execution.
  *
  * @param string URL to redirect to (overrides detection)
- * @param boolean is this a permanent redirect? if true, sens a 301; otherwise a 303
+ * @param boolean is this a permanent redirect? if true, send a 301; otherwise a 303
  */
 function header_redirect( $redirect_to = NULL, $permanent = false )
 {
@@ -2116,6 +2116,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 		// Also remove "action" get param to avoid unwanted actions
 		// blueyed> Removed the removing of "action" here, as it is used to trigger certain views. Instead, "confirm(ed)?" gets removed now
 		// fp> which views please (important to list in order to remove asap)
+		// dh> sorry, don't remember
 		// TODO: fp> action should actually not be used to trigger views. This should be changed at some point.
 		$redirect_to = preg_replace( '~(?<=\?|&amp;|&) (login|pwd|confirm(ed)?) = [^&]+ (&(amp;)?|\?)?~x', '', $redirect_to );
 	}
@@ -2503,6 +2504,9 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 
 /*
  * $Log$
+ * Revision 1.110  2006/08/26 23:28:24  blueyed
+ * doc
+ *
  * Revision 1.109  2006/08/26 20:32:48  fplanque
  * fixed redirects
  *
