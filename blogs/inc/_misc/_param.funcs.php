@@ -427,7 +427,7 @@ function param_check_url( $var, & $uri_scheme )
 {
 	if( $error_detail = validate_url( $GLOBALS[$var], $uri_scheme ) )
 	{
-		$param_error( $var, sprintf( T_('Supplied URL is invalid. (%s)'), $error_detail ) );
+		param_error( $var, sprintf( T_('Supplied URL is invalid. (%s)'), $error_detail ) );
 		return false;
 	}
 	return true;
@@ -1519,6 +1519,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.5  2006/08/26 20:33:52  fplanque
+ * small fixes
+ *
  * Revision 1.4  2006/08/20 20:12:33  fplanque
  * param_() refactoring part 1
  *

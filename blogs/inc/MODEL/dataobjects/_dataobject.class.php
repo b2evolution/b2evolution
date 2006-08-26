@@ -117,7 +117,7 @@ class DataObject
 	 */
 	function dbchange( $dbfieldname, $dbfieldtype, $valuepointer )
 	{
-		//echo '<br />DB change on :'.$dbfieldname;
+		// echo '<br />DB change on :'.$dbfieldname;
 		$this->dbchanges[$dbfieldname]['type'] = $dbfieldtype;
 		$this->dbchanges[$dbfieldname]['value'] = $valuepointer ;
 	}
@@ -662,6 +662,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2006/08/26 20:33:52  fplanque
+ * small fixes
+ *
  * Revision 1.18  2006/08/21 16:07:43  fplanque
  * refactoring
  *
