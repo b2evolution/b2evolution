@@ -79,7 +79,8 @@ switch($action)
 		$BlogCache = & get_Cache( 'BlogCache' );
 		$Blog = & $BlogCache->get_by_ID( $blog );
 
-		$AdminUI->title = T_('Editing post').': '.$edited_Item->dget( 'title', 'htmlhead' ); // gets used in evo_update_document_title()
+		$js_doc_title_prefix = T_('Editing post').': ';
+		$AdminUI->title = $js_doc_title_prefix.$edited_Item->dget( 'title', 'htmlhead' );
 		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, $Blog->get('name') );
 
 		$post_status = $edited_Item->get( 'status' );
@@ -137,15 +138,17 @@ switch($action)
 			$BlogCache = & get_Cache( 'BlogCache' );
 			$Blog = $BlogCache->get_by_ID( $blog );
 
-			$AdminUI->title = T_('Editing post').': '.$edited_Item->dget( 'title', 'htmlhead' ); // gets used in evo_update_document_title()
+			$js_doc_title_prefix = T_('Editing post').': ';
+			$AdminUI->title = $js_doc_title_prefix.$edited_Item->dget( 'title', 'htmlhead' );
 			$AdminUI->title_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, $Blog->get('name') );
 		}
 		else
 		{
 			$edited_Item = & new Item();
 
-			$AdminUI->title = T_('New post in blog:'); // gets used in evo_update_document_title()
+			$AdminUI->title = T_('New post in blog:').' ';
 			$AdminUI->title_titlearea = $AdminUI->title;
+			$js_doc_title_prefix = $AdminUI->title;
 		}
 
 		$blog = autoselect_blog( $blog, 'blog_post_statuses', 'any' );
@@ -313,7 +316,9 @@ switch( $action )
 		 */
 		function evo_update_document_title()
 		{
-			document.title = document.title.replace(/(<?php echo preg_quote(T_('Editing post').': ') ?>|<?php echo preg_quote(T_('New post in blog:')) ?>).*$/, '$1 '+document.getElementById('post_title').value);
+			var posttitle = document.getElementById('post_title').value;
+
+			document.title = document.title.replace( /(<?php echo $js_doc_title_prefix ?>).*$/, '$1'+posttitle );
 		}
 
 		addEvent( post_title_elt, 'keyup', evo_update_document_title, false );
