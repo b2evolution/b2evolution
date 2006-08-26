@@ -55,6 +55,7 @@ $Results->cols[0] = array(
 $Results->cols[1] = array(
 		'th' => T_('Referer'),
 		'order' => 'dom_name',
+		'td_class' => 'nowrap',
 	);
 if( $current_User->check_perm( 'stats', 'edit' ) )
 {
@@ -135,12 +136,5 @@ if( count( $res_stats ) )
 
 
 /*
- * $Log$
- * Revision 1.2  2006/08/24 21:41:13  fplanque
- * enhanced stats
- *
- * Revision 1.1  2006/07/12 18:07:06  fplanque
- * splitted stats into different views
- *
- */
+ nolog */
 ?>

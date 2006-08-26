@@ -312,8 +312,9 @@ $schema_queries = array(
 			dom_name   VARCHAR(250) NOT NULL DEFAULT '',
 			dom_status ENUM('unknown','whitelist','blacklist') NOT NULL DEFAULT 'unknown',
 			dom_type   ENUM('unknown','normal','searcheng','aggregator') NOT NULL DEFAULT 'unknown',
-			PRIMARY KEY (dom_ID),
-			UNIQUE (dom_name)
+			PRIMARY KEY     (dom_ID),
+			UNIQUE dom_name (dom_name),
+			INDEX dom_type  (dom_type)
 		)" ),
 
 	'T_useragents' => array(
@@ -339,11 +340,12 @@ $schema_queries = array(
 			hit_blog_ID        int(11) UNSIGNED NULL DEFAULT NULL,
 			hit_remote_addr    VARCHAR(40) DEFAULT NULL,
 			hit_agnt_ID        INT UNSIGNED NULL,
-			PRIMARY KEY (hit_ID),
-			INDEX hit_agnt_ID ( hit_agnt_ID ),
-			INDEX hit_datetime ( hit_datetime ),
-			INDEX hit_blog_ID (hit_blog_ID),
-			INDEX hit_uri (hit_uri)
+			PRIMARY KEY         (hit_ID),
+			INDEX hit_agnt_ID        ( hit_agnt_ID ),
+			INDEX hit_datetime       ( hit_datetime ),
+			INDEX hit_blog_ID        ( hit_blog_ID ),
+			INDEX hit_uri            ( hit_uri ),
+			INDEX hit_referer_dom_ID ( hit_referer_dom_ID )
 		)" ), // TODO: more indexes?
 
 	'T_subscriptions' => array(
@@ -478,6 +480,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.29  2006/08/26 16:33:02  fplanque
+ * enhanced stats
+ *
  * Revision 1.28  2006/08/21 16:07:44  fplanque
  * refactoring
  *

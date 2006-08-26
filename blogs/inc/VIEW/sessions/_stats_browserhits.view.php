@@ -61,9 +61,9 @@ if( count($res_hits) )
 	$last_date = 0;
 
 	$col_mapping = array(
-			'direct' => 1,
+			'search' => 1,
 			'referer' => 2,
-			'search' => 3,
+			'direct' => 3,
 			'self' => 4,
 			'blacklist' => 5,
 			'admin' => 6,
@@ -98,9 +98,9 @@ if( count($res_hits) )
 	}
 
 	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
-	array_unshift( $chart[ 'chart_data' ][ 1 ], 'Direct accesses' );	// Translations need to be UTF-8
+	array_unshift( $chart[ 'chart_data' ][ 1 ], 'Refering searches' );
 	array_unshift( $chart[ 'chart_data' ][ 2 ], 'Referers' );
-	array_unshift( $chart[ 'chart_data' ][ 3 ], 'Refering searches' );
+	array_unshift( $chart[ 'chart_data' ][ 3 ], 'Direct accesses' );	// Translations need to be UTF-8
 	array_unshift( $chart[ 'chart_data' ][ 4 ], 'Self referred' );
 	array_unshift( $chart[ 'chart_data' ][ 5 ], 'Special referrers' );
 	array_unshift( $chart[ 'chart_data' ][ 6 ], 'Admin' );
@@ -245,9 +245,9 @@ if( count($res_hits) )
 	<table class="grouped" cellspacing="0">
 		<tr>
 			<th class="firstcol"><?php echo T_('Date') ?></th>
-			<th><?php echo T_('Direct accesses') ?></th>
-			<th><?php echo T_('Referers') ?></th>
 			<th><?php echo T_('Refering searches') ?></th>
+			<th><?php echo T_('Referers') ?></th>
+			<th><?php echo T_('Direct accesses') ?></th>
 			<th><?php echo T_('Self referred') ?></th>
 			<th><?php	echo T_('Special referrers') ?></th>
 			<th><?php echo T_('Admin') ?></th>
@@ -269,9 +269,9 @@ if( count($res_hits) )
 						}
 						echo date( locale_datefmt(), $last_date ) ?>
 					</td>
-					<td class="right"><?php echo $hits['direct'] ?></td>
-					<td class="right"><?php echo $hits['referer'] ?></td>
 					<td class="right"><?php echo $hits['search'] ?></td>
+					<td class="right"><?php echo $hits['referer'] ?></td>
+					<td class="right"><?php echo $hits['direct'] ?></td>
 					<td class="right"><?php echo $hits['self'] ?></td>
 					<td class="right"><?php echo $hits['blacklist'] ?></td>
 					<td class="right"><?php echo $hits['admin'] ?></td>
@@ -305,9 +305,9 @@ if( count($res_hits) )
 					}
 					echo date( locale_datefmt(), $this_date ) ?>
 				</td>
-				<td class="right"><?php echo $hits['direct'] ?></td>
-				<td class="right"><?php echo $hits['referer'] ?></td>
 				<td class="right"><?php echo $hits['search'] ?></td>
+				<td class="right"><?php echo $hits['referer'] ?></td>
+				<td class="right"><?php echo $hits['direct'] ?></td>
 				<td class="right"><?php echo $hits['self'] ?></td>
 				<td class="right"><?php echo $hits['blacklist'] ?></td>
 				<td class="right"><?php echo $hits['admin'] ?></td>
@@ -321,9 +321,9 @@ if( count($res_hits) )
 
 		<tr class="total">
 		<td class="firstcol"><?php echo T_('Total') ?></td>
-		<td class="right"><?php echo $hits_total['direct'] ?></td>
-		<td class="right"><?php echo $hits_total['referer'] ?></td>
 		<td class="right"><?php echo $hits_total['search'] ?></td>
+		<td class="right"><?php echo $hits_total['referer'] ?></td>
+		<td class="right"><?php echo $hits_total['direct'] ?></td>
 		<td class="right"><?php echo $hits_total['self'] ?></td>
 		<td class="right"><?php echo $hits_total['blacklist'] ?></td>
 		<td class="right"><?php echo $hits_total['admin'] ?></td>

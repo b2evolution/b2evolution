@@ -685,8 +685,8 @@ function upgrade_b2evo_tables()
 										dom_status ENUM('unknown','whitelist','blacklist') NOT NULL DEFAULT 'unknown',
 										dom_type   ENUM('unknown','normal','searcheng','aggregator') NOT NULL DEFAULT 'unknown',
 										PRIMARY KEY (dom_ID),
-										UNIQUE (dom_name)
-									)" );
+										UNIQUE dom_name (dom_name)
+									)" );	// fp> the unique key was only named in version 1.9. Crap. Put the name back here to save as many souls as possible. bulk has not upgraded from 0.9 yet :/
 			echo "OK.<br />\n";
 
 
@@ -1191,11 +1191,26 @@ function upgrade_b2evo_tables()
 		echo 'Updating hitlog indexes... ';
 		$DB->query( '
 				ALTER TABLE T_hitlog
-				  ADD INDEX hit_agnt_ID ( hit_agnt_ID ),
-				  ADD INDEX hit_uri (hit_uri)' );
+				  ADD INDEX hit_agnt_ID        ( hit_agnt_ID ),
+				  ADD INDEX hit_uri            ( hit_uri ,
+          ADD INDEX hit_referer_dom_ID ( hit_referer_dom_ID )
+				' );
 		echo "OK.<br />\n";
 
   	set_upgrade_checkpoint( '9300' );
+	}
+
+
+	if( $old_db_version < 9310 )
+	{
+		echo 'Updating basedomains... ';
+		$DB->query( '
+				UPDATE T_basedomains
+				   SET dom_status = "unknown"' );		// someone has filled this up with junk blacklists before
+		$DB->query( '
+				ALTER TABLE T_basedomains  ADD INDEX dom_type (dom_type)' );
+		echo "OK.<br />\n";
+  	set_upgrade_checkpoint( '9310' );
 	}
 
 
@@ -1347,6 +1362,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.167  2006/08/26 16:33:02  fplanque
+ * enhanced stats
+ *
  * Revision 1.166  2006/08/24 21:41:14  fplanque
  * enhanced stats
  *

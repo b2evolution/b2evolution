@@ -59,9 +59,9 @@ if( count($res_hits) )
 	$last_date = 0;
 
 	$col_mapping = array(
-			'browser' => 1,
+			'rss' => 1,
 			'robot' => 2,
-			'rss' => 3,
+			'browser' => 3,
 			'unknown' => 4,
 		);
 
@@ -90,9 +90,9 @@ if( count($res_hits) )
 	}
 
 	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
-	array_unshift( $chart[ 'chart_data' ][ 1 ], 'Browser' );	// Translations need to be UTF-8
+	array_unshift( $chart[ 'chart_data' ][ 1 ], 'XML (RSS/Atom)' );
 	array_unshift( $chart[ 'chart_data' ][ 2 ], 'Robots' );
-	array_unshift( $chart[ 'chart_data' ][ 3 ], 'XML (RSS/Atom)' );
+	array_unshift( $chart[ 'chart_data' ][ 3 ], 'Browsers' );	// Translations need to be UTF-8
 	array_unshift( $chart[ 'chart_data' ][ 4 ], 'Unknown' );
 
 	$chart[ 'canvas_bg' ] = array (
@@ -195,7 +195,7 @@ if( count($res_hits) )
 			'separator'=> "",
 			'show_min'=> false );
 
-	$chart [ 'chart_value' ] = array (
+	$chart[ 'chart_value' ] = array (
 			// 'prefix'         =>  string,
 			// 'suffix'         =>  " views",
 			// 'decimals'       =>  int,
@@ -233,9 +233,9 @@ if( count($res_hits) )
 	<table class="grouped" cellspacing="0">
 		<tr>
 			<th class="firstcol"><?php echo T_('Date') ?></th>
-			<th><?php echo T_('Browser') ?></th>
-			<th><?php echo T_('Robots') ?></th>
 			<th><?php echo T_('XML') ?></th>
+			<th><?php echo T_('Robots') ?></th>
+			<th><?php echo T_('Browser') ?></th>
 			<th><?php echo T_('Unknown') ?></th>
 			<th class="lastcol"><?php echo T_('Total') ?></th>
 		</tr>
@@ -255,9 +255,9 @@ if( count($res_hits) )
 						}
 						echo date( locale_datefmt(), $last_date ) ?>
 					</td>
-					<td class="right"><?php echo $hits['browser'] ?></td>
-					<td class="right"><?php echo $hits['robot'] ?></td>
 					<td class="right"><?php echo $hits['rss'] ?></td>
+					<td class="right"><?php echo $hits['robot'] ?></td>
+					<td class="right"><?php echo $hits['browser'] ?></td>
 					<td class="right"><?php echo $hits['unknown'] ?></td>
 					<td class="lastcol right"><?php echo array_sum($hits) ?></td>
 				</tr>
@@ -287,9 +287,9 @@ if( count($res_hits) )
 					}
 					echo date( locale_datefmt(), $this_date ) ?>
 				</td>
-				<td class="right"><?php echo $hits['browser'] ?></td>
-				<td class="right"><?php echo $hits['robot'] ?></td>
 				<td class="right"><?php echo $hits['rss'] ?></td>
+				<td class="right"><?php echo $hits['robot'] ?></td>
+				<td class="right"><?php echo $hits['browser'] ?></td>
 				<td class="right"><?php echo $hits['unknown'] ?></td>
 				<td class="lastcol right"><?php echo array_sum($hits) ?></td>
 			</tr>
@@ -301,9 +301,9 @@ if( count($res_hits) )
 
 		<tr class="total">
 		<td class="firstcol"><?php echo T_('Total') ?></td>
-		<td class="right"><?php echo $hits_total['browser'] ?></td>
-		<td class="right"><?php echo $hits_total['robot'] ?></td>
 		<td class="right"><?php echo $hits_total['rss'] ?></td>
+		<td class="right"><?php echo $hits_total['robot'] ?></td>
+		<td class="right"><?php echo $hits_total['browser'] ?></td>
 		<td class="right"><?php echo $hits_total['unknown'] ?></td>
 		<td class="lastcol right"><?php echo array_sum($hits_total) ?></td>
 		</tr>
@@ -313,15 +313,5 @@ if( count($res_hits) )
 }
 
 /*
- * $Log$
- * Revision 1.3  2006/08/24 21:41:14  fplanque
- * enhanced stats
- *
- * Revision 1.2  2006/07/12 20:18:20  fplanque
- * session stats + minor enhancements
- *
- * Revision 1.1  2006/07/12 18:07:06  fplanque
- * splitted stats into different views
- *
- */
+ nolog */
 ?>

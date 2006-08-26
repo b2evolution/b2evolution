@@ -204,15 +204,15 @@ $AdminUI->add_menu_entries(
 					'browserhits' => array(
 						'text' => T_('Browser hits'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=browserhits&amp;blog='.$blog ),
-					'other' => array(
-						'text' => T_('Direct B-hits'),
-						'href' => 'admin.php?ctrl=stats&amp;tab=other&amp;blog='.$blog ),
-					'referers' => array(
-						'text' => T_('Referered B-hits'),
-						'href' => 'admin.php?ctrl=stats&amp;tab=referers&amp;blog='.$blog ),
 					'refsearches' => array(
 						'text' => T_('Search B-hits'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;blog='.$blog ),
+					'referers' => array(
+						'text' => T_('Referered B-hits'),
+						'href' => 'admin.php?ctrl=stats&amp;tab=referers&amp;blog='.$blog ),
+					'other' => array(
+						'text' => T_('Direct B-hits'),
+						'href' => 'admin.php?ctrl=stats&amp;tab=other&amp;blog='.$blog ),
 					'robots' => array(
 						'text' => T_('Robot hits'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=robots&amp;blog='.$blog ),
@@ -327,6 +327,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.16  2006/08/26 16:33:02  fplanque
+ * enhanced stats
+ *
  * Revision 1.15  2006/08/24 21:41:13  fplanque
  * enhanced stats
  *
