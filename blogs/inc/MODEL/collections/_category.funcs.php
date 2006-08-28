@@ -91,6 +91,11 @@ function cat_update(
 {
 	global $DB;
 
+	if ( !empty( $cat_blog_ID ) )
+	{// lets move any/all children
+		cat_movechildren( $cat_ID, $cat_blog_ID );
+	}
+
 	if( $cat_parent_ID == 0 ) $cat_parent_ID = 'NULL';
 
 	return $DB->query( "UPDATE T_categories
@@ -98,6 +103,33 @@ function cat_update(
 														cat_parent_ID = $cat_parent_ID ".
 														(!empty($cat_blog_ID) ? ", cat_blog_ID = $cat_blog_ID" : '')."
 											WHERE cat_ID = $cat_ID" );
+}
+
+
+/*
+ * cat_movechildren(-)
+ *
+ * recursively move a categories children
+ * 
+ */
+function cat_movechildren( $cat_ID, $cat_blog_ID )
+{
+	global $DB;
+	$sql = 'select cat_ID from T_categories where cat_parent_ID = '.$cat_ID;
+	$results = $DB->get_results( $sql, ARRAY_A );
+	if( $results )
+	{
+		foreach( $results as $record )
+		{
+			// first lets move the category
+			$sql = 'update T_categories
+								set cat_blog_ID = '.$cat_blog_ID.'
+								where cat_ID = '.$record[ 'cat_ID' ];
+			$DB->query( $sql );
+			// now lets move any children of this child
+			cat_movechildren( $record[ 'cat_ID' ], $cat_blog_ID );
+		}
+	}
 }
 
 
@@ -965,6 +997,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.11  2006/08/28 07:32:55  yabs
+ * function cat_update() now moves any children associated with the category
+ *
  * Revision 1.10  2006/08/21 16:07:43  fplanque
  * refactoring
  *
