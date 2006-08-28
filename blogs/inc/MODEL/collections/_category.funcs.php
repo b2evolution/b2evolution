@@ -45,12 +45,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * cat_create(-)
- *
  * Create a new category
- * This funtion has to handle all needed DB dependencies!
  *
- * fplanque: created
+ * This funtion has to handle all needed DB dependencies!
  */
 function cat_create(
 	$cat_name,
@@ -75,13 +72,10 @@ function cat_create(
 }
 
 
-/*
- * cat_update(-)
- *
+/**
  * Update a category
- * This funtion has to handle all needed DB dependencies!
  *
- * fplanque: created
+ * This funtion has to handle all needed DB dependencies!
  */
 function cat_update(
 	$cat_ID,
@@ -106,11 +100,8 @@ function cat_update(
 }
 
 
-/*
- * cat_movechildren(-)
- *
- * recursively move a categories children
- * 
+/**
+ * Recursively move a categories children
  */
 function cat_movechildren( $cat_ID, $cat_blog_ID )
 {
@@ -159,7 +150,7 @@ function cat_delete( $cat_ID )
 					WHERE cat_ID = $cat_ID";
 	if( ! ($row = $DB->get_row( $sql )) )
 	{
-  	$DB->rollback(); // done nothing anyway...
+		$DB->rollback(); // done nothing anyway...
 		return 1; // Success: category already deleted!!
 	}
 
@@ -186,7 +177,7 @@ function cat_delete( $cat_ID )
 
 		if( !$remap_cat_ID && !empty($IDarray) )
 		{
-	  	$DB->rollback(); // done nothing anyway...
+			$DB->rollback(); // done nothing anyway...
 			return T_("Cannot delete last category if there are posts inside!");
 		}
 	}
@@ -256,8 +247,6 @@ function cat_delete( $cat_ID )
 }
 
 
-
-
 /**
  * get_the_category_by_ID(-)
  *
@@ -290,12 +279,8 @@ function get_the_category_by_ID( $cat_ID, $die = true )
 }
 
 
-/*
- * get_the_category(-)
- *
+/**
  * Get category name for current post
- *
- * fplanque: simplified
  *
  * @deprecated
  */
@@ -308,11 +293,8 @@ function get_the_category()
 
 
 
-/*
- * get_catblog(-)
- *
+/**
  * Get blog for a given cat
- * fplanque: added
  */
 function get_catblog( $cat_ID )
 {
@@ -321,11 +303,8 @@ function get_catblog( $cat_ID )
 }
 
 
-/*
- * get_catparent(-)
- *
+/**
  * Get parent category for a given cat
- * fplanque: added
  */
 function get_catparent( $cat_ID )
 {
@@ -333,11 +312,9 @@ function get_catparent( $cat_ID )
 	return $cat['cat_parent_ID'];
 }
 
-/*
- * get_catname(-)
- *
+
+/**
  * Get name for a given cat
- * fplanque: reduced to the max
  */
 function get_catname($cat_ID)
 {
@@ -352,6 +329,7 @@ function get_catname($cat_ID)
  * TODO: replace LEFT JOIN with UNION when switching to MySQL 4
  * This will prevent empty cats from displaying "(1)" as postcount.
  *
+ * @uses cat_load_postcounts()
  * @param string 'none'|'context'|'canonic'
  */
 function cat_load_cache( $cat_load_postcounts = 'none', $dbtable_items = 'T_posts', $dbprefix_items = 'post_',
@@ -543,12 +521,8 @@ function cat_load_postcats_cache()
 }
 
 
-/*
- * postcats_get_byID(-)
- *
+/**
  * Get category associations with given post
- *
- * fplanque: created
  */
 function postcats_get_byID( $post_ID )
 {
@@ -658,7 +632,8 @@ function cat_children( $ccats, $blog_ID, $parent_ID, $callback_before_first, $ca
 
 
 /**
- * Does a given bog have categories?
+ * Does a given blog have categories?
+ *
  * @param integer Blog ID
  * @return boolean
  */
@@ -699,12 +674,11 @@ function cat_query( $load_postcounts = 'none', $dbtable_items = 'T_posts', $dbpr
 
 
 /**
- * the_category(-)
+ * Echoes the main category name
  *
- * echoes the main category name
- * the name of the main category the post belongs to.
- * you can as an admin add categories, and rename them if needed.
- * default category is 'General', you can rename it too.
+ * The name of the main category the post belongs to.
+ * You can as an admin add categories, and rename them if needed.
+ * Default category is 'General', you can rename it too.
  *
  * @deprecated deprecated by {@link Item::main_category()}
  */
@@ -716,12 +690,7 @@ function the_category( $format = 'htmlbody' )
 
 
 /**
- * the_categories(-)
- *
- * lists all the category names
- *
- * fplanque: created
- * fplanque: 0.8.3: changed defaults
+ * Lists all the category names
  *
  * @deprecated deprecated by {@link Item::categories()}
  */
@@ -810,9 +779,7 @@ function the_category_ID()
 
 
 /**
- * lists the category IDs for current post
- *
- * fplanque: created
+ * List the category IDs for current post
  */
 function the_categories_IDs()
 {
@@ -827,12 +794,11 @@ function the_categories_IDs()
 	}
 
 	echo implode( ',', $categoryIDs );
-
 }
 
 
-/*
- * the_category_head(-)
+/**
+ *
  */
 function the_category_head( $before='', $after='' )
 {
@@ -851,10 +817,11 @@ function the_category_head( $before='', $after='' )
 
 /**
  * Copy the catagory structure from one blog to another
+ *
  * The four cat_copy_* functions after blog_copy_cats are required by blog_copy_cats()
  */
 function blog_copy_cats($srcblog, $destblog )
- {
+{
 	global $edited_Blog, $cache_categories, $cat_parents;
 
 	$BlogCache = & get_Cache( 'BlogCache' );
@@ -905,10 +872,11 @@ function cat_copy_after_last( $parent_cat_ID, $level )
 { // callback to end sublist
 }
 
+
 /**
  * Compiles the cat array from $cat (recursive + optional modifiers) and $catsel[] (non recursive)
  *
- * @param strinf
+ * @param string
  * @param array
  * @param array by ref, will be modified
  * @param string by ref, will be modified
@@ -997,6 +965,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.12  2006/08/28 18:11:19  blueyed
+ * doc/whitespace fixes
+ *
  * Revision 1.11  2006/08/28 07:32:55  yabs
  * function cat_update() now moves any children associated with the category
  *
