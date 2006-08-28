@@ -202,6 +202,7 @@ class Plugins
 	 *  - BeforeInstall
 	 *  - BeforeUninstall
 	 *  - BeforeUninstallPayload
+	 *  - ExecCronJob
 	 *  - GetDefaultSettings
 	 *  - GetDefaultUserSettings
 	 *  - GetExtraEvents
@@ -328,6 +329,8 @@ class Plugins
 				'BeforeBlogDisplay' => 'Gets called before a (part of the blog) gets displayed.',
 				'SkinBeginHtmlHead' => 'Gets called at the top of the HTML HEAD section in a skin.',
 				'DisplayTrackbackAddr' => '',
+
+				'GetCronJobs' => 'Gets a list of implemented cron jobs.',
 			);
 
 
@@ -1865,6 +1868,39 @@ class Plugins
 
 
 	/**
+	 * Trigger an event and return an array of all return values of the
+	 * relevant plugins.
+	 *
+	 * @param string Event name, see {@link Plugins::get_supported_events()}
+	 * @param array Associative array of parameters for the Plugin
+	 * @param boolean Ignore {@link empty() empty} return values?
+	 * @return array List of return values, indexed by Plugin ID
+	 */
+	function trigger_collect( $event, $params = NULL, $ignore_empty = true )
+	{
+		if( empty($this->index_event_IDs[$event]) )
+		{
+			return array();
+		}
+
+		$r = array();
+		foreach( $this->index_event_IDs[$event] as $p_ID )
+		{
+			$sub_r = $this->call_method_if_active( $p_ID, $event, $params );
+
+			if( $ignore_empty && empty($sub_r) )
+			{
+				continue;
+			}
+
+			$r[$p_ID] = $sub_r;
+		}
+
+		return $r;
+	}
+
+
+	/**
 	 * Trigger a karma collecting event in order to get Karma percentage.
 	 *
 	 * @param string Event
@@ -2860,6 +2896,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.78  2006/08/28 20:16:29  blueyed
+ * Added GetCronJobs/ExecCronJob Plugin hooks.
+ *
  * Revision 1.77  2006/08/20 21:02:56  blueyed
  * Removed dependency on tokenizer. Quite a few people don't have it.. see http://forums.b2evolution.net//viewtopic.php?t=8664
  *

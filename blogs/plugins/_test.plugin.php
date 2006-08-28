@@ -132,20 +132,6 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * We trigger an extra event ourself (which we also provide ourselves).
-	 *
-	 * @return array
-	 */
-	function GetExtraEvents()
-	{
-		return array(
-				// Gets "min" and "max" as params and should return a random number in between:
-				'test_plugin_get_random' => T_('TEST event that returns a random number.'),
-			);
-	}
-
-
-	/**
 	 * User settings.
 	 *
 	 * @see Plugin::GetDefaultUserSettings()
@@ -167,6 +153,47 @@ class test_plugin extends Plugin
 					'defaultvalue' => '0',
 				),
 			);
+	}
+
+
+	/**
+	 * We trigger an extra event ourself (which we also provide ourselves).
+	 *
+	 * @return array
+	 */
+	function GetExtraEvents()
+	{
+		return array(
+				// Gets "min" and "max" as params and should return a random number in between:
+				'test_plugin_get_random' => T_('TEST event that returns a random number.'),
+			);
+	}
+
+
+	/**
+	 * Define a test cron job
+	 */
+	function GetCronJobs( & $params )
+	{
+		return array(
+				array(
+					'name' => 'TEST plugin - cron job',
+					'ctrl' => 'test_job',
+					'params' => array( 'param' => 1 ),
+				),
+			);
+	}
+
+
+	/**
+	 * Execute/Handle a test/sample cronjob.
+	 */
+	function ExecCronJob( & $params )
+	{
+		if( $params['ctrl'] == 'test_job' )
+		{
+			return array( 'code' => 0, 'message' => 'Test successful.' );
+		}
 	}
 
 
@@ -595,6 +622,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.50  2006/08/28 20:16:30  blueyed
+ * Added GetCronJobs/ExecCronJob Plugin hooks.
+ *
  * Revision 1.49  2006/08/19 07:56:32  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

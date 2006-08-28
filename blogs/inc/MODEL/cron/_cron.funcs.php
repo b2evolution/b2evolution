@@ -43,7 +43,12 @@ function cron_log( $message )
 }
 
 
-
+/**
+ * Call a cron job.
+ *
+ * @param string Name of the job
+ * @param string Params for the job
+ */
 function call_job( $job_name, $job_params = array() )
 {
 	global $DB, $control_path;
@@ -53,34 +58,60 @@ function call_job( $job_name, $job_params = array() )
 	$result_message = NULL;
 	$result_status = 'error';
 
-	$controller = $control_path.$job_name;
-	if( ! is_file( $controller ) )
-	{
-		$result_message = 'Controller ['.$job_name.'] does not exist.';
-		cron_log( $result_message );
+	if( preg_match( '~^plugin_(\d+)_(.*)$~', $job_name, $match ) )
+	{ // Cron job provided by a plugin:
+		load_class( '/_misc/_plugins.class.php' );
+		$Plugins = & new Plugins();
+
+		$Plugin = & $Plugins->get_by_ID( $match[1] );
+		if( ! $Plugin )
+		{
+			$result_message = 'Plugin for controller ['.$job_name.'] could not get instantiated.';
+			cron_log( $result_message );
+			return;
+		}
+
+		// CALL THE PLUGIN TO HANDLE THE JOB:
+		$tmp_params = array( 'ctrl' => $match[2], 'params' => $job_params );
+		$sub_r = $Plugins->call_method( $Plugin->ID, 'ExecCronJob', $tmp_params );
+
+		$error_code = (int)$sub_r['code'];
+		$result_message = $sub_r['message'];
 	}
 	else
 	{
+		$controller = $control_path.$job_name;
+		if( ! is_file( $controller ) )
+		{
+			$result_message = 'Controller ['.$job_name.'] does not exist.';
+			cron_log( $result_message );
+			return;
+		}
+
 		// INCLUDE THE JOB FILE AND RUN IT:
 		$error_code = require $controller;
-
-		if( $error_code != 1 )
-		{	// We got an error
-			$result_status = 'error';
-			$result_message = '[Error code: '.$error_code.' ] '.$result_message;
-		}
-		else
-		{
-			$result_status = 'finished';
-		}
-
-		$timestop = time() + $time_difference;
-		cron_log( 'Task finished at '.date( 'H:i:s', $timestop ).' with status: '.$result_status.' Message: '.$result_message );
 	}
+
+	if( $error_code != 1 )
+	{	// We got an error
+		$result_status = 'error';
+		$result_message = '[Error code: '.$error_code.' ] '.$result_message;
+	}
+	else
+	{
+		$result_status = 'finished';
+	}
+
+	$timestop = time() + $time_difference;
+	cron_log( 'Task finished at '.date( 'H:i:s', $timestop ).' with status: '.$result_status.' Message: '.$result_message );
 }
+
 
 /*
  * $Log$
+ * Revision 1.6  2006/08/28 20:16:29  blueyed
+ * Added GetCronJobs/ExecCronJob Plugin hooks.
+ *
  * Revision 1.5  2006/08/24 00:43:28  fplanque
  * scheduled pings part 2
  *

@@ -586,6 +586,39 @@ class Plugin
 		return array();
 	}
 
+
+	/**
+	 * This method gets asked for a list of cronjobs that the plugin
+	 * provides.
+	 * If a user installs a cron job out of this list, the
+	 * {@link Plugin::ExecCronJob()} of the plugin gets called.
+	 *
+	 * @return array Array of arrays with keys "name", "ctrl" and "params".
+	 *               "name" gets used for display. "ctrl" (string) and
+	 *               "params" (array) get passed to the
+	 *               {@link Plugin::ExecCronJob()} method when the cronjob
+	 *               gets executed.
+	 */
+	function GetCronJobs( & $params )
+	{
+		return array();
+	}
+
+
+	/**
+	 * Execute/handle a cron job, which has been scheduled by the admin out
+	 * of the list that the Plugin provides (see {@link GetCronJobs()}).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'ctrl': The "ctrl" name as defined in {@link GetCronJobs()}
+	 *   - 'params': The "params" value as defined in {@link GetCronJobs()},
+	 *               plus "ctsk_ID" which holds the cron task ID.
+	 * @return array with keys "code" (integer, 1 is ok), "message" (gets logged)
+	 */
+	function ExecCronJob( & $params )
+	{
+	}
+
 	// }}}
 
 
@@ -2585,6 +2618,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.86  2006/08/28 20:16:29  blueyed
+ * Added GetCronJobs/ExecCronJob Plugin hooks.
+ *
  * Revision 1.85  2006/08/20 19:07:08  blueyed
  * doc fix
  *

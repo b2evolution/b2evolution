@@ -32,33 +32,73 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 
-$cron_job_names = array(
-		'test' => T_('Basic test job'),
-		'error' => T_('Error test job'),
-		'anstispam_poll' => T_('Poll the antispam blacklist'),
-		'prune_hits_sessions' => T_('Prune old hits & sessions'),
-		// post notifications, not user schedulable
-	);
-$cron_job_params = array(
-		'test' => array(
-			'ctrl' => 'cron/_test.job.php',
-			'params' => NULL ),
-		'error' => array(
-			'ctrl' => 'cron/_error_test.job.php',
-			'params' => NULL ),
-		'anstispam_poll' => array(
-			'ctrl' => 'cron/_antispam_poll.job.php',
-			'params' => NULL ),
-		'prune_hits_sessions' => array(
-			'ctrl' => 'cron/_prune_hits_sessions.job.php',
-			'params' => NULL ),
-		// post notifications, not user schedulable
-	);
-
-
 $AdminUI->set_path( 'cron' );
 
 param( 'action', 'string', 'list' );
+
+if( $action == 'new' || $action == 'create' )
+{
+	// NOTE: keys starting with "plugin_" are reserved for jobs provided by Plugins
+	$cron_job_names = array(
+			'test' => T_('Basic test job'),
+			'error' => T_('Error test job'),
+			'anstispam_poll' => T_('Poll the antispam blacklist'),
+			'prune_hits_sessions' => T_('Prune old hits & sessions'),
+			// post notifications, not user schedulable
+		);
+	$cron_job_params = array(
+			'test' => array(
+				'ctrl' => 'cron/_test.job.php',
+				'params' => NULL ),
+			'error' => array(
+				'ctrl' => 'cron/_error_test.job.php',
+				'params' => NULL ),
+			'anstispam_poll' => array(
+				'ctrl' => 'cron/_antispam_poll.job.php',
+				'params' => NULL ),
+			'prune_hits_sessions' => array(
+				'ctrl' => 'cron/_prune_hits_sessions.job.php',
+				'params' => NULL ),
+			// post notifications, not user schedulable
+		);
+
+	// Get additional jobs from Plugins:
+	foreach( $Plugins->trigger_collect( 'GetCronJobs' ) as $plug_ID => $jobs )
+	{
+		if( ! is_array($jobs) )
+		{
+			$Debuglog->add( sprintf('GetCronJobs() for plugin #%d did not return array. Ignoring its jobs.', $plug_ID), array('plugins', 'error') );
+			continue;
+		}
+		foreach( $jobs as $job )
+		{
+			// Validate params from plugin:
+			if( ! isset($job['params']) )
+			{
+				$job['params'] = NULL;
+			}
+			if( ! is_array($job) || ! isset($job['ctrl'], $job['name']) )
+			{
+				$Debuglog->add( sprintf('GetCronJobs() for plugin #%d did return invalid job. Ignoring.', $plug_ID), array('plugins', 'error') );
+				continue;
+			}
+			if( isset($job['params']) && ! is_array($job['params']) )
+			{
+				$Debuglog->add( sprintf('GetCronJobs() for plugin #%d did return invalid job params (not an array). Ignoring.', $plug_ID), array('plugins', 'error') );
+				continue;
+			}
+			$ctrl_id = 'plugin_'.$plug_ID.'_'.$job['ctrl'];
+
+			$cron_job_names[$ctrl_id] = $job['name'];
+			$cron_job_params[$ctrl_id] = array(
+					'ctrl' => $ctrl_id,
+					'params' => $job['params'],
+				);
+		}
+	}
+
+}
+
 
 // We want to remember these params from page to page:
 param( 'ctst_pending', 'integer', 0, true );
@@ -179,7 +219,7 @@ switch( $action )
 		$cjob_row = $DB->get_row( $sql, OBJECT, 0, 'Get cron job and log' );
 		if( empty( $cjob_row ) )
 		{
- 			$Messages->add( sprintf( T_('Job #%d does not exist any longer.'), $cjob_ID ), 'error' );
+			$Messages->add( sprintf( T_('Job #%d does not exist any longer.'), $cjob_ID ), 'error' );
 			$action = 'list';
 		}
 		break;
@@ -215,7 +255,7 @@ switch( $action )
 
 	case 'view':
 		// Display VIEW:
-		$AdminUI->disp_view( 'cron/_cronjob.sheet.php' );
+		$AdminUI->disp_view( 'cron/_cronjob.sheet.php' ); // uses $cjob_row
 		break;
 
 	default:
