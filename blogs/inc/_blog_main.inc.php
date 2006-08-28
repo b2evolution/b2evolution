@@ -50,7 +50,15 @@ require_once $model_path.'items/_itemlist2.class.php';
 $Timer->start( '_blog_main.inc' );
 
 // Getting GET or POST parameters:
-param( 'blog', 'integer', 0, true );  // Can't use $default_to_blog because the param must always be included in regenerate_url() when present
+
+/*
+ * blog ID. This is a little bit special.
+ * We can't default to $default_to_blog here because the param should always be included in regenerate_url() when present.
+ * This will prevent weird indexing/search results in case the default changes after indexing.
+ * On some occasions, we'll manually filter it out of rgenerate_url() because we know wer go through a stub for example.
+ */
+param( 'blog', 'integer', 0, true );
+
 param( 'p', 'integer', '', true );              // Specific post number to display
 param( 'title', 'string', '', true );						// urtitle of post to display
 param( 'm', 'integer', '', true );              // YearMonth(Day) to display
@@ -84,11 +92,13 @@ param( 's', 'string', '', true );               // Search string
 param( 'sentence', 'string', 'AND', true );     // Search for sentence or for words
 param( 'exact', 'integer', '', true );          // Require exact match of title or contents
 
+// fp> TODO: param( 'loc', 'string', '', true );							// Locale of the posts (all by default)
+
 param( 'preview', 'integer', 0, true );         // Is this preview ?
 
 param( 'calendar', 'string', '', true );        // Display a specific month in the calendar
 
-param( 'page', 'integer', '', true );
+param( 'page', 'integer', 1, true );						// Post page to show
 param( 'more', 'integer', 0, true );
 
 param( 'c', 'string', '', true );
@@ -269,6 +279,8 @@ if( !empty($preview) )
 elseif( !empty($p) || !empty($title) )
 { // We are going to display a single post
 	$disp = 'single';
+
+	// fp>> TODO: a more generic canonical URL checker. Should work also on date changes, cat changes...
 
 	if( !empty($title) )
 	{ // Replace any non standard chars with a - (which is the new word separator in v 2.0; used to be _)
@@ -486,6 +498,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.35  2006/08/28 18:28:07  fplanque
+ * minor
+ *
  * Revision 1.34  2006/08/26 20:30:42  fplanque
  * made URL titles Google friendly
  *

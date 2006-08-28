@@ -54,8 +54,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
 	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
-	<link rel="alternate" type="text/xml" title="RDF" href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>" />
-	<link rel="alternate" type="text/xml" title="RSS .92" href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>" />
 	<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 	<link rel="stylesheet" href="custom.css" type="text/css" />
@@ -70,7 +68,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 <?php
 	// --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	require( dirname(__FILE__).'/_bloglist.php' );
+	require dirname(__FILE__).'/_bloglist.php';
 	// ------------------------------- END OF BLOG LIST --------------------------------
 ?>
 

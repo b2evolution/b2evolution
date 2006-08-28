@@ -20,11 +20,11 @@
  */
 
 /**
- * Maintenance mode. Set this to true in order to temporarily disable access to the application.
+ * Maintenance mode. Set this to 1 in order to temporarily disable access to the application.
  *
  * Note: it is still possible to access the install script during maintenance mode.
  */
-$maintenance_mode = false;
+$maintenance_mode = 0;
 
 
 // Below is an alternative hardcore version of maintenance mode.

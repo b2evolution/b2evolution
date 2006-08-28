@@ -92,8 +92,8 @@ function convert_lang_to_locale( $table, $columnlang, $columnID )
 				if( substr($newlkey, 0, 2) == strtolower($lkey) ) # TODO: check if valid/suitable
 				{  // if language matches, update
 					$converted = $DB->query( "UPDATE $table
-																		SET $columnlang = '$newlkey'
-																		WHERE $columnlang = '$lkey'" );
+																		   SET $columnlang = '$newlkey'
+																		 WHERE $columnlang = '$lkey'" );
 					echo 'to locale \''. $newlkey. '\'<br />';
 					break;
 				}
@@ -1230,6 +1230,7 @@ function upgrade_b2evo_tables()
 	*/
 
 
+	// Version 2.0 starts here
 
 	if( $old_db_version < 9404 )
 	{
@@ -1372,6 +1373,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.170  2006/08/28 18:28:07  fplanque
+ * minor
+ *
  * Revision 1.169  2006/08/26 20:30:42  fplanque
  * made URL titles Google friendly
  *

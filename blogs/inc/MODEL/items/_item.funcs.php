@@ -390,9 +390,14 @@ function next_post( $format = '% &gt;&gt; ', $next = '#', $title = 'yes', $in_sa
  *
  * @todo move to ItemList
  */
-function next_posts($max_page = 0, $page='' )
+function next_posts( $max_page = 0 )
 {
 	global $p, $paged, $Settings, $edited_Blog, $generating_static;
+
+	/**
+	 * @var Blog
+	 */
+	global $Blog;
 
 	if( empty($p) )
 	{
@@ -400,15 +405,18 @@ function next_posts($max_page = 0, $page='' )
 		$nextpage = intval($paged) + 1;
 		if (!$max_page || $max_page >= $nextpage)
 		{
-			if( !isset($generating_static) )
+			if( !isset($generating_static) && isset($Blog) )
 			{ // We are not generating a static page here:
-				echo regenerate_url( 'paged', 'paged='.$nextpage, $page );
+				echo regenerate_url( 'blog,paged', 'paged='.$nextpage, $Blog->get('dynurl') );
 			}
-			elseif( isset($edited_Blog) )
+			elseif( isset($generating_static) && isset($edited_Blog) )
 			{ // We are generating a static page
 				echo url_add_param( $edited_Blog->get('dynurl'), 'paged='.$nextpage );
 			}
-			// else...should not happen
+			else
+			{
+				debug_die( 'unhandled next page' );
+			}
 		}
 	}
 }
@@ -421,23 +429,27 @@ function next_posts($max_page = 0, $page='' )
  *
  * @todo move to ItemList
  */
-function previous_posts( $page='' )
+function previous_posts( )
 {
-	global $p, $paged, $Settings, $edited_Blog, $generating_static;
+	global $p, $paged, $Settings, $edited_Blog, $Blog, $generating_static;
 
 	if( empty($p) )
 	{
 		$nextpage = intval($paged) - 1;
 		if ($nextpage < 1) $nextpage = 1;
-		if( !isset($generating_static) )
+
+		if( !isset($generating_static) && isset($Blog) )
 		{ // We are not generating a static page here:
-			echo regenerate_url( 'paged', 'paged='.$nextpage, $page );
+			echo regenerate_url( 'blog,paged', 'paged='.$nextpage, $Blog->get('dynurl') );
 		}
-		elseif( isset($edited_Blog) )
+		elseif( isset($generating_static) && isset($edited_Blog) )
 		{ // We are generating a static page
 			echo url_add_param( $edited_Blog->get('dynurl'), 'paged='.$nextpage );
 		}
-		// else...should not happen
+		else
+		{
+			debug_die( 'unhandled previous page' );
+		}
 	}
 }
 
@@ -449,7 +461,7 @@ function previous_posts( $page='' )
  *
  * @todo move to ItemList
  */
-function next_posts_link($label='#', $max_page=0, $page='')
+function next_posts_link($label='#', $max_page=0 )
 {
 	global $p, $paged, $result, $Settings, $MainList, $Blog, $Item;
 
@@ -474,7 +486,7 @@ function next_posts_link($label='#', $max_page=0, $page='')
 		*/
 
 		echo '<a href="';
-		echo next_posts($max_page, $page);
+		echo next_posts( $max_page );
 		echo '">'. htmlspecialchars($label) .'</a>';
 	}
 }
@@ -487,7 +499,7 @@ function next_posts_link($label='#', $max_page=0, $page='')
  *
  * @todo move to ItemList
  */
-function previous_posts_link($label='#', $page='')
+function previous_posts_link( $label='#' )
 {
 	global $Settings, $p, $paged, $Blog;
 
@@ -509,7 +521,7 @@ function previous_posts_link($label='#', $page='')
 		*/
 
 		echo '<a href="';
-		echo previous_posts( $page );
+		echo previous_posts( );
 		echo '">'.htmlspecialchars($label).'</a>';
 	}
 }
@@ -522,7 +534,7 @@ function previous_posts_link($label='#', $page='')
  *
  * @todo move to ItemList
  */
-function posts_nav_link($sep=' :: ', $prelabel='#', $nxtlabel='#', $page='')
+function posts_nav_link( $sep=' :: ', $prelabel='#', $nxtlabel='#' )
 {
 	global $p, $Settings, $MainList;
 
@@ -531,9 +543,9 @@ function posts_nav_link($sep=' :: ', $prelabel='#', $nxtlabel='#', $page='')
 		$max_paged = $MainList->total_pages;
 		if( $max_paged > 1 )
 		{
-			previous_posts_link( $prelabel, $page );
+			previous_posts_link( $prelabel );
 			echo htmlspecialchars($sep);
-			next_posts_link( $nxtlabel, $max_paged, $page );
+			next_posts_link( $nxtlabel, $max_paged );
 		}
 	}
 }
@@ -963,6 +975,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.22  2006/08/28 18:28:07  fplanque
+ * minor
+ *
  * Revision 1.21  2006/08/26 20:30:42  fplanque
  * made URL titles Google friendly
  *

@@ -603,12 +603,12 @@ function param_compact_date( $var, $default = '', $memorize = false, $err_msg, $
 	}
 
 	// We do not have a compact date, try normal date matching:
-	$iso_date = $this->param_check_date( $var, $err_msg, $required );
+	$iso_date = param_check_date( $var, $err_msg, $required );
 
 	if( $iso_date )
 	{
-		$this->set_param( $var, compact_date( $iso_date ) );
-		return $this->params[$var];
+		set_param( $var, compact_date( $iso_date ) );
+		return $$var;
 	}
 
 	// Nothing valid found....
@@ -1519,6 +1519,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.6  2006/08/28 18:28:07  fplanque
+ * minor
+ *
  * Revision 1.5  2006/08/26 20:33:52  fplanque
  * small fixes
  *

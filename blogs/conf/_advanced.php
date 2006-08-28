@@ -156,7 +156,7 @@ $notify_from = $instance_name.'@'.preg_replace( '/^www\./i', '', $basehost );
  *
  * @var boolean
  */
-$redirect_to_postblog = true;
+$redirect_to_postblog = false;
 
 /**
  * If a particular post is requested (by title) but not the the exact same title
@@ -567,7 +567,7 @@ $force_regexp_dirname = '';
 $credit_links = array(
 	array( 'http://b2evolution.net/', 'b2evo' ),
 	array( 'http://evocore.net/', 'evoCore' ),
-	array( 'http://plusjamaisseul.net/', 'seule' ),
+	array( 'http://plusjamaisseul.net/', 'test site' ),
 );
 
 
