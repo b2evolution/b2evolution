@@ -19,8 +19,16 @@ $quiet = 0;
 if( $is_cli )
 { // called through Command Line Interface, handle args:
 
-	$argc = $_SERVER['argc'];
-	$argv = $_SERVER['argv'];
+	if( isset( $_SERVER['argc'], $_SERVER['argv'] ) )
+	{
+		$argc = $_SERVER['argc'];
+		$argv = $_SERVER['argv'];
+	}
+
+	if( ! isset($argv) )
+	{
+		debug_die( 'Assertion failed: $is_cli is true, but does not seem to be CLI.' );
+	}
 
 	foreach( array_slice($argv, 1) as $v )
 	{
@@ -102,7 +110,7 @@ else
 	// Duplicate query for tests!
 	// $DB->query( $sql, 'Request lock' );
 	if( $DB->query( $sql, 'Request lock' ) != 1 )
-	{ // This has no affected exactly ONE row: error! (probably locked -- duplicate ket -- by a concurrent process)
+	{ // This has no affected exactly ONE row: error! (probably locked -- duplicate key -- by a concurrent process)
 		$DB->show_errors = true;
 		$DB->halt_on_error = true;
 		cron_log( 'Could not lock. Task is probably handled by another process.' );
@@ -128,7 +136,7 @@ else
 
 		$DB->show_errors = true;
 		$DB->halt_on_error = true;
-		cron_log( 'Stating task #'.$ctsk_ID.' ['.$ctsk_name.'] at '.date( 'H:i:s', $localtimenow ).'.' );
+		cron_log( 'Starting task #'.$ctsk_ID.' ['.$ctsk_name.'] at '.date( 'H:i:s', $localtimenow ).'.' );
 
 		if( empty($task->ctsk_params) )
 		{
