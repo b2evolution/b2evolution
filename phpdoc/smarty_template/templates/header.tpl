@@ -50,10 +50,10 @@
 <div id="float-wrapper">
 
 <div class="header-menu">
+	<small>{$maintitle}</small>
   		  [ <a href="{$subdir}classtrees_{$package}.html" class="menu">class tree: {$package}</a> ]
 		  [ <a href="{$subdir}elementindex_{$package}.html" class="menu">index: {$package}</a> ]
 		  [ <a href="{$subdir}elementindex.html" class="menu">all elements</a> ]
-	(b2evolution CVS HEAD)
 </div>
 
 
