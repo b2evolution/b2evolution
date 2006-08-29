@@ -36,9 +36,22 @@ $AdminUI->set_path( 'cron' );
 
 param( 'action', 'string', 'list' );
 
+// We want to remember these params from page to page:
+param( 'ctst_pending', 'integer', 0, true );
+param( 'ctst_started', 'integer', 0, true );
+param( 'ctst_timeout', 'integer', 0, true );
+param( 'ctst_error', 'integer', 0, true );
+param( 'ctst_finished', 'integer', 0, true );
+param( 'results_crontab_order', 'string', '-A', true );
+param( 'results_crontab_page', 'integer', 1, true );
+
+
 // fp> The if  below was the point where THE LINE WAS CROSSED!
 // This is bloated here. This has to go into the action handling block (and maybe a function)
 // THIS IS NO LONGER CONTROLLER INITIALIZATION. THIS IS ACTION EXECUTION!
+// dh> ok. Moved the other param inits above. Ok? I don't think it should be an extra function..
+
+// Init names and params for "static" available jobs and ask Plugins about their jobs:
 if( $action == 'new' || $action == 'create' )
 {
 	// NOTE: keys starting with "plugin_" are reserved for jobs provided by Plugins
@@ -99,18 +112,7 @@ if( $action == 'new' || $action == 'create' )
 				);
 		}
 	}
-
 }
-
-
-// We want to remember these params from page to page:
-param( 'ctst_pending', 'integer', 0, true );
-param( 'ctst_started', 'integer', 0, true );
-param( 'ctst_timeout', 'integer', 0, true );
-param( 'ctst_error', 'integer', 0, true );
-param( 'ctst_finished', 'integer', 0, true );
-param( 'results_crontab_order', 'string', '-A', true );
-param( 'results_crontab_page', 'integer', 1, true );
 
 
 switch( $action )
