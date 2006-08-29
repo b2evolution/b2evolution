@@ -264,7 +264,7 @@ $schema_queries = array(
 			sess_user_ID   INT(10) DEFAULT NULL,
 			sess_data      TEXT DEFAULT NULL,
 			PRIMARY KEY( sess_ID )
-		)" ),
+		)" ), // NOTE: sess_lastseen is only relevant/used by Sessions class (+ stats) and results in a quite large index (file size wise)
 
 	'T_usersettings' => array(
 		'Creating user settings table',
@@ -480,6 +480,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.30  2006/08/29 22:59:09  blueyed
+ * doc
+ *
  * Revision 1.29  2006/08/26 16:33:02  fplanque
  * enhanced stats
  *

@@ -35,7 +35,10 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @todo Move to a "who's online" plugin, maybe...
+ * @todo Move to a "who's online" plugin
+ * @todo dh> I wanted to add a MySQL INDEX on the sess_lastseen field, but this "plugin"
+ *       is the only real user of this. So, when making this a plugin, this should
+ *       add the index perhaps.
  */
 class Sessions extends Widget
 {
@@ -88,7 +91,7 @@ class Sessions extends Widget
 			SELECT sess_user_ID
 			  FROM T_sessions
 			 WHERE sess_lastseen > "'.$timeout_YMD.'"
-			   AND sess_key IS NOT NULL' ) as $row )
+			   AND sess_key IS NOT NULL', OBJECT, 'Sessions: get list of relevant users.' ) as $row )
 		{
 			if( !empty( $row->sess_user_ID )
 					&& ( $User = & $UserCache->get_by_ID( $row->sess_user_ID ) ) )
@@ -257,6 +260,9 @@ class Sessions extends Widget
 
 /*
  * $Log$
+ * Revision 1.8  2006/08/29 22:59:09  blueyed
+ * doc
+ *
  * Revision 1.7  2006/08/29 00:26:11  fplanque
  * Massive changes rolling in ItemList2.
  * This is somehow the meat of version 2.0.
