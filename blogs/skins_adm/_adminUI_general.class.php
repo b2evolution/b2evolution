@@ -938,6 +938,8 @@ class AdminUI_general
 					'footer_text_no_limit' => '', // Text if theres no LIMIT and therefor only one page anyway
 						'prev_text' => T_('Previous'),
 						'next_text' => T_('Next'),
+						'no_prev_text' => '',
+						'no_next_text' => '',
 						'list_prev_text' => T_('...'),
 						'list_next_text' => T_('...'),
 						'list_span' => 11,
@@ -1307,6 +1309,11 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.28  2006/08/29 00:26:12  fplanque
+ * Massive changes rolling in ItemList2.
+ * This is somehow the meat of version 2.0.
+ * This branch has gone officially unstable at this point! :>
+ *
  * Revision 1.27  2006/08/21 01:02:10  blueyed
  * whitespace
  *

@@ -2211,6 +2211,11 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.110  2006/08/29 00:26:12  fplanque
+ * Massive changes rolling in ItemList2.
+ * This is somehow the meat of version 2.0.
+ * This branch has gone officially unstable at this point! :>
+ *
  * Revision 1.109  2006/08/21 16:07:45  fplanque
  * refactoring
  *
@@ -2289,18 +2294,6 @@ $s = new xmlrpc_server(
  * Revision 1.86  2006/01/06 16:42:41  fplanque
  * bugfix
  *
- * Revision 1.85  2005/12/12 19:44:09  fplanque
- * Use cached objects by reference instead of copying them!!
- *
- * Revision 1.84  2005/12/11 19:59:51  blueyed
- * Renamed gen_permalink() to get_permalink()
- *
- * Revision 1.83  2005/11/18 00:13:56  blueyed
- * Normalized Log class
- *
- * Revision 1.82  2005/10/31 21:45:05  fplanque
- * refact
- *
  * Revision 1.80  2005/10/29 19:46:45  tor_gisvold
  * Bug fix for all blogger API routines - all of these errored due to lack of global cache definition
  * I also hope that I have fixed the pesky double line spacing done by my CVS frontend - if not I apologise and will fix.
@@ -2308,15 +2301,5 @@ $s = new xmlrpc_server(
  * Revision 1.79  2005/10/23 18:14:24  tor_gisvold
  * Metaweblog API and Movable Type API first cut for new version of b2evolution
  * Tor 23102005
- *
- * Revision 1.78  2005/10/12 12:21:01  fplanque
- * answer: yes :)
- *
- * Revision 1.77  2005/10/11 21:29:21  blueyed
- * Question
- *
- * Revision 1.76  2005/10/05 20:26:12  fplanque
- * cleanup
- *
  */
 ?>

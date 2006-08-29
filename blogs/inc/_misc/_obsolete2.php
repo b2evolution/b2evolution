@@ -677,7 +677,264 @@ function pingback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 	echo '</a>';
 }
 
-
-
 /***** // Pingback tags *****/
+
+
+/**
+ * vegarg: small bug when using $more_file fixed
+ */
+function link_pages( $before='#', $after='#', $next_or_number='number', $nextpagelink='#', $previouspagelink='#',
+										$pagelink='%d', $more_file='')
+{
+	global $id, $page, $numpages, $multipage, $more;
+
+	if( $before == '#' ) $before = '<p>'.T_('Pages:').' ';
+	if( $after == '#' ) $after = '</p>';
+	if( $nextpagelink == '#' ) $nextpagelink = T_('Next page');
+	if( $previouspagelink == '#' ) $previouspagelink = T_('Previous page');
+
+	if ($more_file != '')
+		$file = $more_file;
+	else
+		$file = get_bloginfo('blogurl');
+
+	if( $multipage )
+	{
+		echo $before;
+		if( $next_or_number == 'number' )
+		{
+			for ($i = 1; $i < ($numpages+1); $i = $i + 1)
+			{
+				$j = str_replace('%d', $i, $pagelink);
+				echo ' ';
+				if( ($i != $page) || ( (!$more) && ($page==1) ))
+					echo '<a href="'.url_add_param($file, 'p='.$id.'&amp;more=1&amp;page='.$i).'">';
+				echo $j;
+				if( ($i != $page) || ( (!$more) && ($page==1) ))
+					echo '</a>';
+			}
+		}
+		else
+		{
+			$i = $page - 1;
+			if( $i )
+				echo ' <a href="'.url_add_param($file, 'p='.$id.'&amp;page='.$i).'">'.$previouspagelink.'</a>';
+
+			$i = $page+1;
+
+			if( $i <= $numpages )
+				echo ' <a href="'.url_add_param($file, 'p='.$id.'&amp;page='.$i).'">'.$nextpagelink.'</a>';
+		}
+		echo $after;
+	}
+}
+
+
+
+
+/**
+ * Links to previous/next page
+ *
+ * Note: remove this tag from skin template if you don't want this functionality
+ *
+ * @todo move to ItemList
+ */
+function posts_nav_link( $sep=' :: ', $prelabel='#', $nxtlabel='#' )
+{
+	global $p, $Settings, $MainList;
+
+	if( !empty( $MainList->sql ) && empty($p) )
+	{
+		$max_paged = $MainList->total_pages;
+		if( $max_paged > 1 )
+		{
+			previous_posts_link( $prelabel );
+			echo htmlspecialchars($sep);
+			next_posts_link( $nxtlabel, $max_paged );
+		}
+	}
+}
+
+
+/**
+ * Display a link to previous page of posts
+ *
+ * Note: remove this tag from skin template if you don't want this functionality
+ *
+ * @todo move to ItemList
+ */
+function previous_posts_link( $label='#' )
+{
+	global $Settings, $p, $paged, $Blog;
+
+	if( $label == '#' ) $label = '<< '.T_('Previous Page');
+
+	if( empty($p) && ($paged > 1) )
+	{
+		/*
+		// fplanque>> this code was supposed to make this work on multiple domains, but it breaks stub files !
+		// blueyed>> it looks like using $Blog->get('url') should do it.
+		$siteurl = $Blog->get( 'siteurl', 'raw');
+		if ( !empty( $siteurl ) )
+		{
+			$parsed_url = parse_url( $Blog->get( 'siteurl', 'raw' ) );
+			$page = $parsed_url['scheme'] . '://' .
+					$parsed_url['host'] .
+					$parsed_url['path'];
+		}
+		*/
+
+		echo '<a href="';
+		echo previous_posts( );
+		echo '">'.htmlspecialchars($label).'</a>';
+	}
+}
+
+
+
+/**
+ * Display a link to next page of posts
+ *
+ * Note: remove this tag from skin template if you don't want this functionality
+ *
+ * @todo move to ItemList
+ */
+function next_posts_link($label='#', $max_page=0 )
+{
+	global $p, $paged, $result, $Settings, $MainList, $Blog, $Item;
+
+	if( $label == '#' ) $label = T_('Next Page').' >>';
+
+	if (!$max_page) $max_page = $MainList->get_max_paged();
+	if (!$paged) $paged = 1;
+	$nextpage = intval($paged) + 1;
+	if (empty($p) && (empty($paged) || $nextpage <= $max_page))
+	{
+		/*
+		// fplanque>> this code was supposed to make this work on multiple domains, but it breaks stub files !
+		// blueyed>> it looks like using $Blog->get('url') should do it.
+		$siteurl = $Blog->get( 'siteurl', 'raw');
+		if ( !empty( $siteurl ) )
+		{
+			$parsed_url = parse_url( $Blog->get( 'siteurl', 'raw' ) );
+			$page = $parsed_url['scheme'] . '://' .
+					$parsed_url['host'] .
+					$parsed_url['path'];
+		}
+		*/
+
+		echo '<a href="';
+		echo next_posts( $max_page );
+		echo '">'. htmlspecialchars($label) .'</a>';
+	}
+}
+
+
+
+/**
+ * Display a link to previous page of posts
+ *
+ * Note: remove this tag from skin template if you don't want this functionality
+ *
+ * @todo move to ItemList
+ */
+function previous_posts( )
+{
+	global $p, $paged, $Settings, $edited_Blog, $Blog, $generating_static;
+
+	if( empty($p) )
+	{
+		$nextpage = intval($paged) - 1;
+		if ($nextpage < 1) $nextpage = 1;
+
+		if( !isset($generating_static) && isset($Blog) )
+		{ // We are not generating a static page here:
+			echo regenerate_url( 'blog,paged', 'paged='.$nextpage, $Blog->get('dynurl') );
+		}
+		elseif( isset($generating_static) && isset($edited_Blog) )
+		{ // We are generating a static page
+			echo url_add_param( $edited_Blog->get('dynurl'), 'paged='.$nextpage );
+		}
+		else
+		{
+			debug_die( 'unhandled previous page' );
+		}
+	}
+}
+
+
+
+/**
+ * Display a link to next page of posts
+ *
+ * Note: remove this tag from skin template if you don't want this functionality
+ *
+ * @todo move to ItemList
+ */
+function next_posts( $max_page = 0 )
+{
+	global $p, $paged, $Settings, $edited_Blog, $generating_static;
+
+	/**
+	 * @var Blog
+	 */
+	global $Blog;
+
+	if( empty($p) )
+	{
+		if (!$paged) $paged = 1;
+		$nextpage = intval($paged) + 1;
+		if (!$max_page || $max_page >= $nextpage)
+		{
+			if( !isset($generating_static) && isset($Blog) )
+			{ // We are not generating a static page here:
+				echo regenerate_url( 'blog,paged', 'paged='.$nextpage, $Blog->get('dynurl') );
+			}
+			elseif( isset($generating_static) && isset($edited_Blog) )
+			{ // We are generating a static page
+				echo url_add_param( $edited_Blog->get('dynurl'), 'paged='.$nextpage );
+			}
+			else
+			{
+				debug_die( 'unhandled next page' );
+			}
+		}
+	}
+}
+
+/**
+ * the_weekday(-)
+ *
+ *
+ */
+function the_weekday()
+{
+	global $weekday,$id,$postdata;
+	$the_weekday = T_($weekday[mysql2date('w', $postdata['Date'])]);
+	echo $the_weekday;
+}
+
+
+
+/**
+ * the_weekday_date(-)
+ *
+ *
+ */
+function the_weekday_date($before='',$after='')
+{
+	global $weekday,$id,$postdata,$day,$previousweekday;
+	$the_weekday_date = '';
+	if ($day != $previousweekday) {
+		$the_weekday_date .= $before;
+		$the_weekday_date .= T_($weekday[mysql2date('w', $postdata['Date'])]);
+		$the_weekday_date .= $after;
+		$previousweekday = $day;
+	}
+
+	echo $the_weekday_date;
+}
+
+
+
 ?>

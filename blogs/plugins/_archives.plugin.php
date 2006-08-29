@@ -43,6 +43,105 @@ require_once $GLOBALS['inc_path'].'_misc/_results.class.php';
 
 
 /**
+ * Generate permalink
+ *
+ * TODO: archives modes in clean mode
+ *
+ * @deprecated deprecated by {@link Item::get_permanent_url()} but still used in this class
+ */
+function get_permalink(
+	$file,                  // base URL of the blog
+	$id,                    // post ID to be linked to
+	$use_anchor_mode = '',  // Default to id
+	$use_destination = '',  // Default to config
+	$use_more = NULL,			  // DEPRECATED
+	$use_comments = NULL,   // DEPRECATED
+	$use_trackback = NULL,  // DEPRECATED
+	$use_pingback = NULL )  // DEPRECATED
+{
+	global $cacheweekly;
+	global $Settings;
+
+	// We're gonna need access to more postdata in several cases:
+	$postdata = get_postdata( $id );
+
+	// Defaults:
+	if (empty($use_anchor_mode)) $use_anchor_mode = 'id';
+	if (empty($use_destination))
+			$use_destination = ( strstr( $Settings->get('permalink_type'), 'archive' ) !== false )
+					? 'archive' : 'single';
+	if ($use_destination=='archive') $use_destination = $Settings->get('archive_mode');
+
+	// Generate anchor
+	switch(strtolower($use_anchor_mode))
+	{
+		case 'title':
+			$title = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $postdata['Title']);
+			$anchor = $title;
+			break;
+
+		case 'id':
+		default:
+			$anchor = $id;
+			break;
+	}
+
+	if( ! $Settings->get('links_extrapath') )
+	{ // We reference by Query: Dirty but explicit permalinks
+
+		switch($use_destination)
+		{
+			case 'monthly':
+				$permalink = url_add_param( $file, 'm='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).'#'.$anchor );
+				break;
+			case 'weekly':
+				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']])))
+				{
+					$cacheweekly[$post_date] = $DB->get_var( 'SELECT '.$DB->week( $post_date, locale_startofweek() ) );
+				}
+				$permalink = url_add_param( $file, 'm='.substr($postdata['Date'],0,4).'&amp;w='.$cacheweekly[$postdata['Date']].'#'.$anchor );
+				break;
+			case 'daily':
+				$permalink = url_add_param( $file, 'm='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).substr($postdata['Date'],8,2).'#'.$anchor );
+				break;
+			case 'postbypost':
+			case 'single':
+			default:
+				$permalink = url_add_param( $file, 'p='.$id.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1' );
+				break;
+		}
+	}
+	else
+	{ // We reference by path (CLEAN permalinks!)
+		switch($use_destination)
+		{
+			case 'monthly':
+				$permalink = $file.mysql2date("/Y/m/", $postdata['Date']).'#'.$anchor;
+				break;
+			case 'weekly':
+				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']])))
+				{
+					$cacheweekly[$post_date] = $DB->get_var( 'SELECT '.$DB->week( $post_date, locale_startofweek() ) );
+				}
+				$permalink = $file.mysql2date("/Y/m/", $postdata['Date']).'w'.$cacheweekly[$postdata['Date']].'/#'.$anchor;
+				break;
+			case 'daily':
+				$permalink = $file.mysql2date("/Y/m/d/", $postdata['Date']).'#'.$anchor;
+				break;
+			case 'postbypost':
+			case 'single':
+			default:
+				// This is THE CLEANEST available: RECOMMENDED!
+				$permalink = $file.mysql2date("/Y/m/d/", $postdata['Date']).'p'.$id;
+				break;
+		}
+	}
+
+	return $permalink;
+}
+
+
+/**
  * Archives Plugin
  *
  * This plugin displays
@@ -530,8 +629,15 @@ class ArchiveList extends Results
 }
 
 
+
+
 /*
  * $Log$
+ * Revision 1.28  2006/08/29 00:26:11  fplanque
+ * Massive changes rolling in ItemList2.
+ * This is somehow the meat of version 2.0.
+ * This branch has gone officially unstable at this point! :>
+ *
  * Revision 1.27  2006/07/10 20:19:30  blueyed
  * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
  *

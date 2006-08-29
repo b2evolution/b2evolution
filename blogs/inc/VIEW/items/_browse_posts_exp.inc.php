@@ -123,7 +123,10 @@ while( $Item = & $ItemList->get_item() )
 			<div class="bText">
 				<?php
 					$Item->content();
-					link_pages( '<p class="right">'.T_('Pages:'), '</p>' );
+				?>
+				<?php
+					// Links to post pages (for multipage posts):
+					$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
 				?>
 			</div>
 		</div>
@@ -257,6 +260,11 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.20  2006/08/29 00:26:11  fplanque
+ * Massive changes rolling in ItemList2.
+ * This is somehow the meat of version 2.0.
+ * This branch has gone officially unstable at this point! :>
+ *
  * Revision 1.19  2006/08/19 07:56:31  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

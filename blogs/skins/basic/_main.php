@@ -116,7 +116,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 			<div>
 				<?php $Item->content( '#', '#', T_('Read more...') ); ?>
-				<?php link_pages() ?>
+				<?php
+					// Links to post pages (for multipage posts):
+					$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
+				?>
 			</div>
 
 			<small>
@@ -156,7 +159,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	<div align="center">
 		<strong>
-		<?php posts_nav_link(); ?>
+		<?php
+			// Links to list pages:
+			$MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
+   				'prev_text' => '&lt;&lt; '.T_('Previous'),
+   				'next_text' => T_('Next').' &gt;&gt;',
+				) );
+		?>
 		::
 		<a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('Archives') ?></a>
 		</strong>

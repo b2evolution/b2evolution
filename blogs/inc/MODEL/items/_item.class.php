@@ -139,7 +139,15 @@ class Item extends DataObject
 	var $locale;
 	var $title;
 	var $urltitle;
+
 	var $content;
+
+	/**
+	 * Lazy filled, use split_page()
+	 */
+	var $content_pages = NULL;
+
+
 	var $wordcount = 0;
 	var $main_cat_ID = 0;
 	/**
@@ -864,6 +872,42 @@ class Item extends DataObject
 
 
 	/**
+	 * Make sure, the pages are split up:
+	 */
+	function split_pages()
+	{
+		if( is_null( $this->content_pages ) )
+		{
+			// SPLIT PAGES:
+			$this->content_pages = explode( '<!--nextpage-->', $this->content);
+			$this->pages = count( $this->content_pages );
+		}
+	}
+
+
+	/**
+	 * Get a specific page to display:
+	 */
+	function get_content_page( $page )
+	{
+		// Make sure, the pages are split up:
+		$this->split_pages();
+
+		if( $page < 1 )
+		{
+			$page = 1;
+		}
+
+		if( $page > $this->pages )
+		{
+			$page = $this->pages;
+		}
+
+		return $this->content_pages[$page-1];
+	}
+
+
+	/**
 	 * Template function: display content of item
 	 *
 	 * Calling this with "MORE" (i-e displaying full content) will increase
@@ -929,40 +973,21 @@ class Item extends DataObject
 			$this->inc_viewcount(); // won't increment if current_User == Author
 		}
 
-		$content = $this->content;
-		$numpages = 1;
-
-		if( preg_match('/<!--nextpage-->/', $content ) )
-		{ // This is a multipage post
-			$content = str_replace("\n<!--nextpage-->\n", '<!--nextpage-->', $content);
-			$content = str_replace("\n<!--nextpage-->", '<!--nextpage-->', $content);
-			$content = str_replace("<!--nextpage-->\n", '<!--nextpage-->', $content);
-			$pages = explode('<!--nextpage-->', $content);
-			$numpages = count($pages);
-			if( $disppage === '#' )
-			{ // We want to display the page requested by the user:
-				global $page;
-				$disppage = $page;
-			}
-			if( $disppage > $numpages )
-			{
-				$disppage = $numpages;
-			}
-			elseif( $disppage < 1 )
-			{ // somehow there are a lot of "undefined index -1 errors" for the "$pages[$disppage-1]" line below on the demo site, which I could not reproduce, but this check here makes sense anyway
-				$disppage = 1;
-			}
-			$content = $pages[$disppage-1];
-			if($disppage > 1) $dispmore=1;
+		// Get requested content page:
+		if( $disppage === '#' )
+		{ // We want to display the page requested by the user:
+			global $page;
+			$disppage = $page;
 		}
+		$content_page = $this->get_content_page( $disppage );
 
-		$content_parts = explode('<!--more-->', $content);
 
+		$content_parts = explode('<!--more-->', $content_page);
 		if( count($content_parts)>1 )
 		{ // This is an extended post (has a more section):
 			if( $dispmore )
 			{ // Viewer has already asked for more
-				if( $stripteaser || preg_match('/<!--noteaser-->/', $content ) )
+				if( $stripteaser || preg_match('/<!--noteaser-->/', $content_page ) )
 				{ // We want to strip the teaser:
 					$output = '';
 				}
@@ -1018,7 +1043,7 @@ class Item extends DataObject
 				{
 					$excerpt .= $blah[$i].' ';
 				}
-				$output = $excerpt . '...';
+				$output = $excerpt.'...';
 			}
 		}
 
@@ -1266,6 +1291,64 @@ class Item extends DataObject
 			echo mysql2date( locale_timefmt(), $this->mod_date, $useGM );
 		else
 			echo mysql2date( $format, $this->mod_date, $useGM );
+	}
+
+
+	/**
+	 *
+	 */
+	function page_links( $before = '#', $after = '#', $separator = ' ', $single = '', $current_page = '#', $pagelink = '%d', $url = '' )
+	{
+
+		// Make sure, the pages are split up:
+		$this->split_pages();
+
+		if( $this->pages <= 1 )
+		{	// Single page:
+			echo $single;
+			return;
+		}
+
+		if( $before == '#' ) $before = '<p>'.T_('Pages:').' ';
+		if( $after == '#' ) $after = '</p>';
+
+		if( $current_page == '#' )
+		{
+			global $page;
+			$current_page = $page;
+		}
+
+		if( empty($url) )
+		{
+			$url = $this->get_permanent_url( '', '', true );
+		}
+
+		$page_links = array();
+
+		for( $i = 1; $i <= $this->pages; $i++ )
+		{
+			$text = str_replace('%d', $i, $pagelink);
+
+			if( $i != $current_page )
+			{
+				if( $i == 1 )
+				{	// First page special:
+					$page_links[] = '<a href="'.$url.'">'.$text.'</a>';
+				}
+				else
+				{
+					$page_links[] = '<a href="'.url_add_param( $url, 'page='.$i ).'">'.$text.'</a>';
+				}
+			}
+			else
+			{
+				$page_links[] = $text;
+			}
+		}
+
+		echo $before;
+		echo implode( $separator, $page_links );
+		echo $after;
 	}
 
 
@@ -2966,6 +3049,11 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.86  2006/08/29 00:26:11  fplanque
+ * Massive changes rolling in ItemList2.
+ * This is somehow the meat of version 2.0.
+ * This branch has gone officially unstable at this point! :>
+ *
  * Revision 1.85  2006/08/26 20:30:42  fplanque
  * made URL titles Google friendly
  *

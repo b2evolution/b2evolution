@@ -149,7 +149,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
 		<div class="bText">
 			<?php $Item->content(); ?>
-			<?php link_pages() ?>
+			<?php
+				// Links to post pages (for multipage posts):
+				$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
+			?>
 		</div>
 		<div class="bSmallPrint">
 			<?php $Item->feedback_link( 'comments', '', ' &bull; ' ) // Link to comments ?>
@@ -170,7 +173,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	</div>
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
 
-	<p class="center"><strong><?php posts_nav_link(); ?></strong></p>
+	<?php
+		// Links to list pages:
+		$MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
+   			'prev_text' => '&lt;&lt; '.T_('Previous'),
+   			'next_text' => T_('Next').' &gt;&gt;',
+			) );
+	?>
 
 	<?php
 		// -------------- START OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. --------------
@@ -191,7 +200,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<div class="bSideItem">
 		<h3><?php $Blog->disp( 'name', 'htmlbody' ) ?></h3>
 		<p><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></p>
-		<p class="center"><strong><?php posts_nav_link(); ?></strong></p>
+		<?php
+			// Links to list pages:
+			$MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
+   				'prev_text' => '&lt;&lt; '.T_('Previous'),
+   				'next_text' => T_('Next').' &gt;&gt;',
+				) );
+		?>
 		<!--?php next_post(); // activate this if you want a link to the next post in single page mode ?-->
 		<!--?php previous_post(); // activate this if you want a link to the previous post in single page mode ?-->
 		<ul>

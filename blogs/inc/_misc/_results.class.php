@@ -1844,7 +1844,7 @@ class Results extends Widget
 			}
 			else
 			{	// Display no move up arrow
-				$r = action_icon( T_( 'Sort by order' ), 'nomove_up', regenerate_url( 'action','action=sort_by_order' ) );
+				$r = action_icon( T_( 'Sort by order' ), 'nomove_up', regenerate_url( 'action', 'action=sort_by_order' ) );
 			}
 
 			if( $this->global_is_last )
@@ -1871,7 +1871,7 @@ class Results extends Widget
 	 */
 	function replace_callback( $matches )
 	{
-		//echo $matches[1];
+		// echo '['.$matches[1].']';
 		switch( $matches[1] )
 		{
 			case 'start' :
@@ -1894,19 +1894,19 @@ class Results extends Widget
 
 			case 'prev' :
 				//inits the link to previous page
-				return ( $this->page>1 )
+				return ( $this->page > 1 )
 					? '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.($this->page-1) ).'">'.$this->params['prev_text'].'</a>'
-					: $this->params['prev_text'];
+					: $this->params['no_prev_text'];
 
 			case 'next' :
 				//inits the link to next page
-				return ( $this->page<$this->total_pages )
+				return ( $this->page < $this->total_pages )
 					? '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.($this->page+1) ).'">  '.$this->params['next_text'].'</a>'
-					: $this->params['next_text'];
+					: $this->params['no_next_text'];
 
 			case 'list' :
 				//inits the page list
-				return $this->page_list($this->first(),$this->last());
+				return $this->page_list( $this->first(), $this->last() );
 
 			case 'scroll_list' :
 				//inits the scrolling list of pages
@@ -2180,6 +2180,11 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.28  2006/08/29 00:26:11  fplanque
+ * Massive changes rolling in ItemList2.
+ * This is somehow the meat of version 2.0.
+ * This branch has gone officially unstable at this point! :>
+ *
  * Revision 1.27  2006/08/20 22:25:22  fplanque
  * param_() refactoring part 2
  *

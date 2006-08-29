@@ -230,14 +230,14 @@ class Sessions extends Widget
 	 */
 	function replace_callback( $matches, $User = NULL )
 	{
-		if( isset($this->replace_params['User']) && substr($matches[1], 0, 5) == 'user_' )
+		if( isset($this->params['User']) && substr($matches[1], 0, 5) == 'user_' )
 		{ // user properties
 			$prop = substr($matches[1], 5);
 			if( $prop == 'msgformlink' )
 			{
-				return $this->replace_params['User']->get_msgform_link();
+				return $this->params['User']->get_msgform_link();
 			}
-			elseif( $prop = $this->replace_params['User']->get( $prop ) )
+			elseif( $prop = $this->params['User']->get( $prop ) )
 			{
 				return $prop;
 			}
@@ -257,6 +257,11 @@ class Sessions extends Widget
 
 /*
  * $Log$
+ * Revision 1.7  2006/08/29 00:26:11  fplanque
+ * Massive changes rolling in ItemList2.
+ * This is somehow the meat of version 2.0.
+ * This branch has gone officially unstable at this point! :>
+ *
  * Revision 1.6  2006/08/19 07:56:31  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

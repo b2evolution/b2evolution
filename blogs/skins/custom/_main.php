@@ -106,6 +106,12 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 
 <?php
+	// Links to list pages:
+	$MainList->page_links( '<p class="center">'.T_('Pages:').' <strong>', '</strong></p>' );
+?>
+
+
+<?php
 	// ------------------------------------ START OF POSTS ----------------------------------------
 	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
 	
@@ -155,10 +161,14 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
 		<div class="bText">
 			<?php $Item->content(); ?>
-			<?php link_pages() ?>
+			<?php
+				// Links to post pages (for multipage posts):
+				$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
+			?>
 		</div>
 		<div class="bSmallPrint">
-			<?php 	$Timer->pause( 'skin/_main.inc:mainarea:postcontents' );
+			<?php
+			$Timer->pause( 'skin/_main.inc:mainarea:postcontents' );
 
 			$Timer->resume( 'skin/_main.inc:mainarea:postfooters' );
 
@@ -193,7 +203,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 ?>
 
 <p class="center"><strong>
-	<?php posts_nav_link(); ?>
+	<?php
+		// Links to list pages:
+		$MainList->page_links( '<p class="center"><strong>', '</strong></p>' );
+	?>
 	<?php
 		// previous_post( '<p class="center">%</p>' );
 		// next_post( '<p class="center">%</p>' );
@@ -227,11 +240,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<div class="bSideItem">
 		<h3><?php $Blog->disp( 'name', 'htmlbody' ) ?></h3>
 		<p><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></p>
-		<p class="center"><strong><?php
-			posts_nav_link( ' | ',
-				/* TRANS: previous page (of posts) */ '< '.T_('Previous'),
-				/* TRANS: next page (of posts) */ T_('Next').' >' );
-			?></strong></p>
+		<?php
+			// Links to list pages:
+			$MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
+   				'prev_text' => '&lt;&lt; '.T_('Previous'),
+   				'next_text' => T_('Next').' &gt;&gt;',
+				) );
+		?>
 		<ul>
 			<!-- <li><a href="<?php $Blog->disp( 'staticurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(cached)') ?></span></li> -->
 			<li><a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <!-- <span class="dimmed"><?php echo T_('(no cache)') ?></span> --></li>

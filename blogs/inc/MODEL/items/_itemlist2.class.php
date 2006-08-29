@@ -92,6 +92,7 @@ class ItemList2 extends DataObjectList2
 	 * @param Blog
 	 * @param mixed Default filter set: Do not show posts before this timestamp, can be 'now'
 	 * @param mixed Default filter set: Do not show posts after this timestamp, can be 'now'
+	 * @param integer
 	 * @param string name of cache to be used
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param array restrictions for itemlist (position, contact, firm, ...) key: restriction name, value: ID of the restriction
@@ -100,6 +101,7 @@ class ItemList2 extends DataObjectList2
 			& $Blog,
 			$timestamp_min = NULL,       // Do not show posts before this timestamp
 			$timestamp_max = NULL,   		 // Do not show posts after this timestamp
+			$limit = 20,
 			$cache_name = 'ItemCache',	 // name of cache to be used
 			$param_prefix = '',
 			$filterset_name = '',				// Name to be used when saving the filterset (leave empty to use default for collection)
@@ -111,7 +113,7 @@ class ItemList2 extends DataObjectList2
 		// echo '<br />Instanciating ItemList2';
 
 		// Call parent constructor:
-		parent::DataObjectList2( get_Cache($cache_name), 20, $param_prefix, NULL );
+		parent::DataObjectList2( get_Cache($cache_name), $limit, $param_prefix, NULL );
 
 		// The SQL Query object:
 		$this->ItemQuery = & new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
@@ -294,42 +296,43 @@ class ItemList2 extends DataObjectList2
 	/**
 	 * Init filter params from Request params
 	 *
+	 * @param boolean do we want to use saved filters ?
 	 * @return boolean true if we could apply a filterset based on Request params (either explicit or reloaded)
 	 */
-	function load_from_Request()
+	function load_from_Request( $use_filters = true )
 	{
-	  /**
-	   * @var Request
-	   */
 
-
-
-		// Do we want to restore filters or do we want to create a new filterset
-		$filter_action = param( $this->param_prefix.'filter', 'string', 'save' );
-		// echo ' filter action: ['.$filter_action.'] ';
-		switch( $filter_action )
+		if( $use_filters )
 		{
-			case 'restore':
-				return $this->restore_filterset();
-				/* BREAK */
+			// Do we want to restore filters or do we want to create a new filterset
+			$filter_action = param( $this->param_prefix.'filter', 'string', 'save' );
+			// echo ' filter action: ['.$filter_action.'] ';
+			switch( $filter_action )
+			{
+				case 'restore':
+					return $this->restore_filterset();
+					/* BREAK */
 
-			case 'reset':
-				// We want to reset the memorized filterset:
-				global $Session;
-				$Session->delete( $this->filterset_name );
-				// We have applied no filterset:
-				return false;
-				/* BREAK */
+				case 'reset':
+					// We want to reset the memorized filterset:
+					global $Session;
+					$Session->delete( $this->filterset_name );
+					// We have applied no filterset:
+					return false;
+					/* BREAK */
+			}
+
+			/**
+			 * Filter preset
+			 */
+			$this->filters['filter_preset'] = param( $this->param_prefix.'filter_preset', 'string', $this->default_filters['filter_preset'], true );
+
+			// Activate preset default filters if necessary:
+			$this->activate_preset_filters();
 		}
 
 
-		/**
-		 * Filter preset
-		 */
-		$this->filters['filter_preset'] = param( $this->param_prefix.'filter_preset', 'string', $this->default_filters['filter_preset'], true );
-
-		// Activate preset default filters if necessary:
-		$this->activate_preset_filters();
+		// fp> TODO: param( 'loc', 'string', '', true );							// Locale of the posts (all by default)
 
 
 		/*
@@ -371,7 +374,7 @@ class ItemList2 extends DataObjectList2
 		 * Restrict by keywords
 		 */
 		$this->filters['keywords'] = param( $this->param_prefix.'s', 'string', $this->default_filters['keywords'], true );         // Search string
-		$this->filters['phrase'] = param( $this->param_prefix.'sentence', 'string', $this->default_filters['phrase'], true ); // Search for sentence or for words
+		$this->filters['phrase'] = param( $this->param_prefix.'sentence', 'string', $this->default_filters['phrase'], true ); 		// Search for sentence or for words
 		$this->filters['exact'] = param( $this->param_prefix.'exact', 'integer', $this->default_filters['exact'], true );        // Require exact match of title or contents
 
 
@@ -461,7 +464,7 @@ class ItemList2 extends DataObjectList2
 		//pre_dump( $this->default_filters );
 		//pre_dump( $this->filters );
 
-		if( $filter_action == 'save' )
+		if( $use_filters && $filter_action == 'save' )
 		{
 			$this->save_filterset();
 		}
@@ -1411,10 +1414,49 @@ class ItemList2 extends DataObjectList2
 			$this->last_displayed_date = $current_item_date;
 		}
 	}
+
+
+	/**
+	 * Template tag
+	 */
+	function page_links( $before = '#', $after = '#', $format = '#', $params = array(), $single = '' )
+	{
+		if( $this->total_pages <= 1 )
+		{	// Single page:
+			echo $single;
+			return;
+		}
+
+		if( $format == '#' )
+		{
+			$format = '$prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$';
+		}
+
+		// Use defaults + overrides:
+		$params = array_merge( array(
+				'prev_text' => '&lt;&lt;',
+				'next_text' => '&gt;&gt;',
+				'no_prev_text' => '',
+				'no_next_text' => '',
+				'list_prev_text' => '...',
+				'list_next_text' => '...',
+				'list_span' => 11,
+				'scroll_list_range' => 5,
+			), $params );
+
+		echo $before;
+		echo $this->replace_vars( $format, $params );
+		echo $after;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.20  2006/08/29 00:26:11  fplanque
+ * Massive changes rolling in ItemList2.
+ * This is somehow the meat of version 2.0.
+ * This branch has gone officially unstable at this point! :>
+ *
  * Revision 1.19  2006/08/20 22:25:21  fplanque
  * param_() refactoring part 2
  *

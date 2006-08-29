@@ -1156,6 +1156,11 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.41  2006/08/29 00:26:11  fplanque
+ * Massive changes rolling in ItemList2.
+ * This is somehow the meat of version 2.0.
+ * This branch has gone officially unstable at this point! :>
+ *
  * Revision 1.40  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *
@@ -1277,80 +1282,5 @@ class Comment extends DataObject
  * Renamed Item::getBlog() to Item::get_Blog()
  *
  * Revision 1.23  2006/01/26 23:08:35  blueyed
- * Plugins enhanced.
- *
- * Revision 1.22  2005/12/12 19:21:21  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.21  2005/12/11 19:59:51  blueyed
- * Renamed gen_permalink() to get_permalink()
- *
- * Revision 1.20  2005/11/04 21:42:22  blueyed
- * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
- *
- * Revision 1.19  2005/11/04 18:30:59  fplanque
- * no message
- *
- * Revision 1.18  2005/11/04 13:50:57  blueyed
- * Dataobject::set_param() / set(): return true if a value has been set and false if it did not change. It will not get considered for dbchange() then, too.
- *
- * Revision 1.17  2005/10/07 20:18:57  blueyed
- * Added TRANS comments
- *
- * Revision 1.16  2005/10/03 17:26:44  fplanque
- * synched upgrade with fresh DB;
- * renamed user_ID field
- *
- * Revision 1.15  2005/09/29 15:07:30  fplanque
- * spelling
- *
- * Revision 1.14  2005/09/06 17:13:54  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.13  2005/08/30 18:26:04  fplanque
- * comment spam issues
- *
- * Revision 1.12  2005/08/09 15:22:40  fplanque
- * no message
- *
- * Revision 1.11  2005/08/08 22:35:56  blueyed
- * DEbuglog for send_email_notifications(), whitespace/code layout.
- *
- * Revision 1.10  2005/05/25 18:31:01  fplanque
- * implemented email notifications for new posts
- *
- * Revision 1.9  2005/05/25 17:13:33  fplanque
- * implemented email notifications on new comments/trackbacks
- *
- * Revision 1.8  2005/04/28 20:44:20  fplanque
- * normalizing, doc
- *
- * Revision 1.7  2005/04/12 18:58:16  fplanque
- * use TS_() instead of T_() for JavaScript strings
- *
- * Revision 1.6  2005/04/07 17:55:50  fplanque
- * minor changes
- *
- * Revision 1.5  2005/03/06 16:30:40  blueyed
- * deprecated global table names.
- *
- * Revision 1.4  2005/02/28 09:06:32  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.3  2004/12/09 21:21:19  fplanque
- * introduced foreign key support
- *
- * Revision 1.2  2004/10/14 18:31:25  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.33  2004/10/11 19:13:14  fplanque
- * Edited code documentation.
- *
- * Revision 1.32  2004/10/11 19:02:04  fplanque
- * Edited code documentation.
- *
- */
+ * Plugins enhanced. */
 ?>

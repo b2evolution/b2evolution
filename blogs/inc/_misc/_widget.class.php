@@ -88,13 +88,17 @@ class Widget
 	 * <code>$vars "Display if empty"$</code>
 	 *
 	 * @param string template
-	 * @param array optional params that are put into {@link $this->replace_params}
+	 * @param array optional params that are put into {@link $this->params}
 	 *              to be accessible by derived replace_callback() methods
 	 * @return string The substituted string
 	 */
-	function replace_vars( $template, $replace_params = NULL )
+	function replace_vars( $template, $params = NULL )
 	{
-		$this->replace_params = & $replace_params;
+		if( !is_null( $params ) )
+		{
+			$this->params = $params;
+		}
+
 		return preg_replace_callback(
 			'~\$([a-z_]+)(?:\s+"([^"]*)")?\$~', # pattern
 			array( $this, 'replace_callback_wrapper' ), # callback
@@ -113,11 +117,17 @@ class Widget
 	 */
 	function replace_callback_wrapper( $match )
 	{
+		// Replace the variable with its content (which will be computed on the fly)
 		$r = $this->replace_callback( $match );
 
-		if( empty($r) && !empty($match[2]) )
-		{
-			return $match[2]; // "display if empty"
+		if( empty($r) )
+		{	// Empty result
+			if( !empty($match[2]) )
+			{
+				return $match[2]; // "display if empty"
+			}
+
+			// return $match[1];
 		}
 		return $r;
 	}

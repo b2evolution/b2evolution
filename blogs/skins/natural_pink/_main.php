@@ -85,7 +85,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
 		<div class="bText">
 			<?php $Item->content(); ?>
-			<?php link_pages() ?>
+			<?php
+				// Links to post pages (for multipage posts):
+				$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
+			?>
 		</div>
 		<div class="bSmallPrint">
 			<?php $Item->permanent_link(); ?>
@@ -113,7 +116,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
 
 	<p class="center"><strong>
-		<?php posts_nav_link(); ?>
+		<?php
+			// Links to list pages:
+			$MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
+   				'prev_text' => '&lt;&lt; '.T_('Previous'),
+   				'next_text' => T_('Next').' &gt;&gt;',
+				) );
+		?>
 		<?php
 			// previous_post( '<p class="center">%</p>' );
 			// next_post( '<p class="center">%</p>' );
