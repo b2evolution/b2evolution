@@ -1,0 +1,68 @@
+/**
+ * Image styles
+ */
+
+img {
+	border:none;
+}
+
+img.top {
+	vertical-align:top;
+}
+
+input.middle, /* for image types */
+img.middle {
+	vertical-align:middle;
+}
+
+img.leftmargin {
+	float:left;
+	margin-right:1ex;
+	margin-top:.2ex;
+	margin-bottom:.2ex;
+}
+
+img.rightmargin {
+	float:right;
+	margin-left:1ex;
+	margin-top:.2ex;
+	margin-bottom:.2ex;
+}
+
+img.flag {
+	vertical-align:middle;
+	border:1px solid #000;
+}
+
+div.single_image_zone {
+	overflow: hidden;
+}
+
+div.multi_image_zone {
+	overflow: hidden;
+	background-color: #eee;
+	border: 1px solid #ccc;
+}
+
+div.image_block {
+	/* WARNING: this will screw out backoffice layout (fulltext edit screen) in firefox! 
+		overflow: hidden; */
+	text-align: center;
+}
+
+/* We only float image_blocks when in multiple image zone */
+div.multi_image_zone div.image_block 
+{	
+	margin: 1ex;
+	float: left;
+}
+
+div.image_block img {
+	margin: 1ex;
+}
+
+div.image_legend {
+	font-size: 84%;
+	color: #aaa;
+	margin: 1ex;
+}

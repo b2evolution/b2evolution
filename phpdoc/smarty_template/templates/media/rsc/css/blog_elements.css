@@ -1,0 +1,128 @@
+/**
+ * Default Blog elements styles
+ * Feel free to override all these styles in your own skins
+ */
+
+.bMore {
+	text-align: center;
+}
+.bMore a {
+	font-weight: bold;
+	font-size: 110%;
+}
+
+.FigZone {
+	text-align: center;
+	margin: 8px;
+}
+.FigCent240 {
+	width: 240px;
+	color: #fff;
+	background-color: #000;
+	padding: 12px;
+	margin: 0ex auto;
+	border: 1px solid #fff;
+	text-align: center;
+}
+.FigCent320 {
+	width: 320px;
+	color: #fff;
+	background-color: #000;
+	padding: 12px;
+	margin: 0ex auto;
+	border: 1px solid #fff;
+	text-align: center;
+}
+.FigZone img {
+	border: none;
+	margin-bottom: 8px;
+	text-align: center;
+}
+.FigZone a {
+	color: #fff;
+	text-decoration: none;
+}
+.FigZone a:link {
+	color: #fff;
+}
+.FigZone a:visited {
+	color: #fff;
+}
+.FigZone a:active {
+	color: #fff;
+}
+
+a.permalink_right,
+span.bIcons
+{
+	float: right;
+	border: 0px;
+	margin: 0 0 0 1em;
+}
+
+span.NonExistentWikiWord {
+	border-bottom: 1px dotted #ccc;
+}
+
+div.codeblock {
+	background-color: #eee;
+	border: 1px dotted #aaa;
+	margin: 1ex;
+	padding: 1ex;
+	width: 90%;
+	overflow: auto;
+}
+
+div.codeblock pre {
+	margin: 0;
+}
+
+/* Calendar: */
+table.bCalendarTable caption.bCalendarCaption {
+	font-size: 105%;
+	font-weight: bold;
+	margin: auto;
+	padding: 3px 0;
+	white-space: nowrap;
+}
+table.bCalendarTable {
+	margin: 0 auto 1em auto;
+	font-size: 77%;
+	border-collapse: separate;
+	border-spacing: 0px;
+}
+tr.bCalendarRow {
+	text-align: center;
+}
+th.bCalendarHeaderCell {
+	color: #999;
+	font-size: 84%;
+	width: 4ex;
+}
+td.bCalendarCell,
+td.bCalendarLinkPost,
+td.bCalendarEmptyCell {
+	width: 4ex;
+	padding: 2px 0;
+}
+.bCalendarLinkPost {
+	font-weight: bold;
+}
+/* TODO: not very unique IDs! (prev/next) - used in Calendar at least*/
+td#prev,
+td#next {
+	font-weight: bold;
+	font-size: 105%;
+	padding: .5ex;
+	white-space: nowrap;
+}
+td#prev a,
+td#next a {
+	padding: .5ex;
+}
+td#prev {
+	text-align:left;
+}
+td#next {
+	text-align:right;
+}

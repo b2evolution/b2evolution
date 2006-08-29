@@ -1,0 +1,503 @@
+/*
+ * This is the layout for b2evolution.net
+ * Copyright (c) 2006 bt Francois PLANQUE.
+ */
+
+@import url(basic.css);	/* Import basic styles */
+@import url(img.css);	/* Import standard image styles */
+@import url(blog_elements.css);	/* Import standard blog elements styles */
+@import url(forms.css);	
+
+/*
+ * ------------------------------------ General styles ------------------------------------
+ */
+body {
+	background: #fff;
+	color: #000;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 84%;
+	margin: 0;
+	padding: 0;
+}
+
+/* Link styles */
+a {
+	color: #369;
+}
+a:hover {
+	color: #f90;
+}
+
+/* 
+ * ------------------------------------ Global page layout ------------------------------------
+ */
+div#body_header {
+	text-align: center;
+}
+
+div#body_main {
+	clear: both;
+	width: 73em;
+	margin: 0 auto;
+}
+
+div#body_footer {
+	margin-top: 1em;
+	border-top: 1px solid #ccc;
+	text-align: center;
+	font-size: 84%;
+	color: #999;
+}
+
+
+/* 
+ * ------------------------------------ For the page/body header: ------------------------------------
+ */
+div.shade {
+	background: url(../img/bg_grey.gif) repeat-x bottom;
+}
+ 
+h1#header_logo {
+	position:relative;
+	top: 6px;
+	color: #f90;
+	margin: 0;
+	padding: 0;
+}
+h2#tagline {
+	font-size:100%;
+	position: relative;
+	bottom: 10px;
+	width: 456px;	/* same as logo minus whitespace*/
+	margin: 0 auto;
+	font-weight: normal;
+	text-align: right;
+}
+
+/* Main tabs: */
+table.main_menu {
+	margin: 0 auto;
+	position: relative;
+	/* bottom: 10px; */
+}
+table.main_menu td {
+	background:url(../img/tabs_left_grey.gif) no-repeat left top;
+	padding:0 0 0 9px;
+	border:0;
+	border-bottom:1px solid #949494;
+}
+table.main_menu td a {
+	display: block;
+	background: url(../img/tabs_right_grey.gif) no-repeat right top;
+	white-space:nowrap;
+	padding:4px 11px 3px 2px;
+	text-decoration:none;
+	color:#666;
+}
+table.main_menu td.current {
+	background-position:0% -150px;
+	border-width:0;
+	font-weight: bold;
+}
+table.main_menu td.current a {
+	background-position:100% -150px;
+	padding-bottom:4px;
+	color: #000;
+}
+table.main_menu td a:hover,
+table.main_menu td a:active {
+	text-decoration: underline;		/* for IE */
+	color: #f90;
+}
+table.main_menu td:hover {			/* Won't work in IE */
+	background-position:0% -150px;
+}
+table.main_menu td:hover a {			/* Won't work in IE */
+	background-position:100% -150px;
+}
+
+/*
+ * submenu
+ */
+.sub_menu {
+	margin: 4px auto 0;
+	font-weight: bold;
+}
+.sub_menu a {
+	text-decoration: none;
+	font-weight: normal;
+}
+.sub_menu a:hover {
+	text-decoration: underline;
+}
+.sub_menu a.current {
+	color: #f90;
+	font-weight: bold;
+}
+
+
+/* 
+ * ------------------------------------ For the page/body footer: ------------------------------------
+ */
+div#body_footer p {
+	margin: 1ex;
+}
+
+/* 
+ * ------------------------------------ For the page/body main area: ------------------------------------
+ */
+div#col_left {
+	float:left;
+	width: 15em;
+	overflow:hidden;		/* In IE6, hidden only works when a width is specified */	
+	border-top: 1px solid #fff;	/* Without this, Firefox 1.5 would not correcly align the floats... */
+}
+
+div#col_right {
+	float:right;
+	width: 15em;
+	overflow:hidden;		/* In IE6, hidden only works when a width is specified */	
+	border-top: 1px solid #fff;	/* Without this, Firefox 1.5 would not correcly align the floats... */
+}
+
+div#col_middle {
+	margin: 0 16em;
+	border-top: 1px solid #fff;	/* Without this, Firefox 1.5 would not correcly align the floats... */
+}
+
+div#body_main_footer {
+	clear: both;
+}
+
+
+
+/* 
+ * ------------------------------------ Decorated blocks: ------------------------------------
+ */
+div.decorated {
+	overflow:hidden;
+	padding: 1em 0 0 0;	/* In IE6 we MUST NOT have a bottom margin; it would fail for the left/right cols vs body_footer */
+	/* dh> using padding instead of margin, to prevent hasLayout-margin-collapsing in IE: see http://www.brunildo.org/test/IEMarginCollapseLayout.html */
+}
+
+
+/* Give hasLayout property for IE6 */
+/* \*/
+* html div.decorated { height: 1%; }
+/* */
+
+
+/* Decorated titles: */
+/* title text: */
+div.decorated h1 {
+	margin: 0;
+	padding: 2px 1ex 3px;
+	font-size: 125%;
+	color: #fff;
+}
+div.decorated h2 {
+	margin: 0;
+	padding: 2px 1ex 3px;
+	font-size: 100%;
+	color: #fff;
+}
+/* title links: */
+div.decorated h1 a,
+div.decorated h2 a {
+	color: #fff;
+	text-decoration: none;
+}
+div.decorated h1 a:hover,
+div.decorated h2 a:hover {
+	color: #fff;
+	text-decoration: underline;
+}
+/* upper left rounded corner; */
+h1.uplf_rnd_title,
+h2.uplf_rnd_title,
+div.top_rnd_title {
+	background-color: #f90;
+	background-image: url(../corners/ora_whi_7pf_uplf.gif);
+	background-position: left top;
+	background-repeat: no-repeat;
+}
+/* upper right rounded corner: */
+div.top_rnd_title h1,
+div.top_rnd_title h2 {
+	background-image: url(../corners/ora_whi_7pf_uprg.gif);
+	background-position: right top;
+	background-repeat: no-repeat;
+}
+
+
+/* Decorated block bodies/payloads: */
+/* no bottom corners */
+div.decorated div.filled {
+	background-color: #e8e8e8;
+}
+div.decorated div.squared {
+	border: 1px solid #f90;
+	border-top-style: none;
+}
+/* bottom right rounded */
+div.left_border {
+	border-left: 1px solid #f90;
+}
+
+/* background borders: */
+div.left_bgborder {
+	background-image: url(../corners/ora_1p_ver.gif);
+	background-repeat: repeat-y;
+	background-position: left;
+}
+div.bt_bgborder {
+	background-image: url(../corners/ora_1p_hor.gif);
+	background-repeat: repeat-x;
+	background-position: bottom;
+}
+div.right_bgborder {
+	background-image: url(../corners/ora_1p_ver.gif);
+	background-repeat: repeat-y;
+	background-position: right;
+}
+
+/* We need to put a pixel here in order for IE to accept padding/mpargin of included div */
+div.bt_bgborder img.ie_fix {
+	padding: 0 7px;	/* make sure we don't overlay on corner */
+}
+
+/* bottom rounded corners: */
+div.btrg_rnd_payload {
+	background-color: #e8e8e8;
+	background-image: url(../corners/gry_whi_7pf_btrg.gif);
+	background-repeat: no-repeat;
+	background-position: right bottom;
+}
+div.btlf_rnd_payload {
+	background-image: url(../corners/gry_whi_7pf_btlf.gif);
+	background-repeat: no-repeat;
+	background-position: left bottom;
+}
+div.btrg_corner {
+	background-image: url(../corners/ora_whi_7pw_btrg.gif);
+	background-repeat: no-repeat;
+	background-position: right bottom;
+}
+div.btlf_corner {
+	background-image: url(../corners/ora_whi_7pw_btlf.gif);
+	background-repeat: no-repeat;
+	background-position: left bottom;
+}
+
+/* payload text: */
+div.decorated div.payload {
+	margin: 0 1ex;
+	padding: 1ex 0;
+}
+/* */
+div.decorated div.full_payload {
+	margin: 0;
+	padding: 1ex 0;
+}
+div.decorated div.full_payload p {
+	margin: 1ex;
+}
+/* payload including paragraphs: */
+div.decorated div.para_payload {
+	margin: 0 1ex;
+	padding: 1px 0;	/* minimum 1px vertical padding for IE */
+}
+div.decorated div.para_payload p {
+	margin: 1ex 0;
+}
+
+/* payload links: */
+div.btrg_rnd_payload a {
+	text-decoration: none;
+}
+div.btrg_rnd_payload a:hover {
+	text-decoration: underline;
+}
+/*
+ * Payload contents:
+ */
+div.decorated ul {
+	list-style-type: square;
+	margin: 1ex;
+	padding: 0;
+}
+div.decorated li {
+	margin: 0 0 .5ex 1ex;
+	padding: 0;
+}
+
+div.decorated ul.recent_blog_list {
+	list-style-type:none;
+	margin: 0;
+	padding: 0;
+	width: 14em;
+	overflow:hidden;
+	white-space: nowrap;
+	/* word-wrap: break-word;		/* IE only: breaks long words */
+}
+
+
+div.para_payload h2 {
+	font-size: 117%;
+	margin: 2ex 0 1ex 0;
+	padding: 0 0 3px 0;
+	color: #f90;
+	border-bottom: 2px dotted #f90;
+}
+
+h3, h4 {
+	font-size: 110%;
+	padding-bottom: 3px;
+	color: #f90;
+	border-bottom: 2px dotted #f90;
+}
+
+
+/* 
+ * tables 
+ */
+table.grey
+{
+	border: 1px solid #aaa;
+	margin: 0 auto;
+}
+table.grey tr
+{
+	text-align:center;
+	background-color:#eee;
+}
+table.grey tr.odd
+{
+	background-color:#ddd;
+}
+table.grey td
+{
+	padding: .2ex 1ex;
+}
+table.grey th
+{
+	border-bottom: 1px solid #aaa;
+	background-color: #ccc;
+	padding: .2ex 1ex;
+}
+table.grey td.left
+{
+	text-align: left;
+}
+table.grey td.right
+{
+	text-align: right;
+}
+
+table.spaced td
+{
+	padding: 1ex;
+}
+
+
+/*
+ * News blog:
+ */
+.bSmallHead,
+.bSmallPrint,
+.bCommentSmallPrint {
+	color: #999;
+	font-size: 84%;
+}
+
+div.moderation_msg
+{
+	border: 1px solid #fa9;
+	background: #e8e8e8;
+	margin: 1em 0 1em 3em;
+	padding: 0 1ex;
+	color: #f70;
+}
+div.bComment {
+	overflow: hidden;
+	margin: 1em 0 1em 3em;
+	padding: 1ex;
+	background-color: #e8e8e8;
+}
+div.bCommentTitle {
+	font-weight: bold;
+}
+div.bCommentText {
+	margin: 1ex 0;
+}
+
+
+/* Styles for comment form */
+input.bComment, 
+textarea.bComment
+{
+	border: 1px solid #000;
+	width: 95%;
+	margin: 0ex;
+	padding: 1px;
+}
+
+
+#SearchForm {
+}
+.SearchField {
+	width: 98%;
+	border: 1px solid #000;
+}
+.SearchSubmit {
+	margin-top: 1ex;
+}
+
+
+
+/* 
+ * Recommended hosts
+ */
+div.rec_hosts_desc {
+	font-size: 84%;
+	color: #999;
+}
+div.rec_hosts_desc ul {
+	margin: 0 1ex 1ex 3ex;
+}
+div.rec_hosts_desc li {
+	margin: 0 0 0 1ex;
+}
+
+
+/*
+ * Paypal
+ */
+#PayPalTopLeft {
+	float:right;
+	margin: 2px;
+}
+
+table.rec_host {
+	background-color: #eee;
+	margin: 1ex 0;
+}
+td.host_pic {
+	width: 140px;
+	vertical-align: top;
+	padding: 1ex 0;
+	color: #999;
+	font-size: 84%;
+	text-align:right;
+}
+td.host_msg {
+	vertical-align: top;
+	padding: 1ex 1ex 1ex 1em;
+}
+
+.rec_host h3,
+.rec_host h4 {
+	color: #000;
+	border: none;
+	margin: 0 0 1ex 0;
+}
