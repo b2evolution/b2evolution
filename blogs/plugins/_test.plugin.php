@@ -192,7 +192,7 @@ class test_plugin extends Plugin
 	{
 		if( $params['ctrl'] == 'test_job' )
 		{
-			return array( 'code' => 0, 'message' => 'Test successful.' );
+			return array( 'code' => 1, 'message' => 'Test successful.' );
 		}
 	}
 
@@ -622,6 +622,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.51  2006/08/29 16:44:47  blueyed
+ * Logical fix for cron job return value.
+ *
  * Revision 1.50  2006/08/28 20:16:30  blueyed
  * Added GetCronJobs/ExecCronJob Plugin hooks.
  *
