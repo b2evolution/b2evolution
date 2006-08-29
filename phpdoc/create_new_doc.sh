@@ -24,7 +24,7 @@ cd `dirname $0`
 
 # Generate documentation
 $PHPDOC --title 'b2evolution Technical Documentation (CVS HEAD)' \
---directory `dirname $0`/.. \
+--directory .. \
 --target build/ \
 --output HTML:Smarty:b2evo \
 --ignore _idna_convert_npdata.ser.inc,Connections/,CVS/,gettext/,simpletest/,Templates/,img/,locales/,rsc/,media/,tests/,doc/,extras/,skins/babyblues/,skins/guadeloupe/,skins/wpc_aubmach/,*.gif,*.jpg,*.png,*.css,*.po*,*.mo*,*.bak,*.html,*.sql,*.xml,*.bpd,*.mpd,*.log,*.htaccess,*_TEST.php \
