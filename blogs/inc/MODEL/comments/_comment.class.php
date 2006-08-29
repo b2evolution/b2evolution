@@ -791,7 +791,7 @@ class Comment extends DataObject
 	/**
 	 * Returns a permalink link to the Comment
 	 *
-	 * Note: If you only want to permalink URL, use Comment::get_permanent_url()
+	 * Note: If you only want the permalink URL, use Comment::get_permanent_url()
 	 *
 	 * @param string link text or special value: '#', '#icon#', '#text#'
 	 * @param string link title
@@ -832,7 +832,7 @@ class Comment extends DataObject
 	/**
 	 * Displays a permalink link to the Comment
 	 *
-	 * Note: If you only want to permalink URL, use Comment::permanent_url()
+	 * Note: If you only want the permalink URL, use Comment::permanent_url()
 	 *
 	 * @param string link text
 	 * @param string link title
@@ -935,9 +935,9 @@ class Comment extends DataObject
 	 * Send email notifications to subscribed users:
 	 *
 	 * @todo shall we notify suscribers of blog were this is in extra-cat?
-	 * @todo cache message by locale
-	 * @todo Indicator in url to see where the user came from (&from=subnote ["subscription notification") - Problem: too long urls.
-	 * @todo "Beautify" like Item::send_email_notifications() ?
+	 * @todo cache message by locale like {@link Item::send_email_notifications()}
+	 * @todo Indicator in url to see where the user came from (&from=subnote ["subscription notification"]) - Problem: too long urls.
+	 * @todo "Beautify" like {@link Item::send_email_notifications()} ?
 	 * @todo Should include "visibility status" in the mail to the Item's Author
 	 */
 	function send_email_notifications()
@@ -1156,6 +1156,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.42  2006/08/29 18:36:17  blueyed
+ * doc
+ *
  * Revision 1.41  2006/08/29 00:26:11  fplanque
  * Massive changes rolling in ItemList2.
  * This is somehow the meat of version 2.0.
