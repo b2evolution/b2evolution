@@ -25,10 +25,13 @@ if( $is_cli )
 		$argv = $_SERVER['argv'];
 	}
 
+/*
+ * fp> CLI suffers from shitty compilation on many servers, so the admin might want to run the CGI version instead. It will spit out dirty HTML errors, but at the end of the day, it will do a better job.
 	if( ! isset($argv) )
 	{
 		debug_die( 'Assertion failed: $is_cli is true, but does not seem to be CLI.' );
 	}
+*/
 
 	foreach( array_slice($argv, 1) as $v )
 	{

@@ -36,6 +36,9 @@ $AdminUI->set_path( 'cron' );
 
 param( 'action', 'string', 'list' );
 
+// fp> The if  below was the point where THE LINE WAS CROSSED!
+// This is bloated here. This has to go into the action handling block (and maybe a function)
+// THIS IS NO LONGER CONTROLLER INITIALIZATION. THIS IS ACTION EXECUTION!
 if( $action == 'new' || $action == 'create' )
 {
 	// NOTE: keys starting with "plugin_" are reserved for jobs provided by Plugins
