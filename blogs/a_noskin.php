@@ -288,7 +288,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 				<li><a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>">RSS 2.0 (Userland)</a></li>
 				<li><a href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>">Atom 0.3</a></li>
 			</ul>
-			<a href="http://fplanque.net/Blog/itTrends/2004/01/10/rss_rdf_and_atom_in_a_nutshell" title="External - English">What is RSS?</a>
+			<a href="http://webreference.fr/2006/08/30/rss_atom_xml" title="External - English">What is RSS?</a>
 
 	</div>
 

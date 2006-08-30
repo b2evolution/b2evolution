@@ -264,7 +264,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 				</li>
 			</ul>
 
-		<a href="http://fplanque.net/Blog/itTrends/2004/01/10/rss_rdf_and_atom_in_a_nutshell" title="External - English">What is this?</a>
+		<a href="http://webreference.fr/2006/08/30/rss_atom_xml" title="External - English">What is this?</a>
 
 </div>
 
