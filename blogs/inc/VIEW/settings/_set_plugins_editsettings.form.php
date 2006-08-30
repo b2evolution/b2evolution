@@ -54,6 +54,8 @@ $Form->hidden_ctrl();
 
 
 // Help icons, if available:
+$Form->global_icon( T_('Homepage of the plugin'), 'www', $edit_Plugin->get_help_url().'#Settings', '', 3, 2, array('target'=>'_blank') );
+
 if( $edit_Plugin->get_help_file() )
 { // README in JS popup:
 	$Form->global_icon( T_('Local documentation of the plugin'), 'help',
@@ -174,6 +176,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.19  2006/08/30 17:45:28  blueyed
+ * Fixed "$help_url"/www Plugin help popups (use target _blank instead); Added "$help_url"/www help Plugin to plugin settings (linking to #Settings)
+ *
  * Revision 1.18  2006/08/07 18:10:32  fplanque
  * removed bloated action icons (no reason to come to this pace to perform these actions)
  *

@@ -2499,11 +2499,11 @@ class Plugin
 		$title = '';
 		$icon = 'help';
 		$word = '';
-		$link_attribs = array( 'use_js_popup'=>true, 'use_js_size' => '', 'id'=>'anchor_help_plugin_'.$this->ID.'_'.$target_counter++ );
+		$link_attribs = array( 'target' => '_blank', 'id'=>'anchor_help_plugin_'.$this->ID.'_'.$target_counter++ );
 
 		if( $target == '$help_url' || empty($target) )
 		{
-			$url = ! empty( $this->help_url ) ? $this->help_url : 'http://manual.b2evolution.net/Plugins/'.$this->classname;
+			$url = $this->get_help_url();
 			$title = T_('Homepage of the plugin');
 			$icon = 'www';
 		}
@@ -2516,6 +2516,7 @@ class Plugin
 
 			global $admin_url;
 
+			$link_attribs['use_js_popup'] = true;
 			$link_attribs['use_js_size'] = '500, 400';
 			$title = T_('Local documentation of the plugin');
 			$url = url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_ID='.$this->ID );
@@ -2536,6 +2537,24 @@ class Plugin
 		}
 
 		return action_icon( $title, $icon, $url, $word, 4, 1, $link_attribs );
+	}
+
+
+	/**
+	 * Get the plugin's external help/website URL.
+	 *
+	 * @return string
+	 */
+	function get_help_url()
+	{
+		if( empty( $this->help_url ) )
+		{
+			return 'http://manual.b2evolution.net/Plugins/'.$this->classname;
+		}
+		else
+		{
+			return $this->help_url;
+		}
 	}
 
 
@@ -2618,6 +2637,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.87  2006/08/30 17:45:28  blueyed
+ * Fixed "$help_url"/www Plugin help popups (use target _blank instead); Added "$help_url"/www help Plugin to plugin settings (linking to #Settings)
+ *
  * Revision 1.86  2006/08/28 20:16:29  blueyed
  * Added GetCronJobs/ExecCronJob Plugin hooks.
  *
