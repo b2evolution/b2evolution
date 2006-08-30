@@ -25,38 +25,33 @@ if( $is_cli )
 		$argv = $_SERVER['argv'];
 	}
 
-/*
- * fp> CLI suffers from shitty compilation on many servers, so the admin might want to run the CGI version instead. It will spit out dirty HTML errors, but at the end of the day, it will do a better job.
-	if( ! isset($argv) )
-	{
-		debug_die( 'Assertion failed: $is_cli is true, but does not seem to be CLI.' );
-	}
-*/
-
-	foreach( array_slice($argv, 1) as $v )
-	{
-		switch( $v )
+	if( isset($argv) )
+	{ // may not be set for CGI
+		foreach( array_slice($argv, 1) as $v )
 		{
-			case '-h':
-			case '--help':
-				// display help:
-				echo $argv[0]." - Execute cron jobs for b2evolution\n";
-				echo "\n";
-				echo "Options:\n";
-				echo " -q --quiet: Be quiet (do not output a message, if there are no jobs).\n";
-				echo "             This is especially useful, when running as a cron job.\n";
-				exit(0);
-				break;
+			switch( $v )
+			{
+				case '-h':
+				case '--help':
+					// display help:
+					echo $argv[0]." - Execute cron jobs for b2evolution\n";
+					echo "\n";
+					echo "Options:\n";
+					echo " -q --quiet: Be quiet (do not output a message, if there are no jobs).\n";
+					echo "             This is especially useful, when running as a cron job.\n";
+					exit(0);
+					break;
 
-			case '-q':
-			case '--quiet':
-				// increase quietness:
-				$quiet++;
-				break;
+				case '-q':
+				case '--quiet':
+					// increase quietness:
+					$quiet++;
+					break;
 
-			default:
-				echo 'Invalid option "'.$v.'". Use "-h" or "--help" for a list of options.'."\n";
-				exit(1);
+				default:
+					echo 'Invalid option "'.$v.'". Use "-h" or "--help" for a list of options.'."\n";
+					exit(1);
+			}
 		}
 	}
 }
