@@ -242,9 +242,13 @@ switch ( $Settings->get('eblog_method') )
 			echo "<p><strong>Content-type:</strong> $content_type, <strong>boundary:</strong> $boundary</p>\n";
 			echo '<p><strong>', T_('Raw content:'), '</strong><br /><xmp>', $content, '</xmp></p>';
 
-			$btpos = strpos( $content, $Settings->get('eblog_body_terminator') );
-			if ($btpos) {
-				$content = substr($content, 0, $btpos);
+			$eblog_body_terminator = $Settings->get('eblog_body_terminator');
+			if( ! empty($eblog_body_terminator) )
+			{
+				$btpos = strpos( $content, $eblog_body_terminator );
+				if ($btpos) {
+					$content = substr($content, 0, $btpos);
+				}
 			}
 			$content = trim($content);
 
