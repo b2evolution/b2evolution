@@ -6,6 +6,9 @@
 <IfModule mod_php4.c>
 	php_flag register_globals off
 </IfModule>
+<IfModule mod_php5.c>
+	php_flag register_globals off
+</IfModule>
 
 
 # CLEAN URLS:
@@ -26,6 +29,8 @@
 # using index.php as a stub but not showing it.
 # This will add support for URLs like:  http://example.com/2006/08/29/post-title
 # Redirect anything that's not an existing directory or file to index.php
+#
+# RewriteEngine On
 # RewriteCond %{REQUEST_FILENAME} !-d
 # RewriteCond %{REQUEST_FILENAME} !-f
 # RewriteRule ^  index.php
