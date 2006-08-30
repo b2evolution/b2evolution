@@ -42,6 +42,7 @@ require_once dirname(__FILE__).'/_item.funcs.php';
  *
  * This SECOND implementation will deprecate the first one when finished.
  *
+ * @todo Either implement mod_date() or change where it gets used (e.g. /skins/_atom/_main.php)
  * @package evocore
  */
 class ItemList2 extends DataObjectList2
@@ -71,14 +72,14 @@ class ItemList2 extends DataObjectList2
 	 */
 	var $last_displayed_date = '';
 
-  /**
-   * Lazy filled
-   * @access private
-   */
-  var $advertised_start_date;
-  var $advertised_stop_date;
 	/**
- 	 * Anti infinite loops:
+	 * Lazy filled
+	 * @access private
+	 */
+	var $advertised_start_date;
+	var $advertised_stop_date;
+	/**
+	 * Anti infinite loops:
 	 */
 	var $getting_adv_start_date = false;
 	var $getting_adv_stop_date = false;
@@ -137,26 +138,26 @@ class ItemList2 extends DataObjectList2
 		$this->set_default_filters( array(
 				'filter_preset' => NULL,
 				'ts_min' => $timestamp_min,
-        'ts_max' => $timestamp_max,
-        'cat_array' => array(),
-        'cat_modifier' => NULL,
+				'ts_max' => $timestamp_max,
+				'cat_array' => array(),
+				'cat_modifier' => NULL,
 				'authors' => NULL,
 				'assignees' => NULL,
 				'author_assignee' => NULL,
 				'keywords' => NULL,
-        'phrase' => 'AND',
-        'exact' => 0,
-        'post_ID' => NULL,
-        'post_title' => NULL,
-        'ymdhms' => NULL,
-        'week' => NULL,
-        'ymdhms_min' => NULL,
-        'ymdhms_max' => NULL,
-        'statuses' => NULL,
+				'phrase' => 'AND',
+				'exact' => 0,
+				'post_ID' => NULL,
+				'post_title' => NULL,
+				'ymdhms' => NULL,
+				'week' => NULL,
+				'ymdhms_min' => NULL,
+				'ymdhms_max' => NULL,
+				'statuses' => NULL,
 				'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated' ),
 				'order' => 'DESC',
-        'orderby' => 'datestart',
-        'unit' => $Settings->get('what_to_show'),
+				'orderby' => 'datestart',
+				'unit' => $Settings->get('what_to_show'),
 				'posts' => $this->limit,
 				'page' => 1,
 				'item_type' => NULL,
@@ -186,11 +187,6 @@ class ItemList2 extends DataObjectList2
 	 */
 	function set_filters( $filters )
 	{
-	  /**
-	   * @var Request
-	   */
-
-
 		// Activate the filterset (fallback to default filter when a value is not set):
 		$this->filters = array_merge( $this->default_filters, $filters );
 
@@ -209,7 +205,7 @@ class ItemList2 extends DataObjectList2
 		 * Blog & Chapters/categories restrictions:
 		 */
 		// Get chapters/categories (and compile those values right away)
- 		memorize_param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', $this->default_filters['cat_modifier'], $this->filters['cat_modifier'] );  // List of authors to restrict to
+		memorize_param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', $this->default_filters['cat_modifier'], $this->filters['cat_modifier'] );  // List of authors to restrict to
 		memorize_param( 'catsel', 'array', $this->default_filters['cat_array'], $this->filters['cat_array'] );
 		// TEMP until we get this straight:
 		global $cat_array, $cat_modifier;
@@ -262,11 +258,11 @@ class ItemList2 extends DataObjectList2
 		if( is_null($this->default_filters['ts_min'])
 			&& is_null($this->default_filters['ts_max'] ) )
 		{	// We have not set a strict default -> we allow overridding:
-    	memorize_param( $this->param_prefix.'show_past', 'integer', 0, ($this->filters['ts_min'] == 'now') ? 0 : 1 );
+			memorize_param( $this->param_prefix.'show_past', 'integer', 0, ($this->filters['ts_min'] == 'now') ? 0 : 1 );
 			memorize_param( $this->param_prefix.'show_future', 'integer', 0, ($this->filters['ts_max'] == 'now') ? 0 : 1 );
 		}
 
-    /*
+		/*
 		 * Restrict to the statuses we want to show:
 		 */
 		// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
@@ -281,7 +277,7 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * Paging limits:
 		 */
- 		memorize_param( $this->param_prefix.'unit', 'string', $this->default_filters['unit'], $this->filters['unit'] );    		// list unit: 'posts' or 'days'
+		memorize_param( $this->param_prefix.'unit', 'string', $this->default_filters['unit'], $this->filters['unit'] );    		// list unit: 'posts' or 'days'
 		$this->unit = $this->filters['unit'];	// TEMPORARY
 
 		memorize_param( $this->param_prefix.'posts', 'integer', $this->default_filters['posts'], $this->filters['posts'] ); 			// # of units to display on the page
@@ -381,7 +377,7 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * Specific Item selection?
 		 */
-    $this->filters['post_ID'] = param( $this->param_prefix.'p', 'integer', $this->default_filters['post_ID'] );          // Specific post number to display
+		$this->filters['post_ID'] = param( $this->param_prefix.'p', 'integer', $this->default_filters['post_ID'] );          // Specific post number to display
 		$this->filters['post_title'] = param( $this->param_prefix.'title', 'string', $this->default_filters['post_title'] );	  // urtitle of post to display
 
 		$this->single_post = !empty($this->filters['post_ID']) || !empty($this->filters['post_title']);
@@ -404,7 +400,7 @@ class ItemList2 extends DataObjectList2
 		if( is_null($this->default_filters['ts_min'])
 			&& is_null($this->default_filters['ts_max'] ) )
 		{	// We have not set a strict default -> we allow overridding:
-    	$show_past = param( $this->param_prefix.'show_past', 'integer', 0, true );
+			$show_past = param( $this->param_prefix.'show_past', 'integer', 0, true );
 			$show_future = param( $this->param_prefix.'show_future', 'integer', 0, true );
 			if( $show_past != $show_future )
 			{	// There is a point in overridding:
@@ -431,7 +427,7 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * Paging limits:
 		 */
- 		$this->filters['unit'] = param( $this->param_prefix.'unit', 'string', $this->default_filters['unit'], true );    		// list unit: 'posts' or 'days'
+		$this->filters['unit'] = param( $this->param_prefix.'unit', 'string', $this->default_filters['unit'], true );    		// list unit: 'posts' or 'days'
 		$this->unit = $this->filters['unit'];	// TEMPORARY
 		// echo '<br />unit='.$this->filters['unit'];
 
@@ -494,14 +490,14 @@ class ItemList2 extends DataObjectList2
 	}
 
 
-  /**
-   * Save current filterset to session.
-   */
+	/**
+	 * Save current filterset to session.
+	 */
 	function save_filterset()
 	{
-    /**
-  	 * @var Session
-  	 */
+		/**
+		 * @var Session
+		 */
 		global $Session, $Debuglog;
 
 		$Debuglog->add( 'Saving filterset <strong>'.$this->filterset_name.'</strong>', 'filters' );
@@ -510,11 +506,11 @@ class ItemList2 extends DataObjectList2
 	}
 
 
-  /**
-   * Load previously saved filterset from session.
-   *
-   * @return boolean true if we could restore something
-   */
+	/**
+	 * Load previously saved filterset from session.
+	 *
+	 * @return boolean true if we could restore something
+	 */
 	function restore_filterset()
 	{
 	  /**
@@ -866,9 +862,9 @@ class ItemList2 extends DataObjectList2
 	 * @todo implement HMS part of YMDHMS
 	 *
 	 * @return array
-   */
-  function get_filter_titles()
-  {
+	 */
+	function get_filter_titles()
+	{
 		global $month, $post_statuses;
 
 
@@ -879,10 +875,10 @@ class ItemList2 extends DataObjectList2
 		}
 
 
-  	$title_array = array();
+		$title_array = array();
 
 
-  	if( $this->single_post )
+		if( $this->single_post )
 		{	// We have requested a specific post:
 			// Should be in first position
 			$Item = & $this->get_by_idx( 0 );
@@ -900,8 +896,8 @@ class ItemList2 extends DataObjectList2
 
 
 		// CATEGORIES:
-  	if( !empty($this->filters['cat_array']) )
-  	{ // We have requested specific categories...
+		if( !empty($this->filters['cat_array']) )
+		{ // We have requested specific categories...
 			$cat_names = array();
 			foreach( $this->filters['cat_array'] as $cat_ID )
 			{
@@ -970,7 +966,7 @@ class ItemList2 extends DataObjectList2
 		}
 
 
- 		// KEYWORDS:
+		// KEYWORDS:
 		if( !empty($this->filters['keywords']) )
 		{
 			$title_array['keywords'] = T_('Keyword(s)').': '.$this->filters['keywords'];
@@ -1124,18 +1120,18 @@ class ItemList2 extends DataObjectList2
 	}
 
 
-  /**
-   * Returns values needed to make sort links for a given column
-   *
-   * Returns an array containing the following values:
-   *  - current_order : 'ASC', 'DESC' or ''
-   *  - order_asc : url needed to order in ascending order
-   *  - order_desc
-   *  - order_toggle : url needed to toggle sort order
-   *
-   * @param integer column to sort
-   * @return array
-   */
+	/**
+	 * Returns values needed to make sort links for a given column
+	 *
+	 * Returns an array containing the following values:
+	 *  - current_order : 'ASC', 'DESC' or ''
+	 *  - order_asc : url needed to order in ascending order
+	 *  - order_desc
+	 *  - order_toggle : url needed to toggle sort order
+	 *
+	 * @param integer column to sort
+	 * @return array
+	 */
 	function get_col_sort_values( $col_idx )
 	{
 		$col_order_fields = $this->cols[$col_idx]['order'];
@@ -1187,16 +1183,16 @@ class ItemList2 extends DataObjectList2
 	}
 
 
-  /**
-   * Get the adverstised start date (does not include timestamp_min)
-   *
-   * Note: there is a priority order in the params to determine the start date:
-   *  -dstart
-   *  -week + m
-   *  -m
-   *  -dstop - x days
-   * @see ItemQuery::where_datestart()
-   */
+	/**
+	 * Get the adverstised start date (does not include timestamp_min)
+	 *
+	 * Note: there is a priority order in the params to determine the start date:
+	 *  -dstart
+	 *  -week + m
+	 *  -m
+	 *  -dstop - x days
+	 * @see ItemQuery::where_datestart()
+	 */
 	function get_advertised_start_date()
 	{
 		if( $this->getting_adv_start_date )
@@ -1251,15 +1247,15 @@ class ItemList2 extends DataObjectList2
 	}
 
 
-  /**
-   * Get the adverstised stop date (does not include timestamp_max)
-   *
-   * Note: there is a priority order in the params to determine the stop date.
-   *  -dstop
-   *  -week + m
-   *  -m
-   *  -dstart + x days
-   */
+	/**
+	 * Get the adverstised stop date (does not include timestamp_max)
+	 *
+	 * Note: there is a priority order in the params to determine the stop date.
+	 *  -dstop
+	 *  -week + m
+	 *  -m
+	 *  -dstart + x days
+	 */
 	function get_advertised_stop_date()
 	{
 		if( $this->getting_adv_stop_date )
@@ -1328,12 +1324,12 @@ class ItemList2 extends DataObjectList2
 	}
 
 
-  /**
-   * Make sure date displaying starts at the beginning of the current filter interval
-   *
-   * Note: we're talking about strict dates (no times involved)
-   */
-  function set_start_date( )
+	/**
+	 * Make sure date displaying starts at the beginning of the current filter interval
+	 *
+	 * Note: we're talking about strict dates (no times involved)
+	 */
+	function set_start_date( )
 	{
 		$start_date = $this->get_advertised_start_date();
 
@@ -1452,6 +1448,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.21  2006/08/30 21:59:36  blueyed
+ * todo, doc, whitespace(!)
+ *
  * Revision 1.20  2006/08/29 00:26:11  fplanque
  * Massive changes rolling in ItemList2.
  * This is somehow the meat of version 2.0.
