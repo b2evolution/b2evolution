@@ -239,13 +239,14 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 		}
 		else
 		{ // User is not logged in:
-      // Note: we use funky field names to defeat the most basic guestbook spam bots
+			// Note: we use funky field names to defeat the most basic guestbook spam bots
 			$Form->text( 'u', $comment_author, 40, T_('Name'), '', 100, 'bComment' );
 			$Form->text( 'i', $comment_author_email, 40, T_('Email'), T_('Your email address will <strong>not</strong> be displayed on this site.'), 100, 'bComment' );
 			$Form->text( 'o', $comment_author_url, 40, T_('Site/Url'), T_('Your URL will be displayed.'), 100, 'bComment' );
 		}
 
 		// Message field:
+		// TODO: dh> this uses "id" "p" - should be more distinctive..
 		$Form->textarea( 'p', $comment_content, 10, T_('Comment text'),
 										T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)), 40, 'bComment' );
 
@@ -310,6 +311,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.80  2006/08/30 18:51:53  blueyed
+ * todo
+ *
  * Revision 1.79  2006/08/19 02:15:08  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.
