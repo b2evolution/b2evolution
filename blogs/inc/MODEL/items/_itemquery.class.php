@@ -75,7 +75,7 @@ class ItemQuery extends SQL
 	}
 
 
-  /**
+	/**
 	 * Restrict to a specific post
 	 */
 	function where_ID( $p = '', $title = '' )
@@ -104,7 +104,7 @@ class ItemQuery extends SQL
 	}
 
 
-  /**
+	/**
 	 * Restrict to specific collection/chapters (blog/categories)
 	 *
 	 * @todo get rid of blog #1
@@ -147,7 +147,7 @@ class ItemQuery extends SQL
 			// echo $whichcat;
 			$this->WHERE_and( $whichcat );
 
-   		if( $cat_modifier == '*' )
+			if( $cat_modifier == '*' )
 			{ // We want the categories combined! (i-e posts must be in ALL requested cats)
 				$this->GROUP_BY( $this->dbIDname.' HAVING COUNT(postcat_cat_ID) = '.count($cat_array) );
 			}
@@ -155,7 +155,7 @@ class ItemQuery extends SQL
 	}
 
 
-  /**
+	/**
 	 * Restrict to specific collection/chapters (blog/categories)
 	 *
 	 * @todo get rid of blog #1
@@ -188,7 +188,7 @@ class ItemQuery extends SQL
 			// echo $whichcat;
 			$this->WHERE_and( $whichcat );
 
-   		if( $cat_modifier == '*' )
+			if( $cat_modifier == '*' )
 			{ // We want the categories combined! (i-e posts must be in ALL requested cats)
 				$this->GROUP_BY( $this->dbIDname.' HAVING COUNT(postcat_cat_ID) = '.count($cat_array) );
 			}
@@ -196,7 +196,7 @@ class ItemQuery extends SQL
 	}
 
 
-  /**
+	/**
 	 * Restrict to the visibility/sharing statuses we want to show
 	 *
 	 * @param array Restrict to these statuses
@@ -214,7 +214,7 @@ class ItemQuery extends SQL
 	}
 
 
-  /**
+	/**
 	 * Restrict to specific authors
 	 *
 	 * @param string List of authors to restrict to (must have been previously validated)
@@ -243,7 +243,7 @@ class ItemQuery extends SQL
 	}
 
 
-  /**
+	/**
 	 * Restrict to specific assignees
 	 *
 	 * @param string List of assignees to restrict to (must have been previously validated)
@@ -273,7 +273,7 @@ class ItemQuery extends SQL
 	}
 
 
-  /**
+	/**
 	 * Restrict to specific assignee or author
 	 *
 	 * @param integer assignee or author to restrict to (must have been previously validated)
@@ -292,7 +292,7 @@ class ItemQuery extends SQL
 	}
 
 
-  /**
+	/**
 	 * Restrict to specific (exetnded) statuses
 	 *
 	 * @param string List of assignees to restrict to (must have been previously validated)
@@ -326,13 +326,13 @@ class ItemQuery extends SQL
 	 * Restricts to a specific date range. (despite thje 'start' in the name
 	 *
 	 * Priorities:
-   *  -dstart and/or dstop
-   *  -week + m
-   *  -m
-   * @todo  -dstart + x days
-   * @see ItemList2::get_advertised_start_date()
+	 *  -dstart and/or dstop
+	 *  -week + m
+	 *  -m
+	 * @todo  -dstart + x days
+	 * @see ItemList2::get_advertised_start_date()
 	 *
- 	 * @param string YYYYMMDDHHMMSS (everything after YYYY is optional) or ''
+	 * @param string YYYYMMDDHHMMSS (everything after YYYY is optional) or ''
 	 * @param integer week number or ''
 	 * @param string YYYYMMDDHHMMSS to start at, '' for first available
 	 * @param string YYYYMMDDHHMMSS to stop at
@@ -485,7 +485,7 @@ class ItemQuery extends SQL
 	}
 
 
-  /**
+	/**
 	 * Restrict with keywords
 	 *
 	 * @param string Keyword search string
@@ -550,8 +550,12 @@ class ItemQuery extends SQL
 
 }
 
+
 /*
  * $Log$
+ * Revision 1.8  2006/08/30 22:00:04  blueyed
+ * Whitespace
+ *
  * Revision 1.7  2006/07/02 21:53:31  blueyed
  * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
  *
