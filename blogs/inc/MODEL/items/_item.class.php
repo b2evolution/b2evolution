@@ -713,7 +713,12 @@ class Item extends DataObject
 		$BlogCache = & get_Cache( 'BlogCache' );
 
 		cat_load_postcats_cache();
-		$categoryIDs = $cache_postcats[$this->ID];
+
+		if( isset($cache_postcats[$this->ID]) )
+		{ // dh> may not be set! (demo logs)
+			$categoryIDs = $cache_postcats[$this->ID];
+		}
+		else $categoryIDs = array();
 
 		$categoryNames = array();
 		foreach( $categoryIDs as $cat_ID )
@@ -3049,6 +3054,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.87  2006/08/30 21:58:51  blueyed
+ * Fixed notice/warning
+ *
  * Revision 1.86  2006/08/29 00:26:11  fplanque
  * Massive changes rolling in ItemList2.
  * This is somehow the meat of version 2.0.
