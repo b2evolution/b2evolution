@@ -60,9 +60,11 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	 * --------------------------- BLOG LIST INCLUDED HERE -----------------------------
 	 */
 	require( dirname(__FILE__).'/_bloglist.php' );
-	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
+	// ---------------------------------- END OF BLOG LIST ---------------------------------
+	?>
 
-	<?php // ------------------------------- START OF SKIN LIST -------------------------------
+	<?php
+	// ------------------------------- START OF SKIN LIST -------------------------------
 	if( ! $Blog->get('force_skin') )
 	{	// Skin switching is allowed for this blog:
 		echo T_( 'Select skin:' ), ' ';
@@ -71,7 +73,9 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		[<a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name', 'htmlbody' ) ?></a>]
 		<?php
 		}
-	} // ------------------------------ END OF SKIN LIST ------------------------------ ?>
+	}
+	// ------------------------------ END OF SKIN LIST ------------------------------
+	?>
 
 	<hr>
 	<div align="center">
@@ -79,9 +83,15 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<p><?php $Blog->disp( 'tagline', 'htmlbody' ) ?></p>
 	</div>
 	<hr>
-  <small><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></small>
+	<small><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></small>
 
 	<hr>
+
+	<?php
+	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
+	if( empty( $preview ) ) $Messages->disp( );
+	// --------------------------------- END OF MESSAGES ---------------------------------
+	?>
 
 	<?php request_title( '<h2>', '</h2>' ) ?>
 
@@ -99,7 +109,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			<a href="<?php $Item->permanent_url() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" border="0" align="middle" /></a>
 			<?php $Item->title(); ?>
 			&nbsp;
-			<?php locale_flag( $Item->locale, 'h10px', '', 'middle' ); // Display flag for post locale ?>
+			<?php locale_flag( $Item->locale, 'h10px', '', 'middle' ); /* Display flag for post locale */ ?>
 		</h3>
 
 		<blockquote>
