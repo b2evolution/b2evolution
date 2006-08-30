@@ -188,17 +188,17 @@
 			{ // User is not loggued in:
 				?>
 				<p>
-					<input type="text" name="author" id="author" value="<?php echo $comment_author ?>" size="40" tabindex="1" class="bComment" />
+					<input type="text" name="u" id="author" value="<?php echo $comment_author ?>" size="40" tabindex="1" class="bComment" />
 					<label for="author"><?php echo T_('Name') ?></label>
 				</p>
 
 				<p>
-					<input type="text" name="email" id="email" value="<?php echo $comment_author_email ?>" size="40" tabindex="2" class="bComment" />
+					<input type="text" name="i" id="email" value="<?php echo $comment_author_email ?>" size="40" tabindex="2" class="bComment" />
 					<label for="email"><?php echo T_('E-mail') ?></label>
 				</p>
 
 				<p>
-					<input type="text" name="url" id="url" value="<?php echo $comment_author_url ?>" size="40" tabindex="3" class="bComment" />
+					<input type="text" name="o" id="url" value="<?php echo $comment_author_url ?>" size="40" tabindex="3" class="bComment" />
 					<label for="url"><acronym title=\"Uniform Resource Identifier\">URI</acronym></label>
 				</p>
 
@@ -209,7 +209,7 @@
 		<p>
 			<label for="comment"><?php echo T_('Your Comment'); ?></label>
 			<br />
-			<textarea name="comment" id="comment" cols="70" rows="4" tabindex="4"></textarea>
+			<textarea name="p" id="comment" cols="70" rows="4" tabindex="4"></textarea>
 		</p>
 
 			<p>

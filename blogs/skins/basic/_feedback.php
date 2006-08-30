@@ -185,19 +185,19 @@
 				?>
 				<tr valign="top" bgcolor="#eeeeee">
 					<td align="right"><label for="author"><strong><?php echo T_('Name') ?>:</strong></label></td>
-					<td align="left"><input type="text" name="author" id="author" value="<?php echo $comment_author ?>" size="40" tabindex="1" /></td>
+					<td align="left"><input type="text" name="u" id="author" value="<?php echo $comment_author ?>" size="40" tabindex="1" /></td>
 				</tr>
 
 				<tr valign="top" bgcolor="#eeeeee">
 					<td align="right"><label for="email"><strong><?php echo T_('Email') ?>:</strong></label></td>
-					<td align="left"><input type="text" name="email" id="email" value="<?php echo $comment_author_email ?>" size="40" tabindex="2" /><br />
+					<td align="left"><input type="text" name="i" id="email" value="<?php echo $comment_author_email ?>" size="40" tabindex="2" /><br />
 						<small><?php echo T_('Your email address will <strong>not</strong> be displayed on this site.') ?></small>
 					</td>
 				</tr>
 
 				<tr valign="top" bgcolor="#eeeeee">
 					<td align="right"><label for="url"><strong><?php echo T_('Site/Url') ?>:</strong></label></td>
-					<td align="left"><input type="text" name="url" id="url" value="<?php echo $comment_author_url ?>" size="40" tabindex="3" /><br />
+					<td align="left"><input type="text" name="o" id="url" value="<?php echo $comment_author_url ?>" size="40" tabindex="3" /><br />
 						<small><?php echo T_('Your URL will be displayed.') ?></small>
 					</td>
 				</tr>
@@ -207,7 +207,7 @@
 
 			<tr valign="top" bgcolor="#eeeeee">
 				<td align="right"><label for="comment"><strong><?php echo T_('Comment text') ?>:</strong></label></td>
-				<td align="left" width="450"><textarea cols="50" rows="12" name="comment" id="comment" tabindex="4"></textarea><br />
+				<td align="left" width="450"><textarea cols="50" rows="12" name="p" id="comment" tabindex="4"></textarea><br />
 					<small><?php echo T_('Allowed XHTML tags'), ': ', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)) ?></small>
 				</td>
 			</tr>
