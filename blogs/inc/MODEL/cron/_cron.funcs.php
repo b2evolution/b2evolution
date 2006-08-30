@@ -51,7 +51,7 @@ function cron_log( $message )
  */
 function call_job( $job_name, $job_params = array() )
 {
-	global $DB, $control_path;
+	global $DB, $control_path, $Plugins;
 
 	global $result_message, $result_status, $timestop, $time_difference;
 
@@ -60,8 +60,11 @@ function call_job( $job_name, $job_params = array() )
 
 	if( preg_match( '~^plugin_(\d+)_(.*)$~', $job_name, $match ) )
 	{ // Cron job provided by a plugin:
-		load_class( '/_misc/_plugins.class.php' );
-		$Plugins = & new Plugins();
+		if( ! is_object($Plugins) )
+		{
+			load_class( '/_misc/_plugins.class.php' );
+			$Plugins = & new Plugins();
+		}
 
 		$Plugin = & $Plugins->get_by_ID( $match[1] );
 		if( ! $Plugin )
@@ -109,6 +112,9 @@ function call_job( $job_name, $job_params = array() )
 
 /*
  * $Log$
+ * Revision 1.7  2006/08/30 18:10:01  blueyed
+ * Re-use existing $Plugins event
+ *
  * Revision 1.6  2006/08/28 20:16:29  blueyed
  * Added GetCronJobs/ExecCronJob Plugin hooks.
  *
