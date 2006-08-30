@@ -298,7 +298,6 @@ switch( $action )
 			break;
 		}
 
-		$edit_Plugin->BeforeDisable();
 
 		// we call $Plugins(!) here: the Plugin gets disabled on the current page already and it should not get (un)registered on $Plugins_admin!
 		$Plugins->set_Plugin_status( $edit_Plugin, 'disabled' ); // sets $edit_Plugin->status

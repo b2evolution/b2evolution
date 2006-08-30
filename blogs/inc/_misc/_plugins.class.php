@@ -622,9 +622,15 @@ class Plugins
 			$this->load_plugins_table();
 			$this->load_events();
 		}
-		elseif( ! $this->is_admin_class )
+		else
 		{
-			$this->unregister( $Plugin );
+			// Notify the plugin that it has been disabled:
+			$Plugin->BeforeDisable();
+
+			if( ! $this->is_admin_class )
+			{
+				$this->unregister( $Plugin );
+			}
 		}
 
 		$Plugin->status = $status;
@@ -2896,6 +2902,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.79  2006/08/30 22:51:03  blueyed
+ * Trigger Plugin::BeforeDisable() as deep as possible.
+ *
  * Revision 1.78  2006/08/28 20:16:29  blueyed
  * Added GetCronJobs/ExecCronJob Plugin hooks.
  *
