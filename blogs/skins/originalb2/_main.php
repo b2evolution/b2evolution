@@ -105,7 +105,9 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<?php $Item->content(); ?>
 
 	<div class="rightFlush">
-	<?php link_pages() ?>
+	<?php
+	// TODO: "Call to undefined function"
+	link_pages() ?>
 
 	<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
 	<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>

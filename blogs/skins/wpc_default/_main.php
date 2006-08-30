@@ -100,7 +100,9 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	</div>
 
 	<div class="feedback">
-			<?php link_pages() ?>
+			<?php
+			// TODO: "Call to undefined function"
+			link_pages() ?>
 			<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
 			<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
 	</div>
