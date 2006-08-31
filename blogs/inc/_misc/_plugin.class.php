@@ -2069,11 +2069,11 @@ class Plugin
 	 */
 	function get_plugin_url( $abs = false )
 	{
-		global $ReqHost, $Blog, $plugins_url, $plugins_path;
+		global $ReqHost, $Blog, $plugins_url, $plugins_path, $plugins_subdir;
 
 		if( isset($Blog) && ! is_admin_page() )
 		{
-			$base = $Blog->get('baseurl').$plugins_path;
+			$base = $Blog->get('baseurl').$plugins_subdir;
 		}
 		else
 		{
@@ -2637,6 +2637,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.88  2006/08/31 22:56:12  blueyed
+ * Fixed Plugin::get_plugin_url()
+ *
  * Revision 1.87  2006/08/30 17:45:28  blueyed
  * Fixed "$help_url"/www Plugin help popups (use target _blank instead); Added "$help_url"/www help Plugin to plugin settings (linking to #Settings)
  *
