@@ -2807,7 +2807,7 @@ class Plugins
 		{
 			if( is_object($get_return['data']) )
 			{
-				$GLOBALS[$objectName] = & $get_return['data'];
+				$GLOBALS[$objectName] = $get_return['data']; // COPY! (get_Cache() uses $$objectName instead of $GLOBALS - no deal for PHP5 anyway)
 
 				$Plugin = & $this->get_by_ID( $get_return['plugin_ID'] );
 				register_shutdown_function( array(&$Plugin, 'CacheObjects'),
@@ -2902,6 +2902,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.80  2006/08/31 19:00:03  blueyed
+ * Fixed caching of objects, which was broken with get_Cache() introduction
+ *
  * Revision 1.79  2006/08/30 22:51:03  blueyed
  * Trigger Plugin::BeforeDisable() as deep as possible.
  *
