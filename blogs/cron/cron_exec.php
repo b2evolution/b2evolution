@@ -1,13 +1,21 @@
 <?php
 /**
+ * Execute cron jobs.
+ *
  * Example to use CLI:
  * >c:\php4\php cron_exec.php
  * >c:\php4\php-cli cron_exec.php
  */
 
+
+/**
+ * Include config
+ */
 require_once dirname(__FILE__).'/../conf/_config.php';
 
-// This MIGHT be overkill. TODO: check...
+/**
+ * @todo fp> This MIGHT be overkill. check...
+ */
 require_once $inc_path .'_main.inc.php';
 
 /**
