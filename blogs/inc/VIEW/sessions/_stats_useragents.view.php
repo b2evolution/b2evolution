@@ -51,27 +51,29 @@ if( $agnt_browser ) $selected_agnt_types[] = "'browser'";
 if( $agnt_robot ) $selected_agnt_types[] = "'robot'";
 if( $agnt_rss ) $selected_agnt_types[] = "'rss'";
 if( $agnt_unknown ) $selected_agnt_types[] = "'unknown'";
+$from = 'T_useragents LEFT JOIN T_hitlog ON agnt_ID = hit_agnt_ID';
 $where_clause =  ' WHERE agnt_type IN ('.implode(',',$selected_agnt_types).')';
 
 if( !empty($blog) )
 {
+	$from .= ' INNER JOIN T_blogs ON hit_blog_ID = blog_ID';
 	$where_clause .= ' AND hit_blog_ID = '.$blog;
 }
 
 $total_hit_count = $DB->get_var( "
 		SELECT COUNT(*) AS hit_count
-			FROM T_useragents INNER JOIN T_hitlog ON agnt_ID = hit_agnt_ID "
+			FROM $from "
 			.$where_clause, 0, 0, 'Get total hit count - hits with an UA' );
 
 
 // Create result set:
 $sql = "SELECT agnt_signature, agnt_type, COUNT( * ) AS hit_count
-					FROM T_useragents LEFT JOIN T_hitlog ON agnt_ID = hit_agnt_ID "
+					FROM $from"
 			.$where_clause.'
 				 GROUP BY agnt_ID ';
 
 $count_sql = "SELECT COUNT( agnt_ID )
-					FROM T_useragents "
+					FROM $from"
 			.$where_clause;
 
 $Results = & new Results( $sql, 'uagnt_', '--D', 20, $count_sql );
@@ -143,6 +145,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.3  2006/09/02 00:33:11  blueyed
+ * Merged from branch
+ *
  * Revision 1.2  2006/08/24 21:41:14  fplanque
  * enhanced stats
  *
