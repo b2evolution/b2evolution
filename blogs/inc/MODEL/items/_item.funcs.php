@@ -194,7 +194,7 @@ function get_postdata($postid)
  * @todo dh> see WP's previous_post_link() for param ideas (using $link instead of $previous and $title). Also, use booleans of course!
  *       $in_same_blog would also be useful!
  */
-function previous_post( $format='&lt;&lt; % ', $previous='#', $title='yes', $in_same_cat='no', $limitprev=1, $excluded_categories='')
+function previous_post( $format='&lt;&lt; % ', $previous='#', $title='yes', $in_same_cat='no', $limitprev=1, $excluded_categories='', $in_same_blog = true )
 {
 	global $disp, $posts;
 
@@ -206,7 +206,11 @@ function previous_post( $format='&lt;&lt; % ', $previous='#', $title='yes', $in_
 	global $DB, $postdata;
 	global $Blog;
 
+	// TODO: $postdata is not set here!! (which is generally good - as of "deprecating those globals", but bad in this context)
+
 	if( $previous == '#' ) $previous = T_('Previous post') . ': ';
+
+	$from = 'T_posts';
 
 	$current_post_date = $postdata['Date'];
 	$current_category = $postdata['Category'];
@@ -227,9 +231,15 @@ function previous_post( $format='&lt;&lt; % ', $previous='#', $title='yes', $in_
 		}
 	}
 
+	if( $in_same_blog && isset($postdata['Blog']) )
+	{
+		$from .= ' INNER JOIN T_categories ON post_main_cat_ID = cat_ID';
+		$sqlcat .= ' AND cat_blog_ID = '.$postdata['Blog'];
+	}
+
 	$limitprev--;
 	$sql = "SELECT post_ID, post_title
-	          FROM T_posts
+	          FROM $from
 	         WHERE post_datestart < '$current_post_date'
 	               $sqlcat
 	               $sql_exclude_cats
@@ -256,12 +266,12 @@ function previous_post( $format='&lt;&lt; % ', $previous='#', $title='yes', $in_
 
 /**
  * next_post(-)
- * 
+ *
  * @todo Move to ItemList
  * @todo dh> see WP's previous_post_link() for param ideas (using $link instead of $previous and $title). Also, use booleans of course!
  *       $in_same_blog would also be useful!
  */
-function next_post( $format = '% &gt;&gt; ', $next = '#', $title = 'yes', $in_same_cat = 'no', $limitnext = 1, $excluded_categories = '' )
+function next_post( $format = '% &gt;&gt; ', $next = '#', $title = 'yes', $in_same_cat = 'no', $limitnext = 1, $excluded_categories = '', $in_same_blog = true )
 {
 	global $disp, $posts;
 
@@ -273,7 +283,11 @@ function next_post( $format = '% &gt;&gt; ', $next = '#', $title = 'yes', $in_sa
 	global $postdata, $localtimenow, $DB;
 	global $Blog;
 
+	// TODO: $postdata is not set here!! (which is generally good - as of "deprecating those globals", but bad in this context)
+
 	if( $next == '#' ) $next = T_('Next post') . ': ';
+
+	$from = 'T_posts';
 
 	$current_post_date = $postdata['Date'];
 	$current_category = $postdata['Category'];
@@ -281,28 +295,35 @@ function next_post( $format = '% &gt;&gt; ', $next = '#', $title = 'yes', $in_sa
 	if( is_string($in_same_cat) ) { $in_same_cat = ($in_same_cat != 'no'); }
 
 	$sqlcat = '';
-	if( $in_same_cat ) 
+	if( $in_same_cat )
 	{
 		$sqlcat = " AND post_main_cat_ID = $current_category ";
 	}
 
 	$sql_exclude_cats = '';
-	if (!empty($excluded_categories)) 
+	if (!empty($excluded_categories))
 	{
 		$blah = explode('and', $excluded_categories);
-		foreach($blah as $category) 
+		foreach($blah as $category)
 		{
 			$category = intval($category);
 			$sql_exclude_cats .= " AND post_main_cat_ID != $category";
 		}
 	}
 
+	if( $in_same_blog && isset($postdata['Blog']) )
+	{
+		$from .= ' INNER JOIN T_categories ON post_main_cat_ID = cat_ID';
+		$sqlcat .= ' AND cat_blog_ID = '.$postdata['Blog'];
+	}
+
+
 	// TODO: fp> This should actually look at the min an dmax timestamp settings
 	$now = date('Y-m-d H:i:s', $localtimenow );
 
 	$limitnext--;
 	$sql = "SELECT post_ID, post_title
-	          FROM T_posts
+	          FROM $from
 	         WHERE post_datestart > '$current_post_date'
 	           AND post_datestart < '$now'
 	               $sqlcat
@@ -622,6 +643,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.24  2006/09/02 00:16:21  blueyed
+ * Merge from branches
+ *
  * Revision 1.23  2006/08/29 00:26:11  fplanque
  * Massive changes rolling in ItemList2.
  * This is somehow the meat of version 2.0.

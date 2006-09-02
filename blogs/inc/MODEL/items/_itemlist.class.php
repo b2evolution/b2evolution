@@ -786,9 +786,11 @@ class ItemList extends DataObjectList
 				'Category'   => $this->last_Item->main_cat_ID,
 				'Locale'     => $this->last_Item->locale,
 				'Url'        => $this->last_Item->url,
+				'Flags'      => explode( ',', $this->last_Item->flags ),
 				'Wordcount'  => $this->last_Item->wordcount,
 				'views'      => $this->last_Item->views,
-				'comment_status'   => $this->last_Item->comment_status
+				'comment_status'   => $this->last_Item->comment_status,
+				'Blog'       => $this->last_Item->blog_ID,
 			);
 
 		$day = mysql2date('d.m.y',$postdata['Date']);
@@ -867,6 +869,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.19  2006/09/02 00:16:21  blueyed
+ * Merge from branches
+ *
  * Revision 1.18  2006/08/26 16:33:50  fplanque
  * minor
  *
