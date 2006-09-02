@@ -106,12 +106,16 @@ function call_job( $job_name, $job_params = array() )
 	}
 
 	$timestop = time() + $time_difference;
-	cron_log( 'Task finished at '.date( 'H:i:s', $timestop ).' with status: '.$result_status.' Message: '.$result_message );
+	cron_log( 'Task finished at '.date( 'H:i:s', $timestop ).' with status: '.$result_status
+		."\nMessage: $result_message" );
 }
 
 
 /*
  * $Log$
+ * Revision 1.8  2006/09/02 00:14:43  blueyed
+ * Display cron job message on a single line
+ *
  * Revision 1.7  2006/08/30 18:10:01  blueyed
  * Re-use existing $Plugins event
  *
