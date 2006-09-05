@@ -32,6 +32,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<title><?php echo $app_shortname.$admin_path_seprator.$page_title ?></title>
+	<meta name="ROBOTS" content="NOINDEX" />
 	<link href="<?php echo $rsc_url ?>css/login.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -57,6 +58,9 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
+ * Revision 1.6  2006/09/05 19:07:26  fplanque
+ * small talk with robots
+ *
  * Revision 1.5  2006/05/19 18:15:05  blueyed
  * Merged from v-1-8 branch
  *

@@ -41,7 +41,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<title><?php echo $this->get_html_title(); ?></title>
-
+	<meta name="ROBOTS" content="NOINDEX, NOFOLLOW" />
 	<?php
 	// Include head lines, links (to CSS...), sets <base>, ..
 	echo $this->get_headlines();
