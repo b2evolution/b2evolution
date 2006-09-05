@@ -37,73 +37,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * blog_create(-)
- *
- * Create a new a blog
- * This funtion has to handle all needed DB dependencies!
- *
- * @todo move this to Blog object
- */
-function blog_create(
-	$blog_name,
-	$blog_shortname,
-	$blog_siteurl,
-	$blog_stub,									// This will temporarily be assigned to both STUB and URLNAME
-	$blog_staticfilename = '',
-	$blog_tagline = '',
-	$blog_description = '',
-	$blog_longdesc = '',
-	$blog_locale = '#',
-	$blog_notes = '',
-	$blog_keywords = '',
-	$blog_links_blog_ID = 0,
-	$blog_UID = '',
-	$blog_allowcomments = 'post_by_post',
-	$blog_allowtrackbacks = 1,
-	$blog_pingb2evonet = 0,
-	$blog_pingtechnorati = 0,
-	$blog_pingweblogs = 1,
-	$blog_pingblodotgs = 0,
-	$blog_disp_bloglist	= 1,
-	$blog_in_bloglist = 1 )
-{
-	global $DB, $query, $default_locale;
-
-	if( $blog_locale == '#' ) $blog_locale = $default_locale;
-
-	$query = "INSERT INTO T_blogs( blog_name, blog_shortname, blog_siteurl,
-						blog_stub, blog_urlname, blog_staticfilename,
-						blog_tagline, blog_description, blog_longdesc, blog_locale, blog_notes, blog_keywords,
-						blog_UID, blog_allowcomments, blog_allowtrackbacks, blog_pingb2evonet,
-						blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs, blog_disp_bloglist,
-						blog_in_bloglist, blog_links_blog_ID )
-	VALUES ( ";
-	$query .= "'".$DB->escape($blog_name)."', ";
-	$query .= "'".$DB->escape($blog_shortname)."', ";
-	$query .= "'".$DB->escape($blog_siteurl)."', ";
-	$query .= "'".$DB->escape($blog_stub)."', ";
-	$query .= "'".$DB->escape($blog_stub)."', ";		// This one is for urlname
-	$query .= "'".$DB->escape($blog_staticfilename)."', ";
-	$query .= "'".$DB->escape($blog_tagline)."', ";
-	$query .= "'".$DB->escape($blog_description)."', ";
-	$query .= "'".$DB->escape($blog_longdesc)."', ";
-	$query .= "'".$DB->escape($blog_locale)."', ";
-	$query .= "'".$DB->escape($blog_notes)."', ";
-	$query .= "'".$DB->escape($blog_keywords)."', ";
-	$query .= "'".$DB->escape($blog_UID)."', ";
-	$query .= "'".$DB->escape($blog_allowcomments) . "', "
-				 . "$blog_allowtrackbacks, $blog_pingb2evonet, $blog_pingtechnorati, "
-				 . "$blog_pingweblogs, $blog_pingblodotgs, $blog_disp_bloglist, $blog_in_bloglist, "
-				 . "$blog_links_blog_ID)";
-
-	if( ! ($DB->query( $query )) )
-		return 0;
-
-	return $DB->insert_id;  // blog ID
-}
-
-
-/**
  * Update the user permissions for edited blog
  *
  * @param int Blog ID
@@ -655,6 +588,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.12  2006/09/05 19:05:33  fplanque
+ * refactoring
+ *
  * Revision 1.11  2006/08/21 16:07:43  fplanque
  * refactoring
  *

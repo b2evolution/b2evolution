@@ -350,6 +350,48 @@ function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
 
 
 /**
+ * Create a new a blog
+ * This funtion has to handle all needed DB dependencies!
+ *
+ * @todo move this to Blog object
+ */
+function blog_create(
+	$blog_name,
+	$blog_shortname,
+	$blog_stub,									// This will temporarily be assigned to both STUB and URLNAME
+	$blog_staticfilename = '',
+	$blog_tagline = '',
+	$blog_longdesc = '',
+	$blog_links_blog_ID = 0 )
+{
+	global $DB, $default_locale;
+
+	$query = "INSERT INTO T_blogs( blog_name, blog_shortname, blog_siteurl,
+						blog_stub, blog_urlname, blog_staticfilename,
+						blog_tagline, blog_longdesc, blog_locale,
+						blog_allowcomments, blog_allowtrackbacks, blog_pingb2evonet,
+						blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs, blog_disp_bloglist,
+						blog_in_bloglist, blog_links_blog_ID )
+	VALUES ( ";
+	$query .= "'".$DB->escape($blog_name)."', ";
+	$query .= "'".$DB->escape($blog_shortname)."', ";
+	$query .= "'', ";
+	$query .= "'".$DB->escape($blog_stub)."', ";
+	$query .= "'".$DB->escape($blog_stub)."', ";		// This one is for urlname
+	$query .= "'".$DB->escape($blog_staticfilename)."', ";
+	$query .= "'".$DB->escape($blog_tagline)."', ";
+	$query .= "'".$DB->escape($blog_longdesc)."', ";
+	$query .= "'".$DB->escape($default_locale)."', ";
+	$query .= "'post_by_post', 0, 0, 0, 1, 0, 1, 1, $blog_links_blog_ID)";
+
+	if( ! ($DB->query( $query )) )
+		return false;
+
+	return $DB->insert_id;  // blog ID
+}
+
+
+/**
  * Create default blogs.
  *
  * This is called for fresh installs and cafelog upgrade.
@@ -375,15 +417,10 @@ function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = '#', $bl
 	$blog_all_ID = blog_create(
 		sprintf( T_('%s Title'), $blog_shortname ),
 		$blog_shortname,
-		'',
 		$blog_stub,
 		$blog_stub.'.html',
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
-		sprintf( T_('Short description for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-		$default_locale,
-		sprintf( T_('Notes for %s'), $blog_shortname ),
-		sprintf( T_('Keywords for %s'), $blog_shortname ),
 		4 );
 
 	$blog_shortname = $blog_a_short;
@@ -392,15 +429,10 @@ function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = '#', $bl
 	$blog_a_ID = blog_create(
 		$blog_a_long,
 		$blog_shortname,
-		'',
 		$blog_stub,
 		$blog_stub.'.html',
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
-		sprintf( T_('Short description for %s'), $blog_shortname ),
 		sprintf( (($blog_a_longdesc == '#') ? $default_blog_longdesc : $blog_a_longdesc), $blog_shortname, '' ),
-		$default_locale,
-		sprintf( T_('Notes for %s'), $blog_shortname ),
-		sprintf( T_('Keywords for %s'), $blog_shortname ),
 		4 );
 
 	$blog_shortname = 'Blog B';
@@ -408,15 +440,10 @@ function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = '#', $bl
 	$blog_b_ID = blog_create(
 		sprintf( T_('%s Title'), $blog_shortname ),
 		$blog_shortname,
-		'',
 		$blog_stub,
 		$blog_stub.'.html',
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
-		sprintf( T_('Short description for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-		$default_locale,
-		sprintf( T_('Notes for %s'), $blog_shortname ),
-		sprintf( T_('Keywords for %s'), $blog_shortname ),
 		4 );
 
 	$blog_shortname = 'Linkblog';
@@ -427,15 +454,10 @@ function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = '#', $bl
 	$blog_linkblog_ID = blog_create(
 		sprintf( T_('%s Title'), $blog_shortname ),
 		$blog_shortname,
-		'',
 		$blog_stub,
 		$blog_stub.'.html',
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
-		sprintf( T_('Short description for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-		$default_locale,
-		sprintf( T_('Notes for %s'), $blog_shortname ),
-		sprintf( T_('Keywords for %s'), $blog_shortname ),
 		0 /* no Link blog */ );
 
 	echo "OK.<br />\n";
@@ -1006,6 +1028,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.198  2006/09/05 19:05:33  fplanque
+ * refactoring
+ *
  * Revision 1.197  2006/08/21 16:07:44  fplanque
  * refactoring
  *
