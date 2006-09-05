@@ -31,9 +31,13 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 if( $debug)
-	header("Content-type: text/xml");
+{
+	skin_content_header( 'application/xml' );	// Sets charset!
+}
 else
-	header( 'Content-type: application/atom+xml; charset='.$io_charset );
+{
+	skin_content_header( 'application/atom+xml' );	// Sets charset!
+}
 
 echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 ?>

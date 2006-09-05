@@ -53,7 +53,38 @@ function skin_base_tag()
 	base_tag( $base_href );
 }
 
- 
+/**
+ * Output content type header
+ *
+ * @param string content-type; override for RSS feeds
+ */
+function skin_content_header( $type = 'text/html' )
+{
+	global $generating_static, $io_charset;
+
+	if( empty($generating_static) )
+	{	// We use this method when we are NOT generating a static page
+		header( 'Content-type: '.$type.'; charset='.$io_charset );
+	}
+}
+
+/**
+ * Output content type http_equiv meta tag
+ *
+ * Needed when generating static files
+ *
+ * @param string content-type; override for RSS feeds
+ */
+function skin_content_meta( $type = 'text/html' )
+{
+	global $generating_static, $io_charset;
+
+	if( ! empty($generating_static) )
+	{	// We use this method when we ARE generating a static page
+		echo '<meta http-equiv="Content-Type" content="'.$type.'; charset='.$io_charset.'">';
+	}
+}
+
 /**
  * checks if a skin exists
  *
@@ -203,6 +234,9 @@ function skin_change_url( $display = true )
 
 /*
  * $Log$
+ * Revision 1.9  2006/09/05 22:29:21  fplanque
+ * fixed content types (I hope)
+ *
  * Revision 1.8  2006/08/18 17:23:58  fplanque
  * Visual skin selector
  *

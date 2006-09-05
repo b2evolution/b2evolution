@@ -30,7 +30,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-header( 'Content-type: application/xml; charset='.$io_charset );
+skin_content_header( 'application/xml' );	// Sets charset!
+
 echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 ?>
 <!-- generator="<?php echo $app_name; ?>/<?php echo $app_version ?>" -->

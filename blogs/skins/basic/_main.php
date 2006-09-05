@@ -36,10 +36,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-header( 'Content-type: text/html; charset='.$io_charset );
+skin_content_header();	// Sets charset!
 ?>
 <html>
 <head>
+	<?php skin_content_meta(); /* Charset for static pages */ ?>
 	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
 	<title><?php
 		$Blog->disp('name', 'htmlhead');
