@@ -42,8 +42,6 @@ $app_footer_text = '<a href="http://www.b2evolution.net"><strong><span style="co
 		&ndash;
 		<a href="http://b2evolution.net/about/license.html" class="nobr">'.T_('GPL License').'</a>
 		&ndash;
-		<span class="nobr">&copy;2001-2002 by <a href="http://cafelog.com/">Michel V</a> &amp; others</span>
-		&ndash;
 		<span class="nobr">&copy;2003-2006 by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> &amp; others.</span>';
 
 ?>

@@ -281,9 +281,7 @@ class Blog extends DataObject
 
 		if( param( 'blog_description', 'string', NULL ) !== NULL )
 		{	// Description:
-			$this->shortdesc = get_param( 'blog_description' );
-			// TODO: change that fieldname in DB:
-   		$this->set_param( 'description', 'string', $this->shortdesc );
+			$this->set_from_Request( 'shortdesc', 'blog_description' );
 		}
 
 		if( param( 'blog_keywords', 'string', NULL ) !== NULL )
@@ -428,6 +426,11 @@ class Blog extends DataObject
 					$Settings->dbupdate();
 				}
 			*/
+
+			case 'shortdesc':
+				$this->shortdesc = $parvalue;
+				return parent::set_param( 'description', 'string', $parvalue );
+				break;
 
 			default:
 				return parent::set_param( $parname, 'string', $parvalue );
@@ -1019,6 +1022,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2006/09/05 19:08:43  fplanque
+ * minor
+ *
  * Revision 1.17  2006/08/21 16:07:43  fplanque
  * refactoring
  *
