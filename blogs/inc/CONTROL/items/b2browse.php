@@ -58,6 +58,10 @@ else
 			// Create empty List:
 			$ItemList = & new ItemList2( $Blog, NULL, NULL );
 
+			$ItemList->set_default_filters( array(
+					'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated' ),
+				) );
+
 			if( $tab == 'tracker' )
 			{	// In tracker mode, we want a different default sort:
 				$ItemList->set_default_filters( array(
@@ -107,8 +111,7 @@ else
 			/*
 			 * Latest comments:
 			 */
-			param( 'show_status', 'array', array(), true );	// Array of cats to restrict to
-			$show_statuses = $show_status;
+			param( 'show_statuses', 'array', array(), true );	// Array of cats to restrict to
 
 			$CommentList = & new CommentList( $blog, "'comment','trackback','pingback'", $show_statuses, '',	'',	'DESC',	'',	20 );
 			break;

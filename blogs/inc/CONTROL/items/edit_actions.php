@@ -23,6 +23,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	*/
 global $current_User;
 
+load_class( 'MODEL/items/_item.class.php' );
+
 $AdminUI->set_path( 'edit' );
 
 param( 'action', 'string', '' );
@@ -40,7 +42,7 @@ $mn = ($mn > 59) ? $mn - 60 : $mn;
 $ss = ($ss > 59) ? $ss - 60 : $ss;
 
 // All statuses are allowed for acting on:
-$show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
+// fp> rem 06/09/06 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
 
 switch($action)
 {
@@ -542,6 +544,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.28  2006/09/06 20:45:34  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.27  2006/08/26 20:32:49  fplanque
  * fixed redirects
  *

@@ -40,6 +40,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 require_once dirname(__FILE__).'/../dataobjects/_dataobject.class.php';
 
+global $object_def;
 /**
  * Object definition:
  */
@@ -3054,6 +3055,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.88  2006/09/06 20:45:34  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.87  2006/08/30 21:58:51  blueyed
  * Fixed notice/warning
  *

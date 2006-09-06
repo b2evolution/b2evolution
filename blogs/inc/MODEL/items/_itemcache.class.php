@@ -38,6 +38,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 require_once dirname(__FILE__).'/../dataobjects/_dataobjectcache.class.php';
 
+require_once dirname(__FILE__).'/_item.class.php';
+
 /**
  * Item Cache Class
  *
@@ -146,6 +148,9 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.6  2006/09/06 20:45:34  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.5  2006/06/19 20:59:37  fplanque
  * noone should die anonymously...
  *

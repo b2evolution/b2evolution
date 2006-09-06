@@ -28,7 +28,7 @@ global $Blog;
  */
 global $Plugins;
 
-global $tab, $show_past, $show_future, $show_status, $s, $sentence, $exact, $author, $assgn, $status;
+global $tab, $show_past, $show_future, $show_statuses, $s, $sentence, $exact, $author, $assgn, $status;
 
 
 echo '<div class="browse_side_item">';
@@ -83,19 +83,19 @@ echo '<div class="browse_side_item">';
 
 		<div>
 
-		<input type="checkbox" name="show_status[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_status ) ) echo 'checked="checked" '?> />
+		<input type="checkbox" name="show_statuses[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_statuses ) ) echo 'checked="checked" '?> />
 		<label for="sh_published"><?php echo T_('Published') ?> <span class="notes">(<?php echo T_('Public') ?>)</span></label><br />
 
-		<input type="checkbox" name="show_status[]" value="protected" id="sh_protected" class="checkbox" <?php if( in_array( "protected", $show_status ) ) echo 'checked="checked" '?> />
+		<input type="checkbox" name="show_statuses[]" value="protected" id="sh_protected" class="checkbox" <?php if( in_array( "protected", $show_statuses ) ) echo 'checked="checked" '?> />
 		<label for="sh_protected"><?php echo T_('Protected') ?> <span class="notes">(<?php echo T_('Members only') ?>)</span></label><br />
 
-		<input type="checkbox" name="show_status[]" value="private" id="sh_private" class="checkbox" <?php if( in_array( "private", $show_status ) ) echo 'checked="checked" '?> />
+		<input type="checkbox" name="show_statuses[]" value="private" id="sh_private" class="checkbox" <?php if( in_array( "private", $show_statuses ) ) echo 'checked="checked" '?> />
 		<label for="sh_private"><?php echo T_('Private') ?> <span class="notes">(<?php echo T_('You only') ?>)</span></label><br />
 
-		<input type="checkbox" name="show_status[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_status ) ) echo 'checked="checked" '?> />
+		<input type="checkbox" name="show_statuses[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_statuses ) ) echo 'checked="checked" '?> />
 		<label for="sh_draft"><?php echo T_('Draft') ?> <span class="notes">(<?php echo T_('Not published!') ?>)</span></label><br />
 
-		<input type="checkbox" name="show_status[]" value="deprecated" id="sh_deprecated" class="checkbox" <?php if( in_array( "deprecated", $show_status ) ) echo 'checked="checked" '?> />
+		<input type="checkbox" name="show_statuses[]" value="deprecated" id="sh_deprecated" class="checkbox" <?php if( in_array( "deprecated", $show_statuses ) ) echo 'checked="checked" '?> />
 		<label for="sh_deprecated"><?php echo T_('Deprecated') ?> <span class="notes">(<?php echo T_('Not published!') ?>)</span></label><br />
 
 	 	</div>
@@ -257,6 +257,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.7  2006/09/06 20:45:34  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.6  2006/08/19 08:50:26  fplanque
  * moved out some more stuff from main
  *

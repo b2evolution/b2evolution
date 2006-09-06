@@ -280,11 +280,11 @@ class AbstractSettings
 				$this->_load( $col_key1 );
 
 				if( isset($this->cache[ $col_key1 ]->unserialized) )
-				{
+				{	// The value has been unserailized before:
 					$r = $this->cache[ $col_key1 ]->value;
 				}
 				elseif( isset($this->cache[ $col_key1 ]) )
-				{
+				{	// First attempt to access the value, we need to unserialize it:
 					// Try to unserialize setting (once) - this is as fast as checking an array of values that should get unserialized
 					if( $r = @unserialize($this->cache[ $col_key1 ]->value) )
 					{
@@ -297,7 +297,7 @@ class AbstractSettings
 					$this->cache[ $col_key1 ]->unserialized = true;
 				}
 				else
-				{
+				{	// The value is not in the cache, we use the default:
 					$r = $this->get_default( $col_key1 );
 					$this->cache[ $col_key1 ]->value = $r; // remember in cache
 					$this->cache[ $col_key1 ]->dbUptodate = true;
@@ -703,6 +703,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.13  2006/09/06 20:45:34  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.12  2006/08/04 23:27:03  blueyed
  * Fixed getting default values.
  *

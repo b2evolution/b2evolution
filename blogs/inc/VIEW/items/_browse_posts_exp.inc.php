@@ -33,7 +33,7 @@ global $ItemList;
  */
 global $Item;
 
-global $dispatcher, $blog, $posts, $posts_per_page, $poststart, $postend, $c, $show_statuses, $ReqURI;
+global $dispatcher, $blog, $posts, $posts_per_page, $poststart, $postend, $c, $ReqURI;
 global $add_item_url, $edit_item_url, $delete_item_url, $htsrv_url;
 global $comment_allowed_tags, $comments_use_autobr;
 
@@ -260,6 +260,9 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.21  2006/09/06 20:45:34  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.20  2006/08/29 00:26:11  fplanque
  * Massive changes rolling in ItemList2.
  * This is somehow the meat of version 2.0.

@@ -37,9 +37,6 @@ if( true !== CANUSEXMLRPC )
 $DB->halt_on_error = false;
 $DB->show_errors = false;
 
-// All statuses are allowed for display/acting on (including drafts and deprecated posts):
-$show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
-
 $post_default_title = ''; // posts submitted via the xmlrpc interface get that title
 
 $xmlrpc_debug_messages = 0;		// Set to 1 if you want to enable debug messages (comments inside of the XML responses)
@@ -861,7 +858,7 @@ $bloggergetrecentposts_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcSt
  */
 function bloggergetrecentposts( $m )
 {
-	global $xmlrpcerruser, $DB, $show_statuses;
+	global $xmlrpcerruser, $DB;
 
 	$blog_ID = $m->getParam(1);
 	$blog_ID = $blog_ID->scalarval();
@@ -898,6 +895,7 @@ function bloggergetrecentposts( $m )
 	$MainList = & new ItemList2( $Blog, NULL, NULL, $numposts );
 
 	$MainList->set_filters( array(
+			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated' ),
 			'order' => 'DESC',
 			'unit' => 'posts',
 		) );
@@ -1768,7 +1766,7 @@ $metawebloggetrecentposts_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcS
 
 function metawebloggetrecentposts( $m )
 {
-	global $xmlrpcerruser, $DB, $show_statuses;
+	global $xmlrpcerruser, $DB;
 	global $blog;
 
 	$blog_ID = $m->getParam(0);
@@ -1810,6 +1808,7 @@ function metawebloggetrecentposts( $m )
 	$MainList = & new ItemList2( $Blog, NULL, NULL, $numposts );
 
 	$MainList->set_filters( array(
+			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated' ),
 			'order' => 'DESC',
 			'unit' => 'posts',
 		) );
@@ -2225,6 +2224,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.112  2006/09/06 20:45:34  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.111  2006/09/06 18:34:07  fplanque
  * Finally killed the old stinkin' ItemList(1) class which is deprecated by ItemList2
  *

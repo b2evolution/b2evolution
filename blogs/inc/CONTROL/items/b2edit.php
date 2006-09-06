@@ -10,6 +10,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'MODEL/items/_item.class.php' );
 
 /**
  * @var AdminUI
@@ -24,7 +25,7 @@ $AdminUI->set_path( 'new', $tab );
 param( 'action', 'string', 'new', true );
 
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
-$show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
+// fp> rem 06/09/06 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
 
 /*
  * Load editable objects:

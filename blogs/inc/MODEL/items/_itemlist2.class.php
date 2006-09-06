@@ -155,7 +155,7 @@ class ItemList2 extends DataObjectList2
 				'ymdhms_min' => NULL,
 				'ymdhms_max' => NULL,
 				'statuses' => NULL,
-				'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated' ),
+				'visibility_array' => array( 'published', 'protected', 'private' ),
 				'order' => 'DESC',
 				'orderby' => 'datestart',
 				'unit' => $Settings->get('what_to_show'),
@@ -267,7 +267,7 @@ class ItemList2 extends DataObjectList2
 		 * Restrict to the statuses we want to show:
 		 */
 		// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
-		memorize_param( $this->param_prefix.'show_status', 'array', $this->default_filters['visibility_array'], $this->filters['visibility_array'] );	// Array of sharings to restrict to
+		memorize_param( $this->param_prefix.'show_statuses', 'array', $this->default_filters['visibility_array'], $this->filters['visibility_array'] );	// Array of sharings to restrict to
 
 		/*
 		 * OLD STYLE orders:
@@ -414,7 +414,7 @@ class ItemList2 extends DataObjectList2
 		 * Restrict to the statuses we want to show:
 		 */
 		// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
-		$this->filters['visibility_array'] = param( $this->param_prefix.'show_status', 'array', $this->default_filters['visibility_array'], true );	// Array of sharings to restrict to
+		$this->filters['visibility_array'] = param( $this->param_prefix.'show_statuses', 'array', $this->default_filters['visibility_array'], true );	// Array of sharings to restrict to
 
 
 		/*
@@ -1490,6 +1490,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.23  2006/09/06 20:45:34  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.22  2006/09/06 18:34:04  fplanque
  * Finally killed the old stinkin' ItemList(1) class which is deprecated by ItemList2
  *

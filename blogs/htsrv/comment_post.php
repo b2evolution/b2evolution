@@ -31,7 +31,7 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 
 // statuses allowed for acting on:
-$show_statuses = array( 'published', 'protected', 'private' );
+// fp> rem 06/09/06 $show_statuses = array( 'published', 'protected', 'private' );
 
 // Only for 0.9.0.11, for users who will not update their conf! :/
 if( !isset($minimum_comment_interval) ) $minimum_comment_interval = 30;
@@ -302,6 +302,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.86  2006/09/06 20:45:31  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.85  2006/08/20 22:25:20  fplanque
  * param_() refactoring part 2
  *

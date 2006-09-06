@@ -336,7 +336,7 @@ function cat_load_cache( $cat_load_postcounts = 'none', $dbtable_items = 'T_post
 													$dbIDname_items = 'post_ID' )
 {
 	global $DB, $cache_categories;
-	global $show_statuses, $timestamp_min, $timestamp_max;
+	global $timestamp_min, $timestamp_max;
 	global $Settings;
 
 	if( !isset($cache_categories))
@@ -965,6 +965,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.13  2006/09/06 20:45:34  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.12  2006/08/28 18:11:19  blueyed
  * doc/whitespace fixes
  *
