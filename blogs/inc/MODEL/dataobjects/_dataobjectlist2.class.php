@@ -124,7 +124,8 @@ class DataObjectList2 extends FilteredResults
 		// echo '<br />Get next, current idx was: '.$this->current_idx.'/'.$this->result_num_rows;
 
 		if( $this->current_idx >= $this->result_num_rows )
-		{	// No more comment in list
+		{	// No more object in list
+			$this->current_Obj = NULL;
 			$r = false; // TODO: try with NULL
 			return $r;
 		}
@@ -272,6 +273,9 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.6  2006/09/06 18:34:04  fplanque
+ * Finally killed the old stinkin' ItemList(1) class which is deprecated by ItemList2
+ *
  * Revision 1.5  2006/06/13 21:49:15  blueyed
  * Merged from 1.8 branch
  *

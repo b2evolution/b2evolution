@@ -84,6 +84,7 @@ class ItemList2 extends DataObjectList2
 	var $getting_adv_start_date = false;
 	var $getting_adv_stop_date = false;
 
+	var $group_by_cat = 0;
 
 	/**
 	 * Constructor
@@ -278,7 +279,6 @@ class ItemList2 extends DataObjectList2
 		 * Paging limits:
 		 */
 		memorize_param( $this->param_prefix.'unit', 'string', $this->default_filters['unit'], $this->filters['unit'] );    		// list unit: 'posts' or 'days'
-		$this->unit = $this->filters['unit'];	// TEMPORARY
 
 		memorize_param( $this->param_prefix.'posts', 'integer', $this->default_filters['posts'], $this->filters['posts'] ); 			// # of units to display on the page
 		$this->limit = $this->filters['posts']; // for compatibility with parent class
@@ -428,8 +428,6 @@ class ItemList2 extends DataObjectList2
 		 * Paging limits:
 		 */
 		$this->filters['unit'] = param( $this->param_prefix.'unit', 'string', $this->default_filters['unit'], true );    		// list unit: 'posts' or 'days'
-		$this->unit = $this->filters['unit'];	// TEMPORARY
-		// echo '<br />unit='.$this->filters['unit'];
 
 		$this->filters['posts'] = param( $this->param_prefix.'posts', 'integer', $this->default_filters['posts'], true ); 			// # of units to display on the page
 		$this->limit = $this->filters['posts']; // for compatibility with parent class
@@ -656,14 +654,14 @@ class ItemList2 extends DataObjectList2
 			parent::count_total_rows( $sql_count );
 			//echo '<br />'.$this->total_rows;
 		}
-		elseif( $this->unit == 'days' )
+		elseif( $this->filters['unit'] == 'days' )
 		{ // We are going to limit to x days:
 			// $this->total_rows = 1; // TODO: unknown, check...
 			$this->total_pages = 1;
 			$this->page = 1;
 		}
 		else
-			debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->unit.' (paged mode is obsolete)' );
+			debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->filters['unit'].' (paged mode is obsolete)' );
 
 
 
@@ -687,7 +685,7 @@ class ItemList2 extends DataObjectList2
 			}
 			$this->ItemQuery->LIMIT( $pgstrt.$this->limit );
 		}
-		elseif( $this->unit == 'days' )
+		elseif( $this->filters['unit'] == 'days' )
 		{ // We are going to limit to x days:
 			// echo 'LIMIT DAYS ';
 			if( empty( $this->filters['ymdhms_min'] ) )
@@ -725,7 +723,7 @@ class ItemList2 extends DataObjectList2
 			}
 		}
 		else
-			debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->unit.' (paged mode is obsolete)' );
+			debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->filters['unit'].' (paged mode is obsolete)' );
 
 
 		// GET DATA ROWS:
@@ -1066,7 +1064,7 @@ class ItemList2 extends DataObjectList2
 		elseif( $this->filters['unit'] == 'posts' )
 		{ // We're going to page, so there's no real limit here...
 		}
-		elseif( $this->unit == 'days' )
+		elseif( $this->filters['unit'] == 'days' )
 		{ // We are going to limit to x days:
 			// echo 'LIMIT DAYS ';
 			if( empty( $this->filters['ymdhms_min'] ) )
@@ -1088,7 +1086,7 @@ class ItemList2 extends DataObjectList2
 			}
 		}
 		else
-			debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->unit.' (paged mode is obsolete)' );
+			debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->filters['unit'].' (paged mode is obsolete)' );
 
 
 		return $title_array;
@@ -1109,13 +1107,57 @@ class ItemList2 extends DataObjectList2
 
 
 	/**
-	 * This is basically just a stub for backward compatibility
+	 * If the list is sorted by category...
 	 *
-	 * @deprecated
+	 * Note: this only supports one level of categories (nested cats will be flatened)
+	 */
+	function & get_category_group()
+	{
+		global $row;
+
+		if( empty( $this->current_Obj ) )
+		{	// Very first call
+			// Do a normal get_next()
+			parent::get_next();
+		}
+
+		if( empty( $this->current_Obj ) )
+		{	// We have reached the end of the list
+			return $this->current_Obj;
+		}
+
+		$this->group_by_cat = 1;
+
+		// Memorize main cat
+		$this->main_cat_ID = $this->current_Obj->main_cat_ID;
+
+		return $this->current_Obj;
+	}
+
+
+	/**
+	 * If the list is sorted by category...
+ 	 *
+ 	 * This is basically just a stub for backward compatibility
 	 */
 	function & get_item()
 	{
+		if( $this->group_by_cat == 1 )
+		{	// This is the first call to get_item() after get_category_group()
+			$this->group_by_cat = 2;
+			// Return the object we already got in get_category_group():
+			return $this->current_Obj;
+		}
+
 		$Item = & parent::get_next();
+
+		if( !empty($Item) && $this->group_by_cat == 2 && $Item->main_cat_ID != $this->main_cat_ID )
+		{	// We have just hit a new category!
+			$this->group_by_cat == 0; // For info only.
+			$r = false;
+			return $r;
+		}
+
 		return $Item;
 	}
 
@@ -1448,6 +1490,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.22  2006/09/06 18:34:04  fplanque
+ * Finally killed the old stinkin' ItemList(1) class which is deprecated by ItemList2
+ *
  * Revision 1.21  2006/08/30 21:59:36  blueyed
  * todo, doc, whitespace(!)
  *

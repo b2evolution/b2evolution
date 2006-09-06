@@ -83,26 +83,41 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 
 <?php // --------------------------- BLOG LIST -----------------------------
-	for( $blog=blog_list_start();
-				$blog!=false;
-				 $blog=blog_list_next() )
+
+	load_class( 'MODEL/items/_itemlist2.class.php' );
+
+	$BlogCache = & get_Cache( 'BlogCache' );
+
+	for( $blog = blog_list_start();
+				$blog != false;
+				 $blog = blog_list_next() )
 	{ # by uncommenting the following lines you can hide some blogs
 		// if( $blog == 1 ) continue; // Hide blog 1...
 		?>
-<h3><a href="<?php blog_list_iteminfo('blogurl', 'raw' ) ?>" title="<?php blog_list_iteminfo( 'shortdesc', 'htmlattr'); ?>"><?php blog_list_iteminfo( 'name', 'htmlbody'); ?></a></h3>
+		<h3><a href="<?php blog_list_iteminfo('blogurl', 'raw' ) ?>" title="<?php blog_list_iteminfo( 'shortdesc', 'htmlattr'); ?>"><?php blog_list_iteminfo( 'name', 'htmlbody'); ?></a></h3>
 		<ul>
 		<?php	// Get the 3 last posts for each blog:
-			$BlogBList = & new ItemList( $blog,  '', '', '', '', '', array(), '', 'DESC', '', 3, '', '', '', '', '', '', '', 'posts' );
+			$Blog_B = & $BlogCache->get_by_ID( $blog );
 
-			while( $Item = $BlogBList->get_item() )
+			$BlogBList = & new ItemList2( $Blog_B, NULL, 'now', 3 );
+
+			$BlogBList->set_filters( array(
+					'order' => 'DESC',
+					'unit' => 'posts',
+				) );
+
+			// Run the query:
+			$BlogBList->query();
+
+			while( $Item = & $BlogBList->get_item() )
 			{
-			?>
-			<li lang="<?php $Item->lang() ?>">
-				<?php $Item->issue_date() ?>:
-				<?php $Item->permanent_link( '#title#' ) ?>
-				<span class="small">[<?php $Item->lang() ?>]</span>
-			</li>
-			<?php
+				?>
+				<li lang="<?php $Item->lang() ?>">
+					<?php $Item->issue_date() ?>:
+					<?php $Item->permanent_link( '#title#' ) ?>
+					<span class="small">[<?php $Item->lang() ?>]</span>
+				</li>
+				<?php
 			}
 			?>
 			<li><a href="<?php blog_list_iteminfo('blogurl', 'raw' ) ?>"><?php echo T_('More posts...') ?></a></li>

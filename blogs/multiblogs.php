@@ -115,7 +115,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <?php // ------------------------------------ START OF POSTS ----------------------------------------
 	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
 
-	if( isset($MainList) ) while( $Item = $MainList->get_item() )
+	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
 	{
 		$MainList->date_if_changed();
 		?>
@@ -187,21 +187,27 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	<div class="bSideItem">
 		<?php
-		// Dirty trick until we get everything into objects:
-		$saved_blog = $blog;
-		$blog = 3;	// Blog B now
 		$BlogCache = & get_Cache( 'BlogCache' );
 		$Blog_B = & $BlogCache->get_by_ID( 3 ); // Blog B
 		?>
 
 		<h3>#2: <a href="<?php $Blog_B->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog_B->disp( 'name', 'htmlbody' ) ?></a></h3>
 		<?php
-		// You can restrict to specific categories by listing them in the two params below: '', array()
-		// '', array(9,15) will restrict to cats 9 and 15
-		// '9,15', array() will restrict to cats 9,15 and all their subcats
-		$BlogBList = & new ItemList( $blog,	 $show_statuses, '', $m, $w, '', array(), $author, $order, $orderby, $posts, '', '', '', '', '', '', '', $unit, $timestamp_min, $timestamp_max );
+		$BlogBList = & new ItemList2( $Blog_B, $timestamp_min, $timestamp_max, $posts );
 
-		while( $Item = $BlogBList->get_item() )
+		$BlogBList->set_filters( array(
+				'authors' => $author,
+				'ymdhms' => $m,
+				'week' => $w,
+				'order' => $order,
+				'orderby' => $orderby,
+				'unit' => $unit,
+			) );
+
+		// Run the query:
+		$BlogBList->query();
+
+		while( $Item = & $BlogBList->get_item() )
 		{
 			?>
 			<div class="bPostSide" lang="<?php $Item->lang() ?>">
@@ -220,9 +226,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			</div>
 			<?php
 		}
-
-		// Restore after dirty trick:
-		$blog = $saved_blog;
 		?>
 	</div>
 
@@ -230,20 +233,25 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	<div class="bSideItem">
 		<?php
-		// Dirty trick until we get everything into objects:
-		$saved_blog = $blog;
-		$blog = 4;		// Linkblog now
 		$Blog_roll = & $BlogCache->get_by_ID( 4 ); // Blog roll
 		?>
 		<h3>#3: <a href="<?php $Blog_roll->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog_roll->disp( 'name', 'htmlbody' ) ?></a></h3>
 		<?php
-		// You can restrict to specific categories by listing them in the two params below: '', array()
-		// '', array(9,15) will restrict to cats 9 and 15
-		// '9,15', array() will restrict to cats 9,15 and all their subcats
+		$LinkblogList = & new ItemList2( $Blog_roll, $timestamp_min, $timestamp_max, $posts );
 
-		$LinkblogList = & new ItemList( $blog,	$show_statuses, '', $m, $w, '', array(), $author, $order, $orderby, $posts, '', '', '', '', '', '', '', $unit, $timestamp_min, $timestamp_max );
+		$LinkblogList->set_filters( array(
+				'authors' => $author,
+				'ymdhms' => $m,
+				'week' => $w,
+				'order' => $order,
+				'orderby' => $orderby,
+				'unit' => $unit,
+			) );
 
-		while( $Item = $LinkblogList->get_item() )
+		// Run the query:
+		$LinkblogList->query();
+
+		while( $Item = & $LinkblogList->get_item() )
 		{
 			?>
 			<div class="bPostSide" lang="<?php $Item->lang() ?>">
@@ -262,9 +270,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			</div>
 			<?php
 		}
-
-		// Restore after dirty trick:
-		$blog = $saved_blog;
 		?>
 	</div>
 

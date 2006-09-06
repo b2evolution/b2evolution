@@ -891,14 +891,20 @@ function bloggergetrecentposts( $m )
 	}
 
 
-	// Get the posts to display:
-	$MainList = & new ItemList( $blog_ID, $show_statuses, '', '', '', '', array(), '', 'DESC', '', $numposts,
-															'', '', '', '', '', '', '', 'posts' );
+	$BlogCache = & get_Cache( 'BlogCache' );
+	$Blog = & $BlogCache->get_by_ID( $blog_ID );
 
-	if( $DB->error )
-	{ // DB error
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-	}
+	// Get the posts to display:
+	$MainList = & new ItemList2( $Blog, NULL, NULL, $numposts );
+
+	$MainList->set_filters( array(
+			'order' => 'DESC',
+			'unit' => 'posts',
+		) );
+
+	// Run the query:
+	$MainList->query();
+
 
 	xmlrpc_debugmsg( 'Items:'.$MainList->result_num_rows );
 
@@ -1797,14 +1803,22 @@ function metawebloggetrecentposts( $m )
 	logIO("O","In metawebloggetrecentposts, permissions ok...");
 	logIO("O","In metawebloggetrecentposts, current blog is ...". $blog_ID);
 
+	$BlogCache = & get_Cache( 'BlogCache' );
+	$Blog = & $BlogCache->get_by_ID( $blog_ID );
+
 	// Get the posts to display:
-	$MainList = & new ItemList( $blog_ID, $show_statuses, '', '', '', '', array(), '', 'DESC', '', $numposts,
-															'', '', '', '', '', '', '', 'posts' );
-	if( $DB->error )
-	{ // DB error
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-	}
+	$MainList = & new ItemList2( $Blog, NULL, NULL, $numposts );
+
+	$MainList->set_filters( array(
+			'order' => 'DESC',
+			'unit' => 'posts',
+		) );
+
+	// Run the query:
+	$MainList->query();
+
 	xmlrpc_debugmsg( 'Items:'.$MainList->result_num_rows );
+
 	$data = array();
 	while( $Item = $MainList->get_item() )
 	{
@@ -2211,6 +2225,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.111  2006/09/06 18:34:07  fplanque
+ * Finally killed the old stinkin' ItemList(1) class which is deprecated by ItemList2
+ *
  * Revision 1.110  2006/08/29 00:26:12  fplanque
  * Massive changes rolling in ItemList2.
  * This is somehow the meat of version 2.0.

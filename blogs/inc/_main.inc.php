@@ -306,7 +306,6 @@ require_once $model_path.'comments/_comment.funcs.php';
 require_once $model_path.'items/_item.funcs.php';
 require_once $model_path.'skins/_skin.funcs.php';
 require_once $model_path.'comments/_commentlist.class.php';
-require_once $model_path.'items/_itemlist.class.php';
 require_once $model_path.'sessions/_hitlog.funcs.php';     // referer logging
 require_once dirname(__FILE__).'/_misc/_form.funcs.php';
 require_once dirname(__FILE__).'/_misc/_form.class.php';
@@ -596,6 +595,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.50  2006/09/06 18:34:04  fplanque
+ * Finally killed the old stinkin' ItemList(1) class which is deprecated by ItemList2
+ *
  * Revision 1.49  2006/08/20 22:39:31  fplanque
  * no message
  *

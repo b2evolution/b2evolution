@@ -318,29 +318,8 @@ if( ($disp == 'posts') || ($disp == 'single') )
 
 	// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
 
-/*
-	// TODO: There's a bug here with using $catsel (instead of $cat_array), which I've reported to dev-ML (don't remember). Francois, please look into it.
-	$MainList = & new ItemList(
-		$blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
-		$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
-		$preview, $unit, $timestamp_min, $timestamp_max, $title, $dstart );
-	$MainList->get_max_paged();
-
-	// Old style globals for category.funcs:
-	$postIDlist = & $MainList->postIDlist;
-	$postIDarray = & $MainList->postIDarray;
-*/
-
-
-	// This is the shape of things to come:
-
 	$MainList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max, $Settings->get('posts_per_page') );
 
-	// Init filter params:
-	/*	$MainList->set_default_filters( array(
-				'unit' =>
-			) );
-	*/
 	// pre_dump( $MainList->default_filters );
 
 	$MainList->load_from_Request( false );
@@ -499,6 +478,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.37  2006/09/06 18:34:04  fplanque
+ * Finally killed the old stinkin' ItemList(1) class which is deprecated by ItemList2
+ *
  * Revision 1.36  2006/08/29 00:26:11  fplanque
  * Massive changes rolling in ItemList2.
  * This is somehow the meat of version 2.0.

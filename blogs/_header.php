@@ -127,12 +127,6 @@ $AdminUI->add_menu_entries(
 				'entries' => array(
 					// NOTE: the following entries are defaults in case of the DHTML drop down menu,
 					// they will be overridden in the browse controller
-						/* Deprecated:
-						'postlist' => array(
-							'text' => T_('Post list (Old)'),
-							'href' => 'admin.php?ctrl=browse&amp;tab=postlist&amp;blog='.$blog,
-							),
-						*/
 						'postlist2' => array(
 							'text' => T_('Post list'),
 							'href' => 'admin.php?ctrl=browse&amp;tab=postlist2&amp;blog='.$blog,
@@ -327,6 +321,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.17  2006/09/06 18:34:04  fplanque
+ * Finally killed the old stinkin' ItemList(1) class which is deprecated by ItemList2
+ *
  * Revision 1.16  2006/08/26 16:33:02  fplanque
  * enhanced stats
  *

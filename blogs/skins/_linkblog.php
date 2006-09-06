@@ -43,30 +43,39 @@ if(!isset($linkblog_item_after)) $linkblog_item_after = '</li>';
 
 
 // Load the linkblog blog:
-$LinkblogList = & new ItemList(
-	$linkblog, array(), '', '', '', $linkblog_cat, $linkblog_catsel, '', 'ASC',
-	'main_cat_ID title', $linkblog_limit, '', '', '', '', '', '', '',
-	'posts', $timestamp_min, $timestamp_max );
+$link_Blog = & $BlogCache->get_by_ID( $linkblog );
 
+$LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $linkblog_limit );
 
-// Dirty trick until we get everything into objects:
-$saved_blog = $blog;
-$blog = $linkblog;
+// Compile cat array stuff:
+$linkblog_cat_array = array();
+$linkblog_cat_modifier = '';
+compile_cat_array( $linkblog_cat, $linkblog_catsel, & $linkblog_cat_array, & $linkblog_cat_modifier, $linkblog );
+
+$LinkblogList->set_filters( array(
+		'cat_array' => $linkblog_cat_array,
+		'cat_modifier' => $linkblog_cat_modifier,
+		'order' => 'ASC',
+		'orderby' => 'main_cat_ID title',
+		'unit' => 'posts',
+	) );
+
+// Run the query:
+$LinkblogList->query();
+
 
 // Open the global list
 echo $linkblog_main_start;
 
-$previous_cat = '';
-$linkblog_cat = '';
 
-while( $Item = $LinkblogList->get_category_group() )
+while( $Item = & $LinkblogList->get_category_group() )
 {
 	// Open new cat:
 	echo $linkblog_catname_before;
 	$Item->main_category();
 	echo $linkblog_catname_after;
 
-	while( $Item = $LinkblogList->get_item() )
+	while( $Item = & $LinkblogList->get_item() )
 	{
 		echo $linkblog_item_before;
 		$Item->title();
@@ -83,12 +92,12 @@ while( $Item = $LinkblogList->get_category_group() )
 // Close the global list
 echo $linkblog_main_end;
 
-// Restore after dirty trick:
-$blog = $saved_blog;
-
 
 /*
  * $Log$
+ * Revision 1.15  2006/09/06 18:34:04  fplanque
+ * Finally killed the old stinkin' ItemList(1) class which is deprecated by ItemList2
+ *
  * Revision 1.14  2006/07/06 19:56:29  fplanque
  * no message
  *

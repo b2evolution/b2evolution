@@ -107,8 +107,9 @@ skin_content_header();	// Sets charset!
 
 	<div class="rightFlush">
 	<?php
-	// TODO: "Call to undefined function"
-	link_pages() ?>
+		// Links to post pages (for multipage posts):
+		$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
+	?>
 
 	<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
 	<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
