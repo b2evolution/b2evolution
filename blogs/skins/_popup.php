@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // TODO: blueyed>> What's that?? A HTML-page-block for every item?! Shouldn't that just use $Item perhaps??
 // it's cafelog/b2 legacy. Idf $Item is already available, then fine ;)
 // blueyed> I'm not sure, it just does not seem to make sense to have a loop here!
-while( $Item = $MainList->get_item() )
+while( $Item = & $MainList->get_item() )
 {
 header('Content-Type: text/html; charset='.$io_charset);
 ?>
@@ -60,6 +60,9 @@ header('Content-Type: text/html; charset='.$io_charset);
 
 /*
  * $Log$
+ * Revision 1.16  2006/09/06 21:39:22  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.15  2006/08/19 02:15:08  fplanque
  * Half kille dthe pingbacks
  * Still supported in DB in case someone wants to write a plugin.

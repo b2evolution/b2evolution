@@ -320,19 +320,26 @@ if( ($disp == 'posts') || ($disp == 'single') )
 
 	$MainList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max, $Settings->get('posts_per_page') );
 
-	// pre_dump( $MainList->default_filters );
+	if( ! $preview )
+	{
+		// pre_dump( $MainList->default_filters );
+		$MainList->load_from_Request( false );
+		// pre_dump( $MainList->filters );
 
-	$MainList->load_from_Request( false );
+		// Run the query:
+		$MainList->query();
 
-	// pre_dump( $MainList->filters );
+		// Old style globals for category.funcs:
+		$postIDlist = $MainList->get_page_ID_list();
+		$postIDarray = $MainList->get_page_ID_array();
+	}
+	else
+	{	// We want to preview a	single post, we are going to fake a lot of things...
+		$MainList->peview_from_request();
 
-	// Run the query:
-	$MainList->query();
-
-	// Old style globals for category.funcs:
-	$postIDlist = $MainList->get_page_ID_list();
-	$postIDarray = $MainList->get_page_ID_array();
-
+		// Legacy for the category display
+		$cat_array = array();
+	}
 
 	param( 'more', 'integer', 0, true );
 	param( 'page', 'integer', 1, true );						// Post page to show
@@ -478,6 +485,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.38  2006/09/06 21:39:21  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.37  2006/09/06 18:34:04  fplanque
  * Finally killed the old stinkin' ItemList(1) class which is deprecated by ItemList2
  *

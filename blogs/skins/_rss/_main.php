@@ -55,7 +55,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			  <description><?php $Blog->disp( 'shortdesc' ,'xml' ) ?></description>
 			  <language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
 			  <docs>http://backend.userland.com/rss092</docs>
-			  <?php while( $Item = $MainList->get_item() ) { ?>
+			  <?php while( $Item = & $MainList->get_item() ) { ?>
 			  <item>
 			    <title><?php $Item->title( '', '', false, 'xml' ) ?></title>
 			    <description><?php

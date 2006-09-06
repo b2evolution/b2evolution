@@ -16,7 +16,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-while( $Item = $MainList->get_item() )
+while( $Item = & $MainList->get_item() )
 {
 header( 'Content-type: text/html; charset='.$io_charset );
 ?>

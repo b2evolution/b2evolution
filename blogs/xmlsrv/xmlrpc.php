@@ -907,7 +907,7 @@ function bloggergetrecentposts( $m )
 	xmlrpc_debugmsg( 'Items:'.$MainList->result_num_rows );
 
 	$data = array();
-	while( $Item = $MainList->get_item() )
+	while( $Item = & $MainList->get_item() )
 	{
 		xmlrpc_debugmsg( 'Item:'.$Item->title.
 											' - Issued: '.$Item->issue_date.
@@ -1819,7 +1819,7 @@ function metawebloggetrecentposts( $m )
 	xmlrpc_debugmsg( 'Items:'.$MainList->result_num_rows );
 
 	$data = array();
-	while( $Item = $MainList->get_item() )
+	while( $Item = & $MainList->get_item() )
 	{
 		xmlrpc_debugmsg( 'Item:'.$Item->title.
 											' - Issued: '.$Item->issue_date.
@@ -2224,6 +2224,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.113  2006/09/06 21:39:23  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.112  2006/09/06 20:45:34  fplanque
  * ItemList2 fixes
  *

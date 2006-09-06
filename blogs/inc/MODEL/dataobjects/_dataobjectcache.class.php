@@ -208,7 +208,7 @@ class DataObjectCache
 	{
 		global $Debuglog;
 
-		if( empty($Obj->ID) )
+		if( is_null($Obj->ID) )	// value 0 is used by item preview
 		{
 			$Debuglog->add( 'No object to add!', 'dataobjects' );
 			return false;
@@ -239,7 +239,7 @@ class DataObjectCache
 		// Get ID of the object we'ere preparing to instantiate...
 		$obj_ID = $db_row->{$this->dbIDname};
 
-		if( empty($obj_ID) )
+		if( is_null($obj_ID) )	// value 0 is used for item preview
 		{
 			$Obj = NULL;
 			return $Obj;
@@ -256,7 +256,7 @@ class DataObjectCache
 		{ // Not already cached, add new object:
 			$this->add( $this->new_obj( $db_row ) );
 		}
-		
+
 		return $this->cache[$obj_ID];
 	}
 
@@ -525,6 +525,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.7  2006/09/06 21:39:21  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.6  2006/08/02 16:34:16  yabs
  * corrected $row to $db_row in function get_by_name()
  *

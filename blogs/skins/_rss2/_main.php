@@ -58,7 +58,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				<docs>http://backend.userland.com/rss</docs>
 				<admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $app_version ?>"/>
 				<ttl>60</ttl>
-				<?php while( $Item = $MainList->get_item() ) {	?>
+				<?php while( $Item = & $MainList->get_item() ) {	?>
 				<item>
 					<title><?php $Item->title( '', '', false, 'xml' ) ?></title>
 					<link><?php $Item->permanent_url( 'single' ) ?></link>

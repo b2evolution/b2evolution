@@ -539,6 +539,118 @@ class ItemList2 extends DataObjectList2
 
 
 	/**
+	 * We want to preview a	single post, we are going to fake a lot of things...
+	 *
+	 */
+	function peview_from_request()
+	{
+		global $DB, $localtimenow, $Messages, $current_User, $BlogCache;
+
+		$preview_userid = param( 'preview_userid', 'integer', true );
+		$post_status = param( 'post_status', 'string', true );
+		$post_locale = param( 'post_locale', 'string', $current_User->locale );
+		$content = param( 'content', 'html', true );
+		$post_title = param( 'post_title', 'html', true );
+		$post_url = param( 'post_url', 'string', '' );
+		$post_category = param( 'post_category', 'integer', true );
+		$post_views = param( 'post_views', 'integer', 0 );
+		$renderers = param( 'renderers', 'array', array('default') );
+		if( ! is_array($renderers) )
+		{ // dh> workaround for param() bug. See rev 1.93 of /inc/_misc/_misc.funcs.php
+			$renderers = array('default');
+		}
+		$comment_Blog = & $BlogCache->get_by_ID( get_catblog( $post_category ) );
+		if( $comment_Blog->allowcomments == 'post_by_post' )
+		{ // param is required
+			$post_comment_status = param( 'post_comment_status', 'string', true );
+		}
+		else
+		{
+			$post_comment_status = $comment_Blog->allowcomments;
+		}
+
+		if( !empty($current_User) && $current_User->check_perm( 'edit_timestamp' ) && param( 'edit_date', 'integer', 0 ) )
+		{ // user is allowed to edit timestamps and has checked the box
+			param_date( 'item_issue_date', T_('Please enter a valid issue date.'), $force_edit_date /* required */ );
+			if( strlen(get_param('item_issue_date')) )
+			{ // only set it, if a date was given:
+				param_time( 'item_issue_time' );
+				$item_issue_date = form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ); // TODO: cleanup...
+			}
+			else
+			{
+				$item_issue_date = date( 'Y-m-d H:i:s', $localtimenow );
+			}
+		}
+		else
+		{
+			$item_issue_date = date( 'Y-m-d H:i:s', $localtimenow );
+		}
+
+
+		if( !($item_typ_ID = param( 'item_typ_ID', 'integer', NULL )) )
+			$item_typ_ID = NULL;
+		if( !($item_st_ID = param( 'item_st_ID', 'integer', NULL )) )
+			$item_st_ID = NULL;
+		if( !($item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL )) )
+			$item_assigned_user_ID = NULL;
+		if( !($item_deadline = param( 'item_deadline', 'string', NULL )) )
+			$item_deadline = NULL;
+		$item_priority = param( 'item_priority', 'integer', NULL ); // QUESTION: can this be also empty/NULL?
+
+		$post_title = format_to_post( $post_title, 0 );
+		$content = format_to_post( $content );
+
+		$post_renderers = implode( '.', $renderers );
+
+		if( $errcontent = $Messages->display( T_('Invalid post, please correct these errors:'), '', false, 'error' ) )
+		{
+			$content = $errcontent;
+		}
+
+		// little funky fix for IEwin, rawk on that code
+		global $Hit;
+		if( ($Hit->is_winIE) && (!isset($IEWin_bookmarklet_fix)) )
+		{ // QUESTION: Is this still needed? What about $IEWin_bookmarklet_fix? (blueyed)
+			$content = preg_replace('/\%u([0-9A-F]{4,4})/e', "'&#'.base_convert('\\1',16,10). ';'", $content);
+		}
+
+		$this->sql = "SELECT
+			0 AS {$this->Cache->dbIDname},
+			$preview_userid AS {$this->Cache->dbprefix}creator_user_ID,
+			$preview_userid AS {$this->Cache->dbprefix}lastedit_user_ID,
+			'$item_issue_date' AS {$this->Cache->dbprefix}datestart,
+			'$item_issue_date' AS {$this->Cache->dbprefix}datecreated,
+			'$item_issue_date' AS {$this->Cache->dbprefix}datemodified,
+			'".$DB->escape($post_status)."' AS {$this->Cache->dbprefix}status,
+			'".$DB->escape($post_locale)."' AS {$this->Cache->dbprefix}locale,
+			'".$DB->escape($content)."' AS {$this->Cache->dbprefix}content,
+			'".$DB->escape($post_title)."' AS {$this->Cache->dbprefix}title,
+			NULL AS {$this->Cache->dbprefix}urltitle,
+			'".$DB->escape($post_url)."' AS {$this->Cache->dbprefix}url,
+			$post_category AS {$this->Cache->dbprefix}main_cat_ID,
+			$post_views AS {$this->Cache->dbprefix}views,
+			'' AS {$this->Cache->dbprefix}flags,
+			'noreq' AS {$this->Cache->dbprefix}notifications_status,
+			NULL AS {$this->Cache->dbprefix}notifications_ctsk_ID,
+			".bpost_count_words( $content )." AS {$this->Cache->dbprefix}wordcount,
+			".$DB->quote($post_comment_status)." AS {$this->Cache->dbprefix}comment_status,
+			'".$DB->escape( $post_renderers )."' AS {$this->Cache->dbprefix}renderers,
+			".$DB->quote($item_assigned_user_ID)." AS {$this->Cache->dbprefix}assigned_user_ID,
+			".$DB->quote($item_typ_ID)." AS {$this->Cache->dbprefix}ptyp_ID,
+			".$DB->quote($item_st_ID)." AS {$this->Cache->dbprefix}pst_ID,
+			".$DB->quote($item_deadline)." AS {$this->Cache->dbprefix}datedeadline,
+			".$DB->quote($item_priority)." AS {$this->Cache->dbprefix}priority";
+
+		$this->total_rows = 1;
+		$this->total_pages = 1;
+		$this->page = 1;
+
+		parent::query( false, false, false );
+	}
+
+
+	/**
 	 *
 	 *
 	 * @todo count?
@@ -1158,6 +1270,8 @@ class ItemList2 extends DataObjectList2
 			return $r;
 		}
 
+		//pre_dump( $Item );
+
 		return $Item;
 	}
 
@@ -1490,6 +1604,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.24  2006/09/06 21:39:22  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.23  2006/09/06 20:45:34  fplanque
  * ItemList2 fixes
  *
