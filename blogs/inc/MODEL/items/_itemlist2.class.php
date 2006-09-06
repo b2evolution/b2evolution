@@ -1567,6 +1567,8 @@ class ItemList2 extends DataObjectList2
 	 */
 	function page_links( $before = '#', $after = '#', $format = '#', $params = array(), $single = '' )
 	{
+		global $generating_static;
+
 		if( $this->total_pages <= 1 )
 		{	// Single page:
 			echo $single;
@@ -1578,8 +1580,8 @@ class ItemList2 extends DataObjectList2
 			$format = '$prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$';
 		}
 
-		// Use defaults + overrides:
-		$params = array_merge( array(
+		$default_params = array(
+				'page_url' => '', // All generated links will refer to the current page
 				'prev_text' => '&lt;&lt;',
 				'next_text' => '&gt;&gt;',
 				'no_prev_text' => '',
@@ -1588,7 +1590,14 @@ class ItemList2 extends DataObjectList2
 				'list_next_text' => '...',
 				'list_span' => 11,
 				'scroll_list_range' => 5,
-			), $params );
+			);
+	  if( !empty($generating_static) )
+	  {	// When generating a static page, act as if we were currently on the blog main page:
+	  	$default_params['page_url'] = $this->Blog->get('url');
+		}
+
+		// Use defaults + overrides:
+		$params = array_merge( $default_params, $params );
 
 		echo $before;
 		echo $this->replace_vars( $format, $params );
@@ -1598,6 +1607,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.26  2006/09/06 23:32:55  fplanque
+ * fixed itemlist nav when generating static
+ *
  * Revision 1.25  2006/09/06 21:46:08  fplanque
  * ItemList2 fixes
  *

@@ -872,6 +872,7 @@ class AdminUI_general
 			case 'Results':
 				// Results list:
 				return array(
+					'page_url' => '', // All generated links will refer to the current page
 					'before' => '<div class="results">',
 					'header_start' => '<div class="results_nav">',
 						'header_text' => '<strong>Pages</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
@@ -1309,6 +1310,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.29  2006/09/06 23:32:56  fplanque
+ * fixed itemlist nav when generating static
+ *
  * Revision 1.28  2006/08/29 00:26:12  fplanque
  * Massive changes rolling in ItemList2.
  * This is somehow the meat of version 2.0.

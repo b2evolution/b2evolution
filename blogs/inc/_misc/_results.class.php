@@ -1895,18 +1895,22 @@ class Results extends Widget
 			case 'prev' :
 				//inits the link to previous page
 				return ( $this->page > 1 )
-					? '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.($this->page-1) ).'">'.$this->params['prev_text'].'</a>'
+					? '<a href="'
+						.regenerate_url( $this->page_param, $this->page_param.'='.($this->page-1), $this->params['page_url'] )
+						.'">'.$this->params['prev_text'].'</a>'
 					: $this->params['no_prev_text'];
 
 			case 'next' :
 				//inits the link to next page
 				return ( $this->page < $this->total_pages )
-					? '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.($this->page+1) ).'">  '.$this->params['next_text'].'</a>'
+					? '<a href="'
+						.regenerate_url( $this->page_param, $this->page_param.'='.($this->page+1), $this->params['page_url'] )
+						.'">'.$this->params['next_text'].'</a>'
 					: $this->params['no_next_text'];
 
 			case 'list' :
 				//inits the page list
-				return $this->page_list( $this->first(), $this->last() );
+				return $this->page_list( $this->first(), $this->last(), $this->params['page_url'] );
 
 			case 'scroll_list' :
 				//inits the scrolling list of pages
@@ -1914,19 +1918,19 @@ class Results extends Widget
 
 			case 'first' :
 				//inits the link to first page
-				return $this->display_first();
+				return $this->display_first( $this->params['page_url'] );
 
 			case 'last' :
 				//inits the link to last page
-				return $this->display_last();
+				return $this->display_last( $this->params['page_url'] );
 
 			case 'list_prev' :
 				//inits the link to previous page range
-				return $this->display_prev();
+				return $this->display_prev( $this->params['page_url'] );
 
 			case 'list_next' :
 				//inits the link to next page range
-				return $this->display_next();
+				return $this->display_next( $this->params['page_url'] );
 
 			case 'nb_cols' :
 				// Number of columns in result:
@@ -1981,11 +1985,11 @@ class Results extends Widget
 	/**
 	 * returns the link to the first page, if necessary
 	 */
-	function display_first()
+	function display_first( $page_url = '' )
 	{
 		if( $this->first() > 1 )
 		{ //the list doesn't contain the first page
-			return '<a href="'.regenerate_url( $this->page_param, $this->page_param.'=1' ).'">1</a>';
+			return '<a href="'.regenerate_url( $this->page_param, $this->page_param.'=1', $page_url ).'">1</a>';
 		}
 		else
 		{ //the list already contains the first page
@@ -1997,11 +2001,11 @@ class Results extends Widget
 	/**
 	 * returns the link to the last page, if necessary
 	 */
-	function display_last()
+	function display_last( $page_url = '' )
 	{
 		if( $this->last() < $this->total_pages )
 		{ //the list doesn't contain the last page
-			return '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$this->total_pages ).'">'.$this->total_pages.'</a>';
+			return '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$this->total_pages, $page_url ).'">'.$this->total_pages.'</a>';
 		}
 		else
 		{ //the list already contains the last page
@@ -2013,11 +2017,11 @@ class Results extends Widget
 	/**
 	 * returns a link to previous pages, if necessary
 	 */
-	function display_prev()
+	function display_prev( $page_url = '' )
 	{
 		if( $this->display_first() != NULL )
 		{ //the list has to be displayed
-			return '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.($this->first()-1) ).'">'
+			return '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.($this->first()-1), $page_url ).'">'
 								.$this->params['list_prev_text'].'</a>';
 		}
 
@@ -2027,11 +2031,11 @@ class Results extends Widget
 	/**
 	 * returns a link to next pages, if necessary
 	 */
-	function display_next()
+	function display_next( $page_url = '' )
 	{
 		if( $this->display_last() != NULL )
 		{ //the list has to be displayed
-			return '<a href="'.regenerate_url( $this->page_param,$this->page_param.'='.($this->last()+1) ).'">'
+			return '<a href="'.regenerate_url( $this->page_param,$this->page_param.'='.($this->last()+1), $page_url ).'">'
 								.$this->params['list_next_text'].'</a>';
 		}
 	}
@@ -2040,7 +2044,7 @@ class Results extends Widget
 	/**
 	 * Returns the page link list under the table
 	 */
-	function page_list($min, $max)
+	function page_list( $min, $max, $page_url = '' )
 	{
 		$i = 0;
 		$list = '';
@@ -2049,11 +2053,13 @@ class Results extends Widget
 		{
 			if( $i == $this->page )
 			{ //no link for the current page
-				$list = $list.'<strong class="current_page">'.$i.'</strong> ';
+				$list .= '<strong class="current_page">'.$i.'</strong> ';
 			}
 			else
 			{ //a link for non-current pages
-				$list = $list.'<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$i).'">'.$i.'</a> ';
+				$list .= '<a href="'
+					.regenerate_url( $this->page_param, $this->page_param.'='.$i, $page_url )
+					.'">'.$i.'</a> ';
 			}
 		}
 		return $list;
@@ -2180,6 +2186,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.29  2006/09/06 23:32:56  fplanque
+ * fixed itemlist nav when generating static
+ *
  * Revision 1.28  2006/08/29 00:26:11  fplanque
  * Massive changes rolling in ItemList2.
  * This is somehow the meat of version 2.0.
