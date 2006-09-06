@@ -569,18 +569,12 @@ class ItemList2 extends DataObjectList2
 			$post_comment_status = $comment_Blog->allowcomments;
 		}
 
-		if( !empty($current_User) && $current_User->check_perm( 'edit_timestamp' ) && param( 'edit_date', 'integer', 0 ) )
-		{ // user is allowed to edit timestamps and has checked the box
-			param_date( 'item_issue_date', T_('Please enter a valid issue date.'), $force_edit_date /* required */ );
-			if( strlen(get_param('item_issue_date')) )
-			{ // only set it, if a date was given:
-				param_time( 'item_issue_time' );
-				$item_issue_date = form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ); // TODO: cleanup...
-			}
-			else
-			{
-				$item_issue_date = date( 'Y-m-d H:i:s', $localtimenow );
-			}
+
+		param_date( 'item_issue_date', T_('Please enter a valid issue date.'), false );
+		if( strlen(get_param('item_issue_date')) )
+		{ // only set it, if a date was given:
+			param_time( 'item_issue_time' );
+			$item_issue_date = form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ); // TODO: cleanup...
 		}
 		else
 		{
@@ -1604,6 +1598,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.25  2006/09/06 21:46:08  fplanque
+ * ItemList2 fixes
+ *
  * Revision 1.24  2006/09/06 21:39:22  fplanque
  * ItemList2 fixes
  *
