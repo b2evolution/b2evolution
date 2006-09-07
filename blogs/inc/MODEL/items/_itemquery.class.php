@@ -293,6 +293,24 @@ class ItemQuery extends SQL
 
 
 	/**
+	 * Restrict to specific locale
+	 *
+	 * @param string locale to restrict to ('all' if you don't want to restrict)
+	 */
+	function where_locale( $locale )
+	{
+		global $DB;
+
+		if( $locale == 'all' )
+		{
+			return;
+		}
+
+		$this->WHERE_and( $this->dbprefix.'locale LIKE '.$DB->quote($locale.'%') );
+	}
+
+
+	/**
 	 * Restrict to specific (exetnded) statuses
 	 *
 	 * @param string List of assignees to restrict to (must have been previously validated)
@@ -553,6 +571,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.9  2006/09/07 00:48:55  fplanque
+ * lc parameter for locale filtering of posts
+ *
  * Revision 1.8  2006/08/30 22:00:04  blueyed
  * Whitespace
  *

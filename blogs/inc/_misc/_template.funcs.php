@@ -63,7 +63,7 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 												$display = true, $linktoyeararchive = true, $blogurl = '', $params = '', 
 												$disp_single_title = true, $default = '' )
 {
-	global $cat_modifier, $cat_array, $m, $w, $month, $p, $title, $preview, $disp, $s, $author;
+	global $MainList, $preview, $disp;
 
 	$r = array();
 
@@ -100,123 +100,20 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			{	// We are requesting a post preview:
 				$r[] = T_('PREVIEW');
 			}
-			elseif( $disp_single_title )
+			elseif( $disp_single_title && isset( $MainList ) )
 			{
-				$ItemCache = & get_Cache( 'ItemCache' );
-				if( intval($p) )
-				{	// We are requesting a specific post by ID:
-					if( $Item = & $ItemCache->get_by_ID( $p, false ) )
-					{
-						$r[] = $Item->get('title');
-					}
-				}
-				elseif( !empty( $title ) )
-				{	// We are requesting a specific post by title:
-					if( $Item = & $ItemCache->get_by_urltitle( $title, false ) )
-					{
-						$r[] = $Item->get('title');
-					}
-				}
+				$r = array_merge( $r, $MainList->get_filter_titles( array( 'visibility', 'hide_future' ) ) );
 			}
 			break;		
 	
 		default:
-			// We are displaying a message list/search results...
-			// CATEGORIES:
-			if( !empty($cat_array) )
-			{ // We have requested specific categories...
-				$cat_names = array();
-				foreach( $cat_array as $cat_ID )
-				{
-					if( ($my_cat = get_the_category_by_ID( $cat_ID, false ) ) !== false )
-					{ // It is almost never meaningful to die over an invalid cat when generating title
-						$cat_names[] = $my_cat['cat_name'];
-					}
-				}
-				if( $cat_modifier == '*' )
-				{
-					$cat_names_string = implode( ' + ', $cat_names );
-				}
-				else
-				{
-					$cat_names_string = implode( ', ', $cat_names );
-				}
-				if( !empty( $cat_names_string ) )
-				{
-					if( $cat_modifier == '-' )
-					{
-						$cat_names_string = T_('All but ').$cat_names_string;
-						$r[] = T_('Categories').': '.$cat_names_string;
-					}
-					else
-					{
-						if( count($cat_array) > 1 )
-							$r[] = T_('Categories').': '.$cat_names_string;
-						else
-							$r[] = T_('Category').': '.$cat_names_string;
-					}
-				}
-			}
-
-
-			// TIMEFRAME:
-			if( !empty($m) )
-			{	// We have asked for a specific timeframe:
-
-				$my_year = substr($m,0,4);
-				if( strlen($m) > 4 && isset($month[substr($m,4,2)]) )
-				{ // We have requested a month too:
-					$my_month = T_($month[substr($m,4,2)]);
-				}
-				else
-				{
-					$my_month = '';
-				}
-				// Requested a day?
-				$my_day = substr($m,6,2);
-
-				if( $format == 'htmlbody' && !empty( $my_month ) && $linktoyeararchive )
-				{ // display year as link to year's archive
-					$my_year = '<a href="' . archive_link( $my_year, '', '', '', false, $blogurl, $params ) . '">' . $my_year . '</a>';
-				}
-
-				$arch = T_('Archives for').': '.$my_month.' '.$my_year;
-
-				if( !empty( $my_day ) )
-				{	// We also want to display a day
-					$arch .= ", $my_day";
-				}
-
-				if( !empty($w) && ($w>=0) ) // Note: week # can be 0
-				{	// We also want to display a week number
-					$arch .= ", week $w";
-				}
-
-				$r[] = $arch;
-			}
-
-
-			// KEYWORDS:
-			if( !empty($s) )
+			if( isset( $MainList ) )
 			{
-				$r[] = T_('Keyword(s)').': '.$s;
+				$r = array_merge( $r, $MainList->get_filter_titles( array( 'visibility', 'hide_future' ) ) );
 			}
-
-
-			// AUTHORS:
-			if( !empty($author) )
-			{
-				$r[] = T_('Author(s)').': '.$author;
-			}
+			break;
 	}
 
-
-	/* TODO: once the MainList is moved to ItemList2, remove a lot from above and get them like this:
-	// EXPERIMENTAL:
-	global $MainList;
-	$additional_titles = $MainList->get_title();
-	$r = array_merge( $r, $additional_titles );
-	*/
 
 	if( ! empty( $r ) )
 	{
@@ -312,6 +209,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.11  2006/09/07 00:48:55  fplanque
+ * lc parameter for locale filtering of posts
+ *
  * Revision 1.10  2006/08/24 00:38:18  fplanque
  * allow full control over the default title
  *

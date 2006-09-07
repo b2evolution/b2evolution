@@ -189,8 +189,14 @@ function param( $var, $type = '', $default = '', $memorize = false,
 						$GLOBALS[$var] = NULL;
 						$Debuglog->add( 'param(-): <strong>'.$var.'</strong> set to NULL', 'params' );
 					}
-
-					// TODO: dh> if a var comes in as '' but has type "array" it does not get "converted" to array type (nor gets the default used!)
+				}
+				elseif( $GLOBALS[$var] === array() )
+				{
+					if( $strict_typing === false && $use_default )
+					{	// ADDED BY FP 2006-09-07
+						// We want to consider empty values as invalid and fall back to the default value:
+						$GLOBALS[$var] = $default;
+					}
 				}
 				else
 				{
@@ -1519,6 +1525,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.7  2006/09/07 00:48:55  fplanque
+ * lc parameter for locale filtering of posts
+ *
  * Revision 1.6  2006/08/28 18:28:07  fplanque
  * minor
  *

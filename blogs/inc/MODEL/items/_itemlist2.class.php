@@ -145,6 +145,7 @@ class ItemList2 extends DataObjectList2
 				'authors' => NULL,
 				'assignees' => NULL,
 				'author_assignee' => NULL,
+				'lc' => 'all',									// Filter on requested locale
 				'keywords' => NULL,
 				'phrase' => 'AND',
 				'exact' => 0,
@@ -224,11 +225,15 @@ class ItemList2 extends DataObjectList2
 		 */
 		memorize_param( $this->param_prefix.'assgn', 'string', $this->default_filters['assignees'], $this->filters['assignees'] );  // List of assignees to restrict to
 
-
 		/*
 		 * Restrict to selected author OR assignee:
 		 */
 		memorize_param( $this->param_prefix.'author_assignee', 'string', $this->default_filters['author_assignee'], $this->filters['author_assignee'] );
+
+		/*
+		 * Restrict to selected locale:
+		 */
+		memorize_param( $this->param_prefix.'lc', 'string', $this->default_filters['lc'], $this->filters['lc'] );  // Locale to restrict to
 
 		/*
 		 * Restrict to selected statuses:
@@ -361,6 +366,12 @@ class ItemList2 extends DataObjectList2
 
 
 		/*
+		 * Restrict to selected locale:
+		 */
+		$this->filters['lc'] = param( $this->param_prefix.'lc', 'string', $this->default_filters['lc'], true );
+
+
+		/*
 		 * Restrict to selected statuses:
 		 */
 		$this->filters['statuses'] = param( $this->param_prefix.'status', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', $this->default_filters['statuses'], true );      // List of statuses to restrict to
@@ -414,8 +425,8 @@ class ItemList2 extends DataObjectList2
 		 * Restrict to the statuses we want to show:
 		 */
 		// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
-		$this->filters['visibility_array'] = param( $this->param_prefix.'show_statuses', 'array', $this->default_filters['visibility_array'], true );	// Array of sharings to restrict to
-
+		$this->filters['visibility_array'] = param( $this->param_prefix.'show_statuses', 'array', $this->default_filters['visibility_array']
+						, true, false, true, false );	// Array of sharings to restrict to
 
 		/*
 		 * Ordering:
@@ -685,6 +696,8 @@ class ItemList2 extends DataObjectList2
 
 		$this->ItemQuery->where_author_assignee( $this->filters['author_assignee'] );
 
+		$this->ItemQuery->where_locale( $this->filters['lc'] );
+
 		$this->ItemQuery->where_statuses( $this->filters['statuses'] );
 
 		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
@@ -905,6 +918,8 @@ class ItemList2 extends DataObjectList2
 
 		$lastpost_ItemQuery->where_assignees( $this->filters['assignees'] );
 
+		$lastpost_ItemQuery->where_locale( $this->filters['lc'] );
+
 		$lastpost_ItemQuery->where_statuses( $this->filters['statuses'] );
 
 		$lastpost_ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
@@ -967,7 +982,7 @@ class ItemList2 extends DataObjectList2
 	 *
 	 * @return array
 	 */
-	function get_filter_titles()
+	function get_filter_titles( $ignore = array() )
 	{
 		global $month, $post_statuses;
 
@@ -1098,6 +1113,13 @@ class ItemList2 extends DataObjectList2
 		}
 
 
+		// LOCALE:
+		if( $this->filters['lc'] != 'all' )
+		{
+			$title_array[] = T_('Locale').': '.$this->filters['lc'];
+		}
+
+
 		// EXTRA STATUSES:
 		if( !empty($this->filters['statuses']) )
 		{
@@ -1113,7 +1135,8 @@ class ItemList2 extends DataObjectList2
 
 
 		// SHOW STATUSES
-		if( count( $this->filters['visibility_array'] ) < 5 ) // TEMP
+		if( count( $this->filters['visibility_array'] ) < 5
+			&& !in_array( 'visibility', $ignore ) )
 		{
 			$status_titles = array();
 			foreach( $this->filters['visibility_array'] as $status )
@@ -1151,7 +1174,10 @@ class ItemList2 extends DataObjectList2
 		{
 			if( $this->filters['ts_max'] == 'now' )
 			{
-				$title_array['ts_max'] = T_('Hide future');
+				if( !in_array( 'hide_future', $ignore ) )
+				{
+					$title_array['ts_max'] = T_('Hide future');
+				}
 			}
 			else
 			{
@@ -1607,6 +1633,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.27  2006/09/07 00:48:55  fplanque
+ * lc parameter for locale filtering of posts
+ *
  * Revision 1.26  2006/09/06 23:32:55  fplanque
  * fixed itemlist nav when generating static
  *

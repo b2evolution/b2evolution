@@ -62,45 +62,6 @@ param( 'blog', 'integer', 0, true );
 param( 'p', 'integer', '', true );              // Specific post number to display
 param( 'title', 'string', '', true );						// urtitle of post to display
 
-/*
-param( 'm', 'integer', '', true );              // YearMonth(Day) to display
-param( 'w', 'integer', -1, true );              // Week number
-param( 'dstart', 'integer', '', true );         // YearMonth(Day) to start at
-param( 'unit', 'string', '', true );            // list unit: 'posts' or 'days'
-
-param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', '', true ); // List of cats to restrict to
-param( 'catsel', 'array', array(), true );  // Array of cats to restrict to
-foreach( $catsel as $k => $v )
-{ // make sure this are all integers, to prevent SQL injection! TODO: use param( , 'array[integer]' )
-	$catsel[$k] = (int)$v;
-}
-// Let's compile those values right away (we use them in several different places):
-$cat_array = array();
-$cat_modifier = '';
-compile_cat_array( $cat, $catsel,  $cat_array,  $cat_modifier, $blog == 1 ? 0 : $blog );
-
-param( 'author', '/^-?[0-9]+(,[0-9]+)*$/', '', true );         // List of authors to restrict to
-
-param( 'order', 'string', 'DESC', true );       // ASC or DESC
-param( 'orderby', 'string', '', true );         // list of fields to order by
-
-param( 'posts', 'integer', 0, true );           // # of units to display on the page
-param( 'paged', 'integer', '', true );          // List page number in paged display
-
-param( 'poststart', 'integer', '', true );      // Start results at this position
-param( 'postend', 'integer', '', true );        // End results at this position
-
-param( 's', 'string', '', true );               // Search string
-param( 'sentence', 'string', 'AND', true );     // Search for sentence or for words
-param( 'exact', 'integer', '', true );          // Require exact match of title or contents
-
-
-
-param( 'calendar', 'string', '', true );        // Display a specific month in the calendar
-
-*/
-
-
 param( 'preview', 'integer', 0, true );         // Is this preview ?
 
 param( 'disp', 'string', 'posts', true );
@@ -485,6 +446,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.39  2006/09/07 00:48:55  fplanque
+ * lc parameter for locale filtering of posts
+ *
  * Revision 1.38  2006/09/06 21:39:21  fplanque
  * ItemList2 fixes
  *
