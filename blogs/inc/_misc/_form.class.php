@@ -611,7 +611,7 @@ class Form extends Widget
 	 * @param string initial value (ISO datetime or erroneous if the field is in error state)
 	 * @param string label displayed in front of the field
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
-	 *              - date_format: Format of the date (string, default 'yyyy-MM-dd')
+	 *              - date_format: Format of the date (string, PHP format, default taken from {@link locale_datefmt()})
 	 *              - add_date_format_note: If true, date format note gets prepended to the field's note
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
@@ -1665,8 +1665,6 @@ class Form extends Widget
 	 */
 	function combo_box( $field_name, $field_value, $field_options, $field_label, $field_params = array() )
 	{
-
-
 		if( param_has_error( $field_name) )
 		{	// There is an error on the combo, so we need to set the combo input text class to 'field_error'
 			$input_class = 'field_error';
@@ -2481,8 +2479,6 @@ class Form extends Widget
 	 */
 	function handle_common_params( & $field_params, $field_name = NULL, $field_label = NULL )
 	{
-
-
 		#pre_dump( 'handle_common_params (before)', $field_params );
 
 		$this->_common_params = array(); // Reset
@@ -2615,6 +2611,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.34  2006/09/08 12:05:26  blueyed
+ * doc
+ *
  * Revision 1.33  2006/08/20 22:25:22  fplanque
  * param_() refactoring part 2
  *
