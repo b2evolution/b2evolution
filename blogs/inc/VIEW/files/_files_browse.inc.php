@@ -418,7 +418,15 @@ while( $lFile = & $fm_Filelist->get_next() )
 		echo '<td class="fm_preview_list">';
 		if( $lFile->is_image() )
 		{
-			echo '<img src="'.$lFile->_FileRoot->ads_url.$lFile->_rdfp_rel_path.'" alt="" width="80" />';
+			$img = '<img src="'.$lFile->_FileRoot->ads_url.$lFile->_rdfp_rel_path.'" alt="" width="80" />';
+
+			$link = $lFile->get_view_link( $img );
+			if( ! $link )
+			{ // no view link available:
+				$link = $img;
+			}
+
+			echo $link;
 		}
 		echo '</td>';
 	}
@@ -946,6 +954,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.19  2006/09/08 18:52:56  blueyed
+ * Link image preview to File::get_view_link()
+ *
  * Revision 1.18  2006/07/28 18:27:10  blueyed
  * Basic image preview for image files in the file list
  *
