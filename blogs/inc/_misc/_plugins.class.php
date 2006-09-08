@@ -2617,9 +2617,16 @@ class Plugins
 
 		$plugin_class_methods = array();
 
-		$classfile_contents = @file_get_contents( $Plugin->classfile_path );
-		if( empty($classfile_contents) )
+		if( ! is_readable($Plugin->classfile_path) )
 		{
+			$Debuglog->add( 'get_registered_events(): "'.$Plugin->classfile_path.'" is not readable.', array('plugins', 'error') );
+			return array();
+		}
+
+		$classfile_contents = @file_get_contents( $Plugin->classfile_path );
+		if( ! is_string($classfile_contents) )
+		{
+			$Debuglog->add( 'get_registered_events(): "'.$Plugin->classfile_path.'" could not get read.', array('plugins', 'error') );
 			return array();
 		}
 
@@ -2902,6 +2909,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.81  2006/09/08 15:34:55  blueyed
+ * Enhanced debugging for get_registered_events()
+ *
  * Revision 1.80  2006/08/31 19:00:03  blueyed
  * Fixed caching of objects, which was broken with get_Cache() introduction
  *
