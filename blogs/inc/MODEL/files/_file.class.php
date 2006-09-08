@@ -1263,7 +1263,8 @@ class File extends DataObject
 			$no_access_text = $text;
 		}
 
-		if( ! $url = $this->get_view_url() )
+		$url = $this->get_view_url();
+		if( ! $url )
 		{
 			return $no_access_text;
 		}
@@ -1341,6 +1342,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2006/09/08 15:33:43  blueyed
+ * minor
+ *
  * Revision 1.17  2006/08/19 08:50:26  fplanque
  * moved out some more stuff from main
  *
