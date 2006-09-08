@@ -121,21 +121,15 @@ function install_validate_requirements()
 {
 	$errors = array();
 
-	/*
-	// dh> We use simple regexps to simulate it, if not available.
-	if( ! function_exists( 'token_get_all' ) )
-	{
-		// TODO: Use T_() ?
-		$errors[] = 'We need the PHP Tokenizer functions to get the list of Plugin events (Enabled by default since PHP 4.3.0 and available since PHP 4.2.0).'; // String copied from _plugins.class.php
-	}
-	*/
-
 	return $errors;
 }
 
 
 /*
  * $Log$
+ * Revision 1.15  2006/09/08 15:35:36  blueyed
+ * Completely nuked tokenizer dependency - removed commented out block
+ *
  * Revision 1.14  2006/08/20 20:54:31  blueyed
  * Removed dependency on tokenizer. Quite a few people don't have it.. see http://forums.b2evolution.net//viewtopic.php?t=8664
  *
