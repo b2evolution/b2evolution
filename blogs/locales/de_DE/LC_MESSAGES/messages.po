@@ -3373,7 +3373,7 @@ msgstr "Neuer Benutzer erstellt."
 
 #: ..\..\..\inc\CONTROL\users\b2users.php:413
 msgid "Usersettings of Plugins have been updated."
-msgstr "Benutzereinstellungen für das Plugin wurden aktualisiert."
+msgstr "Benutzereinstellungen für Plugins wurden aktualisiert."
 
 #: ..\..\..\inc\CONTROL\users\b2users.php:438
 msgid "Invalid promotion."
@@ -5787,7 +5787,7 @@ msgstr "Sortiere Verzeichnisse nach oben"
 
 #: ..\..\..\inc\VIEW\files\_files_browse.inc.php:903
 msgid "Show file types"
-msgstr "Zeige Dateitypenversteckte Dateien"
+msgstr "Zeige Dateitypen"
 
 #: ..\..\..\inc\VIEW\files\_files_browse.inc.php:904
 msgid "Show file perms"

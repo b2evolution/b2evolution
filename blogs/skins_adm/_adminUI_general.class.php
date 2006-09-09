@@ -1116,6 +1116,7 @@ class AdminUI_general
 		// pre_dump( 'set_path_level: ', $level, $pathKey, $this->pathProps[$level] );
 
 		/* fp> This things has been making my life miserable for too long:
+			dh> then remove it.. but what's bad about having this assertion here? We should not set_path_level() to something where a user has no perms IMHO?!
 		$perm = $this->check_perm( $pathProps );
 		if( ! $perm && empty($pathProps['text_noperm']) && $die_if_no_perm )
 		{
@@ -1312,6 +1313,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.31  2006/09/09 23:16:18  blueyed
+ * minor
+ *
  * Revision 1.30  2006/09/09 17:51:34  fplanque
  * started new category/chapter editor
  *
