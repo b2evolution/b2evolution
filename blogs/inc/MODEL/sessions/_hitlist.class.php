@@ -141,6 +141,36 @@ class Hitlist
 			WHERE sess_lastseen < "'.$sess_prune_YMD.'"', 'Autoprune sessions' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'hit' );
 
+		// Prune non-referrered basedomains (where the according hits got deleted)
+		// BUT only those with unknown dom_type/dom_status, because otherwise this
+		//     info is useful when we get hit again.
+		$mysql_ver = mysql_get_server_info();
+		if( ($pos = strpos($mysql_ver, '.')) && substr( $mysql_ver, 0, $pos ) >= '4' )
+		{ // MySQL server version >= 4 (required for multi-table deletes):
+			$rows_affected = $DB->query( '
+				DELETE T_basedomains
+				  FROM T_basedomains LEFT JOIN T_hitlog ON hit_referer_dom_ID = dom_ID
+				 WHERE hit_referer_dom_ID IS NULL
+				 AND dom_type = "unknown"
+				 AND dom_status = "unknown"' );
+			$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_basedomains.', 'hit' );
+		}
+		else
+		{ // two queries for MySQL < 4
+			$ids = $DB->get_row( '
+				SELECT dom_ID
+				  FROM T_basedomains LEFT JOIN T_hitlog ON hit_referer_dom_ID = dom_ID
+				 WHERE hit_referer_dom_ID IS NULL
+				 AND dom_type = "unknown"
+				 AND dom_status = "unknown"' );
+
+			$rows_affected = $DB->query( '
+				DELETE FROM T_basedomains
+				 WHERE dom_ID IN ( '.implode( ', ', $ids ).' )' );
+
+			$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_basedomains (MySQL<4).', 'hit' );
+		}
+
 		$Settings->set( 'auto_prune_stats_done', date('Y-m-d H:i:s', $localtimenow) ); // save exact datetime
 		$Settings->dbupdate();
 
