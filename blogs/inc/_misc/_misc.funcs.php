@@ -1981,9 +1981,7 @@ function get_ip_list( $firstOnly = false )
 
 
 /**
- * Get the base domain (without protocol and "www.") of an URL.
- *
- * We only strip "www." here (and not any/all subdomain(s))!
+ * Get the base domain (without protocol and any subdomain) of an URL.
  *
  * @param string URL
  * @return string the base domain
@@ -2504,6 +2502,9 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 
 /*
  * $Log$
+ * Revision 1.112  2006/09/09 13:24:38  blueyed
+ * doc fix
+ *
  * Revision 1.111  2006/08/29 21:37:28  blueyed
  * fixed E_NOTICE
  *
