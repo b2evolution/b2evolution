@@ -53,6 +53,9 @@ if( $dtyp_aggregator ) $selected_agnt_types[] = "'aggregator'";
 if( $dtyp_unknown ) $selected_agnt_types[] = "'unknown'";
 $where_clause =  ' WHERE dom_type IN ('.implode(',',$selected_agnt_types).')';
 
+// Exclude hits of type "self" and "admin":
+$where_clause .= ' AND hit_referer_type NOT IN ( "self", "admin" )';
+
 if( !empty($blog) )
 {
 	$where_clause .= ' AND hit_blog_ID = '.$blog;
@@ -65,16 +68,18 @@ $total_hit_count = $DB->get_var( "
 
 
 // Create result set:
-$sql = "SELECT dom_name, dom_status, dom_type, COUNT( * ) AS hit_count
-					FROM T_basedomains LEFT JOIN T_hitlog ON dom_ID = hit_referer_dom_ID "
-			.$where_clause.'
-				 GROUP BY dom_ID ';
+$results_sql = "
+		SELECT dom_name, dom_status, dom_type, COUNT( * ) AS hit_count
+		  FROM T_basedomains LEFT JOIN T_hitlog ON dom_ID = hit_referer_dom_ID "
+		.$where_clause.'
+		 GROUP BY dom_ID ';
 
-$count_sql = "SELECT COUNT( DISTINCT dom_ID )
-					FROM T_basedomains "
+$results_count_sql = "
+		SELECT COUNT( DISTINCT dom_ID )
+		  FROM T_basedomains INNER JOIN T_hitlog ON dom_ID = hit_referer_dom_ID "
 			.$where_clause;
 
-$Results = & new Results( $sql, 'refdom_', '---D', 20, $count_sql );
+$Results = & new Results( $results_sql, 'refdom_', '---D', 20, $results_count_sql );
 
 
 /**
