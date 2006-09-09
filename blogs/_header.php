@@ -154,35 +154,49 @@ $AdminUI->add_menu_entries(
 				'text' => T_('Categories'),
 				'href' => 'admin.php?ctrl=chapters&amp;blog='.$blog
 			),
+		)
+	);
 
+
+// BLOG SETTINGS:
+$blog_settings_parm_eval = 'global $ctrl, $current_User; return $ctrl != "collections"
+			&& $current_User->check_perm( "blog_properties", "any", false, '.$blog.' );';
+$AdminUI->add_menu_entries(
+		NULL, // root
+		array(
 			'blogs' => array(
 				'text' => T_('Blog settings'),
 				'href' => 'admin.php?ctrl=collections',
 				'entries' => array(
 					'general' => array(
 						'text' => T_('General'),
-						'href' => 'admin.php?ctrl=collections&amp;tab=general&amp;blog='.$blog,
-						'perm_eval' => 'global $action; return $action != "list";' ),
+						'href' => 'admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog,
+						'perm_eval' => $blog_settings_parm_eval ),
 					'skin' => array(
 						'text' => T_('Skin'),
-						'href' => 'admin.php?ctrl=collections&amp;tab=skin&amp;blog='.$blog,
-						'perm_eval' => 'global $action; return $action != "list";' ),
+						'href' => 'admin.php?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
+						'perm_eval' => $blog_settings_parm_eval ),
 					'display' => array(
 						'text' => T_('Display'),
-						'href' => 'admin.php?ctrl=collections&amp;tab=display&amp;blog='.$blog,
-						'perm_eval' => 'global $action; return $action != "list";' ),
+						'href' => 'admin.php?ctrl=coll_settings&amp;tab=display&amp;blog='.$blog,
+						'perm_eval' => $blog_settings_parm_eval ),
+					'chapters' => array(
+						'text' => T_('Chapters'),
+						'href' => 'admin.php?ctrl=chapters2&amp;blog='.$blog,
+						'perm_eval' => 'global $ctrl, $current_User; return $ctrl != "collections"
+															&& $current_User->check_perm( "blog_cats", "", false, '.$blog.' ) ;' ),
 					'advanced' => array(
 						'text' => T_('Advanced'),
-						'href' => 'admin.php?ctrl=collections&amp;tab=advanced&amp;blog='.$blog,
-						'perm_eval' => 'global $action; return $action != "list";' ),
+						'href' => 'admin.php?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog,
+						'perm_eval' => $blog_settings_parm_eval ),
 					'perm' => array(
 						'text' => T_('User permissions'),
-						'href' => 'admin.php?ctrl=collections&amp;tab=perm&amp;blog='.$blog,
-						'perm_eval' => 'global $action; return $action != "list";' ),
+						'href' => 'admin.php?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog,
+						'perm_eval' => $blog_settings_parm_eval ),
 					'permgroup' => array(
 						'text' => T_('Group permissions'),
-						'href' => 'admin.php?ctrl=collections&amp;tab=permgroup&amp;blog='.$blog,
-						'perm_eval' => 'global $action; return $action != "list";' ),
+						'href' => 'admin.php?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog,
+						'perm_eval' => $blog_settings_parm_eval ),
 				)
 			),
 
@@ -321,6 +335,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.18  2006/09/09 17:51:33  fplanque
+ * started new category/chapter editor
+ *
  * Revision 1.17  2006/09/06 18:34:04  fplanque
  * Finally killed the old stinkin' ItemList(1) class which is deprecated by ItemList2
  *

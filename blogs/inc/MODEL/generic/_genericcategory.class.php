@@ -36,7 +36,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Includes:
  */
-require_once $inc_path.'MODEL/generic/_genericproperty.class.php';
+require_once $inc_path.'MODEL/generic/_genericelement.class.php';
 
 
 /**
@@ -44,7 +44,7 @@ require_once $inc_path.'MODEL/generic/_genericproperty.class.php';
  *
  * @package gsbcore
  */
-class GenericCategory extends GenericProperty
+class GenericCategory extends GenericElement
 {
 	var $parent_ID;
 	// To display parent name in form
@@ -63,7 +63,7 @@ class GenericCategory extends GenericProperty
 		global $Debuglog;
 
 		// Call parent constructor:
-		parent::GenericProperty( $tablename, $prefix, $dbIDname, $db_row );
+		parent::GenericElement( $tablename, $prefix, $dbIDname, $db_row );
 
 		if( $db_row != NULL )
 		{

@@ -7,8 +7,6 @@
  *
  * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
- * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
- * Parts of this file are copyright (c)2005 by Jason Edgecombe.
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -23,31 +21,15 @@
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- *
- * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
- * Jason EDGECOMBE's contributions to this file and the b2evolution project
- * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
- * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
- *
- * Jason EDGECOMBE grants Francois PLANQUE the right to license
- * Jason EDGECOMBE's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
- * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
- * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
  *
  * @todo (sessions) When creating a blog, provide "edit options" (3 tabs) instead of a single long "New" form (storing the new Blog object with the session data).
- * @todo move to "new standard", i-e:
- *    1 - init params
- *    2 - perform actions
- *    3 - display error messages
- *    4 - display payload
- *    Currently if you change the name of a blog it gets not reflected in the blog list buttons!
+ * @todo Currently if you change the name of a blog it gets not reflected in the blog list buttons!
  *
  * @version $Id$
  */
@@ -56,7 +38,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $AdminUI->set_path( 'blogs' );
 
 param_action( 'list' );
-param( 'tab', 'string', 'general', true );
 
 if( $action != 'new' )
 {
@@ -66,11 +47,6 @@ if( $action != 'new' )
 		$edited_Blog = & $BlogCache->get_by_ID( $blog );
 		$Blog = & $edited_Blog; // used for "Exit to blogs.." link
 	}
-}
-
-if( $action == 'list' && !empty($blog) )
-{
-	$action = 'edit';
 }
 
 
@@ -107,17 +83,6 @@ switch( $action )
 		$edited_Blog->set( 'urlname', 'new' );
 		$edited_Blog->set( 'stub', '' );
 		break;
-
-	case 'edit':
-	case 'filter1':
-	case 'filter2':
-		// Edit collection form (depending on tab):
-		// Check permissions:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
-
-		$AdminUI->append_path_level( $tab );
-		break;
-
 
 	case 'create':
 		// Insert into DB:
@@ -164,53 +129,6 @@ switch( $action )
 		break;
 
 
-	case 'update':
-		// Update DB:
-		// Check permissions:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
-
-		switch( $tab )
-		{
-			case 'general':
-			case 'display':
-				if( $edited_Blog->load_from_Request( array() ) )
-				{ // Commit update to the DB:
-					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog settings have been updated'), 'success' );
-				}
-				break;
-
-			case 'skin':
-				if( $edited_Blog->load_from_Request( array() ) )
-				{ // Commit update to the DB:
-					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog skin selection has been updated'), 'success' );
-				}
-				break;
-
-			case 'advanced':
-				if( $edited_Blog->load_from_Request( array( 'pings' ) ) )
-				{ // Commit update to the DB:
-					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog settings have been updated'), 'success' );
-				}
-				break;
-
-			case 'perm':
-				blog_update_user_perms( $blog );
-				$Messages->add( T_('The blog permissions have been updated'), 'success' );
-				break;
-
-			case 'permgroup':
-				blog_update_group_perms( $blog );
-				$Messages->add( T_('The blog permissions have been updated'), 'success' );
-				break;
-		}
-
-		$AdminUI->append_path_level( $tab );
-		break;
-
-
 	case 'delete':
 		// ----------  Delete a blog from DB ----------
 		if( $blog == 1 )
@@ -242,7 +160,6 @@ switch( $action )
 
 			$action = 'list';
 		}
-
 		break;
 
 
@@ -316,8 +233,9 @@ switch( $action )
 /**
  * Display page header, menus & messages:
  */
+// fp> TODO: fall back to ctrl=chapters2 when no perm for blog_properties
 $blogListButtons = $AdminUI->get_html_collection_list( 'blog_properties', 'edit',
-											'?ctrl=collections&amp;action=edit&amp;blog=%d&amp;tab='.$tab,
+											'?ctrl=coll_settings&amp;tab=general&amp;blog=%d',
 											T_('List'), '?ctrl=collections&amp;blog=0' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -340,55 +258,6 @@ switch($action)
 		$AdminUI->disp_view( 'collections/_blogs_general.form.php' );
 
 		echo '</div>';
-		break;
-
-
-	case 'edit':
-	case 'filter1':
-	case 'filter2':
-	case 'update':
-		// ---------- Edit blog form ----------
-		if( $action == 'edit' )
-		{ // permissions have not been checked on update:
-			$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
-		}
-
-		// Begin payload block:
-		$AdminUI->disp_payload_begin();
-
-
-		// Display VIEW:
-		switch( $AdminUI->get_path(1) )
-		{
-			case 'general':
-				$next_action = 'update';
-				$AdminUI->disp_view( 'collections/_blogs_general.form.php' );
-				break;
-
-			case 'skin':
-				$AdminUI->disp_view( 'collections/_blogs_skin.form.php' );
-				break;
-
-			case 'display':
-				$AdminUI->disp_view( 'collections/_blogs_display.form.php' );
-				break;
-
-			case 'advanced':
-				$AdminUI->disp_view( 'collections/_blogs_advanced.form.php' );
-				break;
-
-			case 'perm':
-				$AdminUI->disp_view( 'collections/_blogs_permissions.form.php' );
-				break;
-
-			case 'permgroup':
-				$AdminUI->disp_view( 'collections/_blogs_permissions_group.form.php' );
-				break;
-		}
-
-		// End payload block:
-		$AdminUI->disp_payload_end();
-
 		break;
 
 
@@ -466,6 +335,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.1  2006/09/09 17:51:33  fplanque
+ * started new category/chapter editor
+ *
  * Revision 1.23  2006/08/20 22:25:20  fplanque
  * param_() refactoring part 2
  *
@@ -540,94 +412,5 @@ $AdminUI->disp_global_footer();
  *
  * Revision 1.47  2006/01/25 19:16:54  blueyed
  * moved to 1-2-3-4 scheme, todo.
- *
- * Revision 1.46  2005/12/12 19:21:20  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.45  2005/11/24 18:14:22  blueyed
- * using getter for Blog->siteurl again (after having fixed Blog class)
- *
- * Revision 1.44  2005/11/24 16:13:21  blueyed
- * Do not use getter for siteurl, because it actually returns $baseurl.. :(
- *
- * Revision 1.43  2005/11/20 17:53:21  blueyed
- * Better fix for generating static pages
- *
- * Revision 1.42  2005/11/09 00:02:04  blueyed
- * todo
- *
- * Revision 1.41  2005/10/31 00:15:27  blueyed
- * Removed b2categories.php to categories.php
- *
- * Revision 1.40  2005/10/28 20:08:46  blueyed
- * Normalized AdminUI
- *
- * Revision 1.39  2005/08/21 16:20:12  halton
- * Added group based blogging permissions (new tab under blog). Required schema change
- *
- * Revision 1.38  2005/08/04 17:22:14  fplanque
- * better fix for "no linkblog": allow storage of NULL value.
- *
- * Revision 1.37  2005/06/03 15:12:31  fplanque
- * error/info message cleanup
- *
- * Revision 1.36  2005/05/25 17:13:32  fplanque
- * implemented email notifications on new comments/trackbacks
- *
- * Revision 1.35  2005/03/16 19:58:17  fplanque
- * small AdminUI cleanup tasks
- *
- * Revision 1.34  2005/03/15 19:19:46  fplanque
- * minor, moved/centralized some includes
- *
- * Revision 1.33  2005/03/07 00:06:16  blueyed
- * admin UI refactoring, part three
- *
- * Revision 1.32  2005/03/06 19:58:27  blueyed
- * admin UI refactoring, part deux
- *
- * Revision 1.31  2005/03/04 20:14:31  fplanque
- * moved blog list generation to a unique AdminUI method
- *
- * Revision 1.30  2005/03/04 18:40:27  fplanque
- * added Payload display wrappers to admin skin object
- *
- * Revision 1.29  2005/03/02 17:07:33  blueyed
- * no message
- *
- * Revision 1.28  2005/02/28 09:06:39  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.27  2005/02/27 20:34:49  blueyed
- * Admin UI refactoring
- *
- * Revision 1.26  2005/02/24 22:17:45  edgester
- * Added a blog option to allow for a CSS file in the blog media dir to override the skin stylesheet.
- * Added a second blog option to allow for a user CSS file to  override the skin and blog stylesheets.
- *
- * Revision 1.25  2005/02/17 19:36:23  fplanque
- * no message
- *
- * Revision 1.24  2005/02/15 22:05:24  blueyed
- * Started moving obsolete functions to _obsolete092.php..
- *
- * Revision 1.23  2005/01/27 13:34:57  fplanque
- * i18n tuning
- *
- * Revision 1.22  2005/01/13 19:53:48  fplanque
- * Refactoring... mostly by Fabrice... not fully checked :/
- *
- * Revision 1.21  2005/01/05 17:48:54  fplanque
- * consistent blog switcher on top
- *
- * Revision 1.20  2004/12/06 21:45:23  jwedgeco
- * Added header info and granted Francois PLANQUE the right to relicense under the Mozilla Public License.
- *
- * Revision 1.19  2004/11/30 21:51:34  jwedgeco
- * when copying a blog, categories are copied as well.
- *
- * Revision 1.18  2004/11/22 10:41:58  fplanque
- * minor changes
- *
  */
 ?>

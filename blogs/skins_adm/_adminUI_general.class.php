@@ -1088,7 +1088,7 @@ class AdminUI_general
 	 * @param array Properties for this path entry.
 	 * @param boolean Exit script when the user has no permissions to this path and
 	 *                text_noperm is not set for the path?
-	 * @return boolean True if perm granted, false if not (and we're not exiting).
+	 * @return boolean DEPRECATED True if perm granted, false if not (and we're not exiting).
 	 */
 	function set_path_level( $level, $pathKey, $pathProps = array(), $die_if_no_perm = true )
 	{
@@ -1115,13 +1115,15 @@ class AdminUI_general
 
 		// pre_dump( 'set_path_level: ', $level, $pathKey, $this->pathProps[$level] );
 
+		/* fp> This things has been making my life miserable for too long:
 		$perm = $this->check_perm( $pathProps );
 		if( ! $perm && empty($pathProps['text_noperm']) && $die_if_no_perm )
 		{
 			debug_die( T_('Permission denied!').' (set_path_level: '.$level.'/'.$pathKey.')' );
 		}
+		*/
 
-		return $perm;
+		return true; // was:$perm;
 	}
 
 
@@ -1310,6 +1312,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.30  2006/09/09 17:51:34  fplanque
+ * started new category/chapter editor
+ *
  * Revision 1.29  2006/09/06 23:32:56  fplanque
  * fixed itemlist nav when generating static
  *

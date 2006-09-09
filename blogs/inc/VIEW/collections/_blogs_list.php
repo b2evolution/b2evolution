@@ -8,11 +8,6 @@
  * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
  * {@internal Open Source relicensing agreement:
- * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
- * Jason EDGECOMBE's contributions to this file and the b2evolution project
- * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
- * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
- *
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
@@ -21,9 +16,7 @@
  * @package admin
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
- * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
  * @author fplanque: Francois PLANQUE.
- * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
  *
  * @version $Id$
  */
@@ -43,10 +36,13 @@ global $dispatcher;
 $count = 0;
 for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = blog_list_next() )
 {
-	if( ! $current_User->check_perm( 'blog_properties', 'any', false, $curr_blog_ID ) )
+	if( ! $current_User->check_perm( 'blog_properties', 'any', false, $curr_blog_ID )
+	 && ! $current_User->check_perm( 'blog_cats', '', false, $curr_blog_ID ) )
 	{ // Current user is not allowed to edit properties...
 		continue;
 	}
+
+	// TABLE HEADER:
 	if( !isset( $atleastoneshown ) )
 	{ // Display headers the first time we find an viewable blog
 		// TODO 0.9.1 : prewalk the list, this will also allow to know if at least one blog can be deleted
@@ -65,6 +61,7 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 		</tr>
 		<?php
 	}
+
 	?>
 	<tr <?php if( $count % 2 == 1 ) echo 'class="odd"' ?>>
 		<td class="firstcol"><strong>
@@ -73,7 +70,7 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 			echo '&nbsp;';
 			if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
 			{
-				$edit_url = regenerate_url( 'action', 'blog='.$curr_blog_ID );
+				$edit_url = regenerate_url( 'ctrl', 'ctrl=coll_settings&amp;blog='.$curr_blog_ID );
 				echo action_icon( T_('Properties'), 'properties', $edit_url );
 				echo '&nbsp;<a href="'.$edit_url.'" title="'.T_('Properties').'">';
 				blog_list_iteminfo('shortname');
@@ -111,23 +108,35 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 			?>
 		</td>
 
-		<td class="center"><?php locale_flag( blog_list_iteminfo('locale', false) ) ?></td>
+		<td class="shrinkwrap"><?php locale_flag( blog_list_iteminfo('locale', false) ) ?></td>
 
-		<?php if( ($curr_blog_ID == 1) || (!$current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID )) )
-		{ // display empty cell for blog #1 and non deletable blogs
-			echo '<td></td>';
-		}
-		elseif( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
-		{
-			echo '<td class="shrinkwrap">';
-			echo action_icon( T_('Copy this blog!'), 'copy', regenerate_url( 'action', 'action=copy&amp;blog='.$curr_blog_ID ) );
-			?>
-			<a href="<?php echo regenerate_url( 'action', 'action=delete&amp;blog='.$curr_blog_ID ) ?>" style="color:red;font-weight:bold;" onclick="return confirm('<?php printf( TS_('Are you sure you want to delete blog #%d ?\\n\\nWARNING: This will delete ALL POST, COMMENTS,\\nCATEGORIES and other data related to that Blog!\\n\\nThis CANNOT be undone!'), $curr_blog_ID) ?>')"><?php echo get_icon( 'delete' ) ?></a>
-		</td>
 		<?php
-		} ?>
-	</tr>
-	<?php
+
+		// ACTION COLUMN:
+		echo '<td class="shrinkwrap">';
+
+		if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
+		{
+			echo action_icon( T_('Edit settings...'), 'edit', regenerate_url( 'ctrl', 'ctrl=coll_settings&amp;blog='.$curr_blog_ID ) );
+		}
+
+		if( $current_User->check_perm( 'blog_cats', '', false, $curr_blog_ID ) )
+		{
+			echo action_icon( T_('Edit chapters...'), 'edit', regenerate_url( 'ctrl', 'ctrl=chapters2&amp;blog='.$curr_blog_ID ) );
+		}
+
+		if( $curr_blog_ID != 1 && $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
+		{
+			echo action_icon( T_('Copy this blog...'), 'copy', regenerate_url( '', 'action=copy&amp;blog='.$curr_blog_ID ) );
+			?>
+			<a href="<?php echo regenerate_url( '', 'action=delete&amp;blog='.$curr_blog_ID ) ?>" style="color:red;font-weight:bold;" onclick="return confirm('<?php printf( TS_('Are you sure you want to delete blog #%d ?\\n\\nWARNING: This will delete ALL POST, COMMENTS,\\nCATEGORIES and other data related to that Blog!\\n\\nThis CANNOT be undone!'), $curr_blog_ID) ?>')"><?php echo get_icon( 'delete' ) ?></a>
+			<?php
+		}
+
+		echo '</td>';
+
+	echo '</tr>';
+
 	$count++;
 }
 
