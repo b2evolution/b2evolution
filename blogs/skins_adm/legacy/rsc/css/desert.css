@@ -275,7 +275,7 @@ table.grouped td,
 table.filelist td {
 	border-left: 1px solid #9e9286;
 }
-table.grouped tr:hover,
+table.grouped tr.even:hover,
 table.grouped tr.odd:hover,
 table.filelist tr:hover,
 table.filelist tr.odd:hover {
