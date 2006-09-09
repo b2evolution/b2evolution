@@ -82,8 +82,9 @@ function param( $var, $type = '', $default = '', $memorize = false,
 	 *
 	 * Check if already set
 	 * WARNING: when PHP register globals is ON, COOKIES get priority over GET and POST with this!!!
+	 *   dh> I never understood that comment.. does it refer to "variables_order" php.ini setting?
 	 */
-	if( !isset( $GLOBALS[$var] ) || $override )
+	if( ! isset( $GLOBALS[$var] ) || $override )
 	{
 		if( isset($_POST[$var]) )
 		{
@@ -198,6 +199,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 						$GLOBALS[$var] = $default;
 					}
 				}
+				// TODO: dh> if a var (e.g. from POST) comes in as '' but has type "array" it does not get "converted" to array type (nor gets the default used!)
 				else
 				{
 					if( $strict_typing )
@@ -307,6 +309,33 @@ function param_action( $default = '', $memorize = false )
 	}
 
 	return $action;
+}
+
+
+/**
+ * Get a param from cookie.
+ *
+ * {@internal This is just a wrapper around {@link param()} which unsets and
+ *  restores GET and POST. IMHO this is less hackish, at least performance
+ *  wise then using a $sources param for param()}}
+ *
+ * @uses param()
+ * @see param()
+ */
+function param_cookie($var, $type = '', $default = '', $memorize = false,
+		$override = false, $use_default = true, $strict_typing = 'allow_empty')
+{
+	$save_GET = $_GET;
+	$save_POST = $_POST;
+
+	unset( $_GET, $_POST );
+
+	$r = param( $var, $type, $default, $memorize, $override, $use_default, $strict_typing );
+
+	$_GET = $save_GET;
+	$_POST = $save_POST;
+
+	return $r;
 }
 
 
@@ -1487,7 +1516,7 @@ elseif( ini_get('magic_quotes_gpc') )
 	 * Remove quotes from input.
 	 * This handles magic_quotes_gpc and magic_quotes_sybase PHP settings/variants.
 	 *
-	 * NOTE: you should not use it directly, but one of the param-functions or get_cookie()!
+	 * NOTE: you should not use it directly, but one of the param-functions!
 	 *
 	 * @param mixed Value
 	 * @return mixed Value, with magic quotes removed
@@ -1525,6 +1554,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.8  2006/09/09 23:43:52  blueyed
+ * Added param_cookie() and used it for session cookie
+ *
  * Revision 1.7  2006/09/07 00:48:55  fplanque
  * lc parameter for locale filtering of posts
  *
