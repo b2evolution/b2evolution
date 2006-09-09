@@ -383,7 +383,7 @@ if( !$Messages->count('error') )
 			$UserSettings->set( 'focus_on_first_input', $edited_user_focusonfirst, $edited_User->ID );
 
 			// Update user settings:
-			if( $UserSettings->dbupdate() ) $Messages->add( T_('Your feature settings have been changed'), 'success');
+			if( $UserSettings->dbupdate() ) $Messages->add( T_('User feature settings have been changed'), 'success');
 
 			// PluginUserSettings
 			$any_plugin_settings_updated = false;
@@ -686,6 +686,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.34  2006/09/09 17:49:53  fplanque
+ * minor
+ *
  * Revision 1.33  2006/08/20 22:25:21  fplanque
  * param_() refactoring part 2
  *
