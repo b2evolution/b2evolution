@@ -1996,6 +1996,9 @@ function get_base_domain( $url )
 	}
 
 	// Get the base domain (without any subdomains):
+	// TODO: dh> this is severely broken! E.g. "www.ecb.co.uk/" becomes "co.uk"!!
+	//       There are several 2nd-level domains like this
+	//       E.g., for TLD domain "uk" see http://en.wikipedia.org/wiki/.uk#Second-level_domains
 	$base_domain = preg_replace( '~(.*\.)([^.]+\.[^.]+)~', '\\2', $domain );
 
 	return $base_domain;
@@ -2502,6 +2505,9 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 
 /*
  * $Log$
+ * Revision 1.113  2006/09/09 14:07:59  blueyed
+ * TODO for severely broken get_base_domain
+ *
  * Revision 1.112  2006/09/09 13:24:38  blueyed
  * doc fix
  *
