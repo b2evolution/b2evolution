@@ -42,6 +42,8 @@ global $line_class;
 
 global $perm_name, $perm_level;
 
+global $subset_ID;
+
 $line_class = 'odd';
 
 /**
@@ -141,7 +143,7 @@ if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, 
 
 echo '</tr>';
 
-echo $GenericElementCache->recurse( $callbacks );
+echo $GenericElementCache->recurse( $callbacks, $subset_ID );
 
 echo '</table>';
 

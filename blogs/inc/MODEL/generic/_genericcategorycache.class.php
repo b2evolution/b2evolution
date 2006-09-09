@@ -43,17 +43,33 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class GenericCategoryCache extends GenericCache
 {
-	// List of categories object loaded
+	/**
+	 * Which suibsets have been loaded
+	 */
+	var $loaded_subsets = array();
+
+	/**
+	 * List of category objects loaded
+	 */
 	var $cats = array();
-	
+
+	/**
+	 * These are the level 0 categories (which have no parent)
+	 */
 	var $parent_cats = array();
-	
-	// TO DO
-	var $revealed_children = false;
+
+	/**
+	 * Have the children been revealed for all subsets yet?
+	 */
+	var $revealed_all_children = false;
+	/**
+	 * Have the children been revealed for all subsets yet?
+	 */
+	var $revealed_subsets = array();
+
 
 	/**
 	 * Constructor
-
 	 */
 	function GenericCategoryCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL ) 		
 	{
@@ -62,38 +78,65 @@ class GenericCategoryCache extends GenericCache
 
 		
 	/**
-	 * Reveal_children
+	 * Reveal children
+	 *
+	 * After this each Category will have an array pointing to its direct children
+	 *
+	 * @param integer|NULL NULL for all subsets
 	 */
-	function Reveal_children()
-	{	
-		if( $this->revealed_children )
-		{	// Children have already been revealed:
-			return;
-			/* RETURN */
+	function reveal_children( $subset_ID = NULL )
+	{
+		if( is_null( $subset_ID ) )
+		{	// No specific subset
+			if( $this->revealed_all_children )
+			{	// Children have already been revealed:
+				return;
+				/* RETURN */
+			}
+
+			// Make sure everything has been loaded:
+    	$this->load_all();
+
 		}
-		
-		if( !$this->all_loaded )
-		{
-			$this->load_all();
-		}	
-	
+		else
+		{	// We're interested in a specific subset
+			if( !empty( $this->revealed_subsets[$subset_ID] ) )
+			{	// Children have already been revealed:
+				return;
+				/* RETURN */
+			}
+
+			// Make sure the requested subset has been loaded:
+    	$this->load_subset($subset_ID);
+		}
+
+
 		// Reveal children:
 		if( !empty( $this->cache ) )
 		{	// There are loaded categories, so loop on all loaded categories to set their children list if it has:
 			foreach( $this->cache as $cat_ID => $GenericCategory )
 			{
-			if( ! is_null( $GenericCategory->parent_ID ) )
+				if( ! is_null( $GenericCategory->parent_ID ) )
 				{	// This category has a parent, so add it to its parent children list:
 
 					$this->cache[$GenericCategory->parent_ID]->add_children( $this->cache[$cat_ID] );
 				}		
 				else 
 				{	// This category has no parent, so add it to the parent categories list  
-					$this->parent_cats[] = & $this->cache[$cat_ID];			
+					$this->parent_cats[] = & $this->cache[$cat_ID];
 				}	
 			}	
 		}
-		$this->revealed_children = true;
+
+		// Children have been revealed.
+		if( is_null( $subset_ID ) )
+		{	// No specific subset
+			$this->revealed_children = true;
+		}
+		else
+		{	// We're interested in a specific subset
+			$this->revealed_subsets[$subset_ID] = true;
+		}
 	}
 	
 	
@@ -101,24 +144,23 @@ class GenericCategoryCache extends GenericCache
 	 * Return recursive display of loaded categories
 	 * 
 	 * @param array callback funtions (to format the display)
+	 * @param integer|NULL NULL for all subsets
 	 * @param array categories list to display
 	 * @param int depth of  categories list
 	 * 
 	 * @return string recursive list of all loaded categories 
 	 */
-	function recurse( $callbacks, $cat_array = NULL, $level = 0 )
+	function recurse( $callbacks, $subset_ID = NULL, $cat_array = NULL, $level = 0 )
 	{
-		if( !$this->revealed_children )
-		{
-			$this->Reveal_children();
-		}
-		
+		// Make sure children have been revealed for specific subset:
+		$this->reveal_children( $subset_ID );
+
 		if( is_null( $cat_array ) )
 		{	// Get all parent categories:
 			$cat_array = $this->parent_cats;
 		}
 	
-		$r ='';
+		$r = '';
 		
 		$r .= $callbacks['before_level']( $level ); // <ul>
 
@@ -128,7 +170,7 @@ class GenericCategoryCache extends GenericCache
 			
 			if( !empty( $cat->children ) )
 			{	// Add children categories:
-				$r .= $this->recurse( $callbacks, $cat->children, $level+1 ); 
+				$r .= $this->recurse( $callbacks, $subset_ID, $cat->children, $level+1 );
 			}
 			else 
 			{
@@ -147,18 +189,17 @@ class GenericCategoryCache extends GenericCache
 	 * Return recursive select options list of all loaded categories
 	 *
 	 * @param integer selected category in the select input
+	 * @param integer|NULL NULL for all subsets
 	 * @param array categories list to display
 	 * @param int depth of  categories list
-	 * 
+	 *
 	 * @return string select options list of all loaded categories
 	 */
-	function recurse_select( $selected = NULL, $cat_array = NULL, $level = 0 )
+	function recurse_select( $selected = NULL, $subset_ID = NULL, $cat_array = NULL, $level = 0 )
 	{
-		if( !$this->revealed_children )
-		{
-			$this->Reveal_children();
-		}
-	
+		// Make sure children have been revealed for specific subset:
+		$this->reveal_children( $subset_ID );
+
 		if( is_null( $cat_array ) )
 		{	// Get all parent categorie:
 			$cat_array = $this->parent_cats;
@@ -167,7 +208,7 @@ class GenericCategoryCache extends GenericCache
 		$r ='';
 		
 		foreach ($cat_array as $cat )
-		{ 
+		{
 			// Set category indentation in the select:
 			$indent = '';
 			for($i = 0; $i < $level; $i++)
@@ -181,54 +222,13 @@ class GenericCategoryCache extends GenericCache
 			
 			if( !empty( $cat->children ) )
 			{	// Add children categories:
-				$r .= $this->recurse_select( $selected, $cat->children, $level+1 );
+				$r .= $this->recurse_select( $selected, $subset_ID, $cat->children, $level+1 );
 			}
 		}
 
 		return $r;
 	}
 	
-	
-	/**
-	 * Returns form option list with cache contents
-	 *
-	 * Load the cache if necessary
-	 *
-	 * @param integer selected ID
-	 * @param boolean provide a choice for "none" with ID ''
-	 */
-	function parent_option_list_return( $default = 0, $allow_none = false, $method = 'name_return' )
-	{
-		if( (! $this->all_loaded) && $this->load_all )
-		{ // We have not loaded all items so far, but we're allowed to... so let's go:
-			$this->load_all();
-		}
-		
-		if( !$this->revealed_children )
-		{
-			$this->Reveal_children();
-		}
-
-		$r = '';
-
-		if( $allow_none )
-		{
-			$r .= '<option value=""';
-			if( empty($default) ) $r .= ' selected="selected"';
-			$r .= '>'.T_('None').'</option>'."\n";
-		}
-
-		foreach( $this->parent_cats as $loop_Obj )
-		{
-			$r .=  '<option value="'.$loop_Obj->ID.'"';
-			if( $loop_Obj->ID == $default ) $r .= ' selected="selected"';
-			$r .= '>';
-			$r .= $loop_Obj->$method();
-			$r .=  '</option>'."\n";
-		}
-
-		return $r;
-	}
 	
 }
 ?>

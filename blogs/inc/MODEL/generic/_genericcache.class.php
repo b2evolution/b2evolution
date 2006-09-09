@@ -51,6 +51,10 @@ class GenericCache extends DataObjectCache
 		parent::DataObjectCache( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field, $order_by );
 	}
 
+	
+	/**
+	 * Instanciate a new object within this cache
+	 */
 	function & new_obj( $row = NULL )
 	{
 		$objtype = $this->objtype;

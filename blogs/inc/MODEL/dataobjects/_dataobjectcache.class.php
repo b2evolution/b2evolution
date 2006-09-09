@@ -109,7 +109,7 @@ class DataObjectCache
 
 	
 	/**
-	 *  TODO
+	 * Instanciate a new object within this cache
 	 */
 	function & new_obj( $row = NULL )
 	{
@@ -137,16 +137,14 @@ class DataObjectCache
 		$this->clear( true );
 
 		$Debuglog->add( get_class($this).' - Loading <strong>'.$this->objtype.'(ALL)</strong> into cache', 'dataobjects' );
-		$sql = 'SELECT * 
+		$sql = 'SELECT *
 							FROM '.$this->dbtablename.' 
 						 ORDER BY '.$this->order_by;
 							
-		$dbIDname = $this->dbIDname;
-		$objtype = $this->objtype;
 		foreach( $DB->get_results( $sql ) as $row )
 		{
-			 // Instantiate a custom object
-				$this->instantiate( $row );
+			// Instantiate a custom object
+			$this->instantiate( $row );
 		}
 
 		$this->all_loaded = true;
@@ -525,6 +523,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.8  2006/09/09 22:28:08  fplanque
+ * ChapterCache Restricts categories to a specific blog
+ *
  * Revision 1.7  2006/09/06 21:39:21  fplanque
  * ItemList2 fixes
  *

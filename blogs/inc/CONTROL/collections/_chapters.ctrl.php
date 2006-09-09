@@ -40,9 +40,9 @@ $restrict_title = T_('Cannot delete category');	 //&laquo;%s&raquo;
 // It must be initialized to false before checking the delete restrictions
 $checked_delete = false;
 
-load_class( '/MODEL/generic/_genericcategorycache.class.php' );
+load_class( '/MODEL/collections/_chaptercache.class.php' );
 load_class( '/MODEL/generic/_genericcategory.class.php' );
-$GenericElementCache = & new GenericCategoryCache( 'GenericCategory', false, 'T_categories', 'cat_', 'cat_ID', 'cat_name');
+$GenericElementCache = & new ChapterCache();
 
 
 /**
@@ -52,6 +52,8 @@ $blogListButtons = $AdminUI->get_html_collection_list( 'blog_cats', '',
 											'?ctrl='.$ctrl.'&amp;blog=%d',
 											T_('List'), '?ctrl=collections&amp;blog=0' );
 
+// Restrict to chapters of the specific blog:
+$subset_ID = $blog;
 
 require $control_path.'generic/inc/_generic_recursive_listeditor.php';
 ?>
