@@ -35,6 +35,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+load_class( 'MODEL/generic/_genericcache.class.php' );
+
+
 /**
  * GenericCategoryCache class
  *
@@ -71,12 +74,12 @@ class GenericCategoryCache extends GenericCache
 	/**
 	 * Constructor
 	 */
-	function GenericCategoryCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL ) 		
+	function GenericCategoryCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL )
 	{
 		parent::GenericCache( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field );
-	}	
+	}
 
-		
+
 	/**
 	 * Reveal children
 	 *
@@ -120,12 +123,12 @@ class GenericCategoryCache extends GenericCache
 				if( ! is_null( $GenericCategory->parent_ID ) )
 				{	// This category has a parent, so add it to its parent children list:
 					$this->cache[$GenericCategory->parent_ID]->add_children( $this->cache[$cat_ID] );
-				}		
-				else 
-				{	// This category has no parent, so add it to the parent categories list  
+				}
+				else
+				{	// This category has no parent, so add it to the parent categories list
 					$this->parent_cats[] = & $this->cache[$cat_ID];
-				}	
-			}	
+				}
+			}
 		}
 
 		// Children have been revealed.
@@ -138,17 +141,17 @@ class GenericCategoryCache extends GenericCache
 			$this->revealed_subsets[$subset_ID] = true;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Return recursive display of loaded categories
-	 * 
+	 *
 	 * @param array callback funtions (to format the display)
 	 * @param integer|NULL NULL for all subsets
 	 * @param array categories list to display
 	 * @param int depth of  categories list
-	 * 
-	 * @return string recursive list of all loaded categories 
+	 *
+	 * @return string recursive list of all loaded categories
 	 */
 	function recurse( $callbacks, $subset_ID = NULL, $cat_array = NULL, $level = 0 )
 	{
@@ -159,32 +162,32 @@ class GenericCategoryCache extends GenericCache
 		{	// Get all parent categories:
 			$cat_array = $this->parent_cats;
 		}
-	
+
 		$r = '';
-		
+
 		$r .= $callbacks['before_level']( $level ); // <ul>
 
 		foreach ($cat_array as $cat )
-		{ 
-			$r .= $callbacks['line']( $cat, $level ); // <li> Category  - or - <tr><td>Category</td></tr> ... 
-			
+		{
+			$r .= $callbacks['line']( $cat, $level ); // <li> Category  - or - <tr><td>Category</td></tr> ...
+
 			if( !empty( $cat->children ) )
 			{	// Add children categories:
 				$r .= $this->recurse( $callbacks, $subset_ID, $cat->children, $level+1 );
 			}
-			else 
+			else
 			{
 				$r .=$callbacks['no_children']( $cat, $level ); // </li>
 			}
-			
+
 		}
 
 		$r .= $callbacks['after_level']( $level ); // </ul>
 
 		return $r;
 	}
-	
-	
+
+
 	/**
 	 * Return recursive select options list of all loaded categories
 	 *
@@ -235,7 +238,7 @@ class GenericCategoryCache extends GenericCache
 
 		return $r;
 	}
-	
-	
+
+
 }
 ?>

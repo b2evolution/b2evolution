@@ -33,10 +33,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-/**
- * Includes:
- */
-require_once $inc_path.'MODEL/generic/_genericelement.class.php';
+
+load_class( 'MODEL/generic/_genericelement.class.php' );
 
 
 /**

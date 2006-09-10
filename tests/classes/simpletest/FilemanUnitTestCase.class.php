@@ -18,7 +18,7 @@ class FilemanUnitTestCase extends EvoUnitTestCase
 	/**
 	 * Create a file for a given user.
 	 *
-	 * @return string the file name of the created file
+	 * @return string|false the file name of the created file
 	 */
 	function createUserFile( $content = '', $name = '', $user_ID = 1 )
 	{
@@ -26,14 +26,18 @@ class FilemanUnitTestCase extends EvoUnitTestCase
 
 		$FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $user_ID );
 
+		if( ! $FileRoot )
+		{
+			trigger_error( 'Cannot get FileRoot for user #'.$user_ID );
+			return false;
+		}
+
 		if( empty($name) )
 		{
 			$name = basename( tempnam( $FileRoot->ads_path, 'TMP' ) );
 		}
 
-		$this->createFile( $FileRoot->ads_path.$name, $content );
-
-		return $FileRoot->ads_path.$name;
+		return $this->createFile( $FileRoot->ads_path.$name, $content );
 	}
 
 
@@ -68,8 +72,9 @@ class FilemanUnitTestCase extends EvoUnitTestCase
 	 */
 	function createFile( $path, $content = '' )
 	{
-		if( !($fh = fopen( $path, 'w' )) )
+		if( !($fh = @fopen( $path, 'w' )) )
 		{
+			trigger_error( "Cannot create file '$path'!" );
 			return false;
 		}
 

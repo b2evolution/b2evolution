@@ -266,12 +266,13 @@ class AbstractSettings
 	 */
 	function get( $col_key1, $col_key2 = NULL, $col_key3 = NULL )
 	{
-		global $debug, $Debuglog;
+		global $debug;
 
 		if( $debug )
 		{
+			global $Debuglog, $Timer;
 			$this_class = get_class($this);
-			$GLOBALS['Timer']->resume('abstractsettings_'.$this_class.'_get');
+			$Timer->resume('abstractsettings_'.$this_class.'_get');
 		}
 
 		switch( $this->count_col_key_names )
@@ -372,7 +373,7 @@ class AbstractSettings
 			$Debuglog->add( $this_class.'::get( '.$col_key1.'/'.$col_key2.'/'.$col_key3.' ): '
 				.( isset($from_default) ? '[DEFAULT]: ' : '' )
 				.var_export( $r, true ), 'settings' );
-			$GLOBALS['Timer']->pause('abstractsettings_'.$this_class.'_get');
+			$Timer->pause('abstractsettings_'.$this_class.'_get');
 		}
 
 		return $r;
@@ -703,6 +704,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.14  2006/09/10 14:15:28  blueyed
+ * Fixed tests
+ *
  * Revision 1.13  2006/09/06 20:45:34  fplanque
  * ItemList2 fixes
  *

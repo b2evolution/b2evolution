@@ -76,10 +76,13 @@ class FileTestCase extends FilemanUnitTestCase
 		$this->assertTrue( $File->exists(), 'File exists after create().' );
 		$this->assertTrue( file_exists( $temp_path ), 'File really exists.' );
 
-		$File->unlink();
+		if( file_exists( $temp_path ) )
+		{
+			$File->unlink();
 
-		$this->assertFalse( $File->exists(), 'File thinks it is unlinked.' );
-		$this->assertFalse( file_exists( $temp_path ), 'File is really unlinked.' );
+			$this->assertFalse( $File->exists(), 'File thinks it is unlinked.' );
+			$this->assertFalse( file_exists( $temp_path ), 'File is really unlinked.' );
+		}
 	}
 
 

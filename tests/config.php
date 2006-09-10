@@ -47,6 +47,7 @@ require_once EVODIR.'blogs/conf/_config.php';
 
 // Load all .class.php and .funcs.php files:
 require_once $model_path.'files/_file.funcs.php';
+require_once $inc_path.'_misc/_class4.funcs.php';
 
 $includes = get_filenames( $inc_path, true, false );
 foreach( $includes as $include_file )

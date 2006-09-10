@@ -33,10 +33,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-/**
- * Includes:
- */
-require_once dirname(__FILE__).'/../dataobjects/_dataobject.class.php';
+load_class( 'MODEL/generic/_genericelement.class.php' );
 
 /**
  * User property;
