@@ -1256,7 +1256,6 @@ function upgrade_b2evo_tables()
 
 	}
 
-
 	if( $old_db_version < 9405 )
 	{
 		echo 'Updating URL titles... ';
@@ -1265,6 +1264,22 @@ function upgrade_b2evo_tables()
          SET post_urltitle = REPLACE( post_urltitle, "_", "-" )' );
 		echo "OK.<br />\n";
 	}
+
+	if( $old_db_version < 9406 )
+	{
+		echo 'Updating chapter url names... ';
+		$DB->query( '
+			ALTER TABLE T_categories
+				ADD COLUMN cat_urlname VARCHAR(255) NOT NULL' );
+		$DB->query( '
+      UPDATE T_categories
+         SET cat_urlname = CONCAT( "c" , cat_ID )' );
+		$DB->query( '
+			ALTER TABLE T_categories
+				ADD UNIQUE cat_urlname ( cat_urlname )' );
+		echo "OK.<br />\n";
+	}
+
 
 
 	/*
@@ -1373,6 +1388,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.171  2006/09/10 17:33:02  fplanque
+ * started to steam up the categories/chapters
+ *
  * Revision 1.170  2006/08/28 18:28:07  fplanque
  * minor
  *

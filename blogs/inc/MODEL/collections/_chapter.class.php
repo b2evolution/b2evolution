@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Generic Category class.
+ * This file implements the Chapter class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -17,56 +17,56 @@
  *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
  * }}
  *
- * {@internal Open Source relicensing agreement:
- * PROGIDISTRI S.A.S. grants Francois PLANQUE the right to license
- * PROGIDISTRI S.A.S.'s contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
- *
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
- * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
-load_class( 'MODEL/generic/_genericelement.class.php' );
+load_class( 'MODEL/generic/_genericcategory.class.php' );
 
 
 /**
- * Generic Category Class
+ * Chapter Class
  *
  * @package evocore
  */
-class GenericCategory extends GenericElement
+class Chapter extends GenericCategory
 {
-	var $parent_ID;
-	// To display parent name in form
-	var $parent_name;
+	/**
+	 * @var integer
+	 */
+	var $blog_ID;
+	/**
+	 * The Blog of the Item (lazy filled, use {@link get_Blog()} to access it.
+	 * @access protected
+	 * @var Blog
+	 */
+	var $Blog;
 
-	// Category chidrens list
-	var $chidren = array();
 
 	/**
 	 * Constructor
 	 *
 	 * @param table Database row
+ 	 * @param integer|NULL subset to use for new object
 	 */
-	function GenericCategory( $tablename, $prefix = '', $dbIDname = 'ID', $db_row = NULL )
+	function Chapter( $db_row = NULL, $subset_ID = NULL )
 	{
-		global $Debuglog;
-
 		// Call parent constructor:
-		parent::GenericElement( $tablename, $prefix, $dbIDname, $db_row );
+		parent::GenericCategory( 'T_categories', 'cat_', 'cat_ID', $db_row );
 
-		if( $db_row != NULL )
-		{
-			$parentIDfield = $prefix.'parent_ID';
-			$this->parent_ID = $db_row->$parentIDfield;
+		if( is_null($db_row) )
+		{	// We are creating an object here:
+			$this->set( 'blog_ID', $subset_ID );
+		}
+		else
+		{	// Wa are loading an object:
+			$this->blog_ID = $db_row->cat_blog_ID;
+			$this->urlname = $db_row->cat_urlname;
 		}
 	}
 
@@ -80,54 +80,48 @@ class GenericCategory extends GenericElement
 	{
 		parent::load_from_Request();
 
-		if( param( $this->dbprefix.'parent_ID', 'integer', -1 ) !== -1 )
+/*		if( param( $this->dbprefix.'parent_ID', 'integer', -1 ) !== -1 )
 		{
 			$this->set_from_Request( 'parent_ID' );
 		}
-
+*/
 		return ! param_errors_detected();
 	}
 
 
 	/**
-	 * Set param value
+	 * Get the Blog object for the Chapter.
 	 *
-	 * By default, all values will be considered strings
-	 *
-	 * {@internal Contact::set(-)}}
-	 *
-	 * @param string parameter name
-	 * @param mixed parameter value
+	 * @return Blog
 	 */
-	function set( $parname, $parvalue )
+	function & get_Blog()
 	{
-		switch( $parname )
+		if( is_null($this->Blog) )
 		{
- 			case 'parent_ID':
-				$this->set_param( $parname, 'string', $parvalue, true );
-				break;
-
-			case 'name':
-			default:
-				$this->set_param( $parname, 'string', $parvalue );
+			$this->load_Blog();
 		}
+
+		return $this->Blog;
 	}
 
 
 	/**
-	 *
+	 * Load the Blog object for the Chapter, without returning it.
 	 */
-	function add_children( & $GenericCategory )
+	function load_Blog()
 	{
-		$this->children[] = & $GenericCategory;
+		if( is_null($this->Blog) )
+		{
+			$BlogCache = & get_Cache( 'BlogCache' );
+			$this->Blog = & $BlogCache->get_by_ID( $this->blog_ID );
+		}
 	}
-
 }
 
 
 /*
  * $Log$
- * Revision 1.10  2006/09/10 17:33:02  fplanque
+ * Revision 1.1  2006/09/10 17:33:02  fplanque
  * started to steam up the categories/chapters
  *
  */

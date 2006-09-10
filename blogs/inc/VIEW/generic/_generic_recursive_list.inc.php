@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the element list editor list.
+ * This file implements the generic recrusive editor list.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -46,60 +46,83 @@ global $subset_ID;
 
 $line_class = 'odd';
 
+
 /**
- * Get html generic category line
+ * Generate category line when it has children
  *
  * @param GenericCategory generic category we want to display
  * @param int level of the category in the recursive tree
- * @return html generic category line
+ * @return string HTML
  */
 function cat_line( $GenericCategory, $level )
 {
 	global $line_class, $result_fadeout, $permission_to_edit, $current_User;
-	
+
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
-	
+
 	$r = '<tr id="tr-'.$GenericCategory->ID.'"class="'.$line_class.
-					// Fadeout? 
+					// Fadeout?
 					( in_array( $GenericCategory->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">
 					<td class="firstcol shrinkwrap">'.
 						$GenericCategory->ID.'
 					</td>';
-	
+
 	if( $permission_to_edit )
-	{	// We have permission permission to edit, so display action column:						
+	{	// We have permission permission to edit, so display action column:
+		$edit_url = regenerate_url( 'action,'.$GenericCategory->dbIDname, $GenericCategory->dbIDname.'='.$GenericCategory->ID.'&amp;action=edit' );
 		$r .= '<td>
-						<label style="padding-left: '.($level).'em;">'.$GenericCategory->name.'</label>
+						<label style="padding-left: '.($level).'em;"><a href="'.$edit_url.'" title="'.T_('Edit...').'">'.$GenericCategory->name.'</a></label>
 					 </td>
 					 <td class="lastcol shrinkwrap">'.
 						 action_icon( T_('New...'), 'new', regenerate_url( 'action,ID,'.$GenericCategory->dbprefix.'parent_ID', $GenericCategory->dbprefix.'parent_ID='.$GenericCategory->ID.'&amp;action=new' ) ).
-						 action_icon( T_('Edit...'), 'edit', regenerate_url( 'action,'.$GenericCategory->dbIDname, $GenericCategory->dbIDname.'='.$GenericCategory->ID.'&amp;action=edit' ) ).
+						 action_icon( T_('Edit...'), 'edit', $edit_url ).
 						 action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,'.$GenericCategory->dbIDname, $GenericCategory->dbIDname.'='.$GenericCategory->ID.'&amp;action=delete' ) ).'
 					 </td>';
 	}
-	else 
+	else
 	{
 		$r .= '<td class="lastcol">
 						 <label style="padding-left: '.($level).'em;">'.$GenericCategory->name.'</label>
 					 </td>';
 	}
-	
-	
+
+
 	$r .=	'</tr>';
-	
+
 	return $r;
 }
 
+
+/**
+ * Generate category line when it has no children
+ *
+ * @param GenericCategory generic category we want to display
+ * @param int level of the category in the recursive tree
+ * @return string HTML
+ */
 function cat_no_children( $GenericCategory, $level )
 {
 	return '';
 }
 
+
+/**
+ * Generate code when entering a new level
+ *
+ * @param int level of the category in the recursive tree
+ * @return string HTML
+ */
 function cat_before_level( $level )
 {
 	return '';
 }
 
+/**
+ * Generate code when exiting from a level
+ *
+ * @param int level of the category in the recursive tree
+ * @return string HTML
+ */
 function cat_after_level( $level )
 {
 	return '';
@@ -147,4 +170,11 @@ echo $GenericCategoryCache->recurse( $callbacks, $subset_ID );
 
 echo '</table>';
 
+
+/*
+ * $Log$
+ * Revision 1.5  2006/09/10 17:33:02  fplanque
+ * started to steam up the categories/chapters
+ *
+ */
 ?>

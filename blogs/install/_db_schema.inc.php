@@ -146,11 +146,13 @@ $schema_queries = array(
 			cat_ID int(11) unsigned NOT NULL auto_increment,
 			cat_parent_ID int(11) unsigned NULL,
 			cat_name tinytext NOT NULL,
+			cat_urlname varchar(255) NOT NULL,
 			cat_blog_ID int(11) unsigned NOT NULL default 2,
 			cat_description VARCHAR(250) NULL DEFAULT NULL,
 			cat_longdesc TEXT NULL DEFAULT NULL,
 			cat_icon VARCHAR(30) NULL DEFAULT NULL,
 			PRIMARY KEY cat_ID (cat_ID),
+			UNIQUE cat_urlname( cat_urlname ),
 			KEY cat_blog_ID (cat_blog_ID),
 			KEY cat_parent_ID (cat_parent_ID)
 		)" ),
@@ -480,6 +482,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.31  2006/09/10 17:33:02  fplanque
+ * started to steam up the categories/chapters
+ *
  * Revision 1.30  2006/08/29 22:59:09  blueyed
  * doc
  *

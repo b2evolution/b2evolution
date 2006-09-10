@@ -54,6 +54,8 @@ class GenericCache extends DataObjectCache
 	
 	/**
 	 * Instanciate a new object within this cache
+	 *
+	 * @param object|NULL
 	 */
 	function & new_obj( $row = NULL )
 	{
@@ -61,8 +63,15 @@ class GenericCache extends DataObjectCache
 
 		// Instantiate a custom object
 		$obj = new $objtype( $this->dbtablename, $this->dbprefix, $this->dbIDname, $row ); // Copy
-		
+
 		return $obj;
 	}
 }
+
+/*
+ * $Log$
+ * Revision 1.5  2006/09/10 17:33:02  fplanque
+ * started to steam up the categories/chapters
+ *
+ */
 ?>

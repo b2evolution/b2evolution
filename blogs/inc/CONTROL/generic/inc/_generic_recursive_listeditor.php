@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the generic list editor recursif
+ * This file implements the generic recursive list editor
  *
  * NOTE: It uses <code>$AdminUI->get_path(1).'.php'</code> to link back to the ID of the entry.
  *       If that causes problems later, we'd probably need to set a global like $listeditor_url.
@@ -32,7 +32,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id
+ * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -250,42 +250,14 @@ switch( $action )
 			$AdminUI->disp_view( 'generic/_generic_recursive_list.inc.php' );
 		}
 
-		// __________________ Display form form the element object _______________________
-
-		// Determine if we are creating or updating...
-		$creating = is_create_action( $action );
-
-		$Form = & new Form( NULL, 'form' );
-
-		$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
-
-		$Form->begin_form( 'fform', $creating ?  T_('New category') : T_('Category') );
-
-		$Form->hidden( 'action', $creating ? 'create' : 'update' );
-
-		$Form->hidden( 'ctrl', $ctrl );
-
-		$Form->hiddens_by_key( get_memorized( 'action, ctrl' ) );
-
-		$Form->begin_fieldset( T_('Properties') );
-
-			$Form->select_input_options( $edited_GenericCategory->dbprefix.'parent_ID',
-						$GenericCategoryCache->recurse_select( $edited_GenericCategory->parent_ID, $subset_ID, true ), T_('Parent') );
-
-			$Form->text_input( $edited_GenericCategory->dbprefix.'name', $edited_GenericCategory->name, $edited_name_maxlen, T_('name'), array( 'required' => true ) );
-
-		$Form->end_fieldset();
-
-		if( $creating )
+		// Display category edit form:
+		if( !empty( $edit_view_path ) )
 		{
-			$Form->end_form( array( array( 'submit', 'submit', T_('Record'), 'SaveButton' ),
-															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+			$AdminUI->disp_view( $edit_view_path );
 		}
 		else
 		{
-			$Form->hidden( $edited_GenericCategory->dbIDname, $edited_GenericCategory->ID );
-			$Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
-															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+			$AdminUI->disp_view( 'generic/_generic_category.form.php' );
 		}
 
 		// End payload block:
@@ -320,4 +292,11 @@ $AdminUI->disp_payload_end();
 
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
+
+/*
+ * $Log$
+ * Revision 1.7  2006/09/10 17:33:02  fplanque
+ * started to steam up the categories/chapters
+ *
+ */
 ?>

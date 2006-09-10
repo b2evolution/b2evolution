@@ -25,7 +25,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( '/MODEL/generic/_genericcategorycache.class.php' );
+load_class( 'MODEL/generic/_genericcategorycache.class.php' );
+load_class( 'MODEL/collections/_chapter.class.php' );
 
 /**
  * Blog Cache Class
@@ -40,7 +41,7 @@ class ChapterCache extends GenericCategoryCache
 	 */
 	function ChapterCache()
 	{
-		parent::GenericCategoryCache( 'GenericCategory', false, 'T_categories', 'cat_', 'cat_ID', 'cat_name' );
+		parent::GenericCategoryCache( 'Chapter', false, 'T_categories', 'cat_', 'cat_ID', 'cat_name' );
 	}
 
 
@@ -157,19 +158,12 @@ class ChapterCache extends GenericCategoryCache
 	 * Instanciate a new object within this cache
  	 *
  	 * @param object|NULL
- 	 * @param integer|NULL NULL for all subsets
+ 	 * @param integer|NULL subset to use for new object
 	 */
 	function & new_obj( $row = NULL, $subset_ID = NULL )
 	{
-		$objtype = $this->objtype;
-
 		// Instantiate a custom object
-		$Chapter = new $objtype( $this->dbtablename, $this->dbprefix, $this->dbIDname, $row ); // Copy
-
-		if( is_null($row) )
-		{	// We are creating an object here:
-			$Chapter->set( 'blog_ID', $subset_ID );
-		}
+		$Chapter = new Chapter( $row, $subset_ID ); // Copy
 
 		return $Chapter;
 	}
@@ -177,6 +171,9 @@ class ChapterCache extends GenericCategoryCache
 
 /*
  * $Log$
+ * Revision 1.3  2006/09/10 17:33:02  fplanque
+ * started to steam up the categories/chapters
+ *
  * Revision 1.2  2006/09/10 00:16:53  fplanque
  * cleaned up a lot of MB's crap
  * + allowed moving chapters inside of blog

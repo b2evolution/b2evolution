@@ -1,6 +1,28 @@
 <?php
 /**
  * This file implements ther UI controler for chapters management.
+ *
+ * This file is part of the evoCore framework - {@link http://evocore.net/}
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
+ *
+ * {@internal License choice
+ * - If you have received this file as part of a package, please find the license.txt file in
+ *   the same folder or the closest folder above for complete license terms.
+ * - If you have received this file individually (e-g: from http://cvs.sourceforge.net/viewcvs.py/evocms/)
+ *   then you must choose one of the following licenses before using the file:
+ *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
+ *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
+ * }}
+ *
+ * @package admin
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: Francois PLANQUE.
+ *
+ * @version $Id$
  */
 
 $current_User->check_perm( 'blog_cats', 'edit', true, $blog );
@@ -31,7 +53,6 @@ $restrict_title = T_('Cannot delete category');	 //&laquo;%s&raquo;
 $checked_delete = false;
 
 load_class( '/MODEL/collections/_chaptercache.class.php' );
-load_class( '/MODEL/generic/_genericcategory.class.php' );
 $GenericCategoryCache = & new ChapterCache();
 
 
@@ -46,12 +67,19 @@ $blogListButtons = $AdminUI->get_html_collection_list( 'blog_cats', '',
 $subset_ID = $blog;
 
 $list_title = T_('Categories for blog:').' '.$Blog->dget('name');
-$edited_name_maxlen = 40;
-
 $permission_to_edit = $current_User->check_perm( 'blog_cats', '', false, $blog );
 
 // The form will be on its own page:
 $form_below_list = false;
+$edit_view_path = 'collections/_chapter.form.php';
+
 
 require $control_path.'generic/inc/_generic_recursive_listeditor.php';
+
+/*
+ * $Log$
+ * Revision 1.4  2006/09/10 17:33:02  fplanque
+ * started to steam up the categories/chapters
+ *
+ */
 ?>
