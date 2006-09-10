@@ -461,21 +461,23 @@ class Item extends DataObject
 	 *
 	 * @todo archives modes in clean mode
 	 *
-	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
+	 * @param string 'urltitle', 'pid', 'archive#id', 'archive#title' or '' to use default setting
 	 * @param string url to use
 	 * @param boolean true to force single post on destination page
 	 * @param string glue between url params
 	 */
-	function get_permanent_url( $mode = '', $blogurl = '', $force_single = false, $glue = '&amp;' )
+	function get_permanent_url( $permalink_type = '', $blogurl = '', $force_single = false, $glue = '&amp;' )
 	{
 		global $DB, $cacheweekly, $Settings;
 
-		if( empty( $mode ) )
-			$mode = $Settings->get( 'permalink_type' );
+		if( empty( $permalink_type ) )
+		{	// Use default from settings:
+			$permalink_type = $Settings->get( 'permalink_type' );
+		}
 
-		if( $force_single && (strpos( $mode, 'archive' ) !== false) )
-		{ // Comments cannot be displayed in archive mode
-			$mode = 'pid';
+		if( $force_single && (strpos( $permalink_type, 'archive' ) !== false) )
+		{ // We have to fall back to pid
+			$permalink_type = 'pid';
 		}
 
 		if( empty( $blogurl ) )
@@ -486,10 +488,11 @@ class Item extends DataObject
 
 		$post_date = $this->issue_date;
 
-		switch( $mode )
+		switch( $permalink_type )
 		{
 			case 'archive#id':
 				// Link to an archive page:
+				// Determine type of archive page:
 				$dest_type = $Settings->get('archive_mode');
 				$anchor = $this->ID;
 				$urltail = 'p'.$this->ID;
@@ -497,6 +500,7 @@ class Item extends DataObject
 
 			case 'archive#title':
 				// Link to an archive page:
+				// Determine type of archive page:
 				$dest_type = $Settings->get('archive_mode');
 				$anchor = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $this->title );
 				$urltail = 'p'.$this->ID;
@@ -525,60 +529,62 @@ class Item extends DataObject
 				}
 		}
 
-		if( $Settings->get('links_extrapath') == 'disabled' )
-		{ // We reference by Query: Dirty but explicit permalinks
 
-			switch( $dest_type )
-			{
-				case 'monthly':
+		switch( $dest_type )
+		{
+			case 'monthly':
+				// Link to a monthly archive page:
+				if( $Settings->get('links_extrapath') == 'disabled' )
+				{ // Use params:
 					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).substr($post_date,5,2), $glue ).'#'.$anchor;
-					break;
-
-				case 'weekly':
-					if((!isset($cacheweekly)) || (empty($cacheweekly[$post_date])))
-					{
-						$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
-					}
-					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).$glue.'w='.$cacheweekly[$post_date], $glue ).'#'.$anchor;
-					break;
-
-				case 'daily':
-					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).substr($post_date,5,2).substr($post_date,8,2), $glue ).'#'.$anchor;
-					break;
-
-				case 'postbypost':
-				default:
-					$permalink = url_add_param( $blogurl, $urlparam.$glue.'more=1'.$glue.'c=1'.$glue.'tb=1'.$glue.'pb=1', $glue );
-					break;
-			}
-		}
-		else
-		{ // We reference by path (CLEAN permalinks!)
-			// TODO: handle all extra path modes
-			switch( $dest_type )
-			{
-				case 'monthly':
+				}
+				else
+				{ // Use extra path info:
 					$permalink = url_add_tail( $blogurl, mysql2date("/Y/m", $post_date) ).'#'.$anchor;
-					break;
+				}
+				break;
 
-				case 'weekly':
-					if((!isset($cacheweekly)) || (empty($cacheweekly[$post_date])))
-					{
-						$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
-					}
+			case 'weekly':
+				// Link to a weekly archive page:
+				if((!isset($cacheweekly)) || (empty($cacheweekly[$post_date])))
+				{
+					$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
+				}
+				if( $Settings->get('links_extrapath') == 'disabled' )
+				{ // Use params:
+					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).$glue.'w='.$cacheweekly[$post_date], $glue ).'#'.$anchor;
+				}
+				else
+				{ // Use extra path info:
 					$permalink = url_add_tail( $blogurl, mysql2date("/Y/", $post_date).'w'.$cacheweekly[$post_date] ).'#'.$anchor;
-					break;
+				}
+				break;
 
-				case 'daily':
+			case 'daily':
+				// Link to a daily archive page:
+				if( $Settings->get('links_extrapath') == 'disabled' )
+				{ // Use params:
+					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).substr($post_date,5,2).substr($post_date,8,2), $glue ).'#'.$anchor;
+				}
+				else
+				{ // Use extra path info:
 					$permalink = url_add_tail( $blogurl, mysql2date("/Y/m/d", $post_date) ).'#'.$anchor;
-					break;
+				}
+				break;
 
-				case 'postbypost':
-				default:
+			case 'postbypost':
+			default:
+				// Link to a specific post:
+				if( $Settings->get('links_extrapath') == 'disabled' )
+				{ // Use params:
+					$permalink = url_add_param( $blogurl, $urlparam.$glue.'more=1'.$glue.'c=1'.$glue.'tb=1'.$glue.'pb=1', $glue );
+				}
+				else
+				{ // Use extra path info:
 					// This is THE CLEANEST available: RECOMMENDED!
 					$permalink = url_add_tail( $blogurl, mysql2date("/Y/m/d/", $post_date).$urltail );
-					break;
-			}
+				}
+				break;
 		}
 
 		return $permalink;
@@ -3042,6 +3048,11 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.91  2006/09/10 21:18:11  fplanque
+ * transposed permalink generation
+ * looks like a lot of changes but basically I only swiched the imbrocation of an if and a switch
+ * this is needed to make further changes more readable
+ *
  * Revision 1.90  2006/09/10 20:59:18  fplanque
  * extended extra path info setting
  *
