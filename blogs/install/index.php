@@ -407,7 +407,7 @@ switch( $action )
 			<p>
 			<input type="submit" value="&nbsp; <?php echo T_('GO!')?> &nbsp;"
 				onclick="var dc = document.getElementById( 'deletedb' ); if( dc && dc.checked ) { return confirm( '<?php
-					printf( TS_( 'Are you sure you want to delete your existing %s tables?\nDo you have a backup?' ), $app_name );
+					printf( /* TRANS: %s gets replaced by app name, usually "b2evolution" */ TS_( 'Are you sure you want to delete your existing %s tables?\nDo you have a backup?' ), $app_name );
 					?>' ); }" />
 			</p>
 			</form>
@@ -603,6 +603,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.111  2006/09/10 14:16:37  blueyed
+ * trans doc
+ *
  * Revision 1.110  2006/08/20 13:47:26  fplanque
  * extracted param funcs from misc
  *
