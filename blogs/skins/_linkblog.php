@@ -50,7 +50,7 @@ $LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $li
 // Compile cat array stuff:
 $linkblog_cat_array = array();
 $linkblog_cat_modifier = '';
-compile_cat_array( $linkblog_cat, $linkblog_catsel, & $linkblog_cat_array, & $linkblog_cat_modifier, $linkblog );
+compile_cat_array( $linkblog_cat, $linkblog_catsel, $linkblog_cat_array, $linkblog_cat_modifier, $linkblog );
 
 $LinkblogList->set_filters( array(
 		'cat_array' => $linkblog_cat_array,
@@ -95,6 +95,9 @@ echo $linkblog_main_end;
 
 /*
  * $Log$
+ * Revision 1.16  2006/09/10 21:18:25  blueyed
+ * call-time pass-by-reference has been deprecated
+ *
  * Revision 1.15  2006/09/06 18:34:04  fplanque
  * Finally killed the old stinkin' ItemList(1) class which is deprecated by ItemList2
  *
