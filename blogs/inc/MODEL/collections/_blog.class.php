@@ -492,10 +492,16 @@ class Blog extends DataObject
 				{
 					$blogurl .= $this->stub;
 				}
+				/*
+				dh> Removed, because it makes no sense IMHO.
+				    Especially with an empty stub it will leed to http://example.com/.php (e.g. on preview)
+				    It may get moved into the above if-not-empty check, but forcing ".php" at the stub makes no sense IMHO!
+				    Also, this is the only place where $type == 'dynamic' gets used.
 				if( ($type == 'dynamic') && !( preg_match( '#.php$#', $blogurl ) ) )
 				{ // We want to force the dynamic page but the URL is not explicitly dynamic
 					$blogurl .= '.php';
 				}
+				*/
 				return $blogurl;
 
 			default:
@@ -1022,6 +1028,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2006/09/10 13:46:43  blueyed
+ * Removed explicit ".php" extension for "dynamic" type urls.
+ *
  * Revision 1.18  2006/09/05 19:08:43  fplanque
  * minor
  *
