@@ -80,13 +80,10 @@ class GenericCategory extends GenericElement
 	 */
 	function load_from_request()
 	{
-
-
 		parent::load_from_Request();
 
-		if( param( $this->dbprefix.'parent_ID', 'integer', NULL ) )
+		if( param( $this->dbprefix.'parent_ID', 'integer', -1 ) !== -1 )
 		{
-			param_check_number( $this->dbprefix.'parent_ID', T_('Parent ID must be a number') );
 			$this->set_from_Request( 'parent_ID' );
 		}
 
@@ -108,7 +105,6 @@ class GenericCategory extends GenericElement
 	{
 		switch( $parname )
 		{
- 			case 'ext_ID':
  			case 'parent_ID':
 				$this->set_param( $parname, 'string', $parvalue, true );
 				break;
@@ -128,57 +124,6 @@ class GenericCategory extends GenericElement
 		$this->children[] = & $GenericCategory;
 	}
 
-
-	/**
-	 * Enter description here...
-	 *
-	 */
-	function disp_form()
-	{
-		global $ctrl, $action, $edited_name_maxlen;
-
-		// Determine if we are creating or updating...
-		$creating = is_create_action( $action );
-
-		$Form = & new Form( NULL, 'form' );
-
-		$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
-
-		$Form->begin_form( 'fform', $creating ?  T_('New element') : T_('Element') );
-
-		$Form->hidden( 'action', $creating ? 'create' : 'update' );
-
-		$Form->hidden( 'ctrl', $ctrl );
-
-		$Form->hiddens_by_key( get_memorized( 'action, ctrl' ) );
-
-		if( $action == 'new' )
-		{	// Display parent generic category name for the new generic category
-			$Form->info( T_('Add to'), $this->parent_name );
-			$Form->hidden( $this->dbprefix.'parent_ID', $this->parent_ID );
-		}
-		elseif ( $creating )
-		{
-			$Form->info( T_('Add to'), T_('Root') );
-		}
-
-		$Form->text_input( $this->dbprefix.'name', $this->name, $edited_name_maxlen, T_('name'), array( 'required' => true ) );
-
-		$Form->text_input( $this->dbprefix.'ext_ID', $this->ext_ID, 25, T_('External ID') );
-
-		if( ! $creating ) $Form->hidden( $this->dbIDname, $this->ID );
-
-		if( $creating )
-		{
-			$Form->end_form( array( array( 'submit', 'submit', T_('Record'), 'SaveButton' ),
-															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
-		}
-		else
-		{
-			$Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
-															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
-		}
-	}
 
 }
 ?>

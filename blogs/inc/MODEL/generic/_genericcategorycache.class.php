@@ -116,9 +116,9 @@ class GenericCategoryCache extends GenericCache
 		{	// There are loaded categories, so loop on all loaded categories to set their children list if it has:
 			foreach( $this->cache as $cat_ID => $GenericCategory )
 			{
+				// echo $GenericCategory->name;
 				if( ! is_null( $GenericCategory->parent_ID ) )
 				{	// This category has a parent, so add it to its parent children list:
-
 					$this->cache[$GenericCategory->parent_ID]->add_children( $this->cache[$cat_ID] );
 				}		
 				else 
@@ -190,12 +190,13 @@ class GenericCategoryCache extends GenericCache
 	 *
 	 * @param integer selected category in the select input
 	 * @param integer|NULL NULL for all subsets
+	 * @param boolean
 	 * @param array categories list to display
 	 * @param int depth of  categories list
 	 *
 	 * @return string select options list of all loaded categories
 	 */
-	function recurse_select( $selected = NULL, $subset_ID = NULL, $cat_array = NULL, $level = 0 )
+	function recurse_select( $selected = NULL, $subset_ID = NULL, $include_root = false, $cat_array = NULL, $level = 0 )
 	{
 		// Make sure children have been revealed for specific subset:
 		$this->reveal_children( $subset_ID );
@@ -204,9 +205,15 @@ class GenericCategoryCache extends GenericCache
 		{	// Get all parent categorie:
 			$cat_array = $this->parent_cats;
 		}
-	
-		$r ='';
-		
+
+		$r = '';
+
+		if( $include_root )
+		{
+			$r .= '<option value="">'.T_('Root').'</option>';
+			$level++;
+		}
+
 		foreach ($cat_array as $cat )
 		{
 			// Set category indentation in the select:
@@ -214,15 +221,15 @@ class GenericCategoryCache extends GenericCache
 			for($i = 0; $i < $level; $i++)
 			{
 				$indent .='&nbsp;&nbsp;';
-			} 
+			}
 			// Set category option:
 			$r .= '<option value="'.$cat->ID.'" ';
 			if( $cat->ID == $selected ) $r .= ' selected="selected"';
 			$r .= ' >'.$indent.$cat->name.'</option>';
-			
+
 			if( !empty( $cat->children ) )
 			{	// Add children categories:
-				$r .= $this->recurse_select( $selected, $subset_ID, $cat->children, $level+1 );
+				$r .= $this->recurse_select( $selected, $subset_ID, false, $cat->children, $level+1 );
 			}
 		}
 

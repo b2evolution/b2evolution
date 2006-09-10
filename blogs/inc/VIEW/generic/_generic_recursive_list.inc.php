@@ -33,14 +33,14 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 //____________________ Callbacks functions to display categories list _____________________
- 
+
 global $list_title;
 
-global $GenericElementCache;
+global $GenericCategoryCache;
 
 global $line_class;
 
-global $perm_name, $perm_level;
+global $permission_to_edit;
 
 global $subset_ID;
 
@@ -55,7 +55,7 @@ $line_class = 'odd';
  */
 function cat_line( $GenericCategory, $level )
 {
-	global $line_class, $result_fadeout, $perm_name, $perm_level, $current_User;
+	global $line_class, $result_fadeout, $permission_to_edit, $current_User;
 	
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 	
@@ -66,10 +66,10 @@ function cat_line( $GenericCategory, $level )
 						$GenericCategory->ID.'
 					</td>';
 	
-	if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, false ) )
+	if( $permission_to_edit )
 	{	// We have permission permission to edit, so display action column:						
 		$r .= '<td>
-						<label style="padding-left: '.(2*$level).'em;">'.$GenericCategory->name.'</label>
+						<label style="padding-left: '.($level).'em;">'.$GenericCategory->name.'</label>
 					 </td>
 					 <td class="lastcol shrinkwrap">'.
 						 action_icon( T_('New...'), 'new', regenerate_url( 'action,ID,'.$GenericCategory->dbprefix.'parent_ID', $GenericCategory->dbprefix.'parent_ID='.$GenericCategory->ID.'&amp;action=new' ) ).
@@ -80,7 +80,7 @@ function cat_line( $GenericCategory, $level )
 	else 
 	{
 		$r .= '<td class="lastcol">
-						 <label style="padding-left: '.(2*$level).'em;">'.$GenericCategory->name.'</label>
+						 <label style="padding-left: '.($level).'em;">'.$GenericCategory->name.'</label>
 					 </td>';
 	}
 	
@@ -121,10 +121,10 @@ echo '<table class="grouped" cellspacing="0">
 						<div class="results_title">';
 			
 
-if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, false ) )
+if( $permission_to_edit )
 {	// We have permission permission to edit, so display global icon to add nex genereic element:
 	echo '<span class="right_icons">'
-				.action_icon( T_('Add an element...'), 'new', regenerate_url( 'action,'.$GenericElementCache->dbIDname, 'action=new' ), T_('Add element'), 3, 4 ).'  
+				.action_icon( T_('Add an element...'), 'new', regenerate_url( 'action,'.$GenericCategoryCache->dbIDname, 'action=new' ), T_('Add element'), 3, 4 ).'
 				</span>';
 }
 
@@ -136,14 +136,14 @@ echo				$list_title.'
 					<th class="firstcol shrinkwrap right">'.T_('ID').'</th>
 					<th>'.T_('Name').'</th>';
 
-if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, false ) )
+if( $permission_to_edit )
 {	// We have permission permission to edit, so display action column:
 	echo '<th class="lastcol">'.T_('Actions').'</th>';
 }
 
 echo '</tr>';
 
-echo $GenericElementCache->recurse( $callbacks, $subset_ID );
+echo $GenericCategoryCache->recurse( $callbacks, $subset_ID );
 
 echo '</table>';
 

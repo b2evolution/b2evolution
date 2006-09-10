@@ -45,6 +45,80 @@ class ChapterCache extends GenericCategoryCache
 
 
 	/**
+	 * Get an object from cache by ID
+	 *
+	 * Load the cache if necessary (all at once if allowed).
+	 *
+	 * @param integer ID of object to load
+	 * @param boolean true if function should die on error
+	 * @param boolean true if function should die on empty/null
+ 	 * @param integer|NULL NULL for all subsets
+	 * @return reference on cached object
+	 */
+	function & get_by_ID( $req_ID, $halt_on_error = true, $halt_on_empty = true, $subset_ID )
+	{
+		global $DB, $Debuglog;
+
+		if( empty($req_ID) )
+		{
+			if($halt_on_empty)
+			{
+				debug_die( "Requested $this->objtype from $this->dbtablename without ID!" );
+			}
+			$r = NULL;
+			return $r;
+		}
+
+		if( !empty( $this->cache[ $req_ID ] ) )
+		{ // Already in cache
+			// $Debuglog->add( "Accessing $this->objtype($req_ID) from cache", 'dataobjects' );
+			return $this->cache[ $req_ID ];
+		}
+		elseif( !$this->all_loaded )
+		{ // Not in cache, but not everything is loaded yet
+			if( $this->load_all )
+			{ // It's ok to just load everything:
+				$this->load_all();
+			}
+			else
+			{ // Load just the requested object:
+				$Debuglog->add( "Loading <strong>$this->objtype($req_ID)</strong> into cache", 'dataobjects' );
+				// Note: $req_ID MUST be an unsigned integer. This is how DataObject works.
+				$sql = "SELECT *
+				          FROM $this->dbtablename
+				         WHERE $this->dbIDname = $req_ID
+				           AND cat_blog_ID = ".$subset_ID;
+
+				if( $row = $DB->get_row( $sql, OBJECT, 0, 'DataObjectCache::get_by_ID()' ) )
+				{
+					if( ! $this->instantiate( $row ) )
+					{
+						$Debuglog->add( 'Could not add() object to cache!', 'dataobjects' );
+					}
+				}
+				else
+				{
+					$Debuglog->add( 'Could not get DataObject by ID. Query: '.$sql, 'dataobjects' );
+				}
+			}
+		}
+
+		if( empty( $this->cache[ $req_ID ] ) )
+		{ // Requested object does not exist
+			// $Debuglog->add( 'failure', 'dataobjects' );
+			if( $halt_on_error )
+			{
+				debug_die( "Requested $this->objtype does not exist!" );
+			}
+			$r = false;
+			return $r;
+		}
+
+		return $this->cache[ $req_ID ];
+	}
+
+
+	/**
 	 * Load a keyed subset of the cache
 	 *
  	 * @param integer|NULL NULL for all subsets
@@ -58,8 +132,8 @@ class ChapterCache extends GenericCategoryCache
 			return false;
 		}
 
-		// fp> TODO: we may need to support this!
-		// $this->clear( true );
+		// fp> TODO: This kills other subsets. BAD if we want to handle multiple subsets independently
+		$this->clear( true );
 
 		$Debuglog->add( 'ChapterCache - Loading <strong>chapters('.$subset_ID.')</strong> into cache', 'dataobjects' );
 		$sql = 'SELECT *
@@ -78,10 +152,35 @@ class ChapterCache extends GenericCategoryCache
 		return true;
 	}
 
+
+	/**
+	 * Instanciate a new object within this cache
+ 	 *
+ 	 * @param object|NULL
+ 	 * @param integer|NULL NULL for all subsets
+	 */
+	function & new_obj( $row = NULL, $subset_ID = NULL )
+	{
+		$objtype = $this->objtype;
+
+		// Instantiate a custom object
+		$Chapter = new $objtype( $this->dbtablename, $this->dbprefix, $this->dbIDname, $row ); // Copy
+
+		if( is_null($row) )
+		{	// We are creating an object here:
+			$Chapter->set( 'blog_ID', $subset_ID );
+		}
+
+		return $Chapter;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.2  2006/09/10 00:16:53  fplanque
+ * cleaned up a lot of MB's crap
+ * + allowed moving chapters inside of blog
+ *
  * Revision 1.1  2006/09/09 22:28:08  fplanque
  * ChapterCache Restricts categories to a specific blog
  *

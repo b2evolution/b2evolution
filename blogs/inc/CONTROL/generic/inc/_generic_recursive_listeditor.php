@@ -42,22 +42,22 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 param( 'action', 'string', 'list' );
 
 
-if( param( $GenericElementCache->dbIDname, 'integer', NULL, true, false, false ) )
+if( param( $GenericCategoryCache->dbIDname, 'integer', NULL, true, false, false ) )
 {
-	if( ($edited_GenericElement = & $GenericElementCache->get_by_ID( ${$GenericElementCache->dbIDname}, false )) === false )
+	if( ($edited_GenericCategory = & $GenericCategoryCache->get_by_ID( ${$GenericCategoryCache->dbIDname}, false, true, $subset_ID )) === false )
 	{	// We could not find the element to edit:
-		unset( $edited_GenericElement );
+		unset( $edited_GenericCategory );
 		$Messages->head = T_('Cannot edit element!');
 		$Messages->add( T_('Requested element does not exist any longer.'), 'error' );
 		$action = 'nil';
 	}
 }
 
-if ( !is_null( param( $GenericElementCache->dbprefix.'parent_ID', 'integer', NULL ) ) )
+if ( !is_null( param( $GenericCategoryCache->dbprefix.'parent_ID', 'integer', NULL ) ) )
 {
-	if( ( $edited_parent_GenericElement = & $GenericElementCache->get_by_ID( ${$GenericElementCache->dbprefix.'parent_ID'}, false ) ) === false )
+	if( ( $edited_parent_GenericElement = & $GenericCategoryCache->get_by_ID( ${$GenericCategoryCache->dbprefix.'parent_ID'}, false, true, $subset_ID ) ) === false )
 	{ // Parent generic category doesn't exist any longer.
-		unset( $GenericElementCache->dbIDname );
+		unset( $GenericCategoryCache->dbIDname );
 		$Messages->head = T_('Cannot edit element!');
 		$Messages->add( T_('Requested element does not exist any longer.'), 'error' );
 		$action = 'nil';
@@ -72,7 +72,7 @@ $result_fadeout = array();
  */
 if( !empty( $locked_IDs )
 		&& in_array( $action, array( 'edit', 'update', 'delete' ) )
-		&& in_array( $$GenericElementCache->dbIDname, $locked_IDs ) )
+		&& in_array( $$GenericCategoryCache->dbIDname, $locked_IDs ) )
 {
 	$Messages->add( T_('This element is locked and cannot be edited!') );
 	$action = 'list';
@@ -87,21 +87,21 @@ switch( $action )
 	case 'new':
 		// New action
 
-		if( isset( $perm_name ) )
-		{	// We need to Check permission:
-			$current_User->check_perm( $perm_name, $perm_level, true );
+		if( ! $permission_to_edit )
+		{
+			debug_die( 'No permission to edit' );
 		}
 
-		$edited_GenericElement = & $GenericElementCache->new_obj();
+		$edited_GenericCategory = & $GenericCategoryCache->new_obj( NULL, $subset_ID );
 
 		if( isset( $edited_parent_GenericElement ) )
 		{
-			$edited_GenericElement->parent_ID = $edited_parent_GenericElement->ID;
-			$edited_GenericElement->parent_name = $edited_parent_GenericElement->name;
+			$edited_GenericCategory->parent_ID = $edited_parent_GenericElement->ID;
+			$edited_GenericCategory->parent_name = $edited_parent_GenericElement->name;
 		}
 		else
 		{
-			$edited_GenericElement->parent_name = T_('Root');
+			$edited_GenericCategory->parent_name = T_('Root');
 		}
 
 		break;
@@ -110,15 +110,15 @@ switch( $action )
 	case 'edit':
 		// Edit element form...:
 		// Make sure we got an ID:
-		param( $GenericElementCache->dbIDname, 'integer', true );
+		param( $GenericCategoryCache->dbIDname, 'integer', true );
 
-		if( isset( $perm_name ) )
-		{	// We need to Check permission:
-			$current_User->check_perm( $perm_name, $perm_level, true );
+		if( ! $permission_to_edit )
+		{
+			debug_die( 'No permission to edit' );
 		}
 
 		// Get the page number we come from:
-		$previous_page = param( 'results'.$GenericElementCache->dbprefix.'page', 'integer', 1, true );
+		$previous_page = param( 'results'.$GenericCategoryCache->dbprefix.'page', 'integer', 1, true );
 
 		break;
 
@@ -126,22 +126,22 @@ switch( $action )
 	case 'create':
 		// Insert new element...:
 
-		if( isset( $perm_name ) )
-		{	// We need to Check permission:
-			$current_User->check_perm( $perm_name, $perm_level, true );
+		if( ! $permission_to_edit )
+		{
+			debug_die( 'No permission to edit' );
 		}
 
-		$edited_GenericElement = & $GenericElementCache->new_obj();
+		$edited_GenericCategory = & $GenericCategoryCache->new_obj( NULL, $subset_ID );
 
 		// load data from request
-		if( $edited_GenericElement->load_from_Request() )
+		if( $edited_GenericCategory->load_from_Request() )
 		{	// We could load data from form without errors:
 			// Insert in DB:
-			if( $edited_GenericElement->dbinsert() !== false )
+			if( $edited_GenericCategory->dbinsert() !== false )
 			{
 				$Messages->add( T_('New element created.'), 'success' ); // TODO CHANGES THIS
 				// Add the ID of the new element to the result fadeout
-				$result_fadeout[] = $edited_GenericElement->ID;
+				$result_fadeout[] = $edited_GenericCategory->ID;
 				$action = 'list';
 			}
 		}
@@ -150,59 +150,59 @@ switch( $action )
 
 	case 'update':
 		// Make sure we got an ID:
-		param( $GenericElementCache->dbIDname, 'integer', true );
+		param( $GenericCategoryCache->dbIDname, 'integer', true );
 
-		if( isset( $perm_name ) )
-		{	// We need to Check permission:
-			$current_User->check_perm( $perm_name, $perm_level, true );
+		if( ! $permission_to_edit )
+		{
+			debug_die( 'No permission to edit' );
 		}
 
 		// LOAD FORM DATA:
-		if( $edited_GenericElement->load_from_Request() )
+		if( $edited_GenericCategory->load_from_Request() )
 		{	// We could load data from form without errors:
 			// Update in DB:
-			if( $edited_GenericElement->dbupdate() !== false )
+			if( $edited_GenericCategory->dbupdate() !== false )
 			{
 				$Messages->add( T_('Element updated.'), 'success' ); //ToDO change htis
 				// Add the ID of the updated element to the result fadeout
-				$result_fadeout[] = $edited_GenericElement->ID;
+				$result_fadeout[] = $edited_GenericCategory->ID;
 				$action = 'list';
 			}
 		}
 		else
 		{
 			// Get the page number we come from:
-			$previous_page = param( 'results'.$GenericElementCache->dbprefix.'page', 'integer', 1, true );
+			$previous_page = param( 'results'.$GenericCategoryCache->dbprefix.'page', 'integer', 1, true );
 		}
 		break;
 
 
 	case 'delete':
 		// Delete entry:
-		param( $GenericElementCache->dbIDname, 'integer', true );
+		param( $GenericCategoryCache->dbIDname, 'integer', true );
 
-		if( isset( $perm_name ) )
-		{	// We need to Check permission:
-			$current_User->check_perm( $perm_name, $perm_level, true );
+		if( ! $permission_to_edit )
+		{
+			debug_die( 'No permission to edit' );
 		}
 
 		// Set restrictions for element
-		$edited_GenericElement->delete_restrictions = $delete_restrictions;
+		$edited_GenericCategory->delete_restrictions = $delete_restrictions;
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Element &laquo;%s&raquo; deleted.'), $edited_GenericElement->dget( 'name' ) );
-			$GenericElementCache->dbdelete_by_ID( $edited_GenericElement->ID );
-			unset($edited_GenericElement);
-			forget_param( $GenericElementCache->dbIDname );
+			$msg = sprintf( T_('Element &laquo;%s&raquo; deleted.'), $edited_GenericCategory->dget( 'name' ) );
+			$GenericCategoryCache->dbdelete_by_ID( $edited_GenericCategory->ID );
+			unset($edited_GenericCategory);
+			forget_param( $GenericCategoryCache->dbIDname );
 			$Messages->add( $msg, 'success' );
 			$action = 'list';
 		}
 		else
 		{	// not confirmed, Check for restrictions:
 			// Get the page number we come from:
-			$previous_page = param( 'results_'.$GenericElementCache->dbprefix.'page', 'integer', 1, true );
-			if( ! $edited_GenericElement->check_delete( sprintf( T_('Cannot delete element &laquo;%s&raquo;'), $edited_GenericElement->dget( 'name' ) ) ) )
+			$previous_page = param( 'results_'.$GenericCategoryCache->dbprefix.'page', 'integer', 1, true );
+			if( ! $edited_GenericCategory->check_delete( sprintf( T_('Cannot delete element &laquo;%s&raquo;'), $edited_GenericCategory->dget( 'name' ) ) ) )
 			{	// There are restrictions:
 				$action = 'edit';
 			}
@@ -239,8 +239,8 @@ switch( $action )
 
 		if( $action == 'delete' )
 		{	// We need to ask for confirmation:
-			$edited_GenericElement->confirm_delete(
-					sprintf( T_('Delete element &laquo;%s&raquo;?'),  $edited_GenericElement->dget( 'name' ) ),
+			$edited_GenericCategory->confirm_delete(
+					sprintf( T_('Delete element &laquo;%s&raquo;?'),  $edited_GenericCategory->dget( 'name' ) ),
 					$action, get_memorized( 'action' ) );
 		}
 
@@ -250,8 +250,43 @@ switch( $action )
 			$AdminUI->disp_view( 'generic/_generic_recursive_list.inc.php' );
 		}
 
-		// Display form form the element object:
-		$edited_GenericElement->disp_form();
+		// __________________ Display form form the element object _______________________
+
+		// Determine if we are creating or updating...
+		$creating = is_create_action( $action );
+
+		$Form = & new Form( NULL, 'form' );
+
+		$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+
+		$Form->begin_form( 'fform', $creating ?  T_('New category') : T_('Category') );
+
+		$Form->hidden( 'action', $creating ? 'create' : 'update' );
+
+		$Form->hidden( 'ctrl', $ctrl );
+
+		$Form->hiddens_by_key( get_memorized( 'action, ctrl' ) );
+
+		$Form->begin_fieldset( T_('Properties') );
+
+			$Form->select_input_options( $edited_GenericCategory->dbprefix.'parent_ID',
+						$GenericCategoryCache->recurse_select( $edited_GenericCategory->parent_ID, $subset_ID, true ), T_('Parent') );
+
+			$Form->text_input( $edited_GenericCategory->dbprefix.'name', $edited_GenericCategory->name, $edited_name_maxlen, T_('name'), array( 'required' => true ) );
+
+		$Form->end_fieldset();
+
+		if( $creating )
+		{
+			$Form->end_form( array( array( 'submit', 'submit', T_('Record'), 'SaveButton' ),
+															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+		}
+		else
+		{
+			$Form->hidden( $edited_GenericCategory->dbIDname, $edited_GenericCategory->ID );
+			$Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
+															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+		}
 
 		// End payload block:
 		$AdminUI->disp_payload_end();

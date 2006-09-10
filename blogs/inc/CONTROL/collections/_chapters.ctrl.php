@@ -14,16 +14,6 @@ $Blog = & $edited_Blog; // used for "Exit to blogs.." link
 
 $AdminUI->set_path( 'blogs', 'chapters' );
 
- param( 'action', 'string', 'list' );
-
-$list_title = T_('Categories for blog:').' '.$Blog->dget('name');
-$default_col_order = '-A';
-$edited_name_maxlen = 40;
-$perm_name = 'prod';
-$perm_level = 'edit';
-
-// The form will be on its own page:
-$form_below_list = false;
 
 /**
  * Delete restrictions
@@ -42,7 +32,7 @@ $checked_delete = false;
 
 load_class( '/MODEL/collections/_chaptercache.class.php' );
 load_class( '/MODEL/generic/_genericcategory.class.php' );
-$GenericElementCache = & new ChapterCache();
+$GenericCategoryCache = & new ChapterCache();
 
 
 /**
@@ -54,6 +44,14 @@ $blogListButtons = $AdminUI->get_html_collection_list( 'blog_cats', '',
 
 // Restrict to chapters of the specific blog:
 $subset_ID = $blog;
+
+$list_title = T_('Categories for blog:').' '.$Blog->dget('name');
+$edited_name_maxlen = 40;
+
+$permission_to_edit = $current_User->check_perm( 'blog_cats', '', false, $blog );
+
+// The form will be on its own page:
+$form_below_list = false;
 
 require $control_path.'generic/inc/_generic_recursive_listeditor.php';
 ?>
