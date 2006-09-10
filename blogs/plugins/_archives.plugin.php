@@ -86,7 +86,7 @@ function get_permalink(
 			break;
 	}
 
-	if( ! $Settings->get('links_extrapath') )
+	if( $Settings->get('links_extrapath') == 'disabled' )
 	{ // We reference by Query: Dirty but explicit permalinks
 
 		switch($use_destination)
@@ -113,6 +113,7 @@ function get_permalink(
 	}
 	else
 	{ // We reference by path (CLEAN permalinks!)
+		// fp>> TODO: handle all extra path modes
 		switch($use_destination)
 		{
 			case 'monthly':
@@ -633,6 +634,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.29  2006/09/10 20:59:19  fplanque
+ * extended extra path info setting
+ *
  * Revision 1.28  2006/08/29 00:26:11  fplanque
  * Massive changes rolling in ItemList2.
  * This is somehow the meat of version 2.0.

@@ -84,7 +84,7 @@ class GeneralSettings extends AbstractSettings
 		'fm_default_chmod_file' => '664',   // Needs UI
 		'fm_default_chmod_dir' => '775',    // Needs UI
 
-		'links_extrapath' => '0',
+		'links_extrapath' => 'disabled',
 
 		'newusers_canregister' => '0',
 		'newusers_mustvalidate' => '1',
@@ -159,6 +159,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.19  2006/09/10 20:59:18  fplanque
+ * extended extra path info setting
+ *
  * Revision 1.18  2006/08/21 01:02:09  blueyed
  * whitespace
  *

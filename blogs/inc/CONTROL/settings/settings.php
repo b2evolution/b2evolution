@@ -85,7 +85,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	$Settings->set( 'AutoBR', $AutoBR );
 
 
-	param( 'links_extrapath', 'integer', 0 );
+	param( 'links_extrapath', 'string', 'disabled' );
 	$Settings->set( 'links_extrapath', $links_extrapath );
 
 	param( 'permalink_type', 'string', true );
@@ -128,6 +128,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2006/09/10 20:59:18  fplanque
+ * extended extra path info setting
+ *
  * Revision 1.7  2006/08/20 22:25:20  fplanque
  * param_() refactoring part 2
  *

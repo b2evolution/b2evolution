@@ -95,7 +95,15 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Link options') );
 
-$Form->checkbox( 'links_extrapath', $Settings->get('links_extrapath'), T_('Use extra-path info'), sprintf( T_('Recommended if your webserver supports it. Links will look like \'stub/2003/05/20/post_title\' instead of \'stub?title=post_title&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1\'.' ) ) );
+$Form->radio( 'links_extrapath', $Settings->get('links_extrapath'),
+							array(  array( 'disabled', T_('Do not use extra path info'), T_('Permalinks will look like: \'stub?title=post_title&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1\'') ),
+											array( 'short', T_('Only use post URL title'), T_('Permalinks will look like \'stub/post_title\'' ) ),
+											array( 'y', T_('Use year'), T_('Permalinks will look like \'stub/2006/post_title\'' ) ),
+											array( 'ym', T_('Use year &amp; month'), T_('Permalinks will look like \'stub/2006/12/post_title\'' ) ),
+											array( 'ymd', T_('Use year, month &amp; day'), T_('Permalinks will look like \'stub/2006/12/31/post_title\'' ) ),
+											array( 'subchap', T_('Use sub-chapter'), T_('Permalinks will look like \'stub/subchap/post_title\'' ) ),
+											array( 'chapters', T_('Use chapter path'), T_('Permalinks will look like \'stub/chpater/subchap/post_title\'' ) ),
+										), T_('Extra path info'), true );
 
 $Form->radio( 'permalink_type', $Settings->get('permalink_type'),
 							array(  array( 'urltitle', T_('Post called up by its URL title (Recommended)'), T_('Fallback to ID when no URL title available.') ),
@@ -103,6 +111,10 @@ $Form->radio( 'permalink_type', $Settings->get('permalink_type'),
 											array( 'archive#id', T_('Post on archive page, located by its ID') ),
 											array( 'archive#title', T_('Post on archive page, located by its title (for Cafelog compatibility)') )
 										), T_('Permalink type'), true );
+
+// fp> TODO: A dynamic javascript preview of how the two settings above combine
+
+// fp> TODO: Move both of these settings to blog/collection settings
 
 $Form->end_fieldset();
 
@@ -131,6 +143,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.12  2006/09/10 20:59:18  fplanque
+ * extended extra path info setting
+ *
  * Revision 1.11  2006/08/19 08:50:26  fplanque
  * moved out some more stuff from main
  *

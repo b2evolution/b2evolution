@@ -479,11 +479,15 @@ class Blog extends DataObject
 
 			case 'index.php':
 				// Access through index.php + blog qualifier
-				if( $Settings->get('links_extrapath') )
-				{
+				if( $Settings->get('links_extrapath') != 'disabled' )
+				{	// We want to use extra path info, use the blog stub:
+					// fp> this seems odd actually. Shouldn't it be the urlname here???
 					return $base.'index.php/'.$this->stub;
 				}
-				return $base.'index.php?blog='.$this->ID;
+				else
+				{	// Extra path is disabled, use the blog param:
+					return $base.'index.php?blog='.$this->ID;
+				}
 
 			case 'stub':
 				// Access through stub file
@@ -1026,6 +1030,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2006/09/10 20:59:18  fplanque
+ * extended extra path info setting
+ *
  * Revision 1.21  2006/09/10 19:32:32  fplanque
  * completed chapter URL name editing
  *

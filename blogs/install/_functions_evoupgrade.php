@@ -1278,6 +1278,20 @@ function upgrade_b2evo_tables()
 			ALTER TABLE T_categories
 				ADD UNIQUE cat_urlname ( cat_urlname )' );
 		echo "OK.<br />\n";
+
+		echo 'Updating Settings... ';
+		$DB->query( '
+      UPDATE T_settings
+         SET set_value = "disabled"
+       WHERE set_name = "links_extrapath"
+         AND set_value = 0' );
+		$DB->query( '
+      UPDATE T_settings
+         SET set_value = "ymd"
+       WHERE set_name = "links_extrapath"
+         AND set_value <> 0' );
+		echo "OK.<br />\n";
+
 	}
 
 
@@ -1388,6 +1402,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.172  2006/09/10 20:59:18  fplanque
+ * extended extra path info setting
+ *
  * Revision 1.171  2006/09/10 17:33:02  fplanque
  * started to steam up the categories/chapters
  *

@@ -43,7 +43,14 @@ switch( $edited_Blog->get( 'access_type' ) )
 		break;
 
 	case 'index.php':
-		$blog_urlappend = 'index.php'.( $Settings->get('links_extrapath') ? '/'.$edited_Blog->get( 'stub' ) : '?blog='.$edited_Blog->ID );
+		if( $Settings->get('links_extrapath') == 'disabled' )
+		{
+			$blog_urlappend = 'index.php?blog='.$edited_Blog->ID;
+		}
+		else
+		{	// fp>> TODO: This seems odd, shouldn't it be the URL name here??
+			$blog_urlappend = 'index.php/'.$edited_Blog->get( 'stub' );
+		}
 		break;
 
 	case 'stub':
@@ -163,7 +170,7 @@ $Form->begin_fieldset( T_('Blog URL parameters') );
 			array( 'index.php', T_('Explicit reference on index.php'),
 							T_('You might want to use extra-path info with this.'),
 							'',
-							'onclick="update_urlpreview( false, \'index.php'.( $Settings->get('links_extrapath') ? "/'+document.getElementById( 'blog_urlname' ).value" : '?blog='.$edited_Blog->ID."'" ).' )"'
+							'onclick="update_urlpreview( false, \'index.php'.( $Settings->get('links_extrapath') != 'disabled' ? "/'+document.getElementById( 'blog_urlname' ).value" : '?blog='.$edited_Blog->ID."'" ).' )"'
 			),
 			array( 'stub', T_('Explicit reference to stub file (Advanced)').':',
 							'',

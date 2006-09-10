@@ -525,7 +525,7 @@ class Item extends DataObject
 				}
 		}
 
-		if( ! $Settings->get('links_extrapath') )
+		if( $Settings->get('links_extrapath') == 'disabled' )
 		{ // We reference by Query: Dirty but explicit permalinks
 
 			switch( $dest_type )
@@ -554,6 +554,7 @@ class Item extends DataObject
 		}
 		else
 		{ // We reference by path (CLEAN permalinks!)
+			// TODO: handle all extra path modes
 			switch( $dest_type )
 			{
 				case 'monthly':
@@ -2127,7 +2128,7 @@ class Item extends DataObject
 	{
 		global $htsrv_url, $Settings;
 
-		if( $Settings->get('links_extrapath') )
+		if( $Settings->get('links_extrapath') != 'disabled' )
 		{
 			return $htsrv_url.'trackback.php/'.$this->ID;
 		}
@@ -3041,6 +3042,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.90  2006/09/10 20:59:18  fplanque
+ * extended extra path info setting
+ *
  * Revision 1.89  2006/09/10 19:23:28  blueyed
  * Removed Plugin::code(), ::name(), ::short_desc() and ::long_desc(); Fixes for mt-import.php
  *

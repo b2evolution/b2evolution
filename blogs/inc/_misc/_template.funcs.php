@@ -164,7 +164,7 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 	else
 		$link = $file;
 
-	if( (! $Settings->get('links_extrapath')) || (!empty($params)) )
+	if( ($Settings->get('links_extrapath') == 'disabled') || (!empty($params)) )
 	{	// We reference by Query: Dirty but explicit permalinks
 		$link = url_add_param( $link, $params );
 		$link = url_add_param( $link, 'm=' );
@@ -188,7 +188,7 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 	}
 	elseif( $week !== '' )  // Note: week # can be 0 !
 	{
-		if( ! $Settings->get('links_extrapath') )
+		if( $Settings->get('links_extrapath') == 'disabled' )
 		{	// We reference by Query: Dirty but explicit permalinks
 			$link = url_add_param( $link, 'w='.$week );
 		}
@@ -209,6 +209,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.12  2006/09/10 20:59:18  fplanque
+ * extended extra path info setting
+ *
  * Revision 1.11  2006/09/07 00:48:55  fplanque
  * lc parameter for locale filtering of posts
  *
