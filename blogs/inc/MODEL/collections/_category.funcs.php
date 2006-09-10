@@ -63,9 +63,11 @@ function cat_create(
 		$cat_blog_ID = $parent_cat['cat_blog_ID'];
 	}
 
-	// TODO: dh> cat_urlname! - Install fails here..
-	$sql = "INSERT INTO T_categories( cat_parent_ID, cat_name, cat_blog_ID)
-					VALUES ( $cat_parent_ID, ".$DB->quote($cat_name).", $cat_blog_ID )";
+	// Dirty temporary fix:
+	$cat_urlname = preg_replace( '/[^A-Za-z0-9]/', '-', $cat_name );
+
+	$sql = "INSERT INTO T_categories( cat_parent_ID, cat_name, cat_blog_ID, cat_urlname )
+					VALUES ( $cat_parent_ID, ".$DB->quote($cat_name).", $cat_blog_ID, ".$DB->quote($cat_urlname)." )";
 	if( ! $DB->query( $sql ) )
 		return 0;
 
@@ -966,8 +968,8 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
- * Revision 1.14  2006/09/10 19:22:00  blueyed
- * TODO
+ * Revision 1.15  2006/09/10 19:54:07  fplanque
+ * dirty fix
  *
  * Revision 1.13  2006/09/06 20:45:34  fplanque
  * ItemList2 fixes
