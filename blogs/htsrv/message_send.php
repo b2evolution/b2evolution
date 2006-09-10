@@ -72,8 +72,6 @@ if( param( 'optout_cmt_email', 'string', '' ) )
 	}
 
 	$req_ID = generate_random_key(32);
-	$Session->set( 'core.msgform.optout_cmt_email', $optout_cmt_email );
-	$Session->set( 'core.msgform.optout_cmt_reqID', $req_ID );
 
 	$message = sprintf( T_("We have received a request that you do not want to receive emails through\na message form on your comments anymore.\n\nTo confirm that this request is from you, please click on the following link:") )
 		."\n\n"
@@ -84,9 +82,17 @@ if( param( 'optout_cmt_email', 'string', '' ) )
 		."\n\n"
 		.T_('If it was not you that requested this, simply ignore this mail.');
 
-	send_mail( $optout_cmt_email, T_('Confirm opt-out for emails through message form'), $message );
-
-	echo T_('An email has been sent to you, with a link to confirm your request not to receive emails through the comments you have made on this blog.');
+	if( send_mail( $optout_cmt_email, T_('Confirm opt-out for emails through message form'), $message ) )
+	{
+		echo T_('An email has been sent to you, with a link to confirm your request not to receive emails through the comments you have made on this blog.');
+		$Session->set( 'core.msgform.optout_cmt_email', $optout_cmt_email );
+		$Session->set( 'core.msgform.optout_cmt_reqID', $req_ID );
+	}
+	else
+	{
+		$Messages->add( T_('Sorry, could not send email.')
+					.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+	}
 
 	debug_info();
 	exit;
@@ -233,7 +239,7 @@ $message = $message
 
 
 // Send mail
-send_mail( $recipient_address, $subject, $message, "$sender_name <$sender_address>");
+$success_mail = send_mail( $recipient_address, $subject, $message, "$sender_name <$sender_address>" );
 
 
 // Plugins should cleanup their temporary data here:
@@ -246,9 +252,17 @@ if( isset($recipient_User) )
 	locale_restore_previous();
 }
 
+if( $success_mail )
+{
+	$Messages->add( T_('Your message has been sent as email to the user.'), 'success' );
+}
+else
+{
+	$Messages->add( T_('Sorry, could not send email.')
+				.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+}
 
 // Set Messages into user's session, so they get restored on the next page (after redirect):
-$Messages->add( T_('Your message has been sent as email to the user.'), 'success' );
 $Session->set( 'Messages', $Messages );
 $Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
 
@@ -259,6 +273,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.37  2006/09/10 18:14:24  blueyed
+ * Do report error, if sending email fails in message_send.php (msgform and opt-out)
+ *
  * Revision 1.36  2006/08/21 00:03:12  fplanque
  * obsoleted some dirty old thing
  *

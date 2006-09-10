@@ -141,7 +141,7 @@ switch( $action )
 							."\n"
 							.T_('Edit user').': '.$admin_url.'?ctrl=users&user_ID='.$new_User->ID."\n";
 
-		send_mail( $admin_email, T_('New user registration on your blog'), $message, $notify_from );
+		send_mail( $admin_email, T_('New user registration on your blog'), $message, $notify_from ); // ok, if this may fail..
 
 		locale_restore_previous();
 
@@ -188,6 +188,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.74  2006/09/10 18:14:24  blueyed
+ * Do report error, if sending email fails in message_send.php (msgform and opt-out)
+ *
  * Revision 1.73  2006/08/19 08:50:25  fplanque
  * moved out some more stuff from main
  *
