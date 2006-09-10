@@ -105,7 +105,7 @@ class ldap_plugin extends Plugin
 			'fallback_grp_ID' => array(
 				'label' => T_('Default group'),
 				'type' => 'select_group',
-				'note' => T_('The group to use as fallback, if we do not want to create a new group. "None" to not a create a new user in that case.' ),
+				'note' => T_('The group to use as fallback, if we do not want to create a new group. "None" to not create a new user in that case.' ),
 				'allow_none' => true,
 				'defaultvalue' => $Settings->get('newusers_grp_ID'),
 			),
@@ -343,6 +343,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.37  2006/09/10 14:17:26  blueyed
+ * trans fix
+ *
  * Revision 1.36  2006/08/19 08:50:27  fplanque
  * moved out some more stuff from main
  *
