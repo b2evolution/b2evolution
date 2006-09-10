@@ -412,7 +412,7 @@ param( 'mode', 'string', 'normal' );
 				$i++;
 			}
 
-			echo '<p class="center"><a id="imgurls" href="amdin.php?ctrl=mtimport&amp;tab=import&amp;singleimgurls='.( $singleimgurls ? '0' : '1' );
+			echo '<p class="center"><a id="imgurls" href="admin.php?ctrl=mtimport&amp;tab=import&amp;singleimgurls='.( $singleimgurls ? '0' : '1' );
 			if( !empty($exportedfile) ) echo '&amp;exportedfile='.$exportedfile;
 			echo '">'.( $singleimgurls ? 'hide img urls only used once' : 'show also img urls only used once').'</a></p>';
 
