@@ -344,8 +344,8 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 			echo ( $current_sub_group != '' ? ' PluginsSubGroup' : ' PluginsGroup' ); ?>">
 
 			<td class="firstcol">
-				<strong><a title="<?php echo T_('Display info') ?>" href="<?php echo regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID.'">'
-					.format_to_output($loop_Plugin->name) ?></a></strong>
+				<strong><a title="<?php echo T_('Display info') ?>" href="<?php echo regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID) . '">'
+        .format_to_output($loop_Plugin->name); ?></a></strong>
 			</td>
 			<td>
 				<?php
@@ -420,6 +420,9 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 <?php
 /*
  * $Log$
+ * Revision 1.34  2006/09/10 21:56:54  smpdawg
+ * Fixed parse error
+ *
  * Revision 1.33  2006/09/10 19:54:52  blueyed
  * Added CVS Id line
  *
