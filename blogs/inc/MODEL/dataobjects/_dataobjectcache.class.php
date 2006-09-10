@@ -456,6 +456,7 @@ class DataObjectCache
 	 * @todo Shouldn't this use {@link option_list_return()}?
 	 *  dh> the only difference is the $method param and this method only gets used twice..
 	 * fp> yes. Furthermore, all foo_bar_return() methods should be renamed to get_foo_bar() everywhere. and the foo_bar() echo equivalents can go away everywhere too. (One of the few no so good progidistri legacies we owe to Fabrice ;)
+	 * dh> ok. started with it. BUT: with e.g. User::get_preferred_name() it does not default to $format='htmlbody' currently and all getters should rather return the raw value and not as "htmlbody"!?
 	 *
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID ''
@@ -545,6 +546,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.11  2006/09/10 16:16:29  blueyed
+ * question
+ *
  * Revision 1.10  2006/09/10 14:50:48  fplanque
  * minor / doc
  *
