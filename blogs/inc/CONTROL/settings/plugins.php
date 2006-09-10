@@ -1021,13 +1021,12 @@ switch( $action )
 		$Form->begin_form('fform');
 		$Form->hidden( 'ctrl', 'plugins' );
 		$Form->begin_fieldset('Plugin info', array('class' => 'fieldset clear')); // "clear" to fix Konqueror (http://bugs.kde.org/show_bug.cgi?id=117509)
-		$Form->info_field( T_('Name'), $edit_Plugin->name( 'raw', false ) );
+		$Form->info_field( T_('Name'), $edit_Plugin->name );
 		$Form->info_field( T_('Code'),
-				( empty($edit_Plugin->code)
-					? ' - '
-					: $edit_Plugin->code ), array( 'note' => T_('This 32 character code uniquely identifies the functionality of this plugin. It is only necessary to call the plugin by code (SkinTag) or when using it as a Renderer.') ) );
-		$Form->info_field( T_('Short desc'), $edit_Plugin->short_desc( 'raw', false ) );
-		$Form->info_field( T_('Long desc'), $edit_Plugin->long_desc( 'raw', false ) );
+				( empty($edit_Plugin->code) ? ' - ' : $edit_Plugin->code ),
+				array( 'note' => T_('This 32 character code uniquely identifies the functionality of this plugin. It is only necessary to call the plugin by code (SkinTag) or when using it as a Renderer.') ) );
+		$Form->info_field( T_('Short desc'), $edit_Plugin->short_desc );
+		$Form->info_field( T_('Long desc'), $edit_Plugin->long_desc );
 		if( $edit_Plugin->ID > 0 )
 		{ // do not display ID for non registered Plugins
 			$Form->info_field( T_('ID'), $edit_Plugin->ID );

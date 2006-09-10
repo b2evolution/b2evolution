@@ -75,7 +75,7 @@ if( empty($tab) )
 	{
 		echo '<div class="panelblock">';
 		echo '<h2>';
-		$loop_Plugin->name();
+		echo format_to_output($loop_Plugin->name);
 		echo '</h2>';
 		$Plugins->call_method_if_active( $loop_Plugin->ID, 'AdminToolPayload', $params = array() );
 		echo '</div>';

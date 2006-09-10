@@ -668,20 +668,6 @@ class Item extends DataObject
 
 
 	/**
-	 * Template function: Display the main blog name.
-	 *
-	 * @todo is it possible to use {$Item->get_Blog()}->name() instead? (we can't possibly duplicate all sub-object functions here!!!)
-	 *       blueyed>> not with PHP4 and {$Item->get_Blog()}->name() (with curly brackets) not even in PHP5!
-	 * @param string Output format. See {@link format_to_output()}.
-	 */
-	function blog_name( $format = 'htmlbody' )
-	{
-		$current_Blog = & $this->get_Blog();
-		$current_Blog->name( $format );
-	}
-
-
-	/**
 	 * Template function: list all the category names
 	 *
 	 * @param string link title, '#' for default, false if you want no links
@@ -1911,9 +1897,9 @@ class Item extends DataObject
 			// echo $loop_RendererPlugin->apply_rendering;
 
 			echo '<input type="checkbox" class="checkbox" name="renderers[]" value="';
-			$loop_RendererPlugin->code();
+			echo $loop_RendererPlugin->code;
 			echo '" id="renderer_';
-			$loop_RendererPlugin->code();
+			echo $loop_RendererPlugin->code;
 			echo '"';
 
 			switch( $loop_RendererPlugin->apply_rendering )
@@ -1948,14 +1934,14 @@ class Item extends DataObject
 			}
 
 			echo ' title="';
-			$loop_RendererPlugin->short_desc();
+			echo format_to_output($loop_RendererPlugin->short_desc, 'formvalue');
 			echo '" />'
 			.' <label for="renderer_';
-			$loop_RendererPlugin->code();
+			echo $loop_RendererPlugin->code;
 			echo '" title="';
-			$loop_RendererPlugin->short_desc();
+			echo format_to_output($loop_RendererPlugin->short_desc, 'formvalue');
 			echo '">';
-			$loop_RendererPlugin->name();
+			echo format_to_output($loop_RendererPlugin->name);
 			echo '</label>';
 
 			// fp> TODO: the first thing we want here is a TINY javascript popup with the LONG desc. The links to readme and external help should be inside of the tiny popup.
@@ -3055,6 +3041,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.89  2006/09/10 19:23:28  blueyed
+ * Removed Plugin::code(), ::name(), ::short_desc() and ::long_desc(); Fixes for mt-import.php
+ *
  * Revision 1.88  2006/09/06 20:45:34  fplanque
  * ItemList2 fixes
  *

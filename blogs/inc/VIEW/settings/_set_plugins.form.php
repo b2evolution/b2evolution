@@ -343,11 +343,12 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 			echo ( $current_sub_group != '' ? ' PluginsSubGroup' : ' PluginsGroup' ); ?>">
 
 			<td class="firstcol">
-				<strong><a title="<?php echo T_('Display info') ?>" href="<?php echo regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID ) ?>"><?php $loop_Plugin->name(); ?></a></strong>
+				<strong><a title="<?php echo T_('Display info') ?>" href="<?php echo regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID.'">'
+					.format_to_output($loop_Plugin->name) ?></a></strong>
 			</td>
 			<td>
 				<?php
-				$loop_Plugin->short_desc();
+				echo format_to_output($loop_Plugin->short_desc);
 				/*
 				// Available events:
 				$registered_events = implode( ', ', $AvailablePlugins->get_registered_events( $loop_Plugin ) );
@@ -418,6 +419,9 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 <?php
 /*
  * $Log$
+ * Revision 1.32  2006/09/10 19:23:28  blueyed
+ * Removed Plugin::code(), ::name(), ::short_desc() and ::long_desc(); Fixes for mt-import.php
+ *
  * Revision 1.31  2006/08/05 15:26:06  blueyed
  * Fixed possible E_NOTICE
  *

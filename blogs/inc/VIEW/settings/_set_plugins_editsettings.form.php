@@ -75,8 +75,8 @@ $Form->begin_form( 'fform', '',
 $Form->hidden( 'plugin_ID', $edit_Plugin->ID );
 
 $Form->begin_fieldset( T_('Plugin info'), array( 'class' => 'clear' ) );
-	$Form->info_field( T_('Name'), $edit_Plugin->name( 'raw', false ) );
-	$Form->info_field( T_('Short desc'), $edit_Plugin->short_desc( 'raw', false ) );
+	$Form->info_field( T_('Name'), $edit_Plugin->name );
+	$Form->info_field( T_('Short desc'), $edit_Plugin->short_desc );
 $Form->end_fieldset();
 
 // PluginSettings
@@ -176,6 +176,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.20  2006/09/10 19:23:28  blueyed
+ * Removed Plugin::code(), ::name(), ::short_desc() and ::long_desc(); Fixes for mt-import.php
+ *
  * Revision 1.19  2006/08/30 17:45:28  blueyed
  * Fixed "$help_url"/www Plugin help popups (use target _blank instead); Added "$help_url"/www help Plugin to plugin settings (linking to #Settings)
  *

@@ -345,6 +345,10 @@ class Plugin
 	 * defaultvalues), but if you know what you're doing, see
 	 * {@link PluginSettings}, where {@link Plugin::Settings} gets derived from.
 	 *
+	 * NOTE: this method gets called by b2evo when instantiating the plugin, and
+	 *       when the settings get displayed for editing in the backoffice.
+	 *       In the second case, $this->Settings would be true already (from init).
+	 *
 	 * @return array
 	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
 	 * and assign an array with the following keys to them (only 'label' is required):
@@ -478,6 +482,7 @@ class Plugin
 	 * defaultvalues), but if you know what you're doing, see
 	 * {@link PluginUserSettings}, where {@link $UserSettings} gets derived from.
 	 *
+	 * @see Plugin::GetDefaultSettings()
 	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
 	function GetDefaultUserSettings()
@@ -2415,75 +2420,6 @@ class Plugin
 	 */
 
 	/**
-	 * Template function: display plugin code
-	 */
-	function code()
-	{
-		echo $this->code;
-	}
-
-
-	/**
-	 * Template function: Get displayable plugin name.
-	 *
-	 * @param string Output format, see {@link format_to_output()}
-	 * @param boolean shall we display?
-	 * @return string displayable plugin name.
-	 */
-	function name( $format = 'htmlbody', $disp = true )
-	{
-		if( $disp )
-		{
-			echo format_to_output( $this->name, $format );
-		}
-		else
-		{
-			return format_to_output( $this->name, $format );
-		}
-	}
-
-
-	/**
-	 * Template function: display short description for plug in
-	 *
-	 * @param string Output format, see {@link format_to_output()}
-	 * @param boolean shall we display?
-	 * @return string displayable short desc
-	 */
-	function short_desc( $format = 'htmlbody', $disp = true )
-	{
-		if( $disp )
-		{
-			echo format_to_output( $this->short_desc, $format );
-		}
-		else
-		{
-			return format_to_output( $this->short_desc, $format );
-		}
-	}
-
-
-	/**
-	 * Template function: display long description for plug in
-	 *
-	 * @param string Output format, see {@link format_to_output()}
-	 * @param boolean shall we display?
-	 * @return string displayable long desc
-	 */
-	function long_desc( $format = 'htmlbody', $disp = true )
-	{
-		if( $disp )
-		{
-			echo format_to_output( $this->long_desc, $format );
-		}
-		else
-		{
-			return format_to_output( $this->long_desc, $format );
-		}
-	}
-
-
-	/**
 	 * Get a link to a help page (with icon).
 	 *
 	 * @param string Target; one of the following:
@@ -2637,6 +2573,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.89  2006/09/10 19:23:28  blueyed
+ * Removed Plugin::code(), ::name(), ::short_desc() and ::long_desc(); Fixes for mt-import.php
+ *
  * Revision 1.88  2006/08/31 22:56:12  blueyed
  * Fixed Plugin::get_plugin_url()
  *

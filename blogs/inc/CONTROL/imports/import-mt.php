@@ -81,18 +81,19 @@ $head .= <<<EOB
 </head>
 <body>
 <div id="header">
-	<a href="http://b2evolution.net"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution"  title="visit b2evolution's website" width="185" height="40" /></a>
+	<a href="http://b2evolution.net"><img id="evologo" src="rsc/img/b2evolution_minilogo2.png" alt="b2evolution"  title="visit b2evolution's website" width="185" height="40" /></a>
 	<div id="headinfo">
 		<br /><span style="font-size:150%; font-weight:bold">Import Movable Type into b2evolution</span>
 	</div>
 </div>
 EOB;
 
-if( !file_exists('../conf/_config.php') )
+$conf_file = dirname(__FILE__).'/../../../conf/_config.php';
+if( !file_exists( $conf_file ) )
 {
 	dieerror( "There doesn't seem to be a conf/_config.php file. You must install b2evolution before you can import any entries.", $head );
 }
-require( '../conf/_config.php' );
+require( $conf_file );
 if( (!isset($config_is_done) || !$config_is_done) )
 {
 	if( file_exists(dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_conf_error_page.php') )
@@ -126,7 +127,7 @@ param( 'mode', 'string', 'normal' );
 	foreach( array( 'easy', 'normal', 'expert' ) as $tab )
 	{
 		echo ( $tab == $mode ) ? '<li class="current">' : '<li>';
-		echo '<a href="import-mt.php?mode='.$tab.( !empty($exportedfile) ? '&amp;exportedfile='.$exportedfile : '' ).'">'.ucwords($tab).'</a></li>';
+		echo '<a href="admin.php?ctrl=mtimport&mode='.$tab.( !empty($exportedfile) ? '&amp;exportedfile='.$exportedfile : '' ).'">'.ucwords($tab).'</a></li>';
 	}
 ?></ul></div>
 
@@ -203,7 +204,7 @@ param( 'mode', 'string', 'normal' );
 			echo '['.$exportedfile.'].';
 			if( '' == MTEXPORT )
 			{
-				?> [<a href="import-mt.php?mode=<?php echo $mode ?>">choose another export-file</a>]<?php
+				?> [<a href="admin.php?ctrl=mtimport&mode=<?php echo $mode ?>">choose another export-file</a>]<?php
 			} ?></p>
 
 		<p>This file contains <?php echo count( $posts ) ?> post(s) from <?php echo count( $authors ) ?> author(s) in <?php echo count( $categories ) ?> category(ies).</p>
@@ -225,7 +226,8 @@ param( 'mode', 'string', 'normal' );
 
 
 		<div class="panelblock">
-		<form class="fform" action="import-mt.php" method="post">
+		<form class="fform" action="admin.php" method="post">
+			<input type="hidden" name="ctrl" value="mtimport" />
 			<input type="hidden" name="action" value="import" />
 		<?php
 		if( !empty($exportedfile) )
@@ -410,7 +412,7 @@ param( 'mode', 'string', 'normal' );
 				$i++;
 			}
 
-			echo '<p class="center"><a id="imgurls" href="import-mt.php?tab=import&amp;singleimgurls='.( $singleimgurls ? '0' : '1' );
+			echo '<p class="center"><a id="imgurls" href="amdin.php?ctrl=mtimport&amp;tab=import&amp;singleimgurls='.( $singleimgurls ? '0' : '1' );
 			if( !empty($exportedfile) ) echo '&amp;exportedfile='.$exportedfile;
 			echo '">'.( $singleimgurls ? 'hide img urls only used once' : 'show also img urls only used once').'</a></p>';
 
@@ -1014,7 +1016,7 @@ param( 'mode', 'string', 'normal' );
 				{
 					$edited_Item = & new Item();
 					$post_ID = $edited_Item->insert( $post_author, $post_title, $post_content,$post_date, $post_category, $post_catids,
-													$post_status,	$post_locale,	
+													$post_status,	$post_locale,
 													'' /* $post_urltitle */, '' /* $post_url */, $comment_status, $post_renderers );
 				}
 
@@ -1129,7 +1131,8 @@ param( 'mode', 'string', 'normal' );
 		if( $simulate )
 		{
 			echo '
-			<form action="import-mt.php" method="post">
+			<form action="admin.php" method="post">
+			<input type="hidden" name="ctrl" value="mtimport" />
 			<p>
 			<strong>This was only simulated..</strong>
 			';
@@ -1354,7 +1357,7 @@ function import_data_extract_authors_cats()
 	fclose($fp);
 	if( !preg_match( '/^AUTHOR: /', $buffer ) )
 	{
-		dieerror("The file [$exportedfile] does not seem to be a MT exported file.. ".'[<a href="import-mt.php?mode='.$mode.'">choose another export-file</a>]');
+		dieerror("The file [$exportedfile] does not seem to be a MT exported file.. ".'[<a href="admin.php?ctrl=mtimport&amp;mode='.$mode.'">choose another export-file</a>]');
 	}
 
 	$importdata = preg_replace( "/\r?\n|\r/", "\n", $buffer );
@@ -1443,7 +1446,7 @@ function renderer_list()
 		{ // special Auto-P plugin
 			?>
 			<fieldset>
-				<label for="textile" title="<?php	$loop_RendererPlugin->short_desc(); ?>"><strong><?php echo $loop_RendererPlugin->name() ?>:</strong></label>
+				<label for="textile" title="<?php echo format_to_output($loop_RendererPlugin->short_desc, 'formvalue'); ?>"><strong><?php echo format_to_output($loop_RendererPlugin->name) ?>:</strong></label>
 				<div style="margin-left:2ex" />
 				<input type="radio" name="autop" value="1" class="checkbox" checked="checked" /> yes (always)<br>
 				<input type="radio" name="autop" value="0" class="checkbox" /> no (never)<br>
@@ -1458,7 +1461,7 @@ function renderer_list()
 		?>
 		<div>
 			<input type="checkbox" class="checkbox" name="renderers[]"
-				value="<?php $loop_RendererPlugin->code() ?>" id="<?php $loop_RendererPlugin->code() ?>"
+				value="<?php echo $loop_RendererPlugin->code ?>" id="<?php echo $loop_RendererPlugin->code ?>"
 				<?php
 				switch( $loop_RendererPlugin->apply_rendering )
 				{
@@ -1498,8 +1501,8 @@ function renderer_list()
 						break;
 				}
 			?>
-			title="<?php	$loop_RendererPlugin->short_desc(); ?>" />
-		<label for="<?php $loop_RendererPlugin->code() ?>" title="<?php	$loop_RendererPlugin->short_desc(); ?>"><strong><?php echo $loop_RendererPlugin->name(); ?></strong></label>
+			title="<?php echo format_to_output( $loop_RendererPlugin->short_desc, 'formvalue' ) ?>" />
+		<label for="<?php echo $loop_RendererPlugin->code ?>" title="<?php echo format_to_output($loop_RendererPlugin->short_desc, 'formvalue'); ?>"><strong><?php echo format_to_output($loop_RendererPlugin->name); ?></strong></label>
 	</div>
 	<?php
 	}
@@ -1552,12 +1555,13 @@ function chooseexportfile()
 	if( $r )
 	{
 		?>
-		<form action="import-mt.php" class="center">
+		<form action="admin.php" class="center">
 			<p>First, choose a file to import (.TXT files from /admin dir):</p>
 			<select name="exportedfile" onChange="submit()">
 				<?php echo $r ?>
 			</select>
 			<input type="hidden" name="mode" value="<?php echo $mode ?>" />
+			<input type="hidden" name="ctrl" value="mtimport" />
 			<input type="submit" value="Next step..." class="search" />
 		</form>
 		<?php
