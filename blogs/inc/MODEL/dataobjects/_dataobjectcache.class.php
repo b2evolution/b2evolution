@@ -455,6 +455,7 @@ class DataObjectCache
 	 *
 	 * @todo Shouldn't this use {@link option_list_return()}?
 	 *  dh> the only difference is the $method param and this method only gets used twice..
+	 * fp> yes. Furthermore, all foo_bar_return() methods should be renamed to get_foo_bar() everywhere. and the foo_bar() echo equivalents can go away everywhere too. (One of the few no so good progidistri legacies we owe to Fabrice ;)
 	 *
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID ''
@@ -531,6 +532,7 @@ class DataObjectCache
 	 * {@internal dh> QUESTION: I've made this a callback to not translate a string to early,
 	 *  but it would require to have real classes for e.g. GroupCache. Should it be a
 	 *  constructor param instead? }}
+	 * fp> yes I think an added param to the constructor could be ok. Or a set_none_text() method. Please use 'none' instead of 'None' in function name.
 	 *
 	 * @return string
 	 */
@@ -543,6 +545,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.10  2006/09/10 14:50:48  fplanque
+ * minor / doc
+ *
  * Revision 1.9  2006/09/10 00:49:56  blueyed
  * get_None_option_string proposal
  *

@@ -83,6 +83,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 	 * Check if already set
 	 * WARNING: when PHP register globals is ON, COOKIES get priority over GET and POST with this!!!
 	 *   dh> I never understood that comment.. does it refer to "variables_order" php.ini setting?
+	 *		fp> I guess
 	 */
 	if( ! isset( $GLOBALS[$var] ) || $override )
 	{
@@ -1554,6 +1555,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.9  2006/09/10 14:50:48  fplanque
+ * minor / doc
+ *
  * Revision 1.8  2006/09/09 23:43:52  blueyed
  * Added param_cookie() and used it for session cookie
  *

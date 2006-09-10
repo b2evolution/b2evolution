@@ -420,6 +420,7 @@ while( $lFile = & $fm_Filelist->get_next() )
 		{
 			$img = '<img src="'.$lFile->_FileRoot->ads_url.$lFile->_rdfp_rel_path.'" alt="" width="80" />';
 
+			// comment please
 			$link = $lFile->get_view_link( $img );
 			if( ! $link )
 			{ // no view link available:
@@ -954,6 +955,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.20  2006/09/10 14:50:48  fplanque
+ * minor / doc
+ *
  * Revision 1.19  2006/09/08 18:52:56  blueyed
  * Link image preview to File::get_view_link()
  *

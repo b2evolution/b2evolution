@@ -54,7 +54,8 @@ if( $dtyp_unknown ) $selected_agnt_types[] = "'unknown'";
 $where_clause =  ' WHERE dom_type IN ('.implode(',',$selected_agnt_types).')';
 
 // Exclude hits of type "self" and "admin":
-$where_clause .= ' AND hit_referer_type NOT IN ( "self", "admin" )';
+// fp>implement filter checkboxes, not a hardwired filter
+//$where_clause .= ' AND hit_referer_type NOT IN ( "self", "admin" )';
 
 if( !empty($blog) )
 {
