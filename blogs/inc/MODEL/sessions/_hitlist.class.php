@@ -115,7 +115,11 @@ class Hitlist
 	 */
 	function dbprune()
 	{
-		global $DB, $Debuglog, $Settings, $localtimenow;
+		/**
+		 * @var DB
+		 */
+		global $DB;
+		global $Debuglog, $Settings, $localtimenow;
 
 		// Prune when $localtime is a NEW day (which will be the 1st request after midnight):
 		$last_prune = $Settings->get( 'auto_prune_stats_done' );
@@ -162,11 +166,14 @@ class Hitlist
 				  FROM T_basedomains LEFT JOIN T_hitlog ON hit_referer_dom_ID = dom_ID
 				 WHERE hit_referer_dom_ID IS NULL
 				 AND dom_type = "unknown"
-				 AND dom_status = "unknown"' );
+				 AND dom_status = "unknown"', ARRAY_N );
 
-			$rows_affected = $DB->query( '
-				DELETE FROM T_basedomains
-				 WHERE dom_ID IN ( '.implode( ', ', $ids ).' )' );
+			if( !empty( $ids ) )
+			{
+				$rows_affected = $DB->query( '
+					DELETE FROM T_basedomains
+					 WHERE dom_ID IN ( '.implode( ', ', $ids ).' )' );
+			}
 
 			$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_basedomains (MySQL<4).', 'hit' );
 		}
