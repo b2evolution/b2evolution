@@ -89,39 +89,39 @@ class DataObjectCache
 		$this->dbprefix = $prefix;
 		$this->dbIDname = $dbIDname;
 		$this->name_field = $name_field;
-		
+
 		if( empty( $order_by ) )
 		{
 			if( empty( $name_field ) )
-			{	
+			{
 				$this->order_by = $dbIDname;
 			}
-			else 
+			else
 			{
 				$this->order_by = $name_field;
 			}
 		}
-		else 
-		{ 
+		else
+		{
 			$this->order_by = $order_by;
 		}
 	}
 
-	
+
 	/**
 	 * Instanciate a new object within this cache
 	 */
 	function & new_obj( $row = NULL )
 	{
 		$objtype = $this->objtype;
-			
+
 		// Instantiate a custom object
 		$obj = new $objtype( $row ); // COPY !!
-		
+
 		return $obj;
 	}
-	
-	
+
+
 	/**
 	 * Load the cache **extensively**
 	 */
@@ -133,14 +133,14 @@ class DataObjectCache
 		{ // Already loaded
 			return false;
 		}
-		
+
 		$this->clear( true );
 
 		$Debuglog->add( get_class($this).' - Loading <strong>'.$this->objtype.'(ALL)</strong> into cache', 'dataobjects' );
 		$sql = 'SELECT *
-							FROM '.$this->dbtablename.' 
+							FROM '.$this->dbtablename.'
 						 ORDER BY '.$this->order_by;
-							
+
 		foreach( $DB->get_results( $sql ) as $row )
 		{
 			// Instantiate a custom object
@@ -250,7 +250,7 @@ class DataObjectCache
 		{	// Already in shadow, recycle object:
 			$this->add( $this->shadow_cache[$obj_ID] );
 		}
-		else 
+		else
 		{ // Not already cached, add new object:
 			$this->add( $this->new_obj( $db_row ) );
 		}
@@ -261,7 +261,7 @@ class DataObjectCache
 
 	/**
 	 * Clear the cache **extensively**
-	 * 
+	 *
 	 */
 	function clear( $keep_shadow = false )
 	{
@@ -269,11 +269,11 @@ class DataObjectCache
 		{	// Keep copy of cache in case we try to re instantiate previous object:
 			$this->shadow_cache = $this->cache;
 		}
-		else 
+		else
 		{
 			$this->shadow_cache = NULL;
 		}
-		
+
 		$this->cache = array();
 		$this->all_loaded = false;
 	}
@@ -321,7 +321,6 @@ class DataObjectCache
 				$sql = "SELECT *
 				          FROM $this->dbtablename
 				         WHERE $this->dbIDname = $req_ID";
-
 				if( $row = $DB->get_row( $sql, OBJECT, 0, 'DataObjectCache::get_by_ID()' ) )
 				{
 					if( ! $this->instantiate( $row ) )
@@ -410,8 +409,8 @@ class DataObjectCache
 			return $r;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Remove an object from cache by ID
 	 *
@@ -422,11 +421,11 @@ class DataObjectCache
 		unset( $this->cache[$req_ID] );
 		unset( $marcus );
 	}
-	
-	
+
+
 	/**
 	 * Delete an object from DB by ID.
-	 * 
+	 *
 	 * @param integer ID of object to delete
 	 * @return boolean
 	 */
@@ -436,13 +435,13 @@ class DataObjectCache
 		{
 			// Delete from db
 			$this->cache[$req_ID]->dbdelete();
-			 
-			// Remove from cache 
+
+			// Remove from cache
 			$this->remove_by_ID( $req_ID );
-			
+
 			return true;
 		}
-		else 
+		else
 		{
 			return false;
 		}
@@ -455,6 +454,7 @@ class DataObjectCache
 	 * Load the cache if necessary
 	 *
 	 * @todo Shouldn't this use {@link option_list_return()}?
+	 *  dh> the only difference is the $method param and this method only gets used twice..
 	 *
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID ''
@@ -470,7 +470,7 @@ class DataObjectCache
 		{
 			echo '<option value=""';
 			if( empty($default) ) echo ' selected="selected"';
-			echo '>', T_('None') ,'</option>'."\n";
+			echo '>'.$this->get_None_option_string().'</option>'."\n";
 		}
 
 		foreach( $this->cache as $loop_Obj )
@@ -505,7 +505,7 @@ class DataObjectCache
 		{
 			$r .= '<option value=""';
 			if( empty($default) ) $r .= ' selected="selected"';
-			$r .= '>'.T_('None').'</option>'."\n";
+			$r .= '>'.$this->get_None_option_string().'</option>'."\n";
 		}
 
 		foreach( $this->cache as $loop_Obj )
@@ -519,10 +519,33 @@ class DataObjectCache
 
 		return $r;
 	}
+
+
+	/**
+	 * Get the string that gets used for the "None" option in the objects
+	 * options list. This is especially useful for i18n, because there are
+	 * several "None"s!
+	 *
+	 * Subclasses should override this, e.g. "No user" for {@link UserCache}.
+	 *
+	 * {@internal dh> QUESTION: I've made this a callback to not translate a string to early,
+	 *  but it would require to have real classes for e.g. GroupCache. Should it be a
+	 *  constructor param instead? }}
+	 *
+	 * @return string
+	 */
+	function get_None_option_string()
+	{
+		return /* TRANS: the default value for option lists where "None" is allowed */ T_('None');
+	}
 }
+
 
 /*
  * $Log$
+ * Revision 1.9  2006/09/10 00:49:56  blueyed
+ * get_None_option_string proposal
+ *
  * Revision 1.8  2006/09/09 22:28:08  fplanque
  * ChapterCache Restricts categories to a specific blog
  *
