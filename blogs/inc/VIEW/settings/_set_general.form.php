@@ -112,12 +112,6 @@ $Form->radio( 'permalink_type', $Settings->get('permalink_type'),
 											array( 'archive#title', T_('Post on archive page, located by its title (for Cafelog compatibility)') )
 										), T_('Permalink type'), true );
 
-// QUESTION: TODO: there should also be a custom/advanced mode, which
-//           allows to have it defined through a string, where certain
-//           special strings get replaced. And the above modes should
-//           just define those strings. E.g., 'y' => '%year%/%title%'
-//           See how Wordpress handles/allows to define this.
-
 // fp> TODO: A dynamic javascript preview of how the two settings above combine
 
 // fp> TODO: Move both of these settings to blog/collection settings
@@ -149,8 +143,8 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
- * Revision 1.13  2006/09/10 23:00:28  blueyed
- * QUESTION/suggestion about chapter conf
+ * Revision 1.14  2006/09/10 23:40:47  fplanque
+ * minor
  *
  * Revision 1.12  2006/09/10 20:59:18  fplanque
  * extended extra path info setting

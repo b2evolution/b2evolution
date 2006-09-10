@@ -49,7 +49,7 @@ $LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $li
 // Compile cat array stuff:
 $linkblog_cat_array = array();
 $linkblog_cat_modifier = '';
-compile_cat_array( $linkblog_cat, $linkblog_catsel, $linkblog_cat_array, $linkblog_cat_modifier, $linkblog );
+compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */  $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $linkblog );
 
 $LinkblogList->set_filters( array(
 		'cat_array' => $linkblog_cat_array,
@@ -91,6 +91,9 @@ echo $linkblog_main_end;
 
 /*
  * $Log$
+ * Revision 1.13  2006/09/10 23:40:47  fplanque
+ * minor
+ *
  * Revision 1.12  2006/09/10 21:18:25  blueyed
  * call-time pass-by-reference has been deprecated
  *
