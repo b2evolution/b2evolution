@@ -150,7 +150,6 @@ class Item extends DataObject
 
 
 	var $wordcount = 0;
-	var $main_cat_ID = 0;
 	/**
 	 * @var string The list of renderers, imploded by '.'.
 	 */
@@ -180,6 +179,15 @@ class Item extends DataObject
 	 * @var integer
 	 */
 	var $notifications_ctsk_ID;
+
+	/**
+	 * @var integer
+	 */
+	var $main_cat_ID = 0;
+	/**
+	 * @var Chapter
+	 */
+	var $main_Chapter;
 
 	/**
 	 * Derived from $main_cat_ID
@@ -307,7 +315,10 @@ class Item extends DataObject
 			$this->url = $db_row->$db_cols['url'];			// Should move
 
 			// Derived vars
-			$this->blog_ID = get_catblog( $this->main_cat_ID );
+			$ChapterCache = & get_Cache( 'ChapterCache' );
+			$this->main_Chapter = & $ChapterCache->get_by_ID( $this->main_cat_ID );
+
+			$this->blog_ID = $this->main_Chapter->blog_ID;
 		}
 	}
 
@@ -575,14 +586,39 @@ class Item extends DataObject
 			case 'postbypost':
 			default:
 				// Link to a specific post:
-				if( $Settings->get('links_extrapath') == 'disabled' )
-				{ // Use params:
-					$permalink = url_add_param( $blogurl, $urlparam.$glue.'more=1'.$glue.'c=1'.$glue.'tb=1'.$glue.'pb=1', $glue );
-				}
-				else
-				{ // Use extra path info:
-					// This is THE CLEANEST available: RECOMMENDED!
-					$permalink = url_add_tail( $blogurl, mysql2date("/Y/m/d/", $post_date).$urltail );
+				switch( $Settings->get('links_extrapath') )
+				{
+					case 'disabled':
+						// Use params:
+						$permalink = url_add_param( $blogurl, $urlparam.$glue.'more=1'.$glue.'c=1'.$glue.'tb=1'.$glue.'pb=1', $glue );
+						break;
+
+					case 'short':
+						$permalink = url_add_tail( $blogurl, '/'.$urltail );
+						break;
+
+					case 'y':
+						$permalink = url_add_tail( $blogurl, mysql2date('/Y/', $post_date).$urltail );
+						break;
+
+					case 'ym':
+						$permalink = url_add_tail( $blogurl, mysql2date('/Y/m/', $post_date).$urltail );
+						break;
+
+					case 'ymd':
+						$permalink = url_add_tail( $blogurl, mysql2date('/Y/m/d/', $post_date).$urltail );
+						break;
+
+ 					case 'subchap':
+						$permalink = url_add_tail( $blogurl, '/'.$this->main_Chapter->urlname.'/'.$urltail );
+						break;
+
+ 					case 'chapters':
+						$permalink = url_add_tail( $blogurl, '/'.$this->main_Chapter->get_url_path().$urltail );
+						break;
+
+					default:
+						debug_die('extra path mode not supported (yet)');
 				}
 				break;
 		}
@@ -3048,6 +3084,10 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.92  2006/09/10 23:35:56  fplanque
+ * new permalink styles
+ * (decoding not implemented yet)
+ *
  * Revision 1.91  2006/09/10 21:18:11  fplanque
  * transposed permalink generation
  * looks like a lot of changes but basically I only swiched the imbrocation of an if and a switch

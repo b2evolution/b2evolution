@@ -56,7 +56,7 @@ class ChapterCache extends GenericCategoryCache
  	 * @param integer|NULL NULL for all subsets
 	 * @return reference on cached object
 	 */
-	function & get_by_ID( $req_ID, $halt_on_error = true, $halt_on_empty = true, $subset_ID )
+	function & get_by_ID( $req_ID, $halt_on_error = true, $halt_on_empty = true, $subset_ID = NULL )
 	{
 		global $DB, $Debuglog;
 
@@ -64,7 +64,7 @@ class ChapterCache extends GenericCategoryCache
 		{
 			if($halt_on_empty)
 			{
-				debug_die( "Requested $this->objtype from $this->dbtablename without ID!" );
+				debug_die( "Requested Chapter from $this->dbtablename without ID!" );
 			}
 			$r = NULL;
 			return $r;
@@ -72,12 +72,12 @@ class ChapterCache extends GenericCategoryCache
 
 		if( !empty( $this->cache[ $req_ID ] ) )
 		{ // Already in cache
-			// $Debuglog->add( "Accessing $this->objtype($req_ID) from cache", 'dataobjects' );
+			$Debuglog->add( "Accessing Chapter($req_ID) from cache", 'dataobjects' );
 			return $this->cache[ $req_ID ];
 		}
 		elseif( !$this->all_loaded )
 		{ // Not in cache, but not everything is loaded yet
-			if( $this->load_all )
+			if( $this->load_all || is_null($subset_ID) )
 			{ // It's ok to just load everything:
 				$this->load_all();
 			}
@@ -90,7 +90,7 @@ class ChapterCache extends GenericCategoryCache
 				         WHERE $this->dbIDname = $req_ID
 				           AND cat_blog_ID = ".$subset_ID;
 
-				if( $row = $DB->get_row( $sql, OBJECT, 0, 'DataObjectCache::get_by_ID()' ) )
+				if( $row = $DB->get_row( $sql, OBJECT, 0, 'ChapterCache::get_by_ID()' ) )
 				{
 					if( ! $this->instantiate( $row ) )
 					{
@@ -171,6 +171,10 @@ class ChapterCache extends GenericCategoryCache
 
 /*
  * $Log$
+ * Revision 1.4  2006/09/10 23:35:56  fplanque
+ * new permalink styles
+ * (decoding not implemented yet)
+ *
  * Revision 1.3  2006/09/10 17:33:02  fplanque
  * started to steam up the categories/chapters
  *

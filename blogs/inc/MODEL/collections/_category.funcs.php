@@ -341,6 +341,9 @@ function cat_load_cache( $cat_load_postcounts = 'none', $dbtable_items = 'T_post
 	global $DB, $cache_categories;
 	global $timestamp_min, $timestamp_max;
 	global $Settings;
+	global $Timer;
+
+	$Timer->resume( 'cat_load_cache' );
 
 	if( !isset($cache_categories))
 	{
@@ -387,6 +390,9 @@ function cat_load_cache( $cat_load_postcounts = 'none', $dbtable_items = 'T_post
 	}
 
 	cat_load_postcounts( $cat_load_postcounts, $dbtable_items, $dbprefix_items, $dbIDname_items );
+
+	$Timer->pause( 'cat_load_cache' );
+
 }
 
 
@@ -968,6 +974,10 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.16  2006/09/10 23:35:56  fplanque
+ * new permalink styles
+ * (decoding not implemented yet)
+ *
  * Revision 1.15  2006/09/10 19:54:07  fplanque
  * dirty fix
  *

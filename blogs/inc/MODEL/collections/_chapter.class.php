@@ -47,6 +47,13 @@ class Chapter extends GenericCategory
 	 */
 	var $Blog;
 
+	var $urlname;
+
+	/**
+	 * Lazy filled
+	 * @var Chapter
+	 */
+	var $parent_Chapter;
 
 	/**
 	 * Constructor
@@ -100,6 +107,42 @@ class Chapter extends GenericCategory
 	}
 
 
+	function & get_parent_Chapter()
+	{
+		if( ! isset( $this->parent_Chapter ) )
+		{	// Not resoleved yet!
+			if( empty( $this->parent_ID ) )
+			{
+				$this->parent_Chapter = NULL;
+			}
+			else
+			{
+				$ChapterCache = & get_Cache( 'ChapterCache' );
+				$this->parent_Chapter = & $ChapterCache->get_by_ID( $this->parent_ID );
+			}
+		}
+
+		return $this->parent_Chapter;
+	}
+
+
+	/**
+	 * Get URL path (made of URL names) back to the root
+	 */
+	function get_url_path()
+	{
+		$r = $this->urlname.'/';
+
+		$parent_Chapter = & $this->get_parent_Chapter();
+		if( !is_null( $parent_Chapter ) )
+		{	// Recurse:
+			$r = $parent_Chapter->get_url_path().$r;
+		}
+
+		return $r;
+	}
+
+
 	/**
 	 * Get the Blog object for the Chapter.
 	 *
@@ -132,6 +175,10 @@ class Chapter extends GenericCategory
 
 /*
  * $Log$
+ * Revision 1.3  2006/09/10 23:35:56  fplanque
+ * new permalink styles
+ * (decoding not implemented yet)
+ *
  * Revision 1.2  2006/09/10 19:32:32  fplanque
  * completed chapter URL name editing
  *

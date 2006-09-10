@@ -56,6 +56,11 @@ function & get_Cache( $objectName )
 			$BlogCache = new BlogCache(); // COPY (FUNC)
 			return $BlogCache;
 
+		case 'ChapterCache';
+			load_class( '/MODEL/collections/_chaptercache.class.php' );
+			$ChapterCache = new ChapterCache(); // COPY (FUNC)
+			return $ChapterCache;
+
 		case 'FileCache';
 			load_class( '/MODEL/files/_filecache.class.php' );
 			$FileCache = new FileCache(); // COPY (FUNC)
@@ -106,6 +111,10 @@ function & get_Cache( $objectName )
  
 /*
  * $Log$
+ * Revision 1.3  2006/09/10 23:35:56  fplanque
+ * new permalink styles
+ * (decoding not implemented yet)
+ *
  * Revision 1.2  2006/08/19 08:50:27  fplanque
  * moved out some more stuff from main
  *
