@@ -30,6 +30,7 @@
  * @author blueyed: Daniel HAHLER.
  *
  * @todo link to help urls
+ * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -419,6 +420,9 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 <?php
 /*
  * $Log$
+ * Revision 1.33  2006/09/10 19:54:52  blueyed
+ * Added CVS Id line
+ *
  * Revision 1.32  2006/09/10 19:23:28  blueyed
  * Removed Plugin::code(), ::name(), ::short_desc() and ::long_desc(); Fixes for mt-import.php
  *
