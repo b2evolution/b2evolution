@@ -198,6 +198,7 @@ if( $action == 'preview' )
 { // set the Comment into user's session and redirect. _feeback.php of the skin should display it.
 	$Comment->set( 'original_content', $original_comment ); // used in the textarea input field again
 	$Session->set( 'core.preview_Comment', $Comment );
+	$Session->set( 'core.no_CachePageContent', 1 );
 	$Session->dbsave();
 
 	param( 'redirect_to', 'string', '' );
@@ -302,6 +303,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.87  2006/09/10 00:00:57  blueyed
+ * "Solved" Session related todos.
+ *
  * Revision 1.86  2006/09/06 20:45:31  fplanque
  * ItemList2 fixes
  *

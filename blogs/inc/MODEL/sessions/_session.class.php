@@ -1,6 +1,7 @@
 <?php
 /**
- * This file implements the Session class.
+ * This file implements the Session class and holds the
+ * {@link session_unserialize_callback()} function used by it.
  *
  * A session can be bound to a user and provides functions to store data in its
  * context.
@@ -149,9 +150,8 @@ class Session
 					{ // Some session data has been previsouly stored:
 
 						// Unserialize session data (using an own callback that should provide class definitions):
-						// fp> TODO: that function should probably be over here; plus we'll have a php 4 class loader anyway
 						$old_callback = ini_get( 'unserialize_callback_func' );
-						ini_set( 'unserialize_callback_func', 'unserialize_callback' );
+						ini_set( 'unserialize_callback_func', 'session_unserialize_callback' );
 						$this->_data = @unserialize($row->sess_data);
 						ini_set( 'unserialize_callback_func', $old_callback );
 
@@ -339,8 +339,7 @@ class Session
 		{	// There is something to update:
 			$this->_data[$param] = array( ( $expire ? ($localtimenow + $expire) : NULL ), $value );
 
-			// fp> TODO: This is dirty! The session class should not CARE about preview comments. This should be set by the Preview caller!
-			if( in_array( $param, array( 'Messages', 'core.preview_Comment' ) ) )
+			if( $param == 'Messages' )
 			{ // also set boolean to not call CachePageContent plugin event on next request:
 				$this->set( 'core.no_CachePageContent', 1 );
 			}
@@ -436,8 +435,58 @@ class Session
 	}
 }
 
+
+/**
+ * This gets used as a {@link unserialize()} callback function, which is
+ * responsible to load the requested class.
+ *
+ * @todo Once we require PHP5, we should think about using this as __autoload function.
+ *
+ * Currently, this just gets used by the {@link Session} class and includes the
+ * {@link Comment} class and its dependencies.
+ *
+ * @return boolean True, if the required class could be loaded; false, if not
+ */
+function session_unserialize_callback( $classname )
+{
+	global $model_path, $object_def;
+
+	switch( strtolower($classname) )
+	{
+		case 'blog':
+			require_once $model_path.'collections/_blog.class.php';
+			return true;
+
+		case 'collectionsettings':
+			require_once $model_path.'collections/_collsettings.class.php';
+			return true;
+
+		case 'comment':
+			require_once $model_path.'comments/_comment.class.php';
+			return true;
+
+		case 'item':
+			require_once $model_path.'items/_item.class.php';
+			return true;
+
+		case 'group':
+			require_once $model_path.'users/_group.class.php';
+			return true;
+
+		case 'user':
+			require_once $model_path.'users/_user.class.php';
+			return true;
+	}
+
+	return false;
+}
+
+
 /*
  * $Log$
+ * Revision 1.25  2006/09/10 00:00:57  blueyed
+ * "Solved" Session related todos.
+ *
  * Revision 1.24  2006/09/09 23:43:52  blueyed
  * Added param_cookie() and used it for session cookie
  *

@@ -2423,52 +2423,6 @@ function base_tag( $url )
 
 
 /**
- * This gets used as a {@link unserialize()} callback function, which is
- * responsible to load the requested class.
- *
- * @todo Once we require PHP5, we should think about using this as __autoload function.
- *
- * Currently, this just gets used by the {@link Session} class and includes the
- * {@link Comment} class and its dependencies.
- *
- * @return boolean True, if the required class could be loaded; false, if not
- */
-function unserialize_callback( $classname )
-{
-	global $model_path, $object_def;
-
-	switch( strtolower($classname) )
-	{
-		case 'blog':
-			require_once $model_path.'collections/_blog.class.php';
-			return true;
-
-		case 'collectionsettings':
-			require_once $model_path.'collections/_collsettings.class.php';
-			return true;
-
-		case 'comment':
-			require_once $model_path.'comments/_comment.class.php';
-			return true;
-
-		case 'item':
-			require_once $model_path.'items/_item.class.php';
-			return true;
-
-		case 'group':
-			require_once $model_path.'users/_group.class.php';
-			return true;
-
-		case 'user':
-			require_once $model_path.'users/_user.class.php';
-			return true;
-	}
-
-	return false;
-}
-
-
-/**
  * Display an array as a list:
  */
 function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_separator = '', $item_start = '<li>', $item_end = '</li>' )
@@ -2505,6 +2459,9 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 
 /*
  * $Log$
+ * Revision 1.114  2006/09/10 00:00:57  blueyed
+ * "Solved" Session related todos.
+ *
  * Revision 1.113  2006/09/09 14:07:59  blueyed
  * TODO for severely broken get_base_domain
  *
