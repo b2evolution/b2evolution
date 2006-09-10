@@ -127,7 +127,7 @@ param( 'mode', 'string', 'normal' );
 	foreach( array( 'easy', 'normal', 'expert' ) as $tab )
 	{
 		echo ( $tab == $mode ) ? '<li class="current">' : '<li>';
-		echo '<a href="admin.php?ctrl=mtimport&mode='.$tab.( !empty($exportedfile) ? '&amp;exportedfile='.$exportedfile : '' ).'">'.ucwords($tab).'</a></li>';
+		echo '<a href="admin.php?ctrl=mtimport&amp;mode='.$tab.( !empty($exportedfile) ? '&amp;exportedfile='.$exportedfile : '' ).'">'.ucwords($tab).'</a></li>';
 	}
 ?></ul></div>
 
@@ -204,7 +204,7 @@ param( 'mode', 'string', 'normal' );
 			echo '['.$exportedfile.'].';
 			if( '' == MTEXPORT )
 			{
-				?> [<a href="admin.php?ctrl=mtimport&mode=<?php echo $mode ?>">choose another export-file</a>]<?php
+				?> [<a href="admin.php?ctrl=mtimport&amp;mode=<?php echo $mode ?>">choose another export-file</a>]<?php
 			} ?></p>
 
 		<p>This file contains <?php echo count( $posts ) ?> post(s) from <?php echo count( $authors ) ?> author(s) in <?php echo count( $categories ) ?> category(ies).</p>
