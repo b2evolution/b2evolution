@@ -253,7 +253,7 @@ class Blog extends DataObject
 														  AND blog_ID <> '.$this->ID
 														) )
 				{ // urlname is already in use
-					param_error( 'blog_urlname', T_('This URL blog name is already in use by another blog. Please choose another name.') );
+					param_error( 'blog_urlname', T_('This URL name is already in use by another blog. Please choose another name.') );
 				}
 			}
 
@@ -1026,6 +1026,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2006/09/10 19:32:32  fplanque
+ * completed chapter URL name editing
+ *
  * Revision 1.20  2006/09/10 14:50:48  fplanque
  * minor / doc
  *

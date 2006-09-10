@@ -1,12 +1,11 @@
 <?php
 /**
- * This file implements the generic recrusive editor list.
+ * This file implements the recursive chapter list.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -17,24 +16,17 @@
  *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
  * }}
  *
- * {@internal Open Source relicensing agreement:
- * PROGIDISTRI S.A.S. grants Francois PLANQUE the right to license
- * PROGIDISTRI S.A.S.'s contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
- *
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
- * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 //____________________ Callbacks functions to display categories list _____________________
 
-global $list_title;
+global $Blog;
 
 global $GenericCategoryCache;
 
@@ -50,43 +42,48 @@ $line_class = 'odd';
 /**
  * Generate category line when it has children
  *
- * @param GenericCategory generic category we want to display
+ * @param Chapter generic category we want to display
  * @param int level of the category in the recursive tree
  * @return string HTML
  */
-function cat_line( $GenericCategory, $level )
+function cat_line( $Chapter, $level )
 {
 	global $line_class, $result_fadeout, $permission_to_edit, $current_User;
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
-	$r = '<tr id="tr-'.$GenericCategory->ID.'"class="'.$line_class.
+	$r = '<tr id="tr-'.$Chapter->ID.'"class="'.$line_class.
 					// Fadeout?
-					( in_array( $GenericCategory->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">
+					( in_array( $Chapter->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">
 					<td class="firstcol shrinkwrap">'.
-						$GenericCategory->ID.'
-					</td>';
+						$Chapter->ID.'
+				</td>';
 
 	if( $permission_to_edit )
-	{	// We have permission permission to edit, so display action column:
-		$edit_url = regenerate_url( 'action,'.$GenericCategory->dbIDname, $GenericCategory->dbIDname.'='.$GenericCategory->ID.'&amp;action=edit' );
+	{	// We have permission permission to edit:
+		$edit_url = regenerate_url( 'action,'.$Chapter->dbIDname, $Chapter->dbIDname.'='.$Chapter->ID.'&amp;action=edit' );
 		$r .= '<td>
-						<label style="padding-left: '.($level).'em;"><a href="'.$edit_url.'" title="'.T_('Edit...').'">'.$GenericCategory->name.'</a></label>
-					 </td>
-					 <td class="lastcol shrinkwrap">'.
-						 action_icon( T_('New...'), 'new', regenerate_url( 'action,'.$GenericCategory->dbIDname.','.$GenericCategory->dbprefix.'parent_ID', $GenericCategory->dbprefix.'parent_ID='.$GenericCategory->ID.'&amp;action=new' ) ).
-						 action_icon( T_('Edit...'), 'edit', $edit_url ).
-						 action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,'.$GenericCategory->dbIDname, $GenericCategory->dbIDname.'='.$GenericCategory->ID.'&amp;action=delete' ) ).'
+						<label style="padding-left: '.($level).'em;"><a href="'.$edit_url.'" title="'.T_('Edit...').'">'.$Chapter->name.'</a></label>
 					 </td>';
 	}
 	else
 	{
-		$r .= '<td class="lastcol">
-						 <label style="padding-left: '.($level).'em;">'.$GenericCategory->name.'</label>
+		$r .= '<td>
+						 <label style="padding-left: '.($level).'em;">'.$Chapter->name.'</label>
 					 </td>';
 	}
 
+	$r .= '<td>'.$Chapter->dget('urlname').'</td>';
 
+
+	$r .= '<td class="lastcol shrinkwrap">';
+	if( $permission_to_edit )
+	{	// We have permission permission to edit, so display action column:
+		$r .=  action_icon( T_('New...'), 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) ).
+					 action_icon( T_('Edit...'), 'edit', $edit_url ).
+					 action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete' ) );
+	}
+	$r .= '</td>';
 	$r .=	'</tr>';
 
 	return $r;
@@ -96,11 +93,11 @@ function cat_line( $GenericCategory, $level )
 /**
  * Generate category line when it has no children
  *
- * @param GenericCategory generic category we want to display
+ * @param Chapter generic category we want to display
  * @param int level of the category in the recursive tree
  * @return string HTML
  */
-function cat_no_children( $GenericCategory, $level )
+function cat_no_children( $Chapter, $level )
 {
 	return '';
 }
@@ -140,9 +137,9 @@ $callbacks = array(
 
 echo '<table class="grouped" cellspacing="0">
 			<tr>
-					<th colspan="3" class="results_title">
-						<div class="results_title">';
-			
+				<th colspan="4" class="results_title">
+					<div class="results_title">';
+
 
 if( $permission_to_edit )
 {	// We have permission permission to edit, so display global icon to add nex genereic element:
@@ -151,13 +148,14 @@ if( $permission_to_edit )
 				</span>';
 }
 
-echo				$list_title.'
-						</div>
-					</th>
+echo T_('Categories for blog:').' '.$Blog->dget('name').'
+					</div>
+				</th>
 			</tr>
 			<tr>
-					<th class="firstcol shrinkwrap right">'.T_('ID').'</th>
-					<th>'.T_('Name').'</th>';
+				<th class="firstcol shrinkwrap right">'.T_('ID').'</th>
+				<th>'.T_('Name').'</th>
+				<th>'.T_('URL Name').'</th>';
 
 if( $permission_to_edit )
 {	// We have permission permission to edit, so display action column:
@@ -173,11 +171,8 @@ echo '</table>';
 
 /*
  * $Log$
- * Revision 1.6  2006/09/10 19:32:33  fplanque
+ * Revision 1.1  2006/09/10 19:32:32  fplanque
  * completed chapter URL name editing
- *
- * Revision 1.5  2006/09/10 17:33:02  fplanque
- * started to steam up the categories/chapters
  *
  */
 ?>

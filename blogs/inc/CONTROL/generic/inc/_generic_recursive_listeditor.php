@@ -166,8 +166,8 @@ switch( $action )
 				$Messages->add( T_('Element updated.'), 'success' ); //ToDO change htis
 				// Add the ID of the updated element to the result fadeout
 				$result_fadeout[] = $edited_GenericCategory->ID;
-				$action = 'list';
 			}
+			$action = 'list';
 		}
 		else
 		{
@@ -247,7 +247,14 @@ switch( $action )
 		if( $form_below_list )
 		{
 			// Display list VIEW before form view:
-			$AdminUI->disp_view( 'generic/_generic_recursive_list.inc.php' );
+			if( !empty( $list_view_path ) )
+			{
+				$AdminUI->disp_view( $list_view_path );
+			}
+			else
+			{
+				$AdminUI->disp_view( 'generic/_generic_recursive_list.inc.php' );
+			}
 		}
 
 		// Display category edit form:
@@ -269,8 +276,15 @@ switch( $action )
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
-		// Display VIEW:
-		$AdminUI->disp_view( 'generic/_generic_recursive_list.inc.php' );
+		// Display list VIEW:
+		if( !empty( $list_view_path ) )
+		{
+			$AdminUI->disp_view( $list_view_path );
+		}
+		else
+		{
+			$AdminUI->disp_view( 'generic/_generic_recursive_list.inc.php' );
+		}
 
 		// End payload block:
 		$AdminUI->disp_payload_end();
@@ -295,6 +309,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2006/09/10 19:32:32  fplanque
+ * completed chapter URL name editing
+ *
  * Revision 1.7  2006/09/10 17:33:02  fplanque
  * started to steam up the categories/chapters
  *

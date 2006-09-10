@@ -51,10 +51,7 @@ $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) )
 $Form->begin_form( 'fform', $creating ?  T_('New chapter') : T_('Chapter') );
 
 $Form->hidden( 'action', $creating ? 'create' : 'update' );
-
-$Form->hidden( 'ctrl', $ctrl );
-
-$Form->hiddens_by_key( get_memorized( 'action, ctrl' ) );
+$Form->hiddens_by_key( get_memorized( 'action' ) );
 
 $Form->begin_fieldset( T_('Properties') );
 
@@ -79,7 +76,6 @@ if( $creating )
 }
 else
 {
-	$Form->hidden( $edited_Chapter->dbIDname, $edited_Chapter->ID );
 	$Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
@@ -87,6 +83,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.2  2006/09/10 19:32:32  fplanque
+ * completed chapter URL name editing
+ *
  * Revision 1.1  2006/09/10 17:33:02  fplanque
  * started to steam up the categories/chapters
  *

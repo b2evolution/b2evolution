@@ -78,13 +78,24 @@ class Chapter extends GenericCategory
 	 */
 	function load_from_request()
 	{
+		global $DB;
+
 		parent::load_from_Request();
 
-/*		if( param( $this->dbprefix.'parent_ID', 'integer', -1 ) !== -1 )
+		// Check url name
+		if( param_string_not_empty( 'cat_urlname', T_('Please enter an urlname.') ) )
 		{
-			$this->set_from_Request( 'parent_ID' );
+			$this->set_from_Request( 'urlname' );
+    	if( $DB->get_var( 'SELECT COUNT(*)
+													 FROM T_categories
+													WHERE cat_urlname = '.$DB->quote($this->get( 'urlname' )).'
+														AND cat_ID <> '.$this->ID
+														) )
+				{ // urlname is already in use
+					param_error( 'cat_urlname', T_('This URL name is already in use by another chapter. Please choose another name.') );
+				}
 		}
-*/
+
 		return ! param_errors_detected();
 	}
 
@@ -121,6 +132,9 @@ class Chapter extends GenericCategory
 
 /*
  * $Log$
+ * Revision 1.2  2006/09/10 19:32:32  fplanque
+ * completed chapter URL name editing
+ *
  * Revision 1.1  2006/09/10 17:33:02  fplanque
  * started to steam up the categories/chapters
  *

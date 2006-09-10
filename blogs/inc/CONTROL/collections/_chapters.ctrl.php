@@ -66,7 +66,7 @@ $blogListButtons = $AdminUI->get_html_collection_list( 'blog_cats', '',
 // Restrict to chapters of the specific blog:
 $subset_ID = $blog;
 
-$list_title = T_('Categories for blog:').' '.$Blog->dget('name');
+$list_view_path = 'collections/_chapter_list.inc.php';
 $permission_to_edit = $current_User->check_perm( 'blog_cats', '', false, $blog );
 
 // The form will be on its own page:
@@ -78,6 +78,9 @@ require $control_path.'generic/inc/_generic_recursive_listeditor.php';
 
 /*
  * $Log$
+ * Revision 1.5  2006/09/10 19:32:32  fplanque
+ * completed chapter URL name editing
+ *
  * Revision 1.4  2006/09/10 17:33:02  fplanque
  * started to steam up the categories/chapters
  *
