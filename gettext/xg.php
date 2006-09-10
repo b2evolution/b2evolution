@@ -43,7 +43,7 @@ function echo_usage()
 	global $argv;
 
 	echo "Usage: \n";
-	echo basename($argv[0])." <CORE|CWD> [extract]";
+	echo basename($argv[0])." <CORE|CWD> [extract]\n";
 	echo basename($argv[0])." <CORE|CWD> merge <locale> [locale..]\n";
 	echo basename($argv[0])." <CORE|CWD> convert <locale> [locale..]\n";
 	echo "CORE: work on the core application\n";
@@ -138,7 +138,7 @@ else
 
 if( ! realpath($dir_root) )
 {
-	die( 'Fatal error: The path "'.$dir_root.'" was not found!' );
+	die( "Fatal error: The path '$dir_root' was not found!\n" );
 }
 // Normalize path:
 $dir_root = realpath($dir_root).'/';
@@ -157,7 +157,7 @@ if( $action == 'extract' )
 
 			if( ! mkdir( $dir_root.'locales' ) )
 			{
-				die( "FATAL: could not create directory {$dir_root}locales/" );
+				die( "FATAL: could not create directory {$dir_root}locales/\n" );
 			}
 			echo "Created directory.\n";
 		}
@@ -185,12 +185,23 @@ if( $action == 'extract' )
 
 	// Replace various things (see comments)
 	echo 'Automagically search&replace in messages.pot.. ';
-	system( 'sed -i -r "'
-					# remove \r:
-					.'s!\\\\\\\\r!!g;'
-					# make paths relative to the .po files:
-					.'s!^#: ../!#:../../../!g;'
-					.'" '.escapeshellarg($file_pot) );
+	$search = array('~\r~'); // TODO: may need to be '\\r' (or even more escaped ;p)
+	$replace = array('');
+
+	$data = file_get_contents( $file_pot );
+	$data = preg_replace( $search, $replace, $data );
+
+	// Convert forward slashes (unix) in paths to backward slashes (windows)
+	$function = ''; // used as callback
+	if( $mode == 'CORE' )
+	{ // make paths relative to the .po files
+		$function .= '$m[0] = str_replace( " ../", " ../../../", $m[0] );';
+	}
+	$function .= 'return str_replace( "/", "\\\\", $m[0] );';
+
+	$data = preg_replace_callback( '~^#: (.*)$~m', create_function( '$m', $function ), $data );
+
+	file_put_contents( $file_pot, $data );
 
 	if( $mode == 'CORE' )
 	{ // Replace header "vars" in first 20 lines:
@@ -219,7 +230,7 @@ if( $action == 'merge' )
 
 	foreach( $locales_to_merge as $l_locale )
 	{
-		$l_file_po = $dir_root.'/locales/'.$l_locale.'/LC_MESSAGES/messages.po';
+		$l_file_po = $dir_root.'locales/'.$l_locale.'/LC_MESSAGES/messages.po';
 
 		echo 'Merging with '.$l_locale.'.. ';
 
@@ -252,7 +263,7 @@ if( $action == 'convert' )
 
 	foreach( $locales_to_convert as $l_locale )
 	{
-		$l_file_po = $dir_root.'/locales/'.$l_locale.'/LC_MESSAGES/messages.po';
+		$l_file_po = $dir_root.'locales/'.$l_locale.'/LC_MESSAGES/messages.po';
 
 		echo 'Converting '.$l_locale.'.. ';
 
@@ -265,7 +276,7 @@ if( $action == 'convert' )
 		$POFile = new POFile($l_file_po);
 		$ttrans = $POFile->read(false);
 
-		$global_file_path = $dir_root.'/locales/'.$l_locale.'/_global.php';
+		$global_file_path = $dir_root.'locales/'.$l_locale.'/_global.php';
 		$fp = fopen( $global_file_path, 'w+' );
 
 		if( ! $fp )
