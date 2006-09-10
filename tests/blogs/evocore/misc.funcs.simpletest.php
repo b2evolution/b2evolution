@@ -255,6 +255,25 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( get_ban_domain('http://hostname.tld'), '//hostname.tld' );
 	}
 
+
+	/**
+	 * Test {@link url_same_protocol()}
+	 */
+	function test_url_same_protocol()
+	{
+		$this->assertEqual( url_same_protocol( 'http://example.com', 'https://example.com/admin/' ),
+			'https://example.com' );
+
+		$this->assertEqual( url_same_protocol( 'https://example.com', 'https://example.com/admin/' ),
+			'https://example.com' );
+
+		$this->assertEqual( url_same_protocol( 'http://example.com', 'http://example.com/admin/' ),
+			'http://example.com' );
+
+		$this->assertEqual( url_same_protocol( 'https://example.com', 'http://example.com/admin/' ),
+			'http://example.com' );
+	}
+
 }
 
 

@@ -2457,10 +2457,46 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 }
 
 
+/**
+ * Get $url with the same protocol (http/https) as $other_url.
+ *
+ * @param string URL
+ * @param string other URL (defaults to {@link $ReqHost})
+ * @return string
+ */
+function url_same_protocol( $url, $other_url = NULL )
+{
+	if( is_null($other_url) )
+	{
+		global $ReqHost;
+
+		$other_url = $ReqHost;
+	}
+
+	// change protocol of $url to same of admin ('https' <=> 'http')
+	if( substr( $url, 0, 7 ) == 'http://' )
+	{
+		if( substr( $other_url, 0, 8 ) == 'https://' )
+		{
+			$url = 'https://'.substr( $url, 7 );
+		}
+	}
+	elseif( substr( $url, 0, 8 ) == 'https://' )
+	{
+		if( substr( $other_url, 0, 7 ) == 'http://' )
+		{
+			$url = 'http://'.substr( $url, 8 );
+		}
+	}
+
+	return $url;
+}
+
+
 /*
  * $Log$
- * Revision 1.114  2006/09/10 00:00:57  blueyed
- * "Solved" Session related todos.
+ * Revision 1.115  2006/09/10 14:21:35  blueyed
+ * Added url_same_protocol() (+tests) and use it for preview URL
  *
  * Revision 1.113  2006/09/09 14:07:59  blueyed
  * TODO for severely broken get_base_domain

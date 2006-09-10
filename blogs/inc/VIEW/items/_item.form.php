@@ -139,7 +139,9 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	if( $use_preview )
 	{ // ---------- PREVIEW ----------
-		$Form->button( array( 'button', '', T_('Preview'), '', 'b2edit_open_preview(this.form, \''.$Blog->get('dynurl').'\');' ) );
+		$url = url_same_protocol( $Blog->get( 'dynurl' ) );
+
+		$Form->button( array( 'button', '', T_('Preview'), '', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
 	}
 
 	// ---------- SAVE ----------
@@ -346,6 +348,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.23  2006/09/10 14:21:35  blueyed
+ * Added url_same_protocol() (+tests) and use it for preview URL
+ *
  * Revision 1.22  2006/08/20 22:25:22  fplanque
  * param_() refactoring part 2
  *
