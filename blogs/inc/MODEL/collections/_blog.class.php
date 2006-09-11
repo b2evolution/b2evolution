@@ -212,6 +212,11 @@ class Blog extends DataObject
 			{
 				$this->set_from_Request( 'urlname' );
 
+				if( ! preg_match( '|^[A-Za-z0-9\-]+$|', $this->urlname ) )
+				{
+					param_error( 'blog_urlname', T_('The url name is invalid.') );
+				}
+
 				if( $DB->get_var( 'SELECT COUNT(*)
 														 FROM T_blogs
 														WHERE blog_urlname = '.$DB->quote($this->get( 'urlname' )).'
@@ -254,6 +259,13 @@ class Blog extends DataObject
 			// Preferred access type:
 			$this->set( 'access_type',   param( 'blog_access_type',   'string', true ) );
 			$this->set( 'stub',          param( 'blog_stub',          'string', true ) );
+
+			// TODO: change * to +
+			if( ! preg_match( '|^[A-Za-z0-9\-]*$|', $this->urlname ) )
+			{
+				param_error( 'blog_stub', T_('The stub name is invalid.') );
+			}
+
 			if( $this->access_type == 'stub' )
 			{	// fp> If there is a case to leave this blank, comment this out and explain the case. Thanks.
 				// dh> I'm using it with "absolute URL" to have no "stub file" at all..
@@ -1037,6 +1049,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2006/09/11 20:53:33  fplanque
+ * clean chapter paths with decoding, finally :)
+ *
  * Revision 1.23  2006/09/11 19:36:58  fplanque
  * blog url ui refactoring
  *

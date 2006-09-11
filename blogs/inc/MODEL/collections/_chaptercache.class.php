@@ -35,6 +35,10 @@ load_class( 'MODEL/collections/_chapter.class.php' );
  */
 class ChapterCache extends GenericCategoryCache
 {
+	/**
+	 * Lazy filled index of url titles
+	 */
+	var $urlname_index = array();
 
 	/**
 	 * Constructor
@@ -86,8 +90,8 @@ class ChapterCache extends GenericCategoryCache
 				$Debuglog->add( "Loading <strong>$this->objtype($req_ID)</strong> into cache", 'dataobjects' );
 				// Note: $req_ID MUST be an unsigned integer. This is how DataObject works.
 				$sql = "SELECT *
-				          FROM $this->dbtablename
-				         WHERE $this->dbIDname = $req_ID
+				          FROM T_categories
+				         WHERE cat_ID = $req_ID
 				           AND cat_blog_ID = ".$subset_ID;
 
 				if( $row = $DB->get_row( $sql, OBJECT, 0, 'ChapterCache::get_by_ID()' ) )
@@ -117,6 +121,52 @@ class ChapterCache extends GenericCategoryCache
 
 		return $this->cache[ $req_ID ];
 	}
+
+
+
+	/**
+	 * Get an object from cache by urlname
+	 *
+	 * Load the cache if necessary (all at once if allowed).
+	 *
+	 * @param string ID of object to load
+	 * @param boolean true if function should die on error
+	 * @return reference on cached object
+	 */
+	function & get_by_urlname( $req_urlname, $halt_on_error = true )
+	{
+		global $DB, $Debuglog;
+
+		if( !isset( $this->urlname_index[$req_urlname] ) )
+		{ // not yet in cache:
+			// Load just the requested object:
+			$Debuglog->add( "Loading <strong>$this->objtype($req_urlname)</strong> into cache" );
+			$sql = "SELECT *
+			          FROM $this->dbtablename
+			         WHERE cat_urlname = ".$DB->quote($req_urlname);
+			$row = $DB->get_row( $sql );
+			if( empty( $row ) )
+			{	// Requested object does not exist
+				if( $halt_on_error ) debug_die( "Requested $this->objtype does not exist!" );
+				// put into index:
+				$this->urlname_index[$req_urlname] = false;
+
+				return $this->urlname_index[$req_urlname];
+			}
+
+			$this->instantiate( $row );
+
+			// put into index:
+			$this->urlname_index[$req_urlname] = & $this->cache[ $row->cat_ID ];
+		}
+		else
+		{
+			$Debuglog->add( "Retrieving <strong>$this->objtype($req_urlname)</strong> from cache" );
+		}
+
+		return $this->urlname_index[$req_urlname];
+	}
+
 
 
 	/**
@@ -171,6 +221,9 @@ class ChapterCache extends GenericCategoryCache
 
 /*
  * $Log$
+ * Revision 1.6  2006/09/11 20:53:33  fplanque
+ * clean chapter paths with decoding, finally :)
+ *
  * Revision 1.5  2006/09/11 19:34:34  fplanque
  * fully powered the ChapterCache
  *

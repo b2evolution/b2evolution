@@ -7,8 +7,6 @@
  *
  * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
- * Parts of this file are copyright (c)2004-2005 by The University of North Carolina at Charlotte as
- * contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -16,11 +14,6 @@
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- *
- * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
- * Jason EDGECOMBE's contributions to this file and the b2evolution project
- * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
- * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
  * }}
  *
  * @package main
@@ -28,15 +21,6 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
- * @author jeffbearer: Jeff BEARER
- * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
- * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
- *
- * {@internal Below is a list of former authors whose contributions to this file have been
- *            either removed or redesigned and rewritten anew:
- *            - cafelog (team)
- *            - t3dworld
- * }}
  *
  * @version $Id$
  */
@@ -110,11 +94,12 @@ init_charsets( $current_charset );
  *
  * baseurl/blog-urlname/junk/.../junk/post-title    -> points to a single post (no ending slash)
  * baseurl/blog-urlname/junk/.../junk/p142          -> points to a single post
- * #baseurl/blog-urlname/junk/.../junk/chap-urlname/ -> points to a single chapter (because of ending slash)
  * baseurl/blog-urlname/2006/                       -> points to a yearly archive because of ending slash + 4 digits
  * baseurl/blog-urlname/2006/12/                    -> points to a monthly archive
  * baseurl/blog-urlname/2006/12/31/                 -> points to a daily archive
- * baseurl/blog-urlname/2006/w53/                   -> points to a weekly archive (will fail if there is a chapter urlanmed w[0-9]+)
+ * baseurl/blog-urlname/2006/w53/                   -> points to a weekly archive
+ * baseurl/blog-urlname/junk/.../junk/chap-urlname/ -> points to a single chapter (because of ending slash)
+ * Note: category names cannot be named like this [a-z][0-9]+
  */
 if( ! isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
 if( $resolve_extra_path )
@@ -186,36 +171,59 @@ if( $resolve_extra_path )
 			}
 			else
 			{	// ENDING SLASH -> we are looking for a daterange OR a chapter:
-				$i=0;
 
-				// echo $path_elements[$i];
-				if( isset( $path_elements[$i] ) )
-				{
-					if( is_numeric( $path_elements[$i] ) )
-					{ // We'll consider this to be the year
-						$m = $path_elements[$i++];
-						$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'params' );
-
-						if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
-						{ // We'll consider this to be the month
-							$m .= $path_elements[$i++];
-							$Debuglog->add( 'Setting month from extra path info. $m=' . $m , 'params' );
+				$last_part = $path_elements[count($path_elements)-1];
+				// echo $last_part;
+				if( preg_match( '|^w?[0-9]+$|', $last_part ) )
+				{ // Last part is a number or a "week" number:
+					$i=0;
+					// echo $path_elements[$i];
+					if( isset( $path_elements[$i] ) )
+					{
+						if( is_numeric( $path_elements[$i] ) )
+						{ // We'll consider this to be the year
+							$m = $path_elements[$i++];
+							$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'params' );
 
 							if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
-							{ // We'll consider this to be the day
+							{ // We'll consider this to be the month
 								$m .= $path_elements[$i++];
-								$Debuglog->add( 'Setting day from extra path info. $m=' . $m , 'params' );
+								$Debuglog->add( 'Setting month from extra path info. $m=' . $m , 'params' );
+
+								if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
+								{ // We'll consider this to be the day
+									$m .= $path_elements[$i++];
+									$Debuglog->add( 'Setting day from extra path info. $m=' . $m , 'params' );
+								}
+							}
+							elseif( isset( $path_elements[$i] ) && substr( $path_elements[$i], 0, 1 ) == 'w' )
+							{ // We consider this a week number
+								$w = substr( $path_elements[$i], 1, 2 );
 							}
 						}
-						elseif( isset( $path_elements[$i] ) && substr( $path_elements[$i], 0, 1 ) == 'w' )
-						{ // We consider this a week number
-							$w = substr( $path_elements[$i], 1, 2 );
+						else
+						{	// We did not get a number/year...
+							$path_error = 404;
 						}
 					}
-					else
-					{	// We did not get a number/year...
+				}
+				elseif( preg_match( '|^[A-Za-z0-9\-]+$|', $last_part ) )
+				{	// We are pointing to a chapter/category:
+					$ChapterCache = & get_Cache( 'ChapterCache' );
+					$Chapter = & $ChapterCache->get_by_urlname( $last_part, false );
+					if( empty( $Chapter ) )
+					{	// We could not match a chapter...
 						$path_error = 404;
 					}
+					else
+					{
+						$cat = $Chapter->ID;
+					}
+				}
+				else
+				{	// We did not get anything we can decode...
+					// echo 'neither number nor cat';
+					$path_error = 404;
 				}
 			}
 		}
@@ -468,6 +476,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.41  2006/09/11 20:53:33  fplanque
+ * clean chapter paths with decoding, finally :)
+ *
  * Revision 1.40  2006/09/11 00:43:03  fplanque
  * transposed decoding. So far it doesn't decode much more but it's more laxist regarding junk before a post title
  *

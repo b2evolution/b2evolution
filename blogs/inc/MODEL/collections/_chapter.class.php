@@ -93,14 +93,22 @@ class Chapter extends GenericCategory
 		if( param_string_not_empty( 'cat_urlname', T_('Please enter an urlname.') ) )
 		{
 			$this->set_from_Request( 'urlname' );
-    	if( $DB->get_var( 'SELECT COUNT(*)
-													 FROM T_categories
-													WHERE cat_urlname = '.$DB->quote($this->get( 'urlname' )).'
-														AND cat_ID <> '.$this->ID
-														) )
-				{ // urlname is already in use
-					param_error( 'cat_urlname', T_('This URL name is already in use by another chapter. Please choose another name.') );
-				}
+			if( ! preg_match( '|^[A-Za-z0-9\-]+$|', $this->urlname )
+					|| preg_match( '|^[A-Za-z][0-9]+$|', $this->urlname ) ) // This is to prevent conflict with things such as week number
+			{
+				param_error( 'cat_urlname', T_('The url name is invalid.') );
+			}
+			else
+			{
+    		if( $DB->get_var( 'SELECT COUNT(*)
+														 FROM T_categories
+														WHERE cat_urlname = '.$DB->quote($this->urlname).'
+															AND cat_ID <> '.$this->ID
+															) )
+					{ // urlname is already in use
+						param_error( 'cat_urlname', T_('This URL name is already in use by another chapter. Please choose another name.') );
+					}
+			}
 		}
 
 		return ! param_errors_detected();
@@ -144,6 +152,47 @@ class Chapter extends GenericCategory
 
 
 	/**
+	 * Generate the URL to access the category.
+	 *
+	 * @param string|NULL 'param_num', 'subchap', 'chapters'
+	 * @param string|NULL url to use
+	 * @param string glue between url params
+	 */
+	function get_permanent_url( $link_type = NULL, $blogurl = NULL, $glue = '&amp;' )
+	{
+		global $DB, $cacheweekly, $Settings;
+
+		if( empty( $link_type ) )
+		{	// Use default from settings:
+			$this->get_Blog();
+			$link_type = $this->Blog->get_setting( 'chapter_links' );
+		}
+
+		if( empty( $blogurl ) )
+		{
+			$this->get_Blog();
+			$blogurl = $this->Blog->gen_blogurl();
+		}
+
+		switch( $link_type )
+		{
+			case 'param_num':
+				return url_add_param( $blogurl, 'cat='.$this->ID, $glue );
+				/* break; */
+
+			case 'subchap':
+				return url_add_tail( $blogurl, '/'.$this->urlname.'/' );
+				/* break; */
+
+			case 'chapters':
+			default:
+				return url_add_tail( $blogurl, '/'.$this->get_url_path() );
+				/* break; */
+		}
+	}
+
+
+	/**
 	 * Get the Blog object for the Chapter.
 	 *
 	 * @return Blog
@@ -175,6 +224,9 @@ class Chapter extends GenericCategory
 
 /*
  * $Log$
+ * Revision 1.4  2006/09/11 20:53:33  fplanque
+ * clean chapter paths with decoding, finally :)
+ *
  * Revision 1.3  2006/09/10 23:35:56  fplanque
  * new permalink styles
  * (decoding not implemented yet)

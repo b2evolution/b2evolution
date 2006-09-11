@@ -47,6 +47,9 @@ require_once dirname(__FILE__).'/_item.class.php';
  */
 class ItemCache extends DataObjectCache
 {
+	/**
+	 * Lazy filled index of url titles
+	 */
 	var $urltitle_index = array();
 
 	/**
@@ -91,12 +94,10 @@ class ItemCache extends DataObjectCache
 				return $this->urltitle_index[$req_urltitle];
 			}
 
-			$dbIDname = $this->dbIDname;
-			$objtype = $this->objtype;
-			$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
+			$this->instantiate( $row );
 
 			// put into index:
-			$this->urltitle_index[$req_urltitle] = & $this->cache[ $row->$dbIDname ];
+			$this->urltitle_index[$req_urltitle] = & $this->cache[ $row->post_ID ];
 		}
 		else
 		{
@@ -148,6 +149,9 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.7  2006/09/11 20:53:33  fplanque
+ * clean chapter paths with decoding, finally :)
+ *
  * Revision 1.6  2006/09/06 20:45:34  fplanque
  * ItemList2 fixes
  *

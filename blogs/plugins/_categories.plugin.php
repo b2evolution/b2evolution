@@ -254,71 +254,6 @@ class categories_plugin extends Plugin
 	}
 
 
-	function callback_before_first( $parent_cat_ID, $level )
-	{ // callback to start sublist
-		$r = '';
-		if( $level > 0 ) $r .= $this->params['group_start'];
-		return $r;
-	}
-
-
-	function callback_before_each( $cat_ID, $level )
-	{ // callback to display sublist element
-		global $tab, $blog, $cat_array;
-		$cat = get_the_category_by_ID( $cat_ID );
-		$r = $this->params['line_start'];
-
-		if( $this->params['form'] )
-		{	// We want to add form fields:
-			$r .= '<label><input type="checkbox" name="catsel[]" value="'.$cat_ID.'" class="checkbox"';
-			if( in_array( $cat_ID, $cat_array ) )
-			{ // This category is in the current selection
-				$r .= ' checked="checked"';
-			}
-			$r .= ' /> ';
-		}
-
-		$r .= '<a href="';
-
-		if( $this->params['link_type'] == 'context' )
-		{	// We want to preserve current browsing context:
-			$r .= regenerate_url( 'cats,catsel', 'cat='.$cat_ID );
-		}
-		else
-		{
-			$r .= url_add_param( get_bloginfo('blogurl'), 'cat='.$cat_ID );
-		}
-
-		$r .= '">'.format_to_output($cat['cat_name'], 'htmlbody').'</a> <span class="notes">('.$cat['cat_postcount'].')</span>';
-
-		if( in_array( $cat_ID, $cat_array ) )
-		{ // This category is in the current selection
-			$r .= '*';
-		}
-
-		if( $this->params['form'] )
-		{	// We want to add form fields:
-			$r .= '</label>';
-		}
-		return $r;
-	}
-
-
-	function callback_after_each( $cat_ID, $level )
-	{ // callback to display sublist element
-		return $this->params['line_end'];
-	}
-
-
-	function callback_after_last( $parent_cat_ID, $level )
-	{ // callback to end sublist
-		$r = '';
-		if( $level > 0 ) $r .= $this->params['group_end'];
-		return $r;
-	}
-
-
-
 	/**
 	 * Generate category line when it has children
 	 *
@@ -349,7 +284,7 @@ class categories_plugin extends Plugin
 		}
 		else
 		{
-			$r .= url_add_param( get_bloginfo('blogurl'), 'cat='.$Chapter->ID );
+			$r .= $Chapter->get_permanent_url();
 		}
 
 		$r .= '">'.$Chapter->dget('name').'</a>';
@@ -408,6 +343,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.26  2006/09/11 20:53:33  fplanque
+ * clean chapter paths with decoding, finally :)
+ *
  * Revision 1.25  2006/09/11 19:34:34  fplanque
  * fully powered the ChapterCache
  *
