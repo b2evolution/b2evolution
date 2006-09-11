@@ -103,9 +103,19 @@ locale_activate( $Blog->get('locale') );
 init_charsets( $current_charset );
 
 
-// -------------------------
-// Extra path info decoding:
-// -------------------------
+/* -------------------------
+ * Extra path info decoding:
+ * -------------------------
+ * Decoding should try to work like this:
+ *
+ * baseurl/blog-urlname/junk/.../junk/post-title    -> points to a single post (no ending slash)
+ * baseurl/blog-urlname/junk/.../junk/p142          -> points to a single post
+ * #baseurl/blog-urlname/junk/.../junk/chap-urlname/ -> points to a single chapter (because of ending slash)
+ * baseurl/blog-urlname/2006/                       -> points to a yearly archive because of ending slash + 4 digits
+ * baseurl/blog-urlname/2006/12/                    -> points to a monthly archive
+ * baseurl/blog-urlname/2006/12/31/                 -> points to a daily archive
+ * baseurl/blog-urlname/2006/w53/                   -> points to a weekly archive (will fail if there is a chapter urlanmed w[0-9]+)
+ */
 if( ! isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
 if( $resolve_extra_path )
 {
@@ -132,72 +142,81 @@ if( $resolve_extra_path )
 				$path_elements[] = $path_element;
 			}
 		}
-		// echo count( $path_elements );
+		// pre_dump( $path_elements );
 
-		$path_error = 0;
-		$i=0;
-		// echo $path_elements[$i];
-		if( isset( $path_elements[$i] ) && preg_match( '#.+\.php[0-9]?$#', $path_elements[$i] ) )
+		if( isset( $path_elements[0] ) && preg_match( '#.+\.php[0-9]?$#', $path_elements[0] ) )
 		{ // Ignore element ending with .php
-			$i++;
+			array_shift( $path_elements );
 			$Debuglog->add( 'Ignoring *.php in extra path info' , 'params' );
 		}
 
-		if( isset( $path_elements[$i] ) && preg_match( '#^'.$Blog->get( 'stub' ).'$#', $path_elements[$i] )  )
+		if( isset( $path_elements[0] ) && preg_match( '#^'.$Blog->get( 'stub' ).'$#', $path_elements[0] )  )
 		{ // Ignore stub file (if it ends with .php it should aready have been filtered out above)
-			$i++;
+			array_shift( $path_elements );
 			$Debuglog->add( 'Ignoring stub file in extra path info' , 'params' );
 		}
+		// pre_dump( $path_elements );
 
-		// echo $path_elements[$i];
-		if( isset( $path_elements[$i] ) )
+		$path_error = 0;
+
+		// Do we still have extra path info to decode?
+		if( count($path_elements) )
 		{
-			if( is_numeric( $path_elements[$i] ) )
-			{ // We'll consider this to be the year
-				$m = $path_elements[$i++];
-				$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'params' );
+			// Does the pathinfo end with a / ?
+			if( substr( $path_string, -1 ) != '/' )
+			{ // NO ENDING SLASH -> We'll consider this to be a ref to a post:
+				// Set a lot of defaults as if we had received a complex URL:
+				$m = '';
+				$more = 1; // Display the extended entries' text
+				$c = 1;    // Display comments
+				$tb = 1;   // Display trackbacks
+				$pb = 1;   // Display pingbacks
 
-				if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
-				{ // We'll consider this to be the month
-					$m .= $path_elements[$i++];
-					$Debuglog->add( 'Setting month from extra path info. $m=' . $m , 'params' );
-
-					if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
-					{ // We'll consider this to be the day
-						$m .= $path_elements[$i++];
-						$Debuglog->add( 'Setting day from extra path info. $m=' . $m , 'params' );
-
-						if( isset( $path_elements[$i] ) && (!empty( $path_elements[$i] )) )
-						{ // We'll consider this to be a ref to a post
-							// We are accessing a post by permalink
-							// Set a lot of defaults as if we had received a complex URL:
-							$m = '';
-							$more = 1; // Display the extended entries' text
-							$c = 1;    // Display comments
-							$tb = 1;   // Display trackbacks
-							$pb = 1;   // Display pingbacks
-
-							if( preg_match( "#^p([0-9]+)$#", $path_elements[$i], $req_post ) )
-							{ // The last param is of the form p000
-								// echo 'post number';
-								$p = $req_post[1];		// Post to display
-							}
-							else
-							{ // Last param is a string, we'll consider this to be a post urltitle
-								$title = $path_elements[$i];
-								// echo 'post title : ', $title;
-							}
-						}
-					}
+				$path_element = $path_elements[count($path_elements)-1];
+				if( preg_match( "#^p([0-9]+)$#", $path_element, $req_post ) )
+				{ // The last param is of the form p000
+					// echo 'post number';
+					$p = $req_post[1];		// Post to display
 				}
-				elseif( isset( $path_elements[$i] ) && substr( $path_elements[$i], 0, 1 ) == 'w' )
-				{ // We consider this a week number
-					$w = substr( $path_elements[$i], 1, 2 );
+				else
+				{ // Last param is a string, we'll consider this to be a post urltitle
+					$title = $path_element;
+					// echo 'post title : ', $title;
 				}
 			}
 			else
-			{	// We did not get a number/year...
-				$path_error = 404;
+			{	// ENDING SLASH -> we are looking for a daterange OR a chapter:
+				$i=0;
+
+				// echo $path_elements[$i];
+				if( isset( $path_elements[$i] ) )
+				{
+					if( is_numeric( $path_elements[$i] ) )
+					{ // We'll consider this to be the year
+						$m = $path_elements[$i++];
+						$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'params' );
+
+						if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
+						{ // We'll consider this to be the month
+							$m .= $path_elements[$i++];
+							$Debuglog->add( 'Setting month from extra path info. $m=' . $m , 'params' );
+
+							if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
+							{ // We'll consider this to be the day
+								$m .= $path_elements[$i++];
+								$Debuglog->add( 'Setting day from extra path info. $m=' . $m , 'params' );
+							}
+						}
+						elseif( isset( $path_elements[$i] ) && substr( $path_elements[$i], 0, 1 ) == 'w' )
+						{ // We consider this a week number
+							$w = substr( $path_elements[$i], 1, 2 );
+						}
+					}
+					else
+					{	// We did not get a number/year...
+						$path_error = 404;
+					}
+				}
 			}
 		}
 
@@ -226,6 +245,22 @@ elseif( !empty($p) || !empty($title) )
 { // We are going to display a single post
 	$disp = 'single';
 
+	// Make sure the single post we're requesting (still) exists:
+	$ItemCache = & get_Cache( 'ItemCache' );
+	if( !empty($p) )
+	{
+		$Item = & $ItemCache->get_by_ID( $p, false );
+	}
+	else
+	{
+		$Item = & $ItemCache->get_by_urltitle( $title, false );
+	}
+	if( empty( $Item ) )
+	{	// Post doesn't exist! Let's go 404!
+		// fp> TODO: ->viewing_allowed() for draft, private, protected and deprecated...
+		require $view_path.'errors/_404_not_found.page.php'; // error & exit
+	}
+
 	// fp>> TODO: a more generic canonical URL checker. Should work also on date changes, cat changes...
 
 	if( !empty($title) )
@@ -234,9 +269,7 @@ elseif( !empty($p) || !empty($title) )
 		$title = preg_replace( '/[^A-Za-z0-9]/', '-', $title );
 		if( $redirect_to_canonical_title )
 		{	// Check if we have requested the canonical title:
-			$ItemCache = & get_Cache( 'ItemCache' );
-			$Item = & $ItemCache->get_by_urltitle( $title, false );
-			if( $Item !== false && $old_title != $Item->urltitle )
+			if( $old_title != $Item->urltitle )
 			{	// We have asked for an existing Item but not with its canonical title (probably an old permalink), redirect!
 				// fp> TODO: Note: we may be loosing a few specific params here, like page=2 for example. Not tragic, but could be better.
 				header_redirect( $Item->get_permanent_url( '', '', false, '&' ), true );
@@ -248,18 +281,7 @@ elseif( !empty($p) || !empty($title) )
 	// On single post requests, check if we're on the right blog!
 	if( $redirect_to_postblog )
 	{ // Yes we need to check.
-		if( !empty($p) )
-		{
-			$ItemCache = & get_Cache( 'ItemCache' );
-			$Item = & $ItemCache->get_by_ID( $p, false );
-		}
-		elseif( empty($Item) )
-		{	// Item has not been requested already for $redirect_to_canonical_title
-			$ItemCache = & get_Cache( 'ItemCache' );
-			$Item = & $ItemCache->get_by_urltitle( $title, false );
-		}
-
-		if( $Item !== false && $Item->blog_ID != $blog )
+		if( $Item->blog_ID != $blog )
 		{ // We're on the wrong blog (probably an old permalink) let's redirect!
 			// fp> TODO: Note: we may be loosing a few specific params here, like page=2 for example. Not tragic, but could be better.
 			header_redirect( $Item->get_permanent_url( '', '', false, '&' ), true );
@@ -446,6 +468,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.40  2006/09/11 00:43:03  fplanque
+ * transposed decoding. So far it doesn't decode much more but it's more laxist regarding junk before a post title
+ *
  * Revision 1.39  2006/09/07 00:48:55  fplanque
  * lc parameter for locale filtering of posts
  *
