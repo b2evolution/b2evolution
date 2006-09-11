@@ -312,6 +312,10 @@ class test_plugin extends Plugin
 	 */
 	function AdminDisplayEditorButton( & $params )
 	{
+		if( $params['edit_layout'] == 'simple' )
+		{ // this is the "simple" layout, we do nothing
+			return false;
+		}
 		?>
 		<input type="button" value="TEST" onclick="alert('Hi! This is the TEST plugin (AdminDisplayEditorButton)!');" />
 		<?php
@@ -622,6 +626,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.52  2006/09/11 22:23:05  blueyed
+ * (Re-)enabled AdminDisplayEditorButton for "simple" edit_layout, after adding appropriate doc.
+ *
  * Revision 1.51  2006/08/29 16:44:47  blueyed
  * Logical fix for cron job return value.
  *

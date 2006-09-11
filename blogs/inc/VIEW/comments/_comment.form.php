@@ -97,7 +97,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	}
 
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Comment' ) );
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Comment', 'edit_layout' => '' /* TODO: Better value? */ ) );
 
 	?>
 	</div>
@@ -195,6 +195,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.13  2006/09/11 22:23:04  blueyed
+ * (Re-)enabled AdminDisplayEditorButton for "simple" edit_layout, after adding appropriate doc.
+ *
  * Revision 1.12  2006/07/26 20:22:12  blueyed
  * Pass "edit_layout" param with AdminDisplayToolbar event
  *

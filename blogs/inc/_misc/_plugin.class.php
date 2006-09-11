@@ -681,12 +681,18 @@ class Plugin
 	 * You should provide an unique html ID with your button.
 	 *
 	 * @param array Associative array of parameters.
-	 *              - 'target_type': either 'Comment' or 'Item'.
-	 *              - 'edit_layout': "simple", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
+	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'edit_layout': "simple", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
+	 *                    NOTE: Respect the "simple" mode, which should display only the most simple things!
 	 * @return boolean did we display a button?
 	 */
 	function AdminDisplayEditorButton( $params )
 	{
+		if( $params['edit_layout'] == 'simple' )
+		{ // Do nothing in simple mode
+			return false;
+		}
+
 		return false;		// Do nothing by default.
 	}
 
@@ -2573,6 +2579,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.90  2006/09/11 22:23:04  blueyed
+ * (Re-)enabled AdminDisplayEditorButton for "simple" edit_layout, after adding appropriate doc.
+ *
  * Revision 1.89  2006/09/10 19:23:28  blueyed
  * Removed Plugin::code(), ::name(), ::short_desc() and ::long_desc(); Fixes for mt-import.php
  *

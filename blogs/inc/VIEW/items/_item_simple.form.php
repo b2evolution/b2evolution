@@ -160,8 +160,7 @@ $Form->hidden( 'renderers', param('renderers', 'array', NULL) );
 	}
 
 	// CALL PLUGINS NOW:
-	// TODO: make sure plugin authors are strongly encouraged not to display their stuff on simple edit screen by default. Add returns if 'simple' to all existing plugins on the planet, tehn enable this :P
-	// $Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'simple' ) );
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'simple' ) );
 
 	echo '</div>';
 
@@ -279,6 +278,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.14  2006/09/11 22:23:04  blueyed
+ * (Re-)enabled AdminDisplayEditorButton for "simple" edit_layout, after adding appropriate doc.
+ *
  * Revision 1.13  2006/09/10 14:21:35  blueyed
  * Added url_same_protocol() (+tests) and use it for preview URL
  *
