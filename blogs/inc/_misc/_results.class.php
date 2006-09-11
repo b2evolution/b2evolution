@@ -669,7 +669,7 @@ class Results extends Widget
 		if( empty( $this->params ) )
 		{ // Use default params from Admin Skin:
 			global $AdminUI;
-			$this->params = $AdminUI->get_menu_template( 'Results' );
+			$this->params = $AdminUI->get_template( 'Results' );
 		}
 
 		// Make sure we have display parameters:
@@ -2186,6 +2186,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.30  2006/09/11 23:30:49  blueyed
+ * Fixed AdminUI::disp_payload_* for multiple blocks. Cleaned up AdminUI a bit
+ *
  * Revision 1.29  2006/09/06 23:32:56  fplanque
  * fixed itemlist nav when generating static
  *

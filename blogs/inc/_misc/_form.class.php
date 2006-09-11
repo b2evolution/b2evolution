@@ -139,7 +139,7 @@ class Form extends Widget
 		{
 			if( is_object($AdminUI) )
 			{ // Get default skin setting:
-				$template = $AdminUI->get_menu_template( 'Form' );
+				$template = $AdminUI->get_template( 'Form' );
 				$layout = $template['layout'];
 			}
 			else
@@ -2611,6 +2611,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.36  2006/09/11 23:30:49  blueyed
+ * Fixed AdminUI::disp_payload_* for multiple blocks. Cleaned up AdminUI a bit
+ *
  * Revision 1.35  2006/09/11 22:06:08  blueyed
  * Cleaned up option_list callback handling
  *

@@ -1,7 +1,7 @@
 <?php
 /**
  * This file implements the Admin UI class.
- * Admin skins should derive from this class and override {@link get_menu_template()}
+ * Admin skins should derive from this class and override {@link get_template()}
  * for example.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
@@ -35,7 +35,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * The general Admin UI class. It provides functions to handle the UI part of the
  * Backoffice.
  *
- * Admin skins should derive from this class and override {@link get_menu_template()}
+ * Admin skins should derive from this class and override {@link get_template()}
  * for example.
  *
  * @package admin
@@ -184,7 +184,6 @@ class AdminUI_general
 
 		foreach( $entries as $l_key => $l_menu_props )
 		{
-			// TODO: check perms/user settings, ... (this gets mainly done in get_html_menu_entries() for now)
 			$node['entries'][$l_key] = $l_menu_props;
 		}
 	}
@@ -392,7 +391,7 @@ class AdminUI_general
 	 * Get a menu, any level.
 	 *
 	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
-	 * @param string The template name, see {@link get_menu_template()}.
+	 * @param string The template name, see {@link get_template()}.
 	 */
 	function get_html_menu( $path = NULL, $template = 'main' )
 	{
@@ -403,30 +402,6 @@ class AdminUI_general
 		return $r;
 		*/
 		return $this->get_html_menu_entries( $path, $template );
-	}
-
-
-	/**
-	 * Display a submenu (1st sublevel).
-	 *
-	 * Should be called from within the AdminUI class.
-	 *
-	 * @access protected
-	 *
-	 * @param NULL|string|array The path (NULL defaults to first path entry). See {@link get_node_by_path()}.
-	 */
-	function disp_submenu( $path = NULL )
-	{
-		//echo ' disp_submenu-BEGIN ';
-
-		if( is_null($path) )
-		{
-			$path = array( $this->get_path(0) );
-		}
-
-		echo $this->get_html_menu( $path, 'sub' );
-
-		//echo ' disp_submenu-END ';
 	}
 
 
@@ -467,28 +442,61 @@ class AdminUI_general
 	/**
 	 * Display the start of a payload block
 	 *
-	 * Note: it should be possible to display several payload blocks on a single page
+	 * Note: it is possible to display several payload blocks on a single page.
+	 *       The first block uses the "sub" template, the others "block".
+	 *
+	 * @see disp_payload_end()
 	 * @todo check if the plugin event is appropriate. Maybe it should rather go as 'AdminAfterBodyTop' or sth like this.
 	 */
 	function disp_payload_begin()
 	{
 		global $Plugins;
 
-		$Plugins->trigger_event( 'AdminBeginPayload' );
+		if( empty($this->displayed_sub_begin) )
+		{
+			$Plugins->trigger_event( 'AdminBeginPayload' );
 
-		// Display submenu (this also opens a div class="panelblock" or class="panelblocktabs")
-		$this->disp_submenu();
+			// Display submenu (this also opens a div class="panelblock" or class="panelblocktabs")
+
+			//echo ' disp_submenu-BEGIN ';
+			$path = array( $this->get_path(0) );
+			echo $this->get_html_menu( $path, 'sub' );
+			//echo ' disp_submenu-END ';
+
+			$this->displayed_sub_begin = 1;
+		}
+		else
+		{
+			$template = $this->get_template( 'block' );
+
+			echo $template['begin'];
+		}
+
 	}
 
 
 	/**
 	 * Display the end of a payload block
 	 *
-	 * Note: it should be possible to display several payload blocks on a single page
+	 * Note: it is possible to display several payload blocks on a single page.
+	 *       The first block uses the "sub" template, the others "block".
+	 * @see disp_payload_begin()
 	 */
 	function disp_payload_end()
 	{
-		echo "</div>\n";	// class="panelblock*"
+		if( empty($this->displayed_sub_end) )
+		{
+			$name = 'sub';
+			$this->displayed_sub_end = 1;
+		}
+		else
+		{
+			$name = 'block';
+		}
+
+		$template = $this->get_template( $name );
+
+		echo $template['end'];
 	}
 
 
@@ -544,7 +552,7 @@ class AdminUI_general
 	{
 		global $current_User, $blog;
 
-		$template = $this->get_menu_template( 'CollectionList' );
+		$template = $this->get_template( 'CollectionList' );
 
 		$r = $template['before'];
 
@@ -596,7 +604,8 @@ class AdminUI_general
 	 * Get the HTML for the menu entries of a specific path.
 	 *
 	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
-	 * @param string Template name, see {@link get_menu_template()}.
+	 * @param string Template name, see {@link get_template()}.
+	 * @param int Depth (recursion)
 	 * @return string The HTML for the menu.
 	 */
 	function get_html_menu_entries( $path, $template, $depth = 0 )
@@ -605,7 +614,7 @@ class AdminUI_general
 
 		$r = '';
 
-		$templateForLevel = $this->get_menu_template( $template, $depth );
+		$templateForLevel = $this->get_template( $template, $depth );
 
 		if( !( $menuEntries = $this->get_menu_entries($path) ) )
 		{	// No menu entries at this level
@@ -671,6 +680,7 @@ class AdminUI_general
 							: $templateForLevel['beforeEachSel'];
 						$r .= $anchor;
 
+						// Recurse:
 						$r .= $this->get_html_menu_entries( $recursePath, $template, $depth+1 );
 
 						$r .= isset($templateForLevel['afterEachSelWithSub'])
@@ -785,7 +795,7 @@ class AdminUI_general
 	 * @param integer Nesting level (start at 0)
 	 * @return array Associative array which defines layout and optionally properties.
 	 */
-	function get_menu_template( $name, $depth = 0 )
+	function get_template( $name, $depth = 0 )
 	{
 		switch( $name )
 		{
@@ -845,6 +855,15 @@ class AdminUI_general
 						'afterEach'  => '</li>',
 						'beforeEachSel' => '<li class="current">',
 						'afterEachSel' => '</li>',
+						'end' => '</div>', // used to end payload block that opened submenu
+					);
+
+
+			case 'block':
+				// a payload block, anywhere "below" submenu. Gets used by disp_payload_begin()/disp_payload_end()
+				return array(
+						'begin' => '<div class="panelblock">',
+						'end' => "\n</div>",
 					);
 
 
@@ -964,7 +983,7 @@ class AdminUI_general
 			// TODO: add default settings for 'table', 'fieldset', etc...
 
 			default:
-				debug_die( 'Unknown $name for AdminUI::get_menu_template(): '.var_export($name, true) /* PHP 4.2 ! */ );
+				debug_die( 'Unknown $name for AdminUI::get_template(): '.var_export($name, true) /* PHP 4.2 ! */ );
 		}
 	}
 
@@ -1313,6 +1332,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.32  2006/09/11 23:30:49  blueyed
+ * Fixed AdminUI::disp_payload_* for multiple blocks. Cleaned up AdminUI a bit
+ *
  * Revision 1.31  2006/09/09 23:16:18  blueyed
  * minor
  *

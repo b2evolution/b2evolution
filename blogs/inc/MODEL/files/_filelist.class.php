@@ -633,7 +633,7 @@ class Filelist
 		 * This object is what the SQL or the ItemQuery object is to Results or to ItemList2. The model and the display should not be mixed.
 		 * IF NOT doing the clean objects, move this at least to file.funcs.
 		 */
-		$result_params = $AdminUI->get_menu_template('Results');
+		$result_params = $AdminUI->get_template('Results');
 
 
 		// Sorting icon:
@@ -1208,6 +1208,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.18  2006/09/11 23:30:49  blueyed
+ * Fixed AdminUI::disp_payload_* for multiple blocks. Cleaned up AdminUI a bit
+ *
  * Revision 1.17  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

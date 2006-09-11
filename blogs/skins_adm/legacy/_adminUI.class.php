@@ -47,7 +47,7 @@ class AdminUI extends AdminUI_general
 	 * @param string The template name ('main', 'sub').
 	 * @return array
 	 */
-	function get_menu_template( $name, $depth = 0 )
+	function get_template( $name, $depth = 0 )
 	{
 		switch( $name )
 		{
@@ -69,7 +69,7 @@ class AdminUI extends AdminUI_general
 
 			default:
 				// Delegate to parent class:
-				return parent::get_menu_template( $name, $depth );
+				return parent::get_template( $name, $depth );
 		}
 	}
 
