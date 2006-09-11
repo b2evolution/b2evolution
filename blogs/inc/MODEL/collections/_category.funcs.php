@@ -339,7 +339,7 @@ function cat_load_cache( $cat_load_postcounts = 'none', $dbtable_items = 'T_post
 						FROM T_categories
 						ORDER BY cat_name";
 
-		foreach( $DB->get_results( $sql, ARRAY_A ) as $myrow )
+		foreach( $DB->get_results( $sql, ARRAY_A, 'loading CAT cache' ) as $myrow )
 		{
 			$this_cat['cat_name'] = $myrow['cat_name'];
 			$this_cat['cat_blog_ID'] = $myrow['cat_blog_ID'];
@@ -759,6 +759,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.18  2006/09/11 22:29:19  fplanque
+ * chapter cleanup
+ *
  * Revision 1.17  2006/09/11 19:34:34  fplanque
  * fully powered the ChapterCache
  *

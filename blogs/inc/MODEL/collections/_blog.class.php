@@ -261,7 +261,7 @@ class Blog extends DataObject
 			$this->set( 'stub',          param( 'blog_stub',          'string', true ) );
 
 			// TODO: change * to +
-			// dh> Why? Will there be another way to have no/an empty stub?
+			// dh> Why? Will there be another way to have no/an empty stub? fp> yes, it's in a TODO somewhere (on the form?)
 			if( ! preg_match( '|^[A-Za-z0-9\-]*$|', $this->urlname ) )
 			{
 				param_error( 'blog_stub', T_('The stub name is invalid.') );
@@ -1020,6 +1020,17 @@ class Blog extends DataObject
 
 
 	/**
+	 * Template function: display name of blog
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function name( $format = 'htmlbody' )
+	{
+		$this->disp( 'name', $format );
+	}
+
+
+	/**
 	 * Get the name of the blog
 	 *
 	 * @return string
@@ -1033,6 +1044,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2006/09/11 22:29:19  fplanque
+ * chapter cleanup
+ *
  * Revision 1.25  2006/09/11 22:06:08  blueyed
  * Cleaned up option_list callback handling
  *

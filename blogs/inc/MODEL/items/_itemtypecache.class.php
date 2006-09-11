@@ -146,7 +146,7 @@ class ItemTypeCache extends DataObjectCache
 			$r .=  '<option value="'.$loop_Obj->ID.'"';
 			if( $loop_Obj->ID == $default ) $r .= ' selected="selected"';
 			$r .= '>';
-			$r .= format_to_output($loop_Obj->name);
+			$r .= format_to_output( $loop_Obj->name, 'htmlbody' );
 			$r .=  '</option>'."\n";
 		}
 
@@ -157,6 +157,9 @@ class ItemTypeCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.10  2006/09/11 22:29:19  fplanque
+ * chapter cleanup
+ *
  * Revision 1.9  2006/09/11 22:06:08  blueyed
  * Cleaned up option_list callback handling
  *

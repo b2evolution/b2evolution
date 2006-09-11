@@ -727,7 +727,7 @@ class Item extends DataObject
 			$link_title = T_('Browse category');
 		}
 
-		$BlogCache = & get_Cache( 'BlogCache' );
+		$ChapterCache = & get_Cache( 'ChapterCache' );
 
 		// Load cache for category associations with current posts
 		cat_load_postcats_cache();
@@ -741,13 +741,17 @@ class Item extends DataObject
 		$categoryNames = array();
 		foreach( $categoryIDs as $cat_ID )
 		{
-			$cat = get_the_category_by_ID($cat_ID);
-			$cat_name = format_to_output( $cat["cat_name"], $format );
+			/**
+			 * @var Chapter
+			 */
+			$Chapter = & $ChapterCache->get_by_ID( $cat_ID );
 
-			if( $link_title )
+			$cat_name = $Chapter->dget( 'name' );
+
+			if( !empty($link_title) )
 			{ // we want to display links
-				$lBlog = & $BlogCache->get_by_ID( $cat['cat_blog_ID'] );
-				$cat_name = '<a href="'.url_add_param( $lBlog->get('blogurl'), 'cat='.$cat_ID ).'" title="'.$link_title.'">'.$cat_name.'</a>';
+				$lBlog = & $Chapter->get_Blog();
+				$cat_name = '<a href="'.$Chapter->get_permanent_url().'" title="'.$link_title.'">'.$cat_name.'</a>';
 			}
 
 			if( $cat_ID == $this->main_cat_ID )
@@ -758,7 +762,7 @@ class Item extends DataObject
 				}
 				$cat_name = $before_main.$cat_name.$after_main;
 			}
-			elseif( $cat['cat_blog_ID'] == $this->blog_ID )
+			elseif( $Chapter->blog_ID == $this->blog_ID )
 			{ // We are displaying another cat in the same blog
 				if( $before_other == 'hide' )
 				{ // ignore main cat !!!
@@ -788,7 +792,12 @@ class Item extends DataObject
 	 */
 	function main_category( $format = 'htmlbody' )
 	{
-		echo format_to_output( get_catname( $this->main_cat_ID ), $format );
+		$ChapterCache = & get_Cache( 'ChapterCache' );
+		/**
+		 * @var Chapter
+		 */
+		$Chapter = & $ChapterCache->get_by_ID( $this->main_cat_ID );
+		$Chapter->disp( 'name', $format );
 	}
 
 
@@ -3072,6 +3081,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.95  2006/09/11 22:29:19  fplanque
+ * chapter cleanup
+ *
  * Revision 1.94  2006/09/11 22:06:08  blueyed
  * Cleaned up option_list callback handling
  *

@@ -483,7 +483,7 @@ class DataObjectCache
 			$r .=  '<option value="'.$loop_Obj->ID.'"';
 			if( $loop_Obj->ID == $default ) $r .= ' selected="selected"';
 			$r .= '>';
-			$r .= format_to_output( $loop_Obj->$method() );
+			$r .= format_to_output( $loop_Obj->$method(), 'htmlbody' );
 			$r .=  '</option>'."\n";
 		}
 
@@ -514,6 +514,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.15  2006/09/11 22:29:19  fplanque
+ * chapter cleanup
+ *
  * Revision 1.14  2006/09/11 22:06:08  blueyed
  * Cleaned up option_list callback handling
  *
@@ -560,98 +563,5 @@ class DataObjectCache
  *
  * Revision 1.34  2006/02/08 12:24:37  blueyed
  * doc
- *
- * Revision 1.33  2005/12/30 20:13:39  fplanque
- * UI changes mostly (need to double check sync)
- *
- * Revision 1.32  2005/12/12 19:21:21  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.28  2005/11/16 21:53:49  fplanque
- * minor
- *
- * Revision 1.27  2005/11/16 12:21:15  blueyed
- * use debug_die()
- *
- * Revision 1.26  2005/11/09 03:20:05  blueyed
- * minor
- *
- * Revision 1.25  2005/10/03 22:50:53  blueyed
- * Fixed E_NOTICE for PHP 4.4.0 and probably 5.1.x (again). Functions that return by reference must not return values!
- *
- * Revision 1.24  2005/09/29 15:26:15  fplanque
- * added get_by_name()
- *
- * Revision 1.23  2005/09/18 01:46:55  blueyed
- * Fixed E_NOTICE for return by reference (PHP 4.4.0)
- *
- * Revision 1.22  2005/09/06 17:13:54  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.21  2005/08/02 18:15:14  fplanque
- * fix for correct NULL handling
- *
- * Revision 1.20  2005/07/15 18:10:07  fplanque
- * allow instantiating of member objects (used for preloads)
- *
- * Revision 1.19  2005/06/10 18:25:44  fplanque
- * refactoring
- *
- * Revision 1.18  2005/05/16 15:17:13  fplanque
- * minor
- *
- * Revision 1.17  2005/05/11 13:21:38  fplanque
- * allow disabling of mediua dir for specific blogs
- *
- * Revision 1.16  2005/04/19 16:23:02  fplanque
- * cleanup
- * added FileCache
- * improved meta data handling
- *
- * Revision 1.15  2005/03/14 20:22:19  fplanque
- * refactoring, some cacheing optimization
- *
- * Revision 1.14  2005/03/02 15:24:29  fplanque
- * allow get_by_ID(NULL) in some situations
- *
- * Revision 1.13  2005/02/28 09:06:32  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.12  2005/02/14 21:17:45  blueyed
- * optimized cache handling
- *
- * Revision 1.11  2005/02/09 00:27:13  blueyed
- * Removed deprecated globals / userdata handling
- *
- * Revision 1.10  2005/02/08 04:45:02  blueyed
- * improved $DB get_results() handling
- *
- * Revision 1.9  2005/01/20 18:46:26  fplanque
- * debug
- *
- * Revision 1.8  2005/01/13 19:53:50  fplanque
- * Refactoring... mostly by Fabrice... not fully checked :/
- *
- * Revision 1.7  2004/12/27 18:37:58  fplanque
- * changed class inheritence
- *
- * Revision 1.5  2004/12/21 21:18:38  fplanque
- * Finished handling of assigning posts/items to users
- *
- * Revision 1.4  2004/12/17 20:38:52  fplanque
- * started extending item/post capabilities (extra status, type)
- *
- * Revision 1.3  2004/10/14 18:31:25  blueyed
- * granting copyright
- *
- * Revision 1.2  2004/10/14 16:28:40  fplanque
- * minor changes
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.18  2004/10/12 10:27:18  fplanque
- * Edited code documentation.
- *
  */
 ?>
