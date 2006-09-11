@@ -29,9 +29,9 @@ $Form->begin_form( 'fform', T_('Choose a skin') );
 	$Form->hidden( 'blog',$edited_Blog->ID );
 
 	$Form->begin_fieldset( T_('Available skins') );
-	
-	for( skin_list_start(); skin_list_next(); ) 
-	{ 
+
+	for( skin_list_start(); skin_list_next(); )
+	{
 		$skin_name = skin_list_iteminfo( 'name', false );
 		$skin_path = skin_list_iteminfo( 'path', false );
 		$skin_url = skin_list_iteminfo( 'url', false );
@@ -55,16 +55,16 @@ $Form->begin_form( 'fform', T_('Choose a skin') );
 		}
 		else
 		{
-			echo '<a href="?ctrl=collections&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;blog_default_skin='.rawurlencode($skin_name).'">'.T_('Select').'</a>';
+			echo '<a href="?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;blog_default_skin='.rawurlencode($skin_name).'">'.T_('Select').'</a>';
 		}
 		echo '</div>';
 		echo '<strong>'.$skin_name.'</strong></div>';
 		echo '</div>';
-	} 
+	}
 
 	echo '<div class="clear"></div>';
 
 	$Form->end_fieldset( );
-	
+
 $Form->end_form();
 ?>
