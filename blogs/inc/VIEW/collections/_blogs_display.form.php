@@ -55,4 +55,10 @@ $Form->buttons( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 
 $Form->end_form();
 
+/*
+ * $Log$
+ * Revision 1.3  2006/09/11 19:35:35  fplanque
+ * minor
+ *
+ */
 ?>

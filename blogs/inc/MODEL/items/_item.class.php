@@ -742,6 +742,7 @@ class Item extends DataObject
 
 		$BlogCache = & get_Cache( 'BlogCache' );
 
+		// Load cache for category associations with current posts
 		cat_load_postcats_cache();
 
 		if( isset($cache_postcats[$this->ID]) )
@@ -3084,6 +3085,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.93  2006/09/11 19:35:34  fplanque
+ * minor
+ *
  * Revision 1.92  2006/09/10 23:35:56  fplanque
  * new permalink styles
  * (decoding not implemented yet)

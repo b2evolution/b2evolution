@@ -96,13 +96,13 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Link options') );
 
 $Form->radio( 'links_extrapath', $Settings->get('links_extrapath'),
-							array(  array( 'disabled', T_('Do not use extra path info'), T_('Permalinks will look like: \'stub?title=post_title&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1\'') ),
-											array( 'short', T_('Only use post URL title'), T_('Permalinks will look like \'stub/post_title\'' ) ),
-											array( 'y', T_('Use year'), T_('Permalinks will look like \'stub/2006/post_title\'' ) ),
-											array( 'ym', T_('Use year &amp; month'), T_('Permalinks will look like \'stub/2006/12/post_title\'' ) ),
-											array( 'ymd', T_('Use year, month &amp; day'), T_('Permalinks will look like \'stub/2006/12/31/post_title\'' ) ),
-											array( 'subchap', T_('Use sub-chapter'), T_('Permalinks will look like \'stub/subchap/post_title\'' ) ),
-											array( 'chapters', T_('Use chapter path'), T_('Permalinks will look like \'stub/chapter/subchap/post_title\'' ) ),
+							array(  array( 'disabled', T_('Do not use extra path info'), T_('Permalinks will look like: \'stub?title=post-title&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1\'') ),
+											array( 'short', T_('Only use post URL title'), T_('Permalinks will look like \'stub/post-title\'' ) ),
+											array( 'y', T_('Use year'), T_('Permalinks will look like \'stub/2006/post-title\'' ) ),
+											array( 'ym', T_('Use year &amp; month'), T_('Permalinks will look like \'stub/2006/12/post-title\'' ) ),
+											array( 'ymd', T_('Use year, month &amp; day'), T_('Permalinks will look like \'stub/2006/12/31/post-title\'' ) ),
+											array( 'subchap', T_('Use sub-chapter'), T_('Permalinks will look like \'stub/subchap/post-title\'' ) ),
+											array( 'chapters', T_('Use chapter path'), T_('Permalinks will look like \'stub/chapter/subchap/post-title\'' ) ),
 										), T_('Extra path info'), true );
 
 $Form->radio( 'permalink_type', $Settings->get('permalink_type'),
@@ -143,6 +143,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.15  2006/09/11 19:35:35  fplanque
+ * minor
+ *
  * Revision 1.14  2006/09/10 23:40:47  fplanque
  * minor
  *
