@@ -1218,7 +1218,7 @@ class Form extends Widget
 			}
 
 			$r .= '\';';
-			
+
 			if(	!empty($bozo_start_modified) )
 			{
 				$r .= '
@@ -1229,7 +1229,7 @@ class Form extends Widget
 				';
 			}
 
-			
+
 			$r .='	}
 				</script>';
 		}
@@ -1456,7 +1456,7 @@ class Form extends Widget
 	 * @param string Field label to be display with the field
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - 'allow_none': allow to select [none] in list (boolean, default false)
-	 *              - 'object_callback': Object's callback method name (string, default 'option_list_return')
+	 *              - 'object_callback': Object's callback method name (string, default 'get_option_list')
 	 *              - 'loop_object_method': The method on the objects inside the callback (string, default NULL)
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
@@ -1479,7 +1479,7 @@ class Form extends Widget
 		}
 		else
 		{
-			$field_object_callback = 'option_list_return';
+			$field_object_callback = 'get_option_list';
 		}
 
 		if( isset($field_params['loop_object_method']) )
@@ -1518,7 +1518,7 @@ class Form extends Widget
 		$field_note = '',
 		$allow_none = false,
 		$field_class = '',
-		$field_object_callback = 'option_list_return',
+		$field_object_callback = 'get_option_list',
 		$field_onchange = NULL )
 	{
 		$field_params = array(
@@ -2611,6 +2611,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.35  2006/09/11 22:06:08  blueyed
+ * Cleaned up option_list callback handling
+ *
  * Revision 1.34  2006/09/08 12:05:26  blueyed
  * doc
  *

@@ -389,38 +389,22 @@ class Group extends DataObject
 
 
 	/**
-	 * Template function: display name of blog
+	 * Get name of the Group
 	 *
-	 * @param string Output format, see {@link format_to_output()}
+	 * @return string
 	 */
-	function name( $format = 'htmlbody', $disp = true )
+	function get_name()
 	{
-		if( $disp )
-		{ //the result must be displayed
-			$this->disp( 'name', $format );
-		}
-		else
-		{ //the result must be returned
-			return $this->dget( 'name', $format );
-		}
-	}
-
-
-	/**
-	 * Template function: return name of group
-	 *
-	 * @param string Output format, see {@link format_to_output()}
-	 */
-	function name_return( $format = 'htmlbody' )
-	{
-		$r = $this->name( $format, false );
-		return $r;
+		return $this->name;
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.6  2006/09/11 22:06:08  blueyed
+ * Cleaned up option_list callback handling
+ *
  * Revision 1.5  2006/07/12 20:17:13  fplanque
  * minor
  *

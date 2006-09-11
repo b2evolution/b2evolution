@@ -123,8 +123,9 @@ class ItemTypeCache extends DataObjectCache
 	 *
 	 * @param integer selected ID
 	 * @param integer collection ID
+	 * @return string
 	 */
-	function option_list_by_col_ID( $default, $col_ID )
+	function get_option_list_by_col_ID( $default, $col_ID )
 	{
 		if( !isset( $this->col_cache[$col_ID] ) )
 		{ // Collection cache for this collection ID is not set yet, so we load all item types in collection cache for this collection
@@ -145,7 +146,7 @@ class ItemTypeCache extends DataObjectCache
 			$r .=  '<option value="'.$loop_Obj->ID.'"';
 			if( $loop_Obj->ID == $default ) $r .= ' selected="selected"';
 			$r .= '>';
-			$r .= $loop_Obj->name;
+			$r .= format_to_output($loop_Obj->name);
 			$r .=  '</option>'."\n";
 		}
 
@@ -156,6 +157,9 @@ class ItemTypeCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.9  2006/09/11 22:06:08  blueyed
+ * Cleaned up option_list callback handling
+ *
  * Revision 1.8  2006/08/09 21:30:56  fplanque
  * doc
  *

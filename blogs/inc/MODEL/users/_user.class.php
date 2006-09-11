@@ -238,7 +238,7 @@ class User extends DataObject
 
 
 	/**
-	 * Get preferred name for the user.
+	 * Get preferred name of the user, according to {@link User::idmode}.
 	 *
 	 * @return string
 	 */
@@ -1005,27 +1005,9 @@ class User extends DataObject
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function preferred_name( $format = 'htmlbody', $disp = true )
+	function preferred_name( $format = 'htmlbody' )
 	{
-		if( $disp )
-		{
-			$this->disp( 'preferredname', $format );
-		}
-		else
-		{
-			return $this->dget( 'preferredname', $format );
-		}
-	}
-
-
-	/**
-	 * Return user's preferred name
-	 *
-	 * @param string Output format, see {@link format_to_output()}
-	 */
-	function preferred_name_return( $format = 'htmlbody' )
-	{
-		return $this->preferred_name( $format, false );
+		echo format_to_output( $this->get_preferred_name(), $format );
 	}
 
 
@@ -1135,6 +1117,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.40  2006/09/11 22:06:08  blueyed
+ * Cleaned up option_list callback handling
+ *
  * Revision 1.39  2006/08/19 08:50:26  fplanque
  * moved out some more stuff from main
  *

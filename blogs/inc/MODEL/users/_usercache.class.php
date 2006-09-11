@@ -219,7 +219,7 @@ class UserCache extends DataObjectCache
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID 0
 	 */
-	function blog_member_list( $blog_ID, $default = 0, $allow_none = false, $always_load_default = false, $disp = true )
+	function get_blog_member_option_list( $blog_ID, $default = 0, $allow_none = false, $always_load_default = false )
 	{
 		if( $blog_ID )
 		{ // Load requested blog members:
@@ -237,34 +237,16 @@ class UserCache extends DataObjectCache
 			$this->load_all();
 		}
 
-		if( $disp )
-		{
-			parent::option_list( $default, $allow_none, 'preferred_name' );
-		}
-		else
-		{
-			return parent::option_list_return( $default, $allow_none, 'preferred_name_return' );
-		}
-	}
-
-
-	/**
-	 * Display form option list with cache contents
-	 *
-	 * Load the cache if necessary
-	 *
-	 * @param integer selected ID
-	 * @param boolean provide a choice for "none" with ID 0
-	 */
-	function option_list( $default = 0, $allow_none = false )
-	{
-		parent::option_list( $default, $allow_none, 'preferred_name' );
+		return parent::get_option_list( $default, $allow_none, 'get_preferred_name' );
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.4  2006/09/11 22:06:08  blueyed
+ * Cleaned up option_list callback handling
+ *
  * Revision 1.3  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

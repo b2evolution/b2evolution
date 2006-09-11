@@ -296,7 +296,7 @@ function form_select(
  *
  * @param string field name
  * @param string default field value
- * @param DataObjectCache Cache containing values for list
+ * @param DataObjectCache Cache containing values for list (get_option_list() gets called on it)
  * @param string field label to be display before the field
  * @param string note to be displayed after the field
  * @param boolean allow to select [none] in list
@@ -319,7 +319,7 @@ function form_select_object(
 		echo ' class="'.$field_class.'"';
 	}
 	echo '>';
-	$field_object->option_list( $field_value, $allow_none );
+	echo $field_object->get_option_list( $field_value, $allow_none );
 	echo '  </select>';
 	echo '  <span class="notes">'.$field_note.'</span></div>';
 	echo "</fieldset>\n\n";
@@ -545,6 +545,9 @@ function form_submit( $submit_attribs = '' )
 
 /*
  * $Log$
+ * Revision 1.6  2006/09/11 22:06:08  blueyed
+ * Cleaned up option_list callback handling
+ *
  * Revision 1.5  2006/07/17 02:07:20  blueyed
  * form_formstart(): ignore "name" attribute, because it's not xhtml strict and makes no sense anyway IMHO
  *

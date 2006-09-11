@@ -681,32 +681,19 @@ class Item extends DataObject
 
 
 	/**
-	 * Template function: display list of assigned user options
-	 */
-	function assigned_user_options()
-	{
-		global $object_def;
-
-		$UserCache = & get_Cache( 'UserCache' );
-		$UserCache->blog_member_list( $this->blog_ID, $this->assigned_user_ID,
-						$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
-						($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
-						true );
-	}
-
-
-	/**
-	 * Template function: get list of assigned user options
+	 * Get list of assigned user options
+	 *
+	 * @uses UserCache::get_blog_member_option_list()
+	 * @return string HTML select options list
 	 */
 	function get_assigned_user_options()
 	{
 		global $object_def;
 
 		$UserCache = & get_Cache( 'UserCache' );
-		return $UserCache->blog_member_list( $this->blog_ID, $this->assigned_user_ID,
+		return $UserCache->get_blog_member_option_list( $this->blog_ID, $this->assigned_user_ID,
 							$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
-							($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
-							false );
+							($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */ );
 	}
 
 
@@ -2991,7 +2978,7 @@ class Item extends DataObject
 				{ // No status:
 					return '';
 				}
-				return $Element->name_return();
+				return $Element->get_name();
 
 			case 't_type':
 				// Item type (name):
@@ -3002,7 +2989,7 @@ class Item extends DataObject
 
 				$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
 				$type_Element = & $ItemTypeCache->get_by_ID( $this->typ_ID );
-				return $type_Element->name_return();
+				return $type_Element->get_name();
 
 			case 't_priority':
 				return $this->priorities[ $this->priority ];
@@ -3085,6 +3072,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.94  2006/09/11 22:06:08  blueyed
+ * Cleaned up option_list callback handling
+ *
  * Revision 1.93  2006/09/11 19:35:34  fplanque
  * minor
  *

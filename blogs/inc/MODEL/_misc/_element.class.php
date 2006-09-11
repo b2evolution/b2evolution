@@ -97,20 +97,21 @@ class Element extends DataObject
 
 
 	/**
-	 * Template function: return name of item
-	 *
-	 * @param string Output format, see {@link format_to_output()}
+	 * Get the name of the element
+	 * @return string
 	 */
-	function name_return( $format = 'htmlbody' )
+	function get_name()
 	{
-		$r = $this->name( $format, false );
-		return $r;
+		return $this->name;
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.4  2006/09/11 22:06:08  blueyed
+ * Cleaned up option_list callback handling
+ *
  * Revision 1.3  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

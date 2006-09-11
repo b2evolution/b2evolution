@@ -81,7 +81,7 @@ class GenericElement extends DataObject
 		$Debuglog->add( "Created element <strong>$this->name</strong>", 'dataobjects' );
 	}
 
-	
+
 	/**
 	 * Load data from Request form fields.
 	 *
@@ -93,11 +93,11 @@ class GenericElement extends DataObject
 
 		param_string_not_empty( $this->dbprefix.'name', T_('Please enter a name.') );
 		$this->set_from_Request( 'name' );
-		
+
 		return ! param_errors_detected();
 	}
-	
-	
+
+
 	/**
 	 * TODO
 	 *
@@ -105,29 +105,29 @@ class GenericElement extends DataObject
 	function disp_form()
 	{
 		global $ctrl, $action, $edited_name_maxlen, $form_below_list;
-		
+
 		// Determine if we are creating or updating...
-		$creating = is_create_action( $action );	
-	
+		$creating = is_create_action( $action );
+
 		$Form = & new Form( NULL, 'form' );
-		
+
 		if( !$form_below_list )
 		{ // We need to display a link to cancel editing:
 			$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 		}
-		
+
 		$Form->begin_form( 'fform', $creating ?  T_('New element') : T_('Element') );
-		
+
 		$Form->hidden( 'action', $creating ? 'create' : 'update' );
-		
+
 		$Form->hidden( 'ctrl', $ctrl );
-		
+
 		$Form->hiddens_by_key( get_memorized( 'action, ctrl' ) );
-		
+
 		$Form->text_input( $this->dbprefix.'name', $this->name, $edited_name_maxlen, T_('name'), array( 'required' => true ) );
-		
+
 		if( ! $creating ) $Form->hidden( $this->dbIDname, $this->ID );
-		
+
 		if( $creating )
 		{
 			$Form->end_form( array( array( 'submit', 'submit', T_('Record'), 'SaveButton' ),
@@ -139,40 +139,26 @@ class GenericElement extends DataObject
 															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 		}
 	}
-	
-	/**
-	 * Template function: display name of item
-	 *
-	 * @param string Output format, see {@link format_to_output()}
-	 */
-	function name( $format = 'htmlbody', $disp = true )
-	{
-		if( $disp )
-		{ //the result must be displayed
-			$this->disp( 'name', $format );
-		}
-		else
-		{ //the result must be returned
-			return $this->dget( 'name', $format );
-		}
-	}
 
 
 	/**
 	 * Template function: return name of item
 	 *
 	 * @param string Output format, see {@link format_to_output()}
+	 * @return string
 	 */
-	function name_return( $format = 'htmlbody' )
+	function get_name( $format = 'htmlbody' )
 	{
-		$r = $this->name( $format, false );
-		return $r;
+		return $this->dget( 'name', $format );
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.6  2006/09/11 22:06:08  blueyed
+ * Cleaned up option_list callback handling
+ *
  * Revision 1.5  2006/08/20 22:25:21  fplanque
  * param_() refactoring part 2
  *

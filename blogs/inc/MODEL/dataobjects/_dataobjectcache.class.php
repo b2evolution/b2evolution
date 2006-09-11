@@ -453,53 +453,16 @@ class DataObjectCache
 
 
 	/**
-	 * Display form option list with cache contents
-	 *
-	 * Load the cache if necessary
-	 *
-	 * @todo Shouldn't this use {@link option_list_return()}?
-	 *  dh> the only difference is the $method param and this method only gets used twice..
-	 * fp> yes. Furthermore, all foo_bar_return() methods should be renamed to get_foo_bar() everywhere. and the foo_bar() echo equivalents can go away everywhere too. (One of the few no so good progidistri legacies we owe to Fabrice ;)
-	 * dh> ok. started with it. BUT: with e.g. User::get_preferred_name() it does not default to $format='htmlbody' currently and all getters should rather return the raw value and not as "htmlbody"!?
-	 * dh> I'd say to not just have $method, but also $params here, which gets passed to $method. This way we can easily used dget(), without haveing a callback method just for that.
-	 *
-	 * @param integer selected ID
-	 * @param boolean provide a choice for "none" with ID ''
-	 */
-	function option_list( $default = 0, $allow_none = false, $method ='name' )
-	{
-		if( (! $this->all_loaded) && $this->load_all )
-		{ // We have not loaded all items so far, but we're allowed to... so let's go:
-			$this->load_all();
-		}
-
-		if( $allow_none )
-		{
-			echo '<option value=""';
-			if( empty($default) ) echo ' selected="selected"';
-			echo '>'.$this->get_None_option_string().'</option>'."\n";
-		}
-
-		foreach( $this->cache as $loop_Obj )
-		{
-			echo '<option value="'.$loop_Obj->ID.'"';
-			if( $loop_Obj->ID == $default ) echo ' selected="selected"';
-			echo '>';
-			$loop_Obj->$method();
-			echo '</option>'."\n";
-		}
-	}
-
-
-	/**
 	 * Returns form option list with cache contents
 	 *
 	 * Load the cache if necessary
 	 *
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID ''
+	 * @param string Callback method name
+	 * @return string
 	 */
-	function option_list_return( $default = 0, $allow_none = false, $method = 'name_return' )
+	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name' )
 	{
 		if( (! $this->all_loaded) && $this->load_all )
 		{ // We have not loaded all items so far, but we're allowed to... so let's go:
@@ -520,7 +483,7 @@ class DataObjectCache
 			$r .=  '<option value="'.$loop_Obj->ID.'"';
 			if( $loop_Obj->ID == $default ) $r .= ' selected="selected"';
 			$r .= '>';
-			$r .= $loop_Obj->$method();
+			$r .= format_to_output( $loop_Obj->$method() );
 			$r .=  '</option>'."\n";
 		}
 
@@ -551,6 +514,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.14  2006/09/11 22:06:08  blueyed
+ * Cleaned up option_list callback handling
+ *
  * Revision 1.13  2006/09/11 19:34:34  fplanque
  * fully powered the ChapterCache
  *

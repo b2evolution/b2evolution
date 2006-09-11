@@ -46,8 +46,8 @@ require_once dirname(__FILE__).'/../dataobjects/_dataobject.class.php';
 class ItemType extends DataObject
 {
 	var $name;
-	
-	
+
+
 	/**
 	 * Constructor
 	 *
@@ -72,14 +72,12 @@ class ItemType extends DataObject
 	}
 
 	/**
-	 * Template function: return name of item
-	 *
-	 * @param string Output format, see {@link format_to_output()}
+	 * Get the name of the ItemType
+	 * @return string
 	 */
-	function name_return( $format = 'htmlbody' )
+	function get_name()
 	{
-		$r = $this->dget( 'name', $format );
-		return $r;
+		return $this->name;
 	}
 }
 ?>

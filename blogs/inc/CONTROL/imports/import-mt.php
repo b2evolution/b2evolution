@@ -284,7 +284,7 @@ param( 'mode', 'string', 'normal' );
 					<select name="default_blog">
 					<?php
 					$BlogCache = & get_Cache( 'BlogCache' );
-					$BlogCache->option_list( 2 );  // use first non-all blog as default
+					echo $BlogCache->get_option_list( 2 );  // use first non-all blog as default
 					?>
 					</select>
 				</div>

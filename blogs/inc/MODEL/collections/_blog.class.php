@@ -261,6 +261,7 @@ class Blog extends DataObject
 			$this->set( 'stub',          param( 'blog_stub',          'string', true ) );
 
 			// TODO: change * to +
+			// dh> Why? Will there be another way to have no/an empty stub?
 			if( ! preg_match( '|^[A-Za-z0-9\-]*$|', $this->urlname ) )
 			{
 				param_error( 'blog_stub', T_('The stub name is invalid.') );
@@ -804,6 +805,7 @@ class Blog extends DataObject
 		}
 	}
 
+
  	/**
 	 * Get a setting.
 	 *
@@ -815,6 +817,7 @@ class Blog extends DataObject
 
 		return $this->CollectionSettings->get( $this->ID, $parname );
 	}
+
 
  	/**
 	 * Set a setting.
@@ -1017,38 +1020,22 @@ class Blog extends DataObject
 
 
 	/**
-	 * Template function: display name of blog
+	 * Get the name of the blog
 	 *
-	 * @param string Output format, see {@link format_to_output()}
+	 * @return string
 	 */
-	function name( $format = 'htmlbody', $disp = true )
+	function get_name()
 	{
-		if( $disp )
-		{ //the result must be displayed
-			$this->disp( 'name', $format );
-		}
-		else
-		{ //the result must be returned
-			return $this->dget( 'name', $format );
-		}
-	}
-
-
-	/**
-	 * Template function: return name of item
-	 *
-	 * @param string Output format, see {@link format_to_output()}
-	 */
-	function name_return( $format = 'htmlbody' )
-	{
-		$r = $this->name( $format, false );
-		return $r;
+		return $this->name;
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.25  2006/09/11 22:06:08  blueyed
+ * Cleaned up option_list callback handling
+ *
  * Revision 1.24  2006/09/11 20:53:33  fplanque
  * clean chapter paths with decoding, finally :)
  *

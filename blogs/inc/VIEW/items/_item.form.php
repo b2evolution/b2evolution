@@ -219,7 +219,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	echo ' '; // allow wrapping!
 
 	$ItemStatusCache = & get_Cache( 'ItemStatusCache' );
-	$Form->select_options( 'item_st_ID', $ItemStatusCache->option_list_return( $edited_Item->st_ID, true ), 	T_('Task status') );
+	$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->st_ID, true ), 	T_('Task status') );
 
 	echo ' '; // allow wrapping!
 
@@ -348,6 +348,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.24  2006/09/11 22:06:08  blueyed
+ * Cleaned up option_list callback handling
+ *
  * Revision 1.23  2006/09/10 14:21:35  blueyed
  * Added url_same_protocol() (+tests) and use it for preview URL
  *
