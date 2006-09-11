@@ -139,8 +139,17 @@ class categories_plugin extends Plugin
 		$this->params = $params;
 
 
-		// make sure the caches are loaded:
-		cat_query( $params['link_type'], $this->dbtable, $this->dbprefix, $this->dbIDname );
+		/**
+		 * @var ChapterCache
+		 */
+		$ChapterCache = & get_Cache( 'ChapterCache' );
+
+		$callbacks = array(
+			'line' 			 	 => array( $this, 'cat_line' ),
+			'no_children'  => array( $this, 'cat_no_children' ),
+			'before_level' => array( $this, 'cat_before_level' ),
+			'after_level'	 => array( $this, 'cat_after_level' )
+		);
 
 
 		// START DISPLAY:
@@ -149,7 +158,7 @@ class categories_plugin extends Plugin
 		echo $params['title'];
 
 		if( $blog > 1 )
-		{ // We want to display cats for one blog
+		{ // ____________________ We want to display cats for ONE blog ____________________
 			$tmp_disp = '';
 
 			if( $params['option_all'] )
@@ -166,18 +175,22 @@ class categories_plugin extends Plugin
 				$tmp_disp .= '">'.$params['option_all'].'</a>';
 				$tmp_disp .= $this->params['line_end'];
 			}
-			$tmp_disp .= cat_children( $cache_categories, $blog, NULL,
-			                           array( $this, 'callback_before_first' ), array( $this, 'callback_before_each' ),
-			                           array( $this, 'callback_after_each' ), array( $this, 'callback_after_last' ), 0 );
-			if( ! empty($tmp_disp) )
+
+			$r = $tmp_disp . $ChapterCache->recurse( $callbacks, $blog );
+
+			if( ! empty($r) )
 			{
 				echo $params['list_start'];
-				echo $tmp_disp;
+				echo $r;
 				echo $params['list_end'];
 			}
 		}
 		else
-		{ // We want to display cats for all blogs
+		{ // ____________________ We want to display cats for ALL blogs ____________________
+
+			// Make sure everything is loaded at once (vs multiple queries)
+			$ChapterCache->load_all();
+
 			echo $params['collist_start'];
 
 			for( $curr_blog_ID=blog_list_start();
@@ -188,18 +201,6 @@ class categories_plugin extends Plugin
 				{ // Skip Blogs that should not get displayed in public blog list
 					continue;
 				}
-
-				// run recursively through the cats
-				$cat_list = cat_children( $cache_categories, $curr_blog_ID, NULL,
-							array( $this, 'callback_before_first' ), array( $this, 'callback_before_each' ),
-							array( $this, 'callback_after_each' ), array( $this, 'callback_after_last' ), 0 );
-
-/* Make this a param with default to OFF (NO Skip) because even if there are no cats, the blog name is a clickable root category itself
-				if( empty( $cat_list ) )
-				{ // Skip Blogs that have no categories!
-					continue;
-				}
-*/
 
 				echo $params['coll_start'];
 				echo '<a href="';
@@ -216,10 +217,12 @@ class categories_plugin extends Plugin
 				echo '</a>';
 				echo $params['coll_end'];
 
-				if( ! empty($cat_list) )
+				$r = $ChapterCache->recurse( $callbacks, $curr_blog_ID );
+
+				if( ! empty($r) )
 				{
 					echo $params['list_start'];
-					echo $cat_list;
+					echo $r;
 					echo $params['list_end'];
 				}
 			}
@@ -314,11 +317,100 @@ class categories_plugin extends Plugin
 		return $r;
 	}
 
+
+
+	/**
+	 * Generate category line when it has children
+	 *
+	 * @param Chapter generic category we want to display
+	 * @param int level of the category in the recursive tree
+	 * @return string HTML
+	 */
+	function cat_line( $Chapter, $level )
+	{
+		$r = $this->params['line_start'];
+
+		if( $this->params['form'] )
+		{	// We want to add form fields:
+			global $cat_array;
+			$r .= '<label><input type="checkbox" name="catsel[]" value="'.$Chapter->ID.'" class="checkbox"';
+			if( in_array( $Chapter->ID, $cat_array ) )
+			{ // This category is in the current selection
+				$r .= ' checked="checked"';
+			}
+			$r .= ' /> ';
+		}
+
+		$r .= '<a href="';
+
+		if( $this->params['link_type'] == 'context' )
+		{	// We want to preserve current browsing context:
+			$r .= regenerate_url( 'cats,catsel', 'cat='.$Chapter->ID );
+		}
+		else
+		{
+			$r .= url_add_param( get_bloginfo('blogurl'), 'cat='.$Chapter->ID );
+		}
+
+		$r .= '">'.$Chapter->dget('name').'</a>';
+
+		if( $this->params['form'] )
+		{	// We want to add form fields:
+			$r .= '</label>';
+		}
+
+		$r .= $this->params['line_end'];
+
+		return $r;
+	}
+
+
+	/**
+	 * Generate category line when it has no children
+	 *
+	 * @param Chapter generic category we want to display
+	 * @param int level of the category in the recursive tree
+	 * @return string HTML
+	 */
+	function cat_no_children( $Chapter, $level )
+	{
+		return '';
+	}
+
+
+	/**
+	 * Generate code when entering a new level
+	 *
+	 * @param int level of the category in the recursive tree
+	 * @return string HTML
+	 */
+	function cat_before_level( $level )
+	{
+		$r = '';
+		if( $level > 0 ) $r .= $this->params['group_start'];
+		return $r;
+	}
+
+	/**
+	 * Generate code when exiting from a level
+	 *
+	 * @param int level of the category in the recursive tree
+	 * @return string HTML
+	 */
+	function cat_after_level( $level )
+	{
+		$r = '';
+		if( $level > 0 ) $r .= $this->params['group_end'];
+		return $r;
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.25  2006/09/11 19:34:34  fplanque
+ * fully powered the ChapterCache
+ *
  * Revision 1.24  2006/07/10 20:19:30  blueyed
  * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
  *

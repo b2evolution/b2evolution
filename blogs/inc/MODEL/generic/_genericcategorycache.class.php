@@ -46,20 +46,28 @@ load_class( 'MODEL/generic/_genericcache.class.php' );
  */
 class GenericCategoryCache extends GenericCache
 {
+
+	var $subset_cache = array();
+
 	/**
-	 * Which suibsets have been loaded
+	 * Which property of the objects defines the subset
+	 */
+	var $subset_property;
+
+	/**
+	 * Which subsets have been loaded
 	 */
 	var $loaded_subsets = array();
 
 	/**
-	 * List of category objects loaded
-	 */
-	var $cats = array();
-
-	/**
 	 * These are the level 0 categories (which have no parent)
 	 */
-	var $parent_cats = array();
+	var $root_cats = array();
+
+	/**
+	 * These are the level 0 categories (which have no parent) for each subset
+	 */
+	var $subset_root_cats = array();
 
 	/**
 	 * Have the children been revealed for all subsets yet?
@@ -74,9 +82,38 @@ class GenericCategoryCache extends GenericCache
 	/**
 	 * Constructor
 	 */
-	function GenericCategoryCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL )
+	function GenericCategoryCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL, $subset_property = NULL )
 	{
 		parent::GenericCache( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field );
+
+		$this->subset_property = $subset_property;
+	}
+
+
+	/**
+	 * Add a dataobject to the cache
+	 */
+	function add( & $Obj )
+	{
+		global $Debuglog;
+
+		if( parent::add( $Obj ) )
+		{	// Successfuly added
+
+			if( !empty($this->subset_property) )
+			{	// Also add to subset cache:
+				$this->subset_cache[$Obj->{$this->subset_property}][$Obj->ID] = & $Obj;
+			}
+			return true;
+		}
+
+		return false;
+
+
+		// If the object is valid and not already cached:
+		$this->cache[$Obj->ID] = & $Obj;
+
+		return true;
 	}
 
 
@@ -89,56 +126,88 @@ class GenericCategoryCache extends GenericCache
 	 */
 	function reveal_children( $subset_ID = NULL )
 	{
-		if( is_null( $subset_ID ) )
-		{	// No specific subset
-			if( $this->revealed_all_children )
-			{	// Children have already been revealed:
-				return;
-				/* RETURN */
-			}
+		if( $this->revealed_all_children )
+		{	// ALL Children have already been revealed: (can happen even if we require a subset *now*)
+			return;
+			/* RETURN */
+		}
+
+		if( empty($this->subset_property) )
+		{	// We are not handling subsets
 
 			// Make sure everything has been loaded:
     	$this->load_all();
 
-		}
-		else
-		{	// We're interested in a specific subset
-			if( !empty( $this->revealed_subsets[$subset_ID] ) )
-			{	// Children have already been revealed:
-				return;
-				/* RETURN */
-			}
-
-			// Make sure the requested subset has been loaded:
-    	$this->load_subset($subset_ID);
-		}
-
-
-		// Reveal children:
-		if( !empty( $this->cache ) )
-		{	// There are loaded categories, so loop on all loaded categories to set their children list if it has:
-			foreach( $this->cache as $cat_ID => $GenericCategory )
-			{
-				// echo $GenericCategory->name;
-				if( ! is_null( $GenericCategory->parent_ID ) )
-				{	// This category has a parent, so add it to its parent children list:
-					$this->cache[$GenericCategory->parent_ID]->add_children( $this->cache[$cat_ID] );
-				}
-				else
-				{	// This category has no parent, so add it to the parent categories list
-					$this->parent_cats[] = & $this->cache[$cat_ID];
+			// Reveal children:
+			if( !empty( $this->cache ) )
+			{	// There are loaded categories, so loop on all loaded categories to set their children list if it has:
+				foreach( $this->cache as $cat_ID => $GenericCategory )
+				{
+					// echo $GenericCategory->name;
+					if( ! is_null( $GenericCategory->parent_ID ) )
+					{	// This category has a parent, so add it to its parent children list:
+						$this->cache[$GenericCategory->parent_ID]->add_children( $this->cache[$cat_ID] );
+					}
+					else
+					{	// This category has no parent, so add it to the parent categories list
+						$this->root_cats[] = & $this->cache[$cat_ID];
+					}
 				}
 			}
-		}
 
-		// Children have been revealed.
-		if( is_null( $subset_ID ) )
-		{	// No specific subset
-			$this->revealed_children = true;
+			$this->revealed_all_children = true;
 		}
 		else
-		{	// We're interested in a specific subset
-			$this->revealed_subsets[$subset_ID] = true;
+		{	// We are handling subsets
+
+			if( is_null( $subset_ID ) )
+			{	// No specific subset requested, we are going to reveal all subsets
+
+				// Make sure everything has been loaded:
+    		$this->load_all();
+
+    		echo 'REVEALING ALL SUBSETS in a row. Is this needed?';
+
+				foreach( $this->subset_cache as $subset_ID => $dummy )
+				{
+					$this->reveal_children( $subset_ID );
+				}
+
+				$this->revealed_all_children = true;
+			}
+			else
+			{	// We're interested in a specific subset
+				if( !empty( $this->revealed_subsets[$subset_ID] ) )
+				{	// Children have already been revealed:
+					return;
+					/* RETURN */
+				}
+
+				// Make sure the requested subset has been loaded:
+    		$this->load_subset($subset_ID);
+
+
+				// Reveal children:
+				if( !empty( $this->subset_cache[$subset_ID] ) )
+				{	// There are loaded categories, so loop on all loaded categories to set their children list if it has:
+					foreach( $this->subset_cache[$subset_ID] as $cat_ID => $GenericCategory )
+					{
+						// echo $GenericCategory->name;
+						if( ! is_null( $GenericCategory->parent_ID ) )
+						{	// This category has a parent, so add it to its parent children list:
+							$this->cache[$GenericCategory->parent_ID]->add_children( $this->cache[$cat_ID] );
+						}
+						else
+						{	// This category has no parent, so add it to the parent categories list
+							$this->root_cats[] = & $this->cache[$cat_ID];
+							$this->subset_root_cats[$this->cache[$cat_ID]->{$this->subset_property}][] = & $this->cache[$cat_ID];
+						}
+					}
+				}
+
+				// Children have been revealed.
+				$this->revealed_subsets[$subset_ID] = true;
+			}
 		}
 	}
 
@@ -160,29 +229,65 @@ class GenericCategoryCache extends GenericCache
 
 		if( is_null( $cat_array ) )
 		{	// Get all parent categories:
-			$cat_array = $this->parent_cats;
+			if( is_null( $subset_ID ) )
+			{
+				$cat_array = $this->root_cats;
+			}
+			elseif( isset( $this->subset_root_cats[$subset_ID] ) )
+			{	// We have root cats for the requested subset:
+				$cat_array = $this->subset_root_cats[$subset_ID];
+			}
+			else
+			{
+				$cat_array = array();
+			}
 		}
 
 		$r = '';
 
-		$r .= $callbacks['before_level']( $level ); // <ul>
-
-		foreach ($cat_array as $cat )
+		if( is_array( $callbacks['before_level'] ) )
+		{ // object callback:
+			$r .= $callbacks['before_level'][0]->{$callbacks['before_level'][1]}( $level ); // <ul>
+		}
+		else
 		{
-			$r .= $callbacks['line']( $cat, $level ); // <li> Category  - or - <tr><td>Category</td></tr> ...
+			$r .= $callbacks['before_level']( $level ); // <ul>
+		}
+
+		foreach( $cat_array as $cat )
+		{
+			if( is_array( $callbacks['line'] ) )
+			{ // object callback:
+				$r .= $callbacks['line'][0]->{$callbacks['line'][1]}( $cat, $level ); // <li> Category  - or - <tr><td>Category</td></tr> ...
+			}
+			else
+			{
+				$r .= $callbacks['line']( $cat, $level ); // <li> Category  - or - <tr><td>Category</td></tr> ...
+			}
 
 			if( !empty( $cat->children ) )
 			{	// Add children categories:
 				$r .= $this->recurse( $callbacks, $subset_ID, $cat->children, $level+1 );
 			}
+			elseif( is_array( $callbacks['no_children'] ) )
+			{ // object callback:
+				$r .= $callbacks['no_children'][0]->{$callbacks['no_children'][1]}( $cat, $level ); // </li>
+			}
 			else
 			{
-				$r .=$callbacks['no_children']( $cat, $level ); // </li>
+				$r .= $callbacks['no_children']( $cat, $level ); // </li>
 			}
 
 		}
 
-		$r .= $callbacks['after_level']( $level ); // </ul>
+		if( is_array( $callbacks['after_level'] ) )
+		{ // object callback:
+			$r .= $callbacks['after_level'][0]->{$callbacks['after_level'][1]}( $level ); // </ul>
+		}
+		else
+		{
+			$r .= $callbacks['after_level']( $level ); // </ul>
+		}
 
 		return $r;
 	}
@@ -206,7 +311,7 @@ class GenericCategoryCache extends GenericCache
 
 		if( is_null( $cat_array ) )
 		{	// Get all parent categorie:
-			$cat_array = $this->parent_cats;
+			$cat_array = $this->root_cats;
 		}
 
 		$r = '';

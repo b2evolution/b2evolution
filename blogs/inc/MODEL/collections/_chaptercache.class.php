@@ -41,7 +41,7 @@ class ChapterCache extends GenericCategoryCache
 	 */
 	function ChapterCache()
 	{
-		parent::GenericCategoryCache( 'Chapter', false, 'T_categories', 'cat_', 'cat_ID', 'cat_name' );
+		parent::GenericCategoryCache( 'Chapter', false, 'T_categories', 'cat_', 'cat_ID', 'cat_name', 'blog_ID' );
 	}
 
 
@@ -128,7 +128,7 @@ class ChapterCache extends GenericCategoryCache
 	{
 		global $DB, $Debuglog;
 
-		if( isset( $this->loaded_subsets[$subset_ID] ) )
+		if( $this->all_loaded || isset( $this->loaded_subsets[$subset_ID] ) )
 		{ // Already loaded
 			return false;
 		}
@@ -142,7 +142,7 @@ class ChapterCache extends GenericCategoryCache
 						 WHERE cat_blog_ID = '.$subset_ID.'
 						 ORDER BY cat_name';
 
-		foreach( $DB->get_results( $sql ) as $row )
+		foreach( $DB->get_results( $sql, OBJECT, 'Loading chapters('.$subset_ID.') into cache' ) as $row )
 		{
 			// Instantiate a custom object
 			$this->instantiate( $row );
@@ -171,6 +171,9 @@ class ChapterCache extends GenericCategoryCache
 
 /*
  * $Log$
+ * Revision 1.5  2006/09/11 19:34:34  fplanque
+ * fully powered the ChapterCache
+ *
  * Revision 1.4  2006/09/10 23:35:56  fplanque
  * new permalink styles
  * (decoding not implemented yet)

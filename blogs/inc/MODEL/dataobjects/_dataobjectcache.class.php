@@ -127,7 +127,11 @@ class DataObjectCache
 	 */
 	function load_all()
 	{
-		global $DB, $Debuglog;
+		/**
+		 * @var DB
+		 */
+		global $DB;
+		global $Debuglog;
 
 		if( $this->all_loaded )
 		{ // Already loaded
@@ -141,7 +145,7 @@ class DataObjectCache
 							FROM '.$this->dbtablename.'
 						 ORDER BY '.$this->order_by;
 
-		foreach( $DB->get_results( $sql ) as $row )
+		foreach( $DB->get_results( $sql, OBJECT, 'Loading '.$this->objtype.'(ALL) into cache' ) as $row )
 		{
 			// Instantiate a custom object
 			$this->instantiate( $row );
@@ -547,6 +551,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.13  2006/09/11 19:34:34  fplanque
+ * fully powered the ChapterCache
+ *
  * Revision 1.12  2006/09/10 16:23:00  blueyed
  * suggestion
  *

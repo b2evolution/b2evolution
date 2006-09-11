@@ -63,13 +63,13 @@ function cat_line( $Chapter, $level )
 	{	// We have permission permission to edit:
 		$edit_url = regenerate_url( 'action,'.$Chapter->dbIDname, $Chapter->dbIDname.'='.$Chapter->ID.'&amp;action=edit' );
 		$r .= '<td>
-						<label style="padding-left: '.($level).'em;"><a href="'.$edit_url.'" title="'.T_('Edit...').'">'.$Chapter->name.'</a></label>
+						<label style="padding-left: '.($level).'em;"><a href="'.$edit_url.'" title="'.T_('Edit...').'">'.$Chapter->dget('name').'</a></label>
 					 </td>';
 	}
 	else
 	{
 		$r .= '<td>
-						 <label style="padding-left: '.($level).'em;">'.$Chapter->name.'</label>
+						 <label style="padding-left: '.($level).'em;">'.$Chapter->dget('name').'</label>
 					 </td>';
 	}
 
@@ -171,6 +171,9 @@ echo '</table>';
 
 /*
  * $Log$
+ * Revision 1.2  2006/09/11 19:34:34  fplanque
+ * fully powered the ChapterCache
+ *
  * Revision 1.1  2006/09/10 19:32:32  fplanque
  * completed chapter URL name editing
  *
