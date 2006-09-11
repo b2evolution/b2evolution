@@ -107,7 +107,7 @@ class GenericCategoryCache extends GenericCache
 			return true;
 		}
 
-		return false;
+		return false; // TODO: forgot to remove debugging code?!
 
 
 		// If the object is valid and not already cached:
