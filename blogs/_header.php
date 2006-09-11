@@ -185,6 +185,10 @@ $AdminUI->add_menu_entries(
 						'href' => 'admin.php?ctrl=chapters2&amp;blog='.$blog,
 						'perm_eval' => 'global $ctrl, $current_User; return $ctrl != "collections"
 															&& $current_User->check_perm( "blog_cats", "", false, '.$blog.' ) ;' ),
+					'urls' => array(
+						'text' => T_('URLs'),
+						'href' => 'admin.php?ctrl=coll_settings&amp;tab=urls&amp;blog='.$blog,
+						'perm_eval' => $blog_settings_parm_eval ),
 					'advanced' => array(
 						'text' => T_('Advanced'),
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog,
@@ -335,6 +339,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.19  2006/09/11 19:36:58  fplanque
+ * blog url ui refactoring
+ *
  * Revision 1.18  2006/09/09 17:51:33  fplanque
  * started new category/chapter editor
  *

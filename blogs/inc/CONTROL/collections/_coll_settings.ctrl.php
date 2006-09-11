@@ -43,6 +43,9 @@ param_action( 'edit' );
 param( 'tab', 'string', 'general', true );
 
 $BlogCache = & get_Cache( 'BlogCache' );
+/**
+ * @var Blog
+ */
 $edited_Blog = & $BlogCache->get_by_ID( $blog );
 $Blog = & $edited_Blog; // used for "Exit to blogs.." link
 
@@ -84,6 +87,14 @@ switch( $action )
 				{ // Commit update to the DB:
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog skin selection has been updated'), 'success' );
+				}
+				break;
+
+			case 'urls':
+				if( $edited_Blog->load_from_Request( array() ) )
+				{ // Commit update to the DB:
+					$edited_Blog->dbupdate();
+					$Messages->add( T_('The blog settings have been updated'), 'success' );
 				}
 				break;
 
@@ -144,6 +155,10 @@ switch( $AdminUI->get_path(1) )
 		$AdminUI->disp_view( 'collections/_blogs_display.form.php' );
 		break;
 
+	case 'urls':
+		$AdminUI->disp_view( 'collections/_urls.form.php' );
+		break;
+
 	case 'advanced':
 		$AdminUI->disp_view( 'collections/_blogs_advanced.form.php' );
 		break;
@@ -167,6 +182,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2006/09/11 19:36:58  fplanque
+ * blog url ui refactoring
+ *
  * Revision 1.1  2006/09/09 17:51:33  fplanque
  * started new category/chapter editor
  *

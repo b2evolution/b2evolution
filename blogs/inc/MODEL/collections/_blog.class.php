@@ -206,6 +206,24 @@ class Blog extends DataObject
 		}
 
 
+		if( param( 'blog_urlname',   'string', NULL ) !== NULL )
+		{	// check urlname
+			if( param_check_not_empty( 'blog_urlname', T_('You must provide an URL blog name!') ) )
+			{
+				$this->set_from_Request( 'urlname' );
+
+				if( $DB->get_var( 'SELECT COUNT(*)
+														 FROM T_blogs
+														WHERE blog_urlname = '.$DB->quote($this->get( 'urlname' )).'
+														  AND blog_ID <> '.$this->ID
+														) )
+				{ // urlname is already in use
+					param_error( 'blog_urlname', T_('This URL name is already in use by another blog. Please choose another name.') );
+				}
+			}
+		}
+
+
 		if( ($siteurl_type = param( 'blog_siteurl_type',   'string', NULL )) !== NULL )
 		{ // Blog URL parameters:
 			// TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
@@ -241,24 +259,13 @@ class Blog extends DataObject
 				// dh> I'm using it with "absolute URL" to have no "stub file" at all..
 				// param_check_not_empty( 'blog_stub', T_('You must provide a stub file name, e-g: a_stub.php') );
 			}
-
-			// check urlname
-			if( param_string_not_empty( 'blog_urlname', T_('You must provide an URL blog name!') ) )
-			{
-				$this->set_from_Request( 'urlname' );
-
-				if( $DB->get_var( 'SELECT COUNT(*)
-														 FROM T_blogs
-														WHERE blog_urlname = '.$DB->quote($this->get( 'urlname' )).'
-														  AND blog_ID <> '.$this->ID
-														) )
-				{ // urlname is already in use
-					param_error( 'blog_urlname', T_('This URL name is already in use by another blog. Please choose another name.') );
-				}
-			}
-
 		}
 
+
+		if( param( 'chapter_links',   'string', NULL ) !== NULL )
+		{ // Feedback options:
+			$this->set_setting( 'chapter_links', get_param( 'chapter_links' ) );
+		}
 
 		if( param( 'blog_default_skin',  'string', NULL ) !== NULL )
 		{	// Default blog:
@@ -1030,6 +1037,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2006/09/11 19:36:58  fplanque
+ * blog url ui refactoring
+ *
  * Revision 1.22  2006/09/10 20:59:18  fplanque
  * extended extra path info setting
  *

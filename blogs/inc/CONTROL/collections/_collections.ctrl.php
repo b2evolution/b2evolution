@@ -112,19 +112,14 @@ switch( $action )
 
 			$Messages->add( T_('The new blog has been created.'), 'success' );
 
-			if( param( 'blogtemplate', 'integer', -1 ) == -1 )
-			{
-				$Messages->add( sprintf( T_('You should <a %s>create categories</a> for this blog now!'),
-												'href="?ctrl=chapters&amp;action=newcat&amp;blog='.$edited_Blog->ID.'"' ), 'note' );
-			}
-			else
-			{
-				// copy the categories from $blogtemplateid to $blog
-				// TODO: checkbox on duplication form
-				blog_copy_cats($blogtemplate, $edited_Blog->ID);
+			// Successful creation, move on to chapters:
+			$Messages->add( T_('You should create chapters for this blog now!'), 'note' );
 
-				$Messages->add( T_('Categories have been duplicated.'), 'success' );
-			}
+			// Set Messages into user's session, so they get restored on the next page (after redirect):
+			$Session->set( 'Messages', $Messages );
+
+			header_nocache();
+			header_redirect( 'admin.php?ctrl=chapters2&blog='.$edited_Blog->ID );
 		}
 		break;
 
@@ -249,6 +244,7 @@ switch($action)
 {
 	case 'new':
 	case 'copy':
+	case 'create': // in case of validation error
 		// ---------- "New blog" form ----------
 		echo '<div class="panelblock">';
 		echo '<h2>'.T_('New blog').':</h2>';
@@ -335,6 +331,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2006/09/11 19:36:58  fplanque
+ * blog url ui refactoring
+ *
  * Revision 1.1  2006/09/09 17:51:33  fplanque
  * started new category/chapter editor
  *

@@ -48,6 +48,7 @@ class CollectionSettings extends AbstractSettings
 	 */
 	var $_defaults = array(
 			'new_feedback_status' => 'draft',  // 'draft', 'published' or 'deprecated'
+			'chapter_links' => 'param_num',		 // 'param_num', 'subchap', 'chapters'
 		);
 
 
@@ -63,6 +64,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.3  2006/09/11 19:36:58  fplanque
+ * blog url ui refactoring
+ *
  * Revision 1.2  2006/04/21 23:14:16  blueyed
  * Add Messages according to Comment's status.
  *
