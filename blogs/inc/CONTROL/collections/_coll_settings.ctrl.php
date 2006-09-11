@@ -125,7 +125,7 @@ switch( $action )
  * Display page header, menus & messages:
  */
 $blogListButtons = $AdminUI->get_html_collection_list( 'blog_properties', 'edit',
-											'?ctrl=collections&amp;action=edit&amp;blog=%d&amp;tab='.$tab,
+											'?ctrl=coll_settings&amp;action=edit&amp;blog=%d&amp;tab='.$tab,
 											T_('List'), '?ctrl=collections&amp;blog=0' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -182,6 +182,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2006/09/11 20:51:09  blueyed
+ * Use coll_settings as controller in blog list, when in coll_settings, except for the "all" button.
+ *
  * Revision 1.2  2006/09/11 19:36:58  fplanque
  * blog url ui refactoring
  *
