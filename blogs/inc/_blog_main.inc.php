@@ -210,15 +210,18 @@ if( $resolve_extra_path )
 				elseif( preg_match( '|^[A-Za-z0-9\-]+$|', $last_part ) )
 				{	// We are pointing to a chapter/category:
 					$ChapterCache = & get_Cache( 'ChapterCache' );
+					/**
+					 * @var Chapter
+					 */
 					$Chapter = & $ChapterCache->get_by_urlname( $last_part, false );
 					if( empty( $Chapter ) )
 					{	// We could not match a chapter...
 						$path_error = 404;
 					}
 					else
-					{
+					{	// We could match a chapter from the extra path:
 						$cat = $Chapter->ID;
-					}
+			    }
 				}
 				else
 				{	// We did not get anything we can decode...
@@ -230,15 +233,6 @@ if( $resolve_extra_path )
 
 		if( $path_error == 404 )
 		{	// The request points to something we won't be able to resolve:
-
-			// First check, if it's an old-style backoffice-Path (from a redirect-everything non-existing to index.php mod_rewrite rule):
-			if( strpos( $ReqPath, '/admin/' ) === 0 )
-			{
-				// Redirect to admin url and pass request_uri as path_info, so it can be resolved by admin.php to the right menu entry:
-				header_redirect( $admin_url.'/'.substr($ReqURI, 7), true );
-				exit;
-			}
-
 			require $view_path.'errors/_404_not_found.page.php'; // error & exit
 		}
 	}
@@ -261,6 +255,7 @@ elseif( !empty($p) || !empty($title) )
 	}
 	else
 	{
+		$title = preg_replace( '/[^A-Za-z0-9]/', '-', $title );
 		$Item = & $ItemCache->get_by_urltitle( $title, false );
 	}
 	if( empty( $Item ) )
@@ -269,38 +264,54 @@ elseif( !empty($p) || !empty($title) )
 		require $view_path.'errors/_404_not_found.page.php'; // error & exit
 	}
 
-	// fp>> TODO: a more generic canonical URL checker. Should work also on date changes, cat changes...
-
-	if( !empty($title) )
-	{ // Replace any non standard chars with a - (which is the new word separator in v 2.0; used to be _)
-		$old_title = $title;	// Sabve this for later comparison
-		$title = preg_replace( '/[^A-Za-z0-9]/', '-', $title );
-		if( $redirect_to_canonical_title )
-		{	// Check if we have requested the canonical title:
-			if( $old_title != $Item->urltitle )
-			{	// We have asked for an existing Item but not with its canonical title (probably an old permalink), redirect!
-				// fp> TODO: Note: we may be loosing a few specific params here, like page=2 for example. Not tragic, but could be better.
-				header_redirect( $Item->get_permanent_url( '', '', false, '&' ), true );
-				exit();
-			}
-		}
-	}
-
-	// On single post requests, check if we're on the right blog!
-	if( $redirect_to_postblog )
-	{ // Yes we need to check.
-		if( $Item->blog_ID != $blog )
-		{ // We're on the wrong blog (probably an old permalink) let's redirect!
-			// fp> TODO: Note: we may be loosing a few specific params here, like page=2 for example. Not tragic, but could be better.
-			header_redirect( $Item->get_permanent_url( '', '', false, '&' ), true );
-			exit();
+	// EXPERIMENTAL:
+	// Please document encountered problems.
+	if( $redirect_to_canonical_url )
+	{
+		$canoncical_url = $Item->get_permanent_url( '', '', false, '&' );
+		// pre_dump( $canoncical_url, $ReqHost.$ReqURI );
+		// There may be some parameters additional at the end of the URL, but the beginning should be canoncial.
+		if( strpos( $ReqHost.$ReqURI, $Item->get_permanent_url( '', '', false, '&' ) ) !== 0 )
+		{	// The requested URL does not look like the canonical URL for this post,
+			// REDIRECT TO THE CANONICAL URL:
+			// fp> TODO: we're going to lose the additional params, it would be better to keep them...
+			header_redirect( $canoncical_url, true );
 		}
 	}
 
 }
-elseif( empty( $disp ) )
+
+
+if( $disp == 'posts' )
 { // default display:
-	$disp = 'posts';
+	// EXPERIMENTAL:
+	// Please document encountered problems.
+	if( $redirect_to_canonical_url )
+	{
+    param_compile_cat_array();  // fp> is this overkill here?
+    
+    if( preg_match( '|^[0-9]+$|', $cat ) )
+    { // We are requesting a specific category (either byparam or extra path)
+		  // Check if this was a complex request or just a category request:
+      // fp> Note: catsel[]= will not be redirected on purpose
+		  if( empty($_SERVER['QUERY_STRING'])		// no additional param
+			  || preg_match( '|^cat=[0-9]+$|', $_SERVER['QUERY_STRING'] ) )	// just a single cat param and nothing else 
+		  {	// This was just a category request, let's check if the URL was canonical:
+        if( !isset( $Chapter ) )
+        {
+					$ChapterCache = & get_Cache( 'ChapterCache' );
+					$Chapter = & $ChapterCache->get_by_ID( $cat_array[0], false );          
+        }
+			  $canoncical_url = $Chapter->get_permanent_url( NULL, NULL, '&' );
+			  if( $ReqHost.$ReqURI != $canoncical_url )
+			  {
+				  // REDIRECT TO THE CANONICAL URL:
+				  // fp> TODO: we're going to lose the additional params, it would be better to keep them...
+				  header_redirect( $canoncical_url, true );
+			  }
+		  }
+    }
+  }
 }
 
 
@@ -476,6 +487,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.42  2006/09/12 00:31:30  fplanque
+ * 301 redirects to canonical URLs
+ * EXPERIMENTAL - please report problems
+ *
  * Revision 1.41  2006/09/11 20:53:33  fplanque
  * clean chapter paths with decoding, finally :)
  *

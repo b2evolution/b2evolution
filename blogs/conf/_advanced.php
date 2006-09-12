@@ -147,8 +147,12 @@ $notify_from = $instance_name.'@'.preg_replace( '/^www\./i', '', $basehost );
 /**
  * If a particular post is requested (by id or title) but on the wrong blog,
  * do you want to automatically redirect to the right blog?
- *
  * This is overly useful if you move posts or categories from one blog to another
+ *
+ * If a particular post is requested (by title) but not the the exact same title
+ * do you want to automatically redirect to the right title?
+ * This is overly useful when using urltitles since they have changed in v 2.0 ( _ became - )
+ * May be disabled for performance if you were not using versions < 2.0
  *
  * If this is disabled, there are 2 possible situations:
  * - Either the post is no longer part of the requested blog, and you get a "Sorry, nothing to display"
@@ -156,18 +160,7 @@ $notify_from = $instance_name.'@'.preg_replace( '/^www\./i', '', $basehost );
  *
  * @var boolean
  */
-$redirect_to_postblog = false;
-
-/**
- * If a particular post is requested (by title) but not the the exact same title
- * do you want to automatically redirect to the right title?
- *
- * This is overly useful when using urltitles since they have changed in v 2.0 ( _ became - )
- * May be disabled for performance if you were not using versions < 2.0
- *
- * @var boolean
- */
-$redirect_to_canonical_title = true;
+$redirect_to_canonical_url = true;
 
 
 // ** DB options **
