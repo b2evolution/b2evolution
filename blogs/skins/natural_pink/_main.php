@@ -256,11 +256,16 @@ skin_content_header();	// Sets charset!
 	<p class="baseline">
 		Original <a href="http://b2evolution.net/">b2evolution</a> template design by <a href="http://severinelandrieu.com/">S&eacute;verine LANDRIEU</a> &amp; <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a>.
 	</p>
+  <p class="baseline">
+    Credits: <a href="http://skinfaktory.com/">skin makers</a>
 	<?php
 		// Display additional credits (see /conf/_advanced.php):
  		// If you can add your own credits without removing the defaults, you'll be very cool :))
 		// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
-		display_list( $credit_links, '<p class="baseline">'.T_('Credits').': ', '</p>', '|', ' ', ' ' );
+		display_list( $credit_links, '|', '', '|', ' ', ' ' );
+  ?>
+  </p>
+  <?php
 		$Hit->log();	// log the hit on this page
 		debug_info(); // output debug info if requested
 	?>

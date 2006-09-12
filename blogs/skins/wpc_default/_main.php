@@ -235,11 +235,12 @@ skin_content_header();	// Sets charset!
 </div>
 
 <p class="credit"><cite>powered by &nbsp;<a href="http://b2evolution.net/" title="<?php echo T_('Powered by b2evolution; multilingual multiuser multi-blog engine.'); ?>"><img src="<?php echo $rsc_url; ?>img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></cite>
+Credits: <a href="http://skinfaktory.com/">skin converting</a>
 <?php
 	// Display additional credits (see /conf/_advanced.php):
  	// If you can add your own credits without removing the defaults, you'll be very cool :))
  	// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
-	display_list( $credit_links, T_('Credits').': ', ' ', '|', ' ', ' ' );
+	display_list( $credit_links, '|', ' ', '|', ' ', ' ' );
 ?>
 <br />
 <?php echo T_('This skin features a CSS file originally designed for WordPress (See design credits in style.css).') ?><br />
