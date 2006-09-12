@@ -197,8 +197,8 @@ $db_config['aliases'] = array(
 		'T_coll_user_perms'    => $tableprefix.'blogusers',
 		'T_coll_settings'      => $tableprefix.'coll_settings',
 		'T_comments'           => $tableprefix.'comments',
-		'T_cron__log'				 => $tableprefix.'cron__log',
-		'T_cron__task'			 => $tableprefix.'cron__task',
+		'T_cron__log'				   => $tableprefix.'cron__log',
+		'T_cron__task'			   => $tableprefix.'cron__task',
 		'T_files'              => $tableprefix.'files',
 		'T_filetypes'          => $tableprefix.'filetypes',
 		'T_groups'             => $tableprefix.'groups',
@@ -558,8 +558,8 @@ $force_regexp_dirname = '';
  * (Not recommended for plugins with potential security weaknesses)
  */
 $credit_links = array(
-	array( 'http://b2evolution.net/', 'b2evo' ),
-	array( 'http://evocore.net/', 'evoCore' ),
+	array( 'http://b2evolution.net/', 'blog tool' ),
+	array( 'http://evocore.net/', 'framework' ),
 	array( 'http://plusjamaisseul.net/', 'test site' ),
 );
 

@@ -683,7 +683,7 @@ class Plugin
 	 * @param array Associative array of parameters.
 	 *   - 'target_type': either 'Comment' or 'Item'.
 	 *   - 'edit_layout': "simple", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
-	 *                    NOTE: Respect the "simple" mode, which should display only the most simple things!
+	 *                    NOTE: Please respect the "simple" mode, which should display only the most simple things!
 	 * @return boolean did we display a button?
 	 */
 	function AdminDisplayEditorButton( $params )
@@ -2579,6 +2579,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.91  2006/09/12 00:46:47  fplanque
+ * no message
+ *
  * Revision 1.90  2006/09/11 22:23:04  blueyed
  * (Re-)enabled AdminDisplayEditorButton for "simple" edit_layout, after adding appropriate doc.
  *
