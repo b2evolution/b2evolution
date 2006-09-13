@@ -126,6 +126,11 @@ label.radiooption {
 	margin: 0 0 0 25%;
 	/* border: 1px solid #f00; */
 }
+* html .fform div.input {
+	height:1%; /* so IE6 gains layout (hasLayout) and does not cause 3px bug for lines below div.label (if div.input is heigher than div.label) */
+	margin:0; /* fix the margin after the above fix */
+}
+
 .fform fieldset.input{
 	margin: 0;
 	/* border: 1px solid #0f0; */
