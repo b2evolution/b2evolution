@@ -196,17 +196,17 @@ function get_postdata($postid)
  */
 function previous_post( $format='&lt;&lt; % ', $previous='#', $title='yes', $in_same_cat='no', $limitprev=1, $excluded_categories='', $in_same_blog = true )
 {
-	global $disp, $posts;
+	global $disp, $posts, $postdata;
 
-	if( $disp != 'single' && $posts != 1 )
+	// TODO: $postdata is not set here!! (which is generally good - as of "deprecating those globals", but bad in this context)
+
+	if( empty($postdata) || ($disp != 'single' && $posts != 1) )
 	{
 		return;
 	}
 
-	global $DB, $postdata;
+	global $DB;
 	global $Blog;
-
-	// TODO: $postdata is not set here!! (which is generally good - as of "deprecating those globals", but bad in this context)
 
 	if( $previous == '#' ) $previous = T_('Previous post') . ': ';
 
@@ -231,7 +231,7 @@ function previous_post( $format='&lt;&lt; % ', $previous='#', $title='yes', $in_
 		}
 	}
 
-	if( $in_same_blog && isset($postdata['Blog']) )
+	if( $in_same_blog )
 	{
 		$from .= ' INNER JOIN T_categories ON post_main_cat_ID = cat_ID';
 		$sqlcat .= ' AND cat_blog_ID = '.$postdata['Blog'];
@@ -273,17 +273,17 @@ function previous_post( $format='&lt;&lt; % ', $previous='#', $title='yes', $in_
  */
 function next_post( $format = '% &gt;&gt; ', $next = '#', $title = 'yes', $in_same_cat = 'no', $limitnext = 1, $excluded_categories = '', $in_same_blog = true )
 {
-	global $disp, $posts;
+	global $disp, $posts, $postdata;
 
-	if( $disp != 'single' && $posts != 1 )
+	// TODO: $postdata is not set here!! (which is generally good - as of "deprecating those globals", but bad in this context)
+
+	if( empty($postdata) || ($disp != 'single' && $posts != 1) )
 	{
 		return;
 	}
 
-	global $postdata, $localtimenow, $DB;
+	global $localtimenow, $DB;
 	global $Blog;
-
-	// TODO: $postdata is not set here!! (which is generally good - as of "deprecating those globals", but bad in this context)
 
 	if( $next == '#' ) $next = T_('Next post') . ': ';
 
@@ -643,6 +643,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.25  2006/09/13 23:38:06  blueyed
+ * Fix for next_post()/previous_post(), if there is no $postdata - e.g. on /yyyy/mm/dd/not-found-title
+ *
  * Revision 1.24  2006/09/02 00:16:21  blueyed
  * Merge from branches
  *
