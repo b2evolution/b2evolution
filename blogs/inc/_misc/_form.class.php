@@ -72,6 +72,7 @@ class Form extends Widget
 	var $_opentags = array( 'fieldset' => 0 );
 
 	/**
+	 * Suffix for LABELs. Only gets used, if {@link $label_to_the_left} is true.
 	 * @var string
 	 */
 	var $label_suffix = ':';
@@ -116,6 +117,21 @@ class Form extends Widget
 	 * Do we need to add javascript for check/uncheck all functionality
 	 */
 	var $check_all = false;
+
+	/**
+	 * Additional Javascript to append to the form, in {@link Form::end_form()}.
+	 *
+	 * @access protected
+	 * @var array
+	 */
+	var $append_javascript = array();
+
+	/**
+	 * Display param errors with fields, appended to the note?
+	 * @var boolean
+	 */
+	var $disp_param_err_messages_with_fields = true;
+
 
 	/**
 	 * Constructor
@@ -608,7 +624,8 @@ class Form extends Widget
 	 * Builds a date input field.
 	 *
 	 * @param string the name of the input field
-	 * @param string initial value (ISO datetime or erroneous if the field is in error state)
+	 * @param string initial value (ISO datetime (YYYY-MM-DD HH:MM:SS)
+	 *               or erroneous if the field is in error state)
 	 * @param string label displayed in front of the field
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - date_format: Format of the date (string, PHP format, default taken from {@link locale_datefmt()})
@@ -632,8 +649,8 @@ class Form extends Widget
 
 		// Convert PHP date format to JS library date format:
 		// WARNING: this is very incomplete!! Please expand as needed.
-		$js_date_format = preg_replace(
-			array( '/d/', '/m/', '/y/', '/Y/' ),
+		$js_date_format = str_replace(
+			array( 'd', 'm', 'y', 'Y' ),
 			array( 'dd', 'MM', 'yy', 'yyyy' ),
 			$date_format );
 
@@ -1273,18 +1290,26 @@ class Form extends Widget
 		$r .= "\n</form>\n\n";
 
 		// When the page loads, Initialize all the parent child select lists
-		$r .= '<script type="text/javascript">
-							if( typeof addEvent == "function" && typeof init_dynamicSelect == "function" )
-							{
-								addEvent( window, "load", init_dynamicSelect, false );
-								';
-								if( $this->check_all )
-								{ // Init check_all event on check_all links
-									$r .= 'addEvent( window, "load", init_check_all, false );';
-								}
-								$r .= '
-							}
-						</script>';
+		$r .= '
+			<script type="text/javascript">
+				if( typeof addEvent == "function" && typeof init_dynamicSelect == "function" )
+				{
+					addEvent( window, "load", init_dynamicSelect, false );
+					';
+					if( $this->check_all )
+					{ // Init check_all event on check_all links
+						$r .= 'addEvent( window, "load", init_check_all, false );';
+					}
+					$r .= '
+				}
+				';
+
+				if( $this->append_javascript )
+				{ // Append Javascript that we have added
+					$r .= implode( "\n", $this->append_javascript );
+				}
+				$r .= '
+			</script>';
 
 		// Reset (in case we re-use begin_form! NOTE: DO NOT REUSE begin_form, it's against the spec.)
 		$this->hiddens = array();
@@ -1835,9 +1860,14 @@ class Form extends Widget
 
 		if( !empty($field_label) )
 		{
-			$r .= $this->labelstart
-						.$field_label.$this->label_suffix
-						.$this->labelend;
+			$r .= $this->labelstart.$field_label;
+
+			if( $this->label_to_the_left )
+			{
+				$r .= $this->label_suffix;
+			}
+
+			$r .= $this->labelend;
 		}
 		else
 		{ // Empty label:
@@ -2375,9 +2405,13 @@ class Form extends Widget
 	/**
 	 * Generate a general input element.
 	 *
-	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
-	 *              - input_prefix: Text before <input /> (string, default '')
-	 *              - input_suffix: Text after <input /> (string, default "\n")
+	 * @param array Optional params.
+	 *    Additionally to {@link $_common_params} you can use:
+	 *    - input_prefix: Text before <input /> (string, default '')
+	 *    - input_suffix: Text after <input /> (string, default "\n")
+	 *    - input_help: Gets used as default value on empty input (type=text)
+	 *      elements. It gets attached through JavaScript (onfocus, onblur and form.onsubmit).
+	 *
 	 * @return string The <input /> element.
 	 */
 	function get_input_element( $field_params = array(), $parse_common = true )
@@ -2405,6 +2439,13 @@ class Form extends Widget
 		else
 		{
 			$input_suffix = "\n";
+		}
+
+		if( isset($field_params['input_help']) && ( empty($field_params['type']) || $field_params['type'] == 'text' ) )
+		{
+			$this->append_javascript[] = 'input_decorated_help( "'.$field_params['id'].'", "'.format_to_output($field_params['input_help'], 'formvalue').'" );';
+
+			unset($field_params['input_help']); // no HTML attribute
 		}
 
 		$r = $input_prefix
@@ -2448,16 +2489,20 @@ class Form extends Widget
 		if( !empty($this->_common_params['label']) )
 		{
 			$r .= $this->labelstart
-						.'<label'
-						.( !empty($this->_common_params['id'])
-							? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
-							: '' )
-						.'>'
-						.$this->_common_params['label']
-						.$this->label_suffix
-						#.( isset($this->_common_params['required']) && $this->_common_params['required'] ? ' <span class="required">[*]</span>' : '' )
-						.'</label>'
-						.$this->labelend;
+				.'<label'
+				.( !empty($this->_common_params['id'])
+					? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
+					: '' )
+				.'>'
+				.$this->_common_params['label'];
+
+			if( $this->label_to_the_left )
+			{
+				$r .= $this->label_suffix;
+			}
+
+			$r .= '</label>'
+				.$this->labelend;
 		}
 		else
 		{ // Empty label:
@@ -2576,7 +2621,10 @@ class Form extends Widget
 					: 'field_error';
 			}
 
-			$this->_common_params['note'] .= ' <span class="field_error">'.param_get_error_msg( $field_params['name'] ).'</span>';
+			if( $this->disp_param_err_messages_with_fields )
+			{
+				$this->_common_params['note'] .= ' <span class="field_error">'.param_get_error_msg( $field_params['name'] ).'</span>';
+			}
 		}
 		elseif( isset($this->_common_params['required']) && $this->_common_params['required'])
 		{
@@ -2611,6 +2659,12 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.37  2006/09/13 17:13:48  blueyed
+ * - $disp_param_err_messages_with_fields setting
+ * - general "input_help" param, which decorates the field with Javascript attached default/help value
+ * - only display $label_suffix if label is on the left
+ * - doc
+ *
  * Revision 1.36  2006/09/11 23:30:49  blueyed
  * Fixed AdminUI::disp_payload_* for multiple blocks. Cleaned up AdminUI a bit
  *
