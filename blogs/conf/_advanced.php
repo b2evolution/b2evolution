@@ -197,8 +197,8 @@ $db_config['aliases'] = array(
 		'T_coll_user_perms'    => $tableprefix.'blogusers',
 		'T_coll_settings'      => $tableprefix.'coll_settings',
 		'T_comments'           => $tableprefix.'comments',
-		'T_cron__log'				   => $tableprefix.'cron__log',
-		'T_cron__task'			   => $tableprefix.'cron__task',
+		'T_cron__log'          => $tableprefix.'cron__log',
+		'T_cron__task'         => $tableprefix.'cron__task',
 		'T_files'              => $tableprefix.'files',
 		'T_filetypes'          => $tableprefix.'filetypes',
 		'T_groups'             => $tableprefix.'groups',
@@ -550,11 +550,11 @@ $force_regexp_dirname = '';
  * Here you can give credit where credit is due ;)
  * These will appear in the footer of all skins (if the skins are compatible)
  * You can also add site sponsors here.
- * 
+ *
  * If you can add your own credits without removing the samples below, you'll be very cool :))
  * Please leave the credits at the bottom of your pages to make sure your blog gets listed on b2evolution.net
- * 
- * Note: some plugins may add their own credit at the end of this array. 
+ *
+ * Note: some plugins may add their own credit at the end of this array.
  * (Not recommended for plugins with potential security weaknesses)
  */
 $credit_links = array(
