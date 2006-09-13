@@ -511,12 +511,18 @@ function param_check_regexp( $var, $err_msg, $field_err_msg = NULL )
  * Sets a date parameter by converting locale date (if valid) to ISO date.
  *
  * If the date is not valid, it is set to the param unchanged (unconverted).
+ *
+ * @param string param name
+ * @param string error message
+ * @param boolean Is a non-empty date required?
+ * @param string Default (in the format of $date_format)
+ * @param string|NULL date format (php format), defaults to {@link locale_datefmt()}
  */
-function param_date( $var, $err_msg, $required, $default = '' )
+function param_date( $var, $err_msg, $required, $default = '', $date_format = NULL )
 {
 	param( $var, 'string', $default );
 
-	$iso_date = param_check_date( $var, $err_msg, $required );
+	$iso_date = param_check_date( $var, $err_msg, $required, $date_format );
 
 	if( $iso_date )
 	{
@@ -944,7 +950,7 @@ function param_check_passwords( $var1, $var2, $required = false )
 /**
  * Check if there have been validation errors
  *
- * We play it safe here and check for all kind of errors, not just those from this particlar class.
+ * We play it safe here and check for all kind of errors, not just those from this particular class.
  *
  * @return integer
  */
@@ -1046,7 +1052,7 @@ function param_error_multiple( $vars, $err_msg, $field_err_msg = NULL )
 /**
  * This function is used by {@link param_error()} and {@link param_error_multiple()}.
  *
- * If {@link $link_log_messages_to_field_IDs} is true, it will link those parts of the
+ * If {@link $link_param_err_messages_to_field_IDs} is true, it will link those parts of the
  * error message that are not already links, to the html IDs of the fields with errors.
  *
  * @param string param name
@@ -1060,7 +1066,7 @@ function param_add_message_to_Log( $var, $err_msg, $log_category = 'error' )
 	if( !empty($link_param_err_messages_to_field_IDs) )
 	{
 		$var_id = Form::get_valid_id($var);
-		$start_link = '<a href="#'.$var_id.'" onclick="var form_elem = document.getElementById(\''.$var_id.'\'); if( form_elem ) { form_elem.select(); }">';
+		$start_link = '<a href="#'.$var_id.'" onclick="var form_elem = document.getElementById(\''.$var_id.'\'); if( form_elem ) { if(form_elem.select) { form_elem.select(); } else if(form_elem.focus) { form_elem.focus(); } }">'; // "SELECT" does not have .select()
 
 		if( strpos( $err_msg, '<a' ) !== false )
 		{ // there is at least one link in $err_msg, link those parts that are no links
@@ -1555,6 +1561,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.10  2006/09/13 17:08:29  blueyed
+ * Added $date_format param to param_date(); doc fixes; JS fix
+ *
  * Revision 1.9  2006/09/10 14:50:48  fplanque
  * minor / doc
  *
