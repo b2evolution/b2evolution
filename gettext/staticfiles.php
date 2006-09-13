@@ -28,6 +28,7 @@ define( 'EVO_MAIN_INIT', true );
  * Load required functions
  */
 require $misc_inc_path.'_log.class.php';
+require $misc_inc_path.'_param.funcs.php';
 require $misc_inc_path.'_misc.funcs.php';
 require $misc_inc_path.'_form.funcs.php';
 require dirname(__FILE__).'/pofile.class.php';

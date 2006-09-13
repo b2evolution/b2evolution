@@ -107,7 +107,7 @@ msgstr ""
 #: ../../doc/upgradefrom_b2.src.html:24
 #: ../../doc/upgradefrom_b2evo.src.html:24
 #: ../../doc/upgradefrom_mt.src.html:24
-msgid "Support"
+msgid "Forums"
 msgstr ""
 
 #: ../../index.src.html:28
@@ -131,42 +131,50 @@ msgid "You will find complete information on the official <a %s>b2evolution webs
 msgstr ""
 
 #: ../../index.src.html:36
-msgid "Quickstart instructions:"
+msgid "<strong>WARNING:</strong> This is a BETA release. There are still bugs we know of, but we consider the software is globally operational! :-&gt;"
 msgstr ""
 
 #: ../../index.src.html:37
+msgid "NOTE: This version is and will continue to be fully supported in the upgrading scheme and procedures."
+msgstr ""
+
+#: ../../index.src.html:38
+msgid "Quickstart instructions:"
+msgstr ""
+
+#: ../../index.src.html:39
 msgid "You can set up b2evolution in just a few minutes. Just follow the instructions matching your situation:"
 msgstr ""
 
-#: ../../index.src.html:40
+#: ../../index.src.html:42
 #: ../../doc/install_new.src.html:6
 #: ../../doc/install_new.src.html:32
 msgid "Installing b2evolution from scratch"
 msgstr ""
 
-#: ../../index.src.html:42
+#: ../../index.src.html:44
 #: ../../doc/upgradefrom_b2evo.src.html:6
 #: ../../doc/upgradefrom_b2evo.src.html:32
 msgid "Upgrading from a previous version of b2evolution"
 msgstr ""
 
-#: ../../index.src.html:44
+#: ../../index.src.html:46
 msgid "Upgrading from other blog software:"
 msgstr ""
 
-#: ../../index.src.html:46
+#: ../../index.src.html:48
 msgid "Cafelog/b2"
 msgstr ""
 
-#: ../../index.src.html:47
+#: ../../index.src.html:49
 msgid "Movable Type"
 msgstr ""
 
-#: ../../index.src.html:48
+#: ../../index.src.html:50
 msgid "WordPress"
 msgstr ""
 
-#: ../../index.src.html:54
+#: ../../index.src.html:56
 #: ../../doc/install_new.src.html:56
 #: ../../doc/upgradefrom_b2.src.html:74
 #: ../../doc/upgradefrom_b2evo.src.html:54
@@ -174,7 +182,7 @@ msgstr ""
 msgid "official website"
 msgstr ""
 
-#: ../../index.src.html:55
+#: ../../index.src.html:57
 #: ../../doc/install_new.src.html:57
 #: ../../doc/upgradefrom_b2.src.html:75
 #: ../../doc/upgradefrom_b2evo.src.html:55
@@ -182,7 +190,7 @@ msgstr ""
 msgid "GNU GPL license"
 msgstr ""
 
-#: ../../index.src.html:56
+#: ../../index.src.html:58
 #: ../../doc/install_new.src.html:58
 #: ../../doc/upgradefrom_b2.src.html:76
 #: ../../doc/upgradefrom_b2evo.src.html:56
@@ -191,7 +199,7 @@ msgid "contact"
 msgstr ""
 
 #: ../../doc/install_new.src.html:34
-msgid "To install b2evolution you need a PHP enabled web server. Nowadays, renting a server from a hosting company is cheap. Check out our selection of <a %s>hosting offers</a>."
+msgid "To install b2evolution you need a web server. Nowadays, renting a server from a hosting company is cheap. Check out our selection of <a %s>hosting offers</a>."
 msgstr ""
 
 #: ../../doc/install_new.src.html:35
