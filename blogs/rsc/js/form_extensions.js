@@ -62,7 +62,7 @@ function get_form( object )
  * @param integer force set/unset
  */
 function check( object, action )
-{ 
+{
 
 	form_obj = get_form( object );
 
@@ -82,10 +82,10 @@ function check( object, action )
 		}
 		i++;
 	}
-	
+
 	// Cancel default action:
 	return false;
-} 
+}
 
 
 /**
@@ -134,12 +134,12 @@ function cancelClick( e )
 	{	// Firefox
 		e.preventDefault();
 	}
-	return false;	
+	return false;
 }
 
 
 /**
- *	Surround or unsurrond all' surround_check' span restrict to check_val   
+ *	Surround or unsurrond all' surround_check' span restrict to check_val
  *	used to surround all check_all checkboxes
  */
 function surround_check( e, class_name, check_val )
@@ -147,56 +147,56 @@ function surround_check( e, class_name, check_val )
 	var el = findTarget(e);
 	// Get the parent form
 	el_form = get_form( el );
-	// Get all form inputs 
+	// Get all form inputs
 	el_inputs = el_form.getElementsByTagName( 'INPUT' );
-	
+
 	// Loop on all inputs
 	for( i = 0 ; i < el_inputs.length ; i++ )
-	{	
+	{
 		el_input = el_inputs[i];
-		
+
 		if( el_input.type == 'checkbox' )
 		{	// The input is a checkbox
-			if( check_val == null || el_input.checked == check_val ) 
+			if( check_val == null || el_input.checked == check_val )
 			{	// Change the parent (span) class
 				el_input.parentNode.className = class_name;
 			}
 		}
-	}	
+	}
 }
 
 /**
- *	Suround all not checked checkboxes 
+ *	Suround all not checked checkboxes
  */
 function surround_unchecked( e )
-{	
+{
 	surround_check( e, 'checkbox_surround', false );
 }
 /**
- *	Suround all checked checkboxes 
+ *	Suround all checked checkboxes
  */
 function surround_checked( e )
-{	
+{
 	surround_check( e, 'checkbox_surround', true);
 }
 
 /**
- *	Unsuround all checkboxes 
+ *	Unsuround all checkboxes
  */
 function unsurround_all( e )
-{	
+{
 	surround_check( e, 'checkbox_surround_init', null);
 }
 
 /*
- * 	Add links event on all check_all and un_chek_all links 
+ * 	Add links event on all check_all and un_chek_all links
  */
 function init_check_all()
 {	// Get all check_all elements
-	
+
 	//var exx = document.getElementsByName('surround_check');
 	//alert(exx.length);
-	
+
 	var check_links = document.getElementsByName('check_all_nocheckchanges')
 	// Add click event on all check_all links
 	for( var i=0; i < check_links.length ; i++ )
@@ -225,7 +225,7 @@ function init_check_all()
 function clear_form( object )
 {
 	object = check( object, false );
-	
+
 	// empties all the input fields of the form
 	i = 0;
 	while( i < object.length )
@@ -236,14 +236,14 @@ function clear_form( object )
 		}
 		i++;
 	}
-	
+
 	return object;
 }
 
 
 /**
- * focus on the first form input text 
- */	
+ * focus on the first form input text
+ */
 function focus_on_first_input()
 {
 	all_inputs = document.getElementsByTagName( 'input' );
@@ -283,26 +283,68 @@ function focus_on_first_input()
  * @param string class name for the input text
  */
 function check_combo( el_ID, value, class_name )
-{	
+{
 	if( value == 'new' )
 	{	// Display the input text and focus on
-		
+
 		// Get the combo the input text
-		input_text = document.getElementById(el_ID+'_combo' );	
-		
+		input_text = document.getElementById(el_ID+'_combo' );
+
 		// Display the input text
 		input_text.style.display = "inline";
-			
+
  		// Focus on the new input text
-		input_text.focus(); 		
+		input_text.focus();
 	}
-	else 
+	else
 	{ // Hide the input text
-	
+
 		// Get the combo the input text
-		input_text = document.getElementById(el_ID+'_combo' );	
-		
+		input_text = document.getElementById(el_ID+'_combo' );
+
 		// Hide the input text
 		input_text.style.display = "none";
 	}
+}
+
+
+/**
+ * Decorate an input field with a "help value", which gets
+ * removed onfocus and re-added onblur (if the fields real
+ * value is still unchanged).
+ *
+ * @param string ID of the input field
+ * @param string "Help value"
+ */
+function input_decorated_help( id, hvalue )
+{
+	var elm = document.getElementById(id);
+
+	var onblur = function() {
+			if( elm.value == '' || elm.value == hvalue )
+			{
+				elm.style.color = '#666';
+				elm.value = hvalue;
+			}
+		}
+
+	addEvent( elm, 'blur', onblur, false );
+
+	addEvent( elm, 'focus', function() {
+			elm.style.color = '';
+
+			if( elm.value == hvalue )
+				elm.value = '';
+		}, false );
+
+	/* on form's submit: set to empty, if help value */
+	addEvent( elm.form, 'submit', function() {
+			if( elm.value == hvalue )
+			{
+				elm.value = '';
+			}
+		}, false );
+
+	// init:
+	onblur();
 }
