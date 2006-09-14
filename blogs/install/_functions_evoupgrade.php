@@ -1078,8 +1078,8 @@ function upgrade_b2evo_tables()
 				24 => 'ALTER TABLE T_comments ADD COLUMN comment_allow_msgform TINYINT NOT NULL DEFAULT \'0\' AFTER comment_spam_karma',
 				25 => 'ALTER TABLE T_hitlog CHANGE COLUMN hit_referer_type hit_referer_type   ENUM(\'search\',\'blacklist\',\'referer\',\'direct\') NOT NULL',
 				26 => 'ALTER TABLE T_hitlog ADD COLUMN hit_agnt_ID        INT UNSIGNED NULL AFTER hit_remote_addr',
-				27 => 'ALTER TABLE T_links ADD INDEX link_itm_ID( link_itm_ID )',
-				28 => 'ALTER TABLE T_links ADD INDEX link_dest_itm_ID (link_dest_itm_ID)',
+				27 => 'ALTER TABLE T_links ADD INDEX link_itm_ID( link_itm_ID )', // TODO: drop previous INDEX link_item_ID, if existing (or rename?) - see http://forums.b2evolution.net/viewtopic.php?p=43796#43796
+				28 => 'ALTER TABLE T_links ADD INDEX link_dest_itm_ID (link_dest_itm_ID)', // TODO: drop previous INDEX link_dest_item_ID, if existing (or rename?) - see http://forums.b2evolution.net/viewtopic.php?p=43796#43796
 				30 => 'ALTER TABLE T_plugins CHANGE COLUMN plug_priority plug_priority        TINYINT NOT NULL default 50',
 				31 => 'ALTER TABLE T_plugins ADD COLUMN plug_code            VARCHAR(32) NULL AFTER plug_classname',
 				32 => 'ALTER TABLE T_plugins ADD COLUMN plug_apply_rendering ENUM( \'stealth\', \'always\', \'opt-out\', \'opt-in\', \'lazy\', \'never\' ) NOT NULL DEFAULT \'never\' AFTER plug_code',
@@ -1402,6 +1402,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.173  2006/09/14 19:01:42  blueyed
+ * TODO: drop previous/obsolete/duplicate INDEX link_item_ID/link_dest_item_ID
+ *
  * Revision 1.172  2006/09/10 20:59:18  fplanque
  * extended extra path info setting
  *
