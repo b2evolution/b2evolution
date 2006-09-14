@@ -695,10 +695,10 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
  	$r['opened'] = ( $Root->ID == $fm_FileRoot->ID && $rootSubpath == $fm_Filelist->get_rds_list_path() ) ? true : NULL;
 
 	// Folder Icon + Name:
+	$url = regenerate_url( 'root,path,fm_disp_browser', 'root='.$Root->ID.'&amp;path='.$rootSubpath.'&amp;fm_disp_browser=1#fm_browser' ); // link to "fm_browser" anchor/id, at the top of the filelist
 	$label = '<label for="radio_'.$id_path.'">'
-		.action_icon( T_('Open this directory in the file manager'), 'folder',
-						regenerate_url( 'root,path,fm_disp_browser', 'root='.$Root->ID.'&amp;path='.$rootSubpath.'&amp;fm_disp_browser=1' ) )
-		.'<a href="'.regenerate_url( 'root,path,fm_disp_browser', 'root='.$Root->ID.'&amp;path='.$rootSubpath.'&amp;fm_disp_browser=1' ).'"
+		.action_icon( T_('Open this directory in the file manager'), 'folder', $url )
+		.'<a href="'.$url.'"
 		title="'.T_('Open this directory in the file manager').'">'
 		.( empty($rootSubpath) ? $Root->name : basename( $path ) )
 		.'</a>'
@@ -745,6 +745,9 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.22  2006/09/14 22:06:38  blueyed
+ * get_directory_tree(): link to "fm_browser" anchor/id, at the top of the filelist
+ *
  * Revision 1.21  2006/08/19 08:50:26  fplanque
  * moved out some more stuff from main
  *
