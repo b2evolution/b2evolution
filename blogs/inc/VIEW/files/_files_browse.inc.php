@@ -377,7 +377,7 @@ while( $lFile = & $fm_Filelist->get_next() )
 	{	// This mode allows to insert img tags into the post...
 		// Hidden info used by Javascript:
 		echo '<input type="hidden" name="img_tag_'.$countFiles.'" id="img_tag_'.$countFiles
-		    .'" value="'.format_to_output( $lFile->get_tag(), 'formvalue' ).'">';
+		    .'" value="'.format_to_output( $lFile->get_tag(), 'formvalue' ).'" />';
 	}
 
 	echo '</td>';
@@ -955,6 +955,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.22  2006/09/14 21:11:57  blueyed
+ * HTML fix
+ *
  * Revision 1.21  2006/09/10 15:27:53  blueyed
  * doc
  *
