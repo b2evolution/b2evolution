@@ -166,15 +166,18 @@ function trackback(
 	if ( preg_match("/<error>[\r\n\t ]*(\d+)[\r\n\t ]*<\/error>/", $result, $error) )
 	{
 		preg_match("/<message>(.*?)<\/message>/", $result, $error_message);
+
+		$message = isset($error_message[1]) ? $error_message[1] : '';
+
 		switch ($error[1]) {
 			case '0':
-				$result_message = '[' . T_('Succeeded') . '] ' . $error_message[1];
+				$result_message = '[' . T_('Succeeded') . '] ' . $message;
 				break;
 			case '1':
-				$result_message = '[' . T_('Failed') . '] ' . $error_message[1];
+				$result_message = '[' . T_('Failed') . '] ' . $message;
 				break;
 			default:
-				$result_message = '[' . T_('Unknown error') . ' (' . $error[1] . ')] ' . $error_message[1];
+				$result_message = '[' . T_('Unknown error') . ' (' . $error[1] . ')] ' . $message;
 				break;
 		}
 	}
@@ -218,6 +221,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.10  2006/09/15 23:42:15  blueyed
+ * Fixed possible E_NOTICE when sending a successful trackback
+ *
  * Revision 1.9  2006/08/21 16:07:44  fplanque
  * refactoring
  *
