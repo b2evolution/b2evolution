@@ -96,7 +96,8 @@ switch($action)
 		// Set object params:
 		$edited_Item->load_from_Request();
 
-		// TODO: Add a radio into blog settings > Features > Post title: () required () optional () none
+		// TODO: fp> Add a radio into blog settings > Features > Post title: () required () optional () none
+		//       dh> there's no "Features" tab in "Blog settings"?!
 		/*
 		if( empty($edited_Item->title) )
 		{ // post_title is "TEXT NOT NULL" and a title makes sense anyway
@@ -544,6 +545,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2006/09/16 18:59:41  blueyed
+ * QUESTION
+ *
  * Revision 1.28  2006/09/06 20:45:34  fplanque
  * ItemList2 fixes
  *
