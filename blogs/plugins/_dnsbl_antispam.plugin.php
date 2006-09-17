@@ -440,7 +440,7 @@ class dnsbl_antispam_plugin extends Plugin
 			$this->update_stats( 'blocked' );
 
 			// The error for our error page:
-			$error_ip_blocked = sprintf( /* TRANS: %s is the name of a DNS blacklist */ T_('Your IP address is listed in &laquo;%s&raquo;.'), $ip_blocked_by );
+			$error_ip_blocked = sprintf( /* TRANS: %s is the name of a DNS blacklist */ T_('Your IP address (%s) is listed in &laquo;%s&raquo;.'), $Hit->IP, $ip_blocked_by );
 
 			$this->display_error_page( $error_ip_blocked );
 			exit();
@@ -684,6 +684,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.34  2006/09/17 21:27:24  blueyed
+ * Minor improvement to blocked-error: show IP
+ *
  * Revision 1.33  2006/08/20 22:25:22  fplanque
  * param_() refactoring part 2
  *
