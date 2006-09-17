@@ -261,7 +261,9 @@ function locale_restore_previous()
 
 
 /**
- * returns true if locale has been changed
+ * Activate a locale.
+ *
+ * @todo dh> this should make sure, that e.g. "charset" is set for the locale in {@link $locales}. See http://forums.b2evolution.net/viewtopic.php?p=43980#43980
  *
  * @param string locale to activate
  * @param boolean True on success/change, false on failure (if already set or not existant)
@@ -898,6 +900,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.23  2006/09/17 21:28:13  blueyed
+ * doc. todo.
+ *
  * Revision 1.22  2006/08/20 22:25:21  fplanque
  * param_() refactoring part 2
  *
