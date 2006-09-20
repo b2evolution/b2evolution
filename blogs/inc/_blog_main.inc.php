@@ -289,18 +289,18 @@ if( $disp == 'posts' )
 	if( $redirect_to_canonical_url )
 	{
     param_compile_cat_array();  // fp> is this overkill here?
-    
+
     if( preg_match( '|^[0-9]+$|', $cat ) )
     { // We are requesting a specific category (either byparam or extra path)
 		  // Check if this was a complex request or just a category request:
       // fp> Note: catsel[]= will not be redirected on purpose
 		  if( empty($_SERVER['QUERY_STRING'])		// no additional param
-			  || preg_match( '|^cat=[0-9]+$|', $_SERVER['QUERY_STRING'] ) )	// just a single cat param and nothing else 
+			  || preg_match( '|^cat=[0-9]+$|', $_SERVER['QUERY_STRING'] ) )	// just a single cat param and nothing else
 		  {	// This was just a category request, let's check if the URL was canonical:
         if( !isset( $Chapter ) )
         {
 					$ChapterCache = & get_Cache( 'ChapterCache' );
-					$Chapter = & $ChapterCache->get_by_ID( $cat_array[0], false );          
+					$Chapter = & $ChapterCache->get_by_ID( $cat_array[0], false );
         }
 			  $canoncical_url = $Chapter->get_permanent_url( NULL, NULL, '&' );
 			  if( $ReqHost.$ReqURI != $canoncical_url )
@@ -336,8 +336,8 @@ if( ($disp == 'posts') || ($disp == 'single') )
 		$postIDarray = $MainList->get_page_ID_array();
 	}
 	else
-	{	// We want to preview a	single post, we are going to fake a lot of things...
-		$MainList->peview_from_request();
+	{	// We want to preview a single post, we are going to fake a lot of things...
+		$MainList->preview_from_request();
 
 		// Legacy for the category display
 		$cat_array = array();
@@ -487,6 +487,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.43  2006/09/20 14:28:34  blueyed
+ * Fixed typo in function name Item::peview_request()
+ *
  * Revision 1.42  2006/09/12 00:31:30  fplanque
  * 301 redirects to canonical URLs
  * EXPERIMENTAL - please report problems

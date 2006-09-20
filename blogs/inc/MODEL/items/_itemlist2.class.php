@@ -550,10 +550,9 @@ class ItemList2 extends DataObjectList2
 
 
 	/**
-	 * We want to preview a	single post, we are going to fake a lot of things...
-	 *
+	 * We want to preview a single post, we are going to fake a lot of things...
 	 */
-	function peview_from_request()
+	function preview_from_request()
 	{
 		global $DB, $localtimenow, $Messages, $current_User, $BlogCache;
 
@@ -1633,6 +1632,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.28  2006/09/20 14:28:35  blueyed
+ * Fixed typo in function name Item::peview_request()
+ *
  * Revision 1.27  2006/09/07 00:48:55  fplanque
  * lc parameter for locale filtering of posts
  *
