@@ -555,6 +555,7 @@ class ItemList2 extends DataObjectList2
 	function preview_from_request()
 	{
 		global $DB, $localtimenow, $Messages, $current_User, $BlogCache;
+		global $Plugins;
 
 		$preview_userid = param( 'preview_userid', 'integer', true );
 		$post_status = param( 'post_status', 'string', true );
@@ -651,6 +652,12 @@ class ItemList2 extends DataObjectList2
 		$this->page = 1;
 
 		parent::query( false, false, false );
+
+		$Item = & $this->Cache->instantiate( $this->rows[0] );
+
+		// Trigger plugin event
+		// E.g. the youtube plugin uses this to see if it applies to rendering
+		$Plugins->trigger_event( 'AppendItemPreviewTransact', array( 'Item' => & $Item ) );
 	}
 
 
@@ -1632,6 +1639,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.29  2006/09/20 14:38:39  blueyed
+ * Fixed regression: AppendItemPreviewTransact has not been triggered anymore since Itemlist2
+ *
  * Revision 1.28  2006/09/20 14:28:35  blueyed
  * Fixed typo in function name Item::peview_request()
  *
