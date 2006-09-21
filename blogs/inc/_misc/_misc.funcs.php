@@ -1589,7 +1589,7 @@ function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
 	{	// Soft debugging only....
 		if( ! @mail( $to, $subject, $message, $headerstring ) )
 		{
-			$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
+			$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
 			return false;
 		}
 	}
@@ -2495,6 +2495,9 @@ function url_same_protocol( $url, $other_url = NULL )
 
 /*
  * $Log$
+ * Revision 1.116  2006/09/21 17:35:54  blueyed
+ * Add failure message to "error" category of Debuglog, instead of "note".
+ *
  * Revision 1.115  2006/09/10 14:21:35  blueyed
  * Added url_same_protocol() (+tests) and use it for preview URL
  *
