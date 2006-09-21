@@ -28,6 +28,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'MODEL/dataobjects/_dataobject.class.php' );
+
 /**
  * Cronjob
  *
@@ -114,6 +116,9 @@ class Cronjob extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2006/09/21 15:26:28  blueyed
+ * Fixed dependency (and tests)
+ *
  * Revision 1.1  2006/08/24 00:43:28  fplanque
  * scheduled pings part 2
  *
