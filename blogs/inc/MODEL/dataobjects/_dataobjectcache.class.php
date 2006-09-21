@@ -179,8 +179,7 @@ class DataObjectCache
 		$objtype = $this->objtype;
 		foreach( $DB->get_results( $sql ) as $row )
 		{
-			$this->add( new $objtype( $row ) );
-			// TODO: use instantiate()
+			$this->instantiate( $row );
 		}
 	}
 
@@ -514,6 +513,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.16  2006/09/21 16:38:50  blueyed
+ * load_list(): use instantiate(), not really tested, but should work.
+ *
  * Revision 1.15  2006/09/11 22:29:19  fplanque
  * chapter cleanup
  *
