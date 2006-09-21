@@ -277,6 +277,15 @@ $schema_queries = array(
 			PRIMARY KEY ( uset_user_ID, uset_name )
 		)" ),
 
+	'T_item__prerendering' => array(
+		'Creating item cache table',
+		'CREATE TABLE T_item__prerendering(
+			itpr_itm_ID                   INT(11) UNSIGNED NOT NULL,
+			itpr_format                   ENUM(\'htmlbody\', \'entityencoded\', \'xml\', \'text\'),
+			itpr_content_prerendered      TEXT NULL,
+			PRIMARY KEY (itpr_itm_ID, itpr_format)
+		)' ),
+
 	'T_itemstatuses' => array(
 		'Creating table for Post Statuses',
 		"CREATE TABLE T_itemstatuses (
@@ -482,6 +491,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.32  2006/09/21 16:54:26  blueyed
+ * Experimental caching of pre-rendered item content. Added table T_item__prerendering.
+ *
  * Revision 1.31  2006/09/10 17:33:02  fplanque
  * started to steam up the categories/chapters
  *

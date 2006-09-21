@@ -205,6 +205,7 @@ $db_config['aliases'] = array(
 		'T_hitlog'             => $tableprefix.'hitlog',
 		'T_itemstatuses'       => $tableprefix.'poststatuses',
 		'T_itemtypes'          => $tableprefix.'posttypes',
+		'T_item__prerendering' => $tableprefix.'item__prerendering',
 		'T_links'              => $tableprefix.'links',
 		'T_locales'            => $tableprefix.'locales',
 		'T_plugins'            => $tableprefix.'plugins',

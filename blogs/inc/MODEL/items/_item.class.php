@@ -173,7 +173,7 @@ class Item extends DataObject
 	 * Have post processing notifications been handled?
 	 * @var string
 	 */
-  var $notifications_status;
+	var $notifications_status;
 	/**
 	 * Which cron task is responsible for handling notifications?
 	 * @var integer
@@ -219,6 +219,14 @@ class Item extends DataObject
 
 
 	var $priorities;
+
+	/**
+	 * Pre-rendered content, cached by format.
+	 * @see Item::get_prerendered_content()
+	 * @access protected
+	 * @var array|NULL
+	 */
+	var $content_prerendered;
 
 
 	/**
@@ -904,26 +912,85 @@ class Item extends DataObject
 
 
 	/**
-	 * Make sure, the pages are split up:
+	 * Get the rendered content. If it has not been generated yet, it will.
+	 *
+	 * @todo dh> Currently this makes up one query per displayed item. Probably the cache should get pre-fetched by ItemList2?
+	 * @todo dh> In general, $content_prerendered gets only queried once per item, so it seems like a memory waste to cache the query result..!
+	 *
+	 * @param string Format, see {@link format_to_output()}.
+	 *        Only "htmlbody", "entityencoded", "xml" and "text" get cached.
+	 * @return string
 	 */
-	function split_pages()
+	function get_prerendered_content( $format )
 	{
-		if( is_null( $this->content_pages ) )
+		if( ! isset( $this->content_prerendered[$format] ) )
+		{
+			$use_cache = $this->ID && in_array( $format, array( 'htmlbody', 'entityencoded', 'xml', 'text' ) );
+
+			if( $use_cache )
+			{ // the format/item can be cached:
+				global $DB;
+
+				$cache = $DB->get_var( '
+					SELECT itpr_content_prerendered
+						FROM T_item__prerendering
+					 WHERE itpr_itm_ID = '.$this->ID.'
+						 AND itpr_format = "'.$format.'"', 0, 0, 'Check prerendered item content' );
+
+				if( $cache !== NULL ) // may be empty string
+				{ // Retrieved from cache:
+					$this->content_prerendered[$format] = $cache;
+				}
+			}
+
+			if( ! isset( $this->content_prerendered[$format] ) )
+			{
+				global $Plugins, $Debuglog;
+
+				$post_renderers = $Plugins->validate_list( $this->get_renderers() );
+				$this->content_prerendered[$format] = $Plugins->render( $this->content, $post_renderers, $format, array( 'Item' => $this ) );
+
+				$Debuglog->add( 'Generated pre-rendered content ['.$format.']', 'items' );
+
+				if( $use_cache )
+				{ // save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
+					$DB->query( '
+						REPLACE INTO T_item__prerendering (itpr_itm_ID, itpr_format, itpr_content_prerendered)
+						 VALUES ( '.$this->ID.', "'.$format.'", '.$DB->quote($this->content_prerendered[$format]).' )', 'Cache prerendered item content' );
+				}
+			}
+		}
+
+		return $this->content_prerendered[$format];
+	}
+
+
+	/**
+	 * Make sure, the pages are split up
+	 *
+	 * @param string Format, used to retrieve the matching cache; see {@link format_to_output()}
+	 */
+	function split_pages( $format = 'htmlbody' )
+	{
+		if( ! isset( $this->content_pages[$format] ) )
 		{
 			// SPLIT PAGES:
-			$this->content_pages = explode( '<!--nextpage-->', $this->content);
-			$this->pages = count( $this->content_pages );
+			$this->content_pages[$format] = explode( '<!--nextpage-->', $this->get_prerendered_content($format) );
+			$this->pages = count( $this->content_pages[$format] );
 		}
 	}
 
 
 	/**
-	 * Get a specific page to display:
+	 * Get a specific page to display
+	 *
+	 * @param integer Page number
+	 * @param string Format, used to retrieve the matching cache; see {@link format_to_output()}
 	 */
-	function get_content_page( $page )
+	function get_content_page( $page, $format = 'htmlbody' )
 	{
 		// Make sure, the pages are split up:
-		$this->split_pages();
+		$this->split_pages($format);
 
 		if( $page < 1 )
 		{
@@ -935,7 +1002,7 @@ class Item extends DataObject
 			$page = $this->pages;
 		}
 
-		return $this->content_pages[$page-1];
+		return $this->content_pages[$format][$page-1];
 	}
 
 
@@ -947,7 +1014,8 @@ class Item extends DataObject
 	 *
 	 * WARNING: parameter order is different from deprecated the_content(...)
 	 *
-	 * @todo Param order and cleanup
+	 * @todo fp> Param order and cleanup
+	 * @todo dh> Provide get_content() method (and use it here)
 	 * @param mixed page number to display specific page, # for url parameter
 	 * @param mixed true to display 'more' text (which means "full post"), false not to display, # for url parameter
 	 * @param string text to display as the more link
@@ -1011,7 +1079,7 @@ class Item extends DataObject
 			global $page;
 			$disppage = $page;
 		}
-		$content_page = $this->get_content_page( $disppage );
+		$content_page = $this->get_content_page( $disppage, $format ); // cannot include format_to_output() because of the magic below.. eg '<!--more-->' will get stripped in "xml"
 
 
 		$content_parts = explode('<!--more-->', $content_page);
@@ -1051,10 +1119,6 @@ class Item extends DataObject
 			$output = $content_parts[0];
 		}
 
-		// Apply rendering
-		$post_renderers = $Plugins->validate_list( $this->get_renderers() );
-		$output = $Plugins->render( $output, $post_renderers, $format, array( 'Item' => $this ) );
-
 		// Trigger Display plugins:
 		$output = $Plugins->get_trigger_event( 'DisplayItemAllFormats', array(
 				'data' => & $output,
@@ -1066,6 +1130,7 @@ class Item extends DataObject
 		// Character conversions
 		$output = format_to_output( $output, $format );
 
+		// TODO: make $cut also work for other formats..
 		if( ($format == 'xml') && $cut )
 		{ // Let's cut this down...
 			$blah = explode(' ', $output);
@@ -2540,7 +2605,7 @@ class Item extends DataObject
 																false, $this->dbprefix, $this->dbIDname, $this->dbtablename ) );
 		}
 
-		// TODO: allow a plugin to cancel update here (by returning false)? ()
+		// TODO: dh> allow a plugin to cancel update here (by returning false)?
 		$Plugins->trigger_event( 'PrependItemUpdateTransact', $params = array( 'Item' => & $this ) );
 
 		if( $result = parent::dbupdate() )
@@ -2548,6 +2613,9 @@ class Item extends DataObject
 
 			// Let's handle the extracats:
 			$this->insert_update_extracats( 'update' );
+
+			// Empty pre-rendered content cache - any item property may have influence on it:
+			$DB->query( 'DELETE FROM T_item__prerendering WHERE itpr_itm_ID = '.$this->ID );
 
 			$DB->commit();
 
@@ -2569,19 +2637,30 @@ class Item extends DataObject
 	 */
 	function dbdelete()
 	{
-		global $Plugins;
+		global $DB, $Plugins;
 
 		// remember ID, because parent method resets it to 0
 		$old_ID = $this->ID;
 
+		$DB->begin();
+
 		if( $r = parent::dbdelete() )
 		{
+			// Empty pre-rendered content cache:
+			$DB->query( 'DELETE FROM T_item__prerendering WHERE itpr_itm_ID = '.$this->ID );
+
+			$DB->commit();
+
 			// re-set the ID for the Plugin event
 			$this->ID = $old_ID;
 
 			$Plugins->trigger_event( 'AfterItemDelete', $params = array( 'Item' => & $this ) );
 
 			$this->ID = 0;
+		}
+		else
+		{
+			$DB->rollback();
 		}
 
 		return $r;
@@ -3081,6 +3160,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.96  2006/09/21 16:54:26  blueyed
+ * Experimental caching of pre-rendered item content. Added table T_item__prerendering.
+ *
  * Revision 1.95  2006/09/11 22:29:19  fplanque
  * chapter cleanup
  *
