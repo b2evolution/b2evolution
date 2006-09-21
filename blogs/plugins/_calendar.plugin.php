@@ -342,7 +342,8 @@ class Calendar
 				}
 				else
 				{ // highlight no month, when not current year
-					// TODO: BUG: this causes mktime() and the logic where it gets used to fail below! ()
+					// TODO: dh> BUG: this causes mktime() and the logic where it gets used to fail below!
+					// dh> fp, what's the intention here? we cannot mktime() with an empty month, nor does it make sense to include "month=''" in SQL..!
 					$this->month = '';
 				}
 			}
@@ -1065,6 +1066,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.27  2006/09/21 20:55:24  blueyed
+ * TODO: request for clarification on regression
+ *
  * Revision 1.26  2006/07/28 15:27:47  blueyed
  * marked BUG
  *
