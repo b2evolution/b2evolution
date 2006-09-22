@@ -66,7 +66,7 @@
 		 *
 		 * @constant CANUSEXMLRPC true|string Either === true or holds the error message.
 		 */
-		define( 'CANUSEXMLRPC', true );
+		define( 'CANUSEXMLRPC', TRUE );
 	}
 	elseif( !(bool)ini_get('enable_dl') || (bool)ini_get('safe_mode'))
 	{ // We'll not be able to do dynamic loading (fix by Sakichan)
@@ -1016,7 +1016,7 @@
 		var $port;
 		var $errno;
 		var $errstr;
-		var $debug=0;
+		var $debug=DEBUG_XMLRPC_LOGGING;
 		var $username='';
 		var $password='';
 		var $cert='';

@@ -16,21 +16,62 @@
  * @package xmlsrv
  *
  * @version $Id$
+ *
+ * @modified wendall911 at users dot sourceforge.net
  */
 
 /**
  * Initialize everything:
  */
-require_once dirname(__FILE__).'/../conf/_config.php';
-require_once $conf_path.'_admin.php'; // TO get extended definitions Tor Oct 2005
-// fplanque>>WHAT IS UPGRADE USED FOR????
-require_once $conf_path.'_upgrade.php'; // TO get extended definitions Tor Oct 2005
-require_once $inc_path.'_main.inc.php';
 
-if( true !== CANUSEXMLRPC )
-{ // We cannot use XML-RPC: send a error response ( "1 Unknown method" ).
+//Disable Cookies
+$_COOKIE = array();
+
+//Trim requests
+if ( isset($HTTP_RAW_POST_DATA) )
+    $HTTP_RAW_POST_DATA = trim( $HTTP_RAW_POST_DATA );
+/**
+ * Set to TRUE if you want to enable debug messages (comments inside of the XML 
+ * responses)
+ */
+define( DEBUG_XMLRPC_LOGGING, TRUE );
+/**
+ * Set to TRUE to do HTML sanity checking as in the browser interface, set to 
+ * FALSE if you trust the editing tool to do this (more features than the 
+ * browser interface)
+ */
+define( XMLRPC_HTMLCHECKING, TRUE );
+require_once dirname(__FILE__).'/../conf/_config.php';
+require_once $inc_path.'_main.inc.php';
+require_once $inc_path.'_misc/ext/_xmlrpc.php';
+require_once $model_path.'items/_itemlist2.class.php';
+
+if( CANUSEXMLRPC !== TRUE ) { 
+    // We cannot use XML-RPC: send a error response ( "1 Unknown method" ).
+    //this should be structured as an xml response
 	$errResponse = new xmlrpcresp( 0, 1, 'Cannot use XML-RPC. Probably the server is missing the XML extension. Error: '.CANUSEXMLRPC );
 	die( $errResponse->serialize() );
+}
+
+if ( isset( $_GET['rsd'] ) ) { // http://archipelago.phrasewise.com/rsd 
+header('Content-type: text/xml; charset=' . $evo_charset, true);
+
+?>
+<?php echo '<?xml version="1.0" encoding="'.$evo_charset.'"?'.'>'; ?>
+<rsd version="1.0" xmlns="http://archipelago.phrasewise.com/rsd">
+  <service>
+    <engineName>b2evolution</engineName>
+    <engineLink>http://b2evolution.net/</engineLink>
+    <homePageLink><?php $baseurl ?></homePageLink>
+    <apis>
+      <api name="Movable Type" preferred="false" apiLink="<?php echo $baseurl; ?>xmlsrv/xmlrpc.php" />
+      <api name="MetaWeblog" preferred="true" apiLink="<?php echo $baseurl; ?>xmlsrv/xmlrpc.php" />
+      <api name="Blogger" preferred="false" apiLink="<?php echo $baseurl; ?>xmlsrv/xmlrpc.php" />
+    </apis>
+  </service>
+</rsd>
+<?php
+exit;
 }
 
 // We can't display standard error messages. We must return XMLRPC responses.
@@ -39,12 +80,6 @@ $DB->show_errors = false;
 
 $post_default_title = ''; // posts submitted via the xmlrpc interface get that title
 
-$xmlrpc_debug_messages = 0;		// Set to 1 if you want to enable debug messages (comments inside of the XML responses)
-
-// If you want this functionality, please give it it's own config variable in the config files.
-	//$xmlrpc_htmlchecking = 0;  //Set to 1 to do HTML sanity checking as in the browser interface, set to 0 if
-							// you trust the editing tool to do this (more features than the browser interface)
-
 /**
  * Used for logging, only if {@link $debug_xmlrpc_logging} is true
  *
@@ -52,9 +87,8 @@ $xmlrpc_debug_messages = 0;		// Set to 1 if you want to enable debug messages (c
  */
 function logIO($io,$msg)
 {
-	global $debug_xmlrpc_logging;
 
-	if( ! $debug_xmlrpc_logging )
+	if( ! DEBUG_XMLRPC_LOGGING )
 	{
 		return false;
 	}
@@ -76,14 +110,9 @@ function logIO($io,$msg)
  * @param string the source string
  * @return string same length, but only stars
  */
-function starify( $string )
-{
+function starify( $string ) {
 	return str_repeat( '*', strlen( $string ) );
 }
-
-
-
-
 
 $b2newpost_doc='Adds a post, blogger-api like, +title +category +postdate';
 $b2newpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcBoolean, $xmlrpcString, $xmlrpcString, $xmlrpcString));
@@ -1563,7 +1592,6 @@ function mweditpost($m)
 	global $DB;
 	global $Settings;
 	global $Messages;
-	global $xmlrpc_htmlchecking;
 	global $default_category;
 
 	logIO("O","start of mweditpost...");
@@ -1635,12 +1663,12 @@ function mweditpost($m)
 	logIO("O","finished getting contentstruct dateCreated...".$postdate);
 
 
-	if( ! empty($xmlrpc_htmlchecking) )
+	if( XMLRPC_HTMLCHECKING == TRUE )
 	{ // CHECK and FORMAT content
 		$post_title = format_to_post($post_title, 0, 0);
 	}
 	logIO("O","finished converting post_title ...->".$post_title);
-	if( ! empty($xmlrpc_htmlchecking) )
+	if( XMLRPC_HTMLCHECKING == TRUE )
 	{
 		$content = format_to_post($content, 0, 0);  // 25122004 tag - security issue - need to sort !!!
 	}
@@ -2219,11 +2247,11 @@ $s = new xmlrpc_server(
 	)
 );
 
-
-
-
 /*
  * $Log$
+ * Revision 1.114  2006/09/22 19:11:20  wendall911
+ * Added rsd support, restored 0.9.x functionality
+ *
  * Revision 1.113  2006/09/06 21:39:23  fplanque
  * ItemList2 fixes
  *

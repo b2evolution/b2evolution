@@ -45,7 +45,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	// XML RPC Server class
 	// requires: _xmlrpc.php
 
-	if( true !== CANUSEXMLRPC )
+	if( CANUSEXMLRPC !== TRUE )
 	{
 		return;
 	}

@@ -42,10 +42,10 @@ die( 'The site is temporarily down for maintenance.' );
  * Fill in your database details (check carefully or nothing will work!)
  */
 $db_config = array(
-	'user'          => 'demouser',     // your MySQL username
-	'password'      => 'demopass',     // ...and password
-	'name'          => 'b2evolution',  // the name of the database
-	'host'          => 'localhost',    // MySQL Server (typically 'localhost')
+	'user'     => 'wendallc',     // your MySQL username
+	'password' => 'w3nda!!*',     // ...and password
+	'name'     => 'b2evolution',  // the name of the database
+	'host'     => 'localhost',    // MySQL Server (typically 'localhost')
 );
 
 
@@ -84,20 +84,20 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
  *
  * @global string $baseurl
  */
-$baseurl = 'http://localhost/b2evolution/blogs/';
+$baseurl = 'http://blog.toruslaptop.com/';
 
 
 /**
  * Your email. Will be used in severe error messages so that users can contact you.
  * You will also receive notifications for new user registrations there.
  */
-$admin_email = 'postmaster@localhost';
+$admin_email = 'wendallc@83864.com';
 
 
 /**
  * Once you have edited this file to your settings, set the following to 1 (one):
  */
-$config_is_done = 0;
+$config_is_done = 1;
 
 
 # IMPORTANT: you will find more parameters in the other files of the /conf folder.
