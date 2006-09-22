@@ -24,20 +24,24 @@
  * Initialize everything:
  */
 
-//Disable Cookies
+// Disable Cookies
 $_COOKIE = array();
 
-//Trim requests
+// Trim requests (used by XML-RPC library)
 if ( isset($HTTP_RAW_POST_DATA) )
-    $HTTP_RAW_POST_DATA = trim( $HTTP_RAW_POST_DATA );
+{
+	// TODO: dh> xmlrpc should use php://input instead.. see http://bugs.php.net/bug.php?id=22338
+	$HTTP_RAW_POST_DATA = trim( $HTTP_RAW_POST_DATA );
+}
+
 /**
- * Set to TRUE if you want to enable debug messages (comments inside of the XML 
+ * Set to TRUE if you want to enable debug messages (comments inside of the XML
  * responses)
  */
 define( DEBUG_XMLRPC_LOGGING, TRUE );
 /**
- * Set to TRUE to do HTML sanity checking as in the browser interface, set to 
- * FALSE if you trust the editing tool to do this (more features than the 
+ * Set to TRUE to do HTML sanity checking as in the browser interface, set to
+ * FALSE if you trust the editing tool to do this (more features than the
  * browser interface)
  */
 define( XMLRPC_HTMLCHECKING, TRUE );
@@ -46,14 +50,16 @@ require_once $inc_path.'_main.inc.php';
 require_once $inc_path.'_misc/ext/_xmlrpc.php';
 require_once $model_path.'items/_itemlist2.class.php';
 
-if( CANUSEXMLRPC !== TRUE ) { 
+if( CANUSEXMLRPC !== TRUE ) {
     // We cannot use XML-RPC: send a error response ( "1 Unknown method" ).
     //this should be structured as an xml response
 	$errResponse = new xmlrpcresp( 0, 1, 'Cannot use XML-RPC. Probably the server is missing the XML extension. Error: '.CANUSEXMLRPC );
 	die( $errResponse->serialize() );
 }
 
-if ( isset( $_GET['rsd'] ) ) { // http://archipelago.phrasewise.com/rsd 
+
+// Handle "Really Simple Discovery":
+if ( isset( $_GET['rsd'] ) ) { // http://archipelago.phrasewise.com/rsd
 header('Content-type: text/xml; charset=' . $evo_charset, true);
 
 ?>
@@ -62,11 +68,11 @@ header('Content-type: text/xml; charset=' . $evo_charset, true);
   <service>
     <engineName>b2evolution</engineName>
     <engineLink>http://b2evolution.net/</engineLink>
-    <homePageLink><?php $baseurl ?></homePageLink>
+    <homePageLink><?php echo $baseurl ?></homePageLink>
     <apis>
-      <api name="Movable Type" preferred="false" apiLink="<?php echo $baseurl; ?>xmlsrv/xmlrpc.php" />
-      <api name="MetaWeblog" preferred="true" apiLink="<?php echo $baseurl; ?>xmlsrv/xmlrpc.php" />
-      <api name="Blogger" preferred="false" apiLink="<?php echo $baseurl; ?>xmlsrv/xmlrpc.php" />
+      <api name="Movable Type" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php" />
+      <api name="MetaWeblog" preferred="true" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php" />
+      <api name="Blogger" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php" />
     </apis>
   </service>
 </rsd>
@@ -1433,7 +1439,7 @@ $mt_setPostCategories_doc = "Sets the categories for a post.";
 function mt_setPostCategories($m) {
 	global $xmlrpcerruser,$Settings;
 	global $DB, $Messages;
-	
+
 	$post_ID = $m->getParam(0);
 	$post_ID = $post_ID->scalarval();
 	$username = $m->getParam(1);
@@ -2249,6 +2255,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.115  2006/09/22 21:27:53  blueyed
+ * Minor fixes for RSD, formatting, whitespace.
+ *
  * Revision 1.114  2006/09/22 19:11:20  wendall911
  * Added rsd support, restored 0.9.x functionality
  *
