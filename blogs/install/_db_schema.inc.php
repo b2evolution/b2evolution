@@ -281,7 +281,7 @@ $schema_queries = array(
 		'Creating item cache table',
 		'CREATE TABLE T_item__prerendering(
 			itpr_itm_ID                   INT(11) UNSIGNED NOT NULL,
-			itpr_format                   ENUM(\'htmlbody\', \'entityencoded\', \'xml\', \'text\'),
+			itpr_format                   ENUM(\'htmlbody\', \'entityencoded\', \'xml\', \'text\') NOT NULL,
 			itpr_content_prerendered      TEXT NULL,
 			PRIMARY KEY (itpr_itm_ID, itpr_format)
 		)' ),
@@ -491,6 +491,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.33  2006/09/22 17:26:32  blueyed
+ * itpr_format should be NOT NULL (MySQL3 requires this also for a PK and it will never be NULL anyway)
+ *
  * Revision 1.32  2006/09/21 16:54:26  blueyed
  * Experimental caching of pre-rendered item content. Added table T_item__prerendering.
  *
