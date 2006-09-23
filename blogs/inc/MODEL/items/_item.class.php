@@ -221,7 +221,7 @@ class Item extends DataObject
 	var $priorities;
 
 	/**
-	 * Pre-rendered content, cached by format.
+	 * Pre-rendered content, cached by format/validated renderers.
 	 * @see Item::get_prerendered_content()
 	 * @access protected
 	 * @var array|NULL
@@ -923,7 +923,12 @@ class Item extends DataObject
 	 */
 	function get_prerendered_content( $format )
 	{
-		if( ! isset( $this->content_prerendered[$format] ) )
+		global $Plugins;
+
+		$post_renderers = $this->get_renderers_validated();
+		$cache_key = $format.'/'.implode('.', $post_renderers);
+
+		if( ! isset( $this->content_prerendered[$cache_key] ) )
 		{
 			$use_cache = $this->ID && in_array( $format, array( 'htmlbody', 'entityencoded', 'xml', 'text' ) );
 
@@ -935,33 +940,49 @@ class Item extends DataObject
 					SELECT itpr_content_prerendered
 						FROM T_item__prerendering
 					 WHERE itpr_itm_ID = '.$this->ID.'
-						 AND itpr_format = "'.$format.'"', 0, 0, 'Check prerendered item content' );
+						 AND itpr_format = "'.$format.'"
+					   AND itpr_renderers = "'.implode('.', $post_renderers).'"', 0, 0, 'Check prerendered item content' );
 
 				if( $cache !== NULL ) // may be empty string
 				{ // Retrieved from cache:
-					$this->content_prerendered[$format] = $cache;
+					$this->content_prerendered[$cache_key] = $cache;
 				}
 			}
 
-			if( ! isset( $this->content_prerendered[$format] ) )
+			if( ! isset( $this->content_prerendered[$cache_key] ) )
 			{
-				global $Plugins, $Debuglog;
+				global $Debuglog;
 
-				$post_renderers = $Plugins->validate_list( $this->get_renderers() );
-				$this->content_prerendered[$format] = $Plugins->render( $this->content, $post_renderers, $format, array( 'Item' => $this ) );
+				$this->content_prerendered[$cache_key] = $Plugins->render( $this->content, $post_renderers, $format, array( 'Item' => $this ) );
 
-				$Debuglog->add( 'Generated pre-rendered content ['.$format.']', 'items' );
+				$Debuglog->add( 'Generated pre-rendered content ['.$cache_key.']', 'items' );
 
 				if( $use_cache )
 				{ // save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
 					$DB->query( '
-						REPLACE INTO T_item__prerendering (itpr_itm_ID, itpr_format, itpr_content_prerendered)
-						 VALUES ( '.$this->ID.', "'.$format.'", '.$DB->quote($this->content_prerendered[$format]).' )', 'Cache prerendered item content' );
+						REPLACE INTO T_item__prerendering (itpr_itm_ID, itpr_format, itpr_renderers, itpr_content_prerendered)
+						 VALUES ( '.$this->ID.', "'.$format.'", '.$DB->quote(implode('.', $post_renderers)).', '.$DB->quote($this->content_prerendered[$cache_key]).' )', 'Cache prerendered item content' );
 				}
 			}
 		}
 
-		return $this->content_prerendered[$format];
+		return $this->content_prerendered[$cache_key];
+	}
+
+
+	/**
+	 * Set the pre-rendered content.
+	 *
+	 * This is meant to get called by ItemList2, which would do a single query for all
+	 * items.
+	 *
+	 * @param string Pre-rendered content
+	 * @param string Cache-Key ($format.'/'.$renderers). See {@link Item::get_prerendered_content()} for the appropriate query skeleton.
+	 * @return
+	 */
+	function set_prerendered_content( $content, $cache_key )
+	{
+		$this->content_prerendered[$cache_key] = $content;
 	}
 
 
@@ -2616,6 +2637,7 @@ class Item extends DataObject
 
 			// Empty pre-rendered content cache - any item property may have influence on it:
 			$DB->query( 'DELETE FROM T_item__prerendering WHERE itpr_itm_ID = '.$this->ID );
+			$this->content_prerendered = NULL;
 
 			$DB->commit();
 
@@ -2648,6 +2670,7 @@ class Item extends DataObject
 		{
 			// Empty pre-rendered content cache:
 			$DB->query( 'DELETE FROM T_item__prerendering WHERE itpr_itm_ID = '.$this->ID );
+			$this->content_prerendered = NULL;
 
 			$DB->commit();
 
@@ -3124,6 +3147,21 @@ class Item extends DataObject
 
 
 	/**
+	 * Get the list of validated renderers for this Item. This includes stealth plugins etc.
+	 * @return array
+	 */
+	function get_renderers_validated()
+	{
+		if( ! isset($this->renderers_validated) )
+		{
+			global $Plugins;
+			$this->renderers_validated = $Plugins->validate_list( $this->get_renderers() );
+		}
+		return $this->renderers_validated;
+	}
+
+
+	/**
 	 * Add a renderer (by code) to the Item.
 	 * @param string Renderer code to add for this item
 	 */
@@ -3160,6 +3198,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.97  2006/09/23 14:01:29  blueyed
+ * Pre-rendered content: use renderers string for cache_key
+ *
  * Revision 1.96  2006/09/21 16:54:26  blueyed
  * Experimental caching of pre-rendered item content. Added table T_item__prerendering.
  *
