@@ -282,7 +282,9 @@ $schema_queries = array(
 		'CREATE TABLE T_item__prerendering(
 			itpr_itm_ID                   INT(11) UNSIGNED NOT NULL,
 			itpr_format                   ENUM(\'htmlbody\', \'entityencoded\', \'xml\', \'text\') NOT NULL,
+			itpr_renderers                TEXT NOT NULL,
 			itpr_content_prerendered      TEXT NULL,
+			itpr_datemodified             TIMESTAMP NOT NULL,
 			PRIMARY KEY (itpr_itm_ID, itpr_format)
 		)' ),
 
@@ -491,6 +493,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.34  2006/09/23 19:32:06  blueyed
+ * Schema for pre-rendered changes
+ *
  * Revision 1.33  2006/09/22 17:26:32  blueyed
  * itpr_format should be NOT NULL (MySQL3 requires this also for a PK and it will never be NULL anyway)
  *
