@@ -1195,8 +1195,11 @@ class Form extends Widget
 			unset( $form_params['bozo_start_modified'] );
 		}
 
-		$r = "\n\n<form".get_field_attribs_as_string($form_params).">\n"
-					.$this->formstart;
+		$r = "\n\n<form".get_field_attribs_as_string($form_params).">\n";
+
+		$r .= '<div style="display:inline">'; // for XHTML
+
+		$r .= $this->formstart;
 
 		if( empty($form_title) )
 		{
@@ -1281,12 +1284,13 @@ class Form extends Widget
 
 		$r .= $this->formend;
 
-		// Display all buffered hidden fields:
+		// Display all buffered hidden fields in a DIV (for XHTML):
 		foreach( $this->hiddens as $hidden )
 		{
 			$r .= $hidden;
 		}
 
+		$r .= '</div>';
 		$r .= "\n</form>\n\n";
 
 		// When the page loads, Initialize all the parent child select lists
@@ -2658,6 +2662,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.39  2006/09/23 18:26:49  blueyed
+ * XHTML fix: wrap the whole FORM content into a DIV (display:inline)
+ *
  * Revision 1.38  2006/09/23 15:06:02  blueyed
  * Javascript fixes: use CDATA
  *
