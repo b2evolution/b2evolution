@@ -701,7 +701,7 @@ class Form extends Widget
 
 		$r = $this->begin_field()
 				.'<script type="text/javascript">
-						<!--
+						//<![CDATA[
 						var cal_'.$field_name.' = new CalendarPopup();
 						cal_'.$field_name.'.showYearNavigation();
 						cal_'.$field_name.'.showNavigationDropdowns();
@@ -729,7 +729,7 @@ class Form extends Widget
 							."'".T_($weekday_letter[6])."' );\n"
 				.' cal_'.$field_name.'.setWeekStartDay('.locale_startofweek().');
 						cal_'.$field_name.".setTodayText('".TS_('Today')."');
-						// -->
+						//]]>
 					</script>\n"
 				.$this->get_input_element($field_params, false)
 				.'<a href="#" onclick="cal_'.$field_name.".select(document.getElementById('".$field_name."'), 'anchor_".$field_name."', '".$js_date_format."');"
@@ -1292,6 +1292,7 @@ class Form extends Widget
 		// When the page loads, Initialize all the parent child select lists
 		$r .= '
 			<script type="text/javascript">
+				//<![CDATA[
 				if( typeof addEvent == "function" && typeof init_dynamicSelect == "function" )
 				{
 					addEvent( window, "load", init_dynamicSelect, false );
@@ -1309,6 +1310,7 @@ class Form extends Widget
 					$r .= implode( "\n", $this->append_javascript );
 				}
 				$r .= '
+				//]]>
 			</script>';
 
 		// Reset (in case we re-use begin_form! NOTE: DO NOT REUSE begin_form, it's against the spec.)
@@ -1737,12 +1739,9 @@ class Form extends Widget
 
 		$r .= '<input type="text" id="'.$field_name.'_combo" name="'.$field_name.'_combo" size="30" class="'.$input_class.'" style="display:'.$visible.'">';
 
-		// We need <script> tag here to use a <noscript> tag when javascript is deactivated:
-		$r .= '<script type="text/javascript">
-					 </script>';
-
 		if( $visible == 'none' )
 		{ // The input text is hidden, so if no javascript activated, we always display input text:
+			$r .= '<script type="text/javascript"></script>'; // We need <script> tag here to use a <noscript> tag when javascript is deactivated:
 			$r .= '<noscript>
 							<input type="text" id="'.$field_name.'_combo" name="'.$field_name.'_combo" size="30" class="'.$input_class.'">
 						</noscript>';
@@ -2659,6 +2658,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.38  2006/09/23 15:06:02  blueyed
+ * Javascript fixes: use CDATA
+ *
  * Revision 1.37  2006/09/13 17:13:48  blueyed
  * - $disp_param_err_messages_with_fields setting
  * - general "input_help" param, which decorates the field with Javascript attached default/help value

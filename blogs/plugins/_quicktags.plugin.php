@@ -56,7 +56,7 @@ class quicktags_plugin extends Plugin
 		?>
 
 		<script type="text/javascript">
-		<!--
+		//<![CDATA[
 		var b2evoButtons = new Array();
 		var b2evoLinks = new Array();
 		var b2evoOpenTags = new Array();
@@ -439,7 +439,7 @@ class quicktags_plugin extends Plugin
 				b2evoInsertContent(myField, myValue);
 			}
 		}
-		// -->
+		//]]>
 		</script>
 
 		<div class="edit_toolbar"><script type="text/javascript">b2evoToolbar();</script></div>
@@ -451,6 +451,9 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.24  2006/09/23 15:06:03  blueyed
+ * Javascript fixes: use CDATA
+ *
  * Revision 1.23  2006/07/16 23:04:05  fplanque
  * Most plugins should keep as quiet as possible in simple mode.
  * Smilies are about the only thing simple enough for simple mode.
