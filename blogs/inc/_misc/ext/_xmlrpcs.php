@@ -51,8 +51,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	}
 
 	// listMethods: either a string, or nothing
-	$_xmlrpcs_listMethods_sig=array(array($xmlrpcArray, $xmlrpcString), array($xmlrpcArray));
-	$_xmlrpcs_listMethods_doc='This method lists all the methods that the XML-RPC server knows how to dispatch';
+	$_xmlrpcs_listMethods_sig = array(array($xmlrpcArray, $xmlrpcString), array($xmlrpcArray));
+	$_xmlrpcs_listMethods_doc = 'This method lists all the methods that the XML-RPC server knows how to dispatch';
 	/**
 	 * listMethods: either a string, or nothing
 	 */
