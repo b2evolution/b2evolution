@@ -123,6 +123,9 @@ class Item extends DataObject
 	 */
 	var $assigned_user_ID;
 
+	/**
+	 * @var string Publish date ("Y-m-d H:i:s"). This may be in the future.
+	 */
 	var $issue_date;
 	var $mod_date;
 	/**
@@ -3198,6 +3201,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.98  2006/09/25 17:52:20  blueyed
+ * doc
+ *
  * Revision 1.97  2006/09/23 14:01:29  blueyed
  * Pre-rendered content: use renderers string for cache_key
  *
