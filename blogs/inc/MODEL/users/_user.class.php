@@ -290,6 +290,8 @@ class User extends DataObject
 	{
 		global $basepath, $media_subdir, $Messages, $Settings, $Debuglog;
 
+		echo debug_get_backtrace();
+
 		if( ! $Settings->get( 'fm_enable_roots_user' ) )
 		{	// User directories are disabled:
 			$Debuglog->add( 'Attempt to access user media dir, but this feature is disabled', 'files' );
@@ -441,9 +443,21 @@ class User extends DataObject
 		return false;
 	}
 
+	/**
+	 * @deprecated by {@link User::set_Group()} since 1.9
+	 */
+	function setGroup( & $Group )
+	{
+		global $Debuglog;
+		$Debuglog->add( 'Call to deprecated method User::setGroup(), use set_Group() instead.', 'deprecated' );
+		return $this->set_Group( & $Group );
+	}
+
 
 	/**
 	 * Get the {@link Group} of the user.
+	 *
+	 * @todo dh> Shouldn't this return by reference?! (not the ref from GroupCache, but the one of the user)
 	 *
 	 * @return Group
 	 */
@@ -455,6 +469,16 @@ class User extends DataObject
 			$this->Group = $GroupCache->get_by_ID($this->group_ID);
 		}
 		return $this->Group;
+	}
+
+	/**
+	 * @deprecated by {@link User::get_Group()} since 1.9
+	 */
+	function getGroup()
+	{
+		global $Debuglog;
+		$Debuglog->add( 'Call to deprecated method User::getGroup(), use get_Group() instead.', 'deprecated' );
+		return $this->get_Group();
 	}
 
 
@@ -1117,6 +1141,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.41  2006/09/25 22:16:56  blueyed
+ * Re-added User::getGroup() and User::setGroup() as stubs for BC
+ *
  * Revision 1.40  2006/09/11 22:06:08  blueyed
  * Cleaned up option_list callback handling
  *
