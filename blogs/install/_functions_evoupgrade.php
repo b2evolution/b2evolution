@@ -91,9 +91,10 @@ function convert_lang_to_locale( $table, $columnlang, $columnID )
 			{  // loop given locales
 				if( substr($newlkey, 0, 2) == strtolower($lkey) ) # TODO: check if valid/suitable
 				{  // if language matches, update
-					$converted = $DB->query( "UPDATE $table
-																		   SET $columnlang = '$newlkey'
-																		 WHERE $columnlang = '$lkey'" );
+					$converted = $DB->query( "
+						UPDATE $table
+						   SET $columnlang = '$newlkey'
+						 WHERE $columnlang = '$lkey'" );
 					echo 'to locale \''. $newlkey. '\'<br />';
 					break;
 				}
@@ -1407,6 +1408,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.175  2006/09/25 21:59:57  blueyed
+ * Whitespace fix
+ *
  * Revision 1.174  2006/09/25 20:25:49  blueyed
  * Extended date- and time-format fields for locales to 20 chars. See http://forums.b2evolution.net//viewtopic.php?p=44335#44335
  *
