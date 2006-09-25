@@ -290,8 +290,6 @@ class User extends DataObject
 	{
 		global $basepath, $media_subdir, $Messages, $Settings, $Debuglog;
 
-		echo debug_get_backtrace();
-
 		if( ! $Settings->get( 'fm_enable_roots_user' ) )
 		{	// User directories are disabled:
 			$Debuglog->add( 'Attempt to access user media dir, but this feature is disabled', 'files' );
@@ -1141,6 +1139,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.42  2006/09/25 22:18:31  blueyed
+ * Removed debug code, sorry.
+ *
  * Revision 1.41  2006/09/25 22:16:56  blueyed
  * Re-added User::getGroup() and User::setGroup() as stubs for BC
  *
