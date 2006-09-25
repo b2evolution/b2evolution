@@ -796,12 +796,12 @@ function previous_posts_link( $label='#' )
  * Display a link to next page of posts
  *
  * Note: remove this tag from skin template if you don't want this functionality
- *
- * @todo move to ItemList
  */
 function next_posts_link($label='#', $max_page=0 )
 {
 	global $p, $paged, $result, $Settings, $MainList, $Blog, $Item;
+
+	if( empty($MainList) ) return;
 
 	if( $label == '#' ) $label = T_('Next Page').' >>';
 
@@ -835,8 +835,6 @@ function next_posts_link($label='#', $max_page=0 )
  * Display a link to previous page of posts
  *
  * Note: remove this tag from skin template if you don't want this functionality
- *
- * @todo move to ItemList
  */
 function previous_posts( )
 {
