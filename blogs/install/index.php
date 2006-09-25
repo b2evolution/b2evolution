@@ -65,12 +65,25 @@ init_charsets($current_charset);
 
 $timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
 
+
+switch( $action ) {
+	case 'evoupgrade':
+		$title = T_('Upgrade');
+		break;
+
+	// TODO: dh> add appropriate titles for other actions
+
+	default:
+		$title = '';
+
+}
+
 header('Content-Type: text/html; charset='.$io_charset);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<title><?php echo T_('b2evo installer') ?></title>
+	<title><?php echo T_('b2evo installer').( $title ? ': '.$title : '' ) ?></title>
 	<link href="../rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -603,6 +616,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.112  2006/09/25 20:11:40  blueyed
+ * More distinct HTML title, just for upgrade now; TODO
+ *
  * Revision 1.111  2006/09/10 14:16:37  blueyed
  * trans doc
  *
