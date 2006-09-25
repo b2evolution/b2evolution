@@ -546,7 +546,7 @@ class Blog extends DataObject
 
 		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
 		{ // User directories are disabled:
-			$Debuglog->add( 'Attempt to access blog media dir, but this feature is globally disabled' );
+			$Debuglog->add( 'Attempt to access blog media dir, but this feature is globally disabled', 'files' );
 			return false;
 		}
 
@@ -1044,6 +1044,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.27  2006/09/25 17:53:07  blueyed
+ * Add attempt to access globally disabled media_dir to "files" Debuglog category (instead of "notes")
+ *
  * Revision 1.26  2006/09/11 22:29:19  fplanque
  * chapter cleanup
  *
