@@ -1211,6 +1211,11 @@ function upgrade_b2evo_tables()
 				ALTER TABLE T_basedomains  ADD INDEX dom_type (dom_type)' );
 		echo "OK.<br />\n";
 
+		echo 'Altering locales table... ';
+		$DB->query( "ALTER TABLE evo_locales CHANGE COLUMN loc_datefmt loc_datefmt varchar(20) NOT NULL default 'y-m-d'" );
+		$DB->query( "ALTER TABLE evo_locales CHANGE COLUMN loc_timefmt loc_timefmt varchar(20) NOT NULL default 'H:i:s'" );
+		echo "OK.<br />\n";
+
 		set_upgrade_checkpoint( '9310' );
 	}
 
@@ -1402,6 +1407,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.174  2006/09/25 20:25:49  blueyed
+ * Extended date- and time-format fields for locales to 20 chars. See http://forums.b2evolution.net//viewtopic.php?p=44335#44335
+ *
  * Revision 1.173  2006/09/14 19:01:42  blueyed
  * TODO: drop previous/obsolete/duplicate INDEX link_item_ID/link_dest_item_ID
  *

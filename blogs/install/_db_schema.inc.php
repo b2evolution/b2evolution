@@ -235,8 +235,8 @@ $schema_queries = array(
 		"CREATE TABLE T_locales (
 			loc_locale varchar(20) NOT NULL default '',
 			loc_charset varchar(15) NOT NULL default 'iso-8859-1',
-			loc_datefmt varchar(10) NOT NULL default 'y-m-d',
-			loc_timefmt varchar(10) NOT NULL default 'H:i:s',
+			loc_datefmt varchar(20) NOT NULL default 'y-m-d',
+			loc_timefmt varchar(20) NOT NULL default 'H:i:s',
 			loc_startofweek TINYINT UNSIGNED NOT NULL DEFAULT 1,
 			loc_name varchar(40) NOT NULL default '',
 			loc_messages varchar(20) NOT NULL default '',
@@ -493,6 +493,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.35  2006/09/25 20:25:49  blueyed
+ * Extended date- and time-format fields for locales to 20 chars. See http://forums.b2evolution.net//viewtopic.php?p=44335#44335
+ *
  * Revision 1.34  2006/09/23 19:32:06  blueyed
  * Schema for pre-rendered changes
  *
