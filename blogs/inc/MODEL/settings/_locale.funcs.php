@@ -727,28 +727,31 @@ function locale_updateDB()
 	// Loop through list of all HTTP POSTed params:
 	foreach( $_POST as $pkey => $pval )
 	{
-		if( preg_match('/loc_(\d+)_(.*)/', $pkey, $matches) )
-		{	// This is a locale related parameter, get it now:
-			$pval = param( $pkey, 'string', '' );
+		if( ! preg_match('/loc_(\d+)_(.*)/', $pkey, $matches) )
+		{
+			continue;
+		}
 
-			$lfield = $matches[2];
+		// This is a locale related parameter, get it now:
+		$pval = param( $pkey, 'string', '' );
 
-			if( $matches[1] != $lnr )
-			{ // we have a new locale
-				$lnr = $matches[1];
-				$plocale = $pval;
+		$lfield = $matches[2];
 
-				// checkboxes default to 0
-				$templocales[ $plocale ]['enabled'] = 0;
+		if( $matches[1] != $lnr )
+		{ // we have a new locale
+			$lnr = $matches[1];
+			$plocale = $pval;
+
+			// checkboxes default to 0
+			$templocales[ $plocale ]['enabled'] = 0;
+		}
+		elseif( $lnr != 0 )  // be sure to have catched a locale before
+		{
+			if( $lfield == 'startofweek' && ( $lfield < 0 || $lfield > 6 ) )
+			{ // startofweek must be between 0 and 6
+				continue;
 			}
-			elseif( $lnr != 0 )  // be sure to have catched a locale before
-			{
-				if( $lfield == 'startofweek' && ( $lfield < 0 || $lfield > 6 ) )
-				{ // startofweek must be between 0 and 6
-					continue;
-				}
-				$templocales[ $plocale ][$lfield] = $pval;
-			}
+			$templocales[ $plocale ][$lfield] = $pval;
 		}
 	}
 
@@ -900,6 +903,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.25  2006/09/26 23:52:06  blueyed
+ * Minor things while merging with branches
+ *
  * Revision 1.24  2006/09/26 21:24:32  blueyed
  * doc fix
  *

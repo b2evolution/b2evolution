@@ -311,7 +311,7 @@ function next_post( $format = '% &gt;&gt; ', $next = '#', $title = 'yes', $in_sa
 		}
 	}
 
-	if( $in_same_blog && isset($postdata['Blog']) )
+	if( $in_same_blog )
 	{
 		$from .= ' INNER JOIN T_categories ON post_main_cat_ID = cat_ID';
 		$sqlcat .= ' AND cat_blog_ID = '.$postdata['Blog'];
@@ -643,6 +643,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.26  2006/09/26 23:52:06  blueyed
+ * Minor things while merging with branches
+ *
  * Revision 1.25  2006/09/13 23:38:06  blueyed
  * Fix for next_post()/previous_post(), if there is no $postdata - e.g. on /yyyy/mm/dd/not-found-title
  *
