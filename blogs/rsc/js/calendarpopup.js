@@ -11,7 +11,7 @@
 // use. That means, you can include it in your product, or your web
 // site, or any other form where the code is actually being used. You
 // may not put the plain javascript up on your site for download or
-// include it in your javascript libraries for download. 
+// include it in your javascript libraries for download.
 // If you wish to share this code with others, please just point them
 // to the URL instead.
 // Please DO NOT link directly to my .js files from your site. Copy
@@ -30,13 +30,13 @@
 //      CSS prefix.
 // August 19, 2003: Renamed the function to get styles, and made it
 //      work correctly without an object reference
-// August 18, 2003: Changed showYearNavigation and 
+// August 18, 2003: Changed showYearNavigation and
 //      showYearNavigationInput to optionally take an argument of
 //      true or false
 // July 31, 2003: Added text input option for year navigation.
-//      Added a per-calendar CSS prefix option to optionally use 
+//      Added a per-calendar CSS prefix option to optionally use
 //      different styles for different calendars.
-// July 29, 2003: Fixed bug causing the Today link to be clickable 
+// July 29, 2003: Fixed bug causing the Today link to be clickable
 //      even though today falls in a disabled date range.
 //      Changed formatting to use pure CSS, allowing greater control
 //      over look-and-feel options.
@@ -44,35 +44,35 @@
 //      under certain cases when some days of week are disabled
 // March 14, 2003: Added ability to disable individual dates or date
 //      ranges, display as light gray and strike-through
-// March 14, 2003: Removed dependency on graypixel.gif and instead 
+// March 14, 2003: Removed dependency on graypixel.gif and instead
 ///     use table border coloring
 // March 12, 2003: Modified showCalendar() function to allow optional
 //      start-date parameter
 // March 11, 2003: Modified select() function to allow optional
 //      start-date parameter
-/* 
+/*
 DESCRIPTION: This object implements a popup calendar to allow the user to
 select a date, month, quarter, or year.
 
 COMPATABILITY: Works with Netscape 4.x, 6.x, IE 5.x on Windows. Some small
-positioning errors - usually with Window positioning - occur on the 
+positioning errors - usually with Window positioning - occur on the
 Macintosh platform.
-The calendar can be modified to work for any location in the world by 
+The calendar can be modified to work for any location in the world by
 changing which weekday is displayed as the first column, changing the month
 names, and changing the column headers for each day.
 
 USAGE:
 // Create a new CalendarPopup object of type WINDOW
-var cal = new CalendarPopup(); 
+var cal = new CalendarPopup();
 
 // Create a new CalendarPopup object of type DIV using the DIV named 'mydiv'
-var cal = new CalendarPopup('mydiv'); 
+var cal = new CalendarPopup('mydiv');
 
-// Easy method to link the popup calendar with an input box. 
+// Easy method to link the popup calendar with an input box.
 cal.select(inputObject, anchorname, dateFormat);
 // Same method, but passing a default date other than the field's current value
 cal.select(inputObject, anchorname, dateFormat, '01/02/2000');
-// This is an example call to the popup calendar from a link to populate an 
+// This is an example call to the popup calendar from a link to populate an
 // input box. Note that to use this, date.js must also be included!!
 <A HREF="#" onclick="cal.select(document.forms[0].date,'anchorname','MM/dd/yyyy'); return false;">Select</A>
 
@@ -109,7 +109,7 @@ cal.showYearNavigation();
 // Show month and year dropdowns, for quicker selection of month of dates
 cal.showNavigationDropdowns();
 
-// Set the text to be used above each day column. The days start with 
+// Set the text to be used above each day column. The days start with
 // sunday regardless of the value of WeekStartDay
 cal.setDayHeaders("S","M","T",...);
 
@@ -136,7 +136,7 @@ cal.addDisabledDates("Jan 01, 2003", null);
 // Pass two dates to disable all dates inbetween and including the two
 cal.addDisabledDates("January 01, 2003", "Dec 31, 2003");
 
-// When the 'year' select is displayed, set the number of years back from the 
+// When the 'year' select is displayed, set the number of years back from the
 // current year to start listing years. Default is 2.
 // This is also used for year drop-down, to decide how many years +/- to display
 cal.setYearSelectStartOffset(2);
@@ -169,21 +169,21 @@ cal.offsetY = 20;
 NOTES:
 1) Requires the functions in AnchorPosition.js and PopupWindow.js
 
-2) Your anchor tag MUST contain both NAME and ID attributes which are the 
+2) Your anchor tag MUST contain both NAME and ID attributes which are the
    same. For example:
    <A NAME="test" ID="test"> </A>
 
-3) There must be at least a space between <A> </A> for IE5.5 to see the 
+3) There must be at least a space between <A> </A> for IE5.5 to see the
    anchor tag correctly. Do not do <A></A> with no space.
 
 4) When a CalendarPopup object is created, a handler for 'onmouseup' is
    attached to any event handler you may have already defined. Do NOT define
-   an event handler for 'onmouseup' after you define a CalendarPopup object 
+   an event handler for 'onmouseup' after you define a CalendarPopup object
    or the autoHide() will not work correctly.
-   
+
 5) The calendar popup display uses style sheets to make it look nice.
 
-*/ 
+*/
 
 // CONSTRUCTOR for the CalendarPopup Object
 function CalendarPopup() {
@@ -199,8 +199,16 @@ function CalendarPopup() {
 	c.offsetY = 25;
 	c.autoHide();
 	// Calendar-specific properties
-	c.monthNames = new Array("January","February","March","April","May","June","July","August","September","October","November","December");
-	c.monthAbbreviations = new Array("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec");
+	if( typeof MONTH_NAMES != "undefined" && MONTH_NAMES.slice )
+	{
+		c.monthNames = MONTH_NAMES.slice(0, 12);
+		c.monthAbbreviations = MONTH_NAMES.slice(12, 24);
+	}
+	else
+	{
+		c.monthNames = new Array("January","February","March","April","May","June","July","August","September","October","November","December");
+		c.monthAbbreviations = new Array("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec");
+	}
 	c.dayHeaders = new Array("S","M","T","W","T","F","S");
 	c.returnFunction = "CP_tmpReturnFunction";
 	c.returnMonthFunction = "CP_tmpReturnMonthFunction";
@@ -250,7 +258,7 @@ function CalendarPopup() {
 	return c;
 	}
 function CP_copyMonthNamesToWindow() {
-	// Copy these values over to the date.js 
+	// Copy these values over to the date.js
 	if (typeof(window.MONTH_NAMES)!="undefined" && window.MONTH_NAMES!=null) {
 		window.MONTH_NAMES = new Array();
 		for (var i=0; i<this.monthNames.length; i++) {
@@ -262,24 +270,24 @@ function CP_copyMonthNamesToWindow() {
 	}
 }
 // Temporary default functions to be called when items clicked, so no error is thrown
-function CP_tmpReturnFunction(y,m,d) { 
+function CP_tmpReturnFunction(y,m,d) {
 	if (window.CP_targetInput!=null) {
 		var dt = new Date(y,m-1,d,0,0,0);
 		if (window.CP_calendarObject!=null) { window.CP_calendarObject.copyMonthNamesToWindow(); }
 		window.CP_targetInput.value = formatDate(dt,window.CP_dateFormat);
 		}
 	else {
-		alert('Use setReturnFunction() to define which function will get the clicked results!'); 
+		alert('Use setReturnFunction() to define which function will get the clicked results!');
 		}
 	}
-function CP_tmpReturnMonthFunction(y,m) { 
-	alert('Use setReturnMonthFunction() to define which function will get the clicked results!\nYou clicked: year='+y+' , month='+m); 
+function CP_tmpReturnMonthFunction(y,m) {
+	alert('Use setReturnMonthFunction() to define which function will get the clicked results!\nYou clicked: year='+y+' , month='+m);
 	}
-function CP_tmpReturnQuarterFunction(y,q) { 
-	alert('Use setReturnQuarterFunction() to define which function will get the clicked results!\nYou clicked: year='+y+' , quarter='+q); 
+function CP_tmpReturnQuarterFunction(y,q) {
+	alert('Use setReturnQuarterFunction() to define which function will get the clicked results!\nYou clicked: year='+y+' , quarter='+q);
 	}
-function CP_tmpReturnYearFunction(y) { 
-	alert('Use setReturnYearFunction() to define which function will get the clicked results!\nYou clicked: year='+y); 
+function CP_tmpReturnYearFunction(y) {
+	alert('Use setReturnYearFunction() to define which function will get the clicked results!\nYou clicked: year='+y);
 	}
 
 // Set the name of the functions to call to get the clicked item
@@ -340,15 +348,15 @@ function CP_addDisabledDates(start, end) {
 	else if (end  ==null) { this.disabledDatesExpression+="(ds>="+start+")"; }
 	else { this.disabledDatesExpression+="(ds>="+start+"&&ds<="+end+")"; }
 	}
-	
+
 // Set the text to use for the "Today" link
 function CP_setTodayText(text) {
 	this.todayText = text;
 	}
 
 // Set the prefix to be added to all CSS classes when writing output
-function CP_setCssPrefix(val) { 
-	this.cssPrefix = val; 
+function CP_setCssPrefix(val) {
+	this.cssPrefix = val;
 	}
 
 // Show the navigation as an dropdowns that can be manually changed
@@ -366,7 +374,7 @@ function CP_hideCalendar() {
 // Refresh the contents of the calendar display
 function CP_refreshCalendar(index) {
 	var calObject = window.popupWindowObjects[index];
-	if (arguments.length>1) { 
+	if (arguments.length>1) {
 		calObject.populate(calObject.getCalendar(arguments[1],arguments[2],arguments[3],arguments[4],arguments[5]));
 		}
 	else {
@@ -400,8 +408,8 @@ function CP_select(inputobj, linkname, format) {
 		alert("calendar.select: This function can only be used with displayType 'date' or 'week-end'");
 		return;
 		}
-	if (inputobj.type!="text" && inputobj.type!="hidden" && inputobj.type!="textarea") { 
-		alert("calendar.select: Input object passed is not a valid form input object"); 
+	if (inputobj.type!="text" && inputobj.type!="hidden" && inputobj.type!="textarea") {
+		alert("calendar.select: Input object passed is not a valid form input object");
 		window.CP_targetInput=null;
 		return;
 		}
@@ -423,7 +431,7 @@ function CP_select(inputobj, linkname, format) {
 	window.CP_dateFormat = format;
 	this.showCalendar(linkname);
 	}
-	
+
 // Get style block needed to display the calendar correctly
 function getCalendarStyles() {
 	var result = "";
@@ -483,7 +491,7 @@ function CP_getCalendar() {
 		var display_date = 1;
 		var weekday= current_month.getDay();
 		var offset = 0;
-		
+
 		offset = (weekday >= this.weekStartDay) ? weekday-this.weekStartDay : 7-this.weekStartDay+weekday ;
 		if (offset > 0) {
 			display_month--;
@@ -620,7 +628,7 @@ function CP_getCalendar() {
 	// ------------------------------------
 	if (this.displayType=="month" || this.displayType=="quarter" || this.displayType=="year") {
 		if (arguments.length > 0) { var year = arguments[0]; }
-		else { 
+		else {
 			if (this.displayType=="year") {	var year = now.getFullYear()-this.yearSelectStartOffset; }
 			else { var year = now.getFullYear(); }
 			}
@@ -633,8 +641,8 @@ function CP_getCalendar() {
 			result += '</TR></TABLE>\n';
 			}
 		}
-		
-	// Code for MONTH display 
+
+	// Code for MONTH display
 	// ----------------------
 	if (this.displayType=="month") {
 		// If POPUP, write entire HTML document
@@ -649,7 +657,7 @@ function CP_getCalendar() {
 			}
 		result += '</TABLE></CENTER></TD></TR></TABLE>\n';
 		}
-	
+
 	// Code for QUARTER display
 	// ------------------------
 	if (this.displayType=="quarter") {

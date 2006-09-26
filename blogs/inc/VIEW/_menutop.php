@@ -34,6 +34,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $io_charset, $rsc_url, $UserSettings, $Debuglog, $Plugins, $generating_static;
+global $month, $month_abbrev, $weekday, $weekday_abbrev; /* for localized calendar */
 
 header( 'Content-type: text/html; charset='.$io_charset );
 ?>
@@ -60,6 +61,12 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/form_extensions.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/anchorposition.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/date.js"></script>
+	<script type="text/javascript">
+		// Override vars used by date.js (and calendarpopup.js, if present)
+		var MONTH_NAMES=new Array( '<?php echo implode("','", array_map('T_',$month)) ?>','<?php echo implode("','", array_map('trim', array_map( 'T_', $month_abbrev ))) ?>' );
+		var DAY_NAMES=new Array('<?php echo implode("','", $weekday) ?>','<?php echo implode("','", array_map('T_',$weekday_abbrev)) ?>');
+		var DAY_NAMES=new Array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sun','Mon','Tue','Wed','Thu','Fri','Sat');
+	</script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/popupwindow.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/calendarpopup.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/rollovers.js"></script>

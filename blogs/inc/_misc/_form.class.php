@@ -706,20 +706,8 @@ class Form extends Widget
 						cal_'.$field_name.'.showYearNavigation();
 						cal_'.$field_name.'.showNavigationDropdowns();
 						// cal_'.$field_name.'.showYearNavigationInput();
-						cal_'.$field_name.'.setMonthNames( '
-							."'".T_($month['01'])."',"
-							."'".T_($month['02'])."',"
-							."'".T_($month['03'])."',"
-							."'".T_($month['04'])."',"
-							."'".T_($month['05'])."',"
-							."'".T_($month['06'])."',"
-							."'".T_($month['07'])."',"
-							."'".T_($month['08'])."',"
-							."'".T_($month['09'])."',"
-							."'".T_($month['10'])."',"
-							."'".T_($month['11'])."',"
-							."'".T_($month['12'])."');\n"
-				.' cal_'.$field_name.'.setDayHeaders( '
+						// MonthNames get set through MONTH_NAMES
+				   cal_'.$field_name.'.setDayHeaders( '
 							."'".T_($weekday_letter[0])."',"
 							."'".T_($weekday_letter[1])."',"
 							."'".T_($weekday_letter[2])."',"
@@ -2662,6 +2650,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.40  2006/09/26 11:20:01  blueyed
+ * Moved localization of calendar "down" to date.js, as pre-requisite to extend the parsing functionality of date input fields.
+ *
  * Revision 1.39  2006/09/23 18:26:49  blueyed
  * XHTML fix: wrap the whole FORM content into a DIV (display:inline)
  *
