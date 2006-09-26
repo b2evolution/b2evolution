@@ -2045,7 +2045,7 @@ function generate_random_passwd( $length = 8 )
 
 	for( $i = 0; $i < $length; $i++ )
 	{
-		$key .= $keychars{mt_rand(0, $rnd_max)}; // get a random character out of $chars
+		$key .= $keychars{mt_rand(0, $rnd_max)}; // get a random character out of $keychars
 	}
 
 	return $key;
@@ -2495,6 +2495,9 @@ function url_same_protocol( $url, $other_url = NULL )
 
 /*
  * $Log$
+ * Revision 1.118  2006/09/26 11:22:47  blueyed
+ * doc fix
+ *
  * Revision 1.117  2006/09/26 11:21:15  blueyed
  * Fixed generate_random_passwd()
  *
