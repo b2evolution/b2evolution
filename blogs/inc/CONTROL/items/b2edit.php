@@ -319,7 +319,7 @@ switch( $action )
 		{
 			var posttitle = document.getElementById('post_title').value;
 
-			document.title = document.title.replace( /(<?php echo $js_doc_title_prefix ?>).*$/, '$1'+posttitle );
+			document.title = document.title.replace( /(<?php echo preg_quote( trim($js_doc_title_prefix) /* e.g. FF2 trims document.title */ ) ?>).*$/, '$1 '+posttitle );
 		}
 
 		addEvent( post_title_elt, 'keyup', evo_update_document_title, false );
