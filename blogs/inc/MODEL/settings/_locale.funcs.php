@@ -212,7 +212,7 @@ function TS_( $string, $req_locale = '' )
 /**
  * Temporarily switch to another locale
  *
- * Calls can be nested, see {@link locale_restore_previous}.
+ * Calls can be nested, see {@link locale_restore_previous()}.
  *
  * @param string locale to activate
  * @return boolean true on success, false on failure
@@ -900,6 +900,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.24  2006/09/26 21:24:32  blueyed
+ * doc fix
+ *
  * Revision 1.23  2006/09/17 21:28:13  blueyed
  * doc. todo.
  *
