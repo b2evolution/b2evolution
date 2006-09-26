@@ -560,11 +560,27 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 	}
 
 	// Convert PHP date format to regexp pattern:
-	// WARNING: this is very incomplete!! Please expand as needed.
-	$date_regexp = '¤^'.preg_replace(
-		array( '/\\./', '/d/', '/m/', '/y/', '/Y/' ),
-		array( '\\.', '(\\d\\d)', '(\\d\\d)', '(\\d\\d)', '(\\d\\d\\d\\d)' ),
-		$date_format ).'$¤';
+	$date_regexp = '~'.preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
+		if( $m[1] == "\\\" ) return $m[2]; // escaped
+		switch( $m[2] )
+		{
+			case "d": return "([0-3]\\d)"; // day, 01-31
+			case "j": return "([1-3]?\\d)"; // day, 1-31
+			case "l": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday"])))).")";
+			case "D": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_abbrev"])))).")";
+			case "e": // b2evo extension!
+				return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_letter"])))).")";
+
+			case "m": return "([0-1]\\d)"; // month, 01-12
+			case "n": return "(1?\\d)"; // month, 1-12
+			case "F": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["month"])))).")"; //  A full textual representation of a month, such as January or March
+			case "M": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["month_abbrev"])))).")";
+
+			case "y": return "(\\d\\d)"; // year, 00-99
+			case "Y": return "(\\d{4})"; // year, XXXX
+			default:
+				return $m[0];
+		}' ), $date_format ).'~i'; // case-insensitive?
 	// echo $date_format.'...'.$date_regexp;
 
 	// Check that the numbers match the date pattern:
@@ -573,7 +589,7 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 		//pre_dump( $numbers );
 
 		// Get all date pattern parts. We should get 3 parts!:
-		preg_match_all( '/[A-Za-z]/', $date_format, $parts );
+		preg_match_all( '/(?<!\\\\)[A-Za-z]/', $date_format, $parts ); // "(?<!\\\\)" means that the letter is not escaped with "\"
 		//pre_dump( $parts );
 
 		foreach( $parts[0] as $position => $part )
@@ -581,11 +597,19 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 			switch( $part )
 			{
 				case 'd':
+				case 'j':
 					$day = $numbers[$position+1];
 					break;
 
 				case 'm':
+				case 'n':
 					$month = $numbers[$position+1];
+					break;
+				case 'F': // full month name
+					$month = array_search( strtolower($numbers[$position+1]), array_map('strtolower', array_map('trim', array_map('T_', $GLOBALS['month']))) );
+					break;
+				case 'M':
+					$month = array_search( strtolower($numbers[$position+1]), array_map('strtolower', array_map('trim', array_map('T_', $GLOBALS['month_abbrev']))) );
 					break;
 
 				case 'y':
@@ -1561,6 +1585,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.11  2006/09/26 21:13:05  blueyed
+ * Fixed handling of locale dateformats with other chars than "d", "m" and "Y"/"y" when editing items
+ *
  * Revision 1.10  2006/09/13 17:08:29  blueyed
  * Added $date_format param to param_date(); doc fixes; JS fix
  *

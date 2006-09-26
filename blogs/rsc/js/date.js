@@ -11,7 +11,7 @@
 // use. That means, you can include it in your product, or your web
 // site, or any other form where the code is actually being used. You
 // may not put the plain javascript up on your site for download or
-// include it in your javascript libraries for download. 
+// include it in your javascript libraries for download.
 // If you wish to share this code with others, please just point them
 // to the URL instead.
 // Please DO NOT link directly to my .js files from your site. Copy
@@ -20,17 +20,19 @@
 
 // HISTORY
 // ------------------------------------------------------------------
+// Sep 26, 2006: Handle escaped chars in format string, e.g. "\d" as
+//               literal "d" (blueyed)
 // May 17, 2003: Fixed bug in parseDate() for dates <1970
 // March 11, 2003: Added parseDate() function
 // March 11, 2003: Added "NNN" formatting option. Doesn't match up
-//                 perfectly with SimpleDateFormat formats, but 
+//                 perfectly with SimpleDateFormat formats, but
 //                 backwards-compatability was required.
 
 // ------------------------------------------------------------------
-// These functions use the same 'format' strings as the 
+// These functions use the same 'format' strings as the
 // java.text.SimpleDateFormat class, with minor exceptions.
 // The format string consists of the following abbreviations:
-// 
+//
 // Field        | Full Form          | Short Form
 // -------------+--------------------+-----------------------
 // Year         | yyyy (4 digits)    | yy (2 digits), y (2 or 4 digits)
@@ -144,6 +146,15 @@ function formatDate(date,format) {
 	value["ss"]=LZ(s);
 	while (i_format < format.length) {
 		c=format.charAt(i_format);
+		if( c == "\\" )
+		{ // Use escaped char as-is:
+			i_format++;
+			if( i_format < format.length ) {
+				result=result + format.charAt(i_format);
+				i_format++;
+			}
+			continue;
+		}
 		token="";
 		while ((format.charAt(i_format)==c) && (i_format < format.length)) {
 			token += format.charAt(i_format++);
@@ -153,7 +164,7 @@ function formatDate(date,format) {
 		}
 	return result;
 	}
-	
+
 // ------------------------------------------------------------------
 // Utility functions for parsing in getDateFromFormat()
 // ------------------------------------------------------------------
@@ -172,12 +183,12 @@ function _getInt(str,i,minlength,maxlength) {
 		}
 	return null;
 	}
-	
+
 // ------------------------------------------------------------------
 // getDateFromFormat( date_string , format_string )
 //
 // This function takes a date string and a format string. It matches
-// If the date string matches the format string, it returns the 
+// If the date string matches the format string, it returns the
 // getTime() of the date. If it does not match, it returns 0.
 // ------------------------------------------------------------------
 function getDateFromFormat(val,format) {
@@ -197,10 +208,25 @@ function getDateFromFormat(val,format) {
 	var mm=now.getMinutes();
 	var ss=now.getSeconds();
 	var ampm="";
-	
+
 	while (i_format < format.length) {
 		// Get next token from format string
 		c=format.charAt(i_format);
+
+		if( c == "\\" )
+		{ // Consume escaped char:
+			i_format++;
+			if( i_format < format.length ) {
+				if( format.charAt(i_format) != val.charAt(i_val) )
+				{ // Escaped char not found:
+					return 0;
+				}
+				i_format++;
+			}
+			i_val++;
+			continue;
+		}
+
 		token="";
 		while ((format.charAt(i_format)==c) && (i_format < format.length)) {
 			token += format.charAt(i_format++);

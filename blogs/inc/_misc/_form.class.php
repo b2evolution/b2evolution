@@ -647,13 +647,29 @@ class Form extends Widget
 		// Don't keep that attrib in the list:
 		unset( $field_params['date_format'] );
 
-		// Convert PHP date format to JS library date format:
-		// WARNING: this is very incomplete!! Please expand as needed.
-		$js_date_format = str_replace(
-			array( 'd', 'm', 'y', 'Y' ),
-			array( 'dd', 'MM', 'yy', 'yyyy' ),
-			$date_format );
+		// Convert PHP date format to JS library date format (date.js):
+		// NOTE: when editing/extending this here, you probably also have to adjust param_check_date()!
+		$js_date_format = preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
+			if( $m[1] == "\\\" ) return "\\\".$m[0]; // leave escaped
+			switch( $m[2] )
+			{
+				case "d": return "dd"; // day, 01-31
+				case "j": return "d"; // day, 1-31
+				case "l": return "EE"; // weekday (name)
+				case "D": return "E"; // weekday (abbr)
+				case "e": return ""; // weekday letter, not supported
 
+				case "m": return "MM"; // month, 01-12
+				case "n": return "M"; // month, 1-12
+				case "F": return "MMM"; // full month name; "name or abbr" in date.js
+				case "M": return "NNN"; // month name abbr
+
+				case "y": return "yy"; // year, 00-99
+				case "Y": return "yyyy"; // year, XXXX
+				default:
+					return $m[0];
+			}' ), $date_format );
+		#pre_dump( $js_date_format );
 
 		if( param_has_error( $field_name ) )
 		{ // There is an error message for this field:
@@ -691,10 +707,13 @@ class Form extends Widget
 			$field_params['size'] = strlen( $js_date_format );
 		}
 
+		/*
+		dh> do not use maxlength by default. Makes no sense IMHO and fails with dateformats like "j \d\e F, Y"
 		if( !isset($field_params['maxlength']) )
 		{
 			$field_params['maxlength'] = $field_params['size'];
 		}
+		*/
 
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
@@ -2650,6 +2669,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.41  2006/09/26 21:13:05  blueyed
+ * Fixed handling of locale dateformats with other chars than "d", "m" and "Y"/"y" when editing items
+ *
  * Revision 1.40  2006/09/26 11:20:01  blueyed
  * Moved localization of calendar "down" to date.js, as pre-requisite to extend the parsing functionality of date input fields.
  *
