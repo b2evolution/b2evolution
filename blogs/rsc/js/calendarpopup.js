@@ -20,6 +20,8 @@
 
 // HISTORY
 // ------------------------------------------------------------------
+// Sep 26, 2006: If MONTH_NAMES is already defined, use it.
+//               (blueyed)
 // March 29, 2004: Added check in select() method for the form field
 //      being disabled. If it is, just return and don't do anything.
 // March 24, 2004: Fixed bug - when month name and abbreviations were
