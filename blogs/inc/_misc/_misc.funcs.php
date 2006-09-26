@@ -2020,7 +2020,7 @@ function generate_random_key( $length = 32 )
 
 	for( $i = 0; $i < $length; $i++ )
 	{
-		$key .= $keychars{mt_rand(0, $rnd_max )}; // get a random character out of $chars
+		$key .= $keychars{mt_rand(0, $rnd_max)}; // get a random character out of $chars
 	}
 
 	return $key;
@@ -2045,7 +2045,7 @@ function generate_random_passwd( $length = 8 )
 
 	for( $i = 0; $i < $length; $i++ )
 	{
-		$key .= $keychars{mt_rand(0, $keychars )}; // get a random character out of $chars
+		$key .= $keychars{mt_rand(0, $rnd_max)}; // get a random character out of $chars
 	}
 
 	return $key;
@@ -2495,6 +2495,9 @@ function url_same_protocol( $url, $other_url = NULL )
 
 /*
  * $Log$
+ * Revision 1.117  2006/09/26 11:21:15  blueyed
+ * Fixed generate_random_passwd()
+ *
  * Revision 1.116  2006/09/21 17:35:54  blueyed
  * Add failure message to "error" category of Debuglog, instead of "note".
  *
