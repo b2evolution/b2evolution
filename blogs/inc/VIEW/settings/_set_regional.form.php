@@ -42,10 +42,11 @@ global $current_User;
 global $Settings;
 
 global $rsc_subdir, $pagenow, $locales_path, $locales, $action, $edit_locale, $loc_transinfo, $template, $allow_po_extraction, $servertimenow, $allow_po_extraction;
+global $localtimenow;
 
 
 if( $action == 'edit' )
-{
+{ // Edit a locale:
 	param( 'template', 'string', ($edit_locale == '_new_') ? T_('Create new locale') : T_('Edit locale'), 'createnew' );
 
 	$Form = & new Form( $pagenow, 'loc_checkchanges' );
@@ -75,8 +76,10 @@ if( $action == 'edit' )
 
 	if( $edit_locale != '_new_' )
 	{ // we need to remember this for updating locale
-		echo '<input type="hidden" name="oldloc_locale" value="'.$newlocale.'" />';
+		$Form->hidden( 'oldloc_locale', $newlocale );
 	}
+
+	$Form->begin_fieldset();
 	$Form->text( 'newloc_locale', $newlocale, 20, T_('Locale'), sprintf(T_('The first two letters should be a <a %s>ISO 639 language code</a>. The last two letters should be a <a %s>ISO 3166 country code</a>.'), 'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_15.html#SEC221"', 'href="http://www.gnu.org/software/gettext/manual/html_chapter/gettext_16.html#SEC222"'), 20 );
 	$Form->checkbox( 'newloc_enabled', (isset($ltemplate['enabled']) && $ltemplate['enabled']), T_('Enabled'),	T_('Should this locale be available to users?') );
 	$Form->text( 'newloc_name', (isset($ltemplate['name']) ? $ltemplate['name'] : ''), 40, T_('Name'),
@@ -90,12 +93,18 @@ if( $action == 'edit' )
 	$Form->text( 'newloc_priority', (isset($ltemplate['priority']) ? $ltemplate['priority'] : ''), 3, T_('Priority'),
 		T_('1 is highest. Priority is important when selecting a locale from a language code and several locales match the same language; this can happen when detecting browser language. Priority also affects the order in which locales are displayed in dropdown boxes, etc.'), 5 );
 
+	// TODO: Update this field onchange of datefmt/timefmt through AJAX:
+	locale_temp_switch($newlocale);
+	$Form->info_field( T_('Date preview:'), date_i18n( locale_datefmt().' '.locale_timefmt(), $localtimenow ) );
+	locale_restore_previous();
+
 	// generate Javascript array of locales to warn in case of overwriting
 	$l_warnfor = "'".implode("', '", array_keys($locales))."'";
 	if( $edit_locale != '_new_' )
 	{ // remove the locale we want to edit from the generated array
 		$l_warnfor = str_replace("'$newlocale'", "'thiswillneverevermatch'", $l_warnfor);
 	}
+	$Form->end_fieldset();
 
 	$Form->end_form( array( array( 'submit', 'submit', ($edit_locale == '_new_') ? T_('Create') : T_('Update'), 'SaveButton' ),
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
@@ -238,15 +247,15 @@ else
 	$Form->begin_fieldset( T_('Available locales') );
 
 	echo '<p class="center">';
-	if( $loc_transinfo )
-	{
+	if( $loc_transinfo ) {
 		echo '<a href="'.$pagenow.'?ctrl=locales">' . T_('Hide translation info'), '</a>';
 	}
-	else
-	{
+	else {
 		echo '<a href="'.$pagenow.'?ctrl=locales&amp;loc_transinfo=1">' . T_('Show translation info'), '</a>';
 	}
 	echo '</p>';
+
+	echo '<p class="note">'.T_('Hover over the format fields to see a preview.').'</p>';
 
 	echo '<table class="grouped" cellspacing="0">';
 
@@ -283,6 +292,13 @@ else
 	foreach( $locales as $lkey => $lval )
 	{
 		$i++;
+
+		// Generate preview of date/time-format:
+		locale_temp_switch($lkey);
+		$datefmt_preview = date_i18n( $locales[$lkey]['datefmt'], $localtimenow );
+		$timefmt_preview = date_i18n( $locales[$lkey]['timefmt'], $localtimenow );
+		locale_restore_previous();
+
 		?>
 		<tr class="<?php echo (($i%2 == 1) ? 'odd' : 'even') ?>">
 		<td class="firstcol left" title="<?php echo T_('Priority').': '.$locales[$lkey]['priority'].', '.T_('Charset').': '.$locales[$lkey]['charset'].', '.T_('Lang file').': '.$locales[$lkey]['messages'] ?>">
@@ -300,6 +316,8 @@ else
 			{
 				echo '</a>';
 			}
+
+			// TODO: Update title attribs for datefmt/timefmt onchange through AJAX
 			echo '</strong></td>
 				<td class="center">
 					<input type="checkbox" name="loc_'.$i.'_enabled" value="1"'. ( $locales[$lkey]['enabled'] ? 'checked="checked"' : '' ).' />
@@ -308,10 +326,10 @@ else
 					<input type="text" name="loc_'.$i.'_name" value="'.format_to_output( $locales[$lkey]['name'], 'formvalue' ).'" maxlength="40" size="17" />
 				</td>
 				<td>
-					<input type="text" name="loc_'.$i.'_datefmt" value="'.format_to_output( $locales[$lkey]['datefmt'], 'formvalue' ).'" maxlength="20" size="6" />
+					<input type="text" name="loc_'.$i.'_datefmt" value="'.format_to_output( $locales[$lkey]['datefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $datefmt_preview ), 'formvalue' ).'" />
 				</td>
 				<td>
-					<input type="text" name="loc_'.$i.'_timefmt" value="'.format_to_output( $locales[$lkey]['timefmt'], 'formvalue' ).'" maxlength="20" size="6" />
+					<input type="text" name="loc_'.$i.'_timefmt" value="'.format_to_output( $locales[$lkey]['timefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $timefmt_preview ), 'formvalue' ).'" />
 				</td>
 				<td>';
 			$Form->switch_layout( 'none' );
@@ -476,6 +494,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.11  2006/09/26 20:57:38  blueyed
+ * Display preview of date- and time-format in locales editing screen
+ *
  * Revision 1.10  2006/09/25 20:25:49  blueyed
  * Extended date- and time-format fields for locales to 20 chars. See http://forums.b2evolution.net//viewtopic.php?p=44335#44335
  *
