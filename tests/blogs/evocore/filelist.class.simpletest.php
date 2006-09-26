@@ -28,12 +28,6 @@ class FilelistTestCase extends FilemanUnitTestCase
 	}
 
 
-	function tearDown()
-	{
-		parent::tearDown();
-	}
-
-
 	/**
 	 * Tests add_by_path()
 	 */
@@ -236,7 +230,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
 	$test = new FilelistTestCase();
-	$test->run( new HtmlReporter() );
+	$test->run_html_or_cli();
 	unset( $test );
 }
 

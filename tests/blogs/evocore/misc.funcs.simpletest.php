@@ -22,19 +22,7 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 {
 	function MiscFuncsTestCase()
 	{
-		$this->UnitTestCase( 'Miscellaneous functions test' );
-	}
-
-
-	function setUp()
-	{
-		parent::setup();
-	}
-
-
-	function tearDown()
-	{
-		parent::tearDown();
+		$this->EvoUnitTestCase( 'Miscellaneous functions test' );
 	}
 
 
@@ -280,7 +268,7 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
 	$test = new MiscFuncsTestCase();
-	$test->run( new HtmlReporter() );
+	$test->run_html_or_cli();
 	unset( $test );
 }
 ?>

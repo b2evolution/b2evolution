@@ -30,18 +30,6 @@ class FormTestCase extends EvoUnitTestCase
 	}
 
 
-	function setUp()
-	{
-		parent::setUp();
-	}
-
-
-	function tearDown()
-	{
-		parent::tearDown();
-	}
-
-
 	/**
 	 * Test {@link Form::hiddens_by_key()}
 	 */
@@ -86,7 +74,7 @@ class FormTestCase extends EvoUnitTestCase
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
 	$test = new FormTestCase();
-	$test->run( new HtmlReporter() );
+	$test->run_html_or_cli();
 	unset( $test );
 }
 ?>

@@ -31,18 +31,6 @@ class ExtLibsTestCase extends EvoUnitTestCase
 	}
 
 
-	function setUp()
-	{
-		parent::setup();
-	}
-
-
-	function tearDown()
-	{
-		parent::tearDown();
-	}
-
-
 	/**
 	 * Tests {@link idna_convert::encode()}
 	 */
@@ -133,7 +121,7 @@ class ExtLibsTestCase extends EvoUnitTestCase
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
 	$test = new ExtLibsTestCase();
-	$test->run( new HtmlReporter() );
+	$test->run_html_or_cli();
 	unset( $test );
 }
 ?>

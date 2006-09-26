@@ -8,48 +8,25 @@
  */
 require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 
-
 require_once $GLOBALS['plugins_path'].'_auto_p.plugin.php';
 
 
 /**
  * @package tests
  */
-class AutoPPluginTestCase extends UnitTestCase
+class AutoPPluginTestCase extends PluginUnitTestCase
 {
 	function AutoPPluginTestCase()
 	{
-		$this->UnitTestCase( 'Auto-P plugin test' );
+		$this->PluginUnitTestCase( 'Auto-P plugin test' );
 	}
 
 
 	function setUp()
 	{
 		parent::setup();
-		$this->Plugins = & new Plugins_no_DB();
 
-
-		$GLOBALS['DB'] = new MockDB( $this );
-
-		$real_Plugin = new auto_p_plugin();
-
-		// Fake DB entry:
-		$this->Plugins->index_ID_rows[1] = array(
-			'plug_ID' => 1,
-			'plug_priority' => 50,
-			'plug_classname' => 'auto_p_plugin',
-			'plug_code' => 'fake',
-			'plug_apply_rendering' => 'always',
-			'plug_status' => 'enabled',
-			'plug_version' => $real_Plugin->version );
-		$this->Plugins->register( 'auto_p_plugin', /* fake DB entry: */ 1 );
-		$this->Plugin = & $this->Plugins->get_next();
-	}
-
-
-	function tearDown()
-	{
-		parent::tearDown();
+		$this->Plugin = & $this->get_fake_Plugin('auto_p_plugin');
 	}
 
 
@@ -100,15 +77,12 @@ class AutoPPluginTestCase extends UnitTestCase
 
 
 	/**
-	 *
-	 *
-	 * @return
+	 * @return string
 	 */
 	function render_no_p_in_blocks( $data )
 	{
 		return $this->render($data, false);
 	}
-
 
 
 	/**
@@ -337,7 +311,7 @@ if( !isset( $this ) )
 	$Debuglog = new Log();
 
 	$test = new AutoPPluginTestCase();
-	$test->run( new HtmlReporter() );
+	$test->run_html_or_cli();
 	unset( $test );
 }
 ?>

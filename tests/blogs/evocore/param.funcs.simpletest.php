@@ -21,7 +21,7 @@ class ParamFuncsTestCase extends EvoUnitTestCase
 {
 	function ParamFuncsTestCase()
 	{
-		$this->UnitTestCase( 'Param functions test' );
+		$this->EvoUnitTestCase( 'Param functions test' );
 	}
 
 
@@ -32,16 +32,21 @@ class ParamFuncsTestCase extends EvoUnitTestCase
 	{
 		parent::setup();
 
-		$this->old_GLOBALS = serialize($GLOBALS); // simulate cloning
+		$this->used_globals = array_keys($GLOBALS);
 	}
 
 
 	/**
-	 * Restore previous GLOBAL scope.
+	 * Restore previous GLOBAL scope, by unsetting the ones created since {@link setUp()}.
 	 */
 	function tearDown()
 	{
-		$GLOBALS = unserialize($this->old_GLOBALS); // simulate cloning
+		$used_globals = array_keys($GLOBALS);
+
+		foreach( array_diff( $used_globals, $this->used_globals ) as $k )
+		{
+			unset( $GLOBALS[$k] );
+		}
 
 		parent::tearDown();
 	}
@@ -55,7 +60,7 @@ class ParamFuncsTestCase extends EvoUnitTestCase
 
 	function test_typing()
 	{
-		// QUESTION: do we expect the first test to fail really?
+		// QUESTION: dh> do we expect the first test to fail really?
 
 		$_POST['test1'] = '';
 		$this->assertIdentical( param( 'test1', 'array', array() ), array() );
@@ -82,7 +87,7 @@ class ParamFuncsTestCase extends EvoUnitTestCase
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
 	$test = new ParamFuncsTestCase();
-	$test->run( new HtmlReporter() );
+	$test->run_html_or_cli();
 	unset( $test );
 }
 ?>

@@ -103,7 +103,7 @@ class UpgradeToCurrentTestCase extends InstallUnitTestCase
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
 	$test = new UpgradeToCurrentTestCase();
-	$test->run( new HtmlReporter() );
+	$test->run_html_or_cli();
 	unset( $test );
 }
 ?>

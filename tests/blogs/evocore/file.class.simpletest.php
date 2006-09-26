@@ -20,29 +20,6 @@ class FileTestCase extends FilemanUnitTestCase
 	}
 
 
-	function setUp()
-	{
-		parent::setUp();
-
-		Mock::generate('GeneralSettings');
-
-		$this->old_Settings = & $GLOBALS['Settings'];
-		$GLOBALS['Settings'] = new MockGeneralSettings();
-		$GLOBALS['Settings']->setReturnValue( 'get', 1, array( 'fm_enable_roots_user' ) );
-		$GLOBALS['Settings']->setReturnValue( 'get', '775', array( 'fm_default_chmod_dir' ) );
-		$GLOBALS['Settings']->setReturnValue( 'get', '664', array( 'fm_default_chmod_file' ) );
-	}
-
-
-	function tearDown()
-	{
-		parent::tearDown();
-
-		$GLOBALS['Settings'] = & $this->old_Settings;
-		$this->unlinkCreatedFiles();
-	}
-
-
 	/**
 	 * Check if an existing file gets found.
 	 */
@@ -117,7 +94,7 @@ class FileTestCase extends FilemanUnitTestCase
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
 	$test = new FileTestCase();
-	$test->run( new HtmlReporter() );
+	$test->run_html_or_cli();
 	unset( $test );
 }
 ?>

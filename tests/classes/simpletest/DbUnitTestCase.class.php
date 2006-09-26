@@ -39,6 +39,8 @@ class DbUnitTestCase extends EvoUnitTestCase
 
 		$this->test_DB = new DbUnitTestCase_DB( $testDB_conf );
 		$this->test_DB->halt_on_error = false;
+
+		$this->EvoUnitTestCase();
 	}
 
 
@@ -66,14 +68,14 @@ class DbUnitTestCase extends EvoUnitTestCase
 	{
 		$this->test_DB->commit();
 
-		parent::tearDown();
-
 		if( $this->test_DB->error )
 		{
 			$this->fail( 'There has been a DB error.' );
 		}
 
 		$GLOBALS['DB'] = & $this->old_DB;
+
+		parent::tearDown();
 	}
 
 

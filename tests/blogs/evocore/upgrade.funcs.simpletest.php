@@ -28,12 +28,6 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 	}
 
 
-	function tearDown()
-	{
-		parent::tearDown();
-	}
-
-
 	/**
 	 * A wrapper to always execute the generated queries (check for SQL errors) and
 	 * do not exclude any query types.
@@ -898,7 +892,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
 	$test = new UpgradeFuncsTestCase();
-	$test->run( new HtmlReporter() );
+	$test->run_html_or_cli();
 	unset( $test );
 }
 ?>

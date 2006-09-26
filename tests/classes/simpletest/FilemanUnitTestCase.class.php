@@ -16,6 +16,35 @@ class FilemanUnitTestCase extends EvoUnitTestCase
 
 
 	/**
+	 * Create global mocked $Settings object.
+	 */
+	function setUp()
+	{
+		parent::setUp();
+
+		Mock::generate('GeneralSettings');
+
+		$this->old_Settings_FilemanUnitTestCase = & $GLOBALS['Settings'];
+		$GLOBALS['Settings'] = new MockGeneralSettings();
+		$GLOBALS['Settings']->setReturnValue( 'get', 1, array( 'fm_enable_roots_user' ) );
+		$GLOBALS['Settings']->setReturnValue( 'get', '775', array( 'fm_default_chmod_dir' ) );
+		$GLOBALS['Settings']->setReturnValue( 'get', '664', array( 'fm_default_chmod_file' ) );
+	}
+
+
+	/**
+	 * Restore $Settings global
+	 */
+	function tearDown()
+	{
+		$GLOBALS['Settings'] = & $this->old_Settings_FilemanUnitTestCase;
+		$this->unlinkCreatedFiles();
+
+		parent::tearDown();
+	}
+
+
+	/**
 	 * Create a file for a given user.
 	 *
 	 * @return string|false the file name of the created file

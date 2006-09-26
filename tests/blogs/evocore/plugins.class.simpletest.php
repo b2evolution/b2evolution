@@ -25,16 +25,10 @@ class PluginsTestCase extends DbUnitTestCase
 		parent::setUp();
 
 		ob_start();
-		$this->create_current_tables( true ); // we need current tables for Plugins to work
+		$this->create_current_tables(); // we need current tables for Plugins to work
 		ob_end_clean();
 
 		$this->Plugins = new Plugins();
-	}
-
-
-	function tearDown()
-	{
-		parent::tearDown();
 	}
 
 
@@ -135,7 +129,7 @@ class simpletests_b_plugin extends Plugin
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
 	$test = new PluginsTestCase();
-	$test->run( new HtmlReporter() );
+	$test->run_html_or_cli();
 	unset( $test );
 }
 

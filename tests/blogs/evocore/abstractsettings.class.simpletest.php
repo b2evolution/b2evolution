@@ -24,14 +24,18 @@ class AbstractSettingsTestCase extends EvoUnitTestCase
 	{
 		parent::setup();
 
-		$this->MockDB =& new MockDB($this);
-		$GLOBALS['DB'] = $this->MockDB;
+		$this->MockDB = new MockDB($this);
+		$this->old_DB_AbstractSettingsTestCase = & $GLOBALS['DB'];
+		$GLOBALS['DB'] = & $this->MockDB;
+
 		$this->TestSettings =& new AbstractSettings( 'testtable', array( 'test_name' ), 'test_value' );
 	}
 
 
 	function tearDown()
 	{
+		$GLOBALS['DB'] = & $this->old_DB_AbstractSettingsTestCase;
+
 		parent::tearDown();
 	}
 
@@ -82,7 +86,7 @@ class AbstractSettingsTestCase extends EvoUnitTestCase
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
 	$test = new AbstractSettingsTestCase();
-	$test->run( new HtmlReporter() );
+	$test->run_html_or_cli();
 	unset( $test );
 }
 ?>

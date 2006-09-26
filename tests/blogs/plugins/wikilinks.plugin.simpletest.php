@@ -14,11 +14,11 @@ require_once( EVODIR.'blogs/plugins/_wikilinks.plugin.php' );
 /**
  * @package tests
  */
-class WikilinksPluginTestCase extends UnitTestCase
+class WikilinksPluginTestCase extends EvoUnitTestCase
 {
 	function WikilinksPluginTestCase()
 	{
-		$this->UnitTestCase( 'Wiki links plugin test' );
+		$this->EvoUnitTestCase( 'Wiki links plugin test' );
 	}
 
 
@@ -26,12 +26,6 @@ class WikilinksPluginTestCase extends UnitTestCase
 	{
 		parent::setup();
 		$this->Plugin = new wikilinks_plugin();
-	}
-
-
-	function tearDown()
-	{
-		parent::tearDown();
 	}
 
 
@@ -61,7 +55,7 @@ class WikilinksPluginTestCase extends UnitTestCase
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
 	$test = new WikilinksPluginTestCase();
-	$test->run( new HtmlReporter() );
+	$test->run_html_or_cli();
 	unset( $test );
 }
 ?>

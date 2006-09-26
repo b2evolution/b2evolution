@@ -2,7 +2,7 @@
 /**
  * This file implements a derived {@link GroupTest} class which
  * provides {@link loadAllTests} and overwrites {@link run()}
- * to detect CLI.
+ * to detect CLI and use an appropriate reporter then.
  */
 
 /**
