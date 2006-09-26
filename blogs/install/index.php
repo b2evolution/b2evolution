@@ -68,10 +68,24 @@ $timestamp = time() - 120; // We start dates 2 minutes ago because their dates i
 
 switch( $action ) {
 	case 'evoupgrade':
-		$title = T_('Upgrade');
+		$title = T_('Upgrade from a previous version');
 		break;
 
-	// TODO: dh> add appropriate titles for other actions
+	case 'newdb':
+		$title = T_('New Install');
+		break;
+
+	case 'cafelogupgrade':
+		$title = T_('Upgrade from Cafelog/b2');
+		break;
+
+	case 'deletedb':
+		$title = T_('Delete b2evolution tables');
+		break;
+
+	case 'start':
+		$title = T_('Base configuration');
+		break;
 
 	default:
 		$title = '';
@@ -616,6 +630,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.113  2006/09/26 11:23:40  blueyed
+ * Completed titles for $action
+ *
  * Revision 1.112  2006/09/25 20:11:40  blueyed
  * More distinct HTML title, just for upgrade now; TODO
  *
