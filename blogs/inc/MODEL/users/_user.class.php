@@ -448,7 +448,7 @@ class User extends DataObject
 	{
 		global $Debuglog;
 		$Debuglog->add( 'Call to deprecated method User::setGroup(), use set_Group() instead.', 'deprecated' );
-		return $this->set_Group( & $Group );
+		return $this->set_Group( $Group );
 	}
 
 
@@ -1139,6 +1139,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.43  2006/09/26 11:15:26  blueyed
+ * Minor fix for deprecated stub
+ *
  * Revision 1.42  2006/09/25 22:18:31  blueyed
  * Removed debug code, sorry.
  *
