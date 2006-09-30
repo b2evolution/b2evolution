@@ -45,6 +45,7 @@
 			<ul>
 				<li>Enhanced smilies plugin (Yabba)</li>
 				<li>Plugins can get localized/translated (blueyed)</li>
+				<li>Plugin name and short description of installed plugins can be edited by the admin (blueyed)</li>
 				<li>Plugins should not use a constructor anymore, but the PluginInit() method instead. The previous AppendPluginRegister() method has been "renamed" to PluginInit(). (blueyed)</li>
 				<li>Plugins can be grouped (see Plugin::group and Plugin::sub_group) (balupton, blueyed)</li>
 				<li>Added b2evo_Callbacks Javascript object to help plugins interact (blueyed)</li>
@@ -67,6 +68,7 @@
 				<li>Debuglog gets saved in user's session, to simplify debugging when redirects get used, e.g. when a comment gets posted (blueyed, yabba)</li>
 			</ul>
 		</li>
+		<li>Avoid generating ambiguous passwords (blueyed, fplanque)</li>
 	</ul>
 
 
@@ -80,7 +82,6 @@
 
 	<h2>1.8.2 (Final release)</h2>
 	<ul>
-		<li>Avoid generating ambiguous passwords (blueyed, fplanque)</li>
 		<li>Auto-P plugin fixes (blueyed)</li>
 		<li>Removed dependency on PHP tokenizer extension (blueyed)</li>
 		<li>Fixed feedback submission in basic and wpc_default skins (blueyed)</li>
