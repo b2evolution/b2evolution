@@ -437,9 +437,12 @@ class Plugins
 	{
 		$this->load_plugins_table();
 
-		foreach( $this->sorted_IDs as $plugin_ID )
+		foreach( $this->sorted_IDs as $k => $plugin_ID )
 		{ // Instantiate every plugin, so invalid ones do not get unregistered during sorting (crashes PHP, because $sorted_IDs gets changed etc)
-			$this->get_by_ID( $plugin_ID );
+			if( ! $this->get_by_ID( $plugin_ID ) )
+			{
+				unset($this->sorted_IDs[$k]);
+			}
 		}
 
 		switch( $order )
@@ -456,6 +459,8 @@ class Plugins
 				// Sort array by priority:
 				usort( $this->sorted_IDs, array( & $this, 'sort_Plugin_priority') );
 		}
+
+		$this->current_idx = 0;
 	}
 
 	/**
@@ -2909,6 +2914,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.82  2006/09/30 16:46:26  blueyed
+ * Merged fixes from v-1-8
+ *
  * Revision 1.81  2006/09/08 15:34:55  blueyed
  * Enhanced debugging for get_registered_events()
  *

@@ -439,6 +439,7 @@ switch( $action )
 			if( ! is_a($edit_Plugin, 'Plugin') )
 			{
 				$Messages->add( sprintf( T_( 'The plugin with ID %d could not get instantiated.' ), $plugin_ID ), 'error' );
+				$action = 'list';
 				break;
 			}
 		}
@@ -996,13 +997,14 @@ switch( $action )
 
 		</div>
 
-		<?php
+		<?php // }}}
 		break;
 
 
 	case 'edit_settings':
 		$AdminUI->disp_view( 'settings/_set_plugins_editsettings.form.php' );
 		break;
+
 
 	case 'info':
 		// Display plugin info:
