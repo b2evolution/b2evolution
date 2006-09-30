@@ -584,9 +584,23 @@ switch( $action )
 		}
 
 		// Params from/for form:
+		param( 'edited_plugin_name' );
+		param( 'edited_plugin_shortdesc' );
 		param( 'edited_plugin_code' );
 		param( 'edited_plugin_priority' );
 		param( 'edited_plugin_apply_rendering' );
+
+		// Update plugin name and shortdesc:
+		$edit_Plugin->name = $edited_plugin_name;
+		$edit_Plugin->short_desc = $edited_plugin_shortdesc;
+		if( $DB->query( '
+			UPDATE T_plugins
+			   SET plug_name = '.$DB->quote($edited_plugin_name).',
+			       plug_shortdesc = '.$DB->quote($edited_plugin_shortdesc).'
+			 WHERE plug_ID = '.$plugin_ID ) )
+		{
+			$Messages->add( T_('Plugin name/description updated.'), 'success' );
+		}
 
 		$updated = $admin_Plugins->set_code( $edit_Plugin->ID, $edited_plugin_code );
 		if( is_string( $updated ) )
@@ -634,10 +648,6 @@ switch( $action )
 			elseif( $edit_Plugin->Settings->dbupdate() )
 			{
 				$Messages->add( T_('Plugin settings have been updated.'), 'success' );
-			}
-			else
-			{
-				$Messages->add( T_('Plugin settings have not changed.'), 'note' );
 			}
 		}
 

@@ -430,6 +430,8 @@ $schema_queries = array(
 			plug_code            VARCHAR(32) NULL,
 			plug_apply_rendering ENUM( 'stealth', 'always', 'opt-out', 'opt-in', 'lazy', 'never' ) NOT NULL DEFAULT 'never',
 			plug_version         VARCHAR(42) NOT NULL default '0',
+			plug_name            VARCHAR(255) NULL default NULL,
+			plug_shortdesc       VARCHAR(255) NULL default NULL,
 			plug_status          ENUM( 'enabled', 'disabled', 'needs_config', 'broken' ) NOT NULL,
 			plug_spam_weight     TINYINT UNSIGNED NOT NULL DEFAULT 1,
 			PRIMARY KEY ( plug_ID ),
@@ -493,6 +495,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.36  2006/09/30 23:42:06  blueyed
+ * Allow editing the plugin name and short desc of installed plugins
+ *
  * Revision 1.35  2006/09/25 20:25:49  blueyed
  * Extended date- and time-format fields for locales to 20 chars. See http://forums.b2evolution.net//viewtopic.php?p=44335#44335
  *

@@ -150,7 +150,7 @@ class Plugins
 	 * @static
 	 */
 	var $sql_load_plugins_table = '
-			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_apply_rendering, plug_status, plug_version, plug_spam_weight
+			SELECT plug_ID, plug_priority, plug_classname, plug_classpath, plug_code, plug_name, plug_shortdesc, plug_apply_rendering, plug_status, plug_version, plug_spam_weight
 			  FROM T_plugins
 			 WHERE plug_status = "enabled"
 			 ORDER BY plug_priority, plug_classname';
@@ -2909,7 +2909,7 @@ class Plugins_admin extends Plugins
 	 * Load all plugins (not just enabled ones).
 	 */
 	var $sql_load_plugins_table = '
-			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_apply_rendering, plug_status, plug_version, plug_spam_weight
+			SELECT plug_ID, plug_priority, plug_classname, plug_classpath, plug_code, plug_name, plug_shortdesc, plug_apply_rendering, plug_status, plug_version, plug_spam_weight
 			  FROM T_plugins
 			 ORDER BY plug_priority, plug_classname';
 
@@ -2919,6 +2919,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.86  2006/09/30 23:42:06  blueyed
+ * Allow editing the plugin name and short desc of installed plugins
+ *
  * Revision 1.85  2006/09/30 23:12:40  blueyed
  * Do not re-sort when setting new prio for a plugin
  *

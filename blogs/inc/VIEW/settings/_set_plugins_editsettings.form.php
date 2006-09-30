@@ -75,8 +75,8 @@ $Form->begin_form( 'fform', '',
 $Form->hidden( 'plugin_ID', $edit_Plugin->ID );
 
 $Form->begin_fieldset( T_('Plugin info'), array( 'class' => 'clear' ) );
-	$Form->info_field( T_('Name'), $edit_Plugin->name );
-	$Form->info_field( T_('Short desc'), $edit_Plugin->short_desc );
+	$Form->text_input( 'edited_plugin_name', $edit_Plugin->name, 25, T_('Name'), array('maxlength' => 255) );
+	$Form->text_input( 'edited_plugin_shortdesc', $edit_Plugin->short_desc, 50, T_('Short desc'), array('maxlength' => 255) );
 $Form->end_fieldset();
 
 // PluginSettings
@@ -176,6 +176,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.21  2006/09/30 23:42:06  blueyed
+ * Allow editing the plugin name and short desc of installed plugins
+ *
  * Revision 1.20  2006/09/10 19:23:28  blueyed
  * Removed Plugin::code(), ::name(), ::short_desc() and ::long_desc(); Fixes for mt-import.php
  *
