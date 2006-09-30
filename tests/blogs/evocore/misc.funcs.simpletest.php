@@ -262,6 +262,15 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 			'http://example.com' );
 	}
 
+
+	/**
+	 * Test {@link format_to_output()}
+	 */
+	function test_format_to_output()
+	{
+		$this->assertEqual( format_to_output('<a href="">link</a>  text', 'text'), 'link text' );
+	}
+
 }
 
 

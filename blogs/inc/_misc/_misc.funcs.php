@@ -68,6 +68,7 @@ require_once $model_path.'files/_file.funcs.php';
  * - htmlhead: strips out HTML (mainly for use in Title)
  * - htmlattr: use as an attribute: escapes quotes, strip tags
  * - formvalue: use as a form value: escapes quotes and < > but leaves code alone
+ * - text: use as plain-text, e.g. for ascii-mails
  * - xml: use in an XML file: strip HTML tags
  * - xmlattr: use as an attribute: strips tags and escapes quotes
  * @return string formatted text
@@ -130,6 +131,16 @@ function format_to_output( $content, $format = 'htmlbody' )
 			$content = convert_chars($content, 'xml');
 			$content = str_replace('"', '&quot;', $content );
 			$content = str_replace("'", '&#039;', $content );
+			break;
+
+		case 'text':
+			// use as plain-text, e.g. for ascii-mails
+			$content = strip_tags( $content );
+			$trans_tbl = get_html_translation_table( HTML_ENTITIES );
+			$trans_tbl = array_flip( $trans_tbl );
+			$content = strtr( $content, $trans_tbl );
+			$content = preg_replace( '/[ \t]+/', ' ', $content);
+			$content = trim($content);
 			break;
 
 		default:
@@ -2495,6 +2506,9 @@ function url_same_protocol( $url, $other_url = NULL )
 
 /*
  * $Log$
+ * Revision 1.119  2006/09/30 20:35:40  blueyed
+ * Added "text" format to format_to_output()
+ *
  * Revision 1.118  2006/09/26 11:22:47  blueyed
  * doc fix
  *
