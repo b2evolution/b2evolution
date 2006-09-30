@@ -1482,7 +1482,10 @@ class Plugins
 			WHERE plug_ID = '.$plugin_ID );
 
 		$Plugin->priority = $priority;
-		$this->sort();
+
+		// TODO: dh> should only re-sort, if sorted by priority before - if it should get re-sorted at all!
+		//$this->sort();
+
 		return $r;
 	}
 
@@ -2916,6 +2919,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.85  2006/09/30 23:12:40  blueyed
+ * Do not re-sort when setting new prio for a plugin
+ *
  * Revision 1.84  2006/09/30 20:53:49  blueyed
  * Added hook RenderItemAsText, removed general RenderItem
  *
