@@ -262,7 +262,7 @@ class Plugins
 
 				'RenderItemAsHtml' => 'Renders content when generated as HTML.',
 				'RenderItemAsXml' => 'Renders content when generated as XML.',
-				'RenderItem' => 'Renders content when not generated as HTML or XML.',
+				'RenderItemAsText' => 'Renders content when generated as plain text.',
 
 				'FilterCommentAuthor' => 'Filters the comment author.',
 				'FilterCommentAuthorUrl' => 'Filters the URL of the comment author.',
@@ -2169,10 +2169,12 @@ class Plugins
 		{
 			$event = 'RenderItemAsXml';
 		}
-		else
+		elseif( $format == 'text' )
 		{
-			$event = 'RenderItem';
+			$event = 'RenderItemAsText';
 		}
+		else debug_die( 'Unexpected format in Plugins::render(): '.var_export($format, true) );
+
 		$renderer_Plugins = $this->get_list_by_event( $event );
 
 		foreach( $renderer_Plugins as $loop_RendererPlugin )
@@ -2914,6 +2916,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.84  2006/09/30 20:53:49  blueyed
+ * Added hook RenderItemAsText, removed general RenderItem
+ *
  * Revision 1.83  2006/09/30 16:49:56  blueyed
  * minor debuglog wording
  *

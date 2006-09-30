@@ -2007,7 +2007,7 @@ class Item extends DataObject
 		}
 		// pre_dump( $item_renderers );
 
-		foreach( $Plugins->get_list_by_events( array('RenderItem', 'RenderItemAsHtml', 'RenderItemAsXml') ) as $loop_RendererPlugin )
+		foreach( $Plugins->get_list_by_events( array('RenderItemAsHtml', 'RenderItemAsXml', 'RenderItemAsText') ) as $loop_RendererPlugin )
 		{ // Go through whole list of renders
 			// echo ' ',$loop_RendererPlugin->code;
 			if( empty($loop_RendererPlugin->code) )
@@ -3201,6 +3201,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.99  2006/09/30 20:53:49  blueyed
+ * Added hook RenderItemAsText, removed general RenderItem
+ *
  * Revision 1.98  2006/09/25 17:52:20  blueyed
  * doc
  *

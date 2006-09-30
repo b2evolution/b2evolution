@@ -488,13 +488,13 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called when rendering item/post contents other than XML or HTML.
+	 * Event handler: Called when rendering item/post contents as text.
 	 *
 	 * Note: return value is ignored. You have to change $params['content'].
 	 *
-	 * @see Plugin::RenderItem()
+	 * @see Plugin::RenderItemAsText()
 	 */
-	function RenderItem()
+	function RenderItemAsText()
 	{
 		// Do nothing.
 	}
@@ -626,6 +626,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.53  2006/09/30 20:53:49  blueyed
+ * Added hook RenderItemAsText, removed general RenderItem
+ *
  * Revision 1.52  2006/09/11 22:23:05  blueyed
  * (Re-)enabled AdminDisplayEditorButton for "simple" edit_layout, after adding appropriate doc.
  *

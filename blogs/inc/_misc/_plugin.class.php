@@ -969,12 +969,11 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
-	 *   - 'format': see {@link format_to_output()}.
-	 *               Only formats other than 'htmlbody', 'entityencoded' and 'xml' will arrive here.
+	 *   - 'format': see {@link format_to_output()}. Only 'text' will arrive here.
 	 *   - 'Item': the {@link Item} object which gets rendered.
 	 * @return boolean Have we changed something?
 	 */
-	function RenderItem()
+	function RenderItemAsText()
 	{
 		return false;		// Do nothing by default.
 	}
@@ -983,8 +982,8 @@ class Plugin
 	/**
 	 * Event handler: Called when displaying an item/post's content.
 	 *
-	 * This is different from {@link RenderItem()}, {@link RenderItemAsHtml()} and {@link RenderItemAsXml()}:
-	 *  - It applies on every display (rendering might get cached later)
+	 * This is different from {@link RenderItemAsHtml()}, {@link RenderItemAsXml()} and {@link RenderItemAsText()}:
+	 *  - It applies on every display (rendering gets cached)
 	 *  - It calls all Plugins that register this event, not just associated ones.
 	 *
 	 * @param array Associative array of parameters
@@ -2579,6 +2578,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.92  2006/09/30 20:53:49  blueyed
+ * Added hook RenderItemAsText, removed general RenderItem
+ *
  * Revision 1.91  2006/09/12 00:46:47  fplanque
  * no message
  *
