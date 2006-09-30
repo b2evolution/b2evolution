@@ -77,17 +77,15 @@ if( $plugin_ID )
 	}
 
 	// Call the method:
-	$r = $Plugins->call_method( $Plugin->ID, 'htsrv_'.$method, $params );
-
-	if( $r === false )
-	{
-		debug_die( 'The plugin htsrv method returned false!' );
-	}
+	$Plugins->call_method( $Plugin->ID, 'htsrv_'.$method, $params );
 }
 
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.6  2006/09/30 20:03:52  blueyed
+ * Do not debug_die() if Plugins htsrv-method returned false.
+ *
  * Revision 1.5  2006/04/27 20:07:19  blueyed
  * Renamed Plugin::get_htsrv_methods() to GetHtsvMethods() (normalization)
  *
