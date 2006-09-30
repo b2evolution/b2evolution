@@ -2424,7 +2424,7 @@ class Plugins
 
 			if( ! $this->get_by_ID( $this->index_code_ID[$plugin_code] ) )
 			{
-				$Debuglog->add( 'Requested plugin ['.$plugin_code.'] could not be instantiated!', 'plugins' );
+				$Debuglog->add( 'Requested plugin ['.$plugin_code.'] could not get instantiated!', 'plugins' );
 				return $r;
 			}
 		}
@@ -2914,6 +2914,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.83  2006/09/30 16:49:56  blueyed
+ * minor debuglog wording
+ *
  * Revision 1.82  2006/09/30 16:46:26  blueyed
  * Merged fixes from v-1-8
  *
