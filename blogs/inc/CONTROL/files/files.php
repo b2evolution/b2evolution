@@ -121,7 +121,7 @@ $FileRootCache = & get_Cache( 'FileRootCache' );
 
 if( ! empty($root) )
 { // We have requested a root folder by string:
-	$fm_FileRoot = & $FileRootCache->get_by_ID($root);
+	$fm_FileRoot = & $FileRootCache->get_by_ID($root, true);
 
 	if( ! $fm_FileRoot || ! isset( $available_Roots[$fm_FileRoot->ID] ) )
 	{ // Root not found or not in list of available ones
@@ -1512,6 +1512,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.34  2006/09/30 16:55:57  blueyed
+ * $create param for media dir handling, which allows to just get the dir, without creating it.
+ *
  * Revision 1.33  2006/08/20 22:25:20  fplanque
  * param_() refactoring part 2
  *

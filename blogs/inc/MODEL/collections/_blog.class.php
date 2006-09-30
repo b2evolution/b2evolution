@@ -538,9 +538,10 @@ class Blog extends DataObject
 	 * If we're {@link is_admin_page() on an admin page}, it adds status messages.
 	 * @todo These status messages should rather go to a "syslog" and not be displayed to a normal user
 	 *
+	 * @param boolean Create the directory, if it does not exist yet?
 	 * @return mixed the path as string on success, false if the dir could not be created
 	 */
-	function get_media_dir()
+	function get_media_dir( $create = true )
 	{
 		global $basepath, $media_subdir, $Messages, $Settings, $Debuglog;
 
@@ -571,10 +572,10 @@ class Blog extends DataObject
 		}
 
 		// TODO: use a File object here (to access perms, ..) when FileCache::get_by_path() is provided.
-		if( !is_dir( $mediadir ) )
+		if( $create && ! is_dir( $mediadir ) )
 		{
 			// TODO: Link to some help page(s) with errors!
-			if( !is_writable( dirname($mediadir) ) )
+			if( ! is_writable( dirname($mediadir) ) )
 			{ // add error
 				if( is_admin_page() )
 				{
@@ -771,7 +772,7 @@ class Blog extends DataObject
 			 */
 			case 'blog_css':
 				if( $this->allowblogcss
-					&& file_exists( $this->get_media_dir().'style.css' ) )
+					&& file_exists( $this->get_media_dir(false).'style.css' ) )
 				{
 					return '<link rel="stylesheet" href="'.$this->get_media_url().'style.css" type="text/css" />';
 				}
@@ -789,7 +790,7 @@ class Blog extends DataObject
 			case 'user_css':
 				if( $this->allowusercss
 					&& isset( $current_User )
-					&& file_exists( $current_User->get_media_dir().'style.css' ) )
+					&& file_exists( $current_User->get_media_dir(false).'style.css' ) )
 				{
 					return '<link rel="stylesheet" href="'.$current_User->get_media_url().'style.css" type="text/css" />';
 				}
@@ -1044,6 +1045,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2006/09/30 16:55:58  blueyed
+ * $create param for media dir handling, which allows to just get the dir, without creating it.
+ *
  * Revision 1.27  2006/09/25 17:53:07  blueyed
  * Add attempt to access globally disabled media_dir to "files" Debuglog category (instead of "notes")
  *

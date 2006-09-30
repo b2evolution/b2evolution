@@ -284,9 +284,10 @@ class User extends DataObject
 	 * If we're {@link is_admin_page() on an admin page}, it adds status messages.
 	 * @todo These status messages should rather go to a "syslog" and not be displayed to a normal user
 	 *
+	 * @param boolean Create the directory, if it does not exist yet?
 	 * @return mixed the path as string on success, false if the dir could not be created
 	 */
-	function get_media_dir()
+	function get_media_dir( $create = true )
 	{
 		global $basepath, $media_subdir, $Messages, $Settings, $Debuglog;
 
@@ -298,9 +299,9 @@ class User extends DataObject
 
 		$userdir = get_ads_canonical_path( $basepath.$media_subdir.'users/'.$this->login.'/' );
 
-		if( !is_dir( $userdir ) )
+		if( $create && ! is_dir( $userdir ) )
 		{
-			if( !is_writable( dirname($userdir) ) )
+			if( ! is_writable( dirname($userdir) ) )
 			{ // add error
 				if( is_admin_page() )
 				{
@@ -1139,6 +1140,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.44  2006/09/30 16:55:58  blueyed
+ * $create param for media dir handling, which allows to just get the dir, without creating it.
+ *
  * Revision 1.43  2006/09/26 11:15:26  blueyed
  * Minor fix for deprecated stub
  *

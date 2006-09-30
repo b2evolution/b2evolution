@@ -53,7 +53,7 @@ class FilemanUnitTestCase extends EvoUnitTestCase
 	{
 		global $FileRootCache;
 
-		$FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $user_ID );
+		$FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $user_ID, true );
 
 		if( ! $FileRoot )
 		{

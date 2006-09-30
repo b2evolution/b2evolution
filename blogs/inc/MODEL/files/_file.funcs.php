@@ -599,7 +599,7 @@ function get_available_FileRoots()
 
 	// The user's blog (if available) is the default/first one:
 	$FileRootCache = & get_Cache( 'FileRootCache' );
-	$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $current_User->ID );
+	$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $current_User->ID, true );
 	if( $user_FileRoot )
 	{ // We got a user media dir:
 		$r[ $user_FileRoot->ID ] = & $user_FileRoot;
@@ -611,7 +611,7 @@ function get_available_FileRoots()
 	// blog media dirs:
 	foreach( $bloglist as $blog_ID )
 	{
-		if( $Root = & $FileRootCache->get_by_type_and_ID( 'collection', $blog_ID ) )
+		if( $Root = & $FileRootCache->get_by_type_and_ID( 'collection', $blog_ID, true ) )
 		{
 			$r[ $Root->ID ] = & $Root;
 		}
@@ -745,6 +745,9 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.24  2006/09/30 16:55:58  blueyed
+ * $create param for media dir handling, which allows to just get the dir, without creating it.
+ *
  * Revision 1.23  2006/09/30 16:41:00  blueyed
  * Reverted last rev
  *

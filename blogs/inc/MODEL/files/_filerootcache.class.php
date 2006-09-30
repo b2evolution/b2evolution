@@ -54,16 +54,18 @@ class FileRootCache
 	/**
 	 * Get a FileRoot (cached) by ID.
 	 *
+	 * @uses FileRootCache::get_by_type_and_ID()
 	 * @param string ID of the FileRoot (e.g. 'user_X' or 'collection_X')
+	 * @param boolean Create the directory, if it does not exist yet?
 	 * @return FileRoot|false FileRoot on success, false on failure (ads_path is false).
 	 */
-	function & get_by_ID( $id )
+	function & get_by_ID( $id, $create = false )
 	{
 		$part = explode( '_', $id );
 		$root_type = $part[0];
 		$root_in_type_ID = $part[1];
 
-		return $this->get_by_type_and_ID( $root_type, $root_in_type_ID );
+		return $this->get_by_type_and_ID( $root_type, $root_in_type_ID, $create );
 	}
 
 
@@ -72,15 +74,16 @@ class FileRootCache
 	 *
 	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
+	 * @param boolean Create the directory, if it does not exist yet?
 	 * @return FileRoot|false FileRoot on success, false on failure (ads_path is false).
 	 */
-	function & get_by_type_and_ID( $root_type, $root_in_type_ID )
+	function & get_by_type_and_ID( $root_type, $root_in_type_ID, $create = false )
 	{
 		$root_ID = FileRoot::gen_ID( $root_type, $root_in_type_ID );
 
 		if( ! isset( $this->cache[$root_ID] ) )
 		{	// Not in Cache, let's instantiate:
-			$Root = new FileRoot( $root_type, $root_in_type_ID ); // COPY
+			$Root = new FileRoot( $root_type, $root_in_type_ID, $create ); // COPY
 			if( empty($Root->ads_path) ) // false
 			{
 				$Root = false;
@@ -95,11 +98,13 @@ class FileRootCache
 	/**
 	 * Get the absolute path (FileRoot::ads_path) to a given root (with ending slash).
 	 *
+	 * @deprecated since 1.9
+	 * @param boolean Create the directory, if it does not exist yet?
 	 * @return string
 	 */
-	function get_root_dir( $root_type, $root_in_type_ID )
+	function get_root_dir( $root_type, $root_in_type_ID, $create = false )
 	{
-		$tmp_FileRoot = & $this->get_by_type_and_ID( $root_type, $root_in_type_ID );
+		$tmp_FileRoot = & $this->get_by_type_and_ID( $root_type, $root_in_type_ID, $create );
 		return $tmp_FileRoot->ads_path;
 	}
 }
@@ -107,6 +112,9 @@ class FileRootCache
 
 /*
  * $Log$
+ * Revision 1.4  2006/09/30 16:55:58  blueyed
+ * $create param for media dir handling, which allows to just get the dir, without creating it.
+ *
  * Revision 1.3  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

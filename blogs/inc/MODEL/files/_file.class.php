@@ -983,7 +983,9 @@ class File extends DataObject
 
 		$rdfp_rel_path = str_replace( '\\', '/', $rdfp_rel_path );
 		$FileRootCache = & get_Cache( 'FileRootCache' );
-		$adfp_posix_path = $FileRootCache->get_root_dir( $root_type, $root_ID ).$rdfp_rel_path;
+
+		$new_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID, true );
+		$adfp_posix_path = $new_FileRoot->ads_path.$rdfp_rel_path;
 
 		if( ! @rename( $this->_adfp_full_path, $adfp_posix_path ) )
 		{
@@ -994,7 +996,7 @@ class File extends DataObject
 		$this->load_meta();
 
 		// Memorize new filepath:
-		$this->_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID );
+		$this->_FileRoot = & $new_FileRoot;
 		$this->_rdfp_rel_path = $rdfp_rel_path;
 		$this->_adfp_full_path = $adfp_posix_path;
 		$this->_name = basename( $this->_adfp_full_path );
@@ -1342,6 +1344,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2006/09/30 16:55:58  blueyed
+ * $create param for media dir handling, which allows to just get the dir, without creating it.
+ *
  * Revision 1.19  2006/09/10 14:50:48  fplanque
  * minor / doc
  *

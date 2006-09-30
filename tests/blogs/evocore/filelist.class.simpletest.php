@@ -24,7 +24,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 	{
 		parent::setUp();
 
-		$this->Filelist = new Filelist( new FileRoot( 'user', 1 ) );
+		$this->Filelist = new Filelist( new FileRoot( 'user', 1, true /* create */ ) );
 	}
 
 

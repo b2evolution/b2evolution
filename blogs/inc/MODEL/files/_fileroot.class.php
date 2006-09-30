@@ -78,8 +78,9 @@ class FileRoot
 	 *
 	 * @param string Root type: 'user', 'group' or 'collection'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
+	 * @param boolean Create the directory, if it does not exist yet?
 	 */
-	function FileRoot( $root_type, $root_in_type_ID )
+	function FileRoot( $root_type, $root_in_type_ID, $create = true )
 	{
 		// Store type:
 		$this->type = $root_type;
@@ -94,7 +95,7 @@ class FileRoot
 				$UserCache = & get_Cache( 'UserCache' );
 				$User = & $UserCache->get_by_ID( $root_in_type_ID );
 				$this->name = $User->get( 'preferredname' );
-				$this->ads_path = $User->get_media_dir();
+				$this->ads_path = $User->get_media_dir( $create );
 				$this->ads_url = $User->get_media_url();
 				return;
 
@@ -102,7 +103,7 @@ class FileRoot
 				$BlogCache = & get_Cache( 'BlogCache' );
 				$Blog = & $BlogCache->get_by_ID( $root_in_type_ID );
 				$this->name = $Blog->get( 'shortname' );
-				$this->ads_path = $Blog->get_media_dir();
+				$this->ads_path = $Blog->get_media_dir( $create );
 				$this->ads_url = $Blog->get_media_url();
 				return;
 		}
@@ -130,6 +131,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.7  2006/09/30 16:55:58  blueyed
+ * $create param for media dir handling, which allows to just get the dir, without creating it.
+ *
  * Revision 1.6  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *
