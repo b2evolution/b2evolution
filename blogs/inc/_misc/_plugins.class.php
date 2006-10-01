@@ -1455,6 +1455,10 @@ class Plugins
 			$this->index_code_ID[$code] = & $Plugin->ID;
 			$this->index_code_Plugins[$code] = & $Plugin;
 		}
+
+		// Update references to code:
+		// TODO: dh> we might want to update item renderer codes and blog ping plugin codes here! (old code=>new code)
+
 		$Plugin->code = $code;
 
 		return $DB->query( '
@@ -2957,6 +2961,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.89  2006/10/01 19:56:36  blueyed
+ * TODO
+ *
  * Revision 1.88  2006/10/01 15:11:08  blueyed
  * Added DisplayItemAs* equivs to RenderItemAs*; removed DisplayItemAllFormats; clearing of pre-rendered cache, according to plugin event changes
  *
