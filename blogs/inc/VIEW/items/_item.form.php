@@ -247,7 +247,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	// ####################### PLUGIN FIELDSETS #########################
 
-	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item ) );
+	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
 	?>
 
 </div>
@@ -348,6 +348,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.25  2006/10/01 22:21:54  blueyed
+ * edit_layout param fixes/doc
+ *
  * Revision 1.24  2006/09/11 22:06:08  blueyed
  * Cleaned up option_list callback handling
  *

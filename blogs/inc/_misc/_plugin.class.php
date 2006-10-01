@@ -715,8 +715,9 @@ class Plugin
 	 * Event handler: Called when displaying editor toolbars.
 	 *
 	 * @param array Associative array of parameters
-	 *              - 'target_type': either 'Comment' or 'Item'.
-	 *              - 'edit_layout': "simple", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
+	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'edit_layout': "simple", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
+	 *                    NOTE: Please respect the "simple" mode, which should display only the most simple things!
 	 * @return boolean did we display a toolbar?
 	 */
 	function AdminDisplayToolbar( & $params )
@@ -1142,11 +1143,13 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called at the end of the "Edit item" form:
+	 * Event handler: Called at the end of the "Edit item" form.
 	 *
 	 * @param array Associative array of parameters
-	 *              'Form': the {@link Form} object (by reference)
-	 *              'Item': the Item which gets edited (by reference)
+	 *   - 'Form': the {@link Form} object (by reference)
+	 *   - 'Item': the Item which gets edited (by reference)
+	 *   - 'edit_layout': "simple", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
+	 *                    NOTE: Please respect the "simple" mode, which should display only the most simple things!
 	 * @return boolean did we display something?
 	 */
 	function AdminDisplayItemFormFieldset( & $params )
@@ -2138,7 +2141,8 @@ class Plugin
 
 
 	/**
-	 * Get the absolute URL to the plugin's directory (trailing slash included).
+	 * Get the absolute URL to the plugin's directory (where the plugins classfile is).
+	 * Trailing slash included.
 	 *
 	 * This is either below {@link $plugins_url}, if no Blog is set or we're in the
 	 * backoffice, or the "plugins" directory below the Blog's URL root otherwise.
@@ -2647,6 +2651,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.95  2006/10/01 22:21:54  blueyed
+ * edit_layout param fixes/doc
+ *
  * Revision 1.94  2006/10/01 22:11:42  blueyed
  * Ping services as plugins.
  *

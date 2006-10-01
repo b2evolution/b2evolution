@@ -59,7 +59,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	<div class="edit_toolbars">
 	<?php // --------------------------- TOOLBARS ------------------------------------
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'AdminDisplayToolbar', array( 'target_type' => 'Comment', 'edit_layout' => $tab ) );
+		$Plugins->trigger_event( 'AdminDisplayToolbar', array( 'target_type' => 'Comment', 'edit_layout' => NULL ) );
 	?>
 	</div>
 
@@ -195,6 +195,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.14  2006/10/01 22:21:54  blueyed
+ * edit_layout param fixes/doc
+ *
  * Revision 1.13  2006/09/11 22:23:04  blueyed
  * (Re-)enabled AdminDisplayEditorButton for "simple" edit_layout, after adding appropriate doc.
  *
