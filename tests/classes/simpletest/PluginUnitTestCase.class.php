@@ -46,7 +46,9 @@ class PluginUnitTestCase extends EvoUnitTestCase
 		$Plugins->index_ID_rows[1] = array(
 			'plug_ID' => 1,
 			'plug_priority' => 50,
-			'plug_classname' => 'auto_p_plugin',
+			'plug_classname' => $classname,
+			'plug_name' => $real_Plugin->name,
+			'plug_shortdesc' => $real_Plugin->short_desc,
 			'plug_code' => 'fake',
 			'plug_apply_rendering' => 'always',
 			'plug_status' => 'enabled',
