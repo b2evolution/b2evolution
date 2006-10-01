@@ -980,11 +980,10 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called when displaying an item/post's content.
+	 * Event handler: Called when displaying an item/post's content as HTML.
 	 *
-	 * This is different from {@link RenderItemAsHtml()}, {@link RenderItemAsXml()} and {@link RenderItemAsText()}:
-	 *  - It applies on every display (rendering gets cached)
-	 *  - It calls all Plugins that register this event, not just associated ones.
+	 * This is different from {@link RenderItemAsHtml()}, because it gets called
+	 * on every display (while rendering gets cached).
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
@@ -994,7 +993,47 @@ class Plugin
 	 *   - 'dispmore': Does this include the "more" text (if available), which means "full post"?
 	 * @return boolean Have we changed something?
 	 */
-	function DisplayItemAllFormats( & $params )
+	function DisplayItemAsHtml( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called when displaying an item/post's content as XML.
+	 *
+	 * This is different from {@link RenderItemAsXml()}, because it gets called
+	 * on every display (while rendering gets cached).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}.
+	 *   - 'Item': The {@link Item} that gets displayed (by reference).
+	 *   - 'preview': Is this only a preview?
+	 *   - 'dispmore': Does this include the "more" text (if available), which means "full post"?
+	 * @return boolean Have we changed something?
+	 */
+	function DisplayItemAsXml( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called when displaying an item/post's content as text.
+	 *
+	 * This is different from {@link RenderItemAsText()}, because it gets called
+	 * on every display (while rendering gets cached).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'text' will arrive here.
+	 *   - 'Item': The {@link Item} that gets displayed (by reference).
+	 *   - 'preview': Is this only a preview?
+	 *   - 'dispmore': Does this include the "more" text (if available), which means "full post"?
+	 * @return boolean Have we changed something?
+	 */
+	function DisplayItemAsText( & $params )
 	{
 		return false;		// Do nothing by default.
 	}
@@ -2578,6 +2617,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.93  2006/10/01 15:11:08  blueyed
+ * Added DisplayItemAs* equivs to RenderItemAs*; removed DisplayItemAllFormats; clearing of pre-rendered cache, according to plugin event changes
+ *
  * Revision 1.92  2006/09/30 20:53:49  blueyed
  * Added hook RenderItemAsText, removed general RenderItem
  *

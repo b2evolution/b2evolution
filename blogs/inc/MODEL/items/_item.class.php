@@ -956,7 +956,7 @@ class Item extends DataObject
 			{
 				global $Debuglog;
 
-				$this->content_prerendered[$cache_key] = $Plugins->render( $this->content, $post_renderers, $format, array( 'Item' => $this ) );
+				$this->content_prerendered[$cache_key] = $Plugins->render( $this->content, $post_renderers, $format, array( 'Item' => $this ), 'Render' );
 
 				$Debuglog->add( 'Generated pre-rendered content ['.$cache_key.']', 'items' );
 
@@ -1144,12 +1144,10 @@ class Item extends DataObject
 		}
 
 		// Trigger Display plugins:
-		$output = $Plugins->get_trigger_event( 'DisplayItemAllFormats', array(
-				'data' => & $output,
-				'format' => $format,
-				'Item' => & $this,
-				'preview' => $preview,
-				'dispmore' => $dispmore ) );
+		$output = $Plugins->render( $this->content, $this->get_renderers_validated(), $format, array(
+			'Item' => $this,
+			'preview' => $preview,
+			'dispmore' => $dispmore ), 'Display' );
 
 		// Character conversions
 		$output = format_to_output( $output, $format );
@@ -3201,6 +3199,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.100  2006/10/01 15:11:08  blueyed
+ * Added DisplayItemAs* equivs to RenderItemAs*; removed DisplayItemAllFormats; clearing of pre-rendered cache, according to plugin event changes
+ *
  * Revision 1.99  2006/09/30 20:53:49  blueyed
  * Added hook RenderItemAsText, removed general RenderItem
  *

@@ -494,9 +494,48 @@ class test_plugin extends Plugin
 	 *
 	 * @see Plugin::RenderItemAsText()
 	 */
-	function RenderItemAsText()
+	function RenderItemAsText( & $params )
 	{
 		// Do nothing.
+	}
+
+
+	/**
+	 * Event handler: Called when displaying item/post contents as HTML.
+	 *
+	 * Note: return value is ignored. You have to change $params['content'].
+	 *
+	 * @see Plugin::DisplayItemAsHtml()
+	 */
+	function DisplayItemAsHtml( & $params )
+	{
+		$params['data'] = $params['data']."\n<br />-- test_plugin::DisplayItemAsHtml()";
+	}
+
+
+	/**
+	 * Event handler: Called when displaying item/post contents as XML.
+	 *
+	 * Note: return value is ignored. You have to change $params['content'].
+	 *
+	 * @see Plugin::DisplayItemAsXml()
+	 */
+	function DisplayItemAsXml( & $params )
+	{
+		$params['data'] = $params['data']."\n<br />-- test_plugin::DisplayItemAsXml()";
+	}
+
+
+	/**
+	 * Event handler: Called when displaying item/post contents as text.
+	 *
+	 * Note: return value is ignored. You have to change $params['content'].
+	 *
+	 * @see Plugin::DisplayItemAsText()
+	 */
+	function DisplayItemAsText( & $params )
+	{
+		$params['data'] = $params['data']."\n<br />-- test_plugin::DisplayItemAsText()";
 	}
 
 
@@ -626,6 +665,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.54  2006/10/01 15:11:08  blueyed
+ * Added DisplayItemAs* equivs to RenderItemAs*; removed DisplayItemAllFormats; clearing of pre-rendered cache, according to plugin event changes
+ *
  * Revision 1.53  2006/09/30 20:53:49  blueyed
  * Added hook RenderItemAsText, removed general RenderItem
  *

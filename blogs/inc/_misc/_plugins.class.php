@@ -272,13 +272,9 @@ class Plugins
 				'AfterUserInsert' => '',
 				'AfterUserUpdate' => '',
 
-				/*
-				not used yet..
 				'DisplayItemAsHtml' => 'Called on an item when it gets displayed as HTML.',
 				'DisplayItemAsXml' => 'Called on an item when it gets displayed as XML.',
-				'DisplayItem' => 'Called on an item when it gets not displayed as HTML or XML.',
-				*/
-				'DisplayItemAllFormats' => 'Called on an item when it gets displayed.',
+				'DisplayItemAsText' => 'Called on an item when it gets displayed as text.',
 
 				'FilterIpAddress' => 'Called when displaying an IP address.',
 
@@ -794,6 +790,19 @@ class Plugins
 		              WHERE puset_plug_ID = $plugin_ID" );
 
 		// Delete Plugin events (constraints)
+		foreach( $DB->get_col( '
+				SELECT pevt_event
+				  FROM T_pluginevents
+				 WHERE pevt_enabled = 1' ) as $event )
+		{
+			if( strpos($event, 'RenderItemAs') === 0 )
+			{ // Clear pre-rendered content cache, if RenderItemAs* events get removed:
+				$DB->query( 'DELETE FROM T_item__prerendering WHERE 1' );
+				$ItemCache = & get_Cache( 'ItemCache' );
+				$ItemCache->clear();
+				break;
+			}
+		}
 		$DB->query( "DELETE FROM T_pluginevents
 		              WHERE pevt_plug_ID = $plugin_ID" );
 
@@ -1298,6 +1307,15 @@ class Plugins
 						}
 					}
 				}
+			}
+
+			if( $this->index_ID_rows[$Plugin->ID]['plug_name'] !== NULL )
+			{
+				$Plugin->name = $this->index_ID_rows[$Plugin->ID]['plug_name'];
+			}
+			if( $this->index_ID_rows[$Plugin->ID]['plug_shortdesc'] !== NULL )
+			{
+				$Plugin->short_desc = $this->index_ID_rows[$Plugin->ID]['plug_shortdesc'];
 			}
 		}
 		else
@@ -2152,12 +2170,13 @@ class Plugins
 	 *
 	 * @param string content to render (by reference)
 	 * @param array renderer codes to use for opt-out, opt-in and lazy  (by reference)
-	 * @param string Output format, see {@link format_to_output()}
+	 * @param string Output format, see {@link format_to_output()}. Only 'htmlbody',
+	 *        'entityencoded', 'xml' and 'text' are supported.
 	 * @param array Additional params to the Render* methods (e.g. "Item" for items).
 	 *              Do not use "data" or "format" here, because it gets used internally.
 	 * @return string rendered content
 	 */
-	function render( & $content, & $renderers, $format, $params )
+	function render( & $content, & $renderers, $format, $params, $event_prefix = 'Render' )
 	{
 		// echo implode(',',$renderers);
 
@@ -2166,15 +2185,15 @@ class Plugins
 
 		if( $format == 'htmlbody' || $format == 'entityencoded' )
 		{
-			$event = 'RenderItemAsHtml';
+			$event = $event_prefix.'ItemAsHtml'; // 'RenderItemAsHtml'/'DisplayItemAsHtml'
 		}
 		elseif( $format == 'xml' )
 		{
-			$event = 'RenderItemAsXml';
+			$event = $event_prefix.'ItemAsXml'; // 'RenderItemAsXml'/'DisplayItemAsXml'
 		}
 		elseif( $format == 'text' )
 		{
-			$event = 'RenderItemAsText';
+			$event = $event_prefix.'ItemAsText'; // 'RenderItemAsText'/'DisplayItemAsText'
 		}
 		else debug_die( 'Unexpected format in Plugins::render(): '.var_export($format, true) );
 
@@ -2727,48 +2746,59 @@ class Plugins
 			$Debuglog->add( 'Discovered events ['.implode( ', ', $discovered_events ).'] for Plugin '.$Plugin->name, 'plugins' );
 		}
 
+		$new_events_enabled = array();
 		if( $enable_events )
 		{
-			$new_events = array();
 			foreach( $enable_events as $l_event )
 			{
 				if( ! isset( $saved_events[$l_event] ) || ! $saved_events[$l_event] )
 				{ // Event not saved yet or not enabled
-					$new_events[] = $l_event;
+					$new_events_enabled[] = $l_event;
 				}
 			}
-			if( $new_events )
+			if( $new_events_enabled )
 			{
 				$DB->query( '
 					REPLACE INTO T_pluginevents( pevt_plug_ID, pevt_event, pevt_enabled )
-					VALUES ( '.$Plugin->ID.', "'.implode( '", 1 ), ('.$Plugin->ID.', "', $new_events ).'", 1 )' );
+					VALUES ( '.$Plugin->ID.', "'.implode( '", 1 ), ('.$Plugin->ID.', "', $new_events_enabled ).'", 1 )' );
 				$r = true;
 			}
-			$Debuglog->add( 'Enabled events ['.implode( ', ', $new_events ).'] for Plugin '.$Plugin->name, 'plugins' );
+			$Debuglog->add( 'Enabled events ['.implode( ', ', $new_events_enabled ).'] for Plugin '.$Plugin->name, 'plugins' );
 		}
 
+		$new_events_disabled = array();
 		if( $disable_events )
 		{
-			$new_events = array();
 			foreach( $disable_events as $l_event )
 			{
 				if( ! isset( $saved_events[$l_event] ) || $saved_events[$l_event] )
 				{ // Event not saved yet or enabled
-					$new_events[] = $l_event;
+					$new_events_disabled[] = $l_event;
 				}
 			}
-			if( $new_events )
+			if( $new_events_disabled )
 			{
 				$DB->query( '
 					REPLACE INTO T_pluginevents( pevt_plug_ID, pevt_event, pevt_enabled )
-					VALUES ( '.$Plugin->ID.', "'.implode( '", 0 ), ('.$Plugin->ID.', "', $new_events ).'", 0 )' );
+					VALUES ( '.$Plugin->ID.', "'.implode( '", 0 ), ('.$Plugin->ID.', "', $new_events_disabled ).'", 0 )' );
 				$r = true;
 			}
-			$Debuglog->add( 'Disabled events ['.implode( ', ', $new_events ).'] for Plugin '.$Plugin->name, 'plugins' );
+			$Debuglog->add( 'Disabled events ['.implode( ', ', $new_events_disabled ).'] for Plugin '.$Plugin->name, 'plugins' );
 		}
 
 		if( $r )
 		{ // Something has changed: Reload event index
+			foreach( array_merge($obsolete_events, $discovered_events, $new_events_enabled, $new_events_disabled) as $event )
+			{
+				if( strpos($event, 'RenderItemAs') === 0 )
+				{ // Clear pre-rendered content cache, if RenderItemAs* events have been added or removed:
+					$DB->query( 'DELETE FROM T_item__prerendering WHERE 1' );
+					$ItemCache = & get_Cache( 'ItemCache' );
+					$ItemCache->clear();
+					break;
+				}
+			}
+
 			$this->load_events();
 		}
 
@@ -2796,6 +2826,14 @@ class Plugins
 		if( $DB->rows_affected )
 		{
 			$this->load_events();
+
+			if( strpos($plugin_event, 'RenderItemAs') === 0 )
+			{ // Clear pre-rendered content cache, if RenderItemAs* events have been added or removed:
+				$DB->query( 'DELETE FROM T_item__prerendering WHERE 1' );
+				$ItemCache = & get_Cache( 'ItemCache' );
+				$ItemCache->clear();
+				break;
+			}
 
 			return true;
 		}
@@ -2919,6 +2957,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.88  2006/10/01 15:11:08  blueyed
+ * Added DisplayItemAs* equivs to RenderItemAs*; removed DisplayItemAllFormats; clearing of pre-rendered cache, according to plugin event changes
+ *
  * Revision 1.87  2006/10/01 00:14:58  blueyed
  * plug_classpath should not have get merged already
  *
