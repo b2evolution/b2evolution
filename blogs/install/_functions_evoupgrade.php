@@ -1178,8 +1178,7 @@ function upgrade_b2evo_tables()
 		echo 'Updating plugin capabilities... ';
 		$DB->query( '
 				ALTER TABLE T_plugins
-					MODIFY COLUMN plug_status ENUM( \'enabled\', \'disabled\', \'needs_config\', \'broken\' ) NOT NULL,
-					ADD COLUMN plug_classpath VARCHAR(255) NULL default NULL AFTER plug_classname' );
+					MODIFY COLUMN plug_status ENUM( \'enabled\', \'disabled\', \'needs_config\', \'broken\' ) NOT NULL' );
 		echo "OK.<br />\n";
 
 		set_upgrade_checkpoint( '9290' );
@@ -1408,6 +1407,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.176  2006/10/01 00:14:58  blueyed
+ * plug_classpath should not have get merged already
+ *
  * Revision 1.175  2006/09/25 21:59:57  blueyed
  * Whitespace fix
  *
