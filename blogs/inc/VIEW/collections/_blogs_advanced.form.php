@@ -29,6 +29,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Blog;
 
+global $Plugins;
+
 
 $Form = & new Form( NULL, 'blogadvanced_checkchanges' );
 
@@ -51,20 +53,20 @@ $Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 										array( 'subdir',
 														T_('Subdirectory of media folder').':',
 														'',
-														' <span class="nobr"><code>'.$basepath.$media_subdir.'</code><input 
-															type="text" name="blog_media_subdir" size="20" maxlength="255" 
+														' <span class="nobr"><code>'.$basepath.$media_subdir.'</code><input
+															type="text" name="blog_media_subdir" size="20" maxlength="255"
 															class="'.( param_has_error('blog_media_subdir') ? 'field_error' : '' ).'"
 															value="'.$edited_Blog->dget( 'media_subdir', 'formvalue' ).'" /></span>', '' ),
 										array( 'custom',
 														T_('Custom location').':',
 														'',
 														'<fieldset>'
-															.'<div class="label">'.T_('directory').':</div><div class="input"><input 
-																type="text" name="blog_media_fullpath" size="50" maxlength="255" 
+															.'<div class="label">'.T_('directory').':</div><div class="input"><input
+																type="text" name="blog_media_fullpath" size="50" maxlength="255"
 																class="'.( param_has_error('blog_media_fullpath') ? 'field_error' : '' ).'"
 																value="'.$edited_Blog->dget( 'media_fullpath', 'formvalue' ).'" /></div>'
-															.'<div class="label">'.T_('URL').':</div><div class="input"><input 
-																type="text" name="blog_media_url" size="50" maxlength="255" 
+															.'<div class="label">'.T_('URL').':</div><div class="input"><input
+																type="text" name="blog_media_url" size="50" maxlength="255"
 																class="'.( param_has_error('blog_media_url') ? 'field_error' : '' ).'"
 																value="'.$edited_Blog->dget( 'media_url', 'formvalue' ).'" /></div></fieldset>' )
 									), T_('Media dir location'), true
@@ -72,10 +74,38 @@ $Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('After each new post...') );
-	$Form->checkbox( 'blog_pingb2evonet', $edited_Blog->get( 'pingb2evonet' ), T_('Ping b2evolution.net'), T_('to get listed on the "recently updated" list on b2evolution.net').' [<a href="http://b2evolution.net/about/terms.html">'.T_('Terms of service').'</a>]' );
-	$Form->checkbox( 'blog_pingtechnorati', $edited_Blog->get( 'pingtechnorati' ), T_('Ping technorati.com'), T_('to give notice of new post.') );
-	$Form->checkbox( 'blog_pingweblogs', $edited_Blog->get( 'pingweblogs' ), T_('Ping weblogs.com'), T_('to give notice of new post.') );
-	$Form->checkbox( 'blog_pingblodotgs', $edited_Blog->get( 'pingblodotgs' ), T_('Ping blo.gs'), T_('to give notice of new post.') );
+	$ping_plugins = explode(',', $edited_Blog->get_setting('ping_plugins'));
+	$available_ping_plugins = $Plugins->get_list_by_event('ItemSendPing');
+	$displayed_ping_plugin = false;
+	if( $available_ping_plugins )
+	{
+		foreach( $available_ping_plugins as $loop_Plugin )
+		{
+			if( empty($loop_Plugin->code) )
+			{ // Ping plugin needs a code
+				continue;
+			}
+			$displayed_ping_plugin = true;
+
+			$checked = in_array( $loop_Plugin->code, $ping_plugins );
+			$Form->checkbox_input( 'blog_ping_plugins[]', $checked, $loop_Plugin->ping_service_name, array('value'=>$loop_Plugin->code, 'note'=>$loop_Plugin->ping_service_note) );
+
+			while( $key = array_search($loop_Plugin->code, $ping_plugins) )
+			{
+				unset($ping_plugins[$key]);
+			}
+		}
+	}
+	if( ! $displayed_ping_plugin )
+	{
+		echo '<p>'.T_('There are no ping plugins installed.').'</p>';
+	}
+
+	// Provide previous ping services as hidden fields, in case the plugin is temporarily disabled:
+	foreach( $ping_plugins as $ping_plugin_code )
+	{
+		$Form->hidden( 'blog_ping_plugins[]', $ping_plugin_code );
+	}
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Meta data') );

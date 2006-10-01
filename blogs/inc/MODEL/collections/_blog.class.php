@@ -93,10 +93,6 @@ class Blog extends DataObject
 	var $allowtrackbacks = 0;
 	var $allowblogcss = 0;
 	var $allowusercss = 0;
-	var $pingb2evonet = 0;
-	var $pingtechnorati = 0;
-	var $pingweblogs = 1;
-	var $pingblodotgs = 0;
 	var $default_skin;
 	var $force_skin = 0;
 	var $disp_bloglist = 1;
@@ -171,10 +167,6 @@ class Blog extends DataObject
 			$this->allowtrackbacks = $db_row->blog_allowtrackbacks;
 			$this->allowblogcss = $db_row->blog_allowblogcss;
 			$this->allowusercss = $db_row->blog_allowusercss;
-			$this->pingb2evonet = $db_row->blog_pingb2evonet;
-			$this->pingtechnorati = $db_row->blog_pingtechnorati;
-			$this->pingweblogs = $db_row->blog_pingweblogs;
-			$this->pingblodotgs = $db_row->blog_pingblodotgs;
 			$this->default_skin = $db_row->blog_default_skin;
 			$this->force_skin = $db_row->blog_force_skin;
 			$this->disp_bloglist = $db_row->blog_disp_bloglist;
@@ -363,10 +355,7 @@ class Blog extends DataObject
 
 		if( in_array( 'pings', $groups ) )
 		{ // we want to load the ping checkboxes:
-			$this->set( 'pingb2evonet',    param( 'blog_pingb2evonet',    'integer', 0 ) );
-			$this->set( 'pingtechnorati',  param( 'blog_pingtechnorati',  'integer', 0 ) );
-			$this->set( 'pingweblogs',     param( 'blog_pingweblogs',     'integer', 0 ) );
-			$this->set( 'pingblodotgs',    param( 'blog_pingblodotgs',    'integer', 0 ) );
+			$this->set_setting('ping_plugins', implode(',', param( 'blog_ping_plugins', 'array', array() )));
 		}
 
 		if( param( 'blog_allowcomments',   'string', NULL ) !== NULL )
@@ -429,10 +418,6 @@ class Blog extends DataObject
 			case 'ID':
 			case 'allowtrackbacks':
 			case 'allowpingbacks':
-			case 'pingb2evonet':
-			case 'pingtechnorati':
-			case 'pingweblogs':
-			case 'pingblodotgs':
 			case 'disp_bloglist':
 			case 'force_skin':
 				return parent::set_param( $parname, 'number', $parvalue );
@@ -1045,6 +1030,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.29  2006/10/01 22:11:42  blueyed
+ * Ping services as plugins.
+ *
  * Revision 1.28  2006/09/30 16:55:58  blueyed
  * $create param for media dir handling, which allows to just get the dir, without creating it.
  *

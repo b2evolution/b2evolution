@@ -112,10 +112,6 @@ $schema_queries = array(
 			blog_allowtrackbacks TINYINT(1) NOT NULL default 1,
 			blog_allowblogcss TINYINT(1) NOT NULL default 1,
 			blog_allowusercss TINYINT(1) NOT NULL default 1,
-			blog_pingb2evonet TINYINT(1) NOT NULL default 0,
-			blog_pingtechnorati TINYINT(1) NOT NULL default 0,
-			blog_pingweblogs TINYINT(1) NOT NULL default 0,
-			blog_pingblodotgs TINYINT(1) NOT NULL default 0,
 			blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'custom',
 			blog_force_skin TINYINT(1) NOT NULL default 0,
 			blog_disp_bloglist TINYINT(1) NOT NULL DEFAULT 1,
@@ -495,6 +491,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.37  2006/10/01 22:11:42  blueyed
+ * Ping services as plugins.
+ *
  * Revision 1.36  2006/09/30 23:42:06  blueyed
  * Allow editing the plugin name and short desc of installed plugins
  *

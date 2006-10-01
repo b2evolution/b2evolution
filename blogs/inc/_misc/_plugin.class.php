@@ -194,6 +194,20 @@ class Plugin
 	 */
 	var $sub_group;
 
+
+	/**
+	 * Name of the ping service (if this is a ping plugin, see {@link Plugin::ItemSendPing()})
+	 * @var string
+	 */
+	var $ping_service_name;
+
+	/**
+	 * Note about the ping service, used in the list of ping services in the blog settings
+	 * (if this is a ping plugin, see {@link Plugin::ItemSendPing()})
+	 * @var string
+	 */
+	var $ping_service_note;
+
 	/**#@-*/
 
 
@@ -1181,6 +1195,22 @@ class Plugin
 	 *   NULL, if you do not want to say "yes" or "no".
 	 */
 	function ItemCanComment( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: send a ping about a new item.
+	 *
+	 * @param array Associative array of parameters
+	 *        'Item': the Item (by reference)
+	 *        'xmlrpcresp': Set this to the {@link xmlrpcresp} object, if the plugin
+	 *                      uses XMLRPC.
+	 *        'display': Should results get displayed? (normally you should not need
+	 *                   to care about this, especially if you can set 'xmlrpcresp')
+	 * @return boolean Was the ping successful?
+	 */
+	function ItemSendPing( & $params )
 	{
 	}
 
@@ -2617,6 +2647,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.94  2006/10/01 22:11:42  blueyed
+ * Ping services as plugins.
+ *
  * Revision 1.93  2006/10/01 15:11:08  blueyed
  * Added DisplayItemAs* equivs to RenderItemAs*; removed DisplayItemAllFormats; clearing of pre-rendered cache, according to plugin event changes
  *

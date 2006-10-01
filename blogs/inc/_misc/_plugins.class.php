@@ -280,6 +280,7 @@ class Plugins
 
 				'ItemViewsIncreased' => 'Called when the view counter of an item got increased.',
 				'ItemCanComment' => 'Asks the plugin if an item can receive comments/feedback.',
+				'ItemSendPing' => 'Send a ping to a service about new items.',
 
 				'SkinTag' => '',
 
@@ -2961,6 +2962,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.90  2006/10/01 22:11:42  blueyed
+ * Ping services as plugins.
+ *
  * Revision 1.89  2006/10/01 19:56:36  blueyed
  * TODO
  *

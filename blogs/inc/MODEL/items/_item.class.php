@@ -3037,21 +3037,47 @@ class Item extends DataObject
   /**
 	 * Send outbound pings for a post
 	 *
-	 * Dirty temporary function
-	 *
-	 * @param Item
-	 * @param boolean
+	 * @param boolean Display?
 	 */
 	function send_outbound_pings( $display = true )
 	{
+		global $Plugins, $baseurl;
+
 		load_funcs( '_misc/_ping.funcs.php' );
+		load_funcs( '_misc/ext/_xmlrpc.php' );
 
-		$blogparams = get_blogparams_by_ID( $this->blog_ID );
+		$this->load_Blog();
+		$ping_plugins = array_unique(explode(',', $this->Blog->get_setting('ping_plugins')));
 
-		pingb2evonet( $blogparams, $this->ID, $this->title, $display);
-		pingWeblogs( $blogparams, $display);
-		pingBlogs( $blogparams, $display);
-		pingTechnorati( $blogparams, $display );
+		if( preg_match( '#^http://localhost[/:]#',$baseurl) )
+		{
+			if( $display ) echo "<div class=\"panelinfo\">\n<p>", T_('Skipping pings (Running on localhost).'), "</p>\n</div>\n";
+		}
+		else foreach( $ping_plugins as $plugin_code )
+		{
+			$Plugin = & $Plugins->get_by_code($plugin_code);
+
+			if( $Plugin )
+			{
+				if( $display )
+				{
+					echo "<div class=\"panelinfo\">\n";
+					echo '<h3>'.sprintf(T_('Pinging %s...'), $Plugin->ping_service_name)."</h3>\n";
+				}
+				$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => $display );
+
+				$r = $Plugin->ItemSendPing( $params );
+
+				if( isset($params['xmlrpcresp']) && is_a($params['xmlrpcresp'], 'xmlrpcresp') )
+				{
+					xmlrpc_displayresult( $params['xmlrpcresp'], $display );
+				}
+				if( $display )
+				{
+					echo "<p>", T_('Done.'), "</p>\n</div>\n";
+				}
+			}
+		}
 	}
 
 
@@ -3199,6 +3225,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.101  2006/10/01 22:11:42  blueyed
+ * Ping services as plugins.
+ *
  * Revision 1.100  2006/10/01 15:11:08  blueyed
  * Added DisplayItemAs* equivs to RenderItemAs*; removed DisplayItemAllFormats; clearing of pre-rendered cache, according to plugin event changes
  *

@@ -1236,6 +1236,9 @@ function upgrade_b2evo_tables()
 
 
 	// Version 2.0 starts here
+	// TODO: install ping plugins (b2evonet and pingomatic)
+	// TODO: Remove and transform obsolete fields blog_pingb2evonet, blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs
+
 
 	if( $old_db_version < 9404 )
 	{
@@ -1407,6 +1410,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.177  2006/10/01 22:11:43  blueyed
+ * Ping services as plugins.
+ *
  * Revision 1.176  2006/10/01 00:14:58  blueyed
  * plug_classpath should not have get merged already
  *

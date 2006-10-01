@@ -1,6 +1,7 @@
 <?php
 /**
- * This file implements the CollectionSettings class which handle coll_ID/name/value triplets.
+ * This file implements the CollectionSettings class which handles
+ * coll_ID/name/value triplets for collections/blogs.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -35,7 +36,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/../settings/_abstractsettings.class.php';
 
 /**
- * Class to handle the settings for collections
+ * Class to handle the settings for collections/blogs
  *
  * @package evocore
  */
@@ -49,6 +50,7 @@ class CollectionSettings extends AbstractSettings
 	var $_defaults = array(
 			'new_feedback_status' => 'draft',  // 'draft', 'published' or 'deprecated'
 			'chapter_links' => 'param_num',		 // 'param_num', 'subchap', 'chapters'
+			'ping_plugins' => 'ping_pingomatic,ping_b2evo', // ping plugin codes
 		);
 
 
@@ -64,6 +66,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.4  2006/10/01 22:11:42  blueyed
+ * Ping services as plugins.
+ *
  * Revision 1.3  2006/09/11 19:36:58  fplanque
  * blog url ui refactoring
  *
