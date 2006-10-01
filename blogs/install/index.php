@@ -27,6 +27,7 @@ if( ! $config_is_done )
 }
 
 require_once $conf_path.'_upgrade.php';
+require_once $inc_path.'_misc/_class4.funcs.php';
 require_once $misc_inc_path.'_log.class.php';
 $Debuglog = new Log( 'note' );
 require_once $misc_inc_path.'_misc.funcs.php'; // db funcs
@@ -630,6 +631,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.114  2006/10/01 15:23:28  blueyed
+ * Fixed install
+ *
  * Revision 1.113  2006/09/26 11:23:40  blueyed
  * Completed titles for $action
  *
