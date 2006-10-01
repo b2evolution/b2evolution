@@ -35,11 +35,6 @@ if ( isset($HTTP_RAW_POST_DATA) )
 }
 
 /**
- * Set to TRUE if you want to enable debug messages (comments inside of the XML
- * responses)
- */
-define( DEBUG_XMLRPC_LOGGING, TRUE );
-/**
  * Set to TRUE to do HTML sanity checking as in the browser interface, set to
  * FALSE if you trust the editing tool to do this (more features than the
  * browser interface)
@@ -93,8 +88,9 @@ $post_default_title = ''; // posts submitted via the xmlrpc interface get that t
  */
 function logIO($io,$msg)
 {
+	global $debug_xmlrpc_logging;
 
-	if( ! DEBUG_XMLRPC_LOGGING )
+	if( ! $debug_xmlrpc_logging )
 	{
 		return false;
 	}
@@ -2255,6 +2251,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.116  2006/10/01 20:08:39  blueyed
+ * Removed DEBUG_XMLRPC_LOGGING constant again. It gave a notice when using the xmlrpcclient e.g. for sending pings and is not as flexible as a global.
+ *
  * Revision 1.115  2006/09/22 21:27:53  blueyed
  * Minor fixes for RSD, formatting, whitespace.
  *

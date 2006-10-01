@@ -1016,7 +1016,7 @@
 		var $port;
 		var $errno;
 		var $errstr;
-		var $debug=DEBUG_XMLRPC_LOGGING;
+		var $debug=0;
 		var $username='';
 		var $password='';
 		var $cert='';
@@ -1027,7 +1027,10 @@
 
 		function xmlrpc_client($path, $server, $port=0)
 		{
+			global $debug_xmlrpc_logging;
+
 			$this->port=$port; $this->server=$server; $this->path=$path;
+			$this->debug = $debug_xmlrpc_logging;
 		}
 
 		function setDebug($in)
