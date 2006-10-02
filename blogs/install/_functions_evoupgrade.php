@@ -1216,6 +1216,23 @@ function upgrade_b2evo_tables()
 		$DB->query( "ALTER TABLE evo_locales CHANGE COLUMN loc_timefmt loc_timefmt varchar(20) NOT NULL default 'H:i:s'" );
 		echo "OK.<br />\n";
 
+		echo 'Creating item cache table... ';
+		$DB->query( "
+				CREATE TABLE evo_item__prerendering(
+					itpr_itm_ID                   INT(11) UNSIGNED NOT NULL,
+					itpr_format                   ENUM('htmlbody', 'entityencoded', 'xml', 'text') NOT NULL,
+					itpr_renderers                TEXT NOT NULL,
+					itpr_content_prerendered      TEXT NULL,
+					itpr_datemodified             TIMESTAMP NOT NULL,
+					PRIMARY KEY (itpr_itm_ID, itpr_format)
+				)" );
+		echo "OK.<br />\n";
+
+		echo 'Altering plugins table... ';
+		$DB->query( "ALTER TABLE evo_plugins ADD COLUMN plug_name            VARCHAR(255) NULL default NULL AFTER plug_version" );
+		$DB->query( "ALTER TABLE evo_plugins ADD COLUMN plug_shortdesc       VARCHAR(255) NULL default NULL AFTER plug_name" );
+		echo "OK.<br />\n";
+
 		set_upgrade_checkpoint( '9310' );
 	}
 
@@ -1410,6 +1427,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.178  2006/10/02 19:07:32  blueyed
+ * Finished upgrade for 1.9-beta
+ *
  * Revision 1.177  2006/10/01 22:11:43  blueyed
  * Ping services as plugins.
  *
