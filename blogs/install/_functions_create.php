@@ -369,8 +369,7 @@ function blog_create(
 	$query = "INSERT INTO T_blogs( blog_name, blog_shortname, blog_siteurl,
 						blog_stub, blog_urlname, blog_staticfilename,
 						blog_tagline, blog_longdesc, blog_locale,
-						blog_allowcomments, blog_allowtrackbacks, blog_pingb2evonet,
-						blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs, blog_disp_bloglist,
+						blog_allowcomments, blog_allowtrackbacks, blog_disp_bloglist,
 						blog_in_bloglist, blog_links_blog_ID )
 	VALUES ( ";
 	$query .= "'".$DB->escape($blog_name)."', ";
@@ -382,7 +381,7 @@ function blog_create(
 	$query .= "'".$DB->escape($blog_tagline)."', ";
 	$query .= "'".$DB->escape($blog_longdesc)."', ";
 	$query .= "'".$DB->escape($default_locale)."', ";
-	$query .= "'post_by_post', 0, 0, 0, 1, 0, 1, 1, $blog_links_blog_ID)";
+	$query .= "'post_by_post', 0, 1, 1, $blog_links_blog_ID )";
 
 	if( ! ($DB->query( $query )) )
 		return false;
@@ -1028,6 +1027,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.199  2006/10/02 18:32:33  blueyed
+ * Fixed install
+ *
  * Revision 1.198  2006/09/05 19:05:33  fplanque
  * refactoring
  *
