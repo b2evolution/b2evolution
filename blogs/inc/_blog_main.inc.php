@@ -84,7 +84,13 @@ locale_activate( $Blog->get('locale') );
 
 
 // Re-Init charset handling, in case current_charset has changed:
-init_charsets( $current_charset );
+if( init_charsets( $current_charset ) )
+{
+  // Reload Blog(s) (for encoding of name, tagline etc):
+  $BlogCache->clear();
+
+  $Blog = & $BlogCache->get_by_ID( $blog );
+}
 
 
 /* -------------------------
@@ -487,6 +493,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.44  2006/10/04 12:55:24  blueyed
+ * - Reload $Blog, if charset has changed for Blog locale
+ * - only update DB connection charset, if not forced with $db_config['connection_charset']
+ *
  * Revision 1.43  2006/09/20 14:28:34  blueyed
  * Fixed typo in function name Item::peview_request()
  *

@@ -76,7 +76,6 @@
 				<li>Debuglog gets saved in user's session, to simplify debugging when redirects get used, e.g. when a comment gets posted (blueyed, yabba)</li>
 			</ul>
 		</li>
-		<li>Avoid generating ambiguous passwords (blueyed, fplanque)</li>
 	</ul>
 
 
@@ -85,11 +84,14 @@
 		<li>ldap_plugin: Fixed fatal error when setting group for new user (blueyed)</li>
 		<li>Fixed fatal error in next_posts_link() if used on a non-item page, e.g. msgform (blueyed)</li>
 		<li>Fixed quoting of values when editing locales (blueyed)</li>
+    <li>Reload Blog object if charset changed because of its locale (blueyed)</li>
+    <li>Do not override $db_config['connection_charset'], if set (blueyed)</li>
 	</ul>
 
 
 	<h2>1.8.2 (Final release)</h2>
 	<ul>
+		<li>Avoid generating ambiguous passwords (blueyed, fplanque)</li>
 		<li>Auto-P plugin fixes (blueyed)</li>
 		<li>Removed dependency on PHP tokenizer extension (blueyed)</li>
 		<li>Fixed feedback submission in basic and wpc_default skins (blueyed)</li>

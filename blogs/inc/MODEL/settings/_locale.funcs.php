@@ -818,6 +818,7 @@ function convert_charset( $string, $dest_charset, $src_charset )
  *
  * @staticvar boolean Used to only start mb_output_handler once
  * @param string I/O (input/output) charset to use
+ * @return boolean true, if encoding has been changed
  */
 function init_charsets( $req_io_charset )
 {
@@ -827,7 +828,7 @@ function init_charsets( $req_io_charset )
 
 	if( $req_io_charset == $io_charset )
 	{ // no conversation/init needed
-		return;
+		return false;
 	}
 
 	// check, if we want to force a specific charset (e.g. 'utf-8'):
@@ -842,7 +843,7 @@ function init_charsets( $req_io_charset )
 
 	if( $req_io_charset == $io_charset )
 	{ // no conversation/init needed
-		return;
+		return false;
 	}
 
 	$io_charset = $req_io_charset;
@@ -889,7 +890,7 @@ function init_charsets( $req_io_charset )
 	}
 
 	if( isset($DB) // not available in /install/index.php
-			#&& empty($db_config['connection_charset']) // do not override explicit set
+			&& empty($db_config['connection_charset']) // do not override explicitly set one
 		)
 	{
 		// Set encoding for MySQL connection:
@@ -898,11 +899,17 @@ function init_charsets( $req_io_charset )
 
 	$Debuglog->add( 'evo_charset: '.$evo_charset, 'locale' );
 	$Debuglog->add( 'io_charset: '.$io_charset, 'locale' );
+  
+  return true;
 }
 
 
 /*
  * $Log$
+ * Revision 1.26  2006/10/04 12:55:24  blueyed
+ * - Reload $Blog, if charset has changed for Blog locale
+ * - only update DB connection charset, if not forced with $db_config['connection_charset']
+ *
  * Revision 1.25  2006/09/26 23:52:06  blueyed
  * Minor things while merging with branches
  *
