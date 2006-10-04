@@ -1056,7 +1056,10 @@ class Plugin
 
 	/**
 	 * Event handler: called at the beginning of {@link Item::dbupdate() updating
-	 * an item/post in the database}.
+	 * an item/post in the database} and before creating pre-rendered
+	 * content (so lazy renderers can check, if they apply).
+	 *
+	 * @todo dh> Calling this before creating cached content seems dirty. See {@link Plugins::set_code()}
 	 *
 	 * Use this to manipulate the {@link Item}, e.g. adding a renderer code
 	 * through {@link Item::add_renderer()}.
@@ -2651,6 +2654,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.96  2006/10/04 23:51:02  blueyed
+ * Dirty workaround for lazy renderers who detect when they should apply and pre-rendering
+ *
  * Revision 1.95  2006/10/01 22:21:54  blueyed
  * edit_layout param fixes/doc
  *

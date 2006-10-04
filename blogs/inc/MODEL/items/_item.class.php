@@ -956,6 +956,10 @@ class Item extends DataObject
 			{
 				global $Debuglog;
 
+				// Trigger "Update" event, so lazy renderers get a chance to apply, if e.g. their code has been renamed and they are not in the validated renderer list anymore
+				// TODO: dh> this seems (and probably is) dirty. If references to renderers would get updated in Plugins::set_code() this would not be needed probably!
+				$Plugins->trigger_event( 'PrependItemUpdateTransact', array( 'Item' => & $this ) );
+
 				$this->content_prerendered[$cache_key] = $Plugins->render( $this->content, $post_renderers, $format, array( 'Item' => $this ), 'Render' );
 
 				$Debuglog->add( 'Generated pre-rendered content ['.$cache_key.']', 'items' );
@@ -3225,6 +3229,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.102  2006/10/04 23:51:02  blueyed
+ * Dirty workaround for lazy renderers who detect when they should apply and pre-rendering
+ *
  * Revision 1.101  2006/10/01 22:11:42  blueyed
  * Ping services as plugins.
  *
