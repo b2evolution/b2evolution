@@ -1056,10 +1056,7 @@ class Plugin
 
 	/**
 	 * Event handler: called at the beginning of {@link Item::dbupdate() updating
-	 * an item/post in the database} and before creating pre-rendered
-	 * content (so lazy renderers can check, if they apply).
-	 *
-	 * @todo dh> Calling this before creating cached content seems dirty. See {@link Plugins::set_code()}
+	 * an item/post in the database}.
 	 *
 	 * Use this to manipulate the {@link Item}, e.g. adding a renderer code
 	 * through {@link Item::add_renderer()}.
@@ -1230,6 +1227,21 @@ class Plugin
 	 *   - 'template': the template to display the URL (%url%)
 	 */
 	function DisplayTrackbackAddr( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Does your Plugin want to apply as a renderer for the item?
+	 *
+	 * NOTE: this is especially useful for lazy Plugins, which would look
+	 *       at the content and decide, if they apply.
+	 *
+	 * @return boolean|NULL If true, the Plugin gets added as a renderer, false
+	 *         removes it as a renderer (if existing) and NULL does not change the
+	 *         renderer setting regarding your Plugin.
+	 */
+	function ItemApplyAsRenderer( & $params )
 	{
 	}
 
@@ -2654,6 +2666,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.97  2006/10/05 01:06:37  blueyed
+ * Removed dirty "hack"; added ItemApplyAsRenderer hook instead.
+ *
  * Revision 1.96  2006/10/04 23:51:02  blueyed
  * Dirty workaround for lazy renderers who detect when they should apply and pre-rendering
  *

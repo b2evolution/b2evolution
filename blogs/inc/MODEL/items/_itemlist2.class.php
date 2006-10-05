@@ -655,8 +655,9 @@ class ItemList2 extends DataObjectList2
 
 		$Item = & $this->Cache->instantiate( $this->rows[0] );
 
-		// Trigger plugin event
+		// Trigger plugin events
 		// E.g. the youtube plugin uses this to see if it applies to rendering
+		$Item->update_renderers_from_Plugins();
 		$Plugins->trigger_event( 'AppendItemPreviewTransact', array( 'Item' => & $Item ) );
 	}
 
@@ -1639,6 +1640,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.30  2006/10/05 01:06:36  blueyed
+ * Removed dirty "hack"; added ItemApplyAsRenderer hook instead.
+ *
  * Revision 1.29  2006/09/20 14:38:39  blueyed
  * Fixed regression: AppendItemPreviewTransact has not been triggered anymore since Itemlist2
  *

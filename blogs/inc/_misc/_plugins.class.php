@@ -278,9 +278,10 @@ class Plugins
 
 				'FilterIpAddress' => 'Called when displaying an IP address.',
 
-				'ItemViewsIncreased' => 'Called when the view counter of an item got increased.',
+				'ItemApplyAsRenderer' => 'Asks the plugin if it wants to apply as a renderer for an item.',
 				'ItemCanComment' => 'Asks the plugin if an item can receive comments/feedback.',
 				'ItemSendPing' => 'Send a ping to a service about new items.',
+				'ItemViewsIncreased' => 'Called when the view counter of an item got increased.',
 
 				'SkinTag' => '',
 
@@ -1714,6 +1715,7 @@ class Plugins
 	 *
 	 * @param string event name, see {@link Plugin::get_supported_events()}
 	 * @param array Associative array of parameters for the Plugin
+	 * @return boolean True, if at least one plugin has been called.
 	 */
 	function trigger_event( $event, $params = NULL )
 	{
@@ -1737,6 +1739,7 @@ class Plugins
 				break;
 			}
 		}
+		return true;
 	}
 
 
@@ -2962,6 +2965,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.91  2006/10/05 01:06:37  blueyed
+ * Removed dirty "hack"; added ItemApplyAsRenderer hook instead.
+ *
  * Revision 1.90  2006/10/01 22:11:42  blueyed
  * Ping services as plugins.
  *

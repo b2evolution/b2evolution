@@ -956,9 +956,9 @@ class Item extends DataObject
 			{
 				global $Debuglog;
 
-				// Trigger "Update" event, so lazy renderers get a chance to apply, if e.g. their code has been renamed and they are not in the validated renderer list anymore
-				// TODO: dh> this seems (and probably is) dirty. If references to renderers would get updated in Plugins::set_code() this would not be needed probably!
-				$Plugins->trigger_event( 'PrependItemUpdateTransact', array( 'Item' => & $this ) );
+				$this->update_renderers_from_Plugins();
+				$post_renderers = $this->get_renderers_validated(); // might have changed from call above
+				$cache_key = $format.'/'.implode('.', $post_renderers);
 
 				$this->content_prerendered[$cache_key] = $Plugins->render( $this->content, $post_renderers, $format, array( 'Item' => $this ), 'Render' );
 
@@ -990,6 +990,36 @@ class Item extends DataObject
 	function set_prerendered_content( $content, $cache_key )
 	{
 		$this->content_prerendered[$cache_key] = $content;
+	}
+
+
+	/**
+	 * Trigger {@link Plugin::ItemApplyAsRenderer()} event and adjust renderers according
+	 * to return value.
+	 */
+	function update_renderers_from_Plugins()
+	{
+		global $Plugins;
+
+		foreach( $Plugins->get_list_by_event('ItemApplyAsRenderer') as $Plugin )
+		{
+			if( empty($Plugin->code) )
+				continue;
+
+			$r = $Plugin->ItemApplyAsRenderer( $tmp_params = array('Item' => & $this) );
+
+			if( is_bool($r) )
+			{
+				if( $r )
+				{
+					$this->add_renderer( $Plugin->code );
+				}
+				else
+				{
+					$this->remove_renderer( $Plugin->code );
+				}
+			}
+		}
 	}
 
 
@@ -1148,7 +1178,7 @@ class Item extends DataObject
 		}
 
 		// Trigger Display plugins:
-		$output = $Plugins->render( $this->content, $this->get_renderers_validated(), $format, array(
+		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
 			'Item' => $this,
 			'preview' => $preview,
 			'dispmore' => $dispmore ), 'Display' );
@@ -2525,6 +2555,8 @@ class Item extends DataObject
 		// validate url title
 		$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, 0, false, $this->dbprefix, $this->dbIDname, $this->dbtablename) );
 
+		$this->update_renderers_from_Plugins();
+
 		// TODO: allow a plugin to cancel update here (by returning false)?
 		$Plugins->trigger_event( 'PrependItemInsertTransact', $params = array( 'Item' => & $this ) );
 
@@ -2630,6 +2662,8 @@ class Item extends DataObject
 			$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID,
 																false, $this->dbprefix, $this->dbIDname, $this->dbtablename ) );
 		}
+
+		$this->update_renderers_from_Plugins();
 
 		// TODO: dh> allow a plugin to cancel update here (by returning false)?
 		$Plugins->trigger_event( 'PrependItemUpdateTransact', $params = array( 'Item' => & $this ) );
@@ -3053,7 +3087,7 @@ class Item extends DataObject
 		$this->load_Blog();
 		$ping_plugins = array_unique(explode(',', $this->Blog->get_setting('ping_plugins')));
 
-		if( preg_match( '#^http://localhost[/:]#',$baseurl) )
+		if( preg_match( '#^http://localhost[/:]#', $baseurl) || preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) /* domain ending in ".local" */  )
 		{
 			if( $display ) echo "<div class=\"panelinfo\">\n<p>", T_('Skipping pings (Running on localhost).'), "</p>\n</div>\n";
 		}
@@ -3204,6 +3238,7 @@ class Item extends DataObject
 			$renderers[] = $renderer_code;
 			$this->set_renderers( $renderers );
 
+			$this->renderers_validated = NULL;
 			//echo 'Added renderer '.$renderer_code;
 		}
 	}
@@ -3221,6 +3256,7 @@ class Item extends DataObject
 			unset($renderers[$key]);
 			$this->set_renderers( $renderers );
 
+			$this->renderers_validated = NULL;
 			//echo 'Removed renderer '.$renderer_code;
 		}
 	}
@@ -3229,6 +3265,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.103  2006/10/05 01:06:36  blueyed
+ * Removed dirty "hack"; added ItemApplyAsRenderer hook instead.
+ *
  * Revision 1.102  2006/10/04 23:51:02  blueyed
  * Dirty workaround for lazy renderers who detect when they should apply and pre-rendering
  *
