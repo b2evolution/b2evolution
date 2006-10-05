@@ -351,11 +351,10 @@ $schema_queries = array(
 			hit_agnt_ID        INT UNSIGNED NULL,
 			PRIMARY KEY         (hit_ID),
 			INDEX hit_agnt_ID        ( hit_agnt_ID ),
-			INDEX hit_datetime       ( hit_datetime ),
 			INDEX hit_blog_ID        ( hit_blog_ID ),
 			INDEX hit_uri            ( hit_uri ),
 			INDEX hit_referer_dom_ID ( hit_referer_dom_ID )
-		)" ), // TODO: more indexes?
+		)" ),
 
 	'T_subscriptions' => array(
 		'Creating table for subscriptions',
@@ -491,6 +490,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.38  2006/10/05 02:42:22  blueyed
+ * Remove index hit_datetime, because its slow on INSERT (e.g. 1s)
+ *
  * Revision 1.37  2006/10/01 22:11:42  blueyed
  * Ping services as plugins.
  *

@@ -714,7 +714,7 @@ function upgrade_b2evo_tables()
 									PRIMARY KEY (hit_ID),
 									INDEX hit_datetime ( hit_datetime ),
 									INDEX hit_blog_ID (hit_blog_ID)
-								)"; // TODO: more indexes?
+								)";
 			$DB->query( $query );
 			echo "OK.<br />\n";
 
@@ -1237,6 +1237,21 @@ function upgrade_b2evo_tables()
 	}
 
 
+	if( $old_db_version < 9320 )
+	{ // Dropping hit_datetime because it's very slow on INSERT (dh)
+		// This can be so long, it needs its own checkpoint protected block in case of failure
+		echo 'Updating hitlog indexes... ';
+		$DB->query( '
+				ALTER TABLE T_hitlog
+				  DROP INDEX hit_datetime
+				' );
+		echo "OK.<br />\n";
+
+		set_upgrade_checkpoint( '9320' );
+	}
+
+
+
 	// TODO: "If a user has permission to edit a blog, he should be able to put files in the media folder for that blog." - see http://forums.b2evolution.net/viewtopic.php?p=36417#36417
 	/*
 	// blueyed>> I've came up with the following, but it's too generic IMHO
@@ -1427,6 +1442,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.179  2006/10/05 02:42:22  blueyed
+ * Remove index hit_datetime, because its slow on INSERT (e.g. 1s)
+ *
  * Revision 1.178  2006/10/02 19:07:32  blueyed
  * Finished upgrade for 1.9-beta
  *
