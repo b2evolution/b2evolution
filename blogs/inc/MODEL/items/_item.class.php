@@ -920,6 +920,8 @@ class Item extends DataObject
 	 * @todo dh> Currently this makes up one query per displayed item. Probably the cache should get pre-fetched by ItemList2?
 	 * @todo dh> In general, $content_prerendered gets only queried once per item, so it seems like a memory waste to cache the query result..!
 	 *
+	 * NOTE: This calls {@link Item::dbupdate()}, if renderers get changed (from Plugin hook).
+	 *
 	 * @param string Format, see {@link format_to_output()}.
 	 *        Only "htmlbody", "entityencoded", "xml" and "text" get cached.
 	 * @return string
@@ -956,9 +958,14 @@ class Item extends DataObject
 			{
 				global $Debuglog;
 
-				$this->update_renderers_from_Plugins();
-				$post_renderers = $this->get_renderers_validated(); // might have changed from call above
-				$cache_key = $format.'/'.implode('.', $post_renderers);
+				if( $this->update_renderers_from_Plugins() )
+				{
+					$post_renderers = $this->get_renderers_validated(); // might have changed from call above
+					$cache_key = $format.'/'.implode('.', $post_renderers);
+
+					// Save new renderers with item:
+					$this->dbupdate();
+				}
 
 				$this->content_prerendered[$cache_key] = $Plugins->render( $this->content, $post_renderers, $format, array( 'Item' => $this ), 'Render' );
 
@@ -996,30 +1003,35 @@ class Item extends DataObject
 	/**
 	 * Trigger {@link Plugin::ItemApplyAsRenderer()} event and adjust renderers according
 	 * to return value.
+	 * @return boolean True if renderers got changed.
 	 */
 	function update_renderers_from_Plugins()
 	{
 		global $Plugins;
+
+		$r = false;
 
 		foreach( $Plugins->get_list_by_event('ItemApplyAsRenderer') as $Plugin )
 		{
 			if( empty($Plugin->code) )
 				continue;
 
-			$r = $Plugin->ItemApplyAsRenderer( $tmp_params = array('Item' => & $this) );
+			$plugin_r = $Plugin->ItemApplyAsRenderer( $tmp_params = array('Item' => & $this) );
 
-			if( is_bool($r) )
+			if( is_bool($plugin_r) )
 			{
-				if( $r )
+				if( $plugin_r )
 				{
-					$this->add_renderer( $Plugin->code );
+					$r = $this->add_renderer( $Plugin->code ) || $r;
 				}
 				else
 				{
-					$this->remove_renderer( $Plugin->code );
+					$r = $this->remove_renderer( $Plugin->code ) || $r;
 				}
 			}
 		}
+
+		return $r;
 	}
 
 
@@ -3229,42 +3241,55 @@ class Item extends DataObject
 	/**
 	 * Add a renderer (by code) to the Item.
 	 * @param string Renderer code to add for this item
+	 * @return boolean True if renderers have changed
 	 */
 	function add_renderer( $renderer_code )
 	{
 		$renderers = $this->get_renderers();
-		if( ! in_array( $renderer_code, $renderers ) )
+		if( in_array( $renderer_code, $renderers ) )
 		{
-			$renderers[] = $renderer_code;
-			$this->set_renderers( $renderers );
-
-			$this->renderers_validated = NULL;
-			//echo 'Added renderer '.$renderer_code;
+			return false;
 		}
+
+		$renderers[] = $renderer_code;
+		$this->set_renderers( $renderers );
+
+		$this->renderers_validated = NULL;
+		//echo 'Added renderer '.$renderer_code;
 	}
 
 
 	/**
 	 * Remove a renderer (by code) from the Item.
 	 * @param string Renderer code to remove for this item
+	 * @return boolean True if renderers have changed
 	 */
 	function remove_renderer( $renderer_code )
 	{
+		$r = false;
 		$renderers = $this->get_renderers();
-		if( ( $key = array_search( $renderer_code, $renderers ) ) !== false )
+		while( ( $key = array_search( $renderer_code, $renderers ) ) !== false )
 		{
+			$r = true;
 			unset($renderers[$key]);
-			$this->set_renderers( $renderers );
+		}
 
+		if( $r )
+		{
+			$this->set_renderers( $renderers );
 			$this->renderers_validated = NULL;
 			//echo 'Removed renderer '.$renderer_code;
 		}
+		return $r;
 	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.104  2006/10/05 02:12:26  blueyed
+ * Update Item in DB, if renderers get changed in Plugin hook before caching the content
+ *
  * Revision 1.103  2006/10/05 01:06:36  blueyed
  * Removed dirty "hack"; added ItemApplyAsRenderer hook instead.
  *
