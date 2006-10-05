@@ -2162,7 +2162,7 @@ class Plugins
 		// Make sure there's no renderer code with a dot, as the list gets imploded by that when saved:
 		foreach( $validated_renderers as $k => $l_code )
 		{
-			if( strpos( $l_code, '.' ) !== false )
+			if( empty($l_code) || strpos( $l_code, '.' ) !== false )
 			{
 				unset( $validated_renderers[$k] );
 			}
@@ -2965,6 +2965,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.92  2006/10/05 02:10:26  blueyed
+ * Do not add empty codes in Plugins::validate_list()
+ *
  * Revision 1.91  2006/10/05 01:06:37  blueyed
  * Removed dirty "hack"; added ItemApplyAsRenderer hook instead.
  *
