@@ -709,6 +709,23 @@ class Item extends DataObject
 
 
 	/**
+	 * Template function: Display the main blog name.
+	 *
+	 * @deprecated since 1.9
+	 * @todo is it possible to use {$Item->get_Blog()}->name() instead? (we can't possibly duplicate all sub-object functions here!!!)
+	 *       blueyed>> not with PHP4 and {$Item->get_Blog()}->name() (with curly brackets) not even in PHP5!
+	 * @param string Output format. See {@link format_to_output()}.
+	 */
+	function blog_name( $format = 'htmlbody' )
+	{
+		$GLOBALS['Debuglog']->add('Call to deprecated method Item::blog_name()!', 'deprecated');
+
+		$current_Blog = & $this->get_Blog();
+		$current_Blog->name( $format );
+	}
+
+
+	/**
 	 * Template function: list all the category names
 	 *
 	 * @param string link title, '#' for default, false if you want no links
@@ -3287,6 +3304,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.105  2006/10/05 02:43:29  blueyed
+ * Deprecate Item::get_blog_name(), but leave it in for now (BC).
+ *
  * Revision 1.104  2006/10/05 02:12:26  blueyed
  * Update Item in DB, if renderers get changed in Plugin hook before caching the content
  *
