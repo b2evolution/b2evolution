@@ -655,9 +655,7 @@ class ItemList2 extends DataObjectList2
 
 		$Item = & $this->Cache->instantiate( $this->rows[0] );
 
-		// Trigger plugin events
-		// E.g. the youtube plugin uses this to see if it applies to rendering
-		$Item->update_renderers_from_Plugins();
+		// Trigger plugin event, allowing to manipulate the item before it gets previewed
 		$Plugins->trigger_event( 'AppendItemPreviewTransact', array( 'Item' => & $Item ) );
 	}
 
@@ -1640,6 +1638,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.31  2006/10/05 01:17:36  blueyed
+ * Removed unnecessary/doubled call to Item::update_renderers_from_Plugins()
+ *
  * Revision 1.30  2006/10/05 01:06:36  blueyed
  * Removed dirty "hack"; added ItemApplyAsRenderer hook instead.
  *
