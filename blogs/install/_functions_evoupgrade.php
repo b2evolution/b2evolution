@@ -47,6 +47,23 @@ function set_upgrade_checkpoint( $version )
 
 
 /**
+ * @return boolean Does a given index key name exist in DB?
+ */
+function db_index_exists( $table, $index_name )
+{
+	static $cache;
+	global $DB;
+	if( ! isset($cache[$table]) )
+	{
+		$cache[$table] = array();
+		foreach( $DB->get_results('SHOW INDEX FROM '.$table) as $row )
+			$cache[$table][] = $row->Key_name;
+	}
+	return in_array( $index_name, $cache[$table] );
+}
+
+
+/**
  * Converts languages in a given table into according locales
  *
  * @param string name of the table
@@ -1240,12 +1257,15 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 9320 )
 	{ // Dropping hit_datetime because it's very slow on INSERT (dh)
 		// This can be so long, it needs its own checkpoint protected block in case of failure
-		echo 'Updating hitlog indexes... ';
-		$DB->query( '
-				ALTER TABLE T_hitlog
-				  DROP INDEX hit_datetime
-				' );
-		echo "OK.<br />\n";
+		if( db_index_exists( 'T_hitlog', 'hit_datetime' ) )
+		{ // only drop, if it still exists (may have been removed manually)
+			echo 'Updating hitlog indexes... ';
+			$DB->query( '
+					ALTER TABLE T_hitlog
+						DROP INDEX hit_datetime
+					' );
+			echo "OK.<br />\n";
+		}
 
 		set_upgrade_checkpoint( '9320' );
 	}
@@ -1350,8 +1370,10 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version != $new_db_version )
 	{
-		// Update DB schema version to $new_db_version
-		set_upgrade_checkpoint( $new_db_version );
+		if( $DB->get_var( "SELECT set_value FROM T_settings WHERE set_name = 'db_version'" ) < $new_db_version )
+		{ // Update DB schema version to $new_db_version, only if the current one is lower (i.e. not equal from a checkpoint above)
+			set_upgrade_checkpoint( $new_db_version );
+		}
 	}
 
 
@@ -1442,6 +1464,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.180  2006/10/05 02:58:44  blueyed
+ * Support for skipping index dropping, if it does not exist anymore. Should not bark out then! Also do not add the last checkpoint possibly twice.
+ *
  * Revision 1.179  2006/10/05 02:42:22  blueyed
  * Remove index hit_datetime, because its slow on INSERT (e.g. 1s)
  *
