@@ -153,7 +153,7 @@ function create_b2evo_tables()
 			(10, 'pps', 'Powerpoint slideshow', 'pps', 'pps.gif', 'external', 1),
 			(11, 'zip', 'Zip archive', 'application/zip', 'zip.gif', 'external', 1),
 			(12, 'php php3 php4 php5 php6', 'Php files', 'application/x-httpd-php', 'php.gif', 'download', 0),
-			(13, 'css', 'Cascading style sheets', 'text/css', '', 'text', 0)
+			(13, 'css', 'Cascading style sheets', 'text/css', '', 'text', 1)
 		" );
 	echo "OK.<br />\n";
 
@@ -1031,6 +1031,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.201  2006/10/06 21:52:52  blueyed
+ * Enable upload for new "css" type
+ *
  * Revision 1.200  2006/10/06 21:03:07  blueyed
  * Removed deprecated/unused "upload_allowedext" Setting, which restricted file extensions during upload though!
  *
