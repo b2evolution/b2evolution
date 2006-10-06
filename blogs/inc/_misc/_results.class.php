@@ -1377,6 +1377,8 @@ class Results extends Widget
 			}
 			echo $this->params['line_end'];
 
+			$line_count++;
+
 			$this->next_idx();
 		}
 
@@ -1766,7 +1768,7 @@ class Results extends Widget
 		// Sometimes we need embedded function call, so we provide a second sign:
 		$content = preg_replace( '#¤ (.+?) ¤#ix', "'.$1.'", $content );
 
-		// Make callback function move_icons
+		// Make callback function move_icons // dh> what does it do?
 		$content = str_replace( '{move}', "'.\$this->move_icons().'", $content );
 
 
@@ -2186,6 +2188,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.31  2006/10/06 20:52:23  blueyed
+ * Small fix, doc todo
+ *
  * Revision 1.30  2006/09/11 23:30:49  blueyed
  * Fixed AdminUI::disp_payload_* for multiple blocks. Cleaned up AdminUI a bit
  *
