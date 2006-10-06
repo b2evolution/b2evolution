@@ -39,7 +39,7 @@ global $rsc_url;
 // Create result set:
 $Results = & new Results(
 							'SELECT * FROM T_filetypes', 'ftyp_' );
-
+$Results->Cache = & get_Cache( 'FiletypeCache' );
 $Results->title = T_('File types list');
 
 $Results->cols[] = array(
@@ -47,7 +47,7 @@ $Results->cols[] = array(
 						//'order' => 'ftyp_icon',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
-						'td' => '<img src="'.$rsc_url.'icons/fileicons/$ftyp_icon$" alt="$ftyp_icon$">',
+						'td' => '% {Obj}->get_icon() %',
 					);
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
