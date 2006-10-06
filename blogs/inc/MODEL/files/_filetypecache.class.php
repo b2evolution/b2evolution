@@ -58,7 +58,7 @@ class FiletypeCache extends DataObjectCache
 		parent::DataObjectCache( 'Filetype', true, 'T_filetypes', 'ftyp_', 'ftyp_ID', 'ftyp_extensions' );
 	}
 
-	
+
 	/**
 	 * Add a dataobject to the cache
 	 */
@@ -80,25 +80,25 @@ class FiletypeCache extends DataObjectCache
 
 		// If the object is valid and not already cached:
 		$this->cache[$Obj->ID] = & $Obj;
-		
+
 		// cache all extensions
 		$extensions = explode( ' ', $Obj->extensions );
-		
+
 		foreach( $extensions as $extension )
 		{
 			$this->extension_cache[$extension] = $Obj; // not & $Obj
 		}
-		
+
 		return true;
 	}
-	
-	
+
+
  	/**
 	 * Get an object from cache by extensions ID
 	 *
 	 * Load the cache if necessary (all at once if allowed).
 	 *
-	 * @param integer ID of object to load
+	 * @param string Extension string of object to load
 	 * @param boolean true if function should die on error
 	 * @param boolean true if function should die on empty/null
 	 * @return reference on cached object
@@ -129,7 +129,7 @@ class FiletypeCache extends DataObjectCache
 
 		return $this->extension_cache[ $req_ID ];
 	}
-	
-	
+
+
 }
 ?>
