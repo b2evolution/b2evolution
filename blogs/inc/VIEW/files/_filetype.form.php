@@ -39,6 +39,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $edited_Filetype;
 
 global $force_upload_forbiddenext;
+global $rsc_path;
 
 // Determine if we are creating or updating...
 global $action;
@@ -54,20 +55,20 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 
 	$Form->hidden_ctrl();
 	$Form->hidden( 'action', $creating ? 'create' : 'update' );
-	
+
 	if( ! $creating ) $Form->hidden( 'ftyp_ID', $edited_Filetype->ID );
-	
-	$Form->text_input( 'ftyp_extensions', $edited_Filetype->extensions, 40, T_('Extensions'), array( 'maxlength'=>80, 'required'=>true ) );
-	
-	$Form->text_input( 'ftyp_name', $edited_Filetype->name, 40, T_('File type name'), array( 'maxlength'=> 80, 'required'=>true ) );
-		
-	$Form->text_input( 'ftyp_mimetype', $edited_Filetype->mimetype, 40, T_('Mime type'), array( 'maxlength'=> 80, 'required'=>true ) );
-	
-	$Form->text( 'ftyp_icon', $edited_Filetype->icon, 20, T_('Icon'), '', 40 );
+
+	$Form->text_input( 'ftyp_extensions', $edited_Filetype->extensions, 40, T_('Extensions'), array( 'maxlength'=>80, 'required'=>true, 'note'=>sprintf('E.g. &laquo;%s&raquo;'.', '.T_('separated by whitespace'), 'html') ) );
+
+	$Form->text_input( 'ftyp_name', $edited_Filetype->name, 40, T_('File type name'), array( 'maxlength'=> 80, 'required'=>true, 'note'=>sprintf('E.g. &laquo;%s&raquo;', 'HTML file') ) );
+
+	$Form->text_input( 'ftyp_mimetype', $edited_Filetype->mimetype, 40, T_('Mime type'), array( 'maxlength'=> 80, 'required'=>true, 'note'=>sprintf('E.g. &laquo;%s&raquo;', 'text/html') ) );
+
+	$Form->text( 'ftyp_icon', $edited_Filetype->icon, 20, T_('Icon'), sprintf( T_('File name of the icon, must be in %s.'), rel_path_to_base($rsc_path.'icons/fileicons/') ), 40 );
 
 	$Form->radio( 'ftyp_viewtype',
 								$edited_Filetype->viewtype,
-								 array( 
+								 array(
 												array( 'browser', T_( 'Open with browser (popup)' ), T_( 'Let the browser handle the file in a popup.' ) ),
 												array( 'text', T_( 'Open with text viewer (popup)' ), T_( 'Use the online text viewer (recommended for .txt)' ) ),
 												array( 'image', T_( 'Open with image viewer (popup)' ), T_( 'Use the online image viewer (recommended for .gif .png .jpg)' ) ),
@@ -75,9 +76,9 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 												array( 'download', T_( 'Download to disk (no popup)' ), T_( 'Tell the browser to save the file to disk instead of displaying it.' ) )
 											),
 									T_( 'View type' ),
-									true // sperate lines
+									true // separate lines
 							 );
-	
+
 	// Check if the extension is in the array of the not allowed upload extensions from _advanced.php
 	$not_allowed = false;
 	$extensions = explode ( ' ', $edited_Filetype->extensions );
@@ -89,7 +90,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 			continue;
 		}
 	}
-	
+
 	$Form->checkbox( 'ftyp_allowed', $edited_Filetype->allowed, T_('Allow upload'),
 									T_('Check to allow uploading and renaming of this file type'), '', 1, $not_allowed);
 
