@@ -993,8 +993,10 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Creating default file types... ';
-		// Contribs: feel free to add more types here... (and in the block for new installs (create_b2evo_tables()))
-		$DB->query( "INSERT INTO T_filetypes VALUES
+	// TODO: dh> shouldn't they get localized to the app's default locale?
+		$DB->query( "INSERT INTO T_filetypes
+				(ftyp_ID, ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed)
+			VALUES
 				(1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
 				(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 1),
 				(3, 'jpg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
@@ -1270,6 +1272,8 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9320' );
 	}
 
+	// TODO: dh> "upload_allowedext" in T_settings deprecated, but present in 1.8.2 (cannot get configured, though it limits uploads)
+	//           Should get deleted from T_settings, if existing, for 1.9
 
 
 	// TODO: "If a user has permission to edit a blog, he should be able to put files in the media folder for that blog." - see http://forums.b2evolution.net/viewtopic.php?p=36417#36417
@@ -1464,6 +1468,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.181  2006/10/06 21:03:07  blueyed
+ * Removed deprecated/unused "upload_allowedext" Setting, which restricted file extensions during upload though!
+ *
  * Revision 1.180  2006/10/05 02:58:44  blueyed
  * Support for skipping index dropping, if it does not exist anymore. Should not bark out then! Also do not add the last checkpoint possibly twice.
  *

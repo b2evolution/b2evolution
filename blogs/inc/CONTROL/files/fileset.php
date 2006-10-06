@@ -65,7 +65,6 @@ switch( $action )
 					'fm_enable_create_dir',
 					'fm_enable_create_file',
 					'upload_enabled',
-					'upload_allowedext',
 					'upload_maxkb',
 					'regexp_filename' ) );
 			if( $Settings->dbupdate() )

@@ -137,7 +137,10 @@ function create_b2evo_tables()
 	// Upgrade to Phoenix-Beta
 	echo 'Creating default file types... ';
 	// Contribs: feel free to add more types here...
-	$DB->query( "INSERT INTO T_filetypes VALUES
+	// TODO: dh> shouldn't they get localized to the app's default locale?
+	$DB->query( "INSERT INTO T_filetypes
+			(ftyp_ID, ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed)
+		VALUES
 			(1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
 			(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 1),
 			(3, 'jpg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
@@ -149,7 +152,8 @@ function create_b2evo_tables()
 			(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 1),
 			(10, 'pps', 'Powerpoint slideshow', 'pps', 'pps.gif', 'external', 1),
 			(11, 'zip', 'Zip archive', 'application/zip', 'zip.gif', 'external', 1),
-			(12, 'php php3 php4 php5 php6', 'Php files', 'application/x-httpd-php', 'php.gif', 'download', 0)
+			(12, 'php php3 php4 php5 php6', 'Php files', 'application/x-httpd-php', 'php.gif', 'download', 0),
+			(13, 'css', 'Cascading style sheets', 'text/css', '', 'text', 0)
 		" );
 	echo "OK.<br />\n";
 
@@ -1027,6 +1031,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.200  2006/10/06 21:03:07  blueyed
+ * Removed deprecated/unused "upload_allowedext" Setting, which restricted file extensions during upload though!
+ *
  * Revision 1.199  2006/10/02 18:32:33  blueyed
  * Fixed install
  *

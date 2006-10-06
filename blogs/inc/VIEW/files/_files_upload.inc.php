@@ -186,20 +186,23 @@ global $upload_quickmode, $failedFiles;
 				<?php
 				$restrictNotes = array();
 
-				if( $Settings->get( 'upload_allowedext' ) )
-				{ // We want to restrict on file extensions:
-					$restrictNotes[] = '<strong>'.T_('Allowed file extensions').'</strong>: '.$Settings->get( 'upload_allowedext' );
-				}
+				// Get list of recognized file types (others are not allowed to get uploaded)
+				// dh> because FiletypeCache/DataObjectCache has no interface for getting a list, this dirty query seems less dirty to me.
+				$allowed_extensions = $DB->get_col( 'SELECT ftyp_extensions FROM T_filetypes WHERE ftyp_allowed != 0' );
+				$allowed_extensions = implode( ' ', $allowed_extensions ); // implode with space, ftyp_extensions can hold many, separated by space
+				// into array:
+				$allowed_extensions = preg_split( '~\s+~', $allowed_extensions, -1, PREG_SPLIT_NO_EMPTY );
+				// readable:
+				$allowed_extensions = implode_with_and($allowed_extensions);
+
+				$restrictNotes[] = '<strong>'.T_('Allowed file extensions').'</strong>: '.$allowed_extensions;
+
 				if( $Settings->get( 'upload_maxkb' ) )
 				{ // We want to restrict on file size:
 					$restrictNotes[] = '<strong>'.T_('Maximum allowed file size').'</strong>: '.bytesreadable( $Settings->get( 'upload_maxkb' )*1024 );
 				}
 
-				if( $restrictNotes )
-				{
-					echo implode( '<br />', $restrictNotes ).'<br />';
-				}
-
+				echo implode( '<br />', $restrictNotes ).'<br />';
 				?>
 			</p>
 
@@ -285,6 +288,9 @@ global $upload_quickmode, $failedFiles;
 
 /*
  * $Log$
+ * Revision 1.6  2006/10/06 21:03:07  blueyed
+ * Removed deprecated/unused "upload_allowedext" Setting, which restricted file extensions during upload though!
+ *
  * Revision 1.5  2006/04/19 20:13:51  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

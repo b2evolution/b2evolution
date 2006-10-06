@@ -99,7 +99,6 @@ class GeneralSettings extends AbstractSettings
 		'time_difference' => '0',
 		'timeout_sessions' => '604800',     // seconds (604800 == 7 days)
 		'upload_enabled' => '1',
-		'upload_allowedext' => 'jpg jpeg gif png txt csv xls doc ppt css htm html',
 		'upload_maxkb' => '100',
 		'user_minpwdlen' => '5',
 		'what_to_show' => 'posts',
@@ -159,6 +158,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.20  2006/10/06 21:03:06  blueyed
+ * Removed deprecated/unused "upload_allowedext" Setting, which restricted file extensions during upload though!
+ *
  * Revision 1.19  2006/09/10 20:59:18  fplanque
  * extended extra path info setting
  *
