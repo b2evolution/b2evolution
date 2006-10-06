@@ -50,7 +50,7 @@ class Filetype extends DataObject
 	var $mimetype = ''	 ;
 	var $icon = ''			 ;
 	var $viewtype = ''	 ;
-	var $allowed =''		 ;	
+	var $allowed =''		 ;
 
 	/**
 	 * Constructor
@@ -85,7 +85,7 @@ class Filetype extends DataObject
 		}
 	}
 
-	
+
 	/**
 	 * Load data from Request form fields.
 	 *
@@ -106,22 +106,22 @@ class Filetype extends DataObject
 			}
 		}
 		$this->set_from_Request( 'extensions' );
-		
+
 		// Name
 		param_string_not_empty( 'ftyp_name', T_('Please enter a name.') );
 		$this->set_from_Request( 'name' );
-		
+
 		// Mime type
 		param_string_not_empty( 'ftyp_mimetype', T_('Please enter a mime type.') );
 		$this->set_from_Request( 'mimetype' );
-		
+
 		// Icon for the mime type
 		if( param( 'ftyp_icon', 'string', '' ) )
 		{
 			param_check_filename( 'ftyp_icon', T_('Please enter a file name.') );
 		}
 		$this->set_from_Request( 'icon' );
-				
+
 		// View type
 		param( 'ftyp_viewtype', 'string' );
 		$this->set_from_Request( 'viewtype' );
@@ -144,10 +144,10 @@ class Filetype extends DataObject
 			if( $not_allowed )
 			{ // this extension is not allowed
 				$GLOBALS['ftyp_allowed'] = 0;
-			} 
+			}
 		}
 		$this->set_from_Request( 'allowed' );
-		
+
 		return ! param_errors_detected();
 	}
 
@@ -174,19 +174,24 @@ class Filetype extends DataObject
 				$this->set_param( $parname, 'string', $parvalue );
 		}
 	}
-	
+
 	/**
-	 * Return the img html code of the icon 
-	 *
-	 *
+	 * Return the img html code of the icon
+	 * @return string
 	 */
 	function get_icon()
 	{
 		global $rsc_url;
 
-		return '<img src="'.$rsc_url.'icons/fileicons/'.$this->icon.'" alt="" title="'.$this->dget('name', 'htmlattr').'" />';
+		$icon = $this->icon;
+		if( empty($icon) )
+		{ // use default icon
+			$icon = 'default.png';
+		}
+
+		return '<img src="'.$rsc_url.'icons/fileicons/'.$icon.'" alt="" title="'.$this->dget('name', 'htmlattr').'" />';
 	}
-	
-	
+
+
 }
 ?>
