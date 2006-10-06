@@ -129,7 +129,7 @@ function refererList(
 	}
 	if ($visitURL != "global")
 	{
-		$sql_from_where .= " AND hit_uri = '$visitURL'";
+		$sql_from_where .= " AND hit_uri = '".$DB->escape($visitURL, 0, 250)."'";
 	}
 
 	$sql .= $sql_from_where;
@@ -365,6 +365,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.8  2006/10/06 21:54:16  blueyed
+ * Fixed hit_uri handling, especially in strict mode
+ *
  * Revision 1.7  2006/08/20 13:47:25  fplanque
  * extracted param funcs from misc
  *

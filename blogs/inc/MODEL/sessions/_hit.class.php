@@ -528,12 +528,14 @@ class Hit
 
 		$blog_ID = isset($Blog) ? $Blog->ID : NULL;
 
+		$hit_uri = substr($ReqURI, 0, 250); // VARCHAR(250) and likely to be longer
+
 		// insert hit into DB table:
 		$sql = '
 			INSERT INTO T_hitlog(
 				hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
 				hit_referer, hit_referer_dom_ID, hit_blog_ID, hit_remote_addr, hit_agnt_ID )
-			VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($ReqURI).'", "'.$this->referer_type
+			VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($hit_uri).'", "'.$this->referer_type
 				.'", "'.$DB->escape($this->referer).'", '.$DB->null($this->referer_domain_ID).', '.$DB->null($blog_ID).', "'.$DB->escape( $this->IP ).'", '.$this->agent_ID.'
 			)';
 
@@ -621,7 +623,7 @@ class Hit
 				$sql = '
 					SELECT hit_ID FROM T_hitlog INNER JOIN T_sessions ON hit_sess_ID = sess_ID
 					 WHERE sess_user_ID = '.$current_User->ID.'
-						 AND hit_uri = "'.$DB->escape( $ReqURI ).'"
+						 AND hit_uri = "'.$DB->escape( substr($ReqURI, 0, 250) ).'"
 					 LIMIT 1';
 			}
 			else
@@ -632,7 +634,7 @@ class Hit
 					    ON hit_agnt_ID = agnt_ID
 					 WHERE hit_datetime > "'.date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') ).'"
 					   AND hit_remote_addr = '.$DB->quote( $this->IP ).'
-					   AND hit_uri = "'.$DB->escape( $ReqURI ).'"
+					   AND hit_uri = "'.$DB->escape( substr($ReqURI, 0, 250) ).'"
 					   AND agnt_signature = '.$DB->quote($this->user_agent).'
 					 LIMIT 1';
 			}
@@ -682,6 +684,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.40  2006/10/06 21:54:16  blueyed
+ * Fixed hit_uri handling, especially in strict mode
+ *
  * Revision 1.39  2006/08/20 20:12:33  fplanque
  * param_() refactoring part 1
  *

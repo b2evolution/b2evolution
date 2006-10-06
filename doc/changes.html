@@ -83,11 +83,14 @@
 
 	<h2>1.8.3</h2>
 	<ul>
+		<li>A non-editable lists of extensions has been used on restricting uploads (blueyed)</li>
+		<li>Small fixes regarding filetype handling in general (blueyed)</li>
 		<li>ldap_plugin: Fixed fatal error when setting group for new user (blueyed)</li>
 		<li>Fixed fatal error in next_posts_link() if used on a non-item page, e.g. msgform (blueyed)</li>
 		<li>Fixed quoting of values when editing locales (blueyed)</li>
 		<li>Reload Blog object if charset changed because of its locale (blueyed)</li>
 		<li>Do not override $db_config['connection_charset'], if set (blueyed)</li>
+		<li>Fixed MySQL error in strict mode, if logging a requested URI longer than 250 chars (blueyed)</li>
 	</ul>
 
 
