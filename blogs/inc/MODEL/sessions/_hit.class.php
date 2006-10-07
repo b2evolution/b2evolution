@@ -522,13 +522,14 @@ class Hit
 	 */
 	function record_the_hit()
 	{
-		global $DB, $Session, $Settings, $ReqURI, $Blog, $localtimenow, $Debuglog;
+		global $DB, $Session, $ReqURI, $Blog, $localtimenow, $Debuglog;
 
 		$Debuglog->add( 'log(): Recording the hit.', 'hit' );
 
 		$blog_ID = isset($Blog) ? $Blog->ID : NULL;
 
 		$hit_uri = substr($ReqURI, 0, 250); // VARCHAR(250) and likely to be longer
+		$hit_referer = substr($this->referer, 0, 250); // VARCHAR(250) and likely to be longer
 
 		// insert hit into DB table:
 		$sql = '
@@ -536,7 +537,7 @@ class Hit
 				hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
 				hit_referer, hit_referer_dom_ID, hit_blog_ID, hit_remote_addr, hit_agnt_ID )
 			VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($hit_uri).'", "'.$this->referer_type
-				.'", "'.$DB->escape($this->referer).'", '.$DB->null($this->referer_domain_ID).', '.$DB->null($blog_ID).', "'.$DB->escape( $this->IP ).'", '.$this->agent_ID.'
+				.'", "'.$DB->escape($hit_referer).'", '.$DB->null($this->referer_domain_ID).', '.$DB->null($blog_ID).', "'.$DB->escape( $this->IP ).'", '.$this->agent_ID.'
 			)';
 
 		$DB->query( $sql, 'Record the hit' );
@@ -684,6 +685,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.41  2006/10/07 20:45:11  blueyed
+ * Handle logging with referers longer than 250 chars
+ *
  * Revision 1.40  2006/10/06 21:54:16  blueyed
  * Fixed hit_uri handling, especially in strict mode
  *
