@@ -386,6 +386,9 @@ class Plugin
 	 *     'integer': a number (no float, can have leading "+" or "-")
 	 *                  (like 'text' for input, but gets validated when submitting)
 	 *     </li><li>
+	 *     'float': a floating number (can have leading "+" or "-", e.g. "+1", "-0.05")
+	 *                  (like 'text' for input, but gets validated when submitting)
+	 *     </li><li>
 	 *     'textarea': several lines of input. The following can be set for this type:
 	 *       <ul><li>
 	 *       'rows': number of rows
@@ -2666,6 +2669,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.98  2006/10/08 22:13:06  blueyed
+ * Added "float" type to Plugin Setting types.
+ *
  * Revision 1.97  2006/10/05 01:06:37  blueyed
  * Removed dirty "hack"; added ItemApplyAsRenderer hook instead.
  *

@@ -260,6 +260,7 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 		case 'password':
 			$params['type'] = 'password'; // same as text input, but type=password
 
+		case 'float':
 		case 'integer':
 		case 'text':
 			// Default: "text input"
@@ -338,10 +339,24 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 		}
 		$l_value = param( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $l_param_type, $l_param_default );
 
-		if( isset($l_meta['type']) && $l_meta['type'] == 'integer' && ! preg_match( '~^[-+]?\d+$~', $l_value ) )
-		{
-			param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, sprintf( T_('The value for %s must be numeric.'), $l_name ), T_('The value must be numeric.') );
-			continue;
+		if( isset($l_meta['type']) )
+		{ // validate format for "integer" and "float"
+			if( $l_meta['type'] == 'integer' )
+			{
+				if( ! preg_match( '~^[-+]?\d+$~', $l_value ) )
+				{
+					param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, sprintf( T_('The value for %s must be numeric.'), $l_name ), T_('The value must be numeric.') );
+					continue;
+				}
+			}
+			elseif( $l_meta['type'] == 'float' )
+			{
+				if( ! preg_match( '~^[-+]?\d+(\.\d+)?$~', $l_value ) )
+				{
+					param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, sprintf( T_('The value for %s must be numeric.'), $l_name ), T_('The value must be numeric.') );
+					continue;
+				}
+			}
 		}
 
 		// Check valid pattern:
@@ -359,6 +374,18 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 		// Check valid range:
 		if( isset($l_meta['valid_range']) )
 		{
+			// Transform numeric indexes into associative keys:
+			if( ! isset($l_meta['valid_range']['min'], $l_meta['valid_range']['max'])
+				&& isset($l_meta['valid_range'][0], $l_meta['valid_range'][1]) )
+			{
+				$l_meta['valid_range']['min'] = $l_meta['valid_range'][0];
+				$l_meta['valid_range']['max'] = $l_meta['valid_range'][1];
+			}
+			if( isset($l_meta['valid_range'][2]) && ! isset($l_meta['valid_range']['error']) )
+			{
+				$l_meta['valid_range']['error'] = $l_meta['valid_range'][2];
+			}
+
 			if( (isset($l_meta['valid_range']['min']) && $l_value < $l_meta['valid_range']['min'])
 			    || (isset($l_meta['valid_range']['max']) && $l_value > $l_meta['valid_range']['max']) )
 			{
@@ -416,6 +443,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.26  2006/10/08 22:13:05  blueyed
+ * Added "float" type to Plugin Setting types.
+ *
  * Revision 1.25  2006/08/20 22:25:22  fplanque
  * param_() refactoring part 2
  *
