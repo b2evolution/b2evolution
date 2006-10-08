@@ -35,7 +35,7 @@ function skin_base_tag()
 	global $skins_url, $skin, $Blog;
 
 	if( ! empty( $skin ) )
-	{	
+	{
 		$base_href = $skins_url.$skin.'/';
 	}
 	else
@@ -86,16 +86,55 @@ function skin_content_meta( $type = 'text/html' )
 }
 
 /**
- * checks if a skin exists
+ * Checks if a skin is provided by a plugin.
  *
- * @return boolean true is exists, false if not
+ * @uses Plugin::GetProvidedSkins()
+ * @return false|integer False in case no plugin provides the skin or ID of the first plugin that provides it.
+ */
+function skin_provided_by_plugin( $name )
+{
+	static $plugin_skins;
+	if( ! isset($plugin_skins) || ! isset($plugin_skins[$name]) )
+	{
+		global $Plugins;
+
+		$plugin_r = $Plugins->trigger_event_first_return('GetProvidedSkins', NULL, array('in_array'=>$name));
+		if( $plugin_r )
+		{
+			$plugin_skins[$name] = $plugin_r['plugin_ID'];
+		}
+		else
+		{
+			$plugin_skins[$name] = false;
+		}
+	}
+
+	return $plugin_skins[$name];
+}
+
+/**
+ * Checks if a skin exists. This can either be a regular skin directory
+ * or can be in the list {@link Plugin::GetProvidedSkins()}.
+ *
  * @param skin name (directory name)
+ * @return boolean true is exists, false if not
  */
 function skin_exists( $name, $filename = '_main.php' )
 {
 	global $skins_path;
-	
-	return is_readable( $skins_path.$name.'/'.$filename );
+
+	if( is_readable( $skins_path.$name.'/'.$filename ) )
+	{
+		return true;
+	}
+
+	// Check list provided by plugins:
+	if( skin_provided_by_plugin($name) )
+	{
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -151,7 +190,7 @@ function skin_list_start()
 	{	// Check if conf has been properly for version 1.9 (remove in approx 12 months)
 		debug_die( '$skins_path is not properly set in /conf/_advanced.php' );
 	}
-	
+
 	$skin_dir = dir( $skins_path );
 }
 
@@ -234,6 +273,9 @@ function skin_change_url( $display = true )
 
 /*
  * $Log$
+ * Revision 1.10  2006/10/08 22:59:31  blueyed
+ * Added GetProvidedSkins and DisplaySkin hooks. Allow for optimization in Plugins::trigger_event_first_return()
+ *
  * Revision 1.9  2006/09/05 22:29:21  fplanque
  * fixed content types (I hope)
  *

@@ -288,6 +288,9 @@ elseif( !empty($p) || !empty($title) )
 }
 
 
+// TODO: dh> we should first handle $skin, so that if it's provided by a plugin, we do not have to set $MainList etc..
+
+
 if( $disp == 'posts' )
 { // default display:
 	// EXPERIMENTAL:
@@ -380,8 +383,10 @@ if( !empty($tempskin) )
 	// This will be handled like any other skin, except that it will not be stored in a cookie:
 	$skin = $tempskin;
 	$default_skin = '_rss'; // That's gonna be the fallback for now.
-	// TODO [post-phoenix]: decide when or when not you are allowed to override a 'force_skin' directive,
-	// and when or when not you are allowed to fall back to $default_skin.
+	// TODO [post-phoenix]: fp> decide when or when not you are allowed to override a 'force_skin' directive,
+	//   and when or when not you are allowed to fall back to $default_skin.
+	// TODO: dh> there should be no $default_skin and with an invalid $tempskin there should be rather a page with a notice/debug_die()
+  //       Use case: a Plugin registers a skin param and gets disabled some day: there should be an error instead of a default
 }
 
 // Let's check if a skin has been forced in the stub file:
@@ -466,7 +471,14 @@ if( !empty( $skin ) )
 	else
 	{ // Do the main display
 		$Timer->start( 'skin/_main.inc' );
-		require( $skins_path.$skin.'/_main.php' );
+		if( $skin_provided_by_plugin = skin_provided_by_plugin($skin) )
+		{
+			$Plugins->call_method( $skin_provided_by_plugin, 'DisplaySkin', $tmp_params = array('skin'=>$skin) );
+		}
+		else
+		{
+			require( $skins_path.$skin.'/_main.php' );
+		}
 		$Timer->pause( 'skin/_main.inc' );
 	}
 
@@ -493,6 +505,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.45  2006/10/08 22:59:30  blueyed
+ * Added GetProvidedSkins and DisplaySkin hooks. Allow for optimization in Plugins::trigger_event_first_return()
+ *
  * Revision 1.44  2006/10/04 12:55:24  blueyed
  * - Reload $Blog, if charset has changed for Blog locale
  * - only update DB connection charset, if not forced with $db_config['connection_charset']

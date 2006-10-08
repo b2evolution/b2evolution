@@ -806,6 +806,33 @@ class Plugin
 	{
 	}
 
+
+	/**
+	 * Event handler: Gets asked about a list of skin names that the plugin handles.
+	 *
+	 * If one of the skins returned gets called through the "skin=X" URL param, the
+	 * {@link Plugin::DisplaySkin()} method of your plugin gets called.
+	 *
+	 * @return array
+	 */
+	function GetProvidedSkins()
+	{
+		return array();
+	}
+
+
+	/**
+	 * Event handler: Display a skin. Use {@link Plugin::GetProvidedSkins()} to return
+	 * a list of names that you register.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'skin': name of skin to be displayed (from the list of {@link Plugin::GetProvidedSkins()}).
+	 *             If your Plugin only registers one skin, you can ignore it.
+	 */
+	function DisplaySkin( & $params )
+	{
+	}
+
 	// }}}
 
 
@@ -2669,6 +2696,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.99  2006/10/08 22:59:31  blueyed
+ * Added GetProvidedSkins and DisplaySkin hooks. Allow for optimization in Plugins::trigger_event_first_return()
+ *
  * Revision 1.98  2006/10/08 22:13:06  blueyed
  * Added "float" type to Plugin Setting types.
  *

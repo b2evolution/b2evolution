@@ -202,6 +202,7 @@ class Plugins
 	 *  - BeforeInstall
 	 *  - BeforeUninstall
 	 *  - BeforeUninstallPayload
+	 *  - DisplaySkin (called on a skin from {@link GetProvidedSkins()})
 	 *  - ExecCronJob
 	 *  - GetDefaultSettings
 	 *  - GetDefaultUserSettings
@@ -329,6 +330,7 @@ class Plugins
 				'DisplayTrackbackAddr' => '',
 
 				'GetCronJobs' => 'Gets a list of implemented cron jobs.',
+				'GetProvidedSkins' => 'Get a list of "skins" handled by the plugin.',
 			);
 
 
@@ -1815,15 +1817,18 @@ class Plugins
 
 	/**
 	 * Call all plugins for a given event, until the first one returns a value
-	 * (not NULL).
+	 * (not NULL) (and $search is fulfilled, if given).
 	 *
 	 * @param string event name, see {@link Plugin::get_supported_events()}
-	 * @param array Associative array of parameters for the Plugin
+	 * @param array|NULL Associative array of parameters for the Plugin
+	 * @param array|NULL If provided, the return value gets checks against this criteria.
+	 *        Can be:
+	 *         - ( 'in_array' => 'needle' )
 	 * @return array The (modified) params array with key "plugin_ID" set to the last called plugin
 	 *               and 'plugin_return' set to the return value;
 	 *               Empty array if no Plugin returned true or no Plugin has this event registered.
 	 */
-	function trigger_event_first_return( $event, $params = NULL )
+	function trigger_event_first_return( $event, $params = NULL, $search = NULL )
 	{
 		global $Debuglog;
 
@@ -1841,6 +1846,20 @@ class Plugins
 			$r = $this->call_method( $l_plugin_ID, $event, $params );
 			if( isset($r) )
 			{
+				foreach( $search as $k => $v )
+				{ // Check search criterias and continue if it does not match:
+					switch( $k )
+					{
+						case 'in_array':
+							if( ! in_array( $v, $r ) )
+							{
+								continue 3; // continue in main foreach loop
+							}
+							break;
+						default:
+							debug_die('Invalid search criteria in Plugins::trigger_event_first_return / '.$k);
+					}
+				}
 				$Debuglog->add( 'Plugin ID '.$l_plugin_ID.' returned '.( $r ? 'true' : 'false' ).'!', 'plugins' );
 				$params['plugin_return'] = $r;
 				$params['plugin_ID'] = & $l_plugin_ID;
@@ -2965,6 +2984,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.93  2006/10/08 22:59:31  blueyed
+ * Added GetProvidedSkins and DisplaySkin hooks. Allow for optimization in Plugins::trigger_event_first_return()
+ *
  * Revision 1.92  2006/10/05 02:10:26  blueyed
  * Do not add empty codes in Plugins::validate_list()
  *
