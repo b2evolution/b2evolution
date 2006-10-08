@@ -431,11 +431,16 @@ function blog_load_cache()
 	global $DB, $cache_blogs;
 	if( empty($cache_blogs) )
 	{
+		$BlogCache = & get_Cache('BlogCache');
 		$cache_blogs = array();
 
 		foreach( $DB->get_results( "SELECT * FROM T_blogs ORDER BY blog_ID" ) as $this_blog )
 		{
 			$cache_blogs[$this_blog->blog_ID] = $this_blog;
+
+			// Add it to BlogCache, so it does not need to load it also again:
+			// NOTE: dh> it may be bad to instantiate all objects, but there's no shadow_cache for rows..
+			$BlogCache->instantiate($this_blog);
 			//echo 'just cached:'.$cache_blogs[$this_blog->blog_ID]->blog_name.'('.$this_blog->blog_ID.')<br />';
 		}
 	}
@@ -588,6 +593,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.13  2006/10/08 03:40:19  blueyed
+ * Instantiate blog objects in deprecated(?) blog_load_cache(), avoiding extra query for each single blog afterwards
+ *
  * Revision 1.12  2006/09/05 19:05:33  fplanque
  * refactoring
  *

@@ -66,7 +66,7 @@ class DataObjectCache
 	 */
 	var $shadow_cache = NULL;
 
-	var $load_add = false;
+	var $load_all = false;
 	var $all_loaded = false;
 	var $name_field;
 	var $order_by;
@@ -513,6 +513,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.17  2006/10/08 03:40:19  blueyed
+ * Instantiate blog objects in deprecated(?) blog_load_cache(), avoiding extra query for each single blog afterwards
+ *
  * Revision 1.16  2006/09/21 16:38:50  blueyed
  * load_list(): use instantiate(), not really tested, but should work.
  *
