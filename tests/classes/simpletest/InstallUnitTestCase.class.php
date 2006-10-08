@@ -28,6 +28,18 @@ class InstallUnitTestCase extends DbUnitTestCase
 
 
 	/**
+	 * Setup globals according to /install/index.php
+	 */
+	function setUp()
+	{
+		global $timestamp;
+
+		$timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
+
+		parent::setUp();
+	}
+
+	/**
 	 * General after-install checks.
 	 */
 	function tearDown()
