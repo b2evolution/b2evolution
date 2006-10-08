@@ -62,7 +62,7 @@ $UserSettings->param_Request( 'results_plug_order', 'results_plug_order', 'strin
 
 $Results = new Results( '
 	SELECT plug_status, plug_ID, plug_priority, plug_code, plug_apply_rendering FROM T_plugins',
-	'plug_', '--A', NULL /* no limit */ );
+	'plug_', '-A-' /* by name */, NULL /* no limit */ );
 
 $Results->Cache = & $admin_Plugins;
 
@@ -127,7 +127,7 @@ function plugin_results_name_order_callback( $a, $b, $order )
 }
 $Results->cols[] = array(
 		'th' => T_('Plugin'),
-		'order_callback' => 'plugin_results_name_order_callback',
+		'order_objects_callback' => 'plugin_results_name_order_callback',
 		'td' => '% plugin_results_td_name( {Obj} ) %',
 	);
 
@@ -146,7 +146,7 @@ if( count($admin_Plugins->get_plugin_groups()) )
 	}
 	$Results->cols[] = array(
 			'th' => T_('Group'),
-			'order_callback' => 'plugin_results_group_order_callback',
+			'order_objects_callback' => 'plugin_results_group_order_callback',
 			'td' => '% {Obj}->group %',
 		);
 }
@@ -201,7 +201,7 @@ function plugin_results_desc_order_callback( $a, $b, $order )
 $Results->cols[] = array(
 		'th' => T_('Description'),
 		'td' => '% {Obj}->short_desc %',
-		'order_callback' => 'plugin_results_name_order_callback',
+		'order_objects_callback' => 'plugin_results_name_order_callback',
 	);
 
 /*
@@ -420,6 +420,9 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 <?php
 /*
  * $Log$
+ * Revision 1.35  2006/10/08 19:50:10  blueyed
+ * Re-enabled sorting plugins by name, group and desc again
+ *
  * Revision 1.34  2006/09/10 21:56:54  smpdawg
  * Fixed parse error
  *
