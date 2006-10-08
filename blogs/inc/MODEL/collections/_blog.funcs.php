@@ -434,7 +434,7 @@ function blog_load_cache()
 		$BlogCache = & get_Cache('BlogCache');
 		$cache_blogs = array();
 
-		foreach( $DB->get_results( "SELECT * FROM T_blogs ORDER BY blog_ID" ) as $this_blog )
+		foreach( $DB->get_results( "SELECT * FROM T_blogs ORDER BY blog_ID", OBJECT, 'blog_load_cache()' ) as $this_blog )
 		{
 			$cache_blogs[$this_blog->blog_ID] = $this_blog;
 
@@ -443,6 +443,7 @@ function blog_load_cache()
 			$BlogCache->instantiate($this_blog);
 			//echo 'just cached:'.$cache_blogs[$this_blog->blog_ID]->blog_name.'('.$this_blog->blog_ID.')<br />';
 		}
+		$BlogCache->all_loaded = true;
 	}
 }
 
@@ -593,6 +594,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.14  2006/10/08 03:52:09  blueyed
+ * Tell BlogCache that it has loaded all.
+ *
  * Revision 1.13  2006/10/08 03:40:19  blueyed
  * Instantiate blog objects in deprecated(?) blog_load_cache(), avoiding extra query for each single blog afterwards
  *
