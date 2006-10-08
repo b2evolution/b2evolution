@@ -97,7 +97,7 @@ class Item extends DataObject
 
 
 	/**
-	 * @deprecated
+	 * @deprecated by {@link $creator_User}
 	 * @var User
 	 */
 	var $Author;
@@ -1455,9 +1455,9 @@ class Item extends DataObject
 	function mod_date( $format = '', $useGM = false )
 	{
 		if( empty($format) )
-			echo mysql2date( locale_datefmt(), $this->mod_date, $useGM);
+			echo mysql2date( locale_datefmt(), $this->mod_date, $useGM );
 		else
-			echo mysql2date( $format, $this->mod_date, $useGM);
+			echo mysql2date( $format, $this->mod_date, $useGM );
 	}
 
 
@@ -3304,6 +3304,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.106  2006/10/08 22:34:01  blueyed
+ * doc fix
+ *
  * Revision 1.105  2006/10/05 02:43:29  blueyed
  * Deprecate Item::get_blog_name(), but leave it in for now (BC).
  *
