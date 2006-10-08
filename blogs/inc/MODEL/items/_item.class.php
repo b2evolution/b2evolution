@@ -2547,7 +2547,10 @@ class Item extends DataObject
 		$this->set( 'urltitle', $post_urltitle );
 		$this->set( 'content', $post_content );
 		$this->set( 'datestart', $post_timestamp );
+
+		// NOTE: dh> $localtimenow is not defined during install! - all sample posts get a last-modified date of 1970-01-01
 		$this->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
+
 		$this->set( 'main_cat_ID', $main_cat_ID );
 		$this->set( 'extra_cat_IDs', $extra_cat_IDs );
 		$this->set( 'status', $post_status );
@@ -3304,6 +3307,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.107  2006/10/08 22:47:47  blueyed
+ * TODO: $localtimenow is not defined during install!
+ *
  * Revision 1.106  2006/10/08 22:34:01  blueyed
  * doc fix
  *
