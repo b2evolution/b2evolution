@@ -107,25 +107,27 @@ skin_content_header();	// Sets charset!
 
 
 <?php
-	// Links to list pages:
-	$MainList->page_links( '<p class="center">'.T_('Pages:').' <strong>', '</strong></p>' );
+	if( isset($MainList) )
+	{ // Links to list pages:
+		$MainList->page_links( '<p class="center">'.T_('Pages:').' <strong>', '</strong></p>' );
+	}
 ?>
 
 
 <?php
 	// ------------------------------------ START OF POSTS ----------------------------------------
 	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
-	
+
 	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
 	{
 	?>
 
-	<?php 
-		//previous_post();	// link to previous post in single page mode 
+	<?php
+		//previous_post();	// link to previous post in single page mode
 		//next_post(); 			// link to next post in single page mode
 	?>
 
-	<?php 
+	<?php
 		$Timer->resume( 'skin/_main.inc:mainarea:postheaders' );
 
 		$MainList->date_if_changed();
@@ -206,7 +208,7 @@ skin_content_header();	// Sets charset!
 <p class="center"><strong>
 	<?php
 		// Links to list pages:
-		$MainList->page_links( '<p class="center"><strong>', '</strong></p>' );
+		if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>' );
 	?>
 	<?php
 		// previous_post( '<p class="center">%</p>' );
@@ -242,11 +244,13 @@ skin_content_header();	// Sets charset!
 		<h3><?php $Blog->disp( 'name', 'htmlbody' ) ?></h3>
 		<p><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></p>
 		<?php
-			// Links to list pages:
-			$MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
+			if( isset($MainList) )
+			{ // Links to list pages:
+				$MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
    				'prev_text' => '&lt;&lt; '.T_('Previous'),
    				'next_text' => T_('Next').' &gt;&gt;',
 				) );
+			}
 		?>
 		<ul>
 			<!-- <li><a href="<?php $Blog->disp( 'staticurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(cached)') ?></span></li> -->
