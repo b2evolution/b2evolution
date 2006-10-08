@@ -801,6 +801,7 @@ class ItemList2 extends DataObjectList2
 		}
 		elseif( $this->filters['unit'] == 'posts' )
 		{
+			// TODO: dh> check if $limit is NULL!? - though it should not arrive at $page>1 then..
 			// echo 'LIMIT POSTS ';
 			$pgstrt = '';
 			if( $this->page > 1 )
@@ -1638,6 +1639,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.32  2006/10/08 22:35:01  blueyed
+ * TODO: limit===NULL handling
+ *
  * Revision 1.31  2006/10/05 01:17:36  blueyed
  * Removed unnecessary/doubled call to Item::update_renderers_from_Plugins()
  *
