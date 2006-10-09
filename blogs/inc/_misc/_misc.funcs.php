@@ -1007,19 +1007,37 @@ function balanceTags($text)
 }
 
 
-
 /**
- * Wrap pre tag around var_dump() for better debugging
+ * Wrap pre tag around {@link var_export()}/{@link var_dump()} for better debugging.
  *
- * @param, ... mixed variable(s) to dump
+ * @param,... mixed variable(s) to dump
  */
 function pre_dump( $var__var__var__var__ )
 {
-	#echo 'pre_dump(): '.debug_get_backtrace();
+	#echo 'pre_dump(): '.debug_get_backtrace(); // see where a pre_dump() comes from
+
 	echo '<pre style="padding:1ex;border:1px solid #00f;">';
+	$func_num_args = func_num_args();
+	$count = 0;
 	foreach( func_get_args() as $lvar )
 	{
-		echo htmlspecialchars( var_export( $lvar, true ) ).'<br />';
+    if( is_resource($lvar) )
+    { // resource gets reported as NULL by var_export()
+      var_dump($lvar);
+    }
+    else
+    {
+		  echo htmlspecialchars( var_export( $lvar, true ) );
+    }
+    echo "<br />\n";
+
+		$count++;
+		if( $count < $func_num_args )
+		{ // Put HR between arguments
+			echo '<hr />';
+		}
+
+		echo "\n";
 	}
 	echo '</pre>';
 }
@@ -2506,6 +2524,9 @@ function url_same_protocol( $url, $other_url = NULL )
 
 /*
  * $Log$
+ * Revision 1.120  2006/10/09 10:29:16  blueyed
+ * Handling of "resource" arguments in pre_dump()
+ *
  * Revision 1.119  2006/09/30 20:35:40  blueyed
  * Added "text" format to format_to_output()
  *
