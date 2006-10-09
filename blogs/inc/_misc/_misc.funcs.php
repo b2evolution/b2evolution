@@ -1016,30 +1016,27 @@ function pre_dump( $var__var__var__var__ )
 {
 	#echo 'pre_dump(): '.debug_get_backtrace(); // see where a pre_dump() comes from
 
-	echo '<pre style="padding:1ex;border:1px solid #00f;">';
+	echo "\n<pre style=\"padding:1ex;border:1px solid #00f;\">\n";
 	$func_num_args = func_num_args();
 	$count = 0;
 	foreach( func_get_args() as $lvar )
 	{
     if( is_resource($lvar) )
     { // resource gets reported as NULL by var_export()
-      var_dump($lvar);
+      var_dump($lvar); // includes "\n"
     }
     else
     {
-		  echo htmlspecialchars( var_export( $lvar, true ) );
+		  echo htmlspecialchars( var_export( $lvar, true ) )."\n";
     }
-    echo "<br />\n";
 
 		$count++;
 		if( $count < $func_num_args )
 		{ // Put HR between arguments
-			echo '<hr />';
+			echo "<hr />\n";
 		}
-
-		echo "\n";
 	}
-	echo '</pre>';
+	echo "</pre>\n";
 }
 
 
@@ -2524,6 +2521,9 @@ function url_same_protocol( $url, $other_url = NULL )
 
 /*
  * $Log$
+ * Revision 1.121  2006/10/09 10:42:44  blueyed
+ * better layout for pre_dump()
+ *
  * Revision 1.120  2006/10/09 10:29:16  blueyed
  * Handling of "resource" arguments in pre_dump()
  *
