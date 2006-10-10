@@ -355,7 +355,9 @@ class Blog extends DataObject
 
 		if( in_array( 'pings', $groups ) )
 		{ // we want to load the ping checkboxes:
-			$this->set_setting('ping_plugins', implode(',', param( 'blog_ping_plugins', 'array', array() )));
+			$blog_ping_plugins = param( 'blog_ping_plugins', 'array', array() );
+			$blog_ping_plugins = array_unique($blog_ping_plugins);
+			$this->set_setting('ping_plugins', implode(',', $blog_ping_plugins));
 		}
 
 		if( param( 'blog_allowcomments',   'string', NULL ) !== NULL )
@@ -1030,6 +1032,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.30  2006/10/10 23:24:41  blueyed
+ * Fixed duplication of ping plugins from hidden values
+ *
  * Revision 1.29  2006/10/01 22:11:42  blueyed
  * Ping services as plugins.
  *
