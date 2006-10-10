@@ -625,25 +625,28 @@ class DB
 		}
 		else
 		{ // Query was a select, alter, etc...:
-
-			// Take note of column info
-			$i = 0;
-			while( $i < @mysql_num_fields($this->result) )
-			{
-				$this->col_info[$i] = @mysql_fetch_field($this->result);
-				$i++;
-			}
-
-			// Store Query Results
 			$num_rows = 0;
-			while( $row = @mysql_fetch_object($this->result) )
-			{
-				// Store relults as an objects within main array
-				$this->last_result[$num_rows] = $row;
-				$num_rows++;
-			}
 
-			@mysql_free_result($this->result);
+			if( is_resource($this->result) )
+			{ // It's not a resource for CREATE or DROP for example and can even trigger a fatal error (see http://forums.b2evolution.net//viewtopic.php?t=9529)
+				// Take note of column info
+				$i = 0;
+				while( $i < mysql_num_fields($this->result) )
+				{
+					$this->col_info[$i] = mysql_fetch_field($this->result);
+					$i++;
+				}
+
+				// Store Query Results
+				while( $row = mysql_fetch_object($this->result) )
+				{
+					// Store relults as an objects within main array
+					$this->last_result[$num_rows] = $row;
+					$num_rows++;
+				}
+
+				mysql_free_result($this->result);
+			}
 
 			// Log number of rows the query returned
 			$this->num_rows = $num_rows;
@@ -1344,6 +1347,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.23  2006/10/10 21:17:42  blueyed
+ * Fixed possible fatal error while collecting col_info for CREATE and DROP queries
+ *
  * Revision 1.22  2006/08/24 00:36:54  fplanque
  * doc
  *
