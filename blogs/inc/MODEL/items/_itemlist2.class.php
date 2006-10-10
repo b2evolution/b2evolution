@@ -94,7 +94,7 @@ class ItemList2 extends DataObjectList2
 	 * @param Blog
 	 * @param mixed Default filter set: Do not show posts before this timestamp, can be 'now'
 	 * @param mixed Default filter set: Do not show posts after this timestamp, can be 'now'
-	 * @param integer
+	 * @param integer|NULL Limit
 	 * @param string name of cache to be used
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param array restrictions for itemlist (position, contact, firm, ...) key: restriction name, value: ID of the restriction
@@ -1639,6 +1639,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.33  2006/10/10 17:09:39  blueyed
+ * doc
+ *
  * Revision 1.32  2006/10/08 22:35:01  blueyed
  * TODO: limit===NULL handling
  *
