@@ -120,6 +120,8 @@ class DB
 	/**
 	 * CREATE TABLE options.
 	 *
+	 * This gets appended to every "CREATE TABLE" query.
+	 *
 	 * Edit those if you have control over you MySQL server and want a more professional
 	 * database than what is commonly offered by popular hosting providers.
 	 *
@@ -542,9 +544,10 @@ class DB
 			{ // replace in whole query:
 				$query = preg_replace( $this->dbaliases, $this->dbreplaces, $query );
 
-				if( preg_match( '#^ \s* create \s* table \s #ix', $query) )
+				if( ! empty($table_options) && preg_match( '#^ \s* create \s* table \s #ix', $query) )
 				{ // Query is a table creation, we add table options:
-					$query .= $this->table_options;
+					$query = preg_replace( '~;\s*$~', '', $query ); // remove any ";" at the end
+					$query .= ' '.$this->table_options;
 				}
 			}
 		}
@@ -999,80 +1002,77 @@ class DB
 	{
 		$r = '';
 
-		if( $this->col_info )
+		if( ! $this->col_info )
 		{
-			// =====================================================
-			// Results top rows
-			$r .= '<table cellspacing="0" summary="Results for query"><tr>';
-			for( $i = 0, $count = count($this->col_info); $i < $count; $i++ )
-			{
-				$r .= '<th><span class="type">'.$this->col_info[$i]->type.' '.$this->col_info[$i]->max_length.'</span><br />'
-							.$this->col_info[$i]->name.'</th>';
-			}
-			$r .= '</tr>';
+			return '<p>No Results.</p>';
+		}
 
-			$i=0;
+		// =====================================================
+		// Results top rows
+		$r .= '<table cellspacing="0" summary="Results for query"><tr>';
+		for( $i = 0, $count = count($this->col_info); $i < $count; $i++ )
+		{
+			$r .= '<th><span class="type">'.$this->col_info[$i]->type.' '.$this->col_info[$i]->max_length.'</span><br />'
+						.$this->col_info[$i]->name.'</th>';
+		}
+		$r .= '</tr>';
 
-			// ======================================================
-			// print main results
-			if( $this->last_result )
+		$i=0;
+
+		// ======================================================
+		// print main results
+		if( $this->last_result )
+		{
+			foreach( $this->get_results(NULL,ARRAY_N) as $one_row )
 			{
-				foreach( $this->get_results(NULL,ARRAY_N) as $one_row )
+				$i++;
+				if( $i >= $max_lines )
 				{
-					$i++;
-					if( $i >= $max_lines )
+					break;
+				}
+				$r .= '<tr>';
+				foreach( $one_row as $item )
+				{
+					if( $i % 2 )
 					{
-						break;
+						$r .= '<td class="odd">';
 					}
-					$r .= '<tr>';
-					foreach( $one_row as $item )
+					else
 					{
-						if( $i % 2 )
-						{
-							$r .= '<td class="odd">';
-						}
-						else
-						{
-							$r .= '<td>';
-						}
-
-						if( $break_at_comma )
-						{
-							$item = str_replace( ',', '<br />', $item );
-							$item = str_replace( ';', '<br />', $item );
-							$r .= $item;
-						}
-						else
-						{
-							if( strlen( $item ) > 50 )
-							{
-								$item = substr( $item, 0, 50 ).'...';
-							}
-							$r .= htmlspecialchars($item);
-						}
-						$r .= '</td>';
+						$r .= '<td>';
 					}
 
-					$r .= '</tr>';
+					if( $break_at_comma )
+					{
+						$item = str_replace( ',', '<br />', $item );
+						$item = str_replace( ';', '<br />', $item );
+						$r .= $item;
+					}
+					else
+					{
+						if( strlen( $item ) > 50 )
+						{
+							$item = substr( $item, 0, 50 ).'...';
+						}
+						$r .= htmlspecialchars($item);
+					}
+					$r .= '</td>';
 				}
 
-			} // if last result
-			else
-			{
-				$r .= '<tr><td colspan="'.(count($this->col_info)+1).'">No Results</td></tr>';
-			}
-			if( $i >= $max_lines )
-			{
-				$r .= '<tr><td colspan="'.(count($this->col_info)+1).'">Max number of dumped rows has been reached.</td></tr>';
+				$r .= '</tr>';
 			}
 
-			$r .= '</table>';
-
-		} // if col_info
+		} // if last result
 		else
 		{
-			$r .= '<p>No Results.</p>';
+			$r .= '<tr><td colspan="'.(count($this->col_info)+1).'">No Results</td></tr>';
 		}
+		if( $i >= $max_lines )
+		{
+			$r .= '<tr><td colspan="'.(count($this->col_info)+1).'">Max number of dumped rows has been reached.</td></tr>';
+		}
+
+		$r .= '</table>';
 
 		return $r;
 	}
@@ -1347,6 +1347,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.24  2006/10/10 21:21:40  blueyed
+ * Fixed possible SQL error, if table_options get used and theres a semicolon at the end of query; +optimization
+ *
  * Revision 1.23  2006/10/10 21:17:42  blueyed
  * Fixed possible fatal error while collecting col_info for CREATE and DROP queries
  *
