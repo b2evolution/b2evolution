@@ -212,9 +212,7 @@ function b2newpost($m)
 	// Execute or schedule notifications & pings:
 	$edited_Item->handle_post_processing( false );
 
-
 	return new xmlrpcresp(new xmlrpcval($post_ID));
-
 }
 
 
@@ -576,8 +574,12 @@ function bloggereditpost($m)
 	}
 
 	// UPDATE POST IN DB:
-	// TODO: use $edited_Item->set() with only the appropriate fields and then $edited_Item->dbupdate()
-	$edited_Item->update( $post_title, $content, '', $post_category, array($post_category), $status, '#', '', '', 'open' );
+	$edited_Item->set( 'title', $post_title );
+	$edited_Item->set( 'content', $content );
+	$edited_Item->set( 'main_cat_ID', $post_category );
+	$edited_Item->set( 'extra_cat_IDs', array($post_category) );
+	$edited_Item->set( 'status', $status );
+	$edited_Item->dbupdate();
 	if( $DB->error )
 	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
@@ -2107,6 +2109,7 @@ function mt_getcategoryList($m) {
 
 
 /**** SERVER FUNCTIONS ARRAY ****/
+// dh> TODO: Plugin hook here, so that Plugins can provide own callbacks?!
 
 require_once $inc_path.'_misc/ext/_xmlrpcs.php'; // This will add generic remote calls
 
@@ -2251,6 +2254,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.117  2006/10/10 19:23:51  blueyed
+ * Use set()/dbupdate() instead of update() in bloggereditpost()
+ *
  * Revision 1.116  2006/10/01 20:08:39  blueyed
  * Removed DEBUG_XMLRPC_LOGGING constant again. It gave a notice when using the xmlrpcclient e.g. for sending pings and is not as flexible as a global.
  *
