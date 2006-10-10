@@ -544,7 +544,7 @@ class DB
 			{ // replace in whole query:
 				$query = preg_replace( $this->dbaliases, $this->dbreplaces, $query );
 
-				if( ! empty($table_options) && preg_match( '#^ \s* create \s* table \s #ix', $query) )
+				if( ! empty($this->table_options) && preg_match( '#^ \s* create \s* table \s #ix', $query) )
 				{ // Query is a table creation, we add table options:
 					$query = preg_replace( '~;\s*$~', '', $query ); // remove any ";" at the end
 					$query .= ' '.$this->table_options;
@@ -1347,6 +1347,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.25  2006/10/10 21:24:29  blueyed
+ * Fix for the optimization
+ *
  * Revision 1.24  2006/10/10 21:21:40  blueyed
  * Fixed possible SQL error, if table_options get used and theres a semicolon at the end of query; +optimization
  *
