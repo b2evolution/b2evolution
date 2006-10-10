@@ -74,6 +74,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	?></title>
 <!-- InstanceEndEditable -->
 <!-- InstanceBeginEditable name="head" -->
+<?php skin_content_meta(); /* Charset for static pages */ ?>
+<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
 <?php skin_base_tag(); /* You're not using any skin here but this won't hurt. However it will be very helpfull to have this here when you make the switch to a skin! */ ?>
 <meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
 <meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
@@ -175,7 +177,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	<?php
 		// Links to list pages:
-		$MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
+		if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
    			'prev_text' => '&lt;&lt; '.T_('Previous'),
    			'next_text' => T_('Next').' &gt;&gt;',
 			) );
@@ -202,7 +204,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<p><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></p>
 		<?php
 			// Links to list pages:
-			$MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
+			if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
    				'prev_text' => '&lt;&lt; '.T_('Previous'),
    				'next_text' => T_('Next').' &gt;&gt;',
 				) );
