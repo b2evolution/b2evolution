@@ -91,6 +91,12 @@ class DB
 	var $num_queries = 0;
 	var $last_query = '';		// last query SQL string
 	var $last_error = '';			// last DB error string
+
+	/**
+	 * Column information about the last query.
+	 * Note: {@link DB::log_queries} must be enabled for this to work.
+	 * @see DB::get_col_info()
+	 */
 	var $col_info;
 
 	var $vardump_called;
@@ -186,6 +192,7 @@ class DB
 
   /**
    * Do we want to log queries?
+	 * @todo dh> shouldn't this be false by default??
    * @var boolean
    */
 	var $log_queries = true;
@@ -632,12 +639,16 @@ class DB
 
 			if( is_resource($this->result) )
 			{ // It's not a resource for CREATE or DROP for example and can even trigger a fatal error (see http://forums.b2evolution.net//viewtopic.php?t=9529)
-				// Take note of column info
-				$i = 0;
-				while( $i < mysql_num_fields($this->result) )
+
+				if( $this->log_queries )
 				{
-					$this->col_info[$i] = mysql_fetch_field($this->result);
-					$i++;
+					// Take note of column info
+					$i = 0;
+					while( $i < mysql_num_fields($this->result) )
+					{
+						$this->col_info[$i] = mysql_fetch_field($this->result);
+						$i++;
+					}
 				}
 
 				// Store Query Results
@@ -929,6 +940,8 @@ class DB
 	/**
 	 * Function to get column meta data info pertaining to the last query
 	 * see docs for more info and usage
+	 *
+	 * Note: {@link DB::log_queries} must be enabled for this to work.
 	 */
 	function get_col_info( $info_type = 'name', $col_offset = -1 )
 	{
@@ -1347,6 +1360,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.26  2006/10/10 21:42:42  blueyed
+ * Optimization: only collect $col_info, if $log_queries is enabled. TODO.
+ *
  * Revision 1.25  2006/10/10 21:24:29  blueyed
  * Fix for the optimization
  *
