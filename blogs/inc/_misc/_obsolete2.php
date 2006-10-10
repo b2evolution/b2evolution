@@ -1365,4 +1365,26 @@ function pingTechnorati(& $blogparams, $display = true )
 }
 
 
+/**
+ * Get blog params for specified ID
+ *
+ * @todo on a heavy multiblog system, cache them one by one...
+ *
+ * @param integer Blog ID
+ */
+function get_blogparams_by_ID( $blog_ID )
+{
+	global $cache_blogs;
+
+	if( $blog_ID < 1 ) debug_die( 'No blog is selected!' );
+
+	if( empty($cache_blogs[$blog_ID]) )
+	{
+		blog_load_cache();
+	}
+	if( !isset( $cache_blogs[$blog_ID] ) ) debug_die( T_('Requested blog does not exist!') );
+	return $cache_blogs[ $blog_ID ];
+}
+
+
 ?>

@@ -3113,7 +3113,6 @@ class Item extends DataObject
 	{
 		global $Plugins, $baseurl;
 
-		load_funcs( '_misc/_ping.funcs.php' );
 		load_funcs( '_misc/ext/_xmlrpc.php' );
 
 		$this->load_Blog();
@@ -3307,6 +3306,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.108  2006/10/10 17:10:08  blueyed
+ * Removed obsolete file inc/_misc/_ping.funcs.php
+ *
  * Revision 1.107  2006/10/08 22:47:47  blueyed
  * TODO: $localtimenow is not defined during install!
  *
