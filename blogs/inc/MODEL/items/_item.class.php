@@ -155,6 +155,7 @@ class Item extends DataObject
 	var $wordcount = 0;
 	/**
 	 * @var string The list of renderers, imploded by '.'.
+	 * @access protected
 	 */
 	var $renderers;
 	/**
@@ -1628,6 +1629,7 @@ class Item extends DataObject
 													$zero = '#', $one = '#', $more = '#', $title='#', $status = 'published',
 													$use_popup = '#',	$hideifnone = '#', $mode = '', $blogurl = '' )
 	{
+		// dh> TODO:	Add plugin hook, where a Pingback plugin could hook and provide "pingbacks"
 		switch( $type )
 		{
 			case 'feedbacks':
@@ -1669,7 +1671,20 @@ class Item extends DataObject
 
 			case 'pingbacks':
 				// Obsolete, but left for skin compatibility
+				/* dh> left here as a reference for pingbacks plugin:
+				$this->get_Blog();
+				if( ! $this->Blog->get( 'allowpingbacks' ) )
+				{ // Pingbacks not allowed on this blog:
+					return;
+				}
+				if( $hideifnone === '#' ) $hideifnone = true;
+				if( $title == '#' ) $title = T_('Display pingbacks');
+				if( $zero == '#' ) $zero = T_('Pingback (0)');
+				if( $one == '#' ) $one = T_('Pingback (1)');
+				if( $more == '#' ) $more = T_('Pingbacks (%d)');
+				*/
 				return;
+
 				break;
 
 			default:
@@ -2616,6 +2631,8 @@ class Item extends DataObject
 	 *
 	 * This function has to handle all needed DB dependencies!
 	 *
+	 * @deprecated since 1.9 - not used in the core anymore
+	 *
 	 * @param string Title
 	 * @param string Content
 	 * @param string Timestamp ('Y-m-d H:i:s')
@@ -3306,6 +3323,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.109  2006/10/10 19:22:11  blueyed
+ * doc/TODO
+ *
  * Revision 1.108  2006/10/10 17:10:08  blueyed
  * Removed obsolete file inc/_misc/_ping.funcs.php
  *
