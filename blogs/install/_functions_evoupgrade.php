@@ -1140,7 +1140,7 @@ function upgrade_b2evo_tables()
 											)',
 
 				// This is "DEFAULT 1" in the 0.9.0.11 dump.. - changed in 0.9.2?!
-				43 => 'ALTER TABLE evo_blogs ALTER COLUMN blog_allowpingbacks SET DEFAULT 0',
+				43 => 'ALTER TABLE T_blogs ALTER COLUMN blog_allowpingbacks SET DEFAULT 0',
 
 			) as $query )
 		{
@@ -1231,13 +1231,13 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Altering locales table... ';
-		$DB->query( "ALTER TABLE evo_locales CHANGE COLUMN loc_datefmt loc_datefmt varchar(20) NOT NULL default 'y-m-d'" );
-		$DB->query( "ALTER TABLE evo_locales CHANGE COLUMN loc_timefmt loc_timefmt varchar(20) NOT NULL default 'H:i:s'" );
+		$DB->query( "ALTER TABLE T_locales CHANGE COLUMN loc_datefmt loc_datefmt varchar(20) NOT NULL default 'y-m-d'" );
+		$DB->query( "ALTER TABLE T_locales CHANGE COLUMN loc_timefmt loc_timefmt varchar(20) NOT NULL default 'H:i:s'" );
 		echo "OK.<br />\n";
 
 		echo 'Creating item cache table... ';
 		$DB->query( "
-				CREATE TABLE evo_item__prerendering(
+				CREATE TABLE T_item__prerendering(
 					itpr_itm_ID                   INT(11) UNSIGNED NOT NULL,
 					itpr_format                   ENUM('htmlbody', 'entityencoded', 'xml', 'text') NOT NULL,
 					itpr_renderers                TEXT NOT NULL,
@@ -1248,8 +1248,8 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Altering plugins table... ';
-		$DB->query( "ALTER TABLE evo_plugins ADD COLUMN plug_name            VARCHAR(255) NULL default NULL AFTER plug_version" );
-		$DB->query( "ALTER TABLE evo_plugins ADD COLUMN plug_shortdesc       VARCHAR(255) NULL default NULL AFTER plug_name" );
+		$DB->query( "ALTER TABLE T_plugins ADD COLUMN plug_name            VARCHAR(255) NULL default NULL AFTER plug_version" );
+		$DB->query( "ALTER TABLE T_plugins ADD COLUMN plug_shortdesc       VARCHAR(255) NULL default NULL AFTER plug_name" );
 		echo "OK.<br />\n";
 
 		set_upgrade_checkpoint( '9310' );
@@ -1272,32 +1272,12 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9320' );
 	}
 
-	// TODO: dh> "upload_allowedext" in T_settings deprecated, but present in 1.8.2 (cannot get configured, though it limits uploads)
-	//           Should get deleted from T_settings, if existing, for 1.9
-
-
-	// TODO: "If a user has permission to edit a blog, he should be able to put files in the media folder for that blog." - see http://forums.b2evolution.net/viewtopic.php?p=36417#36417
-	/*
-	// blueyed>> I've came up with the following, but it's too generic IMHO
-	if( $old_db_version < 9300 )
+	if( $old_db_version < 9330 )
 	{
-		echo 'Setting automatic media perms on blogs (members can upload)... ';
-		$users = $DB->query( '
-				UPDATE T_users
-				   SET bloguser_perm_media_upload = 1
-				 WHERE bloguser_ismember = 1' );
+		echo 'Removing obsolete settings... ';
+		$DB->query( 'DELETE FROM T_settings WHERE set_name = "upload_allowedext"' );
 		echo "OK.<br />\n";
-	}
-	*/
 
-
-	// Version 2.0 starts here
-	// TODO: install ping plugins (b2evonet and pingomatic)
-	// TODO: Remove and transform obsolete fields blog_pingb2evonet, blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs
-
-
-	if( $old_db_version < 9404 )
-	{
 		echo 'Updating blogs... ';
 		$DB->query( '
 				ALTER TABLE T_blogs
@@ -1317,7 +1297,32 @@ function upgrade_b2evo_tables()
 			ALTER TABLE T_posts
 				DROP COLUMN post_flags' );
 		echo "OK.<br />\n";
+	}
 
+
+	// TODO: "If a user has permission to edit a blog, he should be able to put files in the media folder for that blog." - see http://forums.b2evolution.net/viewtopic.php?p=36417#36417
+	/*
+	// blueyed>> I've came up with the following, but it's too generic IMHO
+	if( $old_db_version < 9300 )
+	{
+		echo 'Setting automatic media perms on blogs (members can upload)... ';
+		$users = $DB->query( '
+				UPDATE T_users
+				   SET bloguser_perm_media_upload = 1
+				 WHERE bloguser_ismember = 1' );
+		echo "OK.<br />\n";
+	}
+	*/
+
+	// TODO: Remove and transform obsolete fields blog_pingb2evonet, blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs
+
+
+	// Version 2.0 starts here
+
+
+	if( $old_db_version < 9404 )
+	{
+		// dh> moved content into "< 9330" block for 1.9
 	}
 
 	if( $old_db_version < 9405 )
@@ -1374,18 +1379,15 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version != $new_db_version )
 	{
-		if( $DB->get_var( "SELECT set_value FROM T_settings WHERE set_name = 'db_version'" ) < $new_db_version )
-		{ // Update DB schema version to $new_db_version, only if the current one is lower (i.e. not equal from a checkpoint above)
+		if( $DB->get_var( "SELECT set_value FROM T_settings WHERE set_name = 'db_version'" ) != $new_db_version )
+		{ // Update DB schema version to $new_db_version, only if the current one is not equal to the one from a checkpoint above
 			set_upgrade_checkpoint( $new_db_version );
 		}
 	}
 
 
-	// This block has to be at the end because plugin install may fail if the DB schema is not current.
-	if( $old_db_version < 9100 )
-	{
-		install_basic_plugins();
-	}
+	// This has to be at the end because plugin install may fail if the DB schema is not current (matching Plugins class).
+	install_basic_plugins( $old_db_version );
 
 
 	// Check DB schema:
@@ -1468,6 +1470,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.182  2006/10/10 23:00:41  blueyed
+ * Fixed some table names to alias; fixed plugin install procedure; installed ping plugins; moved some upgrade code to 1.9
+ *
  * Revision 1.181  2006/10/06 21:03:07  blueyed
  * Removed deprecated/unused "upload_allowedext" Setting, which restricted file extensions during upload though!
  *
