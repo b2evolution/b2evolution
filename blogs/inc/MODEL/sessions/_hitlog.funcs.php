@@ -241,8 +241,11 @@ function stats_blog_ID()
 function stats_blog_name()
 {
 	global $row_stats;
-	$stats_blogparams = get_blogparams_by_ID( $row_stats['hit_blog_ID'] );
-	echo format_to_output( $stats_blogparams->blog_name, 'htmlbody' );
+
+	$BlogCache = & get_Cache('BlogCache');
+	$Blog = & $BlogCache->get_by_ID($row_stats['hit_blog_ID']);
+
+	$Blog->disp('name');
 }
 
 
@@ -365,6 +368,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.9  2006/10/10 19:26:24  blueyed
+ * Use BlogCache instead "blogparams"
+ *
  * Revision 1.8  2006/10/06 21:54:16  blueyed
  * Fixed hit_uri handling, especially in strict mode
  *
