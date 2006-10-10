@@ -50,7 +50,7 @@ class CollectionSettings extends AbstractSettings
 	var $_defaults = array(
 			'new_feedback_status' => 'draft',  // 'draft', 'published' or 'deprecated'
 			'chapter_links' => 'param_num',		 // 'param_num', 'subchap', 'chapters'
-			'ping_plugins' => 'ping_pingomatic,ping_b2evo', // ping plugin codes
+			'ping_plugins' => 'ping_pingomatic,ping_b2evonet', // ping plugin codes, separated by comma
 		);
 
 
@@ -66,6 +66,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.5  2006/10/10 23:29:01  blueyed
+ * Fixed default for "ping_plugins"
+ *
  * Revision 1.4  2006/10/01 22:11:42  blueyed
  * Ping services as plugins.
  *
