@@ -153,13 +153,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 						{
 							document.getElementById( 'userlist_default' ).style.display='none';
 							document.getElementById( 'userlist_wide' ).style.display='block';
-							document.blogperm_checkchanges.layout.value = 'wide';
+							document.getElementById('blogperm_checkchanges').layout.value = 'wide';
 						}
 						else
 						{
 							document.getElementById( 'userlist_wide' ).style.display='none';
 							document.getElementById( 'userlist_default' ).style.display='block';
-							document.blogperm_checkchanges.layout.value = 'default';
+							document.getElementById('blogperm_checkchanges').layout.value = 'default';
 						}
 					}
 

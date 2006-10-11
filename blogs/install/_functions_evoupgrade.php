@@ -51,15 +51,58 @@ function set_upgrade_checkpoint( $version )
  */
 function db_index_exists( $table, $index_name )
 {
-	static $cache;
 	global $DB;
-	if( ! isset($cache[$table]) )
-	{
-		$cache[$table] = array();
-		foreach( $DB->get_results('SHOW INDEX FROM '.$table) as $row )
-			$cache[$table][] = $row->Key_name;
-	}
-	return in_array( $index_name, $cache[$table] );
+
+	$index_name = strtolower($index_name);
+
+	foreach( $DB->get_results('SHOW INDEX FROM '.$table) as $row )
+		if( strtolower($row->Key_name) == $index_name )
+			return true;
+
+	return false;
+}
+
+
+/**
+ * @return boolean Does a given column name exist in DB?
+ */
+function db_col_exists( $table, $col_name )
+{
+	global $DB;
+
+	$col_name = strtolower($col_name);
+
+	foreach( $DB->get_results('SHOW COLUMNS FROM '.$table) as $row )
+		if( strtolower($row->Field) == $col_name )
+			return true;
+
+	return false;
+}
+
+/**
+ * Drops a column, if it exists.
+ */
+function db_drop_col( $table, $col_name )
+{
+	global $DB;
+
+	if( ! db_col_exists($table, $col_name) )
+		return false;
+
+	$DB->query( 'ALTER TABLE '.$table.' DROP '.$col_name );
+}
+
+/**
+ * Add a column, if it does not already exist.
+ */
+function db_add_col( $table, $col_name, $col_desc )
+{
+	global $DB;
+
+	if( db_col_exists($table, $col_name) )
+		return false;
+
+	$DB->query( 'ALTER TABLE '.$table.' ADD COLUMN '.$col_name.' '.$col_desc );
 }
 
 
@@ -1279,23 +1322,24 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Updating blogs... ';
-		$DB->query( '
-				ALTER TABLE T_blogs
-							DROP COLUMN blog_allowpingbacks' );
+		db_drop_col( 'T_blogs', 'blog_allowpingbacks' );
 		echo "OK.<br />\n";
+		// dh> TODO: Remove and transform obsolete fields blog_pingb2evonet, blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs
+
 
 		echo 'Updating posts... ';
-		$DB->query( '
-			ALTER TABLE T_posts
-				ADD COLUMN post_notifications_status   ENUM("noreq","todo","started","finished") NOT NULL DEFAULT "noreq" AFTER post_flags,
-				ADD COLUMN post_notifications_ctsk_ID  INT(10) unsigned NULL DEFAULT NULL AFTER post_notifications_status' );
-		$DB->query( '
-			UPDATE T_posts
-			   SET post_notifications_status = "finished"
-			 WHERE post_flags LIKE "%pingsdone%"' );
-		$DB->query( '
-			ALTER TABLE T_posts
-				DROP COLUMN post_flags' );
+		db_add_col( 'T_posts', 'post_notifications_status',  'ENUM("noreq","todo","started","finished") NOT NULL DEFAULT "noreq" AFTER post_flags' );
+		db_add_col( 'T_posts', 'post_notifications_ctsk_ID', 'INT(10) unsigned NULL DEFAULT NULL AFTER post_notifications_status' );
+
+		if( db_col_exists('T_posts', 'post_flags') )
+		{
+			$DB->query( '
+				UPDATE T_posts
+					 SET post_notifications_status = "finished"
+				 WHERE post_flags LIKE "%pingsdone%"' );
+			db_drop_col( 'T_posts', 'post_flags' );
+		}
+
 		echo "OK.<br />\n";
 	}
 
@@ -1314,7 +1358,6 @@ function upgrade_b2evo_tables()
 	}
 	*/
 
-	// TODO: Remove and transform obsolete fields blog_pingb2evonet, blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs
 
 
 	// Version 2.0 starts here
@@ -1470,6 +1513,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.183  2006/10/11 17:21:09  blueyed
+ * Fixes
+ *
  * Revision 1.182  2006/10/10 23:00:41  blueyed
  * Fixed some table names to alias; fixed plugin install procedure; installed ping plugins; moved some upgrade code to 1.9
  *

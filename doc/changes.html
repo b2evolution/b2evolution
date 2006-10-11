@@ -23,10 +23,9 @@
 		<li>A lot of refactoring (fplanque, blueyed)</li>
 		<li>Pingbacks are dead. R.I.P. (not enough value over maintenance time)</li>
 		<li>...postcounts for categories will probably die soon (not enough value over processing time)</li>
-		<li>Ping services implemented as plugins (blueyed)</li>
 		<li> Plugins
 			<ul>
-				<li>Added events: ItemSendPing</li>
+				<li>Added events: </li>
 			</ul>
 		</li>
 	</ul>
@@ -47,7 +46,8 @@
 		<li>Enhanced form abortion detection javascript (fplanque)</li>
 		<li>Enhanced result tables (progidistri, fplanque, blueyed) </li>
 		<li>Caching of pre-rendered item content (blueyed)</li>
-		<li> Plugins
+		<li>Ping services implemented as plugins (blueyed)</li>
+		<li>Plugins
 			<ul>
 				<li>Enhanced smilies plugin (Yabba)</li>
 				<li>Plugins can get localized/translated (blueyed)</li>
@@ -65,6 +65,7 @@
 				    if it wants to get added or removed as a renderer (blueyed)</li>
 				<li>Added hooks GetProvidedSkins and DisplaySkin, so a Plugin can register skin handlers, e.g.
 				    for displaying something like Google Sitemaps (blueyed)</li>
+				<li>Added hook ItemSendPing: gets called, when pinging for new items (blueyed)</li>
 			</ul>
 		</li>
 		<li>Fixed handling of locale dateformats with other chars than "d", "m" and "Y"/"y" when editing items (blueyed)</li>
@@ -93,6 +94,8 @@
 		<li>Reload Blog object if charset changed because of its locale (blueyed)</li>
 		<li>Do not override $db_config['connection_charset'], if set (blueyed)</li>
 		<li>Fixed MySQL error in strict mode, when logging a requested URI or referrer longer than 250 chars (blueyed)</li>
+		<li>Fixed possible fatal error during install (while collecting col_info for CREATE and DROP queries) (blueyed)</li>
+		<li>Fixed Javascript in blog permission editing tab (blueyed)</li>
 	</ul>
 
 

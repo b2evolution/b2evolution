@@ -63,11 +63,10 @@ class ping_pingomatic_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->name = T_('Pingomatic plugin');
-		$this->short_desc = T_('Ping the pingomatic service');
-		$this->long_desc = T_('Pings the pingomatic service, which relays the ping to the most common ping receivers.');
+		$this->name = T_('Ping-O-Matic plugin');
+		$this->short_desc = T_('Pings the Ping-O-Matic service, which relays your ping to the most common services.');
 
-		$this->ping_service_name = 'Pingomatic';
+		$this->ping_service_name = 'Ping-O-Matic';
 		$this->ping_service_note = T_('Pings a service that relays the ping to the most common services.');
 	}
 
@@ -99,6 +98,9 @@ class ping_pingomatic_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.2  2006/10/11 17:21:09  blueyed
+ * Fixes
+ *
  * Revision 1.1  2006/10/01 22:26:48  blueyed
  * Initial import of ping plugins.
  *

@@ -172,7 +172,7 @@ skin_content_header();	// Sets charset!
 		<strong>
 		<?php
 			// Links to list pages:
-			$MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
+			if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
    				'prev_text' => '&lt;&lt; '.T_('Previous'),
    				'next_text' => T_('Next').' &gt;&gt;',
 				) );

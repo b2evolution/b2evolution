@@ -63,9 +63,8 @@ class generic_ping_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->name = T_('Ping plugin');
-		$this->short_desc = T_('Generic Ping plugin');
-		$this->long_desc = T_('Use this plugin to add a ping service to your installation.');
+		$this->name = T_('Generic Ping plugin');
+		$this->short_desc = T_('Use this plugin to add a generic ping service to your installation.');
 
 		if( isset($this->Settings) )
 		{ // is not set for not-installed Plugins
@@ -200,6 +199,9 @@ class generic_ping_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.2  2006/10/11 17:21:09  blueyed
+ * Fixes
+ *
  * Revision 1.1  2006/10/05 01:19:11  blueyed
  * Initial import of generic ping plugin.
  *

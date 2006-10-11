@@ -79,7 +79,6 @@ class ping_b2evonet_plugin extends Plugin
 	{
 		global $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
 		global $debug;
-		//load_funcs( '_misc/ext/_xmlrpc.php' );
 
 		$item_Blog = $params['Item']->get_Blog();
 
@@ -107,6 +106,9 @@ class ping_b2evonet_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.2  2006/10/11 17:21:09  blueyed
+ * Fixes
+ *
  * Revision 1.1  2006/10/01 22:26:48  blueyed
  * Initial import of ping plugins.
  *

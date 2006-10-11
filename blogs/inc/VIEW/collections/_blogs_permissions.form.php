@@ -316,7 +316,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 						'th' => '',
-						'td' => '<a href="javascript:toggleall_wide(document.blogperm_checkchanges, $user_ID$ );merge_from_wide( document.blogperm_checkchanges, $user_ID$ ); setcheckallspan( $user_ID$ );" title="'.TS_('(un)selects all checkboxes using Javascript').'">
+						'td' => '<a href="javascript:toggleall_wide(document.getElementById(\'blogperm_checkchanges\'), $user_ID$ );merge_from_wide( document.getElementById(\'blogperm_checkchanges\'), $user_ID$ ); setcheckallspan( $user_ID$ );" title="'.TS_('(un)selects all checkboxes using Javascript').'">
 							<span id="checkallspan_$user_ID$">'.TS_('(un)check all').'</span>
 						</a>',
 						'td_class' => 'center',
@@ -415,6 +415,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.11  2006/10/11 17:21:09  blueyed
+ * Fixes
+ *
  * Revision 1.10  2006/08/21 01:02:10  blueyed
  * whitespace
  *

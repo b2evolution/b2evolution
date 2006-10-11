@@ -24,7 +24,7 @@ class InstallUnitTestCase extends DbUnitTestCase
 	/**
 	 * Number of basic plugins to test for being installed.
 	 */
-	var $nr_of_basic_plugins = 7;
+	var $nr_of_basic_plugins = 9;
 
 
 	/**

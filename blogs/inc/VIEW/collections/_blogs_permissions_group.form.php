@@ -132,7 +132,7 @@ function list_groups( $layout, $query )
 							value="1" title="<?php echo T_("Permission to change the blog's media folder content") ?>" />
 					</td>
 					<td class="center">
-						<a href="javascript:toggleall_wide(document.blogperm_checkchanges, <?php echo $lrow['grp_ID'] ?>);merge_from_wide( document.blogperm_checkchanges, <?php echo $lrow['grp_ID'] ?>); setcheckallspan(<?php echo $lrow['grp_ID'] ?>);" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>">
+						<a href="javascript:toggleall_wide(document.getElementById('blogperm_checkchanges'), <?php echo $lrow['grp_ID'] ?>);merge_from_wide( document.getElementById('blogperm_checkchanges'), <?php echo $lrow['grp_ID'] ?>); setcheckallspan(<?php echo $lrow['grp_ID'] ?>);" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>">
 							<span id="checkallspan_<?php echo $lrow['grp_ID'] ?>"><?php echo T_('(un)check all')?></span>
 						</a>
 					</td>
@@ -332,7 +332,7 @@ echo '<p class="note center">'.T_('Note: General group permissions override the 
 $Form->end_fieldset();
 // warning if a user withdraws own permission to edit the blog's properties
 // todo: check if user is withdrawing own group permissions
-form_submit( ( $current_User->ID != 1 ) ); //? 'onclick="if( document.blogperm_checkchanges.blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\''.TS_('Warning! You are about to remove your own permission to edit this blog!\nYou won\'t have access to its properties any longer if you do that!').'\') );"' : '' );
+form_submit( ( $current_User->ID != 1 ) ); //? 'onclick="if( document.getElementById(\'blogperm_checkchanges\').blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\''.TS_('Warning! You are about to remove your own permission to edit this blog!\nYou won\'t have access to its properties any longer if you do that!').'\') );"' : '' );
 
 $Form->end_form();
 ?>
