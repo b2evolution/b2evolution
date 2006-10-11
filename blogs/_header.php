@@ -9,6 +9,8 @@
 
 
 // Get the blog from param, defaulting to the last selected one for this user:
+$BlogCache = & get_Cache( 'BlogCache' );
+
 $user_selected_blog = (int)$UserSettings->get('selected_blog');
 if( $user_selected_blog && ! $BlogCache->get_by_ID($user_selected_blog, false) )
 { // User-selected blog does not exist anymore!
@@ -343,6 +345,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.21  2006/10/11 23:44:49  smpdawg
+ * Bug fix
+ *
  * Revision 1.20  2006/10/11 17:21:09  blueyed
  * Fixes
  *
