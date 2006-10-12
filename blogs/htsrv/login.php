@@ -343,7 +343,9 @@ if( $Session->has_User() )
 	unset($tmp_User);
 }
 
-if( strpos( $redirect_to, str_replace('&amp;', '&', $admin_url) ) === 0 )
+if( ( empty($redirect_to) && is_admin_page() )
+	|| strpos( $redirect_to, str_replace('&amp;', '&', $admin_url) ) === 0
+	|| strpos( $ReqHost.	$redirect_to, str_replace('&amp;', '&', $admin_url) ) === 0 )
 { // don't provide link to bypass
 	$login_required = true;
 }
@@ -358,6 +360,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.73  2006/10/12 23:48:15  blueyed
+ * Fix for if redirect_to is relative
+ *
  * Revision 1.72  2006/08/21 19:07:52  blueyed
  * doc
  *

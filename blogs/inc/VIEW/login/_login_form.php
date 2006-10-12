@@ -80,7 +80,9 @@ $Form->begin_form( 'fform' );
 	echo $Form->inputstart;
 	$Form->submit( array( 'login_action[login]', T_('Log in!'), 'search' ) );
 
-	if( strpos( $redirect_to, str_replace( '&', '&amp;', $admin_url ) ) !== 0 && ! is_admin_page() )
+	if( strpos( $redirect_to, str_replace( '&', '&amp;', $admin_url ) ) !== 0
+		&& strpos( $ReqHost.$redirect_to, str_replace( '&', '&amp;', $admin_url ) ) !== 0 // if $redirect_to is relative
+		&& ! is_admin_page() )
 	{ // provide button to log straight into backoffice, if we would not go there anyway
 		$Form->submit( array( 'login_action[redirect_to_backoffice]', T_('Log into backoffice!'), 'search' ) );
 	}
@@ -125,6 +127,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.14  2006/10/12 23:48:15  blueyed
+ * Fix for if redirect_to is relative
+ *
  * Revision 1.13  2006/07/23 20:18:31  fplanque
  * cleanup
  *
