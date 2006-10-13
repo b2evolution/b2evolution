@@ -422,7 +422,6 @@ class DataObjectCache
 	function remove_by_ID( $req_ID )
 	{
 		unset( $this->cache[$req_ID] );
-		unset( $marcus );
 	}
 
 
@@ -513,6 +512,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.18  2006/10/13 09:58:53  blueyed
+ * Removed bogus unset()
+ *
  * Revision 1.17  2006/10/08 03:40:19  blueyed
  * Instantiate blog objects in deprecated(?) blog_load_cache(), avoiding extra query for each single blog afterwards
  *
