@@ -94,6 +94,7 @@ class UserCache extends DataObjectCache
 		if( !isset( $this->cache_login[$login] ) )
 		{
 			global $DB;
+
 			if( $row = $DB->get_row( '
 					SELECT *
 					  FROM T_users
@@ -240,10 +241,37 @@ class UserCache extends DataObjectCache
 		return parent::get_option_list( $default, $allow_none, 'get_preferred_name' );
 	}
 
+
+	/**
+	 * Clear our caches.
+	 */
+	function clear( $keep_shadow = false )
+	{
+		$this->alreadyCached = array();
+		$this->cache_login = array();
+
+		return parent::clear($keep_shadow);
+	}
+
+	/**
+	 * Handle our login cache.
+	 */
+	function remove_by_ID( $reg_ID )
+	{
+		if( isset($this->cache[$req_ID]) )
+		{
+			unset( $this->cache_login[ $this->cache[$req_ID] ] );
+		}
+		parent::remove_by_ID($req_ID);
+	}
 }
+
 
 /*
  * $Log$
+ * Revision 1.5  2006/10/13 10:01:07  blueyed
+ * Fixed clear() and remove_by_ID() for UserCache and its own caches + test
+ *
  * Revision 1.4  2006/09/11 22:06:08  blueyed
  * Cleaned up option_list callback handling
  *
