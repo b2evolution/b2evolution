@@ -34,6 +34,15 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<title><?php echo $app_shortname.$admin_path_seprator.$page_title ?></title>
 	<meta name="ROBOTS" content="NOINDEX" />
 	<link href="<?php echo $rsc_url ?>css/login.css" rel="stylesheet" type="text/css" />
+	<?php
+	// Insert HEAD lines, which have been defined before:
+	// dh> TODO: currently this may be affected by register_globals=ON
+	// dh> TODO: fp, is this ok? It should maybe be a func and available everywhere we output <HEAD> tags..?
+	if( isset($evo_html_headlines) ) foreach( $evo_html_headlines as $v )
+	{
+		echo $v;
+	}
+	?>
 </head>
 <body>
 
@@ -58,6 +67,9 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
+ * Revision 1.7  2006/10/13 11:44:07  blueyed
+ * Allow injecting additional HTML-headlines
+ *
  * Revision 1.6  2006/09/05 19:07:26  fplanque
  * small talk with robots
  *
