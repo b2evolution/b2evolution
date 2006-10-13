@@ -12,11 +12,13 @@ require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 /**
  * @package tests
  */
-class AbstractSettingsTestCase extends EvoUnitTestCase
+class AbstractSettingsTestCase extends MockDbUnitTestCase
 {
+	var $mocked_DB_methods = array('get_results');
+
 	function AbstractSettingsTestCase()
 	{
-		$this->EvoUnitTestCase( 'AbstractSettings class test' );
+		$this->MockDbUnitTestCase( 'AbstractSettings class test' );
 	}
 
 
@@ -24,19 +26,7 @@ class AbstractSettingsTestCase extends EvoUnitTestCase
 	{
 		parent::setup();
 
-		$this->MockDB = new MockDB($this);
-		$this->old_DB_AbstractSettingsTestCase = & $GLOBALS['DB'];
-		$GLOBALS['DB'] = & $this->MockDB;
-
 		$this->TestSettings =& new AbstractSettings( 'testtable', array( 'test_name' ), 'test_value' );
-	}
-
-
-	function tearDown()
-	{
-		$GLOBALS['DB'] = & $this->old_DB_AbstractSettingsTestCase;
-
-		parent::tearDown();
 	}
 
 
