@@ -2519,8 +2519,62 @@ function url_same_protocol( $url, $other_url = NULL )
 }
 
 
+/**
+ * Try to make $url relative to $target_url, if scheme, host, user and pass matches.
+ *
+ * This is useful for redirect_to params, to keep them short and avoid mod_security
+ * rejecting the request as "Not Acceptable" (whole URL as param).
+ *
+ * @param string URL to handle
+ * @param string URL where we want to make $url relative to
+ * @return string
+ */
+function url_rel_to_same_host( $url, $target_url )
+{
+	$parsed_url = parse_url( $url );
+	if( empty($parsed_url['scheme']) || empty($parsed_url['host']) )
+	{ // no protocol or host information
+		return $url;
+	}
+
+	$target_url = parse_url( $target_url );
+	if( ! empty($target_url['scheme']) && $target_url['scheme'] != $parsed_url['scheme'] )
+	{ // scheme/protocol is different
+		return $url;
+	}
+	if( ! empty($target_url['host']) )
+	{
+		if( empty($target_url['scheme']) || $target_url['host'] != $parsed_url['host'] )
+		{ // target has no scheme (but a host) or hosts differ
+			return $url;
+		}
+
+		if( @$target_url['port'] != @$parsed_url['port'] )
+			return $url;
+		if( @$target_url['user'] != @$parsed_url['user'] )
+			return $url;
+		if( @$target_url['pass'] != @$parsed_url['pass'] )
+			return $url;
+	}
+
+	// We can make the URL relative:
+	$r = '';
+	if( ! empty($parsed_url['path']) )
+		$r .= $parsed_url['path'];
+	if( ! empty($parsed_url['query']) )
+		$r .= '?'.$parsed_url['query'];
+	if( ! empty($parsed_url['fragment']) )
+		$r .= '?'.$parsed_url['fragment'];
+
+	return $r;
+}
+
+
 /*
  * $Log$
+ * Revision 1.122  2006/10/13 11:44:45  blueyed
+ * MFB: url_rel_to_same_host()
+ *
  * Revision 1.121  2006/10/09 10:42:44  blueyed
  * better layout for pre_dump()
  *
