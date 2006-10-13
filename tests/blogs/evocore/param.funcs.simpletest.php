@@ -70,8 +70,6 @@ class ParamFuncsTestCase extends EvoUnitTestCase
 
 	/**
 	 *
-	 *
-	 * @return
 	 */
 	function test_param()
 	{
