@@ -1008,7 +1008,7 @@ function balanceTags($text)
 
 
 /**
- * Wrap pre tag around {@link var_export()}/{@link var_dump()} for better debugging.
+ * Wrap pre tag around {@link var_dump()} for better debugging.
  *
  * @param,... mixed variable(s) to dump
  */
@@ -1021,14 +1021,7 @@ function pre_dump( $var__var__var__var__ )
 	$count = 0;
 	foreach( func_get_args() as $lvar )
 	{
-    if( is_resource($lvar) )
-    { // resource gets reported as NULL by var_export()
-      var_dump($lvar); // includes "\n"
-    }
-    else
-    {
-		  echo htmlspecialchars( var_export( $lvar, true ) )."\n";
-    }
+		var_dump($lvar); // includes "\n"; do not use var_export() because it does not detect recursion by design
 
 		$count++;
 		if( $count < $func_num_args )
@@ -2572,6 +2565,9 @@ function url_rel_to_same_host( $url, $target_url )
 
 /*
  * $Log$
+ * Revision 1.123  2006/10/13 11:47:55  blueyed
+ * Use var_dump() only in pre_dump()
+ *
  * Revision 1.122  2006/10/13 11:44:45  blueyed
  * MFB: url_rel_to_same_host()
  *
