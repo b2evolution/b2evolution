@@ -80,6 +80,23 @@ function db_col_exists( $table, $col_name )
 }
 
 /**
+ * @return boolean Does a list of given column names exist in DB?
+ */
+function db_cols_exist( $table, $col_names )
+{
+	global $DB;
+
+	foreach( $col_names as $k => $v )
+		$col_names[$k] = strtolower($v);
+
+	foreach( $DB->get_results('SHOW COLUMNS FROM '.$table) as $row )
+		if( ($key = array_search(strtolower($row->Field), $col_names)) !== false )
+			unset( $col_names[$key] );
+
+	return count($col_names) == 0;
+}
+
+/**
  * Drops a column, if it exists.
  */
 function db_drop_col( $table, $col_name )
@@ -89,7 +106,7 @@ function db_drop_col( $table, $col_name )
 	if( ! db_col_exists($table, $col_name) )
 		return false;
 
-	$DB->query( 'ALTER TABLE '.$table.' DROP '.$col_name );
+	$DB->query( 'ALTER TABLE '.$table.' DROP COLUMN '.$col_name );
 }
 
 /**
@@ -1323,8 +1340,32 @@ function upgrade_b2evo_tables()
 
 		echo 'Updating blogs... ';
 		db_drop_col( 'T_blogs', 'blog_allowpingbacks' );
+
+		// Remove and transform obsolete fields blog_pingb2evonet, blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs
+		if( db_cols_exist( 'T_blogs', array('blog_pingb2evonet', 'blog_pingtechnorati', 'blog_pingweblogs', 'blog_pingblodotgs') ) )
+		{
+			foreach( $DB->get_results( '
+					SELECT blog_ID, blog_pingb2evonet, blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs
+						FROM T_blogs' ) as $row )
+			{
+				$ping_plugins = $DB->get_var( 'SELECT cset_value FROM T_coll_settings WHERE cset_coll_ID = '.$row->blog_ID.' AND cset_name = "ping_plugins"' );
+				$ping_plugins = explode(',', $ping_plugins);
+				if( $row->blog_pingb2evonet )
+				{
+					$ping_plugins[] = 'ping_b2evonet';
+				}
+				if( $row->blog_pingtechnorati || $row->blog_pingweblogs || $row->blog_pingblodotgs )
+				{ // if either one of the previous pingers was enabled, add ping-o-matic:
+					$ping_plugins[] = 'ping_pingomatic';
+				}
+			}
+			$DB->query( 'ALTER TABLE T_blogs
+					DROP COLUMN blog_pingb2evonet,
+					DROP COLUMN blog_pingtechnorati,
+					DROP COLUMN blog_pingweblogs,
+					DROP COLUMN blog_pingblodotgs' );
+		}
 		echo "OK.<br />\n";
-		// dh> TODO: Remove and transform obsolete fields blog_pingb2evonet, blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs
 
 
 		echo 'Updating posts... ';
@@ -1430,6 +1471,7 @@ function upgrade_b2evo_tables()
 
 
 	// This has to be at the end because plugin install may fail if the DB schema is not current (matching Plugins class).
+	// dh> TODO: if this fails, it won't get repeated
 	install_basic_plugins( $old_db_version );
 
 
@@ -1513,6 +1555,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.184  2006/10/14 20:53:13  blueyed
+ * Transform blog ping settings to new Plugin structure.
+ *
  * Revision 1.183  2006/10/11 17:21:09  blueyed
  * Fixes
  *

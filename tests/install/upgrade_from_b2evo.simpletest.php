@@ -41,6 +41,12 @@ class UpgradeToCurrentTestCase extends InstallUnitTestCase
 		$this->assertEqual( $new_db_version, $this->test_DB->get_var('SELECT set_value FROM T_settings WHERE set_name = "db_version"') );
 		$this->assertEqual( $this->test_DB->get_var( 'SELECT COUNT(*) FROM T_plugins' ), $this->nr_of_basic_plugins );
 
+		// Test that columns are not present anymore:
+		$this->assertEqual(
+			array(),
+			array_intersect( array('blog_pingb2evonet', 'blog_pingtechnorati', 'blog_pingweblogs', 'blog_pingblodotgs'),
+				$this->test_DB->get_col( 'SHOW COLUMNS FROM T_blogs' ) ) );
+
 		$this->test_DB->query( 'SET sql_mode = "'.$this->old_sql_mode.'"' );
 
 		parent::tearDown();
