@@ -1458,13 +1458,13 @@ function debug_info( $force = false )
 		$log_head_links = array();
 		foreach( $log_cats as $l_cat )
 		{
-			$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
+			$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_redir_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
 		}
 		$log_container_head .= implode( ' | ', $log_head_links );
 		echo format_to_output(
 			$sess_Debuglog->display( array(
 					'container' => array( 'string' => $log_container_head, 'template' => false ),
-					'all' => array( 'string' => '<h4 id="debug_info_cat_%s">%s:</h4>', 'template' => false ) ),
+					'all' => array( 'string' => '<h4 id="debug_redir_info_cat_%s">%s:</h4>', 'template' => false ) ),
 				'', false, $log_categories ),
 			'htmlbody' );
 
@@ -2612,6 +2612,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.125  2006/10/14 16:06:38  blueyed
+ * Fixed anchors for "redirection-Debuglog"
+ *
  * Revision 1.124  2006/10/14 02:12:01  blueyed
  * Added url_absolute(), make_rel_links_abs() + Tests; Fixed validate_url() and allow relative URLs, which get converted to absolute ones in feeds.
  *
