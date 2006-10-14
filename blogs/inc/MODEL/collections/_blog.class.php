@@ -419,7 +419,6 @@ class Blog extends DataObject
 		{
 			case 'ID':
 			case 'allowtrackbacks':
-			case 'allowpingbacks':
 			case 'disp_bloglist':
 			case 'force_skin':
 				return parent::set_param( $parname, 'number', $parvalue );
@@ -1032,6 +1031,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2006/10/14 04:43:35  blueyed
+ * Removed last allowpingbacks references
+ *
  * Revision 1.30  2006/10/10 23:24:41  blueyed
  * Fixed duplication of ping plugins from hidden values
  *
