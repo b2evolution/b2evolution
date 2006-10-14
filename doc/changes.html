@@ -16,6 +16,10 @@
 		<li>Clean category/chapter URLs (fplanque)</li>
 		<li>New category/chapter management interface (fplanque)</li>
 		<li>Posts can be filtered by locale, e.g: ?lc=fr or ?lc=fr-FR (more to come) (fplanque)</li>
+		<li>Login form: If Javascript is available the password gets hashed by the client before it gets
+		    sent "over the wire". It's still recommended to set $htsrv_url_sensitive to an SSL URL, but
+		    at least this helps a bit. Plugins which need the raw password have to hook
+		    new LoginAttemptNeedsRawPassword and return true here. (blueyed)</li>
 		<li>301 redirects of post requests to their canonical permalink URL (useful to unify older URLs) (fplanque)</li>
 		<li>301 redirects of category requests to their canonical URL (useful to unify older URLs) (fplanque)</li>
 		<li>All redirects are now either 301 or 303 (No more stinkin' 302s) (fplanque)</li>

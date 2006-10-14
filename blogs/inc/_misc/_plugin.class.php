@@ -1845,6 +1845,20 @@ class Plugin
 
 
 	/**
+	 * Event handler: your Plugin should return true here, if it needs a raw (un-hashed)
+	 * password for the {@link Plugin::LoginAttempt()} event. If any Plugin returns true
+	 * for this event, client-side hashing of the password is not used.
+	 * NOTE: this causes passwords to travel un-encrypted, unless SSL/HTTPS get used.
+	 *
+	 * @return boolean True, if you need the raw password.
+	 */
+	function LoginAttemptNeedsRawPassword()
+	{
+		return false;
+	}
+
+
+	/**
 	 * Event handler: called when a user logs out.
 	 *
 	 * This is meant to cleanup data, e.g. if you use the
@@ -2696,6 +2710,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.100  2006/10/14 16:27:05  blueyed
+ * Client-side password hashing in the login form.
+ *
  * Revision 1.99  2006/10/08 22:59:31  blueyed
  * Added GetProvidedSkins and DisplaySkin hooks. Allow for optimization in Plugins::trigger_event_first_return()
  *

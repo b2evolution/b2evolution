@@ -26,22 +26,44 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+$need_raw_pwd = (bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
+
 
 /**
  * Include page header (also displays Messages):
  */
 $page_title = T_('Login form');
 $page_icon = 'icon_login.gif';
+
+if( ! $need_raw_pwd )
+{ // Include JS for client-side password hashing:
+	$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/functions.js"></script>';
+	$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/md5.js"></script>';
+	$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/sha1.js"></script>';
+}
+
 require dirname(__FILE__).'/_header.php';
 
 
 // The login form has to point back to itself, in case $htsrv_url_sensitive is a "https" link and $redirect_to is not!
-$Form = & new Form( $htsrv_url_sensitive.'login.php', '', 'post', 'fieldset' );
+$Form = & new Form( $htsrv_url_sensitive.'login.php', 'evo_login_form', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
 	$Form->hiddens_by_key( $_POST, /* exclude: */ array('login_action', 'login') ); // passthrough POSTed data (when login is required after having POSTed something)
 	$Form->hidden( 'redirect_to', $redirect_to );
+
+	if( ! $need_raw_pwd )
+	{ // used by JS-password encryption/hashing:
+		$pwd_salt = $Session->get('core.pwd_salt');
+		if( empty($pwd_salt) )
+		{ // generate anew, only if empty - so multiple login screens share the same hash. Gets reset on trying to login.
+			$pwd_salt = generate_random_key(64);
+			$Session->set( 'core.pwd_salt', $pwd_salt, 86400 /* expire in 1 day */ );
+		}
+		$Form->hidden( 'pwd_salt', $pwd_salt );
+		$Form->hidden( 'pwd_hashed', '' ); // gets filled by JS
+	}
 
 	if( isset( $action, $reqID, $sessID ) && $action == 'validatemail' )
 	{ // the user clicked the link from the "validate your account" email, but has not been logged in; pass on the relevant data:
@@ -98,6 +120,27 @@ $Form->end_form();
 
 <script type="text/javascript">
 	document.getElementById( 'login' ).focus();
+
+	<?php
+	if( ! $need_raw_pwd )
+	{
+		?>
+		// Hash the password onsubmit and clear the original pwd field
+		addEvent( document.getElementById("evo_login_form"), "submit", function(){
+				var f = document.getElementById('evo_login_form');
+				var h = f.pwd_hashed;
+				var p = f.pwd;
+				var s = f.pwd_salt;
+				if( h && p && s && typeof hex_sha1 != "undefined" && typeof hex_md5 != "undefined" )
+				{
+					h.value = hex_sha1( hex_md5(p.value) + s.value );
+					p.value = "hashed";
+				}
+				return true;
+			}, false );
+		<?php
+	}
+	?>
 </script>
 
 
@@ -127,6 +170,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.15  2006/10/14 16:27:05  blueyed
+ * Client-side password hashing in the login form.
+ *
  * Revision 1.14  2006/10/12 23:48:15  blueyed
  * Fix for if redirect_to is relative
  *

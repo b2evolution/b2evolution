@@ -401,29 +401,73 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 { // User is trying to login right now
 	$Debuglog->add( 'User is trying to log in.', 'login' );
 
+	header_nocache();
+
 	$login = strtolower(strip_tags(get_magic_quotes_gpc() ? stripslashes($login) : $login));
 	$pass = strip_tags(get_magic_quotes_gpc() ? stripslashes($pass) : $pass);
 	$pass_md5 = md5( $pass );
 
-	header_nocache();
-	// echo 'Trying to log in right now...';
+	// Password hashing by JavaScript:
+	param('pwd_salt', 'string', ''); // just for comparison with the one from Session
+	$pwd_salt_sess = $Session->get('core.pwd_salt');
 
-	$Plugins->trigger_event( 'LoginAttempt', array( 'login' => $login, 'pass' => $pass, 'pass_md5' => $pass_md5 ) );
+	$need_raw_pwd = (bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 
+	if( $need_raw_pwd )
+	{ // at least one plugin requests the password un-hashed:
+		$pwd_hashed = '';
+	}
+	else
+	{
+		param('pwd_hashed', 'string', '');
+	}
+
+	// Trigger Plugin event, which could create the user, according to another database:
+	if( $Plugins->trigger_event( 'LoginAttempt', array(
+			'login' => $login,
+			'pass' => $pass,
+			'pass_md5' => $pass_md5,
+			'pass_salt' => $pwd_salt_sess,
+			'pass_hashed' => $pwd_hashed ) ) )
+	{ // clear the UserCache, if one plugin has been called - it may have changed user(s)
+		$UserCache->clear();
+	}
+
+	$pass_ok = false;
 	if( $Messages->count('login_error') )
 	{ // A plugin has thrown a login error..
 		// Do nothing, the error will get displayed in the login form..
 	}
 	else
-	// Check login and password
-	if( ! user_pass_ok( $login, $pass_md5, true ) )
-	{ // Login failed
-		$Debuglog->add( 'user_pass_ok() returned false!', 'login' );
+	{ // Check login and password
+		$User = & $UserCache->get_by_login($login);
 
-		// This will cause the login screen to "popup" (again)
-		$Messages->add( T_('Wrong login/password.'), 'login_error' );
+		if( $User )
+		{
+			if( ! empty($pwd_hashed) )
+			{ // password hashed by JavaScript:
+				if( $Session->get('core.pwd_salt') == '' )
+				{ // no salt stored in session: probably cookie problem
+					$Messages->add( T_('You need to activate cookies.'), 'login_error' );
+				}
+				elseif( $pwd_salt != $Session->get('core.pwd_salt') )
+				{ // submitted salt differs from the one stored in the session
+					$Messages->add( T_('You seem to have de-activated cookies.'), 'login_error' );
+				}
+				else
+				{
+					$pass_ok = sha1($User->pass.$pwd_salt) == $pwd_hashed;
+					$Session->delete('core.pwd_salt');
+				}
+			}
+			else
+			{
+				$pass_ok = ( $User->pass == $pass_md5 );
+			}
+		}
 	}
-	else
+
+	if( $pass_ok )
 	{ // Login succeeded, set cookies
 		$Debuglog->add( 'User successfully logged in with username and password...', 'login');
 		// set the user from the login that succeeded
@@ -440,6 +484,12 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		if( isset($_COOKIE['cookie'.$instance_name.'pass']) )
 			setcookie( 'cookie'.$instance_name.'pass', '', 200000000, $cookie_path, $cookie_domain );
 	}
+	elseif( ! $Messages->count('login_error') )
+	{ // if there's not login_error message yet, add the default one:
+		// This will cause the login screen to "popup" (again)
+		$Messages->add( T_('Wrong login/password.'), 'login_error' );
+	}
+
 }
 elseif( $Session->has_User() /* logged in */
 	&& /* No login param given or the same as current user: */
@@ -595,6 +645,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.51  2006/10/14 16:27:05  blueyed
+ * Client-side password hashing in the login form.
+ *
  * Revision 1.50  2006/09/06 18:34:04  fplanque
  * Finally killed the old stinkin' ItemList(1) class which is deprecated by ItemList2
  *

@@ -303,6 +303,7 @@ class Plugins
 				'AfterTrackbackInsert' => 'Gets called after a trackback has been recorded.',
 
 				'LoginAttempt' => 'Called when a user tries to login.',
+				'LoginAttemptNeedsRawPassword' => 'A plugin has to return true here, if it needs a raw (un-hashed) password in LoginAttempt.',
 				'AlternateAuthentication' => '',
 				'MessageFormSent' => 'Called when the "Message to user" form has been submitted.',
 				'MessageFormSentCleanup' => 'Called after a email message has been sent through public form.',
@@ -2984,6 +2985,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.94  2006/10/14 16:27:06  blueyed
+ * Client-side password hashing in the login form.
+ *
  * Revision 1.93  2006/10/08 22:59:31  blueyed
  * Added GetProvidedSkins and DisplaySkin hooks. Allow for optimization in Plugins::trigger_event_first_return()
  *
