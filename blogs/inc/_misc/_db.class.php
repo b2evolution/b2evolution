@@ -1337,6 +1337,7 @@ class DB
 			$save_halt_on_error = $this->halt_on_error;
 			$this->show_errors = false;
 			$this->halt_on_error = false;
+			$last_error = $this->last_error;
 			if( $this->query( 'SET NAMES '.$charset ) === false )
 			{
 				$Debuglog->add( 'Could not "SET NAMES '.$charset.'"! (MySQL error: '.strip_tags($this->last_error).')', 'locale' );
@@ -1349,6 +1350,7 @@ class DB
 			}
 			$this->show_errors = $save_show_errors;
 			$this->halt_on_error = $save_halt_on_error;
+			$this->last_error = $last_error;
 
 			$this->connection_charset = $charset;
 		}
@@ -1360,6 +1362,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.27  2006/10/14 03:05:59  blueyed
+ * MFB: fix
+ *
  * Revision 1.26  2006/10/10 21:42:42  blueyed
  * Optimization: only collect $col_info, if $log_queries is enabled. TODO.
  *
