@@ -47,7 +47,7 @@ $CommentList = & new CommentList( $blog, "'comment'", array('published'), '',	''
 		<id><?php $Comment->permanent_url() ?></id>
 		<published><?php $Comment->date( 'isoZ', true ); ?></published>
 		<updated><?php $Comment->date( 'isoZ', true ); ?></updated>
-		<content type="html"><![CDATA[<?php $Comment->content() ?>]]></content>
+		<content type="html"><![CDATA[<?php echo make_rel_links_abs( $Comment->get_content() ); ?>]]></content>
 	</entry>
 	<?php
 	} // End of comment loop.

@@ -75,11 +75,12 @@ switch( $disp )
 			<dc:subject><?php $Item->main_category( 'xml' ) ?></dc:subject>
 			<description><?php
 				$Item->url_link( '', ' ', '%s', array(), 'xml' );
-				$Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'xml', $rss_excerpt_length );
+				$content = $Item->get_content( 1, false, T_('[...] Read more!'), '', '', '', 'xml', $rss_excerpt_length );
+				echo make_rel_links_abs($content);
 			?></description>
 			<content:encoded><![CDATA[<?php
 				$Item->url_link( '<p>', '</p>' );
-				$Item->content()
+				echo make_rel_links_abs( $Item->get_content() );
 			?>]]></content:encoded>
 		</item>
 

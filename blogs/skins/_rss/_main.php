@@ -60,7 +60,8 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			    <title><?php $Item->title( '', '', false, 'xml' ) ?></title>
 			    <description><?php
 			      $Item->url_link( '', ' ', '%s', array(), 'entityencoded' );
-			      $Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'entityencoded' );
+						$content = $Item->get_content( 1, false, T_('[...] Read more!'), '', '', '', 'entityencoded' );
+						echo make_rel_links_abs( $content );
 			    ?></description>
 			    <link><?php $Item->permanent_url( 'single' ) ?></link>
 			  </item>

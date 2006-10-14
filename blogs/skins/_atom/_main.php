@@ -61,9 +61,12 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			<id><?php $Blog->disp( 'atom_url', 'xmlattr' ); /* TODO: may need a regenerate_url() */ ?></id>
 			<subtitle><?php $Blog->disp( 'shortdesc', 'xml' ) ?></subtitle>
 			<generator uri="http://b2evolution.net/" version="<?php echo $app_version ?>"><?php echo $app_name ?></generator>
+			<!--
 			<updated><?php
 			// TODO: dh> call to undefined method:
-			$MainList->mod_date( 'isoZ', true ) ?></updated>
+			//$MainList->mod_date( 'isoZ', true )
+			?></updated>
+			-->
 			<?php
 			while( $Item = & $MainList->get_item() )
 			{
@@ -81,11 +84,10 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				<id><?php $Item->permanent_url( 'single' ) ?></id>
 				<published><?php $Item->issue_date( 'isoZ', true ) ?></published>
 				<updated><?php
-				// TODO: dh> call to undefined method:
 				$Item->mod_date( 'isoZ', true ) ?></updated>
 				<content type="html"><![CDATA[<?php
 					$Item->url_link( '<p>', '</p>' );
-					$Item->content()
+					echo make_rel_links_abs( $Item->get_content() );
 				?>]]></content>
 			</entry>
 

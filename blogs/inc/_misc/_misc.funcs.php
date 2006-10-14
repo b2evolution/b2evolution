@@ -2563,8 +2563,58 @@ function url_rel_to_same_host( $url, $target_url )
 }
 
 
+/**
+ * Make an $url absolute according to $host, if it is not absolute yet.
+ *
+ * @param string URL
+ * @param string Host (including protocol, e.g. 'http://example.com'); defaults to {@link $ReqHost}
+ * @return string
+ */
+function url_absolute( $url, $host = NULL )
+{
+	if( preg_match( '~^\w+://~', $url ) )
+	{ // URL is relative already:
+		return $url;
+	}
+
+	if( empty($host) )
+	{
+		global $ReqHost;
+		$host = $ReqHost;
+	}
+	return $host.$url;
+}
+
+
+/**
+ * Make links in $s absolute.
+ *
+ * It searches for "src" and "href" HTML tag attributes and makes the absolute.
+ *
+ * @uses url_absolute()
+ * @param string content
+ * @param string Hostname including scheme, e.g. http://example.com; defaults to $ReqHost
+ * @return string
+ */
+function make_rel_links_abs( $s, $host = NULL )
+{
+	if( empty($host) )
+	{
+		global $ReqHost;
+		$host = $ReqHost;
+	}
+
+	$s = preg_replace_callback( '~(<[^>]+?)\b((?:src|href)\s*=\s*)(["\'])?([^\\3]+?)(\\3)~i', create_function( '$m', '
+		return $m[1].$m[2].$m[3].url_absolute($m[4], "'.$host.'").$m[5];' ), $s );
+	return $s;
+}
+
+
 /*
  * $Log$
+ * Revision 1.124  2006/10/14 02:12:01  blueyed
+ * Added url_absolute(), make_rel_links_abs() + Tests; Fixed validate_url() and allow relative URLs, which get converted to absolute ones in feeds.
+ *
  * Revision 1.123  2006/10/13 11:47:55  blueyed
  * Use var_dump() only in pre_dump()
  *

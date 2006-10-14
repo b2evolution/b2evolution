@@ -160,11 +160,14 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 	{
 		// valid:
 		foreach( array(
-			'mailto:example@example.org',
 			'http://b2evolution.net',
 			'https://www.b2evolution.net',
 			'http://user@example.com/path',
 			'http://user:pass@example.com/path',
+			'mailto:example@example.org',
+			'mailto:example@example.org?subject=TEST',
+			'http://läu.de/',
+			'/foobar',
 			) as $url )
 		{
 			$r = validate_url( $url, $GLOBALS['comments_allowed_uri_scheme'] );
@@ -179,6 +182,8 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 			'http://',
 			'http://&amp;',
 			'http://<script>...</script>',
+			'mailto:www.example.com',
+			'foobar',
 			) as $url )
 		{
 			$r = validate_url( $url, $GLOBALS['comments_allowed_uri_scheme'] );
@@ -304,6 +309,20 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual(
 			url_rel_to_same_host('foobar', 'http://example.com/barfoo'),
 			'foobar' );
+	}
+
+
+	/**
+	 * Tests {@link make_rel_links_abs()}.
+	 */
+	function test_make_rel_links_abs()
+	{
+		$this->assertEqual(
+			make_rel_links_abs('foo <a href="/bar">bar</a>', 'http://example.com'),
+			'foo <a href="http://example.com/bar">bar</a>' );
+		$this->assertEqual(
+			make_rel_links_abs('foo <a href="http://test/bar">bar</a> <img src="/bar" />', 'http://example.com'),
+			'foo <a href="http://test/bar">bar</a> <img src="http://example.com/bar" />' );
 	}
 
 }

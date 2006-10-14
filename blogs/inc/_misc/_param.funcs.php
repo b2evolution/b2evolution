@@ -1422,45 +1422,54 @@ function validate_url( $url, & $allowed_uri_scheme )
 		return false;
 	}
 
-	// minimum length: http://az.fr
-	if( strlen($url) < 12 )
-	{ // URL too short!
-		$Debuglog->add( 'URL &laquo;'.$url.';&raquo; is too short!', 'error' );
-		return T_('Invalid URL');
-	}
-
 	// Validate URL structure
 	// fp> NOTE: I made this much more laxist than it used to be.
 	// fp> If it turns out I blocked something that was previously allowed, it's a mistake.
 	//
-	// Things still not validated correctly:
-	//   - umlauts in domains/url, e.g. http://läu.de/
-	//   - "mailto:" links
-	if( ! preg_match('~^               # start
-		([a-z][a-z0-9+.\-]*)             # scheme
-		://                              # authority absolute URLs only
-		(\w+(:\w+)?@)?                   # username or username and password (optional)
-		[a-z0-9]([a-z0-9.\-])*           # Don t allow anything too funky like entities
-		(:[0-9]+)?                       # optional port specification
-		~ix', $url, $matches) )
-	{ // Cannot validate URL structure
-		$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
-		return T_('Invalid URL');
+	if( preg_match( '~^\w+:~', $url ) )
+	{ // there's a scheme and therefor an absolute URL:
+		if( substr($url, 0, 6) == 'mailto' )
+		{ // mailto:link
+			preg_match( '~^(mailto):(.*?)(\?.*)?$~', $url, $match );
+			if( ! $match || ! is_email($match[2]) )
+			{
+				return T_('Supplied email address is invalid.');
+			}
+		}
+		elseif( ! preg_match('~^           # start
+			([a-z][a-z0-9+.\-]*)             # scheme
+			://                              # authority absolute URLs only
+			(\w+(:\w+)?@)?                   # username or username and password (optional)
+			[a-z0-9]([a-z0-9.\-])*           # Don t allow anything too funky like entities
+			(:[0-9]+)?                       # optional port specification
+			~ix', $url, $match) )
+		{ // Cannot validate URL structure
+			$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
+			return T_('Invalid URL');
+		}
+
+		$scheme = strtolower($match[1]);
+		if( !in_array( $scheme, $allowed_uri_scheme ) )
+		{ // Scheme not allowed
+			$Debuglog->add( 'URL scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
+			return T_('URI scheme not allowed');
+		}
+
+		// Search for blocked URLs:
+		if( $block = antispam_check($url) )
+		{
+			if( $debug ) return 'Url refused. Debug info: blacklisted word: ['.$block.']';
+			return T_('URL not allowed');
+		}
+	}
+	else
+	{ // URL is relative..
+		if( substr($url, 0, 1) != '/' )
+		{
+			return T_('URL must be a full path starting with "/".');
+		}
 	}
 
-	$scheme = strtolower($matches[1]);
-	if( !in_array( $scheme, $allowed_uri_scheme ) )
-	{ // Scheme not allowed
-		$Debuglog->add( 'URL scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
-		return T_('URI scheme not allowed');
-	}
-
-	// Search for blocked URLs:
-	if( $block = antispam_check($url) )
-	{
-		if( $debug ) return 'Url refused. Debug info: blacklisted word: ['.$block.']';
-		return T_('URL not allowed');
-	}
 
 	return false; // OK
 }
@@ -1585,6 +1594,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.12  2006/10/14 02:12:01  blueyed
+ * Added url_absolute(), make_rel_links_abs() + Tests; Fixed validate_url() and allow relative URLs, which get converted to absolute ones in feeds.
+ *
  * Revision 1.11  2006/09/26 21:13:05  blueyed
  * Fixed handling of locale dateformats with other chars than "d", "m" and "Y"/"y" when editing items
  *

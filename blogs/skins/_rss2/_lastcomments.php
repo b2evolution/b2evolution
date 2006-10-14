@@ -50,8 +50,8 @@ $CommentList = & new CommentList( $blog, "'comment'", array('published'), '',	''
 			<pubDate><?php $Comment->time( 'r', true ); ?></pubDate>
 			<dc:creator><?php $Comment->author( '', '#', '', '#', 'xml' ); ?></dc:creator>
 			<guid isPermaLink="false">c<?php $Comment->ID() ?>@<?php echo $baseurl ?></guid>
-			<description><?php $Comment->content( 'xml' ) ?></description>
-			<content:encoded><![CDATA[<?php $Comment->content() ?>]]></content:encoded>
+			<description><?php echo make_rel_links_abs($Comment->get_content( 'xml' )); ?></description>
+			<content:encoded><![CDATA[<?php echo make_rel_links_abs( $Comment->get_content() ); ?>]]></content:encoded>
 			<link><?php $Comment->permanent_url() ?></link>
 		</item>
 		<?php

@@ -42,9 +42,11 @@ $CommentList = & new CommentList( $blog, "'comment'", array('published'), '',	''
 	<items>
 		<rdf:Seq>
 		<?php while( $Comment = & $CommentList->get_next() )
-		{ // Loop through comments: ?>
+		{ // Loop through comments:
+			?>
 			<rdf:li rdf:resource="<?php $Comment->permanent_url() ?>"/>
-		<?php } // End of comment loop. ?>
+			<?php
+		} ?>
 		</rdf:Seq>
 	</items>
 </channel>
@@ -60,7 +62,7 @@ while( $Comment = & $CommentList->get_next() )
 	<link><?php $Comment->permanent_url() ?></link>
 	<dc:date><?php $Comment->date( 'isoZ', true ); ?></dc:date>
 	<dc:creator><?php $Comment->author( '', '#', '', '#', 'xml' ) ?></dc:creator>
-	<description><?php $Comment->content( 'xml' ) ?></description>
-	<content:encoded><![CDATA[<?php $Comment->content() ?>]]></content:encoded>
+	<description><?php echo make_rel_links_abs($Comment->get_content( 'xml' )); ?></description>
+	<content:encoded><![CDATA[<?php echo make_rel_links_abs( $Comment->get_content() ); ?>]]></content:encoded>
 </item>
 <?php } // End of comment loop. ?>
