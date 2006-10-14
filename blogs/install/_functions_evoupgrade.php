@@ -1358,6 +1358,12 @@ function upgrade_b2evo_tables()
 				{ // if either one of the previous pingers was enabled, add ping-o-matic:
 					$ping_plugins[] = 'ping_pingomatic';
 				}
+
+				// Insert transformed/generated ping plugins collection setting:
+				$ping_plugins = array_unique($ping_plugins);
+				$DB->query( 'REPLACE INTO T_coll_settings
+						( cset_coll_ID, cset_name, cset_value )
+						VALUES ( '.$row->blog_ID.', "ping_plugins", "'.implode( ',', $ping_plugins ).'" )' );
 			}
 			$DB->query( 'ALTER TABLE T_blogs
 					DROP COLUMN blog_pingb2evonet,
@@ -1555,6 +1561,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.185  2006/10/14 21:11:48  blueyed
+ * Actually insert the transformed/generated ping plugins setting(s).
+ *
  * Revision 1.184  2006/10/14 20:53:13  blueyed
  * Transform blog ping settings to new Plugin structure.
  *
