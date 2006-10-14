@@ -1102,8 +1102,9 @@ class Item extends DataObject
 	 *
 	 * WARNING: parameter order is different from deprecated the_content(...)
 	 *
-	 * @todo fp> Param order and cleanup
-	 * @todo dh> Provide get_content() method (and use it here)
+	 * @todo fp> Param order and cleanup!
+	 *
+	 * @uses Item::get_content()
 	 * @param mixed page number to display specific page, # for url parameter
 	 * @param mixed true to display 'more' text (which means "full post"), false not to display, # for url parameter
 	 * @param string text to display as the more link
@@ -1116,6 +1117,45 @@ class Item extends DataObject
 	 * @param string filename to use to display more
 	 */
 	function content(
+		$disppage = '#',
+		$dispmore = '#',
+		$more_link_text = '#',
+		$more_anchor = '#',
+		$before_more = '#',
+		$after_more = '#',
+		$format = 'htmlbody',
+		$cut = 0,
+		$stripteaser = false,
+		$more_file = ''
+		)
+	{
+		echo $this->get_content( $disppage, $dispmore, $more_link_text, $more_anchor, $before_more, $after_more, $format, $cut, $stripteaser, $more_file );
+	}
+
+
+	/**
+	 * Template function: get content of item.
+	 *
+	 * Calling this with "MORE" (i-e displaying full content) will increase
+	 * the view counter, except on special occasions, see {@link Hit::is_new_view()}.
+	 *
+	 * WARNING: parameter order is different from deprecated the_content(...)
+	 *
+	 * @todo fp> Param order and cleanup!
+	 *
+	 * @param mixed page number to display specific page, # for url parameter
+	 * @param mixed true to display 'more' text (which means "full post"), false not to display, # for url parameter
+	 * @param string text to display as the more link
+	 * @param string text to display as the more anchor (once the more link has been clicked)
+	 * @param string string to display before more link/anchor
+	 * @param string string to display after more link/anchor
+	 * @param string Output format, see {@link format_to_output()}
+	 * @param integer max number of words
+	 * @param boolean true if you don't want to repeat teaser after more link was pressed
+	 * @param string filename to use to display more
+	 * @return string
+	 */
+	function get_content(
 		$disppage = '#',
 		$dispmore = '#',
 		$more_link_text = '#',
@@ -1230,7 +1270,7 @@ class Item extends DataObject
 			}
 		}
 
-		echo $output;
+		return $output;
 	}
 
 
@@ -3323,6 +3363,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.110  2006/10/14 01:10:48  blueyed
+ * Finally provide Item::get_content()
+ *
  * Revision 1.109  2006/10/10 19:22:11  blueyed
  * doc/TODO
  *
