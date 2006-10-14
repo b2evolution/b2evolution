@@ -83,8 +83,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				</author>
 				<id><?php $Item->permanent_url( 'single' ) ?></id>
 				<published><?php $Item->issue_date( 'isoZ', true ) ?></published>
-				<updated><?php
-				$Item->mod_date( 'isoZ', true ) ?></updated>
+				<updated><?php $Item->mod_date( 'isoZ', true ) ?></updated>
 				<content type="html"><![CDATA[<?php
 					$Item->url_link( '<p>', '</p>' );
 					echo make_rel_links_abs( $Item->get_content() );
