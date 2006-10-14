@@ -374,7 +374,7 @@ b2evo_Callbacks.prototype = {
 			r = eval( "f(value);" ) || r;
 		}
 		return r;
-	},
+	}
 };
 
 var b2evo_Callbacks = new b2evo_Callbacks();

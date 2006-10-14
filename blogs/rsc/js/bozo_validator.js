@@ -39,9 +39,9 @@ var bozo_confirm_mess;
 var bozo = {
 
 	// array of changes for each form we need to verify (needed to detect if another form has changed when we submit)
-	'tab_changes' : Object(), 	
+	'tab_changes' : Object(),
 	// Total number of changes
-	'nb_changes' : 0, 					
+	'nb_changes' : 0,
 
 	// If no translated message has been provided, use this default:
 	'confirm_mess' : bozo_confirm_mess ? bozo_confirm_mess : 'You have modified this form but you haven\'t submitted it yet.\nYou are about to lose your edits.\nAre you sure?',
@@ -226,7 +226,7 @@ var bozo = {
 				return bozo.confirm_mess;
 			}
 		}
-  },
+  }
 
 }
 
