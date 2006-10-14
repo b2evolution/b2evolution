@@ -335,24 +335,27 @@ class Plugins
 			);
 
 
-			// Let Plugins add additional events (if they trigger those events themselves):
-			$this->load_plugins_table();
+			if( ! defined('EVO_IS_INSTALL') || ! EVO_IS_INSTALL )
+			{ // only call this, if we're not in the process of installation, to avoid errors from Plugins in this case!
+				// Let Plugins add additional events (if they trigger those events themselves):
+				$this->load_plugins_table();
 
-			$rev_sorted_IDs = array_reverse( $this->sorted_IDs ); // so higher priority overwrites lower (just for desc)
+				$rev_sorted_IDs = array_reverse( $this->sorted_IDs ); // so higher priority overwrites lower (just for desc)
 
-			foreach( $rev_sorted_IDs as $plugin_ID )
-			{
-				$Plugin = & $this->get_by_ID( $plugin_ID );
-
-				if( ! $Plugin )
+				foreach( $rev_sorted_IDs as $plugin_ID )
 				{
-					continue;
-				}
+					$Plugin = & $this->get_by_ID( $plugin_ID );
 
-				$extra_events = $Plugin->GetExtraEvents();
-				if( is_array($extra_events) )
-				{
-					$this->_supported_events = array_merge( $this->_supported_events, $extra_events );
+					if( ! $Plugin )
+					{
+						continue;
+					}
+
+					$extra_events = $Plugin->GetExtraEvents();
+					if( is_array($extra_events) )
+					{
+						$this->_supported_events = array_merge( $this->_supported_events, $extra_events );
+					}
 				}
 			}
 		}
@@ -2985,6 +2988,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.95  2006/10/14 20:50:29  blueyed
+ * Define EVO_IS_INSTALL for /install/ and use it in Plugins to skip "dangerous" but unnecessary instantiating of other Plugins
+ *
  * Revision 1.94  2006/10/14 16:27:06  blueyed
  * Client-side password hashing in the login form.
  *

@@ -21,6 +21,12 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 // Make the includes believe they are being called in the right place...
 define( 'EVO_MAIN_INIT', true );
 
+/**
+ * Define that we're in the install process.
+ */
+define( 'EVO_IS_INSTALL', true );
+
+
 if( ! $config_is_done )
 {	// Base config is not done yet, try to guess some values needed for correct display:
 	$rsc_url = '../rsc/';
@@ -631,6 +637,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.115  2006/10/14 20:50:29  blueyed
+ * Define EVO_IS_INSTALL for /install/ and use it in Plugins to skip "dangerous" but unnecessary instantiating of other Plugins
+ *
  * Revision 1.114  2006/10/01 15:23:28  blueyed
  * Fixed install
  *
