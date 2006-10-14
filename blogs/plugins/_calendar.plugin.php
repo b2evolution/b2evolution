@@ -359,8 +359,6 @@ class Calendar
 				}
 				else
 				{ // highlight no month, when not current year
-					// TODO: dh> BUG: this causes mktime() and the logic where it gets used to fail below!
-					// dh> fp, what's the intention here? we cannot mktime() with an empty month, nor does it make sense to include "month=''" in SQL..!
 					$this->month = '';
 				}
 			}
@@ -1106,6 +1104,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.29  2006/10/14 19:07:17  blueyed
+ * Removed TODO
+ *
  * Revision 1.28  2006/10/14 19:05:39  blueyed
  * Fixed "mktime() expects parameter 4 to be long, string given" warning; doc
  *
