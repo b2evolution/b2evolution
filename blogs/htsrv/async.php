@@ -35,7 +35,7 @@ require_once $inc_path.'_main.inc.php';
 
 
 // Check global permission:
-if( ! $current_User->check_perm( 'admin', 'any' ) )
+if( ! $current_User || ! $current_User->check_perm( 'admin', 'any' ) )
 {	// No permission to access admin...
 	require $view_path.'errors/_access_denied.inc.php';
 }
@@ -49,6 +49,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.2  2006/10/14 04:43:55  blueyed
+ * MFB: E_FATAL for anon user
+ *
  * Revision 1.1  2006/06/01 19:06:27  fplanque
  * a taste of Ajax in the framework
  *
