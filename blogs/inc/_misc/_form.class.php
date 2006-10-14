@@ -2092,7 +2092,8 @@ class Form extends Widget
 	 * @param string Field name
 	 * @param string Field value
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
-	 *              Nothing yet.
+   *        - 'overwrite': overwrite existing hidden fields with same name
+	 *          (except if they have "[]" in the name)? boolean, default: true
 	 */
 	function hidden( $field_name, $field_value, $field_params = array() )
 	{
@@ -2110,7 +2111,26 @@ class Form extends Widget
 			$field_params['type'] = 'hidden';
 			$field_params['value'] = $field_value;
 
-			$this->hiddens[] = $this->get_input_element( $field_params );
+			if( strpos($field_name, '[]') )
+			{ // array-style name or we don't want to overwrite, just add it:
+				$this->hiddens[] = $this->get_input_element( $field_params );
+			}
+			else
+			{
+				if( ! isset($params['overwrite']) || $params['overwrite'] )
+				{ // overwrite existing hidden fields:
+					if( isset($this->existing_hiddens[$field_name]) )
+					{
+						unset($this->hiddens[$this->existing_hiddens[$field_name]]);
+					}
+				}
+
+				// add the field and remember that it already exists:
+				end($this->hiddens);
+				$key = key($this->hiddens)+1;
+				$this->hiddens[$key] = $this->get_input_element( $field_params );
+				$this->existing_hiddens[$field_name] = $key;
+			}
 		}
 	}
 
@@ -2669,6 +2689,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.42  2006/10/14 16:07:54  blueyed
+ * Overwrite previous added hidden fields (by default), when adding hidden inputs.
+ *
  * Revision 1.41  2006/09/26 21:13:05  blueyed
  * Fixed handling of locale dateformats with other chars than "d", "m" and "Y"/"y" when editing items
  *
