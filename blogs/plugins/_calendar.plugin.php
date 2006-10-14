@@ -234,14 +234,31 @@ class calendar_plugin extends Plugin
  */
 class Calendar
 {
-	var $year, $month;
+	var $year;
 
-	var $mode;  						// 'month' or 'year'
+	/**
+	 * @var string The month to display or empty in mode 'year' with no selected month.
+	 */
+	var $month;
+
+	/**
+	 * @var string 'month' or 'year'
+	 */
+	var $mode;
 
 	var $where;
-	var $request;						// SQL query string
-	var $result;						// Result set
-	var $result_num_rows;		// Number of rows in result set
+	/**
+	 * @var string SQL query string
+	 */
+	var $request;
+	/**
+	 * Result set
+	 */
+	var $result;
+	/**
+	 * @var integer Number of rows in result set
+	 */
+	var $result_num_rows;
 
 	var $displaycaption;
 	var $monthformat;
@@ -288,7 +305,7 @@ class Calendar
 	 * @var boolean Is today in the displayed frame?
 	 * @access protected
 	 */
-	var $todayIsVisible;
+	var $today_is_visible;
 
 
 	var $link_type;
@@ -327,7 +344,7 @@ class Calendar
 			$this->month = $localmonthnow;
 			$this->mode = 'month';
 
-			$this->todayIsVisible = true;
+			$this->today_is_visible = true;
 		}
 		else
 		{	// We have requested a specific date
@@ -353,7 +370,8 @@ class Calendar
 				$this->mode = 'month';
 			}
 
-			$this->todayIsVisible = ( $this->month == $localmonthnow && $this->year == $localyearnow );
+			$this->today_is_visible = ( $this->year == $localyearnow
+				&& ( empty($this->month) || $this->month == $localmonthnow ) );
 		}
 
 
@@ -617,11 +635,11 @@ class Calendar
 		{ // We want to display navigation in the table footer:
 			echo "<tfoot>\n";
 			echo "<tr>\n";
-			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->todayIsVisible ).'" id="prev">';
+			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->today_is_visible ).'" id="prev">';
 			echo implode( '&nbsp;', $this->getNavLinks( 'prev' ) );
 			echo "</td>\n";
 
-			if( $this->todayIsVisible )
+			if( $this->today_is_visible )
 			{
 				if( $this->mode == 'month' )
 				{
@@ -635,7 +653,7 @@ class Calendar
 							.'">'.T_('Current')
 							.'</a></td>';
 			}
-			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->todayIsVisible ).'" id="next">';
+			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->today_is_visible ).'" id="next">';
 			echo implode( '&nbsp;', $this->getNavLinks( 'next' ) );
 			echo "</td>\n";
 			echo "</tr>\n";
@@ -860,6 +878,17 @@ class Calendar
 				//pre_dump( $this->params['min_timestamp'] );
 				$r[] = '';
 
+				if( empty($this->month) )
+				{ // if $this->month is empty, we're in mode "year" with no selected month
+					$use_range_month = 12;
+					$use_range_day = 31;
+				}
+				else
+				{
+					$use_range_month = $this->month;
+					$use_range_day = date( 'd', $localtimenow );
+				}
+
 				/*
 				 * << (PREV YEAR)
 				 */
@@ -875,7 +904,7 @@ class Calendar
 									WHERE YEAR('.$this->dbprefix.'datestart) < '.$this->year.'
 									'.$nav_ItemQuery->get_where( ' AND ' )
 									.$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
-									ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, ABS( '.intval($this->month).' - MONTH('.$this->dbprefix.'datestart) ) ASC
+									ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, ABS( '.$use_range_month.' - MONTH('.$this->dbprefix.'datestart) ) ASC
 									LIMIT 1', OBJECT, 0, 'Calendar: find prev year with posts' )
 							)
 						{
@@ -885,7 +914,7 @@ class Calendar
 					}
 					else
 					{ // Let's see if the previous year is in the desired navigation range:
-						$prev_year_ts = mktime( 0, 0, 0, $this->month,  date( 'd', $localtimenow ),  $this->year-1 );
+						$prev_year_ts = mktime( 0, 0, 0, $use_range_month,  $use_range_day,  $this->year-1 );
 						if( $prev_year_ts >= $this->params['min_timestamp'] )
 						{
 							$prev_year_year = date( 'Y', $prev_year_ts );
@@ -1012,6 +1041,17 @@ class Calendar
 				}
 
 
+				if( empty($this->month) )
+				{ // if $this->month is empty, we're in mode "year" with no selected month
+					$use_range_month = 12;
+					$use_range_day = 31;
+				}
+				else
+				{
+					$use_range_month = $this->month;
+					$use_range_day = date( 'd', $localtimenow );
+				}
+
 				/*
 				 * >> (NEXT YEAR)
 				 */
@@ -1027,7 +1067,7 @@ class Calendar
 								WHERE YEAR('.$this->dbprefix.'datestart) > '.$this->year.'
 								 '.$nav_ItemQuery->get_where( ' AND ' )
 								 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
-								ORDER BY YEAR('.$this->dbprefix.'datestart) ASC, ABS( '.intval($this->month).' - MONTH('.$this->dbprefix.'datestart) ) ASC
+								ORDER BY YEAR('.$this->dbprefix.'datestart) ASC, ABS( '.$use_range_month.' - MONTH('.$this->dbprefix.'datestart) ) ASC
 								LIMIT 1', OBJECT, 0, 'Calendar: find next year with posts' )
 						)
 						{
@@ -1037,7 +1077,7 @@ class Calendar
 					}
 					else
 					{ // Let's see if the next year is in the desired navigation range:
-						$next_year_ts = mktime( 0, 0, 0, $this->month,  date( 'd', $localtimenow ),  $this->year+1 );
+						$next_year_ts = mktime( 0, 0, 0, $use_range_month,  $use_range_day,  $this->year+1 );
 						if( $next_year_ts <= $this->params['max_timestamp'] )
 						{
 							$next_year_year = date( 'Y', $next_year_ts );
@@ -1066,6 +1106,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.28  2006/10/14 19:05:39  blueyed
+ * Fixed "mktime() expects parameter 4 to be long, string given" warning; doc
+ *
  * Revision 1.27  2006/09/21 20:55:24  blueyed
  * TODO: request for clarification on regression
  *
