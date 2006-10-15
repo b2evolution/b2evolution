@@ -140,8 +140,7 @@ function get_user_login_link( $before = '', $after = '', $link_text = '', $link_
 
 	if( ! empty($redirect) )
 	{
-		$redirect = url_rel_to_same_host( $redirect, $htsrv_url_sensitive );
-		$redirect = '?redirect_to='.rawurlencode($redirect);
+		$redirect = '?redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $htsrv_url_sensitive ) );
 	}
 
 	$r = $before;
@@ -193,15 +192,20 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
 
 	if( !isset($generating_static) )
 	{ // We are not generating a static page here:
-		$redirect = '?redirect_to='.rawurlencode( regenerate_url() );
+		$redirect = regenerate_url();
 	}
 	elseif( isset($edited_Blog) )
 	{ // We are generating a static page
-		$redirect = '?redirect_to='.rawurlencode( $edited_Blog->get('dynurl') );
+		$redirect = $edited_Blog->get('dynurl');
 	}
 	else
 	{ // We are in a weird situation
 		$redirect = '';
+	}
+
+	if( ! empty($redirect) )
+	{
+		$redirect = '?redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $htsrv_url_sensitive ) );
 	}
 
 	$r = $before;
@@ -240,7 +244,7 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
 	if( $link_title == '#' ) $link_title = T_('Logout from your account');
 
 	$r = $before;
-	$r .= '<a href="'.$htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.rawurlencode( regenerate_url() ).'" title="'.$link_title.'">';
+	$r .= '<a href="'.$htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host(regenerate_url(), $htsrv_url_sensitive) ).'" title="'.$link_title.'">';
 	$r .= sprintf( $link_text, $current_User->login );
 	$r .= '</a>';
 	$r .= $after;
@@ -355,7 +359,7 @@ function user_subs_link( $before = '', $after = '', $link_text = '', $link_title
 	if( $link_title == '#' ) $link_title = T_('Subscribe to email notifications');
 
 	echo $before;
-	echo '<a href="'.url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=subs&amp;redirect_to='.rawurlencode(regenerate_url()) )
+	echo '<a href="'.url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=subs&amp;redirect_to='.rawurlencode( url_rel_to_same_host(regenerate_url(), $Blog->get('blogurl'))) )
 			.'" title="', $link_title, '">';
 	printf( $link_text, $current_User->login );
 	echo '</a>';
@@ -491,7 +495,7 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
- * Revision 1.15  2006/10/15 21:30:46  blueyed
+ * Revision 1.16  2006/10/15 21:36:08  blueyed
  * Use url_rel_to_same_host() for redirect_to params.
  *
  * Revision 1.14  2006/08/21 16:07:44  fplanque
