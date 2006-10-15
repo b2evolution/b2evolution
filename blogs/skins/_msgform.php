@@ -155,7 +155,7 @@ $Form = new Form( $htsrv_url.'message_send.php' );
 	$Form->hidden( 'recipient_id', $recipient_id );
 	$Form->hidden( 'post_id', $post_id );
 	$Form->hidden( 'comment_id', $comment_id );
-	$Form->hidden( 'redirect_to', $redirect_to );
+	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url) );
 
 	?>
 
@@ -196,6 +196,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.30  2006/10/15 21:30:46  blueyed
+ * Use url_rel_to_same_host() for redirect_to params.
+ *
  * Revision 1.29  2006/08/19 07:56:32  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

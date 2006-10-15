@@ -408,10 +408,9 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	$pass_md5 = md5( $pass );
 
 	// Password hashing by JavaScript:
+	$need_raw_pwd = (bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 	param('pwd_salt', 'string', ''); // just for comparison with the one from Session
 	$pwd_salt_sess = $Session->get('core.pwd_salt');
-
-	$need_raw_pwd = (bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 
 	if( $need_raw_pwd )
 	{ // at least one plugin requests the password un-hashed:
@@ -433,6 +432,9 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		$UserCache->clear();
 	}
 
+	$Debuglog->add( 'pwd_hashed: '.var_export($pwd_hashed, true)
+		.', pass: '.var_export($pass, true) );
+
 	$pass_ok = false;
 	if( $Messages->count('login_error') )
 	{ // A plugin has thrown a login error..
@@ -441,28 +443,42 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	else
 	{ // Check login and password
 		$User = & $UserCache->get_by_login($login);
-
 		if( $User )
 		{
 			if( ! empty($pwd_hashed) )
 			{ // password hashed by JavaScript:
-				if( $Session->get('core.pwd_salt') == '' )
-				{ // no salt stored in session: probably cookie problem
-					$Messages->add( T_('You need to activate cookies.'), 'login_error' );
+				$Debuglog->add( 'Hashed password available.', 'login' );
+				if( empty($pwd_salt_sess) )
+				{ // no salt stored in session: either cookie problem or the user had already tried logging in (from another window for example)
+					$Debuglog->add( 'Empty salt_sess.', 'login' );
+					if( substr($pass, 0, 7) == 'hashed_' && substr($pass, 7) == $Session->ID )
+					{ // session ID matches, no cookie problem
+						$Messages->add( T_('The login window has expired. Please try again.'), 'login_error' );
+						$Debuglog->add( 'Session ID matches.', 'login' );
+					}
+					else
+					{ // more general error:
+						$Messages->add( T_('Either you have not enabled cookies or this login window has expired.'), 'login_error' );
+						$Debuglog->add( 'Session ID does not match.', 'login' );
+					}
 				}
-				elseif( $pwd_salt != $Session->get('core.pwd_salt') )
+				elseif( $pwd_salt != $pwd_salt_sess )
 				{ // submitted salt differs from the one stored in the session
-					$Messages->add( T_('You seem to have de-activated cookies.'), 'login_error' );
+					$Messages->add( T_('The login window has expired. Please try again.'), 'login_error' );
+					$Debuglog->add( 'Submitted salt and salt from Session do not match.', 'login' );
 				}
 				else
 				{
+					#pre_dump( sha1($User->pass.$pwd_salt), $pwd_hashed );
 					$pass_ok = sha1($User->pass.$pwd_salt) == $pwd_hashed;
 					$Session->delete('core.pwd_salt');
+					$Debuglog->add( 'Compared hash password. Result: '.(int)$pass_ok, 'login' );
 				}
 			}
 			else
 			{
 				$pass_ok = ( $User->pass == $pass_md5 );
+				$Debuglog->add( 'Compared raw password. Result: '.(int)$pass_ok, 'login' );
 			}
 		}
 	}
@@ -645,6 +661,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.52  2006/10/15 21:30:45  blueyed
+ * Use url_rel_to_same_host() for redirect_to params.
+ *
  * Revision 1.51  2006/10/14 16:27:05  blueyed
  * Client-side password hashing in the login form.
  *

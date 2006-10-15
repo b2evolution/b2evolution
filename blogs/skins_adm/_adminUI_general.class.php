@@ -1256,7 +1256,7 @@ class AdminUI_general
 			<div id="headinfo">
 				<span id="headfunctions">'
 					// Note: if we log in with another user, we may not have the perms to come back to the same place any more, thus: redirect to admin home.
-					.'<a href="'.$htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.$admin_url.'">'.T_('Logout').'</a>
+					.'<a href="'.$htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.url_rel_to_same_host($admin_url, $htsrv_url_sensitive).'">'.T_('Logout').'</a>
 					<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'
 					.T_('Logout').'" /></a>
 				</span>
@@ -1332,6 +1332,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.33  2006/10/15 21:30:47  blueyed
+ * Use url_rel_to_same_host() for redirect_to params.
+ *
  * Revision 1.32  2006/09/11 23:30:49  blueyed
  * Fixed AdminUI::disp_payload_* for multiple blocks. Cleaned up AdminUI a bit
  *

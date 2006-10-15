@@ -127,15 +127,21 @@ function get_user_login_link( $before = '', $after = '', $link_text = '', $link_
 
 	if( !isset($generating_static) )
 	{ // We are not generating a static page here:
-		$redirect = '?redirect_to='.rawurlencode( regenerate_url() );
+		$redirect = regenerate_url();
 	}
 	elseif( isset($edited_Blog) )
 	{ // We are generating a static page
-		$redirect = '?redirect_to='.rawurlencode( $edited_Blog->get('dynurl') );
+		$redirect = $edited_Blog->get('dynurl');
 	}
 	else
 	{ // We are in a weird situation
 		$redirect = '';
+	}
+
+	if( ! empty($redirect) )
+	{
+		$redirect = url_rel_to_same_host( $redirect, $htsrv_url_sensitive );
+		$redirect = '?redirect_to='.rawurlencode($redirect);
 	}
 
 	$r = $before;
@@ -485,6 +491,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.15  2006/10/15 21:30:46  blueyed
+ * Use url_rel_to_same_host() for redirect_to params.
+ *
  * Revision 1.14  2006/08/21 16:07:44  fplanque
  * refactoring
  *

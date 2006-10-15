@@ -44,7 +44,7 @@ $Form = & new Form( $htsrv_url_sensitive.'login.php', 'form_validatemail', 'post
 $Form->begin_form( 'fform' );
 
 $Form->hidden( 'action', 'req_validatemail');
-$Form->hidden( 'redirect_to', $redirect_to );
+$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 $Form->hidden( 'req_validatemail_submit', 1 ); // to know if the form has been submitted
 
 $Form->begin_fieldset();
@@ -63,7 +63,7 @@ if( $current_User->group_ID == 1 )
 	$Form->begin_form( 'fform' );
 
 	$Form->hidden( 'action', 'validatemail');
-	$Form->hidden( 'redirect_to', $redirect_to );
+	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 	$Form->hidden( 'reqID', 1 );
 	$Form->hidden( 'sessID', $Session->ID );
 
@@ -86,6 +86,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.10  2006/10/15 21:30:46  blueyed
+ * Use url_rel_to_same_host() for redirect_to params.
+ *
  * Revision 1.9  2006/07/08 17:04:18  fplanque
  * minor
  *

@@ -44,7 +44,7 @@ $Form = & new Form( $htsrv_url_sensitive.'register.php', '', 'post', 'fieldset' 
 $Form->begin_form( 'fform' );
 
 $Form->hidden( 'action', 'register');
-$Form->hidden( 'redirect_to', $redirect_to );
+$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 
 echo $Form->fieldstart;
 
@@ -87,6 +87,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.9  2006/10/15 21:30:46  blueyed
+ * Use url_rel_to_same_host() for redirect_to params.
+ *
  * Revision 1.8  2006/06/25 23:34:15  blueyed
  * wording pt2
  *

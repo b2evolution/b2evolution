@@ -53,7 +53,7 @@ $ProfileForm = & new Form( $htsrv_url_sensitive.'profile_update.php', 'ProfileFo
 
 $ProfileForm->begin_form( 'bComment' );
 $ProfileForm->hidden( 'checkuser_id', $current_User->ID );
-$ProfileForm->hidden( 'redirect_to', $redirect_to );
+$ProfileForm->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 
 $ProfileForm->info( T_('Login'), $current_User->get('login'), T_('ID').': '.$current_User->ID );
 $ProfileForm->info( T_('Level'), $current_User->get('level') );
@@ -87,6 +87,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.33  2006/10/15 21:30:46  blueyed
+ * Use url_rel_to_same_host() for redirect_to params.
+ *
  * Revision 1.32  2006/07/06 19:56:29  fplanque
  * no message
  *

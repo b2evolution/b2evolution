@@ -228,7 +228,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 				// Make sure we get back to the right page (on the right domain)
 				// fplanque>> TODO: check if we can use the permalink instead but we must check that application wide,
 				// that is to say: check with the comments in a pop-up etc...
-				regenerate_url( '', '', $Blog->get('blogurl') ) );
+				url_rel_to_same_host(regenerate_url( '', '', $Blog->get('blogurl') ), $htsrv_url) );
 
 		if( is_logged_in() )
 		{ // User is logged in:
@@ -311,6 +311,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.81  2006/10/15 21:30:46  blueyed
+ * Use url_rel_to_same_host() for redirect_to params.
+ *
  * Revision 1.80  2006/08/30 18:51:53  blueyed
  * todo
  *

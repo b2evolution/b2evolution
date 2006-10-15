@@ -28,6 +28,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $need_raw_pwd = (bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 
+header_nocache(); // do not cache this page, because the JS password salt has to match the session cookie
 
 /**
  * Include page header (also displays Messages):
@@ -51,7 +52,7 @@ $Form = & new Form( $htsrv_url_sensitive.'login.php', 'evo_login_form', 'post', 
 $Form->begin_form( 'fform' );
 
 	$Form->hiddens_by_key( $_POST, /* exclude: */ array('login_action', 'login') ); // passthrough POSTed data (when login is required after having POSTed something)
-	$Form->hidden( 'redirect_to', $redirect_to );
+	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 
 	if( ! $need_raw_pwd )
 	{ // used by JS-password encryption/hashing:
@@ -134,7 +135,7 @@ $Form->end_form();
 				if( h && p && s && typeof hex_sha1 != "undefined" && typeof hex_md5 != "undefined" )
 				{
 					h.value = hex_sha1( hex_md5(p.value) + s.value );
-					p.value = "hashed";
+					p.value = "hashed_<?php echo $Session->ID /* to detect cookie problems */ ?>";
 				}
 				return true;
 			}, false );
@@ -148,7 +149,7 @@ $Form->end_form();
 	<?php user_register_link( '', ' &middot; ', '', '#', true /*disp_when_logged_in*/ )?>
 
 	<a href="<?php echo $htsrv_url_sensitive.'login.php?action=lostpassword'
-		.'&amp;redirect_to='.rawurlencode( $redirect_to );
+		.'&amp;redirect_to='.rawurlencode( url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 		if( !empty($login) )
 		{
 			echo '&amp;login='.rawurlencode($login);
@@ -159,7 +160,7 @@ $Form->end_form();
 	<?php
 	if( empty($login_required) )
 	{ // No login required, allow to pass through
-		echo '<a href="'.$redirect_to.'">'./* Gets displayed as link to the location on the login form if no login is required */ T_('Bypass login...').'</a>';
+		echo '<a href="'.url_rel_to_same_host($redirect_to, $ReqHost).'">'./* Gets displayed as link to the location on the login form if no login is required */ T_('Bypass login...').'</a>';
 	}
 	?>
 </div>
@@ -170,6 +171,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.16  2006/10/15 21:30:46  blueyed
+ * Use url_rel_to_same_host() for redirect_to params.
+ *
  * Revision 1.15  2006/10/14 16:27:05  blueyed
  * Client-side password hashing in the login form.
  *
