@@ -766,7 +766,10 @@ class Plugins
 			$Plugin = '';
 		}
 
-		$this->sort();
+		if( ! defined('EVO_IS_INSTALL') || ! EVO_IS_INSTALL )
+		{ // do not sort, if we're installing/upgrading.. instantiating Plugins might cause a fatal error!
+			$this->sort();
+		}
 
 		return $Plugin;
 	}
@@ -2988,6 +2991,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.96  2006/10/16 08:39:10  blueyed
+ * Merged fixes from v-1-9 branch
+ *
  * Revision 1.95  2006/10/14 20:50:29  blueyed
  * Define EVO_IS_INSTALL for /install/ and use it in Plugins to skip "dangerous" but unnecessary instantiating of other Plugins
  *

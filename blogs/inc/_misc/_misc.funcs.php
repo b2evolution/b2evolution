@@ -2039,7 +2039,7 @@ function generate_random_key( $length = 32 )
 
 	for( $i = 0; $i < $length; $i++ )
 	{
-		$key .= $keychars{mt_rand(0, $rnd_max)}; // get a random character out of $chars
+		$key .= $keychars{mt_rand(0, $rnd_max)}; // get a random character out of $keychars
 	}
 
 	return $key;
@@ -2612,6 +2612,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.126  2006/10/16 08:39:10  blueyed
+ * Merged fixes from v-1-9 branch
+ *
  * Revision 1.125  2006/10/14 16:06:38  blueyed
  * Fixed anchors for "redirection-Debuglog"
  *
