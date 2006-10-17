@@ -168,6 +168,8 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 			'mailto:example@example.org?subject=TEST',
 			'http://läu.de/',
 			'/foobar',
+			'/foobar#anchor',
+			'#anchor',
 			) as $url )
 		{
 			$r = validate_url( $url, $GLOBALS['comments_allowed_uri_scheme'] );

@@ -1464,8 +1464,9 @@ function validate_url( $url, & $allowed_uri_scheme )
 	}
 	else
 	{ // URL is relative..
-		if( substr($url, 0, 1) != '/' )
-		{
+		$char = substr($url, 0, 1);
+		if( $char != '/' && $char != '#' )
+		{ // must start with a slash or hash (for HTML anchors to the same page)
 			return T_('URL must be a full path starting with "/".');
 		}
 	}
@@ -1594,6 +1595,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.13  2006/10/17 17:27:07  blueyed
+ * Allow "#anchor" as valid URL
+ *
  * Revision 1.12  2006/10/14 02:12:01  blueyed
  * Added url_absolute(), make_rel_links_abs() + Tests; Fixed validate_url() and allow relative URLs, which get converted to absolute ones in feeds.
  *
