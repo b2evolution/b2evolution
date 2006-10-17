@@ -31,16 +31,6 @@
 	
 	</div>
 	
-<!--	
-	<div class="sub_menu">
-		<a class="current" href="index.php">Main</a> &middot; 
-		<a class="" href="news.php">News</a> &middot; 
-		<a class="" href="dev/donations.php">Donations</a> &middot; 
-		<a class="" href="about/userblogs.php">User blogs</a> &middot; 
-		<a class="" href="dev/authors.html">Team</a> 
-	</div>
--->
-	
 	<!-- End of page header -->
 </div>
 
@@ -50,22 +40,11 @@
 <div id="float-wrapper">
 
 <div class="header-menu">
-	<small>{$maintitle}</small>
+	<small><strong>{$maintitle}</strong></small>
   		  [ <a href="{$subdir}classtrees_{$package}.html" class="menu">class tree: {$package}</a> ]
 		  [ <a href="{$subdir}elementindex_{$package}.html" class="menu">index: {$package}</a> ]
 		  [ <a href="{$subdir}elementindex.html" class="menu">all elements</a> ]
 </div>
-
-
-<!--
-<div class="header-packages">
-	<span class="header-top-right">{$package}</span>
-	{if $subpackage}
-		&mdash; <span class="header-top-right-subpackage">{$subpackage}</span>
-	{/if}
-</div>
--->
-
 
 <div class="content">
 {if !$hasel}{assign var="hasel" value=false}{/if}
