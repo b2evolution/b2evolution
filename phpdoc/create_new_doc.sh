@@ -36,4 +36,4 @@ $PHPDOC --title 'b2evolution Technical Documentation (CVS HEAD)' \
 --readmeinstallchangelog license.txt
 
 # Publish it:
-rsync -avt  build/ doc.b2evolution.net:/var/www/vhosts/evodoc/web/HEAD/
+rsync -avt --del build/ doc.b2evolution.net:/var/www/vhosts/evodoc/web/HEAD/
