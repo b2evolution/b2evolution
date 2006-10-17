@@ -115,12 +115,16 @@ $Form->begin_form( 'fform' );
 	echo $Form->fieldend;
 $Form->end_form();
 
-
-// Autoselect login text input:
 ?>
 
 <script type="text/javascript">
-	document.getElementById( 'login' ).focus();
+	// Autoselect login text input or pwd input, if there's a login already:
+	var login = document.getElementById('login');
+	if( login.value.length > 0 )
+		document.getElementById('pwd').focus();
+	else
+		login.focus();
+
 
 	<?php
 	if( ! $need_raw_pwd )
@@ -171,6 +175,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.17  2006/10/17 19:54:39  blueyed
+ * Select pwd input by JS, if theres a login already given.
+ *
  * Revision 1.16  2006/10/15 21:30:46  blueyed
  * Use url_rel_to_same_host() for redirect_to params.
  *
