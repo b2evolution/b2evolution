@@ -17,6 +17,8 @@
  *
  * @package evoskins
  *
+ * @todo dh> Allow limiting to current blog and list of "public" ones (e.g. with blog_disp_bloglist==1)
+ *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
@@ -81,6 +83,9 @@ $Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.11  2006/10/17 17:20:07  blueyed
+ * TODO
+ *
  * Revision 1.10  2006/10/15 21:30:46  blueyed
  * Use url_rel_to_same_host() for redirect_to params.
  *
