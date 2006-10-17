@@ -43,7 +43,8 @@ global $edit_Plugin;
  */
 global $admin_Plugins;
 
-global $edited_plugin_priority, $edited_plugin_code, $edited_plugin_apply_rendering, $admin_url;
+global $edited_plugin_name, $edited_plugin_shortdesc, $edited_plugin_priority, $edited_plugin_code, $edited_plugin_apply_rendering;
+global $admin_url;
 
 global $inc_path;
 require_once $inc_path.'_misc/_plugin.funcs.php';
@@ -75,8 +76,8 @@ $Form->begin_form( 'fform', '',
 $Form->hidden( 'plugin_ID', $edit_Plugin->ID );
 
 $Form->begin_fieldset( T_('Plugin info'), array( 'class' => 'clear' ) );
-	$Form->text_input( 'edited_plugin_name', $edit_Plugin->name, 25, T_('Name'), array('maxlength' => 255) );
-	$Form->text_input( 'edited_plugin_shortdesc', $edit_Plugin->short_desc, 50, T_('Short desc'), array('maxlength' => 255) );
+	$Form->text_input( 'edited_plugin_name', $edited_plugin_name, 25, T_('Name'), array('maxlength' => 255) );
+	$Form->text_input( 'edited_plugin_shortdesc', $edited_plugin_shortdesc, 50, T_('Short desc'), array('maxlength' => 255) );
 $Form->end_fieldset();
 
 // PluginSettings
@@ -176,6 +177,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.22  2006/10/17 18:36:47  blueyed
+ * Priorize NULL for plug_name/plug_shortdesc (localization); minor fixes in this area
+ *
  * Revision 1.21  2006/09/30 23:42:06  blueyed
  * Allow editing the plugin name and short desc of installed plugins
  *

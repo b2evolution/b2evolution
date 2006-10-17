@@ -589,17 +589,37 @@ switch( $action )
 		param( 'edited_plugin_code' );
 		param( 'edited_plugin_priority' );
 		param( 'edited_plugin_apply_rendering' );
+		param( 'edited_plugin_displayed_events', 'array', array() );
+		param( 'edited_plugin_events', 'array', array() );
+
+		$default_Plugin = & new $edit_Plugin->classname; // instantiate it to access default member values
+		$default_Plugin->PluginInit( $tmp_params = array('is_installed'=>false) );
 
 		// Update plugin name and shortdesc:
-		$edit_Plugin->name = $edited_plugin_name;
-		$edit_Plugin->short_desc = $edited_plugin_shortdesc;
-		if( $DB->query( '
-			UPDATE T_plugins
-			   SET plug_name = '.$DB->quote($edited_plugin_name).',
-			       plug_shortdesc = '.$DB->quote($edited_plugin_shortdesc).'
-			 WHERE plug_ID = '.$plugin_ID ) )
+		// (Only if changed to preserve initial localization feature and therefor also priorize NULL)
+		if( $edit_Plugin->name != $edited_plugin_name )
 		{
-			$Messages->add( T_('Plugin name/description updated.'), 'success' );
+			$set_to = $edited_plugin_name == $default_Plugin->name ? NULL : $edited_plugin_name;
+			$edit_Plugin->name = $edited_plugin_name;
+			if( $DB->query( '
+				UPDATE T_plugins
+					 SET plug_name = '.$DB->quote($set_to).'
+				 WHERE plug_ID = '.$plugin_ID ) )
+			{
+				$Messages->add( T_('Plugin name updated.'), 'success' );
+			}
+		}
+		if( $edit_Plugin->short_desc != $edited_plugin_shortdesc )
+		{
+			$set_to = $edited_plugin_shortdesc == $default_Plugin->short_desc ? NULL : $edited_plugin_shortdesc;
+			$edit_Plugin->short_desc = $edited_plugin_shortdesc;
+			if( $DB->query( '
+				UPDATE T_plugins
+					 SET plug_shortdesc = '.$DB->quote($set_to).'
+				 WHERE plug_ID = '.$plugin_ID ) )
+			{
+				$Messages->add( T_('Plugin description updated.'), 'success' );
+			}
 		}
 
 		$updated = $admin_Plugins->set_code( $edit_Plugin->ID, $edited_plugin_code );
@@ -652,8 +672,6 @@ switch( $action )
 		}
 
 		// Events:
-		param( 'edited_plugin_displayed_events', 'array', array() );
-		param( 'edited_plugin_events', 'array', array() );
 		$registered_events = $admin_Plugins->get_registered_events( $edit_Plugin );
 
 		$enable_events = array();
@@ -719,6 +737,8 @@ switch( $action )
 		$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditAction', $tmp_params = array() );
 
 		// Params for form:
+		$edited_plugin_name = $edit_Plugin->name;
+		$edited_plugin_shortdesc = $edit_Plugin->short_desc;
 		$edited_plugin_code = $edit_Plugin->code;
 		$edited_plugin_priority = $edit_Plugin->priority;
 		$edited_plugin_apply_rendering = $edit_Plugin->apply_rendering;
@@ -741,11 +761,21 @@ switch( $action )
 		}
 
 		$default_Plugin = & new $edit_Plugin->classname; // instantiate it to access default member values
+		$default_Plugin->PluginInit( $tmp_params = array('is_installed'=>false) );
 
 		// Params for/"from" form:
+		$edited_plugin_name = $default_Plugin->name;
+		$edited_plugin_shortdesc = $default_Plugin->short_desc;
 		$edited_plugin_code = $default_Plugin->code;
 		$edited_plugin_priority = $default_Plugin->priority;
 		$edited_plugin_apply_rendering = $default_Plugin->apply_rendering;
+
+		// Name and short desc:
+		$DB->query( '
+				UPDATE T_plugins
+				   SET plug_name = NULL,
+				       plug_shortdesc = NULL
+				 WHERE plug_ID = '.$plugin_ID );
 
 		// Code:
 		$updated = $admin_Plugins->set_code( $edit_Plugin->ID, $edited_plugin_code );
