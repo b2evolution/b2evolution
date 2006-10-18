@@ -1015,9 +1015,19 @@ param( 'mode', 'string', 'normal' );
 				if( !$simulate )
 				{
 					$edited_Item = & new Item();
-					$post_ID = $edited_Item->insert( $post_author, $post_title, $post_content,$post_date, $post_category, $post_catids,
-													$post_status,	$post_locale,
-													'' /* $post_urltitle */, '' /* $post_url */, $comment_status, $post_renderers );
+					$edited_Item->set('author', $post_author);
+					$edited_Item->set('title', $post_title);
+					$edited_Item->set('content', $post_content);
+					$edited_Item->set('datestart', $post_date);
+					$edited_Item->set('main_cat_ID', $post_category);
+					$edited_Item->set('extra_cat_IDs', $post_catids);
+					$edited_Item->set('status', $post_status);
+					$edited_Item->set('locale', $post_locale);
+					$edited_Item->set('notifications_status', 'finished');
+					$edited_Item->set('comment_status', $comment_status);
+					$edited_Item->set_renderers($post_renderers);
+					$edited_Item->dbinsert();
+					$post_ID = $edited_Item->ID;
 				}
 
 				$message .= '<li><span style="color:green">Imported successfully</span><ul><li>main category: <span style="color:#09c">'.get_catname( $post_category ).'</span></li>';
