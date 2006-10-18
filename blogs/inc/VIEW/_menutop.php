@@ -50,7 +50,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	global $rsc_url, $htsrv_url;
 	?>
 	<script type="text/javascript">
-		// Paths used by JS fucntions:
+		// Paths used by JS functions:
 		var imgpath_expand = '<?php echo get_icon( 'expand', 'url' ); ?>';
 		var imgpath_collapse = '<?php echo get_icon( 'collapse', 'url' ); ?>';
 		var htsrv_url = '<?php echo $htsrv_url ?>';
@@ -397,4 +397,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	global $Plugins;
 	$Plugins->trigger_event( 'AdminEndHtmlHead', array() );
 	?>
+
 </head>
+
