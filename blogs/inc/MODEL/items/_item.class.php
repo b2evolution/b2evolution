@@ -1438,7 +1438,8 @@ class Item extends DataObject
 			return false;
 		}
 
-		$form_url = url_add_param( $form_url, 'recipient_id='.$this->creator_User->ID.'&amp;post_id='.$this->ID.'&amp;redirect_to='.rawurlencode(regenerate_url()) );
+		$form_url = url_add_param( $form_url, 'recipient_id='.$this->creator_User->ID.'&amp;post_id='.$this->ID
+			.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url(), $form_url)) );
 
 		if( $title == '#' ) $title = T_('Send email to post author');
 		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
@@ -3363,6 +3364,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.111  2006/10/18 00:03:51  blueyed
+ * Some forgotten url_rel_to_same_host() additions
+ *
  * Revision 1.110  2006/10/14 01:10:48  blueyed
  * Finally provide Item::get_content()
  *

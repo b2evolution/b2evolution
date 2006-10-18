@@ -896,7 +896,7 @@ class User extends DataObject
 	 *
 	 * If the email could get sent, it saves the used "request_id" into the user's Session.
 	 *
-	 * @param string URL, where to redirect the user after he clicked the validation link.
+	 * @param string URL, where to redirect the user after he clicked the validation link (gets saved in Session).
 	 * @return boolean True, if the email could get sent; false if not
 	 */
 	function send_validate_email( $redirect_to_after = NULL )
@@ -988,7 +988,7 @@ class User extends DataObject
 			$form_url = isset($Blog) ? $Blog->get('msgformurl') : '';
 		}
 
-		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID.'&amp;redirect_to='.rawurlencode(regenerate_url()) );
+		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url(), $form_url)) );
 
 		if( $title == '#' ) $title = T_('Send email to user');
 		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
@@ -1140,6 +1140,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.45  2006/10/18 00:03:51  blueyed
+ * Some forgotten url_rel_to_same_host() additions
+ *
  * Revision 1.44  2006/09/30 16:55:58  blueyed
  * $create param for media dir handling, which allows to just get the dir, without creating it.
  *

@@ -730,7 +730,8 @@ class Comment extends DataObject
 			}
 		}
 
-		$form_url = url_add_param( $form_url, 'comment_id='.$this->ID.'&amp;post_id='.$this->item_ID.'&amp;redirect_to='.rawurlencode(regenerate_url()) );
+		$form_url = url_add_param( $form_url, 'comment_id='.$this->ID.'&amp;post_id='.$this->item_ID
+				.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url(), $form_url)) );
 
 		if( $title == '#' ) $title = T_('Send email to comment author');
 		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
@@ -1156,6 +1157,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.43  2006/10/18 00:03:50  blueyed
+ * Some forgotten url_rel_to_same_host() additions
+ *
  * Revision 1.42  2006/08/29 18:36:17  blueyed
  * doc
  *
