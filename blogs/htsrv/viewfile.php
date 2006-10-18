@@ -66,7 +66,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<title><?php echo $selected_File->get_name().' ('.T_('Preview').')'; ?></title>
-	<script type="text/javascript" src="../rsc/js/styleswitcher.js"></script>
+	<script type="text/javascript" src="../rsc/js/styleswitcher.js?v=2"></script>
 	<link href="../rsc/css/viewfile.css" rel="stylesheet" type="text/css" />
 </head>
 
@@ -234,6 +234,9 @@ debug_info();
 <?php
 /*
  * $Log$
+ * Revision 1.11  2006/10/18 00:15:32  blueyed
+ * Major rewrite of styleswitcher.js, started out with a single fix and fixed some more.
+ *
  * Revision 1.10  2006/08/19 07:56:29  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

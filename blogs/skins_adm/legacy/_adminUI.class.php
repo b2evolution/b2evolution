@@ -92,7 +92,8 @@ class AdminUI extends AdminUI_general
 			$this->headlines[] = '<link href="skins_adm/legacy/rsc/css/custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />';
 		}
 
-		$this->headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/styleswitcher.js"></script>';
+		// Style switcher:
+		$this->headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/styleswitcher.js?v=2"></script>';
 
 		if( $mode == 'sidebar' )
 		{ // Include CSS overrides for sidebar:
@@ -118,10 +119,10 @@ class AdminUI extends AdminUI_general
 
 			<div id="headfunctions">
 				'.T_('Style:').'
-				<a href="#" onclick="setActiveStyleSheet(\'Variation\'); return false;" title="Variation (Default)">V</a>'
-				.'&middot;<a href="#" onclick="setActiveStyleSheet(\'Desert\'); return false;" title="Desert">D</a>'
-				.'&middot;<a href="#" onclick="setActiveStyleSheet(\'Legacy\'); return false;" title="Legacy">L</a>'
-				.( is_file( dirname(__FILE__).'/rsc/css/custom.css' ) ? '&middot;<a href="#" onclick="setActiveStyleSheet(\'Custom\'); return false;" title="Custom">C</a>' : '' )
+				<a href="#" onclick="StyleSwitcher.setActiveStyleSheet(\'Variation\'); return false;" title="Variation (Default)">V</a>'
+				.'&middot;<a href="#" onclick="StyleSwitcher.setActiveStyleSheet(\'Desert\'); return false;" title="Desert">D</a>'
+				.'&middot;<a href="#" onclick="StyleSwitcher.setActiveStyleSheet(\'Legacy\'); return false;" title="Legacy">L</a>'
+				.( is_file( dirname(__FILE__).'/rsc/css/custom.css' ) ? '&middot;<a href="#" onclick="StyleSwitcher.setActiveStyleSheet(\'Custom\'); return false;" title="Custom">C</a>' : '' )
 				.'
 				&bull; '
 				// Note: if we log in with another user, we may not have the perms to come back to the same place any more, thus: redirect to admin home.
