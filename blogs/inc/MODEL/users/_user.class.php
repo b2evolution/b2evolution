@@ -457,16 +457,6 @@ class User extends DataObject
 		return $this->Group;
 	}
 
-	/**
-	 * @deprecated by {@link User::get_Group()} since 1.9
-	 */
-	function getGroup()
-	{
-		global $Debuglog;
-		$Debuglog->add( 'Call to deprecated method User::getGroup(), use get_Group() instead.', 'deprecated' );
-		return $this->get_Group();
-	}
-
 
 	/**
 	 * Check permission for this user
@@ -1127,6 +1117,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.47  2006/10/22 21:38:00  blueyed
+ * getGroup() was never in 1.8, so no need to keep it for BC
+ *
  * Revision 1.46  2006/10/22 21:28:41  blueyed
  * Fixes and cleanup for empty User instantiation.
  *
