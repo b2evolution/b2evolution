@@ -885,7 +885,6 @@ param( 'import_mode', 'string', 'normal' );
 							$new_user->set('nickname', $usersmapped[ $post_author ][1]);
 							$new_user->set('pass', md5( $default_password ));
 							$new_user->set('level', $default_userlevel);
-							$new_user->set('email', 'foobar'); // workaround for 1.8.2: setting it to '' does not change it and can cause a DB error in strict mode. Should be fixed with 1.8.3.
 							$new_user->set('email', '');
 							$GroupCache = & get_Cache( 'GroupCache' );
 							$new_user_Group = & $GroupCache->get_by_ID( $default_usergroup );

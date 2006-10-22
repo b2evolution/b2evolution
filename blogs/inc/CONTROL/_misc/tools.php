@@ -86,7 +86,6 @@ if( empty($tab) )
 		<h2><?php echo T_('Movable Type Import') ?></h2>
 		<ol>
 			<li><?php echo T_('Use MT\'s export functionnality to create a .TXT file containing your posts;') ?></li>
-			<li><?php echo T_('Place that file into the /admin folder on your server;') ?></li>
 			<li><?php printf( T_('Follow the insctructions in the <a %s>MT migration utility</a>.'), ' href="?ctrl=mtimport"' ) ?></li>
 		</ol>
 	</div>
