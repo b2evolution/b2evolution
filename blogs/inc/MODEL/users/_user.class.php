@@ -50,25 +50,31 @@ class User extends DataObject
 	var $firstname;
 	var $lastname;
 	var $nickname;
-	var $idmode;
-	var $locale;
+	var $icq;
 	var $email;
 	var $url;
-	var $icq;
-	var $aim;
-	var $msn;
-	var $yim;
 	var $ip;
 	var $domain;
 	var $browser;
 	var $datecreated;
 	var $level;
-	var $notify;
-	var $showonline;
+	var $aim;
+	var $msn;
+	var $yim;
+	var $locale;
+	var $idmode;
 	/**
 	 * @var boolean Does the user accept emails through a message form?
 	 */
 	var $allow_msgform;
+	var $notify;
+	var $showonline;
+
+	/**
+	 * The ID of the (primary, currently only) group of the user.
+	 * @var integer
+	 */
+	var $group_ID;
 
 	/**
 	 * @var boolean Has the user been validated (by email)?
@@ -81,12 +87,6 @@ class User extends DataObject
 	 * @access protected
 	 */
 	var $_num_posts;
-
-	/**
-	 * The ID of the (primary, currently only) group of the user.
-	 * @var integer
-	 */
-	var $group_ID;
 
 	/**
 	 * @see User::get_Group()
@@ -139,32 +139,19 @@ class User extends DataObject
 			);
 
 		if( $db_row == NULL )
-		{
+		{ // Setting those object properties, which are not "NULL" in DB (MySQL strict mode):
+			// dh> e.g. "email" needs to be NULL, so setting it to "" causes a call to dbchange().
+			// dh> TODO: Maybe email should get "NULL" with 1.9?
+
 			// echo 'Creating blank user';
 			$this->set( 'login', 'login' );
 			$this->set( 'pass', md5('pass') );
-			$this->firstname = '';
-			$this->lastname = '';
-			$this->nickname = '';
-			$this->set( 'idmode', 'login' );
 			$this->set( 'locale',
 				isset( $Settings )
 					? $Settings->get('default_locale') // TODO: (settings) use "new users template setting"
 					: $default_locale );
-			$this->email = '';
-			$this->url = '';
-			$this->icq = NULL;
-			$this->aim = '';
-			$this->msn = '';
-			$this->yim = '';
-			$this->ip = '';
-			$this->domain = '';
-			$this->browser = '';
+			$this->set( 'email', '' );
 			$this->set( 'level', isset( $Settings ) ? $Settings->get('newusers_level') : 0 );
-			$this->set( 'allow_msgform', 1 );
-			$this->set( 'validated', 0 );
-			$this->set( 'notify', 1  );
-			$this->set( 'showonline', 1 );
 			if( isset($localtimenow) )
 			{
 				$this->set_datecreated( $localtimenow );
@@ -183,7 +170,7 @@ class User extends DataObject
 		{
 			// echo 'Instanciating existing user';
 			$this->ID = $db_row->user_ID;
-			$this->login =$db_row->user_login;
+			$this->login = $db_row->user_login;
 			$this->pass = $db_row->user_pass;
 			$this->firstname = $db_row->user_firstname;
 			$this->lastname = $db_row->user_lastname;
@@ -1140,6 +1127,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.46  2006/10/22 21:28:41  blueyed
+ * Fixes and cleanup for empty User instantiation.
+ *
  * Revision 1.45  2006/10/18 00:03:51  blueyed
  * Some forgotten url_rel_to_same_host() additions
  *
