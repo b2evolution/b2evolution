@@ -337,7 +337,7 @@ param( 'import_mode', 'string', 'normal' );
 			form_text( 'default_password2', $default_password, 20, 'Confirm password', 'please confirm the password', 30 , '', 'password' );
 			$GroupCache = & get_Cache( 'GroupCache' );
 			form_select_object( 'default_usergroup', $Settings->get('newusers_grp_ID'), $GroupCache, T_('User group') );
-			$field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://b2evolution.net/man/user_levels.html"' );
+			$field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://manual.b2evolution.net/User_levels"' );
 			form_text( 'default_userlevel', $Settings->get('newusers_level'), 2, T_('Level'), $field_note, 2 );
 			?>
 		</fieldset>
@@ -880,26 +880,25 @@ param( 'import_mode', 'string', 'normal' );
 
 						if( ! $item_Author )
 						{
-							$new_user = new User();
-							$new_user->set('login', strtolower($usersmapped[ $post_author ][1]));
-							$new_user->set('nickname', $usersmapped[ $post_author ][1]);
-							$new_user->set('pass', md5( $default_password ));
-							$new_user->set('level', $default_userlevel);
-							$new_user->set('email', '');
+							$item_Author = new User();
+							$item_Author->set('login', strtolower($usersmapped[ $post_author ][1]));
+							$item_Author->set('nickname', $usersmapped[ $post_author ][1]);
+							$item_Author->set('pass', md5( $default_password ));
+							$item_Author->set('level', $default_userlevel);
+							$item_Author->set('email', '');
 							$GroupCache = & get_Cache( 'GroupCache' );
-							$new_user_Group = & $GroupCache->get_by_ID( $default_usergroup );
-							$new_user->set_Group( $new_user_Group );
+							$item_Author_Group = & $GroupCache->get_by_ID( $default_usergroup );
+							$item_Author->set_Group( $item_Author_Group );
 
 							if( !$simulate )
 							{
-								$new_user->dbinsert();
+								$item_Author->dbinsert();
 							}
 
-							// This is a bad hack, because add() would need an ID
-							$UserCache = & get_Cache( 'UserCache' );
-							$UserCache->cache_login[ $new_user->login ] = & $new_user;
+							// This is a bad hack, because add() would need an ID (which we don't have when simulating)
+							$UserCache->cache_login[ $item_Author->login ] = & $item_Author;
 
-							$message .= '<li style="color:orange">user '.$new_user->login.' created</li>';
+							$message .= '<li style="color:orange">user '.$item_Author->login.' created</li>';
 							$count_userscreated++;
 						}
 						break;
@@ -1021,7 +1020,7 @@ param( 'import_mode', 'string', 'normal' );
 				debug_dump( $post_category, 'post_category' );
 				debug_dump( $post_categories, 'post_categories' );
 				debug_dump( $post_author, 'post_author' );
-				debug_dump( $item_Author->ID, 'item_Author->ID' );
+				debug_dump( isset($item_Author->ID) ? $item_Author->ID : 'NULL (simulating)', 'item_Author->ID' );
 
 				if( !$simulate )
 				{
