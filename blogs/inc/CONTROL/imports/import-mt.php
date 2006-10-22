@@ -39,6 +39,11 @@
  */
 
 /**
+ * @const IMPORT_SRC_DIR directory where to be imported files get searched for.
+ */
+define('IMPORT_SRC_DIR', $basepath);
+
+/**
  * Enter the relative path of the import.txt file containing the MT entries.
  * If the file is called import.txt and it is in /admin, then this line should be:
  * <code>
@@ -59,6 +64,9 @@ $output_debug_dump = 0;
 // ----------- don't change below if you don't know what you do ------------------------
 // TODO: Make this AdminUI compliant, or better: make an MT import plugin..
 
+require_once $inc_path.'MODEL/files/_file.funcs.php';
+load_class('MODEL/items/_item.class.php');
+
 set_magic_quotes_runtime( 0 );  // be clear on this
 
 // TODO: $io_charset !!
@@ -68,39 +76,37 @@ $head = <<<EOB
 <head>
 	<title>b2evolution &rsaquo; Import from Movable Type</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-	<link href="skins/legacy/rsc/css/variation.css" rel="stylesheet" type="text/css" title="Variation" />
-	<link href="skins/legacy/rsc/css/desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
-	<link href="skins/legacy/rsc/css/legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
+	<link href="{$adminskins_url}legacy/rsc/css/variation.css" rel="stylesheet" type="text/css" title="Variation" />
+	<link href="{$adminskins_url}legacy/rsc/css/desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
+	<link href="{$adminskins_url}legacy/rsc/css/legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
 EOB;
-if( is_file( dirname(__FILE__).'/skins/legacy/rsc/css/custom.css' ) )
+if( is_file( $adminskins_path.'legacy/rsc/css/custom.css' ) )
 {
-	$head .= '<link href="skins/legacy/rsc/css/custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />';
+	$head .= '<link href="'.$adminskins_url.'legacy/rsc/css/custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />';
 }
 $head .= <<<EOB
-	<script type="text/javascript" src="../rsc/js/styleswitcher.js?v=2"></script>
+<script type="text/javascript" src="{$rsc_url}js/styleswitcher.js?v=2"></script>
 </head>
 <body>
 <div id="header">
-	<a href="http://b2evolution.net"><img id="evologo" src="rsc/img/b2evolution_minilogo2.png" alt="b2evolution"  title="visit b2evolution's website" width="185" height="40" /></a>
+<a href="http://b2evolution.net"><img id="evologo" src="{$rsc_url}img/b2evolution_minilogo2.png" alt="b2evolution"  title="visit b2evolution's website" width="185" height="40" /></a>
 	<div id="headinfo">
 		<br /><span style="font-size:150%; font-weight:bold">Import Movable Type into b2evolution</span>
 	</div>
 </div>
 EOB;
 
-$conf_file = dirname(__FILE__).'/../../../conf/_config.php';
+$conf_file = $conf_path.'_config.php';
 if( !file_exists( $conf_file ) )
 {
 	dieerror( "There doesn't seem to be a conf/_config.php file. You must install b2evolution before you can import any entries.", $head );
 }
 require( $conf_file );
-if( (!isset($config_is_done) || !$config_is_done) )
+if( ! isset($config_is_done) || ! $config_is_done )
 {
-	if( file_exists(dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_conf_error_page.php') )
-	{
-		$error_message = '';
-		require( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_conf_error_page.php' );
-	}
+	$error_message = '';
+	require( $inc_path.'_conf_error_page.php' );
+
 	dieerror( 'b2evolution configuration is not done yet.', $head );
 }
 
@@ -114,20 +120,20 @@ if( !is_logged_in() || $current_User->Group->ID != 1 )
 	echo $head;
 	$error = 'You must login with an administrator (group #1) account.';
 	$redirect_to = $ReqURI;
-	require( dirname(__FILE__).'/'.$admin_dirout.$htsrv_subdir.'login.php' );
+	require( $htsrv_path.'login.php' );
 }
 
 echo $head;
 
 param( 'exportedfile', 'string', '' );
-param( 'mode', 'string', 'normal' );
+param( 'import_mode', 'string', 'normal' );
 
 /*** mode-tabs ***/ ?>
 <ul class="tabs"><?php
 	foreach( array( 'easy', 'normal', 'expert' ) as $tab )
 	{
-		echo ( $tab == $mode ) ? '<li class="current">' : '<li>';
-		echo '<a href="admin.php?ctrl=mtimport&amp;mode='.$tab.( !empty($exportedfile) ? '&amp;exportedfile='.$exportedfile : '' ).'">'.ucwords($tab).'</a></li>';
+		echo ( $tab == $import_mode ) ? '<li class="current">' : '<li>';
+		echo '<a href="admin.php?ctrl=mtimport&amp;import_mode='.$tab.( !empty($exportedfile) ? '&amp;exportedfile='.$exportedfile : '' ).'">'.ucwords($tab).'</a></li>';
 	}
 ?></ul></div>
 
@@ -152,7 +158,8 @@ param( 'mode', 'string', 'normal' );
 		if( empty($exportedfile) )
 		{ // no valid MTEXPORT defined
 			chooseexportfile();
-			die( '</div></div></body></html>' );
+			echo '</div></div></body></html>';
+			exit;
 		}
 	}
 	else
@@ -195,7 +202,7 @@ param( 'mode', 'string', 'normal' );
 
 	if( empty($action) )
 	{
-		param( 'mode', 'string', 'normal', true );
+		param( 'import_mode', 'string', 'normal', true );
 		import_data_extract_authors_cats();
 
 		?>
@@ -204,7 +211,7 @@ param( 'mode', 'string', 'normal' );
 			echo '['.$exportedfile.'].';
 			if( '' == MTEXPORT )
 			{
-				?> [<a href="admin.php?ctrl=mtimport&amp;mode=<?php echo $mode ?>">choose another export-file</a>]<?php
+				?> [<a href="admin.php?ctrl=mtimport&amp;import_mode=<?php echo $import_mode ?>">choose another export-file</a>]<?php
 			} ?></p>
 
 		<p>This file contains <?php echo count( $posts ) ?> post(s) from <?php echo count( $authors ) ?> author(s) in <?php echo count( $categories ) ?> category(ies).</p>
@@ -239,7 +246,7 @@ param( 'mode', 'string', 'normal' );
 		?>
 
 		<?php
-		switch( $mode )
+		switch( $import_mode )
 		{
 			case 'easy':
 				?>
@@ -275,11 +282,11 @@ param( 'mode', 'string', 'normal' );
 
 		?>
 
-		<?php if( $mode != 'expert' ) { ?>
+		<?php if( $import_mode != 'expert' ) { ?>
 		<fieldset>
 			<legend>Default blog</legend>
 			<fieldset>
-				<div class="label"><?php echo ( $mode == 'easy' ) ? 'Create categories in blog' : 'Use as default blog for categories' ?>:</div>
+				<div class="label"><?php echo ( $import_mode == 'easy' ) ? 'Create categories in blog' : 'Use as default blog for categories' ?>:</div>
 				<div class="input">
 					<select name="default_blog">
 					<?php
@@ -292,7 +299,7 @@ param( 'mode', 'string', 'normal' );
 		</fieldset>
 		<?php } ?>
 
-		<?php if( $mode != 'easy' )	{ ?>
+		<?php if( $import_mode != 'easy' )	{ ?>
 		<fieldset><legend>Author mapping</legend>
 			<?php
 				$evousers = $DB->get_results('SELECT * FROM T_users ORDER BY user_ID');
@@ -350,7 +357,7 @@ param( 'mode', 'string', 'normal' );
 			</div>
 			<div class="input"><select name="catmap_select[]">
 				<?php
-				if( $mode == 'expert' )
+				if( $import_mode == 'expert' )
 					echo '<option value="#DEFAULTSET#">Map to default categories set (see below)</option>';
 					else echo '<option value="#DEFAULTBLOG#">Create in default blog:</option>'; ?>
 				<?php cats_optionslist( $cat ) ?>
@@ -362,7 +369,12 @@ param( 'mode', 'string', 'normal' );
 		<?php
 			$i_cat++;
 		} ?>
-		<?php if( $mode == 'expert' ) fieldset_cats() ?>
+		<?php
+		if( $import_mode == 'expert' )
+		{
+			fieldset_cats();
+		}
+		?>
 		</fieldset>
 		<?php } ?>
 
@@ -373,7 +385,7 @@ param( 'mode', 'string', 'normal' );
 			form_select( 'post_locale', $Settings->get('default_locale'), 'locale_options', T_('Default locale'), 'Locale for posts.' );
 			form_checkbox( 'convert_html_tags', $convert_html_tags, 'Convert ugly HTML', 'this will lowercase all html tags and add a XHTML compliant closing tag to &lt;br&gt;, &lt;img&gt;, &lt;hr&gt; (you\'ll get notes)' );
 
-			if( $mode != 'easy' )
+			if( $import_mode != 'easy' )
 			{ // we'll use 'default' when importing
 				?>
 				<div class="label">Renderers:</div>
@@ -435,7 +447,7 @@ param( 'mode', 'string', 'normal' );
 
 		<fieldset class="submit">
 			<div class="input">
-				<input type="hidden" name="mode" value="<?php echo $mode ?>" />
+				<input type="hidden" name="import_mode" value="<?php echo $import_mode ?>" />
 				<input class="search" type="submit" value=" Import! " />
 				<input class="search" type="reset" value="Reset form" />
 			</div>
@@ -454,6 +466,7 @@ param( 'mode', 'string', 'normal' );
 	*************/
 	elseif( $action == 'import' )
 	{
+		$Timer->start('import_main');
 		?>
 		<div class="panelinfo">
 		<h4>Importing from [<?php echo $exportedfile ?>]..<?php if( $simulate ) echo ' (simulating)' ?></h4>
@@ -472,9 +485,9 @@ param( 'mode', 'string', 'normal' );
 		$count_trackbackscreated = 0;
 
 		// get POSTed data
-		param( 'mode', 'string', true );
+		param( 'import_mode', 'string', true );
 
-		if( $mode != 'expert' )
+		if( $import_mode != 'expert' )
 		{
 			param( 'default_blog', 'integer', true );
 		}
@@ -578,7 +591,7 @@ param( 'mode', 'string', 'normal' );
 
 
 		// get renderers
-		if( $mode != 'easy' )
+		if( $import_mode != 'easy' )
 		{
 			$default_renderers = array();
 			if( !isset($_POST['renderers']) )
@@ -857,23 +870,23 @@ param( 'mode', 'string', 'normal' );
 						continue;  // next post
 
 					case 'b2evo':
-						$post_author = $usersmapped[ $post_author ][1];
+						$item_Author = & $UserCache->get_by_login( $usersmapped[ $post_author ][1] );
 						break;
 
 					case 'createnew':
 						// check if the user already exists
 						$UserCache = & get_Cache( 'UserCache' );
-						if( $ExistingUser =& $UserCache->get_by_login( $usersmapped[ $post_author ][1] ) )
-						{
-							$post_author = $ExistingUser->ID;
-						}
-						else
+						$item_Author = & $UserCache->get_by_login( $usersmapped[ $post_author ][1] );
+
+						if( ! $item_Author )
 						{
 							$new_user = new User();
 							$new_user->set('login', strtolower($usersmapped[ $post_author ][1]));
 							$new_user->set('nickname', $usersmapped[ $post_author ][1]);
 							$new_user->set('pass', md5( $default_password ));
 							$new_user->set('level', $default_userlevel);
+							$new_user->set('email', 'foobar'); // workaround for 1.8.2: setting it to '' does not change it and can cause a DB error in strict mode. Should be fixed with 1.8.3.
+							$new_user->set('email', '');
 							$GroupCache = & get_Cache( 'GroupCache' );
 							$new_user_Group = & $GroupCache->get_by_ID( $default_usergroup );
 							$new_user->set_Group( $new_user_Group );
@@ -889,8 +902,6 @@ param( 'mode', 'string', 'normal' );
 
 							$message .= '<li style="color:orange">user '.$new_user->login.' created</li>';
 							$count_userscreated++;
-
-							$post_author = $new_user->ID;
 						}
 						break;
 					default:
@@ -1011,11 +1022,12 @@ param( 'mode', 'string', 'normal' );
 				debug_dump( $post_category, 'post_category' );
 				debug_dump( $post_categories, 'post_categories' );
 				debug_dump( $post_author, 'post_author' );
+				debug_dump( $item_Author->ID, 'item_Author->ID' );
 
 				if( !$simulate )
 				{
 					$edited_Item = & new Item();
-					$edited_Item->set('author', $post_author);
+					$edited_Item->set_creator_User($item_Author);
 					$edited_Item->set('title', $post_title);
 					$edited_Item->set('content', $post_content);
 					$edited_Item->set('datestart', $post_date);
@@ -1066,7 +1078,7 @@ param( 'mode', 'string', 'normal' );
 							$DB->query( "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author,
 																										comment_author_email, comment_author_url, comment_author_IP,
 																										comment_date, comment_content)
-												VALUES( $post_ID, 'comment', 'NULL', ".$DB->quote($comment_author).",
+												VALUES( $post_ID, 'comment', NULL, ".$DB->quote($comment_author).",
 																".$DB->quote($comment_email).",	".$DB->quote($comment_url).",
 																".$DB->quote($comment_ip).", '$comment_date', ".$DB->quote($comment_content)." )" );
 						}
@@ -1135,7 +1147,7 @@ param( 'mode', 'string', 'normal' );
 			<li><?php echo $count_userscreated ?> user(s) created.</li>
 			<li><?php echo $count_commentscreated ?> comment(s) imported.</li>
 			<li><?php echo $count_trackbackscreated ?> trackback(s) imported.</li>
-			<li>in <?php $Timer->display_time( 'main', 3 ) ?> seconds.</li>
+			<li>in <?php echo $Timer->get_duration('import_main') ?> seconds.</li>
 		</ul>
 		<?php
 		if( $simulate )
@@ -1167,7 +1179,7 @@ param( 'mode', 'string', 'normal' );
 		}
 		?>
 		<p>
-			<a href="<?php echo $admin_dirout ?>">Have fun in your blogs</a> or <a href="<?php echo $admin_url ?>">go to admin</a> (it's fun there, too)
+			<a href="<?php echo $baseurl ?>">Have fun in your blogs</a> or <a href="<?php echo $admin_url ?>">go to admin</a> (it's fun there, too)
 		</p>
 		<?php
 		if( $count_userscreated )
@@ -1223,12 +1235,12 @@ function fieldset_cats()
 
 		// ----------------- START RECURSIVE CAT LIST ----------------
 		cat_query( 'none' );	// make sure the caches are loaded
-		function cat_select_before_first( $parent_cat_ID, $level )
+		function import_cat_select_before_first( $parent_cat_ID, $level )
 		{	// callback to start sublist
 			echo "\n<ul>\n";
 		}
 
-		function cat_select_before_each( $cat_ID, $level )
+		function import_cat_select_before_each( $cat_ID, $level )
 		{	// callback to display sublist element
 			global $current_blog_ID, $blog, $cat, $postdata, $default_main_cat, $action, $tabindex, $allow_cross_posting;
 			$this_cat = get_the_category_by_ID( $cat_ID );
@@ -1254,11 +1266,13 @@ function fieldset_cats()
 			}
 			echo ' '.$this_cat['cat_name'];
 		}
-		function cat_select_after_each( $cat_ID, $level )
+
+		function import_cat_select_after_each( $cat_ID, $level )
 		{	// callback after each sublist element
 			echo "</li>\n";
 		}
-		function cat_select_after_last( $parent_cat_ID, $level )
+
+		function import_cat_select_after_last( $parent_cat_ID, $level )
 		{	// callback to end sublist
 			echo "</ul>\n";
 		}
@@ -1270,8 +1284,8 @@ function fieldset_cats()
 			if( ! blog_has_cats( $current_blog_ID ) ) continue;
 			#if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $current_blog_ID ) ) continue;
 			echo "<h4>".$i_blog->blog_name."</h4>\n";
-			cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
-										'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
+			cat_children( $cache_categories, $current_blog_ID, NULL, 'import_cat_select_before_first',
+										'import_cat_select_before_each', 'import_cat_select_after_each', 'import_cat_select_after_last', 1 );
 		}
 		// ----------------- END RECURSIVE CAT LIST ----------------
 		?>
@@ -1360,14 +1374,14 @@ function import_data_extract_authors_cats()
 	global $exportedfile;
 	global $categories_countprim;
 	global $importdata;
-	global $mode;
+	global $import_mode;
 
 	$fp = fopen( $exportedfile, 'rb');
 	$buffer = fread($fp, filesize( $exportedfile ));
 	fclose($fp);
-	if( !preg_match( '/^AUTHOR: /', $buffer ) )
+	if( !preg_match( '/^[-\s]*AUTHOR: /', $buffer ) )
 	{
-		dieerror("The file [$exportedfile] does not seem to be a MT exported file.. ".'[<a href="admin.php?ctrl=mtimport&amp;mode='.$mode.'">choose another export-file</a>]');
+		dieerror("The file [$exportedfile] does not seem to be a MT exported file.. ".'[<a href="admin.php?ctrl=mtimport&amp;import_mode='.$import_mode.'">choose another export-file</a>]');
 	}
 
 	$importdata = preg_replace( "/\r?\n|\r/", "\n", $buffer );
@@ -1548,13 +1562,13 @@ function debug_dump( $var, $title = '' )
 
 function chooseexportfile()
 {
-	global $exportedfile, $mode;
+	global $exportedfile, $import_mode;
 	// Go through directory:
-	$this_dir = dir( dirname(__FILE__) );
+	$this_dir = dir( IMPORT_SRC_DIR );
 	$r = '';
 	while( $this_file = $this_dir->read() )
 	{
-		if( preg_match( '/^.+\.txt$/', $this_file ) )
+		if( preg_match( '/^.+\.txt$/i', $this_file ) )
 		{
 			$r .= '<option value="'.format_to_output( $this_file, 'formvalue' ).'"';
 			if( $exportedfile == $this_file ) $r .= ' selected="selected"';
@@ -1570,7 +1584,7 @@ function chooseexportfile()
 			<select name="exportedfile" onChange="submit()">
 				<?php echo $r ?>
 			</select>
-			<input type="hidden" name="mode" value="<?php echo $mode ?>" />
+			<input type="hidden" name="import_mode" value="<?php echo $import_mode ?>" />
 			<input type="hidden" name="ctrl" value="mtimport" />
 			<input type="submit" value="Next step..." class="search" />
 		</form>
@@ -1580,8 +1594,8 @@ function chooseexportfile()
 	{ // no file found
 		?>
 		<div class="error">
-		<p class="center">No .TXT file found in /admin. Nothing to import...</p>
-		<p class="center">Please copy your Movable Type .TXT export file to the /admin directory.</p>
+		<p class="center">No .TXT file found. Nothing to import...</p>
+		<p class="center">Please copy your Movable Type .TXT export file into <?php echo rel_path_to_base(IMPORT_SRC_DIR); ?>.</p>
 		</div>
 		<?php
 	}
