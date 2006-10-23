@@ -391,7 +391,7 @@ skin_content_header();	// Sets charset!
 
 <div id="pageFooter">
 	<p class="baseline">
-		<a href="<?php echo $Blog->get('msgformurl').'&amp;recipient_id=1&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url(), $Blog->get('msgformurl'))); ?>">Contact the admin</a>.
+		<a href="<?php echo $Blog->get('msgformurl').'&amp;recipient_id=1&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $Blog->get('msgformurl'))); ?>">Contact the admin</a>.
 		Original template design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> / <a href="http://skinfaktory.com/">The Skin Faktory</a>.
 		<?php
 			// Display additional credits (see /conf/_advanced.php):
