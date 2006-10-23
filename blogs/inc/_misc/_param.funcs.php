@@ -1282,8 +1282,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $moredelim 
 			continue;
 		}
 
-		global $$var;
-		$value = $$var;
+		$value = $GLOBALS[$var];
 		if( (!empty($value)) && ($value != $defval) )
 		{ // Value exists and is not set to default value:
 			// echo "adding $var \n";
@@ -1294,12 +1293,12 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $moredelim 
 				$url_array = array();
 				foreach( $value as $value )
 				{
-					$params[] = $var.'%5B%5D='.$value;
+					$params[] = $var.'%5B%5D='.rawurlencode($value);
 				}
 			}
 			else
 			{	// not an array : normal formatting
-				$params[] = $var.'='.$value;
+				$params[] = $var.'='.rawurlencode($value);
 			}
 		}
 		else
@@ -1595,6 +1594,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.14  2006/10/23 21:16:00  blueyed
+ * MFB: Fix for encoding in regenerate_url()
+ *
  * Revision 1.13  2006/10/17 17:27:07  blueyed
  * Allow "#anchor" as valid URL
  *
