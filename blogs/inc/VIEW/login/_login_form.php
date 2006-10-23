@@ -103,8 +103,8 @@ $Form->begin_form( 'fform' );
 	echo $Form->inputstart;
 	$Form->submit( array( 'login_action[login]', T_('Log in!'), 'search' ) );
 
-	if( strpos( $redirect_to, str_replace( '&', '&amp;', $admin_url ) ) !== 0
-		&& strpos( $ReqHost.$redirect_to, str_replace( '&', '&amp;', $admin_url ) ) !== 0 // if $redirect_to is relative
+	if( strpos( $redirect_to, $admin_url ) !== 0
+		&& strpos( $ReqHost.$redirect_to, $admin_url ) !== 0 // if $redirect_to is relative
 		&& ! is_admin_page() )
 	{ // provide button to log straight into backoffice, if we would not go there anyway
 		$Form->submit( array( 'login_action[redirect_to_backoffice]', T_('Log into backoffice!'), 'search' ) );
@@ -164,6 +164,7 @@ $Form->end_form();
 	<?php
 	if( empty($login_required) )
 	{ // No login required, allow to pass through
+		// TODO: dh> validate redirect_to param?!
 		echo '<a href="'.url_rel_to_same_host($redirect_to, $ReqHost).'">'./* Gets displayed as link to the location on the login form if no login is required */ T_('Bypass login...').'</a>';
 	}
 	?>
@@ -175,6 +176,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.18  2006/10/23 22:19:03  blueyed
+ * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
+ *
  * Revision 1.17  2006/10/17 19:54:39  blueyed
  * Select pwd input by JS, if theres a login already given.
  *

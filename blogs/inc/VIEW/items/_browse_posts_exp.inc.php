@@ -193,7 +193,7 @@ while( $Item = & $ItemList->get_item() )
 			$Form->begin_form( 'bComment' );
 
 			$Form->hidden( 'comment_post_ID', $Item->ID );
-			$Form->hidden( 'redirect_to', htmlspecialchars($ReqURI) );
+			$Form->hidden( 'redirect_to', $ReqURI );
 			?>
 				<fieldset>
 					<div class="label"><?php echo T_('User') ?>:</div>
@@ -260,6 +260,9 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.22  2006/10/23 22:19:03  blueyed
+ * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
+ *
  * Revision 1.21  2006/09/06 20:45:34  fplanque
  * ItemList2 fixes
  *

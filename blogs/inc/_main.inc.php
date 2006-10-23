@@ -573,10 +573,6 @@ else
 			else
 			{
 				param( 'redirect_to', 'string', $baseurl );
-				if( $redirect_to != $baseurl )
-				{ // taken from param, decode:
-					$redirect_to = str_replace('&amp;', '&', $redirect_to);
-				}
 			}
 
 			header_redirect( $redirect_to );
@@ -661,6 +657,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.53  2006/10/23 22:19:02  blueyed
+ * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
+ *
  * Revision 1.52  2006/10/15 21:30:45  blueyed
  * Use url_rel_to_same_host() for redirect_to params.
  *

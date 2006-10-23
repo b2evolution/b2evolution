@@ -965,7 +965,7 @@ class User extends DataObject
 			$form_url = isset($Blog) ? $Blog->get('msgformurl') : '';
 		}
 
-		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url(), $form_url)) );
+		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $form_url)) );
 
 		if( $title == '#' ) $title = T_('Send email to user');
 		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
@@ -1117,6 +1117,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.48  2006/10/23 22:19:02  blueyed
+ * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
+ *
  * Revision 1.47  2006/10/22 21:38:00  blueyed
  * getGroup() was never in 1.8, so no need to keep it for BC
  *

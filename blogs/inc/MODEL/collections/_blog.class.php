@@ -633,6 +633,7 @@ class Blog extends DataObject
 	/**
 	 * Get a param.
 	 *
+	 * @param string Parameter name
 	 * @return false|string The value as string or false in case of error (e.g. media dir is disabled).
 	 */
 	function get( $parname )
@@ -1031,6 +1032,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2006/10/23 22:19:02  blueyed
+ * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
+ *
  * Revision 1.31  2006/10/14 04:43:35  blueyed
  * Removed last allowpingbacks references
  *

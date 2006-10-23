@@ -2101,7 +2101,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 
 	if( empty($redirect_to) )
 	{ // see if there's a redirect_to request param given (where & is encoded as &amp;):
-		$redirect_to = str_replace('&amp;', '&', param( 'redirect_to', 'string', '' ));
+		$redirect_to = param( 'redirect_to', 'string', '' );
 
 		if( empty($redirect_to) )
 		{
@@ -2138,7 +2138,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 		// fp> which views please (important to list in order to remove asap)
 		// dh> sorry, don't remember
 		// TODO: fp> action should actually not be used to trigger views. This should be changed at some point.
-		$redirect_to = preg_replace( '~(?<=\?|&amp;|&) (login|pwd|confirm(ed)?) = [^&]+ (&(amp;)?|\?)?~x', '', $redirect_to );
+		$redirect_to = preg_replace( '~(?<=\?|&) (login|pwd|confirm(ed)?) = [^&]+ ~x', '', $redirect_to );
 	}
 
 
@@ -2612,6 +2612,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.127  2006/10/23 22:19:03  blueyed
+ * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
+ *
  * Revision 1.126  2006/10/16 08:39:10  blueyed
  * Merged fixes from v-1-9 branch
  *

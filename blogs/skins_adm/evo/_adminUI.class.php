@@ -134,7 +134,7 @@ class AdminUI extends AdminUI_general
 			<div id="headinfo">
 				<span id="headfunctions">'
 				// Note: if we log in with another user, we may not have the perms to come back to the same place any more, thus: redirect to admin home.
-				.'<a href="'.$htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.url_rel_to_same_host($admin_url, $htsrv_url_sensitive).'">'.T_('Logout').'</a>
+				.'<a href="'.$htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.rawurlencode(url_rel_to_same_host($admin_url, $htsrv_url_sensitive)).'">'.T_('Logout').'</a>
 					&bull;
 					<a href="'.( isset($Blog) ? $Blog->get('url') : $baseurl ).'">'.T_('Exit to blogs').'
 						<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'

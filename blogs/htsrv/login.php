@@ -321,22 +321,23 @@ switch( $action )
 
 if( empty($redirect_to) )
 { // Use requested URI if nothing provided
-	$redirect_to = str_replace( '&', '&amp;', $ReqURI );
+	$redirect_to = $ReqURI;
 }
 
 if( preg_match( '#/login.php([&?].*)?$#', $redirect_to ) )
 { // avoid "endless loops"
-	$redirect_to = str_replace( '&', '&amp;', $admin_url );
+	$redirect_to = $admin_url;
 }
 
 // Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
-$redirect_to = preg_replace( '~(?<=\?|&amp;|&) (login|pwd) = [^&]+ (&(amp;)?|\?)?~x', '', $redirect_to );
+$redirect_to = preg_replace( '~(?<=\?|&) (login|pwd) = [^&]+ ~x', '', $redirect_to );
 
 if( $Session->has_User() )
 { // The user is already logged in...
 	$tmp_User = & $Session->get_User();
 	if( $tmp_User->validated || ! $Settings->get('newusers_mustvalidate') )
 	{
+		// dh> TODO: validate $redirect_to param!
 		$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $tmp_User->get('login') )
 			.' <a href="'.$redirect_to.'">'.T_('Continue...').'</a>', 'note' );
 	}
@@ -344,8 +345,8 @@ if( $Session->has_User() )
 }
 
 if( ( empty($redirect_to) && is_admin_page() )
-	|| strpos( $redirect_to, str_replace('&amp;', '&', $admin_url) ) === 0
-	|| strpos( $ReqHost.	$redirect_to, str_replace('&amp;', '&', $admin_url) ) === 0 )
+	|| strpos($redirect_to, $admin_url) === 0
+	|| strpos($ReqHost.$redirect_to, $admin_url ) === 0 )
 { // don't provide link to bypass
 	$login_required = true;
 }
@@ -360,6 +361,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.74  2006/10/23 22:19:02  blueyed
+ * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
+ *
  * Revision 1.73  2006/10/12 23:48:15  blueyed
  * Fix for if redirect_to is relative
  *

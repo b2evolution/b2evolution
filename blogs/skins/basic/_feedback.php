@@ -164,7 +164,7 @@
 		<form action="<?php echo $htsrv_url ?>comment_post.php" method="post">
 
 			<input type="hidden" name="comment_post_ID" value="<?php echo $Item->ID() ?>" />
-			<input type="hidden" name="redirect_to" value="<?php echo url_rel_to_same_host(regenerate_url(), $htsrv_url) ?>" />
+			<input type="hidden" name="redirect_to" value="<?php echo rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $htsrv_url)) ?>" />
 
 		<table>
 			<?php
