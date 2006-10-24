@@ -788,25 +788,51 @@ function locale_updateDB()
  *
  * @todo Implement iconv and PHP mapping tables
  *
+ * @see can_convert_charsets()
  * @param string String to convert
  * @param string Target charset (TO)
  * @param string Source charset (FROM)
+ * @return string Encoded string (if it cannot be converted it's the original one)
  */
 function convert_charset( $string, $dest_charset, $src_charset )
 {
 	if( $dest_charset == $src_charset )
-	{
+	{ // no conversation required
 		return $string;
 	}
 
-	if( ! function_exists('mb_convert_variables') )
-	{ // cannot convert encoding using mbstrings
-		return $string;
+	if( function_exists('mb_convert_variables') )
+	{ // mb_string extension:
+		mb_convert_variables( $dest_charset, $src_charset, $string );
 	}
-
-	mb_convert_variables( $dest_charset, $src_charset, $string );
 
 	return $string;
+}
+
+
+/**
+ * Can we convert from charset A to charset B?
+ * @param string Target charset (TO)
+ * @param string Source charset (FROM)
+ * @return boolean
+ */
+function can_convert_charsets( $dest_charset, $src_charset )
+{
+	if( function_exists('mb_internal_encoding') )
+	{ // mb_string extension:
+		$orig = mb_internal_encoding();
+
+		$r = false;
+		if( mb_internal_encoding($dest_charset) && mb_internal_encoding($src_charset) )
+		{ // we can set both encodings, so we should be able to convert:
+			$r = true;
+		}
+
+		mb_internal_encoding($orig);
+		return $r;
+	}
+
+	return false;
 }
 
 
@@ -899,13 +925,16 @@ function init_charsets( $req_io_charset )
 
 	$Debuglog->add( 'evo_charset: '.$evo_charset, 'locale' );
 	$Debuglog->add( 'io_charset: '.$io_charset, 'locale' );
-  
+
   return true;
 }
 
 
 /*
  * $Log$
+ * Revision 1.27  2006/10/24 23:04:05  blueyed
+ * Added can_convert_charsets() function
+ *
  * Revision 1.26  2006/10/04 12:55:24  blueyed
  * - Reload $Blog, if charset has changed for Blog locale
  * - only update DB connection charset, if not forced with $db_config['connection_charset']
