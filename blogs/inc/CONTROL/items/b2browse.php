@@ -99,9 +99,9 @@ else
 					$postIDlist = $ItemList->get_page_ID_list();
 					$postIDarray = $ItemList->get_page_ID_array();
 
-					param( 'c', 'string' );
-					param( 'tb', 'integer', 0 );
-					param( 'pb', 'integer', 0 );
+					param( 'c',  'integer', 0 ); // Display comments?
+					param( 'tb', 'integer', 0 ); // Display trackbacks?
+					param( 'pb', 'integer', 0 ); // Display pingbacks?
 					break;
 			}
 			break;

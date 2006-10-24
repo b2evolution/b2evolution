@@ -353,11 +353,10 @@ if( ($disp == 'posts') || ($disp == 'single') )
 	}
 
 	param( 'more', 'integer', 0, true );
-	param( 'page', 'integer', 1, true );						// Post page to show
-	param( 'c', 'string', '', true );
-	param( 'tb', 'integer', 0, true );
-	param( 'pb', 'integer', 0, true );
-
+	param( 'page', 'integer', 1, true ); // Post page to show
+	param( 'c',    'integer', 0, true ); // Display comments?
+	param( 'tb',   'integer', 0, true ); // Display trackbacks?
+	param( 'pb',   'integer', 0, true ); // Display pingbacks?
 }
 
 
@@ -505,6 +504,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.46  2006/10/24 14:03:52  blueyed
+ * Type $c param ("Display comments?") to integer
+ *
  * Revision 1.45  2006/10/08 22:59:30  blueyed
  * Added GetProvidedSkins and DisplaySkin hooks. Allow for optimization in Plugins::trigger_event_first_return()
  *
