@@ -514,6 +514,19 @@ class ArchiveList extends Results
 													ORDER BY '.$this->dbprefix.'datestart DESC';
 		}
 
+
+		// dh> Temp fix for MySQL bug - apparently in/around 4.1.21/5.0.24.
+		// See http://forums.b2evolution.net/viewtopic.php?p=42529#42529
+		if( in_array($this->archive_mode, array('monthly', 'daily', 'weekly')) )
+		{
+			$sql_version = $DB->query('SELECT VERSION()');
+			if( version_compare($sql_version, '4', '>') )
+			{
+				$sql = 'SELECT SQL_CALC_FOUND_ROWS '.substr( $sql, 7 ); // "SQL_CALC_FOUND_ROWS" available since MySQL 4
+			}
+		}
+
+
 		parent::Results( $sql, 'archivelist_', '', $limit );
 
 		$this->restart();
@@ -634,6 +647,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.30  2006/10/25 22:27:44  blueyed
+ * Fix for MySQL bug
+ *
  * Revision 1.29  2006/09/10 20:59:19  fplanque
  * extended extra path info setting
  *
