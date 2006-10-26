@@ -90,17 +90,17 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		if( isset($_POST[$var]) )
 		{
 			$GLOBALS[$var] = remove_magic_quotes( $_POST[$var] );
-			// $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by POST', 'params' );
+			// if( isset($Debuglog) ) $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by POST', 'params' );
 		}
 		elseif( isset($_GET[$var]) )
 		{
 			$GLOBALS[$var] = remove_magic_quotes($_GET[$var]);
-			// $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by GET', 'params' );
+			// if( isset($Debuglog) ) $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by GET', 'params' );
 		}
 		elseif( isset($_COOKIE[$var]))
 		{
 			$GLOBALS[$var] = remove_magic_quotes($_COOKIE[$var]);
-			// $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by COOKIE', 'params' );
+			// if( isset($Debuglog) ) $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by COOKIE', 'params' );
 		}
 		elseif( $default === true )
 		{
@@ -110,7 +110,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		{	// We haven't set any value yet and we really want one: use default:
 			$GLOBALS[$var] = $default;
 			// echo '<br>param(-): '.$var.'='.$GLOBALS[$var].' set by default';
-			// $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by default', 'params' );
+			// if( isset($Debuglog) ) $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by default', 'params' );
 		}
 		else
 		{ // param not found! don't set the variable.
@@ -122,7 +122,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 	{ // Variable was already set but we need to remove the auto quotes
 		$GLOBALS[$var] = remove_magic_quotes($GLOBALS[$var]);
 
-		// $Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($GLOBALS[$var], true).']!', 'params' );
+		// if( isset($Debuglog) ) $Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($GLOBALS[$var], true).']!', 'params' );
 	}
 
 	if( isset($io_charset) && ! empty($evo_charset) )
@@ -142,14 +142,14 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		{
 			case 'html':
 				// do nothing
-				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as HTML', 'params' );
+				if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> as HTML', 'params' );
 				break;
 
 			case 'string':
 				// strip out any html:
 				// echo $var, '=', $GLOBALS[$var], '<br />';
 				$GLOBALS[$var] = trim( strip_tags($GLOBALS[$var]) );
-				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
+				if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
 				break;
 
 			default:
@@ -157,11 +157,11 @@ function param( $var, $type = '', $default = '', $memorize = false,
 				{	// We want to match against a REGEXP:
 					if( preg_match( $type, $GLOBALS[$var] ) )
 					{	// Okay, match
-						$Debuglog->add( 'param(-): <strong>'.$var.'</strong> matched against '.$type, 'params' );
+						if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> matched against '.$type, 'params' );
 					}
 					elseif( $strict_typing == 'allow_empty' && empty($GLOBALS[$var]) )
 					{	// No match but we accept empty value:
-						$Debuglog->add( 'param(-): <strong>'.$var.'</strong> is empty: ok', 'params' );
+						if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> is empty: ok', 'params' );
 					}
 					elseif( $strict_typing )
 					{	// We cannot accept this MISMATCH:
@@ -170,7 +170,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 					else
 					{ // Fall back to default:
 						$GLOBALS[$var] = $default;
-						$Debuglog->add( 'param(-): <strong>'.$var.'</strong> DID NOT match '.$type.' set to default value='.$GLOBALS[$var], 'params' );
+						if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> DID NOT match '.$type.' set to default value='.$GLOBALS[$var], 'params' );
 					}
 
 					// From now on, consider this as a string: (we need this when memorizing)
@@ -189,7 +189,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 						// this to distinguish between 0 and 'no input'
 						// Note: we do this after regexps because we may or may not want to allow empty strings in regexps
 						$GLOBALS[$var] = NULL;
-						$Debuglog->add( 'param(-): <strong>'.$var.'</strong> set to NULL', 'params' );
+						if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> set to NULL', 'params' );
 					}
 				}
 				elseif( $GLOBALS[$var] === array() )
@@ -235,7 +235,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 
 					// Change the variable type:
 					settype( $GLOBALS[$var], $type );
-					$Debuglog->add( 'param(-): <strong>'.$var.'</strong> typed to '.$type.', new value='.$GLOBALS[$var], 'params' );
+					if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> typed to '.$type.', new value='.$GLOBALS[$var], 'params' );
 				}
 		}
 	}
@@ -1128,12 +1128,13 @@ function memorize_param( $var, $type, $default, $value = NULL )
 
 	if( !isset($global_param_list) )
 	{ // Init list if necessary:
-		$Debuglog->add( 'init $global_param_list', 'params' );
+		if( isset($Debuglog) ) $Debuglog->add( 'init $global_param_list', 'params' );
 		$global_param_list = array();
 	}
 
-	$Debuglog->add( "memorize_param: $var $type default=$default"
-									.(is_null($value) ? '' : " value=$value"), 'params');
+	if( isset($Debuglog) )
+		$Debuglog->add( "memorize_param: $var $type default=$default"
+			.(is_null($value) ? '' : " value=$value"), 'params');
 	$global_param_list[$var] = array( 'type' => $type, 'default' => (($default===true) ? NULL : $default) );
 
 	if( !is_null( $value ) )
@@ -1145,16 +1146,17 @@ function memorize_param( $var, $type, $default, $value = NULL )
 
 /**
  * Forget a param so that is will not get included in subsequent {@link regenerate_url()} calls.
+ * @param string Param name
  */
 function forget_param( $var )
 {
 	global $Debuglog, $global_param_list;
 
-	$Debuglog->add( 'forget_param('.$var.')', 'params' );
+	if( isset($Debuglog) ) $Debuglog->add( 'forget_param('.$var.')', 'params' );
 
 	unset( $global_param_list[$var] );
-
 }
+
 
 /**
  * Set the value of a param (by force! :P)
@@ -1278,7 +1280,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $moredelim 
 		}
 		if( $skip )
 		{ // we don't want to include that param
-			// $Debuglog->add( 'regenerate_url(): EXPLICIT IGNORE '.$var, 'params' );
+			// if( isset($Debuglog) ) $Debuglog->add( 'regenerate_url(): EXPLICIT IGNORE '.$var, 'params' );
 			continue;
 		}
 
@@ -1286,7 +1288,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $moredelim 
 		if( (!empty($value)) && ($value != $defval) )
 		{ // Value exists and is not set to default value:
 			// echo "adding $var \n";
-			// $Debuglog->add( "regenerate_url(): Using var=$var, type=$type, defval=[$defval], val=[$value]", 'params' );
+			// if( isset($Debuglog) ) $Debuglog->add( "regenerate_url(): Using var=$var, type=$type, defval=[$defval], val=[$value]", 'params' );
 
 			if( $type === 'array' )
 			{ // there is a special formatting in case of arrays
@@ -1303,7 +1305,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $moredelim 
 		}
 		else
 		{
-			// $Debuglog->add( "regenerate_url(): DEFAULT ignore var=$var, type=$type, defval=[$defval], val=[$value]", 'params' );
+			// if( isset($Debuglog) ) $Debuglog->add( "regenerate_url(): DEFAULT ignore var=$var, type=$type, defval=[$defval], val=[$value]", 'params' );
 		}
 	}
 
@@ -1328,7 +1330,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $moredelim 
 	{
 		if( ! empty($base_tag_set) )
 		{
-			$Debuglog->add( 'regenerate_url(): Using full URL because of $base_tag_set.', 'params' );
+			if( isset($Debuglog) ) $Debuglog->add( 'regenerate_url(): Using full URL because of $base_tag_set.', 'params' );
 			$url = $ReqHost.$ReqPath;
 		}
 		else
@@ -1341,7 +1343,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $moredelim 
 	{
 		$url = url_add_param( $url, implode( $moredelim, $params ), $moredelim );
 	}
-	// $Debuglog->add( 'regenerate_url(): ['.$url.']', 'params' );
+	// if( isset($Debuglog) ) $Debuglog->add( 'regenerate_url(): ['.$url.']', 'params' );
 	return $url;
 }
 
@@ -1360,13 +1362,23 @@ function url_add_param( $url, $param, $moredelim = '&amp;' )
 		return $url;
 	}
 
+	if( ($anchor_pos = strpos($url, '#')) !== false )
+	{ // There's an "#anchor" in the URL
+		$anchor = substr($url, $anchor_pos);
+		$url = substr($url, 0, $anchor_pos);
+	}
+	else
+	{ // URL without "#anchor"
+		$anchor = '';
+	}
+
 	if( strpos( $url, '?' ) !== false )
 	{ // There are already params in the URL
-		return $url.$moredelim.$param;
+		return $url.$moredelim.$param.$anchor;
 	}
 
 	// These are the first params
-	return $url.'?'.$param;
+	return $url.'?'.$param.$anchor;
 }
 
 
@@ -1443,14 +1455,14 @@ function validate_url( $url, & $allowed_uri_scheme )
 			(:[0-9]+)?                       # optional port specification
 			~ix', $url, $match) )
 		{ // Cannot validate URL structure
-			$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
+			if( isset($Debuglog) ) $Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
 			return T_('Invalid URL');
 		}
 
 		$scheme = strtolower($match[1]);
 		if( !in_array( $scheme, $allowed_uri_scheme ) )
 		{ // Scheme not allowed
-			$Debuglog->add( 'URL scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
+			if( isset($Debuglog) ) $Debuglog->add( 'URL scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
 			return T_('URI scheme not allowed');
 		}
 
@@ -1594,6 +1606,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.15  2006/10/26 09:28:58  blueyed
+ * - Made param funcs independent from $Debuglog global
+ * - Made url_add_param() respect anchors/fragments
+ *
  * Revision 1.14  2006/10/23 21:16:00  blueyed
  * MFB: Fix for encoding in regenerate_url()
  *
