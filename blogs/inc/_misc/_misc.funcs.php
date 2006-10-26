@@ -2524,13 +2524,21 @@ function url_same_protocol( $url, $other_url = NULL )
  */
 function url_rel_to_same_host( $url, $target_url )
 {
-	$parsed_url = parse_url( $url );
+	$parsed_url = @parse_url( $url );
+	if( ! $parsed_url )
+	{ // invalid url
+		return $url;
+	}
 	if( empty($parsed_url['scheme']) || empty($parsed_url['host']) )
 	{ // no protocol or host information
 		return $url;
 	}
 
-	$target_url = parse_url( $target_url );
+	$target_url = @parse_url( $target_url );
+	if( ! $target_url )
+	{ // invalid url
+		return $url;
+	}
 	if( ! empty($target_url['scheme']) && $target_url['scheme'] != $parsed_url['scheme'] )
 	{ // scheme/protocol is different
 		return $url;
@@ -2612,6 +2620,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.128  2006/10/26 20:23:00  blueyed
+ * Handle invalid URLs gracefully in url_rel_to_same_host()
+ *
  * Revision 1.127  2006/10/23 22:19:03  blueyed
  * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
  *
