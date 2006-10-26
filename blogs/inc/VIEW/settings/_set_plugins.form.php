@@ -256,10 +256,16 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	$highlight_fadeout = empty($edit_Plugin) || ! is_object($edit_Plugin) /* may be error string */ ? array() : array( 'plug_ID'=>array($edit_Plugin->ID) );
 
 	$Results->display( NULL, $highlight_fadeout );
+
+	if( $current_User->check_perm( 'options', 'edit' ) )
+	{ // Display action link to reload plugins:
+		?>
+		<p class="center">
+			<a href="admin.php?ctrl=plugins&amp;action=reload_plugins"><?php echo T_('Reload events and codes for installed plugins.') ?></a>
+		</p>
+		<?php
+	}
 	?>
-	<p class="center">
-		<a href="admin.php?ctrl=plugins&amp;action=reload_plugins"><?php echo T_('Reload events and codes for installed plugins.') ?></a>
-	</p>
 </fieldset>
 
 
@@ -420,6 +426,9 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 <?php
 /*
  * $Log$
+ * Revision 1.36  2006/10/26 21:24:14  blueyed
+ * Do not display "reload events" links, if no perms
+ *
  * Revision 1.35  2006/10/08 19:50:10  blueyed
  * Re-enabled sorting plugins by name, group and desc again
  *
