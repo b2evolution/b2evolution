@@ -310,25 +310,34 @@ switch( $action )
 ?>
 
 <script type="text/javascript">
-	if( post_title_elt = document.getElementById('post_title') )
-	{
-		/**
-		 * Updates document.title according to the item title field (post_title)
-		 */
-		function evo_update_document_title()
+
+	<?php
+	if( isset($js_doc_title_prefix) )
+	{ // dynamic document.title handling:
+		?>
+		if( post_title_elt = document.getElementById('post_title') )
 		{
-			var posttitle = document.getElementById('post_title').value;
+			/**
+			 * Updates document.title according to the item title field (post_title)
+			 */
+			function evo_update_document_title()
+			{
+				var posttitle = document.getElementById('post_title').value;
 
-			document.title = document.title.replace( /(<?php echo preg_quote( trim($js_doc_title_prefix) /* e.g. FF2 trims document.title */ ) ?>).*$/, '$1 '+posttitle );
+				document.title = document.title.replace( /(<?php echo preg_quote( trim($js_doc_title_prefix) /* e.g. FF2 trims document.title */ ) ?>).*$/, '$1 '+posttitle );
+			}
+
+			addEvent( post_title_elt, 'keyup', evo_update_document_title, false );
+
+			// Init:
+			evo_update_document_title();
 		}
-
-		addEvent( post_title_elt, 'keyup', evo_update_document_title, false );
-
-		// Init:
-		evo_update_document_title();
+		<?php
 	}
+	?>
 
 
+	// Handle "edit timestamp" field:
 	if( edit_date_elt = document.getElementById('edit_date') )
 	{
 		/**
