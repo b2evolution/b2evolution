@@ -347,6 +347,8 @@ switch( $action )
 			param( 'conf_db_host', 'string', $db_config['host'] );
 			param( 'conf_db_tableprefix', 'string', $tableprefix );
 			// Guess baseurl:
+			// TODO: dh> IMHO HTTP_HOST would be a better default, because it's what the user accesses for install.
+			//       fp, please change it, if it's ok. SERVER_NAME might get used if HTTP_HOST is not given, but that shouldn't be the case normally.
 			$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
 			if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
 				$baseurl .= ':'.$_SERVER['SERVER_PORT'];
@@ -637,6 +639,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.116  2006/10/27 20:11:24  blueyed
+ * TODO
+ *
  * Revision 1.115  2006/10/14 20:50:29  blueyed
  * Define EVO_IS_INSTALL for /install/ and use it in Plugins to skip "dangerous" but unnecessary instantiating of other Plugins
  *
