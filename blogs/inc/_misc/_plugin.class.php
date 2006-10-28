@@ -2427,6 +2427,7 @@ class Plugin
 	/**
 	 * Set param value.
 	 *
+	 * @deprecated since 1.9 - no use.
 	 * @param string Name of parameter
 	 * @param mixed Value of parameter
 	 */
@@ -2743,6 +2744,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.103  2006/10/28 20:07:01  blueyed
+ * Deprecated Plugin::set_param() - no use
+ *
  * Revision 1.102  2006/10/28 15:01:36  blueyed
  * Documentation
  *
