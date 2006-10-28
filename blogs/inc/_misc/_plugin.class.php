@@ -281,15 +281,25 @@ class Plugin
 	/**
 	 * The translations keyed by locale. They get loaded through include() of _global.php.
 	 * @see Plugin::T_()
+	 * @access protected
 	 * @var array
 	 */
-	var $trans = array();
+	var $_trans = array();
 
 	/**
+	 * The translation charsets keyed by locale. They get loaded through include() of _global.php.
+	 * @see Plugin::T_()
+	 * @access protected
+	 * @var array
+	 */
+	var $_trans_charsets = array();
+
+	/**
+	 * @access protected
 	 * @var boolean Has the global /locales/_global.php file (where translation for
 	 * all languages can be put into) been loaded?
 	 */
-	var $trans_loaded_global = false;
+	var $_trans_loaded_global = false;
 
 	/**#@-*/
 
@@ -2089,7 +2099,7 @@ class Plugin
 	{
 		global $current_locale, $locales, $Debuglog, $plugins_path, $evo_charset;
 
-		$trans = & $this->trans;
+		$trans = & $this->_trans;
 
 		if( empty($req_locale) )
 		{ // By default we use the current locale
@@ -2132,9 +2142,9 @@ class Plugin
 			$locales_dir .= 'locales/';
 
 			// First load the global messages file, if existing:
-			if( ! $this->trans_loaded_global )
+			if( ! $this->_trans_loaded_global )
 			{
-				$this->trans_loaded_global = true;
+				$this->_trans_loaded_global = true;
 
 				$file_path = $locales_dir.'_global.php';
 				if( file_exists($file_path) )
@@ -2178,12 +2188,28 @@ class Plugin
 				$Debuglog->add( 'No messages found for locale ['.$req_locale.'],
 												message file [/locales/'.$messages.'/_global.php]', 'locale' );*/
 			}
+
+			// Remember the charset:
+			if( isset($trans[$messages]['']) )
+			{
+				if( ($pos = strpos($trans[$messages][''], 'Content-Type:')) !== false )
+				{
+					if( preg_match('~^Content-Type:.*charset=([\w\d-]+)~', substr($trans[$messages][''], $pos), $match) )
+					{
+						$this->_trans_charsets[$messages] = $match[1];
+						$this->debug_log( 'Charset of messages for '.$messages.' is '.$match[1] );
+					}
+				}
+			}
+			if( ! isset($this->_trans_charsets[$messages]) )
+			{ // not provided, use the one of the main locale files:
+				$this->_trans_charsets[$messages] = $locales[$req_locale]['charset'];
+			}
 		}
 
 		if( isset( $trans[ $messages ][ $search ] ) )
 		{ // If the string has been translated:
 			$r = $trans[ $messages ][ $search ];
-			$messages_charset = $locales[$req_locale]['charset'];
 		}
 		else
 		{ // Fallback to global T_() function:
@@ -2192,7 +2218,7 @@ class Plugin
 
 		if( ! empty($evo_charset) ) // this extra check is needed, because $evo_charset may not yet be determined.. :/
 		{
-			$r = convert_charset( $r, $evo_charset, $messages_charset );
+			$r = convert_charset( $r, $evo_charset, $this->_trans_charsets[$messages] );
 		}
 
 		return $r;
@@ -2710,6 +2736,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.101  2006/10/28 15:00:47  blueyed
+ * (Separate) Charset support for Plugin::T_()
+ *
  * Revision 1.100  2006/10/14 16:27:05  blueyed
  * Client-side password hashing in the login form.
  *
