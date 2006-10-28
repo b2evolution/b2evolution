@@ -292,9 +292,9 @@ class DB
 
 			if( ! extension_loaded('mysql') )
 			{ // Still not loaded:
-				$this->print_error( '<p><strong>The PHP MySQL module could not be loaded.</strong></p>
+				$this->print_error( 'The PHP MySQL module could not be loaded.', '
 					<p>You must edit your php configuration (php.ini) and enable this module ('.$mysql_ext_file.').</p>
-					<p>Do not forget to restart your webserver (if necessary) after editing the PHP conf.</p>' );
+					<p>Do not forget to restart your webserver (if necessary) after editing the PHP conf.</p>', false );
 				return;
 			}
 		}
@@ -309,13 +309,13 @@ class DB
 
 		if( ! $this->dbhandle )
 		{
-			$this->print_error( '<p><strong>Error establishing a database connection!</strong></p>
+			$this->print_error( 'Error establishing a database connection!', '
 				<p>('.mysql_error().')</p>
 				<ol>
 					<li>Are you sure you have typed the correct user/password?</li>
 					<li>Are you sure that you have typed the correct hostname?</li>
 					<li>Are you sure that the database server is running?</li>
-				</ol>' );
+				</ol>', false );
 		}
 		elseif( isset($this->dbname) )
 		{
@@ -357,12 +357,12 @@ class DB
 	{
 		if( !@mysql_select_db($db, $this->dbhandle) )
 		{
-			$this->print_error( '<p><strong>Error selecting database ['.$db.']!</strong></p>
+			$this->print_error( 'Error selecting database ['.$db.']!', '
 				<ol>
 					<li>Are you sure the database exists?</li>
 					<li>Are you sure the DB user is allowed to use that database?</li>
 					<li>Are you sure there is a valid database connection?</li>
-				</ol>' );
+				</ol>', false );
 		}
 	}
 
@@ -449,17 +449,22 @@ class DB
 	/**
 	 * Print SQL/DB error.
 	 *
-	 * TODO: bloated: it probably doesn't make sense to display errors if we don't stop. Any use case?
+	 * TODO: fp> bloated: it probably doesn't make sense to display errors if we don't stop. Any use case?
+	 *       dh> Sure. Local testing (and test cases).
+	 *
+	 * @param string Short error (no HTML)
+	 * @param string Extended description/help for the error (for HTML)
+	 * @param string|false Query title; false if {@link DB::last_query} should not get displayed
 	 */
-	function print_error( $str = '', $query_title = '' )
+	function print_error( $title = '', $html_str = '', $query_title = '' )
 	{
 		// All errors go to the global error array $EZSQL_ERROR..
-		global $EZSQL_ERROR;
+		global $EZSQL_ERROR, $is_cli;
 
 		$this->error = true;
 
 		// If no special error string then use mysql default..
-		$this->last_error = empty($str) ? ( '<p>'.mysql_error($this->dbhandle).'(Errno='.mysql_errno($this->dbhandle).')</p>' ) : $str;
+		$this->last_error = empty($title) ? ( mysql_error($this->dbhandle).'(Errno='.mysql_errno($this->dbhandle).')' ) : $title;
 
 		// Log this error to the global array..
 		$EZSQL_ERROR[] = array(
@@ -467,14 +472,32 @@ class DB
 			'error_str'  => $this->last_error
 		);
 
-		$err_msg = '<p class="error">MySQL error!</p>';
-		$err_msg .= '<div>'.$this->last_error.'</div>';
-		if( !empty($this->last_query) )
+		if( ! ( $this->halt_on_error || $this->show_errors ) )
+		{ // no reason to generate a nice message:
+			return;
+		}
+
+		if( $is_cli )
+		{ // Clean error message for command line interface:
+			$err_msg = "MySQL error! {$this->last_error}\n";
+			if( ! empty($this->last_query) && $query_title !== false )
+			{
+				$err_msg .= "Your query: $query_title\n";
+				$err_msg .= $this->format_query( $this->last_query, false );
+			}
+		}
+		else
 		{
-			$err_msg .= '<p class="error">Your query: '.$query_title.'</p>';
-			$err_msg .= '<pre>';
-			$err_msg .= $this->format_query( $this->last_query );
-			$err_msg .= '</pre>';
+			$err_msg = '<p class="error">MySQL error!</p>'."\n";
+			$err_msg .= "<div><p><strong>{$this->last_error}</strong></p>\n";
+			if( !empty($this->last_query) && $query_title !== false )
+			{
+				$err_msg .= '<p class="error">Your query: '.$query_title.'</p>';
+				$err_msg .= '<pre>';
+				$err_msg .= $this->format_query( $this->last_query, ! $is_cli );
+				$err_msg .= '</pre>';
+			}
+			$err_msg .= "</div>\n";
 		}
 
 		if( $this->halt_on_error )
@@ -611,7 +634,7 @@ class DB
 		// If there is an error then take note of it..
 		if( mysql_error($this->dbhandle) )
 		{
-			$this->print_error( '', $title );
+			$this->print_error( '', '', $title );
 			return false;
 		}
 
@@ -817,7 +840,7 @@ class DB
 		// If invalid output type was specified..
 		else
 		{
-			$this->print_error('<p>DB::get_row(string query, output type, int offset) -- Output type must be one of: OBJECT, ARRAY_A, ARRAY_N</p>');
+			$this->print_error('DB::get_row(string query, output type, int offset) -- Output type must be one of: OBJECT, ARRAY_A, ARRAY_N', '', false);
 		}
 	}
 
@@ -1091,17 +1114,36 @@ class DB
 	}
 
 
-	function format_query( $sql )
+	/**
+	 * Format a SQL query
+	 * @static
+	 * @todo dh> Steal the code from phpMyAdmin :)
+	 * @param string SQL
+	 * @param boolean Format with/for HTML?
+	 */
+	function format_query( $sql, $html = true )
 	{
-		$sql = htmlspecialchars( str_replace("\t", '  ', $sql ) );
-		$sql = str_replace( 'FROM', '<br />FROM', $sql );
-		$sql = str_replace( 'WHERE', '<br />WHERE', $sql );
-		$sql = str_replace( 'GROUP BY', '<br />GROUP BY', $sql );
-		$sql = str_replace( 'ORDER BY', '<br />ORDER BY', $sql );
-		$sql = str_replace( 'LIMIT', '<br />LIMIT', $sql );
-		$sql = str_replace( 'AND ', '<br />&nbsp; AND ', $sql );
-		$sql = str_replace( 'OR ', '<br />&nbsp; OR ', $sql );
-		$sql = str_replace( 'VALUES', '<br />VALUES', $sql );
+		$sql = str_replace("\t", '  ', $sql );
+		if( $html )
+		{
+			$sql = htmlspecialchars( $sql );
+			$replace_prefix = "<br />\n";
+		}
+		else
+		{
+			$replace_prefix = "\n";
+		}
+
+		$search = array(
+			'~(FROM|WHERE|GROUP BY|ORDER BY|LIMIT|VALUES)~',
+			'~(AND |OR )~',
+			);
+		$replace = array(
+				$replace_prefix.'$1',
+				$replace_prefix.'&nbsp; $1',
+			);
+		$sql = preg_replace( $search, $replace, $sql );
+
 		return $sql;
 	}
 
@@ -1124,15 +1166,15 @@ class DB
 		$count_queries = 0;
 		$count_rows = 0;
 
-		echo '<strong>DB queries:</strong> '.$this->num_queries.'<br />';
+		echo '<strong>DB queries:</strong> '.$this->num_queries."<br />\n";
 
 		foreach( $this->queries as $query )
 		{
 			$count_queries++;
-			echo '<h4>Query #'.$count_queries.': '.$query['title'].'</h4>';
+			echo '<h4>Query #'.$count_queries.': '.$query['title']."</h4>\n";
 			echo '<code>';
 			echo $this->format_query( $query['sql'] );
-			echo '</code>';
+			echo "</code>\n";
 
 			// Color-Format duration: long => red, fast => green, normal => black
 			if( $query['time'] > $this->query_duration_slow )
@@ -1199,7 +1241,7 @@ class DB
 
 			$count_rows += $query['rows'];
 		}
-		echo '<strong>Total rows:</strong> '.$count_rows.'<br />';
+		echo "\n<strong>Total rows:</strong> $count_rows<br />\n";
 	}
 
 
@@ -1362,6 +1404,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.28  2006/10/28 15:05:25  blueyed
+ * CLI/non-HTML support for print_error() and format_query()
+ *
  * Revision 1.27  2006/10/14 03:05:59  blueyed
  * MFB: fix
  *
