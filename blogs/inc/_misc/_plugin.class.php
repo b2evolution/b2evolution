@@ -1842,12 +1842,19 @@ class Plugin
 	 * To check, if a user already exists in b2evo with that login/password, you might
 	 * want to use <code>user_pass_ok( $login, $pass_md5, true )</code>.
 	 *
+	 * NOTE: if 'pass_hashed' is not empty, you won't receive the password in clear-type. It
+	 *       has been hashed using client-side Javascript.
+	 *       SHA1( MD5($params['pass']).$params['pass_salt'] ) should result in $params['pass_hashed']!
+	 *       If you need the raw password, see {@link LoginAttemptNeedsRawPassword()}.
+	 *
 	 * @see Plugin::AlternateAuthentication()
 	 * @see Plugin::Logout()
 	 * @param array Associative array of parameters
 	 *   - 'login': user's login
 	 *   - 'pass': user's password
 	 *   - 'pass_md5': user's md5 password
+	 *   - 'pass_salt': the salt used in "pass_hashed"
+	 *   - 'pass_hashed': if non-empty this is the users passwords hashed. See note above.
 	 */
 	function LoginAttempt( $params )
 	{
@@ -2736,8 +2743,8 @@ class Plugin
 
 /*
  * $Log$
- * Revision 1.101  2006/10/28 15:00:47  blueyed
- * (Separate) Charset support for Plugin::T_()
+ * Revision 1.102  2006/10/28 15:01:36  blueyed
+ * Documentation
  *
  * Revision 1.100  2006/10/14 16:27:05  blueyed
  * Client-side password hashing in the login form.
