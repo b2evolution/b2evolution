@@ -528,7 +528,7 @@ class Calendar
 			if( (intval(date('d', $calendarfirst)) > 1) && (intval(date('m', $calendarfirst)) == intval($this->month)) )
 			{
 				#pre_dump( 'with offset bug', date('Y-m-d', $calendarfirst) );
-				$calendarfirst = $calendarfirst - 604800;
+				$calendarfirst = $calendarfirst - 604800 /* 1 week */;
 				#pre_dump( 'without offset bug', date('Y-m-d', $calendarfirst) );
 			}
 		}
@@ -718,22 +718,31 @@ class Calendar
 		}
 		else // mode == 'month'
 		{	// Display current month:
-			$newrow = 0;
-			$j = 0;
-			$k = 1;
+			$dow = 0;
+			$last_day = -1;
+			$dom_displayed = 0; // days of month displayed
 
 			for( $i = $calendarfirst; $i <= $calendarlast; $i = $i + 86400 )
-			{ // loop day by day (86400 seconds = 24 hours)
-				if ($newrow == 1)
+			{ // loop day by day (86400 seconds = 24 hours; but not on days where daylight saving changes!)
+				if( $dow == 7 )
 				{ // We need to start a new row:
-					if( $k > $daysinmonth )
+					if( $dom_displayed >= $daysinmonth )
 					{ // Last day already displayed!
 						break;
 					}
 					echo $this->rowend;
 					echo $this->rowstart;
-					$newrow = 0;
+					$dow = 0;
 				}
+				$dow++;
+
+				// correct daylight saving ("last day"+86400 would lead to "last day at 23:00")
+				while( date('j', $i) == $last_day )
+				{
+					$i += 3600;
+				}
+				$last_day = date('j', $i);
+
 
 				if (date('m', $i) != $this->month)
 				{ // empty cell
@@ -743,7 +752,7 @@ class Calendar
 				}
 				else
 				{ // This day is in this month
-					$k = $k + 1;
+					$dom_displayed++;
 					$calendartoday = (date('Ymd',$i) == date('Ymd', (time() + $Settings->get('time_difference'))));
 
 					if( isset($daysinmonthwithposts[ date('j', $i) ]) )
@@ -789,12 +798,6 @@ class Calendar
 						echo '</a>';
 					}
 					echo $this->cellend;
-				}
-				$j = $j + 1;
-				if ($j == 7)
-				{ // This was the last day of week, we need to start a new row:
-					$j = 0;
-					$newrow = 1;
 				}
 			} // loop day by day
 		} // mode == 'month'
@@ -1104,6 +1107,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.30  2006/10/29 14:52:56  blueyed
+ * Fixed bug with daylight saving time, which displayed days twice
+ *
  * Revision 1.29  2006/10/14 19:07:17  blueyed
  * Removed TODO
  *
