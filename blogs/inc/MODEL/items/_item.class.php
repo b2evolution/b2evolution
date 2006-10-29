@@ -1010,7 +1010,6 @@ class Item extends DataObject
 	 *
 	 * @param string Pre-rendered content
 	 * @param string Cache-Key ($format.'/'.$renderers). See {@link Item::get_prerendered_content()} for the appropriate query skeleton.
-	 * @return
 	 */
 	function set_prerendered_content( $content, $cache_key )
 	{
@@ -3364,6 +3363,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.113  2006/10/29 18:33:23  blueyed
+ * doc fix
+ *
  * Revision 1.112  2006/10/23 22:19:02  blueyed
  * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
  *
