@@ -35,5 +35,8 @@ $PHPDOC --title 'b2evolution Technical Documentation (CVS HEAD)' \
 --sourcecode on \
 --readmeinstallchangelog license.txt
 
+# Fix for "duplicated title" - see http://sourceforge.net/tracker/index.php?func=detail&aid=1545418&group_id=11194&atid=111194
+find build/ | xargs grep -l '<div class="ref-title-box">b2evolution technical documentation<h1' | xargs sed -i 's/<div class="ref-title-box">b2evolution technical documentation<h1/<div class="ref-title-box"><h1/'
+
 # Publish it:
 rsync -avt --del build/ doc.b2evolution.net:/var/www/vhosts/evodoc/web/HEAD/

@@ -137,7 +137,10 @@ ul{ margin-left: 0px; padding-left: 8px; vertical-align: top; }
 .toc { margin-left: 2em; padding-left: 0em }
 
 
-.header-menu { float: right; }
+.header-menu {
+	float: right;
+	text-align:right;
+}
 
 .ref-purpose { color: #666; }
 
@@ -163,3 +166,6 @@ div.content {
 	float:right;
 	width:100%;
 }
+
+div.content h1 { padding:0; margin:0; }
+
