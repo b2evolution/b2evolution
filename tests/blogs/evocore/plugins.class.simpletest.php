@@ -73,21 +73,36 @@ class PluginsTestCase extends DbUnitTestCase
 	 */
 	function test_dependencies_api()
 	{
+		global $app_version;
+
 		Mock::generatePartial( 'Plugin', 'PluginTestVersion', array('GetDependencies') );
 
 		// Only major version given (not fulfilled)
 		$test_Plugin = new PluginTestVersion();
-		$test_Plugin->setReturnValue( 'GetDependencies', array( 'requires' => array( 'api_min' => $this->Plugins->api_version[0]+1 ) ) );
+		$test_Plugin->setReturnValue( 'GetDependencies', array( 'requires' => array( 'app_min' => '1000' ) ) );
 		$dep_msgs = $this->Plugins->validate_dependencies( $test_Plugin, 'enable' );
 		$this->assertEqual( array_keys($dep_msgs), array('error') );
 		$this->assertEqual( count($dep_msgs['error']), 1 );
 
+		// Current version given (fulfilled)
+		$test_Plugin = new PluginTestVersion();
+		$test_Plugin->setReturnValue( 'GetDependencies', array( 'requires' => array( 'app_min' => $app_version ) ) );
+		$dep_msgs = $this->Plugins->validate_dependencies( $test_Plugin, 'enable' );
+		$this->assertEqual( array_keys($dep_msgs), array() );
 
 		// Only major version given (fulfilled)
 		$test_Plugin = new PluginTestVersion();
-		$test_Plugin->setReturnValue( 'GetDependencies', array( 'requires' => array( 'api_min' => $this->Plugins->api_version[0] ) ) );
+		$test_Plugin->setReturnValue( 'GetDependencies', array( 'requires' => array( 'app_min' => '0' ) ) );
 		$dep_msgs = $this->Plugins->validate_dependencies( $test_Plugin, 'enable' );
 		$this->assertEqual( array_keys($dep_msgs), array() );
+
+
+		// Obsolete "api_min" (fulfilled)
+		$test_Plugin = new PluginTestVersion();
+		$test_Plugin->setReturnValue( 'GetDependencies', array( 'requires' => array( 'api_min' => array(1, 1)) ) );
+		$dep_msgs = $this->Plugins->validate_dependencies( $test_Plugin, 'enable' );
+		$this->assertEqual( array_keys($dep_msgs), array() );
+
 	}
 
 }

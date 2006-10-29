@@ -56,6 +56,7 @@ class Plugins
 	 */
 
 	/**
+	 * @deprecated since 1.9
 	 * @var array Our API version as (major, minor). A Plugin can request a check against it through {@link Plugin::GetDependencies()}.
 	 */
 	var $api_version = array( 1, 2 );
@@ -652,7 +653,7 @@ class Plugins
 	 * Install a plugin into DB.
 	 *
 	 * @param string Classname of the plugin to install
-	 * @param string Initial DB Status of the plugin ("enbaled", "disabled", "needs_config", "broken")
+	 * @param string Initial DB Status of the plugin ("enabled", "disabled", "needs_config", "broken")
 	 * @param string|NULL Optional classfile path, if not default (used for tests).
 	 * @return string|Plugin The installed Plugin (perhaps with $install_dep_notes set) or a string in case of error.
 	 */
@@ -844,6 +845,7 @@ class Plugins
 	function validate_dependencies( & $Plugin, $mode )
 	{
 		global $DB, $app_name;
+		global $app_version;
 
 		$msgs = array();
 
@@ -1053,29 +1055,33 @@ class Plugins
 						break;
 
 
-					// TODO: "b2evo" (version)!?
-
-
-					case 'api_min':
-						$api_min = $type_params;
-						if( ! is_array($api_min) )
-						{
-							$api_min = array( $api_min, 0 );
-						}
-
-						if( $this->api_version[0] < $api_min[0]  // API's major version too old
-							|| ( $this->api_version[0] == $api_min[0] && $this->api_version[1] < $api_min[1] ) ) // API's minor version too old
+					case 'app_min':
+						// min b2evo version:
+						if( ! version_compare( $app_version, $type_params, '>=' ) )
 						{
 							if( $class == 'recommends' )
 							{
-								$msgs['note'][] = sprintf( T_('The plugin recommends version %s of the plugin API (%s is installed). Think about upgrading your %s installation.'), implode('.', $api_min), implode('.', $this->api_version), $app_name );
+								$msgs['note'][] = sprintf( /* 1: recommened version; 2: application name (default "b2evolution"); 3: current application version */
+									T_('The plugin recommends version %s of %s (%s is installed). Think about upgrading.'), $type_params, $app_name, $app_version );
 							}
 							else
 							{
-								$msgs['error'][] = sprintf( T_('The plugin requires version %s of the plugin API, but %s is installed. You will probably have to upgrade your %s installation.'), implode('.', $api_min), implode('.', $this->api_version), $app_name );
+								$msgs['error'][] = sprintf( /* 1: required version; 2: application name (default "b2evolution"); 3: current application version */
+									T_('The plugin requires version %s of %s, but %s is installed.'), $type_params, $app_name, $app_version );
 							}
 						}
 						break;
+
+
+					case 'api_min':
+						// obsolete since 1.9:
+						continue;
+
+
+					default:
+						// Unknown depency type, throw an error:
+						$msgs['error'][] = sprintf( T_('Unknown dependency type. This probably means that the plugin is not compatible and you have to upgrade your %s installation.'), $type, $app_name );
+
 				}
 			}
 		}
@@ -2991,6 +2997,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.97  2006/10/29 20:07:34  blueyed
+ * Added "app_min" plugin dependency; Deprecated "api_min"
+ *
  * Revision 1.96  2006/10/16 08:39:10  blueyed
  * Merged fixes from v-1-9 branch
  *

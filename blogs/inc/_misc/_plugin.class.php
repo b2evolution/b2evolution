@@ -281,7 +281,6 @@ class Plugin
 	/**
 	 * The translations keyed by locale. They get loaded through include() of _global.php.
 	 * @see Plugin::T_()
-	 * @access protected
 	 * @var array
 	 */
 	var $_trans = array();
@@ -289,13 +288,11 @@ class Plugin
 	/**
 	 * The translation charsets keyed by locale. They get loaded through include() of _global.php.
 	 * @see Plugin::T_()
-	 * @access protected
 	 * @var array
 	 */
 	var $_trans_charsets = array();
 
 	/**
-	 * @access protected
 	 * @var boolean Has the global /locales/_global.php file (where translation for
 	 * all languages can be put into) been loaded?
 	 */
@@ -522,14 +519,14 @@ class Plugin
 	 *
 	 * This gets checked on install or uninstall of a plugin.
 	 *
-	 * There are two classes of dependencies:
+	 * There are two <strong>classes</strong> of dependencies:
 	 *  - 'recommends': This is just a recommendation. If it cannot get fulfilled
 	 *                  there will just be a note added on install.
 	 *  - 'requires': A plugin cannot be installed if the dependencies cannot get
 	 *                fulfilled. Also, a plugin cannot get uninstalled, if another
 	 *                plugin depends on it.
 	 *
-	 * Each class of dependency can have the following types:
+	 * Each <strong>class</strong> of dependency can have the following types:
 	 *  - 'events_by_one': A list of eventlists that have to be provided by a single plugin,
 	 *                     e.g., <code>array( array('CaptchaPayload', 'CaptchaValidated') )</code>
 	 *                     to look for a plugin that provides both events.
@@ -538,14 +535,16 @@ class Plugin
 	 *    classname and minimum version of the plugin (see {@link Plugin::version}).
 	 *    E.g.: <code>array( 'test_plugin', '1' )</code> to require at least version "1"
 	 *          of the test plugin.
+	 *  - 'app_min': Minimum application (b2evo) version, e.g. "1.9".
+	 *               This way you can make sure that the hooks you need are implemented
+	 *               in the core.
+	 *               (Available since b2evo 1.8.3. To make it work before 1.8.2 use
+	 *               "api_min" and check for array(1, 2) (API version of 1.9)).
 	 *  - 'api_min': You can require a specific minimum version of the Plugins API here.
 	 *               If it's just a number, only the major version is checked against.
 	 *               To check also for the minor version, you have to give an array:
 	 *               array( major, minor ).
-	 *               Major versions will mark drastic changes, while minor version
-	 *               increasement just means "new features" (probably hooks).
-	 *               This way you can make sure that the hooks you need are implemented
-	 *               in the core.
+	 *               Obsolete since 1.9! Used API versions: 1.1 (b2evo 1.8.1) and 1.2 (b2evo 1.9).
 	 *
 	 * @see test_plugin::GetDependencies()
 	 * @return array
@@ -2744,6 +2743,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.104  2006/10/29 20:07:34  blueyed
+ * Added "app_min" plugin dependency; Deprecated "api_min"
+ *
  * Revision 1.103  2006/10/28 20:07:01  blueyed
  * Deprecated Plugin::set_param() - no use
  *
