@@ -818,12 +818,17 @@ function convert_charset( $string, $dest_charset, $src_charset )
  */
 function can_convert_charsets( $dest_charset, $src_charset )
 {
+	if( empty($dest_charset) || empty($src_charset) )
+	{
+		return false;
+	}
+
 	if( function_exists('mb_internal_encoding') )
 	{ // mb_string extension:
 		$orig = mb_internal_encoding();
 
 		$r = false;
-		if( mb_internal_encoding($dest_charset) && mb_internal_encoding($src_charset) )
+		if( @mb_internal_encoding($dest_charset) && @mb_internal_encoding($src_charset) )
 		{ // we can set both encodings, so we should be able to convert:
 			$r = true;
 		}
@@ -890,13 +895,13 @@ function init_charsets( $req_io_charset )
 		{ // check if the encodings are supported:
 			// NOTE: mb_internal_encoding() is the best way to find out if the encoding is supported
 			$old_mb_internal_encoding = mb_internal_encoding();
-			if( ! mb_internal_encoding($io_charset) )
+			if( ! @mb_internal_encoding($io_charset) )
 			{
 				$Debuglog->add( 'Cannot I/O convert because I/O charset ['.$io_charset.'] is not supported by mbstring!', array('error','locale') );
 				$evo_charset = $io_charset;
 				mb_internal_encoding($old_mb_internal_encoding);
 			}
-			elseif( ! mb_internal_encoding($evo_charset) )
+			elseif( ! @mb_internal_encoding($evo_charset) )
 			{
 				$Debuglog->add( 'Cannot I/O convert because $evo_charset='.$evo_charset.' is not supported by mbstring!', array('error','locale') );
 				$evo_charset = $io_charset;
@@ -932,6 +937,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.28  2006/10/29 21:20:53  blueyed
+ * Replace special characters in generated URL titles
+ *
  * Revision 1.27  2006/10/24 23:04:05  blueyed
  * Added can_convert_charsets() function
  *

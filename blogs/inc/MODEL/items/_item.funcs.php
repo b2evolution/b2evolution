@@ -45,7 +45,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @todo Use configurable char as seperator (see tracker); replace umlauts
  *
  * @param string url title to validate
- * @param string real title to use as a source if $urltitle is empty
+ * @param string real title to use as a source if $urltitle is empty (encoded in $evo_charset)
  * @param integer ID of post
  * @return string validated url title
  */
@@ -53,13 +53,35 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 															$dbprefix = 'post_', $dbIDname = 'post_ID', $dbtable = 'T_posts' )
 {
 	global $DB;
+	global $evo_charset;
 
 	$urltitle = trim( $urltitle );
 
-	if( empty( $urltitle ) ) $urltitle = $title;
-	if( empty( $urltitle ) ) $urltitle = 'title';
+	if( empty( $urltitle ) )
+	{
+		if( ! empty($title) )
+			$urltitle = $title;
+		else
+			$urltitle = 'title';
+	}
 
 	// echo 'starting with: '.$urltitle.'<br />';
+
+	// Replace special chars/umlauts, if we can convert charsets:
+	if( can_convert_charsets('UTF-8', $evo_charset) && can_convert_charsets('UTF-8', 'ISO-8859-1') /* source */ )
+	{
+		$urltitle = convert_charset( $urltitle, 'UTF-8', $evo_charset );
+
+		// TODO: add more...?!
+		$search = array( 'Ä', 'ä', 'Ö', 'ö', 'Ü', 'ü', 'ß' ); // iso-8859-1
+		$replace = array( 'Ae', 'ae', 'Oe', 'oe', 'Ue', 'ue', 'ss' );
+
+		foreach( $search as $k => $v )
+		{ // convert $search to UTF-8
+			$search[$k] = convert_charset( $v, 'UTF-8', 'ISO-8859-1' );
+		}
+		$urltitle = str_replace( $search, $replace, $urltitle );
+	}
 
 	// Replace HTML entities
 	$urltitle = htmlentities( $urltitle, ENT_NOQUOTES );
@@ -643,6 +665,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.27  2006/10/29 21:20:53  blueyed
+ * Replace special characters in generated URL titles
+ *
  * Revision 1.26  2006/09/26 23:52:06  blueyed
  * Minor things while merging with branches
  *
