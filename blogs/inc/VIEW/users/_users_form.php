@@ -227,7 +227,7 @@ $Form->end_fieldset();
 $Plugins->restart();
 while( $loop_Plugin = & $Plugins->get_next() )
 {
-	$pluginusersettings = $loop_Plugin->GetDefaultUserSettings();
+	$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
 
 	if( empty($pluginusersettings) )
 	{
@@ -281,6 +281,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.24  2006/10/30 19:00:36  blueyed
+ * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
+ *
  * Revision 1.23  2006/08/20 23:14:07  blueyed
  * doc fix
  *

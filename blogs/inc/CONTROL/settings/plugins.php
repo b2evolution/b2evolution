@@ -148,10 +148,10 @@ function _set_setting_by_path( & $Plugin, $path, $init_value = array(), $setting
 		$setting = $Plugin->Settings->get($set_name);
 
 		// meta info for this setting:
-		$defaults = $Plugin->GetDefaultSettings();
+		$defaults = $Plugin->GetDefaultSettings( $tmp_params = array('for_editing'=>true) );
 		if( ! isset($defaults[ $set_name ]) )
 		{
-			debug_die( 'Invalid setting - no meta data!' );
+			debug_die( 'Invalid setting ('.$set_name.') - no meta data!' );
 		}
 
 		$meta = $defaults[ $set_name ];
@@ -450,8 +450,7 @@ switch( $action )
 		}
 
 		$msg = sprintf( T_('Installed plugin &laquo;%s&raquo;.'), $edit_Plugin->classname );
-		if( ($edit_settings_icon = $edit_Plugin->get_edit_settings_link())
-			&& $edit_Plugin->GetDefaultSettings() /* It provides settings apart from default code and priority */ )
+		if( ($edit_settings_icon = $edit_Plugin->get_edit_settings_link()) )
 		{
 			$msg .= ' '.$edit_settings_icon;
 		}

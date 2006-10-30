@@ -238,7 +238,8 @@ class Plugin
 	/**
 	 * If the plugin provides settings, this will become the object to access them.
 	 *
-	 * This gets instantianted in {@link Plugins::instantiate_Settings()}.
+	 * This gets instantianted on Plugin registration for PHP4 and through
+	 * overloading in PHP5+, which means on first access.
 	 *
 	 * @see GetDefaultSettings()
 	 * @var NULL|PluginSettings
@@ -249,7 +250,8 @@ class Plugin
 	/**
 	 * If the plugin provides user settings, this will become the object to access them.
 	 *
-	 * This gets instantianted in {@link Plugins::instantiate_Settings()}.
+	 * This gets instantianted on Plugin registration for PHP4 and through
+	 * overloading in PHP5+, which means on first access.
 	 *
 	 * NOTE: its methods use {@link $current_User::ID} by default, but you may call it
 	 *       if there's no {@link $current_User} instantiated (yet).
@@ -304,7 +306,8 @@ class Plugin
 	/**
 	 * Constructor.
 	 *
-	 * You should not use a constructor with your plugin, but the PluginInit() method instead!
+	 * You should not use a constructor with your plugin, but the
+	 * {@link Plugin::PluginInit()} method instead!
 	 */
 	function Plugin()
 	{
@@ -366,10 +369,13 @@ class Plugin
 	 * defaultvalues), but if you know what you're doing, see
 	 * {@link PluginSettings}, where {@link Plugin::Settings} gets derived from.
 	 *
-	 * NOTE: this method gets called by b2evo when instantiating the plugin, and
-	 *       when the settings get displayed for editing in the backoffice.
-	 *       In the second case, $this->Settings would be true already (from init).
+	 * NOTE: this method gets called by b2evo when instantiating the plugin
+	 *       settings and when the settings get displayed for editing in the backoffice.
+	 *       In the second case, $params['for_editing'] will be true.
 	 *
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::Settings}.
 	 * @return array
 	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
 	 * and assign an array with the following keys to them (only 'label' is required):
@@ -489,7 +495,7 @@ class Plugin
 	 * </code>
 	 *
 	 */
-	function GetDefaultSettings()
+	function GetDefaultSettings( & $params )
 	{
 		return array();
 	}
@@ -502,14 +508,17 @@ class Plugin
 	 * {@link $UserSettings}, e.g.:
 	 * <code>$this->UserSettings->get( 'my_param' );</code>
 	 *
-	 * You probably don't need to set or change values (other than the
-	 * defaultvalues), but if you know what you're doing, see
-	 * {@link PluginUserSettings}, where {@link $UserSettings} gets derived from.
+	 * This method behaves exactly like {@link Plugin::GetDefaultSettings()},
+	 * except that it defines settings specific for users.
+	 *
 	 *
 	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::UserSettings}.
 	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
-	function GetDefaultUserSettings()
+	function GetDefaultUserSettings( & $params )
 	{
 	}
 
@@ -2734,6 +2743,24 @@ class Plugin
 		return action_icon( T_('Edit plugin settings!'), 'edit', $admin_url.'?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$this->ID );
 	}
 
+
+	/**
+	 * PHP5 overloading of get method to lazy-load (User)Settings.
+	 */
+	function __get( $nm )
+	{
+		switch( $nm )
+		{
+			case 'Settings':
+				$this->Plugins->instantiate_Settings( $this, 'Settings' );
+				return $this->Settings;
+
+			case 'UserSettings':
+				$this->Plugins->instantiate_Settings( $this, 'Settings' );
+				return $this->Settings;
+		}
+	}
+
 	/*
 	 * Interface methods }}}
 	 */
@@ -2743,6 +2770,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.105  2006/10/30 19:00:36  blueyed
+ * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
+ *
  * Revision 1.104  2006/10/29 20:07:34  blueyed
  * Added "app_min" plugin dependency; Deprecated "api_min"
  *

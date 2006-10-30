@@ -66,7 +66,7 @@ class generic_ping_plugin extends Plugin
 		$this->name = T_('Generic Ping plugin');
 		$this->short_desc = T_('Use this plugin to add a generic ping service to your installation.');
 
-		if( isset($this->Settings) )
+		if( $params['is_installed'] )
 		{ // is not set for not-installed Plugins
 			$this->ping_service_name = $this->Settings->get('ping_service_name');
 			$this->ping_service_note = $this->Settings->get('ping_service_note');
@@ -199,6 +199,9 @@ class generic_ping_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.3  2006/10/30 19:00:37  blueyed
+ * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
+ *
  * Revision 1.2  2006/10/11 17:21:09  blueyed
  * Fixes
  *

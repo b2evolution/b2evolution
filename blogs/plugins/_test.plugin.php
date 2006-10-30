@@ -88,7 +88,7 @@ class test_plugin extends Plugin
 	 * @see Plugin::PluginSettingsValidateSet()
 	 * @return array
 	 */
-	function GetDefaultSettings()
+	function GetDefaultSettings( & $params )
 	{
 		$r = array(
 			'click_me' => array(
@@ -119,7 +119,7 @@ class test_plugin extends Plugin
 				),
 			);
 
-		if( isset($this->Settings) )
+		if( $params['for_editing'] )
 		{ // we're asked for the settings for editing:
 			if( $this->Settings->get('my_select') == 'mon' )
 			{
@@ -614,6 +614,16 @@ class test_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Do we need a raw password in {@link LoginAttempt()}?
+	 * @see Plugin::LoginAttemptNeedsRawPassword()
+	 */
+	function LoginAttemptNeedsRawPassword()
+	{
+		return true;
+	}
+
+
+	/**
 	 * Automagically login every user as "demouser" who is not logged in and does not
 	 * try to currently.
 	 *
@@ -665,6 +675,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.55  2006/10/30 19:00:37  blueyed
+ * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
+ *
  * Revision 1.54  2006/10/01 15:11:08  blueyed
  * Added DisplayItemAs* equivs to RenderItemAs*; removed DisplayItemAllFormats; clearing of pre-rendered cache, according to plugin event changes
  *

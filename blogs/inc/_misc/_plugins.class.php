@@ -754,9 +754,7 @@ class Plugins
 
 		// Do the stuff that we've skipped in register method at the beginning:
 
-		// Instantiate the Plugins (User)Settings members:
-		$this->instantiate_Settings( $Plugin, 'Settings' );
-		$this->instantiate_Settings( $Plugin, 'UserSettings' );
+		$this->init_settings( $Plugin );
 
 		$tmp_params = array('db_row' => $this->index_ID_rows[$Plugin->ID], 'is_installed' => false);
 
@@ -1259,8 +1257,7 @@ class Plugins
 		if( $Plugin->ID > 0 )
 		{
 			// Instantiate the Plugins (User)Settings members:
-			$this->instantiate_Settings( $Plugin, 'Settings' );
-			$this->instantiate_Settings( $Plugin, 'UserSettings' );
+			$this->init_settings( $Plugin );
 
 			$tmp_params = array( 'db_row' => $this->index_ID_rows[$Plugin->ID], 'is_installed' => true );
 			if( $Plugin->PluginInit( $tmp_params ) === false && ! $this->is_admin_class )
@@ -1575,10 +1572,35 @@ class Plugins
 
 
 	/**
-	 * Instantiate Settings member of class {@link PluginSettings} for the given
-	 * plugin, if it provides default settings (through {@link Plugin::GetDefaultSettings()}).
+	 * Init {@link Plugin::Settings} and {@link Plugin::UserSettings}, either by
+	 * unsetting them for PHP5's overloading or instantiating them for PHP4.
 	 *
 	 * @param Plugin
+	 */
+	function init_settings( & $Plugin )
+	{
+		if( version_compare( PHP_VERSION, '5', '>=' ) )
+		{ // we use overloading for PHP5, therefor the member has to be unset:
+			unset( $Plugin->Settings );
+			unset( $Plugin->UserSettings );
+
+			// Nothing to do here, will get called through Plugin::__get() when accessed
+			return;
+		}
+
+		// PHP4: instantiate now:
+		$this->instantiate_Settings( $Plugin, 'Settings' );
+		$this->instantiate_Settings( $Plugin, 'UserSettings' );
+	}
+
+
+	/**
+	 * Instantiate Settings member of class {@link PluginSettings} for the given
+	 * plugin, if it provides default settings (through {@link Plugin::GetDefaultSettings()}
+	 * and {@link Plugin::GetDefaultUserSettings()}).
+	 *
+	 * @param Plugin
+	 * @param string settings type: "Settings" or "UserSettings"
 	 * @return NULL|boolean NULL, if no Settings
 	 */
 	function instantiate_Settings( & $Plugin, $set_type )
@@ -1587,7 +1609,8 @@ class Plugins
 
 		$Timer->resume( 'plugins_inst_'.$set_type );
 
-		$defaults = $this->call_method( $Plugin->ID, 'GetDefault'.$set_type, $params = array() );
+		// call Plugin::GetDefaultSettings() or Plugin::GetDefaultUserSettings():
+		$defaults = $this->call_method( $Plugin->ID, 'GetDefault'.$set_type, $params = array('for_editing'=>false) );
 
 		if( empty($defaults) )
 		{
@@ -2997,6 +3020,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.98  2006/10/30 19:00:36  blueyed
+ * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
+ *
  * Revision 1.97  2006/10/29 20:07:34  blueyed
  * Added "app_min" plugin dependency; Deprecated "api_min"
  *

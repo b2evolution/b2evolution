@@ -77,7 +77,7 @@ if( $user_profile_only )
 /*
  * Load editable objects and set $action (while checking permissions)
  */
- 
+
 $UserCache = & get_Cache( 'UserCache' );
 $GroupCache = & get_Cache( 'GroupCache' );
 
@@ -390,7 +390,7 @@ if( !$Messages->count('error') )
 			$Plugins->restart();
 			while( $loop_Plugin = & $Plugins->get_next() )
 			{
-				$pluginusersettings = $loop_Plugin->GetDefaultUserSettings();
+				$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
 
 				if( empty($pluginusersettings) )
 				{
@@ -686,6 +686,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.35  2006/10/30 19:00:36  blueyed
+ * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
+ *
  * Revision 1.34  2006/09/09 17:49:53  fplanque
  * minor
  *

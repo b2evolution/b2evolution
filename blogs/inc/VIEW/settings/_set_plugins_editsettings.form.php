@@ -88,7 +88,7 @@ if( $edit_Plugin->Settings )
 
 	$Form->begin_fieldset( T_('Plugin settings'), array( 'class' => 'clear' ) );
 
-	foreach( $edit_Plugin->GetDefaultSettings() as $l_name => $l_meta )
+	foreach( $edit_Plugin->GetDefaultSettings( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
 	{
 		display_settings_fieldset_field( $l_name, $l_meta, $edit_Plugin, $Form, 'Settings' );
 	}
@@ -177,6 +177,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.23  2006/10/30 19:00:36  blueyed
+ * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
+ *
  * Revision 1.22  2006/10/17 18:36:47  blueyed
  * Priorize NULL for plug_name/plug_shortdesc (localization); minor fixes in this area
  *
