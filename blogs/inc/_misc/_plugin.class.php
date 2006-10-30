@@ -528,14 +528,14 @@ class Plugin
 	 *
 	 * This gets checked on install or uninstall of a plugin.
 	 *
-	 * There are two <strong>classes</strong> of dependencies:
+	 * There are two <b>classes</b> of dependencies:
 	 *  - 'recommends': This is just a recommendation. If it cannot get fulfilled
 	 *                  there will just be a note added on install.
 	 *  - 'requires': A plugin cannot be installed if the dependencies cannot get
 	 *                fulfilled. Also, a plugin cannot get uninstalled, if another
 	 *                plugin depends on it.
 	 *
-	 * Each <strong>class</strong> of dependency can have the following types:
+	 * Each <b>class</b> of dependency can have the following types:
 	 *  - 'events_by_one': A list of eventlists that have to be provided by a single plugin,
 	 *                     e.g., <code>array( array('CaptchaPayload', 'CaptchaValidated') )</code>
 	 *                     to look for a plugin that provides both events.
@@ -2770,6 +2770,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.106  2006/10/30 19:53:27  blueyed
+ * doc fix
+ *
  * Revision 1.105  2006/10/30 19:00:36  blueyed
  * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
  *
