@@ -30,6 +30,8 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
+header( 'Content-Type: text/html; charset='.$io_charset );
+
 // statuses allowed for acting on:
 // fp> rem 06/09/06 $show_statuses = array( 'published', 'protected', 'private' );
 
@@ -183,15 +185,42 @@ $Plugins->trigger_event('BeforeCommentFormInsert', array(
 
 
 /*
- * Error messages:
+ * Display error messages:
  */
 if( $Messages->count('error') )
 {
+	if( ! isset($page_title) )
+	{
+		$page_title = T_('Errors during processing your comment');
+	}
+	?>
+	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
+	<head>
+		<title><?php echo $app_shortname.$admin_path_seprator.$page_title ?></title>
+		<meta name="ROBOTS" content="NOINDEX" />
+		<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset ?>" />
+		<?php
+		// Insert HEAD lines, which have been defined before:
+		// dh> TODO: currently this may be affected by register_globals=ON
+		// dh> TODO: fp, is this ok? It should maybe be a func and available everywhere we output <HEAD> tags..?
+		if( isset($evo_html_headlines) ) foreach( $evo_html_headlines as $v )
+		{
+			echo $v;
+		}
+		?>
+	</head>
+	<body>
+	<?php
 	$Messages->display( T_('Cannot post comment, please correct these errors:'),
 	'[<a href="javascript:history.go(-1)">'. T_('Back to comment editing') . '</a>]' );
 
 	debug_info();  // output debug info, useful to see what a plugin might have done
-	exit(); // TODO: nicer displaying here (but do NOT die or debug_die because this is not a BUG/user hack, it's a plain user input error - any bozo can produce it)
+	?>
+	</body>
+	</html>
+	<?php
+	exit();
 }
 
 if( $action == 'preview' )
@@ -293,9 +322,9 @@ if( $Comment->ID )
 		$Messages->add( T_('Your comment has been submitted. It will appear once it has been approved.'), 'success' );
 	}
 }
-
 // Set Messages into user's session, so they get restored on the next page (after redirect):
 $Session->set( 'Messages', $Messages );
+
 
 header_nocache();
 header_redirect();
@@ -303,6 +332,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.89  2006/10/30 13:48:56  blueyed
+ * Fixed charset/HTML for comment-post page (errors)
+ *
  * Revision 1.88  2006/09/11 19:35:34  fplanque
  * minor
  *
