@@ -81,7 +81,7 @@ function skin_content_meta( $type = 'text/html' )
 
 	if( ! empty($generating_static) )
 	{	// We use this method when we ARE generating a static page
-		echo '<meta http-equiv="Content-Type" content="'.$type.'; charset='.$io_charset.'">';
+		echo '<meta http-equiv="Content-Type" content="'.$type.'; charset='.$io_charset.'" />';
 	}
 }
 
@@ -273,6 +273,9 @@ function skin_change_url( $display = true )
 
 /*
  * $Log$
+ * Revision 1.11  2006/10/30 12:57:33  blueyed
+ * Fix for XHTML
+ *
  * Revision 1.10  2006/10/08 22:59:31  blueyed
  * Added GetProvidedSkins and DisplaySkin hooks. Allow for optimization in Plugins::trigger_event_first_return()
  *
