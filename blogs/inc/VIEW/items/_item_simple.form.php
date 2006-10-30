@@ -79,7 +79,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 
 // Fields used in "advanced" form, but not here:
-$Form->hidden( 'post_locale', param('post_locale', 'string', '') );
+$Form->hidden( 'post_locale', param('post_locale', 'string', $current_User->locale) );
 $Form->hidden( 'item_typ_ID', param('item_typ_ID', 'integer', NULL) );
 $Form->hidden( 'post_url', param('post_url', 'string', '') );
 $Form->hidden( 'post_urltitle', param('post_urltitle', 'string', '') );
@@ -278,6 +278,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.15  2006/10/30 13:03:37  blueyed
+ * Default to current User's locale in simple form.
+ *
  * Revision 1.14  2006/09/11 22:23:04  blueyed
  * (Re-)enabled AdminDisplayEditorButton for "simple" edit_layout, after adding appropriate doc.
  *
