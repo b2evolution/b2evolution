@@ -107,7 +107,7 @@ class ItemList2 extends DataObjectList2
 			$cache_name = 'ItemCache',	 // name of cache to be used
 			$param_prefix = '',
 			$filterset_name = '',				// Name to be used when saving the filterset (leave empty to use default for collection)
-			$restrict_to = array()			// Restrict the item list to a position, or contact, firm.....
+			$restrict_to = array()			// Restrict the item list to a position, or contact, firm..... /* not used yet(?) */
 		)
 	{
 		global $Settings;
@@ -581,7 +581,8 @@ class ItemList2 extends DataObjectList2
 		}
 
 
-		param_date( 'item_issue_date', T_('Please enter a valid issue date.'), false );
+		// Get issue date, using the user's locale (because it's entered like this in the form):
+		param_date( 'item_issue_date', T_('Please enter a valid issue date.'), false, '', locale_datefmt($current_User->locale) );
 		if( strlen(get_param('item_issue_date')) )
 		{ // only set it, if a date was given:
 			param_time( 'item_issue_time' );
@@ -1639,6 +1640,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.34  2006/10/31 00:33:26  blueyed
+ * Fixed item_issue_date for preview
+ *
  * Revision 1.33  2006/10/10 17:09:39  blueyed
  * doc
  *

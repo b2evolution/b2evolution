@@ -386,12 +386,20 @@ function locale_charset( $disp = true )
 
 /**
  * Returns the current locale's default date format
+ * @param string Locale, must be set in {@link $locales}
+ * @return string Date format of the locale, e.g. 'd.m.Y'
  */
-function locale_datefmt()
+function locale_datefmt( $locale = NULL )
 {
-	global $locales, $current_locale;
+	global $locales;
 
-	return $locales[$current_locale]['datefmt'];
+	if( empty($locale) )
+	{
+		global $current_locale;
+		$locale = $current_locale;
+	}
+
+	return $locales[$locale]['datefmt'];
 }
 
 
@@ -937,6 +945,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.29  2006/10/31 00:33:26  blueyed
+ * Fixed item_issue_date for preview
+ *
  * Revision 1.28  2006/10/29 21:20:53  blueyed
  * Replace special characters in generated URL titles
  *
