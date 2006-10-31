@@ -1354,7 +1354,8 @@ function bad_request_die( $additional_info = '' )
 /**
  * Outputs debug info, according to {@link $debug} or $force param. This gets called typically at the end of the page.
  *
- * @param boolean true to force output
+ * @todo dh> add get_debug_info() which returns and supports non-html format (for debug_die())
+ * @param boolean true to force output regardless of {@link $debug}
  */
 function debug_info( $force = false )
 {
@@ -1932,7 +1933,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 
 /**
- * @param string date
+ * @param string date (YYYY-MM-DD)
  * @param string time
  */
 function form_date( $date, $time = '' )
@@ -2620,6 +2621,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.129  2006/10/31 00:32:57  blueyed
+ * doc
+ *
  * Revision 1.128  2006/10/26 20:23:00  blueyed
  * Handle invalid URLs gracefully in url_rel_to_same_host()
  *
