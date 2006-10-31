@@ -1249,6 +1249,25 @@ function debug_die( $additional_info = '' )
 	// This should help preventing indexing robots from indexing the error :P
 	if( ! headers_sent() )
 	{
+		// It's likely that charset info has not been sent yet, so do it:
+		$contenttype_sent = NULL;
+		if( function_exists('headers_list') )
+		{ // PHP 5
+			foreach( headers_list() as $v )
+			{
+				if( stripos($v, 'Content-Type') !== false )
+				{
+					$contenttype_sent = true;
+					break;
+				}
+			}
+		}
+		if( ! $contenttype_sent )
+		{ // Send it for PHP4 always and for PHP5 if not already done so:
+			global $io_charset;
+			header( 'Content-type: text/html; charset='.$io_charset );
+		}
+
 		header('HTTP/1.0 500 Internal Server Error');
 	}
 
@@ -2621,6 +2640,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.130  2006/10/31 01:17:56  blueyed
+ * Send contenttype/CHARSET in debug_die() if not done so before
+ *
  * Revision 1.129  2006/10/31 00:32:57  blueyed
  * doc
  *
