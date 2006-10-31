@@ -544,6 +544,8 @@ to
 
 
 	case 'cafelogupgrade':
+		// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
+		$Plugins = new Plugins_no_DB();
 		/*
 		 * -----------------------------------------------------------------------------------
 		 * UPGRADE FROM B2 : Create a new db structure + copy content from previous b2
@@ -639,6 +641,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.117  2006/10/31 04:44:00  blueyed
+ * Fixed cafelogupgrade
+ *
  * Revision 1.116  2006/10/27 20:11:24  blueyed
  * TODO
  *
