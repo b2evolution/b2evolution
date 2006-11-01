@@ -1293,10 +1293,19 @@ class Plugins
 					if( empty($db_deltas) )
 					{ // No DB changes needed, update (bump or decrease) the version
 						global $DB;
+
 						$DB->query( '
 								UPDATE T_plugins
 								   SET plug_version = '.$DB->quote($Plugin->version).'
 								 WHERE plug_ID = '.$Plugin->ID );
+
+						// Remove any prerenderered content for the Plugins renderer code:
+						if( ! empty($Plugin->code) )
+						{
+							$DB->query( '
+									DELETE FROM T_item__prerendering
+									 WHERE itpr_renderers REGEXP "^(.*\.)?'.$DB->escape($Plugin->code).'(\..*)?$"' );
+						}
 
 						// Detect new events (and delete obsolete ones - in case of downgrade):
 						if( $this->save_events( $Plugin, array() ) )
@@ -3023,6 +3032,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.100  2006/11/01 14:59:27  blueyed
+ * Handle obsoleting pre-rendered item content, if a renderer plugin version changes
+ *
  * Revision 1.99  2006/11/01 14:22:33  blueyed
  * Fixed E_NOTICE/doc
  *

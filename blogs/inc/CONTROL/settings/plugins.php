@@ -350,6 +350,8 @@ switch( $action )
 		$enable_return = $edit_Plugin->BeforeEnable();
 		if( $enable_return === true )
 		{
+			// NOTE: we don't need to handle plug_version here, because it gets handled in Plugins::register() already.
+
 			// Detect new events:
 			$admin_Plugins->save_events( $edit_Plugin, array() );
 
@@ -378,6 +380,8 @@ switch( $action )
 		$changed = false;
 		while( $loop_Plugin = & $admin_Plugins->get_next() )
 		{
+			// NOTE: we don't need to handle plug_version here, because it gets handled in Plugins::register() already.
+
 			// Discover new events:
 			if( $admin_Plugins->save_events( $loop_Plugin, array() ) )
 			{
