@@ -2756,7 +2756,7 @@ class Plugin
 				return isset($this->Settings) ? $this->Settings : NULL;
 
 			case 'UserSettings':
-				$this->Plugins->instantiate_Settings( $this, 'Settings' );
+				$this->Plugins->instantiate_Settings( $this, 'UserSettings' );
 				return isset($this->UserSettings) ? $this->UserSettings : NULL;
 		}
 	}
@@ -2770,7 +2770,7 @@ class Plugin
 
 /*
  * $Log$
- * Revision 1.107  2006/11/01 23:14:33  blueyed
+ * Revision 1.108  2006/11/01 23:18:58  blueyed
  * Fixed __get()
  *
  * Revision 1.106  2006/10/30 19:53:27  blueyed
