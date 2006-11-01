@@ -105,7 +105,6 @@ if( empty($tab) )
 	// TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
 	if( $current_User->check_perm('options', 'edit') )
 	{ // default admin actions:
-
 		?>
 
 		<div class="panelblock">
