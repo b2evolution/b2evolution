@@ -78,13 +78,6 @@ switch($action)
 		$AdminUI->title = T_('Adding new post...');
 
 
-		// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-		$AdminUI->disp_html_head();
-
-		// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-		$AdminUI->disp_body_top();
-
-
 		// CREATE NEW POST:
 		$edited_Item = & new Item();
 
@@ -95,6 +88,16 @@ switch($action)
 
 		// Set object params:
 		$edited_Item->load_from_Request();
+
+		// For the "Exit to blogs..." link:
+		$Blog = $edited_Item->get_Blog();
+
+		// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+		$AdminUI->disp_html_head();
+
+		// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+		$AdminUI->disp_body_top();
+
 
 		// TODO: fp> Add a radio into blog settings > Features > Post title: () required () optional () none
 		//       dh> there's no "Features" tab in "Blog settings"?!
@@ -183,6 +186,15 @@ switch($action)
 		$location = url_add_param( $admin_url, 'ctrl=browse&amp;blog='.$blog.'&amp;filter=restore' );
 		$AdminUI->title = T_('Updating post...');
 
+		// GET POST:
+		param( 'post_ID', 'integer', true );
+		$ItemCache = & get_Cache( 'ItemCache' );
+		$edited_Item = & $ItemCache->get_by_ID( $post_ID );
+
+
+		// For the "Exit to blogs..." link:
+		$Blog = $edited_Item->get_Blog();
+
 		// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 		$AdminUI->disp_html_head();
 
@@ -191,10 +203,6 @@ switch($action)
 
 
 		// UPDATE POST:
-		param( 'post_ID', 'integer', true );
-		$ItemCache = & get_Cache( 'ItemCache' );
-		$edited_Item = & $ItemCache->get_by_ID( $post_ID );
-
 		// Set the params we already got:
 		$edited_Item->set( 'status', $post_status );
 		$edited_Item->set( 'main_cat_ID', $post_category );
@@ -266,6 +274,9 @@ switch($action)
 
 		$AdminUI->title = T_('Updating post status...');
 
+		// For the "Exit to blogs..." link:
+		$Blog = $edited_Item->get_Blog();
+
 		// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 		$AdminUI->disp_html_head();
 
@@ -315,6 +326,8 @@ switch($action)
 
 		$AdminUI->title = T_('Updating post status...');
 
+		// For the "Exit to blogs..." link:
+		$Blog = $edited_Item->get_Blog();
 
 		// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 		$AdminUI->disp_html_head();
@@ -349,14 +362,6 @@ switch($action)
 		 * --------------------------------------------------------------------
 		 * DELETE a post from db
 		 */
-		$AdminUI->title = T_('Deleting post...');
-
-		// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-		$AdminUI->disp_html_head();
-
-		// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-		$AdminUI->disp_body_top();
-
 		param( 'post', 'integer' );
 		$ItemCache = & get_Cache( 'ItemCache' );
 		if( ! ($edited_Item = & $ItemCache->get_by_ID( $post, false ) ) )
@@ -366,6 +371,17 @@ switch($action)
 		}
 		$blog = $edited_Item->blog_ID;
 		$location = url_add_param( $admin_url, 'ctrl=browse&amp;blog='.$blog.'&amp;filter=restore' );
+
+		$AdminUI->title = T_('Deleting post...');
+
+		// For the "Exit to blogs..." link:
+		$Blog = $edited_Item->get_Blog();
+
+		// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+		$AdminUI->disp_html_head();
+
+		// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+		$AdminUI->disp_body_top();
 
 		// Check permission:
 		$current_User->check_perm( 'blog_del_post', '', true, $blog );
@@ -545,6 +561,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.30  2006/11/01 04:24:10  blueyed
+ * MFB: Fixed "Exit to blogs" link by defining the global $Blog for edit action
+ *
  * Revision 1.29  2006/09/16 18:59:41  blueyed
  * QUESTION
  *
