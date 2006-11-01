@@ -1882,18 +1882,21 @@ class Plugins
 			$r = $this->call_method( $l_plugin_ID, $event, $params );
 			if( isset($r) )
 			{
-				foreach( $search as $k => $v )
-				{ // Check search criterias and continue if it does not match:
-					switch( $k )
-					{
-						case 'in_array':
-							if( ! in_array( $v, $r ) )
-							{
-								continue 3; // continue in main foreach loop
-							}
-							break;
-						default:
-							debug_die('Invalid search criteria in Plugins::trigger_event_first_return / '.$k);
+				if( isset($search) )
+				{ // Apply $search:
+					foreach( $search as $k => $v )
+					{ // Check search criterias and continue if it does not match:
+						switch( $k )
+						{
+							case 'in_array':
+								if( ! in_array( $v, $r ) )
+								{
+									continue 3; // continue in main foreach loop
+								}
+								break;
+							default:
+								debug_die('Invalid search criteria in Plugins::trigger_event_first_return / '.$k);
+						}
 					}
 				}
 				$Debuglog->add( 'Plugin ID '.$l_plugin_ID.' returned '.( $r ? 'true' : 'false' ).'!', 'plugins' );
@@ -2157,7 +2160,7 @@ class Plugins
 	 * Validate renderer list.
 	 *
 	 * @param array renderer codes ('default' will include all "opt-out"-ones)
-	 * @return array validated array
+	 * @return array validated array of renderer codes
 	 */
 	function validate_list( $renderers = array('default') )
 	{
@@ -3020,6 +3023,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.99  2006/11/01 14:22:33  blueyed
+ * Fixed E_NOTICE/doc
+ *
  * Revision 1.98  2006/10/30 19:00:36  blueyed
  * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
  *
