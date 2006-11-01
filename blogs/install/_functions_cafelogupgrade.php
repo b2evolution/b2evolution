@@ -11,6 +11,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
+ * Upgrade from cagelog/b2 tables.
+ *
+ * @return boolean|NULL true on success
  */
 function upgrade_cafelog_tables()
 {
@@ -94,7 +97,9 @@ function upgrade_cafelog_tables()
 	echo "OK.<br />\n";
 
 	echo 'Copying Cafelog categories... ';
-	$query = "INSERT INTO T_categories( cat_ID, cat_parent_ID, cat_name, cat_blog_ID ) SELECT DISTINCT cat_ID, NULL, cat_name, 2 FROM $oldtablecategories";
+	// TODO: use function for cat_urlname (see _functions_evoupgrade.php)
+	$query = "INSERT INTO T_categories( cat_ID, cat_parent_ID, cat_name, cat_urlname, cat_blog_ID )
+			SELECT DISTINCT cat_ID, NULL, cat_name, CONCAT('c', cat_ID), 2 FROM $oldtablecategories";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
@@ -149,13 +154,17 @@ function upgrade_cafelog_tables()
 
 
   // Cleanup extra quotes in comments:
-  cleanup_post_quotes();
+  cleanup_post_quotes('post_ID');
 	cleanup_comment_quotes();
 
+	return true;
 }
 
 /*
  * $Log$
+ * Revision 1.43  2006/11/01 00:24:07  blueyed
+ * Fixed cafelog upgrade
+ *
  * Revision 1.42  2006/08/21 16:07:44  fplanque
  * refactoring
  *

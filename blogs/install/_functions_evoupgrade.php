@@ -659,7 +659,7 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8062 )
 	{ // upgrade to 0.9.0.4
-		cleanup_post_quotes();
+		cleanup_post_quotes('ID');
 
 		set_upgrade_checkpoint( '8062' );
 	}
@@ -1430,6 +1430,8 @@ function upgrade_b2evo_tables()
 		$DB->query( '
 			ALTER TABLE T_categories
 				ADD COLUMN cat_urlname VARCHAR(255) NOT NULL' );
+
+		// TODO: dh> "cID" is not that readable, is it? Should use a function instead. Also use it for cafelog upgrade then.
 		$DB->query( '
       UPDATE T_categories
          SET cat_urlname = CONCAT( "c" , cat_ID )' );
@@ -1561,6 +1563,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.186  2006/11/01 00:24:07  blueyed
+ * Fixed cafelog upgrade
+ *
  * Revision 1.185  2006/10/14 21:11:48  blueyed
  * Actually insert the transformed/generated ping plugins setting(s).
  *

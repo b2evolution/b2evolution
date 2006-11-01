@@ -46,12 +46,12 @@ function check_db_version()
 /**
  * Clean up extra quotes in posts
  */
-function cleanup_post_quotes()
+function cleanup_post_quotes( $col_ID = 'ID' )
 {
   global $DB;
 
 	echo "Checking for extra quote escaping in posts... ";
-	$query = "SELECT ID, post_title, post_content
+	$query = "SELECT $col_ID, post_title, post_content
 							FROM T_posts
 						 WHERE post_title LIKE '%\\\\\\\\\'%'
 						 		OR post_title LIKE '%\\\\\\\\\"%'
@@ -70,7 +70,7 @@ function cleanup_post_quotes()
 			$query = "UPDATE T_posts
 								SET post_title = ".$DB->quote( stripslashes( $row['post_title'] ) ).",
 										post_content = ".$DB->quote( stripslashes( $row['post_content'] ) )."
-								WHERE ID = ".$row['ID'];
+								WHERE $col_ID = ".$row[$col_ID];
 			// echo '<br />'.$query;
 			$DB->query( $query );
 		}
@@ -127,6 +127,9 @@ function install_validate_requirements()
 
 /*
  * $Log$
+ * Revision 1.16  2006/11/01 00:24:07  blueyed
+ * Fixed cafelog upgrade
+ *
  * Revision 1.15  2006/09/08 15:35:36  blueyed
  * Completely nuked tokenizer dependency - removed commented out block
  *
