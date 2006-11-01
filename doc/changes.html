@@ -50,7 +50,10 @@
 		<li>Different modes of hitlog/session pruning: per page, as cron job or "off" (fplanque, blueyed)</li>
 		<li>Enhanced form abortion detection javascript (fplanque)</li>
 		<li>Enhanced result tables (progidistri, fplanque, blueyed) </li>
-		<li>Caching of pre-rendered item content (blueyed)</li>
+		<li>Caching of pre-rendered item content. This keeps the content pre-rendered in the database
+		    and improves performance. Obsoleting the cache data should get done automatically, e.g. if
+		    a plugin gets updated. But just in case there's also a "Delete item cache" action in the "Tools"
+		    section to do this. (blueyed)</li>
 		<li>mailto:-links and relative links are valid again are get converted to absolute ones in feeds (blueyed)</li>
 		<li>Ping services implemented as plugins. Plugins for b2evolution.net and Pingomatic (handles more than 15 services) are included, plus a "Generic ping plugin" which can be used for common RPC ping services. (blueyed)</li>
 		<li>Plugins

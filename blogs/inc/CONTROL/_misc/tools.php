@@ -58,6 +58,26 @@ if( ! empty($tab) )
 
 $AdminUI->append_path_level( $tab );
 
+
+if( empty($tab) )
+{ // "Default tab" actions:
+	param( 'action', 'string', '' );
+
+	switch( $action )
+	{
+		case 'del_itemprecache':
+			// TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
+			$current_User->check_perm('options', 'edit', true);
+
+			$DB->query('DELETE FROM T_item__prerendering WHERE 1');
+
+			$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
+
+			break;
+	}
+}
+
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -80,6 +100,26 @@ if( empty($tab) )
 		$Plugins->call_method_if_active( $loop_Plugin->ID, 'AdminToolPayload', $params = array() );
 		echo '</div>';
 	}
+
+
+	// TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
+	if( $current_User->check_perm('options', 'edit') )
+	{ // default admin actions:
+
+		?>
+
+		<div class="panelblock">
+			<h2><?php echo T_('Items') ?></h2>
+			<ul>
+				<li><a href="<?php echo regenerate_url('action', 'action=del_itemprecache') ?>"><?php echo T_('Delete pre-renderered item cache.') ?></a></li>
+			</ul>
+		</div>
+
+		<?php
+	}
+
+
+	// MT import. Left here, so the page is never empty.. :/
 	?>
 
 	<div class="panelblock">
