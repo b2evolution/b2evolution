@@ -1014,14 +1014,38 @@ function balanceTags($text)
  */
 function pre_dump( $var__var__var__var__ )
 {
+	global $is_cli;
+
 	#echo 'pre_dump(): '.debug_get_backtrace(); // see where a pre_dump() comes from
 
-	echo "\n<pre style=\"padding:1ex;border:1px solid #00f;\">\n";
 	$func_num_args = func_num_args();
 	$count = 0;
+
+	if( ! empty($is_cli) )
+	{ // CLI, no encoding of special chars:
+		$count = 0;
+		foreach( func_get_args() as $lvar )
+		{
+			var_dump($lvar);
+
+			$count++;
+			if( $count < $func_num_args )
+			{ // Put newline between arguments
+				echo "\n";
+			}
+		}
+
+		return;
+	}
+
+	echo "\n<pre style=\"padding:1ex;border:1px solid #00f;\">\n";
 	foreach( func_get_args() as $lvar )
 	{
+		ob_start();
 		var_dump($lvar); // includes "\n"; do not use var_export() because it does not detect recursion by design
+		$buffer = ob_get_contents();
+		ob_end_clean();
+		echo htmlspecialchars($buffer);
 
 		$count++;
 		if( $count < $func_num_args )
@@ -2640,6 +2664,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.131  2006/11/01 19:04:35  blueyed
+ * re-added htmlspecialchars() to pre_dump() and made it CLI aware
+ *
  * Revision 1.130  2006/10/31 01:17:56  blueyed
  * Send contenttype/CHARSET in debug_die() if not done so before
  *
