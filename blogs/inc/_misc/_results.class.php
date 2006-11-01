@@ -96,12 +96,14 @@ class Results extends Widget
 	var $page_ID_array;
 
 	/**
-	 * Current object idx in $rows array:
+	 * Current object idx in $rows array
+	 * @var integer
 	 */
 	var $current_idx = 0;
 
 	/**
 	 * idx relative to whole list (range: 0 to total_rows-1)
+	 * @var integer
 	 */
 	var $global_idx;
 
@@ -120,6 +122,8 @@ class Results extends Widget
 	 * Cache to use to instantiate an object and cache it for each line of results.
 	 *
 	 * For this to work, all columns of the related table must be selected in the query
+	 *
+	 * @var DataObjectCache
 	 */
 	var $Cache;
 
@@ -238,7 +242,8 @@ class Results extends Widget
 	 *
 	 *
 	 * @todo we might not want to count total rows when not needed...
-	 * @todo fplanque: I am seriously considering putting $count_sqlinto 2nd or 3rd position. Any prefs?
+	 * @todo fplanque: I am seriously considering putting $count_sql into 2nd or 3rd position. Any prefs?
+	 * @todo dh> We might just use "SELECT SQL_CALC_FOUND_ROWS ..." and "FOUND_ROWS()"..! - available since MySQL 4 - would save one query just for counting!
 	 *
 	 * @param string SQL query
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
@@ -246,6 +251,7 @@ class Results extends Widget
 	 *               example: -A-- will sort in ascending order on 2nd column
 	 *               example: ---D will sort in descending order on 4th column
 	 * @param integer number of lines displayed on one page (NULL to disable paging)
+	 * @param string SQL to get the total count of results
 	 * @param boolean
 	 * @param NULL|string SQL query used to count the total # of rows (if NULL, we'll try to COUNT(*) by ourselves)
 	 */
@@ -2188,6 +2194,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.32  2006/11/01 12:20:24  blueyed
+ * doc/todo
+ *
  * Revision 1.31  2006/10/06 20:52:23  blueyed
  * Small fix, doc todo
  *
