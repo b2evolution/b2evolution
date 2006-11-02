@@ -2,12 +2,17 @@
 /**
  * Tests for upgrading from older b2evo versions to the current version (this one).
  * @package tests
+ * @todo Rename to upgrade.simpletest.php (SVN keep history.. *hint*)
  */
 
 /**
  * SimpleTest config
  */
 require_once dirname(__FILE__).'/../config.simpletest.php';
+
+global $conf_path;
+
+require_once $conf_path.'_upgrade.php';
 
 
 /**
@@ -103,6 +108,41 @@ class UpgradeToCurrentTestCase extends InstallUnitTestCase
 		$this->test_DB->query( 'SET sql_mode = "TRADITIONAL"' );
 		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 1.8 in strict mode successful!' );
 	}
+
+
+	/**
+	 * Test upgrade from cafelog
+	 */
+	function testUpgradeFromCafelog()
+	{
+		global $basepath, $install_subdir;
+
+		require_once $basepath.$install_subdir.'_functions_cafelogupgrade.php';
+
+		$this->executeQueriesFromFile( TESTSDIR.'install/sql/cafelog.sql' );
+		create_b2evo_tables();
+		$this->assertTrue( upgrade_cafelog_tables(), 'Upgrade from Cafelog successful!' );
+		install_basic_plugins();
+	}
+
+
+	/**
+	 * Test upgrade from cafelog (strict mode))
+	 */
+	function testUpgradeFromCafelog_strict()
+	{
+		global $basepath, $install_subdir;
+
+		require_once $basepath.$install_subdir.'_functions_cafelogupgrade.php';
+
+		$this->executeQueriesFromFile( TESTSDIR.'install/sql/cafelog.sql' );
+
+		$this->test_DB->query( 'SET sql_mode = "TRADITIONAL"' );
+		create_b2evo_tables();
+		$this->assertTrue( upgrade_cafelog_tables(), 'Upgrade from Cafelog successful!' );
+		install_basic_plugins();
+	}
+
 }
 
 

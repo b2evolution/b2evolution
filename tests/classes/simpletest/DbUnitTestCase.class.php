@@ -111,6 +111,10 @@ class DbUnitTestCase extends EvoUnitTestCase
 		{
 			$testDbTables = array_merge( $testDbTables, $test_tables );
 		}
+		if( $test_tables = $this->test_DB->get_col( 'SHOW TABLES LIKE "b2%"' ) )
+		{
+			$testDbTables = array_merge( $testDbTables, $test_tables );
+		}
 
 		$old_fk_check = $this->test_DB->get_var( 'SELECT @@FOREIGN_KEY_CHECKS' );
 		$this->test_DB->query( 'SET FOREIGN_KEY_CHECKS = 0;' );

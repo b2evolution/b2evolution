@@ -10,6 +10,10 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+// Define as global, when included in non-global context (tests):
+global $oldtableposts, $oldtableusers, $oldtablesettings, $oldtablecategories, $oldtablecomments;
+global $fileupload_allowedtypes, $fileupload_maxk, $stats_autoprune;
+
 
 /**#@+
  * Old b2 tables used exclusively by the cafelog upgrade mode of the install script.
