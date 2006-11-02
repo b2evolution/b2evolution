@@ -519,7 +519,7 @@ class ArchiveList extends Results
 		// See http://forums.b2evolution.net/viewtopic.php?p=42529#42529
 		if( in_array($this->archive_mode, array('monthly', 'daily', 'weekly')) )
 		{
-			$sql_version = $DB->get_var('SELECT VERSION()');
+			$sql_version = $DB->get_var('SELECT VERSION()'); // fp> TODO: $DB->get_mysql_version()
 			if( version_compare($sql_version, '4', '>') )
 			{
 				$sql = 'SELECT SQL_CALC_FOUND_ROWS '.substr( $sql, 7 ); // "SQL_CALC_FOUND_ROWS" available since MySQL 4
@@ -647,6 +647,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.32  2006/11/02 19:49:22  fplanque
+ * no message
+ *
  * Revision 1.31  2006/10/26 19:04:07  blueyed
  * Make the SQL fix work..
  *
