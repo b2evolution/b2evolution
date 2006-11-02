@@ -3175,7 +3175,8 @@ class Item extends DataObject
 		$this->load_Blog();
 		$ping_plugins = array_unique(explode(',', $this->Blog->get_setting('ping_plugins')));
 
-		if( preg_match( '#^http://localhost[/:]#', $baseurl) || preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) /* domain ending in ".local" */  )
+		if( preg_match( '#^http://localhost[/:]#', $baseurl)
+			|| preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) /* domain ending in ".local" */  )
 		{
 			if( $display ) echo "<div class=\"panelinfo\">\n<p>", T_('Skipping pings (Running on localhost).'), "</p>\n</div>\n";
 		}
@@ -3363,6 +3364,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.115  2006/11/02 16:12:49  blueyed
+ * MFB
+ *
  * Revision 1.114  2006/11/02 16:01:00  blueyed
  * doc
  *
