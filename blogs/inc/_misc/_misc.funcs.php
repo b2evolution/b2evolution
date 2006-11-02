@@ -1703,6 +1703,8 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  * @param string URL where the icon gets linked to (empty to not wrap the icon in a link)
  * @param string word to be displayed after icon
  * @param integer 1-5: weight of the icon. the icon will be displayed only if its weight is >= than the user setting threshold
+ *                     Use 5, if it's a required icon - all others could get disabled by the user.
+ *                     dh> Is the above addition correct, Francois?
  * @param integer 1-5: weight of the word. the word will be displayed only if its weight is >= than the user setting threshold
  * @param array Additional attributes to the A tag. It may also contain these params:
  *              'use_js_popup': if true, the link gets opened as JS popup. You must also pass an "id" attribute for this!
@@ -2664,6 +2666,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.132  2006/11/02 01:34:43  blueyed
+ * doc/QUESTION
+ *
  * Revision 1.131  2006/11/01 19:04:35  blueyed
  * re-added htmlspecialchars() to pre_dump() and made it CLI aware
  *
