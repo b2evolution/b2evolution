@@ -3301,7 +3301,7 @@ class Item extends DataObject
 
 	/**
 	 * Get the list of validated renderers for this Item. This includes stealth plugins etc.
-	 * @return array
+	 * @return array List of validated renderer codes
 	 */
 	function get_renderers_validated()
 	{
@@ -3363,6 +3363,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.114  2006/11/02 16:01:00  blueyed
+ * doc
+ *
  * Revision 1.113  2006/10/29 18:33:23  blueyed
  * doc fix
  *

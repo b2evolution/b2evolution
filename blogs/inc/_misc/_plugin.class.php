@@ -931,8 +931,6 @@ class Plugin
 	 *
 	 * Use this, if your plugin needs configuration before it can be used.
 	 *
-	 * If you want to disable your Plugin yourself, use {@link Plugin::disable()}.
-	 *
 	 * @return true|string True, if the plugin can be enabled/activated,
 	 *                     a string with an error/note otherwise.
 	 */
@@ -2770,6 +2768,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.109  2006/11/02 15:57:10  blueyed
+ * doc
+ *
  * Revision 1.108  2006/11/01 23:18:58  blueyed
  * Fixed __get()
  *
