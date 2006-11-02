@@ -356,6 +356,8 @@ function locale_by_lang( $lang, $fallback_to_default = true )
 /**
  * Displays/Returns the current locale. (for backward compatibility)
  *
+ * @todo dh> "lang" should rather be a two letter code, e.g. "en" for english..
+ *
  * @param boolean true (default) if we want it to be outputted
  * @return string current locale, if $disp = false
  */
@@ -945,6 +947,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.30  2006/11/02 15:58:08  blueyed
+ * todo/note
+ *
  * Revision 1.29  2006/10/31 00:33:26  blueyed
  * Fixed item_issue_date for preview
  *
