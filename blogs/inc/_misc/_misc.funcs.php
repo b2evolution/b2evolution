@@ -1034,26 +1034,45 @@ function pre_dump( $var__var__var__var__ )
 				echo "\n";
 			}
 		}
-
-		return;
 	}
+	elseif( function_exists('xdebug_var_dump') )
+	{ // xdebug already does fancy displaying:
+		ini_set('xdebug.var_display_max_depth', 10);
+		echo "\n<div style=\"padding:1ex;border:1px solid #00f;\">\n";
+		foreach( func_get_args() as $lvar )
+		{
+			xdebug_var_dump($lvar);
 
-	echo "\n<pre style=\"padding:1ex;border:1px solid #00f;\">\n";
-	foreach( func_get_args() as $lvar )
-	{
-		ob_start();
-		var_dump($lvar); // includes "\n"; do not use var_export() because it does not detect recursion by design
-		$buffer = ob_get_contents();
-		ob_end_clean();
-		echo htmlspecialchars($buffer);
-
-		$count++;
-		if( $count < $func_num_args )
-		{ // Put HR between arguments
-			echo "<hr />\n";
+			$count++;
+			if( $count < $func_num_args )
+			{ // Put HR between arguments
+				echo "<hr />\n";
+			}
 		}
+		echo '</div>';
 	}
-	echo "</pre>\n";
+	else
+	{
+		$orig_html_errors = ini_set('html_errors', 0); // e.g. xdebug would use fancy html, if this is on; we catch (and use) xdebug explicitly above, but just in case
+
+		echo "\n<pre style=\"padding:1ex;border:1px solid #00f;\">\n";
+		foreach( func_get_args() as $lvar )
+		{
+			ob_start();
+			var_dump($lvar); // includes "\n"; do not use var_export() because it does not detect recursion by design
+			$buffer = ob_get_contents();
+			ob_end_clean();
+			echo htmlspecialchars($buffer);
+
+			$count++;
+			if( $count < $func_num_args )
+			{ // Put HR between arguments
+				echo "<hr />\n";
+			}
+		}
+		echo "</pre>\n";
+		ini_set('html_errors', $orig_html_errors);
+	}
 }
 
 
@@ -1706,17 +1725,24 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  *                     Use 5, if it's a required icon - all others could get disabled by the user.
  *                     dh> Is the above addition correct, Francois?
  * @param integer 1-5: weight of the word. the word will be displayed only if its weight is >= than the user setting threshold
- * @param array Additional attributes to the A tag. It may also contain these params:
- *              'use_js_popup': if true, the link gets opened as JS popup. You must also pass an "id" attribute for this!
- *              'use_js_size': use this to override the default popup size ("500, 400")
+ * @param array Additional attributes to the A tag. The values most be properly encoded for html output (e.g. quotes).
+ *        It may also contain these params:
+ *         - 'use_js_popup': if true, the link gets opened as JS popup. You must also pass an "id" attribute for this!
+ *         - 'use_js_size': use this to override the default popup size ("500, 400")
+ *         - 'class': defaults to 'action_icon', if not set; use "" to not use it
  * @return string The generated action icon link.
  */
-function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word_weight = 1, $link_attribs = array( 'class'=>'action_icon' ) )
+function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word_weight = 1, $link_attribs = array() )
 {
 	global $UserSettings;
 
 	$link_attribs['href'] = $url;
 	$link_attribs['title'] = $title;
+
+	if( ! isset($link_attribs['class']) )
+	{
+		$link_attribs['class'] = 'action_icon';
+	}
 
 	if( get_icon( $icon, 'rollover' ) )
 	{
@@ -2666,6 +2692,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.133  2006/11/02 15:57:47  blueyed
+ * Fixes for pre_dump() and add_icon()
+ *
  * Revision 1.132  2006/11/02 01:34:43  blueyed
  * doc/QUESTION
  *
