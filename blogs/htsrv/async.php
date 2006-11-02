@@ -44,11 +44,17 @@ if( ! $current_User || ! $current_User->check_perm( 'admin', 'any' ) )
 require_once $inc_path.'_async.inc.php';
 
 
+// QUESTION: dh> is this really meant to handle expanding and collapsing only??
+
+
 echo '-expand='.$expand;
 echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.3  2006/11/02 02:04:08  blueyed
+ * QUESTION
+ *
  * Revision 1.2  2006/10/14 04:43:55  blueyed
  * MFB: E_FATAL for anon user
  *
