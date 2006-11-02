@@ -1413,11 +1413,6 @@ function url_add_tail( $url, $tail )
  * Note: We have a problem when trying to "antispam" a keyword which is already blacklisted
  * If that keyword appears in the URL... then the next page has a bad referer! :/
  *
- * We do not allow relative URLs on purpose because they make no sense in RSS feeds.
- * blueyed>> we could always make them absolute again in the RSS feeds.. I think the extra
- *           processing involved there is worth the benefit of having relative links.
- * fp> ok, but we have to develop both simultaneously.
- *
  * {@internal This function gets tested in misc.funcs.simpletest.php.}}
  *
  * @param string Url to validate
@@ -1606,6 +1601,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.16  2006/11/02 16:31:53  blueyed
+ * MFB
+ *
  * Revision 1.15  2006/10/26 09:28:58  blueyed
  * - Made param funcs independent from $Debuglog global
  * - Made url_add_param() respect anchors/fragments
