@@ -35,7 +35,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Recursive helper function to display a field of the plugin's settings.
+ * Recursive helper function to display a field of the plugin's settings (by manipulating a Form).
  *
  * This gets used for PluginSettings ("Edit plugin") and PluginUserSettings ("Edit user settings").
  *
@@ -52,6 +52,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Form, $set_type = 'Settings', $set_target = NULL, $use_value = NULL )
 {
 	global $debug;
+	static $has_array_type;
 
 	if( ! empty($set_meta['no_edit']) )
 	{ // this setting is not editable
@@ -59,6 +60,16 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 	}
 
 	$params = array();
+
+	if( $use_value === NULL )
+	{ // outermost level
+		$has_array_type = false; // for adding a note about JS
+		$outer_most = true;
+	}
+	else
+	{
+		$outer_most = false;
+	}
 
 	// Passthrough some attributes to elements:
 	foreach( $set_meta as $k => $v )
@@ -216,6 +227,7 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 			break;
 
 		case 'array':
+			$has_array_type = true;
 			$fieldset_title = $set_label;
 			if( $debug )
 			{
@@ -251,7 +263,14 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 			}
 			if( ! isset( $set_meta['max_number'] ) || $set_meta['max_number'] > count($set_value) )
 			{ // no max_number defined or not reached: display link to add a new set
-				echo action_icon( sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label), 'new', regenerate_url( 'action', array('action=add_settings_set', 'set_path='.$set_name.'['.$insert_new_set_as.']', 'plugin_ID='.$Plugin->ID) ), T_('New set') );
+				echo action_icon(
+					sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label),
+					'new',
+					regenerate_url( 'action', array('action=add_settings_set', 'set_path='.$set_name.'['.$insert_new_set_as.']', 'plugin_ID='.$Plugin->ID) ),
+					T_('New set'),
+					5,
+					1,
+					array('onclick'=>'') ); // TODO: AJAX!
 			}
 			$Form->end_fieldset();
 
@@ -286,6 +305,13 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 
 		default:
 			debug_die( 'Unsupported type ['.$set_meta['type'].'] from GetDefaultSettings()!' );
+	}
+
+	if( $outer_most && $has_array_type )
+	{ // Note for Non-Javascript users:
+		#echo '<script type="text/javascript"></script><noscript>';
+		echo '<p class="note">'.T_('Note: before adding a new set you have to save any changes.').'</p>';
+		#echo '</noscript>';
 	}
 }
 
@@ -443,6 +469,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.27  2006/11/02 15:56:53  blueyed
+ * Add note about having to save the settings, before adding a new set.
+ *
  * Revision 1.26  2006/10/08 22:13:05  blueyed
  * Added "float" type to Plugin Setting types.
  *
