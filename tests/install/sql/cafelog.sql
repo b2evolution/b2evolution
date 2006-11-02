@@ -38,7 +38,7 @@ CREATE TABLE b2comments (
   comment_author_email varchar(100) NOT NULL default '',
   comment_author_url varchar(100) NOT NULL default '',
   comment_author_IP varchar(100) NOT NULL default '',
-  comment_date datetime NOT NULL default '0000-00-00 00:00:00',
+  comment_date datetime NOT NULL default '1000-01-01 00:00:00',
   comment_content text NOT NULL,
   comment_karma int(11) NOT NULL default '0',
   PRIMARY KEY  (comment_ID)
@@ -58,7 +58,7 @@ INSERT INTO b2comments VALUES (1, 1, 'Patrick', 'foo@example.com', 'http://url',
 CREATE TABLE b2posts (
   ID int(10) unsigned NOT NULL auto_increment,
   post_author int(4) NOT NULL default '0',
-  post_date datetime NOT NULL default '0000-00-00 00:00:00',
+  post_date datetime NOT NULL default '1000-01-01 00:00:00',
   post_content text NOT NULL,
   post_title text NOT NULL,
   post_category int(4) NOT NULL default '0',
@@ -117,7 +117,7 @@ CREATE TABLE b2users (
   user_ip varchar(15) NOT NULL default '',
   user_domain varchar(200) NOT NULL default '',
   user_browser varchar(200) NOT NULL default '',
-  dateYMDhour datetime NOT NULL default '0000-00-00 00:00:00',
+  dateYMDhour datetime NOT NULL default '1000-01-01 00:00:00',
   user_level int(2) unsigned NOT NULL default '0',
   user_aim varchar(50) NOT NULL default '',
   user_msn varchar(100) NOT NULL default '',
@@ -132,6 +132,6 @@ CREATE TABLE b2users (
 # Dumping data for table `b2users`
 #
 
-INSERT INTO b2users VALUES (1, 'admin', 'password', 'First', 'Last', 'Nick', 0, 'foo@example.com', 'http://daniel.hahler.de/', '127.0.0.1', '127.0.0.1', '', '0000-00-00 00:00:00', 10, '', '', '', 'nickname');
+INSERT INTO b2users VALUES (1, 'admin', 'password', 'First', 'Last', 'Nick', 0, 'foo@example.com', 'http://daniel.hahler.de/', '127.0.0.1', '127.0.0.1', '', '1000-01-01 00:00:00', 10, '', '', '', 'nickname');
 INSERT INTO b2users VALUES (2, 'user1', 'password', 'Elliott', '', 'epm', 0, 'bar@example.com', 'http://www.hahler.de/', '127.0.0.1', '127.0.0.1', 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)', '2004-04-20 18:05:42', 8, '', '', '', 'firstname');
 
