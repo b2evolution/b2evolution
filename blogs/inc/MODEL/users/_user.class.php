@@ -443,16 +443,14 @@ class User extends DataObject
 	/**
 	 * Get the {@link Group} of the user.
 	 *
-	 * @todo dh> Shouldn't this return by reference?! (not the ref from GroupCache, but the one of the user)
-	 *
-	 * @return Group
+	 * @return Group (by reference)
 	 */
-	function get_Group()
+	function & get_Group()
 	{
 		if( ! isset($this->Group) )
 		{
 			$GroupCache = & get_Cache( 'GroupCache' );
-			$this->Group = $GroupCache->get_by_ID($this->group_ID);
+			$this->Group = & $GroupCache->get_by_ID($this->group_ID);
 		}
 		return $this->Group;
 	}
@@ -1117,6 +1115,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.49  2006/11/02 20:34:40  blueyed
+ * MFB (the changed member order is by design, according to db_schema.inc.php)
+ *
  * Revision 1.48  2006/10/23 22:19:02  blueyed
  * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
  *
