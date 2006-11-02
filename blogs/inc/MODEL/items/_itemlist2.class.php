@@ -609,18 +609,6 @@ class ItemList2 extends DataObjectList2
 
 		$post_renderers = implode( '.', $renderers );
 
-		if( $errcontent = $Messages->display( T_('Invalid post, please correct these errors:'), '', false, 'error' ) )
-		{
-			$content = $errcontent;
-		}
-
-		// little funky fix for IEwin, rawk on that code
-		global $Hit;
-		if( ($Hit->is_winIE) && (!isset($IEWin_bookmarklet_fix)) )
-		{ // QUESTION: Is this still needed? What about $IEWin_bookmarklet_fix? (blueyed)
-			$content = preg_replace('/\%u([0-9A-F]{4,4})/e', "'&#'.base_convert('\\1',16,10). ';'", $content);
-		}
-
 		$this->sql = "SELECT
 			0 AS {$this->Cache->dbIDname},
 			$preview_userid AS {$this->Cache->dbprefix}creator_user_ID,
@@ -658,6 +646,18 @@ class ItemList2 extends DataObjectList2
 
 		// Trigger plugin event, allowing to manipulate the item before it gets previewed
 		$Plugins->trigger_event( 'AppendItemPreviewTransact', array( 'Item' => & $Item ) );
+
+		if( $errcontent = $Messages->display( T_('Invalid post, please correct these errors:'), '', false, 'error' ) )
+		{
+			$content = $errcontent;
+		}
+
+		// little funky fix for IEwin, rawk on that code
+		global $Hit;
+		if( ($Hit->is_winIE) && (!isset($IEWin_bookmarklet_fix)) )
+		{ // QUESTION: Is this still needed? What about $IEWin_bookmarklet_fix? (blueyed)
+			$content = preg_replace('/\%u([0-9A-F]{4,4})/e', "'&#'.base_convert('\\1',16,10). ';'", $content);
+		}
 	}
 
 
@@ -1640,6 +1640,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.35  2006/11/02 16:00:42  blueyed
+ * Moved AppendItemPreviewTransact hook, so it can throw error messages
+ *
  * Revision 1.34  2006/10/31 00:33:26  blueyed
  * Fixed item_issue_date for preview
  *
