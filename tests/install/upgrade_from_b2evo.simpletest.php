@@ -12,6 +12,10 @@ require_once dirname(__FILE__).'/../config.simpletest.php';
 
 global $conf_path;
 
+// from /conf/_upgrade.php:
+global $oldtableposts, $oldtableusers, $oldtablesettings, $oldtablecategories, $oldtablecomments;
+global $fileupload_allowedtypes, $fileupload_maxk, $stats_autoprune;
+
 require_once $conf_path.'_upgrade.php';
 
 
