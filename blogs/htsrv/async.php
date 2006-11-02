@@ -35,7 +35,7 @@ require_once $inc_path.'_main.inc.php';
 
 
 // Check global permission:
-if( ! $current_User || ! $current_User->check_perm( 'admin', 'any' ) )
+if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 {	// No permission to access admin...
 	require $view_path.'errors/_access_denied.inc.php';
 }
@@ -45,13 +45,17 @@ require_once $inc_path.'_async.inc.php';
 
 
 // QUESTION: dh> is this really meant to handle expanding and collapsing only??
+// fp> NO this is meant to be extended
 
-
+// Debug info:
 echo '-expand='.$expand;
 echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.4  2006/11/02 18:14:59  fplanque
+ * normalized
+ *
  * Revision 1.3  2006/11/02 02:04:08  blueyed
  * QUESTION
  *
