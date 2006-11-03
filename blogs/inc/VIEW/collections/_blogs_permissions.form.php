@@ -396,6 +396,7 @@ $Results->display();
 echo '</div>';
 
 // Permission note:
+// fp> TODO: link
 echo '<p class="note center">'.T_('Note: General group permissions override the media folder permissions defined here.').'</p>';
 
 $Form->end_fieldset();
@@ -415,6 +416,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.13  2006/11/03 18:22:26  fplanque
+ * no message
+ *
  * Revision 1.12  2006/10/14 04:34:26  blueyed
  * Proper escaping; fixes E_FATAL in Results eval()
  *

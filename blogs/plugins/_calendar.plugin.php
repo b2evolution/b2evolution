@@ -737,6 +737,7 @@ class Calendar
 				$dow++;
 
 				// correct daylight saving ("last day"+86400 would lead to "last day at 23:00")
+				// fp> TODO: use mkdate()
 				while( date('j', $i) == $last_day )
 				{
 					$i += 3600;
@@ -1107,6 +1108,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.31  2006/11/03 18:22:26  fplanque
+ * no message
+ *
  * Revision 1.30  2006/10/29 14:52:56  blueyed
  * Fixed bug with daylight saving time, which displayed days twice
  *
