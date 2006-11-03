@@ -2489,17 +2489,15 @@ class Form extends Widget
 	/**
 	 * Convert a given string (e.g. fieldname) to a valid HTML id.
 	 *
+	 * @static
 	 * @return string
 	 */
 	function get_valid_id( $id )
 	{
+		static $id_count = 0;
 		if( substr( $id, -2 ) == '[]' )
 		{
-			if( empty($this->_generated_id_count) )
-			{
-				$this->_generated_id_count = 0;
-			}
-			$id = substr( $id, 0, -2 ).'_A'.(++$this->_generated_id_count);
+			$id = substr( $id, 0, -2 ).'_A'.(++$id_count);
 		}
 		return str_replace( array( '[', ']' ), '_', $id );
 	}
@@ -2689,6 +2687,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.43  2006/11/03 14:25:24  blueyed
+ * Made Form::get_valid_id() static
+ *
  * Revision 1.42  2006/10/14 16:07:54  blueyed
  * Overwrite previous added hidden fields (by default), when adding hidden inputs.
  *
