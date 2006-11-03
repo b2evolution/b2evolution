@@ -85,12 +85,30 @@ if( ! function_exists( 'mysql_real_escape_string' ) )
  */
 class DB
 {
+	/**
+	 * @var boolean Show/Print errors?
+	 */
 	var $show_errors = true;
+	/**
+	 * @var boolean Halt on errors?
+	 */
 	var $halt_on_error = true;
-	var $error = false;		// no error yet
+	/**
+	 * @var boolean Has an error occured?
+	 */
+	var $error = false;
+	/**
+	 * @var integer Number of done queries.
+	 */
 	var $num_queries = 0;
-	var $last_query = '';		// last query SQL string
-	var $last_error = '';			// last DB error string
+	/**
+	 * @var string last query SQL string
+	 */
+	var $last_query = '';
+	/**
+	 * @var string last DB error string
+	 */
+	var $last_error = '';
 
 	/**
 	 * Column information about the last query.
@@ -99,7 +117,6 @@ class DB
 	 */
 	var $col_info;
 
-	var $vardump_called;
 	var $insert_id = 0;
 
 	var $last_result;
@@ -192,10 +209,10 @@ class DB
 
   /**
    * Do we want to log queries?
-	 * @todo dh> shouldn't this be false by default?? Maybe. Maybe it should not exist at all and we should only use $debug.
+	 * This gets set according to {@link $debug}, if it's set.
    * @var boolean
    */
-	var $log_queries = true;
+	var $log_queries;
 
 	/**
 	 * Log of queries:
@@ -261,7 +278,7 @@ class DB
 	 */
 	function DB( $params )
 	{
-		//pre_dump( $params );
+		global $debug;
 
 		// Mandatory parameters:
 		if( isset( $params['handle'] ) )
@@ -284,6 +301,11 @@ class DB
 		if( isset($params['debug_dump_rows']) ) $this->debug_dump_rows = $params['debug_dump_rows'];
 		if( isset($params['debug_explain_joins']) ) $this->debug_explain_joins = $params['debug_explain_joins'];
 		if( isset($params['debug_dump_function_trace_for_queries']) ) $this->debug_dump_function_trace_for_queries = $params['debug_dump_function_trace_for_queries'];
+
+		if( isset($debug) && ! isset($this->log_queries) )
+		{ // $log_queries follows $debug and respects subclasses, which may define it:
+			$this->log_queries = $debug;
+		}
 
 		if( ! extension_loaded('mysql') )
 		{ // The mysql extension is not loaded, try to dynamically load it:
@@ -989,47 +1011,6 @@ class DB
 
 
 	/**
-	 * Dumps the contents of any input variable to screen in a nicely
-	 * formatted and easy to understand way - any type: Object, Var or Array
-	 *
-	 * @param mixed Variable to dump
-	 */
-	function vardump( $mixed = '' )
-	{
-		echo '<p><table summary="Variable Dump"><tr><td bgcolor="fff"><blockquote style="color:#000090">';
-		echo '<pre style="font-family:Arial">';
-
-		if ( ! $this->vardump_called )
-		{
-			echo '<span style="color:#800080"><strong>ezSQL</strong> (v'.EZSQL_VERSION.") <strong>Variable Dump..</strong></span>\n\n";
-		}
-
-		$var_type = gettype ($mixed);
-		print_r( ( $mixed ? $mixed : '<span style="color:#f00">No Value / False</span>') );
-		echo "\n\n<strong>Type:</strong> ".ucfirst( $var_type )."\n"
-				."<strong>Last Query</strong> [$this->num_queries]<strong>:</strong> "
-				.( $this->last_query ? $this->last_query : "NULL" )."\n"
-				.'<strong>Last Function Call:</strong> '.( $this->func_call ? $this->func_call : 'None' )."\n"
-				.'<strong>Last Rows Returned:</strong> '.count( $this->last_result )."\n"
-				.'</pre></blockquote></td></tr></table>';
-		echo "\n<hr size=1 noshade color=dddddd>";
-
-		$this->vardump_called = true;
-	}
-
-
-	/**
-	 * Alias for {@link vardump()}
-	 *
-	 * @param mixed Variable to dump
-	 */
-	function dumpvar( $mixed )
-	{
-		$this->vardump( $mixed );
-	}
-
-
-	/**
 	 * Get a table (or "<p>No Results.</p>") for the SELECT query results.
 	 *
 	 * @return string HTML table or "No Results" if the
@@ -1168,6 +1149,11 @@ class DB
 
 		echo '<strong>DB queries:</strong> '.$this->num_queries."<br />\n";
 
+		if( ! $this->log_queries )
+		{ // nothing more to do here..
+			return;
+		}
+
 		foreach( $this->queries as $query )
 		{
 			$count_queries++;
@@ -1241,7 +1227,7 @@ class DB
 
 			$count_rows += $query['rows'];
 		}
-		echo '<strong>Total rows:</strong> '.$count_rows.'<br />';
+		echo "\n<strong>Total rows:</strong> $count_rows<br />\n";
 	}
 
 
@@ -1405,6 +1391,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.30  2006/11/03 00:22:21  blueyed
+ * $log_queries follows $debug global; Removed dumpvar() and vardump() - use pre_dump()
+ *
  * Revision 1.29  2006/11/02 19:49:22  fplanque
  * no message
  *
