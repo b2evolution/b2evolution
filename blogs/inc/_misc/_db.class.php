@@ -210,7 +210,7 @@ class DB
   /**
    * Do we want to log queries?
 	 * This gets set according to {@link $debug}, if it's set.
-	 * @todo get rid of this var, use $debug only
+	 * @todo fp> get rid of this var, use $debug only
    * @var boolean
    */
 	var $log_queries;
@@ -336,13 +336,11 @@ class DB
 			$mysql_error = mysql_error();
 			if( empty($mysql_error) )
 			{ // there was a PHP error, like with version below 4.3 which do not support new_link and client_flags; let PHP throw an error:
-
 				$this->print_error( 'Error establishing a database connection!', '
-				<p>You are probably using a PHP version below 4.3! Please upgrade.</p>' );
+					<p>You are probably using a PHP version below 4.3! Please upgrade.</p>', false );
 
 				// Let PHP throw an error:
 				mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $new_link, $client_flags );
-
 			}
 			else
 			{
@@ -1408,6 +1406,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.34  2006/11/04 18:39:15  blueyed
+ * Normalized
+ *
  * Revision 1.33  2006/11/04 18:11:42  fplanque
  * comments
  *
