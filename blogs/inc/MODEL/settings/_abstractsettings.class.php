@@ -287,7 +287,7 @@ class AbstractSettings
 				elseif( isset($this->cache[ $col_key1 ]) )
 				{	// First attempt to access the value, we need to unserialize it:
 					// Try to unserialize setting (once) - this is as fast as checking an array of values that should get unserialized
-					if( $r = @unserialize($this->cache[ $col_key1 ]->value) )
+					if( ($r = @unserialize($this->cache[ $col_key1 ]->value)) !== false )
 					{
 						$this->cache[ $col_key1 ]->value = $r;
 					}
@@ -317,7 +317,7 @@ class AbstractSettings
 				elseif( isset($this->cache[ $col_key1 ][ $col_key2 ]) )
 				{
 					// Try to unserialize setting (once) - this is as fast as checking an array of values that should get unserialized
-					if( $r = @unserialize($this->cache[ $col_key1 ][ $col_key2 ]->value) )
+					if( ($r = @unserialize($this->cache[ $col_key1 ][ $col_key2 ]->value)) !== false )
 					{
 						$this->cache[ $col_key1 ][ $col_key2 ]->value = $r;
 					}
@@ -347,7 +347,7 @@ class AbstractSettings
 				elseif( isset($this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]) )
 				{
 					// Try to unserialize setting (once) - this is as fast as checking an array of values that should get unserialized
-					if( $r = @unserialize($this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value) )
+					if( ($r = @unserialize($this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value)) !== false )
 					{
 						$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value = $r;
 					}
@@ -704,6 +704,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.15  2006/11/04 01:35:02  blueyed
+ * Fixed unserializing of array()
+ *
  * Revision 1.14  2006/09/10 14:15:28  blueyed
  * Fixed tests
  *
