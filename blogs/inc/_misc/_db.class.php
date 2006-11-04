@@ -336,15 +336,20 @@ class DB
 			if( empty($mysql_error) )
 			{ // there was a PHP error, like with version below 4.3 which do not support new_link and client_flags; let PHP throw an error:
 				mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $new_link, $client_flags );
-				$mysql_error = 'You are probably using a PHP version below 4.3! Please upgrade.';
+
+				$this->print_error( 'Error establishing a database connection!', '
+				<p>You are probably using a PHP version below 4.3! Please upgrade.</p>' );
 			}
-			$this->print_error( 'Error establishing a database connection!', '
-				<p>('.$mysql_error.')</p>
-				<ol>
-					<li>Are you sure you have typed the correct user/password?</li>
-					<li>Are you sure that you have typed the correct hostname?</li>
-					<li>Are you sure that the database server is running?</li>
-				</ol>', false );
+			else
+			{
+				$this->print_error( 'Error establishing a database connection!', '
+					<p>('.$mysql_error.')</p>
+					<ol>
+						<li>Are you sure you have typed the correct user/password?</li>
+						<li>Are you sure that you have typed the correct hostname?</li>
+						<li>Are you sure that the database server is running?</li>
+					</ol>', false );
+			}
 		}
 		elseif( isset($this->dbname) )
 		{
@@ -519,6 +524,7 @@ class DB
 		{
 			$err_msg = '<p class="error">MySQL error!</p>'."\n";
 			$err_msg .= "<div><p><strong>{$this->last_error}</strong></p>\n";
+			$err_msg .= $html_str;
 			if( !empty($this->last_query) && $query_title !== false )
 			{
 				$err_msg .= '<p class="error">Your query: '.$query_title.'</p>';
@@ -1398,6 +1404,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.32  2006/11/04 01:29:55  blueyed
+ * Better error displaying. Fix: use $html_str in print_error()
+ *
  * Revision 1.31  2006/11/04 01:22:29  blueyed
  * Proposed fix for users with PHP < 4.3: let them get the PHP error.
  *
