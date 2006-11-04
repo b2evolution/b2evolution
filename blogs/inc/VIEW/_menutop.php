@@ -141,6 +141,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 					/**
 					 * Switches UI layouts by applying CSS style.display
+					 *
+					 * @todo dh> Save into UserSettings (AJAX)
 					 */
 					function switch_layout( layout )
 					{

@@ -81,10 +81,10 @@ $sql = 'SELECT user_ID, user_login, bloguser_perm_poststatuses, bloguser_ismembe
 echo '<div style="float:right">';
 	echo T_('Layout').': ';
 	echo '[<a href="?ctrl=collections&amp;action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout=default"
-					onclick="switch_layout(\'default\'); return false;">Simple</a>] ';
+					onclick="switch_layout(\'default\'); return false;">'.T_('Simple').'</a>] ';
 
 	echo '[<a href="?ctrl=collections&amp;action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout=wide"
-					onclick="switch_layout(\'wide\'); return false;">Wide</a>] ';
+					onclick="switch_layout(\'wide\'); return false;">'.T_('Advanced').'</a>] ';
 
 	if( $debug )
 	{	// Debug mode = both modes are displayed:
@@ -416,6 +416,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.14  2006/11/04 17:19:39  blueyed
+ * Blog perms view links: Changed "Wide" to "Advanced" and localized it together with "Simple". See http://forums.b2evolution.net/viewtopic.php?t=9654
+ *
  * Revision 1.13  2006/11/03 18:22:26  fplanque
  * no message
  *

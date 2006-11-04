@@ -203,9 +203,9 @@ $Form->begin_fieldset( T_('Group permissions') );
 	<?php
 	echo T_('Layout').': ';
 	echo '[<a href="?ctrl=collections&amp;action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=default"
-					onclick="switch_layout(\'default\'); return false;">Simple</a>] ';
+					onclick="switch_layout(\'default\'); return false;">'.T_('Simple').'</a>] ';
 	echo '[<a href="?ctrl=collections&amp;action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=wide"
-					onclick="switch_layout(\'wide\'); return false;">Wide</a>] ';
+					onclick="switch_layout(\'wide\'); return false;">'.T_('Advanced').'</a>] ';
 	global $debug;
 	if( $debug )
 	{
