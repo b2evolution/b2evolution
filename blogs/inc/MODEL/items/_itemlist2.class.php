@@ -644,19 +644,19 @@ class ItemList2 extends DataObjectList2
 
 		$Item = & $this->Cache->instantiate( $this->rows[0] );
 
-		// Trigger plugin event, allowing to manipulate the item before it gets previewed
+		// Trigger plugin event, allowing to manipulate or validate the item before it gets previewed
 		$Plugins->trigger_event( 'AppendItemPreviewTransact', array( 'Item' => & $Item ) );
 
 		if( $errcontent = $Messages->display( T_('Invalid post, please correct these errors:'), '', false, 'error' ) )
 		{
-			$content = $errcontent;
+			$Item->content = $errcontent."\n<hr />\n".$content;
 		}
 
 		// little funky fix for IEwin, rawk on that code
 		global $Hit;
 		if( ($Hit->is_winIE) && (!isset($IEWin_bookmarklet_fix)) )
 		{ // QUESTION: Is this still needed? What about $IEWin_bookmarklet_fix? (blueyed)
-			$content = preg_replace('/\%u([0-9A-F]{4,4})/e', "'&#'.base_convert('\\1',16,10). ';'", $content);
+			$Item->content = preg_replace('/\%u([0-9A-F]{4,4})/e', "'&#'.base_convert('\\1',16,10). ';'", $Item->content);
 		}
 	}
 
@@ -1640,6 +1640,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.36  2006/11/04 19:38:53  blueyed
+ * Fixes for hook move
+ *
  * Revision 1.35  2006/11/02 16:00:42  blueyed
  * Moved AppendItemPreviewTransact hook, so it can throw error messages
  *
