@@ -273,8 +273,9 @@ class DB
 	 *    - 'use_transactions': sets {@link $use_transactions}
 	 *    - 'aliases': Aliases for tables (array( alias => table name )); Default: no aliases.
 	 *    - 'new_link': create a new link to the DB, even if there was a mysql_connect() with
-	 *       the same params before.
+	 *       the same params before. (requires PHP 4.2)
 	 *    - 'client_flags': optional settings like compression or SSL encryption. See {@link http://www.php.net/manual/en/ref.mysql.php#mysql.client-flags}.
+	 *       (requires PHP 4.3)
 	 */
 	function DB( $params )
 	{
@@ -331,8 +332,14 @@ class DB
 
 		if( ! $this->dbhandle )
 		{
+			$mysql_error = mysql_error();
+			if( empty($mysql_error) )
+			{ // there was a PHP error, like with version below 4.3 which do not support new_link and client_flags; let PHP throw an error:
+				mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $new_link, $client_flags );
+				$mysql_error = 'You are probably using a PHP version below 4.3! Please upgrade.';
+			}
 			$this->print_error( 'Error establishing a database connection!', '
-				<p>('.mysql_error().')</p>
+				<p>('.$mysql_error.')</p>
 				<ol>
 					<li>Are you sure you have typed the correct user/password?</li>
 					<li>Are you sure that you have typed the correct hostname?</li>
@@ -1391,6 +1398,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.31  2006/11/04 01:22:29  blueyed
+ * Proposed fix for users with PHP < 4.3: let them get the PHP error.
+ *
  * Revision 1.30  2006/11/03 00:22:21  blueyed
  * $log_queries follows $debug global; Removed dumpvar() and vardump() - use pre_dump()
  *
