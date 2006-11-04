@@ -62,6 +62,8 @@ class UserSettings extends AbstractSettings
 		'pref_edit_tab' => 'simple',
 
 		'fm_imglistpreview' => 1,
+
+		'blogperms_layout' => 'simple', // selected view in blog (user/group) perms
 	);
 
 
@@ -175,8 +177,6 @@ class UserSettings extends AbstractSettings
 	 */
 	function param_Request( $param_name, $uset_name, $type = '', $default = '', $memorize = false, $override = false ) // we do not force setting it..
 	{
-
-
 		$value = param( $param_name, $type, NULL, $memorize, $override, false ); // we pass NULL here, to see if it got set at all
 
 		if( $value !== false )
@@ -202,6 +202,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.20  2006/11/04 17:43:14  blueyed
+ * Blog perm layout views: fixed non-JS links (ctrl param) and store selected one in UserSettings (TODO for switching by JS)
+ *
  * Revision 1.19  2006/08/24 00:42:20  fplanque
  * minor
  *

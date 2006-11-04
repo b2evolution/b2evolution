@@ -20,9 +20,10 @@ global $edited_Blog;
  * @var User
  */
 global $current_User;
+global $UserSettings;
 
+$layout = $UserSettings->param_Request( 'layout', 'blogperms_layout', 'string', 'default' );  // table layout mode
 
-param( 'layout', 'string', 'default' );  // table layout mode
 
 /**
  * Display user list with permissions
@@ -202,14 +203,14 @@ $Form->begin_fieldset( T_('Group permissions') );
 <div style="float:right">
 	<?php
 	echo T_('Layout').': ';
-	echo '[<a href="?ctrl=collections&amp;action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=default"
+	echo '[<a href="?ctrl=coll_settings&amp;action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=default"
 					onclick="switch_layout(\'default\'); return false;">'.T_('Simple').'</a>] ';
-	echo '[<a href="?ctrl=collections&amp;action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=wide"
+	echo '[<a href="?ctrl=coll_settings&amp;action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=wide"
 					onclick="switch_layout(\'wide\'); return false;">'.T_('Advanced').'</a>] ';
 	global $debug;
 	if( $debug )
 	{
-		echo '[<a href="?ctrl=collections&amp;action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=all"
+		echo '[<a href="?ctrl=coll_settings&amp;action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=all"
 						onclick="switch_layout(\'all\'); return false;">Debug</a>] ';
 	}
 	?>

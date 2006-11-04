@@ -22,9 +22,9 @@ global $edited_Blog;
 global $current_User;
 
 global $debug;
+global $UserSettings;
 
-$layout = param( 'layout', 'string', $debug ? 'all' : 'default' );  // table layout mode
-
+$layout = $UserSettings->param_Request( 'layout', 'blogperms_layout', 'string', $debug ? 'all' : 'default' );  // table layout mode
 
 
 $Form = & new Form( NULL, 'blogperm_checkchanges', 'post', 'fieldset' );
@@ -80,15 +80,15 @@ $sql = 'SELECT user_ID, user_login, bloguser_perm_poststatuses, bloguser_ismembe
 // TODO: cancel event in switch layout (or it will trigger bozo validator)
 echo '<div style="float:right">';
 	echo T_('Layout').': ';
-	echo '[<a href="?ctrl=collections&amp;action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout=default"
+	echo '[<a href="?ctrl=coll_settings&amp;action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout=default"
 					onclick="switch_layout(\'default\'); return false;">'.T_('Simple').'</a>] ';
 
-	echo '[<a href="?ctrl=collections&amp;action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout=wide"
+	echo '[<a href="?ctrl=coll_settings&amp;action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout=wide"
 					onclick="switch_layout(\'wide\'); return false;">'.T_('Advanced').'</a>] ';
 
 	if( $debug )
 	{	// Debug mode = both modes are displayed:
-		echo '[<a href="?ctrl=collections&amp;action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout=all"
+		echo '[<a href="?ctrl=coll_settings&amp;action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout=all"
 						onclick="switch_layout(\'all\'); return false;">Debug</a>] ';
 	}
 echo '</div>';
@@ -416,6 +416,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.15  2006/11/04 17:38:24  blueyed
+ * Blog perm layout views: fixed non-JS links (ctrl param) and store selected one in UserSettings (TODO for switching by JS)
+ *
  * Revision 1.14  2006/11/04 17:19:39  blueyed
  * Blog perms view links: Changed "Wide" to "Advanced" and localized it together with "Simple". See http://forums.b2evolution.net/viewtopic.php?t=9654
  *
