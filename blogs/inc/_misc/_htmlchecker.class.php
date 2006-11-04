@@ -75,7 +75,6 @@ class SafeHtmlChecker
 		$this->uri_attrs = & $uri_attrs;
 		$this->allowed_uri_scheme = & $allowed_uri_scheme;
 
-
 		$encoding = strtoupper($encoding); // we might get 'iso-8859-1' for example
 		$this->encoding = $encoding;
 		if( ! in_array( $encoding, array( 'ISO-8859-1', 'UTF-8', 'US-ASCII' ) ) )
@@ -97,11 +96,11 @@ class SafeHtmlChecker
 		// set functions to call when a start or end tag is encountered
 		xml_set_element_handler($this->parser, 'tag_open', 'tag_close');
 		// set function to call for the actual data
-		xml_set_character_data_handler($this->parser, 'cdata');
+		#xml_set_character_data_handler($this->parser, 'cdata');
 
-		xml_set_default_handler($this->parser, 'default_handler');
-		xml_set_external_entity_ref_handler($this->parser, 'external_entity');
-		xml_set_unparsed_entity_decl_handler($this->parser, 'unparsed_entity');
+		#xml_set_default_handler($this->parser, 'default_handler');
+		#xml_set_external_entity_ref_handler($this->parser, 'external_entity');
+		#xml_set_unparsed_entity_decl_handler($this->parser, 'unparsed_entity');
 
 		xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING, false);
 	}
@@ -129,6 +128,7 @@ class SafeHtmlChecker
 	function check($xhtml)
 	{
 		// Convert encoding:
+		// TODO: use convert_encoding()
 		if( empty($this->xml_parser_encoding) || $this->encoding != $this->xml_parser_encoding )
 		{ // we need to convert encoding:
 			if( function_exists( 'mb_convert_encoding' ) )
@@ -157,7 +157,109 @@ class SafeHtmlChecker
 		{
 			$xhtml_head .= ' encoding="'.$this->encoding.'"';
 		}
-		$xhtml_head .= '?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
+
+		$xhtml_head .= '?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"';
+
+		// Include latin1 entities (http://www.w3.org/xhtml1/DTD/xhtml-lat1.ent)
+		$xhtml_head .= '[
+			<!ENTITY nbsp   "&#160;">
+			<!ENTITY iexcl  "&#161;">
+			<!ENTITY cent   "&#162;">
+			<!ENTITY pound  "&#163;">
+			<!ENTITY curren "&#164;">
+			<!ENTITY yen    "&#165;">
+			<!ENTITY brvbar "&#166;">
+			<!ENTITY sect   "&#167;">
+			<!ENTITY uml    "&#168;">
+			<!ENTITY copy   "&#169;">
+			<!ENTITY ordf   "&#170;">
+			<!ENTITY laquo  "&#171;">
+			<!ENTITY not    "&#172;">
+			<!ENTITY shy    "&#173;">
+			<!ENTITY reg    "&#174;">
+			<!ENTITY macr   "&#175;">
+			<!ENTITY deg    "&#176;">
+			<!ENTITY plusmn "&#177;">
+			<!ENTITY sup2   "&#178;">
+			<!ENTITY sup3   "&#179;">
+			<!ENTITY acute  "&#180;">
+			<!ENTITY micro  "&#181;">
+			<!ENTITY para   "&#182;">
+			<!ENTITY middot "&#183;">
+			<!ENTITY cedil  "&#184;">
+			<!ENTITY sup1   "&#185;">
+			<!ENTITY ordm   "&#186;">
+			<!ENTITY raquo  "&#187;">
+			<!ENTITY frac14 "&#188;">
+			<!ENTITY frac12 "&#189;">
+			<!ENTITY frac34 "&#190;">
+			<!ENTITY iquest "&#191;">
+			<!ENTITY Agrave "&#192;">
+			<!ENTITY Aacute "&#193;">
+			<!ENTITY Acirc  "&#194;">
+			<!ENTITY Atilde "&#195;">
+			<!ENTITY Auml   "&#196;">
+			<!ENTITY Aring  "&#197;">
+			<!ENTITY AElig  "&#198;">
+			<!ENTITY Ccedil "&#199;">
+			<!ENTITY Egrave "&#200;">
+			<!ENTITY Eacute "&#201;">
+			<!ENTITY Ecirc  "&#202;">
+			<!ENTITY Euml   "&#203;">
+			<!ENTITY Igrave "&#204;">
+			<!ENTITY Iacute "&#205;">
+			<!ENTITY Icirc  "&#206;">
+			<!ENTITY Iuml   "&#207;">
+			<!ENTITY ETH    "&#208;">
+			<!ENTITY Ntilde "&#209;">
+			<!ENTITY Ograve "&#210;">
+			<!ENTITY Oacute "&#211;">
+			<!ENTITY Ocirc  "&#212;">
+			<!ENTITY Otilde "&#213;">
+			<!ENTITY Ouml   "&#214;">
+			<!ENTITY times  "&#215;">
+			<!ENTITY Oslash "&#216;">
+			<!ENTITY Ugrave "&#217;">
+			<!ENTITY Uacute "&#218;">
+			<!ENTITY Ucirc  "&#219;">
+			<!ENTITY Uuml   "&#220;">
+			<!ENTITY Yacute "&#221;">
+			<!ENTITY THORN  "&#222;">
+			<!ENTITY szlig  "&#223;">
+			<!ENTITY agrave "&#224;">
+			<!ENTITY aacute "&#225;">
+			<!ENTITY acirc  "&#226;">
+			<!ENTITY atilde "&#227;">
+			<!ENTITY auml   "&#228;">
+			<!ENTITY aring  "&#229;">
+			<!ENTITY aelig  "&#230;">
+			<!ENTITY ccedil "&#231;">
+			<!ENTITY egrave "&#232;">
+			<!ENTITY eacute "&#233;">
+			<!ENTITY ecirc  "&#234;">
+			<!ENTITY euml   "&#235;">
+			<!ENTITY igrave "&#236;">
+			<!ENTITY iacute "&#237;">
+			<!ENTITY icirc  "&#238;">
+			<!ENTITY iuml   "&#239;">
+			<!ENTITY eth    "&#240;">
+			<!ENTITY ntilde "&#241;">
+			<!ENTITY ograve "&#242;">
+			<!ENTITY oacute "&#243;">
+			<!ENTITY ocirc  "&#244;">
+			<!ENTITY otilde "&#245;">
+			<!ENTITY ouml   "&#246;">
+			<!ENTITY divide "&#247;">
+			<!ENTITY oslash "&#248;">
+			<!ENTITY ugrave "&#249;">
+			<!ENTITY uacute "&#250;">
+			<!ENTITY ucirc  "&#251;">
+			<!ENTITY uuml   "&#252;">
+			<!ENTITY yacute "&#253;">
+			<!ENTITY thorn  "&#254;">
+			<!ENTITY yuml   "&#255;">
+			]';
+		$xhtml_head .= '>';
 
 		$xhtml = $xhtml_head.'<body>'.$xhtml.'</body>';
 
@@ -288,6 +390,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.9  2006/11/04 21:44:59  blueyed
+ * Include latin1 entities to let xml_parse() not choke on those
+ *
  * Revision 1.8  2006/07/04 17:32:30  fplanque
  * no message
  *
