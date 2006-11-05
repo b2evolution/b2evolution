@@ -66,6 +66,8 @@ $Results = new Results( '
 
 $Results->Cache = & $admin_Plugins;
 
+$Results->title = T_('Installed plugins');
+
 /*
  * STATUS TD:
  */
@@ -426,6 +428,9 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 <?php
 /*
  * $Log$
+ * Revision 1.37  2006/11/05 18:21:08  fplanque
+ * This is about the 4th time I fix the CSS for the plugins list :(
+ *
  * Revision 1.36  2006/10/26 21:24:14  blueyed
  * Do not display "reload events" links, if no perms
  *
