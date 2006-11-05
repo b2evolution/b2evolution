@@ -54,9 +54,7 @@ $Form = & new Form( NULL, 'pluginsettings_checkchanges' );
 $Form->hidden_ctrl();
 
 
-// Help icons, if available:
-$Form->global_icon( T_('Homepage of the plugin'), 'www', $edit_Plugin->get_help_url().'#Settings', '', 3, 2, array('target'=>'_blank') );
-
+// Help icon, if available:
 if( $edit_Plugin->get_help_file() )
 { // README in JS popup:
 	$Form->global_icon( T_('Local documentation of the plugin'), 'help',
@@ -177,6 +175,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.24  2006/11/05 18:33:58  fplanque
+ * no external links in action icons
+ *
  * Revision 1.23  2006/10/30 19:00:36  blueyed
  * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
  *
