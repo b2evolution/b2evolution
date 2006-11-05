@@ -130,7 +130,11 @@ class Comment extends DataObject
 			$this->author_email = $db_row['comment_author_email'];
 			$url = trim( $db_row['comment_author_url'] );
 			$url = preg_replace('#&(?!amp;)#is', '&amp;', $url); // Escape &
-			$this->author_url = (!stristr($url, '://')) ? 'http://'.$url : $url;
+			if( ! empty($url) && ! preg_match( '~^\w+://~', $url ) )
+			{ // URL given and does not start with a protocol:
+				$url = 'http://'.$url;
+			}
+			$this->author_url = $url;
 			$this->author_IP = $db_row['comment_author_IP'];
 			$this->date = $db_row['comment_date'];
 			$this->content = $db_row['comment_content'];
@@ -1157,6 +1161,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.45  2006/11/05 22:12:35  blueyed
+ * Fix
+ *
  * Revision 1.44  2006/10/23 22:19:02  blueyed
  * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
  *
