@@ -91,7 +91,7 @@ $Form->hidden( 'user_ID', $edited_User->ID );
 
 $Form->begin_fieldset( T_('User rights'), array( 'class'=>'fieldset clear' ) );
 
-$field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://b2evolution.net/man/user_levels.html"' );
+$field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://manual.b2evolution.net/User_levels"' );
 if( $current_User->check_perm( 'users', 'edit' ) )
 {
 	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('Level'), array( 'note' => $field_note, 'required' => true ) );
@@ -281,6 +281,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.25  2006/11/05 20:13:57  fplanque
+ * minor
+ *
  * Revision 1.24  2006/10/30 19:00:36  blueyed
  * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
  *

@@ -274,7 +274,7 @@ $schema_queries = array(
 		)" ),
 
 	'T_item__prerendering' => array(
-		'Creating item cache table',
+		'Creating item prerendering cache table',
 		'CREATE TABLE T_item__prerendering(
 			itpr_itm_ID                   INT(11) UNSIGNED NOT NULL,
 			itpr_format                   ENUM(\'htmlbody\', \'entityencoded\', \'xml\', \'text\') NOT NULL,
@@ -490,6 +490,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.39  2006/11/05 20:13:57  fplanque
+ * minor
+ *
  * Revision 1.38  2006/10/05 02:42:22  blueyed
  * Remove index hit_datetime, because its slow on INSERT (e.g. 1s)
  *

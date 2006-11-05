@@ -1310,6 +1310,7 @@ function debug_die( $additional_info = '' )
 			global $io_charset;
 			header( 'Content-type: text/html; charset='.$io_charset );
 		}
+		// fp> TODO: The 15 lines above can be oiptimized in just header(...) . Or am I missing something??
 
 		header('HTTP/1.0 500 Internal Server Error');
 	}
@@ -2692,6 +2693,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.134  2006/11/05 20:13:57  fplanque
+ * minor
+ *
  * Revision 1.133  2006/11/02 15:57:47  blueyed
  * Fixes for pre_dump() and add_icon()
  *

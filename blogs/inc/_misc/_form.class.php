@@ -1204,7 +1204,7 @@ class Form extends Widget
 
 		$r = "\n\n<form".get_field_attribs_as_string($form_params).">\n";
 
-		$r .= '<div style="display:inline">'; // for XHTML
+		$r .= '<div style="display:inline">'; // for XHTML validation (?)
 
 		$r .= $this->formstart;
 
@@ -1300,7 +1300,7 @@ class Form extends Widget
 		$r .= '</div>';
 		$r .= "\n</form>\n\n";
 
-		// When the page loads, Initialize all the parent child select lists
+		// When the page loads, Initialize all the parent child select lists + other javascripts
 		$r .= '
 			<script type="text/javascript">
 				//<![CDATA[
@@ -2687,6 +2687,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.44  2006/11/05 20:13:57  fplanque
+ * minor
+ *
  * Revision 1.43  2006/11/03 14:25:24  blueyed
  * Made Form::get_valid_id() static
  *

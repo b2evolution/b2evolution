@@ -112,7 +112,8 @@ function logIO($io,$msg)
  * @param string the source string
  * @return string same length, but only stars
  */
-function starify( $string ) {
+function starify( $string )
+{
 	return str_repeat( '*', strlen( $string ) );
 }
 
@@ -1596,6 +1597,7 @@ function mweditpost($m)
 	global $DB;
 	global $Settings;
 	global $Messages;
+		global $xmlrpc_htmlchecking;  // fp> so what?? do we use this var or not? (I'd prefer to use a global rather than a constant)
 	global $default_category;
 
 	logIO("O","start of mweditpost...");
@@ -2110,6 +2112,11 @@ function mt_getcategoryList($m) {
 
 /**** SERVER FUNCTIONS ARRAY ****/
 // dh> TODO: Plugin hook here, so that Plugins can provide own callbacks?!
+// fp> The current implementation of this file is not optimal (file is way too large)
+// fp> xmlrpc.php should actually only be a switcher and it should load the function to execute once it has been identified
+// fp> maybe it would make sense to register xmlrpc apis/functions in a DB table
+// fp> it would probably make sense to have *all* xmlrpc methods implemented as plugins (maybe 1 plugin per API; it should be possible to add a single func to an API with an additional plugin)
+// fp> from a security standpoint it would make a lot of sense to disable any rpc that is not needed
 
 require_once $inc_path.'_misc/ext/_xmlrpcs.php'; // This will add generic remote calls
 
@@ -2254,6 +2261,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.118  2006/11/05 20:13:57  fplanque
+ * minor
+ *
  * Revision 1.117  2006/10/10 19:23:51  blueyed
  * Use set()/dbupdate() instead of update() in bloggereditpost()
  *
