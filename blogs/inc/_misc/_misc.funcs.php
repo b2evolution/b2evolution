@@ -1037,6 +1037,7 @@ function pre_dump( $var__var__var__var__ )
 	}
 	elseif( function_exists('xdebug_var_dump') )
 	{ // xdebug already does fancy displaying:
+		// NOTE: xdebug does not display/mark references in the dump.. with "&" prefix
 		ini_set('xdebug.var_display_max_depth', 10);
 		echo "\n<div style=\"padding:1ex;border:1px solid #00f;\">\n";
 		foreach( func_get_args() as $lvar )
@@ -1286,7 +1287,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 function debug_die( $additional_info = '' )
 {
 	global $debug, $baseurl;
-	global $log_app_errors, $app_name;
+	global $log_app_errors, $app_name, $is_cli;
 
 	// Attempt to output an error header (will not work if the output buffer has already flushed once):
 	// This should help preventing indexing robots from indexing the error :P
@@ -1315,33 +1316,53 @@ function debug_die( $additional_info = '' )
 		header('HTTP/1.0 500 Internal Server Error');
 	}
 
-	echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
-	echo '<h3 style="color:#f00;">'.T_('An unexpected error has occured!').'</h3>';
-	echo '<p>'.T_('If this error persits, please report it to the administrator.').'</p>';
-	echo '<p><a href="'.$baseurl.'">'.T_('Go back to home page').'</a></p>';
-	echo '</div>';
-
-	if( ! empty( $additional_info ) )
+	if( $is_cli )
+	{ // Command line interface, e.g. in cron_exec.php:
+		echo '== '.T_('An unexpected error has occured!')." ==\n";
+		echo T_('If this error persits, please report it to the administrator.')."\n";
+		echo T_('Additional information about this error:')."\n";
+		echo strip_tags( $additional_info );
+	}
+	else
 	{
-		echo '<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">';
-		echo '<h3>'.T_('Additional information about this error:').'</h3>';
-		echo $additional_info;
+		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
+		echo '<h3 style="color:#f00;">'.T_('An unexpected error has occured!').'</h3>';
+		echo '<p>'.T_('If this error persits, please report it to the administrator.').'</p>';
+		echo '<p><a href="'.$baseurl.'">'.T_('Go back to home page').'</a></p>';
 		echo '</div>';
+
+		if( ! empty( $additional_info ) )
+		{
+			echo '<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">';
+			echo '<h3>'.T_('Additional information about this error:').'</h3>';
+			echo $additional_info;
+			echo '</div>';
+		}
 	}
 
+	if( $log_app_errors > 1 || $debug )
+	{ // Prepare backtrace
+		$backtrace = debug_get_backtrace();
+
+		if( $log_app_errors > 1 || $is_cli )
+		{
+			$backtrace_cli = trim(strip_tags($backtrace));
+		}
+	}
 
 	if( $log_app_errors )
 	{ // Log error through PHP's logging facilities:
 		$log_message = $app_name.' error: ';
 		if( ! empty($additional_info) )
 		{
-			$log_message .= $additional_info;
+			$log_message .= trim( strip_tags($additional_info) );
 		}
 		else
 		{
 			$log_message .= 'No info specified in debug_die()';
 		}
 
+		// Get file and line info:
 		$file = 'Unknown';
 		$line = 'Unknown';
 		if( function_exists('debug_backtrace') /* PHP 4.3 */ )
@@ -1358,18 +1379,35 @@ function debug_die( $additional_info = '' )
 		}
 		$log_message .= ' in '.$file.' at line '.$line;
 
-		error_log( $log_message, 0 );
+		if( $log_app_errors > 1 )
+		{ // Append backtrace:
+			// indent after newlines:
+			$backtrace_cli = preg_replace( '~(\S)(\n)(\S)~', '$1  $2$3', $backtrace_cli );
+			$log_message .= "\n".$backtrace_cli;
+		}
+		$log_message .= "\n".$_SERVER['REQUEST_URI'].' ('.( isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '-' ).')';
+
+		error_log( $line, 0 /* PHP's system logger */ );
 	}
 
 
+	// DEBUG OUTPUT:
 	if( $debug )
 	{
-		echo debug_get_backtrace();
+		if( $is_cli )
+			echo $backtrace_cli;
+		else
+			echo $backtrace;
+
 		debug_info();
 	}
 
-	// Attempt to keep the html valid (but it doesn't really matter anyway)
-	die( '</body></html>' );
+	// EXIT:
+	if( ! $is_cli )
+	{ // Attempt to keep the html valid (but it doesn't really matter anyway)
+		echo '</body></html>';
+	}
+	die();
 }
 
 
@@ -1497,7 +1535,7 @@ function debug_info( $force = false )
 
 		foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
 			'memory_get_usage' => array( 'display' => 'Memory usage', 'high' => 8000000 ),
-			'xdebug_peak_memory_usage' => array( 'display' => 'Memory peak usage', 'high' => 8000000 ) ) as $l_func => $l_var )
+			'memory_get_peak_usage' /* PHP 5.2 */ => array( 'display' => 'Memory peak usage', 'high' => 8000000 ) ) as $l_func => $l_var )
 		{
 			if( function_exists( $l_func ) )
 			{
@@ -2231,7 +2269,8 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 		// Note: Also see http://de3.php.net/manual/en/function.header.php#50588 and the other comments around
 		header( 'HTTP/1.1 303 See Other' );
 	}
-	header( 'Location: '.$redirect_to );
+	$status = $permanent ? 301 : 303;
+	header( 'Location: '.$redirect_to, true, $status ); // explictly setting the status is required for (fast)cgi
 	exit();
 }
 
@@ -2693,6 +2732,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.135  2006/11/06 19:43:27  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.134  2006/11/05 20:13:57  fplanque
  * minor
  *
