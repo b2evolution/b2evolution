@@ -129,7 +129,6 @@ class Comment extends DataObject
 			$this->author = $db_row['comment_author'];
 			$this->author_email = $db_row['comment_author_email'];
 			$url = trim( $db_row['comment_author_url'] );
-			$url = preg_replace('#&(?!amp;)#is', '&amp;', $url); // Escape &
 			if( ! empty($url) && ! preg_match( '~^\w+://~', $url ) )
 			{ // URL given and does not start with a protocol:
 				$url = 'http://'.$url;
@@ -1161,6 +1160,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.46  2006/11/06 00:05:36  blueyed
+ * Encoding of "&" in Comment::author_url makes no sense, should get done on output.
+ *
  * Revision 1.45  2006/11/05 22:12:35  blueyed
  * Fix
  *
