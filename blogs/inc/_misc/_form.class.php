@@ -511,6 +511,10 @@ class Form extends Widget
 			unset($field_params['force_to']); // not a html attrib
 		}
 
+		// Give it a class, so it can be selected for CSS in IE6
+		if( empty($field_params['class']) ) $field_params['class'] = 'form_text_input';
+		else $field_params['class'] .= ' form_text_input';
+
 		$field_params['name'] = $field_name;
 		$field_params['label'] = $field_label;
 		return $this->input_field( $field_params );
@@ -1204,7 +1208,7 @@ class Form extends Widget
 
 		$r = "\n\n<form".get_field_attribs_as_string($form_params).">\n";
 
-		$r .= '<div style="display:inline">'; // for XHTML validation (?)
+		$r .= '<div style="display:inline">'; // for XHTML validation
 
 		$r .= $this->formstart;
 
@@ -1789,6 +1793,10 @@ class Form extends Widget
 		}
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
+
+		// Give it a class, so it can be selected for CSS in IE6
+		if( empty($field_params['class']) ) $field_params['class'] = 'form_textarea_input';
+		else $field_params['class'] .= ' form_textarea_input';
 
 		$r = $this->begin_field()
 			// NOTE: The following pixel is needed to avoid the dity IE textarea expansion bug
@@ -2687,6 +2695,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.45  2006/11/08 17:47:55  blueyed
+ * Extra classes 'form_text_input' and 'form_textarea_input' to enable IE6 CSS selection
+ *
  * Revision 1.44  2006/11/05 20:13:57  fplanque
  * minor
  *
