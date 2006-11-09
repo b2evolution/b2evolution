@@ -491,6 +491,7 @@ function param_check_filename( $var, $err_msg )
 /**
  * Check if the value of a param is a regular expression (syntax).
  *
+ * @todo dh> BLOATED! I always think it checks for a pattern, but...
  * @param string param name
  * @param string error message
  * @param string|NULL error message for form field ($err_msg gets used if === NULL).
@@ -1601,6 +1602,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.17  2006/11/09 22:56:57  blueyed
+ * todo
+ *
  * Revision 1.16  2006/11/02 16:31:53  blueyed
  * MFB
  *
