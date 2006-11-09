@@ -6173,7 +6173,7 @@ msgstr "Hochladen aktivieren"
 
 #: ..\..\..\inc\VIEW\files\_set_files.form.php:61
 msgid "KB (This cannot be higher than your PHP/Webserver setting!)"
-msgstr "LB (Dies kann nicht höher als die PHP/Webserver-Einstellung sein!)"
+msgstr "KB (Dies kann nicht höher als die PHP/Webserver-Einstellung sein!)"
 
 #: ..\..\..\inc\VIEW\files\_set_files.form.php:61
 msgid "Maximum allowed filesize"
