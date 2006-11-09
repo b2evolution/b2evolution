@@ -338,11 +338,24 @@ class ldap_plugin extends Plugin
 
 		return false;
 	}
+
+
+	/**
+	 * We need the raw password to compare it.
+	 * @return true
+	 */
+	function LoginAttemptNeedsRawPassword()
+	{
+		return true;
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.39  2006/11/09 22:27:20  blueyed
+ * Needs raw pwd
+ *
  * Revision 1.38  2006/10/16 08:39:10  blueyed
  * Merged fixes from v-1-9 branch
  *
