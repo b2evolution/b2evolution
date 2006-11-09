@@ -113,6 +113,9 @@ label.radiooption {
 	padding: 0;
 	/* border: 1px solid #00f; */
 }
+.fform fieldset.bordered {
+	border: 1px solid #ddd;
+}
 .fform div.label {
 	float: left;
 	width: 24%;
