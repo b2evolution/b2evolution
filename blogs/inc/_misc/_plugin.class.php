@@ -517,7 +517,6 @@ class Plugin
 	 *    'for_editing': true, if the settings get queried for editing;
 	 *                   false, if they get queried for instantiating {@link Plugin::UserSettings}.
 	 * @return array See {@link Plugin::GetDefaultSettings()}.
-	 *               NOTE: type 'array' does not work in b2evo 1.8.x (for editing)!
 	 */
 	function GetDefaultUserSettings( & $params )
 	{
@@ -2769,6 +2768,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.111  2006/11/09 22:27:57  blueyed
+ * doc
+ *
  * Revision 1.110  2006/11/04 18:16:31  blueyed
  * MFB: note about bug in 1.8.x
  *
