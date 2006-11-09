@@ -95,10 +95,16 @@ class auto_p_plugin extends Plugin
 		$this->add_p_in_block = $this->Settings->get('add_p_in_block');
 		$this->skip_tags = preg_split( '~\s+~', $this->Settings->get('skip_tags'), -1, PREG_SPLIT_NO_EMPTY );
 
-		$this->handled_first_block = false; // used to detect first block
-
 		$content = preg_replace( "~(\r\n|\r)~", "\n", $content ); // cross-platform newlines
-		$content = $this->handle_blocks( $content );
+
+		// Handle blocks, splitted by "<!--more-->":
+		$content_parts = explode('<!--more-->', $content);
+
+		$content = '';
+		foreach( $content_parts as $content_part )
+		{
+			$content .= $this->handle_blocks( $content_part );
+		}
 
 		return true;
 	}
@@ -163,8 +169,6 @@ class auto_p_plugin extends Plugin
 		{ // No BLOCKS in this $text:
 			$new_text = $this->handle_pre_blocks($text, $in_tag);
 		}
-
-		$this->handled_first_block = true;
 
 		#pre_dump( 'HANDLE_BLOCKS return: ', $new_text, $in_tag );
 		return $new_text;
@@ -625,6 +629,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.31  2006/11/09 22:19:39  blueyed
+ * Fix: split blocks by "<!--more-->" before working on them
+ *
  * Revision 1.30  2006/08/26 15:57:39  blueyed
  * Fixed handling of self-closing inline tags in Auto-P
  *
