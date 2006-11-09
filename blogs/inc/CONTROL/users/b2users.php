@@ -502,6 +502,43 @@ if( !$Messages->count('error') )
 			break;
 
 
+		case 'del_settings_set':
+			param( 'plugin_ID', 'integer', true );
+			param( 'set_path' );
+
+			$admin_Plugins = new Plugins_admin();
+			$admin_Plugins->restart();
+			$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
+
+			require_once $inc_path.'_misc/_plugin.funcs.php';
+			_set_setting_by_path( $edit_Plugin, 'UserSettings', $set_path, NULL );
+
+			$edit_Plugin->Settings->dbupdate();
+
+			$action = 'edit_user';
+
+			break;
+
+
+		case 'add_settings_set': // delegates to edit_settings
+			// Add a new set to an array type setting:
+			param( 'plugin_ID', 'integer', true );
+			param( 'set_path', 'string', '' );
+
+			$admin_Plugins = new Plugins_admin();
+			$admin_Plugins->restart();
+			$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
+
+			require_once $inc_path.'_misc/_plugin.funcs.php';
+			_set_setting_by_path( $edit_Plugin, 'UserSettings', $set_path, array() );
+
+			$edit_Plugin->Settings->dbupdate();
+
+			$action = 'edit_user';
+
+			break;
+
+
 		// ---- GROUPS --------------------------------------------------------------------------------------
 
 		case 'new_group':
@@ -686,6 +723,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.36  2006/11/09 23:40:57  blueyed
+ * Fixed Plugin UserSettings array type editing; Added jquery and use it for AJAHifying Plugin (User)Settings editing of array types
+ *
  * Revision 1.35  2006/10/30 19:00:36  blueyed
  * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
  *

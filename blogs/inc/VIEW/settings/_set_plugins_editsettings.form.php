@@ -88,7 +88,7 @@ if( $edit_Plugin->Settings )
 
 	foreach( $edit_Plugin->GetDefaultSettings( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
 	{
-		display_settings_fieldset_field( $l_name, $l_meta, $edit_Plugin, $Form, 'Settings' );
+		display_plugin_settings_fieldset_field( $l_name, $l_meta, $edit_Plugin, $Form, 'Settings' );
 	}
 
 	$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditDisplayAfter', $tmp_params = array( 'Form' => & $Form ) );
@@ -175,6 +175,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.25  2006/11/09 23:40:57  blueyed
+ * Fixed Plugin UserSettings array type editing; Added jquery and use it for AJAHifying Plugin (User)Settings editing of array types
+ *
  * Revision 1.24  2006/11/05 18:33:58  fplanque
  * no external links in action icons
  *

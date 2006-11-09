@@ -121,129 +121,21 @@ function install_plugin_db_schema_action( & $Plugin )
 }
 
 
-/**
- * Helper method for "add_settings_set" and "delete_settings_set" action.
- *
- * Walks the given settings path and either inits the target entry or unsets it ($init_value=NULL).
- *
- * @param string Setting name
- * @param string The settings path, e.g. 'setting[0]foo[1]'. (Is used as array internally for recursion.)
- * @param mixed The initial value of the setting, typically array() - NULL to unset it (action "delete_settings_set" uses it)
- * @param mixed Used internally for recursion (current setting to look at)
- * @param mixed Used internally for recursion (meta info of current setting to look at)
- * @return array|false
- */
-function _set_setting_by_path( & $Plugin, $path, $init_value = array(), $setting = NULL, $meta = NULL )
-{
-	if( ! is_array($path) )
-	{ // Init:
-		if( ! preg_match( '~(\w+\[\w+\])+~', $path ) )
-		{
-			debug_die( 'Invalid path param!' );
-		}
-
-		$path = preg_split( '~(\[|\]\[?)~', $path, -1, PREG_SPLIT_NO_EMPTY ); // split by "[" and "][", so we get an array with setting name and index alternating
-		$set_name = array_shift($path);
-
-		$setting = $Plugin->Settings->get($set_name);
-
-		// meta info for this setting:
-		$defaults = $Plugin->GetDefaultSettings( $tmp_params = array('for_editing'=>true) );
-		if( ! isset($defaults[ $set_name ]) )
-		{
-			debug_die( 'Invalid setting ('.$set_name.') - no meta data!' );
-		}
-
-		$meta = $defaults[ $set_name ];
-
-		$root_instance = true; // to set the new value at the end
-	}
-	else
-	{
-		$set_name = array_shift($path);
-		$setting = isset($setting[$set_name]) ? $setting[$set_name] : array();
-		$meta = $meta['entries'][$set_name];
-	}
-
-	if( ! is_array($setting) )
-	{ // something broken
-		$setting = array();
-	}
-
-	$set_index = array_shift($path);
-
-	if( ! count($path) )
-	{ // at the end: init this entry
-
-		if( isset($setting[$set_index]) && $init_value != NULL )
-		{ // Setting already exists (and we do not want to delete), e.g. page reload!
-			return false;
-			/*
-			while( isset($l_setting[ $path[0] ]) )
-			{ // bump the index until not set
-				$path[0]++;
-			}
-			*/
-		}
-
-		if( is_null($init_value) )
-		{ // NULL is meant to unset it
-			unset($setting[$set_index]);
-		}
-		else
-		{ // Init entries:
-			$setting[$set_index] = $init_value;
-			foreach( $meta['entries'] as $k => $v )
-			{
-				if( isset( $v['defaultvalue'] ) )
-				{ // set to defaultvalue
-					$setting[$set_index][$k] = $v['defaultvalue'];
-				}
-				else
-				{
-					if( isset($v['type']) && $v['type'] == 'array' )
-					{
-						$setting[$set_index][$k] = array();
-					}
-					else
-					{
-						$setting[$set_index][$k] = '';
-					}
-				}
-			}
-		}
-	}
-	else
-	{ // Recurse:
-		$new_set = _set_setting_by_path( $Plugin, $path, $init_value, $setting[$set_index], $meta );
-
-		if( $new_set !== false )
-		{
-			$setting[$set_index][$path[0]] = $new_set;
-		}
-	}
-
-	if( isset($root_instance) )
-	{ // this is the root call, set the new setting
-		$r = $Plugin->Settings->set( $set_name, $setting );
-	}
-
-	return $setting;
-}
 
 
 // Actions that delegate to other actions (other than list):
 switch( $action )
 {
-	case 'delete_settings_set':
+	case 'del_settings_set':
 		param( 'plugin_ID', 'integer', true );
 		param( 'set_path' );
 
 		$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 
-		_set_setting_by_path( $edit_Plugin, $set_path, NULL );
+		require_once $inc_path.'_misc/_plugin.funcs.php';
+		_set_setting_by_path( $edit_Plugin, 'Settings', $set_path, NULL );
 
-		$edit_Plugin->Settings->dbupdate();
+		#$edit_Plugin->Settings->dbupdate();
 
 		$action = 'edit_settings';
 
@@ -256,7 +148,8 @@ switch( $action )
 
 		$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 
-		_set_setting_by_path( $edit_Plugin, $set_path, array() );
+		require_once $inc_path.'_misc/_plugin.funcs.php';
+		_set_setting_by_path( $edit_Plugin, 'Settings', $set_path, array() );
 
 		#$edit_Plugin->Settings->dbupdate();
 
@@ -905,12 +798,14 @@ if( 1 || $Settings->get( 'plugins_disp_log_in_admin' ) )
 */
 
 
-// Extend titlearea for some actions:
-// blueyed>> IMHO it's a good use for the whitespace here (instead of directly above the payload)
+// Extend titlearea for some actions and add JS:
 switch( $action )
 {
 	case 'edit_settings':
 		$AdminUI->append_to_titlearea( sprintf( T_('Edit plugin &laquo;%s&raquo; (ID %d)'), $edit_Plugin->name, $edit_Plugin->ID ) );
+		// include jquery JS:
+		$AdminUI->add_headline( '<script type="text/javascript" src="'
+			.$rsc_url.'js/'.( $debug ? 'jquery.js' : 'jquery.pack.js' ).'"></script>' );
 		break;
 
 	case 'disp_help':

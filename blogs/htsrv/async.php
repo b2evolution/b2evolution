@@ -30,17 +30,67 @@
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
 
-// HEAVY :(
+/**
+ * HEAVY :(
+ *
+ * @todo dh> refactor _main.inc.php to be able to include small parts
+ *           (e.g. $current_User, charset init, ...) only..
+ *           It works already for $DB (_connect_db.inc.php).
+ */
 require_once $inc_path.'_main.inc.php';
+
+param( 'action', 'string', '' );
 
 
 // Check global permission:
+// TODO: there might be actions for anon users also..
 if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 {	// No permission to access admin...
 	require $view_path.'errors/_access_denied.inc.php';
 }
 
 
+switch( $action )
+{
+	case 'add_plugin_sett_set':
+		// header('Content-type: text/html; charset='.$io_charset);
+
+		param( 'plugin_ID', 'integer', true );
+		$Plugin = & $Plugins->get_by_ID($plugin_ID);
+		if( ! $Plugin )
+		{
+			bad_request_die('Invalid Plugin.');
+		}
+		param( 'set_type', 'string', '' ); // "Settings" or "UserSettings"
+		if( $set_type != 'Settings' && $set_type != 'UserSettings' )
+		{
+			bad_request_die('Invalid set_type param!');
+		}
+		param( 'set_path', '/^\w+(?:\[\w+\])+$/', '' );
+
+		require_once $inc_path.'_misc/_plugin.funcs.php';
+
+		// Init the new setting set:
+		_set_setting_by_path( $Plugin, $set_type, $set_path, array() );
+
+		$r = get_plugin_settings_node_by_path( $Plugin, $set_type, $set_path );
+
+		$Form = new Form(); // fake Form
+		display_plugin_settings_fieldset_field( $set_path, $r[3], $Plugin, $Form, $set_type = 'Settings', $set_target = NULL, $r[2] );
+
+		exit;
+
+	case 'del_plugin_sett_set':
+		// TODO: may use validation here..
+		echo 'OK';
+		exit;
+}
+
+
+/**
+ * @todo dh> What's the reason to delegate to another file here, instead of
+ *           having it all here?
+ */
 require_once $inc_path.'_async.inc.php';
 
 
@@ -53,6 +103,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.5  2006/11/09 23:40:57  blueyed
+ * Fixed Plugin UserSettings array type editing; Added jquery and use it for AJAHifying Plugin (User)Settings editing of array types
+ *
  * Revision 1.4  2006/11/02 18:14:59  fplanque
  * normalized
  *
