@@ -52,7 +52,9 @@ $Form->begin_fieldset( T_('Filemanager options') );
 	// $Form->checkbox( 'fm_enable_roots_group', $Settings->get('fm_enable_roots_group'), T_('Enable group directories'), T_('Check to enable root directories for groups.' ) );
 	$Form->checkbox( 'fm_enable_roots_user', $Settings->get('fm_enable_roots_user'), T_('Enable user directories'), T_('Check to enable root directories for users.' ) );
 	$Form->checkbox( 'fm_enable_create_dir', $Settings->get('fm_enable_create_dir'), T_('Enable creation of dirs'), T_('Check to enable creation of directories.' ) );
+	$Form->text_input( 'fm_default_chmod_dir', $Settings->get('fm_default_chmod_dir'), 4, T_('Default CHMOD for dirs'), array('note'=>T_('Default CHMOD (UNIX permissions) for new directories created by the file manager.' )) );
 	$Form->checkbox( 'fm_enable_create_file', $Settings->get('fm_enable_create_file'), T_('Enable creation of files'), T_('Check to enable creation of files.' ) );
+	$Form->text_input( 'fm_default_chmod_file', $Settings->get('fm_default_chmod_file'), 4, T_('Default CHMOD for files'), array('note'=>T_('Default CHMOD (UNIX permissions) for new files created by the file manager.' )) );
 $Form->end_fieldset();
 
 

@@ -81,8 +81,8 @@ class GeneralSettings extends AbstractSettings
 		'fm_showtypes' => '0',
 		'fm_showfsperms' => '0',
 
-		'fm_default_chmod_file' => '664',   // Needs UI
-		'fm_default_chmod_dir' => '775',    // Needs UI
+		'fm_default_chmod_file' => '664',
+		'fm_default_chmod_dir' => '775',
 
 		'links_extrapath' => 'disabled',
 
@@ -158,6 +158,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.21  2006/11/09 23:11:44  blueyed
+ * Made chmod settings editable
+ *
  * Revision 1.20  2006/10/06 21:03:06  blueyed
  * Removed deprecated/unused "upload_allowedext" Setting, which restricted file extensions during upload though!
  *

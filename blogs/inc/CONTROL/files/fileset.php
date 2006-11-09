@@ -63,7 +63,9 @@ switch( $action )
 					// 'fm_enable_roots_group',
 					'fm_enable_roots_user',
 					'fm_enable_create_dir',
+					'fm_default_chmod_dir',
 					'fm_enable_create_file',
+					'fm_default_chmod_file',
 					'upload_enabled',
 					'upload_maxkb',
 					'regexp_filename' ) );
@@ -93,8 +95,26 @@ switch( $action )
 			param( 'fm_enable_create_dir', 'integer', 0 );
 			$Settings->set( 'fm_enable_create_dir', $fm_enable_create_dir );
 
+			// Default dir CHMOD:
+			if( param( 'fm_default_chmod_dir', 'string', NULL ) !== NULL )
+			{
+				if( ! preg_match('~[0-7]{1,4}~', $fm_default_chmod_dir) )
+					param_error('fm_default_chmod_dir', T_('Invalid CHMOD value.'));
+
+				$Settings->set( 'fm_default_chmod_dir', $fm_default_chmod_dir );
+			}
+
 			param( 'fm_enable_create_file', 'integer', 0 );
 			$Settings->set( 'fm_enable_create_file', $fm_enable_create_file );
+
+			// Default files CHMOD:
+			if( param( 'fm_default_chmod_file', 'string', NULL ) !== NULL )
+			{
+				if( ! preg_match('~[0-7]{1,4}~', $fm_default_chmod_file) )
+					param_error('fm_default_chmod_file', T_('Invalid CHMOD value.'));
+
+				$Settings->set( 'fm_default_chmod_file', $fm_default_chmod_file );
+			}
 
 			// Upload
 			param( 'upload_enabled', 'integer', 0 );
