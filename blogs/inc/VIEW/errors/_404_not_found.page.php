@@ -6,6 +6,8 @@
  *
  * @package evocore
  */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
 
 header('HTTP/1.0 404 Not Found');
 header('Content-Type: text/html; charset=iso-8859-1'); // no translation

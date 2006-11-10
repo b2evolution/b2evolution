@@ -4,6 +4,7 @@
  *
  * @package evocore
  */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Note: if you have a really really good reason to bypass this, uncomment the following line:
 // return;
