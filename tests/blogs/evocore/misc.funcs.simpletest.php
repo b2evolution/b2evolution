@@ -248,6 +248,32 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( get_ban_domain('http://sub3.sub2.sub1.example.com'), '.example.com' );
 		$this->assertEqual( get_ban_domain('http://hostname'), '//hostname' );
 		$this->assertEqual( get_ban_domain('http://hostname.tld'), '//hostname.tld' );
+		$this->assertEqual( get_ban_domain('http://hostname.co.uk'), '//hostname.co.uk' );
+		$this->assertEqual( get_ban_domain('http://www.hostname.co.uk'), '.hostname.co.uk' );
+		$this->assertEqual( get_ban_domain('http://sub.hostname.co.uk'), '.hostname.co.uk' );
+	}
+
+
+	/**
+	 * Test {@link get_base_domain()}
+	 */
+	function test_get_base_domain()
+	{
+		$this->assertEqual( get_base_domain('www.example.com'), 'example.com' );
+		$this->assertEqual( get_base_domain('www2.example.com'), 'example.com' );
+		$this->assertEqual( get_base_domain('http://www.example.com'), 'example.com' );
+		$this->assertEqual( get_base_domain('http://www2.example.com'), 'example.com' );
+		$this->assertEqual( get_base_domain('http://www.example.com/path/'), 'example.com' );
+		$this->assertEqual( get_base_domain('http://www2.example.com/path/?query=1'), 'example.com' );
+		$this->assertEqual( get_base_domain('https://www.example.com'), 'example.com' );
+		$this->assertEqual( get_base_domain('https://www2.example.com'), 'example.com' );
+		$this->assertEqual( get_base_domain('http://sub2.sub1.example.com'), 'example.com' );
+		$this->assertEqual( get_base_domain('http://sub3.sub2.sub1.example.com'), 'example.com' );
+		$this->assertEqual( get_base_domain('http://hostname'), 'hostname' );
+		$this->assertEqual( get_base_domain('http://hostname.tld'), 'hostname.tld' );
+		$this->assertEqual( get_base_domain('http://hostname.co.uk'), 'hostname.co.uk' );
+		$this->assertEqual( get_base_domain('http://www.hostname.co.uk'), 'hostname.co.uk' );
+		$this->assertEqual( get_base_domain('http://sub.hostname.co.uk'), 'hostname.co.uk' );
 	}
 
 
