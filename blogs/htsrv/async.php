@@ -53,7 +53,7 @@ if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 switch( $action )
 {
 	case 'add_plugin_sett_set':
-		// header('Content-type: text/html; charset='.$io_charset);
+		header('Content-type: text/html; charset='.$io_charset);
 
 		param( 'plugin_ID', 'integer', true );
 		$Plugin = & $Plugins->get_by_ID($plugin_ID);
@@ -103,6 +103,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.6  2006/11/10 16:37:30  blueyed
+ * Send charset
+ *
  * Revision 1.5  2006/11/09 23:40:57  blueyed
  * Fixed Plugin UserSettings array type editing; Added jquery and use it for AJAHifying Plugin (User)Settings editing of array types
  *
