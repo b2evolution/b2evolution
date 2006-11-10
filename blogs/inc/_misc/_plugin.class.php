@@ -415,6 +415,9 @@ class Plugin
 	 *       'options': an array of options ('value' => 'description'), see {@link Form::select_input_array()}.
 	 *       </li></ul>
 	 *     </li><li>
+	 *     'select_blog': a drop down field, providing all existing blogs (Group ID is the value or "" if "allow_none" is true)
+	 *                    (since b2evo 1.10)
+	 *     </li><li>
 	 *     'select_group': a drop down field, providing all existing groups (Group ID is the value or "" if "allow_none" is true)
 	 *     </li><li>
 	 *     'select_user': a drop down field, providing all existing groups (User ID is the value or "" if "allow_none" is true)
@@ -2768,6 +2771,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.112  2006/11/10 17:14:20  blueyed
+ * Added "select_blog" type for Plugin (User)Settings
+ *
  * Revision 1.111  2006/11/09 22:27:57  blueyed
  * doc
  *

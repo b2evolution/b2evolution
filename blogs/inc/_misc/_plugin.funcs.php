@@ -212,6 +212,11 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 			$Form->select_input_array( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_meta['options'], $set_label, $params );
 			break;
 
+		case 'select_blog':
+			$BlogCache = & get_Cache( 'BlogCache' );
+			$Form->select_input_object( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $BlogCache, $set_label, $params );
+			break;
+
 		case 'select_group':
 			$GroupCache = & get_Cache( 'GroupCache' );
 			$Form->select_input_object( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $GroupCache, $set_label, $params );
@@ -684,6 +689,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.30  2006/11/10 17:14:20  blueyed
+ * Added "select_blog" type for Plugin (User)Settings
+ *
  * Revision 1.29  2006/11/10 16:37:57  blueyed
  * Fixed ID for AJAX DIV
  *
