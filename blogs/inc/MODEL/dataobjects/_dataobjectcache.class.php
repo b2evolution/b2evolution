@@ -41,6 +41,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Data Object Cache Class
  *
+ * @todo dh> Provide iteration "interface"!
+ *
  * @package evocore
  * @version beta
  */
@@ -512,6 +514,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.19  2006/11/10 20:14:42  blueyed
+ * TODO
+ *
  * Revision 1.18  2006/10/13 09:58:53  blueyed
  * Removed bogus unset()
  *
