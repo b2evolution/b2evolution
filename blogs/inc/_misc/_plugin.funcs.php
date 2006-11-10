@@ -306,9 +306,9 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 
 			if( ! isset( $set_meta['max_number'] ) || $set_meta['max_number'] > count($set_value) )
 			{ // no max_number defined or not reached: display link to add a new set
-				$ajax_id = Form::get_valid_id('newset_'.$set_name);
-				echo '<div id="'.$ajax_id.'">';
 				$set_path = $set_name.'['.$insert_new_set_as.']';
+				$ajax_id = Form::get_valid_id('newset_'.$set_path);
+				echo '<div id="'.$ajax_id.'">';
 				echo action_icon(
 					sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label),
 					'new',
@@ -684,6 +684,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.29  2006/11/10 16:37:57  blueyed
+ * Fixed ID for AJAX DIV
+ *
  * Revision 1.28  2006/11/09 23:40:57  blueyed
  * Fixed Plugin UserSettings array type editing; Added jquery and use it for AJAHifying Plugin (User)Settings editing of array types
  *
