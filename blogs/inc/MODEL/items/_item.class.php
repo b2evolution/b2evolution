@@ -124,7 +124,9 @@ class Item extends DataObject
 	var $assigned_user_ID;
 
 	/**
-	 * @var string Publish date ("Y-m-d H:i:s"). This may be in the future.
+	 * Publish date ("Y-m-d H:i:s"). This may be in the future.
+	 * This should get compared to {@link $localtimenow}.
+	 * @var string
 	 */
 	var $issue_date;
 	var $mod_date;
@@ -420,7 +422,7 @@ class Item extends DataObject
 			$this->set_from_Request( 'url' );
 		}
 
-		if( param( 'content', 'html', '' ) !== NULL ) {
+		if( param( 'content', 'html', NULL ) !== NULL ) {
 			$this->set( 'content', format_to_post( get_param('content') ) );
 		}
 
@@ -985,6 +987,7 @@ class Item extends DataObject
 					$this->dbupdate();
 				}
 
+				// Call renderer plugins:
 				$this->content_prerendered[$cache_key] = $Plugins->render( $this->content, $post_renderers, $format, array( 'Item' => $this ), 'Render' );
 
 				$Debuglog->add( 'Generated pre-rendered content ['.$cache_key.']', 'items' );
@@ -3364,6 +3367,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.116  2006/11/10 20:14:11  blueyed
+ * doc, fix
+ *
  * Revision 1.115  2006/11/02 16:12:49  blueyed
  * MFB
  *
