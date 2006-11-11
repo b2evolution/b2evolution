@@ -897,7 +897,8 @@ class ItemList2 extends DataObjectList2
 
 
 	/**
-	 * Get date of the last post/item
+	 * Get datetime of the last post/item
+	 * @return string 'Y-m-d H:i:s' formatted, maybe from $localtimenow
 	 */
 	function get_lastpostdate()
 	{
@@ -1640,6 +1641,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.37  2006/11/11 17:33:50  blueyed
+ * doc
+ *
  * Revision 1.36  2006/11/04 19:38:53  blueyed
  * Fixes for hook move
  *
