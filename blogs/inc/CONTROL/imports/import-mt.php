@@ -683,8 +683,9 @@ param( 'import_mode', 'string', 'normal' );
 			$post_renderers = $default_renderers;
 			$post_status = 'published';
 
-			// strip the post's last '-----'
-			$post = preg_replace("|-----\n+$|s", '', $post);
+			// strip the post's last '--------'
+			// "MT export files use 8 dashes to delimit entires (not 5, which delimit entry's sections)."
+			$post = preg_replace("|--------\n+$|s", '', $post);
 
 			// first line is author of post
 			$post_author = trim( substr( $post, 0, strpos( $post, "\n", 1 ) ) );
