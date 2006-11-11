@@ -35,7 +35,7 @@ class transport_optimizer_plugin extends Plugin
 	 * Low priority, so other CachePageContent plugins can override our ETag header.
 	 */
 	var $priority = 95;
-	var $version = '1.9-dev';
+	var $version = '2.0-dev';
 
 
 	/**
@@ -131,7 +131,7 @@ class transport_optimizer_plugin extends Plugin
 	*/
 	function obhandler( $output )
 	{
-		global $localtimenow, $current_User;
+		global $servertimenow, $current_User;
 
 		if( empty($output) )
 		{ // this might be the case, if someone else said "304" already
@@ -161,8 +161,7 @@ class transport_optimizer_plugin extends Plugin
 		// Send Last-Modified -----------------
 		if( $this->send_last_modified )
 		{
-			$lastmodified = $localtimenow;
-
+			$lastmodified = $servertimenow;
 			header( 'Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', $lastmodified) );
 		}
 
@@ -187,6 +186,9 @@ class transport_optimizer_plugin extends Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.8  2006/11/11 17:58:20  blueyed
+ * Fix: use $servertimenow for gmdate() in Last-modified header
+ *
  * Revision 1.7  2006/07/14 00:17:50  blueyed
  * Temp fix
  *
