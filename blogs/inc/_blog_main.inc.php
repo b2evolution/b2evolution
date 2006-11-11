@@ -373,9 +373,6 @@ if( !isset($display_blog_list) )
  * Now, we'll jump to displaying!
  */
 
-// Trigger plugin event:
-$Plugins->trigger_event( 'BeforeBlogDisplay' );
-
 // Check if a temporary skin has been requested (used for RSS syndication for example):
 if( !empty($tempskin) )
 {
@@ -435,6 +432,11 @@ $Timer->pause( '_blog_main.inc');
 
 // check to see if we want to display the popup or the main template
 param( 'template', 'string', 'main', true );
+
+
+// Trigger plugin event:
+$Plugins->trigger_event( 'BeforeBlogDisplay', array('skin'=>$skin) );
+
 
 if( !empty( $skin ) )
 { // We want to display now:
@@ -504,6 +506,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.47  2006/11/11 20:33:14  blueyed
+ * Moved BeforeBlogDisplay hook to after $skin has been determined
+ *
  * Revision 1.46  2006/10/24 14:03:52  blueyed
  * Type $c param ("Display comments?") to integer
  *
