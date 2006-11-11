@@ -318,73 +318,68 @@ function get_catname($cat_ID)
  *
  * TODO: replace LEFT JOIN with UNION when switching to MySQL 4
  * This will prevent empty cats from displaying "(1)" as postcount.
- *
- * @uses cat_load_postcounts()
- * @param string 'none'|'context'|'canonic'
  */
-function cat_load_cache( $cat_load_postcounts = 'none', $dbtable_items = 'T_posts', $dbprefix_items = 'post_',
-													$dbIDname_items = 'post_ID' )
+function cat_load_cache( $dbtable_items = 'T_posts', $dbprefix_items = 'post_', $dbIDname_items = 'post_ID' )
 {
 	global $DB, $cache_categories;
 	global $timestamp_min, $timestamp_max;
 	global $Settings;
 	global $Timer;
 
+	if( isset($cache_categories))
+	{
+		return;
+	}
+
 	$Timer->resume( 'cat_load_cache' );
 
-	if( !isset($cache_categories))
+	// echo "loading CAT cache";
+	$sql = "SELECT cat_ID, cat_parent_ID, cat_name, cat_blog_ID
+					FROM T_categories
+					ORDER BY cat_name";
+
+	foreach( $DB->get_results( $sql, ARRAY_A, 'loading CAT cache' ) as $myrow )
 	{
-		// echo "loading CAT cache";
-		$sql = "SELECT cat_ID, cat_parent_ID, cat_name, cat_blog_ID
-						FROM T_categories
-						ORDER BY cat_name";
+		$this_cat['cat_name'] = $myrow['cat_name'];
+		$this_cat['cat_blog_ID'] = $myrow['cat_blog_ID'];
+		$this_cat['cat_parent_ID'] = $myrow['cat_parent_ID'];
+		$this_cat['cat_postcount'] = 0;					// Will be increased later
+		$this_cat['cat_children'] = array();
+		$cache_categories[$myrow['cat_ID']] = $this_cat;
+		// echo 'just cached:',$myrow['cat_ID'],':',$cache_categories[$myrow['cat_ID']]['cat_name'], ' parent:',$cache_categories[$myrow['cat_ID']]['cat_parent_ID'],'<br />';
+	}
 
-		foreach( $DB->get_results( $sql, ARRAY_A, 'loading CAT cache' ) as $myrow )
+	// echo 'Number of cats=', count($cache_categories);
+
+	// Reveal children:
+	if( ! empty( $cache_categories ) )
+	{
+		foreach( $cache_categories as $icat_ID => $i_cat )
 		{
-			$this_cat['cat_name'] = $myrow['cat_name'];
-			$this_cat['cat_blog_ID'] = $myrow['cat_blog_ID'];
-			$this_cat['cat_parent_ID'] = $myrow['cat_parent_ID'];
-			$this_cat['cat_postcount'] = 0;					// Will be increased later
-			$this_cat['cat_children'] = array();
-			$cache_categories[$myrow['cat_ID']] = $this_cat;
-			// echo 'just cached:',$myrow['cat_ID'],':',$cache_categories[$myrow['cat_ID']]['cat_name'], ' parent:',$cache_categories[$myrow['cat_ID']]['cat_parent_ID'],'<br />';
-		}
-
-		// echo 'Number of cats=', count($cache_categories);
-
-		// Reveal children:
-		if( ! empty( $cache_categories ) )
-		{
-			foreach( $cache_categories as $icat_ID => $i_cat )
+			// echo '<br>handling cat ', $icat_ID, ' ', $i_cat['cat_name'];
+			$cat_parent_ID = $i_cat['cat_parent_ID'];
+			if( $cat_parent_ID )
 			{
-				// echo '<br>handling cat ', $icat_ID, ' ', $i_cat['cat_name'];
-				$cat_parent_ID = $i_cat['cat_parent_ID'];
-				if( $cat_parent_ID )
+				if( isset( $cache_categories[$cat_parent_ID] ) )
+				{ // If the parent exists!
+					$cache_categories[$cat_parent_ID]['cat_children'][] = $icat_ID;
+				}
+				else
 				{
-					if( isset( $cache_categories[$cat_parent_ID] ) )
-					{ // If the parent exists!
-						$cache_categories[$cat_parent_ID]['cat_children'][] = $icat_ID;
-					}
-					else
-					{
-						echo( "Catgeory #$icat_ID is oprhan of non existant parent #$cat_parent_ID!<br />" );
-					}
+					echo( "Catgeory #$icat_ID is oprhan of non existant parent #$cat_parent_ID!<br />" );
 				}
 			}
 		}
-
-		// echo 'Number of cats=', count($cache_categories);
 	}
 
-	cat_load_postcounts( $cat_load_postcounts, $dbtable_items, $dbprefix_items, $dbIDname_items );
+	// echo 'Number of cats=', count($cache_categories);
 
 	$Timer->pause( 'cat_load_cache' );
-
 }
 
 
 /**
- * Load the post counts
+ * Load the post counts. This {@link cat_load_cache() loads the cat cache}, if necessary.
  *
  * @param string 'context'|'canonic'
  */
@@ -394,80 +389,85 @@ function cat_load_postcounts( $cat_load_postcounts = 'canonic', $dbtable = 'T_po
 	global $blog, $show_statuses, $author, $assgn, $status;
 	global $m, $w, $dstart, $timestamp_min, $timestamp_max;
 	global $s, $sentence, $exact;
-	global $cat_postcounts_loaded;
 	global $Settings;
+	global $Debuglog;
 
-	if( $cat_load_postcounts == 'none' )
-	{
+	static $cat_postcounts_loaded;
+
+	if( isset($cat_postcounts_loaded) || empty($blog) )
+	{ // Postcounts are loaded or we have no blog for which to load the counts
 		return;
 	}
 
-	if( !isset($cat_postcounts_loaded) && $blog > 0 )
-	{ // Postcounts are not loaded and we have a blog for which to load the counts:
-
-		/*
-		 * WE ARE GOING TO CONSTRUCT THE WHERE CLOSE...
-		 */
-
-		$ItemQuery = & new ItemQuery( $dbtable, $dbprefix, $dbIDname ); // TEMPORARY OBJ
-
-		// - - Select a specific Item:
-		// $ItemQuery->where_ID( $p, $title );
-		if( $cat_load_postcounts == 'context' )
-		{	// We want to preserve the current context:
-			// - - - Restrict to selected blog/categories:
-			$ItemQuery->where_chapter( $blog, '', array() );
-
-			// * Restrict to the statuses we want to show:
-			$ItemQuery->where_visibility( $show_statuses );
-
-			// Restrict to selected authors:
-			$ItemQuery->where_author( $author );
-
-			// Restrict to selected assignees:
-			$ItemQuery->where_assignees( $assgn );
-
-			// Restrict to selected satuses:
-			$ItemQuery->where_statuses( $status );
-
-			// - - - + * * timestamp restrictions:
-			$ItemQuery->where_datestart( $m, $w, $dstart, '', $timestamp_min, $timestamp_max );
-
-			// Keyword search stuff:
-			$ItemQuery->where_keywords( $s, $sentence, $exact );
-		}
-		else
-		{	// We want to preserve only the minimal context:
-			// - - - Restrict to selected blog/categories:
-			$ItemQuery->where_chapter( $blog, '', array() );
-
-			// * Restrict to the statuses we want to show:
-			$ItemQuery->where_visibility( $show_statuses );
-
-			// - - - + * * timestamp restrictions:
-			$ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
-		}
-
-		$sql = 'SELECT postcat_cat_ID AS cat_ID, COUNT(*) AS cat_postcount'
-						// OLD: FROM T_postcats INNER JOIN $dbtable ON postcat_post_ID = $dbIDname
-						// fplanque>> note: there was no restriction to current blog!!
-						.$ItemQuery->get_from()
-						.$ItemQuery->get_where()
-						.$ItemQuery->get_group_by()."
-						GROUP BY cat_ID";
-
-		foreach( $DB->get_results( $sql, ARRAY_A, 'Load postcounts' ) as $myrow )
-		{
-			$cat_ID = $myrow['cat_ID'];
-			if( !isset($cache_categories[$cat_ID]) )
-				echo '<p>*** WARNING: There are '.$myrow['cat_postcount'].' posts attached to non existant category #'.$cat_ID.'. You must fix the database! ***</p>';
-			// echo 'Postcount for cat #', $cat_ID, ' is ', $myrow['cat_postcount'], '<br />';
-			$cache_categories[$cat_ID]['cat_postcount'] = $myrow['cat_postcount'];
-		}
-
-		// echo 'Number of cats=', count($cache_categories);
-		$cat_postcounts_loaded = true;
+	if( empty($cache_categories) )
+	{ // Categories cache is needed:
+		cat_load_cache();
 	}
+
+	/*
+	 * WE ARE GOING TO CONSTRUCT THE WHERE CLOSE...
+	 */
+
+	$ItemQuery = & new ItemQuery( $dbtable, $dbprefix, $dbIDname ); // TEMPORARY OBJ
+
+	// - - Select a specific Item:
+	// $ItemQuery->where_ID( $p, $title );
+	if( $cat_load_postcounts == 'context' )
+	{	// We want to preserve the current context:
+		// - - - Restrict to selected blog/categories:
+		$ItemQuery->where_chapter( $blog, '', array() );
+
+		// * Restrict to the statuses we want to show:
+		$ItemQuery->where_visibility( $show_statuses );
+
+		// Restrict to selected authors:
+		$ItemQuery->where_author( $author );
+
+		// Restrict to selected assignees:
+		$ItemQuery->where_assignees( $assgn );
+
+		// Restrict to selected satuses:
+		$ItemQuery->where_statuses( $status );
+
+		// - - - + * * timestamp restrictions:
+		$ItemQuery->where_datestart( $m, $w, $dstart, '', $timestamp_min, $timestamp_max );
+
+		// Keyword search stuff:
+		$ItemQuery->where_keywords( $s, $sentence, $exact );
+	}
+	else
+	{	// We want to preserve only the minimal context:
+		// - - - Restrict to selected blog/categories:
+		$ItemQuery->where_chapter( $blog, '', array() );
+
+		// * Restrict to the statuses we want to show:
+		$ItemQuery->where_visibility( $show_statuses );
+
+		// - - - + * * timestamp restrictions:
+		$ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
+	}
+
+	$sql = 'SELECT postcat_cat_ID AS cat_ID, COUNT(*) AS cat_postcount'
+					// OLD: FROM T_postcats INNER JOIN $dbtable ON postcat_post_ID = $dbIDname
+					// fplanque>> note: there was no restriction to current blog!!
+					.$ItemQuery->get_from()
+					.$ItemQuery->get_where()
+					.$ItemQuery->get_group_by()."
+					GROUP BY cat_ID";
+
+	foreach( $DB->get_results( $sql, ARRAY_A, 'Load postcounts' ) as $myrow )
+	{
+		$cat_ID = $myrow['cat_ID'];
+		if( !isset($cache_categories[$cat_ID]) )
+		{
+			$Debuglog->add('WARNING: There are '.$myrow['cat_postcount'].' posts attached to non existant category #'.$cat_ID.'. You must fix the database!', 'error');
+		}
+		// echo 'Postcount for cat #', $cat_ID, ' is ', $myrow['cat_postcount'], '<br />';
+		$cache_categories[$cat_ID]['cat_postcount'] = $myrow['cat_postcount'];
+	}
+
+	// echo 'Number of cats=', count($cache_categories);
+	$cat_postcounts_loaded = true;
 
 }
 
@@ -759,6 +759,10 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.19  2006/11/11 15:17:40  blueyed
+ * - Removed bloat from cat_load_cache() (calling cat_load_postcounts(), which had not been used.
+ * - Use $Debuglog for errors with "posts attached to non existant category" warning
+ *
  * Revision 1.18  2006/09/11 22:29:19  fplanque
  * chapter cleanup
  *
