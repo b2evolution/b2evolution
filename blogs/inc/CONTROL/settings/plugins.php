@@ -802,7 +802,8 @@ if( 1 || $Settings->get( 'plugins_disp_log_in_admin' ) )
 switch( $action )
 {
 	case 'edit_settings':
-		$AdminUI->append_to_titlearea( sprintf( T_('Edit plugin &laquo;%s&raquo; (ID %d)'), $edit_Plugin->name, $edit_Plugin->ID ) );
+		$AdminUI->append_to_titlearea( '<a href="'.regenerate_url('', 'action=edit_settings&amp;plugin_ID='.$edit_Plugin->ID).'">'
+			.sprintf( T_('Edit plugin &laquo;%s&raquo; (ID %d)'), $edit_Plugin->name, $edit_Plugin->ID ).'</a>' );
 		// include jquery JS:
 		$AdminUI->add_headline( '<script type="text/javascript" src="'
 			.$rsc_url.'js/'.( $debug ? 'jquery.js' : 'jquery.min.js' ).'"></script>' );
