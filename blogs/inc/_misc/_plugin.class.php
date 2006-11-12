@@ -811,8 +811,6 @@ class Plugin
 
 	/**
 	 * Event handler: Called before a blog gets displayed (in _blog_main.inc.php).
-	 * @param array Associative array of parameters
-	 *   - 'skin': The "skin" param
 	 */
 	function BeforeBlogDisplay( & $params )
 	{
@@ -2773,6 +2771,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.114  2006/11/12 02:12:58  blueyed
+ * removed bloat param
+ *
  * Revision 1.113  2006/11/11 20:33:14  blueyed
  * Moved BeforeBlogDisplay hook to after $skin has been determined
  *
