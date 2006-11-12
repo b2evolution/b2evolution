@@ -4461,7 +4461,7 @@ msgstr "Melde dich an, wenn du einen Account hast..."
 
 #: ..\..\..\inc\MODEL\users\_user.funcs.php:184
 msgid "Register..."
-msgstr "Anmelden..."
+msgstr "Registrieren..."
 
 #: ..\..\..\inc\MODEL\users\_user.funcs.php:185
 msgid "Register to open an account..."
