@@ -85,6 +85,13 @@ class transport_optimizer_plugin extends Plugin
 					'defaultvalue' => '1',
 					'note' => T_('This will send a Last-Modified header with the current time.'),
 				),
+			'lastmod_feeds' => array(
+					'label' => T_('Check If-Modified-Since'),
+					'type' => 'checkbox',
+					'defaultvalue' => '1',
+					'note' => T_('This checks a If-Modified-Since header sent by the browser and sends a "Not Modified" response, if applicable.')
+						.' '.T_('This only works with feeds for items currently.'),
+				),
 			);
 	}
 
@@ -117,6 +124,39 @@ class transport_optimizer_plugin extends Plugin
 	function CachePageContent()
 	{
 		ob_start( array(&$this, 'obhandler') );
+	}
+
+
+	/**
+	 * Check If-Modified-Since header and send HTTP-304 response, if no new items.
+	 * This currently works only for feed skins, where {@link $MainList} and if {@link $disp} is empty, so not for comment feeds.
+	 */
+	function BeforeBlogDisplay( & $params )
+	{
+		global $time_difference, $MainList;
+		global $skin, $disp;
+
+		if( ! isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])
+			|| ! empty($disp) // disp=comments not supported
+			|| ! in_array($skin, array( '_atom', '_rdf', '_rss', '_rss2')) // only feed-skins supported
+			|| ! $this->Settings->get('lastmod_feeds')
+			|| ! preg_match( '~\w\w\w, (\d\d) \w\w\w \d{4} \d\d:\d\d:\d\d GMT~', $_SERVER['HTTP_IF_MODIFIED_SINCE'] ) // no valid RFC 822/1123 date ("Sun, 06 Nov 1994 08:49:37 GMT"):
+			)
+		{
+			return;
+		}
+
+		// last modification date for feed skin:
+		$lastmod = gmdate('U', strtotime($MainList->get_lastpostdate()) - $time_difference);
+
+		$header_lastmod = strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']); // refers to $servertimenow (time())
+
+		if( $lastmod <= $header_lastmod )
+		{ // Not modified since last request:
+			header( 'HTTP/1.0 304 Not Modified' );
+			header( 'X-Not-Modified: 1' );
+			exit;
+		}
 	}
 
 
@@ -186,6 +226,9 @@ class transport_optimizer_plugin extends Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.9  2006/11/12 02:26:11  blueyed
+ * lastmod_feeds setting: send 304 HTTP response, if item feeds have not changed and If-Modified-Since is present
+ *
  * Revision 1.8  2006/11/11 17:58:20  blueyed
  * Fix: use $servertimenow for gmdate() in Last-modified header
  *
