@@ -302,7 +302,6 @@ class ItemList2 extends DataObjectList2
 	 */
 	function load_from_Request( $use_filters = true )
 	{
-
 		if( $use_filters )
 		{
 			// Do we want to restore filters or do we want to create a new filterset
@@ -420,7 +419,6 @@ class ItemList2 extends DataObjectList2
 			}
 		}
 
-
 		/*
 		 * Restrict to the statuses we want to show:
 		 */
@@ -433,7 +431,6 @@ class ItemList2 extends DataObjectList2
 		 */
 		$this->filters['order'] = param( $this->param_prefix.'order', '/^(ASC|asc|DESC|desc)$/', $this->default_filters['order'], true );		// ASC or DESC
 		$this->filters['orderby'] = param( $this->param_prefix.'orderby', '/^([A-Za-z0-9_]+([ ,][A-Za-z0-9_]+)*)?$/', $this->default_filters['orderby'], true );   // list of fields to order by (TODO: change that crap)
-
 
 		/*
 		 * Paging limits:
@@ -450,14 +447,10 @@ class ItemList2 extends DataObjectList2
 		// Item type
 		$this->filters['item_type'] = param( $this->param_prefix.'item_type', 'integer', $this->default_filters['item_type'], true );  // List of item types to restrict to);
 
-
-
-
 		if( param_errors_detected() )
 		{
 			return false;
 		}
-
 
 		if( $this->single_post )
 		{	// We have requested a specific post
@@ -529,7 +522,6 @@ class ItemList2 extends DataObjectList2
 	  /**
 	   * @var Request
 	   */
-
 
 		global $Debuglog;
 
@@ -695,25 +687,16 @@ class ItemList2 extends DataObjectList2
 		 * filtering stuff:
 		 */
 		$this->ItemQuery->where_chapter2( $this->Blog->ID, $this->filters['cat_array'], $this->filters['cat_modifier'] );
-
 		$this->ItemQuery->where_author( $this->filters['authors'] );
-
 		$this->ItemQuery->where_assignees( $this->filters['assignees'] );
-
 		$this->ItemQuery->where_author_assignee( $this->filters['author_assignee'] );
-
 		$this->ItemQuery->where_locale( $this->filters['lc'] );
-
 		$this->ItemQuery->where_statuses( $this->filters['statuses'] );
-
 		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
-
 		$this->ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
-
 		$this->ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
 		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
 		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
-
 		$this->ItemQuery->where_visibility( $this->filters['visibility_array'] );
 
 		/**
@@ -898,12 +881,11 @@ class ItemList2 extends DataObjectList2
 
 	/**
 	 * Get datetime of the last post/item
-	 * @return string 'Y-m-d H:i:s' formatted, maybe from $localtimenow
+	 * @return string 'Y-m-d H:i:s' formatted, maybe from {@link $localtimenow}.
 	 */
 	function get_lastpostdate()
 	{
 		global $localtimenow, $DB;
-
 
 		if( empty( $this->filters ) )
 		{	// Filters have no been set before, we'll use the default filterset:
@@ -916,28 +898,19 @@ class ItemList2 extends DataObjectList2
 		// The SQL Query object:
 		$lastpost_ItemQuery = & new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
 
-
 		/*
-		 * filetring stuff:
+		 * filtering stuff:
 		 */
 		$lastpost_ItemQuery->where_chapter2( $this->Blog->ID, $this->filters['cat_array'], $this->filters['cat_modifier'] );
-
 		$lastpost_ItemQuery->where_author( $this->filters['authors'] );
-
 		$lastpost_ItemQuery->where_assignees( $this->filters['assignees'] );
-
 		$lastpost_ItemQuery->where_locale( $this->filters['lc'] );
-
 		$lastpost_ItemQuery->where_statuses( $this->filters['statuses'] );
-
 		$lastpost_ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
-
 		$lastpost_ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
-
 		$lastpost_ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
 		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
 		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
-
 		$lastpost_ItemQuery->where_visibility( $this->filters['visibility_array'] );
 
 		/**
@@ -949,13 +922,11 @@ class ItemList2 extends DataObjectList2
 			$lastpost_ItemQuery->where_and( 'post_ptyp_ID = '.$this->filters['item_type'] );
 		}
 
-
 		/*
 		 * order by stuff:
 		 * LAST POST FIRST!!! (That's the whole point!)
 		 */
 		$lastpost_ItemQuery->order_by( $this->Cache->dbprefix.'datestart DESC' );
-
 
 		/*
 		 * Paging limits:
@@ -963,10 +934,8 @@ class ItemList2 extends DataObjectList2
 		 */
 		$lastpost_ItemQuery->LIMIT( '1' );
 
-
 		// Select the datestart:
 		$lastpost_ItemQuery->select( $this->Cache->dbprefix.'datestart' );
-
 
 		$lastpostdate = $DB->get_var( $lastpost_ItemQuery->get(), 0, 0, 'Get last post date' );
 
@@ -1641,6 +1610,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.38  2006/11/12 02:13:19  blueyed
+ * doc, whitespace
+ *
  * Revision 1.37  2006/11/11 17:33:50  blueyed
  * doc
  *
