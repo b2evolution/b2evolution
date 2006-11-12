@@ -63,7 +63,7 @@ class UserSettings extends AbstractSettings
 
 		'fm_imglistpreview' => 1,
 
-		'blogperms_layout' => 'simple', // selected view in blog (user/group) perms
+		'blogperms_layout' => 'default', // selected view in blog (user/group) perms
 	);
 
 
@@ -202,6 +202,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.21  2006/11/12 17:37:41  fplanque
+ * code for "simple" is "default"
+ *
  * Revision 1.20  2006/11/04 17:43:14  blueyed
  * Blog perm layout views: fixed non-JS links (ctrl param) and store selected one in UserSettings (TODO for switching by JS)
  *
