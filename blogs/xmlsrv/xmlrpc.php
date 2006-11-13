@@ -45,8 +45,8 @@ require_once $inc_path.'_main.inc.php';
 require_once $inc_path.'_misc/ext/_xmlrpc.php';
 require_once $model_path.'items/_itemlist2.class.php';
 
-if( CANUSEXMLRPC !== TRUE ) {
-    // We cannot use XML-RPC: send a error response ( "1 Unknown method" ).
+if( CANUSEXMLRPC !== TRUE )
+{ // We cannot use XML-RPC: send a error response ( "1 Unknown method" ).
     //this should be structured as an xml response
 	$errResponse = new xmlrpcresp( 0, 1, 'Cannot use XML-RPC. Probably the server is missing the XML extension. Error: '.CANUSEXMLRPC );
 	die( $errResponse->serialize() );
@@ -2261,6 +2261,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.119  2006/11/13 20:49:53  fplanque
+ * doc/cleanup :/
+ *
  * Revision 1.118  2006/11/05 20:13:57  fplanque
  * minor
  *

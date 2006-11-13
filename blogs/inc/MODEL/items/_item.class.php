@@ -712,23 +712,6 @@ class Item extends DataObject
 
 
 	/**
-	 * Template function: Display the main blog name.
-	 *
-	 * @deprecated since 1.9
-	 * @todo is it possible to use {$Item->get_Blog()}->name() instead? (we can't possibly duplicate all sub-object functions here!!!)
-	 *       blueyed>> not with PHP4 and {$Item->get_Blog()}->name() (with curly brackets) not even in PHP5!
-	 * @param string Output format. See {@link format_to_output()}.
-	 */
-	function blog_name( $format = 'htmlbody' )
-	{
-		$GLOBALS['Debuglog']->add('Call to deprecated method Item::blog_name()!', 'deprecated');
-
-		$current_Blog = & $this->get_Blog();
-		$current_Blog->name( $format );
-	}
-
-
-	/**
 	 * Template function: list all the category names
 	 *
 	 * @param string link title, '#' for default, false if you want no links
@@ -938,6 +921,7 @@ class Item extends DataObject
 	 * Get the rendered content. If it has not been generated yet, it will.
 	 *
 	 * @todo dh> Currently this makes up one query per displayed item. Probably the cache should get pre-fetched by ItemList2?
+	 * fp> DEFINITELY!!! Preloading all pre-rendered contents for the current Itemlistpage is paramount!
 	 * @todo dh> In general, $content_prerendered gets only queried once per item, so it seems like a memory waste to cache the query result..!
 	 *
 	 * NOTE: This calls {@link Item::dbupdate()}, if renderers get changed (from Plugin hook).
@@ -2606,7 +2590,7 @@ class Item extends DataObject
 		$this->set( 'content', $post_content );
 		$this->set( 'datestart', $post_timestamp );
 
-		// NOTE: dh> $localtimenow is not defined during install! - all sample posts get a last-modified date of 1970-01-01
+		// TODO: dh> $localtimenow is not defined during install! - all sample posts get a last-modified date of 1970-01-01
 		$this->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
 
 		$this->set( 'main_cat_ID', $main_cat_ID );
@@ -2669,71 +2653,6 @@ class Item extends DataObject
 	}
 
 
-	/**
-	 * Update a post and save to DB
-	 *
-	 * This function has to handle all needed DB dependencies!
-	 *
-	 * @deprecated since 1.9 - not used in the core anymore
-	 *
-	 * @param string Title
-	 * @param string Content
-	 * @param string Timestamp ('Y-m-d H:i:s')
-	 * @param integer Main category ID
-	 * @param array List of extra cats
-	 * @param string Status ('published', 'deprecated', 'protected', 'private' or 'draft'). Empty to not change it.
-	 * @param string Locale. '#' to not change it.
-	 * @param mixed Not used
-	 * @param integer OBSOLETE
-	 * @param boolean Pings done?
-	 * @param string URL title
-	 * @param string URL
-	 * @param string Post comment status
-	 * @param array Renderers
-	 * @param integer Typ ID
-	 * @param integer Status(?) ID
-	 */
-	function update(
-		$post_title,
-		$post_content,
-		$post_timestamp = '',         // 'Y-m-d H:i:s'
-		$main_cat_ID = 1,             // Main cat ID
-		$extra_cat_IDs = array(),     // Table of extra cats
-		$post_status = 'published',
-		$post_locale = '#',
-		$post_urltitle = '',
-		$post_url = '',
-		$post_comment_status = 'open',
-		$post_renderers = array(),
-		$item_typ_ID = 0,
-		$item_st_ID = 0 )
-	{
-		global $localtimenow, $default_locale;
-
-		$this->set( 'title', $post_title );
-		$this->set( 'urltitle', $post_urltitle );
-		$this->set( 'url', $post_url );
-		$this->set( 'content', $post_content );
-		// this is automatic $this->set( 'datemodified', date('Y-m-d H:i:s', $localtimenow ) );
-		$this->set( 'main_cat_ID', $main_cat_ID );
-		$this->set( 'extra_cat_IDs', $extra_cat_IDs );
-		$this->set( 'status', $post_status );
-		$this->set( 'comment_status', $post_comment_status );
-		$this->set_renderers( $post_renderers );
-		$this->set( 'typ_ID', $item_typ_ID );
-		$this->set( 'st_ID', $item_st_ID );
-		if( $post_locale != '#' )
-		{ // only update if it was changed
-			$this->set( 'locale', $post_locale );
-		}
-		if( !empty($post_timestamp) )
-		{
-			$this->set( 'datestart', $post_timestamp );
-		}
-
-		// UPDATE DB:
-		$this->dbupdate();
-	}
 
 
 	/**
@@ -3367,6 +3286,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.117  2006/11/13 20:49:52  fplanque
+ * doc/cleanup :/
+ *
  * Revision 1.116  2006/11/10 20:14:11  blueyed
  * doc, fix
  *

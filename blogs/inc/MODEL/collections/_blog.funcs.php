@@ -425,6 +425,8 @@ function get_bloginfo( $show = '', $this_blogparams = '' )
 
 
 /**
+ * @todo fp> this needs to be deprecated
+ * @todo fp> get rid of the $cache_blogs crap and use $BlogCache only
  */
 function blog_load_cache()
 {
@@ -594,6 +596,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.15  2006/11/13 20:49:52  fplanque
+ * doc/cleanup :/
+ *
  * Revision 1.14  2006/10/08 03:52:09  blueyed
  * Tell BlogCache that it has loaded all.
  *

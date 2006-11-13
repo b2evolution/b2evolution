@@ -502,6 +502,12 @@ class Blog extends DataObject
 				{
 					$blogurl .= $this->stub;
 				}
+				/*
+				dh> following makes no sense IMHO.
+				    Especially with an empty stub it will leed to http://example.com/.php (e.g. on preview)
+				    It may get moved into the above if-not-empty check, but forcing ".php" at the stub makes no sense IMHO!
+				    Also, this is the only place where $type == 'dynamic' gets used.
+				*/
 				if( ($type == 'dynamic') && !( preg_match( '#.php$#', $blogurl ) ) )
 				{ // We want to force the dynamic page but the URL is not explicitly dynamic
 					// This is needed when a static page is taking control of domain.com/stub and we want an explicit link to the LATEST content, which can only be gotten at domain.com/stub.php
@@ -1032,6 +1038,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.33  2006/11/13 20:49:52  fplanque
+ * doc/cleanup :/
+ *
  * Revision 1.32  2006/10/23 22:19:02  blueyed
  * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
  *

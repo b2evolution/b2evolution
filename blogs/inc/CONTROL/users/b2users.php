@@ -503,6 +503,7 @@ if( !$Messages->count('error') )
 
 
 		case 'del_settings_set':
+// fp> TODO: please document the purpose of this action
 			param( 'plugin_ID', 'integer', true );
 			param( 'set_path' );
 
@@ -723,6 +724,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.37  2006/11/13 20:49:52  fplanque
+ * doc/cleanup :/
+ *
  * Revision 1.36  2006/11/09 23:40:57  blueyed
  * Fixed Plugin UserSettings array type editing; Added jquery and use it for AJAHifying Plugin (User)Settings editing of array types
  *
