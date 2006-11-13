@@ -39,7 +39,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Are we runing on Command Line Interface instead of a web request?
+ * @global boolean Are we running on Command Line Interface instead of a web request?
  */
 $is_cli = empty($_SERVER['SERVER_SOFTWARE']) ? true : false;
 $is_web = ! $is_cli;
@@ -260,6 +260,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.10  2006/11/13 13:45:23  blueyed
+ * doc
+ *
  * Revision 1.9  2006/06/13 21:49:14  blueyed
  * Merged from 1.8 branch
  *
