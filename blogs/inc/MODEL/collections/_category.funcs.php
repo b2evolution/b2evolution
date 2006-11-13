@@ -48,6 +48,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Create a new category
  *
  * This funtion has to handle all needed DB dependencies!
+ *
+ * @param string Category name
+ * @param string Category ID ('NULL' as string(!) for root)
+ * @param integer|NULL Blog ID (will be taken from parent cat, if empty)
  */
 function cat_create(
 	$cat_name,
@@ -366,7 +370,7 @@ function cat_load_cache( $dbtable_items = 'T_posts', $dbprefix_items = 'post_', 
 				}
 				else
 				{
-					echo( "Catgeory #$icat_ID is oprhan of non existant parent #$cat_parent_ID!<br />" );
+					echo( "Category #$icat_ID is orphan of non existant parent #$cat_parent_ID!<br />" );
 				}
 			}
 		}
@@ -759,6 +763,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.20  2006/11/13 23:33:52  blueyed
+ * doc, typos
+ *
  * Revision 1.19  2006/11/11 15:17:40  blueyed
  * - Removed bloat from cat_load_cache() (calling cat_load_postcounts(), which had not been used.
  * - Use $Debuglog for errors with "posts attached to non existant category" warning
