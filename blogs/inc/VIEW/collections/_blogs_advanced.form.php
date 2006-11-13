@@ -88,7 +88,7 @@ $Form->begin_fieldset( T_('After each new post...') );
 			$displayed_ping_plugin = true;
 
 			$checked = in_array( $loop_Plugin->code, $ping_plugins );
-			$Form->checkbox_input( 'blog_ping_plugins[]', $checked, $loop_Plugin->ping_service_name, array('value'=>$loop_Plugin->code, 'note'=>$loop_Plugin->ping_service_note) );
+			$Form->checkbox_input( 'blog_ping_plugins[]', $checked, /* TRANS: verb */ T_('Ping ').$loop_Plugin->ping_service_name, array('value'=>$loop_Plugin->code, 'note'=>$loop_Plugin->ping_service_note) );
 
 			while( $key = array_search($loop_Plugin->code, $ping_plugins) )
 			{
