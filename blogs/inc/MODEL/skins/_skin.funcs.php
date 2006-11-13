@@ -54,8 +54,12 @@ function skin_base_tag()
 }
 
 /**
- * Output content type header
+ * Output content-type header
+ * 
+ * We use this method when we are NOT generating a static page
  *
+ * @see skin_content_meta()
+ * 
  * @param string content-type; override for RSS feeds
  */
 function skin_content_header( $type = 'text/html' )
@@ -69,9 +73,11 @@ function skin_content_header( $type = 'text/html' )
 }
 
 /**
- * Output content type http_equiv meta tag
+ * Output content-type http_equiv meta tag
+ * 
+ * We use this method when we ARE generating a static page
  *
- * Needed when generating static files
+ * @see skin_content_header()
  *
  * @param string content-type; override for RSS feeds
  */
@@ -273,6 +279,9 @@ function skin_change_url( $display = true )
 
 /*
  * $Log$
+ * Revision 1.12  2006/11/13 17:00:02  fplanque
+ * doc
+ *
  * Revision 1.11  2006/10/30 12:57:33  blueyed
  * Fix for XHTML
  *
