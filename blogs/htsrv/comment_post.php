@@ -147,7 +147,8 @@ $Comment->set( 'status', $commented_Item->Blog->get_setting('new_feedback_status
 // Check if we want to PREVIEW:
 $action = param_arrayindex( 'submit_comment_post_'.$commented_Item->ID, 'save' );
 
-if( $action != 'preview' )
+if( $action != 'preview'
+	&& ( empty($current_User) || $current_User->group_ID != 1 ) /* not for admins; TODO: dh> config.. also for the time interval.. */  )
 {
 	/*
 	 * Flood-protection
@@ -332,6 +333,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.90  2006/11/14 21:16:26  blueyed
+ * Disable flood protection for admin users
+ *
  * Revision 1.89  2006/10/30 13:48:56  blueyed
  * Fixed charset/HTML for comment-post page (errors)
  *
