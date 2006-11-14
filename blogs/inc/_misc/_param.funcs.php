@@ -399,7 +399,7 @@ function param_check_number( $var, $err_msg, $required = false )
  * @param string param name
  * @param integer min value
  * @param integer max value
- * @param string error message
+ * @param string error message (gets printf'ed with $min and $max)
  * @return boolean true if OK
  */
 function param_integer_range( $var, $min, $max, $err_msg, $required = true )
@@ -415,7 +415,8 @@ function param_integer_range( $var, $min, $max, $err_msg, $required = true )
  * @param string param name
  * @param integer min value
  * @param integer max value
- * @param string error message
+ * @param string error message (gets printf'ed with $min and $max)
+ * @param boolean Is the param required?
  * @return boolean true if OK
  */
 function param_check_range( $var, $min, $max, $err_msg, $required = true )
@@ -1603,6 +1604,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.19  2006/11/14 17:37:22  blueyed
+ * doc
+ *
  * Revision 1.18  2006/11/14 00:21:58  blueyed
  * debug info for "relative" urls in validate_url()
  *
