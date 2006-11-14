@@ -1549,38 +1549,52 @@ function debug_info( $force = false )
 	}
 
 
-	// DEBUGLOG FROM SESSION, after a redirect (with list of categories at top):
-	if( isset($Session) && ($sess_Debuglog = $Session->get('Debuglog')) && is_a( $sess_Debuglog, 'log' ) )
+	// DEBUGLOG(s) FROM SESSION, after redirect(s) (with list of categories at top):
+	if( isset($Session) && ($sess_Debuglogs = $Session->get('Debuglogs')) && ! empty($sess_Debuglogs) )
 	{
-		$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
-		$log_cats = array_keys($sess_Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
-		$log_container_head = '<h3 id="debug_sess_debuglog" style="color:#f00;">Debug messages from redirected page</h3>'
-			// link to real Debuglog:
-			.'<p><a href="'.$ReqHostPathQuery.'#debug_debuglog">See below for the Debuglog from the current request.</a></p>';
-		$log_head_links = array();
-		foreach( $log_cats as $l_cat )
-		{
-			$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_redir_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
+		$count_sess_Debuglogs = count($sess_Debuglogs);
+		if( $count_sess_Debuglogs > 1 )
+		{ // Links to those Debuglogs:
+			echo '<p>There are '.$count_sess_Debuglogs.' Debuglogs from redirected pages: ';
+			for( $i = 1; $i <= $count_sess_Debuglogs; $i++ )
+			{
+				echo '<a href="'.$ReqHostPathQuery.'#debug_sess_debuglog_'.$i.'">#'.$i.'</a> ';
+			}
+			echo '</p>';
 		}
-		$log_container_head .= implode( ' | ', $log_head_links );
-		echo format_to_output(
-			$sess_Debuglog->display( array(
-					'container' => array( 'string' => $log_container_head, 'template' => false ),
-					'all' => array( 'string' => '<h4 id="debug_redir_info_cat_%s">%s:</h4>', 'template' => false ) ),
-				'', false, $log_categories ),
-			'htmlbody' );
 
-		$Session->delete( 'Debuglog' );
+		foreach( $sess_Debuglogs as $k => $sess_Debuglog )
+		{
+			$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
+			$log_cats = array_keys($sess_Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
+			$log_container_head = '<h3 id="debug_sess_debuglog_'.($k+1).'" style="color:#f00;">Debug messages from redirected page (#'.($k+1).')</h3>'
+				// link to real Debuglog:
+				.'<p><a href="'.$ReqHostPathQuery.'#debug_debuglog">See below for the Debuglog from the current request.</a></p>';
+			$log_head_links = array();
+			foreach( $log_cats as $l_cat )
+			{
+				$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_redir_'.($k+1).'_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
+			}
+			$log_container_head .= implode( ' | ', $log_head_links );
+			echo format_to_output(
+				$sess_Debuglog->display( array(
+						'container' => array( 'string' => $log_container_head, 'template' => false ),
+						'all' => array( 'string' => '<h4 id="debug_redir_'.($k+1).'_info_cat_%s">%s:</h4>', 'template' => false ) ),
+					'', false, $log_categories ),
+				'htmlbody' );
+		}
+
+		$Session->delete( 'Debuglogs' );
 	}
 
 
-	// DEBUGLOG (with list of categories at top):
+	// current DEBUGLOG (with list of categories at top):
 	$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
 	$log_cats = array_keys($Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
 	$log_container_head = '<h3 id="debug_debuglog">Debug messages</h3>';
-	if( ! empty($sess_Debuglog) )
-	{ // link to sess_Debuglog:
-		$log_container_head .= '<p><a href="'.$ReqHostPathQuery.'#debug_sess_debuglog">See above for the Debuglog from before the redirect.</a></p>';
+	if( ! empty($sess_Debuglogs) )
+	{ // link to first sess_Debuglog:
+		$log_container_head .= '<p><a href="'.$ReqHostPathQuery.'#debug_sess_debuglog_1">See above for the Debuglog(s) from before the redirect.</a></p>';
 	}
 	$log_head_links = array();
 	foreach( $log_cats as $l_cat )
@@ -2255,7 +2269,12 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 
 	if( $Debuglog->count('all') )
 	{ // Save Debuglog into Session, so that it's available after redirect (gets loaded by Session constructor):
-		$Session->set( 'Debuglog', $Debuglog, 60 /* expire in 60 seconds */ );
+		$sess_Debuglogs = $Session->get('Debuglogs');
+		if( empty($sess_Debuglogs) )
+			$sess_Debuglogs = array();
+
+		$sess_Debuglogs[] = $Debuglog;
+		$Session->set( 'Debuglogs', $sess_Debuglogs, 60 /* expire in 60 seconds */ );
 		$Session->dbsave();
 	}
 
@@ -2732,6 +2751,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.136  2006/11/14 21:57:19  blueyed
+ * Store an array of Debuglog entries in the session, not just the last one - because we may redirect more than once, e.g. when redirecting to canonical url, after having posted a comment.
+ *
  * Revision 1.135  2006/11/06 19:43:27  blueyed
  * *** empty log message ***
  *
