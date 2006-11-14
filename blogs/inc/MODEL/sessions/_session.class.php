@@ -152,12 +152,17 @@ class Session
 						// Unserialize session data (using an own callback that should provide class definitions):
 						$old_callback = ini_get( 'unserialize_callback_func' );
 						ini_set( 'unserialize_callback_func', 'session_unserialize_callback' );
+						// TODO: dh> This can fail, if there are special chars in sess_data:
+						//       It will be encoded in $evo_charset _after_ "SET NAMES", but
+						//       get retrieved here, _before_ any "SET NAMES" (if $db_config['connection_charset'] is not set (default))!
 						$this->_data = @unserialize($row->sess_data);
 						ini_set( 'unserialize_callback_func', $old_callback );
 
 						if( $this->_data === false )
 						{
-							$Debuglog->add( 'Session data corrupted! Serialized data was: --['.var_export($row->sess_data, true).']--', array('session','error') );
+							$Debuglog->add( 'Session data corrupted!<br />
+								connection_charset: '.var_export($DB->connection_charset, true).'<br />
+								Serialized data was: --['.var_export($row->sess_data, true).']--', array('session','error') );
 							$this->_data = array();
 						}
 						else
@@ -484,6 +489,9 @@ function session_unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.26  2006/11/14 21:13:58  blueyed
+ * I've spent > 2 hours debugging this charset nightmare and all I've got are those lousy TODOs..
+ *
  * Revision 1.25  2006/09/10 00:00:57  blueyed
  * "Solved" Session related todos.
  *

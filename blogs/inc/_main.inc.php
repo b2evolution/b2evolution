@@ -238,6 +238,7 @@ $Hit = & new Hit();
 require_once $model_path.'sessions/_session.class.php';
 /**
  * @global Session The Session object
+ * @todo dh> This needs the same "SET NAMES" MySQL-setup as with Session::dbsave() - see the "TODO" with unserialize() in Session::Session()
  */
 $Session = & new Session();
 
@@ -657,6 +658,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.54  2006/11/14 21:13:58  blueyed
+ * I've spent > 2 hours debugging this charset nightmare and all I've got are those lousy TODOs..
+ *
  * Revision 1.53  2006/10/23 22:19:02  blueyed
  * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
  *
