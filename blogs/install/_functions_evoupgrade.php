@@ -56,8 +56,12 @@ function db_index_exists( $table, $index_name )
 	$index_name = strtolower($index_name);
 
 	foreach( $DB->get_results('SHOW INDEX FROM '.$table) as $row )
+	{
 		if( strtolower($row->Key_name) == $index_name )
+		{
 			return true;
+		}
+	}
 
 	return false;
 }
@@ -1158,8 +1162,8 @@ function upgrade_b2evo_tables()
 				24 => 'ALTER TABLE T_comments ADD COLUMN comment_allow_msgform TINYINT NOT NULL DEFAULT \'0\' AFTER comment_spam_karma',
 				25 => 'ALTER TABLE T_hitlog CHANGE COLUMN hit_referer_type hit_referer_type   ENUM(\'search\',\'blacklist\',\'referer\',\'direct\') NOT NULL',
 				26 => 'ALTER TABLE T_hitlog ADD COLUMN hit_agnt_ID        INT UNSIGNED NULL AFTER hit_remote_addr',
-				27 => 'ALTER TABLE T_links ADD INDEX link_itm_ID( link_itm_ID )', // TODO: drop previous INDEX link_item_ID, if existing (or rename?) - see http://forums.b2evolution.net/viewtopic.php?p=43796#43796
-				28 => 'ALTER TABLE T_links ADD INDEX link_dest_itm_ID (link_dest_itm_ID)', // TODO: drop previous INDEX link_dest_item_ID, if existing (or rename?) - see http://forums.b2evolution.net/viewtopic.php?p=43796#43796
+				27 => 'ALTER TABLE T_links ADD INDEX link_itm_ID( link_itm_ID )', // TODO: drop previous INDEX link_item_ID, if existing (or rename?) - see http://forums.b2evolution.net/viewtopic.php?p=43796#43796   fp>yes
+				28 => 'ALTER TABLE T_links ADD INDEX link_dest_itm_ID (link_dest_itm_ID)', // TODO: drop previous INDEX link_dest_item_ID, if existing (or rename?) - see http://forums.b2evolution.net/viewtopic.php?p=43796#43796   fp>yes
 				30 => 'ALTER TABLE T_plugins CHANGE COLUMN plug_priority plug_priority        TINYINT NOT NULL default 50',
 				31 => 'ALTER TABLE T_plugins ADD COLUMN plug_code            VARCHAR(32) NULL AFTER plug_classname',
 				32 => 'ALTER TABLE T_plugins ADD COLUMN plug_apply_rendering ENUM( \'stealth\', \'always\', \'opt-out\', \'opt-in\', \'lazy\', \'never\' ) NOT NULL DEFAULT \'never\' AFTER plug_code',
@@ -1211,7 +1215,8 @@ function upgrade_b2evo_tables()
 	}
 
 
-	// 1.9:
+	// ____________________________ 1.9: ____________________________
+
 	if( $old_db_version < 9290 )
 	{
 		echo 'Post-fix hit_referer_type == NULL... ';
@@ -1290,12 +1295,17 @@ function upgrade_b2evo_tables()
 				ALTER TABLE T_basedomains  ADD INDEX dom_type (dom_type)' );
 		echo "OK.<br />\n";
 
+		set_upgrade_checkpoint( '9310' );
+	}
+
+	if( $old_db_version < 9315 )
+	{
 		echo 'Altering locales table... ';
 		$DB->query( "ALTER TABLE T_locales CHANGE COLUMN loc_datefmt loc_datefmt varchar(20) NOT NULL default 'y-m-d'" );
 		$DB->query( "ALTER TABLE T_locales CHANGE COLUMN loc_timefmt loc_timefmt varchar(20) NOT NULL default 'H:i:s'" );
 		echo "OK.<br />\n";
 
-		echo 'Creating item cache table... ';
+		echo 'Creating item prerendering cache table... ';
 		$DB->query( "
 				CREATE TABLE T_item__prerendering(
 					itpr_itm_ID                   INT(11) UNSIGNED NOT NULL,
@@ -1312,7 +1322,7 @@ function upgrade_b2evo_tables()
 		$DB->query( "ALTER TABLE T_plugins ADD COLUMN plug_shortdesc       VARCHAR(255) NULL default NULL AFTER plug_name" );
 		echo "OK.<br />\n";
 
-		set_upgrade_checkpoint( '9310' );
+		set_upgrade_checkpoint( '9315' );
 	}
 
 
@@ -1471,15 +1481,13 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version != $new_db_version )
 	{
-		if( $DB->get_var( "SELECT set_value FROM T_settings WHERE set_name = 'db_version'" ) != $new_db_version )
-		{ // Update DB schema version to $new_db_version, only if the current one is not equal to the one from a checkpoint above
-			set_upgrade_checkpoint( $new_db_version );
-		}
+		// Update DB schema version to $new_db_version
+		set_upgrade_checkpoint( $new_db_version );
 	}
 
 
 	// This has to be at the end because plugin install may fail if the DB schema is not current (matching Plugins class).
-	// dh> TODO: if this fails, it won't get repeated
+	// dh> TODO: if this fails, it won't get repeated - fp> it what?? it *should* or it *should not* get repeated?
 	install_basic_plugins( $old_db_version );
 
 
@@ -1563,6 +1571,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.187  2006/11/14 23:17:00  fplanque
+ * adding stuff into the 9010 block weeks later was really evil. why do we have blocks for?
+ *
  * Revision 1.186  2006/11/01 00:24:07  blueyed
  * Fixed cafelog upgrade
  *
