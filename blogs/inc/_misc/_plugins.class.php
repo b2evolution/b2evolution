@@ -46,7 +46,6 @@ require_once dirname(__FILE__).'/_plugin.class.php';
  *
  * This is where you can plug in some {@link Plugin plugins} :D
  *
- * @todo A plugin might want to register allowed events (that it triggers itself) on installation..
  * @package evocore
  */
 class Plugins
@@ -3032,6 +3031,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.101  2006/11/14 00:21:05  blueyed
+ * removed todo
+ *
  * Revision 1.100  2006/11/01 14:59:27  blueyed
  * Handle obsoleting pre-rendered item content, if a renderer plugin version changes
  *
