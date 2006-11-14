@@ -42,10 +42,10 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 
 		$old_evo_charset = $evo_charset;
 		$evo_charset = 'ISO-8859-1';
-		$this->assertEqual( urltitle_validate('', 'Äöü'), 'aeoeue' );
+		$this->assertEqual( urltitle_validate('', 'Äöüùé'), 'aeoeueue' );
 
 		$evo_charset = 'UTF-8';
-		$this->assertEqual( urltitle_validate('', convert_charset('Äöü', 'UTF-8', 'ISO-8859-1')), 'aeoeue' );
+		$this->assertEqual( urltitle_validate('', convert_charset('Äöüùé', 'UTF-8', 'ISO-8859-1')), 'aeoeueue' );
 
 		$evo_charset = $old_evo_charset;
 	}

@@ -68,13 +68,15 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	// echo 'starting with: '.$urltitle.'<br />';
 
 	// Replace special chars/umlauts, if we can convert charsets:
+	// TODO: dh> outsource this into an own method, e.g. the autoblog_plugin uses something similar.
+	//           Ok, Francois? Does it belong into _encoding.funcs.php?
 	if( can_convert_charsets('UTF-8', $evo_charset) && can_convert_charsets('UTF-8', 'ISO-8859-1') /* source */ )
 	{
 		$urltitle = convert_charset( $urltitle, 'UTF-8', $evo_charset );
 
 		// TODO: add more...?!
-		$search = array( 'Ä', 'ä', 'Ö', 'ö', 'Ü', 'ü', 'ß' ); // iso-8859-1
-		$replace = array( 'Ae', 'ae', 'Oe', 'oe', 'Ue', 'ue', 'ss' );
+		$search = array( 'Ä', 'ä', 'Ö', 'ö', 'Ü', 'ü', 'ß', 'à', 'è', 'é', 'ì', 'ò', 'ù' ); // iso-8859-1
+		$replace = array( 'Ae', 'ae', 'Oe', 'oe', 'Ue', 'ue', 'ss', 'a', 'e', 'e', 'i', 'o', 'u' );
 
 		foreach( $search as $k => $v )
 		{ // convert $search to UTF-8
@@ -665,6 +667,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.28  2006/11/14 00:41:58  blueyed
+ * Added some more substitutions to special-char-conversation in urltitle_validate(). Should get outsourced IMHO (TODO).
+ *
  * Revision 1.27  2006/10/29 21:20:53  blueyed
  * Replace special characters in generated URL titles
  *
