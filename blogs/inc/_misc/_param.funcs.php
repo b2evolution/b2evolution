@@ -1474,7 +1474,8 @@ function validate_url( $url, & $allowed_uri_scheme )
 		$char = substr($url, 0, 1);
 		if( $char != '/' && $char != '#' )
 		{ // must start with a slash or hash (for HTML anchors to the same page)
-			return T_('URL must be a full path starting with "/".');
+			if( $debug ) return 'Url refused. Debug info: relative URL not starting with "/" or "#": ['.$url.']';
+			return T_('URL must be a full path starting with "/" or an anchor starting with "#".');
 		}
 	}
 
@@ -1602,6 +1603,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.18  2006/11/14 00:21:58  blueyed
+ * debug info for "relative" urls in validate_url()
+ *
  * Revision 1.17  2006/11/09 22:56:57  blueyed
  * todo
  *
