@@ -281,6 +281,7 @@ elseif( !empty($p) || !empty($title) )
 		{	// The requested URL does not look like the canonical URL for this post,
 			// REDIRECT TO THE CANONICAL URL:
 			// fp> TODO: we're going to lose the additional params, it would be better to keep them...
+			$Debuglog->add( 'Redirecting to canonical URL ['.$canoncical_url.'].' );
 			header_redirect( $canoncical_url, true );
 		}
 	}
@@ -506,6 +507,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.48  2006/11/14 21:56:11  blueyed
+ * Debuglog-entry, when redirecting to $canoncical_url
+ *
  * Revision 1.47  2006/11/11 20:33:14  blueyed
  * Moved BeforeBlogDisplay hook to after $skin has been determined
  *
