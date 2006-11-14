@@ -675,7 +675,7 @@ class DB
 			return false;
 		}
 
-		if( preg_match( '#^ \s* (insert|delete|update|replace) \s #ix', $query) )
+		if( preg_match( '#^ \s* (insert|delete|update|replace) \s #ix', $query, $match ) )
 		{ // Query was an insert, delete, update, replace:
 
 			$this->rows_affected = mysql_affected_rows($this->dbhandle);
@@ -684,8 +684,9 @@ class DB
 				$this->queries[ $this->num_queries - 1 ]['rows'] = $this->rows_affected;
 			}
 
-			// Take note of the insert_id
-			if ( preg_match("/^\\s*(insert|replace) /i",$query) )
+			// Take note of the insert_id, for INSERT and REPLACE:
+			$match[1] = strtoupper($match[1]);
+			if( $match[1] == 'INSERT' || $match[1] == 'REPLACE' )
 			{
 				$this->insert_id = mysql_insert_id($this->dbhandle);
 			}
@@ -1406,6 +1407,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.35  2006/11/14 17:35:39  blueyed
+ * small opt
+ *
  * Revision 1.34  2006/11/04 18:39:15  blueyed
  * Normalized
  *
