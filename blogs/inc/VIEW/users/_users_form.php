@@ -227,9 +227,7 @@ $Form->end_fieldset();
 $Plugins->restart();
 while( $loop_Plugin = & $Plugins->get_next() )
 {
-	$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
-
-	if( empty($pluginusersettings) )
+	if( ! $loop_Plugin->UserSettings ) // NOTE: this triggers autoloading in PHP5, which is needed for the "hackish" isset($this->UserSettings)-method to see if the settings are queried for editing (required before 1.9)
 	{
 		continue;
 	}
@@ -239,9 +237,9 @@ while( $loop_Plugin = & $Plugins->get_next() )
 
 	$Form->begin_fieldset( $loop_Plugin->name );
 
-	foreach( $pluginusersettings as $l_name => $l_meta )
+	foreach( $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
 	{
-		display_settings_fieldset_field( $l_name, $l_meta, $loop_Plugin, $Form, 'UserSettings', $edited_User );
+		display_plugin_settings_fieldset_field( $l_name, $l_meta, $loop_Plugin, $Form, 'UserSettings', $edited_User );
 	}
 
 	$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsEditDisplayAfter', $tmp_params = array( 'Form' => & $Form ) );
@@ -281,6 +279,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.26  2006/11/14 00:26:28  blueyed
+ * Made isset($this->UserSettings)-hack work; fixed call to undefined function
+ *
  * Revision 1.25  2006/11/05 20:13:57  fplanque
  * minor
  *
