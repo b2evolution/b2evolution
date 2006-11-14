@@ -122,7 +122,7 @@ if( empty($sender_address) )
 {
 	$Messages->add( T_('Please fill in your email.'), 'error' );
 }
-elseif( !is_email($sender_address) || antispam_check( $sender_address ) )
+elseif( !is_email($sender_address) || antispam_check( $sender_address ) ) // TODO: dh> using antispam_check() here might not allow valid users to contact the admin in case of problems due to the antispam list itself.. :/
 {
 	$Messages->add( T_('Supplied email address is invalid.'), 'error' );
 }
@@ -141,8 +141,8 @@ $recipient_User = NULL;
 $Comment = NULL;
 
 if( ! empty( $recipient_id ) )
-{ // Get the email address for the recipient if a member.
-$UserCache = & get_Cache( 'UserCache' );
+{ // Get the email address for the recipient if a member:
+	$UserCache = & get_Cache( 'UserCache' );
 	$recipient_User = & $UserCache->get_by_ID( $recipient_id );
 
 	if( empty($recipient_User->allow_msgform) )
@@ -151,7 +151,8 @@ $UserCache = & get_Cache( 'UserCache' );
 	}
 
 	$recipient_address = trim($recipient_User->get('preferredname')) . ' <' . $recipient_User->get('email') . '>';
-	// Change the locale so the email is in the recipients language
+
+	// Change the locale so the email is in the recipients language:
 	locale_temp_switch($recipient_User->locale);
 }
 elseif( ! empty( $comment_id ) )
@@ -273,6 +274,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.38  2006/11/14 21:12:55  blueyed
+ * doc
+ *
  * Revision 1.37  2006/09/10 18:14:24  blueyed
  * Do report error, if sending email fails in message_send.php (msgform and opt-out)
  *
