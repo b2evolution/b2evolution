@@ -30,7 +30,12 @@
  *
  * @package evocore
  *
- * @todo Refactor into smaller chunks/files. We should avoid using a "huge" misc early!
+ * @todo dh> Refactor into smaller chunks/files. We should avoid using a "huge" misc early!
+ *       - _debug.funcs.php
+ *       - _formatting.funcs.php
+ *       - _date.funcs.php
+ *       - ?
+ *       NOTE: Encapsulation functions into classes would allow using autoloading (http://php.net/autoload) in PHP5..!
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author cafelog (team)
@@ -1293,26 +1298,8 @@ function debug_die( $additional_info = '' )
 	// This should help preventing indexing robots from indexing the error :P
 	if( ! headers_sent() )
 	{
-		// It's likely that charset info has not been sent yet, so do it:
-		$contenttype_sent = NULL;
-		if( function_exists('headers_list') )
-		{ // PHP 5
-			foreach( headers_list() as $v )
-			{
-				if( stripos($v, 'Content-Type') !== false )
-				{
-					$contenttype_sent = true;
-					break;
-				}
-			}
-		}
-		if( ! $contenttype_sent )
-		{ // Send it for PHP4 always and for PHP5 if not already done so:
-			global $io_charset;
-			header( 'Content-type: text/html; charset='.$io_charset );
-		}
-		// fp> TODO: The 15 lines above can be oiptimized in just header(...) . Or am I missing something??
-
+		global $io_charset;
+		header('Content-type: text/html; charset='.$io_charset); // it's ok, if a previous header would be replaced;
 		header('HTTP/1.0 500 Internal Server Error');
 	}
 
@@ -2751,6 +2738,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.137  2006/11/14 22:10:41  blueyed
+ * Removed own bloat in debug_die(), it is an error after all. doc
+ *
  * Revision 1.136  2006/11/14 21:57:19  blueyed
  * Store an array of Debuglog entries in the session, not just the last one - because we may redirect more than once, e.g. when redirecting to canonical url, after having posted a comment.
  *
