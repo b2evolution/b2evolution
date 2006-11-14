@@ -2272,7 +2272,7 @@ Wenn du möchtest, kannst du diese Einträge einzeln löschen, nachdem du sie geles
 'Allow users to contact you through a message form (your email will NOT be displayed.)' => 'Erlaube Benutzern, Dich über ein Nachrichten-Formular zu kontaktieren (Deine E-Mail Adresse wird NICHT angezeigt).',
 'Linkblog' => 'Linkblog',
 'more' => 'mehr',
-'Comment on %s' => 'Kommentare zu %s',
+'Comment on %s' => 'Kommentar zu %s',
 'Re:' => 'Re:',
 'To' => 'An',
 'From' => 'Von',
