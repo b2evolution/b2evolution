@@ -953,7 +953,7 @@ class Comment extends DataObject
 		// Get list of users who want to be notfied:
 		// TODO: also use extra cats/blogs??
 		// So far you get notifications for everything. We'll need a setting to decide if you want to received unmoderated (aka unpublished) comments or not.
-	// Note: users receive comments on their own posts. This is done on purpose. Otherwise they think it's broken when they test the app.
+		// Note: users receive comments on their own posts. This is done on purpose. Otherwise they think it's broken when they test the app.
 		$sql = 'SELECT DISTINCT user_email, user_locale
 							FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
 						 WHERE sub_coll_ID = '.$this->Item->blog_ID.'
@@ -988,7 +988,7 @@ class Comment extends DataObject
 		{ // Comment from a registered user:
 			$mail_from = '"'.$this->author_User->get('preferredname').'" <'.$this->author_User->get('email').'>';
 		}
-		elseif( empty( $email ) )
+		elseif( empty( $email ) ) // dh> TODO: $email is _always_ empty/unset here.. what was meant here?
 		{
 			global $notify_from;
 			$mail_from = $notify_from;
@@ -1160,6 +1160,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.47  2006/11/14 21:02:57  blueyed
+ * TODO
+ *
  * Revision 1.46  2006/11/06 00:05:36  blueyed
  * Encoding of "&" in Comment::author_url makes no sense, should get done on output.
  *
