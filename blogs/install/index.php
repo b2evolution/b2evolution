@@ -24,7 +24,7 @@ define( 'EVO_MAIN_INIT', true );
 /**
  * Define that we're in the install process.
  */
-define( 'EVO_IS_INSTALL', true );
+define( 'EVO_IS_INSTALLING', true );
 
 
 if( ! $config_is_done )
@@ -119,8 +119,8 @@ header('Content-Type: text/html; charset='.$io_charset);
 		<a href="../index.php"><?php echo T_('Go to Blogs') ?></a> &middot;
 		<a href="../admin.php"><?php echo T_('Go to Admin') ?></a> &middot;
 		<?php echo T_('Online') ?>:
-		<a href="http://b2evolution.net/man/"><?php echo T_('Manual') ?></a> &middot;
-		<a href="http://b2evolution.net/man/supportfaq.html"><?php echo T_('Support') ?></a>
+		<a href="http://manual.b2evolution.net/"><?php echo T_('Manual') ?></a> &middot; 
+		<a href="http://forums.b2evolution.net/"><?php echo T_('Forums') ?></a> 
 	</div>
 </div>
 
@@ -289,7 +289,7 @@ switch( $action )
 				<ul>
 					<li><strong><?php echo T_('You can allow the installer to update the config file by changing its permissions:') ?></strong>
 						<ol>
-							<li><?php printf( T_('<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>.'), $conf_filepath, 'href="http://b2evolution.net/man/install/file_permissions.html" target="_blank"' ); ?></li>
+							<li><?php printf( T_('<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>.'), $conf_filepath, 'href="http://manual.b2evolution.net/Directory_and_file_permissions" target="_blank"' ); ?></li>
 							<li><?php echo T_('Come back to this page and refresh/reload.') ?></li>
 						</ol>
 						<br />
@@ -641,6 +641,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.118  2006/11/14 00:47:32  fplanque
+ * doc
+ *
  * Revision 1.117  2006/10/31 04:44:00  blueyed
  * Fixed cafelogupgrade
  *
@@ -648,7 +651,7 @@ to
  * TODO
  *
  * Revision 1.115  2006/10/14 20:50:29  blueyed
- * Define EVO_IS_INSTALL for /install/ and use it in Plugins to skip "dangerous" but unnecessary instantiating of other Plugins
+ * Define EVO_IS_INSTALLING for /install/ and use it in Plugins to skip "dangerous" but unnecessary instantiating of other Plugins
  *
  * Revision 1.114  2006/10/01 15:23:28  blueyed
  * Fixed install

@@ -1774,7 +1774,7 @@ class Results extends Widget
 		// Sometimes we need embedded function call, so we provide a second sign:
 		$content = preg_replace( '#¤ (.+?) ¤#ix', "'.$1.'", $content );
 
-		// Make callback function move_icons // dh> what does it do?
+		// Make callback function move_icons for oderable lists // dh> what does it do?
 		$content = str_replace( '{move}', "'.\$this->move_icons().'", $content );
 
 
@@ -2194,6 +2194,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.33  2006/11/14 00:47:32  fplanque
+ * doc
+ *
  * Revision 1.32  2006/11/01 12:20:24  blueyed
  * doc/todo
  *

@@ -356,7 +356,7 @@ function locale_by_lang( $lang, $fallback_to_default = true )
 /**
  * Displays/Returns the current locale. (for backward compatibility)
  *
- * @todo dh> "lang" should rather be a two letter code, e.g. "en" for english..
+ * This is for HTML lang attributes
  *
  * @param boolean true (default) if we want it to be outputted
  * @return string current locale, if $disp = false
@@ -947,6 +947,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.31  2006/11/14 00:47:32  fplanque
+ * doc
+ *
  * Revision 1.30  2006/11/02 15:58:08  blueyed
  * todo/note
  *

@@ -100,7 +100,7 @@ switch($action)
 
 
 		// TODO: fp> Add a radio into blog settings > Features > Post title: () required () optional () none
-		//       dh> there's no "Features" tab in "Blog settings"?!
+		//       dh> there's no "Features" tab in "Blog settings"?! fp> yes, it needs to be created
 		/*
 		if( empty($edited_Item->title) )
 		{ // post_title is "TEXT NOT NULL" and a title makes sense anyway
@@ -561,6 +561,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.31  2006/11/14 00:47:32  fplanque
+ * doc
+ *
  * Revision 1.30  2006/11/01 04:24:10  blueyed
  * MFB: Fixed "Exit to blogs" link by defining the global $Blog for edit action
  *

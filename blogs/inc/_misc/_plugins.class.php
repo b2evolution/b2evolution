@@ -335,7 +335,7 @@ class Plugins
 			);
 
 
-			if( ! defined('EVO_IS_INSTALL') || ! EVO_IS_INSTALL )
+			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )
 			{ // only call this, if we're not in the process of installation, to avoid errors from Plugins in this case!
 				// Let Plugins add additional events (if they trigger those events themselves):
 				$this->load_plugins_table();
@@ -764,7 +764,7 @@ class Plugins
 			$Plugin = '';
 		}
 
-		if( ! defined('EVO_IS_INSTALL') || ! EVO_IS_INSTALL )
+		if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )
 		{ // do not sort, if we're installing/upgrading.. instantiating Plugins might cause a fatal error!
 			$this->sort();
 		}
@@ -3031,6 +3031,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.102  2006/11/14 00:47:32  fplanque
+ * doc
+ *
  * Revision 1.101  2006/11/14 00:21:05  blueyed
  * removed todo
  *
@@ -3050,7 +3053,7 @@ class Plugins_admin extends Plugins
  * Merged fixes from v-1-9 branch
  *
  * Revision 1.95  2006/10/14 20:50:29  blueyed
- * Define EVO_IS_INSTALL for /install/ and use it in Plugins to skip "dangerous" but unnecessary instantiating of other Plugins
+ * Define EVO_IS_INSTALLING for /install/ and use it in Plugins to skip "dangerous" but unnecessary instantiating of other Plugins
  *
  * Revision 1.94  2006/10/14 16:27:06  blueyed
  * Client-side password hashing in the login form.

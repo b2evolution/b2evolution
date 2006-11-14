@@ -119,6 +119,7 @@ if( empty($tab) )
 
 
 	// MT import. Left here, so the page is never empty.. :/
+	// fp> who cares if the page is empty?
 	?>
 
 	<div class="panelblock">
