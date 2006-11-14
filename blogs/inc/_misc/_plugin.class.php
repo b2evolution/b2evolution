@@ -373,7 +373,7 @@ class Plugin
 	 *       settings and when the settings get displayed for editing in the backoffice.
 	 *       In the second case, $params['for_editing'] will be true.
 	 *
-	 * @param array Associative array of parameters.
+	 * @param array Associative array of parameters (since 1.9).
 	 *    'for_editing': true, if the settings get queried for editing;
 	 *                   false, if they get queried for instantiating {@link Plugin::Settings}.
 	 * @return array
@@ -2771,6 +2771,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.115  2006/11/14 00:21:33  blueyed
+ * doc
+ *
  * Revision 1.114  2006/11/12 02:12:58  blueyed
  * removed bloat param
  *

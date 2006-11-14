@@ -79,7 +79,7 @@ $Form->begin_fieldset( T_('Plugin info'), array( 'class' => 'clear' ) );
 $Form->end_fieldset();
 
 // PluginSettings
-if( $edit_Plugin->Settings )
+if( $edit_Plugin->Settings ) // NOTE: this triggers PHP5 autoloading through Plugin::__get() and therefor the 'isset($this->Settings)' hack in Plugin::GetDefaultSettings() still works, which is good.
 {
 	global $inc_path;
 	require_once $inc_path.'_misc/_plugin.funcs.php';
@@ -175,6 +175,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.26  2006/11/14 00:22:13  blueyed
+ * doc
+ *
  * Revision 1.25  2006/11/09 23:40:57  blueyed
  * Fixed Plugin UserSettings array type editing; Added jquery and use it for AJAHifying Plugin (User)Settings editing of array types
  *
