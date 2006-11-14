@@ -74,6 +74,7 @@ if( ($use_l10n == 1) && function_exists('_') )
 		{ // We have asked for another locale...
 			if( locale_temp_switch( $req_locale ) )
 			{
+				global $current_charset;
 				$r = _($string);
 				$messages_charset = $current_charset;
 				locale_restore_previous();
@@ -947,6 +948,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.32  2006/11/14 21:12:38  blueyed
+ * Fix for gettext-T_()
+ *
  * Revision 1.31  2006/11/14 00:47:32  fplanque
  * doc
  *
