@@ -56,7 +56,9 @@ switch( $action )
 		header('Content-type: text/html; charset='.$io_charset);
 
 		param( 'plugin_ID', 'integer', true );
-		$Plugin = & $Plugins->get_by_ID($plugin_ID);
+
+		$admin_Plugins = new Plugins_admin(); // use Plugins_admin, because a plugin might be disabled
+		$Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 		if( ! $Plugin )
 		{
 			bad_request_die('Invalid Plugin.');
@@ -103,6 +105,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.7  2006/11/15 22:03:17  blueyed
+ * Use Plugins_admin, because a Plugin might be disabled, when editing its settings
+ *
  * Revision 1.6  2006/11/10 16:37:30  blueyed
  * Send charset
  *
