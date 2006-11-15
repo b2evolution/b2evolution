@@ -179,6 +179,9 @@ elseif( ! empty( $comment_id ) )
 	}
 
 	$recipient_address = trim($Comment->get_author_name()) . ' <' . $Comment->get_author_email() . '>';
+
+	// Change the locale so the email is in the blog's language (better than in the sender's one):
+	locale_temp_switch($Blog->locale);
 }
 
 if( empty($recipient_address) )
@@ -247,11 +250,8 @@ $success_mail = send_mail( $recipient_address, $subject, $message, "$sender_name
 $Plugins->trigger_event( 'MessageFormSentCleanup' );
 
 
-if( isset($recipient_User) )
-{
-	// restore the locale to the readers language
-	locale_restore_previous();
-}
+// restore the locale to the blog visitor language
+locale_restore_previous();
 
 if( $success_mail )
 {
@@ -274,6 +274,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.39  2006/11/15 00:09:16  blueyed
+ * Use the blog locale when sending e-mails to non-members - instead of the one from the visitor
+ *
  * Revision 1.38  2006/11/14 21:12:55  blueyed
  * doc
  *
