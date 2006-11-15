@@ -49,16 +49,16 @@
 		<li>Visual skin selector (fplanque)</li>
 		<li>Filemanager: basic image preview while browsing (blueyed)</li>
 		<li>Post contents get pre-rendered and cached at edit time in order to speed up complex displays.
-			 The cache data gets invalidated automatically, e.g. if a plugin gets updated. 
-			 However, just in case, there's a "Delete item cache" action in the "Tools".</li>
+			The cache data gets invalidated automatically, e.g. if a plugin gets updated. 
+			However, just in case, there's a "Delete item cache" action in the "Tools".</li>
 		<li>Ping services are now implemented as plugins with b2evolution.net and Pingomatic included.
-				There is also a "Generic ping plugin" which can be used for common RPC ping services. (blueyed)</li>
+			There is also a "Generic ping plugin" which can be used for common RPC ping services. (blueyed)</li>
 		<li>Different modes of hitlog/session pruning: per page, as cron job or "off" (fplanque, blueyed)</li>
 		<li>Enhanced result tables (progidistri, fplanque, blueyed) </li>
 		<li>Enhanced handling of locale dateformats (especially when editing posts with other date format chars than "d", "m" and "Y"/"y") (blueyed)</li>
 		<li>mailto:-links and relative links are valid again are get converted to absolute ones in feeds (blueyed)</li>
-		<li>Added $htsrv_url_sensitive config variable which gets used where password are involved</li>
-		<li>"Time difference" can now hanlde values like "1.5" hours.</li>
+		<li>Added $htsrv_url_sensitive config variable which gets used where password are involved (blueyed)</li>
+		<li>"Time difference" can now handle values like "1.5" hours. (blueyed, balupton)</li>
 		<li>Plugins
 			<ul>
 				<li>Enhanced smilies plugin (Yabba)</li>
@@ -66,10 +66,9 @@
 				<li>Plugin name and short description of installed plugins can be edited by the admin (blueyed)</li>
 				<li>Plugins should not use a constructor anymore, but the PluginInit() method instead. The previous AppendPluginRegister() method has been "renamed" to PluginInit(). (blueyed)</li>
 				<li>Plugins can be grouped (see Plugin::group and Plugin::sub_group) (balupton, blueyed)</li>
-				<li>Added b2evo_Callbacks Javascript object to help plugins interact (blueyed)</li>
+				<li>Added b2evo_Callbacks Javascript object to help plugins interact with the textarea and each other (blueyed)</li>
 				<li>Optimized expensive queries in calendar plugin (fplanque)</li>
 				<li>Added events/hooks: Logout, DisplayTrackbackAddr, GetCronJobs, ExecCronJob</li>
-				<li>Removed dependency on PHP tokenizer extension (blueyed)</li>
 				<li>Added hook RenderItemAsText, removed general RenderItem</li>
 				<li>Added hooks DisplayItemAsHtml, DisplayItemAsXml and DisplayItemAsText;
 				    removed general DisplayItemAllFormats (blueyed)</li>
@@ -84,7 +83,7 @@
 			Developer stuff:
 			<ul>
 				<li>Enhanced form abortion detection javascript (fplanque)</li>
-				<li>Application errors (from debug_die()) now get logged like normal PHP errors. See $log_app_errors in /conf/_advanced.php. (blueyed)</li>
+				<li>Application errors (from debug_die()) now get logged like normal PHP errors. See $log_app_errors in /conf/_advanced.php. Experimental. (blueyed)</li>
 				<li>Charset handling improved; added $force_io_charset_if_accepted setting (blueyed)</li>
 				<li>Cleaned up skins (fplanque) </li>
 				<li>Optimized performance of (Abstract)Settings, especially get() (blueyed)</li>

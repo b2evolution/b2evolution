@@ -51,6 +51,8 @@ error_reporting( E_ALL );
  *
  * This means that they will get logged according to PHP's error_log configuration directive.
  *
+ * Experimental! This may be changed to use regular files instead/optionally.
+ *
  * @global boolean Default: true
  */
 $log_app_errors = 1;
