@@ -94,6 +94,7 @@ if( $action == 'edit' )
 		T_('1 is highest. Priority is important when selecting a locale from a language code and several locales match the same language; this can happen when detecting browser language. Priority also affects the order in which locales are displayed in dropdown boxes, etc.'), 5 );
 
 	// TODO: Update this field onchange of datefmt/timefmt through AJAX:
+	// fp> It would actually make more sense to have the preview at the exact place that says "see below"
 	locale_temp_switch($newlocale);
 	$Form->info_field( T_('Date preview:'), date_i18n( locale_datefmt().' '.locale_timefmt(), $localtimenow ) );
 	locale_restore_previous();
@@ -247,15 +248,15 @@ else
 	$Form->begin_fieldset( T_('Available locales') );
 
 	echo '<p class="center">';
-	if( $loc_transinfo ) {
+	if( $loc_transinfo )
+	{
 		echo '<a href="'.$pagenow.'?ctrl=locales">' . T_('Hide translation info'), '</a>';
 	}
-	else {
+	else
+	{
 		echo '<a href="'.$pagenow.'?ctrl=locales&amp;loc_transinfo=1">' . T_('Show translation info'), '</a>';
 	}
 	echo '</p>';
-
-	echo '<p class="note">'.T_('Hover over the format fields to see a preview.').'</p>';
 
 	echo '<table class="grouped" cellspacing="0">';
 
@@ -317,7 +318,7 @@ else
 				echo '</a>';
 			}
 
-			// TODO: Update title attribs for datefmt/timefmt onchange through AJAX
+			// TODO: Update title attribs for datefmt/timefmt onchange through AJAX  -- fp> all that complexity for an invisible tooltip... :/ Users should update the format on the detailed screen and get a dynamic preview there. Maybe the date and time should be editable on the list at all. There is no help here either. Users should be encouraged to go to the detailed screen )
 			echo '</strong></td>
 				<td class="center">
 					<input type="checkbox" name="loc_'.$i.'_enabled" value="1"'. ( $locales[$lkey]['enabled'] ? 'checked="checked"' : '' ).' />
@@ -494,6 +495,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.12  2006/11/15 00:12:51  fplanque
+ * doc
+ *
  * Revision 1.11  2006/09/26 20:57:38  blueyed
  * Display preview of date- and time-format in locales editing screen
  *

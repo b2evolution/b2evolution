@@ -65,6 +65,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		// Override vars used by date.js (and calendarpopup.js, if present)
 		var MONTH_NAMES=new Array( '<?php echo implode("','", array_map('T_',$month)) ?>','<?php echo implode("','", array_map('trim', array_map( 'T_', $month_abbrev ))) ?>' );
 		var DAY_NAMES=new Array('<?php echo implode("','", $weekday) ?>','<?php echo implode("','", array_map('T_',$weekday_abbrev)) ?>');
+		// fp> TODO: why is DAY_NAMES set twice?
 		var DAY_NAMES=new Array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sun','Mon','Tue','Wed','Thu','Fri','Sat');
 	</script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/popupwindow.js"></script>
