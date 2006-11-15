@@ -284,7 +284,7 @@ class AbstractSettings
 				{	// The value has been unserailized before:
 					$r = $this->cache[ $col_key1 ]->value;
 				}
-				elseif( isset($this->cache[ $col_key1 ]) )
+				elseif( isset($this->cache[ $col_key1 ]->value) )
 				{	// First attempt to access the value, we need to unserialize it:
 					// Try to unserialize setting (once) - this is as fast as checking an array of values that should get unserialized
 					if( ($r = @unserialize($this->cache[ $col_key1 ]->value)) !== false )
@@ -314,7 +314,7 @@ class AbstractSettings
 				{
 					$r = $this->cache[ $col_key1 ][ $col_key2 ]->value;
 				}
-				elseif( isset($this->cache[ $col_key1 ][ $col_key2 ]) )
+				elseif( isset($this->cache[ $col_key1 ][ $col_key2 ]->value) )
 				{
 					// Try to unserialize setting (once) - this is as fast as checking an array of values that should get unserialized
 					if( ($r = @unserialize($this->cache[ $col_key1 ][ $col_key2 ]->value)) !== false )
@@ -344,7 +344,7 @@ class AbstractSettings
 				{
 					$r = $this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value;
 				}
-				elseif( isset($this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]) )
+				elseif( isset($this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value) )
 				{
 					// Try to unserialize setting (once) - this is as fast as checking an array of values that should get unserialized
 					if( ($r = @unserialize($this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value)) !== false )
@@ -500,6 +500,7 @@ class AbstractSettings
 	 * Remove a setting.
 	 *
 	 * @param array List of {@link $col_key_names}
+	 * @return boolean
 	 */
 	function delete( $args )
 	{
@@ -524,6 +525,8 @@ class AbstractSettings
 		}
 
 		$atCache->dbRemove = true;
+		unset($atCache->unserialized);
+		unset($atCache->value);
 
 		return true;
 	}
@@ -704,6 +707,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.16  2006/11/15 20:18:50  blueyed
+ * Fixed AbstractSettings::delete(): unset properties in cache
+ *
  * Revision 1.15  2006/11/04 01:35:02  blueyed
  * Fixed unserializing of array()
  *

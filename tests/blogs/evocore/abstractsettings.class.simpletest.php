@@ -51,6 +51,13 @@ class AbstractSettingsTestCase extends MockDbUnitTestCase
 
 		$this->TestSettings->_load();
 		$this->assertEqual( 'abc', $this->TestSettings->get_default( 'default_abc' ) );
+
+		$this->assertEqual( 'abc', $this->TestSettings->get( 'default_abc' ) );
+
+		// After delete it should return the default again:
+		$this->TestSettings->set( 'default_abc', 'foo' );
+		$this->TestSettings->delete( 'default_abc' );
+		$this->assertEqual( 'abc', $this->TestSettings->get( 'default_abc' ) );
 	}
 
 
