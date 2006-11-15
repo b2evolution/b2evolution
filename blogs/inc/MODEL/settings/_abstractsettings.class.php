@@ -281,7 +281,7 @@ class AbstractSettings
 				$this->_load( $col_key1 );
 
 				if( isset($this->cache[ $col_key1 ]->unserialized) )
-				{	// The value has been unserailized before:
+				{	// The value has been unserialized before:
 					$r = $this->cache[ $col_key1 ]->value;
 				}
 				elseif( isset($this->cache[ $col_key1 ]->value) )
@@ -302,7 +302,7 @@ class AbstractSettings
 					$r = $this->get_default( $col_key1 );
 					$this->cache[ $col_key1 ]->value = $r; // remember in cache
 					$this->cache[ $col_key1 ]->dbUptodate = true;
-					$this->cache[ $col_key1 ]->dbRemove = false;
+					$this->cache[ $col_key1 ]->unserialized = true;
 					$from_default = true; // for debug
 				}
 				break;
@@ -332,7 +332,7 @@ class AbstractSettings
 					$r = $this->get_default( $col_key2 );
 					$this->cache[ $col_key1 ][ $col_key2 ]->value = $r; // remember in cache
 					$this->cache[ $col_key1 ][ $col_key2 ]->dbUptodate = true;
-					$this->cache[ $col_key1 ][ $col_key2 ]->dbRemove = false;
+					$this->cache[ $col_key1 ][ $col_key2 ]->unserialized = true;
 					$from_default = true; // for debug
 				}
 				break;
@@ -362,7 +362,7 @@ class AbstractSettings
 					$r = $this->get_default( $col_key3 );
 					$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->value = $r; // remember in cache
 					$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->dbUptodate = true;
-					$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->dbRemove = false;
+					$this->cache[ $col_key1 ][ $col_key2 ][ $col_key3 ]->unserialized = true;
 					$from_default = true; // for debug
 				}
 				break;
@@ -588,7 +588,7 @@ class AbstractSettings
 					{ // Remembered as not existing
 						continue;
 					}
-					if( $value->dbRemove )
+					if( ! empty($value->dbRemove) )
 					{
 						$query_where_delete[] = "{$this->col_key_names[0]} = '$key'";
 						unset( $this->cache[$key] );
@@ -615,7 +615,7 @@ class AbstractSettings
 						{ // Remembered as not existing
 							continue;
 						}
-						if( $value2->dbRemove )
+						if( ! empty($value2->dbRemove) )
 						{
 							$query_where_delete[] = "{$this->col_key_names[0]} = '$key' AND {$this->col_key_names[1]} = '$key2'";
 							unset( $this->cache[$key][$key2] );
@@ -645,7 +645,7 @@ class AbstractSettings
 							{ // Remembered as not existing
 								continue;
 							}
-							if( $value3->dbRemove )
+							if( ! empty($value3->dbRemove) )
 							{
 								$query_where_delete[] = "{$this->col_key_names[0]} = '$key' AND {$this->col_key_names[1]} = '$key2' AND {$this->col_key_names[2]} = '$key3'";
 								unset( $this->cache[$key][$key2][$key3] );
@@ -707,6 +707,10 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.17  2006/11/15 21:04:46  blueyed
+ * - Fixed removing setting after delete() and get() (from defaults) (When getting value from default do not reset $dbRemove property)
+ * - Opt: default settings are already unserialized
+ *
  * Revision 1.16  2006/11/15 20:18:50  blueyed
  * Fixed AbstractSettings::delete(): unset properties in cache
  *
