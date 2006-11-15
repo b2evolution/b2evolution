@@ -159,7 +159,8 @@ if( $action == 'edit' )
 }
 else
 { // show main form
-	if( !$locales[$Settings->get('default_locale')]['enabled'] )
+	if( ! isset($locales[$Settings->get('default_locale')])
+		|| ! $locales[$Settings->get('default_locale')]['enabled'] )
 	{ // default locale is not enabled
 		echo '<div class="error">' . T_('Note: default locale is not enabled.') . '</div>';
 	}
@@ -495,6 +496,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.13  2006/11/15 00:35:14  blueyed
+ * Fix
+ *
  * Revision 1.12  2006/11/15 00:12:51  fplanque
  * doc
  *

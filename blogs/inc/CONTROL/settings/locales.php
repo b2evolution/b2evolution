@@ -120,7 +120,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 					{ // locale key was renamed, we delete the old locale in DB and remember to create the new one
 						$q = $DB->query( 'DELETE FROM T_locales
 																WHERE loc_locale = "'.$oldloc_locale.'"' );
-						if( mysql_affected_rows() )
+						if( $DB->rows_affected )
 						{
 							$Messages->add( sprintf(T_('Deleted settings for locale &laquo;%s&raquo; in database.'), $oldloc_locale), 'success' );
 						}
@@ -157,13 +157,15 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 			$q = $DB->query($query);
 			$Messages->add( sprintf(T_('Saved locale &laquo;%s&raquo;.'), $newloc_locale), 'success' );
 
-			// reload locales: an existing one could have been renamed
+			// reload locales: an existing one could have been renamed (but we keep $evo_charset, which may have changed)
+			$old_evo_charset = $evo_charset;
 			unset( $locales );
 			include $conf_path.'_locales.php';
 			if( file_exists($conf_path.'_overrides_TEST.php') )
 			{ // also overwrite settings again:
 				include $conf_path.'_overrides_TEST.php';
 			}
+			$evo_charset = $old_evo_charset;
 
 			break;
 
@@ -422,6 +424,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2006/11/15 00:35:14  blueyed
+ * Fix
+ *
  * Revision 1.9  2006/08/20 22:25:20  fplanque
  * param_() refactoring part 2
  *
