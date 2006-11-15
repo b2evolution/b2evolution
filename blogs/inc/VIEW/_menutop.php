@@ -64,7 +64,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<script type="text/javascript">
 		// Override vars used by date.js (and calendarpopup.js, if present)
 		var MONTH_NAMES=new Array( '<?php echo implode("','", array_map('T_',$month)) ?>','<?php echo implode("','", array_map('trim', array_map( 'T_', $month_abbrev ))) ?>' );
-		var DAY_NAMES=new Array('<?php echo implode("','", $weekday) ?>','<?php echo implode("','", array_map('T_',$weekday_abbrev)) ?>');
+		var DAY_NAMES=new Array('<?php echo implode("','", array_map('T_', $weekday)) ?>','<?php echo implode("','", array_map('T_',$weekday_abbrev)) ?>');
 	</script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/popupwindow.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/calendarpopup.js"></script>
