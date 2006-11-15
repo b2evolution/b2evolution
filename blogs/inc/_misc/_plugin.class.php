@@ -1692,6 +1692,7 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'User': the {@link User} for which the settings get updated
+	 *   - 'action': "save", "reset" (since b2evo 2.0 - before there was only "save")
 	 *
 	 * @return false|NULL Return false to prevent the settings from being updated to DB.
 	 */
@@ -2771,6 +2772,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.116  2006/11/15 21:14:04  blueyed
+ * "Restore defaults" in user profile
+ *
  * Revision 1.115  2006/11/14 00:21:33  blueyed
  * doc
  *

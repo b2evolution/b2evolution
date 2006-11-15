@@ -383,7 +383,7 @@ if( !$Messages->count('error') )
 			$UserSettings->set( 'focus_on_first_input', $edited_user_focusonfirst, $edited_User->ID );
 
 			// Update user settings:
-			if( $UserSettings->dbupdate() ) $Messages->add( T_('User feature settings have been changed'), 'success');
+			if( $UserSettings->dbupdate() ) $Messages->add( T_('User feature settings have been changed.'), 'success');
 
 			// PluginUserSettings
 			$any_plugin_settings_updated = false;
@@ -403,7 +403,89 @@ if( !$Messages->count('error') )
 				set_Settings_for_Plugin_from_Request( $loop_Plugin, $Plugins, 'UserSettings', $edited_User );
 
 				// Let the plugin handle custom fields:
-				$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array( 'User' => & $edited_User ) );
+				$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array(
+					'User' => & $edited_User, 'action' => 'save' ) );
+
+				if( $ok_to_update === false )
+				{
+					$loop_Plugin->UserSettings->reset();
+				}
+				elseif( $loop_Plugin->UserSettings->dbupdate() )
+				{
+					$any_plugin_settings_updated = true;
+				}
+			}
+			if( $any_plugin_settings_updated )
+			{
+				$Messages->add( T_('Usersettings of Plugins have been updated.'), 'success' );
+			}
+
+			if( $reload_page )
+			{ // save Messages and reload the current page through header redirection
+				$Session->set( 'Messages', $Messages );
+				header_redirect( regenerate_url( 'action', '', '', '&' ) );
+			}
+
+			if( $user_profile_only )
+			{
+				$action = 'edit_user';
+			}
+			break;
+
+
+		case 'default_settings':
+			$reload_page = false; // We set it to true, if a setting changes that needs a page reload (locale, admin skin, ..)
+
+			// Admin skin:
+			$cur_admin_skin = $UserSettings->get('admin_skin');
+
+			$UserSettings->delete( 'admin_skin', $edited_User->ID );
+			if( $cur_admin_skin
+					&& $UserSettings->get('admin_skin', $edited_User->ID ) != $cur_admin_skin
+					&& ($edited_User->ID == $current_User->ID) )
+			{ // admin_skin has changed:
+				$reload_page = true;
+			}
+
+			// Action icon params:
+			$UserSettings->delete( 'action_icon_threshold', $edited_User->ID );
+			$UserSettings->delete( 'action_word_threshold', $edited_User->ID );
+			$UserSettings->delete( 'display_icon_legend', $edited_User->ID );
+
+			// Set bozo validador activation
+			$UserSettings->delete( 'control_form_abortions', $edited_User->ID );
+
+			// Focus on first
+			$UserSettings->delete( 'focus_on_first_input', $edited_User->ID );
+
+			// Update user settings:
+			if( $UserSettings->dbupdate() ) $Messages->add( T_('User feature settings have been changed.'), 'success');
+
+			// PluginUserSettings
+			$any_plugin_settings_updated = false;
+			$Plugins->restart();
+			while( $loop_Plugin = & $Plugins->get_next() )
+			{
+				$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
+
+				if( empty($pluginusersettings) )
+				{
+					continue;
+				}
+
+				foreach( $pluginusersettings as $k => $l_meta )
+				{
+					if( isset($l_meta['layout']) || ! empty($l_meta['no_edit']) )
+					{ // a layout "setting" or not for editing
+						continue;
+					}
+
+					$loop_Plugin->UserSettings->delete($k, $edited_User->ID);
+				}
+
+				// Let the plugin handle custom fields:
+				$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array(
+					'User' => & $edited_User, 'action' => 'reset' ) );
 
 				if( $ok_to_update === false )
 				{
@@ -724,6 +806,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.38  2006/11/15 21:14:04  blueyed
+ * "Restore defaults" in user profile
+ *
  * Revision 1.37  2006/11/13 20:49:52  fplanque
  * doc/cleanup :/
  *

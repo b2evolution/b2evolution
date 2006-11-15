@@ -85,7 +85,6 @@ else
 }
 
 $Form->hidden_ctrl();
-$Form->hidden( 'action', 'userupdate' );
 $Form->hidden( 'user_ID', $edited_User->ID );
 
 
@@ -251,8 +250,10 @@ while( $loop_Plugin = & $Plugins->get_next() )
 if( $action != 'view_user' )
 { // Edit buttons
 	$Form->buttons( array(
-		array( '', '', T_('Save !'), 'SaveButton' ),
-		array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+		array( '', 'actionArray[userupdate]', T_('Save !'), 'SaveButton' ),
+		array( 'reset', '', T_('Reset'), 'ResetButton' ),
+		array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'SaveButton' ),
+	) );
 }
 
 if( ! $creating )
@@ -279,6 +280,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.27  2006/11/15 21:14:04  blueyed
+ * "Restore defaults" in user profile
+ *
  * Revision 1.26  2006/11/14 00:26:28  blueyed
  * Made isset($this->UserSettings)-hack work; fixed call to undefined function
  *
