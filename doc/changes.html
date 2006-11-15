@@ -27,7 +27,8 @@
 		<li>Entities support for HTML checker (blueyed)</li>
 		<li>Made default chmod settings for dirs/files editable (blueyed)</li>
 		<li>Optimized speed (fplanque)</li>
-		<li>A lot of refactoring (fplanque, blueyed)</li>
+		<li>A lot of refactoring (fplanque)</li>
+		<li>Pingbacks are dead. R.I.P. (not enough value over maintenance time)</li>
 		<li>...postcounts for categories will probably die soon (not enough value over processing time)</li>
 
 		<li> Plugins
@@ -42,23 +43,22 @@
 	<ul>
 		<li>Enhanced stats (fplanque)</li>
 		<li>Different item edit views: simple, advanced (blueyed, fplanque)</li>
+		<li>Fixed previewing, if $redirect_to_postblog setting is used (blueyed)</li>
 		<li>Cleaned up blog management (fplanque) </li>
 		<li>Stay in same blog when accessing blog settings (fplanque)</li>
 		<li>Visual skin selector (fplanque)</li>
 		<li>Filemanager: basic image preview while browsing (blueyed)</li>
-		<li>Added $htsrv_url_sensitive config variable which gets used where password are involved</li>
+		<li>Post contents get pre-rendered and cached at edit time in order to speed up complex displays.
+			 The cache data gets invalidated automatically, e.g. if a plugin gets updated. 
+			 However, just in case, there's a "Delete item cache" action in the "Tools".</li>
+		<li>Ping services are now implemented as plugins with b2evolution.net and Pingomatic included.
+				There is also a "Generic ping plugin" which can be used for common RPC ping services. (blueyed)</li>
 		<li>Different modes of hitlog/session pruning: per page, as cron job or "off" (fplanque, blueyed)</li>
-		<li>Enhanced form abortion detection javascript (fplanque)</li>
 		<li>Enhanced result tables (progidistri, fplanque, blueyed) </li>
-		<li>Caching of pre-rendered item content. This keeps the content pre-rendered in the database
-		    and improves performance. Obsoleting the cache data should get done automatically, e.g. if
-		    a plugin gets updated. But just in case there's also a "Delete item cache" action in the "Tools"
-		    section to do this. (blueyed)</li>
-		<li>Ping services implemented as plugins. Plugins for b2evolution.net and Pingomatic (handles more than 15 services) are included, plus a "Generic ping plugin" which can be used for common RPC ping services. (blueyed)</li>
-		<li>Pingbacks are dead. R.I.P. (not enough value over maintenance time)
-			TODO: implement as plugin, once </li>
-		<li>Display preview of date- and time-format in locales editing screen (blueyed)</li>
-
+		<li>Enhanced handling of locale dateformats (especially when editing posts with other date format chars than "d", "m" and "Y"/"y") (blueyed)</li>
+		<li>mailto:-links and relative links are valid again are get converted to absolute ones in feeds (blueyed)</li>
+		<li>Added $htsrv_url_sensitive config variable which gets used where password are involved</li>
+		<li>"Time difference" can now hanlde values like "1.5" hours.</li>
 		<li>Plugins
 			<ul>
 				<li>Enhanced smilies plugin (Yabba)</li>
@@ -80,21 +80,10 @@
 				<li>Added hook ItemSendPing: gets called, when pinging for new items (blueyed)</li>
 			</ul>
 		</li>
-
-		<li>Fixes:
-			<ul>
-				<li>"Time difference" of the server (a regional setting) gets now stored internally in seconds and you can therefor define a value of e.g. "1.5".</li>
-				<li>mailto:-links and relative links are valid again and the latter get converted to absolute URLs in feeds (blueyed)</li>
-				<li>Fixed handling of locale dateformats with other chars than "d", "m" and "Y"/"y" when editing items (blueyed)</li>
-				<li>Extended date- and time-format fields for locales to 20 chars (blueyed)</li>
-				<li>Fixes for/Rewrite of the Javascript Style Switcher in the legacy admin skin (blueyed)</li>
-				<li>Fixed previewing, if $redirect_to_postblog setting is used (blueyed)</li>
-			</ul>
-		</li>
-
 		<li>
 			Developer stuff:
 			<ul>
+				<li>Enhanced form abortion detection javascript (fplanque)</li>
 				<li>Application errors (from debug_die()) now get logged like normal PHP errors. See $log_app_errors in /conf/_advanced.php. (blueyed)</li>
 				<li>Charset handling improved; added $force_io_charset_if_accepted setting (blueyed)</li>
 				<li>Cleaned up skins (fplanque) </li>
