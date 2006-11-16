@@ -16,6 +16,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+// dh> TODO: this looks broken.. it should be only one HTML block, shouldn't it?
+//           I've seen "headers already have been sent" errors on the demo install (when the above header() call was in the loop below)
 while( $Item = & $MainList->get_item() )
 {
 header( 'Content-type: text/html; charset='.$io_charset );
