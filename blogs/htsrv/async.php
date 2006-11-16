@@ -75,10 +75,10 @@ switch( $action )
 		// Init the new setting set:
 		_set_setting_by_path( $Plugin, $set_type, $set_path, array() );
 
-		$r = get_plugin_settings_node_by_path( $Plugin, $set_type, $set_path );
+		$r = get_plugin_settings_node_by_path( $Plugin, $set_type, $set_path, /* create: */ false );
 
 		$Form = new Form(); // fake Form
-		display_plugin_settings_fieldset_field( $set_path, $r[3], $Plugin, $Form, $set_type = 'Settings', $set_target = NULL, $r[2] );
+		display_plugin_settings_fieldset_field( $set_path, $r['set_meta'], $Plugin, $Form, $set_type = 'Settings', $set_target = NULL, $r['set_node'] );
 
 		exit;
 
@@ -105,6 +105,10 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.8  2006/11/16 23:43:39  blueyed
+ * - "key" entry for array-type Plugin(User)Settings can define an input field for the key of the settings entry
+ * - cleanup
+ *
  * Revision 1.7  2006/11/15 22:03:17  blueyed
  * Use Plugins_admin, because a Plugin might be disabled, when editing its settings
  *

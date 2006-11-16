@@ -425,10 +425,14 @@ class Plugin
 	 *     'array': a subset of settings. The value gets automagically (un)serialized through get() and set().
 	 *       The following keys apply to this type:
 	 *       <ul><li>
-	 *       'entries': an array with the sub-settings (which can be everything from the top-level, except:
-	 *                    "valid_pattern", "valid_range"). Note: currently there's no type forcing or checking
-	 *                    for sub-entries involved (e.g., if you have an entry of type "integer", you could get
-	 *                    a non-numeric string there).
+	 *       'entries': an array with meta information about sub-settings
+	 *           (which can be everything from the top-level, except: "valid_pattern", "valid_range").
+	 *           Note: currently there's no type forcing or checking
+	 *                 for sub-entries involved (e.g., if you have an entry of type "integer", you could get
+	 *                 a non-numeric string there).
+	 *       </li><li>
+	 *       'key': defines the key to use for each entry. This may be a text input for example
+	 *              (with label, note etc). (optional, default is numeric keys, which are not editable)
 	 *       </li><li>
 	 *       'max_count': maximum count of sets (optional, default is no restriction)
 	 *       </li><li>
@@ -2772,6 +2776,10 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.117  2006/11/16 23:43:39  blueyed
+ * - "key" entry for array-type Plugin(User)Settings can define an input field for the key of the settings entry
+ * - cleanup
+ *
  * Revision 1.116  2006/11/15 21:14:04  blueyed
  * "Restore defaults" in user profile
  *

@@ -173,6 +173,10 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 	}
 	elseif( ( $set_value = get_param('edit_plugin_'.$Plugin->ID.'_set_'.$set_name) ) !== NULL )
 	{ // use value provided with Request!
+		if( is_array($set_value) )
+		{
+			handle_array_keys_in_plugin_settings($set_value);
+		}
 	}
 	else
 	{
@@ -236,13 +240,14 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 			$has_array_type = true;
 
 			if( substr_count( $set_name, '[' ) % 2 )
-			{ // this refers to a specific array type set (with index pos at the end):
+			{ // this refers to a specific array type set (with index pos at the end), e.g. when adding a field through AJAX:
 				$pos_last_bracket = strrpos($set_name, '[');
-				$disp_arrays = array( substr( $set_name, $pos_last_bracket+1, -1 ) => $set_value );
+				$k_nb = substr( $set_name, $pos_last_bracket+1, -1 );
+				$disp_arrays = array( '' => $set_value ); // empty key..
 				$set_name = substr($set_name, 0, $pos_last_bracket);
 			}
 			else
-			{ // display all values hold by this set:
+			{ // display all values hold in this set:
 				$disp_whole_set = true;
 				$disp_arrays = $set_value;
 				$fieldset_title = $set_label;
@@ -256,20 +261,18 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 				{
 					echo '<p class="notes">'.$params['note'].'</p>';
 				}
+				$k_nb = 0;
 			}
 
 
-			$insert_new_set_as = 0;
 			$user_ID = $set_type == 'UserSettings' ? $set_target->ID : '';
 			if( is_array( $set_value ) && ! empty($set_value) )
-			{
+			{ // Display value of the setting. It may be empty, if there's no set yet.
 				foreach( $disp_arrays as $k => $v )
 				{
 					$fieldset_icons = array();
 					if( ! isset($set_meta['min_count']) || count($set_value) > $set_meta['min_count'] )
 					{ // provide icon to remove this set
-						$fieldset_id = Form::get_valid_id('set_'.$set_name.'['.$k.']');
-
 						$fieldset_icons[] = action_icon(
 								T_('Delete set!'),
 								'delete',
@@ -279,6 +282,7 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 								// attach onclick event to remove the whole fieldset (AJAX):
 								array(
 									'onclick' => "
+										var oThis = this;
 										\$.get('{$htsrv_url}async.php', {
 												action: 'del_plugin_sett_set',
 												plugin_ID: '{$Plugin->ID}',
@@ -289,31 +293,44 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 											function(r, status) {
 												if( r == 'OK' )
 												{
-													\$('#$fieldset_id').remove();
+													\$(oThis).parents('fieldset:first').remove();
 												}
 										} );
 										return false;",
 									)
 								);
 					}
-					$Form->begin_fieldset( '#'.$k, array('id'=>$fieldset_id, 'class'=>'bordered' ), $fieldset_icons );
+					$Form->begin_fieldset( '#'.$k_nb, array('class'=>'bordered'), $fieldset_icons );
+
+					if( isset($set_meta['key']) )
+					{ // KEY FOR THIS ENTRY:
+						if( ! strlen($k) && isset($set_meta['key']['defaultvalue']) )
+						{ // key is not given/set and we have a default:
+							$l_value = $set_meta['key']['defaultvalue'];
+						}
+						else
+						{
+							$l_value = $k;
+						}
+						display_plugin_settings_fieldset_field( $set_name.'['.$k_nb.'][__key__]', $set_meta['key'], $Plugin, $Form, $set_type, $set_target, $l_value );
+					}
 
 					foreach( $set_meta['entries'] as $l_set_name => $l_set_entry )
 					{
 						$l_value = isset($set_value[$k][$l_set_name]) ? $set_value[$k][$l_set_name] : NULL;
-						display_plugin_settings_fieldset_field( $set_name.'['.$k.']['.$l_set_name.']', $l_set_entry, $Plugin, $Form, $set_type, $set_target, $l_value );
+						display_plugin_settings_fieldset_field( $set_name.'['.$k_nb.']['.$l_set_name.']', $l_set_entry, $Plugin, $Form, $set_type, $set_target, $l_value );
 					}
-					$insert_new_set_as = $k+1;
 					$Form->end_fieldset();
+					$k_nb++;
 				}
 			}
 
-
-			if( ! isset( $set_meta['max_number'] ) || $set_meta['max_number'] > count($set_value) )
+			// TODO: fix this for AJAX callbacks, when removing and re-adding items (dh):
+			if( ! isset( $set_meta['max_number'] ) || $set_meta['max_number'] > ($k_nb) )
 			{ // no max_number defined or not reached: display link to add a new set
-				$set_path = $set_name.'['.$insert_new_set_as.']';
-				$ajax_id = Form::get_valid_id('newset_'.$set_path);
-				echo '<div id="'.$ajax_id.'">';
+				$set_path = $set_name.'['.$k_nb.']';
+
+				echo '<div>';
 				echo action_icon(
 					sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label),
 					'new',
@@ -321,6 +338,7 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 					T_('New set'),
 					5, 1, /* icon/text prio */
 					array('onclick'=> "
+						var oThis = this;
 						\$.get('{$htsrv_url}async.php', {
 								action: 'add_plugin_sett_set',
 								plugin_ID: '{$Plugin->ID}',
@@ -328,8 +346,9 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 								set_path: '$set_path'
 							},
 							function(r, status) {
-								\$('#$ajax_id').html(r);
-						} );
+								\$(oThis).parent('div').html(r);
+							}
+						);
 						return false;")
 					);
 				echo '</div>';
@@ -395,20 +414,20 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
  */
 function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array() )
 {
-	$r = get_plugin_settings_node_by_path( $Plugin, $set_type, $path );
+	$r = get_plugin_settings_node_by_path( $Plugin, $set_type, $path, true );
 	if( $r === false )
 	{
 		return false;
 	}
 
 	// Make return value handier. Note: list() would copy and destroy the references (setting and set_node)!
-	$set_name = & $r[0];
-	$setting  = & $r[1];
-	$set_node = & $r[2];
-	$set_meta = & $r[3];
-	$set_parent = & $r[4];
-	$set_key  = & $r[5];
-	#pre_dump( $path, $set_name, $setting, $set_node, $set_meta );
+	$set_name = & $r['set_name'];
+	$set_node = & $r['set_node'];
+	$set_meta = & $r['set_meta'];
+	$set_parent = & $r['set_parent'];
+	$set_key  = & $r['set_key'];
+	$setting  = & $r['setting'];
+	#pre_dump( $r );
 
 	#if( isset($set_node) && $init_value !== NULL )
 	#{ // Setting already exists (and we do not want to delete), e.g. page reload!
@@ -462,14 +481,16 @@ function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array(
  *
  * @param Plugin
  * @param string Settings type ("Settings" or "UserSettings")
- * @param string The settings path, e.g. 'setting[0]foo[1]'. (Is used as array internally for recursion.)
+ * @param string The settings path, e.g. 'setting[0]foo[1]' or even 'setting[]'. (Is used as array internally for recursion.)
  * @return array Array(
- *          - setting name (string); key of the first level
- *          - whole settings (array)
- *          - selected setting node, may be NULL (reference)
- *          - meta info (from GetDefault[User]Settings()) for selected node (array)
+ *          - 'set_name': setting name (string); key of the first level
+ *          - 'set_node': selected setting node, may be NULL (by reference)
+ *          - 'set_meta': meta info (from GetDefault[User]Settings()) for selected node (array)
+ *          - 'set_parent': parent node (by reference)
+ *          - 'set_key': key in parent node (by reference)
+ *          - 'setting': whole settings (array)
  */
-function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path )
+function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create = false )
 {
 	// Init:
 	if( ! preg_match( '~^\w+(\[\w+\])+$~', $path ) )
@@ -477,7 +498,11 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path )
 		debug_die( 'Invalid path param!' );
 	}
 
-	$path = preg_split( '~(\[|\]\[?)~', $path, -1, PREG_SPLIT_NO_EMPTY ); // split by "[" and "][", so we get an array with setting name and index alternating
+	$path = preg_split( '~(\[|\]\[?)~', $path, -1 ); // split by "[" and "][", so we get an array with setting name and index alternating
+	$foo = array_pop($path); // remove last one
+	if( ! empty($foo) )
+		debug_die('Assertion failed!');
+
 	$set_name = $path[0];
 
 	$setting = $Plugin->$set_type->get($set_name);  // $Plugin->Settings or $Plugin->UserSettings
@@ -524,16 +549,33 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path )
 			#$set_parent = & $set_parent[$loop_name];
 			$set_key = $loop_index;
 
-			if( ! isset($found_node[$loop_index]) )
-			{
-				$found_node[$loop_index] = array();
+			if( $set_key === '' )
+			{ // []-syntax: append entry
+				if( $create && ! count($path) )
+				{ // only create, if at the end
+					$found_node[] = array();
+				}
+				$found_node = & $found_node[ array_pop(array_keys($found_node)) ];
 			}
-			$found_node = & $found_node[$loop_index];
+			else
+			{ // specific key:
+				if( ! isset($found_node[$loop_index]) )
+				{
+					$found_node[$loop_index] = array();
+				}
+				$found_node = & $found_node[$loop_index];
+			}
 		}
 	}
 
 	#echo '<h1>RETURN</h1>'; pre_dump( $set_parent, $set_key );
-	return array( $set_name, & $setting, & $found_node, $defaults_node, & $set_parent, & $set_key );
+	return array(
+		'set_name' => $set_name,
+		'set_node' => & $found_node,
+		'set_meta' => $defaults_node,
+		'set_parent' => & $set_parent,
+		'set_key' => & $set_key,
+		'setting' => & $setting );
 }
 
 
@@ -585,79 +627,14 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 		}
 		$l_value = param( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $l_param_type, $l_param_default );
 
-		if( isset($l_meta['type']) )
-		{ // validate format for "integer" and "float"
-			if( $l_meta['type'] == 'integer' )
-			{
-				if( ! preg_match( '~^[-+]?\d+$~', $l_value ) )
-				{
-					param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, sprintf( T_('The value for %s must be numeric.'), $l_name ), T_('The value must be numeric.') );
-					continue;
-				}
-			}
-			elseif( $l_meta['type'] == 'float' )
-			{
-				if( ! preg_match( '~^[-+]?\d+(\.\d+)?$~', $l_value ) )
-				{
-					param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, sprintf( T_('The value for %s must be numeric.'), $l_name ), T_('The value must be numeric.') );
-					continue;
-				}
-			}
+		if( isset($l_meta['type']) && $l_meta['type'] == 'array' )
+		{ // make keys (__key__) in arrays unique and remove them
+			handle_array_keys_in_plugin_settings($l_value);
 		}
 
-		// Check valid pattern:
-		if( isset($l_meta['valid_pattern']) )
+		if( ! validate_plugin_settings_from_param('edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $l_value, $l_meta) )
 		{
-			$param_pattern = is_array($l_meta['valid_pattern']) ? $l_meta['valid_pattern']['pattern'] : $l_meta['valid_pattern'];
-			if( ! preg_match( $param_pattern, $l_value ) )
-			{
-				$param_error = is_array($l_meta['valid_pattern']) ? $l_meta['valid_pattern']['error'] : sprintf(T_('The value is invalid. It must match the regular expression &laquo;%s&raquo;.'), $param_pattern);
-				param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $param_error );
-				continue;
-			}
-		}
-
-		// Check valid range:
-		if( isset($l_meta['valid_range']) )
-		{
-			// Transform numeric indexes into associative keys:
-			if( ! isset($l_meta['valid_range']['min'], $l_meta['valid_range']['max'])
-				&& isset($l_meta['valid_range'][0], $l_meta['valid_range'][1]) )
-			{
-				$l_meta['valid_range']['min'] = $l_meta['valid_range'][0];
-				$l_meta['valid_range']['max'] = $l_meta['valid_range'][1];
-			}
-			if( isset($l_meta['valid_range'][2]) && ! isset($l_meta['valid_range']['error']) )
-			{
-				$l_meta['valid_range']['error'] = $l_meta['valid_range'][2];
-			}
-
-			if( (isset($l_meta['valid_range']['min']) && $l_value < $l_meta['valid_range']['min'])
-			    || (isset($l_meta['valid_range']['max']) && $l_value > $l_meta['valid_range']['max']) )
-			{
-				if( isset($l_meta['valid_range']['error']) )
-				{
-					$param_error = $l_meta['valid_range']['error'];
-				}
-				else
-				{
-					if( isset($l_meta['valid_range']['min']) && isset($l_meta['valid_range']['max']) )
-					{
-						$param_error = sprintf(T_('The value is invalid. It must be in the range from %s to %s.'), $l_meta['valid_range']['min'], $l_meta['valid_range']['max']);
-					}
-					elseif( isset($l_meta['valid_range']['max']) )
-					{
-						$param_error = sprintf(T_('The value is invalid. It must be smaller than %s.'), $l_meta['valid_range']['max']);
-					}
-					else
-					{
-						$param_error = sprintf(T_('The value is invalid. It must be greater than %s.'), $l_meta['valid_range']['min']);
-					}
-				}
-
-				param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $param_error );
-				continue;
-			}
+			continue;
 		}
 
 		// Ask the plugin if it's ok (through PluginSettingsValidateSet() / PluginUserSettingsValidateSet()):
@@ -673,6 +650,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 			continue;
 		}
 
+		// Update the param value, because a plugin might have changed it (through reference):
+		$GLOBALS['edit_plugin_'.$Plugin->ID.'_set_'.$l_name] = $l_value;
+
 		// Set the setting:
 		if( $set_type == 'UserSettings' )
 		{
@@ -683,12 +663,190 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 			$Plugin->Settings->set( $l_name, $l_value );
 		}
 	}
+}
 
+
+/**
+ * Validates settings according to their meta info recursively.
+ *
+ * @param string Param name
+ * @param array Meta info
+ * @return boolean
+ */
+function validate_plugin_settings_from_param( $param_name, $value, $meta )
+{
+	if( is_array($value) && isset($meta['entries']) )
+	{
+		$r = true;
+		if(isset($meta['key']))
+		{ // validate keys:
+			foreach( array_keys($value) as $k )
+			{
+				if( ! validate_plugin_settings_from_param($param_name.'['.$k.'][__key__]', $k, $meta['key']) )
+				{
+					$r = false;
+				}
+			}
+		}
+			foreach( $meta['entries'] as $mk => $mv )
+			{
+				foreach( $value as $vk => $vv )
+				{
+					if( ! isset($vv[$mk]) )
+						continue;
+
+					if( ! validate_plugin_settings_from_param($param_name.'['.$vk.']['.$mk.']', $vv[$mk], $mv) )
+					{
+						$r = false;
+					}
+				}
+			}
+		return $r;
+	}
+
+
+	if( isset($meta['type']) )
+	{
+		switch( $meta['type'] )
+		{
+			case 'integer':
+				if( ! preg_match( '~^[-+]?\d+$~', $value ) )
+				{
+					param_error( $param_name, sprintf( T_('The value for &laquo;%s&raquo; must be numeric.'), $meta['label'] ), T_('The value must be numeric.') );
+					return false;
+				}
+				break;
+
+			case 'float':
+				if( ! preg_match( '~^[-+]?\d+(\.\d+)?$~', $value ) )
+				{
+					param_error( $param_name, sprintf( T_('The value for &laquo;%s&raquo; must be numeric.'), $meta['label'] ), T_('The value must be numeric.') );
+					return false;
+				}
+				break;
+		}
+	}
+
+
+	// Check valid pattern:
+	if( isset($meta['valid_pattern']) )
+	{
+		$param_pattern = is_array($meta['valid_pattern']) ? $meta['valid_pattern']['pattern'] : $meta['valid_pattern'];
+		if( ! preg_match( $param_pattern, $value ) )
+		{
+			$param_error = is_array($meta['valid_pattern']) ? $meta['valid_pattern']['error'] : sprintf(T_('The value is invalid. It must match the regular expression &laquo;%s&raquo;.'), $param_pattern);
+			param_error( $param_name, $param_error );
+			return false;
+		}
+	}
+
+	// Check valid range:
+	if( isset($meta['valid_range']) )
+	{
+		// Transform numeric indexes into associative keys:
+		if( ! isset($meta['valid_range']['min'], $meta['valid_range']['max'])
+			&& isset($meta['valid_range'][0], $meta['valid_range'][1]) )
+		{
+			$meta['valid_range']['min'] = $meta['valid_range'][0];
+			$meta['valid_range']['max'] = $meta['valid_range'][1];
+		}
+		if( isset($meta['valid_range'][2]) && ! isset($meta['valid_range']['error']) )
+		{
+			$meta['valid_range']['error'] = $meta['valid_range'][2];
+		}
+
+		if( (isset($meta['valid_range']['min']) && $value < $meta['valid_range']['min'])
+				|| (isset($meta['valid_range']['max']) && $value > $meta['valid_range']['max']) )
+		{
+			if( isset($meta['valid_range']['error']) )
+			{
+				$param_error = $meta['valid_range']['error'];
+			}
+			else
+			{
+				if( isset($meta['valid_range']['min']) && isset($meta['valid_range']['max']) )
+				{
+					$param_error = sprintf(T_('The value is invalid. It must be in the range from %s to %s.'), $meta['valid_range']['min'], $meta['valid_range']['max']);
+				}
+				elseif( isset($meta['valid_range']['max']) )
+				{
+					$param_error = sprintf(T_('The value is invalid. It must be smaller than %s.'), $meta['valid_range']['max']);
+				}
+				else
+				{
+					$param_error = sprintf(T_('The value is invalid. It must be greater than %s.'), $meta['valid_range']['min']);
+				}
+			}
+
+			param_error( $param_name, $param_error );
+			return false;
+		}
+	}
+	return true;
+}
+
+
+/**
+ * This handles the special "__key__" index in all array type values
+ * in the given array. It makes sure, that "__key__" is unique and
+ * replaces the original key of the value with it.
+ * @param array (by reference)
+ */
+function handle_array_keys_in_plugin_settings( & $a )
+{
+	if( ! is_array($a) )
+		return;
+
+	$new_arr = array(); // use a new array to maintain order, also for "numeric" keys
+
+	foreach( array_keys($a) as $k )
+	{
+		$v = & $a[$k];
+
+		if( is_array($v) && isset($v['__key__']) )
+		{
+			if( $k != $v['__key__'] )
+			{
+				$k = $v['__key__'];
+				if( ! strlen($k) || isset($a[ $k ]) )
+				{ // key already exists (or is empty):
+					$c = 1;
+
+					while( isset($a[ $k.'_'.$c ]) )
+					{
+						$c++;
+					}
+					$k = $k.'_'.$c;
+				}
+			}
+			unset($v['__key__']);
+
+			$new_arr[$k] = $v;
+		}
+		else
+		{
+			$new_arr[$k] = $v;
+		}
+
+		// Recurse:
+		foreach( array_keys($v) as $rk )
+		{
+			if( is_array($v[$rk]) )
+			{
+				handle_array_keys_in_plugin_settings($v[$rk]);
+			}
+		}
+	}
+	$a = $new_arr;
 }
 
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.31  2006/11/16 23:43:40  blueyed
+ * - "key" entry for array-type Plugin(User)Settings can define an input field for the key of the settings entry
+ * - cleanup
+ *
  * Revision 1.30  2006/11/10 17:14:20  blueyed
  * Added "select_blog" type for Plugin (User)Settings
  *
