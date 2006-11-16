@@ -21,6 +21,9 @@
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
+// TODO: dh> this file was meant to be used for things where you only need the basic config.. now all we got is an additional require/file, just because of some windows issue??
+
+
 /**
  * Maintenance mode. Set this to 1 in order to temporarily disable access to the application.
  *
