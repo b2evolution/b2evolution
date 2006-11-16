@@ -984,18 +984,20 @@ class Comment extends DataObject
 		/*
 		 * We have a list of email addresses to notify:
 		 */
+		// TODO: dh> this reveals the comments author's email address to subscribers!!
+		//           $notify_from should get used by default, unless the user has opted in to be the sender!
 		if( $this->get_author_User() )
 		{ // Comment from a registered user:
 			$mail_from = '"'.$this->author_User->get('preferredname').'" <'.$this->author_User->get('email').'>';
 		}
-		elseif( empty( $email ) ) // dh> TODO: $email is _always_ empty/unset here.. what was meant here? - fp> maybethis a code duplication from new post or sth like this?
-		{
-			global $notify_from;
-			$mail_from = $notify_from;
+		elseif( ! empty( $this->author_email ) )
+		{ // non-member, but with email address:
+			$mail_from = "\"$this->author\" <$this->author_email>";
 		}
 		else
-		{
-			$mail_from = "\"$this->author\" <$this->author_email>";
+		{ // Fallback:
+			global $notify_from;
+			$mail_from = $notify_from;
 		}
 
 		$Blog = & $this->Item->get_Blog();
@@ -1160,6 +1162,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.49  2006/11/16 22:41:59  blueyed
+ * Fixed email from address in notifications, but also added TODO
+ *
  * Revision 1.48  2006/11/16 19:23:12  fplanque
  * minor
  *
