@@ -1897,11 +1897,19 @@ class Form extends Widget
 		// PAYLOAD:
 		$r .= format_to_output( $field_info, $format_info );
 
-		// end field (Label always to the left!)
-		$old_label_to_the_left = $this->label_to_the_left;
-		$this->label_to_the_left = true;
-		$r .= $this->end_field();
-		$this->label_to_the_left = $old_label_to_the_left;
+
+		// Taken from end_field() - but we use $infoend:
+		if( !empty($this->_common_params['note']) )
+		{ // We have a note
+			$r .= sprintf( $this->_common_params['note_format'], $this->_common_params['note'] );
+		}
+
+		if( isset($this->_common_params['field_suffix']) )
+		{
+			$r .= $this->_common_params['field_suffix'];
+		}
+
+		$r .= ( isset($this->infoend) ? $this->infoend : $this->inputend ).$this->fieldend;
 
 		return $this->display_or_return( $r );
 	}
@@ -2095,16 +2103,12 @@ class Form extends Widget
 
 
 	/**
-	 * Builds an hidden input tag.
+	 * Builds an hidden input tag, overwriting any previous hidden values (except for "foo[]").
 	 *
 	 * @param string Field name
 	 * @param string Field value
-	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
-   *        - 'overwrite': overwrite existing hidden fields with same name
-	 *          (except if they have "[]" in the name)? boolean, default: true
-	 * fp> why would we want false here? Can we get rid of that param?
 	 */
-	function hidden( $field_name, $field_value, $field_params = array() )
+	function hidden( $field_name, $field_value )
 	{
 		if( is_array( $field_value ) )
 		{ // this happens for example when we've POSTed an array (for PHP it's an array then)
@@ -2126,12 +2130,9 @@ class Form extends Widget
 			}
 			else
 			{
-				if( ! isset($params['overwrite']) || $params['overwrite'] )
-				{ // overwrite existing hidden fields:
-					if( isset($this->existing_hiddens[$field_name]) )
-					{
-						unset($this->hiddens[$this->existing_hiddens[$field_name]]);
-					}
+				if( isset($this->existing_hiddens[$field_name]) )
+				{
+					unset($this->hiddens[$this->existing_hiddens[$field_name]]);
 				}
 
 				// add the field and remember that it already exists:
@@ -2696,6 +2697,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.47  2006/11/16 20:03:25  blueyed
+ * Cleanup; added $infoend support
+ *
  * Revision 1.46  2006/11/16 01:49:40  fplanque
  * doc
  *
