@@ -28,6 +28,7 @@
 $_COOKIE = array();
 
 // Trim requests (used by XML-RPC library)
+// fp> why do we need this pre-processing here?
 if ( isset($HTTP_RAW_POST_DATA) )
 {
 	// TODO: dh> xmlrpc should use php://input instead.. see http://bugs.php.net/bug.php?id=22338
@@ -38,8 +39,11 @@ if ( isset($HTTP_RAW_POST_DATA) )
  * Set to TRUE to do HTML sanity checking as in the browser interface, set to
  * FALSE if you trust the editing tool to do this (more features than the
  * browser interface)
+	* @todo fp> have a global setting with 3 options: check|nocheck|userdef => each then has his own setting to define if his tool does the checking or not.
+	* fp> Also, there should be a permission to say if members of a given group can or cannot post insecure content. If they cannot, then they cannot disable the sanity check
+	* fp> note: if allowed unsecure posting, disabling the sanity cjecker should also be allowed in the html backoffice
  */
-define( XMLRPC_HTMLCHECKING, TRUE );
+$xmlrpc_htmlchecking = true;
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 require_once $inc_path.'_misc/ext/_xmlrpc.php';
@@ -1597,7 +1601,7 @@ function mweditpost($m)
 	global $DB;
 	global $Settings;
 	global $Messages;
-		global $xmlrpc_htmlchecking;  // fp> so what?? do we use this var or not? (I'd prefer to use a global rather than a constant)
+	global $xmlrpc_htmlchecking;
 	global $default_category;
 
 	logIO("O","start of mweditpost...");
@@ -1669,12 +1673,12 @@ function mweditpost($m)
 	logIO("O","finished getting contentstruct dateCreated...".$postdate);
 
 
-	if( XMLRPC_HTMLCHECKING == TRUE )
+	if( ! empty($xmlrpc_htmlchecking) )
 	{ // CHECK and FORMAT content
 		$post_title = format_to_post($post_title, 0, 0);
 	}
 	logIO("O","finished converting post_title ...->".$post_title);
-	if( XMLRPC_HTMLCHECKING == TRUE )
+	if( ! empty($xmlrpc_htmlchecking) )
 	{
 		$content = format_to_post($content, 0, 0);  // 25122004 tag - security issue - need to sort !!!
 	}
@@ -2261,6 +2265,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.120  2006/11/16 19:14:10  fplanque
+ * minor
+ *
  * Revision 1.119  2006/11/13 20:49:53  fplanque
  * doc/cleanup :/
  *
