@@ -988,7 +988,7 @@ class Comment extends DataObject
 		{ // Comment from a registered user:
 			$mail_from = '"'.$this->author_User->get('preferredname').'" <'.$this->author_User->get('email').'>';
 		}
-		elseif( empty( $email ) ) // dh> TODO: $email is _always_ empty/unset here.. what was meant here?
+		elseif( empty( $email ) ) // dh> TODO: $email is _always_ empty/unset here.. what was meant here? - fp> maybethis a code duplication from new post or sth like this?
 		{
 			global $notify_from;
 			$mail_from = $notify_from;
@@ -1160,6 +1160,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.48  2006/11/16 19:23:12  fplanque
+ * minor
+ *
  * Revision 1.47  2006/11/14 21:02:57  blueyed
  * TODO
  *
