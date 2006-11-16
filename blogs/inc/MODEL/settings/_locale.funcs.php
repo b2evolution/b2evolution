@@ -892,11 +892,13 @@ function init_charsets( $req_io_charset )
 
 	if( empty($evo_charset) )
 	{ // empty evo_charset follows I/O charset:
+		// TODO: $evo_charset will not follow, if it has followed before.. (because not empty anymore)
 		$Debuglog->add( '$evo_charset follows $io_charset ('.$io_charset.').', array('locale') );
 		$evo_charset = $io_charset;
 	}
 	elseif( $evo_charset != $io_charset )
 	{ // we have to convert for I/O
+		// TODO: dh> $io_charset has to forcefully follow $evo_charset, if we cannot convert, e.g. utf-8/iso-8859-1
 		if( ! function_exists('mb_convert_encoding') )
 		{
 			$Debuglog->add( '$evo_charset differs from $io_charset, but mbstrings is not available - cannot convert I/O to internal charset!', array('errors','locale') );
@@ -948,6 +950,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.33  2006/11/16 22:33:52  blueyed
+ * some more charset issue releated TODOs.. :/
+ *
  * Revision 1.32  2006/11/14 21:12:38  blueyed
  * Fix for gettext-T_()
  *
