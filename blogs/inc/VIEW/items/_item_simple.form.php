@@ -187,6 +187,9 @@ $Form->hidden( 'renderers', param('renderers', 'array', NULL) );
 	$Form->end_fieldset();
 
 
+	// ####################### PLUGIN FIELDSETS #########################
+
+	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'simple' ) );
 	?>
 
 </div>
@@ -278,6 +281,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.16  2006/11/16 23:10:35  blueyed
+ * Added AdminDisplayItemFormFieldset hook also to simple form
+ *
  * Revision 1.15  2006/10/30 13:03:37  blueyed
  * Default to current User's locale in simple form.
  *
