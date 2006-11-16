@@ -383,8 +383,8 @@ $conf_subdir = 'conf/';                  // Subdirectory relative to base
 $conf_path = str_replace( '\\', '/', dirname(__FILE__) ).'/';
 // echo ' conf_path='.$conf_path;
 
-$basepath = preg_replace( '#/'.$conf_subdir.'$#', '', $conf_path ).'/'; // Remove this file's subpath
-// echo ' basepath='.$basepath;
+$basepath = preg_replace( '#/'.$conf_subdir.'$#i', '', $conf_path ).'/'; // Remove this file's subpath (fp>made [i]nsensitive to case because of Windows URL oddities)
+// echo '<br/>basepath='.$basepath;
 
 /**
  * Location of the include folder.

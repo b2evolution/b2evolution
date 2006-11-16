@@ -18,6 +18,8 @@
  *
  * @package conf
  */
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+
 
 /**
  * Maintenance mode. Set this to 1 in order to temporarily disable access to the application.
@@ -106,13 +108,4 @@ $config_is_done = 0;
 #
 # It is however strongly recommended you browse through these files as soon as you've
 # got your basic installation working. They'll let you customize a lot of things!
-
-# DO NOT EDIT THE FOLLOWING!
-
-define( 'EVO_CONFIG_LOADED', true );
-
-if( file_exists(dirname(__FILE__).'/_config_TEST.php') )
-{
-	include_once dirname(__FILE__).'/_config_TEST.php';    // Put testing conf in there (For testing, you can also set $install_password here)
-}
 ?>

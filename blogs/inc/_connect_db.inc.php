@@ -9,9 +9,10 @@
  */
 
 /**
- * Load basic settings
+ * Load configuration
+ * NOTE: fp> config should always be loaded as a whole because of the prequire"_once" stuff not working very well on Windows
  */
-require_once dirname(__FILE__).'/../conf/_basic_config.php';
+require_once dirname(__FILE__).'/../conf/_config.php';
 
 /**
  * Load DB class
