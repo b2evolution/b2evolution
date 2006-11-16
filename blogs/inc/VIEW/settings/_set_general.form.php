@@ -96,14 +96,15 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Link options') );
 
 $Form->radio( 'links_extrapath', $Settings->get('links_extrapath'),
-							array(  array( 'disabled', T_('Do not use extra path info'), T_('Permalinks will look like: \'stub?title=post-title&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1\'') ),
-											array( 'short', T_('Only use post URL title'), T_('Permalinks will look like \'stub/post-title\'' ) ),
-											array( 'y', T_('Use year'), T_('Permalinks will look like \'stub/2006/post-title\'' ) ),
-											array( 'ym', T_('Use year &amp; month'), T_('Permalinks will look like \'stub/2006/12/post-title\'' ) ),
-											array( 'ymd', T_('Use year, month &amp; day'), T_('Permalinks will look like \'stub/2006/12/31/post-title\'' ) ),
-											array( 'subchap', T_('Use sub-chapter'), T_('Permalinks will look like \'stub/subchap/post-title\'' ) ),
-											array( 'chapters', T_('Use chapter path'), T_('Permalinks will look like \'stub/chapter/subchap/post-title\'' ) ),
-										), T_('Extra path info'), true );
+							array(
+								array( 'disabled', T_('Do not use extra path info'), sprintf( T_('Permalinks will look like: %s'), '\'stub?title=post-title&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1\'' ) ),
+								array( 'short', T_('Only use post URL title'), sprintf( T_('Permalinks will look like: %s'), '\'stub/post-title\'' ) ),
+								array( 'y', T_('Use year'), sprintf( T_('Permalinks will look like: %s'), '\'stub/2006/post-title\'' ) ),
+								array( 'ym', T_('Use year &amp; month'), sprintf( T_('Permalinks will look like: %s'), '\'stub/2006/12/post-title\'' ) ),
+								array( 'ymd', T_('Use year, month &amp; day'), sprintf( T_('Permalinks will look like: %s'), '\'stub/2006/12/31/post-title\'' ) ),
+								array( 'subchap', T_('Use sub-chapter'), sprintf( T_('Permalinks will look like: %s'), '\'stub/subchap/post-title\'' ) ),
+								array( 'chapters', T_('Use chapter path'), sprintf( T_('Permalinks will look like: %s'), '\'stub/chapter/subchap/post-title\'' ) ),
+								), T_('Extra path info'), true );
 
 $Form->radio( 'permalink_type', $Settings->get('permalink_type'),
 							array(  array( 'urltitle', T_('Post called up by its URL title (Recommended)'), T_('Fallback to ID when no URL title available.') ),
@@ -143,6 +144,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.16  2006/11/16 20:36:37  blueyed
+ * Save the translators some tedious work..
+ *
  * Revision 1.15  2006/09/11 19:35:35  fplanque
  * minor
  *
