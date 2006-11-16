@@ -74,13 +74,13 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
 	$Form->textarea( 'content', $content, 16, '', '', 40 , '' );
-	$Form->fieldstart = '<span class="line">';
-	$Form->fieldend = '</span>';
+	$Form->fieldstart = '<div class="line">';
+	$Form->fieldend = '</div>';
 	?>
-	<script type="text/javascript" language="JavaScript">
+	<script type="text/javascript">
 		<!--
 		// This is for toolbar plugins
-		b2evoCanvas = document.getElementById('content');
+		var b2evoCanvas = document.getElementById('content');
 		//-->
 	</script>
 
@@ -195,6 +195,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.15  2006/11/16 23:48:55  blueyed
+ * Use div.line instead of span.line as element wrapper for XHTML validity
+ *
  * Revision 1.14  2006/10/01 22:21:54  blueyed
  * edit_layout param fixes/doc
  *

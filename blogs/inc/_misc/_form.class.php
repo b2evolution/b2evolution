@@ -228,14 +228,14 @@ class Form extends Widget
 				$this->formstart = '';
 				$this->title_fmt = '$title$'."\n"; // TODO: icons
 				$this->no_title_fmt = '';          //           "
-				$this->fieldstart = '<span class="line">';
+				$this->fieldstart = '<div class="line">';
 				$this->labelstart = '';
 				$this->labelend = "\n";
 				$this->labelempty = '';
 				$this->inputstart = '';
 				$this->infostart = '';
 				$this->inputend = "\n";
-				$this->fieldend = "</span>\n";
+				$this->fieldend = "</div>\n";
 				$this->buttonsstart = '';
 				$this->buttonsend = "\n";
 				$this->formend = '';
@@ -2697,6 +2697,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.48  2006/11/16 23:48:56  blueyed
+ * Use div.line instead of span.line as element wrapper for XHTML validity
+ *
  * Revision 1.47  2006/11/16 20:03:25  blueyed
  * Cleanup; added $infoend support
  *

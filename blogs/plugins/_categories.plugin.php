@@ -235,18 +235,18 @@ class categories_plugin extends Plugin
 		if( $params['form'] )
 		{	// We want to add form fields:
 		?>
-			<span class="line"> <?php /* blueyed>> using div.line here makes them "blocks" in Konqueror/Safari(?) */ ?>
+			<div class="line">
 				<input type="radio" name="cat" value="" id="catANY" class="radio" <?php if( $cat_modifier != '-' && $cat_modifier != '*' ) echo 'checked="checked" '?> />
 				<label for="catANY"><?php echo T_('ANY') ?></label>
-			</span>
-			<span class="line">
+			</div>
+			<div class="line">
 				<input type="radio" name="cat" value="-" id="catANYBUT" class="radio" <?php if( $cat_modifier == '-' ) echo 'checked="checked" '?> />
 				<label for="catANYBUT"><?php echo T_('ANY BUT') ?></label>
-			</span>
-			<span class="line">
+			</div>
+			<div class="line">
 				<input type="radio" name="cat" value="*" id="catALL" class="radio" <?php if( $cat_modifier == '*' ) echo 'checked="checked" '?> />
 				<label for="catALL"><?php echo T_('ALL') ?></label>
-			</span>
+			</div>
 		<?php
 		}
 
@@ -345,6 +345,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.28  2006/11/16 23:48:56  blueyed
+ * Use div.line instead of span.line as element wrapper for XHTML validity
+ *
  * Revision 1.27  2006/09/13 15:48:41  smpdawg
  * Minor change
  *

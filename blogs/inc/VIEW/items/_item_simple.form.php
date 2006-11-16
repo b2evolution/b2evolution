@@ -52,8 +52,8 @@ global $use_preview, $post_urltitle, $post_status, $post_comment_status, $post_t
 global $edit_date, $bozo_start_modified;
 
 $Form = & new Form( $form_action, 'item_checkchanges', 'post', 'none' );
-$Form->fieldstart = '<span class="line">';
-$Form->fieldend = '</span>';
+$Form->fieldstart = '<div class="line">';
+$Form->fieldend = '</div>';
 $Form->labelstart = '<strong>';
 $Form->labelend = "</strong>\n";
 
@@ -114,8 +114,8 @@ $Form->hidden( 'renderers', param('renderers', 'array', NULL) );
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
 	$Form->textarea_input( 'content', $content, 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content' ) );
-	$Form->fieldstart = '<span class="line">';
-	$Form->fieldend = '</span>';
+	$Form->fieldstart = '<div class="line">';
+	$Form->fieldend = '</div>';
 	?>
 	<script type="text/javascript" language="JavaScript">
 		<!--
@@ -281,6 +281,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.17  2006/11/16 23:48:56  blueyed
+ * Use div.line instead of span.line as element wrapper for XHTML validity
+ *
  * Revision 1.16  2006/11/16 23:10:35  blueyed
  * Added AdminDisplayItemFormFieldset hook also to simple form
  *

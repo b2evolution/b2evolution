@@ -113,22 +113,22 @@ echo '<div class="browse_side_item">';
 		echo $Form->inputend;
 		// echo T_('Words').' : ';
 		?>
-		<span class="line">
+		<div class="line">
 			<input type="radio" name="sentence" value="AND" id="sentAND" class="radio" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
 			<label for="sentAND"><?php echo T_('AND') ?></label>
-		</span>
-		<span class="line">
+		</div>
+		<div class="line">
 			<input type="radio" name="sentence" value="OR" id="sentOR" class="radio" <?php if( $sentence=='OR' ) echo 'checked="checked" '?> />
 			<label for="sentOR"><?php echo T_('OR') ?></label>
-		</span>
-		<span class="line">
+		</div>
+		<div class="line">
 			<input type="radio" name="sentence" value="sentence" id="sentence" class="radio" <?php if( $sentence=='sentence' ) echo 'checked="checked" '?> />
 			<label for="sentence"><?php echo T_('Entire phrase') ?></label>
-		</span>
-		<span class="line">
+		</div>
+		<div class="line">
 			<input type="checkbox" name="exact" value="1" id="exact" class="checkbox" <?php if( $exact ) echo 'checked="checked" '?> />
 			<label for="exact"><?php echo T_('Exact match') ?></label>
-		</span>
+		</div>
 
 		<?php
 		$Form->end_fieldset();
@@ -257,6 +257,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.8  2006/11/16 23:48:56  blueyed
+ * Use div.line instead of span.line as element wrapper for XHTML validity
+ *
  * Revision 1.7  2006/09/06 20:45:34  fplanque
  * ItemList2 fixes
  *
