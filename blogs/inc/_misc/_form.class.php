@@ -2102,6 +2102,7 @@ class Form extends Widget
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
    *        - 'overwrite': overwrite existing hidden fields with same name
 	 *          (except if they have "[]" in the name)? boolean, default: true
+	 * fp> why would we want false here? Can we get rid of that param?
 	 */
 	function hidden( $field_name, $field_value, $field_params = array() )
 	{
@@ -2695,6 +2696,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.46  2006/11/16 01:49:40  fplanque
+ * doc
+ *
  * Revision 1.45  2006/11/08 17:47:55  blueyed
  * Extra classes 'form_text_input' and 'form_textarea_input' to enable IE6 CSS selection
  *
