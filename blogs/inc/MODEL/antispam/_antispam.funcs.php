@@ -110,7 +110,7 @@ function antispam_check( $haystack )
 
 	// TODO: 'SELECT COUNT(*) FROM T_antispam WHERE aspm_string LIKE "%'.$url.'%" ?
 
-	$Timer->start( 'antispam_url' );
+	$Timer->resume( 'antispam_url' ); // resuming to get the total number..
 	$block = $DB->get_var(
 		"SELECT aspm_string
 		   FROM  T_antispam
@@ -121,7 +121,7 @@ function antispam_check( $haystack )
 			$Debuglog->add( 'Spam block: '.$block );
 			return $block;	// SPAM detected!
 	}
-	$Timer->stop( 'antispam_url' );
+	$Timer->pause( 'antispam_url' );
 
 	return false;	// no problem.
 }
@@ -313,6 +313,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.16  2006/11/16 22:43:17  blueyed
+ * resume/pause antispam_url timer instead of start/stopping, because it may get called more than once
+ *
  * Revision 1.15  2006/08/19 07:56:30  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *
