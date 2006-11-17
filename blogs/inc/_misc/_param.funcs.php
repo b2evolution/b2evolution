@@ -536,7 +536,9 @@ function param_date( $var, $err_msg, $required, $default = '', $date_format = NU
 
 
 /**
- * Check if param is an ISO date
+ * Check if param is an ISO date.
+ *
+ * NOTE: for tokens like e.g. "D" (abbr. weekday), T_() gets used and it uses the current locale!
  *
  * @param string param name
  * @param string error message
@@ -1604,6 +1606,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.20  2006/11/17 00:20:44  blueyed
+ * doc
+ *
  * Revision 1.19  2006/11/14 17:37:22  blueyed
  * doc
  *
