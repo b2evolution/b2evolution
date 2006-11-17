@@ -39,7 +39,7 @@ if( isset( $Blog ) )
 }
 
 // ----------------- START RECURSIVE CAT LIST ----------------
-cat_query( 'none' );	// make sure the caches are loaded
+cat_load_cache();	// make sure the caches are loaded
 
 /**
  * callback to start sublist
@@ -106,6 +106,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.5  2006/11/17 23:29:54  blueyed
+ * Replaced cat_query() calls with cat_load_cache()
+ *
  * Revision 1.4  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

@@ -273,7 +273,7 @@ switch( $action )
 		$Form->text( 'cat_name', $cat_name, 40, T_('New category name'), '', 80 );
 
 		// ----------------- START RECURSIVE CAT LIST ----------------
-		cat_query( 'none' );	// make sure the caches are loaded
+		cat_load_cache();	// make sure the caches are loaded
 
 		function cat_move_before_first( $parent_cat_ID, $level )
 		{ // callback to start sublist
@@ -397,6 +397,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2006/11/17 23:29:53  blueyed
+ * Replaced cat_query() calls with cat_load_cache()
+ *
  * Revision 1.13  2006/08/21 00:03:12  fplanque
  * obsoleted some dirty old thing
  *

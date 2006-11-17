@@ -502,7 +502,7 @@ function cat_select( $display_info = true, $form_fields = true )
 		$default_main_cat = $edited_Item->main_cat_ID;
 	}
 
-	cat_query( 'none' ); // make sure the caches are loaded
+	cat_load_cache(); // make sure the caches are loaded
 
 	if( $allow_cross_posting >= 2 )
 	{ // If BLOG cross posting enabled, go through all blogs with cats:
@@ -667,6 +667,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.29  2006/11/17 23:29:54  blueyed
+ * Replaced cat_query() calls with cat_load_cache()
+ *
  * Revision 1.28  2006/11/14 00:41:58  blueyed
  * Added some more substitutions to special-char-conversation in urltitle_validate(). Should get outsourced IMHO (TODO).
  *

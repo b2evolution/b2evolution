@@ -1235,7 +1235,7 @@ function fieldset_cats()
 		$blog = 1;
 
 		// ----------------- START RECURSIVE CAT LIST ----------------
-		cat_query( 'none' );	// make sure the caches are loaded
+		cat_load_cache();	// make sure the caches are loaded
 		function import_cat_select_before_first( $parent_cat_ID, $level )
 		{	// callback to start sublist
 			echo "\n<ul>\n";

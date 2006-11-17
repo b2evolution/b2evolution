@@ -319,11 +319,8 @@ function get_catname($cat_ID)
 
 /**
  * Load cache for category definitions.
- *
- * TODO: replace LEFT JOIN with UNION when switching to MySQL 4
- * This will prevent empty cats from displaying "(1)" as postcount.
  */
-function cat_load_cache( $dbtable_items = 'T_posts', $dbprefix_items = 'post_', $dbIDname_items = 'post_ID' )
+function cat_load_cache()
 {
 	global $DB, $cache_categories;
 	global $timestamp_min, $timestamp_max;
@@ -384,6 +381,10 @@ function cat_load_cache( $dbtable_items = 'T_posts', $dbprefix_items = 'post_', 
 
 /**
  * Load the post counts. This {@link cat_load_cache() loads the cat cache}, if necessary.
+ *
+ * @todo dh> $cat_load_postcounts='all' should be supported..
+ * @todo dh> Multiple calls, e.g. "canonic" by b2evo and "all" by a plugin should be supported
+ *           It's probably deprecated by ChapterCache anyway?!
  *
  * @param string 'context'|'canonic'
  */
@@ -658,14 +659,19 @@ function blog_has_cats( $blog_ID )
 /**
  * Query for the cats
  *
+ * @deprecated Use cat_load_cache()/cat_load_postcounts() instead
  * @param string 'none'|'context'|'canonic'
  */
 function cat_query( $load_postcounts = 'none', $dbtable_items = 'T_posts', $dbprefix_items = 'post_',
 										$dbIDname_items = 'post_ID' )
 {
 	global $blog;
+
 	if( $blog != 0 ) blog_load_cache();
-	cat_load_cache( $load_postcounts, $dbtable_items, $dbprefix_items, $dbIDname_items );
+	cat_load_cache();
+
+	if($load_postcounts != 'none')
+		cat_load_postcounts($load_postcounts, $dbtable_items, $dbprefix_items, $dbIDname_items);
 }
 
 
@@ -714,7 +720,7 @@ function compile_cat_array( $cat, $catsel, & $cat_array, & $cat_modifier, $restr
 			// Getting required sub-categories:
 			// and add everything to cat array
 			// ----------------- START RECURSIVE CAT LIST ----------------
-			cat_query( 'none' );	// make sure the caches are loaded
+			cat_load_cache();	// make sure the caches are loaded
 			foreach( $req_cat_array as $cat_ID )
 			{ // run recursively through the cats
 				if( ! in_array( $cat_ID, $cat_array ) )
@@ -763,6 +769,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.21  2006/11/17 23:29:54  blueyed
+ * Replaced cat_query() calls with cat_load_cache()
+ *
  * Revision 1.20  2006/11/13 23:33:52  blueyed
  * doc, typos
  *
