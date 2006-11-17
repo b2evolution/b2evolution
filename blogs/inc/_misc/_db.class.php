@@ -1006,22 +1006,24 @@ class DB
 	 */
 	function get_col_info( $info_type = 'name', $col_offset = -1 )
 	{
-		if( $this->col_info )
+		if( ! $this->col_info )
 		{
-			if( $col_offset == -1 )
+			debug_die( 'DB::get_col_info() cannot return a value because no column info is available!' );
+		}
+		
+		if( $col_offset == -1 )
+		{
+			$i = 0;
+			foreach( $this->col_info as $col )
 			{
-				$i = 0;
-				foreach($this->col_info as $col )
-				{
-					$new_array[$i] = $col->{$info_type};
-					$i++;
-				}
-				return $new_array;
+				$new_array[$i] = $col->{$info_type};
+				$i++;
 			}
-			else
-			{
-				return $this->col_info[$col_offset]->{$info_type};
-			}
+			return $new_array;
+		}
+		else
+		{
+			return $this->col_info[$col_offset]->{$info_type};
 		}
 	}
 
@@ -1407,6 +1409,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.36  2006/11/17 01:44:38  fplanque
+ * A function should NEVER FAIL SILENTLY!
+ *
  * Revision 1.35  2006/11/14 17:35:39  blueyed
  * small opt
  *
