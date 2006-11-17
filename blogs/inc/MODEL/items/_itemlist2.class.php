@@ -575,6 +575,7 @@ class ItemList2 extends DataObjectList2
 
 		// Get issue date, using the user's locale (because it's entered like this in the form):
 		param_date( 'item_issue_date', T_('Please enter a valid issue date.'), false, '', locale_datefmt($current_User->locale) );
+		// TODO: dh> get_param() is always true here, also on invalid dates:
 		if( strlen(get_param('item_issue_date')) )
 		{ // only set it, if a date was given:
 			param_time( 'item_issue_time' );
@@ -1610,6 +1611,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.39  2006/11/17 00:09:15  blueyed
+ * TODO: error/E_NOTICE with invalid issue date
+ *
  * Revision 1.38  2006/11/12 02:13:19  blueyed
  * doc, whitespace
  *
