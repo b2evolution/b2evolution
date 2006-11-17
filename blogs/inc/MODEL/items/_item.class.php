@@ -2634,6 +2634,8 @@ class Item extends DataObject
 		// TODO: allow a plugin to cancel update here (by returning false)?
 		$Plugins->trigger_event( 'PrependItemInsertTransact', $params = array( 'Item' => & $this ) );
 
+		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
+
 		if( $result = parent::dbinsert() )
 		{ // We could insert the item object..
 
@@ -2642,7 +2644,7 @@ class Item extends DataObject
 
 			$DB->commit();
 
-			$Plugins->trigger_event( 'AfterItemInsert', $params = array( 'Item' => & $this ) );
+			$Plugins->trigger_event( 'AfterItemInsert', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
 		}
 		else
 		{
@@ -2679,6 +2681,8 @@ class Item extends DataObject
 		// TODO: dh> allow a plugin to cancel update here (by returning false)?
 		$Plugins->trigger_event( 'PrependItemUpdateTransact', $params = array( 'Item' => & $this ) );
 
+		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
+
 		if( $result = parent::dbupdate() )
 		{ // We could update the item object..
 
@@ -2691,7 +2695,7 @@ class Item extends DataObject
 
 			$DB->commit();
 
-			$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this ) );
+			$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
 		}
 		else
 		{
@@ -3286,6 +3290,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.118  2006/11/17 18:36:23  blueyed
+ * dbchanges param for AfterItemUpdate, AfterItemInsert, AfterCommentUpdate and AfterCommentInsert
+ *
  * Revision 1.117  2006/11/13 20:49:52  fplanque
  * doc/cleanup :/
  *

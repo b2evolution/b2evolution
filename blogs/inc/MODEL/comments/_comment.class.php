@@ -1083,9 +1083,11 @@ class Comment extends DataObject
 	{
 		global $Plugins;
 
+		$dbchanges = $this->dbchanges;
+
 		if( $r = parent::dbupdate() )
 		{
-			$Plugins->trigger_event( 'AfterCommentUpdate', $params = array( 'Comment' => & $this ) );
+			$Plugins->trigger_event( 'AfterCommentUpdate', $params = array( 'Comment' => & $this, 'dbchanges' => $dbchanges ) );
 		}
 
 		return $r;
@@ -1123,9 +1125,11 @@ class Comment extends DataObject
 			}
 		}
 
+		$dbchanges = $this->dbchanges;
+
 		if( $r = parent::dbinsert() )
 		{
-			$Plugins->trigger_event( 'AfterCommentInsert', $params = array( 'Comment' => & $this ) );
+			$Plugins->trigger_event( 'AfterCommentInsert', $params = array( 'Comment' => & $this, 'dbchanges' => $dbchanges ) );
 		}
 
 		return $r;
@@ -1162,6 +1166,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.50  2006/11/17 18:36:23  blueyed
+ * dbchanges param for AfterItemUpdate, AfterItemInsert, AfterCommentUpdate and AfterCommentInsert
+ *
  * Revision 1.49  2006/11/16 22:41:59  blueyed
  * Fixed email from address in notifications, but also added TODO
  *

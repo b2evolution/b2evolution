@@ -1128,6 +1128,8 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Item': the related Item (by reference)
+	 *   - 'dbchanges': array with DB changes; a copy of {@link Item::dbchanges()},
+	 *                  before they got applied (since 1.9)
 	 */
 	function AfterItemUpdate( & $params )
 	{
@@ -1155,6 +1157,8 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Item': the related Item (by reference)
+	 *   - 'dbchanges': array with DB changes; a copy of {@link Item::dbchanges()},
+	 *                  before they got applied (since 1.9)
 	 */
 	function AfterItemInsert( & $params )
 	{
@@ -1392,6 +1396,8 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Comment': the related Comment (by reference)
+	 *   - 'dbchanges': array with DB changes; a copy of {@link Comment::dbchanges()},
+	 *                  before they got applied (since 1.9)
 	 */
 	function AfterCommentUpdate( & $params )
 	{
@@ -1404,6 +1410,8 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Comment': the related Comment (by reference)
+	 *   - 'dbchanges': array with DB changes; a copy of {@link Comment::dbchanges()},
+	 *                  before they got applied (since 1.9)
 	 */
 	function AfterCommentInsert( & $params )
 	{
@@ -2776,6 +2784,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.118  2006/11/17 18:36:22  blueyed
+ * dbchanges param for AfterItemUpdate, AfterItemInsert, AfterCommentUpdate and AfterCommentInsert
+ *
  * Revision 1.117  2006/11/16 23:43:39  blueyed
  * - "key" entry for array-type Plugin(User)Settings can define an input field for the key of the settings entry
  * - cleanup
