@@ -22,9 +22,8 @@ function check_db_version()
 	global $DB, $old_db_version, $new_db_version;
 
 	echo '<p>'.T_('Checking DB schema version...').' ';
-	$DB->query( 'SELECT * FROM T_settings LIMIT 1' );
 
-	if( $DB->get_col_info('name', 0) == 'set_name' )
+	if( db_col_exists( 'T_settings', 'set_name' ) )
 	{ // we have new table format (since 0.9)
 		$old_db_version = $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = "db_version"' );
 	}
@@ -127,6 +126,9 @@ function install_validate_requirements()
 
 /*
  * $Log$
+ * Revision 1.17  2006/11/17 01:46:16  fplanque
+ * Fixed broken upgrade path.
+ *
  * Revision 1.16  2006/11/01 00:24:07  blueyed
  * Fixed cafelog upgrade
  *
