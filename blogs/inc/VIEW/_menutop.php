@@ -35,6 +35,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $io_charset, $rsc_url, $UserSettings, $Debuglog, $Plugins, $generating_static;
 global $month, $month_abbrev, $weekday, $weekday_abbrev; /* for localized calendar */
+global $debug, $htsrv_url;
 
 header( 'Content-type: text/html; charset='.$io_charset );
 ?>
@@ -73,14 +74,17 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/dynamic_select.js"></script>
 	<!-- General admin functions: -->
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/admin.js"></script>
+	<!-- include jquery JS: -->
+	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/<?php echo ($debug ? 'jquery.js' : 'jquery.min.js'); ?>"></script>
+
 	<?php
 	global $UserSettings;
-	if( $UserSettings->get('control_form_abortions') <> 0 )
+	if( $UserSettings->get('control_form_abortions') )
 	{	// Activate bozo validator
 		echo '<script type="text/javascript" src="'.$rsc_url.'js/bozo_validator.js"></script>';
 	}
 
-	if( $UserSettings->get('focus_on_first_input') <> 0 )
+	if( $UserSettings->get('focus_on_first_input') )
 	{	// Activate focus on first form <input type="text">:
 		echo '<script type="text/javascript">addEvent( window, "load", focus_on_first_input, false );</script>';
 	}
@@ -147,21 +151,28 @@ header( 'Content-type: text/html; charset='.$io_charset );
 					{
 						if( layout == 'all' )
 						{
-							document.getElementById( 'userlist_default' ).style.display='block';
-							document.getElementById( 'userlist_wide' ).style.display='block';
+							$("#userlist_default").show();
+							$("#userlist_wide").show();
 						}
 						else if( layout == 'wide' )
 						{
-							document.getElementById( 'userlist_default' ).style.display='none';
-							document.getElementById( 'userlist_wide' ).style.display='block';
-							document.getElementById('blogperm_checkchanges').layout.value = 'wide';
+							$('#userlist_default').hide();
+							$('#userlist_wide').show();
 						}
 						else
 						{
-							document.getElementById( 'userlist_wide' ).style.display='none';
-							document.getElementById( 'userlist_default' ).style.display='block';
-							document.getElementById('blogperm_checkchanges').layout.value = 'default';
+							$('#userlist_default').show();
+							$('#userlist_wide').hide();
 						}
+
+						// Update form hidden field:
+						$('#blogperm_checkchanges').attr('layout', layout);
+
+						// Update $UserSettings through async JS request:
+						$.get('<?php echo $htsrv_url ?>async.php', {
+								action: 'admin_blogperms_set_layout',
+								layout: layout
+						});
 					}
 
 

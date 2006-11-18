@@ -35,7 +35,7 @@ require_once dirname(__FILE__).'/../conf/_config.php';
  *
  * @todo dh> refactor _main.inc.php to be able to include small parts
  *           (e.g. $current_User, charset init, ...) only..
- *           It works already for $DB (_connect_db.inc.php).
+ *           It worked already for $DB (_connect_db.inc.php).
  */
 require_once $inc_path.'_main.inc.php';
 
@@ -86,6 +86,12 @@ switch( $action )
 		// TODO: may use validation here..
 		echo 'OK';
 		exit;
+
+	case 'admin_blogperms_set_layout':
+		// Save blog permission tab layout into user settings. This gets called on JS-toggling.
+		$UserSettings->param_Request( 'layout', 'blogperms_layout', 'string', $debug ? 'all' : 'default' );  // table layout mode
+		exit;
+
 }
 
 
@@ -105,6 +111,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.9  2006/11/18 01:27:39  blueyed
+ * Always include jQuery in backoffice (it gets cached and can now be used anywhere freely); Update $UserSettings from (blogperms_)toggle_layout (this and related JS moved out of _menutop.php)
+ *
  * Revision 1.8  2006/11/16 23:43:39  blueyed
  * - "key" entry for array-type Plugin(User)Settings can define an input field for the key of the settings entry
  * - cleanup
