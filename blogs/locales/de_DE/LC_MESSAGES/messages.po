@@ -6667,7 +6667,7 @@ msgstr "Gehe zum Adminbereich!"
 
 #: ..\..\..\inc\VIEW\login\_login_form.php:104
 msgid "Lost your password ?"
-msgstr "Dein Passwort vergessen ?"
+msgstr "Passwort vergessen ?"
 
 #: ..\..\..\inc\VIEW\login\_login_form.php:110
 msgid "Bypass login..."
