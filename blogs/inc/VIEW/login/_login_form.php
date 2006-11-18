@@ -158,7 +158,7 @@ $Form->end_form();
 		{
 			echo '&amp;login='.rawurlencode($login);
 		}
-		?>"><?php echo T_('Lost your password ?')
+		?>"><?php echo T_('Lost password ?')
 		?></a>
 
 	<?php
@@ -176,6 +176,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.19  2006/11/18 02:51:47  blueyed
+ * Use only one "password lost?" variant
+ *
  * Revision 1.18  2006/10/23 22:19:03  blueyed
  * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
  *
