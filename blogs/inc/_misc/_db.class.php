@@ -112,6 +112,7 @@ class DB
 
 	/**
 	 * Column information about the last query.
+	 * Note: {@link DB::log_queries} must be enabled for this to work.
 	 * @see DB::get_col_info()
 	 */
 	var $col_info;
@@ -700,12 +701,15 @@ class DB
 			if( is_resource($this->result) )
 			{ // It's not a resource for CREATE or DROP for example and can even trigger a fatal error (see http://forums.b2evolution.net//viewtopic.php?t=9529)
 
-				// Take note of column info
-				$i = 0;
-				while( $i < mysql_num_fields($this->result) )
+				if( $this->log_queries )
 				{
-					$this->col_info[$i] = mysql_fetch_field($this->result);
-					$i++;
+					// Take note of column info
+					$i = 0;
+					while( $i < mysql_num_fields($this->result) )
+					{
+						$this->col_info[$i] = mysql_fetch_field($this->result);
+						$i++;
+					}
 				}
 
 				// Store Query Results
@@ -1405,9 +1409,8 @@ class DB
 
 /*
  * $Log$
- * Revision 1.37  2006/11/17 16:01:54  blueyed
- * Always populate $col_info again.
- * Regarding resources it may be better to lazy-load them in get_col_info() (or a plain getter of what $col_info is currently), but therefor $result cannot get freed.
+ * Revision 1.38  2006/11/18 03:44:48  fplanque
+ * reverted to optimized col info
  *
  * Revision 1.36  2006/11/17 01:44:38  fplanque
  * A function should NEVER FAIL SILENTLY!
