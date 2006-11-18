@@ -1400,7 +1400,26 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 	}
 
-
+	if( $old_db_version < 9340 )
+	{
+		echo 'Removing duplicate post link indexes... ';
+		if( db_index_exists( 'T_links', 'link_item_ID' ) )
+		{ // only drop, if it still exists (may have been removed manually)
+			$DB->query( '
+					ALTER TABLE T_links
+						DROP INDEX link_item_ID
+					' );
+		}
+		if( db_index_exists( 'T_links', 'link_dest_item_ID' ) )
+		{ // only drop, if it still exists (may have been removed manually)
+			$DB->query( '
+					ALTER TABLE T_links
+						DROP INDEX link_dest_item_ID
+					' );
+		}
+		echo "OK.<br />\n";
+	}
+	
 	// TODO: "If a user has permission to edit a blog, he should be able to put files in the media folder for that blog." - see http://forums.b2evolution.net/viewtopic.php?p=36417#36417
 	/*
 	// blueyed>> I've came up with the following, but it's too generic IMHO
@@ -1571,6 +1590,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.188  2006/11/18 03:58:21  fplanque
+ * removed duplicate indexes on T_links
+ *
  * Revision 1.187  2006/11/14 23:17:00  fplanque
  * adding stuff into the 9010 block weeks later was really evil. why do we have blocks for?
  *
