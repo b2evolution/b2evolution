@@ -30,6 +30,9 @@ code {
 .line {
 	white-space: nowrap;
 }
+div.inline {
+	display:inline;
+}
 .left {
 	text-align: left;
 }

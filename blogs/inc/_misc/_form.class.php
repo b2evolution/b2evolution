@@ -228,7 +228,7 @@ class Form extends Widget
 				$this->formstart = '';
 				$this->title_fmt = '$title$'."\n"; // TODO: icons
 				$this->no_title_fmt = '';          //           "
-				$this->fieldstart = '<div class="line">';
+				$this->fieldstart = '<div class="line inline">';
 				$this->labelstart = '';
 				$this->labelend = "\n";
 				$this->labelempty = '';
@@ -2697,6 +2697,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.49  2006/11/18 17:58:57  blueyed
+ * added DIV.inline and use it additionally for span.line replacement
+ *
  * Revision 1.48  2006/11/16 23:48:56  blueyed
  * Use div.line instead of span.line as element wrapper for XHTML validity
  *

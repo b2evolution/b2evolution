@@ -74,7 +74,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
 	$Form->textarea( 'content', $content, 16, '', '', 40 , '' );
-	$Form->fieldstart = '<div class="line">';
+	$Form->fieldstart = '<div class="line inline">';
 	$Form->fieldend = '</div>';
 	?>
 	<script type="text/javascript">
@@ -195,6 +195,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.16  2006/11/18 17:58:57  blueyed
+ * added DIV.inline and use it additionally for span.line replacement
+ *
  * Revision 1.15  2006/11/16 23:48:55  blueyed
  * Use div.line instead of span.line as element wrapper for XHTML validity
  *

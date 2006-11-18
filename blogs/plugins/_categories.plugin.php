@@ -43,7 +43,7 @@ class categories_plugin extends Plugin
 	var $name = 'Categories Skin Tag';
 	var $code = 'evo_Cats';
 	var $priority = 60;
-	var $version = '1.9-dev';
+	var $version = '2.0-dev';
 	var $author = 'The b2evo Group';
 
 
@@ -235,15 +235,15 @@ class categories_plugin extends Plugin
 		if( $params['form'] )
 		{	// We want to add form fields:
 		?>
-			<div class="line">
+			<div class="line inline">
 				<input type="radio" name="cat" value="" id="catANY" class="radio" <?php if( $cat_modifier != '-' && $cat_modifier != '*' ) echo 'checked="checked" '?> />
 				<label for="catANY"><?php echo T_('ANY') ?></label>
 			</div>
-			<div class="line">
+			<div class="line inline">
 				<input type="radio" name="cat" value="-" id="catANYBUT" class="radio" <?php if( $cat_modifier == '-' ) echo 'checked="checked" '?> />
 				<label for="catANYBUT"><?php echo T_('ANY BUT') ?></label>
 			</div>
-			<div class="line">
+			<div class="line inline">
 				<input type="radio" name="cat" value="*" id="catALL" class="radio" <?php if( $cat_modifier == '*' ) echo 'checked="checked" '?> />
 				<label for="catALL"><?php echo T_('ALL') ?></label>
 			</div>
@@ -345,6 +345,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.29  2006/11/18 17:58:57  blueyed
+ * added DIV.inline and use it additionally for span.line replacement
+ *
  * Revision 1.28  2006/11/16 23:48:56  blueyed
  * Use div.line instead of span.line as element wrapper for XHTML validity
  *

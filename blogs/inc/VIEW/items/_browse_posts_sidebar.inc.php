@@ -113,19 +113,19 @@ echo '<div class="browse_side_item">';
 		echo $Form->inputend;
 		// echo T_('Words').' : ';
 		?>
-		<div class="line">
+		<div class="line inline">
 			<input type="radio" name="sentence" value="AND" id="sentAND" class="radio" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
 			<label for="sentAND"><?php echo T_('AND') ?></label>
 		</div>
-		<div class="line">
+		<div class="line inline">
 			<input type="radio" name="sentence" value="OR" id="sentOR" class="radio" <?php if( $sentence=='OR' ) echo 'checked="checked" '?> />
 			<label for="sentOR"><?php echo T_('OR') ?></label>
 		</div>
-		<div class="line">
+		<div class="line inline">
 			<input type="radio" name="sentence" value="sentence" id="sentence" class="radio" <?php if( $sentence=='sentence' ) echo 'checked="checked" '?> />
 			<label for="sentence"><?php echo T_('Entire phrase') ?></label>
 		</div>
-		<div class="line">
+		<div class="line inline">
 			<input type="checkbox" name="exact" value="1" id="exact" class="checkbox" <?php if( $exact ) echo 'checked="checked" '?> />
 			<label for="exact"><?php echo T_('Exact match') ?></label>
 		</div>
@@ -257,6 +257,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.9  2006/11/18 17:58:57  blueyed
+ * added DIV.inline and use it additionally for span.line replacement
+ *
  * Revision 1.8  2006/11/16 23:48:56  blueyed
  * Use div.line instead of span.line as element wrapper for XHTML validity
  *
