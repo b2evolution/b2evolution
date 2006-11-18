@@ -1162,8 +1162,8 @@ function upgrade_b2evo_tables()
 				24 => 'ALTER TABLE T_comments ADD COLUMN comment_allow_msgform TINYINT NOT NULL DEFAULT \'0\' AFTER comment_spam_karma',
 				25 => 'ALTER TABLE T_hitlog CHANGE COLUMN hit_referer_type hit_referer_type   ENUM(\'search\',\'blacklist\',\'referer\',\'direct\') NOT NULL',
 				26 => 'ALTER TABLE T_hitlog ADD COLUMN hit_agnt_ID        INT UNSIGNED NULL AFTER hit_remote_addr',
-				27 => 'ALTER TABLE T_links ADD INDEX link_itm_ID( link_itm_ID )', // TODO: drop previous INDEX link_item_ID, if existing (or rename?) - see http://forums.b2evolution.net/viewtopic.php?p=43796#43796   fp>yes
-				28 => 'ALTER TABLE T_links ADD INDEX link_dest_itm_ID (link_dest_itm_ID)', // TODO: drop previous INDEX link_dest_item_ID, if existing (or rename?) - see http://forums.b2evolution.net/viewtopic.php?p=43796#43796   fp>yes
+				27 => 'ALTER TABLE T_links ADD INDEX link_itm_ID( link_itm_ID )',
+				28 => 'ALTER TABLE T_links ADD INDEX link_dest_itm_ID (link_dest_itm_ID)',
 				30 => 'ALTER TABLE T_plugins CHANGE COLUMN plug_priority plug_priority        TINYINT NOT NULL default 50',
 				31 => 'ALTER TABLE T_plugins ADD COLUMN plug_code            VARCHAR(32) NULL AFTER plug_classname',
 				32 => 'ALTER TABLE T_plugins ADD COLUMN plug_apply_rendering ENUM( \'stealth\', \'always\', \'opt-out\', \'opt-in\', \'lazy\', \'never\' ) NOT NULL DEFAULT \'never\' AFTER plug_code',
@@ -1419,7 +1419,7 @@ function upgrade_b2evo_tables()
 		}
 		echo "OK.<br />\n";
 	}
-	
+
 	// TODO: "If a user has permission to edit a blog, he should be able to put files in the media folder for that blog." - see http://forums.b2evolution.net/viewtopic.php?p=36417#36417
 	/*
 	// blueyed>> I've came up with the following, but it's too generic IMHO
@@ -1590,6 +1590,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.189  2006/11/18 16:34:24  blueyed
+ * Removed todo
+ *
  * Revision 1.188  2006/11/18 03:58:21  fplanque
  * removed duplicate indexes on T_links
  *
