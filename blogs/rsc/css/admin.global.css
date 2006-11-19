@@ -173,3 +173,8 @@ div.skinshot div.actions {
 .timestamp .time {
 	font-size:84%;
 }
+
+div.tile {
+	display: inline;
+	white-space: nowrap;
+}
