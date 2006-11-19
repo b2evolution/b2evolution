@@ -6,16 +6,11 @@
  */
 class IconLegend
 {
-
+	/**
+	 * @var array List of used icon names
+	 */
 	var $icons = array();
 
-	/**
-	 * Constructor
-	 * @return IconLegend
-	 */
-	function IconLegend()
-	{
-	}
 
 	/**
 	 * Add an icon with his legend to the icons array
@@ -30,43 +25,46 @@ class IconLegend
 		}
 	}
 
+
 	/**
 	 * Display the icon legend
 	 */
 	function display_legend()
 	{
-		global $map_iconfiles;
+		if( empty( $this->icons ) )
+		{
+			return;
+		}
 
-		if( !empty( $this->icons ) )
-		{	// There are some icons to display
-			$r = '<div id="icon_legend">';
+		// There are some icons to display:
+		echo '<div id="icon_legend">';
 
-			// Loop on all map array of filenames for icons to display icons list in the same order:
-			foreach( $map_iconfiles as $icon=>$value )
+		// Loop on all map array of filenames for icons to display icons list in the same order:
+		foreach( $this->icons as $icon )
+		{
+			$icon_info = get_icon_info($icon);
+			if( ! $icon_info )
 			{
-				if( in_array( $icon, $this->icons ) )
-				{	// The icon is used in the page, so display its legend:
-					$r .= '<span class="legend_element">'
-								.get_icon( $icon ) . ' ';
-
-					if( isset( $map_iconfiles[$icon]['legend'] ) )
-					{ // Icon has a legend:
-						$r .= $map_iconfiles[$icon]['legend'] . ' ';
-					}
-					else
-					{ // Icon has no legend so we use the alt:
-						$r .= $map_iconfiles[$icon]['alt'] . ' ';
-					}
-
-					$r .= '</span>';
-				}
+				continue;
 			}
 
-			$r .= '</div>';
-			// Display icon legende:
-			echo $r;
+			echo '<span class="legend_element">'.get_icon( $icon ).' ';
+
+			if( isset( $icon_info['legend'] ) )
+			{ // Icon has a legend:
+				echo $icon_info['legend'] . ' ';
+			}
+			else
+			{ // Icon has no legend so we use the alt:
+				echo $icon_info['alt'] . ' ';
+			}
+
+			echo '</span>';
 		}
+
+		echo '</div>';
 	}
+
 
 	/**
 	 * Reset icons array

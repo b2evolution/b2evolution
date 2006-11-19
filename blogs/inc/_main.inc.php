@@ -332,13 +332,6 @@ $Timer->pause( '_main.inc:requires' );
 
 
 /**
- * Icon Legend
- */
-require_once dirname(__FILE__).'/_misc/_iconlegend.class.php';
-$IconLegend = & new IconLegend();
-
-
-/**
  * Locale selection:
  */
 $Debuglog->add( 'default_locale from conf: '.$default_locale, 'locale' );
@@ -597,6 +590,17 @@ require_once $model_path.'sessions/_sessions.class.php';
 $Sessions = & new Sessions();
 
 
+// Icon legend:
+if( $UserSettings->get('display_icon_legend') )
+{
+	/**
+	 * Icon Legend
+	 */
+	require_once dirname(__FILE__).'/_misc/_iconlegend.class.php';
+	$IconLegend = & new IconLegend();
+}
+
+
 /**
  * User locale selection:
  */
@@ -622,14 +626,6 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale
 
 // Init charset handling:
 init_charsets( $current_charset );
-
-
-/**
- * Load the icons
- *
- * Note: we can't do this earlier because need the users locale set there ({@link T_()})
- */
-require_once $conf_path.'_icons.php';
 
 
 // Display login errors (and form). This uses $io_charset, so it's at the end.
@@ -658,6 +654,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.55  2006/11/19 23:43:04  blueyed
+ * Optimized icon and $IconLegend handling
+ *
  * Revision 1.54  2006/11/14 21:13:58  blueyed
  * I've spent > 2 hours debugging this charset nightmare and all I've got are those lousy TODOs..
  *

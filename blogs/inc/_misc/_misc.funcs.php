@@ -1874,7 +1874,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word
  *
  * Note: to get a file type icon, use {@link File::get_icon()} instead.
  *
- * @uses $map_iconfiles
+ * @uses get_icon_info()
  * @param string icon for what? (key)
  * @param string what to return for that icon ('imgtag', 'alt', 'legend', 'file', 'url', 'size' {@link imgsize()})
  * @param array additional params (
@@ -1885,13 +1885,16 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word
  */
 function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legend = false )
 {
-	global $map_iconfiles, $basepath, $admin_subdir, $baseurl, $Debuglog,	$IconLegend;
+	global $basepath, $admin_subdir, $baseurl, $Debuglog,	$IconLegend;
+	global $conf_path;
 
-	if( isset( $map_iconfiles[$iconKey] ) && isset( $map_iconfiles[$iconKey]['file'] ) )
+	if( ! function_exists('get_icon_info') )
 	{
-		$iconfile = $map_iconfiles[$iconKey]['file'];
+		require_once $conf_path.'_icons.php';
 	}
-	else
+
+	$icon = get_icon_info($iconKey);
+	if( ! $icon || ! isset( $icon['file'] ) )
 	{
 		return '[no image defined for '.var_export( $iconKey, true ).'!]';
 	}
@@ -1899,23 +1902,23 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 	switch( $what )
 	{
 		case 'rollover':
-			if( isset( $map_iconfiles[$iconKey]['rollover'] ) )
+			if( isset( $icon['rollover'] ) )
 			{	// Image has rollover available
-				return $map_iconfiles[$iconKey]['rollover'];
+				return $icon['rollover'];
 			}
 			return false;
 			/* BREAK */
 
 
 		case 'file':
-			return $basepath.$iconfile;
+			return $basepath.$icon['file'];
 			/* BREAK */
 
 
 		case 'alt':
-			if( isset( $map_iconfiles[$iconKey]['alt'] ) )
+			if( isset( $icon['alt'] ) )
 			{ // alt tag from $map_iconfiles
-				return $map_iconfiles[$iconKey]['alt'];
+				return $icon['alt'];
 			}
 			else
 			{ // fallback to $iconKey as alt-tag
@@ -1925,14 +1928,14 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 
 		case 'legend':
-			if( isset( $map_iconfiles[$iconKey]['legend'] ) )
+			if( isset( $icon['legend'] ) )
 			{ // legend tag from $map_iconfiles
-				return $map_iconfiles[$iconKey]['legend'];
+				return $icon['legend'];
 			}
 			else
-			if( isset( $map_iconfiles[$iconKey]['alt'] ) )
+			if( isset( $icon['alt'] ) )
 			{ // alt tag from $map_iconfiles
-				return $map_iconfiles[$iconKey]['alt'];
+				return $icon['alt'];
 			}
 			else
 			{ // fallback to $iconKey as alt-tag
@@ -1942,9 +1945,9 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 
 		case 'class':
-			if( isset($map_iconfiles[$iconKey]['class']) )
+			if( isset($icon['class']) )
 			{
-				return $map_iconfiles[$iconKey]['class'];
+				return $icon['class'];
 			}
 			else
 			{
@@ -1953,42 +1956,42 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			/* BREAK */
 
 		case 'url':
-			return $baseurl.$iconfile;
+			return $baseurl.$icon['file'];
 			/* BREAK */
 
 		case 'size':
-			if( !isset( $map_iconfiles[$iconKey]['size'] ) )
+			if( !isset( $icon['size'] ) )
 			{
 				$Debuglog->add( 'No iconsize for ['.$iconKey.']', 'icons' );
 
-				$map_iconfiles[$iconKey]['size'] = imgsize( $iconfile );
+				$icon['size'] = imgsize( $icon['file'] );
 			}
 
 			switch( $params['size'] )
 			{
 				case 'width':
-					return $map_iconfiles[$iconKey]['size'][0];
+					return $icon['size'][0];
 
 				case 'height':
-					return $map_iconfiles[$iconKey]['size'][1];
+					return $icon['size'][1];
 
 				case 'widthxheight':
-					return $map_iconfiles[$iconKey]['size'][0].'x'.$map_iconfiles[$iconKey]['size'][1];
+					return $icon['size'][0].'x'.$icon['size'][1];
 
 				case 'width':
-					return $map_iconfiles[$iconKey]['size'][0];
+					return $icon['size'][0];
 
 				case 'string':
-					return 'width="'.$map_iconfiles[$iconKey]['size'][0].'" height="'.$map_iconfiles[$iconKey]['size'][1].'"';
+					return 'width="'.$icon['size'][0].'" height="'.$icon['size'][1].'"';
 
 				default:
-					return $map_iconfiles[$iconKey]['size'];
+					return $icon['size'];
 			}
 			/* BREAK */
 
 
 		case 'imgtag':
-			$r = '<img src="'.$baseurl.$iconfile.'" ';
+			$r = '<img src="'.$baseurl.$icon['file'].'" ';
 
 			// Include non CSS fallbacks:
 			$r .= 'border="0" align="top" ';
@@ -1996,9 +1999,9 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			// Include class (will default to "middle"):
 			if( ! isset( $params['class'] ) )
 			{
-				if( isset($map_iconfiles[$iconKey]['class']) )
+				if( isset($icon['class']) )
 				{	// This icon has a class
-					$params['class'] = $map_iconfiles[$iconKey]['class'];
+					$params['class'] = $icon['class'];
 				}
 				else
 				{
@@ -2007,17 +2010,17 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			}
 
 			// Include size (optional):
-			if( isset( $map_iconfiles[$iconKey]['size'] ) )
+			if( isset( $icon['size'] ) )
 			{
-				$r .= 'width="'.$map_iconfiles[$iconKey]['size'][0].'" height="'.$map_iconfiles[$iconKey]['size'][1].'" ';
+				$r .= 'width="'.$icon['size'][0].'" height="'.$icon['size'][1].'" ';
 			}
 
 			// Include alt (XHTML mandatory):
 			if( ! isset( $params['alt'] ) )
 			{
-				if( isset( $map_iconfiles[$iconKey]['alt'] ) )
+				if( isset( $icon['alt'] ) )
 				{ // alt-tag from $map_iconfiles
-					$params['alt'] = $map_iconfiles[$iconKey]['alt'];
+					$params['alt'] = $icon['alt'];
 				}
 				else
 				{ // $iconKey as alt-tag
@@ -2738,6 +2741,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.138  2006/11/19 23:43:05  blueyed
+ * Optimized icon and $IconLegend handling
+ *
  * Revision 1.137  2006/11/14 22:10:41  blueyed
  * Removed own bloat in debug_die(), it is an error after all. doc
  *

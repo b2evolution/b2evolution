@@ -786,7 +786,7 @@ class File extends DataObject
 	 *
 	 * Looks at the file's extension.
 	 *
-	 * @uses $map_iconfiles
+	 * @uses get_icon()
 	 * @return string img tag
 	 */
 	function get_icon()
@@ -1344,6 +1344,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2006/11/19 23:43:04  blueyed
+ * Optimized icon and $IconLegend handling
+ *
  * Revision 1.20  2006/09/30 16:55:58  blueyed
  * $create param for media dir handling, which allows to just get the dir, without creating it.
  *

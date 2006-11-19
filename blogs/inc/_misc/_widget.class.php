@@ -61,8 +61,8 @@ class Widget
 	 * Registers a global action icon
 	 *
 	 * @param string TITLE text (IMG and A link)
-	 * @param string icon code, see {@link $map_iconfiles}
 	 * @param string icon code for {@link get_icon()}
+	 * @param string URL to link to
 	 * @param integer 1-5: weight of the icon. the icon will be displayed only if its weight is >= than the user setting threshold
 	 * @param integer 1-5: weight of the word. the word will be displayed only if its weight is >= than the user setting threshold
 	 * @param array Additional attributes to the A tag. See {@link action_icon()}.
