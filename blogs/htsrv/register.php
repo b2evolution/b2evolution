@@ -36,6 +36,10 @@
  * Includes:
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
+
+// Login is not required on the register page:
+$login_required = false;
+
 require_once $inc_path.'_main.inc.php';
 
 
@@ -188,6 +192,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.75  2006/11/19 16:17:37  blueyed
+ * Login cannot be required on the register page
+ *
  * Revision 1.74  2006/09/10 18:14:24  blueyed
  * Do report error, if sending email fails in message_send.php (msgform and opt-out)
  *
