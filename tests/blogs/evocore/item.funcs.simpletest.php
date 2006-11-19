@@ -32,6 +32,8 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 	{
 		global $evo_charset;
 
+		$old_evo_charset = $evo_charset;
+		$evo_charset = 'ISO-8859-1';
 		$this->assertEqual( urltitle_validate( '  ', " :: çà c'est \"VRAIMENT\" tôa! " ), 'ca-c-est-vraiment-toa' );
 		$this->assertEqual( urltitle_validate( '', "La subtile différence entre acronym et abbr..._452" ), 'la-subtile-difference-entre-acronym-et-a-452' );
 
@@ -40,8 +42,6 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 			echo "Skipping test (cannot convert)...n";
 		}
 
-		$old_evo_charset = $evo_charset;
-		$evo_charset = 'ISO-8859-1';
 		$this->assertEqual( urltitle_validate('', 'Äöüùé'), 'aeoeueue' );
 
 		$evo_charset = 'UTF-8';

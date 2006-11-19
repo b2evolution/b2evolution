@@ -86,7 +86,7 @@ class ParamFuncsTestCase extends EvoUnitTestCase
 	function test_url_add_param()
 	{
 		$this->assertEqual( url_add_param('foo', 'bar', '&'), 'foo?bar' );
-		$this->assertEqual( url_add_param('foo#anchor', 'bar', '&'), 'foo#anchor?bar' );
+		$this->assertEqual( url_add_param('foo#anchor', 'bar', '&'), 'foo?bar#anchor' );
 	}
 
 }
