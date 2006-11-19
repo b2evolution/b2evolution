@@ -22,6 +22,13 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 
 // TODO: dh> this file was meant to be used for things where you only need the basic config.. now all we got is an additional require/file, just because of some windows issue??
+// fp> Hum... that was not overly clear. At some point, someone said "hey let's rename config to basic_config so it'll be more clear for users"
+// so the optimization here was not obvious, especially with the global config including everything else
+// Valid point though. I'll get back to it later because we should the take the 2.0 opportunity to call the other files selectively too.
+// - At least _admin.php should only be called when in the backoffice.
+// - Also we should probably start by moving as many conf options to the backoffice as possible and see how much stuff is left in conf files
+//    Note: some stuff does not make sense in the back-office (for example stuff that depends on the physical path where the files are installed)
+// - In view of reorganization, please list (all or examples) of situations where only a subset of the conf should be loaded.
 
 
 /**

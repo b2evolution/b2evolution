@@ -177,7 +177,7 @@ skin_content_header();	// Sets charset!
 
 			$Item->permanent_link( '#', '#', 'permalink_right' ); ?>
 
-			<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
+			<?php $Item->feedback_link( 'comments', '' ) // Link to comments ?>
 			<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
 			<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
 

@@ -1701,10 +1701,6 @@ class Item extends DataObject
 				// Obsolete, but left for skin compatibility
 				/* dh> left here as a reference for pingbacks plugin:
 				$this->get_Blog();
-				if( ! $this->Blog->get( 'allowpingbacks' ) )
-				{ // Pingbacks not allowed on this blog:
-					return;
-				}
 				if( $hideifnone === '#' ) $hideifnone = true;
 				if( $title == '#' ) $title = T_('Display pingbacks');
 				if( $zero == '#' ) $zero = T_('Pingback (0)');
@@ -3293,6 +3289,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.120  2006/11/19 22:17:42  fplanque
+ * minor / doc
+ *
  * Revision 1.119  2006/11/19 16:07:31  blueyed
  * Fixed saving empty renderers list. This should also fix the saving of "default" instead of the explicit renderer list
  *

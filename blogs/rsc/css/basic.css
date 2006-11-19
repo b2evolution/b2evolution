@@ -42,6 +42,12 @@ code {
 .top {
 	vertical-align: top;
 }
+.floatleft {
+	float: left;
+}
+.floatright {
+	float: right;
+}
 .clear{
 	clear: both;
 }

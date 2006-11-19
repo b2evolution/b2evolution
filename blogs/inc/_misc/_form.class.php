@@ -228,7 +228,7 @@ class Form extends Widget
 				$this->formstart = '';
 				$this->title_fmt = '$title$'."\n"; // TODO: icons
 				$this->no_title_fmt = '';          //           "
-				$this->fieldstart = '<div class="line inline">';
+				$this->fieldstart = '<div class="tile">';
 				$this->labelstart = '';
 				$this->labelend = "\n";
 				$this->labelempty = '';
@@ -2697,6 +2697,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.51  2006/11/19 22:17:42  fplanque
+ * minor / doc
+ *
  * Revision 1.50  2006/11/19 15:52:27  blueyed
  * Fixed E_NOTICE with Form::hidden
  *
