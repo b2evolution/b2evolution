@@ -88,8 +88,8 @@ $Form->hidden( 'item_assigned_user_ID', param('item_assigned_user_ID', 'integer'
 $Form->hidden( 'item_st_ID', param('item_st_ID', 'integer', NULL) );
 $Form->hidden( 'item_deadline', param('item_deadline', 'string', NULL) );
 $Form->hidden( 'trackback_url', param('trackback_url', 'string', NULL) );
-$Form->hidden( 'renderers', param('renderers', 'array', NULL) );
-
+$Form->hidden( 'renderers_displayed', 1 );
+$Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 
 // TODO: Form::hidden() do not add, if NULL?!
 
@@ -281,6 +281,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.20  2006/11/19 16:07:31  blueyed
+ * Fixed saving empty renderers list. This should also fix the saving of "default" instead of the explicit renderer list
+ *
  * Revision 1.19  2006/11/19 03:50:29  fplanque
  * cleaned up CSS
  *

@@ -468,8 +468,9 @@ class Item extends DataObject
 			}
 		}
 
-		if( param( 'renderers', 'array', NULL ) !== NULL ) {
-			$renderers = $Plugins->validate_list( get_param('renderers') );
+		if( param( 'renderers_displayed', 'integer', 0 ) )
+		{ // use "renderers" value only if it has been displayed (may be empty)
+			$renderers = $Plugins->validate_list( param( 'renderers', 'array', array() ) );
 			$this->set( 'renderers', $renderers );
 		}
 
@@ -2110,6 +2111,8 @@ class Item extends DataObject
 		}
 		// pre_dump( $item_renderers );
 
+		echo '<input type="hidden" name="renderers_displayed" value="1" />';
+
 		foreach( $Plugins->get_list_by_events( array('RenderItemAsHtml', 'RenderItemAsXml', 'RenderItemAsText') ) as $loop_RendererPlugin )
 		{ // Go through whole list of renders
 			// echo ' ',$loop_RendererPlugin->code;
@@ -3290,6 +3293,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.119  2006/11/19 16:07:31  blueyed
+ * Fixed saving empty renderers list. This should also fix the saving of "default" instead of the explicit renderer list
+ *
  * Revision 1.118  2006/11/17 18:36:23  blueyed
  * dbchanges param for AfterItemUpdate, AfterItemInsert, AfterCommentUpdate and AfterCommentInsert
  *
