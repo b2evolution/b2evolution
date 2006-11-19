@@ -98,4 +98,6 @@ $testDB_conf = array_merge( array(
 
 // Use default aliases, if not set
 $testDB_conf['aliases'] = array_merge( $db_config['aliases'], isset($testDB_conf['aliases']) ? $testDB_conf['aliases'] : array() );
+
+// pre_dump( $testDB_conf );
 ?>

@@ -1,0 +1,34 @@
+<h1>Setting up Simple Test for b2evo</h1>
+
+<h2>1. Get the Simple Test framework</h2>
+
+<p>If you want to run the <a href="http://www.lastcraft.com/simple_test.php">Simple Test</a> cases in /tests, you'll have to get the
+simpletest framework. Of course.</p>
+
+<p>You can 
+<a href="http://sourceforge.net/project/showfiles.php?group_id=76550">download it from SourceForge</a> or get it straight from CVS (password is empty):</p>
+
+<pre>cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/simpletest login
+cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/simpletest co simpletest</pre>
+
+Put it into the /tests/simpletest directory.
+
+<blockquote><font size="2">
+	<p>If you already have it somewhere, just create the file
+		/tests/config.simpletest.OVERRIDE.php (in the b2evo root directory)
+		define the constant SIMPLETEST_DIR, e.g.:</p>
+	<pre>&lt;?php
+define( 'SIMPLETEST_DIR', '/your/path/with/trailing/slash/' );
+?&gt;</pre>
+	<p>Simplest method, to not edit any config files:
+		Just put a symlink named "symlink" in this directory (where this file
+		is).</p>
+</font></blockquote>
+
+<h2>2. Configure the Simple Test framework</h2>
+
+<p>Edit /test/config.php .
+</p>
+<p><strong> <font color="#FF0000">WARNING: Make sure you configure a TEST database and that you DO NOT run the tests in your normal blog database.</font></strong></p>
+<p>Happy testing..</p>
+

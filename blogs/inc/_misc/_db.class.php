@@ -328,6 +328,7 @@ class DB
 
 		if( ! isset($params['handle']) )
 		{ // Connect to the Database:
+			// echo "mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $new_link, $client_flags )";
 			$this->dbhandle = @mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $new_link, $client_flags );
 		}
 
@@ -337,7 +338,7 @@ class DB
 			if( empty($mysql_error) )
 			{ // there was a PHP error, like with version below 4.3 which do not support new_link and client_flags; let PHP throw an error:
 				$this->print_error( 'Error establishing a database connection!', '
-					<p>You are probably using a PHP version below 4.3! Please upgrade.</p>', false );
+					<p>If you are running a PHP version below 4.3, please upgrade.</p>', false );	// fp> Other causes include: simple tests passing wrong params!
 
 				// Let PHP throw an error:
 				mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $new_link, $client_flags );
@@ -1409,6 +1410,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.39  2006/11/19 23:30:38  fplanque
+ * made simpletest almost installable by almost bozos almost like me
+ *
  * Revision 1.38  2006/11/18 03:44:48  fplanque
  * reverted to optimized col info
  *

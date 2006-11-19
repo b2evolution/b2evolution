@@ -39,7 +39,9 @@ if( !defined( 'SIMPLETEST_DIR' ) )
 
 if( !file_exists( SIMPLETEST_DIR.'unit_tester.php' ) )
 {
-	die( 'SimpleTest framework not found: File '.SIMPLETEST_DIR.'unit_tester.php does not exist.' );
+	echo 'SimpleTest framework not found: File '.SIMPLETEST_DIR.'unit_tester.php does not exist.';
+	require SIMPLETEST_DIR.'index.html';
+	die();
 }
 
 

@@ -38,12 +38,12 @@ class MockDbUnitTestCase extends EvoUnitTestCase
 	 */
 	function setUp()
 	{
-		global $testdb_conf;
+		global $testDB_conf;
 		parent::setup();
 
 		$classname = 'MockDbUnitTestCase_DB_'.get_class($this);
 		$this->MockDB = new $classname($this);
-		$this->MockDB->DB( $testdb_conf );
+		$this->MockDB->DB( $testDB_conf );
 
 		$this->old_DB_MockDbUnitTestCache = & $GLOBALS['DB'];
 		$GLOBALS['DB'] = & $this->MockDB;
