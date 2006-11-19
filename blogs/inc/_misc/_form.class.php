@@ -2115,7 +2115,7 @@ class Form extends Widget
 			foreach( $field_value as $l_key => $l_value )
 			{
 				// Recursion:
-				$this->hidden( $field_name.'['.$l_key.']', $l_value, $field_params );
+				$this->hidden( $field_name.'['.$l_key.']', $l_value );
 			}
 		}
 		else
@@ -2697,6 +2697,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.50  2006/11/19 15:52:27  blueyed
+ * Fixed E_NOTICE with Form::hidden
+ *
  * Revision 1.49  2006/11/18 17:58:57  blueyed
  * added DIV.inline and use it additionally for span.line replacement
  *
