@@ -208,7 +208,7 @@ elseif( !empty( $post_id ) )
 // opt-out links:
 if( $recipient_User )
 { // Member:
-	$message_footer .= T_("You can edit your profile to not reveive mails through a form:")
+	$message_footer .= T_("You can edit your profile to not receive mails through a form:")
 		."\n".url_add_param( str_replace( '&amp;', '&', $Blog->get('url') ), 'disp=profile', '&' );
 }
 elseif( $Comment )
@@ -274,6 +274,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.40  2006/11/20 22:21:46  blueyed
+ * Fixed typo
+ *
  * Revision 1.39  2006/11/15 00:09:16  blueyed
  * Use the blog locale when sending e-mails to non-members - instead of the one from the visitor
  *

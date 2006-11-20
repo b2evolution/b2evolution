@@ -1281,7 +1281,7 @@ msgid "Message sent from your post:"
 msgstr "Nachricht gesendet von deinem Beitrag:"
 
 #: ..\..\..\htsrv\message_send.php:199
-msgid "You can edit your profile to not reveive mails through a form:"
+msgid "You can edit your profile to not receive mails through a form:"
 msgstr "Du kannst Dein Profil editieren, um keine E-Mails über ein Formular zu empfangen:"
 
 #: ..\..\..\htsrv\message_send.php:204

@@ -289,7 +289,7 @@ folgenden Link:',
 'Please do not send empty messages.' => 'Bitte schicke keine leeren Nachrichten.',
 'Message sent from your comment:' => 'Nachricht gesendet von deinem Kommentar:',
 'Message sent from your post:' => 'Nachricht gesendet von deinem Beitrag:',
-'You can edit your profile to not reveive mails through a form:' => 'Du kannst Dein Profil editieren, um keine E-Mails über ein Formular zu empfangen:',
+'You can edit your profile to not receive mails through a form:' => 'Du kannst Dein Profil editieren, um keine E-Mails über ein Formular zu empfangen:',
 'Click on the following link to not receive e-mails on your comments\nfor this e-mail address anymore:' => 'Klicke auf den folgenden Link, um keine E-Mails mehr für Kommentare
 von dieser E-Mail-Adresse zu bekommen:',
 'Cannot send email, please correct these errors:' => 'Kann die E-Mail nicht versenden, bitte berichtige diese Fehler:',
