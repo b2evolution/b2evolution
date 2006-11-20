@@ -1,6 +1,7 @@
 <?php
 /**
  * Tests for the {@link wikilinks_plugin Wiki links plugin}.
+ * @package tests
  */
 
 /**

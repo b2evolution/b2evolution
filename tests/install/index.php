@@ -1,6 +1,7 @@
 <?php
 /**
-* This is the file to do all install tests.
+ * This is the file to do all install tests.
+ * @package tests
  */
 
 /**

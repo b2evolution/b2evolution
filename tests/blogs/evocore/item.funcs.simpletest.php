@@ -1,6 +1,7 @@
 <?php
 /**
  * Tests for item functions.
+ * @package tests
  */
 
 /**

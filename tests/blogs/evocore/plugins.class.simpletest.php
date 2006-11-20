@@ -1,6 +1,7 @@
 <?php
 /**
  * Tests for the {@link Plugins} class
+ * @package tests
  */
 
 /**

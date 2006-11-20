@@ -1,6 +1,7 @@
 <?php
 /**
  * Tests for the upgrade functions, mainly {@link db_delta()}.
+ * @package tests
  */
 
 /**

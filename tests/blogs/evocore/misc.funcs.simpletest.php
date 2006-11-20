@@ -1,6 +1,7 @@
 <?php
 /**
  * Tests for miscellaneous functions.
+ * @package tests
  */
 
 /**

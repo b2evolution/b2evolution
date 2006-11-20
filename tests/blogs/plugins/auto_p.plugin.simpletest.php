@@ -1,6 +1,7 @@
 <?php
 /**
  * Tests for the {@link auto_p_plugin AutoP Plugin}.
+ * @package tests
  */
 
 /**

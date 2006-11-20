@@ -1,6 +1,7 @@
 <?php
 /**
  * Tests for {@link UserCache}.
+ * @package tests
  */
 
 /**

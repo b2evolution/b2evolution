@@ -1,6 +1,7 @@
 <?php
 /**
  * Tests for param functions.
+ * @package tests
  */
 
 /**
