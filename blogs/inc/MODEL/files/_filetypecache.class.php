@@ -49,10 +49,8 @@ class FiletypeCache extends DataObjectCache
 
 	/**
 	 * Constructor
-	 *
-	 * @param table Database row
 	 */
-	function FiletypeCache( $db_row = NULL )
+	function FiletypeCache()
 	{
 		// Call parent constructor:
 		parent::DataObjectCache( 'Filetype', true, 'T_filetypes', 'ftyp_', 'ftyp_ID', 'ftyp_extensions' );
