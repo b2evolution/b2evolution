@@ -111,14 +111,20 @@ class DB
 	var $last_error = '';
 
 	/**
-	 * Column information about the last query.
-	 * Note: {@link DB::log_queries} must be enabled for this to work.
-	 * @see DB::get_col_info()
+	 * @deprecated Obsolete! Use {@link DB::get_col_info()} instead.
 	 */
 	var $col_info;
 
 	var $insert_id = 0;
 
+	/**
+	 * @var resource Last query's resource
+	 */
+	var $result;
+
+	/**
+	 * @var array Last result's rows
+	 */
 	var $last_result;
 
 	/**
@@ -566,8 +572,11 @@ class DB
 	{
 		// Get rid of these
 		$this->last_result = NULL;
-		$this->col_info = NULL;
 		$this->last_query = NULL;
+		if( isset($this->result) && is_resource($this->result) )
+		{ // Free last result resource
+			@mysql_free_result($this->result);
+		}
 	}
 
 
@@ -702,17 +711,6 @@ class DB
 			if( is_resource($this->result) )
 			{ // It's not a resource for CREATE or DROP for example and can even trigger a fatal error (see http://forums.b2evolution.net//viewtopic.php?t=9529)
 
-				if( $this->log_queries )
-				{
-					// Take note of column info
-					$i = 0;
-					while( $i < mysql_num_fields($this->result) )
-					{
-						$this->col_info[$i] = mysql_fetch_field($this->result);
-						$i++;
-					}
-				}
-
 				// Store Query Results
 				while( $row = mysql_fetch_object($this->result) )
 				{
@@ -720,8 +718,6 @@ class DB
 					$this->last_result[$num_rows] = $row;
 					$num_rows++;
 				}
-
-				mysql_free_result($this->result);
 			}
 
 			// Log number of rows the query returned
@@ -749,22 +745,14 @@ class DB
 		{ // Query was a select, let's try to explain joins...
 
 			// save values:
+			$saved_result = $this->result;
 			$saved_last_result = $this->last_result;
-			$saved_col_info = $this->col_info;
 			$saved_num_rows = $this->num_rows;
 
 			$this->last_result = NULL;
-			$this->col_info = NULL;
 			$this->num_rows = 0;
 
 			$this->result = @mysql_query( 'EXPLAIN '.$query, $this->dbhandle );
-			// Take note of column info
-			$i = 0;
-			while( $i < @mysql_num_fields($this->result) )
-			{
-				$this->col_info[$i] = @mysql_fetch_field($this->result);
-				$i++;
-			}
 
 			// Store Query Results
 			$num_rows = 0;
@@ -775,8 +763,6 @@ class DB
 				$num_rows++;
 			}
 
-			@mysql_free_result($this->result);
-
 			// Log number of rows the query returned
 			$this->num_rows = $num_rows;
 
@@ -785,9 +771,12 @@ class DB
 				$this->queries[ $this->num_queries - 1 ]['explain'] = $this->debug_get_rows_table( 100, true );
 			}
 
+			// Free "EXPLAIN" result resource:
+			@mysql_free_result($this->result);
+
 			// Restore:
+			$this->result = $saved_result;
 			$this->last_result = $saved_last_result;
-			$this->col_info = $saved_col_info;
 			$this->num_rows = $saved_num_rows;
 		}
 
@@ -1000,31 +989,56 @@ class DB
 
 
 	/**
-	 * Function to get column meta data info pertaining to the last query
-	 * see docs for more info and usage
+	 * Function to get column meta data info pertaining to the last query.
 	 *
-	 * Note: {@link DB::log_queries} must be enabled for this to work.
+	 * @param string|NULL Key of info, see {@link http://php.net/mysql_fetch_field} for a list;
+	 *                    empty/NULL for an array with all entries
+	 * @param integer Column offset; -1 for all
 	 */
 	function get_col_info( $info_type = 'name', $col_offset = -1 )
 	{
-		if( ! $this->col_info )
-		{
-			debug_die( 'DB::get_col_info() cannot return a value because no column info is available!' );
+		if( ! is_resource($this->result) )
+		{ // fp> A function should NEVER FAIL SILENTLY!
+			debug_die( 'DB::get_col_info() cannot return a value because no result resource is available!' );
 		}
 
+		// Get column info:
 		if( $col_offset == -1 )
-		{
+		{ // all columns:
+			$n = mysql_num_fields($this->result);
 			$i = 0;
-			foreach( $this->col_info as $col )
+			while( $i < $n )
 			{
-				$new_array[$i] = $col->{$info_type};
+				$col_info[$i] = mysql_fetch_field($this->result, $i);
 				$i++;
 			}
-			return $new_array;
 		}
 		else
 		{
-			return $this->col_info[$col_offset]->{$info_type};
+			$col_info = mysql_fetch_field($this->result, $col_offset);
+		}
+
+		if( empty($info_type) )
+		{ // all field properties:
+			return $col_info;
+		}
+		else
+		{ // a specific column field property
+			if( $col_offset == -1 )
+			{
+				$new_array = array();
+				$i = 0;
+				foreach( $col_info as $col )
+				{
+					$new_array[$i] = $col->{$info_type};
+					$i++;
+				}
+				return $new_array;
+			}
+			else
+			{
+				return $col_info->{$info_type};
+			}
 		}
 	}
 
@@ -1038,7 +1052,8 @@ class DB
 	{
 		$r = '';
 
-		if( ! $this->col_info )
+		if( ! is_resource($this->result) // don't let get_col_info() debug_die().. :/
+			|| ! ( $col_info = $this->get_col_info(NULL) ) )
 		{
 			return '<p>No Results.</p>';
 		}
@@ -1046,10 +1061,10 @@ class DB
 		// =====================================================
 		// Results top rows
 		$r .= '<table cellspacing="0" summary="Results for query"><tr>';
-		for( $i = 0, $count = count($this->col_info); $i < $count; $i++ )
+		for( $i = 0, $count = count($col_info); $i < $count; $i++ )
 		{
-			$r .= '<th><span class="type">'.$this->col_info[$i]->type.' '.$this->col_info[$i]->max_length.'</span><br />'
-						.$this->col_info[$i]->name.'</th>';
+			$r .= '<th><span class="type">'.$col_info[$i]->type.' '.$col_info[$i]->max_length.'</span><br />'
+						.$col_info[$i]->name.'</th>';
 		}
 		$r .= '</tr>';
 
@@ -1101,11 +1116,11 @@ class DB
 		} // if last result
 		else
 		{
-			$r .= '<tr><td colspan="'.(count($this->col_info)+1).'">No Results</td></tr>';
+			$r .= '<tr><td colspan="'.(count($col_info)+1).'">No Results</td></tr>';
 		}
 		if( $i >= $max_lines )
 		{
-			$r .= '<tr><td colspan="'.(count($this->col_info)+1).'">Max number of dumped rows has been reached.</td></tr>';
+			$r .= '<tr><td colspan="'.(count($col_info)+1).'">Max number of dumped rows has been reached.</td></tr>';
 		}
 
 		$r .= '</table>';
@@ -1410,6 +1425,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.40  2006/11/20 12:23:28  blueyed
+ * Optimized col_info handling: obsoleted DB::col_info: use DB::get_col_info() instead (lazy-loading of column info)
+ *
  * Revision 1.39  2006/11/19 23:30:38  fplanque
  * made simpletest almost installable by almost bozos almost like me
  *
