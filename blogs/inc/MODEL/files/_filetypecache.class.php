@@ -39,9 +39,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/../dataobjects/_dataobjectcache.class.php';
 
 /**
- * Division Class
+ * FiletypeCache Class
  *
- * @package gsbcore
+ * @package evocore
  */
 class FiletypeCache extends DataObjectCache
 {

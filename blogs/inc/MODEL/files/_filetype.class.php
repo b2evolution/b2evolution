@@ -41,7 +41,7 @@ require_once dirname(__FILE__).'/../dataobjects/_dataobject.class.php';
 /**
  * Filetype Class
  *
- * @package gsbcore
+ * @package evocore
  */
 class Filetype extends DataObject
 {

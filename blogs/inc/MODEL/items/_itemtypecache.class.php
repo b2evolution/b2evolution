@@ -41,7 +41,7 @@ require_once dirname(__FILE__).'/../dataobjects/_dataobjectcache.class.php';
 /**
  * ItemTypeCache Class
  *
- * @package gsbcore
+ * @package evocore
  */
 class ItemTypeCache extends DataObjectCache
 {
@@ -157,6 +157,9 @@ class ItemTypeCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.11  2006/11/20 19:51:28  blueyed
+ * doc: package gsbcore => evocore
+ *
  * Revision 1.10  2006/09/11 22:29:19  fplanque
  * chapter cleanup
  *
