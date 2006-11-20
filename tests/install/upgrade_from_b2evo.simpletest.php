@@ -2,7 +2,7 @@
 /**
  * Tests for upgrading from older b2evo versions to the current version (this one).
  * @package tests
- * @todo Rename to upgrade.simpletest.php (SVN keep history.. *hint*)
+ * @todo Rename to upgrade.simpletest.php (SVN keeps history.. *hint*)
  */
 
 /**
