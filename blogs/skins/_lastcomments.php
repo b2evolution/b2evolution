@@ -45,10 +45,10 @@ while( $Comment = & $CommentList->get_next() )
 			<?php $Comment->content() ?>
 		</div>
 		<div class="bCommentSmallPrint">
-			<?php	$Comment->permanent_link( '#', '#', 'permalink_right' ); ?>
+			<?php $Comment->permanent_link( '#', '#', 'permalink_right' ); ?>
 			<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
-			<?php $Comment->edit_link( ' &middot; ' ) // Link to backoffice for editing ?>
-			<?php $Comment->delete_link( ' &middot; ' ); // Link to backoffice for deleting ?>
+			<?php $Comment->edit_link( ' &middot; ' ) /* Link to backoffice for editing */ ?>
+			<?php $Comment->delete_link( ' &middot; ' ); /* Link to backoffice for deleting */ ?>
 		</div>
 	</div>
 	<!-- ========== END of a COMMENT ========== -->
@@ -58,6 +58,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.28  2006/11/20 22:15:50  blueyed
+ * whitespace/comment format
+ *
  * Revision 1.27  2006/07/06 19:56:29  fplanque
  * no message
  *
