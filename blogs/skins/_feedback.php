@@ -140,7 +140,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 				<?php $Comment->content() ?>
 			</div>
 			<div class="bCommentSmallPrint">
-				<?php	$Comment->permanent_link( '#', '#', 'permalink_right' ); ?>
+				<?php $Comment->permanent_link( '#', '#', 'permalink_right' ); ?>
 
 				<?php $Comment->edit_link( '', '', '#', '#', 'permalink_right' ); /* Link to backoffice for editing */ ?>
 				<?php $Comment->delete_link( '', '', '#', '#', 'permalink_right' ); /* Link to backoffice for deleting */ ?>
@@ -155,13 +155,11 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 	// _______________________________________________________________
 
-
 	// Display count of comments to be moderated:
 	$Item->feedback_moderation( 'feedbacks', '<div class="moderation_msg"><p>', '</p></div>',
-												T_('This post has no feedback awaiting moderation...'),
-												T_('This post has 1 feedback awaiting moderation... %s'),
-												T_('This post has %d feedbacks awaiting moderation... %s') );
-
+			T_('This post has no feedback awaiting moderation...'),
+			T_('This post has 1 feedback awaiting moderation... %s'),
+			T_('This post has %d feedbacks awaiting moderation... %s') );
 
 	// _______________________________________________________________
 
@@ -311,6 +309,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.83  2006/11/20 22:15:30  blueyed
+ * whitespace
+ *
  * Revision 1.82  2006/10/23 22:19:03  blueyed
  * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
  *
