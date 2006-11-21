@@ -285,16 +285,20 @@ function antispam_poll_abuse()
  */
 function get_ban_domain( $url )
 {
-	// Remove junk around domain name:
-	$domain = preg_replace( '~^([a-z]+://)?([^:/]+)(.*)$~i', '\\2', $url );
+	// echo '<p>'.$url;
+	
+	// Remove http:// part + everything after the last path element ( '/' alone is ignored on purpose )
+	$domain = preg_replace( '~^ ([a-z]+://)? ([^/]+) (/ ([^/]*/)+ )? .* ~xi', '\\2\\3', $url );
 
+	// echo '<br>'.$domain;
+	
 	if( preg_match( '~^[0-9.]+$~', $domain ) )
 	{	// All numeric = IP address, don't try to cut it any further
 		return '//'.$domain;
 	}
-
-	// Get the base domain (without any subdomains):
-	$base_domain = preg_replace( '~(.*\.)([^.]+\.[^.]+)~', '\\2', $domain );
+	
+	// Remove any www*. prefix:
+	$base_domain = preg_replace( '~^(www \w* \. )~xi', '', $domain );
 
 	if( empty($base_domain) )
 	{
@@ -313,6 +317,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.17  2006/11/21 19:18:39  fplanque
+ * get_base_domain()  / get_ban_domain() may need more unit tests, especially about what to do when invalid URLs are passed.
+ *
  * Revision 1.16  2006/11/16 22:43:17  blueyed
  * resume/pause antispam_url timer instead of start/stopping, because it may get called more than once
  *

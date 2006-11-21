@@ -233,48 +233,49 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 
 
 	/**
+	 * Test {@link get_base_domain()}
+	 */
+	function test_get_base_domain()
+	{
+		$this->assertEqual( get_base_domain('hostname'), 'hostname' );
+		$this->assertEqual( get_base_domain('http://hostname'), 'hostname' );
+		$this->assertEqual( get_base_domain('www.example.com'), 'example.com' );
+		$this->assertEqual( get_base_domain('www2.example.com'), 'example.com' );
+		$this->assertEqual( get_base_domain('subdom.example.com'), 'subdom.example.com' );
+		$this->assertEqual( get_base_domain('https://www.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
+		$this->assertEqual( get_base_domain('https://www.sub1.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
+		$this->assertEqual( get_base_domain('https://sub1.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
+		$this->assertEqual( get_base_domain('https://hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
+		$this->assertEqual( get_base_domain('https://hello.example.com:8080/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
+	}
+
+
+	/**
 	 * Test {@link get_ban_domain()}
 	 */
 	function test_get_ban_domain()
 	{
 		$this->assertEqual( get_ban_domain('www.example.com'), '.example.com' );
 		$this->assertEqual( get_ban_domain('www2.example.com'), '.example.com' );
-		$this->assertEqual( get_ban_domain('http://www.example.com'), '.example.com' );
-		$this->assertEqual( get_ban_domain('http://www2.example.com'), '.example.com' );
-		$this->assertEqual( get_ban_domain('http://www.example.com/path/'), '.example.com' );
-		$this->assertEqual( get_ban_domain('http://www2.example.com/path/?query=1'), '.example.com' );
-		$this->assertEqual( get_ban_domain('https://www.example.com'), '.example.com' );
-		$this->assertEqual( get_ban_domain('https://www2.example.com'), '.example.com' );
-		$this->assertEqual( get_ban_domain('http://sub2.sub1.example.com'), '.example.com' );
-		$this->assertEqual( get_ban_domain('http://sub3.sub2.sub1.example.com'), '.example.com' );
 		$this->assertEqual( get_ban_domain('http://hostname'), '//hostname' );
 		$this->assertEqual( get_ban_domain('http://hostname.tld'), '//hostname.tld' );
-		$this->assertEqual( get_ban_domain('http://hostname.co.uk'), '//hostname.co.uk' );
-		$this->assertEqual( get_ban_domain('http://www.hostname.co.uk'), '.hostname.co.uk' );
-		$this->assertEqual( get_ban_domain('http://sub.hostname.co.uk'), '.hostname.co.uk' );
-	}
-
-
-	/**
-	 * Test {@link get_base_domain()}
-	 */
-	function test_get_base_domain()
-	{
-		$this->assertEqual( get_base_domain('www.example.com'), 'example.com' );
-		$this->assertEqual( get_base_domain('www2.example.com'), 'example.com' );
-		$this->assertEqual( get_base_domain('http://www.example.com'), 'example.com' );
-		$this->assertEqual( get_base_domain('http://www2.example.com'), 'example.com' );
-		$this->assertEqual( get_base_domain('http://www.example.com/path/'), 'example.com' );
-		$this->assertEqual( get_base_domain('http://www2.example.com/path/?query=1'), 'example.com' );
-		$this->assertEqual( get_base_domain('https://www.example.com'), 'example.com' );
-		$this->assertEqual( get_base_domain('https://www2.example.com'), 'example.com' );
-		$this->assertEqual( get_base_domain('http://sub2.sub1.example.com'), 'example.com' );
-		$this->assertEqual( get_base_domain('http://sub3.sub2.sub1.example.com'), 'example.com' );
-		$this->assertEqual( get_base_domain('http://hostname'), 'hostname' );
-		$this->assertEqual( get_base_domain('http://hostname.tld'), 'hostname.tld' );
-		$this->assertEqual( get_base_domain('http://hostname.co.uk'), 'hostname.co.uk' );
-		$this->assertEqual( get_base_domain('http://www.hostname.co.uk'), 'hostname.co.uk' );
-		$this->assertEqual( get_base_domain('http://sub.hostname.co.uk'), 'hostname.co.uk' );
+		$this->assertEqual( get_ban_domain('http://www.example.com'), '.example.com' );
+		$this->assertEqual( get_ban_domain('http://www2.example.com'), '.example.com' );
+		$this->assertEqual( get_ban_domain('http://www2.example.com/'), '.example.com' );
+		$this->assertEqual( get_ban_domain('http://www.example.com/path/'), '.example.com/path/' );
+		$this->assertEqual( get_ban_domain('http://www.example.com/path/page.html'), '.example.com/path/' );
+		$this->assertEqual( get_ban_domain('http://www2.example.com/path/?query=1'), '.example.com/path/' );
+		$this->assertEqual( get_ban_domain('http://www2.example.com/path/page.html?query=1'), '.example.com/path/' );
+		$this->assertEqual( get_ban_domain('http://example.com/path/'), '//example.com/path/' );
+		$this->assertEqual( get_ban_domain('http://example.com/path/sub/?query=1'), '//example.com/path/sub/' );
+		$this->assertEqual( get_ban_domain('http://example.com/path/sub/page.html'), '//example.com/path/sub/' );
+		$this->assertEqual( get_ban_domain('http://example.com/path/sub/page.html?query=1'), '//example.com/path/sub/' );
+		$this->assertEqual( get_ban_domain('http://example.com:8080/path/sub/page.html?query=1'), '//example.com:8080/path/sub/' );
+		$this->assertEqual( get_ban_domain('https://www.example.com'), '.example.com' );
+		$this->assertEqual( get_ban_domain('https://www2.example.com'), '.example.com' );
+		$this->assertEqual( get_ban_domain('http://sub2.sub1.example.com'), '//sub2.sub1.example.com' );
+		$this->assertEqual( get_ban_domain('http://sub3.sub2.sub1.example.com'), '//sub3.sub2.sub1.example.com' );
+		$this->assertEqual( get_ban_domain('http://sub3.sub2.sub1.example.com'), '//sub3.sub2.sub1.example.com' );
 	}
 
 

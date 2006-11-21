@@ -2116,12 +2116,16 @@ function get_ip_list( $firstOnly = false )
 
 /**
  * Get the base domain (without protocol and any subdomain) of an URL.
+ * 
+ * Gets a max of 3 domain parts (x.y.tld)
  *
  * @param string URL
  * @return string the base domain
  */
 function get_base_domain( $url )
 {
+	//echo '<p>'.$url;
+	// Chop away the http part and the path:
 	$domain = preg_replace( '~^([a-z]+://)?([^:/]+)(.*)$~i', '\\2', $url );
 
 	if( preg_match( '~^[0-9.]+$~', $domain ) )
@@ -2129,11 +2133,16 @@ function get_base_domain( $url )
 		return $domain;
 	}
 
-	// Get the base domain (without any subdomains):
-	// TODO: dh> this is severely broken! E.g. "www.ecb.co.uk/" becomes "co.uk"!!
-	//       There are several 2nd-level domains like this
-	//       E.g., for TLD domain "uk" see http://en.wikipedia.org/wiki/.uk#Second-level_domains
-	$base_domain = preg_replace( '~(.*\.)([^.]+\.[^.]+)~', '\\2', $domain );
+	//echo '<br>'.$domain;
+	
+	// Get the base domain up to 3 levels (x.y.tld):
+	preg_match( '~(\w+ \.)? ( \w+ \.) ? \w+ $~x', $domain, $matches );
+	$base_domain = $matches[0];
+	
+	// Remove any www*. prefix:
+	$base_domain = preg_replace( '~^(www \w* \. )~xi', '', $base_domain );
+		
+	//echo '<br>'.$base_domain.'</p>';
 
 	return $base_domain;
 }
@@ -2741,6 +2750,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.139  2006/11/21 19:18:40  fplanque
+ * get_base_domain()  / get_ban_domain() may need more unit tests, especially about what to do when invalid URLs are passed.
+ *
  * Revision 1.138  2006/11/19 23:43:05  blueyed
  * Optimized icon and $IconLegend handling
  *
