@@ -48,6 +48,8 @@ class ExtLibsTestCase extends EvoUnitTestCase
 
 	/**
 	 * Test {@link SafeHtmlChecker::check()} for encoding issues.
+	 * NOTE: assignment by "& new" is required for PHP4! See also http://de3.php.net/manual/en/function.xml-set-object.php#46107
+	 *       Alternatively, multiple vars for each test may work, or unsetting the last one..
 	 */
 	function test_htmlchecker_check_encoding()
 	{
@@ -59,42 +61,42 @@ class ExtLibsTestCase extends EvoUnitTestCase
 			return;
 		}
 
-		$SHC = new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme
+		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme
 			/* default encoding */ );
 		$SHC->check( 'foo bar' );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme
+		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme
 			/* default encoding */ );
 		$SHC->check( 'foo дц bar' );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme
+		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme
 			/* default encoding */ );
 		$SHC->check( utf8_encode('foo дц bar') );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
+		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
 			'UTF-8' );
 		$SHC->check( 'foo bar' );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
+		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
 			'UTF-8' );
 		$SHC->check( utf8_encode('foo дц bar' ) );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
+		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
 			'UTF-8' );
 		$SHC->check( 'foo дц bar' );
 		$this->assertFalse( $SHC->isOK() );
 
-		$SHC = new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
+		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
 			'ISO-8859-1' );
 		$SHC->check( 'foo дц bar' );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
+		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
 			'ISO-8859-15' );
 		$SHC->check( utf8_encode('foo д bar') );
 		$this->assertTrue( $SHC->isOK() );
@@ -108,7 +110,7 @@ class ExtLibsTestCase extends EvoUnitTestCase
 			$this->assertEqual( $SHC->encoding, 'ISO-8859-15' );
 		}
 
-		$SHC = new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
+		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
 			'ISO-8859-1' );
 		$SHC->check( utf8_encode('foo д bar') );
 		$this->assertTrue( $SHC->isOK() );
