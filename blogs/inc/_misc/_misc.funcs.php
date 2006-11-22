@@ -2116,11 +2116,11 @@ function get_ip_list( $firstOnly = false )
 
 /**
  * Get the base domain (without protocol and any subdomain) of an URL.
- * 
+ *
  * Gets a max of 3 domain parts (x.y.tld)
  *
  * @param string URL
- * @return string the base domain
+ * @return string|false the base domain; false if we could not extract the base domain
  */
 function get_base_domain( $url )
 {
@@ -2134,14 +2134,19 @@ function get_base_domain( $url )
 	}
 
 	//echo '<br>'.$domain;
-	
+
 	// Get the base domain up to 3 levels (x.y.tld):
-	preg_match( '~(\w+ \.)? ( \w+ \.) ? \w+ $~x', $domain, $matches );
-	$base_domain = $matches[0];
-	
+	preg_match( '~(?: \w+ \.)? (?: \w+ \.)? (\w+) $~x', $domain, $matches );
+	if( ! isset($matches[1]) )
+	{ // no match
+		return $domain;
+	}
+
+	$base_domain = $matches[1];
+
 	// Remove any www*. prefix:
 	$base_domain = preg_replace( '~^(www \w* \. )~xi', '', $base_domain );
-		
+
 	//echo '<br>'.$base_domain.'</p>';
 
 	return $base_domain;
@@ -2750,6 +2755,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.140  2006/11/22 00:24:38  blueyed
+ * Fixed get_base_domain() for empty URL/domain
+ *
  * Revision 1.139  2006/11/21 19:18:40  fplanque
  * get_base_domain()  / get_ban_domain() may need more unit tests, especially about what to do when invalid URLs are passed.
  *
