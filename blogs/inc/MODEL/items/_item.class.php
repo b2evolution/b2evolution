@@ -796,7 +796,7 @@ class Item extends DataObject
 
 			$categoryNames[] = $cat_name;
 		}
-		echo implode( $separator, $categoryNames );
+		echo format_to_output( implode( $separator, $categoryNames ), $format);
 	}
 
 
@@ -3289,6 +3289,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.121  2006/11/22 20:12:18  blueyed
+ * Use $format param in Item::categories()
+ *
  * Revision 1.120  2006/11/19 22:17:42  fplanque
  * minor / doc
  *
