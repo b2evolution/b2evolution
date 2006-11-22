@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Generic Category class.
+ * This file implements the GenericCategory class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -25,7 +25,6 @@
  *
  * @package evocore
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
@@ -38,23 +37,30 @@ load_class( 'MODEL/generic/_genericelement.class.php' );
 
 
 /**
- * Generic Category Class
+ * GenericCategory Class
  *
  * @package evocore
  */
 class GenericCategory extends GenericElement
 {
 	var $parent_ID;
-	// To display parent name in form
+	/**
+	 * To display parent name in form
+	 */
 	var $parent_name;
 
-	// Category chidrens list
-	var $chidren = array();
+	/**
+	 * Category children list
+	 */
+	var $children = array();
 
 	/**
 	 * Constructor
 	 *
-	 * @param table Database row
+	 * @param string Table name
+	 * @param string
+	 * @param string DB ID name
+	 * @param array|NULL Database row
 	 */
 	function GenericCategory( $tablename, $prefix = '', $dbIDname = 'ID', $db_row = NULL )
 	{
@@ -94,8 +100,6 @@ class GenericCategory extends GenericElement
 	 *
 	 * By default, all values will be considered strings
 	 *
-	 * {@internal Contact::set(-)}}
-	 *
 	 * @param string parameter name
 	 * @param mixed parameter value
 	 */
@@ -115,7 +119,9 @@ class GenericCategory extends GenericElement
 
 
 	/**
-	 *
+	 * Add a child
+	 * @todo dh> "children" is plural..!
+	 * @param GenericCategory
 	 */
 	function add_children( & $GenericCategory )
 	{
@@ -127,6 +133,9 @@ class GenericCategory extends GenericElement
 
 /*
  * $Log$
+ * Revision 1.11  2006/11/22 20:45:36  blueyed
+ * doc/todo
+ *
  * Revision 1.10  2006/09/10 17:33:02  fplanque
  * started to steam up the categories/chapters
  *
