@@ -481,6 +481,8 @@ function cat_load_postcounts( $cat_load_postcounts = 'canonic', $dbtable = 'T_po
  * Load cache for category associations with current posts
  *
  * @todo put this into main post query when MySQL 4.0 commonly available
+ * @todo dh> why is this limited to the _global_ $postIDlist?!
+ *           Really ridiculous, trying to get a list of category names for an Item (which is not in $postIDlist for example.. :/)
  */
 function cat_load_postcats_cache()
 {
@@ -769,6 +771,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.22  2006/11/22 20:38:17  blueyed
+ * todo
+ *
  * Revision 1.21  2006/11/17 23:29:54  blueyed
  * Replaced cat_query() calls with cat_load_cache()
  *
