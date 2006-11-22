@@ -40,6 +40,8 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
+header( 'Content-Type: text/html; charset='.$io_charset );
+
 
 // TODO: Flood protection (Use Hit class to prevent mass mailings to members..)
 
@@ -305,6 +307,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.43  2006/11/22 19:20:51  blueyed
+ * Output charset header
+ *
  * Revision 1.42  2006/11/22 19:12:22  blueyed
  * Normalized. TODO about feature regression
  *
