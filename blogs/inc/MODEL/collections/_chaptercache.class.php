@@ -18,7 +18,6 @@
  *
  * @package evocore
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
  * @version $Id$
@@ -29,7 +28,7 @@ load_class( 'MODEL/generic/_genericcategorycache.class.php' );
 load_class( 'MODEL/collections/_chapter.class.php' );
 
 /**
- * Blog Cache Class
+ * ChapterCache Class
  *
  * @package evocore
  */
@@ -221,6 +220,9 @@ class ChapterCache extends GenericCategoryCache
 
 /*
  * $Log$
+ * Revision 1.7  2006/11/22 21:53:23  blueyed
+ * doc
+ *
  * Revision 1.6  2006/09/11 20:53:33  fplanque
  * clean chapter paths with decoding, finally :)
  *
