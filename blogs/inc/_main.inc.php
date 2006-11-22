@@ -237,8 +237,11 @@ $Hit = & new Hit();
  */
 require_once $model_path.'sessions/_session.class.php';
 /**
- * @global Session The Session object
+ * The Session object
+ * @global Session
  * @todo dh> This needs the same "SET NAMES" MySQL-setup as with Session::dbsave() - see the "TODO" with unserialize() in Session::Session()
+ * @todo dh> makes no sense in CLI mode (no cookie); Add isset() checks to
+ *           calls on the $Session object, e.g. below?
  */
 $Session = & new Session();
 
@@ -654,6 +657,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.56  2006/11/22 00:04:19  blueyed
+ * todo: $Session should not get instantiated if $is_cli
+ *
  * Revision 1.55  2006/11/19 23:43:04  blueyed
  * Optimized icon and $IconLegend handling
  *
