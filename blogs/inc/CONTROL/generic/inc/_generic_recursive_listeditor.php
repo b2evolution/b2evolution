@@ -292,10 +292,6 @@ switch( $action )
 }
 
 
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
-
-
 // Fadeout javascript
 echo '<script type="text/javascript" src="'.$rsc_url.'js/fadeout.js"></script>';
 echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, false);</script>';
@@ -309,6 +305,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2006/11/22 15:39:11  yabs
+ * Removed duplicate  footer call
+ *
  * Revision 1.8  2006/09/10 19:32:32  fplanque
  * completed chapter URL name editing
  *
