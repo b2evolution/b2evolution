@@ -1,9 +1,6 @@
 <?php
 /**
- * This is a demo template displaying a summary of the last posts in each blog
- *
- * If you're new to b2evolution templates or skins, you should not start with this file
- * It will be easier to start examining blog_a.php or noskin_a.php for instance...
+ * TODO: dh> desc...
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -14,8 +11,8 @@
  */
 
 // The User ID of the administrator:
-$recipient_id = 1; 
- 
+$recipient_id = 1;
+
 /**
  * Check this: we are requiring _main.inc.php INSTEAD of _blog_main.inc.php because we are not
  * trying to initialize any particular blog
@@ -42,9 +39,9 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 <!-- InstanceBeginEditable name="NavBar2" -->
 <?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	
+
 	// This section is OPTIONAL. Delete it if you don't need it.
-	
+
 	$display_blog_list = 1; // forced
 
 	# this is what will start and end your blog links
@@ -98,6 +95,17 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	// ----------------------------- MESSAGE FORM ----------------------------
 	// fp> TODO: inject a flag into session to indicate mail has been successfully sent and do not display the form on success (it's confusing)
 	// Daniel, if you could show me how you would do it, it would be nice (I did not look into naming conventions so far 'core.xxx' etc).
+	// dh> should the user return to this page at all? At least redirect_to should be passed/used.
+	// Then, a flag may be set in message_send.php, but it would fail, if the User sends a mail
+	// to some user (e.g. through a Comment) and then clicks on the contact link.
+	// Registering a shutdown function might help: check $success_mail and set your very own flag
+	// (e.g. "core.contact.sent" with a decent timeout). But this might fail, if the browser gets
+	// here again, while the shutdown is still in progress.
+	// Another option:
+	//  - if redirect_url is not empty, do not care (because we're not coming here again
+	//  - if it's empty, explictly set it to the current URL (to work against wrong referer data),
+	//    _and_ add a GET param like "msg_sent=1".
+	// IMHO this is kinda trivial, but the most robust method.
 	require $skins_path.'_msgform.php';
 	// ------------------------- END OF MESSAGE FORM -------------------------
 ?>
