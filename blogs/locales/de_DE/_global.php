@@ -293,7 +293,7 @@ folgenden Link:',
 'Click on the following link to not receive e-mails on your comments\nfor this e-mail address anymore:' => 'Klicke auf den folgenden Link, um keine E-Mails mehr für Kommentare
 von dieser E-Mail-Adresse zu bekommen:',
 'Cannot send email, please correct these errors:' => 'Kann die E-Mail nicht versenden, bitte berichtige diese Fehler:',
-'Back to email editing' => 'Zurück zum Editieren der E-MailEintrags',
+'Back to email editing' => 'Zurück zum Editieren der E-Mail',
 'This message was sent via the messaging system on %s.' => 'Diese Nachricht wurde über den Nachrichtendienst von %s gesendet.',
 'Your message has been sent as email to the user.' => 'Deine Nachricht wurde als E-Mail an den Benutzer versendet.',
 'You are not logged in.' => 'Du bist nicht angemeldet.',

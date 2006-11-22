@@ -1298,7 +1298,7 @@ msgstr "Kann die E-Mail nicht versenden, bitte berichtige diese Fehler:"
 
 #: ..\..\..\htsrv\message_send.php:220
 msgid "Back to email editing"
-msgstr "Zurück zum Editieren der E-MailEintrags"
+msgstr "Zurück zum Editieren der E-Mail"
 
 #: ..\..\..\htsrv\message_send.php:228
 #, php-format
