@@ -110,9 +110,6 @@ $sender_address = param( 'f', 'string', '' );
 $subject = param( 'g', 'string', '' );
 $message = param( 'h', 'string', '' );
 
-// Getting current blog info:
-$BlogCache = & get_Cache( 'BlogCache' );
-$Blog = & $BlogCache->get_by_ID( $blog );
 
 if( empty($sender_name) )
 {
@@ -137,6 +134,7 @@ if( empty( $message ) )
 
 // Prevent register_globals injection!
 $recipient_address = '';
+$recepient_name = '';
 $recipient_User = NULL;
 $Comment = NULL;
 
@@ -150,9 +148,10 @@ if( ! empty( $recipient_id ) )
 		debug_die( 'Invalid recipient!' );
 	}
 
-	$recipient_address = trim($recipient_User->get('preferredname')) . ' <' . $recipient_User->get('email') . '>';
-
-	// Change the locale so the email is in the recipients language:
+	$recepient_name = trim($recipient_User->get('preferredname'));
+	$recipient_address =  $recepient_name.' <'.$recipient_User->get('email').'>';
+	
+	// Change the locale so the email is in the recipients language
 	locale_temp_switch($recipient_User->locale);
 }
 elseif( ! empty( $comment_id ) )
@@ -178,10 +177,8 @@ elseif( ! empty( $comment_id ) )
 		debug_die( 'Invalid recipient!' );
 	}
 
-	$recipient_address = trim($Comment->get_author_name()) . ' <' . $Comment->get_author_email() . '>';
-
-	// Change the locale so the email is in the blog's language (better than in the sender's one):
-	locale_temp_switch($Blog->locale);
+	$recepient_name = trim($Comment->get_author_name());
+	$recipient_address =  $recepient_name.' <'.$Comment->get_author_email().'>';
 }
 
 if( empty($recipient_address) )
@@ -191,25 +188,40 @@ if( empty($recipient_address) )
 
 
 // Build message footer:
+$BlogCache = & get_Cache( 'BlogCache' );
 $message_footer = '';
 if( !empty( $comment_id ) )
 {
+	// Getting current blog info:
+	$Blog = & $BlogCache->get_by_ID( $blog );	// Required
 	$message_footer .= T_('Message sent from your comment:') . "\n"
 		.url_add_param( $Blog->get('url'), 'p='.$post_id.'&c=1&tb=1&pb=1#'.$comment_id, '&' )
 		."\n\n";
 }
 elseif( !empty( $post_id ) )
 {
+	// Getting current blog info:
+	$Blog = & $BlogCache->get_by_ID( $blog );	// Required
 	$message_footer .= T_('Message sent from your post:') . "\n"
 		.url_add_param( $Blog->get('url'), 'p='.$post_id.'&c=1&tb=1&pb=1', '&' )
 		."\n\n";
+}
+else
+{
+	// Getting current blog info:
+	$Blog = & $BlogCache->get_by_ID( $blog, true, false );	// Optional
+	
 }
 
 // opt-out links:
 if( $recipient_User )
 { // Member:
-	$message_footer .= T_("You can edit your profile to not receive mails through a form:")
-		."\n".url_add_param( str_replace( '&amp;', '&', $Blog->get('url') ), 'disp=profile', '&' );
+	if( !empty( $Blog ) )
+	{
+		$message_footer .= T_("You can edit your profile to not reveive mails through a form:")
+			."\n".url_add_param( str_replace( '&amp;', '&', $Blog->get('url') ), 'disp=profile', '&' );
+	}
+	// TODO: else go to admin
 }
 elseif( $Comment )
 { // Visitor:
@@ -234,13 +246,21 @@ if( $Messages->count( 'error' ) )
 	exit;
 }
 
-
-$message = $message
-	."\n\n-- \n"
-	.sprintf( T_('This message was sent via the messaging system on %s.'), $Blog->name ).".\n"
-	.$Blog->get('url') . "\n\n"
-	.$message_footer;
-
+if( !empty( $Blog ) )
+{
+	$message = $message
+		."\n\n-- \n"
+		.sprintf( T_('This message was sent via the messaging system on %s.'), $Blog->name ).".\n"
+		.$Blog->get('url') . "\n\n"
+		.$message_footer;
+}
+else
+{
+	$message = $message
+		."\n\n-- \n"
+		.sprintf( T_('This message was sent via the messaging system on %s.'), $baseurl ).".\n\n"
+		.$message_footer;
+}
 
 // Send mail
 $success_mail = send_mail( $recipient_address, $subject, $message, "$sender_name <$sender_address>" );
@@ -255,7 +275,14 @@ locale_restore_previous();
 
 if( $success_mail )
 {
-	$Messages->add( T_('Your message has been sent as email to the user.'), 'success' );
+	if( ! empty($recepient_name) )
+	{
+		$Messages->add( sprintf( T_('Your message has been sent as email to %s.'), $recepient_name ), 'success' );
+	}
+	else
+	{
+		$Messages->add( T_('Your message has been sent as email to the user.'), 'success' );
+	}
 }
 else
 {
@@ -274,6 +301,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.41  2006/11/22 01:20:33  fplanque
+ * contact the admin feature
+ *
  * Revision 1.40  2006/11/20 22:21:46  blueyed
  * Fixed typo
  *

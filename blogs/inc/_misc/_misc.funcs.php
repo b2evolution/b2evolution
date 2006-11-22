@@ -1619,6 +1619,8 @@ function debug_info( $force = false )
  * Note: we use a single \n as line ending, though it does not comply to
  * {@link http://www.faqs.org/rfcs/rfc2822 RFC2822}, but seems to be safer,
  * because some mail transfer agents replace \n by \r\n automatically.
+ * 
+ * @todo Unit testing with "nice addresses" This gets broken over and over again.
  *
  * @param string Recipient, either email only or in "Name <example@example.com>" format (RFC2822).
  *               Can be multiple comma-separated addresses.
@@ -1640,8 +1642,11 @@ function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
 	if( is_windows() )
 	{	// fplanque: Windows XP, Apache 1.3, PHP 4.4, MS SMTP : will not accept "nice" addresses.
 		$to = preg_replace( '/^.*?<(.+?)>$/', '$1', $to );
+		$from = preg_replace( '/^.*?<(.+?)>$/', '$1', $from );
 	}
 
+	// echo 'sending email to: ['.htmlspecialchars($to).'] from ['.htmlspecialchars($from).']';
+	
 	if( !is_array( $headers ) )
 	{ // Make sure $headers is an array
 		$headers = array( $headers );
@@ -1763,9 +1768,8 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  * @param string word to be displayed after icon
  * @param integer 1-5: weight of the icon. the icon will be displayed only if its weight is >= than the user setting threshold
  *                     Use 5, if it's a required icon - all others could get disabled by the user.
- *                     dh> Is the above addition correct, Francois?
  * @param integer 1-5: weight of the word. the word will be displayed only if its weight is >= than the user setting threshold
- * @param array Additional attributes to the A tag. The values most be properly encoded for html output (e.g. quotes).
+ * @param array Additional attributes to the A tag. The values must be properly encoded for html output (e.g. quotes).
  *        It may also contain these params:
  *         - 'use_js_popup': if true, the link gets opened as JS popup. You must also pass an "id" attribute for this!
  *         - 'use_js_size': use this to override the default popup size ("500, 400")
@@ -2120,7 +2124,7 @@ function get_ip_list( $firstOnly = false )
  * Gets a max of 3 domain parts (x.y.tld)
  *
  * @param string URL
- * @return string|false the base domain; false if we could not extract the base domain
+ * @return string the base domain
  */
 function get_base_domain( $url )
 {
@@ -2128,25 +2132,20 @@ function get_base_domain( $url )
 	// Chop away the http part and the path:
 	$domain = preg_replace( '~^([a-z]+://)?([^:/]+)(.*)$~i', '\\2', $url );
 
-	if( preg_match( '~^[0-9.]+$~', $domain ) )
-	{	// All numeric = IP address, don't try to cut it any further
+	if( empty($domain) || preg_match( '~^[0-9.]+$~', $domain ) )
+	{	// Empty or All numeric = IP address, don't try to cut it any further
 		return $domain;
 	}
 
 	//echo '<br>'.$domain;
-
+	
 	// Get the base domain up to 3 levels (x.y.tld):
-	preg_match( '~(?: \w+ \.)? (?: \w+ \.)? (\w+) $~x', $domain, $matches );
-	if( ! isset($matches[1]) )
-	{ // no match
-		return $domain;
-	}
-
-	$base_domain = $matches[1];
-
+	preg_match( '~(\w+ \.)? ( \w+ \.) ? \w+ $~x', $domain, $matches );
+	$base_domain = $matches[0];
+	
 	// Remove any www*. prefix:
 	$base_domain = preg_replace( '~^(www \w* \. )~xi', '', $base_domain );
-
+		
 	//echo '<br>'.$base_domain.'</p>';
 
 	return $base_domain;
@@ -2755,6 +2754,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.141  2006/11/22 01:19:34  fplanque
+ * contact the admin feature
+ *
  * Revision 1.140  2006/11/22 00:24:38  blueyed
  * Fixed get_base_domain() for empty URL/domain
  *

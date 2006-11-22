@@ -100,6 +100,7 @@ if( $Blog_all->get( 'stub' ) != '' )
 	<li><strong><?php echo T_('Custom template') ?>: <a href="multiblogs.php"><?php echo T_('Multiple blogs displayed on the same page') ?></a></strong> &nbsp; (multiblogs.php)</li>
 	<li><strong><?php echo T_('Custom template') ?>: <a href="summary.php"><?php echo T_('Summary of last posts in all blogs') ?></a></strong> &nbsp; (summary.php)</li>
 	<li><strong><?php echo T_('Custom template') ?>: <a href="default.php"><?php echo T_('The page you\'re looking at') ?></a></strong> &nbsp; (default.php)</li>
+	<li><strong><?php echo T_('Bonus feature') ?>: <a href="contact.php"><?php echo T_('A standalone form to contact the admin (A contact page for your site)') ?></a></strong> &nbsp; (contact.php)</li>
 </ul>
 <p><?php echo T_('Please note: those demos do not make use of evoSkins, even if you enabled them during install. The only way to change their look and feel is to edit their PHP template. But once, again, remember these are just demos destined to inspire you for your own templates ;)') ?></p>
 
