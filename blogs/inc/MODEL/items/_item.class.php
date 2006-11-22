@@ -734,33 +734,15 @@ class Item extends DataObject
 			$format = 'htmlbody'
 		)
 	{
-		global $cache_postcats;
-
 		if( $link_title == '#' )
 		{ /* TRANS: When the categories for a specific post are displayed, the user can click
 					on these cats to browse them, this is the default href title displayed there */
 			$link_title = T_('Browse category');
 		}
 
-		$ChapterCache = & get_Cache( 'ChapterCache' );
-
-		// Load cache for category associations with current posts
-		cat_load_postcats_cache();
-
-		if( isset($cache_postcats[$this->ID]) )
-		{ // dh> may not be set! (demo logs)
-			$categoryIDs = $cache_postcats[$this->ID];
-		}
-		else $categoryIDs = array();
-
 		$categoryNames = array();
-		foreach( $categoryIDs as $cat_ID )
+		foreach( $this->get_Chapters() as $Chapter )
 		{
-			/**
-			 * @var Chapter
-			 */
-			$Chapter = & $ChapterCache->get_by_ID( $cat_ID );
-
 			$cat_name = $Chapter->dget( 'name' );
 
 			if( !empty($link_title) )
@@ -769,7 +751,7 @@ class Item extends DataObject
 				$cat_name = '<a href="'.$Chapter->get_permanent_url().'" title="'.$link_title.'">'.$cat_name.'</a>';
 			}
 
-			if( $cat_ID == $this->main_cat_ID )
+			if( $Chapter->ID == $this->main_cat_ID )
 			{ // We are displaying the main cat!
 				if( $before_main == 'hide' )
 				{ // ignore main cat !!!
@@ -796,6 +778,7 @@ class Item extends DataObject
 
 			$categoryNames[] = $cat_name;
 		}
+
 		echo format_to_output( implode( $separator, $categoryNames ), $format);
 	}
 
@@ -807,12 +790,53 @@ class Item extends DataObject
 	 */
 	function main_category( $format = 'htmlbody' )
 	{
+		$Chapter = & $this->get_main_Chapter();
+		$Chapter->disp( 'name', $format );
+	}
+
+
+	/**
+	 * Get list of Chapter objects.
+	 *
+	 * @return array of {@link Chapter chapters} (references)
+	 */
+	function get_Chapters()
+	{
+		global $cache_postcats;
+
+		$ChapterCache = & get_Cache( 'ChapterCache' );
+
+		// Load cache for category associations with current posts
+		cat_load_postcats_cache();
+
+		if( isset($cache_postcats[$this->ID]) )
+		{ // dh> may not be set! (demo logs)
+			$categoryIDs = $cache_postcats[$this->ID];
+		}
+		else $categoryIDs = array();
+
+		$chapters = array();
+		foreach( $categoryIDs as $cat_ID )
+		{
+			$chapters[] = & $ChapterCache->get_by_ID( $cat_ID );
+		}
+
+		return $chapters;
+	}
+
+
+	/**
+	 * Get the main Chapter.
+	 *
+	 * @return Chapter
+	 */
+	function & get_main_Chapter()
+	{
 		$ChapterCache = & get_Cache( 'ChapterCache' );
 		/**
 		 * @var Chapter
 		 */
-		$Chapter = & $ChapterCache->get_by_ID( $this->main_cat_ID );
-		$Chapter->disp( 'name', $format );
+		return $ChapterCache->get_by_ID( $this->main_cat_ID );
 	}
 
 
@@ -2551,6 +2575,7 @@ class Item extends DataObject
 	 * This function has to handle all needed DB dependencies!
 	 *
 	 * @todo cleanup the set() calls
+	 * @todo dh> bloat! better to use a set() + dbinsert() IMHO..
 	 */
 	function insert(
 		$author_user_ID,              // Author
@@ -3289,6 +3314,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.122  2006/11/22 20:48:58  blueyed
+ * Added Item::get_Chapters() and Item::get_main_Chapter(); refactorized
+ *
  * Revision 1.121  2006/11/22 20:12:18  blueyed
  * Use $format param in Item::categories()
  *
