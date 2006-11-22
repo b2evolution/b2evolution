@@ -237,6 +237,7 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 	 */
 	function test_get_base_domain()
 	{
+		$this->assertEqual( get_base_domain(''), '' ); // Example: empty referer
 		$this->assertEqual( get_base_domain('hostname'), 'hostname' );
 		$this->assertEqual( get_base_domain('http://hostname'), 'hostname' );
 		$this->assertEqual( get_base_domain('www.example.com'), 'example.com' );
@@ -247,7 +248,6 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( get_base_domain('https://sub1.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
 		$this->assertEqual( get_base_domain('https://hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
 		$this->assertEqual( get_base_domain('https://hello.example.com:8080/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
-		$this->assertEqual( get_base_domain(''), false );
 	}
 
 
