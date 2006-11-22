@@ -1619,7 +1619,7 @@ function debug_info( $force = false )
  * Note: we use a single \n as line ending, though it does not comply to
  * {@link http://www.faqs.org/rfcs/rfc2822 RFC2822}, but seems to be safer,
  * because some mail transfer agents replace \n by \r\n automatically.
- * 
+ *
  * @todo Unit testing with "nice addresses" This gets broken over and over again.
  *
  * @param string Recipient, either email only or in "Name <example@example.com>" format (RFC2822).
@@ -1646,7 +1646,7 @@ function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
 	}
 
 	// echo 'sending email to: ['.htmlspecialchars($to).'] from ['.htmlspecialchars($from).']';
-	
+
 	if( !is_array( $headers ) )
 	{ // Make sure $headers is an array
 		$headers = array( $headers );
@@ -2124,7 +2124,7 @@ function get_ip_list( $firstOnly = false )
  * Gets a max of 3 domain parts (x.y.tld)
  *
  * @param string URL
- * @return string the base domain
+ * @return string the base domain (may become empty, if found invalid)
  */
 function get_base_domain( $url )
 {
@@ -2132,20 +2132,25 @@ function get_base_domain( $url )
 	// Chop away the http part and the path:
 	$domain = preg_replace( '~^([a-z]+://)?([^:/]+)(.*)$~i', '\\2', $url );
 
-	if( empty($domain) || preg_match( '~^[0-9.]+$~', $domain ) )
+	if( empty($domain) || preg_match( '~^([0-9]+\.)+$~', $domain ) )
 	{	// Empty or All numeric = IP address, don't try to cut it any further
 		return $domain;
 	}
 
 	//echo '<br>'.$domain;
-	
+
 	// Get the base domain up to 3 levels (x.y.tld):
-	preg_match( '~(\w+ \.)? ( \w+ \.) ? \w+ $~x', $domain, $matches );
+	// NOTE: "_" is not really valid, but for Windows it is..
+	// TODO: dh> this should also handle IDN "raw" domains with umlauts..
+	if( ! preg_match( '~([a-z0-9][a-z0-9-_]*\.){0,2} ([a-z0-9][a-z0-9-_]*)$~ix', $domain, $matches ) )
+	{
+		return '';
+	}
 	$base_domain = $matches[0];
-	
+
 	// Remove any www*. prefix:
-	$base_domain = preg_replace( '~^(www \w* \. )~xi', '', $base_domain );
-		
+	$base_domain = preg_replace( '~^(www\w*\.)~i', '', $base_domain );
+
 	//echo '<br>'.$base_domain.'</p>';
 
 	return $base_domain;
@@ -2754,6 +2759,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.142  2006/11/22 18:47:59  blueyed
+ * Fixed get_base_domain() again some more; added tests (2 failing ones)
+ *
  * Revision 1.141  2006/11/22 01:19:34  fplanque
  * contact the admin feature
  *

@@ -248,6 +248,20 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( get_base_domain('https://sub1.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
 		$this->assertEqual( get_base_domain('https://hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
 		$this->assertEqual( get_base_domain('https://hello.example.com:8080/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
+
+		// "-" is a valid char:
+		$this->assertEqual( get_base_domain('host-name'), 'host-name' );
+
+		// IDN:
+		$this->assertEqual( get_base_domain('pröhl.de'), 'pröhl.de' );
+		$this->assertEqual( get_base_domain('sub1.sub2.pröhl.de'), 'sub2.pröhl.de' );
+
+		// QUESTION: is it ok, that the following pass? remember: we may receive quite anything..
+		$this->assertEqual( get_base_domain('.de'), 'de' );
+		$this->assertEqual( get_base_domain('.....de'), 'de' );
+		$this->assertIdentical( get_base_domain('...'), '' );
+		$this->assertIdentical( get_base_domain( '1..' ), '' );
+		$this->assertIdentical( get_base_domain( chr(0) ), '' );
 	}
 
 
