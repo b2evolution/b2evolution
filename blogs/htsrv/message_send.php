@@ -134,7 +134,7 @@ if( empty( $message ) )
 
 // Prevent register_globals injection!
 $recipient_address = '';
-$recepient_name = '';
+$recipient_name = '';
 $recipient_User = NULL;
 $Comment = NULL;
 
@@ -148,9 +148,9 @@ if( ! empty( $recipient_id ) )
 		debug_die( 'Invalid recipient!' );
 	}
 
-	$recepient_name = trim($recipient_User->get('preferredname'));
-	$recipient_address =  $recepient_name.' <'.$recipient_User->get('email').'>';
-	
+	$recipient_name = trim($recipient_User->get('preferredname'));
+	$recipient_address =  $recipient_name.' <'.$recipient_User->get('email').'>';
+
 	// Change the locale so the email is in the recipients language
 	locale_temp_switch($recipient_User->locale);
 }
@@ -177,8 +177,12 @@ elseif( ! empty( $comment_id ) )
 		debug_die( 'Invalid recipient!' );
 	}
 
-	$recepient_name = trim($Comment->get_author_name());
-	$recipient_address =  $recepient_name.' <'.$Comment->get_author_email().'>';
+	$recipient_name = trim($Comment->get_author_name());
+	$recipient_address =  $recipient_name.' <'.$Comment->get_author_email().'>';
+
+	// Change the locale so the email is in the blog's language (better than in the sender's one):
+	// TODO: dh> why has this been removed???:
+	// locale_temp_switch($Blog->locale);
 }
 
 if( empty($recipient_address) )
@@ -210,7 +214,7 @@ else
 {
 	// Getting current blog info:
 	$Blog = & $BlogCache->get_by_ID( $blog, true, false );	// Optional
-	
+
 }
 
 // opt-out links:
@@ -275,9 +279,9 @@ locale_restore_previous();
 
 if( $success_mail )
 {
-	if( ! empty($recepient_name) )
+	if( ! empty($recipient_name) )
 	{
-		$Messages->add( sprintf( T_('Your message has been sent as email to %s.'), $recepient_name ), 'success' );
+		$Messages->add( sprintf( T_('Your message has been sent as email to %s.'), $recipient_name ), 'success' );
 	}
 	else
 	{
@@ -301,6 +305,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.42  2006/11/22 19:12:22  blueyed
+ * Normalized. TODO about feature regression
+ *
  * Revision 1.41  2006/11/22 01:20:33  fplanque
  * contact the admin feature
  *
