@@ -259,6 +259,9 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( get_base_domain('www-öl.käse-öl.de'), 'käse-öl.de' );
 		$this->assertEqual( get_base_domain('sub1.sub2.pröhl.de'), 'sub2.pröhl.de' );
 
+		// Invalid:
+		$this->assertEqual( get_base_domain('_host'), '' ); // fist char needs to be alphanumeric
+
 		// The following may not be valid in the future but seem good enough for now:
 		$this->assertEqual( get_base_domain('.de'), 'de' );
 		$this->assertEqual( get_base_domain('.....de'), 'de' );

@@ -2142,6 +2142,8 @@ function get_base_domain( $url )
 	// Get the base domain up to 3 levels (x.y.tld):
 	// NOTE: "_" is not really valid, but for Windows it is..
 	// TODO: dh> this should also handle IDN "raw" domains with umlauts..
+	// NOTE: \w does not match umlauts always.. it's based on setlocale()..
+	// NOTE: \w includes "_"
 	if( ! preg_match( '~  ( \w (\w|-|_)* \. ){0,2}   \w (\w|-|_)*  $~ix', $domain, $matches ) )
 	{
 		return '';
@@ -2150,7 +2152,7 @@ function get_base_domain( $url )
 
 	// Remove any www*. prefix:
 	$base_domain = preg_replace( '~^(www (\w|-|_)* \. )~xi', '', $base_domain );
-		
+
 	//echo '<br>'.$base_domain.'</p>';
 
 	return $base_domain;
@@ -2759,6 +2761,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.144  2006/11/23 23:20:11  blueyed
+ * get_base_domain(): added test, whcih currently fails + notes
+ *
  * Revision 1.143  2006/11/23 02:29:00  fplanque
  * fixed IDN and more IDN
  *
