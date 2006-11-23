@@ -45,6 +45,8 @@ header( 'Content-Type: text/html; charset='.$io_charset );
 
 // TODO: Flood protection (Use Hit class to prevent mass mailings to members..)
 
+// --------------------------------------------------
+// TODO: fp> v2.0: this bloats this file. MOVE to msg_remove.php or sth alike
 if( param( 'optout_cmt_email', 'string', '' ) )
 { // an anonymous commentator wants to opt-out from receiving mails through a message form:
 
@@ -99,6 +101,8 @@ if( param( 'optout_cmt_email', 'string', '' ) )
 	debug_info();
 	exit;
 }
+// END OF BLOCK TO BE MOVED
+// --------------------------------------------------
 
 
 // Getting GET or POST parameters:
@@ -106,7 +110,7 @@ param( 'blog', 'integer', '' );
 param( 'recipient_id', 'integer', '' );
 param( 'post_id', 'integer', '' );
 param( 'comment_id', 'integer', '' );
-// Note: we use funky field name in order to defeat the most basic guestbook spam bots:
+// Note: we use funky field names in order to defeat the most basic guestbook spam bots:
 $sender_name = param( 'd', 'string', '' );
 $sender_address = param( 'f', 'string', '' );
 $subject = param( 'g', 'string', '' );
@@ -134,11 +138,40 @@ if( empty( $message ) )
 	$Messages->add( T_('Please do not send empty messages.'), 'error' );
 }
 
+
 // Prevent register_globals injection!
 $recipient_address = '';
 $recipient_name = '';
 $recipient_User = NULL;
 $Comment = NULL;
+
+
+// Build message footer:
+$BlogCache = & get_Cache( 'BlogCache' );
+$message_footer = '';
+if( !empty( $comment_id ) )
+{
+	// Getting current blog info:
+	$Blog = & $BlogCache->get_by_ID( $blog );	// Required
+	$message_footer .= T_('Message sent from your comment:') . "\n"
+		.url_add_param( $Blog->get('url'), 'p='.$post_id.'&c=1&tb=1&pb=1#'.$comment_id, '&' )
+		."\n\n";
+}
+elseif( !empty( $post_id ) )
+{
+	// Getting current blog info:
+	$Blog = & $BlogCache->get_by_ID( $blog );	// Required
+	$message_footer .= T_('Message sent from your post:') . "\n"
+		.url_add_param( $Blog->get('url'), 'p='.$post_id.'&c=1&tb=1&pb=1', '&' )
+		."\n\n";
+}
+else
+{
+	// Getting current blog info:
+	$Blog = & $BlogCache->get_by_ID( $blog, true, false );	// Optional
+
+}
+
 
 if( ! empty( $recipient_id ) )
 { // Get the email address for the recipient if a member:
@@ -182,9 +215,8 @@ elseif( ! empty( $comment_id ) )
 	$recipient_name = trim($Comment->get_author_name());
 	$recipient_address =  $recipient_name.' <'.$Comment->get_author_email().'>';
 
-	// Change the locale so the email is in the blog's language (better than in the sender's one):
-	// TODO: dh> why has this been removed???:
-	// locale_temp_switch($Blog->locale);
+	// We don't know the receipient's language - Change the locale so the email is in the blog's language:
+	locale_temp_switch($Blog->locale);
 }
 
 if( empty($recipient_address) )
@@ -192,32 +224,6 @@ if( empty($recipient_address) )
 	debug_die( 'No recipient specified!' );
 }
 
-
-// Build message footer:
-$BlogCache = & get_Cache( 'BlogCache' );
-$message_footer = '';
-if( !empty( $comment_id ) )
-{
-	// Getting current blog info:
-	$Blog = & $BlogCache->get_by_ID( $blog );	// Required
-	$message_footer .= T_('Message sent from your comment:') . "\n"
-		.url_add_param( $Blog->get('url'), 'p='.$post_id.'&c=1&tb=1&pb=1#'.$comment_id, '&' )
-		."\n\n";
-}
-elseif( !empty( $post_id ) )
-{
-	// Getting current blog info:
-	$Blog = & $BlogCache->get_by_ID( $blog );	// Required
-	$message_footer .= T_('Message sent from your post:') . "\n"
-		.url_add_param( $Blog->get('url'), 'p='.$post_id.'&c=1&tb=1&pb=1', '&' )
-		."\n\n";
-}
-else
-{
-	// Getting current blog info:
-	$Blog = & $BlogCache->get_by_ID( $blog, true, false );	// Optional
-
-}
 
 // opt-out links:
 if( $recipient_User )
@@ -256,15 +262,15 @@ if( !empty( $Blog ) )
 {
 	$message = $message
 		."\n\n-- \n"
-		.sprintf( T_('This message was sent via the messaging system on %s.'), $Blog->name ).".\n"
-		.$Blog->get('url') . "\n\n"
+		.sprintf( T_('This message was sent via the messaging system on %s.'), $Blog->name )."\n"
+		.$Blog->get('url')."\n\n"
 		.$message_footer;
 }
 else
 {
 	$message = $message
 		."\n\n-- \n"
-		.sprintf( T_('This message was sent via the messaging system on %s.'), $baseurl ).".\n\n"
+		.sprintf( T_('This message was sent via the messaging system on %s.'), $baseurl )."\n\n"
 		.$message_footer;
 }
 
@@ -283,11 +289,11 @@ if( $success_mail )
 {
 	if( ! empty($recipient_name) )
 	{
-		$Messages->add( sprintf( T_('Your message has been sent as email to %s.'), $recipient_name ), 'success' );
+		$Messages->add( sprintf( T_('Your message has been e-mailed to %s.'), $recipient_name ), 'success' );
 	}
 	else
 	{
-		$Messages->add( T_('Your message has been sent as email to the user.'), 'success' );
+		$Messages->add( T_('Your message has been e-mailed to the user.'), 'success' );
 	}
 }
 else
@@ -307,11 +313,15 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.44  2006/11/23 01:44:24  fplanque
+ * finalized standalone messaging
+ * changed block order so that $Blog gets initalized
+ *
  * Revision 1.43  2006/11/22 19:20:51  blueyed
  * Output charset header
  *
  * Revision 1.42  2006/11/22 19:12:22  blueyed
- * Normalized. TODO about feature regression
+ * Normalized. TODO about merge error
  *
  * Revision 1.41  2006/11/22 01:20:33  fplanque
  * contact the admin feature
