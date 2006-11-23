@@ -40,7 +40,7 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 
 		if( ! can_convert_charsets('ISO-8859-1', 'UTF-8') || ! can_convert_charsets('UTF-8', 'ISO-8859-1') )
 		{
-			echo "Skipping test (cannot convert)...n";
+			echo "Skipping test (cannot convert)...\n";
 		}
 
 		$this->assertEqual( urltitle_validate('', 'ִצüשי'), 'aeoeueue' );
