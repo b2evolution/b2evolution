@@ -75,18 +75,24 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 		$urltitle = convert_charset( $urltitle, 'UTF-8', $evo_charset );
 
 		// TODO: add more...?!
-		$search = array( 'Ä', 'ä', 'Ö', 'ö', 'Ü', 'ü', 'ß', 'à', 'è', 'é', 'ì', 'ò', 'ù' ); // iso-8859-1
-		$replace = array( 'Ae', 'ae', 'Oe', 'oe', 'Ue', 'ue', 'ss', 'a', 'e', 'e', 'i', 'o', 'u' );
+		$search = array( 'Ä', 'ä', 'Ö', 'ö', 'Ü', 'ü', 'ß', 'à', 'ç', 'è', 'é', 'ì', 'ò', 'ô', 'ù' ); // iso-8859-1
+		$replace = array( 'Ae', 'ae', 'Oe', 'oe', 'Ue', 'ue', 'ss', 'a', 'c', 'e', 'e', 'i', 'o', 'o', 'u' );
 
 		foreach( $search as $k => $v )
 		{ // convert $search to UTF-8
 			$search[$k] = convert_charset( $v, 'UTF-8', 'ISO-8859-1' );
 		}
 		$urltitle = str_replace( $search, $replace, $urltitle );
+
+		// Replace HTML entities
+		$urltitle = htmlentities( $urltitle, ENT_NOQUOTES, 'UTF-8' );
+	}
+	else
+	{
+		// Replace HTML entities
+		$urltitle = htmlentities( $urltitle, ENT_NOQUOTES, $evo_charset );
 	}
 
-	// Replace HTML entities
-	$urltitle = htmlentities( $urltitle, ENT_NOQUOTES );
 	// Keep only one char in entities!
 	$urltitle = preg_replace( '/&(.).+?;/', '$1', $urltitle );
 	// Replace non acceptable chars
@@ -667,6 +673,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.30  2006/11/23 00:37:35  blueyed
+ * Added two more replacements in urltitle_validate and pass charset to htmlentities()
+ *
  * Revision 1.29  2006/11/17 23:29:54  blueyed
  * Replaced cat_query() calls with cat_load_cache()
  *
