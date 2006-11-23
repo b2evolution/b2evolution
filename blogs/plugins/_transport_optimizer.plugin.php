@@ -70,25 +70,26 @@ class transport_optimizer_plugin extends Plugin
 			'use_etags' => array(
 					'label' => T_('ETag header'),
 					'type' => 'checkbox',
-					'defaultvalue' => '1',
+					'defaultvalue' => 1,
 					'note' => T_('This will send an ETag header with every page, so we can say "Not Modified." if exactly the same page had been sent before.'),
 				),
 			'use_gzipcompression' => array(
 					'label' => T_('GZip compression'),
 					'type' => 'checkbox',
-					'defaultvalue' => '1',
-					'note' => T_('If enabled, the plugin will buffer the output and compress it before sending it to the browser. It is recommened to use the php.ini option zlib.output_compression or a webserver module instead.'),
+					'defaultvalue' => 0,
+					'note' => T_('If enabled, the plugin will buffer the output and compress it before sending it to the browser. It is recommened to use the php.ini option zlib.output_compression or a webserver module instead.')
+						.'<br />'.T_('WARNING: this can use a lot of memory (to temporarily buffer the output) and may cause e.g. your yearly archives to fail displaying at all.'),
 				),
 			'send_last_modified' => array(
 					'label' => T_('Last-Modified'),
 					'type' => 'checkbox',
-					'defaultvalue' => '1',
+					'defaultvalue' => 1,
 					'note' => T_('This will send a Last-Modified header with the current time.'),
 				),
 			'lastmod_feeds' => array(
 					'label' => T_('Check If-Modified-Since'),
 					'type' => 'checkbox',
-					'defaultvalue' => '1',
+					'defaultvalue' => 1,
 					'note' => T_('This checks a If-Modified-Since header sent by the browser and sends a "Not Modified" response, if applicable.')
 						.' '.T_('This only works with feeds for items currently.'),
 				),
@@ -226,6 +227,9 @@ class transport_optimizer_plugin extends Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.10  2006/11/23 00:18:33  blueyed
+ * "use_gzipcompression" off by default + Warning
+ *
  * Revision 1.9  2006/11/12 02:26:11  blueyed
  * lastmod_feeds setting: send 304 HTTP response, if item feeds have not changed and If-Modified-Since is present
  *
