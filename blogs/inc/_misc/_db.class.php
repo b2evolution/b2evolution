@@ -706,7 +706,7 @@ class DB
 		}
 		else
 		{ // Query was a select, alter, etc...:
-			$num_rows = 0;
+			$this->num_rows = 0;
 
 			if( is_resource($this->result) )
 			{ // It's not a resource for CREATE or DROP for example and can even trigger a fatal error (see http://forums.b2evolution.net//viewtopic.php?t=9529)
@@ -715,13 +715,11 @@ class DB
 				while( $row = mysql_fetch_object($this->result) )
 				{
 					// Store relults as an objects within main array
-					$this->last_result[$num_rows] = $row;
-					$num_rows++;
+					$this->last_result[$this->num_rows] = $row;
+					$this->num_rows++;
 				}
 			}
 
-			// Log number of rows the query returned
-			$this->num_rows = $num_rows;
 			if( $this->log_queries )
 			{	// We want to log queries:
 				$this->queries[ $this->num_queries - 1 ]['rows'] = $this->num_rows;
@@ -755,16 +753,13 @@ class DB
 			$this->result = @mysql_query( 'EXPLAIN '.$query, $this->dbhandle );
 
 			// Store Query Results
-			$num_rows = 0;
+			$this->num_rows = 0;
 			while( $row = @mysql_fetch_object($this->result) )
 			{
 				// Store results as an objects within main array
-				$this->last_result[$num_rows] = $row;
-				$num_rows++;
+				$this->last_result[$this->num_rows] = $row;
+				$this->num_rows++;
 			}
-
-			// Log number of rows the query returned
-			$this->num_rows = $num_rows;
 
 			if( $this->log_queries )
 			{	// We want to log queries:
@@ -1425,6 +1420,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.41  2006/11/23 15:33:58  blueyed
+ * Small opt
+ *
  * Revision 1.40  2006/11/20 12:23:28  blueyed
  * Optimized col_info handling: obsoleted DB::col_info: use DB::get_col_info() instead (lazy-loading of column info)
  *
