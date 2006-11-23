@@ -1,6 +1,9 @@
 <?php
 /**
- * TODO: dh> desc...
+ * This is a demo template displaying a form to contact the admin user of the site
+ *
+ * This template is designed to be used aside of your blog, in case you have a website containing other sections than your blog.
+ * This lets you use b2evolution as a contact form handler outside of your blog per se.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -11,7 +14,14 @@
  */
 
 // The User ID of the administrator:
-$recipient_id = 1;
+$recipient_id = 1; 
+
+// Tie this to no blog in particular. (Do not include a link to any blog in the emails you will receive).
+$blog = 0;
+
+// This is the page where we want to go after sending an email. (This page should be able to display $Messages)
+// If empty, we will default to return to the same page, but you could put any URL here.
+$redirect_to = '';
 
 /**
  * Check this: we are requiring _main.inc.php INSTEAD of _blog_main.inc.php because we are not
@@ -20,6 +30,11 @@ $recipient_id = 1;
 require_once dirname(__FILE__).'/conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
+
+
+// Are we returning to this page?
+param( 'return', 'integer', 0 );
+	
 
 header( 'Content-type: text/html; charset='.$io_charset );
 ?>
@@ -93,20 +108,25 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 <?php
 	// ----------------------------- MESSAGE FORM ----------------------------
-	// fp> TODO: inject a flag into session to indicate mail has been successfully sent and do not display the form on success (it's confusing)
-	// Daniel, if you could show me how you would do it, it would be nice (I did not look into naming conventions so far 'core.xxx' etc).
-	// dh> should the user return to this page at all? At least redirect_to should be passed/used.
-	// Then, a flag may be set in message_send.php, but it would fail, if the User sends a mail
-	// to some user (e.g. through a Comment) and then clicks on the contact link.
-	// Registering a shutdown function might help: check $success_mail and set your very own flag
-	// (e.g. "core.contact.sent" with a decent timeout). But this might fail, if the browser gets
-	// here again, while the shutdown is still in progress.
-	// Another option:
-	//  - if redirect_url is not empty, do not care (because we're not coming here again
-	//  - if it's empty, explictly set it to the current URL (to work against wrong referer data),
-	//    _and_ add a GET param like "msg_sent=1".
-	// IMHO this is kinda trivial, but the most robust method.
-	require $skins_path.'_msgform.php';
+	if( empty( $return ) )
+	{	// We are *not* coming back after sending a message:
+
+		if( empty( $redirect_to ) )
+		{	// We haven't asked for a specific return URL, so we'll come back to here with a param.
+			$redirect_to = url_add_param( $ReqURI, 'return=1', '&' );
+		}
+		
+		// The form, per se:
+		require $skins_path.'_msgform.php';
+	}
+	else
+	{	// We are coming back after sending a message:
+	
+		echo '<p>'.T_('Thank you for your message. I will reply as soon as possible.').'</p>';
+		
+		// This is useful for testing but does not really make sense on production:
+		echo '<p><a href="'.regenerate_url().'">'.T_('Send another message?').'</a></p>';
+	}
 	// ------------------------- END OF MESSAGE FORM -------------------------
 ?>
 
@@ -125,5 +145,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <p class="baseline"><!-- InstanceBeginEditable name="Baseline" -->
 
 <!-- InstanceEndEditable --></p>
+<?php 
+	debug_info();
+?>
 </body>
 <!-- InstanceEnd --></html>
