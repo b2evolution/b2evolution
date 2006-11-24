@@ -260,7 +260,8 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( get_base_domain('sub1.sub2.pröhl.de'), 'sub2.pröhl.de' );
 
 		// Invalid:
-		$this->assertEqual( get_base_domain('_host'), '' ); // fist char needs to be alphanumeric
+		// $this->assertEqual( get_base_domain('_host'), '' ); // fist char needs to be alphanumeric
+		// fp> This function is called get_base_domain(), not validate_domain() . If we receive a domain starting with a _, then it is not a problem to keep it in the base domain.
 
 		// The following may not be valid in the future but seem good enough for now:
 		$this->assertEqual( get_base_domain('.de'), 'de' );
