@@ -11,7 +11,7 @@
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
  *   the same folder or the closest folder above for complete license terms.
- * - If you have received this file individually (e-g: from http://cvs.sourceforge.net/viewcvs.py/evocms/)
+ * - If you have received this file individually (e-g: from http://evocms.cvs.sourceforge.net/)
  *   then you must choose one of the following licenses before using the file:
  *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
  *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
@@ -2784,6 +2784,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.119  2006/11/24 18:27:27  blueyed
+ * Fixed link to b2evo CVS browsing interface in file docblocks
+ *
  * Revision 1.118  2006/11/17 18:36:22  blueyed
  * dbchanges param for AfterItemUpdate, AfterItemInsert, AfterCommentUpdate and AfterCommentInsert
  *

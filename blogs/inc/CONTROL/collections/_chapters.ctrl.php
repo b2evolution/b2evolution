@@ -11,7 +11,7 @@
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
  *   the same folder or the closest folder above for complete license terms.
- * - If you have received this file individually (e-g: from http://cvs.sourceforge.net/viewcvs.py/evocms/)
+ * - If you have received this file individually (e-g: from http://evocms.cvs.sourceforge.net/)
  *   then you must choose one of the following licenses before using the file:
  *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
  *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
@@ -78,6 +78,9 @@ require $control_path.'generic/inc/_generic_recursive_listeditor.php';
 
 /*
  * $Log$
+ * Revision 1.6  2006/11/24 18:27:22  blueyed
+ * Fixed link to b2evo CVS browsing interface in file docblocks
+ *
  * Revision 1.5  2006/09/10 19:32:32  fplanque
  * completed chapter URL name editing
  *
