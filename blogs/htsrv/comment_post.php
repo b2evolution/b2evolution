@@ -323,8 +323,6 @@ if( $Comment->ID )
 		$Messages->add( T_('Your comment has been submitted. It will appear once it has been approved.'), 'success' );
 	}
 }
-// Set Messages into user's session, so they get restored on the next page (after redirect):
-$Session->set( 'Messages', $Messages );
 
 
 header_nocache();
@@ -333,6 +331,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.92  2006/11/24 18:06:02  blueyed
+ * Handle saving of $Messages centrally in header_redirect()
+ *
  * Revision 1.91  2006/11/16 01:59:14  fplanque
  * doc
  *

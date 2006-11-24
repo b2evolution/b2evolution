@@ -115,9 +115,6 @@ switch( $action )
 			// Successful creation, move on to chapters:
 			$Messages->add( T_('You should create chapters for this blog now!'), 'note' );
 
-			// Set Messages into user's session, so they get restored on the next page (after redirect):
-			$Session->set( 'Messages', $Messages );
-
 			header_nocache();
 			header_redirect( 'admin.php?ctrl=chapters2&blog='.$edited_Blog->ID );
 		}
@@ -331,6 +328,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2006/11/24 18:06:02  blueyed
+ * Handle saving of $Messages centrally in header_redirect()
+ *
  * Revision 1.2  2006/09/11 19:36:58  fplanque
  * blog url ui refactoring
  *

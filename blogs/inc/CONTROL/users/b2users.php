@@ -421,8 +421,7 @@ if( !$Messages->count('error') )
 			}
 
 			if( $reload_page )
-			{ // save Messages and reload the current page through header redirection
-				$Session->set( 'Messages', $Messages );
+			{ // reload the current page through header redirection:
 				header_redirect( regenerate_url( 'action', '', '', '&' ) );
 			}
 
@@ -502,8 +501,7 @@ if( !$Messages->count('error') )
 			}
 
 			if( $reload_page )
-			{ // save Messages and reload the current page through header redirection
-				$Session->set( 'Messages', $Messages );
+			{ // reload the current page through header redirection:
 				header_redirect( regenerate_url( 'action', '', '', '&' ) );
 			}
 
@@ -806,6 +804,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.39  2006/11/24 18:06:02  blueyed
+ * Handle saving of $Messages centrally in header_redirect()
+ *
  * Revision 1.38  2006/11/15 21:14:04  blueyed
  * "Restore defaults" in user profile
  *

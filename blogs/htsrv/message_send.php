@@ -215,7 +215,7 @@ elseif( ! empty( $comment_id ) )
 	$recipient_name = trim($Comment->get_author_name());
 	$recipient_address =  $recipient_name.' <'.$Comment->get_author_email().'>';
 
-	// We don't know the receipient's language - Change the locale so the email is in the blog's language:
+	// We don't know the recipient's language - Change the locale so the email is in the blog's language:
 	locale_temp_switch($Blog->locale);
 }
 
@@ -302,9 +302,6 @@ else
 				.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
 }
 
-// Set Messages into user's session, so they get restored on the next page (after redirect):
-$Session->set( 'Messages', $Messages );
-$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
 
 // Header redirection
 header_nocache();
@@ -313,6 +310,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.45  2006/11/24 18:06:02  blueyed
+ * Handle saving of $Messages centrally in header_redirect()
+ *
  * Revision 1.44  2006/11/23 01:44:24  fplanque
  * finalized standalone messaging
  * changed block order so that $Blog gets initalized

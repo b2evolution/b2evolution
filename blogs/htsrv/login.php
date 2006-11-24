@@ -181,8 +181,6 @@ switch( $action )
 
 		// Add Message to change the password:
 		$Messages->add( T_( 'Please change your password to something you remember now.' ), 'success' );
-		$Session->set( 'Messages', $Messages );
-		$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
 
 		// Note: the 'core.changepwd.request_id' Session setting gets removed in b2users.php
 
@@ -242,9 +240,6 @@ switch( $action )
 		{ // User can access backoffice
 			$redirect_to = $admin_url;
 		}
-
-		$Session->set( 'Messages', $Messages );
-		$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
 
 		header_nocache();
 		header_redirect();
@@ -361,6 +356,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.75  2006/11/24 18:06:02  blueyed
+ * Handle saving of $Messages centrally in header_redirect()
+ *
  * Revision 1.74  2006/10/23 22:19:02  blueyed
  * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
  *

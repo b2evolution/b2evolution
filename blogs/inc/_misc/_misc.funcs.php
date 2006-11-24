@@ -2224,6 +2224,9 @@ function header_nocache()
  * can be given as function parameter, GET parameter (redirect_to),
  * is taken from {@link Hit::referer} or {@link $baseurl}).
  *
+ * {@link $Debuglog} and {@link $Messages} get stored in {@link $Session}, so they
+ * are available after the redirect.
+ *
  * NOTE: This function {@link exit() exits} the php script execution.
  *
  * @param string URL to redirect to (overrides detection)
@@ -2232,7 +2235,7 @@ function header_nocache()
 function header_redirect( $redirect_to = NULL, $permanent = false )
 {
 	global $Hit, $baseurl, $Blog, $htsrv_url_sensitive;
-	global $Session, $Debuglog;
+	global $Session, $Debuglog, $Messages;
 
 	if( empty($redirect_to) )
 	{ // see if there's a redirect_to request param given (where & is encoded as &amp;):
@@ -2277,6 +2280,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 	}
 
 
+	// Debuglog:
 	if( $Debuglog->count('all') )
 	{ // Save Debuglog into Session, so that it's available after redirect (gets loaded by Session constructor):
 		$sess_Debuglogs = $Session->get('Debuglogs');
@@ -2285,8 +2289,16 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 
 		$sess_Debuglogs[] = $Debuglog;
 		$Session->set( 'Debuglogs', $sess_Debuglogs, 60 /* expire in 60 seconds */ );
-		$Session->dbsave();
 	}
+
+	// Messages:
+	if( $Messages->count('all') )
+	{ // Set Messages into user's session, so they get restored on the next page (after redirect):
+		$Session->set( 'Messages', $Messages );
+	}
+
+	$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
+
 
  	// see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 	if( $permanent )
@@ -2761,6 +2773,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.145  2006/11/24 18:06:02  blueyed
+ * Handle saving of $Messages centrally in header_redirect()
+ *
  * Revision 1.144  2006/11/23 23:20:11  blueyed
  * get_base_domain(): added test, whcih currently fails + notes
  *
