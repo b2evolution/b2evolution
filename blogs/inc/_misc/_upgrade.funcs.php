@@ -500,6 +500,16 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 						$fieldtype .= trim($match[2]);
 					}
 					$field_to_parse = $match[3];
+
+					// There's a bug with a "NOT NULL" field reported as "NULL", work around it (http://bugs.mysql.com/bug.php?id=20910):
+					if( strtoupper($fieldtype) == 'TIMESTAMP' )
+					{
+						$ct_sql = $DB->get_var( 'SHOW CREATE TABLE '.$table, 1, 0 );
+						if( preg_match( '~^\s*`'.$tablefield->Field.'`\s+TIMESTAMP\s+(NOT )?NULL~im', $ct_sql, $match ) )
+						{
+							$tablefield->Null = empty($match[1]) ? 'YES' : 'NO';
+						}
+					}
 				}
 				elseif( preg_match( '~^'.$tablefield->Field.'\s+ (CHAR|VARCHAR|BINARY|VARBINARY) \s* \( ([\d\s]+) \) (\s+ (BINARY|ASCII|UNICODE) )? (.*)$~ix', $column_definition, $match ) )
 				{
@@ -636,15 +646,8 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 				// "[NOT] NULL" (requires $primary_key_fields to be finalized)
 				if( preg_match( '~(.*?) \b (NOT\s+)? NULL \b (.*)$~ix', $field_to_parse, $match ) )
-				{
-					if( strtoupper($fieldtype) == 'TIMESTAMP' )
-					{ // "[NOT] NULL" gets ignored for TIMESTAMP by MySQL and can always be NULL assigned to
-						$want_null = true;
-					}
-					else
-					{ // if "NOT" not matched it's NULL
-						$want_null = empty($match[2]);
-					}
+				{ // if "NOT" not matched it's NULL
+					$want_null = empty($match[2]);
 					$field_to_parse = $match[1].$match[3];
 				}
 				else
@@ -1041,6 +1044,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.23  2006/11/24 17:41:59  blueyed
+ * Fixed NULL handling of TIMESTAMPs and work around the buggy behaviour I was experiencing
+ *
  * Revision 1.22  2006/08/03 00:56:26  blueyed
  * Fix
  *
