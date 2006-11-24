@@ -1,3 +1,10 @@
+<html>
+<head>
+	<title>Setting up Simple Test for b2evo</title>
+</head>
+
+<body>
+
 <h1>Setting up Simple Test for b2evo</h1>
 
 <h2>1. Get the Simple Test framework</h2>
@@ -5,11 +12,13 @@
 <p>If you want to run the <a href="http://www.lastcraft.com/simple_test.php">Simple Test</a> cases in /tests, you'll have to get the
 simpletest framework. Of course.</p>
 
-<p>You can 
+<p>You can
 <a href="http://sourceforge.net/project/showfiles.php?group_id=76550">download it from SourceForge</a> or get it straight from CVS (password is empty):</p>
 
-<pre>cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/simpletest login
-cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/simpletest co simpletest</pre>
+<pre>
+cvs -d:pserver:anonymous@simpletest.cvs.sourceforge.net:/cvsroot/simpletest login
+cvs -z3 -d:pserver:anonymous@simpletest.cvs.sourceforge.net:/cvsroot/simpletest co simpletest
+</pre>
 
 Put it into the /tests/simpletest directory.
 
@@ -32,3 +41,5 @@ define( 'SIMPLETEST_DIR', '/your/path/with/trailing/slash/' );
 <p><strong> <font color="#FF0000">WARNING: Make sure you configure a TEST database and that you DO NOT run the tests in your normal blog database.</font></strong></p>
 <p>Happy testing..</p>
 
+</body>
+</html>
