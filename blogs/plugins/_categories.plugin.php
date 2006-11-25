@@ -120,10 +120,9 @@ class categories_plugin extends Plugin
 		if(!isset($params['line_end'])) $params['line_end'] = "</li>\n";
 
 		// This is what will enclose the sub chapter lists:
-    // smpdawg - This change doesn't (shouldn't) affect appearance but it does fix an HTML validation issue with category lists
-    // that occurs when you have sub-categories.  If a ul is to be nested in another ul it must be inside an li.
-		if(!isset($params['group_start'])) $params['group_start'] = '<li style="list-style: none;"><ul>';
-		if(!isset($params['group_end'])) $params['group_end'] = "</ul></li>\n";
+		// fp> TODO: Change the ordering so that <ul></ul> subgroups are included inside <li></li>
+		if(!isset($params['group_start'])) $params['group_start'] = '<ul>';
+		if(!isset($params['group_end'])) $params['group_end'] = "</ul>\n";
 
 		// This is what will enclose the global list if several blogs are listed on the same page:
 		if(!isset($params['collist_start'])) $params['collist_start'] = '';
@@ -345,6 +344,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.32  2006/11/25 19:27:37  fplanque
+ * "brute force hack" reverted; added TODO for clean solution
+ *
  * Revision 1.31  2006/11/25 19:20:27  fplanque
  * MFB 1.9
  *
@@ -357,8 +359,7 @@ class categories_plugin extends Plugin
  * Revision 1.28  2006/11/16 23:48:56  blueyed
  * Use div.line instead of span.line as element wrapper for XHTML validity
  *
- * Revision 1.27  2006/09/13 15:48:41  smpdawg
- * Minor change
+ * ("brute force hack" reverted; added TODO for clean solution)
  *
  * Revision 1.26  2006/09/11 20:53:33  fplanque
  * clean chapter paths with decoding, finally :)
