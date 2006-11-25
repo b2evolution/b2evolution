@@ -44,33 +44,30 @@ $Form->hidden( 'blog',$edited_Blog->ID );
 $Form->begin_fieldset( T_('Media library') );
 global $basepath, $media_subdir;
 $Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
-									array(
-										array( 'none',
-														T_('None') ),
-										array( 'default',
-														T_('Default'),
-														sprintf( T_('subdirectory &quot;%s&quot; (URL blog name) of %s'), $edited_Blog->urlname, $basepath.$media_subdir ) ),
-										array( 'subdir',
-														T_('Subdirectory of media folder').':',
-														'',
-														' <span class="nobr"><code>'.$basepath.$media_subdir.'</code><input
-															type="text" name="blog_media_subdir" size="20" maxlength="255"
-															class="'.( param_has_error('blog_media_subdir') ? 'field_error' : '' ).'"
-															value="'.$edited_Blog->dget( 'media_subdir', 'formvalue' ).'" /></span>', '' ),
-										array( 'custom',
-														T_('Custom location').':',
-														'',
-														'<fieldset>'
-															.'<div class="label">'.T_('directory').':</div><div class="input"><input
-																type="text" name="blog_media_fullpath" size="50" maxlength="255"
-																class="'.( param_has_error('blog_media_fullpath') ? 'field_error' : '' ).'"
-																value="'.$edited_Blog->dget( 'media_fullpath', 'formvalue' ).'" /></div>'
-															.'<div class="label">'.T_('URL').':</div><div class="input"><input
-																type="text" name="blog_media_url" size="50" maxlength="255"
-																class="'.( param_has_error('blog_media_url') ? 'field_error' : '' ).'"
-																value="'.$edited_Blog->dget( 'media_url', 'formvalue' ).'" /></div></fieldset>' )
-									), T_('Media dir location'), true
-								);
+		array(
+			array( 'none', T_('None') ),
+			array( 'default', T_('Default'),
+				sprintf( T_('subdirectory &quot;%s&quot; (URL blog name) of %s'), $edited_Blog->urlname, $basepath.$media_subdir ) ),
+			array( 'subdir', T_('Subdirectory of media folder').':',
+				'',
+				' <span class="nobr"><code>'.$basepath.$media_subdir.'</code><input
+					type="text" name="blog_media_subdir" size="20" maxlength="255"
+					class="'.( param_has_error('blog_media_subdir') ? 'field_error' : '' ).'"
+					value="'.$edited_Blog->dget( 'media_subdir', 'formvalue' ).'" /></span>', '' ),
+			array( 'custom',
+				T_('Custom location').':',
+				'',
+				'<fieldset>'
+				.'<div class="label">'.T_('directory').':</div><div class="input"><input
+					type="text" name="blog_media_fullpath" size="50" maxlength="255"
+					class="'.( param_has_error('blog_media_fullpath') ? 'field_error' : '' ).'"
+					value="'.$edited_Blog->dget( 'media_fullpath', 'formvalue' ).'" /></div>'
+				.'<div class="label">'.T_('URL').':</div><div class="input"><input
+					type="text" name="blog_media_url" size="50" maxlength="255"
+					class="'.( param_has_error('blog_media_url') ? 'field_error' : '' ).'"
+					value="'.$edited_Blog->dget( 'media_url', 'formvalue' ).'" /></div></fieldset>' )
+		), T_('Media dir location'), true
+	);
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('After each new post...') );
@@ -98,7 +95,7 @@ $Form->begin_fieldset( T_('After each new post...') );
 	}
 	if( ! $displayed_ping_plugin )
 	{
-		echo '<p>'.T_('There are no ping plugins installed.').'</p>'; // fp> Shouldn't this read "activated" ?
+		echo '<p>'.T_('There are no ping plugins activated.').'</p>';
 	}
 
 	// Provide previous ping services as hidden fields, in case the plugin is temporarily disabled:
@@ -119,6 +116,7 @@ $Form->begin_fieldset( T_('Static file generation'), array( 'class'=>'fieldset c
 	$Form->text( 'blog_staticfilename', $edited_Blog->get( 'staticfilename' ), 30, T_('Static filename'), T_('This is the .html file that will be created when you generate a static version of the blog homepage.') );
 $Form->end_fieldset();
 
-$Form->end_form( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
-												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+$Form->end_form( array(
+	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
+	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 ?>
