@@ -17,6 +17,18 @@ function db_delete()
 {
 	global $DB;
 
+	echo "Dropping Prerendering cache table...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_item__prerendering' );
+
+	echo "Dropping Cron log table...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_cron__log' );
+
+	echo "Dropping Cron tasks table...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_cron__task' );
+
+	echo "Dropping Collection settings table...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_coll_settings' );
+
 	echo "Dropping Filetypes table...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_filetypes' );
 
@@ -104,6 +116,9 @@ function db_delete()
 
 /*
  * $Log$
+ * Revision 1.30  2006/11/25 19:20:26  fplanque
+ * MFB 1.9
+ *
  * Revision 1.29  2006/07/04 17:32:30  fplanque
  * no message
  *

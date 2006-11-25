@@ -98,7 +98,7 @@ $Form->begin_fieldset( T_('After each new post...') );
 	}
 	if( ! $displayed_ping_plugin )
 	{
-		echo '<p>'.T_('There are no ping plugins installed.').'</p>';
+		echo '<p>'.T_('There are no ping plugins installed.').'</p>'; // fp> Shouldn't this read "activated" ?
 	}
 
 	// Provide previous ping services as hidden fields, in case the plugin is temporarily disabled:

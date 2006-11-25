@@ -235,15 +235,15 @@ class categories_plugin extends Plugin
 		if( $params['form'] )
 		{	// We want to add form fields:
 		?>
-			<div class="line inline">
+			<div class="tile">
 				<input type="radio" name="cat" value="" id="catANY" class="radio" <?php if( $cat_modifier != '-' && $cat_modifier != '*' ) echo 'checked="checked" '?> />
 				<label for="catANY"><?php echo T_('ANY') ?></label>
 			</div>
-			<div class="line inline">
+			<div class="tile">
 				<input type="radio" name="cat" value="-" id="catANYBUT" class="radio" <?php if( $cat_modifier == '-' ) echo 'checked="checked" '?> />
 				<label for="catANYBUT"><?php echo T_('ANY BUT') ?></label>
 			</div>
-			<div class="line inline">
+			<div class="tile">
 				<input type="radio" name="cat" value="*" id="catALL" class="radio" <?php if( $cat_modifier == '*' ) echo 'checked="checked" '?> />
 				<label for="catALL"><?php echo T_('ALL') ?></label>
 			</div>
@@ -345,6 +345,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.31  2006/11/25 19:20:27  fplanque
+ * MFB 1.9
+ *
  * Revision 1.30  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
