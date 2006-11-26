@@ -219,9 +219,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	?>
 
 </head>
+
 <?php
 /*
  * $Log$
+ * Revision 1.25  2006/11/26 23:25:20  blueyed
+ * Newline at the end, so "view-source" is nicer
+ *
  * Revision 1.24  2006/11/26 02:30:39  fplanque
  * doc / todo
  *
