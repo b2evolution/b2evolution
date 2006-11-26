@@ -28,7 +28,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $blog, $admin_url, $rsc_url;
 
 echo '<h2>'.T_('XML hits summary').'</h2>';
-echo '<p>'.sprintf( T_('These are hits from <a %s>XML readers</a>. This includes RSS &amp; Atom readers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_rss=1&amp;blog='.$blog.'"' ).'</p>';
+echo '<p>'.sprintf( T_('These are hits from <a %s>XML readers</a>. This includes RSS and Atom readers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_rss=1&amp;blog='.$blog.'"' ).'</p>';
 echo '<p>'.T_('Any user agent accessing the XML feeds will be flagged as an XML reader.').'</p>';
 $sql = '
 	SELECT COUNT(*) AS hits, YEAR(hit_datetime) AS year,
@@ -194,6 +194,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.4  2006/11/26 23:39:29  blueyed
+ * trans: "and" instead of "&amp;" (Which should have been "&" anyway!)
+ *
  * Revision 1.3  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
