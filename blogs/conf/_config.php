@@ -32,4 +32,11 @@ if( file_exists(dirname(__FILE__).'/_overrides_TEST.php') )
 { // Override for testing in there:
 	include_once dirname(__FILE__).'/_overrides_TEST.php';	// FOR TESTING / DEVELOPMENT OVERRIDES
 }
+
+/*
+ * $Log$
+ * Revision 1.51  2006/11/26 01:42:08  fplanque
+ * doc
+ *
+ */
 ?>

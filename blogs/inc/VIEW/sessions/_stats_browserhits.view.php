@@ -335,5 +335,9 @@ if( count($res_hits) )
 }
 
 /*
- nolog */
+ * $Log$
+ * Revision 1.4  2006/11/26 01:42:10  fplanque
+ * doc
+ *
+ */
 ?>

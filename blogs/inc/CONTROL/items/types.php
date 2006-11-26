@@ -48,4 +48,11 @@ $perm_name = 'options';
 $perm_level = 'edit';
 
 require $control_path.'_misc/inc/_listeditor.php';
+
+/*
+ * $Log$
+ * Revision 1.6  2006/11/26 01:42:09  fplanque
+ * doc
+ *
+ */
 ?>

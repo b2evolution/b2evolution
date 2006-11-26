@@ -340,4 +340,11 @@ class GenericCategoryCache extends GenericCache
 
 
 }
+
+/*
+ * $Log$
+ * Revision 1.11  2006/11/26 01:42:09  fplanque
+ * doc
+ *
+ */
 ?>

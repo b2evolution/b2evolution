@@ -180,4 +180,10 @@ class Widget
 
 }
 
+/*
+ * $Log$
+ * Revision 1.10  2006/11/26 01:42:10  fplanque
+ * doc
+ *
+ */
 ?>

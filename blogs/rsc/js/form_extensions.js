@@ -348,3 +348,11 @@ function input_decorated_help( id, hvalue )
 	// init:
 	onblur();
 }
+
+/*
+ * $Log$
+ * Revision 1.15  2006/11/26 01:42:10  fplanque
+ * doc
+ *
+ */
+

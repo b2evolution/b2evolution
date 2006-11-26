@@ -158,4 +158,11 @@ class GenericOrderedCache extends GenericCache
 	}
 
 }
+
+/*
+ * $Log$
+ * Revision 1.5  2006/11/26 01:42:09  fplanque
+ * doc
+ *
+ */
 ?>

@@ -1,6 +1,7 @@
 <?php
 /**
  * This file provides icon definitions through a function.
+ * fp> why is this a function now?
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -483,4 +484,10 @@ function get_icon_info($name)
 	}
 }
 
+/*
+ * $Log$
+ * Revision 1.47  2006/11/26 01:42:08  fplanque
+ * doc
+ *
+ */
 ?>

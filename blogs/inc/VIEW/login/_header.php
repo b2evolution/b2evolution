@@ -36,7 +36,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<link href="<?php echo $rsc_url ?>css/login.css" rel="stylesheet" type="text/css" />
 	<?php
 	// Insert HEAD lines, which have been defined before:
-	// dh> TODO: currently this may be affected by register_globals=ON
+	// fp> what is this useful for?
+	// dh> TODO: currently this may be affected by register_globals=ON -- fp> then initialize it to empty somewhere before using it!
 	// dh> TODO: fp, is this ok? It should maybe be a func and available everywhere we output <HEAD> tags..?
 	if( isset($evo_html_headlines) ) foreach( $evo_html_headlines as $v )
 	{
@@ -67,6 +68,9 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
+ * Revision 1.9  2006/11/26 01:42:10  fplanque
+ * doc
+ *
  * Revision 1.8  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

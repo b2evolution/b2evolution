@@ -155,5 +155,9 @@ $Results->cols[] = array(
 $Results->display();
 
 /*
- nolog */
+ * $Log$
+ * Revision 1.6  2006/11/26 01:42:10  fplanque
+ * doc
+ *
+ */
 ?>

@@ -102,4 +102,11 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 $Form->end_form();
 
+
+/*
+ * $Log$
+ * Revision 1.7  2006/11/26 01:42:09  fplanque
+ * doc
+ *
+ */
 ?>

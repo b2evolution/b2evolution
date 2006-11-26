@@ -74,4 +74,11 @@ class IconLegend
 		$this->icons[] = array();
 	}
 }
+
+/*
+ * $Log$
+ * Revision 1.4  2006/11/26 01:42:10  fplanque
+ * doc
+ *
+ */
 ?>

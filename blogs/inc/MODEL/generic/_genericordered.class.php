@@ -126,4 +126,11 @@ class GenericOrdered extends GenericElement
 
 }
 
+
+/*
+ * $Log$
+ * Revision 1.7  2006/11/26 01:42:09  fplanque
+ * doc
+ *
+ */
 ?>

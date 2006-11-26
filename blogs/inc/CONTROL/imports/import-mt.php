@@ -1618,4 +1618,11 @@ function tidypostdata( $string )
 {
 	return str_replace( array('&quot;', '&#039;', '&lt;', '&gt;'), array('"', "'", '<', '>'), remove_magic_quotes( $string ) );
 }
+
+/*
+ * $Log$
+ * Revision 1.25  2006/11/26 01:42:08  fplanque
+ * doc
+ *
+ */
 ?>
