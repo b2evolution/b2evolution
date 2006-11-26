@@ -15,7 +15,7 @@ global $model_path;
 
 if( $Settings->get( 'outbound_notifications_mode' ) != 'cron' )
 { // Autopruning is NOT requested
-	$result_message = T_('Post notifications are not set to run as a scheduled task');
+	$result_message = T_('Post notifications are not set to run as a scheduled task.');
 	return 2;
 }
 
@@ -63,6 +63,9 @@ return 1; /* ok */
 
 /*
  * $Log$
+ * Revision 1.2  2006/11/26 22:25:12  blueyed
+ * MFB: Normalized messages (dot at end of full sentences)
+ *
  * Revision 1.1  2006/08/24 00:43:28  fplanque
  * scheduled pings part 2
  *
