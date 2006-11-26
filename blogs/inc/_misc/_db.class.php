@@ -718,6 +718,8 @@ class DB
 					$this->last_result[$this->num_rows] = $row;
 					$this->num_rows++;
 				}
+				// fp> Please give me gauarantee that removing the free_result() here in order to optimize get_col_info does really optimize things in the end. What if this is a large query result. When does it get freed?
+				// mysql_free_result($this->result);
 			}
 
 			if( $this->log_queries )
@@ -1420,6 +1422,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.43  2006/11/26 02:30:39  fplanque
+ * doc / todo
+ *
  * Revision 1.42  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

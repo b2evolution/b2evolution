@@ -492,7 +492,7 @@ function param_check_filename( $var, $err_msg )
 /**
  * Check if the value of a param is a regular expression (syntax).
  *
- * @todo dh> BLOATED! I always think it checks for a pattern, but...
+ * @todo dh> BLOATED! I always think it checks for a pattern, but... - fp> WHAT *IS* to do here??
  * @param string param name
  * @param string error message
  * @param string|NULL error message for form field ($err_msg gets used if === NULL).
@@ -1136,9 +1136,12 @@ function memorize_param( $var, $type, $default, $value = NULL )
 		$global_param_list = array();
 	}
 
+// fp> All these checks are seriously getting annoying! WHEN does it happen that we use param() (and furtermore anything else) without having a DebugLog?
 	if( isset($Debuglog) )
+	{
 		$Debuglog->add( "memorize_param: $var $type default=$default"
 			.(is_null($value) ? '' : " value=$value"), 'params');
+	}
 	$global_param_list[$var] = array( 'type' => $type, 'default' => (($default===true) ? NULL : $default) );
 
 	if( !is_null( $value ) )
@@ -1477,7 +1480,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 		$char = substr($url, 0, 1);
 		if( $char != '/' && $char != '#' )
 		{ // must start with a slash or hash (for HTML anchors to the same page)
-			if( $debug ) return 'Url refused. Debug info: relative URL not starting with "/" or "#": ['.$url.']';
+// fp> indent			if( $debug ) return 'Url refused. Debug info: relative URL not starting with "/" or "#": ['.$url.']';
 			return T_('URL must be a full path starting with "/" or an anchor starting with "#".');
 		}
 	}
@@ -1606,6 +1609,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.22  2006/11/26 02:30:39  fplanque
+ * doc / todo
+ *
  * Revision 1.21  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

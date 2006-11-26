@@ -116,7 +116,7 @@ switch( $action )
 			$Messages->add( T_('You should create chapters for this blog now!'), 'note' );
 
 			header_nocache();
-			header_redirect( 'admin.php?ctrl=chapters2&blog='.$edited_Blog->ID );
+			header_redirect( 'admin.php?ctrl=chapters2&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
 		break;
 
@@ -328,6 +328,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2006/11/26 02:30:38  fplanque
+ * doc / todo
+ *
  * Revision 1.4  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

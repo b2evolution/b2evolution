@@ -986,6 +986,7 @@ class Comment extends DataObject
 		 */
 		// TODO: dh> this reveals the comments author's email address to subscribers!!
 		//           $notify_from should get used by default, unless the user has opted in to be the sender!
+	// If the subscriber has permission to moderate the comments, he SHOULD receive the email address.
 		if( $this->get_author_User() )
 		{ // Comment from a registered user:
 			$mail_from = '"'.$this->author_User->get('preferredname').'" <'.$this->author_User->get('email').'>';
@@ -1166,6 +1167,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.51  2006/11/26 02:30:39  fplanque
+ * doc / todo
+ *
  * Revision 1.50  2006/11/17 18:36:23  blueyed
  * dbchanges param for AfterItemUpdate, AfterItemInsert, AfterCommentUpdate and AfterCommentInsert
  *

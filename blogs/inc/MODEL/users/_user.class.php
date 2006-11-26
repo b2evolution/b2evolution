@@ -50,31 +50,26 @@ class User extends DataObject
 	var $firstname;
 	var $lastname;
 	var $nickname;
-	var $icq;
+	var $idmode;
+	var $locale;
 	var $email;
 	var $url;
+	var $icq;
+	var $aim;
+	var $msn;
+	var $yim;
 	var $ip;
 	var $domain;
 	var $browser;
 	var $datecreated;
 	var $level;
-	var $aim;
-	var $msn;
-	var $yim;
-	var $locale;
-	var $idmode;
+
 	/**
 	 * @var boolean Does the user accept emails through a message form?
 	 */
 	var $allow_msgform;
 	var $notify;
 	var $showonline;
-
-	/**
-	 * The ID of the (primary, currently only) group of the user.
-	 * @var integer
-	 */
-	var $group_ID;
 
 	/**
 	 * @var boolean Has the user been validated (by email)?
@@ -87,6 +82,12 @@ class User extends DataObject
 	 * @access protected
 	 */
 	var $_num_posts;
+
+	/**
+	 * The ID of the (primary, currently only) group of the user.
+	 * @var integer
+	 */
+	var $group_ID;
 
 	/**
 	 * @see User::get_Group()
@@ -140,7 +141,7 @@ class User extends DataObject
 
 		if( $db_row == NULL )
 		{ // Setting those object properties, which are not "NULL" in DB (MySQL strict mode):
-			// dh> e.g. "email" needs to be NULL, so setting it to "" causes a call to dbchange().
+			// dh> e.g. "email" needs to be NULL, so setting it to "" causes a call to dbchange(). -- fp> needs to be NULL or NOT NULL???
 			// dh> TODO: Maybe email should get "NULL" with 1.9?
 
 			// echo 'Creating blank user';
@@ -1115,6 +1116,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.51  2006/11/26 02:30:39  fplanque
+ * doc / todo
+ *
  * Revision 1.50  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

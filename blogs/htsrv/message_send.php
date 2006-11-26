@@ -305,11 +305,15 @@ else
 
 // Header redirection
 header_nocache();
+// redirect Will save $Messages into Session:
 header_redirect(); // exits!
 
 
 /*
  * $Log$
+ * Revision 1.47  2006/11/26 02:30:38  fplanque
+ * doc / todo
+ *
  * Revision 1.46  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

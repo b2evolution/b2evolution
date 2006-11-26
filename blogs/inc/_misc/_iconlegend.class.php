@@ -13,6 +13,14 @@ class IconLegend
 
 
 	/**
+	 * Constructor
+	 * @return IconLegend
+	 */
+	function IconLegend()
+	{
+	}
+
+	/**
 	 * Add an icon with his legend to the icons array
 	 *
 	 * @param string name of the icon
@@ -77,6 +85,9 @@ class IconLegend
 
 /*
  * $Log$
+ * Revision 1.5  2006/11/26 02:30:39  fplanque
+ * doc / todo
+ *
  * Revision 1.4  2006/11/26 01:42:10  fplanque
  * doc
  *

@@ -385,6 +385,7 @@ function cat_load_cache()
  * @todo dh> $cat_load_postcounts='all' should be supported..
  * @todo dh> Multiple calls, e.g. "canonic" by b2evo and "all" by a plugin should be supported
  *           It's probably deprecated by ChapterCache anyway?!
+ * fp> Yes this will be deprecated
  *
  * @param string 'context'|'canonic'
  */
@@ -483,6 +484,7 @@ function cat_load_postcounts( $cat_load_postcounts = 'canonic', $dbtable = 'T_po
  * @todo put this into main post query when MySQL 4.0 commonly available
  * @todo dh> why is this limited to the _global_ $postIDlist?!
  *           Really ridiculous, trying to get a list of category names for an Item (which is not in $postIDlist for example.. :/)
+ * fp> This is legacy from a quick b2/cafelog hack. This will de deprecated.
  */
 function cat_load_postcats_cache()
 {
@@ -771,6 +773,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.24  2006/11/26 02:30:39  fplanque
+ * doc / todo
+ *
  * Revision 1.23  2006/11/24 18:27:23  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

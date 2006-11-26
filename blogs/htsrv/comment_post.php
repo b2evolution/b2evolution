@@ -326,11 +326,14 @@ if( $Comment->ID )
 
 
 header_nocache();
-header_redirect();
+header_redirect(); // Will save $Messages into Session
 
 
 /*
  * $Log$
+ * Revision 1.94  2006/11/26 02:30:38  fplanque
+ * doc / todo
+ *
  * Revision 1.93  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

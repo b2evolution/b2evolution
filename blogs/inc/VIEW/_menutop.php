@@ -219,4 +219,11 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	?>
 
 </head>
-
+<?php
+/*
+ * $Log$
+ * Revision 1.24  2006/11/26 02:30:39  fplanque
+ * doc / todo
+ *
+ */
+?>

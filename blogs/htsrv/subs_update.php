@@ -108,10 +108,14 @@ $Messages->add( T_('Your profile has been updated.'), 'success' );
 
 
 header_nocache();
+// redirect Will save $Messages into Session:
 header_redirect();
 
 /*
  * $Log$
+ * Revision 1.16  2006/11/26 02:30:38  fplanque
+ * doc / todo
+ *
  * Revision 1.15  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

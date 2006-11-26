@@ -187,6 +187,7 @@ switch( $action )
 		// Redirect to the user's profile in the "users" controller:
 		// TODO: This will probably fail if the user has no admin-access permission! Redirect to profile page in blog instead!?
 		header_nocache();
+		// redirect Will save $Messages into Session:
 		header_redirect( url_add_param( $admin_url, 'ctrl=users&user_ID='.$ForgetfulUser->ID, '&' ) ); // display user's profile
 
 		exit();
@@ -242,6 +243,7 @@ switch( $action )
 		}
 
 		header_nocache();
+		// redirect Will save $Messages into Session:
 		header_redirect();
 		exit();
 
@@ -356,6 +358,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.77  2006/11/26 02:30:38  fplanque
+ * doc / todo
+ *
  * Revision 1.76  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

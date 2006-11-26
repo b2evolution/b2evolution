@@ -2280,7 +2280,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 	}
 
 
-	// Debuglog:
+	// Transfer of Debuglog:
 	if( $Debuglog->count('all') )
 	{ // Save Debuglog into Session, so that it's available after redirect (gets loaded by Session constructor):
 		$sess_Debuglogs = $Session->get('Debuglogs');
@@ -2291,7 +2291,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 		$Session->set( 'Debuglogs', $sess_Debuglogs, 60 /* expire in 60 seconds */ );
 	}
 
-	// Messages:
+	// Transfer of Messages:
 	if( $Messages->count('all') )
 	{ // Set Messages into user's session, so they get restored on the next page (after redirect):
 		$Session->set( 'Messages', $Messages );
@@ -2773,6 +2773,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.147  2006/11/26 02:30:39  fplanque
+ * doc / todo
+ *
  * Revision 1.146  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
