@@ -566,7 +566,7 @@ class DB
 
 
 	/**
-	 * Kill cached query results
+	 * Kill cached query results and the used mysql resource.
 	 */
 	function flush()
 	{
@@ -582,6 +582,9 @@ class DB
 
 	/**
 	 * Basic Query
+	 *
+	 * NOTE: the used mysql resource will be freed in the next call to {@link DB::query()}.
+	 *       You may want to call {@link DB::flush()} after handling large result sets.
 	 *
 	 * @param string SQL query
 	 * @param string title for debugging
@@ -718,8 +721,8 @@ class DB
 					$this->last_result[$this->num_rows] = $row;
 					$this->num_rows++;
 				}
-				// fp> Please give me gauarantee that removing the free_result() here in order to optimize get_col_info does really optimize things in the end. What if this is a large query result. When does it get freed?
-				// mysql_free_result($this->result);
+
+				// NOTE: the resource will be freed with the next query (in flush()).
 			}
 
 			if( $this->log_queries )
@@ -1422,6 +1425,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.44  2006/11/26 03:17:53  blueyed
+ * doc about resource freeing and flush() in general
+ *
  * Revision 1.43  2006/11/26 02:30:39  fplanque
  * doc / todo
  *
