@@ -64,7 +64,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 
 	$Form->text_input( 'ftyp_mimetype', $edited_Filetype->mimetype, 40, T_('Mime type'), array( 'maxlength'=> 80, 'required'=>true, 'note'=>sprintf('E.g. &laquo;%s&raquo;', 'text/html') ) );
 
-	$Form->text( 'ftyp_icon', $edited_Filetype->icon, 20, T_('Icon'), sprintf( T_('File name of the icon, must be in %s.'), rel_path_to_base($rsc_path.'icons/fileicons/') ), 40 );
+	$Form->text( 'ftyp_icon', $edited_Filetype->icon, 20, T_('Icon'), sprintf( /* TRANS: %s is a filesystem path */T_('File name of the icon, must be in %s.'), rel_path_to_base($rsc_path.'icons/fileicons/') ), 40 );
 
 	$Form->radio( 'ftyp_viewtype',
 								$edited_Filetype->viewtype,

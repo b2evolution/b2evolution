@@ -29,7 +29,7 @@ global $blog, $admin_url, $rsc_url;
 
 echo '<h2>'.T_('Robot hits').'</h2>';
 echo '<p>'.sprintf( T_('This page only includes hits identified as made by <a %s>indexing robots</a> a.k.a. web crawlers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_robot=1&amp;blog='.$blog.'"' ).'</p>';
-echo '<p>'.T_('In order to be detected, robots must be listed in /conf/_stats.php').'</p>';
+echo '<p>'. /* TRANS: %s is a filesystem path */ T_('In order to be detected, robots must be listed in %s.').'</p>';
 
 $sql = '
 	SELECT COUNT(*) AS hits, YEAR(hit_datetime) AS year,
@@ -269,6 +269,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.4  2006/11/26 23:40:34  blueyed
+ * trans
+ *
  * Revision 1.3  2006/11/26 01:42:10  fplanque
  * doc
  *

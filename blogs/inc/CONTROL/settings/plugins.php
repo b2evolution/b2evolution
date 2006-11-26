@@ -865,7 +865,7 @@ switch( $action )
 
 			$Form->global_icon( T_('Cancel installation!'), 'close', regenerate_url() );
 
-			$Form->begin_form( 'fform', sprintf( /* %d is ID, %d name */ T_('Finish setup for plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
+			$Form->begin_form( 'fform', sprintf( /* TRANS: %d is ID, %d name */ T_('Finish setup for plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
 
 			echo '<p>'.T_('The plugin needs the following database changes.').'</p>';
 
@@ -908,7 +908,7 @@ switch( $action )
 			$Form->hidden( 'uninstall_confirmed_drop', 1 );
 			$Form->global_icon( T_('Cancel uninstall!'), 'close', regenerate_url() );
 
-			$Form->begin_form( 'fform', sprintf( /* %d is ID, %d name */ T_('Uninstall plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
+			$Form->begin_form( 'fform', sprintf( /* TRANS: %d is ID, %d name */ T_('Uninstall plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
 
 			if( $uninstall_tables_to_drop )
 			{
@@ -1036,6 +1036,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.66  2006/11/26 23:40:34  blueyed
+ * trans
+ *
  * Revision 1.65  2006/11/26 01:42:09  fplanque
  * doc
  *
