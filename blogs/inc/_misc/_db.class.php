@@ -585,6 +585,7 @@ class DB
 	 *
 	 * NOTE: the used mysql resource will be freed in the next call to {@link DB::query()}.
 	 *       You may want to call {@link DB::flush()} after handling large result sets.
+	 * fp> Yeah that's the problem. I want the code less complex, not more complex.
 	 *
 	 * @param string SQL query
 	 * @param string title for debugging
@@ -1425,6 +1426,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.45  2006/11/26 11:12:38  fplanque
+ * doc / todo
+ *
  * Revision 1.44  2006/11/26 03:17:53  blueyed
  * doc about resource freeing and flush() in general
  *
