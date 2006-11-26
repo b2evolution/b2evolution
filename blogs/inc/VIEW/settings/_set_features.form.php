@@ -63,10 +63,10 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('After each new post...') . get_web_help_link('After each post settings'));
 	$Form->radio_input( 'outbound_notifications_mode', $Settings->get('outbound_notifications_mode'), array(
-			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('b2evo will not send out any notification about your new content.'), 'suffix' => '<br />' ),
+			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('No notification about your new content will be sent out.'), 'suffix' => '<br />' ),
 			array( 'value'=>'immediate', 'label'=>T_('Immediate'), 'note'=>T_('This is guaranteed to work but may create an annoying delay after each post.'), 'suffix' => '<br />' ),
 			array( 'value'=>'cron', 'label'=>T_('Asynchronous'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up. You could notify news every minute.') ) ),
-		T_('Outbound pings &amp; email notifications') );
+		T_('Outbound pings and email notifications') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') );
@@ -165,6 +165,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.12  2006/11/26 23:47:42  blueyed
+ * Wording and "and" instead of "&amp;"
+ *
  * Revision 1.11  2006/11/26 23:43:20  blueyed
  * whitespace
  *
