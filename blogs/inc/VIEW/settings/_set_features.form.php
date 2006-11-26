@@ -63,10 +63,10 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('After each new post...') . get_web_help_link('After each post settings'));
 	$Form->radio_input( 'outbound_notifications_mode', $Settings->get('outbound_notifications_mode'), array(
-									array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('b2evo will not send out any notification about your new content.'), 'suffix' => '<br />' ),
-									array( 'value'=>'immediate', 'label'=>T_('Immediate'), 'note'=>T_('This is guaranteed to work but may create an annoying delay after each post.'), 'suffix' => '<br />' ),
-									array( 'value'=>'cron', 'label'=>T_('Asynchronous'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up. You could notify news every minute.') ) ),
-								T_('Outbound pings &amp; email notifications') );
+			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('b2evo will not send out any notification about your new content.'), 'suffix' => '<br />' ),
+			array( 'value'=>'immediate', 'label'=>T_('Immediate'), 'note'=>T_('This is guaranteed to work but may create an annoying delay after each post.'), 'suffix' => '<br />' ),
+			array( 'value'=>'cron', 'label'=>T_('Asynchronous'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up. You could notify news every minute.') ) ),
+		T_('Outbound pings &amp; email notifications') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') );
@@ -127,16 +127,17 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Hit & session logging') . get_web_help_link('Hit logging') );
 
-	$Form->checklist( array( array( 'log_public_hits', 1, T_('on every public page'), $Settings->get('log_public_hits') ),
-													array( 'log_admin_hits', 1, T_('on every admin page'), $Settings->get('log_admin_hits') ) ),
-										'log_hits', T_('Log hits') );
+	$Form->checklist( array(
+			array( 'log_public_hits', 1, T_('on every public page'), $Settings->get('log_public_hits') ),
+			array( 'log_admin_hits', 1, T_('on every admin page'), $Settings->get('log_admin_hits') ) ),
+		'log_hits', T_('Log hits') );
 
 	// TODO: draw a warning sign if set to off
 	$Form->radio_input( 'auto_prune_stats_mode', $Settings->get('auto_prune_stats_mode'), array(
-									array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('Not recommended! Your database will grow very large!!'), 'suffix' => '<br />' ),
-									array( 'value'=>'page', 'label'=>T_('On every page'), 'note'=>T_('This is guaranteed to work but uses extra resources with every page displayed.'), 'suffix' => '<br />' ),
-									array( 'value'=>'cron', 'label'=>T_('With a scheduled job'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up.') ) ),
-								T_('Auto pruning'), array( 'note' => T_('Note: Even if you don\'t log hits, you still need to prune sessions!') ) );
+			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('Not recommended! Your database will grow very large!!'), 'suffix' => '<br />' ),
+			array( 'value'=>'page', 'label'=>T_('On every page'), 'note'=>T_('This is guaranteed to work but uses extra resources with every page displayed.'), 'suffix' => '<br />' ),
+			array( 'value'=>'cron', 'label'=>T_('With a scheduled job'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up.') ) ),
+		T_('Auto pruning'), array( 'note' => T_('Note: Even if you don\'t log hits, you still need to prune sessions!') ) );
 
 	// TODO: hide this if mode set to off:
 	$Form->text_input( 'auto_prune_stats', $Settings->get('auto_prune_stats'), 5, T_('Prune after'),
@@ -161,8 +162,12 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		) );
 }
 
+
 /*
  * $Log$
+ * Revision 1.11  2006/11/26 23:43:20  blueyed
+ * whitespace
+ *
  * Revision 1.10  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
