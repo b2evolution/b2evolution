@@ -492,7 +492,7 @@ function param_check_filename( $var, $err_msg )
 /**
  * Check if the value of a param is a regular expression (syntax).
  *
- * @todo dh> BLOATED! I always think it checks for a pattern, but... - fp> WHAT *IS* to do here??
+ * @todo dh> BLOATED! I always think it checks for a pattern, but... - fp> WHAT *IS* to do here?? - dh> remove it..
  * @param string param name
  * @param string error message
  * @param string|NULL error message for form field ($err_msg gets used if === NULL).
@@ -1137,6 +1137,7 @@ function memorize_param( $var, $type, $default, $value = NULL )
 	}
 
 // fp> All these checks are seriously getting annoying! WHEN does it happen that we use param() (and furtermore anything else) without having a DebugLog?
+// dh> when using the parts of the "framework" by themselves.. e.g. "require_once _param.funcs.php".. OTOH $Debuglog (and $Messages and $Timer etc) could be considered existing everywhere and a smaller _main.inc.php (e.g. _bootstrap.inc.php) would take care of it. OTOH^2: checking with isset() is probably faster than a function call (to Log_noop) and that's mostly the case ($debug=0)
 	if( isset($Debuglog) )
 	{
 		$Debuglog->add( "memorize_param: $var $type default=$default"
@@ -1609,6 +1610,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.23  2006/11/26 23:33:10  blueyed
+ * doc
+ *
  * Revision 1.22  2006/11/26 02:30:39  fplanque
  * doc / todo
  *
