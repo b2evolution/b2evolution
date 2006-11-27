@@ -894,7 +894,7 @@ class AdminUI_general
 					'page_url' => '', // All generated links will refer to the current page
 					'before' => '<div class="results">',
 					'header_start' => '<div class="results_nav">',
-						'header_text' => '<strong>Pages</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
+						'header_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
 						'header_text_single' => '',
 					'header_end' => '</div>',
 					'list_start' => '<table class="grouped" cellspacing="0">'."\n\n",
@@ -903,7 +903,7 @@ class AdminUI_general
 							                ."\n\n<tr>\n",
 							'filters_start' => '<tr class="filters"><td colspan="$nb_cols$">',
 							'filters_end' => '</td></tr>',
-							'line_start_head' => '<tr>',  // TODO: fusionner avec colhead_start_first; mettre à jour admin_UI_general; utiliser colspan="$headspan$"
+							'line_start_head' => '<tr>',  // TODO: fusionner avec colhead_start_first; mettre a jour admin_UI_general; utiliser colspan="$headspan$"
 							'colhead_start' => '<th $class_attrib$>',
 							'colhead_start_first' => '<th class="firstcol $class$">',
 							'colhead_start_last' => '<th class="lastcol $class$">',
@@ -950,7 +950,7 @@ class AdminUI_general
 						'total_line_end' => "</tr>\n\n",
 					'list_end' => "</table>\n\n",
 					'footer_start' => '<div class="results_nav">',
-					'footer_text' => '<strong>Pages</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$'
+					'footer_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$'
 					                  /* T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'. */
 					                  /* '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$' */
 					                  /* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
@@ -1332,6 +1332,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.35  2006/11/27 19:14:14  fplanque
+ * i18n
+ *
  * Revision 1.34  2006/10/23 22:19:03  blueyed
  * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
  *

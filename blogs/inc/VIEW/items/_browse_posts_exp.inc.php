@@ -44,11 +44,11 @@ echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
 // Init display features:
 $display_params = array(
 					'header_start' => '<div class="NavBar center">',
-						'header_text' => '<strong>Pages</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
+						'header_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
 						'header_text_single' => T_('1 page'),
 					'header_end' => '</div>',
 					'footer_start' => '',
-						'footer_text' => '<div class="NavBar center"><strong>Pages</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$</div>',
+						'footer_text' => '<div class="NavBar center"><strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$</div>',
 						'footer_text_single' => '',
 							'prev_text' => T_('Previous'),
 							'next_text' => T_('Next'),
@@ -260,6 +260,9 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.23  2006/11/27 19:14:14  fplanque
+ * i18n
+ *
  * Revision 1.22  2006/10/23 22:19:03  blueyed
  * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
  *
