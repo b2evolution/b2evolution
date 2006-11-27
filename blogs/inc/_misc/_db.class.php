@@ -109,26 +109,32 @@ class DB
 	 * @var string last DB error string
 	 */
 	var $last_error = '';
+
 	/**
 	 * @var integer Last insert ID
 	 */
 	var $insert_id = 0;
+
 	/**
 	 * @var resource Last query's resource
 	 */
 	var $result;
+
 	/**
 	 * @var array Last result's rows
 	 */
 	var $last_result;
+
 	/**
 	 * Number of rows in result set (after a select)
 	 */
 	var $num_rows = 0;
+
 	/**
 	 * Number of rows affected by insert, delete, update or replace
 	 */
 	var $rows_affected = 0;
+
 	/**
 	 * Aliases that will be replaced in queries:
 	 */
@@ -137,6 +143,7 @@ class DB
 	 * Strings that will replace the aliases in queries:
 	 */
 	var $dbreplaces = array();
+
 	/**
 	 * CREATE TABLE options.
 	 *
@@ -150,41 +157,50 @@ class DB
 	 * @var string Default: ''
 	 */
 	var $table_options = '';
+
 	/**
 	 * Use transactions in DB?
 	 *
 	 * You need to use InnoDB in order to enable this.  See the {@link $db_config "table_options" key}.
 	 */
 	var $use_transactions = false;
+
 	/**
 	 * How many transactions are currently nested?
 	 */
 	var $transaction_nesting_level = 0;
+
 	/**
 	 * Rememeber if we have to rollback at the end of a nested transaction construct
 	 */
 	var $rollback_nested_transaction = false;
+
 	/**
 	 * @var object MySQL Database handle
 	 */
 	var $dbhandle;
+
 	/**
 	 * @var string Database username
 	 */
 	var $dbuser;
+
 	/**
 	 * @var string Database username's password
 	 */
 	var $dbpassword;
+
 	/**
 	 * @var string Database name
 	 * @see select()
 	 */
 	var $dbname;
+
 	/**
 	 * @var string Database hostname
 	 */
 	var $dbhost = 'localhost';
+
 	/**
 	 * @var string Current connection charset
 	 * @see DB::set_connection_charset()
@@ -193,6 +209,7 @@ class DB
 
 
 	// DEBUG:
+
   /**
    * Do we want to log queries?
 	 * This gets set according to {@link $debug}, if it's set.
@@ -200,32 +217,38 @@ class DB
    * @var boolean
    */
 	var $log_queries;
+
 	/**
 	 * Log of queries:
 	 * @var array
 	 */
 	var $queries = array();
+
 	/**
 	 * Do we want to explain joins?
 	 * @var boolean (Default: false)
 	 */
 	var $debug_explain_joins = false;
+
 	/**
 	 * Do we want to output a function backtrace for every query?
 	 * @var integer|boolean Number of stack entries to show (from last to first) (Default: 0); true means 'all'.
 	 */
 	var $debug_dump_function_trace_for_queries = 0;
+
 	/**
 	 * Number of rows we want to dump in debug output (0 disables it)
 	 * @var integer (Default: 0)
 	 */
 	var $debug_dump_rows = 0;
+
 	/**
 	 * Time in seconds that is considered a fast query (green).
 	 * @var float
 	 * @see dump_queries()
 	 */
 	var $query_duration_fast = 0.05;
+
 	/**
 	 * Time in seconds that is considered a slow query (red).
 	 * @var float
@@ -689,7 +712,6 @@ class DB
 					$this->num_rows++;
 				}
 
-				// NOTE: the resource will be freed with the next query (in flush()).
 			}
 
 			if( $this->log_queries )
@@ -1345,6 +1367,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.47  2006/11/27 20:54:07  fplanque
+ * doc
+ *
  * Revision 1.46  2006/11/27 01:35:47  blueyed
  * Removed get_col_info() and free mysql_result in query() always again
  *
