@@ -492,13 +492,12 @@ function param_check_filename( $var, $err_msg )
 /**
  * Check if the value of a param is a regular expression (syntax).
  *
- * @todo dh> BLOATED! I always think it checks for a pattern, but... - fp> WHAT *IS* to do here?? - dh> remove it..
  * @param string param name
  * @param string error message
  * @param string|NULL error message for form field ($err_msg gets used if === NULL).
  * @return boolean true if OK
  */
-function param_check_regexp( $var, $err_msg, $field_err_msg = NULL )
+function param_check_isregexp( $var, $err_msg, $field_err_msg = NULL )
 {
 	if( ! is_regexp( $GLOBALS[$var] ) )
 	{
@@ -706,7 +705,7 @@ function param_time( $var, $default = '', $memorize = false,	$override = false, 
 
 	if( param( $var, 'string', $default, $memorize, $override, $forceset ) )
 	{ // Got a time from text field:
-		if( preg_match( '¤^(\d\d):(\d\d)(:(\d\d))?$¤', $$var, $matches ) )
+		if( preg_match( '/^(\d\d):(\d\d)(:(\d\d))?$/', $$var, $matches ) )
 		{
 			$time_h = $matches[1];
 			$time_mn = $matches[2];
@@ -1610,6 +1609,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.24  2006/11/27 21:10:23  fplanque
+ * doc
+ *
  * Revision 1.23  2006/11/26 23:33:10  blueyed
  * doc
  *

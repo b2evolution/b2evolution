@@ -125,12 +125,12 @@ switch( $action )
 
 			// Advanced settings
 			param( 'regexp_filename', 'string', '' );
-			if( param_check_regexp( 'regexp_filename', T_('Valid filename pattern is not a regular expression!') ) )
+			if( param_check_isregexp( 'regexp_filename', T_('Valid filename pattern is not a regular expression!') ) )
 			{
 				$Settings->set( 'regexp_filename', $regexp_filename );
 			}
 			param( 'regexp_dirname', 'string', '' );
-			if( param_check_regexp( 'regexp_dirname', T_('Valid dirname pattern is not a regular expression!') ) )
+			if( param_check_isregexp( 'regexp_dirname', T_('Valid dirname pattern is not a regular expression!') ) )
 			{
 				$Settings->set( 'regexp_dirname', $regexp_dirname );
 			}

@@ -141,8 +141,9 @@ class User extends DataObject
 
 		if( $db_row == NULL )
 		{ // Setting those object properties, which are not "NULL" in DB (MySQL strict mode):
-			// dh> e.g. "email" needs to be NULL, so setting it to "" causes a call to dbchange(). -- fp> needs to be NULL or NOT NULL???
+			// fp> WHAT DO YOU MEAN WITH THIS: dh> e.g. "email" needs to be NULL, so setting it to "" causes a call to dbchange(). -- fp> needs to be NULL or NOT NULL???
 			// dh> TODO: Maybe email should get "NULL" with 1.9?
+// fp> No, a user without an email address makes no sense. NOT NULL reminds it.
 
 			// echo 'Creating blank user';
 			$this->set( 'login', 'login' );
@@ -1116,6 +1117,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.52  2006/11/27 21:10:23  fplanque
+ * doc
+ *
  * Revision 1.51  2006/11/26 02:30:39  fplanque
  * doc / todo
  *
