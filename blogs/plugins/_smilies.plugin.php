@@ -80,7 +80,7 @@ class smilies_plugin extends Plugin
 				),
 				// TODO (yabs) : Display these as images and individual inputs
 				'smiley_list' => array(
-					'label' => $this->T_( 'Smiley list list'),
+					'label' => $this->T_( 'Smiley list'),
 					'note' => sprintf( $this->T_( 'This is the list of smileys [one per line], in the format : char_sequence image_file // optional comment<br />
 							To disable a smiley, just add one or more spaces to the start of its setting<br />
 							You can add new smiley images by uploading the images to the %s folder.' ), '<span style="font-weight:bold">'.$rsc_subdir.'smilies/</span>' ),
@@ -410,6 +410,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.35  2006/11/27 00:32:53  blueyed
+ * trans fix
+ *
  * Revision 1.34  2006/11/27 00:28:36  blueyed
  * trans fix
  *
