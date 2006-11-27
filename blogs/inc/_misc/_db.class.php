@@ -109,34 +109,26 @@ class DB
 	 * @var string last DB error string
 	 */
 	var $last_error = '';
-
 	/**
-	 * @deprecated Obsolete! Use {@link DB::get_col_info()} instead.
+	 * @var integer Last insert ID
 	 */
-	var $col_info;
-
 	var $insert_id = 0;
-
 	/**
 	 * @var resource Last query's resource
 	 */
 	var $result;
-
 	/**
 	 * @var array Last result's rows
 	 */
 	var $last_result;
-
 	/**
 	 * Number of rows in result set (after a select)
 	 */
 	var $num_rows = 0;
-
 	/**
 	 * Number of rows affected by insert, delete, update or replace
 	 */
 	var $rows_affected = 0;
-
 	/**
 	 * Aliases that will be replaced in queries:
 	 */
@@ -145,7 +137,6 @@ class DB
 	 * Strings that will replace the aliases in queries:
 	 */
 	var $dbreplaces = array();
-
 	/**
 	 * CREATE TABLE options.
 	 *
@@ -159,51 +150,41 @@ class DB
 	 * @var string Default: ''
 	 */
 	var $table_options = '';
-
 	/**
 	 * Use transactions in DB?
 	 *
 	 * You need to use InnoDB in order to enable this.  See the {@link $db_config "table_options" key}.
 	 */
 	var $use_transactions = false;
-
 	/**
 	 * How many transactions are currently nested?
 	 */
 	var $transaction_nesting_level = 0;
-
 	/**
 	 * Rememeber if we have to rollback at the end of a nested transaction construct
 	 */
 	var $rollback_nested_transaction = false;
-
 	/**
 	 * @var object MySQL Database handle
 	 */
 	var $dbhandle;
-
-
 	/**
 	 * @var string Database username
 	 */
 	var $dbuser;
-
 	/**
 	 * @var string Database username's password
 	 */
 	var $dbpassword;
-
 	/**
 	 * @var string Database name
 	 * @see select()
 	 */
 	var $dbname;
-
 	/**
 	 * @var string Database hostname
 	 */
 	var $dbhost = 'localhost';
-
 	/**
 	 * @var string Current connection charset
 	 * @see DB::set_connection_charset()
@@ -212,7 +193,6 @@ class DB
 
 
 	// DEBUG:
-
   /**
    * Do we want to log queries?
 	 * This gets set according to {@link $debug}, if it's set.
@@ -220,38 +200,32 @@ class DB
    * @var boolean
    */
 	var $log_queries;
-
 	/**
 	 * Log of queries:
 	 * @var array
 	 */
 	var $queries = array();
-
 	/**
 	 * Do we want to explain joins?
 	 * @var boolean (Default: false)
 	 */
 	var $debug_explain_joins = false;
-
 	/**
 	 * Do we want to output a function backtrace for every query?
 	 * @var integer|boolean Number of stack entries to show (from last to first) (Default: 0); true means 'all'.
 	 */
 	var $debug_dump_function_trace_for_queries = 0;
-
 	/**
 	 * Number of rows we want to dump in debug output (0 disables it)
 	 * @var integer (Default: 0)
 	 */
 	var $debug_dump_rows = 0;
-
 	/**
 	 * Time in seconds that is considered a fast query (green).
 	 * @var float
 	 * @see dump_queries()
 	 */
 	var $query_duration_fast = 0.05;
-
 	/**
 	 * Time in seconds that is considered a slow query (red).
 	 * @var float
@@ -573,19 +547,11 @@ class DB
 		// Get rid of these
 		$this->last_result = NULL;
 		$this->last_query = NULL;
-		if( isset($this->result) && is_resource($this->result) )
-		{ // Free last result resource
-			@mysql_free_result($this->result);
-		}
 	}
 
 
 	/**
 	 * Basic Query
-	 *
-	 * NOTE: the used mysql resource will be freed in the next call to {@link DB::query()}.
-	 *       You may want to call {@link DB::flush()} after handling large result sets.
-	 * fp> Yeah that's the problem. I want the code less complex, not more complex.
 	 *
 	 * @param string SQL query
 	 * @param string title for debugging
@@ -744,12 +710,24 @@ class DB
 			}
 		}
 
+		if( $this->log_queries )
+		{	// We want to log queries:
+			if( $this->debug_dump_rows )
+			{
+				$this->queries[ $this->num_queries - 1 ]['results'] = $this->debug_get_rows_table( $this->debug_dump_rows );
+			}
+		}
+
+		if( is_resource($this->result) )
+		{
+			@mysql_free_result($this->result);
+		}
+
 		// EXPLAIN JOINS ??
 		if( $this->debug_explain_joins && preg_match( '#^ \s* select \s #ix', $query) )
 		{ // Query was a select, let's try to explain joins...
 
 			// save values:
-			$saved_result = $this->result;
 			$saved_last_result = $this->last_result;
 			$saved_num_rows = $this->num_rows;
 
@@ -767,27 +745,14 @@ class DB
 				$this->num_rows++;
 			}
 
-			if( $this->log_queries )
-			{	// We want to log queries:
-				$this->queries[ $this->num_queries - 1 ]['explain'] = $this->debug_get_rows_table( 100, true );
-			}
+			$this->queries[ $this->num_queries - 1 ]['explain'] = $this->debug_get_rows_table( 100, true );
 
 			// Free "EXPLAIN" result resource:
 			@mysql_free_result($this->result);
 
 			// Restore:
-			$this->result = $saved_result;
 			$this->last_result = $saved_last_result;
 			$this->num_rows = $saved_num_rows;
-		}
-
-
-		if( $this->log_queries )
-		{	// We want to log queries:
-			if( $this->debug_dump_rows )
-			{
-				$this->queries[ $this->num_queries - 1 ]['results'] = $this->debug_get_rows_table( $this->debug_dump_rows );
-			}
 		}
 
 		return $return_val;
@@ -990,61 +955,6 @@ class DB
 
 
 	/**
-	 * Function to get column meta data info pertaining to the last query.
-	 *
-	 * @param string|NULL Key of info, see {@link http://php.net/mysql_fetch_field} for a list;
-	 *                    empty/NULL for an array with all entries
-	 * @param integer Column offset; -1 for all
-	 */
-	function get_col_info( $info_type = 'name', $col_offset = -1 )
-	{
-		if( ! is_resource($this->result) )
-		{ // fp> A function should NEVER FAIL SILENTLY!
-			debug_die( 'DB::get_col_info() cannot return a value because no result resource is available!' );
-		}
-
-		// Get column info:
-		if( $col_offset == -1 )
-		{ // all columns:
-			$n = mysql_num_fields($this->result);
-			$i = 0;
-			while( $i < $n )
-			{
-				$col_info[$i] = mysql_fetch_field($this->result, $i);
-				$i++;
-			}
-		}
-		else
-		{
-			$col_info = mysql_fetch_field($this->result, $col_offset);
-		}
-
-		if( empty($info_type) )
-		{ // all field properties:
-			return $col_info;
-		}
-		else
-		{ // a specific column field property
-			if( $col_offset == -1 )
-			{
-				$new_array = array();
-				$i = 0;
-				foreach( $col_info as $col )
-				{
-					$new_array[$i] = $col->{$info_type};
-					$i++;
-				}
-				return $new_array;
-			}
-			else
-			{
-				return $col_info->{$info_type};
-			}
-		}
-	}
-
-
-	/**
 	 * Get a table (or "<p>No Results.</p>") for the SELECT query results.
 	 *
 	 * @return string HTML table or "No Results" if the
@@ -1053,10 +963,19 @@ class DB
 	{
 		$r = '';
 
-		if( ! is_resource($this->result) // don't let get_col_info() debug_die().. :/
-			|| ! ( $col_info = $this->get_col_info(NULL) ) )
+		if( ! is_resource($this->result) )
 		{
 			return '<p>No Results.</p>';
+		}
+
+		// Get column info:
+		$col_info = array();
+		$n = mysql_num_fields($this->result);
+		$i = 0;
+		while( $i < $n )
+		{
+			$col_info[$i] = mysql_fetch_field($this->result, $i);
+			$i++;
 		}
 
 		// =====================================================
@@ -1426,6 +1345,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.46  2006/11/27 01:35:47  blueyed
+ * Removed get_col_info() and free mysql_result in query() always again
+ *
  * Revision 1.45  2006/11/26 11:12:38  fplanque
  * doc / todo
  *
