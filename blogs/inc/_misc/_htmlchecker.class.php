@@ -96,32 +96,9 @@ class SafeHtmlChecker
 		// set functions to call when a start or end tag is encountered
 		xml_set_element_handler($this->parser, 'tag_open', 'tag_close');
 		// set function to call for the actual data
-
-		// fp> why are these lines disabled without further comment? What replaces them?
-		// what happends when something unknown is encountered? does it really maje sense to just *dump* ALL of these?
-		#xml_set_character_data_handler($this->parser, 'cdata');
-
-		#xml_set_default_handler($this->parser, 'default_handler');
-		#xml_set_external_entity_ref_handler($this->parser, 'external_entity');
-		#xml_set_unparsed_entity_decl_handler($this->parser, 'unparsed_entity');
+		xml_set_character_data_handler($this->parser, 'cdata');
 
 		xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING, false);
-	}
-
-	function default_handler( $parser, $data)
-	{
-		// echo 'default handler: '.$data.'<br />';
-	}
-
-	function external_entity( $parser, $open_entity_names, $base, $system_id, $public_id)
-	{
-		// echo 'external_entity<br />';
-	}
-
-
-	function unparsed_entity( $parser, $entity_name, $base, $system_id, $public_id, $notation_name)
-	{
-		// echo 'unparsed_entity<br />';
 	}
 
 
@@ -303,6 +280,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.12  2006/11/27 02:29:53  blueyed
+ * Committed test changes by accident. Test added for it as an exercise.
+ *
  * Revision 1.11  2006/11/26 02:30:39  fplanque
  * doc / todo
  *

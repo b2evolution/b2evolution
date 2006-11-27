@@ -117,6 +117,32 @@ class ExtLibsTestCase extends EvoUnitTestCase
 		$this->assertEqual( $SHC->encoding, 'ISO-8859-1' );
 	}
 
+
+	/**
+	 * Test {@link SafeHtmlChecker::check()}.
+	 * NOTE: assignment by "& new" is required for PHP4! See also http://de3.php.net/manual/en/function.xml-set-object.php#46107
+	 *       Alternatively, multiple vars for each test may work, or unsetting the last one..
+	 */
+	function test_htmlchecker_check()
+	{
+		global $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme;
+		global $Messages;
+
+		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme
+			/* default encoding */ );
+		$SHC->check( '<moo>foo</moo>' );
+		$this->assertEqual( $GLOBALS['Messages']->messages['error'][0],
+			T_('Illegal tag').': <code>moo</code>' );
+		$Messages->clear();
+
+		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme
+			/* default encoding */ );
+		$SHC->check( '<img>foo</img>' );
+		$this->assertEqual( $GLOBALS['Messages']->messages['error'][0],
+			sprintf( T_('Tag &lt;%s&gt; may not contain raw character data'), '<code>img</code>' ) );
+
+	}
+
 }
 
 
