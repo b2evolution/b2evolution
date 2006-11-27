@@ -134,14 +134,24 @@ $Form->begin_fieldset( T_('Hit & session logging') . get_web_help_link('Hit logg
 
 	// TODO: draw a warning sign if set to off
 	$Form->radio_input( 'auto_prune_stats_mode', $Settings->get('auto_prune_stats_mode'), array(
-			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('Not recommended! Your database will grow very large!!'), 'suffix' => '<br />' ),
-			array( 'value'=>'page', 'label'=>T_('On every page'), 'note'=>T_('This is guaranteed to work but uses extra resources with every page displayed.'), 'suffix' => '<br />' ),
-			array( 'value'=>'cron', 'label'=>T_('With a scheduled job'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up.') ) ),
-		T_('Auto pruning'), array( 'note' => T_('Note: Even if you don\'t log hits, you still need to prune sessions!') ) );
+			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('Not recommended! Your database will grow very large!!'), 'suffix' => '<br />',
+				'params' => array('onclick'=>'$("#auto_prune_stats_container").hide();') ),
+			array( 'value'=>'page', 'label'=>T_('On every page'), 'note'=>T_('This is guaranteed to work but uses extra resources with every page displayed.'), 'suffix' => '<br />',
+				'params' => array('onclick'=>'$("#auto_prune_stats_container").show();') ),
+			array( 'value'=>'cron', 'label'=>T_('With a scheduled job'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up.'),
+				'params' => array('onclick'=>'$("#auto_prune_stats_container").show();') ) ),
+		T_('Auto pruning'),
+		array( 'note' => T_('Note: Even if you don\'t log hits, you still need to prune sessions!') ) );
 
-	// TODO: hide this if mode set to off:
+	echo '<div id="auto_prune_stats_container">';
 	$Form->text_input( 'auto_prune_stats', $Settings->get('auto_prune_stats'), 5, T_('Prune after'),
 		array( 'note' => T_('days. How many days of hits & sessions do you want to keep in the database for stats?') ) );
+	echo '</div>';
+
+	if( $Settings->get('auto_prune_stats_mode') == 'off' )
+	{ // hide the "days" input field, if mode set to off:
+		echo '<script type="text/javascript">$("#auto_prune_stats_container").hide();</script>';
+	}
 
 $Form->end_fieldset();
 
@@ -165,6 +175,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.13  2006/11/27 00:07:57  blueyed
+ * Hide auto_prune_stats field, if ~_mode set to off
+ *
  * Revision 1.12  2006/11/26 23:47:42  blueyed
  * Wording and "and" instead of "&amp;"
  *
