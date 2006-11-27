@@ -43,7 +43,7 @@ class ldap_plugin extends Plugin
 {
 	var $code = 'evo_ldap_auth';
 	var $priority = 50;
-	var $version = '1.9-dev';
+	var $version = '2.0-dev';
 	var $author = 'dAniel hAhler';
 
 
@@ -99,6 +99,11 @@ class ldap_plugin extends Plugin
 						'note' => T_('The group to use as template, if we create a new group. Set this to "None" to not create new groups.'),
 						'allow_none' => true,
 					),
+					'disabled' => array(
+						'label' => T_('Disabled'),
+						'defaultvalue' => 0,
+						'type' => 'checkbox',
+					),
 				),
 			),
 
@@ -152,10 +157,15 @@ class ldap_plugin extends Plugin
 		// Loop through list of search sets
 		foreach( $search_sets as $l_set )
 		{
-
 			$server_port = explode(':', $l_set['server']);
 			$server = $server_port[0];
 			$port = isset($server_port[1]) ? $server_port[1] : 389;
+
+			if( ! empty($l_set['disabled']) )
+			{
+				$this->debug_log( 'Skipping disabled LDAP server &laquo;'.$server.':'.$port.'&raquo;!' );
+				continue;
+			}
 
 			if( !($ldap_conn = @ldap_connect( $server, $port )) )
 			{
@@ -353,6 +363,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.40  2006/11/27 19:05:56  blueyed
+ * Added "disabled" setting for LDAP server set entries. Bumped version to 2.0-dev.
+ *
  * Revision 1.39  2006/11/09 22:27:20  blueyed
  * Needs raw pwd
  *
