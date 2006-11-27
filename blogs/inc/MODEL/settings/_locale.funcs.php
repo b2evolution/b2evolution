@@ -197,7 +197,7 @@ else
 /**
  * Translate and escape single quotes.
  *
- * This is to be used mainly for Javascript stings.
+ * This is to be used mainly for Javascript strings.
  *
  * @uses T_()
  * @param string String to translate
@@ -950,6 +950,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.35  2006/11/27 01:36:04  blueyed
+ * doc typo
+ *
  * Revision 1.34  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
