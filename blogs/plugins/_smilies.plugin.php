@@ -74,7 +74,7 @@ class smilies_plugin extends Plugin
 				),
 				'render_comments_default' => array(
 					'label' => $this->T_('Render comments' ),
-					'note' => $this->T_('This is the default setting. Users can override it in their profile'),
+					'note' => $this->T_('This is the default setting. Users can override it in their profile.'),
 					'defaultvalue' => '1',
 					'type' => 'checkbox',
 				),
@@ -410,6 +410,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.34  2006/11/27 00:28:36  blueyed
+ * trans fix
+ *
  * Revision 1.33  2006/08/10 09:07:12  yabs
  * minor mods + added note re smilies folder
  *
