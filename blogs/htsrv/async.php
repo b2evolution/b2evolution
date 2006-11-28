@@ -36,10 +36,9 @@ require_once dirname(__FILE__).'/../conf/_config.php';
  * @todo dh> refactor _main.inc.php to be able to include small parts
  *           (e.g. $current_User, charset init, ...) only..
  *           It worked already for $DB (_connect_db.inc.php).
+ * fp> I think I'll try _core_main.inc , _evo_main.inc , _blog_main.inc ; this file would only need _core_main.inc
  */
 require_once $inc_path.'_main.inc.php';
-
-param( 'action', 'string', '' );
 
 
 // Check global permission:
@@ -50,6 +49,8 @@ if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 }
 
 
+// fp> Does the following have an HTTP fallback when Javascript/AJ is not available?
+param( 'action', 'string', '' );
 switch( $action )
 {
 	case 'add_plugin_sett_set':
@@ -96,8 +97,7 @@ switch( $action )
 
 
 /**
- * @todo dh> What's the reason to delegate to another file here, instead of
- *           having it all here?
+ * Call the handler/dispatcher (it is a common handler for asynchronous calls -- both AJax calls and HTTP GET fallbacks)
  */
 require_once $inc_path.'_async.inc.php';
 
@@ -111,6 +111,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.11  2006/11/28 00:47:16  fplanque
+ * doc
+ *
  * Revision 1.10  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
