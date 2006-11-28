@@ -1934,6 +1934,11 @@ class Item extends DataObject
 
 		if( ! is_logged_in() ) return false;
 
+		if( ! $this->ID )
+		{ // preview..
+			return false;
+		}
+
 		if( ! $current_User->check_perm( 'blog_post_statuses', $this->status, false,
 																			$this->blog_ID ) )
 		{ // User has no right to edit this post
@@ -1963,9 +1968,7 @@ class Item extends DataObject
 	/**
 	 * @see Item::get_edit_link()
 	 */
-	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
-											$actionurl = '#' )
-
+	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $actionurl = '#' )
 	{
 		echo $this->get_edit_link( $before, $after, $text, $title, $class, $actionurl );
 	}
@@ -3314,6 +3317,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.124  2006/11/28 20:04:11  blueyed
+ * No edit link, if ID==0 to avoid confusion in preview, see http://forums.b2evolution.net/viewtopic.php?p=47422#47422
+ *
  * Revision 1.123  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
