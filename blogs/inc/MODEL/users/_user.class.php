@@ -776,9 +776,10 @@ class User extends DataObject
 		}
 
 		// Get list of posts that are going to be deleted (3.23)
-		$post_list = $DB->get_list( 'SELECT post_ID
-																	FROM T_posts
-																	WHERE post_creator_user_ID = '.$this->ID );
+		$post_list = implode( ',', $DB->get_col( '
+				SELECT post_ID
+				  FROM T_posts
+				 WHERE post_creator_user_ID = '.$this->ID ) );
 
 		if( !empty( $post_list ) )
 		{
@@ -1117,6 +1118,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.53  2006/11/28 00:33:01  blueyed
+ * Removed DB::compString() (never used) and DB::get_list() (just a macro and better to have in the 4 used places directly; Cleanup/normalization; no extended regexp, when not needed!
+ *
  * Revision 1.52  2006/11/27 21:10:23  fplanque
  * doc
  *

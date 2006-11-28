@@ -862,7 +862,7 @@ class ItemList2 extends DataObjectList2
 		// echo $DB->format_query( $step1_sql );
 
 		// Get list of the IDs we need:
-		$ID_list = $DB->get_list( $step1_sql, 0, 'Get ID list for ItemList2 (Main|Lastpostdate) Query' );
+		$ID_list = implode( ',', $DB->get_col( $step1_sql, 0, 'Get ID list for ItemList2 (Main|Lastpostdate) Query' ) );
 
 		// Step 2:
 		$this->sql = 'SELECT *
@@ -1614,6 +1614,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.42  2006/11/28 00:33:01  blueyed
+ * Removed DB::compString() (never used) and DB::get_list() (just a macro and better to have in the 4 used places directly; Cleanup/normalization; no extended regexp, when not needed!
+ *
  * Revision 1.41  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

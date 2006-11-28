@@ -116,6 +116,7 @@ class DB
 	var $insert_id = 0;
 
 	/**
+	 * @access protected
 	 * @var resource Last query's resource
 	 */
 	var $result;
@@ -226,18 +227,21 @@ class DB
 
 	/**
 	 * Do we want to explain joins?
+	 * This requires {@link DB::log_queries} to be true.
 	 * @var boolean (Default: false)
 	 */
 	var $debug_explain_joins = false;
 
 	/**
 	 * Do we want to output a function backtrace for every query?
+	 * This requires {@link DB::log_queries} to be true.
 	 * @var integer|boolean Number of stack entries to show (from last to first) (Default: 0); true means 'all'.
 	 */
 	var $debug_dump_function_trace_for_queries = 0;
 
 	/**
 	 * Number of rows we want to dump in debug output (0 disables it)
+	 * This requires {@link DB::log_queries} to be true.
 	 * @var integer (Default: 0)
 	 */
 	var $debug_dump_rows = 0;
@@ -464,29 +468,6 @@ class DB
 
 
 	/**
-	 * Returns the appropriate string to compare $val in a WHERE clause.
-	 *
-	 * @param mixed Value to create a "compare-String" for
-	 * @return string Either 'IS NULL', 'IN ("a", "b", "c")' or " = 'a'".
-	 */
-	function compString( $val )
-	{
-		if( $val === NULL )
-		{
-			return 'IS NULL';
-		}
-		elseif( is_array($val) )
-		{
-			return 'IN ("'.implode('","', $val).'")';
-		}
-		else
-		{
-			return " = '$root'";
-		}
-	}
-
-
-	/**
 	 * Print SQL/DB error.
 	 *
 	 * TODO: fp> bloated: it probably doesn't make sense to display errors if we don't stop. Any use case?
@@ -543,7 +524,7 @@ class DB
 
 		if( $this->halt_on_error )
 		{
-			if( function_exists( 'debug_die' ) )
+			if( function_exists('debug_die') )
 			{
 				debug_die( $err_msg );
 			}
@@ -552,7 +533,7 @@ class DB
 				die( $err_msg );
 			}
 		}
-		elseif ( $this->show_errors )
+		elseif( $this->show_errors )
 		{ // If there is an error then take note of it
 			echo '<div class="error">';
 			echo $err_msg;
@@ -674,11 +655,12 @@ class DB
 		// If there is an error then take note of it..
 		if( mysql_error($this->dbhandle) )
 		{
+			@mysql_free_result($this->result);
 			$this->print_error( '', '', $title );
 			return false;
 		}
 
-		if( preg_match( '#^ \s* (insert|delete|update|replace) \s #ix', $query, $match ) )
+		if( preg_match( '#^\s*(INSERT|DELETE|UPDATE|REPLACE)\s#i', $query, $match ) )
 		{ // Query was an insert, delete, update, replace:
 
 			$this->rows_affected = mysql_affected_rows($this->dbhandle);
@@ -711,7 +693,6 @@ class DB
 					$this->last_result[$this->num_rows] = $row;
 					$this->num_rows++;
 				}
-
 			}
 
 			if( $this->log_queries )
@@ -723,30 +704,24 @@ class DB
 			$return_val = $this->num_rows;
 		}
 
-
 		if( $this->log_queries )
 		{	// We want to log queries:
 			if( $this->debug_dump_function_trace_for_queries )
 			{
 				$this->queries[ $this->num_queries - 1 ]['function_trace'] = debug_get_backtrace( $this->debug_dump_function_trace_for_queries, array( array( 'class' => 'DB' ) ), 1 ); // including first stack entry from class DB
 			}
-		}
 
-		if( $this->log_queries )
-		{	// We want to log queries:
 			if( $this->debug_dump_rows )
 			{
 				$this->queries[ $this->num_queries - 1 ]['results'] = $this->debug_get_rows_table( $this->debug_dump_rows );
 			}
 		}
 
-		if( is_resource($this->result) )
-		{
-			@mysql_free_result($this->result);
-		}
+		// Free original query's result:
+		@mysql_free_result($this->result);
 
 		// EXPLAIN JOINS ??
-		if( $this->debug_explain_joins && preg_match( '#^ \s* select \s #ix', $query) )
+		if( $this->log_queries && $this->debug_explain_joins && preg_match( '#^\s*SELECT\s#i', $query) )
 		{ // Query was a select, let's try to explain joins...
 
 			// save values:
@@ -822,32 +797,28 @@ class DB
 	 */
 	function get_row( $query = NULL, $output = OBJECT, $y = 0, $title = '' )
 	{
-		// Log how the function was called
-		$this->func_call = "\$db->get_row(\"$query\",$output,$y)";
-		// echo $this->func_call, '<br />';
-
 		// If there is a query then perform it if not then use cached results..
-		if ( $query )
+		if( $query )
 		{
 			$this->query($query, $title);
 		}
 
 		// If the output is an object then return object using the row offset..
-		if ( $output == OBJECT )
+		if( $output == OBJECT )
 		{
 			return $this->last_result[$y]
 				? $this->last_result[$y]
 				: NULL;
 		}
 		// If the output is an associative array then return row as such..
-		elseif ( $output == ARRAY_A )
+		elseif( $output == ARRAY_A )
 		{
 			return $this->last_result[$y]
 				? get_object_vars( $this->last_result[$y] )
 				: array();
 		}
 		// If the output is an numerical array then return row as such..
-		elseif ( $output == ARRAY_N )
+		elseif( $output == ARRAY_N )
 		{
 			return $this->last_result[$y]
 				? array_values( get_object_vars($this->last_result[$y]) )
@@ -913,28 +884,12 @@ class DB
 
 
 	/**
-	 * Get a column as comma-separated list.
-	 *
-	 * @param string|NULL Query to execute
-	 * @param integer Column of the result set
-	 * @return string
-	 */
-	function get_list( $query = NULL, $x = 0, $title = '' )
-	{
-		return implode( ',', $this->get_col( $query, $x, $title ) );
-	}
-
-
-	/**
 	 * Return the the query as a result set - see docs for more details
 	 *
 	 * @return array
 	 */
 	function get_results( $query = NULL, $output = OBJECT, $title = '' )
 	{
-		// Log how the function was called
-		$this->func_call = "\$db->get_results(\"$query\", $output)";
-
 		// If there is a query then perform it if not then use cached results..
 		if( $query )
 		{
@@ -942,11 +897,11 @@ class DB
 		}
 
 		// Send back array of objects. Each row is an object
-		if ( $output == OBJECT )
+		if( $output == OBJECT )
 		{
 			return $this->last_result ? $this->last_result : array();
 		}
-		elseif ( $output == ARRAY_A || $output == ARRAY_N )
+		elseif( $output == ARRAY_A || $output == ARRAY_N )
 		{
 			$new_array = array();
 
@@ -958,7 +913,7 @@ class DB
 				{
 					$new_array[$i] = get_object_vars($row);
 
-					if ( $output == ARRAY_N )
+					if( $output == ARRAY_N )
 					{
 						$new_array[$i] = array_values($new_array[$i]);
 					}
@@ -1257,7 +1212,7 @@ class DB
 
 
 	/**
-	 * @todo implement transactions!
+	 * @todo implement transactions! dh> done?
 	 */
 	function rollback()
 	{
@@ -1365,8 +1320,12 @@ class DB
 
 }
 
+
 /*
  * $Log$
+ * Revision 1.48  2006/11/28 00:33:01  blueyed
+ * Removed DB::compString() (never used) and DB::get_list() (just a macro and better to have in the 4 used places directly; Cleanup/normalization; no extended regexp, when not needed!
+ *
  * Revision 1.47  2006/11/27 20:54:07  fplanque
  * doc
  *

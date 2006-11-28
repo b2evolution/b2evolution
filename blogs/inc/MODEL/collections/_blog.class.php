@@ -874,9 +874,10 @@ class Blog extends DataObject
 
 		// Get list of cats that are going to be deleted (3.23)
 		if( $echo ) echo '<br />Getting category list to delete... ';
-		$cat_list = $DB->get_list( "SELECT cat_ID
-																FROM T_categories
-																WHERE cat_blog_ID = $this->ID" );
+		$cat_list = implode( ',', $DB->get_col( "
+				SELECT cat_ID
+				  FROM T_categories
+				 WHERE cat_blog_ID = $this->ID" ) );
 
 		if( empty( $cat_list ) )
 		{ // There are no cats to delete
@@ -887,9 +888,10 @@ class Blog extends DataObject
 
 			// Get list of posts that are going to be deleted (3.23)
 			if( $echo ) echo '<br />Getting post list to delete... ';
-			$post_list = $DB->get_list( "SELECT postcat_post_ID
-																		FROM T_postcats
-																		WHERE postcat_cat_ID IN ($cat_list)" );
+			$post_list = implode( ',', $DB->get_col( "
+					SELECT postcat_post_ID
+					  FROM T_postcats
+					 WHERE postcat_cat_ID IN ($cat_list)" ) );
 
 			if( empty( $post_list ) )
 			{ // There are no posts to delete
@@ -1038,6 +1040,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.35  2006/11/28 00:33:01  blueyed
+ * Removed DB::compString() (never used) and DB::get_list() (just a macro and better to have in the 4 used places directly; Cleanup/normalization; no extended regexp, when not needed!
+ *
  * Revision 1.34  2006/11/24 18:27:23  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
