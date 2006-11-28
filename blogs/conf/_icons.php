@@ -18,7 +18,7 @@ function get_icon_info($name)
 	global $rsc_subdir;
 
 	/*
-fp> does this block really make sense? (was commented out already)
+	 * dh> Idea:
 	global $Plugins;
 	if( $r = $Plugins->trigger_event_first_return('GetIconInfo', array('name'=>$name)) )
 	{
@@ -488,6 +488,9 @@ fp> does this block really make sense? (was commented out already)
 
 /*
  * $Log$
+ * Revision 1.49  2006/11/28 23:20:14  blueyed
+ * doc
+ *
  * Revision 1.48  2006/11/28 02:52:26  fplanque
  * doc
  *
