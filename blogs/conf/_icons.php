@@ -1,7 +1,8 @@
 <?php
 /**
  * This file provides icon definitions through a function.
- * fp> why is this a function now?
+ *
+ * Will resolve translations at runtime and consume less memory than a table.
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -17,6 +18,7 @@ function get_icon_info($name)
 	global $rsc_subdir;
 
 	/*
+fp> does this block really make sense? (was commented out already)
 	global $Plugins;
 	if( $r = $Plugins->trigger_event_first_return('GetIconInfo', array('name'=>$name)) )
 	{
@@ -486,6 +488,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.48  2006/11/28 02:52:26  fplanque
+ * doc
+ *
  * Revision 1.47  2006/11/26 01:42:08  fplanque
  * doc
  *

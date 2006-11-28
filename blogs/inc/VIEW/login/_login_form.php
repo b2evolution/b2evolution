@@ -28,6 +28,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $need_raw_pwd = (bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 
+// Do not cache this page, because the JS password random salt has to match the session cookie:
+// fp> I changed the meaning of teh comment below. Does this reflect the implementation?
+// Do not cache this page, because the JS password random salt has to match the one stored in the current session:
 header_nocache(); // do not cache this page, because the JS password salt has to match the session cookie
 
 /**
@@ -36,9 +39,12 @@ header_nocache(); // do not cache this page, because the JS password salt has to
 $page_title = T_('Login form');
 $page_icon = 'icon_login.gif';
 
+// We include functions.js even if we don't need it. The login page is small. Let's use it as a preloader for the backoffice (which is awfully slow to initialize)
+// fp> TODO: find a javascript way to preload more stuff (like icons) WITHOUT delaying the browser autocomplete of the login & password fields
+$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/functions.js"></script>';
+
 if( ! $need_raw_pwd )
 { // Include JS for client-side password hashing:
-	$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/functions.js"></script>';
 	$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/md5.js"></script>';
 	$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/sha1.js"></script>';
 }
@@ -59,6 +65,11 @@ $Form->begin_form( 'fform' );
 		$pwd_salt = $Session->get('core.pwd_salt');
 		if( empty($pwd_salt) )
 		{ // generate anew, only if empty - so multiple login screens share the same hash. Gets reset on trying to login.
+			// fp> the above is another "so" that makes it really hard to understand what was meant
+		// Suggestion: "Do not regenerate if already set because we want to reuse the previous salt on login screen reloads". 
+		// fp> Question: the comment implies that the salt is reset even on failed login attemps. Why that? I would only have reset it on successful login. Do experts recommend it this way? 
+		// but if you kill the session you get a new salt anyway, so it's no big deal. 
+		// At that point, why not reset the salt at every reload? (it may be good to keep it, but I think the reason should be documented here)
 			$pwd_salt = generate_random_key(64);
 			$Session->set( 'core.pwd_salt', $pwd_salt, 86400 /* expire in 1 day */ );
 		}
@@ -176,6 +187,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.21  2006/11/28 02:52:26  fplanque
+ * doc
+ *
  * Revision 1.20  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

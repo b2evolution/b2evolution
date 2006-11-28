@@ -37,8 +37,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<?php
 	// Insert HEAD lines, which have been defined before:
 	// fp> what is this useful for?
-	// dh> TODO: currently this may be affected by register_globals=ON -- fp> then initialize it to empty somewhere before using it!
+	// dh> TODO: currently this may be affected by register_globals=ON
+	// fp> then initialize it to empty somewhere before using it!
 	// dh> TODO: fp, is this ok? It should maybe be a func and available everywhere we output <HEAD> tags..?
+	// fp> it's not okay if it can be overriden wyth reg globs on
 	if( isset($evo_html_headlines) ) foreach( $evo_html_headlines as $v )
 	{
 		echo $v;
@@ -68,6 +70,9 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
+ * Revision 1.10  2006/11/28 02:52:26  fplanque
+ * doc
+ *
  * Revision 1.9  2006/11/26 01:42:10  fplanque
  * doc
  *

@@ -1536,7 +1536,7 @@ function debug_info( $force = false )
 	}
 
 
-	// DEBUGLOG(s) FROM SESSION, after redirect(s) (with list of categories at top):
+	// DEBUGLOG(s) FROM PREVIOUS SESSIONS, after REDIRECT(s) (with list of categories at top):
 	if( isset($Session) && ($sess_Debuglogs = $Session->get('Debuglogs')) && ! empty($sess_Debuglogs) )
 	{
 		$count_sess_Debuglogs = count($sess_Debuglogs);
@@ -1575,7 +1575,7 @@ function debug_info( $force = false )
 	}
 
 
-	// current DEBUGLOG (with list of categories at top):
+	// CURRENT DEBUGLOG (with list of categories at top):
 	$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
 	$log_cats = array_keys($Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
 	$log_container_head = '<h3 id="debug_debuglog">Debug messages</h3>';
@@ -2142,7 +2142,7 @@ function get_base_domain( $url )
 	// Get the base domain up to 3 levels (x.y.tld):
 	// NOTE: "_" is not really valid, but for Windows it is..
 	// TODO: dh> this should also handle IDN "raw" domains with umlauts..
-	// NOTE: \w does not match umlauts always.. it's based on setlocale()..
+	// NOTE: \w does not always match umlauts.. it's based on setlocale().. (fp> hum, it was too good to be real :P)
 	// NOTE: \w includes "_"
 	if( ! preg_match( '~  ( \w (\w|-|_)* \. ){0,2}   \w (\w|-|_)*  $~ix', $domain, $matches ) )
 	{
@@ -2773,6 +2773,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.148  2006/11/28 02:52:26  fplanque
+ * doc
+ *
  * Revision 1.147  2006/11/26 02:30:39  fplanque
  * doc / todo
  *

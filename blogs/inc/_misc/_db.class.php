@@ -721,7 +721,7 @@ class DB
 		@mysql_free_result($this->result);
 
 		// EXPLAIN JOINS ??
-		if( $this->log_queries && $this->debug_explain_joins && preg_match( '#^\s*SELECT\s#i', $query) )
+		if( $this->log_queries && $this->debug_explain_joins && preg_match( '#^ \s* SELECT \s #ix', $query) )
 		{ // Query was a select, let's try to explain joins...
 
 			// save values:
@@ -1212,7 +1212,7 @@ class DB
 
 
 	/**
-	 * @todo implement transactions! dh> done?
+	 * Rollback current transaction
 	 */
 	function rollback()
 	{
@@ -1323,6 +1323,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.49  2006/11/28 02:52:26  fplanque
+ * doc
+ *
  * Revision 1.48  2006/11/28 00:33:01  blueyed
  * Removed DB::compString() (never used) and DB::get_list() (just a macro and better to have in the 4 used places directly; Cleanup/normalization; no extended regexp, when not needed!
  *
