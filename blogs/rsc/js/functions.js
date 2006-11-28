@@ -163,6 +163,8 @@ function toggle_clickopen( id, hide, displayVisible )
  */
 function textarea_replace_selection( myField, snippet, target_document )
 {
+	target_document = target_document || document;
+
 	if( b2evo_Callbacks.trigger_callback( "insert_raw_into_"+myField.id, snippet ) )
 	{
 		return;
@@ -361,18 +363,39 @@ b2evo_Callbacks.prototype = {
 		this.eventHandlers[event][this.eventHandlers[event].length] = f;
 	},
 
-	trigger_callback : function(event, value) {
+	/**
+	 * @param String event name
+	 * @param mixed argument1
+	 * @param mixed argument2
+	 * ...
+	 * @return boolean true, if any callback returned true
+	 */
+	trigger_callback : function(event, args) {
 		if( typeof this.eventHandlers[event] == "undefined" )
 		{
 			return false;
 		}
 
 		var r = false;
+
+		// copy arguments and build function param string for eval():
+		var cb_args = '';
+		var cb_arguments = arguments;
+		for( var i = 1; i < arguments.length; i++ ) {
+			cb_args += "cb_arguments[" + i + "], ";
+		}
+		if( cb_args.length )
+		{ // remove last ", ":
+			cb_args = cb_args.substring( 0, cb_args.length - 2 );
+		}
+
+		// eval() for each registered callback:
 		for( var i = 0; i < this.eventHandlers[event].length; i++ )
 		{
 			var f = this.eventHandlers[event][i];
-			r = eval( "f(value);" ) || r;
+			r = eval( "f("+cb_args+");" ) || r;
 		}
+
 		return r;
 	}
 };
@@ -381,6 +404,9 @@ var b2evo_Callbacks = new b2evo_Callbacks();
 
 /*
  * $Log$
+ * Revision 1.23  2006/11/28 19:44:51  blueyed
+ * b2evo_Callbacks.trigger_callback() now supports variable number of arguments; textarea_replace_selection(): default to document for target_document arg
+ *
  * Revision 1.22  2006/11/26 01:42:10  fplanque
  * doc
  *
