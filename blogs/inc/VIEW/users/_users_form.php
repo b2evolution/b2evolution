@@ -151,7 +151,14 @@ if( $action != 'view_user' )
 	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when visiting the site.') );
 	$Form->select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options_return', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
 	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), array( 'note' => $email_fieldnote, 'maxlength' => 100, 'required' => true ) );
-	$Form->checkbox( 'edited_user_validated', $edited_User->get('validated'), T_('Validated'), T_('Has the user been validated (through email)?') );
+	if( $current_User->check_perm( 'users', 'edit' ) )
+	{ // user has "edit users" perms:
+		$Form->checkbox( 'edited_user_validated', $edited_User->get('validated'), T_('Validated'), T_('Has the user been validated (through email)?') );
+	}
+	else
+	{ // info only:
+		$Form->info( T_('Validated'), ( $edited_User->get('validated') ? T_('yes') : T_('no') ), T_('Has the user been validated (through email)?') );
+	}
 	$Form->checkbox( 'edited_user_allow_msgform', $edited_User->get('allow_msgform'), T_('Message form'), T_('Check this to allow receiving emails through a message form.') );
 	$Form->checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc.') );
 	$Form->text_input( 'edited_user_url', $edited_User->url, 30, T_('URL'), array( 'note' => $url_fieldnote, 'maxlength' => 100 ) );
@@ -280,6 +287,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.29  2006/11/28 01:31:23  blueyed
+ * Display fix: user cannot edit "validated", if he has no "edit users" perms
+ *
  * Revision 1.28  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
