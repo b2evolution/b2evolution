@@ -142,8 +142,13 @@ class User extends DataObject
 		if( $db_row == NULL )
 		{ // Setting those object properties, which are not "NULL" in DB (MySQL strict mode):
 			// fp> WHAT DO YOU MEAN WITH THIS: dh> e.g. "email" needs to be NULL, so setting it to "" causes a call to dbchange(). -- fp> needs to be NULL or NOT NULL???
+			// dh> IIRC: If User::email is initialised to '' (as a class member and as it's in v-1-8),
+			//     calling $User->set('email', '') causes no call to dbchange()!
 			// dh> TODO: Maybe email should get "NULL" with 1.9?
 // fp> No, a user without an email address makes no sense. NOT NULL reminds it.
+			// dh> The "ldap plugin" (or any other plugin) may have no e-mail for a new user.. also the MT importer
+			//     does not have one (so it creates an empty one) - NULL might be the right thing here..
+			//     "A user can have no email, but an email address cannot be empty!"
 
 			// echo 'Creating blank user';
 			$this->set( 'login', 'login' );
@@ -1118,6 +1123,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.54  2006/11/28 01:10:28  blueyed
+ * doc/discussion
+ *
  * Revision 1.53  2006/11/28 00:33:01  blueyed
  * Removed DB::compString() (never used) and DB::get_list() (just a macro and better to have in the 4 used places directly; Cleanup/normalization; no extended regexp, when not needed!
  *

@@ -50,6 +50,7 @@ if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 
 
 // fp> Does the following have an HTTP fallback when Javascript/AJ is not available?
+// dh> yes, but not through this file.. should it? IMHO not.
 param( 'action', 'string', '' );
 switch( $action )
 {
@@ -111,6 +112,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.12  2006/11/28 01:10:46  blueyed
+ * doc/discussion
+ *
  * Revision 1.11  2006/11/28 00:47:16  fplanque
  * doc
  *
