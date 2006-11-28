@@ -45,7 +45,7 @@ class IconLegend
 		}
 
 		// There are some icons to display:
-		echo '<div id="icon_legend">';
+		echo '<div id="icon_legend">'.T_('Legend').': ';
 
 		// Loop on all map array of filenames for icons to display icons list in the same order:
 		foreach( $this->icons as $icon )
@@ -85,6 +85,9 @@ class IconLegend
 
 /*
  * $Log$
+ * Revision 1.6  2006/11/28 01:02:53  fplanque
+ * minor
+ *
  * Revision 1.5  2006/11/26 02:30:39  fplanque
  * doc / todo
  *
