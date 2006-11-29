@@ -129,6 +129,7 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 
 	if( $use_preview )
 	{ // ---------- PREVIEW ----------
+		load_funcs( '_misc/_url.funcs.php' );
 		$url = url_same_protocol( $Blog->get( 'dynurl' ) );
 
 		$Form->button( array( 'button', '', T_('Preview'), '', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
@@ -281,6 +282,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.21  2006/11/29 20:48:46  blueyed
+ * Moved url_rel_to_same_host() from _misc.funcs.php to _url.funcs.php
+ *
  * Revision 1.20  2006/11/19 16:07:31  blueyed
  * Fixed saving empty renderers list. This should also fix the saving of "default" instead of the explicit renderer list
  *

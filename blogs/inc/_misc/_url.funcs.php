@@ -161,9 +161,47 @@ function fetch_remote_page( $url, & $info )
 }
 
 
+/**
+ * Get $url with the same protocol (http/https) as $other_url.
+ *
+ * @param string URL
+ * @param string other URL (defaults to {@link $ReqHost})
+ * @return string
+ */
+function url_same_protocol( $url, $other_url = NULL )
+{
+	if( is_null($other_url) )
+	{
+		global $ReqHost;
+
+		$other_url = $ReqHost;
+	}
+
+	// change protocol of $url to same of admin ('https' <=> 'http')
+	if( substr( $url, 0, 7 ) == 'http://' )
+	{
+		if( substr( $other_url, 0, 8 ) == 'https://' )
+		{
+			$url = 'https://'.substr( $url, 7 );
+		}
+	}
+	elseif( substr( $url, 0, 8 ) == 'https://' )
+	{
+		if( substr( $other_url, 0, 7 ) == 'http://' )
+		{
+			$url = 'http://'.substr( $url, 8 );
+		}
+	}
+
+	return $url;
+}
+
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.2  2006/11/29 20:48:46  blueyed
+ * Moved url_rel_to_same_host() from _misc.funcs.php to _url.funcs.php
+ *
  * Revision 1.1  2006/11/25 23:00:39  blueyed
  * Added file for URL handling. Includes fetch_remote_page()
  *

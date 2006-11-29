@@ -139,6 +139,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	if( $use_preview )
 	{ // ---------- PREVIEW ----------
+		load_funcs( '_misc/_url.funcs.php' );
 		$url = url_same_protocol( $Blog->get( 'dynurl' ) );
 
 		$Form->button( array( 'button', '', T_('Preview'), '', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
@@ -348,6 +349,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.29  2006/11/29 20:48:46  blueyed
+ * Moved url_rel_to_same_host() from _misc.funcs.php to _url.funcs.php
+ *
  * Revision 1.28  2006/11/19 03:50:29  fplanque
  * cleaned up CSS
  *

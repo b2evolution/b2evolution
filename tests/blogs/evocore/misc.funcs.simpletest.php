@@ -259,9 +259,9 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( get_base_domain('www-öl.käse-öl.de'), 'käse-öl.de' );
 		$this->assertEqual( get_base_domain('sub1.sub2.pröhl.de'), 'sub2.pröhl.de' );
 
-		// Invalid:
-		// $this->assertEqual( get_base_domain('_host'), '' ); // fist char needs to be alphanumeric
+		// Invalid, but ok:
 		// fp> This function is called get_base_domain(), not validate_domain() . If we receive a domain starting with a _, then it is not a problem to keep it in the base domain.
+		$this->assertEqual( get_base_domain('_host'), '_host' );
 
 		// The following may not be valid in the future but seem good enough for now:
 		$this->assertEqual( get_base_domain('.de'), 'de' );
@@ -299,25 +299,6 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( get_ban_domain('http://sub3.sub2.sub1.example.com'), '//sub3.sub2.sub1.example.com' );
 		$this->assertEqual( get_ban_domain('http://sub3.sub2.sub1.example.com'), '//sub3.sub2.sub1.example.com' );
 		$this->assertIdentical( get_ban_domain(''), false );
-	}
-
-
-	/**
-	 * Test {@link url_same_protocol()}
-	 */
-	function test_url_same_protocol()
-	{
-		$this->assertEqual( url_same_protocol( 'http://example.com', 'https://example.com/admin/' ),
-			'https://example.com' );
-
-		$this->assertEqual( url_same_protocol( 'https://example.com', 'https://example.com/admin/' ),
-			'https://example.com' );
-
-		$this->assertEqual( url_same_protocol( 'http://example.com', 'http://example.com/admin/' ),
-			'http://example.com' );
-
-		$this->assertEqual( url_same_protocol( 'https://example.com', 'http://example.com/admin/' ),
-			'http://example.com' );
 	}
 
 
