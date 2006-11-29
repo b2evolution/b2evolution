@@ -362,6 +362,7 @@ locale_activate( $default_locale );
 
 /*
  * Login procedure: {{{
+ * TODO: dh> the meat of this login procedure should be moved to an extra file IMHO so that if a session exists (in most cases) it does not trigger parsing the meat of this code
  */
 if( !isset($login_required) )
 {
@@ -444,38 +445,31 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		{
 			if( ! empty($pwd_hashed) )
 			{ // password hashed by JavaScript:
+
 				$Debuglog->add( 'Hashed password available.', 'login' );
+
 				if( empty($pwd_salt_sess) )
 				{ // no salt stored in session: either cookie problem or the user had already tried logging in (from another window for example)
 					$Debuglog->add( 'Empty salt_sess.', 'login' );
-					if( substr($pass, 0, 7) == 'hashed_' && substr($pass, 7) == $Session->ID )
-					{ // session ID matches, no cookie problem
-						$Messages->add( T_('The login window has expired. Please try again.'), 'login_error' );
-						$Debuglog->add( 'Session ID matches.', 'login' );
-					}
-					else
-					{ // more general error:
-						$Messages->add( T_('Either you have not enabled cookies or this login window has expired.'), 'login_error' );
-						$Debuglog->add( 'Session ID does not match.', 'login' );
-					}
+
+					$Messages->add( T_('Either you have not enabled cookies or this login window has expired.'), 'login_error' );
+					$Debuglog->add( 'Session ID does not match.', 'login' );
 				}
 				elseif( $pwd_salt != $pwd_salt_sess )
-				{ // submitted salt differs from the one stored in the session
+				{ // submitted salt differs from the one stored in the session:
 					$Messages->add( T_('The login window has expired. Please try again.'), 'login_error' );
 					$Debuglog->add( 'Submitted salt and salt from Session do not match.', 'login' );
 				}
 				else
-				{
-					#pre_dump( sha1($User->pass.$pwd_salt), $pwd_hashed );
+				{ // there's a salt submitted and it matches the one from the session:
 					$pass_ok = sha1($User->pass.$pwd_salt) == $pwd_hashed;
-					$Session->delete('core.pwd_salt');
-					$Debuglog->add( 'Compared hash password. Result: '.(int)$pass_ok, 'login' );
+					$Debuglog->add( 'Compared hashed passwords. Result: '.(int)$pass_ok, 'login' );
 				}
 			}
 			else
 			{
 				$pass_ok = ( $User->pass == $pass_md5 );
-				$Debuglog->add( 'Compared raw password. Result: '.(int)$pass_ok, 'login' );
+				$Debuglog->add( 'Compared raw passwords. Result: '.(int)$pass_ok, 'login' );
 			}
 		}
 	}
@@ -657,6 +651,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.58  2006/11/29 03:25:53  blueyed
+ * Enhanced password hashing during login: get the password salt through async request + cleanup
+ *
  * Revision 1.57  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

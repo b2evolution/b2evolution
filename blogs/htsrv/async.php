@@ -41,8 +41,30 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 
 
+param( 'action', 'string', '' );
+
+// Actions for _any_ users:
+switch( $action )
+{
+	case 'get_login_salt':
+	{ // Generate a random "salt", which gets used for encrypting the password on the client side:
+		// (used by JS-password encryption/hashing (/inc/VIEW/login/_login_form.php))
+		// The salt gets requested "on submit".
+		$pwd_salt = generate_random_key(64);
+
+		// set the salt into user's session (and refresh the 60 seconds time window):
+		$Session->set( 'core.pwd_salt', $pwd_salt, 60 );
+		$Session->dbsave();
+
+		echo $pwd_salt;
+		exit;
+	}
+
+
+}
+
+
 // Check global permission:
-// TODO: there might be actions for anon users also..
 if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 {	// No permission to access admin...
 	require $view_path.'errors/_access_denied.inc.php';
@@ -50,8 +72,7 @@ if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 
 
 // fp> Does the following have an HTTP fallback when Javascript/AJ is not available?
-// dh> yes, but not through this file.. should it? IMHO not.
-param( 'action', 'string', '' );
+// dh> yes, but not through this file.. I'll look into refactoring it..
 switch( $action )
 {
 	case 'add_plugin_sett_set':
@@ -112,6 +133,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.13  2006/11/29 03:25:53  blueyed
+ * Enhanced password hashing during login: get the password salt through async request + cleanup
+ *
  * Revision 1.12  2006/11/28 01:10:46  blueyed
  * doc/discussion
  *
