@@ -8,7 +8,7 @@ if(typeof window.jQuery == "undefined") {
  * and GPL (GPL-LICENSE.txt) licenses.
  *
  * $Date$
- * $Rev: 557 $
+ * $Rev: 627 $
  */
 
 // Global undefined variable
@@ -16,14 +16,6 @@ window.undefined = window.undefined;
 
 /**
  * Create a new jQuery Object
- *
- * @test ok( Array.prototype.push, "Array.push()" );
- * ok( Function.prototype.apply, "Function.apply()" );
- * ok( document.getElementById, "getElementById" );
- * ok( document.getElementsByTagName, "getElementsByTagName" );
- * ok( RegExp, "RegExp" );
- * ok( jQuery, "jQuery" );
- * ok( $, "$()" );
  *
  * @constructor
  * @private
@@ -52,7 +44,7 @@ var jQuery = function(a,c) {
 		return new jQuery(a,c);
 
 	// Handle HTML strings
-	if ( a.constructor == String ) {
+	if ( typeof a  == "string" ) {
 		var m = /^[^<]*(<.+>)[^>]*$/.exec(a);
 		if ( m ) a = jQuery.clean( [ m[1] ] );
 	}
@@ -213,8 +205,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <img src="test1.jpg"/> <img src="test2.jpg"/>
 	 * @result 2
 	 *
-	 * @test ok( $("div").length == 2, "Get Number of Elements Found" );
-	 *
 	 * @property
 	 * @name length
 	 * @type Number
@@ -227,8 +217,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @example $("img").size();
 	 * @before <img src="test1.jpg"/> <img src="test2.jpg"/>
 	 * @result 2
-	 *
-	 * @test ok( $("div").size() == 2, "Get Number of Elements Found" );
 	 *
 	 * @name size
 	 * @type Number
@@ -247,8 +235,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <img src="test1.jpg"/> <img src="test2.jpg"/>
 	 * @result [ <img src="test1.jpg"/> <img src="test2.jpg"/> ]
 	 *
-	 * @test isSet( $("div").get(), q("main","foo"), "Get All Elements" );
-	 *
 	 * @name get
 	 * @type Array<Element>
 	 * @cat Core
@@ -261,8 +247,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @example $("img").get(1);
 	 * @before <img src="test1.jpg"/> <img src="test2.jpg"/>
 	 * @result [ <img src="test1.jpg"/> ]
-	 *
-	 * @test ok( $("div").get(0) == document.getElementById("main"), "Get A Single Element" );
 	 *
 	 * @name get
 	 * @type Element
@@ -324,14 +308,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <img/> <img/>
 	 * @result <img src="test.jpg"/> <img src="test.jpg"/>
 	 *
-	 * @test var div = $("div");
-	 * div.each(function(){this.foo = 'zoo';});
-	 * var pass = true;
-	 * for ( var i = 0; i < div.size(); i++ ) {
-	 *   if ( div.get(i).foo != "zoo" ) pass = false;
-	 * }
-	 * ok( pass, "Execute a function, Relative" );
-	 *
 	 * @name each
 	 * @type jQuery
 	 * @param Function fn A function to execute
@@ -358,16 +334,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <div id="foobar"></div><b></b><span id="foo"></span>
 	 * @result -1
 	 *
-	 * @test ok( $([window, document]).index(window) == 0, "Check for index of elements" );
-	 * ok( $([window, document]).index(document) == 1, "Check for index of elements" );
-	 * var inputElements = $('#radio1,#radio2,#check1,#check2');
-	 * ok( inputElements.index(document.getElementById('radio1')) == 0, "Check for index of elements" );
-	 * ok( inputElements.index(document.getElementById('radio2')) == 1, "Check for index of elements" );
-	 * ok( inputElements.index(document.getElementById('check1')) == 2, "Check for index of elements" );
-	 * ok( inputElements.index(document.getElementById('check2')) == 3, "Check for index of elements" );
-	 * ok( inputElements.index(window) == -1, "Check for not found index" );
-	 * ok( inputElements.index(document) == -1, "Check for not found index" );
-	 * 
 	 * @name index
 	 * @type Number
 	 * @param Object obj Object to search for
@@ -390,19 +356,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <img src="test.jpg"/>
 	 * @result test.jpg
 	 *
-	 * @test ok( $('#text1').attr('value') == "Test", 'Check for value attribute' );
-	 * ok( $('#text1').attr('type') == "text", 'Check for type attribute' );
-	 * ok( $('#radio1').attr('type') == "radio", 'Check for type attribute' );
-	 * ok( $('#check1').attr('type') == "checkbox", 'Check for type attribute' );
-	 * ok( $('#simon1').attr('rel') == "bookmark", 'Check for rel attribute' );
-	 * ok( $('#google').attr('title') == "Google!", 'Check for title attribute' );
-	 * ok( $('#mark').attr('hreflang') == "en", 'Check for hreflang attribute' );
-	 * ok( $('#en').attr('lang') == "en", 'Check for lang attribute' );
-	 * ok( $('#simon').attr('class') == "blog link", 'Check for class attribute' );
-	 * ok( $('#name').attr('name') == "name", 'Check for name attribute' );
-	 * ok( $('#text1').attr('name') == "action", 'Check for name attribute' );
-	 * ok( $('#form').attr('action').indexOf("formaction") >= 0, 'Check for action attribute' );
-	 *
 	 * @name attr
 	 * @type Object
 	 * @param String name The name of the property to access.
@@ -418,12 +371,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <img/>
 	 * @result <img src="test.jpg" alt="Test Image"/>
 	 *
-	 * @test var pass = true;
-	 * $("div").attr({foo: 'baz', zoo: 'ping'}).each(function(){
-	 *   if ( this.getAttribute('foo') != "baz" && this.getAttribute('zoo') != "ping" ) pass = false;
-	 * });
-	 * ok( pass, "Set Multiple Attributes" );
-	 *
 	 * @name attr
 	 * @type jQuery
 	 * @param Hash prop A set of key/value pairs to set as object properties.
@@ -436,36 +383,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @example $("img").attr("src","test.jpg");
 	 * @before <img/>
 	 * @result <img src="test.jpg"/>
-	 *
-	 * @test var div = $("div");
-	 * div.attr("foo", "bar");
-	 * var pass = true;
-	 * for ( var i = 0; i < div.size(); i++ ) {
-	 *   if ( div.get(i).getAttribute('foo') != "bar" ) pass = false;
-	 * }
-	 * ok( pass, "Set Attribute" );
-	 *
-	 * $("#name").attr('name', 'something');
-	 * ok( $("#name").name() == 'something', 'Set name attribute' );
-	 * $("#check2").attr('checked', true);
-	 * ok( document.getElementById('check2').checked == true, 'Set checked attribute' );
-	 * $("#check2").attr('checked', false);
-	 * ok( document.getElementById('check2').checked == false, 'Set checked attribute' );
-	 * $("#text1").attr('readonly', true);
-	 * ok( document.getElementById('text1').readOnly == true, 'Set readonly attribute' );
-	 * $("#text1").attr('readonly', false);
-	 * ok( document.getElementById('text1').readOnly == false, 'Set readonly attribute' );
-	 *
-	 * @test stop();
-	 * $.get('data/dashboard.xml', function(xml) { 
-	 *   var titles = [];
-	 *   $('tab', xml).each(function() {
-	 *     titles.push($(this).attr('title'));
-	 *   });
-	 *   ok( titles[0] == 'Location', 'attr() in XML context: Check first title' );
-	 *   ok( titles[1] == 'Users', 'attr() in XML context: Check second title' );
-	 *   start();
-	 * });
 	 *
 	 * @name attr
 	 * @type jQuery
@@ -518,8 +435,6 @@ jQuery.fn = jQuery.prototype = {
 	 * representation of itself. Eg. fontWeight, fontSize, fontFamily, borderWidth,
 	 * borderStyle, borderBottomWidth etc.
 	 *
-	 * @test ok( $('#main').css("display") == 'none', 'Check for css property "display"');
-	 *
 	 * @name css
 	 * @type Object
 	 * @param String name The name of the property to access.
@@ -535,20 +450,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <p>Test Paragraph.</p>
 	 * @result <p style="color:red; background:blue;">Test Paragraph.</p>
 	 *
-	 * @test ok( $('#foo').is(':visible'), 'Modifying CSS display: Assert element is visible');
-	 * $('#foo').css({display: 'none'});
-	 * ok( !$('#foo').is(':visible'), 'Modified CSS display: Assert element is hidden');
-	 * $('#foo').css({display: 'block'});
-	 * ok( $('#foo').is(':visible'), 'Modified CSS display: Assert element is visible');
-	 * $('#floatTest').css({styleFloat: 'right'});
-	 * ok( $('#floatTest').css('styleFloat') == 'right', 'Modified CSS float using "styleFloat": Assert float is right');
-	 * $('#floatTest').css({cssFloat: 'left'});
-	 * ok( $('#floatTest').css('cssFloat') == 'left', 'Modified CSS float using "cssFloat": Assert float is left');
-	 * $('#floatTest').css({'float': 'right'});
-	 * ok( $('#floatTest').css('float') == 'right', 'Modified CSS float using "float": Assert float is right');
-	 * $('#floatTest').css({'font-size': '30px'});
-	 * ok( $('#floatTest').css('font-size') == '30px', 'Modified CSS font-size: Assert font-size is 30px');
-	 * 
 	 * @name css
 	 * @type jQuery
 	 * @param Hash prop A set of key/value pairs to set as style properties.
@@ -562,21 +463,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <p>Test Paragraph.</p>
 	 * @result <p style="color:red;">Test Paragraph.</p>
 	 * @desc Changes the color of all paragraphs to red
-	 *
-	 *
-	 * @test ok( $('#foo').is(':visible'), 'Modifying CSS display: Assert element is visible');
-	 * $('#foo').css('display', 'none');
-	 * ok( !$('#foo').is(':visible'), 'Modified CSS display: Assert element is hidden');
-	 * $('#foo').css('display', 'block');
-	 * ok( $('#foo').is(':visible'), 'Modified CSS display: Assert element is visible');
-	 * $('#floatTest').css('styleFloat', 'left');
-	 * ok( $('#floatTest').css('styleFloat') == 'left', 'Modified CSS float using "styleFloat": Assert float is left');
-	 * $('#floatTest').css('cssFloat', 'right');
-	 * ok( $('#floatTest').css('cssFloat') == 'right', 'Modified CSS float using "cssFloat": Assert float is right');
-	 * $('#floatTest').css('float', 'left');
-	 * ok( $('#floatTest').css('float') == 'left', 'Modified CSS float using "float": Assert float is left');
-	 * $('#floatTest').css('font-size', '20px');
-	 * ok( $('#floatTest').css('font-size') == '20px', 'Modified CSS font-size: Assert font-size is 20px');
 	 *
 	 * @name css
 	 * @type jQuery
@@ -596,9 +482,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @example $("p").text();
 	 * @before <p>Test Paragraph.</p>
 	 * @result Test Paragraph.
-	 *
-	 * @test var expected = "This link has class=\"blog\": Simon Willison's Weblog";
-	 * ok( $('#sap').text() == expected, 'Check for merged text of more then one element.' );
 	 *
 	 * @name text
 	 * @type String
@@ -635,11 +518,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <p>Test Paragraph.</p>
 	 * @result <div class='wrap'><p>Test Paragraph.</p></div>
 	 * 
-	 * @test var defaultText = 'Try them out:'
-	 * var result = $('#first').wrap('<div class="red"><span></span></div>').text();
-	 * ok( defaultText == result, 'Check for wrapping of on-the-fly html' );
-	 * ok( $('#first').parent().parent().is('.red'), 'Check if wrapper has class "red"' );
-	 *
 	 * @name wrap
 	 * @type jQuery
 	 * @param String html A string of HTML, that will be created on the fly and wrapped around the target.
@@ -662,11 +540,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @example $("p").wrap( document.getElementById('content') );
 	 * @before <p>Test Paragraph.</p><div id="content"></div>
 	 * @result <div id="content"><p>Test Paragraph.</p></div>
-	 *
-	 * @test var defaultText = 'Try them out:'
-	 * var result = $('#first').wrap(document.getElementById('empty')).parent();
-	 * ok( result.is('ol'), 'Check for element wrapping' );
-	 * ok( result.text() == defaultText, 'Check for element wrapping' );
 	 *
 	 * @name wrap
 	 * @type jQuery
@@ -704,11 +577,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <p>I would like to say: </p>
 	 * @result <p>I would like to say: <b>Hello</b></p>
 	 *
-	 * @test var defaultText = 'Try them out:'
-	 * var result = $('#first').append('<b>buga</b>');
-	 * ok( result.text() == defaultText + 'buga', 'Check if text appending works' );
-	 * ok( $('#select3').append('<option value="appendTest">Append Test</option>').find('option:last-child').attr('value') == 'appendTest', 'Appending html options to select element');
-	 *
 	 * @name append
 	 * @type jQuery
 	 * @param String html A string of HTML, that will be created on the fly and appended to the target.
@@ -724,10 +592,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <p>I would like to say: </p><b id="foo">Hello</b>
 	 * @result <p>I would like to say: <b id="foo">Hello</b></p>
 	 *
-	 * @test var expected = "This link has class=\"blog\": Simon Willison's WeblogTry them out:";
-	 * $('#sap').append(document.getElementById('first'));
-	 * ok( expected == $('#sap').text(), "Check for appending of element" );
-	 *
 	 * @name append
 	 * @type jQuery
 	 * @param Element elem A DOM element that will be appended.
@@ -742,10 +606,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @example $("p").append( $("b") );
 	 * @before <p>I would like to say: </p><b>Hello</b>
 	 * @result <p>I would like to say: <b>Hello</b></p>
-	 *
-	 * @test var expected = "This link has class=\"blog\": Simon Willison's WeblogTry them out:Yahoo";
-	 * $('#sap').append([document.getElementById('first'), document.getElementById('yahoo')]);
-	 * ok( expected == $('#sap').text(), "Check for appending of array of elements" );
 	 *
 	 * @name append
 	 * @type jQuery
@@ -768,11 +628,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <p>I would like to say: </p>
 	 * @result <p><b>Hello</b>I would like to say: </p>
 	 *
- 	 * @test var defaultText = 'Try them out:'
-	 * var result = $('#first').prepend('<b>buga</b>');
-	 * ok( result.text() == 'buga' + defaultText, 'Check if text prepending works' );
-	 * ok( $('#select3').prepend('<option value="prependTest">Prepend Test</option>').find('option:first-child').attr('value') == 'prependTest', 'Prepending html options to select element');
-	 *
 	 * @name prepend
 	 * @type jQuery
 	 * @param String html A string of HTML, that will be created on the fly and appended to the target.
@@ -788,10 +643,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <p>I would like to say: </p><b id="foo">Hello</b>
 	 * @result <p><b id="foo">Hello</b>I would like to say: </p>
 	 *	 
-	 * @test var expected = "Try them out:This link has class=\"blog\": Simon Willison's Weblog";
-	 * $('#sap').prepend(document.getElementById('first'));
-	 * ok( expected == $('#sap').text(), "Check for prepending of element" );
-	 *
 	 * @name prepend
 	 * @type jQuery
 	 * @param Element elem A DOM element that will be appended.
@@ -806,10 +657,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @example $("p").prepend( $("b") );
 	 * @before <p>I would like to say: </p><b>Hello</b>
 	 * @result <p><b>Hello</b>I would like to say: </p>
-	 *
-	 * @test var expected = "Try them out:YahooThis link has class=\"blog\": Simon Willison's Weblog";
-	 * $('#sap').prepend([document.getElementById('first'), document.getElementById('yahoo')]);
-	 * ok( expected == $('#sap').text(), "Check for prepending of array of elements" );
 	 *
 	 * @name prepend
 	 * @type jQuery
@@ -830,10 +677,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <p>I would like to say: </p>
 	 * @result <b>Hello</b><p>I would like to say: </p>
 	 *
-	 * @test var expected = 'This is a normal link: bugaYahoo';
-	 * $('#yahoo').before('<b>buga</b>');
-	 * ok( expected == $('#en').text(), 'Insert String before' );
-	 *
 	 * @name before
 	 * @type jQuery
 	 * @param String html A string of HTML, that will be created on the fly and appended to the target.
@@ -847,10 +690,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <p>I would like to say: </p><b id="foo">Hello</b>
 	 * @result <b id="foo">Hello</b><p>I would like to say: </p>
 	 *
-	 * @test var expected = "This is a normal link: Try them out:Yahoo";
-	 * $('#yahoo').before(document.getElementById('first'));
-	 * ok( expected == $('#en').text(), "Insert element before" );
-	 *
 	 * @name before
 	 * @type jQuery
 	 * @param Element elem A DOM element that will be appended.
@@ -863,10 +702,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @example $("p").before( $("b") );
 	 * @before <p>I would like to say: </p><b>Hello</b>
 	 * @result <b>Hello</b><p>I would like to say: </p>
-	 *
-	 * @test var expected = "This is a normal link: Try them out:diveintomarkYahoo";
-	 * $('#yahoo').before([document.getElementById('first'), document.getElementById('mark')]);
-	 * ok( expected == $('#en').text(), "Insert array of elements before" );
 	 *
 	 * @name before
 	 * @type jQuery
@@ -887,10 +722,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <p>I would like to say: </p>
 	 * @result <p>I would like to say: </p><b>Hello</b>
 	 *
-	 * @test var expected = 'This is a normal link: Yahoobuga';
-	 * $('#yahoo').after('<b>buga</b>');
-	 * ok( expected == $('#en').text(), 'Insert String after' );
-	 *
 	 * @name after
 	 * @type jQuery
 	 * @param String html A string of HTML, that will be created on the fly and appended to the target.
@@ -904,10 +735,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <b id="foo">Hello</b><p>I would like to say: </p>
 	 * @result <p>I would like to say: </p><b id="foo">Hello</b>
 	 *
-	 * @test var expected = "This is a normal link: YahooTry them out:";
-	 * $('#yahoo').after(document.getElementById('first'));
-	 * ok( expected == $('#en').text(), "Insert element after" );
-	 *
 	 * @name after
 	 * @type jQuery
 	 * @param Element elem A DOM element that will be appended.
@@ -920,10 +747,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @example $("p").after( $("b") );
 	 * @before <b>Hello</b><p>I would like to say: </p>
 	 * @result <p>I would like to say: </p><b>Hello</b>
-	 *
-	 * @test var expected = "This is a normal link: YahooTry them out:diveintomark";
-	 * $('#yahoo').after([document.getElementById('first'), document.getElementById('mark')]);
-	 * ok( expected == $('#en').text(), "Insert array of elements after" );
 	 *
 	 * @name after
 	 * @type jQuery
@@ -944,9 +767,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @example $("p").find("span").end();
 	 * @before <p><span>Hello</span>, how are you?</p>
 	 * @result $("p").find("span").end() == [ <p>...</p> ]
-	 *
-	 * @test ok( 'Yahoo' == $('#yahoo').parent().end().text(), 'Check for end' );
-	 * ok( $('#yahoo').end(), 'Check for end with nothing to end' );
 	 *
 	 * @name end
 	 * @type jQuery
@@ -970,8 +790,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <p><span>Hello</span>, how are you?</p>
 	 * @result $("p").find("span") == [ <span>Hello</span> ]
 	 *
-	 * @test ok( 'Yahoo' == $('#foo').find('.blogTest').text(), 'Check for find' );
-	 *
 	 * @name find
 	 * @type jQuery
 	 * @param String expr An expression to search with.
@@ -994,11 +812,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <b>Hello</b><p>, how are you?</p>
 	 * @result <b>Hello</b><p><b>Hello</b>, how are you?</p>
 	 *
-	 * @test ok( 'This is a normal link: Yahoo' == $('#en').text(), 'Assert text for #en' );
-	 * var clone = $('#yahoo').clone();
-	 * ok( 'Try them out:Yahoo' == $('#first').append(clone).text(), 'Check for clone' );
-	 * ok( 'This is a normal link: Yahoo' == $('#en').text(), 'Reassert text for #en' );
-	 *
 	 * @name clone
 	 * @type jQuery
 	 * @cat DOM/Manipulation
@@ -1020,14 +833,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @example $("p").filter(".selected")
 	 * @before <p class="selected">Hello</p><p>How are you?</p>
 	 * @result $("p").filter(".selected") == [ <p class="selected">Hello</p> ]
-	 *
-	 * @test isSet( $("input").filter(":checked").get(), q("radio2", "check1"), "Filter elements" );
-	 * @test $("input").filter(":checked",function(i){ 
-	 *   ok( this == q("radio2", "check1")[i], "Filter elements, context" );
-	 * });
-	 * @test $("#main > p#ap > a").filter("#foobar",function(){},function(i){
-	 *   ok( this == q("google","groups", "mark")[i], "Filter elements, else context" );
-	 * });
 	 *
 	 * @name filter
 	 * @type jQuery
@@ -1095,15 +900,13 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <p>Hello</p><p id="selected">Hello Again</p>
 	 * @result [ <p>Hello</p> ]
 	 *
-	 * @test ok($("#main > p#ap > a").not("#google").length == 2, ".not")
-	 *
 	 * @name not
 	 * @type jQuery
 	 * @param String expr An expression with which to remove matching elements
 	 * @cat DOM/Traversing
 	 */
 	not: function(t) {
-		return this.pushStack( t.constructor == String ?
+		return this.pushStack( typeof t == "string" ?
 			jQuery.filter(t,this,false).r :
 			jQuery.grep(this,function(a){ return a != t; }), arguments );
 	},
@@ -1150,7 +953,7 @@ jQuery.fn = jQuery.prototype = {
 	 * @cat DOM/Traversing
 	 */
 	add: function(t) {
-		return this.pushStack( jQuery.merge( this, t.constructor == String ?
+		return this.pushStack( jQuery.merge( this, typeof t == "string" ?
 			jQuery.find(t) : t.constructor == Array ? t : [t] ), arguments );
 	},
 
@@ -1173,29 +976,6 @@ jQuery.fn = jQuery.prototype = {
 	 * @before <form></form>
 	 * @result false
 	 * @desc An invalid expression always returns false.
-	 *
-	 * @test ok( $('#form').is('form'), 'Check for element: A form must be a form' );
-	 * ok( !$('#form').is('div'), 'Check for element: A form is not a div' );
-	 * ok( $('#mark').is('.blog'), 'Check for class: Expected class "blog"' );
-	 * ok( !$('#mark').is('.link'), 'Check for class: Did not expect class "link"' );
-	 * ok( $('#simon').is('.blog.link'), 'Check for multiple classes: Expected classes "blog" and "link"' );
-	 * ok( !$('#simon').is('.blogTest'), 'Check for multiple classes: Expected classes "blog" and "link", but not "blogTest"' );
-	 * ok( $('#en').is('[@lang="en"]'), 'Check for attribute: Expected attribute lang to be "en"' );
-	 * ok( !$('#en').is('[@lang="de"]'), 'Check for attribute: Expected attribute lang to be "en", not "de"' );
-	 * ok( $('#text1').is('[@type="text"]'), 'Check for attribute: Expected attribute type to be "text"' );
-	 * ok( !$('#text1').is('[@type="radio"]'), 'Check for attribute: Expected attribute type to be "text", not "radio"' );
-	 * ok( $('#text2').is(':disabled'), 'Check for pseudoclass: Expected to be disabled' );
-	 * ok( !$('#text1').is(':disabled'), 'Check for pseudoclass: Expected not disabled' );
-	 * ok( $('#radio2').is(':checked'), 'Check for pseudoclass: Expected to be checked' );
-	 * ok( !$('#radio1').is(':checked'), 'Check for pseudoclass: Expected not checked' );
-	 * ok( $('#foo').is('[p]'), 'Check for child: Expected a child "p" element' );
-	 * ok( !$('#foo').is('[ul]'), 'Check for child: Did not expect "ul" element' );
-	 * ok( $('#foo').is('[p][a][code]'), 'Check for childs: Expected "p", "a" and "code" child elements' );
-	 * ok( !$('#foo').is('[p][a][code][ol]'), 'Check for childs: Expected "p", "a" and "code" child elements, but no "ol"' );
-	 * ok( !$('#foo').is(0), 'Expected false for an invalid expression - 0' );
-	 * ok( !$('#foo').is(null), 'Expected false for an invalid expression - null' );
-	 * ok( !$('#foo').is(''), 'Expected false for an invalid expression - ""' );
-	 * ok( !$('#foo').is(undefined), 'Expected false for an invalid expression - undefined' );
 	 *
 	 * @name is
 	 * @type Boolean
@@ -1309,14 +1089,6 @@ jQuery.fn = jQuery.prototype = {
  * jQuery.extend(settings, options);
  * @result settings == { validate: true, limit: 5, name: "bar" }
  *
- * @test var settings = { xnumber1: 5, xnumber2: 7, xstring1: "peter", xstring2: "pan" };
- * var options =     { xnumber2: 1, xstring2: "x", xxx: "newstring" };
- * var optionsCopy = { xnumber2: 1, xstring2: "x", xxx: "newstring" };
- * var merged = { xnumber1: 5, xnumber2: 1, xstring1: "peter", xstring2: "x", xxx: "newstring" };
- * jQuery.extend(settings, options);
- * isSet( settings, merged, "Check if extended: settings must be extended" );
- * isSet ( options, optionsCopy, "Check if not modified: options must not be modified" );
- *
  * @name $.extend
  * @param Object obj The object to extend
  * @param Object prop The object that will be merged into the first.
@@ -1351,7 +1123,7 @@ jQuery.extend({
 		jQuery.each( jQuery.macros.axis, function(i,n){
 			jQuery.fn[ i ] = function(a) {
 				var ret = jQuery.map(this,n);
-				if ( a && a.constructor == String )
+				if ( a && typeof a == "string" )
 					ret = jQuery.filter(a,ret).r;
 				return this.pushStack( ret, arguments );
 			};
@@ -1474,7 +1246,7 @@ jQuery.extend({
 		if ( p == "height" || p == "width" ) {
 			var old = {}, oHeight, oWidth, d = ["Top","Bottom","Right","Left"];
 
-			for ( var i in d ) {
+			for ( var i=0; i<d.length; i++ ) {
 				old["padding" + d[i]] = 0;
 				old["border" + d[i] + "Width"] = 0;
 			}
@@ -1554,7 +1326,7 @@ jQuery.extend({
 		var r = [];
 		for ( var i = 0; i < a.length; i++ ) {
 			var arg = a[i];
-			if ( arg.constructor == String ) { // Convert html string into DOM nodes
+			if ( typeof arg == "string" ) { // Convert html string into DOM nodes
 				// Trim whitespace, otherwise indexOf won't work as expected
 				var s = jQuery.trim(arg), div = document.createElement("div"), wrap = [0,"",""];
 
@@ -1631,7 +1403,7 @@ jQuery.extend({
 			image: "a.type=='image'",
 			reset: "a.type=='reset'",
 			button: "a.type=='button'",
-			input: "a.nodeName.toLowerCase().match(/input|select|textarea|button/)"
+			input: "/input|select|textarea|button/i.test(a.nodeName)"
 		},
 		".": "jQuery.className.has(a,m[2])",
 		"@": {
@@ -1650,122 +1422,12 @@ jQuery.extend({
 		">|/", "jQuery.sibling(a.firstChild)",
 		"\\+", "jQuery.sibling(a).next",
 		"~", function(a){
-			var r = [];
 			var s = jQuery.sibling(a);
-			if ( s.n > 0 )
-				for ( var i = s.n; i < s.length; i++ )
-					r.push( s[i] );
-			return r;
+			return s.n >= 0 ? s.slice(s.n+1) : [];
 		}
 	],
 
 	/**
-	 *
-	 * @test t( "Element Selector", "div", ["main","foo"] );
-	 * t( "Element Selector", "body", ["body"] );
-	 * t( "Element Selector", "html", ["html"] );
-	 * ok( $("*").size() >= 30, "Element Selector" );
-	 * t( "Parent Element", "div div", ["foo"] );
-	 *
-	 * t( "ID Selector", "#body", ["body"] );
-	 * t( "ID Selector w/ Element", "body#body", ["body"] );
-	 * t( "ID Selector w/ Element", "ul#first", [] );
-	 *
-	 * t( "Class Selector", ".blog", ["mark","simon"] );
-	 * t( "Class Selector", ".blog.link", ["simon"] );
-	 * t( "Class Selector w/ Element", "a.blog", ["mark","simon"] );
-	 * t( "Parent Class Selector", "p .blog", ["mark","simon"] );
-	 *
-	 * t( "Comma Support", "a.blog, div", ["mark","simon","main","foo"] );
-	 * t( "Comma Support", "a.blog , div", ["mark","simon","main","foo"] );
-	 * t( "Comma Support", "a.blog ,div", ["mark","simon","main","foo"] );
-	 * t( "Comma Support", "a.blog,div", ["mark","simon","main","foo"] );
-	 *
-	 * t( "Child", "p > a", ["simon1","google","groups","mark","yahoo","simon"] );
-	 * t( "Child", "p> a", ["simon1","google","groups","mark","yahoo","simon"] );
-	 * t( "Child", "p >a", ["simon1","google","groups","mark","yahoo","simon"] );
-	 * t( "Child", "p>a", ["simon1","google","groups","mark","yahoo","simon"] );
-	 * t( "Child w/ Class", "p > a.blog", ["mark","simon"] );
-	 * t( "All Children", "code > *", ["anchor1","anchor2"] );
-	 * t( "All Grandchildren", "p > * > *", ["anchor1","anchor2"] );
-	 * t( "Adjacent", "a + a", ["groups"] );
-	 * t( "Adjacent", "a +a", ["groups"] );
-	 * t( "Adjacent", "a+ a", ["groups"] );
-	 * t( "Adjacent", "a+a", ["groups"] );
-	 * t( "Adjacent", "p + p", ["ap","en","sap"] );
-	 * t( "Comma, Child, and Adjacent", "a + a, code > a", ["groups","anchor1","anchor2"] );
-	 * t( "First Child", "p:first-child", ["firstp","sndp"] );
-	 * t( "Attribute Exists", "a[@title]", ["google"] );
-	 * t( "Attribute Exists", "*[@title]", ["google"] );
-	 * t( "Attribute Exists", "[@title]", ["google"] );
-	 *
-	 * t( "Attribute Equals", "a[@rel='bookmark']", ["simon1"] );
-	 * t( "Attribute Equals", 'a[@rel="bookmark"]', ["simon1"] );
-	 * t( "Attribute Equals", "a[@rel=bookmark]", ["simon1"] );
-	 * t( "Multiple Attribute Equals", "input[@type='hidden'],input[@type='radio']", ["hidden1","radio1","radio2"] );
-	 * t( "Multiple Attribute Equals", "input[@type=\"hidden\"],input[@type='radio']", ["hidden1","radio1","radio2"] );
-	 * t( "Multiple Attribute Equals", "input[@type=hidden],input[@type=radio]", ["hidden1","radio1","radio2"] );
-	 *
-	 * t( "Attribute Begins With", "a[@href ^= 'http://www']", ["google","yahoo"] );
-	 * t( "Attribute Ends With", "a[@href $= 'org/']", ["mark"] );
-	 * t( "Attribute Contains", "a[@href *= 'google']", ["google","groups"] );
-	 * t( "First Child", "p:first-child", ["firstp","sndp"] );
-	 * t( "Last Child", "p:last-child", ["sap"] );
-	 * t( "Only Child", "a:only-child", ["simon1","anchor1","yahoo","anchor2"] );
-	 * t( "Empty", "ul:empty", ["firstUL"] );
-	 * t( "Enabled UI Element", "input:enabled", ["text1","radio1","radio2","check1","check2","hidden1","hidden2","name"] );
-	 * t( "Disabled UI Element", "input:disabled", ["text2"] );
-	 * t( "Checked UI Element", "input:checked", ["radio2","check1"] );
-	 * t( "Selected Option Element", "option:selected", ["option1a","option2d","option3b","option3c"] );
-	 * t( "Text Contains", "a:contains('Google')", ["google","groups"] );
-	 * t( "Text Contains", "a:contains('Google Groups')", ["groups"] );
-	 * t( "Element Preceded By", "p ~ div", ["foo"] );
-	 * t( "Not", "a.blog:not(.link)", ["mark"] );
-	 *
-	 * ok( jQuery.find("//*").length >= 30, "All Elements (//*)" );
-	 * t( "All Div Elements", "//div", ["main","foo"] );
-	 * t( "Absolute Path", "/html/body", ["body"] );
-	 * t( "Absolute Path w/ *", "/* /body", ["body"] );
-	 * t( "Long Absolute Path", "/html/body/dl/div/div/p", ["sndp","en","sap"] );
-	 * t( "Absolute and Relative Paths", "/html//div", ["main","foo"] );
-	 * t( "All Children, Explicit", "//code/*", ["anchor1","anchor2"] );
-	 * t( "All Children, Implicit", "//code/", ["anchor1","anchor2"] );
-	 * t( "Attribute Exists", "//a[@title]", ["google"] );
-	 * t( "Attribute Equals", "//a[@rel='bookmark']", ["simon1"] );
-	 * t( "Parent Axis", "//p/..", ["main","foo"] );
-	 * t( "Sibling Axis", "//p/../", ["firstp","ap","foo","first","firstUL","empty","form","floatTest","sndp","en","sap"] );
-	 * t( "Sibling Axis", "//p/../*", ["firstp","ap","foo","first","firstUL","empty","form","floatTest","sndp","en","sap"] );
-	 * t( "Has Children", "//p[a]", ["firstp","ap","en","sap"] );
-	 *
-	 * t( "nth Element", "p:nth(1)", ["ap"] );
-	 * t( "First Element", "p:first", ["firstp"] );
-	 * t( "Last Element", "p:last", ["first"] );
-	 * t( "Even Elements", "p:even", ["firstp","sndp","sap"] );
-	 * t( "Odd Elements", "p:odd", ["ap","en","first"] );
-	 * t( "Position Equals", "p:eq(1)", ["ap"] );
-	 * t( "Position Greater Than", "p:gt(0)", ["ap","sndp","en","sap","first"] );
-	 * t( "Position Less Than", "p:lt(3)", ["firstp","ap","sndp"] );
-	 * t( "Is A Parent", "p:parent", ["firstp","ap","sndp","en","sap","first"] );
-	 * t( "Is Visible", "input:visible", ["text1","text2","radio1","radio2","check1","check2","name"] );
-	 * t( "Is Hidden", "input:hidden", ["hidden1","hidden2"] );
-	 *
-	 * t( "Grouped Form Elements", "input[@name='foo[bar]']", ["hidden2"] );
-	 *
-	 * t( "All Children of ID", "#foo/*", ["sndp", "en", "sap"]  );
-	 * t( "All Children of ID with no children", "#firstUL/*", []  );
-	 *
-	 * t( "Form element :input", ":input", ["text1", "text2", "radio1", "radio2", "check1", "check2", "hidden1", "hidden2", "name", "button", "area1", "select1", "select2", "select3"] );
-	 * t( "Form element :radio", ":radio", ["radio1", "radio2"] );
-	 * t( "Form element :checkbox", ":checkbox", ["check1", "check2"] );
-	 * t( "Form element :text", ":text", ["text1", "text2", "hidden2", "name"] );
-	 * t( "Form element :radio:checked", ":radio:checked", ["radio2"] );
-	 * t( "Form element :checkbox:checked", ":checkbox:checked", ["check1"] );
-	 * t( "Form element :checkbox:checked, :radio:checked", ":checkbox:checked, :radio:checked", ["check1", "radio2"] );
-	 *
-	 * t( ":not() Existing attribute", "select:not([@multiple])", ["select1", "select2"]);
-	 * t( ":not() Equals attribute", "select:not([@name=select1])", ["select2", "select3"]);
-	 * t( ":not() Equals quoted attribute", "select:not([@name='select1'])", ["select2", "select3"]);
-	 *
 	 * @name $.find
 	 * @type Array<Element>
 	 * @private
@@ -2117,7 +1779,7 @@ jQuery.extend({
 	grep: function(elems, fn, inv) {
 		// If a string is passed in for the function, make a function
 		// for it (a handy shortcut)
-		if ( fn.constructor == String )
+		if ( typeof fn == "string" )
 			fn = new Function("a","i","return " + fn);
 
 		var result = [];
@@ -2163,7 +1825,7 @@ jQuery.extend({
 	map: function(elems, fn) {
 		// If a string is passed in for the function, make a function
 		// for it (a handy shortcut)
-		if ( fn.constructor == String )
+		if ( typeof fn == "string" )
 			fn = new Function("a","return " + fn);
 
 		var result = [];
@@ -2734,9 +2396,6 @@ jQuery.macros = {
 		 * @before <input type="text" value="some text"/>
 		 * @result "some text"
 		 *
- 		 * @test ok( $("#text1").val() == "Test", "Check for value of input element" );
-		 * ok( !$("#text1").val() == "", "Check for value of input element" );
-		 *
 		 * @name val
 		 * @type String
 		 * @cat DOM/Attributes
@@ -2748,11 +2407,6 @@ jQuery.macros = {
 		 * @example $("input").val("test");
 		 * @before <input type="text" value="some text"/>
 		 * @result <input type="text" value="test"/>
-		 *
-		 * @test document.getElementById('text1').value = "bla";
-		 * ok( $("#text1").val() == "bla", "Check for modified value of input element" );
-		 * $("#text1").val('test');
-		 * ok ( document.getElementById('text1').value == "test", "Check for modified (via val(String)) value of input element" );
 		 *
 		 * @name val
 		 * @type jQuery
@@ -2780,14 +2434,6 @@ jQuery.macros = {
 		 * @before <div><input/></div>
 		 * @result <div><b>new stuff</b></div>
 		 *
-		 * @test var div = $("div");
-		 * div.html("<b>test</b>");
-		 * var pass = true;
-		 * for ( var i = 0; i < div.size(); i++ ) {
-		 *   if ( div.get(i).childNodes.length == 0 ) pass = false;
-		 * }
-		 * ok( pass, "Set HTML" );
-		 *
 		 * @name html
 		 * @type jQuery
 		 * @param String val Set the html contents to the specified value.
@@ -2801,10 +2447,6 @@ jQuery.macros = {
 		 * @example $("input").id();
 		 * @before <input type="text" id="test" value="some text"/>
 		 * @result "test"
-		 *
- 		 * @test ok( $(document.getElementById('main')).id() == "main", "Check for id" );
-		 * ok( $("#foo").id() == "foo", "Check for id" );
-		 * ok( !$("head").id(), "Check for id" );
 		 *
 		 * @name id
 		 * @type String
@@ -2832,9 +2474,6 @@ jQuery.macros = {
 		 * @before <img src="test.jpg" title="my image"/>
 		 * @result "my image"
 		 *
- 		 * @test ok( $(document.getElementById('google')).title() == "Google!", "Check for title" );
-		 * ok( !$("#yahoo").title(), "Check for title" );
-		 *
 		 * @name title
 		 * @type String
 		 * @cat DOM/Attributes
@@ -2860,10 +2499,6 @@ jQuery.macros = {
 		 * @example $("input").name();
 		 * @before <input type="text" name="username"/>
 		 * @result "username"
-		 *
- 		 * @test ok( $(document.getElementById('text1')).name() == "action", "Check for name" );
-		 * ok( $("#hidden1").name() == "hidden", "Check for name" );
-		 * ok( !$("#area1").name(), "Check for name" );
 		 *
 		 * @name name
 		 * @type String
@@ -3120,8 +2755,6 @@ jQuery.macros = {
 		 * @before <p>Hello</p><div><span>Hello Again</span></div><p>And Again</p>
 		 * @result [ <p>Hello</p>, <p>And Again</p> ]
 		 *
-		 * @test isSet( $("#en").siblings().get(), q("sndp", "sap"), "Check for siblings" ); 
-		 *
 		 * @name siblings
 		 * @type jQuery
 		 * @cat DOM/Traversing
@@ -3134,9 +2767,6 @@ jQuery.macros = {
 		 * @example $("div").siblings(".selected")
 		 * @before <div><span>Hello</span></div><p class="selected">Hello Again</p><p>And Again</p>
 		 * @result [ <p class="selected">Hello Again</p> ]
-		 *
-		 * @test isSet( $("#sndp").siblings("[code]").get(), q("sap"), "Check for filtered siblings (has code child element)" ); 
-		 * isSet( $("#sndp").siblings("[a]").get(), q("en", "sap"), "Check for filtered siblings (has anchor child element)" );
 		 *
 		 * @name siblings
 		 * @type jQuery
@@ -3154,8 +2784,6 @@ jQuery.macros = {
 		 * @before <p>Hello</p><div><span>Hello Again</span></div><p>And Again</p>
 		 * @result [ <span>Hello Again</span> ]
 		 *
-		 * @test isSet( $("#foo").children().get(), q("sndp", "en", "sap"), "Check for children" );
-		 *
 		 * @name children
 		 * @type jQuery
 		 * @cat DOM/Traversing
@@ -3168,8 +2796,6 @@ jQuery.macros = {
 		 * @example $("div").children(".selected")
 		 * @before <div><span>Hello</span><p class="selected">Hello Again</p><p>And Again</p></div>
 		 * @result [ <p class="selected">Hello Again</p> ]
-		 *
-		 * @test isSet( $("#foo").children("[code]").get(), q("sndp", "sap"), "Check for filtered children" ); 
 		 *
 		 * @name children
 		 * @type jQuery
@@ -3203,12 +2829,6 @@ jQuery.macros = {
 		 * @example $("p").show()
 		 * @before <p style="display: none">Hello</p>
 		 * @result [ <p style="display: block">Hello</p> ]
-		 *
-		 * @test var pass = true, div = $("div");
-		 * div.show().each(function(){
-		 *   if ( this.style.display == "none" ) pass = false;
-		 * });
-		 * ok( pass, "Show" );
 		 *
 		 * @name show
 		 * @type jQuery
@@ -3268,14 +2888,6 @@ jQuery.macros = {
 		 * @before <p>Hello</p>
 		 * @result [ <p class="selected">Hello</p> ]
 		 *
-		 * @test var div = $("div");
-		 * div.addClass("test");
-		 * var pass = true;
-		 * for ( var i = 0; i < div.size(); i++ ) {
-		 *  if ( div.get(i).className.indexOf("test") == -1 ) pass = false;
-		 * }
-		 * ok( pass, "Add Class" );
-		 *
 		 * @name addClass
 		 * @type jQuery
 		 * @param String class A CSS class to add to the elements
@@ -3292,24 +2904,6 @@ jQuery.macros = {
 		 * @before <p class="selected">Hello</p>
 		 * @result [ <p>Hello</p> ]
 		 *
-		 * @test var div = $("div").addClass("test");
-		 * div.removeClass("test");
-		 * var pass = true;
-		 * for ( var i = 0; i < div.size(); i++ ) {
-		 *  if ( div.get(i).className.indexOf("test") != -1 ) pass = false;
-		 * }
-		 * ok( pass, "Remove Class" );
-		 * 
-		 * reset();
-		 *
-		 * var div = $("div").addClass("test").addClass("foo").addClass("bar");
-		 * div.removeClass("test").removeClass("bar").removeClass("foo");
-		 * var pass = true;
-		 * for ( var i = 0; i < div.size(); i++ ) {
-		 *  if ( div.get(i).className.match(/test|bar|foo/) ) pass = false;
-		 * }
-		 * ok( pass, "Remove multiple classes" );
-		 *
 		 * @name removeClass
 		 * @type jQuery
 		 * @param String class A CSS class to remove from the elements
@@ -3320,8 +2914,8 @@ jQuery.macros = {
 		},
 
 		/**
-		 * Adds the specified class if it is present, removes it if it is
-		 * not present.
+		 * Adds the specified class if it is not present, removes it if it is
+		 * present.
 		 *
 		 * @example $("p").toggleClass("selected")
 		 * @before <p>Hello</p><p class="selected">Hello Again</p>
@@ -3418,8 +3012,6 @@ jQuery.macros = {
 		 * @cat Events
 		 */
 		bind: function( type, fn ) {
-			if ( fn.constructor == String )
-				fn = new Function("e", ( !fn.indexOf(".") ? "jQuery(this)" : "return " ) + fn);
 			jQuery.event.add( this, type, fn );
 		},
 
@@ -3505,13 +3097,6 @@ jQuery.fn.extend({
 	 *   $(this).removeClass("selected");
 	 * });
 	 * 
-	 * @test var count = 0;
-	 * var fn1 = function() { count++; }
-	 * var fn2 = function() { count--; }
-	 * var link = $('#mark');
-	 * link.click().toggle(fn1, fn2).click().click().click().click().click();
-	 * ok( count == 1, "Check for toggle(fn, fn)" );
-	 *
 	 * @name toggle
 	 * @type jQuery
 	 * @param Function even The function to execute on every even click.
@@ -5016,50 +4601,6 @@ new function(){
 		 * @type jQuery
 		 * @cat Events/Mouse
 		 */
-		 
-		 /**
-		  * @test var count;
-		  * // ignore load
-		  * var e = ("blur,focus,resize,scroll,unload,click,dblclick," +
-		  * 		"mousedown,mouseup,mousemove,mouseover,mouseout,change,reset,select," + 
-		  * 		"submit,keydown,keypress,keyup,error").split(",");
-		  * var handler1 = function(event) {
-		  * 	count++;
-		  * };
-		  * var handler2 = function(event) {
-		  * 	count++;
-		  * };
-		  * for( var i=0; i < e.length; i++) {
-		  * 	var event = e[i];
-		  * 	count = 0;
-		  * 	// bind handler
-		  * 	$(document)[event](handler1);
-		  *		$(document)[event](handler2);
-		  * 	$(document)["one"+event](handler1);
-		  * 	
-		  * 	// call event two times
-		  * 	$(document)[event]();
-		  * 	$(document)[event]();
-		  * 	
-		  * 	// unbind events
-		  * 	$(document)["un"+event](handler1);
-		  * 	// call once more
-		  * 	$(document)[event]();
-		  *
-		  * 	// remove all handlers
-		  *		$(document)["un"+event]();
-		  *
-		  * 	// call once more
-		  * 	$(document)[event]();
-		  * 	
-		  * 	// assert count
-		  *     ok( count == 6, 'Checking event ' + event);
-		  * }
-		  *
-		  * @private
-		  * @name eventTesting
-		  * @cat Events
-		  */
 
 	var e = ("blur,focus,load,resize,scroll,unload,click,dblclick," +
 		"mousedown,mouseup,mousemove,mouseover,mouseout,change,reset,select," + 
@@ -5110,11 +4651,12 @@ new function(){
 	
 		// Use the defer script hack
 		var script = document.getElementById("__ie_init");
-		script.onreadystatechange = function() {
-			if ( this.readyState != "complete" ) return;
-			this.parentNode.removeChild( this );
-			jQuery.ready();
-		};
+		if (script) // script does not exist if jQuery is loaded dynamically
+			script.onreadystatechange = function() {
+				if ( this.readyState != "complete" ) return;
+				this.parentNode.removeChild( this );
+				jQuery.ready();
+			};
 	
 		// Clear from memory
 		script = null;
@@ -5457,14 +4999,6 @@ jQuery.fn.extend({
 	 *   left: 50, opacity: 'show'
 	 * }, 500);
 	 *
-	 * @test stop();
-	 * var hash = {opacity: 'show'};
-	 * var hashCopy = $.extend({}, hash);
-	 * $('#foo').animate(hash, 'fast', function() {
-	 *  ok( hash.opacity == hashCopy.opacity, 'Check if animate changed the hash parameter' );
-	 *  start();
-	 * });
-	 *
 	 * @name animate
 	 * @type jQuery
 	 * @param Hash params A set of style attributes that you wish to animate, and to what end.
@@ -5515,34 +5049,6 @@ jQuery.fn.extend({
 });
 
 jQuery.extend({
-
-	setAuto: function(e,p) {
-		if ( e.notAuto ) return;
-
-		if ( p == "height" && e.scrollHeight != parseInt(jQuery.curCSS(e,p)) ) return;
-		if ( p == "width" && e.scrollWidth != parseInt(jQuery.curCSS(e,p)) ) return;
-
-		// Remember the original height
-		var a = e.style[p];
-
-		// Figure out the size of the height right now
-		var o = jQuery.curCSS(e,p,1);
-
-		if ( p == "height" && e.scrollHeight != o ||
-			p == "width" && e.scrollWidth != o ) return;
-
-		// Set the height to auto
-		e.style[p] = e.currentStyle ? "" : "auto";
-
-		// See what the size of "auto" is
-		var n = jQuery.curCSS(e,p,1);
-
-		// Revert back to the original size
-		if ( o != n && n != "auto" ) {
-			e.style[p] = a;
-			e.notAuto = true;
-		}
-	},
 	
 	speed: function(s,o) {
 		o = o || {};
@@ -5587,64 +5093,71 @@ jQuery.extend({
 	 */
 	
 	fx: function( elem, options, prop ){
-	
+
 		var z = this;
-	
+
 		// The users options
 		z.o = {
 			duration: options.duration || 400,
 			complete: options.complete,
 			step: options.step
 		};
-	
+
 		// The element
 		z.el = elem;
-	
+
 		// The styles
 		var y = z.el.style;
-	
+		
+		// Store display property
+		var oldDisplay = jQuery.css(z.el, 'display');
+		// Set display property to block for animation
+		y.display = "block";
+		// Make sure that nothing sneaks out
+		y.overflow = "hidden";
+
 		// Simple function for setting a style value
 		z.a = function(){
 			if ( options.step )
 				options.step.apply( elem, [ z.now ] );
- 
+
 			if ( prop == "opacity" )
 				jQuery.attr(y, "opacity", z.now); // Let attr handle opacity
 			else if ( parseInt(z.now) ) // My hate for IE will never die
 				y[prop] = parseInt(z.now) + "px";
-				
-			y.display = "block";
 		};
-	
+
 		// Figure out the maximum number to run to
 		z.max = function(){
 			return parseFloat( jQuery.css(z.el,prop) );
 		};
-	
+
 		// Get the current size
 		z.cur = function(){
 			var r = parseFloat( jQuery.curCSS(z.el, prop) );
 			return r && r > -10000 ? r : z.max();
 		};
-	
+
 		// Start an animation from one number to another
 		z.custom = function(from,to){
 			z.startTime = (new Date()).getTime();
 			z.now = from;
 			z.a();
-	
+
 			z.timer = setInterval(function(){
 				z.step(from, to);
 			}, 13);
 		};
-	
+
 		// Simple 'show' function
 		z.show = function(){
 			if ( !z.el.orig ) z.el.orig = {};
 
 			// Remember where we started, so that we can go back to it later
 			z.el.orig[prop] = this.cur();
-			
+
+			z.o.show = true;
+
 			// Begin the animation
 			z.custom(0, z.el.orig[prop]);
 
@@ -5652,7 +5165,7 @@ jQuery.extend({
 			if ( prop != "opacity" )
 				y[prop] = "1px";
 		};
-	
+
 		// Simple 'hide' function
 		z.hide = function(){
 			if ( !z.el.orig ) z.el.orig = {};
@@ -5665,18 +5178,11 @@ jQuery.extend({
 			// Begin the animation
 			z.custom(z.el.orig[prop], 0);
 		};
-	
-		// Remember  the overflow of the element
-		if ( !z.el.oldOverflow )
-			z.el.oldOverflow = jQuery.css( z.el, "overflow" );
-	
-		// Make sure that nothing sneaks out
-		y.overflow = "hidden";
-	
+
 		// Each step of an animation
 		z.step = function(firstNum, lastNum){
 			var t = (new Date()).getTime();
-	
+
 			if (t > z.o.duration + z.startTime) {
 				// Stop the timer
 				clearInterval(z.timer);
@@ -5686,33 +5192,32 @@ jQuery.extend({
 				z.a();
 
 				z.el.curAnim[ prop ] = true;
-				
+
 				var done = true;
 				for ( var i in z.el.curAnim )
 					if ( z.el.curAnim[i] !== true )
 						done = false;
-						
+
 				if ( done ) {
 					// Reset the overflow
-					y.overflow = z.el.oldOverflow;
-				
+					y.overflow = '';
+					
+					// Reset the display
+					y.display = oldDisplay;
+					if (jQuery.css(z.el, 'display') == 'none')
+						y.display = 'block';
+
 					// Hide the element if the "hide" operation was done
 					if ( z.o.hide ) 
 						y.display = 'none';
-					
-					// Reset the property, if the item has been hidden
-					if ( z.o.hide ) {
-						for ( var p in z.el.curAnim ) {
+
+					// Reset the properties, if the item has been hidden or shown
+					if ( z.o.hide || z.o.show )
+						for ( var p in z.el.curAnim )
 							if (p == "opacity")
 								jQuery.attr(y, p, z.el.orig[p]);
 							else
-								y[ p ] = z.el.orig[p] + "px";
-	
-							// set its height and/or width to auto
-							if ( p == 'height' || p == 'width' )
-								jQuery.setAuto( z.el, p );
-						}
-					}
+								y[p] = '';
 				}
 
 				// If a callback was provided, execute it
@@ -5723,7 +5228,7 @@ jQuery.extend({
 				// Figure out where in the animation we are and set the number
 				var p = (t - this.startTime) / z.o.duration;
 				z.now = ((-Math.cos(p*Math.PI)/2) + 0.5) * (lastNum-firstNum) + firstNum;
-	
+
 				// Perform the next step of the animation
 				z.a();
 			}
@@ -5767,39 +5272,11 @@ jQuery.fn.extend({
 	 * @desc Same as above, but with an additional parameter
 	 * and a callback that is executed when the data was loaded.
 	 *
-	 * @test stop();
-	 * $('#first').load("data/name.php", function() {
-	 * 	ok( $('#first').text() == 'ERROR', 'Check if content was injected into the DOM' );
-	 * 	start();
-	 * });
-	 *
-	 * @test stop(); // check if load can be called with only url
-	 * $('#first').load("data/name.php");
-	 * $.get("data/name.php", function() {
-	 *   ok( $('#first').text() == 'ERROR', 'Check if load works without callback');
-	 *   start();
-	 * });
-	 *
-	 * @test stop();
-	 * window.foobar = undefined;
-	 * window.foo = undefined;
-	 * var verifyEvaluation = function() {
-	 *   ok( foobar == "bar", 'Check if script src was evaluated after load' );
-	 *   ok( $('#foo').html() == 'foo', 'Check if script evaluation has modified DOM');
-	 *   ok( $('#ap').html() == 'bar', 'Check if script evaluation has modified DOM');
-	 *   start();
-	 * };
-	 * $('#first').load('data/test.html', function() {
-	 *   ok( $('#first').html().match(/^html text/), 'Check content after loading html' );
-	 *   ok( foo == "foo", 'Check if script was evaluated after load' );
-	 *   setTimeout(verifyEvaluation, 600);
-	 * });
-	 *
 	 * @name load
 	 * @type jQuery
 	 * @param String url The URL of the HTML file to load.
-	 * @param Object params A set of key/value pairs that will be sent to the server.
-	 * @param Function callback A function to be executed whenever the data is loaded.
+	 * @param Object params A set of key/value pairs that will be sent as data to the server.
+	 * @param Function callback A function to be executed whenever the data is loaded (parameters: responseText, status and reponse itself).
 	 * @cat AJAX
 	 */
 	load: function( url, params, callback, ifModified ) {
@@ -5841,9 +5318,9 @@ jQuery.fn.extend({
 					  // Execute all the scripts inside of the newly-injected HTML
 					  .evalScripts()
 					  // Execute callback
-					  .each( callback, [res.responseText, status] );
+					  .each( callback, [res.responseText, status, res] );
 				} else
-					callback.apply( self, [res.responseText, status] );
+					callback.apply( self, [res.responseText, status, res] );
 			}
 		});
 		return this;
@@ -5863,10 +5340,6 @@ jQuery.fn.extend({
 	 * @after name=John&location=Boston
 	 * @desc Serialize a selection of input elements to a string
 	 *
-	 * @test var data = $(':input').not('button').serialize();
-	 * // ignore button, IE takes text content as value, not relevant for this test
-	 * ok( data == 'action=Test&text2=Test&radio1=on&radio2=on&check=on&=on&hidden=&foo[bar]=&name=name&=foobar&select1=&select2=3&select3=1', 'Check form serialization as query string' );
-	 *
 	 * @name serialize
 	 * @type String
 	 * @cat AJAX
@@ -5875,13 +5348,23 @@ jQuery.fn.extend({
 		return jQuery.param( this );
 	},
 
+	/**
+	 * Evaluate all script tags inside this jQuery. If they have a src attribute,
+	 * the script is loaded, otherwise it's content is evaluated.
+	 *
+	 * @name evalScripts
+	 * @type jQuery
+	 * @private
+	 * @cat AJAX
+	 */
 	evalScripts: function() {
 		return this.find('script').each(function(){
 			if ( this.src )
 				// for some weird reason, it doesn't work if the callback is ommited
-				jQuery.getScript( this.src, function() {} );
-			else
-				eval.call( window, this.text || this.textContent || this.innerHTML || "" );
+				jQuery.getScript( this.src );
+			else {
+				jQuery.eval ( this.text || this.textContent || this.innerHTML || "" );
+			}
 		}).end();
 	}
 
@@ -5969,51 +5452,6 @@ if ( jQuery.browser.msie && typeof XMLHttpRequest == "undefined" )
  * @cat AJAX
  */
 
-/**
- * @test stop(); var counter = { complete: 0, success: 0, error: 0 };
- * var success = function() { counter.success++ };
- * var error = function() { counter.error++ };
- * var complete = function() { counter.complete++ };
- * $('#foo').ajaxStart(complete).ajaxStop(complete).ajaxComplete(complete).ajaxError(error).ajaxSuccess(success);
- * // start with successful test
- * $.ajax({url: "data/name.php", success: success, error: error, complete: function() {
- *   ok( counter.error == 0, 'Check succesful request' );
- *   ok( counter.success == 2, 'Check succesful request' );
- *   ok( counter.complete == 3, 'Check succesful request' );
- *   counter.error = 0; counter.success = 0; counter.complete = 0;
- *   $.ajaxTimeout(500);
- *   $.ajax({url: "data/name.php?wait=5", success: success, error: error, complete: function() {
- *     ok( counter.error == 2, 'Check failed request' );
- *     ok( counter.success == 0, 'Check failed request' );
- *     ok( counter.complete == 3, 'Check failed request' );
- *     start();
- *   }});
- * }});
-
- * @test stop(); var counter = { complete: 0, success: 0, error: 0 };
- * counter.error = 0; counter.success = 0; counter.complete = 0;
- * var success = function() { counter.success++ };
- * var error = function() { counter.error++ };
- * $.ajaxTimeout(0);
- * $.ajax({url: "data/name.php", global: false, success: success, error: error, complete: function() {
- *   ok( counter.error == 0, 'Check sucesful request without globals' );
- *   ok( counter.success == 1, 'Check sucesful request without globals' );
- *   ok( counter.complete == 0, 'Check sucesful request without globals' );
- *   counter.error = 0; counter.success = 0; counter.complete = 0;
- *   $.ajaxTimeout(500);
- *   $.ajax({url: "data/name.php?wait=5", global: false, success: success, error: error, complete: function() {
- *      ok( counter.error == 1, 'Check failed request without globals' );
- *      ok( counter.success == 0, 'Check failed request without globals' );
- *      ok( counter.complete == 0, 'Check failed request without globals' );
- *      start();
- *   }});
- * }});
- *
- * @name ajaxHandlersTesting
- * @private
- */
-
-
 new function(){
 	var e = "ajaxStart,ajaxStop,ajaxComplete,ajaxError,ajaxSuccess".split(",");
 
@@ -6046,17 +5484,6 @@ jQuery.extend({
 	 *   }
 	 * )
 	 *
-	 * @test stop();
-	 * $.get('data/dashboard.xml', function(xml) {
-	 * 	var content = [];
-	 * 	$('tab', xml).each(function() {
-	 * 		content.push($(this).text());
-	 * 	});
-	 * 	ok( content[0] == 'blabla', 'Check first tab');
-	 * 	ok( content[1] == 'blublu', 'Check second tab');
-	 * 	start();
-	 * });
-	 *
 	 * @name $.get
 	 * @type undefined
 	 * @param String url The URL of the page to load.
@@ -6065,22 +5492,19 @@ jQuery.extend({
 	 * @cat AJAX
 	 */
 	get: function( url, data, callback, type, ifModified ) {
+		// shift arguments if data argument was ommited
 		if ( data && data.constructor == Function ) {
-			type = callback;
 			callback = data;
 			data = null;
 		}
 
-		// append ? + data or & + data, in case there are already params
-		if ( data ) url += ((url.indexOf("?") > -1) ? "&" : "?") + jQuery.param(data);
-
-		// Build and start the HTTP Request
+		// Delegate
 		jQuery.ajax({
 			url: url,
-			ifModified: ifModified,
-			complete: function(r, status) {
-				if ( callback ) callback( jQuery.httpData(r,type), status );
-			}
+			data: data,
+			success: callback,
+			dataType: type,
+			ifModified: ifModified
 		});
 	},
 
@@ -6104,12 +5528,6 @@ jQuery.extend({
 	 *   }
 	 * )
 	 *
-	 * @test stop();
-	 * $.getIfModified("data/name.php", function(msg) {
-	 *     ok( msg == 'ERROR', 'Check ifModified' );
-	 *     start();
-	 * });
-	 *
 	 * @name $.getIfModified
 	 * @type undefined
 	 * @param String url The URL of the page to load.
@@ -6130,16 +5548,6 @@ jQuery.extend({
 	 * @example $.getScript("test.js", function(){
 	 *   alert("Script loaded and executed.");
 	 * })
-	 *
-	 * @test stop();
-	 * $.getScript("data/test.js", function() {
-	 * 	ok( foobar == "bar", 'Check if script was evaluated' );
-	 * 	start();
-	 * });
-	 *
-	 * @test
-	 * $.getScript("data/test.js");
-	 * ok( true, "Check with single argument, can't verify" );
 	 *
 	 * @name $.getScript
 	 * @type undefined
@@ -6170,21 +5578,6 @@ jQuery.extend({
 	 *   }
 	 * )
 	 *
-	 * @test stop();
-	 * $.getJSON("data/json.php", {json: "array"}, function(json) {
-	 *   ok( json[0].name == 'John', 'Check JSON: first, name' );
-	 *   ok( json[0].age == 21, 'Check JSON: first, age' );
-	 *   ok( json[1].name == 'Peter', 'Check JSON: second, name' );
-	 *   ok( json[1].age == 25, 'Check JSON: second, age' );
-	 *   start();
-	 * });
-	 * @test stop();
-	 * $.getJSON("data/json.php", function(json) {
-	 *   ok( json.data.lang == 'en', 'Check JSON: lang' );
-	 *   ok( json.data.length == 25, 'Check JSON: length' );
-	 *   start();
-	 * });
-	 *
 	 * @name $.getJSON
 	 * @type undefined
 	 * @param String url The URL of the page to load.
@@ -6193,11 +5586,7 @@ jQuery.extend({
 	 * @cat AJAX
 	 */
 	getJSON: function( url, data, callback ) {
-		if(callback)
-			jQuery.get(url, data, callback, "json");
-		else {
-			jQuery.get(url, data, "json");
-		}
+		jQuery.get(url, data, callback, "json");
 	},
 
 	/**
@@ -6219,15 +5608,6 @@ jQuery.extend({
 	 *   }
 	 * )
 	 *
-	 * @test stop();
-	 * $.post("data/name.php", {xml: "5-2"}, function(xml){
-	 *   $('math', xml).each(function() {
-	 * 	    ok( $('calculation', this).text() == '5-2', 'Check for XML' );
-	 * 	    ok( $('result', this).text() == '3', 'Check for XML' );
-	 * 	 });
-	 *   start();
-	 * });
-	 *
 	 * @name $.post
 	 * @type undefined
 	 * @param String url The URL of the page to load.
@@ -6236,14 +5616,13 @@ jQuery.extend({
 	 * @cat AJAX
 	 */
 	post: function( url, data, callback, type ) {
-		// Build and start the HTTP Request
+		// Delegate
 		jQuery.ajax({
 			type: "POST",
 			url: url,
-			data: jQuery.param(data),
-			complete: function(r, status) {
-				if ( callback ) callback( jQuery.httpData(r,type), status );
-			}
+			data: data,
+			success: callback,
+			dataType: type
 		});
 	},
 
@@ -6257,50 +5636,6 @@ jQuery.extend({
 	 *
 	 * @example $.ajaxTimeout( 5000 );
 	 * @desc Make all AJAX requests timeout after 5 seconds.
-	 *
-	 * @test stop();
-	 * var passed = 0;
-	 * var timeout;
-	 * $.ajaxTimeout(1000);
-	 * var pass = function() {
-	 * 	passed++;
-	 * 	if(passed == 2) {
-	 * 		ok( true, 'Check local and global callbacks after timeout' );
-	 * 		clearTimeout(timeout);
-	 *      $('#main').unbind("ajaxError");
-	 * 		start();
-	 * 	}
-	 * };
-	 * var fail = function() {
-	 * 	ok( false, 'Check for timeout failed' );
-	 * 	start();
-	 * };
-	 * timeout = setTimeout(fail, 1500);
-	 * $('#main').ajaxError(pass);
-	 * $.ajax({
-	 *   type: "GET",
-	 *   url: "data/name.php?wait=5",
-	 *   error: pass,
-	 *   success: fail
-	 * });
-	 *
-	 * @test stop(); $.ajaxTimeout(50);
-	 * $.ajax({
-	 *   type: "GET",
-	 *   timeout: 5000,
-	 *   url: "data/name.php?wait=1",
-	 *   error: function() {
-	 * 	   ok( false, 'Check for local timeout failed' );
-	 * 	   start();
-	 *   },
-	 *   success: function() {
-	 *     ok( true, 'Check for local timeout' );
-	 *     start();
-	 *   }
-	 * });
-	 * // reset timeout
-	 * $.ajaxTimeout(0);
-	 *
 	 *
 	 * @name $.ajaxTimeout
 	 * @type undefined
@@ -6316,19 +5651,37 @@ jQuery.extend({
 
 	/**
 	 * Load a remote page using an HTTP request. This function is the primary
-	 * means of making AJAX requests using jQuery. $.ajax() takes one property,
-	 * an object of key/value pairs, that're are used to initalize the request.
+	 * means of making AJAX requests using jQuery. 
 	 *
-	 * These are all the key/values that can be passed in to 'prop':
+	 * $.ajax() returns the XMLHttpRequest that it creates. In most cases you won't
+	 * need that object to manipulate directly, but it is available if you need to
+	 * abort the request manually.
 	 *
-	 * (String) type - The type of request to make (e.g. "POST" or "GET").
+	 * Please note: Make sure the server sends the right mimetype (eg. xml as
+	 * "text/xml"). Sending the wrong mimetype will get you into serious
+	 * trouble that jQuery can't solve.
+	 *
+	 * Supported datatypes (see dataType option) are:
+	 *
+	 * "xml": Returns a XML document that can be processed via jQuery.
+	 *
+	 * "html": Returns HTML as plain text, included script tags are evaluated.
+	 *
+	 * "script": Evaluates the response as Javascript and returns it as plain text.
+	 *
+	 * "json": Evaluates the response as JSON and returns a Javascript Object
+	 *
+	 * $.ajax() takes one property, an object of key/value pairs, that are
+	 * used to initalize the request. These are all the key/values that can
+	 * be passed in to 'prop':
 	 *
 	 * (String) url - The URL of the page to request.
 	 *
-	 * (String) data - A string of data to be sent to the server (POST only).
+	 * (String) type - The type of request to make (e.g. "POST" or "GET"), default is "GET".
 	 *
 	 * (String) dataType - The type of data that you're expecting back from
-	 * the server (e.g. "xml", "html", "script", or "json").
+	 * the server. No default: If the server sends xml, the responseXML, otherwise
+	 * the responseText is is passed to the success callback.
 	 *
 	 * (Boolean) ifModified - Allow the request to be successful only if the
 	 * response has changed since the last request, default is false, ignoring
@@ -6336,10 +5689,10 @@ jQuery.extend({
 	 *
 	 * (Number) timeout - Local timeout to override global timeout, eg. to give a
 	 * single request a longer timeout while all others timeout after 1 seconds,
-	 * see $.ajaxTimeout
+	 * see $.ajaxTimeout()
 	 *
 	 * (Boolean) global - Wheather to trigger global AJAX event handlers for
-	 * this request, default is true. Set to true to prevent that global handlers
+	 * this request, default is true. Set to false to prevent that global handlers
 	 * like ajaxStart or ajaxStop are triggered.
 	 *
 	 * (Function) error - A function to be called if the request fails. The
@@ -6353,6 +5706,21 @@ jQuery.extend({
 	 * (Function) complete - A function to be called when the request finishes. The
 	 * function gets passed two arguments: The XMLHttpRequest object and a
 	 * string describing the type the success of the request.
+	 *
+ 	 * (Object|String) data - Data to be sent to the server. Converted to a query
+	 * string, if not already a string. Is appended to the url for GET-requests.
+	 * Override processData option to prevent processing.
+	 *
+	 * (String) contentType - When sending data to the server, use this content-type,
+	 * default is "application/x-www-form-urlencoded", which is fine for most cases.
+	 *
+	 * (Boolean) processData - By default, data passed in as an object other as string
+	 * will be processed and transformed into a query string, fitting to the default
+	 * content-type "application/x-www-form-urlencoded". If you want to send DOMDocuments,
+	 * set this option to false.
+	 *
+	 * (Boolean) async - By default, all requests are send asynchronous (set to true).
+	 * If you need synchronous requests, set this option to false.
 	 *
 	 * @example $.ajax({
 	 *   type: "GET",
@@ -6371,92 +5739,39 @@ jQuery.extend({
 	 * });
 	 * @desc Save some data to the server and notify the user once its complete.
 	 *
-	 * @test stop();
-	 * $.ajax({
-	 *   type: "GET",
-	 *   url: "data/name.php?name=foo",
-	 *   success: function(msg){
-	 *     ok( msg == 'bar', 'Check for GET' );
-	 *     start();
-	 *   }
-	 * });
-	 *
-	 * @test stop();
-	 * $.ajax({
-	 *   type: "POST",
-	 *   url: "data/name.php",
-	 *   data: "name=peter",
-	 *   success: function(msg){
-	 *     ok( msg == 'pan', 'Check for POST' );
-	 *     start();
-	 *   }
-	 * });
-	 *
-	 * @test stop();
-	 * window.foobar = undefined;
-	 * window.foo = undefined;
-	 * var verifyEvaluation = function() {
-	 *   ok( foobar == "bar", 'Check if script src was evaluated for datatype html' );
-	 *   start();
-	 * };
-	 * $.ajax({
-	 *   dataType: "html",
-	 *   url: "data/test.html",
-	 *   success: function(data) {
-	 *     ok( data.match(/^html text/), 'Check content for datatype html' );
-	 *     ok( foo == "foo", 'Check if script was evaluated for datatype html' );
-	 *     setTimeout(verifyEvaluation, 600);
-	 *   }
-	 * });
-	 *
-	 * @test stop();
-	 * $.ajax({
-	 *   url: "data/with_fries.xml", dataType: "xml", type: "GET", data: "", success: function(resp) {
-	 *     ok( $("properties", resp).length == 1, 'properties in responseXML' );
-	 *     ok( $("jsconf", resp).length == 1, 'jsconf in responseXML' );
-	 *     ok( $("thing", resp).length == 2, 'things in responseXML' );
-	 *     start();
-	 *   }
-	 * });
-	 *
 	 * @name $.ajax
-	 * @type undefined
+	 * @type XMLHttpRequest
 	 * @param Hash prop A set of properties to initialize the request with.
 	 * @cat AJAX
 	 */
-	//ajax: function( type, url, data, ret, ifModified ) {
 	ajax: function( s ) {
-
-		var fvoid = function() {};
+		// TODO introduce global settings, allowing the client to modify them for all requests, not only timeout
 		s = jQuery.extend({
 			global: true,
 			ifModified: false,
 			type: "GET",
 			timeout: jQuery.timeout,
-			complete: fvoid,
-			success: fvoid,
-			error: fvoid,
+			complete: null,
+			success: null,
+			error: null,
 			dataType: null,
+			url: null,
 			data: null,
-			url: null
+			contentType: "application/x-www-form-urlencoded",
+			processData: true,
+			async: true
 		}, s);
 
-		/*
-		// If only a single argument was passed in,
-		// assume that it is a object of key/value pairs
-		if ( !url ) {
-			ret = type.complete;
-			var success = type.success;
-			var error = type.error;
-			var dataType = type.dataType;
-			var global = typeof type.global == "boolean" ? type.global : true;
-			var timeout = typeof type.timeout == "number" ? type.timeout : jQuery.timeout;
-			ifModified = type.ifModified || false;
-			data = type.data;
-			url = type.url;
-			type = type.type;
+		// if data available
+		if ( s.data ) {
+			// convert data if not already a string
+			if (s.processData && typeof s.data != 'string')
+    			s.data = jQuery.param(s.data);
+			// append data to url for get requests
+			if( s.type.toLowerCase() == "get" )
+				// "?" + data or "&" + data (in case there are already params)
+				s.url += ((s.url.indexOf("?") > -1) ? "&" : "?") + s.data;
 		}
-		*/
 
 		// Watch for a new set of requests
 		if ( s.global && ! jQuery.active++ )
@@ -6468,11 +5783,11 @@ jQuery.extend({
 		var xml = new XMLHttpRequest();
 
 		// Open the socket
-		xml.open(s.type, s.url, true);
+		xml.open(s.type, s.url, s.async);
 
 		// Set the correct header, if data is being sent
 		if ( s.data )
-			xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+			xml.setRequestHeader("Content-Type", s.contentType);
 
 		// Set the If-Modified-Since header, if ifModified mode.
 		if ( s.ifModified )
@@ -6506,9 +5821,12 @@ jQuery.extend({
 					if ( s.ifModified && modRes )
 						jQuery.lastModified[s.url] = modRes;
 
-					// If a local callback was specified, fire it
+					// process the data (runs the xml through httpData regardless of callback)
+					var data = jQuery.httpData( xml, s.dataType );
+
+					// If a local callback was specified, fire it and pass it the data
 					if ( s.success )
-						s.success( jQuery.httpData( xml, s.dataType ), status );
+						s.success( data, status );
 
 					// Fire the global callback
 					if( s.global )
@@ -6560,6 +5878,9 @@ jQuery.extend({
 
 		// Send the data
 		xml.send(s.data);
+		
+		// return XMLHttpRequest to allow aborting the request etc.
+		return xml;
 	},
 
 	// Counter for holding the number of active queries
@@ -6600,8 +5921,10 @@ jQuery.extend({
 		var data = !type && ct && ct.indexOf("xml") >= 0;
 		data = type == "xml" || data ? r.responseXML : r.responseText;
 
-		// If the type is "script", eval it
-		if ( type == "script" ) eval.call( window, data );
+		// If the type is "script", eval it in global context
+		if ( type == "script" ) {
+			jQuery.eval( data );
+		}
 
 		// Get the JavaScript object, if JSON is used.
 		if ( type == "json" ) eval( "data = " + data );
@@ -6627,12 +5950,28 @@ jQuery.extend({
 		// Otherwise, assume that it's an object of key/value pairs
 		} else {
 			// Serialize the key/values
-			for ( var j in a )
-				s.push( j + "=" + encodeURIComponent( a[j] ) );
+			for ( var j in a ) {
+				//if one value is array then treat each array value in part
+				if (typeof a[j] == 'object') {
+					for (var k = 0; k < a[j].length; k++) {
+						s.push( j + "[]=" + encodeURIComponent( a[j][k] ) );
+					}
+				} else {
+					s.push( j + "=" + encodeURIComponent( a[j] ) );
+				}
+			}
 		}
 
 		// Return the resulting serialization
 		return s.join("&");
+	},
+	
+	// TODO document me
+	eval: function(data) {
+		if (window.execScript)
+			window.execScript( data );
+		else
+			eval.call( window, data );
 	}
 
 });
