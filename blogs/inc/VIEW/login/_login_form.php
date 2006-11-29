@@ -159,6 +159,7 @@ $Form->end_form();
 					{
 						h.value = hex_sha1( hex_md5(p.value) + s.value );
 						p.value = ""; // unset real password
+						s.value = ""; // unset salt, so it gets re-newed when using the browser's back button
 					}
 					// Submit the form:
 					return true;
@@ -232,6 +233,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.23  2006/11/29 20:04:35  blueyed
+ * More cleanup for login-password hashing
+ *
  * Revision 1.22  2006/11/29 03:25:54  blueyed
  * Enhanced password hashing during login: get the password salt through async request + cleanup
  *

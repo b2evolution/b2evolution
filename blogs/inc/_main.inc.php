@@ -407,7 +407,6 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 	// Password hashing by JavaScript:
 	$need_raw_pwd = (bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
-	param('pwd_salt', 'string', ''); // just for comparison with the one from Session
 	$pwd_salt_sess = $Session->get('core.pwd_salt');
 
 	if( $need_raw_pwd )
@@ -455,14 +454,9 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 					$Messages->add( T_('Either you have not enabled cookies or this login window has expired.'), 'login_error' );
 					$Debuglog->add( 'Session ID does not match.', 'login' );
 				}
-				elseif( $pwd_salt != $pwd_salt_sess )
-				{ // submitted salt differs from the one stored in the session:
-					$Messages->add( T_('The login window has expired. Please try again.'), 'login_error' );
-					$Debuglog->add( 'Submitted salt and salt from Session do not match.', 'login' );
-				}
 				else
-				{ // there's a salt submitted and it matches the one from the session:
-					$pass_ok = sha1($User->pass.$pwd_salt) == $pwd_hashed;
+				{ // compare the password, using the salt stored in the Session:
+					$pass_ok = sha1($User->pass.$pwd_salt_sess) == $pwd_hashed;
 					$Debuglog->add( 'Compared hashed passwords. Result: '.(int)$pass_ok, 'login' );
 				}
 			}
@@ -651,6 +645,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.59  2006/11/29 20:04:35  blueyed
+ * More cleanup for login-password hashing
+ *
  * Revision 1.58  2006/11/29 03:25:53  blueyed
  * Enhanced password hashing during login: get the password salt through async request + cleanup
  *
