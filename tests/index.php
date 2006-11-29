@@ -28,7 +28,9 @@ if( empty($action) )
 		<ul>
 		<li><a href="index.php?action=core.all"><strong>All evoCore tests</strong></a></li>
 		<?php
-		foreach( get_filenames( dirname(__FILE__).'/blogs', true, false, $flat = true ) as $filename )
+		$filenames = get_filenames( dirname(__FILE__).'/blogs', true, false, $flat = true );
+		sort($filenames);
+		foreach( $filenames as $filename )
 		{
 			if( substr($filename, -15) != '.simpletest.php' )
 				continue;
@@ -44,7 +46,9 @@ if( empty($action) )
 		<ul>
 		<li><a href="install/"><strong>All install tests</strong></a></li>
 		<?php
-		foreach( get_filenames( dirname(__FILE__).'/install', true, false, $flat = true ) as $filename )
+		$filenames = get_filenames( dirname(__FILE__).'/install', true, false, $flat = true );
+		sort($filenames);
+		foreach( $filenames as $filename )
 		{
 			if( substr($filename, -15) != '.simpletest.php' )
 				continue;
