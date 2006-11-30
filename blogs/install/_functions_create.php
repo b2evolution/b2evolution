@@ -1014,29 +1014,32 @@ function create_b2evo_relations()
  */
 function install_basic_plugins( $old_db_version = 0 )
 {
-	$Plugins = & new Plugins();
+	echo 'Installing default plugins... ';
+	load_class('_misc/_plugins_admin.class.php');
+
+	$Plugins_admin = & new Plugins_admin();
 
 	if( $old_db_version < 9100 )
 	{
 		echo 'Installing default plugins... ';
 		// Toolbars:
-		$Plugins->install( 'quicktags_plugin' );
+		$Plugins_admin->install( 'quicktags_plugin' );
 		// Renderers:
-		$Plugins->install( 'auto_p_plugin' );
-		$Plugins->install( 'autolinks_plugin' );
-		$Plugins->install( 'texturize_plugin' );
+		$Plugins_admin->install( 'auto_p_plugin' );
+		$Plugins_admin->install( 'autolinks_plugin' );
+		$Plugins_admin->install( 'texturize_plugin' );
 		// SkinTags:
-		$Plugins->install( 'calendar_plugin' );
-		$Plugins->install( 'archives_plugin' );
-		$Plugins->install( 'categories_plugin' );
+		$Plugins_admin->install( 'calendar_plugin' );
+		$Plugins_admin->install( 'archives_plugin' );
+		$Plugins_admin->install( 'categories_plugin' );
 		echo "OK.<br />\n";
 	}
 
 	if( $old_db_version < 9330 )
 	{ // Upgrade to 1.9-beta
 		echo 'Installing default ping plugins... ';
-		$Plugins->install( 'ping_b2evonet_plugin' );
-		$Plugins->install( 'ping_pingomatic_plugin' );
+		$Plugins_admin->install( 'ping_b2evonet_plugin' );
+		$Plugins_admin->install( 'ping_pingomatic_plugin' );
 		echo "OK.<br />\n";
 	}
 }
@@ -1044,6 +1047,9 @@ function install_basic_plugins( $old_db_version = 0 )
 
 /*
  * $Log$
+ * Revision 1.203  2006/11/30 06:04:12  blueyed
+ * Moved Plugins::install() and sort() galore to Plugins_admin
+ *
  * Revision 1.202  2006/10/10 23:00:41  blueyed
  * Fixed some table names to alias; fixed plugin install procedure; installed ping plugins; moved some upgrade code to 1.9
  *
