@@ -158,6 +158,7 @@ class Plugins
 	/**
 	 * @var boolean Used in class {@link Plugins} when it comes to removing plugins from the list, what we don't want
 	 *                when administering plugins (see {@link $Plugins_admin}).
+	 * @static
 	 */
 	var $is_admin_class = false;
 	/**#@-*/
@@ -222,6 +223,7 @@ class Plugins
 	 *
 	 * @todo Finish/Complete descriptions
 	 *
+	 * @todo Move to Plugins_admin
 	 * @return array Name of event (key) => description (value)
 	 */
 	function get_supported_events()
@@ -370,6 +372,7 @@ class Plugins
 	 *
 	 * @todo Add descriptions.
 	 *
+	 * @todo Move to Plugins_admin
 	 * @param boolean Return an associative array with description for the values?
 	 * @return array
 	 */
@@ -399,6 +402,7 @@ class Plugins
 
 	/**
 	 * Discover and register all available plugins.
+	 * @todo Move to Plugins_admin
 	 */
 	function discover()
 	{
@@ -444,6 +448,7 @@ class Plugins
 	 *
 	 * WARNING: do NOT sort by anything else than priority unless you're handling a list of NOT-YET-INSTALLED plugins!
 	 *
+	 * @todo Move to Plugins_admin
 	 * @param string Order: 'priority' (default), 'name'
 	 */
 	function sort( $order = 'priority' )
@@ -478,6 +483,7 @@ class Plugins
 
 	/**
 	 * Callback function to sort plugins by priority (and classname, if they have same priority).
+	 * @todo Move to Plugins_admin
 	 */
 	function sort_Plugin_priority( & $a_ID, & $b_ID )
 	{
@@ -498,6 +504,7 @@ class Plugins
 	 * Callback function to sort plugins by name.
 	 *
 	 * WARNING: do NOT sort by anything else than priority unless you're handling a list of NOT-YET-INSTALLED plugins
+	 * @todo Move to Plugins_admin
 	 */
 	function sort_Plugin_name( & $a_ID, & $b_ID )
 	{
@@ -514,6 +521,7 @@ class Plugins
 	 * Those, which have a group get sorted above the ones without one.
 	 *
 	 * WARNING: do NOT sort by anything else than priority unless you're handling a list of NOT-YET-INSTALLED plugins
+	 * @todo Move to Plugins_admin
 	 */
 	function sort_Plugin_group( & $a_ID, & $b_ID )
 	{
@@ -625,6 +633,7 @@ class Plugins
 	 *       not {@link $admin_Plugins}.
 	 * }}
 	 *
+	 * @todo Move to Plugins_admin
 	 * @param Plugin
 	 * @param string New status ("enabled", "disabled", "needs_config", "broken")
 	 */
@@ -660,6 +669,7 @@ class Plugins
 	/**
 	 * Install a plugin into DB.
 	 *
+	 * @todo Move to Plugins_admin
 	 * @param string Classname of the plugin to install
 	 * @param string Initial DB Status of the plugin ("enabled", "disabled", "needs_config", "broken")
 	 * @param string|NULL Optional classfile path, if not default (used for tests).
@@ -787,6 +797,7 @@ class Plugins
 	 *
 	 * Removes the Plugin, its Settings and Events from the database.
 	 *
+	 * @todo Move to Plugins_admin
 	 * @return boolean True on success
 	 */
 	function uninstall( $plugin_ID )
@@ -843,6 +854,7 @@ class Plugins
 	/**
 	 * Validate dependencies of a Plugin.
 	 *
+	 * @todo Move to Plugins_admin
 	 * @param Plugin
 	 * @param string Mode of check: either 'enable' or 'disable'
 	 * @return array The key 'note' holds an array of notes (recommendations), the key 'error' holds a list
@@ -1436,6 +1448,7 @@ class Plugins
 	 *
 	 * It makes sure that the index is handled and writes it to DB.
 	 *
+	 * @todo Move to Plugins_admin
 	 * @param string Plugin ID
 	 * @param string Code to set the plugin to
 	 * @return boolean|integer|string
@@ -1504,6 +1517,7 @@ class Plugins
 	 *
 	 * It makes sure that the index is handled and writes it to DB.
 	 *
+	 * @todo Move to Plugins_admin
 	 * @return boolean|integer
 	 *   true, if already set to same value.
 	 *   false if another Plugin uses that priority already.
@@ -1548,6 +1562,7 @@ class Plugins
 	 *
 	 * It makes sure that the index is handled and writes it to DB.
 	 *
+	 * @todo Move to Plugins_admin
 	 * @return boolean true if set to new value, false in case of error or if already set to same value
 	 */
 	function set_apply_rendering( $plugin_ID, $apply_rendering )
@@ -1689,6 +1704,7 @@ class Plugins
 	 *
 	 * Plugins with negative ID (auto-generated; not installed (yet)) will not get considered.
 	 *
+	 * @todo Move to Plugins_admin
 	 * @param string class name
 	 * @return int # of regs
 	 */
@@ -2176,6 +2192,7 @@ class Plugins
 	/**
 	 * Validate renderer list.
 	 *
+	 * @todo Move to Plugins_admin
 	 * @param array renderer codes ('default' will include all "opt-out"-ones)
 	 * @return array validated array of renderer codes
 	 */
@@ -2719,6 +2736,7 @@ class Plugins
 	 *
 	 * @todo Extend to get list of defined classes and global functions and check this list before sourcing/including a Plugin! (prevent fatal error)
 	 *
+	 * @todo Move to Plugins_admin
 	 * @return array
 	 */
 	function get_registered_events( $Plugin )
@@ -2769,6 +2787,7 @@ class Plugins
 	 * Save the events that the plugin provides into DB, while removing obsolete
 	 * entries (that the plugin does not register anymore).
 	 *
+	 * @todo Move to Plugins_admin
 	 * @param Plugin Plugin to save events for
 	 * @param array|NULL List of events to save as enabled for the Plugin.
 	 *              By default all provided events get saved as enabled. Pass array() to discover only new ones.
@@ -2892,6 +2911,7 @@ class Plugins
 	/**
 	 * Set the status of an event for a given Plugin.
 	 *
+	 * @todo Move to Plugins_admin
 	 * @return boolean True, if status has changed; false if not
 	 */
 	function set_event_status( $plugin_ID, $plugin_event, $enabled )
@@ -3040,6 +3060,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.106  2006/11/30 05:10:16  blueyed
+ * Marked a bunch of methods to be moved to PLugins_admin
+ *
  * Revision 1.105  2006/11/30 04:32:23  blueyed
  * Minor change in Plugins::discover(), before moving it
  *
