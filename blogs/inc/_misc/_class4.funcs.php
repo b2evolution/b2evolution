@@ -24,7 +24,9 @@
  *
  * @version $Id$
  */
- 
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
 function load_class( $class_path )
 {
 	global $inc_path;
@@ -111,6 +113,9 @@ function & get_Cache( $objectName )
  
 /*
  * $Log$
+ * Revision 1.5  2006/11/30 22:34:15  fplanque
+ * bleh
+ *
  * Revision 1.4  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

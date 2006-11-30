@@ -33,6 +33,8 @@
  * $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
 $AdminUI->set_path( 'cats' );
 $AdminUI->title = T_('Categories for blog:');
 $AdminUI->title_titlearea = $AdminUI->title;
@@ -397,6 +399,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2006/11/30 22:34:15  fplanque
+ * bleh
+ *
  * Revision 1.15  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

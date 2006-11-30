@@ -6,6 +6,7 @@
  *
  * @package admin
  */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
 // Get the blog from param, defaulting to the last selected one for this user:
@@ -345,6 +346,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.22  2006/11/30 22:34:15  fplanque
+ * bleh
+ *
  * Revision 1.21  2006/10/11 23:44:49  smpdawg
  * Bug fix
  *

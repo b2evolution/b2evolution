@@ -25,6 +25,8 @@
  * @version $Id$
  */
 
+// NOTE: it is okay to call this file before including config! 
+ 
 /**
  * Initialize everything:
  */
@@ -507,6 +509,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.49  2006/11/30 22:34:15  fplanque
+ * bleh
+ *
  * Revision 1.48  2006/11/14 21:56:11  blueyed
  * Debuglog-entry, when redirecting to $canoncical_url
  *

@@ -24,6 +24,8 @@
  *
  * @version $Id$
  */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
 
 $current_User->check_perm( 'blog_cats', 'edit', true, $blog );
 
@@ -78,6 +80,9 @@ require $control_path.'generic/inc/_generic_recursive_listeditor.php';
 
 /*
  * $Log$
+ * Revision 1.7  2006/11/30 22:34:15  fplanque
+ * bleh
+ *
  * Revision 1.6  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

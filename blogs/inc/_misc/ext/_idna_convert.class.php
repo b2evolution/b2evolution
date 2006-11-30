@@ -60,6 +60,7 @@
  * @version 0.4.2
  *
  */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 class idna_convert
 {

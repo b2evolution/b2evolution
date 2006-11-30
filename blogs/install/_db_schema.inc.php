@@ -4,6 +4,7 @@
  *
  * @version $Id$
  */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * The b2evo database scheme.
@@ -490,6 +491,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.40  2006/11/30 22:34:16  fplanque
+ * bleh
+ *
  * Revision 1.39  2006/11/05 20:13:57  fplanque
  * minor
  *

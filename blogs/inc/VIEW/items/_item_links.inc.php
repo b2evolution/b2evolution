@@ -26,6 +26,9 @@
  *
  * @version $Id$
  */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
 global $edited_Item, $edit_allowed;
 
 $SQL = & new SQL();
@@ -162,6 +165,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.9  2006/11/30 22:34:15  fplanque
+ * bleh
+ *
  * Revision 1.8  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
