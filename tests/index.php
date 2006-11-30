@@ -42,11 +42,31 @@ if( empty($action) )
 		?>
 		</ul>
 
+
 		<h2>Install tests</h2>
 		<ul>
 		<li><a href="install/"><strong>All install tests</strong></a></li>
 		<?php
 		$filenames = get_filenames( dirname(__FILE__).'/install', true, false, $flat = true );
+		sort($filenames);
+		foreach( $filenames as $filename )
+		{
+			if( substr($filename, -15) != '.simpletest.php' )
+				continue;
+
+			$rel_path = substr($filename, strlen(dirname(__FILE__))+1);
+
+			echo '<li><a href="'.$rel_path.'">'.$rel_path.'</a>';
+		}
+		?>
+		</ul>
+
+
+		<h2>Release tests</h2>
+		<ul>
+		<li><a href="release/"><strong>All release tests</strong></a></li>
+		<?php
+		$filenames = get_filenames( dirname(__FILE__).'/release', true, false, $flat = true );
 		sort($filenames);
 		foreach( $filenames as $filename )
 		{
