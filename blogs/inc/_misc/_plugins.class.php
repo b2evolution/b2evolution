@@ -416,7 +416,7 @@ class Plugins
 			{ // Plugin class name in plugins/
 				$classname = $match[1].'_plugin';
 
-				$this->register( $classname, 0 ); // auto-generate negative ID; will return string on error.
+				$filepath = NULL;
 			}
 			elseif( preg_match( '/^(.+)\_plugin$/', $this_file, $match )
 				&& is_dir( $this->plugins_path.$this_file )
@@ -424,9 +424,15 @@ class Plugins
 			{ // Plugin class name in plugins/<plug_classname>/
 				$classname = $match[1].'_plugin';
 				$filepath = $this->plugins_path.$this_file.'/_'.$match[1].'.plugin.php';
-
-				$this->register( $classname, 0, -1, NULL, $filepath );
 			}
+			else
+			{
+				continue;
+			}
+
+			// TODO: check for parse errors before, e.g. through /htsrc/async.php..?!
+
+			$this->register( $classname, 0, -1, NULL, $filepath ); // auto-generate negative ID; will return string on error.
 		}
 
 		$Timer->pause('plugins_discover');
@@ -3034,6 +3040,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.105  2006/11/30 04:32:23  blueyed
+ * Minor change in Plugins::discover(), before moving it
+ *
  * Revision 1.104  2006/11/30 00:30:33  blueyed
  * Some minor memory optimizations regarding "Plugins" screen
  *
