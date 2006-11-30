@@ -495,7 +495,7 @@ to
 		 */
 
 		// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
-		load_class('inc/_plugins_admin_no_db.class.php');
+		load_class('_misc/_plugins_admin_no_db.class.php');
 		$Plugins = new Plugins_admin_no_DB();
 		?>
 		<h2><?php echo T_('Installing b2evolution tables with sample data')?></h2>
@@ -546,7 +546,7 @@ to
 
 	case 'cafelogupgrade':
 		// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
-		load_class('inc/_plugins_admin_no_db.class.php');
+		load_class('_misc/_plugins_admin_no_db.class.php');
 		$Plugins = new Plugins_admin_no_DB();
 		/*
 		 * -----------------------------------------------------------------------------------
@@ -643,6 +643,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.120  2006/11/30 06:13:23  blueyed
+ * Moved Plugins::install() and sort() galore to Plugins_admin
+ *
  * Revision 1.119  2006/11/30 05:43:40  blueyed
  * Moved Plugins::discover() to Plugins_admin::discover(); Renamed Plugins_no_DB to Plugins_admin_no_DB (and deriving from Plugins_admin)
  *
