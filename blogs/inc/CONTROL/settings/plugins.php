@@ -1015,15 +1015,6 @@ switch( $action )
 
 if( $action == 'list' )
 {
-	if( $UserSettings->get('plugins_disp_avail')
-			&& ( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) // may have been instantiated for action 'info'
-		)
-	{ // We want to display available plugins:
-		$AvailablePlugins = & new Plugins_no_DB(); // do not load registered plugins/events from DB
-		$AvailablePlugins->discover();
-		$AvailablePlugins->sort('name');
-	}
-
 	// Display VIEW:
 	$AdminUI->disp_view( 'settings/_set_plugins.form.php' );
 }
@@ -1036,6 +1027,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.67  2006/11/30 00:30:33  blueyed
+ * Some minor memory optimizations regarding "Plugins" screen
+ *
  * Revision 1.66  2006/11/26 23:40:34  blueyed
  * trans
  *

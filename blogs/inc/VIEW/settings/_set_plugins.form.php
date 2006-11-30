@@ -44,10 +44,6 @@ global $current_User;
  */
 global $admin_Plugins;
 /**
- * @var Plugins_no_DB
- */
-global $AvailablePlugins;
-/**
  * @var UserSettings
  */
 global $UserSettings;
@@ -258,6 +254,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	$highlight_fadeout = empty($edit_Plugin) || ! is_object($edit_Plugin) /* may be error string */ ? array() : array( 'plug_ID'=>array($edit_Plugin->ID) );
 
 	$Results->display( NULL, $highlight_fadeout );
+	unset($Results); // free memory
 
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{ // Display action link to reload plugins:
@@ -298,7 +295,11 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 		</tr>
 
 		<?php
-		$AvailablePlugins->restart();	 // make sure iterator is at start position
+		if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) )
+		{ // (may have been instantiated for action 'info')
+			$AvailablePlugins = & new Plugins_no_DB(); // do not load registered plugins/events from DB
+			$AvailablePlugins->discover();
+		}
 
 		// Sort the plugins by group
 		$AvailablePlugins->sort('group');
@@ -418,6 +419,8 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 		</tr>
 		<?php
 		flush();
+		// free memory:
+		$AvailablePlugins->unregister($loop_Plugin);
 		}
 		?>
 		</tbody>
@@ -428,6 +431,9 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 <?php
 /*
  * $Log$
+ * Revision 1.39  2006/11/30 00:30:33  blueyed
+ * Some minor memory optimizations regarding "Plugins" screen
+ *
  * Revision 1.38  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

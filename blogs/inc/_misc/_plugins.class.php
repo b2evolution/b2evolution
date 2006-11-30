@@ -177,8 +177,7 @@ class Plugins
 	 */
 	function Plugins()
 	{
-		global $basepath, $plugins_subdir;
-		global $DB, $Debuglog, $Timer;
+		global $basepath, $plugins_subdir, $Timer;
 
 		// Set plugin path:
 		$this->plugins_path = $basepath.$plugins_subdir;
@@ -227,9 +226,11 @@ class Plugins
 	 */
 	function get_supported_events()
 	{
-		if( empty( $this->_supported_events ) )
+		static $supported_events;
+
+		if( empty( $supported_events ) )
 		{
-			$this->_supported_events = array(
+			$supported_events = array(
 				'AdminAfterPageFooter' => '',
 				'AdminDisplayEditorButton' => '',
 				'AdminDisplayToolbar' => '',
@@ -354,13 +355,13 @@ class Plugins
 					$extra_events = $Plugin->GetExtraEvents();
 					if( is_array($extra_events) )
 					{
-						$this->_supported_events = array_merge( $this->_supported_events, $extra_events );
+						$supported_events = array_merge( $supported_events, $extra_events );
 					}
 				}
 			}
 		}
 
-		return $this->_supported_events;
+		return $supported_events;
 	}
 
 
@@ -374,9 +375,11 @@ class Plugins
 	 */
 	function get_apply_rendering_values( $with_desc = false )
 	{
-		if( empty( $this->_apply_rendering_values ) )
+		static $apply_rendering_values;
+
+		if( empty( $apply_rendering_values ) )
 		{
-			$this->_apply_rendering_values = array(
+			$apply_rendering_values = array(
 					'stealth' => '',
 					'always' => '',
 					'opt-out' => '',
@@ -387,10 +390,10 @@ class Plugins
 		}
 		if( ! $with_desc )
 		{
-			return array_keys( $this->_apply_rendering_values );
+			return array_keys( $apply_rendering_values );
 		}
 
-		return $this->_apply_rendering_values;
+		return $apply_rendering_values;
 	}
 
 
@@ -3031,6 +3034,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.104  2006/11/30 00:30:33  blueyed
+ * Some minor memory optimizations regarding "Plugins" screen
+ *
  * Revision 1.103  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
