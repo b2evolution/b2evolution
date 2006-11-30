@@ -15,6 +15,55 @@ require_once( dirname(__FILE__).'/../config.simpletest.php' );
  */
 class SecurityChecksTestCase extends EvoUnitTestCase
 {
+	/**
+	 * @var array A list of files, relative to $basepath, which do not need an "defined(EVO_MAIN_INIT)" check.
+	 */
+	var $entry_points = array(
+		'inc/_main.inc.php',
+		'inc/_blog_main.inc.php',
+		'inc/_connect_db.inc.php',
+		'inc/MODEL/settings/_locale.funcs.php',
+		'inc/_misc/ext/_xmlrpc.php',
+		'inc/_misc/ext/_xmlrpcs.php',
+		'conf/_formatting.php',
+		'conf/_config_TEST.php',
+		'conf/_upgrade.php',
+		'conf/_admin.php',
+		'conf/_locales.php',
+		'conf/_advanced.php',
+		'conf/_basic_config.php',
+		'conf/_overrides_TEST.php',
+		'conf/_application.php',
+		'conf/_icons.php',
+		'conf/_config.php',
+		'conf/_stats.php',
+		'cron/cron_exec.php',
+		'cron/mms.php',
+  	'cron/getmail.php',
+  	'htsrv/comment_post.php',
+  	'htsrv/trackback.php',
+  	'htsrv/call_plugin.php',
+  	'htsrv/async.php',
+  	'htsrv/login.php',
+  	'htsrv/viewfile.php',
+  	'htsrv/subs_update.php',
+  	'htsrv/message_send.php',
+  	'htsrv/profile_update.php',
+  	'htsrv/getfile.php',
+  	'htsrv/register.php',
+  	'xmlsrv/atom.php',
+  	'xmlsrv/rdf.php',
+  	'xmlsrv/rss.comments.php',
+  	'xmlsrv/rss2.php',
+  	'xmlsrv/xmlrpc.php',
+  	'xmlsrv/rss.php',
+  	'xmlsrv/rss2.comments.php',
+  	'xmlsrv/rdf.comments.php',
+  	'xmlsrv/atom.comments.php',
+  	'install/phpinfo.php',
+  	'install/index.php',
+	);
+
 	function SecurityChecksTestCase()
 	{
 		$this->EvoUnitTestCase( 'Release tests' );
@@ -69,7 +118,10 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 		$badfiles = array();
 		foreach( $files as $filename )
 		{
-			// TODO: exclude files here, where the defined check is ok to be missing (continue)
+			if( in_array( substr($filename, strlen($basepath)), $this->entry_points) )
+			{ // file is an entry point
+				continue;
+			}
 
 			$buffer = file_get_contents($filename);
 
@@ -88,7 +140,7 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 		if( ! empty($badfiles) )
 		{
 			echo '<h1>Files which seem to miss the check for defined(EVO_MAIN_INIT)</h1>';
-			pre_dump( $badfiles );
+			var_export( $badfiles );
 		}
 		$this->assertFalse( $badfiles );
 	}
