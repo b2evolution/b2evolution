@@ -26,6 +26,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+load_class('_misc/_plugins_admin.class.php');
+
+
 /**
  * A sub-class of {@link Plugins_admin}, just to not load any DB info (which means Plugins and Events).
  *
@@ -56,6 +59,9 @@ class Plugins_admin_no_DB extends Plugins_admin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.2  2006/11/30 06:20:57  blueyed
+ * load_class(parent)
+ *
  * Revision 1.1  2006/11/30 05:43:40  blueyed
  * Moved Plugins::discover() to Plugins_admin::discover(); Renamed Plugins_no_DB to Plugins_admin_no_DB (and deriving from Plugins_admin)
  *
