@@ -680,6 +680,7 @@ class Log_noop {
 	 */
 	function get_messages()
 	{
+		return array();
 	}
 
 
@@ -688,11 +689,15 @@ class Log_noop {
 	 */
 	function get_string()
 	{
+		return '';
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.13  2006/11/30 00:28:13  blueyed
+ * Interface fixes for Log_noop
+ *
  * Revision 1.12  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
