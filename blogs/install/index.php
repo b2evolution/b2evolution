@@ -119,8 +119,8 @@ header('Content-Type: text/html; charset='.$io_charset);
 		<a href="../index.php"><?php echo T_('Go to Blogs') ?></a> &middot;
 		<a href="../admin.php"><?php echo T_('Go to Admin') ?></a> &middot;
 		<?php echo T_('Online') ?>:
-		<a href="http://manual.b2evolution.net/"><?php echo T_('Manual') ?></a> &middot; 
-		<a href="http://forums.b2evolution.net/"><?php echo T_('Forums') ?></a> 
+		<a href="http://manual.b2evolution.net/"><?php echo T_('Manual') ?></a> &middot;
+		<a href="http://forums.b2evolution.net/"><?php echo T_('Forums') ?></a>
 	</div>
 </div>
 
@@ -495,7 +495,8 @@ to
 		 */
 
 		// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
-		$Plugins = new Plugins_no_DB();
+		load_class('inc/_plugins_admin_no_db.class.php');
+		$Plugins = new Plugins_admin_no_DB();
 		?>
 		<h2><?php echo T_('Installing b2evolution tables with sample data')?></h2>
 		<?php
@@ -545,7 +546,8 @@ to
 
 	case 'cafelogupgrade':
 		// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
-		$Plugins = new Plugins_no_DB();
+		load_class('inc/_plugins_admin_no_db.class.php');
+		$Plugins = new Plugins_admin_no_DB();
 		/*
 		 * -----------------------------------------------------------------------------------
 		 * UPGRADE FROM B2 : Create a new db structure + copy content from previous b2
@@ -641,6 +643,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.119  2006/11/30 05:43:40  blueyed
+ * Moved Plugins::discover() to Plugins_admin::discover(); Renamed Plugins_no_DB to Plugins_admin_no_DB (and deriving from Plugins_admin)
+ *
  * Revision 1.118  2006/11/14 00:47:32  fplanque
  * doc
  *

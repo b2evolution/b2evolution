@@ -401,49 +401,6 @@ class Plugins
 
 
 	/**
-	 * Discover and register all available plugins.
-	 * @todo Move to Plugins_admin
-	 */
-	function discover()
-	{
-		global $Debuglog, $Timer;
-
-		$Timer->resume('plugins_discover');
-
-		$Debuglog->add( 'Discovering plugins...', 'plugins' );
-
-		// Go through directory:
-		$this_dir = dir( $this->plugins_path );
-		while( $this_file = $this_dir->read() )
-		{
-			if( preg_match( '/^_(.+)\.plugin\.php$/', $this_file, $match ) && is_file( $this->plugins_path.$this_file ) )
-			{ // Plugin class name in plugins/
-				$classname = $match[1].'_plugin';
-
-				$filepath = NULL;
-			}
-			elseif( preg_match( '/^(.+)\_plugin$/', $this_file, $match )
-				&& is_dir( $this->plugins_path.$this_file )
-				&& is_file( $this->plugins_path.$this_file.'/_'.$match[1].'.plugin.php' ) )
-			{ // Plugin class name in plugins/<plug_classname>/
-				$classname = $match[1].'_plugin';
-				$filepath = $this->plugins_path.$this_file.'/_'.$match[1].'.plugin.php';
-			}
-			else
-			{
-				continue;
-			}
-
-			// TODO: check for parse errors before, e.g. through /htsrc/async.php..?!
-
-			$this->register( $classname, 0, -1, NULL, $filepath ); // auto-generate negative ID; will return string on error.
-		}
-
-		$Timer->pause('plugins_discover');
-	}
-
-
-	/**
 	 * Sort the list of {@link $Plugins}.
 	 *
 	 * WARNING: do NOT sort by anything else than priority unless you're handling a list of NOT-YET-INSTALLED plugins!
@@ -3011,55 +2968,11 @@ class Plugins
 }
 
 
-/**
- * A sub-class of {@link Plugins}, just to not load any DB info (which means Plugins and Events).
- *
- * This is only useful for displaying a list of available plugins or during installation to have
- * a global $Plugins object that does not interfere with the installation process.
- *
- * {@internal This is probably quicker and cleaner than using a member boolean in {@link Plugins} itself.}}
- *
- * @package evocore
- */
-class Plugins_no_DB extends Plugins
-{
-	/**
-	 * No-operation.
-	 */
-	function load_plugins_table()
-	{
-	}
-
-	/**
-	 * No-operation.
-	 */
-	function load_events()
-	{
-	}
-}
-
-
-/**
- * A Plugins object that loads all Plugins, not just the enabled ones. This is needed for the backoffice plugin management.
- *
- * @package evocore
- */
-class Plugins_admin extends Plugins
-{
-	/**
-	 * Load all plugins (not just enabled ones).
-	 */
-	var $sql_load_plugins_table = '
-			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_name, plug_shortdesc, plug_apply_rendering, plug_status, plug_version, plug_spam_weight
-			  FROM T_plugins
-			 ORDER BY plug_priority, plug_classname';
-
-	var $is_admin_class = true;
-}
-
-
 /*
  * $Log$
+ * Revision 1.107  2006/11/30 05:43:40  blueyed
+ * Moved Plugins::discover() to Plugins_admin::discover(); Renamed Plugins_no_DB to Plugins_admin_no_DB (and deriving from Plugins_admin)
+ *
  * Revision 1.106  2006/11/30 05:10:16  blueyed
  * Marked a bunch of methods to be moved to PLugins_admin
  *

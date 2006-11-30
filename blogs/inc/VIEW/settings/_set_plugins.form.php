@@ -295,9 +295,10 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 		</tr>
 
 		<?php
-		if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) )
+		if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_admin_no_DB' ) )
 		{ // (may have been instantiated for action 'info')
-			$AvailablePlugins = & new Plugins_no_DB(); // do not load registered plugins/events from DB
+			load_class('_misc/_plugins_admin_no_db.class.php');
+			$AvailablePlugins = & new Plugins_admin_no_DB(); // do not load registered plugins/events from DB
 			$AvailablePlugins->discover();
 		}
 
@@ -431,6 +432,9 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 <?php
 /*
  * $Log$
+ * Revision 1.40  2006/11/30 05:43:39  blueyed
+ * Moved Plugins::discover() to Plugins_admin::discover(); Renamed Plugins_no_DB to Plugins_admin_no_DB (and deriving from Plugins_admin)
+ *
  * Revision 1.39  2006/11/30 00:30:33  blueyed
  * Some minor memory optimizations regarding "Plugins" screen
  *

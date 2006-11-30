@@ -35,7 +35,7 @@ class EvoUnitTestCase extends UnitTestCase
 		$FiletypeCache = new FiletypeCache();
 		$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
 		$Timer = new Timer();
-		$Plugins = new Plugins_no_DB();
+		$Plugins = new Plugins_admin_no_DB();
 
 		$db_params = $db_config;
 		$db_params['new_link'] = true; // needed to not interfere with the DB connection to the test DB (setup in DbUnitTestCase).

@@ -32,13 +32,11 @@ class PluginUnitTestCase extends EvoUnitTestCase
 
 
 	/**
-	 *
-	 *
-	 * @return
+	 * @return Plugin
 	 */
 	function & get_fake_Plugin( $classname )
 	{
-		$Plugins = new Plugins_no_DB();
+		$Plugins = new Plugins_admin_no_DB();
 
 		$real_Plugin = new $classname();
 

@@ -43,7 +43,7 @@ $UserSettings->param_Request( 'plugins_disp_avail', 'plugins_disp_avail', 'integ
 // Check permission to display:
 $current_User->check_perm( 'options', 'view', true );
 
-
+load_class('_misc/_plugins_admin.class.php');
 $admin_Plugins = new Plugins_admin();
 $admin_Plugins->restart();
 
@@ -745,7 +745,8 @@ switch( $action )
 		param( 'plugin_ID', 'integer', true );
 
 		// Discover available plugins:
-		$AvailablePlugins = & new Plugins_no_DB(); // do not load registered plugins/events from DB
+		load_class('_misc/_plugins_admin_no_db.class.php');
+		$AvailablePlugins = & new Plugins_admin_no_DB(); // do not load registered plugins/events from DB
 		$AvailablePlugins->discover();
 
 		if( ! ($edit_Plugin = & $AvailablePlugins->get_by_ID( $plugin_ID )) )
@@ -764,7 +765,8 @@ switch( $action )
 		param( 'plugin_ID', 'integer', 0 );
 
 		// Discover available plugins:
-		$AvailablePlugins = & new Plugins_no_DB(); // do not load registered plugins/events from DB
+		load_class('_misc/_plugins_admin_no_db.class.php');
+		$AvailablePlugins = & new Plugins_admin_no_DB(); // do not load registered plugins/events from DB
 		$AvailablePlugins->discover();
 
 		if( ! ($edit_Plugin = & $AvailablePlugins->get_by_ID( $plugin_ID )) )
@@ -1027,6 +1029,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.68  2006/11/30 05:43:39  blueyed
+ * Moved Plugins::discover() to Plugins_admin::discover(); Renamed Plugins_no_DB to Plugins_admin_no_DB (and deriving from Plugins_admin)
+ *
  * Revision 1.67  2006/11/30 00:30:33  blueyed
  * Some minor memory optimizations regarding "Plugins" screen
  *
