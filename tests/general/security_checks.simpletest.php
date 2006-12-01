@@ -132,8 +132,10 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 
 		if( ! empty($badfiles) )
 		{
-			echo '<h1>Files which seem to miss the check for defined(EVO_MAIN_INIT)</h1>';
-			pre_dump( $badfiles );
+			echo '<h2>Files which seem to miss the check for defined(EVO_MAIN_INIT)</h2>';
+			echo "\n<ul><li>\n";
+			echo implode( "\n</li><li>\n", $badfiles );
+			echo "\n</li></ul>\n";
 		}
 		$this->assertFalse( $badfiles );
 	}
