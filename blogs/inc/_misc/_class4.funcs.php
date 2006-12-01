@@ -110,7 +110,7 @@ function & get_Cache( $objectName )
 		case 'Plugins_admin':
 			load_class( '_misc/_plugins_admin.class.php' );
 			$Plugins_admin = new Plugins_admin(); // COPY (FUNC)
-			return $LinkCache;
+			return $Plugins_admin;
 
 		case 'UserCache';
 			load_class( 'MODEL/users/_usercache.class.php' );
@@ -124,6 +124,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.7  2006/12/01 20:55:45  blueyed
+ * Fixed load_Class() for $Plugins_admin
+ *
  * Revision 1.6  2006/12/01 02:01:38  blueyed
  * Added "Plugins_admin" to get_Cache() + doc
  *
