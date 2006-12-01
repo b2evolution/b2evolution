@@ -16,23 +16,16 @@ require_once( dirname(__FILE__).'/../config.simpletest.php' );
 class SecurityChecksTestCase extends EvoUnitTestCase
 {
 	/**
-	 * @var array A list of files, relative to $basepath, which do not need an "defined(EVO_MAIN_INIT)" check.
+	 * Below are the valid entry points.
+	 * These include files that properly initalize the config before doing anything (config proxies), thus making sure no
+	 * hazardous variables can be injected with register_globals = On.
+	 *
+	 * @var array A list of files, relative to $basepath, which do not need a "defined(EVO_MAIN_INIT)" check.
 	 */
 	var $entry_points = array(
-		'inc/_main.inc.php',
-		'inc/_blog_main.inc.php',
-		'conf/_formatting.php',
-		'conf/_config_TEST.php',
-		'conf/_upgrade.php',
-		'conf/_admin.php',
-		'conf/_locales.php',
-		'conf/_advanced.php',
-		'conf/_basic_config.php',
-		'conf/_overrides_TEST.php',
-		'conf/_application.php',
-		'conf/_icons.php',
-		'conf/_config.php',
-		'conf/_stats.php',
+		'conf/_config.php',						// okay because it is the config. Special case.
+		'inc/_connect_db.inc.php',		// okay because it starts by loading the config; this is not normalized behaviour though! TODO.
+		// Below are the real entry points:
 		'cron/cron_exec.php',
 		'cron/mms.php',
 		'cron/getmail.php',
@@ -58,6 +51,26 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 		'xmlsrv/atom.comments.php',
 		'install/phpinfo.php',
 		'install/index.php',
+	);
+
+	/**
+	 * A list of files which need a check for EVO_CONFIG_LOADED rather than EVO_MAIN_INIT.
+	 * @var array
+	 */
+	var $init_files = array(
+		'inc/_main.inc.php',
+		'inc/_blog_main.inc.php',
+		'conf/_formatting.php',
+		'conf/_config_TEST.php',
+		'conf/_upgrade.php',
+		'conf/_admin.php',
+		'conf/_locales.php',
+		'conf/_advanced.php',
+		'conf/_basic_config.php',
+		'conf/_overrides_TEST.php',
+		'conf/_application.php',
+		'conf/_icons.php',
+		'conf/_stats.php',
 	);
 
 	function SecurityChecksTestCase()
@@ -106,6 +119,7 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 		global $basepath;
 
 		$search = "if\( \s* ! \s* defined\( \s* 'EVO_MAIN_INIT' \s* \) \s* \) \s* die\( .*? \);";
+		$search_init = "if\( \s* ! \s* defined\( \s* 'EVO_CONFIG_LOADED' \s* \) \s* \) \s* die\( .*? \);";
 
 		$files = $this->get_files_without_symlinks($basepath);
 		$badfiles = array();
@@ -124,15 +138,25 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 				continue;
 			}
 
-			if( ! preg_match( '~^<\?php \s* /\* .*? \*/ \s* '.$search.'~isx', substr($buffer, $pos_phptag) ) )
+			if( in_array( substr($filename, strlen($basepath)), $this->init_files) )
+			{ // file is an init file:
+				if( ! preg_match( '~^<\?php \s* /\* .*? \*/ \s* '.$search_init.'~isx', substr($buffer, $pos_phptag) ) )
+				{
+					$badfiles[] = $filename;
+				}
+			}
+			else
 			{
-				$badfiles[] = $filename;
+				if( ! preg_match( '~^<\?php \s* /\* .*? \*/ \s* '.$search.'~isx', substr($buffer, $pos_phptag) ) )
+				{
+					$badfiles[] = $filename;
+				}
 			}
 		}
 
 		if( ! empty($badfiles) )
 		{
-			echo '<h2>Files which seem to miss the check for defined(EVO_MAIN_INIT)</h2>';
+			echo '<h2>Files which seem to miss the check for defined(EVO_MAIN_INIT/EVO_CONFIG_LOADED)</h2>';
 			echo "\n<ul><li>\n";
 			echo implode( "\n</li><li>\n", $badfiles );
 			echo "\n</li></ul>\n";
