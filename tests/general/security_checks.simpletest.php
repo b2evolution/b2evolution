@@ -95,10 +95,7 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 			$r = array_merge( $r, $files );
 
 			// subdirs:
-			foreach( get_filenames( $dir, false, true, true, false ) as $subdir )
-			{
-				$r = array_merge( $r, $this->get_files_without_symlinks($subdir));
-			}
+			$r = array_merge( $r, $this->get_files_without_symlinks($dir));
 		}
 		return $r;
 	}
