@@ -416,7 +416,7 @@ class Plugin
 	 *       </li></ul>
 	 *     </li><li>
 	 *     'select_blog': a drop down field, providing all existing blogs (Group ID is the value or "" if "allow_none" is true)
-	 *                    (since b2evo 1.10)
+	 *                    (since b2evo EVO_NEXT_VERSION)
 	 *     </li><li>
 	 *     'select_group': a drop down field, providing all existing groups (Group ID is the value or "" if "allow_none" is true)
 	 *     </li><li>
@@ -1634,6 +1634,7 @@ class Plugin
 	 *   - 'name': name of the setting
 	 *   - 'value': value of the setting (by reference)
 	 *   - 'meta': meta data of the setting (as given in {@link GetDefaultSettings()})
+	 *   - 'action': 'display' or 'set' (since b2evo EVO_NEXT_VERSION)
 	 * @return string|NULL Return a string with an error to prevent the setting from being set
 	 *                     and/or a message added to the settings field.
 	 */
@@ -1701,6 +1702,7 @@ class Plugin
 	 *   - 'value': value of the setting (by reference)
 	 *   - 'meta': meta data of the setting (as given in {@link GetDefaultUserSettings()})
 	 *   - 'User': the {@link User} for which the setting is
+	 *   - 'action': 'display' or 'set' (since b2evo EVO_NEXT_VERSION)
 	 * @return string|NULL Return a string with an error to prevent the setting from being set
 	 *                     and/or a message added to the settings field.
 	 */
@@ -1720,7 +1722,7 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'User': the {@link User} for which the settings get updated
-	 *   - 'action': "save", "reset" (since b2evo 2.0 - before there was only "save")
+	 *   - 'action': "save", "reset" (since b2evo EVO_NEXT_VERSION - before there was only "save")
 	 *
 	 * @return false|NULL Return false to prevent the settings from being updated to DB.
 	 */
@@ -2463,20 +2465,6 @@ class Plugin
 
 
 	/**
-	 * Set param value.
-	 *
-	 * @deprecated since 1.9 - no use.
-	 * @param string Name of parameter
-	 * @param mixed Value of parameter
-	 */
-	function set_param( $parname, $parvalue )
-	{
-		// Set value:
-		$this->$parname = $parvalue;
-	}
-
-
-	/**
 	 * Set the status of the plugin.
 	 *
 	 * @param string 'enabled', 'disabled' or 'needs_config'
@@ -2802,6 +2790,11 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.122  2006/12/01 16:47:26  blueyed
+ * - Use EVO_NEXT_VERSION, which should get replaced with the next version 1.10 or 2.0 or whatever
+ * - "action" param for PluginSettingsValidateSet
+ * - Removed deprecated Plugin::set_param()
+ *
  * Revision 1.121  2006/12/01 16:26:34  blueyed
  * Added AdminDisplayCommentFormFieldset hook
  *

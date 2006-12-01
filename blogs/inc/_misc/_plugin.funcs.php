@@ -184,13 +184,20 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 		{ // NOTE: this assumes we come here only on recursion or with $use_value set..!
 			$set_value = $Plugin->UserSettings->get( $set_name, $set_target->ID );
 			$error_value = $Plugin->PluginUserSettingsValidateSet( $tmp_params = array(
-				'name' => $set_name, 'value' => & $set_value, 'meta' => $set_meta, 'User' => $set_target ) );
+				'name' => $set_name,
+				'value' => & $set_value,
+				'meta' => $set_meta,
+				'User' => $set_target,
+				'action' => 'display' ) );
 		}
 		else
 		{ // NOTE: this assumes we come here only on recursion or with $use_value set..!
 			$set_value = $Plugin->$set_type->get( $set_name );
 			$error_value = $Plugin->PluginSettingsValidateSet( $tmp_params = array(
-				'name' => $set_name, 'value' => & $set_value, 'meta' => $set_meta ) );
+				'name' => $set_name,
+				'value' => & $set_value,
+				'meta' => $set_meta,
+				'action' => 'display' ) );
 		}
 
 		if( $error_value )
@@ -638,7 +645,12 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 		}
 
 		// Ask the plugin if it's ok (through PluginSettingsValidateSet() / PluginUserSettingsValidateSet()):
-		$tmp_params = array( 'name' => $l_name, 'value' => & $l_value, 'meta' => $l_meta );
+		$tmp_params = array(
+			'name' => $l_name,
+			'value' => & $l_value,
+			'meta' => $l_meta,
+			'action' => 'set',
+			);
 		if( $set_type == 'UserSettings' )
 		{
 			global $current_User;
@@ -843,6 +855,11 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.33  2006/12/01 16:47:26  blueyed
+ * - Use EVO_NEXT_VERSION, which should get replaced with the next version 1.10 or 2.0 or whatever
+ * - "action" param for PluginSettingsValidateSet
+ * - Removed deprecated Plugin::set_param()
+ *
  * Revision 1.32  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
