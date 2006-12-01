@@ -26,9 +26,9 @@ class DbUnitTestCase extends EvoUnitTestCase
 
 
 	/**
-	 * Constructor
+	 * Setup global $DB as reference to member test_DB (test DB).
 	 */
-	function DbUnitTestCase()
+	function setUp()
 	{
 		global $testDB_conf;
 
@@ -40,16 +40,9 @@ class DbUnitTestCase extends EvoUnitTestCase
 		$this->test_DB = new DbUnitTestCase_DB( $testDB_conf );
 		$this->test_DB->halt_on_error = false;
 
-		$this->EvoUnitTestCase();
-	}
 
-
-	/**
-	 * Setup global $DB as reference to member test_DB (test DB).
-	 */
-	function setUp()
-	{
 		parent::setUp();
+
 
 		$this->old_DB = & $GLOBALS['DB'];
 		$GLOBALS['DB'] = & $this->test_DB;
