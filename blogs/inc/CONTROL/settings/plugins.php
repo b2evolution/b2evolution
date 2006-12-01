@@ -184,7 +184,7 @@ switch( $action )
 		}
 
 		// Check dependencies
-		$msgs = $Plugins->validate_dependencies( $edit_Plugin, 'disable' );
+		$msgs = $admin_Plugins->validate_dependencies( $edit_Plugin, 'disable' );
 		if( ! empty( $msgs['error'] ) )
 		{
 			$Messages->add( T_( 'The plugin cannot be disabled because of the following dependencies:' ).' <ul><li>'.implode('</li><li>', $msgs['error']).'</li></ul>', 'error' );
@@ -226,7 +226,7 @@ switch( $action )
 		}
 
 		// Check dependencies
-		$msgs = $Plugins->validate_dependencies( $edit_Plugin, 'enable' );
+		$msgs = $admin_Plugins->validate_dependencies( $edit_Plugin, 'enable' );
 		if( ! empty( $msgs['error'] ) )
 		{
 			$Messages->add( T_( 'The plugin cannot be enabled because of the following dependencies:' ).' <ul><li>'.implode('</li><li>', $msgs['error']).'</li></ul>' );
@@ -395,7 +395,7 @@ switch( $action )
 		}
 
 		// Check dependencies:
-		$msgs = $Plugins->validate_dependencies( $edit_Plugin, 'disable' );
+		$msgs = $admin_Plugins->validate_dependencies( $edit_Plugin, 'disable' );
 		if( ! empty( $msgs['error'] ) )
 		{
 			$Messages->add( T_( 'The plugin cannot be uninstalled because of the following dependencies:' ).' <ul><li>'.implode('</li><li>', $msgs['error']).'</li></ul>', 'error' );
@@ -1029,6 +1029,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.69  2006/12/01 20:01:38  blueyed
+ * Moved Plugins::validate_dependencies() to Plugins_admin class
+ *
  * Revision 1.68  2006/11/30 05:43:39  blueyed
  * Moved Plugins::discover() to Plugins_admin::discover(); Renamed Plugins_no_DB to Plugins_admin_no_DB (and deriving from Plugins_admin)
  *
