@@ -64,7 +64,7 @@ if( empty($action) )
 
 		<h2>General tests</h2>
 		<ul>
-		<li><a href="release/"><strong>All release tests</strong></a></li>
+		<li><a href="general/"><strong>All general tests</strong></a></li>
 		<?php
 		$filenames = get_filenames( dirname(__FILE__).'/general', true, false, $flat = true );
 		sort($filenames);

@@ -62,7 +62,7 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 
 	function SecurityChecksTestCase()
 	{
-		$this->EvoUnitTestCase( 'Release tests' );
+		$this->EvoUnitTestCase( 'Security tests' );
 	}
 
 
