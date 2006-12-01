@@ -69,7 +69,7 @@ function fetch_remote_page( $url, & $info )
 
 		// headers:
 		$meta = stream_get_meta_data($fp);
-		if( ! $meta || ! preg_match( '~^HTTP/\d+\.\d+ (\d+)~', $meta[0], $match ) )
+		if( ! $meta || ! preg_match( '~^HTTP/\d+\.\d+ (\d+)~', $meta['wrapper_data'][0], $match ) )
 		{
 			$info['error'] = 'Invalid response.';
 			$r = false;
@@ -199,6 +199,9 @@ function url_same_protocol( $url, $other_url = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.3  2006/12/01 17:31:38  blueyed
+ * Fixed url_fopen method for fetch_remote_page
+ *
  * Revision 1.2  2006/11/29 20:48:46  blueyed
  * Moved url_rel_to_same_host() from _misc.funcs.php to _url.funcs.php
  *
