@@ -94,7 +94,6 @@ class Plugins_admin extends Plugins
 	/**
 	 * Install a plugin into DB.
 	 *
-	 * @todo Move to Plugins_admin
 	 * @param string Classname of the plugin to install
 	 * @param string Initial DB Status of the plugin ("enabled", "disabled", "needs_config", "broken")
 	 * @param string|NULL Optional classfile path, if not default (used for tests).
@@ -218,6 +217,42 @@ class Plugins_admin extends Plugins
 
 
 	/**
+	 * Set the status of an event for a given Plugin.
+	 *
+	 * @return boolean True, if status has changed; false if not
+	 */
+	function set_event_status( $plugin_ID, $plugin_event, $enabled )
+	{
+		global $DB;
+
+		$enabled = $enabled ? 1 : 0;
+
+		$DB->query( '
+			UPDATE T_pluginevents
+			   SET pevt_enabled = '.$enabled.'
+			 WHERE pevt_plug_ID = '.$plugin_ID.'
+			   AND pevt_event = "'.$plugin_event.'"' );
+
+		if( $DB->rows_affected )
+		{
+			$this->load_events();
+
+			if( strpos($plugin_event, 'RenderItemAs') === 0 )
+			{ // Clear pre-rendered content cache, if RenderItemAs* events have been added or removed:
+				$DB->query( 'DELETE FROM T_item__prerendering WHERE 1' );
+				$ItemCache = & get_Cache( 'ItemCache' );
+				$ItemCache->clear();
+				break;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
 	 * Sort the list of plugins.
 	 *
 	 * WARNING: do NOT sort by anything else than priority unless you're handling a list of NOT-YET-INSTALLED plugins!
@@ -333,6 +368,9 @@ class Plugins_admin extends Plugins
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.3  2006/12/01 02:03:04  blueyed
+ * Moved Plugins::set_event_status() to Plugins_admin
+ *
  * Revision 1.2  2006/11/30 05:57:54  blueyed
  * Moved Plugins::install() and sort() galore to Plugins_admin
  *

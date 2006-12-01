@@ -2629,43 +2629,6 @@ class Plugins
 
 
 	/**
-	 * Set the status of an event for a given Plugin.
-	 *
-	 * @todo Move to Plugins_admin
-	 * @return boolean True, if status has changed; false if not
-	 */
-	function set_event_status( $plugin_ID, $plugin_event, $enabled )
-	{
-		global $DB;
-
-		$enabled = $enabled ? 1 : 0;
-
-		$DB->query( '
-			UPDATE T_pluginevents
-			   SET pevt_enabled = '.$enabled.'
-			 WHERE pevt_plug_ID = '.$plugin_ID.'
-			   AND pevt_event = "'.$plugin_event.'"' );
-
-		if( $DB->rows_affected )
-		{
-			$this->load_events();
-
-			if( strpos($plugin_event, 'RenderItemAs') === 0 )
-			{ // Clear pre-rendered content cache, if RenderItemAs* events have been added or removed:
-				$DB->query( 'DELETE FROM T_item__prerendering WHERE 1' );
-				$ItemCache = & get_Cache( 'ItemCache' );
-				$ItemCache->clear();
-				break;
-			}
-
-			return true;
-		}
-
-		return false;
-	}
-
-
-	/**
 	 * Load an object from a Cache plugin or create a new one if we have a
 	 * cache miss or no caching plugins.
 	 *
@@ -2733,6 +2696,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.109  2006/12/01 02:03:04  blueyed
+ * Moved Plugins::set_event_status() to Plugins_admin
+ *
  * Revision 1.108  2006/11/30 05:57:54  blueyed
  * Moved Plugins::install() and sort() galore to Plugins_admin
  *

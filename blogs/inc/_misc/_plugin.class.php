@@ -1464,11 +1464,12 @@ class Plugin
 
 
 	/**
-	 * Event handler: called to filter the comment's author URL
+	 * Event handler: called to filter the comment's author URL.
+	 * This may be either the URL only or a full link (A tag).
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'data': the URL of the author/blog (by reference)
-	 *   - 'makelink': true, if the "data" contains a link
+	 *   - 'makelink': true, if the "data" contains a link (HTML A tag)
 	 *   - 'Comment': the {@link Comment} object
 	 */
 	function FilterCommentAuthorUrl( & $params )
@@ -2585,7 +2586,8 @@ class Plugin
 	 */
 	function disable_event( $event )
 	{
-		return $this->Plugins->set_event_status( $this->ID, $event, 0 );
+		$Plugins_admin = & get_Cache('Plugins_admin');
+		return $Plugins_admin->set_event_status( $this->ID, $event, 0 );
 	}
 
 
@@ -2598,7 +2600,8 @@ class Plugin
 	 */
 	function enable_event( $event )
 	{
-		return $this->Plugins->set_event_status( $this->ID, $event, 1 );
+		$Plugins_admin = & get_Cache('Plugins_admin');
+		return $Plugins_admin->set_event_status( $this->ID, $event, 1 );
 	}
 
 	/*
@@ -2784,6 +2787,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.120  2006/12/01 02:03:04  blueyed
+ * Moved Plugins::set_event_status() to Plugins_admin
+ *
  * Revision 1.119  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
