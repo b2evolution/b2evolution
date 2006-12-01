@@ -24,33 +24,32 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 	 */
 	var $entry_points = array(
 		'conf/_config.php',						// okay because it is the config. Special case.
-		'inc/_connect_db.inc.php',		// okay because it starts by loading the config; this is not normalized behaviour though! TODO.
-		// Below are the real entry points:
 		'cron/cron_exec.php',
-		'cron/mms.php',
 		'cron/getmail.php',
-		'htsrv/comment_post.php',
-		'htsrv/trackback.php',
-		'htsrv/call_plugin.php',
+		'cron/mms.php',
 		'htsrv/async.php',
+		'htsrv/call_plugin.php',
+		'htsrv/comment_post.php',
+		'htsrv/getfile.php',
 		'htsrv/login.php',
-		'htsrv/viewfile.php',
-		'htsrv/subs_update.php',
 		'htsrv/message_send.php',
 		'htsrv/profile_update.php',
-		'htsrv/getfile.php',
 		'htsrv/register.php',
+		'htsrv/subs_update.php',
+		'htsrv/trackback.php',
+		'htsrv/viewfile.php',
+		'inc/_connect_db.inc.php',		// okay because it starts by loading the config; this is not normalized behaviour though! TODO.
+		'install/index.php',
+		'install/phpinfo.php',
+		'xmlsrv/atom.comments.php',
 		'xmlsrv/atom.php',
+		'xmlsrv/rdf.comments.php',
 		'xmlsrv/rdf.php',
 		'xmlsrv/rss.comments.php',
-		'xmlsrv/rss2.php',
-		'xmlsrv/xmlrpc.php',
 		'xmlsrv/rss.php',
 		'xmlsrv/rss2.comments.php',
-		'xmlsrv/rdf.comments.php',
-		'xmlsrv/atom.comments.php',
-		'install/phpinfo.php',
-		'install/index.php',
+		'xmlsrv/rss2.php',
+		'xmlsrv/xmlrpc.php',
 	);
 
 	/**
@@ -58,19 +57,19 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 	 * @var array
 	 */
 	var $init_files = array(
-		'inc/_main.inc.php',
-		'inc/_blog_main.inc.php',
-		'conf/_formatting.php',
-		'conf/_config_TEST.php',
-		'conf/_upgrade.php',
 		'conf/_admin.php',
-		'conf/_locales.php',
 		'conf/_advanced.php',
-		'conf/_basic_config.php',
-		'conf/_overrides_TEST.php',
 		'conf/_application.php',
+		'conf/_basic_config.php',
+		'conf/_config_TEST.php',
+		'conf/_formatting.php',
 		'conf/_icons.php',
+		'conf/_locales.php',
+		'conf/_overrides_TEST.php',
 		'conf/_stats.php',
+		'conf/_upgrade.php',
+		'inc/_blog_main.inc.php',
+		'inc/_main.inc.php',
 	);
 
 	function SecurityChecksTestCase()
@@ -120,6 +119,7 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 
 		$search = "if\( \s* ! \s* defined\( \s* 'EVO_MAIN_INIT' \s* \) \s* \) \s* die\( .*? \);";
 		$search_init = "if\( \s* ! \s* defined\( \s* 'EVO_CONFIG_LOADED' \s* \) \s* \) \s* die\( .*? \);";
+		# $search_both = "if\( \s* ! \s* defined\( \s* 'EVO_MAIN_INIT' \s* ) \s* && \s* ! \s* defined( \s* 'EVO_CONFIG_LOADED' \s* ) \s* ) die\( .*? \);";
 
 		$files = $this->get_files_without_symlinks($basepath);
 		$badfiles = array();
