@@ -612,7 +612,7 @@ param( 'import_mode', 'string', 'normal' );
 		else
 		{
 			$Plugins_admin = & get_Cache('Plugins_admin');
-			$default_renderers = $Plugins_admin->validate_list( array('default') );
+			$default_renderers = $Plugins_admin->validate_renderer_list( array('default') );
 			$autop = 1;
 		}
 
@@ -1622,6 +1622,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.27  2006/12/01 20:04:31  blueyed
+ * Renamed Plugins_admin::validate_list() to validate_renderer_list()
+ *
  * Revision 1.26  2006/12/01 19:46:42  blueyed
  * Moved Plugins::validate_list() to Plugins_admin class; added stub in Plugins, because at least the starrating_plugin uses it
  *

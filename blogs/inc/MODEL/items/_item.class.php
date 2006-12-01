@@ -471,7 +471,7 @@ class Item extends DataObject
 		if( param( 'renderers_displayed', 'integer', 0 ) )
 		{ // use "renderers" value only if it has been displayed (may be empty)
 			$Plugins_admin = & get_Cache('Plugins_admin');
-			$renderers = $Plugins_admin->validate_list( param( 'renderers', 'array', array() ) );
+			$renderers = $Plugins_admin->validate_renderer_list( param( 'renderers', 'array', array() ) );
 			$this->set( 'renderers', $renderers );
 		}
 
@@ -3263,7 +3263,7 @@ class Item extends DataObject
 		if( ! isset($this->renderers_validated) )
 		{
 			$Plugins_admin = & get_Cache('Plugins_admin');
-			$this->renderers_validated = $Plugins_admin->validate_list( $this->get_renderers() );
+			$this->renderers_validated = $Plugins_admin->validate_renderer_list( $this->get_renderers() );
 		}
 		return $this->renderers_validated;
 	}
@@ -3318,6 +3318,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.126  2006/12/01 20:04:31  blueyed
+ * Renamed Plugins_admin::validate_list() to validate_renderer_list()
+ *
  * Revision 1.125  2006/12/01 19:46:42  blueyed
  * Moved Plugins::validate_list() to Plugins_admin class; added stub in Plugins, because at least the starrating_plugin uses it
  *
