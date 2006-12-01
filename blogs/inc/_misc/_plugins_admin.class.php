@@ -728,6 +728,74 @@ class Plugins_admin extends Plugins
 
 
 	/**
+	 * Set the code for a given Plugin ID.
+	 *
+	 * It makes sure that the index is handled and writes it to DB.
+	 *
+	 * @param string Plugin ID
+	 * @param string Code to set the plugin to
+	 * @return boolean|integer|string
+	 *   true, if already set to same value.
+	 *   string: error message (already in use, wrong format)
+	 *   1 in case of setting it into DB (number of affected rows).
+	 *   false, if invalid Plugin.
+	 */
+	function set_code( $plugin_ID, $code )
+	{
+		global $DB;
+
+		if( strlen( $code ) > 32 )
+		{
+			return T_( 'The maximum length of a plugin code is 32 characters.' );
+		}
+
+		// TODO: more strict check?! Just "[\w_-]+" as regexp pattern?
+		if( strpos( $code, '.' ) !== false )
+		{
+			return T_( 'The plugin code cannot include a dot!' );
+		}
+
+		if( ! empty($code) && isset( $this->index_code_ID[$code] ) )
+		{
+			if( $this->index_code_ID[$code] == $plugin_ID )
+			{ // Already set to same value
+				return true;
+			}
+			else
+			{
+				return T_( 'The plugin code is already in use by another plugin.' );
+			}
+		}
+
+		$Plugin = & $this->get_by_ID( $plugin_ID );
+		if( ! $Plugin )
+		{
+			return false;
+		}
+
+		if( empty($code) )
+		{
+			$code = NULL;
+		}
+		else
+		{ // update indexes
+			$this->index_code_ID[$code] = & $Plugin->ID;
+			$this->index_code_Plugins[$code] = & $Plugin;
+		}
+
+		// Update references to code:
+		// TODO: dh> we might want to update item renderer codes and blog ping plugin codes here! (old code=>new code)
+
+		$Plugin->code = $code;
+
+		return $DB->query( '
+			UPDATE T_plugins
+			  SET plug_code = '.$DB->quote($code).'
+			WHERE plug_ID = '.$plugin_ID );
+	}
+
+
+	/**
 	 * Set the status of an event for a given Plugin.
 	 *
 	 * @return boolean True, if status has changed; false if not
@@ -1214,6 +1282,9 @@ class Plugins_admin extends Plugins
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.13  2006/12/01 20:44:01  blueyed
+ * Moved Plugins::set_code() to Plugins_admin class
+ *
  * Revision 1.12  2006/12/01 20:41:38  blueyed
  * Moved Plugins::uninstall() to Plugins_admin class
  *
