@@ -50,6 +50,182 @@ class Plugins_admin extends Plugins
 
 
 	/**
+	 * Get the list of supported/available events/hooks.
+	 *
+	 * Additional to the returned event methods (which can be disabled), there are internal
+	 * ones which just get called on the plugin (and get not remembered in T_pluginevents), e.g.:
+	 *  - AfterInstall
+	 *  - BeforeEnable
+	 *  - BeforeDisable
+	 *  - BeforeInstall
+	 *  - BeforeUninstall
+	 *  - BeforeUninstallPayload
+	 *  - DisplaySkin (called on a skin from {@link GetProvidedSkins()})
+	 *  - ExecCronJob
+	 *  - GetDefaultSettings
+	 *  - GetDefaultUserSettings
+	 *  - GetExtraEvents
+	 *  - GetHtsrvMethods
+	 *  - PluginInit
+	 *  - PluginSettingsUpdateAction (Called as action before updating the plugin's settings)
+	 *  - PluginSettingsEditAction (Called as action before editing the plugin's settings)
+	 *  - PluginSettingsEditDisplayAfter (Called after standard plugin settings are displayed for editing)
+	 *  - PluginSettingsValidateSet (Called before setting a plugin's setting in the backoffice)
+	 *  - PluginUserSettingsUpdateAction (Called as action before updating the plugin's user settings)
+	 *  - PluginUserSettingsEditAction (Called as action before editing the plugin's settings)
+	 *  - PluginUserSettingsEditDisplayAfter (Called after displaying normal user settings)
+	 *  - PluginUserSettingsValidateSet (Called before setting a plugin's user setting in the backoffice)
+	 *  - PluginVersionChanged (Called when we detect a version change)
+	 *
+	 *  The max length of event names is 40 chars (T_pluginevents.pevt_event).
+	 *
+	 * @todo Finish/Complete descriptions
+	 *
+	 * @return array Name of event (key) => description (value)
+	 */
+	function get_supported_events()
+	{
+		static $supported_events;
+
+		if( empty( $supported_events ) )
+		{
+			$supported_events = array(
+				'AdminAfterPageFooter' => '',
+				'AdminDisplayEditorButton' => '',
+				'AdminDisplayToolbar' => '',
+				'AdminDisplayCommentFormFieldset' => '',
+				'AdminDisplayItemFormFieldset' => '',
+				'AdminEndHtmlHead' => '',
+				'AdminAfterMenuInit' => '',
+				'AdminTabAction' => '',
+				'AdminTabPayload' => '',
+				'AdminToolAction' => '',
+				'AdminToolPayload' => '',
+
+				'AdminBeforeItemEditCreate' => 'This gets called before a new item gets created.',
+				'AdminBeforeItemEditUpdate' => 'This gets called before an existing item gets updated.',
+
+				'AdminBeginPayload' => '',
+
+				'CacheObjects' => 'Cache data objects.',
+				'CachePageContent' => 'Cache page content.',
+				'CacheIsCollectingContent' => 'Gets asked for if we are generating cached content.',
+
+				'AfterCommentDelete' => 'Gets called after a comment has been deleted from the database.',
+				'AfterCommentInsert' => 'Gets called after a comment has been inserted into the database.',
+				'AfterCommentUpdate' => 'Gets called after a comment has been updated in the database.',
+
+				'AfterItemDelete' => '',
+				'PrependItemInsertTransact' => '',
+				'AfterItemInsert' => '',
+				'PrependItemUpdateTransact' => '',
+				'AfterItemUpdate' => '',
+				'AppendItemPreviewTransact' => '',
+
+				'RenderItemAsHtml' => 'Renders content when generated as HTML.',
+				'RenderItemAsXml' => 'Renders content when generated as XML.',
+				'RenderItemAsText' => 'Renders content when generated as plain text.',
+
+				'FilterCommentAuthor' => 'Filters the comment author.',
+				'FilterCommentAuthorUrl' => 'Filters the URL of the comment author.',
+				'FilterCommentContent' => 'Filters the content of a comment.',
+
+				'AfterUserDelete' => '',
+				'AfterUserInsert' => '',
+				'AfterUserUpdate' => '',
+
+				'DisplayItemAsHtml' => 'Called on an item when it gets displayed as HTML.',
+				'DisplayItemAsXml' => 'Called on an item when it gets displayed as XML.',
+				'DisplayItemAsText' => 'Called on an item when it gets displayed as text.',
+
+				'FilterIpAddress' => 'Called when displaying an IP address.',
+
+				'ItemApplyAsRenderer' => 'Asks the plugin if it wants to apply as a renderer for an item.',
+				'ItemCanComment' => 'Asks the plugin if an item can receive comments/feedback.',
+				'ItemSendPing' => 'Send a ping to a service about new items.',
+				'ItemViewsIncreased' => 'Called when the view counter of an item got increased.',
+
+				'SkinTag' => '',
+
+				'AppendHitLog' => 'Called when a hit gets logged, but before it gets recorded.',
+
+				'DisplayCommentFormButton' => '',
+				'DisplayCommentFormFieldset' => '',
+				'DisplayMessageFormButton' => '',
+				'DisplayMessageFormFieldset' => '',
+				'DisplayLoginFormFieldset' => 'Called when displaying the "Login" form.',
+				'DisplayRegisterFormFieldset' => 'Called when displaying the "Register" form.',
+				'DisplayValidateAccountFormFieldset' => 'Called when displaying the "Validate account" form.',
+
+				'BeforeCommentFormInsert' => 'Called before a comment gets recorded through the public comment form.',
+				'AfterCommentFormInsert' => 'Called after a comment has been added through public form.',
+
+				'BeforeTrackbackInsert' => 'Gets called before a trackback gets recorded.',
+				'AfterTrackbackInsert' => 'Gets called after a trackback has been recorded.',
+
+				'LoginAttempt' => 'Called when a user tries to login.',
+				'LoginAttemptNeedsRawPassword' => 'A plugin has to return true here, if it needs a raw (un-hashed) password in LoginAttempt.',
+				'AlternateAuthentication' => '',
+				'MessageFormSent' => 'Called when the "Message to user" form has been submitted.',
+				'MessageFormSentCleanup' => 'Called after a email message has been sent through public form.',
+				'Logout' => 'Called when a user logs out.',
+
+				'GetSpamKarmaForComment' => 'Asks plugin for the spam karma of a comment/trackback.',
+
+				// Other Plugins can use this:
+				'CaptchaValidated' => 'Validate the test from CaptchaPayload to detect humans.',
+				'CaptchaValidatedCleanup' => 'Cleanup data used for CaptchaValidated.',
+				'CaptchaPayload' => 'Provide a turing test to detect humans.',
+
+				'RegisterFormSent' => 'Called when the "Register" form has been submitted.',
+				'ValidateAccountFormSent' => 'Called when the "Validate account" form has been submitted.',
+				'AppendUserRegistrTransact' => 'Gets appended to the transaction that creates a new user on registration.',
+				'AfterUserRegistration' => 'Gets called after a new user has registered.',
+
+				'SessionLoaded' => '', // gets called after $Session is initialized, quite early.
+
+				'AfterLoginAnonymousUser' => 'Gets called at the end of the login procedure for anonymous visitors.',
+				'AfterLoginRegisteredUser' => 'Gets called at the end of the login procedure for registered users.',
+
+				'BeforeBlogDisplay' => 'Gets called before a (part of the blog) gets displayed.',
+				'SkinBeginHtmlHead' => 'Gets called at the top of the HTML HEAD section in a skin.',
+				'DisplayTrackbackAddr' => '',
+
+				'GetCronJobs' => 'Gets a list of implemented cron jobs.',
+				'GetProvidedSkins' => 'Get a list of "skins" handled by the plugin.',
+			);
+
+
+			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )
+			{ // only call this, if we're not in the process of installation, to avoid errors from Plugins in this case!
+				// Let Plugins add additional events (if they trigger those events themselves):
+				$this->load_plugins_table();
+
+				$rev_sorted_IDs = array_reverse( $this->sorted_IDs ); // so higher priority overwrites lower (just for desc)
+
+				foreach( $rev_sorted_IDs as $plugin_ID )
+				{
+					$Plugin = & $this->get_by_ID( $plugin_ID );
+
+					if( ! $Plugin )
+					{
+						continue;
+					}
+
+					$extra_events = $Plugin->GetExtraEvents();
+					if( is_array($extra_events) )
+					{
+						$supported_events = array_merge( $supported_events, $extra_events );
+					}
+				}
+			}
+		}
+
+		return $supported_events;
+	}
+
+
+	/**
 	 * Count # of registrations of same plugin.
 	 *
 	 * Plugins with negative ID (auto-generated; not installed (yet)) will not get considered.
@@ -903,6 +1079,9 @@ class Plugins_admin extends Plugins
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.10  2006/12/01 20:19:15  blueyed
+ * Moved Plugins::get_supported_events() to Plugins_admin class
+ *
  * Revision 1.9  2006/12/01 20:13:24  blueyed
  * Moved Plugins::count_regs() to Plugins_admin class
  *
