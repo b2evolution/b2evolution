@@ -50,6 +50,30 @@ class Plugins_admin extends Plugins
 
 
 	/**
+	 * Count # of registrations of same plugin.
+	 *
+	 * Plugins with negative ID (auto-generated; not installed (yet)) will not get considered.
+	 *
+	 * @param string class name
+	 * @return int # of regs
+	 */
+	function count_regs( $classname )
+	{
+		$count = 0;
+
+		foreach( $this->sorted_IDs as $plugin_ID )
+		{
+			$Plugin = & $this->get_by_ID( $plugin_ID );
+			if( $Plugin && $Plugin->classname == $classname && $Plugin->ID > 0 )
+			{
+				$count++;
+			}
+		}
+		return $count;
+	}
+
+
+	/**
 	 * Discover and register all available plugins below {@link $plugins_path}.
 	 */
 	function discover()
@@ -538,7 +562,6 @@ class Plugins_admin extends Plugins
 	/**
 	 * Validate dependencies of a Plugin.
 	 *
-	 * @todo Move to Plugins_admin
 	 * @param Plugin
 	 * @param string Mode of check: either 'enable' or 'disable'
 	 * @return array The key 'note' holds an array of notes (recommendations), the key 'error' holds a list
@@ -880,6 +903,9 @@ class Plugins_admin extends Plugins
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.9  2006/12/01 20:13:24  blueyed
+ * Moved Plugins::count_regs() to Plugins_admin class
+ *
  * Revision 1.8  2006/12/01 20:11:24  blueyed
  * Renamed Plugins_admin::validate_list() to validate_renderer_list()
  *

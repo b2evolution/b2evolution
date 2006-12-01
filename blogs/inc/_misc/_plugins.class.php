@@ -1165,31 +1165,6 @@ class Plugins
 
 
 	/**
-	 * Count # of registrations of same plugin.
-	 *
-	 * Plugins with negative ID (auto-generated; not installed (yet)) will not get considered.
-	 *
-	 * @todo Move to Plugins_admin
-	 * @param string class name
-	 * @return int # of regs
-	 */
-	function count_regs( $classname )
-	{
-		$count = 0;
-
-		foreach( $this->sorted_IDs as $plugin_ID )
-		{
-			$Plugin = & $this->get_by_ID( $plugin_ID );
-			if( $Plugin && $Plugin->classname == $classname && $Plugin->ID > 0 )
-			{
-				$count++;
-			}
-		}
-		return $count;
-	}
-
-
-	/**
 	 * Get next plugin in the list.
 	 *
 	 * NOTE: You'll have to call {@link restart()} or {@link load_plugins_table()}
@@ -2186,6 +2161,18 @@ class Plugins
 	// Deprecated stubs: {{{
 
 	/**
+	 * @deprecated since EVO_NEXT_VERSION by Plugins_admin::count_regs()
+	 */
+	function count_regs( $classname )
+	{
+		global $Debuglog;
+		$Debuglog->add('Call to deprecated method Plugins::count_regs()', 'deprecated');
+		$Plugins_admin = & get_Cache('Plugins_admin');
+		return $Plugins_admin->count_regs($classname);
+	}
+
+
+	/**
 	 * Validate renderer list.
 	 *
 	 * @deprecated since EVO_NEXT_VERSION by Plugins_admin::validate_renderer_list()
@@ -2207,6 +2194,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.116  2006/12/01 20:13:23  blueyed
+ * Moved Plugins::count_regs() to Plugins_admin class
+ *
  * Revision 1.115  2006/12/01 20:04:31  blueyed
  * Renamed Plugins_admin::validate_list() to validate_renderer_list()
  *
