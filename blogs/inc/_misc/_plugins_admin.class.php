@@ -217,6 +217,130 @@ class Plugins_admin extends Plugins
 
 
 	/**
+	 * Save the events that the plugin provides into DB, while removing obsolete
+	 * entries (that the plugin does not register anymore).
+	 *
+	 * @param Plugin Plugin to save events for
+	 * @param array|NULL List of events to save as enabled for the Plugin.
+	 *              By default all provided events get saved as enabled. Pass array() to discover only new ones.
+	 * @param array List of events to save as disabled for the Plugin.
+	 *              By default, no events get disabled. Disabling an event takes priority over enabling.
+	 * @return boolean True, if events have changed, false if not.
+	 */
+	function save_events( $Plugin, $enable_events = NULL, $disable_events = NULL )
+	{
+		global $DB, $Debuglog;
+
+		$r = false;
+
+		$saved_events = array();
+		foreach( $DB->get_results( '
+				SELECT pevt_event, pevt_enabled
+				  FROM T_pluginevents
+				 WHERE pevt_plug_ID = '.$Plugin->ID ) as $l_row )
+		{
+			$saved_events[$l_row->pevt_event] = $l_row->pevt_enabled;
+		}
+		$available_events = $this->get_registered_events( $Plugin );
+		$obsolete_events = array_diff( array_keys($saved_events), $available_events );
+
+		if( is_null( $enable_events ) )
+		{ // Enable all events:
+			$enable_events = $available_events;
+		}
+		if( is_null( $disable_events ) )
+		{
+			$disable_events = array();
+		}
+		if( $disable_events )
+		{ // Remove events to be disabled from enabled ones:
+			$enable_events = array_diff( $enable_events, $disable_events );
+		}
+
+		// New discovered events:
+		$discovered_events = array_diff( $available_events, array_keys($saved_events), $enable_events, $disable_events );
+
+
+		// Delete obsolete events from DB:
+		if( $obsolete_events && $DB->query( '
+				DELETE FROM T_pluginevents
+				WHERE pevt_plug_ID = '.$Plugin->ID.'
+					AND pevt_event IN ( "'.implode( '", "', $obsolete_events ).'" )' ) )
+		{
+			$r = true;
+		}
+
+		if( $discovered_events )
+		{
+			$DB->query( '
+				INSERT INTO T_pluginevents( pevt_plug_ID, pevt_event, pevt_enabled )
+				VALUES ( '.$Plugin->ID.', "'.implode( '", 1 ), ('.$Plugin->ID.', "', $discovered_events ).'", 1 )' );
+			$r = true;
+
+			$Debuglog->add( 'Discovered events ['.implode( ', ', $discovered_events ).'] for Plugin '.$Plugin->name, 'plugins' );
+		}
+
+		$new_events_enabled = array();
+		if( $enable_events )
+		{
+			foreach( $enable_events as $l_event )
+			{
+				if( ! isset( $saved_events[$l_event] ) || ! $saved_events[$l_event] )
+				{ // Event not saved yet or not enabled
+					$new_events_enabled[] = $l_event;
+				}
+			}
+			if( $new_events_enabled )
+			{
+				$DB->query( '
+					REPLACE INTO T_pluginevents( pevt_plug_ID, pevt_event, pevt_enabled )
+					VALUES ( '.$Plugin->ID.', "'.implode( '", 1 ), ('.$Plugin->ID.', "', $new_events_enabled ).'", 1 )' );
+				$r = true;
+			}
+			$Debuglog->add( 'Enabled events ['.implode( ', ', $new_events_enabled ).'] for Plugin '.$Plugin->name, 'plugins' );
+		}
+
+		$new_events_disabled = array();
+		if( $disable_events )
+		{
+			foreach( $disable_events as $l_event )
+			{
+				if( ! isset( $saved_events[$l_event] ) || $saved_events[$l_event] )
+				{ // Event not saved yet or enabled
+					$new_events_disabled[] = $l_event;
+				}
+			}
+			if( $new_events_disabled )
+			{
+				$DB->query( '
+					REPLACE INTO T_pluginevents( pevt_plug_ID, pevt_event, pevt_enabled )
+					VALUES ( '.$Plugin->ID.', "'.implode( '", 0 ), ('.$Plugin->ID.', "', $new_events_disabled ).'", 0 )' );
+				$r = true;
+			}
+			$Debuglog->add( 'Disabled events ['.implode( ', ', $new_events_disabled ).'] for Plugin '.$Plugin->name, 'plugins' );
+		}
+
+		if( $r )
+		{ // Something has changed: Reload event index
+			foreach( array_merge($obsolete_events, $discovered_events, $new_events_enabled, $new_events_disabled) as $event )
+			{
+				if( strpos($event, 'RenderItemAs') === 0 )
+				{ // Clear pre-rendered content cache, if RenderItemAs* events have been added or removed:
+					$DB->query( 'DELETE FROM T_item__prerendering WHERE 1' );
+					$ItemCache = & get_Cache( 'ItemCache' );
+					$ItemCache->clear();
+					break;
+				}
+			}
+
+			$this->load_events();
+		}
+
+		return $r;
+	}
+
+
+	/**
 	 * Set the status of an event for a given Plugin.
 	 *
 	 * @return boolean True, if status has changed; false if not
@@ -257,7 +381,6 @@ class Plugins_admin extends Plugins
 	 *
 	 * WARNING: do NOT sort by anything else than priority unless you're handling a list of NOT-YET-INSTALLED plugins!
 	 *
-	 * @todo Move to Plugins_admin
 	 * @param string Order: 'priority' (default), 'name'
 	 */
 	function sort( $order = 'priority' )
@@ -292,7 +415,6 @@ class Plugins_admin extends Plugins
 
 	/**
 	 * Callback function to sort plugins by priority (and classname, if they have same priority).
-	 * @todo Move to Plugins_admin
 	 */
 	function sort_Plugin_priority( & $a_ID, & $b_ID )
 	{
@@ -313,7 +435,6 @@ class Plugins_admin extends Plugins
 	 * Callback function to sort plugins by name.
 	 *
 	 * WARNING: do NOT sort by anything else than priority unless you're handling a list of NOT-YET-INSTALLED plugins
-	 * @todo Move to Plugins_admin
 	 */
 	function sort_Plugin_name( & $a_ID, & $b_ID )
 	{
@@ -330,7 +451,6 @@ class Plugins_admin extends Plugins
 	 * Those, which have a group get sorted above the ones without one.
 	 *
 	 * WARNING: do NOT sort by anything else than priority unless you're handling a list of NOT-YET-INSTALLED plugins
-	 * @todo Move to Plugins_admin
 	 */
 	function sort_Plugin_group( & $a_ID, & $b_ID )
 	{
@@ -368,6 +488,9 @@ class Plugins_admin extends Plugins
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.4  2006/12/01 18:18:22  blueyed
+ * Moved Plugins::save_events() to Plugins_admin class
+ *
  * Revision 1.3  2006/12/01 02:03:04  blueyed
  * Moved Plugins::set_event_status() to Plugins_admin
  *
