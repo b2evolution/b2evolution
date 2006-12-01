@@ -1,21 +1,21 @@
 <?php
 /**
- * This is the file to do all evo tests.
+ * This is the file to do all evoCore tests.
  * @package tests
  */
 
 /**
  * Load config
  */
-require_once( dirname(__FILE__).'/config.simpletest.php' );
+require_once( dirname(__FILE__).'/../config.simpletest.php' );
 
 
 /**
  * Our GroupTest
  */
-$test = new EvoGroupTest( 'evo Tests Suite');
+$test = new EvoGroupTest( 'evo-Core Tests Suite');
 
-$test->loadAllTests( dirname(__FILE__).'/blogs/' );
+$test->loadAllTests( dirname(__FILE__) );
 
 $test->run( new HtmlReporter(), new TextReporter() );
 #$test->run( new HtmlReporterShowPasses(), new TextReporter() );

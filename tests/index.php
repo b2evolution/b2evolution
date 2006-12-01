@@ -24,9 +24,11 @@ if( empty($action) )
 	<body>
 		<h1>b2evolution simpletest framework</h1>
 
+		<a href="index.php?action=all"><strong>All tests</strong></a>
+
 		<h2>evoCore tests</h2>
 		<ul>
-		<li><a href="index.php?action=core.all"><strong>All evoCore tests</strong></a></li>
+		<li><a href="blogs/"><strong>All evoCore tests</strong></a></li>
 		<?php
 		$filenames = get_filenames( dirname(__FILE__).'/blogs', true, false, $flat = true );
 		sort($filenames);
@@ -92,14 +94,22 @@ if( empty($action) )
 
 // ACTIONS:
 
+require_once( dirname(__FILE__).'/config.simpletest.php' );
+
+/**
+ * Our GroupTest
+ */
+$test = new EvoGroupTest( 'evo Tests Suite');
+
+
 switch( $action )
 {
-	case 'core.all':
-		/**
-		 * Include the All-Tests-Suite
-		 */
-		require( dirname(__FILE__).'/alltests.simpletest.php' );
+	case 'all':
+		$test->loadAllTests( dirname(__FILE__).'/' );
 		break;
 }
+
+$test->run( new HtmlReporter(), new TextReporter() );
+#$test->run( new HtmlReporterShowPasses(), new TextReporter() );
 
 ?>
