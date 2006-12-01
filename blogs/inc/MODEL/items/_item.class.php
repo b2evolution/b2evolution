@@ -470,7 +470,8 @@ class Item extends DataObject
 
 		if( param( 'renderers_displayed', 'integer', 0 ) )
 		{ // use "renderers" value only if it has been displayed (may be empty)
-			$renderers = $Plugins->validate_list( param( 'renderers', 'array', array() ) );
+			$Plugins_admin = & get_Cache('Plugins_admin');
+			$renderers = $Plugins_admin->validate_list( param( 'renderers', 'array', array() ) );
 			$this->set( 'renderers', $renderers );
 		}
 
@@ -3261,8 +3262,8 @@ class Item extends DataObject
 	{
 		if( ! isset($this->renderers_validated) )
 		{
-			global $Plugins;
-			$this->renderers_validated = $Plugins->validate_list( $this->get_renderers() );
+			$Plugins_admin = & get_Cache('Plugins_admin');
+			$this->renderers_validated = $Plugins_admin->validate_list( $this->get_renderers() );
 		}
 		return $this->renderers_validated;
 	}
@@ -3317,6 +3318,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.125  2006/12/01 19:46:42  blueyed
+ * Moved Plugins::validate_list() to Plugins_admin class; added stub in Plugins, because at least the starrating_plugin uses it
+ *
  * Revision 1.124  2006/11/28 20:04:11  blueyed
  * No edit link, if ID==0 to avoid confusion in preview, see http://forums.b2evolution.net/viewtopic.php?p=47422#47422
  *
