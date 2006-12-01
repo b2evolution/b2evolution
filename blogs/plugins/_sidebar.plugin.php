@@ -47,7 +47,7 @@ class sidebar_plugin extends Plugin
 	 * We are displaying the tool menu block.
 	 *
 	 * @todo fp>I think this is broken. And I think I'm going to take it down alltogether (should be a complete plugin instead).
-	 * 
+	 *       dh> it is a plugin already?!
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a tool menu block?
 	 */
@@ -90,6 +90,9 @@ class sidebar_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.16  2006/12/01 18:14:48  blueyed
+ * doc/todo
+ *
  * Revision 1.15  2006/11/30 22:34:16  fplanque
  * bleh
  *
