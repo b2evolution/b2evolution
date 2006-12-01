@@ -293,6 +293,38 @@ class Plugins_admin extends Plugins
 
 
 	/**
+	 * Get the list of values for when a rendering Plugin can apply (apply_rendering).
+	 *
+	 * @todo Add descriptions.
+	 *
+	 * @param boolean Return an associative array with description for the values?
+	 * @return array
+	 */
+	function get_apply_rendering_values( $with_desc = false )
+	{
+		static $apply_rendering_values;
+
+		if( empty( $apply_rendering_values ) )
+		{
+			$apply_rendering_values = array(
+					'stealth' => '',
+					'always' => '',
+					'opt-out' => '',
+					'opt-in' => '',
+					'lazy' => '',
+					'never' => '',
+				);
+		}
+		if( ! $with_desc )
+		{
+			return array_keys( $apply_rendering_values );
+		}
+
+		return $apply_rendering_values;
+	}
+
+
+	/**
 	 * Get a list of methods that are supported as events out of the Plugin's
 	 * source file.
 	 *
@@ -589,6 +621,51 @@ class Plugins_admin extends Plugins
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Set the apply_rendering value for a given Plugin ID.
+	 *
+	 * It makes sure that the index is handled and writes it to DB.
+	 *
+	 * @return boolean true if set to new value, false in case of error or if already set to same value
+	 */
+	function set_apply_rendering( $plugin_ID, $apply_rendering )
+	{
+		global $DB;
+
+		if( ! in_array( $apply_rendering, $this->get_apply_rendering_values() ) )
+		{
+			debug_die( 'Plugin apply_rendering not in allowed list.' );
+		}
+
+		$Plugin = & $this->get_by_ID($plugin_ID);
+		if( ! $Plugin )
+		{
+			return false;
+		}
+
+		if( $this->index_ID_rows[$Plugin->ID]['plug_apply_rendering'] == $apply_rendering )
+		{ // Already set to same value
+			return false;
+		}
+
+		$r = $DB->query( '
+			UPDATE T_plugins
+			  SET plug_apply_rendering = '.$DB->quote($apply_rendering).'
+			WHERE plug_ID = '.$plugin_ID );
+
+		$Plugin->apply_rendering = $apply_rendering;
+
+		// Apply-rendering index:
+		if( ! isset( $this->index_apply_rendering_codes[ $Plugin->apply_rendering ] )
+		    || ! in_array( $Plugin->code, $this->index_apply_rendering_codes[ $Plugin->apply_rendering ] ) )
+		{
+			$this->index_apply_rendering_codes[ $Plugin->apply_rendering ][] = $Plugin->code;
+		}
+
+		return true;
 	}
 
 
@@ -1079,6 +1156,9 @@ class Plugins_admin extends Plugins
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.11  2006/12/01 20:34:03  blueyed
+ * Moved Plugins::get_apply_rendering_values() and Plugins::set_apply_rendering() to Plugins_admin class
+ *
  * Revision 1.10  2006/12/01 20:19:15  blueyed
  * Moved Plugins::get_supported_events() to Plugins_admin class
  *

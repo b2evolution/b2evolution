@@ -274,9 +274,7 @@ class Plugin
 	/**
 	 * The "mother" object, where this Plugin got instantiated from.
 	 *
-	 * This is needed, if you have to call a method on it (e.g. {@link Plugins::set_apply_rendering()}.
-	 *
-	 * @var Plugins|Plugins_admin
+	 * @var Plugins|Plugins_admin|Plugins_admin_no_DB
 	 */
 	var $Plugins;
 
@@ -2790,6 +2788,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.123  2006/12/01 20:34:03  blueyed
+ * Moved Plugins::get_apply_rendering_values() and Plugins::set_apply_rendering() to Plugins_admin class
+ *
  * Revision 1.122  2006/12/01 16:47:26  blueyed
  * - Use EVO_NEXT_VERSION, which should get replaced with the next version 1.10 or 2.0 or whatever
  * - "action" param for PluginSettingsValidateSet
