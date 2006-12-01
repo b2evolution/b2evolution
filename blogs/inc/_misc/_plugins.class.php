@@ -2453,59 +2453,6 @@ class Plugins
 
 
 	/**
-	 * Get a list of methods that are supported as events out of the Plugin's
-	 * source file.
-	 *
-	 * @todo Extend to get list of defined classes and global functions and check this list before sourcing/including a Plugin! (prevent fatal error)
-	 *
-	 * @todo Move to Plugins_admin
-	 * @return array
-	 */
-	function get_registered_events( $Plugin )
-	{
-		global $Timer, $Debuglog;
-
-		$Timer->resume( 'plugins_detect_events' );
-
-		$plugin_class_methods = array();
-
-		if( ! is_readable($Plugin->classfile_path) )
-		{
-			$Debuglog->add( 'get_registered_events(): "'.$Plugin->classfile_path.'" is not readable.', array('plugins', 'error') );
-			return array();
-		}
-
-		$classfile_contents = @file_get_contents( $Plugin->classfile_path );
-		if( ! is_string($classfile_contents) )
-		{
-			$Debuglog->add( 'get_registered_events(): "'.$Plugin->classfile_path.'" could not get read.', array('plugins', 'error') );
-			return array();
-		}
-
-		// TODO: allow optional Plugin callback to get list of methods. Like Plugin::GetRegisteredEvents().
-
-		if( preg_match_all( '~^\s*function\s+(\w+)~mi', $classfile_contents, $matches ) )
-		{
-			$plugin_class_methods = $matches[1];
-		}
-		else
-		{
-			$Debuglog->add( 'No functions found in file "'.$Plugin->classfile_path.'".', array('plugins', 'error') );
-			return array();
-		}
-
-		$supported_events = $this->get_supported_events();
-		$supported_events = array_keys($supported_events);
-		$verified_events = array_intersect( $plugin_class_methods, $supported_events );
-
-		$Timer->pause( 'plugins_detect_events' );
-
-		// TODO: Report, when difference in $events_verified and what getRegisteredEvents() returned
-		return $verified_events;
-	}
-
-
-	/**
 	 * Load an object from a Cache plugin or create a new one if we have a
 	 * cache miss or no caching plugins.
 	 *
@@ -2573,6 +2520,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.112  2006/12/01 19:16:00  blueyed
+ * Moved Plugins::get_registered_events() to Plugins_admin class
+ *
  * Revision 1.111  2006/12/01 18:18:21  blueyed
  * Moved Plugins::save_events() to Plugins_admin class
  *
