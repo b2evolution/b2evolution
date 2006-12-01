@@ -236,6 +236,7 @@ class Plugins
 				'AdminAfterPageFooter' => '',
 				'AdminDisplayEditorButton' => '',
 				'AdminDisplayToolbar' => '',
+				'AdminDisplayCommentFormFieldset' => '',
 				'AdminDisplayItemFormFieldset' => '',
 				'AdminEndHtmlHead' => '',
 				'AdminAfterMenuInit' => '',
@@ -2696,6 +2697,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.110  2006/12/01 16:26:34  blueyed
+ * Added AdminDisplayCommentFormFieldset hook
+ *
  * Revision 1.109  2006/12/01 02:03:04  blueyed
  * Moved Plugins::set_event_status() to Plugins_admin
  *

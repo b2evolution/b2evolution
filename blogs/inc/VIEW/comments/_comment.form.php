@@ -97,7 +97,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	}
 
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Comment', 'edit_layout' => '' /* TODO: Better value? */ ) );
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Comment', 'edit_layout' => NULL ) );
 
 	?>
 	</div>
@@ -160,6 +160,12 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 	</fieldset>
 
+	<?php
+	// ####################### PLUGIN FIELDSETS #########################
+
+	$Plugins->trigger_event( 'AdminDisplayCommentFormFieldset', array( 'Form' => & $Form, 'Comment' => & $edited_Comment, 'edit_layout' => NULL ) );
+	?>
+
 </div>
 
 <div class="right_col">
@@ -195,6 +201,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.18  2006/12/01 16:26:34  blueyed
+ * Added AdminDisplayCommentFormFieldset hook
+ *
  * Revision 1.17  2006/11/19 03:50:29  fplanque
  * cleaned up CSS
  *

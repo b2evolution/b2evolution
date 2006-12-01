@@ -353,6 +353,17 @@ class test_plugin extends Plugin
 
 
 	/**
+	 * @see Plugin::AdminDisplayCommentFormFieldset()
+	 */
+	function AdminDisplayCommentFormFieldset( & $params )
+	{
+		$params['Form']->begin_fieldset( 'TEST plugin' );
+		$params['Form']->info_field( 'TEST plugin', 'This is the TEST plugin responding to the AdminDisplayCommentFormFieldset event.' );
+		$params['Form']->end_fieldset( 'Foo' );
+	}
+
+
+	/**
 	 * Event handler: Gets invoked in /admin/_header.php for every backoffice page after
 	 *                the menu structure is build. You can use the {@link $AdminUI} object
 	 *                to modify it.
@@ -675,6 +686,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.57  2006/12/01 16:26:34  blueyed
+ * Added AdminDisplayCommentFormFieldset hook
+ *
  * Revision 1.56  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

@@ -1308,6 +1308,21 @@ class Plugin
 	// Feedback (Comment/Trackback) events: {{{
 
 	/**
+	 * Event handler: Called at the end of the "Edit comment" form.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the {@link Form} object (by reference)
+	 *   - 'Comment': the Comment which gets edited (by reference)
+	 *   - 'edit_layout': only NULL currently, as there's only one layout
+	 * @return boolean did we display something?
+	 */
+	function AdminDisplayCommentFormFieldset( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
+
+	/**
 	 * Event handler: Called at the end of the frontend comment form.
 	 *
 	 * You might want to use this to inject antispam payload to use in
@@ -2787,6 +2802,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.121  2006/12/01 16:26:34  blueyed
+ * Added AdminDisplayCommentFormFieldset hook
+ *
  * Revision 1.120  2006/12/01 02:03:04  blueyed
  * Moved Plugins::set_event_status() to Plugins_admin
  *
