@@ -631,51 +631,6 @@ class Plugins
 
 
 	/**
-	 * Set the priority for a given Plugin ID.
-	 *
-	 * It makes sure that the index is handled and writes it to DB.
-	 *
-	 * @todo Move to Plugins_admin
-	 * @return boolean|integer
-	 *   true, if already set to same value.
-	 *   false if another Plugin uses that priority already.
-	 *   1 in case of setting it into DB.
-	 */
-	function set_priority( $plugin_ID, $priority )
-	{
-		global $DB;
-
-		if( ! preg_match( '~^1?\d?\d$~', $priority ) ) // using preg_match() to catch floating numbers
-		{
-			debug_die( 'Plugin priority must be numeric (0-100).' );
-		}
-
-		$Plugin = & $this->get_by_ID($plugin_ID);
-		if( ! $Plugin )
-		{
-			return false;
-		}
-
-		if( $Plugin->priority == $priority )
-		{ // Already set to same value
-			return true;
-		}
-
-		$r = $DB->query( '
-			UPDATE T_plugins
-			  SET plug_priority = '.$DB->quote($priority).'
-			WHERE plug_ID = '.$plugin_ID );
-
-		$Plugin->priority = $priority;
-
-		// TODO: dh> should only re-sort, if sorted by priority before - if it should get re-sorted at all!
-		//$this->sort();
-
-		return $r;
-	}
-
-
-	/**
 	 * Init {@link Plugin::Settings} and {@link Plugin::UserSettings}, either by
 	 * unsetting them for PHP5's overloading or instantiating them for PHP4.
 	 *
@@ -1816,6 +1771,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.121  2006/12/01 20:46:25  blueyed
+ * Moved Plugins::set_priority() to Plugins_admin class
+ *
  * Revision 1.120  2006/12/01 20:44:01  blueyed
  * Moved Plugins::set_code() to Plugins_admin class
  *
