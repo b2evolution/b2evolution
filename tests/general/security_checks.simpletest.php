@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for the {@link AbstractSettings} class.
+ * Tests for security in the b2evo package.
  * @package tests
  */
 

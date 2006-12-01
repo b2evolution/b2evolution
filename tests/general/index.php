@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the file to do all release tests.
+ * This is the file to do all general tests.
  * @package tests
  */
 
@@ -13,7 +13,7 @@ require_once( dirname(__FILE__).'/../config.simpletest.php' );
 /**
  * Our GroupTest
  */
-$test = new EvoGroupTest( 'evo-Release Tests Suite');
+$test = new EvoGroupTest( 'evo-General Tests Suite');
 
 $test->loadAllTests( dirname(__FILE__) );
 

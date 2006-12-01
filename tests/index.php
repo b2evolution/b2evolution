@@ -62,11 +62,11 @@ if( empty($action) )
 		</ul>
 
 
-		<h2>Release tests</h2>
+		<h2>General tests</h2>
 		<ul>
 		<li><a href="release/"><strong>All release tests</strong></a></li>
 		<?php
-		$filenames = get_filenames( dirname(__FILE__).'/release', true, false, $flat = true );
+		$filenames = get_filenames( dirname(__FILE__).'/general', true, false, $flat = true );
 		sort($filenames);
 		foreach( $filenames as $filename )
 		{
