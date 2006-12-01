@@ -46,6 +46,9 @@ require_once dirname(__FILE__).'/_plugin.class.php';
  *
  * This is where you can plug in some {@link Plugin plugins} :D
  *
+ * @todo dh> Currently when a plugin goes into "broken" status (e.g. file not readable), it is "disabled" afterwards.
+ *       This should rather remember the old status (e.g. "enabled") and make it enabled again.
+ *
  * @package evocore
  */
 class Plugins
@@ -261,7 +264,6 @@ class Plugins
 	 *       not {@link $admin_Plugins}.
 	 * }}
 	 *
-	 * @todo Move to Plugins_admin
 	 * @param Plugin
 	 * @param string New status ("enabled", "disabled", "needs_config", "broken")
 	 */
@@ -1771,6 +1773,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.122  2006/12/01 20:51:27  blueyed
+ * doc
+ *
  * Revision 1.121  2006/12/01 20:46:25  blueyed
  * Moved Plugins::set_priority() to Plugins_admin class
  *
