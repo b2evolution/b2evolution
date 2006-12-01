@@ -1,6 +1,8 @@
 <?php
 /**
- * Tests for the {@link Plugins} class
+ * Tests for the {@link Plugins_admin} class
+ * @todo dh> Rename this to plugins_admin.simpletest.php, once we have SVN or there are
+ *       specific tests for Plugins.
  * @package tests
  */
 
