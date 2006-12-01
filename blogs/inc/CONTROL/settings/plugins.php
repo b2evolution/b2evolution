@@ -437,8 +437,7 @@ switch( $action )
 
 			if( $uninstall_ok )
 			{ // We either have no tables to drop or it has been confirmed:
-				$Plugins->uninstall( $edit_Plugin->ID );
-				$admin_Plugins->unregister( $edit_Plugin );
+				$admin_Plugins->uninstall( $edit_Plugin->ID );
 
 				$Messages->add( /* %s = plugin's classname, %d = plugin's ID */
 					sprintf( T_('The &laquo;%s&raquo; plugin (#%d) has been uninstalled.'), $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
@@ -1029,6 +1028,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.70  2006/12/01 20:41:37  blueyed
+ * Moved Plugins::uninstall() to Plugins_admin class
+ *
  * Revision 1.69  2006/12/01 20:01:38  blueyed
  * Moved Plugins::validate_dependencies() to Plugins_admin class
  *

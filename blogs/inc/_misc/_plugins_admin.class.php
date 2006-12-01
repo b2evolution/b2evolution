@@ -501,6 +501,64 @@ class Plugins_admin extends Plugins
 
 
 	/**
+	 * Uninstall a plugin.
+	 *
+	 * Removes the Plugin, its Settings and Events from the database.
+	 *
+	 * @return boolean True on success
+	 */
+	function uninstall( $plugin_ID )
+	{
+		global $DB, $Debuglog;
+
+		$Debuglog->add( 'Uninstalling plugin (ID '.$plugin_ID.')...', 'plugins' );
+
+		$Plugin = & $this->get_by_ID( $plugin_ID ); // get the Plugin before any not loaded data might get deleted below
+
+		$DB->begin();
+
+		// Delete Plugin settings (constraints)
+		$DB->query( "DELETE FROM T_pluginsettings
+		              WHERE pset_plug_ID = $plugin_ID" );
+
+		// Delete Plugin user settings (constraints)
+		$DB->query( "DELETE FROM T_pluginusersettings
+		              WHERE puset_plug_ID = $plugin_ID" );
+
+		// Delete Plugin events (constraints)
+		foreach( $DB->get_col( '
+				SELECT pevt_event
+				  FROM T_pluginevents
+				 WHERE pevt_enabled = 1' ) as $event )
+		{
+			if( strpos($event, 'RenderItemAs') === 0 )
+			{ // Clear pre-rendered content cache, if RenderItemAs* events get removed:
+				$DB->query( 'DELETE FROM T_item__prerendering WHERE 1' );
+				$ItemCache = & get_Cache( 'ItemCache' );
+				$ItemCache->clear();
+				break;
+			}
+		}
+		$DB->query( "DELETE FROM T_pluginevents
+		              WHERE pevt_plug_ID = $plugin_ID" );
+
+		// Delete from DB
+		$DB->query( "DELETE FROM T_plugins
+		              WHERE plug_ID = $plugin_ID" );
+
+		$DB->commit();
+
+		if( $Plugin )
+		{
+			$this->unregister( $Plugin );
+		}
+
+		$Debuglog->add( 'Uninstalled plugin (ID '.$plugin_ID.').', 'plugins' );
+		return true;
+	}
+
+
+	/**
 	 * Save the events that the plugin provides into DB, while removing obsolete
 	 * entries (that the plugin does not register anymore).
 	 *
@@ -1156,6 +1214,9 @@ class Plugins_admin extends Plugins
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.12  2006/12/01 20:41:38  blueyed
+ * Moved Plugins::uninstall() to Plugins_admin class
+ *
  * Revision 1.11  2006/12/01 20:34:03  blueyed
  * Moved Plugins::get_apply_rendering_values() and Plugins::set_apply_rendering() to Plugins_admin class
  *
