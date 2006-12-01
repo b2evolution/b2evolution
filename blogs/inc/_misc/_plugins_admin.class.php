@@ -798,7 +798,7 @@ class Plugins_admin extends Plugins
 	 * @param array renderer codes ('default' will include all "opt-out"-ones)
 	 * @return array validated array of renderer codes
 	 */
-	function validate_list( $renderers = array('default') )
+	function validate_renderer_list( $renderers = array('default') )
 	{
 		$this->load_plugins_table();
 
@@ -880,6 +880,9 @@ class Plugins_admin extends Plugins
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.8  2006/12/01 20:11:24  blueyed
+ * Renamed Plugins_admin::validate_list() to validate_renderer_list()
+ *
  * Revision 1.7  2006/12/01 20:01:38  blueyed
  * Moved Plugins::validate_dependencies() to Plugins_admin class
  *
