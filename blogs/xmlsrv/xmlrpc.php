@@ -240,47 +240,7 @@ $b2getcategories_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, 
  */
 function b2getcategories( $m )
 {
-	global $xmlrpcerruser, $DB;
-
-	$blogid = $m->getParam(0);
-	$blogid = $blogid->scalarval();
-
-	$username = $m->getParam(1);
-	$username = $username->scalarval();
-
-	$password = $m->getParam(2);
-	$password = $password->scalarval();
-
-	if( ! user_pass_ok($username,$password) )
-	{
-		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
-					 'Wrong username/password combination '.$username.' / '.starify($password));
-	}
-
-	$sql = 'SELECT *
-					FROM T_categories ';
-	if( $blogid > 1 ) $sql .= "WHERE cat_blog_ID = $blogid ";
-	$sql .= "ORDER BY cat_name ASC";
-
-	$rows = $DB->get_results( $sql );
-	if( $DB->error )
-	{ // DB error
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-	}
-
-	xmlrpc_debugmsg( 'Categories:'.count($rows) );
-
-	$data = array();
-	foreach( $rows as $row )
-	{
-		$data[] = new xmlrpcval( array( 'categoryID' => new xmlrpcval($row->cat_ID),
-																		'categoryName' => new xmlrpcval( $row->cat_name )
-			//	mb_convert_encoding( $row->cat_name, "utf-8", "iso-8859-1")  )
-														),"struct");
-	}
-
-	return new xmlrpcresp( new xmlrpcval($data, "array") );
-
+	return _b2_or_mt_get_categories('b2', $m);
 }
 
 
@@ -714,7 +674,7 @@ function bloggergetusersblogs($m)
 
 	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
-	logIO("O","Got Current user.".$current_User);
+	logIO("O","Got Current user (ID ".$current_User->ID.')');
 
 
 	$resp_array = array();
@@ -1395,7 +1355,7 @@ function mwnewpost($m)
 	// Check permission:
 	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
-	logIO("O","currentuser ...". $current_User);
+	logIO("O","currentuser ...". $current_User->ID);
 
 	if( ! $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
 	{
@@ -1435,6 +1395,8 @@ function mwnewpost($m)
 	return new xmlrpcresp(new xmlrpcval($post_ID));
 }
 
+
+// Movable Type API: {{{
 
 $mt_setPostCategories_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcArray));
 $mt_setPostCategories_doc = "Sets the categories for a post.";
@@ -1498,12 +1460,6 @@ function mt_setPostCategories($m) {
 
 	return new xmlrpcresp(new xmlrpcval(1));
 }
-
-
-
-
-
-
 
 
 $mt_getPostCategories_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
@@ -1579,7 +1535,18 @@ function mt_getPostCategories($m) {
 }
 
 
+$mt_getCategoryList_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcString,$xmlrpcString));
+$mt_getCategoryList_doc = 'Get category list';
+/**
+ * Provides mt.getCategoryList
+ * @see http://www.sixapart.com/developers/xmlrpc/movable_type_api/mtgetcategorylist.html
+ */
+function mt_getCategoryList($m) {
+	logIO("O","mt_getCategoryList  start");
+	return _b2_or_mt_get_categories('mt', $m);
+}
 
+// }}}
 
 
 $mweditpost_doc='Edits a post, blogger-api like, +title +category +postdate';
@@ -1754,6 +1721,10 @@ function mweditpost($m)
 
 $mwgetcats_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcString,$xmlrpcString));
 $mwgetcats_doc = 'Get categories of a post, MetaWeblog API-style';
+/**
+ * metaWeblog.getCategories
+ * @see http://www.xmlrpc.com/metaWeblogApi#metawebloggetcategories
+ */
 function mwgetcats( $m )
 {
 	global $xmlrpcerruser, $DB;
@@ -1784,13 +1755,14 @@ function mwgetcats( $m )
 	$data = array();
 	foreach( $rows as $row )
 	{
-		$data[] = new xmlrpcval( array( 'categoryID' => new xmlrpcval($row->cat_ID),
-										'description' => new xmlrpcval( $row->cat_name ),
-										'categoryName' => new xmlrpcval( $row->cat_name ),
-										'htmlUrl' => new xmlrpcval( ''),
-										'rssUrl' => new xmlrpcval( '' )
+		$data[] = new xmlrpcval( array(
+				'categoryId' => new xmlrpcval($row->cat_ID), // not in RFC (http://www.xmlrpc.com/metaWeblogApi)
+				'description' => new xmlrpcval( $row->cat_name ), // not in RFC (http://www.xmlrpc.com/metaWeblogApi)
+				'categoryName' => new xmlrpcval( $row->cat_name ),
+				'htmlUrl' => new xmlrpcval( ''),
+				'rssUrl' => new xmlrpcval( '' )
 			//	mb_convert_encoding( $row->cat_name, "utf-8", "iso-8859-1")  )
-														),"struct");
+			),"struct");
 	}
 	return new xmlrpcresp( new xmlrpcval($data, "array") );
 }
@@ -1972,6 +1944,64 @@ function mwgetpost($m)
 
 
 /**
+ * Helper for {@link b2getcategories()} and {@link mt_getPostCategories()}, because they differ
+ * only in the "categoryId" case ("categoryId" (b2) vs "categoryID" (MT))
+ *
+ * @param string Type, either "b2" or "mt"
+ * @param xmlrpcmsg XML-RPC Message
+ *					0 blogid (string): Unique identifier of the blog to query
+ *					1 username (string): Login for a Blogger user who is member of the blog.
+ *					2 password (string): Password for said username.
+ * @return xmlrpcresp XML-RPC Response
+ */
+function _b2_or_mt_get_categories( $type, $m )
+{
+	global $xmlrpcerruser, $DB;
+
+	$blogid = $m->getParam(0);
+	$blogid = $blogid->scalarval();
+
+	$username = $m->getParam(1);
+	$username = $username->scalarval();
+
+	$password = $m->getParam(2);
+	$password = $password->scalarval();
+
+	if( ! user_pass_ok($username,$password) )
+	{
+		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+					 'Wrong username/password combination '.$username.' / '.starify($password));
+	}
+
+	$sql = 'SELECT *
+					FROM T_categories ';
+	if( $blogid > 1 ) $sql .= "WHERE cat_blog_ID = $blogid ";
+	$sql .= "ORDER BY cat_name ASC";
+
+	$rows = $DB->get_results( $sql );
+	if( $DB->error )
+	{ // DB error
+		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+	}
+
+	xmlrpc_debugmsg( 'Categories:'.count($rows) );
+
+	$categoryIdName = ( $type == 'b2' ? 'categoryID' : 'categoryId' );
+	$data = array();
+	foreach( $rows as $row )
+	{
+		$data[] = new xmlrpcval( array(
+				$categoryIdName => new xmlrpcval($row->cat_ID),
+				'categoryName' => new xmlrpcval( $row->cat_name )
+			//	mb_convert_encoding( $row->cat_name, "utf-8", "iso-8859-1")  )
+			), 'struct' );
+	}
+
+	return new xmlrpcresp( new xmlrpcval($data, "array") );
+}
+
+
+/**
  *
  * @param array struct
  * @param integer blog ID
@@ -2071,49 +2101,6 @@ function _mw_get_cat_IDs($contentstruct, $blog_ID, $empty_struct_ok = false)
 
 
 
-
-
-$mt_getcategoryList_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcString,$xmlrpcString));
-$mt_getcategoryList_doc = 'Get a post, MetaWeblog API-style';
-//function _mt_categoryList($blogid, $username, $password) {
-function mt_getcategoryList($m) {
-	global $xmlrpcerruser, $DB;
-	logIO("O","mt_getgategorylist  start");
-	$blogid = $m->getParam(0);
-	$blogid = $blogid->scalarval();
-	$username = $m->getParam(1);
-	$username = $username->scalarval();
-	$password = $m->getParam(2);
-	$password = $password->scalarval();
-	logIO("O","mt_getgategorylist  finished picking up parameters");
-	if( ! user_pass_ok($username,$password) )
-	{
-		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
-					 'Wrong username/password combination '.$username.' / '.starify($password));
-	}
-	$sql = "SELECT * FROM T_categories ";
-	if( $blogid > 1 ) $sql .= "WHERE cat_blog_ID = $blogid ";
-	$sql .= "ORDER BY cat_name ASC";
-	$rows = $DB->get_results( $sql );
-	if( $DB->error )
-	{	// DB error
-		logIO("O","mt_getgategorylist  DBerror...");
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-	}
-	logIO("O","mt_getgategorylist  no of categories...",count($rows));
-	$data = array();
-	foreach( $rows as $row )
-	{
-		$data[] = new xmlrpcval( array( 'categoryID' => new xmlrpcval($row->cat_ID),
-										'categoryName' => new xmlrpcval( $row->cat_name ),
-														),"struct");
-	}
-	return new xmlrpcresp( new xmlrpcval($data, "array") );
-}
-
-
-
-
 /**** SERVER FUNCTIONS ARRAY ****/
 // dh> TODO: Plugin hook here, so that Plugins can provide own callbacks?!
 // fp> The current implementation of this file is not optimal (file is way too large)
@@ -2161,12 +2148,6 @@ $s = new xmlrpc_server(
 				"function" => "metawebloggetrecentposts",
 				"signature" => $metawebloggetrecentposts_sig,
 				"docstring" => $metawebloggetrecentposts_doc),
-
-		"mt.getCategoryList" =>
-			array(
-				"function" => "b2getcategories",
-				"signature" => $b2getcategories_sig,
-				"docstring" => $b2getcategories_doc),
 
 		"b2.newPost" =>
 			array(
@@ -2246,14 +2227,11 @@ $s = new xmlrpc_server(
 				"signature" => $mt_getPostCategories_sig,
 				"docstring" => $mt_getPostCategories_doc),
 
-		/*
-		blueyed>> defined above already and $mt_getCategoryList_* not defined..
 		"mt.getCategoryList" =>
 			array(
-				"function" => "mt_getCategorylist",
+				"function" => "mt_getCategoryList",
 				"signature" => $mt_getCategoryList_sig,
 				"docstring" => $mt_getCategoryList_doc),
-		*/
 
 		"mt.setPostCategories" =>
 			array(
@@ -2265,6 +2243,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.121  2006/12/02 19:51:08  blueyed
+ * "categoryId" case fixes; see http://forums.b2evolution.net/viewtopic.php?p=47650#47650
+ *
  * Revision 1.120  2006/11/16 19:14:10  fplanque
  * minor
  *
