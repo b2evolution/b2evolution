@@ -40,14 +40,14 @@ require_once dirname(__FILE__).'/../conf/_config.php';
  */
 require_once $inc_path.'_main.inc.php';
 
-
 param( 'action', 'string', '' );
 
-// Actions for _any_ users:
+// Actions for _any_ users (including anonymous):
 switch( $action )
 {
+// fp>SUSPECT:
 	case 'get_login_salt':
-	{ // Generate a random "salt", which gets used for encrypting the password on the client side:
+		// Generate a random "salt", which gets used for encrypting the password on the client side:
 		// (used by JS-password encryption/hashing (/inc/VIEW/login/_login_form.php))
 		// The salt gets requested "on submit".
 		$pwd_salt = generate_random_key(64);
@@ -58,9 +58,7 @@ switch( $action )
 
 		echo $pwd_salt;
 		exit;
-	}
-
-
+// SUSPECT<fp
 }
 
 
@@ -71,6 +69,8 @@ if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 }
 
 
+
+// fp>SUSPECT:
 // fp> Does the following have an HTTP fallback when Javascript/AJ is not available?
 // dh> yes, but not through this file.. I'll look into refactoring it..
 switch( $action )
@@ -116,6 +116,7 @@ switch( $action )
 		exit;
 
 }
+// SUSPECT<fp
 
 
 /**
@@ -133,6 +134,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.14  2006/12/02 22:57:37  fplanque
+ * SUSPECT code. Not releasable. Discussion by email.
+ *
  * Revision 1.13  2006/11/29 03:25:53  blueyed
  * Enhanced password hashing during login: get the password salt through async request + cleanup
  *
