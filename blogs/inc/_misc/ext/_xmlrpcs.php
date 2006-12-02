@@ -461,7 +461,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				for($i=0; $i<sizeof($_xh[$parser]['params']); $i++)
 				{
 					//print "<!-- " . $_xh[$parser]['params'][$i]. "-->\n";
-					$plist.="$i - " .  $_xh[$parser]['params'][$i]. ";\n";
+					//$plist.="$i - " .  $_xh[$parser]['params'][$i]. ";\n";
 					//$allOK = 0;
 					//@eval('$m->addParam(' . $_xh[$parser]['params'][$i]. '); $allOK=1;');
 					@$m->addParam($_xh[$parser]['params'][$i]);
