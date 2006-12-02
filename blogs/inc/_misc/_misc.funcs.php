@@ -929,7 +929,7 @@ function balanceTags($text)
 	# b2 bug fix for LOVE <3 (and other situations with '<' before a number)
 	$text = preg_replace('#<([0-9]{1})#', '&lt;$1', $text);
 
-	while( preg_match("/<(\/?\w*)\s*([^>]*)>/", $text, $regex) )
+	while( preg_match('~<(\s*/?\w+)\s*([^>]*)>~', $text, $regex) )
 	{
 		$newtext = $newtext . $tagqueue;
 
@@ -1043,7 +1043,6 @@ function pre_dump( $var__var__var__var__ )
 	}
 	elseif( function_exists('xdebug_var_dump') )
 	{ // xdebug already does fancy displaying:
-		// NOTE: xdebug does not display/mark references in the dump.. with "&" prefix
 		ini_set('xdebug.var_display_max_depth', 10);
 		echo "\n<div style=\"padding:1ex;border:1px solid #00f;\">\n";
 		foreach( func_get_args() as $lvar )
@@ -2727,6 +2726,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.152  2006/12/02 17:48:31  blueyed
+ * Fixed regexp for balanceTags(), so it does not handle HTML comments as tags
+ *
  * Revision 1.151  2006/12/02 17:32:26  blueyed
  * Missing "global $Messages" in format_to_post()
  *
