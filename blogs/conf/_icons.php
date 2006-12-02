@@ -19,6 +19,7 @@ function get_icon_info($name)
 
 	/*
 	 * dh> Idea:
+	* fp> does not make sense to me. Plugins should do their own icons without a bloated event. Also if we allow something to replace existing icons it should be a skin (either front or admin skin) and some overloaded/overloadable get_skin_icon()/get_admin_icon() should be provided there.
 	global $Plugins;
 	if( $r = $Plugins->trigger_event_first_return('GetIconInfo', array('name'=>$name)) )
 	{
@@ -488,14 +489,8 @@ function get_icon_info($name)
 
 /*
  * $Log$
- * Revision 1.49  2006/11/28 23:20:14  blueyed
- * doc
- *
- * Revision 1.48  2006/11/28 02:52:26  fplanque
- * doc
- *
- * Revision 1.47  2006/11/26 01:42:08  fplanque
- * doc
+ * Revision 1.50  2006/12/02 22:58:12  fplanque
+ * minor
  *
  */
 ?>
