@@ -171,6 +171,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
 	global $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme;
 	global $comments_allowed_tags, $comments_allowed_attributes, $comments_allowed_uri_scheme;
 	global $io_charset;
+	global $Messages;
 
 	// Replace any & that is not a character or entity reference with &amp;
 	$content = preg_replace( '/&(?!#[0-9]+;|#x[0-9a-fA-F]+;|[a-zA-Z_:][a-zA-Z0-9._:-]*;)/', '&amp;', $content );
@@ -2726,6 +2727,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.151  2006/12/02 17:32:26  blueyed
+ * Missing "global $Messages" in format_to_post()
+ *
  * Revision 1.150  2006/11/29 20:48:46  blueyed
  * Moved url_rel_to_same_host() from _misc.funcs.php to _url.funcs.php
  *
