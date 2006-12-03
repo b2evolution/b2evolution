@@ -363,6 +363,7 @@ locale_activate( $default_locale );
 /*
  * Login procedure: {{{
  * TODO: dh> the meat of this login procedure should be moved to an extra file IMHO so that if a session exists (in most cases) it does not trigger parsing the meat of this code
+ * !!! fp> a session can and wil exist before a user is already logged in.
  */
 if( !isset($login_required) )
 {
@@ -486,7 +487,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			setcookie( 'cookie'.$instance_name.'pass', '', 200000000, $cookie_path, $cookie_domain );
 	}
 	elseif( ! $Messages->count('login_error') )
-	{ // if there's not login_error message yet, add the default one:
+	{ // if there's no login_error message yet, add the default one:
 		// This will cause the login screen to "popup" (again)
 		$Messages->add( T_('Wrong login/password.'), 'login_error' );
 	}
@@ -645,6 +646,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.61  2006/12/03 22:38:34  fplanque
+ * doc
+ *
  * Revision 1.60  2006/12/03 18:26:27  fplanque
  * doc
  *
