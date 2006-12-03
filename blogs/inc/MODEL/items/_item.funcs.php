@@ -70,6 +70,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	// Replace special chars/umlauts, if we can convert charsets:
 	// TODO: dh> outsource this into an own method, e.g. the autoblog_plugin uses something similar.
 	//           Ok, Francois? Does it belong into _encoding.funcs.php?
+	// fp> Ok. I think it should go with convert_charset(). It may make sense to spliut _locale.funcs though. in that case I'd call it _charsets.funcs.php  (because encoding is fuzzy, MP3 encoding? DivX? encrypted passwords?. I think charsets is pretty clear about what it is)
 	if( can_convert_charsets('UTF-8', $evo_charset) && can_convert_charsets('UTF-8', 'ISO-8859-1') /* source */ )
 	{
 		$urltitle = convert_charset( $urltitle, 'UTF-8', $evo_charset );
@@ -229,6 +230,7 @@ function previous_post( $format='&lt;&lt; % ', $previous='#', $title='yes', $in_
 	global $disp, $posts, $postdata;
 
 	// TODO: $postdata is not set here!! (which is generally good - as of "deprecating those globals", but bad in this context)
+	// fp> the real TODO is above: move to ItemList!
 
 	if( empty($postdata) || ($disp != 'single' && $posts != 1) )
 	{
@@ -306,6 +308,7 @@ function next_post( $format = '% &gt;&gt; ', $next = '#', $title = 'yes', $in_sa
 	global $disp, $posts, $postdata;
 
 	// TODO: $postdata is not set here!! (which is generally good - as of "deprecating those globals", but bad in this context)
+	// fp> the real TODO is above: move to ItemList!
 
 	if( empty($postdata) || ($disp != 'single' && $posts != 1) )
 	{
@@ -673,6 +676,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.32  2006/12/03 22:23:26  fplanque
+ * doc
+ *
  * Revision 1.31  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
