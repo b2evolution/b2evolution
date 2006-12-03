@@ -1752,15 +1752,22 @@ function mwgetcats( $m )
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
 	xmlrpc_debugmsg( 'Categories:'.count($rows) );
+
+	$ChapterCache = & get_Cache('ChapterCache');
 	$data = array();
 	foreach( $rows as $row )
 	{
+		$Chapter = & $ChapterCache->get_by_ID($row->cat_ID);
+		if( ! $Chapter )
+		{
+			continue;
+		}
 		$data[] = new xmlrpcval( array(
-				'categoryId' => new xmlrpcval($row->cat_ID), // not in RFC (http://www.xmlrpc.com/metaWeblogApi)
+				'categoryId' => new xmlrpcval( $row->cat_ID ), // not in RFC (http://www.xmlrpc.com/metaWeblogApi)
 				'description' => new xmlrpcval( $row->cat_name ), // not in RFC (http://www.xmlrpc.com/metaWeblogApi)
 				'categoryName' => new xmlrpcval( $row->cat_name ),
-				'htmlUrl' => new xmlrpcval( ''),
-				'rssUrl' => new xmlrpcval( '' )
+				'htmlUrl' => new xmlrpcval( $Chapter->get_permanent_url() ),
+				'rssUrl' => new xmlrpcval( url_add_param($Chapter->get_permanent_url(), 'tempskin=_rss2') )
 			//	mb_convert_encoding( $row->cat_name, "utf-8", "iso-8859-1")  )
 			),"struct");
 	}
@@ -2243,6 +2250,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.122  2006/12/03 01:24:38  blueyed
+ * "htmlUrl" and "rssUrl" for metaWeblog.getCategories
+ *
  * Revision 1.121  2006/12/02 19:51:08  blueyed
  * "categoryId" case fixes; see http://forums.b2evolution.net/viewtopic.php?p=47650#47650
  *
