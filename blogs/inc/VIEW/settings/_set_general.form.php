@@ -99,8 +99,8 @@ $Form->radio( 'links_extrapath', $Settings->get('links_extrapath'),
 							array(  array( 'disabled', T_('Do not use extra path info'), T_('Permalinks will look like: \'stub?title=post-title&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1\'') ),
 											array( 'short', T_('Only use post URL title'), T_('Permalinks will look like \'stub/post-title\'' ) ),
 											array( 'y', T_('Use year'), T_('Permalinks will look like \'stub/2006/post-title\'' ) ),
-											array( 'ym', T_('Use year &amp; month'), T_('Permalinks will look like \'stub/2006/12/post-title\'' ) ),
-											array( 'ymd', T_('Use year, month &amp; day'), T_('Permalinks will look like \'stub/2006/12/31/post-title\'' ) ),
+											array( 'ym', T_('Use year & month'), T_('Permalinks will look like \'stub/2006/12/post-title\'' ) ),
+											array( 'ymd', T_('Use year, month & day'), T_('Permalinks will look like \'stub/2006/12/31/post-title\'' ) ),
 											array( 'subchap', T_('Use sub-chapter'), T_('Permalinks will look like \'stub/subchap/post-title\'' ) ),
 											array( 'chapters', T_('Use chapter path'), T_('Permalinks will look like \'stub/chapter/subchap/post-title\'' ) ),
 										), T_('Extra path info'), true );
@@ -143,6 +143,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.19  2006/12/03 01:25:49  blueyed
+ * Use & instead of &amp; when it gets encoded for output
+ *
  * Revision 1.18  2006/11/26 01:37:30  fplanque
  * The URLs are meant to be translated!
  *
