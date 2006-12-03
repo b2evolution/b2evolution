@@ -153,6 +153,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		}
 
 		// --------------------------- AUTOBR --------------------------------------
+			// fp> TODO: this should be Auto-P and handled by the Auto-P plugin in the next fieldset
 		?>
 		<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
 		if( $comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out' ) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr">
@@ -201,6 +202,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.19  2006/12/03 00:22:17  fplanque
+ * doc
+ *
  * Revision 1.18  2006/12/01 16:26:34  blueyed
  * Added AdminDisplayCommentFormFieldset hook
  *

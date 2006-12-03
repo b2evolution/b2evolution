@@ -66,7 +66,7 @@ $Form->begin_fieldset( T_('After each new post...') . get_web_help_link('After e
 			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('No notification about your new content will be sent out.'), 'suffix' => '<br />' ),
 			array( 'value'=>'immediate', 'label'=>T_('Immediate'), 'note'=>T_('This is guaranteed to work but may create an annoying delay after each post.'), 'suffix' => '<br />' ),
 			array( 'value'=>'cron', 'label'=>T_('Asynchronous'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up. You could notify news every minute.') ) ),
-		T_('Outbound pings and email notifications') );
+								T_('Outbound pings &amp; email notifications') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') );
@@ -175,6 +175,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.14  2006/12/03 00:22:17  fplanque
+ * doc
+ *
  * Revision 1.13  2006/11/27 00:07:57  blueyed
  * Hide auto_prune_stats field, if ~_mode set to off
  *
