@@ -140,6 +140,7 @@ $AdminUI->disp_payload_begin();
 
 
 // inject JavaScript: {{{
+// fp> TODO: This code should be in the affected VIEWs, not the CONTROLLER. It is not "controlling" per se. It is only managing the view.
 if($AdminUI->get_path(1) == 'perm' || $AdminUI->get_path(1) == 'permgroup')
 {
 	?>
@@ -377,6 +378,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2006/12/03 16:37:14  fplanque
+ * doc
+ *
  * Revision 1.5  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

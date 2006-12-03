@@ -259,7 +259,8 @@ if( $action != 'view_user' )
 	$Form->buttons( array(
 		array( '', 'actionArray[userupdate]', T_('Save !'), 'SaveButton' ),
 		array( 'reset', '', T_('Reset'), 'ResetButton' ),
-		array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'SaveButton' ),
+		// fp> TODO: Needs a Javascript confirm (at least) before trashing all settings with a misplaced click.
+		// array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'ResetButton' ),
 	) );
 }
 
@@ -287,6 +288,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.30  2006/12/03 16:37:15  fplanque
+ * doc
+ *
  * Revision 1.29  2006/11/28 01:31:23  blueyed
  * Display fix: user cannot edit "validated", if he has no "edit users" perms
  *

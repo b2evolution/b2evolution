@@ -422,7 +422,7 @@ if( !$Messages->count('error') )
 
 			if( $reload_page )
 			{ // reload the current page through header redirection:
-				header_redirect( regenerate_url( 'action', '', '', '&' ) );
+				header_redirect( regenerate_url( 'action', '', '', '&' ) ); // will save $Messages into Session
 			}
 
 			if( $user_profile_only )
@@ -804,6 +804,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.41  2006/12/03 16:37:14  fplanque
+ * doc
+ *
  * Revision 1.40  2006/11/24 18:27:23  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
