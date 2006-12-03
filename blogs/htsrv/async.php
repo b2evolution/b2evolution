@@ -72,10 +72,12 @@ if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 
 // fp>SUSPECT:
 // fp> Does the following have an HTTP fallback when Javascript/AJ is not available?
-// dh> yes, but not through this file.. I'll look into refactoring it..
+// dh> yes, but not through this file..
+// dh> IMHO it does not make sense to let the "normal controller" handle the AJAX call
+//     if there's something lightweight like calling "$UserSettings->param_Request()"!
 switch( $action )
 {
-	case 'add_plugin_sett_set':
+	case 'add_plugin_sett_set': // Add a Plugin(User)Settings set (for "array" type settings):
 		header('Content-type: text/html; charset='.$io_charset);
 
 		param( 'plugin_ID', 'integer', true );
@@ -102,7 +104,6 @@ switch( $action )
 
 		$Form = new Form(); // fake Form
 		display_plugin_settings_fieldset_field( $set_path, $r['set_meta'], $Plugin, $Form, $set_type = 'Settings', $set_target = NULL, $r['set_node'] );
-
 		exit;
 
 	case 'del_plugin_sett_set':
@@ -125,15 +126,15 @@ switch( $action )
 require_once $inc_path.'_async.inc.php';
 
 
-// QUESTION: dh> is this really meant to handle expanding and collapsing only??
-// fp> NO this is meant to be extended
-
 // Debug info:
 echo '-expand='.$expand;
 echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.15  2006/12/03 18:18:17  blueyed
+ * doc
+ *
  * Revision 1.14  2006/12/02 22:57:37  fplanque
  * SUSPECT code. Not releasable. Discussion by email.
  *
