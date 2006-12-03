@@ -88,9 +88,9 @@ foreach( $protects as $protect )
 		bad_request_die( 'Unacceptable params.' );
 	}
 }
+
 /*
- * fp> Alternatively we might want to kill all auto registered globals this way:
- * dh> "Alternatively"? AFAICS the above does not protect us against register_globals!
+ * fp> We might want to kill all auto registered globals this way:
  * TODO: testing
  *
 $superglobals = array($_SERVER, $_ENV, $_FILES, $_COOKIE, $_POST, $_GET);
@@ -645,6 +645,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.60  2006/12/03 18:26:27  fplanque
+ * doc
+ *
  * Revision 1.59  2006/11/29 20:04:35  blueyed
  * More cleanup for login-password hashing
  *

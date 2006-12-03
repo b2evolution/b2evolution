@@ -43,10 +43,12 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	// dh> TODO: fp, is this ok? It should maybe be a func and available everywhere we output <HEAD> tags..?
 	// fp> it's not okay if it can be overriden wyth reg globs on
 	// dh> it could be set to NULL in e.g. _vars.php,
-	//     BUT this feels bloated (to init all eventually used vars), only to let _login_form.php add something here.
+	//     BUT this feels bloated (to init all possibly used vars), only to let _login_form.php add something here.
 	//     Instead of using an array directly, we could use an object (which holds an array).
 	//     Besides the used solution should get used everywhere we're outputting html HEAD and
 	//     e.g. want to allow Plugins inserting something there.
+	// fp> Object would be instanciated only once and there would be no need for derived classes. One single encapsulated variable. So object handling here would be bloated.
+	// Use functions. And you only need to initialize critical vars in _vars. BUT even better: how about enabling the killing of superglobals in _main.php?
 	if( isset($evo_html_headlines) ) foreach( $evo_html_headlines as $v )
 	{
 		echo $v;
@@ -77,6 +79,9 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
+ * Revision 1.14  2006/12/03 18:26:27  fplanque
+ * doc
+ *
  * Revision 1.13  2006/12/03 02:10:39  blueyed
  * doc
  *
