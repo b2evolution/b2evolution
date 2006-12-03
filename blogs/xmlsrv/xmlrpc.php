@@ -455,7 +455,7 @@ $bloggereditpost_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $x
 function bloggereditpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $default_category, $DB;
+	global $DB;
 	global $Messages;
 
 	logIO('I','Called function: blogger.editPost');
@@ -1289,7 +1289,6 @@ function mwnewpost($m)
 	global $xmlrpcerruser; // import user errcode value
 	global $DB;
 	global $Settings;
-	global $default_category;
 
 	logIO("O","start of mwnewpost...");
 
@@ -1569,7 +1568,6 @@ function mweditpost($m)
 	global $Settings;
 	global $Messages;
 	global $xmlrpc_htmlchecking;
-	global $default_category;
 
 	logIO("O","start of mweditpost...");
 	$post_ID = $m->getParam(0);
@@ -2250,6 +2248,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.123  2006/12/03 18:21:26  blueyed
+ * Nuked unused globals
+ *
  * Revision 1.122  2006/12/03 01:24:38  blueyed
  * "htmlUrl" and "rssUrl" for metaWeblog.getCategories
  *
