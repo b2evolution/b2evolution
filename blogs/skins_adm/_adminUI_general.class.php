@@ -55,7 +55,7 @@ class AdminUI_general
 	 *
 	 * @var string
 	 */
-	var $pathSeperator;
+	var $pathSeparator;
 
 	/**
 	 * The Logo for the admin.
@@ -135,10 +135,10 @@ class AdminUI_general
 			$this->admin_logo = $app_admin_logo;
 		}
 
-		if( is_null($this->pathSeperator) )
+		if( is_null($this->pathSeparator) )
 		{
-			global $admin_path_seprator;
-			$this->pathSeperator = $admin_path_seprator;
+			global $admin_path_separator;
+			$this->pathSeparator = $admin_path_separator;
 		}
 
 		$this->init_templates();
@@ -231,7 +231,7 @@ class AdminUI_general
 			{ // We have asked for reverse order of the path elements:
 				$titles = array_reverse($titles);
 			}
-			return implode( $this->pathSeperator, $titles );
+			return implode( $this->pathSeparator, $titles );
 		}
 	}
 
@@ -256,7 +256,7 @@ class AdminUI_general
 				}
 			}
 
-			$this->title_titlearea = implode( $this->pathSeperator, $titles );
+			$this->title_titlearea = implode( $this->pathSeparator, $titles );
 		}
 
 		return $this->title_titlearea.$this->title_titlearea_appendix;
@@ -273,7 +273,7 @@ class AdminUI_general
 	 */
 	function append_to_titlearea( $string )
 	{
-		$this->title_titlearea_appendix .= $this->pathSeperator.$string;
+		$this->title_titlearea_appendix .= $this->pathSeparator.$string;
 	}
 
 
@@ -288,7 +288,7 @@ class AdminUI_general
 	{
 		global $app_shortname;
 
-		$r = $app_shortname.$this->pathSeperator;
+		$r = $app_shortname.$this->pathSeparator;
 
 		if( $htmltitle = $this->get_prop_for_node( $this->path, array( 'htmltitle' ) ) )
 		{ // Explicit htmltitle set:
@@ -1332,6 +1332,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.36  2006/12/03 01:58:27  blueyed
+ * Renamed $admin_path_seprator to $admin_path_separator and AdminUI_general::pathSeperator to AdminUI::pathSeparator
+ *
  * Revision 1.35  2006/11/27 19:14:14  fplanque
  * i18n
  *

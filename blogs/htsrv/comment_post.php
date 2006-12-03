@@ -198,7 +198,7 @@ if( $Messages->count('error') )
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 	<head>
-		<title><?php echo $app_shortname.$admin_path_seprator.$page_title ?></title>
+		<title><?php echo $app_shortname.$admin_path_separator.$page_title ?></title>
 		<meta name="ROBOTS" content="NOINDEX" />
 		<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset ?>" />
 		<?php
@@ -331,6 +331,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.95  2006/12/03 01:58:27  blueyed
+ * Renamed $admin_path_seprator to $admin_path_separator and AdminUI_general::pathSeperator to AdminUI::pathSeparator
+ *
  * Revision 1.94  2006/11/26 02:30:38  fplanque
  * doc / todo
  *

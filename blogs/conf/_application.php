@@ -33,7 +33,7 @@ $app_banner = '<a href="http://b2evolution.net/"><img src="'.$rsc_url.'img/b2evo
 $new_db_version = 9406;
 
 
-$admin_path_seprator = ' :: ';
+$admin_path_separator = ' :: ';
 $app_admin_logo = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website").
 									'"><img id="evologo" src="'.$rsc_url.'img/b2evolution_minilogo2.png" alt="b2evolution" title="'.
 									T_("visit b2evolution's website").'" width="185" height="40" /></a>';
