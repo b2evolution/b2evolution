@@ -466,7 +466,7 @@ function check_canonical_path( $path )
 /**
  * Check for valid filename and extension of the filename (no path allowed). (MB)
  *
- * @uses 	$FiletypeCache, $settings or $force_regexp_filename form _advanced.php
+ * @uses $FiletypeCache, $settings or $force_regexp_filename form _advanced.php
  * @param string filename to test
  * @return nothing if the filename is valid according to the regular expression and the extension too, error message if not
  */
@@ -742,9 +742,56 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 }
 
 
+/**
+ * Create a directory recursively.
+ * NOTE: this can be done with the "recursive" param in PHP5
+ * @param string directory name
+ * @param integer permissions
+ * @return boolean
+ */
+function mkdir_r($dirName, $chmod = NULL)
+{
+	if( $chmod === NULL )
+	{
+		global $Settings;
+		$chmod = $Settings->get('fm_default_chmod_dir');
+	}
+
+	/*
+	if( version_compare(PHP_VERSION, 5, '>=') )
+	{
+		return mkdir( $dirName, $chmod, true );
+	}
+	*/
+	$parts = explode('/', $dirName);
+	$dir = '';
+	foreach( $parts as $part )
+	{
+		if( ! strlen($part) )
+		{
+			continue;
+		}
+
+		$dir .= $part.'/';
+		if( ! is_dir($dir) )
+		{
+			if( ! mkdir($dir, $chmod) )
+			{
+				return false;
+			}
+    }
+	}
+
+	return true;
+}
+
+
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.26  2006/12/03 18:20:29  blueyed
+ * Added mkdir_r()
+ *
  * Revision 1.25  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
