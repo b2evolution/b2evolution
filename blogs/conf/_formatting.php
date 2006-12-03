@@ -19,16 +19,23 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * Choose the formatting options for your posts:
  *  0 to disable
  *  1 to ensable
+ * 
+ * @todo fp>This should be moved to the backoffice. Checbox for each blog.
+ *  
  * @global integer 0|1
  */
 $use_balanceTags = 1;
 
 
-# Choose formatting options for comments
-# 'never'   : option will never be used
-# 'opt-in'  : option will be used only if user explicitely asks for it
-# 'opt-out' : option will be used by default, but user can refuse
-# 'always'  : option will always be used
+/**
+ * Choose formatting options for comments
+ * 'never'   : option will never be used
+ * 'opt-in'  : option will be used only if user explicitely asks for it
+ * 'opt-out' : option will be used by default, but user can refuse
+ * 'always'  : option will always be used
+ * 
+ * @todo fp> remove and let Auto-P handle the comment formatting.
+ */
 $comments_use_autobr = 'opt-out';	// automatically change line breaks to <br />
 
 
@@ -38,17 +45,30 @@ $comments_use_autobr = 'opt-out';	// automatically change line breaks to <br />
  * Posts and comments should be checked to see if they contain valid XHTML code
  * and no invalid code (javascript, styles, CSS, etc...)
  */
+ 
 # Html checking will validate posts and comments to a subset of valid XHTML.
 # This will also do much cleaner security checking than the next option.
 # Note: This option requires the PHP XML module. If your PHP installation doesn't have it
 # disable html_checker and use security_checker.
+/*
+ * @todo fp>This should be moved to the backoffice. Checbox for each blog. This checkbox should NOT be editable by the blog owner. 
+ * Only the system admin should be adble to edit this. Special "Admin" tab on the blog settings.
+ */
 $use_html_checker = 1;
 # Security checking will check for illegal javascript hacks in posts/comments
 # and for CSS in comments. However, this may be a bit harsh on your posts :]
+/*
+ * @todo fp>This should be moved to the backoffice. Checbox for each blog. This checkbox should NOT be editable by the blog owner. 
+ * Only the system admin should be adble to edit this. Special "Admin" tab on the blog settings.
+ */
 $use_security_checker = 0;
 # WARNING: disabling both $use_html_checker and $use_security_checker is suicidal !
 
 // Set this to true if you want to enforce XHTML strict
+/*
+ * @todo fp>This should be moved to the backoffice. Checbox for each blog
+ * @todo fp>It would however be interesting to have additional settings like use_strict, for things like: allow_tables, allow_objects (flash)
+ */
 $use_strict =  false;
 
 
@@ -712,5 +732,8 @@ $b2_htmltranswinuni = array(
 # these options are used by rdf.php (1.0), rss.php (0.92), and rss2.php (2.0)
 # length (in words) of excerpts in the RSS feed? 0=unlimited
 # Note: this will not apply to html content!
+/*
+ * @todo fp>This should be moved to the backoffice. input for each blog
+ */
 $rss_excerpt_length = 0;
 ?>

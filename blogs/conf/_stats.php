@@ -23,7 +23,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * older Netscape browsers will not send these. For example you should list
  * http://www.example.com instead of http://www.example.com/ .
  *
- * @todo move to admin interface (T_basedomains), but use for upgrading
+ * @todo move to admin interface (T_basedomains list editor), but use for upgrading
  *
  * TODO: handle multiple blog roots.
  *
@@ -50,7 +50,7 @@ $self_referer_list = array(
  * older Netscape browsers will not send these. For example you should list
  * http://www.example.com instead of http://www.example.com/ .
  *
- * @todo move to admin interface (T_basedomains), but use for upgrading
+ * @todo move to admin interface (T_basedomains list editor), but use for upgrading
  *
  * @global array
  */
@@ -76,7 +76,7 @@ $blackList = array(
  * The following substrings will be looked up in the referer http header
  * in order to identify search engines
  *
- * @todo move to admin interface, include query params
+ * @todo move to admin interface (specific list editor), include query params
  *
  * @global array $search_engines
  */
@@ -135,7 +135,7 @@ $search_engines = array(
  *
  * The following substrings will be looked up in the user_agent http header
  *
- * @todo move to admin interface (T_useragents)
+ * @todo move to admin interface (T_useragents list editor)
  *
  * 'type' aggregator currently gets only used to "translate" user agent strings.
  * An aggregator hit gets detected by accessing the feed.

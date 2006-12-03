@@ -110,6 +110,7 @@ require_once $model_path.'settings/_locale.funcs.php';
  *    If not given, the value of 'messages' gets used.
  *
  * @todo Locale message dirs should be named LOCALE.CHARSET and not LOCALE_CHARSET, e.g. "zh_CN.utf8" instead of "zh_CN_utf-8" (according to gettext)
+ * @todo fp>Actually, the default locale setting should move to install and we should always use the database after that. What were we smoking when we did that? :P
  */
 $locales = array(
 	'cs-CZ' => array( 'name' => NT_('Czech (CZ)'),
@@ -473,7 +474,9 @@ $locales = array(
  * Set this to 1 if you are a translator and wish to extract strings from your .po file.
  * Warning: do *not* extract .PO files you have not edited yourself.
  * Shipped .PO files contain automatic translations that have *not* been reviewed.
- *
+ * 
+ * @todo fp>This should be moved to the backoffice.
+ * 
  * @global boolean
  */
 $allow_po_extraction = 0;

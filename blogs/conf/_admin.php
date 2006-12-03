@@ -69,6 +69,17 @@ $ctrl_mappings = array(
  *   - 2 if you want to be able to cross-post among multiple blogs/categories
  *   - 3 if you want to be able to change main cat among blogs (which will move the
  *       posts from one blog to another; use with caution)
+ * 
+ * @todo fp>This should be moved to the backoffice.
+ * In the BO, this should actually be split into:
+ * App Settings: 
+ *  checkbox         [] allow cross posting
+ *  another checkbox [] allow moving posting between different blogs
+ * Each blog's settings: radio between:
+ *    o One category per post
+ *    o Multiple categories per post (requires transparent handling of main cat)
+ *    o Main cat + extra cats
+ *    o Don't use categories  (this requires to transparently manage a default category)
  *
  * @global int $allow_cross_posting
  */
@@ -80,6 +91,8 @@ $allow_cross_posting = 1;
  *
  * Special value: NULL and we won't even talk about moving
  *
+ * @todo fp>This should be moved to the backoffice. Checkbox.
+ * 
  * @global bool|NULL $allow_moving_chapters
  */
 $allow_moving_chapters = false;
@@ -90,6 +103,8 @@ $allow_moving_chapters = false;
  *
  * Possible values: 'published', 'deprecated', 'protected', 'private', 'draft'
  *
+ * @todo fp>This should be moved to the backoffice. Select list for each blog.
+ * 
  * @global string $default_post_status
  */
 $default_post_status = 'published';
@@ -97,6 +112,9 @@ $default_post_status = 'published';
 
 /**
  * set this to 1 if you want to use the 'preview' function
+ * 
+ * @todo fp>This should be moved to the backoffice. Checbox for each blog (features). Useful when a blog has no public skin. (Tracker)
+ * 
  * @global boolean $use_preview
  */
 $use_preview = 1;
@@ -104,6 +122,9 @@ $use_preview = 1;
 
 /**
  * Do you want to be able to link each post to an URL ?
+ * 
+ * @todo fp>This should be moved to the backoffice. Checbox for each blog (features).
+ * 
  * @global boolean $use_post_url
  */
 $use_post_url = 1;  // 1 to enable, 0 to disable
@@ -119,6 +140,7 @@ $report_abuse = 1;
 
 
 // ** Image upload ** {{{ @deprecated moved to admin interface, but used for upgrading to 1.6
+// fp> TODO: can we move this to _upgrade.php ??
 /**
  * Set this to 0 to disable file upload, or 1 to enable it
  * @global boolean $use_fileupload
