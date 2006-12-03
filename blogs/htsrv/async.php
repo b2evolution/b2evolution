@@ -75,6 +75,8 @@ if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 // dh> yes, but not through this file..
 // dh> IMHO it does not make sense to let the "normal controller" handle the AJAX call
 //     if there's something lightweight like calling "$UserSettings->param_Request()"!
+//     Hmm.. bad example (but valid). Better example: something like the actions below, which
+//     output only a small part of what the "real controller" does..
 switch( $action )
 {
 	case 'add_plugin_sett_set': // Add a Plugin(User)Settings set (for "array" type settings):
@@ -132,6 +134,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.16  2006/12/03 23:48:13  blueyed
+ * doc
+ *
  * Revision 1.15  2006/12/03 18:18:17  blueyed
  * doc
  *
