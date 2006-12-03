@@ -36,12 +36,17 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<link href="<?php echo $rsc_url ?>css/login.css" rel="stylesheet" type="text/css" />
 	<?php
 // fp>SUSPECT:
-	// Insert HEAD lines, which have been defined before:
+	// Insert HEAD lines, which have been defined before this _header.php file gets included:
 	// fp> what is this useful for?
 	// dh> TODO: currently this may be affected by register_globals=ON
 	// fp> then initialize it to empty somewhere before using it!
 	// dh> TODO: fp, is this ok? It should maybe be a func and available everywhere we output <HEAD> tags..?
 	// fp> it's not okay if it can be overriden wyth reg globs on
+	// dh> it could be set to NULL in e.g. _vars.php,
+	//     BUT this feels bloated (to init all eventually used vars), only to let _login_form.php add something here.
+	//     Instead of using an array directly, we could use an object (which holds an array).
+	//     Besides the used solution should get used everywhere we're outputting html HEAD and
+	//     e.g. want to allow Plugins inserting something there.
 	if( isset($evo_html_headlines) ) foreach( $evo_html_headlines as $v )
 	{
 		echo $v;
@@ -72,6 +77,9 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
+ * Revision 1.13  2006/12/03 02:10:39  blueyed
+ * doc
+ *
  * Revision 1.12  2006/12/03 01:58:27  blueyed
  * Renamed $admin_path_seprator to $admin_path_separator and AdminUI_general::pathSeperator to AdminUI::pathSeparator
  *
