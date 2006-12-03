@@ -35,6 +35,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<meta name="ROBOTS" content="NOINDEX" />
 	<link href="<?php echo $rsc_url ?>css/login.css" rel="stylesheet" type="text/css" />
 	<?php
+// fp>SUSPECT:
 	// Insert HEAD lines, which have been defined before:
 	// fp> what is this useful for?
 	// dh> TODO: currently this may be affected by register_globals=ON
@@ -45,6 +46,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	{
 		echo $v;
 	}
+// SUSPECT<fp
 	?>
 </head>
 <body>
@@ -70,6 +72,9 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/03 00:18:38  fplanque
+ * SUSPECT code. Not releasable. Discussion by email.
+ *
  * Revision 1.10  2006/11/28 02:52:26  fplanque
  * doc
  *
