@@ -194,6 +194,7 @@ if( $Messages->count('error') )
 	{
 		$page_title = T_('Errors during processing your comment');
 	}
+	// TODO: dh> HEAD part should be some global front end include file..
 	?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
@@ -201,15 +202,6 @@ if( $Messages->count('error') )
 		<title><?php echo $app_shortname.$admin_path_separator.$page_title ?></title>
 		<meta name="ROBOTS" content="NOINDEX" />
 		<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset ?>" />
-		<?php
-		// Insert HEAD lines, which have been defined before:
-		// dh> TODO: currently this may be affected by register_globals=ON
-		// dh> TODO: fp, is this ok? It should maybe be a func and available everywhere we output <HEAD> tags..?
-		if( isset($evo_html_headlines) ) foreach( $evo_html_headlines as $v )
-		{
-			echo $v;
-		}
-		?>
 	</head>
 	<body>
 	<?php
@@ -331,6 +323,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.96  2006/12/03 02:01:19  blueyed
+ * Removed unused $evo_html_headlines handling
+ *
  * Revision 1.95  2006/12/03 01:58:27  blueyed
  * Renamed $admin_path_seprator to $admin_path_separator and AdminUI_general::pathSeperator to AdminUI::pathSeparator
  *
