@@ -35,6 +35,45 @@ $oldtablecomments   = 'b2comments';
 // Moved from /blogs/conf/_advanced.php:
 
 /**
+ * Set this to 0 to disable file upload, or 1 to enable it
+ * @global boolean $use_fileupload
+ * @deprecated since 1.6: this is only used for creating the defaults when upgrading
+ *             This has been used until EVO_NEW_VERSION by XMLRPC though.
+ */
+$use_fileupload = 1;
+
+/**
+ * Enter the real path of the directory where you'll upload the pictures.
+ *
+ * If you're unsure about what your real path is, please ask your host's support staff.
+ * Note that the  directory must be writable by the webserver (ChMod 766).
+ * Note for windows-servers users: use forwardslashes instead of backslashes.
+ * Example: $fileupload_realpath = '/home/example/public_html/media/';	# WITH traling slash!
+ * Alternatively you may want to use a path relative to $basepath.
+ *
+ * @global string $fileupload_realpath
+ * @deprecated 1.6: the user uploads to his own media folder (or somewhere else with write permissions)
+ *             This has been used until EVO_NEW_VERSION by XMLRPC/MMS though.
+ */
+$fileupload_realpath = $basepath.'media/';	# WARNING: slashes moved!
+
+/**
+ * Enter the URL of that directory
+ *
+ * This is used to generate the links to the pictures
+ * Example: $fileupload_url = 'http://example.com/media/';	# WITH traling slash!
+ * Alternatively you may want to use an URL relatibe to $baseurl
+ *
+ * @global string $fileupload_url
+ * @deprecated 1.6: the user uploads to his own media folder (or somewhere else with write permissions)
+ *             This has been used until EVO_NEW_VERSION by XMLRPC/MMS though.
+ */
+$fileupload_url = $baseurl.'media/';				# WARNING: slashes moved!
+
+
+// Moved from /blogs/conf/_advanced.php:
+
+/**
  * Accepted file types, you can add to that list if you want.
  *
  * Note: add a space before and after each file type.

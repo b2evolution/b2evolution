@@ -9,6 +9,9 @@
  *
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  *
+ * @todo dh> Make a plugin out of it
+ * @todo This makes no sense in /cron/! (it belongs into /htsrv!)
+ *
  * @copyright (c)2004 by Hans Reinders - {@link http://hansreinders.com}
  *
  * @package htsrv
@@ -25,6 +28,7 @@ require_once $inc_path.'_main.inc.php';
 
 param( 'login', 'string', '', true );
 param( 'pass', 'string', '', true );
+// TODO: dh> $default_category was lost somewhere.. should get handled by transforming it into a plugin.
 param( 'cat', 'integer', $default_category, true );
 
 if( !user_pass_ok( $login, $pass, false ) || $_SERVER['CONTENT_TYPE'] != "application/vnd.wap.mms-message" || strlen( $HTTP_RAW_POST_DATA ) == 0 ) exit;
@@ -36,6 +40,9 @@ $blog = get_catblog($post_category);
 
 // Check permission:
 $current_User->check_perm( 'blog_post_statuses', 'published', true, $blog );
+
+$BlogCache = & get_Cache('BlogCache');
+$Blog = & $BlogCache->get_by_ID($blog);
 
 
 define( "BCC", 			0x01 );
@@ -693,11 +700,20 @@ for ( $i = 0; $i < sizeof( $parts ); $i++ )
 	$type = contentTypeToString( $part->contentType );
 	if ( $ext != '.smil' )
 	{
-		$filename = 'mms' . mktime() . $ext;
-		$part->writeToFile ( $fileupload_realpath.'/'.$filename );
+		// NOTE: you may want to change/hardcode this:
+		$fileupload_path = $Blog->get_media_dir();
 
-		$content .= '<img src="'.$fileupload_url.'/'.$filename.'"';
-		if( $img_dimensions = getimagesize( $fileupload_realpath.'/'.$filename ) )
+		if( ! $fileupload_path )
+		{
+			debug_die('Could not get Blog media directory!');
+		}
+
+		$filename = 'mms' . mktime() . $ext;
+		$filepath = $fileupload_path.$filename;
+		$part->writeToFile ( $filepath );
+
+		$content .= '<img src="'.$Blog->get_media_url().$filename.'"';
+		if( $img_dimensions = getimagesize( $filepath ) )
 		{ // add 'width="xx" height="xx"'
 			$content .= ' '.$img_dimensions[3];
 		}
@@ -723,6 +739,9 @@ exit;
 
 /*
  * $Log$
+ * Revision 1.6  2006/12/03 18:22:58  blueyed
+ * Nuked deprecated fileupload globals
+ *
  * Revision 1.5  2006/08/21 16:07:43  fplanque
  * refactoring
  *

@@ -1137,139 +1137,132 @@ function strip_all_but_one_link($text, $mylink, $log)
 //		-	security, password etc.
 //
 //
-function mwnewMediaObj($m) {
-		global $xmlrpcerruser; // import user errcode value
-		global $Settings, $baseurl,$fileupload_realpath,$fileupload_allowedtypes;
-		global $use_fileupload;
-		logIO("O","start of _newmediaobject...");
-		$blogid = $m->getParam(0);
-		$blogid = $blogid->scalarval();
-		$username = $m->getParam(1);
-		$username = $username->scalarval();
-		$password = $m->getParam(2);
-		$password = $password->scalarval();
-		if( !user_pass_ok($username, $password) )
-		{
-			return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
-					 'Wrong username/password combination '.$username.' / '.starify($password));
-		}
-		if ($use_fileupload != 1)
-		{
-			return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
-					 'Object upload not allowed ');
-		}
-	//	Get the main data - and decode it properly for the image - sorry, binary object
-		$xcontent = $m->getParam(3);
-		$contentstruct = xmlrpc_decode($xcontent);
-					logIO("O", 'Got first contentstruct!'."\n");
+function mwnewMediaObject($m) {
+	global $xmlrpcerruser; // import user errcode value
+	global $Settings, $baseurl,$fileupload_allowedtypes;
+
+	logIO("O","start of _newmediaobject...");
+	$blogid = $m->getParam(0);
+	$blogid = $blogid->scalarval();
+	$username = $m->getParam(1);
+	$username = $username->scalarval();
+	$password = $m->getParam(2);
+	$password = $password->scalarval();
+	if( !user_pass_ok($username, $password) )
+	{
+		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+				 'Wrong username/password combination '.$username.' / '.starify($password));
+	}
+	if( ! $Settings->get('upload_enabled') )
+	{
+		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+				 'Object upload not allowed ');
+	}
+	$BlogCache = & get_Cache('BlogCache');
+	$Blog = & $BlogCache->get_by_ID($blogid);
+
+	// Get the main data - and decode it properly for the image - sorry, binary object
+	$xcontent = $m->getParam(3);
+	$contentstruct = xmlrpc_decode($xcontent);
+	logIO("O", 'Got first contentstruct!'."\n");
+
 	// This call seems to go wrong from Marsedit under certain circumstances - Tor 04012005
-		$data = $contentstruct['bits']; // decoding was done transparantly by xmlrpclibs xmlrpc_decode
-					logIO("O", 'Have decoded data data?'."\n");
-		// - check filesize TODO
-		// - check if filetype is allowed (check filename) TODO
-		$filename = $contentstruct['name'];
-					logIO("O", 'Found filename ->'. $filename ."\n");
-		$type = $contentstruct['type'];
-					logIO("O", 'Done type ->'. $type ."\n");
-		$data = $contentstruct['bits'];
-					logIO("O", 'Done bits ' ."\n");
-		// - check if filetype is allowed (check filename) TODO
-			$dotarray = explode(".",$filename);
-			$fileending = $dotarray[(count($dotarray)-1)];
-					logIO("O", 'File type or ending ->'.$fileending ."\n");
-		// Check that this fileending is legal - for now do jpg, JPG, PNG, png, and GIF, gif
-				$ok = 0;
-		$allowedtypes = explode (' ', $fileupload_allowedtypes); // To work with _admin.php
-		$number_of_allowedtypes = count($allowedtypes);
-					logIO("O", 'Number of allowed types'.$number_of_allowedtypes ."\n");
-		foreach ( $allowedtypes as $type )
-			if (eregi("\." .$type. "$",$filename)) $ok = 1;
-//			if ($fileending == $type)  $ok = 1;
-		if (!$ok) {
-				return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
-					 'Non legal objecttype for upload '.$fileending.' from '.$fileupload_allowedtypes);
-					}
-		// prefix filename with current date (YYYY-MM-DD-)
-		// this to avoid nameclashes
-//			$filename = strftime("%Y%m%d-", time()) . $filename;
-		// create file
-			logIO("O", 'Ready to create file ->'. "../" . $filename ."\n");
-		$fileupload_realpath = $fileupload_realpath . "/" . $blogid; // To comply with _admin.php
-		// try to create new private media directories if needed
-		// TODO Tor 04012005 - if filename prepended with directory/directories
-		// these should either be stripped out (?) or teh directories created automagically
-		if (!@is_dir($fileupload_realpath) ) {
-			$oldumask = umask(0000);
-			if (!@mkdir($fileupload_realpath, 0777))
-				return _ERROR_BADPERMISSIONS;
-			umask($oldumask);
-		}
-		// Check for directory name prepended to filename - should we limit the number of levels of directories?
-		$parts = explode("/",$filename);
-				logIO("O", 'filename inc directories ->'. $filename ."\n");
-			$orig_filename = $filename;
+	$data = $contentstruct['bits']; // decoding was done transparantly by xmlrpclibs xmlrpc_decode
+	logIO("O", 'Have decoded data data?'."\n");
 
-		$fileupload_temp_path = $fileupload_realpath;
-				logIO("O", 'fileupload_temppath ->'. $fileupload_temp_path ."\n");
-		if (count($parts) > 1) {
-			for ($i=0; $i<(count($parts)-1); $i++){
-				$fileupload_temp_path = $fileupload_temp_path . "/" . $parts[$i];
-						logIO("O", 'part ->'. $parts[$i] ."\n");
+	// TODO: check filesize
+	$filename = $contentstruct['name'];
+	logIO("O", 'Found filename ->'. $filename ."\n");
+	$type = $contentstruct['type'];
+	logIO("O", 'Done type ->'. $type ."\n");
+	$data = $contentstruct['bits'];
+	logIO("O", 'Done bits ' ."\n");
 
-						logIO("O", 'temppath ->'. $fileupload_temp_path ."\n");
+	// Split into path + name:
+	$filepath = dirname($filename);
+	$filename = basename($filename);
 
-
-						if (!@is_dir($fileupload_temp_path) ) {
-
-							$oldumask = umask(0000);
-							if (!@mkdir($fileupload_temp_path, 0777))
-								return _ERROR_BADPERMISSIONS;
-							umask($oldumask);
-				}
-			}
-			$orig_filename = $filename;
-			$filename = $parts[count($parts)-1];
-				logIO("O", 'filename after explode ->'. $filename ."\n");
-			$fileupload_realpath = $fileupload_temp_path;
-		}
-		logIO("O", 'Fileupload_realpath ->'. $fileupload_realpath ."\n");
-		$fh = @fopen($fileupload_realpath ."/". $filename, 'wb');
-		logIO("O", 'Managed  to open file ->'. $filename ."\n");
-		if (!$fh)
-			return _ERROR_UPLOADFAILED;
-		logIO("O", 'Managed  to open file ->'. $fileupload_realpath ."/". $filename."\n");
-		$ok = @fwrite($fh, $data);
-					logIO("O", 'Ready  to close file ->'. $filename ."\n");
-		@fclose($fh);
-		if (!$ok)
-			return _ERROR_UPLOADFAILED;
-		logIO("O", 'Ready to chmod file ->'. $filename ."\n");
-		// chmod uploaded file
-		$oldumask = umask(0000);
-		@chmod($fileupload_realpath . "/" . $filename, 0644);
-		umask($oldumask);
-		logIO("O", 'Full returned filename ->'. $fileupload_realpath . '/' . $filename ."\n");
-		logIO("O", 'Full returned url ->'. $baseurl . "/media". "/" . $blogid  . "/" . $orig_filename ."\n");
-		// - return URL as XML
-		$urlstruct = new xmlrpcval(array(
-			"url" => new xmlrpcval($baseurl . "/media". "/" . $blogid  . "/" . $orig_filename,'string')
-		),'struct');
-		return new xmlrpcresp($urlstruct);
+	$filepath_parts = explode('/', $filepath);
+	if( in_array('..', $filepath_parts) )
+	{ // invalid relative path:
+		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+			'Invalid relative part in file path: '.$filepath);
 	}
 
+	// Check valid filename/extension:
+	load_funcs('MODEL/files/_file.funcs.php');
+	if( $error_filename = validate_filename($filename) )
+	{
+		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+			'Invalid objecttype for upload ('.$filename.'): '.$error_filename);
+	}
+
+	$fileupload_path = $Blog->get_media_dir();
+	if( ! $fileupload_path )
+	{
+		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+			'Error accessing Blog media directory.');
+	}
+
+	// Handle subdirs, if any:
+	if( strlen($filepath) && $filepath != '.' )
+	{
+		$fileupload_path .= $filepath;
+		if( ! mkdir_r(dirname($fileupload_path)) )
+		{
+			return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+				'Error creating sub directories: '.rel_path_to_base($fileupload_path));
+		}
+	}
+
+	logIO("O", 'fileupload_path ->'. $fileupload_path ."\n");
+	$fh = @fopen($fileupload_path.$filename, 'wb');
+	logIO("O", 'Managed to open file ->'. $filename ."\n");
+	if (!$fh)
+	{
+		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+			'Error opening file for writing.');
+	}
+
+	logIO("O", 'Managed to open file for writing ->'. $fileupload_path.$filename."\n");
+	$ok = @fwrite($fh, $data);
+	@fclose($fh);
+
+	if (!$ok)
+	{
+		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+			'Error while writing to file.');
+	}
+
+	// chmod uploaded file:
+	$oldumask = umask(0000);
+	@chmod($fileupload_path.$filename, $Settings->get('fm_default_chmod_file'));
+	umask($oldumask);
+
+	$url = $Blog->get_media_url().$filepath.$filename;
+	logIO("O", 'Full returned filename ->'. $fileupload_path . '/' . $filename ."\n");
+	logIO("O", 'Full returned url ->'. $url ."\n");
+
+	// - return URL as XML
+	$urlstruct = new xmlrpcval(array(
+			'url' => new xmlrpcval($url, 'string')
+		), 'struct');
+	return new xmlrpcresp($urlstruct);
+}
 
 
-	// metaWeblog.newMediaObject
-	$mwnewmediaobj_sig = array(array(
-		//  return type
-		$xmlrpcStruct,		// "url" element
-		// params
-		$xmlrpcString,		// blogid
-		$xmlrpcString,		// username
-		$xmlrpcString,		// password
-		$xmlrpcStruct		// 'name', 'type' and 'bits'
-	));
-	$mwnewmediaobj_doc = 'Uploads a file to to the media library of the user';
+
+// metaWeblog.newMediaObject
+$mwnewMediaObject_sig = array(array(
+	//  return type
+	$xmlrpcStruct,		// "url" element
+	// params
+	$xmlrpcString,		// blogid
+	$xmlrpcString,		// username
+	$xmlrpcString,		// password
+	$xmlrpcStruct		// 'name', 'type' and 'bits'
+));
+$mwnewMediaObject_doc = 'Uploads a file to the media library of the blog';
 
 
 
@@ -2120,9 +2113,9 @@ $s = new xmlrpc_server(
 	array(
 		"metaWeblog.newMediaObject" =>
 			array(
-				"function" => "mwnewmediaobj",
-				"signature" => $mwnewmediaobj_sig,
-				"docstring" => $mwnewmediaobj_doc),
+				"function" => "mwnewMediaObject",
+				"signature" => $mwnewMediaObject_sig,
+				"docstring" => $mwnewMediaObject_doc),
 
 		"metaWeblog.newPost" =>
 			array(
@@ -2248,8 +2241,8 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
- * Revision 1.123  2006/12/03 18:21:26  blueyed
- * Nuked unused globals
+ * Revision 1.124  2006/12/03 18:22:58  blueyed
+ * Nuked deprecated fileupload globals
  *
  * Revision 1.122  2006/12/03 01:24:38  blueyed
  * "htmlUrl" and "rssUrl" for metaWeblog.getCategories

@@ -223,8 +223,7 @@ param( 'import_mode', 'string', 'normal' );
 		<div class="panelinfo">
 			<p>Before importing, you should check the URLs of any &lt;img&gt; tags you may have in <?php echo $exportedfile ?>. Will these URLs still be valid after the migration? If not, we advise you do a search and replace on <?php echo $exportedfile ?> before continuing.</p>
 
-			<p>Preferred location for inline images is [<?php echo $fileupload_realpath ?>]<br />
-			If you decide to use this location, your IMG SRC urls should point to [<?php echo $fileupload_url ?>]</p>
+			<p>Preferred location for inline images is the blog media folder.</p>
 
 			<p>You can also handle the images later, but it might be easier now :)</p>
 		</div>
@@ -397,8 +396,12 @@ param( 'import_mode', 'string', 'normal' );
 
 		<?php /*<fieldset style="padding-left:1ex"><legend>&lt;img&gt;-URL mapping</legend>
 			<a id="imgurls"><p class="notes">This lets you map found image urls (their basename) to another basename.
-			You probably want to put the images that you had on your MT installation into b2evo's media (fileupload) folder.<br />
-			So you would use <strong><?php echo $fileupload_url ?></strong> for replacement.<br />
+
+			// TODO: refer to Blog media folder/url and ensure that it's enabled..
+
+			You probably want to put the images that you had on your MT installation into b2evo's media folder.<br />
+			So you would use <strong><?php echo "TODO" ?></strong> for replacement.<br />
+
 			You can leave this empty, of course and nothing will be replaced, but then you'll have probably broken images.</p></a>
 			<?php
 			preg_match_all( '#<img .*?src="([^"]*)/.*?"#is', $importdata, $matches );
@@ -1622,6 +1625,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.28  2006/12/03 18:22:58  blueyed
+ * Nuked deprecated fileupload globals
+ *
  * Revision 1.27  2006/12/01 20:04:31  blueyed
  * Renamed Plugins_admin::validate_list() to validate_renderer_list()
  *
