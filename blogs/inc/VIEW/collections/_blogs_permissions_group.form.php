@@ -21,8 +21,15 @@ global $edited_Blog;
  */
 global $current_User;
 global $UserSettings;
+global $rsc_url, $htsrv_url;
+
 
 $layout = $UserSettings->param_Request( 'layout', 'blogperms_layout', 'string', 'default' );  // table layout mode
+
+// Javascript:
+echo '
+<script type="text/javascript">var htsrv_url = "'.$htsrv_url.'";</script>
+<script type="text/javascript" src="'.$rsc_url.'js/collectionperms.js"></script>';
 
 
 /**
@@ -39,7 +46,6 @@ function list_groups( $layout, $query )
 	global $DB;
 
 	$displayed = array();
-
 
 	foreach( $DB->get_results( $query, ARRAY_A ) as $lKey => $lrow )
 	{ // Go through groups:

@@ -30,7 +30,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * @global array
  */
 $self_referer_list = array(
-	'://'.$basehost,			// This line will match all pages from your the host of your $baseurl
+	'://'.$basehost,			// This line will match all pages from the host of your $baseurl
 	'://www.'.$basehost,	// This line will also match www.you_base_host in case you have no www. on your basehost
 	'http://localhost',
 	'http://127.0.0.1',

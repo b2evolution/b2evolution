@@ -23,8 +23,15 @@ global $current_User;
 
 global $debug;
 global $UserSettings;
+global $rsc_url, $htsrv_url;
 
 $layout = $UserSettings->param_Request( 'layout', 'blogperms_layout', 'string', $debug ? 'all' : 'default' );  // table layout mode
+
+
+// Javascript:
+echo '
+<script type="text/javascript">var htsrv_url = "'.$htsrv_url.'";</script>
+<script type="text/javascript" src="'.$rsc_url.'js/collectionperms.js"></script>';
 
 
 $Form = & new Form( NULL, 'blogperm_checkchanges', 'post', 'fieldset' );
@@ -416,6 +423,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.17  2006/12/03 19:00:30  blueyed
+ * Moved collection perm JavaScript to the views, as per todo
+ *
  * Revision 1.16  2006/11/18 17:57:17  blueyed
  * blogperms_switch_layout() moved/renamed
  *
