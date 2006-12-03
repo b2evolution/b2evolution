@@ -30,6 +30,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * A Plugins object that loads all Plugins, not just the enabled ones.
  * This is needed for the backoffice plugin management.
  *
+ * This extends the basic Plugins by adding all the functionnality needed for administering plugins
+ * in addition to just using the already enabled plugins.
+ *
  * @package evocore
  */
 class Plugins_admin extends Plugins
@@ -1324,8 +1327,11 @@ class Plugins_admin extends Plugins
 }
 
 
-/* {{{ Revision log:
+/*
  * $Log$
+ * Revision 1.15  2006/12/03 16:22:15  fplanque
+ * doc
+ *
  * Revision 1.14  2006/12/01 20:46:25  blueyed
  * Moved Plugins::set_priority() to Plugins_admin class
  *
@@ -1368,6 +1374,5 @@ class Plugins_admin extends Plugins
  * Revision 1.1  2006/11/30 05:43:40  blueyed
  * Moved Plugins::discover() to Plugins_admin::discover(); Renamed Plugins_no_DB to Plugins_admin_no_DB (and deriving from Plugins_admin)
  *
- * }}}
  */
 ?>

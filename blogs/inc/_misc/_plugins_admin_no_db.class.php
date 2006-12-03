@@ -30,10 +30,10 @@ load_class('_misc/_plugins_admin.class.php');
 
 
 /**
- * A sub-class of {@link Plugins_admin}, just to not load any DB info (which means Plugins and Events).
+ * A sub-class of {@link Plugins_admin} which will not load any DB info (i-e: Plugins and Events).
  *
- * This is only useful for displaying a list of available plugins or during installation to have
- * a global $Plugins object that does not interfere with the installation process.
+ * This is useful for displaying a list of available plugins which can be installed.
+ * This is also useful during installation in order to have a global $Plugins object that does not interfere with the installation process.
  *
  * {@internal This is probably quicker and cleaner than using a member boolean in {@link Plugins_admin} itself.}}
  *
@@ -59,6 +59,9 @@ class Plugins_admin_no_DB extends Plugins_admin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.3  2006/12/03 16:22:15  fplanque
+ * doc
+ *
  * Revision 1.2  2006/11/30 06:20:57  blueyed
  * load_class(parent)
  *
