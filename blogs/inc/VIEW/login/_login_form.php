@@ -71,11 +71,13 @@ $Form->begin_form( 'fform' );
 		$Form->hidden( 'sessID', $sessID );
 	}
 
+// fp>SUSPECT
 	if( ! $need_raw_pwd )
 	{ // used by JS-password encryption/hashing (gets filled by JS AJAX callback):
 		$Form->hidden( 'pwd_salt', '' );
 		$Form->hidden( 'pwd_hashed', '' );
 	}
+// SUSPECT<fp
 
 	if( ! empty($mode) )
 	{ // We're in the process of bookmarkletting something, we don't want to lose it:
@@ -132,6 +134,7 @@ $Form->end_form();
 
 
 	<?php
+// fp>SUSPECT
 	if( ! $need_raw_pwd )
 	{
 		/*
@@ -202,6 +205,7 @@ $Form->end_form();
 
 		<?php
 	}
+// <fp
 	?>
 </script>
 
@@ -233,6 +237,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.24  2006/12/03 20:11:18  fplanque
+ * SUSPECT code. Not releasable. Discussion by email.
+ *
  * Revision 1.23  2006/11/29 20:04:35  blueyed
  * More cleanup for login-password hashing
  *
