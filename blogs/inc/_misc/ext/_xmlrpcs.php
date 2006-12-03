@@ -456,12 +456,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 				$m=new xmlrpcmsg($_xh[$parser]['method']);
 				// now add parameters in
-				$plist='';
+				// fp> commented out because it is commented out below: $plist='';
 				//$allOK = 1;
 				for($i=0; $i<sizeof($_xh[$parser]['params']); $i++)
 				{
 					//print "<!-- " . $_xh[$parser]['params'][$i]. "-->\n";
-					//$plist.="$i - " .  $_xh[$parser]['params'][$i]. ";\n";
+					// dh> commented out for PHP 5.2: $plist.="$i - " .  $_xh[$parser]['params'][$i]. ";\n";
 					//$allOK = 0;
 					//@eval('$m->addParam(' . $_xh[$parser]['params'][$i]. '); $allOK=1;');
 					@$m->addParam($_xh[$parser]['params'][$i]);
@@ -545,4 +545,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			print $r->serialize();
 		}
 	}
+	
+/*
+ * $Log$
+ * Revision 1.7  2006/12/03 00:06:39  fplanque
+ * minor
+ *
+ */
 ?>
