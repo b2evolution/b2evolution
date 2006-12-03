@@ -195,6 +195,9 @@ if( $Messages->count('error') )
 		$page_title = T_('Errors during processing your comment');
 	}
 	// TODO: dh> HEAD part should be some global front end include file..
+	// fp> actually, I'd like the error messages to de displayed in a skinnable file. Something that looks like the _main skin file but with minimum extra gadgets (in order to save on DB requests at each "spam denied" error)
+	// fp> So please don't waste time on implementing a half baked solution.
+	// fp> We may want to rethink skins more deeply beofre implementing this.
 	?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
@@ -323,6 +326,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.97  2006/12/03 04:34:44  fplanque
+ * doc
+ *
  * Revision 1.96  2006/12/03 02:01:19  blueyed
  * Removed unused $evo_html_headlines handling
  *
