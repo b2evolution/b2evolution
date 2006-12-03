@@ -2580,6 +2580,7 @@ class Item extends DataObject
 	 *
 	 * @todo cleanup the set() calls
 	 * @todo dh> bloat! better to use a set() + dbinsert() IMHO..
+	 * fp> Of couse. This is pure crap. It was only meant as a temporary upgrade path while refactoring some code. Should be removed ASAP.
 	 */
 	function insert(
 		$author_user_ID,              // Author
@@ -3318,6 +3319,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.127  2006/12/03 18:15:32  fplanque
+ * doc
+ *
  * Revision 1.126  2006/12/01 20:04:31  blueyed
  * Renamed Plugins_admin::validate_list() to validate_renderer_list()
  *
