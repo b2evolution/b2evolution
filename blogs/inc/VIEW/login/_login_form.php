@@ -128,9 +128,13 @@ $Form->end_form();
 	// Autoselect login text input or pwd input, if there's a login already:
 	var login = document.getElementById('login');
 	if( login.value.length > 0 )
+	{	// Focus on the password field:
 		document.getElementById('pwd').focus();
+	}
 	else
+	{	// Focus on the login field:
 		login.focus();
+	}
 
 
 	<?php
@@ -145,10 +149,14 @@ $Form->end_form();
 		 3b. In case of error, do not hash the password
 		 4. Click() the same button again, but this time the salt field is filled already
 		*/
+		// fp> Something will cause FF2 to ask twice about "do you want to memorize this password" :(
 		?>
 
-		$("#evo_login_form :submit").each( function() {
-			$(this).bind( 'click', function() {
+		$("#evo_login_form :submit").each( function() 
+		{
+			$(this).bind( 'click', function() 
+			{
+				// fp>If a true geek could obfuscate his code by using less than ONE char for each var name, he would!
 				// the form:
 				var f = $("#evo_login_form").get(0);
 
@@ -160,8 +168,9 @@ $Form->end_form();
 					var s = f.pwd_salt;
 					if( h && p && s && typeof hex_sha1 != "undefined" && typeof hex_md5 != "undefined" )
 					{
+						// fp> do we really need sha1 AND md5? Looks really overkill to me.
 						h.value = hex_sha1( hex_md5(p.value) + s.value );
-						p.value = ""; // unset real password
+						p.value = ""; // unset real password. 
 						s.value = ""; // unset salt, so it gets re-newed when using the browser's back button
 					}
 					// Submit the form:
@@ -172,37 +181,47 @@ $Form->end_form();
 				var oInput = this;
 
 				// Disable all submit elements:
+				oInput.value = '<?php echo T_('Please wait...') ?>';
 				$("#evo_login_form :submit").attr("disabled", true);
 
 				// get the Password hash by AJAX:
-				$.ajax( {
+				$.ajax( 
+					{	
 						url: '<?php echo url_rel_to_same_host($htsrv_url_sensitive, $ReqHost) ?>async.php',
+						
 						data: { action: 'get_login_salt' },
+						
 						timeout: 10000, // 10sec timeout
-						success: function(r, status) {
-							// Set hidden pwd_salt field in form:
+						
+						success: function(r, status) 
+						{ // Set hidden pwd_salt field in form:
 							f.pwd_salt.value = r;
 						},
-						error: function( xml, error ) {
-							/*
+						
+						error: function( xml, error ) 
+						{ /*
 							  In case the request fails, we send the password unencrypted!
 								(instead of bothering the user with a confirm(), allowing him to cancel plain-text submission).
-								It should not happen anyway..
+								It should not happen anyway.. 
+								fp> The space shuttle should never have failed either...
 							*/
 							f.pwd_salt.value = "no_hashing_because_of_no_salt";
 						},
-						complete: function(xml, status) {
-							// Enable all submit elements again:
+						
+						complete: function(xml, status) 
+						{ // Enable all submit elements again:
 							$("#evo_login_form :submit").removeAttr("disabled");
 							oInput.focus(); // workaround for FF 2.0 bug - it would ignore click() otherwise, but it's "quite nice" anyway.. (btw: an "alert(oInput)" would also workaround this)
 							oInput.click();
 						}
-				} );
+						
+					} 
+				);
 
 				// We submit the form through oInput.click(), in the "complete" AJAX callback:
 				return false;
-			} ) } );
-
+			} ) 
+		} );
 		<?php
 	}
 // <fp
@@ -237,6 +256,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.25  2006/12/03 23:21:30  fplanque
+ * doc
+ *
  * Revision 1.24  2006/12/03 20:11:18  fplanque
  * SUSPECT code. Not releasable. Discussion by email.
  *
