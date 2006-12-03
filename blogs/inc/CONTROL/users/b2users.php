@@ -583,7 +583,7 @@ if( !$Messages->count('error') )
 
 
 		case 'del_settings_set':
-// fp> TODO: please document the purpose of this action
+			// Delete a set of an array type setting:
 			param( 'plugin_ID', 'integer', true );
 			param( 'set_path' );
 
@@ -804,6 +804,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.42  2006/12/03 19:01:57  blueyed
+ * doc
+ *
  * Revision 1.41  2006/12/03 16:37:14  fplanque
  * doc
  *
