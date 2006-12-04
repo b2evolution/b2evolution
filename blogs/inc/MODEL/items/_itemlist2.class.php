@@ -159,7 +159,7 @@ class ItemList2 extends DataObjectList2
 				'visibility_array' => array( 'published', 'protected', 'private' ),
 				'order' => 'DESC',
 				'orderby' => 'datestart',
-				'unit' => $Settings->get('what_to_show'),
+				'unit' => $this->Blog->get_setting('what_to_show'),
 				'posts' => $this->limit,
 				'page' => 1,
 				'item_type' => NULL,
@@ -1190,12 +1190,12 @@ class ItemList2 extends DataObjectList2
 				else
 				{ // We are going to limit to LAST x days:
 					// TODO: rename 'posts' to 'limit'
-					$title_array['posts'] = sprintf( T_('Limit to %d last days'), $this->limit );
+					$title_array['posts'] = sprintf( T_('Limited to %d last days'), $this->limit );
 				}
 			}
 			else
 			{ // We have a start date, we'll display x days starting from that point:
-				$title_array['posts'] = sprintf( T_('Limit to %d days'), $this->limit );
+				$title_array['posts'] = sprintf( T_('Limited to %d days'), $this->limit );
 			}
 		}
 		else
@@ -1614,6 +1614,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.43  2006/12/04 18:16:50  fplanque
+ * Each blog can now have its own "number of page/days to display" settings
+ *
  * Revision 1.42  2006/11/28 00:33:01  blueyed
  * Removed DB::compString() (never used) and DB::get_list() (just a macro and better to have in the 4 used places directly; Cleanup/normalization; no extended regexp, when not needed!
  *

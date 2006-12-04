@@ -268,13 +268,21 @@ class Blog extends DataObject
 
 
 		if( param( 'chapter_links',   'string', NULL ) !== NULL )
-		{ // Feedback options:
+		{ // Chapter permalink type:
 			$this->set_setting( 'chapter_links', get_param( 'chapter_links' ) );
 		}
 
 		if( param( 'blog_default_skin',  'string', NULL ) !== NULL )
 		{	// Default blog:
 			$this->set_from_Request( 'default_skin' );
+		}
+
+		
+		if( param( 'what_to_show',   'string', NULL ) !== NULL )
+		{ // Show x days or x posts?:
+			$this->set_setting( 'what_to_show', get_param( 'what_to_show' ) );
+			param_integer_range( 'posts_per_page', 1, 9999, T_('Items/days per page must be between %d and %d.') );
+			$this->set_setting( 'posts_per_page', get_param( 'posts_per_page' ) );
 		}
 
 
@@ -1040,6 +1048,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2006/12/04 18:16:50  fplanque
+ * Each blog can now have its own "number of page/days to display" settings
+ *
  * Revision 1.35  2006/11/28 00:33:01  blueyed
  * Removed DB::compString() (never used) and DB::get_list() (just a macro and better to have in the 4 used places directly; Cleanup/normalization; no extended regexp, when not needed!
  *

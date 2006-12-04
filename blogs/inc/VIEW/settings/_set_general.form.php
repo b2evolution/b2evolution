@@ -72,14 +72,6 @@ $BlogCache = & get_Cache( 'BlogCache' );
 $Form->select_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default blog to display'),
 											T_('This blog will be displayed on index.php .'), true );
 
-
-$Form->radio( 'what_to_show', $Settings->get('what_to_show'),
-							array(  array( 'days', T_('days') ),
-											array( 'posts', T_('posts') ),
-										), T_('Display unit') );
-
-$Form->text( 'posts_per_page', $Settings->get('posts_per_page'), 4, T_('Posts/Days per page'), '', 4 );
-
 $Form->radio( 'archive_mode', $Settings->get('archive_mode'),
 							array(  array( 'monthly', T_('monthly') ),
 											array( 'weekly', T_('weekly') ),
@@ -143,6 +135,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.20  2006/12/04 18:16:51  fplanque
+ * Each blog can now have its own "number of page/days to display" settings
+ *
  * Revision 1.19  2006/12/03 01:25:49  blueyed
  * Use & instead of &amp; when it gets encoded for output
  *

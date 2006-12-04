@@ -588,8 +588,8 @@ function upgrade_b2evo_tables()
 
 		#echo 'oldrow:<br />'; pre_dump($row);
 		$transform = array(
-			'posts_per_page' => array(5),
-			'what_to_show' => array('posts'),
+			'posts_per_page' => array(5),     // note: moved to blogsettings in 2.0
+			'what_to_show' => array('posts'), // note: moved to blogsettings in 2.0
 			'archive_mode' => array('monthly'),
 			'time_difference' => array(0),
 			'AutoBR' => array(0),
@@ -920,7 +920,7 @@ function upgrade_b2evo_tables()
 								( "upload_maxkb", "'.(isset($fileupload_maxk) ? (int)$fileupload_maxk : '96').'" )
 							';
 		$DB->query( $query );
-		// Replace "paged" mode with "posts"
+		// Replace "paged" mode with "posts" // note: moved to blogsettings in 2.0
 		$DB->query( 'UPDATE T_settings
 										SET set_value = "posts"
 									WHERE set_name = "what_to_show"
@@ -1444,6 +1444,8 @@ function upgrade_b2evo_tables()
 		// dh> moved content into "< 9330" block for 1.9
 	}
 
+	// fp>SUSPECT
+	// fp> have to check if this means kiss your pagerank goodbye
 	if( $old_db_version < 9405 )
 	{
 		echo 'Updating URL titles... ';
@@ -1452,6 +1454,7 @@ function upgrade_b2evo_tables()
          SET post_urltitle = REPLACE( post_urltitle, "_", "-" )' );
 		echo "OK.<br />\n";
 	}
+	// SUSPECT<fp
 
 	if( $old_db_version < 9406 )
 	{
@@ -1484,6 +1487,20 @@ function upgrade_b2evo_tables()
 
 	}
 
+	
+	if( $old_db_version < 9407 )
+	{
+		echo 'Moving general settings to blog settings... ';
+		$DB->query( 'REPLACE INTO T_coll_settings( cset_coll_ID, cset_name, cset_value )
+		             SELECT blog_ID, set_name, set_value
+									 FROM T_blogs, T_settings
+									WHERE set_name = "posts_per_page"
+									   OR set_name = "what_to_show"' );
+		$DB->query( 'DELETE FROM T_settings
+									WHERE set_name = "posts_per_page"
+									   OR set_name = "what_to_show"' );
+		echo "OK.<br />\n";
+	}
 
 
 	/*
@@ -1590,6 +1607,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.190  2006/12/04 18:16:51  fplanque
+ * Each blog can now have its own "number of page/days to display" settings
+ *
  * Revision 1.189  2006/11/18 16:34:24  blueyed
  * Removed todo
  *

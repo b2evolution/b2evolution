@@ -72,12 +72,6 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	param( 'default_blog_ID', 'integer', true );
 	$Settings->set( 'default_blog_ID', $default_blog_ID );
 
-	param_integer_range( 'posts_per_page', 1, 9999, T_('Items/days per page must be between %d and %d.') );
-	$Settings->set( 'posts_per_page', $posts_per_page );
-
-	param( 'what_to_show', 'string', true );
-	$Settings->set( 'what_to_show', $what_to_show );
-
 	param( 'archive_mode', 'string', true );
 	$Settings->set( 'archive_mode', $archive_mode );
 
@@ -128,6 +122,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2006/12/04 18:16:50  fplanque
+ * Each blog can now have its own "number of page/days to display" settings
+ *
  * Revision 1.9  2006/11/24 18:27:23  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

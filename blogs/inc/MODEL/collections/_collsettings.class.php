@@ -51,6 +51,8 @@ class CollectionSettings extends AbstractSettings
 			'new_feedback_status' => 'draft',  // 'draft', 'published' or 'deprecated'
 			'chapter_links' => 'param_num',		 // 'param_num', 'subchap', 'chapters'
 			'ping_plugins' => 'ping_pingomatic,ping_b2evonet', // ping plugin codes, separated by comma
+			'what_to_show' => 'posts',         // posts, days
+			'posts_per_page' => '5',
 		);
 
 
@@ -66,6 +68,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.7  2006/12/04 18:16:50  fplanque
+ * Each blog can now have its own "number of page/days to display" settings
+ *
  * Revision 1.6  2006/11/24 18:27:23  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

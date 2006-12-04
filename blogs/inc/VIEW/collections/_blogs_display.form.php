@@ -33,6 +33,14 @@ $Form->begin_fieldset( T_('Description') );
 	$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This is displayed on the blog template.'), 50, 'large' );
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Content / Posts') );
+	$Form->radio( 'what_to_show', $edited_Blog->get_setting('what_to_show'),
+								array(  array( 'days', T_('days') ),
+												array( 'posts', T_('posts') ),
+											), T_('Display unit') );
+	$Form->text( 'posts_per_page', $edited_Blog->get_setting('posts_per_page'), 4, T_('Posts/Days per page'), '', 4 );
+$Form->end_fieldset();
+
 $Form->begin_fieldset( T_('Skin and style') );
 	$Form->select( 'blog_default_skin', $edited_Blog->get( 'default_skin' ), 'skin_options_return', T_('Default skin') , T_('This is the default skin that will be used to display this blog.') );
 	$Form->checkbox( 'blog_force_skin', 1-$edited_Blog->get( 'force_skin' ), T_('Allow skin switching'), T_('Users will be able to select another skin to view the blog (and their preferred skin will be saved in a cookie).') );
@@ -57,6 +65,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.4  2006/12/04 18:16:50  fplanque
+ * Each blog can now have its own "number of page/days to display" settings
+ *
  * Revision 1.3  2006/09/11 19:35:35  fplanque
  * minor
  *

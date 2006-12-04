@@ -332,7 +332,7 @@ if( ($disp == 'posts') || ($disp == 'single') )
 
 	// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
 
-	$MainList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max, $Settings->get('posts_per_page') );
+	$MainList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max, $Blog->get_setting('posts_per_page') );
 
 	if( ! $preview )
 	{
@@ -509,6 +509,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.50  2006/12/04 18:16:50  fplanque
+ * Each blog can now have its own "number of page/days to display" settings
+ *
  * Revision 1.49  2006/11/30 22:34:15  fplanque
  * bleh
  *

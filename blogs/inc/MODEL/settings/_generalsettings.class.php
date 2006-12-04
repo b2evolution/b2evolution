@@ -92,7 +92,6 @@ class GeneralSettings extends AbstractSettings
 		'newusers_level' => '1',
 
 		'permalink_type' => 'urltitle',
-		'posts_per_page' => '5',
 		'regexp_filename' => '^[a-zA-Z0-9\-_.]+$', // TODO: accept spaces and special chars / do full testing on this
 		'regexp_dirname' => '^[a-zA-Z0-9\-_]+$', // TODO: accept spaces and special chars / do full testing on this
 		'reloadpage_timeout' => '300',
@@ -101,7 +100,6 @@ class GeneralSettings extends AbstractSettings
 		'upload_enabled' => '1',
 		'upload_maxkb' => '100',
 		'user_minpwdlen' => '5',
-		'what_to_show' => 'posts',
 
 		'webhelp_enabled' => '1',
 	);
@@ -158,6 +156,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.23  2006/12/04 18:16:50  fplanque
+ * Each blog can now have its own "number of page/days to display" settings
+ *
  * Revision 1.22  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

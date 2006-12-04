@@ -33,7 +33,7 @@ global $ItemList;
  */
 global $Item;
 
-global $dispatcher, $blog, $posts, $posts_per_page, $poststart, $postend, $c, $ReqURI;
+global $dispatcher, $blog, $posts, $poststart, $postend, $c, $ReqURI;
 global $add_item_url, $edit_item_url, $delete_item_url, $htsrv_url;
 global $comment_allowed_tags, $comments_use_autobr;
 
@@ -260,6 +260,9 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.24  2006/12/04 18:16:51  fplanque
+ * Each blog can now have its own "number of page/days to display" settings
+ *
  * Revision 1.23  2006/11/27 19:14:14  fplanque
  * i18n
  *
