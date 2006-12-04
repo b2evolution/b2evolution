@@ -484,7 +484,7 @@ class Item extends DataObject
 	 * Generate the permalink for the item.
 	 *
 	 * Note: Each item has an unique permalink at any given time. 
-	 * Some admin settings may howerver change the permalinks for previous items.
+	 * Some admin settings may however change the permalinks for previous items.
 	 * Note: This actually only returns the URL, to get a real link, use {@link Item::get_permanent_link()}
 	 *
 	 * @todo archives modes in clean URL mode
@@ -3322,6 +3322,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.130  2006/12/04 20:52:40  blueyed
+ * typo
+ *
  * Revision 1.129  2006/12/04 19:57:58  fplanque
  * How often must I fix the weekly archives until they stop bugging me?
  *
