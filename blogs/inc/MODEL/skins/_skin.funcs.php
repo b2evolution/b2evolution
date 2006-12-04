@@ -145,23 +145,11 @@ function skin_exists( $name, $filename = '_main.php' )
 
 
 /**
- * Outputs an <option> set with default skin selected
- *
- * skin_options(-)
- *
- */
-function skin_options( $default = '' )
-{
-	echo skin_options_return( $default );
-}
-
-
-/**
  * Returns an <option> set with default skin selected
  *
  * @return string
  */
-function skin_options_return( $default = '' )
+function get_skin_options( $default = '' )
 {
 	$r = '';
 
@@ -260,25 +248,11 @@ function skin_list_iteminfo( $what='', $display = true )
 }
 
 
-/**
- * @param boolean display (true) or return?
- */
-function skin_change_url( $display = true )
-{
-	$r = url_add_param( get_bloginfo('blogurl'), 'skin='.rawurlencode(skin_list_iteminfo('name',false)) );
-	if( $display )
-	{
-		echo $r;
-	}
-	else
-	{
-		return $r;
-	}
-}
-
-
 /*
  * $Log$
+ * Revision 1.13  2006/12/04 21:25:18  fplanque
+ * removed user skin switching
+ *
  * Revision 1.12  2006/11/13 17:00:02  fplanque
  * doc
  *
@@ -316,36 +290,5 @@ function skin_change_url( $display = true )
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.9  2005/12/12 19:21:23  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.8  2005/11/24 16:51:08  blueyed
- * minor
- *
- * Revision 1.7  2005/11/18 22:26:07  blueyed
- * skin_exists(): check for readable filename (_main.php by default), instead of is_dir()
- *
- * Revision 1.6  2005/09/06 17:13:55  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.5  2005/08/04 13:05:10  fplanque
- * bugfix
- *
- * Revision 1.4  2005/06/12 07:02:51  blueyed
- * Added skin_options_return()
- *
- * Revision 1.3  2005/02/28 09:06:33  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.2  2004/10/14 18:31:25  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.21  2004/10/12 18:48:34  fplanque
- * Edited code documentation.
- *
  */
 ?>

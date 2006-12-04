@@ -211,19 +211,6 @@ skin_content_header();	// Sets charset!
 	?>
 
 
-	<?php if( ! $Blog->get('force_skin') )
-	{	// Skin switching is allowed for this blog: ?>
-		<div class="bSideItem">
-			<h3><?php echo T_('Choose skin') ?></h3>
-			<ul>
-				<?php // ------------------------------- START OF SKIN LIST -------------------------------
-				for( skin_list_start(); skin_list_next(); ) { ?>
-					<li><a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name', 'htmlbody' ) ?></a></li>
-				<?php } // ------------------------------ END OF SKIN LIST ------------------------------ ?>
-			</ul>
-		</div>
-	<?php } ?>
-
 	<div class="bSideItem">
 		<h3><?php echo T_('Misc') ?></h3>
 		<ul>

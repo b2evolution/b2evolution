@@ -1502,6 +1502,14 @@ function upgrade_b2evo_tables()
 									   OR set_name = "what_to_show"
 									   OR set_name = "archive_mode"' );
 		echo "OK.<br />\n";
+
+		echo 'Upgrading blogs table... ';
+		$query = "ALTER TABLE T_blogs
+							DROP COLUMN blog_force_skin";
+		$DB->query( $query );
+
+		echo "OK.<br />\n";
+
 	}
 
 
@@ -1609,6 +1617,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.192  2006/12/04 21:25:18  fplanque
+ * removed user skin switching
+ *
  * Revision 1.191  2006/12/04 19:41:11  fplanque
  * Each blog can now have its own "archive mode" settings
  *

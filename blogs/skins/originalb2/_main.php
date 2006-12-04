@@ -198,17 +198,6 @@ skin_content_header();	// Sets charset!
 	// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 
 
-<?php if( ! $Blog->get('force_skin') )
-{	// Skin switching is allowed for this blog: ?>
-<h4>skins:</h4>
-<ul>
-	<?php // ---------------------------------- START OF SLIN LIST ----------------------------------
-	for( skin_list_start(); skin_list_next(); ) { ?>
-		<li><a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name' ) ?></a></li>
-	<?php } // --------------------------------- END OF SKIN LIST --------------------------------- ?>
-</ul>
-<?php } ?>
-
 <h4>other:</h4>
 <?php
 	// Administrative links:

@@ -49,8 +49,7 @@ $Form->begin_fieldset( T_('Content / Posts') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Skin and style') );
-	$Form->select( 'blog_default_skin', $edited_Blog->get( 'default_skin' ), 'skin_options_return', T_('Default skin') , T_('This is the default skin that will be used to display this blog.') );
-	$Form->checkbox( 'blog_force_skin', 1-$edited_Blog->get( 'force_skin' ), T_('Allow skin switching'), T_('Users will be able to select another skin to view the blog (and their preferred skin will be saved in a cookie).') );
+	$Form->select( 'blog_default_skin', $edited_Blog->get( 'default_skin' ), 'get_skin_options', T_('Default skin') , T_('This is the default skin that will be used to display this blog.') );
 	$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('A CSS file in the blog media directory will override the default skin stylesheet.') );
 	$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to override the blog and skin stylesheet with their own.') );
 $Form->end_fieldset();
@@ -72,6 +71,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.6  2006/12/04 21:25:18  fplanque
+ * removed user skin switching
+ *
  * Revision 1.5  2006/12/04 19:41:11  fplanque
  * Each blog can now have its own "archive mode" settings
  *

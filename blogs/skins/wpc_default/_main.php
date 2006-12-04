@@ -193,18 +193,6 @@ skin_content_header();	// Sets charset!
 		// -------------------------------- END OF CALENDAR ---------------------------------- ?>
 
 
-	<?php if( ! $Blog->get('force_skin') )
-	{	// We skin switching is allowed for this blog: ?>
-	<li><?php echo T_('Choose skin') ?>:
-		<ul>
-			<?php // ------------------------------- START OF SKIN LIST -------------------------------
-			for( skin_list_start(); skin_list_next(); ) { ?>
-				<li><a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name', 'htmlbody' ) ?></a></li>
-			<?php } // ------------------------------ END OF SKIN LIST ------------------------------ ?>
-		</ul>
-	</li>
-	<?php } ?>
-
 	<li id="other"><?php echo T_('Other'); ?>:
 	<ul>
 		<?php

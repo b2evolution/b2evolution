@@ -377,57 +377,29 @@ if( !isset($display_blog_list) )
  */
 
 // Check if a temporary skin has been requested (used for RSS syndication for example):
-if( !empty($tempskin) )
-{
-	// This will be handled like any other skin, except that it will not be stored in a cookie:
+if( !empty( $tempskin ) )
+{ // This will be handled like any other skin:
 	$skin = $tempskin;
-	$default_skin = '_rss'; // That's gonna be the fallback for now.
-	// TODO [post-phoenix]: fp> decide when or when not you are allowed to override a 'force_skin' directive,
-	//   and when or when not you are allowed to fall back to $default_skin.
-	// TODO: dh> there should be no $default_skin and with an invalid $tempskin there should be rather a page with a notice/debug_die()
-  //       Use case: a Plugin registers a skin param and gets disabled some day: there should be an error instead of a default
 }
 
 // Let's check if a skin has been forced in the stub file:
-// Note: URL skin requests are handled with param() 20 lines below
-// Note: with "register_globals = On" this may be set from URL.. (in which case the code 20 line sbelow becomes useless)
-//       blueyed>> You've said that it's not security issue etc.. but I still would init $skin in /conf/_advanced.php and use empty() here.
+// Note: with "register_globals = On" this may be set from URL..
+// dh> You've said that it's not security issue etc.. but I still would init $skin in /conf/_advanced.php and use empty() here. (fp> note: would break stubs with conf included at the end)
 if( !isset( $skin ) )
 { // No skin forced in stub (not even '' for no-skin)...
-	$Debuglog->add( 'No skin forced.', 'skin' );
-	// We're going to need a default skin:
-	if(  ( !isset( $default_skin ) )          // No default skin forced in stub
-		|| ( !skin_exists( $default_skin ) ) )  // Or the forced default does not exist
-	{ // Use default from the database
-		$default_skin = $Blog->get('default_skin');
-	}
-
-	if( !skin_exists( $default_skin ) || empty( $default_skin ) )
-	{ // blog's default skin does not exist
-		// Because a lot of bloggers will set themseleves a cookie and delete the default skin,
-		// we have to make this fool proof extra checking!
-		printf( T_('The default skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file. Contact the <a %s>webmaster</a>...'), $default_skin , $Blog->dget('shortname'), 'href="'.$admin_url.'?ctrl=collections&amp;action=edit&amp;blog='.$Blog->ID.'"', 'href="mailto:'.$admin_email.'"');
-		debug_die();
-	}
-	$Debuglog->add( '$default_skin = '.$default_skin, 'skin' );
-
-	if( $Blog->get('force_skin') )
-	{ // Blog params tell us to force the use of default skin
-		$skin = $default_skin;
-		$Debuglog->add( 'Forced skin: '.$skin, 'skin' );
-	}
-	else
-	{ // Get the saved skin in cookie or default:
-		param( $cookie_state, 'string', $default_skin, false, true ); // override (in case there has been "param($cookie_state)" before, which set it already to '')
-		$Debuglog->add( 'Skin after looking at cookie: '.$$cookie_state, 'skin' );
-		// Get skin by params or default to cookie
-		// (if cookie was not set, the $$cookie_state contains default skin!)
-		param( 'skin', 'string', $$cookie_state );
-		$Debuglog->add( 'Skin after looking at params: '.$skin, 'skin' );
-	}
+	// Use default from the database
+	$skin = $Blog->get('default_skin');
 }
 
+// Because a lot of bloggers will delete skins, we have to make this fool proof with extra checking:
+if( !empty( $skin ) && !skin_exists( $skin ) )
+{ // We want to use a skin, but it doesn't exist!
+	$err_msg = sprintf( T_('The requested skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file.'), 
+		htmlspecialchars($skin), $Blog->dget('shortname'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=display&amp;action=edit&amp;blog='.$Blog->ID.'"' );
+	debug_die( $err_msg );
+}
 
+	
 $Timer->pause( '_blog_main.inc');
 
 
@@ -509,6 +481,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.51  2006/12/04 21:25:18  fplanque
+ * removed user skin switching
+ *
  * Revision 1.50  2006/12/04 18:16:50  fplanque
  * Each blog can now have its own "number of page/days to display" settings
  *

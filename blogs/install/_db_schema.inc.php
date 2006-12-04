@@ -114,7 +114,6 @@ $schema_queries = array(
 			blog_allowblogcss TINYINT(1) NOT NULL default 1,
 			blog_allowusercss TINYINT(1) NOT NULL default 1,
 			blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'custom',
-			blog_force_skin TINYINT(1) NOT NULL default 0,
 			blog_disp_bloglist TINYINT(1) NOT NULL DEFAULT 1,
 			blog_in_bloglist TINYINT(1) NOT NULL DEFAULT 1,
 			blog_links_blog_ID INT(11) NULL DEFAULT NULL,
@@ -491,6 +490,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.41  2006/12/04 21:25:18  fplanque
+ * removed user skin switching
+ *
  * Revision 1.40  2006/11/30 22:34:16  fplanque
  * bleh
  *

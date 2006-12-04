@@ -94,7 +94,6 @@ class Blog extends DataObject
 	var $allowblogcss = 0;
 	var $allowusercss = 0;
 	var $default_skin;
-	var $force_skin = 0;
 	var $disp_bloglist = 1;
 	var $in_bloglist = 1;
 	var $UID;
@@ -168,7 +167,6 @@ class Blog extends DataObject
 			$this->allowblogcss = $db_row->blog_allowblogcss;
 			$this->allowusercss = $db_row->blog_allowusercss;
 			$this->default_skin = $db_row->blog_default_skin;
-			$this->force_skin = $db_row->blog_force_skin;
 			$this->disp_bloglist = $db_row->blog_disp_bloglist;
 			$this->in_bloglist = $db_row->blog_in_bloglist;
 			$this->media_location = $db_row->blog_media_location;
@@ -294,9 +292,9 @@ class Blog extends DataObject
 			$this->set_from_Request( 'links_blog_ID' );
 
 			// checkboxes (will not get send, if unchecked)
-			$this->set( 'force_skin',  1-param( 'blog_force_skin',    'integer', 0 ) );
 			$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
 			$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
+
 			$this->set( 'disp_bloglist', param( 'blog_disp_bloglist', 'integer', 0 ) );
 			$this->set( 'in_bloglist',   param( 'blog_in_bloglist',   'integer', 0 ) );
 		}
@@ -431,18 +429,8 @@ class Blog extends DataObject
 			case 'ID':
 			case 'allowtrackbacks':
 			case 'disp_bloglist':
-			case 'force_skin':
 				return parent::set_param( $parname, 'number', $parvalue );
 				break;
-
-			/* fplanque: I'm removing this because it's no good when using absolute URL
-			case 'access_type':
-				if( $parvalue == 'default' )
-				{
-					$Settings->set('default_blog_ID', $this->ID);
-					$Settings->dbupdate();
-				}
-			*/
 
 			case 'shortdesc':
 				$this->shortdesc = $parvalue;
@@ -1051,6 +1039,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2006/12/04 21:25:18  fplanque
+ * removed user skin switching
+ *
  * Revision 1.37  2006/12/04 19:41:11  fplanque
  * Each blog can now have its own "archive mode" settings
  *
