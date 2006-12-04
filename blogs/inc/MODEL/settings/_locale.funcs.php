@@ -1,7 +1,6 @@
 <?php
 /**
  * This file implements functions for handling locales and i18n.
- * This file implements functions for logging of hits and extracting stats.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -950,6 +949,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.36  2006/12/04 21:20:28  blueyed
+ * Abstracted convert_special_charsets() out of urltitle_validate()
+ *
  * Revision 1.35  2006/11/27 01:36:04  blueyed
  * doc typo
  *

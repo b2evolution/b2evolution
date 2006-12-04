@@ -53,7 +53,6 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 															$dbprefix = 'post_', $dbIDname = 'post_ID', $dbtable = 'T_posts' )
 {
 	global $DB;
-	global $evo_charset;
 
 	$urltitle = trim( $urltitle );
 
@@ -68,39 +67,9 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	// echo 'starting with: '.$urltitle.'<br />';
 
 	// Replace special chars/umlauts, if we can convert charsets:
-	// TODO: dh> outsource this into an own method, e.g. the autoblog_plugin uses something similar.
-	//           Ok, Francois? Does it belong into _encoding.funcs.php?
-	// fp> Ok. I think it should go with convert_charset(). It may make sense to spliut _locale.funcs though. in that case I'd call it _charsets.funcs.php  (because encoding is fuzzy, MP3 encoding? DivX? encrypted passwords?. I think charsets is pretty clear about what it is)
-	if( can_convert_charsets('UTF-8', $evo_charset) && can_convert_charsets('UTF-8', 'ISO-8859-1') /* source */ )
-	{
-		$urltitle = convert_charset( $urltitle, 'UTF-8', $evo_charset );
+	load_funcs('MODEL/settings/_charset.funcs.php');
+	$urltitle = replace_special_chars($urltitle);
 
-		// TODO: add more...?!
-		$search = array( 'Ä', 'ä', 'Ö', 'ö', 'Ü', 'ü', 'ß', 'à', 'ç', 'è', 'é', 'ì', 'ò', 'ô', 'ù' ); // iso-8859-1
-		$replace = array( 'Ae', 'ae', 'Oe', 'oe', 'Ue', 'ue', 'ss', 'a', 'c', 'e', 'e', 'i', 'o', 'o', 'u' );
-
-		foreach( $search as $k => $v )
-		{ // convert $search to UTF-8
-			$search[$k] = convert_charset( $v, 'UTF-8', 'ISO-8859-1' );
-		}
-		$urltitle = str_replace( $search, $replace, $urltitle );
-
-		// Replace HTML entities
-		$urltitle = htmlentities( $urltitle, ENT_NOQUOTES, 'UTF-8' );
-	}
-	else
-	{
-		// Replace HTML entities
-		$urltitle = htmlentities( $urltitle, ENT_NOQUOTES, $evo_charset );
-	}
-
-	// Keep only one char in entities!
-	$urltitle = preg_replace( '/&(.).+?;/', '$1', $urltitle );
-	// Replace non acceptable chars
-	$urltitle = preg_replace( '/[^A-Za-z0-9]+/', '-', $urltitle );
-	// Remove '-' at start and end:
-	$urltitle = preg_replace( '/^-+/', '', $urltitle );
-	$urltitle = preg_replace( '/-+$/', '', $urltitle );
 	// Make everything lowercase
 	$urltitle = strtolower( $urltitle );
 
@@ -676,6 +645,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.33  2006/12/04 21:20:27  blueyed
+ * Abstracted convert_special_charsets() out of urltitle_validate()
+ *
  * Revision 1.32  2006/12/03 22:23:26  fplanque
  * doc
  *
