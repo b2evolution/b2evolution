@@ -1487,7 +1487,7 @@ function upgrade_b2evo_tables()
 
 	}
 
-	
+
 	if( $old_db_version < 9407 )
 	{
 		echo 'Moving general settings to blog settings... ';
@@ -1533,7 +1533,7 @@ function upgrade_b2evo_tables()
 
 
 	// This has to be at the end because plugin install may fail if the DB schema is not current (matching Plugins class).
-	// dh> TODO: if this fails, it won't get repeated - fp> it what?? it *should* or it *should not* get repeated?
+	// NOTE: if this fails (e.g. fatal error in one of the plugins), it will not get repeated
 	install_basic_plugins( $old_db_version );
 
 
@@ -1617,6 +1617,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.193  2006/12/04 22:24:51  blueyed
+ * doc
+ *
  * Revision 1.192  2006/12/04 21:25:18  fplanque
  * removed user skin switching
  *
