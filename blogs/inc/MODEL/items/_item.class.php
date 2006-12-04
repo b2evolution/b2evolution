@@ -578,7 +578,7 @@ class Item extends DataObject
 				// Link to a weekly archive page:
 				if((!isset($cacheweekly)) || (empty($cacheweekly[$post_date])))
 				{
-					$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
+					$cacheweekly[$post_date] = $DB->get_var( 'SELECT '.$DB->week( $DB->quote($post_date), locale_startofweek() ) );
 				}
 				if( $Settings->get('links_extrapath') == 'disabled' )
 				{ // Use params:
@@ -586,7 +586,7 @@ class Item extends DataObject
 				}
 				else
 				{ // Use extra path info:
-					$permalink = url_add_tail( $blogurl, mysql2date("/Y/", $post_date).'w'.$cacheweekly[$post_date] ).'#'.$anchor;
+					$permalink = url_add_tail( $blogurl, mysql2date("/Y/", $post_date).'w'.$cacheweekly[$post_date] ).'/#'.$anchor;
 				}
 				break;
 
@@ -3322,6 +3322,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.129  2006/12/04 19:57:58  fplanque
+ * How often must I fix the weekly archives until they stop bugging me?
+ *
  * Revision 1.128  2006/12/04 19:41:11  fplanque
  * Each blog can now have its own "archive mode" settings
  *
