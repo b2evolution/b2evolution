@@ -61,7 +61,6 @@ class GeneralSettings extends AbstractSettings
 		'antispam_threshold_delete' => '100', // do not delete by default!
 		'antispam_block_spam_referers' => '1',
 
-		'archive_mode' => 'monthly',
 		'AutoBR' => '0',
 
 		'log_public_hits' => '1',
@@ -156,6 +155,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.24  2006/12/04 19:41:11  fplanque
+ * Each blog can now have its own "archive mode" settings
+ *
  * Revision 1.23  2006/12/04 18:16:50  fplanque
  * Each blog can now have its own "number of page/days to display" settings
  *

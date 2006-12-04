@@ -72,9 +72,6 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	param( 'default_blog_ID', 'integer', true );
 	$Settings->set( 'default_blog_ID', $default_blog_ID );
 
-	param( 'archive_mode', 'string', true );
-	$Settings->set( 'archive_mode', $archive_mode );
-
 	param( 'AutoBR', 'integer', 0 );
 	$Settings->set( 'AutoBR', $AutoBR );
 
@@ -122,6 +119,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/04 19:41:11  fplanque
+ * Each blog can now have its own "archive mode" settings
+ *
  * Revision 1.10  2006/12/04 18:16:50  fplanque
  * Each blog can now have its own "number of page/days to display" settings
  *

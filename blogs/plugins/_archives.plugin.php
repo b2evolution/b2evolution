@@ -42,105 +42,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once $GLOBALS['inc_path'].'_misc/_results.class.php';
 
 
-/**
- * Generate permalink
- *
- * TODO: archives modes in clean mode
- *
- * @deprecated deprecated by {@link Item::get_permanent_url()} but still used in this class
- */
-function get_permalink(
-	$file,                  // base URL of the blog
-	$id,                    // post ID to be linked to
-	$use_anchor_mode = '',  // Default to id
-	$use_destination = '',  // Default to config
-	$use_more = NULL,			  // DEPRECATED
-	$use_comments = NULL,   // DEPRECATED
-	$use_trackback = NULL,  // DEPRECATED
-	$use_pingback = NULL )  // DEPRECATED
-{
-	global $cacheweekly;
-	global $Settings;
-
-	// We're gonna need access to more postdata in several cases:
-	$postdata = get_postdata( $id );
-
-	// Defaults:
-	if (empty($use_anchor_mode)) $use_anchor_mode = 'id';
-	if (empty($use_destination))
-			$use_destination = ( strstr( $Settings->get('permalink_type'), 'archive' ) !== false )
-					? 'archive' : 'single';
-	if ($use_destination=='archive') $use_destination = $Settings->get('archive_mode');
-
-	// Generate anchor
-	switch(strtolower($use_anchor_mode))
-	{
-		case 'title':
-			$title = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $postdata['Title']);
-			$anchor = $title;
-			break;
-
-		case 'id':
-		default:
-			$anchor = $id;
-			break;
-	}
-
-	if( $Settings->get('links_extrapath') == 'disabled' )
-	{ // We reference by Query: Dirty but explicit permalinks
-
-		switch($use_destination)
-		{
-			case 'monthly':
-				$permalink = url_add_param( $file, 'm='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).'#'.$anchor );
-				break;
-			case 'weekly':
-				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']])))
-				{
-					$cacheweekly[$post_date] = $DB->get_var( 'SELECT '.$DB->week( $post_date, locale_startofweek() ) );
-				}
-				$permalink = url_add_param( $file, 'm='.substr($postdata['Date'],0,4).'&amp;w='.$cacheweekly[$postdata['Date']].'#'.$anchor );
-				break;
-			case 'daily':
-				$permalink = url_add_param( $file, 'm='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).substr($postdata['Date'],8,2).'#'.$anchor );
-				break;
-			case 'postbypost':
-			case 'single':
-			default:
-				$permalink = url_add_param( $file, 'p='.$id.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1' );
-				break;
-		}
-	}
-	else
-	{ // We reference by path (CLEAN permalinks!)
-		// fp>> TODO: handle all extra path modes
-		switch($use_destination)
-		{
-			case 'monthly':
-				$permalink = $file.mysql2date("/Y/m/", $postdata['Date']).'#'.$anchor;
-				break;
-			case 'weekly':
-				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']])))
-				{
-					$cacheweekly[$post_date] = $DB->get_var( 'SELECT '.$DB->week( $post_date, locale_startofweek() ) );
-				}
-				$permalink = $file.mysql2date("/Y/m/", $postdata['Date']).'w'.$cacheweekly[$postdata['Date']].'/#'.$anchor;
-				break;
-			case 'daily':
-				$permalink = $file.mysql2date("/Y/m/d/", $postdata['Date']).'#'.$anchor;
-				break;
-			case 'postbypost':
-			case 'single':
-			default:
-				// This is THE CLEANEST available: RECOMMENDED!
-				$permalink = $file.mysql2date("/Y/m/d/", $postdata['Date']).'p'.$id;
-				break;
-		}
-	}
-
-	return $permalink;
-}
-
 
 /**
  * Archives Plugin
@@ -202,8 +103,17 @@ class archives_plugin extends Plugin
 		/**
 		 * @todo get rid of these globals:
 		 */
-		global $blog, $Blog, $m;
-
+		global $blog, $m;
+		/**
+		 * @var Blog
+		 */
+		global $Blog;
+		
+		if( empty($Blog) )
+		{
+			return false;
+		}
+		
 		/**
 		 * Default params:
 		 */
@@ -217,7 +127,7 @@ class archives_plugin extends Plugin
 
 		// Archive mode:
 		if(!isset($params['mode']))
-			$params['mode'] = $Settings->get('archive_mode');
+			$params['mode'] = $Blog->get_setting('archive_mode');
 
 		// Link type:
 		if(!isset($params['link_type'])) $params['link_type'] = 'canonic';
@@ -338,8 +248,10 @@ class archives_plugin extends Plugin
 						echo regenerate_url( $params['context_isolation'], 'p='.$post_ID );
 					}
 					else
-					{	// We want to link to the absolute canonical URL for this archive:
-						echo get_permalink( $Blog->get('url'), $post_ID, 'id' );
+					{	// We want to link to the absolute (canonical) URL for this archive:
+						// fp> TODO: This is NOT canonical. To go to the canonical, we'd need a 'light' itemlist (which does not load too much data)
+						// fp> Note: there may be a "redirect to canonical" anyway. Not optimal, but at least this is less broken than it was before.
+						echo url_add_param( $Blog->get('url'), 'p='.$post_ID.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1' );
 					}
 					echo '">';
 					if ($post_title)
@@ -647,6 +559,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.34  2006/12/04 19:41:11  fplanque
+ * Each blog can now have its own "archive mode" settings
+ *
  * Revision 1.33  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

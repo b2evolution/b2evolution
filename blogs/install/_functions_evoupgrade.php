@@ -588,9 +588,9 @@ function upgrade_b2evo_tables()
 
 		#echo 'oldrow:<br />'; pre_dump($row);
 		$transform = array(
-			'posts_per_page' => array(5),     // note: moved to blogsettings in 2.0
-			'what_to_show' => array('posts'), // note: moved to blogsettings in 2.0
-			'archive_mode' => array('monthly'),
+			'posts_per_page' => array(5),      // note: moved to blogsettings in 2.0
+			'what_to_show' => array('posts'),  // note: moved to blogsettings in 2.0
+			'archive_mode' => array('monthly'),// note: moved to blogsettings in 2.0
 			'time_difference' => array(0),
 			'AutoBR' => array(0),
 			'last_antispam_update' => array('2000-01-01 00:00:00', 'antispam_last_update'),
@@ -1495,10 +1495,12 @@ function upgrade_b2evo_tables()
 		             SELECT blog_ID, set_name, set_value
 									 FROM T_blogs, T_settings
 									WHERE set_name = "posts_per_page"
-									   OR set_name = "what_to_show"' );
+									   OR set_name = "what_to_show"
+									   OR set_name = "archive_mode"' );
 		$DB->query( 'DELETE FROM T_settings
 									WHERE set_name = "posts_per_page"
-									   OR set_name = "what_to_show"' );
+									   OR set_name = "what_to_show"
+									   OR set_name = "archive_mode"' );
 		echo "OK.<br />\n";
 	}
 
@@ -1607,6 +1609,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.191  2006/12/04 19:41:11  fplanque
+ * Each blog can now have its own "archive mode" settings
+ *
  * Revision 1.190  2006/12/04 18:16:51  fplanque
  * Each blog can now have its own "number of page/days to display" settings
  *

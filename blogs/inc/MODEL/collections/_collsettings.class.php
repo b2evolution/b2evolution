@@ -53,6 +53,7 @@ class CollectionSettings extends AbstractSettings
 			'ping_plugins' => 'ping_pingomatic,ping_b2evonet', // ping plugin codes, separated by comma
 			'what_to_show' => 'posts',         // posts, days
 			'posts_per_page' => '5',
+			'archive_mode' => 'monthly',				// monthly, weekly, daily, postbypost
 		);
 
 
@@ -68,6 +69,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/04 19:41:11  fplanque
+ * Each blog can now have its own "archive mode" settings
+ *
  * Revision 1.7  2006/12/04 18:16:50  fplanque
  * Each blog can now have its own "number of page/days to display" settings
  *

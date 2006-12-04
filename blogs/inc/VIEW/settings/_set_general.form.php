@@ -72,13 +72,6 @@ $BlogCache = & get_Cache( 'BlogCache' );
 $Form->select_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default blog to display'),
 											T_('This blog will be displayed on index.php .'), true );
 
-$Form->radio( 'archive_mode', $Settings->get('archive_mode'),
-							array(  array( 'monthly', T_('monthly') ),
-											array( 'weekly', T_('weekly') ),
-											array( 'daily', T_('daily') ),
-											array( 'postbypost', T_('post by post') )
-										), T_('Archive mode') );
-
 $Form->checkbox( 'AutoBR', $Settings->get('AutoBR'), T_('Email/MMS Auto-BR'), T_('Add &lt;BR /&gt; tags to mail/MMS posts.') );
 
 $Form->end_fieldset();
@@ -135,6 +128,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.21  2006/12/04 19:41:11  fplanque
+ * Each blog can now have its own "archive mode" settings
+ *
  * Revision 1.20  2006/12/04 18:16:51  fplanque
  * Each blog can now have its own "number of page/days to display" settings
  *

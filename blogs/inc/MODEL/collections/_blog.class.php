@@ -281,8 +281,11 @@ class Blog extends DataObject
 		if( param( 'what_to_show',   'string', NULL ) !== NULL )
 		{ // Show x days or x posts?:
 			$this->set_setting( 'what_to_show', get_param( 'what_to_show' ) );
+
 			param_integer_range( 'posts_per_page', 1, 9999, T_('Items/days per page must be between %d and %d.') );
 			$this->set_setting( 'posts_per_page', get_param( 'posts_per_page' ) );
+			
+			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
 		}
 
 
@@ -1048,6 +1051,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.37  2006/12/04 19:41:11  fplanque
+ * Each blog can now have its own "archive mode" settings
+ *
  * Revision 1.36  2006/12/04 18:16:50  fplanque
  * Each blog can now have its own "number of page/days to display" settings
  *

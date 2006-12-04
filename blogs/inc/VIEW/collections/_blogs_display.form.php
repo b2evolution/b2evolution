@@ -39,6 +39,13 @@ $Form->begin_fieldset( T_('Content / Posts') );
 												array( 'posts', T_('posts') ),
 											), T_('Display unit') );
 	$Form->text( 'posts_per_page', $edited_Blog->get_setting('posts_per_page'), 4, T_('Posts/Days per page'), '', 4 );
+	$Form->radio( 'archive_mode',  $edited_Blog->get_setting('archive_mode'),
+							array(  array( 'monthly', T_('monthly') ),
+											array( 'weekly', T_('weekly') ),
+											array( 'daily', T_('daily') ),
+											array( 'postbypost', T_('post by post') )
+										), T_('Archive mode') );
+
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Skin and style') );
@@ -65,6 +72,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.5  2006/12/04 19:41:11  fplanque
+ * Each blog can now have its own "archive mode" settings
+ *
  * Revision 1.4  2006/12/04 18:16:50  fplanque
  * Each blog can now have its own "number of page/days to display" settings
  *

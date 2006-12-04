@@ -483,10 +483,11 @@ class Item extends DataObject
 	/**
 	 * Generate the permalink for the item.
 	 *
-	 * Note: Each item has an unique permalink at any given time. Some admin settings may howerver change the permalinks for previous items.
+	 * Note: Each item has an unique permalink at any given time. 
+	 * Some admin settings may howerver change the permalinks for previous items.
 	 * Note: This actually only returns the URL, to get a real link, use {@link Item::get_permanent_link()}
 	 *
-	 * @todo archives modes in clean mode
+	 * @todo archives modes in clean URL mode
 	 *
 	 * @param string 'urltitle', 'pid', 'archive#id', 'archive#title' or '' to use default setting
 	 * @param string url to use
@@ -520,7 +521,8 @@ class Item extends DataObject
 			case 'archive#id':
 				// Link to an archive page:
 				// Determine type of archive page:
-				$dest_type = $Settings->get('archive_mode');
+				$this->get_Blog();
+				$dest_type = $this->Blog->get_setting('archive_mode');
 				$anchor = $this->ID;
 				$urltail = 'p'.$this->ID;
 				break;
@@ -528,7 +530,8 @@ class Item extends DataObject
 			case 'archive#title':
 				// Link to an archive page:
 				// Determine type of archive page:
-				$dest_type = $Settings->get('archive_mode');
+				$this->get_Blog();
+				$dest_type = $this->Blog->get_setting('archive_mode');
 				$anchor = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $this->title );
 				$urltail = 'p'.$this->ID;
 				break;
@@ -3319,6 +3322,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.128  2006/12/04 19:41:11  fplanque
+ * Each blog can now have its own "archive mode" settings
+ *
  * Revision 1.127  2006/12/03 18:15:32  fplanque
  * doc
  *
