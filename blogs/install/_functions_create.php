@@ -1014,7 +1014,6 @@ function create_b2evo_relations()
  */
 function install_basic_plugins( $old_db_version = 0 )
 {
-	echo 'Installing default plugins... ';
 	load_class('_misc/_plugins_admin.class.php');
 
 	$Plugins_admin = & new Plugins_admin();
@@ -1047,6 +1046,9 @@ function install_basic_plugins( $old_db_version = 0 )
 
 /*
  * $Log$
+ * Revision 1.204  2006/12/04 22:25:20  blueyed
+ * Do not output "Installing default plugins... " always
+ *
  * Revision 1.203  2006/11/30 06:04:12  blueyed
  * Moved Plugins::install() and sort() galore to Plugins_admin
  *
