@@ -406,7 +406,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	$pass = strip_tags(get_magic_quotes_gpc() ? stripslashes($pass) : $pass);
 	$pass_md5 = md5( $pass );
 
-//***
+// ***
 	// Password hashing by JavaScript:
 	$need_raw_pwd = (bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 	$pwd_salt_sess = $Session->get('core.pwd_salt');
@@ -469,7 +469,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			}
 		}
 	}
-//***
+// ***
 
 	if( $pass_ok )
 	{ // Login succeeded, set cookies
@@ -648,6 +648,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.64  2006/12/04 20:50:47  blueyed
+ * Use "// ***" instead of "//***" for marking, because of my BC2 filter(s)
+ *
  * Revision 1.63  2006/12/04 00:18:52  fplanque
  * keeping the login hashing
  *
