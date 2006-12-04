@@ -302,7 +302,7 @@ class Plugins
 	 * This handles the indexes, dynamically unregisters a Plugin that does not exist (anymore)
 	 * and instantiates the Plugin's (User)Settings.
 	 *
-	 * @access private
+	 * @access protected
 	 * @param string name of plugin class to instantiate and register
 	 * @param int ID in database (0 if not installed)
 	 * @param int Priority in database (-1 to keep default)
@@ -552,6 +552,8 @@ class Plugins
 		}
 		else
 		{ // This gets called for non-installed Plugins:
+			// Instantiate the Plugins (User)Settings members:
+			$this->init_settings( $Plugin );
 
 			$tmp_params = array( 'db_row' => array(), 'is_installed' => false );
 			if( $Plugin->PluginInit( $tmp_params ) === false && ! $this->is_admin_class )
@@ -572,6 +574,7 @@ class Plugins
 	 * Un-register a plugin.
 	 *
 	 * This does not un-install it from DB, just from the internal indexes.
+	 * @param Plugin
 	 */
 	function unregister( & $Plugin )
 	{
@@ -618,6 +621,7 @@ class Plugins
 	 * This gets used when {@link unregister() unregistering} a Plugin or if
 	 * {@link Plugin::PluginInit()} returned false, which means
 	 * "do not use it for subsequent events in the request".
+	 * @param integer Plugin ID
 	 */
 	function forget_events( $plugin_ID )
 	{
@@ -1773,6 +1777,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.123  2006/12/04 22:27:19  blueyed
+ * Also call init_settings() on not installed Plugins, because it allows using $Settings/$UserSettings in Plugin::PluginInit()
+ *
  * Revision 1.122  2006/12/01 20:51:27  blueyed
  * doc
  *
