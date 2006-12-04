@@ -184,7 +184,7 @@ $Form->end_form();
 				var oInput = this;
 
 				// Disable all submit elements:
-				oInput.value = '<?php echo T_('Please wait...') ?>';
+				oInput.value = '<?php echo TS_('Please wait...') ?>';
 				$("#evo_login_form :submit").attr("disabled", true);
 
 				// get the Password hash by AJAX:
@@ -260,6 +260,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.28  2006/12/04 20:51:39  blueyed
+ * Use TS_() for JS strings
+ *
  * Revision 1.27  2006/12/04 00:18:52  fplanque
  * keeping the login hashing
  *
