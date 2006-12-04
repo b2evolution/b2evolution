@@ -151,13 +151,6 @@ a.BlogButtonCurr:hover {
 	font: 109% Arial, Helvetica, sans-serif;
 
 }
-div.stats{
-	float: right;
-	padding-right: 1px;
-	padding-top: 1px;
-	padding-bottom: 1px;
-	padding-left: 0px;
-}
 
 /* Styles for main area (left) */
 h2 {
@@ -221,25 +214,6 @@ select.bComment  /* Used by the profile form */
 	margin: 0ex;
 }
 
-
-/* Styles for stats */
-div.statbloc
-{
-	float: left;
-	width: 44%;
-	margin: 0 0 2ex 1.5ex;
-	border: 1px solid #78a;
-}
-div.statbloc h3
-{
-	margin-top: 0px;
-	margin-left: 0px;
-	margin-right: 0px;
-	color: #FFFFFF;
-	text-align: center;
-	background: #78a;
-	padding: 1ex;
-}
 
 input.submit,
 input.preview,
