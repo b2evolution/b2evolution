@@ -79,11 +79,8 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
- * Revision 1.14  2006/12/03 18:26:27  fplanque
- * doc
- *
- * Revision 1.13  2006/12/03 02:10:39  blueyed
- * doc
+ * Revision 1.15  2006/12/04 00:18:52  fplanque
+ * keeping the login hashing
  *
  * Revision 1.12  2006/12/03 01:58:27  blueyed
  * Renamed $admin_path_seprator to $admin_path_separator and AdminUI_general::pathSeperator to AdminUI::pathSeparator

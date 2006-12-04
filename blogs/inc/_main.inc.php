@@ -406,14 +406,33 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	$pass = strip_tags(get_magic_quotes_gpc() ? stripslashes($pass) : $pass);
 	$pass_md5 = md5( $pass );
 
+//***
+	// Password hashing by JavaScript:
+	$need_raw_pwd = (bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
+	$pwd_salt_sess = $Session->get('core.pwd_salt');
+
+	if( $need_raw_pwd )
+	{ // at least one plugin requests the password un-hashed:
+		$pwd_hashed = '';
+	}
+	else
+	{
+		param('pwd_hashed', 'string', '');
+	}
+
 	// Trigger Plugin event, which could create the user, according to another database:
 	if( $Plugins->trigger_event( 'LoginAttempt', array(
 			'login' => $login,
 			'pass' => $pass,
-			'pass_md5' => $pass_md5 ) ) )
+			'pass_md5' => $pass_md5,
+			'pass_salt' => $pwd_salt_sess,
+			'pass_hashed' => $pwd_hashed ) ) )
 	{ // clear the UserCache, if one plugin has been called - it may have changed user(s)
 		$UserCache->clear();
 	}
+
+	$Debuglog->add( 'pwd_hashed: '.var_export($pwd_hashed, true)
+		.', pass: '.var_export($pass, true) );
 
 	$pass_ok = false;
 	if( $Messages->count('login_error') )
@@ -425,10 +444,32 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		$User = & $UserCache->get_by_login($login);
 		if( $User )
 		{
-			$pass_ok = ( $User->pass == $pass_md5 );
-			$Debuglog->add( 'Compared raw passwords. Result: '.(int)$pass_ok, 'login' );
+			if( ! empty($pwd_hashed) )
+			{ // password hashed by JavaScript:
+
+				$Debuglog->add( 'Hashed password available.', 'login' );
+
+				if( empty($pwd_salt_sess) )
+				{ // no salt stored in session: either cookie problem or the user had already tried logging in (from another window for example)
+					$Debuglog->add( 'Empty salt_sess.', 'login' );
+
+					$Messages->add( T_('Either you have not enabled cookies or this login window has expired.'), 'login_error' );
+					$Debuglog->add( 'Session ID does not match.', 'login' );
+				}
+				else
+				{ // compare the password, using the salt stored in the Session:
+					$pass_ok = sha1($User->pass.$pwd_salt_sess) == $pwd_hashed;
+					$Debuglog->add( 'Compared hashed passwords. Result: '.(int)$pass_ok, 'login' );
+				}
+			}
+			else
+			{
+				$pass_ok = ( $User->pass == $pass_md5 );
+				$Debuglog->add( 'Compared raw passwords. Result: '.(int)$pass_ok, 'login' );
+			}
 		}
 	}
+//***
 
 	if( $pass_ok )
 	{ // Login succeeded, set cookies
@@ -607,8 +648,8 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
- * Revision 1.62  2006/12/04 00:08:43  blueyed
- * Removed JavaScript-password-hashing feature
+ * Revision 1.63  2006/12/04 00:18:52  fplanque
+ * keeping the login hashing
  *
  * Revision 1.61  2006/12/03 22:38:34  fplanque
  * doc

@@ -167,6 +167,7 @@ class Plugins_admin extends Plugins
 				'AfterTrackbackInsert' => 'Gets called after a trackback has been recorded.',
 
 				'LoginAttempt' => 'Called when a user tries to login.',
+				'LoginAttemptNeedsRawPassword' => 'A plugin has to return true here, if it needs a raw (un-hashed) password in LoginAttempt.',
 				'AlternateAuthentication' => '',
 				'MessageFormSent' => 'Called when the "Message to user" form has been submitted.',
 				'MessageFormSentCleanup' => 'Called after a email message has been sent through public form.',
@@ -1328,11 +1329,8 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
- * Revision 1.16  2006/12/04 00:08:43  blueyed
- * Removed JavaScript-password-hashing feature
- *
- * Revision 1.15  2006/12/03 16:22:15  fplanque
- * doc
+ * Revision 1.17  2006/12/04 00:18:53  fplanque
+ * keeping the login hashing
  *
  * Revision 1.14  2006/12/01 20:46:25  blueyed
  * Moved Plugins::set_priority() to Plugins_admin class
