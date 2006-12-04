@@ -52,6 +52,7 @@ while( $loop_Plugin = & $admin_Plugins->get_next() )
 {
 	if( $loop_Plugin->status == 'broken' && ! isset( $admin_Plugins->plugin_errors[$loop_Plugin->ID] ) )
 	{ // The plugin is not "broken" anymore (either the problem got fixed or it was "broken" from a canceled "install_db_schema" action)
+		// TODO: set this to the previous status (dh)
 		$Plugins->set_Plugin_status( $loop_Plugin, 'disabled' );
 	}
 }
@@ -191,7 +192,7 @@ switch( $action )
 			break;
 		}
 
-		// we call $Plugins(!) here: the Plugin gets disabled on the current page already and it should not get (un)registered on $Plugins_admin!
+		// we call $Plugins(!) here: the Plugin gets disabled on the current page already and it should not get (un)registered on $admin_Plugins!
 		$Plugins->set_Plugin_status( $edit_Plugin, 'disabled' ); // sets $edit_Plugin->status
 
 		$Messages->add( /* TRANS: plugin name, class name and ID */ sprintf( T_('Disabled "%s" plugin (%s, #%d).'), $edit_Plugin->name, $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
@@ -248,7 +249,7 @@ switch( $action )
 			// Detect new events:
 			$admin_Plugins->save_events( $edit_Plugin, array() );
 
-			// we call $Plugins(!) here: the Plugin gets active on the current page already and it should not get (un)registered on $Plugins_admin!
+			// we call $Plugins(!) here: the Plugin gets active on the current page already and it should not get (un)registered on $admin_Plugins!
 			$Plugins->set_Plugin_status( $edit_Plugin, 'enabled' ); // sets $edit_Plugin->status
 
 			$Messages->add( /* TRANS: plugin name, class name and ID */ sprintf( T_('Enabled "%s" plugin (%s, #%d).'), $edit_Plugin->name, $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
@@ -284,7 +285,7 @@ switch( $action )
 			// Detect plugins with no code and try to have at least one plugin with the default code:
 			if( empty($loop_Plugin->code) )
 			{ // Instantiated Plugin has no code
-				$default_Plugin = & new $loop_Plugin->classname;
+				$default_Plugin = & $admin_Plugins->register($loop_Plugin->classname);
 
 				if( ! empty($default_Plugin->code) // Plugin has default code
 				    && ! $admin_Plugins->get_by_code( $default_Plugin->code ) ) // Default code is not in use (anymore)
@@ -294,6 +295,8 @@ switch( $action )
 						$changed = true;
 					}
 				}
+
+				$admin_Plugins->unregister($default_Plugin);
 			}
 		}
 
@@ -487,8 +490,7 @@ switch( $action )
 		param( 'edited_plugin_displayed_events', 'array', array() );
 		param( 'edited_plugin_events', 'array', array() );
 
-		$default_Plugin = & new $edit_Plugin->classname; // instantiate it to access default member values
-		$default_Plugin->PluginInit( $tmp_params = array('is_installed'=>false) );
+		$default_Plugin = & $admin_Plugins->register($edit_Plugin->classname);
 
 		// Update plugin name and shortdesc:
 		// (Only if changed to preserve initial localization feature and therefor also priorize NULL)
@@ -655,8 +657,7 @@ switch( $action )
 			break;
 		}
 
-		$default_Plugin = & new $edit_Plugin->classname; // instantiate it to access default member values
-		$default_Plugin->PluginInit( $tmp_params = array('is_installed'=>false) );
+		$default_Plugin = & $admin_Plugins->register($edit_Plugin->classname);
 
 		// Params for/"from" form:
 		$edited_plugin_name = $default_Plugin->name;
@@ -1028,6 +1029,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.71  2006/12/04 22:34:30  blueyed
+ * Use Plugins_admin::register() to instantiate $default_Plugin
+ *
  * Revision 1.70  2006/12/01 20:41:37  blueyed
  * Moved Plugins::uninstall() to Plugins_admin class
  *
