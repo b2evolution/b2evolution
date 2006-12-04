@@ -275,14 +275,14 @@ class Blog extends DataObject
 			$this->set_from_Request( 'default_skin' );
 		}
 
-		
+
 		if( param( 'what_to_show',   'string', NULL ) !== NULL )
 		{ // Show x days or x posts?:
 			$this->set_setting( 'what_to_show', get_param( 'what_to_show' ) );
 
 			param_integer_range( 'posts_per_page', 1, 9999, T_('Items/days per page must be between %d and %d.') );
 			$this->set_setting( 'posts_per_page', get_param( 'posts_per_page' ) );
-			
+
 			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
 		}
 
@@ -333,10 +333,10 @@ class Blog extends DataObject
 
 		if( param( 'blog_media_location',  'string', NULL ) !== NULL )
 		{	// Media files location:
-			$this->set_from_Request( 'media_location' );
-			$this->setMediaSubDir(    param( 'blog_media_subdir',    'string', '' ) );
-			$this->setMediaFullPath(  param( 'blog_media_fullpath',  'string', '' ) );
-			$this->setMediaUrl(       param( 'blog_media_url',       'string', '' ) );
+			$this->set_from_Request(   'media_location' );
+			$this->set_media_subdir(    param( 'blog_media_subdir',    'string', '' ) );
+			$this->set_media_fullpath(  param( 'blog_media_fullpath',  'string', '' ) );
+			$this->set_media_url(       param( 'blog_media_url',       'string', '' ) );
 
 			// check params
 			switch( $this->get( 'media_location' ) )
@@ -386,7 +386,7 @@ class Blog extends DataObject
 	 *
 	 * @param string the subdirectory
 	 */
-	function setMediaSubDir( $path )
+	function set_media_subdir( $path )
 	{
 		parent::set_param( 'media_subdir', 'string', trailing_slash( $path ) );
 	}
@@ -397,7 +397,7 @@ class Blog extends DataObject
 	 *
 	 * @param string the full path
 	 */
-	function setMediaFullPath( $path )
+	function set_media_fullpath( $path )
 	{
 		parent::set_param( 'media_fullpath', 'string', trailing_slash( $path ) );
 	}
@@ -408,7 +408,7 @@ class Blog extends DataObject
 	 *
 	 * @param string the full URL
 	 */
-	function setMediaUrl( $url )
+	function set_media_url( $url )
 	{
 		parent::set_param( 'media_url', 'string', trailing_slash( $url ) );
 	}
@@ -1039,6 +1039,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.39  2006/12/04 23:49:49  blueyed
+ * Normalized: setMediaUrl() => set_media_url(); setMediaFullPath() => set_media_fullpath(); setMediaSubDir() => set_media_subdir()
+ *
  * Revision 1.38  2006/12/04 21:25:18  fplanque
  * removed user skin switching
  *
