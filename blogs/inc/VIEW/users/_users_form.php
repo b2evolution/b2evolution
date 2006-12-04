@@ -259,9 +259,10 @@ if( $action != 'view_user' )
 	$Form->buttons( array(
 		array( '', 'actionArray[userupdate]', T_('Save !'), 'SaveButton' ),
 		array( 'reset', '', T_('Reset'), 'ResetButton' ),
-		// fp> TODO: Non-Javascript-confirm before trashing all settings with a misplaced click.
+		// dh> TODO: Non-Javascript-confirm before trashing all settings with a misplaced click.
+		// fp> TODO: go back to display of user form after a reset (so you can see what the reset has done)
 		array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'ResetButton',
-			'onclick' => "return confirm('".TS_('This will reset your user settings.').'\n'.TS_('Are you sure?')."');" ),
+			'onclick' => "return confirm('".TS_('This will reset all your user settings.').'\n'.TS_('This cannot be undone.').'\n'.TS_('Are you sure?')."');" ),
 	) );
 }
 
@@ -289,6 +290,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.32  2006/12/04 00:08:56  fplanque
+ * minor
+ *
  * Revision 1.31  2006/12/03 19:09:49  blueyed
  * Javascript confirm() for resetting user settings
  *
