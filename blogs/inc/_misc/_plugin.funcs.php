@@ -615,23 +615,32 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 		}
 
 		$l_param_default = '';
-		if( isset($l_meta['type']) && $l_meta['type'] == 'array' )
-		{ // this settings has a type
-			$l_param_type = $l_meta['type'];
-		}
-		elseif( isset($l_meta['type']) && $l_meta['type'] == 'checkbox' )
+		if( isset($l_meta['type']) )
 		{
-			$l_param_type = 'integer';
-			$l_param_default = 0;
-		}
-		elseif( isset( $l_meta[ 'type' ] ) && ( $l_meta[ 'type' ] == 'html_input' ||  $l_meta[ 'type' ] == 'html_textarea' ) )
-		{
-			$l_param_type = 'html';
+			switch( $l_meta['type'] )
+			{
+				case 'array':
+					// this settings has a type
+					$l_param_type = $l_meta['type'];
+					break;
+
+				case 'checkbox':
+					$l_param_type = 'integer';
+					$l_param_default = 0;
+					break;
+
+				case 'html_input':
+				case 'html_textarea':
+					$l_param_type = 'html';
+					break;
+			}
 		}
 		else
 		{
 			$l_param_type = 'string';
 		}
+
+		// Get the value:
 		$l_value = param( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $l_param_type, $l_param_default );
 
 		if( isset($l_meta['type']) && $l_meta['type'] == 'array' )
@@ -855,6 +864,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.34  2006/12/04 21:39:49  blueyed
+ * Minor refactoring
+ *
  * Revision 1.33  2006/12/01 16:47:26  blueyed
  * - Use EVO_NEXT_VERSION, which should get replaced with the next version 1.10 or 2.0 or whatever
  * - "action" param for PluginSettingsValidateSet
