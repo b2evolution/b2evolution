@@ -601,8 +601,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 	global $Messages;
 
 	$method = 'GetDefault'.$set_type;
+	$tmp_params = array('for_editing' => true);
 
-	foreach( $Plugin->$method() as $l_name => $l_meta )
+	foreach( $Plugin->$method($tmp_params) as $l_name => $l_meta )
 	{
 		if( isset($l_meta['layout']) )
 		{ // a layout "setting"
@@ -709,19 +710,19 @@ function validate_plugin_settings_from_param( $param_name, $value, $meta )
 				}
 			}
 		}
-			foreach( $meta['entries'] as $mk => $mv )
+		foreach( $meta['entries'] as $mk => $mv )
+		{
+			foreach( $value as $vk => $vv )
 			{
-				foreach( $value as $vk => $vv )
-				{
-					if( ! isset($vv[$mk]) )
-						continue;
+				if( ! isset($vv[$mk]) )
+					continue;
 
-					if( ! validate_plugin_settings_from_param($param_name.'['.$vk.']['.$mk.']', $vv[$mk], $mv) )
-					{
-						$r = false;
-					}
+				if( ! validate_plugin_settings_from_param($param_name.'['.$vk.']['.$mk.']', $vv[$mk], $mv) )
+				{
+					$r = false;
 				}
 			}
+		}
 		return $r;
 	}
 
@@ -864,6 +865,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.35  2006/12/04 22:26:06  blueyed
+ * Fixed calling GetDefault(User)Settings with $params in set_Settings_for_Plugin_from_Request()
+ *
  * Revision 1.34  2006/12/04 21:39:49  blueyed
  * Minor refactoring
  *
