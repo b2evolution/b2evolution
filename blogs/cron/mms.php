@@ -10,7 +10,7 @@
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  *
  * @todo dh> Make a plugin out of it
- * @todo This makes no sense in /cron/! (it belongs into /htsrv!)
+ * @todo This makes no sense in /cron/! (it belongs into /htsrv!) fp> true
  *
  * @copyright (c)2004 by Hans Reinders - {@link http://hansreinders.com}
  *
@@ -739,6 +739,9 @@ exit;
 
 /*
  * $Log$
+ * Revision 1.7  2006/12/04 00:10:43  fplanque
+ * doc
+ *
  * Revision 1.6  2006/12/03 18:22:58  blueyed
  * Nuked deprecated fileupload globals
  *
