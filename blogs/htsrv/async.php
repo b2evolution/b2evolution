@@ -40,27 +40,6 @@ require_once dirname(__FILE__).'/../conf/_config.php';
  */
 require_once $inc_path.'_main.inc.php';
 
-param( 'action', 'string', '' );
-
-// Actions for _any_ users (including anonymous):
-switch( $action )
-{
-// fp>SUSPECT:
-	case 'get_login_salt':
-		// Generate a random "salt", which gets used for encrypting the password on the client side:
-		// (used by JS-password encryption/hashing (/inc/VIEW/login/_login_form.php))
-		// The salt gets requested "on submit".
-		$pwd_salt = generate_random_key(64);
-
-		// set the salt into user's session (and refresh the 60 seconds time window):
-		$Session->set( 'core.pwd_salt', $pwd_salt, 60 );
-		$Session->dbsave();
-
-		echo $pwd_salt;
-		exit;
-// SUSPECT<fp
-}
-
 
 // Check global permission:
 if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
@@ -134,6 +113,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.17  2006/12/04 00:08:43  blueyed
+ * Removed JavaScript-password-hashing feature
+ *
  * Revision 1.16  2006/12/03 23:48:13  blueyed
  * doc
  *
