@@ -691,12 +691,15 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 /**
  * Validates settings according to their meta info recursively.
  *
+ * @todo Init "checkbox" values in "array" type settings (they do not get send) (dh)
  * @param string Param name
  * @param array Meta info
  * @return boolean
  */
 function validate_plugin_settings_from_param( $param_name, $value, $meta )
 {
+	global $Messages;
+
 	if( is_array($value) && isset($meta['entries']) )
 	{
 		$r = true;
@@ -710,6 +713,22 @@ function validate_plugin_settings_from_param( $param_name, $value, $meta )
 				}
 			}
 		}
+
+		// Check max_count/min_count
+		// dh> TODO: find a way to link it to the form's fieldset (and add an "error" class to it)
+		if( isset($meta['max_count']) && count($value) > $meta['max_count'] )
+		{
+			$r = false;
+			$label = isset($meta['label']) ? $meta['label'] : $param_name;
+			$Messages->add( sprintf( T_('Too many entries in the "%s" set. It must have %d at most.'), $label, $meta['max_count'] ), 'error' );
+		}
+		elseif( isset($meta['min_count']) && count($value) < $meta['min_count'] )
+		{
+			$r = false;
+			$label = isset($meta['label']) ? $meta['label'] : $param_name;
+			$Messages->add( sprintf( T_('Too few entries in the "%s" set. It must have %d at least.'), $label, $meta['min_count'] ), 'error' );
+		}
+
 		foreach( $meta['entries'] as $mk => $mv )
 		{
 			foreach( $value as $vk => $vv )
@@ -746,9 +765,60 @@ function validate_plugin_settings_from_param( $param_name, $value, $meta )
 					return false;
 				}
 				break;
+
+			case 'select':
+				if( ! in_array( $value, array_keys($meta['options']) ) )
+				{
+					param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $value ) );
+					return false;
+				}
+				break;
+
+			case 'select_blog':
+			case 'select_group':
+			case 'select_user':
+				if( ! strlen($value) )
+				{
+					if( empty($meta['allow_none']) )
+					{ // empty is not ok
+						param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $value ) );
+						return false;
+					}
+				}
+				else
+				{ // Try retrieving the value from the corresponding Cache:
+					switch( $meta['type'] )
+					{
+						case 'select_blog':
+							$Cache = & get_Cache( 'BlogCache' );
+							break;
+
+						case 'select_group':
+							$Cache = & get_Cache( 'GroupCache' );
+							break;
+
+						case 'select_user':
+							$Cache = & get_Cache( 'UserCache' );
+							break;
+					}
+					if( ! $Cache->get_by_ID($value, false, false) )
+					{
+						param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $value ) );
+						return false;
+					}
+				}
+				break;
 		}
 	}
 
+	// Check maxlength:
+	if( isset($meta['maxlength']) )
+	{
+		if( strlen($value) > $meta['maxlength'] )
+		{
+			param_error( $param_name, sprintf( T_('The value is too long.'), $value ) );
+		}
+	}
 
 	// Check valid pattern:
 	if( isset($meta['valid_pattern']) )
@@ -804,6 +874,7 @@ function validate_plugin_settings_from_param( $param_name, $value, $meta )
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -865,6 +936,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.36  2006/12/05 01:59:12  blueyed
+ * Added validation for all types of (User)Settings
+ *
  * Revision 1.35  2006/12/04 22:26:06  blueyed
  * Fixed calling GetDefault(User)Settings with $params in set_Settings_for_Plugin_from_Request()
  *
