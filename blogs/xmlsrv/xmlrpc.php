@@ -27,8 +27,7 @@
 // Disable Cookies
 $_COOKIE = array();
 
-// Trim requests (used by XML-RPC library)
-// fp> why do we need this pre-processing here?
+// Trim requests (used by XML-RPC library); fix for mozBlog and other cases where '<?xml' isn't on the very first line
 if ( isset($HTTP_RAW_POST_DATA) )
 {
 	// TODO: dh> xmlrpc should use php://input instead.. see http://bugs.php.net/bug.php?id=22338
@@ -445,7 +444,7 @@ $bloggereditpost_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $x
  * On success, it returns a boolean true value.
  * On error, it will return a fault with an error message.
  *
- * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_editPost.html}
+ * @see http://www.blogger.com/developers/api/1_docs/xmlrpc_editPost.html
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -493,38 +492,36 @@ function bloggereditpost($m)
 		return new xmlrpcresp(0, $xmlrpcerruser+7, "No such post (#$post_ID)."); // user error 7
 	}
 
-	$newcontent = $m->getParam(4);
-	$newcontent = $newcontent->scalarval();
-	$newcontent = str_replace("\n",'',$newcontent); // Tor - kludge to fix bug in xmlrpc libraries
+	$content = $m->getParam(4);
+	$content = $content->scalarval();
+	$content = str_replace("\n",'',$content); // Tor - kludge to fix bug in xmlrpc libraries
 	// WARNING: the following debug MAY produce a non valid response (XML comment containing emebedded <!-- more -->)
-	// xmlrpc_debugmsg( 'New content: '.$newcontent  );
+	// xmlrpc_debugmsg( 'New content: '.$content  );
 
 	$publish = $m->getParam(5);
 	$publish = $publish->scalarval();
 	$status = $publish ? 'published' : 'draft';
 	logIO('I',"Publish: $publish -> Status: $status");
 
-	if( ! ($postdata = get_postdata($post_ID)) )
-	{
-		return new xmlrpcresp(0, $xmlrpcerruser+7, "No such post (#$post_ID)."); // user error 7
-	}
-
-	logIO('O','Old post Title: '.$postdata['Title']);
-
 	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
 
-	if( ! ($post_category = xmlrpc_getpostcategory($newcontent) ) )
-	{ // No category specified
-		$post_category = $edited_Item->main_cat_ID;
-	}
-	elseif( get_the_category_by_ID( $post_category, false ) === false )
-	{ // requested Cat does not exist:
-		return new xmlrpcresp(0, $xmlrpcerruser+5, 'Requested category does not exist.'); // user error 5
-	}
-	// return new xmlrpcresp(0, $xmlrpcerruser+50, 'post_category='.$post_category );
+	$post_categories = xmlrpc_getpostcategories($content);
+	if( $post_categories )
+	{
+		$main_cat = array_shift($post_categories);
 
-	$blog_ID = get_catblog($post_category);
+		if( get_the_category_by_ID( $main_cat, false ) === false )
+		{ // requested Cat does not exist:
+			return new xmlrpcresp(0, $xmlrpcerruser+5, 'Requested main category does not exist.'); // user error 5
+		}
+	}
+	else
+	{
+		$main_cat = $edited_Item->main_cat_ID;
+	}
+
+	$blog_ID = get_catblog($main_cat);
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $blog_ID ) )
@@ -533,10 +530,7 @@ function bloggereditpost($m)
 				'Permission denied.' );
 	}
 
-	$content = $newcontent;
-
 	$post_title = xmlrpc_getposttitle($content);
-
 	$content = xmlrpc_removepostdata($content);
 
 	// CHECK and FORMAT content
@@ -551,10 +545,14 @@ function bloggereditpost($m)
 	// UPDATE POST IN DB:
 	$edited_Item->set( 'title', $post_title );
 	$edited_Item->set( 'content', $content );
-	$edited_Item->set( 'main_cat_ID', $post_category );
-	$edited_Item->set( 'extra_cat_IDs', array($post_category) );
+	if( $post_categories )
+	{ // update cats, if given:
+		$edited_Item->set( 'main_cat_ID', $main_cat );
+		$edited_Item->set( 'extra_cat_IDs', array($post_categories) );
+	}
 	$edited_Item->set( 'status', $status );
 	$edited_Item->dbupdate();
+
 	if( $DB->error )
 	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
@@ -2246,6 +2244,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.127  2006/12/05 07:23:22  blueyed
+ * Fixed categories handling also for blogger.editPost; doc
+ *
  * Revision 1.126  2006/12/05 06:31:41  blueyed
  * Nuked $default_category from XMLRPC
  *
