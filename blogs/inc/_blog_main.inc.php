@@ -47,6 +47,7 @@ param( 'blog', 'integer', 0, true );
 
 param( 'p', 'integer', '', true );              // Specific post number to display
 param( 'title', 'string', '', true );						// urtitle of post to display
+param( 'redir', 'string', 'yes', false );				// Do we allow redirection to canonical URL?
 
 param( 'preview', 'integer', 0, true );         // Is this preview ?
 
@@ -274,8 +275,10 @@ elseif( !empty($p) || !empty($title) )
 
 	// EXPERIMENTAL:
 	// Please document encountered problems.
-	if( $redirect_to_canonical_url )
-	{
+	// $redir here allows to force a 'single post' URL for commenting
+	if( $redirect_to_canonical_url && $redir == 'yes' )
+	{	// We want to redirect to the Item's canonical URL:
+	
 		$canoncical_url = $Item->get_permanent_url( '', '', false, '&' );
 		// pre_dump( $canoncical_url, $ReqHost.$ReqURI );
 		// There may be some parameters additional at the end of the URL, but the beginning should be canoncial.
@@ -298,7 +301,7 @@ if( $disp == 'posts' )
 { // default display:
 	// EXPERIMENTAL:
 	// Please document encountered problems.
-	if( $redirect_to_canonical_url )
+	if( $redirect_to_canonical_url && $redir == 'yes' )
 	{
     param_compile_cat_array();  // fp> is this overkill here?
 
@@ -481,6 +484,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.52  2006/12/05 00:39:56  fplanque
+ * fixed some more permalinks/archive links
+ *
  * Revision 1.51  2006/12/04 21:25:18  fplanque
  * removed user skin switching
  *

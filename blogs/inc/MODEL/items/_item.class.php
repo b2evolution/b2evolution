@@ -504,8 +504,8 @@ class Item extends DataObject
 		}
 
 		if( $force_single && (strpos( $permalink_type, 'archive' ) !== false) )
-		{ // We have to fall back to pid
-			$permalink_type = 'pid';
+		{ // We don't want a page full of posts:
+			$permalink_type = 'force_single';
 		}
 
 		if( empty( $blogurl ) )
@@ -536,6 +536,13 @@ class Item extends DataObject
 				$urltail = 'p'.$this->ID;
 				break;
 
+			case 'force_single':
+				// Forced Link to individual post:
+				$dest_type = 'postbypost';
+				$urlparam = 'p='.$this->ID.'&amp;redir=no';
+				$urltail = 'p'.$this->ID.'?redir=no';
+				break;
+
 			case 'pid':
 				// Link to individual post:
 				$dest_type = 'postbypost';
@@ -559,7 +566,6 @@ class Item extends DataObject
 				}
 		}
 
-
 		switch( $dest_type )
 		{
 			case 'monthly':
@@ -570,7 +576,7 @@ class Item extends DataObject
 				}
 				else
 				{ // Use extra path info:
-					$permalink = url_add_tail( $blogurl, mysql2date("/Y/m", $post_date) ).'#'.$anchor;
+					$permalink = url_add_tail( $blogurl, mysql2date("/Y/m/", $post_date) ).'#'.$anchor;
 				}
 				break;
 
@@ -598,7 +604,7 @@ class Item extends DataObject
 				}
 				else
 				{ // Use extra path info:
-					$permalink = url_add_tail( $blogurl, mysql2date("/Y/m/d", $post_date) ).'#'.$anchor;
+					$permalink = url_add_tail( $blogurl, mysql2date("/Y/m/d/", $post_date) ).'#'.$anchor;
 				}
 				break;
 
@@ -1757,6 +1763,7 @@ class Item extends DataObject
 
 		if( $mode != 'none' )
 		{ // We want a link:
+			// We want the permanent URL BUT we want if FORCED to a SINGLE post!
 			$url = $this->get_permanent_url( $mode, $blogurl, true );
 			if( $use_popup )
 			{ // We need to tell b2evo to use the popup template
@@ -3324,6 +3331,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.132  2006/12/05 00:39:56  fplanque
+ * fixed some more permalinks/archive links
+ *
  * Revision 1.131  2006/12/05 00:34:39  blueyed
  * Implemented custom "None" option text in DataObjectCache; Added for $ItemStatusCache, $GroupCache, UserCache and BlogCache; Added custom text for Item::priority_options()
  *
