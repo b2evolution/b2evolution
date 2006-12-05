@@ -144,14 +144,25 @@ div.skinshot {
 	padding: 0;
 }
 
-div.skinshot img {
+div.skinshot_placeholder {
 	width: 240px;
+	height: 180px;
 	border: 1px solid #000;
 	margin: 1ex 1ex .5ex 1ex;
+	background: #ddd;
+	text-align: center;
 }
-div.skinshot img.current {
-	width: 240px;
+div.skinshot div.current {
 	border: 1px solid #f00;
+}
+
+div.skinshot_noshot {
+	margin: 36px 0 0 0;
+	color: #999;
+}
+div.skinshot_name {
+	margin: 24px 0 0 0;
+	font-size: 170%;
 }
 
 div.skinshot div.legend {

@@ -313,6 +313,9 @@ $AdminUI->add_menu_entries(
 					'plugins' => array(
 						'text' => T_('Plugins'),
 						'href' => 'admin.php?ctrl=plugins'),
+					'skins' => array(
+						'text' => T_('Skins'),
+						'href' => 'admin.php?ctrl=skins'),
 					'antispam' => array(
 						'text' => T_('Antispam'),
 						'href' => 'admin.php?ctrl=set_antispam'),
@@ -342,6 +345,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.24  2006/12/05 05:41:42  fplanque
+ * created playground for skin management
+ *
  * Revision 1.23  2006/12/05 04:27:49  fplanque
  * moved scheduler to Tools (temporary until UI redesign)
  *

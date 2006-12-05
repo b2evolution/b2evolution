@@ -860,7 +860,12 @@ th.checkright {
 div.skinshot {
 	background-color: #efede0;
 }
-
-div.skinshot img.current {
+div.skinshot_placeholder {
+	background: #e1ddce;
+}
+div.skinshot div.current {
 	border: 1px solid #d00;
+}
+div.skinshot_noshot {
+	color: #765;
 }

@@ -52,6 +52,7 @@ $ctrl_mappings = array(
 		'plugins'      => 'settings/plugins.php',
 		'settings'     => 'settings/settings.php',
 		'set_antispam' => 'settings/antispam.php',
+		'skins'        => 'skins/skins.php',
 		'stats'        => 'sessions/stats.php',
 		'templates'    => 'skins/b2template.php',
 		'tools'        => '_misc/tools.php',

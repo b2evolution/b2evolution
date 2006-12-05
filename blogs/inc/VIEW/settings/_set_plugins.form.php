@@ -275,6 +275,8 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 	echo '<p class="center"><a href="'.regenerate_url( 'plugins_disp_avail', 'plugins_disp_avail=1' ).'">'.T_('Display available plugins.').'</a></p>';
 	return;
 }
+
+// Display available plugins:
 ?>
 
 <fieldset>
@@ -432,6 +434,9 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 <?php
 /*
  * $Log$
+ * Revision 1.41  2006/12/05 05:41:42  fplanque
+ * created playground for skin management
+ *
  * Revision 1.40  2006/11/30 05:43:39  blueyed
  * Moved Plugins::discover() to Plugins_admin::discover(); Renamed Plugins_no_DB to Plugins_admin_no_DB (and deriving from Plugins_admin)
  *
