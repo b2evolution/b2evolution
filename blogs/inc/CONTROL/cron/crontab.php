@@ -32,7 +32,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 
-$AdminUI->set_path( 'cron' );
+$AdminUI->set_path( 'tools', 'cron' );
 
 param( 'action', 'string', 'list' );
 
@@ -276,6 +276,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2006/12/05 04:27:49  fplanque
+ * moved scheduler to Tools (temporary until UI redesign)
+ *
  * Revision 1.14  2006/11/26 01:42:08  fplanque
  * doc
  *

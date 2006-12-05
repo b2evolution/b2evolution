@@ -321,24 +321,20 @@ $AdminUI->add_menu_entries(
 
 			'tools' => array(
 				'text' => T_('Tools'),
-				'href' => 'admin.php?ctrl=tools'
+				'href' => 'admin.php?ctrl=tools',
+				'entries' =>  array(
+					'' => array(	// fp> '' is dirty
+						'text' => T_('Main tab'),
+						'href' => 'admin.php?ctrl=tools' ),
+					'cron' => array(
+						'text' => T_('Scheduler'),
+						'perm_name' => 'options',
+						'perm_level' => 'view',
+						'href' => 'admin.php?ctrl=crontab' ),
+				)
 			),
 		)
 	);
-
-
-// CRON:
-$AdminUI->add_menu_entries(
-		NULL, // root
-		array(
-			'cron' => array(
-				'text' => T_('Scheduler'),
-				'perm_name' => 'options',
-				'perm_level' => 'view',
-				'href' => 'admin.php?ctrl=crontab',
-			),
-		)
-);
 
 
 $Plugins->trigger_event( 'AdminAfterMenuInit' );
@@ -346,6 +342,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.23  2006/12/05 04:27:49  fplanque
+ * moved scheduler to Tools (temporary until UI redesign)
+ *
  * Revision 1.22  2006/11/30 22:34:15  fplanque
  * bleh
  *

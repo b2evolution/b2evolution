@@ -18,22 +18,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once $inc_path.'_misc/_plugin.funcs.php';
 
 
-$AdminUI->set_path( 'tools' );
-
-if( $AdminUI->get_menu_entries('tools') )
-{ // Prepend a "default" tab
-	$AdminUI->unshift_menu_entries( 'tools', array( '' => array('text' => T_('Main tab') ) ) );
-}
-
-$tab_Plugin = NULL;
 param( 'tab', 'string', '', true );
 
+$tab_Plugin = NULL;
 $tab_plugin_ID = false;
 
 if( ! empty($tab) )
-{
+{	// We have requested a tab which is handled by a plugin:
 	if( preg_match( '~^plug_ID_(\d+)$~', $tab, $match ) )
-	{
+	{ // Instanciate the invoked plugin:
 		$tab_plugin_ID = $match[1];
 		$tab_Plugin = & $Plugins->get_by_ID( $match[1] );
 		if( ! $tab_Plugin )
@@ -55,12 +48,12 @@ if( ! empty($tab) )
 	}
 }
 
-
-$AdminUI->append_path_level( $tab );
+// Highlight the requested tab (if valid):
+$AdminUI->set_path( 'tools', $tab );
 
 
 if( empty($tab) )
-{ // "Default tab" actions:
+{ // "Main tab" actions:
 	param( 'action', 'string', '' );
 
 	switch( $action )
@@ -108,7 +101,7 @@ if( empty($tab) )
 		?>
 
 		<div class="panelblock">
-			<h2><?php echo T_('Items') ?></h2>
+			<h2><?php echo T_('Contents cached in the database') ?></h2>
 			<ul>
 				<li><a href="<?php echo regenerate_url('action', 'action=del_itemprecache') ?>"><?php echo T_('Delete pre-renderered item cache.') ?></a></li>
 			</ul>
@@ -118,8 +111,7 @@ if( empty($tab) )
 	}
 
 
-	// MT import. Left here, so the page is never empty.. :/
-	// fp> who cares if the page is empty?
+	// fp> TODO: pluginize MT! :P
 	?>
 
 	<div class="panelblock">
