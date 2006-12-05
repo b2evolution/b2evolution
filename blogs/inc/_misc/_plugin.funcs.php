@@ -615,6 +615,7 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 			continue;
 		}
 
+		$l_param_type = 'string';
 		$l_param_default = '';
 		if( isset($l_meta['type']) )
 		{
@@ -636,12 +637,7 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 					break;
 
 				default:
-					$l_param_type = 'string';
 			}
-		}
-		else
-		{
-			$l_param_type = 'string';
 		}
 
 		// Get the value:
@@ -939,7 +935,7 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /* {{{ Revision log:
  * $Log$
- * Revision 1.37  2006/12/05 02:32:48  blueyed
+ * Revision 1.38  2006/12/05 02:34:05  blueyed
  * Fix for "Minor refactoring".. :/
  *
  * Revision 1.36  2006/12/05 01:59:12  blueyed
