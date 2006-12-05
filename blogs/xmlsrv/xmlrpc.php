@@ -320,7 +320,7 @@ $bloggernewpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $
  * at this time).
  * On error, it will return some error message.
  *
- * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_newPost.html}
+ * @see http://www.blogger.com/developers/api/1_docs/xmlrpc_newPost.html
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -338,7 +338,7 @@ $bloggernewpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $
 function bloggernewpost( $m )
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $default_category, $DB;
+	global $DB;
 	global $Settings, $Messages;
 
 	logIO('I','Called function: blogger.newPost');
@@ -365,18 +365,23 @@ function bloggernewpost( $m )
 	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
 
-	if( ! ($post_category = xmlrpc_getpostcategory($content) ) )
-	{ // There was no category passed in the content:
-		$post_category = $default_category;
+	$post_categories = xmlrpc_getpostcategories($content);
+
+	if( ! $post_categories )
+	{ // There were no categories passed in the content:
+		return new xmlrpcresp(0, $xmlrpcerruser+5, 'No category given.'); // user error 5
 	}
 
+	$main_cat = array_shift($post_categories);
+	logIO('I', 'Main cat: '.$main_cat);
+
 	// Check if category exists
-	if( get_the_category_by_ID( $post_category, false ) === false )
+	if( get_the_category_by_ID( $main_cat, false ) === false )
 	{ // Cat does not exist:
 		return new xmlrpcresp(0, $xmlrpcerruser+5, 'Requested category does not exist.'); // user error 5
 	}
 
-	$blog_ID = get_catblog($post_category);
+	$blog_ID = get_catblog($main_cat);
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $blog_ID ) )
@@ -403,14 +408,22 @@ function bloggernewpost( $m )
 
 	// INSERT NEW POST INTO DB:
 	$edited_Item = & new Item();
-	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $now, $post_category, array( $post_category ), $status, $current_User->locale );
+	$edited_Item->set('title', $post_title);
+	$edited_Item->set('content', $content);
+	$edited_Item->set('datestart', $now);
+	$edited_Item->set('main_cat_ID', $main_cat);
+	$edited_Item->set('extra_cat_IDs', $post_categories);
+	$edited_Item->set('status', $status);
+	$edited_Item->set('locale', $current_User->locale );
+	$edited_Item->set_creator_User($current_User);
+	$edited_Item->dbinsert();
 
-	if( $DB->error )
+	if( ! $edited_Item->ID )
 	{ // DB error
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+		return new xmlrpcresp(0, $xmlrpcerruser+9, 'Error while inserting item: '.$DB->last_error ); // user error 9
 	}
 
-	logIO('O', "Posted ! ID: $post_ID");
+	logIO('O', "Posted ! ID: $edited_Item->ID");
 
 	logIO( 'O', 'Handling notifications...' );
 	// Execute or schedule notifications & pings:
@@ -418,11 +431,8 @@ function bloggernewpost( $m )
 
 	logIO("O","All done.");
 
-	return new xmlrpcresp(new xmlrpcval($post_ID));
-
+	return new xmlrpcresp(new xmlrpcval($edited_Item->ID));
 }
-
-
 
 
 $bloggereditpost_doc='Edits a post, blogger-api like';
@@ -2105,6 +2115,7 @@ function _mw_get_cat_IDs($contentstruct, $blog_ID, $empty_struct_ok = false)
 // fp> xmlrpc.php should actually only be a switcher and it should load the function to execute once it has been identified
 // fp> maybe it would make sense to register xmlrpc apis/functions in a DB table
 // fp> it would probably make sense to have *all* xmlrpc methods implemented as plugins (maybe 1 plugin per API; it should be possible to add a single func to an API with an additional plugin)
+// dh> NOTE: some tools may use different API entry points, e.g. for extended methods.. (But I'm not sure..)
 // fp> from a security standpoint it would make a lot of sense to disable any rpc that is not needed
 
 require_once $inc_path.'_misc/ext/_xmlrpcs.php'; // This will add generic remote calls
@@ -2241,6 +2252,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.125  2006/12/05 06:22:25  blueyed
+ * Fixed blogger.newPost to accept a list of categories, as given by w.bloggar
+ *
  * Revision 1.124  2006/12/03 18:22:58  blueyed
  * Nuked deprecated fileupload globals
  *

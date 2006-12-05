@@ -751,12 +751,37 @@ function xmlrpc_getposttitle($content)
 
 /**
  * Also used by post by mail
+ * @deprecated by xmlrpc_getpostcategories()
  */
 function xmlrpc_getpostcategory($content)
 {
 	if (preg_match('/<category>([0-9]+?)<\/category>/is', $content, $matchcat))
 	{
 		return $matchcat[1];
+	}
+
+	return false;
+}
+
+
+/**
+ * Extract categories out of "<category>" tag from $content.
+ *
+ * NOTE: w.bloggar sends something like "<category>00000013,00000001,00000004,</category>" to
+ *       blogger.newPost.
+ *
+ * @return false|array
+ */
+function xmlrpc_getpostcategories($content)
+{
+	if( preg_match('~<category>(\d+\s*(,\s*\d*)*)</category>~i', $content, $match) )
+	{
+		$cats = preg_split('~\s*,\s*~', $match[1], -1, PREG_SPLIT_NO_EMPTY);
+		foreach( $cats as $k => $v )
+		{
+			$cats[$k] = (int)$v;
+		}
+		return $cats;
 	}
 
 	return false;
@@ -2726,6 +2751,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.153  2006/12/05 06:22:24  blueyed
+ * Fixed blogger.newPost to accept a list of categories, as given by w.bloggar
+ *
  * Revision 1.152  2006/12/02 17:48:31  blueyed
  * Fixed regexp for balanceTags(), so it does not handle HTML comments as tags
  *
