@@ -189,3 +189,40 @@ div.tile {
 	display: inline;
 	white-space: nowrap;
 }
+
+
+
+div.system_check {
+	margin: 1ex 0;
+	background: #ccc;
+	padding: 1ex 0;
+}
+
+div.system_check_name {
+	margin-left: 1ex;
+	font-weight: bold;
+	float:left;
+}
+
+div.system_check_value_ok,
+div.system_check_value_warning,
+div.system_check_value_error {
+	font-weight: bold;
+	margin-left: 50ex;
+}
+
+div.system_check_value_ok {
+	color: #093;
+}
+div.system_check_value_warning {
+	color: #e60;
+}
+div.system_check_value_error {
+	color: #c00;
+}
+
+div.system_check_message_ok,
+div.system_check_message_warning,
+div.system_check_message_error {
+	margin: 1ex;
+}

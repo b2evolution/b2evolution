@@ -329,6 +329,11 @@ $AdminUI->add_menu_entries(
 					'' => array(	// fp> '' is dirty
 						'text' => T_('Main tab'),
 						'href' => 'admin.php?ctrl=tools' ),
+					'system' => array(
+						'text' => T_('System'),
+						'perm_name' => 'options',
+						'perm_level' => 'view',
+						'href' => 'admin.php?ctrl=system' ),
 					'cron' => array(
 						'text' => T_('Scheduler'),
 						'perm_name' => 'options',
@@ -345,6 +350,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.25  2006/12/05 09:59:37  fplanque
+ * A few basic systems checks
+ *
  * Revision 1.24  2006/12/05 05:41:42  fplanque
  * created playground for skin management
  *
