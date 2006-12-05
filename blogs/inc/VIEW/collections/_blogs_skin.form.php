@@ -37,16 +37,25 @@ $Form->begin_form( 'fform', T_('Choose a skin') );
 		$skin_url = skin_list_iteminfo( 'url', false );
 		$preview_url = url_add_param($edited_Blog->get('blogurl'),'tempskin='.rawurlencode($skin_name));
 		echo '<div class="skinshot">';
+		echo '<div class="skinshot_placeholder';
+		if( $skin_name == $edited_Blog->default_skin )
+		{
+			echo ' current';
+		}
+		echo '">';
 		if( file_exists( $skin_path.'/skinshot.jpg' ) )
 		{
 			echo '<a href="'.$preview_url.'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
-			echo '<img src="'.$skin_url.'/skinshot.jpg" width="240" height="180" alt="'.$skin_name.'"';
-			if( $skin_name == $edited_Blog->default_skin )
-			{
-				echo ' class="current"';
-			}
-			echo '/></a>';
+			echo '<img src="'.$skin_url.'/skinshot.jpg" width="240" height="180" alt="'.$skin_name.'" /></a>';
 		}
+		else
+		{
+			echo '<div class="skinshot_noshot">'.T_('No skinshot available for').'</div>';
+			echo '<a href="'.$preview_url.'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
+			echo '<div class="skinshot_name">'.$skin_name.'</div>';
+			echo '</a>';
+		}
+		echo '</div>';
 		echo '<div class="legend">';
 		echo '<div class="actions">';
 		if( $skin_name == $edited_Blog->default_skin )
