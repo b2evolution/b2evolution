@@ -81,6 +81,7 @@ class DataObjectCache
 	 *
 	 * Subclasses should override {@link DataObjectCache::get_none_option_text()} and
 	 * instances should set this property directly.
+		* @todo fp>subclasses should pass a param to the constructor, exactly like instances should.
 	 *
 	 * @var string
 	 */
@@ -508,6 +509,12 @@ class DataObjectCache
 	 * Return the text for "None", if allowed in {@link get_option_list()}.
 	 *
 	 * @see DataObjectCache::none_option_text
+	 * {@internal dh> QUESTION: I've made this a callback to not translate a string to early,
+	 *  but it would require to have real classes for e.g. GroupCache. Should it be a
+	 *  constructor param instead? }}
+	 * fp> yes I think an added param to the constructor could be ok. Or a set_none_text() method. Please use 'none' instead of 'None' in function name.
+		* fp> So, why do you ask if you end up doing the opposite? Again, I think this is too much complexity for one single string. It should just be passed to the constructor.
+	 *
 	 * @return string
 	 */
 	function get_none_option_text()
@@ -524,6 +531,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.22  2006/12/05 00:59:46  fplanque
+ * doc
+ *
  * Revision 1.21  2006/12/05 00:34:39  blueyed
  * Implemented custom "None" option text in DataObjectCache; Added for $ItemStatusCache, $GroupCache, UserCache and BlogCache; Added custom text for Item::priority_options()
  *

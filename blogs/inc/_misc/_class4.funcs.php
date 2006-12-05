@@ -86,7 +86,7 @@ function & get_Cache( $objectName )
 
 		case 'GroupCache';
 			if( ! $Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\' )' ) )
-			{
+			{ // fp> TODO: dirty hack. Add optional param to constructor.
 				$GroupCache->none_option_text = /* TRANS: "None" select option */ T_('No group');
 			}
 			return $GroupCache;
@@ -98,7 +98,7 @@ function & get_Cache( $objectName )
 
 		case 'ItemStatusCache';
 			if( ! $Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_itemstatuses\', \'pst_\', \'pst_ID\' )' ) )
-			{
+			{ // fp> TODO: dirty hack. Add optional param to constructor.
 				$ItemStatusCache->none_option_text = /* TRANS: "None" select option */ T_('No status');
 			}
 			return $ItemStatusCache;
@@ -130,6 +130,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.9  2006/12/05 00:59:46  fplanque
+ * doc
+ *
  * Revision 1.8  2006/12/05 00:34:39  blueyed
  * Implemented custom "None" option text in DataObjectCache; Added for $ItemStatusCache, $GroupCache, UserCache and BlogCache; Added custom text for Item::priority_options()
  *
