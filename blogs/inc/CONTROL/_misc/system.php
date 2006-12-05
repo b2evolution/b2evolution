@@ -1,11 +1,12 @@
 <?php
 /**
- * This file implements the UI controller for System configuration.
+ * This file implements the UI controller for System configuration and analysis.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -17,12 +18,16 @@
  * }}
  *
  * {@internal Open Source relicensing agreement:
+ * Daniel HAHLER grants Francois PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
+ * @author blueyed
  *
  * @version $Id$
  */
@@ -69,8 +74,8 @@ function disp_system_check( $condition, $message = '' )
 	echo '</div>';
 }
 
-$facilitate_exploits = '<p>'.T_('When enabled, this feature is known to facilitate hacking exploits in any PHP application.')."</p>\n<p>" 
-	.T_('b2evolution includes additional measures in order not to be affected by this. 
+$facilitate_exploits = '<p>'.T_('When enabled, this feature is known to facilitate hacking exploits in any PHP application.')."</p>\n<p>"
+	.T_('b2evolution includes additional measures in order not to be affected by this.
 	However, for maximum security, we still recommend disabling this PHP feature.')."</p>\n";
 $change_ini = '<p>'.T_('If possible, change this setting to <code>%s</code> in your php.ini or ask your hosting provider about it.').'</p>';
 
@@ -80,14 +85,12 @@ echo '<h2>'.T_('System checks').'</h2>';
 /*
  * PHP version
  */
-init_system_check( 'PHP version', phpversion() );
-list( $version_main, $version_minor ) = explode( '.', phpversion() );
-$php_version_num = $version_main * 100 + $version_minor;
-if( $php_version_num < 401 )
+init_system_check( 'PHP version', PHP_VERSION );
+if( version_compare( PHP_VERSION, '4.1', '<' ) )
 {
 	disp_system_check( 'error', T_('This version is too old. b2evolution will not run correctly. You must ask your host to upgrade PHP before you can run b2evolution.') );
 }
-elseif( $php_version_num < 403 )
+elseif( version_compare( PHP_VERSION, '4.3', '<' ) )
 {
 	disp_system_check( 'warning', T_('This version is old. b2evolution may run but some features may fail. You should ask your host to upgrade PHP before running b2evolution.') );
 }
@@ -111,8 +114,26 @@ else
 }
 
 
+if( version_compare(PHP_VERSION, '5.2', '>=') )
+{
+	/*
+	 * allow_url_include (since 5.2, supercedes allow_url_fopen for require()/include()
+	 */
+	init_system_check( 'PHP allow_url_include', ini_get('allow_url_include') ?  T_('On') : T_('Off') );
+	if( ini_get('allow_url_include' ) )
+	{
+		disp_system_check( 'warning', $facilitate_exploits.' '.sprintf( $change_ini, 'allow_url_include = Off' )  );
+	}
+	else
+	{
+		disp_system_check( 'ok' );
+	}
+}
+
+
 /*
  * allow_url_fopen
+ * dh> TODO: this is "irrelevant" for PHP 5.2.. it refers to fopen() only, not include()/require()
  */
 init_system_check( 'PHP allow_url_fopen', ini_get('allow_url_fopen') ?  T_('On') : T_('Off') );
 if( ini_get('allow_url_fopen' ) )
@@ -155,6 +176,41 @@ else
 }
 
 
+/*
+ * XML extension
+ */
+init_system_check( 'PHP XML extension', extension_loaded('xml') ?  T_('Loaded') : T_('Not loaded') );
+if( ! extension_loaded('xml' ) )
+{
+	disp_system_check( 'warning', T_('The XML extension is not loaded.') );
+}
+else
+{
+	disp_system_check( 'ok' );
+}
+
+
+/*
+ * /install/ folder
+ */
+$ok = ! is_dir( $basepath.$install_subdir );
+init_system_check( 'Install folder', $ok ?  T_('Deleted') : T_('Not deleted') );
+if( ! $ok )
+{
+	disp_system_check( 'warning', T_('The /install directory has not been removed.') );
+}
+else
+{
+	disp_system_check( 'ok' );
+}
+
+
+// TODO: dh> memory_limit!
+// TODO: dh> output_buffering (recommend off)
+// TODO: dh> session.auto_start (recommend off)
+// TODO: dh> How to change ini settings in .htaccess (for mod_php), link to manual
+// TODO: dh> link to phpinfo()? It's included in the /install/ folder, but that is supposed to be deleted
+
 // pre_dump( ini_get_all() );
 
 
@@ -166,6 +222,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2006/12/05 12:11:14  blueyed
+ * Some more checks and todos
+ *
  * Revision 1.2  2006/12/05 11:30:26  fplanque
  * presentation
  *
