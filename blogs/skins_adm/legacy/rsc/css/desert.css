@@ -869,3 +869,9 @@ div.skinshot div.current {
 div.skinshot_noshot {
 	color: #765;
 }
+
+
+
+div.system_check {
+	border-top: 1px solid #e1ddce;
+}

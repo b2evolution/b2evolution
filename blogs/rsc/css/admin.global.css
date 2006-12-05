@@ -194,12 +194,11 @@ div.tile {
 
 div.system_check {
 	margin: 1ex 0;
-	background: #ccc;
-	padding: 1ex 0;
+	border-top: 1px solid #ddd;
+	padding-top: 1ex;
 }
 
 div.system_check_name {
-	margin-left: 1ex;
 	font-weight: bold;
 	float:left;
 }
@@ -225,4 +224,12 @@ div.system_check_message_ok,
 div.system_check_message_warning,
 div.system_check_message_error {
 	margin: 1ex;
+}
+div.system_check_message_warning {
+	padding: 3px;
+	background: #feb;
+}
+div.system_check_message_error {
+	padding: 3px;
+	background: #fbb;
 }
