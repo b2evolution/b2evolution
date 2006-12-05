@@ -154,7 +154,7 @@ class Item extends DataObject
 	var $content_pages = NULL;
 
 
-	var $wordcount = 0;
+	var $wordcount;
 	/**
 	 * @var string The list of renderers, imploded by '.'.
 	 * @access protected
@@ -2442,7 +2442,7 @@ class Item extends DataObject
 	 */
 	function wordcount()
 	{
-		echo $this->wordcount;
+		echo (int)$this->wordcount; // may have been saved as NULL until 1.9
 	}
 
 
@@ -3329,6 +3329,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.134  2006/12/05 14:28:29  blueyed
+ * Fixed wordcount==0 handling; has been saved as NULL
+ *
  * Revision 1.133  2006/12/05 06:38:40  blueyed
  * doc
  *
