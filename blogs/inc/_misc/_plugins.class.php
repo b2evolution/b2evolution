@@ -1672,6 +1672,7 @@ class Plugins
 	 * @param string object name
 	 * @param string eval this to create the object. Default is to create an object
 	 *               of class $objectName.
+	 * @return boolean True, if retrieved from cache; false if not
 	 */
 	function get_object_from_cacheplugin_or_create( $objectName, $eval_create_object = NULL )
 	{
@@ -1688,7 +1689,7 @@ class Plugins
 				register_shutdown_function( array(&$Plugin, 'CacheObjects'),
 					array( 'action' => 'set', 'key' => 'object_'.$objectName, 'data' => & $GLOBALS[$objectName] ) );
 
-				return;
+				return true;
 			}
 		}
 
@@ -1712,6 +1713,8 @@ class Plugins
 			register_shutdown_function( array(&$Plugin, 'CacheObjects'),
 				array( 'action' => 'set', 'key' => 'object_'.$objectName, 'data' => & $GLOBALS[$objectName] ) );
 		}
+
+		return false;
 	}
 
 
@@ -1777,6 +1780,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.124  2006/12/05 00:23:55  blueyed
+ * Return value for get_object_from_cacheplugin_or_create()
+ *
  * Revision 1.123  2006/12/04 22:27:19  blueyed
  * Also call init_settings() on not installed Plugins, because it allows using $Settings/$UserSettings in Plugin::PluginInit()
  *
