@@ -46,12 +46,12 @@ class GenericCache extends DataObjectCache
 	/**
 	 * Constructor
 	 */
-	function GenericCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL, $order_by = '' )
+	function GenericCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL, $order_by = '', $allow_none_text = NULL )
 	{
-		parent::DataObjectCache( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field, $order_by );
+		parent::DataObjectCache( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field, $order_by, $allow_none_text );
 	}
 
-	
+
 	/**
 	 * Instanciate a new object within this cache
 	 *
@@ -70,6 +70,9 @@ class GenericCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.7  2006/12/05 01:35:27  blueyed
+ * Hooray for less complexity and the 8th param for DataObjectCache()
+ *
  * Revision 1.6  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

@@ -74,14 +74,9 @@ class DataObjectCache
 	var $order_by;
 
 	/**
-	 * The text that gets used for the "None" option in the objects
-	 * options list.
+	 * The text that gets used for the "None" option in the objects options list.
 	 *
 	 * This is especially useful for i18n, because there are several "None"s!
-	 *
-	 * Subclasses should override {@link DataObjectCache::get_none_option_text()} and
-	 * instances should set this property directly.
-		* @todo fp>subclasses should pass a param to the constructor, exactly like instances should.
 	 *
 	 * @var string
 	 */
@@ -96,8 +91,11 @@ class DataObjectCache
 	 * @param string Name of table in database
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
+	 * @param mixed
+	 * @param mixed
+	 * @param string The text that gets used for the "None" option in the objects options list (Default: T_('None')).
 	 */
-	function DataObjectCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname, $name_field = NULL, $order_by = '' )
+	function DataObjectCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname, $name_field = NULL, $order_by = '', $allow_none_text = NULL )
 	{
 		$this->objtype = $objtype;
 		$this->load_all = $load_all;
@@ -120,6 +118,15 @@ class DataObjectCache
 		else
 		{
 			$this->order_by = $order_by;
+		}
+
+		if( isset($allow_none_text) )
+		{
+			$this->none_option_text = $allow_none_text;
+		}
+		else
+		{
+			$this->none_option_text = /* TRANS: the default value for option lists where "None" is allowed */ T_('None');
 		}
 	}
 
@@ -489,7 +496,7 @@ class DataObjectCache
 		{
 			$r .= '<option value=""';
 			if( empty($default) ) $r .= ' selected="selected"';
-			$r .= '>'.format_to_output($this->get_none_option_text()).'</option>'."\n";
+			$r .= '>'.format_to_output($this->none_option_text).'</option>'."\n";
 		}
 
 		foreach( $this->cache as $loop_Obj )
@@ -504,33 +511,14 @@ class DataObjectCache
 		return $r;
 	}
 
-
-	/**
-	 * Return the text for "None", if allowed in {@link get_option_list()}.
-	 *
-	 * @see DataObjectCache::none_option_text
-	 * {@internal dh> QUESTION: I've made this a callback to not translate a string to early,
-	 *  but it would require to have real classes for e.g. GroupCache. Should it be a
-	 *  constructor param instead? }}
-	 * fp> yes I think an added param to the constructor could be ok. Or a set_none_text() method. Please use 'none' instead of 'None' in function name.
-		* fp> So, why do you ask if you end up doing the opposite? Again, I think this is too much complexity for one single string. It should just be passed to the constructor.
-	 *
-	 * @return string
-	 */
-	function get_none_option_text()
-	{
-		if( ! isset($this->none_option_text) )
-		{
-			$this->none_option_text = /* TRANS: the default value for option lists where "None" is allowed */ T_('None');
-		}
-		return $this->none_option_text;
-	}
-
 }
 
 
 /*
  * $Log$
+ * Revision 1.23  2006/12/05 01:35:27  blueyed
+ * Hooray for less complexity and the 8th param for DataObjectCache()
+ *
  * Revision 1.22  2006/12/05 00:59:46  fplanque
  * doc
  *

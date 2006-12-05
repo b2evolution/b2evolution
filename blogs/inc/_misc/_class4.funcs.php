@@ -85,10 +85,7 @@ function & get_Cache( $objectName )
 			return $FiletypeCache;
 
 		case 'GroupCache';
-			if( ! $Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\' )' ) )
-			{ // fp> TODO: dirty hack. Add optional param to constructor.
-				$GroupCache->none_option_text = /* TRANS: "None" select option */ T_('No group');
-			}
+			$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'\', T_(\'No group\') )' );
 			return $GroupCache;
 
 		case 'ItemCache';
@@ -97,10 +94,7 @@ function & get_Cache( $objectName )
 			return $ItemCache;
 
 		case 'ItemStatusCache';
-			if( ! $Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_itemstatuses\', \'pst_\', \'pst_ID\' )' ) )
-			{ // fp> TODO: dirty hack. Add optional param to constructor.
-				$ItemStatusCache->none_option_text = /* TRANS: "None" select option */ T_('No status');
-			}
+			$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_itemstatuses\', \'pst_\', \'pst_ID\', NULL, \'\', T_(\'No status\') )' );
 			return $ItemStatusCache;
 
 		case 'ItemTypeCache';
@@ -130,6 +124,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.10  2006/12/05 01:35:27  blueyed
+ * Hooray for less complexity and the 8th param for DataObjectCache()
+ *
  * Revision 1.9  2006/12/05 00:59:46  fplanque
  * doc
  *

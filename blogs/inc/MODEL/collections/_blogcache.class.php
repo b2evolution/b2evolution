@@ -60,7 +60,8 @@ class BlogCache extends DataObjectCache
 	 */
 	function BlogCache()
 	{
-		parent::DataObjectCache( 'Blog', false, 'T_blogs', 'blog_', 'blog_ID' );
+		parent::DataObjectCache( 'Blog', false, 'T_blogs', 'blog_', 'blog_ID', NULL, '',
+			/* TRANS: "None" select option */ T_('No blog') );
 	}
 
 
@@ -252,20 +253,14 @@ class BlogCache extends DataObjectCache
 
 		return parent::get_option_list( $default, $allow_none, $method );
 	}
-
-
-	/**
-	 * @return string
-	 */
-	function get_none_option_text()
-	{
-		return /* TRANS: "None" select option */ T_('No blog');
-	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.15  2006/12/05 01:35:27  blueyed
+ * Hooray for less complexity and the 8th param for DataObjectCache()
+ *
  * Revision 1.14  2006/12/05 00:34:39  blueyed
  * Implemented custom "None" option text in DataObjectCache; Added for $ItemStatusCache, $GroupCache, UserCache and BlogCache; Added custom text for Item::priority_options()
  *
