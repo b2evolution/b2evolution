@@ -625,16 +625,6 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Do we need a raw password in {@link LoginAttempt()}?
-	 * @see Plugin::LoginAttemptNeedsRawPassword()
-	 */
-	function LoginAttemptNeedsRawPassword()
-	{
-		return true;
-	}
-
-
-	/**
 	 * Automagically login every user as "demouser" who is not logged in and does not
 	 * try to currently.
 	 *
@@ -686,6 +676,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.58  2006/12/05 01:57:10  blueyed
+ * Removed LoginAttemptNeedsRawPassword
+ *
  * Revision 1.57  2006/12/01 16:26:34  blueyed
  * Added AdminDisplayCommentFormFieldset hook
  *
