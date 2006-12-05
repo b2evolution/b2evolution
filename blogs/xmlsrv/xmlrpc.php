@@ -2019,7 +2019,6 @@ function _b2_or_mt_get_categories( $type, $m )
 function _mw_get_cat_IDs($contentstruct, $blog_ID, $empty_struct_ok = false)
 {
 	global $DB, $xmlrpcerruser;
-	global $default_category;
 
 	if( isset($contentstruct['categories']) )
 	{
@@ -2067,12 +2066,6 @@ function _mw_get_cat_IDs($contentstruct, $blog_ID, $empty_struct_ok = false)
 		$cat_IDs = array();
 	}
 
-	if( empty($cat_IDs) && ! empty($default_category) )
-	{ // no cats: use default
-		$cat_IDs = array($default_category);
-		logIO("O", 'fallback to $default_category ...');
-	}
-
 	if( ! empty($cat_IDs) )
 	{ // categories requested to be set:
 
@@ -2087,6 +2080,7 @@ function _mw_get_cat_IDs($contentstruct, $blog_ID, $empty_struct_ok = false)
 	else
 	{ // No category given/valid - use the first for the blog:
 		logIO("O","No category for post given ...");
+
 		$first_cat = $DB->get_var( '
 			SELECT cat_ID
 			  FROM T_categories
@@ -2252,6 +2246,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.126  2006/12/05 06:31:41  blueyed
+ * Nuked $default_category from XMLRPC
+ *
  * Revision 1.125  2006/12/05 06:22:25  blueyed
  * Fixed blogger.newPost to accept a list of categories, as given by w.bloggar
  *
