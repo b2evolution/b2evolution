@@ -104,9 +104,12 @@ skin_content_header();	// Sets charset!
 	<?php
 		if( isset($MainList) )
 		{ // Links to list pages:
-			$MainList->page_links( '<div class="nav_right">', '</div>', '$prev$ &nbsp; $next$', array(
-				'prev_text' => T_('Previous'),
-				'next_text' => T_('Next'),
+			$MainList->page_links( '<div class="nav_right">', '</div>', '$next$ $prev$', array(
+				'prev_text' => '<img src="img/prev.gif" width="29" height="29" alt="'.T_('Previous').'" title="'.T_('Previous').'" />',
+				'next_text' => '<img src="img/next.gif" width="29" height="29" alt="'.T_('Next').'" title="'.T_('Next').'" />',
+				'no_prev_text' => '',
+				'no_next_text' => '<img src="'.$rsc_url.'/img/blank.gif" width="29" height="29" alt="" class="no_nav" />',
+
 			) );
 		}
 	?>
@@ -117,7 +120,7 @@ skin_content_header();	// Sets charset!
 	request_title( '<h2>', '</h2>', ' - ', 'htmlbody', array(
 				'category_text' => T_('Album').': ',
 				'categories_text' => T_('Albums').': ',
-		 ) );
+		 ), false, '<h2>&nbsp;</h2>' );
 	// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?>
 	
@@ -152,15 +155,16 @@ skin_content_header();	// Sets charset!
 
 			<div class="bSmallHead">
 
-			<?php $Item->feedback_link( 'feedbacks', '<div class="action_right">', '</div>', 
-							get_icon( 'nocomment' ) ) // Link to comments ?>
-			
-			<div class="action_right"><?php $Item->permanent_link( T_('Permalink'), '#' ); ?></div>
-			
-			<?php $Item->edit_link( '<div class="action_right">', '</div>', T_('Edit...'), T_('Edit title/description...') ) // Link to backoffice for editing ?>
-			
-			<h3 class="bTitle"><?php $Item->title(); ?></h3>
-			<span class="timestamp"><?php $Item->issue_date( locale_datefmt().' H:i' ); ?></p>
+				<?php $Item->feedback_link( 'feedbacks', '<div class="action_right">', '</div>', 
+								get_icon( 'nocomment' ), get_icon( 'comments' ), get_icon( 'comments' ) ) // Link to comments ?>
+				
+				<div class="action_right"><?php $Item->permanent_link( T_('Permalink'), '#' ); ?></div>
+				
+				<?php $Item->edit_link( '<div class="action_right">', '</div>', T_('Edit...'), T_('Edit title/description...') ) // Link to backoffice for editing ?>
+				
+				<h3 class="bTitle"><?php $Item->title(); ?></h3>
+				<span class="timestamp"><?php $Item->issue_date( locale_datefmt().' H:i' ); ?></span>
+				
 			</div>
 			<div class="bSmallPrint">
 			<?php
@@ -168,18 +172,20 @@ skin_content_header();	// Sets charset!
 					$Item->categories();
 				?>
 			</div>
-			<?php
-				// ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
-				$disp_comments = 1;					// Display the comments if requested
-				$disp_comment_form = 1;			// Display the comments form if comments requested
-				$disp_trackbacks = 1;				// Display the trackbacks if requested
-	
-				$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-				$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
-				require( dirname(__FILE__).'/_feedback.php' );
-				// -------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. --------------
-			?>
 		</div>
+
+		<?php
+			// ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
+			$disp_comments = 1;					// Display the comments if requested
+			$disp_comment_form = 1;			// Display the comments form if comments requested
+			$disp_trackbacks = 1;				// Display the trackbacks if requested
+
+			$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
+			$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
+			require( dirname(__FILE__).'/_feedback.php' );
+			// -------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. --------------
+		?>
+
 		<?php
 			locale_restore_previous();	// Restore previous locale (Blog locale)
 		?>

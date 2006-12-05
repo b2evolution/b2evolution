@@ -102,8 +102,27 @@ div.action_messages {
 }
 .nav_right
 {
-	padding: 1em;
+}
+.nav_right img
+{
+	vertical-align: top;
+}
+.nav_right a
+{
+	display: block;
+	margin: 1ex 0;
 	float: right;
+	border: 1px solid #666;
+}
+.nav_right a:hover
+{
+	border: 1px solid #fff;
+}
+img.no_nav
+{
+	margin: 1ex 0;
+	float: right;
+	border: 1px solid #666;
 }
 .bPost
 {
