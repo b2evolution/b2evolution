@@ -47,7 +47,10 @@ skin_content_header();	// Sets charset!
 	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
 	<title><?php
 		$Blog->disp('name', 'htmlhead');
-		request_title( ' - ', '', ' - ', 'htmlhead' );
+		request_title( ' - ', '', ' - ', 'htmlhead', array(
+				'category_text' => T_('Album').': ',
+				'categories_text' => T_('Albums').': ',
+		 ) );
 	?></title>
 	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
@@ -90,30 +93,34 @@ skin_content_header();	// Sets charset!
 	
 <!-- =================================== START OF MAIN AREA =================================== -->
 	
-<?php
+	<?php
 	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 	if( empty( $preview ) ) $Messages->disp( );
 	// fp>> TODO: I think we should rather forget the messages here so they don't get displayed again.
 	// --------------------------------- END OF MESSAGES ---------------------------------
-?>
+	?>
 	
 
+	<?php
+		if( isset($MainList) )
+		{ // Links to list pages:
+			$MainList->page_links( '<div class="nav_right">', '</div>', '$prev$ &nbsp; $next$', array(
+				'prev_text' => T_('Previous'),
+				'next_text' => T_('Next'),
+			) );
+		}
+	?>
+
+	
 	<?php
 	// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
-	request_title( '<h2>', '</h2>' );
+	request_title( '<h2>', '</h2>', ' - ', 'htmlbody', array(
+				'category_text' => T_('Album').': ',
+				'categories_text' => T_('Albums').': ',
+		 ) );
 	// ------------------------------ END OF REQUEST TITLE -----------------------------
-?>
+	?>
 	
-
-	<?php
-	if( isset($MainList) )
-	{ // Links to list pages:
-		$MainList->page_links( '<p class="center">', '</p>', '$prev$ - $next$', array(
-			'prev_text' => T_('Previous'),
-			'next_text' => T_('Next'),
-		) );
-	}
-?>
 	
 
 	<?php
@@ -142,27 +149,24 @@ skin_content_header();	// Sets charset!
 			?>
 		</div>
 		<div class="bDetails">
-			<h3 class="bTitle"><?php $Item->title(); ?></h3>
+
 			<div class="bSmallHead">
-				<?php
-					$Item->issue_time();
-					echo ', ';
-					$Item->views();
-					echo ', ';
-					echo T_('Categories'), ': ';
-					$Item->categories();
-				?>
+
+			<?php $Item->feedback_link( 'feedbacks', '<div class="action_right">', '</div>', 
+							get_icon( 'nocomment' ) ) // Link to comments ?>
+			
+			<div class="action_right"><?php $Item->permanent_link( T_('Permalink'), '#' ); ?></div>
+			
+			<?php $Item->edit_link( '<div class="action_right">', '</div>', T_('Edit...'), T_('Edit title/description...') ) // Link to backoffice for editing ?>
+			
+			<h3 class="bTitle"><?php $Item->title(); ?></h3>
+			<span class="timestamp"><?php $Item->issue_date( locale_datefmt().' H:i' ); ?></p>
 			</div>
 			<div class="bSmallPrint">
-				<?php
-	
-				$Item->permanent_link( '#', '#', 'permalink_right' ); ?>
-		
-				<?php $Item->feedback_link( 'comments', '' ) // Link to comments ?>
-				<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
-				<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
-		
-				<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
+			<?php
+					echo T_('Albums'), ': ';
+					$Item->categories();
+				?>
 			</div>
 			<?php
 				// ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
@@ -219,7 +223,7 @@ skin_content_header();	// Sets charset!
 	<p class="baseline">
 		<a href="http://b2evolution.net/" title="b2evolution home">Powered by b2evolution</a>
 		|
-		Original template design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> / <a href="http://skinfaktory.com/">The Skin Faktory</a>
+		Template by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> / <a href="http://skinfaktory.com/">The Skin Faktory</a>
 		|
 		<?php
 			// Display additional credits (see /conf/_advanced.php):

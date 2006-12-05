@@ -48,20 +48,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @todo single post: posts do no get proper checking (wether they are in the requested blog or wether their permissions match user rights,
  * thus the title sometimes gets displayed even when it should not. We need to pre-query the ItemList instead!!
  * @todo make it complete with all possible params!
+ * @todo fp> get_request_title() if needed
  *
  * @param string prefix to display if a title is generated
  * @param string suffix to display if a title is generated
  * @param string glue to use if multiple title elements are generated
  * @param string format to output, default 'htmlbody'
- * @param boolean display title? (if false: return)
- * @param boolean show the year as link to year's archive (in monthly mode)
- * @param string params for archive link
+ * @param array params
  * @param boolean do we want to display title for single posts
  * @param default text to display if nothing else
  */
 function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'htmlbody',
-												$display = true, $linktoyeararchive = true, $blogurl = '', $params = '', 
-												$disp_single_title = true, $default = '' )
+												$params = array(), $disp_single_title = true, $default = '' )
 {
 	global $MainList, $preview, $disp;
 
@@ -102,14 +100,14 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			}
 			elseif( $disp_single_title && isset( $MainList ) )
 			{
-				$r = array_merge( $r, $MainList->get_filter_titles( array( 'visibility', 'hide_future' ) ) );
+				$r = array_merge( $r, $MainList->get_filter_titles( array( 'visibility', 'hide_future' ), $params ) );
 			}
 			break;		
 	
 		default:
 			if( isset( $MainList ) )
 			{
-				$r = array_merge( $r, $MainList->get_filter_titles( array( 'visibility', 'hide_future' ) ) );
+				$r = array_merge( $r, $MainList->get_filter_titles( array( 'visibility', 'hide_future' ), $params ) );
 			}
 			break;
 	}
@@ -127,10 +125,7 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 
 	if( !empty( $r ) )
 	{ // We have something to display:
-		if( $display )
-			echo $r;
-		else
-			return $r;
+		echo $r;
 	}
 
 }
@@ -209,6 +204,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.14  2006/12/05 00:01:15  fplanque
+ * enhanced photoblog skin
+ *
  * Revision 1.13  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

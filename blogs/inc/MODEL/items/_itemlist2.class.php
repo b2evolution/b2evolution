@@ -963,20 +963,22 @@ class ItemList2 extends DataObjectList2
 	 *
 	 * @return array
 	 */
-	function get_filter_titles( $ignore = array() )
+	function get_filter_titles( $ignore = array(), $params = array() )
 	{
 		global $month, $post_statuses;
 
-
+		$params = array_merge( array(
+				'category_text' => T_('Category').': ',
+				'categories_text' => T_('Categories').': ',
+			), $params );
+		
 		if( empty( $this->filters ) )
 		{	// Filters have no been set before, we'll use the default filterset:
 			// echo ' setting default filterset ';
 			$this->set_filters( $this->default_filters );
 		}
 
-
 		$title_array = array();
-
 
 		if( $this->single_post )
 		{	// We have requested a specific post:
@@ -1019,14 +1021,14 @@ class ItemList2 extends DataObjectList2
 				if( $this->filters['cat_modifier'] == '-' )
 				{
 					$cat_names_string = T_('All but ').' '.$cat_names_string;
-					$title_array['cats'] = T_('Categories').': '.$cat_names_string;
+					$title_array['cats'] = $params['categories_text'].$cat_names_string;
 				}
 				else
 				{
 					if( count($this->filters['cat_array']) > 1 )
-						$title_array['cats'] = T_('Categories').': '.$cat_names_string;
+						$title_array['cats'] = $params['categories_text'].$cat_names_string;
 					else
-						$title_array['cats'] = T_('Category').': '.$cat_names_string;
+						$title_array['cats'] = $params['category_text'].$cat_names_string;
 				}
 			}
 		}
@@ -1614,6 +1616,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.44  2006/12/05 00:01:15  fplanque
+ * enhanced photoblog skin
+ *
  * Revision 1.43  2006/12/04 18:16:50  fplanque
  * Each blog can now have its own "number of page/days to display" settings
  *

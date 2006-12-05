@@ -88,7 +88,8 @@ a.BlogButtonCurr:hover {
 
 /* Styles for main area (left) */
 h2 {
-	margin: 1ex;
+	margin: 0;
+	padding: 1ex 0 0 0;
 }
 
 /* Styles for posts */
@@ -99,8 +100,14 @@ h2 {
 div.action_messages {
 	margin: 0 2ex;
 }
+.nav_right
+{
+	padding: 1em;
+	float: right;
+}
 .bPost
 {
+	clear: both;
 }
 .image_block img {
 	background: #fff;
@@ -114,20 +121,33 @@ div.action_messages {
 	width: 100%;
 }
 h3.bTitle {
-	margin: 1ex;;
-	padding:0;
+	font-size: 100%;
+	display:inline;
+	letter-spacing: 2px;
 }
 .bText {
 	margin-top: 0px;
 	margin-bottom: 0px;
 }
-.bSmallHead,
-.bSmallPrint
+.bSmallHead
 {
-	font-size: 80%;
 	padding: 2ex;
 }
-
+.bSmallPrint
+{
+	font-size: 84%;
+	padding: 2ex;
+}
+.action_right
+{
+	font-size: 84%;
+	float: right;
+	margin: 0 0 0 1em;
+}
+.timestamp {
+	margin: 0 0 0 1em;
+	font-size: 84%;
+}
 
 input.bComment,
 textarea.bComment
