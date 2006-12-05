@@ -634,6 +634,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 				case 'html_textarea':
 					$l_param_type = 'html';
 					break;
+
+				default:
+					$l_param_type = 'string';
 			}
 		}
 		else
@@ -936,6 +939,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.37  2006/12/05 02:32:48  blueyed
+ * Fix for "Minor refactoring".. :/
+ *
  * Revision 1.36  2006/12/05 01:59:12  blueyed
  * Added validation for all types of (User)Settings
  *
