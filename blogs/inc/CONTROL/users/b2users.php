@@ -68,7 +68,7 @@ if( $user_profile_only )
 	// Make sure the user only edits himself:
 	$user_ID = $current_User->ID;
 	$grp_ID = NULL;
-	if( ! in_array( $action, array( 'userupdate', 'edit_user' ) ) )
+	if( ! in_array( $action, array( 'userupdate', 'edit_user', 'default_settings' ) ) )
 	{
 		$action = 'edit_user';
 	}
@@ -420,14 +420,18 @@ if( !$Messages->count('error') )
 				$Messages->add( T_('Usersettings of Plugins have been updated.'), 'success' );
 			}
 
-			if( $reload_page )
-			{ // reload the current page through header redirection:
-				header_redirect( regenerate_url( 'action', '', '', '&' ) ); // will save $Messages into Session
-			}
-
 			if( $user_profile_only )
 			{
 				$action = 'edit_user';
+			}
+
+			if( $reload_page )
+			{ // reload the current page through header redirection:
+				if( $action != 'edit_user' )
+				{
+					$action = 'list';
+				}
+				header_redirect( regenerate_url( '', 'user_ID='.$edited_User->ID.'&action='.$action, '', '&' ) ); // will save $Messages into Session
 			}
 			break;
 
@@ -500,14 +504,12 @@ if( !$Messages->count('error') )
 				$Messages->add( T_('Usersettings of Plugins have been updated.'), 'success' );
 			}
 
+			// Always display the profile again:
+			$action = 'edit_user';
+
 			if( $reload_page )
 			{ // reload the current page through header redirection:
-				header_redirect( regenerate_url( 'action', '', '', '&' ) );
-			}
-
-			if( $user_profile_only )
-			{
-				$action = 'edit_user';
+				header_redirect( regenerate_url( '', 'user_ID='.$edited_User->ID.'&action='.$action, '', '&' ) ); // will save $Messages into Session
 			}
 			break;
 
@@ -804,6 +806,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.43  2006/12/05 02:54:37  blueyed
+ * Go to user profile after resetting to defaults; fixed handling of action in case of redirecting
+ *
  * Revision 1.42  2006/12/03 19:01:57  blueyed
  * doc
  *
