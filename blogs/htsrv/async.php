@@ -84,7 +84,7 @@ switch( $action )
 
 		param( 'plugin_ID', 'integer', true );
 
-		$admin_Plugins = new Plugins_admin(); // use Plugins_admin, because a plugin might be disabled
+		$admin_Plugins = & get_Cache('Plugins_admin'); // use Plugins_admin, because a plugin might be disabled
 		$Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 		if( ! $Plugin )
 		{
@@ -97,7 +97,7 @@ switch( $action )
 		}
 		param( 'set_path', '/^\w+(?:\[\w+\])+$/', '' );
 
-		require_once $inc_path.'_misc/_plugin.funcs.php';
+		load_funcs('_misc/_plugin.funcs.php');
 
 		// Init the new setting set:
 		_set_setting_by_path( $Plugin, $set_type, $set_path, array() );
@@ -134,6 +134,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.19  2006/12/05 01:04:03  blueyed
+ * Fixed add_plugin_sett_set AJAX callback
+ *
  * Revision 1.18  2006/12/04 00:18:52  fplanque
  * keeping the login hashing
  *
