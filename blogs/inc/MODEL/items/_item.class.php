@@ -2590,9 +2590,7 @@ class Item extends DataObject
 	 *
 	 * This function has to handle all needed DB dependencies!
 	 *
-	 * @todo cleanup the set() calls
-	 * @todo dh> bloat! better to use a set() + dbinsert() IMHO..
-	 * fp> Of couse. This is pure crap. It was only meant as a temporary upgrade path while refactoring some code. Should be removed ASAP.
+	 * @deprecated since EVO_NEXT_VERSION. Use set() + dbinsert() instead
 	 */
 	function insert(
 		$author_user_ID,              // Author
@@ -3331,6 +3329,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.133  2006/12/05 06:38:40  blueyed
+ * doc
+ *
  * Revision 1.132  2006/12/05 00:39:56  fplanque
  * fixed some more permalinks/archive links
  *
