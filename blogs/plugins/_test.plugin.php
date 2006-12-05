@@ -92,32 +92,49 @@ class test_plugin extends Plugin
 	{
 		$r = array(
 			'click_me' => array(
-					'label' => T_('Click me!'),
-					'defaultvalue' => '1',
-					'type' => 'checkbox',
-				),
+				'label' => T_('Click me!'),
+				'defaultvalue' => '1',
+				'type' => 'checkbox',
+			),
 			'input_me' => array(
-					'label' => T_('How are you?'),
-					'defaultvalue' => '',
-					'note' => T_('Welcome to b2evolution'),
-				),
+				'label' => T_('How are you?'),
+				'defaultvalue' => '',
+				'note' => T_('Welcome to b2evolution'),
+			),
 			'my_select' => array(
-					'label' => T_('Selector'),
-					'id' => $this->classname.'_my_select',
-					'onchange' => 'document.getElementById("'.$this->classname.'_a_disabled_one").disabled = ( this.value == "sun" );',
-					'defaultvalue' => 'one',
-					'type' => 'select',
-					'options' => array( 'sun' => T_('Sunday'), 'mon' => T_('Monday') ),
-				),
+				'label' => T_('Selector'),
+				'id' => $this->classname.'_my_select',
+				'onchange' => 'document.getElementById("'.$this->classname.'_a_disabled_one").disabled = ( this.value == "sun" );',
+				'defaultvalue' => 'one',
+				'type' => 'select',
+				'options' => array( 'sun' => T_('Sunday'), 'mon' => T_('Monday') ),
+			),
 			'a_disabled_one' => array(
-					'label' => 'This one is disabled',
-					'id' => $this->classname.'_a_disabled_one',
-					'type' => 'checkbox',
-					'defaultvalue' => '1',
-					'disabled' => true, // this can be useful if you detect that something cannot be changed. You probably want to add a 'note' then, too.
-					'note' => 'Change the above select input to "'.T_('Monday').'" to enable it.',
+				'label' => 'This one is disabled',
+				'id' => $this->classname.'_a_disabled_one',
+				'type' => 'checkbox',
+				'defaultvalue' => '1',
+				'disabled' => true, // this can be useful if you detect that something cannot be changed. You probably want to add a 'note' then, too.
+				'note' => 'Change the above select input to "'.T_('Monday').'" to enable it.',
+			),
+			'blog' => array(
+				'label' => 'A blog',
+				'type' => 'select_blog',
+				'allow_none' => true,
+			),
+			'sets' => array(
+				'type' => 'array',
+				'min_count' => 0,
+				'max_count' => 3,
+				'entries' => array(
+					'user' => array(
+						'label' => 'A user',
+						'type' => 'select_user',
+						'allow_none' => true,
+					),
 				),
-			);
+			),
+		);
 
 		if( $params['for_editing'] )
 		{ // we're asked for the settings for editing:
@@ -676,8 +693,8 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
- * Revision 1.58  2006/12/05 01:57:10  blueyed
- * Removed LoginAttemptNeedsRawPassword
+ * Revision 1.59  2006/12/05 01:57:32  blueyed
+ * Added more settings
  *
  * Revision 1.57  2006/12/01 16:26:34  blueyed
  * Added AdminDisplayCommentFormFieldset hook
