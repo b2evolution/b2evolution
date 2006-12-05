@@ -69,8 +69,10 @@ function disp_system_check( $condition, $message = '' )
 	echo '</div>';
 }
 
-$facilitate_exploits = T_('When enabled, this feature is known to facilitate hacking exploits in any PHP application.');
-$change_ini = T_('If possible, change this setting to <code>%s</code> in your php.ini. Otherwise, ask your hosting provider about it.');
+$facilitate_exploits = '<p>'.T_('When enabled, this feature is known to facilitate hacking exploits in any PHP application.')."</p>\n<p>" 
+	.T_('b2evolution includes additional measures in order not to be affected by this. 
+	However, for maximum security, we still recommend disabling this PHP feature.')."</p>\n";
+$change_ini = '<p>'.T_('If possible, change this setting to <code>%s</code> in your php.ini or ask your hosting provider about it.').'</p>';
 
 
 echo '<h2>'.T_('System checks').'</h2>';
@@ -164,6 +166,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2006/12/05 11:30:26  fplanque
+ * presentation
+ *
  * Revision 1.1  2006/12/05 10:20:18  fplanque
  * A few basic systems checks
  *
