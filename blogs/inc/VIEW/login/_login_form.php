@@ -71,7 +71,6 @@ $Form->begin_form( 'fform' );
 		$Form->hidden( 'sessID', $sessID );
 	}
 
-// ***
 // fp>SUSPECT
 	if( ! $need_raw_pwd )
 	{ // used by JS-password encryption/hashing (gets filled by JS AJAX callback):
@@ -79,7 +78,6 @@ $Form->begin_form( 'fform' );
 		$Form->hidden( 'pwd_hashed', '' );
 	}
 // SUSPECT<fp
-// ***
 
 	if( ! empty($mode) )
 	{ // We're in the process of bookmarkletting something, we don't want to lose it:
@@ -140,7 +138,6 @@ $Form->end_form();
 
 
 	<?php
-//***
 // fp>SUSPECT
 	if( ! $need_raw_pwd )
 	{
@@ -228,7 +225,6 @@ $Form->end_form();
 		<?php
 	}
 // <fp
-//***
 	?>
 </script>
 
@@ -258,8 +254,12 @@ $Form->end_form();
 <?php
 require dirname(__FILE__).'/_footer.php';
 
+
 /*
  * $Log$
+ * Revision 1.29  2006/12/05 01:41:22  blueyed
+ * Removed markers, as requested
+ *
  * Revision 1.28  2006/12/04 20:51:39  blueyed
  * Use TS_() for JS strings
  *
