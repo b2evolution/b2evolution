@@ -85,7 +85,10 @@ function & get_Cache( $objectName )
 			return $FiletypeCache;
 
 		case 'GroupCache';
-			$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\' )' );
+			if( ! $Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\' )' ) )
+			{
+				$GroupCache->none_option_text = /* TRANS: "None" select option */ T_('No group');
+			}
 			return $GroupCache;
 
 		case 'ItemCache';
@@ -94,7 +97,10 @@ function & get_Cache( $objectName )
 			return $ItemCache;
 
 		case 'ItemStatusCache';
-			$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_itemstatuses\', \'pst_\', \'pst_ID\' )' );
+			if( ! $Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_itemstatuses\', \'pst_\', \'pst_ID\' )' ) )
+			{
+				$ItemStatusCache->none_option_text = /* TRANS: "None" select option */ T_('No status');
+			}
 			return $ItemStatusCache;
 
 		case 'ItemTypeCache';
@@ -124,6 +130,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/05 00:34:39  blueyed
+ * Implemented custom "None" option text in DataObjectCache; Added for $ItemStatusCache, $GroupCache, UserCache and BlogCache; Added custom text for Item::priority_options()
+ *
  * Revision 1.7  2006/12/01 20:55:45  blueyed
  * Fixed load_Class() for $Plugins_admin
  *

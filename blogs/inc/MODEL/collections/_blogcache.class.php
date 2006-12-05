@@ -252,10 +252,23 @@ class BlogCache extends DataObjectCache
 
 		return parent::get_option_list( $default, $allow_none, $method );
 	}
+
+
+	/**
+	 * @return string
+	 */
+	function get_none_option_text()
+	{
+		return /* TRANS: "None" select option */ T_('No blog');
+	}
 }
+
 
 /*
  * $Log$
+ * Revision 1.14  2006/12/05 00:34:39  blueyed
+ * Implemented custom "None" option text in DataObjectCache; Added for $ItemStatusCache, $GroupCache, UserCache and BlogCache; Added custom text for Item::priority_options()
+ *
  * Revision 1.13  2006/11/24 18:27:23  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

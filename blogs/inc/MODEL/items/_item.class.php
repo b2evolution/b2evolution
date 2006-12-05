@@ -483,7 +483,7 @@ class Item extends DataObject
 	/**
 	 * Generate the permalink for the item.
 	 *
-	 * Note: Each item has an unique permalink at any given time. 
+	 * Note: Each item has an unique permalink at any given time.
 	 * Some admin settings may however change the permalinks for previous items.
 	 * Note: This actually only returns the URL, to get a real link, use {@link Item::get_permanent_link()}
 	 *
@@ -2097,16 +2097,18 @@ class Item extends DataObject
 	 */
 	function priority_options( $field_value, $allow_none )
 	{
+		$priority = isset($field_value) ? $field_value : $this->priority;
+
 		$r = '';
 		if( $allow_none )
 		{
-			$r = '<option value="">'.T_('None').'</option>';
+			$r = '<option value="">'./* TRANS: "None" select option */T_('No priority').'</option>';
 		}
 
 		foreach( $this->priorities as $i => $name )
 		{
 			$r .= '<option value="'.$i.'"';
-			if( $this->priority == $i )
+			if( $priority == $i )
 			{
 				$r .= ' selected="selected"';
 			}
@@ -3322,6 +3324,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.131  2006/12/05 00:34:39  blueyed
+ * Implemented custom "None" option text in DataObjectCache; Added for $ItemStatusCache, $GroupCache, UserCache and BlogCache; Added custom text for Item::priority_options()
+ *
  * Revision 1.130  2006/12/04 20:52:40  blueyed
  * typo
  *

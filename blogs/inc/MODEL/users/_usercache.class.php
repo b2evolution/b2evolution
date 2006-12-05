@@ -264,11 +264,23 @@ class UserCache extends DataObjectCache
 		}
 		parent::remove_by_ID($req_ID);
 	}
+
+
+	/**
+	 * @return string
+	 */
+	function get_none_option_text()
+	{
+		return /* TRANS: "None" select option */ T_('No user');
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.7  2006/12/05 00:34:39  blueyed
+ * Implemented custom "None" option text in DataObjectCache; Added for $ItemStatusCache, $GroupCache, UserCache and BlogCache; Added custom text for Item::priority_options()
+ *
  * Revision 1.6  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

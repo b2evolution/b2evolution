@@ -73,6 +73,19 @@ class DataObjectCache
 	var $name_field;
 	var $order_by;
 
+	/**
+	 * The text that gets used for the "None" option in the objects
+	 * options list.
+	 *
+	 * This is especially useful for i18n, because there are several "None"s!
+	 *
+	 * Subclasses should override {@link DataObjectCache::get_none_option_text()} and
+	 * instances should set this property directly.
+	 *
+	 * @var string
+	 */
+	var $none_option_text;
+
 
 	/**
 	 * Constructor
@@ -475,7 +488,7 @@ class DataObjectCache
 		{
 			$r .= '<option value=""';
 			if( empty($default) ) $r .= ' selected="selected"';
-			$r .= '>'.$this->get_None_option_string().'</option>'."\n";
+			$r .= '>'.format_to_output($this->get_none_option_text()).'</option>'."\n";
 		}
 
 		foreach( $this->cache as $loop_Obj )
@@ -492,28 +505,28 @@ class DataObjectCache
 
 
 	/**
-	 * Get the string that gets used for the "None" option in the objects
-	 * options list. This is especially useful for i18n, because there are
-	 * several "None"s!
+	 * Return the text for "None", if allowed in {@link get_option_list()}.
 	 *
-	 * Subclasses should override this, e.g. "No user" for {@link UserCache}.
-	 *
-	 * {@internal dh> QUESTION: I've made this a callback to not translate a string to early,
-	 *  but it would require to have real classes for e.g. GroupCache. Should it be a
-	 *  constructor param instead? }}
-	 * fp> yes I think an added param to the constructor could be ok. Or a set_none_text() method. Please use 'none' instead of 'None' in function name.
-	 *
+	 * @see DataObjectCache::none_option_text
 	 * @return string
 	 */
-	function get_None_option_string()
+	function get_none_option_text()
 	{
-		return /* TRANS: the default value for option lists where "None" is allowed */ T_('None');
+		if( ! isset($this->none_option_text) )
+		{
+			$this->none_option_text = /* TRANS: the default value for option lists where "None" is allowed */ T_('None');
+		}
+		return $this->none_option_text;
 	}
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.21  2006/12/05 00:34:39  blueyed
+ * Implemented custom "None" option text in DataObjectCache; Added for $ItemStatusCache, $GroupCache, UserCache and BlogCache; Added custom text for Item::priority_options()
+ *
  * Revision 1.20  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
