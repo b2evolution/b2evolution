@@ -84,7 +84,7 @@ function autoquote( & $string )
 
 
 
-// xmlrpc:
+// xmlrpc: {{{
 
 $pingback_ping_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString));
 
@@ -97,6 +97,7 @@ $pingback_ping_doc = 'gets a pingback and registers it as a comment prefixed by 
  *
  * This is the pingback receiver!
  *
+ * @uses strip_all_but_one_link()
  * original code by Mort (http://mort.mine.nu:8080)
  * fplanque: every time you come here you can correct a couple of bugs...
  */
@@ -346,7 +347,35 @@ function pingback_ping( $m )
 }
 
 
-// end xmlrpc
+/**
+ * Pingback support function
+ */
+function strip_all_but_one_link($text, $mylink, $log)
+{
+	debug_fwrite($log, 'Searching '.$mylink.' in text block #####'.$text."####\n\n");
+
+	$match_link = '#(<a.+?href.+?'.'>)(.+?)(</a>)#';
+	preg_match_all($match_link, $text, $matches);
+	$count = count($matches[0]);
+	for ($i=0; $i<$count; $i++)
+	{
+		$thislink = $matches[0][$i];
+		debug_fwrite($log, 'Analyzing link : '.$thislink."\n");
+
+		if(strstr($thislink, $mylink))
+		{
+			debug_fwrite($log, "MATCH!\n");
+		}
+		else
+		{ // this link doesn't contain what we're looking for
+			$text = str_replace($matches[0][$i], $matches[2][$i], $text);
+		}
+	}
+	return $text;
+}
+
+// end xmlrpc }}}
+
 
 /**
  * Sending pingback

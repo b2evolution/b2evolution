@@ -7,7 +7,6 @@
  * - the BLOGGER API for b2evo, see {@link http://www.blogger.com/developers/api/1_docs/}
  * - Metaweblog API
  * - Movable Type API (partial)
- * - the PINGBACK functions
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -1102,36 +1101,6 @@ function bloggersettemplate( $m )
 	return new xmlrpcresp(new xmlrpcval("1", "boolean"));
 }
 
-
-
-
-/**
- * Pingback support function
- * strip_all_but_one_link(-)
- */
-function strip_all_but_one_link($text, $mylink, $log)
-{
-	debug_fwrite($log, 'Searching '.$mylink.' in text block #####'.$text."####\n\n");
-
-	$match_link = '#(<a.+?href.+?'.'>)(.+?)(</a>)#';
-	preg_match_all($match_link, $text, $matches);
-	$count = count($matches[0]);
-	for ($i=0; $i<$count; $i++)
-	{
-		$thislink = $matches[0][$i];
-		debug_fwrite($log, 'Analyzing link : '.$thislink."\n");
-
-		if(strstr($thislink, $mylink))
-		{
-			debug_fwrite($log, "MATCH!\n");
-		}
-		else
-		{ // this link doesn't contain what we're looking for
-			$text = str_replace($matches[0][$i], $matches[2][$i], $text);
-		}
-	}
-	return $text;
-}
 
 
 //---------- Tor Jan 2005 Metaweblog  API ----------------
@@ -2244,6 +2213,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.128  2006/12/06 17:49:11  blueyed
+ * Moved strip_all_but_one_link() to obsolete2.php; doc (pingback removed)
+ *
  * Revision 1.127  2006/12/05 07:23:22  blueyed
  * Fixed categories handling also for blogger.editPost; doc
  *
