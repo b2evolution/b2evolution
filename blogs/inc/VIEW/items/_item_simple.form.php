@@ -69,7 +69,7 @@ $Form->begin_form( '', '', $params );
 
 $Form->hidden( 'action', $next_action );
 $Form->hidden( 'blog', $Blog->ID );
-if( isset( $mode ) )   $Form->hidden( 'mode', $mode );
+if( isset( $mode ) )   $Form->hidden( 'mode', $mode ); // used by bookmarklet
 if( isset( $edited_Item ) )   $Form->hidden( 'post_ID', $edited_Item->ID );
 
 // In case we send this to the blog for a preview :
@@ -282,6 +282,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.22  2006/12/06 23:55:53  fplanque
+ * hidden the dead body of the sidebar plugin + doc
+ *
  * Revision 1.21  2006/11/29 20:48:46  blueyed
  * Moved url_rel_to_same_host() from _misc.funcs.php to _url.funcs.php
  *

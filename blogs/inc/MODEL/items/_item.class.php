@@ -2229,10 +2229,7 @@ class Item extends DataObject
 		if( !$atLeastOneRenderer )
 		{
 			global $admin_url, $mode;
-			echo '<a title="'.T_('Configure plugins').'" href="'
-				.$admin_url.'?ctrl=plugins"'
-				.( $mode == 'sidebar' ? ' onclick="pop_up_window(\''.$admin_url.'?ctrl=plugins\'); return false;"' : '' )
-				.'>'.T_('No renderer plugins are installed.').'</a>';
+			echo '<a title="'.T_('Configure plugins').'" href="'.$admin_url.'?ctrl=plugins"'.'>'.T_('No renderer plugins are installed.').'</a>';
 		}
 	}
 
@@ -3329,6 +3326,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.135  2006/12/06 23:55:53  fplanque
+ * hidden the dead body of the sidebar plugin + doc
+ *
  * Revision 1.134  2006/12/05 14:28:29  blueyed
  * Fixed wordcount==0 handling; has been saved as NULL
  *

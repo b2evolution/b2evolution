@@ -135,10 +135,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 					$ii = "$i";
 				}
 				echo ">";
-				if( $mode == 'sidebar' )
-					echo T_($month_abbrev[$ii]);
-				else
-					echo T_($month[$ii]);
+				echo T_($month[$ii]);
 				echo "</option>\n";
 			}
 			?>
@@ -202,6 +199,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.20  2006/12/06 23:55:53  fplanque
+ * hidden the dead body of the sidebar plugin + doc
+ *
  * Revision 1.19  2006/12/03 00:22:17  fplanque
  * doc
  *

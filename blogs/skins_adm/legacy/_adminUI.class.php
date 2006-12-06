@@ -95,11 +95,6 @@ class AdminUI extends AdminUI_general
 		// Style switcher:
 		$this->headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/styleswitcher.js?v=2"></script>';
 
-		if( $mode == 'sidebar' )
-		{ // Include CSS overrides for sidebar:
-			$this->headlines[] = '<link href="skins_adm/legacy/rsc/css/sidebar.css" rel="stylesheet" type="text/css" />';
-		}
-
 		return parent::get_headlines();
 	}
 
@@ -156,7 +151,7 @@ class AdminUI extends AdminUI_general
 		$r = '';
 
 		if( empty($this->mode) )
-		{ // We're not running in an special mode (bookmarklet, sidebar...)
+		{ // We're not running in an special mode (bookmarklet...)
 			$r .= $this->get_page_head();
 		}
 

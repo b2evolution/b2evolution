@@ -64,17 +64,8 @@ switch($action)
 
 		// Mumby funky old style navigation stuff:
 		$blog = get_catblog( $post_category );
-		param( 'mode', 'string', '' );
-		switch($mode)
-		{
-			case 'sidebar':
-				$location="b2sidebar.php?blog=$blog";
-				break;
-
-			default:
-				$location = url_add_param( $admin_url, "ctrl=browse&amp;blog=$blog&amp;filter=restore" );
-				break;
-		}
+		param( 'mode', 'string', '' ); // used by bookmarklet
+		$location = url_add_param( $admin_url, "ctrl=browse&amp;blog=$blog&amp;filter=restore" );
 		$AdminUI->title = T_('Adding new post...');
 
 
@@ -561,6 +552,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.32  2006/12/06 23:55:53  fplanque
+ * hidden the dead body of the sidebar plugin + doc
+ *
  * Revision 1.31  2006/11/14 00:47:32  fplanque
  * doc
  *

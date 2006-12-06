@@ -24,7 +24,7 @@ if( $blog != $user_selected_blog )
 	$UserSettings->dbupdate();
 }
 
-param( 'mode', 'string', '', true );  // Sidebar, bookmarklet, upload (upload actually means sth like: select img for post)
+param( 'mode', 'string', '', true );  // bookmarklet, upload (upload actually means sth like: select img for post)
 
 // Get the Admin skin
 // TODO: Allow setting through GET param (dropdown in backoffice), respecting a checkbox "Use different setting on each computer" (if cookie_state handling is ready)
@@ -350,6 +350,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.26  2006/12/06 23:55:53  fplanque
+ * hidden the dead body of the sidebar plugin + doc
+ *
  * Revision 1.25  2006/12/05 09:59:37  fplanque
  * A few basic systems checks
  *
