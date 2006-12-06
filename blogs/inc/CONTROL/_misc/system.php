@@ -135,6 +135,7 @@ if( version_compare(PHP_VERSION, '5.2', '>=') )
  * allow_url_fopen
  * Note: this allows including of remote files (PHP 4 only) as well as opening remote files with fopen() (all versions of PHP)
  * Both have potential for exploits. (The first is easier to exploit than the second).
+ * dh> Should we check for curl etc then also and warn the user until there's no method for us anymore to open remote files? IMHO it's not a warning if allow_url_fopen is "On" in PHP >= 5.2
  */
 init_system_check( 'PHP allow_url_fopen', ini_get('allow_url_fopen') ?  T_('On') : T_('Off') );
 if( ini_get('allow_url_fopen' ) )
@@ -186,6 +187,7 @@ if( ! extension_loaded('xml' ) )
 	disp_system_check( 'warning', T_('The XML extension is not loaded.') ); // fp> This message only repeats the exact same info that is already displayed. Not helpful.
 	// fp>TODO: explain what we need it for. Is it a problem or not.
 	// furthermore I think xmlrpc does dynamic loading (or has it been removed?), in which case this should be tested too.
+	// dh> You mean the deprecated dl() loading? We might just try this then here also before any warning.
 }
 else
 {
@@ -213,8 +215,6 @@ if( ! $install_removed )
 	{
 		disp_system_check( 'ok' );
 	}
-
-
 }
 else
 {
@@ -278,6 +278,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2006/12/06 22:51:41  blueyed
+ * doc
+ *
  * Revision 1.5  2006/12/05 15:15:56  fplanque
  * more tests
  *
