@@ -112,7 +112,6 @@ class BlogCache extends DataObjectCache
 
 		$req_url_wo_proto = substr( $req_url, strpos( $req_url, '://' ) ); // req_url without protocol, so it matches http and https below
 
-		// fp> TODO: protocol detection feels bloated. Why not used a MYSQL REGEXP ??
 		// TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
 		$sql = "
 				SELECT *
@@ -258,6 +257,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.16  2006/12/06 18:04:23  fplanque
+ * doc
+ *
  * Revision 1.15  2006/12/05 01:35:27  blueyed
  * Hooray for less complexity and the 8th param for DataObjectCache()
  *
