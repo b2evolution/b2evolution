@@ -263,7 +263,7 @@ class Form extends Widget
 				$this->formstart = '';
 				$this->title_fmt = '$title$'."\n"; // TODO: icons
 				$this->no_title_fmt = '';          //           "
-				$this->fieldstart = ''; // TODO: fp> shall we still use $ID$ here ?
+				$this->fieldstart = ''; // fp> shall we still use $ID$ here ?
 				$this->labelstart = '';
 				$this->labelend = "\n";
 				$this->labelempty = '';
@@ -2707,6 +2707,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.55  2006/12/06 19:12:11  fplanque
+ * not all comments are something "TO DO". Some really just are "comments"
+ *
  * Revision 1.54  2006/12/06 18:48:20  blueyed
  * doc
  *
