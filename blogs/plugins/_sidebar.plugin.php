@@ -51,6 +51,7 @@ class sidebar_plugin extends Plugin
 		* fp> No. The plugin does only half of the job, the other half bloats the core and has not been maintained for 2 years maybe. Conclusion: if someone needs this he's gonna have to write a full plugin for it.
 	 *  dh> IMHO the "bloat in the core" should just get moved here, and hooks should be added as needed.
 	 *      (If someone makes a "real plugin", he'd need hooks anyway!)
+	 *  dh> seems broken anyway.. $admin_url.'b2sidebar.php' does not exist anymore.. :/
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a tool menu block?
 	 */
@@ -93,6 +94,9 @@ class sidebar_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.19  2006/12/06 23:21:38  blueyed
+ * doc: broken
+ *
  * Revision 1.18  2006/12/03 01:53:25  blueyed
  * doc
  *
