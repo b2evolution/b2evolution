@@ -194,7 +194,7 @@ class Form extends Widget
 														.'<span class="right_icons">$global_icons$</span>'
 														.'$title$</div></th></tr>'."\n";
 				$this->no_title_fmt = '<tr><th colspan="2"><span class="right_icons">$global_icons$</span></th></tr>'."\n";
-				$this->fieldstart = "<tr>\n";
+				$this->fieldstart = '<tr $ID$>'."\n";
 				$this->labelstart = '<td class="label">';
 				$this->labelend = "</td>\n";
 				$this->labelempty = '<td class="label">&nbsp;</td>'."\n";
@@ -211,7 +211,7 @@ class Form extends Widget
 				$this->formstart = '';
 				$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 				$this->no_title_fmt = '<span style="float:right">$global_icons$</span>'."\n";
-				$this->fieldstart = "<fieldset>\n";
+				$this->fieldstart = '<fieldset $ID$>'."\n";
 				$this->labelstart = '<div class="label">';
 				$this->labelend = "</div>\n";
 				$this->labelempty = '';
@@ -228,7 +228,7 @@ class Form extends Widget
 				$this->formstart = '';
 				$this->title_fmt = '$title$'."\n"; // TODO: icons
 				$this->no_title_fmt = '';          //           "
-				$this->fieldstart = '<div class="tile">';
+				$this->fieldstart = '<div class="tile" $ID$>';
 				$this->labelstart = '';
 				$this->labelend = "\n";
 				$this->labelempty = '';
@@ -245,7 +245,7 @@ class Form extends Widget
 				$this->formstart = '';
 				$this->title_fmt = '$title$'."\n"; // TODO: icons
 				$this->no_title_fmt = '';          //           "
-				$this->fieldstart = '<span class="block">';
+				$this->fieldstart = '<span class="block" $ID$>';
 				$this->labelstart = '';
 				$this->labelend = "\n";
 				$this->labelempty = '';
@@ -263,7 +263,7 @@ class Form extends Widget
 				$this->formstart = '';
 				$this->title_fmt = '$title$'."\n"; // TODO: icons
 				$this->no_title_fmt = '';          //           "
-				$this->fieldstart = '';
+				$this->fieldstart = ''; // shall we still use $ID$ here ?
 				$this->labelstart = '';
 				$this->labelend = "\n";
 				$this->labelempty = '';
@@ -305,7 +305,17 @@ class Form extends Widget
 			$this->_common_params['label'] = $field_label;
 		}
 
-		$r = $this->fieldstart;
+		// Start the new form field and inject an automatic DOM id
+		// This is useful to show/hide the whole field by JS.
+		if( !empty(	$this->_common_params['id'] ) )
+		{
+			$ffield_id = 'id="ffield_'.$this->_common_params['id'].'" ';
+		}
+		else
+		{	// fp> This class is so utterly complex, I cannot know for sure if this can happen or not :/
+			$ffield_id = '';
+		}
+		$r = str_replace( '$ID$', $ffield_id, $this->fieldstart );
 
 		if( isset($this->_common_params['field_prefix']) )
 		{
@@ -2697,6 +2707,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.53  2006/12/06 18:06:18  fplanque
+ * an experiment with JS hiding/showing form parts
+ *
  * Revision 1.52  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

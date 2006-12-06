@@ -72,10 +72,12 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') );
 
 	$Form->checkbox_input( 'eblog_enabled', $Settings->get('eblog_enabled'), T_('Enable Blog by email'),
-		array( 'note' => T_('Check to enable the Blog by email feature.' ), 'onclick' => 'this.checked==true?document.getElementById("eblog_section").style.display="":document.getElementById("eblog_section").style.display="none";' ) );
+		array( 'note' => T_('Check to enable the Blog by email feature.' ), 'onclick' =>
+			'document.getElementById("eblog_section").style.display = (this.checked==true ? "" : "none") ;' ) );
 
-	// TODO: this is IMPOSSIBLE to use when you have no javascript!!! :((
+	// TODO: this is IMPOSSIBLE to turn back on when you have no javascript!!! :((
 	echo '<div id="eblog_section" style="'.( $Settings->get('eblog_enabled') ? '' : 'display:none' ).'">';
+
 		$Form->select_input_array( 'eblog_method', array( 'pop3'=>T_('POP3'), 'pop3a'=>T_('POP3 through IMAP extension (experimental)') ), // TRANS: E-Mail retrieval method
 			T_('Retrieval method'), array('value' => $Settings->get('eblog_method'), 'note' => T_('Choose a method to retrieve the emails.') ) );
 
@@ -175,6 +177,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.16  2006/12/06 18:06:18  fplanque
+ * an experiment with JS hiding/showing form parts
+ *
  * Revision 1.15  2006/12/03 01:25:49  blueyed
  * Use & instead of &amp; when it gets encoded for output
  *
