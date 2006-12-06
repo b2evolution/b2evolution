@@ -42,26 +42,6 @@ require_once $inc_path.'_main.inc.php';
 
 param( 'action', 'string', '' );
 
-// Actions for _any_ users (including anonymous):
-switch( $action )
-{
-// fp>SUSPECT:
-	case 'get_login_salt':
-		// Generate a random "salt", which gets used for encrypting the password on the client side:
-		// (used by JS-password encryption/hashing (/inc/VIEW/login/_login_form.php))
-		// The salt gets requested "on submit".
-		$pwd_salt = generate_random_key(64);
-
-		// set the salt into user's session (and refresh the 60 seconds time window):
-		$Session->set( 'core.pwd_salt', $pwd_salt, 60 );
-		$Session->dbsave();
-
-		echo $pwd_salt;
-		exit;
-// SUSPECT<fp
-}
-
-
 // Check global permission:
 if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 {	// No permission to access admin...
@@ -134,6 +114,12 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.20  2006/12/06 23:32:34  fplanque
+ * Rollback to Daniel's most reliable password hashing design. (which is not the last one)
+ * This not only strengthens the login by providing less failure points, it also:
+ * - Fixes the login in IE7
+ * - Removes the double "do you want to memorize this password' in FF.
+ *
  * Revision 1.19  2006/12/05 01:04:03  blueyed
  * Fixed add_plugin_sett_set AJAX callback
  *

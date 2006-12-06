@@ -642,6 +642,16 @@ class test_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Do we need a raw password in {@link LoginAttempt()}?
+	 * @see Plugin::LoginAttemptNeedsRawPassword()
+	 */
+	function LoginAttemptNeedsRawPassword()
+	{
+		return false;	// No we don't need raw. (do not implement this method if the answer is no)
+	}
+
+
+	/**
 	 * Automagically login every user as "demouser" who is not logged in and does not
 	 * try to currently.
 	 *
@@ -693,6 +703,12 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.60  2006/12/06 23:32:35  fplanque
+ * Rollback to Daniel's most reliable password hashing design. (which is not the last one)
+ * This not only strengthens the login by providing less failure points, it also:
+ * - Fixes the login in IE7
+ * - Removes the double "do you want to memorize this password' in FF.
+ *
  * Revision 1.59  2006/12/05 01:57:32  blueyed
  * Added more settings
  *

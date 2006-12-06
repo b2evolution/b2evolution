@@ -408,6 +408,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 	// Password hashing by JavaScript:
 	$need_raw_pwd = (bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
+	param('pwd_salt', 'string', ''); // just for comparison with the one from Session
 	$pwd_salt_sess = $Session->get('core.pwd_salt');
 
 	if( $need_raw_pwd )
@@ -451,13 +452,27 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 				if( empty($pwd_salt_sess) )
 				{ // no salt stored in session: either cookie problem or the user had already tried logging in (from another window for example)
 					$Debuglog->add( 'Empty salt_sess.', 'login' );
-
-					$Messages->add( T_('Either you have not enabled cookies or this login window has expired.'), 'login_error' );
-					$Debuglog->add( 'Session ID does not match.', 'login' );
+					if( substr($pass, 0, 7) == 'hashed_' && substr($pass, 7) == $Session->ID )
+					{ // session ID matches, no cookie problem
+						$Messages->add( T_('The login window has expired. Please try again.'), 'login_error' );
+						$Debuglog->add( 'Session ID matches.', 'login' );
+					}
+					else
+					{ // more general error:
+						$Messages->add( T_('Either you have not enabled cookies or this login window has expired.'), 'login_error' );
+						$Debuglog->add( 'Session ID does not match.', 'login' );
+					}
+				}
+				elseif( $pwd_salt != $pwd_salt_sess )
+				{ // submitted salt differs from the one stored in the session
+					$Messages->add( T_('The login window has expired. Please try again.'), 'login_error' );
+					$Debuglog->add( 'Submitted salt and salt from Session do not match.', 'login' );
 				}
 				else
 				{ // compare the password, using the salt stored in the Session:
-					$pass_ok = sha1($User->pass.$pwd_salt_sess) == $pwd_hashed;
+					#pre_dump( sha1($User->pass.$pwd_salt), $pwd_hashed );
+					$pass_ok = sha1($User->pass.$pwd_salt) == $pwd_hashed;
+					$Session->delete('core.pwd_salt');
 					$Debuglog->add( 'Compared hashed passwords. Result: '.(int)$pass_ok, 'login' );
 				}
 			}
@@ -537,6 +552,7 @@ if( ! empty($current_User)
 	{ // we're not in that action already:
 		$action = 'req_validatemail'; // for login.php
 		$Messages->add( sprintf( /* TRANS: %s gets replaced by the user's email address */ T_('You must validate your email address (%s) before you can log in.'), $current_User->dget('email') ), 'login_error' );
+		// fp> TODO: give the user the opportunity to get a new validation message (this used to work)
 	}
 }
 else
@@ -645,6 +661,12 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.67  2006/12/06 23:32:35  fplanque
+ * Rollback to Daniel's most reliable password hashing design. (which is not the last one)
+ * This not only strengthens the login by providing less failure points, it also:
+ * - Fixes the login in IE7
+ * - Removes the double "do you want to memorize this password' in FF.
+ *
  * Revision 1.66  2006/12/06 22:30:07  fplanque
  * Fixed this use case:
  * Users cannot register themselves.

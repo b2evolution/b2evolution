@@ -28,6 +28,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $need_raw_pwd = (bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 
+// Do not cache this page, because the JS password random salt has to match the session cookie:
+// fp> I changed the meaning of teh comment below. Does this reflect the implementation?
+// Do not cache this page, because the JS password random salt has to match the one stored in the current session:
+header_nocache(); // do not cache this page, because the JS password salt has to match the session cookie
+
 /**
  * Include page header (also displays Messages):
  */
@@ -37,15 +42,16 @@ $page_icon = 'icon_login.gif';
 // We include functions.js even if we don't need it. The login page is small. Let's use it as a preloader for the backoffice (which is awfully slow to initialize)
 // fp> TODO: find a javascript way to preload more stuff (like icons) WITHOUT delaying the browser autocomplete of the login & password fields
 	/* dh>
+
+	// include jquery JS:
+	$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/'.($debug ? 'jquery.js' : 'jquery.min.js').'"></script>';
+
 	$(function(){
 	 alert("Document is ready");
 	});
 	See also http://www.texotela.co.uk/code/jquery/preload/ - might be a good opportunity to take a look at jQuery for you.. :)
 	*/
 $evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/functions.js"></script>';
-
-// include jquery JS:
-$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/'.($debug ? 'jquery.js' : 'jquery.min.js').'"></script>';
 
 if( ! $need_raw_pwd )
 { // Include JS for client-side password hashing:
@@ -73,10 +79,22 @@ $Form->begin_form( 'fform' );
 
 // fp>SUSPECT
 	if( ! $need_raw_pwd )
-	{ // used by JS-password encryption/hashing (gets filled by JS AJAX callback):
-		$Form->hidden( 'pwd_salt', '' );
-		$Form->hidden( 'pwd_hashed', '' );
+	{ // used by JS-password encryption/hashing:
+		$pwd_salt = $Session->get('core.pwd_salt');
+		if( empty($pwd_salt) )
+		{ // generate anew, only if empty - so multiple login screens share the same hash. Gets reset on trying to login.
+			// fp> the above is another "so" that makes it really hard to understand what was meant
+		// Suggestion: "Do not regenerate if already set because we want to reuse the previous salt on login screen reloads". 
+		// fp> Question: the comment implies that the salt is reset even on failed login attemps. Why that? I would only have reset it on successful login. Do experts recommend it this way? 
+		// but if you kill the session you get a new salt anyway, so it's no big deal. 
+		// At that point, why not reset the salt at every reload? (it may be good to keep it, but I think the reason should be documented here)
+			$pwd_salt = generate_random_key(64);
+			$Session->set( 'core.pwd_salt', $pwd_salt, 86400 /* expire in 1 day */ );
+		}
+		$Form->hidden( 'pwd_salt', $pwd_salt );
+		$Form->hidden( 'pwd_hashed', '' ); // gets filled by JS
 	}
+
 // SUSPECT<fp
 
 	echo $Form->fieldstart;
@@ -111,7 +129,6 @@ $Form->end_form();
 
 ?>
 
-
 <script type="text/javascript">
 	// Autoselect login text input or pwd input, if there's a login already:
 	var login = document.getElementById('login');
@@ -129,87 +146,25 @@ $Form->end_form();
 // fp>SUSPECT
 	if( ! $need_raw_pwd )
 	{
-		/*
-		 Password hashing with JavaScript, using a AJAX callback to get a fresh, unique hash.
-		 1. Hook "onsubmit" of each "submit" input
-		 2. onclick: AJAX call to get a unique hash (which gets stored into $Session)
-		 3a. Hash the password (by using the salt)
-		 3b. In case of error, do not hash the password
-		 4. Click() the same button again, but this time the salt field is filled already
-		*/
-		// fp> Something will cause FF2 to ask twice about "do you want to memorize this password" :(
 		?>
-
-		$("#evo_login_form :submit").each( function() 
-		{
-			$(this).bind( 'click', function() 
-			{
+		// Hash the password onsubmit and clear the original pwd field
+		addEvent( document.getElementById("evo_login_form"), "submit", function(){
+			// this.value = '<?php echo TS_('Please wait...') ?>';
 				// fp>If a true geek could obfuscate his code by using less than ONE char for each var name, he would!
-				// the form:
-				var f = $("#evo_login_form").get(0);
-
-				if( f.pwd_salt.value.length > 0 || f.pwd_salt.value == "no_hashing_because_of_no_salt" )
-				{ // inner click():
+				var f = document.getElementById('evo_login_form');
 					// Calculate hashed password and set it in the form:
-					var h = f.pwd_hashed;
-					var p = f.pwd;
-					var s = f.pwd_salt;
-					if( h && p && s && typeof hex_sha1 != "undefined" && typeof hex_md5 != "undefined" )
-					{
-						// fp> do we really need sha1 AND md5? Looks really overkill to me.
-						h.value = hex_sha1( hex_md5(p.value) + s.value );
-						p.value = ""; // unset real password. 
-						s.value = ""; // unset salt, so it gets re-newed when using the browser's back button
-					}
-					// Submit the form:
-					return true;
+				var h = f.pwd_hashed;
+				var p = f.pwd;
+				var s = f.pwd_salt;
+				if( h && p && s && typeof hex_sha1 != "undefined" && typeof hex_md5 != "undefined" )
+				{
+					// We first hash to md5, because that's how the passwords are stored in the database
+					// We then hash with the salt using SHA1 (fp> can't we do that with md5 again, in order to load 1 less Javascript library?)
+					h.value = hex_sha1( hex_md5(p.value) + s.value );
+					p.value = "hashed_<?php echo $Session->ID /* to detect cookie problems */ ?>";
 				}
-
-				// we need the original Input element later:
-				var oInput = this;
-
-				// Disable all submit elements:
-				oInput.value = '<?php echo TS_('Please wait...') ?>';
-				$("#evo_login_form :submit").attr("disabled", true);
-
-				// get the Password hash by AJAX:
-				$.ajax( 
-					{	
-						url: '<?php echo url_rel_to_same_host($htsrv_url_sensitive, $ReqHost) ?>async.php',
-						
-						data: { action: 'get_login_salt' },
-						
-						timeout: 10000, // 10sec timeout
-						
-						success: function(r, status) 
-						{ // Set hidden pwd_salt field in form:
-							f.pwd_salt.value = r;
-						},
-						
-						error: function( xml, error ) 
-						{ /*
-							  In case the request fails, we send the password unencrypted!
-								(instead of bothering the user with a confirm(), allowing him to cancel plain-text submission).
-								It should not happen anyway.. 
-								fp> The space shuttle should never have failed either...
-							*/
-							f.pwd_salt.value = "no_hashing_because_of_no_salt";
-						},
-						
-						complete: function(xml, status) 
-						{ // Enable all submit elements again:
-							$("#evo_login_form :submit").removeAttr("disabled");
-							oInput.focus(); // workaround for FF 2.0 bug - it would ignore click() otherwise, but it's "quite nice" anyway.. (btw: an "alert(oInput)" would also workaround this)
-							oInput.click();
-						}
-						
-					} 
-				);
-
-				// We submit the form through oInput.click(), in the "complete" AJAX callback:
-				return false;
-			} ) 
-		} );
+				return true;
+			}, false );
 		<?php
 	}
 // <fp
@@ -245,6 +200,12 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.31  2006/12/06 23:32:35  fplanque
+ * Rollback to Daniel's most reliable password hashing design. (which is not the last one)
+ * This not only strengthens the login by providing less failure points, it also:
+ * - Fixes the login in IE7
+ * - Removes the double "do you want to memorize this password' in FF.
+ *
  * Revision 1.30  2006/12/06 23:25:32  blueyed
  * Fixed bookmarklet plugins (props Danny); removed unneeded bookmarklet handling in core
  *
