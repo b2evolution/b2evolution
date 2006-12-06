@@ -263,7 +263,7 @@ class Form extends Widget
 				$this->formstart = '';
 				$this->title_fmt = '$title$'."\n"; // TODO: icons
 				$this->no_title_fmt = '';          //           "
-				$this->fieldstart = ''; // shall we still use $ID$ here ?
+				$this->fieldstart = ''; // TODO: fp> shall we still use $ID$ here ?
 				$this->labelstart = '';
 				$this->labelend = "\n";
 				$this->labelempty = '';
@@ -312,7 +312,7 @@ class Form extends Widget
 			$ffield_id = 'id="ffield_'.$this->_common_params['id'].'" ';
 		}
 		else
-		{	// fp> This class is so utterly complex, I cannot know for sure if this can happen or not :/
+		{	// No ID in case there's no id/name given for a field.
 			$ffield_id = '';
 		}
 		$r = str_replace( '$ID$', $ffield_id, $this->fieldstart );
@@ -2282,10 +2282,10 @@ class Form extends Widget
 	 * @param string The name of the radio options
 	 * @param string The checked option
 	 * @param array of arrays The radio options (keys: 'value', 'label', 'note', 'params' (array)).
-	 *                        - 'params':
-	 *                          - 'note': Note for the option (string)
-	 *                          - 'input_suffix' (additional HTML [input field, ..])
-	 *                          - Plus everything for {@link get_input_element()} )
+	 *    'params':
+	 *      - 'note': Note for the option (string)
+	 *      - 'input_suffix' (additional HTML [input field, ..])
+	 *      - Plus everything for {@link get_input_element()} )
 	 * @param string Label
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - lines: Options on seperate lines (DIVs) (boolean, default false)
@@ -2707,6 +2707,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.54  2006/12/06 18:48:20  blueyed
+ * doc
+ *
  * Revision 1.53  2006/12/06 18:06:18  fplanque
  * an experiment with JS hiding/showing form parts
  *
