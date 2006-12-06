@@ -79,18 +79,6 @@ $Form->begin_form( 'fform' );
 	}
 // SUSPECT<fp
 
-	if( ! empty($mode) )
-	{ // We're in the process of bookmarkletting something, we don't want to lose it:
-		param( 'text', 'html', '' );
-		param( 'popupurl', 'html', '' );
-		param( 'popuptitle', 'html', '' );
-
-		$Form->hidden( 'mode', $mode );
-		$Form->hidden( 'text', $text );
-		$Form->hidden( 'popupurl', $popupurl );
-		$Form->hidden( 'popuptitle', $popuptitle );
-	}
-
 	echo $Form->fieldstart;
 
 	?>
@@ -257,6 +245,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.30  2006/12/06 23:25:32  blueyed
+ * Fixed bookmarklet plugins (props Danny); removed unneeded bookmarklet handling in core
+ *
  * Revision 1.29  2006/12/05 01:41:22  blueyed
  * Removed markers, as requested
  *

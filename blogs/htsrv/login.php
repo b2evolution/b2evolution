@@ -45,10 +45,6 @@ require_once $inc_path.'_main.inc.php';
 
 param( 'action', 'string', '' );
 param( 'mode', 'string', '' );
-// bookmarklet stuff:
-param( 'text', 'html', '' );
-param( 'popupurl', 'string', '' );
-param( 'popuptitle', 'string', '' );
 
 param( 'login', 'string', '' );
 // echo 'login: ', $login;
@@ -358,6 +354,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.79  2006/12/06 23:25:32  blueyed
+ * Fixed bookmarklet plugins (props Danny); removed unneeded bookmarklet handling in core
+ *
  * Revision 1.78  2006/12/06 22:30:07  fplanque
  * Fixed this use case:
  * Users cannot register themselves.

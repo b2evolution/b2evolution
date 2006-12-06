@@ -59,7 +59,7 @@ class bookmarklet_plugin extends Plugin
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
-			<a href="javascript:Q=document.selection?document.selection.createRange().text:document.getSelection();void(window.open('<?php echo $admin_url ?>?ctrl=edit&amp;mode=bookmarklet&amp;text='+escape(Q)+'&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));"><?php echo T_('b2evo bookmarklet') ?></a></p>
+			<a href="javascript:Q=document.selection?document.selection.createRange().text:document.getSelection();void(window.open('<?php echo $admin_url ?>?ctrl=edit&amp;mode=bookmarklet&amp;content='+escape(Q)+'&amp;post_url='+escape(location.href)+'&amp;post_title='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));"><?php echo T_('b2evo bookmarklet') ?></a></p>
 			<?php
 			return true;
 		}
@@ -67,7 +67,7 @@ class bookmarklet_plugin extends Plugin
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
-			<a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(btw=window.open('<?php echo $admin_url ?>?ctrl=edit&amp;mode=bookmarklet&amp;text='+escape(Q)+'&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));btw.focus();"><?php echo T_('b2evo bookmarklet') ?></a>
+			<a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(btw=window.open('<?php echo $admin_url ?>?ctrl=edit&amp;mode=bookmarklet&amp;content='+escape(Q)+'&amp;post_url='+escape(location.href)+'&amp;post_title='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));btw.focus();"><?php echo T_('b2evo bookmarklet') ?></a>
 			</p>
 			<?php
 			return true;
@@ -76,7 +76,7 @@ class bookmarklet_plugin extends Plugin
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
-			<a href="javascript:void(window.open('<?php echo $admin_url ?>?ctrl=edit&amp;mode=bookmarklet&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));"><?php echo T_('b2evo bookmarklet') ?></a></p>
+			<a href="javascript:void(window.open('<?php echo $admin_url ?>?ctrl=edit&amp;mode=bookmarklet&amp;post_url='+escape(location.href)+'&amp;post_title='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));"><?php echo T_('b2evo bookmarklet') ?></a></p>
 			<?php
 			return true;
 		}
@@ -84,7 +84,7 @@ class bookmarklet_plugin extends Plugin
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
-			<a href="javascript:Q='';if(top.frames.length==0);void(btw=window.open('<?php echo $admin_url ?>?ctrl=edit&amp;mode=bookmarklet&amp;text='+escape(document.getSelection())+'&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));btw.focus();"><?php echo T_('b2evo bookmarklet') ?></a></p>
+			<a href="javascript:Q='';if(top.frames.length==0);void(btw=window.open('<?php echo $admin_url ?>?ctrl=edit&amp;mode=bookmarklet&amp;content='+escape(document.getSelection())+'&amp;post_url='+escape(location.href)+'&amp;post_title='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));btw.focus();"><?php echo T_('b2evo bookmarklet') ?></a></p>
 			<?php
 			return true;
 		}
@@ -96,6 +96,12 @@ class bookmarklet_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.16  2006/12/06 23:25:32  blueyed
+ * Fixed bookmarklet plugins (props Danny); removed unneeded bookmarklet handling in core
+ *
+ * Revision 1.15.2.2  2006/11/04 19:55:11  fplanque
+ * Reinjected old Log blocks. Removing them from CVS was a bad idea -- especially since Daniel has decided branch 1.9 was his HEAD...
+ *
  * Revision 1.15  2006/07/10 20:19:30  blueyed
  * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
  *

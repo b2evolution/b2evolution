@@ -198,11 +198,6 @@ switch($action)
 
 		$edited_Item->blog_ID = $blog;
 
-		// These are bookmarklet params:
-		param( 'popuptitle', 'string', '' );
-		param( 'popupurl', 'string', '' );
-		param( 'text', 'html', '' );
-
 		// Note: most params are handled by "$edited_Item->load_from_Request();" below..
 
 		param( 'post_extracats', 'array', array() );
