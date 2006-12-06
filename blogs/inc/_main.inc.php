@@ -531,8 +531,7 @@ unset($pass);
 // Check if the user needs to be validated, but is not yet:
 if( ! empty($current_User)
 		&& ! $current_User->validated
-		&& $Settings->get('newusers_mustvalidate')
-		&& param('action', 'string', '') != 'logout' )
+		&& param('action', 'string', '') != 'logout' ) // fp> TODO: non validated users should be automatically logged out
 {
 	if( $action != 'req_validatemail' && $action != 'validatemail' )
 	{ // we're not in that action already:
@@ -646,6 +645,12 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.66  2006/12/06 22:30:07  fplanque
+ * Fixed this use case:
+ * Users cannot register themselves.
+ * Admin creates users that are validated by default. (they don't have to validate)
+ * Admin can invalidate a user. (his email, address actually)
+ *
  * Revision 1.65  2006/12/04 21:45:39  fplanque
  * cleanup
  *

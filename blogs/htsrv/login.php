@@ -332,8 +332,8 @@ $redirect_to = preg_replace( '~(?<=\?|&) (login|pwd) = [^&]+ ~x', '', $redirect_
 if( $Session->has_User() )
 { // The user is already logged in...
 	$tmp_User = & $Session->get_User();
-	if( $tmp_User->validated || ! $Settings->get('newusers_mustvalidate') )
-	{
+	if( $tmp_User->validated )
+	{	// User is not validated (he may have been invalidated)
 		// dh> TODO: validate $redirect_to param!
 		$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $tmp_User->get('login') )
 			.' <a href="'.$redirect_to.'">'.T_('Continue...').'</a>', 'note' );
@@ -358,6 +358,12 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.78  2006/12/06 22:30:07  fplanque
+ * Fixed this use case:
+ * Users cannot register themselves.
+ * Admin creates users that are validated by default. (they don't have to validate)
+ * Admin can invalidate a user. (his email, address actually)
+ *
  * Revision 1.77  2006/11/26 02:30:38  fplanque
  * doc / todo
  *

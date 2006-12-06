@@ -50,9 +50,9 @@ $Form->hidden( 'tab', 'general' );
 $Form->begin_fieldset( T_('Default user rights') );
 
 	$Form->checkbox( 'newusers_canregister', $Settings->get('newusers_canregister'), T_('New users can register'), T_('Check to allow new users to register themselves.' ) );
-	// Note: the options below also make sense, if newusers_canregister is disabled (especially newusers_mustvalidate)
+	// Note: the options below also make sense, if newusers_canregister is disabled
 
-	$Form->checkbox( 'newusers_mustvalidate', $Settings->get('newusers_mustvalidate'), T_('Users must validate'), T_('Check to require users to validate their email by clicking a link sent to them.' ) );
+	$Form->checkbox( 'newusers_mustvalidate', $Settings->get('newusers_mustvalidate'), T_('New users must validate'), T_('Check to require users to validate their email by clicking a link sent to them.' ) );
 
 	$Form->checkbox( 'newusers_revalidate_emailchg', $Settings->get('newusers_revalidate_emailchg'), T_('Validate email changes'), T_('Check to require users to re-validate when they change their email address.' ) );
 
@@ -128,6 +128,12 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.22  2006/12/06 22:30:08  fplanque
+ * Fixed this use case:
+ * Users cannot register themselves.
+ * Admin creates users that are validated by default. (they don't have to validate)
+ * Admin can invalidate a user. (his email, address actually)
+ *
  * Revision 1.21  2006/12/04 19:41:11  fplanque
  * Each blog can now have its own "archive mode" settings
  *

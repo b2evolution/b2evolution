@@ -108,6 +108,10 @@ switch( $action )
 		$new_user_Group = & $GroupCache->get_by_ID( $newusers_grp_ID );
 		// echo $new_user_Group->disp('name');
 		$new_User->set_Group( $new_user_Group );
+
+ 		// Determine if the user must validate before using the system:
+		$new_User->set( 'validated', ! $Settings->get('newusers_mustvalidate') );
+
 		$new_User->dbinsert();
 
 		$new_user_ID = $new_User->ID; // we need this to "rollback" user creation if there's no DB transaction support
@@ -162,6 +166,7 @@ switch( $action )
 			{
 				$Messages->add( T_('Sorry, the email with the link to validate and activate your password could not be sent.')
 					.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+				// fp> TODO: allow to enter a different email address (just in case it's that kind of problem)
 			}
 		}
 
@@ -192,6 +197,12 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.77  2006/12/06 22:30:07  fplanque
+ * Fixed this use case:
+ * Users cannot register themselves.
+ * Admin creates users that are validated by default. (they don't have to validate)
+ * Admin can invalidate a user. (his email, address actually)
+ *
  * Revision 1.76  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

@@ -356,8 +356,10 @@ class User extends DataObject
 			case 'level':
 			case 'notify':
 			case 'showonline':
-			case 'validated':
 				return parent::set_param( $parname, 'number', $parvalue );
+
+			case 'validated':
+				return parent::set_param( $parname, 'number', $parvalue ? 1 : 0 );	// convert boolean
 
 			default:
 				return parent::set_param( $parname, 'string', $parvalue );
@@ -1115,6 +1117,12 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.56  2006/12/06 22:30:07  fplanque
+ * Fixed this use case:
+ * Users cannot register themselves.
+ * Admin creates users that are validated by default. (they don't have to validate)
+ * Admin can invalidate a user. (his email, address actually)
+ *
  * Revision 1.55  2006/12/03 00:22:16  fplanque
  * doc
  *
