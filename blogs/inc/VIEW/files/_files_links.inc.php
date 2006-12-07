@@ -83,7 +83,7 @@ function file_path()
 	global $edited_Item;
 
 	// File relative path & name:
-	return $current_File->edit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID );
+	return $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID );
 }
 $Results->cols[] = array(
 						'th' => T_('Path'),
@@ -106,7 +106,7 @@ function file_actions( $link_ID )
 
 	$title = T_('Locate this file!');
 
-	$r = $current_File->edit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title );
+	$r = $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title );
 
 	return $r.' '.action_icon( T_('Delete this link!'), 'unlink',
                       regenerate_url( 'action', 'link_ID='.$link_ID.'&amp;action=unlink') );
@@ -126,6 +126,9 @@ $Form->end_form( );
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/07 20:03:32  fplanque
+ * Woohoo! File editing... means all skin editing.
+ *
  * Revision 1.7  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

@@ -47,6 +47,11 @@ function load_funcs( $funcs_path )
 }
 
 
+/**
+ * @todo fp> split into 1 function per case. (typed @return values)
+ *
+ * @return DataObjectCache
+ */
 function & get_Cache( $objectName )
 {
 	global $Plugins;
@@ -124,6 +129,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/07 20:03:32  fplanque
+ * Woohoo! File editing... means all skin editing.
+ *
  * Revision 1.10  2006/12/05 01:35:27  blueyed
  * Hooray for less complexity and the 8th param for DataObjectCache()
  *

@@ -38,6 +38,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $fm_Filelist;
 /**
+ * fp> Temporary. I need this for NuSphere debugging.
+ * @var File
+ */
+global $lFile;
+/**
  * @var FileRootCache
  */
 global $FileRootCache;
@@ -320,7 +325,7 @@ $Form->end_form();
 
 	echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'name', /* TRANS: file name */ T_('Name') ).'</th>';
 
-	if( $UserSettings->get('fm_showtypes') ) // MB UPDATE-------------
+	if( $UserSettings->get('fm_showtypes') )
 	{ // Show file types column
 		echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'type', /* TRANS: file type */ T_('Type') ).'</th>';
 	}
@@ -328,7 +333,7 @@ $Form->end_form();
 	echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'size', /* TRANS: file size */ T_('Size') ).'</th>';
 	echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'lastmod', /* TRANS: file's last change / timestamp */ T_('Last change') ).'</th>';
 
-	if( $UserSettings->get('fm_showfsperms') ) // MB UPDATE-------------
+	if( $UserSettings->get('fm_showfsperms') )
 	{ // Show file perms column
 		echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'perms', /* TRANS: file's permissions (short) */ T_('Perms') ).'</th>';
 	}
@@ -591,7 +596,18 @@ while( $lFile = & $fm_Filelist->get_next() )
 	/*****************  Action icons  ****************/
 
 	echo '<td class="actions lastcol">';
-	// Not implemented yet: "Edit file.."
+
+	if( $current_User->check_perm( 'files', 'edit' ) )
+	{ // User can edit:
+		if( $lFile->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
+		{
+			echo action_icon( T_('Edit file...'), 'edit', regenerate_url( 'fm_selected', 'action=edit&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
+		}
+		else
+		{
+			echo get_icon( 'no_edit', 'imgtag', array( 'class' => 'action_icon' ) );
+		}
+	}
 
 	echo action_icon( T_('Edit properties...'), 'properties', regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
 
@@ -960,6 +976,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.25  2006/12/07 20:03:32  fplanque
+ * Woohoo! File editing... means all skin editing.
+ *
  * Revision 1.24  2006/12/07 15:23:42  fplanque
  * filemanager enhanced, refactored, extended to skins directory
  *

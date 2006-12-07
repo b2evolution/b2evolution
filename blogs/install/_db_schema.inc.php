@@ -304,7 +304,7 @@ $schema_queries = array(
 		'Creating table for File Meta Data',
 		"CREATE TABLE T_files (
 			file_ID        int(11) unsigned  not null AUTO_INCREMENT,
-			file_root_type enum('absolute','user','group','collection') not null default 'absolute',
+			file_root_type enum('absolute','user','group','collection','skins') not null default 'absolute',
 			file_root_ID   int(11) unsigned  not null default 0,
 			file_path      varchar(255)      not null default '',
 			file_title     varchar(255),
@@ -490,6 +490,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.43  2006/12/07 20:03:33  fplanque
+ * Woohoo! File editing... means all skin editing.
+ *
  * Revision 1.42  2006/12/07 16:06:24  fplanque
  * prepared new file editing permission
  *

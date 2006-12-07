@@ -121,7 +121,7 @@ function display_link( & $row )
 		global $current_File, $edited_Item;
 
 		// File relative path & name:
-		return $current_File->edit_link( '&amp;fm_mode=link_item&amp;itm_ID='.$edited_Item->ID ).'<span class="filemeta"> - '.$current_File->dget('title').'</span>';
+		return $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;itm_ID='.$edited_Item->ID ).'<span class="filemeta"> - '.$current_File->dget('title').'</span>';
 	}
 
 	return '?';
@@ -142,7 +142,7 @@ if( $edit_allowed )
 		if( isset($current_File) )
 		{
 			$title = T_('Locate this file!');
-			$r = $current_File->edit_link( '&amp;fm_mode=link_item&amp;itm_ID='.$edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title ).' ';
+			$r = $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;itm_ID='.$edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title ).' ';
 		}
 
 		return $r.action_icon( T_('Delete this link!'), 'unlink',
@@ -165,6 +165,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.10  2006/12/07 20:03:32  fplanque
+ * Woohoo! File editing... means all skin editing.
+ *
  * Revision 1.9  2006/11/30 22:34:15  fplanque
  * bleh
  *

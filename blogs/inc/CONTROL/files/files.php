@@ -419,7 +419,13 @@ switch( $action )
 		}
 
 		// Try to get File object:
+		/**
+		 * @var FileCache
+		 */
 		$FileCache = & get_Cache( 'FileCache' );
+		/**
+		 * @var File
+		 */
 		$newFile = & $FileCache->get_by_root_and_path( $fm_Filelist->_FileRoot->type, $fm_Filelist->_FileRoot->in_type_ID, $fm_Filelist->_rds_list_path.$create_name );
 
 		if( $newFile->exists() )
@@ -453,7 +459,7 @@ switch( $action )
 			$Messages->add( T_('Cannot create a file without name.'), 'error' );
 			break;
 		}
-		if( $error_filename = validate_filename( $create_name ) )
+		if( $error_filename = validate_filename( $create_name, $current_User->check_perm( 'files', 'all' ) ) )
 		{ // Not valid filename or extension
 			$Messages->add( $error_filename, 'error' );
 			break;
@@ -559,6 +565,8 @@ switch( $action )
 			break;
 		}
 
+		$allow_locked_filetypes = $current_User->check_perm( 'files', 'all' );
+
 		if( ! $selected_Filelist->count() )
 		{ // There is nothing to rename
 			$Messages->add( T_('Nothing selected.'), 'error' );
@@ -584,15 +592,15 @@ switch( $action )
 
 			if( !$loop_src_File->is_dir() )
 			{
-				if( $error_filename = validate_filename( $new_names[$loop_src_File->get_md5_ID()] ) )
+				if( $error_filename = validate_filename( $new_names[$loop_src_File->get_md5_ID()], $allow_locked_filetypes ) )
 				{ // Not a file name or not an allowed extension
 					$confirmed = 0;
 					param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $error_filename );
 					continue;
 				}
 			}
-			elseif( $error_dirname = validate_dirname( $new_names[$loop_src_File->get_md5_ID()] ) )
-			{ // Not a directory name
+			elseif( $error_dirname = validate_dirname( $new_names[$loop_src_File->get_md5_ID()], $allow_locked_filetypes ) )
+			{ // directory name
 				$confirmed = 0;
 				param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $error_dirname );
 				continue;
@@ -706,8 +714,59 @@ switch( $action )
 		break;
 
 
+	case 'edit':
+		// Edit Text File; this starts the file_edit mode:
+		// fp> Note: This probably should not be a mode.
+		$fm_mode = 'file_edit';
+		break;
+
+
+	case 'update_file':
+		// Update File (Meta Data); on success this ends the file_edit mode:
+
+		if( $demo_mode )
+		{
+			$Messages->add( 'Sorry, you cannot update files in demo mode!', 'error' );
+			break;
+		}
+
+		// Check permission!
+ 		$current_User->check_perm( 'files', 'edit', true );
+
+		$edit_File = & $selected_Filelist->get_by_idx(0);
+
+		// Check that the file is editable:
+		if( ! $edit_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
+		{
+			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edit_File->get_name() ), 'error' );
+	 		// Leave special display mode:
+			$fm_mode = NULL;
+			break;
+		}
+
+		param( 'file_content', 'html', '', false );
+
+
+    $full_path = $edit_File->get_full_path();
+		if( $rsc_handle = fopen( $full_path, 'w+') )
+		{
+			fwrite( $rsc_handle, $file_content );
+			fclose( $rsc_handle );
+			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; have been updated.' ), $edit_File->get_name() ), 'success' );
+		}
+		else
+		{
+			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; could not be updated.' ), $edit_File->get_name() ), 'error' );
+		}
+
+		// Leave special display mode:
+		$fm_mode = NULL;
+		break;
+
+
 	case 'edit_properties':
 		// Edit File properties (Meta Data); this starts the file_properties mode:
+		// fp> Note: This probably should not be a mode.
 		$fm_mode = 'file_properties';
 		break;
 
@@ -715,12 +774,8 @@ switch( $action )
 	case 'update_properties':
 		// Update File properties (Meta Data); on success this ends the file_properties mode: {{{
 
-		if( ! $current_User->check_perm( 'files', 'edit' ) )
-		{ // We do not have permission to edit files
-			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
-			$action = 'list';
-			break;
-		}
+		// Check permission!
+ 		$current_User->check_perm( 'files', 'edit', true );
 
 		$edit_File = & $selected_Filelist->get_by_idx(0);
 		// Load meta data:
@@ -903,12 +958,41 @@ switch( $action )
 switch( $fm_mode )
 { // handle modes {{{
 
-	case 'file_properties':
+	case 'file_edit':
+		// Check permission!
+ 		$current_User->check_perm( 'files', 'edit', true );
+
 		$edit_File = & $selected_Filelist->get_by_idx(0);
-		// Load meta data:
-		$edit_File->load_meta();
+
+		// Check that the file is editable:
+		if( ! $edit_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
+		{
+			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edit_File->get_name() ), 'error' );
+	 		// Leave special display mode:
+			$fm_mode = NULL;
+			break;
+		}
+
+		$full_path = $edit_File->get_full_path();
+		if( $size = filesize($full_path) )
+		{
+			$rsc_handle = fopen( $full_path, 'r');
+			$edit_File->content = fread( $rsc_handle, $size );
+			fclose( $rsc_handle );
+		}
+		else
+		{	// Empty file
+			$edit_File->content = '';
+		}
 		break;
 
+	case 'file_properties':
+		// Check permission!
+ 		$current_User->check_perm( 'files', 'edit', true );
+
+		$edit_File = & $selected_Filelist->get_by_idx(0);
+		$edit_File->load_meta();
+		break;
 
 	case 'file_upload':
 		// {{{
@@ -1105,14 +1189,6 @@ switch( $fm_mode )
 		}
 
 		// }}}
-		break;
-
-
-	case 'file_properties':
-		if( empty($edit_File) )
-		{
-			$fm_mode = NULL;
-		}
 		break;
 
 
@@ -1411,7 +1487,6 @@ switch( $action )
 		$AdminUI->disp_payload_end();
 		break;
 
-
 	case 'edit_perms':
 		// Filesystem permissions for specific files
 		$AdminUI->disp_payload_begin();
@@ -1455,6 +1530,11 @@ switch( $fm_mode )
 	case 'file_upload':
 		// Upload dialog:
 		$AdminUI->disp_view( 'files/_files_upload.inc.php' );
+		break;
+
+	case 'file_edit':
+		// File Edit dialog:
+		$AdminUI->disp_view( 'files/_file_edit.form.php' );
 		break;
 
 	case 'file_properties':
@@ -1512,6 +1592,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.37  2006/12/07 20:03:32  fplanque
+ * Woohoo! File editing... means all skin editing.
+ *
  * Revision 1.36  2006/12/07 15:23:42  fplanque
  * filemanager enhanced, refactored, extended to skins directory
  *

@@ -1515,6 +1515,12 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
+		echo 'Upgrading files table... ';
+		$query = "ALTER TABLE T_files
+							CHANGE COLUMN file_root_type file_root_type enum('absolute','user','group','collection','skins') not null default 'absolute'";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+
 		echo 'Updating file types... ';
 		// Only change this if it's close enough to a default install (non customized)
 		$DB->query( "UPDATE T_filetypes
@@ -1524,6 +1530,7 @@ function upgrade_b2evo_tables()
 										AND ftyp_mimetype ='application/x-httpd-php'
 										AND ftyp_icon = 'php.gif'" );
 		echo "OK.<br />\n";
+
 
 	}
 
@@ -1633,6 +1640,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.195  2006/12/07 20:03:33  fplanque
+ * Woohoo! File editing... means all skin editing.
+ *
  * Revision 1.194  2006/12/07 16:06:24  fplanque
  * prepared new file editing permission
  *

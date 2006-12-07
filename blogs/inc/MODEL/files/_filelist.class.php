@@ -825,7 +825,7 @@ class Filelist
 	 * Get the next entry and increment internal counter.
 	 *
 	 * @param string can be used to query only 'file's or 'dir's.
-	 * @return boolean|File object (by reference) on success, false on end of list
+	 * @return File object (by reference) on success, false on end of list
 	 */
 	function & get_next( $type = '' )
 	{
@@ -934,19 +934,22 @@ class Filelist
 	 * Get a file by index.
 	 *
 	 * @param integer Index of the entries (starting with 0)
-	 * @return false|File
+	 * @param boolean added by fp (set to false when it's a problem)
+	 * @return File
 	 */
-	function & get_by_idx( $index )
+	function & get_by_idx( $index, $halt_on_error = true )
 	{
 		if( isset( $this->_order_index[ $index ] ) )
 		{
 			return $this->_entries[ $this->_order_index[ $index ] ];
 		}
-		else
+		elseif( !$halt_on_error )
 		{
 			$r = false;
 			return $r;
 		}
+
+		debug_die( 'Requested file does not exist!' );
 	}
 
 
@@ -1208,6 +1211,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.20  2006/12/07 20:03:32  fplanque
+ * Woohoo! File editing... means all skin editing.
+ *
  * Revision 1.19  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

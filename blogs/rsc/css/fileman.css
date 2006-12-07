@@ -164,9 +164,6 @@ table.filelist td.size {
 table.filelist td.perms {
 	text-align: center;
 }
-table.filelist td.actions img {
-	margin:0;
-}
 table.filelist tr.listfooter td {
 	/* Temporary colors, needs overriding */
 	border-top: 1px solid #bbb;

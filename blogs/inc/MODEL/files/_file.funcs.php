@@ -467,10 +467,12 @@ function check_canonical_path( $path )
  * Check for valid filename and extension of the filename (no path allowed). (MB)
  *
  * @uses $FiletypeCache, $settings or $force_regexp_filename form _advanced.php
+ *
  * @param string filename to test
+ * @param boolean
  * @return nothing if the filename is valid according to the regular expression and the extension too, error message if not
  */
-function validate_filename( $filename )
+function validate_filename( $filename, $allow_locked_filetypes = false )
 {
 	global $Settings, $force_regexp_filename;
 
@@ -496,8 +498,8 @@ function validate_filename( $filename )
 		$FiletypeCache = & get_Cache( 'FiletypeCache' );
 		if( $Filetype = & $FiletypeCache->get_by_extension( strtolower( $match[1] ) , false ) )
 		{
-			if( $Filetype->allowed )
-			{ // Filename has an allowed extension
+			if( $Filetype->allowed || $allow_locked_filetypes )
+			{ // Filename has an unlocked extension or we allow locked extensions
 				return;
 			}
 			else
@@ -755,6 +757,9 @@ function mkdir_r($dirName, $chmod = NULL)
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.28  2006/12/07 20:03:32  fplanque
+ * Woohoo! File editing... means all skin editing.
+ *
  * Revision 1.27  2006/12/07 15:23:42  fplanque
  * filemanager enhanced, refactored, extended to skins directory
  *

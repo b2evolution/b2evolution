@@ -186,7 +186,7 @@ class File extends DataObject
 
 	/**
 	 * Extension, Mime type, icon, viewtype and 'allowed extension' of the file
-	 * @var Filetype object
+	 * @var Filetype Filetype
 	 */
 	var $Filetype;
 
@@ -407,6 +407,29 @@ class File extends DataObject
 		}
 
 		return $this->_is_image;
+	}
+
+
+	/**
+	 * Is the file editable?
+	 *
+	 * @param boolean allow locked file types?
+	 */
+	function is_editable( $allow_locked = false )
+	{
+		if( $this->is_dir()	// we cannot edit dirs
+				|| !isset($this->Filetype)
+				|| $this->Filetype->viewtype != 'text' )	// we can only edit text files
+		{
+			return false;
+		}
+
+		if( ! $this->Filetype->allowed && ! $allow_locked )
+		{	// We cannot edit locked file types:
+			return false;
+		}
+
+		return true;
 	}
 
 
@@ -1292,7 +1315,7 @@ class File extends DataObject
 
 
 	/**
-	 * Template function. Display link to edit file.
+	 * Get link to edit linked file.
 	 *
 	 * @param integer ID of item to link to => will open the FM in link mode
 	 * @param string link text
@@ -1300,7 +1323,7 @@ class File extends DataObject
 	 * @param string text to display if access denied
 	 * @param string page url for the edit action
 	 */
-	function edit_link( $link_itm_ID = NULL, $text = NULL, $title = NULL, $no_access_text = NULL,
+	function get_linkedit_link( $link_itm_ID = NULL, $text = NULL, $title = NULL, $no_access_text = NULL,
 											$actionurl = 'admin.php?ctrl=files' )
 	{
 		if( is_null( $text ) )
@@ -1344,6 +1367,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2006/12/07 20:03:32  fplanque
+ * Woohoo! File editing... means all skin editing.
+ *
  * Revision 1.22  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

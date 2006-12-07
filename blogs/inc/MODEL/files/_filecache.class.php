@@ -96,7 +96,7 @@ class FileCache extends DataObjectCache
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 * @param string Subpath for this file/folder, relative the associated root, including trailing slash (if directory)
 	 * @param boolean check for meta data?
-	 * @return File an {@link File} object
+	 * @return File a {@link File} object
 	 */
 	function & get_by_root_and_path( $root_type, $root_in_type_ID, $rel_path, $load_meta = false )
 	{
@@ -133,6 +133,9 @@ class FileCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.5  2006/12/07 20:03:32  fplanque
+ * Woohoo! File editing... means all skin editing.
+ *
  * Revision 1.4  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
