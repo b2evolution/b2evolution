@@ -47,14 +47,19 @@ $Form->hidden( 'tab', 'general' );
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Default user rights') );
+$Form->begin_fieldset( T_('Display options') );
+
+$BlogCache = & get_Cache( 'BlogCache' );
+$Form->select_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default blog to display'),
+											T_('This blog will be displayed on index.php .'), true );
+
+$Form->end_fieldset();
+
+// --------------------------------------------
+
+$Form->begin_fieldset( T_('Default user permissions') );
 
 	$Form->checkbox( 'newusers_canregister', $Settings->get('newusers_canregister'), T_('New users can register'), T_('Check to allow new users to register themselves.' ) );
-	// Note: the options below also make sense, if newusers_canregister is disabled
-
-	$Form->checkbox( 'newusers_mustvalidate', $Settings->get('newusers_mustvalidate'), T_('New users must validate'), T_('Check to require users to validate their email by clicking a link sent to them.' ) );
-
-	$Form->checkbox( 'newusers_revalidate_emailchg', $Settings->get('newusers_revalidate_emailchg'), T_('Validate email changes'), T_('Check to require users to re-validate when they change their email address.' ) );
 
 	$GroupCache = & get_Cache( 'GroupCache' );
 	$Form->select_object( 'newusers_grp_ID', $Settings->get('newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
@@ -63,16 +68,13 @@ $Form->begin_fieldset( T_('Default user rights') );
 
 $Form->end_fieldset();
 
-
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Display options') );
+$Form->begin_fieldset( T_('Email validation') );
 
-$BlogCache = & get_Cache( 'BlogCache' );
-$Form->select_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default blog to display'),
-											T_('This blog will be displayed on index.php .'), true );
+	$Form->checkbox( 'newusers_mustvalidate', $Settings->get('newusers_mustvalidate'), T_('New users must validate email'), T_('Check to require users to validate their email by clicking a link sent to them.' ) );
 
-$Form->checkbox( 'AutoBR', $Settings->get('AutoBR'), T_('Email/MMS Auto-BR'), T_('Add &lt;BR /&gt; tags to mail/MMS posts.') );
+	$Form->checkbox( 'newusers_revalidate_emailchg', $Settings->get('newusers_revalidate_emailchg'), T_('Validate email changes'), T_('Check to require users to re-validate when they change their email address.' ) );
 
 $Form->end_fieldset();
 
@@ -111,9 +113,18 @@ $Form->text_input( 'user_minpwdlen', (int)$Settings->get('user_minpwdlen'), 2, T
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Miscellaneous options') );
+// --------------------------------------------
 
-$Form->text_input( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), 5,
+$Form->begin_fieldset( T_('Timeouts') );
+
+	// fp>TODO: enhance UI with a general Form method for Days:Hours:Minutes:Seconds
+	$Form->text_input( 'timeout_sessions', $Settings->get('timeout_sessions'), 9, T_('Session timeout'),
+		array( 'note' => T_('seconds. How long can a user stay inactive before automatic logout?'), 'required'=>true) );
+
+	// fp>TODO: It may make sense to have a different (smaller) timeout for sessions with no logged user.
+	// fp>This might reduce the size of the Sessions table. But this needs to be checked against the hit logging feature.
+
+	$Form->text_input( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), 5,
 								T_('Reload-page timeout'), array( 'note'=>T_('Time (in seconds) that must pass before a request to the same URI from the same IP and useragent is considered as a new hit.'), 'maxlength'=>5, 'required'=>true ) );
 
 $Form->end_fieldset();
@@ -128,6 +139,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.23  2006/12/07 00:55:52  fplanque
+ * reorganized some settings
+ *
  * Revision 1.22  2006/12/06 22:30:08  fplanque
  * Fixed this use case:
  * Users cannot register themselves.

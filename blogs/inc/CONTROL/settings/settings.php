@@ -72,10 +72,6 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	param( 'default_blog_ID', 'integer', true );
 	$Settings->set( 'default_blog_ID', $default_blog_ID );
 
-	param( 'AutoBR', 'integer', 0 );
-	$Settings->set( 'AutoBR', $AutoBR );
-
-
 	param( 'links_extrapath', 'string', 'disabled' );
 	$Settings->set( 'links_extrapath', $links_extrapath );
 
@@ -84,6 +80,18 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 
 	param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimun password length must be between %d and %d.') );
 	$Settings->set( 'user_minpwdlen', $user_minpwdlen );
+
+	// Session timeout
+	$timeout_sessions = param( 'timeout_sessions', 'integer', $Settings->get_default('timeout_sessions') );
+	if( $timeout_sessions < 300 )
+	{ // lower than 5 minutes: not allowed
+		param_error( 'timeout_sessions', sprintf( T_( 'You cannot set a session timeout below %d seconds.' ), 300 ) );
+	}
+	elseif( $timeout_sessions < 86400 )
+	{ // lower than 1 day: notice/warning
+		$Messages->add( sprintf( T_( 'Warning: your session timeout is just %d seconds. Your users may have to re-login often!' ), $timeout_sessions ), 'note' );
+	}
+	$Settings->set( 'timeout_sessions', $timeout_sessions );
 
 	param_integer_range( 'reloadpage_timeout', 0, 99999, T_('Reload-page timeout must be between %d and %d.') );
 	$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
@@ -119,6 +127,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2006/12/07 00:55:52  fplanque
+ * reorganized some settings
+ *
  * Revision 1.11  2006/12/04 19:41:11  fplanque
  * Each blog can now have its own "archive mode" settings
  *

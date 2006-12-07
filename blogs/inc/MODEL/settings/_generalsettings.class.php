@@ -61,7 +61,7 @@ class GeneralSettings extends AbstractSettings
 		'antispam_threshold_delete' => '100', // do not delete by default!
 		'antispam_block_spam_referers' => '1',
 
-		'AutoBR' => '0',
+		'AutoBR' => '0',			// Used for email blogging. fp> TODO: should be replaced by "email renderers/decoders/cleaners"...
 
 		'log_public_hits' => '1',
 		'log_admin_hits' => '0',
@@ -155,6 +155,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.25  2006/12/07 00:55:52  fplanque
+ * reorganized some settings
+ *
  * Revision 1.24  2006/12/04 19:41:11  fplanque
  * Each blog can now have its own "archive mode" settings
  *

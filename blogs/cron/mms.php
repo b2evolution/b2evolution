@@ -24,6 +24,9 @@
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
 
+// Dity conf switch here because this will be pluginized anyway and using the same App Settings switch as email blloggin was a problem.
+$mms_AutoBR = 1;
+
 require_once $inc_path.'_main.inc.php';
 
 param( 'login', 'string', '', true );
@@ -723,7 +726,7 @@ for ( $i = 0; $i < sizeof( $parts ); $i++ )
 // $sizeofparts = calcSize( $md ) / 1024;
 
 $post_title = format_to_post( trim( $post_title ), 0, 0 );
-$content = format_to_post( trim( $content ), $Settings->get('AutoBR'), 0 );
+$content = format_to_post( trim( $content ), $mms_AutoBR, 0 );
 
 $post_date = date('Y-m-d H:i:s', $localtimenow);
 
@@ -739,6 +742,9 @@ exit;
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/07 00:55:51  fplanque
+ * reorganized some settings
+ *
  * Revision 1.7  2006/12/04 00:10:43  fplanque
  * doc
  *

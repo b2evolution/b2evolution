@@ -86,9 +86,9 @@ switch( $action )
 
 			$Settings->delete_array( array(
 				'eblog_enabled', 'eblog_method', 'eblog_server_host', 'eblog_server_port', 'eblog_username',
-				'eblog_password', 'eblog_default_category', 'eblog_subject_prefix',
+				'eblog_password', 'eblog_default_category', 'eblog_subject_prefix', 'AutoBR',
 				'log_public_hits', 'log_admin_hits', 'auto_prune_stats_mode', 'auto_prune_stats',
-				'timeout_sessions',	'outbound_notifications_mode', 'webhelp_enabled' ) );
+				'outbound_notifications_mode', 'webhelp_enabled' ) );
 
 			if( $Settings->dbupdate() )
 			{
@@ -134,6 +134,9 @@ switch( $action )
 			param( 'eblog_subject_prefix', 'string', true );
 			$Settings->set( 'eblog_subject_prefix', trim($eblog_subject_prefix) );
 
+			param( 'AutoBR', 'integer', 0 );
+			$Settings->set( 'AutoBR', $AutoBR );
+
 			param( 'eblog_body_terminator', 'string', true );
 			$Settings->set( 'eblog_body_terminator', trim($eblog_body_terminator) );
 
@@ -158,20 +161,6 @@ switch( $action )
 
 			param( 'auto_prune_stats', 'integer', $Settings->get_default('auto_prune_stats'), false, false, true, false );
 			$Settings->set( 'auto_prune_stats', get_param('auto_prune_stats') );
-
-
-			// Sessions
-			$timeout_sessions = param( 'timeout_sessions', 'integer', $Settings->get_default('timeout_sessions') );
-			if( $timeout_sessions < 300 )
-			{ // lower than 5 minutes: not allowed
-				$timeout_sessions = 300;
-				$Messages->add( sprintf( T_( 'You cannot set a session timeout below %d seconds.' ), 300 ), 'error' );
-			}
-			elseif( $timeout_sessions < 86400 )
-			{ // lower than 1 day: notice/warning
-				$Messages->add( sprintf( T_( 'Warning: your session timeout is just %d seconds. Your users may have to re-login often!' ), $timeout_sessions ), 'note' );
-			}
-			$Settings->set( 'timeout_sessions', $timeout_sessions );
 
 
 			if( ! $Messages->count('error') )
@@ -210,6 +199,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2006/12/07 00:55:52  fplanque
+ * reorganized some settings
+ *
  * Revision 1.16  2006/11/24 18:27:23  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

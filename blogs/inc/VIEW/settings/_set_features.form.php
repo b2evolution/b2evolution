@@ -75,10 +75,10 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 		array( 'note' => T_('Check to enable the Blog by email feature.' ), 'onclick' =>
 			'document.getElementById("eblog_section").style.display = (this.checked==true ? "" : "none") ;' ) );
 
-	// TODO: this is IMPOSSIBLE to turn back on when you have no javascript!!! :((
+	// fp> TODO: this is IMPOSSIBLE to turn back on when you have no javascript!!! :((
 	echo '<div id="eblog_section" style="'.( $Settings->get('eblog_enabled') ? '' : 'display:none' ).'">';
 
-		$Form->select_input_array( 'eblog_method', array( 'pop3'=>T_('POP3'), 'pop3a'=>T_('POP3 through IMAP extension (experimental)') ), // TRANS: E-Mail retrieval method
+		$Form->select_input_array( 'eblog_method', array( 'pop3'=>T_('POP3'), 'pop3a' => T_('POP3 through IMAP extension (experimental)') ), // TRANS: E-Mail retrieval method
 			T_('Retrieval method'), array('value' => $Settings->get('eblog_method'), 'note' => T_('Choose a method to retrieve the emails.') ) );
 
 		$Form->text_input( 'eblog_server_host', $Settings->get('eblog_server_host'), 40, T_('Mail Server'), array( 'maxlength' => 255, 'note' => T_('Hostname or IP address of your incoming mail server.')  )  );
@@ -90,7 +90,7 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 		$Form->password_input( 'eblog_password', $Settings->get('eblog_password'),15,T_('Password'), array( 'maxlength' => 255, 'note' => T_('Password for authenticating to your mail server.')  )  );
 
 		//TODO: have a drop down list of available blogs and categories
-		$Form->text_input( 'eblog_default_category', $Settings->get('eblog_default_category'),5,T_('Default Category'), array( 'maxlength' => 6, 'note' => T_('By default emailed posts will have this category.')  )  );
+		$Form->text_input( 'eblog_default_category', $Settings->get('eblog_default_category'),5,T_('Default Category ID'), array( 'maxlength' => 6, 'note' => T_('By default emailed posts will have this category.')  )  );
 
 		$Form->text_input( 'eblog_subject_prefix', $Settings->get('eblog_subject_prefix'),15,T_('Subject Prefix'), array( 'maxlength' => 255, 'note' => T_('Email subject must start with this prefix to be imported.')  )  );
 
@@ -111,6 +111,9 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 
 		// TODO: provide Non-JS functionality
 		echo '<div id="eblog_section_more" style="display:none">';
+
+			$Form->checkbox( 'AutoBR', $Settings->get('AutoBR'), T_('Email/MMS Auto-BR'), T_('Add &lt;BR /&gt; tags to mail/MMS posts.') );
+
 			$Form->text_input( 'eblog_body_terminator', $Settings->get('eblog_body_terminator'), 15, T_('Body Terminator'), array( 'maxlength' => 255, 'note' => T_('Starting from this string, everything will be ignored, including this string.')  )  );
 
 			$Form->checkbox_input( 'eblog_test_mode', $Settings->get('eblog_test_mode'), T_('Test Mode'), array( 'note' => T_('Check to run Blog by Email in test mode.' ) ) );
@@ -136,8 +139,8 @@ $Form->begin_fieldset( T_('Hit & session logging') . get_web_help_link('Hit logg
 
 	// TODO: draw a warning sign if set to off
 	$Form->radio_input( 'auto_prune_stats_mode', $Settings->get('auto_prune_stats_mode'), array(
-			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('Not recommended! Your database will grow very large!!'), 'suffix' => '<br />',
-				'params' => array('onclick'=>'$("#auto_prune_stats_container").hide();') ),
+			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('Not recommended! Your database will grow very large!!'),
+				'suffix' => '<br />',	'params' => array('onclick'=>'$("#auto_prune_stats_container").hide();') ),
 			array( 'value'=>'page', 'label'=>T_('On every page'), 'note'=>T_('This is guaranteed to work but uses extra resources with every page displayed.'), 'suffix' => '<br />',
 				'params' => array('onclick'=>'$("#auto_prune_stats_container").show();') ),
 			array( 'value'=>'cron', 'label'=>T_('With a scheduled job'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up.'),
@@ -158,13 +161,6 @@ $Form->begin_fieldset( T_('Hit & session logging') . get_web_help_link('Hit logg
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Sessions') . get_web_help_link('Sessions') );
-	// TODO: enhance UI with a general Form method
-	$Form->text_input( 'timeout_sessions', $Settings->get('timeout_sessions'), 9, T_('Session timeout'),
-		array( 'note' => T_('seconds. How long can a user stay inactive before automatic logout?'), 'required'=>true) );
-$Form->end_fieldset();
-
-
 if( $current_User->check_perm( 'options', 'edit' ) )
 {
 	$Form->end_form( array(
@@ -177,6 +173,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.17  2006/12/07 00:55:52  fplanque
+ * reorganized some settings
+ *
  * Revision 1.16  2006/12/06 18:06:18  fplanque
  * an experiment with JS hiding/showing form parts
  *
