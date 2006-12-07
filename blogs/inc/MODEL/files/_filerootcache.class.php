@@ -52,6 +52,51 @@ class FileRootCache
 
 
 	/**
+	 * Get an array of ALL available Fileroots (not just the cached ones).
+	 *
+	 * @todo fp> it would probably make sense to refactor this as the constructor for the file roots
+	 * and initialize the whole cache at construction time
+	 *
+	 * @static
+	 *
+	 * @return array of FileRoots (key being the FileRoot's ID)
+	 */
+	function get_available_FileRoots()
+	{
+		global $current_User;
+
+		$r = array();
+
+		// The user's blog (if available) is the default/first one:
+		$user_FileRoot = & $this->get_by_type_and_ID( 'user', $current_User->ID, true );
+		if( $user_FileRoot )
+		{ // We got a user media dir:
+			$r[ $user_FileRoot->ID ] = & $user_FileRoot;
+		}
+
+		// blog/collection media dirs:
+		$BlogCache = & get_Cache( 'BlogCache' );
+		$bloglist = $BlogCache->load_user_blogs( 'browse', $current_User->ID );
+		foreach( $bloglist as $blog_ID )
+		{
+			if( $Root = & $this->get_by_type_and_ID( 'collection', $blog_ID, true ) )
+			{
+				$r[ $Root->ID ] = & $Root;
+			}
+		}
+
+		// skins root:
+		$skins_FileRoot = & $this->get_by_type_and_ID( 'skins', 0, false );
+		if( $skins_FileRoot )
+		{ // We got a skins dir:
+			$r[ $skins_FileRoot->ID ] = & $skins_FileRoot;
+		}
+
+		return $r;
+	}
+
+
+	/**
 	 * Get a FileRoot (cached) by ID.
 	 *
 	 * @uses FileRootCache::get_by_type_and_ID()
@@ -83,7 +128,7 @@ class FileRootCache
 
 		if( ! isset( $this->cache[$root_ID] ) )
 		{	// Not in Cache, let's instantiate:
-			$Root = new FileRoot( $root_type, $root_in_type_ID, $create ); // COPY
+			$Root = new FileRoot( $root_type, $root_in_type_ID, $create ); // COPY (func)
 			if( empty($Root->ads_path) ) // false
 			{
 				$Root = false;
@@ -112,6 +157,9 @@ class FileRootCache
 
 /*
  * $Log$
+ * Revision 1.6  2006/12/07 15:23:42  fplanque
+ * filemanager enhanced, refactored, extended to skins directory
+ *
  * Revision 1.5  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

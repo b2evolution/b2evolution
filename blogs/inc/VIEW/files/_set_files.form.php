@@ -176,6 +176,7 @@ $Form->begin_fieldset( T_('Accessible file roots'), array( 'id' => 'ffset_filero
 	$Form->checkbox( 'fm_enable_roots_blog', $Settings->get('fm_enable_roots_blog'), T_('Enable blog directories'), T_('Check to enable root directories for blogs.' ) );
 	// $Form->checkbox( 'fm_enable_roots_group', $Settings->get('fm_enable_roots_group'), T_('Enable group directories'), T_('Check to enable root directories for groups.' ) );
 	$Form->checkbox( 'fm_enable_roots_user', $Settings->get('fm_enable_roots_user'), T_('Enable user directories'), T_('Check to enable root directories for users.' ) );
+	$Form->checkbox( 'fm_enable_roots_skins', $Settings->get('fm_enable_roots_skins'), T_('Enable skins directory'), T_('Check to enable root directory for skins.' ) );	// fp> note: meaning may change to 1 dir per (installed) skin
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('File creation options'), array( 'id' => 'ffset_filecreate', 'class' => 'additional_file_settings' ) );
@@ -241,6 +242,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/07 15:23:42  fplanque
+ * filemanager enhanced, refactored, extended to skins directory
+ *
  * Revision 1.10  2006/12/06 21:22:49  fplanque
  * the jQuery tentative and more
  *

@@ -38,6 +38,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $fm_Filelist;
 /**
+ * @var FileRootCache
+ */
+global $FileRootCache;
+/**
  * @var string
  */
 global $fm_mode;
@@ -175,7 +179,7 @@ $Form->end_form();
 		 * Display ROOTs list:
 		 * -----------------------------------------------
 		 */
-		$rootlist = get_available_FileRoots();
+		$rootlist = $FileRootCache->get_available_FileRoots();
 		if( count($rootlist) > 1 )
 		{ // provide list of roots to choose from
 			?>
@@ -291,6 +295,11 @@ $Form->end_form();
 
 	echo '<tr>';
 
+	if( $UserSettings->get( 'fm_imglistpreview' ) )
+	{ // Image file preview:
+		echo '<th class="nowrap">'./* TRANS: Image file preview */ T_('Preview').'</th>';;
+	}
+
 	// "Go to parent" icon
 	echo '<th class="firstcol">';
 	if( empty($fm_Filelist->_rds_list_path) )
@@ -307,11 +316,6 @@ $Form->end_form();
 	if( $fm_flatmode )
 	{
 		echo '<th>'.$fm_Filelist->get_sort_link( 'path', /* TRANS: file/directory path */ T_('Path') ).'</th>';
-	}
-
-	if( $UserSettings->get( 'fm_imglistpreview' ) )
-	{ // Image file preview:
-		echo '<th class="nowrap">'./* TRANS: Image file preview */ T_('Preview').'</th>';;
 	}
 
 	echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'name', /* TRANS: file name */ T_('Name') ).'</th>';
@@ -356,6 +360,27 @@ while( $lFile = & $fm_Filelist->get_next() )
 { // Loop through all Files:
 	echo '<tr class="'.( $countFiles%2 ? 'odd' : 'even' ).'">';
 
+	/***************** Image file preview *******************/
+	if( $UserSettings->get( 'fm_imglistpreview' ) )
+	{
+		echo '<td class="fm_preview_list">';
+		if( $lFile->is_image() )
+		{
+			$img = '<img src="'.$lFile->_FileRoot->ads_url.$lFile->_rdfp_rel_path.'" alt="" width="80" />';
+
+			// Get link to view the file (fallback to no view link - just the img):
+			$link = $lFile->get_view_link( $img );
+			if( ! $link )
+			{ // no view link available:
+				$link = $img;
+			}
+
+			echo $link;
+		}
+		echo '</td>';
+	}
+
+
 	/********************    Checkbox:    *******************/
 
 	echo '<td class="checkbox firstcol">';
@@ -382,6 +407,7 @@ while( $lFile = & $fm_Filelist->get_next() )
 
 	echo '</td>';
 
+
 	/********************  File type Icon:  *******************/
 
 	echo '<td class="icon">';
@@ -399,7 +425,7 @@ while( $lFile = & $fm_Filelist->get_next() )
 		{ // File extension unrecognized
 			echo $lFile->get_icon();
 		}
-}
+	}
 	echo '</td>';
 
 	/*******************  Path (flatmode): ******************/
@@ -408,27 +434,6 @@ while( $lFile = & $fm_Filelist->get_next() )
 	{
 		echo '<td class="filepath">';
 		echo dirname($lFile->get_rdfs_rel_path()).'/';
-		echo '</td>';
-	}
-
-
-	/***************** Image file preview *******************/
-	if( $UserSettings->get( 'fm_imglistpreview' ) )
-	{
-		echo '<td class="fm_preview_list">';
-		if( $lFile->is_image() )
-		{
-			$img = '<img src="'.$lFile->_FileRoot->ads_url.$lFile->_rdfp_rel_path.'" alt="" width="80" />';
-
-			// Get link to view the file (fallback to no view link - just the img):
-			$link = $lFile->get_view_link( $img );
-			if( ! $link )
-			{ // no view link available:
-				$link = $img;
-			}
-
-			echo $link;
-		}
 		echo '</td>';
 	}
 
@@ -955,6 +960,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.24  2006/12/07 15:23:42  fplanque
+ * filemanager enhanced, refactored, extended to skins directory
+ *
  * Revision 1.23  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

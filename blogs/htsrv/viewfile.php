@@ -66,8 +66,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<title><?php echo $selected_File->get_name().' ('.T_('Preview').')'; ?></title>
-	<script type="text/javascript" src="../rsc/js/styleswitcher.js?v=2"></script>
-	<link href="../rsc/css/viewfile.css" rel="stylesheet" type="text/css" />
+	<link href="<?php echo $rsc_url ?>css/viewfile.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
@@ -76,41 +75,47 @@ header( 'Content-type: text/html; charset='.$io_charset );
 switch( $viewtype )
 {
 	case 'image':
-		{{{ // Display image file:
-			echo '<div class="center">';
+		/*
+		 * Image file view:
+		 */
+		echo '<div class="img_preview">';
 
-			if( $imgSize = $selected_File->get_image_size( 'widthheight' ) )
+		if( $imgSize = $selected_File->get_image_size( 'widthheight' ) )
+		{
+			echo '<img ';
+			if( $alt = $selected_File->dget( 'alt', 'htmlattr' ) )
 			{
-				echo '<img ';
-				if( $alt = $selected_File->dget( 'alt', 'htmlattr' ) )
-				{
-					echo 'alt="'.$alt.'" ';
-				}
-				if( $title = $selected_File->dget( 'title', 'htmlattr' ) )
-				{
-					echo 'title="'.$title.'" ';
-				}
-				echo 'class="framed" src="'.$selected_File->get_url().'"'
-							.' width="'.$imgSize[0].'" height="'.$imgSize[1].'" />';
-
-				echo '<div class="subline">';
-				echo '<p><strong>'.$selected_File->dget( 'title' ).'</strong></p>';
-				echo '<p>'.$selected_File->dget( 'desc' ).'</p>';
-				echo '<p>'.$selected_File->get_name().' &middot; ';
-				echo $selected_File->get_image_size().' &middot; ';
-				echo $selected_File->get_size_formatted().'</p>';
-				echo '</div>';
-
+				echo 'alt="'.$alt.'" ';
 			}
+			if( $title = $selected_File->dget( 'title', 'htmlattr' ) )
+			{
+				echo 'title="'.$title.'" ';
+			}
+			echo 'src="'.$selected_File->get_url().'"'
+						.' width="'.$imgSize[0].'" height="'.$imgSize[1].'" />';
 
+			echo '<div class="subline">';
+			echo '<p><strong>'.$selected_File->dget( 'title' ).'</strong></p>';
+			echo '<p>'.$selected_File->dget( 'desc' ).'</p>';
+			echo '<p>'.$selected_File->get_name().' &middot; ';
+			echo $selected_File->get_image_size().' &middot; ';
+			echo $selected_File->get_size_formatted().'</p>';
 			echo '</div>';
-		}}}
+
+		}
+		else
+		{
+			echo 'error';
+		}
+		echo '&nbsp;</div>';
 		break;
 
 	case 'text':
-
+ 		/*
+		 * Text file view:
+		 */
 		if( ($buffer = @file( $selected_File->get_full_path() )) !== false )
-		{{{ // Display raw file
+		{ // Display raw file
 			param( 'showlinenrs', 'integer', 0 );
 
 			$buffer_lines = count( $buffer );
@@ -213,7 +218,7 @@ switch( $viewtype )
 
 				echo '<div class="eof">** '.T_('End Of File').' **</div>';
 			}
-		}}}
+		}
 		else
 		{
 			Log::display( '', '', sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selected_File->get_rdfs_rel_path( $selected_File ) ), 'error' );
@@ -234,6 +239,9 @@ debug_info();
 <?php
 /*
  * $Log$
+ * Revision 1.13  2006/12/07 15:23:42  fplanque
+ * filemanager enhanced, refactored, extended to skins directory
+ *
  * Revision 1.12  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

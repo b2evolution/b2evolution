@@ -76,6 +76,7 @@ class GeneralSettings extends AbstractSettings
 		'fm_enable_roots_blog' => '1',
 		// 'fm_enable_roots_group' => '0',  // TO DO
 		'fm_enable_roots_user' => '0',
+		'fm_enable_roots_skins' => '1',
 
 		'fm_showtypes' => '0',
 		'fm_showfsperms' => '0',
@@ -155,6 +156,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.26  2006/12/07 15:23:42  fplanque
+ * filemanager enhanced, refactored, extended to skins directory
+ *
  * Revision 1.25  2006/12/07 00:55:52  fplanque
  * reorganized some settings
  *

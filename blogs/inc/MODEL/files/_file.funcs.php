@@ -502,7 +502,7 @@ function validate_filename( $filename )
 			}
 			else
 			{	// Filename hasn't an allowed extension
-				return sprintf( T_('&laquo;%s&raquo; has an unallowed extension.'), $filename );
+				return sprintf( T_('&laquo;%s&raquo; is a locked extension.'), htmlentities($match[1]) );
 			}
 		}
 		else
@@ -587,41 +587,6 @@ function rel_path_to_base( $path )
 
 
 /**
- * Get an array of available Fileroots.
- *
- * @return array of FileRoots (key being the FileRoot's ID)
- */
-function get_available_FileRoots()
-{
-	global $current_User;
-
-	$r = array();
-
-	// The user's blog (if available) is the default/first one:
-	$FileRootCache = & get_Cache( 'FileRootCache' );
-	$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $current_User->ID, true );
-	if( $user_FileRoot )
-	{ // We got a user media dir:
-		$r[ $user_FileRoot->ID ] = & $user_FileRoot;
-	}
-
-	$BlogCache = & get_Cache( 'BlogCache' );
-	$bloglist = $BlogCache->load_user_blogs( 'browse', $current_User->ID );
-
-	// blog media dirs:
-	foreach( $bloglist as $blog_ID )
-	{
-		if( $Root = & $FileRootCache->get_by_type_and_ID( 'collection', $blog_ID, true ) )
-		{
-			$r[ $Root->ID ] = & $Root;
-		}
-	}
-
-	return $r;
-}
-
-
-/**
  * Get the directories of the supplied path as a radio button tree.
  *
  * @param NULL|FileRoot A single root or NULL for all available.
@@ -642,7 +607,8 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 		$instance_ID++;
 		$js_closeClickIDs = array();
 
-		$_roots = get_available_FileRoots();
+		$FileRootCache = & get_Cache( 'FileRootCache' );
+		$_roots = $FileRootCache->get_available_FileRoots();
 
 		$r = '<ul class="clicktree">';
 		foreach( $_roots as $l_Root )
@@ -789,6 +755,9 @@ function mkdir_r($dirName, $chmod = NULL)
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.27  2006/12/07 15:23:42  fplanque
+ * filemanager enhanced, refactored, extended to skins directory
+ *
  * Revision 1.26  2006/12/03 18:20:29  blueyed
  * Added mkdir_r()
  *

@@ -115,9 +115,9 @@ $action = param_action();
 $ads_list_path = false; // false by default, gets set if we have a valid root
 $fm_FileRoot = NULL;
 
-$available_Roots = get_available_FileRoots();
-
 $FileRootCache = & get_Cache( 'FileRootCache' );
+
+$available_Roots = $FileRootCache->get_available_FileRoots();
 
 if( ! empty($root) )
 { // We have requested a root folder by string:
@@ -1512,6 +1512,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.36  2006/12/07 15:23:42  fplanque
+ * filemanager enhanced, refactored, extended to skins directory
+ *
  * Revision 1.35  2006/11/24 18:27:23  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

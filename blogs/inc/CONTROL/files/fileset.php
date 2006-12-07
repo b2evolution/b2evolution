@@ -62,6 +62,7 @@ switch( $action )
 					'fm_enable_roots_blog',
 					// 'fm_enable_roots_group',
 					'fm_enable_roots_user',
+					'fm_enable_roots_skins',
 					'fm_enable_create_dir',
 					'fm_default_chmod_dir',
 					'fm_enable_create_file',
@@ -91,6 +92,9 @@ switch( $action )
 
 			param( 'fm_enable_roots_user', 'integer', 0 );
 			$Settings->set( 'fm_enable_roots_user', $fm_enable_roots_user );
+
+			param( 'fm_enable_roots_skins', 'integer', 0 );
+			$Settings->set( 'fm_enable_roots_skins', $fm_enable_roots_skins );
 
 			param( 'fm_enable_create_dir', 'integer', 0 );
 			$Settings->set( 'fm_enable_create_dir', $fm_enable_create_dir );

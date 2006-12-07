@@ -94,17 +94,35 @@ class FileRoot
 			case 'user':
 				$UserCache = & get_Cache( 'UserCache' );
 				$User = & $UserCache->get_by_ID( $root_in_type_ID );
-				$this->name = $User->get( 'preferredname' );
+				$this->name = $User->get( 'preferredname' ).' ('.T_('u').')';
 				$this->ads_path = $User->get_media_dir( $create );
 				$this->ads_url = $User->get_media_url();
 				return;
 
 			case 'collection':
 				$BlogCache = & get_Cache( 'BlogCache' );
+				/**
+				 * @var Blog
+				 */
 				$Blog = & $BlogCache->get_by_ID( $root_in_type_ID );
-				$this->name = $Blog->get( 'shortname' );
+				$this->name = $Blog->get( 'shortname' ).' ('.T_('b').')';
 				$this->ads_path = $Blog->get_media_dir( $create );
 				$this->ads_url = $Blog->get_media_url();
+				return;
+
+    	case 'skins':
+    		global $Settings, $Debuglog;
+     		if( ! $Settings->get( 'fm_enable_roots_skins' ) )
+				{ // Skins root is disabled:
+					$Debuglog->add( 'Attempt to access skins dir, but this feature is globally disabled', 'files' );
+				}
+				else
+				{
+					global $skins_path, $skins_url;
+					$this->name = T_('Skins');
+					$this->ads_path = $skins_path;
+					$this->ads_url = $skins_url;
+				}
 				return;
 		}
 
@@ -121,6 +139,7 @@ class FileRoot
 		{
 			case 'user':
 			case 'collection':
+			case 'skins':
 				return $root_type.'_'.$root_in_type_ID;
 		}
 
@@ -131,6 +150,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.9  2006/12/07 15:23:42  fplanque
+ * filemanager enhanced, refactored, extended to skins directory
+ *
  * Revision 1.8  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
