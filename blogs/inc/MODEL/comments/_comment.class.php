@@ -47,7 +47,8 @@ class Comment extends DataObject
 	 */
 	var $Item;
 	/**
-	 * @var integer The ID of the comment's Item.
+	 * The ID of the comment's Item.
+	 * @var integer
 	 */
 	var $item_ID;
 	/**
@@ -59,35 +60,43 @@ class Comment extends DataObject
 	 */
 	var $author_User;
 	/**
-	 * @var integer|NULL The ID of the author's user. NULL for anonymous visitors.
+	 * The ID of the author's user. NULL for anonymous visitors.
+	 * @var integer
 	 */
 	var $author_ID;
 	/**
-	 * @var string Comment type: 'comment', 'linkback', 'trackback' or 'pingback'
+	 * Comment type: 'comment', 'linkback', 'trackback' or 'pingback'
+	 * @var string
 	 */
 	var $type;
 	/**
-	 * @var string Comment visibility status: 'published', 'deprecated', 'protected', 'private' or 'draft'
+	 * Comment visibility status: 'published', 'deprecated', 'protected', 'private' or 'draft'
+	 * @var string
 	 */
 	var $status;
 	/**
-	 * @var string Name of the (anonymous) visitor (if any).
+	 * Name of the (anonymous) visitor (if any).
+	 * @var string
 	 */
 	var $author;
 	/**
-	 * @var string Email address of the (anonymous) visitor (if any).
+	 * Email address of the (anonymous) visitor (if any).
+	 * @var string
 	 */
 	var $author_email;
 	/**
-	 * @var string URL/Homepage of the (anonymous) visitor (if any).
+	 * URL/Homepage of the (anonymous) visitor (if any).
+	 * @var string
 	 */
 	var $author_url;
 	/**
-	 * @var string IP address of the comment's author (while posting).
+	 * IP address of the comment's author (while posting).
+	 * @var string
 	 */
 	var $author_IP;
 	/**
-	 * @var string Date of the comment (MySQL DATETIME - use e.g. {@link mysql2timestamp()}); local time ({@link $localtimenow})
+	 * Date of the comment (MySQL DATETIME - use e.g. {@link mysql2timestamp()}); local time ({@link $localtimenow})
+	 * @var string
 	 */
 	var $date;
 	/**
@@ -95,11 +104,13 @@ class Comment extends DataObject
 	 */
 	var $content;
 	/**
-	 * @var integer Spam karma of the comment (0-100), 0 being "probably no spam at all"
+	 * Spam karma of the comment (0-100), 0 being "probably no spam at all"
+	 * @var integer
 	 */
 	var $spam_karma;
 	/**
-	 * @var boolean Does an anonymous commentator allow to send messages through a message form?
+	 * Does an anonymous commentator allow to send messages through a message form?
+	 * @var boolean
 	 */
 	var $allow_msgform;
 
@@ -1169,6 +1180,10 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.53  2006/12/07 23:13:10  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.52  2006/12/03 18:10:22  fplanque
  * SUSPECT code. Not releasable. Discussion by email.
  *

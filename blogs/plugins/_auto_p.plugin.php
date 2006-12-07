@@ -28,7 +28,8 @@ class auto_p_plugin extends Plugin
 	var $long_desc;
 
 	/**
-	 * @var string List of block elements (we want a paragraph before and after), excludes: address, added: td, th
+	 * List of block elements (we want a paragraph before and after), excludes: address, added: td, th
+	 * @var string
 	 */
 	var $block_tags = 'blockquote|dd|div|dl|dt|fieldset|form|h[1-6]|hr|li|ol|p|pre|select|table|td|th|ul';
 
@@ -629,6 +630,10 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.32  2006/12/07 23:13:13  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.31  2006/11/09 22:19:39  blueyed
  * Fix: split blocks by "<!--more-->" before working on them
  *

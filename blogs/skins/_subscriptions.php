@@ -37,7 +37,8 @@ $redirect_to = param( 'redirect_to', 'string', '');
 
 
 /**
- * @var Form form to update the profile
+ * form to update the profile
+ * @var Form
  */
 $Form = & new Form( $htsrv_url.'subs_update.php', 'SubsForm' );
 
@@ -83,6 +84,10 @@ $Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.12  2006/12/07 23:13:14  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.11  2006/10/17 17:20:07  blueyed
  * TODO
  *

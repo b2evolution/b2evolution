@@ -242,7 +242,7 @@ class Plugin
 	 * overloading in PHP5+, which means on first access.
 	 *
 	 * @see GetDefaultSettings()
-	 * @var NULL|PluginSettings
+	 * @var PluginSettings
 	 */
 	var $Settings;
 
@@ -257,7 +257,7 @@ class Plugin
 	 *       if there's no {@link $current_User} instantiated (yet).
 	 *
 	 * @see GetDefaultUserSettings()
-	 * @var NULL|PluginUserSettings
+	 * @var PluginUserSettings
 	 */
 	var $UserSettings;
 
@@ -266,15 +266,18 @@ class Plugin
 	 * The status of the plugin.
 	 *
 	 * Use {@link set_status()} to change it, if you need to.
+	 * Either 'enabled', 'disabled', 'needs_config' or 'broken'.
 	 *
-	 * @var string Either 'enabled', 'disabled', 'needs_config' or 'broken'.
+	 * @var string
 	 */
 	var $status;
 
 	/**
 	 * The "mother" object, where this Plugin got instantiated from.
 	 *
-	 * @var Plugins|Plugins_admin|Plugins_admin_no_DB
+	 * Plugins|Plugins_admin|Plugins_admin_no_DB
+	 *
+	 * @var Plugins_admin
 	 */
 	var $Plugins;
 
@@ -293,8 +296,10 @@ class Plugin
 	var $_trans_charsets = array();
 
 	/**
-	 * @var boolean Has the global /locales/_global.php file (where translation for
+	 * Has the global /locales/_global.php file (where translation for
 	 * all languages can be put into) been loaded?
+	 *
+	 * @var boolean
 	 */
 	var $_trans_loaded_global = false;
 
@@ -2788,6 +2793,10 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.127  2006/12/07 23:13:13  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.126  2006/12/05 00:24:10  blueyed
  * doc fix
  *

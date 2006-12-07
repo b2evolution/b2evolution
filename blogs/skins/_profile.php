@@ -47,7 +47,8 @@ $redirect_to = param( 'redirect_to', 'string', '' );
 
 
 /**
- * @var Form form to update the profile
+ * form to update the profile
+ * @var Form
  */
 $ProfileForm = & new Form( $htsrv_url_sensitive.'profile_update.php', 'ProfileForm' );
 
@@ -87,6 +88,10 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.34  2006/12/07 23:13:14  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.33  2006/10/15 21:30:46  blueyed
  * Use url_rel_to_same_host() for redirect_to params.
  *

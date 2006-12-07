@@ -70,7 +70,8 @@ class Session
 
 	/**
 	 * The user ID for the user of the session (NULL for anonymous (not logged in) user).
-	 * @var integer|NULL
+	 * 
+	 * @var integer
 	 */
 	var $user_ID;
 
@@ -489,6 +490,10 @@ function session_unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.28  2006/12/07 23:13:11  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.27  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

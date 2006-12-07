@@ -58,8 +58,9 @@ class Plugins
 	 */
 
 	/**
+	 * Our API version as (major, minor). A Plugin can request a check against it through {@link Plugin::GetDependencies()}.
 	 * @deprecated since 1.9
-	 * @var array Our API version as (major, minor). A Plugin can request a check against it through {@link Plugin::GetDependencies()}.
+	 * @var array
 	 */
 	var $api_version = array( 1, 2 );
 
@@ -140,7 +141,8 @@ class Plugins
 	 */
 
 	/**
-	 * @var string SQL to use in {@link load_plugins_table()}. Gets overwritten for {@link Plugins_admin}.
+	 * SQL to use in {@link load_plugins_table()}. Gets overwritten for {@link Plugins_admin}.
+	 * @var string
 	 * @static
 	 */
 	var $sql_load_plugins_table = '
@@ -150,8 +152,9 @@ class Plugins
 			 ORDER BY plug_priority, plug_classname';
 
 	/**
-	 * @var boolean Used in class {@link Plugins} when it comes to removing plugins from the list, what we don't want
+	 * Used in class {@link Plugins} when it comes to removing plugins from the list, what we don't want
 	 *                when administering plugins (see {@link $Plugins_admin}).
+	 * @var boolean
 	 * @static
 	 */
 	var $is_admin_class = false;
@@ -1780,6 +1783,10 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.125  2006/12/07 23:13:13  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.124  2006/12/05 00:23:55  blueyed
  * Return value for get_object_from_cacheplugin_or_create()
  *

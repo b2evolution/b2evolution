@@ -237,18 +237,21 @@ class Calendar
 	var $year;
 
 	/**
-	 * @var string The month to display or empty in mode 'year' with no selected month.
+	 * The month to display or empty in mode 'year' with no selected month.
+	 * @var string
 	 */
 	var $month;
 
 	/**
-	 * @var string 'month' or 'year'
+	 * 'month' or 'year'
+	 * @var string
 	 */
 	var $mode;
 
 	var $where;
 	/**
-	 * @var string SQL query string
+	 * SQL query string
+	 * @var string
 	 */
 	var $request;
 	/**
@@ -256,7 +259,8 @@ class Calendar
 	 */
 	var $result;
 	/**
-	 * @var integer Number of rows in result set
+	 * Number of rows in result set
+	 * @var integer
 	 */
 	var $result_num_rows;
 
@@ -302,7 +306,8 @@ class Calendar
 	var $browseyears;
 
 	/**
-	 * @var boolean Is today in the displayed frame?
+	 * Is today in the displayed frame?
+	 * @var boolean
 	 * @access protected
 	 */
 	var $today_is_visible;
@@ -1108,6 +1113,10 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.33  2006/12/07 23:13:14  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.32  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

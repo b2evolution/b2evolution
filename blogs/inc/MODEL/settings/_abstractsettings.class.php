@@ -60,7 +60,7 @@ class AbstractSettings
 	/**
 	 * Array with DB column key names.
 	 *
-	 * @var array of strings
+	 * @var array
 	 * @access protected
 	 */
 	var $col_key_names = array();
@@ -86,9 +86,10 @@ class AbstractSettings
 	/**
 	 * The internal cache.
 	 *
-	 * @access protected
-	 * @var array|NULL|false Contains the loaded settings or false, if settings
-	 *                       could not be loaded or NULL if not initialized.
+	 * false, if settings  could not be loaded or NULL if not initialized.
+	 *
+ 	 * @access protected
+	 * @var array
 	 */
 	var $cache = NULL;
 
@@ -128,7 +129,8 @@ class AbstractSettings
 
 
 		/**
-		 * @var integer internal counter for the number of column keys
+		 * internal counter for the number of column keys
+		 * @var integer
 		 */
 		$this->count_col_key_names = count( $this->col_key_names );
 
@@ -707,6 +709,10 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.19  2006/12/07 23:13:11  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.18  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

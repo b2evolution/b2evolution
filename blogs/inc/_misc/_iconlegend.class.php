@@ -40,7 +40,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class IconLegend
 {
 	/**
-	 * @var array List of used icon names
+	 * List of used icon names
+	 * @var array
 	 */
 	var $icons = array();
 
@@ -118,6 +119,10 @@ class IconLegend
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/07 23:13:13  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.7  2006/11/30 22:34:15  fplanque
  * bleh
  *

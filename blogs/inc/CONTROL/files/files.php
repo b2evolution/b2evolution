@@ -376,7 +376,8 @@ $fm_Filelist->sort( $fm_order, $fm_orderasc );
 
 
 /**
- * @var Filelist The selected files
+ * The selected files
+ * @var Filelist
  */
 $selected_Filelist = & new Filelist( $fm_Filelist->get_FileRoot(), false );
 
@@ -1018,7 +1019,8 @@ switch( $fm_mode )
 		param( 'upload_quickmode', 'integer', 0 );
 
 		/**
-		 * @var array Remember failed files (and the error messages)
+		 * Remember failed files (and the error messages)
+		 * @var array
 		 */
 		$failedFiles = array();
 
@@ -1592,6 +1594,10 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.38  2006/12/07 23:13:10  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.37  2006/12/07 20:03:32  fplanque
  * Woohoo! File editing... means all skin editing.
  *

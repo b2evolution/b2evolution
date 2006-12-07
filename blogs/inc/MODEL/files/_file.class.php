@@ -161,24 +161,24 @@ class File extends DataObject
 	var $_perms;
 
 	/**
-	 * File owner.
-	 * @var string|NULL
+	 * File owner. NULL if unknown
+	 * @var string
 	 * @see get_fsowner_name()
 	 * @access protected
 	 */
 	var $_fsowner_name;
 
 	/**
-	 * File group.
-	 * @var string|NULL
+	 * File group. NULL if unknown
+	 * @var string
 	 * @see get_fsgroup_name()
 	 * @access protected
 	 */
 	var $_fsgroup_name;
 
 	/**
-	 * Is the File an image?
-	 * @var NULL|boolean
+	 * Is the File an image? NULL if unknown
+	 * @var boolean
 	 * @see is_image()
 	 * @access protected
 	 */
@@ -186,7 +186,7 @@ class File extends DataObject
 
 	/**
 	 * Extension, Mime type, icon, viewtype and 'allowed extension' of the file
-	 * @var Filetype Filetype
+	 * @var Filetype
 	 */
 	var $Filetype;
 
@@ -1367,6 +1367,10 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2006/12/07 23:13:10  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.23  2006/12/07 20:03:32  fplanque
  * Woohoo! File editing... means all skin editing.
  *

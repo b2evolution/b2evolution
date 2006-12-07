@@ -60,7 +60,8 @@ require_once dirname(__FILE__).'/_widget.class.php';
 class Form extends Widget
 {
 	/**
-	 * @var boolean Output HTML or just return it?
+	 * Output HTML or just return it?
+	 * @var boolean
 	 */
 	var $output = true;
 
@@ -79,7 +80,7 @@ class Form extends Widget
 
 	/**
 	 * Display order of <label> and <input>.
-	 * @var boolean Defaults to true
+	 * @var boolean
 	 */
 	var $label_to_the_left = true;
 
@@ -2707,6 +2708,10 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.56  2006/12/07 23:13:13  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.55  2006/12/06 19:12:11  fplanque
  * not all comments are something "TO DO". Some really just are "comments"
  *

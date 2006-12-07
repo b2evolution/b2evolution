@@ -13,12 +13,14 @@
 class MockDbUnitTestCase extends EvoUnitTestCase
 {
 	/**
-	 * @var DB mocked DB object
+	 * mocked DB object
+	 * @var DB
 	 */
 	var $MockDB;
 
 	/**
-	 * @var array List of methods that should get mocked
+	 * List of methods that should get mocked
+	 * @var array
 	 */
 	var $mocked_DB_methods = array();
 

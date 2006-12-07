@@ -104,22 +104,28 @@ class Item extends DataObject
 
 
 	/**
-	 * @var integer ID of the user that created the item
+	 * ID of the user that created the item
+	 * @var integer
 	 */
 	var $creator_user_ID;
 
 
 	/**
 	 * The assigned User to the item.
+	 * Can be NULL
 	 * @see Item::get_assigned_User()
 	 * @see Item::assign_to()
-	 * @var User|NULL
+	 *
+	 * @var User
 	 * @access protected
 	 */
 	var $assigned_User;
 
 	/**
-	 * @var integer|NULL ID of the user that created the item
+	 * ID of the user that created the item
+	 * Can be NULL
+	 *
+	 * @var integer
 	 */
 	var $assigned_user_ID;
 
@@ -132,7 +138,10 @@ class Item extends DataObject
 	var $mod_date;
 	/**
 	 * The visibility status of the item.
-	 * @var string 'published', 'deprecated', 'protected', 'private' or 'draft'
+	 *
+	 * 'published', 'deprecated', 'protected', 'private' or 'draft'
+	 *
+	 * @var string
 	 */
 	var $status;
 	/**
@@ -156,13 +165,17 @@ class Item extends DataObject
 
 	var $wordcount;
 	/**
-	 * @var string The list of renderers, imploded by '.'.
+	 * The list of renderers, imploded by '.'.
+	 * @var string
 	 * @access protected
 	 */
 	var $renderers;
 	/**
 	 * Comments status
-	 * @var string "open", "disabled" or "closed
+	 *
+	 * "open", "disabled" or "closed
+	 *
+	 * @var string
 	 */
 	var $comment_status;
 	/**
@@ -209,7 +222,9 @@ class Item extends DataObject
 	var $Blog;
 
 	/**
-	 * @var NULL|array of IDs or NULL if we don't know...
+	 * array of IDs or NULL if we don't know...
+	 *
+	 * @var array
 	 */
 	var $extra_cat_IDs = NULL;
 
@@ -228,9 +243,12 @@ class Item extends DataObject
 
 	/**
 	 * Pre-rendered content, cached by format/validated renderers.
+	 *
+	 * Can be NULL
+	 *
 	 * @see Item::get_prerendered_content()
 	 * @access protected
-	 * @var array|NULL
+	 * @var array
 	 */
 	var $content_prerendered;
 
@@ -3326,6 +3344,10 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.136  2006/12/07 23:13:11  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.135  2006/12/06 23:55:53  fplanque
  * hidden the dead body of the sidebar plugin + doc
  *

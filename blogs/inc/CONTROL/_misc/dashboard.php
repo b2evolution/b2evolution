@@ -19,6 +19,12 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * @var User
+ */
+global $current_User;
+
+
 $AdminUI->set_path( 'dashboard' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -36,12 +42,15 @@ echo '<p>Welcome to b2evolution '.$app_version.'. Work in progress...</p>';
 
 echo '<p>This page is supposed to show you the most important things you will need on a daily basis.</p>';
 
-echo '<h2>Set-up</h2>';
+if( $current_User->Group->ID == 1 )
+{
+	echo '<h2>Administrative tasks</h2>';
 
-echo '<ul>';
-// TODO: remember system date check and only remind every 3 months
-echo '<li><a href="admin.php?ctrl=system">Check if your system is secure</a></li>';
-echo '</ul>';
+	echo '<ul>';
+	// TODO: remember system date check and only remind every 3 months
+	echo '<li><a href="admin.php?ctrl=system">Check if your system is secure</a></li>';
+	echo '</ul>';
+}
 
 // End payload block:
 $AdminUI->disp_payload_end();
@@ -51,6 +60,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2006/12/07 23:13:10  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.1  2006/12/07 22:29:26  fplanque
  * reorganized menus / basic dashboard
  *

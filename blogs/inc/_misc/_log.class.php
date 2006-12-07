@@ -51,7 +51,9 @@ class Log
 {
 	/**
 	 * The stored messages (by category).
-	 * @var array array of arrays
+	 * array of arrays
+	 *
+	 * @var array
 	 */
 	var $messages = array();
 
@@ -62,22 +64,26 @@ class Log
 	var $defaultcategory = 'error';
 
 	/**
-	 * @var mixed string or array to display before messages
+	 * string or array to display before messages
+	 * @var mixed
 	 */
 	var $head = '';
 
 	/**
-	 * @var strinf to display after messages
+	 * to display after messages
+	 * @var string
 	 */
 	var $foot = '';
 
 	/**
-	 * @var boolean Should {@link Log::add()} automatically output the messages?
+	 * Should {@link Log::add()} automatically output the messages?
+	 * @var boolean
 	 */
 	var $dump_add = false;
 
 	/**
-	 * @var array Cache for {@link Log::count()}
+	 * Cache for {@link Log::count()}
+	 * @var array
 	 */
 	var $_count = array();
 
@@ -695,6 +701,10 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.14  2006/12/07 23:13:13  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.13  2006/11/30 00:28:13  blueyed
  * Interface fixes for Log_noop
  *

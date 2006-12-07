@@ -66,8 +66,9 @@ class Hit
 	 * The type of referer.
 	 *
 	 * Note: "spam" referers do not get logged.
+	 * 'search'|'blacklist'|'referer'|'direct'|'spam'
 	 *
-	 * @var string 'search'|'blacklist'|'referer'|'direct'|'spam'
+	 * @var string
 	 */
 	var $referer_type;
 
@@ -117,8 +118,9 @@ class Hit
 	 *
 	 * The default setting ('unknown') is taken for new entries (into T_useragents),
 	 * that are not detected as 'rss', 'robot' or 'browser'.
+	 * 'rss'|'robot'|'browser'|'unknown'
 	 *
-	 * @var string 'rss'|'robot'|'browser'|'unknown'
+	 * @var string
 	 */
 	var $agent_type = 'unknown';
 
@@ -129,7 +131,9 @@ class Hit
 	var $agent_ID;
 
 	/**#@+
-	 * @var integer|NULL Detected browser.
+	 * Detected browser.
+	 * 
+	 * @var integer
 	 */
 	var $is_lynx;
 	var $is_gecko;
@@ -685,6 +689,10 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.43  2006/12/07 23:13:11  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.42  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

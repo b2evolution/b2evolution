@@ -86,43 +86,52 @@ if( ! function_exists( 'mysql_real_escape_string' ) )
 class DB
 {
 	/**
-	 * @var boolean Show/Print errors?
+	 * Show/Print errors?
+	 * @var boolean
 	 */
 	var $show_errors = true;
 	/**
-	 * @var boolean Halt on errors?
+	 * Halt on errors?
+	 * @var boolean
 	 */
 	var $halt_on_error = true;
 	/**
-	 * @var boolean Has an error occured?
+	 * Has an error occured?
+	 * @var boolean
 	 */
 	var $error = false;
 	/**
-	 * @var integer Number of done queries.
+	 * Number of done queries.
+	 * @var integer
 	 */
 	var $num_queries = 0;
 	/**
-	 * @var string last query SQL string
+	 * last query SQL string
+	 * @var string
 	 */
 	var $last_query = '';
 	/**
-	 * @var string last DB error string
+	 * last DB error string
+	 * @var string
 	 */
 	var $last_error = '';
 
 	/**
-	 * @var integer Last insert ID
+	 * Last insert ID
+	 * @var integer
 	 */
 	var $insert_id = 0;
 
 	/**
+	 * Last query's resource
 	 * @access protected
-	 * @var resource Last query's resource
+	 * @var resource
 	 */
 	var $result;
 
 	/**
-	 * @var array Last result's rows
+	 * Last result's rows
+	 * @var array
 	 */
 	var $last_result;
 
@@ -155,7 +164,7 @@ class DB
 	 *
 	 * Recommended settings: ' ENGINE=InnoDB '
 	 * Development settings: ' ENGINE=InnoDB DEFAULT CHARSET=utf8 '
-	 * @var string Default: ''
+	 * @var string
 	 */
 	var $table_options = '';
 
@@ -177,33 +186,39 @@ class DB
 	var $rollback_nested_transaction = false;
 
 	/**
-	 * @var object MySQL Database handle
+	 * MySQL Database handle
+	 * @var object
 	 */
 	var $dbhandle;
 
 	/**
-	 * @var string Database username
+	 * Database username
+	 * @var string
 	 */
 	var $dbuser;
 
 	/**
-	 * @var string Database username's password
+	 * Database username's password
+	 * @var string
 	 */
 	var $dbpassword;
 
 	/**
-	 * @var string Database name
+	 * Database name
+	 * @var string
 	 * @see select()
 	 */
 	var $dbname;
 
 	/**
-	 * @var string Database hostname
+	 * Database hostname
+	 * @var string
 	 */
 	var $dbhost = 'localhost';
 
 	/**
-	 * @var string Current connection charset
+	 * Current connection charset
+	 * @var string
 	 * @see DB::set_connection_charset()
 	 */
 	var $connection_charset;
@@ -228,21 +243,24 @@ class DB
 	/**
 	 * Do we want to explain joins?
 	 * This requires {@link DB::log_queries} to be true.
-	 * @var boolean (Default: false)
+	 * @var boolean
 	 */
 	var $debug_explain_joins = false;
 
 	/**
 	 * Do we want to output a function backtrace for every query?
+	 * Number of stack entries to show (from last to first) (Default: 0); true means 'all'.
+	 *
 	 * This requires {@link DB::log_queries} to be true.
-	 * @var integer|boolean Number of stack entries to show (from last to first) (Default: 0); true means 'all'.
+	 *
+	 * @var integer
 	 */
 	var $debug_dump_function_trace_for_queries = 0;
 
 	/**
 	 * Number of rows we want to dump in debug output (0 disables it)
 	 * This requires {@link DB::log_queries} to be true.
-	 * @var integer (Default: 0)
+	 * @var integer
 	 */
 	var $debug_dump_rows = 0;
 
@@ -1326,6 +1344,10 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.51  2006/12/07 23:12:21  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.50  2006/12/03 21:27:21  blueyed
  * Save and reset $error with set_connection_charset(); TODO
  *

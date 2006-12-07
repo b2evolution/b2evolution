@@ -220,7 +220,8 @@ class Results extends Widget
 	var $order_field_list;
 
 	/**
-	 * @var array List of sortable columns by callback ("order_objects_callback" and "order_rows_callback")
+	 * List of sortable columns by callback ("order_objects_callback" and "order_rows_callback"
+	 * @var array
 	 */
 	var $order_callbacks;
 
@@ -2194,6 +2195,10 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.35  2006/12/07 23:13:13  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.34  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

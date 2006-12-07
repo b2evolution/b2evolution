@@ -57,19 +57,19 @@ class Blog extends DataObject
 {
 	/**
 	 * Short name for use in navigation menus
-	 * @var string Short name for use in navigation menus
+	 * @var string
 	 */
 	var $shortname;
 
 	/**
 	 * Complete name
-	 * @var string Complete name
+	 * @var string
 	 */
 	var $name;
 
 	/**
 	 * Tagline to be displayed on template
-	 * @var string Tagline to be displayed on template
+	 * @var string
 	 */
 	var $tagline;
 
@@ -103,11 +103,11 @@ class Blog extends DataObject
 	var $media_url = '';
 
 	/**
-	 * Additional settings for the collection
-	 *
+	 * Additional settings for the collection.  lazy filled.
+ 	 *
 	 * Any non vital params should go into there (this includes many of the above).
 	 *
-	 * @var CollectionSettings lazy filled
+	 * @var CollectionSettings
 	 */
 	var $CollectionSettings;
 
@@ -1039,6 +1039,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.40  2006/12/07 23:13:10  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.39  2006/12/04 23:49:49  blueyed
  * Normalized: setMediaUrl() => set_media_url(); setMediaFullPath() => set_media_fullpath(); setMediaSubDir() => set_media_subdir()
  *

@@ -46,7 +46,8 @@ class Plugins_admin extends Plugins
 			 ORDER BY plug_priority, plug_classname';
 
 	/**
-	 * @var boolean Gets used in base class
+	 * Gets used in base class
+	 * @var boolean
 	 * @static
 	 */
 	var $is_admin_class = true;
@@ -1329,6 +1330,10 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.18  2006/12/07 23:13:13  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.17  2006/12/04 00:18:53  fplanque
  * keeping the login hashing
  *

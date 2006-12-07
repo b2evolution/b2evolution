@@ -65,20 +65,22 @@ class User extends DataObject
 	var $level;
 
 	/**
-	 * @var boolean Does the user accept emails through a message form?
+	 * Does the user accept emails through a message form?
+	 * @var boolean
 	 */
 	var $allow_msgform;
 	var $notify;
 	var $showonline;
 
 	/**
-	 * @var boolean Has the user been validated (by email)?
+	 * Has the user been validated (by email)?
+	 * @var boolean
 	 */
 	var $validated;
 
 	/**
 	 * Number of posts by this user. Use get_num_posts() to access this (lazy filled).
-	 * @var integer|NULL
+	 * @var integer
 	 * @access protected
 	 */
 	var $_num_posts;
@@ -90,8 +92,9 @@ class User extends DataObject
 	var $group_ID;
 
 	/**
+	 * Reference to group
 	 * @see User::get_Group()
-	 * @var NULL|Group Reference to group
+	 * @var Group
 	 * @access protected
 	 */
 	var $Group;
@@ -1117,6 +1120,10 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.57  2006/12/07 23:13:11  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.56  2006/12/06 22:30:07  fplanque
  * Fixed this use case:
  * Users cannot register themselves.

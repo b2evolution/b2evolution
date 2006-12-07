@@ -63,12 +63,14 @@ class Filelist
 	var $flatmode;
 
 	/**
-	 * @var boolean Do we want to include directories? (This gets used by {@link load()}).
+	 * Do we want to include directories? (This gets used by {@link load()}).
+	 * @var boolean
 	 */
 	var $include_dirs = true;
 
 	/**
-	 * @var boolean Do we want to include files? (This gets used by {@link load()}).
+	 * Do we want to include files? (This gets used by {@link load()}).
+	 * @var boolean
 	 */
 	var $include_files = true;
 
@@ -85,8 +87,9 @@ class Filelist
 	 * Path to list with trailing slash.
 	 *
 	 * false if we are constructing an arbitrary list (i-e not tied to a single directory)
+	 * fp> should use NULL instead of false
 	 *
-	 * @var boolean|string
+	 * @var string
 	 * @access protected
 	 */
 	var $_ads_list_path = false;
@@ -95,8 +98,9 @@ class Filelist
 	 * Path to list reltive to root, with trailing slash
 	 *
 	 * false if we are constructing an arbitrary list (i-e not tied to a single directory)
+	 * fp> should use NULL instead of false
 	 *
-	 * @param boolean|string
+	 * @param string
 	 * @access protected
 	 */
 	var $_rds_list_path = false;
@@ -111,25 +115,25 @@ class Filelist
 	 *
 	 * Use {@link set_filter()} to set it.
 	 *
-	 * @var NULL|string
+	 * @var string
 	 * @access protected
 	 */
 	var $_filter = NULL;
 
 	/**
-	 * Is the filter a regular expression?
+	 * Is the filter a regular expression? NULL if unknown
 	 *
 	 * Use {@link set_filter()} to set it.
 	 *
 	 * @see Filelist::_filter
-	 * @var NULL|boolean
+	 * @var boolean
 	 * @access protected
 	 */
 	var $_filter_is_regexp = NULL;
 
 	/**
 	 * The list of Files.
-	 * @var array of File objects
+	 * @var array
 	 * @access protected
 	 */
 	var $_entries = array();
@@ -182,19 +186,22 @@ class Filelist
 	var $_total_entries = 0;
 
 	/**
-	 * @var integer Number of directories
+	 * Number of directories
+	 * @var integer
 	 * @access protected
 	 */
 	var $_total_dirs = 0;
 
 	/**
-	 * @var integer Number of files
+	 * Number of files
+	 * @var integer
 	 * @access protected
 	 */
 	var $_total_files = 0;
 
 	/**
-	 * @var integer Number of bytes
+	 * Number of bytes
+	 * @var integer
 	 * @access protected
 	 */
 	var $_total_bytes = 0;
@@ -224,7 +231,7 @@ class Filelist
 	 *
 	 * NULL is default and means ascending for 'name', descending for the rest
 	 *
-	 * @var boolean|NULL
+	 * @var boolean
 	 * @access protected
 	 */
 	var $_order_asc = NULL;
@@ -1211,6 +1218,10 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.21  2006/12/07 23:13:10  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.20  2006/12/07 20:03:32  fplanque
  * Woohoo! File editing... means all skin editing.
  *

@@ -46,7 +46,8 @@ require_once dirname(__FILE__).'/_fileroot.class.php';
 class FileRootCache
 {
 	/**
-	 * @var array Internal cache
+	 * Internal cache
+	 * @var array
 	 */
 	var $cache = array();
 
@@ -157,6 +158,10 @@ class FileRootCache
 
 /*
  * $Log$
+ * Revision 1.7  2006/12/07 23:13:10  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.6  2006/12/07 15:23:42  fplanque
  * filemanager enhanced, refactored, extended to skins directory
  *

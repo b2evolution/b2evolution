@@ -106,7 +106,8 @@ function antispam_source2( & $row )
 	if( $aspm_sources === NULL )
 	{
 		/**
-		 * @var the antispam sources
+		 * the antispam sources
+		 * @var array
 		 * @static
 		 */
 		$aspm_sources = array (
@@ -162,6 +163,10 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2006/12/07 23:13:12  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.5  2006/08/21 01:02:09  blueyed
  * whitespace
  *

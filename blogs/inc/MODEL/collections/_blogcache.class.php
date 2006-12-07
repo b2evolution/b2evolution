@@ -46,12 +46,14 @@ require_once dirname(__FILE__).'/../dataobjects/_dataobjectcache.class.php';
 class BlogCache extends DataObjectCache
 {
 	/**
-	 * @var array Cache by absolute siteurl
+	 * Cache by absolute siteurl
+	 * @var array
 	 */
 	var $cache_siteurl_abs = array();
 
 	/**
-	 * @var array Cache by urlname
+	 * Cache by urlname 
+	 * @var array
 	 */
 	var $cache_urlname = array();
 
@@ -257,6 +259,10 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.17  2006/12/07 23:13:10  fplanque
+ * @var needs to have only one argument: the variable type
+ * Otherwise, I can't code!
+ *
  * Revision 1.16  2006/12/06 18:04:23  fplanque
  * doc
  *

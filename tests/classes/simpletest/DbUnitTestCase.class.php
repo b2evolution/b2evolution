@@ -19,7 +19,8 @@ require_once $basepath.$install_subdir.'_functions_create.php';
 class DbUnitTestCase extends EvoUnitTestCase
 {
 	/**
-	 * @var DB A database object connected to the test DB.
+	 * A database object connected to the test DB.
+	 * @var DB
 	 * @see $testDB_conf
 	 */
 	var $test_DB;
