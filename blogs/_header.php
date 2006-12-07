@@ -250,21 +250,6 @@ $AdminUI->add_menu_entries(
 				)
 			),
 
-			'antispam' => array( // TODO: move this as the default submenu of Tools?
-				'text' => T_('Antispam'),
-				'perm_name' => 'spamblacklist',
-				'perm_level' => 'view',
-				'href' => 'admin.php?ctrl=antispam'
-			),
-
-			'templates' => array(
-				'text' => T_('Templates'),
-				'title' => T_('Custom skin template editing'),
-				'perm_name' => 'templates',
-				'perm_level' => 'any',
-				'href'=>'admin.php?ctrl=templates'
-			),
-
 			'files' => array(
 				'text' => T_('Files'),
 				'title' => T_('File management'),
@@ -324,21 +309,26 @@ $AdminUI->add_menu_entries(
 
 			'tools' => array(
 				'text' => T_('Tools'),
-				'href' => 'admin.php?ctrl=tools',
+				'href' => 'admin.php?ctrl=crontab',
 				'entries' =>  array(
-					'' => array(	// fp> '' is dirty
-						'text' => T_('Main tab'),
-						'href' => 'admin.php?ctrl=tools' ),
-					'system' => array(
-						'text' => T_('System'),
-						'perm_name' => 'options',
-						'perm_level' => 'view',
-						'href' => 'admin.php?ctrl=system' ),
 					'cron' => array(
 						'text' => T_('Scheduler'),
 						'perm_name' => 'options',
 						'perm_level' => 'view',
 						'href' => 'admin.php?ctrl=crontab' ),
+					'system' => array(
+						'text' => T_('System'),
+						'perm_name' => 'options',
+						'perm_level' => 'view',
+						'href' => 'admin.php?ctrl=system' ),
+					'antispam' => array(
+						'text' => T_('Antispam'),
+						'perm_name' => 'spamblacklist',
+						'perm_level' => 'view',
+						'href' => 'admin.php?ctrl=antispam'	),
+					'' => array(	// fp> '' is dirty
+						'text' => T_('Misc'),
+						'href' => 'admin.php?ctrl=tools' ),
 				)
 			),
 		)
@@ -350,6 +340,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.28  2006/12/07 21:16:55  fplanque
+ * killed templates
+ *
  * Revision 1.27  2006/12/07 01:04:41  fplanque
  * reorganized some settings
  *

@@ -41,7 +41,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 require_once $model_path.'antispam/_antispam.funcs.php';
 
-$AdminUI->set_path( 'antispam' );
+$AdminUI->set_path( 'tools', 'antispam' );
 
 param( 'action', 'string' );
 param( 'confirm', 'string' );
@@ -365,6 +365,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/07 21:16:55  fplanque
+ * killed templates
+ *
  * Revision 1.7  2006/07/04 17:32:28  fplanque
  * no message
  *
