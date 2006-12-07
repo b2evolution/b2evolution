@@ -293,6 +293,15 @@ $AdminUI->add_menu_entries(
 					'features' => array(
 						'text' => T_('Features'),
 						'href' => 'admin.php?ctrl=features' ),
+					'skins' => array(
+						'text' => T_('Skins'),
+						'href' => 'admin.php?ctrl=skins'),
+					'plugins' => array(
+						'text' => T_('Plugins'),
+						'href' => 'admin.php?ctrl=plugins'),
+					'antispam' => array(
+						'text' => T_('Antispam'),
+						'href' => 'admin.php?ctrl=set_antispam'),
 					'regional' => array(
 						'text' => T_('Regional'),
 						'href' => 'admin.php?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
@@ -302,23 +311,14 @@ $AdminUI->add_menu_entries(
 					'filetypes' => array(
 						'text' => T_('File types'),
 						'href' => 'admin.php?ctrl=filetypes' ),
-					'statuses' => array(
-						'text' => T_('Post statuses'),
-						'title' => T_('Post statuses management'),
-						'href' => 'admin.php?ctrl=itemstatuses'),
 					'types' => array(
 						'text' => T_('Post types'),
 						'title' => T_('Post types management'),
 						'href' => 'admin.php?ctrl=itemtypes'),
-					'plugins' => array(
-						'text' => T_('Plugins'),
-						'href' => 'admin.php?ctrl=plugins'),
-					'skins' => array(
-						'text' => T_('Skins'),
-						'href' => 'admin.php?ctrl=skins'),
-					'antispam' => array(
-						'text' => T_('Antispam'),
-						'href' => 'admin.php?ctrl=set_antispam'),
+					'statuses' => array(
+						'text' => T_('Post statuses'),
+						'title' => T_('Post statuses management'),
+						'href' => 'admin.php?ctrl=itemstatuses'),
 				)
 			),
 
@@ -350,6 +350,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.27  2006/12/07 01:04:41  fplanque
+ * reorganized some settings
+ *
  * Revision 1.26  2006/12/06 23:55:53  fplanque
  * hidden the dead body of the sidebar plugin + doc
  *
