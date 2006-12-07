@@ -81,7 +81,7 @@ function create_b2evo_tables()
 	$Group_Admins->set( 'perm_blogs', 'editall' );
 	$Group_Admins->set( 'perm_stats', 'edit' );
 	$Group_Admins->set( 'perm_spamblacklist', 'edit' );
-	$Group_Admins->set( 'perm_files', 'edit' );
+	$Group_Admins->set( 'perm_files', 'all' );
 	$Group_Admins->set( 'perm_options', 'edit' );
 	$Group_Admins->set( 'perm_templates', 1 );
 	$Group_Admins->set( 'perm_users', 'edit' );
@@ -157,23 +157,9 @@ function create_b2evo_tables()
 		" );
 	echo "OK.<br />\n";
 
-	echo 'Giving Administrator Group edit perms on files... ';
-	$DB->query( 'UPDATE T_groups
-							 SET grp_perm_files = "edit"
-							 WHERE grp_ID = 1' );
-	echo "OK.<br />\n";
+	// fp> Code removed. perm_files is handled at group creation!
 
-	echo 'Giving Administrator Group full perms on media for all blogs... ';
-	$DB->query( 'UPDATE T_coll_group_perms
-							 SET bloggroup_perm_media_upload = 1,
-									 bloggroup_perm_media_browse = 1,
-									 bloggroup_perm_media_change = 1
-							 WHERE bloggroup_group_ID = 1' );
-	echo "OK.<br />\n";
-
-
-
-
+	// fp> Code removed. T_coll_group_perms are INSERTED later. (nothing to UPDATE here)
 
 	// NOTE: basic plugins get installed separatly for upgrade and install..
 
@@ -220,7 +206,7 @@ function create_groups()
 	$Group_Admins->set( 'perm_blogs', 'editall' );
 	$Group_Admins->set( 'perm_stats', 'edit' );
 	$Group_Admins->set( 'perm_spamblacklist', 'edit' );
-	$Group_Admins->set( 'perm_files', 'edit' );
+	$Group_Admins->set( 'perm_files', 'all' );
 	$Group_Admins->set( 'perm_options', 'edit' );
 	$Group_Admins->set( 'perm_templates', 1 );
 	$Group_Admins->set( 'perm_users', 'edit' );
@@ -1046,6 +1032,9 @@ function install_basic_plugins( $old_db_version = 0 )
 
 /*
  * $Log$
+ * Revision 1.206  2006/12/07 20:31:29  fplanque
+ * fixed install
+ *
  * Revision 1.205  2006/12/07 16:06:24  fplanque
  * prepared new file editing permission
  *

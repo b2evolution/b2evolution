@@ -449,7 +449,7 @@ function upgrade_b2evo_tables()
 		$Group_Admins->set( 'perm_blogs', 'editall' );
 		$Group_Admins->set( 'perm_stats', 'edit' );
 		$Group_Admins->set( 'perm_spamblacklist', 'edit' );
-		$Group_Admins->set( 'perm_files', 'edit' );
+		$Group_Admins->set( 'perm_files', 'all' );
 		$Group_Admins->set( 'perm_options', 'edit' );
 		$Group_Admins->set( 'perm_templates', 1 );
 		$Group_Admins->set( 'perm_users', 'edit' );
@@ -1080,6 +1080,7 @@ function upgrade_b2evo_tables()
 		$DB->query( 'UPDATE T_groups
 		             SET grp_perm_files = "edit"
 		             WHERE grp_ID = 1' );
+	 	// Later versions give 'all' on install, but we won't upgrade to that for security.
 		echo "OK.<br />\n";
 
 		echo 'Giving Administrator Group full perms on media for all blogs... ';
@@ -1640,6 +1641,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.196  2006/12/07 20:31:29  fplanque
+ * fixed install
+ *
  * Revision 1.195  2006/12/07 20:03:33  fplanque
  * Woohoo! File editing... means all skin editing.
  *
