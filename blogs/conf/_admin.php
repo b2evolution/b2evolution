@@ -14,7 +14,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  *
  * This determines the default page when you access the admin.
  */
-$default_ctrl = 'edit';
+$default_ctrl = 'dashboard';
 
 
 /**

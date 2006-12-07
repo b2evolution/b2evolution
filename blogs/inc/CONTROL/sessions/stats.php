@@ -74,7 +74,6 @@ $AdminUI->set_path( 'stats', $tab );
 $AdminUI->title = T_('View Stats for Blog:');
 
 param( 'action', 'string' );
-param( 'blog', 'integer', 0 );
 
 $blogListButtons = '<a href="'.regenerate_url( array('blog','page'), "blog=0" ).'" class="'.(( 0 == $blog ) ? 'CurrentBlog' : 'OtherBlog').'">'.T_('None').'</a> ';
 for( $curr_blog_ID = blog_list_start();
@@ -214,6 +213,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.32  2006/12/07 23:21:00  fplanque
+ * dashboard blog switching
+ *
  * Revision 1.31  2006/08/24 21:41:13  fplanque
  * enhanced stats
  *

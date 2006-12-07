@@ -25,6 +25,17 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $current_User;
 
 
+
+$blogListButtons = '<a href="'.regenerate_url( array('blog'), 'blog=0' ).'" class="'.(( 0 == $blog ) ? 'CurrentBlog' : 'OtherBlog').'">'.T_('Global').'</a> ';
+for( $curr_blog_ID = blog_list_start();
+			$curr_blog_ID != false;
+			$curr_blog_ID = blog_list_next() )
+{
+	$blogListButtons .= '<a href="'.regenerate_url( array('blog'), 'blog='.$curr_blog_ID ).'" class="'.(( $curr_blog_ID == $blog ) ? 'CurrentBlog' : 'OtherBlog').'">'.blog_list_iteminfo('shortname',false).'</a> ';
+}
+
+
+
 $AdminUI->set_path( 'dashboard' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -42,8 +53,8 @@ echo '<p>Welcome to b2evolution '.$app_version.'. Work in progress...</p>';
 
 echo '<p>This page is supposed to show you the most important things you will need on a daily basis.</p>';
 
-if( $current_User->Group->ID == 1 )
-{
+if( $current_User->check_perm( 'options', 'edit' ) )
+{	// We have some serious admin privilege:
 	echo '<h2>Administrative tasks</h2>';
 
 	echo '<ul>';
@@ -60,6 +71,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2006/12/07 23:21:00  fplanque
+ * dashboard blog switching
+ *
  * Revision 1.2  2006/12/07 23:13:10  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!
