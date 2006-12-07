@@ -135,7 +135,9 @@ if( version_compare(PHP_VERSION, '5.2', '>=') )
  * allow_url_fopen
  * Note: this allows including of remote files (PHP 4 only) as well as opening remote files with fopen() (all versions of PHP)
  * Both have potential for exploits. (The first is easier to exploit than the second).
- * dh> Should we check for curl etc then also and warn the user until there's no method for us anymore to open remote files? fp> Yes
+ * dh> Should we check for curl etc then also and warn the user until there's no method for us anymore to open remote files?
+ * fp> Yes
+ * dh> You must be kidding..!?! How do we open remote files (aka URLs) then?
  */
 init_system_check( 'PHP allow_url_fopen', ini_get('allow_url_fopen') ?  T_('On') : T_('Off') );
 if( ini_get('allow_url_fopen' ) )
@@ -278,6 +280,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/07 23:16:08  blueyed
+ * doc: we want no remote file opening anymore?!
+ *
  * Revision 1.7  2006/12/06 23:38:45  fplanque
  * doc
  *
