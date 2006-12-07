@@ -59,7 +59,7 @@ else
 			/*
 			 * Let's go the clean new way...
 			 */
-			require_once $model_path.'items/_itemlist2.class.php';
+			load_class( 'MODEL/items/_itemlist2.class.php' );
 
 			// Create empty List:
 			$ItemList = & new ItemList2( $Blog, NULL, NULL );

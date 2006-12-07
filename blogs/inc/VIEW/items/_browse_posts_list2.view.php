@@ -50,7 +50,7 @@ echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
 */
 
 
-$ItemList->title = T_('Task list');
+$ItemList->title = T_('Post list');
 
 // Issue date:
 $ItemList->cols[] = array(
@@ -202,6 +202,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.15  2006/12/07 23:59:31  fplanque
+ * basic dashboard stuff
+ *
  * Revision 1.14  2006/12/07 22:29:26  fplanque
  * reorganized menus / basic dashboard
  *

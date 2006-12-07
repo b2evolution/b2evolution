@@ -53,13 +53,53 @@ echo '<p>Welcome to b2evolution '.$app_version.'. Work in progress...</p>';
 
 echo '<p>This page is supposed to show you the most important things you will need on a daily basis.</p>';
 
+if( $blog )
+{
+	$BlogCache = & get_Cache( 'BlogCache' );
+	$Blog = & $BlogCache->get_by_ID($blog); // "Exit to blogs.." link
+
+	echo '<h2>'.$Blog->dget( 'name' ).'</h2>';
+
+	load_class( 'MODEL/items/_itemlist2.class.php' );
+
+	// Create empty List:
+	$ItemList = & new ItemList2( $Blog, NULL, NULL );
+
+	$ItemList->set_default_filters( array(
+			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated' ),
+		) );
+
+	// Init filter params:
+	if( ! $ItemList->load_from_Request() )
+	{ // If we could not init a filterset from request
+		// typically happens when we could no fall back to previously saved filterset...
+		// echo ' no filterset!';
+	}
+
+	// Display VIEW:
+	$AdminUI->disp_view( 'items/_browse_posts_list2.view.php' );
+
+
+	echo '<h3>Shortcuts</h3>';
+	echo '<ul>';
+		echo '<li><a href="admin.php?ctrl=edit&blog='.$Blog->ID.'">Write a new post...</a></li>';
+		echo '<li><a href="'.$Blog->get('url').'" target="_blank">Open public blog page</a></li>';
+		if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+		{
+			echo '<li><a href="admin.php?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'">Change blog name...</a></li>';
+			echo '<li><a href="admin.php?ctrl=coll_settings&tab=skin&blog='.$Blog->ID.'">Change blog skin...</a></li>';
+		}
+	echo '</ul>';
+}
+
+
 if( $current_User->check_perm( 'options', 'edit' ) )
 {	// We have some serious admin privilege:
 	echo '<h2>Administrative tasks</h2>';
 
 	echo '<ul>';
-	// TODO: remember system date check and only remind every 3 months
-	echo '<li><a href="admin.php?ctrl=system">Check if your system is secure</a></li>';
+		// TODO: remember system date check and only remind every 3 months
+		echo '<li><a href="admin.php?ctrl=system">Check if your system is secure...</a></li>';
 	echo '</ul>';
 }
 
@@ -71,6 +111,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2006/12/07 23:59:31  fplanque
+ * basic dashboard stuff
+ *
  * Revision 1.3  2006/12/07 23:21:00  fplanque
  * dashboard blog switching
  *
