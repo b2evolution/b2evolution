@@ -226,7 +226,7 @@ $ItemList->cols[] = array(
 
 if( $current_User->check_perm( 'blog_post_statuses', 'any', false, $Blog->ID ) )
 {	// We have permission to add a post with at least one status:
-	$ItemList->global_icon( T_('Add a task...'), 'new', $add_item_url, T_('Add task'), 3 ,4 );
+	$ItemList->global_icon( T_('Add a task...'), 'new', $add_item_url, T_('New task...'), 3 ,4 );
 }
 
 
@@ -244,6 +244,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.12  2006/12/07 22:29:26  fplanque
+ * reorganized menus / basic dashboard
+ *
  * Revision 1.11  2006/07/04 17:32:30  fplanque
  * no message
  *

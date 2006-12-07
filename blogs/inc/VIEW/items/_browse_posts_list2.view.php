@@ -184,7 +184,7 @@ $ItemList->cols[] = array(
 
 if( $current_User->check_perm( 'blog_post_statuses', 'any', false, $Blog->ID ) )
 {	// We have permission to add a post with at least one status:
-	$ItemList->global_icon( T_('Add a post...'), 'new', $add_item_url, T_('Add post'), 3, 4 );
+	$ItemList->global_icon( T_('Add a post...'), 'new', $add_item_url, T_('New post...'), 3, 4 );
 }
 
 
@@ -202,6 +202,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.14  2006/12/07 22:29:26  fplanque
+ * reorganized menus / basic dashboard
+ *
  * Revision 1.13  2006/07/10 15:27:45  blueyed
  * Fixed display of Blog name in items list (at least with PHP5 it added "Object id #xx" because of the Item::get_Blog() return value).
  *

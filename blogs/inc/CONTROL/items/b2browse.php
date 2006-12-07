@@ -10,6 +10,12 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * @var AdminUI
+ */
+global $AdminUI;
+
+
 
 $AdminUI->title = $AdminUI->title_titlearea = T_('Browse blog:');
 

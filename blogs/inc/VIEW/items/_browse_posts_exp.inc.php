@@ -43,7 +43,8 @@ echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
 
 // Init display features:
 $display_params = array(
-					'header_start' => '<div class="NavBar center">',
+					'header_start' => '<div class="NavBar center"><div class="floatright">'
+								.action_icon( T_('New post...'), 'new', $add_item_url, T_('New post...'), 3, 4 ).'</div>',
 						'header_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
 						'header_text_single' => T_('1 page'),
 					'header_end' => '</div>',
@@ -248,18 +249,14 @@ while( $Item = & $ItemList->get_item() )
 
 // Display navigation:
 $ItemList->display_nav( 'footer' );
-?>
 
-<p class="center">
-	<?php
-	echo action_icon( T_('New post...'), 'new', $add_item_url, T_('New post...'), 3, 4 );
-	?>
-</p>
+echo '<p class="center">'.action_icon( T_('New post...'), 'new', $add_item_url, T_('New post...'), 3, 4 ).'</p>';
 
-
-<?php
 /*
  * $Log$
+ * Revision 1.25  2006/12/07 22:29:26  fplanque
+ * reorganized menus / basic dashboard
+ *
  * Revision 1.24  2006/12/04 18:16:51  fplanque
  * Each blog can now have its own "number of page/days to display" settings
  *

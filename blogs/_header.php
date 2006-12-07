@@ -107,108 +107,22 @@ $AdminUI = & new AdminUI();
 $AdminUI->add_menu_entries(
 		NULL, // root
 		array(
-			'new' => array(
-				'text' => T_('Write'),
-				'href' => 'admin.php?ctrl=edit&amp;blog='.$blog,
-				'style' => 'font-weight: bold;',
-				'entries' => array(
-						'simple' => array(
-							'text' => T_('Simple'),
-							'href' => 'admin.php?ctrl=edit&amp;tab=simple&amp;blog='.$blog,
-							'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php?ctrl=edit&amp;tab=simple&amp;blog='.$blog.'\' );',
-							'name' => 'switch_to_simple_tab_nocheckchanges', // no bozo check
-							),
-						'expert' => array(
-							'text' => T_('Expert'),
-							'href' => 'admin.php?ctrl=edit&amp;tab=expert&amp;blog='.$blog,
-							'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php?ctrl=edit&amp;tab=expert&amp;blog='.$blog.'\' );',
-							'name' => 'switch_to_expert_tab_nocheckchanges', // no bozo check
-							),
-					)
-			),
+			'dashboard' => array(
+				'text' => T_('Dashboard'),
+				'href' => 'admin.php?ctrl=dashboard&amp;blog='.$blog,
+				'style' => 'font-weight: bold;'
+				),
 
 			'edit' => array(
 				'text' => T_('Posts'),
 				'href' => 'admin.php?ctrl=browse&amp;blog='.$blog.'&amp;filter=restore',
-				'style' => 'font-weight: bold;',
-				'entries' => array(
-					// NOTE: the following entries are defaults in case of the DHTML drop down menu,
-					// they will be overridden in the browse controller
-						'postlist2' => array(
-							'text' => T_('Post list'),
-							'href' => 'admin.php?ctrl=browse&amp;tab=postlist2&amp;blog='.$blog,
-							),
-						'tracker' => array(
-							'text' => T_('Tracker'),
-							'href' => 'admin.php?ctrl=browse&amp;tab=tracker&amp;blog='.$blog,
-							),
-						'posts' => array(
-							'text' => T_('Full posts'),
-							'href' => 'admin.php?ctrl=browse&amp;tab=posts&amp;blog='.$blog,
-							),
-					/*	'commentlist' => array(
-							'text' => T_('Comment list'),
-							'href' => 'admin.php?ctrl=browse&amp;tab=commentlist&amp;blog='.$blog,
-							*/
-						'comments' => array(
-							'text' => T_('Comments'),
-							'href' => 'admin.php?ctrl=browse&amp;tab=comments&amp;blog='.$blog,
-							),
-					)
 			),
 
-			'cats' => array(	// TODO: move this to 'blog settings>chapters'
-				'text' => T_('Categories'),
-				'href' => 'admin.php?ctrl=chapters&amp;blog='.$blog
-			),
-		)
-	);
-
-
-// BLOG SETTINGS:
-$blog_settings_parm_eval = 'global $ctrl, $current_User; return $ctrl != "collections"
-			&& $current_User->check_perm( "blog_properties", "any", false, '.$blog.' );';
-$AdminUI->add_menu_entries(
-		NULL, // root
-		array(
-			'blogs' => array(
-				'text' => T_('Blog settings'),
-				'href' => 'admin.php?ctrl=collections',
-				'entries' => array(
-					'general' => array(
-						'text' => T_('General'),
-						'href' => 'admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog,
-						'perm_eval' => $blog_settings_parm_eval ),
-					'skin' => array(
-						'text' => T_('Skin'),
-						'href' => 'admin.php?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
-						'perm_eval' => $blog_settings_parm_eval ),
-					'display' => array(
-						'text' => T_('Display'),
-						'href' => 'admin.php?ctrl=coll_settings&amp;tab=display&amp;blog='.$blog,
-						'perm_eval' => $blog_settings_parm_eval ),
-					'chapters' => array(
-						'text' => T_('Chapters'),
-						'href' => 'admin.php?ctrl=chapters2&amp;blog='.$blog,
-						'perm_eval' => 'global $ctrl, $current_User; return $ctrl != "collections"
-															&& $current_User->check_perm( "blog_cats", "", false, '.$blog.' ) ;' ),
-					'urls' => array(
-						'text' => T_('URLs'),
-						'href' => 'admin.php?ctrl=coll_settings&amp;tab=urls&amp;blog='.$blog,
-						'perm_eval' => $blog_settings_parm_eval ),
-					'advanced' => array(
-						'text' => T_('Advanced'),
-						'href' => 'admin.php?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog,
-						'perm_eval' => $blog_settings_parm_eval ),
-					'perm' => array(
-						'text' => T_('User permissions'),
-						'href' => 'admin.php?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog,
-						'perm_eval' => $blog_settings_parm_eval ),
-					'permgroup' => array(
-						'text' => T_('Group permissions'),
-						'href' => 'admin.php?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog,
-						'perm_eval' => $blog_settings_parm_eval ),
-				)
+			'files' => array(
+				'text' => T_('Files'),
+				'title' => T_('File management'),
+				'href' => 'admin.php?ctrl=files',
+				'perm_eval' => 'global $Settings; return $Settings->get( \'fm_enabled\' ) && $current_User->check_perm( \'files\', \'view\' );'
 			),
 
 			'stats' => array(
@@ -248,13 +162,6 @@ $AdminUI->add_menu_entries(
 						'text' => T_('Sessions'),
 						'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;blog='.$blog ),
 				)
-			),
-
-			'files' => array(
-				'text' => T_('Files'),
-				'title' => T_('File management'),
-				'href' => 'admin.php?ctrl=files',
-				'perm_eval' => 'global $Settings; return $Settings->get( \'fm_enabled\' ) && $current_User->check_perm( \'files\', \'view\' );'
 			),
 
 			'users' => array(
@@ -306,6 +213,55 @@ $AdminUI->add_menu_entries(
 						'href' => 'admin.php?ctrl=itemstatuses'),
 				)
 			),
+		)
+	);
+
+
+// BLOG SETTINGS:
+$blog_settings_parm_eval = 'global $ctrl, $current_User; return $ctrl != "collections"
+			&& $current_User->check_perm( "blog_properties", "any", false, '.$blog.' );';
+$AdminUI->add_menu_entries(
+		NULL, // root
+		array(
+			'blogs' => array(
+				'text' => T_('Blog settings'),
+				'href' => 'admin.php?ctrl=collections',
+				'entries' => array(
+					'general' => array(
+						'text' => T_('General'),
+						'href' => 'admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog,
+						'perm_eval' => $blog_settings_parm_eval ),
+					'skin' => array(
+						'text' => T_('Skin'),
+						'href' => 'admin.php?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
+						'perm_eval' => $blog_settings_parm_eval ),
+					'display' => array(
+						'text' => T_('Display'),
+						'href' => 'admin.php?ctrl=coll_settings&amp;tab=display&amp;blog='.$blog,
+						'perm_eval' => $blog_settings_parm_eval ),
+					'chapters' => array(
+						'text' => T_('Chapters'),
+						'href' => 'admin.php?ctrl=chapters2&amp;blog='.$blog,
+						'perm_eval' => 'global $ctrl, $current_User; return $ctrl != "collections"
+															&& $current_User->check_perm( "blog_cats", "", false, '.$blog.' ) ;' ),
+					'urls' => array(
+						'text' => T_('URLs'),
+						'href' => 'admin.php?ctrl=coll_settings&amp;tab=urls&amp;blog='.$blog,
+						'perm_eval' => $blog_settings_parm_eval ),
+					'advanced' => array(
+						'text' => T_('Advanced'),
+						'href' => 'admin.php?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog,
+						'perm_eval' => $blog_settings_parm_eval ),
+					'perm' => array(
+						'text' => T_('User permissions'),
+						'href' => 'admin.php?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog,
+						'perm_eval' => $blog_settings_parm_eval ),
+					'permgroup' => array(
+						'text' => T_('Group permissions'),
+						'href' => 'admin.php?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog,
+						'perm_eval' => $blog_settings_parm_eval ),
+				)
+			),
 
 			'tools' => array(
 				'text' => T_('Tools'),
@@ -331,6 +287,13 @@ $AdminUI->add_menu_entries(
 						'href' => 'admin.php?ctrl=tools' ),
 				)
 			),
+
+			// This is gonna die soon...
+			'cats' => array(	// TODO: move this to 'blog settings>chapters'
+				'text' => T_('Categories'),
+				'href' => 'admin.php?ctrl=chapters&amp;blog='.$blog
+			),
+
 		)
 	);
 
@@ -340,6 +303,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.29  2006/12/07 22:29:26  fplanque
+ * reorganized menus / basic dashboard
+ *
  * Revision 1.28  2006/12/07 21:16:55  fplanque
  * killed templates
  *

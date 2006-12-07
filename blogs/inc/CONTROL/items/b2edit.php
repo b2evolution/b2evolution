@@ -17,10 +17,30 @@ load_class( 'MODEL/items/_item.class.php' );
  */
 global $AdminUI;
 
+
+$AdminUI->add_menu_entries(
+		'edit',
+		array(
+				'simple' => array(
+					'text' => T_('Simple'),
+					'href' => 'admin.php?ctrl=edit&amp;tab=simple&amp;blog='.$blog,
+					'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php?ctrl=edit&amp;tab=simple&amp;blog='.$blog.'\' );',
+					'name' => 'switch_to_simple_tab_nocheckchanges', // no bozo check
+					),
+				'expert' => array(
+					'text' => T_('Expert'),
+					'href' => 'admin.php?ctrl=edit&amp;tab=expert&amp;blog='.$blog,
+					'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php?ctrl=edit&amp;tab=expert&amp;blog='.$blog.'\' );',
+					'name' => 'switch_to_expert_tab_nocheckchanges', // no bozo check
+					),
+			)
+	);
+
+
 // Get tab ("simple" or "expert") from Request or UserSettings:
 $tab = $UserSettings->param_Request( 'tab', 'pref_edit_tab', 'string', NULL, true /* memorize */ );
 
-$AdminUI->set_path( 'new', $tab );
+$AdminUI->set_path( 'edit', $tab );
 
 param( 'action', 'string', 'new', true );
 
@@ -95,6 +115,7 @@ switch($action)
 		$post_trackbacks = '';
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $post );
+
 		break;
 
 
