@@ -152,7 +152,7 @@ function create_b2evo_tables()
 			(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 1),
 			(10, 'pps', 'Powerpoint slideshow', 'pps', 'pps.gif', 'external', 1),
 			(11, 'zip', 'Zip archive', 'application/zip', 'zip.gif', 'external', 1),
-			(12, 'php php3 php4 php5 php6', 'Php files', 'application/x-httpd-php', 'php.gif', 'download', 0),
+			(12, 'php php3 php4 php5 php6', 'Php files', 'application/x-httpd-php', 'php.gif', 'text', 0),
 			(13, 'css', 'Cascading style sheets', 'text/css', '', 'text', 1)
 		" );
 	echo "OK.<br />\n";
@@ -1046,6 +1046,9 @@ function install_basic_plugins( $old_db_version = 0 )
 
 /*
  * $Log$
+ * Revision 1.205  2006/12/07 16:06:24  fplanque
+ * prepared new file editing permission
+ *
  * Revision 1.204  2006/12/04 22:25:20  blueyed
  * Do not output "Installing default plugins... " always
  *

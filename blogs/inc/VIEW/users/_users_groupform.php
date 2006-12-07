@@ -99,28 +99,38 @@ $Form->begin_fieldset( T_('Permissions for members of this group') );
 	{	// Group #1 always has user management right:
 		$Form->info( T_('Access to Admin area'), T_('Visible link') );
 	}
+
 	$Form->radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'),
 			array(  array( 'user', T_('User permissions') ),
 							array( 'viewall', T_('View all') ),
 							array( 'editall', T_('Full Access') )
 						), T_('Blogs') );
+
 	$Form->radio( 'edited_grp_perm_stats', $edited_Group->get('perm_stats'),
 			array(  $perm_none_option,
 							array( 'view', T_('View only') ),
 							array( 'edit', T_('Full Access') )
 						), T_('Stats') );
+
 	$Form->radio( 'edited_grp_perm_spamblacklist', $edited_Group->get('perm_spamblacklist'),
 			array(  $perm_none_option,
 							array( 'view', T_('View only') ),
 							array( 'edit', T_('Full Access') )
 						), T_('Antispam') );
-	$Form->checkbox( 'edited_grp_perm_templates', $edited_Group->get('perm_templates'), T_('Templates'), T_('Check to allow template editing.') );
+
+	// fp> todo perm check
+	$filetypes_linkstart = '<a href="?ctrl=filetypes" title="'.T_('Edit locked file types...').'">';
+	$filetypes_linkend = '</a>';
 	$Form->radio( 'edited_grp_perm_files', $edited_Group->get('perm_files'),
 			array(	$perm_none_option,
 							$perm_view_option,
 							array( 'add', T_('Add/Upload') ),
-							$perm_edit_option
+							array( 'edit', sprintf( T_('Edit %s'), $filetypes_linkstart.get_icon('file_allowed').$filetypes_linkend ) ),
+							array( 'all', sprintf( T_('Edit all, including %s'), $filetypes_linkstart.get_icon('file_not_allowed').$filetypes_linkend ) ),
 						), T_('Files'), false, T_('This overrides any specific media file permissions on specific blogs.') );
+
+	$Form->checkbox( 'edited_grp_perm_templates', $edited_Group->get('perm_templates'), T_('Skins'), T_('Check to allow access to skin files.') );
+
 	if( $edited_Group->get('ID') != 1 )
 	{	// Groups others than #1 can be prevented from editing users
 		$Form->radio( 'edited_grp_perm_users', $edited_Group->get('perm_users'),
@@ -155,6 +165,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.7  2006/12/07 16:06:24  fplanque
+ * prepared new file editing permission
+ *
  * Revision 1.6  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

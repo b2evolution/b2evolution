@@ -31,7 +31,7 @@ $schema_queries = array(
 			grp_perm_options enum('none','view','edit') NOT NULL default 'none',
 			grp_perm_users enum('none','view','edit') NOT NULL default 'none',
 			grp_perm_templates TINYINT NOT NULL DEFAULT 0,
-			grp_perm_files enum('none','view','add','edit') NOT NULL default 'none',
+			grp_perm_files enum('none','view','add','edit','all') NOT NULL default 'none',
 			PRIMARY KEY grp_ID (grp_ID)
 		)" ),
 
@@ -490,6 +490,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.42  2006/12/07 16:06:24  fplanque
+ * prepared new file editing permission
+ *
  * Revision 1.41  2006/12/04 21:25:18  fplanque
  * removed user skin switching
  *

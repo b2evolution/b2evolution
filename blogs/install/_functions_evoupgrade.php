@@ -1072,7 +1072,7 @@ function upgrade_b2evo_tables()
 				(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 1),
 				(10, 'pps', 'Powerpoint slideshow', 'pps', 'pps.gif', 'external', 1),
 				(11, 'zip', 'Zip archive', 'application/zip', 'zip.gif', 'external', 1),
-				(12, 'php php3 php4 php5 php6', 'Php files', 'application/x-httpd-php', 'php.gif', 'download', 0)
+				(12, 'php php3 php4 php5 php6', 'Php files', 'application/x-httpd-php', 'php.gif', 'text', 0)
 			" );
 		echo "OK.<br />\n";
 
@@ -1507,10 +1507,26 @@ function upgrade_b2evo_tables()
 		$query = "ALTER TABLE T_blogs
 							DROP COLUMN blog_force_skin";
 		$DB->query( $query );
+		echo "OK.<br />\n";
 
+		echo 'Upgrading groups table... ';
+		$query = "ALTER TABLE T_groups
+							CHANGE COLUMN grp_perm_files grp_perm_files enum('none','view','add','edit','all') NOT NULL default 'none'";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+
+		echo 'Updating file types... ';
+		// Only change this if it's close enough to a default install (non customized)
+		$DB->query( "UPDATE T_filetypes
+										SET ftyp_viewtype = 'text'
+									WHERE ftyp_ID = 12
+										AND ftyp_extensions = 'php php3 php4 php5 php6'
+										AND ftyp_mimetype ='application/x-httpd-php'
+										AND ftyp_icon = 'php.gif'" );
 		echo "OK.<br />\n";
 
 	}
+
 
 
 	/*
@@ -1617,6 +1633,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.194  2006/12/07 16:06:24  fplanque
+ * prepared new file editing permission
+ *
  * Revision 1.193  2006/12/04 22:24:51  blueyed
  * doc
  *

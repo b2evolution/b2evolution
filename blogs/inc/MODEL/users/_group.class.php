@@ -211,7 +211,6 @@ class Group extends DataObject
 			case 'spamblacklist':
 			case 'stats':
 			case 'options':
-			case 'files':
 			case 'users':
 				switch( $permvalue )
 				{ // Depending on current group permission:
@@ -220,6 +219,51 @@ class Group extends DataObject
 						// All permissions granted
 						$perm = true;
 						break;
+
+					case 'add':
+						// User can ask for add perm...
+						if( $permlevel == 'add' )
+						{
+							$perm = true;
+							break;
+						}
+						// ... or for any lower priority perm... (no break)
+
+					case 'view':
+						// User can ask for view perm...
+						if( $permlevel == 'view' )
+						{
+							$perm = true;
+							break;
+						}
+						// ... or for any lower priority perm... (no break)
+
+					case 'list':
+						// User can only ask for list perm
+						if( $permlevel == 'list' )
+						{
+							$perm = true;
+							break;
+						}
+				}
+				break;
+
+			case 'files':
+				switch( $permvalue )
+				{ // Depending on current group permission:
+					case 'all':
+						// All permissions granted
+						$perm = true;
+						break;
+
+					case 'edit':
+						// User can ask for normal edit perm...
+						if( $permlevel == 'edit' )
+						{
+							$perm = true;
+							break;
+						}
+						// ... or for any lower priority perm... (no break)
 
 					case 'add':
 						// User can ask for add perm...
@@ -402,6 +446,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/07 16:06:23  fplanque
+ * prepared new file editing permission
+ *
  * Revision 1.7  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
