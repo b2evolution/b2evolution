@@ -39,6 +39,7 @@ $ctrl_mappings = array(
 		'collections'  => 'collections/_collections.ctrl.php',
 		'coll_settings'=> 'collections/_coll_settings.ctrl.php',
 		'crontab'      => 'cron/crontab.php',
+		'dashboard'    => '_misc/dashboard.php',
 		'edit'         => 'items/b2edit.php',
 		'editactions'  => 'items/edit_actions.php',
 		'features'     => 'settings/features.php',
@@ -55,7 +56,6 @@ $ctrl_mappings = array(
 		'skins'        => 'skins/skins.php',
 		'stats'        => 'sessions/stats.php',
 		'system'       => '_misc/system.php',
-		'templates'    => 'skins/b2template.php',
 		'tools'        => '_misc/tools.php',
 		'users'        => 'users/b2users.php',
 	);
