@@ -105,7 +105,9 @@ $test = new EvoGroupTest( 'evo Tests Suite');
 switch( $action )
 {
 	case 'all':
-		$test->loadAllTests( dirname(__FILE__).'/' );
+		$test->loadAllTests( dirname(__FILE__).'/blogs/' );
+		$test->loadAllTests( dirname(__FILE__).'/general/' );
+		$test->loadAllTests( dirname(__FILE__).'/install' );
 		break;
 }
 

@@ -15,6 +15,8 @@ global $conf_path;
 // from /conf/_upgrade.php:
 global $oldtableposts, $oldtableusers, $oldtablesettings, $oldtablecategories, $oldtablecomments;
 global $fileupload_allowedtypes, $fileupload_maxk, $stats_autoprune;
+// for /conf/_upgrade.php:
+global $basepath, $baseurl;
 
 require_once $conf_path.'_upgrade.php';
 

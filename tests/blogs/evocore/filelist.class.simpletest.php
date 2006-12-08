@@ -173,7 +173,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 		$this->assertTrue( $this->Filelist->count(), 1, 'Count after remove ok.' );
 
 		$this->assertReference( $this->Filelist->get_by_idx(0), $FileB, 'First file ok.' );
-		$this->assertFalse( $this->Filelist->get_by_idx(1), 'Second file ok (not existing).' );
+		$this->assertFalse( $this->Filelist->get_by_idx(1, false), 'Second file ok (not existing).' );
 	}
 
 
