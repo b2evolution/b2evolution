@@ -432,7 +432,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	}
 
 	$Debuglog->add( 'pwd_hashed: '.var_export($pwd_hashed, true)
-		.', pass: '.var_export($pass, true) );
+		.', pass: '.var_export($pass, true), 'login' );
 
 	$pass_ok = false;
 	if( $Messages->count('login_error') )
@@ -661,6 +661,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.68  2006/12/08 12:33:22  blueyed
+ * "login" debuglog category for "pwd_hashed" entry
+ *
  * Revision 1.67  2006/12/06 23:32:35  fplanque
  * Rollback to Daniel's most reliable password hashing design. (which is not the last one)
  * This not only strengthens the login by providing less failure points, it also:
