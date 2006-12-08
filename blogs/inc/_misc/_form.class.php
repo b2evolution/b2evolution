@@ -1219,7 +1219,7 @@ class Form extends Widget
 
 		$r = "\n\n<form".get_field_attribs_as_string($form_params).">\n";
 
-		$r .= '<div style="display:inline">'; // for XHTML validation
+		$r .= '<div>'; // for XHTML (dh> removed 'style="display:inline"' because it's buggy with FireFox 1.0.x, at least at the "Write" admin page; see http://forums.b2evolution.net/viewtopic.php?t=10130)
 
 		$r .= $this->formstart;
 
@@ -2708,6 +2708,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.57  2006/12/08 02:08:01  uid156866
+ * MFH: Fixed "Write" page/tab for Firefox 1.0.x
+ *
  * Revision 1.56  2006/12/07 23:13:13  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!
