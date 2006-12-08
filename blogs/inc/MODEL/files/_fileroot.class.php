@@ -111,10 +111,19 @@ class FileRoot
 				return;
 
     	case 'skins':
+    		// fp> some stuff here should go out of here... but I don't know where to put it yet. I'll see after the Skin refactoring.
     		global $Settings, $Debuglog;
+    		/**
+    		 * @var User
+    		 */
+    		global $current_User;
      		if( ! $Settings->get( 'fm_enable_roots_skins' ) )
 				{ // Skins root is disabled:
 					$Debuglog->add( 'Attempt to access skins dir, but this feature is globally disabled', 'files' );
+				}
+				elseif( ! $current_User->check_perm( 'templates' ) )
+				{	// No perm to access templates:
+					$Debuglog->add( 'Attempt to access skins dir, but no permission', 'files' );
 				}
 				else
 				{
@@ -150,6 +159,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.10  2006/12/08 01:53:18  fplanque
+ * Added missing skin access switch
+ *
  * Revision 1.9  2006/12/07 15:23:42  fplanque
  * filemanager enhanced, refactored, extended to skins directory
  *
