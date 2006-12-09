@@ -67,6 +67,7 @@ if( $blog )
 
 	$ItemList->set_default_filters( array(
 			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated' ),
+			'posts' => 5
 		) );
 
 	// Init filter params:
@@ -78,6 +79,10 @@ if( $blog )
 
 	// Display VIEW:
 	$AdminUI->disp_view( 'items/_browse_posts_list2.view.php' );
+
+
+
+	// fp> TODO: drafts
 
 
 	echo '<h3>Shortcuts</h3>';
@@ -111,6 +116,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2006/12/09 02:01:48  fplanque
+ * temporary / minor
+ *
  * Revision 1.4  2006/12/07 23:59:31  fplanque
  * basic dashboard stuff
  *
