@@ -36,11 +36,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-/**
- * Includes:
- */
 param( 'action', 'string', 'list' );
-
 
 if( param( $GenericCategoryCache->dbIDname, 'integer', NULL, true, false, false ) )
 {
@@ -305,6 +301,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/09 17:59:33  fplanque
+ * started "moving chapters accross blogs" feature
+ *
  * Revision 1.10  2006/11/24 18:27:23  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

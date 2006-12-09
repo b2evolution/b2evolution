@@ -48,7 +48,8 @@ $line_class = 'odd';
  */
 function cat_line( $Chapter, $level )
 {
-	global $line_class, $result_fadeout, $permission_to_edit, $current_User;
+	global $line_class, $result_fadeout, $permission_to_edit, $current_User, $allow_moving_chapters;
+
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
@@ -80,9 +81,12 @@ function cat_line( $Chapter, $level )
 	if( $permission_to_edit )
 	{	// We have permission permission to edit, so display action column:
 		$r .=  action_icon( T_('New...'), 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) )
-					.action_icon( T_('Edit...'), 'edit', $edit_url )
-					// .action_icon( T_('Move...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=move' ), T_('Move') )
-					.action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete' ) );
+					.action_icon( T_('Edit...'), 'edit', $edit_url );
+		if( $allow_moving_chapters )
+		{ // If moving cats between blogs is allowed:
+			$r .= action_icon( T_('Move to a different blog...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=move' ), T_('Move') );
+		}
+		$r .= action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete' ) );
 	}
 	$r .= '</td>';
 	$r .=	'</tr>';
@@ -172,6 +176,9 @@ echo '</table>';
 
 /*
  * $Log$
+ * Revision 1.5  2006/12/09 17:59:34  fplanque
+ * started "moving chapters accross blogs" feature
+ *
  * Revision 1.4  2006/12/09 02:37:44  fplanque
  * Prevent user from creating loops in the chapter tree
  * (still needs a check before writing to DB though)

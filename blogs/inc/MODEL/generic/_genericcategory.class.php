@@ -80,6 +80,8 @@ class GenericCategory extends GenericElement
 	/**
 	 * Load data from Request form fields.
 	 *
+	 * @todo fp> check that we are not creating a loop!
+	 *
 	 * @return boolean true if loaded data seems valid.
 	 */
 	function load_from_request()
@@ -133,6 +135,9 @@ class GenericCategory extends GenericElement
 
 /*
  * $Log$
+ * Revision 1.13  2006/12/09 17:59:33  fplanque
+ * started "moving chapters accross blogs" feature
+ *
  * Revision 1.12  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

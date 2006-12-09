@@ -35,54 +35,39 @@ global $edited_GenericCategory;
 $edited_Chapter = & $edited_GenericCategory;
 
 /**
- * @var GenericCategoryCache
+ * @var BlogCache
  */
-global $GenericCategoryCache;
+global $BlogCache;
 
 global $action, $subset_ID;
 
-// Determine if we are creating or updating...
-$creating = is_create_action( $action );
-
 $Form = & new Form( NULL, 'form' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel move!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', $creating ?  T_('New chapter') : T_('Chapter') );
+$Form->begin_form( 'fform', T_('Move chapter') );
 
-$Form->hidden( 'action', $creating ? 'create' : 'update' );
+$Form->hidden( 'action', 'update_move' );
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 
 $Form->begin_fieldset( T_('Properties') );
 
+	$Form->info( T_('Name'), $edited_Chapter->name );
+
 	// We're essentially double checking here...
 	$edited_Blog = & $edited_Chapter->get_Blog();
-	$Form->info( T_('Blog'), $edited_Blog->dget('name') );
 
-	$Form->select_input_options( $edited_Chapter->dbprefix.'parent_ID',
-				$GenericCategoryCache->recurse_select( $edited_Chapter->parent_ID, $subset_ID, true, NULL, 0, array($edited_Chapter->ID) ), T_('Parent') );
-
-	$Form->text_input( $edited_Chapter->dbprefix.'name', $edited_Chapter->name, 40, T_('Name'), '', array( 'required' => true, 'maxlength' => 255 ) );
-
-	$Form->text_input( $edited_Chapter->dbprefix.'urlname', $edited_Chapter->urlname, 40, T_('URL name'), T_('Used for clean URLs. Must be unique.'), array( 'required' => true, 'maxlength' => 255 ) );
+	$Form->select_input_options( $edited_Chapter->dbprefix.'coll_ID', $BlogCache->get_option_list( $edited_Blog->ID ), T_('Attached to blog') );
 
 $Form->end_fieldset();
 
-if( $creating )
-{
-	$Form->end_form( array( array( 'submit', 'submit', T_('Record'), 'SaveButton' ),
-													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
-}
-else
-{
-	$Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
-													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
-}
+$Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
+												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
 
 /*
  * $Log$
- * Revision 1.6  2006/12/09 17:59:34  fplanque
+ * Revision 1.1  2006/12/09 17:59:34  fplanque
  * started "moving chapters accross blogs" feature
  *
  * Revision 1.5  2006/12/09 02:37:44  fplanque
