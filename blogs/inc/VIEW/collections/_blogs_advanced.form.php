@@ -71,7 +71,8 @@ $Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('After each new post...') );
-	$ping_plugins = explode(',', $edited_Blog->get_setting('ping_plugins'));
+	$ping_plugins = preg_split( '~\s*,\s*~', $edited_Blog->get_setting('ping_plugins'), -1, PREG_SPLIT_NO_EMPTY);
+
 	$available_ping_plugins = $Plugins->get_list_by_event('ItemSendPing');
 	$displayed_ping_plugin = false;
 	if( $available_ping_plugins )
@@ -87,7 +88,7 @@ $Form->begin_fieldset( T_('After each new post...') );
 			$checked = in_array( $loop_Plugin->code, $ping_plugins );
 			$Form->checkbox_input( 'blog_ping_plugins[]', $checked, /* TRANS: verb */ T_('Ping ').$loop_Plugin->ping_service_name, array('value'=>$loop_Plugin->code, 'note'=>$loop_Plugin->ping_service_note) );
 
-			while( $key = array_search($loop_Plugin->code, $ping_plugins) )
+			while( ($key = array_search($loop_Plugin->code, $ping_plugins)) !== false )
 			{
 				unset($ping_plugins[$key]);
 			}
