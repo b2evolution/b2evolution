@@ -64,7 +64,7 @@ $Form->begin_fieldset( T_('Default user permissions') );
 	$GroupCache = & get_Cache( 'GroupCache' );
 	$Form->select_object( 'newusers_grp_ID', $Settings->get('newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
 
-	$Form->text_input( 'newusers_level', $Settings->get('newusers_level'), 1, T_('Level for new users'), array( 'note'=>T_('Levels determine hierarchy of users in blogs.' ), 'maxlength'=>1, 'required'=>true ) );
+	$Form->text_input( 'newusers_level', $Settings->get('newusers_level'), 1, T_('Level for new users'), T_('Levels determine hierarchy of users in blogs.' ), array( 'maxlength'=>1, 'required'=>true ) );
 
 $Form->end_fieldset();
 
@@ -109,7 +109,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Security options') );
 
-$Form->text_input( 'user_minpwdlen', (int)$Settings->get('user_minpwdlen'), 2, T_('Minimum password length'),array( 'note'=>T_('for users.'), 'maxlength'=>2, 'required'=>true ) );
+$Form->text_input( 'user_minpwdlen', (int)$Settings->get('user_minpwdlen'), 2, T_('Minimum password length'), T_('for users.'), array( 'maxlength'=>2, 'required'=>true ) );
 
 $Form->end_fieldset();
 
@@ -118,14 +118,13 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Timeouts') );
 
 	// fp>TODO: enhance UI with a general Form method for Days:Hours:Minutes:Seconds
-	$Form->text_input( 'timeout_sessions', $Settings->get('timeout_sessions'), 9, T_('Session timeout'),
-		array( 'note' => T_('seconds. How long can a user stay inactive before automatic logout?'), 'required'=>true) );
+	$Form->text_input( 'timeout_sessions', $Settings->get('timeout_sessions'), 9, T_('Session timeout'), T_('seconds. How long can a user stay inactive before automatic logout?'), array( 'required'=>true) );
 
 	// fp>TODO: It may make sense to have a different (smaller) timeout for sessions with no logged user.
 	// fp>This might reduce the size of the Sessions table. But this needs to be checked against the hit logging feature.
 
 	$Form->text_input( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), 5,
-								T_('Reload-page timeout'), array( 'note'=>T_('Time (in seconds) that must pass before a request to the same URI from the same IP and useragent is considered as a new hit.'), 'maxlength'=>5, 'required'=>true ) );
+								T_('Reload-page timeout'), T_('Time (in seconds) that must pass before a request to the same URI from the same IP and useragent is considered as a new hit.'), array( 'maxlength'=>5, 'required'=>true ) );
 
 $Form->end_fieldset();
 
@@ -139,6 +138,10 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.24  2006/12/09 01:55:36  fplanque
+ * feel free to fill in some missing notes
+ * hint: "login" does not need a note! :P
+ *
  * Revision 1.23  2006/12/07 00:55:52  fplanque
  * reorganized some settings
  *

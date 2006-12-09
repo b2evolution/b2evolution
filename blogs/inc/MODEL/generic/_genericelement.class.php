@@ -124,7 +124,7 @@ class GenericElement extends DataObject
 
 		$Form->hiddens_by_key( get_memorized( 'action, ctrl' ) );
 
-		$Form->text_input( $this->dbprefix.'name', $this->name, $edited_name_maxlen, T_('name'), array( 'required' => true ) );
+		$Form->text_input( $this->dbprefix.'name', $this->name, $edited_name_maxlen, T_('name'), '', array( 'required' => true ) );
 
 		if( ! $creating ) $Form->hidden( $this->dbIDname, $this->ID );
 
@@ -156,6 +156,10 @@ class GenericElement extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/09 01:55:35  fplanque
+ * feel free to fill in some missing notes
+ * hint: "login" does not need a note! :P
+ *
  * Revision 1.7  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

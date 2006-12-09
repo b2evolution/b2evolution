@@ -237,10 +237,9 @@ else
 	}
 	if($neg) { $td_value = '-'.$td_value; }
 
-	$Form->text_input( 'newtime_difference', $td_value, 8 /* hh:mm:ss */, T_('Time difference'),
-			array( 'note'=>sprintf( '['. T_('in hours, e.g. "1", "1:30" or "1.5"'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), '<span id="cur_servertime">'.date_i18n( locale_timefmt(), $servertimenow ).'</span>' )
+	$Form->text_input( 'newtime_difference', $td_value, 8 /* hh:mm:ss */, T_('Time difference'), sprintf( '['. T_('in hours, e.g. "1", "1:30" or "1.5"'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), '<span id="cur_servertime">'.date_i18n( locale_timefmt(), $servertimenow ).'</span>' )
 					.' <a href="#" onclick="calc_TimeDifference(); return false;">'.T_('Calculate time difference').'</a>',
-					'maxlength'=> 8, 'required'=>true ) );
+					array( 'maxlength'=> 8, 'required'=>true ) );
 
 	$Form->select( 'newdefault_locale', $Settings->get('default_locale'), 'locale_options_return', T_('Default locale'), T_('Overridden by browser config, user locale or blog locale (in this order).'));
 	$Form->end_fieldset();
@@ -496,6 +495,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.15  2006/12/09 01:55:36  fplanque
+ * feel free to fill in some missing notes
+ * hint: "login" does not need a note! :P
+ *
  * Revision 1.14  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

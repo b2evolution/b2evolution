@@ -93,7 +93,7 @@ $Form->begin_fieldset( T_('User rights'), array( 'class'=>'fieldset clear' ) );
 $field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://manual.b2evolution.net/User_levels"' );
 if( $current_User->check_perm( 'users', 'edit' ) )
 {
-	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('Level'), array( 'note' => $field_note, 'required' => true ) );
+	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('Level'), $field_note, array( 'required' => true ) );
 }
 else
 {
@@ -143,14 +143,14 @@ else
 
 if( $action != 'view_user' )
 { // We can edit the values:
-	$Form->text_input( 'edited_user_login', $edited_User->login, 20, T_('Login'), array( 'required' => true ) );
-	$Form->text_input( 'edited_user_firstname', $edited_User->firstname, 20, T_('First name'), array( 'maxlength' => 50 ) );
-	$Form->text_input( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), array( 'maxlength' => 50, 'force_to' => 'UpperCase' ) );
-	$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), array( 'maxlength' => 50, 'required' => true ) );
+	$Form->text_input( 'edited_user_login', $edited_User->login, 20, T_('Login'), '', array( 'required' => true ) );
+	$Form->text_input( 'edited_user_firstname', $edited_User->firstname, 20, T_('First name'), '', array( 'maxlength' => 50 ) );
+	$Form->text_input( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), '', array( 'maxlength' => 50, 'force_to' => 'UpperCase' ) );
+	$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => true ) );
 	$Form->select( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown') );
 	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when visiting the site.') );
 	$Form->select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options_return', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
-	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), array( 'note' => $email_fieldnote, 'maxlength' => 100, 'required' => true ) );
+	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, array( 'maxlength' => 100, 'required' => true ) );
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{ // user has "edit users" perms:
 		$Form->checkbox( 'edited_user_validated', $edited_User->get('validated'), T_('Validated'), T_('Has the user been validated (through email)?') );
@@ -161,11 +161,11 @@ if( $action != 'view_user' )
 	}
 	$Form->checkbox( 'edited_user_allow_msgform', $edited_User->get('allow_msgform'), T_('Message form'), T_('Check this to allow receiving emails through a message form.') );
 	$Form->checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc.') );
-	$Form->text_input( 'edited_user_url', $edited_User->url, 30, T_('URL'), array( 'note' => $url_fieldnote, 'maxlength' => 100 ) );
-	$Form->text_input( 'edited_user_icq', $edited_User->icq, 30, T_('ICQ'), array( 'note' => $icq_fieldnote, 'maxlength' => 10 ) );
-	$Form->text_input( 'edited_user_aim', $edited_User->aim, 30, T_('AIM'), array( 'note' => $aim_fieldnote, 'maxlength' => 50 ) );
-	$Form->text_input( 'edited_user_msn', $edited_User->msn, 30, T_('MSN IM'), array( 'maxlength' => 100 ) );
-	$Form->text_input( 'edited_user_yim', $edited_User->yim, 30, T_('YahooIM'), array( 'maxlength' => 50 ) );
+	$Form->text_input( 'edited_user_url', $edited_User->url, 30, T_('URL'), $url_fieldnote, array( 'maxlength' => 100 ) );
+	$Form->text_input( 'edited_user_icq', $edited_User->icq, 30, T_('ICQ'), $icq_fieldnote, array( 'maxlength' => 10 ) );
+	$Form->text_input( 'edited_user_aim', $edited_User->aim, 30, T_('AIM'), $aim_fieldnote, array( 'maxlength' => 50 ) );
+	$Form->text_input( 'edited_user_msn', $edited_User->msn, 30, T_('MSN IM'), '', array( 'maxlength' => 100 ) );
+	$Form->text_input( 'edited_user_yim', $edited_User->yim, 30, T_('YahooIM'), '', array( 'maxlength' => 50 ) );
 	$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => ( !empty($edited_User->ID) ? T_('Leave empty if you don\'t want to change the password.') : '' ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0) ) );
 	$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0) ) );
 	$Form->info( '', sprintf( T_('The minimum password length is %d characters.'), $Settings->get('user_minpwdlen') ) );
@@ -290,6 +290,10 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.34  2006/12/09 01:55:36  fplanque
+ * feel free to fill in some missing notes
+ * hint: "login" does not need a note! :P
+ *
  * Revision 1.33  2006/12/05 02:54:37  blueyed
  * Go to user profile after resetting to defaults; fixed handling of action in case of redirecting
  *

@@ -58,11 +58,11 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 
 	if( ! $creating ) $Form->hidden( 'ftyp_ID', $edited_Filetype->ID );
 
-	$Form->text_input( 'ftyp_extensions', $edited_Filetype->extensions, 40, T_('Extensions'), array( 'maxlength'=>80, 'required'=>true, 'note'=>sprintf('E.g. &laquo;%s&raquo;'.', '.T_('separated by whitespace'), 'html') ) );
+	$Form->text_input( 'ftyp_extensions', $edited_Filetype->extensions, 40, T_('Extensions'), '', array( 'maxlength'=>80, 'required'=>true, 'note'=>sprintf('E.g. &laquo;%s&raquo;'.', '.T_('separated by whitespace'), 'html') ) );
 
-	$Form->text_input( 'ftyp_name', $edited_Filetype->name, 40, T_('File type name'), array( 'maxlength'=> 80, 'required'=>true, 'note'=>sprintf('E.g. &laquo;%s&raquo;', 'HTML file') ) );
+	$Form->text_input( 'ftyp_name', $edited_Filetype->name, 40, T_('File type name'), sprintf('E.g. &laquo;%s&raquo;', 'HTML file'), array( 'maxlength'=> 80, 'required'=>true ) );
 
-	$Form->text_input( 'ftyp_mimetype', $edited_Filetype->mimetype, 40, T_('Mime type'), array( 'maxlength'=> 80, 'required'=>true, 'note'=>sprintf('E.g. &laquo;%s&raquo;', 'text/html') ) );
+	$Form->text_input( 'ftyp_mimetype', $edited_Filetype->mimetype, 40, T_('Mime type'), sprintf('E.g. &laquo;%s&raquo;', 'text/html'), array( 'maxlength'=> 80, 'required'=>true ) );
 
 	$Form->text( 'ftyp_icon', $edited_Filetype->icon, 20, T_('Icon'), sprintf( /* TRANS: %s is a filesystem path */T_('File name of the icon, must be in %s.'), rel_path_to_base($rsc_path.'icons/fileicons/') ), 40 );
 

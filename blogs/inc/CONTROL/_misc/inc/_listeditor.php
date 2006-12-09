@@ -519,7 +519,7 @@ if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, 
 		$Form->info( T_('ID'), $ID );
 	}
 
-	$Form->text_input( 'name', $name, min(40,$edited_name_maxlen), T_('Name'), array( 'maxlength'=>$edited_name_maxlen, 'required'=>true ) );
+	$Form->text_input( 'name', $name, min(40,$edited_name_maxlen), T_('Name'), '', array( 'maxlength'=>$edited_name_maxlen, 'required'=>true ) );
 
 	if( $creating )
 	{

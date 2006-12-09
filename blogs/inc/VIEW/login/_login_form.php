@@ -104,7 +104,7 @@ $Form->begin_form( 'fform' );
 	<div class="center"><span class="notes"><?php printf( T_('You will have to accept cookies in order to log in.') ) ?></span></div>
 
 	<?php
-	$Form->text_input( 'login', $login, 16, T_('Login'), array( 'maxlength' => 20, 'class' => 'input_text' ) );
+	$Form->text_input( 'login', $login, 16, T_('Login'), '', array( 'maxlength' => 20, 'class' => 'input_text' ) );
 
 	$Form->password_input( 'pwd', '', 16, T_('Password'), array( 'maxlength' => 50, 'class' => 'input_text' ) );
 
@@ -200,6 +200,10 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.32  2006/12/09 01:55:36  fplanque
+ * feel free to fill in some missing notes
+ * hint: "login" does not need a note! :P
+ *
  * Revision 1.31  2006/12/06 23:32:35  fplanque
  * Rollback to Daniel's most reliable password hashing design. (which is not the last one)
  * This not only strengthens the login by providing less failure points, it also:

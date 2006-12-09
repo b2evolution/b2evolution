@@ -432,7 +432,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	}
 
 	$Debuglog->add( 'pwd_hashed: '.var_export($pwd_hashed, true)
-		.', pass: '.var_export($pass, true), 'login' );
+		.', pass: '.var_export($pass, true) );
 
 	$pass_ok = false;
 	if( $Messages->count('login_error') )
@@ -661,6 +661,10 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.69  2006/12/09 01:55:35  fplanque
+ * feel free to fill in some missing notes
+ * hint: "login" does not need a note! :P
+ *
  * Revision 1.68  2006/12/08 12:33:22  blueyed
  * "login" debuglog category for "pwd_hashed" entry
  *

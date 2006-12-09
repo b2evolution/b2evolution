@@ -57,7 +57,7 @@ $Form->begin_fieldset( T_('Properties') );
 	$Form->select_input_options( $edited_GenericCategory->dbprefix.'parent_ID',
 				$GenericCategoryCache->recurse_select( $edited_GenericCategory->parent_ID, $subset_ID, true ), T_('Parent') );
 
-	$Form->text_input( $edited_GenericCategory->dbprefix.'name', $edited_GenericCategory->name, $edited_name_maxlen, T_('name'), array( 'required' => true ) );
+	$Form->text_input( $edited_GenericCategory->dbprefix.'name', $edited_GenericCategory->name, $edited_name_maxlen, T_('name'), '', array( 'required' => true ) );
 
 $Form->end_fieldset();
 
@@ -76,6 +76,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.3  2006/12/09 01:55:36  fplanque
+ * feel free to fill in some missing notes
+ * hint: "login" does not need a note! :P
+ *
  * Revision 1.2  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

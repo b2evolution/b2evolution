@@ -62,9 +62,9 @@ $Form->begin_fieldset( T_('Properties') );
 	$Form->select_input_options( $edited_Chapter->dbprefix.'parent_ID',
 				$GenericCategoryCache->recurse_select( $edited_Chapter->parent_ID, $subset_ID, true ), T_('Parent') );
 
-	$Form->text_input( $edited_Chapter->dbprefix.'name', $edited_Chapter->name, 40, T_('Name'), array( 'required' => true, 'maxlength' => 255 ) );
+	$Form->text_input( $edited_Chapter->dbprefix.'name', $edited_Chapter->name, 40, T_('Name'), '', array( 'required' => true, 'maxlength' => 255 ) );
 
-	$Form->text_input( $edited_Chapter->dbprefix.'urlname', $edited_Chapter->urlname, 40, T_('URL name'), array( 'required' => true, 'maxlength' => 255,
+	$Form->text_input( $edited_Chapter->dbprefix.'urlname', $edited_Chapter->urlname, 40, T_('URL name'), '', array( 'required' => true, 'maxlength' => 255,
 														'note' => T_('Used for clean URLs. Must be unique.') ) );
 
 $Form->end_fieldset();
@@ -83,6 +83,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.4  2006/12/09 01:55:36  fplanque
+ * feel free to fill in some missing notes
+ * hint: "login" does not need a note! :P
+ *
  * Revision 1.3  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

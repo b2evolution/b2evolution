@@ -102,7 +102,7 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 
 	$Form->begin_fieldset( T_('Post contents') );
 
-	$Form->text_input( 'post_title', $post_title, 48, T_('Title'), array('maxlength'=>255) );
+	$Form->text_input( 'post_title', $post_title, 48, T_('Title'), '', array('maxlength'=>255) );
 
 	// --------------------------- TOOLBARS ------------------------------------
 	echo '<div class="edit_toolbars">';
@@ -282,6 +282,10 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.23  2006/12/09 01:55:36  fplanque
+ * feel free to fill in some missing notes
+ * hint: "login" does not need a note! :P
+ *
  * Revision 1.22  2006/12/06 23:55:53  fplanque
  * hidden the dead body of the sidebar plugin + doc
  *

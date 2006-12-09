@@ -184,18 +184,17 @@ $Form->begin_fieldset( T_('File creation options'), array( 'id' => 'ffset_filecr
 	$Form->checkbox( 'fm_enable_create_file', $Settings->get('fm_enable_create_file'), T_('Enable creation of files'), T_('Check to enable creation of files.' ) );
 	$Form->checkbox_input( 'upload_enabled', $Settings->get('upload_enabled'), T_('Enable upload of files'), array(
 		'note' => T_('Check to allow uploading files in general.' ), 'onclick' => JS_showhide_ffield_on_this('upload_maxkb') ) );
-	$Form->text_input( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, T_('Maximum upload filesize'), array(
-		'note'=>T_('KB (This cannot be higher than your PHP/Webserver setting!)'), 'maxlength'=>7, 'required'=>true ) );
+	$Form->text_input( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, T_('Maximum upload filesize'), T_('KB (This cannot be higher than your PHP/Webserver setting!)'), array( 'maxlength'=>7, 'required'=>true ) );
 	// Javascript to init hidden/shown state:
 	echo JS_showhide_ffield_on_checkbox( 'upload_maxkb', 'upload_enabled' );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Advanced options'), array( 'id' => 'ffset_fileadvanced', 'class' => 'additional_file_settings' ) );
 
-	$Form->text_input( 'fm_default_chmod_dir', $Settings->get('fm_default_chmod_dir'), 4, T_('Default folder permissions'), array('note'=>T_('Default CHMOD (UNIX permissions) for new directories created by the file manager.' )) );
+	$Form->text_input( 'fm_default_chmod_dir', $Settings->get('fm_default_chmod_dir'), 4, T_('Default folder permissions'), T_('Default CHMOD (UNIX permissions) for new directories created by the file manager.' ) );
 
 	// fp> Does the following also applu to *uploaded* files? (It should)
- 	$Form->text_input( 'fm_default_chmod_file', $Settings->get('fm_default_chmod_file'), 4, T_('Default file permissions'), array('note'=>T_('Default CHMOD (UNIX permissions) for new files created by the file manager.' )) );
+ 	$Form->text_input( 'fm_default_chmod_file', $Settings->get('fm_default_chmod_file'), 4, T_('Default file permissions'), T_('Default CHMOD (UNIX permissions) for new files created by the file manager.' ) );
 
 	if( empty( $force_regexp_filename ) || empty( $force_regexp_dirname ) )
 	{ // At least one of these strings can be configured in the UI:
@@ -242,6 +241,10 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.12  2006/12/09 01:55:36  fplanque
+ * feel free to fill in some missing notes
+ * hint: "login" does not need a note! :P
+ *
  * Revision 1.11  2006/12/07 15:23:42  fplanque
  * filemanager enhanced, refactored, extended to skins directory
  *

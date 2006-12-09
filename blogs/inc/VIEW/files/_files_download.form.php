@@ -45,7 +45,7 @@ $Form->begin_form( 'fform', T_('Download files in archive') );
 	$Form->hidden( 'action_invoked', 1 );
 	$Form->hiddens_by_key( get_memorized() );
 
-	$Form->text_input( 'zipname', $zipname, 30, T_('Archive filename'), array( 'note' => T_('This is the name of the file which will get sent to you.'), 'maxlength' => '' ) );
+	$Form->text_input( 'zipname', $zipname, 30, T_('Archive filename'), T_('This is the name of the file which will get sent to you.'),  array( 'maxlength' => '' ) );
 
 	if( $selected_Filelist->count_dirs() )
 	{ // Allow to exclude dirs:
@@ -65,6 +65,10 @@ $Form->end_form( array(
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.7  2006/12/09 01:55:36  fplanque
+ * feel free to fill in some missing notes
+ * hint: "login" does not need a note! :P
+ *
  * Revision 1.6  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

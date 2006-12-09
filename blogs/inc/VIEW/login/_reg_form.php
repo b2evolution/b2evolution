@@ -48,7 +48,7 @@ $Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sens
 
 echo $Form->fieldstart;
 
-$Form->text_input( 'login', $login, 16,  T_('Login'), array( 'maxlength'=>20, 'class'=>'input_text', 'required'=>true ) );
+$Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20, 'class'=>'input_text', 'required'=>true ) );
 ?>
 
 	<fieldset>
@@ -61,7 +61,7 @@ $Form->text_input( 'login', $login, 16,  T_('Login'), array( 'maxlength'=>20, 'c
 	</fieldset>
 
 	<?php
-	$Form->text_input( 'email', $email, 16, T_('Email'), array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
+	$Form->text_input( 'email', $email, 16, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
 
 	$Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Preferred language') );
 
@@ -87,6 +87,10 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/09 01:55:36  fplanque
+ * feel free to fill in some missing notes
+ * hint: "login" does not need a note! :P
+ *
  * Revision 1.10  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

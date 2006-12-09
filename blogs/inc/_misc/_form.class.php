@@ -485,6 +485,7 @@ class Form extends Widget
 	 * @param string Initial value
 	 * @param integer Size of the input field
 	 * @param string Label displayed with the field (in front by default, see {@link $label_to_the_left}).
+	 * @param string "help" note (Should provide something useful, otherwise leave it empty)
 	 * @param array Extended attributes/params.
 	 *                 - 'maxlength': if not set, $field_size gets used (use '' to disable it)
 	 *                 - 'class': the CSS class to use for the <input> element
@@ -493,9 +494,14 @@ class Form extends Widget
 	 *                 - NOTE: any other attributes will be used as is (onchange, onkeyup, id, ..).
 	 * @return true|string true (if output) or the generated HTML if not outputting
 	 */
-	function text_input( $field_name, $field_value, $field_size, $field_label, $field_params = array() )
+	function text_input( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_params = array() )
 	{
 		$field_params['value'] = $field_value;
+
+		if( !empty($field_note) )
+		{
+			$field_params['note'] = $field_note;
+		}
 
 		if( !empty($field_size) )
 		{
@@ -552,10 +558,6 @@ class Form extends Widget
 	{
 		$field_params = array();
 
-		if( $field_note !== '' )
-		{
-			$field_params['note'] = $field_note;
-		}
 		if( $field_maxlength !== 0 )
 		{
 			$field_params['maxlength'] = $field_maxlength;
@@ -573,7 +575,7 @@ class Form extends Widget
 			$field_params['force_to'] = $force_to;
 		}
 
-		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_params );
+		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_note, $field_params );
 	}
 
 
@@ -595,7 +597,7 @@ class Form extends Widget
 	{
 		$field_params['type'] = 'password';
 
-		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_params );
+		return $this->text_input( $field_name, $field_value, $field_size, $field_label, '', $field_params );	// TEMP: Note already in params
 	}
 
 
@@ -618,10 +620,6 @@ class Form extends Widget
 	{
 		$field_params = array( 'type' => 'password' );
 
-		if( !empty($field_note) )
-		{
-			$field_params['note'] = $field_note;
-		}
 		if( $field_maxlength !== 0 )
 		{
 			$field_params['maxlength'] = $field_maxlength;
@@ -631,7 +629,7 @@ class Form extends Widget
 			$field_params['class'] = $field_class;
 		}
 
-		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_params );
+		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_note, $field_params );
 	}
 
 
@@ -818,7 +816,7 @@ class Form extends Widget
 		// Get time part of datetime:
 		$field_value = substr( $field_value, 11, 8 );
 
-		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_params );
+		return $this->text_input( $field_name, $field_value, $field_size, $field_label, '', $field_params ); // TEMP: Note already in params
 	}
 
 
@@ -2708,6 +2706,10 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.58  2006/12/09 01:55:36  fplanque
+ * feel free to fill in some missing notes
+ * hint: "login" does not need a note! :P
+ *
  * Revision 1.57  2006/12/08 02:08:01  uid156866
  * MFH: Fixed "Write" page/tab for Firefox 1.0.x
  *

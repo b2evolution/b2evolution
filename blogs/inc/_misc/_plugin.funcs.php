@@ -392,7 +392,7 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 				$params['maxlength'] = '';
 			}
 
-			$Form->text_input( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $size, $set_label, $params );
+			$Form->text_input( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $size, $set_label, '', $params ); // TEMP: Note already in params
 			break;
 
 		default:
@@ -935,6 +935,10 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.39  2006/12/09 01:55:36  fplanque
+ * feel free to fill in some missing notes
+ * hint: "login" does not need a note! :P
+ *
  * Revision 1.38  2006/12/05 02:34:05  blueyed
  * Fix for "Minor refactoring".. :/
  *

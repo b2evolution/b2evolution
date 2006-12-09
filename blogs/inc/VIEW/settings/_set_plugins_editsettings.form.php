@@ -74,8 +74,8 @@ $Form->begin_form( 'fform', '',
 $Form->hidden( 'plugin_ID', $edit_Plugin->ID );
 
 $Form->begin_fieldset( T_('Plugin info'), array( 'class' => 'clear' ) );
-	$Form->text_input( 'edited_plugin_name', $edited_plugin_name, 25, T_('Name'), array('maxlength' => 255) );
-	$Form->text_input( 'edited_plugin_shortdesc', $edited_plugin_shortdesc, 50, T_('Short desc'), array('maxlength' => 255) );
+	$Form->text_input( 'edited_plugin_name', $edited_plugin_name, 25, T_('Name'), '', array('maxlength' => 255) );
+	$Form->text_input( 'edited_plugin_shortdesc', $edited_plugin_shortdesc, 50, T_('Short desc'), '', array('maxlength' => 255) );
 $Form->end_fieldset();
 
 // PluginSettings
@@ -98,8 +98,8 @@ if( $edit_Plugin->Settings ) // NOTE: this triggers PHP5 autoloading through Plu
 
 // Plugin variables
 $Form->begin_fieldset( T_('Plugin variables').' ('.T_('Advanced').')', array( 'class' => 'clear' ) );
-$Form->text_input( 'edited_plugin_code', $edited_plugin_code, 15, T_('Code'), array('maxlength'=>32, 'note'=>'The code to call the plugin by code. This is also used to link renderer plugins to items.') );
-$Form->text_input( 'edited_plugin_priority', $edited_plugin_priority, 4, T_('Priority'), array( 'maxlength' => 4 ) );
+$Form->text_input( 'edited_plugin_code', $edited_plugin_code, 15, T_('Code'), T_('The code to call the plugin by code. This is also used to link renderer plugins to items.'), array('maxlength'=>32) );
+$Form->text_input( 'edited_plugin_priority', $edited_plugin_priority, 4, T_('Priority'), '', array( 'maxlength' => 4 ) );
 $render_note = get_web_help_link('Plugin/apply_rendering');
 if( empty( $edited_plugin_code ) )
 {
@@ -175,6 +175,10 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.28  2006/12/09 01:55:36  fplanque
+ * feel free to fill in some missing notes
+ * hint: "login" does not need a note! :P
+ *
  * Revision 1.27  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
