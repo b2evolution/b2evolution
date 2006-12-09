@@ -60,7 +60,7 @@ $Form->begin_fieldset( T_('Properties') );
 	$Form->info( T_('Blog'), $edited_Blog->dget('name') );
 
 	$Form->select_input_options( $edited_Chapter->dbprefix.'parent_ID',
-				$GenericCategoryCache->recurse_select( $edited_Chapter->parent_ID, $subset_ID, true ), T_('Parent') );
+				$GenericCategoryCache->recurse_select( $edited_Chapter->parent_ID, $subset_ID, true, NULL, 0, array($edited_Chapter->ID) ), T_('Parent') );
 
 	$Form->text_input( $edited_Chapter->dbprefix.'name', $edited_Chapter->name, 40, T_('Name'), '', array( 'required' => true, 'maxlength' => 255 ) );
 
@@ -83,6 +83,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.5  2006/12/09 02:37:44  fplanque
+ * Prevent user from creating loops in the chapter tree
+ * (still needs a check before writing to DB though)
+ *
  * Revision 1.4  2006/12/09 01:55:36  fplanque
  * feel free to fill in some missing notes
  * hint: "login" does not need a note! :P

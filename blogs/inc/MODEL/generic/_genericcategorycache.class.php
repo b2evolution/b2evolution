@@ -291,21 +291,23 @@ class GenericCategoryCache extends GenericCache
 	 * Return recursive select options list of all loaded categories
 	 *
 	 * @param integer selected category in the select input
-	 * @param integer|NULL NULL for all subsets
-	 * @param boolean
-	 * @param array categories list to display
-	 * @param int depth of  categories list
+	 * @param integer NULL for all subsets
+	 * @param boolean Include the root element?
+	 * @param array GenercCategory objects to display (will recurse from those starting points)
+	 * @param integer depth of categories list
+	 * @param array IDs of categories to exclude (their children will be ignored to)
 	 *
 	 * @return string select options list of all loaded categories
 	 */
-	function recurse_select( $selected = NULL, $subset_ID = NULL, $include_root = false, $cat_array = NULL, $level = 0 )
+	function recurse_select( $selected = NULL, $subset_ID = NULL, $include_root = false, $Cat_array = NULL,
+							$level = 0, $exclude_array = array() )
 	{
 		// Make sure children have been revealed for specific subset:
 		$this->reveal_children( $subset_ID );
 
-		if( is_null( $cat_array ) )
+		if( is_null( $Cat_array ) )
 		{	// Get all parent categorie:
-			$cat_array = $this->root_cats;
+			$Cat_array = $this->root_cats;
 		}
 
 		$r = '';
@@ -316,8 +318,13 @@ class GenericCategoryCache extends GenericCache
 			$level++;
 		}
 
-		foreach ($cat_array as $cat )
+		foreach( $Cat_array as $GenericCategory )
 		{
+			if( in_array( $GenericCategory->ID, $exclude_array ) )
+			{	// We want to exclude that cat.
+				continue;
+			}
+
 			// Set category indentation in the select:
 			$indent = '';
 			for($i = 0; $i < $level; $i++)
@@ -325,13 +332,13 @@ class GenericCategoryCache extends GenericCache
 				$indent .='&nbsp;&nbsp;';
 			}
 			// Set category option:
-			$r .= '<option value="'.$cat->ID.'" ';
-			if( $cat->ID == $selected ) $r .= ' selected="selected"';
-			$r .= ' >'.$indent.$cat->name.'</option>';
+			$r .= '<option value="'.$GenericCategory->ID.'" ';
+			if( $GenericCategory->ID == $selected ) $r .= ' selected="selected"';
+			$r .= ' >'.$indent.$GenericCategory->name.'</option>';
 
-			if( !empty( $cat->children ) )
+			if( !empty( $GenericCategory->children ) )
 			{	// Add children categories:
-				$r .= $this->recurse_select( $selected, $subset_ID, false, $cat->children, $level+1 );
+				$r .= $this->recurse_select( $selected, $subset_ID, false, $GenericCategory->children, $level+1 );
 			}
 		}
 
@@ -343,6 +350,10 @@ class GenericCategoryCache extends GenericCache
 
 /*
  * $Log$
+ * Revision 1.12  2006/12/09 02:37:44  fplanque
+ * Prevent user from creating loops in the chapter tree
+ * (still needs a check before writing to DB though)
+ *
  * Revision 1.11  2006/11/26 01:42:09  fplanque
  * doc
  *

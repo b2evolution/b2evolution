@@ -79,9 +79,10 @@ function cat_line( $Chapter, $level )
 	$r .= '<td class="lastcol shrinkwrap">';
 	if( $permission_to_edit )
 	{	// We have permission permission to edit, so display action column:
-		$r .=  action_icon( T_('New...'), 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) ).
-					 action_icon( T_('Edit...'), 'edit', $edit_url ).
-					 action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete' ) );
+		$r .=  action_icon( T_('New...'), 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) )
+					.action_icon( T_('Edit...'), 'edit', $edit_url )
+					// .action_icon( T_('Move...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=move' ), T_('Move') )
+					.action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete' ) );
 	}
 	$r .= '</td>';
 	$r .=	'</tr>';
@@ -171,6 +172,10 @@ echo '</table>';
 
 /*
  * $Log$
+ * Revision 1.4  2006/12/09 02:37:44  fplanque
+ * Prevent user from creating loops in the chapter tree
+ * (still needs a check before writing to DB though)
+ *
  * Revision 1.3  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
