@@ -173,17 +173,22 @@ echo $GenericCategoryCache->recurse( $callbacks, $subset_ID );
 
 echo '</table>';
 
-echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a category does not delete items from that category. It will just assign them to the parent category. When deleting a root category, items will be assigned to the oldest remaining category in the same collection (smallest category number).').'</p>';
+/* fp> TODO: maybe... (a general group move of posts would be more useful actually)
+echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a chapter does not delete items from that chapter. It will just assign them to the parent chapter. When deleting a root chapter, items will be assigned to the oldest remaining chapter in the same collection (smallest chapter number).').'</p>';
+*/
 
 global $allow_moving_chapters;
 if( !$allow_moving_chapters )
 {
-	echo '<p class="note">'.T_('<strong>Note:</strong> Moving categories across blogs is disabled.').'</p> ';
+	echo '<p class="note">'.T_('<strong>Note:</strong> Moving chapters across blogs is currently disabled in the config.').'</p> ';
 }
 
 
 /*
  * $Log$
+ * Revision 1.7  2006/12/10 02:07:09  fplanque
+ * doc
+ *
  * Revision 1.6  2006/12/10 01:52:27  fplanque
  * old cats are now officially dead :>
  *
