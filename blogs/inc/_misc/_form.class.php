@@ -345,11 +345,11 @@ class Form extends Widget
 	 */
 	function end_field( $field_note = NULL, $field_note_format = NULL )
 	{
-		if( isset($field_note) )
+		if( !empty($field_note) )
 		{ // deprecated - should get set by calling handle_common_params()
 			$this->_common_params['note'] = $field_note;
 		}
-		if( isset($field_note_format) )
+		if( !empty($field_note_format) )
 		{ // deprecated - should get set by calling handle_common_params()
 			$this->_common_params['note_format'] = $field_note_format;
 		}
@@ -1054,7 +1054,7 @@ class Form extends Widget
 			$field_options .= ' value="'.$lNumber.'">'.T_($lWeekday).'</option>';
 		}
 
-		return $this->select_input_options( $field_name, $field_options, $field_label, $field_params );
+		return $this->select_input_options( $field_name, $field_options, $field_label, '', $field_params );
 	}
 
 
@@ -1453,7 +1453,7 @@ class Form extends Widget
 	{
 		$field_options = call_user_func( $field_list_callback, $field_value );
 
-		return $this->select_input_options( $field_name, $field_options, $field_label, $field_params );
+		return $this->select_input_options( $field_name, $field_options, $field_label, '', $field_params );
 	}
 
 
@@ -1542,7 +1542,7 @@ class Form extends Widget
 			$field_options = $field_object->$field_object_callback( $field_value, $allow_none );
 		}
 
-		return $this->select_input_options( $field_name, $field_options, $field_label, $field_params );
+		return $this->select_input_options( $field_name, $field_options, $field_label, '', $field_params );
 	}
 
 
@@ -1589,12 +1589,13 @@ class Form extends Widget
 	 * @param string field name
 	 * @param string string containing options '<option>...</option>'
 	 * @param string field label to be display before the field
+	 * @param string "help" note (Should provide something useful, otherwise leave it empty)
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - 'label': Field label to be display before the field
 	 *              - 'class': CSS class for select
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function select_input_options( $field_name, $field_options, $field_label, $field_params = array() )
+	function select_input_options( $field_name, $field_options, $field_label, $field_note, $field_params = array() )
 	{
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
@@ -1606,8 +1607,9 @@ class Form extends Widget
 
 		$r .="\n<select".get_field_attribs_as_string($field_params).'>'
 			 .$field_options
-			 ."</select>\n"
-			 .$this->end_field();
+			 ."</select>\n";
+
+		$r .= $this->end_field( $field_note );
 
 		if( !empty( $field_params['parent'] ) )
 		{ // Set up the dynamic preselection array from the parent to this select list options
@@ -1649,7 +1651,7 @@ class Form extends Widget
 			'onchange' => $field_onchange,
 			 );
 
-		return $this->select_input_options( $field_name, $field_options, $field_label, $field_params );
+		return $this->select_input_options( $field_name, $field_options, $field_label, '', $field_params );
 	}
 
 
@@ -1697,7 +1699,7 @@ class Form extends Widget
 			$options_list .= '>'.format_to_output($l_option).'</option>';
 		}
 
-		return $this->select_input_options( $field_name, $options_list, $field_label, $field_params );
+		return $this->select_input_options( $field_name, $options_list, $field_label, '', $field_params );
 	}
 
 
@@ -2722,6 +2724,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.60  2006/12/10 22:17:04  fplanque
+ * added note support to select_input
+ *
  * Revision 1.59  2006/12/10 12:42:40  blueyed
  * "maxlength" handling for textarea fields through javascript
  *
