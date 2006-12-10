@@ -31,6 +31,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
+ * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -375,6 +376,9 @@ class GenericCategoryCache extends GenericCache
 
 /*
  * $Log$
+ * Revision 1.14  2006/12/10 02:01:11  fplanque
+ * doc
+ *
  * Revision 1.13  2006/12/10 01:52:27  fplanque
  * old cats are now officially dead :>
  *
