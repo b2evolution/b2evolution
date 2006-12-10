@@ -113,7 +113,7 @@ class DataObject
 	 * @access protected
 	 * @param string Name of parameter
 	 * @param string DB field type ('string', 'number', 'date' )
-	 * @param mixed Pointer to value of parameter - dh> pointer? So it should be a reference? Would make sense IMHO anyway..
+	 * @param mixed Pointer to value of parameter - dh> pointer? So it should be a reference? Would make sense IMHO anyway.. fp> I just wonder why it's not already a reference... :@ 
 	 */
 	function dbchange( $dbfieldname, $dbfieldtype, $valuepointer ) // TODO: dh> value by reference? see above..
 	{
@@ -662,6 +662,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2006/12/10 23:20:55  fplanque
+ * hum...
+ *
  * Revision 1.21  2006/12/10 03:04:31  blueyed
  * todo
  *
