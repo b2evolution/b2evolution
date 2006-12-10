@@ -1807,6 +1807,22 @@ class Form extends Widget
 		if( empty($field_params['class']) ) $field_params['class'] = 'form_textarea_input';
 		else $field_params['class'] .= ' form_textarea_input';
 
+		if( isset($field_params['maxlength']) )
+		{ // attach event to the textarea to accomplish max length:
+			$this->append_javascript['textarea_maxlength'.$field_name] = '
+				if( typeof jQuery == "function" )
+				{
+				$("#'.$field_params['id'].'").bind( "keyup", function(event)
+					{
+						if( this.value.length > '.$field_params['maxlength'].' )
+						{
+							this.value = this.value.substr(0,'.$field_params['maxlength'].');
+							event.preventDefault();
+						}
+					} );
+				}';
+		}
+
 		$r = $this->begin_field()
 			// NOTE: The following pixel is needed to avoid the dity IE textarea expansion bug
 			// see http://fplanque.net/2003/Articles/iecsstextarea/index.html
@@ -2706,6 +2722,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.59  2006/12/10 12:42:40  blueyed
+ * "maxlength" handling for textarea fields through javascript
+ *
  * Revision 1.58  2006/12/09 01:55:36  fplanque
  * feel free to fill in some missing notes
  * hint: "login" does not need a note! :P

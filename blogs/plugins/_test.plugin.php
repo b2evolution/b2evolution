@@ -134,6 +134,12 @@ class test_plugin extends Plugin
 					),
 				),
 			),
+			'maxlen' => array(
+				'label' => 'Max',
+				'type' => 'textarea',
+				'maxlength' => 10,
+				'note' => 'Maximum length is 10 here.',
+			),
 		);
 
 		if( $params['for_editing'] )
@@ -703,6 +709,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.61  2006/12/10 12:42:40  blueyed
+ * "maxlength" handling for textarea fields through javascript
+ *
  * Revision 1.60  2006/12/06 23:32:35  fplanque
  * Rollback to Daniel's most reliable password hashing design. (which is not the last one)
  * This not only strengthens the login by providing less failure points, it also:
