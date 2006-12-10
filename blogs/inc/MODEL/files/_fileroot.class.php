@@ -94,7 +94,7 @@ class FileRoot
 			case 'user':
 				$UserCache = & get_Cache( 'UserCache' );
 				$User = & $UserCache->get_by_ID( $root_in_type_ID );
-				$this->name = $User->get( 'preferredname' ).' ('.T_('u').')';
+				$this->name = $User->get( 'preferredname' ).' ('. /* TRANS: short for "user" */ T_('u').')';
 				$this->ads_path = $User->get_media_dir( $create );
 				$this->ads_url = $User->get_media_url();
 				return;
@@ -105,7 +105,7 @@ class FileRoot
 				 * @var Blog
 				 */
 				$Blog = & $BlogCache->get_by_ID( $root_in_type_ID );
-				$this->name = $Blog->get( 'shortname' ).' ('.T_('b').')';
+				$this->name = $Blog->get( 'shortname' ).' ('. /* TRANS: short for "blog" */ T_('b').')';
 				$this->ads_path = $Blog->get_media_dir( $create );
 				$this->ads_url = $Blog->get_media_url();
 				return;
@@ -159,6 +159,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/10 03:04:16  blueyed
+ * TRANS note for "u" and "b"
+ *
  * Revision 1.10  2006/12/08 01:53:18  fplanque
  * Added missing skin access switch
  *
