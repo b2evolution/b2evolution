@@ -1595,7 +1595,7 @@ class Form extends Widget
 	 *              - 'class': CSS class for select
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function select_input_options( $field_name, $field_options, $field_label, $field_note, $field_params = array() )
+	function select_input_options( $field_name, $field_options, $field_label, $field_note = '', $field_params = array() )
 	{
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
@@ -2724,6 +2724,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.61  2006/12/10 23:17:10  fplanque
+ * oops
+ *
  * Revision 1.60  2006/12/10 22:17:04  fplanque
  * added note support to select_input
  *
