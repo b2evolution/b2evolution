@@ -99,7 +99,7 @@ switch( $action )
 				break;
 
 			case 'advanced':
-				if( $edited_Blog->load_from_Request( array( 'pings' ) ) )
+				if( $edited_Blog->load_from_Request( array( 'pings', 'workflow' ) ) )
 				{ // Commit update to the DB:
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog settings have been updated'), 'success' );
@@ -182,6 +182,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/10 23:56:26  fplanque
+ * Worfklow stuff is now hidden by default and can be enabled on a per blog basis.
+ *
  * Revision 1.7  2006/12/03 19:00:30  blueyed
  * Moved collection perm JavaScript to the views, as per todo
  *

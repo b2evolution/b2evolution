@@ -48,12 +48,13 @@ class CollectionSettings extends AbstractSettings
 	 * @access protected
 	 */
 	var $_defaults = array(
-			'new_feedback_status' => 'draft',  // 'draft', 'published' or 'deprecated'
-			'chapter_links' => 'param_num',		 // 'param_num', 'subchap', 'chapters'
+			'new_feedback_status' => 'draft',  	// 'draft', 'published' or 'deprecated'
+			'chapter_links' => 'param_num',		 	// 'param_num', 'subchap', 'chapters'
 			'ping_plugins' => 'ping_pingomatic,ping_b2evonet', // ping plugin codes, separated by comma
-			'what_to_show' => 'posts',         // posts, days
+			'what_to_show' => 'posts',         	// posts, days
 			'posts_per_page' => '5',
 			'archive_mode' => 'monthly',				// monthly, weekly, daily, postbypost
+			'use_workflow' => 0,								// Don't use workflow by default
 		);
 
 
@@ -69,6 +70,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.9  2006/12/10 23:56:26  fplanque
+ * Worfklow stuff is now hidden by default and can be enabled on a per blog basis.
+ *
  * Revision 1.8  2006/12/04 19:41:11  fplanque
  * Each blog can now have its own "archive mode" settings
  *

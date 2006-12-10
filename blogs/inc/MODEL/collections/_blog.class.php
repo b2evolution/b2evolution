@@ -369,6 +369,11 @@ class Blog extends DataObject
 			$this->set_setting('ping_plugins', implode(',', $blog_ping_plugins));
 		}
 
+		if( in_array( 'workflow', $groups ) )
+		{ // we want to load the workflow checkboxes:
+			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
+		}
+
 		if( param( 'blog_allowcomments',   'string', NULL ) !== NULL )
 		{ // Feedback options:
 			$this->set_from_Request( 'allowcomments' );
@@ -1039,6 +1044,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.41  2006/12/10 23:56:26  fplanque
+ * Worfklow stuff is now hidden by default and can be enabled on a per blog basis.
+ *
  * Revision 1.40  2006/12/07 23:13:10  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!

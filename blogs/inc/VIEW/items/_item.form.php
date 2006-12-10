@@ -208,26 +208,35 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	// ############################ WORKFLOW #############################
 
-	$Form->begin_fieldset( T_('Workflow properties'), array( 'id' => 'itemform_workflow_props' ) );
+	if( $Blog->get_setting( 'use_workflow' ) )
+	{	// We want to use workflow properties for this blog:
+		$Form->begin_fieldset( T_('Workflow properties'), array( 'id' => 'itemform_workflow_props' ) );
 
-	$Form->select_object( 'item_priority', NULL, $edited_Item, T_('Priority'), '', true, '', 'priority_options' );
+			$Form->select_object( 'item_priority', NULL, $edited_Item, T_('Priority'), '', true, '', 'priority_options' );
 
-	echo ' '; // allow wrapping!
+			echo ' '; // allow wrapping!
 
-	$Form->select_object( 'item_assigned_user_ID', NULL, $edited_Item, T_('Assigned to'),
-												'', true, '', 'get_assigned_user_options' );
+			$Form->select_object( 'item_assigned_user_ID', NULL, $edited_Item, T_('Assigned to'),
+														'', true, '', 'get_assigned_user_options' );
 
-	echo ' '; // allow wrapping!
+			echo ' '; // allow wrapping!
 
-	$ItemStatusCache = & get_Cache( 'ItemStatusCache' );
-	$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->st_ID, true ), 	T_('Task status') );
+			$ItemStatusCache = & get_Cache( 'ItemStatusCache' );
+			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->st_ID, true ), 	T_('Task status') );
 
-	echo ' '; // allow wrapping!
+			echo ' '; // allow wrapping!
 
-	$Form->date( 'item_deadline', $edited_Item->get('deadline'), T_('Deadline') );
+			$Form->date( 'item_deadline', $edited_Item->get('deadline'), T_('Deadline') );
 
-	$Form->end_fieldset();
-
+		$Form->end_fieldset();
+	}
+	else
+	{ // Workflow stuff hidden:
+		$Form->hidden( 'item_priority', param('item_priority', 'integer', NULL) );
+		$Form->hidden( 'item_assigned_user_ID', param('item_assigned_user_ID', 'integer', NULL) );
+		$Form->hidden( 'item_st_ID', param('item_st_ID', 'integer', NULL) );
+		$Form->hidden( 'item_deadline', param('item_deadline', 'string', NULL) );
+	}
 
 	// ####################### ADDITIONAL ACTIONS #########################
 
@@ -349,6 +358,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.32  2006/12/10 23:56:26  fplanque
+ * Worfklow stuff is now hidden by default and can be enabled on a per blog basis.
+ *
  * Revision 1.31  2006/12/09 01:55:36  fplanque
  * feel free to fill in some missing notes
  * hint: "login" does not need a note! :P

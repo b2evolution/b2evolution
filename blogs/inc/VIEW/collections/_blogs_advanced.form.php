@@ -106,6 +106,7 @@ $Form->begin_fieldset( T_('After each new post...') );
 	}
 $Form->end_fieldset();
 
+
 $Form->begin_fieldset( T_('Meta data') );
 	$Form->text( 'blog_description', $edited_Blog->get( 'description' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
 	$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
@@ -116,6 +117,12 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Static file generation'), array( 'class'=>'fieldset clear' ) );
 	$Form->text( 'blog_staticfilename', $edited_Blog->get( 'staticfilename' ), 30, T_('Static filename'), T_('This is the .html file that will be created when you generate a static version of the blog homepage.') );
 $Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_('Workflow') );
+	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
+$Form->end_fieldset();
+
 
 $Form->end_form( array(
 	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
