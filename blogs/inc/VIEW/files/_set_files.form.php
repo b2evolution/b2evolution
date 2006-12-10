@@ -184,7 +184,7 @@ $Form->begin_fieldset( T_('File creation options'), array( 'id' => 'ffset_filecr
 	$Form->checkbox( 'fm_enable_create_file', $Settings->get('fm_enable_create_file'), T_('Enable creation of files'), T_('Check to enable creation of files.' ) );
 	$Form->checkbox_input( 'upload_enabled', $Settings->get('upload_enabled'), T_('Enable upload of files'), array(
 		'note' => T_('Check to allow uploading files in general.' ), 'onclick' => JS_showhide_ffield_on_this('upload_maxkb') ) );
-	$Form->text_input( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, T_('Maximum upload filesize'), T_('KB (This cannot be higher than your PHP/Webserver setting!)'), array( 'maxlength'=>7, 'required'=>true ) );
+	$Form->text_input( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, T_('Maximum upload filesize'), sprintf( /* TRANS: first %s is setting/var name, second is file name */ T_('KB (This cannot be higher than your PHP/Webserver and the %s setting (in %s)!)'), '$upload_maxmaxkb', '/conf/_advanced.php' ), array( 'maxlength'=>7, 'required'=>true ) );
 	// Javascript to init hidden/shown state:
 	echo JS_showhide_ffield_on_checkbox( 'upload_maxkb', 'upload_enabled' );
 $Form->end_fieldset();
@@ -241,6 +241,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.13  2006/12/10 01:47:11  blueyed
+ * Note about $upload_maxmaxkb limit
+ *
  * Revision 1.12  2006/12/09 01:55:36  fplanque
  * feel free to fill in some missing notes
  * hint: "login" does not need a note! :P
