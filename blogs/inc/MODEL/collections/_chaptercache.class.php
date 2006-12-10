@@ -39,12 +39,23 @@ class ChapterCache extends GenericCategoryCache
 	 */
 	var $urlname_index = array();
 
+
 	/**
 	 * Constructor
 	 */
 	function ChapterCache()
 	{
 		parent::GenericCategoryCache( 'Chapter', false, 'T_categories', 'cat_', 'cat_ID', 'cat_name', 'blog_ID' );
+	}
+
+
+	/**
+	 * Empty/reset the cache
+	 */
+	function clear()
+	{
+		$this->urlname_index = array();
+		parent::clear();
 	}
 
 
@@ -204,6 +215,73 @@ class ChapterCache extends GenericCategoryCache
 
 
 	/**
+	 * @param integer
+	 * @param integer
+	 * @param integer
+	 */
+	function move_Chapter_subtree( $chapter_ID, $src_collection_ID, $dest_collection_ID )
+	{
+		/**
+		 * @var DB
+		 */
+		global $DB;
+
+		// Make sure children have been revealed for specific subset:
+		$this->reveal_children( $src_collection_ID );
+
+		// fp>We get the Chapter AFTER reveal_children, because something is wrong with reveal_children or get_by_ID
+		// I don't know what right now, but if we get Chapter earlier, we'll be stuck with an old copy of it that does NOT have the children
+		// TODO: find out what's freakin wrong
+		$Chapter = $this->get_by_ID($chapter_ID);
+
+		$chapters_to_move = array();
+		// Get $chapters_to_move:
+		$this->recurse_move_subtree( $Chapter, $chapters_to_move );
+		// pre_dump( $chapters_to_move );
+
+		$DB->begin();
+
+		// Move to root:
+		if( $parent_Chapter = $Chapter->get_parent_Chapter() )
+		{	// Was not already at root, cut it and move it:
+			// echo 'Move to root';
+			$Chapter->set( 'parent_ID', NULL );
+			$Chapter->dbupdate();
+		}
+
+		// Move Chapters to new Blog:
+		$sql = 'UPDATE T_categories
+							 SET cat_blog_ID = '.$dest_collection_ID.'
+						 WHERE cat_blog_ID = '.$src_collection_ID /* extra security */ .'
+						 	 AND cat_ID IN ('.implode( ',', $chapters_to_move ).')';
+		$DB->query( $sql );
+
+		$DB->commit();
+
+		// Now the cache is badly screwed. Reseting it is fair enough, because this won't happen very often.
+		$this->clear();
+	}
+
+
+	/**
+	 * Support function
+	 *
+	 * @param Chapter
+	 * @param array
+	 */
+	function recurse_move_subtree( & $Chapter, & $list_array )
+	{
+		// Add this to the list:
+		$list_array[] = $Chapter->ID;
+
+		foreach( $Chapter->children as $child_Chapter )
+		{
+			$this->recurse_move_subtree( $child_Chapter, $list_array );
+		}
+	}
+
+
+	/**
 	 * Instanciate a new object within this cache
  	 *
  	 * @param object|NULL
@@ -220,6 +298,9 @@ class ChapterCache extends GenericCategoryCache
 
 /*
  * $Log$
+ * Revision 1.9  2006/12/10 01:52:27  fplanque
+ * old cats are now officially dead :>
+ *
  * Revision 1.8  2006/11/24 18:27:23  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

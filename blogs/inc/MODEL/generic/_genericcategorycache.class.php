@@ -91,6 +91,21 @@ class GenericCategoryCache extends GenericCache
 
 
 	/**
+	 * Empty/reset the cache
+	 */
+	function clear()
+	{
+ 		$this->subset_cache = array();
+ 		$this->loaded_subsets = array();
+		$this->root_cats = array();
+		$this->subset_root_cats = array();
+		$this->revealed_all_children = false;
+		$this->revealed_subsets = array();
+		parent::clear();
+ 	}
+
+
+	/**
 	 * Add a dataobject to the cache
 	 */
 	function add( & $Obj )
@@ -180,16 +195,27 @@ class GenericCategoryCache extends GenericCache
 				// Make sure the requested subset has been loaded:
     		$this->load_subset($subset_ID);
 
-
 				// Reveal children:
 				if( !empty( $this->subset_cache[$subset_ID] ) )
 				{	// There are loaded categories, so loop on all loaded categories to set their children list if it has:
-					foreach( $this->subset_cache[$subset_ID] as $cat_ID => $GenericCategory )
+					foreach( $this->subset_cache[$subset_ID] as $cat_ID => $dummy )	// "as" would give a freakin copy of the object :(((
 					{
+						$GenericCategory = & $this->subset_cache[$subset_ID][$cat_ID];
+						// echo '<br>'.$cat_ID;
 						// echo $GenericCategory->name;
 						if( ! is_null( $GenericCategory->parent_ID ) )
 						{	// This category has a parent, so add it to its parent children list:
-							$this->cache[$GenericCategory->parent_ID]->add_children( $this->cache[$cat_ID] );
+							// echo ' parent='.$GenericCategory->parent_ID;
+							if( ! isset($this->cache[$GenericCategory->parent_ID] ) )
+							{
+								global $Debuglog;
+								$Debuglog->add( 'Detected <strong>orphan cat</strong> with ID='.$GenericCategory->ID.' and non existent parent ID='.$GenericCategory->parent_ID );
+							}
+							else
+							{
+								// echo ' add child';
+								$this->cache[$GenericCategory->parent_ID]->add_children( $this->cache[$cat_ID] );
+							}
 						}
 						else
 						{	// This category has no parent, so add it to the parent categories list
@@ -345,11 +371,13 @@ class GenericCategoryCache extends GenericCache
 		return $r;
 	}
 
-
 }
 
 /*
  * $Log$
+ * Revision 1.13  2006/12/10 01:52:27  fplanque
+ * old cats are now officially dead :>
+ *
  * Revision 1.12  2006/12/09 02:37:44  fplanque
  * Prevent user from creating loops in the chapter tree
  * (still needs a check before writing to DB though)

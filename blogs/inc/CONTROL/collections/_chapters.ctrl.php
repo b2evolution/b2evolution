@@ -70,11 +70,14 @@ $subset_ID = $blog;
 
 $list_view_path = 'collections/_chapter_list.inc.php';
 $permission_to_edit = $current_User->check_perm( 'blog_cats', '', false, $blog );
-// fp> TODO: reinforce that control!
 
 // The form will be on its own page:
 $form_below_list = false;
 $edit_view_path = 'collections/_chapter.form.php';
+
+
+
+// fp> TODO: Detect and repair orphan cats.
 
 
 
@@ -238,6 +241,7 @@ switch( $action )
 
 
 	case 'update_move':
+		// EXTENSION
  		if( ! $allow_moving_chapters )
  		{
 			debug_die( 'Moving of chapters is disabled' );
@@ -269,9 +273,14 @@ switch( $action )
 			break;
 		}
 
+		// Do the actual move! (This WILL reset the cache!)
+		$GenericCategoryCache->move_Chapter_subtree( $edited_GenericCategory->ID, $subset_ID, $cat_coll_ID );
 
+		unset($edited_GenericCategory);
+		$cat_ID = NULL;
+		$action = 'list';
 
-			echo 'TO DO';
+		$Messages->add( T_('Chapters have been moved.'), 'success' );
 
 		break;
 
@@ -417,6 +426,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2006/12/10 01:52:27  fplanque
+ * old cats are now officially dead :>
+ *
  * Revision 1.8  2006/12/09 17:59:31  fplanque
  * started "moving chapters accross blogs" feature
  *

@@ -173,9 +173,20 @@ echo $GenericCategoryCache->recurse( $callbacks, $subset_ID );
 
 echo '</table>';
 
+echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a category does not delete items from that category. It will just assign them to the parent category. When deleting a root category, items will be assigned to the oldest remaining category in the same collection (smallest category number).').'</p>';
+
+global $allow_moving_chapters;
+if( !$allow_moving_chapters )
+{
+	echo '<p class="note">'.T_('<strong>Note:</strong> Moving categories across blogs is disabled.').'</p> ';
+}
+
 
 /*
  * $Log$
+ * Revision 1.6  2006/12/10 01:52:27  fplanque
+ * old cats are now officially dead :>
+ *
  * Revision 1.5  2006/12/09 17:59:34  fplanque
  * started "moving chapters accross blogs" feature
  *

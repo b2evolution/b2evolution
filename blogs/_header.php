@@ -288,12 +288,6 @@ $AdminUI->add_menu_entries(
 				)
 			),
 
-			// This is gonna die soon...
-			'cats' => array(	// TODO: move this to 'blog settings>chapters'
-				'text' => T_('Categories'),
-				'href' => 'admin.php?ctrl=chapters&amp;blog='.$blog
-			),
-
 		)
 	);
 
@@ -303,6 +297,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.30  2006/12/10 01:52:26  fplanque
+ * old cats are now officially dead :>
+ *
  * Revision 1.29  2006/12/07 22:29:26  fplanque
  * reorganized menus / basic dashboard
  *
