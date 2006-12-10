@@ -113,9 +113,9 @@ class DataObject
 	 * @access protected
 	 * @param string Name of parameter
 	 * @param string DB field type ('string', 'number', 'date' )
-	 * @param mixed Pointer to value of parameter
+	 * @param mixed Pointer to value of parameter - dh> pointer? So it should be a reference? Would make sense IMHO anyway..
 	 */
-	function dbchange( $dbfieldname, $dbfieldtype, $valuepointer )
+	function dbchange( $dbfieldname, $dbfieldtype, $valuepointer ) // TODO: dh> value by reference? see above..
 	{
 		// echo '<br />DB change on :'.$dbfieldname;
 		$this->dbchanges[$dbfieldname]['type'] = $dbfieldtype;
@@ -662,6 +662,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2006/12/10 03:04:31  blueyed
+ * todo
+ *
  * Revision 1.20  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
