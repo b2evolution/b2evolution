@@ -98,7 +98,7 @@ $allow_cross_posting = 1;
  * @global bool|NULL $allow_moving_chapters
  */
 $allow_moving_chapters = false;
-
+$allow_moving_chapters = true; // TODO remove, temporary setting fro the demo site for anne to test
 
 /**
  * Default status for new posts:
