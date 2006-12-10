@@ -5,6 +5,8 @@
  * Note: This file will be merged into admin.php
  *
  * @package admin
+ *
+ * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -173,46 +175,31 @@ $AdminUI->add_menu_entries(
 				'href' => 'admin.php?ctrl=users',
 			),
 
-			'options' => array(
-				'text' => T_('App settings'),
-				'perm_name' => 'options',
-				'perm_level' => 'view',
-				'href' => 'admin.php?ctrl=settings',
-				'entries' => array(
-					'general' => array(
-						'text' => T_('General'),
-						'href' => 'admin.php?ctrl=settings' ),
-					'features' => array(
-						'text' => T_('Features'),
-						'href' => 'admin.php?ctrl=features' ),
-					'skins' => array(
-						'text' => T_('Skins'),
-						'href' => 'admin.php?ctrl=skins'),
-					'plugins' => array(
-						'text' => T_('Plugins'),
-						'href' => 'admin.php?ctrl=plugins'),
+			'tools' => array(
+				'text' => T_('Tools'),
+				'href' => 'admin.php?ctrl=crontab',
+				'entries' =>  array(
+					'cron' => array(
+						'text' => T_('Scheduler'),
+						'perm_name' => 'options',
+						'perm_level' => 'view',
+						'href' => 'admin.php?ctrl=crontab' ),
+					'system' => array(
+						'text' => T_('System'),
+						'perm_name' => 'options',
+						'perm_level' => 'view',
+						'href' => 'admin.php?ctrl=system' ),
 					'antispam' => array(
 						'text' => T_('Antispam'),
-						'href' => 'admin.php?ctrl=set_antispam'),
-					'regional' => array(
-						'text' => T_('Regional'),
-						'href' => 'admin.php?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
-					'files' => array(
-						'text' => T_('Files'),
-						'href' => 'admin.php?ctrl=fileset' ),
-					'filetypes' => array(
-						'text' => T_('File types'),
-						'href' => 'admin.php?ctrl=filetypes' ),
-					'types' => array(
-						'text' => T_('Post types'),
-						'title' => T_('Post types management'),
-						'href' => 'admin.php?ctrl=itemtypes'),
-					'statuses' => array(
-						'text' => T_('Post statuses'),
-						'title' => T_('Post statuses management'),
-						'href' => 'admin.php?ctrl=itemstatuses'),
+						'perm_name' => 'spamblacklist',
+						'perm_level' => 'view',
+						'href' => 'admin.php?ctrl=antispam'	),
+					'' => array(	// fp> '' is dirty
+						'text' => T_('Misc'),
+						'href' => 'admin.php?ctrl=tools' ),
 				)
 			),
+
 		)
 	);
 
@@ -263,31 +250,46 @@ $AdminUI->add_menu_entries(
 				)
 			),
 
-			'tools' => array(
-				'text' => T_('Tools'),
-				'href' => 'admin.php?ctrl=crontab',
-				'entries' =>  array(
-					'cron' => array(
-						'text' => T_('Scheduler'),
-						'perm_name' => 'options',
-						'perm_level' => 'view',
-						'href' => 'admin.php?ctrl=crontab' ),
-					'system' => array(
-						'text' => T_('System'),
-						'perm_name' => 'options',
-						'perm_level' => 'view',
-						'href' => 'admin.php?ctrl=system' ),
+			'options' => array(
+				'text' => T_('Global settings'),
+				'perm_name' => 'options',
+				'perm_level' => 'view',
+				'href' => 'admin.php?ctrl=settings',
+				'entries' => array(
+					'general' => array(
+						'text' => T_('General'),
+						'href' => 'admin.php?ctrl=settings' ),
+					'features' => array(
+						'text' => T_('Features'),
+						'href' => 'admin.php?ctrl=features' ),
+					'skins' => array(
+						'text' => T_('Skins'),
+						'href' => 'admin.php?ctrl=skins'),
+					'plugins' => array(
+						'text' => T_('Plugins'),
+						'href' => 'admin.php?ctrl=plugins'),
 					'antispam' => array(
 						'text' => T_('Antispam'),
-						'perm_name' => 'spamblacklist',
-						'perm_level' => 'view',
-						'href' => 'admin.php?ctrl=antispam'	),
-					'' => array(	// fp> '' is dirty
-						'text' => T_('Misc'),
-						'href' => 'admin.php?ctrl=tools' ),
+						'href' => 'admin.php?ctrl=set_antispam'),
+					'regional' => array(
+						'text' => T_('Regional'),
+						'href' => 'admin.php?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
+					'files' => array(
+						'text' => T_('Files'),
+						'href' => 'admin.php?ctrl=fileset' ),
+					'filetypes' => array(
+						'text' => T_('File types'),
+						'href' => 'admin.php?ctrl=filetypes' ),
+					'types' => array(
+						'text' => T_('Post types'),
+						'title' => T_('Post types management'),
+						'href' => 'admin.php?ctrl=itemtypes'),
+					'statuses' => array(
+						'text' => T_('Post statuses'),
+						'title' => T_('Post statuses management'),
+						'href' => 'admin.php?ctrl=itemstatuses'),
 				)
 			),
-
 		)
 	);
 
@@ -297,6 +299,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.31  2006/12/10 02:01:24  fplanque
+ * menu reorg
+ *
  * Revision 1.30  2006/12/10 01:52:26  fplanque
  * old cats are now officially dead :>
  *
