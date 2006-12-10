@@ -264,10 +264,6 @@ function toggle_filter_area( filter_name )
  * What this really is actually, is just a function to perform an asynchronous Request to the server.
  * There is no need to have any XML involved.
  *
- * @todo dh> I'd really like to have a JSON-Callback instead of the fixed "scheme" that only allows
- *       to toggle an element with ID "asyncResponse".. this is very limited.. :/
- *       I vote for the MochiKit JS framework which provides a decent "Async" library.
- *
  * @param string url urlencoded
  */
 function asyncRequest( url )
@@ -404,6 +400,9 @@ var b2evo_Callbacks = new b2evo_Callbacks();
 
 /*
  * $Log$
+ * Revision 1.24  2006/12/10 03:05:02  blueyed
+ * cleanup
+ *
  * Revision 1.23  2006/11/28 19:44:51  blueyed
  * b2evo_Callbacks.trigger_callback() now supports variable number of arguments; textarea_replace_selection(): default to document for target_document arg
  *
