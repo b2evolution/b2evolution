@@ -75,7 +75,7 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 	// Passthrough some attributes to elements:
 	foreach( $set_meta as $k => $v )
 	{
-		if( in_array( $k, array( 'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols' ) ) )
+		if( in_array( $k, array( 'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength' ) ) )
 		{
 			$params[$k] = $v;
 		}
@@ -935,6 +935,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.40  2006/12/10 12:36:58  blueyed
+ * passthrough "rows" and "maxlength" attributes to input elements
+ *
  * Revision 1.39  2006/12/09 01:55:36  fplanque
  * feel free to fill in some missing notes
  * hint: "login" does not need a note! :P
