@@ -276,12 +276,16 @@ switch( $action )
 		// Do the actual move! (This WILL reset the cache!)
 		$GenericCategoryCache->move_Chapter_subtree( $edited_GenericCategory->ID, $subset_ID, $cat_coll_ID );
 
+		$dest_Blog = & $BlogCache->get_by_ID( $cat_coll_ID );
+		$Messages->add( sprintf( T_('The chapter &laquo;%s&raquo; has been moved (with children) to &laquo;%s&raquo;\'s root. You may want to nest it in another parent chapter below...'), $edited_GenericCategory->dget('name'), $dest_Blog->dget( 'shortname' )  ), 'success' );
+
+		header_redirect( 'admin.php?ctrl=chapters2&action=edit&blog='.$cat_coll_ID.'&cat_ID='.$cat_ID );	// will save $Messages
+		/* EXIT */
+
+		// In case we changed the redirect someday:
 		unset($edited_GenericCategory);
 		$cat_ID = NULL;
 		$action = 'list';
-
-		$Messages->add( T_('Chapters have been moved.'), 'success' );
-
 		break;
 
 
@@ -426,6 +430,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2006/12/10 22:28:33  fplanque
+ * improved moving chapters a little bit
+ *
  * Revision 1.9  2006/12/10 01:52:27  fplanque
  * old cats are now officially dead :>
  *

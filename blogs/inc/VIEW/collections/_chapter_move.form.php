@@ -57,7 +57,7 @@ $Form->begin_fieldset( T_('Properties') );
 	// We're essentially double checking here...
 	$edited_Blog = & $edited_Chapter->get_Blog();
 
-	$Form->select_input_options( $edited_Chapter->dbprefix.'coll_ID', $BlogCache->get_option_list( $edited_Blog->ID ), T_('Attached to blog') );
+	$Form->select_input_options( $edited_Chapter->dbprefix.'coll_ID', $BlogCache->get_option_list( $edited_Blog->ID ), T_('Attached to blog'), T_('If you select a new blog, you will be able to choose a position within this blog on the next screen.') );
 
 $Form->end_fieldset();
 
@@ -67,6 +67,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.2  2006/12/10 22:28:33  fplanque
+ * improved moving chapters a little bit
+ *
  * Revision 1.1  2006/12/09 17:59:34  fplanque
  * started "moving chapters accross blogs" feature
  *
