@@ -116,7 +116,7 @@ switch( $action )
 			$Messages->add( T_('You should create categories for this blog now!'), 'note' );
 
 			header_nocache();
-			header_redirect( 'admin.php?ctrl=chapters2&blog='.$edited_Blog->ID ); // will save $Messages into Session
+			header_redirect( 'admin.php?ctrl=chapters&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
 		break;
 
@@ -225,7 +225,7 @@ switch( $action )
 /**
  * Display page header, menus & messages:
  */
-// fp> TODO: fall back to ctrl=chapters2 when no perm for blog_properties
+// fp> TODO: fall back to ctrl=chapters when no perm for blog_properties
 $blogListButtons = $AdminUI->get_html_collection_list( 'blog_properties', 'edit',
 											'?ctrl=coll_settings&amp;tab=general&amp;blog=%d',
 											T_('List'), '?ctrl=collections&amp;blog=0' );
@@ -328,6 +328,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2006/12/11 16:53:47  fplanque
+ * controller name cleanup
+ *
  * Revision 1.6  2006/12/11 00:32:26  fplanque
  * allow_moving_chapters stting moved to UI
  * chapters are now called categories in the UI
