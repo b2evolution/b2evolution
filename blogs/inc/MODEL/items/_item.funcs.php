@@ -526,6 +526,11 @@ function cat_select( $display_info = true, $form_fields = true )
 		}
 	}
 
+	if( $current_User->check_perm( 'blog_cats', '', false, $blog ) )
+	{
+		$r .= '<div><a href="admin.php?ctrl=chapters&amp;action=new">'.T_('Add a new category...').'</a></div>';
+	}
+
 	$r .= '</div>';
 
 	return $r;
@@ -645,6 +650,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.34  2006/12/11 17:26:21  fplanque
+ * some cross-linking
+ *
  * Revision 1.33  2006/12/04 21:20:27  blueyed
  * Abstracted convert_special_charsets() out of urltitle_validate()
  *

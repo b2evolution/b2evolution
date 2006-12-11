@@ -49,16 +49,26 @@ $AdminUI->disp_payload_begin();
 
 // fp> Note: don't bother with T_() yet. This is going to change too often.
 
-echo '<p>Welcome to b2evolution '.$app_version.'. Work in progress...</p>';
-
-echo '<p>This page is supposed to show you the most important things you will need on a daily basis.</p>';
-
 if( $blog )
 {
 	$BlogCache = & get_Cache( 'BlogCache' );
 	$Blog = & $BlogCache->get_by_ID($blog); // "Exit to blogs.." link
 
 	echo '<h2>'.$Blog->dget( 'name' ).'</h2>';
+
+	echo '<h3>Shortcuts</h3>';
+	echo '<ul>';
+		echo '<li><a href="admin.php?ctrl=edit&blog='.$Blog->ID.'">Write a new post...</a></li>';
+		echo '<li><a href="'.$Blog->get('url').'" target="_blank">Open public blog page</a></li>';
+		if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+		{
+			echo '<li><a href="admin.php?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'">Change blog name...</a></li>';
+			echo '<li><a href="admin.php?ctrl=coll_settings&tab=skin&blog='.$Blog->ID.'">Change blog appearance (skin)...</a></li>';
+		}
+	echo '</ul>';
+
+
+	echo '<h3>Latest posts</h3>';
 
 	load_class( 'MODEL/items/_itemlist2.class.php' );
 
@@ -85,16 +95,6 @@ if( $blog )
 	// fp> TODO: drafts
 
 
-	echo '<h3>Shortcuts</h3>';
-	echo '<ul>';
-		echo '<li><a href="admin.php?ctrl=edit&blog='.$Blog->ID.'">Write a new post...</a></li>';
-		echo '<li><a href="'.$Blog->get('url').'" target="_blank">Open public blog page</a></li>';
-		if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
-		{
-			echo '<li><a href="admin.php?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'">Change blog name...</a></li>';
-			echo '<li><a href="admin.php?ctrl=coll_settings&tab=skin&blog='.$Blog->ID.'">Change blog skin...</a></li>';
-		}
-	echo '</ul>';
 }
 
 
@@ -103,8 +103,13 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	echo '<h2>Administrative tasks</h2>';
 
 	echo '<ul>';
+		echo '<li><a href="admin.php?ctrl=users&amp;user_ID='.$current_User->ID.'">Edit my user profile...</a></li>';
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{
+			echo '<li><a href="admin.php?ctrl=users&amp;user_ID='.$current_User->ID.'&action=new_user">Add a new user...</a></li>';
+		}
 		// TODO: remember system date check and only remind every 3 months
-		echo '<li><a href="admin.php?ctrl=system">Check if your system is secure...</a></li>';
+		echo '<li><a href="admin.php?ctrl=system">Check if my system is secure...</a></li>';
 	echo '</ul>';
 }
 
@@ -116,6 +121,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2006/12/11 17:26:21  fplanque
+ * some cross-linking
+ *
  * Revision 1.5  2006/12/09 02:01:48  fplanque
  * temporary / minor
  *

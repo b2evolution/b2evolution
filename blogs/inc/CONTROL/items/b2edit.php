@@ -176,7 +176,7 @@ switch($action)
 		$blog = autoselect_blog( $blog, 'blog_post_statuses', 'any' );
 
 		// Generate available blogs list:
-		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_post_statuses', 'any', $pagenow.'?blog=%d', NULL, '',
+		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_post_statuses', 'any', $pagenow.'?ctrl=edit&amp;blog=%d', NULL, '',
 												'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$pagenow.'\', %d )' );
 
 		if( !$blog )
