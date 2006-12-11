@@ -102,6 +102,8 @@ class GeneralSettings extends AbstractSettings
 		'user_minpwdlen' => '5',
 
 		'webhelp_enabled' => '1',
+
+		'allow_moving_chapters' => '0',				// Do not allow moving chapters by default
 	);
 
 
@@ -156,6 +158,10 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.27  2006/12/11 00:32:26  fplanque
+ * allow_moving_chapters stting moved to UI
+ * chapters are now called categories in the UI
+ *
  * Revision 1.26  2006/12/07 15:23:42  fplanque
  * filemanager enhanced, refactored, extended to skins directory
  *

@@ -53,7 +53,7 @@ class categories_plugin extends Plugin
 	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('This skin tag displays the list of available categories for the blog.');
-		$this->long_desc = T_('Categories are indeed chapters and sub-chapters in the blog.');
+		$this->long_desc = T_('This skin tag displays the list of available categories and sub-categories for the blog.');
 
 		$this->dbtable = 'T_posts';
 		$this->dbprefix = 'post_';
@@ -344,6 +344,10 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.33  2006/12/11 00:32:26  fplanque
+ * allow_moving_chapters stting moved to UI
+ * chapters are now called categories in the UI
+ *
  * Revision 1.32  2006/11/25 19:27:37  fplanque
  * "brute force hack" reverted; added TODO for clean solution
  *

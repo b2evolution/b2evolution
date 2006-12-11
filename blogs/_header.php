@@ -227,7 +227,7 @@ $AdminUI->add_menu_entries(
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=display&amp;blog='.$blog,
 						'perm_eval' => $blog_settings_parm_eval ),
 					'chapters' => array(
-						'text' => T_('Chapters'),
+						'text' => T_('Categories'),
 						'href' => 'admin.php?ctrl=chapters2&amp;blog='.$blog,
 						'perm_eval' => 'global $ctrl, $current_User; return $ctrl != "collections"
 															&& $current_User->check_perm( "blog_cats", "", false, '.$blog.' ) ;' ),
@@ -299,6 +299,10 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.32  2006/12/11 00:32:26  fplanque
+ * allow_moving_chapters stting moved to UI
+ * chapters are now called categories in the UI
+ *
  * Revision 1.31  2006/12/10 02:01:24  fplanque
  * menu reorg
  *

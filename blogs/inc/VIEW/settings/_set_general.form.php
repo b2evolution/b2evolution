@@ -88,8 +88,8 @@ $Form->radio( 'links_extrapath', $Settings->get('links_extrapath'),
 											array( 'y', T_('Use year'), T_('Permalinks will look like \'stub/2006/post-title\'' ) ),
 											array( 'ym', T_('Use year & month'), T_('Permalinks will look like \'stub/2006/12/post-title\'' ) ),
 											array( 'ymd', T_('Use year, month & day'), T_('Permalinks will look like \'stub/2006/12/31/post-title\'' ) ),
-											array( 'subchap', T_('Use sub-chapter'), T_('Permalinks will look like \'stub/subchap/post-title\'' ) ),
-											array( 'chapters', T_('Use chapter path'), T_('Permalinks will look like \'stub/chapter/subchap/post-title\'' ) ),
+											array( 'subchap', T_('Use sub-category'), T_('Permalinks will look like \'stub/subcat/post-title\'' ) ),
+											array( 'chapters', T_('Use category path'), T_('Permalinks will look like \'stub/cat/subcat/post-title\'' ) ),
 										), T_('Extra path info'), true );
 
 $Form->radio( 'permalink_type', $Settings->get('permalink_type'),
@@ -138,6 +138,10 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.25  2006/12/11 00:32:26  fplanque
+ * allow_moving_chapters stting moved to UI
+ * chapters are now called categories in the UI
+ *
  * Revision 1.24  2006/12/09 01:55:36  fplanque
  * feel free to fill in some missing notes
  * hint: "login" does not need a note! :P

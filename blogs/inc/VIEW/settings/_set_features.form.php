@@ -85,7 +85,7 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 
 		$Form->text_input( 'eblog_server_port', $Settings->get('eblog_server_port'), 5, T_('Port Number'), T_('Port number of your incoming mail server (Defaults: pop3:110 imap:143).'), array( 'maxlength' => 6 ) );
 
-		$Form->text_input( 'eblog_username', $Settings->get('eblog_username'), 15, T_('Account Name'), T_('User name for authenticating to your mail server.') array( 'maxlength' => 255 )  );
+		$Form->text_input( 'eblog_username', $Settings->get('eblog_username'), 15, T_('Account Name'), T_('User name for authenticating to your mail server.'), array( 'maxlength' => 255 )  );
 
 		$Form->password_input( 'eblog_password', $Settings->get('eblog_password'),15,T_('Password'), array( 'maxlength' => 255, 'note' => T_('Password for authenticating to your mail server.')  )  );
 
@@ -159,6 +159,10 @@ $Form->begin_fieldset( T_('Hit & session logging') . get_web_help_link('Hit logg
 
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Categories') . get_web_help_link('categories'), array( 'id'=>'categories') );
+	$Form->checkbox_input( 'allow_moving_chapters', $Settings->get('allow_moving_chapters'), T_('Allow moving categories'), array( 'note' => T_('Check to allow moving categories accross blogs. (Caution: can break pre-existing permalinks!)' ) ) );
+$Form->end_fieldset();
+
 
 if( $current_User->check_perm( 'options', 'edit' ) )
 {
@@ -172,6 +176,10 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.19  2006/12/11 00:32:26  fplanque
+ * allow_moving_chapters stting moved to UI
+ * chapters are now called categories in the UI
+ *
  * Revision 1.18  2006/12/09 01:55:36  fplanque
  * feel free to fill in some missing notes
  * hint: "login" does not need a note! :P

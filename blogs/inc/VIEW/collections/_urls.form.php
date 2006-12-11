@@ -178,14 +178,14 @@ $Form->begin_fieldset( T_('Blog URL') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Chapter URLs') );
+$Form->begin_fieldset( T_('Category URLs') );
 
 	$Form->radio( 'chapter_links', $edited_Blog->get_setting('chapter_links'),
 		array(
-				array( 'param_num', T_('Do not use extra path info'), T_('Chapter links will look like: \'stub?cat=123\'') ),
-				array( 'subchap', T_('Use sub-chapter'), T_('Chapter links will look like \'stub/subchap/\'' ) ),
-				array( 'chapters', T_('Use chapter path'), T_('Chapter links will look like \'stub/chapter/subchap/\'' ) ),
-			), T_('Chapter links'), true );
+				array( 'param_num', T_('Do not use extra path info'), T_('Category links will look like: \'stub?cat=123\'') ),
+				array( 'subchap', T_('Use sub-category'), T_('Category links will look like \'stub/subcat/\'' ) ),
+				array( 'chapters', T_('Use category path'), T_('Category links will look like \'stub/cat/subcat/\'' ) ),
+			), T_('Category links'), true );
 
 $Form->end_fieldset();
 
@@ -204,6 +204,10 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.2  2006/12/11 00:32:26  fplanque
+ * allow_moving_chapters stting moved to UI
+ * chapters are now called categories in the UI
+ *
  * Revision 1.1  2006/09/11 19:36:58  fplanque
  * blog url ui refactoring
  *

@@ -89,18 +89,6 @@ $allow_cross_posting = 1;
 
 
 /**
- * Moving chapters between blogs?
- *
- * Special value: NULL and we won't even talk about moving
- *
- * @todo fp>This should be moved to the backoffice. Checkbox.
- *
- * @global bool|NULL $allow_moving_chapters
- */
-$allow_moving_chapters = false;
-$allow_moving_chapters = true; // TODO remove, temporary setting fro the demo site for anne to test
-
-/**
  * Default status for new posts:
  *
  * Possible values: 'published', 'deprecated', 'protected', 'private', 'draft'

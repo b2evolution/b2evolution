@@ -165,7 +165,7 @@ switch( $action )
 
 
 	case 'move': // EXTENSION
- 		if( ! $allow_moving_chapters )
+ 		if( ! $Settings->get('allow_moving_chapters') )
  		{
 			debug_die( 'Moving of chapters is disabled' );
 		}
@@ -242,7 +242,7 @@ switch( $action )
 
 	case 'update_move':
 		// EXTENSION
- 		if( ! $allow_moving_chapters )
+ 		if( ! $Settings->get('allow_moving_chapters') )
  		{
 			debug_die( 'Moving of chapters is disabled' );
 		}
@@ -269,7 +269,7 @@ switch( $action )
 
 		if( $cat_coll_ID == $edited_Blog->ID )
 		{
-			$Messages->add( T_('Chapter had not been moved.'), 'note' );
+			$Messages->add( T_('Category has not been moved.'), 'note' );
 			break;
 		}
 
@@ -277,7 +277,7 @@ switch( $action )
 		$GenericCategoryCache->move_Chapter_subtree( $edited_GenericCategory->ID, $subset_ID, $cat_coll_ID );
 
 		$dest_Blog = & $BlogCache->get_by_ID( $cat_coll_ID );
-		$Messages->add( sprintf( T_('The chapter &laquo;%s&raquo; has been moved (with children) to &laquo;%s&raquo;\'s root. You may want to nest it in another parent chapter below...'), $edited_GenericCategory->dget('name'), $dest_Blog->dget( 'shortname' )  ), 'success' );
+		$Messages->add( sprintf( T_('The category &laquo;%s&raquo; has been moved (with children) to &laquo;%s&raquo;\'s root. You may want to nest it in another parent category below...'), $edited_GenericCategory->dget('name'), $dest_Blog->dget( 'shortname' )  ), 'success' );
 
 		header_redirect( 'admin.php?ctrl=chapters2&action=edit&blog='.$cat_coll_ID.'&cat_ID='.$cat_ID );	// will save $Messages
 		/* EXIT */
@@ -430,6 +430,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/11 00:32:26  fplanque
+ * allow_moving_chapters stting moved to UI
+ * chapters are now called categories in the UI
+ *
  * Revision 1.10  2006/12/10 22:28:33  fplanque
  * improved moving chapters a little bit
  *

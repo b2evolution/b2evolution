@@ -113,7 +113,7 @@ switch( $action )
 			$Messages->add( T_('The new blog has been created.'), 'success' );
 
 			// Successful creation, move on to chapters:
-			$Messages->add( T_('You should create chapters for this blog now!'), 'note' );
+			$Messages->add( T_('You should create categories for this blog now!'), 'note' );
 
 			header_nocache();
 			header_redirect( 'admin.php?ctrl=chapters2&blog='.$edited_Blog->ID ); // will save $Messages into Session
@@ -328,6 +328,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2006/12/11 00:32:26  fplanque
+ * allow_moving_chapters stting moved to UI
+ * chapters are now called categories in the UI
+ *
  * Revision 1.5  2006/11/26 02:30:38  fplanque
  * doc / todo
  *

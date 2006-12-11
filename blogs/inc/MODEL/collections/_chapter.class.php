@@ -106,7 +106,7 @@ class Chapter extends GenericCategory
 															AND cat_ID <> '.$this->ID
 															) )
 					{ // urlname is already in use
-						param_error( 'cat_urlname', T_('This URL name is already in use by another chapter. Please choose another name.') );
+						param_error( 'cat_urlname', T_('This URL name is already in use by another category. Please choose another name.') );
 					}
 			}
 		}
@@ -224,6 +224,10 @@ class Chapter extends GenericCategory
 
 /*
  * $Log$
+ * Revision 1.6  2006/12/11 00:32:26  fplanque
+ * allow_moving_chapters stting moved to UI
+ * chapters are now called categories in the UI
+ *
  * Revision 1.5  2006/11/24 18:27:23  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

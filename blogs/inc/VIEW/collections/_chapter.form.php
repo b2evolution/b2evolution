@@ -48,7 +48,7 @@ $Form = & new Form( NULL, 'form' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', $creating ?  T_('New chapter') : T_('Chapter') );
+$Form->begin_form( 'fform', $creating ?  T_('New category') : T_('Category') );
 
 $Form->hidden( 'action', $creating ? 'create' : 'update' );
 $Form->hiddens_by_key( get_memorized( 'action' ) );
@@ -60,7 +60,7 @@ $Form->begin_fieldset( T_('Properties') );
 	$Form->info( T_('Blog'), $edited_Blog->dget('name') );
 
 	$Form->select_input_options( $edited_Chapter->dbprefix.'parent_ID',
-				$GenericCategoryCache->recurse_select( $edited_Chapter->parent_ID, $subset_ID, true, NULL, 0, array($edited_Chapter->ID) ), T_('Parent') );
+				$GenericCategoryCache->recurse_select( $edited_Chapter->parent_ID, $subset_ID, true, NULL, 0, array($edited_Chapter->ID) ), T_('Parent category') );
 
 	$Form->text_input( $edited_Chapter->dbprefix.'name', $edited_Chapter->name, 40, T_('Name'), '', array( 'required' => true, 'maxlength' => 255 ) );
 
@@ -82,6 +82,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.7  2006/12/11 00:32:26  fplanque
+ * allow_moving_chapters stting moved to UI
+ * chapters are now called categories in the UI
+ *
  * Revision 1.6  2006/12/09 17:59:34  fplanque
  * started "moving chapters accross blogs" feature
  *

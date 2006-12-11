@@ -45,7 +45,7 @@ $Form = & new Form( NULL, 'form' );
 
 $Form->global_icon( T_('Cancel move!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', T_('Move chapter') );
+$Form->begin_form( 'fform', T_('Move category') );
 
 $Form->hidden( 'action', 'update_move' );
 $Form->hiddens_by_key( get_memorized( 'action' ) );
@@ -67,6 +67,10 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.3  2006/12/11 00:32:26  fplanque
+ * allow_moving_chapters stting moved to UI
+ * chapters are now called categories in the UI
+ *
  * Revision 1.2  2006/12/10 22:28:33  fplanque
  * improved moving chapters a little bit
  *

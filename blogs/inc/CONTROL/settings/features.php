@@ -163,6 +163,10 @@ switch( $action )
 			$Settings->set( 'auto_prune_stats', get_param('auto_prune_stats') );
 
 
+			// Categories:
+			$Settings->set( 'allow_moving_chapters', param( 'allow_moving_chapters', 'integer', 0 ) );
+
+
 			if( ! $Messages->count('error') )
 			{
 				if( $Settings->dbupdate() )
@@ -199,6 +203,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2006/12/11 00:32:26  fplanque
+ * allow_moving_chapters stting moved to UI
+ * chapters are now called categories in the UI
+ *
  * Revision 1.17  2006/12/07 00:55:52  fplanque
  * reorganized some settings
  *

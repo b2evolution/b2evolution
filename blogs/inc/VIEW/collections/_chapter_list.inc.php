@@ -48,7 +48,7 @@ $line_class = 'odd';
  */
 function cat_line( $Chapter, $level )
 {
-	global $line_class, $result_fadeout, $permission_to_edit, $current_User, $allow_moving_chapters;
+	global $line_class, $result_fadeout, $permission_to_edit, $current_User, $Settings;
 
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
@@ -82,7 +82,7 @@ function cat_line( $Chapter, $level )
 	{	// We have permission permission to edit, so display action column:
 		$r .=  action_icon( T_('New...'), 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) )
 					.action_icon( T_('Edit...'), 'edit', $edit_url );
-		if( $allow_moving_chapters )
+		if( $Settings->get('allow_moving_chapters') )
 		{ // If moving cats between blogs is allowed:
 			$r .= action_icon( T_('Move to a different blog...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=move' ), T_('Move') );
 		}
@@ -174,18 +174,22 @@ echo $GenericCategoryCache->recurse( $callbacks, $subset_ID );
 echo '</table>';
 
 /* fp> TODO: maybe... (a general group move of posts would be more useful actually)
-echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a chapter does not delete items from that chapter. It will just assign them to the parent chapter. When deleting a root chapter, items will be assigned to the oldest remaining chapter in the same collection (smallest chapter number).').'</p>';
+echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same collection (smallest category number).').'</p>';
 */
 
-global $allow_moving_chapters;
-if( !$allow_moving_chapters )
-{
-	echo '<p class="note">'.T_('<strong>Note:</strong> Moving chapters across blogs is currently disabled in the config.').'</p> ';
+global $Settings;
+if( ! $Settings->get('allow_moving_chapters') )
+{	// TODO: check perm
+	echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sglobal settings%s.'), '<a href="admin.php?ctrl=features#categories">', '</a>' ).'</p> ';
 }
 
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/11 00:32:26  fplanque
+ * allow_moving_chapters stting moved to UI
+ * chapters are now called categories in the UI
+ *
  * Revision 1.7  2006/12/10 02:07:09  fplanque
  * doc
  *
