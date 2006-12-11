@@ -133,23 +133,38 @@ else
  * Add sub menu entries.
  * We do this here instead of _header because we need to include all filter params into regenerate_url()
  * Note: this will override default tabs from _header config.
- * TODO: check if this is still needed
  */
+
 $AdminUI->add_menu_entries(
 		'edit',
 		array(
-				'postlist2' => array(
-					'text' => T_('Post list'),
-					'href' => regenerate_url( 'tab', 'tab=postlist2&amp;filter=restore' ),
-					),
-				'tracker' => array(
-					'text' => T_('Tracker'),
-					'href' => regenerate_url( 'tab', 'tab=tracker&amp;filter=restore' ),
-					),
 				'posts' => array(
 					'text' => T_('Full posts'),
 					'href' => regenerate_url( 'tab', 'tab=posts&amp;filter=restore' ),
 					),
+				'postlist2' => array(
+					'text' => T_('Post list'),
+					'href' => regenerate_url( 'tab', 'tab=postlist2&amp;filter=restore' ),
+					),
+			)
+	);
+
+if( $Blog->get_setting( 'use_workflow' ) )
+{	// We want to use workflow properties for this blog:
+	$AdminUI->add_menu_entries(
+			'edit',
+			array(
+					'tracker' => array(
+						'text' => T_('Tracker'),
+						'href' => regenerate_url( 'tab', 'tab=tracker&amp;filter=restore' ),
+						),
+				)
+		);
+}
+
+$AdminUI->add_menu_entries(
+		'edit',
+		array(
 			/*	'commentlist' => array(
 					'text' => T_('Comment list'),
 					'href' => 'tab=commentlist ), */

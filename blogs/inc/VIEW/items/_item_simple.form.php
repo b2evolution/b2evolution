@@ -83,10 +83,12 @@ $Form->hidden( 'post_locale', param('post_locale', 'string', $current_User->loca
 $Form->hidden( 'item_typ_ID', param('item_typ_ID', 'integer', NULL) );
 $Form->hidden( 'post_url', param('post_url', 'string', '') );
 $Form->hidden( 'post_urltitle', param('post_urltitle', 'string', '') );
+// Workflow stuff:
 $Form->hidden( 'item_priority', param('item_priority', 'integer', NULL) );
 $Form->hidden( 'item_assigned_user_ID', param('item_assigned_user_ID', 'integer', NULL) );
 $Form->hidden( 'item_st_ID', param('item_st_ID', 'integer', NULL) );
 $Form->hidden( 'item_deadline', param('item_deadline', 'string', NULL) );
+//
 $Form->hidden( 'trackback_url', param('trackback_url', 'string', NULL) );
 $Form->hidden( 'renderers_displayed', 1 );
 $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
@@ -282,6 +284,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.24  2006/12/11 00:02:25  fplanque
+ * Worfklow stuff is now hidden by default and can be enabled on a per blog basis.
+ *
  * Revision 1.23  2006/12/09 01:55:36  fplanque
  * feel free to fill in some missing notes
  * hint: "login" does not need a note! :P
