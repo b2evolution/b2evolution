@@ -20,16 +20,17 @@ function set_new_form_action( form, newaction )
 	var saved_action = form.attributes.getNamedItem('action').value;
 	form.attributes.getNamedItem('action').value = newaction;
 
-	// FIX for Safari (2.0.2, OS X 10.4.3), to not submit the item on "Preview"! - (Konqueror does not fail here)
-	if( form.attributes.getNamedItem('action').value == saved_action )
-	{ // Still old value: Setting form.action failed! (This is the case for Safari)
+	// FIX for Safari (2.0.2, OS X 10.4.3) - (Konqueror does not fail here)
+	if( form.attributes.getNamedItem('action').value != newaction )
+	{ // Setting form.action failed! (This is the case for Safari)
 		// NOTE: checking "form.action == saved_action" (or through document.getElementById()) does not work - Safari uses the input element then
 		{ // _Setting_ form.action however sets the form's action attribute (not the input element) on Safari
 			form.action = newaction;
 		}
 
-		if( form.attributes.getNamedItem('action').value == saved_action )
+		if( form.attributes.getNamedItem('action').value != newaction )
 		{ // Still old value, did not work.
+			alert('Cannot set new form action.');
 			return false;
 		}
 	}
@@ -69,7 +70,7 @@ function b2edit_open_preview( form, newaction )
 
 
 /**
- * Submits the form after setting its action to "newaction" and the blog value to "blog" (if given).
+ * Submits the form after setting its action attribute to "newaction" and the blog value to "blog" (if given).
  *
  * This is used to switch to another blog or tab, but "keep" the input in the form.
  */
@@ -88,7 +89,7 @@ function b2edit_reload( form, newaction, blog )
 	}
 	else if( form.elements.action.value == "create" )
 	{
-		form.elements.action.value = "create_switchtab";
+		form.elements.action.value = "new_switchtab";
 	}
 
 	// Set the blog we are switching to:
