@@ -58,7 +58,7 @@ if( $blog )
 
 	echo '<h3>Shortcuts</h3>';
 	echo '<ul>';
-		echo '<li><a href="admin.php?ctrl=edit&blog='.$Blog->ID.'">Write a new post...</a></li>';
+		echo '<li><a href="admin.php?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'">Write a new post...</a></li>';
 		echo '<li><a href="'.$Blog->get('url').'" target="_blank">Open public blog page</a></li>';
 		if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 		{
@@ -123,6 +123,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/12 21:19:31  fplanque
+ * UI fixes
+ *
  * Revision 1.7  2006/12/12 02:53:56  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.

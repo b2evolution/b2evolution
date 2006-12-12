@@ -183,8 +183,6 @@ while( $Item = & $ItemList->get_item() )
 
 			// Files:
 			echo '<div class="bFeedback">';	// TODO
-			// TODO:
-			$edit_allowed = true;
 
 			/**
 			 * Needed by file display funcs
@@ -192,7 +190,7 @@ while( $Item = & $ItemList->get_item() )
 			 */
 			global $edited_Item;
 			$edited_Item = $Item;	// COPY or it will be out of scope for display funcs
-			require dirname(__FILE__).'/_item_links.inc.php';
+			require dirname(__FILE__).'/inc/_item_links.inc.php';
 			echo '</div>';
 
 
@@ -291,6 +289,9 @@ if( $action == 'list' )
 
 /*
  * $Log$
+ * Revision 1.28  2006/12/12 21:19:31  fplanque
+ * UI fixes
+ *
  * Revision 1.27  2006/12/12 19:39:07  fplanque
  * enhanced file links / permissions
  *

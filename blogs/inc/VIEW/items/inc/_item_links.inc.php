@@ -224,32 +224,13 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.1  2006/12/12 21:19:31  fplanque
+ * UI fixes
+ *
  * Revision 1.12  2006/12/12 19:39:07  fplanque
  * enhanced file links / permissions
  *
  * Revision 1.11  2006/12/12 18:04:53  fplanque
  * fixed item links
- *
- * Revision 1.10  2006/12/07 20:03:32  fplanque
- * Woohoo! File editing... means all skin editing.
- *
- * Revision 1.9  2006/11/30 22:34:15  fplanque
- * bleh
- *
- * Revision 1.8  2006/11/24 18:27:26  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.7  2006/06/13 21:49:15  blueyed
- * Merged from 1.8 branch
- *
- * Revision 1.4.2.1  2006/06/12 20:00:40  fplanque
- * one too many massive syncs...
- *
- * Revision 1.5  2006/05/30 21:53:06  blueyed
- * Replaced $EvoConfig->DB with $db_config
- *
- * Revision 1.4  2006/04/19 20:13:51  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
  */
 ?>

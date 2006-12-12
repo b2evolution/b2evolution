@@ -42,11 +42,6 @@ global $Settings;
 
 global $pagenow;
 
-
-// Begin payload block:
-$this->disp_payload_begin();
-
-
 global $next_action, $mode, $post_title, $post_locale, $post_title, $use_post_url, $post_url, $content;
 global $use_preview, $post_urltitle, $post_status, $post_comment_status, $post_trackbacks;
 global $edit_date, $bozo_start_modified;
@@ -261,13 +256,15 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 // ================================== END OF EDIT FORM ==================================
 $Form->end_form();
 
+// ####################### JS BEHAVIORS #########################
 
-// End payload block:
-$this->disp_payload_end();
-
+require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.26  2006/12/12 21:19:31  fplanque
+ * UI fixes
+ *
  * Revision 1.25  2006/12/12 02:53:57  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.

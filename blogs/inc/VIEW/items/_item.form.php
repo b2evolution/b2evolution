@@ -49,9 +49,6 @@ global $Settings;
 global $pagenow;
 
 
-// Begin payload block:
-$this->disp_payload_begin();
-
 global $next_action, $mode, $post_title, $post_locale, $post_title, $use_post_url, $post_url, $content;
 global $use_preview, $post_urltitle, $post_status, $post_comment_status, $post_trackbacks;
 global $edit_date, $bozo_start_modified;
@@ -70,6 +67,7 @@ if( !empty( $bozo_start_modified ) )
 {
 	$params['bozo_start_modified'] = true;
 }
+
 $Form->begin_form( '', '', $params );
 
 $Form->hidden( 'ctrl', 'items' );
@@ -84,7 +82,6 @@ $Form->hidden( 'more', 1 );
 $Form->hidden( 'preview_userid', $current_User->ID );
 
 ?>
-
 <div class="left_col">
 
 	<?php
@@ -336,29 +333,27 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 $Form->end_form();
 
 
-// End payload block:
-$this->disp_payload_end();
-
 
 // ####################### LINKS #########################
 
 if( $next_action == 'update' )
 { // Editing post
-	// End payload block:
-	$this->disp_payload_begin();
 
-	// Consider that if we are here, we're allowed to edit.
-	$edit_allowed = true;
+	require dirname(__FILE__).'/inc/_item_links.inc.php';
 
-	require dirname(__FILE__).'/_item_links.inc.php';
-
-	// End payload block:
-	$this->disp_payload_end();
 }
+
+
+// ####################### JS BEHAVIORS #########################
+
+require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 
 /*
  * $Log$
+ * Revision 1.34  2006/12/12 21:19:31  fplanque
+ * UI fixes
+ *
  * Revision 1.33  2006/12/12 02:53:57  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.
