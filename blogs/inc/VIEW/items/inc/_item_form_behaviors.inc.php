@@ -28,6 +28,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $js_doc_title_prefix;
 ?>
 <script type="text/javascript">
 	<?php
@@ -35,7 +36,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	if( isset($js_doc_title_prefix) )
 	{ // dynamic document.title handling:
 		?>
-		alert( 'a' );
 		if( post_title_elt = document.getElementById('post_title') )
 		{
 			/**
@@ -87,6 +87,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <?php
 /*
  * $Log$
+ * Revision 1.2  2006/12/12 21:25:31  fplanque
+ * UI fixes
+ *
  * Revision 1.1  2006/12/12 21:19:31  fplanque
  * UI fixes
  *
