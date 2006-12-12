@@ -213,7 +213,7 @@ function b2newpost($m)
 
 	logIO( 'O', 'Handling notifications...' );
 	// Execute or schedule notifications & pings:
-	$edited_Item->handle_post_processing( false );
+	$edited_Item->handle_post_processing();
 
 	return new xmlrpcresp(new xmlrpcval($post_ID));
 }
@@ -425,7 +425,7 @@ function bloggernewpost( $m )
 
 	logIO( 'O', 'Handling notifications...' );
 	// Execute or schedule notifications & pings:
-	$edited_Item->handle_post_processing( false );
+	$edited_Item->handle_post_processing();
 
 	logIO("O","All done.");
 
@@ -559,7 +559,7 @@ function bloggereditpost($m)
 
 	logIO( 'O', 'Handling notifications...' );
 	// Execute or schedule notifications & pings:
-	$edited_Item->handle_post_processing( false );
+	$edited_Item->handle_post_processing();
 
 	return new xmlrpcresp(new xmlrpcval("1", "boolean"));
 }
@@ -1359,7 +1359,7 @@ function mwnewpost($m)
 
 	logIO( 'O', 'Handling notifications...' );
 	// Execute or schedule notifications & pings:
-	$edited_Item->handle_post_processing( false );
+	$edited_Item->handle_post_processing();
 
 	return new xmlrpcresp(new xmlrpcval($post_ID));
 }
@@ -2213,6 +2213,10 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.129  2006/12/12 02:53:57  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.128  2006/12/06 17:49:11  blueyed
  * Moved strip_all_but_one_link() to obsolete2.php; doc (pingback removed)
  *

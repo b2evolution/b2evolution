@@ -115,9 +115,9 @@ $AdminUI->add_menu_entries(
 				'style' => 'font-weight: bold;'
 				),
 
-			'edit' => array(
-				'text' => T_('Posts'),
-				'href' => 'admin.php?ctrl=browse&amp;blog='.$blog.'&amp;filter=restore',
+			'items' => array(
+				'text' => T_('Posts / Comments'),
+				'href' => 'admin.php?ctrl=items&amp;blog='.$blog.'&amp;filter=restore',
 			),
 
 			'files' => array(
@@ -299,6 +299,10 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.34  2006/12/12 02:53:56  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.33  2006/12/11 16:53:47  fplanque
  * controller name cleanup
  *

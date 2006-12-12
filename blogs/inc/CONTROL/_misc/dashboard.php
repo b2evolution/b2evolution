@@ -80,6 +80,8 @@ if( $blog )
 			'posts' => 5
 		) );
 
+	// fp> TODO: this overwrites saved filters from the posts tab. make sure it doesn't/
+
 	// Init filter params:
 	if( ! $ItemList->load_from_Request() )
 	{ // If we could not init a filterset from request
@@ -121,6 +123,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2006/12/12 02:53:56  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.6  2006/12/11 17:26:21  fplanque
  * some cross-linking
  *

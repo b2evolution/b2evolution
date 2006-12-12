@@ -40,26 +40,17 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function trackbacks( $post_trackbacks, $content, $post_title, $post_ID )
 {
-	echo "<div class=\"panelinfo\">\n";
-	echo "<h3>", T_('Sending trackbacks...'), "</h3>\n";
-	if(empty($post_trackbacks))
-	{
-		echo "<p>", T_('No trackback to be sent.'), "</p>\n";
+	global $Messages;
+
+	$excerpt = (strlen(strip_tags($content)) > 255) ? substr(strip_tags($content), 0, 252).'...' : strip_tags($content);
+	$Messages->add( T_('Excerpt sent in trackbacks:').' '.$excerpt, 'note' );
+	$trackback_urls = split('( )+', $post_trackbacks,10);		// fplanque: ;
+	foreach($trackback_urls as $tb_url)
+	{ // trackback each url:
+		$tb_url = trim($tb_url);
+		if( empty( $tb_url ) ) continue;
+		trackback($tb_url, $post_title, $excerpt, $post_ID);
 	}
-	else
-	{
-		$excerpt = (strlen(strip_tags($content)) > 255) ? substr(strip_tags($content), 0, 252).'...' : strip_tags($content);
-		echo "<p>", T_('Excerpt to be sent:'), " $excerpt</p>\n";
-		$trackback_urls = split('( )+', $post_trackbacks,10);		// fplanque: ;
-		foreach($trackback_urls as $tb_url)
-		{ // trackback each url:
-			$tb_url = trim($tb_url);
-			if( empty( $tb_url ) ) continue;
-			trackback($tb_url, $post_title, $excerpt, $post_ID);
-		}
-		echo "<p>", T_('Trackbacks done.'), "</p>\n";
-	}
-	echo "</div>\n";
 }
 
 
@@ -221,6 +212,10 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/12 02:53:57  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.10  2006/09/15 23:42:15  blueyed
  * Fixed possible E_NOTICE when sending a successful trackback
  *

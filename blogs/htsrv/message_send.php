@@ -154,7 +154,7 @@ if( !empty( $comment_id ) )
 	// Getting current blog info:
 	$Blog = & $BlogCache->get_by_ID( $blog );	// Required
 	$message_footer .= T_('Message sent from your comment:') . "\n"
-		.url_add_param( $Blog->get('url'), 'p='.$post_id.'&c=1&tb=1&pb=1#'.$comment_id, '&' )
+		.url_add_param( $Blog->get('url'), 'p='.$post_id.'#'.$comment_id, '&' )
 		."\n\n";
 }
 elseif( !empty( $post_id ) )
@@ -162,7 +162,7 @@ elseif( !empty( $post_id ) )
 	// Getting current blog info:
 	$Blog = & $BlogCache->get_by_ID( $blog );	// Required
 	$message_footer .= T_('Message sent from your post:') . "\n"
-		.url_add_param( $Blog->get('url'), 'p='.$post_id.'&c=1&tb=1&pb=1', '&' )
+		.url_add_param( $Blog->get('url'), 'p='.$post_id, '&' )
 		."\n\n";
 }
 else
@@ -311,6 +311,10 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.48  2006/12/12 02:53:56  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.47  2006/11/26 02:30:38  fplanque
  * doc / todo
  *

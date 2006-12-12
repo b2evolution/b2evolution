@@ -138,7 +138,7 @@ class wikilinks_plugin extends Plugin
 				else
 				{ // Item not found
 
-					$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=edit&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^A-Z_])([A-Z])*', '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
+					$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^A-Z_])([A-Z])*', '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
 
 					// WikiWord
 					$replace_links[] = '<span class="NonExistentWikiWord">'.$WikiWord.$create_link.'</span>';
@@ -226,7 +226,7 @@ class wikilinks_plugin extends Plugin
 			else
 			{ // Item not found
 
-				$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=edit&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^A-Z_])([A-Z])*', '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
+				$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^A-Z_])([A-Z])*', '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
 
 				// [[WikiWord text]]
 				$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';
@@ -259,6 +259,10 @@ class wikilinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.22  2006/12/12 02:53:57  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.21  2006/08/19 07:56:32  fplanque
  * Moved a lot of stuff out of the automatic instanciation in _main.inc
  *

@@ -36,9 +36,8 @@ global $comments_use_autobr, $mode, $month, $tab;
 $Form = & new Form( NULL, 'post', 'post', 'linespan' );
 
 $Form->begin_form( 'eform' );
-$Form->hidden( 'ctrl', 'editactions' );
-$Form->hidden( 'action', 'editedcomment' );
-$Form->hidden( 'blog', $Blog->ID );
+$Form->hidden( 'ctrl', 'comments' );
+$Form->hidden( 'action', 'update' );
 $Form->hidden( 'comment_ID', $edited_Comment->ID );
 ?>
 
@@ -109,52 +108,20 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		<?php
 		if( $current_User->check_perm( 'edit_timestamp' ) )
 		{	// ------------------------------------ TIME STAMP -------------------------------------
-			$aa = mysql2date('Y', $edited_Comment->date);
-			$mm = mysql2date('m', $edited_Comment->date);
-			$jj = mysql2date('d', $edited_Comment->date);
-			$hh = mysql2date('H', $edited_Comment->date);
-			$mn = mysql2date('i', $edited_Comment->date);
-			$ss = mysql2date('s', $edited_Comment->date);
-			?>
-			<div>
-			<input type="checkbox" class="checkbox" name="edit_date" value="1" id="timestamp"
-				tabindex="13" />
-			<label for="timestamp"><strong><?php echo T_('Edit timestamp') ?></strong>:</label>
-			<span class="nobr">
-			<input type="text" name="jj" value="<?php echo $jj ?>" size="2" maxlength="2" tabindex="14" />
-			<select name="mm" tabindex="15">
-			<?php
-			for ($i = 1; $i < 13; $i = $i + 1)
-			{
-				echo "\t\t\t<option value=\"$i\"";
-				if ($i == $mm)
-				echo ' selected="selected"';
-				if ($i < 10) {
-					$ii = '0'.$i;
-				} else {
-					$ii = "$i";
-				}
-				echo ">";
-				echo T_($month[$ii]);
-				echo "</option>\n";
-			}
-			?>
-		</select>
-
-		<input type="text" name="aa" value="<?php echo $aa ?>" size="4" maxlength="5" tabindex="16" />
-		</span>
-		<span class="nobr">@
-		<input type="text" name="hh" value="<?php echo $hh ?>" size="2" maxlength="2" tabindex="17" />:<input type="text" name="mn" value="<?php echo $mn ?>" size="2" maxlength="2" tabindex="18" />:<input type="text" name="ss" value="<?php echo $ss ?>" size="2" maxlength="2" tabindex="19" />
-		</span></div>
-		<?php
+			echo '<div id="itemform_edit_timestamp">';
+			$Form->date( 'comment_issue_date', $edited_Comment->date, T_('Comment date') );
+			echo ' '; // allow wrapping!
+			$Form->time( 'comment_issue_time', $edited_Comment->date, '' );
+			echo '</div>';
 		}
 
 		// --------------------------- AUTOBR --------------------------------------
-			// fp> TODO: this should be Auto-P and handled by the Auto-P plugin in the next fieldset
+		// fp> TODO: this should be Auto-P and handled by the Auto-P plugin
 		?>
-		<input type="checkbox" class="checkbox" name="post_autobr" value="1" <?php
-		if( $comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out' ) echo ' checked="checked"' ?> id="autobr" tabindex="6" /><label for="autobr">
-		<strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('This option is deprecated, you should avoid using it.') ?></span></label><br />
+		<input type="checkbox" class="checkbox" name="post_autobr" value="1"
+		<?php	if( $comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out' ) echo ' checked="checked"' ?>
+			id="autobr" tabindex="6" />
+		<label for="autobr"><strong><?php echo T_('Auto-BR') ?></strong></label>
 
 	</fieldset>
 
@@ -199,6 +166,10 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.21  2006/12/12 02:53:56  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.20  2006/12/06 23:55:53  fplanque
  * hidden the dead body of the sidebar plugin + doc
  *

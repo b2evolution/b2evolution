@@ -52,11 +52,11 @@ global $pagenow;
 // Begin payload block:
 $this->disp_payload_begin();
 
-global $form_action, $next_action, $mode, $post_title, $post_locale, $post_title, $use_post_url, $post_url, $content;
+global $next_action, $mode, $post_title, $post_locale, $post_title, $use_post_url, $post_url, $content;
 global $use_preview, $post_urltitle, $post_status, $post_comment_status, $post_trackbacks;
 global $edit_date, $bozo_start_modified;
 
-$Form = & new Form( $form_action, 'item_checkchanges', 'post', 'none' );
+$Form = & new Form( NULL, 'item_checkchanges', 'post', 'none' );
 $Form->fieldstart = '<div class="tile">';
 $Form->fieldend = '</div>';
 $Form->labelstart = '<strong>';
@@ -72,6 +72,7 @@ if( !empty( $bozo_start_modified ) )
 }
 $Form->begin_form( '', '', $params );
 
+$Form->hidden( 'ctrl', 'items' );
 $Form->hidden( 'action', $next_action );
 $Form->hidden( 'blog', $Blog->ID );
 if( isset( $mode ) )   $Form->hidden( 'mode', $mode );	// used by bookmarklet
@@ -358,6 +359,10 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.33  2006/12/12 02:53:57  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.32  2006/12/10 23:56:26  fplanque
  * Worfklow stuff is now hidden by default and can be enabled on a per blog basis.
  *

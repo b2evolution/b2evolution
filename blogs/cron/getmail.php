@@ -336,7 +336,7 @@ switch ( $Settings->get('eblog_method') )
 				$post_ID = $edited_Item->insert( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale );
 
 				// Execute or schedule notifications & pings:
-				$edited_Item->handle_post_processing( false );
+				$edited_Item->handle_post_processing();
 			}
 
 			echo "\n<p><strong>", T_('Posted title'), ':</strong> ', $post_title, '<br />';
@@ -595,7 +595,7 @@ switch ( $Settings->get('eblog_method') )
 				$post_ID = $edited_Item->insert( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale );
 
 				// Execute or schedule notifications & pings:
-				$edited_Item->handle_post_processing( false );
+				$edited_Item->handle_post_processing();
 			}
 
 			echo_message( '&bull;<b>' . T_('Post title') . ":</b> $post_title<br/>",'',3 );

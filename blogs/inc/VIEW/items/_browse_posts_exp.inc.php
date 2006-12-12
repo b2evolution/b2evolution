@@ -33,10 +33,25 @@ global $ItemList;
  */
 global $Item;
 
-global $dispatcher, $blog, $posts, $poststart, $postend, $c, $ReqURI;
-global $add_item_url, $edit_item_url, $delete_item_url, $htsrv_url;
+global $action, $dispatcher, $blog, $posts, $poststart, $postend, $ReqURI;
+global $edit_item_url, $delete_item_url, $htsrv_url;
 global $comment_allowed_tags, $comments_use_autobr;
 
+
+// Run the query:
+$ItemList->query();
+
+// Old style globals for category.funcs:
+global $postIDlist;
+$postIDlist = $ItemList->get_page_ID_list();
+global $postIDarray;
+$postIDarray = $ItemList->get_page_ID_array();
+
+
+if( $action == 'view' )
+{	// We are displaying a single post:
+	echo '<div class="floatright">'.action_icon( T_('Close post'), 'close', regenerate_url( 'action' ), T_('close'), 4, 1 ).'</div>';
+}
 
 // Display title depending on selection params:
 echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
@@ -44,7 +59,7 @@ echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
 // Init display features:
 $display_params = array(
 					'header_start' => '<div class="NavBar center"><div class="floatright">'
-								.action_icon( T_('New post...'), 'new', $add_item_url, T_('New post...'), 3, 4 ).'</div>',
+								.action_icon( T_('New post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post...'), 3, 4 ).'</div>',
 						'header_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
 						'header_text_single' => T_('1 page'),
 					'header_end' => '</div>',
@@ -150,7 +165,7 @@ while( $Item = & $ItemList->get_item() )
 
 			if( $Blog->allowcomments != 'never' )
 			{
-				echo '<a href="?ctrl=browse&amp;tab=posts&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'&amp;c=1" class="ActionButton">';
+				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'&amp;c=1" class="ActionButton">';
 				// TRANS: Link to comments for current post
 				comments_number(T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
 				load_funcs( '_misc/_trackback.funcs.php' ); // TODO: use newer call below
@@ -161,9 +176,9 @@ while( $Item = & $ItemList->get_item() )
 
 		<?php
 		// ---------- comments ----------
-		global $c;
-		if( $c )
-		{ // We have request display of comments
+
+		if( $action == 'view' )
+		{ // We are looking at a single post, include comments:
 			?>
 			<div class="bFeedback">
 			<a id="comments"></a>
@@ -250,10 +265,17 @@ while( $Item = & $ItemList->get_item() )
 // Display navigation:
 $ItemList->display_nav( 'footer' );
 
-echo '<p class="center">'.action_icon( T_('New post...'), 'new', $add_item_url, T_('New post...'), 3, 4 ).'</p>';
+if( $action == 'list' )
+{
+	echo '<p class="center">'.action_icon( T_('New post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post...'), 3, 4 ).'</p>';
+}
 
 /*
  * $Log$
+ * Revision 1.26  2006/12/12 02:53:57  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.25  2006/12/07 22:29:26  fplanque
  * reorganized menus / basic dashboard
  *

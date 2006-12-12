@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the UI controller for the browsing posts.
+ * This file implements the UI controller for managing posts.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -51,6 +51,9 @@ switch( $action )
 		break;
 
 	case 'update':
+	case 'publish':
+	case 'deprecate':
+	case 'delete':
  		// Load post to edit:
  		// Note: we need to *not* use $p here or it will conflict with the list display
 		param( 'post_ID', 'integer', true, true );
@@ -67,7 +70,7 @@ switch( $action )
 	case 'list':
 		if( $action == 'list' )
 		{	// We only need view permission
-			$blog = autoselect_blog( param( 'blog', 'integer', 0 ), 'blog_ismember', 1 );
+			$blog = autoselect_blog( $blog, 'blog_ismember', 1 );
 		}
 		else
 		{	// We need posting permission
@@ -243,6 +246,9 @@ switch( $action )
 		// Execute or schedule notifications & pings:
 		$edited_Item->handle_post_processing();
 
+		$Messages->add( T_('Post has been created.'), 'success' );
+
+		// Switch to list mode:
 		$action = 'list';
 		init_list_mode();
 		break;
@@ -272,7 +278,7 @@ switch( $action )
 		$Plugins->trigger_event( 'AdminBeforeItemEditUpdate', array( 'Item' => & $edited_Item ) );
 
 		if( $Messages->count('error') )
-		{	// There hace been some validation errors:
+		{	// There have been some validation errors:
 			// Params we need for tab switching:
 			$tab_switch_params = 'p='.$post_ID;
 			break;
@@ -299,12 +305,81 @@ switch( $action )
 		// Execute or schedule notifications & pings:
 		$edited_Item->handle_post_processing();
 
+		$Messages->add( T_('Post has been updated.'), 'success' );
+
+		// Switch to list mode:
+		$action = 'list';
+		init_list_mode();
+		break;
+
+
+	case 'publish':
+		// Publish NOW:
+
+		$post_status = 'published';
+		// Check permissions:
+		/* TODO: Check extra categories!!! */
+		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
+		$current_User->check_perm( 'edit_timestamp', 'any', true ) ;
+
+		$edited_Item->set( 'status', $post_status );
+
+		$post_date = date('Y-m-d H:i:s', $localtimenow);
+		$edited_Item->set( 'datestart', $post_date );
+		$edited_Item->set( 'datemodified', $post_date );
+
+		// UPDATE POST IN DB:
+		$edited_Item->dbupdate();
+
+		// Execute or schedule notifications & pings:
+		$edited_Item->handle_post_processing();
+
+		$Messages->add( T_('Post has been published.'), 'success' );
+
+		// Switch to list mode:
+		$action = 'list';
+		init_list_mode();
+		break;
+
+
+	case 'deprecate':
+
+		$post_status = 'deprecated';
+		// Check permissions:
+		/* TODO: Check extra categories!!! */
+		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
+
+		$edited_Item->set( 'status', $post_status );
+		$edited_Item->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
+
+		// UPDATE POST IN DB:
+		$edited_Item->dbupdate();
+
+		$Messages->add( T_('Post has been deprecated.'), 'success' );
+
+		// Switch to list mode:
 		$action = 'list';
 		init_list_mode();
 		break;
 
 
 	case 'delete':
+		// Delete an Item:
+
+		// Check permission:
+		$current_User->check_perm( 'blog_del_post', '', true, $blog );
+
+		// fp> TODO: non javascript confirmation
+		// $AdminUI->title = T_('Deleting post...');
+
+		// DELETE POST FROM DB:
+		$edited_Item->dbdelete();
+
+		$Messages->add( T_('Post has been deleted.'), 'success' );
+
+		// Switch to list mode:
+		$action = 'list';
+		init_list_mode();
 		break;
 
 
@@ -322,8 +397,8 @@ switch( $action )
 		debug_die( 'unhandled action 2' );
 }
 
-/*
- * Action pass 2
+/**
+ * Initialize list mode; Several actions need this.
  */
 function init_list_mode()
 {
@@ -422,44 +497,8 @@ switch( $action )
 		 * Add sub menu entries:
 		 * We do this here instead of _header because we need to include all filter params into regenerate_url()
 		 */
-		$AdminUI->add_menu_entries(
-				'items',
-				array(
-						'full' => array(
-							'text' => T_('Full posts'),
-							'href' => regenerate_url( 'tab', 'tab=full&amp;filter=restore' ),
-							),
-						'list' => array(
-							'text' => T_('Post list'),
-							'href' => regenerate_url( 'tab', 'tab=list&amp;filter=restore' ),
-							),
-					)
-			);
+		attach_browse_tabs();
 
-		if( $Blog->get_setting( 'use_workflow' ) )
-		{	// We want to use workflow properties for this blog:
-			$AdminUI->add_menu_entries(
-					'items',
-					array(
-							'tracker' => array(
-								'text' => T_('Tracker'),
-								'href' => regenerate_url( 'tab', 'tab=tracker&amp;filter=restore' ),
-								),
-						)
-				);
-		}
-
-		/* ignore these for now
-		$AdminUI->add_menu_entries(
-				'items',
-				array(
-						'comments' => array(
-							'text' => T_('Comments'),
-							'href' => regenerate_url( 'tab', 'tab=comments' ),
-							),
-					)
-			);
-		*/
 		break;
 }
 
@@ -486,7 +525,6 @@ switch( $action )
 		$creating = true; // used by cat_select_before_each()
 	case 'edit':
 	case 'update':	// on error
-	case 'delete':
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
@@ -513,6 +551,7 @@ switch( $action )
 		break;
 
 	case 'view':
+	case 'delete':
 		// View a single post:
 
  		// Begin payload block:
@@ -574,6 +613,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2006/12/12 02:53:56  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.2  2006/12/12 00:39:46  fplanque
  * The bulk of item editing is done.
  *

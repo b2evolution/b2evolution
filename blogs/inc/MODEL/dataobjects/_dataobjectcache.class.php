@@ -313,7 +313,7 @@ class DataObjectCache
 	 * @param integer ID of object to load
 	 * @param boolean true if function should die on error
 	 * @param boolean true if function should die on empty/null
-	 * @return reference on cached object
+	 * @return DataObject reference on cached object
 	 */
 	function & get_by_ID( $req_ID, $halt_on_error = true, $halt_on_empty = true )
 	{
@@ -516,6 +516,10 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.24  2006/12/12 02:53:56  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.23  2006/12/05 01:35:27  blueyed
  * Hooray for less complexity and the 8th param for DataObjectCache()
  *

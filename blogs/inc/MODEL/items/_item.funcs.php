@@ -565,7 +565,7 @@ function cat_select_before_first( $parent_cat_ID, $level )
  */
 function cat_select_before_each( $cat_ID, $level, $total_count )
 { // callback to display sublist element
-	global $current_blog_ID, $blog, $cat, $post_extracats, $default_main_cat, $next_action;
+	global $current_blog_ID, $blog, $post_extracats, $default_main_cat, $next_action;
 	global $creating, $allow_cross_posting, $cat_select_level, $cat_select_form_fields;
 	$this_cat = get_the_category_by_ID( $cat_ID );
 	$r = "\n".'<tr class="'.( $total_count%2 ? 'odd' : 'even' ).'">';
@@ -648,8 +648,58 @@ function cat_select_after_last( $parent_cat_ID, $level )
 }
 
 
+/**
+ * Used by the items & the comments controllers
+ */
+function attach_browse_tabs()
+{
+	global $AdminUI, $Blog;
+
+	$AdminUI->add_menu_entries(
+			'items',
+			array(
+					'full' => array(
+						'text' => T_('Full posts'),
+						'href' => regenerate_url( 'ctrl,tab', 'ctrl=items&amp;tab=full&amp;filter=restore' ),
+						),
+					'list' => array(
+						'text' => T_('Post list'),
+						'href' => regenerate_url( 'ctrl,tab', 'ctrl=items&amp;tab=list&amp;filter=restore' ),
+						),
+				)
+		);
+
+	if( $Blog->get_setting( 'use_workflow' ) )
+	{	// We want to use workflow properties for this blog:
+		$AdminUI->add_menu_entries(
+				'items',
+				array(
+						'tracker' => array(
+							'text' => T_('Tracker'),
+							'href' => regenerate_url( 'ctrl,tab', 'ctrl=items&amp;tab=tracker&amp;filter=restore' ),
+							),
+					)
+			);
+	}
+
+	$AdminUI->add_menu_entries(
+			'items',
+			array(
+					'comments' => array(
+						'text' => T_('Comments'),
+						'href' => 'admin.php?ctrl=comments',
+						),
+				)
+		);
+}
+
+
 /*
  * $Log$
+ * Revision 1.35  2006/12/12 02:53:56  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.34  2006/12/11 17:26:21  fplanque
  * some cross-linking
  *

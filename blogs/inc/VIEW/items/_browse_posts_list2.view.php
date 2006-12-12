@@ -28,7 +28,7 @@ global $Blog;
  */
 global $ItemList;
 
-global $add_item_url, $edit_item_url, $delete_item_url;
+global $edit_item_url, $delete_item_url;
 
 
 // Display title depending on selection params:
@@ -99,7 +99,7 @@ function task_title_link( $Item )
 	if( $Item->Blog->allowcomments != 'never' )
 	{	// The current blog can have comments:
 		$nb_comments = generic_ctp_number($Item->ID, 'feedback');
-		$col .= '<a href="?ctrl=browse&amp;tab=posts&amp;blog='.$Item->blog_ID.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1"
+		$col .= '<a href="?ctrl=items&amp;blog='.$Item->blog_ID.'&amp;p='.$Item->ID.'"
 						title="'.sprintf( T_('%d feedbacks'), $nb_comments ).'" class="">';
 		if( $nb_comments )
 		{
@@ -112,7 +112,7 @@ function task_title_link( $Item )
 		$col .= '</a> ';
 	}
 
-	$col .= '<a href="?ctrl=browse&amp;blog='.$Item->blog_ID.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1" class="" title="'.
+	$col .= '<a href="?ctrl=items&amp;blog='.$Item->blog_ID.'&amp;p='.$Item->ID.'" class="" title="'.
 								T_('Edit this task...').'">'.$Item->dget('title').'</a></strong>';
 
 	return $col;
@@ -184,7 +184,7 @@ $ItemList->cols[] = array(
 
 if( $current_User->check_perm( 'blog_post_statuses', 'any', false, $Blog->ID ) )
 {	// We have permission to add a post with at least one status:
-	$ItemList->global_icon( T_('Add a post...'), 'new', $add_item_url, T_('New post...'), 3, 4 );
+	$ItemList->global_icon( T_('Add a post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, T_('New post...'), 3, 4 );
 }
 
 
@@ -202,6 +202,10 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.16  2006/12/12 02:53:57  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.15  2006/12/07 23:59:31  fplanque
  * basic dashboard stuff
  *

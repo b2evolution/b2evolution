@@ -71,8 +71,8 @@ while( $Comment = & $CommentList->get_next() )
 			<?php
 			$comment_Item = & $Comment->get_Item();
 			echo T_('In response to:')
-				.' <a href="?ctrl=browse&amp;blog='.$Blog->ID.'&amp;tab=posts&amp;p='.$comment_Item->ID
-				.'&amp;c=1&amp;tb=1&amp;pb=1" class="" title="'.T_('Edit this task...').'">'.$comment_Item->dget('title').'</a>';
+				.' <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$comment_Item->ID
+				.'" title="'.T_('Edit this task...').'">'.$comment_Item->dget('title').'</a>';
 			?>
 		</div>
 		<div class="bCommentTitle">
@@ -123,6 +123,10 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.10  2006/12/12 02:53:57  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.9  2006/07/04 17:32:29  fplanque
  * no message
  *

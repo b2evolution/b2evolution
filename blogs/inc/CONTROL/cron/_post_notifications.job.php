@@ -46,7 +46,7 @@ $ItemCache = & get_Cache( 'ItemCache' );
 $edited_Item = & $ItemCache->get_by_ID( $item_ID );
 
 // send outbound pings:
-$edited_Item->send_outbound_pings( false );
+$edited_Item->send_outbound_pings();
 
 // Send email notifications now!
 $edited_Item->send_email_notifications( false );
@@ -63,6 +63,10 @@ return 1; /* ok */
 
 /*
  * $Log$
+ * Revision 1.3  2006/12/12 02:53:56  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.2  2006/11/26 22:25:12  blueyed
  * MFB: Normalized messages (dot at end of full sentences)
  *

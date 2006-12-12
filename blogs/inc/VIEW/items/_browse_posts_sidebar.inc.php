@@ -64,7 +64,7 @@ echo '<div class="browse_side_item">';
 		echo '<h3>'.T_('Filters').'</h3>';
 
 		// TODO: style this better...
-		echo '<p><a href="?ctrl=browse&amp;blog='.$Blog->ID.'&amp;filter=reset">'.T_('Reset all filters!').'</a></p>';
+		echo '<p><a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset">'.T_('Reset all filters!').'</a></p>';
 
 		$Form->hidden( 'tab', $tab );
 		$Form->hidden( 'blog', $Blog->ID );
@@ -249,7 +249,7 @@ echo '<div class="browse_side_item">';
 		$Form->submit( array( 'submit', T_('Search'), 'search' ) );
 
 		// TODO: style this better:
-		echo '<a href="?ctrl=browse&amp;blog='.$Blog->ID.'&amp;filter=reset" class="ActionButton">'.T_('Reset all filters!').'</a>';
+		echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset" class="ActionButton">'.T_('Reset all filters!').'</a>';
 
 	$Form->end_form();
 
@@ -257,6 +257,10 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/12 02:53:57  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.10  2006/11/19 03:50:29  fplanque
  * cleaned up CSS
  *

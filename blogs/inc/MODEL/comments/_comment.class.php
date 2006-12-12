@@ -510,7 +510,7 @@ class Comment extends DataObject
 		if( $title == '#' ) $title = T_('Edit this comment');
 
 		echo $before;
-		echo '<a href="'.$admin_url.'?ctrl=edit&amp;action=editcomment&amp;comment='.$this->ID;
+		echo '<a href="'.$admin_url.'?ctrl=comments&amp;action=edit&amp;comment_ID='.$this->ID;
 		echo '" title="'.$title.'"';
 		if( !empty( $class ) ) echo ' class="'.$class.'"';
 		echo '>'.$text.'</a>';
@@ -556,7 +556,7 @@ class Comment extends DataObject
 		}
 		if( $title == '#' ) $title = T_('Delete this comment');
 
-		$url = $admin_url.'?ctrl=editactions&amp;action=deletecomment&amp;comment_ID='.$this->ID;
+		$url = $admin_url.'?ctrl=comments&amp;action=delete&amp;comment_ID='.$this->ID;
 
 		echo $before;
 		if( $button )
@@ -617,7 +617,7 @@ class Comment extends DataObject
 		}
 		//else
 		{
-			$r .= $admin_url.'?ctrl=editactions'.$glue.'action=deprecate_comment'.$glue.'comment_ID='.$this->ID;
+			$r .= $admin_url.'?ctrl=comments'.$glue.'action=deprecate'.$glue.'comment_ID='.$this->ID;
 		}
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
@@ -680,7 +680,7 @@ class Comment extends DataObject
 		}
 		//else
 		{
-			$r .= $admin_url.'?ctrl=editactions'.$glue.'action=publish_comment'.$glue.'comment_ID='.$this->ID;
+			$r .= $admin_url.'?ctrl=comments'.$glue.'action=publish'.$glue.'comment_ID='.$this->ID;
 		}
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
@@ -1066,7 +1066,7 @@ class Comment extends DataObject
 			$notify_message .=
 				T_('Comment').': '.str_replace('&amp;', '&', $this->get_permanent_url( 'pid' ))."\n" // We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 				.$this->get('content')."\n\n"
-				.T_('Edit/Delete').': '.$admin_url.'?ctrl=browse&tab=posts&blog='.$this->Item->blog_ID.'&p='.$this->Item->ID."&c=1\n\n"
+				.T_('Edit/Delete').': '.$admin_url.'?ctrl=items&blog='.$this->Item->blog_ID.'&p='.$this->Item->ID."\n\n"
 				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
 
 			if( $debug )
@@ -1180,6 +1180,10 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.54  2006/12/12 02:53:56  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.53  2006/12/07 23:13:10  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!

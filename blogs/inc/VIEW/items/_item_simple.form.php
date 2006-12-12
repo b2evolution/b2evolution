@@ -47,11 +47,11 @@ global $pagenow;
 $this->disp_payload_begin();
 
 
-global $form_action, $next_action, $mode, $post_title, $post_locale, $post_title, $use_post_url, $post_url, $content;
+global $next_action, $mode, $post_title, $post_locale, $post_title, $use_post_url, $post_url, $content;
 global $use_preview, $post_urltitle, $post_status, $post_comment_status, $post_trackbacks;
 global $edit_date, $bozo_start_modified;
 
-$Form = & new Form( $form_action, 'item_checkchanges', 'post', 'none' );
+$Form = & new Form( NULL, 'item_checkchanges', 'post', 'none' );
 $Form->fieldstart = '<div class="tile">';
 $Form->fieldend = '</div>';
 $Form->labelstart = '<strong>';
@@ -67,6 +67,7 @@ if( !empty( $bozo_start_modified ) )
 }
 $Form->begin_form( '', '', $params );
 
+$Form->hidden( 'ctrl', 'items' );
 $Form->hidden( 'action', $next_action );
 $Form->hidden( 'blog', $Blog->ID );
 if( isset( $mode ) )   $Form->hidden( 'mode', $mode ); // used by bookmarklet
@@ -265,25 +266,12 @@ $Form->end_form();
 $this->disp_payload_end();
 
 
-// ####################### LINKS #########################
-
-if( $next_action == 'update' )
-{ // Editing post
-	// End payload block:
-	$this->disp_payload_begin();
-
-	// Consider that if we are here, we're allowed to edit.
-	$edit_allowed = true;
-
-	require dirname(__FILE__).'/_item_links.inc.php';
-
-	// End payload block:
-	$this->disp_payload_end();
-}
-
-
 /*
  * $Log$
+ * Revision 1.25  2006/12/12 02:53:57  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.24  2006/12/11 00:02:25  fplanque
  * Worfklow stuff is now hidden by default and can be enabled on a per blog basis.
  *

@@ -315,7 +315,7 @@ function pingback_ping( $m )
 							$notify_message .= T_('Website'). ": $original_title\n";
 							$notify_message .= T_('Url'). ": $original_pagelinkedfrom\n";
 							$notify_message .= T_('Excerpt'). ": \n[...] $original_context [...]\n\n";
-							$notify_message .= T_('Edit/Delete').': '.$admin_url.'?ctrl=browse&amp;blog='.$blog.'&p='.$post_ID."&c=1\n\n";
+							$notify_message .= T_('Edit/Delete').': '.$admin_url.'?ctrl=items&amp;blog='.$blog.'&p='.$post_ID."&c=1\n\n";
 
 							send_mail( $recipient, $subject, $notify_message, $notify_from );
 

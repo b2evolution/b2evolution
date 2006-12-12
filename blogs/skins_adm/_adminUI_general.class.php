@@ -923,9 +923,9 @@ class AdminUI_general
 						'tfoot_start' => "<tfoot>\n",
 						'tfoot_end' => "</tfoot>\n\n",
 						'body_start' => "<tbody>\n",
-							'line_start' => "<tr>\n",
+							'line_start' => '<tr class="even">'."\n",
 							'line_start_odd' => '<tr class="odd">'."\n",
-							'line_start_last' => '<tr class="lastline">'."\n",
+							'line_start_last' => '<tr class="even lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
 								'col_start' => '<td $class_attrib$>',
 								'col_start_first' => '<td class="firstcol $class$">',
@@ -1332,6 +1332,10 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.37  2006/12/12 02:53:57  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.36  2006/12/03 01:58:27  blueyed
  * Renamed $admin_path_seprator to $admin_path_separator and AdminUI_general::pathSeperator to AdminUI::pathSeparator
  *

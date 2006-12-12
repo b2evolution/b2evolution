@@ -736,12 +736,16 @@ $post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $post
 writeBackSendConf( $md );
 
 // Execute or schedule notifications & pings:
-$edited_Item->handle_post_processing( false );
+$edited_Item->handle_post_processing();
 
 exit;
 
 /*
  * $Log$
+ * Revision 1.9  2006/12/12 02:53:56  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.8  2006/12/07 00:55:51  fplanque
  * reorganized some settings
  *

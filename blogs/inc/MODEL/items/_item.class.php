@@ -1844,7 +1844,7 @@ class Item extends DataObject
 			if( $edit_comments_link == '#' )
 			{	// Use default link:
 				global $admin_url;
-				$edit_comments_link = '<a href="'.$admin_url.'?ctrl=browse&amp;tab=posts&amp;blog='.$this->blog_ID.'&amp;p='.$this->ID.'&amp;c=1&amp;tb=1&amp;pb=1#comments" title="'.T_('Moderate these feedbacks').'">'.get_icon( 'edit' ).' '.T_('Moderate...').'</a>';
+				$edit_comments_link = '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$this->blog_ID.'&amp;p='.$this->ID.'#comments" title="'.T_('Moderate these feedbacks').'">'.get_icon( 'edit' ).' '.T_('Moderate...').'</a>';
 			}
 		}
 		else
@@ -1902,7 +1902,7 @@ class Item extends DataObject
 
 		if( $actionurl == '#' )
 		{
-			$actionurl = $admin_url.'?ctrl=editactions&amp;action=delete&amp;post=';
+			$actionurl = $admin_url.'?ctrl=items&amp;action=delete&amp;post_ID=';
 		}
 		$url = $actionurl.$this->ID;
 
@@ -1980,7 +1980,7 @@ class Item extends DataObject
 
 		if( $actionurl == '#' )
 		{
-			$actionurl = $admin_url.'?ctrl=edit&amp;action=edit&amp;post=';
+			$actionurl = $admin_url.'?ctrl=items&amp;action=edit&amp;p=';
 		}
 
 		$r = $before;
@@ -2032,7 +2032,7 @@ class Item extends DataObject
 		if( $title == '#' ) $title = T_('Publish now using current date and time.');
 
 		$r = $before;
-		$r .= '<a href="'.$admin_url.'?ctrl=editactions'.$glue.'action=publish'.$glue.'post_ID='.$this->ID;
+		$r .= '<a href="'.$admin_url.'?ctrl=items'.$glue.'action=publish'.$glue.'post_ID='.$this->ID;
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 		$r .= '>'.$text.'</a>';
@@ -2074,7 +2074,7 @@ class Item extends DataObject
 		if( $title == '#' ) $title = T_('Deprecate this post!');
 
 		$r = $before;
-		$r .= '<a href="'.$admin_url.'?ctrl=editactions'.$glue.'action=deprecate'.$glue.'post_ID='.$this->ID;
+		$r .= '<a href="'.$admin_url.'?ctrl=items'.$glue.'action=deprecate'.$glue.'post_ID='.$this->ID;
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 		$r .= '>'.$text.'</a>';
@@ -2763,6 +2763,8 @@ class Item extends DataObject
 	/**
 	 * Trigger event AfterItemDelete after calling parent method.
 	 *
+	 * @todo fp> delete related stuff: comments, cats, file links...
+	 *
 	 * @return boolean true on success
 	 */
 	function dbdelete()
@@ -2777,7 +2779,8 @@ class Item extends DataObject
 		if( $r = parent::dbdelete() )
 		{
 			// Empty pre-rendered content cache:
-			$DB->query( 'DELETE FROM T_item__prerendering WHERE itpr_itm_ID = '.$this->ID );
+			$DB->query( 'DELETE FROM T_item__prerendering
+			                   WHERE itpr_itm_ID = '.$this->ID );
 			$this->content_prerendered = NULL;
 
 			$DB->commit();
@@ -2935,9 +2938,9 @@ class Item extends DataObject
 	 *
 	 * Includes notifications & pings
 	 */
-	function handle_post_processing( $display = true )
+	function handle_post_processing()
 	{
-		global $Settings;
+		global $Settings, $Messages;
 
 		$notifications_mode = $Settings->get('outbound_notifications_mode');
 
@@ -2948,12 +2951,7 @@ class Item extends DataObject
 
 		if( $this->notifications_status == 'finished' )
 		{ // pings have been done before
-			if( $display )
-			{
-				echo "<div class=\"panelinfo\">\n";
-				echo '<p>', T_('Post had already pinged: skipping notifications...'), "</p>\n";
-				echo "</div>\n";
-			}
+			$Messages->add( T_('Post had already pinged: skipping notifications...'), 'note' );
 			return false;
 		}
 
@@ -2962,12 +2960,7 @@ class Item extends DataObject
 
 			// TODO: Check if issue_date has changed and reschedule
 
-			if( $display )
-			{
-				echo "<div class=\"panelinfo\">\n";
-				echo '<p>', T_('Post processing already pending...'), "</p>\n";
-				echo "</div>\n";
-			}
+			$Messages->add( T_('Post processing already pending...'), 'note' );
 			return false;
 		}
 
@@ -2976,34 +2969,24 @@ class Item extends DataObject
 
 			// TODO: discard any notification that may be pending!
 
-			if( $display )
-			{
-				echo "<div class=\"panelinfo\">\n";
-				echo '<p>', T_('Post not publicly published: skipping notifications...'), "</p>\n";
-				echo "</div>\n";
-			}
+			$Messages->add( T_('Post not publicly published: skipping notifications...'), 'note' );
 			return false;
 		}
 
 		if( $notifications_mode == 'immediate' )
 		{	// We want to do the post processing immediately:
 			// send outbound pings:
-			$this->send_outbound_pings( $display );
+			$this->send_outbound_pings();
 
 			// Send email notifications now!
-			$this->send_email_notifications( $display );
+			$this->send_email_notifications( false );
 
 			// Record that processing has been done:
 			$this->set( 'notifications_status', 'finished' );
 		}
 		else
 		{	// We want asynchronous post processing:
-			if( $display )
-			{
-				echo "<div class=\"panelinfo\">\n";
-				echo '<p>'.T_('Scheduling asynchronous notifications...')."</p>\n";
-				echo "</div>\n";
-			}
+			$Messages->add( T_('Scheduling asynchronous notifications...'), 'note' );
 
 			// CREATE OBJECT:
 			load_class( '/MODEL/cron/_cronjob.class.php' );
@@ -3121,7 +3104,7 @@ class Item extends DataObject
 
 					// Footer:
 					."\n-- \n"
-					.T_('Edit/Delete').': '.$admin_url.'?ctrl=browse&blog='.$this->blog_ID.'&p='.$this->ID."\n\n"
+					.T_('Edit/Delete').': '.$admin_url.'?ctrl=items&blog='.$this->blog_ID.'&p='.$this->ID."\n\n"
 
 					.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
 
@@ -3143,12 +3126,10 @@ class Item extends DataObject
 
   /**
 	 * Send outbound pings for a post
-	 *
-	 * @param boolean Display?
 	 */
-	function send_outbound_pings( $display = true )
+	function send_outbound_pings()
 	{
-		global $Plugins, $baseurl;
+		global $Plugins, $baseurl, $Messages;
 
 		load_funcs( '_misc/ext/_xmlrpc.php' );
 
@@ -3158,7 +3139,7 @@ class Item extends DataObject
 		if( preg_match( '#^http://localhost[/:]#', $baseurl)
 			|| preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) /* domain ending in ".local" */  )
 		{
-			if( $display ) echo "<div class=\"panelinfo\">\n<p>", T_('Skipping pings (Running on localhost).'), "</p>\n</div>\n";
+			$Messages->add( T_('Skipping pings (Running on localhost).'), 'note' );
 		}
 		else foreach( $ping_plugins as $plugin_code )
 		{
@@ -3168,20 +3149,16 @@ class Item extends DataObject
 			{
 				if( $display )
 				{
-					echo "<div class=\"panelinfo\">\n";
-					echo '<h3>'.sprintf(T_('Pinging %s...'), $Plugin->ping_service_name)."</h3>\n";
+					$Messages->add( sprintf(T_('Pinging %s...'), $Plugin->ping_service_name), 'note' );
 				}
-				$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => $display );
+				$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
 
 				$r = $Plugin->ItemSendPing( $params );
 
 				if( isset($params['xmlrpcresp']) && is_a($params['xmlrpcresp'], 'xmlrpcresp') )
 				{
-					xmlrpc_displayresult( $params['xmlrpcresp'], $display );
-				}
-				if( $display )
-				{
-					echo "<p>", T_('Done.'), "</p>\n</div>\n";
+					// fp> TODO: put something into $Messages
+					xmlrpc_displayresult( $params['xmlrpcresp'], false );
 				}
 			}
 		}
@@ -3344,6 +3321,10 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.137  2006/12/12 02:53:56  fplanque
+ * Activated new item/comments controllers + new editing navigation
+ * Some things are unfinished yet. Other things may need more testing.
+ *
  * Revision 1.136  2006/12/07 23:13:11  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!
