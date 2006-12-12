@@ -28,7 +28,10 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
+/**
+ * Needed by functions
+ * @var Item
+ */
 global $edited_Item;
 
 $SQL = & new SQL();
@@ -42,7 +45,7 @@ $SQL->WHERE( 'link_itm_ID = '.$edited_Item->ID );
 
 $Results = & new Results( $SQL->get(), 'link_' );
 
-$Results->title = T_('Linked to...');
+$Results->title = T_('This post is linked to...');
 
 /*
  * TYPE
@@ -176,16 +179,16 @@ $Results->cols[] = array(
 						'td' => '%display_link( {row} )%',
 					);
 
-if( $edit_allowed )
-{	// Check that we have permission to edit item:
 
+if( $current_User->check_perm( 'files', 'view' ) )
+{
 	function file_actions( $link_ID )
 	{
 		/**
 		 * @var File
 		 */
 		global $current_File;
-		global $edited_Item;
+		global $edited_Item, $current_User;
 
 		$r = '';
 
@@ -195,8 +198,13 @@ if( $edit_allowed )
 			$r = $current_File->get_linkedit_link( $edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title ).' ';
 		}
 
-		return $r.action_icon( T_('Delete this link!'), 'unlink',
-		                    regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=unlink" ) );
+		if( $current_User->check_perm( 'item', 'edit', false, $edited_Item ) )
+	  {	// Check that we have permission to edit item:
+			$r .= action_icon( T_('Delete this link!'), 'unlink',
+			                  regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=unlink" ) );
+		}
+
+		return $r;
 	}
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
@@ -205,8 +213,9 @@ if( $edit_allowed )
 						);
 }
 
-if( $current_User->check_perm( 'files', 'view' ) )
-{
+if( $current_User->check_perm( 'files', 'view' )
+	&& $current_User->check_perm( 'item', 'edit', false, $edited_Item ) )
+{	// Check that we have permission to edit item:
 	$Results->global_icon( T_('Link a file...'), 'link',
 													'admin.php?ctrl=files&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID, T_('Link files'), 3, 4 );
 }
@@ -215,6 +224,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.12  2006/12/12 19:39:07  fplanque
+ * enhanced file links / permissions
+ *
  * Revision 1.11  2006/12/12 18:04:53  fplanque
  * fixed item links
  *

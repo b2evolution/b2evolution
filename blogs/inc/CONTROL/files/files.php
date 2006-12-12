@@ -818,7 +818,9 @@ switch( $action )
 
 		if( isset($edited_Item) )
 		{
-			// TODO: check item EDIT permissions!
+			// check item EDIT permissions:
+			$current_User->check_perm( 'item', 'edit', true, $edited_Item );
+
 			$DB->begin();
 
 			// Load meta data AND MAKE SURE IT IS CREATED IN DB:
@@ -853,17 +855,18 @@ switch( $action )
 			break;
 		}
 
-		// TODO: get Item (or other object) from Link to check perm
+		// get Item (or other object) from Link to check perm
+		$edited_Item = & $edited_Link->Item;
 
-		// TODO: check item/object EDIT permissions!
 		// Check that we have permission to edit item:
-		// $current_User->check_perm( $perm_name, 'edit', true, $edited_Item->ID );
+		$current_User->check_perm( 'item', 'edit', true, $edited_Item );
 
 		// Delete from DB:
 		$msg = sprintf( T_('Link from &laquo;%s&raquo; deleted.'), $edited_Link->Item->dget('title') );
 		$edited_Link->dbdelete( true );
 		unset( $edited_Link );
 		forget_param( 'link_ID' );
+
 		$Messages->add( $msg, 'success' );
 		break;
 
@@ -1594,6 +1597,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.39  2006/12/12 19:39:07  fplanque
+ * enhanced file links / permissions
+ *
  * Revision 1.38  2006/12/07 23:13:10  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!

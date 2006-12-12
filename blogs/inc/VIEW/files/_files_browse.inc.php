@@ -74,6 +74,11 @@ global $Messages;
  * @var Filelist
  */
 global $selected_Filelist;
+/**
+ * @var Item
+ */
+global $edited_Item;
+
 
 global $disp_fm_browser_toggle, $fm_hide_dirtree, $create_name;
 
@@ -478,7 +483,7 @@ while( $lFile = & $fm_Filelist->get_next() )
 
 	/***************  Link ("chain") icon:  **************/
 
-	if( strpos( $fm_mode, 'link_' ) === 0 )
+	if( isset($edited_Item) && $current_User->check_perm( 'item', 'edit', false, $edited_Item ) )
 	{	// Offer option to link the file to an Item (or anything else):
 		echo action_icon( T_('Link this file!'), 'link', regenerate_url( 'fm_selected', 'action=link&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
 		echo ' ';
@@ -976,6 +981,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.27  2006/12/12 19:39:07  fplanque
+ * enhanced file links / permissions
+ *
  * Revision 1.26  2006/12/12 18:04:53  fplanque
  * fixed item links
  *

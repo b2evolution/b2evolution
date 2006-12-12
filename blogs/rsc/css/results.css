@@ -49,7 +49,10 @@ table.grouped td {
 	border-left: 1px solid #bbb;
 	padding: .3ex 1ex;
 }
-table.grouped th.title,
+table.grouped th.title{
+	border-left: none;
+	text-align: left;
+}
 table.grouped th.firstcol,
 table.grouped td.firstcol {
 	border-left: none;

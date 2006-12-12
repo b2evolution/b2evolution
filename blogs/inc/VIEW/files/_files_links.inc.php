@@ -39,8 +39,9 @@ $Form = & new Form( NULL, 'fm_links', 'post', 'fieldset' );
 
 $Form->global_icon( T_('Quit link mode!'), 'close', regenerate_url( 'fm_mode' ) );
 
-$Form->begin_form( 'fform', sprintf( T_('Link files to &laquo;%s&raquo;...'),
-				$edited_Item->get_edit_link( '', '', $edited_Item->dget('title') ) ) );
+$Form->begin_form( 'fform', sprintf( T_('Files linked to &laquo;%s&raquo; %s :'),
+				'<a href="?ctrl=items&amp;blog='.$edited_Item->blog_ID.'&amp;p='.$edited_Item->ID.'" title="'.T_('View this post...').'">'.$edited_Item->dget('title').'</a>',
+				$edited_Item->get_edit_link( '', '', get_icon( 'edit' ) ) ) );
 
 $Form->hidden_ctrl();
 
@@ -103,14 +104,19 @@ $Results->cols[] = array(
 
 function file_actions( $link_ID )
 {
-	global $current_File, $edited_Item;
+	global $current_File, $edited_Item, $current_User;
 
 	$title = T_('Locate this file!');
 
 	$r = $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title );
 
-	return $r.' '.action_icon( T_('Delete this link!'), 'unlink',
+	if( $current_User->check_perm( 'item', 'edit', false, $edited_Item ) )
+	{	// Check that we have permission to edit item:
+		$r .= action_icon( T_('Delete this link!'), 'unlink',
                       regenerate_url( 'action', 'link_ID='.$link_ID.'&amp;action=unlink') );
+	}
+
+	return $r;
 }
 $Results->cols[] = array(
 						'th' => T_('Actions'),
@@ -121,13 +127,19 @@ $Results->cols[] = array(
 
 $Results->display();
 
-printf( '<p>'.T_('Click on link %s icons below to link additional files to this item.').'</p>', get_icon( 'link', 'imgtag', array('class'=>'top') ) );
+if( $current_User->check_perm( 'item', 'edit', false, $edited_Item ) )
+{	// Check that we have permission to edit item:
+	printf( '<p>'.T_('Click on link %s icons below to link additional files to this item.').'</p>', get_icon( 'link', 'imgtag', array('class'=>'top') ) );
+}
 
 $Form->end_form( );
 
 
 /*
  * $Log$
+ * Revision 1.10  2006/12/12 19:39:07  fplanque
+ * enhanced file links / permissions
+ *
  * Revision 1.9  2006/12/12 18:04:53  fplanque
  * fixed item links
  *

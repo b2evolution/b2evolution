@@ -478,20 +478,26 @@ class User extends DataObject
 	{
 		global $Debuglog;
 
-		if( !is_array($perm_target) && isset($this->cache_perms[$permname][$permlevel][$perm_target]) )
+		if( is_object($perm_target) && isset($perm_target->ID) )
+		{
+			$perm_target_ID = $perm_target->ID;
+		}
+		elseif( !is_array($perm_target) )
+		{
+			$perm_target_ID = $perm_target;
+		}
+
+		if( isset($perm_target_ID)	// if it makes sense to check the cache
+			&& isset($this->cache_perms[$permname][$permlevel][$perm_target_ID]) )
 		{ // Permission in available in Cache:
-			return $this->cache_perms[$permname][$permlevel][$perm_target];
+			$Debuglog->add( "Got perm [$permname][$permlevel][$perm_target_ID] from cache", 'perms' );
+			return $this->cache_perms[$permname][$permlevel][$perm_target_ID];
 		}
 
 		$perm = false;
 
 		switch( $permname )
 		{ // What permission do we want to check?
-			case 'edit_timestamp':
-				// Global permission to edit timestamps...
-				$perm = ($this->level >= 5);
-				break;
-
 			case 'cats_post_statuses':
 				// Category permissions...
 				$perm = $this->check_perm_catsusers( $permname, $permlevel, $perm_target );
@@ -538,6 +544,34 @@ class User extends DataObject
 
 				break;
 
+			case 'edit_timestamp':
+				// Global permission to edit timestamps...
+				// fp> TODO: merge below
+				$perm = ($this->level >= 5);
+				break;
+
+			case 'item':
+				// This is a high level perm...
+				if( !is_a( $perm_target, 'Item' ) )
+				{
+					debug_die( 'No item provided to permission item:'.$permlevel );
+				}
+
+				switch( $permlevel )
+				{
+					case 'edit':
+         		$post_status = $perm_target->get( 'status' );
+         		$blog = $perm_target->blog_ID;
+         		// Call lower level:
+						$perm = $this->check_perm( 'blog_post_statuses', $post_status, false, $blog );
+						break;
+
+					default:
+						debug_die( 'Unhandled permission item:'.$permlevel );
+				}
+				break;
+
+
 			default:
 				// Other global permissions (see if the group can handle them), includes:
 				// files
@@ -555,10 +589,10 @@ class User extends DataObject
 			debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name )." ($permname:$permlevel:$perm_target)" );
 		}
 
-		if( !is_array($perm_target) )
+		if( isset($perm_target_ID) )
 		{
 			// echo "cache_perms[$permname][$permlevel][$perm_target] = $perm;";
-			$this->cache_perms[$permname][$permlevel][$perm_target] = $perm;
+			$this->cache_perms[$permname][$permlevel][$perm_target_ID] = $perm;
 		}
 
 		return $perm;
@@ -1120,6 +1154,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.58  2006/12/12 19:39:07  fplanque
+ * enhanced file links / permissions
+ *
  * Revision 1.57  2006/12/07 23:13:11  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!

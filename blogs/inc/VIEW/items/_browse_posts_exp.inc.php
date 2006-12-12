@@ -50,7 +50,7 @@ $postIDarray = $ItemList->get_page_ID_array();
 
 if( $action == 'view' )
 {	// We are displaying a single post:
-	echo '<div class="floatright">'.action_icon( T_('Close post'), 'close', regenerate_url( 'action' ), T_('close'), 4, 1 ).'</div>';
+	echo '<div class="floatright">'.action_icon( T_('Close post'), 'close', regenerate_url( 'p,action' ), T_('close'), 4, 1 ).'</div>';
 }
 
 // Display title depending on selection params:
@@ -175,10 +175,29 @@ while( $Item = & $ItemList->get_item() )
 		</div>
 
 		<?php
-		// ---------- comments ----------
+
+		// _____________________________________ Displayed in SINGLE VIEW mode only _____________________________________
 
 		if( $action == 'view' )
-		{ // We are looking at a single post, include comments:
+		{ // We are looking at a single post, include files and comments:
+
+			// Files:
+			echo '<div class="bFeedback">';	// TODO
+			// TODO:
+			$edit_allowed = true;
+
+			/**
+			 * Needed by file display funcs
+			 * @var Item
+			 */
+			global $edited_Item;
+			$edited_Item = $Item;	// COPY or it will be out of scope for display funcs
+			require dirname(__FILE__).'/_item_links.inc.php';
+			echo '</div>';
+
+
+
+  		// ---------- comments ----------
 			?>
 			<div class="bFeedback">
 			<a id="comments"></a>
@@ -272,6 +291,9 @@ if( $action == 'list' )
 
 /*
  * $Log$
+ * Revision 1.27  2006/12/12 19:39:07  fplanque
+ * enhanced file links / permissions
+ *
  * Revision 1.26  2006/12/12 02:53:57  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.

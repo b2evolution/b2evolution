@@ -953,7 +953,7 @@ class AdminUI_general
 					                  /* T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'. */
 					                  /* '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$' */
 					                  /* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
-					'footer_text_single' => T_('1 page'),
+					'footer_text_single' => '',
 					'footer_text_no_limit' => '', // Text if theres no LIMIT and therefor only one page anyway
 						'prev_text' => T_('Previous'),
 						'next_text' => T_('Next'),
@@ -1331,6 +1331,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.39  2006/12/12 19:39:08  fplanque
+ * enhanced file links / permissions
+ *
  * Revision 1.38  2006/12/12 16:42:23  fplanque
  * border-collapse sucks (firefox)
  *

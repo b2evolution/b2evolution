@@ -28,6 +28,11 @@ global $AdminUI;
  */
 global $UserSettings;
 
+/**
+ * @var User
+ */
+global $current_User;
+
 param( 'action', 'string', 'list' );
 
 
@@ -173,24 +178,6 @@ switch( $action )
 		// Params we need for tab switching:
 		$tab_switch_params = 'blog='.$blog;
 		break;
-
-	case 'unlink':
- 		// Delete a link:
-
-		// Check permission:
-		$post_status = $edited_Item->get( 'status' );
-		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
-
-		// Unlink File from Item:
-		$msg = sprintf( T_('Link has been deleted from &laquo;%s&raquo;.'), $edited_Link->Item->dget('title') );
-		$edited_Link->dbdelete( true );
-		unset($edited_Link);
-		$Messages->add( $msg, 'success' );
-
-		// go on to edit:
-		$p = $edited_Item->ID;
-		$action = 'edit';
-		// NOBREAK
 
 	case 'edit':
 		// Check permission:
@@ -431,6 +418,25 @@ switch( $action )
 		break;
 
 
+	case 'unlink':
+ 		// Delete a link:
+
+		// Check permission:
+		$current_User->check_perm( 'item', 'edit', true, $edited_Item );
+
+		// Unlink File from Item:
+		$msg = sprintf( T_('Link has been deleted from &laquo;%s&raquo;.'), $edited_Link->Item->dget('title') );
+		$edited_Link->dbdelete( true );
+		unset($edited_Link);
+		$Messages->add( $msg, 'success' );
+
+		// go on to view:
+		$p = $edited_Item->ID;
+		init_list_mode();
+		$action = 'view';
+		break;
+
+
 	default:
 		debug_die( 'unhandled action 2' );
 }
@@ -592,6 +598,9 @@ switch( $action )
 	case 'delete':
 		// View a single post:
 
+		// Memorize 'p' in case we reload while changing some display settings
+		memorize_param( 'p', 'integer', NULL );
+
  		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
@@ -651,6 +660,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2006/12/12 19:39:07  fplanque
+ * enhanced file links / permissions
+ *
  * Revision 1.4  2006/12/12 18:04:53  fplanque
  * fixed item links
  *
