@@ -38,11 +38,31 @@ switch( $action )
 {
 	case 'edit':
 	case 'update':
+	case 'publish':
+	case 'deprecate':
+	case 'delete':
 		param( 'comment_ID', 'integer', true );
 		$edited_Comment = Comment_get_by_ID( $comment_ID );
 
 		$edited_Comment_Item = & $edited_Comment->get_Item();
 		$blog = $edited_Comment_Item->blog_ID;
+		$BlogCache = & get_Cache( 'BlogCache' );
+		$Blog = & $BlogCache->get_by_ID( $blog );
+
+		// Check permission:
+		$current_User->check_perm( 'blog_comments', 'any', true, $blog );
+		break;
+
+	case 'list':
+	  // Check permission:
+		$blog = autoselect_blog( $blog, 'blog_comments', 'any' );
+
+ 		if( ! $blog  )
+		{ // No blog could be selected
+			$Messages->add( T_('You have no permission to edit comments for this blog.' ), 'error' );
+			$action = 'nil';
+		}
+
 		$BlogCache = & get_Cache( 'BlogCache' );
 		$Blog = & $BlogCache->get_by_ID( $blog );
 		break;
@@ -61,26 +81,13 @@ switch( $action )
 		// Do nothing
 		break;
 
-	case 'new':
-		break;
-
 
 	case 'edit':
-		// Check permission:
-		$current_User->check_perm( 'blog_comments', 'any', true, $blog );
-
 		$AdminUI->title = $AdminUI->title_titlearea = T_('Editing comment').' #'.$edited_Comment->ID;
 		break;
 
 
-	case 'create':
-		break;
-
-
 	case 'update':
-		// Check permission:
-		$current_User->check_perm( 'blog_comments', '', true, $blog );
-
 		// fp> TODO: $edited_Comment->load_from_Request( true );
 
 		if( ! $edited_Comment->get_author_User() )
@@ -126,24 +133,75 @@ switch( $action )
 		// UPDATE DB:
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
+		$Messages->add( T_('Comment has been edited.'), 'success' );
+
 		$location = url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment->item_ID, '&' );
 		header_redirect( $location );
-		exit();
+		/* exited */
 		break;
 
 
 	case 'publish':
+		$edited_Comment->set('status', 'published' );
+
+		$edited_Comment->dbupdate();	// Commit update to the DB
+
+		$Messages->add( T_('Comment has been published.'), 'success' );
+
+		$location = url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment->item_ID, '&' );
+		header_redirect( $location );
+		/* exited */
 		break;
 
 
 	case 'deprecate':
+		$edited_Comment->set('status', 'deprecated' );
+
+		$edited_Comment->dbupdate();	// Commit update to the DB
+
+		$Messages->add( T_('Comment has been deprecated.'), 'success' );
+
+		$location = url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment->item_ID, '&' );
+		header_redirect( $location );
+		/* exited */
 		break;
 
+
 	case 'delete':
+		// fp> TODO: non JS confirm
+
+		// Delete from DB:
+		$edited_Comment->dbdelete();
+
+		$Messages->add( T_('Comment has been deleted.'), 'success' );
+
+		$location = url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment->item_ID, '&' );
+		header_redirect( $location );
 		break;
 
 
 	case 'list':
+		/*
+		 * Latest comments:
+		 */
+		$AdminUI->title = $AdminUI->title_titlearea = T_('Latest comments');
+
+		param( 'show_statuses', 'array', array(), true );	// Array of cats to restrict to
+
+		// Generate available blogs list:
+		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_comments', 'any',
+						$pagenow.'?ctrl=comments&amp;blog=%d', NULL, '' );
+
+		/*
+		 * Add sub menu entries:
+		 * We do this here instead of _header because we need to include all filter params into regenerate_url()
+		 */
+		attach_browse_tabs();
+
+		/*
+		 * List of comments to display:
+		 */
+		$CommentList = & new CommentList( $blog, "'comment','trackback','pingback'", $show_statuses, '',	'',	'DESC',	'',	20 );
 		break;
 
 
@@ -173,8 +231,6 @@ switch( $action )
 		// Do nothing
 		break;
 
-	case 'new':
-	case 'create':
 
 	case 'edit':
 	case 'update':	// on error
@@ -189,14 +245,14 @@ switch( $action )
 		$AdminUI->disp_payload_end();
 		break;
 
-	case 'view':
-		break;
 
 	case 'list':
 	default:
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
+		// Display VIEW:
+		$AdminUI->disp_view( 'comments/_browse_comments.inc.php' );
 
 		// End payload block:
 		$AdminUI->disp_payload_end();
@@ -209,6 +265,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2006/12/12 02:47:47  fplanque
+ * Completed comment controller
+ *
  * Revision 1.1  2006/12/12 02:01:52  fplanque
  * basic comment controller
  *
