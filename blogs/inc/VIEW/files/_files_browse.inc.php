@@ -540,7 +540,7 @@ while( $lFile = & $fm_Filelist->get_next() )
 
 	/*******************  File type  ******************/
 
-	if( $UserSettings->get('fm_showtypes') ) // MB UPDATE-------------
+	if( $UserSettings->get('fm_showtypes') )
 	{ // Show file types
 		echo '<td class="type">'.$lFile->get_type().'</td>';
 	}
@@ -558,7 +558,7 @@ while( $lFile = & $fm_Filelist->get_next() )
 
 	/****************  File pemissions  ***************/
 
-	if( $UserSettings->get('fm_showfsperms') ) // MB UPDATE-------------
+	if( $UserSettings->get('fm_showfsperms') )
 	{ // Show file perms
 		echo '<td class="perms">';
 		$fm_permlikelsl = $UserSettings->param_Request( 'fm_permlikelsl', 'fm_permlikelsl', 'integer', 0 );
@@ -976,6 +976,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.26  2006/12/12 18:04:53  fplanque
+ * fixed item links
+ *
  * Revision 1.25  2006/12/07 20:03:32  fplanque
  * Woohoo! File editing... means all skin editing.
  *

@@ -39,11 +39,11 @@ $Form = & new Form( NULL, 'fm_links', 'post', 'fieldset' );
 
 $Form->global_icon( T_('Quit link mode!'), 'close', regenerate_url( 'fm_mode' ) );
 
-$Form->begin_form( 'fform', sprintf( T_('Link files to &laquo;%s&raquo;...'), $edited_Item->dget('title') ) );
+$Form->begin_form( 'fform', sprintf( T_('Link files to &laquo;%s&raquo;...'),
+				$edited_Item->get_edit_link( '', '', $edited_Item->dget('title') ) ) );
 
 $Form->hidden_ctrl();
 
-$edited_Item->edit_link( '<p>', '</p>', T_('Edit this post') );
 
 $Results = & new Results(
 					'SELECT link_ID, link_ltype_ID, T_files.*
@@ -68,7 +68,8 @@ function file_type( & $row )
 }
 $Results->cols[] = array(
 						'th' => T_('Type'),
-						'td_class' => 'left',
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
 						'td' => '%file_type( {row} )%',
 					);
 
@@ -113,19 +114,23 @@ function file_actions( $link_ID )
 }
 $Results->cols[] = array(
 						'th' => T_('Actions'),
-						'td_class' => 'center',
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
 						'td' => '%file_actions( #link_ID# )%',
 					);
 
 $Results->display();
 
-printf( '<p>'.T_('Click on a link icon %s below to link an additional file to this item.').'</p>', get_icon( 'link' ) );
+printf( '<p>'.T_('Click on link %s icons below to link additional files to this item.').'</p>', get_icon( 'link', 'imgtag', array('class'=>'top') ) );
 
 $Form->end_form( );
 
 
 /*
  * $Log$
+ * Revision 1.9  2006/12/12 18:04:53  fplanque
+ * fixed item links
+ *
  * Revision 1.8  2006/12/07 20:03:32  fplanque
  * Woohoo! File editing... means all skin editing.
  *

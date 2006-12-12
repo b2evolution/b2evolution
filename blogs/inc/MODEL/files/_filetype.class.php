@@ -189,7 +189,7 @@ class Filetype extends DataObject
 			$icon = 'default.png';
 		}
 
-		return '<img src="'.$rsc_url.'icons/fileicons/'.$icon.'" alt="" title="'.$this->dget('name', 'htmlattr').'" />';
+		return '<img src="'.$rsc_url.'icons/fileicons/'.$icon.'" alt="" title="'.$this->dget('name', 'htmlattr').'" class="middle" />';
 	}
 
 

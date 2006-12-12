@@ -29,7 +29,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $edited_Item, $edit_allowed;
+global $edited_Item;
 
 $SQL = & new SQL();
 
@@ -92,6 +92,8 @@ $Results->cols[] = array(
  */
 function display_subtype( & $row )
 {
+	$r = '';
+
 	if( !empty($row->file_ID) )
 	{
 		global $current_File;
@@ -101,8 +103,26 @@ function display_subtype( & $row )
 		$current_File->load_meta( false, $row );
 
 		// File type:
-		return $current_File->get_view_link( $current_File->get_icon(), T_('Let browser handle this file!')  ).' '.$current_File->get_type();
+		$r .= $current_File->get_type().' ';
+
+		if( $current_File->is_dir() )
+		{ // Directory
+			$r .= $current_File->get_icon();
+		}
+		else
+		{ // File
+			if( $view_link = $current_File->get_view_link( $current_File->get_icon(), NULL, NULL ) )
+			{
+				$r .=  $view_link;
+			}
+			else
+			{ // File extension unrecognized
+				$r .=  $current_File->get_icon();
+			}
+		}
 	}
+
+  return $r;
 }
 $Results->cols[] = array(
 						'th' => T_('Sub-Type'),
@@ -118,10 +138,35 @@ function display_link( & $row )
 {
 	if( !empty($row->file_ID) )
 	{
-		global $current_File, $edited_Item;
+		/**
+		 * @var File
+		 */
+		global $current_File;
+		global $edited_Item;
+
+		$r = '';
 
 		// File relative path & name:
-		return $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;itm_ID='.$edited_Item->ID ).'<span class="filemeta"> - '.$current_File->dget('title').'</span>';
+		// return $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;itm_ID='.$edited_Item->ID );
+		if( $current_File->is_dir() )
+		{ // Directory
+			$r .= $current_File->dget( '_name' );
+		}
+		else
+		{ // File
+			if( $view_link = $current_File->get_view_link() )
+			{
+				$r .= $view_link;
+			}
+			else
+			{ // File extension unrecognized
+				$r .= $current_File->dget( '_name' );
+			}
+		}
+
+		$r .= '<span class="filemeta"> - '.$current_File->dget('title').'</span>';
+
+		return $r;
 	}
 
 	return '?';
@@ -133,20 +178,25 @@ $Results->cols[] = array(
 
 if( $edit_allowed )
 {	// Check that we have permission to edit item:
+
 	function file_actions( $link_ID )
 	{
-		global $current_File, $edited_Item;
+		/**
+		 * @var File
+		 */
+		global $current_File;
+		global $edited_Item;
 
 		$r = '';
 
 		if( isset($current_File) )
 		{
 			$title = T_('Locate this file!');
-			$r = $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;itm_ID='.$edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title ).' ';
+			$r = $current_File->get_linkedit_link( $edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title ).' ';
 		}
 
 		return $r.action_icon( T_('Delete this link!'), 'unlink',
-		                    regenerate_url( 'itm_ID,action', "link_ID=$link_ID&amp;action=delete_link" ) );
+		                    regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=unlink" ) );
 	}
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
@@ -158,13 +208,16 @@ if( $edit_allowed )
 if( $current_User->check_perm( 'files', 'view' ) )
 {
 	$Results->global_icon( T_('Link a file...'), 'link',
-													'admin.php?ctrl=files&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID, T_('Link file'), 3, 4 );
+													'admin.php?ctrl=files&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID, T_('Link files'), 3, 4 );
 }
 
 $Results->display();
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/12 18:04:53  fplanque
+ * fixed item links
+ *
  * Revision 1.10  2006/12/07 20:03:32  fplanque
  * Woohoo! File editing... means all skin editing.
  *

@@ -39,6 +39,27 @@ param( 'action', 'string', 'list' );
  */
 switch( $action )
 {
+	case 'unlink':
+	  param( 'link_ID', 'integer', true );
+		$LinkCache = & get_Cache( 'LinkCache' );
+		if( ($edited_Link = & $LinkCache->get_by_ID( $link_ID, false )) !== false )
+		{	// We have a link, get the Item it is attached to:
+			$edited_Item = & $edited_Link->Item;
+
+			// Load the blog we're in:
+			$Blog = $edited_Item->get_Blog();
+			$blog = $Blog->ID;
+		}
+		else
+		{	// We could not find the link to edit:
+			$Messages->head = T_('Cannot edit link!');
+			$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
+			unset( $edited_Link );
+			unset( $link_ID );
+			$action = 'nil';
+		}
+		break;
+
 	case 'edit':
  		// Load post to edit:
 		param( 'p', 'integer', true, true );
@@ -153,6 +174,23 @@ switch( $action )
 		$tab_switch_params = 'blog='.$blog;
 		break;
 
+	case 'unlink':
+ 		// Delete a link:
+
+		// Check permission:
+		$post_status = $edited_Item->get( 'status' );
+		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
+
+		// Unlink File from Item:
+		$msg = sprintf( T_('Link has been deleted from &laquo;%s&raquo;.'), $edited_Link->Item->dget('title') );
+		$edited_Link->dbdelete( true );
+		unset($edited_Link);
+		$Messages->add( $msg, 'success' );
+
+		// go on to edit:
+		$p = $edited_Item->ID;
+		$action = 'edit';
+		// NOBREAK
 
 	case 'edit':
 		// Check permission:
@@ -613,6 +651,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2006/12/12 18:04:53  fplanque
+ * fixed item links
+ *
  * Revision 1.3  2006/12/12 02:53:56  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.
