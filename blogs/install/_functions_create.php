@@ -517,9 +517,9 @@ Nethertheless, once you feel comfortable with b2evolution, you should try activa
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("Apache optimization..."), T_("In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> there are two files called [<code>sample.htaccess</code>]. You should try renaming those to [<code>.htaccess</code>].
+	$edited_Item->insert( 1, T_("Apache optimization..."), T_("In the <code>/blogs</code> folder there is a file called [<code>sample.htaccess</code>]. You should try renaming it to [<code>.htaccess</code>].
 
-This will optimize the way b2evolution is handled by the webserver (if you are using Apache). These files are not active by default because a few hosts would display an error right away when you try to use them. If this happens to you when you rename the files, just remove them and you'll be fine."), $now, $cat_b2evo );
+This will optimize the way b2evolution is handled by the webserver (if you are using Apache). This file is not active by default because a few hosts would display an error right away when you try to use it. If this happens to you when you rename the file, just remove it again and you'll be fine."), $now, $cat_b2evo );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -1032,6 +1032,9 @@ function install_basic_plugins( $old_db_version = 0 )
 
 /*
  * $Log$
+ * Revision 1.207  2006/12/12 20:26:12  blueyed
+ * Fixed sample post about sample.htaccess in (obsolete/removed) "admin" folder. See http://forums.b2evolution.net/viewtopic.php?p=48204#48204
+ *
  * Revision 1.206  2006/12/07 20:31:29  fplanque
  * fixed install
  *
