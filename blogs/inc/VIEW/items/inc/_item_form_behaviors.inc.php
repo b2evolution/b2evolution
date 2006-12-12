@@ -57,36 +57,43 @@ global $js_doc_title_prefix;
 	}
 
 	// Add event to check the edit_date checkbox whenever the date is modified:
-	?>
-	if( edit_date_elt = document.getElementById('edit_date') )
+	if( $creating )
 	{
-		/**
-		 * If user modified date, check the checkbox:
-		 */
-		function evo_check_edit_date()
+		?>
+		if( edit_date_elt = document.getElementById('edit_date') )
 		{
-			edit_date_elt.checked = true;
-		}
+			/**
+			 * If user modified date, check the checkbox:
+			 */
+			function evo_check_edit_date()
+			{
+				edit_date_elt.checked = true;
+			}
 
-		if( item_issue_date_elt = document.getElementById('item_issue_date') )
-		{
-			addEvent( item_issue_date_elt, 'change', evo_check_edit_date, false );
+			if( item_issue_date_elt = document.getElementById('item_issue_date') )
+			{
+				addEvent( item_issue_date_elt, 'change', evo_check_edit_date, false );
+			}
+			if( item_issue_time_elt = document.getElementById('item_issue_time') )
+			{
+				addEvent( item_issue_time_elt, 'change', evo_check_edit_date, false );
+			}
+			if( item_issue_date_button = document.getElementById('anchor_item_issue_date') )
+			{
+				addEvent( item_issue_date_button, 'click', evo_check_edit_date, false );
+			}
 		}
-		if( item_issue_time_elt = document.getElementById('item_issue_time') )
-		{
-			addEvent( item_issue_time_elt, 'change', evo_check_edit_date, false );
-		}
-		if( item_issue_date_button = document.getElementById('anchor_item_issue_date') )
-		{
-			addEvent( item_issue_date_button, 'click', evo_check_edit_date, false );
-		}
+		<?php
 	}
-
+	?>
 </script>
 
 <?php
 /*
  * $Log$
+ * Revision 1.3  2006/12/12 23:23:30  fplanque
+ * finished post editing v2.0
+ *
  * Revision 1.2  2006/12/12 21:25:31  fplanque
  * UI fixes
  *

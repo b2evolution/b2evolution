@@ -42,9 +42,12 @@ global $Settings;
 
 global $pagenow;
 
-global $next_action, $mode, $post_title, $post_locale, $post_title, $use_post_url, $post_url, $content;
-global $use_preview, $post_urltitle, $post_status, $post_comment_status, $post_trackbacks;
-global $edit_date, $bozo_start_modified;
+global $mode, $use_post_url;
+global $use_preview, $post_status, $post_comment_status, $trackback_url;
+global $edit_date, $bozo_start_modified, $creating;
+
+// Determine if we are creating or updating...
+$creating = is_create_action( $action );
 
 $Form = & new Form( NULL, 'item_checkchanges', 'post', 'none' );
 $Form->fieldstart = '<div class="tile">';
@@ -63,7 +66,7 @@ if( !empty( $bozo_start_modified ) )
 $Form->begin_form( '', '', $params );
 
 $Form->hidden( 'ctrl', 'items' );
-$Form->hidden( 'action', $next_action );
+$Form->hidden( 'action', $creating ? 'create' : 'update' );
 $Form->hidden( 'blog', $Blog->ID );
 if( isset( $mode ) )   $Form->hidden( 'mode', $mode ); // used by bookmarklet
 if( isset( $edited_Item ) )   $Form->hidden( 'post_ID', $edited_Item->ID );
@@ -75,17 +78,18 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 
 // Fields used in "advanced" form, but not here:
-$Form->hidden( 'post_locale', param('post_locale', 'string', $current_User->locale) );
-$Form->hidden( 'item_typ_ID', param('item_typ_ID', 'integer', NULL) );
-$Form->hidden( 'post_url', param('post_url', 'string', '') );
-$Form->hidden( 'post_urltitle', param('post_urltitle', 'string', '') );
-// Workflow stuff:
-$Form->hidden( 'item_priority', param('item_priority', 'integer', NULL) );
-$Form->hidden( 'item_assigned_user_ID', param('item_assigned_user_ID', 'integer', NULL) );
-$Form->hidden( 'item_st_ID', param('item_st_ID', 'integer', NULL) );
-$Form->hidden( 'item_deadline', param('item_deadline', 'string', NULL) );
-//
-$Form->hidden( 'trackback_url', param('trackback_url', 'string', NULL) );
+$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
+$Form->hidden( 'item_typ_ID', $edited_Item->typ_ID );
+$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
+$Form->hidden( 'post_urltitle', $edited_Item->get( 'urltitle' ) );
+if( $Blog->get_setting( 'use_workflow' ) )
+{	// We want to use workflow properties for this blog:
+	$Form->hidden( 'item_priority', $edited_Item->priority );
+	$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
+	$Form->hidden( 'item_st_ID', $edited_Item->st_ID );
+	$Form->hidden( 'item_deadline', $edited_Item->deadline );
+}
+$Form->hidden( 'trackback_url', $trackback_url );
 $Form->hidden( 'renderers_displayed', 1 );
 $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 
@@ -100,7 +104,7 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 
 	$Form->begin_fieldset( T_('Post contents') );
 
-	$Form->text_input( 'post_title', $post_title, 48, T_('Title'), '', array('maxlength'=>255) );
+	$Form->text_input( 'post_title', $edited_Item->title, 48, T_('Title'), '', array('maxlength'=>255) );
 
 	// --------------------------- TOOLBARS ------------------------------------
 	echo '<div class="edit_toolbars">';
@@ -111,7 +115,7 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 	// ---------------------------- TEXTAREA -------------------------------------
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
-	$Form->textarea_input( 'content', $content, 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content' ) );
+	$Form->textarea_input( 'content', $edited_Item->get( 'content' ), 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content' ) );
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';
 	?>
@@ -137,7 +141,7 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 	$Form->submit( array( '', /* TRANS: This is the value of an input submit button */ T_('Save !'), 'SaveButton' ) );
 
 	// ---------- DELETE ----------
-	if( $next_action == 'update' )
+	if( ! $creating )
 	{ // Editing post
 		// Display delete button if current user has the rights:
 		$edited_Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
@@ -174,7 +178,7 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 		echo ' '; // allow wrapping!
 		$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '' );
 		echo ' '; // allow wrapping!
-		if( $next_action == 'create' )
+		if( $creating )
 		{ // If not checked, create time will be used...
 			$Form->checkbox( 'edit_date', $edit_date, '', T_('Edit') );
 		}
@@ -262,6 +266,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.27  2006/12/12 23:23:30  fplanque
+ * finished post editing v2.0
+ *
  * Revision 1.26  2006/12/12 21:19:31  fplanque
  * UI fixes
  *

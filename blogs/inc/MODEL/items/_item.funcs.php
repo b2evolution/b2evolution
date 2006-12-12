@@ -565,7 +565,7 @@ function cat_select_before_first( $parent_cat_ID, $level )
  */
 function cat_select_before_each( $cat_ID, $level, $total_count )
 { // callback to display sublist element
-	global $current_blog_ID, $blog, $post_extracats, $default_main_cat, $next_action;
+	global $current_blog_ID, $blog, $post_extracats, $default_main_cat;
 	global $creating, $allow_cross_posting, $cat_select_level, $cat_select_form_fields;
 	$this_cat = get_the_category_by_ID( $cat_ID );
 	$r = "\n".'<tr class="'.( $total_count%2 ? 'odd' : 'even' ).'">';
@@ -574,7 +574,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
 	{ // This is current blog or we allow moving posts accross blogs
 		if( ($default_main_cat == 0)
-			&& ($next_action == 'create' /* old school */ || $creating /* new school */ )
+			&& $creating
 			&& ($current_blog_ID == $blog) )
 		{ // Assign default cat for new post
 			$default_main_cat = $cat_ID;
@@ -696,6 +696,9 @@ function attach_browse_tabs()
 
 /*
  * $Log$
+ * Revision 1.36  2006/12/12 23:23:30  fplanque
+ * finished post editing v2.0
+ *
  * Revision 1.35  2006/12/12 02:53:56  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.

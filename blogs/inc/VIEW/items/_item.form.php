@@ -49,9 +49,12 @@ global $Settings;
 global $pagenow;
 
 
-global $next_action, $mode, $post_title, $post_locale, $post_title, $use_post_url, $post_url, $content;
-global $use_preview, $post_urltitle, $post_status, $post_comment_status, $post_trackbacks;
-global $edit_date, $bozo_start_modified;
+global $mode, $use_post_url;
+global $use_preview, $post_status, $post_comment_status, $trackback_url;
+global $edit_date, $bozo_start_modified, $creating;
+
+// Determine if we are creating or updating...
+$creating = is_create_action( $action );
 
 $Form = & new Form( NULL, 'item_checkchanges', 'post', 'none' );
 $Form->fieldstart = '<div class="tile">';
@@ -71,7 +74,7 @@ if( !empty( $bozo_start_modified ) )
 $Form->begin_form( '', '', $params );
 
 $Form->hidden( 'ctrl', 'items' );
-$Form->hidden( 'action', $next_action );
+$Form->hidden( 'action', $creating ? 'create' : 'update' );
 $Form->hidden( 'blog', $Blog->ID );
 if( isset( $mode ) )   $Form->hidden( 'mode', $mode );	// used by bookmarklet
 if( isset( $edited_Item ) )   $Form->hidden( 'post_ID', $edited_Item->ID );
@@ -89,11 +92,11 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->begin_fieldset( T_('Post contents') );
 
-	$Form->text_input( 'post_title', $post_title, 48, T_('Title'), '', array('maxlength'=>255) );
+	$Form->text_input( 'post_title', $edited_Item->title, 48, T_('Title'), '', array('maxlength'=>255) );
 
 	echo ' <span id="itemform_post_locale">'; // allow wrapping here! (and below)
 	                                          // blueyed>> (Opera would additionally need text/&nbsp; here, but that wraps ugly)
-	$Form->select( 'post_locale', $post_locale, 'locale_options_return', T_('Language') );
+	$Form->select( 'post_locale', $edited_Item->get( 'locale' ), 'locale_options_return', T_('Language') );
 	echo '</span>';
 
 	echo ' <span id="itemform_typ_ID">';
@@ -104,7 +107,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	if( $use_post_url )
 	{
 		echo ' <span id="itemform_post_url">';
-		$Form->text( 'post_url', $post_url, 40, T_('Link to url'), '', 255 );
+		$Form->text( 'post_url', $edited_Item->get( 'url' ), 40, T_('Link to url'), '', 255 );
 		echo '</span>';
 	}
 	else
@@ -121,7 +124,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	// ---------------------------- TEXTAREA -------------------------------------
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
-	$Form->textarea_input( 'content', $content, 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content' ) );
+	$Form->textarea_input( 'content', $edited_Item->get( 'content' ), 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content' ) );
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';
 	?>
@@ -147,7 +150,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->submit( array( '', /* TRANS: This is the value of an input submit button */ T_('Save !'), 'SaveButton' ) );
 
 	// ---------- DELETE ----------
-	if( $next_action == 'update' )
+	if( ! $creating )
 	{ // Editing post
 		// Display delete button if current user has the rights:
 		$edited_Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
@@ -189,7 +192,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		echo ' '; // allow wrapping!
 		$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '' );
 		echo ' '; // allow wrapping!
-		if( $next_action == 'create' )
+		if( $creating )
 		{ // If not checked, create time will be used...
 			$Form->checkbox( 'edit_date', $edit_date, '', T_('Edit') );
 		}
@@ -198,7 +201,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		<?php
 	}
 
-	$Form->text( 'post_urltitle', $post_urltitle, 40, T_('URL Title'),
+	$Form->text( 'post_urltitle', $edited_Item->get( 'urltitle' ), 40, T_('URL Title'),
 	             T_('(to be used in permalinks)'), $field_maxlength = 50 ) ;
 
 	$Form->end_fieldset();
@@ -228,13 +231,6 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 		$Form->end_fieldset();
 	}
-	else
-	{ // Workflow stuff hidden:
-		$Form->hidden( 'item_priority', param('item_priority', 'integer', NULL) );
-		$Form->hidden( 'item_assigned_user_ID', param('item_assigned_user_ID', 'integer', NULL) );
-		$Form->hidden( 'item_st_ID', param('item_st_ID', 'integer', NULL) );
-		$Form->hidden( 'item_deadline', param('item_deadline', 'string', NULL) );
-	}
 
 	// ####################### ADDITIONAL ACTIONS #########################
 
@@ -245,7 +241,9 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		// --------------------------- TRACKBACK --------------------------------------
 		?>
 		<div id="itemform_trackbacks">
-			<label for="trackback_url"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" value="<?php echo format_to_output( $post_trackbacks, 'formvalue' ); ?>" />
+			<label for="trackback_url"><strong><?php echo T_('Trackback URLs') ?>:</strong>
+			<span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br />
+			<input type="text" name="trackback_url" class="large" id="trackback_url" value="<?php echo format_to_output( $trackback_url, 'formvalue' ); ?>" />
 		</div>
 		<?php
 
@@ -318,6 +316,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
 
+	// fp> TODO: there should be no param call here (shld be in controller)
 	$edited_Item->renderer_checkboxes( param('renderers', 'array', NULL) );
 
 	$Form->end_fieldset();
@@ -336,7 +335,7 @@ $Form->end_form();
 
 // ####################### LINKS #########################
 
-if( $next_action == 'update' )
+if( $creating )
 { // Editing post
 
 	require dirname(__FILE__).'/inc/_item_links.inc.php';
@@ -351,6 +350,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.35  2006/12/12 23:23:30  fplanque
+ * finished post editing v2.0
+ *
  * Revision 1.34  2006/12/12 21:19:31  fplanque
  * UI fixes
  *

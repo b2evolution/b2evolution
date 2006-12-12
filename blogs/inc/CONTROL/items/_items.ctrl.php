@@ -80,8 +80,9 @@ switch( $action )
 	case 'publish':
 	case 'deprecate':
 	case 'delete':
+ 		// Note: we need to *not* use $p in the cases above or it will conflict with the list display
+	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
  		// Load post to edit:
- 		// Note: we need to *not* use $p here or it will conflict with the list display
 		param( 'post_ID', 'integer', true, true );
 		$ItemCache = & get_Cache( 'ItemCache' );
 		$edited_Item = & $ItemCache->get_by_ID( $post_ID );
@@ -92,6 +93,7 @@ switch( $action )
 		break;
 
 	case 'new':
+	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 	case 'create':
 	case 'list':
 		if( $action == 'list' )
@@ -117,7 +119,7 @@ switch( $action )
 		break;
 
 	default:
-		debug_die( 'unhandled action 1' );
+		debug_die( 'unhandled action 1:'.htmlspecialchars($action) );
 }
 
 
@@ -131,12 +133,18 @@ switch( $action )
 		break;
 
 	case 'new':
+	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 		// New post form  (can be a bookmarklet form if mode == bookmarklet )
 
 		load_class( 'MODEL/items/_item.class.php' );
 		$edited_Item = & new Item();
 
 		$edited_Item->blog_ID = $blog;
+
+		// We use the request variables to fill the edit form, because we need to be able to pass those values
+		// from tab to tab via javascript when the editor wants to switch views...
+		// Also used by bookmarklet
+		$edited_Item->load_from_Request(); // needs Blog set
 
 		// We know we can use at least one status,
 		// but we need to make sure the requested/default one is ok...
@@ -155,12 +163,6 @@ switch( $action )
 				$post_status = 'deprecated';
 		}
 
-		// We use the variables below to fill the edit form, because we need to be able to pass those values
-		// from tab to tab via javascript when the editor wants to switch views...
-
-		// Note: most params are handled by "$edited_Item->load_from_Request();" below..
-		$edited_Item->load_from_Request(); // needs Blog set
-
 		param( 'post_extracats', 'array', array() );
 		param( 'edit_date', 'integer', 0 ); // checkbox
 		$default_main_cat = param( 'post_category', 'integer', $edited_Item->main_cat_ID );
@@ -169,6 +171,9 @@ switch( $action )
 			$default_main_cat = 0;
 		}
 		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
+
+		// Trackback addresses (never saved into item)
+ 		param( 'trackback_url', 'string', '' );
 
 		// Page title:
 		$AdminUI->title = T_('New post in blog:').' ';
@@ -179,25 +184,45 @@ switch( $action )
 		$tab_switch_params = 'blog='.$blog;
 		break;
 
-	case 'edit':
-		// Check permission:
-		$post_status = $edited_Item->get( 'status' );
-		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
 
-		// We use the variables below to fill the edit form, because we need to be able to pass those values
+	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
+		// This is somewhat in between new and edit...
+
+		// Check permission based on DB status:
+		$current_User->check_perm( 'blog_post_statuses', $edited_Item->get( 'status' ), true, $blog );
+
+		// We use the request variables to fill the edit form, because we need to be able to pass those values
 		// from tab to tab via javascript when the editor wants to switch views...
+		$edited_Item->load_from_Request(); // needs Blog set
 
-		$post_locale = $edited_Item->get( 'locale' );
+		// We know we can use at least one status,
+		// but we need to make sure the requested/default one is ok...
+		param( 'post_status', 'string',  $default_post_status );		// 'published' or 'draft' or ...
+		if( ! $current_User->check_perm( 'blog_post_statuses', $post_status, false, $blog ) )
+		{ // We need to find another one:
+			if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
+				$post_status = 'published';
+			elseif( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $blog ) )
+				$post_status = 'protected';
+			elseif( $current_User->check_perm( 'blog_post_statuses', 'private', false, $blog ) )
+				$post_status = 'private';
+			elseif( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $blog ) )
+				$post_status = 'draft';
+			else
+				$post_status = 'deprecated';
+		}
 
-		// $cat = $edited_Item->get( 'main_cat_ID' );
+		param( 'post_extracats', 'array', array() );
+		param( 'edit_date', 'integer', 0 ); // checkbox
+		$default_main_cat = param( 'post_category', 'integer', $edited_Item->main_cat_ID );
+		if( $default_main_cat && $allow_cross_posting < 3 && get_catblog($default_main_cat) != $blog )
+		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing: setting it to 0 uses the first cat in the list
+			$default_main_cat = 0;
+		}
+		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
 
-		$post_title = $edited_Item->get( 'title' );
-		$post_urltitle = $edited_Item->get( 'urltitle' );
-		$post_url = $edited_Item->get( 'url' );
-		$content = $edited_Item->get( 'content' );
-		$post_trackbacks = '';
-		$post_comment_status = $edited_Item->get( 'comment_status' );
-		$post_extracats = postcats_get_byID( $p );
+		// Trackback addresses (never saved into item)
+ 		param( 'trackback_url', 'string', '' );
 
 		// Page title:
 		$js_doc_title_prefix = T_('Editing post').': ';
@@ -205,7 +230,27 @@ switch( $action )
 		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, $Blog->get('name') );
 
 		// Params we need for tab switching:
-		$tab_switch_params = 'p='.$p;
+		$tab_switch_params = 'p='.$edited_Item->ID;
+		break;
+
+
+	case 'edit':
+		// Check permission:
+		$post_status = $edited_Item->get( 'status' );
+		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
+
+		$post_comment_status = $edited_Item->get( 'comment_status' );
+		$post_extracats = postcats_get_byID( $p );
+
+  	$trackback_url = '';
+
+		// Page title:
+		$js_doc_title_prefix = T_('Editing post').': ';
+		$AdminUI->title = $js_doc_title_prefix.$edited_Item->dget( 'title', 'htmlhead' );
+		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, $Blog->get('name') );
+
+		// Params we need for tab switching:
+		$tab_switch_params = 'p='.$edited_Item->ID;
 		break;
 
 
@@ -484,11 +529,11 @@ function init_list_mode()
 switch( $action )
 {
 	case 'new':
-
+	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 		// Generate available blogs list:
 		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_post_statuses', 'any',
-						$pagenow.'?ctrl=items&amp;action=new&amp;blog=%d', NULL, ''
-						/* , 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$pagenow.'\', %d )' */ );
+						'admin.php?ctrl=items&amp;action=new&amp;blog=%d', NULL, '',
+						'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php\', %d )' );
 
 		// We don't check the following earlier, because we want the blog switching buttons to be available:
 		if( ! blog_has_cats( $blog ) )
@@ -501,6 +546,7 @@ switch( $action )
 		/* NOBREAK */
 
 	case 'edit':
+	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
 	case 'update': // on error
 		// Get tab ("simple" or "expert") from Request or UserSettings:
 		$tab = $UserSettings->param_Request( 'tab', 'pref_edit_tab', 'string', NULL, true /* memorize */ );
@@ -511,13 +557,13 @@ switch( $action )
 						'simple' => array(
 							'text' => T_('Simple'),
 							'href' => 'admin.php?ctrl=items&amp;action='.$action.'&amp;tab=simple&amp;'.$tab_switch_params,
-							// fp> TODO: fix: 'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php?ctrl=edit&amp;tab=simple&amp;blog='.$blog.'\' );',
+							'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php?tab=simple&amp;blog='.$blog.'\' );',
 							// 'name' => 'switch_to_simple_tab_nocheckchanges', // no bozo check
 							),
 						'expert' => array(
 							'text' => T_('Expert'),
 							'href' => 'admin.php?ctrl=items&amp;action='.$action.'&amp;tab=expert&amp;'.$tab_switch_params,
-							// fp> TODO: fix: 'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php?ctrl=edit&amp;tab=expert&amp;blog='.$blog.'\' );',
+							'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php?tab=expert&amp;blog='.$blog.'\' );',
 							// 'name' => 'switch_to_expert_tab_nocheckchanges', // no bozo check
 							),
 					)
@@ -563,19 +609,15 @@ switch( $action )
 		// Do nothing
 		break;
 
+  case 'new_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
+		$bozo_start_modified = true;	// We want to start with a form being already modified
 	case 'new':
 	case 'create':
-		$next_action = 'create';
-		$creating = true; // used by cat_select_before_each()
 	case 'edit':
 	case 'update':	// on error
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
-
-		if( empty($next_action) )
-		{
-			$next_action = 'update';
-		}
 
 		// Display VIEW:
 		switch( $tab )
@@ -660,6 +702,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2006/12/12 23:23:29  fplanque
+ * finished post editing v2.0
+ *
  * Revision 1.5  2006/12/12 19:39:07  fplanque
  * enhanced file links / permissions
  *

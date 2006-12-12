@@ -2337,15 +2337,17 @@ function is_create_action( $action )
 	switch( $action_parts[0] )
 	{
 		case 'new':
+		case 'new_switchtab':
 		case 'copy':
 		case 'create':	// we return in this state after a validation error
 			return true;
 
 		case 'edit':
+		case 'edit_switchtab':
 		case 'update':	// we return in this state after a validation error
 		case 'delete':
 		// The following one's a bit far fetched, but can happen if we have no sheet display:
-		case 'delete_link':
+		case 'unlink':
 		case 'view':
 			return false;
 
@@ -2751,6 +2753,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.154  2006/12/12 23:23:30  fplanque
+ * finished post editing v2.0
+ *
  * Revision 1.153  2006/12/05 06:22:24  blueyed
  * Fixed blogger.newPost to accept a list of categories, as given by w.bloggar
  *
