@@ -788,8 +788,7 @@ class AdminUI_general
 	 *
 	 * Templates can handle multiple depth levels
 	 *
-	 * This is a method (and not a member array) to allow dynamic generation.
-	 * fp>>I'm not so sure about this... feels a little bloated... gotta think about it..
+	 * This is a method (and not a member array) to allow dynamic generation and T_()
 	 *
 	 * @param string Name of the template ('main', 'sub')
 	 * @param integer Nesting level (start at 0)
@@ -899,7 +898,7 @@ class AdminUI_general
 					'header_end' => '</div>',
 					'list_start' => '<table class="grouped" cellspacing="0">'."\n\n",
 						'head_start' => "<thead><tr>\n",
-							'head_title' => '<th colspan="$nb_cols$"><span style="float:right">$global_icons$</span>$title$</th></tr>'
+							'head_title' => '<th colspan="$nb_cols$" class="title"><span style="float:right">$global_icons$</span>$title$</th></tr>'
 							                ."\n\n<tr>\n",
 							'filters_start' => '<tr class="filters"><td colspan="$nb_cols$">',
 							'filters_end' => '</td></tr>',
@@ -965,8 +964,8 @@ class AdminUI_general
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
-					'no_results_start' => '<table class="grouped clear" cellspacing="0">'."\n\n"
-								                .'<th><span style="float:right">$global_icons$</span>'
+					'no_results_start' => '<table class="grouped" cellspacing="0">'."\n\n"
+								                .'<th class="title"><span style="float:right">$global_icons$</span>'
 								                .'$title$</th></tr>'."\n",
 					'no_results_end'   => '<tr class="lastline"><td class="firstcol lastcol">'.T_('No results.').'</td></tr>'
 								                .'</table>'."\n\n",
@@ -1332,6 +1331,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.38  2006/12/12 16:42:23  fplanque
+ * border-collapse sucks (firefox)
+ *
  * Revision 1.37  2006/12/12 02:53:57  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.

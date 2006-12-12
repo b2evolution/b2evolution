@@ -11,7 +11,7 @@
 table.grouped {
 	border: 1px solid #bbb;
 	margin: 1ex auto;
-	border-collapse: collapse;
+	width: 100%;
 	/* clear:both; */
 }
 
@@ -48,6 +48,11 @@ table.grouped tr.odd {
 table.grouped td {
 	border-left: 1px solid #bbb;
 	padding: .3ex 1ex;
+}
+table.grouped th.title,
+table.grouped th.firstcol,
+table.grouped td.firstcol {
+	border-left: none;
 }
 table.grouped tr.group td {
 	font-weight: bold;
