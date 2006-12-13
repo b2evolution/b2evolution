@@ -1,12 +1,13 @@
 <?php
 /**
- * This file attached JS bahviors to item_form objects
+ * This file attaches JS behaviors to item_form objects
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- *
+ * * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
+
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
  *   the same folder or the closest folder above for complete license terms.
@@ -17,12 +18,14 @@
  * }}
  *
  * {@internal Open Source relicensing agreement:
+ * Daniel HAHLER grants Francois PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package admin
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE.
+ * @author blueyed: Daniel HAHLER
  *
  * @version $Id$
  */
@@ -91,6 +94,9 @@ global $js_doc_title_prefix;
 <?php
 /*
  * $Log$
+ * Revision 1.4  2006/12/13 18:35:56  blueyed
+ * Talking about behavior
+ *
  * Revision 1.3  2006/12/12 23:23:30  fplanque
  * finished post editing v2.0
  *
