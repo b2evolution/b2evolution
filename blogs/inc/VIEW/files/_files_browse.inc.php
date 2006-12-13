@@ -373,10 +373,10 @@ while( $lFile = & $fm_Filelist->get_next() )
 	/*****************  Image file preview:  *******************/
 	if( $UserSettings->get( 'fm_imglistpreview' ) )
 	{
-		echo '<td class="fm_preview_list">';
+		echo '<td class="fm_preview_list center">';
 		if( $lFile->is_image() )
 		{
-			$img = '<img src="'.$lFile->get_thumb_url().'" alt="" width="80" />';
+			$img = '<img src="'.$lFile->get_thumb_url().'" alt="" />';
 
 			// Get link to view the file (fallback to no view link - just the img):
 			$link = $lFile->get_view_link( $img );
@@ -981,6 +981,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.29  2006/12/13 18:10:22  fplanque
+ * thumbnail resampling proof of concept
+ *
  * Revision 1.28  2006/12/13 03:08:28  fplanque
  * thumbnail implementation design demo
  *

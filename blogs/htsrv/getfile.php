@@ -64,13 +64,44 @@ if( !empty( $size) && $File->is_image() )
 	// fp> TODO: a million things (fp) but you get the idea...
 	// The generated thumb will be saved to a cached file here (fp)
 	// The cache will be accessed through the File object (fp)
-	$im_handle   = imagecreatetruecolor( 80, 80 ); /* Create a black image */
-	$text_color  = imagecolorallocate( $im_handle, 255, 255, 255 );
-	imagestring( $im_handle, 3, 9, 25, 'Thumbnail', $text_color);
-	$text_color  = imagecolorallocate( $im_handle, 255, 0, 0 );
-	imagestring( $im_handle, 3, 20, 42, 'Error!', $text_color);
-	header('Content-type: image/png' );
-	imagepng( $im_handle );
+	load_funcs( 'MODEL/files/_image.funcs.php' );
+
+	$thumb_width = 80;
+	$thumb_height = 80;
+	$err = NULL;		// Short error code
+
+	switch( $File->Filetype->mimetype )
+	{
+		case 'image/jpeg':
+			$src_imh = imagecreatefromjpeg( $File->get_full_path() );
+			$err = generate_thumb( $src_imh, $thumb_width, $thumb_height );
+			break;
+
+		case 'image/gif':
+			$src_imh = imagecreatefromgif( $File->get_full_path() );
+			$err = generate_thumb( $src_imh, $thumb_width, $thumb_height );
+			break;
+
+		default:
+			// Un recognized mime type
+			$err = 'Emime';	// Sort error code
+			$err_info = $File->Filetype->mimetype;
+	}
+
+	if( !empty( $err ) )
+	{	// Generate an error image and try to squeeze an error message inside:
+		// Note: we write small and close to the upper left in order to have as much text as possible on small thumbs
+  	$im_handle = imagecreatetruecolor( $thumb_width, $thumb_height ); // Create a black image
+		$text_color = imagecolorallocate( $im_handle, 255, 0, 0 );
+		imagestring( $im_handle, 2, 2, 1, $err, $text_color);
+		if( !empty( $err_info ) )
+		{	// Additional info
+			$text_color = imagecolorallocate( $im_handle, 255, 255, 255 );
+			imagestring( $im_handle, 2, 2, 12, $err_info, $text_color);
+		}
+		header('Content-type: image/png' );
+		imagepng( $im_handle );
+	}
 }
 else
 {	// We want the regular file:
@@ -89,6 +120,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/13 18:10:21  fplanque
+ * thumbnail resampling proof of concept
+ *
  * Revision 1.10  2006/12/13 03:08:28  fplanque
  * thumbnail implementation design demo
  *
