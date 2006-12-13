@@ -105,6 +105,9 @@ class Blog extends DataObject
 	/**
 	 * Additional settings for the collection.  lazy filled.
  	 *
+	 * @see Blog::get_setting()
+	 * @see Blog::set_setting()
+	 * @see Blog::load_CollectionSettings()
 	 * Any non vital params should go into there (this includes many of the above).
 	 *
 	 * @var CollectionSettings
@@ -1044,6 +1047,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.42  2006/12/13 18:23:36  blueyed
+ * doc
+ *
  * Revision 1.41  2006/12/10 23:56:26  fplanque
  * Worfklow stuff is now hidden by default and can be enabled on a per blog basis.
  *
