@@ -261,7 +261,10 @@ else
 
 
 /*
- * register_globals
+ * GD Library
+ * windows: extension=php_gd2.dll
+ * unix: ?
+ * fp> Note: I'm going to use this for thumbnails for now, but I plan to use it for other things like small stats & status graphics.
  */
 $gd_info = function_exists( 'gd_info' ) ? gd_info() : array( 'GD Version' => NULL );
 $gd_version = $gd_info['GD Version'];
@@ -273,6 +276,54 @@ if( ! isset($gd_version) )
 else
 {
 	disp_system_check( 'ok' );
+
+	init_system_check( 'GD JPG Support', !empty($gd_info['JPG Support']) ? T_('Read/Write') : T_('No') );
+	if( empty($gd_info['JPG Support']) )
+	{
+		disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for JPG images.') );
+	}
+	else
+	{
+		disp_system_check( 'ok' );
+	}
+
+	init_system_check( 'GD PNG Support', !empty($gd_info['JPG Support']) ? T_('Read/Write') : T_('No') );
+	if( empty($gd_info['PNG Support']) )
+	{
+		disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for PNG images.') );
+	}
+	else
+	{
+		disp_system_check( 'ok' );
+	}
+
+	if( !empty($gd_info['GIF Create Support']) )
+	{
+		$gif_support = T_('Read/Write');
+	}
+	elseif( !empty($gd_info['GIF Read Support']) )
+	{
+		$gif_support = T_('Read');
+	}
+	else
+	{
+		$gif_support = T_('No');
+	}
+	init_system_check( 'GD GIF Support', $gif_support );
+	if( $gif_support == T_('No') )
+	{
+		disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for GIF images.') );
+	}
+	elseif( $gif_support == T_('Read') )
+	{
+		disp_system_check( 'warning', T_('Thumbnails for GIF images will be generated as PNG or JPG.') );
+	}
+	else
+	{
+		disp_system_check( 'ok' );
+	}
+
+	// pre_dump( $gd_info );
 }
 
 
@@ -299,6 +350,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/13 03:08:28  fplanque
+ * thumbnail implementation design demo
+ *
  * Revision 1.10  2006/12/13 00:57:18  fplanque
  * GD... just for fun ;)
  *

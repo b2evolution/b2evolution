@@ -370,13 +370,13 @@ while( $lFile = & $fm_Filelist->get_next() )
 { // Loop through all Files:
 	echo '<tr class="'.( $countFiles%2 ? 'odd' : 'even' ).'">';
 
-	/***************** Image file preview *******************/
+	/*****************  Image file preview:  *******************/
 	if( $UserSettings->get( 'fm_imglistpreview' ) )
 	{
 		echo '<td class="fm_preview_list">';
 		if( $lFile->is_image() )
 		{
-			$img = '<img src="'.$lFile->_FileRoot->ads_url.$lFile->_rdfp_rel_path.'" alt="" width="80" />';
+			$img = '<img src="'.$lFile->get_thumb_url().'" alt="" width="80" />';
 
 			// Get link to view the file (fallback to no view link - just the img):
 			$link = $lFile->get_view_link( $img );
@@ -981,6 +981,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.28  2006/12/13 03:08:28  fplanque
+ * thumbnail implementation design demo
+ *
  * Revision 1.27  2006/12/12 19:39:07  fplanque
  * enhanced file links / permissions
  *

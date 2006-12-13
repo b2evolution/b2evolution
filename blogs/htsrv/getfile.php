@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the File view.
+ * This file implements the File view (including resizing of images)
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -39,37 +39,59 @@ require_once $inc_path.'/_main.inc.php';
 
 
 // Check permission:
+// fp> TODO: skip this if $public_access_to_media  (needs testing before enabling)
 if( ! isset($current_User) )
 {
 	debug_die( 'No permission to get file (not logged in)!' );
 }
 $current_User->check_perm( 'files', 'view', true );
+// fp> TODO: check specific READ perm for requested fileroot
 
 // Load params:
-param( 'root', 'string', true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
+param( 'root', 'string', true );	// the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
 param( 'path', 'string', true );
+param( 'size', 'string', NULL );	// Can be used for images.
 
 // Load fileroot info:
 $FileRootCache = & get_Cache( 'FileRootCache' );
 $FileRoot = & $FileRootCache->get_by_ID( $root );
 
-// Create file object
-$File = & new File( $FileRoot->type , $FileRoot->in_type_ID, $path );
+// Load file object (not the file content):
+$File = & new File( $FileRoot->type, $FileRoot->in_type_ID, $path );
 
-// Headers to display the file directly in the browser
-header('Content-type: '.$File->Filetype->mimetype );
-header('Content-Length: '.filesize( $File->get_full_path() ) );
-
-if( $File->Filetype->viewtype == 'download' )
-{
-	header('Content-disposition: attachment; filename="'.$File->get_name().'"' );
+if( !empty( $size) && $File->is_image() )
+{	// We want a thumbnail:
+	// fp> TODO: a million things (fp) but you get the idea...
+	// The generated thumb will be saved to a cached file here (fp)
+	// The cache will be accessed through the File object (fp)
+	$im_handle   = imagecreatetruecolor( 80, 80 ); /* Create a black image */
+	$text_color  = imagecolorallocate( $im_handle, 255, 255, 255 );
+	imagestring( $im_handle, 3, 9, 25, 'Thumbnail', $text_color);
+	$text_color  = imagecolorallocate( $im_handle, 255, 0, 0 );
+	imagestring( $im_handle, 3, 20, 42, 'Error!', $text_color);
+	header('Content-type: image/png' );
+	imagepng( $im_handle );
 }
+else
+{	// We want the regular file:
+	// Headers to display the file directly in the browser
+	header('Content-type: '.$File->Filetype->mimetype );
+	header('Content-Length: '.filesize( $File->get_full_path() ) );
 
-// Display the content of the file
-readfile( $File->get_full_path() );
+	if( $File->Filetype->viewtype == 'download' )
+	{
+		header('Content-disposition: attachment; filename="'.$File->get_name().'"' );
+	}
+
+	// Display the content of the file
+	readfile( $File->get_full_path() );
+}
 
 /*
  * $Log$
+ * Revision 1.10  2006/12/13 03:08:28  fplanque
+ * thumbnail implementation design demo
+ *
  * Revision 1.9  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

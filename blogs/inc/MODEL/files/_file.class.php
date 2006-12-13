@@ -533,7 +533,7 @@ class File extends DataObject
 		{ // Directory
 			if( $public_access_to_media )
 			{ // Public access: full path
-				$url = $this->get_rdfs_rel_path();
+				$url = $this->get_full_path(); 	// fp> was get_rdfs_rel_path(); but that seems wrong
 			}
 			else
 			{ // No Access
@@ -549,7 +549,11 @@ class File extends DataObject
 			else
 			{ // Private Access: doesn't show the full path
 				$root = $this->_FileRoot->ID;
-				$url = $htsrv_url.'getfile.php/'.rawurlencode( $this->_name ).'?root='.$root.'&amp;path='.$this->_rdfp_rel_path;
+				$url = $htsrv_url.'getfile.php/'
+								// This is for clean 'save as':
+								.rawurlencode( $this->_name )
+								// This is for locating the file:
+								.'?root='.$root.'&amp;path='.$this->_rdfp_rel_path;
 			}
 		}
 		return $url;
@@ -1362,11 +1366,46 @@ class File extends DataObject
 
 		return '<a href="'.$url.'" title="'.$title.'">'.$text.'</a>';
 	}
+
+
+	/**
+	 * Get the thumbnail URL for the file
+	 */
+	function get_thumb_url()
+	{
+		global $public_access_to_media, $htsrv_url;
+
+		if( ! $this->is_image() )
+		{ // Not an image
+			debug_die( 'Cannot only thumb images');
+		}
+
+		/* TODO: if public and thumb already exists, then optimize:
+		 * No need to go through PHP if the file already exists and publicly accessible:
+		if( $public_access_to_media )
+		{ // Public Access : full path
+			$url = $this->_FileRoot->ads_url.$this->_rdfp_rel_path;
+		}
+		*/
+
+		$root = $this->_FileRoot->ID;
+		$url = $htsrv_url.'getfile.php/'
+						// This is for clean 'save as':
+						.rawurlencode( $this->_name )
+						// This is for locating the file:
+						.'?root='.$root.'&amp;path='.$this->_rdfp_rel_path.'&amp;size=thumb';
+
+		return $url;
+	}
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.25  2006/12/13 03:08:28  fplanque
+ * thumbnail implementation design demo
+ *
  * Revision 1.24  2006/12/07 23:13:10  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!
