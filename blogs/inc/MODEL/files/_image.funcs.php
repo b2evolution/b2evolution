@@ -29,6 +29,14 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+/**
+ * Scale dimensions to fit into a constrained size, while preserving aspect ratio.
+ *
+ * @param integer source width
+ * @param integer source height
+ * @param integer constrained width
+ * @param integer constrained height
+ */
 function scale_dimensions_to_fit( $src_width, $src_height, $max_width, $max_height )
 {
 	$src_ratio = $src_width / $src_height;
@@ -46,6 +54,16 @@ function scale_dimensions_to_fit( $src_width, $src_height, $max_width, $max_heig
 	return array( $width, $height );
 }
 
+
+/**
+ * Scale dimensions to fit into a constrained size, while preserving aspect ratio.
+ * The scaling only happens if the source is larger than the constraint.
+ *
+ * @param integer source width
+ * @param integer source height
+ * @param integer constrained width
+ * @param integer constrained height
+ */
 function shrink_dimensions_to_fit( $src_width, $src_height, $max_width, $max_height )
 {
 	if( $src_width > $max_width || $src_height > $max_height )
@@ -56,33 +74,111 @@ function shrink_dimensions_to_fit( $src_width, $src_height, $max_width, $max_hei
 	return array( $src_width, $src_height );
 }
 
+
 /**
- * @return string short error code
+ * Load an image from a file into memory
+ *
+ * @param string
+ * @param string
+ * @return array resource image handle or NULL
+ */
+function load_image( $path, $mimetype )
+{
+	$err = NULL;
+	$err_info = NULL;
+	$imh = NULL;
+
+	switch( $mimetype )
+	{
+		case 'image/jpeg':
+			$imh = imagecreatefromjpeg( $path );
+			break;
+
+		case 'image/gif':
+			$imh = imagecreatefromgif( $path );
+			break;
+
+ 		default:
+			// Unrecognized mime type
+			$err = 'Emime';	// Sort error code
+			$err_info = $mimetype;
+			break;
+	}
+
+	return array( $err, $err_info, $imh );
+}
+
+
+/**
+ * Output an image from memory to web client
+ *
+ * @param resource image handle
+ * @param string
+ * @return string
+ */
+function output_image( $imh, $mimetype )
+{
+	$err = NULL;
+
+	switch( $mimetype )
+	{
+		case 'image/jpeg':
+			header('Content-type: '.$mimetype );
+			imagejpeg( $imh );
+			break;
+
+		case 'image/gif':
+			header('Content-type: '.$mimetype );
+			imagegif( $imh );
+			break;
+
+ 		default:
+			// Unrecognized mime type
+			$err = 'Emime';	// Sort error code
+			break;
+	}
+
+	return $err;
+}
+
+
+
+
+/**
+ * Generate a thumbnail
+ *
+ * @return array short error code + dest image handler
  */
 function generate_thumb( $src_imh, $thumb_width, $thumb_height )
 {
 	$src_width = imagesx( $src_imh ) ;
 	$src_height = imagesy( $src_imh );
 
-	list( $dest_width, $dest_height ) = shrink_dimensions_to_fit( $src_width, $src_height, $thumb_width, $thumb_height );
+	if( $src_width <= $thumb_width && $src_height <= $thumb_height )
+	{	// There is no need to resample, use original!
+		return array( NULL, $src_imh );
+	}
+
+	list( $dest_width, $dest_height ) = scale_dimensions_to_fit( $src_width, $src_height, $thumb_width, $thumb_height );
 
 	// pre_dump( $src_width, $src_height, $dest_width, $dest_height );
 
 	$dest_imh = imagecreatetruecolor( $dest_width, $dest_height ); // Create a black image
 	if( ! imagecopyresampled( $dest_imh, $src_imh, 0, 0, 0, 0, $dest_width, $dest_height, $src_width, $src_height ) )
 	{
-		return 'Eresample';	// Sort error code
+		return array( 'Eresample', $dest_imh );
 	}
 
 	// TODO: imageinterlace();
-	header('Content-type: image/jpeg' );
-	imagejpeg( $dest_imh );
 
-	return NULL;
+	return array( NULL, $dest_imh );
 }
 
 /*
  * $Log$
+ * Revision 1.2  2006/12/13 20:10:31  fplanque
+ * object responsibility delegation?
+ *
  * Revision 1.1  2006/12/13 18:10:21  fplanque
  * thumbnail resampling proof of concept
  *

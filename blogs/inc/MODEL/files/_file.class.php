@@ -1398,11 +1398,74 @@ class File extends DataObject
 		return $url;
 	}
 
+
+	/**
+	 *	Save thumbnail for file
+	 *
+	 * @param resource
+	 * @param string
+	 */
+	function save_thumb( $thumb_imh, $thumb_mimetype )
+	{
+	}
+
+
+	/**
+	 * This will spit out a content-type header followed by a thumbnail for this file.
+	 *
+	 * @todo a million things (fp) but you get the idea...
+	 * The generated thumb will be saved to a cached file here (fp)
+	 * The cache will be accessed through the File object (fp)
+	 * @todo cleanup memory resources
+	 *
+	 * @param string requested size: 'thumbnail'
+	 */
+	function thumbnail( $req_size )
+	{
+		load_funcs( 'MODEL/files/_image.funcs.php' );
+
+		// fp> TODO: switch( $req_size ) (fp)
+		$thumb_width = 80;
+		$thumb_height = 80;
+		$err = NULL;		// Short error code
+
+		$mimetype = $this->Filetype->mimetype;
+
+		list( $err, $err_info, $src_imh ) = load_image( $this->get_full_path(), $mimetype );
+		if( empty( $err ) )
+		{
+			list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_width, $thumb_height );
+			if( empty( $err ) )
+			{
+				$this->save_thumb( $dest_imh, $mimetype );
+
+				$err = output_image( $dest_imh, $mimetype );
+			}
+		}
+
+		if( !empty( $err ) )
+		{	// Generate an error image and try to squeeze an error message inside:
+			// Note: we write small and close to the upper left in order to have as much text as possible on small thumbs
+  		$im_handle = imagecreatetruecolor( $thumb_width, $thumb_height ); // Create a black image
+			$text_color = imagecolorallocate( $im_handle, 255, 0, 0 );
+			imagestring( $im_handle, 2, 2, 1, $err, $text_color);
+			if( !empty( $err_info ) )
+			{	// Additional info
+				$text_color = imagecolorallocate( $im_handle, 255, 255, 255 );
+				imagestring( $im_handle, 2, 2, 12, $err_info, $text_color);
+			}
+			header('Content-type: image/png' );
+			imagepng( $im_handle );
+		}
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.26  2006/12/13 20:10:30  fplanque
+ * object responsibility delegation?
+ *
  * Revision 1.25  2006/12/13 03:08:28  fplanque
  * thumbnail implementation design demo
  *
