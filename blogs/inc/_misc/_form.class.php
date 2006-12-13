@@ -345,7 +345,7 @@ class Form extends Widget
 	 */
 	function end_field( $field_note = NULL, $field_note_format = NULL )
 	{
-		if( isset($field_note) )
+		if( isset($field_note) ) // Note: allow "0" as a note
 		{ // deprecated - should get set by calling handle_common_params()
 			$this->_common_params['note'] = $field_note;
 		}
@@ -2724,6 +2724,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.63  2006/12/13 19:34:25  fplanque
+ * doc
+ *
  * Revision 1.62  2006/12/13 18:00:35  blueyed
  * Allow "0" as note (again) + avoid unnecessary negation
  *

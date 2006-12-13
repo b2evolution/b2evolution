@@ -6,8 +6,8 @@
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- * * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
-
+ * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
+ *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
  *   the same folder or the closest folder above for complete license terms.
@@ -26,6 +26,7 @@
  * @package admin
  *
  * @author blueyed: Daniel HAHLER
+ * @author fplanque: Francois PLANQUE.
  *
  * @version $Id$
  */
@@ -94,8 +95,12 @@ global $js_doc_title_prefix;
 <?php
 /*
  * $Log$
+ * Revision 1.5  2006/12/13 19:34:25  fplanque
+ * doc
+ *
  * Revision 1.4  2006/12/13 18:35:56  blueyed
  * Talking about behavior
+ * fp> what??
  *
  * Revision 1.3  2006/12/12 23:23:30  fplanque
  * finished post editing v2.0
