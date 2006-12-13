@@ -581,7 +581,9 @@ class User extends DataObject
 		}
 
 		// echo "<br>Checking user perm $permname:$permlevel:$perm_target";
-		$Debuglog->add( "User perm $permname:$permlevel:$perm_target => ".($perm?'granted':'DENIED'), 'perms' );
+		$Debuglog->add( "User perm $permname:$permlevel:"
+			.( is_object($perm_target) ? get_class($perm_target).'('.$perm_target_ID.')' : $perm_target ) // prevent catchable E_FATAL with PHP 5.2 (because there's no __tostring for e.g. Item)
+			.' => '.($perm?'granted':'DENIED'), 'perms' );
 
 		if( ! $perm && $assert )
 		{ // We can't let this go on!
@@ -1154,6 +1156,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.59  2006/12/13 19:16:31  blueyed
+ * Fixed E_FATAL with PHP 5.2
+ *
  * Revision 1.58  2006/12/12 19:39:07  fplanque
  * enhanced file links / permissions
  *
