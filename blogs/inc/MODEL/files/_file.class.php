@@ -533,7 +533,7 @@ class File extends DataObject
 		{ // Directory
 			if( $public_access_to_media )
 			{ // Public access: full path
-				$url = $this->get_full_path(); 	// fp> was get_rdfs_rel_path(); but that seems wrong
+				$url = $this->get_rdfs_rel_path();
 			}
 			else
 			{ // No Access
@@ -1369,9 +1369,11 @@ class File extends DataObject
 
 
 	/**
-	 * Get the thumbnail URL for the file
+	 * Get the thumbnail URL for this file
+	 *
+	 * @param string not ready for being changed yet (fp)
 	 */
-	function get_thumb_url()
+	function get_thumb_url( $size_name = 'fit-80x80' )
 	{
 		global $public_access_to_media, $htsrv_url;
 
@@ -1380,14 +1382,18 @@ class File extends DataObject
 			debug_die( 'Cannot only thumb images');
 		}
 
-		/* TODO: if public and thumb already exists, then optimize:
-		 * No need to go through PHP if the file already exists and publicly accessible:
-		if( $public_access_to_media )
-		{ // Public Access : full path
-			$url = $this->_FileRoot->ads_url.$this->_rdfp_rel_path;
+		if( $public_access_to_media
+			&& $af_thumb_path = $this->get_af_thumb_path( $size_name, NULL, false ) )
+		{ // If the thumbnail was already cached, we could publicly access it:
+			if( is_file( $af_thumb_path ) )
+			{	// The thumb IS already cache! :)
+				// Let's point directly into the cache:
+				$url = $this->_FileRoot->ads_url.dirname($this->_rdfp_rel_path).'/.evocache/'.$this->_name.'/'.$size_name.'.'.$this->get_ext();
+				return $url;
+			}
 		}
-		*/
 
+		// No thumbnail available (at least publicly), we need to go throuit getfile.php!
 		$root = $this->_FileRoot->ID;
 		$url = $htsrv_url.'getfile.php/'
 						// This is for clean 'save as':
@@ -1418,7 +1424,10 @@ class File extends DataObject
 
 		if( $create_if_needed && !is_dir( $adp_evocache ) )
 		{	// Create the directory:
-			mkdir_r( $adp_evocache );
+			if( ! mkdir_r( $adp_evocache ) )
+			{	// Could not create
+				return NULL;
+			}
 		}
 
 		return $adp_evocache.'/';
@@ -1430,13 +1439,17 @@ class File extends DataObject
 	 * af = Absolute File
 	 *
 	 * @param string size name
-	 * @param string miemtype of thumbnail
+	 * @param string mimetype of thumbnail (NULL if we're ready to take wathever is available)
 	 * @param boolean shall we create the dir if it doesn't exist?
 	 * @return string or NULL if can't be obtained
 	 */
-	function get_af_thumb_path( $size_name, $thumb_mimetype, $create_evocache_if_needed = false )
+	function get_af_thumb_path( $size_name, $thumb_mimetype = NULL, $create_evocache_if_needed = false )
 	{
-		if( $thumb_mimetype != $this->Filetype->mimetype )
+		if( empty($thumb_mimetype) )
+		{
+			$thumb_mimetype = $this->Filetype->mimetype;
+		}
+		elseif( $thumb_mimetype != $this->Filetype->mimetype )
 		{
 			debug_die( 'Not supported. For now, thumbnails have to have same mime type as their parent file.' );
 			// TODO: extract prefered extension of filetypes config
@@ -1453,22 +1466,55 @@ class File extends DataObject
 
 
 	/**
-	 *	Save thumbnail for file
+	 *Save thumbnail for file
 	 *
 	 * @param resource
 	 * @param string size name
 	 * @param string miemtype of thumbnail
 	 * @param string short error code
 	 */
-	function save_thumb( $thumb_imh, $size_name, $thumb_mimetype )
+	function save_thumb_to_cache( $thumb_imh, $size_name, $thumb_mimetype )
 	{
 		if( $af_thumb_path = $this->get_af_thumb_path( $size_name, $thumb_mimetype, true ) )
 		{	// We obtained a path for the thumbnail to be saved:
 			return save_image( $thumb_imh, $af_thumb_path, $thumb_mimetype );
 		}
 
-		return 'Eaccess';
+		return 'Ewr-access';
 	}
+
+
+	/**
+	 * Output previously saved thumbnail for file
+	 *
+	 * @param string size name
+	 * @param string miemtype of thumbnail
+	 * @param string short error code
+	 */
+	function output_cached_thumb( $size_name, $thumb_mimetype )
+	{
+		if( $af_thumb_path = $this->get_af_thumb_path( $size_name, $thumb_mimetype, false ) )
+		{	// We obtained a path for the thumbnail to be saved:
+			if( ! file_exists( $af_thumb_path ) )
+			{	// The thumbnail was not found...
+				return 'Enotcached';
+			}
+
+			if( ! is_readable( $af_thumb_path ) )
+			{
+				return 'Eread';
+			}
+
+ 			header('Content-type: '.$thumb_mimetype );
+			header('Content-Length: '.filesize( $af_thumb_path ) );
+			// Output the content of the file
+			readfile( $af_thumb_path );
+			return NULL;
+		}
+
+		return 'Erd-access';
+	}
+
 
 
 	/**
@@ -1489,20 +1535,33 @@ class File extends DataObject
 		$size_name = 'fit-80x80';
 		$thumb_width = 80;
 		$thumb_height = 80;
-		$err = NULL;		// Short error code
 
 		$mimetype = $this->Filetype->mimetype;
 
-		list( $err, $err_info, $src_imh ) = load_image( $this->get_full_path(), $mimetype );
-		if( empty( $err ) )
-		{
-			list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_width, $thumb_height );
+		// Try to output the cached thumbnail:
+		$err = $this->output_cached_thumb( $size_name, $mimetype );
+
+		if( $err == 'Enotcached' )
+		{	// The thumbnail wasn't already in the cache, try to generate and cache it now:
+			$err = NULL;		// Short error code
+
+			list( $err, $err_info, $src_imh ) = load_image( $this->get_full_path(), $mimetype );
 			if( empty( $err ) )
 			{
-				$err = $this->save_thumb( $dest_imh, $size_name, $mimetype );
+				list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_width, $thumb_height );
 				if( empty( $err ) )
 				{
-					$err = output_image( $dest_imh, $mimetype );
+					$err = $this->save_thumb_to_cache( $dest_imh, $size_name, $mimetype );
+					if( empty( $err ) )
+					{	// File was saved. Ouput that same file immediately:
+						// This is probably better than recompressing the memory image..
+						$err = $this->output_cached_thumb( $size_name, $mimetype );
+					}
+					else
+					{	// File could not be saved.
+						// fp> We might want to output dynamically...
+						// $err = output_image( $dest_imh, $mimetype );
+					}
 				}
 			}
 		}
@@ -1527,6 +1586,10 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2006/12/13 22:26:27  fplanque
+ * This has reached the point of a functional eternal cache.
+ * TODO: handle cache on delete, upload/overwrite, rename, move, copy.
+ *
  * Revision 1.27  2006/12/13 21:23:56  fplanque
  * .evocache folders / saving of thumbnails
  *

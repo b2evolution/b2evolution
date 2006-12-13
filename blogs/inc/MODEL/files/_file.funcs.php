@@ -745,7 +745,7 @@ function mkdir_r( $dirName, $chmod = NULL )
 		$dir .= $part.'/';
 		if( ! is_dir($dir) )
 		{
-			if( ! mkdir($dir, $chmod) )
+			if( ! @mkdir($dir, $chmod) )
 			{
 				return false;
 			}
@@ -759,6 +759,10 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.30  2006/12/13 22:26:27  fplanque
+ * This has reached the point of a functional eternal cache.
+ * TODO: handle cache on delete, upload/overwrite, rename, move, copy.
+ *
  * Revision 1.29  2006/12/13 21:23:56  fplanque
  * .evocache folders / saving of thumbnails
  *
