@@ -116,7 +116,7 @@ switch( $action )
 			$Messages->add( T_('You should create categories for this blog now!'), 'note' );
 
 			header_nocache();
-			header_redirect( 'admin.php?ctrl=chapters&blog='.$edited_Blog->ID ); // will save $Messages into Session
+			header_redirect( url_add_param( $admin_url, 'ctrl=chapters&blog='.$edited_Blog->ID, '&' ) ); // will save $Messages into Session
 		}
 		break;
 
@@ -328,6 +328,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/13 18:17:39  blueyed
+ * Fixed header_redirect() which would only work if b2evo is installed in DOCUMENT_ROOT and would not have been RFC-compliant anyway
+ *
  * Revision 1.7  2006/12/11 16:53:47  fplanque
  * controller name cleanup
  *

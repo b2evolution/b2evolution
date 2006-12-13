@@ -279,7 +279,7 @@ switch( $action )
 		$dest_Blog = & $BlogCache->get_by_ID( $cat_coll_ID );
 		$Messages->add( sprintf( T_('The category &laquo;%s&raquo; has been moved (with children) to &laquo;%s&raquo;\'s root. You may want to nest it in another parent category below...'), $edited_GenericCategory->dget('name'), $dest_Blog->dget( 'shortname' )  ), 'success' );
 
-		header_redirect( 'admin.php?ctrl=chapters&action=edit&blog='.$cat_coll_ID.'&cat_ID='.$cat_ID );	// will save $Messages
+		header_redirect( url_add_param( $admin_url, 'ctrl=chapters&action=edit&blog='.$cat_coll_ID.'&cat_ID='.$cat_ID, '&' ) );	// will save $Messages
 		/* EXIT */
 
 		// In case we changed the redirect someday:
@@ -430,6 +430,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2006/12/13 18:17:39  blueyed
+ * Fixed header_redirect() which would only work if b2evo is installed in DOCUMENT_ROOT and would not have been RFC-compliant anyway
+ *
  * Revision 1.12  2006/12/11 16:53:47  fplanque
  * controller name cleanup
  *
