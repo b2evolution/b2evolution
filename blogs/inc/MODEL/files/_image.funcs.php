@@ -115,9 +115,10 @@ function load_image( $path, $mimetype )
  * @param resource image handle
  * @param string pathname of image file
  * @param string
+ * @param integer permissions
  * @return string
  */
-function save_image( $imh, $path, $mimetype )
+function save_image( $imh, $path, $mimetype, $chmod = NULL )
 {
 	$err = NULL;
 
@@ -135,6 +136,17 @@ function save_image( $imh, $path, $mimetype )
 			// Unrecognized mime type
 			$err = 'Emime';	// Sort error code
 			break;
+	}
+
+	if( empty( $err ) )
+	{
+		// Make sure the file has the default permissions we want:
+		if( $chmod === NULL )
+		{
+			global $Settings;
+			$chmod = $Settings->get('fm_default_chmod_dir');
+		}
+		chmod( $path, $chmod );
 	}
 
 	return $err;
@@ -208,6 +220,9 @@ function generate_thumb( $src_imh, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.4  2006/12/13 22:43:24  fplanque
+ * default perms for newly created thumbnails
+ *
  * Revision 1.3  2006/12/13 21:23:56  fplanque
  * .evocache folders / saving of thumbnails
  *
