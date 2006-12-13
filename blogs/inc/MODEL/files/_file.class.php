@@ -1400,13 +1400,74 @@ class File extends DataObject
 
 
 	/**
+	 * Get the full path to the thumbnail for this file.
+	 *
+	 * ads = Absolute Directory Slash
+	 *
+	 * @param boolean shall we create the dir if it doesn't exist?
+	 * @return string or NULL if can't be obtained
+	 */
+	function get_ads_evocache( $create_if_needed = false )
+	{
+		if( strpos( $this->_dir, '/.evocache/' ) !== false )
+		{	// We are already in an evocahce folder: refuse to go further!
+			return NULL;
+		}
+
+		$adp_evocache = $this->_dir.'.evocache/'.$this->_name;
+
+		if( $create_if_needed && !is_dir( $adp_evocache ) )
+		{	// Create the directory:
+			mkdir_r( $adp_evocache );
+		}
+
+		return $adp_evocache.'/';
+	}
+
+	/**
+	 * Get the full path to the thumbanil for this file.
+	 *
+	 * af = Absolute File
+	 *
+	 * @param string size name
+	 * @param string miemtype of thumbnail
+	 * @param boolean shall we create the dir if it doesn't exist?
+	 * @return string or NULL if can't be obtained
+	 */
+	function get_af_thumb_path( $size_name, $thumb_mimetype, $create_evocache_if_needed = false )
+	{
+		if( $thumb_mimetype != $this->Filetype->mimetype )
+		{
+			debug_die( 'Not supported. For now, thumbnails have to have same mime type as their parent file.' );
+			// TODO: extract prefered extension of filetypes config
+		}
+
+		// Get the filename of the thumbnail
+		if( $ads_evocache = $this->get_ads_evocache( $create_evocache_if_needed ) )
+		{
+			return $ads_evocache.$size_name.'.'.$this->get_ext();
+		}
+
+		return NULL;
+	}
+
+
+	/**
 	 *	Save thumbnail for file
 	 *
 	 * @param resource
-	 * @param string
+	 * @param string size name
+	 * @param string miemtype of thumbnail
+	 * @param string short error code
 	 */
-	function save_thumb( $thumb_imh, $thumb_mimetype )
+	function save_thumb( $thumb_imh, $size_name, $thumb_mimetype )
 	{
+		if( $af_thumb_path = $this->get_af_thumb_path( $size_name, $thumb_mimetype, true ) )
+		{	// We obtained a path for the thumbnail to be saved:
+			return save_image( $thumb_imh, $af_thumb_path, $thumb_mimetype );
+		}
+
+		return 'Eaccess';
 	}
 
 
@@ -1425,6 +1486,7 @@ class File extends DataObject
 		load_funcs( 'MODEL/files/_image.funcs.php' );
 
 		// fp> TODO: switch( $req_size ) (fp)
+		$size_name = 'fit-80x80';
 		$thumb_width = 80;
 		$thumb_height = 80;
 		$err = NULL;		// Short error code
@@ -1437,9 +1499,11 @@ class File extends DataObject
 			list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_width, $thumb_height );
 			if( empty( $err ) )
 			{
-				$this->save_thumb( $dest_imh, $mimetype );
-
-				$err = output_image( $dest_imh, $mimetype );
+				$err = $this->save_thumb( $dest_imh, $size_name, $mimetype );
+				if( empty( $err ) )
+				{
+					$err = output_image( $dest_imh, $mimetype );
+				}
 			}
 		}
 
@@ -1463,6 +1527,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.27  2006/12/13 21:23:56  fplanque
+ * .evocache folders / saving of thumbnails
+ *
  * Revision 1.26  2006/12/13 20:10:30  fplanque
  * object responsibility delegation?
  *

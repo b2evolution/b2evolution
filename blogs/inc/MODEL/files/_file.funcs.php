@@ -712,12 +712,14 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 
 /**
  * Create a directory recursively.
+ *
  * NOTE: this can be done with the "recursive" param in PHP5
+ *
  * @param string directory name
  * @param integer permissions
  * @return boolean
  */
-function mkdir_r($dirName, $chmod = NULL)
+function mkdir_r( $dirName, $chmod = NULL )
 {
 	if( $chmod === NULL )
 	{
@@ -757,6 +759,9 @@ function mkdir_r($dirName, $chmod = NULL)
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.29  2006/12/13 21:23:56  fplanque
+ * .evocache folders / saving of thumbnails
+ *
  * Revision 1.28  2006/12/07 20:03:32  fplanque
  * Woohoo! File editing... means all skin editing.
  *

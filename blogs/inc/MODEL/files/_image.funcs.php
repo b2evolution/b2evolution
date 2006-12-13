@@ -37,7 +37,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param integer constrained width
  * @param integer constrained height
  */
-function scale_dimensions_to_fit( $src_width, $src_height, $max_width, $max_height )
+function scale_to_constraint( $src_width, $src_height, $max_width, $max_height )
 {
 	$src_ratio = $src_width / $src_height;
 	if( $max_width / $max_height <= $src_ratio )
@@ -64,11 +64,11 @@ function scale_dimensions_to_fit( $src_width, $src_height, $max_width, $max_heig
  * @param integer constrained width
  * @param integer constrained height
  */
-function shrink_dimensions_to_fit( $src_width, $src_height, $max_width, $max_height )
+function fit_into_constraint( $src_width, $src_height, $max_width, $max_height )
 {
 	if( $src_width > $max_width || $src_height > $max_height )
 	{
-		return scale_dimensions_to_fit( $src_width, $src_height, $max_width, $max_height );
+		return scale_to_constraint( $src_width, $src_height, $max_width, $max_height );
 	}
 
 	return array( $src_width, $src_height );
@@ -78,7 +78,7 @@ function shrink_dimensions_to_fit( $src_width, $src_height, $max_width, $max_hei
 /**
  * Load an image from a file into memory
  *
- * @param string
+ * @param string pathname of image file
  * @param string
  * @return array resource image handle or NULL
  */
@@ -106,6 +106,38 @@ function load_image( $path, $mimetype )
 	}
 
 	return array( $err, $err_info, $imh );
+}
+
+
+/**
+ * Output an image from memory to web client
+ *
+ * @param resource image handle
+ * @param string pathname of image file
+ * @param string
+ * @return string
+ */
+function save_image( $imh, $path, $mimetype )
+{
+	$err = NULL;
+
+	switch( $mimetype )
+	{
+		case 'image/jpeg':
+			imagejpeg( $imh, $path );
+			break;
+
+		case 'image/gif':
+			imagegif( $imh, $path );
+			break;
+
+ 		default:
+			// Unrecognized mime type
+			$err = 'Emime';	// Sort error code
+			break;
+	}
+
+	return $err;
 }
 
 
@@ -159,7 +191,7 @@ function generate_thumb( $src_imh, $thumb_width, $thumb_height )
 		return array( NULL, $src_imh );
 	}
 
-	list( $dest_width, $dest_height ) = scale_dimensions_to_fit( $src_width, $src_height, $thumb_width, $thumb_height );
+	list( $dest_width, $dest_height ) = scale_to_constraint( $src_width, $src_height, $thumb_width, $thumb_height );
 
 	// pre_dump( $src_width, $src_height, $dest_width, $dest_height );
 
@@ -176,6 +208,9 @@ function generate_thumb( $src_imh, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.3  2006/12/13 21:23:56  fplanque
+ * .evocache folders / saving of thumbnails
+ *
  * Revision 1.2  2006/12/13 20:10:31  fplanque
  * object responsibility delegation?
  *
