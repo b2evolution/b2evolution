@@ -259,6 +259,24 @@ else
 }
 
 
+
+/*
+ * register_globals
+ */
+$gd_info = function_exists( 'gd_info' ) ? gd_info() : array( 'GD Version' => NULL );
+$gd_version = $gd_info['GD Version'];
+init_system_check( 'GD Library version', isset($gd_version) ? $gd_version : T_('Not installed') );
+if( ! isset($gd_version) )
+{
+	disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for images.') );
+}
+else
+{
+	disp_system_check( 'ok' );
+}
+
+
+
 // TODO: dh> memory_limit!
 // TODO: dh> output_buffering (recommend off)
 // TODO: dh> session.auto_start (recommend off)
@@ -281,6 +299,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2006/12/13 00:57:18  fplanque
+ * GD... just for fun ;)
+ *
  * Revision 1.9  2006/12/07 23:21:00  fplanque
  * dashboard blog switching
  *
