@@ -25,8 +25,8 @@
  * @version $Id$
  */
 
-// NOTE: it is okay to call this file before including config! 
- 
+// NOTE: it is okay to call this file before including config!
+
 /**
  * Initialize everything:
  */
@@ -294,7 +294,7 @@ elseif( !empty($p) || !empty($title) )
 	// $redir here allows to force a 'single post' URL for commenting
 	if( $redirect_to_canonical_url && $redir == 'yes' )
 	{	// We want to redirect to the Item's canonical URL:
-	
+
 		$canoncical_url = $Item->get_permanent_url( '', '', false, '&' );
 		// pre_dump( $canoncical_url, $ReqHost.$ReqURI );
 		// There may be some parameters additional at the end of the URL, but the beginning should be canoncial.
@@ -391,6 +391,7 @@ if( ($disp == 'posts') || ($disp == 'single') )
 
 	if( !empty($skin) && substr( $skin, 0, 1 ) == '_' )
 	{	// We are displaying an RSS/Atom feed:
+		// TODO: dh> IMHO we should rather use "feed_" as prefix for the feed skins.. "_" as prefix seems more like "system"/"internal" and not "feed"
 		$items_nb_limit = $Blog->get_setting('posts_per_feed');
 	}
 	else
@@ -498,6 +499,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.56  2006/12/14 21:54:52  blueyed
+ * todo
+ *
  * Revision 1.55  2006/12/14 21:41:15  fplanque
  * Allow different number of items in feeds than on site
  *
