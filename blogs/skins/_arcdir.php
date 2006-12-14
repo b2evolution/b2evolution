@@ -15,20 +15,19 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( $disp == 'arcdir' )
-{ // We have asked to display full archives:
-
-	// Call the Archives plugin WITH NO LIMIT & NO MORE LINK:
-	$Plugins->call_by_code( 'evo_Arch', array( 'title'=>'',
-	                                            'block_start'=>'',
-	                                            'block_end'=>'',
-	                                            'limit'=>'',
-	                                            'more_link'=>'' ) );
-}
+// Call the Archives plugin WITH NO LIMIT & NO MORE LINK:
+$Plugins->call_by_code( 'evo_Arch', array( 'title'=>'',
+	                                          'block_start'=>'',
+	                                          'block_end'=>'',
+	                                          'limit'=>'',
+	                                          'more_link'=>'' ) );
 
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/14 21:56:25  fplanque
+ * minor optimization
+ *
  * Revision 1.10  2006/07/06 19:56:29  fplanque
  * no message
  *

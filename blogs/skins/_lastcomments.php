@@ -16,11 +16,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-if( $disp != 'comments' )
-{	// We have not asked for comments to be displayed...
-	return false;		// Nothing to do here!
-}
-
 $CommentList = & new CommentList( $blog, "'comment','trackback','pingback'", array('published'), '',	'',	'DESC',	'',	20 );
 
 $CommentList->display_if_empty( '<div class="bComment"><p>'.T_('No comment yet...').'</p></div>' );
@@ -58,6 +53,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.29  2006/12/14 21:56:25  fplanque
+ * minor optimization
+ *
  * Revision 1.28  2006/11/20 22:15:50  blueyed
  * whitespace/comment format
  *
