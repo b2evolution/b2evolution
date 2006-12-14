@@ -336,7 +336,7 @@ class DB
 
 		if( ! extension_loaded('mysql') )
 		{ // The mysql extension is not loaded, try to dynamically load it:
-			$mysql_ext_file = strtoupper(substr(PHP_OS, 0, 3) == 'WIN') ? 'php_mysql.dll' : 'mysql.so';
+			$mysql_ext_file = is_windows() ? 'php_mysql.dll' : 'mysql.so';
 			@dl( $mysql_ext_file );
 
 			if( ! extension_loaded('mysql') )
@@ -1344,6 +1344,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.52  2006/12/14 00:42:04  fplanque
+ * A little bit of windows detection / normalization
+ *
  * Revision 1.51  2006/12/07 23:12:21  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!

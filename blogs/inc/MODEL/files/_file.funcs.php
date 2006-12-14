@@ -734,7 +734,7 @@ function mkdir_r( $dirName, $chmod = NULL )
 	}
 	*/
 	$parts = explode('/', $dirName);
-	$dir = '/';
+	$dir = is_windows() ? '' : '/';
 	foreach( $parts as $part )
 	{
 		if( ! strlen($part) )
@@ -759,6 +759,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.32  2006/12/14 00:42:04  fplanque
+ * A little bit of windows detection / normalization
+ *
  * Revision 1.31  2006/12/14 00:07:43  blueyed
  * Fixed mkdir_r
  *

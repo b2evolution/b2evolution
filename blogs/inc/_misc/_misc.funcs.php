@@ -729,8 +729,7 @@ function is_email( $email, $format = 'simple', $return_match = false )
  */
 function is_windows()
 {
-	// gotta love microdoft
-	return ( isset( $_SERVER['WINDIR'] ) || isset( $_SERVER['windir'] ) );
+	return ( strtoupper(substr(PHP_OS,0,3)) == 'WIN' );
 }
 
 
@@ -2753,6 +2752,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.155  2006/12/14 00:42:04  fplanque
+ * A little bit of windows detection / normalization
+ *
  * Revision 1.154  2006/12/12 23:23:30  fplanque
  * finished post editing v2.0
  *
