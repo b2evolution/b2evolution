@@ -3147,18 +3147,18 @@ class Item extends DataObject
 
 			if( $Plugin )
 			{
-				if( $display )
-				{
-					$Messages->add( sprintf(T_('Pinging %s...'), $Plugin->ping_service_name), 'note' );
-				}
+				$Messages->add( sprintf(T_('Pinging %s...'), $Plugin->ping_service_name), 'note' );
 				$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
 
 				$r = $Plugin->ItemSendPing( $params );
 
 				if( isset($params['xmlrpcresp']) && is_a($params['xmlrpcresp'], 'xmlrpcresp') )
 				{
-					// fp> TODO: put something into $Messages
-					xmlrpc_displayresult( $params['xmlrpcresp'], false );
+					// fp> TODO: let xmlrpc_displayresult() handle $Messages (e.g. "error", but should be connected/after the "Pinging %s..." from above)
+					ob_start();
+					xmlrpc_displayresult( $params['xmlrpcresp'], true );
+					$Messages->add( ob_get_contents(), 'note' );
+					ob_end_clean();
 				}
 			}
 		}
@@ -3321,6 +3321,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.138  2006/12/14 22:26:31  blueyed
+ * Fixed E_NOTICE and displaying of pings into $Messages (though "hackish")
+ *
  * Revision 1.137  2006/12/12 02:53:56  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.
