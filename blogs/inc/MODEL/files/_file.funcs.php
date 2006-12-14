@@ -715,6 +715,8 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
  *
  * NOTE: this can be done with the "recursive" param in PHP5
  *
+ * @todo dh> simpletests for this (especially for open_basedir)
+ *
  * @param string directory name
  * @param integer permissions
  * @return boolean
@@ -733,8 +735,36 @@ function mkdir_r( $dirName, $chmod = NULL )
 		return mkdir( $dirName, $chmod, true );
 	}
 	*/
-	$parts = explode('/', $dirName);
+
 	$dir = is_windows() ? '' : '/';
+	$parts = explode('/', $dirName);
+
+	if( $open_basedirs = ini_get('open_basedir') )
+	{ // "open_basedir" restriction in effect:
+		$obd_sep = is_windows() ? ';' : ':';
+		// Create the array of open_basedir paths
+		$open_basedirs = explode($obd_sep, $open_basedirs);
+
+		$in_obd = false;
+		// Iterate through open_basedir paths looking for a match
+		// TODO: dh> handle (optional trailing slash)
+		foreach( $open_basedirs as $test )
+		{
+			if( strpos($dirName, $test) === 0 )
+			{
+				$in_obd = true;
+				// Start with this open_basedir entry:
+				$dir = trailing_slash($test);
+				$parts = explode( '/', substr($dirName, strlen($dir)) );
+				break;
+			}
+		}
+		if( ! $in_obd )
+		{ // no open_basedir entry matches the requested dir name:
+			return false;
+		}
+	}
+
 	foreach( $parts as $part )
 	{
 		if( ! strlen($part) )
@@ -745,11 +775,11 @@ function mkdir_r( $dirName, $chmod = NULL )
 		$dir .= $part.'/';
 		if( ! is_dir($dir) )
 		{
-			if( ! @mkdir($dir, $chmod) )
+			if( ! @mkdir($dir, octdec($chmod)) )
 			{
 				return false;
 			}
-    }
+		}
 	}
 
 	return true;
@@ -759,6 +789,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.33  2006/12/14 00:58:17  blueyed
+ * mkdir_r(): fixed permissions with mkdir() call and handle open_basedir restrictions
+ *
  * Revision 1.32  2006/12/14 00:42:04  fplanque
  * A little bit of windows detection / normalization
  *
