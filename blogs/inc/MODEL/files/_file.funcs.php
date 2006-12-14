@@ -765,6 +765,10 @@ function mkdir_r( $dirName, $chmod = NULL )
 		}
 	}
 
+	// fp> suggestion: this is going bottom up from the root. Thus hitting problems with basedirs.
+	// by going bottom down and trying to shorten the wanted path until we find something that already exists, we would not need the basedir handling
+	// also when creating only 1 or 2 new levels in a 5-7 existing levels path, it might be faster
+
 	foreach( $parts as $part )
 	{
 		if( ! strlen($part) )
@@ -789,6 +793,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.34  2006/12/14 01:53:10  fplanque
+ * doc
+ *
  * Revision 1.33  2006/12/14 00:58:17  blueyed
  * mkdir_r(): fixed permissions with mkdir() call and handle open_basedir restrictions
  *
