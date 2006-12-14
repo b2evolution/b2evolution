@@ -100,35 +100,45 @@ $Results->cols[] = array(
  */
 function display_subtype( & $row )
 {
+	if( empty($row->file_ID) )
+	{
+		return '';
+	}
+
+	global $current_File;
+	// Instantiate a File object for this line:
+	$current_File = new File( $row->file_root_type, $row->file_root_ID, $row->file_path ); // COPY!
+	// Flow meta data into File object:
+	$current_File->load_meta( false, $row );
+
+	if( $preview_thumb = $current_File->get_preview_thumb() )
+	{	// We got a thumbnail:
+		return $preview_thumb;
+	}
+
+	// No thumb, display File type:
+
 	$r = '';
 
-	if( !empty($row->file_ID) )
-	{
-		global $current_File;
-		// Instantiate a File object for this line:
-		$current_File = new File( $row->file_root_type, $row->file_root_ID, $row->file_path ); // COPY!
-		// Flow meta data into File object:
-		$current_File->load_meta( false, $row );
-
-		// File type:
-		$r .= $current_File->get_type().' ';
-
-		if( $current_File->is_dir() )
-		{ // Directory
-			$r .= $current_File->get_icon();
+	if( $current_File->is_dir() )
+	{ // Directory
+		$r .= $current_File->get_icon();
+	}
+	else
+	{ // File
+		if( $view_link = $current_File->get_view_link( $current_File->get_icon(), NULL, NULL ) )
+		{
+			$r .=  $view_link;
 		}
 		else
-		{ // File
-			if( $view_link = $current_File->get_view_link( $current_File->get_icon(), NULL, NULL ) )
-			{
-				$r .=  $view_link;
-			}
-			else
-			{ // File extension unrecognized
-				$r .=  $current_File->get_icon();
-			}
+		{ // File extension unrecognized
+			$r .=  $current_File->get_icon();
 		}
 	}
+
+	// File type:
+	$r .= ' '.$current_File->get_type();
+
 
   return $r;
 }
@@ -229,6 +239,10 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.3  2006/12/14 00:47:41  fplanque
+ * thumbnails & previews everywhere.
+ * this is getting good :D
+ *
  * Revision 1.2  2006/12/14 00:01:49  fplanque
  * land in correct collection when opening FM from an Item
  *
