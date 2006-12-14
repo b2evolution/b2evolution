@@ -42,7 +42,7 @@ class FileFuncsTestCase extends EvoUnitTestCase
 		{
 			return false;
 		}
-		while( $file = readdir($dir_handle) )
+		while( ($file = readdir($dir_handle)) !== false )
 		{
 			if( $file == '.' || $file == '..' )
 			{
@@ -83,6 +83,9 @@ class FileFuncsTestCase extends EvoUnitTestCase
 
 		$this->assertTrue( mkdir_r( TMPDIR.'test/foo/bar/2' ) );
 		$this->assertTrue( is_dir( TMPDIR.'test/foo/bar/2' ) );
+
+		$this->assertTrue( mkdir_r( TMPDIR.'test//foo/bar///0' ) );
+		$this->assertTrue( is_dir( TMPDIR.'test//foo/bar///0' ) );
 
 		// does not work (PHP does not allow it):
 		// ini_set('open_basedir', TMPDIR.'test/bar');

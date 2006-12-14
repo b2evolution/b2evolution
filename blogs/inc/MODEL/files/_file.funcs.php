@@ -748,7 +748,7 @@ function mkdir_r( $dirName, $chmod = NULL )
 	$create_dirs = array();
 	foreach($parts as $part)
 	{
-		if( empty($part) )
+		if( ! strlen($part) )
 		{
 			continue;
 		}
@@ -775,6 +775,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.36  2006/12/14 23:02:43  blueyed
+ * Fixed handling of "0" as directory
+ *
  * Revision 1.35  2006/12/14 22:13:05  blueyed
  * mkdir_r(): implemented suggestion from Francois, not tested with open_basedir yet
  *
