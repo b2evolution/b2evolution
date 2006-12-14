@@ -299,7 +299,7 @@ elseif( !empty($p) || !empty($title) )
 
 if( $disp == 'posts' )
 { // default display:
-	// EXPERIMENTAL:
+	// EXPERIMENTAL: Check if we want to redirect to a canonical URL
 	// Please document encountered problems.
 	if( $redirect_to_canonical_url && $redir == 'yes' )
 	{
@@ -366,17 +366,8 @@ if( ($disp == 'posts') || ($disp == 'single') )
 }
 
 
-// Default display params:
-
-// Displaying of blog list on templates?
-if( !isset($display_blog_list) )
-{ // If not already set in stub:
-	$display_blog_list = $Blog->get('disp_bloglist');
-}
-
-
 /*
- * Now, we'll jump to displaying!
+ * ______________________ DETERMINE WHICH SKIN TO USE FOR DISPLAY _______________________
  */
 
 // Check if a temporary skin has been requested (used for RSS syndication for example):
@@ -387,17 +378,24 @@ if( !empty( $tempskin ) )
 
 // Let's check if a skin has been forced in the stub file:
 // Note: with "register_globals = On" this may be set from URL..
-// dh> You've said that it's not security issue etc.. but I still would init $skin in /conf/_advanced.php and use empty() here. (fp> note: would break stubs with conf included at the end)
+// dh> You've said that it's not security issue etc.. but I still would init $skin in /conf/_advanced.php and use empty() here.
+// (fp> note: would break stubs with conf included at the end)
 if( !isset( $skin ) )
 { // No skin forced in stub (not even '' for no-skin)...
 	// Use default from the database
 	$skin = $Blog->get('default_skin');
 }
 
+// Check validity of requested skin name:
+if( ereg( '([^-A-Za-z0-9._]|\.\.)', $skin ) )
+{
+	debug_die( 'The requested skin is invalid.' );
+}
+
 // Because a lot of bloggers will delete skins, we have to make this fool proof with extra checking:
 if( !empty( $skin ) && !skin_exists( $skin ) )
 { // We want to use a skin, but it doesn't exist!
-	$err_msg = sprintf( T_('The requested skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file.'), 
+	$err_msg = sprintf( T_('The requested skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file.'),
 		htmlspecialchars($skin), $Blog->dget('shortname'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=display&amp;action=edit&amp;blog='.$Blog->ID.'"' );
 	debug_die( $err_msg );
 }
@@ -406,7 +404,11 @@ if( !empty( $skin ) && !skin_exists( $skin ) )
 $Timer->pause( '_blog_main.inc');
 
 
-// At this point $skin holds the name of the skin we want to use, or '' for no skin!
+/*
+ * _______________________________ READY TO DISPLAY _______________________________
+ *
+ * At this point $skin holds the name of the skin we want to use, or '' for no skin!
+ */
 
 // check to see if we want to display the popup or the main template
 param( 'template', 'string', 'main', true );
@@ -416,31 +418,16 @@ param( 'template', 'string', 'main', true );
 $Plugins->trigger_event( 'BeforeBlogDisplay', array('skin'=>$skin) );
 
 
+// Fix default display params (in case no info was provided by stub file):
+// Displaying of blog list on templates?
+if( !isset($display_blog_list) )
+{ // If not already set in stub:
+	$display_blog_list = $Blog->get('disp_bloglist');
+}
+
+
 if( !empty( $skin ) )
 { // We want to display now:
-
-	if( empty( $tempskin )
-	 && ( !empty($_GET['skin']) || !empty($_POST['skin'] ) ) )
-	{ // We have just asked for a skin change explicitely
-		// Set a cookie to remember it:
-		// Including config and functions files   ??
-
-		if( ! setcookie( $cookie_state, $skin, $cookie_expires, $Blog->get('cookie_path'), $Blog->get('cookie_domain')) )
-		{ // This damn failed !
-			echo "<p>setcookie failed!</p>";
-		}
-	}
-
-	if( ereg( '([^-A-Za-z0-9._]|\.\.)', $skin ) )
-	{
-		// echo ("<p>Invalid skin name!</p>");
-		$skin = $default_skin;
-	}
-	elseif( !skin_exists($skin) )
-	{
-		// echo "<p>Oops, no such skin!</p>";
-		$skin = $default_skin;
-	}
 
 	// TODO: sanitize $template and allow any request on _xxx.tpl.php or sth like that.
 	if( $template == 'popup' )
@@ -470,20 +457,21 @@ else
 	{ // Do the popup display
 		require( $skins_path.'_popup.php' );
 
-		// log the hit on this page (in case the skin hasn't already done so)
+		// log the hit on this page (in case the full template forgets to do so)
 		$Hit->log();
 
 		exit();
 	}
 
 	$Debuglog->add( 'No skin or popup requested.', 'skin' );
-	// If we end up here the blog file should be a full template, not just a stub...
-	// Note: The full template SHOULD call $Hit->log();
 }
 
 
 /*
  * $Log$
+ * Revision 1.53  2006/12/14 20:57:55  fplanque
+ * Hum... this really needed some cleaning up!
+ *
  * Revision 1.52  2006/12/05 00:39:56  fplanque
  * fixed some more permalinks/archive links
  *
