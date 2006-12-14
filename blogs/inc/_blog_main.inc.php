@@ -389,9 +389,11 @@ if( ($disp == 'posts') || ($disp == 'single') )
 
 	// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
 
+	// Note: skins are going to be registered in the DB. There will be a flag to identify feeds.
+	// For now, we use the *existing* '_' prefix.
+	// Note: Feed skin folders should be identidied by sth more descriptive (like a '_feed_' prefix or '.feed'/'.xml' suffix
 	if( !empty($skin) && substr( $skin, 0, 1 ) == '_' )
 	{	// We are displaying an RSS/Atom feed:
-		// TODO: dh> IMHO we should rather use "feed_" as prefix for the feed skins.. "_" as prefix seems more like "system"/"internal" and not "feed"
 		$items_nb_limit = $Blog->get_setting('posts_per_feed');
 	}
 	else
@@ -499,6 +501,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.57  2006/12/14 22:05:18  fplanque
+ * doc
+ *
  * Revision 1.56  2006/12/14 21:54:52  blueyed
  * todo
  *
