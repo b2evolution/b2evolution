@@ -29,6 +29,11 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
+ * @var Blog
+ */
+global $Blog;
+
+/**
  * Needed by functions
  * @var Item
  */
@@ -216,14 +221,17 @@ if( $current_User->check_perm( 'files', 'view' ) )
 if( $current_User->check_perm( 'files', 'view' )
 	&& $current_User->check_perm( 'item', 'edit', false, $edited_Item ) )
 {	// Check that we have permission to edit item:
-	$Results->global_icon( T_('Link a file...'), 'link',
-													'admin.php?ctrl=files&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID, T_('Link files'), 3, 4 );
+	$Results->global_icon( T_('Link a file...'), 'link', url_add_param( $Blog->get_filemanager_link(),
+													'fm_mode=link_item&amp;item_ID='.$edited_Item->ID ), T_('Link files'), 3, 4 );
 }
 
 $Results->display();
 
 /*
  * $Log$
+ * Revision 1.2  2006/12/14 00:01:49  fplanque
+ * land in correct collection when opening FM from an Item
+ *
  * Revision 1.1  2006/12/12 21:19:31  fplanque
  * UI fixes
  *

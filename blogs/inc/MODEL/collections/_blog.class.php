@@ -538,7 +538,7 @@ class Blog extends DataObject
 	 * @todo These status messages should rather go to a "syslog" and not be displayed to a normal user
 	 *
 	 * @param boolean Create the directory, if it does not exist yet?
-	 * @return mixed the path as string on success, false if the dir could not be created
+	 * @return string path string on success, false if the dir could not be created
 	 */
 	function get_media_dir( $create = true )
 	{
@@ -640,6 +640,18 @@ class Blog extends DataObject
 				$Debuglog->add( 'Attempt to access blog media url, but this feature is disabled for this blog', 'files' );
 				return false;
 		}
+	}
+
+
+	/**
+ 	 * Get link to edit files
+ 	 *
+ 	 * @param string link (false on error)
+	 */
+	function get_filemanager_link()
+	{
+		load_class( 'MODEL/files/_fileroot.class.php' );
+		return 'admin.php?ctrl=files&amp;root='.FileRoot::gen_ID( 'collection', $this->ID );
 	}
 
 
@@ -1047,6 +1059,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.43  2006/12/14 00:01:49  fplanque
+ * land in correct collection when opening FM from an Item
+ *
  * Revision 1.42  2006/12/13 18:23:36  blueyed
  * doc
  *

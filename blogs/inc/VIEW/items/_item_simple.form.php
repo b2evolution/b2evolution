@@ -149,16 +149,19 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 
 	if( $Settings->get( 'fm_enabled' ) )
 	{ // ---------- UPLOAD ----------
+		// Note: we try to land in the Blog media folder if possible
+		// fp> TODO: check what happens if blog folders are disabled
 		if( $current_User->check_perm( 'files', 'view' ) )
 		{
 			echo '<input id="itemform_button_files" type="button" value="'.format_to_output(T_('Files'), 'formvalue').'" class="ActionButton"
-			       onclick="pop_up_window( \'admin.php?ctrl=files&amp;mode=upload\', \'fileman_upload\' );" /> ';
+			       onclick="pop_up_window( \''.url_add_param( $Blog->get_filemanager_link(), 'mode=upload' ).'\', \'fileman_upload\' );" /> ';
 		}
 
+		// fp> TODO: perms. It would be nice if we could upload files without viewing them, but I don't think that works.
 		if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) )
 		{
 			echo '<input id="itemform_button_upload" type="button" value="'.format_to_output(T_('Upload'), 'formvalue').'" class="ActionButton"
-			       onclick="pop_up_window( \'admin.php?ctrl=files&amp;mode=upload&amp;fm_mode=file_upload\', \'fileman_upload\' );" /> ';
+			       onclick="pop_up_window( \''.url_add_param( $Blog->get_filemanager_link(), 'mode=upload&amp;fm_mode=file_upload' ).'\', \'fileman_upload\' );" /> ';
 		}
 	}
 
@@ -266,6 +269,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.28  2006/12/14 00:01:49  fplanque
+ * land in correct collection when opening FM from an Item
+ *
  * Revision 1.27  2006/12/12 23:23:30  fplanque
  * finished post editing v2.0
  *

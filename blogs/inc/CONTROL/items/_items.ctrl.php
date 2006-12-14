@@ -538,7 +538,7 @@ switch( $action )
 		// We don't check the following earlier, because we want the blog switching buttons to be available:
 		if( ! blog_has_cats( $blog ) )
 		{
-			$Messages->add( T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), 'error' );
+			$Messages->add( sprintf( T_('Since this blog has no categories, you cannot post into it. You must <a %s>create categories</a> first.'), 'href="admin.php?ctrl=chapters&amp;blog='.$blog.'"') , 'error' );
 			$action = 'nil';
 			break;
 		}
@@ -702,6 +702,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2006/12/14 00:01:49  fplanque
+ * land in correct collection when opening FM from an Item
+ *
  * Revision 1.6  2006/12/12 23:23:29  fplanque
  * finished post editing v2.0
  *
