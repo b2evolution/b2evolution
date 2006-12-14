@@ -64,16 +64,10 @@ function file_type( & $row )
 	// Flow meta data into File object:
 	$current_File->load_meta( false, $row );
 
-	if( $preview_thumb = $current_File->get_preview_thumb() )
-	{	// We got a thumbnail:
-		return $preview_thumb;
-	}
-
-	// No thumb, display File type:
-	return $current_File->get_view_link( $current_File->get_icon(), T_('Let browser handle this file!')  ).' '.$current_File->get_type();
+	return $current_File->get_preview_thumb( 'fulltype' );
 }
 $Results->cols[] = array(
-						'th' => T_('Type'),
+						'th' => T_('Icon/Type'),
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
 						'td' => '%file_type( {row} )%',
@@ -145,6 +139,9 @@ $Form->end_form( );
 
 /*
  * $Log$
+ * Revision 1.12  2006/12/14 01:46:29  fplanque
+ * refactoring / factorized image preview display
+ *
  * Revision 1.11  2006/12/14 00:33:53  fplanque
  * thumbnails & previews everywhere.
  * this is getting good :D

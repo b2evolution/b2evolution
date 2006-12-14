@@ -305,11 +305,6 @@ $Form->end_form();
 
 	echo '<tr>';
 
-	if( $UserSettings->get( 'fm_imglistpreview' ) )
-	{ // Image file preview:
-		echo '<th class="nowrap">'./* TRANS: Image file preview */ T_('Preview').'</th>';;
-	}
-
 	// "Go to parent" icon
 	echo '<th class="firstcol">';
 	if( empty($fm_Filelist->_rds_list_path) )
@@ -322,7 +317,18 @@ $Form->end_form();
 	}
 	echo '</th>';
 
-	echo '<th>'.$fm_Filelist->get_sort_link( 'type', '' ).'</th>';
+	echo '<th class="nowrap">';
+	if( $UserSettings->get( 'fm_imglistpreview' ) )
+	{ // Image file preview:
+		$col_title = T_('Icon/Type');
+	}
+	else
+	{
+		$col_title = /* TRANS: short for (file)Type */ T_(' T ');
+	}
+	echo $fm_Filelist->get_sort_link( 'type', $col_title );
+	echo '</th>';
+
 	if( $fm_flatmode )
 	{
 		echo '<th>'.$fm_Filelist->get_sort_link( 'path', /* TRANS: file/directory path */ T_('Path') ).'</th>';
@@ -371,16 +377,6 @@ while( $lFile = & $fm_Filelist->get_next() )
 	echo '<tr class="'.( $countFiles%2 ? 'odd' : 'even' ).'">';
 
 
-	/*****************  Image file preview:  *******************/
-
-	if( $UserSettings->get( 'fm_imglistpreview' ) )
-	{
-		echo '<td class="fm_preview_list center">';
-		echo $lFile->get_preview_thumb();
-		echo '</td>';
-	}
-
-
 	/********************    Checkbox:    *******************/
 
 	echo '<td class="checkbox firstcol">';
@@ -408,22 +404,29 @@ while( $lFile = & $fm_Filelist->get_next() )
 	echo '</td>';
 
 
-	/********************  File type Icon:  *******************/
+	/********************  Icon / File type:  *******************/
 
-	echo '<td class="icon">';
-	if( $lFile->is_dir() )
-	{ // Directory
-		echo '<a href="'.$lFile->get_view_url().'" title="'.T_('Change into this directory').'">'.$lFile->get_icon().'</a>';
+	echo '<td class="icon_type">';
+	if( $UserSettings->get( 'fm_imglistpreview' ) )
+	{	// Image preview OR full type:
+		echo $lFile->get_preview_thumb( 'fulltype' );
 	}
 	else
-	{ // File
-		if( $view_link = $lFile->get_view_link( $lFile->get_icon(), NULL, NULL ) )
-		{
-			echo $view_link;
+	{	// No image preview, small type:
+		if( $lFile->is_dir() )
+		{ // Directory
+			echo '<a href="'.$lFile->get_view_url().'" title="'.T_('Change into this directory').'">'.$lFile->get_icon().'</a>';
 		}
 		else
-		{ // File extension unrecognized
-			echo $lFile->get_icon();
+		{ // File
+			if( $view_link = $lFile->get_view_link( $lFile->get_icon(), NULL, NULL ) )
+			{
+				echo $view_link;
+			}
+			else
+			{ // File extension unrecognized
+				echo $lFile->get_icon();
+			}
 		}
 	}
 	echo '</td>';
@@ -971,6 +974,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.31  2006/12/14 01:46:29  fplanque
+ * refactoring / factorized image preview display
+ *
  * Revision 1.30  2006/12/14 00:33:53  fplanque
  * thumbnails & previews everywhere.
  * this is getting good :D

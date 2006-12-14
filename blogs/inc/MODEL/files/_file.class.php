@@ -533,7 +533,7 @@ class File extends DataObject
 		{ // Directory
 			if( $public_access_to_media )
 			{ // Public access: full path
-				$url = $this->get_rdfs_rel_path();
+				$url = $this->_FileRoot->ads_url.$this->get_rdfs_rel_path();
 			}
 			else
 			{ // No Access
@@ -1233,17 +1233,24 @@ class File extends DataObject
 	/**
 	 * Get URL to view the file (either with viewer of with browser, etc...)
 	 */
-	function get_view_url()
+	function get_view_url( $always_open_dirs_in_fm = true )
 	{
-		global $htsrv_url;
+		global $htsrv_url, $public_access_to_media;
 
 		// Get root code
 		$root_ID = $this->_FileRoot->ID;
 
 		if( $this->is_dir() )
 		{ // Directory
-			// fp>> Note: we MUST NOT clear mode, especially when mode=upload, or else the IMG button disappears when entering a subdir
-			return regenerate_url( 'root,path', 'root='.$root_ID.'&amp;path='.$this->get_rdfs_rel_path() );
+			if( $always_open_dirs_in_fm || ! $public_access_to_media )
+			{ // open the dir in the filemanager:
+				// fp>> Note: we MUST NOT clear mode, especially when mode=upload, or else the IMG button disappears when entering a subdir
+				return regenerate_url( 'root,path', 'root='.$root_ID.'&amp;path='.$this->get_rdfs_rel_path() );
+			}
+			else
+			{ // Public access: direct link to folder:
+				return $this->get_url();
+			}
 		}
 		else
 		{ // File
@@ -1292,7 +1299,9 @@ class File extends DataObject
 			$no_access_text = $text;
 		}
 
-		$url = $this->get_view_url();
+		// Get the URL for viewing the file/dir:
+		$url = $this->get_view_url( false );
+
 		if( empty($url) )
 		{
 			return $no_access_text;
@@ -1385,7 +1394,7 @@ class File extends DataObject
 		if( $public_access_to_media
 			&& $af_thumb_path = $this->get_af_thumb_path( $size_name, NULL, false ) )
 		{ // If the thumbnail was already cached, we could publicly access it:
-			if( is_file( $af_thumb_path ) )
+			if( @is_file( $af_thumb_path ) )
 			{	// The thumb IS already cache! :)
 				// Let's point directly into the cache:
 				$url = $this->_FileRoot->ads_url.dirname($this->_rdfp_rel_path).'/.evocache/'.$this->_name.'/'.$size_name.'.'.$this->get_ext();
@@ -1408,25 +1417,35 @@ class File extends DataObject
  	/**
 	 * Displays a preview thumbnail which is clickable and opens a view popup
 	 *
+	 * @param string what do do with files that are not images? 'fulltype'
 	 * @return string HTML to display
  	 */
-	function get_preview_thumb()
+	function get_preview_thumb( $format_for_non_images = '' )
 	{
-		if( ! $this->is_image() )
+		if( $this->is_image() )
+		{	// Ok, it's an image:
+			$img = '<img src="'.$this->get_thumb_url().'" alt="'.$this->get_type().'" title="'.$this->get_type().'" />';
+
+			// Get link to view the file (fallback to no view link - just the img):
+			$link = $this->get_view_link( $img );
+			if( ! $link )
+			{ // no view link available:
+				$link = $img;
+			}
+
+			return $link;
+		}
+
+		// Not an image...
+		switch( $format_for_non_images )
 		{
-			return NULL;
+			case 'fulltype':
+				// Full: Icon + File type:
+				return $this->get_view_link( $this->get_icon() ).' '.$this->get_type();
+				break;
 		}
 
-		$img = '<img src="'.$this->get_thumb_url().'" alt="" />';
-
-		// Get link to view the file (fallback to no view link - just the img):
-		$link = $this->get_view_link( $img );
-		if( ! $link )
-		{ // no view link available:
-			$link = $img;
-		}
-
-		return $link;
+		return '';
 	}
 
 	
@@ -1611,6 +1630,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.30  2006/12/14 01:46:29  fplanque
+ * refactoring / factorized image preview display
+ *
  * Revision 1.29  2006/12/14 00:33:53  fplanque
  * thumbnails & previews everywhere.
  * this is getting good :D

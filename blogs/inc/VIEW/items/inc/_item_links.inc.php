@@ -111,39 +111,10 @@ function display_subtype( & $row )
 	// Flow meta data into File object:
 	$current_File->load_meta( false, $row );
 
-	if( $preview_thumb = $current_File->get_preview_thumb() )
-	{	// We got a thumbnail:
-		return $preview_thumb;
-	}
-
-	// No thumb, display File type:
-
-	$r = '';
-
-	if( $current_File->is_dir() )
-	{ // Directory
-		$r .= $current_File->get_icon();
-	}
-	else
-	{ // File
-		if( $view_link = $current_File->get_view_link( $current_File->get_icon(), NULL, NULL ) )
-		{
-			$r .=  $view_link;
-		}
-		else
-		{ // File extension unrecognized
-			$r .=  $current_File->get_icon();
-		}
-	}
-
-	// File type:
-	$r .= ' '.$current_File->get_type();
-
-
-  return $r;
+	return $current_File->get_preview_thumb( 'fulltype' );
 }
 $Results->cols[] = array(
-						'th' => T_('Sub-Type'),
+						'th' => T_('Icon/Type'),
 						'td_class' => 'shrinkwrap',
 						'td' => '%display_subtype( {row} )%',
 					);
@@ -239,6 +210,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.4  2006/12/14 01:46:29  fplanque
+ * refactoring / factorized image preview display
+ *
  * Revision 1.3  2006/12/14 00:47:41  fplanque
  * thumbnails & previews everywhere.
  * this is getting good :D

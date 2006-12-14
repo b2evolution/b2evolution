@@ -96,21 +96,13 @@ table.filelist tr.odd:hover {
 }
 table.filelist td {
 	border-left: 1px solid #bbb;
-	padding: .3ex 1ex;
-}
-table.filelist input.checkbox {
-	border:none;
-	background-color: #eee;
-}
-table.filelist tr.odd input.checkbox {
-	border:none;
-	background-color: #ddd;
+	padding: 2px 4px;
 }
 
 
 /* Table headers/footers: */
 table.filelist th {
-	padding: .3ex 1ex;
+	padding: 2px 4px;
 	border-bottom: 1px solid #bbb;
 	border-left: 1px solid #bbb;
 	background-color: #ddd;
@@ -122,7 +114,7 @@ table.filelist th img {
 /* Table BASIC sort buttons/headers: */
 table.filelist th a.basic_current,
 table.filelist th a.basic_sort_link {
-	padding: 0 1ex;
+	padding: 0 4px;
 	display: block;
 	height: 100%;
 }
@@ -137,8 +129,21 @@ table.filelist td.error {
 	padding:2ex;
 	color:red;
 }
-table.filelist td.type {
-	white-space:nowrap;
+table.filelist td.checkbox {
+	text-align: center;
+}
+table.filelist input.checkbox {
+	border:none;
+	background-color: #eee;
+}
+table.filelist tr.odd input.checkbox {
+	border:none;
+	background-color: #ddd;
+}
+table.filelist td.icon_type {
+	text-align: center;
+	white-space: nowrap;
+	width: 1%;
 }
 table.filelist td#fileman_error, /* used when an error (e.g. "no files") gets displayed */
 table.filelist td.fm_filename {
