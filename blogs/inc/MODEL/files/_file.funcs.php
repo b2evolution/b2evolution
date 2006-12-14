@@ -734,7 +734,7 @@ function mkdir_r( $dirName, $chmod = NULL )
 	}
 	*/
 	$parts = explode('/', $dirName);
-	$dir = '';
+	$dir = '/';
 	foreach( $parts as $part )
 	{
 		if( ! strlen($part) )
@@ -759,6 +759,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.31  2006/12/14 00:07:43  blueyed
+ * Fixed mkdir_r
+ *
  * Revision 1.30  2006/12/13 22:26:27  fplanque
  * This has reached the point of a functional eternal cache.
  * TODO: handle cache on delete, upload/overwrite, rename, move, copy.
