@@ -41,7 +41,7 @@ $FileList = & new DataObjectList2( $FileCache );
 
 
 $SQL = & new SQL();
-$SQL->SELECT( 'file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
+$SQL->SELECT( 'post_ID, file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
 $SQL->FROM( 'T_categories INNER JOIN T_postcats ON cat_ID = postcat_cat_ID
 							INNER JOIN T_posts ON postcat_post_ID = post_ID
 							INNER JOIN T_links ON post_ID = link_itm_ID
@@ -63,13 +63,15 @@ while( $File = & $FileList->get_next() )
 		continue;
 	}
 
-
+	$post_ID = $FileList->rows[$FileList->current_idx-1]->post_ID;
+	echo '<a href="'.url_add_param( $Blog->get('url'), 'p='.$post_ID ).'">';
 	// Generate the IMG THUMBNAIL tag with all the alt, title and desc if available
 	echo '<img src="'.$File->get_thumb_url().'" '
 				.'alt="'.$File->dget('alt', 'htmlattr').'" '
 				.'title="'.$File->dget('title', 'htmlattr').'" />';
+	echo '</a>';
 
-	// fp> TODO: link. I really need an ItemListLight now :#
+	// fp> TODO: CLEAN link. I really need an ItemListLight now :#
 	/*
 		Basic spec for ItemListLight:
 		- either params to ItemList2 or parent class. I'm not sure.
@@ -87,6 +89,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.2  2006/12/14 22:54:36  fplanque
+ * thumbnail archives proof of concept
+ *
  * Revision 1.1  2006/12/14 22:29:37  fplanque
  * thumbnail archives proof of concept
  *
