@@ -55,6 +55,8 @@ $FileList->query( false, false, false );
 
 echo '<div class="image_block">';
 
+$count = 0;
+$prev_post_ID = 0;
 while( $File = & $FileList->get_next() )
 {
 	if( ! $File->is_image() )
@@ -64,7 +66,19 @@ while( $File = & $FileList->get_next() )
 	}
 
 	$post_ID = $FileList->rows[$FileList->current_idx-1]->post_ID;
-	echo '<a href="'.url_add_param( $Blog->get('url'), 'p='.$post_ID ).'">';
+	if( $post_ID != $prev_post_ID )
+	{
+		$prev_post_ID = $post_ID;
+		$count++;
+	}
+
+	// Hack a dirty permalink( will redirect to canonical):
+	// $link = url_add_param( $Blog->get('url'), 'p='.$post_ID );
+
+	// Hack a link to the right "page". Very daring!!
+	$link = url_add_param( $Blog->get('url'), 'paged='.$count );
+
+	echo '<a href="'.$link.'">';
 	// Generate the IMG THUMBNAIL tag with all the alt, title and desc if available
 	echo '<img src="'.$File->get_thumb_url().'" '
 				.'alt="'.$File->dget('alt', 'htmlattr').'" '
@@ -89,8 +103,8 @@ echo '</div>';
 
 /*
  * $Log$
- * Revision 1.2  2006/12/14 22:54:36  fplanque
- * thumbnail archives proof of concept
+ * Revision 1.3  2006/12/14 23:02:28  fplanque
+ * the unbelievable hack :P
  *
  * Revision 1.1  2006/12/14 22:29:37  fplanque
  * thumbnail archives proof of concept
