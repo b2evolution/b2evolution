@@ -409,24 +409,24 @@ while( $lFile = & $fm_Filelist->get_next() )
 	echo '<td class="icon_type">';
 	if( $UserSettings->get( 'fm_imglistpreview' ) )
 	{	// Image preview OR full type:
-		echo $lFile->get_preview_thumb( 'fulltype' );
+		if( $lFile->is_dir() )
+		{ // Navigate into Directory
+			echo '<a href="'.$lFile->get_view_url().'" title="'.T_('Change into this directory').'">'.$lFile->get_icon().' '.T_('Directory').'</a>';
+		}
+		else
+		{
+			echo $lFile->get_preview_thumb( 'fulltype' );
+		}
 	}
 	else
 	{	// No image preview, small type:
-		if( $lFile->is_dir() )
-		{ // Directory
+ 		if( $lFile->is_dir() )
+		{ // Navigate into Directory
 			echo '<a href="'.$lFile->get_view_url().'" title="'.T_('Change into this directory').'">'.$lFile->get_icon().'</a>';
 		}
 		else
 		{ // File
-			if( $view_link = $lFile->get_view_link( $lFile->get_icon(), NULL, NULL ) )
-			{
-				echo $view_link;
-			}
-			else
-			{ // File extension unrecognized
-				echo $lFile->get_icon();
-			}
+			echo $lFile->get_view_link( $lFile->get_icon(), NULL, $lFile->get_icon() );
 		}
 	}
 	echo '</td>';
@@ -974,6 +974,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.32  2006/12/14 02:18:23  fplanque
+ * fixed navigation
+ *
  * Revision 1.31  2006/12/14 01:46:29  fplanque
  * refactoring / factorized image preview display
  *
