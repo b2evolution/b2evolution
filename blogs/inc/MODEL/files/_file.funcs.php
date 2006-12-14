@@ -723,6 +723,11 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
  */
 function mkdir_r( $dirName, $chmod = NULL )
 {
+	if( is_dir($dirName) )
+	{ // already exists:
+		return true;
+	}
+
 	if( $chmod === NULL )
 	{
 		global $Settings;
@@ -736,56 +741,33 @@ function mkdir_r( $dirName, $chmod = NULL )
 	}
 	*/
 
-	$dir = is_windows() ? '' : '/';
-	$parts = explode('/', $dirName);
+	$dirName = trailing_slash($dirName);
 
-	if( $open_basedirs = ini_get('open_basedir') )
-	{ // "open_basedir" restriction in effect:
-		$obd_sep = is_windows() ? ';' : ':';
-		// Create the array of open_basedir paths
-		$open_basedirs = explode($obd_sep, $open_basedirs);
-
-		$in_obd = false;
-		// Iterate through open_basedir paths looking for a match
-		// TODO: dh> handle (optional trailing slash)
-		foreach( $open_basedirs as $test )
-		{
-			if( strpos($dirName, $test) === 0 )
-			{
-				$in_obd = true;
-				// Start with this open_basedir entry:
-				$dir = trailing_slash($test);
-				$parts = explode( '/', substr($dirName, strlen($dir)) );
-				break;
-			}
-		}
-		if( ! $in_obd )
-		{ // no open_basedir entry matches the requested dir name:
-			return false;
-		}
-	}
-
-	// fp> suggestion: this is going bottom up from the root. Thus hitting problems with basedirs.
-	// by going bottom down and trying to shorten the wanted path until we find something that already exists, we would not need the basedir handling
-	// also when creating only 1 or 2 new levels in a 5-7 existing levels path, it might be faster
-
-	foreach( $parts as $part )
+	$parts = array_reverse( explode('/', $dirName) );
+	$loop_dir = $dirName;
+	$create_dirs = array();
+	foreach($parts as $part)
 	{
-		if( ! strlen($part) )
+		if( empty($part) )
 		{
 			continue;
 		}
+		// We want to create this dir:
+		array_unshift($create_dirs, $loop_dir);
+		$loop_dir = substr($loop_dir, 0, 0 - strlen($part)-1);
 
-		$dir .= $part.'/';
-		if( ! is_dir($dir) )
-		{
-			if( ! @mkdir($dir, octdec($chmod)) )
+		if( is_dir($loop_dir) )
+		{ // found existing dir:
+			foreach($create_dirs as $loop_dir )
 			{
-				return false;
+				if( ! @mkdir($loop_dir, octdec($chmod)) )
+				{
+					return false;
+				}
 			}
+			return true;
 		}
 	}
-
 	return true;
 }
 
@@ -793,6 +775,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.35  2006/12/14 22:13:05  blueyed
+ * mkdir_r(): implemented suggestion from Francois, not tested with open_basedir yet
+ *
  * Revision 1.34  2006/12/14 01:53:10  fplanque
  * doc
  *
