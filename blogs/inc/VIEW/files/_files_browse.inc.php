@@ -370,23 +370,13 @@ while( $lFile = & $fm_Filelist->get_next() )
 { // Loop through all Files:
 	echo '<tr class="'.( $countFiles%2 ? 'odd' : 'even' ).'">';
 
+
 	/*****************  Image file preview:  *******************/
+
 	if( $UserSettings->get( 'fm_imglistpreview' ) )
 	{
 		echo '<td class="fm_preview_list center">';
-		if( $lFile->is_image() )
-		{
-			$img = '<img src="'.$lFile->get_thumb_url().'" alt="" />';
-
-			// Get link to view the file (fallback to no view link - just the img):
-			$link = $lFile->get_view_link( $img );
-			if( ! $link )
-			{ // no view link available:
-				$link = $img;
-			}
-
-			echo $link;
-		}
+		echo $lFile->get_preview_thumb();
 		echo '</td>';
 	}
 
@@ -981,6 +971,10 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.30  2006/12/14 00:33:53  fplanque
+ * thumbnails & previews everywhere.
+ * this is getting good :D
+ *
  * Revision 1.29  2006/12/13 18:10:22  fplanque
  * thumbnail resampling proof of concept
  *

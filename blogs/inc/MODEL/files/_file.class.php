@@ -1405,6 +1405,31 @@ class File extends DataObject
 	}
 
 
+ 	/**
+	 * Displays a preview thumbnail which is clickable and opens a view popup
+	 *
+	 * @return string HTML to display
+ 	 */
+	function get_preview_thumb()
+	{
+		if( ! $this->is_image() )
+		{
+			return NULL;
+		}
+
+		$img = '<img src="'.$this->get_thumb_url().'" alt="" />';
+
+		// Get link to view the file (fallback to no view link - just the img):
+		$link = $this->get_view_link( $img );
+		if( ! $link )
+		{ // no view link available:
+			$link = $img;
+		}
+
+		return $link;
+	}
+
+	
 	/**
 	 * Get the full path to the thumbnail for this file.
 	 *
@@ -1586,6 +1611,10 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.29  2006/12/14 00:33:53  fplanque
+ * thumbnails & previews everywhere.
+ * this is getting good :D
+ *
  * Revision 1.28  2006/12/13 22:26:27  fplanque
  * This has reached the point of a functional eternal cache.
  * TODO: handle cache on delete, upload/overwrite, rename, move, copy.

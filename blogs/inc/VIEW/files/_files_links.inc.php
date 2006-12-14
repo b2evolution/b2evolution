@@ -60,11 +60,16 @@ function file_type( & $row )
 	global $current_File;
 
 	// Instantiate a File object for this line:
-	$current_File = new File( $row->file_root_type, $row->file_root_ID, $row->file_path ); // COPY!
+	$current_File = new File( $row->file_root_type, $row->file_root_ID, $row->file_path ); // COPY (FUNC) needed for following columns
 	// Flow meta data into File object:
 	$current_File->load_meta( false, $row );
 
-	// File type:
+	if( $preview_thumb = $current_File->get_preview_thumb() )
+	{	// We got a thumbnail:
+		return $preview_thumb;
+	}
+
+	// No thumb, display File type:
 	return $current_File->get_view_link( $current_File->get_icon(), T_('Let browser handle this file!')  ).' '.$current_File->get_type();
 }
 $Results->cols[] = array(
@@ -94,6 +99,8 @@ $Results->cols[] = array(
 						'td' => '%file_path()%',
 					);
 
+
+// TITLE COLUMN:
 $Results->cols[] = array(
 						'th' => T_('Title'),
 						'order' => 'file_title',
@@ -102,6 +109,7 @@ $Results->cols[] = array(
 					);
 
 
+// ACTIONS COLUMN:
 function file_actions( $link_ID )
 {
 	global $current_File, $edited_Item, $current_User;
@@ -137,6 +145,10 @@ $Form->end_form( );
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/14 00:33:53  fplanque
+ * thumbnails & previews everywhere.
+ * this is getting good :D
+ *
  * Revision 1.10  2006/12/12 19:39:07  fplanque
  * enhanced file links / permissions
  *
