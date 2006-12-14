@@ -159,7 +159,7 @@ skin_content_header();	// Sets charset!
 
 
 			$SQL = & new SQL();
-			$SQL->SELECT( 'link_ID, link_ltype_ID, file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
+			$SQL->SELECT( 'file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
 			$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 			$SQL->WHERE( 'link_itm_ID = '.$Item->ID );
 			$SQL->ORDER_BY( 'link_ID' );
