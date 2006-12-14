@@ -145,17 +145,19 @@ h3.bTitle {
 	letter-spacing: 2px;
 }
 .bText {
-	margin-top: 0px;
-	margin-bottom: 0px;
+	margin: 0;
+	padding: 0 12px;
 }
 .bSmallHead
 {
-	padding: 2ex;
+	margin: 0;
+	padding: 12px 12px 6px 12px;
 }
 .bSmallPrint
 {
+	margin: 0;
 	font-size: 84%;
-	padding: 2ex;
+	padding: 6px 12px 12px 12px;
 }
 .action_right
 {
@@ -184,5 +186,4 @@ select.bComment  /* Used by the profile form */
 	padding: 1px;
 	margin: 0ex;
 }
-
 

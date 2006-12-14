@@ -144,28 +144,68 @@ skin_content_header();	// Sets charset!
 			locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
 			$Item->anchor(); // Anchor for permalinks to refer to
 		?>
-		<div class="bText">
-			<?php $Item->content(); ?>
+		<div class="bImages">
+
+
 			<?php
-				// Links to post pages (for multipage posts):
-				$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
+
+			/*
+			 * Display images!
+			 * fp> TODO: factorize (fp)
+			 */
+			$FileCache = & get_Cache( 'FileCache' );
+
+			$FileList = & new DataObjectList2( $FileCache );
+
+
+			$SQL = & new SQL();
+			$SQL->SELECT( 'link_ID, link_ltype_ID, file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
+			$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
+			$SQL->WHERE( 'link_itm_ID = '.$Item->ID );
+			$SQL->ORDER_BY( 'link_ID' );
+
+			$FileList->sql = $SQL->get();
+
+			$FileList->query( false, false, false );
+
+			while( $File = & $FileList->get_next() )
+			{
+				if( ! $File->is_image() )
+				{	// Skip anything that is not an image
+					// fp> TODO: maybe this property should be stored in link_ltype_ID
+					continue;
+				}
+				// Generate the IMG tag with all the alt, title and desc if available
+				echo $File->get_tag();
+			}
+
 			?>
+
 		</div>
 		<div class="bDetails">
 
 			<div class="bSmallHead">
 
-				<?php $Item->feedback_link( 'feedbacks', '<div class="action_right">', '</div>', 
+				<?php $Item->feedback_link( 'feedbacks', '<div class="action_right">', '</div>',
 								get_icon( 'nocomment' ), get_icon( 'comments' ), get_icon( 'comments' ) ) // Link to comments ?>
-				
+
 				<div class="action_right"><?php $Item->permanent_link( T_('Permalink'), '#' ); ?></div>
-				
+
 				<?php $Item->edit_link( '<div class="action_right">', '</div>', T_('Edit...'), T_('Edit title/description...') ) // Link to backoffice for editing ?>
-				
+
 				<h3 class="bTitle"><?php $Item->title(); ?></h3>
 				<span class="timestamp"><?php $Item->issue_date( locale_datefmt().' H:i' ); ?></span>
-				
+
 			</div>
+
+			<div class="bText">
+				<?php $Item->content(); ?>
+				<?php
+					// Links to post pages (for multipage posts):
+					$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
+				?>
+			</div>
+
 			<div class="bSmallPrint">
 			<?php
 					echo T_('Albums'), ': ';
