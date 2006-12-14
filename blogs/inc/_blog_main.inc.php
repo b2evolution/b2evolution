@@ -44,37 +44,14 @@ $Timer->start( '_blog_main.inc' );
  * On some occasions, we'll manually filter it out of rgenerate_url() because we know wer go through a stub for example.
  */
 param( 'blog', 'integer', 0, true );
-
-param( 'p', 'integer', '', true );              // Specific post number to display
-param( 'title', 'string', '', true );						// urtitle of post to display
-param( 'redir', 'string', 'yes', false );				// Do we allow redirection to canonical URL?
-
-param( 'preview', 'integer', 0, true );         // Is this preview ?
-
-param( 'disp', 'string', 'posts', true );
-
-param( 'tempskin', 'string', '', true );
-
-
-if( !isset($timestamp_min) ) $timestamp_min = '';
-if( !isset($timestamp_max) ) $timestamp_max = '';
-
-if( $preview )
-{ // Ignore this hit
-	$Hit->ignore = true;
-}
-
-if( param( 'stats', 'integer', 0 ) || $disp == 'stats' )
-{
-	require $view_path.'errors/_410_stats_gone.page.php'; // error & exit
-}
-
 // Getting current blog info:
 $BlogCache = & get_Cache( 'BlogCache' );
 $Blog = & $BlogCache->get_by_ID( $blog );
 
 
 /*
+ * _______________________________ Locale / Charset for the Blog _________________________________
+ *
 	TODO: blueyed>> This should get moved as default to the locale detection in _main.inc.php,
 	        as we only want to activate the I/O charset, which is probably the user's..
 	        It prevents using a locale/charset in the front office, apart from the one given as default for the blog!!
@@ -96,9 +73,11 @@ if( init_charsets( $current_charset ) )
 }
 
 
-/* -------------------------
- * Extra path info decoding:
- * -------------------------
+/*
+ * _____________________________ Extra path info decoding ________________________________
+ *
+ * This will translate extra path into 'regular' params.
+ *
  * Decoding should try to work like this:
  *
  * baseurl/blog-urlname/junk/.../junk/post-title    -> points to a single post (no ending slash)
@@ -248,7 +227,44 @@ if( $resolve_extra_path )
 }
 
 
-if( !empty($preview) )
+/*
+ * ____________________________ Query params ____________________________
+ *
+ * Note: if the params have been set by the extra-path-info above, param() will not touch them.
+ */
+param( 'p', 'integer', '', true );              // Specific post number to display
+param( 'title', 'string', '', true );						// urtitle of post to display
+param( 'redir', 'string', 'yes', false );				// Do we allow redirection to canonical URL? (allows to force a 'single post' URL for commenting)
+
+param( 'preview', 'integer', 0, true );         // Is this preview ?
+if( $preview )
+{ // Ignore this hit
+	$Hit->ignore = true;
+}
+
+param( 'stats', 'integer', 0 );									// Deprecated but might still be used by spambots
+param( 'disp', 'string', 'posts', true );
+
+// In case these were not set by the stub:
+if( !isset($timestamp_min) ) $timestamp_min = '';
+if( !isset($timestamp_max) ) $timestamp_max = '';
+
+
+/*
+ * ____________________________ "Clean up" the request ____________________________
+ *
+ * Make sure that:
+ * 1) disp is set to "single" if single post requested
+ * 2) URL is canonical if:
+ *    - some content was requested in a weird/deprecated way
+ *    - or if content identifiers have changed
+ */
+if( $stats || $disp == 'stats' )
+{	// This used to be a spamfest...
+	require $view_path.'errors/_410_stats_gone.page.php'; // error & exit
+	// EXIT.
+}
+elseif( !empty($preview) )
 {
 	$disp = 'single';
 }
@@ -273,7 +289,7 @@ elseif( !empty($p) || !empty($title) )
 		require $view_path.'errors/_404_not_found.page.php'; // error & exit
 	}
 
-	// EXPERIMENTAL:
+	// EXPERIMENTAL: Check if we want to redirect to a canonical URL for the post
 	// Please document encountered problems.
 	// $redir here allows to force a 'single post' URL for commenting
 	if( $redirect_to_canonical_url && $redir == 'yes' )
@@ -292,14 +308,9 @@ elseif( !empty($p) || !empty($title) )
 	}
 
 }
-
-
-// TODO: dh> we should first handle $skin, so that if it's provided by a plugin, we do not have to set $MainList etc..
-
-
-if( $disp == 'posts' )
+elseif( $disp == 'posts' )
 { // default display:
-	// EXPERIMENTAL: Check if we want to redirect to a canonical URL
+	// EXPERIMENTAL: Check if we want to redirect to a canonical URL for the category
 	// Please document encountered problems.
 	if( $redirect_to_canonical_url && $redir == 'yes' )
 	{
@@ -330,6 +341,47 @@ if( $disp == 'posts' )
 }
 
 
+/*
+ * ______________________ DETERMINE WHICH SKIN TO USE FOR DISPLAY _______________________
+ */
+
+// Check if a temporary skin has been requested (used for RSS syndication for example):
+param( 'tempskin', 'string', '', true );
+if( !empty( $tempskin ) )
+{ // This will be handled like any other skin:
+	$skin = $tempskin;
+}
+
+// Let's check if a skin has been forced in the stub file:
+// Note: with "register_globals = On" this may be set from URL..
+// dh> You've said that it's not security issue etc.. but I still would init $skin in /conf/_advanced.php and use empty() here.
+// (fp> note: would break stubs with conf included at the end)
+if( !isset( $skin ) )
+{ // No skin forced in stub (not even '' for no-skin)...
+	// Use default from the database
+	$skin = $Blog->get('default_skin');
+}
+
+// Check validity of requested skin name:
+if( ereg( '([^-A-Za-z0-9._]|\.\.)', $skin ) )
+{
+	debug_die( 'The requested skin is invalid.' );
+}
+
+// Because a lot of bloggers will delete skins, we have to make this fool proof with extra checking:
+if( !empty( $skin ) && !skin_exists( $skin ) )
+{ // We want to use a skin, but it doesn't exist!
+	$err_msg = sprintf( T_('The requested skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file.'),
+		htmlspecialchars($skin), $Blog->dget('shortname'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=display&amp;action=edit&amp;blog='.$Blog->ID.'"' );
+	debug_die( $err_msg );
+}
+
+
+/*
+ * ____________________________ GET POSTS TO DISPLAY ACCORDING TO REQUEST ______________________________
+ *
+ * fp> Shall we move this to the skins? Sth like get_MainList() ?
+ */
 if( ($disp == 'posts') || ($disp == 'single') )
 { // If we are going to display posts and not something special...
 
@@ -366,41 +418,6 @@ if( ($disp == 'posts') || ($disp == 'single') )
 }
 
 
-/*
- * ______________________ DETERMINE WHICH SKIN TO USE FOR DISPLAY _______________________
- */
-
-// Check if a temporary skin has been requested (used for RSS syndication for example):
-if( !empty( $tempskin ) )
-{ // This will be handled like any other skin:
-	$skin = $tempskin;
-}
-
-// Let's check if a skin has been forced in the stub file:
-// Note: with "register_globals = On" this may be set from URL..
-// dh> You've said that it's not security issue etc.. but I still would init $skin in /conf/_advanced.php and use empty() here.
-// (fp> note: would break stubs with conf included at the end)
-if( !isset( $skin ) )
-{ // No skin forced in stub (not even '' for no-skin)...
-	// Use default from the database
-	$skin = $Blog->get('default_skin');
-}
-
-// Check validity of requested skin name:
-if( ereg( '([^-A-Za-z0-9._]|\.\.)', $skin ) )
-{
-	debug_die( 'The requested skin is invalid.' );
-}
-
-// Because a lot of bloggers will delete skins, we have to make this fool proof with extra checking:
-if( !empty( $skin ) && !skin_exists( $skin ) )
-{ // We want to use a skin, but it doesn't exist!
-	$err_msg = sprintf( T_('The requested skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file.'),
-		htmlspecialchars($skin), $Blog->dget('shortname'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=display&amp;action=edit&amp;blog='.$Blog->ID.'"' );
-	debug_die( $err_msg );
-}
-
-	
 $Timer->pause( '_blog_main.inc');
 
 
@@ -415,10 +432,11 @@ param( 'template', 'string', 'main', true );
 
 
 // Trigger plugin event:
+// fp> TODO: please doc with example of what this can be used for
 $Plugins->trigger_event( 'BeforeBlogDisplay', array('skin'=>$skin) );
 
 
-// Fix default display params (in case no info was provided by stub file):
+// Set default display params (in case no info was provided by stub file):
 // Displaying of blog list on templates?
 if( !isset($display_blog_list) )
 { // If not already set in stub:
@@ -469,6 +487,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.54  2006/12/14 21:35:05  fplanque
+ * block reordering tentative
+ *
  * Revision 1.53  2006/12/14 20:57:55  fplanque
  * Hum... this really needed some cleaning up!
  *
