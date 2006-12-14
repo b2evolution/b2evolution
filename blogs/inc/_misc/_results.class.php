@@ -673,9 +673,9 @@ class Results extends Widget
 	 */
 	function display_init( $display_params = NULL )
 	{
-		if( empty( $this->params ) )
+		global $AdminUI;
+		if( empty( $this->params ) && isset( $AdminUI ) )
 		{ // Use default params from Admin Skin:
-			global $AdminUI;
 			$this->params = $AdminUI->get_template( 'Results' );
 		}
 
@@ -2195,6 +2195,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.36  2006/12/14 19:15:53  fplanque
+ * minor fix
+ *
  * Revision 1.35  2006/12/07 23:13:13  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!
