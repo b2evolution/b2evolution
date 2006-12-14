@@ -286,6 +286,9 @@ class Blog extends DataObject
 			param_integer_range( 'posts_per_page', 1, 9999, T_('Items/days per page must be between %d and %d.') );
 			$this->set_setting( 'posts_per_page', get_param( 'posts_per_page' ) );
 
+			param_integer_range( 'posts_per_feed', 1, 9999, T_('Items per feed must be between %d and %d.') );
+			$this->set_setting( 'posts_per_feed', get_param( 'posts_per_feed' ) );
+
 			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
 		}
 
@@ -1059,6 +1062,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.44  2006/12/14 21:41:15  fplanque
+ * Allow different number of items in feeds than on site
+ *
  * Revision 1.43  2006/12/14 00:01:49  fplanque
  * land in correct collection when opening FM from an Item
  *

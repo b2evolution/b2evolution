@@ -381,13 +381,24 @@ if( !empty( $skin ) && !skin_exists( $skin ) )
  * ____________________________ GET POSTS TO DISPLAY ACCORDING TO REQUEST ______________________________
  *
  * fp> Shall we move this to the skins? Sth like get_MainList() ?
+ * fp> That would save the '_' detection hack... and maybe some processing when we don't need the MainList.
+ * fp> It is tricky though. A lot of navigation things need the mainlist.
  */
 if( ($disp == 'posts') || ($disp == 'single') )
 { // If we are going to display posts and not something special...
 
 	// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
 
-	$MainList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max, $Blog->get_setting('posts_per_page') );
+	if( !empty($skin) && substr( $skin, 0, 1 ) == '_' )
+	{	// We are displaying an RSS/Atom feed:
+		$items_nb_limit = $Blog->get_setting('posts_per_feed');
+	}
+	else
+	{	// We are displaying something visual
+		$items_nb_limit = $Blog->get_setting('posts_per_page');
+	}
+
+	$MainList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max, $items_nb_limit );
 
 	if( ! $preview )
 	{
@@ -487,6 +498,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.55  2006/12/14 21:41:15  fplanque
+ * Allow different number of items in feeds than on site
+ *
  * Revision 1.54  2006/12/14 21:35:05  fplanque
  * block reordering tentative
  *

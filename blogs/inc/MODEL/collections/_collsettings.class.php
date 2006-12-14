@@ -53,6 +53,7 @@ class CollectionSettings extends AbstractSettings
 			'ping_plugins' => 'ping_pingomatic,ping_b2evonet', // ping plugin codes, separated by comma
 			'what_to_show' => 'posts',         	// posts, days
 			'posts_per_page' => '5',
+			'posts_per_feed' => '8',
 			'archive_mode' => 'monthly',				// monthly, weekly, daily, postbypost
 			'use_workflow' => 0,								// Don't use workflow by default
 		);
@@ -70,6 +71,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.10  2006/12/14 21:41:15  fplanque
+ * Allow different number of items in feeds than on site
+ *
  * Revision 1.9  2006/12/10 23:56:26  fplanque
  * Worfklow stuff is now hidden by default and can be enabled on a per blog basis.
  *

@@ -37,14 +37,15 @@ $Form->begin_fieldset( T_('Content / Posts') );
 	$Form->radio( 'what_to_show', $edited_Blog->get_setting('what_to_show'),
 								array(  array( 'days', T_('days') ),
 												array( 'posts', T_('posts') ),
-											), T_('Display unit') );
-	$Form->text( 'posts_per_page', $edited_Blog->get_setting('posts_per_page'), 4, T_('Posts/Days per page'), '', 4 );
+											), T_('Display unit'), false,  T_('Do you want to restrict on the number of days or the number of posts?') );
+	$Form->text( 'posts_per_page', $edited_Blog->get_setting('posts_per_page'), 4, T_('Posts/Days per page'), T_('How many days or posts fo you want to display on the home page?'), 4 );
+	$Form->text( 'posts_per_feed', $edited_Blog->get_setting('posts_per_feed'), 4, T_('Posts in RSS/Atom feeds'),  T_('How many of the latest posts do you want to include in RSS & Atom feeds?'), 4 );
 	$Form->radio( 'archive_mode',  $edited_Blog->get_setting('archive_mode'),
 							array(  array( 'monthly', T_('monthly') ),
 											array( 'weekly', T_('weekly') ),
 											array( 'daily', T_('daily') ),
 											array( 'postbypost', T_('post by post') )
-										), T_('Archive mode') );
+										), T_('Archive grouping'), false,  T_('How do you want to browse the post archives? May also apply to permalinks.') );
 
 $Form->end_fieldset();
 
@@ -71,6 +72,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.7  2006/12/14 21:41:16  fplanque
+ * Allow different number of items in feeds than on site
+ *
  * Revision 1.6  2006/12/04 21:25:18  fplanque
  * removed user skin switching
  *
