@@ -24,6 +24,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $current_User;
 
+if( $blog )
+{
+	$BlogCache = & get_Cache( 'BlogCache' );
+	$Blog = & $BlogCache->get_by_ID($blog); // "Exit to blogs.." link
+}
 
 
 $blogListButtons = '<a href="'.regenerate_url( array('blog'), 'blog=0' ).'" class="'.(( 0 == $blog ) ? 'CurrentBlog' : 'OtherBlog').'">'.T_('Global').'</a> ';
@@ -44,15 +49,13 @@ $AdminUI->disp_html_head();
 // Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 $AdminUI->disp_body_top();
 
-// Begin payload block:
-$AdminUI->disp_payload_begin();
 
 // fp> Note: don't bother with T_() yet. This is going to change too often.
 
 if( $blog )
 {
-	$BlogCache = & get_Cache( 'BlogCache' );
-	$Blog = & $BlogCache->get_by_ID($blog); // "Exit to blogs.." link
+	// Begin payload block:
+	$AdminUI->disp_payload_begin();
 
 	echo '<h2>'.$Blog->dget( 'name' ).'</h2>';
 
@@ -97,11 +100,17 @@ if( $blog )
 	// fp> TODO: drafts
 
 
+	// End payload block:
+	$AdminUI->disp_payload_end();
 }
+
 
 
 if( $current_User->check_perm( 'options', 'edit' ) )
 {	// We have some serious admin privilege:
+	// Begin payload block:
+	$AdminUI->disp_payload_begin();
+
 	echo '<h2>Administrative tasks</h2>';
 
 	echo '<ul>';
@@ -113,16 +122,19 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		// TODO: remember system date check and only remind every 3 months
 		echo '<li><a href="admin.php?ctrl=system">Check if my system is secure...</a></li>';
 	echo '</ul>';
+	// End payload block:
+	$AdminUI->disp_payload_end();
 }
 
-// End payload block:
-$AdminUI->disp_payload_end();
 
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2006/12/15 22:53:26  fplanque
+ * cleanup
+ *
  * Revision 1.8  2006/12/12 21:19:31  fplanque
  * UI fixes
  *
