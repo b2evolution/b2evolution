@@ -74,12 +74,12 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	$urltitle = strtolower( $urltitle );
 
 	// Normalize to 40 chars + a number
-	preg_match( '/^(.*?)(-[0-9]+)?$/', $urltitle, $matches );
+	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
 	$urlbase = substr( $matches[1], 0, 40 );
 	$urltitle = $urlbase;
-	if( ! empty( $matches[2] ) )
+	if( ! empty( $matches[4] ) )
 	{
-		$urltitle = $urlbase.$matches[2];
+		$urltitle = $urlbase.'-'.$matches[4];
 	}
 
 
@@ -696,6 +696,11 @@ function attach_browse_tabs()
 
 /*
  * $Log$
+ * Revision 1.37  2006/12/15 23:31:21  fplanque
+ * reauthorized _ in urltitles.
+ * No breaking of legacy permalinks.
+ * - remains the default placeholder though.
+ *
  * Revision 1.36  2006/12/12 23:23:30  fplanque
  * finished post editing v2.0
  *

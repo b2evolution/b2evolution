@@ -73,7 +73,7 @@ function replace_special_chars( $str )
 	// Keep only one char in entities!
 	$str = preg_replace( '/&(.).+?;/', '$1', $str );
 	// Replace non acceptable chars
-	$str = preg_replace( '/[^A-Za-z0-9]+/', '-', $str );
+	$str = preg_replace( '/[^A-Za-z0-9_]+/', '-', $str );
 	// Remove '-' at start and end:
 	$str = preg_replace( '/^-+/', '', $str );
 	$str = preg_replace( '/-+$/', '', $str );
@@ -84,6 +84,11 @@ function replace_special_chars( $str )
 
 /*
  * $Log$
+ * Revision 1.2  2006/12/15 23:31:21  fplanque
+ * reauthorized _ in urltitles.
+ * No breaking of legacy permalinks.
+ * - remains the default placeholder though.
+ *
  * Revision 1.1  2006/12/04 21:20:28  blueyed
  * Abstracted convert_special_charsets() out of urltitle_validate()
  *

@@ -1440,23 +1440,6 @@ function upgrade_b2evo_tables()
 	// Version 2.0 starts here
 
 
-	if( $old_db_version < 9404 )
-	{
-		// dh> moved content into "< 9330" block for 1.9
-	}
-
-	// fp>SUSPECT
-	// fp> have to check if this means kiss your pagerank goodbye
-	if( $old_db_version < 9405 )
-	{
-		echo 'Updating URL titles... ';
-		$DB->query( '
-      UPDATE T_posts
-         SET post_urltitle = REPLACE( post_urltitle, "_", "-" )' );
-		echo "OK.<br />\n";
-	}
-	// SUSPECT<fp
-
 	if( $old_db_version < 9406 )
 	{
 		echo 'Updating chapter url names... ';
@@ -1535,6 +1518,17 @@ function upgrade_b2evo_tables()
 
 	}
 
+
+
+	/*
+	// fp> have to check if this means kiss your pagerank goodbye
+		echo 'Updating URL titles... ';
+		$DB->query( '
+      UPDATE T_posts
+         SET post_urltitle = REPLACE( post_urltitle, "_", "-" )' );
+		echo "OK.<br />\n";
+	}
+	*/
 
 
 	/*
@@ -1641,6 +1635,11 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.197  2006/12/15 23:31:22  fplanque
+ * reauthorized _ in urltitles.
+ * No breaking of legacy permalinks.
+ * - remains the default placeholder though.
+ *
  * Revision 1.196  2006/12/07 20:31:29  fplanque
  * fixed install
  *

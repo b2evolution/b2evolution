@@ -36,11 +36,20 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 		$old_evo_charset = $evo_charset;
 		$evo_charset = 'ISO-8859-1';
 		$this->assertEqual( urltitle_validate( '  ', " :: çà c'est \"VRAIMENT\" tôa! " ), 'ca-c-est-vraiment-toa' );
-		$this->assertEqual( urltitle_validate( '', "La subtile différence entre acronym et abbr..._452" ), 'la-subtile-difference-entre-acronym-et-a-452' );
+		$this->assertEqual( urltitle_validate( '  ', " :: çà c'est_tôa! " ), 'ca-c-est_toa' );
+		$this->assertEqual( urltitle_validate( '  ', " :: çà * c'est_tôa! * *" ), 'ca-c-est_toa' );
+		$this->assertEqual( urltitle_validate( '', 'La différence entre acronym et abbr...-452' ), 'la-difference-entre-acronym-et-abbr-452' );
+		$this->assertEqual( urltitle_validate( '', 'La différence entre acronym et abbr..._452' ), 'la-difference-entre-acronym-et-abbr-452' );
+		$this->assertEqual( urltitle_validate( '', 'La différence entre acronym et abbr_452' ), 'la-difference-entre-acronym-et-abbr-452' );
+		// Test length cropping
+		$this->assertEqual( urltitle_validate( '', 'La subtile différence entre acronym et abbr..._452' ), 'la-subtile-difference-entre-acronym-et-a-452' );
+		$this->assertEqual( urltitle_validate( '', 'La subtile différence entre acronym et abbr...-452' ), 'la-subtile-difference-entre-acronym-et-a-452' );
 
 		if( ! can_convert_charsets('ISO-8859-1', 'UTF-8') || ! can_convert_charsets('UTF-8', 'ISO-8859-1') )
 		{
-			echo "Skipping test (cannot convert)...\n";
+			echo "Skipping tests (cannot convert charsets)...</br>\n";
+			// fp>> errr... what is it skipping ?? shouldn't there be a return here? I'm adding it:
+			return;
 		}
 
 		$this->assertEqual( urltitle_validate('', 'Äöüùé'), 'aeoeueue' );
