@@ -3154,7 +3154,7 @@ class Item extends DataObject
 
 				if( isset($params['xmlrpcresp']) && is_a($params['xmlrpcresp'], 'xmlrpcresp') )
 				{
-					// fp> TODO: let xmlrpc_displayresult() handle $Messages (e.g. "error", but should be connected/after the "Pinging %s..." from above)
+					// dh> TODO: let xmlrpc_displayresult() handle $Messages (e.g. "error", but should be connected/after the "Pinging %s..." from above)
 					ob_start();
 					xmlrpc_displayresult( $params['xmlrpcresp'], true );
 					$Messages->add( ob_get_contents(), 'note' );
@@ -3321,6 +3321,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.139  2006/12/15 22:59:05  fplanque
+ * doc
+ *
  * Revision 1.138  2006/12/14 22:26:31  blueyed
  * Fixed E_NOTICE and displaying of pings into $Messages (though "hackish")
  *
