@@ -99,7 +99,9 @@ class GeneralSettings extends AbstractSettings
 		'timeout_sessions' => '604800',     // seconds (604800 == 7 days)
 		'upload_enabled' => '1',
 		'upload_maxkb' => '100',
+
 		'user_minpwdlen' => '5',
+		'js_passwd_hashing' => '1',					// Use JS password hashing by default
 
 		'webhelp_enabled' => '1',
 
@@ -158,6 +160,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.28  2006/12/15 22:54:14  fplanque
+ * allow disabling of password hashing
+ *
  * Revision 1.27  2006/12/11 00:32:26  fplanque
  * allow_moving_chapters stting moved to UI
  * chapters are now called categories in the UI

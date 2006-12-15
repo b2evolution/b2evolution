@@ -26,12 +26,12 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-$need_raw_pwd = (bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
-
 // Do not cache this page, because the JS password random salt has to match the session cookie:
 // fp> I changed the meaning of teh comment below. Does this reflect the implementation?
 // Do not cache this page, because the JS password random salt has to match the one stored in the current session:
 header_nocache(); // do not cache this page, because the JS password salt has to match the session cookie
+
+$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 
 /**
  * Include page header (also displays Messages):
@@ -53,7 +53,7 @@ $page_icon = 'icon_login.gif';
 	*/
 $evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/functions.js"></script>';
 
-if( ! $need_raw_pwd )
+if( $transmit_hashed_password )
 { // Include JS for client-side password hashing:
 	$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/md5.js"></script>';
 	$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/sha1.js"></script>';
@@ -78,7 +78,7 @@ $Form->begin_form( 'fform' );
 	}
 
 // fp>SUSPECT
-	if( ! $need_raw_pwd )
+	if( $transmit_hashed_password )
 	{ // used by JS-password encryption/hashing:
 		$pwd_salt = $Session->get('core.pwd_salt');
 		if( empty($pwd_salt) )
@@ -144,7 +144,7 @@ $Form->end_form();
 
 	<?php
 // fp>SUSPECT
-	if( ! $need_raw_pwd )
+	if( $transmit_hashed_password )
 	{
 		?>
 		// Hash the password onsubmit and clear the original pwd field
@@ -200,6 +200,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.33  2006/12/15 22:54:14  fplanque
+ * allow disabling of password hashing
+ *
  * Revision 1.32  2006/12/09 01:55:36  fplanque
  * feel free to fill in some missing notes
  * hint: "login" does not need a note! :P

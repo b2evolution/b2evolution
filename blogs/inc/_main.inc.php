@@ -402,23 +402,32 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 	header_nocache();
 
-	$login = strtolower(strip_tags(get_magic_quotes_gpc() ? stripslashes($login) : $login));
-	$pass = strip_tags(get_magic_quotes_gpc() ? stripslashes($pass) : $pass);
+	// Note: login and password cannot include '<' !
+	$login = strtolower(strip_tags(remove_magic_quotes($login)));
+	$pass = strip_tags(remove_magic_quotes($pass));
 	$pass_md5 = md5( $pass );
 
-	// Password hashing by JavaScript:
-	$need_raw_pwd = (bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
+
+	/*
+	 * Handle javascript-hashed password:
+	 * If possible, the login form will hash the entered password with a salt that changes everytime.
+	 */
 	param('pwd_salt', 'string', ''); // just for comparison with the one from Session
 	$pwd_salt_sess = $Session->get('core.pwd_salt');
 
-	if( $need_raw_pwd )
+	// $Debuglog->add( 'salt: '.var_export($pwd_salt, true).', session salt: '.var_export($pwd_salt_sess, true) );
+
+	$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
+	if( $transmit_hashed_password )
+	{
+		param( 'pwd_hashed', 'string', '' );
+	}
+	else
 	{ // at least one plugin requests the password un-hashed:
 		$pwd_hashed = '';
 	}
-	else
-	{
-		param('pwd_hashed', 'string', '');
-	}
+
+	// $Debuglog->add( 'pwd_hashed: '.var_export($pwd_hashed, true).', pass: '.var_export($pass, true) );
 
 	// Trigger Plugin event, which could create the user, according to another database:
 	if( $Plugins->trigger_event( 'LoginAttempt', array(
@@ -427,12 +436,9 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			'pass_md5' => $pass_md5,
 			'pass_salt' => $pwd_salt_sess,
 			'pass_hashed' => $pwd_hashed ) ) )
-	{ // clear the UserCache, if one plugin has been called - it may have changed user(s)
+	{ // clear the UserCache, if a plugin has been called - it may have changed user(s)
 		$UserCache->clear();
 	}
-
-	$Debuglog->add( 'pwd_hashed: '.var_export($pwd_hashed, true)
-		.', pass: '.var_export($pass, true) );
 
 	$pass_ok = false;
 	if( $Messages->count('login_error') )
@@ -491,15 +497,6 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		$current_User = & $UserCache->get_by_login($login);
 		// save the user for later hits
 		$Session->set_User( $current_User );
-
-		// Remove deprecated cookies:
-		// We do not use $cookie_user / $cookie_pass (would be set in _obsolete092.php), because it
-		//  does not harm really (cookies time out) and would allow to set arbitrary cookies through
-		//  register_globals!
-		if( isset($_COOKIE['cookie'.$instance_name.'user']) )
-			setcookie( 'cookie'.$instance_name.'user', '', 200000000, $cookie_path, $cookie_domain );
-		if( isset($_COOKIE['cookie'.$instance_name.'pass']) )
-			setcookie( 'cookie'.$instance_name.'pass', '', 200000000, $cookie_path, $cookie_domain );
 	}
 	elseif( ! $Messages->count('login_error') )
 	{ // if there's no login_error message yet, add the default one:
@@ -661,6 +658,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.70  2006/12/15 22:54:14  fplanque
+ * allow disabling of password hashing
+ *
  * Revision 1.69  2006/12/09 01:55:35  fplanque
  * feel free to fill in some missing notes
  * hint: "login" does not need a note! :P

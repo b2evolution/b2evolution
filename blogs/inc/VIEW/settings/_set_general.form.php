@@ -109,7 +109,9 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Security options') );
 
-$Form->text_input( 'user_minpwdlen', (int)$Settings->get('user_minpwdlen'), 2, T_('Minimum password length'), T_('for users.'), array( 'maxlength'=>2, 'required'=>true ) );
+	$Form->text_input( 'user_minpwdlen', (int)$Settings->get('user_minpwdlen'), 2, T_('Minimum password length'), T_('characters.'), array( 'maxlength'=>2, 'required'=>true ) );
+
+	$Form->checkbox_input( 'js_passwd_hashing', (bool)$Settings->get('js_passwd_hashing'), T_('Login password hashing'), array( 'note'=>T_('Check to enable the login form to hash the password with Javascript before transmitting it. This provides extra security on non-SSL connections.')) );
 
 $Form->end_fieldset();
 
@@ -138,6 +140,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.26  2006/12/15 22:54:14  fplanque
+ * allow disabling of password hashing
+ *
  * Revision 1.25  2006/12/11 00:32:26  fplanque
  * allow_moving_chapters stting moved to UI
  * chapters are now called categories in the UI

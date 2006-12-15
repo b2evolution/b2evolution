@@ -81,6 +81,10 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimun password length must be between %d and %d.') );
 	$Settings->set( 'user_minpwdlen', $user_minpwdlen );
 
+	param( 'js_passwd_hashing', 'integer', 0 );
+	$Settings->set( 'js_passwd_hashing', $js_passwd_hashing );
+
+
 	// Session timeout
 	$timeout_sessions = param( 'timeout_sessions', 'integer', $Settings->get_default('timeout_sessions') );
 	if( $timeout_sessions < 300 )
@@ -127,6 +131,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2006/12/15 22:54:14  fplanque
+ * allow disabling of password hashing
+ *
  * Revision 1.12  2006/12/07 00:55:52  fplanque
  * reorganized some settings
  *
