@@ -84,7 +84,8 @@ $current_User->dbupdate();
 
 
 // Work the blogs:
-$values = array();
+$subscription_values = array();
+$unsubscribed = array();
 $subs_blog_IDs = explode( ',', $subs_blog_IDs );
 foreach( $subs_blog_IDs as $loop_blog_ID )
 {
@@ -95,16 +96,31 @@ foreach( $subs_blog_IDs as $loop_blog_ID )
 	$sub_items    = param( 'sub_items_'.$loop_blog_ID,    'integer', 0 );
 	$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
 
-	$values[] = "( $loop_blog_ID, $current_User->ID, $sub_items, $sub_comments )";
+	if( $sub_items || $sub_comments )
+	{	// We have a subscription for this blog
+		$subscription_values[] = "( $loop_blog_ID, $current_User->ID, $sub_items, $sub_comments )";
+	}
+	else
+	{	// No subscription here:
+		$unsubscribed[] = $loop_blog_ID;
+	}
 }
 
-if( count($values) )
-{	// We need to record vales:
+if( count($subscription_values) )
+{	// We need to record values:
 	$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-								VALUES '.implode( ', ', $values ) );
+								VALUES '.implode( ', ', $subscription_values ) );
 }
 
-$Messages->add( T_('Your profile has been updated.'), 'success' );
+if( count($unsubscribed) )
+{	// We need to make sure some values are cleared:
+	$DB->query( 'DELETE FROM T_subscriptions
+								 WHERE sub_user_ID = '.$current_User->ID.'
+								 	 AND sub_coll_ID IN ('.implode( ', ', $unsubscribed ).')' );
+}
+
+
+$Messages->add( T_('Your profile & subscriptions have been updated.'), 'success' );
 
 
 header_nocache();
@@ -113,6 +129,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.17  2006/12/16 00:38:48  fplanque
+ * Cleaned up subscription db handling
+ *
  * Revision 1.16  2006/11/26 02:30:38  fplanque
  * doc / todo
  *

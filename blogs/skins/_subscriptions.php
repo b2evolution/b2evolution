@@ -32,8 +32,9 @@ if( ! is_logged_in() )
 	echo '<p>', T_( 'You are not logged in.' ), '</p>';
 	return;
 }
-// --- //
-$redirect_to = param( 'redirect_to', 'string', '');
+
+
+$redirect_to = param( 'redirect_to', 'string', '' );
 
 
 /**
@@ -48,7 +49,7 @@ $Form->begin_form( 'bComment' );
 
 	$Form->begin_fieldset( T_('Global settings') );
 
-		$Form->info( T_('Login'), $current_User->get('login'), T_('ID').': '.$current_User->ID );
+		$Form->info( T_('Login'), $current_User->get('login') );
 
 		$Form->text( 'newuser_email', $current_User->get( 'email' ), 40, T_('Email'), '', 100, 'bComment' );
 
@@ -59,19 +60,35 @@ $Form->begin_form( 'bComment' );
 	$Form->begin_fieldset( T_('Blog subscriptions') );
 
 		$sql = 'SELECT blog_ID, blog_shortname, sub_items, sub_comments
-		          FROM T_blogs LEFT JOIN T_subscriptions ON ( blog_ID = sub_coll_ID AND sub_user_ID = '.$current_User->ID.' )
+		          FROM T_blogs INNER JOIN T_subscriptions ON ( blog_ID = sub_coll_ID AND sub_user_ID = '.$current_User->ID.' )
 		         WHERE blog_in_bloglist <> 0';
 		$blog_subs = $DB->get_results( $sql );
 
+		$encountered_current_blog = false;
 		$subs_blog_IDs = array();
 		foreach( $blog_subs AS $blog_sub )
 		{
+			if( $blog_sub->blog_ID == $Blog->ID )
+			{
+				$encountered_current_blog = true;
+			}
+
 			$subs_blog_IDs[] = $blog_sub->blog_ID;
 			$subscriptions = array(
 					array( 'sub_items_'.$blog_sub->blog_ID,    '1', T_('Posts'),    $blog_sub->sub_items ),
 					array( 'sub_comments_'.$blog_sub->blog_ID, '1', T_('Comments'), $blog_sub->sub_comments )
 				);
 			$Form->checklist( $subscriptions, 'subscriptions', format_to_output( $blog_sub->blog_shortname, 'htmlbody' ) );
+		}
+
+		if( !$encountered_current_blog )
+		{	// Propose current blog too:
+			$subs_blog_IDs[] = $Blog->ID;
+			$subscriptions = array(
+					array( 'sub_items_'.$Blog->ID,    '1', T_('Posts'),    0 ),
+					array( 'sub_comments_'.$Blog->ID, '1', T_('Comments'), 0 )
+				);
+			$Form->checklist( $subscriptions, 'subscriptions', $Blog->dget('shortname') );
 		}
 
 		$Form->hidden( 'subs_blog_IDs', implode( ',', $subs_blog_IDs ) );
@@ -84,6 +101,9 @@ $Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.13  2006/12/16 00:38:48  fplanque
+ * Cleaned up subscription db handling
+ *
  * Revision 1.12  2006/12/07 23:13:14  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!
