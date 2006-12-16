@@ -188,7 +188,7 @@ if( $action != 'view_user' )
 	$Form->begin_fieldset( T_('Password') );
 
 		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => ( !empty($edited_User->ID) ? T_('Leave empty if you don\'t want to change the password.') : '' ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0) ) );
-		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('The minimum password length is %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0) ) );
+		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0) ) );
 
 	$Form->end_fieldset();
 
@@ -352,6 +352,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.36  2006/12/16 00:15:51  fplanque
+ * reorganized user profile page/form
+ *
  * Revision 1.35  2006/12/16 00:12:21  fplanque
  * reorganized user profile page/form
  *
