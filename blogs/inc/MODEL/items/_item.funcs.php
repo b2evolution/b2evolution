@@ -42,7 +42,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * Using title as a source if url title is empty
  *
- * @todo Use configurable char as seperator (see tracker); replace umlauts
+ * @todo Use configurable char as seperator (see tracker)
+ * @todo dh> Allow/Use more than 40 chars
  *
  * @param string url title to validate
  * @param string real title to use as a source if $urltitle is empty (encoded in $evo_charset)
@@ -696,6 +697,9 @@ function attach_browse_tabs()
 
 /*
  * $Log$
+ * Revision 1.38  2006/12/16 17:05:55  blueyed
+ * todo
+ *
  * Revision 1.37  2006/12/15 23:31:21  fplanque
  * reauthorized _ in urltitles.
  * No breaking of legacy permalinks.
