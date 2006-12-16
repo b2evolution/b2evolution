@@ -959,28 +959,32 @@ class Comment extends DataObject
 	{
 		global $DB, $admin_url, $debug, $Debuglog;
 
-		$this->get_Item();
+		$edited_Item = & $this->get_Item();
+		$edited_Blog = & $edited_Item->get_Blog();
 
-		// Get list of users who want to be notfied:
-		// TODO: also use extra cats/blogs??
-		// So far you get notifications for everything. We'll need a setting to decide if you want to received unmoderated (aka unpublished) comments or not.
-		// Note: users receive comments on their own posts. This is done on purpose. Otherwise they think it's broken when they test the app.
-		$sql = 'SELECT DISTINCT user_email, user_locale
-							FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
-						 WHERE sub_coll_ID = '.$this->Item->blog_ID.'
-						   AND sub_comments <> 0
-						   AND LENGTH(TRIM(user_email)) > 0';
-		$notify_list = $DB->get_results( $sql );
-
-		// Preprocess list:
 		$notify_array = array();
-		foreach( $notify_list as $notification )
-		{
-			$notify_array[$notification->user_email] = $notification->user_locale;
+
+		if( $edited_Blog->get_setting( 'allow_subscriptions' ) )
+		{	// Get list of users who want to be notfied:
+			// TODO: also use extra cats/blogs??
+			// So far you get notifications for everything. We'll need a setting to decide if you want to received unmoderated (aka unpublished) comments or not.
+			// Note: users receive comments on their own posts. This is done on purpose. Otherwise they think it's broken when they test the app.
+			$sql = 'SELECT DISTINCT user_email, user_locale
+								FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
+							 WHERE sub_coll_ID = '.$this->Item->blog_ID.'
+							   AND sub_comments <> 0
+							   AND LENGTH(TRIM(user_email)) > 0';
+			$notify_list = $DB->get_results( $sql );
+
+			// Preprocess list:
+			foreach( $notify_list as $notification )
+			{
+				$notify_array[$notification->user_email] = $notification->user_locale;
+			}
 		}
 
-		// Check if we need to add the author:
-		$item_author_User = & $this->Item->get_creator_User();
+		// Check if we need to include the author:
+		$item_author_User = & $edited_Item->get_creator_User();
 		if( $item_author_User->notify
 				&& ( ! empty( $item_author_User->email ) ) )
 		{ // Author wants to be notified:
@@ -992,13 +996,14 @@ class Comment extends DataObject
 			return false;
 		}
 
+
 		/*
 		 * We have a list of email addresses to notify:
 		 */
 // fp>SUSPECT
-		// TODO: dh> this reveals the comments author's email address to subscribers!!
+		// TODO: dh> this reveals the comments author's email address to all subscribers!!
 		//           $notify_from should get used by default, unless the user has opted in to be the sender!
-		// If the subscriber has permission to moderate the comments, he SHOULD receive the email address.
+		// fp>If the subscriber has permission to moderate the comments, he SHOULD receive the email address.
 		if( $this->get_author_User() )
 		{ // Comment from a registered user:
 			$mail_from = '"'.$this->author_User->get('preferredname').'" <'.$this->author_User->get('email').'>';
@@ -1013,8 +1018,6 @@ class Comment extends DataObject
 			$mail_from = $notify_from;
 		}
 // SUSPECT<fp
-
-		$Blog = & $this->Item->get_Blog();
 
 		// Send emails:
 		foreach( $notify_array as $notify_email => $notify_locale )
@@ -1033,12 +1036,12 @@ class Comment extends DataObject
 					$subject = T_('[%s] New comment on "%s"');
 			}
 
-			$subject = sprintf( $subject, $Blog->get('shortname'), $this->Item->get('title') );
+			$subject = sprintf( $subject, $edited_Blog->get('shortname'), $edited_Item->get('title') );
 
-			$notify_message = T_('Blog').': '.$Blog->get('shortname')
-				.' ( '.str_replace('&amp;', '&', $Blog->get('blogurl'))." )\n"
-				.T_('Post').': '.$this->Item->get('title')
-				.' ( '.str_replace('&amp;', '&', $this->Item->get_permanent_url( 'pid' ))." )\n";
+			$notify_message = T_('Blog').': '.$edited_Blog->get('shortname')
+				.' ( '.str_replace('&amp;', '&', $edited_Blog->get('blogurl'))." )\n"
+				.T_('Post').': '.$edited_Item->get('title')
+				.' ( '.str_replace('&amp;', '&', $edited_Item->get_permanent_url( 'pid' ))." )\n";
 				// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 
 			switch( $this->type )
@@ -1066,8 +1069,8 @@ class Comment extends DataObject
 			$notify_message .=
 				T_('Comment').': '.str_replace('&amp;', '&', $this->get_permanent_url( 'pid' ))."\n" // We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 				.$this->get('content')."\n\n"
-				.T_('Edit/Delete').': '.$admin_url.'?ctrl=items&blog='.$this->Item->blog_ID.'&p='.$this->Item->ID."\n\n"
-				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
+				.T_('Edit/Delete').': '.$admin_url.'?ctrl=items&blog='.$edited_Blog->ID.'&p='.$edited_Item->ID."\n\n"
+				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
 
 			if( $debug )
 			{
@@ -1180,6 +1183,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.55  2006/12/16 01:30:46  fplanque
+ * Setting to allow/disable email subscriptions on a per blog basis
+ *
  * Revision 1.54  2006/12/12 02:53:56  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.

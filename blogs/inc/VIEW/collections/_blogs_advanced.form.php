@@ -119,12 +119,15 @@ $Form->begin_fieldset( T_('Static file generation'), array( 'class'=>'fieldset c
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Workflow') );
-	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
-$Form->end_fieldset();
-
-
 $Form->end_form( array(
 	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+
+
+/*
+ * $Log$
+ * Revision 1.15  2006/12/16 01:30:47  fplanque
+ * Setting to allow/disable email subscriptions on a per blog basis
+ *
+ */
 ?>

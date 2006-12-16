@@ -33,7 +33,7 @@ if( ! is_logged_in() )
 	return;
 }
 
-
+// fp> Note: This will "fail" if the user clicks on the 'subscriptions' link from the subscriptions page
 $redirect_to = param( 'redirect_to', 'string', '' );
 
 
@@ -59,8 +59,10 @@ $Form->begin_form( 'bComment' );
 
 	$Form->begin_fieldset( T_('Blog subscriptions') );
 
+		// Gte those blogs for which we have already subscriptions (for this user)
 		$sql = 'SELECT blog_ID, blog_shortname, sub_items, sub_comments
 		          FROM T_blogs INNER JOIN T_subscriptions ON ( blog_ID = sub_coll_ID AND sub_user_ID = '.$current_User->ID.' )
+		          			INNER JOIN T_coll_settings ON ( blog_ID = cset_coll_ID AND cset_name = "allow_subscriptions" AND cset_value = "1" )
 		         WHERE blog_in_bloglist <> 0';
 		$blog_subs = $DB->get_results( $sql );
 
@@ -81,14 +83,21 @@ $Form->begin_form( 'bComment' );
 			$Form->checklist( $subscriptions, 'subscriptions', format_to_output( $blog_sub->blog_shortname, 'htmlbody' ) );
 		}
 
-		if( !$encountered_current_blog )
-		{	// Propose current blog too:
-			$subs_blog_IDs[] = $Blog->ID;
-			$subscriptions = array(
-					array( 'sub_items_'.$Blog->ID,    '1', T_('Posts'),    0 ),
-					array( 'sub_comments_'.$Blog->ID, '1', T_('Comments'), 0 )
-				);
-			$Form->checklist( $subscriptions, 'subscriptions', $Blog->dget('shortname') );
+		if( $Blog->get_setting( 'allow_subscriptions' ) )
+		{
+			if( !$encountered_current_blog )
+			{	// Propose current blog too:
+				$subs_blog_IDs[] = $Blog->ID;
+				$subscriptions = array(
+						array( 'sub_items_'.$Blog->ID,    '1', T_('Posts'),    0 ),
+						array( 'sub_comments_'.$Blog->ID, '1', T_('Comments'), 0 )
+					);
+				$Form->checklist( $subscriptions, 'subscriptions', $Blog->dget('shortname') );
+			}
+		}
+		else
+		{
+			$Form->info( $Blog->dget('shortname'), T_('Subscriptions are not allowed for this blog.') );
 		}
 
 		$Form->hidden( 'subs_blog_IDs', implode( ',', $subs_blog_IDs ) );
@@ -101,6 +110,9 @@ $Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.14  2006/12/16 01:30:47  fplanque
+ * Setting to allow/disable email subscriptions on a per blog basis
+ *
  * Revision 1.13  2006/12/16 00:38:48  fplanque
  * Cleaned up subscription db handling
  *

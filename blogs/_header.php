@@ -218,6 +218,10 @@ $AdminUI->add_menu_entries(
 						'text' => T_('General'),
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog,
 						'perm_eval' => $blog_settings_parm_eval ),
+					'features' => array(
+						'text' => T_('Features'),
+						'href' => 'admin.php?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog,
+						'perm_eval' => $blog_settings_parm_eval ),
 					'skin' => array(
 						'text' => T_('Skin'),
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
@@ -299,6 +303,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.35  2006/12/16 01:30:46  fplanque
+ * Setting to allow/disable email subscriptions on a per blog basis
+ *
  * Revision 1.34  2006/12/12 02:53:56  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.

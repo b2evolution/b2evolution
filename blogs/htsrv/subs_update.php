@@ -106,6 +106,7 @@ foreach( $subs_blog_IDs as $loop_blog_ID )
 	}
 }
 
+// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
 if( count($subscription_values) )
 {	// We need to record values:
 	$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
@@ -129,6 +130,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.18  2006/12/16 01:30:46  fplanque
+ * Setting to allow/disable email subscriptions on a per blog basis
+ *
  * Revision 1.17  2006/12/16 00:38:48  fplanque
  * Cleaned up subscription db handling
  *

@@ -375,8 +375,9 @@ class Blog extends DataObject
 			$this->set_setting('ping_plugins', implode(',', $blog_ping_plugins));
 		}
 
-		if( in_array( 'workflow', $groups ) )
+		if( in_array( 'features', $groups ) )
 		{ // we want to load the workflow checkboxes:
+			$this->set_setting( 'allow_subscriptions',  param( 'allow_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
 		}
 
@@ -1062,6 +1063,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.45  2006/12/16 01:30:46  fplanque
+ * Setting to allow/disable email subscriptions on a per blog basis
+ *
  * Revision 1.44  2006/12/14 21:41:15  fplanque
  * Allow different number of items in feeds than on site
  *

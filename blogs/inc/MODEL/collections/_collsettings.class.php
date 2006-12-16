@@ -55,6 +55,7 @@ class CollectionSettings extends AbstractSettings
 			'posts_per_page' => '5',
 			'posts_per_feed' => '8',
 			'archive_mode' => 'monthly',				// monthly, weekly, daily, postbypost
+			'allow_subscriptions' => 0,					// Don't all email subscriptions by default
 			'use_workflow' => 0,								// Don't use workflow by default
 		);
 
@@ -71,6 +72,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/16 01:30:46  fplanque
+ * Setting to allow/disable email subscriptions on a per blog basis
+ *
  * Revision 1.10  2006/12/14 21:41:15  fplanque
  * Allow different number of items in feeds than on site
  *

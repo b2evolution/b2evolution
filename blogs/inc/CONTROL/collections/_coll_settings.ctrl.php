@@ -75,7 +75,16 @@ switch( $action )
 		{
 			case 'general':
 			case 'display':
+			case 'urls':
 				if( $edited_Blog->load_from_Request( array() ) )
+				{ // Commit update to the DB:
+					$edited_Blog->dbupdate();
+					$Messages->add( T_('The blog settings have been updated'), 'success' );
+				}
+				break;
+
+			case 'features':
+				if( $edited_Blog->load_from_Request( array( 'features' ) ) )
 				{ // Commit update to the DB:
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog settings have been updated'), 'success' );
@@ -90,16 +99,8 @@ switch( $action )
 				}
 				break;
 
-			case 'urls':
-				if( $edited_Blog->load_from_Request( array() ) )
-				{ // Commit update to the DB:
-					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog settings have been updated'), 'success' );
-				}
-				break;
-
 			case 'advanced':
-				if( $edited_Blog->load_from_Request( array( 'pings', 'workflow' ) ) )
+				if( $edited_Blog->load_from_Request( array( 'pings' ) ) )
 				{ // Commit update to the DB:
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog settings have been updated'), 'success' );
@@ -147,6 +148,10 @@ switch( $AdminUI->get_path(1) )
 		$AdminUI->disp_view( 'collections/_blogs_general.form.php' );
 		break;
 
+	case 'features':
+		$AdminUI->disp_view( 'collections/_coll_features.form.php' );
+		break;
+
 	case 'skin':
 		$AdminUI->disp_view( 'collections/_blogs_skin.form.php' );
 		break;
@@ -182,6 +187,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2006/12/16 01:30:46  fplanque
+ * Setting to allow/disable email subscriptions on a per blog basis
+ *
  * Revision 1.8  2006/12/10 23:56:26  fplanque
  * Worfklow stuff is now hidden by default and can be enabled on a per blog basis.
  *

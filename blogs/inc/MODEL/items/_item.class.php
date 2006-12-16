@@ -3032,6 +3032,13 @@ class Item extends DataObject
 	{
 		global $DB, $admin_url, $debug, $Debuglog;
 
+ 		$edited_Blog = & $this->get_Blog();
+
+		if( ! $edited_Blog->get_setting( 'allow_subscriptions' ) )
+		{	// Subscriptions not enabled!
+			return;
+		}
+
 		if( $display )
 		{
 			echo "<div class=\"panelinfo\">\n";
@@ -3069,8 +3076,6 @@ class Item extends DataObject
 		$this->get_creator_User();
 		$mail_from = '"'.$this->creator_User->get('preferredname').'" <'.$this->creator_User->get('email').'>';
 
-		$Blog = & $this->get_Blog();
-
 		// Send emails:
 		$cache_by_locale = array();
 		foreach( $notify_array as $notify_email => $notify_locale )
@@ -3082,11 +3087,11 @@ class Item extends DataObject
 				// Calculate length for str_pad to align labels:
 				$pad_len = max( strlen(T_('Blog')), strlen(T_('Author')), strlen(T_('Title')), strlen(T_('Url')), strlen(T_('Content')) );
 
-				$cache_by_locale[$notify_locale]['subject'] = sprintf( T_('[%s] New post: "%s"'), $Blog->get('shortname'), $this->get('title') );
+				$cache_by_locale[$notify_locale]['subject'] = sprintf( T_('[%s] New post: "%s"'), $edited_Blog->get('shortname'), $this->get('title') );
 
 				$cache_by_locale[$notify_locale]['message'] =
-					str_pad( T_('Blog'), $pad_len ).': '.$Blog->get('shortname')
-					.' ( '.str_replace('&amp;', '&', $Blog->get('blogurl'))." )\n"
+					str_pad( T_('Blog'), $pad_len ).': '.$edited_Blog->get('shortname')
+					.' ( '.str_replace('&amp;', '&', $edited_Blog->get('blogurl'))." )\n"
 
 					.str_pad( T_('Author'), $pad_len ).': '.$this->creator_User->get('preferredname').' ('.$this->creator_User->get('login').")\n"
 
@@ -3106,7 +3111,7 @@ class Item extends DataObject
 					."\n-- \n"
 					.T_('Edit/Delete').': '.$admin_url.'?ctrl=items&blog='.$this->blog_ID.'&p='.$this->ID."\n\n"
 
-					.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
+					.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
 
 				locale_restore_previous();
 			}
@@ -3321,6 +3326,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.140  2006/12/16 01:30:46  fplanque
+ * Setting to allow/disable email subscriptions on a per blog basis
+ *
  * Revision 1.139  2006/12/15 22:59:05  fplanque
  * doc
  *

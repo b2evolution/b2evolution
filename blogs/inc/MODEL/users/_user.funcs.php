@@ -355,6 +355,11 @@ function user_subs_link( $before = '', $after = '', $link_text = '', $link_title
 		return false;
 	}
 
+	if( ! $Blog->get_setting( 'allow_subscriptions' ) )
+	{
+		return false;
+	}
+
 	if( $link_text == '' ) $link_text = T_('Subscribe (%s)');
 	if( $link_title == '#' ) $link_title = T_('Subscribe to email notifications');
 
@@ -495,6 +500,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.19  2006/12/16 01:30:46  fplanque
+ * Setting to allow/disable email subscriptions on a per blog basis
+ *
  * Revision 1.18  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
