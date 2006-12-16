@@ -322,14 +322,11 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 				$current_sub_group = '';
 				$count = 0;
 				?>
-				<tr class="PluginsSeperator">
-					<th colspan="5"></th>
-				</tr>
 				<tr class="PluginsGroup">
 					<th colspan="5"><?php
 					if( $current_group == '' || $current_group == 'Un-Grouped' )
 					{
-						echo T_('Un-Grouped');
+						echo T_('Un-classified');
 					}
 					else
 					{
@@ -380,7 +377,7 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 				echo format_to_output($clean_version);
 				?>
 			</td>
-			<td>
+			<td class="nowrap">
 				<?php
 				echo action_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID ) );
 				// Help icons, if available:
@@ -399,7 +396,7 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 				}
 				?>
 			</td>
-			<td class="lastcol">
+			<td class="nowrap lastcol">
 				<?php
 				$registrations = $admin_Plugins->count_regs($loop_Plugin->classname);
 
@@ -434,6 +431,9 @@ if( ! $UserSettings->get('plugins_disp_avail') )
 <?php
 /*
  * $Log$
+ * Revision 1.42  2006/12/16 04:07:10  fplanque
+ * visual cleanup
+ *
  * Revision 1.41  2006/12/05 05:41:42  fplanque
  * created playground for skin management
  *

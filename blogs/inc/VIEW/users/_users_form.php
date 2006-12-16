@@ -91,9 +91,10 @@ $Form->hidden( 'user_ID', $edited_User->ID );
 
 $Form->begin_fieldset( T_('User permissions'), array( 'class'=>'fieldset clear' ) );
 
+	$edited_User->get_Group();
+
 	if( $edited_User->get('ID') != 1 && $current_User->check_perm( 'users', 'edit' ) )
 	{	// This is not Admin and we're not restricted: we're allowed to change the user group:
-		$edited_User->get_Group();
 		$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get('newusers_grp_ID') : $edited_User->Group->get('ID');
 		$GroupCache = & get_Cache( 'GroupCache' );
 		$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group') );
@@ -230,30 +231,6 @@ $Form->begin_fieldset( T_('Preferences') );
 		// To activate focus on first form input text
 		$Form->checkbox( 'edited_user_focusonfirst', $UserSettings->get( 'focus_on_first_input', $edited_User->ID ), T_('Focus on first field'), T_('The focus will automatically go to the first input text field.') );
 
-		// PluginUserSettings
-		$Plugins->restart();
-		while( $loop_Plugin = & $Plugins->get_next() )
-		{
-			if( ! $loop_Plugin->UserSettings ) // NOTE: this triggers autoloading in PHP5, which is needed for the "hackish" isset($this->UserSettings)-method to see if the settings are queried for editing (required before 1.9)
-			{
-				continue;
-			}
-
-			global $inc_path;
-			require_once $inc_path.'_misc/_plugin.funcs.php';
-
-			$Form->begin_fieldset( $loop_Plugin->name );
-
-			foreach( $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
-			{
-				display_plugin_settings_fieldset_field( $l_name, $l_meta, $loop_Plugin, $Form, 'UserSettings', $edited_User );
-			}
-
-			$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsEditDisplayAfter', $tmp_params = array( 'Form' => & $Form ) );
-
-			$Form->end_fieldset();
-		}
-
 	}
 	else
 	{ // display only
@@ -269,6 +246,36 @@ $Form->begin_fieldset( T_('Preferences') );
 $Form->end_fieldset();
 
 // _____________________________________________________________________
+
+if( $action != 'view_user' )
+{ // We can edit the values:
+	// PluginUserSettings
+	global $inc_path;
+	require_once $inc_path.'_misc/_plugin.funcs.php';
+
+	$Plugins->restart();
+	while( $loop_Plugin = & $Plugins->get_next() )
+	{
+		if( ! $loop_Plugin->UserSettings ) // NOTE: this triggers autoloading in PHP5, which is needed for the "hackish" isset($this->UserSettings)-method to see if the settings are queried for editing (required before 1.9)
+		{
+			continue;
+		}
+
+		$Form->begin_fieldset( $loop_Plugin->name );
+
+			foreach( $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
+			{
+				display_plugin_settings_fieldset_field( $l_name, $l_meta, $loop_Plugin, $Form, 'UserSettings', $edited_User );
+			}
+
+		$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsEditDisplayAfter', $tmp_params = array( 'Form' => & $Form ) );
+
+		$Form->end_fieldset();
+	}
+}
+
+// _____________________________________________________________________
+
 
 $Form->begin_fieldset( T_('Additional info') );
 
@@ -352,6 +359,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.37  2006/12/16 04:07:11  fplanque
+ * visual cleanup
+ *
  * Revision 1.36  2006/12/16 00:15:51  fplanque
  * reorganized user profile page/form
  *

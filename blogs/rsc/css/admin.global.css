@@ -118,6 +118,7 @@ table.grouped tr.PluginsSeperator th {
 	border-top: 1px solid #9e9286;
 }
 
+table.grouped tr.PluginsGroup th,
 table.grouped tr.PluginsSubGroup th {
 	border-bottom: 1px solid #9e9286;
 	border-top: 1px solid #9e9286;
