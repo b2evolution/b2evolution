@@ -76,12 +76,13 @@ skin_content_header();	// Sets charset!
 <div class="pageHeader">
 
 	<div class="floatright">
+		<a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><?php echo T_('Recently') ?></a>
+		|
+		<a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('Index') ?></a>
 		<?php
 				user_login_link( ' | ', ' ' );
 				user_register_link( ' | ', ' ' );
 				user_admin_link( ' | ', ' ' );
-				user_profile_link( ' | ', ' ' );
-				user_subs_link( ' | ', ' ' );
 				user_logout_link( ' | ', ' ' );
 			?>
 	</div>
@@ -251,25 +252,23 @@ skin_content_header();	// Sets charset!
 <div id="pageFooter">
 
 	<p class="baseline">
-		<a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><?php echo T_('Recently') ?></a>
-		|
-		<a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('Archives') ?></a>
+		<a href="<?php echo $Blog->get('msgformurl').'&amp;recipient_id=1&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $Blog->get('msgformurl'))); ?>">Contact</a>
 		|
 		<a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><?php echo T_('Last comments') ?></a>
-	</p>
-
-	<p class="baseline">
-		<a href="<?php echo $Blog->get('msgformurl').'&amp;recipient_id=1&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $Blog->get('msgformurl'))); ?>">Contact</a>
 		|
 		<a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>">RSS 2.0</a> /
 		<a href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><?php echo T_('Atom Feed') ?></a> /
 		<a href="http://webreference.fr/2006/08/30/rss_atom_xml" title="External - English"><?php echo T_('What is RSS?') ?></a>
+		<?php
+			user_profile_link( ' | ', ' ' );
+			user_subs_link( ' | ', ' ' );
+		?>
 	</p>
 	
 	<p class="baseline">
-		<a href="http://b2evolution.net/" title="b2evolution home">Powered by b2evolution</a>
+		Powered by <a href="http://b2evolution.net/" title="b2evolution home">b2evolution</a>
 		|
-		Template by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> / <a href="http://skinfaktory.com/">The Skin Faktory</a>
+		Skin by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> / <a href="http://skinfaktory.com/">The Skin Faktory</a>
 		|
 		<?php
 			// Display additional credits (see /conf/_advanced.php):
