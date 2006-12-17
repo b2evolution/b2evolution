@@ -203,7 +203,7 @@ while( $Item = & $ItemList->get_item() )
 			<?php
 			global $CommentList;
 
-			$CommentList = new CommentList( 0, "'comment','trackback','pingback'", array(), $Item->ID, '', 'ASC' );
+			$CommentList = new CommentList( NULL, "'comment','trackback','pingback'", array(), $Item->ID, '', 'ASC' );
 
 			$CommentList->display_if_empty(
 										'<div class="bComment"><p>' .
@@ -289,6 +289,11 @@ if( $action == 'list' )
 
 /*
  * $Log$
+ * Revision 1.29  2006/12/17 23:42:39  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.28  2006/12/12 21:19:31  fplanque
  * UI fixes
  *

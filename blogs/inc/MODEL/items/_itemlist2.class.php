@@ -339,7 +339,7 @@ class ItemList2 extends DataObjectList2
 		 * Blog & Chapters/categories restrictions:
 		 */
 		// Get chapters/categories (and compile those values right away)
-		param_compile_cat_array( $this->Blog->ID == 1 ? 0 : $this->Blog->ID,
+		param_compile_cat_array( /* TODO: check $this->Blog->ID == 1 ? 0 :*/ $this->Blog->ID,
 								$this->default_filters['cat_modifier'], $this->default_filters['cat_array'] );
 
 		$this->filters['cat_array'] = get_param( 'cat_array' );
@@ -690,7 +690,7 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * filtering stuff:
 		 */
-		$this->ItemQuery->where_chapter2( $this->Blog->ID, $this->filters['cat_array'], $this->filters['cat_modifier'] );
+		$this->ItemQuery->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'] );
 		$this->ItemQuery->where_author( $this->filters['authors'] );
 		$this->ItemQuery->where_assignees( $this->filters['assignees'] );
 		$this->ItemQuery->where_author_assignee( $this->filters['author_assignee'] );
@@ -905,7 +905,7 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * filtering stuff:
 		 */
-		$lastpost_ItemQuery->where_chapter2( $this->Blog->ID, $this->filters['cat_array'], $this->filters['cat_modifier'] );
+		$lastpost_ItemQuery->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'] );
 		$lastpost_ItemQuery->where_author( $this->filters['authors'] );
 		$lastpost_ItemQuery->where_assignees( $this->filters['assignees'] );
 		$lastpost_ItemQuery->where_locale( $this->filters['lc'] );
@@ -1616,6 +1616,11 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.45  2006/12/17 23:42:38  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.44  2006/12/05 00:01:15  fplanque
  * enhanced photoblog skin
  *

@@ -107,19 +107,24 @@ $Form->begin_fieldset( T_('After each new post...') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Meta data') );
-	$Form->text( 'blog_description', $edited_Blog->get( 'description' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
-	$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
-	$Form->textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 5, T_('Notes'), T_('Additional info. Appears in the backoffice.'), 50, 'large' );
-$Form->end_fieldset();
-
-
-$Form->begin_fieldset( T_('Static file generation'), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( T_('Static file generation') );
 	$Form->text( 'blog_staticfilename', $edited_Blog->get( 'staticfilename' ), 30, T_('Static filename'), T_('This is the .html file that will be created when you generate a static version of the blog homepage.') );
 	if( $current_User->check_perm( 'blog_genstatic', 'any', false, $edited_Blog->ID ) )
 	{
 		$Form->info( T_('Static page'), '<a href="admin.php?ctrl=collections&amp;action=GenStatic&amp;blog='.$edited_Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">'.T_('Generate now!').'</a>' );
 	}
+$Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_('Aggregation') );
+	$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Blogs to aggregate'), T_('List blog IDs separated by ,'), 255 );
+$Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_('Meta data') );
+	$Form->text( 'blog_description', $edited_Blog->get( 'description' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
+	$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
+	$Form->textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 5, T_('Notes'), T_('Additional info. Appears in the backoffice.'), 50, 'large' );
 $Form->end_fieldset();
 
 
@@ -130,6 +135,11 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.17  2006/12/17 23:42:38  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.16  2006/12/17 02:42:21  fplanque
  * streamlined access to blog settings
  *

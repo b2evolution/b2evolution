@@ -63,12 +63,12 @@ function upgrade_cafelog_tables()
 
 	echo 'Setting groups... ';
 	$query = "UPDATE T_users
-							 SET user_grp_ID = ".$Group_Users->get('ID')."
+							 SET user_grp_ID = ".$Group_Users->ID."
 						 WHERE user_level = 0";
 	$DB->query( $query );
 
 	$query = "UPDATE T_users
-							 SET user_grp_ID = ".$Group_Bloggers->get('ID')."
+							 SET user_grp_ID = ".$Group_Bloggers->ID."
 						 WHERE user_level > 0 and user_level < 10 ";
 	$DB->query( $query );
 
@@ -162,6 +162,11 @@ function upgrade_cafelog_tables()
 
 /*
  * $Log$
+ * Revision 1.45  2006/12/17 23:42:39  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.44  2006/11/02 16:19:23  blueyed
  * Fixed cafelog upgrade in strict mode
  *

@@ -123,11 +123,6 @@ switch( $action )
 
 	case 'delete':
 		// ----------  Delete a blog from DB ----------
-		if( $blog == 1 )
-		{
-			bad_request_die( 'You can\'t delete Blog #1!' );
-		}
-
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
@@ -336,6 +331,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2006/12/17 23:42:38  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.9  2006/12/17 02:42:21  fplanque
  * streamlined access to blog settings
  *

@@ -629,7 +629,7 @@ function create_default_settings( $override = array() )
 	$defaults = array(
 		'db_version' => $new_db_version,
 		'default_locale' => $default_locale,
-		'newusers_grp_ID' => $Group_Users->get('ID'),
+		'newusers_grp_ID' => $Group_Users->ID,
 	);
 
 	$settings = array_merge( array_keys($defaults), array_keys($override) );
@@ -1032,6 +1032,11 @@ function install_basic_plugins( $old_db_version = 0 )
 
 /*
  * $Log$
+ * Revision 1.208  2006/12/17 23:42:39  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.207  2006/12/12 20:26:12  blueyed
  * Fixed sample post about sample.htaccess in (obsolete/removed) "admin" folder. See http://forums.b2evolution.net/viewtopic.php?p=48204#48204
  *

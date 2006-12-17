@@ -755,7 +755,7 @@ function bloggergetuserinfo($m)
 	{
 		$struct = new xmlrpcval( array(
 															'nickname' => new xmlrpcval( $User->get('nickname') ),
-															'userid' => new xmlrpcval( $User->get('ID') ),
+															'userid' => new xmlrpcval( $User->ID ),
 															'url' => new xmlrpcval( $User->get('url') ),
 															'email' => new xmlrpcval( $User->get('email') ),
 															'lastname' => new xmlrpcval( $User->get('lastname') ),
@@ -1576,7 +1576,7 @@ function mweditpost($m)
 	// Check permission:
 	$UserCache = & get_Cache( 'UserCache' );
 	$User = & $UserCache->get_by_login( $username );
-	logIO("O","User ID ...".$User->get('ID'));
+	logIO('O','User ID ...'.$User->ID);
 	if( ! $User->check_perm( 'blog_post_statuses', $status, false, $edited_Item->blog_ID ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+2, 'Permission denied.'); // user error 2
@@ -1712,8 +1712,20 @@ function mwgetcats( $m )
 	}
 	$sql = "SELECT cat_ID, cat_name
 					FROM T_categories ";
-	if( $blogid > 1 ) $sql .= "WHERE cat_blog_ID = $blogid ";
-	$sql .= "ORDER BY cat_name ASC";
+
+	$BlogCache = & get_Cache('BlogCache');
+	$current_Blog = $BlogCache->get_by_ID( $blog );
+	$aggregate_coll_IDs = $current_Blog->get_setting('aggregate_coll_IDs');
+	if( empty( $aggregate_coll_IDs ) )
+	{	// We only want posts from the current blog:
+		$sql .= 'WHERE cat_blog_ID ='.$current_Blog->ID;
+	}
+	else
+	{	// We are aggregating posts from several blogs:
+		$sql .= 'WHERE cat_blog_ID IN ('.$aggregate_coll_IDs.')';
+	}
+
+	$sql .= " ORDER BY cat_name ASC";
 	$rows = $DB->get_results( $sql );
 	if( $DB->error )
 	{	// DB error
@@ -1950,8 +1962,20 @@ function _b2_or_mt_get_categories( $type, $m )
 
 	$sql = 'SELECT *
 					FROM T_categories ';
-	if( $blogid > 1 ) $sql .= "WHERE cat_blog_ID = $blogid ";
-	$sql .= "ORDER BY cat_name ASC";
+
+	$BlogCache = & get_Cache('BlogCache');
+	$current_Blog = $BlogCache->get_by_ID( $blog );
+	$aggregate_coll_IDs = $current_Blog->get_setting('aggregate_coll_IDs');
+	if( empty( $aggregate_coll_IDs ) )
+	{	// We only want posts from the current blog:
+		$sql .= 'WHERE cat_blog_ID ='.$current_Blog->ID;
+	}
+	else
+	{	// We are aggregating posts from several blogs:
+		$sql .= 'WHERE cat_blog_ID IN ('.$aggregate_coll_IDs.')';
+	}
+
+	$sql .= " ORDER BY cat_name ASC";
 
 	$rows = $DB->get_results( $sql );
 	if( $DB->error )
@@ -2213,6 +2237,11 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.130  2006/12/17 23:42:40  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.129  2006/12/12 02:53:57  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.

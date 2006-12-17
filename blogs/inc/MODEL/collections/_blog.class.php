@@ -352,7 +352,7 @@ class Blog extends DataObject
 					{
 						param_error( 'blog_media_fullpath', T_('Media dir location').': '.T_('You must provide the full path of the media directory.') );
 					}
-					if( !preg_match( '#https?://#', $this->get( 'media_url' ) ) )
+					if( !preg_match( '#^https?://#', $this->get( 'media_url' ) ) )
 					{
 						param_error( 'blog_media_url', T_('Media dir location').': '
 														.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!') );
@@ -384,9 +384,21 @@ class Blog extends DataObject
 		if( param( 'blog_allowcomments',   'string', NULL ) !== NULL )
 		{ // Feedback options:
 			$this->set_from_Request( 'allowcomments' );
-			$this->set_setting( 'new_feedback_status',  param( 'new_feedback_status', 'string', 'draft' ) );
+			$this->set_setting( 'new_feedback_status', param( 'new_feedback_status', 'string', 'draft' ) );
 			$this->set( 'allowtrackbacks', param( 'blog_allowtrackbacks', 'integer', 0 ) );
 		}
+
+		if( param( 'aggregate_coll_IDs', 'string', NULL ) !== NULL )
+		{ // Aggregate list:
+			// fp> TODO: check perms on each aggregated blog (if changed)
+			// fp> TODO: better interface
+			if( !preg_match( '#^([0-9]+(,[0-9]+)*)?$#', get_param( 'aggregate_coll_IDs' ) ) )
+			{
+				param_error( 'aggregate_coll_IDs', T_('Invalid aggregate blog ID list!') );
+			}
+			$this->set_setting( 'aggregate_coll_IDs', get_param( 'aggregate_coll_IDs' ) );
+		}
+
 
 		return ! param_errors_detected();
 
@@ -1063,6 +1075,11 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.46  2006/12/17 23:42:38  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.45  2006/12/16 01:30:46  fplanque
  * Setting to allow/disable email subscriptions on a per blog basis
  *

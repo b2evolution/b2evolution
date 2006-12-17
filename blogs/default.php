@@ -58,7 +58,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 				$curr_blog_ID != false;
 				 $curr_blog_ID = blog_list_next() )
 	{ # by uncommenting the following lines you can hide some blogs
-		if( $curr_blog_ID == 1 ) continue; // Hide blog 1...
 		// if( $curr_blog_ID == 2 ) continue; // Hide blog 2...
 		echo '<li><strong>';
 		printf( T_('Blog #%d'), $curr_blog_ID );
@@ -79,19 +78,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	?>
 </ul>
 
-<?php
-// Select Blog #1:
-$blog = 1;
-$Blog_all = & $BlogCache->get_by_ID( 1 );
-if( $Blog_all->get( 'stub' ) != '' )
-{	// Only display if the stub is set:
-	?>
-	<ul>
-	<li><strong><?php echo T_('Blog #1') ?>: <a href="<?php $Blog_all->disp( 'blogurl', 'raw' ); ?>"><?php echo T_('This is a special blog that aggregates all messages from all other blogs!') ?></a></strong> &nbsp; (<?php $Blog_all->disp( 'stub', 'raw' ); ?>)</li>
-	</ul>
-	<?php
-}
-?>
 <p><?php echo T_('Please note: the above list (as well as the menu) is automatically generated and includes only the blogs that have a &quot;stub url name&quot;. You can set this in the blog configuration in the back-office.') ?></p>
 <h2><?php echo T_('More demos') ?>:</h2>
 <ul>

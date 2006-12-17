@@ -201,7 +201,7 @@ switch( $action )
 		/*
 		 * List of comments to display:
 		 */
-		$CommentList = & new CommentList( $blog, "'comment','trackback','pingback'", $show_statuses, '',	'',	'DESC',	'',	20 );
+		$CommentList = & new CommentList( $Blog, "'comment','trackback','pingback'", $show_statuses, '',	'',	'DESC',	'',	20 );
 		break;
 
 
@@ -265,6 +265,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2006/12/17 23:42:38  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.2  2006/12/12 02:47:47  fplanque
  * Completed comment controller
  *

@@ -99,7 +99,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 	<h4><?php echo implode( ", ", $disp_title) ?>:</h4>
 
 	<?php
-	$CommentList = & new CommentList( 0, implode(',', $type_list), array('published'), $Item->ID, '', 'ASC' );
+	$CommentList = & new CommentList( NULL, implode(',', $type_list), array('published'), $Item->ID, '', 'ASC' );
 
 	$CommentList->display_if_empty(
 								'<div class="bComment"><p>' .
@@ -309,6 +309,11 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.84  2006/12/17 23:42:39  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.83  2006/11/20 22:15:30  blueyed
  * whitespace
  *

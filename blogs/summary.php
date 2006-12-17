@@ -92,7 +92,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 				$blog != false;
 				 $blog = blog_list_next() )
 	{ # by uncommenting the following lines you can hide some blogs
-		// if( $blog == 1 ) continue; // Hide blog 1...
+		// if( $blog == 2 ) continue; // Hide blog 2...
 		?>
 		<h3><a href="<?php blog_list_iteminfo('blogurl', 'raw' ) ?>" title="<?php blog_list_iteminfo( 'shortdesc', 'htmlattr'); ?>"><?php blog_list_iteminfo( 'name', 'htmlbody'); ?></a></h3>
 		<ul>

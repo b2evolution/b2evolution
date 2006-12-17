@@ -91,6 +91,10 @@ class categories_plugin extends Plugin
 		 * @todo get rid of these globals:
 		 */
 		global $blog, $cat_modifier;
+		/**
+		 * @var Blog
+		 */
+		global $Blog;
 
 		/**
 		 * Default params:
@@ -158,7 +162,8 @@ class categories_plugin extends Plugin
 
 		echo $params['title'];
 
-		if( $blog > 1 )
+		$aggregate_coll_IDs = $Blog->get_setting('aggregate_coll_IDs');
+		if( empty($aggregate_coll_IDs) )
 		{ // ____________________ We want to display cats for ONE blog ____________________
 			$tmp_disp = '';
 
@@ -187,21 +192,21 @@ class categories_plugin extends Plugin
 			}
 		}
 		else
-		{ // ____________________ We want to display cats for ALL blogs ____________________
+		{ // ____________________ We want to display cats for SEVERAL blogs ____________________
+
+			$BlogCache = & get_Cache( 'BlogCache' );
 
 			// Make sure everything is loaded at once (vs multiple queries)
+			// fp> TODO: scaling
 			$ChapterCache->load_all();
 
 			echo $params['collist_start'];
 
-			for( $curr_blog_ID=blog_list_start();
-						$curr_blog_ID!=false;
-						 $curr_blog_ID=blog_list_next() )
+			$coll_ID_array = explode( ',', $aggregate_coll_IDs );
+			foreach( $coll_ID_array as $curr_blog_ID )
 			{
-				if( ! blog_list_iteminfo('disp_bloglist', false) )
-				{ // Skip Blogs that should not get displayed in public blog list
-					continue;
-				}
+
+				$loop_Blog = & $BlogCache->get_by_ID( $curr_blog_ID );
 
 				echo $params['coll_start'];
 				echo '<a href="';
@@ -211,10 +216,10 @@ class categories_plugin extends Plugin
 				}
 				else
 				{
-					blog_list_iteminfo('blogurl');
+					$loop_Blog->disp('blogurl','raw');
 				}
 				echo '">';
-				blog_list_iteminfo('name');
+				$loop_Blog->disp('name');
 				echo '</a>';
 				echo $params['coll_end'];
 
@@ -344,6 +349,11 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.34  2006/12/17 23:42:39  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.33  2006/12/11 00:32:26  fplanque
  * allow_moving_chapters stting moved to UI
  * chapters are now called categories in the UI

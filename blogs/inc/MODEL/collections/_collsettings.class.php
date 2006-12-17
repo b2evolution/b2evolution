@@ -57,6 +57,7 @@ class CollectionSettings extends AbstractSettings
 			'archive_mode' => 'monthly',				// monthly, weekly, daily, postbypost
 			'allow_subscriptions' => 0,					// Don't all email subscriptions by default
 			'use_workflow' => 0,								// Don't use workflow by default
+			'aggregate_coll_IDs' => '',
 		);
 
 
@@ -72,6 +73,11 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.12  2006/12/17 23:42:38  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.11  2006/12/16 01:30:46  fplanque
  * Setting to allow/disable email subscriptions on a per blog basis
  *

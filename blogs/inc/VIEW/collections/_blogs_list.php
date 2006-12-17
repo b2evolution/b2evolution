@@ -125,7 +125,7 @@ for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = 
 			echo action_icon( T_('Edit categories...'), 'edit', regenerate_url( 'ctrl', 'ctrl=chapters&amp;blog='.$curr_blog_ID ) );
 		}
 
-		if( $curr_blog_ID != 1 && $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
+		if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
 		{
 			echo action_icon( T_('Copy this blog...'), 'copy', regenerate_url( '', 'action=copy&amp;blog='.$curr_blog_ID ) );
 			?>

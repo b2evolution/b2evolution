@@ -120,17 +120,26 @@ class ItemQuery extends SQL
 		// Save for future use (permission checks..)
 		$this->blog = $blog;
 
-		if( $blog != 1 )
-		{ // Not Special case where we aggregate all blogs
-			$this->WHERE_and( 'cat_blog_ID = '. $blog );
+
+		$BlogCache = & get_Cache('BlogCache');
+		$current_Blog = $BlogCache->get_by_ID( $blog );
+		$aggregate_coll_IDs = $current_Blog->get_setting('aggregate_coll_IDs');
+		if( empty( $aggregate_coll_IDs ) )
+		{	// We only want posts from the current blog:
+			$this->WHERE_and( 'cat_blog_ID = '.$current_Blog->ID );
 		}
+		else
+		{	// We are aggregating posts from several blogs:
+			$this->WHERE_and( 'cat_blog_ID IN ('.$aggregate_coll_IDs.')' );
+		}
+
 
 		$cat_array = NULL;
 		$cat_modifier = NULL;
 
 		// Compile the real category list to use:
 		// TODO: allow to pass the compiled vars directly to this class
-		compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, $blog == 1 ? 0 : $blog );
+		compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, /* TODO $blog == 1 ? 0 : */ $blog );
 
 		if( ! empty($cat_array) )
 		{	// We want to restict to some cats:
@@ -160,16 +169,23 @@ class ItemQuery extends SQL
 	 *
 	 * @todo get rid of blog #1
 	 *
-	 * @param integer
+	 * @param Blog
+	 * @param array
+	 * @param string
 	 */
-	function where_chapter2( $blog_ID, $cat_array, $cat_modifier )
+	function where_chapter2( & $Blog, $cat_array, $cat_modifier )
 	{
 		// Save for future use (permission checks..)
-		$this->blog = $blog_ID;
+		$this->blog = $Blog->ID;
 
-		if( $blog_ID != 1 )
-		{ // Not Special case where we aggregate all blogs
-			$this->WHERE_and( 'cat_blog_ID = '.$blog_ID );
+		$aggregate_coll_IDs = $Blog->get_setting('aggregate_coll_IDs');
+		if( empty( $aggregate_coll_IDs ) )
+		{	// We only want posts from the current blog:
+			$this->WHERE_and( 'cat_blog_ID = '.$Blog->ID );
+		}
+		else
+		{	// We are aggregating posts from several blogs:
+			$this->WHERE_and( 'cat_blog_ID IN ('.$aggregate_coll_IDs.')' );
 		}
 
 
@@ -571,6 +587,11 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/17 23:42:38  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.10  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

@@ -1350,7 +1350,10 @@ function cat_children2(
 		$child_count = 0;
 		foreach( $ccats as $icat_ID => $i_cat )
 		{
-			if( $icat_ID && (($blog_ID == 0) || ($i_cat['cat_blog_ID'] == $blog_ID)) && ($i_cat['cat_parent_ID'] == $parent_ID) )
+			// fp> TODO: check what ($blog_ID == 0) is for .. ?
+			if( $icat_ID
+				&& ( ($blog_ID == 0) || ($i_cat['cat_blog_ID'] == $blog_ID))
+				&& ($i_cat['cat_parent_ID'] == $parent_ID) )
 			{ // this cat is in the blog and is a child of the parent
 				$child_count++;
 
@@ -1625,6 +1628,11 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.29  2006/12/17 23:42:38  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.28  2006/12/03 18:22:58  blueyed
  * Nuked deprecated fileupload globals
  *

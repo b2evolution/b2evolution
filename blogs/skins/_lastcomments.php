@@ -16,7 +16,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-$CommentList = & new CommentList( $blog, "'comment','trackback','pingback'", array('published'), '',	'',	'DESC',	'',	20 );
+$CommentList = & new CommentList( $Blog, "'comment','trackback','pingback'", array('published'), '',	'',	'DESC',	'',	20 );
 
 $CommentList->display_if_empty( '<div class="bComment"><p>'.T_('No comment yet...').'</p></div>' );
 
@@ -53,6 +53,11 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.30  2006/12/17 23:42:39  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.29  2006/12/14 21:56:25  fplanque
  * minor optimization
  *

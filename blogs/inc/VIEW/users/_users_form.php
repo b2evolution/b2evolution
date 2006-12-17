@@ -73,7 +73,7 @@ if( !$user_profile_only )
 	$Form->global_icon( ( $action != 'view_user' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', regenerate_url( 'user_ID,action' ) );
 }
 
-if( $edited_User->get('ID') == 0 )
+if( $edited_User->ID == 0 )
 {	// Creating new user:
 	$creating = true;
 	$Form->begin_form( 'fform', T_('Create new user profile') );
@@ -93,9 +93,9 @@ $Form->begin_fieldset( T_('User permissions'), array( 'class'=>'fieldset clear' 
 
 	$edited_User->get_Group();
 
-	if( $edited_User->get('ID') != 1 && $current_User->check_perm( 'users', 'edit' ) )
+	if( $edited_User->ID != 1 && $current_User->check_perm( 'users', 'edit' ) )
 	{	// This is not Admin and we're not restricted: we're allowed to change the user group:
-		$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get('newusers_grp_ID') : $edited_User->Group->get('ID');
+		$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get('newusers_grp_ID') : $edited_User->Group->ID;
 		$GroupCache = & get_Cache( 'GroupCache' );
 		$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group') );
 	}
@@ -359,6 +359,11 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.38  2006/12/17 23:42:39  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.37  2006/12/16 04:07:11  fplanque
  * visual cleanup
  *

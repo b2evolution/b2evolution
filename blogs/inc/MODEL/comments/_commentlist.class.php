@@ -38,13 +38,13 @@ require_once dirname(__FILE__).'/../dataobjects/_dataobjectlist.class.php';
  */
 class CommentList extends DataObjectList
 {
-	var $blog;
-
 	/**
 	 * Constructor
+	 *
+	 * @param Blog can pass NULL if $p is passed
 	 */
 	function CommentList(
-		$blog = 1,
+		$Blog,
 		$comment_types = "'comment'",
 		$show_statuses = array( 'published' ),	// Restrict to these statuses
 		$p = '',															// Restrict to specific post
@@ -61,26 +61,30 @@ class CommentList extends DataObjectList
 		// Call parent constructor:
 		parent::DataObjectList( 'T_comments', 'comment_', 'comment_ID', 'Item', NULL, $limit );
 
-		$this->blog = $blog;
-
-
 		$this->sql = 'SELECT DISTINCT T_comments.*
 									FROM T_comments INNER JOIN T_posts ON comment_post_ID = post_ID ';
 
 		if( !empty( $p ) )
 		{	// Restrict to comments on selected post
-			$this->sql .= " WHERE comment_post_ID = $p AND ";
-		}
-		elseif( $blog > 1 )
-		{	// Restrict to viewable posts/cats on current blog
-			$this->sql .= "INNER JOIN T_postcats ON post_ID = postcat_post_ID INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID WHERE othercats.cat_blog_ID = $blog AND ";
+			$this->sql .= 'WHERE comment_post_ID = '.$p;
 		}
 		else
-		{	// This is blog 1, we don't care, we can include all comments:
-			$this->sql .= ' WHERE ';
+		{
+			$this->sql .= 'INNER JOIN T_postcats ON post_ID = postcat_post_ID
+										INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID ';
+
+			$aggregate_coll_IDs = $Blog->get_setting('aggregate_coll_IDs');
+			if( empty( $aggregate_coll_IDs ) )
+			{	// We only want posts from the current blog:
+				$this->sql .= 'WHERE othercats.cat_blog_ID = '.$Blog->ID;
+			}
+			else
+			{	// We are aggregating posts from several blogs:
+				$this->sql .= 'WHERE othercats.cat_blog_ID IN ('.$aggregate_coll_IDs.')';
+			}
 		}
 
-		$this->sql .= "comment_type IN ($comment_types) ";
+		$this->sql .= ' AND comment_type IN ('.$comment_types.') ';
 
 		/*
 		 * ----------------------------------------------------
@@ -170,6 +174,11 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.6  2006/12/17 23:42:38  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.5  2006/07/04 17:32:29  fplanque
  * no message
  *

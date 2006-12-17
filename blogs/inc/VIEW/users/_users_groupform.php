@@ -51,7 +51,7 @@ $Form = & new Form( NULL, 'group_checkchanges' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'grp_ID,action' ) );
 
-if( $edited_Group->get('ID') == 0 )
+if( $edited_Group->ID == 0 )
 {
 	$Form->begin_form( 'fform', T_('Creating new group') );
 }
@@ -87,7 +87,7 @@ $standard_perm_options = array(
 
 $Form->begin_fieldset( T_('Permissions for members of this group') );
 
-	if( $edited_Group->get('ID') != 1 )
+	if( $edited_Group->ID != 1 )
 	{	// Groups others than #1 can be prevented from editing users
 		$Form->radio( 'edited_grp_perm_admin', $edited_Group->get('perm_admin'),
 				array(  array( 'none', T_('No Access') ),
@@ -131,7 +131,7 @@ $Form->begin_fieldset( T_('Permissions for members of this group') );
 
 	$Form->checkbox( 'edited_grp_perm_templates', $edited_Group->get('perm_templates'), T_('Skins'), T_('Check to allow access to skin files.') );
 
-	if( $edited_Group->get('ID') != 1 )
+	if( $edited_Group->ID != 1 )
 	{	// Groups others than #1 can be prevented from editing users
 		$Form->radio( 'edited_grp_perm_users', $edited_Group->get('perm_users'),
 				array(	$perm_none_option,
@@ -165,6 +165,11 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/17 23:42:39  fplanque
+ * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
+ * Look into Advanced Settings for the aggregating blog.
+ * There may be side effects and new bugs created by this. Please report them :]
+ *
  * Revision 1.7  2006/12/07 16:06:24  fplanque
  * prepared new file editing permission
  *
