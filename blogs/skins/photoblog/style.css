@@ -33,7 +33,7 @@ div#pageFooter {
 p.baseline {
 	text-align: center;
 	font-size: 84%;
-	padding: 1ex;
+	padding: 6ex 0 4ex 0;
 	margin: 0;
 }
 
@@ -94,7 +94,7 @@ h2 {
 
 /* Styles for posts */
 .bPosts {
-	width: 700px;
+	width: 780px;
 	margin: 0 auto;
 }
 div.action_messages {
@@ -128,7 +128,7 @@ img.no_nav
 {
 	clear: both;
 }
-.image_block img {
+div.image_block img {
 	background: #fff;
 	padding: 5px;
 	border: 1px solid #555;
