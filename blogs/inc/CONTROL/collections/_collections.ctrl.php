@@ -160,64 +160,72 @@ switch( $action )
 		$AdminUI->append_to_titlearea( sprintf( T_('Generating static page for blog [%s]'), $edited_Blog->dget('name') ) );
 		$current_User->check_perm( 'blog_genstatic', 'any', true, $blog );
 
+		param( 'redir_after_genstatic', 'string', NULL );
+
 		$staticfilename = $edited_Blog->get('staticfilename');
 		if( empty( $staticfilename ) )
 		{
 			$Messages->add( T_('You haven\'t set a static filename for this blog!') );
-			break;
-		}
-
-		// GENERATION!
-		$static_gen_saved_locale = $current_locale;
-		$generating_static = true;
-		$resolve_extra_path = false;
-		ob_start();
-		switch( $edited_Blog->access_type )
-		{
-			case 'default':
-			case 'index.php':
-				// Access through index.php
-				// We need to set required variables
-				$blog = $edited_Blog->ID;
-				# This setting retricts posts to those published, thus hiding drafts.
-				$show_statuses = array();
-				# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
-				$linkblog_cat = '';
-				# This is the array if categories to restrict the linkblog to (non recursive)
-				$linkblog_catsel = array( );
-				# Here you can set a limit before which posts will be ignored
-				$timestamp_min = '';
-				# Here you can set a limit after which posts will be ignored
-				$timestamp_max = 'now';
-				// That's it, now let b2evolution do the rest! :)
-				require $inc_path.'_blog_main.inc.php';
-				break;
-
-			case 'stub':
-				// Access through stub file
-				// TODO: stub file might be empty or handled by webserver (mod_rewrite)! We cannot require this!
-				// TODO: It presently also allows to include ".php" files here!!
-				require $edited_Blog->get('dynfilepath');
-		}
-		$generated_static_page_html = ob_get_contents();
-		ob_end_clean();
-		unset( $generating_static );
-
-		// Switch back to saved locale (the blog page may have changed it):
-		locale_activate( $static_gen_saved_locale);
-
-		$staticfilename = $edited_Blog->get('staticfilepath');
-
-		if( ! ($fp = @fopen( $staticfilename, 'w' )) )
-		{ // could not open file
-			$Messages->add( T_('File cannot be written!') );
-			$Messages->add( sprintf( '<p>'.T_('You should check the file permissions for [%s]. See <a %s>online manual on file permissions</a>.').'</p>',$staticfilename, 'href="http://b2evolution.net/man/install/file_permissions.html"' ) );
 		}
 		else
-		{ // file is writable
-			fwrite( $fp, $generated_static_page_html );
-			fclose( $fp );
-			$Messages->add( sprintf( T_('Generated static file &laquo;%s&raquo;.'), $staticfilename ), 'success' );
+		{
+			// GENERATION!
+			$static_gen_saved_locale = $current_locale;
+			$generating_static = true;
+			$resolve_extra_path = false;
+			ob_start();
+			switch( $edited_Blog->access_type )
+			{
+				case 'default':
+				case 'index.php':
+					// Access through index.php
+					// We need to set required variables
+					$blog = $edited_Blog->ID;
+					# This setting retricts posts to those published, thus hiding drafts.
+					$show_statuses = array();
+					# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
+					$linkblog_cat = '';
+					# This is the array if categories to restrict the linkblog to (non recursive)
+					$linkblog_catsel = array( );
+					# Here you can set a limit before which posts will be ignored
+					$timestamp_min = '';
+					# Here you can set a limit after which posts will be ignored
+					$timestamp_max = 'now';
+					// That's it, now let b2evolution do the rest! :)
+					require $inc_path.'_blog_main.inc.php';
+					break;
+
+				case 'stub':
+					// Access through stub file
+					// TODO: stub file might be empty or handled by webserver (mod_rewrite)! We cannot require this!
+					// TODO: It presently also allows to include ".php" files here!!
+					require $edited_Blog->get('dynfilepath');
+			}
+			$generated_static_page_html = ob_get_contents();
+			ob_end_clean();
+			unset( $generating_static );
+
+			// Switch back to saved locale (the blog page may have changed it):
+			locale_activate( $static_gen_saved_locale);
+
+			$staticfilename = $edited_Blog->get('staticfilepath');
+
+			if( ! ($fp = @fopen( $staticfilename, 'w' )) )
+			{ // could not open file
+				$Messages->add( T_('File cannot be written!') );
+				$Messages->add( sprintf( '<p>'.T_('You should check the file permissions for [%s]. See <a %s>online manual on file permissions</a>.').'</p>',$staticfilename, 'href="http://b2evolution.net/man/install/file_permissions.html"' ) );
+			}
+			else
+			{ // file is writable
+				fwrite( $fp, $generated_static_page_html );
+				fclose( $fp );
+				$Messages->add( sprintf( T_('Generated static file &laquo;%s&raquo;.'), $staticfilename ), 'success' );
+			}
+		}
+
+		if( !empty( $redir_after_genstatic ) )
+		{
+			header_redirect( $redir_after_genstatic );
 		}
 		break;
 }
@@ -328,6 +336,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2006/12/17 02:42:21  fplanque
+ * streamlined access to blog settings
+ *
  * Revision 1.8  2006/12/13 18:17:39  blueyed
  * Fixed header_redirect() which would only work if b2evo is installed in DOCUMENT_ROOT and would not have been RFC-compliant anyway
  *

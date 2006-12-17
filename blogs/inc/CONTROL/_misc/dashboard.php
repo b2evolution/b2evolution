@@ -68,6 +68,10 @@ if( $blog )
 			echo '<li><a href="admin.php?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'">Change blog name...</a></li>';
 			echo '<li><a href="admin.php?ctrl=coll_settings&tab=skin&blog='.$Blog->ID.'">Change blog appearance (skin)...</a></li>';
 		}
+		if( $current_User->check_perm( 'blog_genstatic', 'any', false, $Blog->ID ) )
+		{
+			echo '<li><a href="admin.php?ctrl=collections&amp;action=GenStatic&amp;blog='.$Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">Generate static page!</a></li>';
+		}
 	echo '</ul>';
 
 
@@ -132,6 +136,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2006/12/17 02:42:22  fplanque
+ * streamlined access to blog settings
+ *
  * Revision 1.9  2006/12/15 22:53:26  fplanque
  * cleanup
  *

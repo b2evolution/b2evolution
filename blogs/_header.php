@@ -178,6 +178,8 @@ $AdminUI->add_menu_entries(
 			'tools' => array(
 				'text' => T_('Tools'),
 				'href' => 'admin.php?ctrl=crontab',
+				'perm_name' => 'options',
+				'perm_level' => 'view',	// FP> This assumes that we don't let regular users access the tools, including plugin tools.
 				'entries' =>  array(
 					'cron' => array(
 						'text' => T_('Scheduler'),
@@ -205,52 +207,65 @@ $AdminUI->add_menu_entries(
 
 
 // BLOG SETTINGS:
-$blog_settings_parm_eval = 'global $ctrl, $current_User; return $ctrl != "collections"
+$coll_settings_perm = 'global $ctrl, $current_User; return $ctrl != "collections"
 			&& $current_User->check_perm( "blog_properties", "any", false, '.$blog.' );';
+$coll_chapters_perm = 'global $ctrl, $current_User; return $ctrl != "collections"
+			&& $current_User->check_perm( "blog_cats", "", false, '.$blog.' );';
+if( $coll_settings_perm )
+{	// Default: show Generel Blog Settings
+	$default_page = 'admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog;
+}
+elseif( $coll_chapters_perm )
+{	// Default: show categories
+	$default_page = 'admin.php?ctrl=chapters&amp;blog='.$blog;
+}
+else
+{	// Default: Show list of blogs
+	$default_page = 'admin.php?ctrl=collections';
+}
 $AdminUI->add_menu_entries(
 		NULL, // root
 		array(
 			'blogs' => array(
 				'text' => T_('Blog settings'),
-				'href' => 'admin.php?ctrl=collections',
+				'href' => $default_page,
 				'entries' => array(
 					'general' => array(
 						'text' => T_('General'),
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog,
-						'perm_eval' => $blog_settings_parm_eval ),
+						'perm_eval' => $coll_settings_perm ),
 					'features' => array(
 						'text' => T_('Features'),
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog,
-						'perm_eval' => $blog_settings_parm_eval ),
+						'perm_eval' => $coll_settings_perm ),
 					'skin' => array(
 						'text' => T_('Skin'),
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
-						'perm_eval' => $blog_settings_parm_eval ),
+						'perm_eval' => $coll_settings_perm ),
 					'display' => array(
 						'text' => T_('Display'),
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=display&amp;blog='.$blog,
-						'perm_eval' => $blog_settings_parm_eval ),
+						'perm_eval' => $coll_settings_perm ),
 					'chapters' => array(
 						'text' => T_('Categories'),
 						'href' => 'admin.php?ctrl=chapters&amp;blog='.$blog,
-						'perm_eval' => 'global $ctrl, $current_User; return $ctrl != "collections"
-															&& $current_User->check_perm( "blog_cats", "", false, '.$blog.' ) ;' ),
+						'perm_eval' => $coll_chapters_perm ),
 					'urls' => array(
 						'text' => T_('URLs'),
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=urls&amp;blog='.$blog,
-						'perm_eval' => $blog_settings_parm_eval ),
+						'perm_eval' => $coll_settings_perm ),
 					'advanced' => array(
 						'text' => T_('Advanced'),
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog,
-						'perm_eval' => $blog_settings_parm_eval ),
+						'perm_eval' => $coll_settings_perm ),
 					'perm' => array(
 						'text' => T_('User permissions'),
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog,
-						'perm_eval' => $blog_settings_parm_eval ),
+						'perm_eval' => $coll_settings_perm ),
 					'permgroup' => array(
 						'text' => T_('Group permissions'),
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog,
-						'perm_eval' => $blog_settings_parm_eval ),
+						'perm_eval' => $coll_settings_perm ),
 				)
 			),
 
@@ -303,6 +318,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.36  2006/12/17 02:42:22  fplanque
+ * streamlined access to blog settings
+ *
  * Revision 1.35  2006/12/16 01:30:46  fplanque
  * Setting to allow/disable email subscriptions on a per blog basis
  *

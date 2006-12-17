@@ -39,7 +39,7 @@ $Form->begin_form( 'fform' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'advanced' );
-$Form->hidden( 'blog',$edited_Blog->ID );
+$Form->hidden( 'blog', $edited_Blog->ID );
 
 $Form->begin_fieldset( T_('Media library') );
 global $basepath, $media_subdir;
@@ -116,6 +116,10 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Static file generation'), array( 'class'=>'fieldset clear' ) );
 	$Form->text( 'blog_staticfilename', $edited_Blog->get( 'staticfilename' ), 30, T_('Static filename'), T_('This is the .html file that will be created when you generate a static version of the blog homepage.') );
+	if( $current_User->check_perm( 'blog_genstatic', 'any', false, $edited_Blog->ID ) )
+	{
+		$Form->info( T_('Static page'), '<a href="admin.php?ctrl=collections&amp;action=GenStatic&amp;blog='.$edited_Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">'.T_('Generate now!').'</a>' );
+	}
 $Form->end_fieldset();
 
 
@@ -126,6 +130,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.16  2006/12/17 02:42:21  fplanque
+ * streamlined access to blog settings
+ *
  * Revision 1.15  2006/12/16 01:30:47  fplanque
  * Setting to allow/disable email subscriptions on a per blog basis
  *
