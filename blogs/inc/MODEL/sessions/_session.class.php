@@ -221,7 +221,7 @@ class Session
 	 */
 	function set_User( $User )
 	{
-		return $this->set_user_ID( $User->get('ID') );
+		return $this->set_user_ID( $User->ID );
 	}
 
 
@@ -490,6 +490,9 @@ function session_unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.29  2006/12/17 23:44:35  fplanque
+ * minor cleanup
+ *
  * Revision 1.28  2006/12/07 23:13:11  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!

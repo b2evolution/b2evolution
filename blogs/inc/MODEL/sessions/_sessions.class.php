@@ -97,7 +97,7 @@ class Sessions extends Widget
 					&& ( $User = & $UserCache->get_by_ID( $row->sess_user_ID ) ) )
 			{
 				// assign by ID so that each user is only counted once (he could use multiple user agents at the same time)
-				$this->_registered_Users[ $User->get('ID') ] = & $User;
+				$this->_registered_Users[ $User->ID ] = & $User;
 
 				if( !$User->showonline )
 				{
@@ -260,6 +260,9 @@ class Sessions extends Widget
 
 /*
  * $Log$
+ * Revision 1.10  2006/12/17 23:44:35  fplanque
+ * minor cleanup
+ *
  * Revision 1.9  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

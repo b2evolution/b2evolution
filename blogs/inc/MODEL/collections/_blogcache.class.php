@@ -213,7 +213,7 @@ class BlogCache extends DataObjectCache
 		}
 
 		$where_user = 'WHERE bloguser_user_ID = '.$user_ID;
-		$where_group = 'WHERE bloggroup_group_ID = '.$for_User->Group->get('ID');
+		$where_group = 'WHERE bloggroup_group_ID = '.$for_User->Group->ID;
 
 		if( $criterion == 'browse' )
 		{
@@ -259,6 +259,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.18  2006/12/17 23:44:35  fplanque
+ * minor cleanup
+ *
  * Revision 1.17  2006/12/07 23:13:10  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!
