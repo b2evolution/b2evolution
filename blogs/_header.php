@@ -211,11 +211,11 @@ $coll_settings_perm = 'global $ctrl, $current_User; return $ctrl != "collections
 			&& $current_User->check_perm( "blog_properties", "any", false, '.$blog.' );';
 $coll_chapters_perm = 'global $ctrl, $current_User; return $ctrl != "collections"
 			&& $current_User->check_perm( "blog_cats", "", false, '.$blog.' );';
-if( $coll_settings_perm )
+if( $blog && $coll_settings_perm )
 {	// Default: show Generel Blog Settings
 	$default_page = 'admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog;
 }
-elseif( $coll_chapters_perm )
+elseif( $blog && $coll_chapters_perm )
 {	// Default: show categories
 	$default_page = 'admin.php?ctrl=chapters&amp;blog='.$blog;
 }
@@ -318,6 +318,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.37  2006/12/17 23:49:32  fplanque
+ * Avoid nasty bug when there are no blogs on the system.
+ *
  * Revision 1.36  2006/12/17 02:42:22  fplanque
  * streamlined access to blog settings
  *
