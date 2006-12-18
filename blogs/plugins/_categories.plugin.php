@@ -205,8 +205,12 @@ class categories_plugin extends Plugin
 			$coll_ID_array = explode( ',', $aggregate_coll_IDs );
 			foreach( $coll_ID_array as $curr_blog_ID )
 			{
-
-				$loop_Blog = & $BlogCache->get_by_ID( $curr_blog_ID );
+				// Get blog:
+				$loop_Blog = & $BlogCache->get_by_ID( $curr_blog_ID, false );
+				if( empty($loop_Blog) )
+				{	// That one doesn't exist (any more?)
+					continue;
+				}
 
 				echo $params['coll_start'];
 				echo '<a href="';
@@ -349,6 +353,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.35  2006/12/18 00:41:06  fplanque
+ * handle non existing blogs a little better
+ *
  * Revision 1.34  2006/12/17 23:42:39  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.

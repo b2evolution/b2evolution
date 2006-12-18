@@ -23,6 +23,15 @@ if( ! $linkblog )
 	return;
 }
 
+// Load the linkblog blog:
+$link_Blog = & $BlogCache->get_by_ID( $linkblog, false );
+
+if( empty($link_Blog) )
+{
+	echo $linkblog_main_start.T_('The requested LinkBlog doesn\'t exist any more!').$linkblog_main_end;
+	return;
+}
+
 
 # maximum number of linkblog entries to display:
 if(!isset($linkblog_limit)) $linkblog_limit = 20;
@@ -38,12 +47,6 @@ if(!isset($linkblog_catlist_end)) $linkblog_catlist_end = '</ul>';
 if(!isset($linkblog_item_before)) $linkblog_item_before = '<li>';
 if(!isset($linkblog_item_after)) $linkblog_item_after = '</li>';
 
-
-// --- //
-
-
-// Load the linkblog blog:
-$link_Blog = & $BlogCache->get_by_ID( $linkblog );
 
 $LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $linkblog_limit );
 
@@ -95,6 +98,9 @@ echo $linkblog_main_end;
 
 /*
  * $Log$
+ * Revision 1.18  2006/12/18 00:41:07  fplanque
+ * handle non existing blogs a little better
+ *
  * Revision 1.17  2006/09/10 23:40:47  fplanque
  * minor
  *
