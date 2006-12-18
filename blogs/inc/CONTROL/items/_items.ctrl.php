@@ -681,6 +681,9 @@ switch( $action )
 					// Display VIEW:
 					$AdminUI->disp_view( 'items/_browse_tracker.inc.php' );
 					break;
+
+				default:
+					debug_die( 'unhandled display type' );
 			}
 		echo '</td>';
 
@@ -702,6 +705,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/18 01:43:25  fplanque
+ * minor bugfix
+ *
  * Revision 1.7  2006/12/14 00:01:49  fplanque
  * land in correct collection when opening FM from an Item
  *

@@ -58,7 +58,7 @@ class UserSettings extends AbstractSettings
 		'action_icon_threshold' => 3,
 		'action_word_threshold' => 3,
 		'control_form_abortions' => 1,
-		'pref_browse_tab' => 'posts',
+		'pref_browse_tab' => 'full',
 		'pref_edit_tab' => 'simple',
 
 		'fm_imglistpreview' => 1,
@@ -202,6 +202,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.23  2006/12/18 01:43:26  fplanque
+ * minor bugfix
+ *
  * Revision 1.22  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
