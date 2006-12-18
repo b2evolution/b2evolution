@@ -551,31 +551,38 @@ function blog_list_iteminfo( $what, $show = 'raw' )
  * Check permissions on a given blog (by ID) and autoselect an appropriate blog
  * if necessary.
  *
- * @param integer Pre-selected blog (usually blog GET param)
+ * For use in admin
+ *
  * @param string Permission name that must be given to the {@link $current_User} object.
  * @param string Permission level that must be given to the {@link $current_User} object.
  * @return integer The selected blog (0 means failure).
  */
-function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
+function autoselect_blog( $permname, $permlevel = 'any' )
 {
+	global $blog;
+	global $Blog;
 	global $current_User;
 	global $default_to_blog;
 
-	if( $selectedBlog )
-	{ // a blog is selected
-		if( !$current_User->check_perm( $permname, $permlevel, false, $selectedBlog ) )
+	$autoselected_blog = $blog;
+
+	if( $autoselected_blog )
+	{ // a blog is already selected
+		if( !$current_User->check_perm( $permname, $permlevel, false, $autoselected_blog ) )
 		{ // invalid blog
-			$selectedBlog = 0;
+			$autoselected_blog = 0;
 		}
 	}
 
-	if( !$selectedBlog )
+	if( !$autoselected_blog )
 	{ // No blog is selected so far (or selection was invalid)...
+		/*
 		if( $current_User->check_perm( $permname, $permlevel, false, $default_to_blog ) )
 		{ // Default blog is a valid choice
-			$selectedBlog = $default_to_blog;
+			$autoselected_blog = $default_to_blog;
 		}
 		else
+		*/
 		{ // Let's try to find another one:
 			for( $curr_blog_ID = blog_list_start();
 						$curr_blog_ID != false;
@@ -584,18 +591,80 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 				// not good for demouser>edit_cats: if( $current_User->check_perm( 'blog_ismember', 1, false, $curr_blog_ID ) )
 				if( $current_User->check_perm( $permname, $permlevel, false, $curr_blog_ID ) )
 				{ // Current user is a member of this blog... let's select it:
-					$selectedBlog = $curr_blog_ID;
+					$autoselected_blog = $curr_blog_ID;
 					break;
 				}
 			}
 		}
 	}
 
-	return $selectedBlog;
+	if( $autoselected_blog )
+	{ // a blog is finally selected
+		if( set_working_blog( $autoselected_blog ) )
+		{
+	   	$BlogCache = & get_Cache( 'BlogCache' );
+			$Blog = & $BlogCache->get_by_ID( $blog, true, false );
+		}
+		return true;
+	}
+
+	return false;
 }
+
+
+/**
+ * Check that we have received a valid blog param
+ *
+ * For use in admin
+ */
+function valid_blog_requested()
+{
+	global $Blog, $Messages;
+	if( empty( $Blog ) )
+	{	// The requested blog does not exist
+		$Messages->add( T_('The requested blog does not exist (any more?)'), 'error' );
+		return false;
+	}
+	return true;
+}
+
+
+/**
+ * Set working blog to a new value and memorize it in user settings if needed.
+ *
+ * For use in admin
+ *
+ * @return boolean $blog changed?
+ */
+function set_working_blog( $new_blog_ID )
+{
+	global $blog, $UserSettings;
+
+	if( $new_blog_ID == $blog )
+	{
+		return false;
+	}
+
+	$blog = $new_blog_ID;
+
+	if( $new_blog_ID != (int)$UserSettings->get('selected_blog') )
+	{
+		$UserSettings->set( 'selected_blog', $blog );
+		$UserSettings->dbupdate();
+	}
+
+	return true;
+}
+
 
 /*
  * $Log$
+ * Revision 1.17  2006/12/18 03:20:41  fplanque
+ * _header will always try to set $Blog.
+ * autoselect_blog() will do so also.
+ * controllers can use valid_blog_requested() to make sure we have one
+ * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
+ *
  * Revision 1.16  2006/11/24 18:27:23  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

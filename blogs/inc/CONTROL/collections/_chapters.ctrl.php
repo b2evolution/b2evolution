@@ -27,14 +27,15 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-$current_User->check_perm( 'blog_cats', 'edit', true, $blog );
-
-
-
-$BlogCache = & get_Cache( 'BlogCache' );
-$edited_Blog = & $BlogCache->get_by_ID( $blog );
-$Blog = & $edited_Blog; // used for "Exit to blogs.." link
-
+if( valid_blog_requested() )
+{
+	$current_User->check_perm( 'blog_cats', 'edit', true, $blog );
+	$edited_Blog = & $Blog;
+}
+else
+{
+	$action = 'nil';
+}
 
 $AdminUI->set_path( 'blogs', 'chapters' );
 
@@ -430,6 +431,12 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2006/12/18 03:20:41  fplanque
+ * _header will always try to set $Blog.
+ * autoselect_blog() will do so also.
+ * controllers can use valid_blog_requested() to make sure we have one
+ * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
+ *
  * Revision 1.13  2006/12/13 18:17:39  blueyed
  * Fixed header_redirect() which would only work if b2evo is installed in DOCUMENT_ROOT and would not have been RFC-compliant anyway
  *

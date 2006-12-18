@@ -14,19 +14,24 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Get the blog from param, defaulting to the last selected one for this user:
 $BlogCache = & get_Cache( 'BlogCache' );
 
+// Get the requested blog NOW; we need it for quite a few of the menu urls:
 $user_selected_blog = (int)$UserSettings->get('selected_blog');
-if( $user_selected_blog && ! $BlogCache->get_by_ID($user_selected_blog, false) )
-{ // User-selected blog does not exist anymore!
-	$user_selected_blog = 0;
+if( param( 'blog', 'integer', NULL, true ) === NULL      // We got no explicit blog choice (not even '0' for 'no blog'):
+	|| ($blog != 0 && ! ($Blog = $BlogCache->get_by_ID( $blog, false, false )) )) // or we requested a nonexistent blog
+{ // Try the memorized blog from the previous action:
+	$blog = $user_selected_blog;
+	if( ! ($Blog = $BlogCache->get_by_ID( $blog, false, false ) ) )
+	{	// That one doesn't exist either...
+		$blog = 0;
+	}
 }
-param( 'blog', 'integer', $user_selected_blog, true ); // We may need this for the urls
-if( $blog != $user_selected_blog )
-{ // Update UserSettings for selected blog:
-	$UserSettings->set( 'selected_blog', $blog );
-	$UserSettings->dbupdate();
+elseif( $blog != $user_selected_blog )
+{ // We have selected a new & valid blog. Update UserSettings for selected blog:
+	set_working_blog( $blog );
 }
 
-param( 'mode', 'string', '', true );  // bookmarklet, upload (upload actually means sth like: select img for post)
+// bookmarklet, upload (upload actually means sth like: select img for post):
+param( 'mode', 'string', '', true );
 
 // Get the Admin skin
 // TODO: Allow setting through GET param (dropdown in backoffice), respecting a checkbox "Use different setting on each computer" (if cookie_state handling is ready)
@@ -318,6 +323,12 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.38  2006/12/18 03:20:21  fplanque
+ * _header will always try to set $Blog.
+ * autoselect_blog() will do so also.
+ * controllers can use valid_blog_requested() to make sure we have one
+ * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
+ *
  * Revision 1.37  2006/12/17 23:49:32  fplanque
  * Avoid nasty bug when there are no blogs on the system.
  *

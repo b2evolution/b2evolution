@@ -202,6 +202,12 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.24  2006/12/18 03:20:22  fplanque
+ * _header will always try to set $Blog.
+ * autoselect_blog() will do so also.
+ * controllers can use valid_blog_requested() to make sure we have one
+ * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
+ *
  * Revision 1.23  2006/12/18 01:43:26  fplanque
  * minor bugfix
  *

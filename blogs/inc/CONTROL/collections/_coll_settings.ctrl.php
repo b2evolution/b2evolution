@@ -43,18 +43,22 @@ memorize_param( 'blog', 'integer', -1 );	// Needed when genereting static page f
 param_action( 'edit' );
 param( 'tab', 'string', 'general', true );
 
-if( $tab != 'list' )
-{	// We need to select a blog for this tab:
-	$blog = autoselect_blog( $blog, 'blog_properties', 'view' );
+autoselect_blog( 'blog_properties', 'view' );
+if( valid_blog_requested() )
+{
+	$edited_Blog = & $Blog;
+}
+else
+{
+
+	$action = 'nil';
 }
 
-$BlogCache = & get_Cache( 'BlogCache' );
 /**
  * @var Blog
  */
-$edited_Blog = & $BlogCache->get_by_ID( $blog );
-$Blog = & $edited_Blog; // used for "Exit to blogs.." link
 
+$edited_Blog = & $Blog;
 
 /**
  * Perform action:
@@ -193,6 +197,12 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/18 03:20:41  fplanque
+ * _header will always try to set $Blog.
+ * autoselect_blog() will do so also.
+ * controllers can use valid_blog_requested() to make sure we have one
+ * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
+ *
  * Revision 1.10  2006/12/17 02:42:21  fplanque
  * streamlined access to blog settings
  *

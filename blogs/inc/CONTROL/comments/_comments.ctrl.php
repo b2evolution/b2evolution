@@ -45,7 +45,7 @@ switch( $action )
 		$edited_Comment = Comment_get_by_ID( $comment_ID );
 
 		$edited_Comment_Item = & $edited_Comment->get_Item();
-		$blog = $edited_Comment_Item->blog_ID;
+		set_working_blog( $edited_Comment_Item->blog_ID );
 		$BlogCache = & get_Cache( 'BlogCache' );
 		$Blog = & $BlogCache->get_by_ID( $blog );
 
@@ -55,16 +55,11 @@ switch( $action )
 
 	case 'list':
 	  // Check permission:
-		$blog = autoselect_blog( $blog, 'blog_comments', 'any' );
-
- 		if( ! $blog  )
+		if( ! autoselect_blog( 'blog_comments', 'any' ) )
 		{ // No blog could be selected
-			$Messages->add( T_('You have no permission to edit comments for this blog.' ), 'error' );
+			$Messages->add( T_('You have no permission to edit comments.' ), 'error' );
 			$action = 'nil';
 		}
-
-		$BlogCache = & get_Cache( 'BlogCache' );
-		$Blog = & $BlogCache->get_by_ID( $blog );
 		break;
 
 	default:
@@ -265,6 +260,12 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2006/12/18 03:20:41  fplanque
+ * _header will always try to set $Blog.
+ * autoselect_blog() will do so also.
+ * controllers can use valid_blog_requested() to make sure we have one
+ * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
+ *
  * Revision 1.3  2006/12/17 23:42:38  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.

@@ -53,7 +53,7 @@ switch( $action )
 
 			// Load the blog we're in:
 			$Blog = $edited_Item->get_Blog();
-			$blog = $Blog->ID;
+			set_working_blog( $Blog->ID );
 		}
 		else
 		{	// We could not find the link to edit:
@@ -73,7 +73,7 @@ switch( $action )
 
 		// Load the blog we're in:
 		$Blog = $edited_Item->get_Blog();
-		$blog = $Blog->ID;
+		set_working_blog( $Blog->ID );
 		break;
 
 	case 'update':
@@ -89,7 +89,7 @@ switch( $action )
 
 		// Load the blog we're in:
 		$Blog = $edited_Item->get_Blog();
-		$blog = $Blog->ID;
+		set_working_blog( $Blog->ID );
 		break;
 
 	case 'new':
@@ -98,23 +98,18 @@ switch( $action )
 	case 'list':
 		if( $action == 'list' )
 		{	// We only need view permission
-			$blog = autoselect_blog( $blog, 'blog_ismember', 1 );
+			$selected = autoselect_blog( 'blog_ismember', 1 );
 		}
 		else
 		{	// We need posting permission
-			$blog = autoselect_blog( $blog, 'blog_post_statuses', 'any' );
+			$selected = autoselect_blog( 'blog_post_statuses', 'any' );
 		}
 
-		if( ! $blog  )
+		if( ! $selected  )
 		{ // No blog could be selected
 			$Messages->add( sprintf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'),
 											 'href="mailto:'.$admin_email.'?subject=b2evo-promotion"' ), 'error' );
 			$action = 'nil';
-		}
-		else
-		{ // We could select a valid blog which we have permission to access:
-			$BlogCache = & get_Cache( 'BlogCache' );
-			$Blog = & $BlogCache->get_by_ID( $blog );
 		}
 		break;
 
@@ -683,7 +678,7 @@ switch( $action )
 					break;
 
 				default:
-					debug_die( 'unhandled display type' );
+					debug_die( 'unhandled display type:'.htmlspecialchars($tab) );
 			}
 		echo '</td>';
 
@@ -705,6 +700,12 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2006/12/18 03:20:41  fplanque
+ * _header will always try to set $Blog.
+ * autoselect_blog() will do so also.
+ * controllers can use valid_blog_requested() to make sure we have one
+ * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
+ *
  * Revision 1.8  2006/12/18 01:43:25  fplanque
  * minor bugfix
  *

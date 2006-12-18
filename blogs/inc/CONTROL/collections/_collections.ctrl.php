@@ -39,13 +39,17 @@ $AdminUI->set_path( 'blogs' );
 
 param_action( 'list' );
 
-if( $action != 'new' )
+if( $action != 'new'
+	&& $action != 'list'
+	&& $action != 'create' )
 {
-	if( !empty( $blog ) )
+	if( valid_blog_requested() )
 	{
-		$BlogCache = & get_Cache( 'BlogCache' );
-		$edited_Blog = & $BlogCache->get_by_ID( $blog );
-		$Blog = & $edited_Blog; // used for "Exit to blogs.." link
+		$edited_Blog = & $Blog;
+	}
+	else
+	{
+		$action = 'list';
 	}
 }
 
@@ -141,7 +145,7 @@ switch( $action )
 			unset( $edited_Blog );
 			unset( $Blog );
 			forget_param( 'blog' );
-			$blog = 0;
+			set_working_blog( 0 );
 			$UserSettings->delete( 'selected_blog' );	// Needed or subsequent pages may try to access the delete blog
 			$UserSettings->dbupdate();
 
@@ -331,6 +335,12 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/18 03:20:21  fplanque
+ * _header will always try to set $Blog.
+ * autoselect_blog() will do so also.
+ * controllers can use valid_blog_requested() to make sure we have one
+ * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
+ *
  * Revision 1.10  2006/12/17 23:42:38  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.
