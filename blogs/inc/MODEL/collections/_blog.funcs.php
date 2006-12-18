@@ -602,8 +602,9 @@ function autoselect_blog( $permname, $permlevel = 'any' )
 	{ // a blog is finally selected
 		if( set_working_blog( $autoselected_blog ) )
 		{
+			// echo 'autoselected a new blog';
 	   	$BlogCache = & get_Cache( 'BlogCache' );
-			$Blog = & $BlogCache->get_by_ID( $blog, true, false );
+			$Blog = $BlogCache->get_by_ID( $blog, true, false );	// COPY !
 		}
 		return true;
 	}
@@ -659,6 +660,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.18  2006/12/18 13:14:34  fplanque
+ * bugfix
+ *
  * Revision 1.17  2006/12/18 03:20:41  fplanque
  * _header will always try to set $Blog.
  * autoselect_blog() will do so also.
