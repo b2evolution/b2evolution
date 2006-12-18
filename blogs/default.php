@@ -44,51 +44,73 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 <?php $Messages->disp(); ?>
 
-<p>
-	<?php echo T_('This is the default homepage for b2evolution. It will be displayed as long as you don\'t select a default blog in the general settings.');
-	?>
-	( <a href="<?php echo $admin_url ?>?ctrl=settings&amp;tab=general#default_blog_ID"><?php echo T_( 'Edit config' ) ?></a> )
-</p>
-
-
-<h2><?php echo T_('Individual blogs on this system') ?>:</h2>
-<ul>
-<?php // --------------------------- BLOG LIST -----------------------------
-	for( $curr_blog_ID = blog_list_start();
-				$curr_blog_ID != false;
-				 $curr_blog_ID = blog_list_next() )
-	{ # by uncommenting the following lines you can hide some blogs
-		// if( $curr_blog_ID == 2 ) continue; // Hide blog 2...
-		echo '<li><strong>';
-		printf( T_('Blog #%d'), $curr_blog_ID );
-		echo ': <a href="';
-		blog_list_iteminfo( 'blogurl', 'raw');
-		echo '" title="';
-		blog_list_iteminfo( 'shortdesc', 'htmlattr');
-		echo '">';
-		blog_list_iteminfo( 'name', 'htmlbody');
-		echo '</a></strong>&nbsp; ';
-		if( $l_stub = blog_list_iteminfo( 'stub', false) )
-		{
-			echo '('.$l_stub.')';
-		}
-		echo '</li>';
+<?php
+	/**
+	 * @var BlogCache
+	 */
+	$BlogCache = & get_Cache('BlogCache');
+	$BlogCache->load_all();
+	if( count( $BlogCache->cache ) == 0 )
+	{	// There is no blog on this system!
+		echo '<p><strong>'.T_('b2evolution is installed and ready but you have created no blog on this system yet.').'</strong></p>';
+		echo '<p><strong><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Create a blog now...' ).'</a></strong></p>';
 	}
-	// ---------------------------------- END OF BLOG LIST ---------------------------------
+	else
+	{
 	?>
-</ul>
 
-<p><?php echo T_('Please note: the above list (as well as the menu) is automatically generated and includes only the blogs that have a &quot;stub url name&quot;. You can set this in the blog configuration in the back-office.') ?></p>
-<h2><?php echo T_('More demos') ?>:</h2>
-<ul>
-	<li><strong><?php echo T_('Stub file') ?>: <a href="a_stub.php"><?php echo T_('Blog #2 called through a stub file') ?></a></strong> &nbsp; (a_stub.php)</li>
-	<li><strong><?php echo T_('Custom template') ?>: <a href="a_noskin.php"><?php echo T_('Blog #2 called through a custom template (not a skin)') ?></a></strong> &nbsp; (a_noskin.php)</li>
-	<li><strong><?php echo T_('Custom template') ?>: <a href="multiblogs.php"><?php echo T_('Multiple blogs displayed on the same page') ?></a></strong> &nbsp; (multiblogs.php)</li>
-	<li><strong><?php echo T_('Custom template') ?>: <a href="summary.php"><?php echo T_('Summary of last posts in all blogs') ?></a></strong> &nbsp; (summary.php)</li>
-	<li><strong><?php echo T_('Custom template') ?>: <a href="default.php"><?php echo T_('The page you\'re looking at') ?></a></strong> &nbsp; (default.php)</li>
-	<li><strong><?php echo T_('Bonus feature') ?>: <a href="contact.php"><?php echo T_('A standalone form to contact the admin (A contact page for your site)') ?></a></strong> &nbsp; (contact.php)</li>
-</ul>
-<p><?php echo T_('Please note: those demos do not make use of evoSkins, even if you enabled them during install. The only way to change their look and feel is to edit their PHP template. But once, again, remember these are just demos destined to inspire you for your own templates ;)') ?></p>
+	<p>
+		<?php echo T_('This is the default homepage for b2evolution. It will be displayed as long as you don\'t select a default blog in the general settings.');
+		?>
+		( <a href="<?php echo $admin_url ?>?ctrl=settings&amp;tab=general#default_blog_ID"><?php echo T_( 'Edit config' ) ?></a> )
+	</p>
+
+
+	<h2><?php echo T_('Blogs on this system') ?>:</h2>
+	<ul>
+	<?php // --------------------------- BLOG LIST -----------------------------
+		for( $curr_blog_ID = blog_list_start();
+					$curr_blog_ID != false;
+					 $curr_blog_ID = blog_list_next() )
+		{ # by uncommenting the following lines you can hide some blogs
+			// if( $curr_blog_ID == 2 ) continue; // Hide blog 2...
+			echo '<li><strong>';
+			printf( T_('Blog #%d'), $curr_blog_ID );
+			echo ': <a href="';
+			blog_list_iteminfo( 'blogurl', 'raw');
+			echo '" title="';
+			blog_list_iteminfo( 'shortdesc', 'htmlattr');
+			echo '">';
+			blog_list_iteminfo( 'name', 'htmlbody');
+			echo '</a></strong>';
+			echo '</li>';
+		}
+		// ---------------------------------- END OF BLOG LIST ---------------------------------
+		?>
+	</ul>
+
+	<h2><?php echo T_('More demos') ?>:</h2>
+	<ul>
+		<?php
+			$first_Blog = & $BlogCache->get_by_ID( 1, false );
+			if( !empty( $first_Blog ) )
+			{
+			?>
+				<li><strong><?php echo T_('Stub file') ?>: <a href="a_stub.php"><?php echo T_('Blog #1 called through a stub file') ?></a></strong> &nbsp; (a_stub.php)</li>
+				<li><strong><?php echo T_('Custom template') ?>: <a href="a_noskin.php"><?php echo T_('Blog #1 called through a custom template (not a skin)') ?></a></strong> &nbsp; (a_noskin.php)</li>
+				<li><strong><?php echo T_('Custom template') ?>: <a href="multiblogs.php"><?php echo T_('Multiple blogs displayed on the same page') ?></a></strong> &nbsp; (multiblogs.php)</li>
+			<?php
+			}
+		?>
+		<li><strong><?php echo T_('Custom template') ?>: <a href="summary.php"><?php echo T_('Summary of last posts in all blogs') ?></a></strong> &nbsp; (summary.php)</li>
+		<li><strong><?php echo T_('Custom template') ?>: <a href="default.php"><?php echo T_('The page you\'re looking at') ?></a></strong> &nbsp; (default.php)</li>
+		<li><strong><?php echo T_('Bonus feature') ?>: <a href="contact.php"><?php echo T_('A standalone form to contact the admin (A contact page for your site)') ?></a></strong> &nbsp; (contact.php)</li>
+	</ul>
+	<p class="note"><?php echo T_('Please note: those demos do not make use of skins. The only way to change their look and feel is to edit their PHP template. But once, again, remember these are just demos destined to inspire you for your own templates ;)') ?></p>
+
+	<?php
+	}
+?>
 
 <h2><?php echo T_('Administration') ?>:</h2>
 <ul>

@@ -21,7 +21,7 @@
 # First, select which blog you want to display here!
 # You can find these numbers in the back-office under the Blogs section.
 # You can also create new blogs over there. If you do, you may duplicate this file for the new blog.
-$blog = 2;		// 2 is for "demo blog A" or your upgraded blog (depends on your install)
+$blog = 1;
 
 # Tell b2evolution you don't want to use evoSkins for this template:
 $skin = '';
