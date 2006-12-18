@@ -994,6 +994,8 @@ class Item extends DataObject
 		{
 			$use_cache = $this->ID && in_array( $format, array( 'htmlbody', 'entityencoded', 'xml', 'text' ) );
 
+			// $use_cache = false;
+
 			if( $use_cache )
 			{ // the format/item can be cached:
 				global $DB;
@@ -1007,12 +1009,13 @@ class Item extends DataObject
 
 				if( $cache !== NULL ) // may be empty string
 				{ // Retrieved from cache:
+					// echo ' retrieved from prerendered cache';
 					$this->content_prerendered[$cache_key] = $cache;
 				}
 			}
 
 			if( ! isset( $this->content_prerendered[$cache_key] ) )
-			{
+			{	// Not cached yet:
 				global $Debuglog;
 
 				if( $this->update_renderers_from_Plugins() )
@@ -1025,7 +1028,9 @@ class Item extends DataObject
 				}
 
 				// Call renderer plugins:
+				// pre_dump( $this->content );
 				$this->content_prerendered[$cache_key] = $Plugins->render( $this->content, $post_renderers, $format, array( 'Item' => $this ), 'Render' );
+				// pre_dump( $this->content_prerendered[$cache_key] );
 
 				$Debuglog->add( 'Generated pre-rendered content ['.$cache_key.']', 'items' );
 
@@ -1104,6 +1109,7 @@ class Item extends DataObject
 			// SPLIT PAGES:
 			$this->content_pages[$format] = explode( '<!--nextpage-->', $this->get_prerendered_content($format) );
 			$this->pages = count( $this->content_pages[$format] );
+			// echo ' Pages:'.$this->pages;
 		}
 	}
 
@@ -1231,6 +1237,8 @@ class Item extends DataObject
 			$dispmore = $more;
 		}
 
+		// echo 'More:'.$dispmore;
+
 		/*
 		 * Check if we want to increment view count, see {@link Hit::is_new_view()}
 		 */
@@ -1247,10 +1255,11 @@ class Item extends DataObject
 			$disppage = $page;
 		}
 		$content_page = $this->get_content_page( $disppage, $format ); // cannot include format_to_output() because of the magic below.. eg '<!--more-->' will get stripped in "xml"
-
+		// pre_dump($content_page);
 
 		$content_parts = explode('<!--more-->', $content_page);
-		if( count($content_parts)>1 )
+		// echo ' Parts:'.count($content_parts);
+		if( count($content_parts) > 1 )
 		{ // This is an extended post (has a more section):
 			if( $dispmore )
 			{ // Viewer has already asked for more
@@ -3326,6 +3335,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.141  2006/12/18 13:31:12  fplanque
+ * fixed broken more tag
+ *
  * Revision 1.140  2006/12/16 01:30:46  fplanque
  * Setting to allow/disable email subscriptions on a per blog basis
  *

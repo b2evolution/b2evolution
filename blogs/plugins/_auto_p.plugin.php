@@ -99,15 +99,16 @@ class auto_p_plugin extends Plugin
 		$content = preg_replace( "~(\r\n|\r)~", "\n", $content ); // cross-platform newlines
 
 		// Handle blocks, splitted by "<!--more-->":
+		// fp> don't we also want to split the pages?
 		$content_parts = explode('<!--more-->', $content);
 
-		$content = '';
+		$new_content_parts = array();
 		foreach( $content_parts as $content_part )
 		{
-			$content .= $this->handle_blocks( $content_part );
+			$new_content_parts[] = $this->handle_blocks( $content_part );
 		}
 
-		return true;
+		return implode('<!--more-->', $new_content_parts);
 	}
 
 
@@ -630,6 +631,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.33  2006/12/18 13:31:12  fplanque
+ * fixed broken more tag
+ *
  * Revision 1.32  2006/12/07 23:13:13  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!
