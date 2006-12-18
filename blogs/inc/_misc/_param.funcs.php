@@ -227,7 +227,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 						{	// We have an empty value and we accept it
 							// ok..
 						}
-						elseif( !empty( $regexp ) && !preg_match( $regexp, $GLOBALS[$var] ) )
+						elseif( !empty( $regexp ) && ( !is_scalar($GLOBALS[$var]) || !preg_match( $regexp, $GLOBALS[$var] ) ) )
 						{	// Value does not match!
 							bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
 						}
@@ -1609,6 +1609,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.25  2006/12/18 16:16:12  blueyed
+ * Fixed E_NOTICE if we're expecting e.g. "integer" but receive "array"
+ *
  * Revision 1.24  2006/11/27 21:10:23  fplanque
  * doc
  *
