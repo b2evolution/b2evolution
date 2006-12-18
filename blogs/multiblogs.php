@@ -10,7 +10,7 @@
  */
 
 # First blog will be displayed the regular way (why bother?)
-$blog = 2;		// 2 is for "demo blog A" or your upgraded blog (depends on your install)
+$blog = 1;
 
 # Tell b2evolution you don't want to use evoSkins
 # (evoSkins are designed to display only one blog at once + optionnaly a linkblog)
@@ -186,7 +186,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<div class="bSideItem">
 		<?php
 		$BlogCache = & get_Cache( 'BlogCache' );
-		$Blog_B = & $BlogCache->get_by_ID( 3 ); // Blog B
+		$Blog_B = & $BlogCache->get_by_ID( 2, false );
+		if( empty($Blog_B) )
+		{
+			echo T_('Blog #2 doesn\'t seem to exist.');
+		}
+		else
+		{
 		?>
 
 		<h3>#2: <a href="<?php $Blog_B->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog_B->disp( 'name', 'htmlbody' ) ?></a></h3>
@@ -224,6 +230,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			</div>
 			<?php
 		}
+		}
 		?>
 	</div>
 
@@ -231,7 +238,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	<div class="bSideItem">
 		<?php
-		$Blog_roll = & $BlogCache->get_by_ID( 4 ); // Blog roll
+		$Blog_roll = & $BlogCache->get_by_ID( 3, false );
+		if( empty($Blog_roll) )
+		{
+			echo T_('Blog #3 doesn\'t seem to exist.');
+		}
+		else
+		{
 		?>
 		<h3>#3: <a href="<?php $Blog_roll->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog_roll->disp( 'name', 'htmlbody' ) ?></a></h3>
 		<?php
@@ -268,6 +281,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			</div>
 			<?php
 		}
+		}
 		?>
 	</div>
 
@@ -287,9 +301,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			?>
 		</ul>
 	</div>
-
-	<p class="center">powered by<br />
-	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $rsc_url ?>img/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="middle" /></a></p>
 
 </div>
 <!-- InstanceEndEditable --></div>

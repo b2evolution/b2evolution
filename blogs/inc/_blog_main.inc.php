@@ -46,8 +46,12 @@ $Timer->start( '_blog_main.inc' );
 param( 'blog', 'integer', 0, true );
 // Getting current blog info:
 $BlogCache = & get_Cache( 'BlogCache' );
-$Blog = & $BlogCache->get_by_ID( $blog );
-
+$Blog = & $BlogCache->get_by_ID( $blog, false );
+if( empty( $Blog ) )
+{
+	require $view_path.'errors/_404_blog_not_found.page.php'; // error & exit
+	// EXIT.
+}
 
 /*
  * _______________________________ Locale / Charset for the Blog _________________________________
@@ -501,6 +505,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.58  2006/12/18 00:56:16  fplanque
+ * non existent blog error handling
+ *
  * Revision 1.57  2006/12/14 22:05:18  fplanque
  * doc
  *
