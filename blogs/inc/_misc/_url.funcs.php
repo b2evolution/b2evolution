@@ -53,39 +53,39 @@ function fetch_remote_page( $url, & $info )
 		}
 		$r = curl_exec($ch);
 		$info['status'] = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		$info['error'] = curl_error($ch);
 		curl_close($ch);
 
 		return $r;
 	}
 
-	// FOPEN:
-	if( ini_get('allow_url_fopen') )
+
+	// URL FOPEN:
+	if( ini_get('allow_url_fopen') && function_exists('stream_get_meta_data') /* PHP 4.3 */ )
 	{
 		$fp = @fopen($url, 'r');
-		if( ! $fp )
-		{
-			return false;
-		}
-
-		// headers:
-		$meta = stream_get_meta_data($fp);
-		if( ! $meta || ! preg_match( '~^HTTP/\d+\.\d+ (\d+)~', $meta['wrapper_data'][0], $match ) )
-		{
-			$info['error'] = 'Invalid response.';
-			$r = false;
-		}
-		else
-		{
-			$info['status'] = $match[1];
-			$r = '';
-			while( $buf = fread($fp, 4096) )
-			{ //read the complete file (binary safe)
-				$r .= $buf;
+		if( $fp )
+		{ // this will be false e.g. for "404", but it's not trivial to get the status error for this, so we retry with fsockopen further down
+			// headers:
+			$meta = stream_get_meta_data($fp);
+			if( ! $meta || ! preg_match( '~^HTTP/\d+\.\d+ (\d+)~', $meta['wrapper_data'][0], $match ) )
+			{
+				$info['error'] = 'Invalid response.';
+				$r = false;
 			}
-		}
-		fclose($fp);
+			else
+			{
+				$info['status'] = $match[1];
+				$r = '';
+				while( $buf = fread($fp, 4096) )
+				{ //read the complete file (binary safe)
+					$r .= $buf;
+				}
+			}
+			fclose($fp);
 
-		return $r;
+			return $r;
+		}
 	}
 
 
@@ -114,7 +114,7 @@ function fetch_remote_page( $url, & $info )
 	$fp = @fsockopen($host, $port, $errno, $errstr, 30);
 	if( ! $fp )
 	{
-		$info['error'] = $errstr.' ('.$errstr.')';
+		$info['error'] = $errstr.' (#'.$errno.')';
 		return false;
 	}
 
@@ -199,6 +199,9 @@ function url_same_protocol( $url, $other_url = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.4  2006/12/19 21:35:26  blueyed
+ * fetch_remote_page(): if url_fopen fails, use fsockopen-fallback (for errstr and status). Plus minor fixes.
+ *
  * Revision 1.3  2006/12/01 17:31:38  blueyed
  * Fixed url_fopen method for fetch_remote_page
  *
