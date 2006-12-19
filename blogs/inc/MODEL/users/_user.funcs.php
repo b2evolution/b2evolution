@@ -333,7 +333,7 @@ function get_user_profile_link( $before = '', $after = '', $link_text = '', $lin
 	if( $link_title == '#' ) $link_title = T_('Edit your profile');
 
 	$r = $before
-		.'<a href="'.url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=profile&amp;redirect_to='.rawurlencode(regenerate_url('','','','&')) )
+		.'<a href="'.url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=profile&amp;redirect_to='.rawurlencode( url_rel_to_same_host(regenerate_url('','','','&'), $Blog->get('blogurl')) ) )
 		.'" title="'.$link_title.'">'
 		.sprintf( $link_text, $current_User->login )
 		.'</a>'
@@ -500,6 +500,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.20  2006/12/19 20:48:28  blueyed
+ * MFB: Use relative URL for "redirect_to" in get_user_profile_link(). See http://forums.b2evolution.net/viewtopic.php?p=48686#48686
+ *
  * Revision 1.19  2006/12/16 01:30:46  fplanque
  * Setting to allow/disable email subscriptions on a per blog basis
  *
