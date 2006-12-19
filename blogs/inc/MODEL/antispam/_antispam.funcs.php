@@ -286,17 +286,17 @@ function antispam_poll_abuse()
 function get_ban_domain( $url )
 {
 	// echo '<p>'.$url;
-	
+
 	// Remove http:// part + everything after the last path element ( '/' alone is ignored on purpose )
-	$domain = preg_replace( '~^ ([a-z]+://)? ([^/]+) (/ ([^/]*/)+ )? .* ~xi', '\\2\\3', $url );
+	$domain = preg_replace( '~^ ([a-z]+://)? ([^/#]+) (/ ([^/]*/)+ )? .* ~xi', '\\2\\3', $url );
 
 	// echo '<br>'.$domain;
-	
+
 	if( preg_match( '~^[0-9.]+$~', $domain ) )
 	{	// All numeric = IP address, don't try to cut it any further
 		return '//'.$domain;
 	}
-	
+
 	// Remove any www*. prefix:
 	$base_domain = preg_replace( '~^(www \w* \. )~xi', '', $domain );
 
@@ -317,6 +317,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.18  2006/12/19 17:21:54  blueyed
+ * Fixed domain extraction if anchor (#) follows domain name directly. See http://forums.b2evolution.net/viewtopic.php?p=48672#48672
+ *
  * Revision 1.17  2006/11/21 19:18:39  fplanque
  * get_base_domain()  / get_ban_domain() may need more unit tests, especially about what to do when invalid URLs are passed.
  *

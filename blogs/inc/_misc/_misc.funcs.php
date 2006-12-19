@@ -2154,7 +2154,7 @@ function get_base_domain( $url )
 {
 	//echo '<p>'.$url;
 	// Chop away the http part and the path:
-	$domain = preg_replace( '~^([a-z]+://)?([^:/]+)(.*)$~i', '\\2', $url );
+	$domain = preg_replace( '~^([a-z]+://)?([^:/#]+)(.*)$~i', '\\2', $url );
 
 	if( empty($domain) || preg_match( '~^([0-9]+\.)+$~', $domain ) )
 	{	// Empty or All numeric = IP address, don't try to cut it any further
@@ -2752,6 +2752,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.156  2006/12/19 17:21:54  blueyed
+ * Fixed domain extraction if anchor (#) follows domain name directly. See http://forums.b2evolution.net/viewtopic.php?p=48672#48672
+ *
  * Revision 1.155  2006/12/14 00:42:04  fplanque
  * A little bit of windows detection / normalization
  *

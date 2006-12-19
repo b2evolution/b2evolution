@@ -249,6 +249,10 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( get_base_domain('https://hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
 		$this->assertEqual( get_base_domain('https://hello.example.com:8080/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
 
+		// Anchor after domain name, used by spammers:
+		$this->assertEqual( get_base_domain('http://example.com#anchor'), 'example.com' );
+		$this->assertEqual( get_base_domain('http://example.com/#anchor'), 'example.com' );
+
 		// "-" is a valid char:
 		$this->assertEqual( get_base_domain('host-name'), 'host-name' );
 		$this->assertEqual( get_base_domain('www-2.host-name.tld'), 'host-name.tld' );
@@ -299,6 +303,10 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( get_ban_domain('http://sub3.sub2.sub1.example.com'), '//sub3.sub2.sub1.example.com' );
 		$this->assertEqual( get_ban_domain('http://sub3.sub2.sub1.example.com'), '//sub3.sub2.sub1.example.com' );
 		$this->assertIdentical( get_ban_domain(''), false );
+
+		// Anchor after domain name, used by spammers:
+		$this->assertEqual( get_ban_domain('http://example.com#anchor'), '//example.com' );
+		$this->assertEqual( get_ban_domain('http://example.com/#anchor'), '//example.com' );
 	}
 
 
