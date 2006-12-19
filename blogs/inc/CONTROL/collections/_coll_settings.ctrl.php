@@ -39,7 +39,7 @@ $current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
 $AdminUI->set_path( 'blogs' );
 
-memorize_param( 'blog', 'integer', -1 );	// Needed when genereting static page for example
+memorize_param( 'blog', 'integer', -1 );	// Needed when generating static page for example
 param_action( 'edit' );
 param( 'tab', 'string', 'general', true );
 
@@ -197,6 +197,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2006/12/19 20:33:35  blueyed
+ * doc/todo
+ *
  * Revision 1.11  2006/12/18 03:20:41  fplanque
  * _header will always try to set $Blog.
  * autoselect_blog() will do so also.

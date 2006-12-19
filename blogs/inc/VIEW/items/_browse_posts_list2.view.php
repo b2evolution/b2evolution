@@ -65,7 +65,7 @@ $ItemList->cols[] = array(
 
 // Blog name:
 if( $Blog->get_setting( 'aggregate_coll_IDs' ) )
-{ // "All blogs": display name of blog
+{ // Aggregated blog: display name of blog
 	$ItemList->cols[] = array(
 			'th' => T_('Blog'),
 			'th_class' => 'nowrap',
@@ -202,6 +202,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.18  2006/12/19 20:33:35  blueyed
+ * doc/todo
+ *
  * Revision 1.17  2006/12/17 23:42:39  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.
