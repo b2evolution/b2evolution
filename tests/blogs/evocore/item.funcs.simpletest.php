@@ -47,8 +47,7 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 
 		if( ! can_convert_charsets('ISO-8859-1', 'UTF-8') || ! can_convert_charsets('UTF-8', 'ISO-8859-1') )
 		{
-			echo "Skipping tests (cannot convert charsets)...</br>\n";
-			// fp>> errr... what is it skipping ?? shouldn't there be a return here? I'm adding it:
+			echo "Skipping tests (cannot convert charsets)...<br />\n";
 			return;
 		}
 
