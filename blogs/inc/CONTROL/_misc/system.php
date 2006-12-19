@@ -138,7 +138,8 @@ if( version_compare(PHP_VERSION, '5.2', '>=') )
  * dh> Should we check for curl etc then also and warn the user until there's no method for us anymore to open remote files?
  * fp> Yes
  * dh> You must be kidding..!?! How do we open remote files (aka URLs) then?
- * As discussed on the mailing list. the get_url function should try curl, then fsock, then fopen as a last resort. We will not refuse to use fopen. But we will consider it insecure.
+ * fp> As discussed on the mailing list. the get_url function should try curl, then fsock, then fopen as a last resort. We will not refuse to use fopen. But we will consider it insecure.
+ * dh> You should read the above again.. if we check that "curl etc" is not available what should we use at the end??
  */
 init_system_check( 'PHP allow_url_fopen', ini_get('allow_url_fopen') ?  T_('On') : T_('Off') );
 if( ini_get('allow_url_fopen' ) )
@@ -350,6 +351,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2006/12/19 21:35:45  blueyed
+ * code discussion
+ *
  * Revision 1.11  2006/12/13 03:08:28  fplanque
  * thumbnail implementation design demo
  *
