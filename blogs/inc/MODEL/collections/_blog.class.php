@@ -225,12 +225,9 @@ class Blog extends DataObject
 		if( ($siteurl_type = param( 'blog_siteurl_type',   'string', NULL )) !== NULL )
 		{ // Blog URL parameters:
 			// TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
-			$blog_siteurl_relative = param( 'blog_siteurl_relative', 'string', true );
-			$blog_siteurl_absolute = param( 'blog_siteurl_absolute', 'string', true );
-
 			if( $siteurl_type == 'absolute' )
 			{
-				$blog_siteurl = $blog_siteurl_absolute;
+				$blog_siteurl = param( 'blog_siteurl_absolute', 'string', true );
 				if( !preg_match( '#^https?://.+#', $blog_siteurl ) )
 				{
 					$Messages->add( T_('Blog Folder URL').': '
@@ -239,7 +236,7 @@ class Blog extends DataObject
 			}
 			else
 			{ // relative siteurl
-				$blog_siteurl = $blog_siteurl_relative;
+				$blog_siteurl = param( 'blog_siteurl_relative', 'string', true );
 				if( preg_match( '#^https?://#', $blog_siteurl ) )
 				{
 					$Messages->add( T_('Blog Folder URL').': '
@@ -247,6 +244,19 @@ class Blog extends DataObject
 				}
 			}
 			$this->set( 'siteurl', $blog_siteurl );
+
+
+			// Test if "htsrv/" is accessible below blog's baseurl:
+			// TODO: dh> this should be a warning maybe, if fetch_remote_page() fails by itself..
+			global $htsrv_subdir;
+			load_funcs('_misc/_url.funcs.php');
+			fetch_remote_page($this->get('baseurl').$htsrv_subdir, $info);
+			if( $info['status'] == '404' || substr($info['status'], 0, 1) == '5' )
+			{
+				param_error( $siteurl_type == 'absolute' ? 'blog_siteurl_absolute' : 'blog_siteurl_relative',
+					sprintf( T_('The Blog Folder URL does not seem to be correct. Could not access %s (HTTP status %s).'),
+					$this->get('baseurl').$htsrv_subdir, $info['status'] ) );
+			}
 
 
 			// Preferred access type:
@@ -1075,6 +1085,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.47  2006/12/19 21:40:17  blueyed
+ * Test if baseurl is valid by testing if "htsrv/" is accessible below it; see http://forums.b2evolution.net/viewtopic.php?p=48707#48707 et seqq.
+ *
  * Revision 1.46  2006/12/17 23:42:38  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.
