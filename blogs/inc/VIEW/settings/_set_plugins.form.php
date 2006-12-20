@@ -43,17 +43,9 @@ global $current_User;
  * @var Plugins
  */
 global $admin_Plugins;
-/**
- * @var UserSettings
- */
-global $UserSettings;
 
 global $inc_path, $edit_Plugin;
 require_once $inc_path.'_misc/_plugin.funcs.php';
-
-
-// Store/retrieve order from UserSettings:
-$UserSettings->param_Request( 'results_plug_order', 'results_plug_order', 'string', '--A', true );
 
 
 $Results = new Results( '
@@ -269,168 +261,14 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 
 <?php
-// "Show available plugins" if currently hidden
-if( ! $UserSettings->get('plugins_disp_avail') )
-{
-	echo '<p class="center"><a href="'.regenerate_url( 'plugins_disp_avail', 'plugins_disp_avail=1' ).'">'.T_('Display available plugins.').'</a></p>';
-	return;
-}
-
-// Display available plugins:
-?>
-
-<fieldset>
-	<legend><?php echo T_('Available plugins') ?></legend>
-	<div class="right_icons"><?php
-	// "Hide available plugins":
-	echo action_icon( T_('Hide available plugins'), 'close', regenerate_url( 'plugins_disp_avail', 'plugins_disp_avail=0' ) )
-	?></div>
-
-	<table class="grouped" cellspacing="0">
-		<tbody>
-		<tr>
-			<th class="firstcol"><?php echo T_('Plugin') ?></th>
-			<th><?php echo T_('Description') ?></th>
-			<th><?php echo T_('Version') ?></th>
-			<th><?php echo T_('Help') ?></th>
-			<th class="lastcol"><?php echo T_('Actions') ?></th>
-		</tr>
-
-		<?php
-		if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_admin_no_DB' ) )
-		{ // (may have been instantiated for action 'info')
-			load_class('_misc/_plugins_admin_no_db.class.php');
-			$AvailablePlugins = & new Plugins_admin_no_DB(); // do not load registered plugins/events from DB
-			$AvailablePlugins->discover();
-		}
-
-		// Sort the plugins by group
-		$AvailablePlugins->sort('group');
-		// Grouping
-		$current_group = false; // False so it does the header once
-		$current_sub_group = '';
-
-		$number_of_groups = count($AvailablePlugins->get_plugin_groups());
-
-		$count = 0;
-		while( $loop_Plugin = & $AvailablePlugins->get_next() )
-		{
-
-			if( $loop_Plugin->group !== $current_group && $number_of_groups )
-			{ // Reason why $current_group is false
-				$current_group = $loop_Plugin->group;
-				$current_sub_group = '';
-				$count = 0;
-				?>
-				<tr class="PluginsGroup">
-					<th colspan="5"><?php
-					if( $current_group == '' || $current_group == 'Un-Grouped' )
-					{
-						echo T_('Un-classified');
-					}
-					else
-					{
-						echo $current_group;
-					}
-					?></th>
-				</tr>
-				<?php
-			}
-
-			if( $loop_Plugin->sub_group != $current_sub_group )
-			{
-				$current_sub_group = $loop_Plugin->sub_group;
-				$count = 0;
-				?>
-				<tr class="PluginsSubGroup">
-					<th colspan="5"><?php echo $current_sub_group; ?></th>
-				</tr>
-				<?php
-			}
-
-		?>
-		<tr class="<?php echo (($count++ % 2) ? 'odd' : 'even');
-			echo ( $current_sub_group != '' ? ' PluginsSubGroup' : ' PluginsGroup' ); ?>">
-
-			<td class="firstcol">
-				<strong><a title="<?php echo T_('Display info') ?>" href="<?php echo regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID) . '">'
-        .format_to_output($loop_Plugin->name); ?></a></strong>
-			</td>
-			<td>
-				<?php
-				echo format_to_output($loop_Plugin->short_desc);
-				/*
-				// Available events:
-				$registered_events = implode( ', ', $AvailablePlugins->get_registered_events( $loop_Plugin ) );
-				if( empty($registered_events) )
-				{
-					$registered_events = '-';
-				}
-				echo '<span class="advanced_info notes"><br />'.T_('Registered events:').' '.$registered_events.'</span>';
-				*/
-				?>
-			</td>
-			<td>
-				<?php
-				$clean_version = preg_replace( array('~^(CVS\s+)?\$'.'Revision:\s*~i', '~\s*\$$~'), '', $loop_Plugin->version );
-
-				echo format_to_output($clean_version);
-				?>
-			</td>
-			<td class="nowrap">
-				<?php
-				echo action_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID ) );
-				// Help icons, if available:
-				$help_icons = array();
-				if( $help_external = $loop_Plugin->get_help_link() )
-				{
-					$help_icons[] = $help_external;
-				}
-				if( $help_internal = $loop_Plugin->get_help_link('$readme') )
-				{
-					$help_icons[] = $help_internal;
-				}
-				if( ! empty($help_icons) )
-				{
-					echo ' '.implode( ' ', $help_icons );
-				}
-				?>
-			</td>
-			<td class="nowrap lastcol">
-				<?php
-				$registrations = $admin_Plugins->count_regs($loop_Plugin->classname);
-
-				if( $current_User->check_perm( 'options', 'edit', false )
-				    && ( ! isset( $loop_Plugin->number_of_installs )
-				         || $registrations < $loop_Plugin->number_of_installs ) )
-				{ // number of installations are not limited or not reached yet and user has "edit options" perms
-					?>
-					[<a href="admin.php?ctrl=plugins&amp;action=install&amp;plugin=<?php echo rawurlencode($loop_Plugin->classname) ?>"><?php
-						echo T_('Install');
-						if( $registrations )
-						{	// This plugin is already installed
-							echo ' #'.($registrations+1);
-						}
-						?></a>]
-					<?php
-				}
-				?>
-			</td>
-		</tr>
-		<?php
-		flush();
-		// free memory:
-		$AvailablePlugins->unregister($loop_Plugin);
-		}
-		?>
-		</tbody>
-	</table>
-</fieldset>
+echo '<p class="center"><a href="'.regenerate_url( 'action', 'action=list_available' ).'">'.T_('Display available plugins.').'</a></p>';
 
 
-<?php
 /*
  * $Log$
+ * Revision 1.43  2006/12/20 23:07:23  blueyed
+ * Moved list of available plugins to separate sub-screen/form
+ *
  * Revision 1.42  2006/12/16 04:07:10  fplanque
  * visual cleanup
  *

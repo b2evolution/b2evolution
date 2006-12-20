@@ -1515,7 +1515,10 @@ function upgrade_b2evo_tables()
 										AND ftyp_icon = 'php.gif'" );
 		echo "OK.<br />\n";
 
-
+		echo 'Remove obsolete user settings... ';
+		$DB->query( 'DELETE FROM T_usersettings
+									WHERE set_name = "plugins_disp_avail"' );
+		echo "OK.<br />\n";
 	}
 
 
@@ -1635,6 +1638,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.198  2006/12/20 23:07:24  blueyed
+ * Moved list of available plugins to separate sub-screen/form
+ *
  * Revision 1.197  2006/12/15 23:31:22  fplanque
  * reauthorized _ in urltitles.
  * No breaking of legacy permalinks.

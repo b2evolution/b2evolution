@@ -312,7 +312,7 @@ switch( $action )
 		break;
 
 
-	case 'install': // Install a plugin. This may be a two-step action, when DB changes have to be confirmed {{{
+	case 'install': // Install a plugin. This may be a two-step action, when DB changes have to be confirmed
 		$action = 'list';
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -1015,10 +1015,17 @@ switch( $action )
 }
 
 
-if( $action == 'list' )
+switch( $action )
 {
-	// Display VIEW:
-	$AdminUI->disp_view( 'settings/_set_plugins.form.php' );
+	case 'list':
+		// Display VIEW:
+		$AdminUI->disp_view( 'settings/_set_plugins.form.php' );
+		break;
+
+	case 'list_available':
+		// Display VIEW:
+		$AdminUI->disp_view( 'settings/_set_plugins_available.form.php' );
+		break;
 }
 
 // End payload block:
@@ -1029,6 +1036,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.72  2006/12/20 23:07:23  blueyed
+ * Moved list of available plugins to separate sub-screen/form
+ *
  * Revision 1.71  2006/12/04 22:34:30  blueyed
  * Use Plugins_admin::register() to instantiate $default_Plugin
  *
