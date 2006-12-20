@@ -87,6 +87,25 @@ class AutoPPluginTestCase extends PluginUnitTestCase
 
 
 	/**
+	 * Test special tags ("<!--more-->", "<!--nextpage-->" and "<!--noteaser-->")
+	 */
+	function test_special_tags()
+	{
+		$this->assertEqual( "<p>foo</p><!--more--><p>bar</p>",
+			$this->render( 'foo<!--more-->bar' ) );
+
+		$this->assertEqual( "<p>foo</p><!--more--><!--noteaser--><p>bar</p>",
+			$this->render( 'foo<!--more--><!--noteaser-->bar' ) );
+
+		$this->assertEqual( "<p>foo</p><!--nextpage--><p>bar</p>",
+			$this->render( 'foo<!--nextpage-->bar' ) );
+
+		$this->assertEqual( "<p>foo</p><!--noteaser--><p>bar</p>",
+			$this->render( 'foo<!--noteaser-->bar' ) );
+	}
+
+
+	/**
 	 * Test rendering of the Auto-P plugin.
 	 */
 	function test_render()

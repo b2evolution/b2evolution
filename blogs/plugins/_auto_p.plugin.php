@@ -90,25 +90,27 @@ class auto_p_plugin extends Plugin
 	{
 		#echo '<hr style="border:1em solid blue;" />';
 
-		$content = & $params['data'];
-
 		$this->use_auto_br = $this->Settings->get('br');
 		$this->add_p_in_block = $this->Settings->get('add_p_in_block');
 		$this->skip_tags = preg_split( '~\s+~', $this->Settings->get('skip_tags'), -1, PREG_SPLIT_NO_EMPTY );
 
+		$content = & $params['data'];
+
 		$content = preg_replace( "~(\r\n|\r)~", "\n", $content ); // cross-platform newlines
 
-		// Handle blocks, splitted by "<!--more-->":
+		// Handle blocks, splitted by "<!--more-->", "<!--nextpage-->" or "<!--noteaser-->":
 		// fp> don't we also want to split the pages?
-		$content_parts = explode('<!--more-->', $content);
+		$content_parts = preg_split( '~(<!--(?:more|nextpage|noteaser)-->)~', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
+		$content_parts[] = '';
 
-		$new_content_parts = array();
-		foreach( $content_parts as $content_part )
+		$content = '';
+		for( $i = 0; $i < count($content_parts); $i = $i+2 )
 		{
-			$new_content_parts[] = $this->handle_blocks( $content_part );
+			$content .= $this->handle_blocks( $content_parts[$i] );
+			$content .= $content_parts[$i+1];
 		}
 
-		return implode('<!--more-->', $new_content_parts);
+		return true;
 	}
 
 
@@ -631,6 +633,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.34  2006/12/20 13:42:54  blueyed
+ * Made Auto-P plugin work again and let it handle also nextpage and noteaser special tags
+ *
  * Revision 1.33  2006/12/18 13:31:12  fplanque
  * fixed broken more tag
  *
