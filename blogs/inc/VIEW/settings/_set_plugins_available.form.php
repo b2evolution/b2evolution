@@ -87,14 +87,11 @@ global $admin_Plugins;
 				$current_sub_group = '';
 				$count = 0;
 				?>
-				<tr class="PluginsSeperator">
-					<th colspan="5"></th>
-				</tr>
 				<tr class="PluginsGroup">
 					<th colspan="5"><?php
 					if( $current_group == '' || $current_group == 'Un-Grouped' )
 					{
-						echo T_('Un-Grouped');
+						echo T_('Un-Classified');
 					}
 					else
 					{
@@ -199,6 +196,9 @@ global $admin_Plugins;
 <?php
 /*
  * $Log$
+ * Revision 1.2  2006/12/20 23:46:01  blueyed
+ * Part of last change to _set_plugins.form.php has been lost while splitting
+ *
  * Revision 1.1  2006/12/20 23:07:23  blueyed
  * Moved list of available plugins to separate sub-screen/form
  *
