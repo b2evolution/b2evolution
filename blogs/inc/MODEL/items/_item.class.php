@@ -1254,6 +1254,10 @@ class Item extends DataObject
 			global $page;
 			$disppage = $page;
 		}
+
+		// TODO: dh> there's a regression here! E.g. the smilies plugin cannot render the "=>" from the "<!--more-->" tag anymore.
+		//       (Pre)Rendering should probably be done according to $disppage and <!--more--> should get handled before.
+		//       See http://forums.b2evolution.net//viewtopic.php?p=48746#48746 and the splitting required by the Auto-P plugin.
 		$content_page = $this->get_content_page( $disppage, $format ); // cannot include format_to_output() because of the magic below.. eg '<!--more-->' will get stripped in "xml"
 		// pre_dump($content_page);
 
@@ -3335,6 +3339,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.142  2006/12/20 13:57:34  blueyed
+ * TODO about regression because of pre-rendering and the <!--more--> tag
+ *
  * Revision 1.141  2006/12/18 13:31:12  fplanque
  * fixed broken more tag
  *
