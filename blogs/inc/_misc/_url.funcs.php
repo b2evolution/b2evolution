@@ -28,7 +28,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 /**
  * Fetch remote page
+ *
  * Attempt to retrieve a remote page, first with cURL, then fopen, then fsockopen.
+ * @todo fp> order should be cURL, then fsockopen, then fopen.
+ *
  * @param string URL
  * @param array Info (by reference)
  *        'error': holds error message, if any
@@ -199,6 +202,9 @@ function url_same_protocol( $url, $other_url = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.5  2006/12/21 21:50:52  fplanque
+ * doc
+ *
  * Revision 1.4  2006/12/19 21:35:26  blueyed
  * fetch_remote_page(): if url_fopen fails, use fsockopen-fallback (for errstr and status). Plus minor fixes.
  *
