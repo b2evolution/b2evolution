@@ -591,7 +591,7 @@ function rel_path_to_base( $path )
 /**
  * Get the directories of the supplied path as a radio button tree.
  *
- * @param NULL|FileRoot A single root or NULL for all available.
+ * @param FileRoot A single root or NULL for all available.
  * @param string the root path to use
  * @param array Parameters
  *      - 'disp_radios': display a radio with each directory that's meant to select it in a form
@@ -637,13 +637,22 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 
 
 	// We'll go through files in current dir:
-	$Nodelist = new Filelist( $Root, trailing_slash($path) );
+	$Nodelist = & new Filelist( $Root, trailing_slash($path) );
 	$Nodelist->load();
 	$has_sub_dirs = $Nodelist->count_dirs();
 
 	$id_path = 'id_path_'.$instance_ID.md5( $path );
 
 	$r['string'] = '<span class="folder_in_tree">';
+
+	if( !empty($fm_Filelist) && $Root->ID == $fm_FileRoot->ID && $rootSubpath == $fm_Filelist->get_rds_list_path() )
+	{	// This is the current open path
+	 	$r['opened'] = true;
+	}
+	else
+	{
+	 	$r['opened'] = NULL;
+	}
 
 	// Optional radio input to select this path:
 	if( ! empty($params['disp_radios']) )
@@ -654,13 +663,16 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 			.' type="radio"'
 			.' name="root_and_path"'
 			.' value="'.$root_and_path.'"'
-			.' id="radio_'.$id_path.'"'
-			.( $Root->ID == $fm_FileRoot->ID && $rootSubpath == $fm_Filelist->get_rds_list_path() ? ' checked="checked"' : '' )
-			//.( ! $has_sub_dirs ? ' style="margin-right:'.get_icon( 'collapse', 'size', array( 'size' => 'width' ) ).'px"' : '' )
-			.' /> &nbsp; &nbsp;';
-	}
+			.' id="radio_'.$id_path.'"';
 
- 	$r['opened'] = ( $Root->ID == $fm_FileRoot->ID && $rootSubpath == $fm_Filelist->get_rds_list_path() ) ? true : NULL;
+		if( $r['opened'] )
+		{	// This is the current open path
+			$r['string'] .= ' checked="checked"';
+		}
+
+		//.( ! $has_sub_dirs ? ' style="margin-right:'.get_icon( 'collapse', 'size', array( 'size' => 'width' ) ).'px"' : '' )
+		$r['string'] .= ' /> &nbsp; &nbsp;';
+	}
 
 	// Folder Icon + Name:
 	$url = regenerate_url( 'root,path,fm_disp_browser', 'root='.$Root->ID.'&amp;path='.$rootSubpath.'&amp;fm_disp_browser=1' );
@@ -775,6 +787,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.37  2006/12/21 23:39:32  fplanque
+ * minor refactoring.
+ *
  * Revision 1.36  2006/12/14 23:02:43  blueyed
  * Fixed handling of "0" as directory
  *
