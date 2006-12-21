@@ -50,7 +50,7 @@ class basic_antispam_plugin extends Plugin
 	var $name = 'Basic Antispam';
 	var $code = '';
 	var $priority = 60;
-	var $version = '1.9-dev';
+	var $version = '2.0-dev';
 	var $author = 'The b2evo Group';
 
 
@@ -100,12 +100,6 @@ class basic_antispam_plugin extends Plugin
 					'label' => T_('Check referers for URL'),
 					'note' => T_('Check refering pages, if they contain our URL. This may generate a lot of additional traffic!'),
 					'defaultvalue' => '0',
-				),
-				'check_url_trackbacks' => array(
-					'type' => 'checkbox',
-					'label' => T_('Check trackbacks for URL'),
-					'note' => T_('Check trackback pages, if they contain our URL. This may generate a lot of additional traffic!'),
-					'defaultvalue' => '1',
 				),
 
 			);
@@ -158,7 +152,7 @@ class basic_antispam_plugin extends Plugin
 	 * Disable/Enable events according to settings.
 	 *
 	 * "AppendHitLog" gets enabled according to check_url_referers setting.
-	 * "BeforeTrackbackInsert" gets disabled, if we do not check for duplicate content and do not check for our URL.
+	 * "BeforeTrackbackInsert" gets disabled, if we do not check for duplicate content.
 	 */
 	function BeforeEnable()
 	{
@@ -171,7 +165,7 @@ class basic_antispam_plugin extends Plugin
 			$this->disable_event( 'AppendHitLog' );
 		}
 
-		if( ! $this->Settings->get('check_dupes') && ! $this->Settings->get('check_url_trackbacks') )
+		if( ! $this->Settings->get('check_dupes') )
 		{
 			$this->disable_event( 'BeforeTrackbackInsert' );
 		}
@@ -185,7 +179,6 @@ class basic_antispam_plugin extends Plugin
 
 
 	/**
-	 * - Check if our hostname is linked in the URL of the trackback.
 	 * - Check for duplicate trackbacks.
 	 */
 	function BeforeTrackbackInsert( & $params )
@@ -193,12 +186,6 @@ class basic_antispam_plugin extends Plugin
 		if( $this->is_duplicate_comment( $params['Comment'] ) )
 		{
 			$this->msg( T_('The trackback seems to be a duplicate.'), 'error' );
-			return;
-		}
-
-		if( $this->Settings->get('check_url_trackbacks') && ! $this->is_referer_linking_us( $params['Comment']->author_url, '' ) )
-		{ // Our hostname is not linked by the permanent url of the refering entry:
-			$this->msg( T_('Could not find link to us in your URL!'), 'error' );
 		}
 	}
 
@@ -395,31 +382,83 @@ class basic_antispam_plugin extends Plugin
 			return false;
 		}
 
-		if( ! ($fp = @fopen( $referer, 'r' )) )
-		{ // could not access referring page
-			$this->debug_log( 'is_referer_linking_us(): could not access &laquo;'.$referer.'&raquo;' );
+		// Load page content (max. 500kb), using fsockopen:
+		$url_parsed = parse_url($referer);
+		if( empty($url_parsed['scheme']) ) {
+			$url_parsed = parse_url('http://'.$referer);
+		}
 
+		$host = $url_parsed['host'];
+		$port = ( empty($url_parsed['port']) ? 80 : $url_parsed['port'] );
+		$path = empty($url_parsed['path']) ? '/' : $url_parsed['path'];
+		if( ! empty($url_parsed['query']) )
+		{
+			$path .= '?'.$url_parsed['query'];
+		}
+
+		$fp = @fsockopen($host, $port, $errno, $errstr, 30);
+		if( ! $fp )
+		{ // could not access referring page
+			$this->debug_log( 'is_referer_linking_us(): could not access &laquo;'.$referer.'&raquo; (host: '.$host.'): '.$errstr.' (#'.$errno.')' );
 			return false;
 		}
 
-		socket_set_timeout($fp, 5); // timeout after 5 seconds
+		// Set timeout for data:
+		if( function_exists('stream_set_timeout') )
+			stream_set_timeout( $fp, 20 ); // PHP 4.3.0
+		else
+			socket_set_timeout( $fp, 20 ); // PHP 4
+
+		// Send request:
+		$out = "GET $path HTTP/1.0\r\n";
+		$out .= "Host: $host:$port\r\n";
+		$out .= "Connection: Close\r\n\r\n";
+		fwrite($fp, $out);
+
+		// Skip headers:
+		$i = 0;
+		$source_charset = 'iso-8859-1'; // default
+		while( ($s = fgets($fp, 4096)) !== false )
+		{
+			$i++;
+			if( $s == "\r\n" || $i > 100 /* max 100 head lines */ )
+			{
+				break;
+			}
+			if( preg_match('~^Content-Type:.*?charset=([\w-]+)~i', $s, $match ) )
+			{
+				$source_charset = $match[1];
+			}
+		}
+
 		// Get the refering page's content
 		$content_ref_page = '';
 		$bytes_read = 0;
-		while( ($l_byte = fgetc($fp)) !== false )
+		while( ($s = fgets($fp, 4096)) !== false )
 		{
-			$content_ref_page .= $l_byte;
-			if( ++$bytes_read > 512000 )
+			$content_ref_page .= $s;
+			$bytes_read += strlen($s);
+			if( $bytes_read > 512000 )
 			{ // do not pull more than 500kb of data!
 				break;
 			}
 		}
+		fclose($fp);
+
+		if( ! strlen($content_ref_page) )
+		{
+			$this->debug_log( 'is_referer_linking_us(): empty $content_ref_page ('.bytesreadable($bytes_read).' read)' );
+			return false;
+		}
+
 
 		/**
 		 * IDNA converter class
 		 */
 		require_once $misc_inc_path.'ext/_idna_convert.class.php';
 		$IDNA = new Net_IDNA_php4();
+
+		$have_idn_name = false;
 
 		// Build the search pattern:
 		// We match for basically for 'href="[SERVER][URI]', where [SERVER] is a list of possible hosts (especially IDNA)
@@ -443,11 +482,12 @@ class basic_antispam_plugin extends Plugin
 		}
 		$search_pattern_hosts = array_unique($search_pattern_hosts);
 		foreach( $search_pattern_hosts as $l_host )
-		{ // add IDN, because this is probably linked
+		{ // add IDN, because this could be linked:
 			$l_idn_host = $IDNA->decode( $l_host ); // the decoded puny-code ("xn--..") name (utf8)
 
 			if( $l_idn_host != $l_host )
 			{
+				$have_idn_name = true;
 				$search_pattern_hosts[] = $l_idn_host;
 			}
 		}
@@ -457,10 +497,31 @@ class basic_antispam_plugin extends Plugin
 		{
 			$search_pattern_hosts[$i] = preg_quote( $search_pattern_hosts[$i], '~' );
 		}
-		$search_pattern .= implode( '|', $search_pattern_hosts ).')'.$uri.'~i';
+		$search_pattern .= implode( '|', $search_pattern_hosts ).')';
+		if( empty($uri) )
+		{ // host(s) should end with "/", "'", '"', "?" or whitespace
+			$search_pattern .= '[/"\'\s?]';
+		}
+		else
+		{
+			$search_pattern .= preg_quote($uri, '~');
+			// URI should end with "'", '"' or whitespace
+			$search_pattern .= '["\'\s]';
+		}
+		$search_pattern .= '~i';
 
+		if( $have_idn_name )
+		{ // Convert charset to UTF-8, because the decoded domain name is UTF-8, too:
+			if( can_convert_charsets( 'utf-8', $source_charset ) )
+			{
+				$content_ref_page = convert_charset( $content_ref_page, 'utf-8', $source_charset );
+			}
+			else
+			{
+				$this->debug_log( 'is_referer_linking_us(): warning: cannot convert charset of referring page' );
+			}
+		}
 
-		// TODO: handle encoding of the refering page (mbstrings), if we have decoded base name, $content_ref_page must be utf8
 		if( preg_match( $search_pattern, $content_ref_page ) )
 		{
 			$this->debug_log( 'is_referer_linking_us(): found current URL in page ('.bytesreadable($bytes_read).' read)' );
@@ -535,11 +596,29 @@ class basic_antispam_plugin extends Plugin
 		return $DB->get_var( $sql, 0, 0, 'Checking for duplicate feedback content.' );
 	}
 
+
+	/**
+	 * A little housekeeping.
+	 * @return true
+	 */
+	function PluginVersionChanged( & $params )
+	{
+		$this->Settings->delete('check_url_trackbacks');
+		$this->Settings->dbupdate();
+	}
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.25  2006/12/21 16:14:25  blueyed
+ * Basic Antispam Plugin:
+ * - Use fsockopen instead of url fopen to get refering page contents
+ * - Removed "check_url_trackbacks" setting: it has been unreliable and is against the trackback specs anyway. This is what pingbacks are for.
+ * - Convert charset of the refering page contents, if we have a decoded/utf-8 encoded IDN
+ * - Some improvements to matching pattern
+ *
  * Revision 1.24  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
