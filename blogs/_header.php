@@ -15,13 +15,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $BlogCache = & get_Cache( 'BlogCache' );
 
 // Get the requested blog NOW; we need it for quite a few of the menu urls:
-// TODO: dh> shouldn't $Blog get set by reference?
 $user_selected_blog = (int)$UserSettings->get('selected_blog');
 if( param( 'blog', 'integer', NULL, true ) === NULL      // We got no explicit blog choice (not even '0' for 'no blog'):
-	|| ($blog != 0 && ! ($Blog = $BlogCache->get_by_ID( $blog, false, false )) )) // or we requested a nonexistent blog
+	|| ($blog != 0 && ! ($Blog = & $BlogCache->get_by_ID( $blog, false, false )) )) // or we requested a nonexistent blog
 { // Try the memorized blog from the previous action:
 	$blog = $user_selected_blog;
-	if( ! ($Blog = $BlogCache->get_by_ID( $blog, false, false ) ) )
+	if( ! ($Blog = & $BlogCache->get_by_ID( $blog, false, false ) ) )
 	{	// That one doesn't exist either...
 		$blog = 0;
 	}
@@ -324,6 +323,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.40  2006/12/21 22:56:38  fplanque
+ * Blog set by reference
+ *
  * Revision 1.39  2006/12/19 20:33:35  blueyed
  * doc/todo
  *
