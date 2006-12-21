@@ -247,6 +247,11 @@ class Blog extends DataObject
 
 
 			// Test if "htsrv/" is accessible below blog's baseurl:
+/* fp> This is not in the "specs". htsrv does NOT have to be a subfolder of the blog baseurl.
+			// If some code somewhere assumes that htsrv is under the blog basurl, THERE is the issue that needs a fix. Not here.
+			// (Current implementation of multihoming should not be considered as reference.)
+			// Ideally, it would be possible to choose the location of htsrv for each blog. Even more important with absolute URLs where the htsrv may be on a different domain. (might create cookie issues though)
+			// Assuming htsrv is under the blog baseurl is okay for a default. It is not okay as a requirement.
 			// TODO: dh> this should be a warning maybe, if fetch_remote_page() fails by itself..
 			global $htsrv_subdir;
 			load_funcs('_misc/_url.funcs.php');
@@ -257,7 +262,7 @@ class Blog extends DataObject
 					sprintf( T_('The Blog Folder URL does not seem to be correct. Could not access %s (HTTP status %s).'),
 					$this->get('baseurl').$htsrv_subdir, $info['status'] ) );
 			}
-
+*/
 
 			// Preferred access type:
 			$this->set( 'access_type',   param( 'blog_access_type',   'string', true ) );
@@ -1085,6 +1090,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.48  2006/12/21 22:25:43  fplanque
+ * Removed restricting constraint. (It may have been good for hiding a bug, but it restricts the purpose)
+ *
  * Revision 1.47  2006/12/19 21:40:17  blueyed
  * Test if baseurl is valid by testing if "htsrv/" is accessible below it; see http://forums.b2evolution.net/viewtopic.php?p=48707#48707 et seqq.
  *
