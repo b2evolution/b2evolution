@@ -384,7 +384,7 @@ function get_canonical_path( $ads_path )
 
 	$ads_path = str_replace( '//', '/', $ads_path );
 	$ads_path = str_replace( '/./', '/', $ads_path );
-	while( ($ads_realpath = preg_replace( '#(^|/)([^/]+)/\.\./#', '$1', $ads_path )) != $ads_path )
+	while( ($ads_realpath = preg_replace( '#(^|/)([^/^.]+)/\.\./#', '$1', $ads_path )) != $ads_path )
 	{ // While we find /../ back references to dereference...
 		// echo '*';
 		$ads_path = $ads_realpath;
@@ -392,8 +392,8 @@ function get_canonical_path( $ads_path )
 
 	// pre_dump( 'get_canonical_path()', $ads_path, $ads_realpath );
 
-	if( empty( $ads_realpath ) )
-	{	// Path doesn't exist:
+	if( strpos( $ads_realpath, '..' ) !== false )
+	{	// Path malformed:
 		return NULL;
 	}
 
@@ -783,6 +783,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.43  2006/12/22 01:17:37  fplanque
+ * fix
+ *
  * Revision 1.42  2006/12/22 01:09:30  fplanque
  * cleanup
  *

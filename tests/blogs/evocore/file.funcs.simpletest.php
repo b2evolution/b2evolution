@@ -102,7 +102,12 @@ class FileFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( get_canonical_path( 'hello/../world/' ), 'world/' );
 		$this->assertEqual( get_canonical_path( '/hello/../world/../' ), '/' );
 		$this->assertEqual( get_canonical_path( '/hello/world/../../' ), '/' );
+		$this->assertEqual( get_canonical_path( '/../' ), NULL );
+		$this->assertEqual( get_canonical_path( '/../../' ), NULL );	// Even number of ..
 		$this->assertEqual( get_canonical_path( 'C:\\hello\\world\\..\\..\\' ), 'C:/' );
+		$this->assertEqual( get_canonical_path( 'C:\\hello\\world\\..\\..\\..\\' ), NULL );
+		$this->assertEqual( get_canonical_path( 'C:\\hello\\world\\..\\..\\..\\..\\' ), NULL );
+		$this->assertEqual( get_canonical_path( 'C:\\../..\\' ), NULL );
 	}
 }
 
