@@ -105,10 +105,6 @@ function fetch_remote_page( $url, & $info )
 	{
 		$path .= '?'.$url_parsed['query'];
 	}
-	if( ! empty($url_parsed['fragment']) )
-	{
-		$path .= '#'.$url_parsed['fragment'];
-	}
 
 	$out = "GET $path HTTP/1.0\r\n";
 	$out .= "Host: $host:$port\r\n";
@@ -202,6 +198,9 @@ function url_same_protocol( $url, $other_url = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.6  2006/12/22 00:25:15  blueyed
+ * Do not send URL fragment in GET
+ *
  * Revision 1.5  2006/12/21 21:50:52  fplanque
  * doc
  *
