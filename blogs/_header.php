@@ -129,7 +129,15 @@ $AdminUI->add_menu_entries(
 				'text' => T_('Files'),
 				'title' => T_('File management'),
 				'href' => 'admin.php?ctrl=files',
-				'perm_eval' => 'global $Settings; return $Settings->get( \'fm_enabled\' ) && $current_User->check_perm( \'files\', \'view\' );'
+				'perm_eval' => 'global $Settings; return $Settings->get( \'fm_enabled\' ) && $current_User->check_perm( \'files\', \'view\' );',
+				'entries' => array(
+					'browse' => array(
+						'text' => T_('Browse'),
+						'href' => 'admin.php?ctrl=files' ),
+					'upload' => array(
+						'text' => T_('Upload'),
+						'href' => 'admin.php?ctrl=upload' ),
+					),
 			),
 
 			'stats' => array(
@@ -323,6 +331,10 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.41  2006/12/22 00:51:33  fplanque
+ * dedicated upload tab - proof of concept
+ * (interlinking to be done)
+ *
  * Revision 1.40  2006/12/21 22:56:38  fplanque
  * Blog set by reference
  *

@@ -56,6 +56,7 @@ $ctrl_mappings = array(
 		'system'       => '_misc/system.php',
 		'tools'        => '_misc/tools.php',
 		'users'        => 'users/b2users.php',
+		'upload'       => 'files/_upload.ctrl.php',
 	);
 
 
