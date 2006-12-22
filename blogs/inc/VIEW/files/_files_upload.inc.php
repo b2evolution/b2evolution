@@ -38,7 +38,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $Settings;
 
-global $upload_quickmode, $failedFiles;
+global $upload_quickmode, $failedFiles, $ads_list_path;
 
 ?>
 
@@ -181,31 +181,6 @@ global $upload_quickmode, $failedFiles;
 		<div class="box_files_to_upload">
 		<fieldset class="files_to_upload">
 			<legend><?php echo T_('Files to upload') ?></legend>
-
-			<p>
-				<?php
-				$restrictNotes = array();
-
-				// Get list of recognized file types (others are not allowed to get uploaded)
-				// dh> because FiletypeCache/DataObjectCache has no interface for getting a list, this dirty query seems less dirty to me.
-				$allowed_extensions = $DB->get_col( 'SELECT ftyp_extensions FROM T_filetypes WHERE ftyp_allowed != 0' );
-				$allowed_extensions = implode( ' ', $allowed_extensions ); // implode with space, ftyp_extensions can hold many, separated by space
-				// into array:
-				$allowed_extensions = preg_split( '~\s+~', $allowed_extensions, -1, PREG_SPLIT_NO_EMPTY );
-				// readable:
-				$allowed_extensions = implode_with_and($allowed_extensions);
-
-				$restrictNotes[] = '<strong>'.T_('Allowed file extensions').'</strong>: '.$allowed_extensions;
-
-				if( $Settings->get( 'upload_maxkb' ) )
-				{ // We want to restrict on file size:
-					$restrictNotes[] = '<strong>'.T_('Maximum allowed file size').'</strong>: '.bytesreadable( $Settings->get( 'upload_maxkb' )*1024 );
-				}
-
-				echo implode( '<br />', $restrictNotes ).'<br />';
-				?>
-			</p>
-
 			<ul id="uploadfileinputs">
 				<?php
 					if( empty($failedFiles) )
@@ -264,6 +239,30 @@ global $upload_quickmode, $failedFiles;
 			</ul>
 
 			<p class="uploadfileinputs"><a href="#" onclick="addAnotherFileInput(); return false;"><?php echo T_('Add another file'); ?></a></p>
+
+			<p>
+				<?php
+				$restrictNotes = array();
+
+				// Get list of recognized file types (others are not allowed to get uploaded)
+				// dh> because FiletypeCache/DataObjectCache has no interface for getting a list, this dirty query seems less dirty to me.
+				$allowed_extensions = $DB->get_col( 'SELECT ftyp_extensions FROM T_filetypes WHERE ftyp_allowed != 0' );
+				$allowed_extensions = implode( ' ', $allowed_extensions ); // implode with space, ftyp_extensions can hold many, separated by space
+				// into array:
+				$allowed_extensions = preg_split( '~\s+~', $allowed_extensions, -1, PREG_SPLIT_NO_EMPTY );
+				// readable:
+				$allowed_extensions = implode_with_and($allowed_extensions);
+
+				$restrictNotes[] = '<strong>'.T_('Allowed file extensions').'</strong>: '.$allowed_extensions;
+
+				if( $Settings->get( 'upload_maxkb' ) )
+				{ // We want to restrict on file size:
+					$restrictNotes[] = '<strong>'.T_('Maximum allowed file size').'</strong>: '.bytesreadable( $Settings->get( 'upload_maxkb' )*1024 );
+				}
+
+				echo implode( '<br />', $restrictNotes ).'<br />';
+				?>
+			</p>
 		</fieldset>
 		</div>
 
@@ -271,7 +270,7 @@ global $upload_quickmode, $failedFiles;
 		<fieldset class="upload_into">
 			<legend><?php echo T_('Upload files into:'); ?></legend>
 			<?php
-				echo get_directory_tree( NULL, NULL, array('disp_radios'=>true) );
+				echo get_directory_tree( NULL, NULL, $ads_list_path, true );
 			?>
 		</fieldset>
 		</div>
@@ -288,6 +287,10 @@ global $upload_quickmode, $failedFiles;
 
 /*
  * $Log$
+ * Revision 1.8  2006/12/22 00:17:05  fplanque
+ * got rid of dirty globals
+ * some refactoring
+ *
  * Revision 1.7  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

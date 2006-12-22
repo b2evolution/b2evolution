@@ -80,7 +80,7 @@ global $selected_Filelist;
 global $edited_Item;
 
 
-global $disp_fm_browser_toggle, $fm_hide_dirtree, $create_name;
+global $disp_fm_browser_toggle, $fm_hide_dirtree, $create_name, $ads_list_path;
 
 
 // Begin payload block:
@@ -289,7 +289,7 @@ $Form->end_form();
 	{
 		echo '<td id="fm_dirtree">';
 
-		echo get_directory_tree();
+		echo get_directory_tree( NULL, NULL, $ads_list_path );
 
 		echo '</td>';
 	}
@@ -974,6 +974,10 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.33  2006/12/22 00:17:05  fplanque
+ * got rid of dirty globals
+ * some refactoring
+ *
  * Revision 1.32  2006/12/14 02:18:23  fplanque
  * fixed navigation
  *

@@ -593,13 +593,12 @@ function rel_path_to_base( $path )
  *
  * @param FileRoot A single root or NULL for all available.
  * @param string the root path to use
- * @param array Parameters
- *      - 'disp_radios': display a radio with each directory that's meant to select it in a form
+ * @param boolean add radio buttons ?
+ * @param string used by recursion
  * @return string
  */
-function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $rootSubpath = NULL, $name = NULL )
+function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_full_path = NULL, $radios = false, $rds_rel_path = NULL )
 {
-	global $fm_FileRoot, $fm_Filelist;
 	static $js_closeClickIDs; // clickopen IDs that should get closed
 	static $instance_ID = 0;
 
@@ -615,7 +614,7 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 		$r = '<ul class="clicktree">';
 		foreach( $_roots as $l_Root )
 		{
-			$subR = get_directory_tree( $l_Root, $l_Root->ads_path, $params, '' );
+			$subR = get_directory_tree( $l_Root, $l_Root->ads_path, $ads_selected_full_path, $radios, '' );
 			if( !empty( $subR['string'] ) )
 			{
 				$r .= '<li>'.$subR['string'].'</li>';
@@ -637,15 +636,16 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 
 
 	// We'll go through files in current dir:
-	$Nodelist = & new Filelist( $Root, trailing_slash($path) );
+	$Nodelist = & new Filelist( $Root, trailing_slash($ads_full_path) );
 	$Nodelist->load();
 	$has_sub_dirs = $Nodelist->count_dirs();
 
-	$id_path = 'id_path_'.$instance_ID.md5( $path );
+	$id_path = 'id_path_'.$instance_ID.md5( $ads_full_path );
 
 	$r['string'] = '<span class="folder_in_tree">';
 
-	if( !empty($fm_Filelist) && $Root->ID == $fm_FileRoot->ID && $rootSubpath == $fm_Filelist->get_rds_list_path() )
+	// echo '<br />'. $rds_rel_path . ' - '.$ads_full_path;
+	if( $ads_full_path == $ads_selected_full_path )
 	{	// This is the current open path
 	 	$r['opened'] = true;
 	}
@@ -655,9 +655,9 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 	}
 
 	// Optional radio input to select this path:
-	if( ! empty($params['disp_radios']) )
+	if( $radios )
 	{
-		$root_and_path = format_to_output( implode( '::', array($Root->ID, $rootSubpath) ), 'formvalue' );
+		$root_and_path = format_to_output( implode( '::', array($Root->ID, $rds_rel_path) ), 'formvalue' );
 
 		$r['string'] .= '<input'
 			.' type="radio"'
@@ -675,12 +675,12 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 	}
 
 	// Folder Icon + Name:
-	$url = regenerate_url( 'root,path,fm_disp_browser', 'root='.$Root->ID.'&amp;path='.$rootSubpath.'&amp;fm_disp_browser=1' );
+	$url = regenerate_url( 'root,path,fm_disp_browser', 'root='.$Root->ID.'&amp;path='.$rds_rel_path.'&amp;fm_disp_browser=1' );
 	$label = '<label for="radio_'.$id_path.'">'
 		.action_icon( T_('Open this directory in the file manager'), 'folder', $url )
 		.'<a href="'.$url.'"
 		title="'.T_('Open this directory in the file manager').'">'
-		.( empty($rootSubpath) ? $Root->name : basename( $path ) )
+		.( empty($rds_rel_path) ? $Root->name : basename( $ads_full_path ) )
 		.'</a>'
 		.'</label>';
 
@@ -701,7 +701,7 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 
 		while( $l_File = & $Nodelist->get_next( 'dir' ) )
 		{
-			$rSub = get_directory_tree( $Root, $l_File->get_full_path(), $params, $l_File->get_rdfs_rel_path() );
+			$rSub = get_directory_tree( $Root, $l_File->get_full_path(), $ads_selected_full_path, $radios, $l_File->get_rdfs_rel_path() );
 
 			if( $rSub['opened'] )
 			{ // pass opened status on, if given
@@ -787,8 +787,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
- * Revision 1.37  2006/12/21 23:39:32  fplanque
- * minor refactoring.
+ * Revision 1.38  2006/12/22 00:17:05  fplanque
+ * got rid of dirty globals
+ * some refactoring
  *
  * Revision 1.36  2006/12/14 23:02:43  blueyed
  * Fixed handling of "0" as directory
