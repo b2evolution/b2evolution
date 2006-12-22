@@ -91,6 +91,19 @@ class FileFuncsTestCase extends EvoUnitTestCase
 		// ini_set('open_basedir', TMPDIR.'test/bar');
 	}
 
+
+	function test_get_canonical_path()
+	{
+		$this->assertEqual( get_canonical_path( '' ), '' );
+		$this->assertEqual( get_canonical_path( '/hello/world' ), '/hello/world/' );
+		$this->assertEqual( get_canonical_path( 'hello/world' ), 'hello/world/' );
+		$this->assertEqual( get_canonical_path( '/hello/world/' ), '/hello/world/' );
+		$this->assertEqual( get_canonical_path( '/hello/../world' ), '/world/' );
+		$this->assertEqual( get_canonical_path( 'hello/../world/' ), 'world/' );
+		$this->assertEqual( get_canonical_path( '/hello/../world/../' ), '/' );
+		$this->assertEqual( get_canonical_path( '/hello/world/../../' ), '/' );
+		$this->assertEqual( get_canonical_path( 'C:\\hello\\world\\..\\..\\' ), 'C:/' );
+	}
 }
 
 

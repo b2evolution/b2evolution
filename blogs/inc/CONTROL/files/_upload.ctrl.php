@@ -143,7 +143,7 @@ if( $fm_FileRoot )
 		}
 		elseif( $ads_list_path != $non_canonical_list_path )
 		{	// We have reduced the absolute path, we should also reduce the relative $path (used in urls params)
-			$path = substr( get_canonical_path( '/'.$path ), 1 );	// TODO: replace this complexity with better regexp inside of get_canonical_path()
+			$path = get_canonical_path( $path );
 		}
 	}
 }
@@ -417,6 +417,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2006/12/22 01:09:30  fplanque
+ * cleanup
+ *
  * Revision 1.1  2006/12/22 00:51:34  fplanque
  * dedicated upload tab - proof of concept
  * (interlinking to be done)
