@@ -1600,9 +1600,8 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
- * Revision 1.41  2006/12/22 00:57:21  fplanque
- * dedicated upload tab - proof of concept
- * (interlinking to be done)
+ * Revision 1.42  2006/12/22 00:58:02  fplanque
+ * fix
  *
  * Revision 1.40  2006/12/22 00:50:33  fplanque
  * improved path cleaning
