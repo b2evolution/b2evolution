@@ -84,9 +84,9 @@ $Form->begin_form( 'fform' );
 		if( empty($pwd_salt) )
 		{ // generate anew, only if empty - so multiple login screens share the same hash. Gets reset on trying to login.
 			// fp> the above is another "so" that makes it really hard to understand what was meant
-		// Suggestion: "Do not regenerate if already set because we want to reuse the previous salt on login screen reloads". 
-		// fp> Question: the comment implies that the salt is reset even on failed login attemps. Why that? I would only have reset it on successful login. Do experts recommend it this way? 
-		// but if you kill the session you get a new salt anyway, so it's no big deal. 
+		// Suggestion: "Do not regenerate if already set because we want to reuse the previous salt on login screen reloads".
+		// fp> Question: the comment implies that the salt is reset even on failed login attemps. Why that? I would only have reset it on successful login. Do experts recommend it this way?
+		// but if you kill the session you get a new salt anyway, so it's no big deal.
 		// At that point, why not reset the salt at every reload? (it may be good to keep it, but I think the reason should be documented here)
 			$pwd_salt = generate_random_key(64);
 			$Session->set( 'core.pwd_salt', $pwd_salt, 86400 /* expire in 1 day */ );
@@ -148,20 +148,19 @@ $Form->end_form();
 	{
 		?>
 		// Hash the password onsubmit and clear the original pwd field
+		// TODO: dh> it would be nice to disable the clicked/used submit button. That's how it has been when the submit was attached to the submit button(s)
 		addEvent( document.getElementById("evo_login_form"), "submit", function(){
 			// this.value = '<?php echo TS_('Please wait...') ?>';
-				// fp>If a true geek could obfuscate his code by using less than ONE char for each var name, he would!
-				var f = document.getElementById('evo_login_form');
-					// Calculate hashed password and set it in the form:
-				var h = f.pwd_hashed;
-				var p = f.pwd;
-				var s = f.pwd_salt;
-				if( h && p && s && typeof hex_sha1 != "undefined" && typeof hex_md5 != "undefined" )
+				var form = document.getElementById('evo_login_form');
+
+				// Calculate hashed password and set it in the form:
+				if( form.pwd_hashed && form.pwd && form.pwd_salt && typeof hex_sha1 != "undefined" && typeof hex_md5 != "undefined" )
 				{
 					// We first hash to md5, because that's how the passwords are stored in the database
 					// We then hash with the salt using SHA1 (fp> can't we do that with md5 again, in order to load 1 less Javascript library?)
-					h.value = hex_sha1( hex_md5(p.value) + s.value );
-					p.value = "hashed_<?php echo $Session->ID /* to detect cookie problems */ ?>";
+					// NOTE: MD5 is kind of "weak" and therefor we also use SHA1
+					form.pwd_hashed.value = hex_sha1( hex_md5(form.pwd.value) + form.pwd_salt.value );
+					fown.pwd.value = "hashed_<?php echo $Session->ID /* to detect cookie problems */ ?>";
 				}
 				return true;
 			}, false );
@@ -200,6 +199,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.34  2006/12/22 20:11:02  blueyed
+ * todo, doc, cleanup
+ *
  * Revision 1.33  2006/12/15 22:54:14  fplanque
  * allow disabling of password hashing
  *
