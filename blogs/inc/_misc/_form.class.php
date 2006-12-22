@@ -1823,6 +1823,7 @@ class Form extends Widget
 						}
 					} );
 				}';
+			unset($field_params['maxlength']); // not a HTML attribute for textarea
 		}
 
 		$r = $this->begin_field()
@@ -2724,6 +2725,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.64  2006/12/22 22:22:20  blueyed
+ * Unset "maxlength" field_param in textarea_input(): not a html attrib
+ *
  * Revision 1.63  2006/12/13 19:34:25  fplanque
  * doc
  *
