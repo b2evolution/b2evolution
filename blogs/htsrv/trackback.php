@@ -48,7 +48,9 @@ require_once $inc_path.'_main.inc.php';
  */
 function trackback_response( $error = 0, $error_message = '' )
 { // trackback - reply
-	echo '<?xml version="1.0" encoding="iso-8859-1"?'.">\n";
+	global $io_charset;
+
+	echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.">\n";
 	echo "<response>\n";
 	echo "<error>$error</error>\n";
 	echo "<message>$error_message</message>\n";
@@ -111,7 +113,7 @@ if( $commented_Item->comment_status != 'open' )
 
 
 // CHECK content
-if( $error = validate_url( $url, $comments_allowed_uri_scheme ) )
+if( $error = validate_url( $url, $comments_allowed_uri_scheme, /* absolute: */ true ) )
 {
 	$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
 }
@@ -174,7 +176,7 @@ $Plugins->trigger_event( 'BeforeTrackbackInsert', array( 'Comment' => & $Comment
 // Display errors:
 if( $errstring = $Messages->get_string( 'Cannot insert trackback, please correct these errors:', '' ) )
 {
-	trackback_response(2, $errstring);	// TODO: check TRACKBACK SPEC that error code 2 is ok; blueyed> Why should we use 2?
+	trackback_response(2, $errstring);	// TODO: check TRACKBACK SPEC that error code 2 is ok
 }
 
 
@@ -208,6 +210,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.57  2006/12/22 00:26:41  blueyed
+ * Require absolute URL for trackback source; Correct charset for trackback_response()
+ *
  * Revision 1.56  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
