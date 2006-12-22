@@ -122,6 +122,12 @@ class test_plugin extends Plugin
 				'type' => 'select_blog',
 				'allow_none' => true,
 			),
+			'blogs' => array(
+				'label' => 'A set of blogs',
+				'type' => 'select_blog',
+				'multiple' => true,
+				'allow_none' => true,
+			),
 			'sets' => array(
 				'type' => 'array',
 				'min_count' => 0,
@@ -709,6 +715,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.62  2006/12/22 22:29:35  blueyed
+ * Support for "multiple" attribute in SELECT elements, especially for GetDefault(User)Settings plugin callback
+ *
  * Revision 1.61  2006/12/10 12:42:40  blueyed
  * "maxlength" handling for textarea fields through javascript
  *

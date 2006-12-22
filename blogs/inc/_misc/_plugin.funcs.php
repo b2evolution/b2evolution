@@ -80,6 +80,10 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 			$params[$k] = $v;
 		}
 	}
+	if( ! empty($set_meta['multiple']) )
+	{ // "multiple" attribute for "select" inputs:
+		$params['multiple'] = 'multiple';
+	}
 
 	if( isset($set_meta['note']) )
 	{
@@ -90,8 +94,7 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 	{
 		$set_meta['type'] = 'text';
 	}
-
-	if( $set_meta['type'] == 'html_textarea' )
+	elseif( $set_meta['type'] == 'html_textarea' )
 	{
 		$set_meta['type'] = 'textarea';
 	}
@@ -173,7 +176,7 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 	}
 	elseif( ( $set_value = get_param('edit_plugin_'.$Plugin->ID.'_set_'.$set_name) ) !== NULL )
 	{ // use value provided with Request!
-		if( is_array($set_value) )
+		if( $set_meta['type'] == 'array' )
 		{
 			handle_array_keys_in_plugin_settings($set_value);
 		}
@@ -207,30 +210,35 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 	}
 
 	// Display input element:
+	$input_name = 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name;
+	if( substr($set_meta['type'], 0, 6) == 'select' && ! empty($set_meta['multiple']) )
+	{ // a "multiple" select:
+		$input_name .= '[]';
+	}
 	switch( $set_meta['type'] )
 	{
 		case 'checkbox':
-			$Form->checkbox_input( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $set_label, $params );
+			$Form->checkbox_input( $input_name, $set_value, $set_label, $params );
 			break;
 
 		case 'textarea':
 			$textarea_rows = isset($set_meta['rows']) ? $set_meta['rows'] : 3;
-			$Form->textarea_input( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $textarea_rows, $set_label, $params );
+			$Form->textarea_input( $input_name, $set_value, $textarea_rows, $set_label, $params );
 			break;
 
 		case 'select':
 			$params['value'] = $set_value;
-			$Form->select_input_array( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_meta['options'], $set_label, $params );
+			$Form->select_input_array( $input_name, $set_meta['options'], $set_label, $params );
 			break;
 
 		case 'select_blog':
 			$BlogCache = & get_Cache( 'BlogCache' );
-			$Form->select_input_object( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $BlogCache, $set_label, $params );
+			$Form->select_input_object( $input_name, $set_value, $BlogCache, $set_label, $params );
 			break;
 
 		case 'select_group':
 			$GroupCache = & get_Cache( 'GroupCache' );
-			$Form->select_input_object( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $GroupCache, $set_label, $params );
+			$Form->select_input_object( $input_name, $set_value, $GroupCache, $set_label, $params );
 			break;
 
 		case 'select_user':
@@ -240,7 +248,7 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 			{
 				$params['loop_object_method'] = 'get_preferred_name';
 			}
-			$Form->select_input_object( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $UserCache, $set_label, $params );
+			$Form->select_input_object( $input_name, $set_value, $UserCache, $set_label, $params );
 			break;
 
 		case 'array':
@@ -392,7 +400,7 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 				$params['maxlength'] = '';
 			}
 
-			$Form->text_input( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $size, $set_label, '', $params ); // TEMP: Note already in params
+			$Form->text_input( $input_name, $set_value, $size, $set_label, '', $params ); // TEMP: Note already in params
 			break;
 
 		default:
@@ -619,6 +627,10 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 		$l_param_default = '';
 		if( isset($l_meta['type']) )
 		{
+			if( substr($l_meta['type'], 0, 6) == 'select' && ! empty($l_meta['multiple']) )
+			{ // a "multiple" select:
+				$l_param_type = 'array';
+			}
 			switch( $l_meta['type'] )
 			{
 				case 'array':
@@ -766,17 +778,27 @@ function validate_plugin_settings_from_param( $param_name, $value, $meta )
 				break;
 
 			case 'select':
-				if( ! in_array( $value, array_keys($meta['options']) ) )
+				$check_options = $value;
+				if( ! is_array($check_options) )
+				{ // no "multiple" select:
+					$check_options = array($check_options);
+				}
+
+				foreach($check_options as $v)
 				{
-					param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $value ) );
-					return false;
+					if( ! in_array( $v, array_keys($meta['options']) ) )
+					{
+						param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $v ) );
+						return false;
+					}
 				}
 				break;
 
 			case 'select_blog':
 			case 'select_group':
 			case 'select_user':
-				if( ! strlen($value) )
+				if( is_array($value) && empty($value) // empty "multiple" select
+					|| ( ! is_array($value) && ! strlen($value) ) )
 				{
 					if( empty($meta['allow_none']) )
 					{ // empty is not ok
@@ -800,10 +822,20 @@ function validate_plugin_settings_from_param( $param_name, $value, $meta )
 							$Cache = & get_Cache( 'UserCache' );
 							break;
 					}
-					if( ! $Cache->get_by_ID($value, false, false) )
+
+					$check_options = $value;
+					if( ! is_array($check_options) )
+					{ // no "multiple" select:
+						$check_options = array($check_options);
+					}
+
+					foreach($check_options as $v)
 					{
-						param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $value ) );
-						return false;
+						if( ! $Cache->get_by_ID($v, false, false) )
+						{
+							param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $v ) );
+							return false;
+						}
 					}
 				}
 				break;
@@ -887,7 +919,9 @@ function validate_plugin_settings_from_param( $param_name, $value, $meta )
 function handle_array_keys_in_plugin_settings( & $a )
 {
 	if( ! is_array($a) )
+	{
 		return;
+	}
 
 	$new_arr = array(); // use a new array to maintain order, also for "numeric" keys
 
@@ -935,6 +969,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.41  2006/12/22 22:29:35  blueyed
+ * Support for "multiple" attribute in SELECT elements, especially for GetDefault(User)Settings plugin callback
+ *
  * Revision 1.40  2006/12/10 12:36:58  blueyed
  * passthrough "rows" and "maxlength" attributes to input elements
  *

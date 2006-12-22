@@ -478,7 +478,7 @@ class DataObjectCache
 	 *
 	 * Load the cache if necessary
 	 *
-	 * @param integer selected ID
+	 * @param integer|array selected ID (or list of IDs, for "multiple" selects)
 	 * @param boolean provide a choice for "none" with ID ''
 	 * @param string Callback method name
 	 * @return string
@@ -488,6 +488,11 @@ class DataObjectCache
 		if( (! $this->all_loaded) && $this->load_all )
 		{ // We have not loaded all items so far, but we're allowed to... so let's go:
 			$this->load_all();
+		}
+
+		if( ! is_array($default) )
+		{
+			$default = array($default);
 		}
 
 		$r = '';
@@ -502,7 +507,7 @@ class DataObjectCache
 		foreach( $this->cache as $loop_Obj )
 		{
 			$r .=  '<option value="'.$loop_Obj->ID.'"';
-			if( $loop_Obj->ID == $default ) $r .= ' selected="selected"';
+			if( in_array($loop_Obj->ID, $default) ) $r .= ' selected="selected"';
 			$r .= '>';
 			$r .= format_to_output( $loop_Obj->$method(), 'htmlbody' );
 			$r .=  '</option>'."\n";
@@ -516,6 +521,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.25  2006/12/22 22:29:35  blueyed
+ * Support for "multiple" attribute in SELECT elements, especially for GetDefault(User)Settings plugin callback
+ *
  * Revision 1.24  2006/12/12 02:53:56  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.

@@ -475,9 +475,11 @@ class Plugin
 	 *   'layout': Use this to visually group your settings.
 	 *               Either 'begin_fieldset', 'end_fieldset' or 'separator'. You can use 'label' for 'begin_fieldset'.
 	 *   </li><li>
-	 *   'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect': get passed
-	 *           through as attributes to the form/input element.
-	 *   </li></ul>
+	 *   'multiple': This allows to select multiple values in a SELECT (including select_*) (boolean)
+	 *               (since EVO_NEXT_VERSION)
+	 *   </li><li>
+	 *   'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength':
+	 *       get passed through as attributes to the form/input element.
 	 *   </li></ul>
 	 *
 	 *
@@ -2793,6 +2795,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.128  2006/12/22 22:29:35  blueyed
+ * Support for "multiple" attribute in SELECT elements, especially for GetDefault(User)Settings plugin callback
+ *
  * Revision 1.127  2006/12/07 23:13:13  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!
