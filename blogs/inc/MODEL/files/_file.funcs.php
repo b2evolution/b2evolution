@@ -369,19 +369,18 @@ function no_trailing_slash( $path )
 
 
 /**
- * Returns canonicalized absolute pathname of a directory + ending slash
- *
- * (a)bsolute
- * (d)irectory
- * (s)lash termintaed
+ * Returns canonicalized pathname of a directory + ending slash
  *
  * @param string absolute path to be reduced ending with slash
- * @return string|NULL absolute reduced path, slaah terminated or NULL if the path doesn't exist
+ * @return string absolute reduced path, slash terminated or NULL if the path doesn't exist
  */
-function get_ads_canonical_path( $ads_path )
+function get_canonical_path( $ads_path )
 {
 	// Remove windows backslashes:
 	$ads_path = str_replace( '\\', '/', $ads_path );
+
+	// Make sure there's a trailing slash
+	$ads_path = $ads_path.'/';
 
 	$ads_path = str_replace( '//', '/', $ads_path );
 	$ads_path = str_replace( '/./', '/', $ads_path );
@@ -391,17 +390,14 @@ function get_ads_canonical_path( $ads_path )
 		$ads_path = $ads_realpath;
 	}
 
-	// pre_dump( 'get_ads_canonical_path()', $ads_path, $ads_realpath );
+	// pre_dump( 'get_canonical_path()', $ads_path, $ads_realpath );
 
 	if( empty( $ads_realpath ) )
 	{	// Path doesn't exist:
 		return NULL;
 	}
 
-	// Remove windows backslashes:
-	$ads_realpath = str_replace( '\\', '/', $ads_realpath );
-
-	return trailing_slash($ads_realpath);
+	return $ads_realpath;
 }
 
 
@@ -787,6 +783,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.39  2006/12/22 00:50:33  fplanque
+ * improved path cleaning
+ *
  * Revision 1.38  2006/12/22 00:17:05  fplanque
  * got rid of dirty globals
  * some refactoring

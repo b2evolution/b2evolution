@@ -286,7 +286,7 @@ class User extends DataObject
 			return false;
 		}
 
-		$userdir = get_ads_canonical_path( $basepath.$media_subdir.'users/'.$this->login.'/' );
+		$userdir = get_canonical_path( $basepath.$media_subdir.'users/'.$this->login.'/' );
 
 		if( $create && ! is_dir( $userdir ) )
 		{
@@ -1156,6 +1156,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.60  2006/12/22 00:50:33  fplanque
+ * improved path cleaning
+ *
  * Revision 1.59  2006/12/13 19:16:31  blueyed
  * Fixed E_FATAL with PHP 5.2
  *

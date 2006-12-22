@@ -584,15 +584,15 @@ class Blog extends DataObject
 		switch( $this->media_location )
 		{
 			case 'default':
-				$mediadir = get_ads_canonical_path( $basepath.$media_subdir.'blogs/'.$this->urlname.'/' );
+				$mediadir = get_canonical_path( $basepath.$media_subdir.'blogs/'.$this->urlname.'/' );
 				break;
 
 			case 'subdir':
-				$mediadir = get_ads_canonical_path( $basepath.$media_subdir.$this->media_subdir );
+				$mediadir = get_canonical_path( $basepath.$media_subdir.$this->media_subdir );
 				break;
 
 			case 'custom':
-				$mediadir = get_ads_canonical_path( $this->media_fullpath );
+				$mediadir = get_canonical_path( $this->media_fullpath );
 				break;
 
 			case 'none':
@@ -1090,6 +1090,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.49  2006/12/22 00:50:33  fplanque
+ * improved path cleaning
+ *
  * Revision 1.48  2006/12/21 22:25:43  fplanque
  * Removed restricting constraint. (It may have been good for hiding a bug, but it restricts the purpose)
  *

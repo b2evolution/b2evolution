@@ -51,10 +51,6 @@
  * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
  *
  * @version $Id$
- *
- * @todo thumbnail view
- * @todo PHPInfo (special permission)
- * @todo directly run PHP-code (eval)
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -80,7 +76,7 @@ if( ! $Settings->get( 'fm_enabled' ) )
 $current_User->check_perm( 'files', 'view', true );
 
 
-$AdminUI->set_path( 'files' );
+$AdminUI->set_path( 'files', 'browse' );
 
 
 // INIT params:
@@ -153,20 +149,26 @@ if( $fm_FileRoot )
 	else
 	{ // Root exists
 		// Let's get into requested list dir...
-		$ads_list_path = trailing_slash( $fm_FileRoot->ads_path.$path );
+		$non_canonical_list_path = $fm_FileRoot->ads_path.$path;
 
 		// Dereference any /../ just to make sure, and CHECK if directory exists:
-		$ads_list_path = get_ads_canonical_path( $ads_list_path );
+		$ads_list_path = get_canonical_path( $non_canonical_list_path );
 
 		if( !is_dir( $ads_list_path ) )
-		{ // This should never happen, but just in case the diretcoty does not exist:
+		{ // This should never happen, but just in case the diretory does not exist:
 			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $path ), 'error' );
+			$path = '';		// fp> added
 			$ads_list_path = NULL;
 		}
 		elseif( ! preg_match( '#^'.preg_quote($fm_FileRoot->ads_path, '#').'#', $ads_list_path ) )
 		{ // cwd is OUTSIDE OF root!
 			$Messages->add( T_( 'You are not allowed to go outside your root directory!' ), 'error' );
+			$path = '';		// fp> added
 			$ads_list_path = $fm_FileRoot->ads_path;
+		}
+		elseif( $ads_list_path != $non_canonical_list_path )
+		{	// We have reduced the absolute path, we should also reduce the relative $path (used in urls params)
+			$path = substr( get_canonical_path( '/'.$path ), 1 );	// TODO: replace this complexity with better regexp inside of get_canonical_path()
 		}
 	}
 }
@@ -1597,6 +1599,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.40  2006/12/22 00:50:33  fplanque
+ * improved path cleaning
+ *
  * Revision 1.39  2006/12/12 19:39:07  fplanque
  * enhanced file links / permissions
  *
