@@ -831,6 +831,10 @@ function validate_plugin_settings_from_param( $param_name, $value, $meta )
 
 					foreach($check_options as $v)
 					{
+						if( empty($v) && ! empty($meta['allow_none']) )
+						{ // empty is ok:
+							continue;
+						}
 						if( ! $Cache->get_by_ID($v, false, false) )
 						{
 							param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $v ) );
@@ -969,6 +973,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.42  2006/12/22 22:36:07  blueyed
+ * Fixed selecting selected "None" option in "multiple" selects
+ *
  * Revision 1.41  2006/12/22 22:29:35  blueyed
  * Support for "multiple" attribute in SELECT elements, especially for GetDefault(User)Settings plugin callback
  *
