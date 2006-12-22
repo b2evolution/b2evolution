@@ -380,7 +380,7 @@ function get_canonical_path( $ads_path )
 	$ads_path = str_replace( '\\', '/', $ads_path );
 
 	// Make sure there's a trailing slash
-	$ads_path = $ads_path.'/';
+	$ads_path = trailing_slash($ads_path);
 
 	$ads_path = str_replace( '//', '/', $ads_path );
 	$ads_path = str_replace( '/./', '/', $ads_path );
@@ -783,6 +783,10 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.40  2006/12/22 00:57:21  fplanque
+ * dedicated upload tab - proof of concept
+ * (interlinking to be done)
+ *
  * Revision 1.39  2006/12/22 00:50:33  fplanque
  * improved path cleaning
  *
