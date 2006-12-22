@@ -1424,9 +1424,10 @@ function url_add_tail( $url, $tail )
  *
  * @param string Url to validate
  * @param array Allowed URI schemes (see /conf/_formatting.php)
+ * @param boolean Must the URL be absolute?
  * @return mixed false (which means OK) or error message
  */
-function validate_url( $url, & $allowed_uri_scheme )
+function validate_url( $url, & $allowed_uri_scheme, $absolute = false )
 {
 	global $debug, $Debuglog;
 
@@ -1477,6 +1478,11 @@ function validate_url( $url, & $allowed_uri_scheme )
 	}
 	else
 	{ // URL is relative..
+		if( $absolute )
+		{
+			return T_('URL must be absolute.');
+		}
+
 		$char = substr($url, 0, 1);
 		if( $char != '/' && $char != '#' )
 		{ // must start with a slash or hash (for HTML anchors to the same page)
@@ -1609,6 +1615,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.26  2006/12/22 00:25:48  blueyed
+ * Added $absolute param to url_validate()
+ *
  * Revision 1.25  2006/12/18 16:16:12  blueyed
  * Fixed E_NOTICE if we're expecting e.g. "integer" but receive "array"
  *
