@@ -376,6 +376,7 @@ function bloggernewpost( $m )
 	// Check if category exists
 	if( get_the_category_by_ID( $main_cat, false ) === false )
 	{ // Cat does not exist:
+		// fp> TODO use $Blog->get_default_cat_ID();
 		return new xmlrpcresp(0, $xmlrpcerruser+5, 'Requested category does not exist.'); // user error 5
 	}
 
@@ -2237,6 +2238,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.131  2006/12/23 23:37:35  fplanque
+ * refactoring / Blog::get_default_cat_ID()
+ *
  * Revision 1.130  2006/12/17 23:42:40  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.

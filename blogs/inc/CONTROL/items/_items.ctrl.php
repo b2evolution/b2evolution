@@ -149,10 +149,10 @@ switch( $action )
 
 		param( 'post_extracats', 'array', array() );
 		param( 'edit_date', 'integer', 0 ); // checkbox
-		$default_main_cat = param( 'post_category', 'integer', $edited_Item->main_cat_ID );
+		$default_main_cat = param( 'post_category', 'integer', $Blog->get_default_cat_ID() );
 		if( $default_main_cat && $allow_cross_posting < 3 && get_catblog($default_main_cat) != $blog )
-		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing: setting it to 0 uses the first cat in the list
-			$default_main_cat = 0;
+		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
+			$default_main_cat = $Blog->get_default_cat_ID();
 		}
 		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
 
@@ -188,8 +188,8 @@ switch( $action )
 		param( 'edit_date', 'integer', 0 ); // checkbox
 		$default_main_cat = param( 'post_category', 'integer', $edited_Item->main_cat_ID );
 		if( $default_main_cat && $allow_cross_posting < 3 && get_catblog($default_main_cat) != $blog )
-		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing: setting it to 0 uses the first cat in the list
-			$default_main_cat = 0;
+		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
+			$default_main_cat = $Blog->get_default_cat_ID();
 		}
 		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
 
@@ -677,6 +677,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2006/12/23 23:37:35  fplanque
+ * refactoring / Blog::get_default_cat_ID()
+ *
  * Revision 1.10  2006/12/23 23:15:22  fplanque
  * refactoring / Blog::get_allowed_item_status()
  *

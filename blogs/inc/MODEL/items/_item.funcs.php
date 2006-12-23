@@ -463,7 +463,7 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_', $req_b
  */
 function cat_select( $display_info = true, $form_fields = true )
 {
-	global $default_main_cat, $allow_cross_posting, $cache_blogs, $cache_categories,
+	global $allow_cross_posting, $cache_blogs, $cache_categories,
 					$blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
 
 	$r = '<div class="extracats">';
@@ -476,10 +476,6 @@ function cat_select( $display_info = true, $form_fields = true )
 	}
 
 	$cat_select_form_fields = $form_fields;
-	if( ! isset($default_main_cat) )
-	{
-		$default_main_cat = $edited_Item->main_cat_ID;
-	}
 
 	cat_load_cache(); // make sure the caches are loaded
 
@@ -574,12 +570,6 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	// RADIO for main cat:
 	if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
 	{ // This is current blog or we allow moving posts accross blogs
-		if( ($default_main_cat == 0)
-			&& $creating
-			&& ($current_blog_ID == $blog) )
-		{ // Assign default cat for new post
-			$default_main_cat = $cat_ID;
-		}
 		if( $cat_select_form_fields )
 		{	// We want a form field:
 			$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
@@ -697,6 +687,9 @@ function attach_browse_tabs()
 
 /*
  * $Log$
+ * Revision 1.39  2006/12/23 23:37:35  fplanque
+ * refactoring / Blog::get_default_cat_ID()
+ *
  * Revision 1.38  2006/12/16 17:05:55  blueyed
  * todo
  *

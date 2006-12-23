@@ -116,6 +116,14 @@ class Blog extends DataObject
 
 
 	/**
+	 * Lazy filled
+	 *
+	 * @var integer
+	 */
+	var $default_cat_ID;
+
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
@@ -597,6 +605,31 @@ class Blog extends DataObject
 		}
 
 		return $status;
+	}
+
+
+	/**
+	 * Get default category for current blog
+	 *
+	 * @todo fp> this is a super lame stub, but it's still better than nothing. Should be user configurable.
+	 *
+	 */
+	function get_default_cat_ID()
+	{
+		if( !isset( $this->default_cat_ID ) )
+		{
+			global $DB;
+
+			$sql = 'SELECT cat_ID
+			          FROM T_categories
+			         WHERE cat_blog_ID = '.$this->ID.'
+			         ORDER BY cat_ID
+			         LIMIT 1';
+
+			$this->default_cat_ID = $DB->get_var( $sql, 0, 0, 'Get default category' );
+		}
+
+		return $this->default_cat_ID;
 	}
 
 
@@ -1128,6 +1161,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.51  2006/12/23 23:37:35  fplanque
+ * refactoring / Blog::get_default_cat_ID()
+ *
  * Revision 1.50  2006/12/23 23:15:19  fplanque
  * refactoring / Blog::get_allowed_item_status()
  *
