@@ -65,7 +65,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<title><?php echo $selected_File->get_name().' ('.T_('Preview').')'; ?></title>
+	<title><?php echo $selected_File->dget('name').' ('.T_('Preview').')'; ?></title>
 	<link href="<?php echo $rsc_url ?>css/viewfile.css" rel="stylesheet" type="text/css" />
 </head>
 
@@ -97,7 +97,7 @@ switch( $viewtype )
 			echo '<div class="subline">';
 			echo '<p><strong>'.$selected_File->dget( 'title' ).'</strong></p>';
 			echo '<p>'.$selected_File->dget( 'desc' ).'</p>';
-			echo '<p>'.$selected_File->get_name().' &middot; ';
+			echo '<p>'.$selected_File->dget('name').' &middot; ';
 			echo $selected_File->get_image_size().' &middot; ';
 			echo $selected_File->get_size_formatted().'</p>';
 			echo '</div>';
@@ -123,7 +123,7 @@ switch( $viewtype )
 			echo '<div class="fileheader">';
 
 			echo '<p>';
-			echo T_('File').': <strong>'.$selected_File->get_name().'</strong>';
+			echo T_('File').': <strong>'.$selected_File->dget('name').'</strong>';
 			echo ' &middot; ';
 			echo T_('Title').': <strong>'.$selected_File->dget( 'title' ).'</strong>';
 			echo '</p>';
@@ -226,7 +226,7 @@ switch( $viewtype )
 		break;
 
 	default:
-			Log::display( '', '', sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selected_File->get_name() ), 'error' );
+			Log::display( '', '', sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selected_File->dget('name') ), 'error' );
 		break;
 }
 
@@ -239,6 +239,9 @@ debug_info();
 <?php
 /*
  * $Log$
+ * Revision 1.14  2006/12/23 22:53:11  fplanque
+ * extra security
+ *
  * Revision 1.13  2006/12/07 15:23:42  fplanque
  * filemanager enhanced, refactored, extended to skins directory
  *

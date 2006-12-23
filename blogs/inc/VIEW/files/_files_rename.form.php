@@ -53,7 +53,7 @@ $Form->begin_form( 'fform', T_('Rename') );
 	$selected_Filelist->restart();
 	while( $loop_src_File = & $selected_Filelist->get_next() )
 	{
-		$Form->begin_fieldset( T_('File').': '.$loop_src_File->get_name() );
+		$Form->begin_fieldset( T_('File').': '.$loop_src_File->dget('name') );
 
 		$Form->text( 'new_names['.$loop_src_File->get_md5_ID().']', $new_names[$loop_src_File->get_md5_ID()], 32,
 									T_('New name'), $loop_src_File->dget('title'), 128 );
@@ -67,6 +67,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Rename'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.6  2006/12/23 22:53:10  fplanque
+ * extra security
+ *
  * Revision 1.5  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

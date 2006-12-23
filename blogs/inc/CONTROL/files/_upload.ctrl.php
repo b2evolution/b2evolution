@@ -309,7 +309,7 @@ if( isset($_FILES) && count( $_FILES ) )
 		if( $newFile->exists() )
 		{ // The file already exists in the target location!
 			// TODO: Rename/Overwriting (save as filename_<numeric_extension> and provide interface to confirm, rename or overwrite)
-			$failedFiles[$lKey] = sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newFile->get_name() );
+			$failedFiles[$lKey] = sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newFile->dget('name') );
 			// Abort upload for this file:
 			continue;
 		}
@@ -325,7 +325,7 @@ if( isset($_FILES) && count( $_FILES ) )
 		// change to default chmod settings
 		if( $newFile->chmod( NULL ) === false )
 		{ // add a note, this is no error!
-			$Messages->add( sprintf( T_('Could not change permissions of &laquo;%s&raquo; to default chmod setting.'), $newFile->get_name() ), 'note' );
+			$Messages->add( sprintf( T_('Could not change permissions of &laquo;%s&raquo; to default chmod setting.'), $newFile->dget('name') ), 'note' );
 		}
 
 		// Refreshes file properties (type, size, perms...)
@@ -345,7 +345,7 @@ if( isset($_FILES) && count( $_FILES ) )
 			$newFile->set( 'desc', trim( strip_tags($uploadfile_desc[$lKey])) );
 		}
 
-		$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->get_name() );
+		$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->dget('name') );
 		if( $mode == 'upload' )
 		{
 			// TODO: Add plugin hook to allow generating JS insert code(s)
@@ -417,6 +417,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2006/12/23 22:53:11  fplanque
+ * extra security
+ *
  * Revision 1.2  2006/12/22 01:09:30  fplanque
  * cleanup
  *

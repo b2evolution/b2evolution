@@ -46,7 +46,7 @@ $Form->begin_form( 'fform', T_('File properties') );
 	$Form->hiddens_by_key( get_memorized() );
 
 	$Form->begin_fieldset( T_('Properties') );
-		$Form->info( T_('Filename'), $edit_File->get_name(), T_('This is the name of the file on the server hard drive.') );
+		$Form->info( T_('Filename'), $edit_File->dget('name'), T_('This is the name of the file on the server hard drive.') );
 		$Form->info( T_('Type'), $edit_File->get_icon().' '.$edit_File->get_type() );
 	$Form->end_fieldset();
 
@@ -80,6 +80,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.6  2006/12/23 22:53:10  fplanque
+ * extra security
+ *
  * Revision 1.5  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

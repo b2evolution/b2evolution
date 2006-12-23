@@ -101,7 +101,6 @@ class File extends DataObject
 	/**
 	 * Name of this file/folder, without path.
 	 * @var string
-	 * @see get_name()
 	 * @access protected
 	 */
 	var $_name;
@@ -441,6 +440,25 @@ class File extends DataObject
 	function get_md5_ID()
 	{
 		return $this->_md5ID;
+	}
+
+
+	/**
+	 * Get a member param by its name
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
+	 */
+	function get( $parname )
+	{
+		switch( $parname )
+		{
+			case 'name':
+				return $this->_name;
+
+			default:
+				return parent::get( $parname );
+		}
 	}
 
 
@@ -1630,6 +1648,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2006/12/23 22:53:10  fplanque
+ * extra security
+ *
  * Revision 1.30  2006/12/14 01:46:29  fplanque
  * refactoring / factorized image preview display
  *

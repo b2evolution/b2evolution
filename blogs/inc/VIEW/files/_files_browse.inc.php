@@ -487,7 +487,7 @@ while( $lFile = & $fm_Filelist->get_next() )
 	if( $lFile->is_dir() )
 	{ // Directory
 		// Link to open the directory in the curent window
-		echo '<a href="'.$browse_dir_url.'">'.$lFile->get_name().'</a>';
+		echo '<a href="'.$browse_dir_url.'">'.$lFile->dget('name').'</a>';
 	}
 	else
 	{ // File
@@ -497,7 +497,7 @@ while( $lFile = & $fm_Filelist->get_next() )
 		}
 		else
 		{ // File extension unrecognized
-			echo $lFile->get_name();
+			echo $lFile->dget('name');
 		}
 	}
 
@@ -709,9 +709,6 @@ else
 			src="<?php echo get_icon( 'download', 'url' ) ?>"
 			onclick="return check_if_selected_files();" />
 
-			<!-- Not implemented yet: input class="ActionButton" type="submit"
-				name="actionArray[sendbymail]" value="<?php echo T_('Send by mail') ?>" onclick="return check_if_selected_files();" / -->
-
 		<?php
 		/* Not fully functional:
 		<input class="ActionButton" type="image" name="actionArray[file_copy]"
@@ -828,7 +825,7 @@ if( $countFiles )
 
 
 /*
- * CREATE TOOLBAR:
+ * CREATE FILE/FOLDER TOOLBAR:
  */
 if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ))
 			&& $current_User->check_perm( 'files', 'add' ) )
@@ -972,8 +969,10 @@ $Form = & new Form( NULL, 'fm_options_checkchanges', 'get', 'none' );
 $this->disp_payload_end();
 
 /*
- * {{{ Revision log:
  * $Log$
+ * Revision 1.34  2006/12/23 22:53:10  fplanque
+ * extra security
+ *
  * Revision 1.33  2006/12/22 00:17:05  fplanque
  * got rid of dirty globals
  * some refactoring
@@ -1050,253 +1049,5 @@ $this->disp_payload_end();
  *
  * Revision 1.10  2006/04/12 19:16:52  fplanque
  * Integrated dirtree in filemanager
- *
- * Revision 1.9  2006/03/29 23:24:01  blueyed
- * Fixed linking of files.
- *
- * Revision 1.8  2006/03/26 20:42:48  blueyed
- * Show Filelist dirtree by default and save it into UserSettings
- *
- * Revision 1.7  2006/03/26 13:44:51  blueyed
- * Sort filelist after creating files/dirs; display $create_name in input box again;
- *
- * Revision 1.6  2006/03/26 02:37:57  blueyed
- * Directory tree next to files list.
- *
- * Revision 1.5  2006/03/13 21:20:53  blueyed
- * fixed UserSettings::param_Request()
- *
- * Revision 1.4  2006/03/13 20:55:26  blueyed
- * Moved Request::param_UserSettings() to UserSettings::param_Request()
- *
- * Revision 1.3  2006/03/12 23:09:01  fplanque
- * doc cleanup
- *
- * Revision 1.2  2006/03/12 03:03:33  blueyed
- * Fixed and cleaned up "filemanager".
- *
- * Revision 1.1  2006/02/23 21:12:17  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.81  2006/02/13 22:03:10  blueyed
- * Fixed conflict with general .filename class.
- *
- * Revision 1.80  2006/02/13 21:40:30  fplanque
- * fixed memorizing of the mode when uploading/inserting IMGs into posts.
- *
- * Revision 1.79  2006/02/13 20:20:09  fplanque
- * minor / cleanup
- *
- * Revision 1.78  2006/02/13 01:05:20  blueyed
- * Fix IDs to the item textarea.
- *
- * Revision 1.76  2006/02/11 21:19:29  fplanque
- * added bozo validator to FM
- *
- * Revision 1.75  2006/02/06 20:05:30  fplanque
- * minor
- *
- * Revision 1.74  2006/02/03 21:58:04  fplanque
- * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
- *
- * Revision 1.73  2006/01/20 16:45:43  blueyed
- * whitespace
- *
- * Revision 1.72  2006/01/20 00:39:17  blueyed
- * Refactorisation/enhancements to filemanager.
- *
- * Revision 1.71  2006/01/11 22:09:29  blueyed
- * Reactive "download selected files as zip", also as a "workaround" to always have an icon next to "With selected files:".. ;)
- *
- * Revision 1.70  2006/01/09 22:00:32  blueyed
- * Fixed colspan for first row to be as wide as the number of chosen columns.
- *
- * Revision 1.69  2005/12/30 20:13:39  fplanque
- * UI changes mostly (need to double check sync)
- *
- * Revision 1.68  2005/12/19 22:48:45  blueyed
- * doc
- *
- * Revision 1.67  2005/12/19 16:42:03  fplanque
- * minor
- *
- * Revision 1.66  2005/12/19 04:36:16  blueyed
- * Fix using textarea_replace_selection() for IE from a popup.
- *
- * Revision 1.65  2005/12/16 16:59:11  blueyed
- * (Optional) File owner and group columns in Filemanager.
- *
- * Revision 1.64  2005/12/16 15:03:04  blueyed
- * tooltitle class for "Create new.." labels
- *
- * Revision 1.63  2005/12/16 14:58:24  blueyed
- * Valid target for popup link, fix label for filterString, labels for "Create new .."
- *
- * Revision 1.62  2005/12/16 14:02:50  blueyed
- * Killed "open selected files in popup" feature. Renamed openselected() to check_if_selected_files() (what has been a sub-feature of openselected())
- *
- * Revision 1.61  2005/12/14 19:36:15  fplanque
- * Enhanced file management
- *
- * Revision 1.60  2005/12/12 19:21:20  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.59  2005/12/10 03:02:49  blueyed
- * Quick upload mode merged from post-phoenix
- *
- * Revision 1.58  2005/11/27 06:13:52  blueyed
- * Moved textarea_replace_selection() to functions.js to allow using it everywhere.
- *
- * Revision 1.57  2005/11/25 14:33:35  fplanque
- * no message
- *
- * Revision 1.56  2005/11/24 20:29:01  blueyed
- * minor changes (fixes in commented out code); allow mass-editing of file perms (again)
- *
- * Revision 1.55  2005/11/24 18:33:04  blueyed
- * Konqueror (Safari?) and Firefox fixes
- *
- * Revision 1.54  2005/11/24 08:53:59  blueyed
- * file_cmr is deprecated
- *
- * Revision 1.53  2005/11/22 04:41:38  blueyed
- * Fix permissions editing again
- *
- * Revision 1.52  2005/11/21 18:33:19  fplanque
- * Too many undiscussed changes all around: Massive rollback! :((
- * As said before, I am only taking CLEARLY labelled bugfixes.
- *
- * Revision 1.45  2005/11/14 18:08:14  blueyed
- * Fix fatal error when displaying paths in flat mode.
- *
- * Revision 1.43.2.1  2005/11/14 17:57:18  blueyed
- * The options bug was another bug (actionArray)
- *
- * Revision 1.43  2005/11/06 11:22:10  yabs
- * correcting options bug
- *
- * Revision 1.42  2005/10/30 03:51:24  blueyed
- * Refactored showhide-JS functionality.
- * Moved showhide() from the features form to functions.js, and renamed to toggle_display_by_id();
- * Moved web_help_link() to get_web_help_link() in _misc.funcs.php, doc
- *
- * Revision 1.41  2005/10/28 20:08:46  blueyed
- * Normalized AdminUI
- *
- * Revision 1.40  2005/09/26 23:06:53  blueyed
- * Converted options fieldset to Form class
- *
- * Revision 1.39  2005/09/06 17:13:53  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.38  2005/08/12 17:31:06  fplanque
- * minor
- *
- * Revision 1.37  2005/08/08 18:30:48  fplanque
- * allow inserting of files as IMG or A HREFs from the filemanager
- *
- * Revision 1.36  2005/06/22 17:23:23  blueyed
- * html fix: closing <ul>
- *
- * Revision 1.35  2005/05/26 19:11:09  fplanque
- * no message
- *
- * Revision 1.34  2005/05/17 19:26:05  fplanque
- * FM: copy / move debugging
- *
- * Revision 1.33  2005/05/13 16:49:17  fplanque
- * Finished handling of multiple roots in storing file data.
- * Also removed many full paths passed through URL requests.
- * No full path should ever be seen by the user (only the admins).
- *
- * Revision 1.32  2005/05/12 18:39:24  fplanque
- * storing multi homed/relative pathnames for file meta data
- *
- * Revision 1.31  2005/05/11 15:58:30  fplanque
- * cleanup
- *
- * Revision 1.30  2005/05/09 16:09:37  fplanque
- * implemented file manager permissions through Groups
- *
- * Revision 1.29  2005/05/06 20:04:33  fplanque
- * added contribs
- * fixed filemanager settings
- *
- * Revision 1.28  2005/05/04 19:40:40  fplanque
- * cleaned up file settings a little bit
- *
- * Revision 1.27  2005/04/29 18:49:32  fplanque
- * Normalizing, doc, cleanup
- *
- * Revision 1.26  2005/04/28 20:44:18  fplanque
- * normalizing, doc
- *
- * Revision 1.25  2005/04/27 19:05:44  fplanque
- * normalizing, cleanup, documentaion
- *
- * Revision 1.22  2005/04/19 16:23:00  fplanque
- * cleanup
- * added FileCache
- * improved meta data handling
- *
- * Revision 1.20  2005/04/15 18:02:58  fplanque
- * finished implementation of properties/meta data editor
- * started implementation of files to items linking
- *
- * Revision 1.19  2005/04/14 19:57:52  fplanque
- * filemanager refactoring & cleanup
- * started implementation of properties/meta data editor
- * note: the whole fm_mode thing is not really desireable...
- *
- * Revision 1.18  2005/04/14 18:34:03  fplanque
- * filemanager refactoring
- *
- * Revision 1.17  2005/04/13 18:31:26  fplanque
- * tried to make copy/move/rename work ...
- *
- * Revision 1.16  2005/04/12 19:00:22  fplanque
- * File manager cosmetics
- *
- * Revision 1.14  2005/03/16 19:58:13  fplanque
- * small AdminUI cleanup tasks
- *
- * Revision 1.13  2005/03/04 18:40:26  fplanque
- * added Payload display wrappers to admin skin object
- *
- * Revision 1.12  2005/02/28 09:06:37  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.11  2005/02/27 20:34:48  blueyed
- * Admin UI refactoring
- *
- * Revision 1.10  2005/02/21 00:34:36  blueyed
- * check for defined DB_USER!
- *
- * Revision 1.9  2005/02/08 01:01:39  blueyed
- * moved searchbox, beautified create bar.
- *
- * Revision 1.8  2005/01/27 21:56:07  blueyed
- * layout..
- *
- * Revision 1.7  2005/01/27 20:07:51  blueyed
- * rolled layout back somehow..
- *
- * Revision 1.6  2005/01/27 13:34:56  fplanque
- * i18n tuning
- *
- * Revision 1.4  2005/01/26 17:55:23  blueyed
- * catching up..
- *
- * Revision 1.3  2005/01/25 18:07:42  fplanque
- * CSS/style cleanup
- *
- * Revision 1.2  2005/01/15 20:32:14  blueyed
- * small fix, warning icon
- *
- * Revision 1.1  2005/01/12 17:55:51  fplanque
- * extracted browsing interface into separate file to make code more readable
- * }}}
  */
 ?>

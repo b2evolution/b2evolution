@@ -405,6 +405,7 @@ switch( $action )
 		$Messages->add( T_('You have to enable JavaScript to use this feature.'), 'error' );
 		break;
 
+
 	case 'createnew_dir':
 		if( ! $Settings->get( 'fm_enable_create_dir' ) )
 		{ // Directory creation is gloablly disabled:
@@ -493,24 +494,8 @@ switch( $action )
 		break;
 
 
-	/*
-	case 'send_by_mail':
-	{{{ not implemented yet
-		// TODO: implement
-		if( !$selected_Filelist->count() )
-		{
-			$Messages->add( T_('Nothing selected.'), 'error' );
-			break;
-		}
-
-		echo 'TODO: Send selected by mail, query email address..';
-		break;
-	}}}
-	*/
-
-
 	case 'download':
-	{{{ // TODO: provide optional zip formats (tgz, ..) - the used lib provides more..
+	{ // TODO: provide optional zip formats (tgz, ..) - the used lib provides more..
 		$action_title = T_('Download');
 
 		if( !$selected_Filelist->count() )
@@ -556,7 +541,7 @@ switch( $action )
 		$zipfile->create_archive();
 		$zipfile->download_file();
 		exit;
-	}}}
+	}
 
 
 	case 'rename':
@@ -677,12 +662,12 @@ switch( $action )
 			{
 				if( $l_File->unlink() )
 				{
-					$Messages->add( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.') : T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->get_name() ), 'success' );
+					$Messages->add( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.') : T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success' );
 					$fm_Filelist->remove( $l_File );
 				}
 				else
 				{
-					$Messages->add( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).') : T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->get_name() ), 'error' );
+					$Messages->add( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).') : T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error' );
 				}
 			}
 			$action = 'list';
@@ -742,7 +727,7 @@ switch( $action )
 		// Check that the file is editable:
 		if( ! $edit_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
 		{
-			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edit_File->get_name() ), 'error' );
+			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edit_File->dget('name') ), 'error' );
 	 		// Leave special display mode:
 			$fm_mode = NULL;
 			break;
@@ -756,11 +741,11 @@ switch( $action )
 		{
 			fwrite( $rsc_handle, $file_content );
 			fclose( $rsc_handle );
-			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; have been updated.' ), $edit_File->get_name() ), 'success' );
+			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; have been updated.' ), $edit_File->dget('name') ), 'success' );
 		}
 		else
 		{
-			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; could not be updated.' ), $edit_File->get_name() ), 'error' );
+			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; could not be updated.' ), $edit_File->dget('name') ), 'error' );
 		}
 
 		// Leave special display mode:
@@ -792,11 +777,11 @@ switch( $action )
 		// Store File object into DB:
 		if( $edit_File->dbsave() )
 		{
-			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have been updated.' ), $edit_File->get_name() ), 'success' );
+			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have been updated.' ), $edit_File->dget('name') ), 'success' );
 		}
 		else
 		{
-			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $edit_File->get_name() ), 'note' );
+			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $edit_File->dget('name') ), 'note' );
 		}
 
 		// Leave special display mode:
@@ -919,7 +904,7 @@ switch( $action )
 				}
 				elseif( !isset($perms[ $l_File->get_md5_ID() ]) )
 				{ // happens for an empty text input or when no radio option is selected
-					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not been changed.'), $l_File->get_name() ), 'note' );
+					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not been changed.'), $l_File->dget('name') ), 'note' );
 					continue;
 				}
 				else
@@ -932,7 +917,7 @@ switch( $action )
 
 				if( $newperms === false )
 				{
-					$Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $l_File->get_name(), $chmod ), 'error' );
+					$Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $l_File->dget('name'), $chmod ), 'error' );
 				}
 				else
 				{
@@ -941,11 +926,11 @@ switch( $action )
 
 					if( $newperms === $oldperms )
 					{
-						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not been changed.'), $l_File->get_name() ), 'note' );
+						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not been changed.'), $l_File->dget('name') ), 'note' );
 					}
 					else
 					{
-						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $l_File->get_name(), $l_File->get_perms() ), 'success' );
+						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $l_File->dget('name'), $l_File->get_perms() ), 'success' );
 					}
 				}
 			}
@@ -974,7 +959,7 @@ switch( $fm_mode )
 		// Check that the file is editable:
 		if( ! $edit_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
 		{
-			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edit_File->get_name() ), 'error' );
+			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edit_File->dget('name') ), 'error' );
 	 		// Leave special display mode:
 			$fm_mode = NULL;
 			break;
@@ -1133,7 +1118,7 @@ switch( $fm_mode )
 				if( $newFile->exists() )
 				{ // The file already exists in the target location!
 					// TODO: Rename/Overwriting (save as filename_<numeric_extension> and provide interface to confirm, rename or overwrite)
-					$failedFiles[$lKey] = sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newFile->get_name() );
+					$failedFiles[$lKey] = sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newFile->dget('name') );
 					// Abort upload for this file:
 					continue;
 				}
@@ -1149,7 +1134,7 @@ switch( $fm_mode )
 				// change to default chmod settings
 				if( $newFile->chmod( NULL ) === false )
 				{ // add a note, this is no error!
-					$Messages->add( sprintf( T_('Could not change permissions of &laquo;%s&raquo; to default chmod setting.'), $newFile->get_name() ), 'note' );
+					$Messages->add( sprintf( T_('Could not change permissions of &laquo;%s&raquo; to default chmod setting.'), $newFile->dget('name') ), 'note' );
 				}
 
 				// Refreshes file properties (type, size, perms...)
@@ -1169,7 +1154,7 @@ switch( $fm_mode )
 					$newFile->set( 'desc', trim( strip_tags($uploadfile_desc[$lKey])) );
 				}
 
-				$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->get_name() );
+				$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->dget('name') );
 				if( $mode == 'upload' )
 				{
 					// TODO: Add plugin hook to allow generating JS insert code(s)
@@ -1262,7 +1247,7 @@ switch( $fm_mode )
 			if( ! isset( $new_names[$loop_src_File->get_md5_ID()] ) )
 			{ // We have not yet provided a name to rename to...
 				$confirm = 0;
-				$new_names[$loop_src_File->get_md5_ID()] = $loop_src_File->get_name();
+				$new_names[$loop_src_File->get_md5_ID()] = $loop_src_File->get('name');
 				continue;
 			}
 
@@ -1369,7 +1354,7 @@ switch( $fm_mode )
 						{ // Unlink failed:
 							$DB->rollback();
 
-							$Messages->add( sprintf( ( $dest_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).') : T_('Could not delete the file &laquo;%s&raquo;.') ), $dest_File->get_name() ), 'error' );
+							$Messages->add( sprintf( ( $dest_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).') : T_('Could not delete the file &laquo;%s&raquo;.') ), $dest_File->dget('name') ), 'error' );
 
 							// Move on to next file:
 							continue;
@@ -1598,8 +1583,10 @@ $AdminUI->disp_global_footer();
 
 
 /*
- * {{{ Revision log:
  * $Log$
+ * Revision 1.44  2006/12/23 22:53:11  fplanque
+ * extra security
+ *
  * Revision 1.43  2006/12/22 01:09:30  fplanque
  * cleanup
  *
@@ -1675,326 +1662,5 @@ $AdminUI->disp_global_footer();
  *
  * Revision 1.19  2006/04/14 19:33:29  fplanque
  * evocore sync
- *
- * Revision 1.18  2006/04/13 00:10:52  blueyed
- * cleanup
- *
- * Revision 1.17  2006/04/12 19:12:58  fplanque
- * partial cleanup
- *
- * Revision 1.16  2006/03/26 20:42:48  blueyed
- * Show Filelist dirtree by default and save it into UserSettings
- *
- * Revision 1.15  2006/03/26 19:44:43  blueyed
- * Filelist::include_files/include_dirs added; normalization
- *
- * Revision 1.14  2006/03/26 14:00:49  blueyed
- * Made Filelist constructor more decent
- *
- * Revision 1.13  2006/03/26 13:44:51  blueyed
- * Sort filelist after creating files/dirs; display $create_name in input box again;
- *
- * Revision 1.12  2006/03/26 03:06:24  blueyed
- * When there's only one selected file for download, use its filename as base for archive.
- *
- * Revision 1.11  2006/03/26 02:57:24  blueyed
- * Get param for dirtree early.
- *
- * Revision 1.10  2006/03/26 02:37:57  blueyed
- * Directory tree next to files list.
- *
- * Revision 1.9  2006/03/17 20:57:26  fplanque
- * just in case... (being a little paranoid with file management may save your day someday :P)
- *
- * Revision 1.8  2006/03/16 19:26:04  fplanque
- * Fixed & simplified media dirs out of web root.
- *
- * Revision 1.7  2006/03/16 18:44:39  blueyed
- * Removed redundant (never reached) permission check.
- *
- * Revision 1.6  2006/03/13 21:20:53  blueyed
- * fixed UserSettings::param_Request()
- *
- * Revision 1.5  2006/03/12 23:08:56  fplanque
- * doc cleanup
- *
- * Revision 1.4  2006/03/12 20:51:53  blueyed
- * Moved Request::param_UserSettings() to UserSettings::param_Request()
- *
- * Revision 1.2  2006/03/12 03:03:32  blueyed
- * Fixed and cleaned up "filemanager".
- *
- * Revision 1.1  2006/02/23 21:11:56  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.162  2006/02/13 20:20:09  fplanque
- * minor / cleanup
- *
- * Revision 1.161  2006/02/13 01:05:20  blueyed
- * Fix IDs to the item textarea.
- *
- * Revision 1.159  2006/02/11 21:29:46  fplanque
- * Fixed display of link_item mode
- *
- * Revision 1.158  2006/02/10 22:05:07  fplanque
- * Normalized itm links
- *
- * Revision 1.157  2006/01/20 00:39:17  blueyed
- * Refactorisation/enhancements to filemanager.
- *
- * Revision 1.156  2006/01/20 00:07:26  blueyed
- * 1-2-3-4 scheme for files.php again. Not fully tested.
- *
- * Revision 1.155  2006/01/11 22:09:29  blueyed
- * Reactive "download selected files as zip", also as a "workaround" to always have an icon next to "With selected files:".. ;)
- *
- * Revision 1.154  2006/01/11 17:32:53  fplanque
- * wording / translation
- *
- * Revision 1.153  2006/01/02 19:43:57  fplanque
- * just a little new year cleanup
- *
- * Revision 1.152  2005/12/19 04:36:16  blueyed
- * Fix using textarea_replace_selection() for IE from a popup.
- *
- * Revision 1.151  2005/12/16 16:59:12  blueyed
- * (Optional) File owner and group columns in Filemanager.
- *
- * Revision 1.150  2005/12/15 19:00:40  blueyed
- * Another hard to merge fix. When a filename is invalid handle it like all other upload errors.
- *
- * Revision 1.149  2005/12/14 19:36:15  fplanque
- * Enhanced file management
- *
- * Revision 1.148  2005/12/12 19:44:09  fplanque
- * Use cached objects by reference instead of copying them!!
- *
- * Revision 1.147  2005/12/12 17:57:22  fplanque
- * fixed bug with delete (when some links prevent deletion)
- *
- * Revision 1.146  2005/12/12 16:40:17  fplanque
- * fixed quick upload
- *
- * Revision 1.145  2005/12/10 03:02:50  blueyed
- * Quick upload mode merged from post-phoenix
- *
- * Revision 1.144  2005/12/06 00:01:56  blueyed
- * Unset action/fm_mode when no FileRoot available.
- *
- * Revision 1.142  2005/12/04 15:49:20  blueyed
- * More descriptive error message when no perms for 'files'/'view'.
- *
- * Revision 1.141  2005/11/27 08:48:41  blueyed
- * fix editing file properties (there were two 'case's)..
- *
- * Revision 1.140  2005/11/27 06:36:01  blueyed
- * Use deprecated LogUpload for phoenix, because it's not 1-2-3-4 scheme here.
- *
- * Revision 1.139  2005/11/27 06:16:02  blueyed
- * Echo code to display uploaded file in 'upload' mode and allow to insert it through JS (0.9.1 behaviour).
- *
- * Revision 1.138  2005/11/24 18:32:10  blueyed
- * Use $Fileman to get (deprecated) chmod defaults, not $Filemanager, which does not exist.. :/
- *
- * Revision 1.137  2005/11/24 17:56:20  blueyed
- * chmod() the uploaded file
- *
- * Revision 1.135  2005/11/24 13:23:57  blueyed
- * debug_die() for invalid action (only if actionArray given [and invalid])
- *
- * Revision 1.134  2005/11/24 08:54:42  blueyed
- * debug_die() for invalid action; doc
- *
- * Revision 1.131  2005/11/22 04:41:38  blueyed
- * Fix permissions editing again
- *
- * Revision 1.130  2005/11/21 18:33:19  fplanque
- * Too many undiscussed changes all around: Massive rollback! :((
- * As said before, I am only taking CLEARLY labelled bugfixes.
- *
- * Revision 1.121  2005/11/14 16:43:43  blueyed
- * FGix actionArray
- *
- * Revision 1.120  2005/10/28 20:08:46  blueyed
- * Normalized AdminUI
- *
- * Revision 1.119  2005/10/28 02:37:37  blueyed
- * Normalized AbstractSettings API
- *
- * Revision 1.117  2005/09/22 21:35:26  blueyed
- * Fixed another "Only variables can be passed by reference" notice (php4) / fatal error (php5)
- *
- * Revision 1.116  2005/08/12 17:37:14  fplanque
- * cleanup
- *
- * Revision 1.115  2005/07/26 18:56:21  fplanque
- * minor
- *
- * Revision 1.114  2005/07/26 18:50:48  fplanque
- * enhanced attached file handling
- *
- * Revision 1.113  2005/06/03 20:14:38  fplanque
- * started input validation framework
- *
- * Revision 1.112  2005/06/03 15:12:32  fplanque
- * error/info message cleanup
- *
- * Revision 1.110  2005/05/24 15:26:51  fplanque
- * cleanup
- *
- * Revision 1.109  2005/05/17 19:26:06  fplanque
- * FM: copy / move debugging
- *
- * Revision 1.108  2005/05/16 15:17:12  fplanque
- * minor
- *
- * Revision 1.107  2005/05/13 18:41:28  fplanque
- * made file links clickable... finally ! :P
- *
- * Revision 1.106  2005/05/13 16:49:17  fplanque
- * Finished handling of multiple roots in storing file data.
- * Also removed many full paths passed through URL requests.
- * No full path should ever be seen by the user (only the admins).
- *
- * Revision 1.105  2005/05/12 18:39:24  fplanque
- * storing multi homed/relative pathnames for file meta data
- *
- * Revision 1.104  2005/05/11 15:58:30  fplanque
- * cleanup
- *
- * Revision 1.103  2005/05/10 18:38:15  fplanque
- * cleaned up log message display (part 1)
- *
- * Revision 1.102  2005/05/09 16:09:38  fplanque
- * implemented file manager permissions through Groups
- *
- * Revision 1.101  2005/05/06 20:04:47  fplanque
- * added contribs
- * fixed filemanager settings
- * Removed checking against browser provided mime types (very unsecure!)
- *
- * Revision 1.100  2005/05/04 19:40:40  fplanque
- * cleaned up file settings a little bit
- *
- * Revision 1.99  2005/04/29 18:49:32  fplanque
- * Normalizing, doc, cleanup
- *
- * Revision 1.98  2005/04/28 20:44:18  fplanque
- * normalizing, doc
- *
- * Revision 1.97  2005/04/27 19:05:44  fplanque
- * normalizing, cleanup, documentaion
- *
- * Revision 1.94  2005/04/21 18:01:29  fplanque
- * CSS styles refactoring
- *
- * Revision 1.93  2005/04/21 12:13:42  blueyed
- * doc
- *
- * Revision 1.92  2005/04/20 20:04:12  fplanque
- * visual cleanup of FM
- *
- * Revision 1.91  2005/04/19 16:23:01  fplanque
- * cleanup
- * added FileCache
- * improved meta data handling
- *
- * Revision 1.89  2005/04/15 18:02:58  fplanque
- * finished implementation of properties/meta data editor
- * started implementation of files to items linking
- *
- * Revision 1.88  2005/04/14 19:57:52  fplanque
- * filemanager refactoring & cleanup
- * started implementation of properties/meta data editor
- * note: the whole fm_mode thing is not really desireable...
- *
- * Revision 1.87  2005/04/14 18:34:03  fplanque
- * filemanager refactoring
- *
- * Revision 1.86  2005/04/14 13:14:03  fplanque
- * copy / move / rename is such a bad thing :'(
- *
- * Revision 1.85  2005/04/13 18:31:27  fplanque
- * tried to make copy/move/rename work ...
- *
- * Revision 1.84  2005/04/13 17:48:21  fplanque
- * File manager refactoring
- * storing of file meta data through upload
- * displaying or metadate in previews
- *
- * Revision 1.83  2005/04/12 19:36:30  fplanque
- * File manager cosmetics
- *
- * Revision 1.82  2005/04/12 19:00:22  fplanque
- * File manager cosmetics
- *
- * Revision 1.81  2005/03/15 19:19:46  fplanque
- * minor, moved/centralized some includes
- *
- * Revision 1.80  2005/03/08 15:23:52  fplanque
- * no message
- *
- * Revision 1.79  2005/03/07 00:06:17  blueyed
- * admin UI refactoring, part three
- *
- * Revision 1.78  2005/02/28 09:06:39  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.77  2005/02/27 20:34:49  blueyed
- * Admin UI refactoring
- *
- * Revision 1.76  2005/02/23 04:06:16  blueyed
- * minor
- *
- * Revision 1.75  2005/02/12 00:58:13  blueyed
- * fixed preg_split() better ($allowedFileExtensions, $allowedMimeTypes)
- *
- * Revision 1.74  2005/02/11 20:30:20  jwedgeco
- * Added copyright and license info. I forgot to add it on the last commit.
- *
- * Revision 1.73  2005/02/11 20:27:51  jwedgeco
- * I added a kludge. For some reason on my setup, the empty() php funtion doesn't work on $allowedFileExtensions when $settings->get(upload_allowedext) is blank.
- *
- * Revision 1.72  2005/02/08 01:06:52  blueyed
- * fileupload reworked, fixed "Display FM" / "Leave mode" buttons
- *
- * Revision 1.71  2005/01/27 13:34:57  fplanque
- * i18n tuning
- *
- * Revision 1.69  2005/01/26 17:55:23  blueyed
- * catching up..
- *
- * Revision 1.68  2005/01/14 17:39:02  blueyed
- * layout
- *
- * Revision 1.67  2005/01/13 20:27:42  blueyed
- * $mode
- *
- * Revision 1.66  2005/01/12 20:22:51  fplanque
- * started file/dataobject linking
- *
- * Revision 1.65  2005/01/12 17:55:51  fplanque
- * extracted browsing interface into separate file to make code more readable
- *
- * Revision 1.63  2005/01/09 05:36:39  blueyed
- * fileupload
- *
- * Revision 1.62  2005/01/08 12:05:50  blueyed
- * small bugfix
- *
- * Revision 1.61  2005/01/08 01:24:19  blueyed
- * filelist refactoring
- *
- * Revision 1.60  2005/01/06 15:45:36  blueyed
- * Fixes..
- *
- * Revision 1.59  2005/01/06 11:31:46  blueyed
- * bugfixes
- *
- * Revision 1.58  2005/01/06 10:15:46  blueyed
- * FM upload and refactoring
- * }}}
  */
 ?>
