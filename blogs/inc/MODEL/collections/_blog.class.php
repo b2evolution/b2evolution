@@ -563,6 +563,44 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get allowed post status for current user in this blog
+	 *
+	 * @todo make default a Blog param
+	 *
+	 * @param string status to start with. Empty to use default.
+	 * @return string authorized status; NULL if none
+	 */
+	function get_allowed_item_status( $status = NULL )
+	{
+		global $current_User;
+		global $default_post_status;
+
+		if( empty( $status ) )
+		{
+			$status = $default_post_status;
+		}
+
+		if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $this->ID ) )
+		{ // We need to find another one:
+			$status = NULL;
+
+			if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $this->ID ) )
+				$status = 'published';
+			elseif( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $this->ID ) )
+				$status = 'protected';
+			elseif( $current_User->check_perm( 'blog_post_statuses', 'private', false, $this->ID ) )
+				$status = 'private';
+			elseif( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $this->ID ) )
+				$status = 'draft';
+			elseif( $current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $this->ID ) )
+				$status = 'deprecated';
+		}
+
+		return $status;
+	}
+
+
+	/**
 	 * Get the blog's media directory (and create it if necessary).
 	 *
 	 * If we're {@link is_admin_page() on an admin page}, it adds status messages.
@@ -1090,6 +1128,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.50  2006/12/23 23:15:19  fplanque
+ * refactoring / Blog::get_allowed_item_status()
+ *
  * Revision 1.49  2006/12/22 00:50:33  fplanque
  * improved path cleaning
  *

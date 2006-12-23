@@ -52,7 +52,7 @@ switch( $action )
 			$edited_Item = & $edited_Link->Item;
 
 			// Load the blog we're in:
-			$Blog = $edited_Item->get_Blog();
+			$Blog = & $edited_Item->get_Blog();
 			set_working_blog( $Blog->ID );
 		}
 		else
@@ -72,7 +72,7 @@ switch( $action )
 		$edited_Item = & $ItemCache->get_by_ID( $p );
 
 		// Load the blog we're in:
-		$Blog = $edited_Item->get_Blog();
+		$Blog = & $edited_Item->get_Blog();
 		set_working_blog( $Blog->ID );
 		break;
 
@@ -88,7 +88,7 @@ switch( $action )
 		$edited_Item = & $ItemCache->get_by_ID( $post_ID );
 
 		// Load the blog we're in:
-		$Blog = $edited_Item->get_Blog();
+		$Blog = & $edited_Item->get_Blog();
 		set_working_blog( $Blog->ID );
 		break;
 
@@ -141,22 +141,11 @@ switch( $action )
 		// Also used by bookmarklet
 		$edited_Item->load_from_Request(); // needs Blog set
 
+		param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
-		// but we need to make sure the requested/default one is ok...
-		param( 'post_status', 'string',  $default_post_status );		// 'published' or 'draft' or ...
-		if( ! $current_User->check_perm( 'blog_post_statuses', $post_status, false, $blog ) )
-		{ // We need to find another one:
-			if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
-				$post_status = 'published';
-			elseif( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $blog ) )
-				$post_status = 'protected';
-			elseif( $current_User->check_perm( 'blog_post_statuses', 'private', false, $blog ) )
-				$post_status = 'private';
-			elseif( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $blog ) )
-				$post_status = 'draft';
-			else
-				$post_status = 'deprecated';
-		}
+		// but we need to make sure the requested/default one is ok:
+		$post_status = $Blog->get_allowed_item_status( $post_status );
+
 
 		param( 'post_extracats', 'array', array() );
 		param( 'edit_date', 'integer', 0 ); // checkbox
@@ -190,22 +179,10 @@ switch( $action )
 		// from tab to tab via javascript when the editor wants to switch views...
 		$edited_Item->load_from_Request(); // needs Blog set
 
+		param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
-		// but we need to make sure the requested/default one is ok...
-		param( 'post_status', 'string',  $default_post_status );		// 'published' or 'draft' or ...
-		if( ! $current_User->check_perm( 'blog_post_statuses', $post_status, false, $blog ) )
-		{ // We need to find another one:
-			if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
-				$post_status = 'published';
-			elseif( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $blog ) )
-				$post_status = 'protected';
-			elseif( $current_User->check_perm( 'blog_post_statuses', 'private', false, $blog ) )
-				$post_status = 'private';
-			elseif( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $blog ) )
-				$post_status = 'draft';
-			else
-				$post_status = 'deprecated';
-		}
+		// but we need to make sure the requested/default one is ok:
+		$post_status = $Blog->get_allowed_item_status( $post_status );
 
 		param( 'post_extracats', 'array', array() );
 		param( 'edit_date', 'integer', 0 ); // checkbox
@@ -700,6 +677,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2006/12/23 23:15:22  fplanque
+ * refactoring / Blog::get_allowed_item_status()
+ *
  * Revision 1.9  2006/12/18 03:20:41  fplanque
  * _header will always try to set $Blog.
  * autoselect_blog() will do so also.
