@@ -478,7 +478,7 @@ class DataObjectCache
 	 *
 	 * Load the cache if necessary
 	 *
-	 * @param integer|array selected ID (or list of IDs, for "multiple" selects)
+	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID ''
 	 * @param string Callback method name
 	 * @return string
@@ -490,24 +490,19 @@ class DataObjectCache
 			$this->load_all();
 		}
 
-		if( ! is_array($default) )
-		{
-			$default = array($default);
-		}
-
 		$r = '';
 
 		if( $allow_none )
 		{
 			$r .= '<option value=""';
-			if( empty($default) || in_array('', $default) ) $r .= ' selected="selected"';
+			if( empty($default) ) $r .= ' selected="selected"';
 			$r .= '>'.format_to_output($this->none_option_text).'</option>'."\n";
 		}
 
 		foreach( $this->cache as $loop_Obj )
 		{
 			$r .=  '<option value="'.$loop_Obj->ID.'"';
-			if( in_array($loop_Obj->ID, $default) ) $r .= ' selected="selected"';
+			if( $loop_Obj->ID == $default ) $r .= ' selected="selected"';
 			$r .= '>';
 			$r .= format_to_output( $loop_Obj->$method(), 'htmlbody' );
 			$r .=  '</option>'."\n";
@@ -521,11 +516,10 @@ class DataObjectCache
 
 /*
  * $Log$
- * Revision 1.26  2006/12/22 22:36:07  blueyed
- * Fixed selecting selected "None" option in "multiple" selects
- *
- * Revision 1.25  2006/12/22 22:29:35  blueyed
- * Support for "multiple" attribute in SELECT elements, especially for GetDefault(User)Settings plugin callback
+ * Revision 1.27  2006/12/24 01:09:55  fplanque
+ * Rollback. Non geeks do not know how to use select multiple.
+ * Checkbox lists should be used instead.
+ * The core does. There is not reason for plugins not to do so also.
  *
  * Revision 1.24  2006/12/12 02:53:56  fplanque
  * Activated new item/comments controllers + new editing navigation
