@@ -79,6 +79,7 @@ global $selected_Filelist;
  */
 global $edited_Item;
 
+global $Blog;
 
 global $disp_fm_browser_toggle, $fm_hide_dirtree, $create_name, $ads_list_path;
 
@@ -670,6 +671,15 @@ else
 			&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
 
 		<?php
+		if( $fm_Filelist->get_root_type() == 'collection' || !empty($Blog) )
+		{	// We are browsing files for a collection:
+			// fp> TODO: use current as default but let user choose into whoch blog he wants to post
+			echo '<input type="submit" name="actionArray[make_posts]" class="ActionButton"
+				value="'.T_('Make posts').'"
+				title="'.T_('Make posts with selected images').'" />';
+		}
+
+
 		if( $mode == 'upload' )
 		{	// We are uploading in a popup opened by an edit screen
 			?>
@@ -687,12 +697,12 @@ else
 		{ // User can edit:
 			?>
 			<input class="ActionButton" type="image" name="actionArray[rename]"
-				title="<?php echo T_('Rename the selected files'); ?>"
+				title="<?php echo T_('Rename the selected files...'); ?>"
 				src="<?php echo get_icon( 'file_rename', 'url' ); ?>"
 				onclick="return check_if_selected_files();" />
 
 			<input class="DeleteButton" type="image" name="actionArray[delete]"
-				title="<?php echo T_('Delete the selected files') ?>"
+				title="<?php echo T_('Delete the selected files...') ?>"
 				src="<?php echo get_icon( 'file_delete', 'url' ) ?>"
 				onclick="return check_if_selected_files();" />
 			<?php
@@ -702,7 +712,7 @@ else
 		?>
 
 		<input class="ActionButton"
-			title="<?php echo T_('Download the selected files as archive') ?>"
+			title="<?php echo T_('Download the selected files as archive...') ?>"
 			name="actionArray[download]"
 			value="download"
 			type="image"
@@ -970,6 +980,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.35  2006/12/24 00:52:57  fplanque
+ * Make posts with images - Proof of concept
+ *
  * Revision 1.34  2006/12/23 22:53:10  fplanque
  * extra security
  *

@@ -1129,9 +1129,10 @@ class Filelist
 
 		$to_load = array();
 
-		foreach( $this->_entries as $loop_File )
+		for( $i=0; $i<count($this->_entries); $i++ )
 		{	// For each file:
-			// echo $loop_File->get_full_path();
+			$loop_File = & $this->_entries[$i];
+			// echo '<br>'.$loop_File->get_full_path();
 
 			if( $loop_File->meta != 'unknown' )
 			{ // We have already loaded meta data:
@@ -1141,35 +1142,50 @@ class Filelist
 			$to_load[] = $DB->quote( $loop_File->get_rdfp_rel_path() );
 		}
 
-		if( ! count( $to_load ) )
-		{	// We don't need to load anything...
-			return false;
+		if( count( $to_load ) )
+		{	// We have something to load...
+			/**
+			 * @var FileCache
+			 */
+			$FileCache = & get_Cache( 'FileCache' );
+
+			$rows = $DB->get_results( '
+				SELECT *
+				  FROM T_files
+				 WHERE file_root_type = "'.$this->_FileRoot->type.'"
+				   AND file_root_ID = '.$this->_FileRoot->in_type_ID.'
+				   AND file_path IN ('.implode( ',', $to_load ).')',
+				OBJECT, 'Load FileList meta data' );
+
+			if( count($rows) )
+			{ // Go through rows of loaded meta data...
+				foreach( $rows as $row )
+				{
+					// Retrieve matching File object:
+					/**
+					 * @var File
+					 */
+					$loop_File = & $FileCache->get_by_root_and_path( $row->file_root_type, $row->file_root_ID, $row->file_path );
+
+					// Associate meta data to File object:
+					$loop_File->load_meta( false, $row );
+				}
+			}
 		}
 
-		$rows = $DB->get_results( '
-			SELECT *
-			  FROM T_files
-			 WHERE file_root_type = "'.$this->_FileRoot->type.'"
-			   AND file_root_ID = '.$this->_FileRoot->in_type_ID.'
-			   AND file_path IN ('.implode( ',', $to_load ).')',
-			OBJECT, 'Load FileList meta data' );
-		if( ! $rows )
-		{ // We haven't found any meta data...
-			return false;
+		// For all Files that still have no meta data, memorize that we could not find any meta data
+		for( $i=0; $i<count($this->_entries); $i++ )
+		{	// For each file:
+			$loop_File = & $this->_entries[$i];
+
+			if( $loop_File->meta == 'unknown' )
+			{
+				$loop_File->meta = 'notfound';
+			}
 		}
 
-		// Go through rows of loaded meta data...
-		$FileCache = & get_Cache( 'FileCache' );
-		foreach( $rows as $row )
-		{
-			// Retrieve matching File object:
-			$loop_File = & $FileCache->get_by_root_and_path( $row->file_root_type, $row->file_root_ID, $row->file_path );
-
-			// Associate meta data to File object:
-			$loop_File->load_meta( false, $row );
-		}
-
-		return true;
+		// Has sth been loaded?
+		return count( $to_load ) && count($rows);
 	}
 
 
@@ -1218,6 +1234,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.22  2006/12/24 00:52:56  fplanque
+ * Make posts with images - Proof of concept
+ *
  * Revision 1.21  2006/12/07 23:13:10  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!

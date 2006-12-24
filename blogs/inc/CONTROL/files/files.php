@@ -703,6 +703,105 @@ switch( $action )
 		break;
 
 
+	case 'make_posts':
+		// Make posts with selected images:
+		if( ! $selected_Filelist->count() )
+		{
+			$Messages->add( T_('Nothing selected.'), 'error' );
+			$action = 'list';
+			break;
+		}
+
+		// fp> TODO: this block should move to a general level
+		// Try to go to the right blog:
+		if( $fm_Filelist->get_root_type() == 'collection' )
+		{
+			set_working_blog( $fm_Filelist->get_root_ID() );
+      // Load the blog we're in:
+			$Blog = & $BlogCache->get_by_ID( $blog );
+		}
+		// ---
+
+
+		if( empty( $Blog ) )
+		{
+			$Messages->add( T_('No destination blog is selected.'), 'error' );
+			break;
+		}
+		//$Blog->disp('name');
+
+		// Get default status (includes PERM CHECK):
+		$item_status = $Blog->get_allowed_item_status();
+		if( empty($item_status) )
+		{
+			$Messages->add( T_('Sorry, you have no permission to post into this blog.'), 'error' );
+			break;
+		}
+
+		// make sure we have loaded metas for all files in selection!
+		$selected_Filelist->load_meta();
+
+		// Ready to create posts:
+		load_class( 'MODEL/items/_item.class.php' );
+		while( $l_File = & $selected_Filelist->get_next() )
+		{
+			if( ! $l_File->is_image() )
+			{
+				$Messages->add( sprintf( T_('Cannot post &laquo;%s&raquo; because it is not an image.'), $l_File->dget('name') ), 'error' );
+				continue;
+			}
+
+			// Create a post:
+			$edited_Item = & new Item();
+
+			$edited_Item->blog_ID = $blog;
+
+			$edited_Item->set( 'status', $item_status );
+
+			$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
+
+			$title = $l_File->get('title');
+			if( empty($title) )
+			{
+				$title = $l_File->get('name');
+			}
+			$edited_Item->set( 'title', $title );
+
+			$DB->begin();
+
+			// INSERT NEW POST INTO DB:
+			$edited_Item->dbinsert();
+
+			// echo '<br>file meta: '.$l_File->meta;
+			if(	$l_File->meta == 'notfound' )
+			{	// That file has no meta data yet, create it now!
+				$l_File->dbsave();
+			}
+
+			// Let's make the link!
+			$edited_Link = & new Link();
+			$edited_Link->set( 'itm_ID', $edited_Item->ID );
+			$edited_Link->set( 'file_ID', $l_File->ID );
+			$edited_Link->dbinsert();
+
+			$DB->commit();
+
+			$Messages->add( sprintf( T_('&laquo;%s&raquo; has been posted.'), $l_File->dget('name') ), 'success' );
+		}
+
+		// Note: we redirect without restoring filter. This should allow to see the new files.
+		// &filter=restore
+		header_redirect( 'admin.php?ctrl=items&blog='.$blog );	// Will save $Messages
+
+		// Note: we have EXITED here. In case we remove the redir, we need this:
+
+		// Reset stuff so it doesn't interfere with upcomming display
+		unset( $edited_Item );
+		unset( $edited_Link );
+		$selected_Filelist = & new Filelist( $fm_Filelist->get_FileRoot(), false );
+		break;
+
+
 	case 'edit':
 		// Edit Text File; this starts the file_edit mode:
 		// fp> Note: This probably should not be a mode.
@@ -1584,6 +1683,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.45  2006/12/24 00:52:57  fplanque
+ * Make posts with images - Proof of concept
+ *
  * Revision 1.44  2006/12/23 22:53:11  fplanque
  * extra security
  *
