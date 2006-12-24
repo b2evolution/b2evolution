@@ -284,7 +284,7 @@ elseif( !empty($p) || !empty($title) )
 	}
 	else
 	{
-		$title = preg_replace( '/[^A-Za-z0-9]/', '-', $title );
+		$title = preg_replace( '/[^A-Za-z0-9_]/', '-', $title );
 		$Item = & $ItemCache->get_by_urltitle( $title, false );
 	}
 	if( empty( $Item ) )
@@ -505,6 +505,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.59  2006/12/24 00:45:51  fplanque
+ * bugfix
+ *
  * Revision 1.58  2006/12/18 00:56:16  fplanque
  * non existent blog error handling
  *
