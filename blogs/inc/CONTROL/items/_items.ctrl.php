@@ -193,6 +193,8 @@ switch( $action )
 		}
 		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
 
+		$default_main_cat = $edited_Item->main_cat_ID;
+
 		// Trackback addresses (never saved into item)
  		param( 'trackback_url', 'string', '' );
 
@@ -210,6 +212,8 @@ switch( $action )
 		// Check permission:
 		$post_status = $edited_Item->get( 'status' );
 		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
+
+		$default_main_cat = $edited_Item->main_cat_ID;
 
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p );
@@ -677,6 +681,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2006/12/24 00:42:14  fplanque
+ * refactoring / Blog::get_default_cat_ID()
+ *
  * Revision 1.11  2006/12/23 23:37:35  fplanque
  * refactoring / Blog::get_default_cat_ID()
  *
