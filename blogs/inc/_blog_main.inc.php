@@ -375,7 +375,7 @@ if( ereg( '([^-A-Za-z0-9._]|\.\.)', $skin ) )
 // Because a lot of bloggers will delete skins, we have to make this fool proof with extra checking:
 if( !empty( $skin ) && !skin_exists( $skin ) )
 { // We want to use a skin, but it doesn't exist!
-	$err_msg = sprintf( T_('The requested skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file.'),
+	$err_msg = sprintf( T_('The skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file.'),
 		htmlspecialchars($skin), $Blog->dget('shortname'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=display&amp;action=edit&amp;blog='.$Blog->ID.'"' );
 	debug_die( $err_msg );
 }
@@ -505,6 +505,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.60  2006/12/26 00:55:58  fplanque
+ * wording
+ *
  * Revision 1.59  2006/12/24 00:45:51  fplanque
  * bugfix
  *

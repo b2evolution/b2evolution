@@ -268,7 +268,7 @@ function get_icon_info($name)
 		);
 		case 'no_edit': return array(	// placeholder
 			'file' => $rsc_subdir.'img/blank.gif',
-			'alt'  => T_(''),
+			'alt'  => '',
 			'size' => array( 16, 15 ),
 		);
 		case 'properties': return array(
@@ -494,6 +494,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.52  2006/12/26 00:55:58  fplanque
+ * wording
+ *
  * Revision 1.51  2006/12/07 20:03:31  fplanque
  * Woohoo! File editing... means all skin editing.
  *

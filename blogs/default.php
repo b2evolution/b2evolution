@@ -106,7 +106,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<li><strong><?php echo T_('Custom template') ?>: <a href="default.php"><?php echo T_('The page you\'re looking at') ?></a></strong> &nbsp; (default.php)</li>
 		<li><strong><?php echo T_('Bonus feature') ?>: <a href="contact.php"><?php echo T_('A standalone form to contact the admin (A contact page for your site)') ?></a></strong> &nbsp; (contact.php)</li>
 	</ul>
-	<p class="note"><?php echo T_('Please note: those demos do not make use of skins. The only way to change their look and feel is to edit their PHP template. But once, again, remember these are just demos destined to inspire you for your own templates ;)') ?></p>
+	<p class="note"><?php echo T_('Please note: those demos do not make use of skins. The only way to change their look and feel is to edit their PHP template. But, once again, remember these are just demos destined to inspire you for your own templates ;)') ?></p>
 
 	<?php
 	}

@@ -128,7 +128,7 @@ switch( $action )
 		// UPDATE DB:
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
-		$Messages->add( T_('Comment has been edited.'), 'success' );
+		$Messages->add( T_('Comment has been updated.'), 'success' );
 
 		$location = url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment->item_ID, '&' );
 		header_redirect( $location );
@@ -260,6 +260,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2006/12/26 00:55:58  fplanque
+ * wording
+ *
  * Revision 1.4  2006/12/18 03:20:41  fplanque
  * _header will always try to set $Blog.
  * autoselect_blog() will do so also.
