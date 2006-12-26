@@ -192,7 +192,7 @@ if( $Messages->count('error') )
 {
 	if( ! isset($page_title) )
 	{
-		$page_title = T_('Errors during processing your comment');
+		$page_title = T_('Errors while processing your comment');
 	}
 	// TODO: dh> HEAD part should be some global front end include file..
 	// fp> actually, I'd like the error messages to de displayed in a skinnable file. Something that looks like the _main skin file but with minimum extra gadgets (in order to save on DB requests at each "spam denied" error)
@@ -326,6 +326,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.98  2006/12/26 00:08:30  fplanque
+ * wording
+ *
  * Revision 1.97  2006/12/03 04:34:44  fplanque
  * doc
  *

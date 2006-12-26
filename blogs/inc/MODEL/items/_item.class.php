@@ -1920,7 +1920,7 @@ class Item extends DataObject
 		{ // Display as button
 			$r .= '<input type="button"';
 			$r .= ' value="'.$text.'" title="'.$title.'" onclick="if ( confirm(\'';
-			$r .= TS_('You are about to delete this post!\\n\'Cancel\' to stop, \'OK\' to delete.');
+			$r .= TS_('You are about to delete this post!\\nThis cannot be undone!');
 			$r .= '\') ) { document.location.href=\''.$url.'\' }"';
 			if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 			$r .= '/>';
@@ -1928,7 +1928,7 @@ class Item extends DataObject
 		else
 		{ // Display as link
 			$r .= '<a href="'.$url.'" title="'.$title.'" onclick="return confirm(\'';
-			$r .= TS_('You are about to delete this post!\\n\'Cancel\' to stop, \'OK\' to delete.');
+			$r .= TS_('You are about to delete this post!\\nThis cannot be undone!');
 			$r .= '\')"';
 			if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 			$r .= '>'.$text.'</a>';
@@ -3335,6 +3335,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.144  2006/12/26 00:08:29  fplanque
+ * wording
+ *
  * Revision 1.143  2006/12/21 22:35:28  fplanque
  * No regression. But a change in usage. The more link must be configured in the skin.
  * Renderers cannot side-effect on the more tag any more and that actually makes the whole thing safer.

@@ -563,7 +563,7 @@ class Comment extends DataObject
 		{ // Display as button
 			echo '<input type="button"';
 			echo ' value="'.$text.'" title="'.$title.'" onclick="if ( confirm(\'';
-			echo TS_('You are about to delete this comment!\\n\'Cancel\' to stop, \'OK\' to delete.');
+			echo TS_('You are about to delete this comment!\\nThis cannot be undone!');
 			echo '\') ) { document.location.href=\''.$url.'\' }"';
 			if( !empty( $class ) ) echo ' class="'.$class.'"';
 			echo '/>';
@@ -571,7 +571,7 @@ class Comment extends DataObject
 		else
 		{ // Display as link
 			echo '<a href="'.$url.'" title="'.$title.'" onclick="return confirm(\'';
-			echo TS_('You are about to delete this comment!\\n\'Cancel\' to stop, \'OK\' to delete.');
+			echo TS_('You are about to delete this comment!\\nThis cannot be undone!');
 			echo '\')"';
 			if( !empty( $class ) ) echo ' class="'.$class.'"';
 			echo '>'.$text.'</a>';
@@ -1183,6 +1183,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.56  2006/12/26 00:08:29  fplanque
+ * wording
+ *
  * Revision 1.55  2006/12/16 01:30:46  fplanque
  * Setting to allow/disable email subscriptions on a per blog basis
  *
