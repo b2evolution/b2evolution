@@ -72,8 +72,8 @@ class test_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = T_('Test plugin');
-		$this->long_desc = T_('This plugin responds to virtually all possible plugin events :P');
+		$this->short_desc = 'Test plugin';
+		$this->long_desc = 'This plugin responds to virtually all possible plugin events :P';
 	}
 
 
@@ -92,22 +92,22 @@ class test_plugin extends Plugin
 	{
 		$r = array(
 			'click_me' => array(
-				'label' => T_('Click me!'),
+				'label' => 'Click me!',
 				'defaultvalue' => '1',
 				'type' => 'checkbox',
 			),
 			'input_me' => array(
-				'label' => T_('How are you?'),
+				'label' => 'How are you?',
 				'defaultvalue' => '',
-				'note' => T_('Welcome to b2evolution'),
+				'note' => 'Welcome to b2evolution',
 			),
 			'my_select' => array(
-				'label' => T_('Selector'),
+				'label' => 'Selector',
 				'id' => $this->classname.'_my_select',
 				'onchange' => 'document.getElementById("'.$this->classname.'_a_disabled_one").disabled = ( this.value == "sun" );',
 				'defaultvalue' => 'one',
 				'type' => 'select',
-				'options' => array( 'sun' => T_('Sunday'), 'mon' => T_('Monday') ),
+				'options' => array( 'sun' => 'Sunday', 'mon' => 'Monday' ),
 			),
 			'a_disabled_one' => array(
 				'label' => 'This one is disabled',
@@ -115,7 +115,7 @@ class test_plugin extends Plugin
 				'type' => 'checkbox',
 				'defaultvalue' => '1',
 				'disabled' => true, // this can be useful if you detect that something cannot be changed. You probably want to add a 'note' then, too.
-				'note' => 'Change the above select input to "'.T_('Monday').'" to enable it.',
+				'note' => 'Change the above select input to "Monday" to enable it.',
 			),
 			'blog' => array(
 				'label' => 'A blog',
@@ -172,12 +172,12 @@ class test_plugin extends Plugin
 	{
 		return array(
 				'echo_random' => array(
-					'label' => T_('Echo a random number in AdminBeginPayload event'),
+					'label' => 'Echo a random number in AdminBeginPayload event',
 					'type' => 'checkbox',
 					'defaultvalue' => '0',
 				),
 				'deactivate' => array(
-					'label' => T_('Deactivate'),
+					'label' => 'Deactivate',
 					'type' => 'checkbox',
 					'defaultvalue' => '0',
 				),
@@ -194,7 +194,7 @@ class test_plugin extends Plugin
 	{
 		return array(
 				// Gets "min" and "max" as params and should return a random number in between:
-				'test_plugin_get_random' => T_('TEST event that returns a random number.'),
+				'test_plugin_get_random' => 'TEST event that returns a random number.',
 			);
 	}
 
@@ -272,11 +272,11 @@ class test_plugin extends Plugin
 	{
 		if( $this->UserSettings->get('echo_random') )
 		{
-			$this->msg( T_('TEST plugin: Random numbers have been disabled.') );
+			$this->msg( 'TEST plugin: Random numbers have been disabled.' );
 		}
 		else
 		{
-			$this->msg( T_('TEST plugin: Random numbers have been enabled.') );
+			$this->msg( 'TEST plugin: Random numbers have been enabled.' );
 		}
 
 		return true;
@@ -715,6 +715,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.63  2006/12/26 00:08:01  fplanque
+ * reduce strain on translators. plugin devs need to understand english anyway.
+ *
  * Revision 1.62  2006/12/22 22:29:35  blueyed
  * Support for "multiple" attribute in SELECT elements, especially for GetDefault(User)Settings plugin callback
  *
