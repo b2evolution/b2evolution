@@ -24,6 +24,7 @@ class auto_p_plugin extends Plugin
 	var $priority = 70;
 	var $version = '1.9';
 	var $apply_rendering = 'opt-out';
+	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
 
@@ -633,6 +634,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.35  2006/12/26 03:19:12  fplanque
+ * assigned a few significant plugin groups
+ *
  * Revision 1.34  2006/12/20 13:42:54  blueyed
  * Made Auto-P plugin work again and let it handle also nextpage and noteaser special tags
  *

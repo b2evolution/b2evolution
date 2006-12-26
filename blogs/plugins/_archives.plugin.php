@@ -60,6 +60,7 @@ class archives_plugin extends Plugin
 	var $priority = 50;
 	var $version = '1.9-dev';
 	var $author = 'The b2evo Group';
+	var $group = 'skin-tag';
 
 
 	/**
@@ -559,6 +560,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.35  2006/12/26 03:19:12  fplanque
+ * assigned a few significant plugin groups
+ *
  * Revision 1.34  2006/12/04 19:41:11  fplanque
  * Each blog can now have its own "archive mode" settings
  *

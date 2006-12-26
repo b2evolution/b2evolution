@@ -52,6 +52,7 @@ class basic_antispam_plugin extends Plugin
 	var $priority = 60;
 	var $version = '2.0-dev';
 	var $author = 'The b2evo Group';
+	var $group = 'antispam';
 
 
 	/**
@@ -612,6 +613,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.26  2006/12/26 03:19:12  fplanque
+ * assigned a few significant plugin groups
+ *
  * Revision 1.25  2006/12/21 16:14:25  blueyed
  * Basic Antispam Plugin:
  * - Use fsockopen instead of url fopen to get refering page contents

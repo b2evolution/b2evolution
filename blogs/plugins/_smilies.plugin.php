@@ -24,6 +24,7 @@ class smilies_plugin extends Plugin
 	var $priority = 80;
 	var $version = '1.9-dev';
 	var $apply_rendering = 'opt-out';
+	var $group = 'rendering';
 
 	/**
 	 * Text similes search array
@@ -410,6 +411,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.36  2006/12/26 03:19:12  fplanque
+ * assigned a few significant plugin groups
+ *
  * Revision 1.35  2006/11/27 00:32:53  blueyed
  * trans fix
  *

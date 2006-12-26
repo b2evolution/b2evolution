@@ -52,7 +52,7 @@ class calendar_plugin extends Plugin
 	var $priority = 20;
 	var $version = '1.9-dev';
 	var $author = 'The b2evo Group';
-
+	var $group = 'skin-tag';
 
 
 	/**
@@ -1113,6 +1113,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.34  2006/12/26 03:19:12  fplanque
+ * assigned a few significant plugin groups
+ *
  * Revision 1.33  2006/12/07 23:13:14  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!

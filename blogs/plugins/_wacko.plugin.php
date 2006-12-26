@@ -24,6 +24,7 @@ class wacko_plugin extends Plugin
 	var $priority = 30;
 	var $version = '1.9-dev';
 	var $apply_rendering = 'opt-in';
+	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
 
@@ -172,6 +173,9 @@ class wacko_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.14  2006/12/26 03:19:12  fplanque
+ * assigned a few significant plugin groups
+ *
  * Revision 1.13  2006/07/10 20:19:30  blueyed
  * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
  *

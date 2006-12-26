@@ -24,6 +24,7 @@ class wikilinks_plugin extends Plugin
 	var $priority = 35;
 	var $version = '1.9-dev';
 	var $apply_rendering = 'opt-in';
+	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
 
@@ -259,6 +260,9 @@ class wikilinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.23  2006/12/26 03:19:12  fplanque
+ * assigned a few significant plugin groups
+ *
  * Revision 1.22  2006/12/12 02:53:57  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.

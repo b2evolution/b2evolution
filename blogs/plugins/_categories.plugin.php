@@ -45,6 +45,7 @@ class categories_plugin extends Plugin
 	var $priority = 60;
 	var $version = '2.0-dev';
 	var $author = 'The b2evo Group';
+	var $group = 'skin-tag';
 
 
 	/**
@@ -353,6 +354,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.36  2006/12/26 03:19:12  fplanque
+ * assigned a few significant plugin groups
+ *
  * Revision 1.35  2006/12/18 00:41:06  fplanque
  * handle non existing blogs a little better
  *

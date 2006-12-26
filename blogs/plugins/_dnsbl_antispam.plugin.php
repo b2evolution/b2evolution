@@ -44,6 +44,7 @@ class dnsbl_antispam_plugin extends Plugin
 	var $priority = 40;
 	var $version = '1.9-dev';
 	var $author = 'The b2evo Group';
+	var $group = 'antispam';
 
 
 	/**
@@ -684,6 +685,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.35  2006/12/26 03:19:12  fplanque
+ * assigned a few significant plugin groups
+ *
  * Revision 1.34  2006/09/17 21:27:24  blueyed
  * Minor improvement to blocked-error: show IP
  *

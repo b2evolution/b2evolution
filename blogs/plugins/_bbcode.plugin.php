@@ -23,6 +23,7 @@ class bbcode_plugin extends Plugin
 	var $priority = 50;
 	var $version = '1.9-dev';
 	var $apply_rendering = 'opt-in';
+	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
 
@@ -211,6 +212,9 @@ class bbcode_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.18  2006/12/26 03:19:12  fplanque
+ * assigned a few significant plugin groups
+ *
  * Revision 1.17  2006/07/31 16:12:18  yabs
  * Modified 'allow_html' to html_input/html_textarea
  *
