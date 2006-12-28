@@ -49,7 +49,7 @@ param( 'mode', 'string', '' );
 param( 'login', 'string', '' );
 // echo 'login: ', $login;
 
-param( 'redirect_to', 'string', '' ); // gets used by header_redirect(); if appropriate (perms) we let it default to $admin_url
+param( 'redirect_to', 'string', true ); // gets used by header_redirect(); required
 
 
 switch( $action )
@@ -335,7 +335,13 @@ if( $ReqHost.$ReqPath != $htsrv_url_sensitive.'login.php' )
 	$Messages->add( sprintf( T_('WARNING: you are trying to log in on <strong>%s</strong> but we expect you to log in on <strong>%s</strong>. If this is due to an automatic redirect, this will prevent you from successfully loging in. You must either fix your webserver configuration, or your %s configuration in order for these two URLs to match.'), $ReqHost.$ReqPath, $htsrv_url_sensitive.'login.php', $app_name ), 'error' );
 }
 
+// Note: the following regexp would fail when loging on to the same domain, because cookie_domain starts with a dot '.'
+// However, same domain logins will happen with a relative redirect_to, so it is covered with '^/'
+if( !preg_match( '#^/|(https?://[a-z\-.]*'.str_replace( '.', '\.', $cookie_domain ).')#i', $redirect_to ) )
+{
+	$Messages->add( sprintf( T_('WARNING: you are trying to log in to <strong>%s</strong> but your cookie domain is <strong>%s</strong>. You will not be able to successfully log in to the requested domain until you fix your cookie domain in your %s configuration.'), $redirect_to, $cookie_domain, $app_name ), 'error' );
 
+}
 
 // Default: login form
 require $view_path.'login/_login_form.php';
@@ -344,6 +350,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.81  2006/12/28 19:18:49  fplanque
+ * trap yet another login/cookie caveat
+ *
  * Revision 1.80  2006/12/28 15:44:31  fplanque
  * login refactoring / simplified
  *
