@@ -243,12 +243,17 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 			$Form->text( 'o', $comment_author_url, 40, T_('Site/Url'), T_('Your URL will be displayed.'), 100, 'bComment' );
 		}
 
+		echo '<div class="comment_toolbars">';
+		// CALL PLUGINS NOW:
+		$Plugins->trigger_event( 'DisplayCommentToolbar', array() );
+		echo '</div>';
+
 		// Message field:
 		// TODO: dh> this uses "id" "p" - should be more distinctive..
 		$Form->textarea( 'p', $comment_content, 10, T_('Comment text'),
 										T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)), 40, 'bComment' );
-
-
+		// set b2evoCanvas for plugins
+		echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "p" );</script>';
 		$comment_options = array();
 		$Form->output = false;
 		$Form->label_to_the_left = false;
@@ -309,6 +314,10 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.85  2006/12/28 23:20:40  fplanque
+ * added plugin event for displaying comment form toolbars
+ * used by smilies plugin
+ *
  * Revision 1.84  2006/12/17 23:42:39  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.

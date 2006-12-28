@@ -96,7 +96,7 @@ class Plugins_admin extends Plugins
 			$supported_events = array(
 				'AdminAfterPageFooter' => '',
 				'AdminDisplayEditorButton' => '',
-				'AdminDisplayToolbar' => '',
+				'AdminDisplayToolbar' => 'Display a toolbar on the edit screen(s)',
 				'AdminDisplayCommentFormFieldset' => '',
 				'AdminDisplayItemFormFieldset' => '',
 				'AdminEndHtmlHead' => '',
@@ -153,6 +153,7 @@ class Plugins_admin extends Plugins
 
 				'AppendHitLog' => 'Called when a hit gets logged, but before it gets recorded.',
 
+				'DisplayCommentToolbar' => 'Display a toolbar on the public feedback form',
 				'DisplayCommentFormButton' => '',
 				'DisplayCommentFormFieldset' => '',
 				'DisplayMessageFormButton' => '',
@@ -1330,6 +1331,10 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.19  2006/12/28 23:20:40  fplanque
+ * added plugin event for displaying comment form toolbars
+ * used by smilies plugin
+ *
  * Revision 1.18  2006/12/07 23:13:13  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!

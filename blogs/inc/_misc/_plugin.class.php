@@ -1313,6 +1313,18 @@ class Plugin
 	// Feedback (Comment/Trackback) events: {{{
 
 	/**
+	 * Event handler: Called when displaying editor toolbars.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCommentToolbar( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
+
+	/**
 	 * Event handler: Called at the end of the "Edit comment" form.
 	 *
 	 * @param array Associative array of parameters
@@ -2795,6 +2807,10 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.129  2006/12/28 23:20:40  fplanque
+ * added plugin event for displaying comment form toolbars
+ * used by smilies plugin
+ *
  * Revision 1.128  2006/12/22 22:29:35  blueyed
  * Support for "multiple" attribute in SELECT elements, especially for GetDefault(User)Settings plugin callback
  *

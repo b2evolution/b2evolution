@@ -22,7 +22,7 @@ class smilies_plugin extends Plugin
 	var $code = 'b2evSmil';
 	var $name = 'Smilies';
 	var $priority = 80;
-	var $version = '1.9-dev';
+	var $version = '1.9.2';
 	var $apply_rendering = 'opt-out';
 	var $group = 'rendering';
 
@@ -73,10 +73,10 @@ class smilies_plugin extends Plugin
 					'type' => 'checkbox',
 					'note' => T_( 'This is the default setting. Users can override it in their profile.' ),
 				),
-				'render_comments_default' => array(
+				'render_comments' => array(	// fp> Note: this is not a default in this version, it's an 'always' :]
 					'label' => $this->T_('Render comments' ),
-					'note' => $this->T_('This is the default setting. Users can override it in their profile.'),
-					'defaultvalue' => '1',
+					'note' => $this->T_('Check to also render smilies in comments.'),
+					'defaultvalue' => '0',
 					'type' => 'checkbox',
 				),
 				// TODO (yabs) : Display these as images and individual inputs
@@ -141,8 +141,7 @@ XX(      graydead.gif
 
 
 	/**
-	 * Allowing the user to deactivate the toolbar..
-	 * Allowing user to deactivate smilies in comments
+	 * Allowing the user to override the display of the toolbar.
 	 *
 	 * @return array
 	 */
@@ -154,28 +153,51 @@ XX(      graydead.gif
 					'defaultvalue' => $this->Settings->get('use_toolbar_default'),
 					'type' => 'checkbox',
 				),
-				'render_comments' => array(
-					'label' => $this->T_('Render comments' ),
-					'note' => $this->T_('If enabled the smileys in comments will also be rendered'),
-					'defaultvalue' => $this->Settings->get( 'render_comments_default' ),
-					'type' => 'checkbox',
-				),
 			);
 	}
 
+
 	/**
-	 * Display a toolbar
+	 * Display a toolbar in admin
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		if( ! $this->UserSettings->get('use_toolbar') )
+		if( $this->UserSettings->get('use_toolbar') )
 		{
-			return false;
+			return $this->display_smiley_bar();
 		}
+		return false;
+	}
 
+
+	/**
+	 * Event handler: Called when displaying editor toolbars.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCommentToolbar( & $params )
+	{
+		if( $this->Settings->get( 'render_comments' )
+		&& ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
+			|| ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
+		{	
+			return $this->display_smiley_bar();
+		}
+		return false;
+	}
+
+
+	/**
+	 * Display the smiley toolbar
+	 *
+	 * @return boolean did we display a toolbar?
+	 */
+	function display_smiley_bar()
+	{
 		$this->InitSmilies();	// check smilies cached
 
 		$grins = '';
@@ -240,6 +262,7 @@ XX(      graydead.gif
 		return true;
 	}
 
+
 	/**
 	 * Perform rendering
 	 *
@@ -247,11 +270,13 @@ XX(      graydead.gif
 	 */
 	function FilterCommentContent( & $params )
 	{
-		if( $this->UserSettings->get( 'render_comments' ) )
+		if( $this->Settings->get( 'render_comments' ) )
 		{
 			$this->RenderItemAsHtml( $params );
 		}
-	}
+	}	
+	
+
 
 	/**
 	 * Perform rendering
@@ -411,11 +436,30 @@ XX(      graydead.gif
 
 /*
  * $Log$
- * Revision 1.36  2006/12/26 03:19:12  fplanque
+ * Revision 1.37  2006/12/28 23:20:40  fplanque
+ * added plugin event for displaying comment form toolbars
+ * used by smilies plugin
+ *
+ * Revision 1.31.2.10  2006/12/27 09:41:12  yabs
+ * Removed b2evocanvas, minor other changes, clarified doc
+ *
+ * Revision 1.31.2.9  2006/12/26 03:18:51  fplanque
  * assigned a few significant plugin groups
  *
- * Revision 1.35  2006/11/27 00:32:53  blueyed
- * trans fix
+ * Revision 1.31.2.8  2006/12/16 04:30:59  fplanque
+ * doc
+ *
+ * Revision 1.31.2.7  2006/12/03 08:27:35  yabs
+ * Removed user setting - render_comments
+ * Changed behaviour - render_comments_default used instead
+ * Added skintag to display toolbar ifsmilies in comments enabled - usersetting overrides toolbar default
+ * Other minor changes to code
+ *
+ * Revision 1.31.2.6  2006/11/27 19:12:50  fplanque
+ * 1.9 POT has gone public. No more unnecessary changes.
+ * 1.9.x language packs should work for ALL 1.9.x versions.
+ * Adding strings is okay. Removing strings/changing strings for fun is not OK.
+ * Move to 1.10 or 2.0
  *
  * Revision 1.34  2006/11/27 00:28:36  blueyed
  * trans fix
