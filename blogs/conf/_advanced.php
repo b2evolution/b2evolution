@@ -324,15 +324,12 @@ $cookie_path = preg_replace( '#https?://[^/]+#', '', $baseurl );
  *
  * @global string Default: ( strpos($basehost, '.') ) ? '.'. $basehost : '';
  */
-$cookie_domain = ( strpos($basehost, '.') ? '.'. $basehost : '' );
+$cookie_domain = ( strpos($basehost, '.') ? '.'.$basehost : '' );
 //echo 'cookie_domain='. $cookie_domain. ' cookie_path='. $cookie_path;
 
 /**#@+
  * Names for cookies.
  */
-// This is mainly used for storing the prefered skin:
-// Note: This is not a SESSION variable. It is a user pref that works even for non registered users.
-$cookie_state   = 'cookie'.$instance_name.'state';
 // The following remember the comment meta data for non registered users:
 $cookie_name    = 'cookie'.$instance_name.'name';
 $cookie_email   = 'cookie'.$instance_name.'email';
