@@ -70,7 +70,7 @@ class Session
 
 	/**
 	 * The user ID for the user of the session (NULL for anonymous (not logged in) user).
-	 * 
+	 *
 	 * @var integer
 	 */
 	var $user_ID;
@@ -104,6 +104,9 @@ class Session
 		global $Hit;
 		global $cookie_session, $cookie_expires, $cookie_path, $cookie_domain;
 
+		$Debuglog->add( 'cookie_domain='.$cookie_domain, 'session' );
+		$Debuglog->add( 'cookie_path='.$cookie_path, 'session' );
+
 		$session_cookie = param_cookie( $cookie_session, 'string', '' );
 		if( empty( $session_cookie ) )
 		{
@@ -120,7 +123,7 @@ class Session
 				$session_id_by_cookie = $match[1];
 				$session_key_by_cookie = $match[2];
 
-				$Debuglog->add( 'ID (from cookie): '.$session_id_by_cookie, 'session' );
+				$Debuglog->add( 'Session ID received from cookie: '.$session_id_by_cookie, 'session' );
 
 				$row = $DB->get_row( '
 					SELECT sess_ID, sess_key, sess_data, sess_user_ID
@@ -134,13 +137,13 @@ class Session
 				}
 				else
 				{ // ID + key are valid: load data
-					$Debuglog->add( 'ID is valid.', 'session' );
+					$Debuglog->add( 'Session ID is valid.', 'session' );
 					$this->ID = $row->sess_ID;
 					$this->key = $row->sess_key;
 					$this->user_ID = $row->sess_user_ID;
 					$this->is_validated = true;
 
-					$Debuglog->add( 'user_ID: '.var_export($this->user_ID, true), 'session' );
+					$Debuglog->add( 'Session user_ID: '.var_export($this->user_ID, true), 'session' );
 
 					if( empty( $row->sess_data ) )
 					{
@@ -490,6 +493,9 @@ function session_unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.30  2006/12/28 15:43:31  fplanque
+ * minor
+ *
  * Revision 1.29  2006/12/17 23:44:35  fplanque
  * minor cleanup
  *
