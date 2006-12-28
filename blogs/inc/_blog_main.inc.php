@@ -39,11 +39,19 @@ $Timer->start( '_blog_main.inc' );
 
 /*
  * blog ID. This is a little bit special.
- * We can't default to $default_to_blog here because the param should always be included in regenerate_url() when present.
- * This will prevent weird indexing/search results in case the default changes after indexing.
- * On some occasions, we'll manually filter it out of rgenerate_url() because we know wer go through a stub for example.
+ * If it has been explicitely memorized already, we don't touch it.
+ * Note: explicitely != auto regsiter globals != stub file just setting it with $blog=x
+ * Note: stub files should probably memorize the param explicitely!
  */
-param( 'blog', 'integer', 0, true );
+if( ! param_ismemorized('blog') )
+{	// Not explicitely memorized yet, get param from GET or auto_regsiter_globals OR a stub $blog = x:
+	$Debuglog->add( 'blog param not memorized before _blog_main.inc', 'params' );
+	// We default to 0 here because the param should always be included in regenerate_url() when present.
+	// This will prevent weird indexing/search results in case the default changes after indexing.
+  // On some occasions, we'll manually filter it out of rgenerate_url() because we know we go through a stub for example.
+	param( 'blog', 'integer', 0, true );
+}
+
 // Getting current blog info:
 $BlogCache = & get_Cache( 'BlogCache' );
 $Blog = & $BlogCache->get_by_ID( $blog, false );
@@ -505,6 +513,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.61  2006/12/28 18:31:30  fplanque
+ * prevent impersonating of blog in multiblog situation
+ *
  * Revision 1.60  2006/12/26 00:55:58  fplanque
  * wording
  *

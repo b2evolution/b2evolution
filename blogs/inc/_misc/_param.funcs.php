@@ -1135,13 +1135,9 @@ function memorize_param( $var, $type, $default, $value = NULL )
 		$global_param_list = array();
 	}
 
-// fp> All these checks are seriously getting annoying! WHEN does it happen that we use param() (and furtermore anything else) without having a DebugLog?
-// dh> when using the parts of the "framework" by themselves.. e.g. "require_once _param.funcs.php".. OTOH $Debuglog (and $Messages and $Timer etc) could be considered existing everywhere and a smaller _main.inc.php (e.g. _bootstrap.inc.php) would take care of it. OTOH^2: checking with isset() is probably faster than a function call (to Log_noop) and that's mostly the case ($debug=0)
-	if( isset($Debuglog) )
-	{
-		$Debuglog->add( "memorize_param: $var $type default=$default"
+	$Debuglog->add( "memorize_param: $var $type default=$default"
 			.(is_null($value) ? '' : " value=$value"), 'params');
-	}
+
 	$global_param_list[$var] = array( 'type' => $type, 'default' => (($default===true) ? NULL : $default) );
 
 	if( !is_null( $value ) )
@@ -1159,9 +1155,20 @@ function forget_param( $var )
 {
 	global $Debuglog, $global_param_list;
 
-	if( isset($Debuglog) ) $Debuglog->add( 'forget_param('.$var.')', 'params' );
+	$Debuglog->add( 'forget_param('.$var.')', 'params' );
 
 	unset( $global_param_list[$var] );
+}
+
+
+/**
+ * Has the param already been memorized?
+ */
+function param_ismemorized( $var )
+{
+	global $global_param_list;
+
+	return isset($global_param_list[$var]);
 }
 
 
@@ -1615,6 +1622,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.27  2006/12/28 18:31:30  fplanque
+ * prevent impersonating of blog in multiblog situation
+ *
  * Revision 1.26  2006/12/22 00:25:48  blueyed
  * Added $absolute param to url_validate()
  *
