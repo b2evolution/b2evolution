@@ -313,7 +313,10 @@ $cookie_path = preg_replace( '#https?://[^/]+#', '', $baseurl );
  * @global string Default: ( strpos($basehost, '.') ) ? '.'. $basehost : '';
  */
 $cookie_domain = ( strpos($basehost, '.') ? '.'.$basehost : '' );
-//echo 'cookie_domain='. $cookie_domain. ' cookie_path='. $cookie_path;
+// When hosting multiple domains (not just subdomains) on a single instance of b2evo,
+// you want to try this:
+// $cookie_domain = '.'.$_SERVER['HTTP_HOST'];
+
 
 /**#@+
  * Names for cookies.
