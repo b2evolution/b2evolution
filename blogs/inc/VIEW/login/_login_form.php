@@ -31,6 +31,19 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Do not cache this page, because the JS password random salt has to match the one stored in the current session:
 header_nocache(); // do not cache this page, because the JS password salt has to match the session cookie
 
+if( empty($redirect_to) )
+{ // Use requested URI if nothing provided
+	$redirect_to = $ReqURI;
+}
+
+if( preg_match( '#/login.php([&?].*)?$#', $redirect_to ) )
+{ // avoid "endless loops"
+	$redirect_to = $admin_url;
+}
+
+$Debuglog->add( 'redirect_to: '.$redirect_to );
+
+
 $transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 
 /**
@@ -184,7 +197,9 @@ $Form->end_form();
 		?></a>
 
 	<?php
-	if( empty($login_required) )
+	if( empty($login_required)
+		&& strpos($redirect_to, $admin_url) !== 0
+		&& strpos($ReqHost.$redirect_to, $admin_url ) !== 0 )
 	{ // No login required, allow to pass through
 		// TODO: dh> validate redirect_to param?!
 		echo '<a href="'.url_rel_to_same_host($redirect_to, $ReqHost).'">'./* Gets displayed as link to the location on the login form if no login is required */ T_('Bypass login...').'</a>';
@@ -199,6 +214,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.35  2006/12/28 15:44:30  fplanque
+ * login refactoring / simplified
+ *
  * Revision 1.34  2006/12/22 20:11:02  blueyed
  * todo, doc, cleanup
  *

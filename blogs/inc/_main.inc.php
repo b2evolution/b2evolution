@@ -636,9 +636,7 @@ init_charsets( $current_charset );
 
 if( $Messages->count( 'login_error' ) )
 {
-	header_nocache();
-
-	require $htsrv_path.'login.php';
+	require $view_path.'login/_login_form.php';
 	exit();
 }
 
@@ -658,6 +656,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.71  2006/12/28 15:44:31  fplanque
+ * login refactoring / simplified
+ *
  * Revision 1.70  2006/12/15 22:54:14  fplanque
  * allow disabling of password hashing
  *

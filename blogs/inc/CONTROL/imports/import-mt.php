@@ -119,10 +119,7 @@ if( ! isset($config_is_done) || ! $config_is_done )
 // Check if user is logged in and is in group #1 (admins)
 if( !is_logged_in() || $current_User->Group->ID != 1 )
 {	// login failed
-	echo $head;
-	$error = 'You must login with an administrator (group #1) account.';
-	$redirect_to = $ReqURI;
-	require( $htsrv_path.'login.php' );
+	debug_die( 'You must login with an administrator (group #1) account.' );
 }
 
 echo $head;
@@ -1628,6 +1625,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.30  2006/12/28 15:44:31  fplanque
+ * login refactoring / simplified
+ *
  * Revision 1.29  2006/12/17 23:42:38  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.

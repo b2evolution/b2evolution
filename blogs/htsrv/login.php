@@ -311,17 +311,6 @@ switch( $action )
 
 }
 
-
-if( empty($redirect_to) )
-{ // Use requested URI if nothing provided
-	$redirect_to = $ReqURI;
-}
-
-if( preg_match( '#/login.php([&?].*)?$#', $redirect_to ) )
-{ // avoid "endless loops"
-	$redirect_to = $admin_url;
-}
-
 // Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
 $redirect_to = preg_replace( '~(?<=\?|&) (login|pwd) = [^&]+ ~x', '', $redirect_to );
 
@@ -337,14 +326,15 @@ if( $Session->has_User() )
 	unset($tmp_User);
 }
 
-if( ( empty($redirect_to) && is_admin_page() )
-	|| strpos($redirect_to, $admin_url) === 0
-	|| strpos($ReqHost.$redirect_to, $admin_url ) === 0 )
-{ // don't provide link to bypass
-	$login_required = true;
+$Debuglog->add( 'redirect_to: '.$redirect_to );
+
+// echo $htsrv_url_sensitive.'login.php';
+// echo '<br>'.$ReqHost.$ReqPath;
+if( $ReqHost.$ReqPath != $htsrv_url_sensitive.'login.php' )
+{
+	$Messages->add( sprintf( T_('WARNING: you are trying to log in on <strong>%s</strong> but we expect you to log in on <strong>%s</strong>. If this is due to an automatic redirect, this will prevent you from successfully loging in. You must either fix your webserver configuration, or your %s configuration in order for these two URLs to match.'), $ReqHost.$ReqPath, $htsrv_url_sensitive.'login.php', $app_name ), 'error' );
 }
 
-$Debuglog->add( 'redirect_to: '.$redirect_to );
 
 
 // Default: login form
@@ -354,6 +344,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.80  2006/12/28 15:44:31  fplanque
+ * login refactoring / simplified
+ *
  * Revision 1.79  2006/12/06 23:25:32  blueyed
  * Fixed bookmarklet plugins (props Danny); removed unneeded bookmarklet handling in core
  *
