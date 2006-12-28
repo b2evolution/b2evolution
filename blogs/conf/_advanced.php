@@ -79,18 +79,6 @@ $require_name_email = 1;
 $minimum_comment_interval = 30;
 
 
-if( !isset($default_to_blog) )
-{ /**
-	 * Set the blog number to be used when not otherwise specified.
-	 * 2 is the default setting, since it is the first user blog created by b2evo.
-	 * 1 is also a popular choice, since it is a special blog aggregating all the others.
-	 * @global int $default_to_blog
-	 * @todo move to {@link $Settings}
-	 */
-	$default_to_blog = 2;
-}
-
-
 /**
  * Set the length of the online session time out (in seconds).
  *

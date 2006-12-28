@@ -562,7 +562,6 @@ function autoselect_blog( $permname, $permlevel = 'any' )
 	global $blog;
 	global $Blog;
 	global $current_User;
-	global $default_to_blog;
 
 	$autoselected_blog = $blog;
 
@@ -576,24 +575,16 @@ function autoselect_blog( $permname, $permlevel = 'any' )
 
 	if( !$autoselected_blog )
 	{ // No blog is selected so far (or selection was invalid)...
-		/*
-		if( $current_User->check_perm( $permname, $permlevel, false, $default_to_blog ) )
-		{ // Default blog is a valid choice
-			$autoselected_blog = $default_to_blog;
-		}
-		else
-		*/
-		{ // Let's try to find another one:
-			for( $curr_blog_ID = blog_list_start();
-						$curr_blog_ID != false;
-						$curr_blog_ID = blog_list_next() )
-			{
-				// not good for demouser>edit_cats: if( $current_User->check_perm( 'blog_ismember', 1, false, $curr_blog_ID ) )
-				if( $current_User->check_perm( $permname, $permlevel, false, $curr_blog_ID ) )
-				{ // Current user is a member of this blog... let's select it:
-					$autoselected_blog = $curr_blog_ID;
-					break;
-				}
+		// Let's try to find another one:
+		for( $curr_blog_ID = blog_list_start();
+					$curr_blog_ID != false;
+					$curr_blog_ID = blog_list_next() )
+		{
+			// not good for demouser>edit_cats: if( $current_User->check_perm( 'blog_ismember', 1, false, $curr_blog_ID ) )
+			if( $current_User->check_perm( $permname, $permlevel, false, $curr_blog_ID ) )
+			{ // Current user is a member of this blog... let's select it:
+				$autoselected_blog = $curr_blog_ID;
+				break;
 			}
 		}
 	}
@@ -660,6 +651,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.19  2006/12/28 18:30:30  fplanque
+ * cleanup of obsolete var
+ *
  * Revision 1.18  2006/12/18 13:14:34  fplanque
  * bugfix
  *
