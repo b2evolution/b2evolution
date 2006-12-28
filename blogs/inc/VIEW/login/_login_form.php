@@ -31,10 +31,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Do not cache this page, because the JS password random salt has to match the one stored in the current session:
 header_nocache(); // do not cache this page, because the JS password salt has to match the session cookie
 
-if( empty($redirect_to) )
-{ // Use requested URI if nothing provided
-	$redirect_to = $ReqURI;
-}
+// Use requested URI if nothing provided
+param( 'redirect_to', 'string', $ReqURI );
 
 if( preg_match( '#/login.php([&?].*)?$#', $redirect_to ) )
 { // avoid "endless loops"
@@ -214,6 +212,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.36  2006/12/28 19:15:42  fplanque
+ * bugfix: don't lose redirect_to on repeated login failures
+ *
  * Revision 1.35  2006/12/28 15:44:30  fplanque
  * login refactoring / simplified
  *
