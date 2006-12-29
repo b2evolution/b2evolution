@@ -45,27 +45,28 @@ $Form->begin_form( 'fform', T_('Choose a skin') );
 		echo '">';
 		if( file_exists( $skin_path.'/skinshot.jpg' ) )
 		{
-			echo '<a href="'.$preview_url.'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
-			echo '<img src="'.$skin_url.'/skinshot.jpg" width="240" height="180" alt="'.$skin_name.'" /></a>';
+			if( $skin_name == $edited_Blog->default_skin )
+			{
+				echo '<img src="'.$skin_url.'/skinshot.jpg" width="240" height="180" alt="'.$skin_name.'" />';
+			}
+			else
+			{
+				echo '<a href="?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;blog_default_skin='.rawurlencode($skin_name).'" title="'.T_('Select this skin!').'">';
+				echo '<img src="'.$skin_url.'/skinshot.jpg" width="240" height="180" alt="'.$skin_name.'" /></a>';
+			}
 		}
 		else
 		{
 			echo '<div class="skinshot_noshot">'.T_('No skinshot available for').'</div>';
-			echo '<a href="'.$preview_url.'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
+			echo '<a href="?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;blog_default_skin='.rawurlencode($skin_name).'" title="'.T_('Select this skin!').'">';
 			echo '<div class="skinshot_name">'.$skin_name.'</div>';
 			echo '</a>';
 		}
 		echo '</div>';
 		echo '<div class="legend">';
 		echo '<div class="actions">';
-		if( $skin_name == $edited_Blog->default_skin )
-		{
-			echo T_('Selected');
-		}
-		else
-		{
-			echo '<a href="?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;blog_default_skin='.rawurlencode($skin_name).'">'.T_('Select').'</a>';
-		}
+		echo '<a href="'.$preview_url.'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
+		echo T_('Preview').'</a>';
 		echo '</div>';
 		echo '<strong>'.$skin_name.'</strong></div>';
 		echo '</div>';
