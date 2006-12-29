@@ -117,6 +117,11 @@ function & get_Cache( $objectName )
 			$Plugins_admin = new Plugins_admin(); // COPY (FUNC)
 			return $Plugins_admin;
 
+		case 'SkinCache';
+			load_class( 'MODEL/skins/_skincache.class.php' );
+			$SkinCache = new SkinCache(); // COPY (FUNC)
+			return $SkinCache;
+
 		case 'UserCache';
 			load_class( 'MODEL/users/_usercache.class.php' );
 			$UserCache = new UserCache(); // COPY (FUNC)
@@ -129,6 +134,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.12  2006/12/29 01:10:06  fplanque
+ * basic skin registering
+ *
  * Revision 1.11  2006/12/07 20:03:32  fplanque
  * Woohoo! File editing... means all skin editing.
  *

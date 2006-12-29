@@ -91,8 +91,8 @@ class DataObjectCache
 	 * @param string Name of table in database
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
-	 * @param mixed
-	 * @param mixed
+	 * @param string Name of the name field (including prefix)
+	 * @param string field names or NULL to use name field
 	 * @param string The text that gets used for the "None" option in the objects options list (Default: T_('None')).
 	 */
 	function DataObjectCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname, $name_field = NULL, $order_by = '', $allow_none_text = NULL )
@@ -516,6 +516,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.28  2006/12/29 01:10:06  fplanque
+ * basic skin registering
+ *
  * Revision 1.27  2006/12/24 01:09:55  fplanque
  * Rollback. Non geeks do not know how to use select multiple.
  * Checkbox lists should be used instead.

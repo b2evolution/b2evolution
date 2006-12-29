@@ -206,6 +206,7 @@ $db_config['aliases'] = array(
 		'T_posts'              => $tableprefix.'posts',
 		'T_sessions'           => $tableprefix.'sessions',
 		'T_settings'           => $tableprefix.'settings',
+		'T_skin'               => $tableprefix.'skin',
 		'T_subscriptions'      => $tableprefix.'subscriptions',
 		'T_users'              => $tableprefix.'users',
 		'T_useragents'         => $tableprefix.'useragents',

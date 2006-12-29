@@ -92,6 +92,18 @@ $schema_queries = array(
 			KEY user_grp_ID (user_grp_ID)
 		)" ),
 
+	'T_skins' => array(
+		'Creating table for installed skins',
+		"CREATE TABLE T_skin (
+				skin_ID      int(11) unsigned      NOT NULL auto_increment,
+				skin_name    varchar(32)           NOT NULL,
+				skin_type    enum('normal','feed') NOT NULL default 'normal',
+				skin_folder  varchar(32)           NOT NULL,
+				PRIMARY KEY skin_ID (skin_ID),
+				UNIQUE skin_folder( skin_folder ),
+				KEY skin_name( skin_name )
+			)" ),
+
 	'T_blogs' => array(
 		'Creating table for Blogs',
 		"CREATE TABLE T_blogs (
@@ -490,6 +502,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.44  2006/12/29 01:10:06  fplanque
+ * basic skin registering
+ *
  * Revision 1.43  2006/12/07 20:03:33  fplanque
  * Woohoo! File editing... means all skin editing.
  *

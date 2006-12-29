@@ -24,9 +24,40 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Check permission to display:
 $current_User->check_perm( 'options', 'view', true );
 
+param( 'action', 'string', 'list' );
+
+
+/**
+ * Perform action:
+ */
+switch( $action )
+{
+	case 'create':
+		param( 'skin_folder', 'string', true );
+
+		// Check permission to edit:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// CREATE NEW SKIN:
+		load_class( 'MODEL/skins/_skin.class.php' );
+	 	$edited_Skin = & new Skin();
+
+		$edited_Skin->set( 'name', $skin_folder );
+		$edited_Skin->set( 'folder', $skin_folder );
+		$edited_Skin->set( 'type', 'normal' );
+
+		// INSERT NEW SKIN INTO DB:
+		$edited_Skin->dbinsert();
+
+		$Messages->add( T_('Skin has been installed.'), 'success' );
+
+		// Switch to list mode:
+		header_redirect( '?ctrl=skins' );
+		break;
+}
+
 
 $AdminUI->set_path( 'options', 'skins' );
-
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -48,6 +79,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2006/12/29 01:10:06  fplanque
+ * basic skin registering
+ *
  * Revision 1.1  2006/12/05 05:41:42  fplanque
  * created playground for skin management
  *

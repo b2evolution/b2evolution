@@ -15,11 +15,23 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $skins_path, $skins_url;
 
-$skin_folders = get_filenames( $skins_path, false, true, true, false, true );
+/**
+ * @var SkinCache
+ */
+$SkinCache = & get_Cache( 'SkinCache' );
+$SkinCache->load_all();
 
+echo '<h2>'.T_('Skins available for installation').'</h2>';
+
+$skin_folders = get_filenames( $skins_path, false, true, true, false, true );
 
 foreach( $skin_folders as $skin_folder )
 {
+  if( $SkinCache->get_by_folder( $skin_folder, false ) )
+	{	// Already installed...
+		continue;
+	}
+
 	echo '<div class="skinshot">';
 	echo '<div class="skinshot_placeholder">';
 	if( file_exists( $skins_path.$skin_folder.'/skinshot.jpg' ) )
@@ -33,7 +45,12 @@ foreach( $skin_folders as $skin_folder )
 	}
 	echo '</div>';
 	echo '<div class="legend">';
-	echo '<strong>'.$skin_folder.'</strong></div>';
+	echo '<div class="actions">';
+	echo '<a href="?ctrl=skins&amp;action=create&amp;skin_folder='.rawurlencode($skin_folder).'" title="'.T_('Install NOW!').'">';
+	echo T_('Install NOW!').'</a>';
+	echo '</div>';
+	echo '<strong>'.$skin_folder.'</strong>';
+	echo '</div>';
 	echo '</div>';
 
 }
