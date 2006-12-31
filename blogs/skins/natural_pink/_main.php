@@ -114,7 +114,6 @@ skin_content_header();	// Sets charset!
 	<div class="separator" ><img src="rsc/img/separator.gif" width="265" height="14" alt="" /></div>
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
 
-	<p class="center"><strong>
 		<?php
 			// Links to list pages:
 			if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
@@ -126,7 +125,6 @@ skin_content_header();	// Sets charset!
 			// previous_post( '<p class="center">%</p>' );
 			// next_post( '<p class="center">%</p>' );
 		?>
-	</strong></p>
 
 	<?php
 		// -------------- START OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. --------------
