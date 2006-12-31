@@ -255,6 +255,9 @@ input.preview:hover {
 	margin-top: 0px;
 	margin-bottom: 0px;
 }
+.bSideItem .no_list{
+list-style:none;
+}
 .bSideItem form {
 	margin-top: 0px;
 	margin-bottom: 0px;

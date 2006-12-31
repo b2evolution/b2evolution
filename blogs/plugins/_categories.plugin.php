@@ -126,8 +126,8 @@ class categories_plugin extends Plugin
 
 		// This is what will enclose the sub chapter lists:
 		// fp> TODO: Change the ordering so that <ul></ul> subgroups are included inside <li></li>
-		if(!isset($params['group_start'])) $params['group_start'] = '<ul>';
-		if(!isset($params['group_end'])) $params['group_end'] = "</ul>\n";
+		if(!isset($params['group_start'])) $params['group_start'] = '<li class="no_list"><ul>';
+		if(!isset($params['group_end'])) $params['group_end'] = "</ul></li>\n";
 
 		// This is what will enclose the global list if several blogs are listed on the same page:
 		if(!isset($params['collist_start'])) $params['collist_start'] = '';
@@ -354,6 +354,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.37  2006/12/31 11:21:16  yabs
+ * validation
+ *
  * Revision 1.36  2006/12/26 03:19:12  fplanque
  * assigned a few significant plugin groups
  *
