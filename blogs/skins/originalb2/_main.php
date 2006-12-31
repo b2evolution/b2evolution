@@ -96,7 +96,7 @@ skin_content_header();	// Sets charset!
 		&nbsp;-&nbsp;
 		Categories: <?php $Item->categories() ?>
 		&nbsp;-&nbsp;
-		<span class="storyAuthor"><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>?author=<?php $Item->creator_User->ID() ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php $Item->creator_User->preferred_name() ?></a></span>
+		<span class="storyAuthor"><a href="<?php echo url_add_param( $Blog->get('blogurl'), 'author='.$Item->creator_User->ID ); ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php $Item->creator_User->preferred_name() ?></a></span>
 		@ <a href="<?php $Item->permanent_url() ?>"><?php $Item->issue_time() ?></a>
 	</div>
 
