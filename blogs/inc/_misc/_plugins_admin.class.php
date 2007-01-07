@@ -361,6 +361,7 @@ class Plugins_admin extends Plugins
 		}
 
 		// TODO: allow optional Plugin callback to get list of methods. Like Plugin::GetRegisteredEvents().
+		// fp> bloated. what problem does it solve?
 
 		if( preg_match_all( '~^\s*function\s+(\w+)~mi', $classfile_contents, $matches ) )
 		{
@@ -1337,6 +1338,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.21  2007/01/07 19:39:44  fplanque
+ * doc
+ *
  * Revision 1.20  2007/01/07 05:26:01  fplanque
  * doc
  *
