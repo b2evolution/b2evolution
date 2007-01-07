@@ -317,7 +317,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		// First step:
+		// First step:   fp> what's setp 2 ?
 		param( 'plugin', 'string', true );
 
 		$edit_Plugin = & $admin_Plugins->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
@@ -1036,6 +1036,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.73  2007/01/07 05:26:01  fplanque
+ * doc
+ *
  * Revision 1.72  2006/12/20 23:07:23  blueyed
  * Moved list of available plugins to separate sub-screen/form
  *

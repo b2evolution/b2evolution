@@ -313,7 +313,7 @@ class Plugins
 	 * @param string Path of the .php class file of the plugin.
 	 * @param boolean Must the plugin exist (classfile_path and classname)?
 	 *                This is used internally to be able to unregister a non-existing plugin.
-	 * @return Plugin|string Plugin ref to newly created plugin; string in case of error
+	 * @return Plugin Plugin ref to newly created plugin; string in case of error
 	 */
 	function & register( $classname, $ID = 0, $priority = -1, $apply_rendering = NULL, $classfile_path = NULL, $must_exists = true )
 	{
@@ -380,7 +380,7 @@ class Plugins
 				$r = sprintf( 'Plugin class for &laquo;%s&raquo; in file &laquo;%s&raquo; not defined.', $classname, rel_path_to_base($classfile_path) );
 				$Debuglog->add( $r, array( 'plugins', 'error' ) );
 
-				// Get the Plugin object (must not exist)
+				// Get the Plugin object (must not exist)    fp> why is this recursive?
 				$Plugin = & $this->register( $classname, $ID, $priority, $apply_rendering, $classfile_path, false );
 				$this->plugin_errors[$ID]['register'] = $r;
 				$this->set_Plugin_status( $Plugin, 'broken' );
@@ -1783,6 +1783,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.126  2007/01/07 05:26:01  fplanque
+ * doc
+ *
  * Revision 1.125  2006/12/07 23:13:13  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!

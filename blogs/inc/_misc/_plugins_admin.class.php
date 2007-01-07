@@ -330,8 +330,10 @@ class Plugins_admin extends Plugins
 
 
 	/**
+	 * Discover plugin events from its source file.
+	 *
 	 * Get a list of methods that are supported as events out of the Plugin's
-	 * source file.
+	 * class definition.
 	 *
 	 * @todo Extend to get list of defined classes and global functions and check this list before sourcing/including a Plugin! (prevent fatal error)
 	 *
@@ -386,13 +388,14 @@ class Plugins_admin extends Plugins
 	 *
 	 * @param string Classname of the plugin to install
 	 * @param string Initial DB Status of the plugin ("enabled", "disabled", "needs_config", "broken")
-	 * @param string|NULL Optional classfile path, if not default (used for tests).
-	 * @return string|Plugin The installed Plugin (perhaps with $install_dep_notes set) or a string in case of error.
+	 * @param string Optional classfile path, if not default (used for tests).
+	 * @return Plugin The installed Plugin (perhaps with $install_dep_notes set) or a string in case of error.
 	 */
 	function & install( $classname, $plug_status = 'enabled', $classfile_path = NULL )
 	{
 		global $DB, $Debuglog;
 
+		// Load Plugins data from T_plugins (only once), ordered by priority.
 		$this->load_plugins_table();
 
 		// Register the plugin:
@@ -588,7 +591,10 @@ class Plugins_admin extends Plugins
 		{
 			$saved_events[$l_row->pevt_event] = $l_row->pevt_enabled;
 		}
+
+		// Discover events from plugin's source file:
 		$available_events = $this->get_registered_events( $Plugin );
+
 		$obsolete_events = array_diff( array_keys($saved_events), $available_events );
 
 		if( is_null( $enable_events ) )
@@ -1331,6 +1337,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.20  2007/01/07 05:26:01  fplanque
+ * doc
+ *
  * Revision 1.19  2006/12/28 23:20:40  fplanque
  * added plugin event for displaying comment form toolbars
  * used by smilies plugin
