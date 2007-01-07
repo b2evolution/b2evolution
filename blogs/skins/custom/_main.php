@@ -238,6 +238,17 @@ skin_content_header();	// Sets charset!
 
 <div class="bSideBar">
 
+
+	<?php
+		// EXPERIMENTAL:
+		// Display container and contents:
+		$Skin->container( NT_('Right Sidebar'), array(
+				'block_start' => '<div class="bSideItem">',
+				'block_end' => '</div>',
+			) );
+	?>
+
+
 	<div class="bSideItem">
 		<h3><?php $Blog->disp( 'name', 'htmlbody' ) ?></h3>
 		<p><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></p>
@@ -374,6 +385,14 @@ skin_content_header();	// Sets charset!
 ?>
 
 <div id="pageFooter">
+	<?php
+		// EXPERIMENTAL:
+		// Display container and contents:
+		$Skin->container( NT_('Footer'), array(
+				'block_start' => '<div class="baseline">',
+				'block_end' => '</div>',
+			) );
+	?>
 	<p class="baseline">
 		<a href="<?php echo $Blog->get('msgformurl').'&amp;recipient_id=1&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $Blog->get('msgformurl'))); ?>">Contact the admin</a>.
 		Original template design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> / <a href="http://skinfaktory.com/">The Skin Faktory</a>.

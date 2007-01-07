@@ -473,6 +473,10 @@ if( !isset($display_blog_list) )
 if( !empty( $skin ) )
 { // We want to display now:
 
+	// EXPERIMENTAL:
+	load_class( 'MODEL/skins/_skin.class.php' );
+	$Skin = & new Skin();
+
 	// TODO: sanitize $template and allow any request on _xxx.tpl.php or sth like that.
 	if( $template == 'popup' )
 	{ // Do the popup display
@@ -513,6 +517,11 @@ else
 
 /*
  * $Log$
+ * Revision 1.62  2007/01/07 05:32:11  fplanque
+ * added some more DB skin handling (install+uninstall+edit properties ok)
+ * still useless though :P
+ * next step: discover containers in installed skins
+ *
  * Revision 1.61  2006/12/28 18:31:30  fplanque
  * prevent impersonating of blog in multiblog situation
  *

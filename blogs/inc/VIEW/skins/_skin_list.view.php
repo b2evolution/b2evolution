@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the UI view for the Advanced blog properties.
+ * This file implements the UI view for the installed skins.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -13,48 +13,74 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $skins_path, $skins_url;
+// Create result set:
+$Results = & new Results( 'SELECT *
+													 	 FROM T_skin' );
+$Results->Cache = & get_Cache( 'SkinCache' );
+$Results->title = T_('Installed skins');
 
-/**
- * @var SkinCache
- */
-$SkinCache = & get_Cache( 'SkinCache' );
-$SkinCache->load_all();
+if( $current_User->check_perm( 'options', 'edit', false ) )
+{ // We have permission to modify:
+	$Results->cols[] = array(
+							'th' => T_('Name'),
+							'order' => 'skin_name',
+							'td' => '<strong><a href="'.regenerate_url( '', 'skin_ID=$skin_ID$&amp;action=edit' ).'" title="'.T_('Edit skin properties...').'">$skin_name$</a></strong>',
+						);
+}
+else
+{ // We have NO permission to modify:
+	$Results->cols[] = array(
+							'th' => T_('Name'),
+							'order' => 'skin_name',
+							'td' => '<strong>$skin_name$</strong>',
+						);
+}
 
-echo '<h2>'.T_('Skins available for installation').'</h2>';
+$Results->cols[] = array(
+						'th' => T_('Skin type'),
+						'order' => 'skin_type',
+						'td_class' => 'center',
+						'td' => '$skin_type$',
+					);
 
-$skin_folders = get_filenames( $skins_path, false, true, true, false, true );
+$Results->cols[] = array(
+						'th' => T_('# of blogs'),
+						'order' => '',
+						'td_class' => 'right',
+						'td' => 'n.a.',
+					);
 
-foreach( $skin_folders as $skin_folder )
-{
-  if( $SkinCache->get_by_folder( $skin_folder, false ) )
-	{	// Already installed...
-		continue;
-	}
+$Results->cols[] = array(
+						'th' => T_('Skin Folder'),
+						'order' => 'skin_folder',
+						'td' => '$skin_folder$',
+					);
 
-	echo '<div class="skinshot">';
-	echo '<div class="skinshot_placeholder">';
-	if( file_exists( $skins_path.$skin_folder.'/skinshot.jpg' ) )
-	{
-		echo '<img src="'.$skins_url.$skin_folder.'/skinshot.jpg" width="240" height="180" alt="'.$skin_folder.'" />';
-	}
-	else
-	{
-		echo '<div class="skinshot_noshot">'.T_('No skinshot available for').'</div>';
-		echo '<div class="skinshot_name">'.$skin_folder.'</div>';
-	}
-	echo '</div>';
-	echo '<div class="legend">';
-	echo '<div class="actions">';
-	echo '<a href="?ctrl=skins&amp;action=create&amp;skin_folder='.rawurlencode($skin_folder).'" title="'.T_('Install NOW!').'">';
-	echo T_('Install NOW!').'</a>';
-	echo '</div>';
-	echo '<strong>'.$skin_folder.'</strong>';
-	echo '</div>';
-	echo '</div>';
+if( $current_User->check_perm( 'options', 'edit', false ) )
+{ // We have permission to modify:
 
+	$Results->cols[] = array(
+							'th' => T_('Actions'),
+							'th_class' => 'shrinkwrap',
+							'td_class' => 'shrinkwrap',
+							'td' => action_icon( T_('Edit skin properties...'), 'properties',
+	                        '%regenerate_url( \'action\', \'skin_ID=$skin_ID$&amp;action=edit\')%' )
+	                    .action_icon( T_('Uninstall this skin!'), 'delete',
+	                        '%regenerate_url( \'action\', \'skin_ID=$skin_ID$&amp;action=delete\')%' ),
+						);
+
+  $Results->global_icon( T_('Install new skin...'), 'new', regenerate_url( 'action', 'action=new'), T_('Install'), 3, 4  );
 }
 
 
-echo '<div class="clear"></div>';
+// $fadeout_array = array( 'skin_ID' => array(6) );
+$fadeout_array = NULL;
+
+$Results->display( NULL, 'session' );
+
+
+
+/*
+ * $Log:
+ */
 ?>
