@@ -160,7 +160,7 @@ echo T_('Categories for blog:').' '.$Blog->dget('name').'
 			<tr>
 				<th class="firstcol shrinkwrap right">'.T_('ID').'</th>
 				<th>'.T_('Name').'</th>
-				<th>'.T_('URL Name').'</th>';
+				<th>'.T_('URL name').'</th>';
 
 if( $permission_to_edit )
 {	// We have permission permission to edit, so display action column:
@@ -186,6 +186,9 @@ if( ! $Settings->get('allow_moving_chapters') )
 
 /*
  * $Log$
+ * Revision 1.9  2007/01/07 05:28:15  fplanque
+ * i18n wording
+ *
  * Revision 1.8  2006/12/11 00:32:26  fplanque
  * allow_moving_chapters stting moved to UI
  * chapters are now called categories in the UI

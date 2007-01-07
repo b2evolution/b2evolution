@@ -840,7 +840,7 @@ switch( $action )
 		{
 			fwrite( $rsc_handle, $file_content );
 			fclose( $rsc_handle );
-			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; have been updated.' ), $edit_File->dget('name') ), 'success' );
+			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; has been updated.' ), $edit_File->dget('name') ), 'success' );
 		}
 		else
 		{
@@ -1683,6 +1683,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.46  2007/01/07 05:28:15  fplanque
+ * i18n wording
+ *
  * Revision 1.45  2006/12/24 00:52:57  fplanque
  * Make posts with images - Proof of concept
  *
