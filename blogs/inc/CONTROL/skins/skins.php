@@ -59,8 +59,6 @@ switch( $action )
 		$edited_Skin->set( 'folder', $skin_folder );
 		$edited_Skin->set( 'type', substr($skin_folder,0,1) == '_' ? 'feed' : 'normal' );
 
-		$DB->begin();
-
 		// Look for containers in skin file:
 		$edited_Skin->discover_containers();
 
@@ -68,8 +66,6 @@ switch( $action )
 		$edited_Skin->dbinsert();
 
 		$Messages->add( T_('Skin has been installed.'), 'success' );
-
-		$DB->commit();
 
 		// We want to highlight the edited object on next list display:
  		$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
@@ -114,6 +110,9 @@ switch( $action )
 
 		// Look for containers in skin file:
 		$edited_Skin->discover_containers();
+
+		// Save to DB:
+		$edited_Skin->db_save_containers();
 
 		// We want to highlight the edited object on next list display:
  		$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
@@ -200,6 +199,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2007/01/07 23:38:21  fplanque
+ * discovery of skin containers
+ *
  * Revision 1.4  2007/01/07 19:40:18  fplanque
  * discover skin containers
  *

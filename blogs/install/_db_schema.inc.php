@@ -92,9 +92,9 @@ $schema_queries = array(
 			KEY user_grp_ID (user_grp_ID)
 		)" ),
 
-	'T_skins' => array(
+	'T_skins__skin' => array(
 		'Creating table for installed skins',
-		"CREATE TABLE T_skin (
+		"CREATE TABLE T_skins__skin (
 				skin_ID      int(11) unsigned      NOT NULL auto_increment,
 				skin_name    varchar(32)           NOT NULL,
 				skin_type    enum('normal','feed') NOT NULL default 'normal',
@@ -102,6 +102,14 @@ $schema_queries = array(
 				PRIMARY KEY skin_ID (skin_ID),
 				UNIQUE skin_folder( skin_folder ),
 				KEY skin_name( skin_name )
+			)" ),
+
+	'T_skins__container' => array(
+		'Creating table for skin containers',
+		"CREATE TABLE T_skins__container (
+				sco_skin_ID   int(11) unsigned      NOT NULL,
+				sco_name      varchar(40)           NOT NULL,
+				PRIMARY KEY (sco_skin_ID, sco_name)
 			)" ),
 
 	'T_blogs' => array(
@@ -502,6 +510,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.45  2007/01/07 23:38:20  fplanque
+ * discovery of skin containers
+ *
  * Revision 1.44  2006/12/29 01:10:06  fplanque
  * basic skin registering
  *

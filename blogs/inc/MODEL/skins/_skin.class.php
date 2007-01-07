@@ -38,6 +38,13 @@ class Skin extends DataObject
 	var $type;
 
 	/**
+	 * Lazy filled.
+	 * @var array
+	 */
+	var $container_list = NULL;
+
+
+	/**
 	 * Constructor
 	 *
 	 * @param table Database row
@@ -45,7 +52,11 @@ class Skin extends DataObject
 	function Skin( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_skin', 'skin_', 'skin_ID' );
+		parent::DataObject( 'T_skins__skin', 'skin_', 'skin_ID' );
+
+		$this->delete_cascades = array(
+				array( 'table'=>'T_skins__container', 'fk'=>'sco_skin_ID', 'msg'=>T_('%d link containers') ),
+			);
 
 		if( is_null($db_row) )
 		{	// We are creating an object here:
@@ -125,13 +136,104 @@ class Skin extends DataObject
 		$container_list = array_merge( $matches[3], $matches[5] );
 
 		// Filter out empty elements (due to regexp "|" )
-		$container_list = array_filter( $container_list, create_function( '$a', 'return !empty($a);' ) );
+		$this->container_list = array_filter( $container_list, create_function( '$a', 'return !empty($a);' ) );
 
-		// pre_dump( $container_list );
+		// pre_dump( $this->container_list );
 
-		// TODO : register into db
 
-		$Messages->add( sprintf( T_('%d containers have been found in the skin file.'), count( $container_list ) ), 'success' );
+		$Messages->add( sprintf( T_('%d containers have been found in the skin file.'), count( $this->container_list ) ), 'success' );
+		return true;
+	}
+
+
+	/**
+	 * @return array
+	 */
+	function get_containers()
+	{
+    /**
+		 * @var DB
+		 */
+		global $DB;
+
+		if( is_null( $this->container_list ) )
+		{
+			$this->container_list = $DB->get_col(
+				'SELECT sco_name
+					 FROM T_skins__container
+					WHERE sco_skin_ID = '.$this->ID, 0, 'get list of containers for skin' );
+		}
+
+		return $this->container_list;
+	}
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * @return boolean true
+	 */
+	function dbupdate()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		if( parent::dbinsert() !== false )
+		{	// Skin updated, also save containers:
+			$this->db_save_containers();
+		}
+
+		$DB->commit();
+
+		return true;
+	}
+
+
+	/**
+	 * Insert object into DB based on previously recorded changes.
+	 *
+	 * @return boolean true
+	 */
+	function dbinsert()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		if( parent::dbinsert() )
+		{	// Skin saved, also save containers:
+			$this->db_save_containers();
+		}
+
+		$DB->commit();
+
+		return true;
+	}
+
+
+	/**
+	 * Save containers
+	 *
+	 * to be called by dbinsert / dbupdate
+	 */
+	function db_save_containers()
+	{
+		global $DB;
+
+		if( empty( $this->container_list ) )
+		{
+			return false;
+		}
+
+		$values = array();
+		foreach( $this->container_list as $container_name )
+		{
+			$values [] = '( '.$this->ID.', '.$DB->quote($container_name).' )';
+		}
+
+		$DB->query( 'REPLACE INTO T_skins__container( sco_skin_ID, sco_name )
+									VALUES '.implode( ',', $values ), 'Insert containers' );
+
 		return true;
 	}
 
@@ -178,6 +280,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2007/01/07 23:38:20  fplanque
+ * discovery of skin containers
+ *
  * Revision 1.3  2007/01/07 19:40:18  fplanque
  * discover skin containers
  *

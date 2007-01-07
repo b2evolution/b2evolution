@@ -242,7 +242,7 @@ skin_content_header();	// Sets charset!
 	<?php
 		// EXPERIMENTAL:
 		// Display container and contents:
-		$Skin->container( NT_('Right Sidebar'), array(
+		$Skin->container( NT_('Sidebar'), array(
 				'block_start' => '<div class="bSideItem">',
 				'block_end' => '</div>',
 			) );

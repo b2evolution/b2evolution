@@ -53,7 +53,7 @@ class SkinCache extends DataObjectCache
 	 */
 	function SkinCache()
 	{
-		parent::DataObjectCache( 'Skin', false, 'T_skin', 'skin_', 'skin_ID', 'skin_name', NULL,
+		parent::DataObjectCache( 'Skin', false, 'T_skins__skin', 'skin_', 'skin_ID', 'skin_name', NULL,
 			/* TRANS: "None" select option */ T_('No skin') );
 	}
 
@@ -116,6 +116,9 @@ class SkinCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.2  2007/01/07 23:38:20  fplanque
+ * discovery of skin containers
+ *
  * Revision 1.1  2006/12/29 01:10:06  fplanque
  * basic skin registering
  *

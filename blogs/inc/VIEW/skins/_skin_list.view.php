@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Create result set:
 $Results = & new Results( 'SELECT *
-													 	 FROM T_skin' );
+													 	 FROM T_skins__skin' );
 $Results->Cache = & get_Cache( 'SkinCache' );
 $Results->title = T_('Installed skins');
 

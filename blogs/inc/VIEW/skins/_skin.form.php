@@ -50,8 +50,6 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 
 		$Form->text_input( 'skin_name', $edited_Skin->name, 32, T_('Skin name'), T_('As seen by blog owners'), array( 'required'=>true ) );
 
-		$Form->info( T_('Skin folder'), $edited_Skin->folder );
-
 		$Form->radio( 'skin_type',
 									$edited_Skin->type,
 									 array(
@@ -61,6 +59,10 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 										T_( 'Skin type' ),
 										true // separate lines
 								 );
+
+		$container_ul = '<ul><li>'.implode( '</li><li>', $edited_Skin->get_containers() ).'</li></ul>';
+		$Form->info( T_('Containers'), $container_ul );
+
 	$Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
@@ -69,6 +71,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.2  2007/01/07 23:38:20  fplanque
+ * discovery of skin containers
+ *
  * Revision 1.1  2007/01/07 05:32:11  fplanque
  * added some more DB skin handling (install+uninstall+edit properties ok)
  * still useless though :P
