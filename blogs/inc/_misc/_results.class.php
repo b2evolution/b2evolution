@@ -606,10 +606,10 @@ class Results extends Widget
 	 * This is the meat of this class!
 	 *
 	 * @param array|NULL
-	 * @param array Fadeout settings (column key => crit (array))
+	 * @param array Fadeout settings array( 'key column' => array of values ) or 'session'
 	 * @return int # of rows displayed
 	 */
-	function display( $display_params = NULL, $fadeout = array() )
+	function display( $display_params = NULL, $fadeout = NULL )
 	{
 		// Initialize displaying:
 		$this->display_init( $display_params );
@@ -1198,10 +1198,21 @@ class Results extends Widget
 	 *
 	 * @access protected
 	 *
-	 * @param array fadeout list
+	 * @param array fadeout list or 'session'
 	 */
-	function display_body( $fadeout = array() )
+	function display_body( $fadeout = NULL )
 	{
+		global $Session, $Debuglog;
+
+		if( $fadeout == 'session' )
+		{	// Get fadeout_array from session:
+			if( ($fadeout = $Session->get('fadeout_array')) && is_array( $fadeout ) )
+			{
+				$Debuglog->add( 'Got fadeout_array from session data.', 'session' );
+				$Session->delete( 'fadeout_array' );
+			}
+		}
+
 		if( !empty( $fadeout ) )
 		{ // Initialize fadeout javascript:
 			global $rsc_url;
@@ -1340,15 +1351,19 @@ class Results extends Widget
 				/**
 				 * Update class and add a fadeout ID for fadeout list results
 				 */
-				foreach ( $fadeout as $key=>$crit )
+				if( !empty( $fadeout ) )
 				{
-					if( isset( $row->$key ) && in_array( $row->$key, $crit ) )
-					{ // Col is in the fadeout list
-						// TODO: CLEAN THIS UP!
-						$class .= ' fadeout-ffff00" id="fadeout-'.$fadeout_count;
+					foreach( $fadeout as $key => $crit )
+					{
+						// echo 'fadeout '.$key.'='.$crit;
+						if( isset( $row->$key ) && in_array( $row->$key, $crit ) )
+						{ // Col is in the fadeout list
+							// TODO: CLEAN THIS UP!
+							$class .= ' fadeout-ffff00" id="fadeout-'.$fadeout_count;
 
-						$fadeout_count++;
-						break;
+							$fadeout_count++;
+							break;
+						}
 					}
 				}
 
@@ -2195,6 +2210,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.37  2007/01/07 05:27:41  fplanque
+ * extended fadeout, but still not fixed everywhere
+ *
  * Revision 1.36  2006/12/14 19:15:53  fplanque
  * minor fix
  *

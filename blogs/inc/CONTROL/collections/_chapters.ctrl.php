@@ -205,7 +205,7 @@ switch( $action )
 			{
 				$Messages->add( T_('New element created.'), 'success' ); // TODO CHANGES THIS
 				// Add the ID of the new element to the result fadeout
-				$result_fadeout[] = $edited_GenericCategory->ID;
+				$result_fadeout[$edited_GenericCategory->dbIDname][] = $edited_GenericCategory->ID;
 				$action = 'list';
 			}
 		}
@@ -229,7 +229,7 @@ switch( $action )
 			{
 				$Messages->add( T_('Element updated.'), 'success' ); //ToDO change htis
 				// Add the ID of the updated element to the result fadeout
-				$result_fadeout[] = $edited_GenericCategory->ID;
+				$result_fadeout[$edited_GenericCategory->dbIDname][] = $edited_GenericCategory->ID;
 			}
 			$action = 'list';
 		}
@@ -431,6 +431,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2007/01/07 05:27:41  fplanque
+ * extended fadeout, but still not fixed everywhere
+ *
  * Revision 1.14  2006/12/18 03:20:41  fplanque
  * _header will always try to set $Blog.
  * autoselect_blog() will do so also.
