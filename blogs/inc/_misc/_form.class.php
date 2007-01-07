@@ -1217,7 +1217,9 @@ class Form extends Widget
 
 		$r = "\n\n<form".get_field_attribs_as_string($form_params).">\n";
 
-		$r .= '<div>'; // for XHTML (dh> removed 'style="display:inline"' because it's buggy with FireFox 1.0.x, at least at the "Write" admin page; see http://forums.b2evolution.net/viewtopic.php?t=10130)
+		// $r .= '<div>'; // for XHTML (dh> removed 'style="display:inline"' because it's buggy with FireFox 1.0.x, at least at the "Write" admin page; see http://forums.b2evolution.net/viewtopic.php?t=10130)
+		// fp> inline was needed for inline forms like the DELETE confirmation.
+		// fp> why does XHTML require all forms to have an embedded DIV?
 
 		$r .= $this->formstart;
 
@@ -1310,7 +1312,7 @@ class Form extends Widget
 			$r .= $hidden;
 		}
 
-		$r .= '</div>';
+		// $r .= '</div>';
 		$r .= "\n</form>\n\n";
 
 		// When the page loads, Initialize all the parent child select lists + other javascripts
@@ -2725,6 +2727,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.65  2007/01/07 05:25:09  fplanque
+ * "fixed" regression :/
+ *
  * Revision 1.64  2006/12/22 22:22:20  blueyed
  * Unset "maxlength" field_param in textarea_input(): not a html attrib
  *
