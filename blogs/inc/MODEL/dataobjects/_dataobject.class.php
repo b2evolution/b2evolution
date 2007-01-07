@@ -126,7 +126,7 @@ class DataObject
 	/**
 	 * Update the DB based on previously recorded changes
 	 *
-	 * @return boolean|NULL true on success, false on failure to update, NULL if no update necessary
+	 * @return boolean true on success, false on failure to update, NULL if no update necessary
 	 */
 	function dbupdate()
 	{
@@ -662,6 +662,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2007/01/07 23:37:26  fplanque
+ * doc cleanup
+ *
  * Revision 1.22  2006/12/10 23:20:55  fplanque
  * hum...
  *
