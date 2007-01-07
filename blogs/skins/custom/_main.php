@@ -387,8 +387,9 @@ skin_content_header();	// Sets charset!
 <div id="pageFooter">
 	<?php
 		// EXPERIMENTAL:
+		// Double quotes used only for test purposes.
 		// Display container and contents:
-		$Skin->container( NT_('Footer'), array(
+		$Skin->container( NT_("Footer"), array(
 				'block_start' => '<div class="baseline">',
 				'block_end' => '</div>',
 			) );

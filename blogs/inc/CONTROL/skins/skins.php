@@ -39,6 +39,7 @@ if( param( 'skin_ID', 'integer', '', true) )
 	}
 }
 
+
 /**
  * Perform action:
  */
@@ -58,10 +59,17 @@ switch( $action )
 		$edited_Skin->set( 'folder', $skin_folder );
 		$edited_Skin->set( 'type', substr($skin_folder,0,1) == '_' ? 'feed' : 'normal' );
 
+		$DB->begin();
+
+		// Look for containers in skin file:
+		$edited_Skin->discover_containers();
+
 		// INSERT NEW SKIN INTO DB:
 		$edited_Skin->dbinsert();
 
 		$Messages->add( T_('Skin has been installed.'), 'success' );
+
+		$DB->commit();
 
 		// We want to highlight the edited object on next list display:
  		$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
@@ -92,6 +100,25 @@ switch( $action )
 
 			$action = 'list';
 		}
+		break;
+
+
+	case 'reload':
+		// Reload containers:
+
+ 		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// Make sure we got an skin_ID:
+		param( 'skin_ID', 'integer', true );
+
+		// Look for containers in skin file:
+		$edited_Skin->discover_containers();
+
+		// We want to highlight the edited object on next list display:
+ 		$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
+
+		$action = 'list';
 		break;
 
 
@@ -173,6 +200,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2007/01/07 19:40:18  fplanque
+ * discover skin containers
+ *
  * Revision 1.3  2007/01/07 05:32:12  fplanque
  * added some more DB skin handling (install+uninstall+edit properties ok)
  * still useless though :P

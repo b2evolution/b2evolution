@@ -90,6 +90,53 @@ class Skin extends DataObject
 
 
 	/**
+	 * Discover containers included in skin file
+	 * @todo
+	 */
+	function discover_containers()
+	{
+		global $skins_path, $Messages;
+
+		$rf_main_subpath = $this->folder.'/_main.php';
+		$af_main_path = $skins_path.$rf_main_subpath;
+
+		if( ! is_readable($af_main_path) )
+		{
+			$Messages->add( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
+			return false;
+		}
+
+		$file_contents = @file_get_contents( $af_main_path );
+		if( ! is_string($file_contents) )
+		{
+			$Messages->add( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
+			return false;
+		}
+
+
+		// if( ! preg_match_all( '~ \$Skin->container\( .*? (\' (.+?) \' )|(" (.+?) ") ~xmi', $file_contents, $matches ) )
+		if( ! preg_match_all( '~ \$Skin->container\( .*? ((\' (.+?) \')|(" (.+?) ")) ~xmi', $file_contents, $matches ) )
+		{
+			$Messages->add( sprintf( T_('No containers found in skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
+			return false;
+		}
+
+		// Merge matches from the two regexp parts (due to regexp "|" )
+		$container_list = array_merge( $matches[3], $matches[5] );
+
+		// Filter out empty elements (due to regexp "|" )
+		$container_list = array_filter( $container_list, create_function( '$a', 'return !empty($a);' ) );
+
+		// pre_dump( $container_list );
+
+		// TODO : register into db
+
+		$Messages->add( sprintf( T_('%d containers have been found in the skin file.'), count( $container_list ) ), 'success' );
+		return true;
+	}
+
+
+	/**
 	 * Display skinshot for skin folder in various places.
 	 *
 	 * Including for NON installed skins.
@@ -131,6 +178,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2007/01/07 19:40:18  fplanque
+ * discover skin containers
+ *
  * Revision 1.2  2007/01/07 05:32:11  fplanque
  * added some more DB skin handling (install+uninstall+edit properties ok)
  * still useless though :P
