@@ -43,16 +43,13 @@ global $current_User;
 global $admin_Plugins;
 
 ?>
-
-<fieldset>
-	<legend><?php echo T_('Available plugins') ?></legend>
-	<div class="right_icons"><?php
-	// "Hide available plugins":
-	echo action_icon( T_('Hide available plugins'), 'close', regenerate_url( 'plugins_disp_avail', 'plugins_disp_avail=0' ) )
-	?></div>
-
 	<table class="grouped" cellspacing="0">
-		<tbody>
+		<thead>
+		<tr>
+			<th colspan="5" class="title"><span style="float: right;"><?php
+				echo action_icon( T_('Cancel install!'), 'close', regenerate_url(), T_('Cancel'), 3, 4 )
+				?></span><?php echo T_('Plugins available for installation') ?></th>
+		</tr>
 		<tr>
 			<th class="firstcol"><?php echo T_('Plugin') ?></th>
 			<th><?php echo T_('Description') ?></th>
@@ -60,7 +57,10 @@ global $admin_Plugins;
 			<th><?php echo T_('Help') ?></th>
 			<th class="lastcol"><?php echo T_('Actions') ?></th>
 		</tr>
-
+		</thead>
+		</foot>
+		</tfoot>
+		<tbody>
 		<?php
 		if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_admin_no_DB' ) )
 		{ // (may have been instantiated for action 'info')
@@ -190,12 +190,13 @@ global $admin_Plugins;
 		?>
 		</tbody>
 	</table>
-</fieldset>
-
 
 <?php
 /*
  * $Log$
+ * Revision 1.3  2007/01/07 18:42:35  fplanque
+ * cleaned up reload/refresh icons & links
+ *
  * Revision 1.2  2006/12/20 23:46:01  blueyed
  * Part of last change to _set_plugins.form.php has been lost while splitting
  *

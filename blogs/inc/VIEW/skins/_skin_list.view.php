@@ -64,12 +64,14 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
 							'td' => action_icon( T_('Edit skin properties...'), 'properties',
-	                        '%regenerate_url( \'action\', \'skin_ID=$skin_ID$&amp;action=edit\')%' )
+	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=edit\')%' )
+	                    .action_icon( T_('Reload containers!'), 'reload',
+	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=reload\')%' )
 	                    .action_icon( T_('Uninstall this skin!'), 'delete',
-	                        '%regenerate_url( \'action\', \'skin_ID=$skin_ID$&amp;action=delete\')%' ),
+	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=delete\')%' ),
 						);
 
-  $Results->global_icon( T_('Install new skin...'), 'new', regenerate_url( 'action', 'action=new'), T_('Install'), 3, 4  );
+  $Results->global_icon( T_('Install new skin...'), 'new', regenerate_url( 'action', 'action=new'), T_('Install new'), 3, 4  );
 }
 
 

@@ -21,7 +21,8 @@ global $skins_path;
 $SkinCache = & get_Cache( 'SkinCache' );
 $SkinCache->load_all();
 
-echo '<h2>'.T_('Skins available for installation').'</h2>';
+echo '<h2><span class="right_icons">'.action_icon( T_('Cancel install!'), 'close', regenerate_url() ).'</span>'
+	.T_('Skins available for installation').'</h2>';
 
 $skin_folders = get_filenames( $skins_path, false, true, true, false, true );
 

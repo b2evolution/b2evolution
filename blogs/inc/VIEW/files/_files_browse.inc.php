@@ -260,7 +260,7 @@ $Form->end_form();
 		<span style="display:none;" id="fm_reloadhint">
 			<a href="<?php echo regenerate_url() ?>"
 				title="<?php echo T_('A popup has discovered that the displayed content of this window is not up to date. Click to reload.'); ?>">
-				<?php echo get_icon( 'reload' ) ?>
+				<?php echo get_icon( 'refresh' ) ?>
 			</a>
 		</span>
 
@@ -980,6 +980,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.36  2007/01/07 18:42:35  fplanque
+ * cleaned up reload/refresh icons & links
+ *
  * Revision 1.35  2006/12/24 00:52:57  fplanque
  * Make posts with images - Proof of concept
  *

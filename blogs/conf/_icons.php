@@ -215,11 +215,17 @@ function get_icon_info($name)
 			'size' => array( 15, 15 ),
 		);
 
-		case 'reload': return array(
-			'file' => $rsc_subdir.'icons/reload.png',
-			'alt'  => T_('Reload'),
+		case 'refresh': return array(
+			'file' => $rsc_subdir.'icons/refresh.png',
+			'alt'  => T_('Refresh'),
 			'size' => array( 16, 16 ),
 		);
+		case 'reload': return array(
+			'file' => $rsc_subdir.'icons/reload.gif',
+			'alt'  => T_('Reload'),
+			'size' => array( 15, 15 ),
+		);
+
 		case 'download': return array(
 			'file' => $rsc_subdir.'icons/download_manager.png',
 			'alt'  => T_('Download'),
@@ -494,6 +500,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.53  2007/01/07 18:42:35  fplanque
+ * cleaned up reload/refresh icons & links
+ *
  * Revision 1.52  2006/12/26 00:55:58  fplanque
  * wording
  *

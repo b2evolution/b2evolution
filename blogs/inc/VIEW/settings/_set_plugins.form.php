@@ -236,36 +236,31 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 			'td_class' => 'shrinkwrap',
 		);
 }
-?>
+
+// Action icons:
+
+if( $current_User->check_perm( 'options', 'edit' ) )
+{ // Display action link to reload plugins:
+	$Results->global_icon( T_('Reload events and codes for installed plugins.'), 'reload', regenerate_url( 'action', 'action=reload_plugins' ), T_('Reload plugins'), 3, 4 );
+}
+
+$Results->global_icon( T_('Install new plugin...'), 'new', regenerate_url( 'action', 'action=list_available' ), T_('Install new'), 3, 4 );
 
 
-<fieldset>
-	<legend><?php echo T_('Installed plugins') ?></legend>
-	<?php
-	// if there happened something with a plugin_ID, apply fadeout to the row:
-	$highlight_fadeout = empty($edit_Plugin) || ! is_object($edit_Plugin) /* may be error string */ ? array() : array( 'plug_ID'=>array($edit_Plugin->ID) );
 
-	$Results->display( NULL, $highlight_fadeout );
-	unset($Results); // free memory
+// if there happened something with a plugin_ID, apply fadeout to the row:
+$highlight_fadeout = empty($edit_Plugin) || ! is_object($edit_Plugin) /* may be error string */ ? array() : array( 'plug_ID'=>array($edit_Plugin->ID) );
 
-	if( $current_User->check_perm( 'options', 'edit' ) )
-	{ // Display action link to reload plugins:
-		?>
-		<p class="center">
-			<a href="admin.php?ctrl=plugins&amp;action=reload_plugins"><?php echo T_('Reload events and codes for installed plugins.') ?></a>
-		</p>
-		<?php
-	}
-	?>
-</fieldset>
+$Results->display( NULL, $highlight_fadeout );
 
-
-<?php
-echo '<p class="center"><a href="'.regenerate_url( 'action', 'action=list_available' ).'">'.T_('Display available plugins.').'</a></p>';
+unset($Results); // free memory
 
 
 /*
  * $Log$
+ * Revision 1.44  2007/01/07 18:42:35  fplanque
+ * cleaned up reload/refresh icons & links
+ *
  * Revision 1.43  2006/12/20 23:07:23  blueyed
  * Moved list of available plugins to separate sub-screen/form
  *
@@ -292,84 +287,5 @@ echo '<p class="center"><a href="'.regenerate_url( 'action', 'action=list_availa
  *
  * Revision 1.35  2006/10/08 19:50:10  blueyed
  * Re-enabled sorting plugins by name, group and desc again
- *
- * Revision 1.34  2006/09/10 21:56:54  smpdawg
- * Fixed parse error
- *
- * Revision 1.33  2006/09/10 19:54:52  blueyed
- * Added CVS Id line
- *
- * Revision 1.32  2006/09/10 19:23:28  blueyed
- * Removed Plugin::code(), ::name(), ::short_desc() and ::long_desc(); Fixes for mt-import.php
- *
- * Revision 1.31  2006/08/05 15:26:06  blueyed
- * Fixed possible E_NOTICE
- *
- * Revision 1.30  2006/07/23 23:01:55  blueyed
- * cleanup
- *
- * Revision 1.29  2006/07/17 01:53:12  blueyed
- * added param to UserSettings::param_Request
- *
- * Revision 1.28  2006/07/10 22:53:38  blueyed
- * Grouping of plugins added, based on a patch from balupton
- *
- * Revision 1.27  2006/07/03 23:35:24  blueyed
- * Performance: Only load AvailablePlugins if used!
- *
- * Revision 1.26  2006/07/03 23:24:57  blueyed
- * info / feedback
- *
- * Revision 1.25  2006/06/26 21:43:18  blueyed
- * small enhancements
- *
- * Revision 1.24  2006/06/22 19:53:06  blueyed
- * minor
- *
- * Revision 1.23  2006/06/20 23:24:14  blueyed
- * Added "order_callback" support for Results; made "name" and "desc" columns in Plugins list sortable
- *
- * Revision 1.22  2006/06/20 00:16:54  blueyed
- * Transformed Plugins table into Results object, so some columns are sortable.
- *
- * Revision 1.21  2006/06/05 23:15:00  blueyed
- * cleaned up plugin help links
- *
- * Revision 1.20  2006/05/30 23:14:54  blueyed
- * Re-enabled internal help, because it has been fixed; link name of available Plugins also to "info" action, because easier to click
- *
- * Revision 1.19  2006/05/30 19:39:55  fplanque
- * plugin cleanup
- *
- * Revision 1.18  2006/05/04 06:44:45  blueyed
- * Display version with available plugins.
- *
- * Revision 1.17  2006/05/02 01:47:58  blueyed
- * Normalization
- *
- * Revision 1.16  2006/04/27 19:11:12  blueyed
- * Cleanup; handle broken plugins more decent
- *
- * Revision 1.15  2006/04/19 20:13:52  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.14  2006/04/18 19:37:37  fplanque
- * minor
- *
- * Revision 1.13  2006/04/18 15:16:37  blueyed
- * todo
- *
- * Revision 1.12  2006/04/13 01:36:27  blueyed
- * Added interface method to edit Plugin settings (gets already used by YouTube Plugin)
- *
- * Revision 1.11  2006/04/13 01:23:19  blueyed
- * Moved help related functions back to Plugin class
- *
- * Revision 1.10  2006/04/11 22:28:58  blueyed
- * cleanup
- *
- * Revision 1.9  2006/04/11 21:22:26  fplanque
- * partial cleanup
- *
  */
 ?>

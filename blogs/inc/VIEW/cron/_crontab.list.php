@@ -69,7 +69,7 @@ $Results = & new Results( $SQL->get(), 'crontab_', '-A' );
 $Results->title = T_('Scheduled jobs') . get_web_help_link('scheduler');
 
 
-$Results->global_icon( T_('Refresh'), 'new', regenerate_url(), T_('Refresh'), 0, 5 );
+$Results->global_icon( T_('Refresh'), 'refresh', regenerate_url(), T_('Refresh'), 3, 4 );
 if( $current_User->check_perm( 'options', 'edit', false, NULL ) )
 {	// Permission to edit settings:
 	$Results->global_icon( T_('Refresh'), 'new', regenerate_url( 'action,cjob_ID', 'action=new' ), T_('Add job'), 3, 4 );
@@ -168,6 +168,9 @@ echo '<p>[<a href="'.$cron_url.'cron_exec.php" onclick="return pop_up_window( \'
 
 /*
  * $Log$
+ * Revision 1.8  2007/01/07 18:42:35  fplanque
+ * cleaned up reload/refresh icons & links
+ *
  * Revision 1.7  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
