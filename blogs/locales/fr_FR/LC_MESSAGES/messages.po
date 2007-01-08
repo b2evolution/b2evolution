@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2006-12-26 01:51+0100\n"
-"PO-Revision-Date: 2006-12-26 01:53+0100\n"
+"PO-Revision-Date: 2007-01-03 17:44+0100\n"
 "Last-Translator: Francois PLANQUE <fplanque.net>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -223,7 +223,7 @@ msgstr "Bienvenue dans b2evoltution"
 
 #: ..\..\..\default.php:55
 msgid "b2evolution is installed and ready but you have created no blog on this system yet."
-msgstr ""
+msgstr "b2evolution est installé et prêt à fonctionner, mais il semble que vous n'ayez pas encore créé de blog sur ce système."
 
 #: ..\..\..\default.php:56
 msgid "Create a blog now..."
@@ -324,11 +324,11 @@ msgstr "Ce gabarit de démonstration affiche 3 blogs simultanément (1 à gauche, 2
 
 #: ..\..\..\multiblogs.php:192
 msgid "Blog #2 doesn't seem to exist."
-msgstr ""
+msgstr "Le blog n°2 ne semble pas exister."
 
 #: ..\..\..\multiblogs.php:244
 msgid "Blog #3 doesn't seem to exist."
-msgstr ""
+msgstr "Le blog n°3 ne semble pas exister."
 
 #: ..\..\..\summary.php:30
 #: ..\..\..\summary.php:67
@@ -345,7 +345,7 @@ msgstr "Plus d'articles..."
 
 #: ..\..\..\_header.php:118
 msgid "Dashboard"
-msgstr ""
+msgstr "Tableau de bord"
 
 #: ..\..\..\_header.php:124
 msgid "Posts / Comments"
@@ -451,7 +451,7 @@ msgstr "Planif"
 
 #: ..\..\..\_header.php:203
 msgid "System"
-msgstr ""
+msgstr "Système"
 
 #: ..\..\..\_header.php:208
 #: ..\..\..\_header.php:304
@@ -1665,11 +1665,11 @@ msgstr "L'habillage [%s] affecté au blog [%s] n'existe pas. Il doit être correct
 #: ..\..\..\inc\_main.inc.php:463
 #: ..\..\..\inc\_main.inc.php:474
 msgid "The login window has expired. Please try again."
-msgstr ""
+msgstr "La fenêtre de login a expiré. Merci de réessayer."
 
 #: ..\..\..\inc\_main.inc.php:468
 msgid "Either you have not enabled cookies or this login window has expired."
-msgstr ""
+msgstr "Soit vous n'avez pas activé les cookies, soit la fenêtre de login a expiré."
 
 #: ..\..\..\inc\_main.inc.php:504
 msgid "Wrong login/password."
@@ -2084,12 +2084,12 @@ msgstr "%d sous catégories"
 #: ..\..\..\inc\CONTROL\collections\_chapters.ctrl.php:48
 #, php-format
 msgid "%d posts within category through main cat"
-msgstr ""
+msgstr "%d articles utilisent cette catégorie comme catégorie principale"
 
 #: ..\..\..\inc\CONTROL\collections\_chapters.ctrl.php:49
 #, php-format
 msgid "%d posts within category through extra cat"
-msgstr ""
+msgstr "%d articles utilisent cette catégorie comme catégorie complémentaire"
 
 #: ..\..\..\inc\CONTROL\collections\_chapters.ctrl.php:52
 msgid "Cannot delete category"
@@ -2152,7 +2152,7 @@ msgstr "La catégorie a été déplacée."
 #: ..\..\..\inc\CONTROL\collections\_chapters.ctrl.php:281
 #, php-format
 msgid "The category &laquo;%s&raquo; has been moved (with children) to &laquo;%s&raquo;'s root. You may want to nest it in another parent category below..."
-msgstr ""
+msgstr "La categorie &laquo;%s&raquo; a été déplacée (avec ses enfants) vers la racine du blog &laquo;%s&raquo;. Vous voudrez peut être la déplacer dans une sous-catégorie ci-dessous..."
 
 #: ..\..\..\inc\CONTROL\collections\_chapters.ctrl.php:307
 #: ..\..\..\inc\CONTROL\generic\inc\_generic_listeditor.php:212
@@ -2359,11 +2359,9 @@ msgstr "La tâche planifiée n°%d n'existe plus."
 msgid "The Error TEST cron controller simulates an error, thus this \"error\" is normal!"
 msgstr "Le contrôleur de tâche TEST d'erreur simule une erreur, cette \"erreur\" est donc normale!"
 
-# D:\www\b2evo19\blogs\inc\CONTROL\cron\_post_notifications.job.php:18
 #: ..\..\..\inc\CONTROL\cron\_post_notifications.job.php:18
-#, fuzzy
 msgid "Post notifications are not set to run as a scheduled task."
-msgstr "Les notifications ne sont pas paramétrées pour être envoyées de manière planifiée"
+msgstr "Les notifications ne sont pas paramétrées pour être envoyées de manière planifiée."
 
 # D:\www\b2evo19\blogs\inc\CONTROL\cron\_post_notifications.job.php:40
 #: ..\..\..\inc\CONTROL\cron\_post_notifications.job.php:40
@@ -2547,40 +2545,38 @@ msgid "cannot be deleted because of the following relations"
 msgstr "ne peut être supprimé à cause des relations suivantes"
 
 #: ..\..\..\inc\CONTROL\files\files.php:728
-#, fuzzy
 msgid "No destination blog is selected."
-msgstr "Vous n'avez rien sélectionné."
+msgstr "Aucun blog destination n'est sélectionné."
 
 #: ..\..\..\inc\CONTROL\files\files.php:737
-#, fuzzy
 msgid "Sorry, you have no permission to post into this blog."
-msgstr "Désolé, vous n'avez la permission d'accéder à cette section."
+msgstr "Désolé, vous n'avez la permission de poster dans ce blog."
 
 #: ..\..\..\inc\CONTROL\files\files.php:750
-#, fuzzy, php-format
+#, php-format
 msgid "Cannot post &laquo;%s&raquo; because it is not an image."
-msgstr "Impossible d'écraser le fichier &laquo;%s&raquo; à cause des relations suivantes"
+msgstr "Impossible de poster &laquo;%s&raquo; car il ne s'agit pas d'une image."
 
 #: ..\..\..\inc\CONTROL\files\files.php:789
-#, fuzzy, php-format
+#, php-format
 msgid "&laquo;%s&raquo; has been posted."
-msgstr "Le fichier &laquo;%s&raquo; n'a pas été renommé."
+msgstr "&laquo;%s&raquo; a été posté."
 
 #: ..\..\..\inc\CONTROL\files\files.php:829
 #: ..\..\..\inc\CONTROL\files\files.php:1061
-#, fuzzy, php-format
+#, php-format
 msgid "You are not allowed to edit &laquo;%s&raquo;."
-msgstr "Vous n'êtes pas autorisé à voir les autres utilisateurs."
+msgstr "Vous n'êtes pas autorisé à modifier &laquo;%s&raquo;."
 
 #: ..\..\..\inc\CONTROL\files\files.php:843
-#, fuzzy, php-format
+#, php-format
 msgid "The file &laquo;%s&raquo; have been updated."
-msgstr "Le fichier &laquo;%s&raquo; a été créé."
+msgstr ""
 
 #: ..\..\..\inc\CONTROL\files\files.php:847
-#, fuzzy, php-format
+#, php-format
 msgid "The file &laquo;%s&raquo; could not be updated."
-msgstr "Impossible d'accéder au fichier &laquo;%s&raquo;!"
+msgstr "Le fichier &laquo;%s&raquo; n'a pas pu être mis à jour."
 
 #: ..\..\..\inc\CONTROL\files\files.php:879
 #, php-format
@@ -2766,9 +2762,8 @@ msgstr "Les réglages n'ont pas changé."
 
 #: ..\..\..\inc\CONTROL\files\fileset.php:106
 #: ..\..\..\inc\CONTROL\files\fileset.php:118
-#, fuzzy
 msgid "Invalid CHMOD value."
-msgstr "Date invalide"
+msgstr "Valeur CHMOD invalide."
 
 #: ..\..\..\inc\CONTROL\files\fileset.php:127
 #, php-format
@@ -2935,14 +2930,14 @@ msgid "Post has been deleted."
 msgstr "L'article a été supprimé."
 
 #: ..\..\..\inc\CONTROL\items\_items.ctrl.php:449
-#, fuzzy, php-format
+#, php-format
 msgid "Link has been deleted from &laquo;%s&raquo;."
-msgstr "Impossible de supprimer le groupe &laquo;%s&raquo;"
+msgstr "Le lien a été retiré de &laquo;%s&raquo;"
 
 #: ..\..\..\inc\CONTROL\items\_items.ctrl.php:517
-#, fuzzy, php-format
+#, php-format
 msgid "Since this blog has no categories, you cannot post into it. You must <a %s>create categories</a> first."
-msgstr "Vous ne pouvez pas poster dans ce blog tant que vous n'y avez pas créé de catégorie."
+msgstr "Vous ne pouvez pas poster dans ce blog tant que vous n'y avez pas <a %s>créé de catégorie</a>."
 
 # D:\www\b2evo19\blogs\_header.php:113
 # D:\www\b2evo19\blogs\inc\VIEW\collections\_blogs_permissions.form.php:84
@@ -2958,9 +2953,8 @@ msgid "Expert"
 msgstr "Expert"
 
 #: ..\..\..\inc\CONTROL\items\_items.ctrl.php:551
-#, fuzzy
 msgid "View post & comments"
-msgstr "Derniers commentaires"
+msgstr "Voir articles & commentaires"
 
 #: ..\..\..\inc\CONTROL\items\_items.ctrl.php:557
 msgid "Browse blog:"
@@ -3445,9 +3439,8 @@ msgstr "Nouvel utilisateur créé."
 
 #: ..\..\..\inc\CONTROL\users\b2users.php:389
 #: ..\..\..\inc\CONTROL\users\b2users.php:468
-#, fuzzy
 msgid "User feature settings have been changed."
-msgstr "Les paramètres utilisateur ont été mis à jour."
+msgstr "Les paramètres de fonctionnalités utilisateur ont été mis à jour."
 
 #: ..\..\..\inc\CONTROL\users\b2users.php:423
 #: ..\..\..\inc\CONTROL\users\b2users.php:507
@@ -3531,13 +3524,13 @@ msgstr "Global"
 
 #: ..\..\..\inc\CONTROL\_misc\system.php:77
 msgid "When enabled, this feature is known to facilitate hacking exploits in any PHP application."
-msgstr ""
+msgstr "Lorsqu'elle est activée, cette fonction est connue pour faciliter l'exploitation frauduleuse de toute application PHP."
 
 #: ..\..\..\inc\CONTROL\_misc\system.php:78
 msgid ""
 "b2evolution includes additional measures in order not to be affected by this.\n"
 "\tHowever, for maximum security, we still recommend disabling this PHP feature."
-msgstr ""
+msgstr "b2evolution include des mesures additionnelles afin de ne pas être affecté par ce problème. Cependant, pour une sécurité maximale, nous recommandons de désactiver cette fonctionnalité PHP."
 
 #: ..\..\..\inc\CONTROL\_misc\system.php:80
 #, php-format
@@ -3545,9 +3538,8 @@ msgid "If possible, change this setting to <code>%s</code> in your php.ini or as
 msgstr ""
 
 #: ..\..\..\inc\CONTROL\_misc\system.php:83
-#, fuzzy
 msgid "System checks"
-msgstr "Orthographe"
+msgstr "Vérifications système"
 
 #: ..\..\..\inc\CONTROL\_misc\system.php:91
 msgid "This version is too old. b2evolution will not run correctly. You must ask your host to upgrade PHP before you can run b2evolution."
@@ -3589,9 +3581,8 @@ msgid "Not loaded"
 msgstr "Non chargé"
 
 #: ..\..\..\inc\CONTROL\_misc\system.php:188
-#, fuzzy
 msgid "The XML extension is not loaded."
-msgstr "L'extension de fichier &laquo;%s&raquo; n'est pas permise."
+msgstr "L'extension XML n'est pas chargée."
 
 #: ..\..\..\inc\CONTROL\_misc\system.php:203
 msgid "Deleted"
@@ -3685,9 +3676,8 @@ msgid "Removed %d cached entries."
 msgstr "%d entrées de cache retirées."
 
 #: ..\..\..\inc\CONTROL\_misc\tools.php:104
-#, fuzzy
 msgid "Contents cached in the database"
-msgstr "Votre identifiant pour accéder à la base de données"
+msgstr ""
 
 # D:\www\b2evo19\blogs\inc\CONTROL\_misc\tools.php:113
 #: ..\..\..\inc\CONTROL\_misc\tools.php:106
@@ -3973,14 +3963,12 @@ msgstr "Vous devez entrer un 'Nom URL' pour le blog !"
 
 #: ..\..\..\inc\MODEL\collections\_blog.class.php:218
 #: ..\..\..\inc\MODEL\collections\_chapter.class.php:99
-#, fuzzy
 msgid "The url name is invalid."
-msgstr "Le nom fourni n'est pas valide."
+msgstr "Le nom url n'est pas valide."
 
 #: ..\..\..\inc\MODEL\collections\_blog.class.php:227
-#, fuzzy
 msgid "This URL name is already in use by another blog. Please choose another name."
-msgstr "Ce 'Nom URL' est déjà utilisé pour un autre blog. Veuillez choisir un autre nom."
+msgstr "Ce Nom URL est déjà utilisé pour un autre blog. Veuillez choisir un autre nom."
 
 #: ..\..\..\inc\MODEL\collections\_blog.class.php:241
 #: ..\..\..\inc\MODEL\collections\_blog.class.php:250
@@ -3998,9 +3986,8 @@ msgid "You must provide a relative URL (without <code>http://</code> or <code>ht
 msgstr "Vous devez indiquer une URL relative (sans <code>http://</code> ni <code>https://</code>)!"
 
 #: ..\..\..\inc\MODEL\collections\_blog.class.php:283
-#, fuzzy
 msgid "The stub name is invalid."
-msgstr "Le numéro de téléphone est invalide."
+msgstr "Le nom de fichier stub est invalide."
 
 #: ..\..\..\inc\MODEL\collections\_blog.class.php:309
 #, php-format
@@ -4008,9 +3995,9 @@ msgid "Items/days per page must be between %d and %d."
 msgstr "Le nombre d'articles/jours par page doit être compris entre %d et %d."
 
 #: ..\..\..\inc\MODEL\collections\_blog.class.php:312
-#, fuzzy, php-format
+#, php-format
 msgid "Items per feed must be between %d and %d."
-msgstr "Le nombre d'articles/jours par page doit être compris entre %d et %d."
+msgstr "Le nombre d'articles par flux doit être compris entre %d et %d."
 
 #: ..\..\..\inc\MODEL\collections\_blog.class.php:376
 #: ..\..\..\inc\MODEL\collections\_blog.class.php:380
@@ -4103,9 +4090,8 @@ msgid "Deleted blog's static file"
 msgstr "Fichier statique du blog supprimé"
 
 #: ..\..\..\inc\MODEL\collections\_blog.funcs.php:626
-#, fuzzy
 msgid "The requested blog does not exist (any more?)"
-msgstr "Le blog demandé n'existe pas!"
+msgstr "Le blog demandé n'existe pas (plus?)"
 
 #. TRANS: "None" select option
 #: ..\..\..\inc\MODEL\collections\_blogcache.class.php:66
@@ -4126,14 +4112,12 @@ msgid "Requested category %s does not exist!"
 msgstr "La catégorie demandée %s n'existe pas"
 
 #: ..\..\..\inc\MODEL\collections\_chapter.class.php:93
-#, fuzzy
 msgid "Please enter an urlname."
-msgstr "Merci d'entrer un nom."
+msgstr "Merci d'entrer un nom url."
 
 #: ..\..\..\inc\MODEL\collections\_chapter.class.php:109
-#, fuzzy
 msgid "This URL name is already in use by another category. Please choose another name."
-msgstr "Ce 'Nom URL' est déjà utilisé pour un autre blog. Veuillez choisir un autre nom."
+msgstr "Ce Nom URL est déjà utilisé pour une autre catégorie. Veuillez choisir un autre nom."
 
 #: ..\..\..\inc\MODEL\comments\_comment.class.php:356
 #: ..\..\..\inc\VIEW\collections\_blogs_permissions.form.php:376
@@ -4162,11 +4146,12 @@ msgstr "Supprimer ce commentaire"
 # D:\www\b2evo19\blogs\inc\MODEL\comments\_comment.class.php:561
 #: ..\..\..\inc\MODEL\comments\_comment.class.php:566
 #: ..\..\..\inc\MODEL\comments\_comment.class.php:574
-#, fuzzy
 msgid ""
 "You are about to delete this comment!\\n"
 "This cannot be undone!"
-msgstr "Vous êtes sur le point de supprimer ce commentaire!"
+msgstr ""
+"Vous êtes sur le point de supprimer ce commentaire!\\n"
+"Ceci est irréversible!"
 
 #: ..\..\..\inc\MODEL\comments\_comment.class.php:610
 #: ..\..\..\inc\MODEL\items\_item.class.php:2082
@@ -4396,9 +4381,9 @@ msgid "&laquo;%s&raquo; is not a valid filename."
 msgstr "&laquo;%s&raquo; n'est pas un nom de fichier valide."
 
 #: ..\..\..\inc\MODEL\files\_file.funcs.php:503
-#, fuzzy, php-format
+#, php-format
 msgid "&laquo;%s&raquo; is a locked extension."
-msgstr "&laquo;%s&raquo; n'a pas une extension autorisée."
+msgstr "&laquo;%s&raquo; est une extension verrouillée."
 
 #: ..\..\..\inc\MODEL\files\_file.funcs.php:508
 #, php-format
@@ -4662,11 +4647,12 @@ msgstr "Supprimer cet article"
 # D:\www\b2evo19\blogs\inc\MODEL\items\_item.class.php:1779
 #: ..\..\..\inc\MODEL\items\_item.class.php:1923
 #: ..\..\..\inc\MODEL\items\_item.class.php:1931
-#, fuzzy
 msgid ""
 "You are about to delete this post!\\n"
 "This cannot be undone!"
-msgstr "Vous êtes sur le point de supprimer cet article!"
+msgstr ""
+"Vous êtes sur le point de supprimer cet article!\\n"
+"Ceci est irréversible!"
 
 #: ..\..\..\inc\MODEL\items\_item.class.php:1988
 msgid "Edit this post..."
@@ -4686,9 +4672,8 @@ msgstr "Déprécier cet commentaire!"
 
 #. TRANS: "None" select option
 #: ..\..\..\inc\MODEL\items\_item.class.php:2139
-#, fuzzy
 msgid "No priority"
-msgstr "Monter la priorité"
+msgstr "Pas de priorité"
 
 #: ..\..\..\inc\MODEL\items\_item.class.php:2259
 msgid "Configure plugins"
@@ -4792,9 +4777,8 @@ msgid "Note: Cross posting among multiple categories is currently disabled."
 msgstr "Note: l'enregistrement d'articles simultanément dans plusieurs catégories est actuellement désactivé."
 
 #: ..\..\..\inc\MODEL\items\_item.funcs.php:528
-#, fuzzy
 msgid "Add a new category..."
-msgstr "Ajouter un type de fichier..."
+msgstr "Ajouter une nouvelle catégorie..."
 
 #: ..\..\..\inc\MODEL\items\_item.funcs.php:543
 msgid "Main"
@@ -4918,14 +4902,14 @@ msgid "Hide future"
 msgstr "Cacher le futrur"
 
 #: ..\..\..\inc\MODEL\items\_itemlist2.class.php:1195
-#, fuzzy, php-format
+#, php-format
 msgid "Limited to %d last days"
-msgstr "Limiter aux %d derniers jours"
+msgstr "Limité aux %d derniers jours"
 
 #: ..\..\..\inc\MODEL\items\_itemlist2.class.php:1200
-#, fuzzy, php-format
+#, php-format
 msgid "Limited to %d days"
-msgstr "Limiter à %d jours"
+msgstr "Limité à %d jours"
 
 #: ..\..\..\inc\MODEL\items\_itemtype.class.php:63
 #, php-format
@@ -5438,9 +5422,8 @@ msgid "Posts/Days per page"
 msgstr "Articles/Jours par page"
 
 #: ..\..\..\inc\VIEW\collections\_blogs_display.form.php:41
-#, fuzzy
 msgid "How many days or posts fo you want to display on the home page?"
-msgstr "jours. (0 pour désactiver) Combien de jours de stats voulez vous conserver dans la base de données?"
+msgstr "Combien de jours de stats voulez vous conserver dans la base de données?"
 
 #: ..\..\..\inc\VIEW\collections\_blogs_display.form.php:42
 msgid "Posts in RSS/Atom feeds"
@@ -5559,15 +5542,13 @@ msgstr "Sera utilisé dans les menus de sélection au travers de l'interface d'adm
 
 #: ..\..\..\inc\VIEW\collections\_blogs_general.form.php:49
 #: ..\..\..\inc\VIEW\collections\_urls.form.php:119
-#, fuzzy
 msgid "Blog URL name"
-msgstr "URL blog"
+msgstr "Nom URL"
 
 #: ..\..\..\inc\VIEW\collections\_blogs_general.form.php:49
 #: ..\..\..\inc\VIEW\collections\_urls.form.php:119
-#, fuzzy
 msgid "Used to uniquely identify this blog. Appears in URLs and gets used as default for the media location (see the advanced tab)."
-msgstr "Utilisé pour identifier ce blog de manière unique. Apparait dans les URLs lorsque les extra path infos sont activées. Est également utilisé pour le répertoire média par défaut (voir onglet Avancé)."
+msgstr "Utilisé pour identifier ce blog de manière unique. Apparait dans les URLs. Est également utilisé pour le répertoire média par défaut (voir onglet Avancé)."
 
 #: ..\..\..\inc\VIEW\collections\_blogs_general.form.php:50
 msgid "Main Locale"
@@ -5650,19 +5631,16 @@ msgid "Gen!"
 msgstr "Gen!"
 
 #: ..\..\..\inc\VIEW\collections\_blogs_list.php:120
-#, fuzzy
 msgid "Edit settings..."
-msgstr "Editer les propriétés..."
+msgstr "Editer les paramètres..."
 
 #: ..\..\..\inc\VIEW\collections\_blogs_list.php:125
-#, fuzzy
 msgid "Edit categories..."
-msgstr "Editer la catégorie"
+msgstr "Editer les catégories..."
 
 #: ..\..\..\inc\VIEW\collections\_blogs_list.php:130
-#, fuzzy
 msgid "Copy this blog..."
-msgstr "Copier ce blog!"
+msgstr "Copier ce blog..."
 
 # D:\www\b2evo19\blogs\inc\VIEW\collections\_blogs_list.php:125
 #: ..\..\..\inc\VIEW\collections\_blogs_list.php:132
@@ -5888,9 +5866,8 @@ msgstr "Prévisualiser le blog avec cet habillage dans une nouvelle fenêtre."
 
 #: ..\..\..\inc\VIEW\collections\_blogs_skin.form.php:53
 #: ..\..\..\inc\VIEW\skins\_skin_list.view.php:31
-#, fuzzy
 msgid "No skinshot available for"
-msgstr "Desc non dispo"
+msgstr "Pas d'apperçu pour"
 
 #: ..\..\..\inc\VIEW\collections\_blogs_skin.form.php:67
 msgid "Select"
@@ -5898,19 +5875,16 @@ msgstr "Sélectionner"
 
 #: ..\..\..\inc\VIEW\collections\_chapter.form.php:51
 #: ..\..\..\inc\VIEW\generic\_generic_category.form.php:47
-#, fuzzy
 msgid "New category"
-msgstr "Nouveau nom de catégorie"
+msgstr "Nouvelle catégorie"
 
 #: ..\..\..\inc\VIEW\collections\_chapter.form.php:63
-#, fuzzy
 msgid "Parent category"
-msgstr "Nouvelle catégorie parente"
+msgstr "Catégorie parente"
 
 #: ..\..\..\inc\VIEW\collections\_chapter.form.php:67
-#, fuzzy
 msgid "URL name"
-msgstr "Nom URL pour le blog"
+msgstr "Nom URL"
 
 #: ..\..\..\inc\VIEW\collections\_chapter.form.php:67
 msgid "Used for clean URLs. Must be unique."
@@ -5952,9 +5926,8 @@ msgid "Categories for blog:"
 msgstr "Catégories pour le blog:"
 
 #: ..\..\..\inc\VIEW\collections\_chapter_list.inc.php:163
-#, fuzzy
 msgid "URL Name"
-msgstr "Nom"
+msgstr "Nom URL"
 
 #: ..\..\..\inc\VIEW\collections\_chapter_list.inc.php:183
 #, fuzzy, php-format
@@ -5962,14 +5935,12 @@ msgid "<strong>Note:</strong> Moving categories across blogs is currently disabl
 msgstr "Note: Le déplacement de catégories entre blogs est activé. Utilisez avec précaution."
 
 #: ..\..\..\inc\VIEW\collections\_chapter_move.form.php:46
-#, fuzzy
 msgid "Cancel move!"
-msgstr "Annuler le renommage!"
+msgstr "Annuler le déplacement!"
 
 #: ..\..\..\inc\VIEW\collections\_chapter_move.form.php:48
-#, fuzzy
 msgid "Move category"
-msgstr "Afficher cette catégorie"
+msgstr "Déplacer la catégorie"
 
 #: ..\..\..\inc\VIEW\collections\_chapter_move.form.php:60
 #, fuzzy
@@ -6110,9 +6081,8 @@ msgid "Category links"
 msgstr "Catégories"
 
 #: ..\..\..\inc\VIEW\collections\_urls.form.php:193
-#, fuzzy
 msgid "Post URLs"
-msgstr "Articles"
+msgstr "URLs des articles"
 
 #: ..\..\..\inc\VIEW\comments\_browse_comments.inc.php:43
 msgid "Feedback (Comments, Trackbacks...)"
@@ -6132,9 +6102,8 @@ msgid "Advanced properties"
 msgstr "Propriétés avancées"
 
 #: ..\..\..\inc\VIEW\comments\_comment.form.php:112
-#, fuzzy
 msgid "Comment date"
-msgstr "Texte du commentaire"
+msgstr "Date du commentaire"
 
 #: ..\..\..\inc\VIEW\comments\_comment.form.php:124
 #: ..\..\..\inc\VIEW\items\_browse_posts_exp.inc.php:252
@@ -6518,9 +6487,8 @@ msgstr "Remonter au dossier parent"
 #: ..\..\..\inc\VIEW\files\_files_browse.inc.php:324
 #: ..\..\..\inc\VIEW\files\_files_links.inc.php:70
 #: ..\..\..\inc\VIEW\items\inc\_item_links.inc.php:117
-#, fuzzy
 msgid "Icon/Type"
-msgstr "Type"
+msgstr "Icône/Type"
 
 #. TRANS: file/directory path
 #: ..\..\..\inc\VIEW\files\_files_browse.inc.php:335
@@ -7020,7 +6988,6 @@ msgid "Editing:"
 msgstr "Listing:"
 
 #: ..\..\..\inc\VIEW\files\_file_edit.form.php:53
-#, fuzzy
 msgid "Save!"
 msgstr "Enregistrer!"
 
@@ -7193,19 +7160,16 @@ msgid "Restore defaults"
 msgstr "Restaurer les valeurs par défaut"
 
 #: ..\..\..\inc\VIEW\generic\_generic_category.form.php:58
-#, fuzzy
 msgid "Parent"
-msgstr "Ancien parent"
+msgstr "Parent"
 
 #: ..\..\..\inc\VIEW\items\_browse_posts_exp.inc.php:53
-#, fuzzy
 msgid "Close post"
-msgstr "Fermer la fiche"
+msgstr "Fermer l'article"
 
 #: ..\..\..\inc\VIEW\items\_browse_posts_exp.inc.php:53
-#, fuzzy
 msgid "close"
-msgstr "Fermer"
+msgstr "fermer"
 
 #: ..\..\..\inc\VIEW\items\_browse_posts_exp.inc.php:62
 #: ..\..\..\inc\VIEW\items\_browse_posts_exp.inc.php:287
@@ -7561,9 +7525,8 @@ msgid "Link a file..."
 msgstr "Lier un fichier...."
 
 #: ..\..\..\inc\VIEW\items\inc\_item_links.inc.php:206
-#, fuzzy
 msgid "Link files"
-msgstr "Lier fichier"
+msgstr "Lier fichiers"
 
 #: ..\..\..\inc\VIEW\login\_login_form.php:39
 msgid "Login form"
@@ -8241,9 +8204,8 @@ msgid "days. How many days of hits & sessions do you want to keep in the databas
 msgstr "jours. (0 pour désactiver) Combien de jours de stats voulez vous conserver dans la base de données?"
 
 #: ..\..\..\inc\VIEW\settings\_set_features.form.php:163
-#, fuzzy
 msgid "Allow moving categories"
-msgstr "Catégories du blog supprimées"
+msgstr "Autoriser le déplacement de catégories"
 
 #: ..\..\..\inc\VIEW\settings\_set_features.form.php:163
 msgid "Check to allow moving categories accross blogs. (Caution: can break pre-existing permalinks!)"
@@ -8266,9 +8228,8 @@ msgid "This blog will be displayed on index.php ."
 msgstr "Ce blog sera affiché sur index.php ."
 
 #: ..\..\..\inc\VIEW\settings\_set_general.form.php:60
-#, fuzzy
 msgid "Default user permissions"
-msgstr "Permissions par défaut"
+msgstr "Permissions utilisateur par défaut"
 
 #: ..\..\..\inc\VIEW\settings\_set_general.form.php:62
 msgid "New users can register"
@@ -8333,9 +8294,8 @@ msgid "Permalinks will look like 'stub/post-title'"
 msgstr ""
 
 #: ..\..\..\inc\VIEW\settings\_set_general.form.php:88
-#, fuzzy
 msgid "Use year"
-msgstr "Utilisateur"
+msgstr "Utiliser l'année"
 
 #: ..\..\..\inc\VIEW\settings\_set_general.form.php:88
 msgid "Permalinks will look like 'stub/2006/post-title'"
@@ -8366,9 +8326,8 @@ msgid "Permalinks will look like 'stub/cat/subcat/post-title'"
 msgstr ""
 
 #: ..\..\..\inc\VIEW\settings\_set_general.form.php:93
-#, fuzzy
 msgid "Extra path info"
-msgstr "Utiliser les URL étendues"
+msgstr "Utiliser les extra path infos"
 
 #: ..\..\..\inc\VIEW\settings\_set_general.form.php:96
 msgid "Post called up by its URL title (Recommended)"
@@ -8511,9 +8470,8 @@ msgid "Hide available plugins"
 msgstr "Cache les plugins disponibles"
 
 #: ..\..\..\inc\VIEW\settings\_set_plugins_available.form.php:94
-#, fuzzy
 msgid "Un-Classified"
-msgstr "Fichier Classe"
+msgstr "Non classifiés"
 
 #: ..\..\..\inc\VIEW\settings\_set_plugins_available.form.php:174
 msgid "Install"
