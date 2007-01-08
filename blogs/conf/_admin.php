@@ -57,6 +57,7 @@ $ctrl_mappings = array(
 		'tools'        => '_misc/tools.php',
 		'users'        => 'users/b2users.php',
 		'upload'       => 'files/_upload.ctrl.php',
+		'widgets'      => 'collections/_widgets.ctrl.php',
 	);
 
 

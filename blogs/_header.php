@@ -259,6 +259,10 @@ $AdminUI->add_menu_entries(
 						'text' => T_('Display'),
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=display&amp;blog='.$blog,
 						'perm_eval' => $coll_settings_perm ),
+					'widgets' => array(
+						'text' => T_('Widgets'),
+						'href' => 'admin.php?ctrl=widgets&amp;blog='.$blog,
+						'perm_eval' => $coll_settings_perm ),
 					'chapters' => array(
 						'text' => T_('Categories'),
 						'href' => 'admin.php?ctrl=chapters&amp;blog='.$blog,
@@ -331,6 +335,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.42  2007/01/08 21:55:42  fplanque
+ * very rough widget handling
+ *
  * Revision 1.41  2006/12/22 00:51:33  fplanque
  * dedicated upload tab - proof of concept
  * (interlinking to be done)
