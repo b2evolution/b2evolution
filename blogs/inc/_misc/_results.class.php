@@ -44,7 +44,7 @@ require_once dirname(__FILE__).'/_widget.class.php';
  *
  * @todo Support $cols[]['order_rows_callback'] / order_objects_callback also if there's a LIMIT?
  */
-class Results extends Widget
+class Results extends Table
 {
 	var $DB;
 
@@ -67,11 +67,6 @@ class Results extends Widget
 	 * Number of rows in result set for current page.
 	 */
 	var $result_num_rows;
-
-	/**
-	 * Total number of pages
-	 */
-	var $total_pages;
 
 	/**
 	 * Current page
@@ -154,21 +149,10 @@ class Results extends Widget
 	var $cols;
 
 	/**
-	 * Lazy filled.
-	 */
-	var $nb_cols;
-
-	/**
 	 * Do we want to display column headers?
 	 * @var boolean
 	 */
 	var $col_headers = true;
-
-
-	/**
-	 * Display parameters
-	 */
-	var $params = NULL;
 
 
 	/**
@@ -673,68 +657,11 @@ class Results extends Widget
 	 */
 	function display_init( $display_params = NULL )
 	{
-		global $AdminUI;
-		if( empty( $this->params ) && isset( $AdminUI ) )
-		{ // Use default params from Admin Skin:
-			$this->params = $AdminUI->get_template( 'Results' );
-		}
-
-		// Make sure we have display parameters:
-		if( !is_null($display_params) )
-		{ // Use passed params:
-			//$this->params = & $display_params;
-			if( !empty( $this->params ) )
-			{
-				$this->params = array_merge( $this->params, $display_params );
-			}
-			else
-			{
-				$this->params = & $display_params;
-			}
-		}
+	 	// Lazy fill $this->params:
+		parent::display_init( $display_params );
 
 		// Make sure query has executed and we're at the top of the resultset:
 		$this->restart();
-	}
-
-
-	/**
-	 * Display list/table start.
-	 *
-	 * Typically outputs UL or TABLE tags.
-	 *
-	 * @param boolean do we want special treatment when there are no results
-	 */
-	function display_list_start( $detect_no_results = true )
-	{
-		if( $detect_no_results && $this->total_pages == 0 )
-		{ // There are no results! Nothing to display!
-			echo $this->replace_vars( $this->params['no_results_start'] );
-		}
-		else
-		{	// We have rows to display:
-			echo $this->params['list_start'];
-		}
-	}
-
-
-	/**
-	 * Display list/table end.
-	 *
-	 * Typically outputs </ul> or </table>
-	 *
-	 * @param boolean do we want special treatment when there are no results
-	 */
-	function display_list_end( $detect_no_results = true )
-	{
-		if( $detect_no_results && $this->total_pages == 0 )
-		{ // There are no results! Nothing to display!
-			echo $this->replace_vars( $this->params['no_results_end'] );
-		}
-		else
-		{	// We have rows to display:
-			echo $this->params['list_end'];
-		}
 	}
 
 
@@ -894,7 +821,6 @@ class Results extends Widget
 	 * Display list/table head.
 	 *
 	 * This includes list head/title and column headers.
-	 * This is optional and will only produce output if column headers are defined.
 	 * EXPERIMENTAL: also dispays <tfoot>
 	 *
 	 * @access protected
@@ -1956,14 +1882,6 @@ class Results extends Widget
 				//inits the link to next page range
 				return $this->display_next( $this->params['page_url'] );
 
-			case 'nb_cols' :
-				// Number of columns in result:
-				if( !isset($this->nb_cols) )
-				{
-					$this->nb_cols = count($this->cols);
-				}
-				return $this->nb_cols;
-
 			default :
 				return parent::replace_callback( $matches );
 		}
@@ -2210,6 +2128,11 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.38  2007/01/08 23:44:19  fplanque
+ * inserted Table widget
+ * WARNING: this has nothing to do with ComponentWidgets...
+ * (except that I'm gonna need the Table Widget when handling the ComponentWidgets :>
+ *
  * Revision 1.37  2007/01/07 05:27:41  fplanque
  * extended fadeout, but still not fixed everywhere
  *

@@ -42,14 +42,21 @@ global $current_User;
  */
 global $admin_Plugins;
 
+$Table = & new Table();
+
+$Table->title = T_('Plugins available for installation');
+
+$Table->global_icon( T_('Cancel install!'), 'close', regenerate_url(), T_('Cancel'), 3, 4 );
+
+$Table->nb_cols = 5;
+
+$Table->display_init();
+
+$Table->display_list_start();
+
+// TITLE / FILTERS / COLUMN HEADERS:
+$Table->display_head();
 ?>
-	<table class="grouped" cellspacing="0">
-		<thead>
-		<tr>
-			<th colspan="5" class="title"><span style="float: right;"><?php
-				echo action_icon( T_('Cancel install!'), 'close', regenerate_url(), T_('Cancel'), 3, 4 )
-				?></span><?php echo T_('Plugins available for installation') ?></th>
-		</tr>
 		<tr>
 			<th class="firstcol"><?php echo T_('Plugin') ?></th>
 			<th><?php echo T_('Description') ?></th>
@@ -189,11 +196,17 @@ global $admin_Plugins;
 		}
 		?>
 		</tbody>
-	</table>
-
 <?php
+
+$Table->display_list_end();
+
 /*
  * $Log$
+ * Revision 1.4  2007/01/08 23:44:19  fplanque
+ * inserted Table widget
+ * WARNING: this has nothing to do with ComponentWidgets...
+ * (except that I'm gonna need the Table Widget when handling the ComponentWidgets :>
+ *
  * Revision 1.3  2007/01/07 18:42:35  fplanque
  * cleaned up reload/refresh icons & links
  *

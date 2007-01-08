@@ -56,7 +56,6 @@ class Widget
 	 */
 	var $global_icons = array();
 
-
 	/**
 	 * Registers a global action icon
 	 *
@@ -180,8 +179,160 @@ class Widget
 
 }
 
+
+/**
+ * Class Table
+ * @package evocore
+ */
+class Table extends Widget
+{
+	/**
+	 * Display parameters
+	 */
+	var $params = NULL;
+
+	/**
+	 * Total number of pages
+	 */
+	var $total_pages = 1;
+
+	/**
+	 * Number of cols.
+	 */
+	var $nb_cols;
+
+
+	/**
+	 * Initialize things in order to be ready for displaying.
+	 *
+	 * Lazy fills $this->params
+	 */
+	function display_init( $display_params = NULL )
+	{
+		global $AdminUI;
+		if( empty( $this->params ) && isset( $AdminUI ) )
+		{ // Use default params from Admin Skin:
+			$this->params = $AdminUI->get_template( 'Results' );
+		}
+
+		// Make sure we have display parameters:
+		if( !is_null($display_params) )
+		{ // Use passed params:
+			//$this->params = & $display_params;
+			if( !empty( $this->params ) )
+			{
+				$this->params = array_merge( $this->params, $display_params );
+			}
+			else
+			{
+				$this->params = & $display_params;
+			}
+		}
+	}
+
+
+	/**
+	 * Display list/table start.
+	 *
+	 * Typically outputs UL or TABLE tags.
+	 */
+	function display_list_start()
+	{
+		if( $this->total_pages == 0 )
+		{ // There are no results! Nothing to display!
+			echo $this->replace_vars( $this->params['no_results_start'] );
+		}
+		else
+		{	// We have rows to display:
+			echo $this->params['list_start'];
+		}
+	}
+
+
+	/**
+	 * Display list/table end.
+	 *
+	 * Typically outputs </ul> or </table>
+	 */
+	function display_list_end()
+	{
+		if( $this->total_pages == 0 )
+		{ // There are no results! Nothing to display!
+			echo $this->replace_vars( $this->params['no_results_end'] );
+		}
+		else
+		{	// We have rows to display:
+			echo $this->params['list_end'];
+		}
+	}
+
+
+	/**
+	 * Display list/table head.
+	 *
+	 * This includes list head/title and column headers.
+	 * EXPERIMENTAL: also dispays <tfoot>
+	 *
+	 * @access protected
+	 */
+	function display_head()
+	{
+		echo $this->params['head_start'];
+
+		// DISPLAY TITLE:
+		if( isset($this->title) )
+		{ // A title has been defined for this result set:
+			echo $this->replace_vars( $this->params['head_title'] );
+		}
+
+ 		// DISPLAY COLUMN HEADERS:
+		if( isset( $this->cols ) )
+		{
+		}
+
+		echo $this->params['head_end'];
+
+
+		// Experimental:
+		echo $this->params['tfoot_start'];
+		echo $this->params['tfoot_end'];
+	}
+
+
+	/**
+	 * Widget callback for template vars.
+	 *
+	 * This allows to replace template vars, see {@link Widget::replace_callback()}.
+	 *
+	 * @return string
+	 */
+	function replace_callback( $matches )
+	{
+		// echo '['.$matches[1].']';
+		switch( $matches[1] )
+		{
+			case 'nb_cols' :
+				// Number of columns in result:
+				if( !isset($this->nb_cols) )
+				{
+					$this->nb_cols = count($this->cols);
+				}
+				return $this->nb_cols;
+
+			default :
+				return parent::replace_callback( $matches );
+		}
+	}
+
+}
+
 /*
  * $Log$
+ * Revision 1.11  2007/01/08 23:44:19  fplanque
+ * inserted Table widget
+ * WARNING: this has nothing to do with ComponentWidgets...
+ * (except that I'm gonna need the Table Widget when handling the ComponentWidgets :>
+ *
  * Revision 1.10  2006/11/26 01:42:10  fplanque
  * doc
  *
