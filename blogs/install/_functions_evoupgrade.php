@@ -1550,12 +1550,15 @@ function upgrade_b2evo_tables()
 
 		echo 'Creating widgets table... ';
 		$DB->query( 'CREATE TABLE T_widget (
-            wi_coll_ID    INT(11) UNSIGNED NOT NULL,
-            wi_sco_name   VARCHAR( 40 ) NOT NULL,
-            wi_type       ENUM( \'core\', \'plugin\' ) NOT NULL DEFAULT \'core\',
-            wi_code       VARCHAR(32) NOT NULL,
-            wi_params     TEXT NULL,
-            PRIMARY KEY ( wi_coll_ID, wi_sco_name, wi_type, wi_code )
+ 						wi_ID					INT(10) UNSIGNED auto_increment,
+						wi_coll_ID    INT(11) UNSIGNED NOT NULL,
+						wi_sco_name   VARCHAR( 40 ) NOT NULL,
+						wi_order			INT(10) UNSIGNED NOT NULL,
+						wi_type       ENUM( \'core\', \'plugin\' ) NOT NULL DEFAULT \'core\',
+						wi_code       VARCHAR(32) NOT NULL,
+						wi_params     TEXT NULL,
+						PRIMARY KEY ( wi_ID ),
+						UNIQUE wi_order( wi_coll_ID, wi_sco_name, wi_order )
           )' );
 		echo "OK.<br />\n";
 
@@ -1682,6 +1685,10 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.201  2007/01/08 23:45:48  fplanque
+ * A little less rough widget manager...
+ * (can handle multiple instances of same widget and remembers order)
+ *
  * Revision 1.200  2007/01/08 21:53:51  fplanque
  * typo
  *

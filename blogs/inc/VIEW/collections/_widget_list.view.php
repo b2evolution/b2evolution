@@ -27,7 +27,8 @@ $container_Widget_array = array();
 
 $sql = 'SELECT *
 		      FROM T_widget
-		     WHERE wi_coll_ID = '.$Blog->ID;
+		     WHERE wi_coll_ID = '.$Blog->ID.'
+		     ORDER BY wi_sco_name, wi_order';
 $widget_rs = $DB->get_results( $sql, OBJECT, 'Get list of widgets for collection' );
 foreach( $widget_rs as $row )
 {
@@ -79,6 +80,10 @@ foreach( $container_Widget_array as $container=>$dummy )
 
 /*
  * $Log$
+ * Revision 1.2  2007/01/08 23:45:48  fplanque
+ * A little less rough widget manager...
+ * (can handle multiple instances of same widget and remembers order)
+ *
  * Revision 1.1  2007/01/08 21:55:42  fplanque
  * very rough widget handling
  *

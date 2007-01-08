@@ -159,12 +159,15 @@ $schema_queries = array(
 	'T_widget' => array(
 		'Creating components table',
 		"CREATE TABLE T_widget (
+			wi_ID					INT(10) UNSIGNED auto_increment,
 			wi_coll_ID    INT(11) UNSIGNED NOT NULL,
 			wi_sco_name   VARCHAR( 40 ) NOT NULL,
+			wi_order			INT(10) UNSIGNED NOT NULL,
 			wi_type       ENUM( 'core', 'plugin' ) NOT NULL DEFAULT 'core',
 			wi_code       VARCHAR(32) NOT NULL,
 			wi_params     TEXT NULL,
-			PRIMARY KEY ( wi_coll_ID, wi_sco_name, wi_type, wi_code )
+			PRIMARY KEY ( wi_ID ),
+			UNIQUE wi_order( wi_coll_ID, wi_sco_name, wi_order )
 		)" ),
 
 	'T_categories' => array(
@@ -521,6 +524,10 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.48  2007/01/08 23:45:48  fplanque
+ * A little less rough widget manager...
+ * (can handle multiple instances of same widget and remembers order)
+ *
  * Revision 1.47  2007/01/08 21:53:51  fplanque
  * typo
  *

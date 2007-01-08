@@ -32,8 +32,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * @package evocore
  */
-class ComponentWidget
+class ComponentWidget extends DataObject
 {
+	var $coll_ID;
+	/**
+	 * Container name
+	 */
+	var $sco_name;
+	var $order;
 	var $type;
 	var $code;
 	var $params;
@@ -42,13 +48,16 @@ class ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function ComponentWidget( $db_row = NULL, $type = 'core', $code = NULL, $params = array() )
+	function ComponentWidget( $db_row = NULL, $type = 'core', $code = NULL, $params = NULL )
 	{
+		// Call parent constructor:
+		parent::DataObject( 'T_widget', 'wi_', 'wi_ID' );
+
 		if( is_null($db_row) )
 		{	// We are creating an object here:
-			$this->type = $type;
-			$this->code = $code;
-			$this->params = $params;
+			$this->set( 'type', $type );
+			$this->set( 'code', $code );
+			// $this->set( 'params', $params );
 		}
 		else
 		{	// Wa are loading an object:
@@ -77,11 +86,43 @@ class ComponentWidget
 
 		return T_('Unknown');
 	}
+
+	/**
+	 * Insert object into DB based on previously recorded changes.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbinsert()
+	{
+		global $DB;
+
+		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
+
+		$DB->begin();
+
+		$order_max = $DB->get_var(
+			'SELECT MAX(wi_order)
+				 FROM T_widget
+				WHERE wi_coll_ID = '.$this->coll_ID.'
+					AND wi_sco_name = '.$DB->quote($this->sco_name), 0, 0, 'Get current max order' );
+
+		$this->set( 'order', $order_max+1 );
+
+		$res = parent::dbinsert();
+
+		$DB->commit();
+
+		return $res;
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.2  2007/01/08 23:45:48  fplanque
+ * A little less rough widget manager...
+ * (can handle multiple instances of same widget and remembers order)
+ *
  * Revision 1.1  2007/01/08 21:55:42  fplanque
  * very rough widget handling
  *

@@ -94,11 +94,16 @@ switch( $action )
 			debug_type( 'Unhandled widget code' );
 		}
 
-		$sql = 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_type, wi_code, wi_params )
-						VALUES ( '.$Blog->ID.', '.$DB->quote($container).', '.$DB->quote($type).', '.$DB->quote($code).', NULL )';
-		$DB->query( $sql, 'Insert widget' );
+		$edited_ComponentWidget = & new ComponentWidget( NULL, $type, $code, array() );
+		$edited_ComponentWidget->set( 'coll_ID', $Blog->ID );
+		$edited_ComponentWidget->set( 'sco_name', $container );
 
-		$Messages->add( T_('The widget has been added to the container.'), 'success' );
+		// INSERT INTO DB:
+		$edited_ComponentWidget->dbinsert();
+
+		$Messages->add( sprintf( T_('Widget &laquo;%s&raquo; has been added to container &laquo;%s&raquo;.'),
+					$edited_ComponentWidget->get_name(), T_($container)	), 'success' );
+
 		header_redirect( '?ctrl=widgets&blog='.$Blog->ID );
 		break;
 
@@ -177,6 +182,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2007/01/08 23:45:48  fplanque
+ * A little less rough widget manager...
+ * (can handle multiple instances of same widget and remembers order)
+ *
  * Revision 1.1  2007/01/08 21:55:42  fplanque
  * very rough widget handling
  *
