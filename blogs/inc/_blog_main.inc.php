@@ -364,28 +364,35 @@ if( !empty( $tempskin ) )
 	$skin = $tempskin;
 }
 
-// Let's check if a skin has been forced in the stub file:
-// Note: with "register_globals = On" this may be set from URL..
-// dh> You've said that it's not security issue etc.. but I still would init $skin in /conf/_advanced.php and use empty() here.
-// (fp> note: would break stubs with conf included at the end)
-if( !isset( $skin ) )
-{ // No skin forced in stub (not even '' for no-skin)...
-	// Use default from the database
-	$skin = $Blog->get('default_skin');
-}
+if( isset( $skin ) )
+{	// A skin has been requested by folder_name (url or stub):
 
-// Check validity of requested skin name:
-if( ereg( '([^-A-Za-z0-9._]|\.\.)', $skin ) )
-{
-	debug_die( 'The requested skin is invalid.' );
-}
+	// Check validity of requested skin name:
+	if( ereg( '([^-A-Za-z0-9._]|\.\.)', $skin ) )
+	{
+		debug_die( 'The requested skin name is invalid.' );
+	}
 
-// Because a lot of bloggers will delete skins, we have to make this fool proof with extra checking:
-if( !empty( $skin ) && !skin_exists( $skin ) )
-{ // We want to use a skin, but it doesn't exist!
-	$err_msg = sprintf( T_('The skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file.'),
-		htmlspecialchars($skin), $Blog->dget('shortname'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=display&amp;action=edit&amp;blog='.$Blog->ID.'"' );
-	debug_die( $err_msg );
+	// Because a lot of bloggers will delete skins, we have to make this fool proof with extra checking:
+	if( !empty( $skin ) && !skin_exists( $skin ) )
+	{ // We want to use a skin, but it doesn't exist!
+		$err_msg = sprintf( T_('The skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file.'),
+			htmlspecialchars($skin), $Blog->dget('shortname'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=display&amp;action=edit&amp;blog='.$Blog->ID.'"' );
+		debug_die( $err_msg );
+	}
+
+	// EXPERIMENTAL:
+	load_class( 'MODEL/skins/_skin.class.php' );
+	$Skin = & new Skin();
+
+}
+else
+{ // Use default skin from the database
+	$SkinCache = & get_cache( 'SkinCache' );
+
+	$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
+
+	$skin = $Skin->folder;
 }
 
 
@@ -473,10 +480,6 @@ if( !isset($display_blog_list) )
 if( !empty( $skin ) )
 { // We want to display now:
 
-	// EXPERIMENTAL:
-	load_class( 'MODEL/skins/_skin.class.php' );
-	$Skin = & new Skin();
-
 	// TODO: sanitize $template and allow any request on _xxx.tpl.php or sth like that.
 	if( $template == 'popup' )
 	{ // Do the popup display
@@ -517,6 +520,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.63  2007/01/08 02:11:55  fplanque
+ * Blogs now make use of installed skins
+ * next step: make use of widgets inside of skins
+ *
  * Revision 1.62  2007/01/07 05:32:11  fplanque
  * added some more DB skin handling (install+uninstall+edit properties ok)
  * still useless though :P

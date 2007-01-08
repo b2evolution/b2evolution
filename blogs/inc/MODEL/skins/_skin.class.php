@@ -72,6 +72,11 @@ class Skin extends DataObject
 	}
 
 
+	function get_name()
+	{
+		return $this->name;
+	}
+
 	/**
 	 * Load data from Request form fields.
 	 *
@@ -245,28 +250,56 @@ class Skin extends DataObject
 	 *
 	 * @static
 	 */
-	function disp_skinshot( $skin_folder, $function = NULL )
+	function disp_skinshot( $skin_folder, $function = NULL, $selected = false, $select_url = NULL, $function_url = NULL )
 	{
 		global $skins_path, $skins_url;
 
+		if( !empty($select_url) )
+		{
+			$select_a_begin = '<a href="'.$select_url.'" title="'.T_('Select this skin!').'">';
+			$select_a_end = '</a>';
+		}
+		else
+		{
+			$select_a_begin = '';
+			$select_a_end = '';
+		}
+
 		echo '<div class="skinshot">';
-		echo '<div class="skinshot_placeholder">';
+		echo '<div class="skinshot_placeholder';
+		if( $selected )
+		{
+			echo ' current';
+		}
+		echo '">';
 		if( file_exists( $skins_path.$skin_folder.'/skinshot.jpg' ) )
 		{
+			echo $select_a_begin;
 			echo '<img src="'.$skins_url.$skin_folder.'/skinshot.jpg" width="240" height="180" alt="'.$skin_folder.'" />';
+			echo $select_a_end;
 		}
 		else
 		{
 			echo '<div class="skinshot_noshot">'.T_('No skinshot available for').'</div>';
-			echo '<div class="skinshot_name">'.$skin_folder.'</div>';
+			echo '<div class="skinshot_name">'.$select_a_begin.$skin_folder.$select_a_end.'</div>';
 		}
 		echo '</div>';
 		echo '<div class="legend">';
-		if( $function == 'install' )
+		if( !empty( $function) )
 		{
 			echo '<div class="actions">';
-			echo '<a href="?ctrl=skins&amp;action=create&amp;skin_folder='.rawurlencode($skin_folder).'" title="'.T_('Install NOW!').'">';
-			echo T_('Install NOW!').'</a>';
+			switch( $function )
+			{
+				case 'install':
+					echo '<a href="?ctrl=skins&amp;action=create&amp;skin_folder='.rawurlencode($skin_folder).'" title="'.T_('Install NOW!').'">';
+					echo T_('Install NOW!').'</a>';
+					break;
+
+				case 'select':
+					echo '<a href="'.$function_url.'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
+					echo T_('Preview').'</a>';
+					break;
+			}
 			echo '</div>';
 		}
 		echo '<strong>'.$skin_folder.'</strong>';
@@ -280,6 +313,10 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2007/01/08 02:11:56  fplanque
+ * Blogs now make use of installed skins
+ * next step: make use of widgets inside of skins
+ *
  * Revision 1.4  2007/01/07 23:38:20  fplanque
  * discovery of skin containers
  *

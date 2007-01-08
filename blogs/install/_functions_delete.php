@@ -83,8 +83,17 @@ function db_delete()
 	echo "Dropping Groups...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_groups' );
 
+	echo "Dropping Widgets...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_widget' );
+
 	echo "Dropping Blogs...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_blogs' );
+
+	echo "Dropping skin containers...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_skins__container' );
+
+	echo "Dropping skins...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_skins__skin' );
 
 	echo "Dropping Settings...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_settings' );
@@ -116,6 +125,10 @@ function db_delete()
 
 /*
  * $Log$
+ * Revision 1.31  2007/01/08 02:11:56  fplanque
+ * Blogs now make use of installed skins
+ * next step: make use of widgets inside of skins
+ *
  * Revision 1.30  2006/11/25 19:20:26  fplanque
  * MFB 1.9
  *

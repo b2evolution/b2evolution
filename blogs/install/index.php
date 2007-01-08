@@ -36,6 +36,7 @@ require_once $conf_path.'_upgrade.php';
 require_once $inc_path.'_misc/_class4.funcs.php';
 require_once $misc_inc_path.'_log.class.php';
 $Debuglog = new Log( 'note' );
+$Messages = new Log('error');
 require_once $misc_inc_path.'_misc.funcs.php'; // db funcs
 require_once $inc_path.'_vars.inc.php';
 require_once $misc_inc_path.'_db.class.php';
@@ -45,6 +46,7 @@ require_once $model_path.'items/_item.class.php';
 require_once $model_path.'items/_item.funcs.php';
 require_once $misc_inc_path.'_form.funcs.php';
 require_once $model_path.'users/_user.funcs.php';
+require_once $model_path.'skins/_skin.funcs.php';
 require_once $misc_inc_path.'_timer.class.php';
 require_once $misc_inc_path.'_plugins.class.php';
 require_once dirname(__FILE__).'/_functions_install.php';
@@ -502,6 +504,7 @@ to
 		<?php
 		create_b2evo_tables();
 		populate_main_tables();
+		install_basic_skins();
 		install_basic_plugins();
 		?>
 		<h2><?php echo T_('Installation successful!')?></h2>
@@ -643,6 +646,10 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.121  2007/01/08 02:11:56  fplanque
+ * Blogs now make use of installed skins
+ * next step: make use of widgets inside of skins
+ *
  * Revision 1.120  2006/11/30 06:13:23  blueyed
  * Moved Plugins::install() and sort() galore to Plugins_admin
  *

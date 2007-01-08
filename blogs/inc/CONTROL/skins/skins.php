@@ -52,18 +52,7 @@ switch( $action )
 		$current_User->check_perm( 'options', 'edit', true );
 
 		// CREATE NEW SKIN:
-		load_class( 'MODEL/skins/_skin.class.php' );
-	 	$edited_Skin = & new Skin();
-
-		$edited_Skin->set( 'name', $skin_folder );
-		$edited_Skin->set( 'folder', $skin_folder );
-		$edited_Skin->set( 'type', substr($skin_folder,0,1) == '_' ? 'feed' : 'normal' );
-
-		// Look for containers in skin file:
-		$edited_Skin->discover_containers();
-
-		// INSERT NEW SKIN INTO DB:
-		$edited_Skin->dbinsert();
+		$edited_Skin = & skin_install( $skin_folder );
 
 		$Messages->add( T_('Skin has been installed.'), 'success' );
 
@@ -199,6 +188,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2007/01/08 02:11:56  fplanque
+ * Blogs now make use of installed skins
+ * next step: make use of widgets inside of skins
+ *
  * Revision 1.5  2007/01/07 23:38:21  fplanque
  * discovery of skin containers
  *

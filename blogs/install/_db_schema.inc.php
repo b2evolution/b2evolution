@@ -95,7 +95,7 @@ $schema_queries = array(
 	'T_skins__skin' => array(
 		'Creating table for installed skins',
 		"CREATE TABLE T_skins__skin (
-				skin_ID      int(11) unsigned      NOT NULL auto_increment,
+				skin_ID      int(10) unsigned      NOT NULL auto_increment,
 				skin_name    varchar(32)           NOT NULL,
 				skin_type    enum('normal','feed') NOT NULL default 'normal',
 				skin_folder  varchar(32)           NOT NULL,
@@ -107,7 +107,7 @@ $schema_queries = array(
 	'T_skins__container' => array(
 		'Creating table for skin containers',
 		"CREATE TABLE T_skins__container (
-				sco_skin_ID   int(11) unsigned      NOT NULL,
+				sco_skin_ID   int(10) unsigned      NOT NULL,
 				sco_name      varchar(40)           NOT NULL,
 				PRIMARY KEY (sco_skin_ID, sco_name)
 			)" ),
@@ -115,34 +115,34 @@ $schema_queries = array(
 	'T_blogs' => array(
 		'Creating table for Blogs',
 		"CREATE TABLE T_blogs (
-			blog_ID int(11) unsigned NOT NULL auto_increment,
-			blog_shortname varchar(12) NULL default '',
-			blog_name varchar(50) NOT NULL default '',
-			blog_tagline varchar(250) NULL default '',
-			blog_description varchar(250) NULL default '',
-			blog_longdesc TEXT NULL DEFAULT NULL,
-			blog_locale VARCHAR(20) NOT NULL DEFAULT 'en-EU',
-			blog_access_type VARCHAR(10) NOT NULL DEFAULT 'index.php',
-			blog_siteurl varchar(120) NOT NULL default '',
-			blog_staticfilename varchar(30) NULL default NULL,
-			blog_stub VARCHAR(255) NOT NULL DEFAULT 'stub',
-			blog_urlname VARCHAR(255) NOT NULL DEFAULT 'urlname',
-			blog_notes TEXT NULL,
-			blog_keywords tinytext,
-			blog_allowcomments VARCHAR(20) NOT NULL default 'post_by_post',
+			blog_ID              int(11) unsigned NOT NULL auto_increment,
+			blog_shortname       varchar(12) NULL default '',
+			blog_name            varchar(50) NOT NULL default '',
+			blog_tagline         varchar(250) NULL default '',
+			blog_description     varchar(250) NULL default '',
+			blog_longdesc        TEXT NULL DEFAULT NULL,
+			blog_locale          VARCHAR(20) NOT NULL DEFAULT 'en-EU',
+			blog_access_type     VARCHAR(10) NOT NULL DEFAULT 'index.php',
+			blog_siteurl         varchar(120) NOT NULL default '',
+			blog_staticfilename  varchar(30) NULL default NULL,
+			blog_stub            VARCHAR(255) NOT NULL DEFAULT 'stub',
+			blog_urlname         VARCHAR(255) NOT NULL DEFAULT 'urlname',
+			blog_notes           TEXT NULL,
+			blog_keywords        tinytext,
+			blog_allowcomments   VARCHAR(20) NOT NULL default 'post_by_post',
 			blog_allowtrackbacks TINYINT(1) NOT NULL default 1,
-			blog_allowblogcss TINYINT(1) NOT NULL default 1,
-			blog_allowusercss TINYINT(1) NOT NULL default 1,
-			blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'custom',
-			blog_disp_bloglist TINYINT(1) NOT NULL DEFAULT 1,
-			blog_in_bloglist TINYINT(1) NOT NULL DEFAULT 1,
-			blog_links_blog_ID INT(11) NULL DEFAULT NULL,
-			blog_commentsexpire INT(4) NOT NULL DEFAULT 0,
-			blog_media_location ENUM( 'default', 'subdir', 'custom', 'none' ) DEFAULT 'default' NOT NULL,
-			blog_media_subdir VARCHAR( 255 ) NULL,
-			blog_media_fullpath VARCHAR( 255 ) NULL,
-			blog_media_url VARCHAR( 255 ) NULL,
-			blog_UID VARCHAR(20),
+			blog_allowblogcss    TINYINT(1) NOT NULL default 1,
+			blog_allowusercss    TINYINT(1) NOT NULL default 1,
+			blog_skin_ID         INT(10) UNSIGNED NOT NULL DEFAULT 1,
+			blog_disp_bloglist   TINYINT(1) NOT NULL DEFAULT 1,
+			blog_in_bloglist     TINYINT(1) NOT NULL DEFAULT 1,
+			blog_links_blog_ID   INT(11) NULL DEFAULT NULL,
+			blog_commentsexpire  INT(4) NOT NULL DEFAULT 0,
+			blog_media_location  ENUM( 'default', 'subdir', 'custom', 'none' ) DEFAULT 'default' NOT NULL,
+			blog_media_subdir    VARCHAR( 255 ) NULL,
+			blog_media_fullpath  VARCHAR( 255 ) NULL,
+			blog_media_url       VARCHAR( 255 ) NULL,
+			blog_UID             VARCHAR(20),
 			PRIMARY KEY blog_ID (blog_ID),
 			UNIQUE KEY blog_urlname (blog_urlname)
 		)" ),
@@ -154,6 +154,17 @@ $schema_queries = array(
 			cset_name    VARCHAR( 30 ) NOT NULL,
 			cset_value   VARCHAR( 255 ) NULL,
 			PRIMARY KEY ( cset_coll_ID, cset_name )
+		)" ),
+
+	'T_widget' => array(
+		'Creating components table',
+		"CREATE TABLE T_widget (
+			wi_coll_ID    INT(11) UNSIGNED NOT NULL,
+			wi_sco_name   VARCHAR( 40 ) NOT NULL,
+			wi_type       ENUM( 'core', 'plugin' ) NOT NULL DEFAULT 'core',
+			wi_code       VARCHAR(32) NOT NULL,
+			wi_param      TEXT NULL,
+			PRIMARY KEY ( wi_coll_ID, wi_sco_name, wi_type, wi_code )
 		)" ),
 
 	'T_categories' => array(
@@ -510,6 +521,10 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.46  2007/01/08 02:11:56  fplanque
+ * Blogs now make use of installed skins
+ * next step: make use of widgets inside of skins
+ *
  * Revision 1.45  2007/01/07 23:38:20  fplanque
  * discovery of skin containers
  *

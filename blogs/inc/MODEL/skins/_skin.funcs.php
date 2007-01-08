@@ -53,6 +53,7 @@ function skin_base_tag()
 	base_tag( $base_href );
 }
 
+
 /**
  * Output content-type header
  * 
@@ -72,6 +73,7 @@ function skin_content_header( $type = 'text/html' )
 	}
 }
 
+
 /**
  * Output content-type http_equiv meta tag
  * 
@@ -90,6 +92,7 @@ function skin_content_meta( $type = 'text/html' )
 		echo '<meta http-equiv="Content-Type" content="'.$type.'; charset='.$io_charset.'" />';
 	}
 }
+
 
 /**
  * Checks if a skin is provided by a plugin.
@@ -118,6 +121,7 @@ function skin_provided_by_plugin( $name )
 	return $plugin_skins[$name];
 }
 
+
 /**
  * Checks if a skin exists. This can either be a regular skin directory
  * or can be in the list {@link Plugin::GetProvidedSkins()}.
@@ -145,111 +149,38 @@ function skin_exists( $name, $filename = '_main.php' )
 
 
 /**
- * Returns an <option> set with default skin selected
+ * Install a skin
  *
- * @return string
+ * @todo do not install if skin doesn't exist. Important for upgrade. Need to NOT fail if ZERO skins installed though :/
+ *
+ * @param string
+ * @return Skin
  */
-function get_skin_options( $default = '' )
+function & skin_install( $skin_folder )
 {
-	$r = '';
+	load_class( 'MODEL/skins/_skin.class.php' );
+	$edited_Skin = new Skin(); // COPY (FUNC)
 
-	for( skin_list_start(); skin_list_next(); )
-	{
-		$r .= '<option value="';
-		$r .= skin_list_iteminfo( 'name', false );
-		$r .=  '"';
-		if( skin_list_iteminfo( 'name',false ) == $default )
-		{
-			$r .= ' selected="selected" ';
-		}
-		$r .=  '>';
-		$r .= skin_list_iteminfo( 'name', false );
-		$r .=  "</option>\n";
-	}
+	$edited_Skin->set( 'name', $skin_folder );
+	$edited_Skin->set( 'folder', $skin_folder );
+	$edited_Skin->set( 'type', substr($skin_folder,0,1) == '_' ? 'feed' : 'normal' );
 
-	return $r;
-}
+	// Look for containers in skin file:
+	$edited_Skin->discover_containers();
 
+	// INSERT NEW SKIN INTO DB:
+	$edited_Skin->dbinsert();
 
-/**
- * Initializes skin list iterator
- *
- * lists all folders in skin directory
- */
-function skin_list_start()
-{
-	global $skins_path, $skin_dir;
-
-	if( empty( $skins_path ) )
-	{	// Check if conf has been properly for version 1.9 (remove in approx 12 months)
-		debug_die( '$skins_path is not properly set in /conf/_advanced.php' );
-	}
-
-	$skin_dir = dir( $skins_path );
-}
-
-
-/**
- * Get next skin
- *
- * Lists all folders in skin directory,
- * except the ones starting with a . (UNIX style) or a _ (FrontPage style)
- *
- * @return string skin name
- */
-function skin_list_next()
-{
-	global $skins_path, $skin_dir, $skin_name;
-
-	do
-	{ // Find next subfolder:
-		if( !($skin_name = $skin_dir->read()) )
-		{
-			return false;		// No more subfolder
-		}
-	} while( ( ! is_dir($skins_path.$skin_name) )	// skip regular files
-						|| ($skin_name[0] == '.')								// skip UNIX hidden files/dirs
-						|| ($skin_name[0] == '_')								// skip FRONTPAGE hidden files/dirs
-						|| ($skin_name == 'CVS' ) );						// Skip CVS directory
-	// echo 'ret=',  $skin_name;
-	return $skin_name;
-}
-
-
-/**
- * skin_list_iteminfo(-)
- *
- * Display info about item
- *
- * fplanque: created
- */
-function skin_list_iteminfo( $what='', $display = true )
-{
-	global $skins_path, $skins_url, $skin_name;
-
-	switch( $what )
-	{
-		case 'path':
-			$info = $skins_path.$skin_name;
-			break;
-
-		case 'url':
-			$info = $skins_url.$skin_name;
-			break;
-
-		case 'name':
-		default:
-			$info = $skin_name;
-	}
-
-	if( $display ) echo $info;
-
-	return $info;
+	return $edited_Skin;
 }
 
 
 /*
  * $Log$
+ * Revision 1.14  2007/01/08 02:11:56  fplanque
+ * Blogs now make use of installed skins
+ * next step: make use of widgets inside of skins
+ *
  * Revision 1.13  2006/12/04 21:25:18  fplanque
  * removed user skin switching
  *

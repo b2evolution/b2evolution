@@ -30,46 +30,18 @@ $Form->begin_form( 'fform', T_('Choose a skin') );
 
 	$Form->begin_fieldset( T_('Available skins') );
 
-	for( skin_list_start(); skin_list_next(); )
+	$SkinCache = & get_Cache( 'SkinCache' );
+	$SkinCache->load_all();
+
+	// TODO: this is like touching private parts :>
+	foreach( $SkinCache->cache as $Skin )
 	{
-		$skin_name = skin_list_iteminfo( 'name', false );
-		$skin_path = skin_list_iteminfo( 'path', false );
-		$skin_url = skin_list_iteminfo( 'url', false );
-		$preview_url = url_add_param($edited_Blog->get('blogurl'),'tempskin='.rawurlencode($skin_name));
-		echo '<div class="skinshot">';
-		echo '<div class="skinshot_placeholder';
-		if( $skin_name == $edited_Blog->default_skin )
-		{
-			echo ' current';
-		}
-		echo '">';
-		if( file_exists( $skin_path.'/skinshot.jpg' ) )
-		{
-			if( $skin_name == $edited_Blog->default_skin )
-			{
-				echo '<img src="'.$skin_url.'/skinshot.jpg" width="240" height="180" alt="'.$skin_name.'" />';
-			}
-			else
-			{
-				echo '<a href="?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;blog_default_skin='.rawurlencode($skin_name).'" title="'.T_('Select this skin!').'">';
-				echo '<img src="'.$skin_url.'/skinshot.jpg" width="240" height="180" alt="'.$skin_name.'" /></a>';
-			}
-		}
-		else
-		{
-			echo '<div class="skinshot_noshot">'.T_('No skinshot available for').'</div>';
-			echo '<a href="?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;blog_default_skin='.rawurlencode($skin_name).'" title="'.T_('Select this skin!').'">';
-			echo '<div class="skinshot_name">'.$skin_name.'</div>';
-			echo '</a>';
-		}
-		echo '</div>';
-		echo '<div class="legend">';
-		echo '<div class="actions">';
-		echo '<a href="'.$preview_url.'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
-		echo T_('Preview').'</a>';
-		echo '</div>';
-		echo '<strong>'.$skin_name.'</strong></div>';
-		echo '</div>';
+		$selected = ($edited_Blog->skin_ID == $Skin->ID);
+		$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;blog_skin_ID='.$Skin->ID;
+		$preview_url = url_add_param($edited_Blog->get('blogurl'),'tempskin='.rawurlencode($Skin->folder));
+
+		// Display skinshot:
+		Skin::disp_skinshot( $Skin->folder, 'select', $selected, $select_url, $preview_url );
 	}
 
 	echo '<div class="clear"></div>';

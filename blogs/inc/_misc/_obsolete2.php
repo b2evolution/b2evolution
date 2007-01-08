@@ -1191,4 +1191,110 @@ function the_categories( $link_title = '#',				// false if you want no links
 
 
 
+/**
+ * Returns an <option> set with default skin selected
+ *
+ * @deprecated
+ *
+ * @return string
+ */
+function get_skin_options( $default = '' )
+{
+	$r = '';
+
+	for( skin_list_start(); skin_list_next(); )
+	{
+		$r .= '<option value="';
+		$r .= skin_list_iteminfo( 'name', false );
+		$r .=  '"';
+		if( skin_list_iteminfo( 'name',false ) == $default )
+		{
+			$r .= ' selected="selected" ';
+		}
+		$r .=  '>';
+		$r .= skin_list_iteminfo( 'name', false );
+		$r .=  "</option>\n";
+	}
+
+	return $r;
+}
+
+
+/**
+ * Initializes skin list iterator
+ *
+ * lists all folders in skin directory
+ *
+ * @deprecated
+ */
+function skin_list_start()
+{
+	global $skins_path, $skin_dir;
+
+	if( empty( $skins_path ) )
+	{	// Check if conf has been properly for version 1.9 (remove in approx 12 months)
+		debug_die( '$skins_path is not properly set in /conf/_advanced.php' );
+	}
+
+	$skin_dir = dir( $skins_path );
+}
+
+
+/**
+ * Get next skin
+ *
+ * Lists all folders in skin directory,
+ * except the ones starting with a . (UNIX style) or a _ (FrontPage style)
+ *
+ * @deprecated
+ *
+ * @return string skin name
+ */
+function skin_list_next()
+{
+	global $skins_path, $skin_dir, $skin_name;
+
+	do
+	{ // Find next subfolder:
+		if( !($skin_name = $skin_dir->read()) )
+		{
+			return false;		// No more subfolder
+		}
+	} while( ( ! is_dir($skins_path.$skin_name) )	// skip regular files
+						|| ($skin_name[0] == '.')								// skip UNIX hidden files/dirs
+						|| ($skin_name[0] == '_')								// skip FRONTPAGE hidden files/dirs
+						|| ($skin_name == 'CVS' ) );						// Skip CVS directory
+	// echo 'ret=',  $skin_name;
+	return $skin_name;
+}
+
+/**
+ * Display info about item
+ *
+ * @deprecated
+ */
+function skin_list_iteminfo( $what='', $display = true )
+{
+	global $skins_path, $skins_url, $skin_name;
+
+	switch( $what )
+	{
+		case 'path':
+			$info = $skins_path.$skin_name;
+			break;
+
+		case 'url':
+			$info = $skins_url.$skin_name;
+			break;
+
+		case 'name':
+		default:
+			$info = $skin_name;
+	}
+
+	if( $display ) echo $info;
+
+	return $info;
+}
+
 ?>

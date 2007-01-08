@@ -93,7 +93,7 @@ class Blog extends DataObject
 	var $allowtrackbacks = 0;
 	var $allowblogcss = 0;
 	var $allowusercss = 0;
-	var $default_skin;
+	var $skin_ID;
 	var $disp_bloglist = 1;
 	var $in_bloglist = 1;
 	var $UID;
@@ -154,7 +154,7 @@ class Blog extends DataObject
 			$this->set( 'locale', $default_locale );
 			$this->set( 'access_type', 'index.php' );
 			$this->set( 'urlname', 'new' );
-			$this->set( 'default_skin', 'basic' );
+			$this->skin_ID = 1;	// TODO: this is the DB default, but it will fail if skin #1 does not exist
 		}
 		else
 		{
@@ -177,7 +177,7 @@ class Blog extends DataObject
 			$this->allowtrackbacks = $db_row->blog_allowtrackbacks;
 			$this->allowblogcss = $db_row->blog_allowblogcss;
 			$this->allowusercss = $db_row->blog_allowusercss;
-			$this->default_skin = $db_row->blog_default_skin;
+			$this->skin_ID = $db_row->blog_skin_ID;
 			$this->disp_bloglist = $db_row->blog_disp_bloglist;
 			$this->in_bloglist = $db_row->blog_in_bloglist;
 			$this->media_location = $db_row->blog_media_location;
@@ -296,9 +296,9 @@ class Blog extends DataObject
 			$this->set_setting( 'chapter_links', get_param( 'chapter_links' ) );
 		}
 
-		if( param( 'blog_default_skin',  'string', NULL ) !== NULL )
+		if( param( 'blog_skin_ID', 'integer', NULL ) !== NULL )
 		{	// Default blog:
-			$this->set_from_Request( 'default_skin' );
+			$this->set_from_Request( 'skin_ID' );
 		}
 
 
@@ -1161,6 +1161,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.52  2007/01/08 02:11:55  fplanque
+ * Blogs now make use of installed skins
+ * next step: make use of widgets inside of skins
+ *
  * Revision 1.51  2006/12/23 23:37:35  fplanque
  * refactoring / Blog::get_default_cat_ID()
  *

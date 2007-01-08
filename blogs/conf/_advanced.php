@@ -212,6 +212,7 @@ $db_config['aliases'] = array(
 		'T_users'              => $tableprefix.'users',
 		'T_useragents'         => $tableprefix.'useragents',
 		'T_usersettings'       => $tableprefix.'usersettings',
+		'T_widget'             => $tableprefix.'widget',
 	);
 
 

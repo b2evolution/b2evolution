@@ -33,6 +33,7 @@ foreach( $skin_folders as $skin_folder )
 		continue;
 	}
 
+	// Display skinshot:
 	Skin::disp_skinshot( $skin_folder, 'install' );
 }
 

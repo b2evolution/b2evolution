@@ -985,6 +985,21 @@ function create_b2evo_relations()
 
 
 /**
+ * Install basic skins.
+ */
+function install_basic_skins()
+{
+	echo 'Installing default skins... ';
+
+	skin_install( 'custom' );
+	skin_install( 'basic' );
+	skin_install( 'natural_pink' );
+
+	echo "OK.<br />\n";
+}
+
+
+/**
  * Install basic plugins.
  *
  * This gets called separately on fresh installs.
@@ -1032,6 +1047,10 @@ function install_basic_plugins( $old_db_version = 0 )
 
 /*
  * $Log$
+ * Revision 1.209  2007/01/08 02:11:56  fplanque
+ * Blogs now make use of installed skins
+ * next step: make use of widgets inside of skins
+ *
  * Revision 1.208  2006/12/17 23:42:39  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.

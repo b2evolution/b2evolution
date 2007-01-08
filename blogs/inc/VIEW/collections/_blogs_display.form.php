@@ -50,7 +50,10 @@ $Form->begin_fieldset( T_('Content / Posts') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Skin and style') );
-	$Form->select( 'blog_default_skin', $edited_Blog->get( 'default_skin' ), 'get_skin_options', T_('Default skin') , T_('This is the default skin that will be used to display this blog.') );
+
+	$SkinCache = & get_Cache( 'SkinCache' );
+	$SkinCache->load_all();
+	$Form->select_input_object( 'blog_skin_ID', $edited_Blog->skin_ID, $SkinCache, T_('Skin') );
 	$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('A CSS file in the blog media directory will override the default skin stylesheet.') );
 	$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to override the blog and skin stylesheet with their own.') );
 $Form->end_fieldset();
@@ -72,6 +75,10 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.8  2007/01/08 02:11:55  fplanque
+ * Blogs now make use of installed skins
+ * next step: make use of widgets inside of skins
+ *
  * Revision 1.7  2006/12/14 21:41:16  fplanque
  * Allow different number of items in feeds than on site
  *

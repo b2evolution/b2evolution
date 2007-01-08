@@ -1517,10 +1517,54 @@ function upgrade_b2evo_tables()
 
 		echo 'Remove obsolete user settings... ';
 		$DB->query( 'DELETE FROM T_usersettings
-									WHERE set_name = "plugins_disp_avail"' );
+									WHERE uset_name = "plugins_disp_avail"' );
 		echo "OK.<br />\n";
+
+		set_upgrade_checkpoint( '9407' );
 	}
 
+
+	if( $old_db_version < 9408 )
+	{
+		echo 'Creating skins table... ';
+		$DB->query( 'CREATE TABLE T_skins__skin (
+              skin_ID      int(10) unsigned      NOT NULL auto_increment,
+              skin_name    varchar(32)           NOT NULL,
+              skin_type    enum(\'normal\',\'feed\') NOT NULL default \'normal\',
+              skin_folder  varchar(32)           NOT NULL,
+              PRIMARY KEY skin_ID (skin_ID),
+              UNIQUE skin_folder( skin_folder ),
+              KEY skin_name( skin_name )
+            )' );
+		echo "OK.<br />\n";
+
+		echo 'Creating skin containers table... ';
+		$DB->query( 'CREATE TABLE T_skins__container (
+              sco_skin_ID   int(10) unsigned      NOT NULL,
+              sco_name      varchar(40)           NOT NULL,
+              PRIMARY KEY (sco_skin_ID, sco_name)
+            )' );
+		echo "OK.<br />\n";
+
+		install_basic_skins();
+
+		echo 'Creating widgets table... ';
+		$DB->query( 'CREATE TABLE T_widget (
+            wi_coll_ID    INT(11) UNSIGNED NOT NULL,
+            wi_sco_name   VARCHAR( 40 ) NOT NULL,
+            wi_type       ENUM( \'core\', \'plugin\' ) NOT NULL DEFAULT \'core\',
+            wi_code       VARCHAR(32) NOT NULL,
+            wi_param      TEXT NULL,
+            PRIMARY KEY ( wi_coll_ID, wi_sco_name, wi_type, wi_code )
+          )' );
+		echo "OK.<br />\n";
+
+		echo 'Updating blogs table... ';
+		$DB->query( 'ALTER TABLE T_blogs
+									DROP COLUMN blog_default_skin,
+									 ADD COLUMN blog_skin_ID INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER blog_allowusercss' );
+		echo "OK.<br />\n";
+	}
 
 
 	/*
@@ -1638,6 +1682,10 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.199  2007/01/08 02:11:56  fplanque
+ * Blogs now make use of installed skins
+ * next step: make use of widgets inside of skins
+ *
  * Revision 1.198  2006/12/20 23:07:24  blueyed
  * Moved list of available plugins to separate sub-screen/form
  *
