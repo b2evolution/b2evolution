@@ -1554,7 +1554,7 @@ function upgrade_b2evo_tables()
             wi_sco_name   VARCHAR( 40 ) NOT NULL,
             wi_type       ENUM( \'core\', \'plugin\' ) NOT NULL DEFAULT \'core\',
             wi_code       VARCHAR(32) NOT NULL,
-            wi_param      TEXT NULL,
+            wi_params     TEXT NULL,
             PRIMARY KEY ( wi_coll_ID, wi_sco_name, wi_type, wi_code )
           )' );
 		echo "OK.<br />\n";
@@ -1682,6 +1682,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.200  2007/01/08 21:53:51  fplanque
+ * typo
+ *
  * Revision 1.199  2007/01/08 02:11:56  fplanque
  * Blogs now make use of installed skins
  * next step: make use of widgets inside of skins

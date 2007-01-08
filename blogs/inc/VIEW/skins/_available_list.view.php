@@ -41,6 +41,9 @@ foreach( $skin_folders as $skin_folder )
 echo '<div class="clear"></div>';
 
 /*
- * $Log:
+ * $Log$
+ * Revision 1.4  2007/01/08 21:53:51  fplanque
+ * typo
+ *
  */
 ?>
