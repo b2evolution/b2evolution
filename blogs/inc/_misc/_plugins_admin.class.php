@@ -362,6 +362,9 @@ class Plugins_admin extends Plugins
 
 		// TODO: allow optional Plugin callback to get list of methods. Like Plugin::GetRegisteredEvents().
 		// fp> bloated. what problem does it solve?
+		// dh> With a captcha_base.class.php the actual plugin (extending the class) would have to define all the event methods and not just the methods to provide the tests.
+		//     With a GetRegisteredEvents method in captcha_base.class.php this would not be required.
+		//     The whole point of such a base class would be to simplify writing a captcha plugin and IMHO it's "bloated" to force a whole block of methods into it that do only call the parent method.
 
 		if( preg_match_all( '~^\s*function\s+(\w+)~mi', $classfile_contents, $matches ) )
 		{
@@ -1338,6 +1341,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.22  2007/01/09 00:53:53  blueyed
+ * doc
+ *
  * Revision 1.21  2007/01/07 19:39:44  fplanque
  * doc
  *
