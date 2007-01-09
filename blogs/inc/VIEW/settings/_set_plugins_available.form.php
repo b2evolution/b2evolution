@@ -65,8 +65,6 @@ $Table->display_head();
 			<th class="lastcol"><?php echo T_('Actions') ?></th>
 		</tr>
 		</thead>
-		</foot>
-		</tfoot>
 		<tbody>
 		<?php
 		if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_admin_no_DB' ) )
@@ -202,6 +200,9 @@ $Table->display_list_end();
 
 /*
  * $Log$
+ * Revision 1.5  2007/01/09 00:29:52  blueyed
+ * Fixed HTML: wrong "</foot></tfoot>"
+ *
  * Revision 1.4  2007/01/08 23:44:19  fplanque
  * inserted Table widget
  * WARNING: this has nothing to do with ComponentWidgets...
