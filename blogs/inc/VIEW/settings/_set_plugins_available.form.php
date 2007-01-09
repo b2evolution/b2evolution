@@ -56,6 +56,8 @@ $Table->display_list_start();
 
 // TITLE / FILTERS / COLUMN HEADERS:
 $Table->display_head();
+
+// TODO: dh> the row below should get displayed through Table::$cols in Table::display_head() and the "</thead>" omitted here.. (it gets closed in display_head() already)
 ?>
 		<tr>
 			<th class="firstcol"><?php echo T_('Plugin') ?></th>
@@ -200,6 +202,9 @@ $Table->display_list_end();
 
 /*
  * $Log$
+ * Revision 1.6  2007/01/09 00:49:04  blueyed
+ * todo
+ *
  * Revision 1.5  2007/01/09 00:29:52  blueyed
  * Fixed HTML: wrong "</foot></tfoot>"
  *

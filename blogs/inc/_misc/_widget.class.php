@@ -182,6 +182,7 @@ class Widget
 
 /**
  * Class Table
+ * @todo dh> shouldn't this be in a separate file?
  * @package evocore
  */
 class Table extends Widget
@@ -288,6 +289,7 @@ class Table extends Widget
  		// DISPLAY COLUMN HEADERS:
 		if( isset( $this->cols ) )
 		{
+			// TODO: dh> ...
 		}
 
 		echo $this->params['head_end'];
@@ -328,6 +330,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.12  2007/01/09 00:49:04  blueyed
+ * todo
+ *
  * Revision 1.11  2007/01/08 23:44:19  fplanque
  * inserted Table widget
  * WARNING: this has nothing to do with ComponentWidgets...
