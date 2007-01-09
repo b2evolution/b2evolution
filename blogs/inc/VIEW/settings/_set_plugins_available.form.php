@@ -67,6 +67,8 @@ $Table->display_head();
 			<th class="lastcol"><?php echo T_('Actions') ?></th>
 		</tr>
 		</thead>
+		<tfoot>
+		</tfoot>
 		<tbody>
 		<?php
 		if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_admin_no_DB' ) )
@@ -202,6 +204,9 @@ $Table->display_list_end();
 
 /*
  * $Log$
+ * Revision 1.7  2007/01/09 22:42:23  fplanque
+ * tfoot
+ *
  * Revision 1.6  2007/01/09 00:49:04  blueyed
  * todo
  *
