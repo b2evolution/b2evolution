@@ -366,6 +366,7 @@ class Plugins_admin extends Plugins
 		//     With a GetRegisteredEvents method in captcha_base.class.php this would not be required.
 		//     The whole point of such a base class would be to simplify writing a captcha plugin and IMHO it's "bloated" to force a whole block of methods into it that do only call the parent method.
 
+		// TODO: dh> only match in the relevant "class block"
 		if( preg_match_all( '~^\s*function\s+(\w+)~mi', $classfile_contents, $matches ) )
 		{
 			$plugin_class_methods = $matches[1];
@@ -1341,6 +1342,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.23  2007/01/09 01:00:51  blueyed
+ * todo
+ *
  * Revision 1.22  2007/01/09 00:53:53  blueyed
  * doc
  *
