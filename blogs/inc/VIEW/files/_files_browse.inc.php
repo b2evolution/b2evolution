@@ -673,7 +673,7 @@ else
 		<?php
 		if( $fm_Filelist->get_root_type() == 'collection' || !empty($Blog) )
 		{	// We are browsing files for a collection:
-			// fp> TODO: use current as default but let user choose into whoch blog he wants to post
+			// fp> TODO: use current as default but let user choose into which blog he wants to post
 			echo '<input type="submit" name="actionArray[make_posts]" class="ActionButton"
 				value="'.T_('Make posts').'"
 				title="'.T_('Make posts with selected images').'" />';
@@ -980,6 +980,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.37  2007/01/09 00:55:16  blueyed
+ * fixed typo(s)
+ *
  * Revision 1.36  2007/01/07 18:42:35  fplanque
  * cleaned up reload/refresh icons & links
  *

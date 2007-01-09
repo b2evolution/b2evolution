@@ -34,7 +34,7 @@ if( param( 'skin_ID', 'integer', '', true) )
 		unset( $edited_Skin );
 		forget_param( 'skin_ID' );
 		$Messages->head = T_('Cannot edit skin!');
-		$Messages->add( T_('Requested is not installed any longer.'), 'error' );
+		$Messages->add( T_('Requested skin is not installed any longer.'), 'error' );
 		$action = 'nil';
 	}
 }
@@ -188,6 +188,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2007/01/09 00:55:16  blueyed
+ * fixed typo(s)
+ *
  * Revision 1.6  2007/01/08 02:11:56  fplanque
  * Blogs now make use of installed skins
  * next step: make use of widgets inside of skins

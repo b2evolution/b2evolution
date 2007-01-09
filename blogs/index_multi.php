@@ -1,7 +1,7 @@
 <?php
 /**
  * This is an alternative index.php file.
- * This one is optimized for a multiblog steup where each blog can be identified by its URL.
+ * This one is optimized for a multiblog setup where each blog can be identified by its URL.
  * This file will ignore any ?blog= parameter.
  *
  * b2evolution - {@link http://b2evolution.net/}

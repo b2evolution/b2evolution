@@ -40,15 +40,15 @@ $Timer->start( '_blog_main.inc' );
 /*
  * blog ID. This is a little bit special.
  * If it has been explicitely memorized already, we don't touch it.
- * Note: explicitely != auto regsiter globals != stub file just setting it with $blog=x
+ * Note: explicitely != auto_register_globals != stub file just setting it with $blog=x
  * Note: stub files should probably memorize the param explicitely!
  */
 if( ! param_ismemorized('blog') )
-{	// Not explicitely memorized yet, get param from GET or auto_regsiter_globals OR a stub $blog = x:
+{	// Not explicitely memorized yet, get param from GET or auto_register_globals OR a stub $blog = x:
 	$Debuglog->add( 'blog param not memorized before _blog_main.inc', 'params' );
 	// We default to 0 here because the param should always be included in regenerate_url() when present.
 	// This will prevent weird indexing/search results in case the default changes after indexing.
-  // On some occasions, we'll manually filter it out of rgenerate_url() because we know we go through a stub for example.
+  // On some occasions, we'll manually filter it out of regenerate_url() because we know we go through a stub for example.
 	param( 'blog', 'integer', 0, true );
 }
 
@@ -520,6 +520,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.64  2007/01/09 00:55:16  blueyed
+ * fixed typo(s)
+ *
  * Revision 1.63  2007/01/08 02:11:55  fplanque
  * Blogs now make use of installed skins
  * next step: make use of widgets inside of skins
