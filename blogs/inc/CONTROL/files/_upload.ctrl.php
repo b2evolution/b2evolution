@@ -150,6 +150,8 @@ if( $fm_FileRoot )
 
 
 // If there were errors, display them and exit (especially in case there's no valid FileRoot ($fm_FileRoot)):
+// TODO: dh> this prevents users from uploading if _any_ blog media directory is not writable.
+//           See http://forums.b2evolution.net/viewtopic.php?p=49001#49001
 if( $Messages->count('error') )
 {
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -417,6 +419,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2007/01/10 21:41:51  blueyed
+ * todo: any "error" does not allow uploading and "blog media directory could not be created" is such an error, which may not be relevant
+ *
  * Revision 1.3  2006/12/23 22:53:11  fplanque
  * extra security
  *
