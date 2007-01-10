@@ -317,7 +317,6 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		// First step:   fp> what's setp 2 ?
 		param( 'plugin', 'string', true );
 
 		$edit_Plugin = & $admin_Plugins->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
@@ -1036,6 +1035,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.74  2007/01/10 21:41:00  blueyed
+ * Step 2 is installing the DB changes
+ *
  * Revision 1.73  2007/01/07 05:26:01  fplanque
  * doc
  *
