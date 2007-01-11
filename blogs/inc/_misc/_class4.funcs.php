@@ -64,32 +64,32 @@ function & get_Cache( $objectName )
 
 	switch( $objectName )
 	{
-		case 'BlogCache';
+		case 'BlogCache':
 			load_class( 'MODEL/collections/_blogcache.class.php' );
 			$BlogCache = new BlogCache(); // COPY (FUNC)
 			return $BlogCache;
 
-		case 'ChapterCache';
+		case 'ChapterCache':
 			load_class( 'MODEL/collections/_chaptercache.class.php' );
 			$ChapterCache = new ChapterCache(); // COPY (FUNC)
 			return $ChapterCache;
 
-		case 'FileCache';
+		case 'FileCache':
 			load_class( 'MODEL/files/_filecache.class.php' );
 			$FileCache = new FileCache(); // COPY (FUNC)
 			return $FileCache;
 
-		case 'FileRootCache';
+		case 'FileRootCache':
 			load_class( 'MODEL/files/_filerootcache.class.php' );
 			$Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
 			return $FileRootCache;
 
-		case 'FiletypeCache';
+		case 'FiletypeCache':
 			load_class( 'MODEL/files/_filerootcache.class.php' );
 			$Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
 			return $FiletypeCache;
 
-		case 'GroupCache';
+		case 'GroupCache':
 			$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'\', T_(\'No group\') )' );
 			return $GroupCache;
 
@@ -98,16 +98,16 @@ function & get_Cache( $objectName )
 			$ItemCache = new ItemCache(); // COPY (FUNC)
 			return $ItemCache;
 
-		case 'ItemStatusCache';
+		case 'ItemStatusCache':
 			$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_itemstatuses\', \'pst_\', \'pst_ID\', NULL, \'\', T_(\'No status\') )' );
 			return $ItemStatusCache;
 
-		case 'ItemTypeCache';
+		case 'ItemTypeCache':
 			load_class( 'MODEL/items/_itemtypecache.class.php' );
 			$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', 'new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
 			return $ItemTypeCache;
 
-		case 'LinkCache';
+		case 'LinkCache':
 			load_class( 'MODEL/items/_linkcache.class.php' );
 			$LinkCache = new LinkCache(); // COPY (FUNC)
 			return $LinkCache;
@@ -117,15 +117,19 @@ function & get_Cache( $objectName )
 			$Plugins_admin = new Plugins_admin(); // COPY (FUNC)
 			return $Plugins_admin;
 
-		case 'SkinCache';
+		case 'SkinCache':
 			load_class( 'MODEL/skins/_skincache.class.php' );
 			$SkinCache = new SkinCache(); // COPY (FUNC)
 			return $SkinCache;
 
-		case 'UserCache';
+		case 'UserCache':
 			load_class( 'MODEL/users/_usercache.class.php' );
 			$UserCache = new UserCache(); // COPY (FUNC)
 			return $UserCache;
+
+		case 'WidgetCache':
+			$WidgetCache = new DataObjectCache( 'ComponentWidget', false, 'T_widget', 'wi_', 'wi_ID' ); // COPY (FUNC)
+			return $WidgetCache;
 
 		default:
 			debug_die( 'getCache(): Unknown Cache type:'.$objectName );
@@ -134,6 +138,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.13  2007/01/11 02:57:25  fplanque
+ * implemented removing widgets from containers
+ *
  * Revision 1.12  2006/12/29 01:10:06  fplanque
  * basic skin registering
  *

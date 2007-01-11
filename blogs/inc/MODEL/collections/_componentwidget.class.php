@@ -61,9 +61,11 @@ class ComponentWidget extends DataObject
 		}
 		else
 		{	// Wa are loading an object:
-			$this->type = $db_row->wi_type;
-			$this->code = $db_row->wi_code;
-			$this->params = $db_row->wi_params;
+			$this->ID      = $db_row->wi_ID;
+			$this->coll_ID = $db_row->wi_coll_ID;
+			$this->type    = $db_row->wi_type;
+			$this->code    = $db_row->wi_code;
+			$this->params  = $db_row->wi_params;
 		}
 	}
 
@@ -119,6 +121,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2007/01/11 02:57:25  fplanque
+ * implemented removing widgets from containers
+ *
  * Revision 1.2  2007/01/08 23:45:48  fplanque
  * A little less rough widget manager...
  * (can handle multiple instances of same widget and remembers order)

@@ -84,13 +84,13 @@ function display_container( $container, $legend_suffix = '' )
 			echo $ComponentWidget->get_name();
 			$Table->display_col_end();
 
-			// Note: this is totally useless, but we need more cols for the screen to feel "right"
+			// Note: this is totally useless, but we need more cols for the screen to feel "right":
 			$Table->display_col_start();
 			echo $ComponentWidget->type;
 			$Table->display_col_end();
 
 			$Table->display_col_start();
-			echo action_icon( T_('Remove this widget!'), 'delete', regenerate_url( '', 'action=delete&amp;wi_ID='.$ComponentWidget->ID ) );
+			echo action_icon( T_('Remove this widget!'), 'delete', regenerate_url( 'blog', 'action=delete&amp;wi_ID='.$ComponentWidget->ID ) );
 			$Table->display_col_end();
 
 			$Table->display_line_end();
@@ -121,6 +121,9 @@ foreach( $container_Widget_array as $container=>$dummy )
 
 /*
  * $Log$
+ * Revision 1.4  2007/01/11 02:57:25  fplanque
+ * implemented removing widgets from containers
+ *
  * Revision 1.3  2007/01/11 02:25:06  fplanque
  * refactoring of Table displays
  * body / line / col / fadeout
