@@ -225,7 +225,6 @@ class Results extends Table
 	/**
 	 * Constructor
 	 *
-	 *
 	 * @todo we might not want to count total rows when not needed...
 	 * @todo fplanque: I am seriously considering putting $count_sql into 2nd or 3rd position. Any prefs?
 	 * @todo dh> We might just use "SELECT SQL_CALC_FOUND_ROWS ..." and "FOUND_ROWS()"..! - available since MySQL 4 - would save one query just for counting!
@@ -596,7 +595,7 @@ class Results extends Table
 	function display( $display_params = NULL, $fadeout = NULL )
 	{
 		// Initialize displaying:
-		$this->display_init( $display_params );
+		$this->display_init( $display_params, $fadeout );
 
 		// -------------------------
 		// Proceed with display:
@@ -628,7 +627,7 @@ class Results extends Table
 					$this->display_head();
 
 					// GROUP & DATA ROWS:
-					$this->display_body( $fadeout );
+					$this->display_body();
 
 					// Totals line
 					$this->display_totals();
@@ -654,11 +653,14 @@ class Results extends Table
 	 * Initialize things in order to be ready for displaying.
 	 *
 	 * This is useful when manually displaying, i-e: not by using Results::display()
-	 */
-	function display_init( $display_params = NULL )
+ 	*
+	 * @param array
+	 * @param array Fadeout settings array( 'key column' => array of values ) or 'session'
+ 	 */
+	function display_init( $display_params = NULL, $fadeout = NULL )
 	{
 	 	// Lazy fill $this->params:
-		parent::display_init( $display_params );
+		parent::display_init( $display_params, $fadeout );
 
 		// Make sure query has executed and we're at the top of the resultset:
 		$this->restart();
@@ -846,267 +848,8 @@ class Results extends Table
 
 
 		// DISPLAY COLUMN HEADERS:
-		if( isset( $this->cols ) )
-		{
+		$this->display_col_headers();
 
-			if( !isset($this->nb_cols) )
-			{	// Needed for sort strings:
-				$this->nb_cols = count($this->cols);
-			}
-
-
-			$th_group_activated = false;
-
-			// Loop on all columns to see if we have th_group columns:
-			foreach( $this->cols as $col )
-			{
-				if( isset( $col['th_group'] )	)
-				{	// We have a th_group column, so break:
-					$th_group_activated = true;
-					break;
-				}
-			}
-
-			$current_th_group_colspan = 1;
-			$current_th_colspan = 1;
-			$current_th_group_title = NULL;
-			$current_th_title = NULL;
-			$header_cells = array();
-
-			// Loop on all columns to get an array of header cells description
-			// Each header cell will have a colspan and rowspan value
-			// The line 0 is reserved for th_group
-			// The line 1 is reserved for th
-			foreach( $this->cols as $key=>$col )
-			{
-				//_______________________________ TH GROUP __________________________________
-
-				if( isset( $col['th_group'] ) )
-				{	// The column has a th_group
-					if( is_null( $current_th_group_title ) || $col['th_group'] != $current_th_group_title )
-					{	// It's the begining of a th_group colspan (line0):
-
-						//Initialize current th_group colspan to 1 (line0):
-						$current_th_group_colspan = 1;
-
-						// Set colspan and rowspan colum for line0 to 1:
-						$header_cells[0][$key]['colspan'] = 1;
-						$header_cells[0][$key]['rowspan'] = 1;
-					}
-					else
-					{	// The column is part of a th group colspan
-						// Update the first th group colspan cell
-						$header_cells[0][$key-$current_th_group_colspan]['colspan']++;
-
-						// Set the colspan column to 0 to not display it
-						$header_cells[0][$key]['colspan'] = 0;
-						$header_cells[0][$key]['rowspan'] = 0;
-
-						//Update current th_group colspan to 1 (line0):
-						$current_th_group_colspan++;
-					}
-
-					// Update current th group title:
-					$current_th_group_title = 	$col['th_group'];
-				}
-
-				//___________________________________ TH ___________________________________
-
-				if( is_null( $current_th_title ) || $col['th'] != $current_th_title )
-				{	// It's the begining of a th colspan (line1)
-
-					//Initialize current th colspan to 1 (line1):
-					$current_th_colspan = 1;
-
-					// Update current th title:
-					$current_th_title = $col['th'];
-
-					if( $th_group_activated  && !isset( $col['th_group'] ) )
-					{ // We have to lines and the column has no th_group, so it will be a "rowspan2"
-
-						// Set the cell colspan and rowspan values for the line0:
-						$header_cells[0][$key]['colspan'] = 1;
-						$header_cells[0][$key]['rowspan'] = 2;
-
-						// Set the cell colspan and rowspan values for the line1, to do not display it:
-						$header_cells[1][$key]['colspan'] = 0;
-						$header_cells[1][$key]['rowspan'] = 0;
-					}
-					else
-					{	// The cell has no rowspan
-						$header_cells[1][$key]['colspan'] = 1;
-						$header_cells[1][$key]['rowspan'] = 1;
-					}
-				}
-				else
-				{	// The column is part of a th colspan
-					if( $th_group_activated && !isset( $col['th_group'] ) )
-					{	// We have to lines and the column has no th_group, the colspan is "a rowspan 2"
-
-						// Update the first th cell colspan in line0
-						$header_cells[0][$key-$current_th_colspan]['colspan']++;
-
-						// Set the cell colspan to 0 in line0 to not display it:
-						$header_cells[0][$key]['colspan'] = 0;
-						$header_cells[0][$key]['rowspan'] = 0;
-					}
-					else
-					{ // Update the first th colspan cell in line1
-						$header_cells[1][$key-$current_th_colspan]['colspan']++;
-					}
-
-					// Set the cell colspan to 0 in line1 to do not display it:
-					$header_cells[1][$key]['colspan'] = 0;
-					$header_cells[1][$key]['rowspan'] = 0;
-
-					$current_th_colspan++;
-				}
-			}
-
-			// ________________________________________________________________________________
-
-			if( !$th_group_activated )
-			{	// We have only the "th" line to display
-				$start = 1;
-			}
-			else
-			{	// We have the "th_group" and the "th" lines to display
-				$start = 0;
-			}
-
-			//__________________________________________________________________________________
-
-			// Loop on all headers lines:
-			for( $i = $start; $i <2 ; $i++ )
-			{
-				echo $this->params['line_start_head'];
-				// Loop on all headers lines cells to display them:
-				foreach( $header_cells[$i] as $key=>$cell )
-				{
-					if( $cell['colspan'] )
-					{	// We have to dispaly cell:
-						if( $i == 0 && $cell['rowspan'] != 2 )
-						{	// The cell is a th_group
-							$th_title = $this->cols[$key]['th_group'];
-							$col_order = isset( $this->cols[$key]['order_group'] );
-						}
-						else
-						{	// The cell is a th
-							$th_title = $this->cols[$key]['th'] ;
-							$col_order = isset( $this->cols[$key]['order'] ) || isset( $this->cols[$key]['order_objects_callback'] ) || isset( $this->cols[$key]['order_rows_callback'] );
-						}
-
-
-						if( isset( $this->cols[$key]['th_class'] ) )
-						{	// We have a class for the th column
-							$class = $this->cols[$key]['th_class'];
-						}
-						else
-						{	// We have no class for the th column
-							$class = '';
-						}
-
-						if( $key == 0 && isset($this->params['colhead_start_first']) )
-						{ // Display first column start:
-							$output = $this->params['colhead_start_first'];
-
-							// Add the total column class in the grp col start first param class:
-							$output = str_replace( '$class$', $class, $output );
-						}
-						elseif( ( $key + $cell['colspan'] ) == (count( $this->cols) ) && isset($this->params['colhead_start_last']) )
-						{ // Last column can get special formatting:
-							$output = $this->params['colhead_start_last'];
-
-							// Add the total column class in the grp col start end param class:
-							$output = str_replace( '$class$', $class, $output );
-						}
-						else
-						{ // Display regular colmun start:
-							$output = $this->params['colhead_start'];
-
-							// Replace the "class_attrib" in the grp col start param by the td column class
-							$output = str_replace( '$class_attrib$', 'class="'.$class.'"', $output );
-						}
-
-
-						// Set colspan and rowspan values for the cell:
-						$output = preg_replace( '#(<)([^>]*)>$#', '$1$2 colspan="'.$cell['colspan'].'" rowspan="'.$cell['rowspan'].'">' , $output );
-
-						echo $output;
-
-						if( $col_order )
-						{ // The column can be ordered:
-							$col_sort_values = $this->get_col_sort_values( $key );
-
-
-							// Determine CLASS SUFFIX depending on wether the current column is currently sorted or not:
-							if( !empty($col_sort_values['current_order']) )
-							{ // We are currently sorting on the current column:
-								$class_suffix = '_current';
-							}
-							else
-							{	// We are not sorting on the current column:
-								$class_suffix = '_sort_link';
-							}
-
-							// Display title depending on sort type/mode:
-							if( $this->params['sort_type'] == 'single' )
-							{ // single column sort type:
-
-								// Title with toggle:
-								echo '<a href="'.$col_sort_values['order_toggle'].'"'
-											.' title="'.T_('Change Order').'"'
-											.' class="single'.$class_suffix.'"'
-											.'>'.$th_title.'</a>';
-
-								// Icon for ascending sort:
-								echo '<a href="'.$col_sort_values['order_asc'].'"'
-											.' title="'.T_('Ascending order').'"'
-											.'>'.$this->params['sort_asc_'.($col_sort_values['current_order'] == 'ASC' ? 'on' : 'off')].'</a>';
-
-								// Icon for descending sort:
-								echo '<a href="'.$col_sort_values['order_desc'].'"'
-											.' title="'.T_('Descending order').'"'
-											.'>'.$this->params['sort_desc_'.($col_sort_values['current_order'] == 'DESC' ? 'on' : 'off')].'</a>';
-
-							}
-							else
-							{ // basic sort type (toggle single column):
-
-								if( $col_sort_values['current_order'] == 'ASC' )
-								{ // the sorting is ascending and made on the current column
-									$sort_icon = $this->params['basic_sort_asc'];
-								}
-								elseif( $col_sort_values['current_order'] == 'DESC' )
-								{ // the sorting is descending and made on the current column
-									$sort_icon = $this->params['basic_sort_desc'];
-								}
-								else
-								{ // the sorting is not made on the current column
-									$sort_icon = $this->params['basic_sort_off'];
-								}
-
-								// Toggle Icon + Title
-								echo '<a href="'.$col_sort_values['order_toggle'].'"'
-											.' title="'.T_('Change Order').'"'
-											.' class="basic'.$class_suffix.'"'
-											.'>'.$sort_icon.' '.$th_title.'</a>';
-
-							}
-
-						}
-						elseif( $th_title )
-						{ // the column can't be ordered, but we still have a header defined:
-							echo $th_title;
-						}
-						// </td>
-						echo $this->params['colhead_end'];
-					}
-				}
-				// </tr>
-				echo $this->params['line_end'];
-			}
-		} // this->cols not set
 
 		echo $this->params['head_end'];
 
@@ -1123,39 +866,20 @@ class Results extends Table
 	 * This includes groups and data rows.
 	 *
 	 * @access protected
-	 *
-	 * @param array fadeout list or 'session'
 	 */
-	function display_body( $fadeout = NULL )
+	function display_body()
 	{
 		global $Session, $Debuglog;
 
-		if( $fadeout == 'session' )
-		{	// Get fadeout_array from session:
-			if( ($fadeout = $Session->get('fadeout_array')) && is_array( $fadeout ) )
-			{
-				$Debuglog->add( 'Got fadeout_array from session data.', 'session' );
-				$Session->delete( 'fadeout_array' );
-			}
-		}
+		// BODY START:
+		$this->display_body_start();
 
-		if( !empty( $fadeout ) )
-		{ // Initialize fadeout javascript:
-			global $rsc_url;
-			echo '<script type="text/javascript" src="'.$rsc_url.'js/fadeout.js"></script>';
-			echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, false);</script>';
-		}
-
-		echo $this->params['body_start'];
-
-		$line_count = 0;
 		// Used to set an id to fadeout element
-		$fadeout_count = 0;
 		foreach( $this->rows as $row )
 		{ // For each row/line:
 
 			/*
-			 * Group row stuff:
+			 * GROUP ROW stuff:
 			 */
 			if( !empty($this->group_by) )
 			{	// We are grouping...
@@ -1231,7 +955,7 @@ class Results extends Table
 
 
 			/*
-			 * Data row stuff:
+			 * DATA ROW stuff:
 			 */
 			if( !empty($this->ID_col) && empty($row->{$this->ID_col}) )
 			{	// We have detected an empty data row which we want to ignore... (happens with empty groups)
@@ -1246,91 +970,48 @@ class Results extends Table
 			}
 
 
-			if( $this->current_idx % 2 )
-			{ // Odd line:
-				if( $this->current_idx == count($this->rows)-1 )
-					echo $this->params['line_start_odd_last'];
-				else
-					echo $this->params['line_start_odd'];
-			}
-			else
-			{ // Even line:
-				if( $this->current_idx == count($this->rows)-1 )
-					echo $this->params['line_start_last'];
-				else
-					echo $this->params['line_start'];
+			// Check for fadeout
+			$fadeout_line = false;
+			if( !empty( $this->fadeout_array ) )
+			{
+				foreach( $this->fadeout_array as $key => $crit )
+				{
+					// echo 'fadeout '.$key.'='.$crit;
+					if( isset( $row->$key ) && in_array( $row->$key, $crit ) )
+					{ // Col is in the fadeout list
+						// TODO: CLEAN THIS UP!
+						$fadeout_line = true;
+						break;
+					}
+				}
 			}
 
-			$col_count = 0;
+			// LINE START:
+			$this->display_line_start( $this->current_idx == count($this->rows)-1, $fadeout_line );
+
 			foreach( $this->cols as $col )
 			{ // For each column:
 
-				if( isset( $col['td_class'] ) )
-				{	// We have a class for the total column
-					$class = $col['td_class'];
-				}
-				else
-				{	// We have no class for the total column
-					$class = '';
-				}
-
-				/**
-				 * Update class and add a fadeout ID for fadeout list results
-				 */
-				if( !empty( $fadeout ) )
-				{
-					foreach( $fadeout as $key => $crit )
-					{
-						// echo 'fadeout '.$key.'='.$crit;
-						if( isset( $row->$key ) && in_array( $row->$key, $crit ) )
-						{ // Col is in the fadeout list
-							// TODO: CLEAN THIS UP!
-							$class .= ' fadeout-ffff00" id="fadeout-'.$fadeout_count;
-
-							$fadeout_count++;
-							break;
-						}
-					}
-				}
-
-				if( ($col_count==0) && isset($this->params['col_start_first']) )
-				{ // Display first column column start:
-					$output = $this->params['col_start_first'];
-					// Add the total column class in the col start first param class:
-					$output = str_replace( '$class$', $class, $output );
-				}
-				elseif( ($col_count==count($this->cols)-1) && isset($this->params['col_start_last']) )
-				{ // Last column can get special formatting:
-					$output = $this->params['col_start_last'];
-					// Add the total column class in the col start end param class:
-					$output = str_replace( '$class$', $class, $output );
-				}
-				else
-				{ // Display regular colmun start:
-					$output = $this->params['col_start'];
-					// Replace the "class_attrib" in the total col start param by the td column class
-					$output = str_replace( '$class_attrib$', 'class="'.$class.'"', $output );
-				}
+				// COL START:
+				$this->display_col_start();
 
 				// Contents to output:
-				$output .= $col['td'];
-
-				$output .= $this->params['col_end'];
-
-				$output = $this->parse_col_content($output);
+				$output = $this->parse_col_content( $col['td'] );
 				#pre_dump( '{'.$output.'}' );
 				eval( "echo '$output';" );
 
-				$col_count++;
+				// COL START:
+				$this->display_col_end();
 			}
-			echo $this->params['line_end'];
 
-			$line_count++;
+			// LINE END:
+			$this->display_line_end();
 
 			$this->next_idx();
 		}
 
-		echo $this->params['body_end'];
+		// BODY END:
+		$this->display_body_end();
 	}
 
 
@@ -2128,6 +1809,10 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.39  2007/01/11 02:25:06  fplanque
+ * refactoring of Table displays
+ * body / line / col / fadeout
+ *
  * Revision 1.38  2007/01/08 23:44:19  fplanque
  * inserted Table widget
  * WARNING: this has nothing to do with ComponentWidgets...
