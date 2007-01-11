@@ -6,7 +6,6 @@
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -116,6 +115,9 @@ class SkinCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.3  2007/01/11 20:42:37  fplanque
+ * no message
+ *
  * Revision 1.2  2007/01/07 23:38:20  fplanque
  * discovery of skin containers
  *
