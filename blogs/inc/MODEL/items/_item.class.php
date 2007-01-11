@@ -1310,6 +1310,7 @@ class Item extends DataObject
 			$blah = explode(' ', $output);
 			if (count($blah) > $cut)
 			{
+				$excerpt = '';
 				for ($i=0; $i<$cut; $i++)
 				{
 					$excerpt .= $blah[$i].' ';
@@ -3335,6 +3336,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.145  2007/01/11 19:29:50  blueyed
+ * Fixed E_NOTICE when using the "excerpt" feature
+ *
  * Revision 1.144  2006/12/26 00:08:29  fplanque
  * wording
  *
