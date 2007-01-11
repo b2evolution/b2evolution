@@ -128,7 +128,8 @@ function & get_Cache( $objectName )
 			return $UserCache;
 
 		case 'WidgetCache':
-			$WidgetCache = new DataObjectCache( 'ComponentWidget', false, 'T_widget', 'wi_', 'wi_ID' ); // COPY (FUNC)
+			load_class( 'MODEL/collections/_widgetcache.class.php' );
+			$WidgetCache = new WidgetCache(); // COPY (FUNC)
 			return $WidgetCache;
 
 		default:
@@ -138,6 +139,10 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.14  2007/01/11 20:44:19  fplanque
+ * skin containers proof of concept
+ * (no params handling yet though)
+ *
  * Revision 1.13  2007/01/11 02:57:25  fplanque
  * implemented removing widgets from containers
  *

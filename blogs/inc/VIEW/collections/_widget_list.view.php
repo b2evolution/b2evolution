@@ -21,24 +21,12 @@ global $container_list;
 
 
 // Load widgets for current collection:
-// EXPERIMENTAL:
-
-$container_Widget_array = array();
-
-$sql = 'SELECT *
-		      FROM T_widget
-		     WHERE wi_coll_ID = '.$Blog->ID.'
-		     ORDER BY wi_sco_name, wi_order';
-$widget_rs = $DB->get_results( $sql, OBJECT, 'Get list of widgets for collection' );
-foreach( $widget_rs as $row )
-{
-	$container_Widget_array[$row->wi_sco_name][] = & new ComponentWidget( $row );
-}
-// pre_dump($container_Widget_array);
+$WidgetCache = & get_Cache( 'WidgetCache' );
+$container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID );
 
 function display_container( $container, $legend_suffix = '' )
 {
-	global $container_Widget_array;
+	global $Blog;
 
 	$Table = & new Table();
 
@@ -66,7 +54,10 @@ function display_container( $container, $legend_suffix = '' )
 	// BODY START:
 	$Table->display_body_start();
 
-	if( empty($container_Widget_array[$container]) )
+	$WidgetCache = & get_Cache( 'WidgetCache' );
+	$Widget_array = & $WidgetCache->get_by_coll_container( $Blog->ID, $container );
+
+	if( empty($Widget_array) )
 	{	// TODO: cleanup
 		$Table->display_line_start( true );
 		$Table->display_col_start();
@@ -76,7 +67,7 @@ function display_container( $container, $legend_suffix = '' )
 	}
 	else
 	{
-		foreach( $container_Widget_array[$container] as $ComponentWidget )
+		foreach( $Widget_array as $ComponentWidget )
 		{
 			$Table->display_line_start();
 
@@ -121,6 +112,10 @@ foreach( $container_Widget_array as $container=>$dummy )
 
 /*
  * $Log$
+ * Revision 1.5  2007/01/11 20:44:19  fplanque
+ * skin containers proof of concept
+ * (no params handling yet though)
+ *
  * Revision 1.4  2007/01/11 02:57:25  fplanque
  * implemented removing widgets from containers
  *

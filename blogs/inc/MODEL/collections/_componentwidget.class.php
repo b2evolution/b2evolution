@@ -61,13 +61,15 @@ class ComponentWidget extends DataObject
 		}
 		else
 		{	// Wa are loading an object:
-			$this->ID      = $db_row->wi_ID;
-			$this->coll_ID = $db_row->wi_coll_ID;
-			$this->type    = $db_row->wi_type;
-			$this->code    = $db_row->wi_code;
-			$this->params  = $db_row->wi_params;
+			$this->ID       = $db_row->wi_ID;
+			$this->coll_ID  = $db_row->wi_coll_ID;
+			$this->sco_name = $db_row->wi_sco_name;
+			$this->type     = $db_row->wi_type;
+			$this->code     = $db_row->wi_code;
+			$this->params   = $db_row->wi_params;
 		}
 	}
+
 
 	/**
 	 * Get name of widget
@@ -88,6 +90,52 @@ class ComponentWidget extends DataObject
 
 		return T_('Unknown');
 	}
+
+
+	/**
+	 * Display the widget!
+	 *
+	 * @param array
+	 */
+	function display( $params = array() )
+	{
+		global $Blog;
+
+		if( $this->type != 'core' )
+		{
+			echo 'Not handled yet.';
+			return;
+		}
+
+		switch( $this->code )
+		{
+			case 'coll-title':
+				// fp> TODO: replace HTML by params (fp; will be done shortly)
+				echo '<h1 id="pageTitle">';
+				echo '<a href="'.$Blog->get( 'url', 'raw' ).'">';
+				$Blog->disp( 'name', 'htmlbody' );
+				echo "</a></h1>\n";
+				break;
+
+      case 'coll-tagline':
+				// fp> TODO: replace HTML by params (fp; will be done shortly)
+				echo '<div class="pageSubtitle">';
+				$Blog->disp( 'tagline', 'htmlbody' );
+				echo '</div>';
+				break;
+
+      case 'coll-longdesc':
+				// fp> TODO: replace HTML by params (fp; will be done shortly)
+				echo '<p>';
+				$Blog->disp( 'longdesc', 'htmlbody' );
+				echo '</p>';
+				break;
+
+			default:
+				echo T_('Unknown');
+		}
+	}
+
 
 	/**
 	 * Insert object into DB based on previously recorded changes.
@@ -121,6 +169,10 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2007/01/11 20:44:19  fplanque
+ * skin containers proof of concept
+ * (no params handling yet though)
+ *
  * Revision 1.3  2007/01/11 02:57:25  fplanque
  * implemented removing widgets from containers
  *

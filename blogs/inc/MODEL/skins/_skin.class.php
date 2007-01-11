@@ -72,6 +72,9 @@ class Skin extends DataObject
 	}
 
 
+	/**
+	 *
+	 */
 	function get_name()
 	{
 		return $this->name;
@@ -98,10 +101,28 @@ class Skin extends DataObject
 
 	/**
 	 *	Display a container
+	 *
+	 * @param string
+	 * @param array
 	 */
-	function container( $name, $params = array() )
+	function container( $sco_name, $params = array() )
 	{
-		echo '<div>Debug: container: '.$name.'</div>';
+		/**
+		 * Blog currently displayed
+		 * @var Blog
+		 */
+		global $Blog;
+
+		// echo '<div>Debug: container: '.$sco_name.'</div>';
+
+   	$WidgetCache = & get_Cache( 'WidgetCache' );
+		$Widget_array = & $WidgetCache->get_by_coll_container( $Blog->ID, $sco_name );
+
+		foreach( $Widget_array as $ComponentWidget )
+		{
+			// Let the Widget dispolay itself (with contextual params):
+			$ComponentWidget->display( $params );
+		}
 	}
 
 
@@ -313,6 +334,10 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2007/01/11 20:44:19  fplanque
+ * skin containers proof of concept
+ * (no params handling yet though)
+ *
  * Revision 1.5  2007/01/08 02:11:56  fplanque
  * Blogs now make use of installed skins
  * next step: make use of widgets inside of skins
