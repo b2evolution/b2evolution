@@ -235,7 +235,8 @@ class Table extends Widget
 	 */
 	function display_init( $display_params = NULL, $fadeout = NULL )
 	{
-		global $AdminUI;
+		global $AdminUI, $Session, $Debuglog;
+
 		if( empty( $this->params ) && isset( $AdminUI ) )
 		{ // Use default params from Admin Skin:
 			$this->params = $AdminUI->get_template( 'Results' );
@@ -769,6 +770,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.14  2007/01/11 21:06:05  fplanque
+ * bugfix
+ *
  * Revision 1.13  2007/01/11 02:25:06  fplanque
  * refactoring of Table displays
  * body / line / col / fadeout

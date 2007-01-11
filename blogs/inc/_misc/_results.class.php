@@ -869,8 +869,6 @@ class Results extends Table
 	 */
 	function display_body()
 	{
-		global $Session, $Debuglog;
-
 		// BODY START:
 		$this->display_body_start();
 
@@ -1809,6 +1807,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.40  2007/01/11 21:06:05  fplanque
+ * bugfix
+ *
  * Revision 1.39  2007/01/11 02:25:06  fplanque
  * refactoring of Table displays
  * body / line / col / fadeout
