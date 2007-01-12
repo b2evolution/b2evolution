@@ -1514,7 +1514,7 @@ class Plugins
 			{
 				if( $Plugin = & $this->get_by_ID( $l_plugin_ID ) )
 				{
-					$r[ $l_plugin_ID ] = & $Plugin;
+					$r[ $l_plugin_ID ] = $Plugin; // copy reference
 				}
 			}
 		}
@@ -1539,7 +1539,7 @@ class Plugins
 			{
 				if( $Plugin = & $this->get_by_ID( $l_plugin_ID ) )
 				{
-					$r[ $l_plugin_ID ] = & $Plugin;
+					$r[ $l_plugin_ID ] = $Plugin; // copy reference
 				}
 			}
 		}
@@ -1584,7 +1584,7 @@ class Plugins
 			$Plugin = & $this->get_by_ID( $plugin_ID );
 			if( $Plugin )
 			{
-				$r[ $plugin_ID ] = & $Plugin;
+				$r[ $plugin_ID ] = $Plugin; // copy reference
 			}
 		}
 
@@ -1791,6 +1791,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.129  2007/01/12 21:53:12  blueyed
+ * Probably fixed Plugins::get_list_by_* methods: the returned references were always the one to the last Plugin
+ *
  * Revision 1.128  2007/01/12 21:11:52  blueyed
  * doc fixed: it is important to know what gets returned in case of error
  *
