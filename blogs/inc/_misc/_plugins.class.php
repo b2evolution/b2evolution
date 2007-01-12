@@ -1401,7 +1401,7 @@ class Plugins
 	 * This is the workhorse when it comes to lazy-instantiating a Plugin.
 	 *
 	 * @param integer plugin ID
-	 * @return Plugin
+	 * @return Plugin (false in case of error)
 	 */
 	function & get_by_ID( $plugin_ID )
 	{
@@ -1446,7 +1446,7 @@ class Plugins
 	 * Get a plugin by its classname.
 	 *
 	 * @param string
-	 * @return Plugin
+	 * @return Plugin (false in case of error)
 	 */
 	function & get_by_classname( $classname )
 	{
@@ -1469,7 +1469,7 @@ class Plugins
 	 * Get a specific Plugin by its code.
 	 *
 	 * @param string plugin code
-	 * @return Plugin
+	 * @return Plugin (false in case of error)
 	 */
 	function & get_by_code( $plugin_code )
 	{
@@ -1732,7 +1732,7 @@ class Plugins
 	/**
 	 * Callback, which gets used for {@link Results}.
 	 *
-	 * @return Plugin
+	 * @return Plugin (false in case of error)
 	 */
 	function & instantiate( $row )
 	{
@@ -1791,6 +1791,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.128  2007/01/12 21:11:52  blueyed
+ * doc fixed: it is important to know what gets returned in case of error
+ *
  * Revision 1.127  2007/01/12 05:14:42  fplanque
  * doc
  *
