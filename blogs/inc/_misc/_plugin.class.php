@@ -277,6 +277,10 @@ class Plugin
 	 *
 	 * Plugins|Plugins_admin|Plugins_admin_no_DB
 	 *
+	 * fp> This is FREAKING INSANE! The only purpose I can see for this is to prevent debugging with pre_dump() of the Plugin!
+	 * fp> There is ONLY ONE "mother". She's not hard to find! (Or at least she shouldn't be!!)
+	 * @todo get rid of this!
+	 *
 	 * @var Plugins_admin
 	 */
 	var $Plugins;
@@ -2807,6 +2811,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.130  2007/01/12 05:14:42  fplanque
+ * doc
+ *
  * Revision 1.129  2006/12/28 23:20:40  fplanque
  * added plugin event for displaying comment form toolbars
  * used by smilies plugin

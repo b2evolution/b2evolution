@@ -58,44 +58,35 @@ class Plugins
 	 */
 
 	/**
-	 * Our API version as (major, minor). A Plugin can request a check against it through {@link Plugin::GetDependencies()}.
-	 * @deprecated since 1.9
-	 * @var array
-	 */
-	var $api_version = array( 1, 2 );
-
-	/**
-	 * Index: plugin_code => Plugin
+	 * @var array of plugin_code => Plugin
 	 */
 	var $index_code_Plugins = array();
 
 	/**
-	 * Index: plugin_ID => Plugin
-	 * @var array
+	 * @var array of plugin_ID => Plugin
 	 */
 	var $index_ID_Plugins = array();
 
 	/**
-	 * Cache Plugin IDs by event. IDs are sorted by priority.
-	 * @var array
+	 * @var array of event => plug_ID. IDs are sorted by priority.
 	 */
 	var $index_event_IDs = array();
 
 	/**
-	 * plug_ID => DB row from T_plugins to lazy-instantiate a Plugin.
-	 * @var array
+	 * fp> does it cost that much to instantiate plugins right away, now that init is no longer in the constructor?
+	 * @var array of plug_ID => DB row from T_plugins. Used to lazy-instantiate Plugins.
 	 */
 	var $index_ID_rows = array();
 
 	/**
-	 * plug_code => plug_ID map to lazy-instantiate by code.
-	 * @var array
+	 * fp> does it cost that much to instantiate plugins right away, now that init is no longer in the constructor?
+	 * @var array of plug_code => plug_ID. Usedp to lazy-instantiate by code.
 	 */
 	var $index_code_ID = array();
 
 	/**
 	 * Cache Plugin codes by apply_rendering setting.
-	 * @var array
+	 * @var array of apply_rendering => plug_code
 	 */
 	var $index_apply_rendering_codes = array();
 
@@ -158,6 +149,7 @@ class Plugins
 	 * @static
 	 */
 	var $is_admin_class = false;
+
 	/**#@-*/
 
 
@@ -182,6 +174,7 @@ class Plugins
 
 		$Timer->resume( 'plugin_init' );
 
+		// Load events for enabled plugins:
 		$this->load_events();
 
 		$Timer->pause( 'plugin_init' );
@@ -259,8 +252,10 @@ class Plugins
 
 	/**
 	 * Sets the status of a Plugin in DB and registers it into the internal indices when "enabled".
-	 * Otherwise it gets unregisters, but only when we're not in {@link Plugins_admin}, because we
+	 * Otherwise it gets unregisterd, but only when we're not in {@link Plugins_admin}, because we
 	 * want to keep it in then in our indices.
+	 *
+	 * @todo fp>$this->is_admin_class is dirty!!
 	 *
 	 * {@internal
 	 * Note: this should probably always get called on the {@link $Plugins} object,
@@ -577,6 +572,7 @@ class Plugins
 	 * Un-register a plugin.
 	 *
 	 * This does not un-install it from DB, just from the internal indexes.
+	 *
 	 * @param Plugin
 	 */
 	function unregister( & $Plugin )
@@ -624,6 +620,7 @@ class Plugins
 	 * This gets used when {@link unregister() unregistering} a Plugin or if
 	 * {@link Plugin::PluginInit()} returned false, which means
 	 * "do not use it for subsequent events in the request".
+	 *
 	 * @param integer Plugin ID
 	 */
 	function forget_events( $plugin_ID )
@@ -669,7 +666,7 @@ class Plugins
 	 *
 	 * @param Plugin
 	 * @param string settings type: "Settings" or "UserSettings"
-	 * @return NULL|boolean NULL, if no Settings
+	 * @return boolean NULL, if no Settings
 	 */
 	function instantiate_Settings( & $Plugin, $set_type )
 	{
@@ -736,12 +733,23 @@ class Plugins
 
 
 	/**
+	 * Load plugins table and rewind iterator used by {@link get_next()}.
+	 */
+	function restart()
+	{
+		$this->load_plugins_table();
+
+		$this->current_idx = 0;
+	}
+
+
+	/**
 	 * Get next plugin in the list.
 	 *
 	 * NOTE: You'll have to call {@link restart()} or {@link load_plugins_table()}
 	 * before using it.
 	 *
-	 * @return Plugin|false (false if no more plugin).
+	 * @return Plugin (false if no more plugin).
 	 */
 	function & get_next()
 	{
@@ -769,17 +777,6 @@ class Plugins
 			$r = false;
 			return $r;
 		}
-	}
-
-
-	/**
-	 * Load plugins table and rewind iterator used by {@link get_next()}.
-	 */
-	function restart()
-	{
-		$this->load_plugins_table();
-
-		$this->current_idx = 0;
 	}
 
 
@@ -812,11 +809,13 @@ class Plugins
 		}
 
 		$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[$event]), 'plugins' );
+
 		foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
 		{
 			$this->call_method( $l_plugin_ID, $event, $params );
+
 			if( ! empty($this->_stop_propagation) )
-			{
+			{	// A plugin has requested to stop propagation.
 				$this->_stop_propagation = false;
 				break;
 			}
@@ -954,7 +953,9 @@ class Plugins
 
 
 	/**
-	 * Trigger an $event and return an index of $params.
+	 * Trigger an event and return an index of params.
+	 *
+	 * fp> please explain what this is for.
 	 *
 	 * @param string Event name, see {@link Plugins_admin::get_supported_events()}
 	 * @param array Associative array of parameters for the Plugin
@@ -1183,6 +1184,8 @@ class Plugins
 	 *
 	 * This is a wrapper around {@link call_method()}.
 	 *
+	 * fp> why doesn't call_method always check if it's deactivated?
+	 *
 	 * @param integer Plugin ID
 	 * @param string Method name.
 	 * @param array Params (by reference).
@@ -1201,7 +1204,33 @@ class Plugins
 
 
 	/**
-	 * Render the content of an item.
+	 * Call a specific plugin by its code.
+	 *
+	 * This will call the SkinTag event handler.
+	 *
+	 * @param string plugin code
+	 * @param array Associative array of parameters (gets passed to the plugin)
+	 * @return boolean
+	 */
+	function call_by_code( $code, $params = array() )
+	{
+		$Plugin = & $this->get_by_code( $code );
+
+		if( ! $Plugin )
+		{
+			global $Debuglog;
+			$Debuglog->add( 'No plugin available for code ['.$code.']!', array('plugins', 'error') );
+			return false;
+		}
+
+		$this->call_method_if_active( $Plugin->ID, 'SkinTag', $params );
+
+		return true;
+	}
+
+
+	/**
+	 * Render the content of an item by calling the relevant renderer plugins.
 	 *
 	 * @param string content to render (by reference)
 	 * @param array renderer codes to use for opt-out, opt-in and lazy  (by reference)
@@ -1270,6 +1299,8 @@ class Plugins
 	/**
 	 * Quick-render a string with a single plugin and format it for output.
 	 *
+	 * @todo rename
+	 *
 	 * @param string Plugin code (must have render() method)
 	 * @param array
 	 *   'data': Data to render
@@ -1329,32 +1360,6 @@ class Plugins
 
 
 	/**
-	 * Call a specific plugin by its code.
-	 *
-	 * This will call the SkinTag event handler.
-	 *
-	 * @param string plugin code
-	 * @param array Associative array of parameters (gets passed to the plugin)
-	 * @return boolean
-	 */
-	function call_by_code( $code, $params = array() )
-	{
-		$Plugin = & $this->get_by_code( $code );
-
-		if( ! $Plugin )
-		{
-			global $Debuglog;
-			$Debuglog->add( 'No plugin available for code ['.$code.']!', array('plugins', 'error') );
-			return false;
-		}
-
-		$this->call_method_if_active( $Plugin->ID, 'SkinTag', $params );
-
-		return true;
-	}
-
-
-	/**
 	 * Load Plugins data from T_plugins (only once), ordered by priority.
 	 *
 	 * This fills the needed indexes to lazy-instantiate a Plugin when requested.
@@ -1393,10 +1398,10 @@ class Plugins
 	/**
 	 * Get a specific plugin by its ID.
 	 *
-	 * This is the workhorse when it comes to lazy-instantiate a Plugin.
+	 * This is the workhorse when it comes to lazy-instantiating a Plugin.
 	 *
 	 * @param integer plugin ID
-	 * @return Plugin|false
+	 * @return Plugin
 	 */
 	function & get_by_ID( $plugin_ID )
 	{
@@ -1440,9 +1445,10 @@ class Plugins
 	/**
 	 * Get a plugin by its classname.
 	 *
-	 * @return Plugin|false
+	 * @param string
+	 * @return Plugin
 	 */
-	function & get_by_classname($classname)
+	function & get_by_classname( $classname )
 	{
 		$this->load_plugins_table(); // We use index_ID_rows (no own index yet)
 
@@ -1462,8 +1468,8 @@ class Plugins
 	/**
 	 * Get a specific Plugin by its code.
 	 *
-	 * @param string plugin name
-	 * @return Plugin|false
+	 * @param string plugin code
+	 * @return Plugin
 	 */
 	function & get_by_code( $plugin_code )
 	{
@@ -1496,7 +1502,7 @@ class Plugins
 	 * Get a list of Plugins for a given event.
 	 *
 	 * @param string Event name
-	 * @return array List of Plugins, where the key is the plugin's ID
+	 * @return array of plug_ID => Plugin
 	 */
 	function get_list_by_event( $event )
 	{
@@ -1645,6 +1651,8 @@ class Plugins
 
 	/**
 	 * (Re)load Plugin Events for enabled (normal use) or all (admin use) plugins.
+	 *
+	 * @todo fp> make decent use of classes. redefine this function in Plugins_admin and don't do dirty tricks like $this->is_admin_class
 	 */
 	function load_events()
 	{
@@ -1724,7 +1732,7 @@ class Plugins
 	/**
 	 * Callback, which gets used for {@link Results}.
 	 *
-	 * @return Plugin|false
+	 * @return Plugin
 	 */
 	function & instantiate( $row )
 	{
@@ -1783,6 +1791,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.127  2007/01/12 05:14:42  fplanque
+ * doc
+ *
  * Revision 1.126  2007/01/07 05:26:01  fplanque
  * doc
  *

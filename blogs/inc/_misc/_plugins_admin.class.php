@@ -54,7 +54,10 @@ class Plugins_admin extends Plugins
 
 
 	/**
-	 * Get the list of supported/available events/hooks.
+	 * Get the list of all events/hooks supported by the plugin framework.
+	 *
+	 * Also puts in additional events provided by plugins.
+	 * fp> please provide an example/use case
 	 *
 	 * Additional to the returned event methods (which can be disabled), there are internal
 	 * ones which just get called on the plugin (and get not remembered in T_pluginevents), e.g.:
@@ -203,7 +206,9 @@ class Plugins_admin extends Plugins
 
 			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )
 			{ // only call this, if we're not in the process of installation, to avoid errors from Plugins in this case!
+
 				// Let Plugins add additional events (if they trigger those events themselves):
+				// fp> please provide an example/use case
 				$this->load_plugins_table();
 
 				$rev_sorted_IDs = array_reverse( $this->sorted_IDs ); // so higher priority overwrites lower (just for desc)
@@ -255,7 +260,7 @@ class Plugins_admin extends Plugins
 
 
 	/**
-	 * Discover and register all available plugins below {@link $plugins_path}.
+	 * Discover and register all available plugins in the {@link $plugins_path} folder/subfolders.
 	 */
 	function discover()
 	{
@@ -298,7 +303,7 @@ class Plugins_admin extends Plugins
 
 
 	/**
-	 * Get the list of values for when a rendering Plugin can apply (apply_rendering).
+	 * Get the list of all possible values for apply_rendering (defines when a rendering Plugin can apply).
 	 *
 	 * @todo Add descriptions.
 	 *
@@ -576,7 +581,7 @@ class Plugins_admin extends Plugins
 	 * entries (that the plugin does not register anymore).
 	 *
 	 * @param Plugin Plugin to save events for
-	 * @param array|NULL List of events to save as enabled for the Plugin.
+	 * @param array List of events to save as enabled for the Plugin.
 	 *              By default all provided events get saved as enabled. Pass array() to discover only new ones.
 	 * @param array List of events to save as disabled for the Plugin.
 	 *              By default, no events get disabled. Disabling an event takes priority over enabling.
@@ -1342,6 +1347,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.24  2007/01/12 05:14:42  fplanque
+ * doc
+ *
  * Revision 1.23  2007/01/09 01:00:51  blueyed
  * todo
  *
