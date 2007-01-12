@@ -62,6 +62,7 @@ if( ! empty($Plugins->index_event_IDs['SkinTag']) )
 }
 
 // THIS should be the right way... but it doesn't link to the right plugins!!!???://
+// dh> cannot confirm.. in fact Plugins::get_list_by_event() does quite the same as your implementation above?!
 $Plugin_array = $Plugins->get_list_by_event( 'SkinTag' );
 // pre_dump( $Plugin_array );
 if( ! empty($Plugin_array) )
@@ -71,7 +72,6 @@ if( ! empty($Plugin_array) )
 	foreach( $Plugin_array as $ID => $Plugin )
 	{
 		echo '<li>';
-		echo $ID;
 		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code ).'" title="'.T_('Add this widget to the container').'">';
 		echo get_icon( 'new' ).$Plugin->name;
 		echo '</a></li>';
@@ -82,6 +82,9 @@ if( ! empty($Plugin_array) )
 
 /*
  * $Log$
+ * Revision 1.3  2007/01/12 21:38:42  blueyed
+ * doc
+ *
  * Revision 1.2  2007/01/12 05:17:15  fplanque
  * $Plugins->get_list_by_event() returns crap :((
  *
