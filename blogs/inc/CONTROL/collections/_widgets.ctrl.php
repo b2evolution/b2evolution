@@ -95,12 +95,12 @@ switch( $action )
 
 		if( $type != 'core' )
 		{
-			debug_type( 'Unhandled widget type' );
+			debug_die( 'Unhandled widget type' );
 		}
 
 		if( !in_array( $code, $core_componentwidget_codes ) )
 		{
-			debug_type( 'Unhandled widget code' );
+			debug_die( 'Unhandled widget code' );
 		}
 
 		$edited_ComponentWidget = & new ComponentWidget( NULL, $type, $code, array() );
@@ -203,6 +203,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2007/01/12 05:15:07  fplanque
+ * minor fix
+ *
  * Revision 1.4  2007/01/12 02:40:26  fplanque
  * widget default params proof of concept
  * (param customization to be done)
