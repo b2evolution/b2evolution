@@ -1038,6 +1038,8 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 /**
  * Remove backticks around a field/table name.
  *
+ * "backtick" means "single backquote" (`)
+ *
  * @param string Field name
  * @return string
  */
@@ -1123,6 +1125,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.25  2007/01/12 01:34:39  fplanque
+ * doc
+ *
  * Revision 1.24  2007/01/12 01:21:38  blueyed
  * db_delta() fixes: handle backticks (to be tested more), dropping all existing columns in a table and index/key names (to be tested more)
  *
