@@ -1502,7 +1502,7 @@ class Plugins
 	 * Get a list of Plugins for a given event.
 	 *
 	 * @param string Event name
-	 * @return array of plug_ID => Plugin
+	 * @return array plugin_ID => & Plugin
 	 */
 	function get_list_by_event( $event )
 	{
@@ -1514,7 +1514,8 @@ class Plugins
 			{
 				if( $Plugin = & $this->get_by_ID( $l_plugin_ID ) )
 				{
-					$r[ $l_plugin_ID ] = $Plugin; // copy reference
+					$r[ $l_plugin_ID ] = & $Plugin;
+					unset($Plugin); // so that we do not overwrite the reference in the next loop
 				}
 			}
 		}
@@ -1527,7 +1528,7 @@ class Plugins
 	 * Get a list of Plugins for a list of events. Every Plugin is only once in this list.
 	 *
 	 * @param array Array of events
-	 * @return array List of Plugins, where the key is the plugin's ID
+	 * @return array plugin_ID => & Plugin
 	 */
 	function get_list_by_events( $events )
 	{
@@ -1539,7 +1540,8 @@ class Plugins
 			{
 				if( $Plugin = & $this->get_by_ID( $l_plugin_ID ) )
 				{
-					$r[ $l_plugin_ID ] = $Plugin; // copy reference
+					$r[ $l_plugin_ID ] = & $Plugin;
+					unset($Plugin); // so that we do not overwrite the reference in the next loop
 				}
 			}
 		}
@@ -1551,7 +1553,7 @@ class Plugins
 	/**
 	 * Get a list of plugins that provide all given events.
 	 *
-	 * @return array The list of plugins, where the key is the plugin's ID
+	 * @return array plugin_ID => & Plugin
 	 */
 	function get_list_by_all_events( $events )
 	{
@@ -1584,7 +1586,8 @@ class Plugins
 			$Plugin = & $this->get_by_ID( $plugin_ID );
 			if( $Plugin )
 			{
-				$r[ $plugin_ID ] = $Plugin; // copy reference
+				$r[ $plugin_ID ] = & $Plugin;
+				unset($Plugin); // so that we do not overwrite the reference in the next loop
 			}
 		}
 
@@ -1791,6 +1794,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.130  2007/01/12 22:05:28  blueyed
+ * Real fix for Plugins::get_list_by_* (keeping and returning reference instead of copy)
+ *
  * Revision 1.129  2007/01/12 21:53:12  blueyed
  * Probably fixed Plugins::get_list_by_* methods: the returned references were always the one to the last Plugin
  *
