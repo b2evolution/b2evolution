@@ -279,6 +279,8 @@ class Plugin
 	 *
 	 * fp> This is FREAKING INSANE! The only purpose I can see for this is to prevent debugging with pre_dump() of the Plugin!
 	 * fp> There is ONLY ONE "mother". She's not hard to find! (Or at least she shouldn't be!!)
+	 * dh> pre_dump() handles this, since it does not use var_export() anymore (recursion)
+	 * dh> IMHO it _is_ required
 	 * @todo get rid of this!
 	 *
 	 * @var Plugins_admin
@@ -2811,6 +2813,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.131  2007/01/12 21:01:23  blueyed
+ * doc about $Plugins member
+ *
  * Revision 1.130  2007/01/12 05:14:42  fplanque
  * doc
  *
