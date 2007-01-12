@@ -33,8 +33,58 @@ foreach( $core_componentwidget_codes as $code )
 }
 echo '</ul>';
 
+
+// Now, let's try to get the Plugins that implement a skintag...
+// TODO: at some point we may merge them with the above, but alphabetical order probably isn't the best solution
+
+/**
+ * @var Plugins
+ */
+global $Plugins;
+
+// this uses a private array, so there should probably be a better method...
+if( ! empty($Plugins->index_event_IDs['SkinTag']) )
+{ //We have some plugins
+	// echo '<h3>'.T_('Plugins').'</h3>';
+	echo '<ul>';
+	foreach( $Plugins->index_event_IDs['SkinTag'] as $l_plugin_ID )
+	{
+    /**
+		 * @var Plugin
+		 */
+		$Plugin = & $Plugins->get_by_ID( $l_plugin_ID );
+		echo '<li>';
+		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code ).'" title="'.T_('Add this widget to the container').'">';
+		echo get_icon( 'new' ).$Plugin->name;
+		echo '</a></li>';
+	}
+	echo '</ul>';
+}
+
+// THIS should be the right way... but it doesn't link to the right plugins!!!???://
+$Plugin_array = $Plugins->get_list_by_event( 'SkinTag' );
+// pre_dump( $Plugin_array );
+if( ! empty($Plugin_array) )
+{ //We have some plugins
+	// echo '<h3>'.T_('Plugins').'</h3>';
+	echo '<ul>';
+	foreach( $Plugin_array as $ID => $Plugin )
+	{
+		echo '<li>';
+		echo $ID;
+		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code ).'" title="'.T_('Add this widget to the container').'">';
+		echo get_icon( 'new' ).$Plugin->name;
+		echo '</a></li>';
+	}
+	echo '</ul>';
+}
+
+
 /*
  * $Log$
+ * Revision 1.2  2007/01/12 05:17:15  fplanque
+ * $Plugins->get_list_by_event() returns crap :((
+ *
  * Revision 1.1  2007/01/08 21:55:42  fplanque
  * very rough widget handling
  *
