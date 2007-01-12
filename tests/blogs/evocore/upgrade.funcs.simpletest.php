@@ -887,6 +887,94 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 	}
 
 
+	/**
+	 * Test backtick syntax for column/table names.
+	 */
+	function test_backticks()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				i TINYINT
+			)" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE `test_1` (
+				`i` TINYINT
+			)" );
+
+		$this->assertEqual( count($r), 0 );
+	}
+
+
+	/**
+	 * Test if index names get handled correctly.
+	 */
+	function test_index_handle_names()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				`t1` TINYINT,
+				`t2` TINYINT,
+				KEY (t1, t2),
+				KEY (t1, t2)
+			)" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE test_1 (
+				t1 TINYINT,
+				`t2` TINYINT,
+				KEY t1_2 (t1, `t2`),
+				KEY (t1, `t2`)
+			)" );
+
+		$this->assertEqual( count($r), 0 );
+	}
+
+
+	/**
+	 * Test if it uses DROP TABLE, if all columns get deleted.
+	 * "You can't delete all columns with ALTER TABLE; use DROP TABLE instead(Errno=1090)"
+	 */
+	function test_drop_table_if_all_cols_get_dropped()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				foo TINYINT
+			)" );
+
+		$create_table = "
+			CREATE TABLE test_1 (
+				bar TINYINT
+			)";
+		$r = $this->db_delta_wrapper( $create_table );
+
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( $r['test_1'][0]['queries'][0], 'DROP TABLE test_1' );
+		$this->assertEqual( $r['test_1'][1]['queries'][0], $create_table );
+	}
+
+
+	/**
+	 * Test if it uses DROP TABLE, if all columns get deleted, but "drop_column" is excluded.
+	 */
+	function test_drop_table_if_all_cols_get_dropped_drop_column_excluded()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				foo TINYINT
+			)" );
+
+		$create_table = "
+			CREATE TABLE test_1 (
+				bar TINYINT
+			)";
+		$r = $this->db_delta_wrapper( $create_table, /* exclude defaults: */ array('drop_column', 'drop_index') );
+
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( $r['test_1'][0]['queries'][0], 'ALTER TABLE test_1 ADD COLUMN bar TINYINT FIRST' );
+	}
+
+
 }
 
 

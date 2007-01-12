@@ -62,7 +62,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * @author Originally taken from Wordpress, heavily enhanced and modified by blueyed
  *
- * @todo "You can't delete all columns with ALTER TABLE; use DROP TABLE instead(Errno=1090)"
+ * @todo "Plugin can't change primary key" {@link http://forums.b2evolution.net/viewtopic.php?t=10345}
  * @todo Handle COMMENT for tables?!
  *
  * @see http://dev.mysql.com/doc/refman/4.1/en/create-table.html
@@ -77,7 +77,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function db_delta( $queries, $exclude_types = array(), $execute = false )
 {
-	global $Debuglog, $DB;
+	global $Debuglog, $DB, $debug;
 
 	if( ! is_array($queries) )
 	{
@@ -98,9 +98,9 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 	// Split the queries into $items, by their type:
 	foreach( $queries as $qry )
 	{
-		if( preg_match( '|^\s*(CREATE TABLE\s+)(IF NOT EXISTS\s+)?([^\s(]+)(.*)$|is', $qry, $match) )
+		if( preg_match( '|^(\s*CREATE TABLE\s+)(IF NOT EXISTS\s+)?([^\s(]+)(.*)$|is', $qry, $match) )
 		{
-			$tablename = preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[3] );
+			$tablename = db_delta_remove_backticks(preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[3] ));
 			$qry = $match[1].( empty($match[2]) ? '' : $match[2] ).$tablename.$match[4];
 
 			$items[strtolower($tablename)][] = array(
@@ -115,17 +115,17 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				'note' => sprintf( 'Created database &laquo;<strong>%s</strong>&raquo;', $match[1] ),
 				'type' => 'create_database' ) );
 		}
-		elseif( preg_match( '|^\s*(INSERT INTO\s+)([\S]+)(.*)$|is', $qry, $match) )
+		elseif( preg_match( '|^(\s*INSERT INTO\s+)([\S]+)(.*)$|is', $qry, $match) )
 		{
-			$tablename = preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[2] );
+			$tablename = db_delta_remove_backticks(preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[2] ));
 			$items[strtolower($tablename)][] = array(
 				'queries' => array($match[1].$tablename.$match[3]),
 				'note' => '',
 				'type' => 'insert' );
 		}
-		elseif( preg_match( '|^\s*(UPDATE\s+)([\S]+)(.*)$|is', $qry, $match) )
+		elseif( preg_match( '|^(\s*UPDATE\s+)([\S]+)(.*)$|is', $qry, $match) )
 		{
-			$tablename = preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[2] );
+			$tablename = db_delta_remove_backticks(preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[2] ));
 			$items[strtolower($tablename)][] = array(
 				'queries' => array($match[1].$tablename.$match[3]),
 				'note' => '',
@@ -220,13 +220,13 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 			{ // For every field line specified in the query
 				// Extract the field name
 				preg_match( '|^([^\s(]+)|', trim($create_definition), $match );
-				$fieldname = $match[1];
-				$fieldname_lowered = strtolower($match[1]);
+				$fieldname = db_delta_remove_backticks($match[1]);
+				$fieldname_lowered = strtolower($fieldname);
 
 				$create_definition = trim($create_definition, ", \r\n\t");
 
 				if( in_array( $fieldname_lowered, array( '', 'primary', 'index', 'fulltext', 'unique', 'key' ) ) )
-				{ // INDEX (but not in column_definition - this gets added later)
+				{ // INDEX (but not in column_definition - those get handled later)
 					$add_index = array(
 						'create_definition' => $create_definition,
 					);
@@ -298,7 +298,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 
 				// Let's see which indices are present already for the table:
-				// TODO: use meta data available now in $indices, instead of building a regular expression!?
+				// TODO: dh> use meta data available now in $indices, instead of building a regular expression!?
 				$obsolete_indices = $existing_indices; // will get unset as found
 
 				foreach( $existing_indices as $index_name => $index_data )
@@ -308,6 +308,8 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					if( $index_name == 'PRIMARY' )
 					{
 						$index_pattern .= 'PRIMARY(\s+KEY)?';
+						// optional primary key name:
+						$index_pattern .= '(\s+\w+)?';
 					}
 					elseif( $index_data['unique'] )
 					{
@@ -317,13 +319,9 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					{
 						$index_pattern .= '(INDEX|KEY)';
 					}
-					if( $index_name == 'PRIMARY' )
-					{ // optional primary key name
-						$index_pattern .= '(\s+\w+)?';
-					}
-					else
+					if( $index_name != 'PRIMARY' )
 					{
-						$index_pattern .= '(\s+'.$index_name.')?';
+						$index_pattern .= '(\s+`?'.$index_name.'`?)'; // optionally in backticks
 					}
 
 					$index_columns = '';
@@ -335,23 +333,51 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 							$index_columns .= '\s*,\s*';
 						}
 						// Add the field to the column list string
-						$index_columns .= $column_data['fieldname'];
+						$index_columns .= '`?'.$column_data['fieldname'].'`?'; // optionally in backticks
 						if( ! empty($column_data['subpart']) )
 						{
 							$index_columns .= '\s*\(\s*'.$column_data['subpart'].'\s*\)\s*';
 						}
 					}
-					// Add the column list to the index create string
-					$index_pattern .= '\s*\(\s*'.$index_columns.'\s*\)';
 
+					// Sort index definitions with names to the beginning:
+					/*
+					usort( $indices, create_function( '$a, $b', '
+						if( preg_match( "~^\w+\s+[^(]~", $a["create_definition"] )
+						{
+
+						}' ) );
+					*/
+
+
+					$used_auto_keys = array();
 					foreach( $indices as $k => $index )
 					{
-						if( preg_match( '~'.$index_pattern.'~i', trim($index['create_definition']) ) )
+						$pattern = $index_pattern;
+						if( ! preg_match( '~^\w+\s+[^(]~', $index['create_definition'], $match ) )
+						{ // no key name given, make the name part optional, if it's the default one:
+							// (Default key name seems to be the first column, eventually with "_\d+"-suffix)
+							$auto_key = strtoupper($index['col_names'][0]);
+							if( isset($used_auto_keys[$auto_key]) )
+							{
+								$used_auto_keys[$auto_key]++;
+								$auto_key .= '_'.$used_auto_keys[$auto_key];
+							}
+							$used_auto_keys[$auto_key] = 1;
+
+							if( $auto_key == $index_name )
+							{ // the auto-generated keyname is the same as the one we have, so make it optional in the pattern:
+								$pattern .= '?';
+							}
+						}
+						// Add the column list to the index create string
+						$pattern .= '\s*\(\s*'.$index_columns.'\s*\)';
+
+						#pre_dump( '~'.$pattern.'~i', trim($index['create_definition']) );
+						if( preg_match( '~'.$pattern.'~i', trim($index['create_definition']) ) )
 						{ // This index already exists: remove the index from our indices to create
 							unset($indices[$k]);
 							unset($obsolete_indices[$index_name]);
-
-							#echo "<pre style=\"border:1px solid #ccc;margin-top:5px;\">{$table}:<br/>Found index:".$index.' ('.$index_pattern.")</pre>\n";
 							break;
 						}
 					}
@@ -417,6 +443,32 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 			// Fetch the table column structure from the database
 			$tablefields = $DB->get_results( 'DESCRIBE '.$table );
 
+
+			// If "drop_column" is not excluded we have to check if all existing cols would get dropped,
+			// to prevent "You can't delete all columns with ALTER TABLE; use DROP TABLE instead(Errno=1090)"
+			if( ! in_array('drop_column', $exclude_types) )
+			{
+				$at_least_one_col_stays = false;
+				foreach($tablefields as $tablefield)
+				{
+					$fieldname_lowered = strtolower($tablefield->Field);
+
+					if( isset($wanted_fields[ $fieldname_lowered ]) )
+					{
+						$at_least_one_col_stays = true;
+					}
+				}
+
+				if( ! $at_least_one_col_stays )
+				{ // all columns get dropped: so we need to DROP TABLE and then use the original CREATE TABLE
+					array_unshift($items[$table_lowered], array(
+						'queries' => array('DROP TABLE '.$table),
+						'note' => 'Dropped <strong>'.$table.'.</strong>',
+						'type' => 'drop_column' ));
+					continue; // next $table
+				}
+			}
+
 			// For every field in the existing table
 			foreach($tablefields as $tablefield)
 			{
@@ -458,8 +510,11 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				unset($type_matches); // have we detected the type as matching (for optional length param)
 				$fieldtype = '';
 
+
+				$pattern_field = '`?'.$tablefield->Field.'`?'; // optionally in backticks
+
 				// Get the field type from the query
-				if( preg_match( '~^'.$tablefield->Field.'\s+ (TINYINT|SMALLINT|MEDIUMINT|INTEGER|INT|BIGINT|REAL|DOUBLE|FLOAT|DECIMAL|DEC|NUMERIC) ( \s* \([\d\s,]+\) )? (\s+ UNSIGNED)? (\s+ ZEROFILL)? (.*)$~ix', $column_definition, $match ) )
+				if( preg_match( '~^'.$pattern_field.'\s+ (TINYINT|SMALLINT|MEDIUMINT|INTEGER|INT|BIGINT|REAL|DOUBLE|FLOAT|DECIMAL|DEC|NUMERIC) ( \s* \([\d\s,]+\) )? (\s+ UNSIGNED)? (\s+ ZEROFILL)? (.*)$~ix', $column_definition, $match ) )
 				{
 					$fieldtype = $match[1];
 
@@ -492,7 +547,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					$matches_pattern = '~^'.preg_replace( '~\((\d+)\)~', '(\(\d+\))?', $tablefield->Type ).'$~i';
 					$type_matches = preg_match( $matches_pattern, $fieldtype );
 				}
-				elseif( preg_match( '~^'.$tablefield->Field.'\s+(DATETIME|DATE|TIMESTAMP|TIME|YEAR|TINYBLOB|BLOB|MEDIUMBLOB|LONGBLOB|TINYTEXT|TEXT|MEDIUMTEXT|LONGTEXT) ( \s+ BINARY )? (.*)$~ix', $column_definition, $match ) )
+				elseif( preg_match( '~^'.$pattern_field.'\s+(DATETIME|DATE|TIMESTAMP|TIME|YEAR|TINYBLOB|BLOB|MEDIUMBLOB|LONGBLOB|TINYTEXT|TEXT|MEDIUMTEXT|LONGTEXT) ( \s+ BINARY )? (.*)$~ix', $column_definition, $match ) )
 				{
 					$fieldtype = $match[1];
 					if( isset($match[2]) )
@@ -511,7 +566,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 						}
 					}
 				}
-				elseif( preg_match( '~^'.$tablefield->Field.'\s+ (CHAR|VARCHAR|BINARY|VARBINARY) \s* \( ([\d\s]+) \) (\s+ (BINARY|ASCII|UNICODE) )? (.*)$~ix', $column_definition, $match ) )
+				elseif( preg_match( '~^'.$pattern_field.'\s+ (CHAR|VARCHAR|BINARY|VARBINARY) \s* \( ([\d\s]+) \) (\s+ (BINARY|ASCII|UNICODE) )? (.*)$~ix', $column_definition, $match ) )
 				{
 					$len = trim($match[2]);
 
@@ -534,7 +589,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 						$type_matches = preg_match( '~^(VAR)?'.preg_quote( $fieldtype, '~' ).'$~i', $tablefield->Type );
 					}
 				}
-				elseif( preg_match( '~^'.$tablefield->Field.'\s+ (ENUM|SET) \s* \( (.*) \) (.*)$~ix', $column_definition, $match ) )
+				elseif( preg_match( '~^'.$pattern_field.'\s+ (ENUM|SET) \s* \( (.*) \) (.*)$~ix', $column_definition, $match ) )
 				{
 					$values = preg_split( '~\s*,\s*~', trim($match[2]), -1, PREG_SPLIT_NO_EMPTY ); // TODO: will fail for values containing ","..
 					$values = implode( ',', $values );
@@ -546,6 +601,14 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					$type_matches = ( $field_compare == $tablefield->Type );
 
 					$field_to_parse = $match[3];
+				}
+				else
+				{
+					if( $debug )
+					{
+						debug_die( 'db_delta(): Cannot find existing types field in column definition ('.$pattern_field.'/'.$column_definition.')' );
+					}
+					continue;
 				}
 
 
@@ -752,7 +815,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					// Handle changes from "NULL" to "NOT NULL"
 					if( $change_null && ! $want_null && isset($update_default_set) )
 					{ // Prepend query to update NULL fields to default
-						array_unshift( $queries, 'UPDATE '.$table.' SET '.$fieldname.' = '.$update_default_set.' WHERE '.$fieldname.' IS NULL' );
+						array_unshift( $queries, 'UPDATE '.$table.' SET '.$tablefield->Field.' = '.$update_default_set.' WHERE '.$tablefield->Field.' IS NULL' );
 
 						if( substr( $tablefield->Type, 0, 5 ) == 'enum(' )
 						{
@@ -973,6 +1036,22 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 
 /**
+ * Remove backticks around a field/table name.
+ *
+ * @param string Field name
+ * @return string
+ */
+function db_delta_remove_backticks($fieldname)
+{
+	if( substr($fieldname, 0, 1) == '`' && substr($fieldname, -1) == '`' )
+	{ // backticks:
+		$fieldname = substr($fieldname, 1, -1);
+	}
+	return $fieldname;
+}
+
+
+/**
  * Alter the DB schema to match the current expected one ({@link $schema_queries}).
  *
  * @todo if used by install only, then put it into the install folde!!!
@@ -1044,6 +1123,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.24  2007/01/12 01:21:38  blueyed
+ * db_delta() fixes: handle backticks (to be tested more), dropping all existing columns in a table and index/key names (to be tested more)
+ *
  * Revision 1.23  2006/11/24 17:41:59  blueyed
  * Fixed NULL handling of TIMESTAMPs and work around the buggy behaviour I was experiencing
  *
