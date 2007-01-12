@@ -62,11 +62,16 @@ skin_content_header();	// Sets charset!
 ?>
 
 <div class="pageHeader">
-
-<h1 id="pageTitle"><?php $Blog->disp( 'name', 'htmlbody' ) ?></h1>
-
-<div class="pageSubtitle"><?php $Blog->disp( 'tagline', 'htmlbody' ) ?></div>
-
+	<?php
+		// Display container and contents:
+		$Skin->container( NT_('Header'), array(
+				// The following params will be used as defaults for widgets included in this container:
+				'block_start' => '<div class="$wi_class$">',
+				'block_end' => '</div>',
+				'block_title_start' => '<h1>',
+				'block_title_end' => '</h1>',
+			) );
+	?>
 </div>
 
 </div>

@@ -74,11 +74,16 @@ skin_content_header();	// Sets charset!
 ?>
 
 <div class="pageHeader">
-
-<h1 id="pageTitle"><a href="<?php $Blog->disp( 'url', 'raw' ) ?>"><?php $Blog->disp( 'name', 'htmlbody' ) ?></a></h1>
-
-<div class="pageSubtitle"><?php $Blog->disp( 'tagline', 'htmlbody' ) ?></div>
-
+	<?php
+		// Display container and contents:
+		$Skin->container( NT_('Header'), array(
+				// The following params will be used as defaults for widgets included in this container:
+				'block_start' => '<div class="$wi_class$">',
+				'block_end' => '</div>',
+				'block_title_start' => '<h1>',
+				'block_title_end' => '</h1>',
+			) );
+	?>
 </div>
 
 <div class="bPosts">
@@ -240,18 +245,19 @@ skin_content_header();	// Sets charset!
 
 
 	<?php
-		// EXPERIMENTAL:
 		// Display container and contents:
 		$Skin->container( NT_('Sidebar'), array(
-				'block_start' => '<div class="bSideItem">',
+				// The following params will be used as defaults for widgets included in this container:
+				'block_start' => '<div class="bSideItem $wi_class$">',
 				'block_end' => '</div>',
+				'block_title_start' => '<h3>',
+				'block_title_end' => '</h3>',
 			) );
 	?>
 
 
 	<div class="bSideItem">
-		<h3><?php $Blog->disp( 'name', 'htmlbody' ) ?></h3>
-		<p><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></p>
+
 		<?php
 			if( isset($MainList) )
 			{ // Links to list pages:
@@ -386,13 +392,11 @@ skin_content_header();	// Sets charset!
 
 <div id="pageFooter">
 	<?php
-		// EXPERIMENTAL:
-		// Double quotes used only for test purposes.
 		// Display container and contents:
 		$Skin->container( NT_("Footer"), array(
-				'block_start' => '<div class="baseline">',
-				'block_end' => '</div>',
+				// The following params will be used as defaults for widgets included in this container:
 			) );
+		// Note: Double quotes have been used around "Footer" only for test purposes.
 	?>
 	<p class="baseline">
 		<a href="<?php echo $Blog->get('msgformurl').'&amp;recipient_id=1&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $Blog->get('msgformurl'))); ?>">Contact the admin</a>.

@@ -68,9 +68,9 @@ $container_list = $Skin->get_containers();
 
 
 $core_componentwidget_codes = array(
-		'coll-title',
-    'coll-tagline',
-    'coll-longdesc',
+		'coll_title',
+    'coll_tagline',
+    'coll_longdesc',
 	);
 
 
@@ -203,6 +203,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2007/01/12 02:40:26  fplanque
+ * widget default params proof of concept
+ * (param customization to be done)
+ *
  * Revision 1.3  2007/01/11 02:57:25  fplanque
  * implemented removing widgets from containers
  *

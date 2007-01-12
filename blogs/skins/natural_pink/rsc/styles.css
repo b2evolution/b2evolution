@@ -116,13 +116,19 @@ a.BlogButtonCurr {
 /*
  * Header styles:
  */
-h1#pageTitle {
+div.pageHeader h1 {
 	font-size: 250%;
 	font-weight: bold;
 	margin: 0;
 	padding: 0;
 }
-.pageSubTitle {
+div.pageHeader h1 a {
+	color: #000;
+}
+div.pageHeader h1 a:hover {
+	color: #c0c;
+}
+div.pageHeader div.widget_core_coll_tagline {
 	letter-spacing: 4px;
 	margin: 1ex 0;
 	font-size: 109%;

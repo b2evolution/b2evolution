@@ -115,6 +115,14 @@ class Skin extends DataObject
 
 		// echo '<div>Debug: container: '.$sco_name.'</div>';
 
+		// Make sure we have the basic params we expect:
+		$params = array_merge( array(
+					'block_start' => '<div class="$wi_class$">',
+					'block_end' => '</div>',
+					'block_title_start' => '<h3>',
+					'block_title_end' => '</h3>',
+				), $params );
+
    	$WidgetCache = & get_Cache( 'WidgetCache' );
 		$Widget_array = & $WidgetCache->get_by_coll_container( $Blog->ID, $sco_name );
 
@@ -337,6 +345,10 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2007/01/12 02:40:26  fplanque
+ * widget default params proof of concept
+ * (param customization to be done)
+ *
  * Revision 1.7  2007/01/12 00:39:11  fplanque
  * bugfix
  *

@@ -83,9 +83,9 @@ class ComponentWidget extends DataObject
 
 		switch( $this->code )
 		{
-			case 'coll-title'    : return T_('Blog Title');
-      case 'coll-tagline'  : return T_('Blog Tagline');
-      case 'coll-longdesc' : return T_('Blog Long Description');
+			case 'coll_title'    : return T_('Blog Title');
+      case 'coll_tagline'  : return T_('Blog Tagline');
+      case 'coll_longdesc' : return T_('Blog Long Description');
 		}
 
 		return T_('Unknown');
@@ -95,45 +95,52 @@ class ComponentWidget extends DataObject
 	/**
 	 * Display the widget!
 	 *
-	 * @param array
+	 * @param array MUST contain at least the basic display params
 	 */
-	function display( $params = array() )
+	function display( $params )
 	{
 		global $Blog;
+
+		// Customize params to the current widget:
+		$params = str_replace( '$wi_class$', 'widget_'.$this->type.'_'.$this->code, $params );
+
+		echo $params['block_start'];
 
 		if( $this->type != 'core' )
 		{
 			echo 'Not handled yet.';
-			return;
 		}
-
-		switch( $this->code )
+		else
 		{
-			case 'coll-title':
-				// fp> TODO: replace HTML by params (fp; will be done shortly)
-				echo '<h1 id="pageTitle">';
-				echo '<a href="'.$Blog->get( 'url', 'raw' ).'">';
-				$Blog->disp( 'name', 'htmlbody' );
-				echo "</a></h1>\n";
-				break;
+			switch( $this->code )
+			{
+				case 'coll_title':
+					// fp> TODO: replace HTML by params (fp; will be done shortly)
+					echo $params['block_title_start'];
+					echo '<a href="'.$Blog->get( 'url', 'raw' ).'">';
+					$Blog->disp( 'name', 'htmlbody' );
+					echo '</a>';
+					echo $params['block_title_end'];
+					break;
 
-      case 'coll-tagline':
-				// fp> TODO: replace HTML by params (fp; will be done shortly)
-				echo '<div class="pageSubtitle">';
-				$Blog->disp( 'tagline', 'htmlbody' );
-				echo '</div>';
-				break;
+	      case 'coll_tagline':
+					// fp> TODO: replace HTML by params (fp; will be done shortly)
+					$Blog->disp( 'tagline', 'htmlbody' );
+					break;
 
-      case 'coll-longdesc':
-				// fp> TODO: replace HTML by params (fp; will be done shortly)
-				echo '<p>';
-				$Blog->disp( 'longdesc', 'htmlbody' );
-				echo '</p>';
-				break;
+	      case 'coll_longdesc':
+					// fp> TODO: replace HTML by params (fp; will be done shortly)
+					echo '<p>';
+					$Blog->disp( 'longdesc', 'htmlbody' );
+					echo '</p>';
+					break;
 
-			default:
-				echo T_('Unknown');
+				default:
+					echo T_('Unknown');
+			}
 		}
+
+		echo $params['block_end'];
 	}
 
 
@@ -169,6 +176,10 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2007/01/12 02:40:26  fplanque
+ * widget default params proof of concept
+ * (param customization to be done)
+ *
  * Revision 1.4  2007/01/11 20:44:19  fplanque
  * skin containers proof of concept
  * (no params handling yet though)

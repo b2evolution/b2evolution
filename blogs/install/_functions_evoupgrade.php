@@ -1567,6 +1567,8 @@ function upgrade_b2evo_tables()
 									DROP COLUMN blog_default_skin,
 									 ADD COLUMN blog_skin_ID INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER blog_allowusercss' );
 		echo "OK.<br />\n";
+
+		install_basic_widgets();
 	}
 
 
@@ -1685,6 +1687,10 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.202  2007/01/12 02:40:26  fplanque
+ * widget default params proof of concept
+ * (param customization to be done)
+ *
  * Revision 1.201  2007/01/08 23:45:48  fplanque
  * A little less rough widget manager...
  * (can handle multiple instances of same widget and remembers order)

@@ -128,14 +128,20 @@ a.BlogButtonCurr {
 /*
  * Header styles:
  */
-h1#pageTitle {
+div.pageHeader h1 {
 	font-size: 250%;
 	font-weight: bold;
 	margin: 0;
 	padding: 0;
 	color:#06a3c4;
 }
-.pageSubtitle {
+div.pageHeader h1 a {
+	color:#06a3c4;
+}
+div.pageHeader h1 a:hover {
+	color: #c0c;
+}
+div.pageHeader div.widget_core_coll_tagline {
 	letter-spacing: 4px;
 	padding: 0 0 3px 0;
 	font-size: 109%;
@@ -163,8 +169,10 @@ div.bTitle {
 	background-color:#06a3c4;
 }
 h3.bTitle {
-	color: #fff;
 	margin: 0 1ex;
+}
+h3.bTitle a {
+	color: #fff;
 }
 .bText {
 	margin: 0 1ex 0;

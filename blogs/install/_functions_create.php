@@ -992,12 +992,45 @@ function install_basic_skins()
 	echo 'Installing default skins... ';
 
 	skin_install( 'custom' );
-	skin_install( 'basic' );
 	skin_install( 'natural_pink' );
+	skin_install( 'nifty_corners' );
+	skin_install( 'photoblog' );
+
+	skin_install( '_atom' );
+	skin_install( '_rss2' );
 
 	echo "OK.<br />\n";
 }
 
+/**
+ * Install basic widgets.
+ */
+function install_basic_widgets()
+{
+	global $DB;
+
+	echo 'Installing default widgets... ';
+
+	// Add title to all blog Headers:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Header", 1, "core", "coll_title"
+							   FROM T_blogs' );
+	// Add tagline to all blogs Headers:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Header", 2, "core", "coll_tagline"
+							   FROM T_blogs' );
+
+	// Add title to all blog Sidebars:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Sidebar", 1, "core", "coll_title"
+							   FROM T_blogs' );
+	// Add longdesc to all blogs Sidebars:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Sidebar", 2, "core", "coll_longdesc"
+							   FROM T_blogs' );
+
+	echo "OK.<br />\n";
+}
 
 /**
  * Install basic plugins.
@@ -1047,6 +1080,10 @@ function install_basic_plugins( $old_db_version = 0 )
 
 /*
  * $Log$
+ * Revision 1.210  2007/01/12 02:40:26  fplanque
+ * widget default params proof of concept
+ * (param customization to be done)
+ *
  * Revision 1.209  2007/01/08 02:11:56  fplanque
  * Blogs now make use of installed skins
  * next step: make use of widgets inside of skins

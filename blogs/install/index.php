@@ -506,6 +506,7 @@ to
 		populate_main_tables();
 		install_basic_skins();
 		install_basic_plugins();
+		install_basic_widgets();
 		?>
 		<h2><?php echo T_('Installation successful!')?></h2>
 
@@ -646,6 +647,10 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.122  2007/01/12 02:40:26  fplanque
+ * widget default params proof of concept
+ * (param customization to be done)
+ *
  * Revision 1.121  2007/01/08 02:11:56  fplanque
  * Blogs now make use of installed skins
  * next step: make use of widgets inside of skins
