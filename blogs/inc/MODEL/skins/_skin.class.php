@@ -118,10 +118,13 @@ class Skin extends DataObject
    	$WidgetCache = & get_Cache( 'WidgetCache' );
 		$Widget_array = & $WidgetCache->get_by_coll_container( $Blog->ID, $sco_name );
 
-		foreach( $Widget_array as $ComponentWidget )
+		if( !empty($Widget_array) )
 		{
-			// Let the Widget dispolay itself (with contextual params):
-			$ComponentWidget->display( $params );
+			foreach( $Widget_array as $ComponentWidget )
+			{
+				// Let the Widget dispolay itself (with contextual params):
+				$ComponentWidget->display( $params );
+			}
 		}
 	}
 
@@ -334,6 +337,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2007/01/12 00:39:11  fplanque
+ * bugfix
+ *
  * Revision 1.6  2007/01/11 20:44:19  fplanque
  * skin containers proof of concept
  * (no params handling yet though)
