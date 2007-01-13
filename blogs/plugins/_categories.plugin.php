@@ -74,8 +74,8 @@ class categories_plugin extends Plugin
 	 *                - 'form' : true|false (default: false)
 	 *                - 'list_start' : (Default '<ul>'), does not get displayed for empty lists
 	 *                - 'list_end' : (Default '</ul>'), does not get displayed for empty lists
-	 *                - 'line_start' : (Default '<li>')
-	 *                - 'line_end' : (Default '</li>')
+	 *                - 'item_start' : (Default '<li>')
+	 *                - 'item_end' : (Default '</li>')
 	 *                - 'group_start' : (Default '<ul>') - (for BLOG 1 Categories)
 	 *                - 'group_end' : (Default "</ul>\n") - (for BLOG 1 Categories)
 	 *                - 'collist_start' : (Default '') - (for BLOG 1 Categories)
@@ -116,17 +116,28 @@ class categories_plugin extends Plugin
 		// Add form fields?:
 		if(!isset($params['form'])) $params['form'] = false;
 
+/* Debugging code, just in case we need it again soon...
+		if(!isset($params['list_start'])) $params['list_start'] = '<br>[list start]'; // '<ul>';
+		if(!isset($params['list_end'])) $params['list_end'] = '<br>[list end]'; // "</ul>\n";
+
+		// This is what will separate the category links:
+		if(!isset($params['item_start'])) $params['item_start'] = '<br>[line start]'; // '<li>';
+		if(!isset($params['item_end'])) $params['item_end'] = '[line end]'; // "</li>\n";
+
+		// This is what will enclose the sub chapter lists:
+		if(!isset($params['group_start'])) $params['group_start'] = '<br>[group start]'; // '<ul>';
+		if(!isset($params['group_end'])) $params['group_end'] = '<br>[group end]'; // "</ul>\n";
+*/
 
 		// This is what will enclose the category list:
 		if(!isset($params['list_start'])) $params['list_start'] = '<ul>';
 		if(!isset($params['list_end'])) $params['list_end'] = "</ul>\n";
 
 		// This is what will separate the category links:
-		if(!isset($params['line_start'])) $params['line_start'] = '<li>';
-		if(!isset($params['line_end'])) $params['line_end'] = "</li>\n";
+		if(!isset($params['item_start'])) $params['item_start'] = '<li>';
+		if(!isset($params['item_end'])) $params['item_end'] = "</li>\n";
 
 		// This is what will enclose the sub chapter lists:
-		// fp> TODO: Change the ordering so that <ul></ul> subgroups are included inside <li></li>
 		if(!isset($params['group_start'])) $params['group_start'] = '<ul>';
 		if(!isset($params['group_end'])) $params['group_end'] = "</ul>\n";
 
@@ -176,7 +187,7 @@ class categories_plugin extends Plugin
 
 			if( $params['option_all'] )
 			{	// We want to display a link to all cats:
-				$tmp_disp .= $this->params['line_start'].'<a href="';
+				$tmp_disp .= $this->params['item_start'].'<a href="';
 				if( $this->params['link_type'] == 'context' )
 				{	// We want to preserve current browsing context:
 					$tmp_disp .= regenerate_url( 'cats,catsel' );
@@ -186,7 +197,7 @@ class categories_plugin extends Plugin
 					$tmp_disp .= get_bloginfo('blogurl');
 				}
 				$tmp_disp .= '">'.$params['option_all'].'</a>';
-				$tmp_disp .= $this->params['line_end'];
+				$tmp_disp .= $this->params['item_end'];
 			}
 
 			$r = $tmp_disp . $ChapterCache->recurse( $callbacks, $blog );
@@ -280,7 +291,7 @@ class categories_plugin extends Plugin
 	 */
 	function cat_line( $Chapter, $level )
 	{
-		$r = $this->params['line_start'];
+		$r = $this->params['item_start'];
 
 		if( $this->params['form'] )
 		{	// We want to add form fields:
@@ -311,7 +322,8 @@ class categories_plugin extends Plugin
 			$r .= '</label>';
 		}
 
-		$r .= $this->params['line_end'];
+		// Do not end line here because we need to include children first!
+		// $r .= $this->params['item_end'];
 
 		return $r;
 	}
@@ -326,7 +338,8 @@ class categories_plugin extends Plugin
 	 */
 	function cat_no_children( $Chapter, $level )
 	{
-		return '';
+		// End current line:
+		return $this->params['item_end'];
 	}
 
 
@@ -339,7 +352,10 @@ class categories_plugin extends Plugin
 	function cat_before_level( $level )
 	{
 		$r = '';
-		if( $level > 0 ) $r .= $this->params['group_start'];
+		if( $level > 0 )
+		{	// If this is not the root:
+			$r .= $this->params['group_start'];
+		}
 		return $r;
 	}
 
@@ -352,7 +368,12 @@ class categories_plugin extends Plugin
 	function cat_after_level( $level )
 	{
 		$r = '';
-		if( $level > 0 ) $r .= $this->params['group_end'];
+		if( $level > 0 )
+		{	// If this is not the root:
+			$r .= $this->params['group_end'];
+			// End current (parent) line:
+			$r .= $this->params['item_end'];
+		}
 		return $r;
 	}
 }
@@ -360,6 +381,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.40  2007/01/13 23:36:36  fplanque
+ * fixed validation of subcats; I hope...
+ *
  * Revision 1.39  2007/01/13 18:36:24  fplanque
  * renamed "Skin Tag" plugins into "Widget" plugins
  * but otherwise they remain basically the same & compatible
