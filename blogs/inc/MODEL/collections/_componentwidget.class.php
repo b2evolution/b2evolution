@@ -95,6 +95,7 @@ class ComponentWidget extends DataObject
 			}
 			else
 			{
+				// TODO: dh> shouldn't this store a reference?
 				$this->Plugin = $Plugins->get_by_code( $this->code );
 			}
 		}
@@ -212,6 +213,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2007/01/13 14:35:42  blueyed
+ * todo: $Plugin should be a ref?!
+ *
  * Revision 1.6  2007/01/13 04:10:44  fplanque
  * implemented "add" support for plugin widgets
  *
