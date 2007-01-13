@@ -872,7 +872,6 @@ class Results extends Table
 		// BODY START:
 		$this->display_body_start();
 
-		// Used to set an id to fadeout element
 		foreach( $this->rows as $row )
 		{ // For each row/line:
 
@@ -1807,6 +1806,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.41  2007/01/13 16:41:51  blueyed
+ * doc
+ *
  * Revision 1.40  2007/01/11 21:06:05  fplanque
  * bugfix
  *

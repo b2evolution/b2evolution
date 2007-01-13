@@ -279,11 +279,11 @@ class Plugin
 	 *
 	 * fp> This is FREAKING INSANE! The only purpose I can see for this is to prevent debugging with pre_dump() of the Plugin!
 	 * fp> There is ONLY ONE "mother". She's not hard to find! (Or at least she shouldn't be!!)
-	 * dh> pre_dump() handles this, since it does not use var_export() anymore (recursion)
-	 * pre_dump() does NOT handle "this". It displays a kilometer long dump of irrelevant stuff when trying to dump a single plugin. All it probably "handles" is inifnite loops, but that's not the issue here. 
 	 * dh> IMHO it _is_ required
 	 * fp> Required for what? for not using global Plugins?
-	 * @todo get rid of this!
+	 * dh> For having the reference to the "mother". It may be Plugins or Plugins_admin, but using a global named $Plugins always _could_ work.
+	 *     But I don't see a problem here really, except (sort of) when var_dumping. You may want to use xdebug, which limits this (new version).
+	 * @todo fp> get rid of this!
 	 *
 	 * @var Plugins_admin
 	 */
@@ -2815,6 +2815,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.133  2007/01/13 16:41:51  blueyed
+ * doc
+ *
  * Revision 1.132  2007/01/13 03:34:00  fplanque
  * ...
  *
