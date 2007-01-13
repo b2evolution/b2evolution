@@ -44,6 +44,13 @@ class ComponentWidget extends DataObject
 	var $code;
 	var $params;
 
+	/**
+	 * Lazy instanciated
+	 * (false if this Widget is not handled by a Plugin)
+	 * @var Plugin
+	 */
+	var $Plugin = NULL;
+
 
 	/**
 	 * Constructor
@@ -72,22 +79,51 @@ class ComponentWidget extends DataObject
 
 
 	/**
+	 * Get ref to Plugin handling this Widget
+	 *
+	 * @return Plugin
+	 */
+	function & get_Plugin()
+	{
+		global $Plugins;
+
+		if( is_null( $this->Plugin ) )
+		{
+			if( $this->type != 'plugin' )
+			{
+				$this->Plugin = false;
+			}
+			else
+			{
+				$this->Plugin = $Plugins->get_by_code( $this->code );
+			}
+		}
+
+		return $this->Plugin;
+	}
+
+
+	/**
 	 * Get name of widget
 	 */
 	function get_name()
 	{
-		if( $this->type != 'core' )
+		switch( $this->type )
 		{
-			return 'Not handled yet.';
-		}
+			case 'core':
+				switch( $this->code )
+				{
+					case 'coll_title'    : return T_('Blog Title');
+		      case 'coll_tagline'  : return T_('Blog Tagline');
+		      case 'coll_longdesc' : return T_('Blog Long Description');
+				}
+				break;
 
-		switch( $this->code )
-		{
-			case 'coll_title'    : return T_('Blog Title');
-      case 'coll_tagline'  : return T_('Blog Tagline');
-      case 'coll_longdesc' : return T_('Blog Long Description');
+			case 'plugin':
+				$this->get_Plugin();
+				return $this->Plugin->name;
+				break;
 		}
-
 		return T_('Unknown');
 	}
 
@@ -176,6 +212,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2007/01/13 04:10:44  fplanque
+ * implemented "add" support for plugin widgets
+ *
  * Revision 1.5  2007/01/12 02:40:26  fplanque
  * widget default params proof of concept
  * (param customization to be done)

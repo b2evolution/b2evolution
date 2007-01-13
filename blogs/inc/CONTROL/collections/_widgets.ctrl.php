@@ -20,6 +20,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @var AdminUI
  */
 global $AdminUI;
+/**
+ * @var Plugins
+ */
+global $Plugins;
 
 load_class( 'MODEL/collections/_componentwidget.class.php' );
 
@@ -93,15 +97,31 @@ switch( $action )
 			break;
 		}
 
-		if( $type != 'core' )
+		switch( $type )
 		{
-			debug_die( 'Unhandled widget type' );
+			case 'core':
+				// Check the requested core widget is valid:
+				if( !in_array( $code, $core_componentwidget_codes ) )
+				{
+					debug_die( 'Unhandled core widget code' );
+				}
+				break;
+
+			case 'plugin':
+				if( ! $Plugin = & $Plugins->get_by_code( $code ) )
+				{
+					debug_die( 'Requested plugin not found' );
+				}
+				if( ! $Plugins->has_event( $Plugin->ID, 'SkinTag' ) )
+				{
+					debug_die( 'Requested plugin does not support SkinTag' );
+				}
+				break;
+
+			default:
+				debug_die( 'Unhandled widget type' );
 		}
 
-		if( !in_array( $code, $core_componentwidget_codes ) )
-		{
-			debug_die( 'Unhandled widget code' );
-		}
 
 		$edited_ComponentWidget = & new ComponentWidget( NULL, $type, $code, array() );
 		$edited_ComponentWidget->set( 'coll_ID', $Blog->ID );
@@ -125,7 +145,7 @@ switch( $action )
 		$Messages->add( $msg, 'success' );
 
 		// PREVENT RELOAD & Switch to list mode:
-		header_redirect( '?ctrl=widgets&amp;blog='.$blog );
+		header_redirect( '?ctrl=widgets&blog='.$blog );
 		break;
 
  	case 'list':
@@ -203,6 +223,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2007/01/13 04:10:44  fplanque
+ * implemented "add" support for plugin widgets
+ *
  * Revision 1.5  2007/01/12 05:15:07  fplanque
  * minor fix
  *
