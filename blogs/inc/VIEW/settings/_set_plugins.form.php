@@ -53,6 +53,11 @@ $Results = new Results( '
 	'plug_', '-A-' /* by name */, NULL /* no limit */ );
 
 $Results->Cache = & $admin_Plugins;
+$Results->group_by_obj_prop = 'group';
+$Results->grp_cols[] = array(
+		'td' => '% ( empty( {Obj}->group ) && $this->current_group_count[0] > 1 ? T_(\'Un-Grouped\') : {Obj}->group ) %',
+		'td_colspan' => 0,
+	);
 
 $Results->title = T_('Installed plugins');
 
@@ -120,26 +125,6 @@ $Results->cols[] = array(
 		'order_objects_callback' => 'plugin_results_name_order_callback',
 		'td' => '% plugin_results_td_name( {Obj} ) %',
 	);
-
-if( count($admin_Plugins->get_plugin_groups()) )
-{
-	/*
-	 * PLUGIN GROUP TD:
-	 */
-	function plugin_results_group_order_callback( $a, $b, $order )
-	{
-		global $admin_Plugins;
-
-		$r = $admin_Plugins->sort_Plugin_group( $a->ID, $b->ID );
-		if( $order == 'DESC' ) { $r = -$r; }
-		return $r;
-	}
-	$Results->cols[] = array(
-			'th' => T_('Group'),
-			'order_objects_callback' => 'plugin_results_group_order_callback',
-			'td' => '% {Obj}->group %',
-		);
-}
 
 /*
  * PRIORITY TD:
@@ -258,6 +243,9 @@ unset($Results); // free memory
 
 /*
  * $Log$
+ * Revision 1.45  2007/01/13 19:19:58  blueyed
+ * Group by plugin group; removed the "Group" column therefor
+ *
  * Revision 1.44  2007/01/07 18:42:35  fplanque
  * cleaned up reload/refresh icons & links
  *
