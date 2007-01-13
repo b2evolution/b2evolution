@@ -91,8 +91,8 @@ while( $loop_Plugin = & $AvailablePlugins->get_next() )
 		$current_group = $loop_Plugin->group;
 		$current_sub_group = '';
 		?>
-		<tr class="PluginsGroup">
-			<th colspan="5"><?php
+		<tr class="group">
+			<td colspan="5" class="first"><?php
 			if( $current_group == '' || $current_group == 'Un-Grouped' )
 			{
 				echo T_('Un-Classified');
@@ -101,7 +101,7 @@ while( $loop_Plugin = & $AvailablePlugins->get_next() )
 			{
 				echo $current_group;
 			}
-			?></th>
+			?></td>
 		</tr>
 		<?php
 	}
@@ -197,6 +197,9 @@ $Table->display_list_end();
 
 /*
  * $Log$
+ * Revision 1.9  2007/01/13 22:38:13  fplanque
+ * normalized
+ *
  * Revision 1.8  2007/01/11 02:25:06  fplanque
  * refactoring of Table displays
  * body / line / col / fadeout
