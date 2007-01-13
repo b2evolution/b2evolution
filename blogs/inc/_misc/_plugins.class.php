@@ -1658,8 +1658,6 @@ class Plugins
 
 	/**
 	 * (Re)load Plugin Events for enabled (normal use) or all (admin use) plugins.
-	 *
-	 * @todo fp> make decent use of classes. redefine this function in Plugins_admin and don't do dirty tricks like $this->is_admin_class
 	 */
 	function load_events()
 	{
@@ -1672,7 +1670,7 @@ class Plugins
 				SELECT pevt_plug_ID, pevt_event
 					FROM T_pluginevents INNER JOIN T_plugins ON pevt_plug_ID = plug_ID
 				 WHERE pevt_enabled > 0
-				 '.( $this->is_admin_class ? '' : 'AND plug_status = "enabled"' ).'
+				   AND plug_status = "enabled"
 				 ORDER BY plug_priority, plug_classname', OBJECT, 'Loading plugin events' ) as $l_row )
 		{
 			$this->index_event_IDs[$l_row->pevt_event][] = $l_row->pevt_plug_ID;
@@ -1798,6 +1796,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.132  2007/01/13 14:57:28  blueyed
+ * Removed $is_admin_class hack from load_events() by re-implementing (copying most of it) to Plugins_admin as per todo
+ *
  * Revision 1.131  2007/01/13 04:09:40  fplanque
  * doc
  *

@@ -577,6 +577,29 @@ class Plugins_admin extends Plugins
 
 
 	/**
+	 * (Re)load Plugin Events for enabled (normal use) or all (admin use) plugins.
+	 *
+	 * This is the same as {@link Plugins::load_events()} except that it loads all Plugins (not just enabled ones)
+	 */
+	function load_events()
+	{
+		global $Debuglog, $DB;
+
+		$this->index_event_IDs = array();
+
+		$Debuglog->add( 'Loading plugin events.', 'plugins' );
+		foreach( $DB->get_results( '
+				SELECT pevt_plug_ID, pevt_event
+					FROM T_pluginevents INNER JOIN T_plugins ON pevt_plug_ID = plug_ID
+				 WHERE pevt_enabled > 0
+				 ORDER BY plug_priority, plug_classname', OBJECT, 'Loading plugin events' ) as $l_row )
+		{
+			$this->index_event_IDs[$l_row->pevt_event][] = $l_row->pevt_plug_ID;
+		}
+	}
+
+
+	/**
 	 * Save the events that the plugin provides into DB, while removing obsolete
 	 * entries (that the plugin does not register anymore).
 	 *
@@ -1347,6 +1370,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.25  2007/01/13 14:57:28  blueyed
+ * Removed $is_admin_class hack from load_events() by re-implementing (copying most of it) to Plugins_admin as per todo
+ *
  * Revision 1.24  2007/01/12 05:14:42  fplanque
  * doc
  *
