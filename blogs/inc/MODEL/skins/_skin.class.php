@@ -100,7 +100,11 @@ class Skin extends DataObject
 
 
 	/**
-	 *	Display a container
+	 * Display a container
+	 *
+	 * @todo fp> if it doesn't get any skin specific, move it outta here! :P
+	 * fp> Do we need Skin objects in the frontoffice at all? -- Do we want to include the dispatcher into the Skin object? WARNING: globals
+	 * fp> We might want to customize the container defaults. -- Per blog or per skin?
 	 *
 	 * @param string
 	 * @param array
@@ -345,6 +349,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2007/01/13 18:37:29  fplanque
+ * doc
+ *
  * Revision 1.8  2007/01/12 02:40:26  fplanque
  * widget default params proof of concept
  * (param customization to be done)
