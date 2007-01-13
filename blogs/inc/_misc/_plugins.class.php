@@ -1618,6 +1618,10 @@ class Plugins
 	/**
 	 * Has a plugin a specific event registered/enabled?
 	 *
+	 * @todo fp> The plugin should discover its events itself / This question should be asked to the Plugin itself. 
+	 *
+	 * @param integer
+	 * @param string
 	 * @return boolean
 	 */
 	function has_event( $plugin_ID, $event )
@@ -1636,14 +1640,14 @@ class Plugins
 	 *                should be served by the same plugin.
 	 * @return boolean
 	 */
-	function are_events_available( $events, $by_one_plugin = false )
+	function are_events_available( $events, $require_all_in_same_plugin = false )
 	{
 		if( ! is_array($events) )
 		{
 			$events = array($events);
 		}
 
-		if( $by_one_plugin )
+		if( $require_all_in_same_plugin )
 		{
 			return (bool)$this->get_list_by_all_events( $events );
 		}
@@ -1794,6 +1798,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.131  2007/01/13 04:09:40  fplanque
+ * doc
+ *
  * Revision 1.130  2007/01/12 22:05:28  blueyed
  * Real fix for Plugins::get_list_by_* (keeping and returning reference instead of copy)
  *
