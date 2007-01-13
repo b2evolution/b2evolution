@@ -95,8 +95,7 @@ class ComponentWidget extends DataObject
 			}
 			else
 			{
-				// TODO: dh> shouldn't this store a reference?
-				$this->Plugin = $Plugins->get_by_code( $this->code );
+				$this->Plugin = & $Plugins->get_by_code( $this->code );
 			}
 		}
 
@@ -121,8 +120,12 @@ class ComponentWidget extends DataObject
 				break;
 
 			case 'plugin':
-				$this->get_Plugin();
-				return $this->Plugin->name;
+				// Make sure Plugin is loaded:
+				if( $this->get_Plugin() )
+				{
+					return $this->Plugin->name;
+				}
+				return T_('Inactive / Uninstalled plugin');
 				break;
 		}
 		return T_('Unknown');
@@ -132,52 +135,58 @@ class ComponentWidget extends DataObject
 	/**
 	 * Display the widget!
 	 *
+	 * @todo fp> handle custom params for each widget
+	 *
 	 * @param array MUST contain at least the basic display params
 	 */
 	function display( $params )
 	{
 		global $Blog;
+		global $Plugins;
 
 		// Customize params to the current widget:
 		$params = str_replace( '$wi_class$', 'widget_'.$this->type.'_'.$this->code, $params );
 
-		echo $params['block_start'];
-
-		if( $this->type != 'core' )
+		switch( $this->type )
 		{
-			echo 'Not handled yet.';
+			case 'core':
+				echo $params['block_start'];
+
+				switch( $this->code )
+				{
+					case 'coll_title':
+						// fp> TODO: replace HTML by params (fp; will be done shortly)
+						echo $params['block_title_start'];
+						echo '<a href="'.$Blog->get( 'url', 'raw' ).'">';
+						$Blog->disp( 'name', 'htmlbody' );
+						echo '</a>';
+						echo $params['block_title_end'];
+						break;
+
+		      case 'coll_tagline':
+						// fp> TODO: replace HTML by params (fp; will be done shortly)
+						$Blog->disp( 'tagline', 'htmlbody' );
+						break;
+
+		      case 'coll_longdesc':
+						// fp> TODO: replace HTML by params (fp; will be done shortly)
+						echo '<p>';
+						$Blog->disp( 'longdesc', 'htmlbody' );
+						echo '</p>';
+						break;
+
+					default:
+						echo T_('Unknown');
+				}
+
+				echo $params['block_end'];
+				break;
+
+			case 'plugin':
+				// Call plugin (will return silently if Plugin is not enabled):
+				$Plugins->call_by_code( $this->code, $params );
+				break;
 		}
-		else
-		{
-			switch( $this->code )
-			{
-				case 'coll_title':
-					// fp> TODO: replace HTML by params (fp; will be done shortly)
-					echo $params['block_title_start'];
-					echo '<a href="'.$Blog->get( 'url', 'raw' ).'">';
-					$Blog->disp( 'name', 'htmlbody' );
-					echo '</a>';
-					echo $params['block_title_end'];
-					break;
-
-	      case 'coll_tagline':
-					// fp> TODO: replace HTML by params (fp; will be done shortly)
-					$Blog->disp( 'tagline', 'htmlbody' );
-					break;
-
-	      case 'coll_longdesc':
-					// fp> TODO: replace HTML by params (fp; will be done shortly)
-					echo '<p>';
-					$Blog->disp( 'longdesc', 'htmlbody' );
-					echo '</p>';
-					break;
-
-				default:
-					echo T_('Unknown');
-			}
-		}
-
-		echo $params['block_end'];
 	}
 
 
@@ -213,6 +222,10 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2007/01/13 18:40:33  fplanque
+ * SkinTag/Widget plugins now get displayed inside of the containers.
+ * next step: adapt all default skins to use this.
+ *
  * Revision 1.7  2007/01/13 14:35:42  blueyed
  * todo: $Plugin should be a ref?!
  *
