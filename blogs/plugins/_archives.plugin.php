@@ -109,12 +109,12 @@ class archives_plugin extends Plugin
 		 * @var Blog
 		 */
 		global $Blog;
-		
+
 		if( empty($Blog) )
 		{
 			return false;
 		}
-		
+
 		/**
 		 * Default params:
 		 */
@@ -450,6 +450,7 @@ class ArchiveList extends Results
 	 * Count the number of rows of the SQL result
 	 *
 	 * These queries are complex enough for us not to have to rewrite them:
+	 * dh> ???
 	 */
 	function count_total_rows()
 	{
@@ -491,7 +492,7 @@ class ArchiveList extends Results
 
 		// echo $sql_count;
 
-		$this->total_rows = $this->DB->get_var( $sql_count ); //count total rows
+		$this->total_rows = $DB->get_var( $sql_count ); //count total rows
 
 		// echo 'total rows='.$this->total_rows;
 	}
@@ -560,6 +561,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.36  2007/01/13 16:55:00  blueyed
+ * Removed $DB member of Results class and use global $DB instead
+ *
  * Revision 1.35  2006/12/26 03:19:12  fplanque
  * assigned a few significant plugin groups
  *

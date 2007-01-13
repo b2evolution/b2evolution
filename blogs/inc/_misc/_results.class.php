@@ -46,8 +46,6 @@ require_once dirname(__FILE__).'/_widget.class.php';
  */
 class Results extends Table
 {
-	var $DB;
-
 	/**
 	 * SQL query
 	 */
@@ -241,8 +239,6 @@ class Results extends Table
 	 */
 	function Results( $sql, $param_prefix = '', $default_order = '', $limit = 20, $count_sql = NULL, $init_page = true )
 	{
-		global $DB;
-		$this->DB = & $DB;
 		$this->sql = $sql;
 		$this->limit = $limit;
 		$this->param_prefix = $param_prefix;
@@ -308,6 +304,8 @@ class Results extends Table
 	 */
 	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
 	{
+		global $DB;
+
 		if( !is_null( $this->rows ) )
 		{ // Query has already executed:
 			return;
@@ -385,10 +383,10 @@ class Results extends Table
 		}
 
 		// Execute query and store results
-		$this->rows = $this->DB->get_results( $sql );
+		$this->rows = $DB->get_results( $sql );
 
 		// Store row count
-		$this->result_num_rows = $this->DB->num_rows;
+		$this->result_num_rows = $DB->num_rows;
 
 
 		// Sort with callbacks:
@@ -496,6 +494,8 @@ class Results extends Table
 	 */
 	function count_total_rows( $sql_count = NULL )
 	{
+		global $DB;
+
 		if( empty( $sql_count ) )
 		{
 			if( is_null($this->sql) )
@@ -547,7 +547,7 @@ class Results extends Table
 			// echo $sql_count;
 		}
 
-		$this->total_rows = $this->DB->get_var( $sql_count ); //count total rows
+		$this->total_rows = $DB->get_var( $sql_count ); //count total rows
 
 		$this->total_pages = empty($this->limit) ? 1 : ceil($this->total_rows / $this->limit);
 
@@ -1806,6 +1806,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.42  2007/01/13 16:55:00  blueyed
+ * Removed $DB member of Results class and use global $DB instead
+ *
  * Revision 1.41  2007/01/13 16:41:51  blueyed
  * doc
  *
