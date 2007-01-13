@@ -47,7 +47,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	//     Instead of using an array directly, we could use an object (which holds an array).
 	//     Besides the used solution should get used everywhere we're outputting html HEAD and
 	//     e.g. want to allow Plugins inserting something there.
-	// fp> Object would be instanciated only once and there would be no need for derived classes. One single encapsulated variable. So object handling here would be bloated.
+	// fp> Object would be instantiated only once and there would be no need for derived classes. One single encapsulated variable. So object handling here would be bloated.
 	// Use functions. And you only need to initialize critical vars in _vars. BUT even better: how about enabling the killing of superglobals in _main.php?
 	if( isset($evo_html_headlines) ) foreach( $evo_html_headlines as $v )
 	{
@@ -79,6 +79,9 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
+ * Revision 1.16  2007/01/13 22:28:13  fplanque
+ * doc
+ *
  * Revision 1.15  2006/12/04 00:18:52  fplanque
  * keeping the login hashing
  *

@@ -158,7 +158,7 @@ class Results extends Table
 	 *
 	 * Leave empty if you don't want to group.
 	 *
-	 * NOTE: you probably want to use ORDER BY in your query for this to work correctly.
+	 * NOTE: you have to use ORDER BY goup_column in your query for this to work correctly.
 	 *
 	 * @var mixed string or array
 	 */
@@ -1971,6 +1971,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.44  2007/01/13 22:28:12  fplanque
+ * doc
+ *
  * Revision 1.43  2007/01/13 19:19:24  blueyed
  * Grouping by object properties
  *

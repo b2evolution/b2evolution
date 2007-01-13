@@ -3,6 +3,8 @@
  * This file implements the UI view for the plugin settings.
  *
  * @todo dh> Move plugin's group name to DB setting?!
+ * fp> this would actually make more sense than renaming the name and code of plugins, but it's still complexity we don't really need.
+ * fp> When you reach that level of needs you're already a plugin maniac/developper and you hack the plugin php code anyway.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -59,6 +61,11 @@ $Results->Cache = & $admin_Plugins;
 /*
 // TODO: dh> make this an optional view (while also removing the "group" col then)?
 //           It's nice to have, but does not allow sorting by priority really..
+// fp> Yes, 90% pf the time, seing a grouped list is what we'd need most. (sorted by priority within each group by default)
+// in the remaining 10% we need an overall priority view because a plugin is not in the right group or more problematic: in multiple groups
+// BTW, when does the priority apply besides for rendering? I think we should document that at the bottom of the screen. ("Apply" needs an short explanation too).
+// BTW, "category" or "class" or "family" would be a better name for plugin "group"s. "group" sounds arbitrary. I think this shoudl convey the idea of a "logical grouping" by "main" purpose of the plugin.
+//
 $Results->group_by_obj_prop = 'group';
 $Results->grp_cols[] = array(
 		'td' => '% ( empty( {Obj}->group ) && $this->current_group_count[0] > 1 ? T_(\'Un-Grouped\') : {Obj}->group ) %',
@@ -270,6 +277,9 @@ unset($Results); // free memory
 
 /*
  * $Log$
+ * Revision 1.47  2007/01/13 22:28:13  fplanque
+ * doc
+ *
  * Revision 1.46  2007/01/13 19:37:39  blueyed
  * Removed grouping by group from installed plugins. It should be an alternative view probably, if it is useful at all
  *

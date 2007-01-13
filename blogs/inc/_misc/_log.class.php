@@ -307,7 +307,7 @@ class Log
 	 *
 	 * @todo Make this simple!
 	 * start by getting rid of the $category selection and the special cases for 'all'. If you don't want to display ALL messages,
-	 * then you should not log them in the same Log ovject and you should instanciate separate logs instead.
+	 * then you should not log them in the same Log object and you should instantiate separate logs instead.
 	 *
 	 * @param string|NULL Header/title, might be array ( category => msg ),
 	 *                    'container' is then top. NULL for object's default ({@link Log::head}.
@@ -701,6 +701,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.15  2007/01/13 22:28:12  fplanque
+ * doc
+ *
  * Revision 1.14  2006/12/07 23:13:13  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!

@@ -45,7 +45,7 @@ class ComponentWidget extends DataObject
 	var $params;
 
 	/**
-	 * Lazy instanciated
+	 * Lazy instantiated
 	 * (false if this Widget is not handled by a Plugin)
 	 * @var Plugin
 	 */
@@ -222,6 +222,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2007/01/13 22:28:12  fplanque
+ * doc
+ *
  * Revision 1.8  2007/01/13 18:40:33  fplanque
  * SkinTag/Widget plugins now get displayed inside of the containers.
  * next step: adapt all default skins to use this.
