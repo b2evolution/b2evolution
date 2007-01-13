@@ -154,19 +154,34 @@ class Results extends Table
 
 
 	/**
-	 * Fieldname to group on.
+	 * DB fieldname to group on.
 	 *
 	 * Leave empty if you don't want to group.
 	 *
-	 * @var string
+	 * NOTE: you probably want to use ORDER BY in your query for this to work correctly.
+	 *
+	 * @var mixed string or array
 	 */
 	var $group_by = '';
 
 	/**
-	 * Current group identifier:
-	 * @var string
+	 * Object property/properties to group on.
+	 *
+	 * Objects get instantiated and grouped by the given property/member value.
+	 *
+	 * NOTE: this requires {@link Result::Cache} to be set and is probably only useful,
+	 *       if you do not use {@link Result::limit}, because grouping appears after
+	 *       the relevant data has been pulled from DB.
+	 *
+	 * @var mixed string or array
 	 */
-	var $current_group_ID = 0;
+	var $group_by_obj_prop;
+
+	/**
+	 * Current group identifier (by level/depth)
+	 * @var array
+	 */
+	var $current_group_ID;
 
 	/**
 	 * Definitions for each GROUP column:
@@ -202,7 +217,7 @@ class Results extends Table
 	var $order_field_list;
 
 	/**
-	 * List of sortable columns by callback ("order_objects_callback" and "order_rows_callback"
+	 * List of sortable columns by callback ("order_objects_callback" and "order_rows_callback")
 	 * @var array
 	 */
 	var $order_callbacks;
@@ -276,7 +291,7 @@ class Results extends Table
 
 		$this->global_is_last = ( $this->global_idx >= $this->total_rows-1 ) ? true : false;
 
-		$this->current_group_ID = 0;
+		$this->current_group_ID = NULL;
 	}
 
 
@@ -393,7 +408,7 @@ class Results extends Table
 		if( $this->order_callbacks )
 		{
 			if( $append_limit && !empty($this->limit) )
-			{
+			{ // Check for sorting with callbacks:
 				debug_die( '"order_objects_callback"/"order_rows_callback" are not supported with LIMIT.' );
 			}
 
@@ -414,7 +429,99 @@ class Results extends Table
 			}
 		}
 
+		// Group by object property:
+		if( ! empty($this->group_by_obj_prop) )
+		{
+			if( ! is_array($this->group_by_obj_prop) )
+			{
+				$this->group_by_obj_prop = array($this->group_by_obj_prop);
+			}
+
+			$this->mergesort( $this->rows, array( &$this, 'callback_group_by_obj_prop' ) );
+		}
+
 		// echo '<br />rows on page='.$this->result_num_rows;
+	}
+
+
+	/**
+	 * Merge sort. This is required to not re-order items when sorting for e.g. grouping at the end.
+	 *
+	 * @see http://de2.php.net/manual/en/function.usort.php#38827
+	 *
+	 * @param array List of items to sort
+	 * @param callback Sort function/method
+	 */
+	function mergesort(&$array, $cmp_function)
+	{
+		// Arrays of size < 2 require no action.
+		if (count($array) < 2) return;
+		// Split the array in half
+		$halfway = count($array) / 2;
+		$array1 = array_slice($array, 0, $halfway);
+		$array2 = array_slice($array, $halfway);
+		// Recurse to sort the two halves
+		$this->mergesort($array1, $cmp_function);
+		$this->mergesort($array2, $cmp_function);
+		// If all of $array1 is <= all of $array2, just append them.
+		if (call_user_func($cmp_function, end($array1), $array2[0]) < 1) {
+				$array = array_merge($array1, $array2);
+				return;
+		}
+		// Merge the two sorted arrays into a single sorted array
+		$array = array();
+		$ptr1 = $ptr2 = 0;
+		while ($ptr1 < count($array1) && $ptr2 < count($array2)) {
+				if (call_user_func($cmp_function, $array1[$ptr1], $array2[$ptr2]) < 1) {
+						$array[] = $array1[$ptr1++];
+				}
+				else {
+						$array[] = $array2[$ptr2++];
+				}
+		}
+		// Merge the remainder
+		while ($ptr1 < count($array1)) $array[] = $array1[$ptr1++];
+		while ($ptr2 < count($array2)) $array[] = $array2[$ptr2++];
+		return;
+	 }
+
+
+	/**
+	 * Callback, to sort {@link Result::rows} according to {@link Result::group_by_obj_prop}.
+	 *
+	 * @param array DB row for object A
+	 * @param array DB row for object B
+	 * @param integer Depth, used internally (you can group on a list of member properties)
+	 * @return integer
+	 */
+	function callback_group_by_obj_prop( $row_a, $row_b, $depth = 0 )
+	{
+		$obj_prop = $this->group_by_obj_prop[$depth];
+
+		$a = & $this->Cache->instantiate($row_a);
+		$a_value = $a->$obj_prop;
+		$b = & $this->Cache->instantiate($row_b);
+		$b_value = $b->$obj_prop;
+
+		if( $a_value == $b_value )
+		{
+			if( $depth+1 < count($this->group_by_obj_prop) )
+			{
+				return $this->callback_group_by_obj_prop( $row_a, $row_b, ($depth + 1) );
+			}
+			else
+			{ // on the last level of grouping:
+				return 0;
+			}
+		}
+
+		// Sort empty group_by-values to the bottom
+		if( empty($a_value) )
+			return 1;
+		if( empty($b_value) )
+			return -1;
+
+		return strcasecmp( $a_value, $b_value );
 	}
 
 
@@ -872,20 +979,78 @@ class Results extends Table
 		// BODY START:
 		$this->display_body_start();
 
+		// Prepare data for grouping:
+		$group_by_all = array();
+		if( ! empty($this->group_by) )
+		{
+			$group_by_all['row'] = is_array($this->group_by) ? $this->group_by : array($this->group_by);
+		}
+		if( ! empty($this->group_by_obj_prop) )
+		{
+			$group_by_all['obj_prop'] = is_array($this->group_by_obj_prop) ? $this->group_by_obj_prop : array($this->group_by_obj_prop);
+		}
+
+		$this->current_group_count = array(); // useful in parse_col_content()
+
+
 		foreach( $this->rows as $row )
 		{ // For each row/line:
 
 			/*
 			 * GROUP ROW stuff:
 			 */
-			if( !empty($this->group_by) )
-			{	// We are grouping...
-				if( $row->{$this->group_by} != $this->current_group_ID )
-				{	// We have just entered a new group!
-					// memorize new group identifier:
-					$this->current_group_ID = $row->{$this->group_by};
+			if( ! empty($group_by_all) )
+			{	// We are grouping (by SQL and/or object property)...
 
-					echo '<tr class="group">';
+				$group_depth = 0;
+				$group_changed = false;
+				foreach( $group_by_all as $type => $names )
+				{
+					foreach( $names as $name )
+					{
+						if( $type == 'row' )
+						{
+							$value = $row->$name;
+						}
+						elseif( $type == 'obj_prop' )
+						{
+							$this->current_Obj = $this->Cache->instantiate($row); // useful also for parse_col_content() below
+							$value = $this->current_Obj->$name;
+						}
+						else debug_die( 'Invalid Results-group_by-type: '.var_export( $type, true ) );
+
+
+						if( $this->current_group_ID[$group_depth] != $value )
+						{ // Group changed here:
+							$this->current_group_ID[$group_depth] = $value;
+
+							if( ! isset($this->current_group_count[$group_depth]) )
+							{
+								$this->current_group_count[$group_depth] = 0;
+							}
+							else
+							{
+								$this->current_group_count[$group_depth]++;
+							}
+
+							// unset sub-group identifiers:
+							for( $i = $group_depth+1, $n = count($this->current_group_ID); $i < $n; $i++ )
+							{
+								unset($this->current_group_ID[$i]);
+							}
+
+							$group_changed = true;
+							break 2;
+						}
+
+						$group_depth++;
+					}
+				}
+
+				if( $group_changed )
+				{ // We have just entered a new group!
+
+					echo $this->params['grp_line_start']; // TODO: dh> support grp_line_start_odd, grp_line_start_last, grp_line_start_odd_last - as defined in _adminUI_general.class.php
 
 					$col_count = 0;
 					foreach( $this->grp_cols as $grp_col )
@@ -1806,6 +1971,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.43  2007/01/13 19:19:24  blueyed
+ * Grouping by object properties
+ *
  * Revision 1.42  2007/01/13 16:55:00  blueyed
  * Removed $DB member of Results class and use global $DB instead
  *
