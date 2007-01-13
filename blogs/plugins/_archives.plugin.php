@@ -55,12 +55,12 @@ class archives_plugin extends Plugin
 	 * either in the subclass declaration or in the subclass constructor.
 	 */
 
-	var $name = 'Archives Skin Tag';
+	var $name = 'Archives Widget';
 	var $code = 'evo_Arch';
 	var $priority = 50;
 	var $version = '1.9-dev';
 	var $author = 'The b2evo Group';
-	var $group = 'skin-tag';
+	var $group = 'widget';
 
 
 	/**
@@ -83,7 +83,7 @@ class archives_plugin extends Plugin
 	 * @param array Associative array of parameters. Valid keys are:
 	 *                - 'block_start' : (Default: '<div class="bSideItem">')
 	 *                - 'block_end' : (Default: '</div>')
-	 *                - 'title' : (Default: '<h3>'.T_('Archives').'</h3>')
+	 *                - 'title' : (Default: T_('Archives'))
 	 *                - 'mode' : 'monthly'|'daily'|'weekly'|'postbypost' (Default: conf.)
 	 *                - 'link_type' : 'canonic'|'context' (default: canonic)
 	 *                - 'context_isolation' : what params need override when changing date/range (Default: 'm,w,p,title,unit,dstart' )
@@ -123,8 +123,9 @@ class archives_plugin extends Plugin
 		if(!isset($params['block_end'])) $params['block_end'] = "</div>\n";
 
 		// Title:
-		if(!isset($params['title']))
-			$params['title'] = '<h3>'.T_('Archives').'</h3>';
+		if(!isset($params['block_title_start'])) $params['block_title_start'] = '<h3>';
+		if(!isset($params['block_title_end'])) $params['block_title_end'] = '</h3>';
+		if(!isset($params['title'])) $params['title'] = T_('Archives');
 
 		// Archive mode:
 		if(!isset($params['mode']))
@@ -164,7 +165,12 @@ class archives_plugin extends Plugin
 
 		echo $params['block_start'];
 
-		echo $params['title'];
+		if( !empty($params['title']) )
+		{	// We want to display a title for the widget block:
+			echo $params['block_title_start'];
+			echo $params['title'];
+			echo $params['block_title_end'];
+		}
 
 		echo $params['list_start'];
 		while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title) )
@@ -561,6 +567,10 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.37  2007/01/13 18:36:24  fplanque
+ * renamed "Skin Tag" plugins into "Widget" plugins
+ * but otherwise they remain basically the same & compatible
+ *
  * Revision 1.36  2007/01/13 16:55:00  blueyed
  * Removed $DB member of Results class and use global $DB instead
  *

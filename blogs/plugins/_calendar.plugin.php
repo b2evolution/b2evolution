@@ -47,12 +47,12 @@ class calendar_plugin extends Plugin
 	 * either in the subclass declaration or in the subclass constructor.
 	 */
 
-	var $name = 'Calendar Skin Tag';
+	var $name = 'Calendar Widget';
 	var $code = 'evo_Calr';
 	var $priority = 20;
 	var $version = '1.9-dev';
 	var $author = 'The b2evo Group';
-	var $group = 'skin-tag';
+	var $group = 'widget';
 
 
 	/**
@@ -75,7 +75,7 @@ class calendar_plugin extends Plugin
 	 * @param array Associative array of parameters. Valid keys are:
 	 *      - 'block_start' : (Default: '<div class="bSideItem">')
 	 *      - 'block_end' : (Default: '</div>')
-	 *      - 'title' : (Default: '<h3>'.T_('Calendar').'</h3>')
+	 *      - 'title' : (Default: T_('Calendar'))
 	 *      - 'displaycaption'
 	 *      - 'monthformat'
 	 *      - 'linktomontharchive'
@@ -128,8 +128,9 @@ class calendar_plugin extends Plugin
 		if(!isset($params['block_end'])) $params['block_end'] = "</div>\n";
 
 		// Title:
-		if(!isset($params['title']))
-			$params['title'] = '<h3>'.T_('Calendar').'</h3>';
+		if(!isset($params['block_title_start'])) $params['block_title_start'] = '<h3>';
+		if(!isset($params['block_title_end'])) $params['block_title_end'] = '</h3>';
+		if(!isset($params['title'])) $params['title'] = T_('Calendar');
 
 
 		$Calendar = & new Calendar( $m, $params );
@@ -175,7 +176,12 @@ class calendar_plugin extends Plugin
 
 		echo $params['block_start'];
 
-		echo $params['title'];
+		if( !empty($params['title']) )
+		{	// We want to display a title for the widget block:
+			echo $params['block_title_start'];
+			echo $params['title'];
+			echo $params['block_title_end'];
+		}
 
 		// CONSTRUCT THE WHERE CLAUSE:
 
@@ -1113,6 +1119,10 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.35  2007/01/13 18:36:24  fplanque
+ * renamed "Skin Tag" plugins into "Widget" plugins
+ * but otherwise they remain basically the same & compatible
+ *
  * Revision 1.34  2006/12/26 03:19:12  fplanque
  * assigned a few significant plugin groups
  *
