@@ -36,6 +36,11 @@ $Form->begin_form( 'fform', T_('Choose a skin') );
 	// TODO: this is like touching private parts :>
 	foreach( $SkinCache->cache as $Skin )
 	{
+		if( $Skin->type != 'normal' )
+		{	// This skin cannot be used here...
+			continue;
+		}
+
 		$selected = ($edited_Blog->skin_ID == $Skin->ID);
 		$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;blog_skin_ID='.$Skin->ID;
 		$preview_url = url_add_param($edited_Blog->get('blogurl'),'tempskin='.rawurlencode($Skin->folder));

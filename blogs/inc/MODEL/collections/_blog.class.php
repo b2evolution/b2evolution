@@ -758,6 +758,50 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get URL to display the blog with a temporary skin.
+	 *
+	 * @param string
+	 * @param string
+	 * @param boolean
+	 */
+	function get_tempskin_url( $skin_folder_name, $additional_params = '', $halt_on_error = false )
+	{
+		/**
+		 * @var SkinCache
+		 */
+	 	$SkinCache = & get_Cache( 'SkinCache' );
+		if( ! $Skin = & $SkinCache->get_by_folder( $skin_folder_name, $halt_on_error ) )
+		{
+			return NULL;
+		}
+
+		return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin='.$skin_folder_name );
+	}
+
+
+	/**
+	 * Get URL to display the blog posts in an XML feed.
+	 *
+	 * @param string
+	 */
+	function get_item_feed_url( $skin_folder_name )
+	{
+		return $this->get_tempskin_url( $skin_folder_name );
+	}
+
+
+	/**
+	 * Get URL to display the blog comments in an XML feed.
+	 *
+	 * @param string
+	 */
+	function get_comment_feed_url( $skin_folder_name )
+	{
+		return url_add_param( $this->get_tempskin_url( $skin_folder_name ), 'disp=comments' );
+	}
+
+
+	/**
 	 * Get a param.
 	 *
 	 * @param string Parameter name
@@ -852,28 +896,28 @@ class Blog extends DataObject
 				return $this->shortdesc;
 
 			case 'rdf_url':
-				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_rdf' );
+				return $this->get_item_feed_url( '_rdf' );
 
 			case 'rss_url':
-				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_rss' );
+				return $this->get_item_feed_url( '_rss' );
 
 			case 'rss2_url':
-				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_rss2' );
+				return $this->get_item_feed_url( '_rss2' );
 
 			case 'atom_url':
-				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_atom' );
+				return $this->get_item_feed_url( '_atom' );
 
 			case 'comments_rdf_url':
-				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_rdf&amp;disp=comments' );
+				return $this->get_comment_feed_url( '_rdf' );
 
 			case 'comments_rss_url':
-				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_rss&amp;disp=comments' );
+				return $this->get_comment_feed_url( '_rss' );
 
 			case 'comments_rss2_url':
-				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_rss2&amp;disp=comments' );
+				return $this->get_comment_feed_url( '_rss2' );
 
 			case 'comments_atom_url':
-				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_atom&amp;disp=comments' );
+				return $this->get_comment_feed_url( '_atom' );
 
 			case 'admin_email':
 				return $admin_email;
@@ -1161,6 +1205,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.53  2007/01/14 01:33:34  fplanque
+ * losely restrict to *installed* XML feed skins
+ *
  * Revision 1.52  2007/01/08 02:11:55  fplanque
  * Blogs now make use of installed skins
  * next step: make use of widgets inside of skins

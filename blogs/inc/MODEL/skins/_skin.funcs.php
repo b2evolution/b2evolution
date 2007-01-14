@@ -154,14 +154,15 @@ function skin_exists( $name, $filename = '_main.php' )
  * @todo do not install if skin doesn't exist. Important for upgrade. Need to NOT fail if ZERO skins installed though :/
  *
  * @param string
+ * @param string NULL for default
  * @return Skin
  */
-function & skin_install( $skin_folder )
+function & skin_install( $skin_folder, $name = NULL )
 {
 	load_class( 'MODEL/skins/_skin.class.php' );
 	$edited_Skin = new Skin(); // COPY (FUNC)
 
-	$edited_Skin->set( 'name', $skin_folder );
+	$edited_Skin->set( 'name', empty( $name) ? $skin_folder : $name );
 	$edited_Skin->set( 'folder', $skin_folder );
 	$edited_Skin->set( 'type', substr($skin_folder,0,1) == '_' ? 'feed' : 'normal' );
 
@@ -177,6 +178,9 @@ function & skin_install( $skin_folder )
 
 /*
  * $Log$
+ * Revision 1.15  2007/01/14 01:33:34  fplanque
+ * losely restrict to *installed* XML feed skins
+ *
  * Revision 1.14  2007/01/08 02:11:56  fplanque
  * Blogs now make use of installed skins
  * next step: make use of widgets inside of skins

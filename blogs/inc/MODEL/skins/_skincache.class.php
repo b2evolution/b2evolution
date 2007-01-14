@@ -47,6 +47,9 @@ class SkinCache extends DataObjectCache
 	 */
 	var $cache_by_folder = array();
 
+	var $loaded_types = array();
+
+
 	/**
 	 * Constructor
 	 */
@@ -110,11 +113,51 @@ class SkinCache extends DataObjectCache
 		return $Skin;
 	}
 
+
+	/**
+	 * Load the cache by type
+	 *
+	 * @param string
+ 	 */
+	function load_by_type( $type )
+	{
+		/**
+		 * @var DB
+		 */
+		global $DB;
+		global $Debuglog;
+
+		if( $this->all_loaded || !empty($this->loaded_types[$type]) )
+		{ // Already loaded
+			return false;
+		}
+
+		$Debuglog->add( get_class($this).' - Loading <strong>'.$this->objtype.'('.$type.')</strong> into cache', 'dataobjects' );
+		$sql = 'SELECT *
+							FROM T_skins__skin
+						 WHERE skin_type = '.$DB->quote($type).'
+						 ORDER BY skin_name';
+
+		foreach( $DB->get_results( $sql, OBJECT, 'Loading Skins('.$type.') into cache' ) as $row )
+		{
+			// Instantiate a custom object
+			$this->instantiate( $row );
+		}
+
+		$this->loaded_types[$type] = true;
+
+		return true;
+	}
+
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.4  2007/01/14 01:33:34  fplanque
+ * losely restrict to *installed* XML feed skins
+ *
  * Revision 1.3  2007/01/11 20:42:37  fplanque
  * no message
  *
