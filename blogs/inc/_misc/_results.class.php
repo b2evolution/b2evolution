@@ -1080,7 +1080,7 @@ class Results extends Table
 							$output = str_replace( '$class$', $class, $output );
 						}
 						else
-						{ // Display regular colmun start:
+						{ // Display regular column start:
 							$output = $this->params['grp_col_start'];
 
 							// Replace the "class_attrib" in the grp col start param by the td column class
@@ -1110,8 +1110,7 @@ class Results extends Table
 						$col_count++;
 					}
 
-					echo '</tr>';
-
+					echo $this->params['grp_line_end'];
 				}
 			}
 
@@ -1971,6 +1970,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.45  2007/01/14 03:00:02  blueyed
+ * typo and use $this->params['grp_line_end'] instead of '</tr>'
+ *
  * Revision 1.44  2007/01/13 22:28:12  fplanque
  * doc
  *
