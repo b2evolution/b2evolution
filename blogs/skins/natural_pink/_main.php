@@ -147,95 +147,30 @@ skin_content_header();	// Sets charset!
 
 <div class="bSideBar">
 
-	<?php 
-		// -------------------------- CALENDAR INCLUDED HERE -----------------------------
-		// Call the Calendar plugin:
-		$Plugins->call_by_code( 'evo_Calr', array(	// Params follow:
-				'title'=>'',			// No title.
+	<?php
+		// Display container contents:
+		$Skin->container( NT_('Sidebar'), array(
+				// The following (optional) params will be used as defaults for widgets included in this container:
+				// This will enclose each widget in a block:
+				'block_start' => '<div class="bSideItem $wi_class$">',
+				'block_end' => '</div>',
+				// This will enclose the title of each widget:
+				'block_title_start' => '<h3>',
+				'block_title_end' => '</h3>',
+				// If a widget displays a list, this will enclose that list:
+				'list_start' => '<ul>',
+				'list_end' => '</ul>',
+				// This will enclose each item in a list:
+				'item_start' => '<li>',
+				'item_end' => '</li>',
+				// This will enclose sub-lists in a list:
+				'group_start' => '<ul>',
+				'group_end' => '</ul>',
 			) );
-		// ----------------------------- END OF CALENDAR --------------------------------- 
 	?>
 
-	<div class="bSideItem">
-		<h3><?php $Blog->disp( 'name', 'htmlbody' ) ?></h3>
-		<p><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></p>
-		<ul>
-			<li><a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a></li>
-			<li><a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><strong><?php echo T_('Archives') ?></strong></a></li>
-			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>
-		</ul>
-	</div>
-
-	<div class="bSideItem">
-		<h3 class="sideItemTitle"><?php echo T_('Search') ?></h3>
-		<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), 'search', 'SearchForm' ) ?>
-			<p><input type="text" name="s" size="30" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" /><br />
-			<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo T_('All Words') ?></label><br />
-			<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo T_('Some Word') ?></label><br />
-			<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo T_('Entire phrase') ?></label></p>
-			<input type="submit" name="submit" class="submit" value="<?php echo T_('Search') ?>" />
-		</form>
-	</div>
-
-
-	<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
-		// Call the Categories plugin:
-		$Plugins->call_by_code( 'evo_Cats', array(	// Add parameters below:
-			) );
-		// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
-
-
-	<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-		// Call the Archives plugin:
-		$Plugins->call_by_code( 'evo_Arch', array(	// Add parameters below:
-			) );
-		// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
-
-
-	<div class="bSideItem">
-		<h3><?php echo T_('Misc') ?></h3>
-		<ul>
-			<?php
-				user_login_link( '<li>', '</li>' );
-				user_register_link( '<li>', '</li>' );
-				user_admin_link( '<li>', '</li>' );
-				user_profile_link( '<li>', '</li>' );
-				user_subs_link( '<li>', '</li>' );
-				user_logout_link( '<li>', '</li>' );
-			?>
-		</ul>
-	</div>
-
-<div class="bSideItem">
-		<h3><img src="<?php echo $rsc_url ?>icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> <?php echo T_('XML Feeds') ?></h3>
-			<ul>
-				<li>
-					RSS 0.92:
-					<a href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>"><?php echo T_('Posts') ?></a>,
-					<a href="<?php $Blog->disp( 'comments_rss_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
-				</li>
-				<li>
-					RSS 1.0:
-					<a href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>"><?php echo T_('Posts') ?></a>,
-					<a href="<?php $Blog->disp( 'comments_rdf_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
-				</li>
-				<li>
-					RSS 2.0:
-					<a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><?php echo T_('Posts') ?></a>,
-					<a href="<?php $Blog->disp( 'comments_rss2_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
-				</li>
-				<li>
-					Atom:
-					<a href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><?php echo T_('Posts') ?></a>,
-					<a href="<?php $Blog->disp( 'comments_atom_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
-				</li>
-			</ul>
-
-		<a href="http://webreference.fr/2006/08/30/rss_atom_xml" title="External - English">What is this?</a>
-
-</div>
-<p class="center">powered by<br />
-<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $rsc_url; ?>img/b2evolution_logo_80.gif" alt="b2evolution" width="80" height="17" border="0" class="middle" /></a></p>
+	<p class="center small">powered by<br />
+	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $rsc_url; ?>img/b2evolution_logo_80.gif" alt="b2evolution" width="80" height="17" border="0" class="middle" /></a></p>
 
 </div>
 

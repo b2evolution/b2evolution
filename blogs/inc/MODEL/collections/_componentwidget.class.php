@@ -275,6 +275,26 @@ class ComponentWidget extends DataObject
 						return true;
 
 					case 'user_tools':
+						// User tools:
+						echo $params['block_start'];
+
+						echo $params['block_title_start'];
+						echo T_('User tools');
+						echo $params['block_title_end'];
+
+						echo $params['list_start'];
+						user_login_link( $params['item_start'], $params['item_end'] );
+						user_register_link( $params['item_start'], $params['item_end'] );
+						user_admin_link( $params['item_start'], $params['item_end'] );
+						user_profile_link( $params['item_start'], $params['item_end'] );
+						user_subs_link( $params['item_start'], $params['item_end'] );
+						user_logout_link( $params['item_start'], $params['item_end'] );
+						echo $params['list_end'];
+
+						echo $params['block_end'];
+						return true;
+
+
 					case 'admin_help':
 
 				}
@@ -325,6 +345,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2007/01/14 03:24:30  fplanque
+ * widgets complete proof of concept with multiple skins
+ *
  * Revision 1.10  2007/01/14 01:32:11  fplanque
  * more widgets supported! :)
  *

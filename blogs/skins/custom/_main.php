@@ -266,26 +266,12 @@ skin_content_header();	// Sets charset!
 			) );
 	?>
 
+
 	<?php
 		// -------------------------- LINKBLOG INCLUDED HERE -----------------------------
 		require( dirname(__FILE__).'/_linkblog.php' );
 		// -------------------------------- END OF LINKBLOG ----------------------------------
 	?>
-
-
-	<div class="bSideItem">
-		<h3><?php echo T_('Misc') ?></h3>
-		<ul>
-			<?php
-				user_login_link( '<li>', '</li>' );
-				user_register_link( '<li>', '</li>' );
-				user_admin_link( '<li>', '</li>' );
-				user_profile_link( '<li>', '</li>' );
-				user_subs_link( '<li>', '</li>' );
-				user_logout_link( '<li>', '</li>' );
-			?>
-		</ul>
-	</div>
 
 
 	<?php
@@ -294,13 +280,15 @@ skin_content_header();	// Sets charset!
 		// TODO: when this gets a SkinTag plugin this check should get done by the Plugin
 		// fp> will not be a plugin because it's too closely tied to internals (Sessions)
 		?>
-	<div class="bSideItem">
-		<h3 class="sideItemTitle"><?php echo T_('Who\'s Online?') ?></h3>
+		<div class="bSideItem">
+			<h3 class="sideItemTitle"><?php echo T_('Who\'s Online?') ?></h3>
+			<?php
+				$Sessions->display_onliners();
+			?>
+		</div>
 		<?php
-			$Sessions->display_onliners();
-		?>
-	</div>
-	<?php } ?>
+	}
+	?>
 
 
 	<p class="center">powered by<br />

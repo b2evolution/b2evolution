@@ -241,17 +241,6 @@ input.preview:hover {
 	padding: 0 0 2ex 0;
 	border-bottom: 1px solid #ddd;
 }
-/* Special SideItems: */
-.widget_plugin_evo_Calr,
-.widget_core_coll_title {
-	/* background-color: #fee; */
-	padding: 0;
-	border-bottom: 0;
-}
-.widget_core_coll_title a {
-	text-decoration: none;
-	color: #78a;
-}
 
 .bSideItem ul {
 	margin-left: 8px;
@@ -282,6 +271,19 @@ input.SearchField
 	padding: .5ex;
 	width: 96%;
 	margin: 0ex;
+}
+
+/* Special SideItems: */
+.widget_plugin_evo_Calr,
+.widget_core_coll_title,
+.widget_core_coll_longdesc {
+	/* background-color: #fee; */
+	padding: 0;
+	border-bottom: 0;
+}
+.widget_core_coll_title a {
+	text-decoration: none;
+	color: #78a;
 }
 
 /* Calendar: */

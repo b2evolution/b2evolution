@@ -193,6 +193,7 @@ select.bComment		/* Used by the profile form */
 	margin: 2ex;
 	padding: 0 0 2ex 0;
 }
+
 .bSideItem ul {
 	margin-left: 8px;
 	padding-left: 8px;
@@ -222,6 +223,16 @@ input.SearchField
 	padding: .5ex;
 	width: 96%;
 	margin: 0ex;
+}
+
+/* Special SideItems: */
+.widget_plugin_evo_Calr,
+.widget_core_coll_title,
+.widget_core_coll_longdesc {
+	padding: 0;
+}
+.widget_core_coll_title a {
+	color: #f09;
 }
 
 /* Calendar: */

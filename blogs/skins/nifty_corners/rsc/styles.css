@@ -149,7 +149,7 @@ div.pageHeader div.widget_core_coll_tagline {
 
 
 /* 
- * Styles for foms 
+ * Styles for posts
  */
 .bPost, .bPostpublished
 {
@@ -238,6 +238,16 @@ input.SearchField
 	padding: .5ex;
 	width: 96%;
 	margin: 0ex;
+}
+
+/* Special SideItems: */
+.widget_plugin_evo_Calr,
+.widget_core_coll_title,
+.widget_core_coll_longdesc {
+	padding: 0;
+}
+.widget_core_coll_title a {
+	color: #06a3c4;
 }
 
 /* Calendar: */
