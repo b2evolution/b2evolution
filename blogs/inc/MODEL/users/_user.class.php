@@ -509,7 +509,13 @@ class User extends DataObject
 				break;
 
 			case 'blog_properties':
-				// Blog permission to edit its properties... (depending on user AND its group)
+			case 'blog_ismember':
+			case 'blog_post_statuses':
+			case 'blog_del_post':
+			case 'blog_comments':
+			case 'blog_cats':
+			case 'blog_genstatic':
+				// Blog permission to edit its properties... (Group may grant view acces, full access)
 				// Forward request to group:
 				$this->get_Group();
 				if( $this->Group->check_perm( 'blogs', $permlevel ) )
@@ -528,6 +534,7 @@ class User extends DataObject
 				}
 				break;
 
+			/*
 			case 'blog_ismember':
 			case 'blog_post_statuses':
 			case 'blog_del_post':
@@ -543,6 +550,7 @@ class User extends DataObject
 				}
 
 				break;
+			*/
 
 			case 'edit_timestamp':
 				// Global permission to edit timestamps...
@@ -1156,6 +1164,10 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.61  2007/01/14 22:08:48  fplanque
+ * Broadened global group blog view/edit provileges.
+ * I hoipe I didn't screw up here :/
+ *
  * Revision 1.60  2006/12/22 00:50:33  fplanque
  * improved path cleaning
  *
