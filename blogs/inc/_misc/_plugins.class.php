@@ -633,8 +633,10 @@ class Plugins
 	 */
 	function init_settings( & $Plugin )
 	{
-		if( version_compare( PHP_VERSION, '5', '>=' ) )
+		if( version_compare( PHP_VERSION, '5.1', '>=' ) )
 		{ // we use overloading for PHP5, therefor the member has to be unset:
+			// Note: this is somehow buggy at least in PHP 5.0.5, therefor we use it from 5.1 on.
+			//       see http://forums.b2evolution.net/viewtopic.php?p=49031#49031
 			unset( $Plugin->Settings );
 			unset( $Plugin->UserSettings );
 
@@ -642,7 +644,7 @@ class Plugins
 			return;
 		}
 
-		// PHP4: instantiate now:
+		// PHP < 5.1: instantiate now:
 		$this->instantiate_Settings( $Plugin, 'Settings' );
 		$this->instantiate_Settings( $Plugin, 'UserSettings' );
 	}
@@ -1785,6 +1787,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.135  2007/01/14 19:37:24  blueyed
+ * Fix for overloading problems of (User)Settings in PHP 5.0.5
+ *
  * Revision 1.134  2007/01/14 18:15:51  blueyed
  * Nuked hackish $is_admin_class as per todo
  *
