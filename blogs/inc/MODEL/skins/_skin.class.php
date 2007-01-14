@@ -219,7 +219,7 @@ class Skin extends DataObject
 
 		$DB->begin();
 
-		if( parent::dbinsert() !== false )
+		if( parent::dbupdate() !== false )
 		{	// Skin updated, also save containers:
 			$this->db_save_containers();
 		}
@@ -349,6 +349,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2007/01/14 00:45:13  fplanque
+ * bugfix
+ *
  * Revision 1.9  2007/01/13 18:37:29  fplanque
  * doc
  *
