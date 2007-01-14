@@ -130,7 +130,7 @@ class calendar_plugin extends Plugin
 		// Title:
 		if(!isset($params['block_title_start'])) $params['block_title_start'] = '<h3>';
 		if(!isset($params['block_title_end'])) $params['block_title_end'] = '</h3>';
-		if(!isset($params['title'])) $params['title'] = T_('Calendar');
+		if(!isset($params['title'])) $params['title'] = '';
 
 
 		$Calendar = & new Calendar( $m, $params );
@@ -1119,6 +1119,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.36  2007/01/14 01:31:51  fplanque
+ * do not display title by default (bloated)
+ *
  * Revision 1.35  2007/01/13 18:36:24  fplanque
  * renamed "Skin Tag" plugins into "Widget" plugins
  * but otherwise they remain basically the same & compatible
