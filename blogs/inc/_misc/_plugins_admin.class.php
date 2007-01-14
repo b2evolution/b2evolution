@@ -45,13 +45,6 @@ class Plugins_admin extends Plugins
 			  FROM T_plugins
 			 ORDER BY plug_priority, plug_classname';
 
-	/**
-	 * Gets used in base class
-	 * @var boolean
-	 * @static
-	 */
-	var $is_admin_class = true;
-
 
 	/**
 	 * Get the list of all events/hooks supported by the plugin framework.
@@ -232,6 +225,26 @@ class Plugins_admin extends Plugins
 		}
 
 		return $supported_events;
+	}
+
+
+	/**
+	 * Un-register a plugin, only if forced.
+	 *
+	 * This does not un-install it from DB, just from the internal indexes.
+	 *
+	 * @param Plugin
+	 * @param boolean Force unregistering
+	 * @return boolean True, if unregistered
+	 */
+	function unregister( & $Plugin, $force = false )
+	{
+		if( ! $force )
+		{
+			return false;
+		}
+
+		return parent::unregister($Plugin, $force);
 	}
 
 
@@ -419,7 +432,7 @@ class Plugins_admin extends Plugins
 		if( isset($Plugin->number_of_installs)
 		    && ( $this->count_regs( $Plugin->classname ) >= $Plugin->number_of_installs ) )
 		{
-			$this->unregister( $Plugin );
+			$this->unregister( $Plugin, true );
 			$r = T_('The plugin cannot be installed again.');
 			return $r;
 		}
@@ -427,7 +440,7 @@ class Plugins_admin extends Plugins
 		$install_return = $Plugin->BeforeInstall();
 		if( $install_return !== true )
 		{
-			$this->unregister( $Plugin );
+			$this->unregister( $Plugin, true );
 			$r = T_('The installation of the plugin failed.');
 			if( is_string($install_return) )
 			{
@@ -447,7 +460,7 @@ class Plugins_admin extends Plugins
 
 		if( ! empty( $dep_msgs['error'] ) )
 		{ // fatal errors (required dependencies):
-			$this->unregister( $Plugin );
+			$this->unregister( $Plugin, true );
 			$r = T_('Some plugin dependencies are not fulfilled:').' <ul><li>'.implode( '</li><li>', $dep_msgs['error'] ).'</li></ul>';
 			return $r;
 		}
@@ -502,10 +515,9 @@ class Plugins_admin extends Plugins
 
 		$tmp_params = array('db_row' => $this->index_ID_rows[$Plugin->ID], 'is_installed' => false);
 
-		if( $Plugin->PluginInit( $tmp_params ) === false && ! $this->is_admin_class )
+		if( $Plugin->PluginInit( $tmp_params ) === false && $this->unregister( $Plugin ) )
 		{
 			$Debuglog->add( 'Unregistered plugin, because PluginInit returned false.', 'plugins' );
-			$this->unregister( $Plugin );
 			$Plugin = '';
 		}
 
@@ -568,7 +580,7 @@ class Plugins_admin extends Plugins
 
 		if( $Plugin )
 		{
-			$this->unregister( $Plugin );
+			$this->unregister( $Plugin, true );
 		}
 
 		$Debuglog->add( 'Uninstalled plugin (ID '.$plugin_ID.').', 'plugins' );
@@ -1370,6 +1382,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.26  2007/01/14 18:15:51  blueyed
+ * Nuked hackish $is_admin_class as per todo
+ *
  * Revision 1.25  2007/01/13 14:57:28  blueyed
  * Removed $is_admin_class hack from load_events() by re-implementing (copying most of it) to Plugins_admin as per todo
  *

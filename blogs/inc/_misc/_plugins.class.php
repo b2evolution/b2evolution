@@ -142,14 +142,6 @@ class Plugins
 			 WHERE plug_status = "enabled"
 			 ORDER BY plug_priority, plug_classname';
 
-	/**
-	 * Used in class {@link Plugins} when it comes to removing plugins from the list, what we don't want
-	 *                when administering plugins (see {@link $Plugins_admin}).
-	 * @var boolean
-	 * @static
-	 */
-	var $is_admin_class = false;
-
 	/**#@-*/
 
 
@@ -255,8 +247,6 @@ class Plugins
 	 * Otherwise it gets unregisterd, but only when we're not in {@link Plugins_admin}, because we
 	 * want to keep it in then in our indices.
 	 *
-	 * @todo fp>$this->is_admin_class is dirty!!
-	 *
 	 * {@internal
 	 * Note: this should probably always get called on the {@link $Plugins} object,
 	 *       not {@link $admin_Plugins}.
@@ -282,10 +272,7 @@ class Plugins
 			// Notify the plugin that it has been disabled:
 			$Plugin->BeforeDisable();
 
-			if( ! $this->is_admin_class )
-			{
-				$this->unregister( $Plugin );
-			}
+			$this->unregister( $Plugin );
 		}
 
 		$Plugin->status = $status;
@@ -308,10 +295,9 @@ class Plugins
 	 * @param string Path of the .php class file of the plugin.
 	 * @param boolean Must the plugin exist (classfile_path and classname)?
 	 *                This is used internally to be able to unregister a non-existing plugin.
-	 * @param boolean Return an object, also in case of error (used by admin functions)
 	 * @return Plugin Plugin ref to newly created plugin; string in case of error
 	 */
-	function & register( $classname, $ID = 0, $priority = -1, $apply_rendering = NULL, $classfile_path = NULL, $must_exists = true, $return_object = false )
+	function & register( $classname, $ID = 0, $priority = -1, $apply_rendering = NULL, $classfile_path = NULL, $must_exists = true )
 	{
 		global $Debuglog, $Messages, $Timer;
 
@@ -348,17 +334,17 @@ class Plugins
 				$this->plugin_errors[$ID]['register'] = $r;
 				$this->set_Plugin_status( $Plugin, 'broken' );
 
-				// dh> removed: if( $this->is_admin_class )
-				if( $return_object )
+				// unregister:
+				if( $this->unregister( $Plugin ) )
+				{
+					$Debuglog->add( 'Unregistered plugin ['.$classname.']!', array( 'plugins', 'error' ) );
+				}
+				else
 				{
 					$Plugin->name = $Plugin->classname; // use the classname instead of "unnamed plugin"
 					$Timer->pause( 'plugins_register' );
 					return $Plugin;
 				}
-
-				// unregister:
-				$this->unregister( $Plugin );
-				$Debuglog->add( 'Unregistered plugin ['.$classname.']!', array( 'plugins', 'error' ) );
 
 				$Timer->pause( 'plugins_register' );
 				return $r;
@@ -382,17 +368,17 @@ class Plugins
 				$this->plugin_errors[$ID]['register'] = $r;
 				$this->set_Plugin_status( $Plugin, 'broken' );
 
-				// dh> removed: if( $this->is_admin_class )
-				if( $return_object )
+				// unregister:
+				if( $this->unregister( $Plugin ) )
+				{
+					$Debuglog->add( 'Unregistered plugin ['.$classname.']!', array( 'plugins', 'error' ) );
+				}
+				else
 				{
 					$Plugin->name = $Plugin->classname; // use the classname instead of "unnamed plugin"
 					$Timer->pause( 'plugins_register' );
 					return $Plugin;
 				}
-
-				// unregister:
-				$this->unregister( $Plugin );
-				$Debuglog->add( 'Unregistered plugin ['.$classname.']!', array( 'plugins', 'error' ) );
 
 				$Timer->pause( 'plugins_register' );
 				return $r;
@@ -469,10 +455,9 @@ class Plugins
 			$this->init_settings( $Plugin );
 
 			$tmp_params = array( 'db_row' => $this->index_ID_rows[$Plugin->ID], 'is_installed' => true );
-			if( $Plugin->PluginInit( $tmp_params ) === false && ! $this->is_admin_class )
+			if( $Plugin->PluginInit( $tmp_params ) === false && $this->unregister( $Plugin ) )
 			{
 				$Debuglog->add( 'Unregistered plugin, because PluginInit returned false.', 'plugins' );
-				$this->unregister( $Plugin );
 				$Plugin = '';
 			}
 			// Version check:
@@ -487,9 +472,8 @@ class Plugins
 				{
 					$Debuglog->add( 'Set plugin status to "needs_config", because PluginVersionChanged returned false.', 'plugins' );
 					$this->set_Plugin_status( $Plugin, 'needs_config' );
-					if( ! $this->is_admin_class )
+					if( $this->unregister( $Plugin ) )
 					{ // only unregister the Plugin, if it's not the admin list's class:
-						$this->unregister( $Plugin );
 						$Plugin = '';
 					}
 				}
@@ -533,9 +517,8 @@ class Plugins
 						$this->set_Plugin_status( $Plugin, 'needs_config' );
 						$Debuglog->add( 'Set plugin status to "needs_config", because version DB schema needs upgrade.', 'plugins' );
 
-						if( ! $this->is_admin_class )
+						if( $this->unregister( $Plugin ) )
 						{ // only unregister the Plugin, if it's not the admin list's class:
-							$this->unregister( $Plugin );
 							$Plugin = '';
 						}
 					}
@@ -557,10 +540,9 @@ class Plugins
 			$this->init_settings( $Plugin );
 
 			$tmp_params = array( 'db_row' => array(), 'is_installed' => false );
-			if( $Plugin->PluginInit( $tmp_params ) === false && ! $this->is_admin_class )
+			if( $Plugin->PluginInit( $tmp_params ) === false && $this->unregister( $Plugin ) )
 			{
 				$Debuglog->add( 'Unregistered plugin, because PluginInit returned false.', 'plugins' );
-				$this->unregister( $Plugin );
 				$Plugin = '';
 			}
 		}
@@ -577,8 +559,10 @@ class Plugins
 	 * This does not un-install it from DB, just from the internal indexes.
 	 *
 	 * @param Plugin
+	 * @param boolean Force unregistering (ignored here, but used in Plugins_admin)
+	 * @return boolean True, if unregistered
 	 */
-	function unregister( & $Plugin )
+	function unregister( & $Plugin, $force = false )
 	{
 		global $Debuglog;
 
@@ -614,6 +598,8 @@ class Plugins
 		{ // We have removed a file before or at the $sort_key'th position
 			$this->current_idx--;
 		}
+
+		return true;
 	}
 
 
@@ -1799,6 +1785,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.134  2007/01/14 18:15:51  blueyed
+ * Nuked hackish $is_admin_class as per todo
+ *
  * Revision 1.133  2007/01/14 08:05:03  blueyed
  * Started to remove $is_admin_class in Plugins::register()
  *
