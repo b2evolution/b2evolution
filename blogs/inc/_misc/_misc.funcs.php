@@ -1433,9 +1433,14 @@ function bad_request_die( $additional_info = '' )
 {
 	global $debug, $baseurl;
 
-	// Attempt to output an error header (will not work if there is too much content already out):
+	// Attempt to output an error header (will not work if the output buffer has already flushed once):
 	// This should help preventing indexing robots from indexing the error :P
-	@header('HTTP/1.0 400 Bad Request');
+	if( ! headers_sent() )
+	{
+		global $io_charset;
+		header('Content-type: text/html; charset='.$io_charset); // it's ok, if a previous header would be replaced;
+		header('HTTP/1.0 400 Bad Request');
+	}
 
 	echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
 	echo '<h3 style="color:#f00;">'.T_('Bad Request!').'</h3>';
@@ -2752,6 +2757,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.157  2007/01/14 05:41:10  blueyed
+ * Send correct charset with bad_request_die()
+ *
  * Revision 1.156  2006/12/19 17:21:54  blueyed
  * Fixed domain extraction if anchor (#) follows domain name directly. See http://forums.b2evolution.net/viewtopic.php?p=48672#48672
  *
