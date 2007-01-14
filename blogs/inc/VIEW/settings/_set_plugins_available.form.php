@@ -121,7 +121,7 @@ while( $loop_Plugin = & $AvailablePlugins->get_next() )
 
 		$Table->display_col_start();
 	  ?>
-			<strong><a title="<?php echo T_('Display info') ?>" href="<?php echo regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID) . '">'
+			<strong><a title="<?php echo T_('Display info') ?>" href="<?php echo regenerate_url( 'action,plugin_class', 'action=info&amp;plugin_class='.$loop_Plugin->classname) . '">'
 	    .format_to_output($loop_Plugin->name); ?></a></strong>
 		<?php
 		$Table->display_col_end();
@@ -146,7 +146,7 @@ while( $loop_Plugin = & $AvailablePlugins->get_next() )
 		$Table->display_col_end();
 
 		$Table->display_col_start();
-			echo action_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID ) );
+			echo action_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_class', 'action=info&amp;plugin_class='.$loop_Plugin->classname ) );
 			// Help icons, if available:
 			$help_icons = array();
 			if( $help_external = $loop_Plugin->get_help_link() )
@@ -197,6 +197,9 @@ $Table->display_list_end();
 
 /*
  * $Log$
+ * Revision 1.10  2007/01/14 08:21:01  blueyed
+ * Optimized "info", "disp_help" and "disp_help_plain" actions by refering to them through classname, which makes Plugins::discover() unnecessary
+ *
  * Revision 1.9  2007/01/13 22:38:13  fplanque
  * normalized
  *

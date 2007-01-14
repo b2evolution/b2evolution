@@ -58,11 +58,11 @@ $Form->hidden_ctrl();
 if( $edit_Plugin->get_help_file() )
 { // README in JS popup:
 	$Form->global_icon( T_('Local documentation of the plugin'), 'help',
-		url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_ID='.$edit_Plugin->ID.'#'.$edit_Plugin->classname.'_settings' ), '', array('use_js_popup'=>true, 'id'=>'anchor_help_popup_'.$edit_Plugin->ID) );
+		url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_class='.$edit_Plugin->classname.'#'.$edit_Plugin->classname.'_settings' ), '', array('use_js_popup'=>true, 'id'=>'anchor_help_popup_'.$edit_Plugin->ID) );
 }
 
 // Info button:
-$Form->global_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$edit_Plugin->ID ) );
+$Form->global_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_class', 'action=info&amp;plugin_class='.$edit_Plugin->classname ) );
 
 // Close button:
 $Form->global_icon( T_('Cancel edit!'), 'close', regenerate_url() );
@@ -175,6 +175,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.29  2007/01/14 08:21:01  blueyed
+ * Optimized "info", "disp_help" and "disp_help_plain" actions by refering to them through classname, which makes Plugins::discover() unnecessary
+ *
  * Revision 1.28  2006/12/09 01:55:36  fplanque
  * feel free to fill in some missing notes
  * hint: "login" does not need a note! :P

@@ -374,8 +374,6 @@ switch( $action )
 		{ // Add notes from dependencies
 			$Messages->add_messages( array( 'note' => $edit_Plugin->install_dep_notes ) );
 		}
-
-		// }}}
 		break;
 
 
@@ -741,55 +739,22 @@ switch( $action )
 
 
 	case 'info':
-		param( 'plugin_ID', 'integer', true );
+	case 'disp_help':
+	case 'disp_help_plain': // just the help, without any payload
+		param( 'plugin_class', 'string', true );
 
-		if( $plugin_ID < 0 )
-		{ // not installed:
-			// Discover available plugins:
-			load_class('_misc/_plugins_admin_no_db.class.php');
-			$AvailablePlugins = & new Plugins_admin_no_DB(); // do not load registered plugins/events from DB
-			$AvailablePlugins->discover();
+		$edit_Plugin = & $admin_Plugins->register( $plugin_class );
 
-			$edit_Plugin = & $AvailablePlugins->get_by_ID( $plugin_ID );
+		if( is_string($edit_Plugin) )
+		{
+			$Messages->add($edit_Plugin, 'error');
+			$edit_Plugin = false;
+			$action = 'list';
 		}
 		else
-		{ // installed:
-			$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
-		}
-		if( ! $edit_Plugin )
 		{
-			$action = 'list';
+			$admin_Plugins->unregister( $edit_Plugin );
 		}
-		break;
-
-
-	case 'disp_help_plain': // just the help, without any payload
-	case 'disp_help':
-		param( 'plugin_ID', 'integer', 0 );
-
-		// Discover available plugins:
-		load_class('_misc/_plugins_admin_no_db.class.php');
-		$AvailablePlugins = & new Plugins_admin_no_DB(); // do not load registered plugins/events from DB
-		$AvailablePlugins->discover();
-
-		if( ! ($edit_Plugin = & $AvailablePlugins->get_by_ID( $plugin_ID )) )
-		{
-			$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
-		}
-		if( ! $edit_Plugin || ! ($help_file = $edit_Plugin->get_help_file()) )
-		{
-			$action = 'list';
-			break;
-		}
-
-		if( $action == 'disp_help' )
-		{ // display it later
-			break;
-		}
-
-		readfile($help_file);
-		debug_info();
-		exit();
 
 		break;
 
@@ -811,7 +776,21 @@ switch( $action )
 			.sprintf( T_('Edit plugin &laquo;%s&raquo; (ID %d)'), $edit_Plugin->name, $edit_Plugin->ID ).'</a>' );
 		break;
 
+	case 'disp_help_plain': // just the help, without any payload
 	case 'disp_help':
+		if( ! ($help_file = $edit_Plugin->get_help_file()) )
+		{
+			$action = 'list';
+			break;
+		}
+
+		if( $action == 'disp_help_plain' )
+		{ // display it now and exit:
+			readfile($help_file);
+			debug_info();
+			exit();
+		}
+
 		$title = sprintf( T_('Help for plugin &laquo;%s&raquo;'), '<a href="admin.php?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$edit_Plugin->ID.'">'.$edit_Plugin->name.'</a>' );
 		if( ! empty($edit_Plugin->help_url) )
 		{
@@ -1039,6 +1018,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.76  2007/01/14 08:21:01  blueyed
+ * Optimized "info", "disp_help" and "disp_help_plain" actions by refering to them through classname, which makes Plugins::discover() unnecessary
+ *
  * Revision 1.75  2007/01/14 05:53:14  blueyed
  * Optimized init of "info" action: do not discover available Plugins, if not necessary
  *

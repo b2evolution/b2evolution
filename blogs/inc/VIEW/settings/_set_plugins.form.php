@@ -218,7 +218,7 @@ $Results->cols[] = array(
  */
 function plugin_results_td_help( $Plugin )
 {
-	return action_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$Plugin->ID ) )
+	return action_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_class', 'action=info&amp;plugin_class='.$Plugin->classname ) )
 		// Help icons, if available:
 		.$Plugin->get_help_link('$help_url')
 		.' '.$Plugin->get_help_link('$readme');
@@ -277,6 +277,9 @@ unset($Results); // free memory
 
 /*
  * $Log$
+ * Revision 1.48  2007/01/14 08:21:01  blueyed
+ * Optimized "info", "disp_help" and "disp_help_plain" actions by refering to them through classname, which makes Plugins::discover() unnecessary
+ *
  * Revision 1.47  2007/01/13 22:28:13  fplanque
  * doc
  *
