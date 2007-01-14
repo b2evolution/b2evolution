@@ -897,9 +897,9 @@ class AdminUI_general
 						'header_text_single' => '',
 					'header_end' => '</div>',
 					'list_start' => '<table class="grouped" cellspacing="0">'."\n\n",
-						'head_start' => "<thead><tr>\n",
-							'head_title' => '<th colspan="$nb_cols$" class="title"><span style="float:right">$global_icons$</span>$title$</th></tr>'
-							                ."\n\n<tr>\n",
+						'head_start' => "<thead>\n",
+							'head_title' => '<tr><th colspan="$nb_cols$" class="title"><span style="float:right">$global_icons$</span>$title$</th>'
+							                ."\n</tr>\n",
 							'filters_start' => '<tr class="filters"><td colspan="$nb_cols$">',
 							'filters_end' => '</td></tr>',
 							'line_start_head' => '<tr>',  // TODO: fusionner avec colhead_start_first; mettre a jour admin_UI_general; utiliser colspan="$headspan$"
@@ -918,7 +918,7 @@ class AdminUI_general
 							'basic_sort_off' => '',
 							'basic_sort_asc' => get_icon( 'ascending' ),
 							'basic_sort_desc' => get_icon( 'descending' ),
-						'head_end' => "</tr></thead>\n\n",
+						'head_end' => "</thead>\n\n",
 						'tfoot_start' => "<tfoot>\n",
 						'tfoot_end' => "</tfoot>\n\n",
 						'body_start' => "<tbody>\n",
@@ -1331,6 +1331,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.40  2007/01/14 17:26:11  blueyed
+ * Fixed wrong TR around whole HEAD contents
+ *
  * Revision 1.39  2006/12/12 19:39:08  fplanque
  * enhanced file links / permissions
  *
