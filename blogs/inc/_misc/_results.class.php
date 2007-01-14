@@ -1100,6 +1100,10 @@ class Results extends Table
 							}
 							$output = str_replace( '$colspan_attrib$', 'colspan="'.$colspan.'"', $output );
 						}
+						else
+						{ // remove non-HTML attrib:
+							$output = str_replace( '$colspan_attrib$', '', $output );
+						}
 
 						// Contents to output:
 						$output .= $this->parse_col_content( $grp_col['td'] );
@@ -1970,6 +1974,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.46  2007/01/14 17:32:41  blueyed
+ * Always replace/remove "$colspan_attrib$"
+ *
  * Revision 1.45  2007/01/14 03:00:02  blueyed
  * typo and use $this->params['grp_line_end'] instead of '</tr>'
  *
