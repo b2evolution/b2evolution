@@ -52,39 +52,22 @@
 	</ul>
 	</div>
 	
-<h1>Cafelog/b2 (オリジナルの b2) からのアップグレード</h1>
+<h1>Upgrading from b2/Cafelog</h1>
 
-<p>始める前に、b2evolution のいくつかのネットワーク機能を利用する際には、あなたは我々の簡単な <a href="http://b2evolution.net/about/terms.html">サービス規約</a> に同意する必要があることに注意してください。</p>
-
-<p>以下のアップグレード手順は、b2 バージョン 0.6.1 と 0.6.2 でのみテストされています。しかし、バージョン 0.5.x 系でも問題無くアップグレードできるはずだと考えています。とにかく、あなたが b2 のどの古いバージョンを使っていても、まったく安全にアップグレードを試してみることができます。b2evolution はあなたのデータを解釈できなくても、データを傷つけることはありません。最悪の場合で、エラーメッセージが表示されるだけです。</p>
-<p><em>しかし、新しいもののインストールを始める前には、例のごとく、現在のウェブサイト / ブログ / データベース (あなたが設置しているものによります) のバックアップを行うのが賢明です。</em></p>
-
-<p>b2evolution 配布 .zip アーカイブを展開した後:</p>
+<p>If you would like to upgrade from the original b2/Cafelog (versions 0.5.x up to 0.6.2), please follow these steps:</p>
 
 <ol class="expanded">
-<li>サーバ上で、Cafelog/b2 用にあなたが現在使用している MySQL データベースを確認してください。アップグレードを可能にするために、b2evolution 用にも同じデータベースを使用しなければなりません。安心してください、b2evolution はあなたの Cafelog/b2 のテーブルやデータを変更することはありません!<br />
-		<span class="small"><br />
-		<strong>注意1: </strong>設定を変更しなかった場合は、b2evolution によって作られる全てのテーブルには evo_ と接頭辞が付きます。同じ接頭辞を用いるアプリケーションをすでに使用しているのでなければ、これによって安全に他のアプリケーションと一つのデータベースを共有することができます。例えば、Cafelog/b2 は b2 という接頭辞のついたテーブルを使用します。既存のテーブルが影響を受けることはないはずです。<br />
-		<strong>注意2:</strong> なぜ同じデータベースなのか? データをコピーするのに使用している SQL プロセス -- これは早くて安全です -- が、一つのデータベース内でしか行えないからです。</span>
-</li>
+<li>Do <strong>not</strong> install the current version of b2evolution right now. Instead, download b2evolution version 1.x. You can download  <a href="http://b2evolution.net/downloads/index.php">almost any version of b2evolution here</a>.</li>
 
-<li>b2evolution のファイル群をあなたのウェブサイトにアップロードしてください。<br />
-  <br />
-  <span class="small"><strong>注意:</strong> あなたのサイトにアップロードする必要があるのは <code>/blogs</code> ディレクトリの中身だけです。b2evolution をあなたのサイトのホームページとして扱いたい場合は、<code>/blogs</code> フォルダの中身をあなたのウェブサイトのルートにアップロードしてください。しかし、新しいサブディレクトリ、例えば <code>/b2evo</code> に、ファイル群をアップロードすることもできます。この方法では、<strong>あなたが b2evolution を試してみている間、既存の Cafelog/b2 ブログが完全に機能し続けます。</strong><br />
-  </span> <br />
-あなたが blogs フォルダの中身を <code>http://yoursite.com/b2evo</code> にインストールすると仮定しましょう...</li>
+<li>Follow the instructions incuded in b2evolution 1.x to upgrade from b2/Cafelog.</li>
 
-<li>インストール スクリプトをサーバ上で実行してください。スクリプトは  <code>http://yoursite.com/b2evo/install</code> に配置されています。それから、画面の指示に従ってください。<br /> <br /> インストーラは、あなたに数個の質問をして、必要なデータベース テーブルを作り、b2 のデータを b2evo にコピーし (b2 に影響を及ぼしません)、あなたの b2evolution の設定を行います。 </li>
-<li>新しくインストールされたものが動作していることを確認してください。</li>
-<li>公開サーバでは、<code>/install</code> サブフォルダを削除することを推奨します。</li>
-<li>既存の b2 テンプレートを b2evolution にアップグレードする注意事項を <a href="http://b2evolution.net/man/">マニュアル</a> や <a href="http://forums.b2evolution.net/">フォーラム</a> で確認してください。</li>
-<li>基本的なインストールが終わった後で、いくつかの <a href="http://b2evolution.net/man/install/trickystuff.html">処理する必要がある注意を要する事柄</a> (オンライン マニュアル) があります。</li>
+<li>Come back to the current version of b2evolution and <a href="upgradefrom_b2evo.ja-JP.html">upgrade from b2evolution 1.x to the current version</a>. </li>
 </ol>
 
 	<div id="rowfooter">
 		<a href="http://b2evolution.net/">公式ウェブサイト</a> &middot; 
 		<a href="http://b2evolution.net/about/license.html">GNU GPL ライセンス</a> &middot; 
-		<a href="http://fplanque.net/About/index.html">連絡: Fran&ccedil;ois PLANQUE</a>
+		<a href="http://fplanque.net/contact/">連絡: Fran&ccedil;ois PLANQUE</a>
 	</div>
 </body>
 </html>

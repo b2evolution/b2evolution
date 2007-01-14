@@ -52,39 +52,22 @@
 	</ul>
 	</div>
 	
-<h1>Oppgradere fra Cafelog/b2 (den opprinnelige b2)</h1>
+<h1>Upgrading from b2/Cafelog</h1>
 
-<p>Før du begynner, merk at noen av online-tjenestene som b2evolution tilbyr, krever at du godtar våre enkle <a href="http://b2evolution.net/about/terms.html">Bruksvilkår</a>.</p>
-
-<p>Oppgraderingsprosedyren nedenfor har kun blitt testet med versjonene 0.6.1 og 0.6.2 av b2, men vi mener at å oppgradere fra versjonene 0.5.x også burde gå uten problemer. Uansett kan du bare prøve det uten grunn til bekymring: b2evolution vil ikke skade din informasjon, selv om den ikke forstår den. Det verste som kan skje er at du får en feilmelding.</p>
-<p><em>Men som alltid er det lurt å gjøre en backup av ditt nåværende nettsted / din blog / din database (avhengig av hva du allerede har)</em></p>
-
-<p>Så snart du har pakket opp .ZIP-filen b2evolution kommer i:</p>
+<p>If you would like to upgrade from the original b2/Cafelog (versions 0.5.x up to 0.6.2), please follow these steps:</p>
 
 <ol class="expanded">
-<li>På serveren din, finn mysql-databasen du allerede bruker til Cafelog/b2. Du må bruke den samme databasen til b2evolution for å kunne oppgradere. Bare slapp av, b2evolution vil ikke forandre på dine Cafelog/b2-tabeller eller informasjon på noen måte!<br />
-		<span class="small"><br />
-		<strong>Merk 1: </strong>Med mindre du endret konfigurasjonsfilen, vil alle tabeller laget av b2evolution få evo_ som prefiks. Hvis du ikke allerede har et annet program som bruker den samme prefiksen, vil dette gjøre det tryggere å installere b2evolution i en database delt med andre programmer. For eksempel bruker Cafelog/b2 tabeller med b2 som prefiks. Dine eksisterende tabeller vil ikke bli påvirket på noen måte.<br />
-		<strong>Merk 2:</strong> Hvorfor bruke den samme databasen? Fordi SQL-prosessen vi bruker for å kopiere informasjonen -- som er rask og sikker -- kan bare brukes innen en enkelt database.</span>
-</li>
+<li>Do <strong>not</strong> install the current version of b2evolution right now. Instead, download b2evolution version 1.x. You can download  <a href="http://b2evolution.net/downloads/index.php">almost any version of b2evolution here</a>.</li>
 
-<li>Last opp b2evolution-filene til ditt nettsted.<br />
-  <br />
-  <span class="small"><strong>Merk:</strong> Bare innholdet i <code>/blogs</code>-mappen trengs for at b2evolution skal virke. Hvis du vil at b2evolution skal håndtere hovedsiden på ditt nettsted, kan du laste opp innholdet av <code>/blogs</code>-mappen til ditt nettsteds hovedmappe. Eller du kan for eksempel starte med å laste opp filene til en ny undermappe, <code>/b2evo</code>; på den måten <strong>vil din eksisterende Cafelog/b2-blog være fullstendig funksjonell mens du finner ut hva du synes om b2evolution.</strong><br />
-  </span> <br />
-La oss anta at du installerer innholdet av /blogs-mappen til <code>http://dittdomene.no/b2evo</code> ...</li>
+<li>Follow the instructions incuded in b2evolution 1.x to upgrade from b2/Cafelog.</li>
 
-<li>Kjør installasjonsskriptet på serveren din. Det finner du i <code>http://dittdomene.no/b2evo/install</code> . Deretter følger du bare instruksjonene på skjermen.<br /> <br /> Installasjonsskriptet vil stille deg noen spørsmål, lage de nødvendige database-tabellene, kopiere dine eksisterende b2-data til b2evo (uten å påvirke b2) og konfigurere b2evolution for deg. </li>
-<li>Sjekk at den nye installasjonen virker.</li>
-<li>På produksjonsservere anbefales det at du sletter <code>/install</code>-undermappen.</li>
-<li>Sjekk i <a href="http://b2evolution.net/man/">manualen</a> eller i <a href="http://forums.b2evolution.net/">forumene</a> for hjelp med å oppgradere din eksisterende b2 mal til b2evolution.</li>
-<li>Når grunninstallasjonen er ferdig, er det noen få <a href="http://b2evolution.net/man/install/trickystuff.html">vanskelige ting du kanskje må håndtere</a> (online manual).</li>
+<li>Come back to the current version of b2evolution and <a href="upgradefrom_b2evo.nb-NO.html">upgrade from b2evolution 1.x to the current version</a>. </li>
 </ol>
 
 	<div id="rowfooter">
 		<a href="http://b2evolution.net/">offisielt nettsted</a> &middot; 
 		<a href="http://b2evolution.net/about/license.html">GNU GPL lisens</a> &middot; 
-		<a href="http://fplanque.net/About/index.html">kontakt: Fran&ccedil;ois PLANQUE</a>
+		<a href="http://fplanque.net/contact/">kontakt: Fran&ccedil;ois PLANQUE</a>
 	</div>
 </body>
 </html>

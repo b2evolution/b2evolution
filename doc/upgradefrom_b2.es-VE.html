@@ -52,39 +52,22 @@
 	</ul>
 	</div>
 	
-<h1>Migrando desde Cafelog/b2 (el b2 original)</h1>
+<h1>Upgrading from b2/Cafelog</h1>
 
-<p>Antes de comenzar, por favor note que algunas características de red de b2evolution requieren que acepte nuestros simples <a href="http://b2evolution.net/about/terms.html">Terminos de servicio</a>.</p>
-
-<p>El siguiente procedimiento de migración ha sido probado exclusivamente con las versiones 0.6.1 y 0.6.2 de b2. Aunque creemos podría funcionar sin problemas con las versiones 0.5.x. De todas formas, si está ejecutando cualquier versión más vieja de b2, puede hacer un intento con seguridad. b2evolution no dañará sus datos aunque no pueda entenderlos. Lo peor que podría obtener es un mensaje de error.</p>
-<p><em>Sin embargo, como siempre, es recomendable hacer un respaldo actual de su sitio web / blog / base de datos (dependiendo de lo que ya tenga) antes de comenzar a instalar algo nuevo.</em></p>
-
-<p>Una vez que ha hecho unzip de la distribución b2evolution:</p>
+<p>If you would like to upgrade from the original b2/Cafelog (versions 0.5.x up to 0.6.2), please follow these steps:</p>
 
 <ol class="expanded">
-<li>En su servidor, localice la base de datos mySQL que actualmente esté utilizando para Cafelog/b2. Debe utilizar la misma base de datos para que b2evolution sea capaz de hacer la migración. Siéntase seguro, ¡b2evolution no alterará sus tablas ni sus datos de Cafelog/b2 de ninguna manera!<br />
-		<span class="small"><br />
-		<strong>Nota 1: </strong>A menos que haya cambiado el config, todas las tablas de b2evolution tienen el prefijo evo_. A menos que actualmente ya tenga una aplicación usando el mismo prefijo, esto hace segura la instalación de b2evolution en una base de datos compartida con otras aplicaciones. Por ejemplo, Cafelog/b2 por defecto usa el prefijo b2 para las tablas. Sus tablas existentes no serán afectadas de ninguna manera.<br />
-		<strong>Nota 2:</strong> Por qué la misma base de datos? Porque el proceso SQL que usamos para copiar los datos -que es rápido y seguro- solo puede hacerse dentro de una misma base de datos.</span>
-</li>
+<li>Do <strong>not</strong> install the current version of b2evolution right now. Instead, download b2evolution version 1.x. You can download  <a href="http://b2evolution.net/downloads/index.php">almost any version of b2evolution here</a>.</li>
 
-<li>Suba los archivos de b2evolution al sitio web.<br />
-  <br />
-  <span class="small"><strong>Nota:</strong> Solo es necesario subir al sitio el contenido del directorio <code>/blogs</code>. Si quiere que b2evolution se encargue de la página inicial de su sitio, suba el contenido de la carpeta <code>/blogs</code> a la raíz de su sitio web. Sin embargo, puede comenzar subiendo los archivos a un nuevo subdirectorio, por ejemplo <code>/b2evo</code>; de esa manera <strong> su blog Cagelog/b2 existente continuará siendo totalmente funcional mientras verifica b2evolution.</strong><br />
-  </span> <br />
-Asumamos que instala el contenido de la carpeta blogs en <code>http://elsitio.com/b2evo</code> ...</li>
+<li>Follow the instructions incuded in b2evolution 1.x to upgrade from b2/Cafelog.</li>
 
-<li>Ejecute el script de instalación en su servidor. Está localizado en code>http://elsitio.com/b2evo/install</code> . Entonces simplemente debe seguir las instrucciones en pantallas. <br />   <br /> El instalador le hará algunas preguntas, creará las tablas de la base de datos, copiará sus datos de b2 a b2evo (sin afectar b2) y configurará b2evolution por usted. </li>
-<li>Verifique para asegurar que la nueva instalación funciona.</li>
-<li>Para servidores en producción, es recomendable que borre la subcarpeta <code>/install</code>.</li>
-<li>Revise el <a href="http://b2evolution.net/man/">manual</a> o los <a href="http://forums.b2evolution.net/">foros</a> en busca de notas sobre como migrar sus plantillas b2 existentes a b2evolution.</li>
-<li>Después que la instalación básica está hecha, hay algunos <a href="http://b2evolution.net/man/install/trickystuff.html">puntos que debe cuidar</a> (manual en línea).</li>
+<li>Come back to the current version of b2evolution and <a href="upgradefrom_b2evo.es-VE.html">upgrade from b2evolution 1.x to the current version</a>. </li>
 </ol>
 
 	<div id="rowfooter">
 		<a href="http://b2evolution.net/">sitio web oficial</a> &middot; 
 		<a href="http://b2evolution.net/about/license.html">licencia GNU GPL</a> &middot; 
-		<a href="http://fplanque.net/About/index.html">contacto: Fran&ccedil;ois PLANQUE</a>
+		<a href="http://fplanque.net/contact/">contacto: Fran&ccedil;ois PLANQUE</a>
 	</div>
 </body>
 </html>

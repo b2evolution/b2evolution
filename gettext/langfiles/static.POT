@@ -176,7 +176,7 @@ msgstr ""
 
 #: ../../index.src.html:56
 #: ../../doc/install_new.src.html:56
-#: ../../doc/upgradefrom_b2.src.html:74
+#: ../../doc/upgradefrom_b2.src.html:45
 #: ../../doc/upgradefrom_b2evo.src.html:54
 #: ../../doc/upgradefrom_mt.src.html:45
 msgid "official website"
@@ -184,7 +184,7 @@ msgstr ""
 
 #: ../../index.src.html:57
 #: ../../doc/install_new.src.html:57
-#: ../../doc/upgradefrom_b2.src.html:75
+#: ../../doc/upgradefrom_b2.src.html:46
 #: ../../doc/upgradefrom_b2evo.src.html:55
 #: ../../doc/upgradefrom_mt.src.html:46
 msgid "GNU GPL license"
@@ -192,7 +192,7 @@ msgstr ""
 
 #: ../../index.src.html:58
 #: ../../doc/install_new.src.html:58
-#: ../../doc/upgradefrom_b2.src.html:76
+#: ../../doc/upgradefrom_b2.src.html:47
 #: ../../doc/upgradefrom_b2evo.src.html:56
 #: ../../doc/upgradefrom_mt.src.html:47
 msgid "contact"
@@ -203,14 +203,12 @@ msgid "To install b2evolution you need a web server. Nowadays, renting a server 
 msgstr ""
 
 #: ../../doc/install_new.src.html:35
-#: ../../doc/upgradefrom_b2.src.html:34
 #: ../../doc/upgradefrom_b2evo.src.html:33
 #: ../../doc/upgradefrom_mt.src.html:33
 msgid "Before you begin, please note that some network features of b2evolution require you to agree our simple <a %s>Terms of service</a>."
 msgstr ""
 
 #: ../../doc/install_new.src.html:36
-#: ../../doc/upgradefrom_b2.src.html:43
 msgid "Once you have unzipped the b2evolution distribution:"
 msgstr ""
 
@@ -220,7 +218,6 @@ msgstr ""
 
 #: ../../doc/install_new.src.html:40
 #: ../../doc/install_new.src.html:43
-#: ../../doc/upgradefrom_b2.src.html:60
 msgid "Note:"
 msgstr ""
 
@@ -229,7 +226,6 @@ msgid "b2evolution will create about 25 tables in the database you select. Unles
 msgstr ""
 
 #: ../../doc/install_new.src.html:41
-#: ../../doc/upgradefrom_b2.src.html:58
 msgid "Upload the b2evolution files to your website."
 msgstr ""
 
@@ -246,19 +242,16 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr ""
 
 #: ../../doc/install_new.src.html:50
-#: ../../doc/upgradefrom_b2.src.html:67
 #: ../../doc/upgradefrom_b2evo.src.html:44
 msgid "Check to make sure the new installation works."
 msgstr ""
 
 #: ../../doc/install_new.src.html:51
-#: ../../doc/upgradefrom_b2.src.html:68
 #: ../../doc/upgradefrom_b2evo.src.html:45
 msgid "On production servers, it is recommended that you delete the <code>/install</code> subfolder."
 msgstr ""
 
 #: ../../doc/install_new.src.html:52
-#: ../../doc/upgradefrom_b2.src.html:70
 #: ../../doc/upgradefrom_b2evo.src.html:50
 msgid "After basic install is done, there are a few <a %s>tricky things you may need to take care of</a> (online manual)."
 msgstr ""
@@ -268,51 +261,23 @@ msgid "Upgrading from Cafelog/b2"
 msgstr ""
 
 #: ../../doc/upgradefrom_b2.src.html:32
-msgid "Upgrading from Cafelog/b2 (the original b2)"
+msgid "Upgrading from b2/Cafelog"
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:36
-msgid "The upgrade procedure below has been tested exclusively with b2 versions 0.6.1 and 0.6.2. Though, we believe that versions 0.5.x should also upgrade without problems. Anyway, if you run any older version of b2, you can give it a try quite safely. b2evolution will not harm your data, even if it can't understand it. The worst you would get is an error message."
+#: ../../doc/upgradefrom_b2.src.html:34
+msgid "If you would like to upgrade from the original b2/Cafelog (versions 0.5.x up to 0.6.2), please follow these steps:"
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:40
-msgid "However, as always, it is wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new."
+#: ../../doc/upgradefrom_b2.src.html:37
+msgid "Do <strong>not</strong> install the current version of b2evolution right now. Instead, download b2evolution version 1.x. You can download  <a %s>almost any version of b2evolution here</a>."
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:46
-msgid "On your server, locate the mysql database you are already using for Cafelog/b2. You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will not alter your Cafelog/b2 tables and data in any way!"
+#: ../../doc/upgradefrom_b2.src.html:39
+msgid "Follow the instructions incuded in b2evolution 1.x to upgrade from b2/Cafelog."
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:50
-msgid "Note 1:"
-msgstr ""
-
-#: ../../doc/upgradefrom_b2.src.html:50
-msgid "Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. For example, Cafelog/b2 used tables prefixed with b2 . Your existing tables will not be affected in any way."
-msgstr ""
-
-#: ../../doc/upgradefrom_b2.src.html:54
-msgid "Note 2:"
-msgstr ""
-
-#: ../../doc/upgradefrom_b2.src.html:54
-msgid "Why the same database? Because the SQL process we use to copy the data -- which is fast and secure -- can only be done within a single database."
-msgstr ""
-
-#: ../../doc/upgradefrom_b2.src.html:60
-msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing Cafelog/b2 blog remains fully functional while you check out b2evolution.</strong>"
-msgstr ""
-
-#: ../../doc/upgradefrom_b2.src.html:62
-msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/b2evo</code> ..."
-msgstr ""
-
-#: ../../doc/upgradefrom_b2.src.html:64
-msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />   <br /> The installer will ask you a few questions, create required database tables, copy your b2 data to b2evo (without affecting b2) and configure b2evolution for you."
-msgstr ""
-
-#: ../../doc/upgradefrom_b2.src.html:69
-msgid "Check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
+#: ../../doc/upgradefrom_b2.src.html:41
+msgid "Come back to the current version of b2evolution and <a %s>upgrade from b2evolution 1.x to the current version</a>."
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:35

@@ -52,39 +52,22 @@
 	</ul>
 	</div>
 	
-<h1>Upgrade depuis Cafélog/b2 (la version originale de b2)</h1>
+<h1>Upgrading from b2/Cafelog</h1>
 
-<p>Avant de commencer, merci de noter que certaines fonctionnalités distribuées de b2evolution nécessitent que vous approuvier nos <a href="http://b2evolution.net/about/terms.html">Conditions d'utilisation</a> (très simples).</p>
-
-<p>La procédure de mise à jour ci dessous a été testée exclusivement avec b2 versions 0.6.1 et 0.6.2. Cependant, nous pensons que les versions 0.5.x devraient également pouvoir être mises à jour sans problèmes. Dans tous les cas, si vous utilisez une version antérieure de b2, vous pouvez faire un essai de mise à jour sans risque. b2evolution n'abimera pas vos données, même s'il n'arrive pas à les comprendre. Le pire qui pourrait arriver est un message d'erreur.</p>
-<p><em>Cependant, comme toujours, il est prudent de faire une copie de sauvegarde de votre site web / blog / base de données courants (selon ce que vous avez déjà) avant de commencer l'installation de quelque chose de nouveau.</em></p>
-
-<p>Après avoit dézippé le fichier de distribution de b2evolution:</p>
+<p>If you would like to upgrade from the original b2/Cafelog (versions 0.5.x up to 0.6.2), please follow these steps:</p>
 
 <ol class="expanded">
-<li>Sur votre serveur, localisez la base de données mySQL que vous utilisez déjà pour Cafélog/b2. Vous devez utiliser la même base de données pour b2evolution afin de pouvoir upgrader. Soyez rassuré, b2evolution ne modifiera pas vos tables Cafélog/b2 en quelque manière que ce soit!<br />
-		<span class="small"><br />
-		<strong>Note 1: </strong>A moins que vous n'ayez changé la configuration, toutes les tables créées par b2evolution sont préfixées avec evo_ . A moins que vous n'ayez déjà une application utilisant le même préfixe, l'installation de b2evolution dans une base de données partagées avec d'autre applications est donc sûre. Par exemple, Cafélog/b2 utilisait des tables préfixées avec b2 . Vos tables existantes ne seront affectées en aucune manière.<br />
-		<strong>Note 2:</strong> Pourquoi la même base de données? Parce que le processus SQL -- rapide et sûr -- que nous utilisons pour copier les données ne peut être effectué qu'à l'interieur d'une même base de données.</span>
-</li>
+<li>Do <strong>not</strong> install the current version of b2evolution right now. Instead, download b2evolution version 1.x. You can download  <a href="http://b2evolution.net/downloads/index.php">almost any version of b2evolution here</a>.</li>
 
-<li>Téléchargez les fichiers de b2evolution sur votre serveur web.<br />
-  <br />
-  <span class="small"><strong>Note:</strong> Seuls les contenus du répertoire <code>/blogs</code> ont besoin d'être téléchargés sur votre serveur. Si vous voulez que b2evolution prenne en charge la page d'accueil de votre site, téléchargez les contenus du dossier <code>/blogs</code> à la racine de votre site web. Autrement, le mieux est de télécharger les fichiers dans un sous-répertoire de votre site web, <code>/b2evo</code> par exemple; de cette manière <strong>votre blog Cafelog/b2 reste complètement fonctionnel pendant que vous évaluez b2evolution.</strong><br />
-  </span> <br />
-Supposons que vous installiez les contenus du répertoire blogs à l'emplacement <code>http://votresite.com/b2evo</code> ...</li>
+<li>Follow the instructions incuded in b2evolution 1.x to upgrade from b2/Cafelog.</li>
 
-<li>Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/b2evo/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation vos posera quelques questions, créera les tables requises dans la base de donnés, copiera vos données b2 vers b2evolution (sans altérer b2) et configurera b2evolution pour vous. </li>
-<li>Vérifiez que la nouvelle installation fonctionne.</li>
-<li>Sur les serveurs de production, il est recommandé de supprimer le sous répertoire <code>/install</code>.</li>
-<li>Consultez le <a href="http://b2evolution.net/man/">manuel</a> ou les <a href="http://forums.b2evolution.net/">forums</a> pour obtenir des informations sur la manière d'upgrader votre gabarit &amp; habillage WordPress existants vers b2evolution.</li>
-<li>Une fois que l'installation de base est terminée, il y a quelques <a href="http://b2evolution.net/man/install/trickystuff.html">choses légèrement délicates à régler</a> (manual en ligne).</li>
+<li>Come back to the current version of b2evolution and <a href="upgradefrom_b2evo.fr-CA.html">upgrade from b2evolution 1.x to the current version</a>. </li>
 </ol>
 
 	<div id="rowfooter">
 		<a href="http://b2evolution.net/">site officiel</a> &middot; 
 		<a href="http://b2evolution.net/about/license.html">Licence GNU GPL</a> &middot; 
-		<a href="http://fplanque.net/About/index.html">contact: Fran&ccedil;ois PLANQUE</a>
+		<a href="http://fplanque.net/contact/">contact: Fran&ccedil;ois PLANQUE</a>
 	</div>
 </body>
 </html>

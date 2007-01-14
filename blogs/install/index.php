@@ -425,9 +425,6 @@ switch( $action )
 			<p><input type="radio" name="action" id="evoupgrade" value="evoupgrade" />
 				<label for="evoupgrade"><?php echo T_('<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version. <strong>WARNING:</strong> If you have modified your database, this operation may fail. Make sure you have a backup.').' '.T_('<strong>NOTE:</strong> Your stats will be reset.')?></label></p>
 
-			<p><input type="radio" name="action" id="cafelogupgrade" value="cafelogupgrade" />
-				<label for="cafelogupgrade"><?php echo T_('<strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them.')?></label></p>
-
 			<?php
 				if( $allow_evodb_reset == 1 )
 				{
@@ -548,29 +545,6 @@ to
 		break;
 
 
-	case 'cafelogupgrade':
-		// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
-		load_class('_misc/_plugins_admin_no_db.class.php');
-		$Plugins = new Plugins_admin_no_DB();
-		/*
-		 * -----------------------------------------------------------------------------------
-		 * UPGRADE FROM B2 : Create a new db structure + copy content from previous b2
-		 * -----------------------------------------------------------------------------------
-		 */
-		require_once( dirname(__FILE__). '/_functions_cafelogupgrade.php' );
-		?>
-		<h2><?php printf( T_('Installing b2evolution tables and copying existing %s data'), 'b2' ) ?></h2>
-		<?php
-			create_b2evo_tables();
-			upgrade_cafelog_tables();
-			install_basic_plugins();
-		?>
-		<p><?php echo T_('Upgrade completed successfully!')?></p>
-		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'"', 'b2')?></p>
-		<?php
-		break;
-
-
 	case 'deletedb':
 		/*
 		 * -----------------------------------------------------------------------------------
@@ -647,6 +621,11 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.123  2007/01/14 03:47:53  fplanque
+ * killed upgrade from b2/cafelog
+ * (if people haven't upgraded yet, there's little chance they ever will,
+ * no need to maintain this. We also provide an upgrade path with 1.x)
+ *
  * Revision 1.122  2007/01/12 02:40:26  fplanque
  * widget default params proof of concept
  * (param customization to be done)

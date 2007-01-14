@@ -52,39 +52,22 @@
 	</ul>
 	</div>
 	
-<h1>Обновление с Cafelog/b2 (оргинальная b2)</h1>
+<h1>Upgrading from b2/Cafelog</h1>
 
-<p>Перед началом, пожалуйста обратите внимание на некоторые сетевые особенности b2evolution требуемые для вашего согласия с <a href="http://b2evolution.net/about/terms.html">Terms of service</a>.</p>
-
-<p>Процедура обновления была протестирована на b2 версии 0.6.1 и 0.6.2. Несмотря на это мы думаем версии 0.5.х должны будут обновиться без проблем. Если вы работаете с более старыми версиями b2evolution не причинит им вред.</p>
-<p><em>Однако, всегда, делайте backup вашего текущего сайта / блогов / базы перед началом инсталирования нового.</em></p>
-
-<p>Распакуйте b2evolution дистрибутив:</p>
+<p>If you would like to upgrade from the original b2/Cafelog (versions 0.5.x up to 0.6.2), please follow these steps:</p>
 
 <ol class="expanded">
-<li>На вашем сервере mysql база используется Cafelog/b2. Вы можите использовать b2evolution в ней жи и сделать обновление.  b2evolution добавит новые таблицы при этом данные Cafelog/b2 останутся!<br />
-		<span class="small"><br />
-		<strong>Внимание 1: </strong>Кроме ваших изменений в конфиге, все таблицы, ссоозданные в b2evolution имеют префикс evo_ . Вы можите установить и использовать b2evolution с другими приложениями в одной базе используя префикс. Например, Cafelog/b2 использует таблицы с префиксом b2. Ваши существующие таблицы не будут затронуты.<br />
-		<strong>Внимание 2:</strong> Почему в одной базе? Потому что SQL процесс будет использовать копию данных -- который быстрее и надежнее -- в одной базе.</span>
-</li>
+<li>Do <strong>not</strong> install the current version of b2evolution right now. Instead, download b2evolution version 1.x. You can download  <a href="http://b2evolution.net/downloads/index.php">almost any version of b2evolution here</a>.</li>
 
-<li>Обновление b2evolution файлов на вашем сайте.<br />
-  <br />
-  <span class="small"><strong>Внимание:</strong> Только контент в <code>/blogs</code> папке должен быть обновлен на вашем сайте. Если вы хотите чтобы b2evolution был единственным на вашем сайте, загрузите контент в <code>/blogs</code> папку в корне вашего сайта. Вы можите загрузить все в новую папку, например, <code>/b2evo</code> и<strong> ваш существующий Cafelog/b2 сохранит полную функциональностьвместе с b2evolution.</strong><br />
-  </span> <br />
-Разрешите принять инсталяцию вашего контента в папку блога <code>http://yoursite.com/b2evo</code> ...</li>
+<li>Follow the instructions incuded in b2evolution 1.x to upgrade from b2/Cafelog.</li>
 
-<li>Запустите установочный скрипт на вашем сервере. Он расположен в <code>http://yoursite.com/b2evo/install</code> . Следуйте инструкциям на экране.<br />   <br /> Установщик задаст несколько простых вопросов, создаст таблицы в базе данных, скопирует ваши  b2 данные в b2evo (не затрагивая  b2) и сконфигурирует b2evolution для вас. </li>
-<li>Выберите для начала новой инсталяции.</li>
-<li>После установки мы рекомендуем удалить папку <code>/install</code> и её подпапки.</li>
-<li>Посмотрите <a href="http://b2evolution.net/man/">руководствоl</a> и  <a href="http://forums.b2evolution.net/">форум</a> для обновления существующих тем b2 в b2evolution.</li>
-<li>После окончания основной установки посмотрите на некоторые <a href="http://b2evolution.net/man/install/trickystuff.html">хитрости и необходимые вещи </a> (в онлайн руководстве).</li>
+<li>Come back to the current version of b2evolution and <a href="upgradefrom_b2evo.ru-RU-cp1251.html">upgrade from b2evolution 1.x to the current version</a>. </li>
 </ol>
 
 	<div id="rowfooter">
 		<a href="http://b2evolution.net/">офицальный сайт</a> &middot; 
 		<a href="http://b2evolution.net/about/license.html">GNU GPL лицензия</a> &middot; 
-		<a href="http://fplanque.net/About/index.html">контакт: Fran&ccedil;ois PLANQUE</a>
+		<a href="http://fplanque.net/contact/">контакт: Fran&ccedil;ois PLANQUE</a>
 	</div>
 </body>
 </html>
