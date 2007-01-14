@@ -473,6 +473,31 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 
 	/**
+	 * Special test for AUTO_INCREMENT/PRIMARY KEY handling.
+	 */
+	function test_add_auto_increment_and_PK_rename()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE IF NOT EXISTS test_1 (
+				i INT,
+				PRIMARY KEY (i)
+			)" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE IF NOT EXISTS test_1 (
+				ID int(10) unsigned NOT NULL auto_increment,
+				i INT,
+				PRIMARY KEY (ID)
+			)" );
+
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( count($r['test_1']), 1 );
+		$this->assertEqual( $r['test_1'][0]['queries'],
+			array('ALTER TABLE test_1 ADD COLUMN ID int(10) unsigned NOT NULL auto_increment FIRST, DROP PRIMARY KEY, ADD PRIMARY KEY (ID)') );
+	}
+
+
+	/**
 	 * Test if a PRIMARY KEY gets detected when "moved" in the schema
 	 */
 	function test_db_delta_move_key()

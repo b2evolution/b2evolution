@@ -665,6 +665,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 						if( ! empty( $primary_key_fields ) )
 						{
 							$column_definition .= ', DROP PRIMARY KEY';
+							unset( $obsolete_indices['PRIMARY'] );
 						}
 					}
 					else
@@ -685,6 +686,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 								if( ! empty( $existing_primary_fields ) )
 								{ // and a PRIMARY key exists already
 									$column_definition .= ', DROP PRIMARY KEY';
+									unset( $obsolete_indices['PRIMARY'] );
 								}
 								$existing_primary_fields = array(); // we expect no existing primary key anymore
 								$primary_key_fields = $l_index['col_names']; // this becomes our primary key
@@ -903,6 +905,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 							if( ! empty( $existing_primary_fields ) )
 							{ // and a PRIMARY key exists already
 								$column_definition .= ', DROP PRIMARY KEY';
+								unset( $obsolete_indices['PRIMARY'] );
 							}
 							$existing_primary_fields = array(); // we expect no existing primary key anymore
 							$primary_key_fields = $l_index['col_names']; // this becomes our primary key
@@ -952,7 +955,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 			array_shift( $items[$table_lowered] );
 
 
-			// Add the remaining indeces (which are not "inline" with a column definition and therefor already handled):
+			// Add the remaining indices (which are not "inline" with a column definition and therefor already handled):
 			foreach( $indices as $index )
 			{
 				if( empty($index['create_definition']) )
@@ -1125,6 +1128,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.27  2007/01/14 21:40:17  blueyed
+ * db_delta() fix for PK handling/obsoleting
+ *
  * Revision 1.26  2007/01/14 03:05:54  blueyed
  * db_delta() fix: handle/remove backticks in auto-generated index names
  *
