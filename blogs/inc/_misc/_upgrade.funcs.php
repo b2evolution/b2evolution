@@ -60,9 +60,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * NOTE: it may be needed to merge an 'add_index' or 'drop_index' type query into an
  *       'add_column'/'change_column' query (adding "AUTO_INCREMENT" for example)!
  *
+ * NOTE: collations and charset changes are ignored. It seems quite difficult to support this,
+ *       and it seems to be best to handle this "manually".
+ *
  * @author Originally taken from Wordpress, heavily enhanced and modified by blueyed
  *
- * @todo "Plugin can't change primary key" {@link http://forums.b2evolution.net/viewtopic.php?t=10345}
  * @todo Handle COMMENT for tables?!
  *
  * @see http://dev.mysql.com/doc/refman/4.1/en/create-table.html
@@ -1128,6 +1130,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.28  2007/01/14 21:55:07  blueyed
+ * doc
+ *
  * Revision 1.27  2007/01/14 21:40:17  blueyed
  * db_delta() fix for PK handling/obsoleting
  *
