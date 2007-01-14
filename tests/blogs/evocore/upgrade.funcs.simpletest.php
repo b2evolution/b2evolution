@@ -975,6 +975,24 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 	}
 
 
+	/**
+	 * Tests if backticks get handled in "auto key names" ("i" in this case)
+	 */
+	function test_handle_backticks_in_auto_key_names()
+	{
+		$sql = "
+			CREATE TABLE `test_1` (
+				`i` INT,
+				INDEX ( `i` )
+			)";
+		$this->test_DB->query( $sql );
+
+		$r = $this->db_delta_wrapper( $sql );
+
+		$this->assertEqual( count($r), 0 );
+	}
+
+
 }
 
 

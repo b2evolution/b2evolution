@@ -357,7 +357,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 						if( ! preg_match( '~^\w+\s+[^(]~', $index['create_definition'], $match ) )
 						{ // no key name given, make the name part optional, if it's the default one:
 							// (Default key name seems to be the first column, eventually with "_\d+"-suffix)
-							$auto_key = strtoupper($index['col_names'][0]);
+							$auto_key = db_delta_remove_backticks(strtoupper($index['col_names'][0]));
 							if( isset($used_auto_keys[$auto_key]) )
 							{
 								$used_auto_keys[$auto_key]++;
@@ -1125,6 +1125,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.26  2007/01/14 03:05:54  blueyed
+ * db_delta() fix: handle/remove backticks in auto-generated index names
+ *
  * Revision 1.25  2007/01/12 01:34:39  fplanque
  * doc
  *
