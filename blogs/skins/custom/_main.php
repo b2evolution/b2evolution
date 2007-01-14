@@ -245,75 +245,26 @@ skin_content_header();	// Sets charset!
 
 
 	<?php
-		// Display container and contents:
+		// Display container contents:
 		$Skin->container( NT_('Sidebar'), array(
-				// The following params will be used as defaults for widgets included in this container:
+				// The following (optional) params will be used as defaults for widgets included in this container:
+				// This will enclose each widget in a block:
 				'block_start' => '<div class="bSideItem $wi_class$">',
 				'block_end' => '</div>',
+				// This will enclose the title of each widget:
 				'block_title_start' => '<h3>',
 				'block_title_end' => '</h3>',
+				// If a widget displays a list, this will enclose that list:
+				'list_start' => '<ul>',
+				'list_end' => '</ul>',
+				// This will enclose each item in a list:
+				'item_start' => '<li>',
+				'item_end' => '</li>',
+				// This will enclose sub-lists in a list:
+				'group_start' => '<ul>',
+				'group_end' => '</ul>',
 			) );
 	?>
-
-
-	<div class="bSideItem">
-
-		<?php
-			if( isset($MainList) )
-			{ // Links to list pages:
-				$MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
-   				'prev_text' => '&lt;&lt; '.T_('Previous'),
-   				'next_text' => T_('Next').' &gt;&gt;',
-				) );
-			}
-		?>
-		<ul>
-			<!-- <li><a href="<?php $Blog->disp( 'staticurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(cached)') ?></span></li> -->
-			<li><a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <!-- <span class="dimmed"><?php echo T_('(no cache)') ?></span> --></li>
-			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>
-		</ul>
-
-		<?php
-			// -------------------------- CALENDAR INCLUDED HERE -----------------------------
-			// Call the Calendar plugin:
-			$Plugins->call_by_code( 'evo_Calr', array(	// Params follow:
-					'block_start'=>'',
-					'block_end'=>'',
-					'title'=>'',			// No title.
-				) );
-			// -------------------------------- END OF CALENDAR ----------------------------------
-		?>
-	</div>
-
-	<div class="bSideItem">
-		<h3 class="sideItemTitle"><?php echo T_('Search') ?></h3>
-		<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), 'search', 'SearchForm' ) ?>
-			<p><input type="text" name="s" size="30" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" /><br />
-			<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo T_('All Words') ?></label><br />
-			<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo T_('Some Word') ?></label><br />
-			<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo T_('Entire phrase') ?></label></p>
-			<input type="submit" name="submit" class="submit" value="<?php echo T_('Search') ?>" />
-		</form>
-	</div>
-
-
-	<?php
-		// -------------------------- CATEGORIES INCLUDED HERE -----------------------------
-		// Call the Categories plugin:
-		$Plugins->call_by_code( 'evo_Cats', array(	// Add parameters below:
-			) );
-		// -------------------------------- END OF CATEGORIES ----------------------------------
-	?>
-
-
-	<?php
-		// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-		// Call the Archives plugin:
-		$Plugins->call_by_code( 'evo_Arch', array(	// Add parameters below:
-			) );
-		// -------------------------------- END OF ARCHIVES ----------------------------------
-	?>
-
 
 	<?php
 		// -------------------------- LINKBLOG INCLUDED HERE -----------------------------
@@ -337,38 +288,11 @@ skin_content_header();	// Sets charset!
 	</div>
 
 
-	<div class="bSideItem">
-		<h3><img src="<?php echo $rsc_url ?>icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> <?php echo T_('XML Feeds') ?></h3>
-			<ul>
-				<li>
-					RSS 0.92:
-					<a href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>"><?php echo T_('Posts') ?></a>,
-					<a href="<?php $Blog->disp( 'comments_rss_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
-				</li>
-				<li>
-					RSS 1.0:
-					<a href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>"><?php echo T_('Posts') ?></a>,
-					<a href="<?php $Blog->disp( 'comments_rdf_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
-				</li>
-				<li>
-					RSS 2.0:
-					<a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><?php echo T_('Posts') ?></a>,
-					<a href="<?php $Blog->disp( 'comments_rss2_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
-				</li>
-				<li>
-					Atom:
-					<a href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><?php echo T_('Posts') ?></a>,
-					<a href="<?php $Blog->disp( 'comments_atom_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
-				</li>
-			</ul>
-			<a href="http://webreference.fr/2006/08/30/rss_atom_xml" title="External - English"><?php echo T_('What is RSS?') ?></a>
-	</div>
-
-
 	<?php
 	if( empty($generating_static) && ! $Plugins->trigger_event_first_true('CacheIsCollectingContent') )
 	{ // We're not generating static pages nor is a caching plugin collecting the content, so we can display this block
 		// TODO: when this gets a SkinTag plugin this check should get done by the Plugin
+		// fp> will not be a plugin because it's too closely tied to internals (Sessions)
 		?>
 	<div class="bSideItem">
 		<h3 class="sideItemTitle"><?php echo T_('Who\'s Online?') ?></h3>

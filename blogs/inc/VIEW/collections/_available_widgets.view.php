@@ -15,14 +15,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $container;
 
-global $core_componentwidget_codes;
+global $core_componentwidget_defs;
 
 echo '<h2><span class="right_icons">'.action_icon( T_('Cancel!'), 'close', regenerate_url( 'container' ) ).'</span>'
 	.sprintf(T_('Widgets available for insertion into &laquo;%s&raquo;'), $container ).'</h2>';
 
 echo '<ul>';
 
-foreach( $core_componentwidget_codes as $code )
+foreach( $core_componentwidget_defs as $code => $dummy )
 {
 	$ComponentWidget = & new ComponentWidget( NULL, 'core', $code );
 
@@ -60,6 +60,9 @@ if( ! empty($Plugin_array) )
 
 /*
  * $Log$
+ * Revision 1.5  2007/01/14 01:32:11  fplanque
+ * more widgets supported! :)
+ *
  * Revision 1.4  2007/01/12 21:53:12  blueyed
  * Probably fixed Plugins::get_list_by_* methods: the returned references were always the one to the last Plugin
  *

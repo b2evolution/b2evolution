@@ -51,6 +51,7 @@ switch( $action )
 		$WidgetCache = & get_Cache( 'WidgetCache' );
 		$edited_ComponentWidget = & $WidgetCache->get_by_ID( $wi_ID );
 		// Take blog from here!
+		// echo $edited_ComponentWidget->coll_ID;
  		set_working_blog( $edited_ComponentWidget->coll_ID );
 		break;
 
@@ -69,13 +70,6 @@ $SkinCache = & get_Cache( 'SkinCache' );
 $Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
 // Make sure containers are loaded for that skin:
 $container_list = $Skin->get_containers();
-
-
-$core_componentwidget_codes = array(
-		'coll_title',
-    'coll_tagline',
-    'coll_longdesc',
-	);
 
 
 /**
@@ -101,7 +95,7 @@ switch( $action )
 		{
 			case 'core':
 				// Check the requested core widget is valid:
-				if( !in_array( $code, $core_componentwidget_codes ) )
+				if( !isset( $core_componentwidget_defs[$code] ) )
 				{
 					debug_die( 'Unhandled core widget code' );
 				}
@@ -223,6 +217,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2007/01/14 01:32:11  fplanque
+ * more widgets supported! :)
+ *
  * Revision 1.6  2007/01/13 04:10:44  fplanque
  * implemented "add" support for plugin widgets
  *

@@ -996,11 +996,12 @@ function install_basic_skins()
 	skin_install( 'nifty_corners' );
 	skin_install( 'photoblog' );
 
-	skin_install( '_atom' );
-	skin_install( '_rss2' );
+	skin_install( '_atom', 'Atom' );
+	skin_install( '_rss2', 'RSS 2.0' );
 
 	echo "OK.<br />\n";
 }
+
 
 /**
  * Install basic widgets.
@@ -1020,13 +1021,42 @@ function install_basic_widgets()
 							 SELECT blog_ID, "Header", 2, "core", "coll_tagline"
 							   FROM T_blogs' );
 
+	// Add Calendar plugin to all blog Sidebars:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Sidebar", 1, "plugin", "evo_Calr"
+							   FROM T_blogs' );
 	// Add title to all blog Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 1, "core", "coll_title"
+							 SELECT blog_ID, "Sidebar", 2, "core", "coll_title"
 							   FROM T_blogs' );
 	// Add longdesc to all blogs Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 2, "core", "coll_longdesc"
+							 SELECT blog_ID, "Sidebar", 3, "core", "coll_longdesc"
+							   FROM T_blogs' );
+	// Add common links to all blogs Sidebars:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Sidebar", 4, "core", "coll_common_links"
+							   FROM T_blogs' );
+	// Add search form to all blogs Sidebars:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Sidebar", 5, "core", "coll_search_form"
+							   FROM T_blogs' );
+	// Add Categories plugin to all blog Sidebars:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Sidebar", 6, "plugin", "evo_Cats"
+							   FROM T_blogs' );
+	// Add XML feeds to all blogs Sidebars:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Sidebar", 7, "core", "coll_xml_feeds"
+							   FROM T_blogs' );
+	// Add User tools to all blogs Sidebars:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Sidebar", 8, "core", "user_tools"
+							   FROM T_blogs' );
+
+	// Add Admin help to all blog Footers:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Footer", 1, "core", "admin_help"
 							   FROM T_blogs' );
 
 	echo "OK.<br />\n";
@@ -1080,6 +1110,9 @@ function install_basic_plugins( $old_db_version = 0 )
 
 /*
  * $Log$
+ * Revision 1.211  2007/01/14 01:32:14  fplanque
+ * more widgets supported! :)
+ *
  * Revision 1.210  2007/01/12 02:40:26  fplanque
  * widget default params proof of concept
  * (param customization to be done)
