@@ -966,8 +966,9 @@ class AdminUI_general
 					'footer_end' => "</div>\n\n",
 					'no_results_start' => '<table class="grouped" cellspacing="0">'."\n\n"
 								                .'<th class="title"><span style="float:right">$global_icons$</span>'
-								                .'$title$</th></tr>'."\n",
-					'no_results_end'   => '<tr class="lastline"><td class="firstcol lastcol">'.T_('No results.').'</td></tr>'
+								                .'$title$</th></tr>'."\n"
+								                .'<tr class="lastline"><td class="firstcol lastcol">',
+					'no_results_end'   => '</td></tr>'
 								                .'</table>'."\n\n",
 				'after' => '</div>',
 				'sort_type' => 'basic'
@@ -1331,6 +1332,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.41  2007/01/14 22:06:48  fplanque
+ * support for customized 'no results' messages
+ *
  * Revision 1.40  2007/01/14 17:26:11  blueyed
  * Fixed wrong TR around whole HEAD contents
  *

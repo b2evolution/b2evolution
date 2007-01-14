@@ -224,6 +224,14 @@ class Table extends Widget
 	 */
 	var $is_fadeout_line;
 
+	var $no_results_text;
+
+
+	function Table()
+	{
+		$this->no_results_text = T_('No results.');
+	}
+
 
 	/**
 	 * Initialize things in order to be ready for displaying.
@@ -295,6 +303,8 @@ class Table extends Widget
 		if( $this->total_pages == 0 )
 		{ // There are no results! Nothing to display!
 			echo $this->replace_vars( $this->params['no_results_start'] );
+			echo $this->no_results_text;
+			echo $this->replace_vars( $this->params['no_results_end'] );
 		}
 		else
 		{	// We have rows to display:
@@ -312,7 +322,6 @@ class Table extends Widget
 	{
 		if( $this->total_pages == 0 )
 		{ // There are no results! Nothing to display!
-			echo $this->replace_vars( $this->params['no_results_end'] );
 		}
 		else
 		{	// We have rows to display:
@@ -770,6 +779,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.15  2007/01/14 22:06:48  fplanque
+ * support for customized 'no results' messages
+ *
  * Revision 1.14  2007/01/11 21:06:05  fplanque
  * bugfix
  *

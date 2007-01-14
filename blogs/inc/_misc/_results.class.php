@@ -254,6 +254,8 @@ class Results extends Table
 	 */
 	function Results( $sql, $param_prefix = '', $default_order = '', $limit = 20, $count_sql = NULL, $init_page = true )
 	{
+		parent::Table();
+
 		$this->sql = $sql;
 		$this->limit = $limit;
 		$this->param_prefix = $param_prefix;
@@ -1974,6 +1976,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.47  2007/01/14 22:06:48  fplanque
+ * support for customized 'no results' messages
+ *
  * Revision 1.46  2007/01/14 17:32:41  blueyed
  * Always replace/remove "$colspan_attrib$"
  *
