@@ -743,13 +743,17 @@ switch( $action )
 	case 'info':
 		param( 'plugin_ID', 'integer', true );
 
-		// Discover available plugins:
-		load_class('_misc/_plugins_admin_no_db.class.php');
-		$AvailablePlugins = & new Plugins_admin_no_DB(); // do not load registered plugins/events from DB
-		$AvailablePlugins->discover();
+		if( $plugin_ID < 0 )
+		{ // not installed:
+			// Discover available plugins:
+			load_class('_misc/_plugins_admin_no_db.class.php');
+			$AvailablePlugins = & new Plugins_admin_no_DB(); // do not load registered plugins/events from DB
+			$AvailablePlugins->discover();
 
-		if( ! ($edit_Plugin = & $AvailablePlugins->get_by_ID( $plugin_ID )) )
-		{
+			$edit_Plugin = & $AvailablePlugins->get_by_ID( $plugin_ID );
+		}
+		else
+		{ // installed:
 			$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 		}
 		if( ! $edit_Plugin )
@@ -1035,6 +1039,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.75  2007/01/14 05:53:14  blueyed
+ * Optimized init of "info" action: do not discover available Plugins, if not necessary
+ *
  * Revision 1.74  2007/01/10 21:41:00  blueyed
  * Step 2 is installing the DB changes
  *
