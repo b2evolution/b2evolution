@@ -308,9 +308,10 @@ class Plugins
 	 * @param string Path of the .php class file of the plugin.
 	 * @param boolean Must the plugin exist (classfile_path and classname)?
 	 *                This is used internally to be able to unregister a non-existing plugin.
+	 * @param boolean Return an object, also in case of error (used by admin functions)
 	 * @return Plugin Plugin ref to newly created plugin; string in case of error
 	 */
-	function & register( $classname, $ID = 0, $priority = -1, $apply_rendering = NULL, $classfile_path = NULL, $must_exists = true )
+	function & register( $classname, $ID = 0, $priority = -1, $apply_rendering = NULL, $classfile_path = NULL, $must_exists = true, $return_object = false )
 	{
 		global $Debuglog, $Messages, $Timer;
 
@@ -347,7 +348,8 @@ class Plugins
 				$this->plugin_errors[$ID]['register'] = $r;
 				$this->set_Plugin_status( $Plugin, 'broken' );
 
-				if( $this->is_admin_class )
+				// dh> removed: if( $this->is_admin_class )
+				if( $return_object )
 				{
 					$Plugin->name = $Plugin->classname; // use the classname instead of "unnamed plugin"
 					$Timer->pause( 'plugins_register' );
@@ -362,7 +364,7 @@ class Plugins
 				return $r;
 			}
 		}
-		else
+		elseif( ! class_exists($classname) ) // If there are several copies of one plugin for example..
 		{
 			$Debuglog->add( 'Loading plugin class file: '.$classname, 'plugins' );
 			require_once $classfile_path;
@@ -380,7 +382,8 @@ class Plugins
 				$this->plugin_errors[$ID]['register'] = $r;
 				$this->set_Plugin_status( $Plugin, 'broken' );
 
-				if( $this->is_admin_class )
+				// dh> removed: if( $this->is_admin_class )
+				if( $return_object )
 				{
 					$Plugin->name = $Plugin->classname; // use the classname instead of "unnamed plugin"
 					$Timer->pause( 'plugins_register' );
@@ -1618,7 +1621,7 @@ class Plugins
 	/**
 	 * Has a plugin a specific event registered/enabled?
 	 *
-	 * @todo fp> The plugin should discover its events itself / This question should be asked to the Plugin itself. 
+	 * @todo fp> The plugin should discover its events itself / This question should be asked to the Plugin itself.
 	 *
 	 * @param integer
 	 * @param string
@@ -1796,6 +1799,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.133  2007/01/14 08:05:03  blueyed
+ * Started to remove $is_admin_class in Plugins::register()
+ *
  * Revision 1.132  2007/01/13 14:57:28  blueyed
  * Removed $is_admin_class hack from load_events() by re-implementing (copying most of it) to Plugins_admin as per todo
  *
