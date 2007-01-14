@@ -660,7 +660,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 		$this->test_DB->query( "
 			CREATE TABLE test_1 (
 				i INT( 10 ) NOT NULL DEFAULT '0',
-				v VARCHAR( 30 ) COLLATE latin1_german1_ci NOT NULL DEFAULT '',
+				v VARCHAR( 30 ) NOT NULL DEFAULT '',
 				PRIMARY KEY ( i, v )
 			)" );
 
