@@ -2679,7 +2679,7 @@ class Plugin
 			$link_attribs['use_js_popup'] = true;
 			$link_attribs['use_js_size'] = '500, 400';
 			$title = T_('Local documentation of the plugin');
-			$url = url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_ID='.$this->ID );
+			$url = url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_class='.$this->classname );
 			$icon = 'help';
 		}
 		elseif( substr($target, 0, 1) == '#' )
@@ -2815,6 +2815,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.134  2007/01/14 18:05:45  blueyed
+ * Optimized "info", "disp_help" and "disp_help_plain" actions by refering to them through classname, which makes Plugins::discover() unnecessary
+ *
  * Revision 1.133  2007/01/13 16:41:51  blueyed
  * doc
  *
