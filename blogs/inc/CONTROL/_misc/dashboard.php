@@ -30,15 +30,9 @@ if( $blog )
 	$Blog = & $BlogCache->get_by_ID($blog); // "Exit to blogs.." link
 }
 
-
-$blogListButtons = '<a href="'.regenerate_url( array('blog'), 'blog=0' ).'" class="'.(( 0 == $blog ) ? 'CurrentBlog' : 'OtherBlog').'">'.T_('Global').'</a> ';
-for( $curr_blog_ID = blog_list_start();
-			$curr_blog_ID != false;
-			$curr_blog_ID = blog_list_next() )
-{
-	$blogListButtons .= '<a href="'.regenerate_url( array('blog'), 'blog='.$curr_blog_ID ).'" class="'.(( $curr_blog_ID == $blog ) ? 'CurrentBlog' : 'OtherBlog').'">'.blog_list_iteminfo('shortname',false).'</a> ';
-}
-
+$blogListButtons = $AdminUI->get_html_collection_list( 'blog_ismember', '',
+											regenerate_url( array('blog'), 'blog=%d' ),
+											T_('Global'), regenerate_url( array('blog'), 'blog=0' ) );
 
 
 $AdminUI->set_path( 'dashboard' );
@@ -53,7 +47,7 @@ $AdminUI->disp_body_top();
 // fp> Note: don't bother with T_() yet. This is going to change too often.
 
 if( $blog )
-{
+{	// We want to look at a specific blog:
 	// Begin payload block:
 	$AdminUI->disp_payload_begin();
 
@@ -107,7 +101,15 @@ if( $blog )
 	// End payload block:
 	$AdminUI->disp_payload_end();
 }
+else
+{	// We're on the GLOBAL tab...
 
+	$AdminUI->disp_payload_begin();
+	// Display blog list VIEW:
+	$AdminUI->disp_view( 'collections/_blogs_list.php' );
+	$AdminUI->disp_payload_end();
+
+}
 
 
 if( $current_User->check_perm( 'options', 'edit' ) )
@@ -136,6 +138,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2007/01/14 22:43:29  fplanque
+ * handled blog view perms.
+ *
  * Revision 1.10  2006/12/17 02:42:22  fplanque
  * streamlined access to blog settings
  *
