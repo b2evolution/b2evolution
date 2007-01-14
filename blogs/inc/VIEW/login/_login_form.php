@@ -171,7 +171,7 @@ $Form->end_form();
 					// We then hash with the salt using SHA1 (fp> can't we do that with md5 again, in order to load 1 less Javascript library?)
 					// NOTE: MD5 is kind of "weak" and therefor we also use SHA1
 					form.pwd_hashed.value = hex_sha1( hex_md5(form.pwd.value) + form.pwd_salt.value );
-					fown.pwd.value = "hashed_<?php echo $Session->ID /* to detect cookie problems */ ?>";
+					form.pwd.value = "hashed_<?php echo $Session->ID /* to detect cookie problems */ ?>";
 				}
 				return true;
 			}, false );
@@ -212,6 +212,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.37  2007/01/14 21:18:48  fplanque
+ * bugfix
+ *
  * Revision 1.36  2006/12/28 19:15:42  fplanque
  * bugfix: don't lose redirect_to on repeated login failures
  *
