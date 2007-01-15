@@ -893,7 +893,8 @@ class File extends DataObject
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">',
 	                  $after_image_legend = '</div>',
-	                  $after_image = '</div>' )
+	                  $after_image = '</div>',
+	                  $size_name = 'original' )
 	{
 		if( $this->is_dir() )
 		{	// We can't reference a directory
@@ -904,11 +905,21 @@ class File extends DataObject
 
 		if( $this->is_image() )
 		{ // Make an IMG link:
-			$r = $before_image
-						.'<img src="'.$this->get_url().'" '
-						.'alt="'.$this->dget('alt', 'htmlattr').'" '
-						.'title="'.$this->dget('title', 'htmlattr').'" '
-						.$this->get_image_size( 'string' ).' />';
+			$r = $before_image;
+			if( $size_name == 'original' )
+			{
+					$r .= '<img src="'.$this->get_url().'" '
+								.'alt="'.$this->dget('alt', 'htmlattr').'" '
+								.'title="'.$this->dget('title', 'htmlattr').'" '
+								.$this->get_image_size( 'string' ).' />';
+			}
+			else
+			{
+					$r .= '<img src="'.$this->get_thumb_url( $size_name ).'" '
+								.'alt="'.$this->dget('alt', 'htmlattr').'" '
+								.'title="'.$this->dget('title', 'htmlattr').'" />';
+					// TODO: size
+			}
 			$desc = $this->dget('desc');
 			if( !empty($desc) )
 			{
@@ -1406,7 +1417,7 @@ class File extends DataObject
 
 		if( ! $this->is_image() )
 		{ // Not an image
-			debug_die( 'Cannot only thumb images');
+			debug_die( 'Can only thumb images');
 		}
 
 		if( $public_access_to_media
@@ -1420,13 +1431,13 @@ class File extends DataObject
 			}
 		}
 
-		// No thumbnail available (at least publicly), we need to go throuit getfile.php!
+		// No thumbnail available (at least publicly), we need to go through getfile.php!
 		$root = $this->_FileRoot->ID;
 		$url = $htsrv_url.'getfile.php/'
 						// This is for clean 'save as':
 						.rawurlencode( $this->_name )
 						// This is for locating the file:
-						.'?root='.$root.'&amp;path='.$this->_rdfp_rel_path.'&amp;size=thumb';
+						.'?root='.$root.'&amp;path='.$this->_rdfp_rel_path.'&amp;size='.$size_name;
 
 		return $url;
 	}
@@ -1593,10 +1604,20 @@ class File extends DataObject
 	{
 		load_funcs( 'MODEL/files/_image.funcs.php' );
 
-		// fp> TODO: switch( $req_size ) (fp)
-		$size_name = 'fit-80x80';
-		$thumb_width = 80;
-		$thumb_height = 80;
+		$size_name = $req_size;
+		switch( $req_size )
+		{
+			case 'fit-720x720';
+				$thumb_width = 720;
+				$thumb_height = 720;
+				break;
+
+			case 'fit-80x80';
+			default:
+				$size_name = 'fit-80x80';
+				$thumb_width = 80;
+				$thumb_height = 80;
+		}
 
 		$mimetype = $this->Filetype->mimetype;
 
@@ -1648,6 +1669,10 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2007/01/15 20:48:20  fplanque
+ * constrained photoblog image size
+ * TODO: sharpness issue
+ *
  * Revision 1.31  2006/12/23 22:53:10  fplanque
  * extra security
  *

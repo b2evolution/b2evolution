@@ -47,7 +47,7 @@ $SQL->FROM( 'T_categories INNER JOIN T_postcats ON cat_ID = postcat_cat_ID
 							INNER JOIN T_links ON post_ID = link_itm_ID
 							INNER JOIN T_files ON link_file_ID = file_ID' );
 $SQL->WHERE( 'cat_blog_ID = '.$Blog->ID ); // fp> TODO: want to restrict on images :]
-$SQL->ORDER_BY( 'post_datestart DESC, link_ID' );
+$SQL->ORDER_BY( 'post_datestart DESC, post_ID DESC, link_ID' );
 
 $FileList->sql = $SQL->get();
 
@@ -103,6 +103,10 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.4  2007/01/15 20:48:19  fplanque
+ * constrained photoblog image size
+ * TODO: sharpness issue
+ *
  * Revision 1.3  2006/12/14 23:02:28  fplanque
  * the unbelievable hack :P
  *

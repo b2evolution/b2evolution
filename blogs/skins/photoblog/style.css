@@ -94,7 +94,7 @@ h2 {
 
 /* Styles for posts */
 .bPosts {
-	width: 780px;
+	width: 760px;
 	margin: 0 auto;
 }
 div.action_messages {
@@ -134,10 +134,10 @@ div.image_block img {
 	border: 1px solid #555;
 }
 .bDetails {
-	margin: 2em 0;
+	width: 80%;
+	margin: 2em auto;
 	background: #555;
 	border: 1px solid #aaa;
-	width: 100%;
 }
 h3.bTitle {
 	font-size: 100%;
@@ -186,4 +186,3 @@ select.bComment  /* Used by the profile form */
 	padding: 1px;
 	margin: 0ex;
 }
-
