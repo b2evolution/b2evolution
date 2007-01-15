@@ -130,7 +130,10 @@ function create_default_data()
 
 
 	echo 'Creating admin user... ';
+
 	global $timestamp, $admin_email, $default_locale, $install_password;
+	global $random_password;
+
 	$User_Admin = & new User();
 	$User_Admin->set( 'login', 'admin' );
 	if( !isset( $install_password ) )
@@ -293,7 +296,6 @@ function create_demo_contents()
 	global $timestamp, $admin_email;
 	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
 	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
-	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_linkblog_b2evo, $cat_linkblog_contrib;
 	global $DB;
 	global $default_locale, $install_password;
 
@@ -321,6 +323,7 @@ function create_demo_contents()
 
 	echo "Creating default blogs... ";
 
+	/*
 	$blog_shortname = 'Blog All';
 	$blog_stub = 'all';
 	$blog_more_longdesc = "<br />
@@ -334,6 +337,7 @@ function create_demo_contents()
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
 		4 );
+	*/
 
 	$blog_shortname = 'Blog A';
 	$blog_a_long = sprintf( T_('%s Title'), $blog_shortname );
@@ -345,7 +349,7 @@ function create_demo_contents()
 		$blog_stub.'.html',
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-		4 );
+		3 );	// !!! Linkblofg ID
 
 	$blog_shortname = 'Blog B';
 	$blog_stub = 'b';
@@ -356,7 +360,7 @@ function create_demo_contents()
 		$blog_stub.'.html',
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-		4 );
+		3 );	// !!! Linkblofg ID
 
 	$blog_shortname = 'Linkblog';
 	$blog_stub = 'links';
@@ -376,60 +380,50 @@ function create_demo_contents()
 
 
 	global $query, $timestamp;
-	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_linkblog_b2evo, $cat_linkblog_contrib;
 
 	echo 'Creating sample categories... ';
 
 	// Create categories for blog A
-	$cat_ann_a = cat_create( 'Announcements [A]', 'NULL', 2 );
-	$cat_news = cat_create( 'News', 'NULL', 2 );
-	$cat_bg = cat_create( 'Background', 'NULL', 2 );
+	$cat_ann_a = cat_create( 'Welcome', 'NULL', $blog_a_ID );
+	$cat_news = cat_create( 'News', 'NULL', $blog_a_ID );
+	$cat_bg = cat_create( 'Background', 'NULL', $blog_a_ID );
+	$cat_fun = cat_create( 'Fun', 'NULL', $blog_a_ID );
+	$cat_life = cat_create( 'In real life', $cat_fun, $blog_a_ID );
+	$cat_web = cat_create( 'On the web', $cat_fun, $blog_a_ID );
+	$cat_sports = cat_create( 'Sports', $cat_life, $blog_a_ID );
+	$cat_movies = cat_create( 'Movies', $cat_life, $blog_a_ID );
+	$cat_music = cat_create( 'Music', $cat_life, $blog_a_ID );
 
 	// Create categories for blog B
-	$cat_ann_b = cat_create( 'Announcements [B]', 'NULL', 3 );
-	$cat_fun = cat_create( 'Fun', 'NULL', 3 );
-	$cat_life = cat_create( 'In real life', $cat_fun, 3 );
-	$cat_web = cat_create( 'On the web', $cat_fun, 3 );
-	$cat_sports = cat_create( 'Sports', $cat_life, 3 );
-	$cat_movies = cat_create( 'Movies', $cat_life, 3 );
-	$cat_music = cat_create( 'Music', $cat_life, 3 );
-	$cat_b2evo = cat_create( 'b2evolution Tips', 'NULL', 3 );
+	$cat_ann_b = cat_create( 'Announcements', 'NULL', $blog_b_ID );
+	$cat_b2evo = cat_create( 'b2evolution Tips', 'NULL', $blog_b_ID );
 
 	// Create categories for linkblog
-	$cat_linkblog_b2evo = cat_create( 'b2evolution', 'NULL', 4 );
-	$cat_linkblog_contrib = cat_create( 'contributors', 'NULL', 4 );
+	$cat_linkblog_b2evo = cat_create( 'b2evolution', 'NULL', $blog_linkblog_ID );
+	$cat_linkblog_contrib = cat_create( 'contributors', 'NULL', $blog_linkblog_ID );
 
 	echo "OK.<br />\n";
 
 
-	echo 'Creating sample posts for blog A... ';
+	echo 'Creating sample posts... ';
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_('First Post'), T_('<p>This is the first post.</p>
 
-<p>It appears on both blog A and blog B.</p>'), $now, $cat_ann_a, array( $cat_ann_b ) );
+<p>It appears in a single category.</p>'), $now, $cat_ann_a );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_('Second post'), T_('<p>This is the second post.</p>
 
-<p>It appears on blog A only but in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a, $cat_bg ) );
+<p>It appears in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a ) );
 
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_('Third post'), T_('<p>This is the third post.</p>
-
-<p>It appears on blog B only and in a single category.</p>'), $now, $cat_fun );
-
-	echo "OK.<br />\n";
 
 
 	// POPULATE THE LINKBLOG:
-	echo 'Creating default linkblog entries... ';
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -464,63 +458,52 @@ function create_demo_contents()
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 'http://fplanque.net/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 'http://fplanque.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'b2evolution', 'Project home', $now, $cat_linkblog_b2evo, array(), 'published',	'en-EU', '', 'http://b2evolution.net/', 'disabled', array() );
+	$edited_Item->insert( 1, 'b2evolution home', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-EU', '', 'http://b2evolution.net/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_('This is a sample linkblog entry'), T_("This is sample text describing the linkblog entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your linkblog entries (favorite/related sites)."), $now, $cat_linkblog_b2evo, array(), 'published',	$default_locale, '', 'http://b2evolution.net/', 'disabled', array() );
+	$edited_Item->insert( 1, 'User manual', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-EU', '', 'http://manual.b2evolution.net/', 'disabled', array() );
 
-	echo "OK.<br />\n";
+	// Insert a post into linkblog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, 'Support forums', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-EU', '', 'http://forums.b2evolution.net/', 'disabled', array() );
 
 
 	global $query, $timestamp;
-	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_linkblog_b2evo, $cat_linkblog_contrib;
-
-	echo 'Creating sample posts... ';
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_("Clean Permalinks!"), T_("b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.
 
-Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the Settings screen... (check 'Use extra-path info')"), $now, $cat_b2evo );
+Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the Global Settings &gt; Link options in the admin interface."), $now, $cat_b2evo );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_("Apache optimization..."), T_("In the <code>/blogs</code> folder there is a file called [<code>sample.htaccess</code>]. You should try renaming it to [<code>.htaccess</code>].
 
-This will optimize the way b2evolution is handled by the webserver (if you are using Apache). This file is not active by default because a few hosts would display an error right away when you try to use it. If this happens to you when you rename the file, just remove it again and you'll be fine."), $now, $cat_b2evo );
+This will optimize the way b2evolution is handled by the webserver (if you are using Apache). This file is not active by default because a few hosts would display an error right away when you try to use it. If this happens to you when you rename the file, just remove it and you'll be fine."), $now, $cat_b2evo );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("About evoSkins..."), T_("By default, b2evolution blogs are displayed using a default skin.
+	$edited_Item->insert( 1, T_("Skins, Stubs, Templates &amp; website integration..."), T_("By default, blogs are displayed using a skin. (More on skins in another post.)
 
-Readers can choose a new skin by using the skin switcher integrated in most skins.
-
-You can change the default skin used for any blog by editing the blog parameters in the admin interface. You can also force the use of the default skin for everyone.
-
-Otherwise, you can restrict available skins by deleting some of them from the /blogs/skins folder. You can also create new skins by duplicating, renaming and customizing any existing skin folder.
-
-To start customizing a skin, open its '<code>_main.php</code>' file in an editor and read the comments in there. And, of course, read the manual on evoSkins!"), $now, $cat_b2evo );
-
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("Skins, Stubs and Templates..."), T_("By default, all pre-installed blogs are displayed using a skin. (More on skins in another post.)
-
-That means, blogs are accessed through '<code>index.php</code>', which loads default parameters from the database and then passes on the display job to a skin.
+This means, blogs are accessed through '<code>index.php</code>', which loads default parameters from the database and then passes on the display job to a skin.
 
 Alternatively, if you don't want to use the default DB parameters and want to, say, force a skin, a category or a specific linkblog, you can create a stub file like the provided '<code>a_stub.php</code>' and call your blog through this stub instead of index.php .
 
 Finally, if you need to do some very specific customizations to your blog, you may use plain templates instead of skins. In this case, call your blog through a full template, like the provided '<code>a_noskin.php</code>'.
+
+If you want to integrate a b2evolution blog into a complex website, you'll probably want to do it by copy/pasting code from <code>a_noskin.php</code> into a page of your website.
 
 You will find more information in the stub/template files themselves. Open them in a text editor and read the comments in there.
 
@@ -529,12 +512,24 @@ Either way, make sure you go to the blogs admin and set the correct access metho
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("Multiple Blogs, new blogs, old blogs..."),
-								T_("By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Linkblog'.
+	$edited_Item->insert( 1, T_("About widgets..."), T_('b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.
 
-Some of these blogs have a special role. Read about it on the corresponding page.
+You can add, remove and reorder widgets from the Blog Settings tab in the admin interface.
 
-You can create additional blogs or delete unwanted blogs from the blogs admin."), $now, $cat_b2evo );
+Note: to be displayed widgets are placed in containers. Each container appears in a specific place on a skin. If you change the skin of your blog, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.'), $now, $cat_b2evo );
+
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("About skins..."), T_('By default, b2evolution blogs are displayed using a skin.
+
+You can change the skin used by any blog by editing the blog settings in the admin interface.
+
+You can download additional skins from the <a href="http://skins.b2evolution.net/" traget="_blank">skin site</a>. To install them, unzip them in the /blogs/skins directory, then go to General Settings &gt; Skins in the admin interface and click on "Install new".
+
+You can also create your own skins by duplicating, renaming and customizing any existing skin folder from the /blogs/skins directory.
+
+To start customizing a skin, open its "<code>_main.php</code>" file in an editor and read the comments in there. And, of course, read the manual on skins!'), $now, $cat_b2evo );
 
 
 	// Create newbie posts:
@@ -556,7 +551,7 @@ This is page 3.
 
 This is page 4.
 
-It is the last page.'), $now, $cat_b2evo, array( $cat_bg , $cat_b2evo ) );
+It is the last page.'), $now, $cat_bg );
 
 
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -565,7 +560,7 @@ It is the last page.'), $now, $cat_b2evo, array( $cat_bg , $cat_b2evo ) );
 
 <!--more--><!--noteaser-->
 
-This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_b2evo, array( $cat_bg , $cat_b2evo ) );
+This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_bg );
 
 
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -574,16 +569,19 @@ This is the extended text. You only see it when you have clicked the "more" link
 
 <!--more-->
 
-This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_b2evo, array( $cat_bg , $cat_b2evo ) );
+This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_bg );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("Important information"), T_("Blog B contains a few posts in the 'b2evolution Tips' category.
+	$edited_Item->insert( 1, T_("Welcome to b2evolution!"), T_("Three blogs have been created with sample contents:
+<ul>
+	<li><strong>Blog A</strong>: You are currently looking at it. It contains a few sample posts, using simple features of b2evolution.</li>
+	<li><strong>Blog B</strong>: You can access it from a link the top of the page. It contains information about more advanced features.</li>
+	<li><strong>Linkblog</strong>: The linkblog is included by default in the sidebar of both Blog A &amp; Blog B.</li>
+</ul>
 
-All these entries are designed to help you so, as EdB would say: \"<em>read them all before you start hacking away!</em>\" ;)
-
-If you wish, you can delete these posts one by one after you have read them. You could also change their status to 'deprecated' in order to visually keep track of what you have already read."), $now, $cat_b2evo, array( $cat_ann_a , $cat_ann_b ) );
+You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, skin, widgets, etc.) from the Blog Settings tab in the admin interface."), $now, $cat_ann_a );
 
 	echo "OK.<br />\n";
 
@@ -953,6 +951,9 @@ function install_basic_plugins( $old_db_version = 0 )
 
 /*
  * $Log$
+ * Revision 1.213  2007/01/15 17:00:42  fplanque
+ * cleaned up default contents
+ *
  * Revision 1.212  2007/01/15 03:53:24  fplanque
  * refactoring / simplified installer
  *
