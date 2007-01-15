@@ -141,6 +141,45 @@ switch( $action )
 
 			$Messages->add( T_('A default category has been created for this blog.'), 'success' );
 
+			// ADD DEFAULT WIDGETS:
+			// Add title to all blog Headers:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+									 VALUES( '.$edited_Blog->ID.', "Header", 1, "core", "coll_title" )' );
+			// Add tagline to all blogs Headers:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+									 VALUES( '.$edited_Blog->ID.', "Header", 2, "core", "coll_tagline" )' );
+
+			// Add Calendar plugin to all blog Sidebars:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 1, "plugin", "evo_Calr" )' );
+			// Add title to all blog Sidebars:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 2, "core", "coll_title" )' );
+			// Add longdesc to all blogs Sidebars:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 3, "core", "coll_longdesc" )' );
+			// Add common links to all blogs Sidebars:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 4, "core", "coll_common_links" )' );
+			// Add search form to all blogs Sidebars:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 5, "core", "coll_search_form" )' );
+			// Add Categories plugin to all blog Sidebars:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 6, "plugin", "evo_Cats" )' );
+			// Add XML feeds to all blogs Sidebars:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 7, "core", "coll_xml_feeds" )' );
+			// Add User tools to all blogs Sidebars:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 8, "core", "user_tools" )' );
+
+			// Add Admin help to all blog Footers:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+									 VALUES( '.$edited_Blog->ID.', "Footer", 1, "core", "admin_help" )' );
+
+			$Messages->add( T_('Default widgets have been set-up for this blog.'), 'success' );
+
 			$DB->commit();
 
 			// Commit changes in cache:
@@ -392,6 +431,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2007/01/15 16:59:57  fplanque
+ * create default widgets with each new blog
+ *
  * Revision 1.14  2007/01/15 03:54:36  fplanque
  * pepped up new blog creation a little more
  *
