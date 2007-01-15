@@ -94,24 +94,35 @@ class Chapter extends GenericCategory
 		{
 			$this->set_from_Request( 'urlname' );
 			if( ! preg_match( '|^[A-Za-z0-9\-]+$|', $this->urlname )
-					|| preg_match( '|^[A-Za-z][0-9]+$|', $this->urlname ) ) // This is to prevent conflict with things such as week number
+					|| preg_match( '|^[A-Za-z][0-9]*$|', $this->urlname ) ) // This is to prevent conflict with things such as week number
 			{
 				param_error( 'cat_urlname', T_('The url name is invalid.') );
 			}
 			else
 			{
-    		if( $DB->get_var( 'SELECT COUNT(*)
-														 FROM T_categories
-														WHERE cat_urlname = '.$DB->quote($this->urlname).'
-															AND cat_ID <> '.$this->ID
-															) )
-					{ // urlname is already in use
-						param_error( 'cat_urlname', T_('This URL name is already in use by another category. Please choose another name.') );
-					}
+    		if( Chapter::urlname_exists( $this->urlname, $this->ID ) )
+				{ // urlname is already in use
+					param_error( 'cat_urlname', T_('This URL name is already in use by another category. Please choose another name.') );
+				}
 			}
 		}
 
 		return ! param_errors_detected();
+	}
+
+
+	/**
+	 * @static
+	 */
+	function urlname_exists( $urlname, $ignore_ID = 0 )
+	{
+		global $DB;
+
+		return $DB->get_var( 'SELECT COUNT(*)
+														 FROM T_categories
+														WHERE cat_urlname = '.$DB->quote($urlname).'
+															AND cat_ID <> '.$ignore_ID
+													);
 	}
 
 
@@ -219,11 +230,55 @@ class Chapter extends GenericCategory
 			$this->Blog = & $BlogCache->get_by_ID( $this->blog_ID );
 		}
 	}
+
+
+	/**
+	 * Insert object into DB based on previously recorded changes.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbinsert()
+	{
+		global $DB;
+
+		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
+
+		$DB->begin();
+
+		if( Chapter::urlname_exists( $this->urlname ) )
+		{	// We gotta find another name:
+			$sql = 'SELECT cat_urlname
+								FROM T_categories
+							 WHERE cat_urlname REGEXP "^'.$this->urlname.'(-[0-9]+)?$"';
+			$highest_number = 0;
+			foreach( $DB->get_results( $sql ) as $row )
+			{
+				if( preg_match( '/-([0-9]+)$/', $row->cat_urlname, $matches ) )
+				{ // This one has a number, we extract it:
+					$existing_number = (integer) $matches[1];
+					if( $existing_number > $highest_number )
+					{ // This is the new high
+						$highest_number = $existing_number;
+					}
+				}
+			}
+			$this->set( 'urlname', $this->urlname.'-'.($highest_number+1) );
+		}
+
+		$r = parent::dbinsert();
+
+		$DB->commit();
+
+		return $r;
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.7  2007/01/15 00:38:06  fplanque
+ * pepped up "new blog" creation a little. To be continued.
+ *
  * Revision 1.6  2006/12/11 00:32:26  fplanque
  * allow_moving_chapters stting moved to UI
  * chapters are now called categories in the UI

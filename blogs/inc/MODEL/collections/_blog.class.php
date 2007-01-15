@@ -149,11 +149,8 @@ class Blog extends DataObject
 		{
 			global $default_locale;
 			// echo 'Creating blank blog';
-			$this->set( 'shortname', T_('New blog') );
-			$this->set( 'name', T_('New weblog') );
 			$this->set( 'locale', $default_locale );
 			$this->set( 'access_type', 'index.php' );
-			$this->set( 'urlname', 'new' );
 			$this->skin_ID = 1;	// TODO: this is the DB default, but it will fail if skin #1 does not exist
 		}
 		else
@@ -188,6 +185,48 @@ class Blog extends DataObject
 		}
 	}
 
+
+	/**
+	 * @param string
+	 */
+	function init_by_kind( $kind )
+	{
+		switch( $kind )
+		{
+			case 'photo':
+				$this->set( 'name', T_('My photoblog') );
+				$this->set( 'shortname', T_('Photoblog') );
+				$this->set( 'urlname', 'photo' );
+				break;
+
+			case 'std':
+			default:
+				$this->set( 'name', T_('My weblog') );
+				$this->set( 'shortname', T_('Blog') );
+				$this->set( 'urlname', 'blog' );
+				break;
+		}
+	}
+
+
+	/**
+	 * @static
+	 *
+	 * @param string
+	 * @return string
+	 */
+	function kind_name( $kind )
+	{
+  	switch( $kind )
+		{
+			case 'photo':
+				return T_('Photoblog');
+
+			case 'std':
+			default:
+				return T_('Standard blog');
+		}
+	}
 
 	/**
 	 * Load data from Request form fields.
@@ -1205,6 +1244,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.54  2007/01/15 00:38:06  fplanque
+ * pepped up "new blog" creation a little. To be continued.
+ *
  * Revision 1.53  2007/01/14 01:33:34  fplanque
  * losely restrict to *installed* XML feed skins
  *

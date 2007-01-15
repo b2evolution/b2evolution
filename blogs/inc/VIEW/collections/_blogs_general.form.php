@@ -37,10 +37,13 @@ $Form->begin_form( 'fform' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', $next_action );
 $Form->hidden( 'tab', $tab );
-$Form->hidden( 'blog', $blog );
-if( $action == 'copy' )
+if( $next_action == 'create' )
 {
-	$Form->hidden( 'blogtemplate', $blog );
+	$Form->hidden( 'kind', get_param('kind') );
+}
+else
+{
+	$Form->hidden( 'blog', $blog );
 }
 
 $Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear' ) );
@@ -78,6 +81,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.16  2007/01/15 00:38:05  fplanque
+ * pepped up "new blog" creation a little. To be continued.
+ *
  * Revision 1.15  2006/09/11 19:36:58  fplanque
  * blog url ui refactoring
  *

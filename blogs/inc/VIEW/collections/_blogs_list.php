@@ -58,7 +58,7 @@ $Results->no_results_text = $no_results;
 
 if( $current_User->check_perm( 'blogs', 'create' ) )
 {
-	$Results->global_icon( T_('New blog...'), 'new', url_add_param( $dispatcher, 'ctrl=collections&amp;action=new' ), T_('New blog...'), 3, 4 );
+	$Results->global_icon( T_('New blog...'), 'new', url_add_param( $dispatcher, 'ctrl=collections&amp;action=new-seltype' ), T_('New blog...'), 3, 4 );
 }
 
 $Results->cols[] = array(
@@ -175,11 +175,14 @@ $Results->cols[] = array(
 					);
 
 
-$Results->display();
+$Results->display( NULL, 'session' );
 
 
 /*
  * $Log$
+ * Revision 1.13  2007/01/15 00:38:06  fplanque
+ * pepped up "new blog" creation a little. To be continued.
+ *
  * Revision 1.12  2007/01/14 22:42:55  fplanque
  * removed old crap
  *

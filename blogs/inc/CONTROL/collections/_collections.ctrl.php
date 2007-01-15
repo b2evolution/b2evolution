@@ -39,7 +39,8 @@ $AdminUI->set_path( 'blogs' );
 
 param_action( 'list' );
 
-if( $action != 'new'
+if( $action != 'new-seltype'
+	&& $action != 'new'
 	&& $action != 'list'
 	&& $action != 'create' )
 {
@@ -78,12 +79,12 @@ switch( $action )
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
-		$AdminUI->append_path_level( 'new', array( 'text' => T_('New') ) );
-
 		$edited_Blog = & new Blog( NULL );
-		$edited_Blog->set( 'name', T_('New weblog') );
-		$edited_Blog->set( 'shortname', T_('New blog') );
-		$edited_Blog->set( 'urlname', 'new' );
+
+		param( 'kind', 'string', true );
+		$edited_Blog->init_by_kind( $kind );
+
+		$AdminUI->append_path_level( 'new', array( 'text' => T_('New') ) );
 		break;
 
 	case 'create':
@@ -93,10 +94,16 @@ switch( $action )
 
 		$edited_Blog = & new Blog( NULL );
 
+		param( 'kind', 'string', true );
+
 		if( $edited_Blog->load_from_Request( array() ) )
 		{
+			$DB->begin();
+
 			// DB INSERT
 			$edited_Blog->dbinsert();
+
+			$Messages->add( T_('The new blog has been created.'), 'success' );
 
 			// Set default user permissions for this blog (All permissions for the current user)
 			// Proceed insertions:
@@ -108,17 +115,25 @@ switch( $action )
 					VALUES ( $edited_Blog->ID, $current_User->ID, 1,
 							'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1 )" );
 
+			// Create default category:
+			load_class( 'MODEL/collections/_chapter.class.php' );
+			$edited_Chapter = & new Chapter( NULL, $edited_Blog->ID );
+			$edited_Chapter->set( 'name', T_('Main category') );
+			$edited_Chapter->set( 'urlname', 'main' );
+			$edited_Chapter->dbinsert();
+
+			$Messages->add( T_('A default category has been created for this blog.'), 'success' );
+
+			$DB->commit();
+
 			// Commit changes in cache:
 			$BlogCache = & get_Cache( 'BlogCache' );
 			$BlogCache->add( $edited_Blog );
 
-			$Messages->add( T_('The new blog has been created.'), 'success' );
+			// We want to highlight the edited object on next list display:
+ 			$Session->set( 'fadeout_array', array( 'blog_ID' => array($edited_Blog->ID) ) );
 
-			// Successful creation, move on to chapters:
-			$Messages->add( T_('You should create categories for this blog now!'), 'note' );
-
-			header_nocache();
-			header_redirect( url_add_param( $admin_url, 'ctrl=chapters&blog='.$edited_Blog->ID, '&' ) ); // will save $Messages into Session
+			header_redirect( 'admin.php?ctrl=collections&blog=0' ); // will save $Messages into Session
 		}
 		break;
 
@@ -247,17 +262,29 @@ $AdminUI->disp_body_top();
 
 switch($action)
 {
+	case 'new-seltype':
+		$AdminUI->displayed_sub_begin = 1;	// DIRTY HACK :/ replacing an even worse hack...
+		$AdminUI->disp_payload_begin();
+
+		$AdminUI->disp_view( 'collections/_coll_sel_type.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
+
 	case 'new':
 	case 'create': // in case of validation error
+		$AdminUI->displayed_sub_begin = 1;	// DIRTY HACK :/ replacing an even worse hack...
+		$AdminUI->disp_payload_begin();
+
 		// ---------- "New blog" form ----------
-		echo '<div class="panelblock">';
-		echo '<h2>'.T_('New blog').':</h2>';
+		echo '<h2>'.sprintf( T_('New %s'), Blog::kind_name($kind) ).':</h2>';
 
 		$next_action = 'create';
 
 		$AdminUI->disp_view( 'collections/_blogs_general.form.php' );
 
-		echo '</div>';
+		$AdminUI->disp_payload_end();
 		break;
 
 
@@ -338,6 +365,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2007/01/15 00:38:06  fplanque
+ * pepped up "new blog" creation a little. To be continued.
+ *
  * Revision 1.12  2007/01/14 22:09:52  fplanque
  * attempt to display the list of blogs in a modern way.
  *
