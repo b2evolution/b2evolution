@@ -499,11 +499,9 @@ to
 		?>
 		<h2><?php echo T_('Installing b2evolution tables with sample data')?></h2>
 		<?php
-		create_b2evo_tables();
-		populate_main_tables();
-		install_basic_skins();
-		install_basic_plugins();
-		install_basic_widgets();
+		create_tables();
+		create_default_data();
+		create_demo_contents();
 		?>
 		<h2><?php echo T_('Installation successful!')?></h2>
 
@@ -621,6 +619,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.124  2007/01/15 03:53:24  fplanque
+ * refactoring / simplified installer
+ *
  * Revision 1.123  2007/01/14 03:47:53  fplanque
  * killed upgrade from b2/cafelog
  * (if people haven't upgraded yet, there's little chance they ever will,

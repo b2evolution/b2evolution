@@ -42,28 +42,32 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * Create b2 tables.
- *
- * Used for fresh install + upgrade from b2
+ * Used for fresh install
  */
-function create_b2evo_tables()
+function create_tables()
 {
 	global $inc_path;
-	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
-	global $DB;
 
 	require_once dirname(__FILE__).'/_db_schema.inc.php';
 	require_once $inc_path.'_misc/_upgrade.funcs.php';
 
 	// Alter DB to match DB schema:
 	install_make_db_schema_current( true );
+}
 
-	// Insert all default data:
+
+/**
+ * Insert all default data:
+ */
+function create_default_data()
+{
+	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
+	global $DB;
 
 	// upgrade to 0.8.7
 	echo 'Creating default blacklist entries... ';
 	$query = "INSERT INTO T_antispam(aspm_string) VALUES ".
-	"('penis-enlargement'), ('online-casino'), ".
+	"('online-casino'), ('penis-enlargement'), ".
 	"('order-viagra'), ('order-phentermine'), ('order-xenical'), ".
 	"('order-prophecia'), ('sexy-lingerie'), ('-porn-'), ".
 	"('-adult-'), ('-tits-'), ('buy-phentermine'), ".
@@ -125,6 +129,33 @@ function create_b2evo_tables()
 	echo "OK.<br />\n";
 
 
+	echo 'Creating admin user... ';
+	global $timestamp, $admin_email, $default_locale, $install_password;
+	$User_Admin = & new User();
+	$User_Admin->set( 'login', 'admin' );
+	if( !isset( $install_password ) )
+	{
+		$random_password = generate_random_passwd(); // no ambiguous chars
+	}
+	else
+	{
+		$random_password = $install_password;
+	}
+	$User_Admin->set( 'pass', md5($random_password) );	// random
+	$User_Admin->set( 'nickname', 'admin' );
+	$User_Admin->set_email( $admin_email );
+	$User_Admin->set( 'validated', 1 ); // assume it's validated
+	$User_Admin->set( 'ip', '127.0.0.1' );
+	$User_Admin->set( 'domain', 'localhost' );
+	$User_Admin->set( 'level', 10 );
+	$User_Admin->set( 'locale', $default_locale );
+	$User_Admin->set_datecreated( $timestamp++ );
+	// Note: NEVER use database time (may be out of sync + no TZ control)
+	$User_Admin->set_Group( $Group_Admins );
+	$User_Admin->dbinsert();
+	echo "OK.<br />\n";
+
+
 	// Upgrade to Phoenix-Alpha
 	echo 'Creating default Post Types... ';
 	$DB->query( "
@@ -157,138 +188,248 @@ function create_b2evo_tables()
 		" );
 	echo "OK.<br />\n";
 
-	// fp> Code removed. perm_files is handled at group creation!
 
-	// fp> Code removed. T_coll_group_perms are INSERTED later. (nothing to UPDATE here)
+	create_default_settings();
 
-	// NOTE: basic plugins get installed separatly for upgrade and install..
+	install_basic_skins();
 
-	// Create relations:
-	// fp> These are probably not working any more. I think I'll make them part of the default install with version 2.0
-	create_b2evo_relations();
+	install_basic_plugins();
 
 	return true;
 }
 
 
 /**
- * Create user permissions
+ * Create a new a blog
+ * This funtion has to handle all needed DB dependencies!
  *
- * WARNING: changing this may break the upgrade path
- * Used when creating full install and upgrading from earlier versions
+ * @todo move this to Blog object
  */
-function create_groups()
+function create_blog(
+	$blog_name,
+	$blog_shortname,
+	$blog_stub,									// This will temporarily be assigned to both STUB and URLNAME
+	$blog_staticfilename = '',
+	$blog_tagline = '',
+	$blog_longdesc = '',
+	$blog_links_blog_ID = 0 )
 {
-	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
-	global $DB;
+	global $DB, $default_locale;
 
-	echo 'Creating table for Groups... ';
-	$query = "CREATE TABLE T_groups (
-		grp_ID int(11) NOT NULL auto_increment,
-		grp_name varchar(50) NOT NULL default '',
-		grp_perm_admin enum('none','hidden','visible') NOT NULL default 'visible',
-		grp_perm_blogs enum('user','viewall','editall') NOT NULL default 'user',
-		grp_perm_stats enum('none','view','edit') NOT NULL default 'none',
-		grp_perm_spamblacklist enum('none','view','edit') NOT NULL default 'none',
-		grp_perm_options enum('none','view','edit') NOT NULL default 'none',
-		grp_perm_users enum('none','view','edit') NOT NULL default 'none',
-		grp_perm_templates TINYINT NOT NULL DEFAULT 0,
-		grp_perm_files enum('none','view','add','edit') NOT NULL default 'none',
-		PRIMARY KEY grp_ID (grp_ID)
-	)";
-	$DB->query( $query );
-	echo "OK.<br />\n";
+	$query = "INSERT INTO T_blogs( blog_name, blog_shortname, blog_siteurl,
+						blog_stub, blog_urlname, blog_staticfilename,
+						blog_tagline, blog_longdesc, blog_locale,
+						blog_allowcomments, blog_allowtrackbacks, blog_disp_bloglist,
+						blog_in_bloglist, blog_links_blog_ID )
+	VALUES ( ";
+	$query .= "'".$DB->escape($blog_name)."', ";
+	$query .= "'".$DB->escape($blog_shortname)."', ";
+	$query .= "'', ";
+	$query .= "'".$DB->escape($blog_stub)."', ";
+	$query .= "'".$DB->escape($blog_stub)."', ";		// This one is for urlname
+	$query .= "'".$DB->escape($blog_staticfilename)."', ";
+	$query .= "'".$DB->escape($blog_tagline)."', ";
+	$query .= "'".$DB->escape($blog_longdesc)."', ";
+	$query .= "'".$DB->escape($default_locale)."', ";
+	$query .= "'post_by_post', 0, 1, 1, $blog_links_blog_ID )";
 
-	echo 'Creating default groups... ';
-	$Group_Admins = new Group(); // COPY !
-	$Group_Admins->set( 'name', 'Administrators' );
-	$Group_Admins->set( 'perm_admin', 'visible' );
-	$Group_Admins->set( 'perm_blogs', 'editall' );
-	$Group_Admins->set( 'perm_stats', 'edit' );
-	$Group_Admins->set( 'perm_spamblacklist', 'edit' );
-	$Group_Admins->set( 'perm_files', 'all' );
-	$Group_Admins->set( 'perm_options', 'edit' );
-	$Group_Admins->set( 'perm_templates', 1 );
-	$Group_Admins->set( 'perm_users', 'edit' );
-	$Group_Admins->dbinsert();
+	if( ! ($DB->query( $query )) )
+		return false;
 
-	$Group_Privileged = new Group(); // COPY !
-	$Group_Privileged->set( 'name', 'Privileged Bloggers' );
-	$Group_Privileged->set( 'perm_admin', 'visible' );
-	$Group_Privileged->set( 'perm_blogs', 'viewall' );
-	$Group_Privileged->set( 'perm_stats', 'view' );
-	$Group_Privileged->set( 'perm_spamblacklist', 'edit' );
-	$Group_Privileged->set( 'perm_files', 'add' );
-	$Group_Privileged->set( 'perm_options', 'view' );
-	$Group_Privileged->set( 'perm_templates', 0 );
-	$Group_Privileged->set( 'perm_users', 'view' );
-	$Group_Privileged->dbinsert();
-
-	$Group_Bloggers = new Group(); // COPY !
-	$Group_Bloggers->set( 'name', 'Bloggers' );
-	$Group_Bloggers->set( 'perm_admin', 'visible' );
-	$Group_Bloggers->set( 'perm_blogs', 'user' );
-	$Group_Bloggers->set( 'perm_stats', 'none' );
-	$Group_Bloggers->set( 'perm_spamblacklist', 'view' );
-	$Group_Bloggers->set( 'perm_files', 'view' );
-	$Group_Bloggers->set( 'perm_options', 'none' );
-	$Group_Bloggers->set( 'perm_templates', 0 );
-	$Group_Bloggers->set( 'perm_users', 'none' );
-	$Group_Bloggers->dbinsert();
-
-	$Group_Users = new Group(); // COPY !
-	$Group_Users->set( 'name', 'Basic Users' );
-	$Group_Users->set( 'perm_admin', 'none' );
-	$Group_Users->set( 'perm_blogs', 'user' );
-	$Group_Users->set( 'perm_stats', 'none' );
-	$Group_Users->set( 'perm_spamblacklist', 'none' );
-	$Group_Users->set( 'perm_files', 'none' );
-	$Group_Users->set( 'perm_options', 'none' );
-	$Group_Users->set( 'perm_templates', 0 );
-	$Group_Users->set( 'perm_users', 'none' );
-	$Group_Users->dbinsert();
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for Blog-User permissions... ';
-	$query = "CREATE TABLE T_coll_user_perms (
-		bloguser_blog_ID int(11) unsigned NOT NULL default 0,
-		bloguser_user_ID int(11) unsigned NOT NULL default 0,
-		bloguser_ismember tinyint NOT NULL default 0,
-		bloguser_perm_poststatuses set('published','deprecated','protected','private','draft') NOT NULL default '',
-		bloguser_perm_delpost tinyint NOT NULL default 0,
-		bloguser_perm_comments tinyint NOT NULL default 0,
-		bloguser_perm_cats tinyint NOT NULL default 0,
-		bloguser_perm_properties tinyint NOT NULL default 0,
-		bloguser_perm_media_upload tinyint NOT NULL default 0,
-		bloguser_perm_media_browse tinyint NOT NULL default 0,
-		bloguser_perm_media_change tinyint NOT NULL default 0,
-		PRIMARY KEY bloguser_pk (bloguser_blog_ID,bloguser_user_ID)
-	)";
-	$DB->query( $query );
-	echo "OK.<br />\n";
-
+	return $DB->insert_id;  // blog ID
 }
 
 
 /**
- * Populate the linkblog with contributors to the release...
+ * Insert default settings into T_settings.
+ *
+ * It only writes those to DB, that get overridden (passed as array), or have
+ * no default in {@link _generalsettings.class.php} / {@link GeneralSettings::default}.
+ *
+ * @param array associative array (settings name => value to use), allows
+ *              overriding of defaults
  */
-function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
+function create_default_settings( $override = array() )
 {
-	global $timestamp, $default_locale;
+	global $DB, $new_db_version, $default_locale, $Group_Users;
 
+	$defaults = array(
+		'db_version' => $new_db_version,
+		'default_locale' => $default_locale,
+		'newusers_grp_ID' => $Group_Users->ID,
+	);
+
+	$settings = array_merge( array_keys($defaults), array_keys($override) );
+	$settings = array_unique( $settings );
+	$insertvalues = array();
+	foreach( $settings as $name )
+	{
+		if( isset($override[$name]) )
+		{
+			$insertvalues[] = '('.$DB->quote($name).', '.$DB->quote($override[$name]).')';
+		}
+		else
+		{
+			$insertvalues[] = '('.$DB->quote($name).', '.$DB->quote($defaults[$name]).')';
+		}
+	}
+
+	echo 'Creating default settings'.( count($override) ? ' (with '.count($override).' existing values)' : '' ).'... ';
+	$DB->query(
+		"INSERT INTO T_settings (set_name, set_value)
+		VALUES ".implode( ', ', $insertvalues ) );
+	echo "OK.<br />\n";
+}
+
+
+/**
+ * This is called only for fresh installs and fills the tables with
+ * demo/tutorial things.
+ */
+function create_demo_contents()
+{
+	global $baseurl, $new_db_version;
+	global $random_password, $query;
+	global $timestamp, $admin_email;
+	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
+	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
+	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_linkblog_b2evo, $cat_linkblog_contrib;
+	global $DB;
+	global $default_locale, $install_password;
+
+	echo 'Creating demo user... ';
+	$User_Demo = & new User();
+	$User_Demo->set( 'login', 'demouser' );
+	$User_Demo->set( 'pass', md5($random_password) ); // random
+	$User_Demo->set( 'nickname', 'Mr. Demo' );
+	$User_Demo->set_email( $admin_email );
+	$User_Demo->set( 'validated', 1 ); // assume it's validated
+	$User_Demo->set( 'ip', '127.0.0.1' );
+	$User_Demo->set( 'domain', 'localhost' );
+	$User_Demo->set( 'level', 0 );
+	$User_Demo->set( 'locale', $default_locale );
+	$User_Demo->set_datecreated( $timestamp++ );
+	$User_Demo->set_Group( $Group_Users );
+	$User_Demo->dbinsert();
+	echo "OK.<br />\n";
+
+
+	global $default_locale, $query, $timestamp;
+	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
+
+	$default_blog_longdesc = T_("This is the long description for the blog named '%s'. %s");
+
+	echo "Creating default blogs... ";
+
+	$blog_shortname = 'Blog All';
+	$blog_stub = 'all';
+	$blog_more_longdesc = "<br />
+<br />
+<strong>".T_("This blog (blog #1) is actually a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by unchecking 'Include in public blog list' in the blogs admin.")."</strong>";
+	$blog_all_ID = create_blog(
+		sprintf( T_('%s Title'), $blog_shortname ),
+		$blog_shortname,
+		$blog_stub,
+		$blog_stub.'.html',
+		sprintf( T_('Tagline for %s'), $blog_shortname ),
+		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
+		4 );
+
+	$blog_shortname = 'Blog A';
+	$blog_a_long = sprintf( T_('%s Title'), $blog_shortname );
+	$blog_stub = 'a';
+	$blog_a_ID = create_blog(
+		$blog_a_long,
+		$blog_shortname,
+		$blog_stub,
+		$blog_stub.'.html',
+		sprintf( T_('Tagline for %s'), $blog_shortname ),
+		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
+		4 );
+
+	$blog_shortname = 'Blog B';
+	$blog_stub = 'b';
+	$blog_b_ID = create_blog(
+		sprintf( T_('%s Title'), $blog_shortname ),
+		$blog_shortname,
+		$blog_stub,
+		$blog_stub.'.html',
+		sprintf( T_('Tagline for %s'), $blog_shortname ),
+		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
+		4 );
+
+	$blog_shortname = 'Linkblog';
+	$blog_stub = 'links';
+	$blog_more_longdesc = '<br />
+<br />
+<strong>'.T_("The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.").'</strong>';
+	$blog_linkblog_ID = create_blog(
+		sprintf( T_('%s Title'), $blog_shortname ),
+		$blog_shortname,
+		$blog_stub,
+		$blog_stub.'.html',
+		sprintf( T_('Tagline for %s'), $blog_shortname ),
+		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
+		0 /* no Link blog */ );
+
+	echo "OK.<br />\n";
+
+
+	global $query, $timestamp;
+	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_linkblog_b2evo, $cat_linkblog_contrib;
+
+	echo 'Creating sample categories... ';
+
+	// Create categories for blog A
+	$cat_ann_a = cat_create( 'Announcements [A]', 'NULL', 2 );
+	$cat_news = cat_create( 'News', 'NULL', 2 );
+	$cat_bg = cat_create( 'Background', 'NULL', 2 );
+
+	// Create categories for blog B
+	$cat_ann_b = cat_create( 'Announcements [B]', 'NULL', 3 );
+	$cat_fun = cat_create( 'Fun', 'NULL', 3 );
+	$cat_life = cat_create( 'In real life', $cat_fun, 3 );
+	$cat_web = cat_create( 'On the web', $cat_fun, 3 );
+	$cat_sports = cat_create( 'Sports', $cat_life, 3 );
+	$cat_movies = cat_create( 'Movies', $cat_life, 3 );
+	$cat_music = cat_create( 'Music', $cat_life, 3 );
+	$cat_b2evo = cat_create( 'b2evolution Tips', 'NULL', 3 );
+
+	// Create categories for linkblog
+	$cat_linkblog_b2evo = cat_create( 'b2evolution', 'NULL', 4 );
+	$cat_linkblog_contrib = cat_create( 'contributors', 'NULL', 4 );
+
+	echo "OK.<br />\n";
+
+
+	echo 'Creating sample posts for blog A... ';
+
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('First Post'), T_('<p>This is the first post.</p>
+
+<p>It appears on both blog A and blog B.</p>'), $now, $cat_ann_a, array( $cat_ann_b ) );
+
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('Second post'), T_('<p>This is the second post.</p>
+
+<p>It appears on blog A only but in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a, $cat_bg ) );
+
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('Third post'), T_('<p>This is the third post.</p>
+
+<p>It appears on blog B only and in a single category.</p>'), $now, $cat_fun );
+
+	echo "OK.<br />\n";
+
+
+	// POPULATE THE LINKBLOG:
 	echo 'Creating default linkblog entries... ';
-
-	// Insert a post into linkblog:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Travis', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://www.travisswicegood.com/', 'disabled', array() );
-
-	// Insert a post into linkblog:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Nate', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://www.loganelementary.com', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -336,172 +477,8 @@ function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
 	$edited_Item->insert( 1, T_('This is a sample linkblog entry'), T_("This is sample text describing the linkblog entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your linkblog entries (favorite/related sites)."), $now, $cat_linkblog_b2evo, array(), 'published',	$default_locale, '', 'http://b2evolution.net/', 'disabled', array() );
 
 	echo "OK.<br />\n";
-}
 
 
-/**
- * Create a new a blog
- * This funtion has to handle all needed DB dependencies!
- *
- * @todo move this to Blog object
- */
-function blog_create(
-	$blog_name,
-	$blog_shortname,
-	$blog_stub,									// This will temporarily be assigned to both STUB and URLNAME
-	$blog_staticfilename = '',
-	$blog_tagline = '',
-	$blog_longdesc = '',
-	$blog_links_blog_ID = 0 )
-{
-	global $DB, $default_locale;
-
-	$query = "INSERT INTO T_blogs( blog_name, blog_shortname, blog_siteurl,
-						blog_stub, blog_urlname, blog_staticfilename,
-						blog_tagline, blog_longdesc, blog_locale,
-						blog_allowcomments, blog_allowtrackbacks, blog_disp_bloglist,
-						blog_in_bloglist, blog_links_blog_ID )
-	VALUES ( ";
-	$query .= "'".$DB->escape($blog_name)."', ";
-	$query .= "'".$DB->escape($blog_shortname)."', ";
-	$query .= "'', ";
-	$query .= "'".$DB->escape($blog_stub)."', ";
-	$query .= "'".$DB->escape($blog_stub)."', ";		// This one is for urlname
-	$query .= "'".$DB->escape($blog_staticfilename)."', ";
-	$query .= "'".$DB->escape($blog_tagline)."', ";
-	$query .= "'".$DB->escape($blog_longdesc)."', ";
-	$query .= "'".$DB->escape($default_locale)."', ";
-	$query .= "'post_by_post', 0, 1, 1, $blog_links_blog_ID )";
-
-	if( ! ($DB->query( $query )) )
-		return false;
-
-	return $DB->insert_id;  // blog ID
-}
-
-
-/**
- * Create default blogs.
- *
- * This is called for fresh installs and cafelog upgrade.
- *
- * @param string
- * @param string
- * @param string
- */
-function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = '#', $blog_a_longdesc = '#' )
-{
-	global $default_locale, $query, $timestamp;
-	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
-
-	$default_blog_longdesc = T_("This is the long description for the blog named '%s'. %s");
-
-	echo "Creating default blogs... ";
-
-	$blog_shortname = 'Blog All';
-	$blog_stub = 'all';
-	$blog_more_longdesc = "<br />
-<br />
-<strong>".T_("This blog (blog #1) is actually a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by unchecking 'Include in public blog list' in the blogs admin.")."</strong>";
-	$blog_all_ID = blog_create(
-		sprintf( T_('%s Title'), $blog_shortname ),
-		$blog_shortname,
-		$blog_stub,
-		$blog_stub.'.html',
-		sprintf( T_('Tagline for %s'), $blog_shortname ),
-		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-		4 );
-
-	$blog_shortname = $blog_a_short;
-	if( $blog_a_long == '#' ) $blog_a_long = sprintf( T_('%s Title'), $blog_shortname );
-	$blog_stub = 'a';
-	$blog_a_ID = blog_create(
-		$blog_a_long,
-		$blog_shortname,
-		$blog_stub,
-		$blog_stub.'.html',
-		sprintf( T_('Tagline for %s'), $blog_shortname ),
-		sprintf( (($blog_a_longdesc == '#') ? $default_blog_longdesc : $blog_a_longdesc), $blog_shortname, '' ),
-		4 );
-
-	$blog_shortname = 'Blog B';
-	$blog_stub = 'b';
-	$blog_b_ID = blog_create(
-		sprintf( T_('%s Title'), $blog_shortname ),
-		$blog_shortname,
-		$blog_stub,
-		$blog_stub.'.html',
-		sprintf( T_('Tagline for %s'), $blog_shortname ),
-		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-		4 );
-
-	$blog_shortname = 'Linkblog';
-	$blog_stub = 'links';
-	$blog_more_longdesc = '<br />
-<br />
-<strong>'.T_("The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.").'</strong>';
-	$blog_linkblog_ID = blog_create(
-		sprintf( T_('%s Title'), $blog_shortname ),
-		$blog_shortname,
-		$blog_stub,
-		$blog_stub.'.html',
-		sprintf( T_('Tagline for %s'), $blog_shortname ),
-		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-		0 /* no Link blog */ );
-
-	echo "OK.<br />\n";
-}
-
-
-/**
- * Create default categories.
- *
- * This is called for fresh installs and cafelog upgrade.
- *
- * @param boolean
- */
-function create_default_categories( $populate_blog_a = true )
-{
-	global $query, $timestamp;
-	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_linkblog_b2evo, $cat_linkblog_contrib;
-
-	echo 'Creating sample categories... ';
-
-	if( $populate_blog_a )
-	{
-		// Create categories for blog A
-		$cat_ann_a = cat_create( 'Announcements [A]', 'NULL', 2 );
-		$cat_news = cat_create( 'News', 'NULL', 2 );
-		$cat_bg = cat_create( 'Background', 'NULL', 2 );
-	}
-
-	// Create categories for blog B
-	$cat_ann_b = cat_create( 'Announcements [B]', 'NULL', 3 );
-	$cat_fun = cat_create( 'Fun', 'NULL', 3 );
-	$cat_life = cat_create( 'In real life', $cat_fun, 3 );
-	$cat_web = cat_create( 'On the web', $cat_fun, 3 );
-	$cat_sports = cat_create( 'Sports', $cat_life, 3 );
-	$cat_movies = cat_create( 'Movies', $cat_life, 3 );
-	$cat_music = cat_create( 'Music', $cat_life, 3 );
-	$cat_b2evo = cat_create( 'b2evolution Tips', 'NULL', 3 );
-
-	// Create categories for linkblog
-	$cat_linkblog_b2evo = cat_create( 'b2evolution', 'NULL', 4 );
-	$cat_linkblog_contrib = cat_create( 'contributors', 'NULL', 4 );
-
-	echo "OK.<br />\n";
-}
-
-
-/**
- * Create default contents.
- *
- * This is called for fresh installs and cafelog upgrade.
- *
- * @param boolean
- */
-function create_default_contents( $populate_blog_a = true )
-{
 	global $query, $timestamp;
 	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_linkblog_b2evo, $cat_linkblog_contrib;
 
@@ -579,7 +556,7 @@ This is page 3.
 
 This is page 4.
 
-It is the last page.'), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_bg , $cat_b2evo ) : array ( $cat_b2evo ) ) );
+It is the last page.'), $now, $cat_b2evo, array( $cat_bg , $cat_b2evo ) );
 
 
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -588,7 +565,7 @@ It is the last page.'), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_bg , 
 
 <!--more--><!--noteaser-->
 
-This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_bg , $cat_b2evo ) : array ( $cat_b2evo ) ) );
+This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_b2evo, array( $cat_bg , $cat_b2evo ) );
 
 
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -597,7 +574,7 @@ This is the extended text. You only see it when you have clicked the "more" link
 
 <!--more-->
 
-This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_bg , $cat_b2evo ) : array ( $cat_b2evo ) ) );
+This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_b2evo, array( $cat_bg , $cat_b2evo ) );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -606,148 +583,10 @@ This is the extended text. You only see it when you have clicked the "more" link
 
 All these entries are designed to help you so, as EdB would say: \"<em>read them all before you start hacking away!</em>\" ;)
 
-If you wish, you can delete these posts one by one after you have read them. You could also change their status to 'deprecated' in order to visually keep track of what you have already read."), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_ann_a , $cat_ann_b ) : array ( $cat_ann_b ) ) );
+If you wish, you can delete these posts one by one after you have read them. You could also change their status to 'deprecated' in order to visually keep track of what you have already read."), $now, $cat_b2evo, array( $cat_ann_a , $cat_ann_b ) );
 
 	echo "OK.<br />\n";
 
-}
-
-
-/**
- * Insert default settings into T_settings.
- *
- * It only writes those to DB, that get overridden (passed as array), or have
- * no default in {@link _generalsettings.class.php} / {@link GeneralSettings::default}.
- *
- * @param array associative array (settings name => value to use), allows
- *              overriding of defaults
- */
-function create_default_settings( $override = array() )
-{
-	global $DB, $new_db_version, $default_locale, $Group_Users;
-
-	$defaults = array(
-		'db_version' => $new_db_version,
-		'default_locale' => $default_locale,
-		'newusers_grp_ID' => $Group_Users->ID,
-	);
-
-	$settings = array_merge( array_keys($defaults), array_keys($override) );
-	$settings = array_unique( $settings );
-	$insertvalues = array();
-	foreach( $settings as $name )
-	{
-		if( isset($override[$name]) )
-		{
-			$insertvalues[] = '('.$DB->quote($name).', '.$DB->quote($override[$name]).')';
-		}
-		else
-		{
-			$insertvalues[] = '('.$DB->quote($name).', '.$DB->quote($defaults[$name]).')';
-		}
-	}
-
-	echo 'Creating default settings'.( count($override) ? ' (with '.count($override).' existing values)' : '' ).'... ';
-	$DB->query(
-		"INSERT INTO T_settings (set_name, set_value)
-		VALUES ".implode( ', ', $insertvalues ) );
-	echo "OK.<br />\n";
-}
-
-
-/**
- * This is called only for fresh installs and fills the tables with
- * demo/tutorial things.
- */
-function populate_main_tables()
-{
-	global $baseurl, $new_db_version;
-	global $random_password, $query;
-	global $timestamp, $admin_email;
-	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
-	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
-	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_linkblog_b2evo, $cat_linkblog_contrib;
-	global $DB;
-	global $default_locale, $install_password;
-
-	create_default_blogs();
-
-	create_default_categories();
-
-	echo 'Creating default users... ';
-
-	// USERS !
-	$User_Admin = & new User();
-	$User_Admin->set( 'login', 'admin' );
-	if( !isset( $install_password ) )
-	{
-		$random_password = generate_random_passwd(); // no ambiguous chars
-	}
-	else
-	{
-		$random_password = $install_password;
-	}
-	$User_Admin->set( 'pass', md5($random_password) );	// random
-	$User_Admin->set( 'nickname', 'admin' );
-	$User_Admin->set_email( $admin_email );
-	$User_Admin->set( 'validated', 1 ); // assume it's validated
-	$User_Admin->set( 'ip', '127.0.0.1' );
-	$User_Admin->set( 'domain', 'localhost' );
-	$User_Admin->set( 'level', 10 );
-	$User_Admin->set( 'locale', $default_locale );
-	$User_Admin->set_datecreated( $timestamp++ );
-	// Note: NEVER use database time (may be out of sync + no TZ control)
-	$User_Admin->set_Group( $Group_Admins );
-	$User_Admin->dbinsert();
-
-	$User_Demo = & new User();
-	$User_Demo->set( 'login', 'demouser' );
-	$User_Demo->set( 'pass', md5($random_password) ); // random
-	$User_Demo->set( 'nickname', 'Mr. Demo' );
-	$User_Demo->set_email( $admin_email );
-	$User_Demo->set( 'validated', 1 ); // assume it's validated
-	$User_Demo->set( 'ip', '127.0.0.1' );
-	$User_Demo->set( 'domain', 'localhost' );
-	$User_Demo->set( 'level', 0 );
-	$User_Demo->set( 'locale', $default_locale );
-	$User_Demo->set_datecreated( $timestamp++ );
-	$User_Demo->set_Group( $Group_Users );
-	$User_Demo->dbinsert();
-
-	echo "OK.<br />\n";
-
-
-	echo 'Creating sample posts for blog A... ';
-
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_('First Post'), T_('<p>This is the first post.</p>
-
-<p>It appears on both blog A and blog B.</p>'), $now, $cat_ann_a, array( $cat_ann_b ) );
-
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_('Second post'), T_('<p>This is the second post.</p>
-
-<p>It appears on blog A only but in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a, $cat_bg ) );
-
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_('Third post'), T_('<p>This is the third post.</p>
-
-<p>It appears on blog B only and in a single category.</p>'), $now, $cat_fun );
-
-	echo "OK.<br />\n";
-
-
-	// POPULATE THE LINKBLOG:
-	populate_linkblog( $now, $cat_linkblog_b2evo, $cat_linkblog_contrib );
-
-	// Create blog B contents:
-	create_default_contents();
 
 
 	echo 'Creating sample comments... ';
@@ -802,14 +641,18 @@ function populate_main_tables()
 	echo "OK.<br />\n";
 	*/
 
-	create_default_settings();
+
+	install_basic_widgets();
+
 }
 
 
 /**
  * Create relations
+ *
+ * @todo NOT UP TO DATE AT ALL :( -- update field names before activating this
  */
-function create_b2evo_relations()
+function create_relations()
 {
 	global $DB, $db_use_fkeys;
 
@@ -1110,6 +953,9 @@ function install_basic_plugins( $old_db_version = 0 )
 
 /*
  * $Log$
+ * Revision 1.212  2007/01/15 03:53:24  fplanque
+ * refactoring / simplified installer
+ *
  * Revision 1.211  2007/01/14 01:32:14  fplanque
  * more widgets supported! :)
  *
@@ -1149,160 +995,5 @@ function install_basic_plugins( $old_db_version = 0 )
  *
  * Revision 1.200  2006/10/06 21:03:07  blueyed
  * Removed deprecated/unused "upload_allowedext" Setting, which restricted file extensions during upload though!
- *
- * Revision 1.199  2006/10/02 18:32:33  blueyed
- * Fixed install
- *
- * Revision 1.198  2006/09/05 19:05:33  fplanque
- * refactoring
- *
- * Revision 1.197  2006/08/21 16:07:44  fplanque
- * refactoring
- *
- * Revision 1.196  2006/08/20 23:16:02  blueyed
- * generate_random_key(): use param to not use ambiguous chars.
- *
- * Revision 1.195  2006/08/20 17:23:35  fplanque
- * no message
- *
- * Revision 1.194  2006/08/07 21:04:12  fplanque
- * doc
- *
- * Revision 1.193  2006/08/04 22:13:23  blueyed
- * Finished de-abstraction
- *
- * Revision 1.192  2006/07/23 20:18:31  fplanque
- * cleanup
- *
- * Revision 1.190  2006/07/04 17:32:30  fplanque
- * no message
- *
- * Revision 1.189  2006/06/18 01:14:03  blueyed
- * lazy instantiate user's group; normalisation
- *
- * Revision 1.188  2006/05/22 22:58:19  blueyed
- * Changed my URL
- *
- * Revision 1.187  2006/04/29 17:24:09  blueyed
- * doc
- *
- * Revision 1.186  2006/04/22 02:36:39  blueyed
- * Validate users on registration through email link (+cleanup around it)
- *
- * Revision 1.185  2006/04/11 21:22:26  fplanque
- * partial cleanup
- *
- * Revision 1.184  2006/04/10 09:27:04  blueyed
- * Fix adding default itemtypes when upgrading from 0.9.x; cleaned up plugins install
- *
- * Revision 1.183  2006/03/23 21:02:15  fplanque
- * cleanup
- *
- * Revision 1.182  2006/03/22 20:31:41  blueyed
- * Install autolinks_plugin as basic plugin.
- *
- * Revision 1.181  2006/03/12 23:09:26  fplanque
- * doc cleanup
- *
- * Revision 1.180  2006/03/11 02:02:01  blueyed
- * Normalized t_pluginusersettings
- *
- * Revision 1.179  2006/03/07 19:30:22  fplanque
- * comments
- *
- * Revision 1.178  2006/03/06 23:14:23  blueyed
- * Moved _db_schema.inc.php to /install/ folder
- *
- * Revision 1.177  2006/02/24 19:59:29  blueyed
- * New install/upgrade, which makes use of db_delta()
- *
- * Revision 1.176  2006/02/23 21:12:33  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.175  2006/02/13 20:20:10  fplanque
- * minor / cleanup
- *
- * Revision 1.174  2006/02/11 01:08:19  blueyed
- * Oh what fun it is to drop some "e".
- *
- * Revision 1.173  2006/02/10 22:05:07  fplanque
- * Normalized itm links
- *
- * Revision 1.172  2006/02/03 17:35:17  blueyed
- * post_renderers as TEXT
- *
- * Revision 1.171  2006/01/28 18:25:02  blueyed
- * pset_value as TEXT
- *
- * Revision 1.170  2006/01/26 22:43:58  blueyed
- * Added comment_spam_karma field
- *
- * Revision 1.169  2006/01/06 18:58:09  blueyed
- * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
- *
- * Revision 1.168  2006/01/06 00:11:47  blueyed
- * Fix potential SQL error when upgrading from < 0.9 to Phoenix
- *
- * Revision 1.167  2005/12/30 18:54:59  fplanque
- * minor
- *
- * Revision 1.166  2005/12/30 18:08:24  fplanque
- * no message
- *
- * Revision 1.165  2005/12/29 20:20:01  blueyed
- * Renamed T_plugin_settings to T_pluginsettings
- *
- * Revision 1.164  2005/12/22 23:13:40  blueyed
- * Plugins' API changed and handling optimized
- *
- * Revision 1.162  2005/12/14 22:30:06  blueyed
- * Fix inserting default filetypes for MySQL 3
- *
- * Revision 1.161  2005/12/14 19:36:16  fplanque
- * Enhanced file management
- *
- * Revision 1.159  2005/12/12 19:22:03  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.158  2005/12/11 00:22:53  blueyed
- * MySQL strict mode fixes. (SET sql_mode = "TRADITIONAL";)
- *
- * Revision 1.153  2005/11/16 17:20:23  fplanque
- * hit_ID moved back to INT for performance reasons.
- *
- * Revision 1.152  2005/11/05 01:53:54  blueyed
- * Linked useragent to a session rather than a hit;
- * SQL: moved T_hitlog.hit_agnt_ID to T_sessions.sess_agnt_ID
- *
- * Revision 1.151  2005/10/31 23:20:45  fplanque
- * keeping things straight...
- *
- * Revision 1.150  2005/10/31 08:19:07  blueyed
- * Refactored getRandomPassword() and Session::generate_key() into generate_random_key()
- *
- * Revision 1.149  2005/10/31 01:38:45  blueyed
- * create_default_settings(): rely on defaults from $Settings
- *
- * Revision 1.148  2005/10/29 21:00:01  blueyed
- * Moved $db_use_fkeys to $EvoConfig->DB['use_fkeys'].
- *
- * Revision 1.147  2005/10/27 00:11:12  mfollett
- * fixed my own error which would disallow installation because of an extra comma in the create table for the sessions table
- *
- * Revision 1.146  2005/10/26 22:49:03  mfollett
- * Removed the unique requirement for IP and user ID on the sessions table.
- *
- * Revision 1.145  2005/10/03 18:10:08  fplanque
- * renamed post_ID field
- *
- * Revision 1.144  2005/10/03 17:26:44  fplanque
- * synched upgrade with fresh DB;
- * renamed user_ID field
- *
- * Revision 1.143  2005/10/03 16:30:42  fplanque
- * fixed hitlog upgrade because daniel didn't do it :((
- *
  */
 ?>

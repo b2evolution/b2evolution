@@ -381,7 +381,92 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		// Create User Groups
-		create_groups();
+		global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
+		echo 'Creating table for Groups... ';
+		$query = "CREATE TABLE T_groups (
+			grp_ID int(11) NOT NULL auto_increment,
+			grp_name varchar(50) NOT NULL default '',
+			grp_perm_admin enum('none','hidden','visible') NOT NULL default 'visible',
+			grp_perm_blogs enum('user','viewall','editall') NOT NULL default 'user',
+			grp_perm_stats enum('none','view','edit') NOT NULL default 'none',
+			grp_perm_spamblacklist enum('none','view','edit') NOT NULL default 'none',
+			grp_perm_options enum('none','view','edit') NOT NULL default 'none',
+			grp_perm_users enum('none','view','edit') NOT NULL default 'none',
+			grp_perm_templates TINYINT NOT NULL DEFAULT 0,
+			grp_perm_files enum('none','view','add','edit') NOT NULL default 'none',
+			PRIMARY KEY grp_ID (grp_ID)
+		)";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+
+		echo 'Creating default groups... ';
+		$Group_Admins = new Group(); // COPY !
+		$Group_Admins->set( 'name', 'Administrators' );
+		$Group_Admins->set( 'perm_admin', 'visible' );
+		$Group_Admins->set( 'perm_blogs', 'editall' );
+		$Group_Admins->set( 'perm_stats', 'edit' );
+		$Group_Admins->set( 'perm_spamblacklist', 'edit' );
+		$Group_Admins->set( 'perm_files', 'all' );
+		$Group_Admins->set( 'perm_options', 'edit' );
+		$Group_Admins->set( 'perm_templates', 1 );
+		$Group_Admins->set( 'perm_users', 'edit' );
+		$Group_Admins->dbinsert();
+
+		$Group_Privileged = new Group(); // COPY !
+		$Group_Privileged->set( 'name', 'Privileged Bloggers' );
+		$Group_Privileged->set( 'perm_admin', 'visible' );
+		$Group_Privileged->set( 'perm_blogs', 'viewall' );
+		$Group_Privileged->set( 'perm_stats', 'view' );
+		$Group_Privileged->set( 'perm_spamblacklist', 'edit' );
+		$Group_Privileged->set( 'perm_files', 'add' );
+		$Group_Privileged->set( 'perm_options', 'view' );
+		$Group_Privileged->set( 'perm_templates', 0 );
+		$Group_Privileged->set( 'perm_users', 'view' );
+		$Group_Privileged->dbinsert();
+
+		$Group_Bloggers = new Group(); // COPY !
+		$Group_Bloggers->set( 'name', 'Bloggers' );
+		$Group_Bloggers->set( 'perm_admin', 'visible' );
+		$Group_Bloggers->set( 'perm_blogs', 'user' );
+		$Group_Bloggers->set( 'perm_stats', 'none' );
+		$Group_Bloggers->set( 'perm_spamblacklist', 'view' );
+		$Group_Bloggers->set( 'perm_files', 'view' );
+		$Group_Bloggers->set( 'perm_options', 'none' );
+		$Group_Bloggers->set( 'perm_templates', 0 );
+		$Group_Bloggers->set( 'perm_users', 'none' );
+		$Group_Bloggers->dbinsert();
+
+		$Group_Users = new Group(); // COPY !
+		$Group_Users->set( 'name', 'Basic Users' );
+		$Group_Users->set( 'perm_admin', 'none' );
+		$Group_Users->set( 'perm_blogs', 'user' );
+		$Group_Users->set( 'perm_stats', 'none' );
+		$Group_Users->set( 'perm_spamblacklist', 'none' );
+		$Group_Users->set( 'perm_files', 'none' );
+		$Group_Users->set( 'perm_options', 'none' );
+		$Group_Users->set( 'perm_templates', 0 );
+		$Group_Users->set( 'perm_users', 'none' );
+		$Group_Users->dbinsert();
+		echo "OK.<br />\n";
+
+
+		echo 'Creating table for Blog-User permissions... ';
+		$query = "CREATE TABLE T_coll_user_perms (
+			bloguser_blog_ID int(11) unsigned NOT NULL default 0,
+			bloguser_user_ID int(11) unsigned NOT NULL default 0,
+			bloguser_ismember tinyint NOT NULL default 0,
+			bloguser_perm_poststatuses set('published','deprecated','protected','private','draft') NOT NULL default '',
+			bloguser_perm_delpost tinyint NOT NULL default 0,
+			bloguser_perm_comments tinyint NOT NULL default 0,
+			bloguser_perm_cats tinyint NOT NULL default 0,
+			bloguser_perm_properties tinyint NOT NULL default 0,
+			bloguser_perm_media_upload tinyint NOT NULL default 0,
+			bloguser_perm_media_browse tinyint NOT NULL default 0,
+			bloguser_perm_media_change tinyint NOT NULL default 0,
+			PRIMARY KEY bloguser_pk (bloguser_blog_ID,bloguser_user_ID)
+		)";
+		$DB->query( $query );
+		echo "OK.<br />\n";
 		$tablegroups_isuptodate = true;
 		$tableblogusers_isuptodate = true;
 
@@ -1687,6 +1772,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.203  2007/01/15 03:53:24  fplanque
+ * refactoring / simplified installer
+ *
  * Revision 1.202  2007/01/12 02:40:26  fplanque
  * widget default params proof of concept
  * (param customization to be done)
