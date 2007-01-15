@@ -21,7 +21,7 @@ class smilies_plugin extends Plugin
 {
 	var $code = 'b2evSmil';
 	var $name = 'Smilies';
-	var $priority = 80;
+	var $priority = 15;
 	var $version = '1.9.2';
 	var $apply_rendering = 'opt-out';
 	var $group = 'rendering';
@@ -436,6 +436,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.38  2007/01/15 03:55:22  fplanque
+ * lowered priority so there is no conflict with other replacements generating smileys.
+ *
  * Revision 1.37  2006/12/28 23:20:40  fplanque
  * added plugin event for displaying comment form toolbars
  * used by smilies plugin
