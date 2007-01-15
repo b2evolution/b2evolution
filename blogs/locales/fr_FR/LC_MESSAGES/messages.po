@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2006-12-26 01:51+0100\n"
-"PO-Revision-Date: 2007-01-03 17:44+0100\n"
+"PO-Revision-Date: 2007-01-15 20:06+0100\n"
 "Last-Translator: Francois PLANQUE <fplanque.net>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -231,7 +231,7 @@ msgstr "Créer un blog maintenant..."
 
 #: ..\..\..\default.php:63
 msgid "This is the default homepage for b2evolution. It will be displayed as long as you don't select a default blog in the general settings."
-msgstr "Ceci est la page d'accueil par défaut pour b2evolution. Elle sera affichée tant que vous n'aurez oas sélectionné un blog par défaut dans les réglages généraux."
+msgstr "Ceci est la page d'accueil par défaut pour b2evolution. Elle sera affichée tant que vous n'aurez pas sélectionné un blog par défaut dans les réglages généraux."
 
 #: ..\..\..\default.php:65
 msgid "Edit config"

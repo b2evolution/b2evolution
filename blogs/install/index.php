@@ -50,7 +50,6 @@ require_once $model_path.'skins/_skin.funcs.php';
 require_once $misc_inc_path.'_timer.class.php';
 require_once $misc_inc_path.'_plugins.class.php';
 require_once dirname(__FILE__).'/_functions_install.php';
-require_once dirname(__FILE__).'/_functions_create.php';
 
 $Timer = & new Timer('main');
 
@@ -496,38 +495,33 @@ to
 		 * NEW DB: Create a plain new db structure + sample contents
 		 * -----------------------------------------------------------------------------------
 		 */
+		require_once dirname(__FILE__).'/_functions_create.php';
+
 		param( 'create_sample_contents', 'integer', 0 );
 
-		// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
-		load_class('_misc/_plugins_admin_no_db.class.php');
-		$Plugins = new Plugins_admin_no_DB();
-		?>
-		<h2><?php echo T_('Installing b2evolution tables with sample data')?></h2>
-		<?php
+		echo '<h2>'.T_('Creating b2evolution tables...').'</h2>';
+		flush();
 		create_tables();
+
+		echo '<h2>'.T_('Creating minimun default data...').'</h2>';
+		flush();
 		create_default_data();
+
 		if( $create_sample_contents )
 		{
+			echo '<h2>'.T_('Installing sample contents...').'</h2>';
+			flush();
 			create_demo_contents();
 		}
-		?>
-		<h2><?php echo T_('Installation successful!')?></h2>
 
-		<p>
-		<strong>
-		<?php
+		echo '<h2>'.T_('Installation successful!').'</h2>';
+
+		echo '<p><strong>';
 		printf( T_('Now you can <a %s>log in</a> with the login "admin" and password "%s".'), 'href="'.$admin_url.'"', $random_password );
-		?>
-		</strong>
-		</p>
+		echo '</strong></p>';
 
-		<p>
-		<?php
-		echo T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.');
-		?>
-		</p>
+		echo '<p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>';
 
-		<?php
 		break;
 
 
@@ -538,9 +532,9 @@ to
 		 * -----------------------------------------------------------------------------------
 		 */
 		require_once( dirname(__FILE__). '/_functions_evoupgrade.php' );
-		?>
-		<h2><?php echo T_('Upgrading data in existing b2evolution database')?></h2>
-		<?php
+
+		echo '<h2>'.T_('Upgrading data in existing b2evolution database...').'</h2>';
+		flush();
 		if( upgrade_b2evo_tables() )
 		{
 			?>
@@ -558,9 +552,10 @@ to
 		 * -----------------------------------------------------------------------------------
 		 */
 		require_once( dirname(__FILE__). '/_functions_delete.php' );
-		?>
-		<h2><?php echo T_('Deleting b2evolution tables from the datatase') ?></h2>
-		<?php
+
+		echo '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>';
+		flush();
+
 		if( $allow_evodb_reset != 1 )
 		{
 			echo '<p>'.T_('For security reasons, the reset feature is disabled by default.' ).'</p>';
@@ -627,6 +622,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.126  2007/01/15 19:10:29  fplanque
+ * install refactoring
+ *
  * Revision 1.125  2007/01/15 18:48:44  fplanque
  * allow blank install.
  *

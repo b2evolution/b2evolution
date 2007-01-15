@@ -52,7 +52,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	$BlogCache->load_all();
 	if( count( $BlogCache->cache ) == 0 )
 	{	// There is no blog on this system!
-		echo '<p><strong>'.T_('b2evolution is installed and ready but you have created no blog on this system yet.').'</strong></p>';
+		echo '<p><strong>'.T_('b2evolution is installed and ready but you haven\'t created any blog on this system yet.').'</strong></p>';
 		echo '<p><strong><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Create a blog now...' ).'</a></strong></p>';
 	}
 	else
