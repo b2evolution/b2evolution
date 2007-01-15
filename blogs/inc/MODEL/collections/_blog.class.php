@@ -1071,6 +1071,7 @@ class Blog extends DataObject
 			{
 				// So far all settings have been saved to collection #0 !
 				// Update the settings: hackish but the base class should not even store this value actually...
+				// dh> what do you mean? What "base class"? Is there a problem with CollectionSettings?
 				$this->CollectionSettings->cache[$this->ID] = $this->CollectionSettings->cache[0];
 				unset( $this->CollectionSettings->cache[0] );
 
@@ -1287,6 +1288,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.56  2007/01/15 19:28:39  blueyed
+ * doc
+ *
  * Revision 1.55  2007/01/15 03:54:36  fplanque
  * pepped up new blog creation a little more
  *
