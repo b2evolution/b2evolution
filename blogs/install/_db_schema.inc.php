@@ -130,7 +130,7 @@ $schema_queries = array(
 			blog_notes           TEXT NULL,
 			blog_keywords        tinytext,
 			blog_allowcomments   VARCHAR(20) NOT NULL default 'post_by_post',
-			blog_allowtrackbacks TINYINT(1) NOT NULL default 1,
+			blog_allowtrackbacks TINYINT(1) NOT NULL default 0,
 			blog_allowblogcss    TINYINT(1) NOT NULL default 1,
 			blog_allowusercss    TINYINT(1) NOT NULL default 1,
 			blog_skin_ID         INT(10) UNSIGNED NOT NULL DEFAULT 1,
@@ -524,6 +524,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.49  2007/01/15 20:54:57  fplanque
+ * minor fix
+ *
  * Revision 1.48  2007/01/08 23:45:48  fplanque
  * A little less rough widget manager...
  * (can handle multiple instances of same widget and remembers order)
