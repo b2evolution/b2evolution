@@ -31,7 +31,7 @@ foreach( $SkinCache->cache as $Skin )
 	}
 
 	// Display skinshot:
-	Skin::disp_skinshot( $Skin->folder, 'pick', false, '?ctrl=collections&amp;action=new&amp;kind='.$kind.'&amp;skin_ID='.$Skin->ID );
+	Skin::disp_skinshot( $Skin->folder, 'pick', false, '?ctrl=collections&amp;action=new-name&amp;kind='.$kind.'&amp;skin_ID='.$Skin->ID );
 }
 
 echo '<div class="clear"></div>';

@@ -39,9 +39,9 @@ $AdminUI->set_path( 'blogs' );
 
 param_action( 'list' );
 
-if( $action != 'new-seltype'
+if( $action != 'new'
 	&& $action != 'new-selskin'
-	&& $action != 'new'
+	&& $action != 'new-name'
 	&& $action != 'list'
 	&& $action != 'create' )
 {
@@ -67,7 +67,7 @@ else
  */
 switch( $action )
 {
-	case 'new-seltype':
+	case 'new':
 		// New collection:
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
@@ -85,7 +85,7 @@ switch( $action )
 		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( T_('New %s'), Blog::kind_name($kind) ) ) );
 		break;
 
-	case 'new':
+	case 'new-name':
 		// New collection:
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
@@ -318,7 +318,7 @@ $AdminUI->disp_body_top();
 
 switch($action)
 {
-	case 'new-seltype':
+	case 'new':
 		$AdminUI->displayed_sub_begin = 1;	// DIRTY HACK :/ replacing an even worse hack...
 		$AdminUI->disp_payload_begin();
 
@@ -338,7 +338,7 @@ switch($action)
 		break;
 
 
-	case 'new':
+	case 'new-name':
 	case 'create': // in case of validation error
 		$AdminUI->displayed_sub_begin = 1;	// DIRTY HACK :/ replacing an even worse hack...
 		$AdminUI->disp_payload_begin();
@@ -431,6 +431,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2007/01/15 18:48:06  fplanque
+ * cleanup
+ *
  * Revision 1.15  2007/01/15 16:59:57  fplanque
  * create default widgets with each new blog
  *
