@@ -420,10 +420,14 @@ switch( $action )
 			<p><?php echo T_('The installation can be done in different ways. Choose one:')?></p>
 
 			<p><input type="radio" name="action" id="newdb" value="newdb" checked="checked" />
-				<label for="newdb"><?php echo T_('<strong>New Install</strong>: Install b2evolution database tables with sample data.')?></label></p>
+				<label for="newdb"><?php echo T_('<strong>New Install</strong>: Install b2evolution database tables.')?></label></p>
+			<p style="margin-left: 2em;">
+				<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />
+				<label for="create_sample_contents"><?php echo T_('Also install sample blogs &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.')?></label>
+			</p>
 
 			<p><input type="radio" name="action" id="evoupgrade" value="evoupgrade" />
-				<label for="evoupgrade"><?php echo T_('<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version. <strong>WARNING:</strong> If you have modified your database, this operation may fail. Make sure you have a backup.').' '.T_('<strong>NOTE:</strong> Your stats will be reset.')?></label></p>
+				<label for="evoupgrade"><?php echo T_('<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version. <strong>WARNING:</strong> If you have modified your database, this operation may fail. Make sure you have a backup.') ?></label></p>
 
 			<?php
 				if( $allow_evodb_reset == 1 )
@@ -431,7 +435,7 @@ switch( $action )
 					?>
 					<p><input type="radio" name="action" id="deletedb" value="deletedb" />
 					<label for="deletedb"><strong><?php echo T_('Delete b2evolution tables')?></strong>:
-					<?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have some, will not be touched in any way.')?></label></p>
+					<?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Any non-b2evolution tables will remain untouched though.')?></label></p>
 
 					<p><input type="radio" name="action" id="start" value="start" />
 					<label for="start"><?php echo T_('<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location...')?></label></p>
@@ -492,6 +496,7 @@ to
 		 * NEW DB: Create a plain new db structure + sample contents
 		 * -----------------------------------------------------------------------------------
 		 */
+		param( 'create_sample_contents', 'integer', 0 );
 
 		// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
 		load_class('_misc/_plugins_admin_no_db.class.php');
@@ -501,7 +506,10 @@ to
 		<?php
 		create_tables();
 		create_default_data();
-		create_demo_contents();
+		if( $create_sample_contents )
+		{
+			create_demo_contents();
+		}
 		?>
 		<h2><?php echo T_('Installation successful!')?></h2>
 
@@ -619,6 +627,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.125  2007/01/15 18:48:44  fplanque
+ * allow blank install.
+ *
  * Revision 1.124  2007/01/15 03:53:24  fplanque
  * refactoring / simplified installer
  *
