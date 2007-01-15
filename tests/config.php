@@ -3,6 +3,8 @@
  * Config file for tests.
  */
 
+set_time_limit(0);
+
 /**
  * Create it locally and define EVODIR or other constants there.
  * You can also override array indexes of {@link $testDB_conf} there.
