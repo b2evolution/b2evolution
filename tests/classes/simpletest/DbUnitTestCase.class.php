@@ -6,7 +6,7 @@
 
 
 /**
- * We use create_b2evo_tables() in {@link create_current_tables()}.
+ * We use create_tables() in {@link create_current_tables()}.
  */
 require_once $basepath.$install_subdir.'_functions_create.php';
 
@@ -130,7 +130,7 @@ class DbUnitTestCase extends EvoUnitTestCase
 	{
 		$this->dropTestDbTables();
 
-		create_b2evo_tables();
+		create_tables();
 	}
 
 
