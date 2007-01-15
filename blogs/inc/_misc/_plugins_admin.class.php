@@ -283,11 +283,7 @@ class Plugins_admin extends Plugins
 
 		$Debuglog->add( 'Discovering plugins...', 'plugins' );
 
-		$Timer->resume('plugins_discover::get_filenames');
-		$plugin_files = get_filenames( $this->plugins_path, true, false );
-		$Timer->pause('plugins_discover::get_filenames');
-
-		foreach( $plugin_files as $path )
+		foreach( get_filenames( $this->plugins_path, true, false ) as $path )
 		{
 			if( ! preg_match( '~/_([^/]+)\.plugin\.php$~', $path, $match ) && is_file( $path ) )
 			{
@@ -305,8 +301,6 @@ class Plugins_admin extends Plugins
 				$Debuglog->add( 'Skipping duplicate plugin (classname '.$classname.')!', array('error', 'plugins') );
 				continue;
 			}
-
-			// TODO: check for parse errors before, e.g. through /htsrc/async.php..?!
 
 			$this->register( $classname, 0, -1, NULL, $path ); // auto-generate negative ID; will return string on error.
 		}
@@ -1382,6 +1376,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.27  2007/01/15 19:28:29  blueyed
+ * Small opt
+ *
  * Revision 1.26  2007/01/14 18:15:51  blueyed
  * Nuked hackish $is_admin_class as per todo
  *
