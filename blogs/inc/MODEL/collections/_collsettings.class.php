@@ -68,11 +68,34 @@ class CollectionSettings extends AbstractSettings
 	{
 		parent::AbstractSettings( 'T_coll_settings', array( 'cset_coll_ID', 'cset_name' ), 'cset_value', 1 );
 	}
+
+	/**
+	 * Loads the settings. Not meant to be called directly, but gets called
+	 * when needed.
+	 *
+	 * @access protected
+	 * @param string First column key
+	 * @param string Second column key
+	 * @return boolean
+	 */
+	function _load( $coll_ID, $arg )
+	{
+		if( empty( $coll_ID ) )
+		{
+			return false;
+		}
+
+		return parent::_load( $coll_ID, $arg );
+	}
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.13  2007/01/15 03:54:36  fplanque
+ * pepped up new blog creation a little more
+ *
  * Revision 1.12  2006/12/17 23:42:38  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.

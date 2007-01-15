@@ -221,3 +221,18 @@ div.system_check_message_error {
 	padding: 3px;
 	background: #fbb;
 }
+
+table.coll_kind {
+	margin: 0 3ex;
+}
+table.coll_kind td {
+	padding: 2ex;
+	vertical-align: top;
+}
+table.coll_kind td.coll_kind {
+	white-space: nowrap;
+	padding-right: 3ex;
+}
+td.coll_kind h3 {
+	margin: 0;
+}

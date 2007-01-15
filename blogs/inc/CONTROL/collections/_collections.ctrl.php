@@ -40,6 +40,7 @@ $AdminUI->set_path( 'blogs' );
 param_action( 'list' );
 
 if( $action != 'new-seltype'
+	&& $action != 'new-selskin'
 	&& $action != 'new'
 	&& $action != 'list'
 	&& $action != 'create' )
@@ -74,6 +75,16 @@ switch( $action )
 		$AdminUI->append_path_level( 'new', array( 'text' => T_('New') ) );
 		break;
 
+	case 'new-selskin':
+		// New collection:
+		// Check permissions:
+		$current_User->check_perm( 'blogs', 'create', true );
+
+		param( 'kind', 'string', true );
+
+		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( T_('New %s'), Blog::kind_name($kind) ) ) );
+		break;
+
 	case 'new':
 		// New collection:
 		// Check permissions:
@@ -84,7 +95,9 @@ switch( $action )
 		param( 'kind', 'string', true );
 		$edited_Blog->init_by_kind( $kind );
 
-		$AdminUI->append_path_level( 'new', array( 'text' => T_('New') ) );
+ 		param( 'skin_ID', 'integer', true );
+
+		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( T_('New %s'), Blog::kind_name($kind) ) ) );
 		break;
 
 	case 'create':
@@ -95,6 +108,10 @@ switch( $action )
 		$edited_Blog = & new Blog( NULL );
 
 		param( 'kind', 'string', true );
+		$edited_Blog->init_by_kind( $kind );
+
+ 		param( 'skin_ID', 'integer', true );
+		$edited_Blog->set( 'skin_ID', $skin_ID );
 
 		if( $edited_Blog->load_from_Request( array() ) )
 		{
@@ -272,6 +289,16 @@ switch($action)
 		break;
 
 
+	case 'new-selskin':
+		$AdminUI->displayed_sub_begin = 1;	// DIRTY HACK :/ replacing an even worse hack...
+		$AdminUI->disp_payload_begin();
+
+		$AdminUI->disp_view( 'collections/_coll_sel_skin.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
+
 	case 'new':
 	case 'create': // in case of validation error
 		$AdminUI->displayed_sub_begin = 1;	// DIRTY HACK :/ replacing an even worse hack...
@@ -365,6 +392,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2007/01/15 03:54:36  fplanque
+ * pepped up new blog creation a little more
+ *
  * Revision 1.13  2007/01/15 00:38:06  fplanque
  * pepped up "new blog" creation a little. To be continued.
  *

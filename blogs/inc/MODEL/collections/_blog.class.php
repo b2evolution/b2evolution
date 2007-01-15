@@ -197,6 +197,15 @@ class Blog extends DataObject
 				$this->set( 'name', T_('My photoblog') );
 				$this->set( 'shortname', T_('Photoblog') );
 				$this->set( 'urlname', 'photo' );
+				$this->set_setting( 'posts_per_page', 1 );
+				$this->set_setting( 'archive_mode', 'postbypost' );
+				break;
+
+			case 'group':
+				$this->set( 'name', T_('Our blog') );
+				$this->set( 'shortname', T_('Group') );
+				$this->set( 'urlname', 'group' );
+				$this->set_setting( 'use_workflow', 1 );
 				break;
 
 			case 'std':
@@ -221,6 +230,9 @@ class Blog extends DataObject
 		{
 			case 'photo':
 				return T_('Photoblog');
+
+			case 'group':
+				return T_('Group blog');
 
 			case 'std':
 			default:
@@ -1024,12 +1036,16 @@ class Blog extends DataObject
 	 */
 	function set_setting( $parname, $value )
 	{
+	 	// Make sure collection settings are loaded
 		$this->load_CollectionSettings();
 
 		return $this->CollectionSettings->set( $this->ID, $parname, $value );
 	}
 
 
+	/**
+	 * Make sure collection settings are loaded
+	 */
 	function load_CollectionSettings()
 	{
 		if( ! isset( $this->CollectionSettings ) )
@@ -1037,6 +1053,32 @@ class Blog extends DataObject
 			require_once dirname(__FILE__).'/_collsettings.class.php';
 			$this->CollectionSettings = new CollectionSettings(); // COPY (function)
 		}
+	}
+
+
+ 	/**
+	 * Insert into the DB
+	 */
+	function dbinsert()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		if( parent::dbinsert() )
+		{
+			if( isset( $this->CollectionSettings ) )
+			{
+				// So far all settings have been saved to collection #0 !
+				// Update the settings: hackish but the base class should not even store this value actually...
+				$this->CollectionSettings->cache[$this->ID] = $this->CollectionSettings->cache[0];
+				unset( $this->CollectionSettings->cache[0] );
+
+				$this->CollectionSettings->dbupdate();
+			}
+		}
+
+		$DB->commit();
 	}
 
 
@@ -1049,11 +1091,12 @@ class Blog extends DataObject
 
 		$DB->begin();
 
-		parent::dbupdate();
-
-		if( isset( $this->CollectionSettings ) )
+		if( parent::dbupdate() )
 		{
-			$this->CollectionSettings->dbupdate();
+			if( isset( $this->CollectionSettings ) )
+			{
+				$this->CollectionSettings->dbupdate();
+			}
 		}
 
 		$DB->commit();
@@ -1244,6 +1287,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.55  2007/01/15 03:54:36  fplanque
+ * pepped up new blog creation a little more
+ *
  * Revision 1.54  2007/01/15 00:38:06  fplanque
  * pepped up "new blog" creation a little. To be continued.
  *

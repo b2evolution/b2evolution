@@ -40,6 +40,7 @@ $Form->hidden( 'tab', $tab );
 if( $next_action == 'create' )
 {
 	$Form->hidden( 'kind', get_param('kind') );
+	$Form->hidden( 'skin_ID', get_param('skin_ID') );
 }
 else
 {
@@ -81,6 +82,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.17  2007/01/15 03:54:36  fplanque
+ * pepped up new blog creation a little more
+ *
  * Revision 1.16  2007/01/15 00:38:05  fplanque
  * pepped up "new blog" creation a little. To be continued.
  *
