@@ -50,6 +50,10 @@ if( ! $commented_Item->can_comment( NULL ) )
 }
 
 
+// TODO: dh> a plugin hook would be useful here. There's BeforeCommentFormInsert below, but it's just before displaying messages.
+//           e.g. the OpenID plugin would need to alter the form params here.
+
+
 // Note: we use funky field names to defeat the most basic guestbook spam bots and/or their most basic authors
 $comment = param( 'p', 'html' );
 param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 );
@@ -326,6 +330,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.99  2007/01/16 22:48:13  blueyed
+ * Plugin hook TODO
+ *
  * Revision 1.98  2006/12/26 00:08:30  fplanque
  * wording
  *
