@@ -305,9 +305,10 @@ class Session
 	 * Get a data value for the session. This checks for the data to be expired and unsets it then.
 	 *
 	 * @param string Name of the data's key.
-	 * @return mixed|NULL The value, if set; otherwise NULL
+	 * @param mixed Default value to use if key is not set or has expired. (since EVO_NEXT_VERSION)
+	 * @return mixed|NULL The value, if set; otherwise $default
 	 */
-	function get( $param )
+	function get( $param, $default = NULL )
 	{
 		global $Debuglog, $localtimenow;
 
@@ -326,7 +327,7 @@ class Session
 			}
 		}
 
-		return NULL;
+		return $default;
 	}
 
 
@@ -493,6 +494,9 @@ function session_unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.31  2007/01/16 00:08:44  blueyed
+ * Implemented $default param for Session::get()
+ *
  * Revision 1.30  2006/12/28 15:43:31  fplanque
  * minor
  *
