@@ -221,6 +221,10 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 		$Form = & new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID );
 		$Form->begin_form( 'bComment' );
 
+		// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
+		//           Actually, the best would be, if the $Form object could be changed by a plugin
+		//           before display!
+
 		$Form->hidden( 'comment_post_ID', $Item->ID );
 		$Form->hidden( 'redirect_to',
 				// Make sure we get back to the right page (on the right domain)
@@ -238,6 +242,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 		else
 		{ // User is not logged in:
 			// Note: we use funky field names to defeat the most basic guestbook spam bots
+			// TODO: dh> those funky field names should become a setting or "constants" somehow.
 			$Form->text( 'u', $comment_author, 40, T_('Name'), '', 100, 'bComment' );
 			$Form->text( 'i', $comment_author_email, 40, T_('Email'), T_('Your email address will <strong>not</strong> be displayed on this site.'), 100, 'bComment' );
 			$Form->text( 'o', $comment_author_url, 40, T_('Site/Url'), T_('Your URL will be displayed.'), 100, 'bComment' );
@@ -314,6 +319,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.86  2007/01/16 22:53:38  blueyed
+ * TODOs
+ *
  * Revision 1.85  2006/12/28 23:20:40  fplanque
  * added plugin event for displaying comment form toolbars
  * used by smilies plugin
