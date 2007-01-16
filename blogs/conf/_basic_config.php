@@ -100,8 +100,8 @@ $baseurl = 'http://localhost/b2evolution/blogs/';
 
 
 /**
- * Your email. Will be used in severe error messages so that users can contact you.
- * You will also receive notifications for new user registrations there.
+ * This is used only to create the Admin account.
+ * @todo move to installer.
  */
 $admin_email = 'postmaster@localhost';
 

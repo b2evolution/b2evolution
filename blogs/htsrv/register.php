@@ -139,6 +139,9 @@ switch( $action )
 		$UserCache->add( $new_User );
 
 		// Send email to admin (using his locale):
+		/**
+		 * @var User
+		 */
 		$AdminUser = & $UserCache->get_by_ID( 1 );
 		locale_temp_switch( $AdminUser->get( 'locale' ) );
 
@@ -149,7 +152,7 @@ switch( $action )
 							."\n"
 							.T_('Edit user').': '.$admin_url.'?ctrl=users&user_ID='.$new_User->ID."\n";
 
-		send_mail( $admin_email, T_('New user registration on your blog'), $message, $notify_from ); // ok, if this may fail..
+		send_mail( $AdminUser->get( 'email' ), T_('New user registration on your blog'), $message, $notify_from ); // ok, if this may fail..
 
 		locale_restore_previous();
 
@@ -197,6 +200,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.78  2007/01/16 00:44:42  fplanque
+ * don't use $admin_email in  the app
+ *
  * Revision 1.77  2006/12/06 22:30:07  fplanque
  * Fixed this use case:
  * Users cannot register themselves.

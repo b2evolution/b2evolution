@@ -860,7 +860,7 @@ class Blog extends DataObject
 	 */
 	function get( $parname )
 	{
-		global $xmlsrv_url, $admin_email, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
+		global $xmlsrv_url, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
 
 		switch( $parname )
 		{
@@ -969,9 +969,6 @@ class Blog extends DataObject
 
 			case 'comments_atom_url':
 				return $this->get_comment_feed_url( '_atom' );
-
-			case 'admin_email':
-				return $admin_email;
 
 
 			/* Add the html for a blog-specified stylesheet
@@ -1288,6 +1285,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.57  2007/01/16 00:44:42  fplanque
+ * don't use $admin_email in  the app
+ *
  * Revision 1.56  2007/01/15 19:28:39  blueyed
  * doc
  *

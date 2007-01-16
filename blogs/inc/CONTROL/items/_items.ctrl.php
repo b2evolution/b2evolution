@@ -107,8 +107,7 @@ switch( $action )
 
 		if( ! $selected  )
 		{ // No blog could be selected
-			$Messages->add( sprintf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'),
-											 'href="mailto:'.$admin_email.'?subject=b2evo-promotion"' ), 'error' );
+			$Messages->add( T_('Sorry, you have no permission to post yet.'), 'error' );
 			$action = 'nil';
 		}
 		break;
@@ -681,6 +680,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2007/01/16 00:44:42  fplanque
+ * don't use $admin_email in  the app
+ *
  * Revision 1.12  2006/12/24 00:42:14  fplanque
  * refactoring / Blog::get_default_cat_ID()
  *
