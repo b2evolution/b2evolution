@@ -188,33 +188,6 @@ $AdminUI->add_menu_entries(
 				'href' => 'admin.php?ctrl=users',
 			),
 
-			'tools' => array(
-				'text' => T_('Tools'),
-				'href' => 'admin.php?ctrl=crontab',
-				'perm_name' => 'options',
-				'perm_level' => 'view',	// FP> This assumes that we don't let regular users access the tools, including plugin tools.
-				'entries' =>  array(
-					'cron' => array(
-						'text' => T_('Scheduler'),
-						'perm_name' => 'options',
-						'perm_level' => 'view',
-						'href' => 'admin.php?ctrl=crontab' ),
-					'system' => array(
-						'text' => T_('System'),
-						'perm_name' => 'options',
-						'perm_level' => 'view',
-						'href' => 'admin.php?ctrl=system' ),
-					'antispam' => array(
-						'text' => T_('Antispam'),
-						'perm_name' => 'spamblacklist',
-						'perm_level' => 'view',
-						'href' => 'admin.php?ctrl=antispam'	),
-					'' => array(	// fp> '' is dirty
-						'text' => T_('Misc'),
-						'href' => 'admin.php?ctrl=tools' ),
-				)
-			),
-
 		)
 	);
 
@@ -326,6 +299,34 @@ $AdminUI->add_menu_entries(
 						'href' => 'admin.php?ctrl=itemstatuses'),
 				)
 			),
+
+			'tools' => array(
+				'text' => T_('Tools'),
+				'href' => 'admin.php?ctrl=crontab',
+				'perm_name' => 'options',
+				'perm_level' => 'view',	// FP> This assumes that we don't let regular users access the tools, including plugin tools.
+				'entries' =>  array(
+					'cron' => array(
+						'text' => T_('Scheduler'),
+						'perm_name' => 'options',
+						'perm_level' => 'view',
+						'href' => 'admin.php?ctrl=crontab' ),
+					'system' => array(
+						'text' => T_('System'),
+						'perm_name' => 'options',
+						'perm_level' => 'view',
+						'href' => 'admin.php?ctrl=system' ),
+					'antispam' => array(
+						'text' => T_('Antispam'),
+						'perm_name' => 'spamblacklist',
+						'perm_level' => 'view',
+						'href' => 'admin.php?ctrl=antispam'	),
+					'' => array(	// fp> '' is dirty
+						'text' => T_('Misc'),
+						'href' => 'admin.php?ctrl=tools' ),
+				)
+			),
+
 		)
 	);
 
@@ -335,6 +336,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.43  2007/01/16 00:45:42  fplanque
+ * still trying to find the right placement...
+ *
  * Revision 1.42  2007/01/08 21:55:42  fplanque
  * very rough widget handling
  *
