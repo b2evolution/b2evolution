@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2006-12-26 01:51+0100\n"
-"PO-Revision-Date: 2007-01-15 20:06+0100\n"
+"PO-Revision-Date: 2007-01-16 01:24+0100\n"
 "Last-Translator: Francois PLANQUE <fplanque.net>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -501,12 +501,12 @@ msgstr "Options avancées"
 #: ..\..\..\inc\VIEW\users\_users_form.php:92
 #: ..\..\..\inc\VIEW\users\_users_groupform.php:104
 msgid "User permissions"
-msgstr "Permissions des utilisateurs"
+msgstr "Perms utilisateurs"
 
 #: ..\..\..\_header.php:279
 #: ..\..\..\inc\VIEW\collections\_blogs_permissions_group.form.php:205
 msgid "Group permissions"
-msgstr "Permissions des groupes"
+msgstr "Perms groupes"
 
 #: ..\..\..\_header.php:286
 #: ..\..\..\skins\_subscriptions.php:50
@@ -7025,7 +7025,7 @@ msgstr "Ceci est utile pour les images"
 #: ..\..\..\inc\VIEW\files\_file_properties.inc.php:58
 #: ..\..\..\inc\VIEW\files\_file_properties.inc.php:64
 msgid "Caption/Description"
-msgstr "Lége,de/Description"
+msgstr "Légende/Description"
 
 #: ..\..\..\inc\VIEW\files\_set_files.form.php:167
 msgid "File Settings"
