@@ -12,6 +12,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * Automatic links plugin.
+ *
+ * @todo dh> Provide a setting for:
+ *   - marking external and internal (relative URL or on the blog's URL) links with a HTML/CSS class
+ *   - add e.g. 'target="_blank"' to external links
+ *
  * @package plugins
  */
 class autolinks_plugin extends Plugin
@@ -56,6 +62,9 @@ class autolinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.15  2007/01/17 21:41:05  blueyed
+ * todo for useful settings/features
+ *
  * Revision 1.14  2006/12/26 03:19:12  fplanque
  * assigned a few significant plugin groups
  *
