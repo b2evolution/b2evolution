@@ -100,7 +100,6 @@ class auto_p_plugin extends Plugin
 		$content = preg_replace( "~(\r\n|\r)~", "\n", $content ); // cross-platform newlines
 
 		// Handle blocks, splitted by "<!--more-->", "<!--nextpage-->" or "<!--noteaser-->":
-		// fp> don't we also want to split the pages?
 		$content_parts = preg_split( '~(<!--(?:more|nextpage|noteaser)-->)~', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
 		$content_parts[] = '';
 
@@ -634,6 +633,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.36  2007/01/17 23:35:58  blueyed
+ * Removed obsolete question/todo
+ *
  * Revision 1.35  2006/12/26 03:19:12  fplanque
  * assigned a few significant plugin groups
  *
