@@ -49,7 +49,10 @@ param( 'mode', 'string', '' );
 param( 'login', 'string', '' );
 // echo 'login: ', $login;
 
-param( 'redirect_to', 'string', true ); // gets used by header_redirect(); required
+// gets used by header_redirect(); required
+// dh> header_redirect() as a good fallback mechanism. Now it's impossible to just go to /htsrv/login.php manually..!
+#param( 'redirect_to', 'string', true );
+param( 'redirect_to', 'string', '' );
 
 
 switch( $action )
@@ -337,7 +340,7 @@ if( $ReqHost.$ReqPath != $htsrv_url_sensitive.'login.php' )
 
 // Note: the following regexp would fail when loging on to the same domain, because cookie_domain starts with a dot '.'
 // However, same domain logins will happen with a relative redirect_to, so it is covered with '^/'
-if( !preg_match( '#^/|(https?://[a-z\-.]*'.str_replace( '.', '\.', $cookie_domain ).')#i', $redirect_to ) )
+if( strlen($redirect_to) && !preg_match( '#^/|(https?://[a-z\-.]*'.str_replace( '.', '\.', $cookie_domain ).')#i', $redirect_to ) )
 {
 	$Messages->add( sprintf( T_('WARNING: you are trying to log in to <strong>%s</strong> but your cookie domain is <strong>%s</strong>. You will not be able to successfully log in to the requested domain until you fix your cookie domain in your %s configuration.'), $redirect_to, $cookie_domain, $app_name ), 'error' );
 
@@ -350,6 +353,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.82  2007/01/17 23:54:54  blueyed
+ * fixed "empty $redirect_to" regression
+ *
  * Revision 1.81  2006/12/28 19:18:49  fplanque
  * trap yet another login/cookie caveat
  *
