@@ -2552,7 +2552,7 @@ class Plugin
 	 * @param string Name of the data's key (gets prefixed with 'plugIDX_' internally).
 	 * @param mixed The value
 	 * @param integer Time in seconds for data to expire (0 to disable).
-	 * @param boolean Should the data get saved immediately?
+	 * @param boolean Should the data get saved immediately? (otherwise it gets saved on script shutdown)
 	 */
 	function session_set( $name, $value, $timeout, $save_immediately = false )
 	{
@@ -2572,13 +2572,14 @@ class Plugin
 	 * This checks for the data to be expired and unsets it then.
 	 *
 	 * @param string Name of the data's key (gets prefixed with 'plugIDX_' internally).
-	 * @return mixed|NULL The value, if set; otherwise NULL
+	 * @param mixed Default value to use if key is not set or has expired. (since EVO_NEXT_VERSION)
+	 * @return mixed The value, if set; otherwise $default
 	 */
-	function session_get( $name )
+	function session_get( $name, $default = NULL )
 	{
 		global $Session;
 
-		return $Session->get( 'plugID'.$this->ID.'_'.$name );
+		return $Session->get( 'plugID'.$this->ID.'_'.$name, $default );
 	}
 
 
@@ -2815,6 +2816,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.135  2007/01/17 23:37:10  blueyed
+ * Bypass new $default param in Plugin::session_get()
+ *
  * Revision 1.134  2007/01/14 18:05:45  blueyed
  * Optimized "info", "disp_help" and "disp_help_plain" actions by refering to them through classname, which makes Plugins::discover() unnecessary
  *
@@ -3107,7 +3111,7 @@ class Plugin
  * *** empty log message ***
  *
  * Revision 1.36  2006/04/27 20:07:19  blueyed
- * Renamed Plugin::get_htsrv_methods() to GetHtsvMethods() (normalization)
+ * Renamed Plugin::get_htsrv_methods() to GetHtsrvMethods() (normalization)
  *
  * Revision 1.35  2006/04/27 19:44:33  blueyed
  * A plugin can disable events (e.g. after install)
