@@ -242,7 +242,6 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 		else
 		{ // User is not logged in:
 			// Note: we use funky field names to defeat the most basic guestbook spam bots
-			// TODO: dh> those funky field names should become a setting or "constants" somehow.
 			$Form->text( 'u', $comment_author, 40, T_('Name'), '', 100, 'bComment' );
 			$Form->text( 'i', $comment_author_email, 40, T_('Email'), T_('Your email address will <strong>not</strong> be displayed on this site.'), 100, 'bComment' );
 			$Form->text( 'o', $comment_author_url, 40, T_('Site/Url'), T_('Your URL will be displayed.'), 100, 'bComment' );
@@ -319,6 +318,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.87  2007/01/18 22:28:53  fplanque
+ * no unnecessary complexity
+ *
  * Revision 1.86  2007/01/16 22:53:38  blueyed
  * TODOs
  *
