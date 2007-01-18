@@ -83,6 +83,9 @@ if( $plugin_ID )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.8  2007/01/18 00:21:16  blueyed
+ * doc
+ *
  * Revision 1.7  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
@@ -90,7 +93,7 @@ if( $plugin_ID )
  * Do not debug_die() if Plugins htsrv-method returned false.
  *
  * Revision 1.5  2006/04/27 20:07:19  blueyed
- * Renamed Plugin::get_htsrv_methods() to GetHtsvMethods() (normalization)
+ * Renamed Plugin::get_htsrv_methods() to GetHtsrvMethods() (normalization)
  *
  * Revision 1.4  2006/04/19 20:13:48  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)

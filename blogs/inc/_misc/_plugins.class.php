@@ -1787,6 +1787,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.136  2007/01/18 00:23:57  blueyed
+ * doc
+ *
  * Revision 1.135  2007/01/14 19:37:24  blueyed
  * Fix for overloading problems of (User)Settings in PHP 5.0.5
  *
@@ -2086,7 +2089,7 @@ class Plugins
  * *** empty log message ***
  *
  * Revision 1.35  2006/04/27 20:07:19  blueyed
- * Renamed Plugin::get_htsrv_methods() to GetHtsvMethods() (normalization)
+ * Renamed Plugin::get_htsrv_methods() to GetHtsrvMethods() (normalization)
  *
  * Revision 1.34  2006/04/27 19:44:33  blueyed
  * A plugin can disable events (e.g. after install)
