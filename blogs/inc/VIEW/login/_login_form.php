@@ -200,7 +200,8 @@ $Form->end_form();
 		&& strpos($ReqHost.$redirect_to, $admin_url ) !== 0 )
 	{ // No login required, allow to pass through
 		// TODO: dh> validate redirect_to param?!
-		echo '<a href="'.rawurlencode(url_rel_to_same_host($redirect_to, $ReqHost)).'">'./* Gets displayed as link to the location on the login form if no login is required */ T_('Bypass login...').'</a>';
+		echo '<a href="'.htmlspecialchars(url_rel_to_same_host($redirect_to, $ReqHost)).'">'
+		./* Gets displayed as link to the location on the login form if no login is required */ T_('Cancel login...').'</a>';
 	}
 	?>
 </div>
@@ -212,7 +213,7 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
- * Revision 1.39  2007/01/18 22:24:35  fplanque
+ * Revision 1.40  2007/01/18 23:59:29  fplanque
  * Re: Secunia. Proper sanitization.
  *
  * Revision 1.38  2007/01/18 18:50:12  blueyed

@@ -324,7 +324,7 @@ if( $Session->has_User() )
 	{	// User is not validated (he may have been invalidated)
 		// dh> TODO: validate $redirect_to param!
 		$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $tmp_User->get('login') )
-			.' <a href="'.rawurlencode($redirect_to).'">'.T_('Continue...').'</a>', 'note' );
+			.' <a href="'.htmlspecialchars($redirect_to).'">'.T_('Continue...').'</a>', 'note' );
 	}
 	unset($tmp_User);
 }
@@ -353,7 +353,7 @@ exit();
 
 /*
  * $Log$
- * Revision 1.83  2007/01/18 22:24:35  fplanque
+ * Revision 1.84  2007/01/18 23:59:29  fplanque
  * Re: Secunia. Proper sanitization.
  *
  * Revision 1.82  2007/01/17 23:54:54  blueyed
