@@ -1018,6 +1018,48 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 	}
 
 
+	/**
+	 * Test possible combinations of "[UNIQUE [KEY] | [PRIMARY] KEY]" in column_definition
+	 */
+	function test_inline_unique_and_pk_combos()
+	{
+		foreach( array(
+				'CREATE TABLE test_1 ( i INT UNIQUE KEY PRIMARY KEY )' => 2,
+				'CREATE TABLE test_1 ( i INT UNIQUE PRIMARY KEY )' => 2,
+				'CREATE TABLE test_1 ( i INT UNIQUE KEY )' => 1,
+				'CREATE TABLE test_1 ( i INT PRIMARY KEY )' => 1,
+				'CREATE TABLE test_1 ( i INT KEY )' => 1,
+				'CREATE TABLE test_1 ( i INT PRIMARY KEY UNIQUE KEY )' => 2,
+				'CREATE TABLE test_1 ( i INT PRIMARY KEY UNIQUE )' => 2,
+				'CREATE TABLE test_1 ( i INT KEY UNIQUE )' => 2,
+				'CREATE TABLE test_1 ( i INT UNIQUE )' => 1 )
+			as $sql => $key_count )
+		{
+			$this->test_DB->query( $sql );
+			$r = $this->db_delta_wrapper( $sql );
+
+			$this->assertEqual( count($r), 0 );
+			$this->assertEqual( count($this->test_DB->get_results( 'SHOW INDEX FROM test_1' )), $key_count );
+
+			$this->dropTestDbTables();
+		}
+	}
+
+
+	/**
+	 * Test if splitting of fields "just by comma" works.
+	 */
+	function test_splitting_fields_by_comma()
+	{
+		$sql = "CREATE TABLE test_1 ( i INT, v VARCHAR(255), INDEX idx (i, v), PRIMARY KEY (v(20)) )";
+
+		$this->test_DB->query( $sql );
+
+		$r = $this->db_delta_wrapper( $sql );
+
+		$this->assertEqual( count($r), 0 );
+	}
+
 }
 
 

@@ -213,7 +213,37 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 			$qryline = trim($match[1]);
 
 			// Separate field lines into an array
-			$flds = preg_split( '~,(\r?\n|\r)~', $qryline, -1, PREG_SPLIT_NO_EMPTY );
+			#$flds = preg_split( '~,(\r?\n|\r)~', $qryline, -1, PREG_SPLIT_NO_EMPTY );
+
+			$flds = array();
+			$in_parens = 0;
+			$buffer = '';
+			for( $i = 0; $i < strlen($qryline); $i++ )
+			{
+				$c = $qryline[$i];
+
+				if( $c == ',' && ! $in_parens )
+				{ // split here:
+					$flds[] = trim($buffer);
+					$buffer = '';
+					continue;
+				}
+
+				if( $c == '(' )
+				{
+					$in_parens++;
+				}
+				elseif( $c == ')' )
+				{
+					$in_parens--;
+				}
+
+				$buffer .= $c;
+			}
+			if( strlen($buffer) )
+			{
+				$flds[] = trim($buffer);
+			}
 
 			//echo "<hr/><pre>\n".print_r(strtolower($table), true).":\n".print_r($items, true)."</pre><hr/>";
 
@@ -276,6 +306,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 
 			// INDEX STUFF:
+
 			/**
 			 * @global array Holds the existing indices (with array's key UPPERcased)
 			 */
@@ -298,148 +329,155 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				}
 				unset($tableindices);
 
-
 				// Let's see which indices are present already for the table:
 				// TODO: dh> use meta data available now in $indices, instead of building a regular expression!?
 				$obsolete_indices = $existing_indices; // will get unset as found
-
-				foreach( $existing_indices as $index_name => $index_data )
-				{
-					// Build a create string to compare to the query
-					$index_pattern = '^';
-					if( $index_name == 'PRIMARY' )
-					{
-						$index_pattern .= 'PRIMARY(\s+KEY)?';
-						// optional primary key name:
-						$index_pattern .= '(\s+\w+)?';
-					}
-					elseif( $index_data['unique'] )
-					{
-						$index_pattern .= 'UNIQUE(\s+(?:INDEX|KEY))?';
-					}
-					else
-					{
-						$index_pattern .= '(INDEX|KEY)';
-					}
-					if( $index_name != 'PRIMARY' )
-					{
-						$index_pattern .= '(\s+`?'.$index_name.'`?)'; // optionally in backticks
-					}
-
-					$index_columns = '';
-					// For each column in the index
-					foreach( $index_data['columns'] as $column_data )
-					{
-						if( $index_columns != '' )
-						{
-							$index_columns .= '\s*,\s*';
-						}
-						// Add the field to the column list string
-						$index_columns .= '`?'.$column_data['fieldname'].'`?'; // optionally in backticks
-						if( ! empty($column_data['subpart']) )
-						{
-							$index_columns .= '\s*\(\s*'.$column_data['subpart'].'\s*\)\s*';
-						}
-					}
-
-					// Sort index definitions with names to the beginning:
-					/*
-					usort( $indices, create_function( '$a, $b', '
-						if( preg_match( "~^\w+\s+[^(]~", $a["create_definition"] )
-						{
-
-						}' ) );
-					*/
-
-
-					$used_auto_keys = array();
-					foreach( $indices as $k => $index )
-					{
-						$pattern = $index_pattern;
-						if( ! preg_match( '~^\w+\s+[^(]~', $index['create_definition'], $match ) )
-						{ // no key name given, make the name part optional, if it's the default one:
-							// (Default key name seems to be the first column, eventually with "_\d+"-suffix)
-							$auto_key = db_delta_remove_backticks(strtoupper($index['col_names'][0]));
-							if( isset($used_auto_keys[$auto_key]) )
-							{
-								$used_auto_keys[$auto_key]++;
-								$auto_key .= '_'.$used_auto_keys[$auto_key];
-							}
-							$used_auto_keys[$auto_key] = 1;
-
-							if( $auto_key == $index_name )
-							{ // the auto-generated keyname is the same as the one we have, so make it optional in the pattern:
-								$pattern .= '?';
-							}
-						}
-						// Add the column list to the index create string
-						$pattern .= '\s*\(\s*'.$index_columns.'\s*\)';
-
-						#pre_dump( '~'.$pattern.'~i', trim($index['create_definition']) );
-						if( preg_match( '~'.$pattern.'~i', trim($index['create_definition']) ) )
-						{ // This index already exists: remove the index from our indices to create
-							unset($indices[$k]);
-							unset($obsolete_indices[$index_name]);
-							break;
-						}
-					}
-					if( isset($obsolete_indices[$index_name]) )
-					{
-						#echo "<pre style=\"border:1px solid #ccc;margin-top:5px;\">{$table}:<br/><b>Did not find index:</b>".$index_name.'/'.$index_pattern."<br/>".print_r($indices, true)."</pre>\n";
-					}
-				}
-
-				// Set $existing_primary_fields and $existing_key_fields
-				foreach( $existing_indices as $l_key_name => $l_key_info )
-				{
-					$l_key_fields = array();
-					foreach( $l_key_info['columns'] as $l_col )
-					{
-						$l_key_fields[] = strtolower($l_col['fieldname']);
-					}
-					if( $l_key_name == 'PRIMARY' )
-					{ // Remember _existing_ PRIMARY KEYs
-						$existing_primary_fields = $l_key_fields;
-					}
-
-					$existing_key_fields = array_merge( $existing_key_fields, $l_key_fields );
-				}
-				$existing_key_fields = array_unique($existing_key_fields);
-				#pre_dump( 'existing_primary_fields', $existing_primary_fields );
-				#pre_dump( 'existing_key_fields', $existing_key_fields );
 			}
 
 
 			// Pre-run KEYs defined in "column_definition" (e.g. used for AUTO_INCREMENT handling)
 			foreach( $wanted_fields as $fieldname_lowered => $field_info )
 			{
-				$fld = $field_info['field'];
-				if( preg_match( '~ \b (?: (UNIQUE) (\s+ (?:INDEX|KEY))? | (PRIMARY \s+)? KEY ) \b ~ix', $fld, $match ) )
-				{ // This has an "inline" INDEX/KEY:
-					$add_index = array(
+				$parse = $field_info['field'];
+
+				if( preg_match( '~ \b UNIQUE (?:\s+ KEY)? \b ~ix ', $parse, $match ) )
+				{ // This has an "inline" UNIQUE index:
+					$indices[] = array(
+							'name' => $fieldname_lowered,
+							'is_PK' => false,
 							'create_definition' => NULL, // "inline"
-							'col_names' => array($fld),
-							'name' => $fld,
+							'col_names' => array($fieldname_lowered),
 							'keyword' => NULL,
 							#'type' => $match[3], // "USING [type_name]"
 						);
 
-					if( empty($match[1]) )
-					{
-						$primary_key_fields = array($fieldname_lowered);
-						unset( $obsolete_indices['PRIMARY'] );
-						$add_index['is_PK'] = true;
-					}
-					else
-					{
-						$add_index['is_PK'] = false;
-					}
+					unset( $obsolete_indices[strtoupper($fieldname_lowered)] );
+					$parse = str_replace( $match[0], '', $parse );
 					$fields_with_keys[] = $fieldname_lowered;
+				}
 
-					$indices[] = $add_index;
+				if( preg_match( '~ \b (PRIMARY\s+)? KEY \b ~ix', $parse, $match ) )
+				{ // inline PK:
+					$indices[] = array(
+							'name' => 'PRIMARY',
+							'is_PK' => true,
+							'create_definition' => NULL, // "inline"
+							'col_names' => array($fieldname_lowered),
+							'keyword' => NULL,
+							#'type' => $match[3], // "USING [type_name]"
+						);
+					$fields_with_keys[] = $fieldname_lowered;
+					$primary_key_fields = array($fieldname_lowered);
+					unset( $obsolete_indices['PRIMARY'] );
 				}
 			}
 			$fields_with_keys = array_unique($fields_with_keys);
+
+
+			foreach( $existing_indices as $index_name => $index_data )
+			{
+				// Build a create string to compare to the query
+				$index_pattern = '^';
+				if( $index_name == 'PRIMARY' )
+				{
+					$index_pattern .= 'PRIMARY(\s+KEY)?';
+					// optional primary key name:
+					$index_pattern .= '(\s+\w+)?';
+				}
+				elseif( $index_data['unique'] )
+				{
+					$index_pattern .= 'UNIQUE(\s+(?:INDEX|KEY))?';
+				}
+				else
+				{
+					$index_pattern .= '(INDEX|KEY)';
+				}
+				if( $index_name != 'PRIMARY' )
+				{
+					$index_pattern .= '(\s+`?'.$index_name.'`?)'; // optionally in backticks
+				}
+
+				$index_columns = '';
+				// For each column in the index
+				foreach( $index_data['columns'] as $column_data )
+				{
+					if( $index_columns != '' )
+					{
+						$index_columns .= '\s*,\s*';
+					}
+					// Add the field to the column list string
+					$index_columns .= '`?'.$column_data['fieldname'].'`?'; // optionally in backticks
+					if( ! empty($column_data['subpart']) )
+					{
+						$index_columns .= '\s*\(\s*'.$column_data['subpart'].'\s*\)\s*';
+					}
+				}
+
+				// Sort index definitions with names to the beginning:
+				/*
+				usort( $indices, create_function( '$a, $b', '
+					if( preg_match( "~^\w+\s+[^(]~", $a["create_definition"] )
+					{
+
+					}' ) );
+				*/
+
+
+				$used_auto_keys = array();
+				foreach( $indices as $k => $index )
+				{
+					$pattern = $index_pattern;
+					if( ! preg_match( '~^\w+\s+[^(]~', $index['create_definition'], $match ) )
+					{ // no key name given, make the name part optional, if it's the default one:
+						// (Default key name seems to be the first column, eventually with "_\d+"-suffix)
+						$auto_key = db_delta_remove_backticks(strtoupper($index['col_names'][0]));
+						if( isset($used_auto_keys[$auto_key]) )
+						{
+							$used_auto_keys[$auto_key]++;
+							$auto_key .= '_'.$used_auto_keys[$auto_key];
+						}
+						$used_auto_keys[$auto_key] = 1;
+
+						if( $auto_key == $index_name )
+						{ // the auto-generated keyname is the same as the one we have, so make it optional in the pattern:
+							$pattern .= '?';
+						}
+					}
+					// Add the column list to the index create string
+					$pattern .= '\s*\(\s*'.$index_columns.'\s*\)';
+
+					#pre_dump( '~'.$pattern.'~i', trim($index['create_definition']) );
+					if( preg_match( '~'.$pattern.'~i', trim($index['create_definition']) ) )
+					{ // This index already exists: remove the index from our indices to create
+						unset($indices[$k]);
+						unset($obsolete_indices[$index_name]);
+						break;
+					}
+				}
+				if( isset($obsolete_indices[$index_name]) )
+				{
+					#echo "<pre style=\"border:1px solid #ccc;margin-top:5px;\">{$table}:<br/><b>Did not find index:</b>".$index_name.'/'.$index_pattern."<br/>".print_r($indices, true)."</pre>\n";
+				}
+			}
+
+			// Set $existing_primary_fields and $existing_key_fields
+			foreach( $existing_indices as $l_key_name => $l_key_info )
+			{
+				$l_key_fields = array();
+				foreach( $l_key_info['columns'] as $l_col )
+				{
+					$l_key_fields[] = strtolower($l_col['fieldname']);
+				}
+				if( $l_key_name == 'PRIMARY' )
+				{ // Remember _existing_ PRIMARY KEYs
+					$existing_primary_fields = $l_key_fields;
+				}
+
+				$existing_key_fields = array_merge( $existing_key_fields, $l_key_fields );
+			}
+			$existing_key_fields = array_unique($existing_key_fields);
+			#pre_dump( 'existing_primary_fields', $existing_primary_fields );
+			#pre_dump( 'existing_key_fields', $existing_key_fields );
 
 
 			// Fetch the table column structure from the database
@@ -1130,6 +1168,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.29  2007/01/18 21:03:51  blueyed
+ * db_delta() fixes: splitting fields by comma; inline UNIQUE and PK handling
+ *
  * Revision 1.28  2007/01/14 21:55:07  blueyed
  * doc
  *
