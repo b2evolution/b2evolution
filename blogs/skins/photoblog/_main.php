@@ -264,11 +264,11 @@ skin_content_header();	// Sets charset!
 			user_subs_link( ' | ', ' ' );
 		?>
 	</p>
-	
+
 	<p class="baseline">
 		Powered by <a href="http://b2evolution.net/" title="b2evolution home">b2evolution</a>
 		|
-		Skin by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> / <a href="http://skinfaktory.com/">The Skin Faktory</a>
+		Skin by <a href="http://skinfaktory.com/">The Skin Faktory</a>
 		|
 		<?php
 			// Display additional credits (see /conf/_advanced.php):
