@@ -1626,6 +1626,55 @@ class Item extends DataObject
 
 
 	/**
+	 * Display the images linked to the current Item
+	 */
+	function images( $params = array() )
+	{
+		$params = array_merge( array(
+				'before' =>              '<div>',
+				'before_image' =>        '<div class="image_block">',
+				'before_image_legend' => '<div class="image_legend">',
+				'after_image_legend' =>  '</div>',
+				'after_image' =>         '</div>',
+				'after' =>               '</div>',
+				'image_size' =>          'fit-720x500'
+			), $params );
+
+		$FileCache = & get_Cache( 'FileCache' );
+
+		$FileList = & new DataObjectList2( $FileCache );
+
+
+		$SQL = & new SQL();
+		$SQL->SELECT( 'file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
+		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
+		$SQL->WHERE( 'link_itm_ID = '.$this->ID );
+		$SQL->ORDER_BY( 'link_ID' );
+
+		$FileList->sql = $SQL->get();
+
+		$FileList->query( false, false, false );
+
+		$r = '';
+		while( $File = & $FileList->get_next() )
+		{
+			if( ! $File->is_image() )
+			{	// Skip anything that is not an image
+				// fp> TODO: maybe this property should be stored in link_ltype_ID
+				continue;
+			}
+			// Generate the IMG tag with all the alt, title and desc if available
+			$r .= $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'] );
+		}
+
+		if( !empty($r) )
+		{
+			echo $params['before'].$r.$params['after'];
+		}
+	}
+
+
+	/**
 	 * Template function: display permalink for item
 	 *
 	 * Note: This actually only outputs the URL, to display a real link, use {@link Item::permanent_link()}
@@ -3336,6 +3385,10 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.146  2007/01/19 10:45:42  fplanque
+ * images everywhere :D
+ * At this point the photoblogging code can be considered operational.
+ *
  * Revision 1.145  2007/01/11 19:29:50  blueyed
  * Fixed E_NOTICE when using the "excerpt" feature
  *

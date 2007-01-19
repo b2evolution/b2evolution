@@ -166,7 +166,22 @@ skin_content_header();	// Sets charset!
 			$Timer->resume( 'skin/_main.inc:mainarea:postcontents' );
 		?>
 		</div>
+
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
+
+		<?php
+			// Display images that are linked to this post:
+			$Item->images( array(
+					'before' =>              '<div class="bImages">',
+					'before_image' =>        '<div class="image_block">',
+					'before_image_legend' => '<div class="image_legend">',
+					'after_image_legend' =>  '</div>',
+					'after_image' =>         '</div>',
+					'after' =>               '</div>',
+					'image_size' =>          'fit-320x320'
+				) );
+		?>
+
 		<div class="bText">
 			<?php $Item->content(); ?>
 			<?php
@@ -174,6 +189,7 @@ skin_content_header();	// Sets charset!
 				$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
 			?>
 		</div>
+
 		<div class="bSmallPrint">
 			<?php
 			$Timer->pause( 'skin/_main.inc:mainarea:postcontents' );
@@ -188,6 +204,7 @@ skin_content_header();	// Sets charset!
 
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 		</div>
+
 		<?php
 			// ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
 			$disp_comments = 1;					// Display the comments if requested

@@ -92,12 +92,11 @@ skin_content_header();	// Sets charset!
 		$Item->anchor();
 		locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
 		?>
+
 		<h3>
 			<?php $Item->issue_time(); ?>
-			<a href="<?php $Item->permanent_url() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" border="0" align="middle" /></a>
+			<a href="<?php $Item->permanent_url() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" border="0" align="absmiddle" /></a>
 			<?php $Item->title(); ?>
-			&nbsp;
-			<?php locale_flag( $Item->locale, 'h10px', '', 'middle' ); /* Display flag for post locale */ ?>
 		</h3>
 
 		<blockquote>
@@ -106,11 +105,21 @@ skin_content_header();	// Sets charset!
 			<?php
 				echo T_('Categories'), ': ';
 				$Item->categories();
-				echo ', ';
-				$Item->wordcount();
-				echo ' ', T_('words');
 			?>
 			</small>
+
+			<?php
+				// Display images that are linked to this post:
+				$Item->images( array(
+						'before' =>              '<table cellspacing="5">',
+						'before_image' =>        '<tr><td align="center">',
+						'before_image_legend' => '<br><small>',
+						'after_image_legend' =>  '</small>',
+						'after_image' =>         '</td></tr>',
+						'after' =>               '</table>',
+						'image_size' =>          'fit-320x320'
+					) );
+			?>
 
 			<div>
 				<?php $Item->content( '#', '#', T_('Read more...') ); ?>

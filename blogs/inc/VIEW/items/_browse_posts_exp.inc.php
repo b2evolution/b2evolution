@@ -136,6 +136,20 @@ while( $Item = & $ItemList->get_item() )
 
 		<div class="bContent">
 			<h3 class="bTitle"><?php $Item->title() ?></h3>
+
+			<?php
+				// Display images that are linked to this post:
+				$Item->images( array(
+						'before' =>              '<div class="bImages">',
+						'before_image' =>        '<div class="image_block">',
+						'before_image_legend' => '<div class="image_legend">',
+						'after_image_legend' =>  '</div>',
+						'after_image' =>         '</div>',
+						'after' =>               '</div>',
+						'image_size' =>          'fit-320x320'
+					) );
+			?>
+
 			<div class="bText">
 				<?php
 					$Item->content();
@@ -289,6 +303,10 @@ if( $action == 'list' )
 
 /*
  * $Log$
+ * Revision 1.30  2007/01/19 10:45:42  fplanque
+ * images everywhere :D
+ * At this point the photoblogging code can be considered operational.
+ *
  * Revision 1.29  2006/12/17 23:42:39  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.

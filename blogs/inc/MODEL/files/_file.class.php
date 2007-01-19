@@ -1614,6 +1614,12 @@ class File extends DataObject
 				$thumb_quality = 90;
 				break;
 
+			case 'fit-320x320';
+				$thumb_width = 320;
+				$thumb_height = 320;
+				$thumb_quality = 85;
+				break;
+
 			case 'fit-80x80';
 			default:
 				$size_name = 'fit-80x80';
@@ -1672,6 +1678,10 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.35  2007/01/19 10:45:42  fplanque
+ * images everywhere :D
+ * At this point the photoblogging code can be considered operational.
+ *
  * Revision 1.34  2007/01/19 09:31:05  fplanque
  * Provision for case sensitive file meta data handling
  *

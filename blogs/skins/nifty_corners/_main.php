@@ -91,11 +91,14 @@ skin_content_header();	// Sets charset!
 		$MainList->date_if_changed();
 		locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
 	?>
+
 	<div class="bTitle"><h3 class="bTitle"><?php $Item->title(); ?></h3></div>
+
 	<div class="bPost" lang="<?php $Item->lang() ?>">
 		<?php
 			$Item->anchor(); // Anchor for permalinks to refer to
 		?>
+
 		<div class="bSmallHead">
 		<?php
 			$Item->permanent_link( '#icon#' );
@@ -106,6 +109,20 @@ skin_content_header();	// Sets charset!
 			echo ' &nbsp; ';
 		?>
 		</div>
+
+		<?php
+			// Display images that are linked to this post:
+			$Item->images( array(
+					'before' =>              '<div class="bImages">',
+					'before_image' =>        '<div class="image_block">',
+					'before_image_legend' => '<div class="image_legend">',
+					'after_image_legend' =>  '</div>',
+					'after_image' =>         '</div>',
+					'after' =>               '</div>',
+					'image_size' =>          'fit-320x320'
+				) );
+		?>
+
 		<div class="bText">
 			<?php $Item->content(); ?>
 			<?php
@@ -113,6 +130,7 @@ skin_content_header();	// Sets charset!
 				$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
 			?>
 		</div>
+
 		<div class="bSmallPrint">
 			<?php $Item->permanent_link(); ?>
 			<?php $Item->feedback_link( 'comments', ' &bull; ' ) // Link to comments ?>
@@ -122,6 +140,7 @@ skin_content_header();	// Sets charset!
 
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 		</div>
+
 		<?php
 			// ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
 			$disp_comments = 1;					// Display the comments if requested

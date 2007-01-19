@@ -145,44 +145,22 @@ skin_content_header();	// Sets charset!
 			locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
 			$Item->anchor(); // Anchor for permalinks to refer to
 		?>
-		<div class="bImages">
 
 
-			<?php
+		<?php
+			// Display images that are linked to this post:
+			$Item->images( array(
+					'before' =>              '<div class="bImages">',
+					'before_image' =>        '<div class="image_block">',
+					'before_image_legend' => '<div class="image_legend">',
+					'after_image_legend' =>  '</div>',
+					'after_image' =>         '</div>',
+					'after' =>               '</div>',
+					'image_size' =>          'fit-720x500'
+				) );
+		?>
 
-			/*
-			 * Display images!
-			 * fp> TODO: factorize (fp)
-			 */
-			$FileCache = & get_Cache( 'FileCache' );
 
-			$FileList = & new DataObjectList2( $FileCache );
-
-
-			$SQL = & new SQL();
-			$SQL->SELECT( 'file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
-			$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
-			$SQL->WHERE( 'link_itm_ID = '.$Item->ID );
-			$SQL->ORDER_BY( 'link_ID' );
-
-			$FileList->sql = $SQL->get();
-
-			$FileList->query( false, false, false );
-
-			while( $File = & $FileList->get_next() )
-			{
-				if( ! $File->is_image() )
-				{	// Skip anything that is not an image
-					// fp> TODO: maybe this property should be stored in link_ltype_ID
-					continue;
-				}
-				// Generate the IMG tag with all the alt, title and desc if available
-				echo $File->get_tag( '<div class="image_block">', '<div class="image_legend">', '</div>', '</div>', 'fit-720x500' );
-			}
-
-			?>
-
-		</div>
 		<div class="bDetails">
 
 			<div class="bSmallHead">
