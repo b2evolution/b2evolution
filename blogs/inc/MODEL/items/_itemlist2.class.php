@@ -546,7 +546,14 @@ class ItemList2 extends DataObjectList2
 	 */
 	function preview_from_request()
 	{
-		global $DB, $localtimenow, $Messages, $current_User, $BlogCache;
+		global $current_User;
+
+		if( empty($current_User) )
+		{ // dh> only logged in user's can preview. Alternatively we need those checks where $current_User gets used below.
+			return;
+		}
+
+		global $DB, $localtimenow, $Messages, $BlogCache;
 		global $Plugins;
 
 		$preview_userid = param( 'preview_userid', 'integer', true );
@@ -971,7 +978,7 @@ class ItemList2 extends DataObjectList2
 				'category_text' => T_('Category').': ',
 				'categories_text' => T_('Categories').': ',
 			), $params );
-		
+
 		if( empty( $this->filters ) )
 		{	// Filters have no been set before, we'll use the default filterset:
 			// echo ' setting default filterset ';
@@ -1616,6 +1623,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.46  2007/01/19 21:48:09  blueyed
+ * Fixed possible notice in preview_from_request()
+ *
  * Revision 1.45  2006/12/17 23:42:38  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.
