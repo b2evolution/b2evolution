@@ -292,6 +292,18 @@ function install_basic_widgets()
 
 
 
+function advanced_properties()
+{
+	/*
+// file_path needs to be case sensitive on unix
+// Note: it should be ok on windows too if we take care of updating the db on case renames
+ALTER TABLE `T_files` CHANGE `file_path` `file_path` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL
+or
+ALTER TABLE `T_files` CHANGE `file_path` `file_path` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL
+	*/
+}
+
+
 /**
  * Create relations
  *
@@ -474,6 +486,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.19  2007/01/19 09:31:04  fplanque
+ * Provision for case sensitive file meta data handling
+ *
  * Revision 1.18  2007/01/15 19:10:29  fplanque
  * install refactoring
  *

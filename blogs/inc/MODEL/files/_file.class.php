@@ -265,7 +265,8 @@ class File extends DataObject
 					OBJECT, 0, 'Load file meta data' );
 			}
 
-			if( $row )
+			// We check that we got something AND that the CASE matches (because of case insensitive collations on MySQL)
+			if( $row && $row->file_path == $this->_rdfp_rel_path )
 			{ // We found meta data
 				$Debuglog->add( "Loaded metadata for {$this->_FileRoot->ID}:{$this->_rdfp_rel_path}", 'files' );
 				$this->meta  = 'loaded';
@@ -1671,6 +1672,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.34  2007/01/19 09:31:05  fplanque
+ * Provision for case sensitive file meta data handling
+ *
  * Revision 1.33  2007/01/19 08:20:36  fplanque
  * Addressed resized image quality.
  *
