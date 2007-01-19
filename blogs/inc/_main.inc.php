@@ -548,8 +548,7 @@ if( ! empty($current_User)
 	if( $action != 'req_validatemail' && $action != 'validatemail' )
 	{ // we're not in that action already:
 		$action = 'req_validatemail'; // for login.php
-		$Messages->add( sprintf( /* TRANS: %s gets replaced by the user's email address */ T_('You must validate your email address (%s) before you can log in.'), $current_User->dget('email') ), 'login_error' );
-		// fp> TODO: give the user the opportunity to get a new validation message (this used to work)
+		$Messages->add( T_('You must validate your email address before you can log in.'), 'login_error' );
 	}
 }
 else
@@ -636,7 +635,7 @@ init_charsets( $current_charset );
 
 if( $Messages->count( 'login_error' ) )
 {
-	require $view_path.'login/_login_form.php';
+	require $htsrv_path.'login.php';
 	exit();
 }
 
@@ -656,6 +655,11 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.72  2007/01/19 03:06:57  fplanque
+ * Changed many little thinsg in the login procedure.
+ * There may be new bugs, sorry. I tested this for several hours though.
+ * More refactoring to be done.
+ *
  * Revision 1.71  2006/12/28 15:44:31  fplanque
  * login refactoring / simplified
  *

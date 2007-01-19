@@ -30,14 +30,12 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
 /**
  * Include page header:
  */
-$page_title = T_('Account validation form');
+$page_title = T_('Email address validation');
 $page_icon = 'icon_register.gif';
 require dirname(__FILE__).'/_header.php';
-
 
 $Form = & new Form( $htsrv_url_sensitive.'login.php', 'form_validatemail', 'post', 'fieldset' );
 
@@ -47,14 +45,20 @@ $Form->hidden( 'action', 'req_validatemail');
 $Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 $Form->hidden( 'req_validatemail_submit', 1 ); // to know if the form has been submitted
 
-$Form->begin_fieldset();
+$Form->begin_fieldset( T_('Email address validation') );
+
+	echo '<ol>';
+	echo '<li>'.T_('Please confirm your email address below.').'</li>';
+	echo '<li>'.T_('An email will be sent to this address immediately.').'</li>';
+	echo '<li>'.T_('As soon as you receive the email, click on the link therein to activate your account.').'</li>';
+	echo '</ol>';
 
 	$Form->text_input( 'email', $email, 16, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
 
 	$Plugins->trigger_event( 'DisplayValidateAccountFormFieldset', array( 'Form' => & $Form ) );
 
 // TODO: the form submit value is too wide (in Konqueror and most probably in IE!)
-$Form->end_form( array(array( 'name'=>'form_validatemail_submit', 'value'=>T_('Request email to activate my account!'), 'class'=>'ActionButton' )) ); // display hidden fields etc
+$Form->end_form( array(array( 'name'=>'form_validatemail_submit', 'value'=>T_('Send me an email now!'), 'class'=>'ActionButton' )) ); // display hidden fields etc
 
 
 if( $current_User->group_ID == 1 )
@@ -86,6 +90,11 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.13  2007/01/19 03:06:56  fplanque
+ * Changed many little thinsg in the login procedure.
+ * There may be new bugs, sorry. I tested this for several hours though.
+ * More refactoring to be done.
+ *
  * Revision 1.12  2006/12/09 01:55:36  fplanque
  * feel free to fill in some missing notes
  * hint: "login" does not need a note! :P

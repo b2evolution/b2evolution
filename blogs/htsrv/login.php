@@ -43,17 +43,14 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 
-param( 'action', 'string', '' );
+param( 'action', 'string', 'req_login' );
 param( 'mode', 'string', '' );
 
 param( 'login', 'string', '' );
 // echo 'login: ', $login;
 
-// gets used by header_redirect(); required
-// dh> header_redirect() has a good fallback mechanism. Now it's impossible to just go to /htsrv/login.php manually..!
-#param( 'redirect_to', 'string', true );
-param( 'redirect_to', 'string', '' );
-
+// gets used by header_redirect();
+param( 'redirect_to', 'string', $ReqURI );
 
 switch( $action )
 {
@@ -65,13 +62,7 @@ switch( $action )
 		header_nocache();
 		header_redirect(); // defaults to redirect_to param and exits
 		/* exited */
-
-
-	case 'lostpassword': // Lost password:
-		// Display retrieval form:
-		require $view_path.'login/_lostpass_form.php';
-
-		exit();
+		break;
 
 
 	case 'retrievepassword': // Send passwort change request by mail
@@ -83,7 +74,8 @@ switch( $action )
 		if( ! $ForgetfulUser )
 		{ // User does not exist
 			// pretend that the email is sent for avoiding guessing user_login
-			$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'success' );
+			$Messages->add( T_('If you correctly typed in your login, a link to change your password has been sent to your email address.' ), 'success' );
+			$action = 'req_login';
 			break;
 		}
 
@@ -93,6 +85,7 @@ switch( $action )
 		if( $demo_mode && ($ForgetfulUser->login == 'demouser' || $ForgetfulUser->ID == 1) )
 		{
 			$Messages->add( T_('You cannot reset this account in demo mode.'), 'error' );
+			$action = 'req_login';
 			break;
 		}
 
@@ -135,12 +128,13 @@ switch( $action )
 				$Session->set( 'core.changepwd.request_id', $request_id, 86400 * 2 ); // expires in two days (or when clicked)
 				$Session->dbsave(); // save immediately
 
-				$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'success' );
+				$Messages->add( T_('If you correctly typed in your login, a link to change your password has been sent to your registered email address.' ), 'success' );
 			}
 		}
 
 		locale_restore_previous();
 
+		$action = 'req_login';
 		break;
 
 
@@ -153,24 +147,25 @@ switch( $action )
 
 		if( ! $ForgetfulUser || empty($reqID) )
 		{ // This was not requested
-			$Messages->add( T_('Invalid password change request!'), 'error' );
+			$Messages->add( T_('Invalid password change request! Please try again...'), 'error' );
+			$action = 'lostpassword';
+			$login_required = true; // Do not display "Without login.." link on the form
 			break;
 		}
 
 		if( $sessID != $Session->ID )
 		{ // Another session ID than for requesting password change link used!
-			$Messages->add( T_('You have to use the same session (by means of your session cookie) as when you have requested the action.'), 'error' );
+			$Messages->add( T_('You have to use the same session (by means of your session cookie) as when you have requested the action. Please try again...'), 'error' );
+			$action = 'lostpassword';
+			$login_required = true; // Do not display "Without login.." link on the form
 			break;
 		}
 
 		// Validate provided reqID against the one stored in the user's session
 		if( $Session->get( 'core.changepwd.request_id' ) != $reqID )
 		{
-			$Messages->add( T_('Invalid password change request!'), 'error' );
-			$Messages->add(
-				sprintf( T_('You can <a href="%s">send yourself a new link</a>.'),
-				$htsrv_url_sensitive.'login.php?action=retrievepassword&amp;login='.rawurlencode($login) ), 'note' );
-
+			$Messages->add( T_('Invalid password change request! Please try again...'), 'error' );
+			$action = 'lostpassword';
 			$login_required = true; // Do not display "Without login.." link on the form
 			break;
 		}
@@ -188,9 +183,7 @@ switch( $action )
 		header_nocache();
 		// redirect Will save $Messages into Session:
 		header_redirect( url_add_param( $admin_url, 'ctrl=users&user_ID='.$ForgetfulUser->ID, '&' ) ); // display user's profile
-
-		exit();
-
+		/* exited */
 		break;
 
 
@@ -207,12 +200,14 @@ switch( $action )
 		if( empty($reqID) )
 		{ // This was not requested
 			$Messages->add( T_('Invalid email address validation request!'), 'error' );
+			$action = 'req_validatemail';
 			break;
 		}
 
 		if( $sessID != $Session->ID )
 		{ // Another session ID than for requesting account validation link used!
-			$Messages->add( T_('You have to use the same session (by means of your session cookie) as when you have requested the action.'), 'error' );
+			$Messages->add( T_('You have to use the same session (by means of your session cookie) as when you have requested the action. Please try again...'), 'error' );
+			$action = 'req_validatemail';
 			break;
 		}
 
@@ -244,11 +239,11 @@ switch( $action )
 		header_nocache();
 		// redirect Will save $Messages into Session:
 		header_redirect();
-		exit();
-
+		/* exited */
 		break;
 
 } // switch( $action ) (1st)
+
 
 
 /* For actions that other delegate to from the switch above: */
@@ -263,6 +258,7 @@ switch( $action )
 		if( ! is_logged_in() )
 		{
 			$Messages->add( T_('You have to be logged in to request an account validation link.'), 'error' );
+			$action = '';
 			break;
 		}
 
@@ -305,38 +301,20 @@ switch( $action )
 				$Messages->add( T_('You have no email address with your profile, therefore we cannot validate it. Please give your email address below.'), 'error' );
 			}
 		}
-
-		// Display retrieval form:
-		require $view_path.'login/_validate_form.php';
-
-		exit();
 		break;
-
 }
 
-// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
-$redirect_to = preg_replace( '~(?<=\?|&) (login|pwd) = [^&]+ ~x', '', $redirect_to );
 
-if( $Session->has_User() )
-{ // The user is already logged in...
-	$tmp_User = & $Session->get_User();
-	if( $tmp_User->validated )
-	{	// User is not validated (he may have been invalidated)
-		// dh> TODO: validate $redirect_to param!
-		$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $tmp_User->get('login') )
-			.' <a href="'.htmlspecialchars($redirect_to).'">'.T_('Continue...').'</a>', 'note' );
+if( ! defined( 'EVO_MAIN_INIT' ) )
+{	// Do not check this if the form was included inside of _main.inc
+	// echo $htsrv_url_sensitive.'login.php';
+	// echo '<br>'.$ReqHost.$ReqPath;
+	if( $ReqHost.$ReqPath != $htsrv_url_sensitive.'login.php' )
+	{
+		$Messages->add( sprintf( T_('WARNING: you are trying to log in on <strong>%s</strong> but we expect you to log in on <strong>%s</strong>. If this is due to an automatic redirect, this will prevent you from successfully loging in. You must either fix your webserver configuration, or your %s configuration in order for these two URLs to match.'), $ReqHost.$ReqPath, $htsrv_url_sensitive.'login.php', $app_name ), 'error' );
 	}
-	unset($tmp_User);
 }
 
-$Debuglog->add( 'redirect_to: '.$redirect_to );
-
-// echo $htsrv_url_sensitive.'login.php';
-// echo '<br>'.$ReqHost.$ReqPath;
-if( $ReqHost.$ReqPath != $htsrv_url_sensitive.'login.php' )
-{
-	$Messages->add( sprintf( T_('WARNING: you are trying to log in on <strong>%s</strong> but we expect you to log in on <strong>%s</strong>. If this is due to an automatic redirect, this will prevent you from successfully loging in. You must either fix your webserver configuration, or your %s configuration in order for these two URLs to match.'), $ReqHost.$ReqPath, $htsrv_url_sensitive.'login.php', $app_name ), 'error' );
-}
 
 // Note: the following regexp would fail when loging on to the same domain, because cookie_domain starts with a dot '.'
 // However, same domain logins will happen with a relative redirect_to, so it is covered with '^/'
@@ -346,13 +324,49 @@ if( strlen($redirect_to) && !preg_match( '#^/|(https?://[a-z\-.]*'.str_replace( 
 
 }
 
-// Default: login form
-require $view_path.'login/_login_form.php';
+
+if( preg_match( '#/login.php([&?].*)?$#', $redirect_to ) )
+{ // avoid "endless loops"
+	$redirect_to = $admin_url;
+}
+
+// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
+$redirect_to = preg_replace( '~(?<=\?|&) (login|pwd) = [^&]+ ~x', '', $redirect_to );
+$Debuglog->add( 'redirect_to: '.$redirect_to );
+
+
+/**
+ * Display:
+ */
+switch( $action )
+{
+	case 'lostpassword':
+		// Lost password:
+		// Display retrieval form:
+		require $view_path.'login/_lostpass_form.php';
+		break;
+
+	case 'req_validatemail':
+		// Send email validation link by mail (initial form and action)
+		// Display validation form:
+		require $view_path.'login/_validate_form.php';
+		break;
+
+	default:
+		// Display login form
+		require $view_path.'login/_login_form.php';
+}
+
 exit();
 
 
 /*
  * $Log$
+ * Revision 1.85  2007/01/19 03:06:57  fplanque
+ * Changed many little thinsg in the login procedure.
+ * There may be new bugs, sorry. I tested this for several hours though.
+ * More refactoring to be done.
+ *
  * Revision 1.84  2007/01/18 23:59:29  fplanque
  * Re: Secunia. Proper sanitization.
  *

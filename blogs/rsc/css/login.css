@@ -32,6 +32,12 @@ h2.logintitle {
 	margin: .5ex;
 }
 
+
+div.log_container {
+	margin-left: 0;
+	margin-right: 0;
+}
+
 /* Form elements: */
 input.input_text {
 	border: 1px solid #ccc;
@@ -59,12 +65,16 @@ div.loginblock {
 	border: 1px solid #CCCCCC;
 	padding: 2ex;
 	margin: 3ex auto;
-	width: 30em;
+	width: 40em;
 	clear: both;
 }
 div.loginblock fieldset {
 	margin: 0;
 	padding: 1ex 0;
+}
+div.loginblock legend {
+	margin: 0 1ex;
+	font-weight: bold;
 }
 
 .footer {
@@ -79,6 +89,11 @@ div.loginblock fieldset {
 
 /*
  * $Log$
+ * Revision 1.2  2007/01/19 03:06:56  fplanque
+ * Changed many little thinsg in the login procedure.
+ * There may be new bugs, sorry. I tested this for several hours though.
+ * More refactoring to be done.
+ *
  * Revision 1.1  2006/02/23 21:12:34  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

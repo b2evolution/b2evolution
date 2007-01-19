@@ -122,8 +122,8 @@ function get_user_login_link( $before = '', $after = '', $link_text = '', $link_
 
 	if( is_logged_in() ) return false;
 
-	if( $link_text == '' ) $link_text = T_('Login...');
-	if( $link_title == '#' ) $link_title = T_('Login if you have an account...');
+	if( $link_text == '' ) $link_text = T_('Log in');
+	if( $link_title == '#' ) $link_title = T_('Log in if you have an account...');
 
 	if( !isset($generating_static) )
 	{ // We are not generating a static page here:
@@ -285,15 +285,13 @@ function get_user_admin_link( $before = '', $after = '', $page = '', $link_text 
 {
 	global $admin_url, $blog, $current_User;
 
-	if( ! is_logged_in() ) return false;
-
-	if( ! $current_User->check_perm( 'admin', 'visible' ) )
+	if( is_logged_in() && ! $current_User->check_perm( 'admin', 'visible' ) )
 	{ // If user should NOT see admin link:
 		return false;
 	}
 
 	if( $link_text == '' ) $link_text = T_('Admin');
-	if( $link_title == '#' ) $link_title = T_('Go to the back-office');
+	if( $link_title == '#' ) $link_title = T_('Go to the back-office...');
 	// add the blog param to $page if it is not already in there
 	if( !preg_match('/(&|&amp;|\?)blog=/', $page) ) $page = url_add_param( $page, 'blog='.$blog );
 
@@ -500,6 +498,11 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.21  2007/01/19 03:06:57  fplanque
+ * Changed many little thinsg in the login procedure.
+ * There may be new bugs, sorry. I tested this for several hours though.
+ * More refactoring to be done.
+ *
  * Revision 1.20  2006/12/19 20:48:28  blueyed
  * MFB: Use relative URL for "redirect_to" in get_user_profile_link(). See http://forums.b2evolution.net/viewtopic.php?p=48686#48686
  *

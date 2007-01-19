@@ -26,23 +26,22 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-// Do not cache this page, because the JS password random salt has to match the session cookie:
-// fp> I changed the meaning of teh comment below. Does this reflect the implementation?
 // Do not cache this page, because the JS password random salt has to match the one stored in the current session:
 header_nocache(); // do not cache this page, because the JS password salt has to match the session cookie
 
-// Use requested URI if nothing provided
-param( 'redirect_to', 'string', $ReqURI );
 
-if( preg_match( '#/login.php([&?].*)?$#', $redirect_to ) )
-{ // avoid "endless loops"
-	$redirect_to = $admin_url;
+if( $Session->has_User() )
+{ // The user is already logged in...
+	$tmp_User = & $Session->get_User();
+	if( $tmp_User->validated )
+	{	// User is not validated (he may have been invalidated)
+		// dh> TODO: validate $redirect_to param!
+		$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $tmp_User->get('login') )
+			.' <a href="'.htmlspecialchars($redirect_to).'">'.T_('Continue').' &raquo;</a>', 'note' );
+	}
+	unset($tmp_User);
 }
 
-$Debuglog->add( 'redirect_to: '.$redirect_to );
-
-
-$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 
 /**
  * Include page header (also displays Messages):
@@ -50,10 +49,10 @@ $transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)
 $page_title = T_('Login form');
 $page_icon = 'icon_login.gif';
 
-// We include functions.js even if we don't need it. The login page is small. Let's use it as a preloader for the backoffice (which is awfully slow to initialize)
-// fp> TODO: find a javascript way to preload more stuff (like icons) WITHOUT delaying the browser autocomplete of the login & password fields
-	/* dh>
-
+/*
+  fp> The login page is small. Let's use it as a preloader for the backoffice (which is awfully slow to initialize)
+  fp> TODO: find a javascript way to preload more stuff (like icons) WITHOUT delaying the browser autocomplete of the login & password fields
+	dh>
 	// include jquery JS:
 	$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/'.($debug ? 'jquery.js' : 'jquery.min.js').'"></script>';
 
@@ -61,15 +60,20 @@ $page_icon = 'icon_login.gif';
 	 alert("Document is ready");
 	});
 	See also http://www.texotela.co.uk/code/jquery/preload/ - might be a good opportunity to take a look at jQuery for you.. :)
-	*/
+ */
+
 $evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/functions.js"></script>';
 
+$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 if( $transmit_hashed_password )
 { // Include JS for client-side password hashing:
 	$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/md5.js"></script>';
 	$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/sha1.js"></script>';
 }
 
+/**
+ * Login header
+ */
 require dirname(__FILE__).'/_header.php';
 
 
@@ -78,7 +82,7 @@ $Form = & new Form( $htsrv_url_sensitive.'login.php', 'evo_login_form', 'post', 
 
 $Form->begin_form( 'fform' );
 
-	$Form->hiddens_by_key( $_POST, /* exclude: */ array('login_action', 'login') ); // passthrough POSTed data (when login is required after having POSTed something)
+	$Form->hiddens_by_key( $_POST, /* exclude: */ array('login_action', 'login', 'action') ); // passthrough POSTed data (when login is required after having POSTed something)
 	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 
 	if( isset( $action, $reqID, $sessID ) && $action == 'validatemail' )
@@ -93,37 +97,42 @@ $Form->begin_form( 'fform' );
 	{ // used by JS-password encryption/hashing:
 		$pwd_salt = $Session->get('core.pwd_salt');
 		if( empty($pwd_salt) )
-		{ // generate anew, only if empty - so multiple login screens share the same hash. Gets reset on trying to login.
-			// fp> the above is another "so" that makes it really hard to understand what was meant
-		// Suggestion: "Do not regenerate if already set because we want to reuse the previous salt on login screen reloads".
-		// fp> Question: the comment implies that the salt is reset even on failed login attemps. Why that? I would only have reset it on successful login. Do experts recommend it this way?
-		// but if you kill the session you get a new salt anyway, so it's no big deal.
-		// At that point, why not reset the salt at every reload? (it may be good to keep it, but I think the reason should be documented here)
+		{ // Do not regenerate if already set because we want to reuse the previous salt on login screen reloads
+			// fp> Question: the comment implies that the salt is reset even on failed login attemps. Why that? I would only have reset it on successful login. Do experts recommend it this way?
+			// but if you kill the session you get a new salt anyway, so it's no big deal.
+			// At that point, why not reset the salt at every reload? (it may be good to keep it, but I think the reason should be documented here)
 			$pwd_salt = generate_random_key(64);
 			$Session->set( 'core.pwd_salt', $pwd_salt, 86400 /* expire in 1 day */ );
 		}
 		$Form->hidden( 'pwd_salt', $pwd_salt );
 		$Form->hidden( 'pwd_hashed', '' ); // gets filled by JS
 	}
-
 // SUSPECT<fp
 
-	echo $Form->fieldstart;
+	$Form->begin_fieldset();
 
-	?>
+	echo '<div class="center notes">'.T_('You will have to accept cookies in order to log in.').'</div>';
 
-	<div class="center"><span class="notes"><?php printf( T_('You will have to accept cookies in order to log in.') ) ?></span></div>
-
-	<?php
 	$Form->text_input( 'login', $login, 16, T_('Login'), '', array( 'maxlength' => 20, 'class' => 'input_text' ) );
 
-	$Form->password_input( 'pwd', '', 16, T_('Password'), array( 'maxlength' => 50, 'class' => 'input_text' ) );
+	$pwd_note = '<a href="'.$htsrv_url_sensitive.'login.php?action=lostpassword&amp;redirect_to='
+								.rawurlencode( url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+	if( !empty($login) )
+	{
+		$pwd_note .= '&amp;login='.rawurlencode($login);
+	}
+	$pwd_note .= '">'.T_('Lost password ?').'</a>';
+
+	$Form->password_input( 'pwd', '', 16, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 50, 'class' => 'input_text' ) );
+
+
 
 	// Allow a plugin to add fields/payload
 	$Plugins->trigger_event( 'DisplayLoginFormFieldset', array( 'Form' => & $Form ) );
 
 	echo $Form->fieldstart;
 	echo $Form->inputstart;
+
 	$Form->submit( array( 'login_action[login]', T_('Log in!'), 'search' ) );
 
 	if( strpos( $redirect_to, $admin_url ) !== 0
@@ -135,7 +144,8 @@ $Form->begin_form( 'fform' );
 	echo $Form->inputend;
 	echo $Form->fieldend;
 
-	echo $Form->fieldend;
+	$Form->end_fieldset();
+
 $Form->end_form();
 
 ?>
@@ -185,14 +195,6 @@ $Form->end_form();
 <div class="login_actions" style="text-align:right">
 	<?php user_register_link( '', ' &middot; ', '', '#', true /*disp_when_logged_in*/ )?>
 
-	<a href="<?php echo $htsrv_url_sensitive.'login.php?action=lostpassword'
-		.'&amp;redirect_to='.rawurlencode( url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
-		if( !empty($login) )
-		{
-			echo '&amp;login='.rawurlencode($login);
-		}
-		?>"><?php echo T_('Lost password ?')
-		?></a>
 
 	<?php
 	if( empty($login_required)
@@ -201,7 +203,7 @@ $Form->end_form();
 	{ // No login required, allow to pass through
 		// TODO: dh> validate redirect_to param?!
 		echo '<a href="'.htmlspecialchars(url_rel_to_same_host($redirect_to, $ReqHost)).'">'
-		./* Gets displayed as link to the location on the login form if no login is required */ T_('Cancel login...').'</a>';
+		./* Gets displayed as link to the location on the login form if no login is required */ T_('Abort login!').'</a>';
 	}
 	?>
 </div>
@@ -213,6 +215,11 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.41  2007/01/19 03:06:56  fplanque
+ * Changed many little thinsg in the login procedure.
+ * There may be new bugs, sorry. I tested this for several hours though.
+ * More refactoring to be done.
+ *
  * Revision 1.40  2007/01/18 23:59:29  fplanque
  * Re: Secunia. Proper sanitization.
  *
@@ -288,33 +295,6 @@ require dirname(__FILE__).'/_footer.php';
  *
  * Revision 1.14  2006/10/12 23:48:15  blueyed
  * Fix for if redirect_to is relative
- *
- * Revision 1.13  2006/07/23 20:18:31  fplanque
- * cleanup
- *
- * Revision 1.12  2006/07/17 01:33:13  blueyed
- * Fixed account validation by email for users who registered themselves
- *
- * Revision 1.11  2006/07/01 23:49:59  fplanque
- * wording
- *
- * Revision 1.10  2006/06/25 23:34:15  blueyed
- * wording pt2
- *
- * Revision 1.9  2006/06/25 23:23:38  blueyed
- * wording
- *
- * Revision 1.8  2006/06/22 22:30:04  blueyed
- * htsrv url for password related scripts (login, register and profile update)
- *
- * Revision 1.7  2006/04/22 02:36:38  blueyed
- * Validate users on registration through email link (+cleanup around it)
- *
- * Revision 1.6  2006/04/20 22:13:48  blueyed
- * Display "Register..." link in login form also if user is logged in already.
- *
- * Revision 1.5  2006/04/19 20:13:51  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
  *
  */
 ?>

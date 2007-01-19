@@ -35,25 +35,29 @@ $page_title = T_('Lost password ?');
 $page_icon = 'icon_login.gif';
 require dirname(__FILE__).'/_header.php';
 
-Log::display( '', '', T_('A link to change your password will be sent to you by email.'), 'note' );
-
-
 $Form = & new Form( $htsrv_url_sensitive.'login.php', '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
-$Form->hidden( 'action', 'retrievepassword' );
-$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+	$Form->hidden( 'action', 'retrievepassword' );
+	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 
-$Form->begin_fieldset();
-$Form->text( 'login', $login, 16, T_('Login'), '', 20 , 'input_text' );
+	$Form->begin_fieldset( T_('Lost password ?') );
 
-echo $Form->fieldstart.$Form->inputstart;
-// TODO: the form submit value is too wide (in Konqueror and most probably in IE!)
-$Form->submit_input( array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Request email to change my password!'), 'class' => 'ActionButton' ) );
-echo $Form->inputend.$Form->fieldend;
+	echo '<ol>';
+	echo '<li>'.T_('Please enter your login below.').'</li>';
+	echo '<li>'.T_('An email will be sent to your registered email address immediately.').'</li>';
+	echo '<li>'.T_('As soon as you receive the email, click on the link therein to change your password.').'</li>';
+	echo '</ol>';
 
-$Form->end_fieldset();;
+	$Form->text( 'login', $login, 16, T_('Login'), '', 20 , 'input_text' );
+
+	echo $Form->fieldstart.$Form->inputstart;
+	// TODO: the form submit value is too wide (in Konqueror and most probably in IE!)
+	$Form->submit_input( array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me an email now!'), 'class' => 'ActionButton' ) );
+	echo $Form->inputend.$Form->fieldend;
+
+	$Form->end_fieldset();;
 
 $Form->end_form();
 
@@ -61,6 +65,11 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.10  2007/01/19 03:06:56  fplanque
+ * Changed many little thinsg in the login procedure.
+ * There may be new bugs, sorry. I tested this for several hours though.
+ * More refactoring to be done.
+ *
  * Revision 1.9  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

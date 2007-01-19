@@ -1687,7 +1687,7 @@ function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
 	$headers['X-Remote-Addr'] = implode( ',', get_ip_list() );
 
 	// -- Build headers ----
-	if( $from === NULL )
+	if( empty($from) )
 	{
 		$from = $notify_from;
 	}
@@ -2247,6 +2247,8 @@ function header_nocache()
  *
  * NOTE: This function {@link exit() exits} the php script execution.
  *
+ * @todo fp> do NOT allow $redirect_to = NULL. This leads to spaghetti code and unpredictable behavior.
+ *
  * @param string URL to redirect to (overrides detection)
  * @param boolean is this a permanent redirect? if true, send a 301; otherwise a 303
  */
@@ -2757,6 +2759,11 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.158  2007/01/19 03:06:57  fplanque
+ * Changed many little thinsg in the login procedure.
+ * There may be new bugs, sorry. I tested this for several hours though.
+ * More refactoring to be done.
+ *
  * Revision 1.157  2007/01/14 05:41:10  blueyed
  * Send correct charset with bad_request_die()
  *
