@@ -165,6 +165,8 @@ while( $Item = & $ItemList->get_item() )
 			<?php
 			$Item->permanent_link( '#', '#', 'permalink_right' );
 
+			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="ActionButton">'.T_('View...').'</a>';
+
 			// Display edit button if current user has the rights:
 			$Item->edit_link( ' ', ' ', '#', '#', 'ActionButton' );
 
@@ -179,7 +181,7 @@ while( $Item = & $ItemList->get_item() )
 
 			if( $Blog->allowcomments != 'never' )
 			{
-				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'&amp;c=1" class="ActionButton">';
+				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'#comments" class="ActionButton">';
 				// TRANS: Link to comments for current post
 				comments_number(T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
 				load_funcs( '_misc/_trackback.funcs.php' ); // TODO: use newer call below
@@ -303,6 +305,9 @@ if( $action == 'list' )
 
 /*
  * $Log$
+ * Revision 1.31  2007/01/19 10:57:46  fplanque
+ * UI
+ *
  * Revision 1.30  2007/01/19 10:45:42  fplanque
  * images everywhere :D
  * At this point the photoblogging code can be considered operational.

@@ -113,7 +113,7 @@ function task_title_link( $Item )
 	}
 
 	$col .= '<a href="?ctrl=items&amp;blog='.$Item->blog_ID.'&amp;p='.$Item->ID.'" class="" title="'.
-								T_('Edit this task...').'">'.$Item->dget('title').'</a></strong>';
+								T_('View this post...').'">'.$Item->dget('title').'</a></strong>';
 
 	return $col;
 }
@@ -202,6 +202,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.19  2007/01/19 10:57:46  fplanque
+ * UI
+ *
  * Revision 1.18  2006/12/19 20:33:35  blueyed
  * doc/todo
  *
