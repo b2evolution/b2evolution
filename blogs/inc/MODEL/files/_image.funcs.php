@@ -115,17 +115,18 @@ function load_image( $path, $mimetype )
  * @param resource image handle
  * @param string pathname of image file
  * @param string
+ * @param integer
  * @param integer permissions
  * @return string
  */
-function save_image( $imh, $path, $mimetype, $chmod = NULL )
+function save_image( $imh, $path, $mimetype, $quality = 90, $chmod = NULL )
 {
 	$err = NULL;
 
 	switch( $mimetype )
 	{
 		case 'image/jpeg':
-			imagejpeg( $imh, $path );
+			imagejpeg( $imh, $path, $quality );
 			break;
 
 		case 'image/gif':
@@ -220,6 +221,9 @@ function generate_thumb( $src_imh, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.5  2007/01/19 08:20:36  fplanque
+ * Addressed resized image quality.
+ *
  * Revision 1.4  2006/12/13 22:43:24  fplanque
  * default perms for newly created thumbnails
  *

@@ -1546,11 +1546,11 @@ class File extends DataObject
 	 * @param string miemtype of thumbnail
 	 * @param string short error code
 	 */
-	function save_thumb_to_cache( $thumb_imh, $size_name, $thumb_mimetype )
+	function save_thumb_to_cache( $thumb_imh, $size_name, $thumb_mimetype, $thumb_quality = 90 )
 	{
 		if( $af_thumb_path = $this->get_af_thumb_path( $size_name, $thumb_mimetype, true ) )
 		{	// We obtained a path for the thumbnail to be saved:
-			return save_image( $thumb_imh, $af_thumb_path, $thumb_mimetype );
+			return save_image( $thumb_imh, $af_thumb_path, $thumb_mimetype, $thumb_quality );
 		}
 
 		return 'Ewr-access';
@@ -1607,9 +1607,10 @@ class File extends DataObject
 		$size_name = $req_size;
 		switch( $req_size )
 		{
-			case 'fit-720x720';
+			case 'fit-720x500';
 				$thumb_width = 720;
-				$thumb_height = 720;
+				$thumb_height = 500;
+				$thumb_quality = 90;
 				break;
 
 			case 'fit-80x80';
@@ -1617,6 +1618,7 @@ class File extends DataObject
 				$size_name = 'fit-80x80';
 				$thumb_width = 80;
 				$thumb_height = 80;
+				$thumb_quality = 75;
 		}
 
 		$mimetype = $this->Filetype->mimetype;
@@ -1634,7 +1636,7 @@ class File extends DataObject
 				list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_width, $thumb_height );
 				if( empty( $err ) )
 				{
-					$err = $this->save_thumb_to_cache( $dest_imh, $size_name, $mimetype );
+					$err = $this->save_thumb_to_cache( $dest_imh, $size_name, $mimetype, $thumb_quality );
 					if( empty( $err ) )
 					{	// File was saved. Ouput that same file immediately:
 						// This is probably better than recompressing the memory image..
@@ -1669,6 +1671,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.33  2007/01/19 08:20:36  fplanque
+ * Addressed resized image quality.
+ *
  * Revision 1.32  2007/01/15 20:48:20  fplanque
  * constrained photoblog image size
  * TODO: sharpness issue

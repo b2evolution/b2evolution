@@ -177,7 +177,7 @@ skin_content_header();	// Sets charset!
 					continue;
 				}
 				// Generate the IMG tag with all the alt, title and desc if available
-				echo $File->get_tag( '<div class="image_block">', '<div class="image_legend">', '</div>', '</div>', 'original' );
+				echo $File->get_tag( '<div class="image_block">', '<div class="image_legend">', '</div>', '</div>', 'fit-720x500' );
 			}
 
 			?>
