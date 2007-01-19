@@ -26,14 +26,16 @@ global $current_User;
 
 if( $blog )
 {
-	$BlogCache = & get_Cache( 'BlogCache' );
-	$Blog = & $BlogCache->get_by_ID($blog); // "Exit to blogs.." link
+	if( ! $current_User->check_perm( 'blog_ismember', '', false, $blog ) )
+	{	// We don't have permission for the requested blog (may happen if we come to admin from a link on a different blog)
+		set_working_blog( 0 );
+		unset( $Blog );
+	}
 }
 
 $blogListButtons = $AdminUI->get_html_collection_list( 'blog_ismember', '',
 											regenerate_url( array('blog'), 'blog=%d' ),
 											T_('Global'), regenerate_url( array('blog'), 'blog=0' ) );
-
 
 $AdminUI->set_path( 'dashboard' );
 
@@ -138,6 +140,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2007/01/19 08:20:57  fplanque
+ * bugfix
+ *
  * Revision 1.11  2007/01/14 22:43:29  fplanque
  * handled blog view perms.
  *
