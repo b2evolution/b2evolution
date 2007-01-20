@@ -2331,6 +2331,8 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 		header( 'HTTP/1.1 303 See Other' );
 	}
 	$status = $permanent ? 301 : 303;
+
+	$Debuglog->add('Redirecting to '.$redirect_to.' (status '.$status.')');
 	header( 'Location: '.$redirect_to, true, $status ); // explictly setting the status is required for (fast)cgi
 	exit();
 }
@@ -2759,6 +2761,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.159  2007/01/20 00:38:19  blueyed
+ * Added Debulog entry in header_redirect()
+ *
  * Revision 1.158  2007/01/19 03:06:57  fplanque
  * Changed many little thinsg in the login procedure.
  * There may be new bugs, sorry. I tested this for several hours though.
