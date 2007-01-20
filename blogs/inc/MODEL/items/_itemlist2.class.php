@@ -892,7 +892,10 @@ class ItemList2 extends DataObjectList2
 
 	/**
 	 * Get datetime of the last post/item
-	 * @return string 'Y-m-d H:i:s' formatted, maybe from {@link $localtimenow}.
+	 * @todo dh> Optimize this, if this can be said after having done {@link query()} already.
+	 * @todo dh> Cache result
+	 * @todo dh> Add $dateformat param
+	 * @return string 'Y-m-d H:i:s' formatted; If there are no items this will be {@link $localtimenow}.
 	 */
 	function get_lastpostdate()
 	{
@@ -1623,6 +1626,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.47  2007/01/20 23:05:11  blueyed
+ * todos
+ *
  * Revision 1.46  2007/01/19 21:48:09  blueyed
  * Fixed possible notice in preview_from_request()
  *
