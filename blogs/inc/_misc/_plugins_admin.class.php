@@ -283,26 +283,40 @@ class Plugins_admin extends Plugins
 
 		$Debuglog->add( 'Discovering plugins...', 'plugins' );
 
-		foreach( get_filenames( $this->plugins_path, true, false ) as $path )
+		// too inefficient: foreach( get_filenames( $this->plugins_path, true, false ) as $path )
+
+		// Get subdirs in $this->plugins_path
+		$subdirs = array();
+		$subdirs = get_filenames( $this->plugins_path, false, true, true, false );
+
+		// Skip plugins which are in a directory that starts with an underscore ("_")
+		foreach( $subdirs as $k => $v )
 		{
-			if( ! preg_match( '~/_([^/]+)\.plugin\.php$~', $path, $match ) && is_file( $path ) )
+			if( substr($v, 0, 1) == '_' || substr($v, -7) != '_plugin' )
 			{
-				continue;
+				unset($subdirs[$k]);
 			}
-			$classname = $match[1].'_plugin';
+		}
+		$subdirs[] = $this->plugins_path;
 
-			if( substr( dirname($path), 0, 1 ) == '_' )
-			{ // Skip plugins which are in a directory that starts with an underscore ("_")
-				continue;
-			}
-
-			if( $this->get_by_classname($classname) )
+		foreach( $subdirs as $subdir )
+		{
+			foreach( get_filenames( $subdir, true, false, true, false ) as $filename )
 			{
-				$Debuglog->add( 'Skipping duplicate plugin (classname '.$classname.')!', array('error', 'plugins') );
-				continue;
-			}
+				if( ! preg_match( '~/_([^/]+)\.plugin\.php$~', $filename, $match ) && is_file( $filename ) )
+				{
+					continue;
+				}
 
-			$this->register( $classname, 0, -1, NULL, $path ); // auto-generate negative ID; will return string on error.
+				$classname = $match[1].'_plugin';
+
+				if( $this->get_by_classname($classname) )
+				{
+					$Debuglog->add( 'Skipping duplicate plugin (classname '.$classname.')!', array('error', 'plugins') );
+					continue;
+				}
+				$this->register( $classname, 0, -1, NULL, $filename ); // auto-generate negative ID; will return string on error.
+			}
 		}
 
 		$Timer->pause('plugins_discover');
@@ -1376,6 +1390,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.28  2007/01/20 16:03:24  blueyed
+ * Optimized discover()
+ *
  * Revision 1.27  2007/01/15 19:28:29  blueyed
  * Small opt
  *
