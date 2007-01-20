@@ -53,7 +53,6 @@ $Form->begin_form( 'fform' );
 	$Form->text( 'login', $login, 16, T_('Login'), '', 20 , 'input_text' );
 
 	echo $Form->fieldstart.$Form->inputstart;
-	// TODO: the form submit value is too wide (in Konqueror and most probably in IE!)
 	$Form->submit_input( array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me an email now!'), 'class' => 'ActionButton' ) );
 	echo $Form->inputend.$Form->fieldend;
 
@@ -65,6 +64,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.11  2007/01/20 01:44:43  blueyed
+ * removed done todo
+ *
  * Revision 1.10  2007/01/19 03:06:56  fplanque
  * Changed many little thinsg in the login procedure.
  * There may be new bugs, sorry. I tested this for several hours though.
