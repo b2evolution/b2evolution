@@ -292,7 +292,8 @@ class Plugins_admin extends Plugins
 		// Skip plugins which are in a directory that starts with an underscore ("_")
 		foreach( $subdirs as $k => $v )
 		{
-			if( substr($v, 0, 1) == '_' || substr($v, -7) != '_plugin' )
+			$v_bn = basename($v);
+			if( substr(basename($v_bn), 0, 1) == '_' || substr($v_bn, -7) != '_plugin' )
 			{
 				unset($subdirs[$k]);
 			}
@@ -1390,6 +1391,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.29  2007/01/20 23:43:12  blueyed
+ * bugfix for new discover(): exclude subdirs that start with "_" now again
+ *
  * Revision 1.28  2007/01/20 16:03:24  blueyed
  * Optimized discover()
  *
