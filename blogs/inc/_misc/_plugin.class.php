@@ -114,8 +114,8 @@ class Plugin
 	 *
 	 * This is for user info only.
 	 *
-	 * If empty, it defaults to 'http://manual.b2evolution.net/Plugins/[plugin_classname]',
-	 * where '[plugin_classname]' is the plugin's PHP class name.
+	 * If empty, it defaults to 'http://manual.b2evolution.net/[plugin_classname]',
+	 * where '[plugin_classname]' is the plugin's PHP class name (with first char uppercased).
 	 *
 	 * @var string
 	 */
@@ -2685,8 +2685,7 @@ class Plugin
 		}
 		elseif( substr($target, 0, 1) == '#' )
 		{ // anchor
-			$help_url = ! empty( $this->help_url ) ? $this->help_url : 'http://manual.b2evolution.net/Plugins/'.$this->classname;
-			$url = $help_url.$target;
+			$url = $this->get_help_url().$target;
 		}
 		elseif( preg_match( '~^https?://~', $target ) )
 		{ // absolute URL (strict match to allow other formats later if needed)
@@ -2704,13 +2703,15 @@ class Plugin
 	/**
 	 * Get the plugin's external help/website URL.
 	 *
+	 * If {@link Plugin::help_url} is empty, it defaults to the manual wiki.
+	 *
 	 * @return string
 	 */
 	function get_help_url()
 	{
 		if( empty( $this->help_url ) )
 		{
-			return 'http://manual.b2evolution.net/Plugins/'.$this->classname;
+			return 'http://manual.b2evolution.net/'.strtoupper($this->classname[0]).substr($this->classname,1);
 		}
 		else
 		{
@@ -2816,6 +2817,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.136  2007/01/20 23:48:10  blueyed
+ * Changed plugin default URL to manual.b2evolution.net/classname_plugin
+ *
  * Revision 1.135  2007/01/17 23:37:10  blueyed
  * Bypass new $default param in Plugin::session_get()
  *

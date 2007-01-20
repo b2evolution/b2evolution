@@ -47,7 +47,7 @@ class generic_ping_plugin extends Plugin
 	var $priority = 50;
 	var $version = '1.9-dev';
 	var $author = 'The b2evo Group';
-	var $help_url = '';  // empty URL defaults to manual wiki, in this case: http://manual.b2evolution.net/Plugins/test_plugin';
+	var $help_url = '';  // empty URL defaults to manual wiki
 
 	/*
 	 * These variables MAY be overriden.
@@ -199,6 +199,9 @@ class generic_ping_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.5  2007/01/20 23:48:10  blueyed
+ * Changed plugin default URL to manual.b2evolution.net/classname_plugin
+ *
  * Revision 1.4  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

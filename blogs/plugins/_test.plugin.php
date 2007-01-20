@@ -55,7 +55,7 @@ class test_plugin extends Plugin
 	var $priority = 50;
 	var $version = '1.9-dev';
 	var $author = 'The b2evo Group';
-	var $help_url = '';  // empty URL defaults to manual wiki, in this case: http://manual.b2evolution.net/Plugins/test_plugin';
+	var $help_url = '';  // empty URL defaults to manual wiki
 
 	/*
 	 * These variables MAY be overriden.
@@ -715,6 +715,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.64  2007/01/20 23:48:10  blueyed
+ * Changed plugin default URL to manual.b2evolution.net/classname_plugin
+ *
  * Revision 1.63  2006/12/26 00:08:01  fplanque
  * reduce strain on translators. plugin devs need to understand english anyway.
  *
