@@ -30,6 +30,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 header_nocache(); // do not cache this page, because the JS password salt has to match the session cookie
 
 
+// TODO: dh> the message below should also get displayed in _reg_form.
+// E.g., the user might have clicked accidently on an old password change link.
 if( $Session->has_User() )
 { // The user is already logged in...
 	$tmp_User = & $Session->get_User();
@@ -215,6 +217,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.42  2007/01/20 01:44:56  blueyed
+ * todo
+ *
  * Revision 1.41  2007/01/19 03:06:56  fplanque
  * Changed many little thinsg in the login procedure.
  * There may be new bugs, sorry. I tested this for several hours though.
