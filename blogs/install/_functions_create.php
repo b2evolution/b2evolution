@@ -541,7 +541,7 @@ This is the extended text. You only see it when you have clicked the "more" link
 	$edited_Item->insert( 1, T_("Welcome to b2evolution!"), T_("Three blogs have been created with sample contents:
 <ul>
 	<li><strong>Blog A</strong>: You are currently looking at it. It contains a few sample posts, using simple features of b2evolution.</li>
-	<li><strong>Blog B</strong>: You can access it from a link the top of the page. It contains information about more advanced features.</li>
+	<li><strong>Blog B</strong>: You can access it from a link at the top of the page. It contains information about more advanced features.</li>
 	<li><strong>Linkblog</strong>: The linkblog is included by default in the sidebar of both Blog A &amp; Blog B.</li>
 </ul>
 
@@ -611,6 +611,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.215  2007/01/20 16:08:36  blueyed
+ * fixed grammar
+ *
  * Revision 1.214  2007/01/15 19:10:29  fplanque
  * install refactoring
  *
