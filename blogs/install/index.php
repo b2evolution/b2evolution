@@ -503,7 +503,7 @@ to
 		flush();
 		create_tables();
 
-		echo '<h2>'.T_('Creating minimun default data...').'</h2>';
+		echo '<h2>'.T_('Creating minimum default data...').'</h2>';
 		flush();
 		create_default_data();
 
@@ -622,6 +622,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.127  2007/01/20 01:44:22  blueyed
+ * typo
+ *
  * Revision 1.126  2007/01/15 19:10:29  fplanque
  * install refactoring
  *
