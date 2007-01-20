@@ -398,6 +398,8 @@ function user_preferredname( $user_ID )
 /**
  * Check profile parameters and add errors to {@link $Messages}.
  *
+ * @todo dh> use {@link param_error()} here?
+ *
  * @param array associative array
  *              'login': check for non-empty
  *              'nickname': check for non-empty
@@ -498,6 +500,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.22  2007/01/20 00:38:39  blueyed
+ * todo
+ *
  * Revision 1.21  2007/01/19 03:06:57  fplanque
  * Changed many little thinsg in the login procedure.
  * There may be new bugs, sorry. I tested this for several hours though.
