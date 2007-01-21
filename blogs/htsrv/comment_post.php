@@ -103,7 +103,7 @@ $original_comment = $comment;
 //echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);
 $comment = strip_tags($comment, $comment_allowed_tags);
 // TODO: AutoBR should really be a "comment renderer" (like with Items)
-$comment = format_to_post($original_comment, $comment_autobr, 1);
+$comment = format_to_post($comment, $comment_autobr, 1);
 
 if( empty($comment) )
 { // comment should not be empty!
@@ -325,6 +325,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.101  2007/01/21 22:51:17  blueyed
+ * Security fix: tags have not been stripped
+ *
  * Revision 1.100  2007/01/21 02:05:48  fplanque
  * cleanup
  *
