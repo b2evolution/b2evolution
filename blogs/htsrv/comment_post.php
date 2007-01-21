@@ -32,11 +32,6 @@ require_once $inc_path.'_main.inc.php';
 
 header( 'Content-Type: text/html; charset='.$io_charset );
 
-// statuses allowed for acting on:
-// fp> rem 06/09/06 $show_statuses = array( 'published', 'protected', 'private' );
-
-// Only for 0.9.0.11, for users who will not update their conf! :/
-if( !isset($minimum_comment_interval) ) $minimum_comment_interval = 30;
 
 // Getting GET or POST parameters:
 param( 'comment_post_ID', 'integer', true ); // required
@@ -330,6 +325,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.100  2007/01/21 02:05:48  fplanque
+ * cleanup
+ *
  * Revision 1.99  2007/01/16 22:48:13  blueyed
  * Plugin hook TODO
  *
