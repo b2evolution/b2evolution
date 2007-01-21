@@ -100,8 +100,11 @@ $now = date( 'Y-m-d H:i:s', $localtimenow );
 
 // CHECK and FORMAT content
 $original_comment = $comment;
-//echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);
-$comment = strip_tags($comment, $comment_allowed_tags);
+if( ! $use_html_checker )
+{
+	//echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);
+	$comment = strip_tags($comment, $comment_allowed_tags);
+}
 // TODO: AutoBR should really be a "comment renderer" (like with Items)
 $comment = format_to_post($comment, $comment_autobr, 1);
 
@@ -325,6 +328,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.102  2007/01/21 23:26:31  fplanque
+ * preserve "fail on spam" by default
+ *
  * Revision 1.101  2007/01/21 22:51:17  blueyed
  * Security fix: tags have not been stripped
  *
