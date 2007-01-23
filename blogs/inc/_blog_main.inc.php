@@ -135,10 +135,10 @@ if( $resolve_extra_path )
 			$Debuglog->add( 'Ignoring *.php in extra path info' , 'params' );
 		}
 
-		if( isset( $path_elements[0] ) && preg_match( '#^'.$Blog->get( 'stub' ).'$#', $path_elements[0] )  )
-		{ // Ignore stub file (if it ends with .php it should aready have been filtered out above)
+		if( isset( $path_elements[0] ) && preg_match( '#^'.$Blog->get( 'stub' ).'|'.$Blog->get( 'urlname' ).'$#', $path_elements[0] )  )
+		{ // Ignore stub file (if it ends with .php it should already have been filtered out above)
 			array_shift( $path_elements );
-			$Debuglog->add( 'Ignoring stub file in extra path info' , 'params' );
+			$Debuglog->add( 'Ignoring stub filename OR blog urlname in extra path info' , 'params' );
 		}
 		// pre_dump( $path_elements );
 
@@ -520,6 +520,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.65  2007/01/23 08:07:16  fplanque
+ * Fixed blog URLs including urlnames
+ *
  * Revision 1.64  2007/01/09 00:55:16  blueyed
  * fixed typo(s)
  *
