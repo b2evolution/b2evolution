@@ -620,20 +620,15 @@ class Blog extends DataObject
 				// Access through stub file
 				$blogurl = $base;
 				if( !empty($this->stub) )
-				{
+				{	// fp> if default_stub gets implemented, empty stubs will no longer be allowed.
 					$blogurl .= $this->stub;
-				}
-				/*
-				dh> following makes no sense IMHO.
-				    Especially with an empty stub it will leed to http://example.com/.php (e.g. on preview)
-				    It may get moved into the above if-not-empty check, but forcing ".php" at the stub makes no sense IMHO!
-				    Also, this is the only place where $type == 'dynamic' gets used.
-				*/
-				if( ($type == 'dynamic') && !( preg_match( '#.php$#', $blogurl ) ) )
-				{ // We want to force the dynamic page but the URL is not explicitly dynamic
-					// This is needed when a static page is taking control of domain.com/stub and we want an explicit link to the LATEST content, which can only be gotten at domain.com/stub.php
-					// fp> This creates a small problem with empty stubs (domain.com/.php). This should be fixed by using a fourth blog_access_type: default, index.php, stub, *default_stub* . Consequence: require the stub fied on blog properties form when stub mode is selected
-					$blogurl .= '.php';
+					if( ($type == 'dynamic') && !( preg_match( '#.php$#', $blogurl ) ) )
+					{ // We want to force the dynamic page but the URL is not explicitly dynamic
+						// This is needed when a static page is taking control of domain.com/stub and we want an explicit link to the LATEST content, which can only be gotten at domain.com/stub.php
+						// fp> This creates a small problem with empty stubs (domain.com/.php). This should be fixed by using a fourth blog_access_type: default, index.php, stub, *default_stub* .
+						// Consequence: require the stub field on blog properties form when stub mode is selected
+						$blogurl .= '.php';
+					}
 				}
 				return $blogurl;
 
@@ -1357,6 +1352,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.61  2007/01/23 07:31:22  fplanque
+ * "fixed" as per todo
+ *
  * Revision 1.60  2007/01/23 05:30:20  fplanque
  * "Contact the owner"
  *
