@@ -755,7 +755,7 @@ class Item extends DataObject
 	 */
 	function categories(
 			$link_title = '#',
-			$before_main='<strong>', $after_main='</strong>',
+			$before_main='', $after_main='',
 			$before_other='', $after_other='',
 			$before_external='<em>', $after_external='</em>',
 			$separator = ', ',
@@ -3385,6 +3385,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.147  2007/01/23 03:46:24  fplanque
+ * cleaned up presentation
+ *
  * Revision 1.146  2007/01/19 10:45:42  fplanque
  * images everywhere :D
  * At this point the photoblogging code can be considered operational.

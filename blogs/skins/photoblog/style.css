@@ -186,3 +186,18 @@ select.bComment  /* Used by the profile form */
 	padding: 1px;
 	margin: 0ex;
 }
+
+table.image_index {
+	margin: 1ex auto;
+}
+table.image_index td {
+	width: 88px;
+	height: 88px;
+	background: #555;
+	text-align: center;
+	vertical-align: center;
+	border: 1px solid #333;
+}
+table.image_index td:hover {
+	background: #777;
+}

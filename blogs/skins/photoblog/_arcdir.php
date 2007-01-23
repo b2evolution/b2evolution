@@ -53,8 +53,9 @@ $FileList->sql = $SQL->get();
 
 $FileList->query( false, false, false );
 
-echo '<div class="image_block">';
+echo '<table class="image_index" cellspacing="3">';
 
+$nb_cols = 8;
 $count = 0;
 $prev_post_ID = 0;
 while( $File = & $FileList->get_next() )
@@ -64,6 +65,12 @@ while( $File = & $FileList->get_next() )
 		// fp> TODO: maybe this property should be stored in link_ltype_ID
 		continue;
 	}
+
+	if( $count % $nb_cols == 0 )
+	{
+		echo '<tr>';
+	}
+	echo '<td>';
 
 	$post_ID = $FileList->rows[$FileList->current_idx-1]->post_ID;
 	if( $post_ID != $prev_post_ID )
@@ -96,13 +103,28 @@ while( $File = & $FileList->get_next() )
 		- we need this for regular text postbypost archives too (dirty links so far)
 		- we could use this for any kind of lists (last posts, most popular, sitemap )
 	*/
+
+	echo '</td>';
+	if( $count % $nb_cols == 0 )
+	{
+		echo '</tr>';
+	}
+
+}
+
+if( $count && ( $count % $nb_cols != 0 ) )
+{
+	echo '</tr>';
 }
 
 
-echo '</div>';
+echo '</table>';
 
 /*
  * $Log$
+ * Revision 1.5  2007/01/23 03:46:24  fplanque
+ * cleaned up presentation
+ *
  * Revision 1.4  2007/01/15 20:48:19  fplanque
  * constrained photoblog image size
  * TODO: sharpness issue
