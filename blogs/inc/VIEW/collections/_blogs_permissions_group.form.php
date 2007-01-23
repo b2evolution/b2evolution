@@ -334,7 +334,7 @@ $Form->begin_fieldset( T_('Group permissions') );
 
 <?php
 // Permission note:
-echo '<p class="note center">'.T_('Note: General group permissions override the media folder permissions defined here.').'</p>';
+echo '<p class="note center">'.T_('Note: General group permissions may further restrict any media folder permissions defined here.').'</p>';
 
 $Form->end_fieldset();
 // warning if a user withdraws own permission to edit the blog's properties

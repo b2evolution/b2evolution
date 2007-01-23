@@ -404,7 +404,7 @@ echo '</div>';
 
 // Permission note:
 // fp> TODO: link
-echo '<p class="note center">'.T_('Note: General group permissions override the media folder permissions defined here.').'</p>';
+echo '<p class="note center">'.T_('Note: General group permissions may further restrict any media folder permissions defined here.').'</p>';
 
 $Form->end_fieldset();
 
@@ -423,6 +423,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.18  2007/01/23 04:20:30  fplanque
+ * wording
+ *
  * Revision 1.17  2006/12/03 19:00:30  blueyed
  * Moved collection perm JavaScript to the views, as per todo
  *

@@ -127,7 +127,7 @@ $Form->begin_fieldset( T_('Permissions for members of this group') );
 							array( 'add', T_('Add/Upload') ),
 							array( 'edit', sprintf( T_('Edit %s'), $filetypes_linkstart.get_icon('file_allowed').$filetypes_linkend ) ),
 							array( 'all', sprintf( T_('Edit all, including %s'), $filetypes_linkstart.get_icon('file_not_allowed').$filetypes_linkend ) ),
-						), T_('Files'), false, T_('This overrides any specific media file permissions on specific blogs.') );
+						), T_('Files'), false, T_('This setting will further restrict any media file permissions on specific blogs.') );
 
 	$Form->checkbox( 'edited_grp_perm_templates', $edited_Group->get('perm_templates'), T_('Skins'), T_('Check to allow access to skin files.') );
 
@@ -165,6 +165,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.9  2007/01/23 04:20:31  fplanque
+ * wording
+ *
  * Revision 1.8  2006/12/17 23:42:39  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.

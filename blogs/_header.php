@@ -249,11 +249,11 @@ $AdminUI->add_menu_entries(
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog,
 						'perm_eval' => $coll_settings_perm ),
 					'perm' => array(
-						'text' => T_('User permissions'),
+						'text' => T_('User perms'), // keep label short
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog,
 						'perm_eval' => $coll_settings_perm ),
 					'permgroup' => array(
-						'text' => T_('Group permissions'),
+						'text' => T_('Group perms'), // keep label short
 						'href' => 'admin.php?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog,
 						'perm_eval' => $coll_settings_perm ),
 				)
@@ -336,6 +336,9 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.44  2007/01/23 04:20:31  fplanque
+ * wording
+ *
  * Revision 1.43  2007/01/16 00:45:42  fplanque
  * still trying to find the right placement...
  *
