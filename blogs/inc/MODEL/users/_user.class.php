@@ -167,6 +167,10 @@ class User extends DataObject
 			{ // Group for this user:
 				$this->group_ID = $Settings->get('newusers_grp_ID');
 			}
+
+ 			$this->set( 'allow_msgform', 1 );
+ 			$this->set( 'notify', 1 );
+ 			$this->set( 'showonline', 1 );
 		}
 		else
 		{
@@ -1164,6 +1168,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.62  2007/01/23 05:00:25  fplanque
+ * better user defaults
+ *
  * Revision 1.61  2007/01/14 22:08:48  fplanque
  * Broadened global group blog view/edit provileges.
  * I hoipe I didn't screw up here :/

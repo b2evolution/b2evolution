@@ -57,7 +57,9 @@ class UserSettings extends AbstractSettings
 	var $_defaults = array(
 		'action_icon_threshold' => 3,
 		'action_word_threshold' => 3,
+		'display_icon_legend' => 0,
 		'control_form_abortions' => 1,
+		'focus_on_first_input' => 1,
 		'pref_browse_tab' => 'full',
 		'pref_edit_tab' => 'simple',
 
@@ -202,6 +204,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.25  2007/01/23 05:00:25  fplanque
+ * better user defaults
+ *
  * Revision 1.24  2006/12/18 03:20:22  fplanque
  * _header will always try to set $Blog.
  * autoselect_blog() will do so also.
