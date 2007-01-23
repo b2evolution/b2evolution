@@ -2075,6 +2075,49 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 			return $r;
 			/* BREAK */
+
+		case 'noimg':
+			$blank_icon = get_icon_info('pixel');
+
+			$r = '<img src="'.$baseurl.$blank_icon['file'].'" ';
+
+			// Include non CSS fallbacks:
+			$r .= 'border="0" align="top" ';
+
+			// Include class (will default to "noicon"):
+			if( ! isset( $params['class'] ) )
+			{
+				if( isset($icon['class']) )
+				{	// This icon has a class
+					$params['class'] = $icon['class'];
+				}
+				else
+				{
+					$params['class'] = 'no_icon';
+				}
+			}
+
+			// Include size (optional):
+			if( isset( $icon['size'] ) )
+			{
+				$r .= 'width="'.$icon['size'][0].'" height="'.$icon['size'][1].'" ';
+			}
+
+			// Include alt (XHTML mandatory):
+			if( ! isset( $params['alt'] ) )
+			{
+				$params['alt'] = '';
+			}
+
+			// Add all the attributes:
+			$r .= get_field_attribs_as_string( $params, false );
+
+			// Close tag:
+			$r .= '/>';
+
+			return $r;
+			/* BREAK */
+
 	}
 }
 
@@ -2763,6 +2806,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.161  2007/01/23 21:44:43  fplanque
+ * handle generic "empty"/noimg icons
+ *
  * Revision 1.160  2007/01/23 05:30:21  fplanque
  * "Contact the owner"
  *

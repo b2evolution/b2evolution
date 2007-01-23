@@ -60,7 +60,8 @@ ul.plain {
 }
 
 
-.action_icon {
+.action_icon,
+.no_icon {
 	margin: 0 2px;
 	font-weight: bold;
 }
