@@ -177,12 +177,24 @@ skin_content_header();	// Sets charset!
 		<a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('Archives') ?></a>
 		</strong>
 
-		<p><?php
+		<p>
+		<?php
+			// Display a link to contact the owner of this blog (if owner accepts messages):
+			$Blog->contact_link( array(
+					'before'      => ' [',
+					'after'       => '] ',
+					'text'   => T_('Contact'),
+					'title'  => T_('Send a message to the owner of this blog...'),
+				) );
+		?>
+
+		<?php
 			user_login_link( ' [', '] ' );
 			user_register_link( ' [', '] ' );
 			user_admin_link( ' [', '] ' );
 			user_logout_link( ' [', '] ' );
-		?></p>
+		?>
+		</p>
 	</div>
 
 	<hr>

@@ -79,6 +79,14 @@ skin_content_header();	// Sets charset!
 
 <div class="posts">
 <div class="innerwrap">
+
+<?php
+	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
+	if( empty( $preview ) ) $Messages->disp( );
+	// fp>> TODO: I think we should rather forget the messages here so they don't get displayed again.
+	// --------------------------------- END OF MESSAGES ---------------------------------
+?>
+
 <?php request_title( '<h2>', '</h2>' ) ?>
 
 <!-- =================================== START OF MAIN AREA =================================== -->
@@ -220,14 +228,26 @@ skin_content_header();	// Sets charset!
 	<p class="baseline">
 		Original <a href="http://b2evolution.net/">b2evolution</a> template design by <a href="http://severinelandrieu.com/">S&eacute;verine LANDRIEU</a> &amp; <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> / <a href="http://skinfaktory.com/">The Skin Faktory</a>.
 	</p>
-	<?php
-		// Display additional credits (see /conf/_advanced.php):
- 		// If you can add your own credits without removing the defaults, you'll be very cool :))
-		// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
-		display_list( $credit_links, '<p class="baseline">'.T_('Credits').': ', '</p>', '|', ' ', ' ' );
-		$Hit->log();	// log the hit on this page
-		debug_info(); // output debug info if requested
-	?>
+	<p class="baseline">
+		<?php
+			// Display a link to contact the owner of this blog (if owner accepts messages):
+			$Blog->contact_link( array(
+					'before'      => '',
+					'after'       => ' &bull; ',
+					'text'   => T_('Contact'),
+					'title'  => T_('Send a message to the owner of this blog...'),
+				) );
+		?>
+
+		<?php
+			// Display additional credits (see /conf/_advanced.php):
+ 			// If you can add your own credits without removing the defaults, you'll be very cool :))
+			// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
+			display_list( $credit_links, T_('Credits').': ', '', '|', ' ', ' ' );
+			$Hit->log();	// log the hit on this page
+			debug_info(); // output debug info if requested
+		?>
+	</p>
 </div>
 
 </div>

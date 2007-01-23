@@ -61,6 +61,14 @@ skin_content_header();	// Sets charset!
 
 
 <div class="bPosts">
+
+<?php
+	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
+	if( empty( $preview ) ) $Messages->disp( );
+	// fp>> TODO: I think we should rather forget the messages here so they don't get displayed again.
+	// --------------------------------- END OF MESSAGES ---------------------------------
+?>
+
 <?php request_title( '<h2>', '</h2>' ) ?>
 
 <!-- =================================== START OF MAIN AREA =================================== -->
@@ -199,6 +207,16 @@ skin_content_header();	// Sets charset!
 		Original <a href="http://b2evolution.net/">b2evolution</a> template design by <a href="http://severinelandrieu.com/">S&eacute;verine LANDRIEU</a> &amp; <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a>.
 	</p>
   <p class="baseline">
+		<?php
+			// Display a link to contact the owner of this blog (if owner accepts messages):
+			$Blog->contact_link( array(
+					'before'      => '',
+					'after'       => ' &bull; ',
+					'text'   => T_('Contact'),
+					'title'  => T_('Send a message to the owner of this blog...'),
+				) );
+		?>
+
     Credits: <a href="http://skinfaktory.com/">skin makers</a>
 	<?php
 		// Display additional credits (see /conf/_advanced.php):
