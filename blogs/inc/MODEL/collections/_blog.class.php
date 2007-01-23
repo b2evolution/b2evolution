@@ -1089,12 +1089,11 @@ class Blog extends DataObject
 
 		$DB->begin();
 
-		if( parent::dbupdate() )
+		parent::dbupdate();
+
+		if( isset( $this->CollectionSettings ) )
 		{
-			if( isset( $this->CollectionSettings ) )
-			{
-				$this->CollectionSettings->dbupdate();
-			}
+			$this->CollectionSettings->dbupdate();
 		}
 
 		$DB->commit();
@@ -1285,6 +1284,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.58  2007/01/23 03:45:56  fplanque
+ * bugfix
+ *
  * Revision 1.57  2007/01/16 00:44:42  fplanque
  * don't use $admin_email in  the app
  *
