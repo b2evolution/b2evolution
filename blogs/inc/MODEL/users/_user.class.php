@@ -128,6 +128,7 @@ class User extends DataObject
 		//       Use a callback (get_delete_restrictions/get_delete_cascades) instead? Should be also better for performance!
 		// fp> These settings should probably be merged with the global database description used by the installer/upgrader. However I'm not sure about how compelx plugins would be able to integrate then...
 		$this->delete_restrictions = array(
+				array( 'table'=>'T_blogs', 'fk'=>'blog_owner_user_ID', 'msg'=>T_('%d blogs owned by this user') ),
 				array( 'table'=>'T_posts', 'fk'=>'post_lastedit_user_ID', 'msg'=>T_('%d posts last edited by this user') ),
 				array( 'table'=>'T_posts', 'fk'=>'post_assigned_user_ID', 'msg'=>T_('%d posts assigned to this user') ),
 				array( 'table'=>'T_links', 'fk'=>'link_creator_user_ID', 'msg'=>T_('%d links created by this user') ),
@@ -1168,6 +1169,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.63  2007/01/23 21:45:25  fplanque
+ * "enforce" foreign keys
+ *
  * Revision 1.62  2007/01/23 05:00:25  fplanque
  * better user defaults
  *

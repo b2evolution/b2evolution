@@ -134,7 +134,7 @@ switch( $action )
 		{	// not confirmed, Check for restrictions:
 			if( ! $edited_Skin->check_delete( sprintf( T_('Cannot uninstall skin &laquo;%s&raquo;'), $edited_Skin->dget('name') ) ) )
 			{	// There are restrictions:
-				$action = 'view';
+				$action = 'edit';
 			}
 		}
 
@@ -163,17 +163,17 @@ switch( $action )
 		$AdminUI->disp_view( 'skins/_available_list.view.php' );
 		break;
 
+	case 'delete':
+		// We need to ask for confirmation:
+		$edited_Skin->confirm_delete(
+				sprintf( T_('Uninstall skin &laquo;%s&raquo;?'),  $edited_Skin->dget( 'name' ) ),
+				$action, get_memorized( 'action' ) );
 	case 'edit':
 	case 'update':	// we return in this state after a validation error
 		// Display VIEW:
 		$AdminUI->disp_view( 'skins/_skin.form.php' );
 		break;
 
-	case 'delete':
-		// We need to ask for confirmation:
-		$edited_Skin->confirm_delete(
-				sprintf( T_('Uninstall skin &laquo;%s&raquo;?'),  $edited_Skin->dget( 'name' ) ),
-				$action, get_memorized( 'action' ) );
 	case 'list':
 		// Display VIEW:
 		$AdminUI->disp_view( 'skins/_skin_list.view.php' );
@@ -188,6 +188,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2007/01/23 21:45:26  fplanque
+ * "enforce" foreign keys
+ *
  * Revision 1.7  2007/01/09 00:55:16  blueyed
  * fixed typo(s)
  *

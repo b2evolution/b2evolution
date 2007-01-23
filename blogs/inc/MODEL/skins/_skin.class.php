@@ -54,6 +54,10 @@ class Skin extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_skins__skin', 'skin_', 'skin_ID' );
 
+		$this->delete_restrictions = array(
+				array( 'table'=>'T_blogs', 'fk'=>'blog_skin_ID', 'msg'=>T_('%d blogs using this skin') ),
+			);
+
 		$this->delete_cascades = array(
 				array( 'table'=>'T_skins__container', 'fk'=>'sco_skin_ID', 'msg'=>T_('%d link containers') ),
 			);
@@ -349,6 +353,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2007/01/23 21:45:25  fplanque
+ * "enforce" foreign keys
+ *
  * Revision 1.10  2007/01/14 00:45:13  fplanque
  * bugfix
  *

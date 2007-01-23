@@ -14,8 +14,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Create result set:
-$Results = & new Results( 'SELECT *
-													 	 FROM T_skins__skin' );
+$Results = & new Results( 'SELECT T_skins__skin.*, COUNT(blog_ID) AS nb_blogs
+													 	 FROM T_skins__skin LEFT JOIN T_blogs ON skin_ID = blog_skin_ID
+													 	GROUP BY skin_ID' );
 $Results->Cache = & get_Cache( 'SkinCache' );
 $Results->title = T_('Installed skins');
 
@@ -44,10 +45,11 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th' => T_('# of blogs'),
-						'order' => '',
-						'td_class' => 'right',
-						'td' => 'n.a.',
+						'th' => T_('Blogs'),
+						'order' => 'nb_blogs',
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'center',
+						'td' => '¤conditional( (#nb_blogs# > 0), #nb_blogs#, \'&nbsp;\' )¤',
 					);
 
 $Results->cols[] = array(
@@ -58,7 +60,6 @@ $Results->cols[] = array(
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
-
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
 							'th_class' => 'shrinkwrap',
@@ -67,8 +68,10 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=edit\')%' )
 	                    .action_icon( T_('Reload containers!'), 'reload',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=reload\')%' )
-	                    .action_icon( T_('Uninstall this skin!'), 'delete',
-	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=delete\')%' ),
+											.'¤conditional( #nb_blogs# < 1, \''
+											.action_icon( T_('Uninstall this skin!'), 'delete',
+	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=delete\')%' ).'\', \''
+	                        .get_icon( 'delete', 'noimg' ).'\' )¤',
 						);
 
   $Results->global_icon( T_('Install new skin...'), 'new', regenerate_url( 'action', 'action=new'), T_('Install new'), 3, 4  );
