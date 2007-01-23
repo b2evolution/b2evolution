@@ -35,34 +35,12 @@ global $Settings;
  */
 global $Debuglog;
 
-// Prepare last part of blog URL preview:
-switch( $edited_Blog->get( 'access_type' ) )
-{
-	case 'default':
-		$blog_urlappend = 'index.php';
-		break;
-
-	case 'index.php':
-		if( $Settings->get('links_extrapath') == 'disabled' )
-		{
-			$blog_urlappend = 'index.php?blog='.$edited_Blog->ID;
-		}
-		else
-		{	// fp>> TODO: This seems odd, shouldn't it be the URL name here??
-			$blog_urlappend = 'index.php/'.$edited_Blog->get( 'stub' );
-		}
-		break;
-
-	case 'stub':
-		$blog_urlappend = $edited_Blog->get( 'stub' );
-		break;
-}
-
 ?>
 <script type="text/javascript">
 	<!--
-	var blog_baseurl = '<?php $edited_Blog->disp( 'baseurl', 'formvalue' ); ?>';
-	var blog_urlappend = '<?php echo str_replace( "'", "\'", $blog_urlappend ) ?>';
+	// Script to update the Blog URL preview:
+	var blog_baseurl = '<?php echo str_replace( "'", "\'", $edited_Blog->get( 'baseurl' ) ); ?>';
+	var blog_urlappend = '<?php echo str_replace( "'", "\'", substr( $edited_Blog->gen_blogurl(), strlen($edited_Blog->get( 'baseurl' )) ) ); ?>';
 
 	function update_urlpreview( base, append )
 	{
@@ -173,7 +151,7 @@ $Form->begin_fieldset( T_('Blog URL') );
 			),
 		), T_('Preferred access type'), true );
 
-	$Form->info( T_('URL preview'), '<span id="urlpreview">'.$edited_Blog->dget( 'baseurl', 'entityencoded' ).$blog_urlappend.'</span>' );
+	$Form->info( T_('URL preview'), '<span id="urlpreview">'.$edited_Blog->gen_blogurl().'</span>' );
 
 $Form->end_fieldset();
 
@@ -204,6 +182,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.3  2007/01/23 08:06:25  fplanque
+ * Simplified!!!
+ *
  * Revision 1.2  2006/12/11 00:32:26  fplanque
  * allow_moving_chapters stting moved to UI
  * chapters are now called categories in the UI
