@@ -54,6 +54,9 @@ if( ! param_ismemorized('blog') )
 
 // Getting current blog info:
 $BlogCache = & get_Cache( 'BlogCache' );
+/**
+ * @var Blog
+ */
 $Blog = & $BlogCache->get_by_ID( $blog, false );
 if( empty( $Blog ) )
 {
@@ -135,7 +138,9 @@ if( $resolve_extra_path )
 			$Debuglog->add( 'Ignoring *.php in extra path info' , 'params' );
 		}
 
-		if( isset( $path_elements[0] ) && preg_match( '#^'.$Blog->get( 'stub' ).'|'.$Blog->get( 'urlname' ).'$#', $path_elements[0] )  )
+		if( isset( $path_elements[0] )
+				&& ( $path_elements[0] == $Blog->stub
+						|| $path_elements[0] == $Blog->urlname ) )
 		{ // Ignore stub file (if it ends with .php it should already have been filtered out above)
 			array_shift( $path_elements );
 			$Debuglog->add( 'Ignoring stub filename OR blog urlname in extra path info' , 'params' );
@@ -520,6 +525,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.66  2007/01/23 08:17:49  fplanque
+ * another simplification...
+ *
  * Revision 1.65  2007/01/23 08:07:16  fplanque
  * Fixed blog URLs including urlnames
  *
