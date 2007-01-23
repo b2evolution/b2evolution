@@ -195,7 +195,7 @@ table.image_index td {
 	height: 88px;
 	background: #555;
 	text-align: center;
-	vertical-align: center;
+	vertical-align: middle;
 	border: 1px solid #333;
 }
 table.image_index td:hover {
