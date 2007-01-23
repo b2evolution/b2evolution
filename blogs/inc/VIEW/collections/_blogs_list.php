@@ -32,8 +32,8 @@ global $Settings;
 
 global $dispatcher;
 
-$sql = 'SELECT T_blogs.*
-					FROM T_blogs';
+$sql = 'SELECT T_blogs.*, user_login
+					FROM T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID';
 if( ! $current_User->check_perm( 'blogs', 'view' ) )
 {	// We do not have perm to view all blogs... we need to restrict to those we're a member of:
 	$sql .= ' LEFT JOIN T_coll_user_perms ON ( blog_ID = bloguser_blog_ID
@@ -95,6 +95,12 @@ $Results->cols[] = array(
 						'th' => T_('Full Name'),
 						'order' => 'blog_name',
 						'td' => '$blog_name$',
+					);
+
+$Results->cols[] = array(
+						'th' => T_('Owner'),
+						'order' => 'user_login',
+						'td' => '$user_login$',
 					);
 
 $Results->cols[] = array(
@@ -180,6 +186,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.15  2007/01/23 04:19:50  fplanque
+ * handling of blog owners
+ *
  * Revision 1.14  2007/01/15 18:48:20  fplanque
  * cleanup
  *

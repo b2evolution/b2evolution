@@ -75,6 +75,14 @@ class Blog extends DataObject
 
 	var $shortdesc; // description
 	var $longdesc;
+
+	var $owner_user_ID;
+	/**
+	 * Lazy filled
+	 * @var User
+	 */
+	var $owner_User = NULL;
+
 	var $locale;
 	var $access_type;
 
@@ -149,6 +157,7 @@ class Blog extends DataObject
 		{
 			global $default_locale;
 			// echo 'Creating blank blog';
+			$this->owner_user_ID = 1; // DB default
 			$this->set( 'locale', $default_locale );
 			$this->set( 'access_type', 'index.php' );
 			$this->skin_ID = 1;	// TODO: this is the DB default, but it will fail if skin #1 does not exist
@@ -158,6 +167,7 @@ class Blog extends DataObject
 			$this->ID = $db_row->blog_ID;
 			$this->shortname = $db_row->blog_shortname;
 			$this->name = $db_row->blog_name;
+			$this->owner_user_ID = $db_row->blog_owner_user_ID;
 			$this->tagline = $db_row->blog_tagline;
 			$this->shortdesc = $db_row->blog_description;	// description
 			$this->longdesc = $db_row->blog_longdesc;
@@ -473,6 +483,20 @@ class Blog extends DataObject
 			$this->set_setting( 'aggregate_coll_IDs', get_param( 'aggregate_coll_IDs' ) );
 		}
 
+		if( param( 'owner_login', 'string', NULL ) !== NULL )
+		{ // Permissions:
+			$UserCache = & get_Cache( 'UserCache' );
+			$owner_User = & $UserCache->get_by_login( get_param('owner_login'), false, false );
+			if( empty( $owner_User ) )
+			{
+				param_error( 'owner_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), get_param('owner_login') ) );
+			}
+			else
+			{
+				$this->set( 'owner_user_ID', $owner_User->ID );
+				$this->owner_User = & $owner_User;
+			}
+		}
 
 		return ! param_errors_detected();
 
@@ -1280,10 +1304,30 @@ class Blog extends DataObject
 		return $this->name;
 	}
 
+
+	/**
+	 * Resolve user ID of owner
+	 *
+	 * @return User
+	 */
+	function & get_owner_User()
+	{
+		if( !isset($this->owner_User) )
+		{
+			$UserCache = & get_Cache( 'UserCache' );
+			$this->owner_User = & $UserCache->get_by_ID($this->owner_user_ID);
+		}
+
+		return $this->owner_User;
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.59  2007/01/23 04:19:50  fplanque
+ * handling of blog owners
+ *
  * Revision 1.58  2007/01/23 03:45:56  fplanque
  * bugfix
  *

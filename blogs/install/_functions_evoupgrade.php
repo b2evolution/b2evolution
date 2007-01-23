@@ -1651,6 +1651,7 @@ function upgrade_b2evo_tables()
 		$DB->query( 'ALTER TABLE T_blogs
 								 ALTER COLUMN blog_allowtrackbacks SET DEFAULT 0,
 									DROP COLUMN blog_default_skin,
+									 ADD COLUMN blog_owner_user_ID   int(11) unsigned NOT NULL default 1 AFTER blog_name,
 									 ADD COLUMN blog_skin_ID INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER blog_allowusercss' );
 		echo "OK.<br />\n";
 
@@ -1773,6 +1774,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.205  2007/01/23 04:19:50  fplanque
+ * handling of blog owners
+ *
  * Revision 1.204  2007/01/15 20:54:57  fplanque
  * minor fix
  *

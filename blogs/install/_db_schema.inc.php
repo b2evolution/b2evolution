@@ -118,6 +118,7 @@ $schema_queries = array(
 			blog_ID              int(11) unsigned NOT NULL auto_increment,
 			blog_shortname       varchar(12) NULL default '',
 			blog_name            varchar(50) NOT NULL default '',
+			blog_owner_user_ID   int(11) unsigned NOT NULL default 1,
 			blog_tagline         varchar(250) NULL default '',
 			blog_description     varchar(250) NULL default '',
 			blog_longdesc        TEXT NULL DEFAULT NULL,
@@ -524,6 +525,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.50  2007/01/23 04:19:50  fplanque
+ * handling of blog owners
+ *
  * Revision 1.49  2007/01/15 20:54:57  fplanque
  * minor fix
  *

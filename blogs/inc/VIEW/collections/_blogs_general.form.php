@@ -54,6 +54,16 @@ $Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear
 	$Form->select( 'blog_locale', $edited_Blog->get( 'locale' ), 'locale_options_return', T_('Main Locale'), T_('Determines the language of the navigation links on the blog.') );
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Permissions') );
+	// fp> Note: There are 2 reasons why we don't provide a select here:
+	// 1. If there are 1000 users, it's a pain.
+	// 2. A single blog owner is not necessarily allowed to see all other users.
+	$owner_User = & $edited_Blog->get_owner_User();
+	$Form->text( 'owner_login', $owner_User->login, 20, T_('Owner'), T_('Login of this blog\'s owner.') );
+
+	// fp> TODO: checkbox 'Advanced perms', 'Check to enable advanced user & group permission tabs'
+$Form->end_fieldset();
+
 $Form->begin_fieldset( T_('Feedback options') );
 	$Form->radio( 'blog_allowcomments', $edited_Blog->get( 'allowcomments' ),
 						array(  array( 'always', T_('Always on all posts'), T_('Always allow comments on every posts') ),
@@ -82,6 +92,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.18  2007/01/23 04:19:50  fplanque
+ * handling of blog owners
+ *
  * Revision 1.17  2007/01/15 03:54:36  fplanque
  * pepped up new blog creation a little more
  *
