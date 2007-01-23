@@ -2257,6 +2257,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 	global $Hit, $baseurl, $Blog, $htsrv_url_sensitive;
 	global $Session, $Debuglog, $Messages;
 
+	// fp> get this out
 	if( empty($redirect_to) )
 	{ // see if there's a redirect_to request param given (where & is encoded as &amp;):
 		$redirect_to = param( 'redirect_to', 'string', '' );
@@ -2277,15 +2278,16 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 			}
 		}
 	}
+	// <fp
 
-
+	/* fp>why do we need this?
 	if( substr($redirect_to, 0, 1) == '/' )
 	{ // relative URL, prepend current host:
 		global $ReqHost;
 
 		$redirect_to = $ReqHost.$redirect_to;
 	}
-
+	*/
 
 	if( strpos($redirect_to, $htsrv_url_sensitive) === 0 /* we're going somewhere on $htsrv_url_sensitive */
 	 || strpos($redirect_to, $baseurl) === 0   /* we're going somewhere on $baseurl */ )
@@ -2300,7 +2302,10 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 	}
 
 
-	// Transfer of Debuglog:
+	$status = $permanent ? 301 : 303;
+ 	$Debuglog->add('Redirecting to '.$redirect_to.' (status '.$status.')');
+
+	// Transfer of Debuglog to next page:
 	if( $Debuglog->count('all') )
 	{ // Save Debuglog into Session, so that it's available after redirect (gets loaded by Session constructor):
 		$sess_Debuglogs = $Session->get('Debuglogs');
@@ -2311,14 +2316,13 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 		$Session->set( 'Debuglogs', $sess_Debuglogs, 60 /* expire in 60 seconds */ );
 	}
 
-	// Transfer of Messages:
+	// Transfer of Messages to next page:
 	if( $Messages->count('all') )
 	{ // Set Messages into user's session, so they get restored on the next page (after redirect):
 		$Session->set( 'Messages', $Messages );
 	}
 
 	$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
-
 
  	// see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 	if( $permanent )
@@ -2330,9 +2334,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 		// Note: Also see http://de3.php.net/manual/en/function.header.php#50588 and the other comments around
 		header( 'HTTP/1.1 303 See Other' );
 	}
-	$status = $permanent ? 301 : 303;
 
-	$Debuglog->add('Redirecting to '.$redirect_to.' (status '.$status.')');
 	header( 'Location: '.$redirect_to, true, $status ); // explictly setting the status is required for (fast)cgi
 	exit();
 }
@@ -2761,6 +2763,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.160  2007/01/23 05:30:21  fplanque
+ * "Contact the owner"
+ *
  * Revision 1.159  2007/01/20 00:38:19  blueyed
  * Added Debulog entry in header_redirect()
  *

@@ -1321,10 +1321,45 @@ class Blog extends DataObject
 		return $this->owner_User;
 	}
 
+
+	/**
+	 * Template tag
+	 */
+	function contact_link( $params )
+	{
+		$this->get_owner_User();
+		if( ! $this->owner_User->allow_msgform )
+		{
+			return false;
+		}
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => '',
+				'after'       => '',
+				'text'        => 'Contact', // Note: left untranslated, should be translated in skin anyway
+				'title'       => 'Send a message to the owner of this blog...',
+			), $params );
+
+
+		echo $params['before'];
+		echo '<a href="'.url_add_param( $this->get('msgformurl'), 'recipient_id='.$this->owner_user_ID.'&amp;redirect_to='
+					// The URL will be made relative on the next page (this is needed when $htsrv_url is on another domain! -- multiblog situation )
+					.rawurlencode( regenerate_url('','','','&') ) );
+		echo '" title="'.$params['title'].'">'.$params['text'].'</a>';
+		echo $params['after'];
+
+		return true;
+	}
+
+
 }
 
 /*
  * $Log$
+ * Revision 1.60  2007/01/23 05:30:20  fplanque
+ * "Contact the owner"
+ *
  * Revision 1.59  2007/01/23 04:19:50  fplanque
  * handling of blog owners
  *

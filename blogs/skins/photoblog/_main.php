@@ -230,8 +230,16 @@ skin_content_header();	// Sets charset!
 <div id="pageFooter">
 
 	<p class="baseline">
-		<a href="<?php echo $Blog->get('msgformurl').'&amp;recipient_id=1&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $Blog->get('msgformurl'))); ?>">Contact</a>
-		|
+		<?php
+			// Display a link to contact the owner of this blog (if owner accepts messages):
+			$Blog->contact_link( array(
+					'before'      => '',
+					'after'       => ' | ',
+					'text'   => T_('Contact'),
+					'title'  => T_('Send a message to the owner of this blog...'),
+				) );
+		?>
+
 		<a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><?php echo T_('Last comments') ?></a>
 		|
 		<a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>">RSS 2.0</a> /

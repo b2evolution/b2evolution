@@ -287,14 +287,8 @@ locale_restore_previous();
 
 if( $success_mail )
 {
-	if( ! empty($recipient_name) )
-	{
-		$Messages->add( sprintf( T_('Your message has been e-mailed to %s.'), $recipient_name ), 'success' );
-	}
-	else
-	{
-		$Messages->add( T_('Your message has been e-mailed to the user.'), 'success' );
-	}
+	// Never say to whom we sent the email -- prevent user enumeration.
+	$Messages->add( T_('Your message has been sent.'), 'success' );
 }
 else
 {
@@ -311,6 +305,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.49  2007/01/23 05:30:21  fplanque
+ * "Contact the owner"
+ *
  * Revision 1.48  2006/12/12 02:53:56  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.
