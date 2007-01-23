@@ -1531,9 +1531,6 @@ class Results extends Table
 	 * - £var£
 	 * - #var#
 	 * - {row}
-	 * - {global_idx}
-	 * - {global_is_first}
-	 * - {global_is_last}
 	 * - %func()%
 	 * - ¤func()¤
 	 */
@@ -1549,12 +1546,6 @@ class Results extends Table
 		$content = preg_replace( '!\# (\w+) \#!ix', "\$row->$1", $content );
 		// Make variable substitution for full ROW:
 		$content = str_replace( '{row}', '$row', $content );
-		// Make variable substitution for full global_idx:
-		$content = str_replace( '{global_idx}', "\$this->global_idx", $content );
-		// Make variable substitution for full global_is_first:
-		$content = str_replace( '{global_is_first}', "\$this->global_is_first", $content );
-		// Make variable substitution for full global_is_last:
-		$content = str_replace( '{global_is_last}', "\$this->global_is_last", $content );
 		// Make callback function substitution:
 		$content = preg_replace( '#% (.+?) %#ix', "'.$1.'", $content );
 		// Make variable substitution for intanciated Object:
@@ -1976,6 +1967,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.48  2007/01/23 22:08:49  fplanque
+ * cleanup
+ *
  * Revision 1.47  2007/01/14 22:06:48  fplanque
  * support for customized 'no results' messages
  *
