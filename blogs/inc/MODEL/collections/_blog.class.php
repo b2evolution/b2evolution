@@ -374,6 +374,9 @@ class Blog extends DataObject
 			$this->set_setting( 'posts_per_feed', get_param( 'posts_per_feed' ) );
 
 			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
+
+ 			$this->set_setting( 'orderby', param( 'orderby', 'string', true ) );
+ 			$this->set_setting( 'orderdir', param( 'orderdir', 'string', true ) );
 		}
 
 
@@ -1351,6 +1354,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.63  2007/01/23 09:25:40  fplanque
+ * Configurable sort order.
+ *
  * Revision 1.62  2007/01/23 08:07:16  fplanque
  * Fixed blog URLs including urlnames
  *

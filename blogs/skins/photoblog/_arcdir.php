@@ -47,7 +47,8 @@ $SQL->FROM( 'T_categories INNER JOIN T_postcats ON cat_ID = postcat_cat_ID
 							INNER JOIN T_links ON post_ID = link_itm_ID
 							INNER JOIN T_files ON link_file_ID = file_ID' );
 $SQL->WHERE( 'cat_blog_ID = '.$Blog->ID ); // fp> TODO: want to restrict on images :]
-$SQL->ORDER_BY( 'post_datestart DESC, post_ID DESC, link_ID' );
+$SQL->ORDER_BY( 'post_'.$Blog->get_setting('orderby').' '.$Blog->get_setting('orderdir')
+								.', post_ID '.$Blog->get_setting('orderdir').', link_ID' );
 
 $FileList->sql = $SQL->get();
 
@@ -94,6 +95,8 @@ while( $File = & $FileList->get_next() )
 
 	// fp> TODO: CLEAN link. I really need an ItemListLight now :#
 	/*
+		WARNING: the above is not an ItemList, it's a FileList :/
+
 		Basic spec for ItemListLight:
 		- either params to ItemList2 or parent class. I'm not sure.
 		- no loading/nor querying of the content
@@ -122,6 +125,9 @@ echo '</table>';
 
 /*
  * $Log$
+ * Revision 1.6  2007/01/23 09:25:39  fplanque
+ * Configurable sort order.
+ *
  * Revision 1.5  2007/01/23 03:46:24  fplanque
  * cleaned up presentation
  *

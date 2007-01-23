@@ -34,6 +34,18 @@ $Form->begin_fieldset( T_('Description') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Content / Posts') );
+	$Form->select_input_array( 'orderby', $edited_Blog->get_setting('orderby'), array(
+												'datestart' => T_('Date issued (Default)'),
+												//'datedeadline' => T_('Deadline'),
+												'title'     => T_('Title'),
+												'datecreated' => T_('Date created'),
+												'datemodified' => T_('Date last modified'),
+												'urltitle'     => T_('URL Title'),
+												'priority'     => T_('Priority'),
+											), T_('Order by'), T_('Default ordering of posts.') );
+	$Form->select_input_array( 'orderdir', $edited_Blog->get_setting('orderdir'), array(
+												'ASC'  => T_('Ascending'),
+												'DESC' => T_('Descending'), ), T_('Direction') );
 	$Form->radio( 'what_to_show', $edited_Blog->get_setting('what_to_show'),
 								array(  array( 'days', T_('days') ),
 												array( 'posts', T_('posts') ),
@@ -75,6 +87,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.9  2007/01/23 09:25:40  fplanque
+ * Configurable sort order.
+ *
  * Revision 1.8  2007/01/08 02:11:55  fplanque
  * Blogs now make use of installed skins
  * next step: make use of widgets inside of skins

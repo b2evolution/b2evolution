@@ -157,8 +157,8 @@ class ItemList2 extends DataObjectList2
 				'ymdhms_max' => NULL,
 				'statuses' => NULL,
 				'visibility_array' => array( 'published', 'protected', 'private' ),
-				'order' => 'DESC',
-				'orderby' => 'datestart',
+				'orderby' =>  $this->Blog->get_setting('orderby'),
+				'order' => $this->Blog->get_setting('orderdir'),
 				'unit' => $this->Blog->get_setting('what_to_show'),
 				'posts' => $this->limit,
 				'page' => 1,
@@ -719,17 +719,17 @@ class ItemList2 extends DataObjectList2
 		}
 
 		/*
-		 * order by stuff:
+		 * ORDER BY stuff:
 		 */
 		$order = $this->filters['order'];
 
 		$orderby = str_replace( ' ', ',', $this->filters['orderby'] );
 		$orderby_array = explode( ',', $orderby );
 
-		// Format each order param with default colum names:
+		// Format each order param with default column names:
 		$orderby_array = preg_replace( '#^(.+)$#', $this->Cache->dbprefix.'$1 '.$order, $orderby_array );
 
-		// Add a parameter to make sure there is no ambiguity in ordering on similar items:
+		// Add an ID parameter to make sure there is no ambiguity in ordering on similar items:
 		$orderby_array[] = $this->Cache->dbIDname.' '.$order;
 
 		$order_by = implode( ', ', $orderby_array );
@@ -1626,6 +1626,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.48  2007/01/23 09:25:40  fplanque
+ * Configurable sort order.
+ *
  * Revision 1.47  2007/01/20 23:05:11  blueyed
  * todos
  *
