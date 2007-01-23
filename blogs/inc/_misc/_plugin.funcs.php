@@ -227,8 +227,7 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 			break;
 
 		case 'select':
-			$params['value'] = $set_value;
-			$Form->select_input_array( $input_name, $set_meta['options'], $set_label, $params );
+			$Form->select_input_array( $input_name, $set_value, $set_meta['options'], $set_label, NULL, $params );
 			break;
 
 		case 'select_blog':
@@ -973,6 +972,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.43  2007/01/23 08:57:36  fplanque
+ * decrap!
+ *
  * Revision 1.42  2006/12/22 22:36:07  blueyed
  * Fixed selecting selected "None" option in "multiple" selects
  *

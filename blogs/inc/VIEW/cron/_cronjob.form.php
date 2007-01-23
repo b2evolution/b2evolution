@@ -38,7 +38,7 @@ $Form->begin_form( 'fform', T_('New scheduled job') );
 
 	$Form->begin_fieldset( T_('Job details') . get_web_help_link('scheduler_job_form') );
 
-		$Form->select_input_array( 'cjob_type', $cron_job_names, T_('Job type') );
+		$Form->select_input_array( 'cjob_type', NULL, $cron_job_names, T_('Job type') );
 
 		$Form->date_input( 'cjob_date', date2mysql( $localtimenow ), T_('Schedule date'), array(
 							 'required' => true ) );
@@ -58,6 +58,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.4  2007/01/23 08:57:36  fplanque
+ * decrap!
+ *
  * Revision 1.3  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

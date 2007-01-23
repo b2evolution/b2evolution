@@ -76,10 +76,8 @@ $Form->begin_fieldset( T_('Feedback options') );
 			'published'  => T_('Published'),
 			'deprecated' => T_('Deprecated')
 		);
-	$Form->select_input_array( 'new_feedback_status', $status_options, T_('New feedback status') /* gets referred to in antispam settings form */, array(
-				'value' => $edited_Blog->get_setting('new_feedback_status'),
-				'note' => T_('This status will be assigned to any new comment/trackback (unless overriden by plugins).')
-			) );
+	$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
+				T_('New feedback status'), T_('This status will be assigned to any new comment/trackback (unless overriden by plugins).') );
 
 	$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Allow trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
 
@@ -92,6 +90,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.19  2007/01/23 08:57:35  fplanque
+ * decrap!
+ *
  * Revision 1.18  2007/01/23 04:19:50  fplanque
  * handling of blog owners
  *

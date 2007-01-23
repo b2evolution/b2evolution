@@ -1664,25 +1664,17 @@ class Form extends Widget
 	 *
 	 * @uses select_input_options()
 	 * @param string field name
+	 * @param mixed Initial value
 	 * @param array Options. If an associative key (string) is used, this gets the value attribute.
 	 * @param string Field label to be display before the field
+	 * @param string Note
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - 'value': The selected value
 	 *              - Plus all of {@link select_input_options()}.
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function select_input_array( $field_name, $field_options, $field_label, $field_params = array() )
+	function select_input_array( $field_name, $field_value, $field_options, $field_label, $field_note = NULL, $field_params = array() )
 	{
-		if( isset($field_params['value']) )
-		{
-			$field_value = $field_params['value'];
-			unset($field_params['value']); // not an attribute to <select>
-		}
-		else
-		{
-			$field_value = NULL;
-		}
-
 		// Build $options_list
 		$options_list = '';
 
@@ -1701,7 +1693,7 @@ class Form extends Widget
 			$options_list .= '>'.format_to_output($l_option).'</option>';
 		}
 
-		return $this->select_input_options( $field_name, $options_list, $field_label, '', $field_params );
+		return $this->select_input_options( $field_name, $options_list, $field_label, $field_note, $field_params );
 	}
 
 
@@ -2727,6 +2719,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.66  2007/01/23 08:57:36  fplanque
+ * decrap!
+ *
  * Revision 1.65  2007/01/07 05:25:09  fplanque
  * "fixed" regression :/
  *

@@ -105,10 +105,8 @@ if( empty( $edited_plugin_code ) )
 {
 	$render_note .= ' '.T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
 }
-$Form->select_input_array( 'edited_plugin_apply_rendering', $admin_Plugins->get_apply_rendering_values(), T_('Apply rendering'), array(
-	'value' => $edited_plugin_apply_rendering,
-	'note' => $render_note )
-	);
+$Form->select_input_array( 'edited_plugin_apply_rendering', $edited_plugin_apply_rendering,
+		$admin_Plugins->get_apply_rendering_values(), T_('Apply rendering'), $render_note );
 $Form->end_fieldset();
 
 
@@ -175,6 +173,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.30  2007/01/23 08:57:36  fplanque
+ * decrap!
+ *
  * Revision 1.29  2007/01/14 08:21:01  blueyed
  * Optimized "info", "disp_help" and "disp_help_plain" actions by refering to them through classname, which makes Plugins::discover() unnecessary
  *

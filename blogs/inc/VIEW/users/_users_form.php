@@ -215,7 +215,7 @@ $Form->begin_fieldset( T_('Preferences') );
 
 		$Form->select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options_return', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
 
-		$Form->select_input_array( 'edited_user_admin_skin', get_admin_skins(), T_('Admin skin'), array( 'value' => $value_admin_skin, 'note' => T_('The skin defines how the backoffice appears to you.') ) );
+		$Form->select_input_array( 'edited_user_admin_skin', $value_admin_skin, get_admin_skins(), T_('Admin skin'), T_('The skin defines how the backoffice appears to you.') );
 
 	  // fp> TODO: We gotta have something like $edited_User->UserSettings->get('legend');
 		// Icon/text thresholds:
@@ -359,6 +359,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.39  2007/01/23 08:57:36  fplanque
+ * decrap!
+ *
  * Revision 1.38  2006/12/17 23:42:39  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.

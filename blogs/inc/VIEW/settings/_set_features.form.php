@@ -78,8 +78,8 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 	// fp> TODO: this is IMPOSSIBLE to turn back on when you have no javascript!!! :((
 	echo '<div id="eblog_section" style="'.( $Settings->get('eblog_enabled') ? '' : 'display:none' ).'">';
 
-		$Form->select_input_array( 'eblog_method', array( 'pop3'=>T_('POP3'), 'pop3a' => T_('POP3 through IMAP extension (experimental)') ), // TRANS: E-Mail retrieval method
-			T_('Retrieval method'), array('value' => $Settings->get('eblog_method'), 'note' => T_('Choose a method to retrieve the emails.') ) );
+		$Form->select_input_array( 'eblog_method', $Settings->get('eblog_method'), array( 'pop3'=>T_('POP3'), 'pop3a' => T_('POP3 through IMAP extension (experimental)') ), // TRANS: E-Mail retrieval method
+			T_('Retrieval method'), T_('Choose a method to retrieve the emails.') );
 
 		$Form->text_input( 'eblog_server_host', $Settings->get('eblog_server_host'), 40, T_('Mail Server'), T_('Hostname or IP address of your incoming mail server.'), array( 'maxlength' => 255 ) );
 
@@ -176,6 +176,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.21  2007/01/23 08:57:36  fplanque
+ * decrap!
+ *
  * Revision 1.20  2006/12/12 20:41:41  blueyed
  * Whitespace
  *
