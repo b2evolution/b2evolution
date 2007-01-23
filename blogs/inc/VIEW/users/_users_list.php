@@ -65,9 +65,11 @@ if( !empty( $keywords ) )
 	}
 }
 
-$sql = "SELECT T_users.*, grp_ID, grp_name
+$sql = "SELECT T_users.*, grp_ID, grp_name, COUNT(blog_ID) AS nb_blogs
 					FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
+								LEFT JOIN T_blogs on user_ID = blog_owner_user_ID
 				 WHERE $where_clause 1
+				 GROUP BY user_ID
 				 ORDER BY grp_name, *";
 
 
@@ -132,7 +134,10 @@ function grp_actions( & $row )
 	{ // delete
 		$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'action', 'action=delete_group&amp;grp_ID='.$row->grp_ID ) );
 	}
-
+	else
+	{
+		$r .= get_icon( 'delete', 'noimg' );
+	}
 	return $r;
 }
 $Results->grp_cols[] = array(
@@ -153,12 +158,14 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 						'th' => T_('Login'),
+						'th_class' => 'shrinkwrap',
 						'order' => 'user_login',
 						'td' => '<a href="?ctrl=users&amp;user_ID=$user_ID$">$user_login$</a>',
 					);
 
 $Results->cols[] = array(
 						'th' => T_('Nickname'),
+						'th_class' => 'shrinkwrap',
 						'order' => 'user_nickname',
 						'td' => '$user_nickname$',
 					);
@@ -190,10 +197,19 @@ $Results->cols[] = array(
 								.get_icon( 'www', 'imgtag', array( 'class' => 'middle', 'title' => 'Website: $user_url$' ) ).'</a>\', \'&nbsp;\' )¤',
 					);
 
+$Results->cols[] = array(
+						'th' => T_('Blogs'),
+						'order' => 'nb_blogs',
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'center',
+						'td' => '¤conditional( (#nb_blogs# > 0), #nb_blogs#, \'&nbsp;\' )¤',
+					);
+
 if( ! $current_User->check_perm( 'users', 'edit', false ) )
 {
 	$Results->cols[] = array(
 						'th' => T_('Level'),
+						'th_class' => 'shrinkwrap',
 						'td_class' => 'right',
 						'order' => 'user_level',
 						'default_dir' => 'D',
@@ -202,28 +218,48 @@ if( ! $current_User->check_perm( 'users', 'edit', false ) )
 }
 else
 {
+	function display_level( $user_level, $user_ID )
+	{
+		$r = '';
+		if( $user_level > 0)
+		{
+			$r .= action_icon( TS_('Decrease user level'), 'decrease',
+							regenerate_url( 'action', 'action=promote&amp;prom=down&amp;user_ID='.$user_ID ) );
+		}
+		else
+		{
+			$r .= get_icon( 'decrease', 'noimg' );
+		}
+		$r .= sprintf( '<code>% 2d </code>', $user_level );
+		if( $user_level < 10 )
+		{
+			$r.= action_icon( TS_('Increase user level'), 'increase',
+							regenerate_url( 'action', 'action=promote&amp;prom=up&amp;user_ID='.$user_ID ) );
+		}
+		else
+		{
+	  	$r .= get_icon( 'increase', 'noimg' );
+		}
+		return $r;
+	}
 	$Results->cols[] = array(
 						'th' => T_('Level'),
-						'td_class' => 'right',
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
 						'order' => 'user_level',
 						'default_dir' => 'D',
-						'td' => '¤conditional( (#user_level# > 0), \''
-											.action_icon( TS_('Decrease user level'), 'decrease',
-												'%regenerate_url( \'action\', \'action=promote&amp;prom=down&amp;user_ID=$user_ID$\' )%' ).'\' )¤'
-										.'$user_level$ '
-										.'¤conditional( (#user_level# < 10), \''
-											.action_icon( TS_('Increase user level'), 'increase',
-												'%regenerate_url( \'action\', \'action=promote&amp;prom=up&amp;user_ID=$user_ID$\' )%' ).'\' )¤',
+						'td' => '%display_level( #user_level#, #user_ID# )%',
 					);
-
 
 	$Results->cols[] = array(
 						'th' => T_('Actions'),
 						'td_class' => 'shrinkwrap',
 						'td' => action_icon( T_('Edit this user...'), 'edit', '%regenerate_url( \'action\', \'user_ID=$user_ID$\' )%' )
 										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'action\', \'action=new_user&amp;user_ID=$user_ID$\' )%' )
-										.'¤conditional( (#user_ID# != 1) && (#user_ID# != '.$current_User->ID.'), \''
-											.action_icon( T_('Delete this user!'), 'delete', '%regenerate_url( \'action\', \'action=delete_user&amp;user_ID=$user_ID$\' )%' ).'\' )¤'
+										.'¤conditional( (#user_ID# != 1) && (#nb_blogs# < 1) && (#user_ID# != '.$current_User->ID.'), \''
+											.action_icon( T_('Delete this user!'), 'delete',
+												'%regenerate_url( \'action\', \'action=delete_user&amp;user_ID=$user_ID$\' )%' ).'\', \''
+	                    .get_icon( 'delete', 'noimg' ).'\' )¤'
 					);
 }
 
@@ -234,6 +270,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.14  2007/01/23 22:09:03  fplanque
+ * visual alignment
+ *
  * Revision 1.13  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
