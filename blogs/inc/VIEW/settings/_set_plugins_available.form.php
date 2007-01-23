@@ -145,6 +145,7 @@ while( $loop_Plugin = & $AvailablePlugins->get_next() )
 			echo format_to_output($clean_version);
 		$Table->display_col_end();
 
+		// HELP COL:
 		$Table->display_col_start();
 			echo action_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_class', 'action=info&amp;plugin_class='.$loop_Plugin->classname ) );
 			// Help icons, if available:
@@ -197,6 +198,9 @@ $Table->display_list_end();
 
 /*
  * $Log$
+ * Revision 1.11  2007/01/23 22:23:04  fplanque
+ * FIXED (!!!) disappearing help window!
+ *
  * Revision 1.10  2007/01/14 08:21:01  blueyed
  * Optimized "info", "disp_help" and "disp_help_plain" actions by refering to them through classname, which makes Plugins::discover() unnecessary
  *

@@ -1832,7 +1832,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word
 	// "use_js_popup": open link in a JS popup
 	if( ! empty($link_attribs['use_js_popup']) )
 	{
-		$popup_js = 'var win = new PopupWindow(); win.autoHide(); win.setUrl( \''.$link_attribs['href'].'\' ); win.setSize(  ); ';
+		$popup_js = 'var win = new PopupWindow(); win.setUrl( \''.$link_attribs['href'].'\' ); win.setSize(  ); ';
 
 		if( isset($link_attribs['use_js_size']) )
 		{
@@ -2806,6 +2806,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.162  2007/01/23 22:23:04  fplanque
+ * FIXED (!!!) disappearing help window!
+ *
  * Revision 1.161  2007/01/23 21:44:43  fplanque
  * handle generic "empty"/noimg icons
  *
