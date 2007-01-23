@@ -604,7 +604,7 @@ while( $lFile = & $fm_Filelist->get_next() )
 		}
 		else
 		{
-			echo get_icon( 'no_edit', 'imgtag', array( 'class' => 'action_icon' ) );
+			echo get_icon( 'edit', 'noimg' );
 		}
 	}
 
@@ -980,6 +980,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.38  2007/01/23 22:30:14  fplanque
+ * empty icons cleanup
+ *
  * Revision 1.37  2007/01/09 00:55:16  blueyed
  * fixed typo(s)
  *

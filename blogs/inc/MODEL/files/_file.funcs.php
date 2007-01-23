@@ -683,7 +683,7 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 	// Handle potential subdir:
 	if( ! $has_sub_dirs )
 	{	// No subirs
-		$r['string'] .= get_icon( 'noexpand' ).'&nbsp;'.$label.'</span>';
+		$r['string'] .= get_icon( 'expand', 'noimg', array( 'class'=>'' ) ).'&nbsp;'.$label.'</span>';
 		return $r;
 	}
 	else
@@ -783,6 +783,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.44  2007/01/23 22:30:14  fplanque
+ * empty icons cleanup
+ *
  * Revision 1.43  2006/12/22 01:17:37  fplanque
  * fix
  *

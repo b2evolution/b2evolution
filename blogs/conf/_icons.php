@@ -209,11 +209,6 @@ function get_icon_info($name)
 			'legend' => T_('Collapse'),
 			'size' => array( 15, 15 ),
 		);
-		case 'noexpand': return array(
-			'file' => $rsc_subdir.'icons/blank.gif',
-			'alt'  => '&nbsp;',
-			'size' => array( 15, 15 ),
-		);
 
 		case 'refresh': return array(
 			'file' => $rsc_subdir.'icons/refresh.png',
@@ -270,11 +265,6 @@ function get_icon_info($name)
 		case 'edit': return array(
 			'file' => $rsc_subdir.'icons/edit.gif',
 			'alt'  => T_('Edit'),
-			'size' => array( 16, 15 ),
-		);
-		case 'no_edit': return array(	// placeholder
-			'file' => $rsc_subdir.'img/blank.gif',
-			'alt'  => '',
 			'size' => array( 16, 15 ),
 		);
 		case 'properties': return array(
@@ -500,6 +490,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.54  2007/01/23 22:30:14  fplanque
+ * empty icons cleanup
+ *
  * Revision 1.53  2007/01/07 18:42:35  fplanque
  * cleaned up reload/refresh icons & links
  *
