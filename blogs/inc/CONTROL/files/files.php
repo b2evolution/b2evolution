@@ -187,6 +187,28 @@ $AdminUI->add_menu_entries(
 	);
 
 
+// Update settings NOW since they may affect the FileList
+if( $action == 'update_settings' )
+{ // Updating user settings from options list
+	$UserSettings->set( 'fm_dirsnotattop',   1-param( 'option_dirsattop',        'integer', 0 ) );
+	$UserSettings->set( 'fm_permlikelsl',      param( 'option_permlikelsl',      'integer', 0 ) );
+	$UserSettings->set( 'fm_imglistpreview',   param( 'option_imglistpreview',   'integer', 0 ) );
+	$UserSettings->set( 'fm_getimagesizes',    param( 'option_getimagesizes',    'integer', 0 ) );
+	$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
+	$UserSettings->set( 'fm_showtypes',        param( 'option_showtypes',        'integer', 0 ) );
+	$UserSettings->set( 'fm_showfsperms',      param( 'option_showfsperms',      'integer', 0 ) );
+	$UserSettings->set( 'fm_showfsowner',      param( 'option_showfsowner',      'integer', 0 ) );
+	$UserSettings->set( 'fm_showfsgroup',      param( 'option_showfsgroup',      'integer', 0 ) );
+	$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
+
+	if( $UserSettings->dbupdate() )
+	{
+		$Messages->add( T_('Your user settings have been updated.'), 'success' );
+	}
+
+	$action = 'list';
+}
+
 /**
  * Filelist
  * fp>> TODO: When the user is viewing details for a file he should (by default) not be presented with the filelist in addition to the file properties
@@ -264,28 +286,6 @@ else
 }
 
 
-if( $action == 'update_settings' )
-{ // Updating user settings from options list
-	$UserSettings->set( 'fm_dirsnotattop',   1-param( 'option_dirsattop',        'integer', 0 ) );
-	$UserSettings->set( 'fm_permlikelsl',      param( 'option_permlikelsl',      'integer', 0 ) );
-	$UserSettings->set( 'fm_imglistpreview',   param( 'option_imglistpreview',   'integer', 0 ) );
-	$UserSettings->set( 'fm_getimagesizes',    param( 'option_getimagesizes',    'integer', 0 ) );
-	$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
-	$UserSettings->set( 'fm_showtypes',        param( 'option_showtypes',        'integer', 0 ) );
-	$UserSettings->set( 'fm_showfsperms',      param( 'option_showfsperms',      'integer', 0 ) );
-	$UserSettings->set( 'fm_showfsowner',      param( 'option_showfsowner',      'integer', 0 ) );
-	$UserSettings->set( 'fm_showfsgroup',      param( 'option_showfsgroup',      'integer', 0 ) );
-	$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
-
-	if( $UserSettings->dbupdate() )
-	{
-		$Messages->add( T_('Your user settings have been updated.'), 'success' );
-	}
-
-	$action = '';
-}
-
-
 // Do we want to display the directory tree next to the files table
 $UserSettings->param_Request( 'fm_hide_dirtree', 'fm_hide_dirtree', 'integer', 0, true );
 
@@ -326,7 +326,7 @@ if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 
 if( empty($ads_list_path) )
 { // We have no Root / list path, there was an error. Unset any action or mode.
-	$action = '';
+	$action = 'nil';
 	$fm_mode = NULL;
 }
 
@@ -338,7 +338,7 @@ if( ! empty($action) )
 		case 'filter_unset':
 			forget_param( 'fm_filter' );
 			$fm_filter = '';
-			$action = '';
+			$action = 'list';
 			break;
 
 		case 'createnew':
@@ -824,7 +824,7 @@ switch( $action )
 		{
 			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edit_File->dget('name') ), 'error' );
 	 		// Leave special display mode:
-			$action = '';
+			$action = 'list';
 			break;
 		}
 
@@ -1353,7 +1353,7 @@ $AdminUI->disp_body_top();
 /*
  * Display payload:
  */
-if( !empty($action ) )
+if( !empty($action ) && $action != 'list' && $action != 'nil' )
 {
 	$AdminUI->disp_payload_begin();
 
@@ -1435,6 +1435,12 @@ switch( $fm_mode )
 		// Links dialog:
 		$AdminUI->disp_view( 'files/_files_links.inc.php' );
 		break;
+
+	case 'settings':
+		// Display settings dialog:
+		$AdminUI->disp_view( 'files/_file_displaysettings.form.php' );
+		break;
+
 }
 
 
@@ -1454,6 +1460,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.50  2007/01/24 05:57:55  fplanque
+ * cleanup / settings
+ *
  * Revision 1.49  2007/01/24 03:45:29  fplanque
  * decrap / removed a lot of bloat...
  *

@@ -40,7 +40,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param integer bytes
  * @return string bytes made readable
  */
-function bytesreadable( $bytes )
+function bytesreadable( $bytes, $decimals = 2 )
 {
 	static $types = NULL;
 
@@ -60,7 +60,7 @@ function bytesreadable( $bytes )
 		$bytes /= 1024;
 	}
 
-	$r = round($bytes, 2).'&nbsp;';
+	$r = round($bytes, $decimals).'&nbsp;';
 	$r .= '<abbr title="'.$types[$i]['text'].'">';
 	$r .= $types[$i]['abbr'];
 	$r .= '</abbr>';
@@ -783,6 +783,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.46  2007/01/24 05:57:55  fplanque
+ * cleanup / settings
+ *
  * Revision 1.45  2007/01/24 03:45:29  fplanque
  * decrap / removed a lot of bloat...
  *

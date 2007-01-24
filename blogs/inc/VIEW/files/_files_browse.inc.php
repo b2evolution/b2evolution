@@ -84,25 +84,6 @@ global $Blog;
 global $fm_hide_dirtree, $create_name, $ads_list_path;
 
 
-echo '<div id="filemanmain">';
-
-?>
-
-<!-- FLAT MODE: -->
-
-<?php
-$Form = & new Form( NULL, 'fmbar_flatmode', 'post', 'none' );
-$Form->begin_form( 'toolbaritem' );
-	$Form->hidden_ctrl();
-	$Form->hiddens_by_key( get_memorized('fm_flatmode') );
-	if( ! $fm_flatmode )
-	{
-		$Form->hidden( 'fm_flatmode', 1 );
-	}
-	$Form->button( array( 'class' => 'ActionButton',
-			'title' => ( $fm_flatmode ? T_('Normal mode') : T_('All files and folders, including subdirectories') ),
-			'value' => ( $fm_flatmode ? T_('Normal mode') : T_('Flat mode') ) ) );
-$Form->end_form();
 ?>
 
 
@@ -212,6 +193,27 @@ $Form->end_form();
 		{
 			echo ' <a href="'.regenerate_url('fm_hide_dirtree', 'fm_hide_dirtree=1').'">'.T_('Hide directory tree').'</a>';
 		}
+
+		/*
+		 * Flat mode
+		 */
+		echo ' - ';
+		if( $fm_flatmode )
+		{
+			echo ' <a href="'.regenerate_url('fm_flatmode', 'fm_flatmode=0').'" title="'
+						.T_('View one folder per page').'">'.T_('Folder mode').'</a>';
+		}
+		else
+		{
+			echo ' <a href="'.regenerate_url('fm_flatmode', 'fm_flatmode=1').'" title="'
+						.T_('View all files and subfolders on a single page').'">'.T_('Flat mode').'</a>';
+		}
+
+		/*
+		 * Settings:
+		 */
+		echo ' - <a href="'.regenerate_url('fm_mode', 'fm_mode=settings').'" title="'
+						.T_('Edit display settings').'">'.T_('Display settings').'</a>';
 
 		echo '</div> ';
 
@@ -893,57 +895,11 @@ if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add
 <div class="clear"></div>
 
 <?php
-
-
-// ------------------
-// Display options:
-// Let's keep these at the end since they won't be accessed more than occasionaly
-// and only by advanced users
-// ------------------
-param( 'options_show', 'integer', 0 );
-
-$Form = & new Form( NULL, 'fm_options_checkchanges', 'get', 'none' );
-	$Form->label_to_the_left = false;
-	$Form->label_suffix = '';
-	$Form->fieldend = '<br />';
-
-	$Form->begin_form( 'fform' );
-		$Form->hidden_ctrl();
-		$Form->hidden( 'options_show', 1 );
-		$Form->hiddens_by_key( get_memorized() );
-
-		// Link to toggle the display of the form
-		global $options_show;
-		$toggle_link = '['.get_link_showhide( 'options_toggle', 'options_list', T_('Hide menu'), T_('Show menu'), !$options_show ).']';
-
-		$Form->begin_fieldset( T_('Options').$toggle_link );
-
-		echo '<div id="options_list" ';
-		if( !$options_show ) echo ' style="display:none"';
-		echo '>';
-			$Form->checkbox( 'option_dirsattop', !$UserSettings->get('fm_dirsnotattop'), T_('Sort directories at top') );
-			$Form->checkbox( 'option_showtypes', $UserSettings->get('fm_showtypes'), T_('Show file types') );
-			$Form->checkbox( 'option_imglistpreview', $UserSettings->get('fm_imglistpreview'), T_('Display thumbnails for image files') );
-			$Form->checkbox( 'option_getimagesizes', $UserSettings->get('fm_getimagesizes'), T_('Display the image size of image files') );
-			$Form->checkbox( 'option_showfsperms', $UserSettings->get('fm_showfsperms'), T_('Show file perms') );
-			$Form->checkbox( 'option_showfsowner', $UserSettings->get('fm_showfsowner'), T_('Show file owners') );
-			$Form->checkbox( 'option_showfsgroup', $UserSettings->get('fm_showfsgroup'), T_('Show file groups') );
-			$Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Show hidden files') );
-			$Form->checkbox( 'option_permlikelsl', $UserSettings->get('fm_permlikelsl'), T_('Display file permissions like "rwxr-xr-x" rather than short form') );
-			$Form->checkbox( 'option_recursivedirsize', $UserSettings->get('fm_recursivedirsize'), T_('Recursive size of directories') );
-
-			$Form->submit( array('actionArray[update_settings]', T_('Update !'), 'ActionButton') );
-		echo '</div>';
-
-		$Form->end_fieldset();
-	$Form->end_form();
-?>
-
-</div>
-
-<?php
 /*
  * $Log$
+ * Revision 1.42  2007/01/24 05:57:55  fplanque
+ * cleanup / settings
+ *
  * Revision 1.41  2007/01/24 03:45:29  fplanque
  * decrap / removed a lot of bloat...
  *

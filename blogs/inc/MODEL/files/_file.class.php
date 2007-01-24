@@ -883,7 +883,7 @@ class File extends DataObject
 		}
 		else
 		{
-			return bytesreadable( $this->_size );
+			return bytesreadable( $this->_size, 0 );
 		}
 	}
 
@@ -1678,6 +1678,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2007/01/24 05:57:55  fplanque
+ * cleanup / settings
+ *
  * Revision 1.35  2007/01/19 10:45:42  fplanque
  * images everywhere :D
  * At this point the photoblogging code can be considered operational.
