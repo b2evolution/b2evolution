@@ -149,11 +149,11 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 
 		$this->assertEqual(
 			implode_with_and( array('one', 'two') ),
-			'one and two' );
+			'one &amp; two' );
 
 		$this->assertEqual(
 			implode_with_and( array('one', 'two', 'three') ),
-			'one, two and three' );
+			'one, two &amp; three' );
 	}
 
 

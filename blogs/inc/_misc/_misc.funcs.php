@@ -2624,7 +2624,7 @@ function is_admin_page()
  * @todo Support for locales that have a different kind of enumeration?!
  * @return string
  */
-function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
+function implode_with_and( $arr, $implode_by = ', ', $implode_last = ' &amp; ' )
 {
 	switch( count($arr) )
 	{
@@ -2636,11 +2636,6 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 			return $r;
 
 		default:
-			if( ! isset($implode_last) )
-			{
-				$implode_last = /* TRANS: Used to append the last element of an enumeration of at least two strings */ T_(' and ');
-			}
-
 			$r = implode( $implode_by, array_slice( $arr, 0, -1 ) )
 			    .$implode_last.array_pop( $arr );
 			return $r;
@@ -2806,6 +2801,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.163  2007/01/24 01:32:30  fplanque
+ * 'zip & css' is more readable than 'zip and css'
+ *
  * Revision 1.162  2007/01/23 22:23:04  fplanque
  * FIXED (!!!) disappearing help window!
  *
