@@ -80,67 +80,13 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.7  2007/01/24 02:35:42  fplanque
+ * refactoring
+ *
  * Revision 1.6  2006/12/23 22:53:10  fplanque
  * extra security
  *
  * Revision 1.5  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.4  2006/04/19 20:13:51  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.3  2006/03/12 23:09:01  fplanque
- * doc cleanup
- *
- * Revision 1.2  2006/03/12 03:03:33  blueyed
- * Fixed and cleaned up "filemanager".
- *
- * Revision 1.1  2006/02/23 21:12:17  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.13  2006/02/11 21:19:29  fplanque
- * added bozo validator to FM
- *
- * Revision 1.12  2005/12/12 19:21:20  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.11  2005/10/31 23:20:45  fplanque
- * keeping things straight...
- *
- * Revision 1.10  2005/10/28 20:08:46  blueyed
- * Normalized AdminUI
- *
- * Revision 1.9  2005/09/06 17:13:53  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.8  2005/08/22 18:42:25  fplanque
- * minor
- *
- * Revision 1.7  2005/07/29 19:43:53  blueyed
- * minor: forceFM is a user setting!; typo in comment.
- *
- * Revision 1.6  2005/05/09 16:09:31  fplanque
- * implemented file manager permissions through Groups
- *
- * Revision 1.5  2005/04/28 20:44:18  fplanque
- * normalizing, doc
- *
- * Revision 1.4  2005/04/27 19:05:43  fplanque
- * normalizing, cleanup, documentaion
- *
- * Revision 1.3  2005/04/15 18:02:58  fplanque
- * finished implementation of properties/meta data editor
- * started implementation of files to items linking
- *
- * Revision 1.2  2005/04/14 19:57:51  fplanque
- * filemanager refactoring & cleanup
- * started implementation of properties/meta data editor
- * note: the whole fm_mode thing is not really desireable...
- *
- * Revision 1.1  2005/04/14 18:34:02  fplanque
- * filemanager refactoring
- *
  */
 ?>

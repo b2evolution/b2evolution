@@ -891,20 +891,19 @@ if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_crea
 /*
  * UPLOAD:
  */
-if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) && $fm_mode != 'file_upload' )
+if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) )
 {	// Upload is enabled and we have permission to use it...
 	echo "<!-- QUICK UPLOAD: -->\n";
 	$Form = & new Form( NULL, 'fmbar_quick_upload', 'post', 'none', 'multipart/form-data' );
 	$Form->begin_form( 'toolbaritem' );
-		$Form->hidden_ctrl();
+		$Form->hidden( 'ctrl', 'upload' );
 		$Form->hidden( 'upload_quickmode', 1 );
 		// The following is mainly a hint to the browser.
 		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
-		$Form->hiddens_by_key( get_memorized('fm_mode') );
-		$Form->hidden( 'fm_mode', 'file_upload' );
+		$Form->hiddens_by_key( get_memorized('ctrl,fm_mode') );
 		echo '<div>';
 		echo '<input name="uploadfile[]" type="file" size="10" />';
-		echo '<input class="ActionButton" type="submit" value="'.T_('Quick Upload!').'" />';
+		echo '<input class="ActionButton" type="submit" value="'.T_('Upload!').'" />';
 		echo '</div>';
 	$Form->end_form();
 }
@@ -953,7 +952,6 @@ $Form = & new Form( NULL, 'fm_options_checkchanges', 'get', 'none' );
 			$Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Show hidden files') );
 			$Form->checkbox( 'option_permlikelsl', $UserSettings->get('fm_permlikelsl'), T_('Display file permissions like "rwxr-xr-x" rather than short form') );
 			$Form->checkbox( 'option_recursivedirsize', $UserSettings->get('fm_recursivedirsize'), T_('Recursive size of directories') );
-			$Form->checkbox( 'option_forceFM', $UserSettings->get('fm_forceFM'), T_('Always show the Filemanager'), 'Display the Filemanager also in modes like upload.' );
 
 			$Form->submit( array('actionArray[update_settings]', T_('Update !'), 'ActionButton') );
 		echo '</div>';
@@ -970,6 +968,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.40  2007/01/24 02:35:42  fplanque
+ * refactoring
+ *
  * Revision 1.39  2007/01/24 01:40:14  fplanque
  * Upload tab now stays in context
  *

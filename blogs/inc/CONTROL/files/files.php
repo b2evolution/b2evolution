@@ -140,6 +140,11 @@ if( ! $fm_FileRoot )
 	else
 	{
 		$Messages->add( T_('You don\'t have access to any root directory.'), 'error' );
+		$AdminUI->disp_html_head();
+		// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+		$AdminUI->disp_body_top();
+		$AdminUI->disp_global_footer();
+		exit();
 	}
 }
 
@@ -174,22 +179,6 @@ if( $fm_FileRoot )
 			$path = get_canonical_path( $path );
 		}
 	}
-}
-
-
-// If there were errors, display them and exit (especially in case there's no valid FileRoot ($fm_FileRoot)):
-if( $Messages->count('error') )
-{
-	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-	$AdminUI->disp_html_head();
-
-	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-	$AdminUI->disp_body_top();
-	$AdminUI->disp_payload_begin();
-	$AdminUI->disp_payload_end();
-
-	$AdminUI->disp_global_footer();
-	exit();
 }
 
 
@@ -296,7 +285,6 @@ if( $action == 'update_settings' )
 	$UserSettings->set( 'fm_showfsowner',      param( 'option_showfsowner',      'integer', 0 ) );
 	$UserSettings->set( 'fm_showfsgroup',      param( 'option_showfsgroup',      'integer', 0 ) );
 	$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
-	$UserSettings->set( 'fm_forceFM',          param( 'option_forceFM',          'integer', 0 ) );
 
 	if( $UserSettings->dbupdate() )
 	{
@@ -1094,210 +1082,13 @@ switch( $fm_mode )
 		}
 		break;
 
+
 	case 'file_properties':
 		// Check permission!
  		$current_User->check_perm( 'files', 'edit', true );
 
 		$edit_File = & $selected_Filelist->get_by_idx(0);
 		$edit_File->load_meta();
-		break;
-
-	case 'file_upload':
-		// {{{
-		/*
-		 * upload mode
-		 */
-		// Check permissions:
-		if( ! $Settings->get('upload_enabled') )
-		{ // Upload is globally disabled
-			$Messages->add( T_('Upload is disabled.'), 'error' );
-			$fm_mode = NULL;
-			break;
-		}
-
-		if( ! $current_User->check_perm( 'files', 'add' ) )
-		{ // We do not have permission to add files
-			$Messages->add( T_('You have no permission to add/upload files.'), 'error' );
-			$fm_mode = NULL;
-			break;
-		}
-
-		// Quick mode means "just upload and leave mode when successful"
-		param( 'upload_quickmode', 'integer', 0 );
-
-		/**
-		 * Remember failed files (and the error messages)
-		 * @var array
-		 */
-		$failedFiles = array();
-
-		// Process uploaded files:
-		if( isset($_FILES) && count( $_FILES ) )
-		{ // Some files have been uploaded:
-			param( 'uploadfile_title', 'array', array() );
-			param( 'uploadfile_alt', 'array', array() );
-			param( 'uploadfile_desc', 'array', array() );
-			param( 'uploadfile_name', 'array', array() );
-
-			foreach( $_FILES['uploadfile']['name'] as $lKey => $lName )
-			{
-				if( empty( $lName ) )
-				{ // No file name
-					if( $upload_quickmode )
-					{
-						$Messages->add( T_( 'Please select a local file to upload.' ) );
-					}
-					elseif( !empty( $uploadfile_title[$lKey] )
-					     || !empty( $uploadfile_alt[$lKey] )
-					     || !empty( $uploadfile_desc[$lKey] )
-					     || !empty( $uploadfile_name[$lKey] ) )
-					{ // User specified params but NO file!!!
-						// Remember the file as failed when additional info provided.
-						$failedFiles[$lKey] = T_( 'Please select a local file to upload.' );
-					}
-					// Abort upload for this file:
-					continue;
-				}
-
-				if( $Settings->get( 'upload_maxkb' )
-				    && $_FILES['uploadfile']['size'][$lKey] > $Settings->get( 'upload_maxkb' )*1024 )
-				{ // bigger than defined by blog
-					$failedFiles[$lKey] = sprintf(
-							/* TRANS: %s will be replaced by the difference */ T_('The file is %s too large. Maximum allowed is: %s.'),
-							bytesreadable( $_FILES['uploadfile']['size'][$lKey] - $Settings->get( 'upload_maxkb' ) ),
-							bytesreadable($Settings->get( 'upload_maxkb' )*1024) );
-					// Abort upload for this file:
-					continue;
-				}
-
-				if( $_FILES['uploadfile']['error'][$lKey] )
-				{ // PHP has detected an error!:
-					switch( $_FILES['uploadfile']['error'][$lKey] )
-					{
-						case UPLOAD_ERR_FORM_SIZE:
-							// The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.
-
-							// This can easily be changed, so we do not use it.. file size gets checked for real just above.
-							break;
-
-						case UPLOAD_ERR_INI_SIZE: // bigger than allowed in php.ini
-							$failedFiles[$lKey] = T_('The file exceeds the upload_max_filesize directive in php.ini.');
-							// Abort upload for this file:
-							continue;
-
-						case UPLOAD_ERR_PARTIAL:
-							$failedFiles[$lKey] = T_('The file was only partially uploaded.');
-							// Abort upload for this file:
-							continue;
-
-						case UPLOAD_ERR_NO_FILE:
-							// Is probably the same as empty($lName) before.
-							$failedFiles[$lKey] = T_('No file was uploaded.');
-							// Abort upload for this file:
-							continue;
-
-						case 6: // numerical value of UPLOAD_ERR_NO_TMP_DIR
-						# (min_php: 4.3.10, 5.0.3) case UPLOAD_ERR_NO_TMP_DIR:
-							// Missing a temporary folder.
-							$failedFiles[$lKey] = T_('Missing a temporary folder (upload_tmp_dir in php.ini).');
-							// Abort upload for this file:
-							continue;
-
-						default:
-							$failedFiles[$lKey] = T_('Unknown error.').' #'.$_FILES['uploadfile']['error'][$lKey];
-							// Abort upload for this file:
-							continue;
-					}
-				}
-
-				if( !is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey] ) )
-				{ // Ensure that a malicious user hasn't tried to trick the script into working on files upon which it should not be working.
-					$failedFiles[$lKey] = T_('The file does not seem to be a valid upload!');
-					// Abort upload for this file:
-					continue;
-				}
-
-				// Use new name on server if specified:
-				$newName = !empty( $uploadfile_name[ $lKey ] ) ? $uploadfile_name[ $lKey ] : $lName;
-
-				if( $error_filename = validate_filename( $newName ) )
-				{ // Not a file name or not an allowed extension
-					$failedFiles[$lKey] = $error_filename;
-					// Abort upload for this file:
-					continue;
-				}
-
-				// Get File object for requested target location:
-				$FileCache = & get_Cache( 'FileCache' );
-				$newFile = & $FileCache->get_by_root_and_path( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID(), $fm_Filelist->get_rds_list_path().$newName, true );
-
-				if( $newFile->exists() )
-				{ // The file already exists in the target location!
-					// TODO: Rename/Overwriting (save as filename_<numeric_extension> and provide interface to confirm, rename or overwrite)
-					$failedFiles[$lKey] = sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newFile->dget('name') );
-					// Abort upload for this file:
-					continue;
-				}
-
-				// Attempt to move the uploaded file to the requested target location:
-				if( !move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->get_full_path() ) )
-				{
-					$failedFiles[$lKey] = T_('An unknown error occurred when moving the uploaded file on the server.');
-					// Abort upload for this file:
-					continue;
-				}
-
-				// change to default chmod settings
-				if( $newFile->chmod( NULL ) === false )
-				{ // add a note, this is no error!
-					$Messages->add( sprintf( T_('Could not change permissions of &laquo;%s&raquo; to default chmod setting.'), $newFile->dget('name') ), 'note' );
-				}
-
-				// Refreshes file properties (type, size, perms...)
-				$newFile->load_properties();
-
-				// Store extra info about the file into File Object:
-				if( isset( $uploadfile_title[$lKey] ) )
-				{ // If a title text has been passed... (does not happen in quick upload mode)
-					$newFile->set( 'title', trim( strip_tags($uploadfile_title[$lKey])) );
-				}
-				if( isset( $uploadfile_alt[$lKey] ) )
-				{ // If an alt text has been passed... (does not happen in quick upload mode)
-					$newFile->set( 'alt', trim( strip_tags($uploadfile_alt[$lKey])) );
-				}
-				if( isset( $uploadfile_desc[$lKey] ) )
-				{ // If a desc text has been passed... (does not happen in quick upload mode)
-					$newFile->set( 'desc', trim( strip_tags($uploadfile_desc[$lKey])) );
-				}
-
-				$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->dget('name') );
-				if( $mode == 'upload' )
-				{
-					// TODO: Add plugin hook to allow generating JS insert code(s)
-					$img_tag = format_to_output( $newFile->get_tag(), 'formvalue' );
-					$success_msg .=
-						'<ul>'
-							.'<li>'.T_("Here's the code to display it:").' <input type="text" value="'.$img_tag.'" /></li>'
-							.'<li><a href="#" onclick="if( window.focus && window.opener ){ window.opener.focus(); textarea_replace_selection( window.opener.document.getElementById(\'itemform_post_content\'), \''.format_to_output( $newFile->get_tag(), 'formvalue' ).'\', window.opener.document ); } return false;">'.T_('Add the code to your post !').'</a></li>'
-						.'</ul>';
-				}
-
-				$Messages->add( $success_msg, 'success' );
-
-				// Store File object into DB:
-				$newFile->dbsave();
-
-				// Tell the filemanager about the new file:
-				$fm_Filelist->add( $newFile );
-			}
-
-			if( $upload_quickmode && !$failedFiles )
-			{ // we're quick uploading and have no failed files, leave the mode
-				$fm_mode = NULL;
-			}
-		}
-
-		// }}}
 		break;
 
 
@@ -1636,11 +1427,6 @@ switch( $fm_mode )
 		$AdminUI->disp_view( 'files/_files_cmr.inc.php' );
 		break;
 
-	case 'file_upload':
-		// Upload dialog:
-		$AdminUI->disp_view( 'files/_files_upload.inc.php' );
-		break;
-
 	case 'file_edit':
 		// File Edit dialog:
 		$AdminUI->disp_view( 'files/_file_edit.form.php' );
@@ -1669,7 +1455,7 @@ if( isset($fm_forceFM) )
 { // display FM, but no "close" icon
 	$disp_fm_browser = $fm_forceFM;
 }
-elseif( $fm_mode && ! $UserSettings->get('fm_forceFM') )
+elseif( $fm_mode )
 {
 	$disp_fm_browser = $fm_disp_browser;
 	$disp_fm_browser_toggle = true;
@@ -1700,6 +1486,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.48  2007/01/24 02:35:42  fplanque
+ * refactoring
+ *
  * Revision 1.47  2007/01/24 01:40:15  fplanque
  * Upload tab now stays in context
  *
@@ -1736,56 +1525,5 @@ $AdminUI->disp_global_footer();
  *
  * Revision 1.35  2006/11/24 18:27:23  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.34  2006/09/30 16:55:57  blueyed
- * $create param for media dir handling, which allows to just get the dir, without creating it.
- *
- * Revision 1.33  2006/08/20 22:25:20  fplanque
- * param_() refactoring part 2
- *
- * Revision 1.32  2006/08/20 20:12:32  fplanque
- * param_() refactoring part 1
- *
- * Revision 1.31  2006/08/19 10:57:40  blueyed
- * doc fixes.
- *
- * Revision 1.30  2006/08/19 07:56:29  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.29  2006/07/28 18:27:10  blueyed
- * Basic image preview for image files in the file list
- *
- * Revision 1.28  2006/07/28 17:30:30  blueyed
- * Refer to itemform_post_content field by ID, as its form has no name anymore
- *
- * Revision 1.27  2006/07/17 01:53:12  blueyed
- * added param to UserSettings::param_Request
- *
- * Revision 1.26  2006/07/07 18:42:37  blueyed
- * After upload: First save the file properties, before generating the code to display it.
- *
- * Revision 1.25  2006/06/19 20:59:37  fplanque
- * noone should die anonymously...
- *
- * Revision 1.24  2006/06/13 21:49:15  blueyed
- * Merged from 1.8 branch
- *
- * Revision 1.21.2.3  2006/06/12 20:00:33  fplanque
- * one too many massive syncs...
- *
- * Revision 1.23  2006/05/30 22:36:05  blueyed
- * doc
- *
- * Revision 1.22  2006/05/29 19:30:13  fplanque
- * no message
- *
- * Revision 1.21  2006/05/12 21:53:37  blueyed
- * Fixes, cleanup, translation for plugins
- *
- * Revision 1.20  2006/04/19 20:13:49  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.19  2006/04/14 19:33:29  fplanque
- * evocore sync
  */
 ?>
