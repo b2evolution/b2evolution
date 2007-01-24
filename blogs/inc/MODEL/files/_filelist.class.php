@@ -299,6 +299,8 @@ class Filelist
 	 *
 	 * NOTE: this does not work for arbitrary lists!
 	 *
+	 * @todo flatmode always shows hidden files, even if we don't want them :/
+	 *
 	 * @uses $flatmode
 	 * @return boolean True on sucess, false on failure (not accessible)
 	 */
@@ -1240,6 +1242,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.25  2007/01/24 13:28:38  fplanque
+ * todo
+ *
  * Revision 1.24  2007/01/24 13:26:56  fplanque
  * fixed sort by type
  *
