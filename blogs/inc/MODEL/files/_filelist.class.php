@@ -570,6 +570,12 @@ class Filelist
 				$r = strcasecmp( $FileA->get_fsgroup_name(), $FileB->get_fsgroup_name() );
 				break;
 
+			case 'type':
+				if( $r = strcasecmp( $FileA->get_type(), $FileB->get_type() ) )
+				{
+					break;
+				}
+				// same type: continue to name:
 			default:
 			case 'name':
 				$r = strcasecmp( $FileA->get_name(), $FileB->get_name() );
@@ -1234,6 +1240,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.24  2007/01/24 13:26:56  fplanque
+ * fixed sort by type
+ *
  * Revision 1.23  2007/01/24 12:18:25  blueyed
  * Fixed PHP-fnmatch() implementation (for Windows)
  *
