@@ -59,7 +59,7 @@ class UserSettings extends AbstractSettings
 		'action_word_threshold' => 3,
 		'display_icon_legend' => 0,
 		'control_form_abortions' => 1,
-		'focus_on_first_input' => 1,
+		'focus_on_first_input' => 0,			// TODO: fix sideeffect when pressing F5
 		'pref_browse_tab' => 'full',
 		'pref_edit_tab' => 'simple',
 
@@ -204,6 +204,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.26  2007/01/24 01:57:07  fplanque
+ * minor
+ *
  * Revision 1.25  2007/01/23 05:00:25  fplanque
  * better user defaults
  *
