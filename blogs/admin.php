@@ -195,7 +195,7 @@ $AdminUI->add_menu_entries(
 						'text' => T_('Browse'),
 						'href' => 'admin.php?ctrl=files' ),
 					'upload' => array(
-						'text' => T_('Upload'),
+						'text' => T_('Upload multiple'),
 						'href' => 'admin.php?ctrl=upload' ),
 					),
 			),
@@ -450,6 +450,9 @@ $Hit->log();
 
 /*
  * $Log$
+ * Revision 1.20  2007/01/24 13:44:56  fplanque
+ * cleaned up upload
+ *
  * Revision 1.19  2007/01/24 00:48:57  fplanque
  * Refactoring
  *

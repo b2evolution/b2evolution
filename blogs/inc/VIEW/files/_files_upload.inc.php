@@ -38,6 +38,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $Settings;
 
+global $UserSettings;
+
 global $upload_quickmode, $failedFiles, $ads_list_path;
 
 ?>
@@ -148,10 +150,17 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 		closeLink.style.cssFloat = 'right';
 
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Choose a file'); ?>:', false, 'input', 'uploadfile[]', '20', '0', 'file', '' );
+		<?php
+		if( $UserSettings->get('fm_uploadwithproperties') )
+		{	// We want file properties on the upload form:
+			?>
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Filename on server (optional)'); ?>:', false, 'input', 'uploadfile_name[]', '20', '80', 'text', '' );
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Long title'); ?>:', true, 'input', 'uploadfile_title[]', '50', '255', 'text', 'large' );
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Alternative text (useful for images)'); ?>:', true, 'input', 'uploadfile_alt[]', '50', '255', 'text', 'large' );
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Caption/Description of the file'); ?>:', true, 'textarea', 'uploadfile_desc[]', '38', '3', '', 'large' );
+			<?php
+		}
+		?>
 	}
 	// -->
 </script>
@@ -162,7 +171,7 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 
 	$Form = & new Form( NULL, 'fm_upload_checkchanges', 'post', 'fieldset', 'multipart/form-data' );
 
-	$Form->global_icon( T_('Quit upload mode!'), 'close', regenerate_url( 'fm_mode' ) );
+	$Form->global_icon( T_('Quit upload mode!'), 'close', regenerate_url( 'ctrl,fm_mode', 'ctrl=files' ) );
 
 	$Form->begin_form( 'fform', T_('File upload') );
 
@@ -184,8 +193,8 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 			<ul id="uploadfileinputs">
 				<?php
 					if( empty($failedFiles) )
-					{ // No failed failes, display one empty input block:
-						$displayFiles[] = NULL;
+					{ // No failed failes, display 5 empty input blocks:
+						$displayFiles = array( NULL, NULL, NULL, NULL, NULL );
 					}
 					else
 					{ // Display failed files:
@@ -206,31 +215,37 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 							echo '<li>';
 						}
 
+						// fp> TODO: would be cool to add a close icon starting at the 2nd <li>
 						?>
 
 						<label><?php echo T_('Choose a file'); ?>:</label>
 						<input name="uploadfile[]" size="20" type="file" /><br />
 
-						<label><?php echo T_('Filename on server (optional)'); ?>:</label>
-						<input name="uploadfile_name[]" type="text" size="20" maxlength="80"
-							value="<?php echo ( isset( $uploadfile_name[$lKey] ) ? format_to_output( $uploadfile_name[$lKey], 'formvalue' ) : '' ) ?>" /><br />
-
-						<label><?php echo T_('Long title'); ?>:</label><br />
-						<input name="uploadfile_title[]" type="text" size="50" maxlength="255" class="large"
-							value="<?php echo ( isset( $uploadfile_title[$lKey] ) ? format_to_output( $uploadfile_title[$lKey], 'formvalue' ) : '' );
-							?>" /><br />
-
-						<label><?php echo T_('Alternative text (useful for images)'); ?>:</label><br />
-						<input name="uploadfile_alt[]" type="text" size="50" maxlength="255" class="large"
-							value="<?php echo ( isset( $uploadfile_alt[$lKey] ) ? format_to_output( $uploadfile_alt[$lKey], 'formvalue' ) : '' );
-							?>" /><br />
-
-						<label><?php echo T_('Caption/Description of the file'); /* TODO: maxlength (DB) */ ?>:</label><br />
-						<textarea name="uploadfile_desc[]" rows="3" cols="38" class="large"><?php
-							echo ( isset( $uploadfile_desc[$lKey] ) ? $uploadfile_desc[$lKey] : '' )
-						?></textarea><br />
-
 						<?php
+						if( $UserSettings->get('fm_uploadwithproperties') )
+						{	// We want file properties on the upload form:
+							?>
+							<label><?php echo T_('Filename on server (optional)'); ?>:</label>
+							<input name="uploadfile_name[]" type="text" size="20" maxlength="80"
+								value="<?php echo ( isset( $uploadfile_name[$lKey] ) ? format_to_output( $uploadfile_name[$lKey], 'formvalue' ) : '' ) ?>" /><br />
+
+							<label><?php echo T_('Long title'); ?>:</label><br />
+							<input name="uploadfile_title[]" type="text" size="50" maxlength="255" class="large"
+								value="<?php echo ( isset( $uploadfile_title[$lKey] ) ? format_to_output( $uploadfile_title[$lKey], 'formvalue' ) : '' );
+								?>" /><br />
+
+							<label><?php echo T_('Alternative text (useful for images)'); ?>:</label><br />
+							<input name="uploadfile_alt[]" type="text" size="50" maxlength="255" class="large"
+								value="<?php echo ( isset( $uploadfile_alt[$lKey] ) ? format_to_output( $uploadfile_alt[$lKey], 'formvalue' ) : '' );
+								?>" /><br />
+
+							<label><?php echo T_('Caption/Description of the file'); /* TODO: maxlength (DB) */ ?>:</label><br />
+							<textarea name="uploadfile_desc[]" rows="3" cols="38" class="large"><?php
+								echo ( isset( $uploadfile_desc[$lKey] ) ? $uploadfile_desc[$lKey] : '' )
+							?></textarea><br />
+							<?php
+						}
+
 						echo '</li>';
 						// no text after </li> or JS will bite you! (This is where additional blocks get inserted)
 					}
@@ -238,9 +253,9 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 				?>
 			</ul>
 
-			<p class="uploadfileinputs"><a href="#" onclick="addAnotherFileInput(); return false;"><?php echo T_('Add another file'); ?></a></p>
+			<p class="uploadfileinputs"><a href="#" onclick="addAnotherFileInput(); return false;" class="small"><?php echo T_('Add another file'); ?></a></p>
 
-			<p>
+			<p class="note">
 				<?php
 				$restrictNotes = array();
 
@@ -287,6 +302,9 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 
 /*
  * $Log$
+ * Revision 1.9  2007/01/24 13:44:56  fplanque
+ * cleaned up upload
+ *
  * Revision 1.8  2006/12/22 00:17:05  fplanque
  * got rid of dirty globals
  * some refactoring

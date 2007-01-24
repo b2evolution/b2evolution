@@ -389,7 +389,7 @@ $AdminUI->add_menu_entries(
 					'text' => T_('Browse'),
 					'href' => 'admin.php?ctrl=files&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
 				'upload' => array(
-					'text' => T_('Upload'),
+					'text' => T_('Upload multiple'),
 					'href' => 'admin.php?ctrl=upload&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
 			)
 	);
@@ -439,6 +439,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2007/01/24 13:44:56  fplanque
+ * cleaned up upload
+ *
  * Revision 1.6  2007/01/24 02:35:42  fplanque
  * refactoring
  *

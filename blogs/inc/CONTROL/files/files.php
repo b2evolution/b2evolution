@@ -193,7 +193,7 @@ $AdminUI->add_menu_entries(
 					'text' => T_('Browse'),
 					'href' => 'admin.php?ctrl=files&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
 				'upload' => array(
-					'text' => T_('Upload'),
+					'text' => T_('Upload multiple'),
 					'href' => 'admin.php?ctrl=upload&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
 			)
 	);
@@ -232,6 +232,7 @@ if( ! empty($action) )
 			$UserSettings->set( 'fm_imglistpreview',   param( 'option_imglistpreview',   'integer', 0 ) );
 			$UserSettings->set( 'fm_getimagesizes',    param( 'option_getimagesizes',    'integer', 0 ) );
 			$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
+			$UserSettings->set( 'fm_uploadwithproperties', param( 'option_uploadwithproperties', 'integer', 0 ) );
 			$UserSettings->set( 'fm_showtypes',        param( 'option_showtypes',        'integer', 0 ) );
 			$UserSettings->set( 'fm_showfsperms',      param( 'option_showfsperms',      'integer', 0 ) );
 			$UserSettings->set( 'fm_showfsowner',      param( 'option_showfsowner',      'integer', 0 ) );
@@ -1455,6 +1456,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.52  2007/01/24 13:44:56  fplanque
+ * cleaned up upload
+ *
  * Revision 1.51  2007/01/24 06:31:41  fplanque
  * decrap refactoring
  *

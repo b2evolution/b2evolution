@@ -59,6 +59,7 @@ $Form->begin_form( 'fform', T_('Display settings') );
 		$Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Hidden files'), T_('Check to show hidden files') );
 		$Form->checkbox( 'option_dirsattop', !$UserSettings->get('fm_dirsnotattop'), T_('Folders first'), T_('Check to always display folders before files') );
 		$Form->checkbox( 'option_recursivedirsize', $UserSettings->get('fm_recursivedirsize'), T_('Folder sizes'), T_('Check to compute recursive size of folders') );
+		$Form->checkbox( 'option_uploadwithproperties', $UserSettings->get('fm_uploadwithproperties'), T_('Upload with properties'), T_('Check to add file properties to the upload form') );
 	$Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'actionArray[update_settings]', T_('Update !'), 'ActionButton'),
@@ -66,6 +67,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update_settings]', T_('Upd
 
 /*
  * $Log$
+ * Revision 1.2  2007/01/24 13:44:56  fplanque
+ * cleaned up upload
+ *
  * Revision 1.1  2007/01/24 05:57:55  fplanque
  * cleanup / settings
  *

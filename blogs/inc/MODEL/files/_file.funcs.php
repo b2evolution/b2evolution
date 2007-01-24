@@ -636,13 +636,11 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 
 	// Folder Icon + Name:
 	$url = regenerate_url( 'root,path', 'root='.$Root->ID.'&amp;path='.$rds_rel_path );
-	$label = '<label for="radio_'.$id_path.'">'
-		.action_icon( T_('Open this directory in the file manager'), 'folder', $url )
+	$label = action_icon( T_('Open this directory in the file manager'), 'folder', $url )
 		.'<a href="'.$url.'"
 		title="'.T_('Open this directory in the file manager').'">'
 		.( empty($rds_rel_path) ? $Root->name : basename( $ads_full_path ) )
-		.'</a>'
-		.'</label>';
+		.'</a>';
 
 	// Handle potential subdir:
 	if( ! $has_sub_dirs )
@@ -747,6 +745,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.49  2007/01/24 13:44:56  fplanque
+ * cleaned up upload
+ *
  * Revision 1.48  2007/01/24 12:18:25  blueyed
  * Fixed PHP-fnmatch() implementation (for Windows)
  *
