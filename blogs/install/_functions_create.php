@@ -189,10 +189,10 @@ function create_default_data()
 			(7, 'doc', 'Microsoft Word file', 'application/msword', 'doc.gif', 'external', 1),
 			(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'xls.gif', 'external', 1),
 			(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 1),
-			(10, 'pps', 'Powerpoint slideshow', 'pps', 'pps.gif', 'external', 1),
-			(11, 'zip', 'Zip archive', 'application/zip', 'zip.gif', 'external', 1),
-			(12, 'php php3 php4 php5 php6', 'Php files', 'application/x-httpd-php', 'php.gif', 'text', 0),
-			(13, 'css', 'Cascading style sheets', 'text/css', '', 'text', 1)
+			(10, 'pps', 'Slideshow', 'pps', 'pps.gif', 'external', 1),
+			(11, 'zip', 'ZIP archive', 'application/zip', 'zip.gif', 'external', 1),
+			(12, 'php php3 php4 php5 php6', 'PHP script', 'application/x-httpd-php', 'php.gif', 'text', 0),
+			(13, 'css', 'Style sheet', 'text/css', '', 'text', 1)
 		" );
 	echo "OK.<br />\n";
 
@@ -611,6 +611,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.216  2007/01/24 13:47:28  fplanque
+ * cleaned up file types
+ *
  * Revision 1.215  2007/01/20 16:08:36  blueyed
  * fixed grammar
  *
