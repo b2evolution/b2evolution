@@ -1161,10 +1161,11 @@ class Form extends Widget
 		// Need to add event click on links at the form end.
 		$this->check_all = true;
 
-		return '<a id="check_all_nocheckchanges" href="'.regenerate_url().'">'
+		// fp> This is "name=" and I mean it!!! The JS is looking for all elements with this name!
+		return '<a name="check_all_nocheckchanges" href="'.regenerate_url().'">'
 				//.T_('Check all').' '
 				.get_icon( 'check_all', 'imgtag', NULL, true )
-				.'</a> | <a id="uncheck_all_nocheckchanges" href="'.regenerate_url().'">'
+				.'</a> | <a name="uncheck_all_nocheckchanges" href="'.regenerate_url().'">'
 				//.T_('Uncheck all').' '
 				.get_icon( 'uncheck_all', 'imgtag', NULL, true ).'</a> '.'&nbsp;';
 	}
@@ -2719,6 +2720,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.67  2007/01/24 06:43:25  fplanque
+ * fix
+ *
  * Revision 1.66  2007/01/23 08:57:36  fplanque
  * decrap!
  *
