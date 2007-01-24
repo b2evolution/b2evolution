@@ -893,17 +893,7 @@ if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_crea
  */
 if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) && $fm_mode != 'file_upload' )
 {	// Upload is enabled and we have permission to use it...
-	echo "<!-- UPLOAD: -->\n";
-	$Form = & new Form( NULL, 'fmbar_adv_upload', 'post', 'none' );
-	$Form->begin_form( 'toolbaritem' );
-		$Form->hidden_ctrl();
-		echo '<div>';
-		$Form->hiddens_by_key( get_memorized('fm_mode') );
-		$Form->hidden( 'fm_mode', 'file_upload' );
-		echo '<input class="ActionButton" type="submit" value="'.T_('Advanced upload...').'" />';
-		echo '</div>';
-	$Form->end_form();
-
+	echo "<!-- QUICK UPLOAD: -->\n";
 	$Form = & new Form( NULL, 'fmbar_quick_upload', 'post', 'none', 'multipart/form-data' );
 	$Form->begin_form( 'toolbaritem' );
 		$Form->hidden_ctrl();
@@ -980,6 +970,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.39  2007/01/24 01:40:14  fplanque
+ * Upload tab now stays in context
+ *
  * Revision 1.38  2007/01/23 22:30:14  fplanque
  * empty icons cleanup
  *

@@ -75,7 +75,6 @@ if( ! $Settings->get( 'fm_enabled' ) )
 // Check permission:
 $current_User->check_perm( 'files', 'view', true );
 
-
 $AdminUI->set_path( 'files', 'browse' );
 
 
@@ -99,6 +98,7 @@ else
 	}
 }
 
+
 /**
  * @global string The file manager mode we're in ('fm_upload', 'fm_cmr')
  */
@@ -109,6 +109,9 @@ $action = param_action();
 
 // Get root:
 $ads_list_path = false; // false by default, gets set if we have a valid root
+/**
+ * @var FileRoot
+ */
 $fm_FileRoot = NULL;
 
 $FileRootCache = & get_Cache( 'FileRootCache' );
@@ -188,6 +191,20 @@ if( $Messages->count('error') )
 	$AdminUI->disp_global_footer();
 	exit();
 }
+
+
+// Update sub-menu:
+$AdminUI->add_menu_entries(
+		'files',
+		array(
+				'browse' => array(
+					'text' => T_('Browse'),
+					'href' => 'admin.php?ctrl=files&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
+				'upload' => array(
+					'text' => T_('Upload'),
+					'href' => 'admin.php?ctrl=upload&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
+			)
+	);
 
 
 /**
@@ -1683,6 +1700,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.47  2007/01/24 01:40:15  fplanque
+ * Upload tab now stays in context
+ *
  * Revision 1.46  2007/01/07 05:28:15  fplanque
  * i18n wording
  *

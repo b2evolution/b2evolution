@@ -167,10 +167,8 @@ if( $Messages->count('error') )
 }
 
 
-
 $Debuglog->add( 'FM root: '.var_export( $fm_FileRoot, true ), 'files' );
 $Debuglog->add( 'FM _ads_list_path: '.var_export( $ads_list_path, true ), 'files' );
-
 
 
 if( empty($ads_list_path) )
@@ -188,16 +186,29 @@ if( empty($ads_list_path) )
 if( ! $Settings->get('upload_enabled') )
 { // Upload is globally disabled
 	$Messages->add( T_('Upload is disabled.'), 'error' );
-	$fm_mode = NULL;
-	break;
 }
 
 if( ! $current_User->check_perm( 'files', 'add' ) )
 { // We do not have permission to add files
 	$Messages->add( T_('You have no permission to add/upload files.'), 'error' );
-	$fm_mode = NULL;
-	break;
 }
+
+
+// If there were errors, display them and exit (especially in case there's no valid FileRoot ($fm_FileRoot)):
+if( $Messages->count('error') )
+{
+	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
+
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
+	$AdminUI->disp_payload_begin();
+	$AdminUI->disp_payload_end();
+
+	$AdminUI->disp_global_footer();
+	exit();
+}
+
 
 // Quick mode means "just upload and leave mode when successful"
 param( 'upload_quickmode', 'integer', 0 );
@@ -366,13 +377,25 @@ if( isset($_FILES) && count( $_FILES ) )
 
 	}
 
-	if( $upload_quickmode && !$failedFiles )
-	{ // we're quick uploading and have no failed files, leave the mode
-		$fm_mode = NULL;
+	if( !$failedFiles )
+	{ // no failed files, Go back to Browsing
+		header_redirect( 'admin.php?ctrl=files&root='.$fm_FileRoot->ID.'&path='.rawurlencode($path) );
 	}
 }
 
 
+// Update sub-menu:
+$AdminUI->add_menu_entries(
+		'files',
+		array(
+				'browse' => array(
+					'text' => T_('Browse'),
+					'href' => 'admin.php?ctrl=files&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
+				'upload' => array(
+					'text' => T_('Upload'),
+					'href' => 'admin.php?ctrl=upload&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
+			)
+	);
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -419,6 +442,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2007/01/24 01:40:15  fplanque
+ * Upload tab now stays in context
+ *
  * Revision 1.4  2007/01/10 21:41:51  blueyed
  * todo: any "error" does not allow uploading and "blog media directory could not be created" is such an error, which may not be relevant
  *
