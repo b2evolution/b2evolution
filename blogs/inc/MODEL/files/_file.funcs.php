@@ -172,56 +172,18 @@ function get_admin_skins()
 }
 
 
-/**
- * A replacement for fnmatch() which needs PHP 4.3
- *
- * @todo fp> *.j matches image.jpg - i don't think that's normal -- PHP 4.3 ok now
- *
- * @author jcl [atNOSPAM] jcl [dot] name {@link http://php.net/manual/function.fnmatch.php}
- */
-function my_fnmatch( $pattern, $file )
+if( ! function_exists('fnmatch') )
 {
-	$lenpattern = strlen($pattern);
-	$lenfile    = strlen($file);
-
-	for($i=0 ; $i<$lenpattern ; $i++)
-	{
-		if($pattern[$i] == "*")
-		{
-			for($c=$i ; $c<max($lenpattern, $lenfile) ; $c++)
-			{
-				if(my_fnmatch(substr($pattern, $i+1), substr($file, $c)))
-					return true;
-			}
-			return false;
-		}
-
-		if($pattern[$i] == "[")
-		{
-			$letter_set = array();
-			for($c=$i+1 ; $c<$lenpattern ; $c++)
-			{
-				if($pattern[$c] != "]")
-					array_push($letter_set, $pattern[$c]);
-				else
-					break;
-			}
-			foreach($letter_set as $letter)
-			{
-				if(my_fnmatch($letter.substr($pattern, $c+1), substr($file, $i)))
-					return true;
-			}
-			return false;
-		}
-
-		if($pattern[$i] == "?") continue;
-		if($pattern[$i] != $file[$i]) return false;
-	}
-
-	if(($lenpattern != $lenfile) && ($pattern[$i - 1] == "?")) return false;
-	return true;
+    /**
+     * A replacement for fnmatch() which needs PHP 4.3 and a POSIX compliant system (Windows is not).
+     *
+     * @author jk at ricochetsolutions dot com {@link http://php.net/manual/function.fnmatch.php#71725}
+     */
+   function fnmatch($pattern, $string)
+   {
+       return preg_match( '#^'.strtr(preg_quote($pattern, '#'), array('\*' => '.*', '\?' => '.')).'$#i', $string);
+   }
 }
-
 
 
 /**
@@ -785,6 +747,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.48  2007/01/24 12:18:25  blueyed
+ * Fixed PHP-fnmatch() implementation (for Windows)
+ *
  * Revision 1.47  2007/01/24 06:31:09  fplanque
  * doc
  *

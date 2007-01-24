@@ -354,7 +354,7 @@ class Filelist
 				}
 				else
 				{ // Filter is NOT a regexp:
-					if( !my_fnmatch( $this->_filter, $name ) )
+					if( ! fnmatch( $this->_filter, $name ) )
 					{
 						continue;
 					}
@@ -1234,6 +1234,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.23  2007/01/24 12:18:25  blueyed
+ * Fixed PHP-fnmatch() implementation (for Windows)
+ *
  * Revision 1.22  2006/12/24 00:52:56  fplanque
  * Make posts with images - Proof of concept
  *
