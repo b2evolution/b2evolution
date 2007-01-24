@@ -15,8 +15,6 @@
  * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
- * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte
- * as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -35,11 +33,6 @@
  * PROGIDISTRI S.A.S. grants Francois PLANQUE the right to license
  * PROGIDISTRI S.A.S.'s contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- *
- * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
- * Jason EDGECOMBE's contributions to this file and the b2evolution project
- * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
- * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
  * }}
  *
  * @package admin
@@ -47,8 +40,6 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
- * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
- * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
  *
  * @version $Id$
  */
@@ -294,14 +285,9 @@ if( $action == 'update_settings' )
 	$action = '';
 }
 
-/**
- * @global boolean We set this to true to force displaying of the FM (without toggle option!)
- */
-$fm_forceFM = NULL;
 
-
-param( 'fm_disp_browser', 'integer', 0, true );
-$UserSettings->param_Request( 'fm_hide_dirtree', 'fm_hide_dirtree', 'integer', 0, true ); // The directory tree next to the files table
+// Do we want to display the directory tree next to the files table
+$UserSettings->param_Request( 'fm_hide_dirtree', 'fm_hide_dirtree', 'integer', 0, true );
 
 
 /*
@@ -500,8 +486,12 @@ switch( $action )
 
 
 	case 'download':
-	{ // TODO: provide optional zip formats (tgz, ..) - the used lib provides more..
-		$action_title = T_('Download');
+		// TODO: provide optional zip formats (tgz, ..) - the used lib provides more..
+
+		// Exit any special mode we may have been in:
+		$fm_mode = NULL;
+
+		$action_title = T_('Downoad');
 
 		if( !$selected_Filelist->count() )
 		{
@@ -546,11 +536,15 @@ switch( $action )
 		$zipfile->create_archive();
 		$zipfile->download_file();
 		exit;
-	}
+		/* EXITED! */
 
 
 	case 'rename':
 		// Rename a file:
+
+		// Exit any special mode we may have been in:
+		$fm_mode = NULL;
+
 		// This will not allow to overwrite existing files, the same way Windows and MacOS do not allow it. Adding an option will only clutter the interface and satisfy geeks only.
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
@@ -642,7 +636,11 @@ switch( $action )
 
 
 	case 'delete':
-		// Delete a file or directory: {{{
+		// Delete a file or directory:
+
+		// Exit any special mode we may have been in:
+		$fm_mode = NULL;
+
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
@@ -704,12 +702,15 @@ switch( $action )
 				$action = 'list';
 			}
 		}
-		// }}}
 		break;
 
 
 	case 'make_posts':
 		// Make posts with selected images:
+
+		// Exit any special mode we may have been in:
+		$fm_mode = NULL;
+
 		if( ! $selected_Filelist->count() )
 		{
 			$Messages->add( T_('Nothing selected.'), 'error' );
@@ -807,15 +808,45 @@ switch( $action )
 		break;
 
 
-	case 'edit':
-		// Edit Text File; this starts the file_edit mode:
-		// fp> Note: This probably should not be a mode.
-		$fm_mode = 'file_edit';
+	case 'edit_file':
+		// Edit Text File
+
+		// Exit any special mode we may have been in:
+		$fm_mode = NULL;
+
+		// Check permission!
+ 		$current_User->check_perm( 'files', 'edit', true );
+
+		$edit_File = & $selected_Filelist->get_by_idx(0);
+
+		// Check that the file is editable:
+		if( ! $edit_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
+		{
+			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edit_File->dget('name') ), 'error' );
+	 		// Leave special display mode:
+			$action = '';
+			break;
+		}
+
+		$full_path = $edit_File->get_full_path();
+		if( $size = filesize($full_path) )
+		{
+			$rsc_handle = fopen( $full_path, 'r');
+			$edit_File->content = fread( $rsc_handle, $size );
+			fclose( $rsc_handle );
+		}
+		else
+		{	// Empty file
+			$edit_File->content = '';
+		}
 		break;
 
 
 	case 'update_file':
-		// Update File (Meta Data); on success this ends the file_edit mode:
+		// Update File:
+
+		// Exit any special mode we may have been in:
+		$fm_mode = NULL;
 
 		if( $demo_mode )
 		{
@@ -851,21 +882,28 @@ switch( $action )
 		{
 			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; could not be updated.' ), $edit_File->dget('name') ), 'error' );
 		}
-
-		// Leave special display mode:
-		$fm_mode = NULL;
 		break;
 
 
 	case 'edit_properties':
-		// Edit File properties (Meta Data); this starts the file_properties mode:
-		// fp> Note: This probably should not be a mode.
-		$fm_mode = 'file_properties';
+		// Edit File properties (Meta Data)
+
+		// Exit any special mode we may have been in:
+		$fm_mode = NULL;
+
+		// Check permission!
+ 		$current_User->check_perm( 'files', 'edit', true );
+
+		$edit_File = & $selected_Filelist->get_by_idx(0);
+		$edit_File->load_meta();
 		break;
 
 
 	case 'update_properties':
 		// Update File properties (Meta Data); on success this ends the file_properties mode: {{{
+
+		// Exit any special mode we may have been in:
+		$fm_mode = NULL;
 
 		// Check permission!
  		$current_User->check_perm( 'files', 'edit', true );
@@ -964,7 +1002,11 @@ switch( $action )
 
 
 	case 'edit_perms':
-		// Edit file or directory permissions: {{{
+		// Edit file or directory permissions:
+
+		// Exit any special mode we may have been in:
+		$fm_mode = NULL;
+
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
@@ -1044,54 +1086,15 @@ switch( $action )
 		{ // No file left selected... (everything worked fine)
 			$action = 'list';
 		}
-		// }}}
 		break;
 }
 
 
-// pre_dump( 'fm mode:'.$fm_mode );
-
+/*
+ * Prepare for modes:
+ */
 switch( $fm_mode )
-{ // handle modes {{{
-
-	case 'file_edit':
-		// Check permission!
- 		$current_User->check_perm( 'files', 'edit', true );
-
-		$edit_File = & $selected_Filelist->get_by_idx(0);
-
-		// Check that the file is editable:
-		if( ! $edit_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
-		{
-			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edit_File->dget('name') ), 'error' );
-	 		// Leave special display mode:
-			$fm_mode = NULL;
-			break;
-		}
-
-		$full_path = $edit_File->get_full_path();
-		if( $size = filesize($full_path) )
-		{
-			$rsc_handle = fopen( $full_path, 'r');
-			$edit_File->content = fread( $rsc_handle, $size );
-			fclose( $rsc_handle );
-		}
-		else
-		{	// Empty file
-			$edit_File->content = '';
-		}
-		break;
-
-
-	case 'file_properties':
-		// Check permission!
- 		$current_User->check_perm( 'files', 'edit', true );
-
-		$edit_File = & $selected_Filelist->get_by_idx(0);
-		$edit_File->load_meta();
-		break;
-
-
+{
 	case 'file_copy':
 	case 'file_move':
 		// ------------------------
@@ -1298,16 +1301,6 @@ switch( $fm_mode )
 				else debug_die( 'Unhandled file copy/move mode' );
 			}
 		}
-
-		if( $fm_source_Filelist->count() )
-		{ // There are still uncopied/unmoved files, we want the file manager in this mode:
-			$fm_forceFM = true;
-		}
-		else
-		{
-			// Leave mode:
-			$fm_mode = NULL;
-		}
 		break;
 
 
@@ -1323,12 +1316,9 @@ switch( $fm_mode )
 		}
 
 		// TODO: check EDIT permissions!
-
-		// we want to display the file manager in this mode:
-		$fm_forceFM = true;
 		break;
 
-} // }}}
+}
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -1341,7 +1331,6 @@ $AdminUI->disp_body_top();
 // Display reload-icon in the opener window if we're a popup in the same CWD and the
 // Filemanager content differs.
 ?>
-
 <script type="text/javascript">
 	<!--
 	if( opener
@@ -1358,65 +1347,80 @@ $AdminUI->disp_body_top();
 	}
 	// -->
 </script>
-
-
 <?php
+
+
 /*
  * Display payload:
  */
-switch( $action )
+if( !empty($action ) )
 {
-	case 'rename':
-		// Rename files dialog:
-		$AdminUI->disp_payload_begin();
-		$AdminUI->disp_view( 'files/_files_rename.form.php' );
-		$AdminUI->disp_payload_end();
-		break;
+	$AdminUI->disp_payload_begin();
 
-	case 'delete':
-		// Delete file(s). We arrive here either if not confirmed or in case of error(s).
-		$AdminUI->disp_payload_begin();
-		$AdminUI->disp_view( 'files/_files_delete.form.php' );
-		$AdminUI->disp_payload_end();
-		break;
+	// Action displays:
+	switch( $action )
+	{
+		case 'rename':
+			// Rename files dialog:
+			$AdminUI->disp_view( 'files/_files_rename.form.php' );
+			break;
 
-	case 'download':
-		// Delete file(s). We arrive here either if not confirmed or in case of error(s).
-		$AdminUI->disp_payload_begin();
-		$AdminUI->disp_view( 'files/_files_download.form.php' );
-		$AdminUI->disp_payload_end();
-		break;
+		case 'delete':
+			// Delete file(s). We arrive here either if not confirmed or in case of error(s).
+			$AdminUI->disp_view( 'files/_files_delete.form.php' );
+			break;
 
-	case 'edit_perms':
-		// Filesystem permissions for specific files
-		$AdminUI->disp_payload_begin();
-		$AdminUI->disp_view( 'files/_files_permissions.form.php' );
-		$AdminUI->disp_payload_end();
-		break;
+		case 'download':
+			// Delete file(s). We arrive here either if not confirmed or in case of error(s).
+			$AdminUI->disp_view( 'files/_files_download.form.php' );
+			break;
 
-	default:
-		// Deferred action message:
-		if( isset($action_title) )
-		{
-			echo "\n<h2>$action_title</h2>\n";
-		}
+		case 'edit_perms':
+			// Filesystem permissions for specific files
+			$AdminUI->disp_view( 'files/_files_permissions.form.php' );
+			break;
 
-		if( isset($action_msg) )
-		{
-			echo $action_msg;
+		case 'edit_file':
+			// File Edit dialog:
+			$AdminUI->disp_view( 'files/_file_edit.form.php' );
+			break;
 
-			if( isset( $js_focus ) )
-			{ // we want to auto-focus a field
-				echo '
-				<script type="text/javascript">
-					<!--
-					'.$js_focus.'.focus();
-					// -->
-				</script>';
+		case 'edit_properties':
+			// File properties (Meta data) dialog:
+			$AdminUI->disp_view( 'files/_file_properties.inc.php' );
+			break;
+
+		default:
+			// Deferred action message:
+			// fp> When does this happen??
+			if( isset($action_title) )
+			{
+				echo "\n<h2>$action_title</h2>\n";
 			}
-		}
+
+			if( isset($action_msg) )
+			{
+				echo $action_msg;
+
+				if( isset( $js_focus ) )
+				{ // we want to auto-focus a field
+					echo '
+					<script type="text/javascript">
+						<!--
+						'.$js_focus.'.focus();
+						// -->
+					</script>';
+				}
+			}
+	}
+
+	// End payload block:
+	$AdminUI->disp_payload_end();
 }
 
+
+// Begin payload block (if action, this is the second payload block)
+$AdminUI->disp_payload_begin();
 
 // FM modes displays:
 switch( $fm_mode )
@@ -1427,58 +1431,22 @@ switch( $fm_mode )
 		$AdminUI->disp_view( 'files/_files_cmr.inc.php' );
 		break;
 
-	case 'file_edit':
-		// File Edit dialog:
-		$AdminUI->disp_view( 'files/_file_edit.form.php' );
-		break;
-
-	case 'file_properties':
-		// File properties (Meta data) dialog:
-		$AdminUI->disp_view( 'files/_file_properties.inc.php' );
-		break;
-
 	case 'link_item':
 		// Links dialog:
-		$AdminUI->disp_payload_begin();
 		$AdminUI->disp_view( 'files/_files_links.inc.php' );
-		$AdminUI->disp_payload_end();
 		break;
 }
 
 
-// "Display Filemanager" link, if appropriate
-// fp>> This needs SERIOUS documentation !
-$disp_fm_browser = true;
-$disp_fm_browser_toggle = false;
-
-if( isset($fm_forceFM) )
-{ // display FM, but no "close" icon
-	$disp_fm_browser = $fm_forceFM;
-}
-elseif( $fm_mode )
-{
-	$disp_fm_browser = $fm_disp_browser;
-	$disp_fm_browser_toggle = true;
-}
-
-if( $disp_fm_browser_toggle && ! $disp_fm_browser )
-{ // FM browser can be toggled - link to display (link to hide it gets displayed in _files_browse view)
-	echo '<div class="panelinfo" id="FM_anchor">';
-	echo '[<a href="'.regenerate_url( 'fm_disp_browser', 'fm_disp_browser=1' ).'">'.T_('Display Filemanager').'</a>]';
-	echo '</div>';
-}
+// -------------------
+// Browsing interface:
+// -------------------
+// Display VIEW:
+$AdminUI->disp_view( 'files/_files_browse.inc.php' );
 
 
-if( $disp_fm_browser )
-{ // We're NOT in a mode where we want to hide the FM
-	// -------------------
-	// Browsing interface:
-	// -------------------
-
-	// Display VIEW:
-	$AdminUI->disp_view( 'files/_files_browse.inc.php' );
-}
-
+// End payload block:
+$AdminUI->disp_payload_end();
 
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
@@ -1486,6 +1454,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.49  2007/01/24 03:45:29  fplanque
+ * decrap / removed a lot of bloat...
+ *
  * Revision 1.48  2007/01/24 02:35:42  fplanque
  * refactoring
  *

@@ -56,8 +56,6 @@ global $fm_source_Filelist;
  */
 global $new_names;
 
-// Begin payload block:
-$this->disp_payload_begin();
 
 $Form = & new Form( NULL, 'fm_copymove_checkchanges' );
 
@@ -91,11 +89,11 @@ $Form->end_form( array( array( 'submit', 'submit', $fm_mode == 'file_copy' ? T_(
 echo '<p class="notes"><strong>'.T_('You are in copy/move mode.')
 				.'</strong> '.T_('Please navigate to the desired target location.').'</p>';
 
-// End payload block:
-$this->disp_payload_end();
-
 /*
  * $Log$
+ * Revision 1.6  2007/01/24 03:45:29  fplanque
+ * decrap / removed a lot of bloat...
+ *
  * Revision 1.5  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

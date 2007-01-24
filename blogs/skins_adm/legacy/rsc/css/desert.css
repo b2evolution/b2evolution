@@ -419,11 +419,13 @@ div.panelinfo p {
 	margin: 1ex 0;
 	padding: 0;
 }
-div.panelblock {
-	clear:both;
-	border: 1px solid #e1ddce;
-	padding: 1ex;
-	margin: 1ex 1em;
+div.panelblock,
+div.tabbedpanelblock {
+	clear: both;
+	border: 1px solid #9e9286;
+	background-color: #fbfaf9;
+	padding: 1ex 1em 1ex 1em;
+	margin: 1ex 1em 2ex 1em;
 }
 .footer {
 	text-align: center;
@@ -512,12 +514,8 @@ div.panelblocktabs
 	line-height:normal;
 }
 div.tabbedpanelblock {
-	clear: both;
-	border: 1px solid #9e9286;
 	border-top: none;
-	background-color: #fbfaf9;
-	padding: 1ex 1em 1ex 1em;
-	margin: 0 1em 2ex 1em;
+	margin-top: 0;
 }
 div.tabbedpanelblock fieldset {
 	border: 1px solid #ddd;

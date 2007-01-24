@@ -81,19 +81,11 @@ global $edited_Item;
 
 global $Blog;
 
-global $disp_fm_browser_toggle, $fm_hide_dirtree, $create_name, $ads_list_path;
+global $fm_hide_dirtree, $create_name, $ads_list_path;
 
-
-// Begin payload block:
-$this->disp_payload_begin();
 
 echo '<div id="filemanmain">';
 
-
-if( $disp_fm_browser_toggle )
-{ // File browser interface can be toggled, link to hide
-	echo '<span class="toolbaritem">'.action_icon( T_('Hide Filemanager'), 'close', regenerate_url( 'fm_disp_browser', 'fm_disp_browser=0' ) ).'</span>';
-}
 ?>
 
 <!-- FLAT MODE: -->
@@ -147,21 +139,7 @@ $Form->begin_form( 'toolbaritem' );
 		<?php
 	}
 $Form->end_form();
-
-
-/* Not implemented yet:
-
-<!-- SEARCH BOX: -->
-
-<form class="toolbaritem" id="fmbar_search">
-	<input type="text" name="searchfor" value="--todo--" size="20" />
-	<input type="image"
-		class="ActionButton"
-		title="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>"
-		src="<glasses>" />
-</form>
-
-*/ ?>
+?>
 
 
 <!-- THE MAIN FORM -->
@@ -600,7 +578,7 @@ while( $lFile = & $fm_Filelist->get_next() )
 	{ // User can edit:
 		if( $lFile->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
 		{
-			echo action_icon( T_('Edit file...'), 'edit', regenerate_url( 'fm_selected', 'action=edit&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
+			echo action_icon( T_('Edit file...'), 'edit', regenerate_url( 'fm_selected', 'action=edit_file&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
 		}
 		else
 		{
@@ -730,17 +708,18 @@ else
 			title="<?php echo T_('Move the selected files'); ?>"
 			onclick="return check_if_selected_files();"
 			src="<?php echo get_icon( 'file_move', 'url' ); ?>" />
-// This is too geeky! Default perms radio options and unchecked radio groups! NO WAY!
-// If you want this feature to be usable by average users you must only have one line per file OR one file for all. You can't mix both.
-// The only way to have both is to have 2 spearate forms: 1 titled "change perms for all files simultaneously"-> submit  and another 1 title "change perms for each file individually" -> another submit
-// POST PHOENIX
-// fplanque>> second thought: changing perms for multiple files at once is useful. BUT assigning different perms to several files with ONE form is trying to solve a problem that not even geeks can face once in a lifetime.
-// This has to be simplified to ONE single set of permissions for all selected files. (If you need different perms, click again)
+		// This is too geeky! Default perms radio options and unchecked radio groups! NO WAY!
+		// If you want this feature to be usable by average users you must only have one line per file OR one file for all. You can't mix both.
+		// The only way to have both is to have 2 spearate forms: 1 titled "change perms for all files simultaneously"-> submit  and another 1 title "change perms for each file individually" -> another submit
+		// POST PHOENIX
+		// fplanque>> second thought: changing perms for multiple files at once is useful. BUT assigning different perms to several files with ONE form is trying to solve a problem that not even geeks can face once in a lifetime.
+		// This has to be simplified to ONE single set of permissions for all selected files. (If you need different perms, click again)
 			<input class="ActionButton" type="image" name="actionArray[edit_perms]"
 			onclick="return check_if_selected_files();"
 			title="<?php echo T_('Change permissions for the selected files'); ?>"
 			src="<?php echo get_icon( 'file_perms', 'url' ); ?>" />
-	*/ ?>
+		*/
+		?>
 
 		</td>
 	</tr>
@@ -963,11 +942,11 @@ $Form = & new Form( NULL, 'fm_options_checkchanges', 'get', 'none' );
 </div>
 
 <?php
-// End payload block:
-$this->disp_payload_end();
-
 /*
  * $Log$
+ * Revision 1.41  2007/01/24 03:45:29  fplanque
+ * decrap / removed a lot of bloat...
+ *
  * Revision 1.40  2007/01/24 02:35:42  fplanque
  * refactoring
  *
@@ -1023,47 +1002,5 @@ $this->disp_payload_end();
  *
  * Revision 1.23  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.22  2006/09/14 21:11:57  blueyed
- * HTML fix
- *
- * Revision 1.21  2006/09/10 15:27:53  blueyed
- * doc
- *
- * Revision 1.20  2006/09/10 14:50:48  fplanque
- * minor / doc
- *
- * Revision 1.19  2006/09/08 18:52:56  blueyed
- * Link image preview to File::get_view_link()
- *
- * Revision 1.18  2006/07/28 18:27:10  blueyed
- * Basic image preview for image files in the file list
- *
- * Revision 1.17  2006/07/28 17:30:30  blueyed
- * Refer to itemform_post_content field by ID, as its form has no name anymore
- *
- * Revision 1.16  2006/07/17 01:53:12  blueyed
- * added param to UserSettings::param_Request
- *
- * Revision 1.15  2006/06/13 21:49:15  blueyed
- * Merged from 1.8 branch
- *
- * Revision 1.14.2.1  2006/06/12 20:00:39  fplanque
- * one too many massive syncs...
- *
- * Revision 1.14  2006/04/27 21:25:43  blueyed
- * Do not use own Log object for Filelist (revert)
- *
- * Revision 1.13  2006/04/19 22:54:48  blueyed
- * Use own Log object for Filelist
- *
- * Revision 1.12  2006/04/19 20:13:51  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.11  2006/04/14 19:34:40  fplanque
- * folder tree reorganization
- *
- * Revision 1.10  2006/04/12 19:16:52  fplanque
- * Integrated dirtree in filemanager
  */
 ?>

@@ -671,7 +671,7 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 	}
 
 	// Folder Icon + Name:
-	$url = regenerate_url( 'root,path,fm_disp_browser', 'root='.$Root->ID.'&amp;path='.$rds_rel_path.'&amp;fm_disp_browser=1' );
+	$url = regenerate_url( 'root,path', 'root='.$Root->ID.'&amp;path='.$rds_rel_path );
 	$label = '<label for="radio_'.$id_path.'">'
 		.action_icon( T_('Open this directory in the file manager'), 'folder', $url )
 		.'<a href="'.$url.'"
@@ -783,6 +783,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.45  2007/01/24 03:45:29  fplanque
+ * decrap / removed a lot of bloat...
+ *
  * Revision 1.44  2007/01/23 22:30:14  fplanque
  * empty icons cleanup
  *

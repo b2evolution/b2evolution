@@ -33,9 +33,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edit_File;
 
-// Begin payload block:
-$this->disp_payload_begin();
-
 $Form = & new Form( NULL, 'fm_properties_checkchanges' );
 
 $Form->global_icon( T_('Close properties!'), 'close', regenerate_url('fm_mode') );
@@ -75,11 +72,11 @@ else
 	$Form->end_form();
 }
 
-// End payload block:
-$this->disp_payload_end();
-
 /*
  * $Log$
+ * Revision 1.8  2007/01/24 03:45:29  fplanque
+ * decrap / removed a lot of bloat...
+ *
  * Revision 1.7  2007/01/24 02:35:42  fplanque
  * refactoring
  *

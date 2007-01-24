@@ -51,6 +51,8 @@ $Form->begin_form( 'fform', T_('Delete') );
 	$Form->hidden( 'action', 'delete' );
 	$Form->hidden( 'confirmed', 1 );
 
+	$Form->begin_fieldset( T_('Confirm delete') );
+
 	echo $selected_Filelist->count() > 1
 		? T_('Do you really want to delete the following files?')
 		: T_('Do you really want to delete the following file?');
@@ -63,12 +65,17 @@ $Form->begin_form( 'fform', T_('Delete') );
 		}
 	echo '</ul>';
 
+	$Form->end_fieldset();
+
 $Form->end_form( array(
 		array( 'submit', 'submit', T_('Delete'), 'DeleteButton' ) ) );
 
 
 /*
  * $Log$
+ * Revision 1.6  2007/01/24 03:45:29  fplanque
+ * decrap / removed a lot of bloat...
+ *
  * Revision 1.5  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

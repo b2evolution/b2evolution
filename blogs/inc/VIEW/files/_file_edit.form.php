@@ -33,9 +33,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edit_File;
 
-// Begin payload block:
-$this->disp_payload_begin();
-
 $Form = & new Form( NULL, 'file_edit' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url('fm_mode') );
@@ -58,11 +55,11 @@ $Form->begin_form( 'fform', T_('Editing:').' '.$edit_File->get_rdfs_rel_path() )
 
 $Form->end_form();
 
-// End payload block:
-$this->disp_payload_end();
-
 /*
  * $Log$
+ * Revision 1.3  2007/01/24 03:45:29  fplanque
+ * decrap / removed a lot of bloat...
+ *
  * Revision 1.2  2007/01/24 02:35:42  fplanque
  * refactoring
  *
