@@ -51,7 +51,7 @@ if ( $test_type > 0 )
 	error_reporting (0);
 
 	$page_title = T_('Blog by email');
-	require_once( dirname(__FILE__).'/../_header.php' );
+	require_once( dirname(__FILE__).'/../_header.php' ); // TODO: this is a dirty hack, and now it's broken :/
 	$show_messages = true;
 	$str_failure = ' <font color="red">[ ' . T_('Failed') . ' ]</font>';
 	$str_warning = ' <font color="orange">[ ' . T_('Warning') . ' ]</font>';

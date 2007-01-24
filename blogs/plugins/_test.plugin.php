@@ -393,7 +393,7 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Gets invoked in /admin/_header.php for every backoffice page after
+	 * Event handler: Gets invoked in /admin.php for every backoffice page after
 	 *                the menu structure is build. You can use the {@link $AdminUI} object
 	 *                to modify it.
 	 *
@@ -715,6 +715,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.65  2007/01/24 00:48:58  fplanque
+ * Refactoring
+ *
  * Revision 1.64  2007/01/20 23:48:10  blueyed
  * Changed plugin default URL to manual.b2evolution.net/classname_plugin
  *
