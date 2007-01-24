@@ -56,63 +56,58 @@ global $Settings;
 
 global $fm_hide_dirtree, $create_name, $ads_list_path;
 
-
 ?>
 
-
-<!-- FILTER BOX: -->
-
-<?php
-// Title for checkbox and its label
-$titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalue' );
-
-$Form = & new Form( NULL, 'fmbar_filter_checkchanges', 'post', 'none' );
-$Form->begin_form( 'toolbaritem' );
-	$Form->hidden_ctrl();
-	$Form->hiddens_by_key( get_memorized(), array('fm_filter', 'fm_filter_regex') );
-	?>
-	<label for="fm_filter" class="tooltitle"><?php echo T_('Filter') ?>:</label>
-	<input type="text" name="fm_filter" id="fm_filter"
-		value="<?php echo format_to_output( $fm_Filelist->get_filter( false ), 'formvalue' ) ?>"
-		size="7" accesskey="f" />
-
-	<input type="checkbox" class="checkbox" name="fm_filter_regex" id="fm_filter_regex" title="<?php echo $titleRegExp; ?>"
-		value="1"<?php if( $fm_Filelist->is_filter_regexp() ) echo ' checked="checked"' ?> />
-	<label for="fm_filter_regex" title="<?php echo $titleRegExp; ?>"><?php
-		echo /* TRANS: short for "is regular expression" */ T_('RegExp'); ?></label>
-
-	<input type="submit" name="actionArray[filter]" class="ActionButton"
-		value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
-
-	<?php
-	if( $fm_Filelist->is_filtering() )
-	{ // "reset filter" form
-		?>
-		<input type="image" name="actionArray[filter_unset]" value="<?php echo T_('Unset filter'); ?>"
-			title="<?php echo T_('Unset filter'); ?>" src="<?php echo get_icon( 'delete', 'url' ) ?>" class="ActionButton" />
-		<?php
-	}
-$Form->end_form();
-?>
-
-
-<!-- THE MAIN FORM -->
+<!-- FILE BROWSER -->
 
 <table id="fm_browser" cellspacing="0" cellpadding="0">
 	<thead>
 		<tr>
 			<td colspan="2" id="fm_bar">
+
+			<!-- FILTER BOX: -->
+
+			<?php
+			// Title for checkbox and its label
+			$titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalue' );
+
+			$Form = & new Form( NULL, 'fmbar_filter_checkchanges', 'post', 'none' );
+			$Form->begin_form( 'toolbaritem' );
+				$Form->hidden_ctrl();
+				$Form->hiddens_by_key( get_memorized(), array('fm_filter', 'fm_filter_regex') );
+				?>
+				<label for="fm_filter" class="tooltitle"><?php echo T_('Filter') ?>:</label>
+				<input type="text" name="fm_filter" id="fm_filter"
+					value="<?php echo format_to_output( $fm_Filelist->get_filter( false ), 'formvalue' ) ?>"
+					size="7" accesskey="f" />
+
+				<input type="checkbox" class="checkbox" name="fm_filter_regex" id="fm_filter_regex" title="<?php echo $titleRegExp; ?>"
+					value="1"<?php if( $fm_Filelist->is_filter_regexp() ) echo ' checked="checked"' ?> />
+				<label for="fm_filter_regex" title="<?php echo $titleRegExp; ?>"><?php
+					echo /* TRANS: short for "is regular expression" */ T_('RegExp'); ?></label>
+
+				<input type="submit" name="actionArray[filter]" class="SmallButton"
+					value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
+
+				<?php
+				if( $fm_Filelist->is_filtering() )
+				{ // "reset filter" form
+					?>
+					<input type="image" name="actionArray[filter_unset]" value="<?php echo T_('Unset filter'); ?>"
+						title="<?php echo T_('Unset filter'); ?>" src="<?php echo get_icon( 'delete', 'url' ) ?>" class="ActionButton" />
+					<?php
+				}
+			$Form->end_form();
+			?>
+
+			<!-- ROOTS SELECT -->
+
 			<?php
 				$Form = & new Form( NULL, 'fmbar_roots', 'post', 'none' );
 				$Form->begin_form();
 				// $Form->hidden_ctrl();
 				$Form->hiddens_by_key( get_memorized() );
 
-				/*
-				 * -----------------------------------------------
-				 * Display ROOTs list:
-				 * -----------------------------------------------
-				 */
 				$rootlist = $FileRootCache->get_available_FileRoots();
 				if( count($rootlist) > 1 )
 				{ // provide list of roots to choose from
@@ -239,104 +234,103 @@ $Form->end_form();
 					echo '</td>';
 				}
 
-				// ______________________________ Files ______________________________
 				echo '<td id="fm_files">';
+				// ______________________________ Files ______________________________
 
 				require dirname(__FILE__).'/_file_list.form.php';
 
-				echo '</td>';
+				// ______________________________ Toolbars ______________________________
+				echo '<div id="fileman_toolbars_bottom">';
+
+				/*
+				 * CREATE FILE/FOLDER TOOLBAR:
+				 */
+				if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ))
+							&& $current_User->check_perm( 'files', 'add' ) )
+				{ // dir or file creation is enabled and we're allowed to add files:
+					global $create_type;
+
+					$Form = & new Form( NULL, 'fmbar_create_checkchanges', 'post', 'none' );
+					$Form->begin_form( 'toolbaritem' );
+						$Form->hidden( 'action', 'createnew' );
+						$Form->hidden_ctrl();
+						$Form->hiddens_by_key( get_memorized() );
+						if( ! $Settings->get( 'fm_enable_create_dir' ) )
+						{	// We can create files only:
+							echo '<label for="fm_createname" class="tooltitle">'.T_('New file:').'</label>';
+							echo '<input type="hidden" name="create_type" value="file" />';
+						}
+						elseif( ! $Settings->get( 'fm_enable_create_file' ) )
+						{	// We can create directories only:
+							echo '<label for="fm_createname" class="tooltitle">'.T_('New folder:').'</label>';
+							echo '<input type="hidden" name="create_type" value="dir" />';
+						}
+						else
+						{	// We can create both files and directories:
+							echo T_('New').': ';
+							echo '<select name="create_type">';
+							echo '<option value="dir"';
+							if( isset($create_type) &&  $create_type == 'dir' )
+							{
+								echo ' selected="selected"';
+							}
+							echo '>'.T_('folder').'</option>';
+
+							echo '<option value="file"';
+							if( isset($create_type) && $create_type == 'file' )
+							{
+								echo ' selected="selected"';
+							}
+							echo '>'.T_('file').'</option>';
+							echo '</select>:';
+						}
+					?>
+					<input type="text" name="create_name" id="fm_createname" value="<?php
+						if( isset( $create_name ) )
+						{
+							echo $create_name;
+						} ?>" size="15" />
+					<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
+					<?php
+					$Form->end_form();
+				}
+
+
+				/*
+				 * UPLOAD:
+				 */
+				if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) )
+				{	// Upload is enabled and we have permission to use it...
+					echo "<!-- QUICK UPLOAD: -->\n";
+					$Form = & new Form( NULL, 'fmbar_quick_upload', 'post', 'none', 'multipart/form-data' );
+					$Form->begin_form( 'toolbaritem' );
+						$Form->hidden( 'ctrl', 'upload' );
+						$Form->hidden( 'upload_quickmode', 1 );
+						// The following is mainly a hint to the browser.
+						$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
+						$Form->hiddens_by_key( get_memorized('ctrl,fm_mode') );
+						echo '<div>';
+						echo '<input name="uploadfile[]" type="file" size="10" />';
+						echo '<input class="ActionButton" type="submit" value="'.T_('Upload!').'" />';
+						echo '</div>';
+					$Form->end_form();
+				}
+
+				echo '</div>';
+				echo '<div class="clear"></div>';
+
+				echo '</td>'
 			?>
 		</tr>
 	</tbody>
 </table>
 
-
-<div id="fileman_toolbars_bottom">
-
-<?php
-
-/*
- * CREATE FILE/FOLDER TOOLBAR:
- */
-if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ))
-			&& $current_User->check_perm( 'files', 'add' ) )
-{ // dir or file creation is enabled and we're allowed to add files:
-	global $create_type;
-
-	$Form = & new Form( NULL, 'fmbar_create_checkchanges', 'post', 'none' );
-	$Form->begin_form( 'toolbaritem' );
-		$Form->hidden( 'action', 'createnew' );
-		$Form->hidden_ctrl();
-		$Form->hiddens_by_key( get_memorized() );
-		if( ! $Settings->get( 'fm_enable_create_dir' ) )
-		{	// We can create files only:
-			echo '<label for="fm_createname" class="tooltitle">'.T_('New file:').'</label>';
-			echo '<input type="hidden" name="create_type" value="file" />';
-		}
-		elseif( ! $Settings->get( 'fm_enable_create_file' ) )
-		{	// We can create directories only:
-			echo '<label for="fm_createname" class="tooltitle">'.T_('New folder:').'</label>';
-			echo '<input type="hidden" name="create_type" value="dir" />';
-		}
-		else
-		{	// We can create both files and directories:
-			echo T_('New').': ';
-			echo '<select name="create_type">';
-			echo '<option value="dir"';
-			if( isset($create_type) &&  $create_type == 'dir' )
-			{
-				echo ' selected="selected"';
-			}
-			echo '>'.T_('folder').'</option>';
-
-			echo '<option value="file"';
-			if( isset($create_type) && $create_type == 'file' )
-			{
-				echo ' selected="selected"';
-			}
-			echo '>'.T_('file').'</option>';
-			echo '</select>:';
-		}
-	?>
-	<input type="text" name="create_name" id="fm_createname" value="<?php
-		if( isset( $create_name ) )
-		{
-			echo $create_name;
-		} ?>" size="15" />
-	<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
-	<?php
-	$Form->end_form();
-}
-
-
-/*
- * UPLOAD:
- */
-if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) )
-{	// Upload is enabled and we have permission to use it...
-	echo "<!-- QUICK UPLOAD: -->\n";
-	$Form = & new Form( NULL, 'fmbar_quick_upload', 'post', 'none', 'multipart/form-data' );
-	$Form->begin_form( 'toolbaritem' );
-		$Form->hidden( 'ctrl', 'upload' );
-		$Form->hidden( 'upload_quickmode', 1 );
-		// The following is mainly a hint to the browser.
-		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
-		$Form->hiddens_by_key( get_memorized('ctrl,fm_mode') );
-		echo '<div>';
-		echo '<input name="uploadfile[]" type="file" size="10" />';
-		echo '<input class="ActionButton" type="submit" value="'.T_('Upload!').'" />';
-		echo '</div>';
-	$Form->end_form();
-}
-?>
-
-</div>
-
-<div class="clear"></div>
-
 <?php
 /*
  * $Log$
+ * Revision 1.44  2007/01/24 07:58:59  fplanque
+ * integrated toolbars
+ *
  * Revision 1.43  2007/01/24 07:18:22  fplanque
  * file split
  *

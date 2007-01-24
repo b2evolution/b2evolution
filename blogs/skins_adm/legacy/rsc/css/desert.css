@@ -166,6 +166,13 @@ a.PublishButton:hover {
 	border: 1px solid #c00;
 }
 
+input.SmallButton {
+	color:#333;
+	background-image: url(../img/desert-button.gif);
+	background-color: #e1ddce;
+	border: 1px solid #ccc5aa;
+}
+
 input.search,
 input.ActionButton,
 input.SaveButton,
@@ -226,14 +233,15 @@ div.edit_actions input.DeleteButton:hover {
 	border-top: 1px solid #9e9286;
 	border-left: 1px solid #9e9286;
 	border-right: 1px solid #9e9286;
-	background-color: #efede0;
+	background-color: #e3dfd0;
 }
 #fm_dirtree {
 	border: 1px solid #9e9286;
+	background-color: #f5f3ef;
 }
 #fm_files {
 	border: 1px solid #9e9286;
-	background-color: #efede0;
+	background-color:#e3dfd0;
 }
 table.filelist {
 	border-bottom: 1px solid #9e9286;
