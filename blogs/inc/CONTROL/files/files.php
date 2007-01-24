@@ -97,7 +97,6 @@ $fm_mode = param( 'fm_mode', 'string', NULL, true );
 
 $action = param_action();
 
-
 // Get root:
 $ads_list_path = false; // false by default, gets set if we have a valid root
 /**
@@ -131,11 +130,6 @@ if( ! $fm_FileRoot )
 	else
 	{
 		$Messages->add( T_('You don\'t have access to any root directory.'), 'error' );
-		$AdminUI->disp_html_head();
-		// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-		$AdminUI->disp_body_top();
-		$AdminUI->disp_global_footer();
-		exit();
 	}
 }
 
@@ -173,6 +167,24 @@ if( $fm_FileRoot )
 }
 
 
+if( empty($ads_list_path) )
+{ // We have no Root / list path, there was an error. Unset any action or mode.
+	$action = 'nil';
+	$fm_mode = NULL;
+
+	$AdminUI->disp_html_head();
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
+	$AdminUI->disp_global_footer();
+	exit();
+}
+
+
+$Debuglog->add( 'FM root: '.var_export( $fm_FileRoot, true ), 'files' );
+$Debuglog->add( 'FM _ads_list_path: '.var_export( $ads_list_path, true ), 'files' );
+$Debuglog->add( 'path: '.var_export( $path, true ), 'files' );
+
+
 // Update sub-menu:
 $AdminUI->add_menu_entries(
 		'files',
@@ -187,34 +199,68 @@ $AdminUI->add_menu_entries(
 	);
 
 
-// Update settings NOW since they may affect the FileList
-if( $action == 'update_settings' )
-{ // Updating user settings from options list
-	$UserSettings->set( 'fm_dirsnotattop',   1-param( 'option_dirsattop',        'integer', 0 ) );
-	$UserSettings->set( 'fm_permlikelsl',      param( 'option_permlikelsl',      'integer', 0 ) );
-	$UserSettings->set( 'fm_imglistpreview',   param( 'option_imglistpreview',   'integer', 0 ) );
-	$UserSettings->set( 'fm_getimagesizes',    param( 'option_getimagesizes',    'integer', 0 ) );
-	$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
-	$UserSettings->set( 'fm_showtypes',        param( 'option_showtypes',        'integer', 0 ) );
-	$UserSettings->set( 'fm_showfsperms',      param( 'option_showfsperms',      'integer', 0 ) );
-	$UserSettings->set( 'fm_showfsowner',      param( 'option_showfsowner',      'integer', 0 ) );
-	$UserSettings->set( 'fm_showfsgroup',      param( 'option_showfsgroup',      'integer', 0 ) );
-	$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
-
-	if( $UserSettings->dbupdate() )
+// Check actions that need early processing:
+if( ! empty($action) )
+{
+	switch( $action )
 	{
-		$Messages->add( T_('Your user settings have been updated.'), 'success' );
-	}
+		case 'filter':
+			$action = 'list';
+			break;
 
-	$action = 'list';
+		case 'filter_unset':
+			// Clear filters!
+			$fm_filter = '';
+			$action = 'list';
+			break;
+
+		case 'createnew':
+			// Check permission:
+			$current_User->check_perm( 'files', 'add', true );
+
+			// create new file/dir
+			param( 'create_type', 'string', '' ); // 'file', 'dir'
+			param( 'create_name', 'string', '' );
+
+			$action = ( $create_type == 'file' ? 'createnew_file' : 'createnew_dir'  );
+			break;
+
+    case 'update_settings':
+			// Update settings NOW since they may affect the FileList
+			$UserSettings->set( 'fm_dirsnotattop',   1-param( 'option_dirsattop',        'integer', 0 ) );
+			$UserSettings->set( 'fm_permlikelsl',      param( 'option_permlikelsl',      'integer', 0 ) );
+			$UserSettings->set( 'fm_imglistpreview',   param( 'option_imglistpreview',   'integer', 0 ) );
+			$UserSettings->set( 'fm_getimagesizes',    param( 'option_getimagesizes',    'integer', 0 ) );
+			$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
+			$UserSettings->set( 'fm_showtypes',        param( 'option_showtypes',        'integer', 0 ) );
+			$UserSettings->set( 'fm_showfsperms',      param( 'option_showfsperms',      'integer', 0 ) );
+			$UserSettings->set( 'fm_showfsowner',      param( 'option_showfsowner',      'integer', 0 ) );
+			$UserSettings->set( 'fm_showfsgroup',      param( 'option_showfsgroup',      'integer', 0 ) );
+			$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
+
+			if( $UserSettings->dbupdate() )
+			{
+				$Messages->add( T_('Your user settings have been updated.'), 'success' );
+			}
+
+			$action = 'list';
+	}
 }
+
+
+// Do we want to display the directory tree next to the files table
+$UserSettings->param_Request( 'fm_hide_dirtree', 'fm_hide_dirtree', 'integer', 0, true );
+
 
 /**
  * Filelist
- * fp>> TODO: When the user is viewing details for a file he should (by default) not be presented with the filelist in addition to the file properties
- * In cases like that, we should try to avoid instanciating a Filelist.
  */
 $fm_Filelist = new Filelist( $fm_FileRoot, $ads_list_path );
+$Debuglog->add( 'FM _rds_list_path: '.var_export( $fm_Filelist->_rds_list_path, true ), 'files' );
+
+param( 'fm_filter', '', NULL, true );
+param( 'fm_filter_regex', 'integer', 0, true );
+$fm_Filelist->set_Filter( $fm_filter, $fm_filter_regex );
 
 if( $UserSettings->param_Request( 'fm_dirsnotattop', 'fm_dirsnotattop', 'integer', 0 ) )
 {
@@ -233,61 +279,37 @@ if( param( 'fm_flatmode', '', NULL, true ) )
 	$fm_Filelist->flatmode = true;
 }
 
-param( 'fm_filter', '', NULL, true );
-param( 'fm_filter_regex', 'integer', 0, true );
+// Load Filelist (with meta data):
+$fm_Filelist->load();
 
-if( ! empty($fm_filter) )
+// Sort Filelist
+param( 'fm_order', 'string', NULL, true );
+if( ! in_array( $fm_order, array( 'name', 'path', 'type', 'size', 'lastmod', 'perms', 'fsowner', 'fsgroup' ) ) )
 {
-	$fm_Filelist->set_filter( $fm_filter, $fm_filter_regex );
+	$fm_order = NULL;
 }
-
-$Debuglog->add( 'FM root: '.var_export( $fm_FileRoot, true ), 'files' );
-$Debuglog->add( 'FM _ads_list_path: '.var_export( $ads_list_path, true ), 'files' );
-$Debuglog->add( 'path: '.var_export( $path, true ), 'files' );
-$Debuglog->add( 'FM _rds_list_path: '.var_export( $fm_Filelist->_rds_list_path, true ), 'files' );
+param( 'fm_orderasc', '', NULL, true );
+$fm_Filelist->sort( $fm_order, $fm_orderasc );
 
 
-// For modes build $fm_source_Filelist
-if( $fm_mode && $fm_sources = param( 'fm_sources', 'array', array(), true ) )
+/**
+ * The selected files
+ * @var Filelist
+ */
+$selected_Filelist = & new Filelist( $fm_Filelist->get_FileRoot(), false );
+
+/**
+ * @global array A list of files which are selected in the FM list.
+ */
+$fm_selected = param( 'fm_selected', 'array', array(), true );
+
+$Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
+
+foreach( $fm_selected as $l_source_path )
 {
-	$fm_sources_root = param( 'fm_sources_root', 'string', '', true );
-
-	$sources_Root = & $FileRootCache->get_by_ID( $fm_sources_root );
-
-	if( $sources_Root )
-	{ // instantiate the source list for the selected sources
-		$fm_source_Filelist = & new Filelist( $sources_Root );
-	}
-	else
-	{ // Fallback: source files are considered to be in the current root
-		$fm_source_Filelist = & new Filelist( $fm_Filelist->get_FileRoot() );
-		$Debuglog->add( 'SourceList without explicit root!', 'error' );
-	}
-
-	if( $fm_source_Filelist )
-	{
-		// TODO: should fail for non-existant sources, or sources where no read-perm
-		foreach( $fm_sources as $l_source_path )
-		{
-			// echo '<br>'.$lSourcePath;
-			$fm_source_Filelist->add_by_subpath( urldecode($l_source_path), true );
-		}
-	}
-	else
-	{ // Without SourceList there's no mode
-		$fm_mode = false;
-	}
+	// echo '<br>'.$l_source_path;
+	$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
 }
-else
-{
-	$fm_source_Filelist = false;
-	$fm_sources = NULL;
-	$fm_sources_root = NULL;
-}
-
-
-// Do we want to display the directory tree next to the files table
-$UserSettings->param_Request( 'fm_hide_dirtree', 'fm_hide_dirtree', 'integer', 0, true );
 
 
 /*
@@ -321,71 +343,6 @@ if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 		forget_param( 'item_ID' );
 		unset( $item_ID );
 	}
-}
-
-
-if( empty($ads_list_path) )
-{ // We have no Root / list path, there was an error. Unset any action or mode.
-	$action = 'nil';
-	$fm_mode = NULL;
-}
-
-// Check actions that toggle Filelist properties or delegate to other actions:
-if( ! empty($action) )
-{
-	switch( $action )
-	{
-		case 'filter_unset':
-			forget_param( 'fm_filter' );
-			$fm_filter = '';
-			$action = 'list';
-			break;
-
-		case 'createnew':
-			// Check permission:
-			$current_User->check_perm( 'files', 'add', true );
-
-			// create new file/dir
-			param( 'create_type', 'string', '' ); // 'file', 'dir'
-			param( 'create_name', 'string', '' );
-
-			$action = ( $create_type == 'file' ? 'createnew_file' : 'createnew_dir'  );
-			break;
-	}
-}
-
-$fm_Filelist->set_Filter( $fm_filter, $fm_filter_regex );
-
-// Load Filelist (with meta data):
-$fm_Filelist->load();
-
-// Sort Filelist
-param( 'fm_order', 'string', NULL, true );
-if( ! in_array( $fm_order, array( 'name', 'path', 'type', 'size', 'lastmod', 'perms', 'fsowner', 'fsgroup' ) ) )
-{
-	$fm_order = NULL;
-}
-param( 'fm_orderasc', '', NULL, true );
-$fm_Filelist->sort( $fm_order, $fm_orderasc );
-
-
-/**
- * The selected files
- * @var Filelist
- */
-$selected_Filelist = & new Filelist( $fm_Filelist->get_FileRoot(), false );
-
-/**
- * @global array A list of files which are selected in the FM list.
- */
-$fm_selected = param( 'fm_selected', 'array', array(), true );
-
-$Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
-
-foreach( $fm_selected as $l_source_path )
-{
-	// echo '<br>'.$l_source_path;
-	$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
 }
 
 
@@ -1135,6 +1092,44 @@ switch( $fm_mode )
 			break;
 		}
 
+		// Get the source list
+		if( $fm_sources = param( 'fm_sources', 'array', array(), true ) )
+		{
+			$fm_sources_root = param( 'fm_sources_root', 'string', '', true );
+
+			$sources_Root = & $FileRootCache->get_by_ID( $fm_sources_root );
+
+			if( $sources_Root )
+			{ // instantiate the source list for the selected sources
+				$fm_source_Filelist = & new Filelist( $sources_Root );
+			}
+			else
+			{ // Fallback: source files are considered to be in the current root
+				$fm_source_Filelist = & new Filelist( $fm_Filelist->get_FileRoot() );
+				$Debuglog->add( 'SourceList without explicit root!', 'error' );
+			}
+
+			if( $fm_source_Filelist )
+			{
+				// TODO: should fail for non-existant sources, or sources where no read-perm
+				foreach( $fm_sources as $l_source_path )
+				{
+					// echo '<br>'.$lSourcePath;
+					$fm_source_Filelist->add_by_subpath( urldecode($l_source_path), true );
+				}
+			}
+			else
+			{ // Without SourceList there's no mode
+				$fm_mode = false;
+			}
+		}
+		else
+		{
+			$fm_source_Filelist = false;
+			$fm_sources = NULL;
+			$fm_sources_root = NULL;
+		}
+
 		if( ! $fm_source_Filelist || ! $fm_source_Filelist->count() )
 		{
 			$Messages->add( T_('No source files!'), 'error' );
@@ -1460,6 +1455,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.51  2007/01/24 06:31:41  fplanque
+ * decrap refactoring
+ *
  * Revision 1.50  2007/01/24 05:57:55  fplanque
  * cleanup / settings
  *
