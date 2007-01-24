@@ -175,6 +175,8 @@ function get_admin_skins()
 /**
  * A replacement for fnmatch() which needs PHP 4.3
  *
+ * @todo fp> *.j matches image.jpg - i don't think that's normal -- PHP 4.3 ok now
+ *
  * @author jcl [atNOSPAM] jcl [dot] name {@link http://php.net/manual/function.fnmatch.php}
  */
 function my_fnmatch( $pattern, $file )
@@ -783,6 +785,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.47  2007/01/24 06:31:09  fplanque
+ * doc
+ *
  * Revision 1.46  2007/01/24 05:57:55  fplanque
  * cleanup / settings
  *
