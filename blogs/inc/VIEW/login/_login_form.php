@@ -195,7 +195,7 @@ $Form->end_form();
 
 
 <div class="login_actions" style="text-align:right">
-	<?php user_register_link( '', ' &middot; ', '', '#', true /*disp_when_logged_in*/ )?>
+	<?php user_register_link( '', '', '', '#', true /*disp_when_logged_in*/ )?>
 
 
 	<?php
@@ -204,7 +204,7 @@ $Form->end_form();
 		&& strpos($ReqHost.$redirect_to, $admin_url ) !== 0 )
 	{ // No login required, allow to pass through
 		// TODO: dh> validate redirect_to param?!
-		echo '<a href="'.htmlspecialchars(url_rel_to_same_host($redirect_to, $ReqHost)).'">'
+		echo ' &middot; <a href="'.htmlspecialchars(url_rel_to_same_host($redirect_to, $ReqHost)).'">'
 		./* Gets displayed as link to the location on the login form if no login is required */ T_('Abort login!').'</a>';
 	}
 	?>
@@ -217,6 +217,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.43  2007/01/25 21:55:02  blueyed
+ * Only display "&middot;" if text follows with the links in the bottom right
+ *
  * Revision 1.42  2007/01/20 01:44:56  blueyed
  * todo
  *
