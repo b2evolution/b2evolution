@@ -489,8 +489,9 @@ $Form->begin_form();
 				// NOTE: No delete confirmation by javascript, we need to check DB integrity!
 
 			}
-			?>
 
+
+			/* BROKEN:
 			<input class="ActionButton"
 				title="<?php echo T_('Download the selected files as archive...') ?>"
 				name="actionArray[download]"
@@ -498,8 +499,8 @@ $Form->begin_form();
 				type="image"
 				src="<?php echo get_icon( 'download', 'url' ) ?>"
 				onclick="return check_if_selected_files();" />
+			*/
 
-			<?php
 			/* Not fully functional:
 			<input class="ActionButton" type="image" name="actionArray[file_copy]"
 				title="<?php echo T_('Copy the selected files'); ?>"
@@ -609,6 +610,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.4  2007/01/25 03:45:49  fplanque
+ * deactivated broken feature
+ *
  * Revision 1.3  2007/01/25 03:17:00  fplanque
  * visual cleanup for average users
  * geeky stuff preserved as options
