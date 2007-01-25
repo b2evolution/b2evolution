@@ -226,97 +226,79 @@ $Form->begin_form();
 
 		echo '<td class="fm_filename">';
 
-		/*************  Invalid filename warning:  *************/
+			/*************  Invalid filename warning:  *************/
 
-		if( !$lFile->is_dir() )
-		{
-			if( $error_filename = validate_filename( $lFile->get_name() ) )
-			{ // TODO: Warning icon with hint
-				echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_filename ) );
-			}
-		}
-		elseif( $error_dirname = validate_dirname( $lFile->get_name() ) )
-		{ // TODO: Warning icon with hint
-			echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_dirname ) );
-		}
-
-		/****  Open in a new window  (only directories)  ****/
-
-		if( $lFile->is_dir() )
-		{ // Directory
-			$browse_dir_url = $lFile->get_view_url();
-			$target = 'evo_fm_'.$lFile->get_md5_ID();
-
-			echo '<a href="'.$browse_dir_url.'" target="'.$target.' " class="filenameIcon"
-						title="'.T_('Open in a new window').'" onclick="'
-
-						."pop_up_window( '$browse_dir_url', '$target', '"
-						.'width=800,height=800,'
-						."scrollbars=yes,status=yes,resizable=yes' ); return false;"
-
-						.'">'.get_icon( 'window_new' ).'</a>';
-		}
-
-		/***************  Link ("chain") icon:  **************/
-
-		if( isset($edited_Item) && $current_User->check_perm( 'item', 'edit', false, $edited_Item ) )
-		{	// Offer option to link the file to an Item (or anything else):
-			echo action_icon( T_('Link this file!'), 'link', regenerate_url( 'fm_selected', 'action=link&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
-			echo ' ';
-		}
-
-		/********************  Filename  ********************/
-
-		if( $lFile->is_dir() )
-		{ // Directory
-			// Link to open the directory in the curent window
-			echo '<a href="'.$browse_dir_url.'">'.$lFile->dget('name').'</a>';
-		}
-		else
-		{ // File
-			if( $view_link = $lFile->get_view_link( $lFile->get_name(), NULL, NULL ) )
+			if( !$lFile->is_dir() )
 			{
-				echo $view_link;
+				if( $error_filename = validate_filename( $lFile->get_name() ) )
+				{ // TODO: Warning icon with hint
+					echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_filename ) );
+				}
+			}
+			elseif( $error_dirname = validate_dirname( $lFile->get_name() ) )
+			{ // TODO: Warning icon with hint
+				echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_dirname ) );
+			}
+
+			/****  Open in a new window  (only directories)  ****/
+
+			if( $lFile->is_dir() )
+			{ // Directory
+				$browse_dir_url = $lFile->get_view_url();
+				$target = 'evo_fm_'.$lFile->get_md5_ID();
+
+				echo '<a href="'.$browse_dir_url.'" target="'.$target.' " class="filenameIcon"
+							title="'.T_('Open in a new window').'" onclick="'
+
+							."pop_up_window( '$browse_dir_url', '$target', '"
+							.'width=800,height=800,'
+							."scrollbars=yes,status=yes,resizable=yes' ); return false;"
+
+							.'">'.get_icon( 'window_new' ).'</a>';
+			}
+
+			/***************  Link ("chain") icon:  **************/
+
+			if( isset($edited_Item) && $current_User->check_perm( 'item', 'edit', false, $edited_Item ) )
+			{	// Offer option to link the file to an Item (or anything else):
+				echo action_icon( T_('Link this file!'), 'link', regenerate_url( 'fm_selected', 'action=link&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
+				echo ' ';
+			}
+
+			/********************  Filename  ********************/
+
+			if( $lFile->is_dir() )
+			{ // Directory
+				// Link to open the directory in the curent window
+				echo '<a href="'.$browse_dir_url.'">'.$lFile->dget('name').'</a>';
 			}
 			else
-			{ // File extension unrecognized
-				echo $lFile->dget('name');
+			{ // File
+				if( $view_link = $lFile->get_view_link( $lFile->get_name(), NULL, NULL ) )
+				{
+					echo $view_link;
+				}
+				else
+				{ // File extension unrecognized
+					echo $lFile->dget('name');
+				}
 			}
-		}
 
-		/***************  File meta data:  **************/
+			/***************  File meta data:  **************/
 
-		echo '<span class="filemeta">';
-		// Optionally display IMAGE pixel size:
-		if( $UserSettings->get( 'fm_getimagesizes' ) )
-		{
-			echo ' ('.$lFile->get_image_size( 'widthxheight' ).')';
-		}
-		// Optionnaly display meta data title:
-		if( $lFile->meta == 'loaded' )
-		{	// We have loaded meta data for this file:
-			echo ' - '.$lFile->title;
-		}
-		echo '</span>';
-
-		/*
-		 * Directory in flat mode:
-		 *
-		if( $fm_flatmode && $fm_Filelist->get_sort_order() == 'name' )
-		{
-			?>
-			<div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
-			$subPath = $lFile->get_rdfs_rel_path();
-			if( empty( $subPath ) )
+			echo '<span class="filemeta">';
+			// Optionally display IMAGE pixel size:
+			if( $UserSettings->get( 'fm_getimagesizes' ) )
 			{
-				$subPath = './';
+				echo ' ('.$lFile->get_image_size( 'widthxheight' ).')';
 			}
-			echo $subPath;
-			?>
-			</div>
-			<?php
-		}
-		*/
+			// Optionnaly display meta data title:
+			if( $lFile->meta == 'loaded' )
+			{	// We have loaded meta data for this file:
+				echo ' - '.$lFile->title;
+			}
+			echo '</span>';
+
 		echo '</td>';
 
 		/*******************  File type  ******************/
@@ -513,6 +495,7 @@ $Form->begin_form();
 				title="<?php echo T_('Move the selected files'); ?>"
 				onclick="return check_if_selected_files();"
 				src="<?php echo get_icon( 'file_move', 'url' ); ?>" />
+
 			// This is too geeky! Default perms radio options and unchecked radio groups! NO WAY!
 			// If you want this feature to be usable by average users you must only have one line per file OR one file for all. You can't mix both.
 			// The only way to have both is to have 2 spearate forms: 1 titled "change perms for all files simultaneously"-> submit  and another 1 title "change perms for each file individually" -> another submit
@@ -611,6 +594,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.2  2007/01/25 02:42:01  fplanque
+ * cleanup
+ *
  * Revision 1.1  2007/01/24 07:18:22  fplanque
  * file split
  *
