@@ -37,10 +37,10 @@
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
 
+require_once $inc_path.'_main.inc.php';
+
 // Login is not required on the register page:
 $login_required = false;
-
-require_once $inc_path.'_main.inc.php';
 
 
 param( 'action', 'string', '' );
@@ -200,6 +200,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.79  2007/01/25 22:03:37  blueyed
+ * Move hardcoded "$login_required = false" after include of _main.inc.php, so that it cannot get overridden in main init. There is no use case for this.
+ *
  * Revision 1.78  2007/01/16 00:44:42  fplanque
  * don't use $admin_email in  the app
  *
