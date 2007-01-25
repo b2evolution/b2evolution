@@ -525,13 +525,16 @@ class Plugins
 				}
 			}
 
-			if( $this->index_ID_rows[$Plugin->ID]['plug_name'] !== NULL )
+			if( $Plugin )
 			{
-				$Plugin->name = $this->index_ID_rows[$Plugin->ID]['plug_name'];
-			}
-			if( $this->index_ID_rows[$Plugin->ID]['plug_shortdesc'] !== NULL )
-			{
-				$Plugin->short_desc = $this->index_ID_rows[$Plugin->ID]['plug_shortdesc'];
+				if( $this->index_ID_rows[$Plugin->ID]['plug_name'] !== NULL )
+				{
+					$Plugin->name = $this->index_ID_rows[$Plugin->ID]['plug_name'];
+				}
+				if( $this->index_ID_rows[$Plugin->ID]['plug_shortdesc'] !== NULL )
+				{
+					$Plugin->short_desc = $this->index_ID_rows[$Plugin->ID]['plug_shortdesc'];
+				}
 			}
 		}
 		else
@@ -787,7 +790,7 @@ class Plugins
 	 * @param array Associative array of parameters for the Plugin
 	 * @return boolean True, if at least one plugin has been called.
 	 */
-	function trigger_event( $event, $params = NULL )
+	function trigger_event( $event, $params = array() )
 	{
 		global $Debuglog;
 
@@ -1787,6 +1790,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.137  2007/01/25 23:48:18  blueyed
+ * Fixed notice if Plugin got unregistered, e.g. because of DB schema change during loading; always pass array() if calling a Plugin method as $params
+ *
  * Revision 1.136  2007/01/18 00:23:57  blueyed
  * doc
  *
