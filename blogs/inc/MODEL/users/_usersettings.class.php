@@ -64,6 +64,8 @@ class UserSettings extends AbstractSettings
 		'pref_edit_tab' => 'simple',
 
 		'fm_imglistpreview' => 1,
+		'fm_showdate'       => 'compact',
+		'fm_allowfiltering' => 'simple',
 
 		'blogperms_layout' => 'default', // selected view in blog (user/group) perms
 	);
@@ -204,6 +206,10 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.27  2007/01/25 03:17:00  fplanque
+ * visual cleanup for average users
+ * geeky stuff preserved as options
+ *
  * Revision 1.26  2007/01/24 01:57:07  fplanque
  * minor
  *

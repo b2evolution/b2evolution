@@ -49,6 +49,10 @@ $Form->begin_form( 'fform', T_('Display settings') );
 
 	$Form->begin_fieldset( T_('Columns') );
 		$Form->checkbox( 'option_showtypes', $UserSettings->get('fm_showtypes'), T_('File type'), T_('Based on file extension') );
+		$Form->radio_input( 'option_showdate', $UserSettings->get('fm_showdate'), array(
+				array( 'value'=>'no', 'label'=>T_('No') ),
+				array( 'value'=>'compact', 'label'=>T_('Compact format') ),
+				array( 'value'=>'long', 'label'=>T_('Long format') ) ), T_('Last change') );
 		$Form->checkbox( 'option_showfsperms', $UserSettings->get('fm_showfsperms'), T_('File permissions'), T_('Unix file permissions') );
 		$Form->checkbox( 'option_permlikelsl', $UserSettings->get('fm_permlikelsl'), '', T_('Check to display file permissions like "rwxr-xr-x" rather than short form') );
 		$Form->checkbox( 'option_showfsowner', $UserSettings->get('fm_showfsowner'), T_('File Owner'), T_('Unix file owner') );
@@ -59,6 +63,10 @@ $Form->begin_form( 'fform', T_('Display settings') );
 		$Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Hidden files'), T_('Check to show hidden files') );
 		$Form->checkbox( 'option_dirsattop', !$UserSettings->get('fm_dirsnotattop'), T_('Folders first'), T_('Check to always display folders before files') );
 		$Form->checkbox( 'option_recursivedirsize', $UserSettings->get('fm_recursivedirsize'), T_('Folder sizes'), T_('Check to compute recursive size of folders') );
+		$Form->radio_input( 'option_allowfiltering', $UserSettings->get('fm_allowfiltering'), array(
+				array( 'value'=>'no', 'label'=>T_('No') ),
+				array( 'value'=>'simple', 'label'=>T_('Simple') ),
+				array( 'value'=>'regexp', 'label'=>T_('With regular expressions') ) ), T_('Allow filtering') );
 		$Form->checkbox( 'option_uploadwithproperties', $UserSettings->get('fm_uploadwithproperties'), T_('Upload with properties'), T_('Check to add file properties to the upload form') );
 	$Form->end_fieldset();
 
@@ -67,6 +75,10 @@ $Form->end_form( array( array( 'submit', 'actionArray[update_settings]', T_('Upd
 
 /*
  * $Log$
+ * Revision 1.4  2007/01/25 03:17:00  fplanque
+ * visual cleanup for average users
+ * geeky stuff preserved as options
+ *
  * Revision 1.3  2007/01/25 02:41:26  fplanque
  * made settings non sticky
  *

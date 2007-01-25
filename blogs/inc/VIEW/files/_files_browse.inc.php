@@ -54,6 +54,8 @@ global $current_User;
  */
 global $Settings;
 
+global $UserSettings;
+
 global $fm_hide_dirtree, $create_name, $ads_list_path;
 
 ?>
@@ -64,40 +66,46 @@ global $fm_hide_dirtree, $create_name, $ads_list_path;
 	<thead>
 		<tr>
 			<td colspan="2" id="fm_bar">
-
-			<!-- FILTER BOX: -->
-
 			<?php
-			// Title for checkbox and its label
-			$titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalue' );
+				if( $UserSettings->get( 'fm_allowfiltering' ) != 'no' )
+				{
+					// Title for checkbox and its label
+					$titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalue' );
 
-			$Form = & new Form( NULL, 'fmbar_filter_checkchanges', 'post', 'none' );
-			$Form->begin_form( 'toolbaritem' );
-				$Form->hidden_ctrl();
-				$Form->hiddens_by_key( get_memorized(), array('fm_filter', 'fm_filter_regex') );
-				?>
-				<label for="fm_filter" class="tooltitle"><?php echo T_('Filter') ?>:</label>
-				<input type="text" name="fm_filter" id="fm_filter"
-					value="<?php echo format_to_output( $fm_Filelist->get_filter( false ), 'formvalue' ) ?>"
-					size="7" accesskey="f" />
-
-				<input type="checkbox" class="checkbox" name="fm_filter_regex" id="fm_filter_regex" title="<?php echo $titleRegExp; ?>"
-					value="1"<?php if( $fm_Filelist->is_filter_regexp() ) echo ' checked="checked"' ?> />
-				<label for="fm_filter_regex" title="<?php echo $titleRegExp; ?>"><?php
-					echo /* TRANS: short for "is regular expression" */ T_('RegExp'); ?></label>
-
-				<input type="submit" name="actionArray[filter]" class="SmallButton"
-					value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
-
-				<?php
-				if( $fm_Filelist->is_filtering() )
-				{ // "reset filter" form
+					$Form = & new Form( NULL, 'fmbar_filter_checkchanges', 'get', 'none' );
+					$Form->begin_form( 'toolbaritem' );
+					$Form->hidden_ctrl();
+					$Form->hiddens_by_key( get_memorized(), array('fm_filter', 'fm_filter_regex') );
 					?>
-					<input type="image" name="actionArray[filter_unset]" value="<?php echo T_('Unset filter'); ?>"
-						title="<?php echo T_('Unset filter'); ?>" src="<?php echo get_icon( 'delete', 'url' ) ?>" class="ActionButton" />
+					<label for="fm_filter" class="tooltitle"><?php echo T_('Filter') ?>:</label>
+					<input type="text" name="fm_filter" id="fm_filter"
+						value="<?php echo format_to_output( $fm_Filelist->get_filter( false ), 'formvalue' ) ?>"
+						size="7" accesskey="f" />
+
 					<?php
-				}
-			$Form->end_form();
+						if( $UserSettings->get( 'fm_allowfiltering' ) == 'regexp' )
+						{
+							?>
+							<input type="checkbox" class="checkbox" name="fm_filter_regex" id="fm_filter_regex" title="<?php echo $titleRegExp; ?>"
+								value="1"<?php if( $fm_Filelist->is_filter_regexp() ) echo ' checked="checked"' ?> />
+							<label for="fm_filter_regex" title="<?php echo $titleRegExp; ?>"><?php
+								echo /* TRANS: short for "is regular expression" */ T_('RegExp').'</label>';
+						}
+					?>
+
+					<input type="submit" name="actionArray[filter]" class="SmallButton"
+						value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
+
+					<?php
+					if( $fm_Filelist->is_filtering() )
+					{ // "reset filter" form
+						?>
+						<input type="image" name="actionArray[filter_unset]" value="<?php echo T_('Unset filter'); ?>"
+							title="<?php echo T_('Unset filter'); ?>" src="<?php echo get_icon( 'delete', 'url' ) ?>" class="ActionButton" />
+						<?php
+					}
+				$Form->end_form();
+			}
 			?>
 
 			<!-- ROOTS SELECT -->
@@ -328,6 +336,10 @@ global $fm_hide_dirtree, $create_name, $ads_list_path;
 <?php
 /*
  * $Log$
+ * Revision 1.46  2007/01/25 03:17:00  fplanque
+ * visual cleanup for average users
+ * geeky stuff preserved as options
+ *
  * Revision 1.45  2007/01/25 02:41:50  fplanque
  * made settings non sticky
  *

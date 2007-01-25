@@ -676,22 +676,39 @@ class File extends DataObject
 	 */
 	function get_lastmod_formatted( $format = '#' )
 	{
+		global $localtimenow;
+
 		switch( $format )
 		{
-			case '#':
-				$format = locale_datefmt().' '.locale_timefmt();
-				break;
-
 			case 'date':
-				$format = locale_datefmt();
-				break;
+				return date_i18n( locale_datefmt(), $this->_lastmod_ts );
 
 			case 'time':
-				$format = locale_timefmt();
-				break;
-		}
+				return date_i18n( locale_timefmt(), $this->_lastmod_ts );
 
-		return date_i18n( $format, $this->_lastmod_ts );
+			case 'compact':
+				$age = $localtimenow - $this->_lastmod_ts;
+				if( $age < 3600 )
+				{	// Less than 1 hour: return full time
+					return date_i18n( 'H:i:s', $this->_lastmod_ts );
+				}
+				if( $age < 86400 )
+				{	// Less than 24 hours: return compact time
+					return date_i18n( 'H:i', $this->_lastmod_ts );
+				}
+				if( $age < 31536000 )
+				{	// Less than 365 days: Month and day
+					return date_i18n( 'M, d', $this->_lastmod_ts );
+				}
+				// Older: return yeat
+				return date_i18n( 'Y', $this->_lastmod_ts );
+				break;
+
+			case '#':
+				default:
+				$format = locale_datefmt().' '.locale_timefmt();
+				return date_i18n( $format, $this->_lastmod_ts );
+		}
 	}
 
 
@@ -1678,6 +1695,10 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.37  2007/01/25 03:17:00  fplanque
+ * visual cleanup for average users
+ * geeky stuff preserved as options
+ *
  * Revision 1.36  2007/01/24 05:57:55  fplanque
  * cleanup / settings
  *

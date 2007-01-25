@@ -348,13 +348,17 @@ switch( $action )
 		$UserSettings->set( 'fm_permlikelsl',      param( 'option_permlikelsl',      'integer', 0 ) );
 		$UserSettings->set( 'fm_imglistpreview',   param( 'option_imglistpreview',   'integer', 0 ) );
 		$UserSettings->set( 'fm_getimagesizes',    param( 'option_getimagesizes',    'integer', 0 ) );
-		$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
-		$UserSettings->set( 'fm_uploadwithproperties', param( 'option_uploadwithproperties', 'integer', 0 ) );
+
 		$UserSettings->set( 'fm_showtypes',        param( 'option_showtypes',        'integer', 0 ) );
+		$UserSettings->set( 'fm_showdate',         param( 'option_showdate',         'string', 'compact' ) );
 		$UserSettings->set( 'fm_showfsperms',      param( 'option_showfsperms',      'integer', 0 ) );
 		$UserSettings->set( 'fm_showfsowner',      param( 'option_showfsowner',      'integer', 0 ) );
 		$UserSettings->set( 'fm_showfsgroup',      param( 'option_showfsgroup',      'integer', 0 ) );
+
 		$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
+		$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
+		$UserSettings->set( 'fm_uploadwithproperties', param( 'option_uploadwithproperties', 'integer', 0 ) );
+		$UserSettings->set( 'fm_allowfiltering',   param( 'option_allowfiltering', 'string', 'simple' ) );
 
 		if( $UserSettings->dbupdate() )
 		{
@@ -1473,6 +1477,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.54  2007/01/25 03:17:00  fplanque
+ * visual cleanup for average users
+ * geeky stuff preserved as options
+ *
  * Revision 1.53  2007/01/25 02:41:10  fplanque
  * refactoring / decrap
  *

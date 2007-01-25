@@ -125,7 +125,11 @@ $Form->begin_form();
 		}
 
 		echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'size', /* TRANS: file size */ T_('Size') ).'</th>';
-		echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'lastmod', /* TRANS: file's last change / timestamp */ T_('Last change') ).'</th>';
+
+		if( $UserSettings->get('fm_showdate') != 'no' )
+		{ // Show last mod column
+			echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'lastmod', /* TRANS: file's last change / timestamp */ T_('Last change') ).'</th>';
+		}
 
 		if( $UserSettings->get('fm_showfsperms') )
 		{ // Show file perms column
@@ -314,10 +318,20 @@ $Form->begin_form();
 
 		/****************  File time stamp  ***************/
 
-		echo '<td class="timestamp">';
-		echo '<span class="date">'.$lFile->get_lastmod_formatted( 'date' ).'</span> ';
-		echo '<span class="time">'.$lFile->get_lastmod_formatted( 'time' ).'</span>';
-		echo '</td>';
+		if( $UserSettings->get('fm_showdate') != 'no' )
+		{ // Show file types
+			echo '<td class="timestamp">';
+			if( $UserSettings->get('fm_showdate') == 'long' )
+			{
+				echo '<span class="date">'.$lFile->get_lastmod_formatted( 'date' ).'</span> ';
+				echo '<span class="time">'.$lFile->get_lastmod_formatted( 'time' ).'</span>';
+			}
+			else
+			{	// Compact format
+				echo $lFile->get_lastmod_formatted( 'compact' );
+			}
+			echo '</td>';
+		}
 
 		/****************  File pemissions  ***************/
 
@@ -393,9 +407,10 @@ $Form->begin_form();
 	/**
 	 * @global integer Number of cols for the files table, 6 is minimum.
 	 */
-	$filetable_cols = 6
+	$filetable_cols = 5
 		+ (int)$fm_flatmode
 		+ (int)$UserSettings->get('fm_showtypes')
+		+ (int)($UserSettings->get('fm_showdate') != 'no')
 		+ (int)$UserSettings->get('fm_showfsperms')
 		+ (int)$UserSettings->get('fm_showfsowner')
 		+ (int)$UserSettings->get('fm_showfsgroup')
@@ -594,6 +609,10 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.3  2007/01/25 03:17:00  fplanque
+ * visual cleanup for average users
+ * geeky stuff preserved as options
+ *
  * Revision 1.2  2007/01/25 02:42:01  fplanque
  * cleanup
  *
