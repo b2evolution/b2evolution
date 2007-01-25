@@ -900,7 +900,7 @@ class File extends DataObject
 		}
 		else
 		{
-			return bytesreadable( $this->_size, 0 );
+			return bytesreadable( $this->_size );
 		}
 	}
 
@@ -1695,6 +1695,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2007/01/25 03:37:14  fplanque
+ * made bytesreadable() really readable for average people.
+ *
  * Revision 1.37  2007/01/25 03:17:00  fplanque
  * visual cleanup for average users
  * geeky stuff preserved as options

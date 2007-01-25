@@ -40,9 +40,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param integer bytes
  * @return string bytes made readable
  */
-function bytesreadable( $bytes, $decimals = 2 )
+function bytesreadable( $bytes )
 {
 	static $types = NULL;
+
+	if( empty($bytes) )
+	{
+		return T_('Empty');
+	}
 
 	if( !isset($types) )
 	{ // generate once:
@@ -60,10 +65,15 @@ function bytesreadable( $bytes, $decimals = 2 )
 		$bytes /= 1024;
 	}
 
-	$r = round($bytes, $decimals).'&nbsp;';
-	$r .= '<abbr title="'.$types[$i]['text'].'">';
+	// Format to maximum of 1 digit after .
+	$precision = max( 0, ( 1 -floor(log($bytes)/log(10))) );
+	$r = sprintf( '%.'.$precision.'f', $bytes );
+
+	$r .= '&nbsp;<abbr title="'.$types[$i]['text'].'">';
 	$r .= $types[$i]['abbr'];
 	$r .= '</abbr>';
+
+	// $r .= ' '.$precision;
 
 	return $r;
 }
@@ -745,6 +755,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.50  2007/01/25 03:37:14  fplanque
+ * made bytesreadable() really readable for average people.
+ *
  * Revision 1.49  2007/01/24 13:44:56  fplanque
  * cleaned up upload
  *
