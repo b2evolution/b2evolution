@@ -176,14 +176,6 @@ class DB
 	var $use_transactions = false;
 
 	/**
-	 * AUTOCOMMIT mode. Default for MySQL is ON.
-	 * @see DB::set_autocommit()
-	 * @access protected
-	 * @var boolean
-	 */
-	var $autocommit = true;
-
-	/**
 	 * How many transactions are currently nested?
 	 */
 	var $transaction_nesting_level = 0;
@@ -1230,10 +1222,6 @@ class DB
 				{
 					$this->query( 'COMMIT', 'COMMIT transaction' );
 				}
-				if( ! $this->autocommit )
-				{
-					$this->transaction_nesting_level = 2;
-				}
 				$this->rollback_nested_transaction = false;
 			}
 			$this->transaction_nesting_level--;
@@ -1252,39 +1240,12 @@ class DB
 			{ // Only ROLLBACK if there are no remaining nested transactions:
 				$this->query( 'ROLLBACK', 'ROLLBACK transaction' );
 				$this->rollback_nested_transaction = false;
-
-				if( ! $this->autocommit )
-				{
-					$this->transaction_nesting_level = 2;
-				}
 			}
 			else
 			{ // Remember we'll have to roll back at the end!
 				$this->rollback_nested_transaction = true;
 			}
 			$this->transaction_nesting_level--;
-		}
-	}
-
-
-	/**
-	 * Set AUTOCOMMIT value.
-	 *
-	 * If the autocommit mode is switched off, then we can consider that a
-	 * user always has a transaction open.
-	 *
-	 * @param boolean
-	 */
-	function set_autocommit( $mode )
-	{
-		if( $this->use_transactions )
-		{
-			$this->autocommit = $mode;
-			if( ! $mode )
-			{
-				$this->transaction_nesting_level = 1;
-			}
-			$this->query( 'SET AUTOCOMMIT = '.(int)$mode );
 		}
 	}
 
@@ -1383,8 +1344,8 @@ class DB
 
 /*
  * $Log$
- * Revision 1.53  2007/01/24 23:39:42  blueyed
- * AUTOCOMMIT support; probably too bloated and may get rolled back - I wonder though if it is done right.. :p - I have implemented this for the PHP-OpenID MySQL store
+ * Revision 1.54  2007/01/25 05:14:13  fplanque
+ * rollback
  *
  * Revision 1.52  2006/12/14 00:42:04  fplanque
  * A little bit of windows detection / normalization
