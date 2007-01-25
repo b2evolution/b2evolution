@@ -505,7 +505,7 @@ switch( $action )
 		// Exit any special mode we may have been in:
 		$fm_mode = NULL;
 
-		$action_title = T_('Downoad');
+		$action_title = T_('Download');
 
 		if( !$selected_Filelist->count() )
 		{
@@ -1477,6 +1477,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.55  2007/01/25 05:09:06  fplanque
+ * i18n update
+ *
  * Revision 1.54  2007/01/25 03:17:00  fplanque
  * visual cleanup for average users
  * geeky stuff preserved as options

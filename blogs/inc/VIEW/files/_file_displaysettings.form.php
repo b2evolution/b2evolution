@@ -35,7 +35,7 @@ global $UserSettings;
 
 $Form = & new Form( NULL, 'file_displaysettings_checkchanges' );
 
-$Form->global_icon( T_('Quit settings mode!'), 'close', regenerate_url() );
+$Form->global_icon( T_('Close settings!'), 'close', regenerate_url() );
 
 $Form->begin_form( 'fform', T_('Display settings') );
 
@@ -60,7 +60,7 @@ $Form->begin_form( 'fform', T_('Display settings') );
 	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('Options') );
-		$Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Hidden files'), T_('Check to show hidden files') );
+		$Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Hidden files'), T_('Check to show hidden files. Hidden files start with a dot (.)') );
 		$Form->checkbox( 'option_dirsattop', !$UserSettings->get('fm_dirsnotattop'), T_('Folders first'), T_('Check to always display folders before files') );
 		$Form->checkbox( 'option_recursivedirsize', $UserSettings->get('fm_recursivedirsize'), T_('Folder sizes'), T_('Check to compute recursive size of folders') );
 		$Form->radio_input( 'option_allowfiltering', $UserSettings->get('fm_allowfiltering'), array(
@@ -75,6 +75,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update_settings]', T_('Upd
 
 /*
  * $Log$
+ * Revision 1.5  2007/01/25 05:09:05  fplanque
+ * i18n update
+ *
  * Revision 1.4  2007/01/25 03:17:00  fplanque
  * visual cleanup for average users
  * geeky stuff preserved as options

@@ -53,7 +53,7 @@ function Blog_get_by_ID( $blog_ID )
 	{
 		blog_load_cache();
 	}
-	if( !isset( $cache_blogs[$blog_ID] ) ) debug_die( T_('Requested blog does not exist!') );
+	if( !isset( $cache_blogs[$blog_ID] ) ) debug_die( 'Requested blog does not exist!' );
 
 	return new Blog( $cache_blogs[$blog_ID] ); // COPY !
 }
@@ -275,7 +275,7 @@ function pingback_ping( $m )
 					// CHECK and FORMAT content
 					if( $error = validate_url( $pagelinkedfrom, $comments_allowed_uri_scheme ) )
 					{
-						$Messages->add( T_('Supplied URL is invalid: ').$error );
+						$Messages->add( 'Supplied URL is invalid: '.$error );
 					}
 					$context = format_to_post($context,1,1);
 
@@ -306,16 +306,16 @@ function pingback_ping( $m )
 							locale_temp_switch( $AuthorUser->get( 'locale' ) );
 
 							$recipient = $AuthorUser->get( 'email' );
-							$subject = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] );
+							$subject = sprintf( 'New pingback on your post #%d "%s"', $post_ID, $postdata['Title'] );
 
 							$comment_Blog = & $BlogCache->get_by_ID( $blog );
 
-							$notify_message  = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] )."\n";
+							$notify_message  = sprintf( 'New pingback on your post #%d "%s"', $post_ID, $postdata['Title'] )."\n";
 							$notify_message .= url_add_param( $comment_Blog->get('blogurl'), "p=$post_ID&pb=1\n\n", '&' );
-							$notify_message .= T_('Website'). ": $original_title\n";
-							$notify_message .= T_('Url'). ": $original_pagelinkedfrom\n";
-							$notify_message .= T_('Excerpt'). ": \n[...] $original_context [...]\n\n";
-							$notify_message .= T_('Edit/Delete').': '.$admin_url.'?ctrl=items&amp;blog='.$blog.'&p='.$post_ID."&c=1\n\n";
+							$notify_message .= 'Website'. ": $original_title\n";
+							$notify_message .= 'Url'. ": $original_pagelinkedfrom\n";
+							$notify_message .= ('Excerpt'). ": \n[...] $original_context [...]\n\n";
+							$notify_message .= ('Edit/Delete').': '.$admin_url.'?ctrl=items&amp;blog='.$blog.'&p='.$post_ID."&c=1\n\n";
 
 							send_mail( $recipient, $subject, $notify_message, $notify_from );
 
@@ -396,18 +396,18 @@ function pingback(
 	if( $display )
 	{
 		echo "<div class=\"panelinfo\">\n";
-		echo '<h3>', T_('Sending pingbacks...'), '</h3>', "\n";
+		echo '<h3>', ('Sending pingbacks...'), '</h3>', "\n";
 	}
 
 	if( ! $post_pingback )
 	{
-		if( $display ) echo '<p>', T_('No pingback to be done.'), '</p>', "\n";
+		if( $display ) echo '<p>', ('No pingback to be done.'), '</p>', "\n";
 	}
 	else
 	{
 		$log = debug_fopen('./pingback.log', 'a');
 		$post_links = array();
-		debug_fwrite($log, T_('BEGIN').' '.time()."\n");
+		debug_fwrite($log, ('BEGIN').' '.time()."\n");
 
 		// Variables
 		$ltrs = '\w';
@@ -439,7 +439,7 @@ function pingback(
 		 preg_match_all("{\b http:// [0-9A-Za-z:/_~+\-%.?&=;]+}x", $content, $post_links_temp);
 
 		// Debug
-		debug_fwrite($log, T_('Post contents').':');
+		debug_fwrite($log, ('Post contents').':');
 		debug_fwrite($log, $content."\n");
 
 		// Step 2.
@@ -470,13 +470,13 @@ function pingback(
 
 		foreach ($post_links as $pagelinkedto)
 		{
-			if( $display ) echo '<p>', T_('Processing:'), ' ', $pagelinkedto, "<br />\n";
-			debug_fwrite($log, T_('Processing:').' '.$pagelinkedto."\n\n");
+			if( $display ) echo '<p>', ('Processing:'), ' ', $pagelinkedto, "<br />\n";
+			debug_fwrite($log, ('Processing:').' '.$pagelinkedto."\n\n");
 
 			$bits = parse_url($pagelinkedto);
 			if (!isset($bits['host'])) {
-				if( $display ) echo T_('Couldn\'t find a hostname for:'),' ',$pagelinkedto, "<br />\n";
-				debug_fwrite($log, T_('Couldn\'t find a hostname for:').' '.$pagelinkedto."\n\n");
+				if( $display ) echo ('Couldn\'t find a hostname for:'),' ',$pagelinkedto, "<br />\n";
+				debug_fwrite($log, ('Couldn\'t find a hostname for:').' '.$pagelinkedto."\n\n");
 				continue;
 			}
 			$host = $bits['host'];
@@ -490,12 +490,12 @@ function pingback(
 			$port = isset($bits['port']) ? $bits['port'] : 80;
 
 			// Try to connect to the server at $host
-			if( $display ) echo T_('Connect to server at:'), ' ',$host;
+			if( $display ) echo ('Connect to server at:'), ' ',$host;
 			$fp = fsockopen($host, $port, $errno, $errstr, 20); // this timeout is just for setting up the socket
 			if (!$fp)
 			{
-				if( $display ) echo T_('Couldn\'t open a connection to:'), ' ', $pagelinkedto, "<br />\n";
-				debug_fwrite($log, T_('Couldn\'t open a connection to:').' '.$host."\n\n");
+				if( $display ) echo ('Couldn\'t open a connection to:'), ' ', $pagelinkedto, "<br />\n";
+				debug_fwrite($log, ('Couldn\'t open a connection to:').' '.$host."\n\n");
 				continue;
 			}
 			echo "<br />\n";
@@ -516,7 +516,7 @@ function pingback(
 			fputs($fp, $request);
 
 			// Start receiving headers and content
-			debug_fwrite($log, T_('Start receiving headers and content')."\n");
+			debug_fwrite($log, ('Start receiving headers and content')."\n");
 			$contents = '';
 			$headers = '';
 			$gettingHeaders = true;
@@ -550,8 +550,8 @@ function pingback(
 				{	// on a trouvé dans les headers
 					preg_match('#x-pingback: (.+)#is', $headers, $matches);
 					$pingback_server_url = trim($matches[1]);
-					echo T_('Pingback server found from X-Pingback header:'), ' ', $pingback_server_url, "<br />\n";
-					debug_fwrite($log, T_('Pingback server found from X-Pingback header:').' '.$pingback_server_url."\n");
+					echo ('Pingback server found from X-Pingback header:'), ' ', $pingback_server_url, "<br />\n";
+					debug_fwrite($log, ('Pingback server found from X-Pingback header:').' '.$pingback_server_url."\n");
 					$found_pingback_server = 1;
 					break;
 				}
@@ -564,8 +564,8 @@ function pingback(
 					$pingback_href_end = strpos($contents, $quote, $pingback_href_start);
 					$pingback_server_url_len = $pingback_href_end-$pingback_href_start;
 					$pingback_server_url = substr($contents, $pingback_href_start, $pingback_server_url_len);
-					echo T_('Pingback server found from Pingback <link /> tag:'), ' ', $pingback_server_url, "<br />\n";
-					debug_fwrite($log,  T_('Pingback server found from Pingback <link /> tag:').' '.$pingback_server_url."\n");
+					echo ('Pingback server found from Pingback <link /> tag:'), ' ', $pingback_server_url, "<br />\n";
+					debug_fwrite($log,  ('Pingback server found from Pingback <link /> tag:').' '.$pingback_server_url."\n");
 					$found_pingback_server = 1;
 					break;
 				}
@@ -573,19 +573,19 @@ function pingback(
 
 			if(!$found_pingback_server)
 			{
-				if( $display )	echo T_('Pingback server not found in headers and content'), "<br />\n";
-				debug_fwrite($log, T_('Pingback server not found in headers and content'). "\n\n*************************\n\n");
+				if( $display )	echo ('Pingback server not found in headers and content'), "<br />\n";
+				debug_fwrite($log, ('Pingback server not found in headers and content'). "\n\n*************************\n\n");
 				@fclose($fp);
 			}
 			elseif( empty($pingback_server_url) )
 			{
-				if( $display )	echo T_('Pingback server URL is empty (may be an internal PHP fgets error)'), "<br />\n";
-				debug_fwrite($log, T_('Pingback server URL is empty (may be an internal PHP fgets error)'). "\n\n*************************\n\n");
+				if( $display )	echo ('Pingback server URL is empty (may be an internal PHP fgets error)'), "<br />\n";
+				debug_fwrite($log, ('Pingback server URL is empty (may be an internal PHP fgets error)'). "\n\n*************************\n\n");
 				@fclose($fp);
 			}
 			else
 			{
-				debug_fwrite($log,"\n\n". T_('Pingback server data'). "\n");
+				debug_fwrite($log,"\n\n". ('Pingback server data'). "\n");
 
 				$parsed_url = parse_url( $pingback_server_url );
 				debug_fwrite($log, 'host: '.$parsed_url['host']."\n");
@@ -595,16 +595,16 @@ function pingback(
 
 				 // Now, the RPC call
 				$method = 'pingback.ping';
-				if( $display )	echo T_('Page Linked To:'), " $pagelinkedto<br />\n";
-				debug_fwrite($log, T_('Page Linked To:').' '.$pagelinkedto."\n");
-				if( $display )	echo T_('Page Linked From:'), " $pagelinkedfrom<br />\n";
-				debug_fwrite($log, T_('Page Linked From:').' '.$pagelinkedfrom."\n");
+				if( $display )	echo ('Page Linked To:'), " $pagelinkedto<br />\n";
+				debug_fwrite($log, ('Page Linked To:').' '.$pagelinkedto."\n");
+				if( $display )	echo ('Page Linked From:'), " $pagelinkedfrom<br />\n";
+				debug_fwrite($log, ('Page Linked From:').' '.$pagelinkedfrom."\n");
 
 				load_funcs( '_misc/ext/_xmlrpc.php' );
 				$client = new xmlrpc_client( $parsed_url['path'], $parsed_url['host'], $port);
 				$client->setDebug( $debug );
 				$message = new xmlrpcmsg($method, array(new xmlrpcval($pagelinkedfrom), new xmlrpcval($pagelinkedto)));
-				printf( T_('Pinging %s...')."<br />\n", $host );
+				printf( ('Pinging %s...')."<br />\n", $host );
 				$result = $client->send($message);
 
 				// Display response
@@ -614,9 +614,9 @@ function pingback(
 			if( $display )	echo "</p>\n";
 		}
 
-		debug_fwrite($log, "\n". T_('END'). ": ".time()."\n****************************\n\r");
+		debug_fwrite($log, "\n". ('END'). ": ".time()."\n****************************\n\r");
 		debug_fclose($log);
-		if( $display )	echo "<p>", T_('Pingbacks done.'), "<p>\n";
+		if( $display )	echo "<p>", ('Pingbacks done.'), "<p>\n";
 	}
 	if( $display )	echo "</div>\n";
 }
@@ -639,9 +639,9 @@ function pingback(
  */
 function pingback_number($zero='#', $one='#', $more='#', $post_ID = NULL )
 {
-	if( $zero == '#' ) $zero = T_('Pingback (0)');
-	if( $one == '#' ) $one = T_('Pingback (1)');
-	if( $more == '#' ) $more = T_('Pingbacks (%d)');
+	if( $zero == '#' ) $zero = ('Pingback (0)');
+	if( $one == '#' ) $one = ('Pingback (1)');
+	if( $more == '#' ) $more = ('Pingbacks (%d)');
 
 	if( empty( $post_ID ) )
 	{
@@ -717,10 +717,10 @@ function link_pages( $before='#', $after='#', $next_or_number='number', $nextpag
 {
 	global $id, $page, $numpages, $multipage, $more;
 
-	if( $before == '#' ) $before = '<p>'.T_('Pages:').' ';
+	if( $before == '#' ) $before = '<p>'.('Pages:').' ';
 	if( $after == '#' ) $after = '</p>';
-	if( $nextpagelink == '#' ) $nextpagelink = T_('Next page');
-	if( $previouspagelink == '#' ) $previouspagelink = T_('Previous page');
+	if( $nextpagelink == '#' ) $nextpagelink = ('Next page');
+	if( $previouspagelink == '#' ) $previouspagelink = ('Previous page');
 
 	if ($more_file != '')
 		$file = $more_file;
@@ -796,7 +796,7 @@ function previous_posts_link( $label='#' )
 {
 	global $Settings, $p, $paged, $Blog;
 
-	if( $label == '#' ) $label = '<< '.T_('Previous Page');
+	if( $label == '#' ) $label = '<< '.('Previous Page');
 
 	if( empty($p) && ($paged > 1) )
 	{
@@ -834,7 +834,7 @@ function next_posts_link($label='#', $max_page=0 )
 
 	if( empty($MainList) ) return;
 
-	if( $label == '#' ) $label = T_('Next Page').' >>';
+	if( $label == '#' ) $label = ('Next Page').' >>';
 
 	if (!$max_page) $max_page = $MainList->get_max_paged();
 	if (!$paged) $paged = 1;
@@ -941,7 +941,7 @@ function next_posts( $max_page = 0 )
 function the_weekday()
 {
 	global $weekday,$id,$postdata;
-	$the_weekday = T_($weekday[mysql2date('w', $postdata['Date'])]);
+	$the_weekday = ($weekday[mysql2date('w', $postdata['Date'])]);
 	echo $the_weekday;
 }
 
@@ -958,7 +958,7 @@ function the_weekday_date($before='',$after='')
 	$the_weekday_date = '';
 	if ($day != $previousweekday) {
 		$the_weekday_date .= $before;
-		$the_weekday_date .= T_($weekday[mysql2date('w', $postdata['Date'])]);
+		$the_weekday_date .= ($weekday[mysql2date('w', $postdata['Date'])]);
 		$the_weekday_date .= $after;
 		$previousweekday = $day;
 	}
@@ -1133,7 +1133,7 @@ function the_categories( $link_title = '#',				// false if you want no links
 	if( $link_title == '#' )
 	{ /* TRANS: When the categories for a specific post are displayed, the user can click
 				on these cats to browse them, this is the default href title displayed there */
-		$link_title = T_('Browse category');
+		$link_title = ('Browse category');
 	}
 
 	$main_cat_ID = $postdata['Category'];
