@@ -1387,7 +1387,7 @@ class Plugin
 	 * @see Plugin::DisplayCommentFormFieldset()
 	 * @param array Associative array of parameters
 	 *   - 'Comment': the Comment (by reference)
-	 *   - 'original_comment': this is the unstripped and unformated posted comment, use with care! (by reference)
+	 *   - 'original_comment': this is the unstripped and unformated posted comment
 	 *   - 'is_preview': is this a request for previewing the comment? (boolean)
 	 */
 	function BeforeCommentFormInsert( & $params )
@@ -1401,7 +1401,7 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Comment': the Comment (by reference)
-	 *   - 'original_comment': this is the unstripped and unformated posted comment, use with care!
+	 *   - 'original_comment': this is the unstripped and unformated posted comment
 	 */
 	function AfterCommentFormInsert( & $params )
 	{
@@ -2817,6 +2817,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.138  2007/01/25 00:59:49  blueyed
+ * Do not pass "original_comment" in BeforeCommentFormInsert as a reference: makes no sense
+ *
  * Revision 1.137  2007/01/24 00:48:58  fplanque
  * Refactoring
  *

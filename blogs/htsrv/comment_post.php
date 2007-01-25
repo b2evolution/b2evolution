@@ -183,7 +183,7 @@ if( $action != 'preview' )
 // Trigger event: a Plugin could add a $category="error" message here..
 $Plugins->trigger_event('BeforeCommentFormInsert', array(
 	'Comment' => & $Comment,
-	'original_comment' => & $original_comment,
+	'original_comment' => $original_comment,
 	'is_preview' => ($action == 'preview') ) );
 
 
@@ -328,6 +328,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.103  2007/01/25 00:59:49  blueyed
+ * Do not pass "original_comment" in BeforeCommentFormInsert as a reference: makes no sense
+ *
  * Revision 1.102  2007/01/21 23:26:31  fplanque
  * preserve "fail on spam" by default
  *
