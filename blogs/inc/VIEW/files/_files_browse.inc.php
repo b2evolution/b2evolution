@@ -171,7 +171,7 @@ global $fm_hide_dirtree, $create_name, $ads_list_path;
 				/*
 				 * Settings:
 				 */
-				echo ' - <a href="'.regenerate_url('fm_mode', 'fm_mode=settings').'" title="'
+				echo ' - <a href="'.regenerate_url('', 'action=edit_settings').'" title="'
 								.T_('Edit display settings').'">'.T_('Display settings').'</a>';
 
 				$Form->end_form();
@@ -328,6 +328,9 @@ global $fm_hide_dirtree, $create_name, $ads_list_path;
 <?php
 /*
  * $Log$
+ * Revision 1.45  2007/01/25 02:41:50  fplanque
+ * made settings non sticky
+ *
  * Revision 1.44  2007/01/24 07:58:59  fplanque
  * integrated toolbars
  *

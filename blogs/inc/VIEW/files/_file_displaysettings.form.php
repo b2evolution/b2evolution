@@ -35,7 +35,7 @@ global $UserSettings;
 
 $Form = & new Form( NULL, 'file_displaysettings_checkchanges' );
 
-$Form->global_icon( T_('Quit settings mode!'), 'close', regenerate_url('fm_mode') );
+$Form->global_icon( T_('Quit settings mode!'), 'close', regenerate_url() );
 
 $Form->begin_form( 'fform', T_('Display settings') );
 
@@ -67,6 +67,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update_settings]', T_('Upd
 
 /*
  * $Log$
+ * Revision 1.3  2007/01/25 02:41:26  fplanque
+ * made settings non sticky
+ *
  * Revision 1.2  2007/01/24 13:44:56  fplanque
  * cleaned up upload
  *
