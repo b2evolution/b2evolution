@@ -159,13 +159,13 @@ skin_content_header();	// Sets charset!
 		?>
 
 	<?php
-		// -------------- START OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. --------------
+		// -------------- START OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. --------------
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.
 		$current_skin_includes_path = dirname(__FILE__).'/';
 		// Call the dispatcher:
 		require $skins_path.'_dispatch.inc.php';
-		// --------------- END OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. ---------------
+		// --------------- END OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. ---------------
 	?>
 
 </div>

@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the template that displays the links to the last comments for a blog
+ * This is the template that displays the links to the latest comments for a blog
  *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the _main.php template.
@@ -53,6 +53,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.31  2007/01/25 13:41:51  fplanque
+ * wording
+ *
  * Revision 1.30  2006/12/17 23:42:39  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.

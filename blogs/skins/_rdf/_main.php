@@ -33,7 +33,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 switch( $disp )
 {
 	case 'comments':
-		// this includes the last comments if requested:
+		// this includes the latest comments if requested:
 		require( dirname(__FILE__).'/_lastcomments.php' );
 		break;
 

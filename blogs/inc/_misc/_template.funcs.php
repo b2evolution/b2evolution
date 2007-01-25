@@ -40,7 +40,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * Outputs the title of the category when you load the page with <code>?cat=</code>
  * Display "Archive Directory" title if it has been requested
- * Display "Last comments" title if these have been requested
+ * Display "Latest comments" title if these have been requested
  * Display "Statistics" title if these have been requested
  * Display "User profile" title if it has been requested
  *
@@ -73,8 +73,8 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			break;
 
 		case 'comments':
-			// We are requesting the last comments:
-			$r[] = T_('Last comments');
+			// We are requesting the latest comments:
+			$r[] = T_('Latest comments');
 			break;
 
 		case 'profile':
@@ -204,6 +204,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.15  2007/01/25 13:41:52  fplanque
+ * wording
+ *
  * Revision 1.14  2006/12/05 00:01:15  fplanque
  * enhanced photoblog skin
  *

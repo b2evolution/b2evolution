@@ -182,13 +182,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	?>
 
 	<?php
-		// -------------- START OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. --------------
+		// -------------- START OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. --------------
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into the same directory as this file.
 		$current_skin_includes_path = dirname(__FILE__).'/';
 		// Call the dispatcher:
 		require $skins_path.'_dispatch.inc.php';
-		// --------------- END OF INCLUDES FOR LAST COMMENTS, MY PROFILE, ETC. ---------------
+		// --------------- END OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. ---------------
 	?>
 
 </div>
@@ -212,7 +212,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<ul>
 			<li><a href="<?php $Blog->disp( 'staticurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(cached)') ?></span></li>
 			<li><a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(no cache)') ?></span></li>
-			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>
+			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Latest comments') ?></strong></a></li>
 		</ul>
 		<?php // -------------------------- CALENDAR INCLUDED HERE -----------------------------
 			// Call the Calendar plugin:

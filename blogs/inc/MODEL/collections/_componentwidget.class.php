@@ -211,7 +211,7 @@ class ComponentWidget extends DataObject
 						echo $params['item_end'];
 
 						echo $params['item_start'];
-						echo '<strong><a href="'.$Blog->get('lastcommentsurl').'">'.T_('Last comments').'</a></strong>';
+						echo '<strong><a href="'.$Blog->get('lastcommentsurl').'">'.T_('Latest comments').'</a></strong>';
 						echo $params['item_end'];
 
 						echo $params['list_end'];
@@ -345,6 +345,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2007/01/25 13:41:50  fplanque
+ * wording
+ *
  * Revision 1.11  2007/01/14 03:24:30  fplanque
  * widgets complete proof of concept with multiple skins
  *
