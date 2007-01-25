@@ -199,53 +199,216 @@ $AdminUI->add_menu_entries(
 	);
 
 
-// Check actions that need early processing:
-if( ! empty($action) )
+
+/**
+ * A list of filepaths which are selected in the FM list.
+ *
+ * @todo fp> This could probably be further simpplified by using "fm_sources" for selections.
+ * Note: fm_sources is better because it also handles sources/selections on a different fileroot
+ *
+ * @global array
+ */
+$fm_selected = param( 'fm_selected', 'array', array(), true );
+$Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
+/**
+ * The selected files (must be within current fileroot)
+ *
+ * @global Filelist
+ */
+$selected_Filelist = & new Filelist( $fm_FileRoot, false );
+foreach( $fm_selected as $l_source_path )
 {
-	switch( $action )
-	{
-		case 'filter':
-			$action = 'list';
+	// echo '<br>'.$l_source_path;
+	$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
+}
+
+
+
+// Check actions that need early processing:
+if( $action == 'createnew' )
+{
+	// Check permission:
+	$current_User->check_perm( 'files', 'add', true );
+
+	// create new file/dir
+	param( 'create_type', 'string', true ); // 'file', 'dir'
+
+	$action = ( $create_type == 'file' ? 'createnew_file' : 'createnew_dir'  );
+}
+
+switch( $action )
+{
+	case 'filter':
+		$action = 'list';
+		break;
+
+	case 'filter_unset':
+		// Clear filters!
+		$fm_filter = '';
+		$action = 'list';
+		break;
+
+	case 'createnew_dir':
+		// We are probably comming from 'createnew' but there is no guarantee!
+		// Check permission:
+		$current_User->check_perm( 'files', 'add', true );
+
+		if( ! $Settings->get( 'fm_enable_create_dir' ) )
+		{ // Directory creation is gloablly disabled:
+			$Messages->add( T_('Directory creation is disabled.'), 'error' );
 			break;
+		}
 
-		case 'filter_unset':
-			// Clear filters!
-			$fm_filter = '';
-			$action = 'list';
+		if( !	param( 'create_name', 'string', '' ) )
+		{ // No name was supplied:
+			$Messages->add( T_('Cannot create a directory without name.'), 'error' );
 			break;
-
-		case 'createnew':
-			// Check permission:
-			$current_User->check_perm( 'files', 'add', true );
-
-			// create new file/dir
-			param( 'create_type', 'string', '' ); // 'file', 'dir'
-			param( 'create_name', 'string', '' );
-
-			$action = ( $create_type == 'file' ? 'createnew_file' : 'createnew_dir'  );
+		}
+		if( $error_dirname = validate_dirname( $create_name ) )
+		{ // Not valid dirname
+			$Messages->add( $error_dirname, 'error' );
 			break;
+		}
 
-    case 'update_settings':
-			// Update settings NOW since they may affect the FileList
-			$UserSettings->set( 'fm_dirsnotattop',   1-param( 'option_dirsattop',        'integer', 0 ) );
-			$UserSettings->set( 'fm_permlikelsl',      param( 'option_permlikelsl',      'integer', 0 ) );
-			$UserSettings->set( 'fm_imglistpreview',   param( 'option_imglistpreview',   'integer', 0 ) );
-			$UserSettings->set( 'fm_getimagesizes',    param( 'option_getimagesizes',    'integer', 0 ) );
-			$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
-			$UserSettings->set( 'fm_uploadwithproperties', param( 'option_uploadwithproperties', 'integer', 0 ) );
-			$UserSettings->set( 'fm_showtypes',        param( 'option_showtypes',        'integer', 0 ) );
-			$UserSettings->set( 'fm_showfsperms',      param( 'option_showfsperms',      'integer', 0 ) );
-			$UserSettings->set( 'fm_showfsowner',      param( 'option_showfsowner',      'integer', 0 ) );
-			$UserSettings->set( 'fm_showfsgroup',      param( 'option_showfsgroup',      'integer', 0 ) );
-			$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
+		// Try to get File object:
+		/**
+		 * @var FileCache
+		 */
+		$FileCache = & get_Cache( 'FileCache' );
+		/**
+		 * @var File
+		 */
+		$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, $path.$create_name );
 
-			if( $UserSettings->dbupdate() )
-			{
-				$Messages->add( T_('Your user settings have been updated.'), 'success' );
-			}
+		if( $newFile->exists() )
+		{
+			$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $create_name ), 'error' );
+			break;
+		}
 
-			$action = 'list';
-	}
+		if( ! $newFile->create( $create_type ) )
+		{
+			$Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $fm_Filelist->_rds_list_path ), 'error' );
+		}
+
+		$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
+
+		header_redirect( regenerate_url( '', '', '', '&' ) );
+		// $action = 'list';
+		break;
+
+
+	case 'createnew_file':
+		// We are probably comming from 'createnew' but there is no guarantee!
+		// Check permission:
+		$current_User->check_perm( 'files', 'add', true );
+
+		if( ! $Settings->get( 'fm_enable_create_file' ) )
+		{ // File creation is gloablly disabled:
+			$Messages->add( T_('File creation is disabled.'), 'error' );
+			break;
+		}
+
+		if( !	param( 'create_name', 'string', '' ) )
+		{ // No name was supplied:
+			$Messages->add( T_('Cannot create a file without name.'), 'error' );
+			break;
+		}
+		if( $error_filename = validate_filename( $create_name, $current_User->check_perm( 'files', 'all' ) ) )
+		{ // Not valid filename or extension
+			$Messages->add( $error_filename, 'error' );
+			break;
+		}
+
+		// Try to get File object:
+		$FileCache = & get_Cache( 'FileCache' );
+		$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, $path.$create_name );
+
+		if( $newFile->exists() )
+		{
+			$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $create_name ), 'error' );
+			break;
+		}
+
+		if( ! $newFile->create( $create_type ) )
+		{
+			$Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $fm_Filelist->_rds_list_path ), 'error' );
+		}
+
+		$Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
+
+		header_redirect( regenerate_url( '', '', '', '&' ) );
+		// $action = 'list';
+		break;
+
+
+  case 'update_settings':
+		// Update settings NOW since they may affect the FileList
+		$UserSettings->set( 'fm_dirsnotattop',   1-param( 'option_dirsattop',        'integer', 0 ) );
+		$UserSettings->set( 'fm_permlikelsl',      param( 'option_permlikelsl',      'integer', 0 ) );
+		$UserSettings->set( 'fm_imglistpreview',   param( 'option_imglistpreview',   'integer', 0 ) );
+		$UserSettings->set( 'fm_getimagesizes',    param( 'option_getimagesizes',    'integer', 0 ) );
+		$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
+		$UserSettings->set( 'fm_uploadwithproperties', param( 'option_uploadwithproperties', 'integer', 0 ) );
+		$UserSettings->set( 'fm_showtypes',        param( 'option_showtypes',        'integer', 0 ) );
+		$UserSettings->set( 'fm_showfsperms',      param( 'option_showfsperms',      'integer', 0 ) );
+		$UserSettings->set( 'fm_showfsowner',      param( 'option_showfsowner',      'integer', 0 ) );
+		$UserSettings->set( 'fm_showfsgroup',      param( 'option_showfsgroup',      'integer', 0 ) );
+		$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
+
+		if( $UserSettings->dbupdate() )
+		{
+			$Messages->add( T_('Your user settings have been updated.'), 'success' );
+		}
+
+		header_redirect( regenerate_url( '', '', '', '&' ) );
+		// $action = 'list';
+		break;
+
+	case 'update_file':
+		// Update File:
+
+		// Exit any special mode we may have been in:
+		$fm_mode = NULL;
+
+		if( $demo_mode )
+		{
+			$Messages->add( 'Sorry, you cannot update files in demo mode!', 'error' );
+			break;
+		}
+
+		// Check permission!
+ 		$current_User->check_perm( 'files', 'edit', true );
+
+		$edit_File = & $selected_Filelist->get_by_idx(0);
+
+		// Check that the file is editable:
+		if( ! $edit_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
+		{
+			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edit_File->dget('name') ), 'error' );
+	 		// Leave special display mode:
+			$fm_mode = NULL;
+			break;
+		}
+
+		param( 'file_content', 'html', '', false );
+
+
+    $full_path = $edit_File->get_full_path();
+		if( $rsc_handle = fopen( $full_path, 'w+') )
+		{
+			fwrite( $rsc_handle, $file_content );
+			fclose( $rsc_handle );
+			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; has been updated.' ), $edit_File->dget('name') ), 'success' );
+		}
+		else
+		{
+			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; could not be updated.' ), $edit_File->dget('name') ), 'error' );
+		}
+
+		header_redirect( regenerate_url( '', '', '', '&' ) );
+		// $action = 'list';
+		break;
 }
 
 
@@ -280,7 +443,9 @@ if( param( 'fm_flatmode', '', NULL, true ) )
 	$fm_Filelist->flatmode = true;
 }
 
-// Load Filelist (with meta data):
+/*
+ * Load Filelist (with meta data):
+ */
 $fm_Filelist->load();
 
 // Sort Filelist
@@ -291,26 +456,6 @@ if( ! in_array( $fm_order, array( 'name', 'path', 'type', 'size', 'lastmod', 'pe
 }
 param( 'fm_orderasc', '', NULL, true );
 $fm_Filelist->sort( $fm_order, $fm_orderasc );
-
-
-/**
- * The selected files
- * @var Filelist
- */
-$selected_Filelist = & new Filelist( $fm_Filelist->get_FileRoot(), false );
-
-/**
- * @global array A list of files which are selected in the FM list.
- */
-$fm_selected = param( 'fm_selected', 'array', array(), true );
-
-$Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
-
-foreach( $fm_selected as $l_source_path )
-{
-	// echo '<br>'.$l_source_path;
-	$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
-}
 
 
 /*
@@ -349,101 +494,8 @@ if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 
 switch( $action )
 {
-	case 'open_in_new_windows':
-		// catch JS-only actions (happens when Javascript is disabled on the browser)
-		$Messages->add( T_('You have to enable JavaScript to use this feature.'), 'error' );
-		break;
-
-
-	case 'createnew_dir':
-		if( ! $Settings->get( 'fm_enable_create_dir' ) )
-		{ // Directory creation is gloablly disabled:
-			$Messages->add( T_('Directory creation is disabled.'), 'error' );
-			break;
-		}
-		if( empty($create_name) )
-		{ // No name was supplied:
-			$Messages->add( T_('Cannot create a directory without name.'), 'error' );
-			break;
-		}
-		if( $error_dirname = validate_dirname( $create_name ) )
-		{ // Not valid dirname
-			$Messages->add( $error_dirname, 'error' );
-			break;
-		}
-
-		// Try to get File object:
-		/**
-		 * @var FileCache
-		 */
-		$FileCache = & get_Cache( 'FileCache' );
-		/**
-		 * @var File
-		 */
-		$newFile = & $FileCache->get_by_root_and_path( $fm_Filelist->_FileRoot->type, $fm_Filelist->_FileRoot->in_type_ID, $fm_Filelist->_rds_list_path.$create_name );
-
-		if( $newFile->exists() )
-		{
-			$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $create_name ), 'error' );
-			break;
-		}
-
-		if( $newFile->create( $create_type ) )
-		{
-			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
-
-			$fm_Filelist->add( $newFile );
-			$fm_Filelist->sort();
-		}
-		else
-		{
-			$Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $fm_Filelist->_rds_list_path ), 'error' );
-		}
-		break;
-
-
-	case 'createnew_file':
-		if( ! $Settings->get( 'fm_enable_create_file' ) )
-		{ // File creation is gloablly disabled:
-			$Messages->add( T_('File creation is disabled.'), 'error' );
-			break;
-		}
-		if( empty($create_name) )
-		{ // No name was supplied:
-			$Messages->add( T_('Cannot create a file without name.'), 'error' );
-			break;
-		}
-		if( $error_filename = validate_filename( $create_name, $current_User->check_perm( 'files', 'all' ) ) )
-		{ // Not valid filename or extension
-			$Messages->add( $error_filename, 'error' );
-			break;
-		}
-
-		// Try to get File object:
-		$FileCache = & get_Cache( 'FileCache' );
-		$newFile = & $FileCache->get_by_root_and_path( $fm_Filelist->_FileRoot->type, $fm_Filelist->_FileRoot->in_type_ID, $fm_Filelist->_rds_list_path.$create_name );
-
-		if( $newFile->exists() )
-		{
-			$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $create_name ), 'error' );
-			break;
-		}
-
-		if( $newFile->create( $create_type ) )
-		{
-			$Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
-
-			$fm_Filelist->add( $newFile );
-			$fm_Filelist->sort();
-		}
-		else
-		{
-			$Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $fm_Filelist->_rds_list_path ), 'error' );
-		}
-		break;
-
-
 	case 'download':
+		// TODO: We don't need the Filelist, move UP!
 		// TODO: provide optional zip formats (tgz, ..) - the used lib provides more..
 
 		// Exit any special mode we may have been in:
@@ -498,6 +550,7 @@ switch( $action )
 
 
 	case 'rename':
+		// TODO: We don't need the Filelist, move UP!
 		// Rename a file:
 
 		// Exit any special mode we may have been in:
@@ -594,6 +647,7 @@ switch( $action )
 
 
 	case 'delete':
+		// TODO: We don't need the Filelist, move UP!
 		// Delete a file or directory:
 
 		// Exit any special mode we may have been in:
@@ -664,6 +718,7 @@ switch( $action )
 
 
 	case 'make_posts':
+		// TODO: We don't need the Filelist, move UP!
 		// Make posts with selected images:
 
 		// Exit any special mode we may have been in:
@@ -767,6 +822,7 @@ switch( $action )
 
 
 	case 'edit_file':
+		// TODO: We don't need the Filelist, move UP!
 		// Edit Text File
 
 		// Exit any special mode we may have been in:
@@ -800,50 +856,8 @@ switch( $action )
 		break;
 
 
-	case 'update_file':
-		// Update File:
-
-		// Exit any special mode we may have been in:
-		$fm_mode = NULL;
-
-		if( $demo_mode )
-		{
-			$Messages->add( 'Sorry, you cannot update files in demo mode!', 'error' );
-			break;
-		}
-
-		// Check permission!
- 		$current_User->check_perm( 'files', 'edit', true );
-
-		$edit_File = & $selected_Filelist->get_by_idx(0);
-
-		// Check that the file is editable:
-		if( ! $edit_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
-		{
-			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edit_File->dget('name') ), 'error' );
-	 		// Leave special display mode:
-			$fm_mode = NULL;
-			break;
-		}
-
-		param( 'file_content', 'html', '', false );
-
-
-    $full_path = $edit_File->get_full_path();
-		if( $rsc_handle = fopen( $full_path, 'w+') )
-		{
-			fwrite( $rsc_handle, $file_content );
-			fclose( $rsc_handle );
-			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; has been updated.' ), $edit_File->dget('name') ), 'success' );
-		}
-		else
-		{
-			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; could not be updated.' ), $edit_File->dget('name') ), 'error' );
-		}
-		break;
-
-
 	case 'edit_properties':
+		// TODO: We don't need the Filelist, move UP!
 		// Edit File properties (Meta Data)
 
 		// Exit any special mode we may have been in:
@@ -858,6 +872,7 @@ switch( $action )
 
 
 	case 'update_properties':
+		// TODO: We don't need the Filelist, move UP!
 		// Update File properties (Meta Data); on success this ends the file_properties mode: {{{
 
 		// Exit any special mode we may have been in:
@@ -891,6 +906,7 @@ switch( $action )
 
 
 	case 'link':
+		// TODO: We don't need the Filelist, move UP!
 		// Link File to Item (or other object if extended below):
 
 		// Note: we are not modifying any file here, we're just linking it
@@ -933,6 +949,7 @@ switch( $action )
 
 
 	case 'unlink':
+		// TODO: We don't need the Filelist, move UP!
 		// Unlink File from Item (or other object if extended):
 
 		// Note: we are not modifying any file here, we're just linking it
@@ -960,6 +977,7 @@ switch( $action )
 
 
 	case 'edit_perms':
+		// TODO: We don't need the Filelist, move UP!
 		// Edit file or directory permissions:
 
 		// Exit any special mode we may have been in:
@@ -1386,6 +1404,11 @@ if( !empty($action ) && $action != 'list' && $action != 'nil' )
 			$AdminUI->disp_view( 'files/_file_properties.inc.php' );
 			break;
 
+		case 'edit_settings':
+			// Display settings dialog:
+			$AdminUI->disp_view( 'files/_file_displaysettings.form.php' );
+			break;
+
 		default:
 			// Deferred action message:
 			// fp> When does this happen??
@@ -1431,12 +1454,6 @@ switch( $fm_mode )
 		// Links dialog:
 		$AdminUI->disp_view( 'files/_files_links.inc.php' );
 		break;
-
-	case 'settings':
-		// Display settings dialog:
-		$AdminUI->disp_view( 'files/_file_displaysettings.form.php' );
-		break;
-
 }
 
 
@@ -1456,6 +1473,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.53  2007/01/25 02:41:10  fplanque
+ * refactoring / decrap
+ *
  * Revision 1.52  2007/01/24 13:44:56  fplanque
  * cleaned up upload
  *
