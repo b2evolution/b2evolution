@@ -79,6 +79,7 @@ class FileCache extends DataObjectCache
 			}
 			else
 			{	// Already cached:
+				$current_File = & $this->cache[$obj_ID];
 				// Flow meta data into File object:
 				$current_File->load_meta( false, $db_row );
 			}
@@ -133,6 +134,9 @@ class FileCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.6  2007/01/25 05:09:53  fplanque
+ * bugfix
+ *
  * Revision 1.5  2006/12/07 20:03:32  fplanque
  * Woohoo! File editing... means all skin editing.
  *
