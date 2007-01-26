@@ -1759,14 +1759,14 @@ class Item extends DataObject
 	 * @param string Link text to display when there are >1 comments (include %d for # of comments)
 	 * @param string Link title
 	 * @param string Status of feedbacks to count
-	 * @param boolean true to use a popup windows ('#' to use if comments_popup_windows() is there)
+	 * @param boolean true to use a popup windows
 	 * @param boolean true to hide if no feedback ('#' for default)
 	 * @param string 'pid' or 'title'; 'none' for NO LINK
 	 * @param string url to use
 	 */
 	function feedback_link( $type = 'feedbacks', $before = '', $after = '',
 													$zero = '#', $one = '#', $more = '#', $title='#', $status = 'published',
-													$use_popup = '#',	$hideifnone = '#', $mode = '', $blogurl = '' )
+													$use_popup = false,	$hideifnone = '#', $mode = '', $blogurl = '' )
 	{
 		// dh> TODO:	Add plugin hook, where a Pingback plugin could hook and provide "pingbacks"
 		switch( $type )
@@ -1826,13 +1826,6 @@ class Item extends DataObject
 				debug_die( "Unknown feedback type [$type]" );
 		}
 
-		if( $use_popup == '#' )
-		{ // Use popups if javascript is included in page
-			global $b2commentsjavascript;
-
-			$use_popup = $b2commentsjavascript;
-		}
-
 		$number = generic_ctp_number( $this->ID, $type, $status );
 
 		if( ($number == 0) && $hideifnone )
@@ -1854,7 +1847,7 @@ class Item extends DataObject
 			echo 'title="'.$title.'"';
 			if( $use_popup )
 			{	// Special URL if we can open a popup (i-e if JS is enabled):
-				$popup_url = url_add_param( $url, 'template=popup' );
+				$popup_url = url_add_param( $url, 'disp=feedback-popup' );
 				echo ' onclick="return pop_up_window( \''.$popup_url.'\', \'evo_comments\' )"';
 			}
 			echo '>';
@@ -3385,6 +3378,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.149  2007/01/26 04:52:53  fplanque
+ * clean comment popups (skins 2.0)
+ *
  * Revision 1.148  2007/01/26 02:12:06  fplanque
  * cleaner popup windows
  *

@@ -2649,12 +2649,18 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = ' &amp; ' )
  * @param string URL to use (this gets used as base URL for all relative links on the HTML page)
  * @return string
  */
-function base_tag( $url )
+function base_tag( $url, $target = NULL )
 {
 	global $base_tag_set;
 
 	$base_tag_set = true;
-	echo '<base href="'.$url.'" />';
+	echo '<base href="'.$url.'"';
+
+	if( !empty($target) )
+	{
+		echo ' target="'.$target.'"';
+	}
+	echo ' />';
 }
 
 
@@ -2680,7 +2686,7 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 			echo $item_start;
 			if( is_array( $item ) )
 			{
-				echo '<a href="'.$item[0].'">'.$item[1].'</a>';
+				echo '<a href="'.$item[0].'" target="_blank">'.$item[1].'</a>';
 			}
 			else
 			{
@@ -2801,6 +2807,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.164  2007/01/26 04:52:53  fplanque
+ * clean comment popups (skins 2.0)
+ *
  * Revision 1.163  2007/01/24 01:32:30  fplanque
  * 'zip & css' is more readable than 'zip and css'
  *

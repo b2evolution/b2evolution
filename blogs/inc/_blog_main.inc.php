@@ -268,27 +268,10 @@ if( !isset($timestamp_max) ) $timestamp_max = '';
 
 
 /*
- * ____________________________ "Clean up" the request ____________________________
- *
- * Make sure that:
- * 1) disp is set to "single" if single post requested
- * 2) URL is canonical if:
- *    - some content was requested in a weird/deprecated way
- *    - or if content identifiers have changed
+ * ____________________________ Get specific Item if requested ____________________________
  */
-if( $stats || $disp == 'stats' )
-{	// This used to be a spamfest...
-	require $view_path.'errors/_410_stats_gone.page.php'; // error & exit
-	// EXIT.
-}
-elseif( !empty($preview) )
-{
-	$disp = 'single';
-}
-elseif( !empty($p) || !empty($title) )
+if( !empty($p) || !empty($title) )
 { // We are going to display a single post
-	$disp = 'single';
-
 	// Make sure the single post we're requesting (still) exists:
 	$ItemCache = & get_Cache( 'ItemCache' );
 	if( !empty($p) )
@@ -305,6 +288,31 @@ elseif( !empty($p) || !empty($title) )
 		// fp> TODO: ->viewing_allowed() for draft, private, protected and deprecated...
 		require $view_path.'errors/_404_not_found.page.php'; // error & exit
 	}
+}
+
+
+/*
+ * ____________________________ "Clean up" the request ____________________________
+ *
+ * Make sure that:
+ * 1) disp is set to "single" if single post requested
+ * 2) URL is canonical if:
+ *    - some content was requested in a weird/deprecated way
+ *    - or if content identifiers have changed
+ */
+if( $stats || $disp == 'stats' )
+{	// This used to be a spamfest...
+	require $view_path.'errors/_410_stats_gone.page.php'; // error & exit
+	// EXIT.
+}
+elseif( !empty($preview) )
+{	// Preview
+	$disp = 'single';
+}
+elseif( $disp == 'posts' &&
+	(!empty($p) || !empty($title)) )
+{ // We are going to display a single post
+	$disp = 'single';
 
 	// EXPERIMENTAL: Check if we want to redirect to a canonical URL for the post
 	// Please document encountered problems.
@@ -408,51 +416,57 @@ else
  * fp> That would save the '_' detection hack... and maybe some processing when we don't need the MainList.
  * fp> It is tricky though. A lot of navigation things need the mainlist.
  */
-if( ($disp == 'posts') || ($disp == 'single') )
-{ // If we are going to display posts and not something special...
+switch( $disp )
+{
+	case 'posts':
+	case 'single':
+	case 'feedback-popup':
+		// We need to load posts for this display:
 
-	// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
+		// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
 
-	// Note: skins are going to be registered in the DB. There will be a flag to identify feeds.
-	// For now, we use the *existing* '_' prefix.
-	// Note: Feed skin folders should be identidied by sth more descriptive (like a '_feed_' prefix or '.feed'/'.xml' suffix
-	if( !empty($skin) && substr( $skin, 0, 1 ) == '_' )
-	{	// We are displaying an RSS/Atom feed:
-		$items_nb_limit = $Blog->get_setting('posts_per_feed');
-	}
-	else
-	{	// We are displaying something visual
-		$items_nb_limit = $Blog->get_setting('posts_per_page');
-	}
+		// Note: skins are going to be registered in the DB. There will be a flag to identify feeds.
+		// For now, we use the *existing* '_' prefix.
+		// Note: Feed skin folders should be identidied by sth more descriptive (like a '_feed_' prefix or '.feed'/'.xml' suffix
+		if( !empty($skin) && substr( $skin, 0, 1 ) == '_' )
+		{	// We are displaying an RSS/Atom feed:
+			$items_nb_limit = $Blog->get_setting('posts_per_feed');
+		}
+		else
+		{	// We are displaying something visual
+			$items_nb_limit = $Blog->get_setting('posts_per_page');
+		}
 
-	$MainList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max, $items_nb_limit );
+		$MainList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max, $items_nb_limit );
 
-	if( ! $preview )
-	{
-		// pre_dump( $MainList->default_filters );
-		$MainList->load_from_Request( false );
-		// pre_dump( $MainList->filters );
+		if( ! $preview )
+		{
+			// pre_dump( $MainList->default_filters );
+			$MainList->load_from_Request( false );
+			// pre_dump( $MainList->filters );
 
-		// Run the query:
-		$MainList->query();
+			// Run the query:
+			$MainList->query();
 
-		// Old style globals for category.funcs:
-		$postIDlist = $MainList->get_page_ID_list();
-		$postIDarray = $MainList->get_page_ID_array();
-	}
-	else
-	{	// We want to preview a single post, we are going to fake a lot of things...
-		$MainList->preview_from_request();
+			// Old style globals for category.funcs:
+			$postIDlist = $MainList->get_page_ID_list();
+			$postIDarray = $MainList->get_page_ID_array();
+		}
+		else
+		{	// We want to preview a single post, we are going to fake a lot of things...
+			$MainList->preview_from_request();
 
-		// Legacy for the category display
-		$cat_array = array();
-	}
+			// Legacy for the category display
+			$cat_array = array();
+		}
 
-	param( 'more', 'integer', 0, true );
-	param( 'page', 'integer', 1, true ); // Post page to show
-	param( 'c',    'integer', 0, true ); // Display comments?
-	param( 'tb',   'integer', 0, true ); // Display trackbacks?
-	param( 'pb',   'integer', 0, true ); // Display pingbacks?
+		param( 'more', 'integer', 0, true );
+		param( 'page', 'integer', 1, true ); // Post page to show
+		param( 'c',    'integer', 0, true ); // Display comments?
+		param( 'tb',   'integer', 0, true ); // Display trackbacks?
+		param( 'pb',   'integer', 0, true ); // Display pingbacks?
+
+		break;
 }
 
 
@@ -464,9 +478,6 @@ $Timer->pause( '_blog_main.inc');
  *
  * At this point $skin holds the name of the skin we want to use, or '' for no skin!
  */
-
-// check to see if we want to display the popup or the main template
-param( 'template', 'string', 'main', true );
 
 
 // Trigger plugin event:
@@ -485,46 +496,44 @@ if( !isset($display_blog_list) )
 if( !empty( $skin ) )
 { // We want to display now:
 
-	// TODO: sanitize $template and allow any request on _xxx.tpl.php or sth like that.
-	if( $template == 'popup' )
-	{ // Do the popup display
-		require( $skins_path.$skin.'/_popup.php' );
+	if( $skin_provided_by_plugin = skin_provided_by_plugin($skin) )
+	{
+		$Plugins->call_method( $skin_provided_by_plugin, 'DisplaySkin', $tmp_params = array('skin'=>$skin) );
 	}
 	else
-	{ // Do the main display
-		$Timer->start( 'skin/_main.inc' );
-		if( $skin_provided_by_plugin = skin_provided_by_plugin($skin) )
-		{
-			$Plugins->call_method( $skin_provided_by_plugin, 'DisplaySkin', $tmp_params = array('skin'=>$skin) );
+	{
+		$disp_handlers = array(
+				'feedback-popup' => 'feedback_popup.page.php',
+				// 'arcdir'   => 'arcdir.page.php',
+				// 'comments' => 'latestcom.page.php',
+				// 'msgform'  => 'msgform.page.php',
+				// 'profile'  => 'profile.page.php',
+				// 'subs'     => 'subscriptions.page.php',
+				// All others will default to _main.php  TODO: rename to default.page.php
+			);
+
+		if( !empty($disp_handlers[$disp])
+				&& file_exists( $disp_handler = $skins_path.$skin.'/'.$disp_handlers[$disp] ) )
+		{	// The skin has a customized page handler for this display:
+			require $disp_handler;
 		}
 		else
-		{
-			require( $skins_path.$skin.'/_main.php' );
+		{	// Use the default handler from the skins dir:
+			require $skins_path.$skin.'/_main.php';
 		}
-		$Timer->pause( 'skin/_main.inc' );
 	}
 
 	// log the hit on this page (in case the skin hasn't already done so)
 	$Hit->log();
 }
-else
-{ // we don't want to use a skin
-	if( $template == 'popup' )
-	{ // Do the popup display
-		require( $skins_path.'_popup.php' );
 
-		// log the hit on this page (in case the full template forgets to do so)
-		$Hit->log();
-
-		exit();
-	}
-
-	$Debuglog->add( 'No skin or popup requested.', 'skin' );
-}
-
+// We'll just return to the caller now... (if we have not used a skin, the caller should do the display after this)
 
 /*
  * $Log$
+ * Revision 1.67  2007/01/26 04:52:53  fplanque
+ * clean comment popups (skins 2.0)
+ *
  * Revision 1.66  2007/01/23 08:17:49  fplanque
  * another simplification...
  *

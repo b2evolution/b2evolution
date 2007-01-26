@@ -187,6 +187,10 @@ select.bComment  /* Used by the profile form */
 	margin: 0ex;
 }
 
+.comments_popup {
+	margin: 1em;
+}
+
 table.image_index {
 	margin: 1ex auto;
 }

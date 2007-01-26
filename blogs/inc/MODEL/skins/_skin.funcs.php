@@ -32,7 +32,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function skin_base_tag()
 {
-	global $skins_url, $skin, $Blog;
+	global $skins_url, $skin, $Blog, $disp;
 
 	if( ! empty( $skin ) )
 	{
@@ -50,7 +50,13 @@ function skin_base_tag()
 		}
 	}
 
-	base_tag( $base_href );
+	$target = NULL;
+	if( !empty($disp) && strpos( $disp, '-popup' ) )
+	{	// We are (normally) displaying in a popup window, we need most links to open a new window!
+		$target = '_blank';
+	}
+
+	base_tag( $base_href, $target );
 }
 
 
@@ -178,6 +184,9 @@ function & skin_install( $skin_folder, $name = NULL )
 
 /*
  * $Log$
+ * Revision 1.16  2007/01/26 04:52:53  fplanque
+ * clean comment popups (skins 2.0)
+ *
  * Revision 1.15  2007/01/14 01:33:34  fplanque
  * losely restrict to *installed* XML feed skins
  *

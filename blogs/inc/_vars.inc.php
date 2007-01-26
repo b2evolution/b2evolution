@@ -163,10 +163,6 @@ if( $is_web )
 	$pagenow = $pagenow[0];
 }
 
-// So far, we did not include the javascript for popupups
-$b2commentsjavascript = false;
-
-
 // the weekdays and the months..
 $weekday[0] = NT_('Sunday');
 $weekday[1] = NT_('Monday');
@@ -260,6 +256,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.12  2007/01/26 04:52:53  fplanque
+ * clean comment popups (skins 2.0)
+ *
  * Revision 1.11  2006/11/24 18:27:22  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

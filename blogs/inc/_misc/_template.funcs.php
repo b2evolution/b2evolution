@@ -77,6 +77,13 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			$r[] = T_('Latest comments');
 			break;
 
+		case 'feedback-popup':
+			// We are requesting the comments on a specific post:
+			// Should be in first position
+			$Item = & $MainList->get_by_idx( 0 );
+			$r[] = T_('Feeback on ').$Item->get('title');
+			break;
+
 		case 'profile':
 			// We are requesting the user profile:
 			$r[] = T_('User profile');
@@ -204,6 +211,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.16  2007/01/26 04:52:53  fplanque
+ * clean comment popups (skins 2.0)
+ *
  * Revision 1.15  2007/01/25 13:41:52  fplanque
  * wording
  *
