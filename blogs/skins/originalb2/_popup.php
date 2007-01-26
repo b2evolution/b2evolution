@@ -27,7 +27,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<title><?php	$Blog->disp('name', 'htmlhead') ?> - feedback on '<?php $Item->title( '', '', false, 'htmlhead' ) ?>'</title>
-	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
+	<?php skin_base_tag(); /* Base URL for this DIR. You need this to fix relative links! */ ?>
 	<style type="text/css" media="screen">
 		@import url( 'layout2b.css' );
 	</style>
