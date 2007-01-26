@@ -148,8 +148,17 @@ function param( $var, $type = '', $default = '', $memorize = false,
 			case 'string':
 				// strip out any html:
 				// echo $var, '=', $GLOBALS[$var], '<br />';
-				$GLOBALS[$var] = trim( strip_tags($GLOBALS[$var]) );
-				if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
+				if( ! is_scalar($GLOBALS[$var]) )
+				{ // This happens if someone uses "foo[]=x" where "foo" is expected as string
+					// TODO: dh> debug_die() instead?
+					$GLOBALS[$var] = '';
+					$Debuglog->add( 'param(-): <strong>'.$var.'</strong> is not scalar!', 'params' );
+				}
+				else
+				{
+					$GLOBALS[$var] = trim( strip_tags($GLOBALS[$var]) );
+				}
+				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
 				break;
 
 			default:
@@ -1622,6 +1631,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.28  2007/01/26 00:21:23  blueyed
+ * Fixed possible E_NOTICE; TODO
+ *
  * Revision 1.27  2006/12/28 18:31:30  fplanque
  * prevent impersonating of blog in multiblog situation
  *
