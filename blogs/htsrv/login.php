@@ -191,11 +191,7 @@ switch( $action )
 		param( 'reqID', 'string', '' );
 		param( 'sessID', 'integer', '' );
 
-		if( ! is_logged_in() )
-		{ // this can happen, if a new user registers and clicks on the "validate by email" link, without logging in first
-			$Messages->add( T_('Please login to validate your account.'), 'error' );
-			break;
-		}
+		// Catch errors:
 
 		if( empty($reqID) )
 		{ // This was not requested
@@ -221,6 +217,14 @@ switch( $action )
 			$login_required = true; // Do not display "Without login.." link on the form
 			break;
 		}
+
+		if( ! is_logged_in() )
+		{ // this can happen, if a new user registers and clicks on the "validate by email" link, without logging in first
+			$Messages->add( T_('Please login to validate your account.'), 'error' );
+			break;
+		}
+
+		// Validate user:
 
 		$current_User->set( 'validated', 1 );
 		$current_User->dbupdate();
@@ -362,6 +366,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.86  2007/01/26 18:40:43  blueyed
+ * Saner order of validate-email-link error message handling.
+ *
  * Revision 1.85  2007/01/19 03:06:57  fplanque
  * Changed many little thinsg in the login procedure.
  * There may be new bugs, sorry. I tested this for several hours though.
