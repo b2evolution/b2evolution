@@ -1915,13 +1915,14 @@ class Plugin
 	 * @see Plugin::AlternateAuthentication()
 	 * @see Plugin::Logout()
 	 * @param array Associative array of parameters
-	 *   - 'login': user's login
-	 *   - 'pass': user's password
-	 *   - 'pass_md5': user's md5 password
-	 *   - 'pass_salt': the salt used in "pass_hashed"
-	 *   - 'pass_hashed': if non-empty this is the users passwords hashed. See note above.
+	 *   - 'login': user's login (by reference since 1.10.0)
+	 *   - 'pass': user's password (by reference since 1.10.0)
+	 *   - 'pass_md5': user's md5 password (by reference since 1.10.0)
+	 *   - 'pass_salt': the salt used in "pass_hashed" (by reference since 1.10.0)
+	 *   - 'pass_hashed': if non-empty this is the users passwords hashed. See note above. (by reference since 1.10.0)
+	 *   - 'pass_ok': is the password ok for 'login'? (by reference) (since 1.10.0)
 	 */
-	function LoginAttempt( $params )
+	function LoginAttempt( & $params )
 	{
 	}
 
@@ -2817,6 +2818,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.139  2007/01/26 21:52:42  blueyed
+ * Improved LoginAttempt hook: all params get passed by reference and "pass_ok" has been added
+ *
  * Revision 1.138  2007/01/25 00:59:49  blueyed
  * Do not pass "original_comment" in BeforeCommentFormInsert as a reference: makes no sense
  *

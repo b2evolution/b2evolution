@@ -409,27 +409,33 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 	// $Debuglog->add( 'pwd_hashed: '.var_export($pwd_hashed, true).', pass: '.var_export($pass, true) );
 
+	$pass_ok = false;
 	// Trigger Plugin event, which could create the user, according to another database:
 	if( $Plugins->trigger_event( 'LoginAttempt', array(
-			'login' => $login,
-			'pass' => $pass,
-			'pass_md5' => $pass_md5,
-			'pass_salt' => $pwd_salt_sess,
-			'pass_hashed' => $pwd_hashed ) ) )
+			'login' => & $login,
+			'pass' => & $pass,
+			'pass_md5' => & $pass_md5,
+			'pass_salt' => & $pwd_salt_sess,
+			'pass_hashed' => & $pwd_hashed,
+			'pass_ok' => & $pass_ok ) ) )
 	{ // clear the UserCache, if a plugin has been called - it may have changed user(s)
 		$UserCache->clear();
 	}
 
-	$pass_ok = false;
 	if( $Messages->count('login_error') )
 	{ // A plugin has thrown a login error..
 		// Do nothing, the error will get displayed in the login form..
+
+		// TODO: dh> make sure that the user gets logged out?! (a Plugin might have logged him in and another one thrown an error)
 	}
 	else
 	{ // Check login and password
+
+		// Make sure that we can load the user:
 		$User = & $UserCache->get_by_login($login);
-		if( $User )
-		{
+
+		if( $User && ! $pass_ok )
+		{ // check the password, if no plugin has set "it's ok":
 			if( ! empty($pwd_hashed) )
 			{ // password hashed by JavaScript:
 
@@ -437,7 +443,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 				if( empty($pwd_salt_sess) )
 				{ // no salt stored in session: either cookie problem or the user had already tried logging in (from another window for example)
-					$Debuglog->add( 'Empty salt_sess.', 'login' );
+					$Debuglog->add( 'Empty salt_sess!', 'login' );
 					if( substr($pass, 0, 7) == 'hashed_' && substr($pass, 7) == $Session->ID )
 					{ // session ID matches, no cookie problem
 						$Messages->add( T_('The login window has expired. Please try again.'), 'login_error' );
@@ -635,6 +641,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.74  2007/01/26 21:52:42  blueyed
+ * Improved LoginAttempt hook: all params get passed by reference and "pass_ok" has been added
+ *
  * Revision 1.73  2007/01/26 04:49:17  fplanque
  * cleanup
  *
