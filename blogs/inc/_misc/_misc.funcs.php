@@ -1394,11 +1394,11 @@ function debug_die( $additional_info = '' )
 		{ // Append backtrace:
 			// indent after newlines:
 			$backtrace_cli = preg_replace( '~(\S)(\n)(\S)~', '$1  $2$3', $backtrace_cli );
-			$log_message .= "\n".$backtrace_cli;
+			$log_message .= "\nBacktrace:\n".$backtrace_cli;
 		}
 		$log_message .= "\n".$_SERVER['REQUEST_URI'].' ('.( isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '-' ).')';
 
-		error_log( $line, 0 /* PHP's system logger */ );
+		error_log( str_replace("\n", ' / ', $log_message), 0 /* PHP's system logger */ );
 	}
 
 
@@ -2807,6 +2807,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.165  2007/01/26 20:43:03  blueyed
+ * Fixed exp. app error logging
+ *
  * Revision 1.164  2007/01/26 04:52:53  fplanque
  * clean comment popups (skins 2.0)
  *
