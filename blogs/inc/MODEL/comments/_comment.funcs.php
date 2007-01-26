@@ -241,87 +241,11 @@ function comments_link($file='', $tb=0, $pb=0 )
 }
 
 
-/**
- * This will include the javascript that is required to open comments,
- * trackback and pingback in popup windows.
- *
- * You should put this tag before the </head> tag in your template.
- *
- * @param integer width of window or false
- * @param integer height of window or false
- * @param boolean do you want a scrollbar
- * @param boolean do you want a status bar
- * @param boolean do you want the windows to be resizable
- */
-function comments_popup_script( $width = 600, $height = 450,
-																$scrollbars = true, $status = true, $resizable = true )
-{
-	global $b2commentsjavascript;
-
-	$b2commentsjavascript = true;
-	$properties = array();
-	if( $width ) $properties[] = 'width='.$width;
-	if( $height ) $properties[] = 'height='.$height;
-	$properties[] = 'scrollbars='.intval( $scrollbars );
-	$properties[] = 'status='.intval( $status );
-	$properties[] = 'resizable='.intval( $resizable );
-	$properties = implode( ',', $properties );
-	?>
-
-	<script language="javascript" type="text/javascript">
-		<!--
-		function b2open( url )
-		{
-			window.open( url, '_blank', '<?php echo $properties; ?>');
-		}
-		//-->
-	</script>
-
-	<?php
-}
-
-
-/**
- * comment_author_url(-)
- *
- * @deprecated deprecated by {@link Comment::author_url()}
- */
-function comment_author_url($echo=true)
-{
-	global $commentdata;
-	$url = trim($commentdata['comment_author_url']);
-	$url = (!stristr($url, '://')) ? 'http://'.$url : $url;
-	// convert & into &amp;
-	$url = preg_replace('#&([^amp\;])#is', '&amp;$1', $url);
-	if ($url != 'http://')
-	{
-		if ($echo)
-			echo $url;
-		else
-			return $url;
-	}
-}
-
-
-/**
- * comment_author_url_basedomain(-)
- *
- * @uses comment_author_url()
- * @deprecated
- */
-function comment_author_url_basedomain( $disp = true )
-{
-	global $commentdata;
-	$url = comment_author_url(false);
-	$base_domain = get_base_domain( $url );
-	if( $disp )
-		echo $base_domain;
-	else
-		return $base_domain;
-}
-
 /*
  * $Log$
+ * Revision 1.9  2007/01/26 04:49:17  fplanque
+ * cleanup
+ *
  * Revision 1.8  2006/08/21 16:07:43  fplanque
  * refactoring
  *

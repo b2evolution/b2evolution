@@ -135,12 +135,6 @@ $Timer = & new Timer('total');
 
 $Timer->start( '_main.inc' );
 
-/**
- * Load base + advanced configuration:
- */
-// Note: this should have been done before coming here...
-// require_once dirname(__FILE__).'/_config.php';
-
 
 /**
  * Sets various arrays and vars, also $app_name!
@@ -316,20 +310,6 @@ require_once dirname(__FILE__).'/_misc/_form.class.php';
 require_once $model_path.'items/_itemquery.class.php';
 require_once dirname(__FILE__).'/_misc/ext/_swfcharts.php';
 
-/**
- * Optionally include obsolete functions
- */
-if( false ) // TODO: conf switch
-{
-	if( file_exists($inc_path.'_misc/_obsolete092.php') )
-	{
-		include_once $inc_path.'_misc/_obsolete092.php';
-	}
-	if( file_exists($inc_path.'_misc/_obsolete2.php') )
-	{
-		include_once $inc_path.'_misc/_obsolete2.php';
-	}
-}
 
 $Timer->pause( '_main.inc:requires' );
 
@@ -655,6 +635,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.73  2007/01/26 04:49:17  fplanque
+ * cleanup
+ *
  * Revision 1.72  2007/01/19 03:06:57  fplanque
  * Changed many little thinsg in the login procedure.
  * There may be new bugs, sorry. I tested this for several hours though.

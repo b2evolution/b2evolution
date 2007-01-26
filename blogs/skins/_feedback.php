@@ -107,6 +107,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 													T_('No %s for this post yet...'), implode( "/", $disp_title) ) .
 								'</p></div>' );
 
+  /**
+	 * @var Comment
+	 */
 	while( $Comment = & $CommentList->get_next() )
 	{	// Loop through comments:
 		?>
@@ -219,7 +222,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 		<!-- form to add a comment -->
 		<?php
 		$Form = & new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID );
-		$Form->begin_form( 'bComment' );
+		$Form->begin_form( 'bComment', '', array( 'target' => '_self' ) );
 
 		// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
 		//           Actually, the best would be, if the $Form object could be changed by a plugin
@@ -318,6 +321,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.88  2007/01/26 04:49:17  fplanque
+ * cleanup
+ *
  * Revision 1.87  2007/01/18 22:28:53  fplanque
  * no unnecessary complexity
  *
@@ -341,96 +347,5 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
  *
  * Revision 1.81  2006/10/15 21:30:46  blueyed
  * Use url_rel_to_same_host() for redirect_to params.
- *
- * Revision 1.80  2006/08/30 18:51:53  blueyed
- * todo
- *
- * Revision 1.79  2006/08/19 02:15:08  fplanque
- * Half kille dthe pingbacks
- * Still supported in DB in case someone wants to write a plugin.
- *
- * Revision 1.78  2006/08/07 16:49:35  fplanque
- * doc
- *
- * Revision 1.77  2006/08/04 23:36:33  blueyed
- * Added DisplayTrackbackAddr hook to all skins.
- *
- * Revision 1.76  2006/07/26 17:15:45  blueyed
- * Replaced "name" attribute with "id" for anchors
- *
- * Revision 1.75  2006/07/23 23:28:54  fplanque
- * oops
- *
- * Revision 1.74  2006/07/23 20:18:32  fplanque
- * cleanup
- *
- * Revision 1.73  2006/07/23 17:19:52  blueyed
- * MFB
- *
- * Revision 1.72  2006/07/19 20:12:31  blueyed
- * fixed html
- *
- * Revision 1.71  2006/07/06 19:56:29  fplanque
- * no message
- *
- * Revision 1.70  2006/06/24 12:07:16  blueyed
- * fixed merge error
- *
- * Revision 1.69  2006/06/24 05:19:39  smpdawg
- * Fixed various javascript warnings and errors.
- * Spelling corrections.
- * Fixed PHP warnings.
- *
- * Revision 1.68  2006/06/23 19:41:20  fplanque
- * no message
- *
- * Revision 1.67  2006/06/22 21:58:34  fplanque
- * enhanced comment moderation
- *
- * Revision 1.66  2006/06/22 18:37:47  fplanque
- * fixes
- *
- * Revision 1.65  2006/06/16 20:34:20  fplanque
- * basic spambot defeating
- *
- * Revision 1.64  2006/06/10 19:16:17  blueyed
- * DisplayTrackbackAddr event
- *
- * Revision 1.63  2006/05/30 20:32:57  blueyed
- * Lazy-instantiate "expensive" properties of Comment and Item.
- *
- * Revision 1.62  2006/05/19 18:15:06  blueyed
- * Merged from v-1-8 branch
- *
- * Revision 1.61.2.1  2006/05/19 15:06:26  fplanque
- * dirty sync
- *
- * Revision 1.61  2006/05/04 10:32:41  blueyed
- * Use original comment content in preview's form.
- *
- * Revision 1.60  2006/05/04 00:59:48  blueyed
- * fix
- *
- * Revision 1.59  2006/05/04 00:56:48  blueyed
- * fix
- *
- * Revision 1.58  2006/05/02 22:39:29  blueyed
- * Delete preview Comment if it has been displayed.
- *
- * Revision 1.57  2006/05/02 22:25:28  blueyed
- * Comment preview for frontoffice.
- *
- * Revision 1.56  2006/04/19 13:05:22  fplanque
- * minor
- *
- * Revision 1.55  2006/04/18 20:17:26  fplanque
- * fast comment status switching
- *
- * Revision 1.54  2006/04/18 19:29:52  fplanque
- * basic comment status implementation
- *
- * Revision 1.53  2006/04/11 21:22:26  fplanque
- * partial cleanup
- *
  */
 ?>

@@ -1001,7 +1001,7 @@ class ItemList2 extends DataObjectList2
 			}
 			else
 			{
-				$title_array[] = T_('Post details').': '.$Item->get('title');
+				$title_array[] = $Item->get('title');
 			}
 			return $title_array;
 		}
@@ -1626,6 +1626,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.49  2007/01/26 04:49:17  fplanque
+ * cleanup
+ *
  * Revision 1.48  2007/01/23 09:25:40  fplanque
  * Configurable sort order.
  *
