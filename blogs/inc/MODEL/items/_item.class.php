@@ -1842,10 +1842,6 @@ class Item extends DataObject
 		{ // We want a link:
 			// We want the permanent URL BUT we want if FORCED to a SINGLE post!
 			$url = $this->get_permanent_url( $mode, $blogurl, true );
-			if( $use_popup )
-			{ // We need to tell b2evo to use the popup template
-				$url = url_add_param( $url, 'template=popup' );
-			}
 		}
 
 
@@ -1856,7 +1852,11 @@ class Item extends DataObject
 			echo '<a href="'.$url;
 			echo '#'.$type.'" ';	// Position on feedback
 			echo 'title="'.$title.'"';
-			if( $use_popup ) echo ' onclick="b2open(this.href); return false"';
+			if( $use_popup )
+			{	// Special URL if we can open a popup (i-e if JS is enabled):
+				$popup_url = url_add_param( $url, 'template=popup' );
+				echo ' onclick="return pop_up_window( \''.$popup_url.'\', \'evo_comments\' )"';
+			}
 			echo '>';
 		}
 
@@ -3385,6 +3385,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.148  2007/01/26 02:12:06  fplanque
+ * cleaner popup windows
+ *
  * Revision 1.147  2007/01/23 03:46:24  fplanque
  * cleaned up presentation
  *

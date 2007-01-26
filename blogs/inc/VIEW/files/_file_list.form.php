@@ -249,15 +249,12 @@ $Form->begin_form();
 			if( $lFile->is_dir() )
 			{ // Directory
 				$browse_dir_url = $lFile->get_view_url();
+				$popup_url = url_add_param( $browse_dir_url, 'mode=popup' );
 				$target = 'evo_fm_'.$lFile->get_md5_ID();
 
 				echo '<a href="'.$browse_dir_url.'" target="'.$target.' " class="filenameIcon"
 							title="'.T_('Open in a new window').'" onclick="'
-
-							."pop_up_window( '$browse_dir_url', '$target', '"
-							.'width=800,height=800,'
-							."scrollbars=yes,status=yes,resizable=yes' ); return false;"
-
+							."return pop_up_window( '$popup_url', '$target' )"
 							.'">'.get_icon( 'window_new' ).'</a>';
 			}
 
@@ -610,6 +607,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.5  2007/01/26 02:12:06  fplanque
+ * cleaner popup windows
+ *
  * Revision 1.4  2007/01/25 03:45:49  fplanque
  * deactivated broken feature
  *

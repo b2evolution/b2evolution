@@ -99,12 +99,12 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 		// TODO: "cron/" is supposed to not reside in the server's DocumentRoot, therefor is not necessarily accessible
 		$Form->info_field(
 			T_('Perform Server Test'),
-			' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "'.$baseurl.'cron/getmail.php?test=1", "getmail" );\'>[ ' . T_('connection') . ' ]</a>'
-			.' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "'.$baseurl.'cron/getmail.php?test=2", "getmail" );\'>[ ' . T_('messages') . ' ]</a>'
-			.' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "'.$baseurl.'cron/getmail.php?test=3", "getmail" );\'>[ ' . T_('verbose') . ' ]</a>',
+			' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "'.$baseurl.'cron/getmail.php?test=1", "getmail" )\'>[ ' . T_('connection') . ' ]</a>'
+			.' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "'.$baseurl.'cron/getmail.php?test=2", "getmail" )\'>[ ' . T_('messages') . ' ]</a>'
+			.' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "'.$baseurl.'cron/getmail.php?test=3", "getmail" )\'>[ ' . T_('verbose') . ' ]</a>',
 			array() );
 
-//		$Form->info_field ('','<a id="eblog_test_email" href="#" onclick=\'return pop_up_window( "' . $htsrv_url . 'getmail.php?test=email", "getmail" );\'>' . T_('Test email') . '</a>',array());
+//		$Form->info_field ('','<a id="eblog_test_email" href="#" onclick=\'return pop_up_window( "' . $htsrv_url . 'getmail.php?test=email", "getmail" )\'>' . T_('Test email') . '</a>',array());
 		// special show / hide link
 		$Form->info_field('', get_link_showhide( 'eblog_show_more','eblog_section_more', T_('Hide extra options'), T_('Show extra options...') ) );
 
@@ -176,6 +176,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.22  2007/01/26 02:12:09  fplanque
+ * cleaner popup windows
+ *
  * Revision 1.21  2007/01/23 08:57:36  fplanque
  * decrap!
  *

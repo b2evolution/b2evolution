@@ -43,6 +43,8 @@ function set_new_form_action( form, newaction )
 /**
  * Open the item in a preview window (a new window with target 'b2evo_preview'), by changing
  * the form's action attribute and target temporarily.
+ *
+ * fp> This is gonna die...
  */
 function b2edit_open_preview( form, newaction )
 {

@@ -1365,11 +1365,9 @@ class File extends DataObject
 			// onclick: we unset target attrib and return the return value of pop_up_window() to make the browser not follow the regular href link (at least FF 1.5 needs the target reset)
 			return '<a href="'.$url.'" target="'.$target.'"
 				title="'.T_('Open in a new window').'" onclick="'
-				."this.target = ''; return pop_up_window( '$url', '$target', '"
-				.'width='.( ( $width = $this->get_image_size( 'width' ) ) ? ( $width + 100 ) : 800  ).','
-				.'height='.( ( $height = $this->get_image_size( 'height' ) ) ? ( $height + 150 ) : 800  ).','
-				."scrollbars=yes,status=yes,resizable=yes' );"
-				.'">'.$text.'</a>';
+				."this.target = ''; return pop_up_window( '$url', '$target', "
+				.(( $width = $this->get_image_size( 'width' ) ) ? ( $width + 100 ) : 750 ).', '
+				.(( $height = $this->get_image_size( 'height' ) ) ? ( $height + 150 ) : 550 ).' )">'.$text.'</a>';
 		}
 	}
 
@@ -1695,6 +1693,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.39  2007/01/26 02:12:06  fplanque
+ * cleaner popup windows
+ *
  * Revision 1.38  2007/01/25 03:37:14  fplanque
  * made bytesreadable() really readable for average people.
  *

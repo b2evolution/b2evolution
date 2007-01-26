@@ -163,11 +163,14 @@ $Results->display();
 
 
 global $cron_url;
-echo '<p>[<a href="'.$cron_url.'cron_exec.php" onclick="return pop_up_window( \''.$cron_url.'cron_exec.php\', \'evo_cron\', \'width=400,height=300,scrollbars=yes,status=yes,resizable=yes\' )" target="evo_cron">'.T_('Execute pending jobs in a popup window now!').'</a>]</p>';
+echo '<p>[<a href="'.$cron_url.'cron_exec.php" onclick="return pop_up_window( \''.$cron_url.'cron_exec.php\', \'evo_cron\' )" target="evo_cron">'.T_('Execute pending jobs in a popup window now!').'</a>]</p>';
 
 
 /*
  * $Log$
+ * Revision 1.9  2007/01/26 02:12:06  fplanque
+ * cleaner popup windows
+ *
  * Revision 1.8  2007/01/07 18:42:35  fplanque
  * cleaned up reload/refresh icons & links
  *

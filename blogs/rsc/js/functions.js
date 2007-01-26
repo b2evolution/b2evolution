@@ -58,17 +58,36 @@ function addEvent( elm, evType, fn, useCapture )
 
 
 /**
- * Opens a window and makes sure it gets focus.
+ * Opens a window, centers it and makes sure it gets focus.
  */
-function pop_up_window( href, target, params )
+function pop_up_window( href, target, width, height, params )
 {
-	if( typeof(params) == 'undefined' )
-	{
-		params = 'width=750,height=550,scrollbars=yes,status=yes,resizable=yes';
+ 	if( typeof(width) == 'undefined' )
+ 	{
+		width = 750;
 	}
 
+ 	if( typeof(height) == 'undefined' )
+ 	{
+		height = 550;
+	}
+
+	left = (screen.width - width) / 2;
+  top = (screen.height - height) / 2;
+
+ 	if( typeof(params) == 'undefined' )
+	{
+		params = 'scrollbars=yes, status=yes, resizable=yes, menubar=yes';
+	}
+
+	params = 'width=' + width + ', height=' + height + ', ' + 'left=' + left + ', top=' + top + ', ' + params;
+
+	// Open window:
 	opened = window.open( href, target, params );
+
+	// Bring to front!
 	opened.focus();
+
 	if( typeof(openedWindows) == 'undefined' )
 	{
 		openedWindows = new Array(opened);
@@ -400,6 +419,9 @@ var b2evo_Callbacks = new b2evo_Callbacks();
 
 /*
  * $Log$
+ * Revision 1.25  2007/01/26 02:12:09  fplanque
+ * cleaner popup windows
+ *
  * Revision 1.24  2006/12/10 03:05:02  blueyed
  * cleanup
  *
