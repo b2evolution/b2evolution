@@ -25,7 +25,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	$Results->cols[] = array(
 							'th' => T_('Name'),
 							'order' => 'skin_name',
-							'td' => '<strong><a href="'.regenerate_url( '', 'skin_ID=$skin_ID$&amp;action=edit' ).'" title="'.T_('Edit skin properties...').'">$skin_name$</a></strong>',
+							'td' => '<strong><a href="'.regenerate_url( '', 'skin_ID=$skin_ID$&amp;action=edit' ).'" title="'.TS_('Edit skin properties...').'">$skin_name$</a></strong>',
 						);
 }
 else
@@ -64,12 +64,12 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'th' => T_('Actions'),
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
-							'td' => action_icon( T_('Edit skin properties...'), 'properties',
+							'td' => action_icon( TS_('Edit skin properties...'), 'properties',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=edit\')%' )
-	                    .action_icon( T_('Reload containers!'), 'reload',
+	                    .action_icon( TS_('Reload containers!'), 'reload',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=reload\')%' )
 											.'¤conditional( #nb_blogs# < 1, \''
-											.action_icon( T_('Uninstall this skin!'), 'delete',
+											.action_icon( TS_('Uninstall this skin!'), 'delete',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=delete\')%' ).'\', \''
 	                        .get_icon( 'delete', 'noimg' ).'\' )¤',
 						);
