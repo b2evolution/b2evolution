@@ -15,51 +15,44 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
-// TODO: blueyed>> What's that?? A HTML-page-block for every item?! Shouldn't that just use $Item perhaps??
-// it's cafelog/b2 legacy. Idf $Item is already available, then fine ;)
-// blueyed> I'm not sure, it just does not seem to make sense to have a loop here!
-while( $Item = & $MainList->get_item() )
-{
 header('Content-Type: text/html; charset='.$io_charset);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<title><?php	$Blog->disp('name', 'htmlhead') ?> - feedback on '<?php $Item->title( '', '', false, 'htmlhead' ) ?>'</title>
-	<?php skin_base_tag(); /* Base URL for this DIR. You need this to fix relative links! */ ?> />
-	<style type="text/css" media="screen">
-		@import url( 'originalb2/layout2b.css' );
-	</style>
-	<link rel="stylesheet" type="text/css" media="print" href="originalb2/print.css" />
+	<title><?php $Blog->disp('name', 'htmlhead') ?> - feedback on '<?php $Item->title( '', '', false, 'htmlhead' ) ?>'</title>
+	<?php skin_base_tag(); /* Base URL for this DIR. You need this to fix relative links! */ ?>
 </head>
 <body>
 
-<div id="contentcomments">
-
 <?php
-	/**
-	 * this includes the feedback and a form to add a new comment depending on request
-	 */
-	$disp_comments = 1;					// Display the comments if requested
-	$disp_comment_form = 1;			// Display the comments form if comments requested
-	$disp_trackbacks = 1;				// Display the trackbacks if requested
-	$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-	$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
-	require( dirname(__FILE__).'/_feedback.php' );
+	// Normally, there should only be one item to display...
+	while( $Item = & $MainList->get_item() )
+	{
+		echo '<div id="contentcomments">';
+		/**
+		 * this includes the feedback and a form to add a new comment depending on request
+		 */
+		$disp_comments = 1;					// Display the comments if requested
+		$disp_comment_form = 1;			// Display the comments form if comments requested
+		$disp_trackbacks = 1;				// Display the trackbacks if requested
+		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
+		$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
+		require( dirname(__FILE__).'/_feedback.php' );
+		echo '</div>';
+	}
 ?>
-</div>
 
-<div><strong><span style="color: #0099CC">::</span> <a href="javascript:window.close()">close this window</a></strong></div>
+<div><strong><a href="javascript:window.close()">close this window</a></strong></div>
 
 </body>
 </html>
 <?php
-}
-
-
 /*
  * $Log$
+ * Revision 1.17  2007/01/26 00:36:17  fplanque
+ * cleaner
+ *
  * Revision 1.16  2006/09/06 21:39:22  fplanque
  * ItemList2 fixes
  *
