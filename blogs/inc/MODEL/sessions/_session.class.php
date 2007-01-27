@@ -309,8 +309,8 @@ class Session
 	 * Get a data value for the session. This checks for the data to be expired and unsets it then.
 	 *
 	 * @param string Name of the data's key.
-	 * @param mixed Default value to use if key is not set or has expired. (since EVO_NEXT_VERSION)
-	 * @return mixed|NULL The value, if set; otherwise $default
+	 * @param mixed Default value to use if key is not set or has expired. (since 1.10.0)
+	 * @return mixed The value, if set; otherwise $default
 	 */
 	function get( $param, $default = NULL )
 	{
@@ -498,6 +498,9 @@ function session_unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.33  2007/01/27 15:18:23  blueyed
+ * doc
+ *
  * Revision 1.32  2007/01/27 01:02:49  blueyed
  * debug_die() if ini_set() fails on Session data restore
  *

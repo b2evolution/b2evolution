@@ -1918,8 +1918,8 @@ class Plugin
 	 *   - 'login': user's login (by reference since 1.10.0)
 	 *   - 'pass': user's password (by reference since 1.10.0)
 	 *   - 'pass_md5': user's md5 password (by reference since 1.10.0)
-	 *   - 'pass_salt': the salt used in "pass_hashed" (by reference since 1.10.0)
-	 *   - 'pass_hashed': if non-empty this is the users passwords hashed. See note above. (by reference since 1.10.0)
+	 *   - 'pass_salt': the salt used in "pass_hashed" (by reference) (since EVO_NEXT_VERSION)
+	 *   - 'pass_hashed': if non-empty this is the users passwords hashed. See note above. (by reference) (since EVO_NEXT_VERSION)
 	 *   - 'pass_ok': is the password ok for 'login'? (by reference) (since 1.10.0)
 	 */
 	function LoginAttempt( & $params )
@@ -2573,7 +2573,7 @@ class Plugin
 	 * This checks for the data to be expired and unsets it then.
 	 *
 	 * @param string Name of the data's key (gets prefixed with 'plugIDX_' internally).
-	 * @param mixed Default value to use if key is not set or has expired. (since EVO_NEXT_VERSION)
+	 * @param mixed Default value to use if key is not set or has expired. (since 1.10.0)
 	 * @return mixed The value, if set; otherwise $default
 	 */
 	function session_get( $name, $default = NULL )
@@ -2818,6 +2818,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.140  2007/01/27 15:19:06  blueyed
+ * doc
+ *
  * Revision 1.139  2007/01/26 21:52:42  blueyed
  * Improved LoginAttempt hook: all params get passed by reference and "pass_ok" has been added
  *
