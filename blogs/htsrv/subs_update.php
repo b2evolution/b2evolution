@@ -64,7 +64,7 @@ if( $demo_mode && ($current_User->login == 'demouser') )
 /**
  * Additional checks:
  */
-profile_check_params( array( 'email' => $newuser_email ) );
+profile_check_params( array( 'email' => array($newuser_email, 'newuser_email') ) );
 
 
 if( $Messages->count( 'error' ) )
@@ -132,6 +132,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.20  2007/01/27 19:57:12  blueyed
+ * Use param_error() in profile_check_params()
+ *
  * Revision 1.19  2007/01/27 19:53:17  blueyed
  * Fixed charset when displaying errors
  *

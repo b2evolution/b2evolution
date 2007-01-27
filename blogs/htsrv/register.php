@@ -74,7 +74,12 @@ switch( $action )
 		param( 'pass2', 'string', '' );
 
 		// Check profile params:
-		profile_check_params( array( 'login' => $login, 'pass1' => $pass1, 'pass2' => $pass2, 'email' => $email, 'pass_required' => true ) );
+		profile_check_params( array(
+			'login' => $login,
+			'pass1' => $pass1,
+			'pass2' => $pass2,
+			'email' => $email,
+			'pass_required' => true ) );
 
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
 		$login = strtolower( $login );
@@ -200,6 +205,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.80  2007/01/27 19:57:12  blueyed
+ * Use param_error() in profile_check_params()
+ *
  * Revision 1.79  2007/01/25 22:03:37  blueyed
  * Move hardcoded "$login_required = false" after include of _main.inc.php, so that it cannot get overridden in main init. There is no use case for this.
  *

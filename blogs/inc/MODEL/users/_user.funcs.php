@@ -388,77 +388,74 @@ function user_preferredname( $user_ID )
 }
 
 
-/*
- * profile_title(-)
- *
- * @movedTo _obsolete092.php
- */
-
-
 /**
- * Check profile parameters and add errors to {@link $Messages}.
+ * Check profile parameters and add errors through {@link param_error()}.
  *
- * @todo dh> use {@link param_error()} here?
- *
- * @param array associative array
- *              'login': check for non-empty
- *              'nickname': check for non-empty
- *              'icq': must be a number
- *              'email': mandatory, must be well formed
- *              'url': must be well formed, in allowed scheme, not blacklisted
- *              'pass1' / 'pass2': passwords (twice), must be the same and not == login (if given)
- *              'pass_required': false/true (default is true)
+ * @param array associative array.
+ *     Either array( $value, $input_name ) or just $value;
+ *     ($input_name gets used for associating it to a form fieldname)
+ *     - 'login': check for non-empty
+ *     - 'nickname': check for non-empty
+ *     - 'icq': must be a number
+ *     - 'email': mandatory, must be well formed
+ *     - 'url': must be well formed, in allowed scheme, not blacklisted
+ *     - 'pass1' / 'pass2': passwords (twice), must be the same and not == login (if given)
+ *     - 'pass_required': false/true (default is true)
  * @param User|NULL A user to use for additional checks (password != login/nick).
  */
 function profile_check_params( $params, $User = NULL )
 {
 	global $Messages, $Settings, $comments_allowed_uri_scheme;
 
-	if( !is_array($params) )
+	foreach( $params as $k => $v )
 	{
-		$params = array( $params );
+		// normalize params:
+		if( $k != 'pass_required' && ! is_array($v) )
+		{
+			$params[$k] = array($v, $k);
+		}
 	}
 
 	// checking login has been typed:
-	if( isset($params['login']) && empty($params['login']) )
+	if( isset($params['login']) && empty($params['login'][0]) )
 	{
-		$Messages->add( T_('Please enter a login.'), 'error' );
+		param_error( 'login', T_('Please enter a login.') );
 	}
 
 	// checking the nickname has been typed
-	if( isset($params['nickname']) && empty($params['nickname']) )
+	if( isset($params['nickname']) && empty($params['nickname'][0]) )
 	{
-		$Messages->add( T_('Please enter a nickname (can be the same as your login).'), 'error' );
+		param_error($params['nickname'][1], T_('Please enter a nickname (can be the same as your login).') );
 	}
 
 	// if the ICQ UIN has been entered, check to see if it has only numbers
 	if( !empty($params['icq']) )
 	{
-		if( !preg_match( '#^[0-9]+$#', $params['icq']) )
+		if( !preg_match( '#^[0-9]+$#', $params['icq'][0]) )
 		{
-			$Messages->add( T_('The ICQ UIN can only be a number, no letters allowed.'), 'error' );
+			param_error( $params['icq'][1], T_('The ICQ UIN can only be a number, no letters allowed.') );
 		}
 	}
 
 	// checking e-mail address
-	if( isset($params['email']) )
+	if( isset($params['email'][0]) )
 	{
-		if( empty($params['email']) )
+		if( empty($params['email'][0]) )
 		{
-			$Messages->add( T_('Please enter an e-mail address.'), 'error' );
+			param_error( $params['email'][1], T_('Please enter an e-mail address.') );
 		}
-		elseif( !is_email($params['email']) )
+		elseif( !is_email($params['email'][0]) )
 		{
-			$Messages->add( T_('The email address is invalid.'), 'error' );
+			param_error( $params['email'][1], T_('The email address is invalid.') );
 		}
 	}
 
 	// Checking URL:
 	if( isset($params['url']) )
 	{
-		if( $error = validate_url( $params['url'], $comments_allowed_uri_scheme ) )
+		if( $error = validate_url( $params['url'][0], $comments_allowed_uri_scheme ) )
 		{
-			$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
+			param_error( $params['url'][1], T_('Supplied URL is invalid: ').$error );
 		}
 	}
 
@@ -466,40 +463,43 @@ function profile_check_params( $params, $User = NULL )
 
 	$pass_required = isset( $params['pass_required'] ) ? $params['pass_required'] : true;
 
-	if( isset($params['pass1']) && isset($params['pass2']) )
+	if( isset($params['pass1'][0]) && isset($params['pass2'][0]) )
 	{
-		if( $pass_required || !empty($params['pass1']) || !empty($params['pass2']) )
+		if( $pass_required || !empty($params['pass1'][0]) || !empty($params['pass2'][0]) )
 		{ // Password is required or was given
 			// checking the password has been typed twice
-			if( empty($params['pass1']) || empty($params['pass2']) )
+			if( empty($params['pass1'][0]) || empty($params['pass2'][0]) )
 			{
-				$Messages->add( T_('Please enter your password twice.'), 'error' );
+				param_error( $params['pass2'][1], T_('Please enter your password twice.') );
 			}
 
 			// checking the password has been typed twice the same:
-			if( $params['pass1'] != $params['pass2'] )
+			if( $params['pass1'][0] !== $params['pass2'][0] )
 			{
-				$Messages->add( T_('You typed two different passwords.'), 'error' );
+				param_error( $params['pass1'][1], T_('You typed two different passwords.') );
 			}
-			elseif( strlen($params['pass1']) < $Settings->get('user_minpwdlen')
-							|| strlen($params['pass2']) < $Settings->get('user_minpwdlen') )
+			elseif( strlen($params['pass1'][0]) < $Settings->get('user_minpwdlen') )
 			{
-				$Messages->add( sprintf( T_('The minimum password length is %d characters.'), $Settings->get('user_minpwdlen')), 'error' );
+				param_error( $params['pass1'][1], sprintf( T_('The minimum password length is %d characters.'), $Settings->get('user_minpwdlen')) );
 			}
-			elseif( isset($User) && $params['pass1'] == $User->get('login') )
+			elseif( isset($User) && $params['pass1'][0] == $User->get('login') )
 			{
-				$Messages->add( T_('The password must be different from your login.'), 'error' );
+				param_error( $params['pass1'][1], T_('The password must be different from your login.') );
 			}
-			elseif( isset($User) && $params['pass1'] == $User->get('nickname') )
+			elseif( isset($User) && $params['pass1'][0] == $User->get('nickname') )
 			{
-				$Messages->add( T_('The password must be different from your nickname.'), 'error' );
+				param_error( $params['pass1'][1], T_('The password must be different from your nickname.') );
 			}
 		}
 	}
 }
 
+
 /*
  * $Log$
+ * Revision 1.23  2007/01/27 19:57:12  blueyed
+ * Use param_error() in profile_check_params()
+ *
  * Revision 1.22  2007/01/20 00:38:39  blueyed
  * todo
  *
