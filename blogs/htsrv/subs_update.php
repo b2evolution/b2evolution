@@ -69,6 +69,8 @@ profile_check_params( array( 'email' => $newuser_email ) );
 
 if( $Messages->count( 'error' ) )
 {
+	// TODO: dh> display errors with the form itself
+	header( 'Content-type: text/html; charset='.$io_charset );
 	$Messages->display( T_('Cannot update profile. Please correct the following errors:'),
 			'[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
 	debug_info();
@@ -130,6 +132,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.19  2007/01/27 19:53:17  blueyed
+ * Fixed charset when displaying errors
+ *
  * Revision 1.18  2006/12/16 01:30:46  fplanque
  * Setting to allow/disable email subscriptions on a per blog basis
  *

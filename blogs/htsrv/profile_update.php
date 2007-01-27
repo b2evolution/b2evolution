@@ -95,6 +95,8 @@ profile_check_params( array(
 
 if( $Messages->count('error') )
 {
+	header('Content-type: text/html; charset='.$io_charset);
+	// TODO: dh> these error should get displayed with the profile form itself, or at least there should be a "real HTML page" here (without JS-backlink)
 	$Messages->display( T_('Cannot update profile. Please correct the following errors:'),
 		'[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
 	debug_info();
@@ -144,6 +146,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.49  2007/01/27 19:52:51  blueyed
+ * Fixed charset when displaying errors
+ *
  * Revision 1.48  2006/11/26 02:30:38  fplanque
  * doc / todo
  *
