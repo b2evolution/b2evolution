@@ -154,8 +154,12 @@ class Session
 					{ // Some session data has been previsouly stored:
 
 						// Unserialize session data (using an own callback that should provide class definitions):
-						$old_callback = ini_get( 'unserialize_callback_func' );
-						ini_set( 'unserialize_callback_func', 'session_unserialize_callback' );
+						$old_callback = ini_set( 'unserialize_callback_func', 'session_unserialize_callback' );
+						if( $old_callback === false )
+						{ // this can fail, if "ini_set" has been disabled for security reasons.. :/
+							// TODO: dh> add this to "System check page"?
+							debug_die('ini_set() is disabled! b2evo cannot adjust "unserialize_callback_func" for Session restoring!');
+						}
 						// TODO: dh> This can fail, if there are special chars in sess_data:
 						//       It will be encoded in $evo_charset _after_ "SET NAMES", but
 						//       get retrieved here, _before_ any "SET NAMES" (if $db_config['connection_charset'] is not set (default))!
@@ -494,6 +498,9 @@ function session_unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.32  2007/01/27 01:02:49  blueyed
+ * debug_die() if ini_set() fails on Session data restore
+ *
  * Revision 1.31  2007/01/16 00:08:44  blueyed
  * Implemented $default param for Session::get()
  *
