@@ -268,7 +268,8 @@ if( $action != 'view_user' )
 				display_plugin_settings_fieldset_field( $l_name, $l_meta, $loop_Plugin, $Form, 'UserSettings', $edited_User );
 			}
 
-		$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsEditDisplayAfter', $tmp_params = array( 'Form' => & $Form ) );
+			$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsEditDisplayAfter',
+				$tmp_params = array( 'Form' => & $Form, 'User' => $edited_User ) );
 
 		$Form->end_fieldset();
 	}
@@ -359,6 +360,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.40  2007/01/27 16:08:53  blueyed
+ * Pass "User" param to PluginUserSettingsEditDisplayAfter plugin hook
+ *
  * Revision 1.39  2007/01/23 08:57:36  fplanque
  * decrap!
  *

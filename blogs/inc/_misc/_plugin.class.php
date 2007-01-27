@@ -1780,6 +1780,7 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Form': the {@link Form}, where an fieldset has been opened already (by reference)
+	 *   - 'User': the {@link User} whose settings get displayed for editing (since 1.10.0)
 	 */
 	function PluginUserSettingsEditDisplayAfter( & $params )
 	{
@@ -2818,6 +2819,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.141  2007/01/27 16:08:53  blueyed
+ * Pass "User" param to PluginUserSettingsEditDisplayAfter plugin hook
+ *
  * Revision 1.140  2007/01/27 15:19:06  blueyed
  * doc
  *
