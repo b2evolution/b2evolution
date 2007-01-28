@@ -240,7 +240,7 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
 		return false;
 	}
 
-	if( $link_text == '' ) $link_text = T_('Logout (%s)');
+	if( $link_text == '' ) $link_text = T_('Logout');
 	if( $link_title == '#' ) $link_title = T_('Logout from your account');
 
 	$r = $before;
@@ -263,9 +263,9 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
  * @param string Text for the link.
  * @param string Title for the link.
  */
-function user_admin_link( $before = '', $after = '', $page = '', $link_text = '', $link_title = '#' )
+function user_admin_link( $before = '', $after = '', $page = '', $link_text = '', $link_title = '#', $not_visible = '' )
 {
-	echo get_user_admin_link( $before, $after, $page, $link_text, $link_title );
+	echo get_user_admin_link( $before, $after, $page, $link_text, $link_title, $not_visible );
 }
 
 
@@ -281,13 +281,13 @@ function user_admin_link( $before = '', $after = '', $page = '', $link_text = ''
  * @param string Title for the link.
  * @return string
  */
-function get_user_admin_link( $before = '', $after = '', $page = '', $link_text = '', $link_title = '#' )
+function get_user_admin_link( $before = '', $after = '', $page = '', $link_text = '', $link_title = '#', $not_visible = '' )
 {
 	global $admin_url, $blog, $current_User;
 
 	if( is_logged_in() && ! $current_User->check_perm( 'admin', 'visible' ) )
 	{ // If user should NOT see admin link:
-		return false;
+		return $not_visible;
 	}
 
 	if( $link_text == '' ) $link_text = T_('Admin');
@@ -327,7 +327,14 @@ function get_user_profile_link( $before = '', $after = '', $link_text = '', $lin
 		return false;
 	}
 
-	if( $link_text == '' ) $link_text = T_('Profile (%s)');
+	if( $link_text == '' )
+	{
+		$link_text = T_('Profile');
+	}
+	else
+	{
+		$link_text = str_replace( '%s', $current_User->login, $link_text );
+	}
 	if( $link_title == '#' ) $link_title = T_('Edit your profile');
 
 	$r = $before
@@ -358,7 +365,7 @@ function user_subs_link( $before = '', $after = '', $link_text = '', $link_title
 		return false;
 	}
 
-	if( $link_text == '' ) $link_text = T_('Subscribe (%s)');
+	if( $link_text == '' ) $link_text = T_('Subscribe');
 	if( $link_title == '#' ) $link_title = T_('Subscribe to email notifications');
 
 	echo $before;
@@ -497,6 +504,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.24  2007/01/28 17:53:09  fplanque
+ * changes for 2.0 skin structure
+ *
  * Revision 1.23  2007/01/27 19:57:12  blueyed
  * Use param_error() in profile_check_params()
  *
