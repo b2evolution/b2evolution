@@ -1,56 +1,24 @@
 <?php
-	/**
-	 * This is the main template. It displays the blog.
-	 *
-	 * However this file is not meant to be called directly.
-	 * It is meant to be called automagically by b2evolution.
-	 * To display a blog, you should call a stub file instead, for example:
-	 * /blogs/index.php or /blogs/blog_b.php
-	 *
-	 * b2evolution - {@link http://b2evolution.net/}
-	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
-	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
-	 *
-	 * @package evoskins
-	 * @subpackage custom
-	 */
+/**
+ * This is the main page template.
+ *
+ * It is used to display the blog when no specific page template is available.
+ *
+ * @package evoskins
+ * @subpackage nifty_corners
+ */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-skin_content_header();	// Sets charset!
+
+// -------------------------- HTML HEADER INCLUDED HERE --------------------------
+require $skins_path.'_html_header.inc.php';
+// Note: You can customize the default HTML header by copying the 
+// _html_header.inc.php file into the current skin folder.
+// -------------------------------- END OF HEADER --------------------------------
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
-<head>
-	<?php skin_content_meta(); /* Charset for static pages */ ?>
-	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
-	<title><?php
-		$Blog->disp('name', 'htmlhead');
-		request_title( ' - ', '', ' - ', 'htmlhead' );
-	?></title>
-	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
-	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
-	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
-	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
-	<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
-	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
-	<link rel="stylesheet" href="rsc/styles.css" type="text/css" />
-	<link rel="stylesheet" type="text/css" href="rsc/nifty_corners.css" />
-	<link rel="stylesheet" type="text/css" href="rsc/nifty_print.css" media="print" />
-	<script type="text/javascript" src="rsc/nifty_corners.js"></script>
-	<script type="text/javascript">
-		window.onload=function()
-		{
-			if(!NiftyCheck())
-					return;
-			Rounded("div.outerwrap","all","transparent","#fff","");
-			Rounded("div.posts","all","transparent","#fff","");
-			Rounded("div.bSideBar","all","transparent","#fff","");
-			Rounded("div.bTitle","top","#fff","#06a3c4","smooth");
-		}
-	</script>
-</head>
-<body>
+
 <div class="wrapper">
+<div class="wrapper2">
 
 <div class="outerwrap">
 <div class="innerwrap">
@@ -181,7 +149,6 @@ skin_content_header();	// Sets charset!
 		// -------------- START OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. --------------
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.
-		$current_skin_includes_path = dirname(__FILE__).'/';
 		// Call the dispatcher:
 		require $skins_path.'_dispatch.inc.php';
 		// --------------- END OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. ---------------
@@ -224,33 +191,21 @@ skin_content_header();	// Sets charset!
 
 <div class="clear"><img src="<?php echo $rsc_url; ?>img/blank.gif" width="1" height="1" alt="" /></div>
 
-<div id="pageFooter">
-	<p class="baseline">
-		Original <a href="http://b2evolution.net/">b2evolution</a> template design by <a href="http://severinelandrieu.com/">S&eacute;verine LANDRIEU</a> &amp; <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> / <a href="http://skinfaktory.com/">The Skin Faktory</a>.
-	</p>
-	<p class="baseline">
-		<?php
-			// Display a link to contact the owner of this blog (if owner accepts messages):
-			$Blog->contact_link( array(
-					'before'      => '',
-					'after'       => ' &bull; ',
-					'text'   => T_('Contact'),
-					'title'  => T_('Send a message to the owner of this blog...'),
-				) );
-		?>
-
-		<?php
-			// Display additional credits (see /conf/_advanced.php):
- 			// If you can add your own credits without removing the defaults, you'll be very cool :))
-			// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
-			display_list( $credit_links, T_('Credits').': ', '', '|', ' ', ' ' );
-			$Hit->log();	// log the hit on this page
-			debug_info(); // output debug info if requested
-		?>
-	</p>
-</div>
+<?php
+// ------------------------- BODY FOOTER INCLUDED HERE --------------------------
+require $skins_path.'_body_footer.inc.php';
+// Note: You can customize the default BODY footer by copying the
+// _body_footer.inc.php file into the current skin folder.
+// ------------------------------- END OF FOOTER --------------------------------
+?>
 
 </div>
+</div>
 
-</body>
-</html>
+<?php
+// ------------------------- HTML FOOTER INCLUDED HERE --------------------------
+require $skins_path.'_html_footer.inc.php';
+// Note: You can customize the default HTML footer by copying the 
+// _html_footer.inc.php file into the current skin folder.
+// ------------------------------- END OF FOOTER --------------------------------
+?>

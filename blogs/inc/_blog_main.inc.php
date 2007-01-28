@@ -494,7 +494,7 @@ if( !isset($display_blog_list) )
 
 
 if( !empty( $skin ) )
-{ // We want to display now:
+{ // We want to display with a skin now:
 
 	if( $skin_provided_by_plugin = skin_provided_by_plugin($skin) )
 	{
@@ -502,6 +502,9 @@ if( !empty( $skin ) )
 	}
 	else
 	{
+		// Path for the current skin:
+		$ads_current_skin_path = $skins_path.$skin.'/';
+
 		$disp_handlers = array(
 				'feedback-popup' => 'feedback_popup.page.php',
 				// 'arcdir'   => 'arcdir.page.php',
@@ -513,24 +516,33 @@ if( !empty( $skin ) )
 			);
 
 		if( !empty($disp_handlers[$disp])
-				&& file_exists( $disp_handler = $skins_path.$skin.'/'.$disp_handlers[$disp] ) )
+				&& file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[$disp] ) )
 		{	// The skin has a customized page handler for this display:
 			require $disp_handler;
 		}
 		else
 		{	// Use the default handler from the skins dir:
-			require $skins_path.$skin.'/_main.php';
+			require $ads_current_skin_path.'_main.php';
 		}
 	}
 
 	// log the hit on this page (in case the skin hasn't already done so)
 	$Hit->log();
 }
+else
+{	// We don't use a skin. Hopefully the caller will do some displaying.
+	// Set a few vars with default values, just in case...
+	$ads_current_skin_path = $htsrv_path;
 
-// We'll just return to the caller now... (if we have not used a skin, the caller should do the display after this)
+	// We'll just return to the caller now... (if we have not used a skin, the caller should do the display after this)
+}
+
 
 /*
  * $Log$
+ * Revision 1.68  2007/01/28 17:50:54  fplanque
+ * started moving towards 2.0 skin structure
+ *
  * Revision 1.67  2007/01/26 04:52:53  fplanque
  * clean comment popups (skins 2.0)
  *
@@ -606,151 +618,5 @@ if( !empty( $skin ) )
  * Revision 1.44  2006/10/04 12:55:24  blueyed
  * - Reload $Blog, if charset has changed for Blog locale
  * - only update DB connection charset, if not forced with $db_config['connection_charset']
- *
- * Revision 1.43  2006/09/20 14:28:34  blueyed
- * Fixed typo in function name Item::peview_request()
- *
- * Revision 1.42  2006/09/12 00:31:30  fplanque
- * 301 redirects to canonical URLs
- * EXPERIMENTAL - please report problems
- *
- * Revision 1.41  2006/09/11 20:53:33  fplanque
- * clean chapter paths with decoding, finally :)
- *
- * Revision 1.40  2006/09/11 00:43:03  fplanque
- * transposed decoding. So far it doesn't decode much more but it's more laxist regarding junk before a post title
- *
- * Revision 1.39  2006/09/07 00:48:55  fplanque
- * lc parameter for locale filtering of posts
- *
- * Revision 1.38  2006/09/06 21:39:21  fplanque
- * ItemList2 fixes
- *
- * Revision 1.37  2006/09/06 18:34:04  fplanque
- * Finally killed the old stinkin' ItemList(1) class which is deprecated by ItemList2
- *
- * Revision 1.36  2006/08/29 00:26:11  fplanque
- * Massive changes rolling in ItemList2.
- * This is somehow the meat of version 2.0.
- * This branch has gone officially unstable at this point! :>
- *
- * Revision 1.34  2006/08/26 20:30:42  fplanque
- * made URL titles Google friendly
- *
- * Revision 1.33  2006/08/21 00:03:12  fplanque
- * obsoleted some dirty old thing
- *
- * Revision 1.32  2006/08/20 22:25:20  fplanque
- * param_() refactoring part 2
- *
- * Revision 1.31  2006/08/20 20:12:32  fplanque
- * param_() refactoring part 1
- *
- * Revision 1.30  2006/08/19 07:56:29  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.29  2006/08/19 00:41:16  fplanque
- * planted some freaky timers!
- *
- * Revision 1.28  2006/08/07 16:49:35  fplanque
- * doc
- *
- * Revision 1.27  2006/08/07 00:32:07  blueyed
- * Fixed previewing, if $redirect_to_postblog setting is used
- *
- * Revision 1.26  2006/07/24 00:05:44  fplanque
- * cleaned up skins
- *
- * Revision 1.25  2006/07/06 19:59:08  fplanque
- * better logs, better stats, better pruning
- *
- * Revision 1.24  2006/06/30 22:58:13  blueyed
- * Abstracted charset conversation, not much tested.
- *
- * Revision 1.23  2006/05/29 19:54:45  fplanque
- * no message
- *
- * Revision 1.22  2006/05/19 17:03:58  blueyed
- * locale activation fix from v-1-8, abstraction of setting DB connection charset
- *
- * Revision 1.21  2006/05/14 17:59:59  blueyed
- * "try/catch" SET NAMES (Thanks, bodo)
- *
- * Revision 1.20  2006/05/12 21:53:37  blueyed
- * Fixes, cleanup, translation for plugins
- *
- * Revision 1.19  2006/05/05 15:46:03  blueyed
- * Nasty bug that produces empty pages..
- *
- * Revision 1.18  2006/05/03 01:53:42  blueyed
- * Encode subject in mails correctly (if mbstrings is available)
- *
- * Revision 1.17  2006/04/29 01:24:04  blueyed
- * More decent charset support;
- * unresolved issues include:
- *  - front office still forces the blog's locale/charset!
- *  - if there's content in utf8, it cannot get displayed with an I/O charset of latin1
- *
- * Revision 1.16  2006/04/24 17:54:18  blueyed
- * todo
- *
- * Revision 1.15  2006/04/24 15:43:35  fplanque
- * no message
- *
- * Revision 1.14  2006/04/21 17:05:08  blueyed
- * cleanup
- *
- * Revision 1.13  2006/04/19 20:13:48  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.12  2006/04/11 20:37:57  blueyed
- * Re-activated /admin/-redirect
- *
- * Revision 1.11  2006/04/11 17:10:22  fplanque
- * The view is not a place for redirects!
- *
- * Revision 1.10  2006/04/10 22:05:26  blueyed
- * Fixed path to stats gone page
- *
- * Revision 1.8  2006/03/18 14:38:36  blueyed
- * fix
- *
- * Revision 1.6  2006/03/16 23:33:53  blueyed
- * Fixed path to 404-error-page
- *
- * Revision 1.5  2006/03/12 23:46:13  fplanque
- * experimental
- *
- * Revision 1.4  2006/03/12 23:08:53  fplanque
- * doc cleanup
- *
- * Revision 1.3  2006/03/12 03:48:51  blueyed
- * bugfix
- *
- * Revision 1.2  2006/03/09 22:29:59  fplanque
- * cleaned up permanent urls
- *
- * Revision 1.1  2006/02/23 21:11:55  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.45  2006/01/30 16:09:34  blueyed
- * doc
- *
- * Revision 1.44  2006/01/26 21:27:21  blueyed
- * add debug
- *
- * Revision 1.43  2006/01/26 19:27:58  fplanque
- * no message
- *
- * Revision 1.42  2006/01/25 19:19:17  blueyed
- * Fixes for blogurl handling. Thanks to BenFranske for pointing out the biggest issue (http://forums.b2evolution.net/viewtopic.php?t=6844)
- *
- * Revision 1.41  2006/01/22 22:41:59  blueyed
- * Timer, doc
- *
- * Revision 1.40  2006/01/04 19:07:48  fplanque
- * allow filtering on assignees
  */
 ?>

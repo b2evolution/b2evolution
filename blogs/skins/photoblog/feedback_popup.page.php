@@ -1,13 +1,20 @@
 <?php
 /**
  * This is the comments-popup page template.
+ *
+ * It is used to display the blog when no specific page template is available.
+ *
+ * @package evoskins
+ * @subpackage photoblog
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-// --------------------------- HEADER INCLUDED HERE -----------------------------
-require dirname(__FILE__).'/_header.inc.php';
-// ------------------------------- END OF HEADER --------------------------------
 
+// -------------------------- HTML HEADER INCLUDED HERE --------------------------
+require $skins_path.'_html_header.inc.php';
+// Note: You can customize the default HTML header by copying the
+// _html_header.inc.php file into the current skin folder.
+// -------------------------------- END OF HEADER --------------------------------
 ?>
 
 <div class="comments_popup">
@@ -45,9 +52,9 @@ while( $Item = & $MainList->get_item() )
 <p class="center"><strong><a href="javascript:window.close()">close this window</a></strong></p>
 
 <?php
-
-// --------------------------- FOOTER INCLUDED HERE -----------------------------
-require dirname(__FILE__).'/_footer.inc.php';
+// ------------------------- HTML FOOTER INCLUDED HERE --------------------------
+require $skins_path.'_html_footer.inc.php';
+// Note: You can customize the default HTML footer by copying the
+// _html_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------
-
 ?>

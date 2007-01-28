@@ -1,45 +1,61 @@
 /* Designed by Francois PLANQUE - http://fplanque.net/ */
 
-@import url(../../../rsc/css/basic.css);	/* Import basic styles */
-@import url(../../../rsc/css/img.css);	/* Import standard image styles */
-@import url(../../../rsc/css/blog_elements.css);	/* Import standard blog elements styles */
-@import url(../../../rsc/css/forms.css);	/* Import default form styles */
-@import url(../../../rsc/css/comments.css);	/* Import default comment styles */
+@import url(../../rsc/css/basic.css);	/* Import basic styles */
+@import url(../../rsc/css/img.css);	/* Import standard image styles */
+@import url(../../rsc/css/blog_elements.css);	/* Import standard blog elements styles */
+@import url(../../rsc/css/forms.css);	/* Import default form styles */
+@import url(../../rsc/css/comments.css);	/* Import default comment styles */
 
 /*
  * Main page construct:
  */
 body {
-	background: #eee url(img/bg.gif) repeat fixed center;
-	padding: 1em;
-	margin: 0;
+	background: #82cdac url(rsc/img/bg.jpg) repeat-x fixed left top;
 	color: #000;
-	font-family: Georgia, "Times New Roman", Times, serif;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 84%;
+
 }
 
-div#wrapper /* Main white content zone */
+h1, h2, h3, h4, h5, h6 {
+	font-family: "Trebuchet MS", "Lucida Grande", Arial, Helvetica, sans-serif;
+}
+
+div.wrapper
 {
-	background: #fff url(img/flamand.gif) no-repeat right bottom;
-	width: 90ex;
-	margin: 0 auto;
-	padding: 0;
-	border: 1px solid #000;
+	margin: 2ex;
 }
-
+div.wrapper2 /* Main centered zone */
+{
+	width: 105ex;
+	margin: 0 auto;
+}
+div.outerwrap /* Main rounded content zone */
+{
+	margin: 1ex 0;
+	padding: 5px 0;
+	/* border: 1px solid #000;  */
+}
+div.innerwrap /* Main white content zone */
+{
+	padding: 0;
+	border: 1px solid #fff; /* needed to force inner paddings */ 
+	background-color:#fff;
+}
 div.pageHeader /* Title zone */
 {
-	margin: 1ex;
+	margin: 0 1ex;
 	padding: 0;
-	border-bottom: 1px dotted #000;
-	background-image: url(img/birds.gif);
+	background-image: url(rsc/img/squares.gif);
 	background-repeat: no-repeat;
-	background-position: right top;
+	background-position: right center;
+	/* border: 1px solid #f00; */
 }
 
 
-.bPosts /* Left column */
+.posts /* Left column */
 {
-	width: 60ex;
+	width: 75ex;
 	float: left;
 	overflow: hidden;
 }
@@ -49,14 +65,12 @@ div.pageHeader /* Title zone */
 	width: 29ex;
 	float: right;
 	overflow: hidden;
-	border-left: 1px dotted #000;
-	padding-bottom: 250px;	/* Breathing space for background image */
 }
 div.clear {
 	clear: both;
 }
 div#pageFooter {
-	margin: 1ex 195px 1ex 1ex;
+	margin: 1ex;
 	padding:0;
 	border-top: 1px dotted #000;
 }
@@ -65,6 +79,7 @@ p.baseline {
 	text-align: center;
 	margin:1ex;
 }
+
 
 /*
  * General styles:
@@ -80,35 +95,34 @@ a:hover {
 }
 
 h2 {
-	color: #f09;
-	font-size: 180%;
+	color: #06a3c4;
+	font-size: 160%;
 	margin: 1ex;
 }
 h3 {
-	color: #f09;
-	font-size: 120%;
+	color: #06a3c4;
+	font-size: 110%;
 }
 h4 {
-	color: #f09;
-	font-size: 110%;
+	color: #06a3c4;
+	font-size: 105%;
 }
 
 /*
  * Blog list on top:
  */
 ul#bloglist {
-	border-bottom: 1px dotted #000;
-	margin: 0 1ex;
-	padding: 0;
+	border-bottom: 2px solid #06a3c4;
+	margin: 0 1ex 2px 1ex;
+	padding: 0 0 2px 0;
 	list-style-type:none;
-	padding: .5ex 0;
 }
 ul#bloglist li {
 	display: inline;
 	padding-right: 1em;
 }
 a.BlogButtonCurr {
-	color: #f09;
+	color: #06a3c4;
 	font-weight:bold;
 }
 
@@ -121,50 +135,55 @@ div.pageHeader h1 {
 	font-weight: bold;
 	margin: 0;
 	padding: 0;
+	color:#06a3c4;
 }
 div.pageHeader h1 a {
-	color: #000;
+	color:#06a3c4;
 }
 div.pageHeader h1 a:hover {
 	color: #c0c;
 }
 div.pageHeader div.widget_core_coll_tagline {
 	letter-spacing: 4px;
-	margin: 1ex 0;
+	padding: 0 0 3px 0;
 	font-size: 109%;
 }
 
 
 /* 
- * Styles for foms 
+ * Styles for posts
  */
 .bPost, .bPostpublished
 {
 	clear: both;
-	margin: 0 2.5ex;
+	margin: 0 1ex 3ex 1ex;
 	padding: 0;
-}
-div.separator {
-	text-align:center;
-	margin: 2em 0;
+	/* border: 1px solid #e2f1f4; */
 }
 .bSmallHead {
 	font-size: 78%;
-	margin: 2ex 0 1ex 0;
+	margin: 1ex;
 }
-.bTitle {
-	color: #000;
-	margin: 1ex 0;
+div.bTitle {
+	clear: both;
+	margin: 1ex 1ex 0 1ex;
+	padding: 5px 0 4px 0;
+	background-color:#06a3c4;
+}
+h3.bTitle {
+	margin: 0 1ex;
+}
+h3.bTitle a {
+	color: #fff;
 }
 .bText {
-	margin-top: 0px;
-	margin-bottom: 0px;
+	margin: 0 1ex 0;
 }
 .bSmallPrint
 {
 	clear: both;
 	font-size: 78%;
-	margin: 1ex 0 2ex 0;
+	margin: 1ex;
 }
 
 input.bComment, 
@@ -189,11 +208,9 @@ select.bComment		/* Used by the profile form */
  * Styles for sidebar (right) 
  */
 .bSideItem {
-	font-size: 84%;
 	margin: 2ex;
 	padding: 0 0 2ex 0;
 }
-
 .bSideItem ul {
 	margin-left: 8px;
 	padding-left: 8px;
@@ -232,7 +249,7 @@ input.SearchField
 	padding: 0;
 }
 .widget_core_coll_title a {
-	color: #f09;
+	color: #06a3c4;
 }
 
 /* Calendar: */
@@ -246,7 +263,7 @@ table.bCalendarTable {
 	border-collapse: separate; 
 }
 table.bCalendarTable a {
-	color: #f09;
+	color: #06a3c4;
 }
 table.bCalendarTable tfoot td {
 	background-color: #eee;
@@ -263,7 +280,7 @@ th.bCalendarHeaderCell {
 	font-weight:normal;
 }
 #bCalendarToday {
-	background-color: #fac;
+	background-color: #E2F1F4;
 }
 
 /*
@@ -273,10 +290,11 @@ form.bComment fieldset div.label,
 form.bComment fieldset div.input,
 form.bComment fieldset div.info
 {
-	font-size: 84%;
+	padding-top: 0;
+	/* font-size: 84%; */
 }
 textarea.bComment,
 input.bComment,
 input.SearchField {
-	background-color: #fff0f8;
+	background-color: #E2F1F4;
 }

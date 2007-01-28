@@ -1,11 +1,19 @@
 <?php
 /**
- * This is the header include template.
+ * This is the HTML header include template.
  *
  * This is meant to be included in a page template.
  * Note: This is also included in the popup: do not include site navigation!
+ *
+ * @package evoskins
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+if( file_exists( $ads_current_skin_path.'_html_header.inc.php' ) )
+{	// The skin has a customized handler, use that one instead:
+	require $ads_current_skin_path.'_html_header.inc.php';
+	return;
+}
 
 skin_content_header();	// Sets charset!
 ?>
@@ -16,8 +24,6 @@ skin_content_header();	// Sets charset!
 	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
 	<title><?php
 		request_title( '', ' - ', ' - ', 'htmlhead', array(
-				'category_text' => T_('Album').': ',
-				'categories_text' => T_('Albums').': ',
 		 ) );
 		$Blog->disp('name', 'htmlhead');
 	?></title>
@@ -36,3 +42,9 @@ skin_content_header();	// Sets charset!
 </head>
 
 <body>
+
+<?php
+// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
+require $skins_path.'_toolbar.inc.php';
+// -------------------------------- END OF HEADER --------------------------------
+?>

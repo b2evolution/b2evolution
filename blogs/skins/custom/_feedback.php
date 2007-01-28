@@ -14,7 +14,7 @@
 	 * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
 	 *
 	 * @package evoskins
-	 * @subpackage custom
+	 * @subpackage teal
 	 */
 	if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

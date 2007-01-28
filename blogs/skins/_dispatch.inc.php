@@ -30,9 +30,9 @@ if( $disp != 'posts' && $disp != 'single' )
 		
 	$disp_handler = $disp_handlers[$disp];
 		
-	if( file_exists( $current_skin_includes_path.$disp_handler ) )
+	if( file_exists( $ads_current_skin_path.$disp_handler ) )
 	{	// The skin has a customized handler for this display:
-		require $current_skin_includes_path.$disp_handler;
+		require $ads_current_skin_path.$disp_handler;
 	}
 	else
 	{	// Use the default handler from the skins dir:
@@ -43,6 +43,9 @@ if( $disp != 'posts' && $disp != 'single' )
 
 /*
  * $Log$
+ * Revision 1.3  2007/01/28 17:50:18  fplanque
+ * started moving towards 2.0 skin structure
+ *
  * Revision 1.2  2006/08/16 23:50:17  fplanque
  * moved credits to correct place
  *

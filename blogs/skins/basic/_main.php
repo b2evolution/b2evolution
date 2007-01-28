@@ -1,41 +1,15 @@
 <?php
 /**
- * This is the main template. It displays the blog.
+ * This is the main page template.
  *
- * However this file is not meant to be called directly.
- * It is meant to be called automagically by b2evolution.
- * To display a blog, the easiest way is to call index.php?blog=#
- * where # is the number of your blog.
- *
- * This file is part of the b2evolution project - {@link http://b2evolution.net/}
- *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- *
- * {@internal Open Source relicensing agreement:
- * Jason EDGECOMBE grants Francois PLANQUE the right to license
- * Jason EDGECOMBE's personal contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
+ * It is used to display the blog when no specific page template is available.
  *
  * @package evoskins
  * @subpackage basic
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
- * @author cafelog (team)
- * @author edgester Jason EDGECOMBE
- *
- * {@internal Below is a list of former authors whose contributions to this file have been
- *            either removed or redesigned and rewritten anew:
- *            - (none)
- * }}
- *
- * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+// ----------------------------- HEADER BEGINS HERE ------------------------------
 skin_content_header();	// Sets charset!
 ?>
 <html>
@@ -43,18 +17,18 @@ skin_content_header();	// Sets charset!
 	<?php skin_content_meta(); /* Charset for static pages */ ?>
 	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
 	<title><?php
+		request_title( '', ' - ', ' - ', 'htmlhead', array(
+		 ) );
 		$Blog->disp('name', 'htmlhead');
-		request_title( ' - ', '', ' - ', 'htmlhead' );
 	?>
 	</title>
 	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
-	<?php
-		$Blog->disp( 'blog_css', 'raw');
-		$Blog->disp( 'user_css', 'raw');
-	?>
 </head>
 <body>
+<?php
+// -------------------------------- END OF HEADER --------------------------------
+?>
 
 <?php
 	/**
@@ -156,7 +130,6 @@ skin_content_header();	// Sets charset!
 		// -------------- START OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. --------------
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.
-		$current_skin_includes_path = dirname(__FILE__).'/';
 		// Call the dispatcher:
 		require $skins_path.'_dispatch.inc.php';
 		// --------------- END OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. ---------------

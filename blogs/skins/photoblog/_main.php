@@ -3,16 +3,24 @@
  * This is the main page template.
  *
  * It is used to display the blog when no specific page template is available.
+ *
+ * @package evoskins
+ * @subpackage photoblog
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-// --------------------------- HEADER INCLUDED HERE -----------------------------
-require dirname(__FILE__).'/_header.inc.php';
-// ------------------------------- END OF HEADER --------------------------------
 
-// --------------------------- BLOG LIST INCLUDED HERE -----------------------------
+// -------------------------- HTML HEADER INCLUDED HERE --------------------------
+require $skins_path.'_html_header.inc.php';
+// Note: You can customize the default HTML header by copying the
+// _html_header.inc.php file into the current skin folder.
+// -------------------------------- END OF HEADER --------------------------------
+?>
+
+<?php
+// -------------------------- BLOG LIST INCLUDED HERE ----------------------------
 require dirname(__FILE__).'/_bloglist.php';
-// ------------------------------- END OF BLOG LIST --------------------------------
+// ------------------------------ END OF BLOG LIST -------------------------------
 ?>
 
 <div class="pageHeader">
@@ -24,8 +32,6 @@ require dirname(__FILE__).'/_bloglist.php';
 		<?php
 				user_login_link( ' | ', ' ' );
 				user_register_link( ' | ', ' ' );
-				user_admin_link( ' | ', ' ' );
-				user_logout_link( ' | ', ' ' );
 			?>
 	</div>
 	
@@ -162,7 +168,6 @@ require dirname(__FILE__).'/_bloglist.php';
 	// -------------- START OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. --------------
 	// Note: you can customize any of the sub templates included here by
 	// copying the matching php file into your skin directory.
-	$current_skin_includes_path = dirname(__FILE__).'/';
 	// Call the dispatcher:
 	require $skins_path.'_dispatch.inc.php';
 	// --------------- END OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. ---------------
@@ -172,34 +177,19 @@ require dirname(__FILE__).'/_bloglist.php';
 </div>
 
 
-<div id="pageFooter">
+<?php
+// ------------------------- BODY FOOTER INCLUDED HERE --------------------------
+require $skins_path.'_body_footer.inc.php';
+// Note: You can customize the default BODY footer by copying the
+// _body_footer.inc.php file into the current skin folder.
+// ------------------------------- END OF FOOTER --------------------------------
+?>
 
-	<p class="baseline">
-		<?php
-			// Display a link to contact the owner of this blog (if owner accepts messages):
-			$Blog->contact_link( array(
-					'before'      => '',
-					'after'       => ' | ',
-					'text'   => T_('Contact'),
-					'title'  => T_('Send a message to the owner of this blog...'),
-				) );
-		?>
-
-		<a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><?php echo T_('Latest comments') ?></a>
-		|
-		<a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>">RSS 2.0</a> /
-		<a href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><?php echo T_('Atom Feed') ?></a> /
-		<a href="http://webreference.fr/2006/08/30/rss_atom_xml" title="External - English"><?php echo T_('What is RSS?') ?></a>
-		<?php
-			user_profile_link( ' | ', ' ' );
-			user_subs_link( ' | ', ' ' );
-		?>
-	</p>
-
-</div>
 
 <?php
-// --------------------------- FOOTER INCLUDED HERE -----------------------------
-require dirname(__FILE__).'/_footer.inc.php';
+// ------------------------- HTML FOOTER INCLUDED HERE --------------------------
+require $skins_path.'_html_footer.inc.php';
+// Note: You can customize the default HTML footer by copying the
+// _html_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------
 ?>

@@ -38,6 +38,9 @@ require_once dirname(__FILE__).'/conf/_config.php';
 
 require_once $inc_path.'_blog_main.inc.php';
 
+// Make sure includes will check in the current folder!
+$ads_current_skin_path = dirname(__FILE__).'/';
+
 # Now, below you'll find the magic template...
 
 header( 'Content-type: text/html; charset='.$io_charset );
@@ -169,7 +172,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		// -------------- START OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. --------------
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into the same directory as this file.
-		$current_skin_includes_path = dirname(__FILE__).'/';
 		// Call the dispatcher:
 		require $skins_path.'_dispatch.inc.php';
 		// --------------- END OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. ---------------

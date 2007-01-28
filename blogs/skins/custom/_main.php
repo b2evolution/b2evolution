@@ -1,70 +1,22 @@
 <?php
 /**
- * This is the main template. It displays the blog.
+ * This is the main page template.
  *
- * However this file is not meant to be called directly.
- * It is meant to be called automagically by b2evolution.
- * To display a blog, the easiest way is to call index.php?blog=#
- * where # is the number of your blog.
- *
- * This file is part of the b2evolution project - {@link http://b2evolution.net/}
- *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- * Parts of this file are copyright (c)2005 by Jason EDGECOMBE.
- * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER.
- *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- *
- * {@internal Open Source relicensing agreement:
- * Daniel HAHLER grants Francois PLANQUE the right to license
- * Daniel HAHLER's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- *
- * Jason EDGECOMBE grants Francois PLANQUE the right to license
- * Jason EDGECOMBE's personal contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
+ * It is used to display the blog when no specific page template is available.
  *
  * @package evoskins
- * @subpackage custom
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER
- * @author cafelog (team)
- * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
- * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
- *
- * @version $Id$
+ * @subpackage teal
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-$Timer->start( 'skin/_main.inc:header' );
 
-skin_content_header();	// Sets charset!
+// -------------------------- HTML HEADER INCLUDED HERE --------------------------
+require $skins_path.'_html_header.inc.php';
+// Note: You can customize the default HTML header by copying the 
+// _html_header.inc.php file into the current skin folder.
+// -------------------------------- END OF HEADER --------------------------------
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
-<head>
-	<?php skin_content_meta(); /* Charset for static pages */ ?>
-	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
-	<title><?php
-		$Blog->disp('name', 'htmlhead');
-		request_title( ' - ', '', ' - ', 'htmlhead' );
-	?></title>
-	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
-	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
-	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
-	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
-	<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
-	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
-	<link rel="stylesheet" href="custom.css" type="text/css" />
-	<?php
-		$Blog->disp( 'blog_css', 'raw');
-		$Blog->disp( 'user_css', 'raw');
-	?>
-</head>
 
-<body>
 <div id="wrapper">
 
 <?php
@@ -89,12 +41,6 @@ skin_content_header();	// Sets charset!
 <div class="bPosts">
 
 <!-- =================================== START OF MAIN AREA =================================== -->
-
-<?php
-	$Timer->pause( 'skin/_main.inc:header' );
-
-	$Timer->start( 'skin/_main.inc:mainarea' );
-?>
 
 
 <?php
@@ -133,12 +79,6 @@ skin_content_header();	// Sets charset!
 		//next_post(); 			// link to next post in single page mode
 	?>
 
-	<?php
-		$Timer->resume( 'skin/_main.inc:mainarea:postheaders' );
-
-		$MainList->date_if_changed();
-	?>
-
 	<div class="bPost bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
 		<?php
 			locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
@@ -161,10 +101,6 @@ skin_content_header();	// Sets charset!
 			locale_flag( $Item->locale, 'h10px' );
 			echo '<br /> ', T_('Categories'), ': ';
 			$Item->categories();
-
-			$Timer->pause( 'skin/_main.inc:mainarea:postheaders' );
-
-			$Timer->resume( 'skin/_main.inc:mainarea:postcontents' );
 		?>
 		</div>
 
@@ -193,10 +129,6 @@ skin_content_header();	// Sets charset!
 
 		<div class="bSmallPrint">
 			<?php
-			$Timer->pause( 'skin/_main.inc:mainarea:postcontents' );
-
-			$Timer->resume( 'skin/_main.inc:mainarea:postfooters' );
-
 			$Item->permanent_link( '#', '#', 'permalink_right' ); ?>
 
 			<?php $Item->feedback_link( 'comments', '' ) // Link to comments ?>
@@ -221,10 +153,7 @@ skin_content_header();	// Sets charset!
 		?>
 	</div>
 	<?php
-	$Timer->pause( 'skin/_main.inc:mainarea:postfooters' );
 	} // ---------------------------------- END OF POSTS ------------------------------------
-
-	$Timer->start( 'skin/_main.inc:mainarea:extradisp' );
 
 ?>
 
@@ -241,23 +170,14 @@ skin_content_header();	// Sets charset!
 	// -------------- START OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. --------------
 	// Note: you can customize any of the sub templates included here by
 	// copying the matching php file into your skin directory.
-	$current_skin_includes_path = dirname(__FILE__).'/';
 	// Call the dispatcher:
 	require $skins_path.'_dispatch.inc.php';
 	// --------------- END OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. ---------------
-
-	$Timer->pause( 'skin/_main.inc:mainarea:extradisp' );
 
 ?>
 
 </div>
 <!-- =================================== START OF SIDEBAR =================================== -->
-
-<?php
-	$Timer->pause( 'skin/_main.inc:mainarea' );
-
-	$Timer->start( 'skin/_main.inc:sidebar' );
-?>
 
 <div class="bSideBar">
 
@@ -314,48 +234,20 @@ skin_content_header();	// Sets charset!
 
 </div>
 
-<?php
-	$Timer->pause( 'skin/_main.inc:sidebar' );
 
-	$Timer->start( 'skin/_main.inc:footer' );
+<?php
+// ------------------------- BODY FOOTER INCLUDED HERE --------------------------
+require $skins_path.'_body_footer.inc.php';
+// Note: You can customize the default BODY footer by copying the
+// _body_footer.inc.php file into the current skin folder.
+// ------------------------------- END OF FOOTER --------------------------------
 ?>
 
-<div id="pageFooter">
-	<?php
-		// Display container and contents:
-		$Skin->container( NT_("Footer"), array(
-				// The following params will be used as defaults for widgets included in this container:
-			) );
-		// Note: Double quotes have been used around "Footer" only for test purposes.
-	?>
-	<p class="baseline">
 
-		<?php
-			// Display a link to contact the owner of this blog (if owner accepts messages):
-			$Blog->contact_link( array(
-					'before'      => '',
-					'after'       => '. ',
-					'text'   => T_('Contact'),
-					'title'  => T_('Send a message to the owner of this blog...'),
-				) );
-		?>
-
-		Original template design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> / <a href="http://skinfaktory.com/">The Skin Faktory</a>.
-
-		<?php
-			// Display additional credits (see /conf/_advanced.php):
- 			// If you can add your own credits without removing the defaults, you'll be very cool :))
-		 	// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
-			display_list( $credit_links, T_('Credits').': ', ' ', '|', ' ', ' ' );
-		?>
-	</p>
-</div>
-</div>
 <?php
-	$Hit->log();	// log the hit on this page
-	debug_info(); // output debug info if requested
-
-	$Timer->pause( 'skin/_main.inc:footer' );
+// ------------------------- HTML FOOTER INCLUDED HERE --------------------------
+require $skins_path.'_html_footer.inc.php';
+// Note: You can customize the default HTML footer by copying the
+// _html_footer.inc.php file into the current skin folder.
+// ------------------------------- END OF FOOTER --------------------------------
 ?>
-</body>
-</html>

@@ -1,59 +1,47 @@
 /* Designed by Francois PLANQUE - http://fplanque.net/ */
 
-@import url(../../../rsc/css/basic.css);	/* Import basic styles */
-@import url(../../../rsc/css/img.css);	/* Import standard image styles */
-@import url(../../../rsc/css/blog_elements.css);	/* Import standard blog elements styles */
-@import url(../../../rsc/css/forms.css);	/* Import default form styles */
-@import url(../../../rsc/css/comments.css);	/* Import default comment styles */
+@import url(../../rsc/css/basic.css);	/* Import basic styles */
+@import url(../../rsc/css/img.css);	/* Import standard image styles */
+@import url(../../rsc/css/blog_elements.css);	/* Import standard blog elements styles */
+@import url(../../rsc/css/forms.css);	/* Import default form styles */
+@import url(../../rsc/css/comments.css);	/* Import default comment styles */
 
 /*
  * Main page construct:
  */
 body {
-	background: #82cdac url(img/bg.jpg) repeat-x fixed left top;
-	padding: 1ex 2ex;
-	margin: 0;
+	background: #eee url(rsc/img/bg.gif) repeat fixed center;
 	color: #000;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 84%;
-
+	font-family: Georgia, "Times New Roman", Times, serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
-	font-family: "Trebuchet MS", "Lucida Grande", Arial, Helvetica, sans-serif;
-}
-
-div.wrapper /* Main centered zone */
+div.wrapper
 {
-	width: 105ex;
+	margin: 1em;
+}
+div.wrapper2 /* Main white content zone */
+{
+	background: #fff url(rsc/img/flamand.gif) no-repeat right bottom;
+	width: 90ex;
 	margin: 0 auto;
-}
-div.outerwrap /* Main rounded content zone */
-{
-	margin: 1ex 0;
-	padding: 5px 0;
-	/* border: 1px solid #000;  */
-}
-div.innerwrap /* Main white content zone */
-{
 	padding: 0;
-	border: 1px solid #fff; /* needed to force inner paddings */ 
-	background-color:#fff;
+	border: 1px solid #000;
 }
+
 div.pageHeader /* Title zone */
 {
-	margin: 0 1ex;
+	margin: 1ex;
 	padding: 0;
-	background-image: url(img/squares.gif);
+	border-bottom: 1px dotted #000;
+	background-image: url(rsc/img/birds.gif);
 	background-repeat: no-repeat;
-	background-position: right center;
-	/* border: 1px solid #f00; */
+	background-position: right top;
 }
 
 
-.posts /* Left column */
+.bPosts /* Left column */
 {
-	width: 75ex;
+	width: 60ex;
 	float: left;
 	overflow: hidden;
 }
@@ -63,12 +51,14 @@ div.pageHeader /* Title zone */
 	width: 29ex;
 	float: right;
 	overflow: hidden;
+	border-left: 1px dotted #000;
+	padding-bottom: 250px;	/* Breathing space for background image */
 }
 div.clear {
 	clear: both;
 }
 div#pageFooter {
-	margin: 1ex;
+	margin: 1ex 195px 1ex 1ex;
 	padding:0;
 	border-top: 1px dotted #000;
 }
@@ -77,7 +67,6 @@ p.baseline {
 	text-align: center;
 	margin:1ex;
 }
-
 
 /*
  * General styles:
@@ -93,34 +82,35 @@ a:hover {
 }
 
 h2 {
-	color: #06a3c4;
-	font-size: 160%;
+	color: #f09;
+	font-size: 180%;
 	margin: 1ex;
 }
 h3 {
-	color: #06a3c4;
-	font-size: 110%;
+	color: #f09;
+	font-size: 120%;
 }
 h4 {
-	color: #06a3c4;
-	font-size: 105%;
+	color: #f09;
+	font-size: 110%;
 }
 
 /*
  * Blog list on top:
  */
 ul#bloglist {
-	border-bottom: 2px solid #06a3c4;
-	margin: 0 1ex 2px 1ex;
-	padding: 0 0 2px 0;
+	border-bottom: 1px dotted #000;
+	margin: 0 1ex;
+	padding: 0;
 	list-style-type:none;
+	padding: .5ex 0;
 }
 ul#bloglist li {
 	display: inline;
 	padding-right: 1em;
 }
 a.BlogButtonCurr {
-	color: #06a3c4;
+	color: #f09;
 	font-weight:bold;
 }
 
@@ -133,55 +123,50 @@ div.pageHeader h1 {
 	font-weight: bold;
 	margin: 0;
 	padding: 0;
-	color:#06a3c4;
 }
 div.pageHeader h1 a {
-	color:#06a3c4;
+	color: #000;
 }
 div.pageHeader h1 a:hover {
 	color: #c0c;
 }
 div.pageHeader div.widget_core_coll_tagline {
 	letter-spacing: 4px;
-	padding: 0 0 3px 0;
+	margin: 1ex 0;
 	font-size: 109%;
 }
 
 
 /* 
- * Styles for posts
+ * Styles for foms 
  */
 .bPost, .bPostpublished
 {
 	clear: both;
-	margin: 0 1ex 3ex 1ex;
+	margin: 0 2.5ex;
 	padding: 0;
-	/* border: 1px solid #e2f1f4; */
+}
+div.separator {
+	text-align:center;
+	margin: 2em 0;
 }
 .bSmallHead {
 	font-size: 78%;
-	margin: 1ex;
+	margin: 2ex 0 1ex 0;
 }
-div.bTitle {
-	clear: both;
-	margin: 1ex 1ex 0 1ex;
-	padding: 5px 0 4px 0;
-	background-color:#06a3c4;
-}
-h3.bTitle {
-	margin: 0 1ex;
-}
-h3.bTitle a {
-	color: #fff;
+.bTitle {
+	color: #000;
+	margin: 1ex 0;
 }
 .bText {
-	margin: 0 1ex 0;
+	margin-top: 0px;
+	margin-bottom: 0px;
 }
 .bSmallPrint
 {
 	clear: both;
 	font-size: 78%;
-	margin: 1ex;
+	margin: 1ex 0 2ex 0;
 }
 
 input.bComment, 
@@ -206,9 +191,11 @@ select.bComment		/* Used by the profile form */
  * Styles for sidebar (right) 
  */
 .bSideItem {
+	font-size: 84%;
 	margin: 2ex;
 	padding: 0 0 2ex 0;
 }
+
 .bSideItem ul {
 	margin-left: 8px;
 	padding-left: 8px;
@@ -247,7 +234,7 @@ input.SearchField
 	padding: 0;
 }
 .widget_core_coll_title a {
-	color: #06a3c4;
+	color: #f09;
 }
 
 /* Calendar: */
@@ -261,7 +248,7 @@ table.bCalendarTable {
 	border-collapse: separate; 
 }
 table.bCalendarTable a {
-	color: #06a3c4;
+	color: #f09;
 }
 table.bCalendarTable tfoot td {
 	background-color: #eee;
@@ -278,7 +265,7 @@ th.bCalendarHeaderCell {
 	font-weight:normal;
 }
 #bCalendarToday {
-	background-color: #E2F1F4;
+	background-color: #fac;
 }
 
 /*
@@ -288,11 +275,10 @@ form.bComment fieldset div.label,
 form.bComment fieldset div.input,
 form.bComment fieldset div.info
 {
-	padding-top: 0;
-	/* font-size: 84%; */
+	font-size: 84%;
 }
 textarea.bComment,
 input.bComment,
 input.SearchField {
-	background-color: #E2F1F4;
+	background-color: #fff0f8;
 }

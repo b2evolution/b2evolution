@@ -1,5 +1,12 @@
 /* Basic styles */
 
+body {
+	padding: 0;
+	margin: 0;
+	font: 84% Arial, Helvetica, sans-serif;
+}
+
+
 blockquote {
 	border: 2px dotted #ccc;
 	background-color: #eee;
@@ -84,6 +91,37 @@ code {
 a.discrete {
 	text-decoration: none;
 }
+
+/*
+ * Evo Toolbar
+ */
+div#evo_toolbar {
+	background-color: ThreeDFace ;
+	font: menu;
+	color: ButtonText;
+	border-top: 1px solid ThreeDHighlight;
+	border-bottom: 1px solid ThreeDShadow;
+}
+div#evo_toolbar a {
+	border: 1px solid ThreeDFace;
+	color: ButtonText;
+	text-decoration: none;
+	padding: 2px;
+}
+div#evo_toolbar a:hover {
+	border-top-color: ThreeDHighlight;
+	border-left-color: ThreeDHighlight;
+	border-bottom-color: ThreeDShadow;
+	border-right-color: ThreeDShadow;
+}
+div#evo_toolbar .actions_left {
+	padding: 4px;
+}
+div#evo_toolbar .actions_right {
+	padding: 4px;
+	float: right;
+}
+
 
 /*
 {{{ Messages
