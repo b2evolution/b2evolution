@@ -68,6 +68,8 @@ if( $blog )
 		{
 			echo '<li><a href="admin.php?ctrl=collections&amp;action=GenStatic&amp;blog='.$Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">Generate static page!</a></li>';
 		}
+
+		// TODO: dh> display link to "not-approved" (to be moderated) comments, if any. Therefor the comments list must be filterable.
 	echo '</ul>';
 
 
@@ -140,6 +142,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2007/01/28 23:31:57  blueyed
+ * todo
+ *
  * Revision 1.12  2007/01/19 08:20:57  fplanque
  * bugfix
  *
