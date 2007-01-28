@@ -50,8 +50,8 @@ span.field_error {
 input.field_error,
 select.field_error,
 textarea.field_error {
-	background:#fbf2ee;
-	border: 1px solid #d99;
+	background-color:#fbf2ee ! important;
+	border: 1px solid #d99 ! important;
 }
 span.checkbox_error {
 	background: #fbf2ee;
