@@ -1378,6 +1378,31 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called before at the beginning, if a comment form gets sent (and received).
+	 *
+	 * Use this to filter input, e.g. the OpenID uses this to provide alternate authentication.
+	 *
+	 * @since 1.10.0
+	 * @see Plugin::DisplayCommentFormFieldset()
+	 * @param array Associative array of parameters
+	 *   - 'comment_post_ID': ID of the item the comment is for
+	 *   - 'comment': the comment text (by reference)
+	 *   - 'original_comment': the original (unstripped) comment text
+	 *   - 'is_preview': is this a preview request?
+	 *   - 'user_ID': ID of the user, if logged in
+	 *   - 'anon_name': Name of the anonymous commenter (by reference)
+	 *   - 'anon_email': E-Mail of the anonymous commenter (by reference)
+	 *   - 'anon_url': URL of the anonymous commenter (by reference)
+	 *   - 'anon_allow_msgform': "Allow msgform" preference of the anonymous commenter (by reference)
+	 *   - 'anon_cookies': "Remember me" preference of the anonymous commenter (by reference)
+	 *   - 'redirect_to': URL where to redirect to in the end of comment posting (by reference)
+	 */
+	function CommentFormSent( & $params )
+	{
+	}
+
+
+	/**
 	 * Event handler: Called before a comment gets inserted through the public comment
 	 *                form.
 	 *
@@ -1500,7 +1525,6 @@ class Plugin
 	function FilterCommentAuthor( & $params )
 	{
 	}
-
 
 
 	/**
@@ -1876,6 +1900,13 @@ class Plugin
 	 *
 	 * You can cancel the registration process by {@link Plugin::msg() adding a message}
 	 * of type "error".
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'login': Login name (by reference) (since 1.10.0)
+	 *   - 'email': E-Mail value (by reference) (since 1.10.0)
+	 *   - 'locale': Locale value (by reference) (since 1.10.0)
+	 *   - 'pass1': Password (by reference) (since 1.10.0)
+	 *   - 'pass2': Confirmed password (by reference) (since 1.10.0)
 	 */
 	function RegisterFormSent( & $params )
 	{
@@ -2819,6 +2850,11 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.142  2007/01/28 23:58:46  blueyed
+ * - Added hook CommentFormSent
+ * - Re-ordered comment_post.php to: init, validate, process
+ * - RegisterFormSent hook can now filter the form values in a clean way
+ *
  * Revision 1.141  2007/01/27 16:08:53  blueyed
  * Pass "User" param to PluginUserSettingsEditDisplayAfter plugin hook
  *

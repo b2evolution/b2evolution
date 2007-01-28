@@ -35,6 +35,11 @@ header( 'Content-Type: text/html; charset='.$io_charset );
 
 // Getting GET or POST parameters:
 param( 'comment_post_ID', 'integer', true ); // required
+param( 'redirect_to', 'string', '' );
+
+
+$action = param_arrayindex( 'submit_comment_post_'.$comment_post_ID, 'save' );
+
 
 $ItemCache = & get_Cache( 'ItemCache' );
 $commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
@@ -44,24 +49,59 @@ if( ! $commented_Item->can_comment( NULL ) )
 	$Messages->add( T_('You cannot leave comments on this post!'), 'error' );
 }
 
-
-// TODO: dh> a plugin hook would be useful here. There's BeforeCommentFormInsert below, but it's just before displaying messages.
-//           e.g. the OpenID plugin would need to alter the form params here.
-
-
 // Note: we use funky field names to defeat the most basic guestbook spam bots and/or their most basic authors
 $comment = param( 'p', 'html' );
+
 param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 );
 
-if( ! is_logged_in() )
+if( is_logged_in() )
+{
+	$User = & $current_User;
+}
+else
 {	// User is not logged in (registered users), we need some id info from him:
+	$User = NULL;
 	// Note: we use funky field names to defeat the most basic guestbook spam bots and/or their most basic authors
 	$author = param( 'u', 'string' );
 	$email = param( 'i', 'string' );
 	$url = param( 'o', 'string' );
 	param( 'comment_cookies', 'integer', 0 );
 	param( 'comment_allow_msgform', 'integer', 0 ); // checkbox
+}
 
+$now = date( 'Y-m-d H:i:s', $localtimenow );
+
+// CHECK and FORMAT content
+$original_comment = $comment;
+if( ! $use_html_checker )
+{
+	//echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);
+	$comment = strip_tags($comment, $comment_allowed_tags);
+}
+// TODO: AutoBR should really be a "comment renderer" (like with Items)
+$comment = format_to_post($comment, $comment_autobr, 1);
+
+
+// VALIDATION:
+
+// Trigger event: a Plugin could add a $category="error" message here..
+$Plugins->trigger_event( 'CommentFormSent', array(
+		'comment_post_ID' => $comment_post_ID,
+		'comment' => & $comment,
+		'original_comment' => $original_comment,
+		'is_preview' => ($action == 'preview'),
+		'anon_name' => & $author,
+		'anon_email' => & $email,
+		'anon_url' => & $url,
+		'anon_allow_msgform' => & $comment_allow_msgform,
+		'anon_cookies' => & $comment_cookies,
+		'user_ID' => ( isset($User) ? $User->ID : NULL ),
+		'redirect_to' => & $redirect_to,
+	) );
+
+
+if( ! $User )
+{	// User is not logged in (registered users), we need some id info from him:
 	if ($require_name_email)
 	{ // We want Name and EMail with comments
 		if( empty($author) )
@@ -96,18 +136,6 @@ if( ! is_logged_in() )
 	}
 }
 
-$now = date( 'Y-m-d H:i:s', $localtimenow );
-
-// CHECK and FORMAT content
-$original_comment = $comment;
-if( ! $use_html_checker )
-{
-	//echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);
-	$comment = strip_tags($comment, $comment_allowed_tags);
-}
-// TODO: AutoBR should really be a "comment renderer" (like with Items)
-$comment = format_to_post($comment, $comment_autobr, 1);
-
 if( empty($comment) )
 { // comment should not be empty!
 	$Messages->add( T_('Please do not send empty comments.'), 'error' );
@@ -125,9 +153,9 @@ elseif( antispam_check( strip_tags($comment) ) )
 $Comment = & new Comment();
 $Comment->set( 'type', 'comment' );
 $Comment->set_Item( $commented_Item );
-if( is_logged_in() )
+if( $User )
 { // User is logged in, we'll use his ID
-	$Comment->set_author_User( $current_User );
+	$Comment->set_author_User( $User );
 }
 else
 {	// User is not logged in:
@@ -144,10 +172,6 @@ $commented_Item->get_Blog(); // Make sure Blog is loaded
 
 // Assign default status for new comments:
 $Comment->set( 'status', $commented_Item->Blog->get_setting('new_feedback_status') );
-
-
-// Check if we want to PREVIEW:
-$action = param_arrayindex( 'submit_comment_post_'.$commented_Item->ID, 'save' );
 
 if( $action != 'preview' )
 {
@@ -222,13 +246,12 @@ if( $Messages->count('error') )
 }
 
 if( $action == 'preview' )
-{ // set the Comment into user's session and redirect. _feeback.php of the skin should display it.
+{ // set the Comment into user's session and redirect. _feedback.php of the skin should display it.
 	$Comment->set( 'original_content', $original_comment ); // used in the textarea input field again
 	$Session->set( 'core.preview_Comment', $Comment );
 	$Session->set( 'core.no_CachePageContent', 1 );
 	$Session->dbsave();
 
-	param( 'redirect_to', 'string', '' );
 	$redirect_to .= '#comment_preview';
 
 	header_nocache();
@@ -312,7 +335,6 @@ if( $Comment->ID )
 		$Messages->add( T_('Your comment has been submitted.'), 'success' );
 
 		// Append anchor to the redirect_to param, so the user sees his comment:
-		param( 'redirect_to', 'string', '' );
 		$redirect_to .= '#'.$Comment->get_anchor();
 	}
 	else
@@ -328,6 +350,11 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.104  2007/01/28 23:58:46  blueyed
+ * - Added hook CommentFormSent
+ * - Re-ordered comment_post.php to: init, validate, process
+ * - RegisterFormSent hook can now filter the form values in a clean way
+ *
  * Revision 1.103  2007/01/25 00:59:49  blueyed
  * Do not pass "original_comment" in BeforeCommentFormInsert as a reference: makes no sense
  *

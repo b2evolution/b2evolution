@@ -58,20 +58,26 @@ if( ! $Settings->get('newusers_canregister') )
 switch( $action )
 {
 	case 'register':
-		// Call plugin event to allow catching input in general and validating own things from DisplayRegisterFormFieldset event
-		$Plugins->trigger_event( 'RegisterFormSent' );
-
-		if( $Messages->count( 'error' ) )
-		{ // a Plugin has added an error
-			break;
-		}
-
 		/*
 		 * Do the registration:
 		 */
 		param( 'redirect_to', 'string', $admin_url );
 		param( 'pass1', 'string', '' );
 		param( 'pass2', 'string', '' );
+
+		// Call plugin event to allow catching input in general and validating own things from DisplayRegisterFormFieldset event
+		$Plugins->trigger_event( 'RegisterFormSent', array(
+				'login' => & $login,
+				'email' => & $email,
+				'locale' => & $locale,
+				'pass1' => & $pass1,
+				'pass2' => & $pass2,
+			) );
+
+		if( $Messages->count( 'error' ) )
+		{ // a Plugin has added an error
+			break;
+		}
 
 		// Check profile params:
 		profile_check_params( array(
@@ -205,6 +211,11 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.81  2007/01/28 23:58:46  blueyed
+ * - Added hook CommentFormSent
+ * - Re-ordered comment_post.php to: init, validate, process
+ * - RegisterFormSent hook can now filter the form values in a clean way
+ *
  * Revision 1.80  2007/01/27 19:57:12  blueyed
  * Use param_error() in profile_check_params()
  *

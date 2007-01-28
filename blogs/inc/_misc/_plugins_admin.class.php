@@ -158,6 +158,7 @@ class Plugins_admin extends Plugins
 				'DisplayRegisterFormFieldset' => 'Called when displaying the "Register" form.',
 				'DisplayValidateAccountFormFieldset' => 'Called when displaying the "Validate account" form.',
 
+				'CommentFormSent' => 'Called when a public comment form has been sent and gets received.',
 				'BeforeCommentFormInsert' => 'Called before a comment gets recorded through the public comment form.',
 				'AfterCommentFormInsert' => 'Called after a comment has been added through public form.',
 
@@ -1391,6 +1392,11 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.30  2007/01/28 23:58:46  blueyed
+ * - Added hook CommentFormSent
+ * - Re-ordered comment_post.php to: init, validate, process
+ * - RegisterFormSent hook can now filter the form values in a clean way
+ *
  * Revision 1.29  2007/01/20 23:43:12  blueyed
  * bugfix for new discover(): exclude subdirs that start with "_" now again
  *
