@@ -220,9 +220,9 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
 /**
  * Template tag: Output a link to logout
  */
-function user_logout_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+function user_logout_link( $before = '', $after = '', $link_text = '', $link_title = '#', $params = array() )
 {
-	echo get_user_logout_link( $before, $after, $link_text, $link_title );
+	echo get_user_logout_link( $before, $after, $link_text, $link_title, $params );
 }
 
 
@@ -231,7 +231,7 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
  *
  * @return string
  */
-function get_user_logout_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+function get_user_logout_link( $before = '', $after = '', $link_text = '', $link_title = '#', $params = array() )
 {
 	global $htsrv_url_sensitive, $current_User, $blog;
 
@@ -243,8 +243,11 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
 	if( $link_text == '' ) $link_text = T_('Logout');
 	if( $link_title == '#' ) $link_title = T_('Logout from your account');
 
+
 	$r = $before;
-	$r .= '<a href="'.$htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host(regenerate_url('','','','&'), $htsrv_url_sensitive) ).'" title="'.$link_title.'">';
+	$r .= '<a href="'.$htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host(regenerate_url('','','','&'), $htsrv_url_sensitive) ).'"';
+	$r .= get_field_attribs_as_string( $params, false );
+	$r .= ' title="'.$link_title.'">';
 	$r .= sprintf( $link_text, $current_User->login );
 	$r .= '</a>';
 	$r .= $after;
@@ -263,9 +266,9 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
  * @param string Text for the link.
  * @param string Title for the link.
  */
-function user_admin_link( $before = '', $after = '', $page = '', $link_text = '', $link_title = '#', $not_visible = '' )
+function user_admin_link( $before = '', $after = '', $link_text = '', $link_title = '#', $not_visible = '' )
 {
-	echo get_user_admin_link( $before, $after, $page, $link_text, $link_title, $not_visible );
+	echo get_user_admin_link( $before, $after, $link_text, $link_title, $not_visible );
 }
 
 
@@ -281,7 +284,7 @@ function user_admin_link( $before = '', $after = '', $page = '', $link_text = ''
  * @param string Title for the link.
  * @return string
  */
-function get_user_admin_link( $before = '', $after = '', $page = '', $link_text = '', $link_title = '#', $not_visible = '' )
+function get_user_admin_link( $before = '', $after = '', $link_text = '', $link_title = '#', $not_visible = '' )
 {
 	global $admin_url, $blog, $current_User;
 
@@ -293,10 +296,11 @@ function get_user_admin_link( $before = '', $after = '', $page = '', $link_text 
 	if( $link_text == '' ) $link_text = T_('Admin');
 	if( $link_title == '#' ) $link_title = T_('Go to the back-office...');
 	// add the blog param to $page if it is not already in there
-	if( !preg_match('/(&|&amp;|\?)blog=/', $page) ) $page = url_add_param( $page, 'blog='.$blog );
+
+	$url = url_add_param( $admin_url, 'blog='.$blog );
 
 	$r = $before;
-	$r .= '<a href="'.$admin_url.$page.'" title="'.$link_title.'">';
+	$r .= '<a href="'.$url.'" title="'.$link_title.'">';
 	$r .= $link_text;
 	$r .= '</a>';
 	$r .= $after;
@@ -504,6 +508,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.25  2007/01/29 09:58:55  fplanque
+ * enhanced toolbar - experimental
+ *
  * Revision 1.24  2007/01/28 17:53:09  fplanque
  * changes for 2.0 skin structure
  *
@@ -532,58 +539,5 @@ function profile_check_params( $params, $User = NULL )
  *
  * Revision 1.16  2006/10/15 21:36:08  blueyed
  * Use url_rel_to_same_host() for redirect_to params.
- *
- * Revision 1.14  2006/08/21 16:07:44  fplanque
- * refactoring
- *
- * Revision 1.13  2006/08/19 07:56:31  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.12  2006/07/26 20:48:33  blueyed
- * Added Plugin event "Logout"
- *
- * Revision 1.11  2006/07/26 20:19:15  blueyed
- * Set $current_User = NULL on logout (not false!)
- *
- * Revision 1.10  2006/06/25 23:34:15  blueyed
- * wording pt2
- *
- * Revision 1.9  2006/06/25 23:23:38  blueyed
- * wording
- *
- * Revision 1.8  2006/06/22 22:30:04  blueyed
- * htsrv url for password related scripts (login, register and profile update)
- *
- * Revision 1.7  2006/04/20 22:13:48  blueyed
- * Display "Register..." link in login form also if user is logged in already.
- *
- * Revision 1.6  2006/04/19 20:13:50  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.5  2006/03/26 03:34:12  blueyed
- * Fixed E_NOTICE
- *
- * Revision 1.4  2006/03/26 03:25:21  blueyed
- * Added more getters
- *
- * Revision 1.3  2006/03/12 23:09:00  fplanque
- * doc cleanup
- *
- * Revision 1.2  2006/02/24 20:26:37  blueyed
- * _group.funcs.php is empty
- *
- * Revision 1.1  2006/02/23 21:11:58  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.40  2006/01/30 16:09:34  blueyed
- * doc
- *
- * Revision 1.38  2006/01/26 20:58:16  blueyed
- * Added get_user_profile_link()
- *
- * Revision 1.37  2006/01/15 19:05:36  blueyed
- * user_admin_link(): empty default for $page, so that /admin/index.php gets respected.
  */
 ?>

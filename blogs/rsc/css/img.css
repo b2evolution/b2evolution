@@ -11,9 +11,12 @@ img.top {
 }
 
 input.middle, /* for image types */
-img.middle,
-img.icon {
+img.middle {
 	vertical-align:middle;
+}
+
+img.icon {
+	vertical-align:bottom;
 }
 
 img.leftmargin {

@@ -1984,7 +1984,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			}
 			else
 			{
-				return 'icon';
+				return '';
 			}
 			/* BREAK */
 
@@ -2038,7 +2038,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				}
 				else
 				{
-					$params['class'] = 'icon';
+					$params['class'] = '';
 				}
 			}
 
@@ -2807,6 +2807,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.167  2007/01/29 09:58:55  fplanque
+ * enhanced toolbar - experimental
+ *
  * Revision 1.166  2007/01/29 09:24:41  fplanque
  * icon stuff
  *

@@ -36,6 +36,7 @@ skin_content_header();	// Sets charset!
 		$Blog->disp( 'user_css', 'raw');
 	?>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/functions.js"></script>
+	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/rollovers.js"></script>
 </head>
 
 <body>

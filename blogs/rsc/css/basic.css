@@ -96,7 +96,7 @@ a.discrete {
  * Evo Toolbar
  */
 div#evo_toolbar {
-	background-color: ThreeDFace ;
+	background-color: ThreeDFace;
 	font: menu;
 	color: ButtonText;
 	border-top: 1px solid ThreeDHighlight;
@@ -106,7 +106,7 @@ div#evo_toolbar a {
 	border: 1px solid ThreeDFace;
 	color: ButtonText;
 	text-decoration: none;
-	padding: 2px;
+	padding: 2px 1ex;
 }
 div#evo_toolbar a:hover {
 	border-top-color: ThreeDHighlight;
@@ -122,7 +122,49 @@ div#evo_toolbar .actions_right {
 	float: right;
 }
 
+div#evo_toolbar ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+div#evo_toolbar li {
+  display: inline;
+}
+div#evo_toolbar li ul {
+  position: absolute;
+	background-color: ThreeDFace;
+	border: 1px solid;
+	border-top-color: ThreeDHighlight;
+	border-left-color: ThreeDHighlight;
+	border-bottom-color: ThreeDShadow;
+	border-right-color: ThreeDShadow;
+	padding: 0 8px 0 0;
+}
+div#evo_toolbar li.menu_open ul {
+	display: block;
+}
+div#evo_toolbar li.menu_close ul {
+	display: none;
+}
+div#evo_toolbar li.menu_open:hover ul,
+div#evo_toolbar li.menu_close:hover ul {
+	display: block;
+}
+div#evo_toolbar li ul li {
+	display: block;
+}
+div#evo_toolbar li ul li a {
+	display: block;
+	padding: 4px;
+	border: none;
+	width: 100%;
+}
+div#evo_toolbar li ul li a:hover {
+	background-color: Highlight;
+	color: HighlightText;
+}
 
+	
 /*
 {{{ Messages
 */
