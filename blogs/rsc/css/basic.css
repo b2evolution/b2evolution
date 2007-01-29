@@ -138,7 +138,7 @@ div#evo_toolbar li ul {
 	border-left-color: ThreeDHighlight;
 	border-bottom-color: ThreeDShadow;
 	border-right-color: ThreeDShadow;
-	padding: 0 8px 0 0;
+	padding: 0 4ex 0 0;
 }
 div#evo_toolbar li.menu_open ul {
 	display: block;
@@ -155,7 +155,7 @@ div#evo_toolbar li ul li {
 }
 div#evo_toolbar li ul li a {
 	display: block;
-	padding: 4px;
+	padding: 4px 2ex;
 	border: none;
 	width: 100%;
 }
