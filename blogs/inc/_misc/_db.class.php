@@ -1224,7 +1224,10 @@ class DB
 				}
 				$this->rollback_nested_transaction = false;
 			}
-			$this->transaction_nesting_level--;
+			if( $this->transaction_nesting_level )
+			{
+				$this->transaction_nesting_level--;
+			}
 		}
 	}
 
@@ -1245,7 +1248,10 @@ class DB
 			{ // Remember we'll have to roll back at the end!
 				$this->rollback_nested_transaction = true;
 			}
-			$this->transaction_nesting_level--;
+			if( $this->transaction_nesting_level )
+			{
+				$this->transaction_nesting_level--;
+			}
 		}
 	}
 
@@ -1344,6 +1350,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.55  2007/01/29 01:21:22  blueyed
+ * Do not let $transaction_nesting_level become negative!
+ *
  * Revision 1.54  2007/01/25 05:14:13  fplanque
  * rollback
  *
