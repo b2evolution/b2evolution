@@ -1151,8 +1151,14 @@ class Plugins
 
 		if( $debug )
 		{
+			/*
 			// Hide passwords from Debuglog!
-			$debug_params = $params;
+			// Clone/copy (references!):
+			$debug_params = array();
+			foreach( $params as $k => $v )
+			{
+				$debug_params[$k] = $v;
+			}
 			if( isset($debug_params['pass']) )
 			{
 				$debug_params['pass'] = '-hidden-';
@@ -1161,7 +1167,8 @@ class Plugins
 			{
 				$debug_params['pass_md5'] = '-hidden-';
 			}
-			// $Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( '.htmlspecialchars(var_export( $debug_params, true )).' )', 'plugins' );
+			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( '.htmlspecialchars(var_export( $debug_params, true )).' )', 'plugins' );
+			*/
 			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( )', 'plugins' );
 		}
 
@@ -1790,6 +1797,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.138  2007/01/29 21:33:52  blueyed
+ * Fixed login with JS-hashing disabled and debugging turned on (PHP5)
+ *
  * Revision 1.137  2007/01/25 23:48:18  blueyed
  * Fixed notice if Plugin got unregistered, e.g. because of DB schema change during loading; always pass array() if calling a Plugin method as $params
  *
