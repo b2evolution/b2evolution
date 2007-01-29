@@ -115,6 +115,8 @@ class ItemQuery extends SQL
 	 */
 	function where_chapter( $blog, $cat = '', $catsel = array() )
 	{
+		global $cat_array; // this is required for the cat_req() callback in compile_cat_array()
+
 		$blog = intval($blog);	// Extra security
 
 		// Save for future use (permission checks..)
@@ -587,6 +589,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.12  2007/01/29 20:04:23  blueyed
+ * MFB: Fixed inclusion of sub-categories in item list
+ *
  * Revision 1.11  2006/12/17 23:42:38  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.
