@@ -35,6 +35,12 @@ function get_icon_info($name)
 			'size' => array( 1, 1 ),
 		);
 
+		case 'dropdown': return array(
+			'file' => $rsc_subdir.'icons/dropdown.gif',
+			'alt'  => T_('Folder'),
+			'size' => array( 11, 9 ),
+		);
+
 		case 'folder': return array( // icon for folders
 			'file' => $rsc_subdir.'icons/fileicons/folder.gif',
 			'alt'  => T_('Folder'),
@@ -490,6 +496,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.55  2007/01/29 09:24:41  fplanque
+ * icon stuff
+ *
  * Revision 1.54  2007/01/23 22:30:14  fplanque
  * empty icons cleanup
  *

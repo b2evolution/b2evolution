@@ -1984,7 +1984,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			}
 			else
 			{
-				return 'middle';
+				return 'icon';
 			}
 			/* BREAK */
 
@@ -2029,7 +2029,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			// Include non CSS fallbacks:
 			$r .= 'border="0" align="top" ';
 
-			// Include class (will default to "middle"):
+			// Include class (will default to "icon"):
 			if( ! isset( $params['class'] ) )
 			{
 				if( isset($icon['class']) )
@@ -2038,7 +2038,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				}
 				else
 				{
-					$params['class'] = 'middle';
+					$params['class'] = 'icon';
 				}
 			}
 
@@ -2807,6 +2807,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.166  2007/01/29 09:24:41  fplanque
+ * icon stuff
+ *
  * Revision 1.165  2007/01/26 20:43:03  blueyed
  * Fixed exp. app error logging
  *

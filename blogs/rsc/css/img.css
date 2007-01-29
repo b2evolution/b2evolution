@@ -11,7 +11,8 @@ img.top {
 }
 
 input.middle, /* for image types */
-img.middle {
+img.middle,
+img.icon {
 	vertical-align:middle;
 }
 
