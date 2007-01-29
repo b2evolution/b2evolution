@@ -24,16 +24,11 @@ function setupRollovers()
 	for(var i = 0; i < all_links.length; i++)
 	{
 		var link = all_links[i];
-
 		if(link.className && (' ' + link.className + ' ').indexOf(' rollover ') != -1)
 		{ // The link has the rollover class (among potentially other classes):
-			if( link.childNodes &&
-					link.childNodes[0].nodeName.toLowerCase() == 'img')
-			{ // There is an image within the link,
-				// Set up event handlers:
-				link.onmouseover = mouseover;
-				link.onmouseout = mouseout;
-			}
+			// Set up event handlers:
+			link.onmouseover = mouseover;
+			link.onmouseout = mouseout;
 		}
 	}
 }
@@ -69,15 +64,18 @@ function findTarget(e)
  */
 function mouseover(e)
 {
- var target = findTarget(e);
- if (!target) return;
+	var target = findTarget(e);
+	if (!target) return;
 
- // the only child node of the a-tag in target will be an img-tag
- var img_tag = target.childNodes[0];
+	var img_tag = target.childNodes[0];
+	if( img_tag.nodeName.toLowerCase() != 'img')
+	{
+		img_tag = target.childNodes[1];
+	}
 
- // Take the "src", which names an image called "something.ext",
- // Make it point to "something_over.ext"
- img_tag.src = img_tag.src.replace(/(\.[^.]+)$/, '_over$1');
+	// Take the "src", which names an image called "something.ext",
+	// Make it point to "something_over.ext"
+	img_tag.src = img_tag.src.replace(/(\.[^.]+)$/, '_over$1');
 }
 
 
@@ -89,8 +87,11 @@ function mouseout(e)
  var target = findTarget(e);
  if (!target) return;
 
- // the only child node of the a-tag in target will be an img-tag
- var img_tag = target.childNodes[0];
+	var img_tag = target.childNodes[0];
+	if( img_tag.nodeName.toLowerCase() != 'img')
+	{
+		img_tag = target.childNodes[1];
+	}
 
  // Take the "src", which names an image as "something_over.ext",
  // Make it point to "something.ext"
