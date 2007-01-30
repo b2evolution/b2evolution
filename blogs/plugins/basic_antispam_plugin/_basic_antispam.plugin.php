@@ -606,6 +606,7 @@ class basic_antispam_plugin extends Plugin
 	{
 		$this->Settings->delete('check_url_trackbacks');
 		$this->Settings->dbupdate();
+		return true;
 	}
 
 }
@@ -613,6 +614,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.27  2007/01/30 19:55:04  blueyed
+ * Return explictly true in PluginVersionChanged
+ *
  * Revision 1.26  2006/12/26 03:19:12  fplanque
  * assigned a few significant plugin groups
  *
