@@ -468,7 +468,7 @@ class Plugins
 				// Tell the Plugin that we've detected a version change:
 				$tmp_params = array( 'old_version'=>$this->index_ID_rows[$Plugin->ID]['plug_version'], 'db_row'=>$this->index_ID_rows[$Plugin->ID] );
 
-				if( ! $this->call_method( $Plugin->ID, 'PluginVersionChanged', $tmp_params ) )
+				if( $this->call_method( $Plugin->ID, 'PluginVersionChanged', $tmp_params ) === false )
 				{
 					$Debuglog->add( 'Set plugin status to "needs_config", because PluginVersionChanged returned false.', 'plugins' );
 					$this->set_Plugin_status( $Plugin, 'needs_config' );
@@ -1797,6 +1797,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.139  2007/01/30 19:52:48  blueyed
+ * Only deactivate a Plugin if PluginVersionChanged returns === false; fixes the basic_antispam_plugin, which returned NULL
+ *
  * Revision 1.138  2007/01/29 21:33:52  blueyed
  * Fixed login with JS-hashing disabled and debugging turned on (PHP5)
  *
