@@ -85,6 +85,7 @@ $comment = format_to_post($comment, $comment_autobr, 1);
 // VALIDATION:
 
 // Trigger event: a Plugin could add a $category="error" message here..
+// openID plugin will check login here
 $Plugins->trigger_event( 'CommentFormSent', array(
 		'comment_post_ID' => $comment_post_ID,
 		'comment' => & $comment,
@@ -101,7 +102,7 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 
 
 if( ! $User )
-{	// User is not logged in (registered users), we need some id info from him:
+{	// User is still not logged in, we need some id info from him:
 	if ($require_name_email)
 	{ // We want Name and EMail with comments
 		if( empty($author) )
@@ -350,6 +351,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.105  2007/02/03 18:52:15  fplanque
+ * doc
+ *
  * Revision 1.104  2007/01/28 23:58:46  blueyed
  * - Added hook CommentFormSent
  * - Re-ordered comment_post.php to: init, validate, process
@@ -396,104 +400,5 @@ header_redirect(); // Will save $Messages into Session
  *
  * Revision 1.89  2006/10/30 13:48:56  blueyed
  * Fixed charset/HTML for comment-post page (errors)
- *
- * Revision 1.88  2006/09/11 19:35:34  fplanque
- * minor
- *
- * Revision 1.87  2006/09/10 00:00:57  blueyed
- * "Solved" Session related todos.
- *
- * Revision 1.86  2006/09/06 20:45:31  fplanque
- * ItemList2 fixes
- *
- * Revision 1.85  2006/08/20 22:25:20  fplanque
- * param_() refactoring part 2
- *
- * Revision 1.84  2006/08/19 07:56:29  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.83  2006/06/16 20:34:19  fplanque
- * basic spambot defeating
- *
- * Revision 1.82  2006/06/14 17:26:13  fplanque
- * minor
- *
- * Revision 1.81  2006/05/29 22:27:46  blueyed
- * Use NULL instead of false for "no display".
- *
- * Revision 1.80  2006/05/29 21:13:18  fplanque
- * no message
- *
- * Revision 1.79  2006/05/24 20:43:19  blueyed
- * Pass "Item" as param to Render* event methods.
- *
- * Revision 1.78  2006/05/20 01:56:07  blueyed
- * ItemCanComment hook; "disable anonymous feedback" through basic antispam plugin
- *
- * Revision 1.76.2.1  2006/05/19 15:06:23  fplanque
- * dirty sync
- *
- * Revision 1.76  2006/05/12 21:53:37  blueyed
- * Fixes, cleanup, translation for plugins
- *
- * Revision 1.75  2006/05/04 10:32:41  blueyed
- * Use original comment content in preview's form.
- *
- * Revision 1.74  2006/05/04 04:07:24  blueyed
- * After posting a comment, add the anchor to the redirect param; also use more distinctive anchor name for comments
- *
- * Revision 1.73  2006/05/02 22:25:27  blueyed
- * Comment preview for frontoffice.
- *
- * Revision 1.72  2006/05/02 04:36:24  blueyed
- * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
- *
- * Revision 1.71  2006/05/01 04:25:04  blueyed
- * Normalization
- *
- * Revision 1.70  2006/04/24 15:43:35  fplanque
- * no message
- *
- * Revision 1.69  2006/04/21 23:14:16  blueyed
- * Add Messages according to Comment's status.
- *
- * Revision 1.68  2006/04/21 18:10:53  blueyed
- * todos
- *
- * Revision 1.67  2006/04/20 22:24:07  blueyed
- * plugin hooks cleanup
- *
- * Revision 1.66  2006/04/20 16:31:29  fplanque
- * comment moderation (finished for 1.8)
- *
- * Revision 1.65  2006/04/19 23:50:39  blueyed
- * Normalized Messages handling (error displaying and transport in Session)
- *
- * Revision 1.64  2006/04/19 22:26:24  blueyed
- * cleanup/polish
- *
- * Revision 1.63  2006/04/19 20:13:48  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.62  2006/03/22 01:07:05  blueyed
- * bad brackets
- *
- * Revision 1.61  2006/03/20 22:28:34  blueyed
- * Changed defaults for Log's display methods to "all" categories.
- *
- * Revision 1.60  2006/03/19 17:54:25  blueyed
- * Opt-out for email through message form.
- *
- * Revision 1.58  2006/03/07 19:30:22  fplanque
- * comments
- *
- * Revision 1.57  2006/03/06 20:40:13  blueyed
- * debug_info() added in case of errors.
- *
- * Revision 1.52  2006/02/23 21:11:47  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
  */
 ?>
