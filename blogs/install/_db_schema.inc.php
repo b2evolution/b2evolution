@@ -204,7 +204,7 @@ $schema_queries = array(
 			post_pst_ID                 int(11) unsigned NULL,
 			post_ptyp_ID                int(11) unsigned NULL,
 			post_locale                 VARCHAR(20) NOT NULL DEFAULT 'en-EU',
-			post_content                text NULL,
+			post_content                MEDIUMTEXT NULL,
 			post_title                  text NOT NULL,
 			post_urltitle               VARCHAR(50) NULL DEFAULT NULL,
 			post_url                    VARCHAR(255) NULL DEFAULT NULL,
@@ -314,7 +314,7 @@ $schema_queries = array(
 			itpr_itm_ID                   INT(11) UNSIGNED NOT NULL,
 			itpr_format                   ENUM(\'htmlbody\', \'entityencoded\', \'xml\', \'text\') NOT NULL,
 			itpr_renderers                TEXT NOT NULL,
-			itpr_content_prerendered      TEXT NULL,
+			itpr_content_prerendered      MEDIUMTEXT NULL,
 			itpr_datemodified             TIMESTAMP NOT NULL,
 			PRIMARY KEY (itpr_itm_ID, itpr_format)
 		)' ),
@@ -525,6 +525,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.51  2007/02/03 19:05:36  fplanque
+ * allow longer posts
+ *
  * Revision 1.50  2007/01/23 04:19:50  fplanque
  * handling of blog owners
  *
