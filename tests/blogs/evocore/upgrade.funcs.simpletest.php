@@ -18,9 +18,6 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 	function UpgradeFuncsTestCase()
 	{
 		$this->DbUnitTestCase( 'Upgrade funcs tests' );
-
-		/* exclude defaults: */
-		$this->exclude_defaults = array('drop_column', 'drop_index', 'change_column_shrink');
 	}
 
 
@@ -649,12 +646,12 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 			)" );
 		$r = $this->db_delta_wrapper("
 			CREATE TABLE test_1 (
-				i BIGINT KEY
+				i SMALLINT KEY
 			)" );
 
 		$this->assertEqual( count($r), 1 );
 		$this->assertEqual( count($r['test_1']), 1 );
-		$this->assertEqual( 'ALTER TABLE test_1 DROP PRIMARY KEY, CHANGE COLUMN i i BIGINT KEY', $r['test_1'][0]['queries'][0] );
+		$this->assertEqual( 'ALTER TABLE test_1 DROP PRIMARY KEY, CHANGE COLUMN i i SMALLINT KEY', $r['test_1'][0]['queries'][0] );
 	}
 
 
@@ -662,21 +659,21 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 	{
 		$this->test_DB->query( "
 			CREATE TABLE test_1 (
-				i INT NOT NULL DEFAULT '0',
+				i INT( 10 ) NOT NULL DEFAULT '0',
 				v VARCHAR( 30 ) NOT NULL DEFAULT '',
 				PRIMARY KEY ( i, v )
 			)" );
 
 		$r = $this->db_delta_wrapper( "
 			CREATE TABLE test_1 (
-				i BIGINT UNSIGNED NOT NULL,
+				i INT(11) UNSIGNED NOT NULL,
 				v VARCHAR( 30 ) NOT NULL,
 				PRIMARY KEY ( i, v )
 			)" );
 
 		$this->assertEqual( count($r), 1 );
 		$this->assertEqual( count($r['test_1']), 1 );
-		$this->assertEqual( 'ALTER TABLE test_1 CHANGE COLUMN i i BIGINT UNSIGNED NOT NULL', $r['test_1'][0]['queries'][0] );
+		$this->assertEqual( 'ALTER TABLE test_1 CHANGE COLUMN i i INT(11) UNSIGNED NOT NULL', $r['test_1'][0]['queries'][0] );
 	}
 
 
@@ -809,7 +806,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 		$r = $this->db_delta_wrapper( "
 			CREATE TABLE test_1 (
 				i2 INTEGER PRIMARY KEY
-			)", $this->exclude_defaults );
+			)", /* exclude defaults: */ array('drop_column', 'drop_index') );
 
 		$this->assertEqual( count($r), 1 );
 		$this->assertEqual( count($r['test_1']), 1 );
@@ -832,7 +829,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 		$r = $this->db_delta_wrapper( "
 			CREATE TABLE test_1 (
 				i3 INTEGER PRIMARY KEY
-			)", $this->exclude_defaults );
+			)", /* exclude defaults: */ array('drop_column', 'drop_index') );
 
 		$this->assertEqual( count($r), 1 );
 		$this->assertEqual( count($r['test_1']), 1 );
@@ -855,7 +852,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 			CREATE TABLE test_1 (
 				i2 INTEGER PRIMARY KEY,
 				dummy INT
-			)", $this->exclude_defaults );
+			)", /* exclude defaults: */ array('drop_column', 'drop_index') );
 
 		$this->assertEqual( count($r), 1 );
 		$this->assertEqual( count($r['test_1']), 1 );
@@ -889,7 +886,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 		$r = $this->db_delta_wrapper( "
 			CREATE TABLE test_1 (
 				v VARCHAR(33) PRIMARY KEY
-			)", $this->exclude_defaults );
+			)", /* exclude defaults: */ array('drop_column', 'drop_index') );
 
 		$this->assertEqual( count($r), 1 );
 		$this->assertEqual( count($r['test_1']), 1 );
@@ -909,7 +906,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 			CREATE TABLE test_1 (
 				t1 TINYINT,
 				t2 TINYINT(2)
-			)", $this->exclude_defaults );
+			)", /* exclude defaults: */ array('drop_column', 'drop_index') );
 
 		$this->assertEqual( count($r), 0 );
 	}
@@ -996,7 +993,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 			CREATE TABLE test_1 (
 				bar TINYINT
 			)";
-		$r = $this->db_delta_wrapper( $create_table, $this->exclude_defaults );
+		$r = $this->db_delta_wrapper( $create_table, /* exclude defaults: */ array('drop_column', 'drop_index') );
 
 		$this->assertEqual( count($r), 1 );
 		$this->assertEqual( $r['test_1'][0]['queries'][0], 'ALTER TABLE test_1 ADD COLUMN bar TINYINT FIRST' );
@@ -1050,7 +1047,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 
 	/**
-	 * Test if splitting of fields "just by comma" (instead of newlines) works.
+	 * Test if splitting of fields "just by comma" works.
 	 */
 	function test_splitting_fields_by_comma()
 	{
@@ -1059,57 +1056,6 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 		$this->test_DB->query( $sql );
 
 		$r = $this->db_delta_wrapper( $sql );
-
-		$this->assertEqual( count($r), 0 );
-	}
-
-
-	/**
-	 * Test if manually upgraded fields do not get altered,
-	 * e.g. 'TEXT' => 'MEDIUMTEXT',
-	 *      'INT' => 'BIGINT',
-	 *      'BLOB' => 'MEDIUMBLOB'
-	 */
-	function test_do_not_alter_boosted_storage_size()
-	{
-		$this->test_DB->query( "
-			CREATE TABLE test_1 (
-				i BIGINT,
-				v VARCHAR(255),
-				t MEDIUMTEXT,
-				b BLOB
-			)" );
-
-		$r = $this->db_delta_wrapper( "
-			CREATE TABLE test_1 (
-				i INT,
-				v VARCHAR(255),
-				t TEXT,
-				b TINYBLOB
-			)" );
-
-		$this->assertEqual( count($r), 0 );
-	}
-
-
-	/**
-	 * Test case insensitivness in field names and column definitions.
-	 */
-	function test_case_sensitivity()
-	{
-		$this->test_DB->query( "
-			CREATE TABLE test_1 (
-				i INT,
-				v VARCHAR(255),
-				t MEDIumTEXT
-			)" );
-
-		$r = $this->db_delta_wrapper( "
-			CREATE TABLE test_1 (
-				I iNt,
-				V VaRCHaR(255),
-				T MEDiuMTEXT
-			)" );
 
 		$this->assertEqual( count($r), 0 );
 	}
