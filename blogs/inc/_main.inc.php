@@ -435,7 +435,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		$User = & $UserCache->get_by_login($login);
 
 		if( $User && ! $pass_ok )
-		{ // check the password, if no plugin has set "it's ok":
+		{ // check the password, if no plugin has said "it's ok":
 			if( ! empty($pwd_hashed) )
 			{ // password hashed by JavaScript:
 
@@ -641,6 +641,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.75  2007/02/03 18:46:30  fplanque
+ * doc
+ *
  * Revision 1.74  2007/01/26 21:52:42  blueyed
  * Improved LoginAttempt hook: all params get passed by reference and "pass_ok" has been added
  *
