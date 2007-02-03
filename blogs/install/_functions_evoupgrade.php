@@ -224,7 +224,7 @@ function upgrade_b2evo_tables()
 		$db_schema_needs_update = false;
 		foreach( $schema_queries as $table => $query_info )
 		{
-			if( db_delta( $query_info[1], array('drop_column', 'drop_index') ) )
+			if( db_delta( $query_info[1], array('drop_column', 'drop_index', 'change_column_shrink') ) )
 			{
 				$db_schema_needs_update = true;
 				break;
@@ -1699,7 +1699,7 @@ function upgrade_b2evo_tables()
 
 	foreach( $schema_queries as $table => $query_info )
 	{
-		foreach( db_delta( $query_info[1], array('drop_column', 'drop_index') ) as $table => $queries )
+		foreach( db_delta( $query_info[1], array('drop_column', 'drop_index', 'change_column_shrink') ) as $table => $queries )
 		{
 			foreach( $queries as $qinfo )
 			{
@@ -1774,6 +1774,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.206  2007/02/03 02:56:04  blueyed
+ * Added "change_column_shrink" exclude_type and exlude it by default; this is meant to not downgrade e.g. MEDIUMTEXT to TEXT
+ *
  * Revision 1.205  2007/01/23 04:19:50  fplanque
  * handling of blog owners
  *

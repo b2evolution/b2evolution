@@ -53,6 +53,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *  - 'update'
  *  - 'drop_column'
  *  - 'change_column'
+ *  - 'change_column_shrink'
  *  - 'change_default'
  *  - 'add_column'
  *  - 'add_index'
@@ -550,26 +551,24 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				unset($type_matches); // have we detected the type as matching (for optional length param)
 				$fieldtype = '';
 
-
 				$pattern_field = '`?'.$tablefield->Field.'`?'; // optionally in backticks
 
 				// Get the field type from the query
 				if( preg_match( '~^'.$pattern_field.'\s+ (TINYINT|SMALLINT|MEDIUMINT|INTEGER|INT|BIGINT|REAL|DOUBLE|FLOAT|DECIMAL|DEC|NUMERIC) ( \s* \([\d\s,]+\) )? (\s+ UNSIGNED)? (\s+ ZEROFILL)? (.*)$~ix', $column_definition, $match ) )
 				{
-					$fieldtype = $match[1];
+					$fieldtype = strtoupper($match[1]);
 
-					if( strtoupper($fieldtype) == 'INTEGER' )
+					if( $fieldtype == 'INTEGER' )
 					{ // synonym
 						$fieldtype = 'INT';
 					}
-					elseif( strtoupper($fieldtype) == 'DECIMAL' )
+					elseif( $fieldtype == 'DECIMAL' )
 					{ // synonym
 						$fieldtype = 'DEC';
 					}
 
-
 					if( isset($match[2]) )
-					{
+					{ // append optional "length" param (trimmed)
 						$fieldtype .= preg_replace( '~\s+~', '', $match[2] );
 					}
 					if( ! empty($match[3]) )
@@ -583,21 +582,67 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 					$field_to_parse = $match[5];
 
-					// The length param is optional:
-					$matches_pattern = '~^'.preg_replace( '~\((\d+)\)~', '(\(\d+\))?', $tablefield->Type ).'$~i';
-					$type_matches = preg_match( $matches_pattern, $fieldtype );
+					// Compare. Note: the length param (in brackets) is optional
+					$a = substr($fieldtype, 0, strpos($fieldtype, 'INT')+3);
+					$b = strtoupper($tablefield->Type);
+					$b = substr(strtoupper($b), 0, strpos($b, 'INT')+3);
+					if( ! in_array('change_column_shrink', $exclude_types) )
+					{
+						$cmp_values = array('TINYINT'=>1, 'SMALLINT'=>2, 'MEDIUMINT'=>3, 'INT'=>4, 'BIGINT'=>5);
+						if( isset($cmp_values[$a], $cmp_values[$b]) )
+						{
+							$type_matches = ( $cmp_values[$a] <= $cmp_values[$b] );
+						}
+						else
+						{
+							$type_matches = ( $a == $b );
+						}
+					}
+					else
+					{
+						$type_matches = ( $a == $b );
+					}
 				}
 				elseif( preg_match( '~^'.$pattern_field.'\s+(DATETIME|DATE|TIMESTAMP|TIME|YEAR|TINYBLOB|BLOB|MEDIUMBLOB|LONGBLOB|TINYTEXT|TEXT|MEDIUMTEXT|LONGTEXT) ( \s+ BINARY )? (.*)$~ix', $column_definition, $match ) )
 				{
-					$fieldtype = $match[1];
+					$fieldtype = strtoupper($match[1]);
 					if( isset($match[2]) )
 					{ // "binary"
 						$fieldtype .= trim($match[2]);
 					}
 					$field_to_parse = $match[3];
 
+					// Compare. Note: the length param (in brackets) is optional
+					$a = $fieldtype;
+					$b = strtoupper($tablefield->Type);
+					if( ! in_array('change_column_shrink', $exclude_types) )
+					{
+						// check "TEXT" types:
+						$cmp_values = array('TINYTEXT'=>1, 'TEXT'=>2, 'MEDIUMTEXT'=>3, 'LONGTEXT'=>4);
+						if( isset($cmp_values[$a], $cmp_values[$b]) )
+						{
+							$type_matches = ( $cmp_values[$a] <= $cmp_values[$b] );
+						}
+						else
+						{ // check "BLOB":
+							$cmp_values_blob = array('TINYBLOB'=>1, 'BLOB'=>2, 'MEDIUMBLOB'=>3, 'LONGBLOB'=>4);
+							if( isset($cmp_values_blob[$a], $cmp_values_blob[$b]) )
+							{
+								$type_matches = ( $cmp_values_blob[$a] <= $cmp_values_blob[$b] );
+							}
+							else
+							{
+								$type_matches = ( $a == $b );
+							}
+						}
+					}
+					else
+					{
+						$type_matches = ( $a == $b );
+					}
+
 					// There's a bug with a "NOT NULL" field reported as "NULL", work around it (http://bugs.mysql.com/bug.php?id=20910):
-					if( strtoupper($fieldtype) == 'TIMESTAMP' )
+					if( $fieldtype == 'TIMESTAMP' )
 					{
 						$ct_sql = $DB->get_var( 'SHOW CREATE TABLE '.$table, 1, 0 );
 						if( preg_match( '~^\s*`'.$tablefield->Field.'`\s+TIMESTAMP\s+(NOT )?NULL~im', $ct_sql, $match ) )
@@ -609,8 +654,8 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				elseif( preg_match( '~^'.$pattern_field.'\s+ (CHAR|VARCHAR|BINARY|VARBINARY) \s* \( ([\d\s]+) \) (\s+ (BINARY|ASCII|UNICODE) )? (.*)$~ix', $column_definition, $match ) )
 				{
 					$len = trim($match[2]);
+					$fieldtype = strtoupper($match[1]).'('.$len.')';
 
-					$fieldtype = $match[1].'('.$len.')';
 					if( ! empty($match[3]) )
 					{ // "binary", "ascii", "unicode"
 						$fieldtype .= ' '.$match[3];
@@ -634,7 +679,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					$values = preg_split( '~\s*,\s*~', trim($match[2]), -1, PREG_SPLIT_NO_EMPTY ); // TODO: will fail for values containing ","..
 					$values = implode( ',', $values );
 
-					$fieldtype = $match[1].'('.$values.')';
+					$fieldtype = strtoupper($match[1]).'('.$values.')';
 					$field_compare = strtolower($match[1]).'('.$values.')';
 
 					// compare case-sensitive
@@ -787,11 +832,11 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 				if( ! isset($type_matches) )
 				{ // not tried to match before
-					$type_matches = ( strtolower($tablefield->Type) == strtolower($fieldtype) );
+					$type_matches = ( strtoupper($tablefield->Type) == $fieldtype );
 				}
 
 				#pre_dump( 'change_null ($change_null, $tablefield, $want_null)', $change_null, $tablefield, $want_null );
-				#pre_dump( 'type_matches', $type_matches, strtolower($tablefield->Type), strtolower($fieldtype) );
+				#pre_dump( 'type_matches', $type_matches, strtolower($tablefield->Type), $fieldtype );
 
 
 				// See what DEFAULT we would get or want
@@ -805,22 +850,24 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				}
 				else
 				{ // implicit default, see http://dev.mysql.com/doc/refman/4.1/en/data-type-defaults.html
-					if( preg_match( '~^(TINYINT|SMALLINT|MEDIUMINT|INTEGER|INT|BIGINT|REAL|DOUBLE|FLOAT|DECIMAL|DEC|NUMERIC)$~i', $fieldtype ) )
+					if( preg_match( '~^(TINYINT|SMALLINT|MEDIUMINT|INTEGER|INT|BIGINT|REAL|DOUBLE|FLOAT|DECIMAL|DEC|NUMERIC)$~', $fieldtype ) )
 					{ // numeric
 						$update_default = '0';
 						$update_default_set = '0';
 					}
-					elseif( strtoupper($fieldtype) == 'TIMESTAMP' )
+					elseif( $fieldtype == 'TIMESTAMP' )
 					{ // TODO: the default should be current date and time for the first field - but AFAICS we won't have NULL fields anyway
 					}
-					elseif( preg_match( '~^(DATETIME|DATE|TIME|YEAR)$~i', $fieldtype ) )
+					elseif( preg_match( '~^(DATETIME|DATE|TIME|YEAR)$~', $fieldtype ) )
 					{
 						$update_default = '0'; // short form for various special "zero" values
 						$update_default_set = '0';
 					}
-					elseif( preg_match( '~^ENUM\(~i', $fieldtype ) )
+					elseif( substr($fieldtype, 0, 4) == 'ENUM' )
 					{
-						$update_default_set = trim(substr( $fieldtype, 5, strpos($fieldtype, ',')-5 )); // first value
+						preg_match( '~["\']?.*?["\']?\s*[,)]~x', substr($fieldtype,5), $match );
+						$update_default_set = trim( $match[0], "\n\r\t\0\x0bB ()," ); // strip default whitespace, braces & comma
+						// first value (until "," or end) of $fieldtype_param:
 						$update_default = preg_replace( '~^(["\'])(.*)\1$~', '$2', $update_default_set ); // without quotes
 					}
 					else
@@ -836,10 +883,11 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				{ // Change the whole column to $column_definition:
 					/*
 					echo '<h2>No_Match</h2>';
+					pre_dump( $type_matches, $change_null, $want_null );
 					pre_dump( $tablefield, $column_definition );
 					pre_dump( 'flds', $flds );
 					pre_dump( 'wanted_fields', $wanted_fields );
-					pre_dump( strtolower($tablefield->Type), strtolower($fieldtype), $column_definition );
+					pre_dump( strtolower($tablefield->Type), $fieldtype, $column_definition );
 					*/
 
 					$queries = array( 'ALTER TABLE '.$table );
@@ -1168,6 +1216,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.30  2007/02/03 02:56:04  blueyed
+ * Added "change_column_shrink" exclude_type and exlude it by default; this is meant to not downgrade e.g. MEDIUMTEXT to TEXT
+ *
  * Revision 1.29  2007/01/18 21:03:51  blueyed
  * db_delta() fixes: splitting fields by comma; inline UNIQUE and PK handling
  *
