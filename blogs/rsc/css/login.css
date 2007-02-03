@@ -49,6 +49,10 @@ input.input_text {
 	margin-left: 0;
 	margin-right: 0;
 }
+input.field_error {
+	background:#fbf2ee;
+	border: 1px solid #d99;
+}
 
 /* Links and buttons: */
 a {
@@ -89,6 +93,9 @@ div.loginblock legend {
 
 /*
  * $Log$
+ * Revision 1.3  2007/02/03 18:43:14  fplanque
+ * cleaner handling of errors
+ *
  * Revision 1.2  2007/01/19 03:06:56  fplanque
  * Changed many little thinsg in the login procedure.
  * There may be new bugs, sorry. I tested this for several hours though.
