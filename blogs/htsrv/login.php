@@ -210,7 +210,7 @@ switch( $action )
 		// Validate provided reqID against the one stored in the user's session
 		$request_ids = $Session->get( 'core.validatemail.request_ids' );
 		if( ( ! is_array($request_ids) || ! in_array( $reqID, $request_ids ) )
-			&& ! ( $current_User->group_ID == 1 && $reqID == 1 /* admin users can validate themselves by a button click */ ) )
+			&& ! ( isset($current_User) && $current_User->group_ID == 1 && $reqID == 1 /* admin users can validate themselves by a button click */ ) )
 		{
 			$Messages->add( T_('Invalid email address validation request!'), 'error' );
 			$action = 'req_validatemail';
@@ -366,6 +366,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.87  2007/02/03 19:48:55  blueyed
+ * Fixed possible E_NOTICE
+ *
  * Revision 1.86  2007/01/26 18:40:43  blueyed
  * Saner order of validate-email-link error message handling.
  *
