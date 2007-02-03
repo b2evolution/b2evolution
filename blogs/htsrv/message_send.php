@@ -169,7 +169,6 @@ else
 {
 	// Getting current blog info:
 	$Blog = & $BlogCache->get_by_ID( $blog, true, false );	// Optional
-
 }
 
 
@@ -244,9 +243,12 @@ elseif( $Comment )
 
 // Trigger event: a Plugin could add a $category="error" message here..
 $Plugins->trigger_event( 'MessageFormSent', array(
-	'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id,
+	'recipient_ID' => & $recipient_id,
+	'item_ID' => $post_id,
+	'comment_ID' => $comment_id,
 	'message' => & $message,
 	'message_footer' => & $message_footer,
+	'Blog' => & $Blog,
 	) );
 
 
@@ -305,6 +307,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.50  2007/02/03 19:49:36  blueyed
+ * Added "Blog" param to MessageFormSent hook
+ *
  * Revision 1.49  2007/01/23 05:30:21  fplanque
  * "Contact the owner"
  *

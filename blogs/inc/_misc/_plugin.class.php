@@ -1603,6 +1603,7 @@ class Plugin
 	 *   - 'comment_ID': ID of the comment where the user clicked the msgform icon (if any)
 	 *   - 'message': The message to be sent (by reference)
 	 *   - 'message_footer': The footer of the message (by reference)
+	 *   - 'Blog': The blog, depending on the context (may be null) (by reference) (since 1.10.0)
 	 */
 	function MessageFormSent( & $params )
 	{
@@ -2850,6 +2851,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.143  2007/02/03 19:49:36  blueyed
+ * Added "Blog" param to MessageFormSent hook
+ *
  * Revision 1.142  2007/01/28 23:58:46  blueyed
  * - Added hook CommentFormSent
  * - Re-ordered comment_post.php to: init, validate, process
