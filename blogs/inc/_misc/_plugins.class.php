@@ -1152,6 +1152,7 @@ class Plugins
 		if( $debug )
 		{
 			/*
+			// fp> why is this commented out now?
 			// Hide passwords from Debuglog!
 			// Clone/copy (references!):
 			$debug_params = array();
@@ -1797,6 +1798,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.140  2007/02/03 19:00:31  fplanque
+ * doc
+ *
  * Revision 1.139  2007/01/30 19:52:48  blueyed
  * Only deactivate a Plugin if PluginVersionChanged returns === false; fixes the basic_antispam_plugin, which returned NULL
  *
