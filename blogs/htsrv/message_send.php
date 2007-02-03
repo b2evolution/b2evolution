@@ -29,8 +29,7 @@
  *
  * @author Jeff Bearer - {@link http://www.jeffbearer.com/} + blueyed, fplanque
  *
- * @todo Plugin hook.
- * @todo Respect/provide user profile setting if he wants to be available for e-mail through msgform.
+ * @todo dh> we should use the current_User's ID, if he's logged in here. It seems that only the message form gets pre-filled with hidden fields currently.
  */
 
 /**
@@ -116,7 +115,14 @@ $sender_address = param( 'f', 'string', '' );
 $subject = param( 'g', 'string', '' );
 $message = param( 'h', 'string', '' );
 
+// Prevent register_globals injection!
+$recipient_address = '';
+$recipient_name = '';
+$recipient_User = NULL;
+$Comment = NULL;
 
+
+// Core param validation
 if( empty($sender_name) )
 {
 	$Messages->add( T_('Please fill in your name.'), 'error' );
@@ -137,13 +143,6 @@ if( empty( $message ) )
 { // message should not be empty!
 	$Messages->add( T_('Please do not send empty messages.'), 'error' );
 }
-
-
-// Prevent register_globals injection!
-$recipient_address = '';
-$recipient_name = '';
-$recipient_User = NULL;
-$Comment = NULL;
 
 
 // Build message footer:
@@ -246,9 +245,12 @@ $Plugins->trigger_event( 'MessageFormSent', array(
 	'recipient_ID' => & $recipient_id,
 	'item_ID' => $post_id,
 	'comment_ID' => $comment_id,
+	'subject' => & $subject,
 	'message' => & $message,
 	'message_footer' => & $message_footer,
 	'Blog' => & $Blog,
+	'sender_name' => & $sender_name,
+	'sender_email' => & $sender_address,
 	) );
 
 
@@ -307,6 +309,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.51  2007/02/03 20:25:37  blueyed
+ * Added "sender_name", "sender_email" and "subject" params to MessageFormSent
+ *
  * Revision 1.50  2007/02/03 19:49:36  blueyed
  * Added "Blog" param to MessageFormSent hook
  *

@@ -1601,6 +1601,9 @@ class Plugin
 	 *   - 'recipient_ID': ID of the user (if any)
 	 *   - 'item_ID': ID of the item where the user clicked the msgform icon (if any)
 	 *   - 'comment_ID': ID of the comment where the user clicked the msgform icon (if any)
+	 *   - 'sender_name': The name of the sender (by reference) (since 1.10.0)
+	 *   - 'sender_email': The email address of the sender (by reference) (since 1.10.0)
+	 *   - 'subject': The subject of the message to be sent (by reference) (since 1.10.0)
 	 *   - 'message': The message to be sent (by reference)
 	 *   - 'message_footer': The footer of the message (by reference)
 	 *   - 'Blog': The blog, depending on the context (may be null) (by reference) (since 1.10.0)
@@ -2851,6 +2854,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.144  2007/02/03 20:25:37  blueyed
+ * Added "sender_name", "sender_email" and "subject" params to MessageFormSent
+ *
  * Revision 1.143  2007/02/03 19:49:36  blueyed
  * Added "Blog" param to MessageFormSent hook
  *
