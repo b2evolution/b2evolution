@@ -160,7 +160,11 @@ $Form->begin_fieldset( T_('Identity') );
 
 		$Form->text_input( 'edited_user_login', $edited_User->login, 20, T_('Login'), '', array( 'required' => true ) );
 		$Form->text_input( 'edited_user_firstname', $edited_User->firstname, 20, T_('First name'), '', array( 'maxlength' => 50 ) );
-		$Form->text_input( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), '', array( 'maxlength' => 50, 'force_to' => 'UpperCase' ) );
+		$Form->text_input( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), '', array(
+			'maxlength' => 50,
+			// TODO: dh> make this a config option! There have been several complains already about this, e.g. http://manual.b2evolution.net/index.php?title=Talk:Users_Groups_tab&oldid=3125
+			//           OK? Where should it go?
+			'onchange' => 'this.value = this.value.toUpperCase();' ) );
 		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => true ) );
 		$Form->select( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown') );
 		$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
@@ -360,6 +364,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.41  2007/02/04 16:38:37  blueyed
+ * Removed "force_to" ("UpperCase") bloat; todo: make force-lastname-to-uppercase configurable
+ *
  * Revision 1.40  2007/01/27 16:08:53  blueyed
  * Pass "User" param to PluginUserSettingsEditDisplayAfter plugin hook
  *
