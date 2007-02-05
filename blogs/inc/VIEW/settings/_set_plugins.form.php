@@ -210,7 +210,7 @@ function plugin_results_desc_order_callback( $a, $b, $order )
 $Results->cols[] = array(
 		'th' => T_('Description'),
 		'td' => '% {Obj}->short_desc %',
-		'order_objects_callback' => 'plugin_results_name_order_callback',
+		'order_objects_callback' => 'plugin_results_desc_order_callback',
 	);
 
 /*
@@ -277,6 +277,9 @@ unset($Results); // free memory
 
 /*
  * $Log$
+ * Revision 1.49  2007/02/05 22:17:29  blueyed
+ * Fixed sorting plugins by description
+ *
  * Revision 1.48  2007/01/14 08:21:01  blueyed
  * Optimized "info", "disp_help" and "disp_help_plain" actions by refering to them through classname, which makes Plugins::discover() unnecessary
  *
