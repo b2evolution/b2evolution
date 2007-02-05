@@ -1152,7 +1152,7 @@ class Plugins
 		if( $debug )
 		{
 			/*
-			// fp> why is this commented out now?
+			// Note: this is commented out, because $debug_params gets not dumped anymore (last line of this block)
 			// Hide passwords from Debuglog!
 			// Clone/copy (references!):
 			$debug_params = array();
@@ -1798,6 +1798,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.141  2007/02/05 22:37:06  blueyed
+ * doc
+ *
  * Revision 1.140  2007/02/03 19:00:31  fplanque
  * doc
  *
