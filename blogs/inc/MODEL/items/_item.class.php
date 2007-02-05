@@ -1000,12 +1000,12 @@ class Item extends DataObject
 			{ // the format/item can be cached:
 				global $DB;
 
-				$cache = $DB->get_var( '
+				$cache = $DB->get_var( "
 					SELECT itpr_content_prerendered
 						FROM T_item__prerendering
-					 WHERE itpr_itm_ID = '.$this->ID.'
-						 AND itpr_format = "'.$format.'"
-					   AND itpr_renderers = "'.implode('.', $post_renderers).'"', 0, 0, 'Check prerendered item content' );
+					 WHERE itpr_itm_ID = ".$this->ID."
+						 AND itpr_format = '".$format."'
+					   AND itpr_renderers = '".implode('.', $post_renderers)."'", 0, 0, 'Check prerendered item content' );
 
 				if( $cache !== NULL ) // may be empty string
 				{ // Retrieved from cache:
@@ -3378,6 +3378,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.150  2007/02/05 13:32:49  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.149  2007/01/26 04:52:53  fplanque
  * clean comment popups (skins 2.0)
  *

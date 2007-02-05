@@ -87,11 +87,11 @@ class Sessions extends Widget
 
 		// We get all sessions that have been seen in $timeout_YMD and that have a session key.
 		// NOTE: we do not use DISTINCT here, because guest users are all "NULL".
-		foreach( $DB->get_results( '
+		foreach( $DB->get_results( "
 			SELECT sess_user_ID
 			  FROM T_sessions
-			 WHERE sess_lastseen > "'.$timeout_YMD.'"
-			   AND sess_key IS NOT NULL', OBJECT, 'Sessions: get list of relevant users.' ) as $row )
+			 WHERE sess_lastseen > '".$timeout_YMD."'
+			   AND sess_key IS NOT NULL", OBJECT, 'Sessions: get list of relevant users.' ) as $row )
 		{
 			if( !empty( $row->sess_user_ID )
 					&& ( $User = & $UserCache->get_by_ID( $row->sess_user_ID ) ) )
@@ -260,6 +260,9 @@ class Sessions extends Widget
 
 /*
  * $Log$
+ * Revision 1.11  2007/02/05 13:29:09  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.10  2006/12/17 23:44:35  fplanque
  * minor cleanup
  *
