@@ -271,6 +271,10 @@ class ComponentWidget extends DataObject
 
 						echo $params['list_end'];
 
+						echo $params['notes_start'];
+						echo '<a href="http://webreference.fr/2006/08/30/rss_atom_xml" target="_blank" title="External - English">What is RSS?</a>';
+						echo $params['notes_end'];
+
 						echo $params['block_end'];
 						return true;
 
@@ -345,6 +349,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2007/02/05 00:35:43  fplanque
+ * small adjustments
+ *
  * Revision 1.12  2007/01/25 13:41:50  fplanque
  * wording
  *

@@ -79,6 +79,11 @@ require $skins_path.'_html_header.inc.php';
 		//next_post(); 			// link to next post in single page mode
 	?>
 
+
+	<?php
+		$MainList->date_if_changed();
+	?>
+
 	<div class="bPost bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
 		<?php
 			locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
@@ -128,8 +133,7 @@ require $skins_path.'_html_header.inc.php';
 		</div>
 
 		<div class="bSmallPrint">
-			<?php
-			$Item->permanent_link( '#', '#', 'permalink_right' ); ?>
+			<?php $Item->permanent_link( '#', '#', 'permalink_right' ); ?>
 
 			<?php $Item->feedback_link( 'comments', '' ) // Link to comments ?>
 			<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
@@ -201,6 +205,9 @@ require $skins_path.'_html_header.inc.php';
 				// This will enclose sub-lists in a list:
 				'group_start' => '<ul>',
 				'group_end' => '</ul>',
+				// This will enclose (foot)notes:
+				'notes_start' => '<div class="notes">',
+				'notes_end' => '</div>',
 			) );
 	?>
 

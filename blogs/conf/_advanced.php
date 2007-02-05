@@ -141,8 +141,6 @@ $notify_from = $instance_name.'@'.preg_replace( '/^www\./i', '', $basehost );
  *
  * If a particular post is requested (by title) but not the the exact same title
  * do you want to automatically redirect to the right title?
- * This is overly useful when using urltitles since they have changed in v 2.0 ( _ became - )
- * May be disabled for performance if you were not using versions < 2.0
  *
  * If this is disabled, there are 2 possible situations:
  * - Either the post is no longer part of the requested blog, and you get a "Sorry, nothing to display"
@@ -317,7 +315,7 @@ $cookie_path = preg_replace( '#https?://[^/]+#', '', $baseurl );
  */
 $cookie_domain = ( strpos($basehost, '.') ? '.'.$basehost : '' );
 // When hosting multiple domains (not just subdomains) on a single instance of b2evo,
-// you want to try this:
+// you may want to try this:
 // $cookie_domain = '.'.$_SERVER['HTTP_HOST'];
 
 

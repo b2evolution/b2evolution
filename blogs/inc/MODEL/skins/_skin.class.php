@@ -129,6 +129,14 @@ class Skin extends DataObject
 					'block_end' => '</div>',
 					'block_title_start' => '<h3>',
 					'block_title_end' => '</h3>',
+					'list_start' => '<ul>',
+					'list_end' => '</ul>',
+					'item_start' => '<li>',
+					'item_end' => '</li>',
+					'group_start' => '<ul>',
+					'group_end' => '</ul>',
+					'notes_start' => '<div class="notes">',
+					'notes_end' => '</div>',
 				), $params );
 
    	$WidgetCache = & get_Cache( 'WidgetCache' );
@@ -353,6 +361,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2007/02/05 00:35:43  fplanque
+ * small adjustments
+ *
  * Revision 1.11  2007/01/23 21:45:25  fplanque
  * "enforce" foreign keys
  *

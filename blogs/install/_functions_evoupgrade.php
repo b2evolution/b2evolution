@@ -1655,6 +1655,12 @@ function upgrade_b2evo_tables()
 									 ADD COLUMN blog_skin_ID INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER blog_allowusercss' );
 		echo "OK.<br />\n";
 
+		echo 'Updating post tables... ';
+		$DB->query( 'ALTER TABLE T_posts CHANGE COLUMN post_content post_content MEDIUMTEXT NULL' );
+		$DB->query( 'ALTER TABLE T_item__prerendering CHANGE COLUMN itpr_content_prerendered itpr_content_prerendered MEDIUMTEXT NULL' );
+		echo "OK.<br />\n";
+
+
 		install_basic_widgets();
 	}
 
@@ -1774,6 +1780,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.208  2007/02/05 00:35:44  fplanque
+ * small adjustments
+ *
  * Revision 1.207  2007/02/03 19:00:49  fplanque
  * unbloat
  *

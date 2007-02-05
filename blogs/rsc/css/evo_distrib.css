@@ -1,9 +1,12 @@
-
 @import url(basic.css);	/* Import basic styles */
 @import url(img.css);	/* Import standard image styles */
 @import url(forms.css);	/* Import standard form styles */
 
 /* Global page layout */
+body {
+	margin: 1ex;
+}
+
 #rowheader {
 	text-align: center;
 	margin-bottom: 1em;
