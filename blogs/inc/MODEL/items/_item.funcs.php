@@ -88,7 +88,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	// Find all occurrences of urltitle-number in the DB:
 	$sql = 'SELECT '.$dbprefix.'urltitle
 					  FROM '.$dbtable.'
-					 WHERE '.$dbprefix.'urltitle REGEXP "^'.$urlbase.'(-[0-9]+)?$"';
+					 WHERE '.$dbprefix."urltitle REGEXP '^".$urlbase."(-[0-9]+)?$'";
 	if( $post_ID )
 	{	// Ignore current post
 		$sql .= ' AND '.$dbIDname.' <> '.$post_ID;
@@ -418,7 +418,7 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_', $req_b
 		unset( $show_statuses[$key] );
 		if( is_logged_in() )
 		{ // We need to be logged in to have a chance to see this:
-			$where .= $or.' ( '.$dbprefix.'status = "private" AND '.$dbprefix.'creator_user_ID = '.$current_User->ID.' ) ';
+			$where .= $or.' ( '.$dbprefix."status = 'private' AND ".$dbprefix.'creator_user_ID = '.$current_User->ID.' ) ';
 			$or = ' OR ';
 		}
 	}
@@ -687,6 +687,9 @@ function attach_browse_tabs()
 
 /*
  * $Log$
+ * Revision 1.40  2007/02/06 13:34:20  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.39  2006/12/23 23:37:35  fplanque
  * refactoring / Blog::get_default_cat_ID()
  *

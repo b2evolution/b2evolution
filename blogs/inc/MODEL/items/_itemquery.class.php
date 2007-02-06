@@ -460,8 +460,8 @@ class ItemQuery extends SQL
 				// that overlap 2 years properly, even when start on week is monday (which MYSQL won't handle properly)
 				$start_date_for_week = get_start_date_for_week( $m, $w, locale_startofweek() );
 
-				$this->WHERE_and( $this->dbprefix.'datestart >= "'.date('Y-m-d',$start_date_for_week).'"' );
-				$this->WHERE_and( $this->dbprefix.'datestart < "'.date('Y-m-d',$start_date_for_week+604800 ).'"' ); // + 7 days
+				$this->WHERE_and( $this->dbprefix."datestart >= '".date('Y-m-d',$start_date_for_week)."'" );
+				$this->WHERE_and( $this->dbprefix."datestart < '".date('Y-m-d',$start_date_for_week+604800 )."'" ); // + 7 days
 
 				$start_is_set = true;
 				$stop_is_set = true;
@@ -589,6 +589,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.13  2007/02/06 13:37:45  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.12  2007/01/29 20:04:23  blueyed
  * MFB: Fixed inclusion of sub-categories in item list
  *
