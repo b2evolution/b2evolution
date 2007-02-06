@@ -347,7 +347,7 @@ class SQL
 				break;
 
 			case 'PHRASE':
-					$where = $search_field.' LIKE "%'.$DB->escape( $search ).'%"'.$this->WHERE_regexp( $search, $search_kw_combine );
+					$where = $search_field." LIKE '%".$DB->escape( $search )."%'".$this->WHERE_regexp( $search, $search_kw_combine );
 					break;
 
 			case 'BEGINWITH':
@@ -404,6 +404,9 @@ class SQL
 
 /*
  * $Log$
+ * Revision 1.10  2007/02/06 13:27:26  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.9  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
