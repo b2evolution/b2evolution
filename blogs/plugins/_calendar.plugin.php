@@ -494,12 +494,12 @@ class Calendar
 			// QUERY which gets the last available post (BTW, I think there is already a function for that somwhere)
 
 			$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.') AS item_count,
-													YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart),
-													DAYOFMONTH('.$this->dbprefix.'datestart) AS myday
+													EXTRACT(YEAR FROM '.$this->dbprefix.'datestart), EXTRACT(MONTH FROM '.$this->dbprefix.'datestart),
+													EXTRACT(DAY FROM '.$this->dbprefix.'datestart) AS myday
 									FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 										INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-									WHERE YEAR('.$this->dbprefix.'datestart) = "'.$this->year.'"
-										AND MONTH('.$this->dbprefix.'datestart) = "'.$this->month.'"
+									WHERE EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) = \''.$this->year.'\'
+										AND EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) = \''.$this->month.'\'
 										'.$this->ItemQuery->get_where( ' AND ' ).'
 									GROUP BY myday '.$this->ItemQuery->get_group_by( ', ' ).'
 									ORDER BY '.$this->dbprefix.'datestart DESC';
@@ -1119,6 +1119,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.37  2007/02/06 12:49:39  waltercruz
+ * Changing the date queries to the EXTRACT syntax
+ *
  * Revision 1.36  2007/01/14 01:31:51  fplanque
  * do not display title by default (bloated)
  *
