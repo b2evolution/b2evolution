@@ -1668,12 +1668,12 @@ class Plugins
 		$this->index_event_IDs = array();
 
 		$Debuglog->add( 'Loading plugin events.', 'plugins' );
-		foreach( $DB->get_results( '
+		foreach( $DB->get_results( "
 				SELECT pevt_plug_ID, pevt_event
 					FROM T_pluginevents INNER JOIN T_plugins ON pevt_plug_ID = plug_ID
 				 WHERE pevt_enabled > 0
-				   AND plug_status = "enabled"
-				 ORDER BY plug_priority, plug_classname', OBJECT, 'Loading plugin events' ) as $l_row )
+				   AND plug_status = 'enabled'
+				 ORDER BY plug_priority, plug_classname", OBJECT, 'Loading plugin events' ) as $l_row )
 		{
 			$this->index_event_IDs[$l_row->pevt_event][] = $l_row->pevt_plug_ID;
 		}
@@ -1798,6 +1798,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.142  2007/02/06 00:08:56  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.141  2007/02/05 22:37:06  blueyed
  * doc
  *
