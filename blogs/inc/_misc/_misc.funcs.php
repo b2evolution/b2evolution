@@ -2421,11 +2421,28 @@ function is_create_action( $action )
  */
 function get_link_showhide( $link_id, $target_id, $text_when_displayed, $text_when_hidden, $display_hidden = true )
 {
-	$html = "<a id='$link_id' href='#' onclick='return toggle_display_by_id(\"$link_id\",\"$target_id\",\"".str_replace( '"', '\"', $text_when_displayed ).'","'.str_replace( '"', '\"', $text_when_hidden ).'")\'>'
+	$html = "<a id='$link_id' href='#' onclick='return toggle_display_by_id(\"$link_id\", \"$target_id\", \""
+		.jsspecialchars( $text_when_displayed ).'", "'.jsspecialchars( $text_when_hidden ).'")\'>'
 		.( $display_hidden ? $text_when_hidden : $text_when_displayed )
 		.'</a>';
 
 	return $html;
+}
+
+
+/**
+ * Escape a string to be used in Javascript.
+ *
+ * @param string
+ * @return string
+ */
+function jsspecialchars($s)
+{
+	$r = str_replace(
+		array(  '\\', '"', "'" ),
+		array( '\\\\', '\"', "\'" ),
+		$s );
+	return htmlspecialchars($r, ENT_QUOTES);
 }
 
 
@@ -2807,6 +2824,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.168  2007/02/06 13:47:25  blueyed
+ * Fixed escaping in get_link_showhide(); added jsspecialchars(); see http://forums.b2evolution.net/viewtopic.php?p=50564
+ *
  * Revision 1.167  2007/01/29 09:58:55  fplanque
  * enhanced toolbar - experimental
  *
