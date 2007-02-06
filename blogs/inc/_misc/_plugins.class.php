@@ -136,11 +136,11 @@ class Plugins
 	 * @var string
 	 * @static
 	 */
-	var $sql_load_plugins_table = '
+	var $sql_load_plugins_table = "
 			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_name, plug_shortdesc, plug_apply_rendering, plug_status, plug_version, plug_spam_weight
 			  FROM T_plugins
-			 WHERE plug_status = "enabled"
-			 ORDER BY plug_priority, plug_classname';
+			 WHERE plug_status = 'enabled'
+			 ORDER BY plug_priority, plug_classname";
 
 	/**#@-*/
 
@@ -1798,6 +1798,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.144  2007/02/06 14:33:21  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.143  2007/02/06 14:26:20  blueyed
  * MFB: do not pass $renderers by reference to Plugins::render()
  *
