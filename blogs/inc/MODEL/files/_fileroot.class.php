@@ -76,6 +76,10 @@ class FileRoot
 	/**
 	 * Constructor
 	 *
+	 * @todo dh> this can fail miserable, if e.g. a non-existent blog gets requested.
+	 *           Should we handle this gracefully (by returning ads_path=false)?
+	 *           See http://forums.b2evolution.net/viewtopic.php?p=50565#50565
+	 *
 	 * @param string Root type: 'user', 'group' or 'collection'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 * @param boolean Create the directory, if it does not exist yet?
@@ -159,6 +163,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.12  2007/02/06 14:34:14  blueyed
+ * todo
+ *
  * Revision 1.11  2006/12/10 03:04:16  blueyed
  * TRANS note for "u" and "b"
  *
