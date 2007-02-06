@@ -536,12 +536,12 @@ class Hit
 		$hit_referer = substr($this->referer, 0, 250); // VARCHAR(250) and likely to be longer
 
 		// insert hit into DB table:
-		$sql = '
+		$sql = "
 			INSERT INTO T_hitlog(
 				hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
 				hit_referer, hit_referer_dom_ID, hit_blog_ID, hit_remote_addr, hit_agnt_ID )
-			VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($hit_uri).'", "'.$this->referer_type
-				.'", "'.$DB->escape($hit_referer).'", '.$DB->null($this->referer_domain_ID).', '.$DB->null($blog_ID).', "'.$DB->escape( $this->IP ).'", '.$this->agent_ID.'
+			VALUES( '".$Session->ID."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', '".$this->referer_type
+				."', '".$DB->escape($hit_referer)."', ".$DB->null($this->referer_domain_ID).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', ".$this->agent_ID.'
 			)';
 
 		$DB->query( $sql, 'Record the hit' );
@@ -689,6 +689,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.45  2007/02/06 13:44:05  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.44  2007/02/06 00:03:38  waltercruz
  * Changing double quotes to single quotes
  *
