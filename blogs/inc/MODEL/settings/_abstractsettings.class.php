@@ -182,7 +182,7 @@ class AbstractSettings
 
 			for( $i = 0; $i < $this->cache_by_col_keys; $i++ )
 			{
-				$whereList[] = $this->col_key_names[$i].' = "'.$args[$i].'"';
+				$whereList[] = $this->col_key_names[$i]." = '".$args[$i]."'";
 
 				if( ! is_array( $testCache )
 						|| is_null($args[$i])
@@ -709,6 +709,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.20  2007/02/06 00:41:52  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.19  2006/12/07 23:13:11  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!
