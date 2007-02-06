@@ -1235,14 +1235,14 @@ class Plugins
 	 * Render the content of an item by calling the relevant renderer plugins.
 	 *
 	 * @param string content to render (by reference)
-	 * @param array renderer codes to use for opt-out, opt-in and lazy  (by reference)
+	 * @param array renderer codes to use for opt-out, opt-in and lazy
 	 * @param string Output format, see {@link format_to_output()}. Only 'htmlbody',
 	 *        'entityencoded', 'xml' and 'text' are supported.
 	 * @param array Additional params to the Render* methods (e.g. "Item" for items).
 	 *              Do not use "data" or "format" here, because it gets used internally.
 	 * @return string rendered content
 	 */
-	function render( & $content, & $renderers, $format, $params, $event_prefix = 'Render' )
+	function render( & $content, $renderers, $format, $params, $event_prefix = 'Render' )
 	{
 		// echo implode(',',$renderers);
 
@@ -1798,6 +1798,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.143  2007/02/06 14:26:20  blueyed
+ * MFB: do not pass $renderers by reference to Plugins::render()
+ *
  * Revision 1.142  2007/02/06 00:08:56  waltercruz
  * Changing double quotes to single quotes
  *
