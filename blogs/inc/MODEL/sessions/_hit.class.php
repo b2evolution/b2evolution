@@ -432,10 +432,10 @@ class Hit
 		}
 
 
-		if( $agnt_data = $DB->get_row( '
+		if( $agnt_data = $DB->get_row( "
 			SELECT agnt_ID FROM T_useragents
-			 WHERE agnt_signature = "'.$DB->escape( $this->user_agent ).'"
-			   AND agnt_type = "'.$this->agent_type.'"' ) )
+			 WHERE agnt_signature = '".$DB->escape( $this->user_agent )."'
+			   AND agnt_type = '".$this->agent_type."'" ) )
 		{ // this agent (with that type) hit us once before, re-use ID
 			$this->agent_ID = $agnt_data->agnt_ID;
 		}
@@ -689,6 +689,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.44  2007/02/06 00:03:38  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.43  2006/12/07 23:13:11  fplanque
  * @var needs to have only one argument: the variable type
  * Otherwise, I can't code!
