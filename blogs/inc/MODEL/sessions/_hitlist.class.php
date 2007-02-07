@@ -130,9 +130,9 @@ class Hitlist
 
 		$time_prune_before = ($localtimenow - ($Settings->get('auto_prune_stats') * 86400)); // 1 day = 86400 seconds
 
-		$rows_affected = $DB->query( '
+		$rows_affected = $DB->query( "
 			DELETE FROM T_hitlog
-			WHERE hit_datetime < "'.date('Y-m-d', $time_prune_before).'"', 'Autopruning hit log' );
+			WHERE hit_datetime < '".date('Y-m-d', $time_prune_before)."'", 'Autopruning hit log' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_hitlog.', 'hit' );
 
 		// Prune sessions that have timed out and are older than auto_prune_stats
@@ -140,9 +140,9 @@ class Hitlist
 		$smaller_time = min( $sess_prune_before, $time_prune_before );
 		$sess_prune_YMD = date( 'Y-m-d H:i:s', $smaller_time );
 
-		$rows_affected = $DB->query( '
+		$rows_affected = $DB->query( "
 			DELETE FROM T_sessions
-			WHERE sess_lastseen < "'.$sess_prune_YMD.'"', 'Autoprune sessions' );
+			WHERE sess_lastseen < '".$sess_prune_YMD."'", 'Autoprune sessions' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'hit' );
 
 		// Prune non-referrered basedomains (where the according hits got deleted)
@@ -151,22 +151,22 @@ class Hitlist
 		$mysql_ver = mysql_get_server_info();
 		if( ($pos = strpos($mysql_ver, '.')) && substr( $mysql_ver, 0, $pos ) >= '4' )
 		{ // MySQL server version >= 4 (required for multi-table deletes):
-			$rows_affected = $DB->query( '
+			$rows_affected = $DB->query( "
 				DELETE T_basedomains
 				  FROM T_basedomains LEFT JOIN T_hitlog ON hit_referer_dom_ID = dom_ID
 				 WHERE hit_referer_dom_ID IS NULL
-				 AND dom_type = "unknown"
-				 AND dom_status = "unknown"' );
+				 AND dom_type = 'unknown'
+				 AND dom_status = 'unknown'" );
 			$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_basedomains.', 'hit' );
 		}
 		else
 		{ // two queries for MySQL < 4
-			$ids = $DB->get_row( '
+			$ids = $DB->get_row( "
 				SELECT dom_ID
 				  FROM T_basedomains LEFT JOIN T_hitlog ON hit_referer_dom_ID = dom_ID
 				 WHERE hit_referer_dom_ID IS NULL
-				 AND dom_type = "unknown"
-				 AND dom_status = "unknown"', ARRAY_N );
+				 AND dom_type = 'unknown'
+				 AND dom_status = 'unknown'", ARRAY_N );
 
 			if( !empty( $ids ) )
 			{
