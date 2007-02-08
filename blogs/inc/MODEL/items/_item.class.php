@@ -1036,9 +1036,9 @@ class Item extends DataObject
 
 				if( $use_cache )
 				{ // save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
-					$DB->query( '
+					$DB->query( "
 						REPLACE INTO T_item__prerendering (itpr_itm_ID, itpr_format, itpr_renderers, itpr_content_prerendered)
-						 VALUES ( '.$this->ID.', "'.$format.'", '.$DB->quote(implode('.', $post_renderers)).', '.$DB->quote($this->content_prerendered[$cache_key]).' )', 'Cache prerendered item content' );
+						 VALUES ( '.$this->ID.', '".$format."', ".$DB->quote(implode('.', $post_renderers)).', '.$DB->quote($this->content_prerendered[$cache_key]).' )', 'Cache prerendered item content' );
 				}
 			}
 		}
@@ -3378,6 +3378,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.151  2007/02/08 03:45:40  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.150  2007/02/05 13:32:49  waltercruz
  * Changing double quotes to single quotes
  *

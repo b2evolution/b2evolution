@@ -96,10 +96,10 @@ class UserCache extends DataObjectCache
 		{
 			global $DB;
 
-			if( $row = $DB->get_row( '
+			if( $row = $DB->get_row( "
 					SELECT *
 					  FROM T_users
-					 WHERE user_login = "'.$DB->escape($login).'"', 0, 0, 'Get User login' ) )
+					 WHERE user_login = '".$DB->escape($login)."'", 0, 0, 'Get User login' ) )
 			{
 				$this->add( new User( $row ) );
 			}
@@ -270,6 +270,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.9  2007/02/08 03:48:22  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.8  2006/12/05 01:35:27  blueyed
  * Hooray for less complexity and the 8th param for DataObjectCache()
  *
