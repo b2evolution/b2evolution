@@ -562,7 +562,7 @@ class DB
 
 
 	/**
-	 * Kill cached query results and the used mysql resource.
+	 * Kill cached query results
 	 */
 	function flush()
 	{
@@ -1350,6 +1350,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.56  2007/02/09 17:28:56  blueyed
+ * doc
+ *
  * Revision 1.55  2007/01/29 01:21:22  blueyed
  * Do not let $transaction_nesting_level become negative!
  *
