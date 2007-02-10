@@ -30,11 +30,11 @@ global $blog, $admin_url, $rsc_url;
 echo '<h2>'.T_('XML hits summary').'</h2>';
 echo '<p>'.sprintf( T_('These are hits from <a %s>XML readers</a>. This includes RSS and Atom readers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_rss=1&amp;blog='.$blog.'"' ).'</p>';
 echo '<p>'.T_('Any user agent accessing the XML feeds will be flagged as an XML reader.').'</p>';
-$sql = '
-	SELECT COUNT(*) AS hits, YEAR(hit_datetime) AS year,
-			   MONTH(hit_datetime) AS month, DAYOFMONTH(hit_datetime) AS day
+$sql = "
+	SELECT COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,
+			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
 		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-	 WHERE agnt_type = "rss"';
+	 WHERE agnt_type = 'rss'";
 if( $blog > 0 )
 {
 	$sql .= ' AND hit_blog_ID = '.$blog;
@@ -194,6 +194,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.5  2007/02/10 17:59:03  waltercruz
+ * Changing double quotes to single quotes and the MySQL date functions to the standart ones
+ *
  * Revision 1.4  2006/11/26 23:39:29  blueyed
  * trans: "and" instead of "&amp;" (Which should have been "&" anyway!)
  *

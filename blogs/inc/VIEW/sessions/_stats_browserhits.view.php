@@ -39,11 +39,11 @@ echo '<p>'.sprintf( T_('This page only includes hits identified as made by a <a 
 // Solution : CAST to string
 // TODO: I've also limited this to agnt_type "browser" here, according to the change for "referers" (Rev 1.6)
 //       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
-$sql = '
-	SELECT COUNT(*) AS hits, CONCAT(hit_referer_type) AS referer_type, YEAR(hit_datetime) AS year,
-			   MONTH(hit_datetime) AS month, DAYOFMONTH(hit_datetime) AS day
-		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-	 WHERE agnt_type = "browser"';
+$sql = "
+	SELECT COUNT(*) AS hits, hit_referer_type AS referer_type, EXTRACT(YEAR FROM hit_datetime) AS year,
+	EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
+	FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
+	 WHERE agnt_type = 'browser'";
 if( $blog > 0 )
 {
 	$sql .= ' AND hit_blog_ID = '.$blog;
@@ -336,6 +336,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.5  2007/02/10 17:54:00  waltercruz
+ * Changing double quotes to single quotes and the MySQL date functions to the standart ones
+ *
  * Revision 1.4  2006/11/26 01:42:10  fplanque
  * doc
  *

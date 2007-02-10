@@ -31,11 +31,11 @@ echo '<h2>'.T_('Robot hits').'</h2>';
 echo '<p>'.sprintf( T_('This page only includes hits identified as made by <a %s>indexing robots</a> a.k.a. web crawlers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_robot=1&amp;blog='.$blog.'"' ).'</p>';
 echo '<p>'. /* TRANS: %s is a filesystem path */ T_('In order to be detected, robots must be listed in %s.').'</p>';
 
-$sql = '
-	SELECT COUNT(*) AS hits, YEAR(hit_datetime) AS year,
-			   MONTH(hit_datetime) AS month, DAYOFMONTH(hit_datetime) AS day
+$sql = "
+	SELECT COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,
+			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
 		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-	 WHERE agnt_type = "robot"';
+	 WHERE agnt_type = 'robot'";
 if( $blog > 0 )
 {
 	$sql .= ' AND hit_blog_ID = '.$blog;
@@ -200,15 +200,15 @@ if( count($res_hits) )
 echo '<h2>'.T_('Top Indexing Robots').':</h2>';
 
 // Create result set:
-$sql = 'SELECT COUNT(*) AS hit_count, agnt_signature
+$sql = "SELECT COUNT(*) AS hit_count, agnt_signature
 					FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-				 WHERE agnt_type = "robot" '
+				 WHERE agnt_type = 'robot' "
 				 			.( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog ).'
 				 GROUP BY agnt_signature';
 
-$count_sql = 'SELECT COUNT( DISTINCT agnt_signature )
+$count_sql = "SELECT COUNT( DISTINCT agnt_signature )
 								FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-							 WHERE agnt_type = "robot" '
+							 WHERE agnt_type = 'robot' "
 							 .( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog );
 
 $Results = & new Results( $sql, 'topidx', '-D', 20, $count_sql );
@@ -269,6 +269,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2007/02/10 17:55:25  waltercruz
+ * Changing double quotes to single quotes and the MySQL date functions to the standart ones
+ *
  * Revision 1.4  2006/11/26 23:40:34  blueyed
  * trans
  *
