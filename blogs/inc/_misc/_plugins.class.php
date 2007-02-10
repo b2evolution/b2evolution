@@ -486,11 +486,20 @@ class Plugins
 					if( empty($db_deltas) )
 					{ // No DB changes needed, update (bump or decrease) the version
 						global $DB;
+						$Plugins_admin = & get_Cache('Plugins_admin');
 
+						// Update version in DB:
 						$DB->query( '
 								UPDATE T_plugins
 								   SET plug_version = '.$DB->quote($Plugin->version).'
 								 WHERE plug_ID = '.$Plugin->ID );
+
+						// Update "plug_version" in indexes:
+						$this->index_ID_rows[$Plugin->ID]['plug_version'] = $Plugin->version;
+						if( isset($Plugins_admin->index_ID_rows[$Plugin->ID]) )
+						{
+							$Plugins_admin->index_ID_rows[$Plugin->ID]['plug_version'] = $Plugin->version;
+						}
 
 						// Remove any prerenderered content for the Plugins renderer code:
 						if( ! empty($Plugin->code) )
@@ -501,7 +510,6 @@ class Plugins
 						}
 
 						// Detect new events (and delete obsolete ones - in case of downgrade):
-						$Plugins_admin = & get_Cache('Plugins_admin');
 						if( $Plugins_admin->save_events( $Plugin, array() ) )
 						{
 							$this->load_events(); // re-load for the current request
@@ -1798,6 +1806,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.145  2007/02/10 18:39:54  blueyed
+ * Fix: update "plug_version" in indices, so PluginVersionChanged does not get called twice (in Plugins_admin too)
+ *
  * Revision 1.144  2007/02/06 14:33:21  waltercruz
  * Changing double quotes to single quotes
  *
