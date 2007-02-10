@@ -1157,12 +1157,12 @@ class Filelist
 			 */
 			$FileCache = & get_Cache( 'FileCache' );
 
-			$rows = $DB->get_results( '
+			$rows = $DB->get_results( "
 				SELECT *
 				  FROM T_files
-				 WHERE file_root_type = "'.$this->_FileRoot->type.'"
-				   AND file_root_ID = '.$this->_FileRoot->in_type_ID.'
-				   AND file_path IN ('.implode( ',', $to_load ).')',
+				 WHERE file_root_type = '".$this->_FileRoot->type."'
+				   AND file_root_ID = ".$this->_FileRoot->in_type_ID."
+				   AND file_path IN (".implode( ',', $to_load ).")",
 				OBJECT, 'Load FileList meta data' );
 
 			if( count($rows) )
@@ -1242,6 +1242,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.26  2007/02/10 18:01:58  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.25  2007/01/24 13:28:38  fplanque
  * todo
  *

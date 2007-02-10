@@ -117,12 +117,12 @@ function refererList(
 		$sql .= ", agnt_signature";
 	}
 
-	$sql_from_where = '
+	$sql_from_where = "
 			  FROM T_hitlog
 			 INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
 			  LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
-			 WHERE hit_referer_type IN ('.$type.')
-			   AND agnt_type = "browser"';
+			 WHERE hit_referer_type IN (".$type.")
+			   AND agnt_type = 'browser'";
 	if( !empty($blog_ID) )
 	{
 		$sql_from_where .= " AND hit_blog_ID = '$blog_ID'";
@@ -368,6 +368,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.11  2007/02/10 18:00:34  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.10  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

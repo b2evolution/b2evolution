@@ -257,11 +257,11 @@ class File extends DataObject
 		{ // We haven't tried loading yet:
 			if( is_null( $row )	)
 			{	// No DB data has been provided:
-				$row = $DB->get_row( '
+				$row = $DB->get_row( "
 					SELECT * FROM T_files
-					 WHERE file_root_type = "'.$this->_FileRoot->type.'"
-					   AND file_root_ID = '.$this->_FileRoot->in_type_ID.'
-					   AND file_path = '.$DB->quote($this->_rdfp_rel_path),
+					 WHERE file_root_type = '".$this->_FileRoot->type."'
+					   AND file_root_ID = ".$this->_FileRoot->in_type_ID."
+					   AND file_path = ".$DB->quote($this->_rdfp_rel_path),
 					OBJECT, 0, 'Load file meta data' );
 			}
 
@@ -1693,6 +1693,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.40  2007/02/10 18:03:03  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.39  2007/01/26 02:12:06  fplanque
  * cleaner popup windows
  *
