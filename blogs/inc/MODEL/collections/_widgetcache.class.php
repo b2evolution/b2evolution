@@ -76,11 +76,15 @@ class WidgetCache extends DataObjectCache
 			for( $i = 0; $i < count( $widget_rs ); $i++ )
 			{
 				// fp> NOTE: object CPOPYing is weird here but it needs to be like this in PHP4 or all abjects from the loop will look the same
+				// dh> this may seem all weird, because you may have to unset $ComponentWidget when having assigned it by reference before assigning it again in the next loop.
 				$ComponentWidget = & new ComponentWidget( $widget_rs[$i] ); // fp> NOTE: no copy because we need copy on the next line anyway!!
 				// Add to regular cache (but not with $this->add() because we need a COPY!!):
 				$this->cache[$ComponentWidget->ID] = $ComponentWidget; // COPY!!!! WEIRD BUT NECESSARY / PHP 4 (fp)
-				// This is teh cache we're interested in:
+				// This is the cache we're interested in:
 				$this->cache_container_Widget_array[$ComponentWidget->coll_ID][$ComponentWidget->sco_name][] = & $this->cache[$ComponentWidget->ID];
+
+				// TODO: dh> try the next line, and you may be able to assign by reference to $cache or use add()
+				// unset($ComponentWidget);
 			}
 			// pre_dump($this->cache_container_Widget_array[$coll_ID]);
 		}
@@ -105,6 +109,9 @@ class WidgetCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.2  2007/02/10 18:37:16  blueyed
+ * doc/todo
+ *
  * Revision 1.1  2007/01/11 20:44:19  fplanque
  * skin containers proof of concept
  * (no params handling yet though)
