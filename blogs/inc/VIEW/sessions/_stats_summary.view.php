@@ -39,8 +39,8 @@ echo '<p>'.sprintf( T_('This page includes all recorded hits, split down by <a %
 // TODO: I've also limited this to agnt_type "browser" here, according to the change for "referers" (Rev 1.6)
 //       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
 $sql = '
-	SELECT COUNT(*) AS hits, agnt_type, YEAR(hit_datetime) AS year,
-			   MONTH(hit_datetime) AS month, DAYOFMONTH(hit_datetime) AS day
+	SELECT COUNT(*) AS hits, agnt_type, EXTRACT(YEAR FROM hit_datetime) AS year,
+			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
 		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID';
 if( $blog > 0 )
 {
@@ -315,6 +315,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.7  2007/02/10 17:57:16  waltercruz
+ * Changing the MySQL date functions to the standart ones
+ *
  * Revision 1.6  2006/11/26 01:42:10  fplanque
  * doc
  *
