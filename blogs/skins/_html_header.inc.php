@@ -47,5 +47,5 @@ skin_content_header();	// Sets charset!
 <?php
 // ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
 require $skins_path.'_toolbar.inc.php';
-// -------------------------------- END OF HEADER --------------------------------
+// ------------------------------- END OF TOOLBAR --------------------------------
 ?>
