@@ -490,6 +490,7 @@ class Form extends Widget
 	 *                 - 'maxlength': if not set, $field_size gets used (use '' to disable it)
 	 *                 - 'class': the CSS class to use for the <input> element
 	 *                 - 'type': 'text', 'password' (defaults to 'text')
+	 *                 - 'force_to': 'UpperCase' (JS onchange handler)
 	 *                 - NOTE: any other attributes will be used as is (onchange, onkeyup, id, ..).
 	 * @return true|string true (if output) or the generated HTML if not outputting
 	 */
@@ -515,6 +516,16 @@ class Form extends Widget
 		if( !isset($field_params['type']) )
 		{ // type defaults to "text"
 			$field_params['type'] = 'text';
+		}
+
+		if( isset($field_params['force_to']) )
+		{
+			if( $field_params['force_to'] == 'UpperCase' )
+			{ // Force input to uppercase (at front of onchange event)
+				$field_params['onchange'] = 'this.value = this.value.toUpperCase();'
+					.( empty($field_params['onchange']) ? '' : ' '.$field_params['onchange'] );
+			}
+			unset($field_params['force_to']); // not a html attrib
 		}
 
 		// Give it a class, so it can be selected for CSS in IE6
@@ -543,7 +554,7 @@ class Form extends Widget
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function text( $field_name, $field_value, $field_size, $field_label, $field_note = '',
-											$field_maxlength = 0, $field_class = '', $inputtype = 'text' )
+											$field_maxlength = 0, $field_class = '', $inputtype = 'text', $force_to = '' )
 	{
 		$field_params = array();
 
@@ -558,6 +569,10 @@ class Form extends Widget
 		if( $inputtype !== 'text' )
 		{
 			$field_params['type'] = $inputtype;
+		}
+		if( $force_to !== '' )
+		{
+			$field_params['force_to'] = $force_to;
 		}
 
 		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_note, $field_params );
@@ -2703,8 +2718,8 @@ class Form extends Widget
 
 /*
  * $Log$
- * Revision 1.68  2007/02/04 16:38:37  blueyed
- * Removed "force_to" ("UpperCase") bloat; todo: make force-lastname-to-uppercase configurable
+ * Revision 1.69  2007/02/11 15:00:15  fplanque
+ * keeping JS abstraction.
  *
  * Revision 1.67  2007/01/24 06:43:25  fplanque
  * fix
