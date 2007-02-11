@@ -1121,182 +1121,184 @@ function pre_dump( $var__var__var__var__ )
  */
 function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'function' => 'debug_get_backtrace' ), $offset_ignore_from = 0 )
 {
+	if( ! function_exists( 'debug_backtrace' ) ) // PHP 4.3.0
+	{
+		return 'Function debug_backtrace() is not available!';
+	}
+
 	$r = '';
 
-	if( function_exists( 'debug_backtrace' ) ) // PHP 4.3.0
-	{
-		$backtrace = debug_backtrace();
-		$count_ignored = 0; // remember how many have been ignored
-		$limited = false;   // remember if we have limited to $limit_to_last
+	$backtrace = debug_backtrace();
+	$count_ignored = 0; // remember how many have been ignored
+	$limited = false;   // remember if we have limited to $limit_to_last
 
-		if( $ignore_from )
-		{	// we want to ignore from a certain point
-			$trace_length = 0;
-			$break_because_of_offset = false;
+	if( $ignore_from )
+	{	// we want to ignore from a certain point
+		$trace_length = 0;
+		$break_because_of_offset = false;
 
-			for( $i = count($backtrace); $i > 0; $i-- )
-			{	// Search the backtrace from behind (first call).
-				$l_stack = & $backtrace[$i-1];
+		for( $i = count($backtrace); $i > 0; $i-- )
+		{	// Search the backtrace from behind (first call).
+			$l_stack = & $backtrace[$i-1];
 
-				if( $break_because_of_offset && $offset_ignore_from < 1 )
-				{ // we've respected the offset, but need to break now
-					break; // ignore from here
-				}
-
-				foreach( $ignore_from as $l_ignore_key => $l_ignore_value )
-				{	// Check if we want to ignore from here
-					if( is_array($l_ignore_value) )
-					{	// It's an array - all must match
-						foreach( $l_ignore_value as $l_ignore_mult_key => $l_ignore_mult_val )
-						{
-							if( !isset($l_stack[$l_ignore_mult_key]) /* not set with this stack entry */
-								|| strcasecmp($l_stack[$l_ignore_mult_key], $l_ignore_mult_val) /* not this value (case-insensitive) */ )
-							{
-								continue 2; // next ignore setting, because not all match.
-							}
-						}
-						if( $offset_ignore_from-- > 0 )
-						{
-							$break_because_of_offset = true;
-							break;
-						}
-						break 2; // ignore from here
-					}
-					elseif( isset($l_stack[$l_ignore_key])
-						&& !strcasecmp($l_stack[$l_ignore_key], $l_ignore_value) /* is equal case-insensitive */ )
-					{
-						if( $offset_ignore_from-- > 0 )
-						{
-							$break_because_of_offset = true;
-							break;
-						}
-						break 2; // ignore from here
-					}
-				}
-				$trace_length++;
+			if( $break_because_of_offset && $offset_ignore_from < 1 )
+			{ // we've respected the offset, but need to break now
+				break; // ignore from here
 			}
 
-			$count_ignored = count($backtrace) - $trace_length;
-
-			$backtrace = array_slice( $backtrace, 0-$trace_length ); // cut off ignored ones
-		}
-
-		$count_backtrace = count($backtrace);
-		if( is_numeric($limit_to_last) && $limit_to_last < $count_backtrace )
-		{	// we want to limit to a maximum number
-			$limited = true;
-			$backtrace = array_slice( $backtrace, 0, $limit_to_last );
-			$count_backtrace = $limit_to_last;
-		}
-
-		$r .= '<div style="padding:1ex; margin-bottom:1ex; text-align:left; color:#000; background-color:#ddf">
-						<h3>Backtrace:</h3>'."\n";
-		if( $count_backtrace )
-		{
-			$r .= '<ol style="font-family:monospace;">';
-
-			$i = 0;
-			foreach( $backtrace as $l_trace )
-			{
-				if( ++$i == $count_backtrace )
-				{
-					$r .= '<li style="padding:0.5ex 0;">';
-				}
-				else
-				{
-					$r .= '<li style="padding:0.5ex 0; border-bottom:1px solid #77d;">';
-				}
-				$args = array();
-				if( isset($l_trace['args']) && is_array( $l_trace['args'] ) )
-				{	// Prepare args:
-					foreach( $l_trace['args'] as $l_arg )
+			foreach( $ignore_from as $l_ignore_key => $l_ignore_value )
+			{	// Check if we want to ignore from here
+				if( is_array($l_ignore_value) )
+				{	// It's an array - all must match
+					foreach( $l_ignore_value as $l_ignore_mult_key => $l_ignore_mult_val )
 					{
-						$l_arg_type = gettype($l_arg);
-						switch( $l_arg_type )
+						if( !isset($l_stack[$l_ignore_mult_key]) /* not set with this stack entry */
+							|| strcasecmp($l_stack[$l_ignore_mult_key], $l_ignore_mult_val) /* not this value (case-insensitive) */ )
 						{
-							case 'integer':
-							case 'double':
-								$args[] = $l_arg;
-								break;
-							case 'string':
-								$args[] = '"'.htmlspecialchars(str_replace("\n", '', substr($l_arg, 0, 64))).((strlen($l_arg) > 64) ? '...' : '').'"';
-								break;
-							case 'array':
-								$args[] = 'Array('.count($l_arg).')';
-								break;
-							case 'object':
-								$args[] = 'Object('.get_class($l_arg).')';
-								break;
-							case 'resource':
-								$args[] = 'Resource('.strstr($l_arg, '#').')';
-								break;
-							case 'boolean':
-								$args[] = $l_arg ? 'true' : 'false';
-								break;
-							default:
-								$args[] = $l_arg_type;
+							continue 2; // next ignore setting, because not all match.
 						}
 					}
+					if( $offset_ignore_from-- > 0 )
+					{
+						$break_because_of_offset = true;
+						break;
+					}
+					break 2; // ignore from here
 				}
-
-				$call = '<strong>';
-				if( isset($l_trace['class']) )
+				elseif( isset($l_stack[$l_ignore_key])
+					&& !strcasecmp($l_stack[$l_ignore_key], $l_ignore_value) /* is equal case-insensitive */ )
 				{
-					$call .= $l_trace['class'];
+					if( $offset_ignore_from-- > 0 )
+					{
+						$break_because_of_offset = true;
+						break;
+					}
+					break 2; // ignore from here
 				}
-				if( isset($l_trace['type']) )
-				{
-					$call .= $l_trace['type'];
-				}
-				$call .= $l_trace['function'].'(</strong>';
-				if( $args )
-				{
-					$call .= ' '.implode( ', ', $args ).' ';
-				}
-				$call .='<strong>)</strong>';
-
-				$r .= $call."<br />\n";
-
-				$r .= '<strong>';
-				if( isset($l_trace['file']) )
-				{
-					$r .= 'File: </strong> '.$l_trace['file'];
-				}
-				else
-				{
-					$r .= '[runtime created function]</strong>';
-				}
-				if( isset($l_trace['line']) )
-				{
-					$r .= ':'.$l_trace['line'];
-				}
-
-				$r .= "</li>\n";
 			}
-			$r .= '</ol>';
-		}
-		else
-		{
-			$r .= '<p>No backtrace available.</p>';
+			$trace_length++;
 		}
 
-		// Extra notes, might be to much, but explains why we stopped at some point. Feel free to comment it out or remove it.
-		$notes = array();
-		if( $count_ignored )
-		{
-			$notes[] = 'Ignored last: '.$count_ignored;
-		}
-		if( $limited )
-		{
-			$notes[] = 'Limited to'.( $count_ignored ? ' remaining' : '' ).': '.$limit_to_last;
-		}
-		if( $notes )
-		{
-			$r .= '<p class="small">'.implode( ' - ', $notes ).'</p>';
-		}
+		$count_ignored = count($backtrace) - $trace_length;
 
-		$r .= "</div>\n";
+		$backtrace = array_slice( $backtrace, 0-$trace_length ); // cut off ignored ones
 	}
+
+	$count_backtrace = count($backtrace);
+	if( is_numeric($limit_to_last) && $limit_to_last < $count_backtrace )
+	{	// we want to limit to a maximum number
+		$limited = true;
+		$backtrace = array_slice( $backtrace, 0, $limit_to_last );
+		$count_backtrace = $limit_to_last;
+	}
+
+	$r .= '<div style="padding:1ex; margin-bottom:1ex; text-align:left; color:#000; background-color:#ddf;">
+					<h3>Backtrace:</h3>'."\n";
+	if( $count_backtrace )
+	{
+		$r .= '<ol style="font-family:monospace;">';
+
+		$i = 0;
+		foreach( $backtrace as $l_trace )
+		{
+			if( ++$i == $count_backtrace )
+			{
+				$r .= '<li style="padding:0.5ex 0;">';
+			}
+			else
+			{
+				$r .= '<li style="padding:0.5ex 0; border-bottom:1px solid #77d;">';
+			}
+			$args = array();
+			if( isset($l_trace['args']) && is_array( $l_trace['args'] ) )
+			{	// Prepare args:
+				foreach( $l_trace['args'] as $l_arg )
+				{
+					$l_arg_type = gettype($l_arg);
+					switch( $l_arg_type )
+					{
+						case 'integer':
+						case 'double':
+							$args[] = $l_arg;
+							break;
+						case 'string':
+							$args[] = '"'.htmlspecialchars(str_replace("\n", '', substr($l_arg, 0, 64))).((strlen($l_arg) > 64) ? '...' : '').'"';
+							break;
+						case 'array':
+							$args[] = 'Array('.count($l_arg).')';
+							break;
+						case 'object':
+							$args[] = 'Object('.get_class($l_arg).')';
+							break;
+						case 'resource':
+							$args[] = 'Resource('.strstr($l_arg, '#').')';
+							break;
+						case 'boolean':
+							$args[] = $l_arg ? 'true' : 'false';
+							break;
+						default:
+							$args[] = $l_arg_type;
+					}
+				}
+			}
+
+			$call = "<strong>\n";
+			if( isset($l_trace['class']) )
+			{
+				$call .= $l_trace['class'];
+			}
+			if( isset($l_trace['type']) )
+			{
+				$call .= $l_trace['type'];
+			}
+			$call .= $l_trace['function']."( </strong>\n";
+			if( $args )
+			{
+				$call .= ' '.implode( ', ', $args ).' ';
+			}
+			$call .='<strong>)</strong>';
+
+			$r .= $call."<br />\n";
+
+			$r .= '<strong>';
+			if( isset($l_trace['file']) )
+			{
+				$r .= "File: </strong> ".$l_trace['file'];
+			}
+			else
+			{
+				$r .= '[runtime created function]</strong>';
+			}
+			if( isset($l_trace['line']) )
+			{
+				$r .= ' on line '.$l_trace['line'];
+			}
+
+			$r .= "</li>\n";
+		}
+		$r .= '</ol>';
+	}
+	else
+	{
+		$r .= '<p>No backtrace available.</p>';
+	}
+
+	// Extra notes, might be to much, but explains why we stopped at some point. Feel free to comment it out or remove it.
+	$notes = array();
+	if( $count_ignored )
+	{
+		$notes[] = 'Ignored last: '.$count_ignored;
+	}
+	if( $limited )
+	{
+		$notes[] = 'Limited to'.( $count_ignored ? ' remaining' : '' ).': '.$limit_to_last;
+	}
+	if( $notes )
+	{
+		$r .= '<p class="small">'.implode( ' - ', $notes ).'</p>';
+	}
+
+	$r .= "</div>\n";
 
 	return $r;
 }
@@ -2824,6 +2826,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.169  2007/02/11 02:10:35  blueyed
+ * Minor improvements to debug_get_backtrace()
+ *
  * Revision 1.168  2007/02/06 13:47:25  blueyed
  * Fixed escaping in get_link_showhide(); added jsspecialchars(); see http://forums.b2evolution.net/viewtopic.php?p=50564
  *
