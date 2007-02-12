@@ -49,6 +49,8 @@ $Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sens
 echo $Form->fieldstart;
 
 $Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20, 'class'=>'input_text', 'required'=>true ) );
+
+// TODO: dh> display param errors with pass1 and pass2..
 ?>
 
 	<fieldset>
@@ -79,7 +81,7 @@ $Form->end_form(); // display hidden fields etc
 ?>
 
 <div style="text-align:right">
-	<a href="<?php echo $htsrv_url_sensitive.'login.php' ?>"><?php echo T_('Log into existing account...') ?></a>
+	<a href="<?php echo $htsrv_url_sensitive.'login.php?redirect_to='.rawurlencode(url_rel_to_same_host($redirect_to, $htsrv_url_sensitive)) ?>"><?php echo T_('Log into existing account...') ?></a>
 </div>
 
 <?php
@@ -87,6 +89,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.12  2007/02/12 00:20:41  blueyed
+ * Pass redirect_to param to "Login..." link
+ *
  * Revision 1.11  2006/12/09 01:55:36  fplanque
  * feel free to fill in some missing notes
  * hint: "login" does not need a note! :P
