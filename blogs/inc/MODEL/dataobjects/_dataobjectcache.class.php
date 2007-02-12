@@ -58,7 +58,7 @@ class DataObjectCache
 	var $objtype;
 
 	/**
-	 * Object array
+	 * Object array by ID
 	 */
 	var $cache = array();
 
@@ -68,8 +68,22 @@ class DataObjectCache
 	 */
 	var $shadow_cache = NULL;
 
+	/**
+	 * NON indexed object array
+	 * @var array of DataObjects
+	 */
+	var $DataObject_array = array();
+
+  /**
+	 * Index of current iteration
+	 * @see DataObjectCache::get_next()
+	 */
+	var $current_idx = NULL;
+
 	var $load_all = false;
 	var $all_loaded = false;
+
+
 	var $name_field;
 	var $order_by;
 
@@ -238,15 +252,19 @@ class DataObjectCache
 			return false;
 		}
 
+		// fplanque: I don't want an extra (and expensive) comparison here. $this->cache[$Obj->ID] === $Obj.
+		// If you need this you're probably misusing the cache.
 		if( isset($this->cache[$Obj->ID]) )
-		// fplanque: I don't want an extra (and expensive) comparison here. $this->cache[$Obj->ID] === $Obj. If you need this you're probably misusing the cache.
 		{
 			$Debuglog->add( $this->objtype.': Object with ID '.$Obj->ID.' is already cached', 'dataobjects' );
 			return false;
 		}
 
 		// If the object is valid and not already cached:
+		// Add object to cache:
 		$this->cache[$Obj->ID] = & $Obj;
+		// Add a reference in the object list:
+		$this->DataObject_array[] = & $Obj;
 
 		return true;
 	}
@@ -301,7 +319,54 @@ class DataObjectCache
 		}
 
 		$this->cache = array();
+		$this->DataObject_array = array();
 		$this->all_loaded = false;
+		$this->current_idx = NULL;
+	}
+
+
+  /**
+	 * This provides a simple interface for looping over the contents of the Cache.
+	 *
+	 * This should only be used for basic enumeration.
+	 * If you need complex filtering of the cache contents, you should probablt use a DataObjectList instead.
+	 *
+	 * @see DataObject::get_next()
+	 *
+	 * @return DataObject
+	 */
+	function & get_first()
+	{
+		$this->load_all();
+
+		$this->current_idx = -1;
+		return $this->get_next();
+	}
+
+
+  /**
+	 * This provides a simple interface for looping over the contents of the Cache.
+	 *
+	 * This should only be used for basic enumeration.
+	 * If you need complex filtering of the cache contents, you should probablt use a DataObjectList instead.
+	 *
+	 * @see DataObject::get_first()
+	 *
+	 * @return DataObject
+	 */
+	function & get_next()
+	{
+		$this->current_idx++;
+		// echo 'getting idx:'.$this->current_idx;
+
+		if( ! isset( $this->DataObject_array[$this->current_idx] ) )
+		{
+			$this->current_idx = NULL;
+			$r = NULL;
+			return $r;
+		}
+
+		return $this->DataObject_array[$this->current_idx];
 	}
 
 
@@ -516,6 +581,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.29  2007/02/12 15:42:40  fplanque
+ * public interface for looping over a cache
+ *
  * Revision 1.28  2006/12/29 01:10:06  fplanque
  * basic skin registering
  *

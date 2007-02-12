@@ -481,16 +481,23 @@ function cat_select( $display_info = true, $form_fields = true )
 
 	if( $allow_cross_posting >= 2 )
 	{ // If BLOG cross posting enabled, go through all blogs with cats:
-		foreach( $cache_blogs as $i_blog )
+    /**
+		 * @var BlogCache
+		 */
+		$BlogCache = & get_Cache('BlogCache');
+
+    /**
+		 * @var Blog
+		 */
+		for( $l_Blog = & $BlogCache->get_first(); !is_null($l_Blog); $l_Blog = & $BlogCache->get_next() )
 		{ // run recursively through the cats
-			$current_blog_ID = $i_blog->blog_ID;
-			if( ! blog_has_cats( $current_blog_ID ) )
+			if( ! blog_has_cats( $l_Blog->ID ) )
 				continue;
-			if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $current_blog_ID ) )
+			if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $l_Blog->ID ) )
 				continue;
-			$r .= '<h4>'.format_to_output($i_blog->blog_name)."</h4>\n";
+			$r .= '<h4>'.$l_Blog->dget('name')."</h4>\n";
 			$r .= '<table cellspacing="0" class="catselect">'.cat_select_header();
-			$r .= cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
+			$r .= cat_children( $cache_categories, $l_Blog->ID, NULL, 'cat_select_before_first',
 										'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
 			$r .= '</table>';
 		}
@@ -687,6 +694,9 @@ function attach_browse_tabs()
 
 /*
  * $Log$
+ * Revision 1.41  2007/02/12 15:42:40  fplanque
+ * public interface for looping over a cache
+ *
  * Revision 1.40  2007/02/06 13:34:20  waltercruz
  * Changing double quotes to single quotes
  *
