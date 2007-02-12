@@ -136,11 +136,11 @@ class Plugins
 	 * @var string
 	 * @static
 	 */
-	var $sql_load_plugins_table = "
+	var $sql_load_plugins_table = '
 			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_name, plug_shortdesc, plug_apply_rendering, plug_status, plug_version, plug_spam_weight
 			  FROM T_plugins
-			 WHERE plug_status = 'enabled'
-			 ORDER BY plug_priority, plug_classname";
+			 WHERE plug_status = \'enabled\'
+			 ORDER BY plug_priority, plug_classname';
 
 	/**#@-*/
 
@@ -1676,12 +1676,12 @@ class Plugins
 		$this->index_event_IDs = array();
 
 		$Debuglog->add( 'Loading plugin events.', 'plugins' );
-		foreach( $DB->get_results( "
+		foreach( $DB->get_results( '
 				SELECT pevt_plug_ID, pevt_event
 					FROM T_pluginevents INNER JOIN T_plugins ON pevt_plug_ID = plug_ID
 				 WHERE pevt_enabled > 0
-				   AND plug_status = 'enabled'
-				 ORDER BY plug_priority, plug_classname", OBJECT, 'Loading plugin events' ) as $l_row )
+				   AND plug_status = \'enabled\'
+				 ORDER BY plug_priority, plug_classname', OBJECT, 'Loading plugin events' ) as $l_row )
 		{
 			$this->index_event_IDs[$l_row->pevt_event][] = $l_row->pevt_plug_ID;
 		}
@@ -1806,6 +1806,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.146  2007/02/12 15:42:59  fplanque
+ * no message
+ *
  * Revision 1.145  2007/02/10 18:39:54  blueyed
  * Fix: update "plug_version" in indices, so PluginVersionChanged does not get called twice (in Plugins_admin too)
  *
