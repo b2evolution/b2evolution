@@ -1441,11 +1441,12 @@ function url_add_tail( $url, $tail )
  * @param string Url to validate
  * @param array Allowed URI schemes (see /conf/_formatting.php)
  * @param boolean Must the URL be absolute?
+ * @param boolean Return verbose error message? (Should get only used in the backoffice)
  * @return mixed false (which means OK) or error message
  */
-function validate_url( $url, & $allowed_uri_scheme, $absolute = false )
+function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose = false )
 {
-	global $debug, $Debuglog;
+	global $Debuglog;
 
 	if( empty($url) )
 	{ // Empty URL, no problem
@@ -1461,9 +1462,17 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false )
 		if( substr($url, 0, 6) == 'mailto' )
 		{ // mailto:link
 			preg_match( '~^(mailto):(.*?)(\?.*)?$~', $url, $match );
-			if( ! $match || ! is_email($match[2]) )
+			if( ! $match )
 			{
-				return T_('Supplied email address is invalid.');
+				return $verbose
+					? sprintf( T_('Invalid email link: %s.'), $url )
+					: T_('Invalid email link.');
+			}
+      elseif( ! is_email($match[2]) )
+			{
+				return $verbose
+					? sprintf( T_('Supplied email address (%s) is invalid.'), $match[2] )
+					: T_('Invalid email address.');
 			}
 		}
 		elseif( ! preg_match('~^           # start
@@ -1474,39 +1483,44 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false )
 			(:[0-9]+)?                       # optional port specification
 			~ix', $url, $match) )
 		{ // Cannot validate URL structure
-			if( isset($Debuglog) ) $Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
-			return T_('Invalid URL');
+			$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
+			return $verbose
+				? sprintf( T_('Invalid URL format (%s).'), $url )
+				: T_('Invalid URL format.');
 		}
 
 		$scheme = strtolower($match[1]);
 		if( !in_array( $scheme, $allowed_uri_scheme ) )
 		{ // Scheme not allowed
-			if( isset($Debuglog) ) $Debuglog->add( 'URL scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
-			return T_('URI scheme not allowed');
+			$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
+			return $verbose
+				? sprintf( T_('URI scheme "%s" not allowed.'), $scheme )
+				: T_('URI scheme not allowed.');
 		}
 
 		// Search for blocked URLs:
 		if( $block = antispam_check($url) )
 		{
-			if( $debug ) return 'Url refused. Debug info: blacklisted word: ['.$block.']';
-			return T_('URL not allowed');
+			return $verbose
+				? sprintf( T_('URL "%s" not allowed: blacklisted word "%s".'), $url, $block )
+				: T_('URL not allowed');
 		}
 	}
 	else
 	{ // URL is relative..
 		if( $absolute )
 		{
-			return T_('URL must be absolute.');
+			return $verbose ? sprintf( T_('URL "%s" must be absolute.'), $url ) : T_('URL must be absolute.');
 		}
 
 		$char = substr($url, 0, 1);
 		if( $char != '/' && $char != '#' )
 		{ // must start with a slash or hash (for HTML anchors to the same page)
-// fp> indent			if( $debug ) return 'Url refused. Debug info: relative URL not starting with "/" or "#": ['.$url.']';
-			return T_('URL must be a full path starting with "/" or an anchor starting with "#".');
+			return $verbose
+				? sprintf( T_('URL "%s" must be a full path starting with "/" or an anchor starting with "#".'), $url )
+				: T_('URL must be a full path starting with "/" or an anchor starting with "#".');
 		}
 	}
-
 
 	return false; // OK
 }
@@ -1631,6 +1645,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.29  2007/02/12 17:59:52  blueyed
+ * $verbose param for validate_url() - not used yet anywhere, but useful IMHO, e.g. in the backoffice.
+ *
  * Revision 1.28  2007/01/26 00:21:23  blueyed
  * Fixed possible E_NOTICE; TODO
  *
