@@ -327,6 +327,7 @@ if( $Comment->ID )
 	 * New comment notifications:
 	 * --------------------------
 	 */
+	// TODO: dh> this should only send published feedback probably and should also use "outbound_notifications_mode"
 	$Comment->send_email_notifications();
 
 
@@ -351,6 +352,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.106  2007/02/13 01:30:31  blueyed
+ * TODO: do not notify about not published comments / use "outbound_notifications_mode" setting for comments, too
+ *
  * Revision 1.105  2007/02/03 18:52:15  fplanque
  * doc
  *

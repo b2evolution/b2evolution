@@ -4,6 +4,8 @@
  *
  * @author fplanque: Francois PLANQUE
  *
+ * @todo dh> Should this also handle feedback notifications (according to the "outbound_notifications_mode" setting)?
+ *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -63,6 +65,9 @@ return 1; /* ok */
 
 /*
  * $Log$
+ * Revision 1.4  2007/02/13 01:30:31  blueyed
+ * TODO: do not notify about not published comments / use "outbound_notifications_mode" setting for comments, too
+ *
  * Revision 1.3  2006/12/12 02:53:56  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.
