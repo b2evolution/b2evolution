@@ -1506,6 +1506,21 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 	}
 
+	// ____________________________ 1.10: ____________________________
+
+	if( $old_db_version < 9350 )
+	{
+		echo 'Updating post tables... ';
+		$DB->query( 'ALTER TABLE T_posts CHANGE COLUMN post_content post_content MEDIUMTEXT NULL' );
+		$DB->query( 'ALTER TABLE T_item__prerendering CHANGE COLUMN itpr_content_prerendered itpr_content_prerendered MEDIUMTEXT NULL' );
+		echo "OK.<br />\n";
+
+		echo 'Updating sessions table... ';
+		$DB->query( 'ALTER TABLE T_sessions CHANGE COLUMN sess_data sess_data MEDIUMBLOB DEFAULT NULL' );
+		echo "OK.<br />\n";
+	}
+
+
 	// TODO: "If a user has permission to edit a blog, he should be able to put files in the media folder for that blog." - see http://forums.b2evolution.net/viewtopic.php?p=36417#36417
 	/*
 	// blueyed>> I've came up with the following, but it's too generic IMHO
@@ -1521,9 +1536,7 @@ function upgrade_b2evo_tables()
 	*/
 
 
-
-	// Version 2.0 starts here
-
+	// ____________________________ 2.0: ____________________________
 
 	if( $old_db_version < 9406 )
 	{
@@ -1655,11 +1668,6 @@ function upgrade_b2evo_tables()
 									 ADD COLUMN blog_skin_ID INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER blog_allowusercss' );
 		echo "OK.<br />\n";
 
-		echo 'Updating post tables... ';
-		$DB->query( 'ALTER TABLE T_posts CHANGE COLUMN post_content post_content MEDIUMTEXT NULL' );
-		$DB->query( 'ALTER TABLE T_item__prerendering CHANGE COLUMN itpr_content_prerendered itpr_content_prerendered MEDIUMTEXT NULL' );
-		echo "OK.<br />\n";
-
 
 		install_basic_widgets();
 	}
@@ -1780,6 +1788,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.209  2007/02/13 00:38:11  blueyed
+ * Changed DB fields for 1.10.0: sess_data to MEDIUMTEXT (serialize() does not completely convert the binary data to text); post_content and itpr_content_prerendered to MEDIUMTEXT
+ *
  * Revision 1.208  2007/02/05 00:35:44  fplanque
  * small adjustments
  *

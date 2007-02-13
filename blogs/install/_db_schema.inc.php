@@ -295,9 +295,10 @@ $schema_queries = array(
 			sess_lastseen  DATETIME NOT NULL,
 			sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
 			sess_user_ID   INT(10) DEFAULT NULL,
-			sess_data      TEXT DEFAULT NULL,
+			sess_data      MEDIUMBLOB DEFAULT NULL,
 			PRIMARY KEY( sess_ID )
 		)" ), // NOTE: sess_lastseen is only relevant/used by Sessions class (+ stats) and results in a quite large index (file size wise)
+		// NOTE: sess_data is (MEDIUM)BLOB because e.g. serialize() does not completely convert binary data to text
 
 	'T_usersettings' => array(
 		'Creating user settings table',
@@ -525,6 +526,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.52  2007/02/13 00:38:11  blueyed
+ * Changed DB fields for 1.10.0: sess_data to MEDIUMTEXT (serialize() does not completely convert the binary data to text); post_content and itpr_content_prerendered to MEDIUMTEXT
+ *
  * Revision 1.51  2007/02/03 19:05:36  fplanque
  * allow longer posts
  *
