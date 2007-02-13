@@ -184,6 +184,10 @@ switch( $action )
 			}
 		}
 
+		// Autologin the user. This is more comfortable for the user and avoids
+		// extra confusion when account validation is required.
+		$Session->set_User( $new_User );
+
 		// Display confirmation screen:
 		require $view_path.'login/_reg_complete.php';
 
@@ -211,6 +215,12 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.82  2007/02/13 21:03:40  blueyed
+ * Improved login/register/validation process:
+ * - "Your account has been validated already." if an account had already been validated
+ * - "We have already sent you %d email(s) with a validation link." note
+ * - Autologin the user after he has registered (he just typed his credentials!)
+ *
  * Revision 1.81  2007/01/28 23:58:46  blueyed
  * - Added hook CommentFormSent
  * - Re-ordered comment_post.php to: init, validate, process

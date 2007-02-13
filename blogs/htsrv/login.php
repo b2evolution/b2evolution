@@ -191,47 +191,55 @@ switch( $action )
 		param( 'reqID', 'string', '' );
 		param( 'sessID', 'integer', '' );
 
-		// Catch errors:
-
-		if( empty($reqID) )
-		{ // This was not requested
-			$Messages->add( T_('Invalid email address validation request!'), 'error' );
-			$action = 'req_validatemail';
-			break;
+		if( is_logged_in() && $current_User->validated )
+		{ // Already validated, e.g. clicked on an obsolete email link:
+			$Messages->add( T_('Your account has been validated already.'), 'note' );
+			// no break: cleanup & redirect below
 		}
-
-		if( $sessID != $Session->ID )
-		{ // Another session ID than for requesting account validation link used!
-			$Messages->add( T_('You have to use the same session (by means of your session cookie) as when you have requested the action. Please try again...'), 'error' );
-			$action = 'req_validatemail';
-			break;
-		}
-
-		// Validate provided reqID against the one stored in the user's session
-		$request_ids = $Session->get( 'core.validatemail.request_ids' );
-		if( ( ! is_array($request_ids) || ! in_array( $reqID, $request_ids ) )
-			&& ! ( isset($current_User) && $current_User->group_ID == 1 && $reqID == 1 /* admin users can validate themselves by a button click */ ) )
+		else
 		{
-			$Messages->add( T_('Invalid email address validation request!'), 'error' );
-			$action = 'req_validatemail';
-			$login_required = true; // Do not display "Without login.." link on the form
-			break;
+			// Check valid format:
+			if( empty($reqID) )
+			{ // This was not requested
+				$Messages->add( T_('Invalid email address validation request!'), 'error' );
+				$action = 'req_validatemail';
+				break;
+			}
+
+			// Check valid session (format only, meant as help for the user):
+			if( $sessID != $Session->ID )
+			{ // Another session ID than for requesting account validation link used!
+				$Messages->add( T_('You have to use the same session (by means of your session cookie) as when you have requested the action. Please try again...'), 'error' );
+				$action = 'req_validatemail';
+				break;
+			}
+
+			// Validate provided reqID against the one stored in the user's session
+			$request_ids = $Session->get( 'core.validatemail.request_ids' );
+			if( ( ! is_array($request_ids) || ! in_array( $reqID, $request_ids ) )
+				&& ! ( isset($current_User) && $current_User->group_ID == 1 && $reqID == 1 /* admin users can validate themselves by a button click */ ) )
+			{
+				$Messages->add( T_('Invalid email address validation request!'), 'error' );
+				$action = 'req_validatemail';
+				$login_required = true; // Do not display "Without login.." link on the form
+				break;
+			}
+
+			if( ! is_logged_in() )
+			{ // this can happen, if a new user registers and clicks on the "validate by email" link, without logging in first
+				// Note: we reuse $reqID and $sessID in the form to come back here.
+
+				$Messages->add( T_('Please login to validate your account.'), 'error' );
+				break;
+			}
+
+			// Validate user:
+
+			$current_User->set( 'validated', 1 );
+			$current_User->dbupdate();
+
+			$Messages->add( T_( 'Your email address has been validated.' ), 'success' );
 		}
-
-		if( ! is_logged_in() )
-		{ // this can happen, if a new user registers and clicks on the "validate by email" link, without logging in first
-			$Messages->add( T_('Please login to validate your account.'), 'error' );
-			break;
-		}
-
-		// Validate user:
-
-		$current_User->set( 'validated', 1 );
-		$current_User->dbupdate();
-
-		$Session->delete( 'core.validatemail.request_ids' );
-
-		$Messages->add( T_( 'Your email address has been validated.' ), 'success' );
 
 		$redirect_to = $Session->get( 'core.validatemail.redirect_to' );
 
@@ -239,6 +247,10 @@ switch( $action )
 		{ // User can access backoffice
 			$redirect_to = $admin_url;
 		}
+
+		// Cleanup:
+		$Session->delete('core.validatemail.request_ids');
+		$Session->delete('core.validatemail.redirect_to');
 
 		header_nocache();
 		// redirect Will save $Messages into Session:
@@ -254,14 +266,15 @@ switch( $action )
 switch( $action )
 {
 	case 'req_validatemail': // Send email validation link by mail (initial form and action)
-		if( ! $Settings->get('newusers_mustvalidate') )
-		{ // validating emails is not activated/necessary
-			break;
-		}
-
 		if( ! is_logged_in() )
 		{
 			$Messages->add( T_('You have to be logged in to request an account validation link.'), 'error' );
+			$action = '';
+			break;
+		}
+
+		if( ! $Settings->get('newusers_mustvalidate') || $current_User->validated )
+		{ // validating emails is not activated/necessary (check this after login, so it gets not "announced")
 			$action = '';
 			break;
 		}
@@ -300,6 +313,13 @@ switch( $action )
 		}
 		else
 		{ // Form not yet submitted:
+			// Add a note, if we have already sent validation links:
+			$request_ids = $Session->get( 'core.validatemail.request_ids' );
+			if( is_array($request_ids) && count($request_ids) )
+			{
+				$Messages->add( sprintf( T_('We have already sent you %d email(s) with a validation link.'), count($request_ids) ), 'note' );
+			}
+
 			if( empty($current_User->email) )
 			{ // add (error) note to be displayed in the form
 				$Messages->add( T_('You have no email address with your profile, therefore we cannot validate it. Please give your email address below.'), 'error' );
@@ -322,10 +342,17 @@ if( ! defined( 'EVO_MAIN_INIT' ) )
 
 // Note: the following regexp would fail when loging on to the same domain, because cookie_domain starts with a dot '.'
 // However, same domain logins will happen with a relative redirect_to, so it is covered with '^/'
-if( strlen($redirect_to) && !preg_match( '#^/|(https?://[a-z\-.]*'.str_replace( '.', '\.', $cookie_domain ).')#i', $redirect_to ) )
+// (forms should use e.g. "url_rel_to_same_host($redirect_to, $htsrv_url_sensitive)" for this)
+if( strlen($redirect_to) )
 {
-	$Messages->add( sprintf( T_('WARNING: you are trying to log in to <strong>%s</strong> but your cookie domain is <strong>%s</strong>. You will not be able to successfully log in to the requested domain until you fix your cookie domain in your %s configuration.'), $redirect_to, $cookie_domain, $app_name ), 'error' );
+	// Make it relative to the form's target, in case it has been set absolute (and can be made relative).
+	// Just in case it gets sent absolute. This should not trigger this warning then..!
+	$redirect_to = url_rel_to_same_host($redirect_to, $htsrv_url_sensitive);
 
+	if( !preg_match( '#^/|(https?://[a-z\-.]*'.str_replace( '.', '\.', $cookie_domain ).')#i', $redirect_to ) )
+	{
+		$Messages->add( sprintf( T_('WARNING: you are trying to log in to <strong>%s</strong> but your cookie domain is <strong>%s</strong>. You will not be able to successfully log in to the requested domain until you fix your cookie domain in your %s configuration.'), $redirect_to, $cookie_domain, $app_name ), 'error' );
+	}
 }
 
 
@@ -366,6 +393,12 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.88  2007/02/13 21:03:40  blueyed
+ * Improved login/register/validation process:
+ * - "Your account has been validated already." if an account had already been validated
+ * - "We have already sent you %d email(s) with a validation link." note
+ * - Autologin the user after he has registered (he just typed his credentials!)
+ *
  * Revision 1.87  2007/02/03 19:48:55  blueyed
  * Fixed possible E_NOTICE
  *

@@ -47,9 +47,11 @@ $Form->info( T_('Login'), $login );
 $Form->info( T_('Email'), $email );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( '', array( 'class'=>'submit' ) );
-$Form->submit( array( '', T_('Log in!'), 'ActionButton' ) );
-$Form->end_fieldset();
+// Now the user has been logged in automatically at the end of the registration progress.
+// Allow him to go to the blogs, though he will see the "validate account" screen then, if he has not clicked
+// the validation link yet and validation is required.
+echo '<p class="center"><a href="'.$baseurl.'">'.T_('Go to blogs').'</a></p>';
+
 
 $Form->end_form();
 
@@ -57,6 +59,12 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.8  2007/02/13 21:03:40  blueyed
+ * Improved login/register/validation process:
+ * - "Your account has been validated already." if an account had already been validated
+ * - "We have already sent you %d email(s) with a validation link." note
+ * - Autologin the user after he has registered (he just typed his credentials!)
+ *
  * Revision 1.7  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
