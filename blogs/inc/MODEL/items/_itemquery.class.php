@@ -468,17 +468,17 @@ class ItemQuery extends SQL
 			}
 			elseif( !empty($m) )
 			{	// We want to restrict on an interval:
-				$this->WHERE_and( 'YEAR('.$this->dbprefix.'datestart)='.intval(substr($m,0,4)) );
+				$this->WHERE_and( 'EXTRACT(YEAR FROM '.$this->dbprefix.'datestart)='.intval(substr($m,0,4)) );
 				if( strlen($m) > 5 )
-					$this->WHERE_and( 'MONTH('.$this->dbprefix.'datestart)='.intval(substr($m,4,2)) );
+					$this->WHERE_and( 'EXTRACT(MONTH FROM '.$this->dbprefix.'datestart)='.intval(substr($m,4,2)) );
 				if( strlen($m) > 7 )
-					$this->WHERE_and( 'DAYOFMONTH('.$this->dbprefix.'datestart)='.intval(substr($m,6,2)) );
+					$this->WHERE_and( 'EXTRACT(DAY FROM '.$this->dbprefix.'datestart)='.intval(substr($m,6,2)) );
 				if( strlen($m) > 9 )
-					$this->WHERE_and( 'HOUR('.$this->dbprefix.'datestart)='.intval(substr($m,8,2)) );
+					$this->WHERE_and( 'EXTRACT(HOUR FROM '.$this->dbprefix.'datestart)='.intval(substr($m,8,2)) );
 				if( strlen($m) > 11 )
-					$this->WHERE_and( 'MINUTE('.$this->dbprefix.'datestart)='.intval(substr($m,10,2)) );
+					$this->WHERE_and( 'EXTRACT(MINUTE FROM '.$this->dbprefix.'datestart)='.intval(substr($m,10,2)) );
 				if( strlen($m) > 13 )
-					$this->WHERE_and( 'SECOND('.$this->dbprefix.'datestart)='.intval(substr($m,12,2)) );
+					$this->WHERE_and( 'EXTRACT(SECOND FROM '.$this->dbprefix.'datestart)='.intval(substr($m,12,2)) );
 
 				$start_is_set = true;
 				$stop_is_set = true;
@@ -589,6 +589,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.14  2007/02/14 15:04:35  waltercruz
+ * Changing the date queries to the EXTRACT syntax
+ *
  * Revision 1.13  2007/02/06 13:37:45  waltercruz
  * Changing double quotes to single quotes
  *
