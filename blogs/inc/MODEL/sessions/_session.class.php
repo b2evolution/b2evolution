@@ -200,13 +200,13 @@ class Session
 			$this->key = generate_random_key(32);
 
 			// We need to INSERT now because we need an ID now! (for the cookie)
-			$DB->query( '
+			$DB->query( "
 				INSERT INTO T_sessions( sess_key, sess_lastseen, sess_ipaddress )
 				VALUES (
-					"'.$this->key.'",
-					"'.date( 'Y-m-d H:i:s', $localtimenow ).'",
-					"'.$Hit->IP.'"
-				)' );
+					'".$this->key."',
+					'".date( 'Y-m-d H:i:s', $localtimenow )."',
+					'".$Hit->IP."'
+				)" );
 
 			$this->ID = $DB->insert_id;
 
@@ -498,6 +498,9 @@ function session_unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.34  2007/02/14 14:38:04  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.33  2007/01/27 15:18:23  blueyed
  * doc
  *
