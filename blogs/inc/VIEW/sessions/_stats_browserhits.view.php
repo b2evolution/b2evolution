@@ -39,9 +39,15 @@ echo '<p>'.sprintf( T_('This page only includes hits identified as made by a <a 
 // Solution : CAST to string
 // TODO: I've also limited this to agnt_type "browser" here, according to the change for "referers" (Rev 1.6)
 //       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
+// waltercruz >> MySQL sorts ENUM columns according to the order in which the enumeration
+// members were listed in the column specification, not the lexical order. Solution: CAST to string using using CONCAT
+// or CAST (but CAST only works from MySQL 4.0.2)
+// References:
+// http://dev.mysql.com/doc/refman/5.0/en/enum.html
+// http://dev.mysql.com/doc/refman/4.1/en/cast-functions.html
 $sql = '
-	SELECT COUNT(*) AS hits, CONCAT(hit_referer_type) AS referer_type, YEAR(hit_datetime) AS year,
-			   MONTH(hit_datetime) AS month, DAYOFMONTH(hit_datetime) AS day
+	SELECT COUNT(*) AS hits, CONCAT(hit_referer_type) AS referer_type, EXTRACT(YEAR FROM hit_datetime) AS year,
+			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
 		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
 	 WHERE agnt_type = "browser"';
 if( $blog > 0 )
@@ -336,6 +342,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.7  2007/02/14 11:39:18  waltercruz
+ * Reverting the reverted query and adding a comment about the sorting of ENUMS
+ *
  * Revision 1.6  2007/02/11 15:19:58  fplanque
  * rollback of non equivalent query
  *
