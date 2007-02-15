@@ -400,14 +400,14 @@ class Session
 		}
 
 		$sess_data = empty($this->_data) ? NULL : serialize($this->_data);
-		$DB->query( '
+		$DB->query( "
 			UPDATE T_sessions SET
-				sess_data = '.$DB->quote( $sess_data ).',
-				sess_ipaddress = "'.$Hit->IP.'",
-				sess_key = '.$DB->quote( $this->key ).',
-				sess_lastseen = "'.date( 'Y-m-d H:i:s', $localtimenow ).'",
-				sess_user_ID = '.$DB->null( $this->user_ID ).'
-			WHERE sess_ID = '.$this->ID, 'Session::dbsave()' );
+				sess_data = ".$DB->quote( $sess_data ).",
+				sess_ipaddress = '".$Hit->IP."',
+				sess_key = ".$DB->quote( $this->key ).",
+				sess_lastseen = '".date( 'Y-m-d H:i:s', $localtimenow )."',
+				sess_user_ID = ".$DB->null( $this->user_ID )."
+			WHERE sess_ID = ".$this->ID, 'Session::dbsave()' );
 
 		$Debuglog->add( 'Session data saved!', 'session' );
 
@@ -498,6 +498,9 @@ function session_unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.35  2007/02/15 16:37:53  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.34  2007/02/14 14:38:04  waltercruz
  * Changing double quotes to single quotes
  *
