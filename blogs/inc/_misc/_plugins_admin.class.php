@@ -670,10 +670,10 @@ class Plugins_admin extends Plugins
 
 
 		// Delete obsolete events from DB:
-		if( $obsolete_events && $DB->query( '
+		if( $obsolete_events && $DB->query( "
 				DELETE FROM T_pluginevents
-				WHERE pevt_plug_ID = '.$Plugin->ID.'
-					AND pevt_event IN ( "'.implode( '", "', $obsolete_events ).'" )' ) )
+				WHERE pevt_plug_ID = ".$Plugin->ID."
+					AND pevt_event IN ( '".implode( '", "', $obsolete_events )."' )" ) )
 		{
 			$r = true;
 		}
@@ -1392,6 +1392,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.31  2007/02/16 13:34:08  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.30  2007/01/28 23:58:46  blueyed
  * - Added hook CommentFormSent
  * - Re-ordered comment_post.php to: init, validate, process

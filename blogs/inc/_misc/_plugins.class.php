@@ -259,7 +259,7 @@ class Plugins
 	{
 		global $DB, $Debuglog;
 
-		$DB->query( 'UPDATE T_plugins SET plug_status = "'.$status.'" WHERE plug_ID = "'.$Plugin->ID.'"' );
+		$DB->query( "UPDATE T_plugins SET plug_status = '".$status."' WHERE plug_ID = '".$Plugin->ID."'" );
 
 		if( $status == 'enabled' )
 		{ // Reload plugins tables, which includes the plugin in further requests
@@ -1806,6 +1806,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.147  2007/02/16 13:30:38  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.146  2007/02/12 15:42:59  fplanque
  * no message
  *
