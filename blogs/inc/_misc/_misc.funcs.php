@@ -1067,7 +1067,12 @@ function pre_dump( $var__var__var__var__ )
 	}
 	elseif( function_exists('xdebug_var_dump') )
 	{ // xdebug already does fancy displaying:
-		ini_set('xdebug.var_display_max_depth', 10);
+
+		// no limits:
+		$old_var_display_max_children = ini_set('xdebug.var_display_max_children', -1); // default: 128
+		$old_var_display_max_data = ini_set('xdebug.var_display_max_data', -1); // max string length; default: 512
+		$old_var_display_max_depth = ini_set('xdebug.var_display_max_depth', -1); // default: 3
+
 		echo "\n<div style=\"padding:1ex;border:1px solid #00f;\">\n";
 		foreach( func_get_args() as $lvar )
 		{
@@ -1080,6 +1085,11 @@ function pre_dump( $var__var__var__var__ )
 			}
 		}
 		echo '</div>';
+
+		// restore xdebug settings:
+		ini_set('xdebug.var_display_max_children', $old_var_display_max_children);
+		ini_set('xdebug.var_display_max_data', $old_var_display_max_data);
+		ini_set('xdebug.var_display_max_depth', $old_var_display_max_depth);
 	}
 	else
 	{
@@ -2826,6 +2836,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.170  2007/02/16 11:23:02  blueyed
+ * No limits for xdebug_var_dump() in pre_dump()
+ *
  * Revision 1.169  2007/02/11 02:10:35  blueyed
  * Minor improvements to debug_get_backtrace()
  *
