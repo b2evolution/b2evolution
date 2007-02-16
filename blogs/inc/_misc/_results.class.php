@@ -322,7 +322,6 @@ class Results extends Table
 	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
 	{
 		global $DB;
-
 		if( !is_null( $this->rows ) )
 		{ // Query has already executed:
 			return;
@@ -333,11 +332,10 @@ class Results extends Table
 		{ // Let's create default column definitions:
 			$this->cols = array();
 
-			if( !preg_match( '#SELECT \s+ (.+?) \s+ FROM#six', $this->sql, $matches ) )
+			if( !preg_match( '#^(SELECT.*?(\([^)]*?FROM[^)]*\).*)*)FROM#six', $this->sql, $matches ) )
 			{
 				debug_die( 'Results->query() : No SELECT clause!' );
 			}
-
 			// Split requested columns by commata
 			foreach( preg_split( '#\s*,\s*#', $matches[1] ) as $l_select )
 			{
@@ -1967,6 +1965,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.49  2007/02/16 17:29:14  waltercruz
+ * A more tricky regexp is needed to handle tre FROM part with the EXTRACT syntax
+ *
  * Revision 1.48  2007/01/23 22:08:49  fplanque
  * cleanup
  *
