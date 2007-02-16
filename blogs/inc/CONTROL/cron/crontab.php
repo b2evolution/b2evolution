@@ -231,10 +231,10 @@ switch( $action )
 
 	case 'list':
 		// Detect timed out tasks:
-		$sql = ' UPDATE T_cron__log
-								SET clog_status = "timeout"
-							WHERE clog_status = "started"
-										AND clog_realstart_datetime < '.$DB->quote( date2mysql( time() + $time_difference - $cron_timeout_delay ) );
+		$sql = " UPDATE T_cron__log
+								SET clog_status = 'timeout'
+							WHERE clog_status = 'started'
+										AND clog_realstart_datetime < ".$DB->quote( date2mysql( time() + $time_difference - $cron_timeout_delay ) );
 		$DB->query( $sql, 'Detect cron timeouts.' );
 
 		break;
@@ -276,6 +276,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2007/02/16 11:53:11  waltercruz
+ * Changing double quotes to single quotes
+ *
  * Revision 1.15  2006/12/05 04:27:49  fplanque
  * moved scheduler to Tools (temporary until UI redesign)
  *
