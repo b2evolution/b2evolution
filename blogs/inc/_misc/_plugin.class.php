@@ -2422,10 +2422,12 @@ class Plugin
 	 * Get the URL to call a plugin method through http. This links to the /htsrv/call_plugin.php
 	 * file.
 	 *
-	 * It uses the Blog's baseurl and changes "http" to "https", if needed, so that this URL can
-	 * be used in AJAX callbacks (which requires it to be on the same domain/protocol).
+	 * It uses either {@link $htsrv_url} or {@link $htsrv_url_sensitive} (if {@link $ReqHost} is on https).
 	 *
-	 * @todo we might want to provide whitelisting of methods through {@link $Session} here and check for it in the htsrv handler.
+	 * NOTE: AJAX callbacks are required to be on the same domain/protocol, so if you're using absolute
+	 *       blog URLs you must set {@link $htsrv_url} dynamically, to use the same domain!
+	 *
+	 * @todo dh> we might want to provide whitelisting of methods through {@link $Session} here and check for it in the htsrv handler.
 	 *
 	 * @param string Method to call. This must be listed in {@link GetHtsrvMethods()}.
 	 * @param array Array of optional parameters passed to the method.
@@ -2435,32 +2437,10 @@ class Plugin
 	 */
 	function get_htsrv_url( $method, $params = array(), $glue = '&amp;', $abs = false )
 	{
-		global $htsrv_url, $htsrv_subdir;
+		global $htsrv_url, $htsrv_url_sensitive;
 		global $ReqHost, $Blog;
 
-		if( isset($Blog) && ! is_admin_page() )
-		{
-			$base = $Blog->get('baseurl').$htsrv_subdir;
-		}
-		else
-		{
-			$base = $htsrv_url;
-		}
-
-		if( strpos( $base, $ReqHost ) !== 0 )
-		{ // the base url does not begin with the requested host:
-
-			// Fix "http:" to "https:":
-			if( strpos( $ReqHost, 'https:' ) === 0 && strpos( $base, 'http:' ) === 0 )
-			{
-				$base_fixed = 'https:'.substr( $base, 5 );
-
-				if( strpos( $base_fixed, $ReqHost ) === 0 )
-				{
-					$base = $base_fixed;
-				}
-			}
-		}
+		$base = substr($ReqHost, 0, 6) == 'https:' ? $htsrv_url_sensitive : $htsrv_url;
 
 		if( ! $abs && strpos( $base, $ReqHost ) === 0 )
 		{ // cut off $ReqHost if the resulting URL starts with it:
@@ -2854,6 +2834,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.145  2007/02/17 21:12:14  blueyed
+ * Removed magic in Plugin::get_htsrv_url() which used the blog url and assumed that "htsrv" was available in there
+ *
  * Revision 1.144  2007/02/03 20:25:37  blueyed
  * Added "sender_name", "sender_email" and "subject" params to MessageFormSent
  *
