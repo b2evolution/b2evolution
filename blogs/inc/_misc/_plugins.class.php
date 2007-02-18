@@ -68,6 +68,7 @@ class Plugins
 	var $index_ID_Plugins = array();
 
 	/**
+	 * @see Plugins::load_events()
 	 * @var array of event => plug_ID. IDs are sorted by priority.
 	 */
 	var $index_event_IDs = array();
@@ -533,7 +534,7 @@ class Plugins
 				}
 			}
 
-			if( $Plugin )
+			if( $Plugin && isset($this->index_ID_rows[$Plugin->ID]) ) // may have been unregistered above
 			{
 				if( $this->index_ID_rows[$Plugin->ID]['plug_name'] !== NULL )
 				{
@@ -1806,6 +1807,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.148  2007/02/18 20:50:42  blueyed
+ * Fixed possible E_NOTICE when a plugin got unregistered
+ *
  * Revision 1.147  2007/02/16 13:30:38  waltercruz
  * Changing double quotes to single quotes
  *
