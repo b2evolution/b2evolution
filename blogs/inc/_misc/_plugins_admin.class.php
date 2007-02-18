@@ -422,6 +422,8 @@ class Plugins_admin extends Plugins
 	/**
 	 * Install a plugin into DB.
 	 *
+	 * NOTE: this won't install necessary DB changes and not trigger {@link Plugin::AfterInstall}!
+	 *
 	 * @param string Classname of the plugin to install
 	 * @param string Initial DB Status of the plugin ("enabled", "disabled", "needs_config", "broken")
 	 * @param string Optional classfile path, if not default (used for tests).
@@ -1395,6 +1397,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.33  2007/02/18 23:19:28  blueyed
+ * doc
+ *
  * Revision 1.32  2007/02/18 20:52:38  blueyed
  * Load parent class
  *
