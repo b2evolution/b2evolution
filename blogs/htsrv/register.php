@@ -93,7 +93,7 @@ switch( $action )
 		$UserCache = & get_Cache( 'UserCache' );
 		if( $UserCache->get_by_login( $login ) )
 		{ // The login is already registered
-			$Messages->add( sprintf( T_('The login &laquo;%s&raquo; is already registered, please choose another one.'), $login ), 'error' );
+			param_error( 'login', sprintf( T_('The login &laquo;%s&raquo; is already registered, please choose another one.'), $login ) );
 		}
 
 		if( $Messages->count( 'error' ) )
@@ -215,6 +215,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.83  2007/02/18 20:05:47  blueyed
+ * Use param_error() for "login already exists" error message
+ *
  * Revision 1.82  2007/02/13 21:03:40  blueyed
  * Improved login/register/validation process:
  * - "Your account has been validated already." if an account had already been validated
