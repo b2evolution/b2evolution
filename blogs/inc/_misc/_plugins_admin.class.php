@@ -26,6 +26,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+load_funcs('_misc/_plugins.class.php');
+
+
 /**
  * A Plugins object that loads all Plugins, not just the enabled ones.
  * This is needed for the backoffice plugin management.
@@ -1392,6 +1395,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.32  2007/02/18 20:52:38  blueyed
+ * Load parent class
+ *
  * Revision 1.31  2007/02/16 13:34:08  waltercruz
  * Changing double quotes to single quotes
  *
