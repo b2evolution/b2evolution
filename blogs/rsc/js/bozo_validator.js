@@ -234,6 +234,5 @@ var bozo = {
 addEvent( window, 'load', bozo.init, false );
 // The following does not seem to work with addEvent... !?
 // addEvent( window, 'beforeunload', bozo.validate_close, false );
-// TODO: dh> probably this would work:
 // addEvent( window.document, 'beforeunload', bozo.validate_close, false );
 window.onbeforeunload = bozo.validate_close;
