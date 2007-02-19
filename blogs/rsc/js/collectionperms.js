@@ -27,19 +27,19 @@ function toggleall_wide( the_form, id, set )
 		allchecked[id] = allchecked[id] ? false : true;
 	}
 
-	the_form.elements['blog_ismember_'+String(id)].checked = allchecked[id];
-	the_form.elements['blog_perm_published_'+String(id)].checked = allchecked[id];
-	the_form.elements['blog_perm_protected_'+String(id)].checked = allchecked[id];
-	the_form.elements['blog_perm_private_'+String(id)].checked = allchecked[id];
-	the_form.elements['blog_perm_draft_'+String(id)].checked = allchecked[id];
-	the_form.elements['blog_perm_deprecated_'+String(id)].checked = allchecked[id];
-	the_form.elements['blog_perm_delpost_'+String(id)].checked = allchecked[id];
-	the_form.elements['blog_perm_comments_'+String(id)].checked = allchecked[id];
-	the_form.elements['blog_perm_media_upload_'+String(id)].checked = allchecked[id];
-	the_form.elements['blog_perm_media_browse_'+String(id)].checked = allchecked[id];
-	the_form.elements['blog_perm_media_change_'+String(id)].checked = allchecked[id];
-	the_form.elements['blog_perm_cats_'+String(id)].checked = allchecked[id];
-	the_form.elements['blog_perm_properties_'+String(id)].checked = allchecked[id];
+	// Trigger click() on all checkboxes that need to change.
+	// This also triggers the bozo validator, if activated!
+	var options = new Array(
+			"blog_ismember_", "blog_perm_published_", "blog_perm_protected_", "blog_perm_private_", "blog_perm_draft_", "blog_perm_deprecated_", "blog_perm_delpost_", "blog_perm_comments_", "blog_perm_media_upload_", "blog_perm_media_browse_", "blog_perm_media_change_", "blog_perm_cats_", "blog_perm_properties_"
+		);
+	for( var i = 0; i < options.length; i++ )
+	{
+		var option = options[i]+String(id);
+		if( the_form.elements[option].checked != allchecked[id] )
+		{
+			the_form.elements[option].click();
+		}
+	}
 }
 
 
