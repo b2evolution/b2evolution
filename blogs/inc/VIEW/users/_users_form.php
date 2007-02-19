@@ -261,17 +261,30 @@ if( $action != 'view_user' )
 			continue;
 		}
 
+		// We use output buffers here to display the fieldset only, if there's content in there (either from PluginSettings or PluginSettingsEditDisplayAfter).
+		ob_start();
 		$Form->begin_fieldset( $loop_Plugin->name );
 
-			foreach( $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
-			{
-				display_plugin_settings_fieldset_field( $l_name, $l_meta, $loop_Plugin, $Form, 'UserSettings', $edited_User );
-			}
-
-			$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsEditDisplayAfter',
-				$tmp_params = array( 'Form' => & $Form, 'User' => $edited_User ) );
-
+		ob_start();
+		foreach( $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
+		{
+			display_plugin_settings_fieldset_field( $l_name, $l_meta, $loop_Plugin, $Form, 'UserSettings', $edited_User );
+		}
+		$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsEditDisplayAfter',
+			$tmp_params = array( 'Form' => & $Form, 'User' => $edited_User ) );
+		$has_contents = strlen( ob_get_contents() );
 		$Form->end_fieldset();
+
+		if( $has_contents )
+		{
+			ob_end_flush();
+			ob_end_flush();
+		}
+		else
+		{ // No content, discard output buffers:
+			ob_end_clean();
+			ob_end_clean();
+		}
 	}
 }
 
@@ -360,6 +373,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.44  2007/02/19 23:17:00  blueyed
+ * Only display Plugin(User)Settings fieldsets if there is content in them.
+ *
  * Revision 1.43  2007/02/14 01:37:18  blueyed
  * Fixed E_PARSE
  *

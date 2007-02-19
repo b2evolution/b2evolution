@@ -84,8 +84,11 @@ if( $edit_Plugin->Settings ) // NOTE: this triggers PHP5 autoloading through Plu
 	global $inc_path;
 	require_once $inc_path.'_misc/_plugin.funcs.php';
 
+	// We use output buffers here to display the fieldset only, if there's content in there (either from PluginSettings or PluginSettingsEditDisplayAfter).
+	ob_start();
 	$Form->begin_fieldset( T_('Plugin settings'), array( 'class' => 'clear' ) );
 
+	ob_start();
 	foreach( $edit_Plugin->GetDefaultSettings( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
 	{
 		display_plugin_settings_fieldset_field( $l_name, $l_meta, $edit_Plugin, $Form, 'Settings' );
@@ -93,7 +96,19 @@ if( $edit_Plugin->Settings ) // NOTE: this triggers PHP5 autoloading through Plu
 
 	$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditDisplayAfter', $tmp_params = array( 'Form' => & $Form ) );
 
+	$has_contents = strlen( ob_get_contents() );
 	$Form->end_fieldset();
+
+	if( $has_contents )
+	{
+		ob_end_flush();
+		ob_end_flush();
+	}
+	else
+	{ // No content, discard output buffers:
+		ob_end_clean();
+		ob_end_clean();
+	}
 }
 
 // Plugin variables
@@ -173,6 +188,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.31  2007/02/19 23:17:00  blueyed
+ * Only display Plugin(User)Settings fieldsets if there is content in them.
+ *
  * Revision 1.30  2007/01/23 08:57:36  fplanque
  * decrap!
  *
