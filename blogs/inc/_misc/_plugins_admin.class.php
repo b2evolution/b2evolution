@@ -194,6 +194,7 @@ class Plugins_admin extends Plugins
 
 				'BeforeBlogDisplay' => 'Gets called before a (part of the blog) gets displayed.',
 				'SkinBeginHtmlHead' => 'Gets called at the top of the HTML HEAD section in a skin.',
+				'SkinEndHtmlBody' => 'Gets called at the end of the skin\'s HTML BODY section.',
 				'DisplayTrackbackAddr' => '',
 
 				'GetCronJobs' => 'Gets a list of implemented cron jobs.',
@@ -1397,6 +1398,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.34  2007/02/19 23:20:07  blueyed
+ * Added plugin event SkinEndHtmlBody
+ *
  * Revision 1.33  2007/02/18 23:19:28  blueyed
  * doc
  *

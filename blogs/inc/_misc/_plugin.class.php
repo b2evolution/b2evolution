@@ -846,6 +846,16 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called at the end of the skin's HTML BODY section.
+	 *
+	 * Use this to add any HTML snippet at the end of the generated page.
+	 */
+	function SkinEndHtmlBody( & $params )
+	{
+	}
+
+
+	/**
 	 * Event handler: Gets asked about a list of skin names that the plugin handles.
 	 *
 	 * If one of the skins returned gets called through the "skin=X" URL param, the
@@ -2834,6 +2844,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.146  2007/02/19 23:20:07  blueyed
+ * Added plugin event SkinEndHtmlBody
+ *
  * Revision 1.145  2007/02/17 21:12:14  blueyed
  * Removed magic in Plugin::get_htsrv_url() which used the blog url and assumed that "htsrv" was available in there
  *
