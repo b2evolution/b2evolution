@@ -88,7 +88,7 @@ var bozo = {
 			{	// Get the next input element:
 				var field = all_inputs[j];
 
-				if( field.className.indexOf( 'no_checkchanges' ) == -1  )
+				if( field.className.indexOf( '_nocheckchanges' ) == -1  )
 				{	// We want to track changes on this field:
 
 					if( field.type == 'submit' )
