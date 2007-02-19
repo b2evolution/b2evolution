@@ -441,9 +441,9 @@ class Hit
 		}
 		else
 		{ // create new user agent entry
-			$DB->query( '
+			$DB->query( "
 				INSERT INTO T_useragents ( agnt_signature, agnt_type )
-				VALUES ( "'.$DB->escape( $this->user_agent ).'", "'.$this->agent_type.'" )' );
+				VALUES ( '".$DB->escape( $this->user_agent )."', '".$this->agent_type."' )" );
 
 			$this->agent_ID = $DB->insert_id;
 		}
@@ -625,23 +625,23 @@ class Hit
 			// Restrict to current user if logged in:
 			if( ! empty($current_User->ID) )
 			{ // select by user ID: one user counts really just once. May be even faster than the anonymous query below..!?
-				$sql = '
+				$sql = "
 					SELECT hit_ID FROM T_hitlog INNER JOIN T_sessions ON hit_sess_ID = sess_ID
-					 WHERE sess_user_ID = '.$current_User->ID.'
-						 AND hit_uri = "'.$DB->escape( substr($ReqURI, 0, 250) ).'"
-					 LIMIT 1';
+					 WHERE sess_user_ID = ".$current_User->ID."
+						 AND hit_uri = '".$DB->escape( substr($ReqURI, 0, 250) )."'
+					 LIMIT 1";
 			}
 			else
 			{ // select by remote_addr/agnt_signature:
-				$sql = '
+				$sql = "
 					SELECT hit_ID
 					  FROM T_hitlog INNER JOIN T_useragents
 					    ON hit_agnt_ID = agnt_ID
-					 WHERE hit_datetime > "'.date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') ).'"
-					   AND hit_remote_addr = '.$DB->quote( $this->IP ).'
-					   AND hit_uri = "'.$DB->escape( substr($ReqURI, 0, 250) ).'"
-					   AND agnt_signature = '.$DB->quote($this->user_agent).'
-					 LIMIT 1';
+					 WHERE hit_datetime > '".date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') )."'
+					   AND hit_remote_addr = ".$DB->quote( $this->IP )."
+					   AND hit_uri = '".$DB->escape( substr($ReqURI, 0, 250) )."'
+					   AND agnt_signature = ".$DB->quote($this->user_agent)."
+					 LIMIT 1";
 			}
 			if( $DB->get_var( $sql, 0, 0, 'Hit: Check for reload' ) )
 			{
@@ -689,6 +689,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.46  2007/02/19 13:15:34  waltercruz
+ * Changing double quotes to single quotes in queries
+ *
  * Revision 1.45  2007/02/06 13:44:05  waltercruz
  * Changing double quotes to single quotes
  *
