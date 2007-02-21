@@ -288,6 +288,7 @@ if( !$Messages->count('error') )
 			param( 'edited_user_allow_msgform', 'integer', 0 );
 			param( 'edited_user_notify', 'integer', 0 );
 			param( 'edited_user_showonline', 'integer', 0 );
+			param( 'edited_user_set_login_multiple_sessions', 'integer', 0 );
 
 			param( 'edited_user_pass1', 'string', true );
 			param( 'edited_user_pass2', 'string', true );
@@ -367,6 +368,8 @@ if( !$Messages->count('error') )
 			}
 
 			// Now that the User exists in the DB and has an ID, update the settings:
+
+			$UserSettings->set( 'login_multiple_sessions', $edited_user_set_login_multiple_sessions, $edited_User->ID );
 
 			if( $UserSettings->set( 'admin_skin', $edited_user_admin_skin, $edited_User->ID )
 					&& ($edited_User->ID == $current_User->ID) )
@@ -804,6 +807,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.46  2007/02/21 22:21:30  blueyed
+ * "Multiple sessions" user setting
+ *
  * Revision 1.45  2007/02/21 21:17:20  blueyed
  * When resetting values to defaults, just delete all of them (defaults).
  *

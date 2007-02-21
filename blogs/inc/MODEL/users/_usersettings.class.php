@@ -68,6 +68,8 @@ class UserSettings extends AbstractSettings
 		'fm_allowfiltering' => 'simple',
 
 		'blogperms_layout' => 'default', // selected view in blog (user/group) perms
+
+		'login_multiple_sessions' => 0, // allow multiple open sessions?
 	);
 
 
@@ -206,6 +208,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.28  2007/02/21 22:21:30  blueyed
+ * "Multiple sessions" user setting
+ *
  * Revision 1.27  2007/01/25 03:17:00  fplanque
  * visual cleanup for average users
  * geeky stuff preserved as options

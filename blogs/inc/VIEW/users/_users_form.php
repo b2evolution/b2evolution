@@ -164,6 +164,8 @@ $Form->begin_fieldset( T_('Identity') );
 		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => true ) );
 		$Form->select( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown') );
 		$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
+		$Form->checkbox( 'edited_user_set_login_multiple_sessions', $UserSettings->get('login_multiple_sessions', $edited_User->ID), T_('Multiple sessions'),
+			T_('Check this if you want to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will disconnect you on the previous one.') );
 
 	}
 	else
@@ -175,7 +177,7 @@ $Form->begin_fieldset( T_('Identity') );
 		$Form->info( T_('Nickname'), $edited_User->get('nickname') );
 		$Form->info( T_('Identity shown'), $edited_User->get('preferredname') );
 		$Form->info( T_('Show online'), ($edited_User->get('showonline')) ? T_('yes') : T_('no') );
-
+		$Form->info( T_('Multiple sessions'), ($UserSettings->get('login_multiple_sessions', $edited_User->ID) ? T_('yes') : T_('no')) );
   }
 
 $Form->end_fieldset();
@@ -373,6 +375,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.45  2007/02/21 22:21:30  blueyed
+ * "Multiple sessions" user setting
+ *
  * Revision 1.44  2007/02/19 23:17:00  blueyed
  * Only display Plugin(User)Settings fieldsets if there is content in them.
  *
