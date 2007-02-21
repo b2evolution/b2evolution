@@ -388,8 +388,14 @@ class Comment extends DataObject
 	{
 		if( !empty( $this->author_IP ) )
 		{
+			global $Plugins;
+
 			echo $before;
-			echo $this->author_IP;
+			// Filter the IP by plugins for display:
+			echo $Plugins->get_trigger_event( 'FilterIpAddress', array(
+					'format'=>'htmlbody',
+					'data' => $this->author_IP ),
+				'data' );
 			echo $after;
 		}
 	}
@@ -951,8 +957,8 @@ class Comment extends DataObject
 	 *
 	 * @todo shall we notify suscribers of blog were this is in extra-cat?
 	 * @todo cache message by locale like {@link Item::send_email_notifications()}
-	 * @todo Indicator in url to see where the user came from (&from=subnote ["subscription notification"]) - Problem: too long urls.
-	 * @todo "Beautify" like {@link Item::send_email_notifications()} ?
+	 * @todo dh> Indicator in url to see where the user came from (&from=subnote ["subscription notification"]) - Problem: too long urls.
+	 * @todo dh> "Beautify" like {@link Item::send_email_notifications()} ?
 	 * @todo Should include "visibility status" in the mail to the Item's Author
 	 */
 	function send_email_notifications()
@@ -1183,6 +1189,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.57  2007/02/21 23:59:00  blueyed
+ * Trigger FilterIpAddress event in author_ip()
+ *
  * Revision 1.56  2006/12/26 00:08:29  fplanque
  * wording
  *
