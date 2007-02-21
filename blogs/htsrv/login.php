@@ -51,6 +51,7 @@ param( 'login', 'string', '' );
 
 // gets used by header_redirect();
 // TODO: dh> problem here is that $ReqURI won't include the e.g. "ctrl" param in a POSTed form and therefor the user lands on the default admin page after logging in (again)
+// fp> I think this will fix itself when we do another improvement: 303 redirect after each POST so that we never have an issue with people trying to reload a post
 param( 'redirect_to', 'string', $ReqURI );
 
 switch( $action )
@@ -394,6 +395,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.90  2007/02/21 23:52:26  fplanque
+ * doc
+ *
  * Revision 1.89  2007/02/21 21:16:14  blueyed
  * todo
  *

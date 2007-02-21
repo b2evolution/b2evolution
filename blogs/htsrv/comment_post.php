@@ -328,6 +328,7 @@ if( $Comment->ID )
 	 * --------------------------
 	 */
 	// TODO: dh> this should only send published feedback probably and should also use "outbound_notifications_mode"
+	// fp> yes for general users, but comment moderators need to receive notifications for new unpublished comments
 	$Comment->send_email_notifications();
 
 
@@ -352,6 +353,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.107  2007/02/21 23:52:26  fplanque
+ * doc
+ *
  * Revision 1.106  2007/02/13 01:30:31  blueyed
  * TODO: do not notify about not published comments / use "outbound_notifications_mode" setting for comments, too
  *
