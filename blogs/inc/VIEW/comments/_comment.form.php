@@ -139,7 +139,8 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		<legend><?php echo T_('Comment info') ?></legend>
 		<p><strong><?php echo T_('Author') ?>:</strong> <?php echo $edited_Comment->author() ?></p>
 		<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $edited_Comment->type; ?></p>
-		<p><strong><?php echo T_('IP address') ?>:</strong> <?php echo $edited_Comment->author_IP; ?></p>
+		<p><strong><?php echo T_('IP address') ?>:</strong> <?php
+			echo $Plugins->get_trigger_event( 'FilterIpAddress', array('format'=>'htmlbody', 'data'=>$edited_Comment->author_IP), 'data' ); ?></p>
 		<p><strong><?php echo T_('Spam Karma') ?>:</strong> <?php $edited_Comment->spam_karma(); ?></p>
 		<p><strong><?php echo T_('Item') ?>:</strong> <?php
 			$comment_Item = & $edited_Comment->get_Item();
@@ -166,6 +167,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.22  2007/02/21 23:35:57  blueyed
+ * Trigger FilterIpAddress event
+ *
  * Revision 1.21  2006/12/12 02:53:56  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.
