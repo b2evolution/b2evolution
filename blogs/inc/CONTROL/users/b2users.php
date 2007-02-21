@@ -453,16 +453,11 @@ if( !$Messages->count('error') )
 				$reload_page = true;
 			}
 
-			// Action icon params:
-			$UserSettings->delete( 'action_icon_threshold', $edited_User->ID );
-			$UserSettings->delete( 'action_word_threshold', $edited_User->ID );
-			$UserSettings->delete( 'display_icon_legend', $edited_User->ID );
-
-			// Set bozo validador activation
-			$UserSettings->delete( 'control_form_abortions', $edited_User->ID );
-
-			// Focus on first
-			$UserSettings->delete( 'focus_on_first_input', $edited_User->ID );
+			// Remove all UserSettings where a default exists:
+			foreach( $UserSettings->get_defaults() as $k => $v )
+			{
+				$UserSettings->delete( $k, $edited_User->ID );
+			}
 
 			// Update user settings:
 			if( $UserSettings->dbupdate() ) $Messages->add( T_('User feature settings have been changed.'), 'success');
@@ -809,6 +804,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.45  2007/02/21 21:17:20  blueyed
+ * When resetting values to defaults, just delete all of them (defaults).
+ *
  * Revision 1.44  2006/12/06 22:30:07  fplanque
  * Fixed this use case:
  * Users cannot register themselves.
