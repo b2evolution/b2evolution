@@ -1148,7 +1148,7 @@ function upgrade_b2evo_tables()
 			VALUES
 				(1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
 				(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 1),
-				(3, 'jpg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
+				(3, 'jpg jpeg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
 				(4, 'txt', 'Text file', 'text/plain', 'document.png', 'text', 1),
 				(5, 'htm html', 'HTML file', 'text/html', 'html.png', 'browser', 0),
 				(6, 'pdf', 'PDF file', 'application/pdf', 'pdf.png', 'browser', 1),
@@ -1788,6 +1788,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.210  2007/02/21 21:33:43  fplanque
+ * allow jpeg extension on new installs/upgrades
+ *
  * Revision 1.209  2007/02/13 00:38:11  blueyed
  * Changed DB fields for 1.10.0: sess_data to MEDIUMTEXT (serialize() does not completely convert the binary data to text); post_content and itpr_content_prerendered to MEDIUMTEXT
  *

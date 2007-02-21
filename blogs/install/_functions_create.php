@@ -182,7 +182,7 @@ function create_default_data()
 		VALUES
 			(1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
 			(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 1),
-			(3, 'jpg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
+			(3, 'jpg jpeg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
 			(4, 'txt', 'Text file', 'text/plain', 'document.png', 'text', 1),
 			(5, 'htm html', 'HTML file', 'text/html', 'html.png', 'browser', 0),
 			(6, 'pdf', 'PDF file', 'application/pdf', 'pdf.png', 'browser', 1),
@@ -611,6 +611,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.217  2007/02/21 21:33:43  fplanque
+ * allow jpeg extension on new installs/upgrades
+ *
  * Revision 1.216  2007/01/24 13:47:28  fplanque
  * cleaned up file types
  *
