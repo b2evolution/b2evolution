@@ -50,6 +50,7 @@ param( 'login', 'string', '' );
 // echo 'login: ', $login;
 
 // gets used by header_redirect();
+// TODO: dh> problem here is that $ReqURI won't include the e.g. "ctrl" param in a POSTed form and therefor the user lands on the default admin page after logging in (again)
 param( 'redirect_to', 'string', $ReqURI );
 
 switch( $action )
@@ -393,6 +394,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.89  2007/02/21 21:16:14  blueyed
+ * todo
+ *
  * Revision 1.88  2007/02/13 21:03:40  blueyed
  * Improved login/register/validation process:
  * - "Your account has been validated already." if an account had already been validated
