@@ -243,8 +243,8 @@ if( isset($_FILES) && count( $_FILES ) )
 				&& $_FILES['uploadfile']['size'][$lKey] > $Settings->get( 'upload_maxkb' )*1024 )
 		{ // bigger than defined by blog
 			$failedFiles[$lKey] = sprintf(
-					/* TRANS: %s will be replaced by the difference */ T_('The file is %s too large. Maximum allowed is: %s.'),
-					bytesreadable( $_FILES['uploadfile']['size'][$lKey] - $Settings->get( 'upload_maxkb' ) ),
+					/* TRANS: %s will be replaced by the difference */ T_('The file is too large: %s but the maximum allowed is %s.'),
+					bytesreadable( $_FILES['uploadfile']['size'][$lKey] ),
 					bytesreadable($Settings->get( 'upload_maxkb' )*1024) );
 			// Abort upload for this file:
 			continue;
@@ -292,7 +292,7 @@ if( isset($_FILES) && count( $_FILES ) )
 
 		if( !is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey] ) )
 		{ // Ensure that a malicious user hasn't tried to trick the script into working on files upon which it should not be working.
-			$failedFiles[$lKey] = T_('The file does not seem to be a valid upload!');
+			$failedFiles[$lKey] = T_('The file does not seem to be a valid upload! It may exceed the upload_max_filesize directive in php.ini.');
 			// Abort upload for this file:
 			continue;
 		}
@@ -439,6 +439,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2007/02/22 18:36:57  fplanque
+ * better error messages
+ *
  * Revision 1.7  2007/01/24 13:44:56  fplanque
  * cleaned up upload
  *
