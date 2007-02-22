@@ -52,7 +52,7 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 	 * @usedby addAnotherFileInput()
 	 */
 	function appendLabelAndInputElements( appendTo, labelText, labelBr, inputOrTextarea, inputName,
-																				inputSizeOrCols, inputMaxLengthOrRows, inputType, inputClass )
+	                                      inputSizeOrCols, inputMaxLengthOrRows, inputType, inputClass )
 	{
 		// LABEL:
 
@@ -216,6 +216,7 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 						}
 
 						// fp> TODO: would be cool to add a close icon starting at the 2nd <li>
+						// dh> TODO: it may be useful to add the "accept" attrib to the INPUT elements to give the browser a hint about the accepted MIME types
 						?>
 
 						<label><?php echo T_('Choose a file'); ?>:</label>
@@ -302,6 +303,9 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 
 /*
  * $Log$
+ * Revision 1.10  2007/02/22 20:19:28  blueyed
+ * todo for "accept" attrib in file input
+ *
  * Revision 1.9  2007/01/24 13:44:56  fplanque
  * cleaned up upload
  *
