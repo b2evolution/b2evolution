@@ -15,11 +15,12 @@ if( file_exists( $ads_current_skin_path.'_html_footer.inc.php' ) )
 	return;
 }
 
-$Hit->log();	// log the hit on this page
-debug_info(); // output debug info if requested
 
 // Trigger plugin event, which could be used e.g. by a google_analytics plugin to add the javascript snippet here:
 $Plugins->trigger_event('SkinEndHtmlBody');
+
+$Hit->log();	// log the hit on this page
+debug_info(); // output debug info if requested
 ?>
 </body>
 </html>
