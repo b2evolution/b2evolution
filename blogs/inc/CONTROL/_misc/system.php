@@ -180,6 +180,65 @@ else
 
 
 /*
+ * Sizes
+ */
+$upload_max_filesize = ini_get('upload_max_filesize');
+if( strpos( $upload_max_filesize, 'M' ) )
+{
+	$upload_max_filesize = intval($upload_max_filesize) * 1024;
+}
+init_system_check( 'PHP upload_max_filesize', ini_get('upload_max_filesize') );
+disp_system_check( 'ok' );
+
+
+$post_max_size = ini_get('post_max_size');
+if( strpos( $post_max_size, 'M' ) )
+{
+	$post_max_size = intval($post_max_size) * 1024;
+}
+init_system_check( 'PHP post_max_size', ini_get('post_max_size') );
+if( $post_max_size > $upload_max_filesize )
+{
+	disp_system_check( 'ok' );
+}
+else
+{
+	disp_system_check( 'error', T_('post_max_size should be larger than upload_max_filesize') );
+}
+
+
+$memory_limit = ini_get('memory_limit');
+if( empty($memory_limit) )
+{
+	init_system_check( 'PHP memory_limit', T_('n.a.') );
+	disp_system_check( 'warning' );
+}
+else
+{
+	if( strpos( $memory_limit, 'M' ) )
+	{
+		$memory_limit = intval($memory_limit) * 1024;
+	}
+	init_system_check( 'PHP memory_limit', ini_get('memory_limit') );
+	if( $memory_limit <= $post_max_size )
+	{
+		disp_system_check( 'error', T_('memory_limit should be larger than post_max_size') );
+	}
+	elseif( $memory_limit < 8096 )
+	{
+		disp_system_check( 'error', T_('The memory_limit is very low. Some features of b2evolution will fail to work;') );
+	}
+	elseif( $memory_limit < 12288 )
+	{
+		disp_system_check( 'warining', T_('The memory_limit is low. Some features of b2evolution may fail to work;') );
+	}
+	else
+	{
+		disp_system_check( 'ok' );
+	}
+}
+
+/*
  * XML extension
  */
 init_system_check( 'PHP XML extension', extension_loaded('xml') ?  T_('Loaded') : T_('Not loaded') );
@@ -348,6 +407,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2007/02/22 19:08:31  fplanque
+ * file/memory size checks (not fully tested)
+ *
  * Revision 1.13  2006/12/21 21:50:32  fplanque
  * removed rant
  *
