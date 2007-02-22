@@ -57,6 +57,11 @@ param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 )
 if( is_logged_in() )
 {
 	$User = & $current_User;
+	$author = null;
+	$email = null;
+	$url = null;
+	$comment_cookies = null;
+	$comment_allow_msgform = null;
 }
 else
 {	// User is not logged in (registered users), we need some id info from him:
@@ -71,8 +76,30 @@ else
 
 $now = date( 'Y-m-d H:i:s', $localtimenow );
 
-// CHECK and FORMAT content
+
+// VALIDATION:
+
 $original_comment = $comment;
+
+// Trigger event: a Plugin could add a $category="error" message here..
+// This must get triggered before any internal validation and must pass all relevant params.
+// openID plugin will validate a given OpenID here
+$Plugins->trigger_event( 'CommentFormSent', array(
+		'comment_post_ID' => $comment_post_ID,
+		'comment' => & $comment,
+		'comment_autobr' => & $comment_autobr,
+		'is_preview' => ($action == 'preview'),
+		'anon_name' => & $author,
+		'anon_email' => & $email,
+		'anon_url' => & $url,
+		'anon_allow_msgform' => & $comment_allow_msgform,
+		'anon_cookies' => & $comment_cookies,
+		'User' => & $User,
+		'redirect_to' => & $redirect_to,
+	) );
+
+
+// CHECK and FORMAT content
 if( ! $use_html_checker )
 {
 	//echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);
@@ -80,25 +107,6 @@ if( ! $use_html_checker )
 }
 // TODO: AutoBR should really be a "comment renderer" (like with Items)
 $comment = format_to_post($comment, $comment_autobr, 1);
-
-
-// VALIDATION:
-
-// Trigger event: a Plugin could add a $category="error" message here..
-// openID plugin will check login here
-$Plugins->trigger_event( 'CommentFormSent', array(
-		'comment_post_ID' => $comment_post_ID,
-		'comment' => & $comment,
-		'original_comment' => $original_comment,
-		'is_preview' => ($action == 'preview'),
-		'anon_name' => & $author,
-		'anon_email' => & $email,
-		'anon_url' => & $url,
-		'anon_allow_msgform' => & $comment_allow_msgform,
-		'anon_cookies' => & $comment_cookies,
-		'user_ID' => ( isset($User) ? $User->ID : NULL ),
-		'redirect_to' => & $redirect_to,
-	) );
 
 
 if( ! $User )
@@ -353,6 +361,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.108  2007/02/22 22:14:14  blueyed
+ * Improved CommentFormSent hook
+ *
  * Revision 1.107  2007/02/21 23:52:26  fplanque
  * doc
  *

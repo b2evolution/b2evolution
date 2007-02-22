@@ -1396,10 +1396,10 @@ class Plugin
 	 * @see Plugin::DisplayCommentFormFieldset()
 	 * @param array Associative array of parameters
 	 *   - 'comment_post_ID': ID of the item the comment is for
-	 *   - 'comment': the comment text (by reference)
-	 *   - 'original_comment': the original (unstripped) comment text
+	 *   - 'comment': the original, unfiltered comment text (by reference)
+	 *   - 'comment_autobr': is the Auto-BR checkbox checked (by reference)
 	 *   - 'is_preview': is this a preview request?
-	 *   - 'user_ID': ID of the user, if logged in
+	 *   - 'User': {@link User}, if logged in or null (by reference)
 	 *   - 'anon_name': Name of the anonymous commenter (by reference)
 	 *   - 'anon_email': E-Mail of the anonymous commenter (by reference)
 	 *   - 'anon_url': URL of the anonymous commenter (by reference)
@@ -2844,6 +2844,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.147  2007/02/22 22:14:13  blueyed
+ * Improved CommentFormSent hook
+ *
  * Revision 1.146  2007/02/19 23:20:07  blueyed
  * Added plugin event SkinEndHtmlBody
  *
