@@ -776,7 +776,7 @@ class Item extends DataObject
 			if( !empty($link_title) )
 			{ // we want to display links
 				$lBlog = & $Chapter->get_Blog();
-				$cat_name = '<a href="'.$Chapter->get_permanent_url().'" title="'.$link_title.'">'.$cat_name.'</a>';
+				$cat_name = '<a href="'.$Chapter->get_permanent_url().'" title="'.htmlspecialchars($link_title).'">'.$cat_name.'</a>';
 			}
 
 			if( $Chapter->ID == $this->main_cat_ID )
@@ -1029,10 +1029,11 @@ class Item extends DataObject
 
 				// Call renderer plugins:
 				// pre_dump( $this->content );
-				$this->content_prerendered[$cache_key] = $Plugins->render( $this->content, $post_renderers, $format, array( 'Item' => $this ), 'Render' );
+				$this->content_prerendered[$cache_key] = $this->content;
+				$Plugins->render( $this->content_prerendered[$cache_key] /* by ref */, $post_renderers, $format, array( 'Item' => $this ), 'Render' );
 				// pre_dump( $this->content_prerendered[$cache_key] );
 
-				$Debuglog->add( 'Generated pre-rendered content ['.$cache_key.']', 'items' );
+				$Debuglog->add( 'Generated pre-rendered content ['.$cache_key.'] for item #'.$this->ID, 'items' );
 
 				if( $use_cache )
 				{ // save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
@@ -1041,6 +1042,10 @@ class Item extends DataObject
 						 VALUES ( ".$this->ID.", '".$format."', ".$DB->quote(implode('.', $post_renderers)).', '.$DB->quote($this->content_prerendered[$cache_key]).' )', 'Cache prerendered item content' );
 				}
 			}
+		}
+		else
+		{
+			$Debuglog->add( 'Fetched pre-rendered content ['.$cache_key.'] for item #'.$this->ID, 'items' );
 		}
 
 		return $this->content_prerendered[$cache_key];
@@ -3378,6 +3383,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.153  2007/02/23 19:16:07  blueyed
+ * MFB: Fixed handling of Item::content for pre-rendering (it gets passed by reference!)
+ *
  * Revision 1.152  2007/02/18 22:51:26  waltercruz
  * Fixing a little confusion with quotes and string concatenation
  *
