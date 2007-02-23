@@ -417,10 +417,15 @@ switch( $action )
 		// fp> TODO: non javascript confirmation
 		// $AdminUI->title = T_('Deleting post...');
 
-		// DELETE POST FROM DB:
-		$edited_Item->dbdelete();
+		$Plugins->trigger_event( 'AdminBeforeItemEditDelete', array( 'Item' => & $edited_Item ) );
 
-		$Messages->add( T_('Post has been deleted.'), 'success' );
+		if( ! $Messages->count('error') )
+		{	// There have been no validation errors:
+			// DELETE POST FROM DB:
+			$edited_Item->dbdelete();
+
+			$Messages->add( T_('Post has been deleted.'), 'success' );
+		}
 
 		// Switch to list mode:
 		$action = 'list';
@@ -680,6 +685,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2007/02/23 00:21:23  blueyed
+ * Fixed Plugins::get_next() if the last Plugin got unregistered; Added AdminBeforeItemEditDelete hook
+ *
  * Revision 1.13  2007/01/16 00:44:42  fplanque
  * don't use $admin_email in  the app
  *

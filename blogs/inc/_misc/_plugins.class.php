@@ -107,10 +107,10 @@ class Plugins
 	var $loaded_plugins_table = false;
 
 	/**
-	 * Current object idx in {@link $sorted_IDs} array.
+	 * Current object index in {@link $sorted_IDs} array.
 	 * @var integer
 	 */
-	var $current_idx = 0;
+	var $current_idx = -1;
 
 	/**
 	 * List of IDs, sorted. This gets used to lazy-instantiate a Plugin.
@@ -742,7 +742,7 @@ class Plugins
 	{
 		$this->load_plugins_table();
 
-		$this->current_idx = 0;
+		$this->current_idx = -1;
 	}
 
 
@@ -758,13 +758,13 @@ class Plugins
 	{
 		global $Debuglog;
 
+		++$this->current_idx;
+
 		$Debuglog->add( 'get_next() ('.$this->current_idx.')..', 'plugins' );
 
 		if( isset($this->sorted_IDs[$this->current_idx]) )
 		{
 			$Plugin = & $this->get_by_ID( $this->sorted_IDs[$this->current_idx] );
-
-			$this->current_idx++;
 
 			if( ! $Plugin )
 			{ // recurse until we've been through whole $sorted_IDs!
@@ -777,6 +777,7 @@ class Plugins
 		else
 		{
 			$Debuglog->add( 'return: false', 'plugins' );
+			--$this->current_idx;
 			$r = false;
 			return $r;
 		}
@@ -1807,6 +1808,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.149  2007/02/23 00:21:23  blueyed
+ * Fixed Plugins::get_next() if the last Plugin got unregistered; Added AdminBeforeItemEditDelete hook
+ *
  * Revision 1.148  2007/02/18 20:50:42  blueyed
  * Fixed possible E_NOTICE when a plugin got unregistered
  *

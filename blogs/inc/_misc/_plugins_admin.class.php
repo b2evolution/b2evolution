@@ -105,8 +105,9 @@ class Plugins_admin extends Plugins
 				'AdminToolAction' => '',
 				'AdminToolPayload' => '',
 
-				'AdminBeforeItemEditCreate' => 'This gets called before a new item gets created.',
-				'AdminBeforeItemEditUpdate' => 'This gets called before an existing item gets updated.',
+				'AdminBeforeItemEditCreate' => 'This gets called before a new item gets created from the backoffice.',
+				'AdminBeforeItemEditUpdate' => 'This gets called before an existing item gets updated from the backoffice.',
+				'AdminBeforeItemEditDelete' => 'This gets called before an existing item gets deleted from the backoffice.',
 
 				'AdminBeginPayload' => '',
 
@@ -981,7 +982,7 @@ class Plugins_admin extends Plugins
 				usort( $this->sorted_IDs, array( & $this, 'sort_Plugin_priority') );
 		}
 
-		$this->current_idx = 0;
+		$this->current_idx = -1;
 	}
 
 	/**
@@ -1398,6 +1399,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.35  2007/02/23 00:21:23  blueyed
+ * Fixed Plugins::get_next() if the last Plugin got unregistered; Added AdminBeforeItemEditDelete hook
+ *
  * Revision 1.34  2007/02/19 23:20:07  blueyed
  * Added plugin event SkinEndHtmlBody
  *

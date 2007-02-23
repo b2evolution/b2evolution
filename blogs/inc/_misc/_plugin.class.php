@@ -1239,6 +1239,21 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called before an item gets deleted (in the backoffice).
+	 *
+	 * You could {@link Plugin::msg() add a message} of
+	 * category "error" here, to prevent the comment from being deleted.
+	 *
+	 * @since 2.0
+	 * @param array Associative array of parameters
+	 *              'Item': the Item which gets created (by reference)
+	 */
+	function AdminBeforeItemEditDelete( & $params )
+	{
+	}
+
+
+	/**
 	 * Event handler: Called before a new item gets created (in the backoffice).
 	 *
 	 * You could {@link Plugin::msg() add a message} of
@@ -2844,6 +2859,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.148  2007/02/23 00:21:23  blueyed
+ * Fixed Plugins::get_next() if the last Plugin got unregistered; Added AdminBeforeItemEditDelete hook
+ *
  * Revision 1.147  2007/02/22 22:14:13  blueyed
  * Improved CommentFormSent hook
  *

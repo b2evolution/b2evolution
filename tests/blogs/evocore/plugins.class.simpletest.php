@@ -108,6 +108,29 @@ class PluginsTestCase extends DbUnitTestCase
 
 	}
 
+
+	/**
+	 *
+	 */
+	function test_get_next()
+	{
+		$this->Plugins = new Plugins_admin_no_DB();
+
+		$a = & $this->Plugins->register('simpletests_b_plugin', 0, -1, null, __FILE__);
+		$b = & $this->Plugins->register('simpletests_b_plugin', 0, -1, null, __FILE__);
+		$this->assertReference( $this->Plugins->get_next(), $a );
+		$this->assertReference( $this->Plugins->get_next(), $b );
+		$this->assertFalse( $this->Plugins->get_next() );
+
+		$this->Plugins->restart();
+		$this->assertReference( $this->Plugins->get_next(), $a );
+		$this->Plugins->restart();
+		$this->assertReference( $this->Plugins->get_next(), $a );
+		$this->Plugins->unregister($b, true);
+		$this->assertFalse( $this->Plugins->get_next() );
+
+	}
+
 }
 
 
