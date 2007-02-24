@@ -1301,7 +1301,7 @@ class Plugins_admin extends Plugins
 
 					default:
 						// Unknown depency type, throw an error:
-						$msgs['error'][] = sprintf( T_('Unknown dependency type. This probably means that the plugin is not compatible and you have to upgrade your %s installation.'), $type, $app_name );
+						$msgs['error'][] = sprintf( T_('Unknown dependency type (%s). This probably means that the plugin is not compatible and you have to upgrade your %s installation.'), $type, $app_name );
 
 				}
 			}
@@ -1399,6 +1399,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.36  2007/02/24 23:03:00  blueyed
+ * MFB: Fixed "Unknown dependency type" error display
+ *
  * Revision 1.35  2007/02/23 00:21:23  blueyed
  * Fixed Plugins::get_next() if the last Plugin got unregistered; Added AdminBeforeItemEditDelete hook
  *
