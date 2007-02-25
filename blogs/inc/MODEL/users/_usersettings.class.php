@@ -69,7 +69,7 @@ class UserSettings extends AbstractSettings
 
 		'blogperms_layout' => 'default', // selected view in blog (user/group) perms
 
-		'login_multiple_sessions' => 0, // allow multiple open sessions?
+		'login_multiple_sessions' => 0, 	// allow multiple concurrent sessions?
 	);
 
 
@@ -208,6 +208,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.29  2007/02/25 01:39:06  fplanque
+ * wording
+ *
  * Revision 1.28  2007/02/21 22:21:30  blueyed
  * "Multiple sessions" user setting
  *

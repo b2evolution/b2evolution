@@ -245,9 +245,9 @@ class Session
 		{
 			global $UserSettings, $DB;
 
-			// Invalidate previous sessions:
 			if( ! $UserSettings->get('login_multiple_sessions', $user_ID) )
-			{ // the user only wants a single session open:
+			{ // The user does not want to have multiple sessions open at the same time:
+				// Invalidate previous sessions:
 				global $Debuglog;
 				$Debuglog->add( 'Invalidating all previous user sessions, because login_multiple_sessions=0', 'session' );
 				$DB->query( '
@@ -512,6 +512,9 @@ function session_unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.37  2007/02/25 01:39:05  fplanque
+ * wording
+ *
  * Revision 1.36  2007/02/21 22:21:30  blueyed
  * "Multiple sessions" user setting
  *
