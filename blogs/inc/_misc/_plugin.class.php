@@ -2450,7 +2450,7 @@ class Plugin
 	 * It uses either {@link $htsrv_url} or {@link $htsrv_url_sensitive} (if {@link $ReqHost} is on https).
 	 *
 	 * NOTE: AJAX callbacks are required to be on the same domain/protocol, so if you're using absolute
-	 *       blog URLs you must set {@link $htsrv_url} dynamically, to use the same domain!
+	 *       blog URLs on different domains you must set {@link $htsrv_url} dynamically, to use the same domain!
 	 *
 	 * @todo dh> we might want to provide whitelisting of methods through {@link $Session} here and check for it in the htsrv handler.
 	 *
@@ -2859,6 +2859,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.149  2007/02/25 02:03:51  fplanque
+ * no message
+ *
  * Revision 1.148  2007/02/23 00:21:23  blueyed
  * Fixed Plugins::get_next() if the last Plugin got unregistered; Added AdminBeforeItemEditDelete hook
  *
