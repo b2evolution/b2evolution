@@ -392,6 +392,8 @@ class Comment extends DataObject
 
 			echo $before;
 			// Filter the IP by plugins for display:
+// fp> Wait, what is this supposed to do? Prevent display of spammy URLs?
+// fp> What's the point? Preventing teh admin from seeing spam IPs?
 			echo $Plugins->get_trigger_event( 'FilterIpAddress', array(
 					'format'=>'htmlbody',
 					'data' => $this->author_IP ),
@@ -1189,6 +1191,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.58  2007/02/25 01:34:19  fplanque
+ * doc
+ *
  * Revision 1.57  2007/02/21 23:59:00  blueyed
  * Trigger FilterIpAddress event in author_ip()
  *
