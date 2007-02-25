@@ -20,6 +20,7 @@
 
 // HISTORY
 // ------------------------------------------------------------------
+// Feb 25, 2007: Added support for "S" (ordinal day number) (blueyed)
 // Sep 26, 2006: Handle escaped chars in format string, e.g. "\d" as
 //               literal "d" (blueyed)
 // May 17, 2003: Fixed bug in parseDate() for dates <1970
@@ -47,6 +48,8 @@
 // Minute       | mm (2 digits)      | m (1 or 2 digits)
 // Second       | ss (2 digits)      | s (1 or 2 digits)
 // AM/PM        | a                  |
+// day suffix   |                    |
+// (st|nd|rd|th)| S                  |
 //
 // NOTE THE DIFFERENCE BETWEEN MM and mm! Month=MM, not mm!
 // Examples:
@@ -144,6 +147,20 @@ function formatDate(date,format) {
 	value["mm"]=LZ(m);
 	value["s"]=s;
 	value["ss"]=LZ(s);
+
+	// english ordinal numbers (see http://en.wikipedia.org/wiki/Names_of_numbers_in_English#Ordinal_numbers):
+	if( d < 20 && d > 9 )
+	{
+		value["S"] = "th";
+	}
+	else switch( d % 10 )
+	{
+		case 1: value["S"] = "st"; break;
+		case 2: value["S"] = "nd"; break;
+		case 3: value["S"] = "rd"; break;
+		default: value["S"] = "th"; break;
+	}
+
 	while (i_format < format.length) {
 		c=format.charAt(i_format);
 		if( c == "\\" )

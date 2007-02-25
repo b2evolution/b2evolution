@@ -582,6 +582,7 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 			case "D": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_abbrev"])))).")";
 			case "e": // b2evo extension!
 				return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_letter"])))).")";
+				case "S": return "(st|nd|rd|th)"; // english suffix for day
 
 			case "m": return "([0-1]\\d)"; // month, 01-12
 			case "n": return "(1?\\d)"; // month, 1-12
@@ -1645,6 +1646,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.30  2007/02/25 18:29:55  blueyed
+ * MFB: Support "S" (ordinal date suffix) in date format (calendar and validator)
+ *
  * Revision 1.29  2007/02/12 17:59:52  blueyed
  * $verbose param for validate_url() - not used yet anywhere, but useful IMHO, e.g. in the backoffice.
  *
