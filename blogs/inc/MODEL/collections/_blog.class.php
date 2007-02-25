@@ -319,8 +319,8 @@ class Blog extends DataObject
 /* fp> This is not in the "specs". htsrv does NOT have to be a subfolder of the blog baseurl.
    dh> ok. I assumed it in Plugin::get_htsrv_url() and it fails, if someone uses a relative siteurl (and "index.php" as stub).
 
-			// Ideally, it would be possible to choose the location of htsrv for each blog. Even more important with absolute URLs where the htsrv may be on a different domain. (might create cookie issues though)
-			// Assuming htsrv is under the blog baseurl is okay for a default. It is not okay as a requirement.
+			// fp> Ideally, it would be possible to choose the location of htsrv for each blog. Even more important with absolute URLs where the htsrv may be on a different domain. (might create cookie issues though)
+			// fp> Assuming htsrv is under the blog baseurl is okay for a default. It is not okay as a requirement.
 
 			// dh> it there something else than that we could test here?
 
@@ -1357,6 +1357,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.65  2007/02/25 01:31:34  fplanque
+ * minor
+ *
  * Revision 1.64  2007/02/17 21:12:14  blueyed
  * Removed magic in Plugin::get_htsrv_url() which used the blog url and assumed that "htsrv" was available in there
  *
