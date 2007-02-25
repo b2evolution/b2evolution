@@ -12,7 +12,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 require $skins_path.'_html_header.inc.php';
-// Note: You can customize the default HTML header by copying the 
+// Note: You can customize the default HTML header by copying the
 // _html_header.inc.php file into the current skin folder.
 // -------------------------------- END OF HEADER --------------------------------
 ?>
@@ -224,6 +224,8 @@ require $skins_path.'_html_header.inc.php';
 	{ // We're not generating static pages nor is a caching plugin collecting the content, so we can display this block
 		// TODO: when this gets a SkinTag plugin this check should get done by the Plugin
 		// fp> will not be a plugin because it's too closely tied to internals (Sessions)
+		// dh> The $Sessions global gets used in two places, in _main.inc.php(!) and here.
+		//     IMHO it should really become a widget! It may become a core plugin.
 		?>
 		<div class="bSideItem">
 			<h3 class="sideItemTitle"><?php echo T_('Who\'s Online?') ?></h3>
