@@ -177,7 +177,7 @@ $Form->begin_fieldset( T_('Identity') );
 		$Form->info( T_('Nickname'), $edited_User->get('nickname') );
 		$Form->info( T_('Identity shown'), $edited_User->get('preferredname') );
 		$Form->info( T_('Show online'), ($edited_User->get('showonline')) ? T_('yes') : T_('no') );
-		$Form->info( T_('Multiple sessions'), ($UserSettings->get('login_multiple_sessions', $edited_User->ID) ? T_('yes') : T_('no')) );
+		$Form->info( T_('Multiple sessions'), ($UserSettings->get('login_multiple_sessions', $edited_User->ID) ? T_('Allowed') : T_('Forbidden')) );
   }
 
 $Form->end_fieldset();
@@ -375,6 +375,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.46  2007/02/25 01:21:58  fplanque
+ * Wording
+ *
  * Revision 1.45  2007/02/21 22:21:30  blueyed
  * "Multiple sessions" user setting
  *
