@@ -16,7 +16,8 @@
  *  - Use addEvent() and do not overwrite window.on(un)load
  */
 
-function StyleSwitcher() {
+function StyleSwitcher()
+{
 	/**
 	 * Cross browser event handling for IE5+, NS6+ an Mozilla/Gecko
 	 * NOTE: taken/copied here from /rsc/js/functions.js
@@ -44,19 +45,14 @@ function StyleSwitcher() {
 
 	var oThis = this;
 
-	this.onload = function(e) {
+	this.onload = function(e)
+	{
 		var cookie = oThis.readCookie("evo_style");
 		var title = cookie ? cookie : oThis.getPreferredStyleSheet();
 		oThis.setActiveStyleSheet(title);
 	};
 
-	this.onunload = function(e) {
-		var title = oThis.getActiveStyleSheet();
-		oThis.createCookie("evo_style", title, 365);
-	};
-
 	addEvent( window, 'load', this.onload, false );
-	addEvent( window, 'unload', this.onunload, false );
 
 	this.onload(); // do it now already, so there's no "skin changing" after load on "larger" pages
 };
@@ -70,52 +66,72 @@ StyleSwitcher.prototype.setActiveStyleSheet = function (title)
 
 	// test if it's a valid one:
 	for(var i=0; (a = document.getElementsByTagName("link")[i]); i++)
+	{
 		if(a.getAttribute("rel").indexOf("style") != -1 && a.getAttribute("title"))
+		{
 			if(a.getAttribute("title") == title)
 			{
 				valid = true;
 				break;
 			}
+		}
+	}
 
 	if( ! valid )
 		return false;
 
-	for(i=0; (a = document.getElementsByTagName("link")[i]); i++) {
-		if(a.getAttribute("rel").indexOf("style") != -1 && a.getAttribute("title")) {
-			// dh> fixed Konqueror bug here (http://bugs.kde.org/135849) and optimized for other browsers (2006-10-17)
+	// IE6 and IE7 need to disable all stylesheets first and then re-enable it..
+	// ..at least when we call the onload event directly, too.
+	// There is a bug with Konqueror (http://bugs.kde.org/135849) but it does not seem to apply here anymore?!
+	for(i=0; (a = document.getElementsByTagName("link")[i]); i++)
+	{
+		if(a.getAttribute("rel").indexOf("style") != -1 && a.getAttribute("title"))
+		{
+			a.disabled = true;
 			if(a.getAttribute("title") == title)
+			{
 				a.disabled = false;
-			else
-				a.disabled = true;
+			}
 		}
 	}
+
+	this.createCookie("evo_style", title, 365);
 
 	return true;
 };
 
-StyleSwitcher.prototype.getActiveStyleSheet = function() {
+StyleSwitcher.prototype.getActiveStyleSheet = function()
+{
 	var i, a;
-	for(i=0; (a = document.getElementsByTagName("link")[i]); i++) {
-		if(a.getAttribute("rel").indexOf("style") != -1 && a.getAttribute("title") && !a.disabled) {
+	for(i=0; (a = document.getElementsByTagName("link")[i]); i++)
+	{
+		if(a.getAttribute("rel").indexOf("style") != -1 && a.getAttribute("title") && !a.disabled)
+		{
 			return a.getAttribute("title");
 		}
 	}
 	return null;
 };
 
-StyleSwitcher.prototype.getPreferredStyleSheet = function() {
+StyleSwitcher.prototype.getPreferredStyleSheet = function()
+{
 	var i, a;
-	for(i=0; (a = document.getElementsByTagName("link")[i]); i++) {
+	for(i=0; (a = document.getElementsByTagName("link")[i]); i++)
+	{
 		if(a.getAttribute("rel").indexOf("style") != -1
-		&& a.getAttribute("rel").indexOf("alt") == -1
-		&& a.getAttribute("title")
-		) return a.getAttribute("title");
+			&& a.getAttribute("rel").indexOf("alt") == -1
+			&& a.getAttribute("title") )
+		{
+			return a.getAttribute("title");
+		}
 	}
 	return null;
 };
 
-StyleSwitcher.prototype.createCookie = function(name,value,days) {
-	if (days) {
+StyleSwitcher.prototype.createCookie = function(name,value,days)
+{
+	if (days)
+	{
 		var date = new Date();
 		date.setTime(date.getTime()+(days*24*60*60*1000));
 		var expires = "; expires="+date.toGMTString();
@@ -124,15 +140,21 @@ StyleSwitcher.prototype.createCookie = function(name,value,days) {
 	document.cookie = name+"="+value+expires+"; path=/";
 };
 
-StyleSwitcher.prototype.readCookie = function(name) {
+StyleSwitcher.prototype.readCookie = function(name)
+{
 	var nameEQ = name + "=";
 	var ca = document.cookie.split(';');
-	for(var i=0;i < ca.length;i++) {
+	for(var i=0;i < ca.length;i++)
+	{
 		var c = ca[i];
 		while (c.charAt(0)==' ')
+		{
 			c = c.substring(1,c.length);
+		}
 		if (c.indexOf(nameEQ) == 0)
+		{
 			return c.substring(nameEQ.length,c.length);
+		}
 	}
 
 	return null;
