@@ -1465,12 +1465,14 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
 			preg_match( '~^(mailto):(.*?)(\?.*)?$~', $url, $match );
 			if( ! $match )
 			{
+// fp> WTF!? we're gonna print out UNESCAPED content that WE KNOW IS INVALID/UNSAFE!??!!!
 				return $verbose
 					? sprintf( T_('Invalid email link: %s.'), $url )
 					: T_('Invalid email link.');
 			}
       elseif( ! is_email($match[2]) )
 			{
+// fp> WTF!? we're gonna print out UNESCAPED content that WE KNOW IS INVALID/UNSAFE!??!!!
 				return $verbose
 					? sprintf( T_('Supplied email address (%s) is invalid.'), $match[2] )
 					: T_('Invalid email address.');
@@ -1485,6 +1487,7 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
 			~ix', $url, $match) )
 		{ // Cannot validate URL structure
 			$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
+// fp> WTF!? we're gonna print out UNESCAPED content that WE KNOW IS INVALID/UNSAFE!??!!!
 			return $verbose
 				? sprintf( T_('Invalid URL format (%s).'), $url )
 				: T_('Invalid URL format.');
@@ -1493,6 +1496,7 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
 		$scheme = strtolower($match[1]);
 		if( !in_array( $scheme, $allowed_uri_scheme ) )
 		{ // Scheme not allowed
+// fp> WTF!? we're gonna print out UNESCAPED content that WE KNOW IS INVALID/UNSAFE!??!!!
 			$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
 			return $verbose
 				? sprintf( T_('URI scheme "%s" not allowed.'), $scheme )
@@ -1646,6 +1650,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.31  2007/02/26 03:41:16  fplanque
+ * doc
+ *
  * Revision 1.30  2007/02/25 18:29:55  blueyed
  * MFB: Support "S" (ordinal date suffix) in date format (calendar and validator)
  *

@@ -195,7 +195,7 @@ switch( $action )
 
 		if( is_logged_in() && $current_User->validated )
 		{ // Already validated, e.g. clicked on an obsolete email link:
-			$Messages->add( T_('Your account has been validated already.'), 'note' );
+			$Messages->add( T_('Your account has already been validated.'), 'note' );
 			// no break: cleanup & redirect below
 		}
 		else
@@ -395,6 +395,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.91  2007/02/26 03:41:16  fplanque
+ * doc
+ *
  * Revision 1.90  2007/02/21 23:52:26  fplanque
  * doc
  *
@@ -403,6 +406,7 @@ exit();
  *
  * Revision 1.88  2007/02/13 21:03:40  blueyed
  * Improved login/register/validation process:
+// So seriously now:  "been validated already" and then "already been validated" on the same line!!! I don't think this is funny any longer. ("already been" is better)
  * - "Your account has been validated already." if an account had already been validated
  * - "We have already sent you %d email(s) with a validation link." note
  * - Autologin the user after he has registered (he just typed his credentials!)

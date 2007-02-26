@@ -5,6 +5,7 @@
  * @author fplanque: Francois PLANQUE
  *
  * @todo dh> Should this also handle feedback notifications (according to the "outbound_notifications_mode" setting)?
+ * fp> No. The feedback notifications should have their own job.
  *
  * @version $Id$
  */
@@ -65,6 +66,9 @@ return 1; /* ok */
 
 /*
  * $Log$
+ * Revision 1.5  2007/02/26 03:41:16  fplanque
+ * doc
+ *
  * Revision 1.4  2007/02/13 01:30:31  blueyed
  * TODO: do not notify about not published comments / use "outbound_notifications_mode" setting for comments, too
  *
