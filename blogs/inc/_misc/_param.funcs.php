@@ -1466,6 +1466,7 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
 			if( ! $match )
 			{
 // fp> WTF!? we're gonna print out UNESCAPED content that WE KNOW IS INVALID/UNSAFE!??!!!
+// dh> It gets returned when requested explictly. This is meant to get displayed using htmlspecialchars() in the backoffice; see CVS log..
 				return $verbose
 					? sprintf( T_('Invalid email link: %s.'), $url )
 					: T_('Invalid email link.');
@@ -1473,6 +1474,7 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
       elseif( ! is_email($match[2]) )
 			{
 // fp> WTF!? we're gonna print out UNESCAPED content that WE KNOW IS INVALID/UNSAFE!??!!!
+// dh> It gets returned when requested explictly. This is meant to get displayed using htmlspecialchars() in the backoffice; see CVS log..
 				return $verbose
 					? sprintf( T_('Supplied email address (%s) is invalid.'), $match[2] )
 					: T_('Invalid email address.');
@@ -1488,6 +1490,7 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
 		{ // Cannot validate URL structure
 			$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
 // fp> WTF!? we're gonna print out UNESCAPED content that WE KNOW IS INVALID/UNSAFE!??!!!
+// dh> It gets returned when requested explictly. This is meant to get displayed using htmlspecialchars() in the backoffice; see CVS log..
 			return $verbose
 				? sprintf( T_('Invalid URL format (%s).'), $url )
 				: T_('Invalid URL format.');
@@ -1497,6 +1500,7 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
 		if( !in_array( $scheme, $allowed_uri_scheme ) )
 		{ // Scheme not allowed
 // fp> WTF!? we're gonna print out UNESCAPED content that WE KNOW IS INVALID/UNSAFE!??!!!
+// dh> It gets returned when requested explictly. This is meant to get displayed using htmlspecialchars() in the backoffice; see CVS log..
 			$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
 			return $verbose
 				? sprintf( T_('URI scheme "%s" not allowed.'), $scheme )
@@ -1650,6 +1654,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.32  2007/02/28 23:33:19  blueyed
+ * doc
+ *
  * Revision 1.31  2007/02/26 03:41:16  fplanque
  * doc
  *

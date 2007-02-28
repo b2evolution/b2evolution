@@ -140,7 +140,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		<p><strong><?php echo T_('Author') ?>:</strong> <?php echo $edited_Comment->author() ?></p>
 		<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $edited_Comment->type; ?></p>
 		<p><strong><?php echo T_('IP address') ?>:</strong> <?php
-// fp> again, what's the point? (see comment in other file)
+			// Display IP address and allow plugins to filter it, e.g. the DNSBL plugin will add a link to check the IP:
 			echo $Plugins->get_trigger_event( 'FilterIpAddress', array('format'=>'htmlbody', 'data'=>$edited_Comment->author_IP), 'data' ); ?></p>
 		<p><strong><?php echo T_('Spam Karma') ?>:</strong> <?php $edited_Comment->spam_karma(); ?></p>
 		<p><strong><?php echo T_('Item') ?>:</strong> <?php
@@ -168,6 +168,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.24  2007/02/28 23:37:52  blueyed
+ * doc
+ *
  * Revision 1.23  2007/02/25 01:40:43  fplanque
  * doc
  *
