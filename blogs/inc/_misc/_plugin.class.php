@@ -1411,9 +1411,11 @@ class Plugin
 	 * @see Plugin::DisplayCommentFormFieldset()
 	 * @param array Associative array of parameters
 	 *   - 'comment_post_ID': ID of the item the comment is for
-	 *   - 'comment': the original, unfiltered comment text (by reference)
+	 *   - 'comment': the comment text (by reference)
+	 *   - 'original_comment': the original, unfiltered comment text - you should not modify it here,
+	 *      this is meant e.g. for the OpenID plugin to re-inject it after redirection (by reference)
 	 *   - 'comment_autobr': is the Auto-BR checkbox checked (by reference)
-	 *   - 'is_preview': is this a preview request?
+	 *   - 'action': "save" or "preview" (by reference)
 	 *   - 'User': {@link User}, if logged in or null (by reference)
 	 *   - 'anon_name': Name of the anonymous commenter (by reference)
 	 *   - 'anon_email': E-Mail of the anonymous commenter (by reference)
@@ -1438,6 +1440,7 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'Comment': the Comment (by reference)
 	 *   - 'original_comment': this is the unstripped and unformated posted comment
+	 *   - 'action': "save" or "preview" (by reference) (since 1.10)
 	 *   - 'is_preview': is this a request for previewing the comment? (boolean)
 	 */
 	function BeforeCommentFormInsert( & $params )
@@ -2859,6 +2862,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.150  2007/02/28 23:21:53  blueyed
+ * Pass $original_comment to CommentFormSent and "action" to BeforeCommentFormInsert
+ *
  * Revision 1.149  2007/02/25 02:03:51  fplanque
  * no message
  *

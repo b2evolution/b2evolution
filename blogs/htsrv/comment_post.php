@@ -87,8 +87,9 @@ $original_comment = $comment;
 $Plugins->trigger_event( 'CommentFormSent', array(
 		'comment_post_ID' => $comment_post_ID,
 		'comment' => & $comment,
+		'original_comment' => & $original_comment,
 		'comment_autobr' => & $comment_autobr,
-		'is_preview' => ($action == 'preview'),
+		'action' => & $action,
 		'anon_name' => & $author,
 		'anon_email' => & $email,
 		'anon_url' => & $url,
@@ -217,7 +218,8 @@ if( $action != 'preview' )
 $Plugins->trigger_event('BeforeCommentFormInsert', array(
 	'Comment' => & $Comment,
 	'original_comment' => $original_comment,
-	'is_preview' => ($action == 'preview') ) );
+	'is_preview' => ($action == 'preview'),
+	'action' => & $action ) );
 
 
 /*
@@ -361,6 +363,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.109  2007/02/28 23:21:53  blueyed
+ * Pass $original_comment to CommentFormSent and "action" to BeforeCommentFormInsert
+ *
  * Revision 1.108  2007/02/22 22:14:14  blueyed
  * Improved CommentFormSent hook
  *
