@@ -184,7 +184,8 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 						 FROM T_hitlog INNER JOIN T_basedomains ON hit_referer_dom_ID = dom_ID
 						 			LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
 						WHERE hit_referer LIKE '.$DB->quote('%'.$keyword.'%').'
-						ORDER BY dom_name ASC';
+						ORDER BY dom_name ASC
+						LIMIT 500';
 		$res_affected_hits = $DB->get_results( $sql, ARRAY_A );
 		if( $DB->num_rows == 0 )
 		{ // No matching hits.
@@ -196,7 +197,7 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 			<p>
 				<input type="checkbox" name="delhits" id="delhits_cb" value="1" checked="checked" />
 				<label for="delhits_cb">
-				<strong><?php printf ( T_('Delete the following %d referer hits:'), $DB->num_rows ) ?></strong>
+				<strong><?php printf ( T_('Delete the following %s referer hits:'), $DB->num_rows == 500 ? '500+' : $DB->num_rows ) ?></strong>
 				</label>
 			</p>
 			<table class="grouped" cellspacing="0">
@@ -238,7 +239,8 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 									 OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
 							 		 OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
     				   		 OR comment_content LIKE '.$DB->quote('%'.$keyword.'%').'
-						 ORDER BY comment_date ASC';
+						 ORDER BY comment_date ASC
+						 LIMIT 500';
 		$res_affected_comments = $DB->get_results( $sql, ARRAY_A, 'Find matching comments' );
 		if( $DB->num_rows == 0 )
 		{ // No matching hits.
@@ -250,7 +252,7 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 			<p>
 				<input type="checkbox" name="delcomments" id="delcomments_cb" value="1" checked="checked" />
 				<label for="delcomments_cb">
-				<strong><?php printf ( T_('Delete the following %d comments:'), count($res_affected_comments) ) ?></strong>
+				<strong><?php printf ( T_('Delete the following %s comments:'), $DB->num_rows == 500 ? '500+' : $DB->num_rows ) ?></strong>
 				</label>
 			</p>
 			<table class="grouped" cellspacing="0">
@@ -365,6 +367,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2007/03/01 02:42:03  fplanque
+ * prevent miserable failure when trying to delete heavy spam.
+ *
  * Revision 1.8  2006/12/07 21:16:55  fplanque
  * killed templates
  *
