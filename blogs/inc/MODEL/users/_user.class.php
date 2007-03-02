@@ -522,17 +522,18 @@ class User extends DataObject
 			case 'blog_genstatic':
 				// Blog permission to edit its properties... (Group may grant view acces, full access)
 				// Forward request to group:
-				$this->get_Group();
+				/* fp> I commented this out because I don't understand what it's for and it break restricting
+						blog_post_statuses to private for example
 				if( $this->Group->check_perm( 'blogs', $permlevel ) )
 				{ // If group says yes
 					$perm = true;
 					break;
-				}
+				}*/
 				if( $perm_target > 0 )
-				{ // Check user perm for this blog
+				{ // Check user perm for this blog:
 					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
 					if ( $perm == false )
-					{ // Check groups for permissions to this specific blog
+					{ // Check groups for permissions to this specific blog:
 						$this->get_Group();
 						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
 					}
@@ -1169,6 +1170,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.64  2007/03/02 00:44:43  fplanque
+ * various small fixes
+ *
  * Revision 1.63  2007/01/23 21:45:25  fplanque
  * "enforce" foreign keys
  *

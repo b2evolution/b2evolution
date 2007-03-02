@@ -148,9 +148,11 @@ class Blog extends DataObject
 			);
 
 		$this->delete_cascades = array(
-				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user rights defintions') ),
-				// b2evo only:
+				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user permission defintions') ),
+				array( 'table'=>'T_coll_group_perms', 'fk'=>'bloggroup_blog_ID', 'msg'=>T_('%d group permission defintions') ),
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_coll_ID', 'msg'=>T_('%d subscriptions') ),
+				array( 'table'=>'T_widget', 'fk'=>'wi_coll_ID', 'msg'=>T_('%d widgets') ),
+				array( 'table'=>'T_hitlog', 'fk'=>'hit_blog_ID', 'msg'=>T_('%d hits') ),
 			);
 
 		if( $db_row == NULL )
@@ -655,6 +657,9 @@ class Blog extends DataObject
 	 */
 	function get_allowed_item_status( $status = NULL )
 	{
+    /**
+		 * @var User
+		 */
 		global $current_User;
 		global $default_post_status;
 
@@ -662,7 +667,6 @@ class Blog extends DataObject
 		{
 			$status = $default_post_status;
 		}
-
 		if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $this->ID ) )
 		{ // We need to find another one:
 			$status = NULL;
@@ -678,7 +682,6 @@ class Blog extends DataObject
 			elseif( $current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $this->ID ) )
 				$status = 'deprecated';
 		}
-
 		return $status;
 	}
 
@@ -1203,34 +1206,6 @@ class Blog extends DataObject
 
 		} // / are there cats?
 
-		// Delete blogusers
-		if( $echo ) echo '<br />Deleting user-blog permissions... ';
-		$ret = $DB->query( "DELETE FROM T_coll_user_perms
-												WHERE bloguser_blog_ID = $this->ID" );
-		if( $echo ) printf( '(%d rows)', $ret );
-		$Messages->add( T_('Deleted blog\'s user permissions'), 'success' );
-
-		// Delete bloggroups
-		if( $echo ) echo '<br />Deleting group-blog permissions... ';
-		$ret = $DB->query( "DELETE FROM T_coll_group_perms
-												WHERE bloggroup_blog_ID = $this->ID" );
-		if( $echo ) printf( '(%d rows)', $ret );
-		$Messages->add( T_('Deleted blog\'s group permissions'), 'success' );
-
-		// Delete subscriptions
-		if( $echo ) echo '<br />Deleting subscriptions... ';
-		$ret = $DB->query( "DELETE FROM T_subscriptions
-												WHERE sub_coll_ID = $this->ID" );
-		if( $echo ) printf( '(%d rows)', $ret );
-		$Messages->add( T_('Deleted blog\'s subscriptions'), 'success' );
-
-		// Delete hitlogs
-		if( $echo ) echo '<br />Deleting blog hitlogs... ';
-		$ret = $DB->query( "DELETE FROM T_hitlog
-												WHERE hit_blog_ID = $this->ID",
-												'Deleting blog hitlogs' );
-		if( $echo ) printf( '(%d rows)', $ret );
-		$Messages->add( T_('Deleted blog\'s hitlogs'), 'success' );
 
 		if( $delete_stub_file )
 		{ // Delete stub file
@@ -1357,6 +1332,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.66  2007/03/02 00:44:43  fplanque
+ * various small fixes
+ *
  * Revision 1.65  2007/02/25 01:31:34  fplanque
  * minor
  *
