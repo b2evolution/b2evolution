@@ -54,13 +54,31 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			  <link><?php $Blog->disp( 'blogurl', 'xml' ) ?></link>
 			  <description><?php $Blog->disp( 'shortdesc' ,'xml' ) ?></description>
 			  <language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
-			  <docs>http://backend.userland.com/rss092</docs>
+			  <docs>http://blogs.law.harvard.edu/tech/rss</docs>
 			  <?php while( $Item = & $MainList->get_item() ) { ?>
 			  <item>
 			    <title><?php $Item->title( '', '', false, 'xml' ) ?></title>
 			    <description><?php
-			      $Item->url_link( '', ' ', '%s', array(), 'entityencoded' );
-						$content = $Item->get_content( 1, false, T_('[...] Read more!'), '', '', '', 'entityencoded' );
+			    	// fp> TODO: make a clear decision on wether or not $before &nd $after get formatted to output or not.
+			      $Item->url_link( '&lt;p&gt;', '&lt;/p&gt;', '%s', array(), 'entityencoded' );
+
+						// Display images that are linked to this post:
+						$content = $Item->get_images( array(
+								'before' =>              '<div>',
+								'before_image' =>        '<div>',
+								'before_image_legend' => '<div><i>',
+								'after_image_legend' =>  '</i></div>',
+								'after_image' =>         '</div>',
+								'after' =>               '</div>',
+								'image_size' =>          'fit-320x320'
+							), 'entityencoded' );
+
+						$content .= $Item->get_content( 1, false, T_('[...] Read more!'), '', '', '', 'entityencoded' );
+
+						// fp> this is  another one of these "oooooh it's just a tiny little change"
+						// and "we only need to make the links absolute in RSS"
+						// and then you get half baked code! The URL LINK stays RELATIVE!! :((
+						// TODO: clean solution : work in format_to_output!
 						echo make_rel_links_abs( $content );
 			    ?></description>
 			    <link><?php $Item->permanent_url( 'single' ) ?></link>

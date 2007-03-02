@@ -62,7 +62,7 @@ while( $Comment = & $CommentList->get_next() )
 	<link><?php $Comment->permanent_url() ?></link>
 	<dc:date><?php $Comment->date( 'isoZ', true ); ?></dc:date>
 	<dc:creator><?php $Comment->author( '', '#', '', '#', 'xml' ) ?></dc:creator>
-	<description><?php echo make_rel_links_abs($Comment->get_content( 'xml' )); ?></description>
+	<description><?php echo make_rel_links_abs( $Comment->get_content('entityencoded') ); ?></description>
 	<content:encoded><![CDATA[<?php echo make_rel_links_abs( $Comment->get_content() ); ?>]]></content:encoded>
 </item>
 <?php } // End of comment loop. ?>

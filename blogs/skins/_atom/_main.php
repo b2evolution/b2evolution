@@ -85,8 +85,26 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				<published><?php $Item->issue_date( 'isoZ', true ) ?></published>
 				<updated><?php $Item->mod_date( 'isoZ', true ) ?></updated>
 				<content type="html"><![CDATA[<?php
-					$Item->url_link( '<p>', '</p>' );
-					echo make_rel_links_abs( $Item->get_content() );
+						$Item->url_link( '<p>', '</p>' );
+
+						// Display images that are linked to this post:
+						$content = $Item->get_images( array(
+								'before' =>              '<div>',
+								'before_image' =>        '<div>',
+								'before_image_legend' => '<div><i>',
+								'after_image_legend' =>  '</i></div>',
+								'after_image' =>         '</div>',
+								'after' =>               '</div>',
+								'image_size' =>          'fit-320x320'
+							), 'htmlbody' );
+
+						$content .= $Item->get_content();
+
+						// fp> this is another one of these "oooooh it's just a tiny little change"
+						// and "we only need to make the links absolute in RSS"
+						// and then you get half baked code! The URL LINK stays RELATIVE!! :((
+						// TODO: clean solution : work in format_to_output! --- we probably need 'htmlfeed' as 'htmlbody+absolute'
+						echo make_rel_links_abs( $content );
 				?>]]></content>
 			</entry>
 

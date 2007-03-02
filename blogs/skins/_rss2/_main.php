@@ -55,7 +55,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				<link><?php $Blog->disp( 'blogurl', 'xml' ) ?></link>
 				<description><?php $Blog->disp( 'shortdesc', 'xml' ) ?></description>
 				<language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
-				<docs>http://backend.userland.com/rss</docs>
+				<docs>http://blogs.law.harvard.edu/tech/rss</docs>
 				<admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $app_version ?>"/>
 				<ttl>60</ttl>
 				<?php while( $Item = & $MainList->get_item() ) {	?>
@@ -64,16 +64,52 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 					<link><?php $Item->permanent_url( 'single' ) ?></link>
 					<pubDate><?php $Item->issue_date( 'r', true ) ?></pubDate>
 					<dc:creator><?php $Item->get_creator_User(); $Item->creator_User->preferred_name('xml') ?></dc:creator>
-					<?php $Item->categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'xml' ) ?>
+					<?php $Item->categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'htmlbody' ) // TODO: "xml" eats away the tags!! ?>
 					<guid isPermaLink="false"><?php $Item->ID() ?>@<?php echo $baseurl ?></guid>
-					<description><?php
-						$Item->url_link( '', ' ', '%s', array(), 'xml' );
-						$content = $Item->get_content( 1, false, T_('[...] Read more!'), '', '', '', 'xml', $rss_excerpt_length );
+			    <description><?php
+			    	// fp> TODO: make a clear decision on wether or not $before &nd $after get formatted to output or not.
+			      $Item->url_link( '&lt;p&gt;', '&lt;/p&gt;', '%s', array(), 'entityencoded' );
+
+						// Display images that are linked to this post:
+						$content = $Item->get_images( array(
+								'before' =>              '<div>',
+								'before_image' =>        '<div>',
+								'before_image_legend' => '<div><i>',
+								'after_image_legend' =>  '</i></div>',
+								'after_image' =>         '</div>',
+								'after' =>               '</div>',
+								'image_size' =>          'fit-320x320'
+							), 'entityencoded' );
+
+						$content .= $Item->get_content( 1, false, T_('[...] Read more!'), '', '', '', 'entityencoded' );
+
+						// fp> this is another one of these "oooooh it's just a tiny little change"
+						// and "we only need to make the links absolute in RSS"
+						// and then you get half baked code! The URL LINK stays RELATIVE!! :((
+						// TODO: clean solution : work in format_to_output!
 						echo make_rel_links_abs( $content );
-					?></description>
+			    ?></description>
 					<content:encoded><![CDATA[<?php
 						$Item->url_link( '<p>', '</p>' );
-						echo make_rel_links_abs( $Item->get_content() );
+
+						// Display images that are linked to this post:
+						$content = $Item->get_images( array(
+								'before' =>              '<div>',
+								'before_image' =>        '<div>',
+								'before_image_legend' => '<div><i>',
+								'after_image_legend' =>  '</i></div>',
+								'after_image' =>         '</div>',
+								'after' =>               '</div>',
+								'image_size' =>          'fit-320x320'
+							), 'htmlbody' );
+
+						$content .= $Item->get_content();
+
+						// fp> this is another one of these "oooooh it's just a tiny little change"
+						// and "we only need to make the links absolute in RSS"
+						// and then you get half baked code! The URL LINK stays RELATIVE!! :((
+						// TODO: clean solution : work in format_to_output! --- we probably need 'htmlfeed' as 'htmlbody+absolute'
+						echo make_rel_links_abs( $content );
 					?>]]></content:encoded>
 					<comments><?php comments_link( '', 1, 1 ) ?></comments>
 				</item>

@@ -1615,8 +1615,23 @@ class Item extends DataObject
 
 	/**
 	 * Display the images linked to the current Item
+	 *
+	 * @param array of params
+	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function images( $params = array() )
+	function images( $params = array(), $format = 'htmlbody' )
+	{
+		echo $this->get_images( $params, $format );
+	}
+
+
+	/**
+	 * Get block of images linked to the current Item
+	 *
+	 * @param array of params
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function get_images( $params = array(), $format = 'htmlbody' )
 	{
 		$params = array_merge( array(
 				'before' =>              '<div>',
@@ -1657,8 +1672,13 @@ class Item extends DataObject
 
 		if( !empty($r) )
 		{
-			echo $params['before'].$r.$params['after'];
+			$r = $params['before'].$r.$params['after'];
+
+			// Character conversions
+			$r = format_to_output( $r, $format );
 		}
+
+		return $r;
 	}
 
 
@@ -3366,6 +3386,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.155  2007/03/02 04:40:38  fplanque
+ * fixed/commented a lot of stuff with the feeds
+ *
  * Revision 1.154  2007/03/02 03:09:12  fplanque
  * rss length doesn't make sense since it doesn't apply to html format anyway.
  * clean solutionwould be to handle an "excerpt" field separately
