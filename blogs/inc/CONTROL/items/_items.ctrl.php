@@ -33,6 +33,11 @@ global $UserSettings;
  */
 global $current_User;
 
+/**
+ * @var Blog
+ */
+global $Blog;
+
 param( 'action', 'string', 'list' );
 
 
@@ -685,6 +690,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2007/03/02 01:36:51  fplanque
+ * small fixes
+ *
  * Revision 1.14  2007/02/23 00:21:23  blueyed
  * Fixed Plugins::get_next() if the last Plugin got unregistered; Added AdminBeforeItemEditDelete hook
  *

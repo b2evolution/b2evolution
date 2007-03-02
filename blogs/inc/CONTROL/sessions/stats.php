@@ -69,6 +69,9 @@ function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
 	return '<a href="'.$full_url.'">'.$hit_uri.'</a>';
 }
 
+// We set the default to -1 so that blog=0 will make its way into regenerate_url()s whenever watching global stats.
+memorize_param( 'blog', 'integer', -1 );
+
 $tab = param( 'tab', 'string', 'summary', true );
 $AdminUI->set_path( 'stats', $tab );
 $AdminUI->title = T_('View Stats for Blog:');
@@ -213,6 +216,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.33  2007/03/02 01:36:51  fplanque
+ * small fixes
+ *
  * Revision 1.32  2006/12/07 23:21:00  fplanque
  * dashboard blog switching
  *

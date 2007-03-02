@@ -1309,8 +1309,9 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $moredelim 
 		}
 
 		$value = $GLOBALS[$var];
-		if( (!empty($value)) && ($value != $defval) )
-		{ // Value exists and is not set to default value:
+		if( $value != $defval )
+		{ // Value is not set to default value:
+			// Note: sometimes we will want to include an empty value, especially blog=0 ! In that case we set the default for blog to -1.
 			// echo "adding $var \n";
 			// if( isset($Debuglog) ) $Debuglog->add( "regenerate_url(): Using var=$var, type=$type, defval=[$defval], val=[$value]", 'params' );
 
@@ -1333,7 +1334,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $moredelim 
 		}
 	}
 
-	// Merge in  the params we want to force to a specifoc value:
+	// Merge in the params we want to force to a specific value:
 	if( !empty( $set ) )
 	{	// We got some forced params:
 		// Transform set param into an array:
@@ -1467,6 +1468,7 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
 			{
 // fp> WTF!? we're gonna print out UNESCAPED content that WE KNOW IS INVALID/UNSAFE!??!!!
 // dh> It gets returned when requested explictly. This is meant to get displayed using htmlspecialchars() in the backoffice; see CVS log..
+// fp> This totally makes no sense at all. htmlspecialchars after a T_() !!  Not even mentioning people that will forget. The espace should be in there. btw, there is nothing in the log about this and if there was, it would be the worst possible place to put that kind of info!!
 				return $verbose
 					? sprintf( T_('Invalid email link: %s.'), $url )
 					: T_('Invalid email link.');
@@ -1654,6 +1656,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.33  2007/03/02 01:36:51  fplanque
+ * small fixes
+ *
  * Revision 1.32  2007/02/28 23:33:19  blueyed
  * doc
  *
