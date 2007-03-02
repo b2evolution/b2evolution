@@ -57,16 +57,11 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		default:
 			?>
 			<link rel="alternate" type="text/html" href="<?php $Blog->disp( 'blogurl', 'xml' ) ?>" />
-			<link rel="self" type="text/html" href="<?php $Blog->disp( 'atom_url', 'xmlattr' ) ?>" />
+			<link rel="self" type="application/atom+xml" href="<?php $Blog->disp( 'atom_url', 'xmlattr' ) ?>" />
 			<id><?php $Blog->disp( 'atom_url', 'xmlattr' ); /* TODO: may need a regenerate_url() */ ?></id>
 			<subtitle><?php $Blog->disp( 'shortdesc', 'xml' ) ?></subtitle>
 			<generator uri="http://b2evolution.net/" version="<?php echo $app_version ?>"><?php echo $app_name ?></generator>
-			<!--
-			<updated><?php
-			// TODO: dh> call to undefined method:
-			//$MainList->mod_date( 'isoZ', true )
-			?></updated>
-			-->
+			<updated><?php echo gmdate('Y-m-d\TH:i:s\Z'); ?></updated>
 			<?php
 			while( $Item = & $MainList->get_item() )
 			{

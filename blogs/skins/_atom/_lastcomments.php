@@ -28,7 +28,7 @@ $CommentList = & new CommentList( $Blog, "'comment'", array('published'), '',	''
 
 ?>
 	<link rel="alternate" type="text/html" href="<?php $Blog->disp( 'lastcommentsurl', 'xml' ) ?>" />
-	<link rel="self" type="text/html" href="<?php $Blog->disp( 'comments_atom_url', 'xmlattr' ) ?>" />
+	<link rel="self" type="application/atom+xml" href="<?php $Blog->disp( 'comments_atom_url', 'xmlattr' ) ?>" />
 	<id><?php $Blog->disp( 'comments_atom_url', 'xmlattr' ) /* TODO: may need a regenerate_url() */ ?></id>
 	<generator uri="http://b2evolution.net/" version="<?php echo $app_version ?>"><?php echo $app_name ?></generator>
 	<updated><?php echo gmdate('Y-m-d\TH:i:s\Z'); ?></updated>
