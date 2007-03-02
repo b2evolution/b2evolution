@@ -1174,12 +1174,11 @@ class Item extends DataObject
 		$before_more = '#',
 		$after_more = '#',
 		$format = 'htmlbody',
-		$cut = 0,
 		$stripteaser = false,
 		$more_file = ''
 		)
 	{
-		echo $this->get_content( $disppage, $dispmore, $more_link_text, $more_anchor, $before_more, $after_more, $format, $cut, $stripteaser, $more_file );
+		echo $this->get_content( $disppage, $dispmore, $more_link_text, $more_anchor, $before_more, $after_more, $format, $stripteaser, $more_file );
 	}
 
 
@@ -1213,13 +1212,12 @@ class Item extends DataObject
 		$before_more = '#',
 		$after_more = '#',
 		$format = 'htmlbody',
-		$cut = 0,
 		$stripteaser = false,
 		$more_file = ''
 		)
 	{
 		global $Plugins, $Hit, $more, $preview, $current_User, $Debuglog;
-		// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
+		// echo $format,'-',$dispmore,'-',$disppage;
 
 		if( $more_link_text == '#' )
 		{ // TRANS: this is the default text for the extended post "more" link
@@ -1308,21 +1306,6 @@ class Item extends DataObject
 
 		// Character conversions
 		$output = format_to_output( $output, $format );
-
-		// TODO: make $cut also work for other formats..
-		if( ($format == 'xml') && $cut )
-		{ // Let's cut this down...
-			$blah = explode(' ', $output);
-			if (count($blah) > $cut)
-			{
-				$excerpt = '';
-				for ($i=0; $i<$cut; $i++)
-				{
-					$excerpt .= $blah[$i].' ';
-				}
-				$output = $excerpt.'...';
-			}
-		}
 
 		return $output;
 	}
@@ -3383,6 +3366,10 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.154  2007/03/02 03:09:12  fplanque
+ * rss length doesn't make sense since it doesn't apply to html format anyway.
+ * clean solutionwould be to handle an "excerpt" field separately
+ *
  * Revision 1.153  2007/02/23 19:16:07  blueyed
  * MFB: Fixed handling of Item::content for pre-rendering (it gets passed by reference!)
  *

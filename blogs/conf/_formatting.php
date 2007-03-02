@@ -727,13 +727,4 @@ $b2_htmltranswinuni = array(
 	'&#159;' => '&#376;'
 );
 
-
-# ** RSS syndication options **
-# these options are used by rdf.php (1.0), rss.php (0.92), and rss2.php (2.0)
-# length (in words) of excerpts in the RSS feed? 0=unlimited
-# Note: this will not apply to html content!
-/*
- * @todo fp>This should be moved to the backoffice. input for each blog
- */
-$rss_excerpt_length = 0;
 ?>
