@@ -3,6 +3,15 @@
  * Feel free to override all these styles in your own skins
  */
 
+table.prevnext_post {
+	width: 95%;
+	margin: 0 auto;
+}
+table.prevnext_post a {
+	text-decoration: none;
+}
+
+
 .bMore {
 	text-align: center;
 }

@@ -65,6 +65,17 @@ require dirname(__FILE__).'/_bloglist.php';
 
 
 	<?php
+		if( isset($MainList) )
+		{ // Links to previous and next post in single post mode:
+			echo '<div class="nav_right">';
+			$MainList->next_item_link( '', ' ', '<img src="img/next.gif" width="29" height="29" alt="'.T_('Next').'" title="'.T_('Next').'" />', '<img src="'.$rsc_url.'/img/blank.gif" width="29" height="29" alt="" class="no_nav" />' );
+			$MainList->prev_item_link( '', '', '<img src="img/prev.gif" width="29" height="29" alt="'.T_('Previous').'" title="'.T_('Previous').'" />' );
+			echo '</div>';
+		}
+	?>
+
+
+	<?php
 	// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
 	request_title( '<h2>', '</h2>', ' - ', 'htmlbody', array(
 				'category_text' => T_('Album').': ',

@@ -50,6 +50,19 @@ require $skins_path.'_html_header.inc.php';
 	// --------------------------------- END OF MESSAGES ---------------------------------
 ?>
 
+<?php
+	if( isset($MainList) )
+	{ // Links to previous and next post in single post mode:
+		$MainList->prevnext_item_links( array(
+				'block_start' => '<table class="prevnext_post"><tr>',
+				'prev_start'  => '<td>',
+				'prev_end'    => '</td>',
+				'next_start'  => '<td class="right">',
+				'next_end'    => '</td>',
+				'block_end'   => '</tr></table>' ) );
+	}
+?>
+
 <?php request_title( '<h2>', '</h2>' ) ?>
 
 <!-- =================================== START OF MAIN AREA =================================== -->

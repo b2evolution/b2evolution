@@ -55,7 +55,7 @@ require $skins_path.'_html_header.inc.php';
 	if( isset($MainList) )
 	{ // Links to previous and next post in single post mode:
 		$MainList->prevnext_item_links( array(
-				'block_start' => '<table class="wide"><tr>',
+				'block_start' => '<table class="prevnext_post"><tr>',
 				'prev_start'  => '<td>',
 				'prev_end'    => '</td>',
 				'next_start'  => '<td class="right">',
@@ -169,14 +169,11 @@ require $skins_path.'_html_header.inc.php';
 
 ?>
 
-	<?php
-		// Links to list pages:
-		if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>' );
-	?>
-	<?php
-		// previous_post( '<p class="center">%</p>' );
-		// next_post( '<p class="center">%</p>' );
-	?>
+<?php
+	// Links to list pages:
+	if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>' );
+?>
+
 
 <?php
 	// -------------- START OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. --------------

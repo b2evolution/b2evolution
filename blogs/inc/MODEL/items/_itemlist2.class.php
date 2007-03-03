@@ -86,6 +86,12 @@ class ItemList2 extends DataObjectList2
 
 	var $group_by_cat = 0;
 
+
+  /**
+	 * @var array
+	 */
+	var $prevnext_Item = array();
+
 	/**
 	 * Constructor
 	 *
@@ -1639,7 +1645,7 @@ class ItemList2 extends DataObjectList2
 	/**
 	 * Skip to previous
 	 */
-	function prev_item_link( $before = '', $after = '', $text = '&laquo; $title$' )
+	function prev_item_link( $before = '', $after = '', $text = '&laquo; $title$', $no_item = '' )
 	{
     /**
 		 * @var Item
@@ -1652,13 +1658,17 @@ class ItemList2 extends DataObjectList2
 			$prev_Item->permanent_link( $text );
 			echo $after;
 		}
+		else
+		{
+			echo $no_item;
+		}
 	}
 
 
 	/**
 	 * Skip to next
 	 */
-	function next_item_link(  $before = '', $after = '', $text = '$title$ &raquo;' )
+	function next_item_link(  $before = '', $after = '', $text = '$title$ &raquo;', $no_item = '' )
 	{
     /**
 		 * @var Item
@@ -1670,6 +1680,10 @@ class ItemList2 extends DataObjectList2
 			echo $before;
 			$next_Item->permanent_link( $text );
 			echo $after;
+		}
+		else
+		{
+			echo $no_item;
 		}
 	}
 
@@ -1688,6 +1702,11 @@ class ItemList2 extends DataObjectList2
 		{
 			$r = NULL;
 			return $r;
+		}
+
+		if( !empty( $this->prevnext_Item[$direction] ) )
+		{
+			return $this->prevnext_Item[$direction];
 		}
 
     /**
@@ -1819,13 +1838,18 @@ class ItemList2 extends DataObjectList2
 		$next_ID = $DB->get_var( $step1_sql, 0, 0, 'Get ID of next item' );
 
 		// Step 2: get the item (may be NULL):
-		return $ItemCache->get_by_ID( $next_ID, true, false );
+		$this->prevnext_Item[$direction] = & $ItemCache->get_by_ID( $next_ID, true, false );
+
+		return $this->prevnext_Item[$direction];
 
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.51  2007/03/03 03:37:56  fplanque
+ * extended prev/next item links
+ *
  * Revision 1.50  2007/03/03 01:14:12  fplanque
  * new methods for navigating through posts in single item display mode
  *

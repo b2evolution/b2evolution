@@ -52,6 +52,9 @@ div.pageHeader /* Title zone */
 	/* border: 1px solid #f00; */
 }
 
+table.prevnext_post {
+	width: 98%;
+}
 
 .posts /* Left column */
 {

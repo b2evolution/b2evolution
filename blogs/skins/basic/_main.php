@@ -55,6 +55,19 @@ skin_content_header();	// Sets charset!
 	// --------------------------------- END OF MESSAGES ---------------------------------
 	?>
 
+  <?php
+	if( isset($MainList) )
+	{ // Links to previous and next post in single post mode:
+		$MainList->prevnext_item_links( array(
+				'block_start' => '',
+				'prev_start'  => '',
+				'prev_end'    => ' :',
+				'next_start'  => ': ',
+				'next_end'    => '',
+				'block_end'   => '' ) );
+	}
+	?>
+
 	<?php request_title( '<h2>', '</h2>' ) ?>
 
 	<?php	// ---------------------------------- START OF POSTS --------------------------------------
