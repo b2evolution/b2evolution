@@ -52,6 +52,20 @@ require $skins_path.'_html_header.inc.php';
 
 
 <?php
+	if( isset($MainList) )
+	{ // Links to previous and next post in single post mode:
+		$MainList->prevnext_item_links( array(
+				'block_start' => '<table class="wide"><tr>',
+				'prev_start'  => '<td>',
+				'prev_end'    => '</td>',
+				'next_start'  => '<td class="right">',
+				'next_end'    => '</td>',
+				'block_end'   => '</tr></table>' ) );
+	}
+?>
+
+
+<?php
 	// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
 	request_title( '<h2>', '</h2>' );
 	// ------------------------------ END OF REQUEST TITLE -----------------------------
@@ -73,12 +87,6 @@ require $skins_path.'_html_header.inc.php';
 	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
 	{
 	?>
-
-	<?php
-		//previous_post();	// link to previous post in single page mode
-		//next_post(); 			// link to next post in single page mode
-	?>
-
 
 	<?php
 		$MainList->date_if_changed();

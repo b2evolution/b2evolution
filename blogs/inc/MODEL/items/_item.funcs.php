@@ -126,8 +126,6 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 
 /**
- * get_postdata(-)
- *
  * if global $postdata was not set it will be
  */
 function get_postdata($postid)
@@ -185,173 +183,6 @@ function get_postdata($postid)
 
 	return false;
 }
-
-
-
-
-/**
- * previous_post(-)
- * @todo Move to ItemList
- * @todo dh> see WP's previous_post_link() for param ideas (using $link instead of $previous and $title). Also, use booleans of course!
- *       $in_same_blog would also be useful!
- */
-function previous_post( $format='&lt;&lt; % ', $previous='#', $title='yes', $in_same_cat='no', $limitprev=1, $excluded_categories='', $in_same_blog = true )
-{
-	global $disp, $posts, $postdata;
-
-	// TODO: $postdata is not set here!! (which is generally good - as of "deprecating those globals", but bad in this context)
-	// fp> the real TODO is above: move to ItemList!
-
-	if( empty($postdata) || ($disp != 'single' && $posts != 1) )
-	{
-		return;
-	}
-
-	global $DB;
-	global $Blog;
-
-	if( $previous == '#' ) $previous = T_('Previous post') . ': ';
-
-	$from = 'T_posts';
-
-	$current_post_date = $postdata['Date'];
-	$current_category = $postdata['Category'];
-
-	if( is_string($in_same_cat) ) { $in_same_cat = ($in_same_cat != 'no'); }
-
-	$sqlcat = '';
-	if( $in_same_cat ) {
-		$sqlcat = " AND post_main_cat_ID = $current_category ";
-	}
-
-	$sql_exclude_cats = '';
-	if (!empty($excluded_categories)) {
-		$blah = explode('and', $excluded_categories);
-		foreach($blah as $category) {
-			$category = intval($category);
-			$sql_exclude_cats .= " AND post_main_cat_ID <> $category";
-		}
-	}
-
-	if( $in_same_blog )
-	{
-		$from .= ' INNER JOIN T_categories ON post_main_cat_ID = cat_ID';
-		$sqlcat .= ' AND cat_blog_ID = '.$postdata['Blog'];
-	}
-
-	$limitprev--;
-	$sql = "SELECT post_ID, post_title
-	          FROM $from
-	         WHERE post_datestart < '$current_post_date'
-	               $sqlcat
-	               $sql_exclude_cats
-	           AND ".statuses_where_clause()."
-	         ORDER BY post_datestart DESC
-	         LIMIT $limitprev, 1";
-
-	if( $p_info = $DB->get_row( $sql, OBJECT, 0, 'previous_post()' ) )
-	{
-		$ItemCache = & get_Cache( 'ItemCache' );
-		$Item = & $ItemCache->get_by_ID($p_info->post_ID);
-
-		$blog_url = $in_same_cat ? $Blog->get('url') : '';
-		$string = '<a href="'.$Item->get_permanent_url('', $blog_url).'">'.$previous;
-		if( $title == 'yes' ) {
-			$string .= $p_info->post_title;
-		}
-		$string .= '</a>';
-		$format = str_replace('%',$string,$format);
-		echo $format;
-	}
-}
-
-
-/**
- * next_post(-)
- *
- * @todo Move to ItemList
- * @todo dh> see WP's previous_post_link() for param ideas (using $link instead of $previous and $title). Also, use booleans of course!
- *       $in_same_blog would also be useful!
- */
-function next_post( $format = '% &gt;&gt; ', $next = '#', $title = 'yes', $in_same_cat = 'no', $limitnext = 1, $excluded_categories = '', $in_same_blog = true )
-{
-	global $disp, $posts, $postdata;
-
-	// TODO: $postdata is not set here!! (which is generally good - as of "deprecating those globals", but bad in this context)
-	// fp> the real TODO is above: move to ItemList!
-
-	if( empty($postdata) || ($disp != 'single' && $posts != 1) )
-	{
-		return;
-	}
-
-	global $localtimenow, $DB;
-	global $Blog;
-
-	if( $next == '#' ) $next = T_('Next post') . ': ';
-
-	$from = 'T_posts';
-
-	$current_post_date = $postdata['Date'];
-	$current_category = $postdata['Category'];
-
-	if( is_string($in_same_cat) ) { $in_same_cat = ($in_same_cat != 'no'); }
-
-	$sqlcat = '';
-	if( $in_same_cat )
-	{
-		$sqlcat = " AND post_main_cat_ID = $current_category ";
-	}
-
-	$sql_exclude_cats = '';
-	if (!empty($excluded_categories))
-	{
-		$blah = explode('and', $excluded_categories);
-		foreach($blah as $category)
-		{
-			$category = intval($category);
-			$sql_exclude_cats .= " AND post_main_cat_ID != $category";
-		}
-	}
-
-	if( $in_same_blog )
-	{
-		$from .= ' INNER JOIN T_categories ON post_main_cat_ID = cat_ID';
-		$sqlcat .= ' AND cat_blog_ID = '.$postdata['Blog'];
-	}
-
-
-	// TODO: fp> This should actually look at the min an dmax timestamp settings
-	$now = date('Y-m-d H:i:s', $localtimenow );
-
-	$limitnext--;
-	$sql = "SELECT post_ID, post_title
-	          FROM $from
-	         WHERE post_datestart > '$current_post_date'
-	           AND post_datestart < '$now'
-	               $sqlcat
-	               $sql_exclude_cats
-	           AND ".statuses_where_clause()."
-	         ORDER BY post_datestart ASC
-	         LIMIT $limitnext, 1";
-
-	if( $p_info = $DB->get_row( $sql, OBJECT, 0, 'next_post()' ) )
-	{
-		$ItemCache = & get_Cache( 'ItemCache' );
-		$Item = & $ItemCache->get_by_ID($p_info->post_ID);
-
-		$blog_url = $in_same_cat ? $Blog->get('url') : '';
-		$string = '<a href="'.$Item->get_permanent_url('', $blog_url).'">'.$next;
-		if ($title=='yes') {
-			$string .= $p_info->post_title;
-		}
-		$string .= '</a>';
-		$format = str_replace('%',$string,$format);
-		echo $format;
-	}
-}
-
-
 
 
 
@@ -694,6 +525,9 @@ function attach_browse_tabs()
 
 /*
  * $Log$
+ * Revision 1.42  2007/03/03 01:14:12  fplanque
+ * new methods for navigating through posts in single item display mode
+ *
  * Revision 1.41  2007/02/12 15:42:40  fplanque
  * public interface for looping over a cache
  *

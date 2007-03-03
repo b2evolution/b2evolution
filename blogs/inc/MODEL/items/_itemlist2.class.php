@@ -1622,10 +1622,213 @@ class ItemList2 extends DataObjectList2
 		echo $this->replace_vars( $format, $params );
 		echo $after;
 	}
+
+
+  /**
+	 *
+	 */
+	function prevnext_item_links( $params )
+	{
+		echo( $params['block_start'] );
+		$this->prev_item_link( $params['prev_start'], $params['prev_end'] );
+		$this->next_item_link( $params['next_start'], $params['next_end'] );
+		echo( $params['block_end'] );
+	}
+
+
+	/**
+	 * Skip to previous
+	 */
+	function prev_item_link( $before = '', $after = '', $text = '&laquo; $title$' )
+	{
+    /**
+		 * @var Item
+		 */
+		$prev_Item = & $this->get_prevnext_Item( 'prev' );
+
+		if( !is_null($prev_Item) )
+		{
+			echo $before;
+			$prev_Item->permanent_link( $text );
+			echo $after;
+		}
+	}
+
+
+	/**
+	 * Skip to next
+	 */
+	function next_item_link(  $before = '', $after = '', $text = '$title$ &raquo;' )
+	{
+    /**
+		 * @var Item
+		 */
+		$next_Item = & $this->get_prevnext_Item( 'next' );
+
+		if( !is_null($next_Item) )
+		{
+			echo $before;
+			$next_Item->permanent_link( $text );
+			echo $after;
+		}
+	}
+
+	/**
+	 * Skip to previous/next Item
+	 *
+	 * If several items share the same spot (like same issue datetime) then they'll get all skipped at once.
+	 *
+	 * @param string prev | next  (relative to the current sort order)
+	 */
+	function & get_prevnext_Item( $direction = 'next' )
+	{
+		global $DB, $ItemCache;
+
+		if( ! $this->single_post )
+		{
+			$r = NULL;
+			return $r;
+		}
+
+    /**
+		 * @var Item
+		 */
+		$current_Item = $this->get_by_idx(0);
+
+		if( is_null($current_Item) )
+		{
+			debug_die( 'no current item!!!' );
+		}
+
+		$next_Query = & new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
+
+		// GENERATE THE QUERY:
+
+		/*
+		 * filtering stuff:
+		 */
+		$next_Query->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'] );
+		$next_Query->where_author( $this->filters['authors'] );
+		$next_Query->where_assignees( $this->filters['assignees'] );
+		$next_Query->where_author_assignee( $this->filters['author_assignee'] );
+		$next_Query->where_locale( $this->filters['lc'] );
+		$next_Query->where_statuses( $this->filters['statuses'] );
+		$next_Query->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
+		// $next_Query->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
+		$next_Query->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
+		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
+		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
+		$next_Query->where_visibility( $this->filters['visibility_array'] );
+
+		/**
+		 * Restrict to an item type
+		 */
+		if( !empty( $this->filters['item_type'] ) )
+		{
+			$next_Query->where_and( 'post_ptyp_ID = '.$this->filters['item_type'] );
+		}
+
+		/*
+		 * ORDER BY stuff:
+		 */
+		if( ($direction == 'next' && $this->filters['order'] == 'DESC')
+			|| ($direction == 'prev' && $this->filters['order'] == 'ASC') )
+		{
+			$order = 'DESC';
+			$operator = ' < ';
+		}
+		else
+		{
+			$order = 'ASC';
+			$operator = ' > ';
+		}
+
+		$orderby = str_replace( ' ', ',', $this->filters['orderby'] );
+		$orderby_array = explode( ',', $orderby );
+
+		// Format each order param with default column names:
+		$orderbyorder_array = preg_replace( '#^(.+)$#', $this->Cache->dbprefix.'$1 '.$order, $orderby_array );
+
+		// Add an ID parameter to make sure there is no ambiguity in ordering on similar items:
+		$orderbyorder_array[] = $this->Cache->dbIDname.' '.$order;
+
+		$order_by = implode( ', ', $orderbyorder_array );
+
+
+		$next_Query->order_by( $order_by );
+
+
+		// LIMIT to 1 single result
+		$next_Query->LIMIT( '1' );
+
+		// fp> TODO: I think some additional limits need to come back here (for timespans)
+
+
+    /*
+		 * Position right after the current element depending on current sorting params
+		 *
+		 * fp> WARNING: This only works with the FIRST order param!
+		 * If there are several items on the same issuedatetime for example, they'll all get skipped at once!
+		 * You cannot put several criterias combined with AND!!! (you would need stuf like a>a0 OR (a=a0 AND b>b0) etc.
+		 * This is too complex, so I'm going to call this function a "skip to next" that cannot digg into details
+		 */
+		switch( $orderby_array[0] )
+		{
+			case 'datestart':
+				// special var name:
+				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
+																.$operator
+																.$DB->quote($current_Item->issue_date) );
+				break;
+
+			case 'title':
+			case 'datecreated':
+			case 'datemodified':
+			case 'urltitle':
+			case 'priority':	// Note: will skip to next priority level
+				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
+																.$operator
+																.$DB->quote($current_Item->{$orderby_array[0]}) );
+				break;
+
+			default:
+				echo 'WARNING: unhandled sorting: '.htmlspecialchars( $orderby_array[0] );
+		}
+
+
+
+		// GET DATA ROWS:
+
+
+		// We are going to proceed in two steps (we simulate a subquery)
+		// 1) we get the IDs we need
+		// 2) we get all the other fields matching these IDs
+		// This is more efficient than manipulating all fields at once.
+
+		// Step 1:
+		$step1_sql = 'SELECT DISTINCT '.$this->Cache->dbIDname
+									.$next_Query->get_from()
+									.$next_Query->get_where()
+									.$next_Query->get_group_by()
+									.$next_Query->get_order_by()
+									.$next_Query->get_limit();
+
+		// echo $DB->format_query( $step1_sql );
+
+		// Get list of the IDs we need:
+		$next_ID = $DB->get_var( $step1_sql, 0, 0, 'Get ID of next item' );
+
+		// Step 2: get the item (may be NULL):
+		return $ItemCache->get_by_ID( $next_ID, true, false );
+
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.50  2007/03/03 01:14:12  fplanque
+ * new methods for navigating through posts in single item display mode
+ *
  * Revision 1.49  2007/01/26 04:49:17  fplanque
  * cleanup
  *

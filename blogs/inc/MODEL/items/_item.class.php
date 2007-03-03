@@ -1701,7 +1701,7 @@ class Item extends DataObject
 	 *
 	 * Note: If you only want the permalink URL, use {@link Item::get_permanent_url()}
 	 *
-	 * @param string link text or special value: '#', '#icon#', '#text#', '#title#'
+	 * @param string link text or special value: '#', '#icon#', '#text#', '#title#' '... $title$ ...'
 	 * @param string link title
 	 * @param string class name
 	 */
@@ -1735,7 +1735,7 @@ class Item extends DataObject
 		// Display as link
 		$r = '<a href="'.$url.'" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
-		$r .= '>'.$text.'</a>';
+		$r .= '>'.str_replace( '$title$', format_to_output( $this->title ), $text ).'</a>';
 
 		return $r;
 	}
@@ -3386,6 +3386,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.156  2007/03/03 01:14:11  fplanque
+ * new methods for navigating through posts in single item display mode
+ *
  * Revision 1.155  2007/03/02 04:40:38  fplanque
  * fixed/commented a lot of stuff with the feeds
  *
