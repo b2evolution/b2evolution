@@ -208,23 +208,26 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
  * We need this function because if no Blog is currently active (some admin pages or site pages)
  * then we'll go to the general home.
  */
-function blog_home_link( $blog_text = 'Blog', $home_text = 'Home' )
+function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_text = 'Home' )
 {
 	global $Blog, $baseurl;
 
 	if( isset( $Blog ) )
 	{
-  	echo '<a href="'.$Blog->get( 'url' ).'">'.$blog_text.'</a>';
+  	echo $before.'<a href="'.$Blog->get( 'url' ).'">'.$blog_text.'</a>'.$after;
 	}
 	elseif( !empty($home_text) )
 	{
-  	echo '<a href="'.$baseurl.'">'.$home_text.'</a>';
+  	echo $before.'<a href="'.$baseurl.'">'.$home_text.'</a>'.$after;
 	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.18  2007/03/04 19:47:37  fplanque
+ * enhanced toolbar menu
+ *
  * Revision 1.17  2007/03/04 05:24:52  fplanque
  * some progress on the toolbar menu
  *
