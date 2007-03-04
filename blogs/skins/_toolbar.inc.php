@@ -128,17 +128,30 @@ global $admin_url;
 <script type="text/javascript">
 	function evo_menu_show( elt )
 	{
-		x = elt.offsetLeft;
-		y = elt.offsetTop + elt.offsetHeight;
+		// window.status = elt.nodeName;
+
 		child = elt.firstChild;
 		while( child.nodeName != 'UL' )
 		{
 			child = child.nextSibling;
 			if( child == null )
-			{
-				break;
+			{	// No UL was found
+				return;
 			}
 		}
+		// <div></div>alert( 'ya '+elt.innerHTML+' '+x+' '+y );
+
+		// Find offset of parent bottom:
+		var x = elt.offsetLeft;
+		var y = elt.offsetTop + elt.offsetHeight;
+		// Need to recurse to add parent offsets:
+		var obj = elt.offsetParent;
+		while (obj) {
+			x += obj.offsetLeft;
+			y += obj.offsetTop;
+			obj = obj.offsetParent;
+		}
+
 		child.style.left = x + 'px';
 		child.style.top = y + 'px';
 		elt.className = 'menu_open'; // This is for IE6 which has no li:hover support
