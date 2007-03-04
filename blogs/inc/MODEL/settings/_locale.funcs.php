@@ -416,6 +416,13 @@ function locale_timefmt()
 }
 
 
+function locale_datetimefmt( $separator = ' ' )
+{
+	global $locales, $current_locale;
+
+	return $locales[$current_locale]['datefmt'].$separator.$locales[$current_locale]['timefmt'];
+}
+
 /**
  * Returns the current locale's start of week
  *
@@ -949,6 +956,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.37  2007/03/04 20:14:16  fplanque
+ * GMT date now in system checks
+ *
  * Revision 1.36  2006/12/04 21:20:28  blueyed
  * Abstracted convert_special_charsets() out of urltitle_validate()
  *

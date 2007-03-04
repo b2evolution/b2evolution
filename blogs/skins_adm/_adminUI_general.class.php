@@ -1290,10 +1290,7 @@ class AdminUI_general
 
 		if( !$obhandler_debug )
 		{ // don't display changing time when we want to test obhandler
-			$r .= $app_shortname.' v <strong>'.$app_version.'</strong> &middot; '.T_('Time:').' <strong>'.date_i18n( locale_timefmt(), $localtimenow ).'</strong>'
-				.' &middot; <acronym title="'.T_('Greenwich Mean Time').'">'
-				./* TRANS: short for Greenwich Mean Time */ T_('GMT:').'</acronym> <strong>'.gmdate( locale_timefmt(), $servertimenow).'</strong>'
-				."\n";
+			$r .= $app_shortname.' v <strong>'.$app_version.'</strong> &middot; '.T_('Time:').' <strong>'.date_i18n( locale_timefmt(), $localtimenow ).'</strong>';
 		}
 
 		return $r;
@@ -1335,6 +1332,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.43  2007/03/04 20:14:16  fplanque
+ * GMT date now in system checks
+ *
  * Revision 1.42  2007/03/04 05:24:53  fplanque
  * some progress on the toolbar menu
  *

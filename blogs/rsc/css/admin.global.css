@@ -193,6 +193,7 @@ div.system_check_name {
 	float:left;
 }
 
+div.system_check_value_note,
 div.system_check_value_ok,
 div.system_check_value_warning,
 div.system_check_value_error {

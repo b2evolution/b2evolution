@@ -82,6 +82,41 @@ $change_ini = '<p>'.T_('If possible, change this setting to <code>%s</code> in y
 
 echo '<h2>'.T_('System checks').'</h2>';
 
+
+/**
+ * b2evo version
+ */
+$app_timestamp = mysql2timestamp( $app_date );
+init_system_check( 'b2evolution version', $app_version.' released on '.date_i18n( locale_datefmt(), $app_timestamp ) );
+$app_age = ($localtimenow - $app_timestamp) / 3600 / 24 / 30;	// approx age in months
+if( $app_age > 12 )
+{
+	disp_system_check( 'error', sprintf( T_('This version is old. You should check for newer releases on <a %s>b2evolution.net</a>.'),
+		' href="http://b2evolution.net/downloads/"'	) );
+}
+elseif( $app_age > 6 )
+{
+	disp_system_check( 'warning', sprintf( T_('This version is aging. You may want to check for newer releases on <a %s>b2evolution.net</a>.'),
+		' href="http://b2evolution.net/downloads/"'	) );
+}
+else
+{
+	disp_system_check( 'ok' );
+}
+
+
+/**
+ * Time
+ */
+init_system_check( 'Server time', date_i18n( locale_datetimefmt( ' - ' ), $servertimenow ) );
+disp_system_check( 'note' );
+
+init_system_check( 'GMT / UTC time', gmdate( locale_datetimefmt( ' - ' ), $servertimenow ) );
+disp_system_check( 'note' );
+
+init_system_check( 'b2evolution time', date_i18n( locale_datetimefmt( ' - ' ), $localtimenow ) );
+disp_system_check( 'note' );
+
 /*
  * PHP version
  */
@@ -407,6 +442,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2007/03/04 20:14:16  fplanque
+ * GMT date now in system checks
+ *
  * Revision 1.14  2007/02/22 19:08:31  fplanque
  * file/memory size checks (not fully tested)
  *
