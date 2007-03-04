@@ -423,7 +423,11 @@ class AdminUI_general
 	 */
 	function disp_body_top()
 	{
+		global $skins_path;
+
 		echo "<body>\n";
+
+		require $skins_path.'_toolbar.inc.php';
 
 		echo $this->get_body_top();
 	}
@@ -1280,16 +1284,15 @@ class AdminUI_general
 	 */
 	function get_head_info()
 	{
-		global $pagenow, $obhandler_debug, $localtimenow, $servertimenow, $current_User;
+		global $app_shortname, $app_version, $pagenow, $obhandler_debug, $localtimenow, $servertimenow, $current_User;
 
 		$r = '';
 
 		if( !$obhandler_debug )
 		{ // don't display changing time when we want to test obhandler
-			$r .= "\n".T_('Time:').' <strong>'.date_i18n( locale_timefmt(), $localtimenow ).'</strong>'
+			$r .= $app_shortname.' v <strong>'.$app_version.'</strong> &middot; '.T_('Time:').' <strong>'.date_i18n( locale_timefmt(), $localtimenow ).'</strong>'
 				.' &middot; <acronym title="'.T_('Greenwich Mean Time').'">'
 				./* TRANS: short for Greenwich Mean Time */ T_('GMT:').'</acronym> <strong>'.gmdate( locale_timefmt(), $servertimenow).'</strong>'
-				.' &middot; '.T_('Logged in as:').' <strong><a href="'.$pagenow.'?ctrl=users&amp;user_ID='.$current_User->ID.'">'.$current_User->dget('login').'</a></strong>'
 				."\n";
 		}
 
@@ -1332,6 +1335,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.42  2007/03/04 05:24:53  fplanque
+ * some progress on the toolbar menu
+ *
  * Revision 1.41  2007/01/14 22:06:48  fplanque
  * support for customized 'no results' messages
  *

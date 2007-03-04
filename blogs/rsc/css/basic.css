@@ -133,11 +133,11 @@ div#evo_toolbar li ul {
   position: absolute;
 	background-color: ThreeDFace;
 	border: 1px solid;
+	padding: 1px;
 	border-top-color: ThreeDHighlight;
 	border-left-color: ThreeDHighlight;
 	border-bottom-color: ThreeDShadow;
 	border-right-color: ThreeDShadow;
-	padding: 0 4ex 0 0;
 }
 div#evo_toolbar li.menu_open ul {
 	display: block;
@@ -151,6 +151,8 @@ div#evo_toolbar li.menu_close:hover ul {
 }
 div#evo_toolbar li ul li {
 	display: block;
+	padding: 0 4ex 0 0;
+	white-space: nowrap;
 }
 div#evo_toolbar li ul li a {
 	display: block;
@@ -162,8 +164,10 @@ div#evo_toolbar li ul li a:hover {
 	background-color: Highlight;
 	color: HighlightText;
 }
+div#evo_toolbar li.separator {
+	padding: 0;
+}
 
-	
 /*
 {{{ Messages
 */

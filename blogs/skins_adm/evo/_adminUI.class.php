@@ -120,7 +120,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_page_head()
 	{
-		global $app_shortname, $app_version, $current_User, $htsrv_url_sensitive, $baseurl, $admin_url, $rsc_url, $Blog;
+		global $current_User, $htsrv_url_sensitive, $baseurl, $admin_url, $rsc_url, $Blog;
 
 		$r = '
 		<div id="header">
@@ -136,8 +136,7 @@ class AdminUI extends AdminUI_general
 						.T_('Exit to blogs').'" /></a>
 				</span>
 
-				'.$app_shortname.' v <strong>'.$app_version.'</strong>
-				&middot; '.$this->get_head_info().'
+				'.$this->get_head_info().'
 			</div>
 
 			<h1>'.$this->get_title_for_titlearea().'</h1>

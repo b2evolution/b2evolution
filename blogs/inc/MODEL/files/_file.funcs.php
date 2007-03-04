@@ -152,8 +152,7 @@ function get_filenames( $path, $inc_files = true, $inc_dirs = true, $flat = true
  *
  * This checks if there's a _adminUI.class.php in there.
  *
- * @return array|false List of directory names that hold admin skins or
- *         false, if the admin skins driectory does not exist.
+ * @return array  List of directory names that hold admin skins or false, if the admin skins driectory does not exist.
  */
 function get_admin_skins()
 {
@@ -755,6 +754,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.51  2007/03/04 05:24:52  fplanque
+ * some progress on the toolbar menu
+ *
  * Revision 1.50  2007/01/25 03:37:14  fplanque
  * made bytesreadable() really readable for average people.
  *

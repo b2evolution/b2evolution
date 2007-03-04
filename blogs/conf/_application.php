@@ -34,11 +34,12 @@ $new_db_version = 9408;
 
 
 $admin_path_separator = ' :: ';
-$app_admin_logo = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website").
-									'"><img id="evologo" src="'.$rsc_url.'img/b2evolution_minilogo2.png" alt="b2evolution" title="'.
-									T_("visit b2evolution's website").'" width="185" height="40" /></a>';
 
-$app_footer_text = '<a href="http://www.b2evolution.net"><strong><span style="color:#333">b</span><sub><span style="color:#f90;margin-top:2ex;">2</span></sub><span style="color:#333">e</span><span style="color:#543">v</span><span style="color:#752">o</span><span style="color:#962">l</span><span style="color:#b72">u</span><span style="color:#c81">t</span><span style="color:#d91">i</span><span style="color:#e90">o</span><span style="color:#f90">n</span></strong> '.$app_version.'</a>
+$app_footer_text = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website").
+									'"><img class="middle" src="'.$rsc_url.'img/b2evolution_logo_100.gif" alt="b2evolution" title="'.
+									T_("visit b2evolution's website").'" width="100" height="22" /></a>
+
+									'.$app_version.'</a>
 		&ndash;
 		<a href="http://b2evolution.net/about/license.html" class="nobr">'.T_('GPL License').'</a>
 		&ndash;

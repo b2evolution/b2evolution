@@ -361,9 +361,9 @@ table.grouped tr.total td{
 	border: 0;
 }
 #headfunctions {
-	margin-top: .5ex;
-	text-align:right;
-	margin-right: 1ex;
+	line-height: 200%;
+	float:right;
+	margin-right: 1em;
 	color: #b0b0b0;
 }
 #headfunctions a {
@@ -379,7 +379,7 @@ table.grouped tr.total td{
 }
 #headinfo {
 	padding-left: 1em;
-	line-height: 150%;
+	line-height: 200%;
 	color: #b0b0b0;
 	white-space: nowrap;
 }

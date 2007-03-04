@@ -241,7 +241,7 @@ $Form->begin_fieldset( T_('Preferences') );
 
 		$Form->info_field( T_('Admin skin'), $value_admin_skin, array( 'note' => T_('The skin defines how the backoffice appears to you.') ) );
 
-		// fp> TODO: a lot of things will not be displayed here. Do we want that?
+		// fp> TODO: a lot of things will not be displayed in view only mode. Do we want that?
 
 	}
 
@@ -375,6 +375,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.47  2007/03/04 05:24:52  fplanque
+ * some progress on the toolbar menu
+ *
  * Revision 1.46  2007/02/25 01:21:58  fplanque
  * Wording
  *

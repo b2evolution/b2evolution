@@ -138,14 +138,6 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 }
 
 
-/*
- * single_month_title(-)
- * arcdir_title(-)
- *
- * @movedTo _obsolete092.php
- */
-
-
 /**
  * Create a link to archive, using either params or extra path info.
  *
@@ -209,8 +201,33 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 	return $link;
 }
 
+
+/**
+ * Output a link to current blog.
+ *
+ * We need this function because if no Blog is currently active (some admin pages or site pages)
+ * then we'll go to the general home.
+ */
+function blog_home_link( $blog_text = 'Blog', $home_text = 'Home' )
+{
+	global $Blog, $baseurl;
+
+	if( isset( $Blog ) )
+	{
+  	echo '<a href="'.$Blog->get( 'url' ).'">'.$blog_text.'</a>';
+	}
+	elseif( !empty($home_text) )
+	{
+  	echo '<a href="'.$baseurl.'">'.$home_text.'</a>';
+	}
+}
+
+
 /*
  * $Log$
+ * Revision 1.17  2007/03/04 05:24:52  fplanque
+ * some progress on the toolbar menu
+ *
  * Revision 1.16  2007/01/26 04:52:53  fplanque
  * clean comment popups (skins 2.0)
  *

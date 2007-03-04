@@ -110,22 +110,13 @@ class AdminUI extends AdminUI_general
 
 		$r = '
 		<div id="header">
-			'.$this->admin_logo.'
-
 			<div id="headfunctions">
-				'.T_('Style:').'
+				'.T_('Color scheme:').'
 				<a href="#" onclick="StyleSwitcher.setActiveStyleSheet(\'Variation\'); return false;" title="Variation (Default)">V</a>'
 				.'&middot;<a href="#" onclick="StyleSwitcher.setActiveStyleSheet(\'Desert\'); return false;" title="Desert">D</a>'
 				.'&middot;<a href="#" onclick="StyleSwitcher.setActiveStyleSheet(\'Legacy\'); return false;" title="Legacy">L</a>'
 				.( is_file( dirname(__FILE__).'/rsc/css/custom.css' ) ? '&middot;<a href="#" onclick="StyleSwitcher.setActiveStyleSheet(\'Custom\'); return false;" title="Custom">C</a>' : '' )
 				.'
-				&bull; '
-				// Note: if we log in with another user, we may not have the perms to come back to the same place any more, thus: redirect to admin home.
-				.'<a href="'.$htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.rawurlencode(url_rel_to_same_host($admin_url, $htsrv_url_sensitive)).'">'.T_('Logout').'</a>
-				&bull;
-				<a href="'.( empty($Blog) ? $baseurl : $Blog->get('url') ).'" class="rollover">'.T_('Exit to blogs').'
-					<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'
-					.T_('Exit to blogs').'" /></a>
 			</div>
 
 			<div id="headinfo">'.$this->get_head_info().'</div>'

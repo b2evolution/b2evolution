@@ -37,8 +37,18 @@ function get_icon_info($name)
 
 		case 'dropdown': return array(
 			'file' => $rsc_subdir.'icons/dropdown.gif',
-			'alt'  => T_('Folder'),
-			'size' => array( 11, 9 ),
+			'alt'  => T_('¤'),
+			'size' => array( 11, 8 ),
+		);
+		case 'switch-to-admin': return array(
+			'file' => $rsc_subdir.'icons/switch-to-admin.gif',
+			'alt'  => T_('A'),
+			'size' => array( 13, 14 ),
+		);
+		case 'switch-to-blog': return array(
+			'file' => $rsc_subdir.'icons/switch-to-blog.gif',
+			'alt'  => T_('B'),
+			'size' => array( 13, 14 ),
 		);
 
 		case 'folder': return array( // icon for folders
@@ -496,6 +506,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.56  2007/03/04 05:24:52  fplanque
+ * some progress on the toolbar menu
+ *
  * Revision 1.55  2007/01/29 09:24:41  fplanque
  * icon stuff
  *

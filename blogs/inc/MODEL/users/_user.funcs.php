@@ -229,11 +229,14 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
 /**
  * Template tag: Get a link to logout
  *
+ * @param string
+ * @param string
+ * @param string link text can include %s for current user login
  * @return string
  */
 function get_user_logout_link( $before = '', $after = '', $link_text = '', $link_title = '#', $params = array() )
 {
-	global $htsrv_url_sensitive, $current_User, $blog;
+	global $admin_url, $baseurl, $htsrv_url_sensitive, $current_User, $is_admin_page, $Blog;
 
 	if( ! is_logged_in() )
 	{
@@ -243,9 +246,28 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
 	if( $link_text == '' ) $link_text = T_('Logout');
 	if( $link_title == '#' ) $link_title = T_('Logout from your account');
 
+	if( $is_admin_page )
+	{
+		if( isset( $Blog ) )
+		{	// Go to the home page of the blog that was being edited:
+  		$redirect_to = $Blog->get( 'url' );
+		}
+		else
+		{	// We were not editing a blog...
+			// return to global home:
+  		$redirect_to = url_rel_to_same_host( $baseurl, $htsrv_url_sensitive);
+  		// Alternative: return to the login page (fp> a basic user would be pretty lost on that login page)
+  		// $redirect_to = url_rel_to_same_host($admin_url, $htsrv_url_sensitive);
+		}
+
+	}
+	else
+	{	// Return to current blog page:
+		$redirect_to = url_rel_to_same_host(regenerate_url('','','','&'), $htsrv_url_sensitive);
+	}
 
 	$r = $before;
-	$r .= '<a href="'.$htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host(regenerate_url('','','','&'), $htsrv_url_sensitive) ).'"';
+	$r .= '<a href="'.$htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.rawurlencode($redirect_to).'"';
 	$r .= get_field_attribs_as_string( $params, false );
 	$r .= ' title="'.$link_title.'">';
 	$r .= sprintf( $link_text, $current_User->login );
@@ -324,7 +346,7 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
  */
 function get_user_profile_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $current_User, $Blog;
+	global $current_User, $Blog, $is_admin_page, $admin_url;
 
 	if( ! is_logged_in() )
 	{
@@ -341,9 +363,17 @@ function get_user_profile_link( $before = '', $after = '', $link_text = '', $lin
 	}
 	if( $link_title == '#' ) $link_title = T_('Edit your profile');
 
+	if( $is_admin_page )
+	{
+		$url = $admin_url.'?ctrl=users&amp;user_ID='.$current_User->ID;
+	}
+	else
+	{
+		$url = url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=profile&amp;redirect_to='.rawurlencode( url_rel_to_same_host(regenerate_url('','','','&'), $Blog->get('blogurl')) ) );
+	}
+
 	$r = $before
-		.'<a href="'.url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=profile&amp;redirect_to='.rawurlencode( url_rel_to_same_host(regenerate_url('','','','&'), $Blog->get('blogurl')) ) )
-		.'" title="'.$link_title.'">'
+		.'<a href="'.$url.'" title="'.$link_title.'">'
 		.sprintf( $link_text, $current_User->login )
 		.'</a>'
 		.$after;
@@ -357,9 +387,9 @@ function get_user_profile_link( $before = '', $after = '', $link_text = '', $lin
  */
 function user_subs_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $current_User, $Blog;
+	global $current_User, $Blog, $is_admin_page;
 
-	if( ! is_logged_in() )
+	if( ! is_logged_in() || $is_admin_page )
 	{
 		return false;
 	}
@@ -508,6 +538,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.26  2007/03/04 05:24:52  fplanque
+ * some progress on the toolbar menu
+ *
  * Revision 1.25  2007/01/29 09:58:55  fplanque
  * enhanced toolbar - experimental
  *
