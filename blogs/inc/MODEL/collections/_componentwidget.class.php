@@ -210,6 +210,11 @@ class ComponentWidget extends DataObject
 						echo '<strong><a href="'.$Blog->get('arcdirurl').'">'.T_('Archives').'</a></strong>';
 						echo $params['item_end'];
 
+						// fp> TODO: don't display this if categories plugin not installed... or depluginize categories (I'm not sure)
+						echo $params['item_start'];
+						echo '<strong><a href="'.$Blog->get('catdirurl').'">'.T_('Categories').'</a></strong>';
+						echo $params['item_end'];
+
 						echo $params['item_start'];
 						echo '<strong><a href="'.$Blog->get('lastcommentsurl').'">'.T_('Latest comments').'</a></strong>';
 						echo $params['item_end'];
@@ -349,6 +354,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2007/03/04 21:46:39  fplanque
+ * category directory / albums
+ *
  * Revision 1.13  2007/02/05 00:35:43  fplanque
  * small adjustments
  *

@@ -17,6 +17,7 @@ if( $disp != 'posts' && $disp != 'single' )
 { // We must display a sub template:
 	$disp_handlers = array(
 			'arcdir'   => '_arcdir.php',
+			'catdir'   => '_catdir.disp.php',
 			'comments' => '_lastcomments.php',
 			'msgform'  => '_msgform.php',
 			'profile'  => '_profile.php',
@@ -43,6 +44,9 @@ if( $disp != 'posts' && $disp != 'single' )
 
 /*
  * $Log$
+ * Revision 1.4  2007/03/04 21:42:49  fplanque
+ * category directory / albums
+ *
  * Revision 1.3  2007/01/28 17:50:18  fplanque
  * started moving towards 2.0 skin structure
  *

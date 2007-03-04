@@ -65,11 +65,21 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 
 	$r = array();
 
+	$params = array_merge( array(
+			'arcdir_text' => T_('Archive directory'),
+			'catdir_text' => T_('Category directory'),
+		), $params );
+
 	switch( $disp )
 	{
 		case 'arcdir':
 			// We are requesting the archive directory:
-			$r[] = T_('Archive Directory');
+			$r[] = $params['arcdir_text'];
+			break;
+
+		case 'catdir':
+			// We are requesting the archive directory:
+			$r[] = $params['catdir_text'];
 			break;
 
 		case 'comments':
@@ -225,6 +235,9 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 
 /*
  * $Log$
+ * Revision 1.19  2007/03/04 21:42:49  fplanque
+ * category directory / albums
+ *
  * Revision 1.18  2007/03/04 19:47:37  fplanque
  * enhanced toolbar menu
  *

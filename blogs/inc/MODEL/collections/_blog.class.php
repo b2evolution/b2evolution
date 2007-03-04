@@ -966,6 +966,9 @@ class Blog extends DataObject
 			case 'arcdirurl':
 				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=arcdir' );
 
+			case 'catdirurl':
+				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=catdir' );
+
 			case 'msgformurl':
 				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=msgform' );
 
@@ -1332,6 +1335,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.67  2007/03/04 21:42:49  fplanque
+ * category directory / albums
+ *
  * Revision 1.66  2007/03/02 00:44:43  fplanque
  * various small fixes
  *

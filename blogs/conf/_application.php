@@ -18,6 +18,12 @@ $app_shortname = 'b2evo';
 $app_version = '2.0-dev';
 
 /**
+ * Release date
+ */
+$app_date = '2007-01-31';
+
+
+/**
  * Is displayed on the login screen:
  */
 $app_banner = '<a href="http://b2evolution.net/"><img src="'.$rsc_url.'img/b2evolution_minilogo.png" width="231" height="50" alt="b2evolution" /></a>';

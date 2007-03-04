@@ -29,10 +29,12 @@ require dirname(__FILE__).'/_bloglist.php';
 		<a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><?php echo T_('Recently') ?></a>
 		|
 		<a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('Index') ?></a>
+		|
+		<a href="<?php $Blog->disp( 'catdirurl', 'raw' ) ?>"><?php echo T_('Albums') ?></a>
 		<?php
-				user_login_link( ' | ', ' ' );
-				user_register_link( ' | ', ' ' );
-			?>
+			user_login_link( ' | ', ' ' );
+			user_register_link( ' | ', ' ' );
+		?>
 	</div>
 	
 	<h1 id="pageTitle"><a href="<?php $Blog->disp( 'url', 'raw' ) ?>"><?php $Blog->disp( 'name', 'htmlbody' ) ?></a></h1>
@@ -78,6 +80,8 @@ require dirname(__FILE__).'/_bloglist.php';
 	<?php
 	// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
 	request_title( '<h2>', '</h2>', ' - ', 'htmlbody', array(
+				'arcdir_text' => T_('Index'),
+				'catdir_text' => T_('Albums'),
 				'category_text' => T_('Album').': ',
 				'categories_text' => T_('Albums').': ',
 		 ), false, '<h2>&nbsp;</h2>' );
