@@ -1343,8 +1343,6 @@ class Item extends DataObject
 	/**
 	 * Template function: get content teaser of item (will stop at "<!-- more -->"
 	 *
-	 * This will NOT increase the view counter
-	 *
 	 * @param mixed page number to display specific page, # for url parameter
 	 * @param boolean # if you don't want to repeat teaser after more link was pressed and <-- noteaser --> has been found
 	 * @param string filename to use to display more
@@ -1401,28 +1399,17 @@ class Item extends DataObject
 	/**
 	 * Template function: get content extension of item (part after "<!-- more -->")
 	 *
-	 * This will increase the view counter in more mode (even if no part after more)
-	 *
 	 * @param mixed page number to display specific page, # for url parameter
 	 * @param string filename to use to display more
 	 * @return string
 	 */
 	function get_content_extension( $disppage = '#', $format = 'htmlbody' )
 	{
-		global $Plugins, $more, $preview, $Hit, $preview, $Debuglog;
+		global $Plugins, $more, $preview;
 
 		if( ! $more )
 		{	// NOT in more mode:
 			return NULL;
-		}
-
-		/*
-		 * Check if we want to increment view count, see {@link Hit::is_new_view()}
-		 */
-		#pre_dump( 'incViews', $dispmore, !$preview, $Hit->is_new_view() );
-		if( ! $preview && $Hit->is_new_view() )
-		{ // Increment view counter (only if current User is not the item's author)
-			$this->inc_viewcount(); // won't increment if current_User == Author
 		}
 
 		// Get requested content page:
@@ -1460,6 +1447,48 @@ class Item extends DataObject
 		return $output;
 	}
 
+
+  /**
+	 * Increase view counter
+	 *
+	 * @todo merge with inc_viewcount
+	 */
+	function count_view( $allow_multiple_counts_per_page = false )
+	{
+		global $Hit, $preview, $Debuglog;
+
+		if( $preview )
+		{
+			// echo 'PREVIEW';
+			return false;
+		}
+
+		/*
+		 * Check if we want to increment view count, see {@link Hit::is_new_view()}
+		 */
+	/*	if( ! $Hit->is_new_view() )
+		{	// This is a reload
+			echo 'RELOAD';
+			return false;
+		} */
+
+		if( ! $allow_multiple_counts_per_page )
+		{	// Check that we don't increase multiple viewcounts on the same page
+			// This make the assumption that the first post in a list is "viewed" and the other are not (necesarily)
+			global $view_counts_on_this_page;
+			if( $view_counts_on_this_page >= 1 )
+			{	// we already had a count on this page
+				// echo 'ALREADY HAD A COUNT';
+				return false;
+			}
+			$view_counts_on_this_page++;
+		}
+		echo 'COUNTING VIEW';
+
+    // Increment view counter (only if current User is not the item's author)
+		return $this->inc_viewcount(); // won't increment if current_User == Author
+
+	}
 
   /**
 	 * Display more link
@@ -3596,6 +3625,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.159  2007/03/05 04:49:17  fplanque
+ * better precision for viewcounts
+ *
  * Revision 1.158  2007/03/05 02:13:26  fplanque
  * improved dashboard
  *

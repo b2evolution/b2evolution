@@ -113,8 +113,15 @@ require $skins_path.'_html_header.inc.php';
 		?>
 
 		<div class="bText">
-			<?php $Item->content(); ?>
 			<?php
+				// Increment view count!
+				$Item->count_view( false );
+
+				// Display CONTENT:
+				echo $Item->get_content_teaser();
+				$Item->more_link();
+				echo $Item->get_content_extension();
+
 				// Links to post pages (for multipage posts):
 				$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
 			?>
