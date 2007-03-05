@@ -118,7 +118,7 @@ function task_title_link( $Item )
 	return $col;
 }
 $ItemList->cols[] = array(
-						'th' => T_('Task'),
+						'th' => T_('Title'),
 						'order' => 'title',
 						'td_class' => 'tskst_$post_pst_ID$',
 						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj} )%</strong>',
@@ -202,6 +202,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.20  2007/03/05 02:12:56  fplanque
+ * minor
+ *
  * Revision 1.19  2007/01/19 10:57:46  fplanque
  * UI
  *

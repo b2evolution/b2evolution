@@ -56,7 +56,7 @@ if( $action == 'view' )
 // Display title depending on selection params:
 echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
 
-// Init display features:
+// Initialize things in order to be ready for displaying.
 $display_params = array(
 					'header_start' => '<div class="NavBar center"><div class="floatright">'
 								.action_icon( T_('New post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post...'), 3, 4 ).'</div>',
@@ -305,6 +305,9 @@ if( $action == 'list' )
 
 /*
  * $Log$
+ * Revision 1.32  2007/03/05 02:12:56  fplanque
+ * minor
+ *
  * Revision 1.31  2007/01/19 10:57:46  fplanque
  * UI
  *
