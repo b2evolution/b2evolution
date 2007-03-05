@@ -1311,6 +1311,184 @@ class Item extends DataObject
 	}
 
 
+
+	/**
+	 * Template function: get content teaser of item (will stop at "<!-- more -->"
+	 *
+	 * This will NOT increase the view counter
+	 *
+	 * @param mixed page number to display specific page, # for url parameter
+	 * @param boolean # if you don't want to repeat teaser after more link was pressed and <-- noteaser --> has been found
+	 * @param string filename to use to display more
+	 * @return string
+	 */
+	function get_content_teaser( $disppage = '#', $stripteaser = '#', $format = 'htmlbody' )
+	{
+		global $Plugins, $preview, $Debuglog;
+
+		// Get requested content page:
+		if( $disppage === '#' )
+		{ // We want to display the page requested by the user:
+			global $page;
+			$disppage = $page;
+		}
+
+		$content_page = $this->get_content_page( $disppage, $format ); // cannot include format_to_output() because of the magic below.. eg '<!--more-->' will get stripped in "xml"
+		// pre_dump($content_page);
+
+		$content_parts = explode( '<!--more-->', $content_page );
+		// echo ' Parts:'.count($content_parts);
+
+		if( count($content_parts) > 1 )
+		{ // This is an extended post (has a more section):
+			if( $stripteaser === '#' )
+			{
+				global $more;
+				// If we're in "more" mode and we want to strip the teaser, we'll strip:
+				$stripteaser = ( $more && preg_match('/<!--noteaser-->/', $content_page ) );
+			}
+
+			if( $stripteaser )
+			{
+				return NULL;
+			}
+		}
+
+		$output = $content_parts[0];
+
+		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
+		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
+				'Item' => $this,
+				'preview' => $preview,
+				// 'dispmore' => $dispmore  // fp> I see no doc for what this is for, so I don't know how to make it comaptible
+			), 'Display' );
+
+		// Character conversions
+		$output = format_to_output( $output, $format );
+
+		return $output;
+	}
+
+
+	/**
+	 * Template function: get content extension of item (part after "<!-- more -->")
+	 *
+	 * This will increase the view counter in more mode (even if no part after more)
+	 *
+	 * @param mixed page number to display specific page, # for url parameter
+	 * @param string filename to use to display more
+	 * @return string
+	 */
+	function get_content_extension( $disppage = '#', $format = 'htmlbody' )
+	{
+		global $Plugins, $more, $preview, $Hit, $preview, $Debuglog;
+
+		if( ! $more )
+		{	// NOT in more mode:
+			return NULL;
+		}
+
+		/*
+		 * Check if we want to increment view count, see {@link Hit::is_new_view()}
+		 */
+		#pre_dump( 'incViews', $dispmore, !$preview, $Hit->is_new_view() );
+		if( ! $preview && $Hit->is_new_view() )
+		{ // Increment view counter (only if current User is not the item's author)
+			$this->inc_viewcount(); // won't increment if current_User == Author
+		}
+
+		// Get requested content page:
+		if( $disppage === '#' )
+		{ // We want to display the page requested by the user:
+			global $page;
+			$disppage = $page;
+		}
+
+		$content_page = $this->get_content_page( $disppage, $format ); // cannot include format_to_output() because of the magic below.. eg '<!--more-->' will get stripped in "xml"
+		// pre_dump($content_page);
+
+		$content_parts = explode( '<!--more-->', $content_page );
+		// echo ' Parts:'.count($content_parts);
+
+		if( count($content_parts) < 2 )
+		{ // This is NOT an extended post
+			return NULL;
+		}
+
+		// Output everything after <!-- more -->
+		array_shift($content_parts);
+		$output = implode('', $content_parts);
+
+		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
+		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
+				'Item' => $this,
+				'preview' => $preview,
+				// 'dispmore' => $dispmore  // fp> I see no doc for what this is for, so I don't know how to make it comaptible
+			), 'Display' );
+
+		// Character conversions
+		$output = format_to_output( $output, $format );
+
+		return $output;
+	}
+
+
+  /**
+	 * Display more link
+	 *
+	 * @param string string to display before more link
+	 * @param string string to display after more link
+	 * @param string text to display as the more link
+	 * @param string text to display as the more anchor (once the more link has been clicked)
+	 * @param mixed page number to display specific page, # for url parameter
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function more_link( $before = '<p class="bMore">', $after = '</p>', $more_link_text = '#', $more_anchor = '#', $disppage = '#', $format = 'htmlbody' )
+	{
+		global $more;
+
+		// Get requested content page:
+		if( $disppage === '#' )
+		{ // We want to display the page requested by the user:
+			global $page;
+			$disppage = $page;
+		}
+
+		$content_page = $this->get_content_page( $disppage, $format ); // cannot include format_to_output() because of the magic below.. eg '<!--more-->' will get stripped in "xml"
+		// pre_dump($content_page);
+
+		$content_parts = explode( '<!--more-->', $content_page );
+		// echo ' Parts:'.count($content_parts);
+
+		if( count($content_parts) < 2 )
+		{ // This is NOT an extended post:
+			return ;
+		}
+
+		if( ! $more )
+		{	// We're NOT in "more" mode:
+			if( $more_link_text == '#' )
+			{ // TRANS: this is the default text for the extended post "more" link
+				$more_link_text = T_('Read more').' &raquo;';
+			}
+
+			echo $before
+						.'<a href="'.$this->get_permanent_url().'#more'.$this->ID.'">'
+						.$more_link_text.'</a>'
+						.$after;
+		}
+		elseif( ! preg_match('/<!--noteaser-->/', $content_page ) )
+		{	// We are in mode mode and we're not hiding the teaser:
+			if( $more_anchor == '#' )
+			{ // TRANS: this is the default text displayed once the more link has been activated
+				$more_anchor = '<p class="bMore">'.T_('Follow up:').'</p>';
+			}
+			echo '<a id="more'.$this->ID.'" name="more'.$this->ID.'"></a>';
+			echo $more_anchor;
+		}
+	}
+
+
 	/**
 	 * Template function: display deadline date (datetime) of Item
 	 *
@@ -1659,6 +1837,10 @@ class Item extends DataObject
 		$FileList->query( false, false, false );
 
 		$r = '';
+    /**
+		 * @var File
+		 */
+		$File = NULL;
 		while( $File = & $FileList->get_next() )
 		{
 			if( ! $File->is_image() )
@@ -3386,6 +3568,10 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.157  2007/03/05 01:47:50  fplanque
+ * splitting up Item::content() - proof of concept.
+ * needs to be optimized.
+ *
  * Revision 1.156  2007/03/03 01:14:11  fplanque
  * new methods for navigating through posts in single item display mode
  *
