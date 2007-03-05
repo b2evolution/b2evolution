@@ -1466,11 +1466,11 @@ class Item extends DataObject
 		/*
 		 * Check if we want to increment view count, see {@link Hit::is_new_view()}
 		 */
-	/*	if( ! $Hit->is_new_view() )
+		if( ! $Hit->is_new_view() )
 		{	// This is a reload
-			echo 'RELOAD';
+			// echo 'RELOAD';
 			return false;
-		} */
+		}
 
 		if( ! $allow_multiple_counts_per_page )
 		{	// Check that we don't increase multiple viewcounts on the same page
@@ -1483,7 +1483,8 @@ class Item extends DataObject
 			}
 			$view_counts_on_this_page++;
 		}
-		echo 'COUNTING VIEW';
+
+		//echo 'COUNTING VIEW';
 
     // Increment view counter (only if current User is not the item's author)
 		return $this->inc_viewcount(); // won't increment if current_User == Author
@@ -3625,6 +3626,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.160  2007/03/05 04:52:42  fplanque
+ * better precision for viewcounts
+ *
  * Revision 1.159  2007/03/05 04:49:17  fplanque
  * better precision for viewcounts
  *

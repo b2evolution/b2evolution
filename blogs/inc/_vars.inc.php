@@ -254,8 +254,18 @@ $post_statuses = array (
 	'draft' => NT_('Draft'),
 );
 
+
+/**
+ * Number of view counts increased on this page
+ * @var integer
+ */
+$view_counts_on_this_page = 0;
+
 /*
  * $Log$
+ * Revision 1.13  2007/03/05 04:49:17  fplanque
+ * better precision for viewcounts
+ *
  * Revision 1.12  2007/01/26 04:52:53  fplanque
  * clean comment popups (skins 2.0)
  *
