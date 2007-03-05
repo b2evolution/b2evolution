@@ -121,6 +121,8 @@ if( $blog )
 			echo '</h3>';
 
 			echo '<div class="small">'.$Item->get_content_excerpt( 150 ).'</div>';
+
+			echo '<div style="clear:left;">'.get_icon('pixel').'</div>'; // IE crap
 			?>
 		</div>
 		<?php
@@ -172,6 +174,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2007/03/05 04:48:15  fplanque
+ * IE crap
+ *
  * Revision 1.14  2007/03/05 02:13:25  fplanque
  * improved dashboard
  *
