@@ -4,6 +4,29 @@
  * This should be included with every skin and overridden when needed.
  */
 
+div.dashboard_sidebar {
+	width: 20em;
+	float: right;
+	border: 1px solid #999;
+	background-color: #eee;
+	padding: 1em;
+}
+
+.dashboard_post {
+	clear:left;
+}
+.dashboard_post_details {
+	font-size: 74%;
+	font-weight: normal;
+}
+.dashboard_thumbnails {
+	float:left;
+	margin: 4px 4px 4px 0;
+}
+.dashboard_post_title {
+	font-size: 110%;
+	margin: 1em 0 0 0;
+}
 
 /*
  * Categories selection table:

@@ -907,6 +907,12 @@ class File extends DataObject
 
 	/**
 	 * Get a complete tag (IMG or A HREF) pointing to this file.
+	 *
+	 * @param string
+	 * @param string NULL for no legend
+	 * @param string
+	 * @param string
+	 * @param string
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">',
@@ -939,7 +945,7 @@ class File extends DataObject
 					// TODO: size
 			}
 			$desc = $this->dget('desc');
-			if( !empty($desc) )
+			if( !empty($desc) and !is_null($before_image_legend) )
 			{
 				$r .= $before_image_legend
 								.$this->dget('desc')
@@ -1693,6 +1699,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.41  2007/03/05 02:13:26  fplanque
+ * improved dashboard
+ *
  * Revision 1.40  2007/02/10 18:03:03  waltercruz
  * Changing double quotes to single quotes
  *

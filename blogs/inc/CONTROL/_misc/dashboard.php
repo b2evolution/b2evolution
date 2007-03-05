@@ -55,6 +55,7 @@ if( $blog )
 
 	echo '<h2>'.$Blog->dget( 'name' ).'</h2>';
 
+	echo '<div class="dashboard_sidebar">';
 	echo '<h3>Shortcuts</h3>';
 	echo '<ul>';
 		echo '<li><a href="admin.php?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'">Write a new post...</a></li>';
@@ -71,7 +72,7 @@ if( $blog )
 
 		// TODO: dh> display link to "not-approved" (to be moderated) comments, if any. Therefor the comments list must be filterable.
 	echo '</ul>';
-
+	echo '</div>';
 
 	echo '<h3>Latest posts</h3>';
 
@@ -80,27 +81,56 @@ if( $blog )
 	// Create empty List:
 	$ItemList = & new ItemList2( $Blog, NULL, NULL );
 
-	$ItemList->set_default_filters( array(
+	// Filter list:
+	$ItemList->set_filters( array(
 			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated' ),
-			'posts' => 5
+			'posts' => 5,
 		) );
 
-	// fp> TODO: this overwrites saved filters from the posts tab. make sure it doesn't/
+	// Get ready for display (runs the query):
+	$ItemList->display_init();
 
-	// Init filter params:
-	if( ! $ItemList->load_from_Request() )
-	{ // If we could not init a filterset from request
-		// typically happens when we could no fall back to previously saved filterset...
-		// echo ' no filterset!';
+	while( $Item = & $ItemList->get_item() )
+	{
+		?>
+		<div class="dashboard_post" lang="<?php $Item->lang() ?>">
+			<?php
+			// We don't switch locales in the backoffice, since we use the user pref anyway
+			// Load item's creator user:
+			$Item->get_creator_User();
+
+			// Display images that are linked to this post:
+			$Item->images( array(
+					'before' =>              '<div class="dashboard_thumbnails">',
+					'before_image' =>        '',
+					'before_image_legend' => NULL,	// No legend
+					'after_image_legend' =>  NULL,
+					'after_image' =>         '',
+					'after' =>               '</div>',
+					'image_size' =>          'fit-80x80'
+				) );
+
+			echo '<h3 class="dashboard_post_title">';
+			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget( 'title' ).'</a>';
+
+			echo ' <span class="dashboard_post_details">';
+			$Item->status();
+			echo ' &bull; ';
+			$Item->views();
+			echo '</span>';
+			echo '</h3>';
+
+			echo '<div class="small">'.$Item->get_content_excerpt( 150 ).'</div>';
+			?>
+		</div>
+		<?php
 	}
-
-	// Display VIEW:
-	$AdminUI->disp_view( 'items/_browse_posts_list2.view.php' );
-
 
 
 	// fp> TODO: drafts
 
+
+	echo '<div class="clear"></div>';
 
 	// End payload block:
 	$AdminUI->disp_payload_end();
@@ -142,6 +172,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2007/03/05 02:13:25  fplanque
+ * improved dashboard
+ *
  * Revision 1.13  2007/01/28 23:31:57  blueyed
  * todo
  *

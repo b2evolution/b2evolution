@@ -971,11 +971,13 @@ class Item extends DataObject
 
 
 	/**
-	 * Get the rendered content. If it has not been generated yet, it will.
+	 * Get the prerendered content. If it has not been generated yet, it will.
 	 *
 	 * @todo dh> Currently this makes up one query per displayed item. Probably the cache should get pre-fetched by ItemList2?
 	 * fp> DEFINITELY!!! Preloading all pre-rendered contents for the current Itemlistpage is paramount!
+	 *
 	 * @todo dh> In general, $content_prerendered gets only queried once per item, so it seems like a memory waste to cache the query result..!
+	 * fp> I don't know if this is supposed to be related but that doesn't change anything to the previous todo.
 	 *
 	 * NOTE: This calls {@link Item::dbupdate()}, if renderers get changed (from Plugin hook).
 	 *
@@ -1027,7 +1029,7 @@ class Item extends DataObject
 					$this->dbupdate();
 				}
 
-				// Call renderer plugins:
+				// Call RENDERER plugins:
 				// pre_dump( $this->content );
 				$this->content_prerendered[$cache_key] = $this->content;
 				$Plugins->render( $this->content_prerendered[$cache_key] /* by ref */, $post_renderers, $format, array( 'Item' => $this ), 'Render' );
@@ -1103,7 +1105,7 @@ class Item extends DataObject
 
 
 	/**
-	 * Make sure, the pages are split up
+	 * Make sure, the pages have been obtained (and split up_ from prerendered cache.
 	 *
 	 * @param string Format, used to retrieve the matching cache; see {@link format_to_output()}
 	 */
@@ -1113,6 +1115,7 @@ class Item extends DataObject
 		{
 			// SPLIT PAGES:
 			$this->content_pages[$format] = explode( '<!--nextpage-->', $this->get_prerendered_content($format) );
+
 			$this->pages = count( $this->content_pages[$format] );
 			// echo ' Pages:'.$this->pages;
 		}
@@ -1120,7 +1123,7 @@ class Item extends DataObject
 
 
 	/**
-	 * Get a specific page to display
+	 * Get a specific page to display (from the prerendered cache)
 	 *
 	 * @param integer Page number
 	 * @param string Format, used to retrieve the matching cache; see {@link format_to_output()}
@@ -1128,7 +1131,7 @@ class Item extends DataObject
 	function get_content_page( $page, $format = 'htmlbody' )
 	{
 		// Make sure, the pages are split up:
-		$this->split_pages($format);
+		$this->split_pages( $format );
 
 		if( $page < 1 )
 		{
@@ -1310,6 +1313,31 @@ class Item extends DataObject
 		return $output;
 	}
 
+
+  /**
+	 * This is like a teaser with no HTML and a cropping.
+	 *
+	 * @todo fp> allow use to submit his own excerpt in expert editing mode
+	 */
+	function get_content_excerpt( $crop_at = 200 )
+	{
+		// Get teaser for page 1:
+		// fp> Note: I'm not sure about using 'text' here, but there should definitely be no rendering here.
+		$output = $this->get_content_teaser( 1, false, 'text' );
+
+		// Get rid of all HTML:
+		$output = strip_tags( $output );
+
+		// Ger rid of all new lines:
+		$output = trim( str_replace( array( "\r", "\n", "\t" ), array( ' ', ' ', ' ' ), $output ) );
+
+		if( strlen( $output ) > $crop_at )
+		{
+			$output = substr( $output, 0, $crop_at ).'...';
+		}
+
+		return $output;
+	}
 
 
 	/**
@@ -3568,6 +3596,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.158  2007/03/05 02:13:26  fplanque
+ * improved dashboard
+ *
  * Revision 1.157  2007/03/05 01:47:50  fplanque
  * splitting up Item::content() - proof of concept.
  * needs to be optimized.
