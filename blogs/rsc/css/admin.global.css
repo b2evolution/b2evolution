@@ -10,22 +10,26 @@ div.dashboard_sidebar {
 	border: 1px solid #999;
 	background-color: #eee;
 	padding: 1em;
+	margin: 0 0 0 1em;
 }
 
 .dashboard_post {
 	clear:left;
+	/* border: 1px solid red; */
+	margin: 1ex 0;
 }
 .dashboard_post_details {
 	font-size: 74%;
 	font-weight: normal;
+	color: #999;
 }
 .dashboard_thumbnails {
 	float:left;
-	margin: 4px 4px 4px 0;
+	margin: 2px 4px 2px 0;
 }
 .dashboard_post_title {
 	font-size: 110%;
-	margin: 1em 0 0 0;
+	margin: 0;
 }
 
 /*
