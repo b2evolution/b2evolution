@@ -317,7 +317,10 @@ $cookie_domain = ( strpos($basehost, '.') ? '.'.$basehost : '' );
 // When hosting multiple domains (not just subdomains) on a single instance of b2evo,
 // you may want to try this:
 // $cookie_domain = '.'.$_SERVER['HTTP_HOST'];
-
+// fp> I think we should make the following (+localhost exception) the default:
+// -- Have a cookie domain of 2 levels only, base on current basehost.
+// $cookie_domain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '.$2', $basehost );
+// echo $cookie_domain;
 
 /**#@+
  * Names for cookies.

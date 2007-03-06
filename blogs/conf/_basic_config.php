@@ -97,7 +97,9 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
  * @global string $baseurl
  */
 $baseurl = 'http://localhost/b2evolution/blogs/';
-
+// Use the following if you want to use the current domain:
+//$baseurl = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://')
+//						.$_SERVER['HTTP_HOST'].'/';
 
 /**
  * This is used only to create the Admin account.
