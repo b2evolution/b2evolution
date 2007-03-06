@@ -470,7 +470,7 @@ function profile_check_params( $params, $User = NULL )
 	}
 
 	// if the ICQ UIN has been entered, check to see if it has only numbers
-	if( !empty($params['icq']) )
+	if( !empty($params['icq'][0]) )
 	{
 		if( !preg_match( '#^[0-9]+$#', $params['icq'][0]) )
 		{
@@ -538,6 +538,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.27  2007/03/06 12:23:38  fplanque
+ * bugfix
+ *
  * Revision 1.26  2007/03/04 05:24:52  fplanque
  * some progress on the toolbar menu
  *
