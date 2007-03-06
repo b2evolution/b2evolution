@@ -1147,173 +1147,6 @@ class Item extends DataObject
 	}
 
 
-	/**
-	 * Template function: display content of item
-	 *
-	 * Calling this with "MORE" (i-e displaying full content) will increase
-	 * the view counter, except on special occasions, see {@link Hit::is_new_view()}.
-	 *
-	 * WARNING: parameter order is different from deprecated the_content(...)
-	 *
-	 * @todo fp> Param order and cleanup!
-	 *
-	 * @uses Item::get_content()
-	 * @param mixed page number to display specific page, # for url parameter
-	 * @param mixed true to display 'more' text (which means "full post"), false not to display, # for url parameter
-	 * @param string text to display as the more link
-	 * @param string text to display as the more anchor (once the more link has been clicked)
-	 * @param string string to display before more link/anchor
-	 * @param string string to display after more link/anchor
-	 * @param string Output format, see {@link format_to_output()}
-	 * @param integer max number of words
-	 * @param boolean true if you don't want to repeat teaser after more link was pressed
-	 * @param string filename to use to display more
-	 */
-	function content(
-		$disppage = '#',
-		$dispmore = '#',
-		$more_link_text = '#',
-		$more_anchor = '#',
-		$before_more = '#',
-		$after_more = '#',
-		$format = 'htmlbody',
-		$stripteaser = false,
-		$more_file = ''
-		)
-	{
-		echo $this->get_content( $disppage, $dispmore, $more_link_text, $more_anchor, $before_more, $after_more, $format, $stripteaser, $more_file );
-	}
-
-
-	/**
-	 * Template function: get content of item.
-	 *
-	 * Calling this with "MORE" (i-e displaying full content) will increase
-	 * the view counter, except on special occasions, see {@link Hit::is_new_view()}.
-	 *
-	 * WARNING: parameter order is different from deprecated the_content(...)
-	 *
-	 * @todo fp> Param order and cleanup!
-	 *
-	 * @param mixed page number to display specific page, # for url parameter
-	 * @param mixed true to display 'more' text (which means "full post"), false not to display, # for url parameter
-	 * @param string text to display as the more link
-	 * @param string text to display as the more anchor (once the more link has been clicked)
-	 * @param string string to display before more link/anchor
-	 * @param string string to display after more link/anchor
-	 * @param string Output format, see {@link format_to_output()}
-	 * @param integer max number of words
-	 * @param boolean true if you don't want to repeat teaser after more link was pressed
-	 * @param string filename to use to display more
-	 * @return string
-	 */
-	function get_content(
-		$disppage = '#',
-		$dispmore = '#',
-		$more_link_text = '#',
-		$more_anchor = '#',
-		$before_more = '#',
-		$after_more = '#',
-		$format = 'htmlbody',
-		$stripteaser = false,
-		$more_file = ''
-		)
-	{
-		global $Plugins, $Hit, $more, $preview, $current_User, $Debuglog;
-		// echo $format,'-',$dispmore,'-',$disppage;
-
-		if( $more_link_text == '#' )
-		{ // TRANS: this is the default text for the extended post "more" link
-			$more_link_text = '=> '.T_('Read more!');
-		}
-
-		if( $more_anchor == '#' )
-		{ // TRANS: this is the default text displayed once the more link has been activated
-			$more_anchor = '['.T_('More:').']';
-		}
-
-		if( $before_more == '#' )
-			$before_more = '<p class="bMore">';
-
-		if( $after_more == '#' )
-			$after_more = '</p>';
-
-		if( $dispmore === '#' )
-		{ // We want to display more if requested by user:
-			$dispmore = $more;
-		}
-
-		// echo 'More:'.$dispmore;
-
-		/*
-		 * Check if we want to increment view count, see {@link Hit::is_new_view()}
-		 */
-		#pre_dump( 'incViews', $dispmore, !$preview, $Hit->is_new_view() );
-		if( $dispmore && ! $preview && $Hit->is_new_view() )
-		{ // Increment view counter (only if current User is not the item's author)
-			$this->inc_viewcount(); // won't increment if current_User == Author
-		}
-
-		// Get requested content page:
-		if( $disppage === '#' )
-		{ // We want to display the page requested by the user:
-			global $page;
-			$disppage = $page;
-		}
-		$content_page = $this->get_content_page( $disppage, $format ); // cannot include format_to_output() because of the magic below.. eg '<!--more-->' will get stripped in "xml"
-		// pre_dump($content_page);
-
-		$content_parts = explode('<!--more-->', $content_page);
-		// echo ' Parts:'.count($content_parts);
-		if( count($content_parts) > 1 )
-		{ // This is an extended post (has a more section):
-			if( $dispmore )
-			{ // Viewer has already asked for more
-				if( $stripteaser || preg_match('/<!--noteaser-->/', $content_page ) )
-				{ // We want to strip the teaser:
-					$output = '';
-				}
-				else
-				{ // We keep the teaser:
-					$output = $content_parts[0];
-					if( !empty($more_anchor) ) $output .= $before_more;
-					$output .= '<a id="more'.$this->ID.'" name="more'.$this->ID.'"></a>'.$more_anchor;
-					if( !empty($more_anchor) ) $output .= $after_more;
-				}
-				if( count($content_parts) > 2 )
-				{ // we have additional <!--more--> tags somewhere
-					array_shift($content_parts);
-					$output .= implode('', $content_parts);
-				}
-				else $output .= $content_parts[1];
-			}
-			else
-			{ // We are offering to read more
-				$output = $content_parts[0];
-				$output .= $before_more .
-										'<a href="'.$this->get_permanent_url( 'pid', $more_file ).'#more'.$this->ID.'">'.
-										$more_link_text.'</a>' .
-										$after_more;
-			}
-		}
-		else
-		{ // Regular post
-			$output = $content_parts[0];
-		}
-
-		// Trigger Display plugins:
-		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
-			'Item' => $this,
-			'preview' => $preview,
-			'dispmore' => $dispmore ), 'Display' );
-
-		// Character conversions
-		$output = format_to_output( $output, $format );
-
-		return $output;
-	}
-
-
   /**
 	 * This is like a teaser with no HTML and a cropping.
 	 *
@@ -1339,6 +1172,30 @@ class Item extends DataObject
 		return $output;
 	}
 
+
+	/**
+	 * Display content teaser of item (will stop at "<!-- more -->"
+	 */
+	function content_teaser( $params )
+	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => '',
+				'after'       => '',
+				'disppage'    => '#',
+				'stripteaser' => '#',
+				'format'      => 'htmlbody',
+			), $params );
+
+		$r = $this->get_content_teaser( $params['disppage'], $params['stripteaser'], $params['format'] );
+
+		if( !empty($r) )
+		{
+			echo $params['before'];
+			echo $r;
+			echo $params['after'];
+		}
+	}
 
 	/**
 	 * Template function: get content teaser of item (will stop at "<!-- more -->"
@@ -1393,6 +1250,30 @@ class Item extends DataObject
 		$output = format_to_output( $output, $format );
 
 		return $output;
+	}
+
+
+	/**
+	 * Display content teaser of item (will stop at "<!-- more -->"
+	 */
+	function content_extension( $params )
+	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => '',
+				'after'       => '',
+				'disppage'    => '#',
+				'format'      => 'htmlbody',
+			), $params );
+
+		$r = $this->get_content_extension( $params['disppage'], $params['format'] );
+
+		if( !empty($r) )
+		{
+			echo $params['before'];
+			echo $r;
+			echo $params['after'];
+		}
 	}
 
 
@@ -1491,6 +1372,13 @@ class Item extends DataObject
 
 	}
 
+
+	function more_link( $before = '<p class="bMore">', $after = '</p>', $more_link_text = '#', $more_anchor = '#', $disppage = '#', $format = 'htmlbody' )
+	{
+		echo $this->get_more_link( $before, $after, $more_link_text, $more_anchor, $disppage, $format );
+	}
+
+
   /**
 	 * Display more link
 	 *
@@ -1501,7 +1389,7 @@ class Item extends DataObject
 	 * @param mixed page number to display specific page, # for url parameter
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function more_link( $before = '<p class="bMore">', $after = '</p>', $more_link_text = '#', $more_anchor = '#', $disppage = '#', $format = 'htmlbody' )
+	function get_more_link( $before = '<p class="bMore">', $after = '</p>', $more_link_text = '#', $more_anchor = '#', $disppage = '#', $format = 'htmlbody' )
 	{
 		global $more;
 
@@ -1520,7 +1408,7 @@ class Item extends DataObject
 
 		if( count($content_parts) < 2 )
 		{ // This is NOT an extended post:
-			return ;
+			return '';
 		}
 
 		if( ! $more )
@@ -1530,19 +1418,21 @@ class Item extends DataObject
 				$more_link_text = T_('Read more').' &raquo;';
 			}
 
-			echo $before
+			return format_to_output( $before
 						.'<a href="'.$this->get_permanent_url().'#more'.$this->ID.'">'
 						.$more_link_text.'</a>'
-						.$after;
+						.$after, $format );
 		}
 		elseif( ! preg_match('/<!--noteaser-->/', $content_page ) )
 		{	// We are in mode mode and we're not hiding the teaser:
+			// (if we're higin the teaser we display this as a normal page ie: no anchor)
 			if( $more_anchor == '#' )
 			{ // TRANS: this is the default text displayed once the more link has been activated
 				$more_anchor = '<p class="bMore">'.T_('Follow up:').'</p>';
 			}
-			echo '<a id="more'.$this->ID.'" name="more'.$this->ID.'"></a>';
-			echo $more_anchor;
+
+			return format_to_output( '<a id="more'.$this->ID.'" name="more'.$this->ID.'"></a>'
+							.$more_anchor, $format );
 		}
 	}
 
@@ -3626,6 +3516,10 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.161  2007/03/06 12:18:08  fplanque
+ * got rid of dirty Item::content()
+ * Advantage: the more link is now independant. it can be put werever people want it
+ *
  * Revision 1.160  2007/03/05 04:52:42  fplanque
  * better precision for viewcounts
  *
@@ -3781,368 +3675,5 @@ class Item extends DataObject
  *
  * Revision 1.111  2006/10/18 00:03:51  blueyed
  * Some forgotten url_rel_to_same_host() additions
- *
- * Revision 1.110  2006/10/14 01:10:48  blueyed
- * Finally provide Item::get_content()
- *
- * Revision 1.109  2006/10/10 19:22:11  blueyed
- * doc/TODO
- *
- * Revision 1.108  2006/10/10 17:10:08  blueyed
- * Removed obsolete file inc/_misc/_ping.funcs.php
- *
- * Revision 1.107  2006/10/08 22:47:47  blueyed
- * TODO: $localtimenow is not defined during install!
- *
- * Revision 1.106  2006/10/08 22:34:01  blueyed
- * doc fix
- *
- * Revision 1.105  2006/10/05 02:43:29  blueyed
- * Deprecate Item::get_blog_name(), but leave it in for now (BC).
- *
- * Revision 1.104  2006/10/05 02:12:26  blueyed
- * Update Item in DB, if renderers get changed in Plugin hook before caching the content
- *
- * Revision 1.103  2006/10/05 01:06:36  blueyed
- * Removed dirty "hack"; added ItemApplyAsRenderer hook instead.
- *
- * Revision 1.102  2006/10/04 23:51:02  blueyed
- * Dirty workaround for lazy renderers who detect when they should apply and pre-rendering
- *
- * Revision 1.101  2006/10/01 22:11:42  blueyed
- * Ping services as plugins.
- *
- * Revision 1.100  2006/10/01 15:11:08  blueyed
- * Added DisplayItemAs* equivs to RenderItemAs*; removed DisplayItemAllFormats; clearing of pre-rendered cache, according to plugin event changes
- *
- * Revision 1.99  2006/09/30 20:53:49  blueyed
- * Added hook RenderItemAsText, removed general RenderItem
- *
- * Revision 1.98  2006/09/25 17:52:20  blueyed
- * doc
- *
- * Revision 1.97  2006/09/23 14:01:29  blueyed
- * Pre-rendered content: use renderers string for cache_key
- *
- * Revision 1.96  2006/09/21 16:54:26  blueyed
- * Experimental caching of pre-rendered item content. Added table T_item__prerendering.
- *
- * Revision 1.95  2006/09/11 22:29:19  fplanque
- * chapter cleanup
- *
- * Revision 1.94  2006/09/11 22:06:08  blueyed
- * Cleaned up option_list callback handling
- *
- * Revision 1.93  2006/09/11 19:35:34  fplanque
- * minor
- *
- * Revision 1.92  2006/09/10 23:35:56  fplanque
- * new permalink styles
- * (decoding not implemented yet)
- *
- * Revision 1.91  2006/09/10 21:18:11  fplanque
- * transposed permalink generation
- * looks like a lot of changes but basically I only swiched the imbrocation of an if and a switch
- * this is needed to make further changes more readable
- *
- * Revision 1.90  2006/09/10 20:59:18  fplanque
- * extended extra path info setting
- *
- * Revision 1.89  2006/09/10 19:23:28  blueyed
- * Removed Plugin::code(), ::name(), ::short_desc() and ::long_desc(); Fixes for mt-import.php
- *
- * Revision 1.88  2006/09/06 20:45:34  fplanque
- * ItemList2 fixes
- *
- * Revision 1.87  2006/08/30 21:58:51  blueyed
- * Fixed notice/warning
- *
- * Revision 1.86  2006/08/29 00:26:11  fplanque
- * Massive changes rolling in ItemList2.
- * This is somehow the meat of version 2.0.
- * This branch has gone officially unstable at this point! :>
- *
- * Revision 1.85  2006/08/26 20:30:42  fplanque
- * made URL titles Google friendly
- *
- * Revision 1.84  2006/08/26 16:33:50  fplanque
- * minor
- *
- * Revision 1.83  2006/08/24 00:43:28  fplanque
- * scheduled pings part 2
- *
- * Revision 1.82  2006/08/21 21:33:35  fplanque
- * scheduled pings part 1
- *
- * Revision 1.81  2006/08/21 16:07:43  fplanque
- * refactoring
- *
- * Revision 1.80  2006/08/20 22:25:21  fplanque
- * param_() refactoring part 2
- *
- * Revision 1.79  2006/08/20 20:12:32  fplanque
- * param_() refactoring part 1
- *
- * Revision 1.78  2006/08/19 08:50:26  fplanque
- * moved out some more stuff from main
- *
- * Revision 1.77  2006/08/19 07:56:30  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.76  2006/08/19 02:15:07  fplanque
- * Half kille dthe pingbacks
- * Still supported in DB in case someone wants to write a plugin.
- *
- * Revision 1.75  2006/08/07 16:33:27  fplanque
- * Default messages should not be any more geeky then necessary.
- *
- * Revision 1.74  2006/08/05 17:18:41  blueyed
- * doc/todo
- *
- * Revision 1.73  2006/08/02 17:06:11  blueyed
- * added "(ID #X)" to permalink's default title; doc
- *
- * Revision 1.72  2006/07/31 15:42:43  blueyed
- * Fixed handling of post_comment_status
- *
- * Revision 1.71  2006/07/26 17:15:44  blueyed
- * Replaced "name" attribute with "id" for anchors
- *
- * Revision 1.70  2006/07/23 21:51:01  blueyed
- * doc
- *
- * Revision 1.69  2006/07/10 15:27:45  blueyed
- * Fixed display of Blog name in items list (at least with PHP5 it added "Object id #xx" because of the Item::get_Blog() return value).
- *
- * Revision 1.68  2006/07/08 23:03:52  blueyed
- * Removed debugging/test code.
- *
- * Revision 1.67  2006/07/08 22:33:43  blueyed
- * Integrated "simple edit form".
- *
- * Revision 1.66  2006/07/01 17:07:56  blueyed
- * Fixed Edit/Delete link for item notifications
- *
- * Revision 1.65  2006/06/25 17:33:39  fplanque
- * fixed moderation link
- *
- * Revision 1.64  2006/06/22 21:58:34  fplanque
- * enhanced comment moderation
- *
- * Revision 1.63  2006/06/22 18:37:47  fplanque
- * fixes
- *
- * Revision 1.62  2006/06/19 20:59:37  fplanque
- * noone should die anonymously...
- *
- * Revision 1.58  2006/06/15 15:01:19  fplanque
- * bugfix
- *
- * Revision 1.57  2006/06/12 00:42:21  blueyed
- * Item::get_trackback_url() added
- *
- * Revision 1.56  2006/06/05 23:15:00  blueyed
- * cleaned up plugin help links
- *
- * Revision 1.55  2006/06/05 18:03:46  blueyed
- * *** empty log message ***
- *
- * Revision 1.54  2006/06/02 20:12:37  fplanque
- * I don't like that fuzzy code.
- *
- * Revision 1.53  2006/06/01 21:07:33  blueyed
- * Moved ItemCanComment back.
- *
- * Revision 1.52  2006/06/01 18:36:09  fplanque
- * no message
- *
- * Revision 1.51  2006/05/30 20:32:57  blueyed
- * Lazy-instantiate "expensive" properties of Comment and Item.
- *
- * Revision 1.50  2006/05/30 19:39:55  fplanque
- * plugin cleanup
- *
- * Revision 1.49  2006/05/29 23:40:34  blueyed
- * Do not display errors with "comment" feedback link.
- *
- * Revision 1.48  2006/05/29 22:27:46  blueyed
- * Use NULL instead of false for "no display".
- *
- * Revision 1.47  2006/05/29 19:28:44  fplanque
- * no message
- *
- * Revision 1.46  2006/05/24 20:46:05  blueyed
- * Forgot to commit changes needed for the "ItemCanComment" event.
- *
- * Revision 1.44  2006/05/19 18:15:05  blueyed
- * Merged from v-1-8 branch
- *
- * Revision 1.43.2.1  2006/05/19 15:06:24  fplanque
- * dirty sync
- *
- * Revision 1.43  2006/05/12 21:53:37  blueyed
- * Fixes, cleanup, translation for plugins
- *
- * Revision 1.42  2006/04/29 23:27:10  blueyed
- * Only trigger update/insert/delete events if parent returns true
- *
- * Revision 1.41  2006/04/24 20:35:32  fplanque
- * really nasty bugs!
- *
- * Revision 1.40  2006/04/24 20:31:15  blueyed
- * doc fixes
- *
- * Revision 1.39  2006/04/19 20:13:50  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.38  2006/04/19 19:52:27  blueyed
- * url-encode redirect_to param
- *
- * Revision 1.37  2006/04/19 17:25:31  blueyed
- * Commented debug output out
- *
- * Revision 1.36  2006/04/19 15:56:02  blueyed
- * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
- * and Item::comments to Item::comment_status (Item API change)
- *
- * Revision 1.35  2006/04/19 13:05:21  fplanque
- * minor
- *
- * Revision 1.34  2006/04/18 21:09:20  blueyed
- * Added hooks to manipulate Items before insert/update/preview; fixes; cleanup
- *
- * Revision 1.33  2006/04/18 20:41:00  blueyed
- * Decent getters/setters for renderers.
- *
- * Revision 1.31  2006/04/13 01:23:19  blueyed
- * Moved help related functions back to Plugin class
- *
- * Revision 1.30  2006/04/11 22:28:58  blueyed
- * cleanup
- *
- * Revision 1.29  2006/04/11 21:22:25  fplanque
- * partial cleanup
- *
- * Revision 1.28  2006/04/10 23:11:40  blueyed
- * Fixed incrementing view count on ALL items altogether! :/
- *
- * Revision 1.27  2006/04/06 09:39:10  blueyed
- * doc
- *
- * Revision 1.26  2006/04/05 19:16:34  blueyed
- * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
- *
- * Revision 1.25  2006/04/04 21:49:02  blueyed
- * doc
- *
- * Revision 1.24  2006/03/27 21:22:11  fplanque
- * more admin link fixes
- *
- * Revision 1.23  2006/03/24 20:24:37  fplanque
- * fixed admin links
- *
- * Revision 1.21  2006/03/23 23:34:13  blueyed
- * cleanup
- *
- * Revision 1.20  2006/03/23 22:01:17  blueyed
- * todo
- *
- * Revision 1.19  2006/03/23 21:02:19  fplanque
- * cleanup
- *
- * Revision 1.18  2006/03/21 19:55:05  blueyed
- * notifications: cache by locale/nicer (padded) formatting; respect $allow_msgform in msgform_link()
- *
- * Revision 1.17  2006/03/18 19:17:53  blueyed
- * Removed remaining use of $img_url
- *
- * Revision 1.16  2006/03/15 19:31:26  blueyed
- * whitespace
- *
- * Revision 1.15  2006/03/12 23:08:59  fplanque
- * doc cleanup
- *
- * Revision 1.14  2006/03/10 21:08:26  fplanque
- * Cleaned up post browsing a little bit..
- *
- * Revision 1.13  2006/03/10 17:18:59  blueyed
- * doc
- *
- * Revision 1.12  2006/03/09 22:29:59  fplanque
- * cleaned up permanent urls
- *
- * Revision 1.11  2006/03/09 21:58:52  fplanque
- * cleaned up permalinks
- *
- * Revision 1.10  2006/03/09 15:23:27  fplanque
- * fixed broken images
- *
- * Revision 1.9  2006/03/07 19:13:31  fplanque
- * isset() is more compact and more readable
- *
- * Revision 1.8  2006/03/06 21:14:49  blueyed
- * Fixed incrementing view.
- *
- * Revision 1.7  2006/03/06 20:03:40  fplanque
- * comments
- *
- * Revision 1.6  2006/03/02 19:57:53  blueyed
- * Added DisplayIpAddress() and fixed/finished DisplayItemAllFormats()
- *
- * Revision 1.5  2006/03/01 01:07:43  blueyed
- * Plugin(s) polishing
- *
- * Revision 1.4  2006/02/27 20:55:50  blueyed
- * JS help links fixed
- *
- * Revision 1.2  2006/02/24 19:17:52  blueyed
- * Only increment view count if current User is not the Author.
- *
- * Revision 1.1  2006/02/23 21:11:58  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.100  2006/02/11 21:50:07  fplanque
- * doc
- *
- * Revision 1.99  2006/02/10 22:08:07  fplanque
- * Various small fixes
- *
- * Revision 1.98  2006/02/10 22:05:07  fplanque
- * Normalized itm links
- *
- * Revision 1.97  2006/02/06 20:05:30  fplanque
- * minor
- *
- * Revision 1.95  2006/02/05 00:54:12  blueyed
- * increment_viewcount(), doc
- *
- * Revision 1.94  2006/02/03 21:58:05  fplanque
- * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
- *
- * Revision 1.93  2006/02/03 17:35:17  blueyed
- * post_renderers as TEXT
- *
- * Revision 1.91  2006/01/29 20:36:35  blueyed
- * Renamed Item::getBlog() to Item::get_Blog()
- *
- * Revision 1.90  2006/01/26 23:08:35  blueyed
- * Plugins enhanced.
- *
- * Revision 1.89  2006/01/26 20:09:58  blueyed
- * Fix for comments visibility. Thanks to jbettis (http://forums.b2evolution.net/viewtopic.php?p=32435)
- *
- * Revision 1.87  2006/01/16 00:45:19  blueyed
- * Item::content() extra check for "$disppage < 1".
- *
- * Revision 1.86  2006/01/15 17:59:23  blueyed
- * API break of Item::url_link(). See http://dev.b2evolution.net/todo.php/2005/12/09/api_break_params_to_item_url_link_change
- *
- * Revision 1.85  2006/01/10 20:59:49  fplanque
- * minor / fixed internal sync issues @ progidistri
- *
- * Revision 1.83  2006/01/06 18:58:08  blueyed
- * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
  */
 ?>

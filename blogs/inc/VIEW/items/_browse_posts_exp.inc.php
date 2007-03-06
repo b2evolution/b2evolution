@@ -152,9 +152,20 @@ while( $Item = & $ItemList->get_item() )
 
 			<div class="bText">
 				<?php
-					$Item->content();
-				?>
-				<?php
+					// Uncomment this in case you wnt to count view in backoffice:
+					// $Item->count_view( false );
+
+					// Display CONTENT:
+					$Item->content_teaser( array(
+							'before'      => '',
+							'after'       => '',
+						) );
+					$Item->more_link();
+					$Item->content_extension( array(
+							'before'      => '',
+							'after'       => '',
+						) );
+
 					// Links to post pages (for multipage posts):
 					$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
 				?>
@@ -305,6 +316,10 @@ if( $action == 'list' )
 
 /*
  * $Log$
+ * Revision 1.33  2007/03/06 12:18:09  fplanque
+ * got rid of dirty Item::content()
+ * Advantage: the more link is now independant. it can be put werever people want it
+ *
  * Revision 1.32  2007/03/05 02:12:56  fplanque
  * minor
  *

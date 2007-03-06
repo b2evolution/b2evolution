@@ -109,8 +109,21 @@ skin_content_header();	// Sets charset!
 			?>
 
 			<div>
-				<?php $Item->content( '#', '#', T_('Read more...') ); ?>
 				<?php
+					// Increment view count of first post on page:
+					$Item->count_view( false );
+
+					// Display CONTENT:
+					$Item->content_teaser( array(
+							'before'      => '',
+							'after'       => '',
+						) );
+					$Item->more_link();
+					$Item->content_extension( array(
+							'before'      => '',
+							'after'       => '',
+						) );
+
 					// Links to post pages (for multipage posts):
 					$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
 				?>

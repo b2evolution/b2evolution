@@ -81,11 +81,20 @@ while( $Item = & $LinkblogList->get_category_group() )
 	while( $Item = & $LinkblogList->get_item() )
 	{
 		echo $linkblog_item_before;
-		$Item->title();
-		echo ' ';
-		$Item->content( 1, 0, T_('more'), '[', ']' );	// Description + more link
-		echo ' ';
+
+		$Item->title( '', ' ' );
+
+		$Item->content_teaser( array(
+				'before'      => '',
+				'after'       => ' ',
+				'disppage'    => 1,
+				'stripteaser' => false,
+			) );
+
+		$Item->more_link( '', ' ', T_('more').' &raquo;' );
+
 		$Item->permanent_link( '#icon#' );
+
 		echo $linkblog_item_after;
 	}
 
@@ -98,6 +107,10 @@ echo $linkblog_main_end;
 
 /*
  * $Log$
+ * Revision 1.19  2007/03/06 12:18:09  fplanque
+ * got rid of dirty Item::content()
+ * Advantage: the more link is now independant. it can be put werever people want it
+ *
  * Revision 1.18  2006/12/18 00:41:07  fplanque
  * handle non existing blogs a little better
  *

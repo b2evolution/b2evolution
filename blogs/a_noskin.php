@@ -151,8 +151,21 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		</div>
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
 		<div class="bText">
-			<?php $Item->content(); ?>
 			<?php
+				// Increment view count of first post on page:
+				$Item->count_view( false );
+
+				// Display CONTENT:
+				$Item->content_teaser( array(
+						'before'      => '',
+						'after'       => '',
+					) );
+				$Item->more_link();
+				$Item->content_extension( array(
+						'before'      => '',
+						'after'       => '',
+					) );
+
 				// Links to post pages (for multipage posts):
 				$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
 			?>

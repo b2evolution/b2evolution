@@ -147,9 +147,15 @@ require dirname(__FILE__).'/_bloglist.php';
 					$Item->count_view( false );
 
 					// Display CONTENT:
-					echo $Item->get_content_teaser();
+					$Item->content_teaser( array(
+							'before'      => '',
+							'after'       => '',
+						) );
 					$Item->more_link();
-					echo $Item->get_content_extension();
+					$Item->content_extension( array(
+							'before'      => '',
+							'after'       => '',
+						) );
 
 					// Links to post pages (for multipage posts):
 					$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
