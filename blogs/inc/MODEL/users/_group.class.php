@@ -334,7 +334,7 @@ class Group extends DataObject
 				// Now we'll check permissions for each blog:
 				foreach( $perm_target_blogs as $loop_blog_ID )
 				{
-					if( ! $this->check_perm_bloggroups( 'blog_post_statuses', $permlevel, $loop_blog_ID ) )
+					if( ! $this->check_perm( 'blog_post_statuses', $permlevel, $loop_blog_ID ) )
 					{ // If at least one blog is denied:
 						return false;	// permission denied
 					}
@@ -446,6 +446,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2007/03/07 02:34:29  fplanque
+ * Fixed very sneaky bug
+ *
  * Revision 1.8  2006/12/07 16:06:23  fplanque
  * prepared new file editing permission
  *

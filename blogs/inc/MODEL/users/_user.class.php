@@ -520,43 +520,25 @@ class User extends DataObject
 			case 'blog_comments':
 			case 'blog_cats':
 			case 'blog_genstatic':
-				// Blog permission to edit its properties... (Group may grant view acces, full access)
-				// Forward request to group:
-				/* fp> I commented this out because I don't understand what it's for and it break restricting
-						blog_post_statuses to private for example
+				// Blog permission to edit its properties...
+				$this->get_Group();
+
+				// Group may grant VIEW acces, FULL access:
 				if( $this->Group->check_perm( 'blogs', $permlevel ) )
-				{ // If group says yes
+				{ // If group grants a global permission:
 					$perm = true;
 					break;
-				}*/
+				}
+
 				if( $perm_target > 0 )
 				{ // Check user perm for this blog:
 					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
 					if ( $perm == false )
 					{ // Check groups for permissions to this specific blog:
-						$this->get_Group();
 						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
 					}
 				}
 				break;
-
-			/*
-			case 'blog_ismember':
-			case 'blog_post_statuses':
-			case 'blog_del_post':
-			case 'blog_comments':
-			case 'blog_cats':
-			case 'blog_genstatic':
-				// Blog permission to this or that... (depending on this user only)
-				$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
-				if ( $perm == false )
-				{ // Check groups blog specific perm
-					$this->get_Group();
-					$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
-				}
-
-				break;
-			*/
 
 			case 'edit_timestamp':
 				// Global permission to edit timestamps...
@@ -649,7 +631,7 @@ class User extends DataObject
 				// Now we'll check permissions for each blog:
 				foreach( $perm_target_blogs as $loop_blog_ID )
 				{
-					if( ! $this->check_perm_blogusers( 'blog_post_statuses', $permlevel, $loop_blog_ID ) )
+					if( ! $this->check_perm( 'blog_post_statuses', $permlevel, false, $loop_blog_ID ) )
 					{ // If at least one blog is denied:
 						return false;	// permission denied
 					}
@@ -1170,6 +1152,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.65  2007/03/07 02:34:29  fplanque
+ * Fixed very sneaky bug
+ *
  * Revision 1.64  2007/03/02 00:44:43  fplanque
  * various small fixes
  *
