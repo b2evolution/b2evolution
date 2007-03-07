@@ -555,7 +555,7 @@ function blog_list_iteminfo( $what, $show = 'raw' )
  *
  * @param string Permission name that must be given to the {@link $current_User} object.
  * @param string Permission level that must be given to the {@link $current_User} object.
- * @return integer The selected blog (0 means failure).
+ * @return boolean true on success
  */
 function autoselect_blog( $permname, $permlevel = 'any' )
 {
@@ -569,6 +569,7 @@ function autoselect_blog( $permname, $permlevel = 'any' )
 	{ // a blog is already selected
 		if( !$current_User->check_perm( $permname, $permlevel, false, $autoselected_blog ) )
 		{ // invalid blog
+			// echo 'current blog was invalid';
 			$autoselected_blog = 0;
 		}
 	}
@@ -599,6 +600,10 @@ function autoselect_blog( $permname, $permlevel = 'any' )
 		}
 		return true;
 	}
+
+	echo 'no blog has perm';
+	$blog = 0;
+	$Blog = NULL;
 
 	return false;
 }
@@ -651,6 +656,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.20  2007/03/07 02:38:58  fplanque
+ * do some recovery on incorrect $blog
+ *
  * Revision 1.19  2006/12/28 18:30:30  fplanque
  * cleanup of obsolete var
  *

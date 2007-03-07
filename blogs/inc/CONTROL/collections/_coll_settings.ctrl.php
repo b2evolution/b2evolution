@@ -35,30 +35,27 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
-
-$AdminUI->set_path( 'blogs' );
+// Check permissions on requested blog and autoselect an appropriate blog if necessary.
+// This will prevent a fat error when switching tabs and you have restricted perms on blog properties.
+if( autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm check
+{	// We have a blog to work on:
+	/**
+	 * @var Blog
+	 */
+	$edited_Blog = & $Blog;
+}
+else
+{
+	// Note: we may still have permission to edit categories!!
+	// $Messages->add( T_('Sorry, you have no permission to edit blog properties.'), 'error' );
+	$action = 'nil';
+}
 
 memorize_param( 'blog', 'integer', -1 );	// Needed when generating static page for example
 param_action( 'edit' );
 param( 'tab', 'string', 'general', true );
 
-autoselect_blog( 'blog_properties', 'view' );
-if( valid_blog_requested() )
-{
-	$edited_Blog = & $Blog;
-}
-else
-{
-
-	$action = 'nil';
-}
-
-/**
- * @var Blog
- */
-
-$edited_Blog = & $Blog;
+$AdminUI->set_path( 'blogs' ); // 2nd level will be added below
 
 /**
  * Perform action:
@@ -132,6 +129,7 @@ switch( $action )
 		break;
 }
 
+
 /**
  * Display page header, menus & messages:
  */
@@ -197,6 +195,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2007/03/07 02:38:58  fplanque
+ * do some recovery on incorrect $blog
+ *
  * Revision 1.12  2006/12/19 20:33:35  blueyed
  * doc/todo
  *
