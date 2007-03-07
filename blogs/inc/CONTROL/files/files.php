@@ -186,18 +186,20 @@ $Debuglog->add( 'path: '.var_export( $path, true ), 'files' );
 
 
 // Update sub-menu:
-$AdminUI->add_menu_entries(
-		'files',
-		array(
-				'browse' => array(
-					'text' => T_('Browse'),
-					'href' => 'admin.php?ctrl=files&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
-				'upload' => array(
-					'text' => T_('Upload multiple'),
-					'href' => 'admin.php?ctrl=upload&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
-			)
-	);
-
+if( $current_User->check_perm( 'files', 'add' ) )
+{ // Permission to upload: (no subtabs needed otherwise)
+	$AdminUI->add_menu_entries(
+			'files',
+			array(
+					'browse' => array(
+						'text' => T_('Browse'),
+						'href' => 'admin.php?ctrl=files&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
+					'upload' => array(
+						'text' => T_('Upload multiple'),
+						'href' => 'admin.php?ctrl=upload&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
+				)
+		);
+}
 
 
 /**
@@ -1477,6 +1479,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.56  2007/03/07 04:50:04  fplanque
+ * fixed perm checks
+ *
  * Revision 1.55  2007/01/25 05:09:06  fplanque
  * i18n update
  *
