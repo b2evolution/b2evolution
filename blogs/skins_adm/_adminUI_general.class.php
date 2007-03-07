@@ -164,10 +164,6 @@ class AdminUI_general
 	 *     'style': CSS style for this entry.
 	 *     'onclick': onclick property for this entry.
 	 *     'name': name attribute of the link/entry.
-	 *     'perm_name': permission name to check.
-	 *     'perm_level': permission level that must be granted.
-	 *     'perm_eval': This gets evaluated and must return true for the entry to be accessible.
-	 *     'text_noperm': Text to display if no permission granted.
 	 *     'entries': array of sub-entries
 	 */
 	function add_menu_entries( $path, $entries )
@@ -635,13 +631,6 @@ class AdminUI_general
 
 			foreach( $menuEntries as $loop_key => $loop_details )
 			{
-				$perm = true; // By default
-
-				if( ! ($perm = $this->check_perm( $loop_details )) && ! isset($loop_details['text_noperm']) )
-				{ // If permission requested but not granted, and we have no alt text, display no tab:
-					continue;
-				}
-
 				$anchor = '<a href="';
 
 				if( isset( $loop_details['href'] ) )
@@ -670,8 +659,7 @@ class AdminUI_general
 					$anchor .= ' name="'.$loop_details['name'].'"';
 				}
 
-				$anchor .= '>'.format_to_output( $perm ? $loop_details['text'] : $loop_details['text_noperm'], 'htmlbody' )
-				              ."</a>";
+				$anchor .= '>'.format_to_output( $loop_details['text'], 'htmlbody' )."</a>";
 
 				if( $loop_key == $selected )
 				{ // Highlight selected entry
@@ -1109,11 +1097,9 @@ class AdminUI_general
 	 * @param integer Path level to set (starts at 0)
 	 * @param array Either the key of the path or an array(keyname, propsArray).
 	 * @param array Properties for this path entry.
-	 * @param boolean Exit script when the user has no permissions to this path and
-	 *                text_noperm is not set for the path?
 	 * @return boolean DEPRECATED True if perm granted, false if not (and we're not exiting).
 	 */
-	function set_path_level( $level, $pathKey, $pathProps = array(), $die_if_no_perm = true )
+	function set_path_level( $level, $pathKey, $pathProps = array() )
 	{
 		// Get the parent node (the level above this one):
 		if( $level == 0 )
@@ -1138,16 +1124,7 @@ class AdminUI_general
 
 		// pre_dump( 'set_path_level: ', $level, $pathKey, $this->pathProps[$level] );
 
-		/* fp> This things has been making my life miserable for too long:
-			dh> then remove it.. but what's bad about having this assertion here? We should not set_path_level() to something where a user has no perms IMHO?!
-		$perm = $this->check_perm( $pathProps );
-		if( ! $perm && empty($pathProps['text_noperm']) && $die_if_no_perm )
-		{
-			debug_die( T_('Permission denied!').' (set_path_level: '.$level.'/'.$pathKey.')' );
-		}
-		*/
-
-		return true; // was:$perm;
+		return true;
 	}
 
 
@@ -1233,14 +1210,16 @@ class AdminUI_general
 	function init_menus()
 	{
 		global $Plugins;
-		global $blog, $loc_transinfo;
+		global $blog, $loc_transinfo, $ctrl;
+		global $Settings;
+		global $current_User;
 
 		if( !empty($this->_menus) )
 		{	// Already initialized!
 			return;
 		}
 
-		// TODO?? 'href' should be splitted into 'ctrl' and 'params'/'params_eval'
+
 		$this->add_menu_entries(
 				NULL, // root
 				array(
@@ -1253,212 +1232,279 @@ class AdminUI_general
 					'items' => array(
 						'text' => T_('Posts / Comments'),
 						'href' => 'admin.php?ctrl=items&amp;blog='.$blog.'&amp;filter=restore',
-					),
+						// Controller may add subtabs
+						),
+					) );
 
-					'files' => array(
-						'text' => T_('Files'),
-						'title' => T_('File management'),
-						'href' => 'admin.php?ctrl=files',
-						'perm_eval' => 'global $Settings; return $Settings->get( \'fm_enabled\' ) && $current_User->check_perm( \'files\', \'view\' );',
-						'entries' => array(
-							'browse' => array(
-								'text' => T_('Browse'),
-								'href' => 'admin.php?ctrl=files' ),
-							'upload' => array(
-								'text' => T_('Upload multiple'),
-								'href' => 'admin.php?ctrl=upload' ),
-							),
-					),
 
-					'stats' => array(
-						'text' => T_('Stats'),
-						'perm_name' => 'stats',
-						'perm_level' => 'view',
-						'href' => 'admin.php?ctrl=stats',
-						'entries' => array(
-							'summary' => array(
-								'text' => T_('Hit summary'),
-								'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;blog='.$blog ),
-							'browserhits' => array(
-								'text' => T_('Browser hits'),
-								'href' => 'admin.php?ctrl=stats&amp;tab=browserhits&amp;blog='.$blog ),
-							'refsearches' => array(
-								'text' => T_('Search B-hits'),
-								'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;blog='.$blog ),
-							'referers' => array(
-								'text' => T_('Referered B-hits'),
-								'href' => 'admin.php?ctrl=stats&amp;tab=referers&amp;blog='.$blog ),
-							'other' => array(
-								'text' => T_('Direct B-hits'),
-								'href' => 'admin.php?ctrl=stats&amp;tab=other&amp;blog='.$blog ),
-							'robots' => array(
-								'text' => T_('Robot hits'),
-								'href' => 'admin.php?ctrl=stats&amp;tab=robots&amp;blog='.$blog ),
-							'syndication' => array(
-								'text' => T_('XML hits'),
-								'href' => 'admin.php?ctrl=stats&amp;tab=syndication&amp;blog='.$blog ),
-							'useragents' => array(
-								'text' => T_('User agents'),
-								'href' => 'admin.php?ctrl=stats&amp;tab=useragents&amp;blog='.$blog ),
-							'domains' => array(
-								'text' => T_('Referring domains'),
-								'href' => 'admin.php?ctrl=stats&amp;tab=domains&amp;blog='.$blog ),
-							'sessions' => array(
-								'text' => T_('Sessions'),
-								'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;blog='.$blog ),
-						)
-					),
+		if( $Settings->get( 'fm_enabled' ) && $current_User->check_perm( 'files', 'view' ) )
+		{	// FM enabled and permission to view files:
+			$this->add_menu_entries( NULL, array(
+						'files' => array(
+							'text' => T_('Files'),
+							'title' => T_('File management'),
+							'href' => 'admin.php?ctrl=files',
+							// Controller may add subtabs
+						),
+					) );
 
-					'users' => array(
+		}
+
+
+		if( $current_User->check_perm( 'stats', 'view' ) )
+		{	// Permission to view stats:
+			$this->add_menu_entries(
+					NULL, // root
+					array(
+						'stats' => array(
+							'text' => T_('Stats'),
+							'href' => 'admin.php?ctrl=stats',
+							'entries' => array(
+								'summary' => array(
+									'text' => T_('Hit summary'),
+									'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;blog='.$blog ),
+								'browserhits' => array(
+									'text' => T_('Browser hits'),
+									'href' => 'admin.php?ctrl=stats&amp;tab=browserhits&amp;blog='.$blog ),
+								'refsearches' => array(
+									'text' => T_('Search B-hits'),
+									'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;blog='.$blog ),
+								'referers' => array(
+									'text' => T_('Referered B-hits'),
+									'href' => 'admin.php?ctrl=stats&amp;tab=referers&amp;blog='.$blog ),
+								'other' => array(
+									'text' => T_('Direct B-hits'),
+									'href' => 'admin.php?ctrl=stats&amp;tab=other&amp;blog='.$blog ),
+								'robots' => array(
+									'text' => T_('Robot hits'),
+									'href' => 'admin.php?ctrl=stats&amp;tab=robots&amp;blog='.$blog ),
+								'syndication' => array(
+									'text' => T_('XML hits'),
+									'href' => 'admin.php?ctrl=stats&amp;tab=syndication&amp;blog='.$blog ),
+								'useragents' => array(
+									'text' => T_('User agents'),
+									'href' => 'admin.php?ctrl=stats&amp;tab=useragents&amp;blog='.$blog ),
+								'domains' => array(
+									'text' => T_('Referring domains'),
+									'href' => 'admin.php?ctrl=stats&amp;tab=domains&amp;blog='.$blog ),
+								'sessions' => array(
+									'text' => T_('Sessions'),
+									'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;blog='.$blog ),
+							)
+						),
+					) );
+		}
+
+
+		if( $current_User->check_perm( 'users', 'view' ) )
+		{	// Permission to view users:
+			$this->add_menu_entries( NULL, array(
+						'users' => array(
 						'text' => T_('Users'),
 						'title' => T_('User management'),
-						'perm_name' => 'users',
-						'perm_level' => 'view',
-						'text_noperm' => T_('My profile'),	// displayed if perm not granted
 						'href' => 'admin.php?ctrl=users',
 					),
+				) );
+		}
+		else
+		{	// Only perm to view his own profile:
+			$this->add_menu_entries( NULL, array(
+						'users' => array(
+						'text' => T_('My profile'),
+						'title' => T_('User profile'),
+						'href' => 'admin.php?ctrl=users',
+					),
+				) );
+		}
 
-				)
-			);
 
 
 		// BLOG SETTINGS:
-		$coll_settings_perm = 'global $blog, $ctrl, $current_User; return $ctrl != "collections"
-					&& $current_User->check_perm( "blog_properties", "any", false, $blog );';
-		$coll_chapters_perm = 'global $blog, $ctrl, $current_User; return $ctrl != "collections"
-					&& $current_User->check_perm( "blog_cats", "", false, $blog );';
-		if( $blog && $coll_settings_perm ) // fp > seems buggy
-		{	// Default: show General Blog Settings
-			$default_page = 'admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog;
-		}
-		elseif( $blog && $coll_chapters_perm ) // fp > seems buggy
-		{	// Default: show categories
-			$default_page = 'admin.php?ctrl=chapters&amp;blog='.$blog;
+		if( $ctrl == 'collections' )
+		{ // We are viewing the blog list, nothing fancy involved:
+			$this->add_menu_entries(
+					NULL, // root
+					array(
+						'blogs' => array(
+							'text' => T_('Blog settings'),
+							'href' => 'admin.php?ctrl=collections',
+						),
+					) );
 		}
 		else
-		{	// Default: Show list of blogs
-			$default_page = 'admin.php?ctrl=collections';
-		}
-		$this->add_menu_entries(
-				NULL, // root
-				array(
-					'blogs' => array(
-						'text' => T_('Blog settings'),
-						'href' => $default_page,
-						'entries' => array(
+		{	// We're on any other page, we may have a direct destination
+		  // + we have subtabs (fp > maybe the subtabs should go into the controller as for _items ?)
+
+			// What perms do we have?
+			$coll_settings_perm = $current_User->check_perm( 'blog_properties', 'any', false, $blog );
+			$coll_chapters_perm = $current_User->check_perm( 'blog_cats', '', false, $blog );
+
+			// Determine default page based on permissions:
+			if( $coll_settings_perm )
+			{	// Default: show General Blog Settings
+				$default_page = 'admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog;
+			}
+			elseif( $coll_chapters_perm )
+			{	// Default: show categories
+				$default_page = 'admin.php?ctrl=chapters&amp;blog='.$blog;
+			}
+			else
+			{	// Default: Show list of blogs
+				$default_page = 'admin.php?ctrl=collections';
+			}
+
+			$this->add_menu_entries(
+					NULL, // root
+					array(
+						'blogs' => array(
+							'text' => T_('Blog settings'),
+							'href' => $default_page,
+							),
+						) );
+
+			if( $coll_settings_perm )
+			{
+				$this->add_menu_entries( 'blogs',	array(
 							'general' => array(
 								'text' => T_('General'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog,
-								'perm_eval' => $coll_settings_perm ),
+								'href' => 'admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog, ),
 							'features' => array(
 								'text' => T_('Features'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog,
-								'perm_eval' => $coll_settings_perm ),
+								'href' => 'admin.php?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog, ),
 							'skin' => array(
 								'text' => T_('Skin'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
-								'perm_eval' => $coll_settings_perm ),
+								'href' => 'admin.php?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog, ),
 							'display' => array(
 								'text' => T_('Display'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=display&amp;blog='.$blog,
-								'perm_eval' => $coll_settings_perm ),
+								'href' => 'admin.php?ctrl=coll_settings&amp;tab=display&amp;blog='.$blog, ),
 							'widgets' => array(
 								'text' => T_('Widgets'),
-								'href' => 'admin.php?ctrl=widgets&amp;blog='.$blog,
-								'perm_eval' => $coll_settings_perm ),
+								'href' => 'admin.php?ctrl=widgets&amp;blog='.$blog, ),
+						) );
+			}
+
+			if( $coll_chapters_perm )
+			{
+				$this->add_menu_entries( 'blogs',	array(
 							'chapters' => array(
 								'text' => T_('Categories'),
-								'href' => 'admin.php?ctrl=chapters&amp;blog='.$blog,
-								'perm_eval' => $coll_chapters_perm ),
+								'href' => 'admin.php?ctrl=chapters&amp;blog='.$blog ),
+						) );
+			}
+
+			if( $coll_settings_perm )
+			{
+				$this->add_menu_entries( 'blogs',	array(
 							'urls' => array(
 								'text' => T_('URLs'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=urls&amp;blog='.$blog,
-								'perm_eval' => $coll_settings_perm ),
+								'href' => 'admin.php?ctrl=coll_settings&amp;tab=urls&amp;blog='.$blog, ),
 							'advanced' => array(
 								'text' => T_('Advanced'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog,
-								'perm_eval' => $coll_settings_perm ),
+								'href' => 'admin.php?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog, ),
 							'perm' => array(
 								'text' => T_('User perms'), // keep label short
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog,
-								'perm_eval' => $coll_settings_perm ),
+								'href' => 'admin.php?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog, ),
 							'permgroup' => array(
 								'text' => T_('Group perms'), // keep label short
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog,
-								'perm_eval' => $coll_settings_perm ),
-						)
-					),
+								'href' => 'admin.php?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog, ),
+						) );
+			}
+		}
 
-					'options' => array(
-						'text' => T_('Global settings'),
-						'perm_name' => 'options',
-						'perm_level' => 'view',
-						'href' => 'admin.php?ctrl=settings',
-						'entries' => array(
-							'general' => array(
-								'text' => T_('General'),
-								'href' => 'admin.php?ctrl=settings' ),
-							'features' => array(
-								'text' => T_('Features'),
-								'href' => 'admin.php?ctrl=features' ),
-							'skins' => array(
-								'text' => T_('Skins'),
-								'href' => 'admin.php?ctrl=skins'),
-							'plugins' => array(
-								'text' => T_('Plugins'),
-								'href' => 'admin.php?ctrl=plugins'),
-							'antispam' => array(
-								'text' => T_('Antispam'),
-								'href' => 'admin.php?ctrl=set_antispam'),
-							'regional' => array(
-								'text' => T_('Regional'),
-								'href' => 'admin.php?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
-							'files' => array(
-								'text' => T_('Files'),
-								'href' => 'admin.php?ctrl=fileset' ),
-							'filetypes' => array(
-								'text' => T_('File types'),
-								'href' => 'admin.php?ctrl=filetypes' ),
-							'types' => array(
-								'text' => T_('Post types'),
-								'title' => T_('Post types management'),
-								'href' => 'admin.php?ctrl=itemtypes'),
-							'statuses' => array(
-								'text' => T_('Post statuses'),
-								'title' => T_('Post statuses management'),
-								'href' => 'admin.php?ctrl=itemstatuses'),
-						)
-					),
 
-					'tools' => array(
-						'text' => T_('Tools'),
-						'href' => 'admin.php?ctrl=crontab',
-						'perm_name' => 'options',
-						'perm_level' => 'view',	// FP> This assumes that we don't let regular users access the tools, including plugin tools.
-						'entries' =>  array(
-							'cron' => array(
-								'text' => T_('Scheduler'),
-								'perm_name' => 'options',
-								'perm_level' => 'view',
-								'href' => 'admin.php?ctrl=crontab' ),
-							'system' => array(
-								'text' => T_('System'),
-								'perm_name' => 'options',
-								'perm_level' => 'view',
-								'href' => 'admin.php?ctrl=system' ),
-							'antispam' => array(
-								'text' => T_('Antispam'),
-								'perm_name' => 'spamblacklist',
-								'perm_level' => 'view',
-								'href' => 'admin.php?ctrl=antispam'	),
+		if( $current_User->check_perm( 'options', 'view' ) )
+		{	// Permission to view settings:
+			$this->add_menu_entries( NULL, array(
+						'options' => array(
+							'text' => T_('Global settings'),
+							'href' => 'admin.php?ctrl=settings',
+							'entries' => array(
+								'general' => array(
+									'text' => T_('General'),
+									'href' => 'admin.php?ctrl=settings' ),
+								'features' => array(
+									'text' => T_('Features'),
+									'href' => 'admin.php?ctrl=features' ),
+								'skins' => array(
+									'text' => T_('Skins'),
+									'href' => 'admin.php?ctrl=skins'),
+								'plugins' => array(
+									'text' => T_('Plugins'),
+									'href' => 'admin.php?ctrl=plugins'),
+								'antispam' => array(
+									'text' => T_('Antispam'),
+									'href' => 'admin.php?ctrl=set_antispam'),
+								'regional' => array(
+									'text' => T_('Regional'),
+									'href' => 'admin.php?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
+								'files' => array(
+									'text' => T_('Files'),
+									'href' => 'admin.php?ctrl=fileset' ),
+								'filetypes' => array(
+									'text' => T_('File types'),
+									'href' => 'admin.php?ctrl=filetypes' ),
+								'types' => array(
+									'text' => T_('Post types'),
+									'title' => T_('Post types management'),
+									'href' => 'admin.php?ctrl=itemtypes'),
+								'statuses' => array(
+									'text' => T_('Post statuses'),
+									'title' => T_('Post statuses management'),
+									'href' => 'admin.php?ctrl=itemstatuses'),
+							)
+						),
+					) );
+		}
+
+
+		if( $current_User->check_perm( 'options', 'view' ) )
+		{	// Permission to view settings:
+			// FP> This assumes that we don't let regular users access the tools, including plugin tools.
+				$this->add_menu_entries( NULL, array(
+						'tools' => array(
+							'text' => T_('Tools'),
+							'href' => 'admin.php?ctrl=crontab',
+							'entries' =>  array(
+								'cron' => array(
+									'text' => T_('Scheduler'),
+									'href' => 'admin.php?ctrl=crontab' ),
+								'system' => array(
+									'text' => T_('System'),
+									'href' => 'admin.php?ctrl=system' ),
+									),
+								),
+							) );
+
+				if( $current_User->check_perm( 'spamblacklist', 'view' ) )
+				{	// Permission to view antispam:
+					$this->add_menu_entries( 'tools', array(
+									'antispam' => array(
+										'text' => T_('Antispam'),
+										'href' => 'admin.php?ctrl=antispam'	),
+									) );
+				}
+
+				$this->add_menu_entries( 'tools', array(
 							'' => array(	// fp> '' is dirty
 								'text' => T_('Misc'),
 								'href' => 'admin.php?ctrl=tools' ),
-						)
-					),
-
-				)
-			);
+						) );
+		}
+		elseif( $current_User->check_perm( 'spamblacklist', 'view' ) )
+		{	// Permission to view antispam but NOT tools:
+			// Give it it's own tab:
+			$this->add_menu_entries( NULL, array(
+						'tools' => array(
+							'text' => T_('Tools'),
+							'href' => 'admin.php?ctrl=antispam',
+							'entries' =>  array(
+								'antispam' => array(
+									'text' => T_('Antispam'),
+									'href' => 'admin.php?ctrl=antispam'	),
+								),
+						),
+					) );
+		}
 
 
 		// Yet another event with crappy (inexistant) doc.
@@ -1542,42 +1588,14 @@ class AdminUI_general
 		return $r;
 	}
 
-
-	/**
-	 * Checks if {@link $current_User the current User} has needed perms on a menu entry.
-	 *
-	 * @param array Path properties: An array, where 'perm_name' and/or 'perm_eval' might be set.
-	 *              'perm_level' (used with 'perm_name') defaults to 'any' if not given.
-	 * @return boolean
-	 */
-	function check_perm( $perminfo )
-	{
-		global $current_User;
-
-		if( isset($perminfo['perm_name']) )
-		{ // 'perm_name' given, check it together with 'perm_level' (which defaults to 'any')
-			$perm_level = isset( $perminfo['perm_level'] ) ? $perminfo['perm_level'] : 'any';
-			if( ! $current_User->check_perm( $perminfo['perm_name'], $perm_level ) )
-			{	// permission denied!
-				return false;
-			}
-		}
-
-		if( isset($perminfo['perm_eval']) )
-		{ // also check for 'perm_eval'
-			if( ! eval($perminfo['perm_eval']) )
-			{	// permission denied!
-				return false;
-			}
-		}
-
-		return true;
-	}
-
 }
 
 /*
  * $Log$
+ * Revision 1.45  2007/03/07 04:52:00  fplanque
+ * Check perms while building the menu:
+ * so much easier and so much more flexible
+ *
  * Revision 1.44  2007/03/07 02:37:15  fplanque
  * OMG I decided that pregenerating the menus was getting to much of a PITA!
  * It's a zillion problems with the permissions.
@@ -1616,215 +1634,5 @@ class AdminUI_general
  *
  * Revision 1.33  2006/10/15 21:30:47  blueyed
  * Use url_rel_to_same_host() for redirect_to params.
- *
- * Revision 1.32  2006/09/11 23:30:49  blueyed
- * Fixed AdminUI::disp_payload_* for multiple blocks. Cleaned up AdminUI a bit
- *
- * Revision 1.31  2006/09/09 23:16:18  blueyed
- * minor
- *
- * Revision 1.30  2006/09/09 17:51:34  fplanque
- * started new category/chapter editor
- *
- * Revision 1.29  2006/09/06 23:32:56  fplanque
- * fixed itemlist nav when generating static
- *
- * Revision 1.28  2006/08/29 00:26:12  fplanque
- * Massive changes rolling in ItemList2.
- * This is somehow the meat of version 2.0.
- * This branch has gone officially unstable at this point! :>
- *
- * Revision 1.27  2006/08/21 01:02:10  blueyed
- * whitespace
- *
- * Revision 1.26  2006/08/20 22:25:22  fplanque
- * param_() refactoring part 2
- *
- * Revision 1.25  2006/07/12 20:17:13  fplanque
- * minor
- *
- * Revision 1.24  2006/07/08 22:33:43  blueyed
- * Integrated "simple edit form".
- *
- * Revision 1.23  2006/07/08 17:04:19  fplanque
- * minor
- *
- * Revision 1.21  2006/06/25 23:34:15  blueyed
- * wording pt2
- *
- * Revision 1.20  2006/06/25 23:23:38  blueyed
- * wording
- *
- * Revision 1.19  2006/06/22 22:30:05  blueyed
- * htsrv url for password related scripts (login, register and profile update)
- *
- * Revision 1.18  2006/06/22 19:23:01  blueyed
- * Text for fotter, if no LIMIT
- *
- * Revision 1.17  2006/06/22 18:37:48  fplanque
- * fixes
- *
- * Revision 1.16  2006/06/14 17:03:59  fplanque
- * A little better logout from admin... useful for bozos.
- *
- * Revision 1.15  2006/06/13 21:49:16  blueyed
- * Merged from 1.8 branch
- *
- * Revision 1.13.2.3  2006/06/12 20:00:57  fplanque
- * one too many massive syncs...
- *
- * Revision 1.13  2006/05/12 21:53:38  blueyed
- * Fixes, cleanup, translation for plugins
- *
- * Revision 1.12  2006/05/02 18:15:20  fplanque
- * invalid xhtml fix
- *
- * Revision 1.11  2006/04/27 18:28:33  fplanque
- * moved Blog specific stuff out of evocore
- *
- * Revision 1.10  2006/04/24 20:43:43  blueyed
- * Exit to selected blog, if any
- *
- * Revision 1.9  2006/04/19 17:17:19  blueyed
- * Fix
- *
- * Revision 1.8  2006/04/19 12:54:41  fplanque
- * not using exit links any more because it won't translate
- *
- * Revision 1.7  2006/04/14 19:25:32  fplanque
- * evocore merge with work app
- *
- * Revision 1.6  2006/04/12 15:16:54  fplanque
- * partial cleanup
- *
- * Revision 1.5  2006/04/11 21:56:27  blueyed
- * cleanup
- *
- * Revision 1.4  2006/04/04 21:54:23  blueyed
- * cleanup/whitespace
- *
- * Revision 1.2  2006/03/12 23:09:30  fplanque
- * doc cleanup
- *
- * Revision 1.1  2006/02/23 21:12:51  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.52  2006/02/03 21:58:04  fplanque
- * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
- *
- * Revision 1.51  2006/02/01 20:06:15  blueyed
- * die_if_no_perm re-enabled
- *
- * Revision 1.50  2006/01/30 19:49:17  fplanque
- * Fixed the 3 broken check_perm() features! 1) text_no_perm 2) perm_eval 3) average user trying to edit his profile
- *
- * Revision 1.49  2006/01/30 16:09:33  blueyed
- * doc
- *
- * Revision 1.47  2006/01/26 23:08:35  blueyed
- * Plugins enhanced.
- *
- * Revision 1.46  2006/01/26 20:27:45  blueyed
- * minor
- *
- * Revision 1.45  2006/01/25 18:24:21  fplanque
- * hooked bozo validator in several different places
- *
- * Revision 1.44  2006/01/23 23:29:49  blueyed
- * Added permission checks when setting a path
- *
- * Revision 1.43  2006/01/10 19:03:16  blueyed
- * Use $app_shortname in get_page_head()
- *
- * Revision 1.42  2005/12/12 19:21:20  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.41  2005/12/08 22:54:02  blueyed
- * Doc, Normalization
- *
- * Revision 1.40  2005/11/25 03:57:57  blueyed
- * doc, normalization
- *
- * Revision 1.39  2005/11/17 17:39:55  blueyed
- * Removed trailing whitespace in T_() for acronym title
- *
- * Revision 1.38  2005/11/03 18:23:43  fplanque
- * minor
- *
- * Revision 1.37  2005/10/30 23:42:46  blueyed
- * Refactored get_head_links() into existing get_headlines(); doc
- *
- * Revision 1.36  2005/10/28 20:08:46  blueyed
- * Normalized AdminUI
- *
- * Revision 1.35  2005/10/26 23:08:28  blueyed
- * doc; todo
- *
- * Revision 1.34  2005/10/12 18:24:37  fplanque
- * bugfixes
- *
- * Revision 1.33  2005/09/06 17:13:53  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.32  2005/08/31 19:06:41  fplanque
- * minor
- *
- * Revision 1.30  2005/07/18 14:21:37  fplanque
- * Use a default Form layout which can be skin dependant
- *
- * Revision 1.29  2005/07/15 16:41:50  fplanque
- * fixed typo
- *
- * Revision 1.28  2005/07/14 21:03:31  blueyed
- * Fixed notice with array_merge() again.
- *
- * Revision 1.27  2005/07/10 00:09:06  blueyed
- * renamed getNode() to get_node_by_path(), fixed array_merge() notice for PHP5
- *
- * Revision 1.26  2005/06/23 18:43:06  blueyed
- * Fixed constructor's name.
- *
- * Revision 1.25  2005/06/22 17:21:39  blueyed
- * css fix for khtml
- *
- * Revision 1.24  2005/06/03 20:14:37  fplanque
- * started input validation framework
- *
- * Revision 1.22  2005/05/02 19:06:44  fplanque
- * started paging of user list..
- *
- * Revision 1.21  2005/04/28 20:44:17  fplanque
- * normalizing, doc
- *
- * Revision 1.20  2005/04/21 18:01:28  fplanque
- * CSS styles refactoring
- *
- * Revision 1.19  2005/04/15 18:02:57  fplanque
- * finished implementation of properties/meta data editor
- * started implementation of files to items linking
- *
- * Revision 1.18  2005/03/21 17:37:47  fplanque
- * results/table layout refactoring
- *
- * Revision 1.17  2005/03/18 00:24:04  blueyed
- * doc
- *
- * Revision 1.16  2005/03/17 14:06:37  fplanque
- * put back page titles in logical order
- *
- * Revision 1.15  2005/03/16 19:58:13  fplanque
- * small AdminUI cleanup tasks
- *
- * Revision 1.14  2005/03/16 16:05:09  fplanque
- * $app_footer_text
- *
- * Revision 1.13  2005/03/13 19:46:53  blueyed
- * application config layer
- *
- * Revision 1.12  2005/03/11 12:40:15  fplanque
- * multiple browsing views, part ONE
- *
  */
 ?>
