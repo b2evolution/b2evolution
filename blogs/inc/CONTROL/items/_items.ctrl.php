@@ -40,6 +40,7 @@ global $Blog;
 
 param( 'action', 'string', 'list' );
 
+$AdminUI->set_path( 'items' );	// Sublevel may be attached below
 
 /*
  * Init the objects we want to work on.
@@ -577,7 +578,10 @@ switch( $action )
 		break;
 }
 
-$AdminUI->set_path( 'items', !empty($tab) ? $tab : NULL );
+if( !empty($tab) )
+{
+	$AdminUI->append_path_level( $tab );
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -690,6 +694,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2007/03/07 02:37:43  fplanque
+ * OMG I decided that pregenerating the menus was getting to much of a PITA!
+ * It's a zillion problems with the permissions.
+ * This will be simplified a lot. Enough of these crazy stuff.
+ *
  * Revision 1.15  2007/03/02 01:36:51  fplanque
  * small fixes
  *

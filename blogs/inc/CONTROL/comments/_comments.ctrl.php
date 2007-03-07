@@ -67,6 +67,8 @@ switch( $action )
 }
 
 
+$AdminUI->set_path( 'items' );	// Sublevel may be attached below
+
 /**
  * Perform action:
  */
@@ -193,6 +195,8 @@ switch( $action )
 		 */
 		attach_browse_tabs();
 
+		$AdminUI->append_path_level( 'comments' );
+
 		/*
 		 * List of comments to display:
 		 */
@@ -260,6 +264,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2007/03/07 02:37:52  fplanque
+ * OMG I decided that pregenerating the menus was getting to much of a PITA!
+ * It's a zillion problems with the permissions.
+ * This will be simplified a lot. Enough of these crazy stuff.
+ *
  * Revision 1.5  2006/12/26 00:55:58  fplanque
  * wording
  *
