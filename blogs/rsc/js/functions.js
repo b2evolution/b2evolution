@@ -72,8 +72,8 @@ function pop_up_window( href, target, width, height, params )
 		height = 550;
 	}
 
-	left = (screen.width - width) / 2;
-  top = (screen.height - height) / 2;
+	var left = (screen.width - width) / 2;
+	var top = (screen.height - height) / 2;
 
  	if( typeof(params) == 'undefined' )
 	{
@@ -386,6 +386,7 @@ b2evo_Callbacks.prototype = {
 	 * @return boolean true, if any callback returned true
 	 */
 	trigger_callback : function(event, args) {
+
 		if( typeof this.eventHandlers[event] == "undefined" )
 		{
 			return false;
@@ -419,6 +420,9 @@ var b2evo_Callbacks = new b2evo_Callbacks();
 
 /*
  * $Log$
+ * Revision 1.26  2007/03/07 19:26:20  blueyed
+ * Fix; for IE IIRC
+ *
  * Revision 1.25  2007/01/26 02:12:09  fplanque
  * cleaner popup windows
  *
