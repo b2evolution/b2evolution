@@ -36,6 +36,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param array Info (by reference)
  *        'error': holds error message, if any
  *        'status': HTTP status (e.g. 200 or 404)
+ *        'used_method': Used method ("curl", "fopen" or "fsockopen")
  * @return string|false The remote page as a string; false in case of error
  */
 function fetch_remote_page( $url, & $info )
@@ -47,6 +48,8 @@ function fetch_remote_page( $url, & $info )
 	// CURL:
 	if( extension_loaded('curl') )
 	{
+		$info['used_method'] = 'curl';
+
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -57,15 +60,21 @@ function fetch_remote_page( $url, & $info )
 		$r = curl_exec($ch);
 		$info['status'] = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		$info['error'] = curl_error($ch);
+		if( curl_errno($ch) )
+		{
+			$info['error'] .= '(#'.curl_errno($ch).')';
+		}
 		curl_close($ch);
 
 		return $r;
 	}
 
 
-	// URL FOPEN:
-	if( ini_get('allow_url_fopen') && function_exists('stream_get_meta_data') /* PHP 4.3 */ )
+	// URL FOPEN (fallback to fsockopen, if fopen() fails):
+	if( ini_get('allow_url_fopen') && function_exists('stream_get_meta_data') /* PHP 4.3, may also be disabled!? */ )
 	{
+		$info['used_method'] = 'fopen';
+
 		$fp = @fopen($url, 'r');
 		if( $fp )
 		{ // this will be false e.g. for "404", but it's not trivial to get the status error for this, so we retry with fsockopen further down
@@ -93,6 +102,7 @@ function fetch_remote_page( $url, & $info )
 
 
 	// As a last resort, try fsockopen:
+	$info['used_method'] = 'fsockopen';
 	$url_parsed = parse_url($url);
 	if( empty($url_parsed['scheme']) ) {
 		$url_parsed = parse_url('http://'.$url);
@@ -198,6 +208,9 @@ function url_same_protocol( $url, $other_url = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.7  2007/03/08 22:55:21  blueyed
+ * fetch_remote_page: Added "used_method" to $info and errno to "curl" method.
+ *
  * Revision 1.6  2006/12/22 00:25:15  blueyed
  * Do not send URL fragment in GET
  *
