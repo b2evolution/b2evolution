@@ -933,21 +933,19 @@ class Blog extends DataObject
 				}
 
 			case 'baseurlroot':
-				if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $this->get('baseurl'), $matches ) )
+				if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->get('baseurl'), $matches ) )
 				{
 					// TODO: shouldn't that include a trailing slash?:
 					return $matches[1];
 				}
-
-				debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed.' );
+				debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->get('baseurl').'].' );
 
 			case 'basehost':
-				if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $this->get('baseurl'), $matches ) )
+				if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->get('baseurl'), $matches ) )
 				{
 					return $matches[2];
 				}
-
-				debug_die( 'Blog::get(baseurl)/basehost - assertion failed.' );
+				debug_die( 'Blog::get(baseurl)/basehost - assertion failed [baseurl: '.$this->get('baseurl').'].' );
 
 			case 'cookie_domain':
 				$basehost = $this->get('basehost');
@@ -1335,6 +1333,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.68  2007/03/08 00:17:42  blueyed
+ * More info in assertion for "baseurlroot" and "basehost" and more strict pattern
+ *
  * Revision 1.67  2007/03/04 21:42:49  fplanque
  * category directory / albums
  *
