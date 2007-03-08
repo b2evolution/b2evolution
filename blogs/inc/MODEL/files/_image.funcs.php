@@ -91,11 +91,11 @@ function load_image( $path, $mimetype )
 	switch( $mimetype )
 	{
 		case 'image/jpeg':
-			$imh = imagecreatefromjpeg( $path );
+			$imh = imagecreatefromjpeg( $path ); // dh> TODO: this can fail, if $path is not a valid jpeg! Handle this.
 			break;
 
 		case 'image/gif':
-			$imh = imagecreatefromgif( $path );
+			$imh = imagecreatefromgif( $path );  // dh> TODO: this can fail, if $path is not a valid gif! Handle this.
 			break;
 
  		default:
@@ -221,6 +221,9 @@ function generate_thumb( $src_imh, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.6  2007/03/08 00:22:35  blueyed
+ * TODO
+ *
  * Revision 1.5  2007/01/19 08:20:36  fplanque
  * Addressed resized image quality.
  *
