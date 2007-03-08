@@ -172,7 +172,7 @@ elseif( $grp_ID !== NULL )
 			$admin_User = & $UserCache->get_by_ID(1);
 			$demo_User = & $UserCache->get_by_login('demouser');
 			if( $edited_Group->ID == $admin_User->Group->ID
-					|| $edited_Group->ID == $demo_User->Group->ID )
+					|| $edited_Group->ID == $demo_User->group_ID )
 			{
 				$Messages->add( T_('You cannot edit the groups of user &laquo;admin&raquo; or &laquo;demouser&raquo; in demo mode!'), 'error' );
 				$action = 'view_group';
@@ -807,6 +807,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.47  2007/03/08 00:46:17  blueyed
+ * Fixed check for disallowing demouser-group-changes in demomode
+ *
  * Revision 1.46  2007/02/21 22:21:30  blueyed
  * "Multiple sessions" user setting
  *
