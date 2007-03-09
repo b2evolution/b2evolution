@@ -139,12 +139,21 @@ $Form->begin_fieldset( T_('Hit & session logging') . get_web_help_link('Hit logg
 
 	// TODO: draw a warning sign if set to off
 	$Form->radio_input( 'auto_prune_stats_mode', $Settings->get('auto_prune_stats_mode'), array(
-			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('Not recommended! Your database will grow very large!!'),
-				'suffix' => '<br />',	'params' => array('onclick'=>'$("#auto_prune_stats_container").hide();') ),
-			array( 'value'=>'page', 'label'=>T_('On every page'), 'note'=>T_('This is guaranteed to work but uses extra resources with every page displayed.'), 'suffix' => '<br />',
-				'params' => array('onclick'=>'$("#auto_prune_stats_container").show();') ),
-			array( 'value'=>'cron', 'label'=>T_('With a scheduled job'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up.'),
-				'params' => array('onclick'=>'$("#auto_prune_stats_container").show();') ) ),
+			array(
+				'value'=>'off',
+				'label'=>T_('Off'),
+				'note'=>T_('Not recommended! Your database will grow very large!!'),
+				'suffix' => '<br />',
+				'onclick'=>'$("#auto_prune_stats_container").hide();' ),
+			array(
+				'value'=>'page',
+				'label'=>T_('On every page'),
+				'note'=>T_('This is guaranteed to work but uses extra resources with every page displayed.'), 'suffix' => '<br />',
+				'onclick'=>'$("#auto_prune_stats_container").show();' ),
+			array(
+				'value'=>'cron',
+				'label'=>T_('With a scheduled job'),
+				'note'=>T_('Recommended if you have your scheduled jobs properly set up.'), 'onclick'=>'$("#auto_prune_stats_container").show();' ) ),
 		T_('Auto pruning'),
 		array( 'note' => T_('Note: Even if you don\'t log hits, you still need to prune sessions!') ) );
 
@@ -176,6 +185,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.23  2007/03/09 15:18:42  blueyed
+ * Removed bloated "params" usage in Form::radio_input() for $field_options. Now the attribs/params for each radio input are directly in the $field_options entry instead.
+ *
  * Revision 1.22  2007/01/26 02:12:09  fplanque
  * cleaner popup windows
  *

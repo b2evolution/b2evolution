@@ -2292,11 +2292,16 @@ class Form extends Widget
 	 *
 	 * @param string The name of the radio options
 	 * @param string The checked option
-	 * @param array of arrays The radio options (keys: 'value', 'label', 'note', 'params' (array)).
-	 *    'params':
-	 *      - 'note': Note for the option (string)
-	 *      - 'input_suffix' (additional HTML [input field, ..])
-	 *      - Plus everything for {@link get_input_element()} )
+	 * @param array of arrays The radio options
+	 *        Keys:
+	 *         - 'value' (required)
+	 *         - 'label' (required)
+	 *         - 'note'
+	 *         - 'type' (default: "radio")
+	 *         - 'class' (default: "radio")
+	 *         - 'name' (default: $field_name)
+	 *         - 'suffix' (gets used after the radio's label)
+	 *         - Plus everything for {@link get_input_element()} )
 	 * @param string Label
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - lines: Options on seperate lines (DIVs) (boolean, default false)
@@ -2328,51 +2333,44 @@ class Form extends Widget
 		 * Build options list:
 		 */
 		$count_options = 0; // used for unique IDs (label/radio)
-		foreach( $field_options as $loop_field_option )
+		foreach( $field_options as $loop_radio )
 		{
-			$count_options++;
-
 			if( $field_lines ) $r .= "<div>\n";
 
-			$input_params = isset( $loop_field_option['params'] )
-				? $loop_field_option['params']
-				: array();
-
-			$input_params = array_merge(
-				array(
-					'type' => 'radio',
-					'class' => 'radio',
-					'name' => $field_name,
-					'value' => $loop_field_option['value'],
-				),
-				$input_params );
-
-			if( $field_value == $loop_field_option['value'] )
-			{ // Current selection:
-				$input_params['checked'] = 'checked';
+			// Defaults:
+			if( ! isset($loop_radio['type']) )  $loop_radio['type'] = 'radio';
+			if( ! isset($loop_radio['class']) ) $loop_radio['class'] = 'radio';
+			if( ! isset($loop_radio['name']) )  $loop_radio['name'] = $field_name;
+			if( ! isset($loop_radio['id']) )
+			{ // build unique id:
+				$loop_radio['id'] = $this->get_valid_id($field_params['name'].'_radio_'.(++$count_options));
 			}
 
-			// build unique id:
-			$input_params['id'] = $this->get_valid_id( $field_params['name'].'_radio_'.$count_options);
+			if( $field_value == $loop_radio['value'] )
+			{ // Current selection:
+				$loop_radio['checked'] = 'checked';
+			}
 
-			$r .= $this->get_input_element( $input_params, false ) // the radio element
-				.'<label class="radiooption" for="'.$input_params['id'].'">'
-				.$loop_field_option['label']
+			// the radio element:
+			$r .= $this->get_input_element( $loop_radio, false );
+
+			// the label:
+			$r .= '<label class="radiooption" for="'.$loop_radio['id'].'">'
+				.$loop_radio['label']
 				.'</label>';
 
-			if( !empty($loop_field_option['note']) )
+			if( ! empty($loop_radio['note']) )
 			{ // Add a note for the current radio option:
-				$r .= '<span class="notes">'.$loop_field_option['note'].'</span>';
+				$r .= '<span class="notes">'.$loop_radio['note'].'</span>';
 			}
 
-			if( !empty( $loop_field_option['params']['note'] ) )
-			{ // notes for radio option
-				$r .= '<span class="notes">'.$loop_field_option['params']['note'].'</span>';
-			}
-			if( !empty( $loop_field_option['suffix'] ) )
+			if( !empty( $loop_radio['suffix'] ) )
 			{ // optional text for radio option (like additional fieldsets or input boxes)
-				$r .= $loop_field_option['suffix'];
+				$r .= $loop_radio['suffix'];
 			}
+
+			// Split radio options by whitespace:
+			$r .= "\n";
 
 			if( $field_lines ) $r .= "</div>\n";
 		}
@@ -2394,44 +2392,34 @@ class Form extends Widget
 	 * @param string notes
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function radio(
-		$field_name,
-		$field_value,
-		$field_options,
-		$field_label,
-		$field_lines = false,
-		$field_note = '' )
+	function radio( $field_name, $field_value, $field_options, $field_label, $field_lines = false, $field_note = '' )
 	{
 		$new_field_options = array();
 
 		foreach( $field_options as $l_key => $l_options )
 		{
-			$l_params = array();
+			$new_field_options[$l_key] = array(
+				'value' => $l_options[0],
+				'label' => $l_options[1] );
 
 			if( isset($l_options[2]) )
 			{
-				$l_params['note'] = $l_options[2];
+				$new_field_options[$l_key]['note'] = $l_options[2];
 			}
 			if( isset($l_options[4]) )
-			{ // Convert "inline attribs" to params array
+			{ // Convert "inline attribs" to "params" array
 				preg_match_all( '#(\w+)=[\'"](.*)[\'"]#', $l_options[4], $matches, PREG_SET_ORDER );
 
 				foreach( $matches as $l_set_nr => $l_match )
 				{
-					$l_params[$l_match[1]] = $l_match[2];
+					$new_field_options[$l_key][$l_match[1]] = $l_match[2];
 				}
 			}
-
-			$new_field_options[$l_key] = array(
-				'value' => $l_options[0],
-				'label' => $l_options[1],
-				'params' => $l_params );
 
 			if( isset($l_options[3]) )
 			{
 				$new_field_options[$l_key]['suffix'] = $l_options[3];
 			}
-
 		}
 
 		$field_params = array( 'lines' => $field_lines, 'note' => $field_note );
@@ -2718,6 +2706,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.70  2007/03/09 15:18:52  blueyed
+ * Removed bloated "params" usage in Form::radio_input() for $field_options. Now the attribs/params for each radio input are directly in the $field_options entry instead.
+ *
  * Revision 1.69  2007/02/11 15:00:15  fplanque
  * keeping JS abstraction.
  *

@@ -97,11 +97,11 @@ $Form->begin_form( 'fform', T_('Change permissions') );
 			$l_perms = $l_File->get_perms( 'octal' );
 			if( $l_perms == 555 )
 			{
-				$field_options[0]['params']['checked'] = 'checked';
+				$field_options[0]['checked'] = 'checked';
 			}
 			else
 			{
-				$field_options[1]['params']['checked'] = 'checked';
+				$field_options[1]['checked'] = 'checked';
 			}
 			$Form->radio_input( 'perms['.$l_File->get_md5_ID().']', false, $field_options, $l_File->get_rdfp_rel_path(), $field_params );
 		}
@@ -125,6 +125,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.7  2007/03/09 15:18:42  blueyed
+ * Removed bloated "params" usage in Form::radio_input() for $field_options. Now the attribs/params for each radio input are directly in the $field_options entry instead.
+ *
  * Revision 1.6  2006/11/24 18:27:25  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
