@@ -2291,7 +2291,7 @@ class Form extends Widget
 	 * Generate set of radio options.
 	 *
 	 * @param string The name of the radio options
-	 * @param string The checked option
+	 * @param string The checked option's value
 	 * @param array of arrays The radio options
 	 *        Keys:
 	 *         - 'value' (required)
@@ -2299,6 +2299,7 @@ class Form extends Widget
 	 *         - 'note'
 	 *         - 'type' (default: "radio")
 	 *         - 'class' (default: "radio")
+	 *         - 'checked' (default: 'value' gets compared to $field_value)
 	 *         - 'name' (default: $field_name)
 	 *         - 'suffix' (gets used after the radio's label)
 	 *         - Plus everything for {@link get_input_element()} )
@@ -2346,7 +2347,11 @@ class Form extends Widget
 				$loop_radio['id'] = $this->get_valid_id($field_params['name'].'_radio_'.(++$count_options));
 			}
 
-			if( $field_value == $loop_radio['value'] )
+			if( isset($loop_radio['checked']) )
+			{ // convert boolean:
+				if( $loop_radio['checked'] ) $loop_radio['checked'] = 'checked';
+			}
+			elseif( $field_value == $loop_radio['value'] )
 			{ // Current selection:
 				$loop_radio['checked'] = 'checked';
 			}
@@ -2706,6 +2711,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.71  2007/03/09 15:39:56  blueyed
+ * radio_input(): Use "checked" param for $field_options if given
+ *
  * Revision 1.70  2007/03/09 15:18:52  blueyed
  * Removed bloated "params" usage in Form::radio_input() for $field_options. Now the attribs/params for each radio input are directly in the $field_options entry instead.
  *
