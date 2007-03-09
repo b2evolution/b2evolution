@@ -143,6 +143,10 @@ if( empty( $message ) )
 { // message should not be empty!
 	$Messages->add( T_('Please do not send empty messages.'), 'error' );
 }
+elseif( antispam_check(  strip_tags( $message ) ) )
+{ // lets check the message against the blacklist
+    $Messages->add( T_('Supplied message is invalid.'), 'error' );
+}
 
 
 // Build message footer:
@@ -309,6 +313,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.52  2007/03/09 10:07:53  yabs
+ * Added antispam check
+ *
  * Revision 1.51  2007/02/03 20:25:37  blueyed
  * Added "sender_name", "sender_email" and "subject" params to MessageFormSent
  *
