@@ -166,7 +166,7 @@ class Session
 						$this->_data = @unserialize($row->sess_data);
 						ini_set( 'unserialize_callback_func', $old_callback );
 
-						if( $this->_data === false )
+						if( ! is_array($this->_data) )
 						{
 							$Debuglog->add( 'Session data corrupted!<br />
 								connection_charset: '.var_export($DB->connection_charset, true).'<br />
@@ -512,6 +512,9 @@ function session_unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.38  2007/03/11 18:29:50  blueyed
+ * Use is_array for session data check
+ *
  * Revision 1.37  2007/02/25 01:39:05  fplanque
  * wording
  *
