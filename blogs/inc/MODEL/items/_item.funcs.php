@@ -400,7 +400,7 @@ function cat_select_before_first( $parent_cat_ID, $level )
  */
 function cat_select_before_each( $cat_ID, $level, $total_count )
 { // callback to display sublist element
-	global $current_blog_ID, $blog, $post_extracats, $default_main_cat;
+	global $current_blog_ID, $blog, $post_extracats, $edited_Item;
 	global $creating, $allow_cross_posting, $cat_select_level, $cat_select_form_fields;
 	$this_cat = get_the_category_by_ID( $cat_ID );
 	$r = "\n".'<tr class="'.( $total_count%2 ? 'odd' : 'even' ).'">';
@@ -412,7 +412,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 		{	// We want a form field:
 			$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
 						.T_('Select as MAIN category').'" value="'.$cat_ID.'"';
-			if( $cat_ID == $default_main_cat )
+			if( $cat_ID == $edited_Item->main_cat_ID )
 			{ // main cat of the Item or set as default main cat above
 				$r .= ' checked="checked"';
 			}
@@ -421,7 +421,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 		}
 		else
 		{	// We just want info:
-			$r .= '<td class="selector catsel_main">'.bullet( $cat_ID == $default_main_cat ).'</td>';
+			$r .= '<td class="selector catsel_main">'.bullet( $cat_ID == $edited_Item->main_cat_ID ).'</td>';
 		}
 	}
 	else
@@ -436,7 +436,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 		{	// We want a form field:
 			$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
 						.T_('Select as an additional category').'" value="'.$cat_ID.'"';
-			// if( ($cat_ID == $default_main_cat) || (in_array( $cat_ID, $post_extracats )) )  <--- We don't want to precheck the default cat because it will stay checked if we change the default main. On edit, the checkbox will always be in the array.
+			// if( ($cat_ID == $edited_Item->main_cat_ID) || (in_array( $cat_ID, $post_extracats )) )  <--- We don't want to precheck the default cat because it will stay checked if we change the default main. On edit, the checkbox will always be in the array.
 			if( (in_array( $cat_ID, $post_extracats )) )
 			{
 				$r .= ' checked="checked"';
@@ -446,7 +446,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 		}
 		else
 		{	// We just want info:
-			$r .= '<td class="selector catsel_main">'.bullet( ($cat_ID == $default_main_cat) || (in_array( $cat_ID, $post_extracats )) ).'</td>';
+			$r .= '<td class="selector catsel_main">'.bullet( ($cat_ID == $edited_Item->main_cat_ID) || (in_array( $cat_ID, $post_extracats )) ).'</td>';
 		}
 	}
 
@@ -523,8 +523,43 @@ function attach_browse_tabs()
 }
 
 
+
+/**
+ * Allow to select status/visibility
+ */
+function visibility_select( & $Form, $post_status )
+{
+	global $current_User, $Blog;
+
+	$sharing_options = array();
+
+	if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $Blog->ID ) )
+		$sharing_options[] = array( 'published', T_('Published (Public)') );
+
+	if( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $Blog->ID ) )
+		$sharing_options[] = array( 'protected', T_('Protected (Members only)') );
+
+	if( $current_User->check_perm( 'blog_post_statuses', 'private', false, $Blog->ID ) )
+		$sharing_options[] = array( 'private', T_('Private (You only)') );
+
+	if( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $Blog->ID ) )
+		$sharing_options[] = array( 'draft', T_('Draft (Not published!)') );
+
+	if( $current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $Blog->ID ) )
+		$sharing_options[] = array( 'deprecated', T_('Deprecated (Not published!)') );
+
+	if( $current_User->check_perm( 'blog_post_statuses', 'redirected', false, $Blog->ID ) )
+		$sharing_options[] = array( 'redirected', T_('Redirected') );
+
+	$Form->radio( 'post_status', $post_status, $sharing_options, '', true );
+}
+
+
 /*
  * $Log$
+ * Revision 1.43  2007/03/11 23:56:02  fplanque
+ * fixed some post editing oddities / variable cleanup (more could be done)
+ *
  * Revision 1.42  2007/03/03 01:14:12  fplanque
  * new methods for navigating through posts in single item display mode
  *
@@ -575,100 +610,5 @@ function attach_browse_tabs()
  *
  * Revision 1.27  2006/10/29 21:20:53  blueyed
  * Replace special characters in generated URL titles
- *
- * Revision 1.26  2006/09/26 23:52:06  blueyed
- * Minor things while merging with branches
- *
- * Revision 1.25  2006/09/13 23:38:06  blueyed
- * Fix for next_post()/previous_post(), if there is no $postdata - e.g. on /yyyy/mm/dd/not-found-title
- *
- * Revision 1.24  2006/09/02 00:16:21  blueyed
- * Merge from branches
- *
- * Revision 1.23  2006/08/29 00:26:11  fplanque
- * Massive changes rolling in ItemList2.
- * This is somehow the meat of version 2.0.
- * This branch has gone officially unstable at this point! :>
- *
- * Revision 1.22  2006/08/28 18:28:07  fplanque
- * minor
- *
- * Revision 1.21  2006/08/26 20:30:42  fplanque
- * made URL titles Google friendly
- *
- * Revision 1.20  2006/08/21 16:07:43  fplanque
- * refactoring
- *
- * Revision 1.19  2006/08/19 07:56:30  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.18  2006/08/05 17:59:52  fplanque
- * minor
- *
- * Revision 1.17  2006/08/04 15:24:31  blueyed
- * Respect status in next_post()/previous_post() (Thanks, Austriaco)
- *
- * Revision 1.16  2006/08/03 20:43:39  blueyed
- * Additional fix and cleanup for next_post()/previous_post()
- *
- * Revision 1.15  2006/08/03 18:22:49  blueyed
- * next_post()/prev_post(): only use current blog URL, if "in_same_cat".
- *
- * Revision 1.14  2006/08/01 22:27:34  blueyed
- * Fixed next_post()/previous_post(): use permanent URL, based on current Blog (clean URLs). Also check for disp==single instead of "p", which does not work when a post has been selected by title (param).
- *
- * Revision 1.13  2006/07/23 23:27:07  blueyed
- * cleanup
- *
- * Revision 1.12  2006/07/23 20:18:30  fplanque
- * cleanup
- *
- * Revision 1.11  2006/07/10 18:15:21  blueyed
- * Fix for default main cat, when switching blogs.
- *
- * Revision 1.10  2006/07/08 22:33:43  blueyed
- * Integrated "simple edit form".
- *
- * Revision 1.9  2006/04/19 20:13:50  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.8  2006/04/19 15:56:02  blueyed
- * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
- * and Item::comments to Item::comment_status (Item API change)
- *
- * Revision 1.7  2006/04/11 21:22:25  fplanque
- * partial cleanup
- *
- * Revision 1.6  2006/04/06 13:49:50  blueyed
- * Background "striping" for "Categories" fieldset
- *
- * Revision 1.5  2006/04/04 21:46:48  blueyed
- * doc, todo
- *
- * Revision 1.4  2006/03/12 23:46:13  fplanque
- * experimental
- *
- * Revision 1.3  2006/03/12 23:08:59  fplanque
- * doc cleanup
- *
- * Revision 1.2  2006/03/09 22:29:59  fplanque
- * cleaned up permanent urls
- *
- * Revision 1.1  2006/02/23 21:11:58  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.46  2006/02/05 14:07:18  blueyed
- * Fixed 'postbypost' archive mode.
- *
- * Revision 1.45  2006/01/10 20:59:49  fplanque
- * minor / fixed internal sync issues @ progidistri
- *
- * Revision 1.44  2006/01/04 20:35:14  fplanque
- * no message
- *
- * Revision 1.43  2006/01/04 15:03:52  fplanque
- * enhanced list sorting capabilities
  */
 ?>

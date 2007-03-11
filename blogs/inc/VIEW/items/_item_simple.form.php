@@ -43,7 +43,7 @@ global $Settings;
 global $pagenow;
 
 global $mode, $use_post_url;
-global $use_preview, $post_status, $post_comment_status, $trackback_url;
+global $use_preview, $post_comment_status, $trackback_url;
 global $edit_date, $bozo_start_modified, $creating;
 
 // Determine if we are creating or updating...
@@ -210,19 +210,7 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 
 	$Form->begin_fieldset( T_('Visibility / Sharing'), array( 'id' => 'itemform_visibility' ) );
 
-	$sharing_options = array();
-	if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $Blog->ID ) )
-		$sharing_options[] = array( 'published', T_('Published (Public)') );
-	if( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $Blog->ID ) )
-		$sharing_options[] = array( 'protected', T_('Protected (Members only)') );
-	if( $current_User->check_perm( 'blog_post_statuses', 'private', false, $Blog->ID ) )
-		$sharing_options[] = array( 'private', T_('Private (You only)') );
-	if( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $Blog->ID ) )
-		$sharing_options[] = array( 'draft', T_('Draft (Not published!)') );
-	if( $current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $Blog->ID ) )
-		$sharing_options[] = array( 'deprecated', T_('Deprecated (Not published!)') );
-
-	$Form->radio( 'post_status', $post_status, $sharing_options, '', true );
+	visibility_select( $Form, $edited_Item->status );
 
 	$Form->end_fieldset();
 
@@ -263,6 +251,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.30  2007/03/11 23:56:02  fplanque
+ * fixed some post editing oddities / variable cleanup (more could be done)
+ *
  * Revision 1.29  2007/01/26 02:12:09  fplanque
  * cleaner popup windows
  *

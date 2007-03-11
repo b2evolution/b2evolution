@@ -146,18 +146,18 @@ switch( $action )
 		// Also used by bookmarklet
 		$edited_Item->load_from_Request(); // needs Blog set
 
-		param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
+		$edited_Item->status = param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
 		// but we need to make sure the requested/default one is ok:
-		$post_status = $Blog->get_allowed_item_status( $post_status );
+		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
 
 
 		param( 'post_extracats', 'array', array() );
 		param( 'edit_date', 'integer', 0 ); // checkbox
-		$default_main_cat = param( 'post_category', 'integer', $Blog->get_default_cat_ID() );
-		if( $default_main_cat && $allow_cross_posting < 3 && get_catblog($default_main_cat) != $blog )
+		$edited_Item->main_cat_ID = param( 'post_category', 'integer', $Blog->get_default_cat_ID() );
+		if( $edited_Item->main_cat_ID && $allow_cross_posting < 3 && get_catblog($edited_Item->main_cat_ID) != $blog )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
-			$default_main_cat = $Blog->get_default_cat_ID();
+			$edited_Item->main_cat_ID = $Blog->get_default_cat_ID();
 		}
 		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
 
@@ -180,25 +180,23 @@ switch( $action )
 		// Check permission based on DB status:
 		$current_User->check_perm( 'blog_post_statuses', $edited_Item->get( 'status' ), true, $blog );
 
+		$edited_Item->status = param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
+		// We know we can use at least one status,
+		// but we need to make sure the requested/default one is ok:
+		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
+
 		// We use the request variables to fill the edit form, because we need to be able to pass those values
 		// from tab to tab via javascript when the editor wants to switch views...
 		$edited_Item->load_from_Request(); // needs Blog set
 
-		param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
-		// We know we can use at least one status,
-		// but we need to make sure the requested/default one is ok:
-		$post_status = $Blog->get_allowed_item_status( $post_status );
-
 		param( 'post_extracats', 'array', array() );
 		param( 'edit_date', 'integer', 0 ); // checkbox
-		$default_main_cat = param( 'post_category', 'integer', $edited_Item->main_cat_ID );
-		if( $default_main_cat && $allow_cross_posting < 3 && get_catblog($default_main_cat) != $blog )
+		$edited_Item->main_cat_ID = param( 'post_category', 'integer', $edited_Item->main_cat_ID );
+		if( $edited_Item->main_cat_ID && $allow_cross_posting < 3 && get_catblog($edited_Item->main_cat_ID) != $blog )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
-			$default_main_cat = $Blog->get_default_cat_ID();
+			$edited_Item->main_cat_ID = $Blog->get_default_cat_ID();
 		}
 		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
-
-		$default_main_cat = $edited_Item->main_cat_ID;
 
 		// Trackback addresses (never saved into item)
  		param( 'trackback_url', 'string', '' );
@@ -215,10 +213,8 @@ switch( $action )
 
 	case 'edit':
 		// Check permission:
-		$post_status = $edited_Item->get( 'status' );
-		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
-
-		$default_main_cat = $edited_Item->main_cat_ID;
+		$edited_Item->status = $edited_Item->get( 'status' );
+		$current_User->check_perm( 'blog_post_statuses', $edited_Item->status, true, $blog );
 
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p );
@@ -491,7 +487,7 @@ function init_list_mode()
 	$ItemList = new ItemList2( $Blog, NULL, NULL ); // COPY (func)
 
 	$ItemList->set_default_filters( array(
-			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated' ),
+			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated', 'redirected' ),
 		) );
 
 	if( $tab == 'tracker' )
@@ -694,6 +690,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2007/03/11 23:56:03  fplanque
+ * fixed some post editing oddities / variable cleanup (more could be done)
+ *
  * Revision 1.16  2007/03/07 02:37:43  fplanque
  * OMG I decided that pregenerating the menus was getting to much of a PITA!
  * It's a zillion problems with the permissions.
