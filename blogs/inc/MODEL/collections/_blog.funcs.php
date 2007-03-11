@@ -95,6 +95,9 @@ function blog_update_user_perms( $blog )
 			$perm_deprecated = param( 'blog_perm_deprecated_'.$loop_user_ID, 'string', '' );
 			if( !empty($perm_deprecated) ) $perm_post[] = 'deprecated';
 
+			$perm_redirected = param( 'blog_perm_redirected_'.$loop_user_ID, 'string', '' );
+			if( !empty($perm_redirected) ) $perm_post[] = 'redirected';
+
 			$perm_delpost = param( 'blog_perm_delpost_'.$loop_user_ID, 'integer', 0 );
 			$perm_comments = param( 'blog_perm_comments_'.$loop_user_ID, 'integer', 0 );
 			$perm_cats = param( 'blog_perm_cats_'.$loop_user_ID, 'integer', 0 );
@@ -183,6 +186,9 @@ function blog_update_group_perms( $blog )
 			$perm_deprecated = param( 'blog_perm_deprecated_'.$loop_group_ID, 'string', '' );
 			if( !empty($perm_deprecated) ) $perm_post[] = 'deprecated';
 
+			$perm_redirected = param( 'blog_perm_redirected_'.$loop_group_ID, 'string', '' );
+			if( !empty($perm_redirected) ) $perm_post[] = 'redirected';
+
 			$perm_delpost = param( 'blog_perm_delpost_'.$loop_group_ID, 'integer', 0 );
 			$perm_comments = param( 'blog_perm_comments_'.$loop_group_ID, 'integer', 0 );
 			$perm_cats = param( 'blog_perm_cats_'.$loop_group_ID, 'integer', 0 );
@@ -260,7 +266,7 @@ function blogperms_get_easy2( $perms, $context='user' )
 	$perms_admin =   (int)$perms->{'blog'.$context.'_perm_properties'}
 									+(int)$perms->{'blog'.$context.'_perm_cats'};
 
-	if( $perms_editor == 10 )
+	if( $perms_editor == 11 )
 	{ // has full editor rights
 		switch( $perms_admin )
 		{
@@ -313,7 +319,7 @@ function blogperms_from_easy( $easy_group )
 			$r['bloguser_perm_cats'] = 1;
 
 		case 'editor':
-			$r['bloguser_perm_poststatuses'] = 'deprecated,draft,private,protected,published';
+			$r['bloguser_perm_poststatuses'] = 'deprecated,draft,private,protected,published,redirected';
 			$r['bloguser_perm_delpost'] = 1;
 			$r['bloguser_perm_comments'] = 1;
 			$r['bloguser_perm_media_upload'] = 1;
@@ -590,6 +596,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.22  2007/03/11 22:48:19  fplanque
+ * handling of permission to redirect posts
+ *
  * Revision 1.21  2007/03/11 22:30:07  fplanque
  * cleaned up group perms
  *

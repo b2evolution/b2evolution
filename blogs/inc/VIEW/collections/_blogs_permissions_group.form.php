@@ -226,37 +226,45 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can post/edit with following statuses:'),
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Published'),
+						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Publ'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_status_checkbox( {row}, \'published\', \''.TS_('Permission to read protected posts').'\' )%',
 						'td_class' => 'center',
 					);
 $Results->cols[] = array(
 						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can post/edit with following statuses:'),
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Protected'),
+						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Prot'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_status_checkbox( {row}, \'protected\', \''.TS_('Permission to post into this blog with protected status').'\' )%',
 						'td_class' => 'center',
 					);
 $Results->cols[] = array(
 						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can post/edit with following statuses:'),
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Private'),
+						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Priv'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_status_checkbox( {row}, \'private\', \''.TS_('Permission to post into this blog with private status').'\' )%',
 						'td_class' => 'center',
 					);
 $Results->cols[] = array(
 						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can post/edit with following statuses:'),
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Draft'),
+						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Drft'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_status_checkbox( {row}, \'draft\', \''.TS_('Permission to post into this blog with draft status').'\' )%',
 						'td_class' => 'center',
 					);
 $Results->cols[] = array(
 						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can post/edit with following statuses:'),
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Deprecated'),
+						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Depr'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_status_checkbox( {row}, \'deprecated\', \''.TS_('Permission to post into this blog with deprecated status').'\' )%',
+						'td_class' => 'center',
+					);
+
+$Results->cols[] = array(
+						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can post/edit with following statuses:'),
+						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Redr'),
+						'th_class' => 'checkright',
+						'td' => '%coll_perm_status_checkbox( {row}, \'redirected\', \''.TS_('Permission to post into this blog with redirected status').'\' )%',
 						'td_class' => 'center',
 					);
 
@@ -425,6 +433,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.13  2007/03/11 22:48:19  fplanque
+ * handling of permission to redirect posts
+ *
  * Revision 1.12  2007/03/11 22:30:08  fplanque
  * cleaned up group perms
  *

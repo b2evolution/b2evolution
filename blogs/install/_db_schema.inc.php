@@ -41,7 +41,7 @@ $schema_queries = array(
 			bloguser_blog_ID int(11) unsigned NOT NULL default 0,
 			bloguser_user_ID int(11) unsigned NOT NULL default 0,
 			bloguser_ismember tinyint NOT NULL default 0,
-			bloguser_perm_poststatuses set('published','deprecated','protected','private','draft') NOT NULL default '',
+			bloguser_perm_poststatuses set('published','deprecated','protected','private','draft','redirected') NOT NULL default '',
 			bloguser_perm_delpost tinyint NOT NULL default 0,
 			bloguser_perm_comments tinyint NOT NULL default 0,
 			bloguser_perm_cats tinyint NOT NULL default 0,
@@ -200,7 +200,7 @@ $schema_queries = array(
 			post_datedeadline           datetime NULL,
 			post_datecreated            datetime NULL,
 			post_datemodified           datetime NOT NULL,
-			post_status                 enum('published','deprecated','protected','private','draft') NOT NULL default 'published',
+			post_status                 enum('published','deprecated','protected','private','draft','redirected') NOT NULL default 'published',
 			post_pst_ID                 int(11) unsigned NULL,
 			post_ptyp_ID                int(11) unsigned NULL,
 			post_locale                 VARCHAR(20) NOT NULL DEFAULT 'en-EU',
@@ -244,7 +244,7 @@ $schema_queries = array(
 			comment_ID        int(11) unsigned NOT NULL auto_increment,
 			comment_post_ID   int(11) unsigned NOT NULL default '0',
 			comment_type enum('comment','linkback','trackback','pingback') NOT NULL default 'comment',
-			comment_status ENUM('published', 'deprecated', 'protected', 'private', 'draft') DEFAULT 'published' NOT NULL,
+			comment_status ENUM('published','deprecated','protected','private','draft','redirected') DEFAULT 'published' NOT NULL,
 			comment_author_ID int unsigned NULL default NULL,
 			comment_author varchar(100) NULL,
 			comment_author_email varchar(255) NULL,
@@ -408,7 +408,7 @@ $schema_queries = array(
 			bloggroup_blog_ID int(11) unsigned NOT NULL default 0,
 			bloggroup_group_ID int(11) unsigned NOT NULL default 0,
 			bloggroup_ismember tinyint NOT NULL default 0,
-			bloggroup_perm_poststatuses set('published','deprecated','protected','private','draft') NOT NULL default '',
+			bloggroup_perm_poststatuses set('published','deprecated','protected','private','draft','redirected') NOT NULL default '',
 			bloggroup_perm_delpost tinyint NOT NULL default 0,
 			bloggroup_perm_comments tinyint NOT NULL default 0,
 			bloggroup_perm_cats tinyint NOT NULL default 0,
@@ -526,6 +526,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.53  2007/03/11 22:48:19  fplanque
+ * handling of permission to redirect posts
+ *
  * Revision 1.52  2007/02/13 00:38:11  blueyed
  * Changed DB fields for 1.10.0: sess_data to MEDIUMTEXT (serialize() does not completely convert the binary data to text); post_content and itpr_content_prerendered to MEDIUMTEXT
  *

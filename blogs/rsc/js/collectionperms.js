@@ -30,7 +30,7 @@ function toggleall_wide( the_form, id, set )
 	// Trigger click() on all checkboxes that need to change.
 	// This also triggers the bozo validator, if activated!
 	var options = new Array(
-			"blog_ismember_", "blog_perm_published_", "blog_perm_protected_", "blog_perm_private_", "blog_perm_draft_", "blog_perm_deprecated_", "blog_perm_delpost_", "blog_perm_comments_", "blog_perm_media_upload_", "blog_perm_media_browse_", "blog_perm_media_change_", "blog_perm_cats_", "blog_perm_properties_"
+			"blog_ismember_", "blog_perm_published_", "blog_perm_protected_", "blog_perm_private_", "blog_perm_draft_", "blog_perm_deprecated_", "blog_perm_redirected_", "blog_perm_delpost_", "blog_perm_comments_", "blog_perm_media_upload_", "blog_perm_media_browse_", "blog_perm_media_change_", "blog_perm_cats_", "blog_perm_properties_"
 		);
 	for( var i = 0; i < options.length; i++ )
 	{
@@ -103,6 +103,7 @@ function merge_from_easy( source, userid )
 			source.form.elements['blog_perm_private_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_draft_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_deprecated_'+String(userid)].checked = 1;
+			source.form.elements['blog_perm_redirected_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_delpost_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_comments_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_media_browse_'+String(userid)].checked = 1;
@@ -142,7 +143,8 @@ function merge_from_wide( source, userid )
 	}
 	else
 	{
-		var perms_editor = Number(f.elements['blog_perm_deprecated_'+String(userid)].checked)
+		var perms_editor = Number(f.elements['blog_perm_redirected_'+String(userid)].checked)
+										+Number(f.elements['blog_perm_deprecated_'+String(userid)].checked)
 										+Number(f.elements['blog_perm_draft_'+String(userid)].checked)
 										+Number(f.elements['blog_perm_private_'+String(userid)].checked)
 										+Number(f.elements['blog_perm_protected_'+String(userid)].checked)
@@ -156,7 +158,7 @@ function merge_from_wide( source, userid )
 		var perms_admin = Number(f.elements['blog_perm_properties_'+String(userid)].checked)
 										+Number(f.elements['blog_perm_cats_'+String(userid)].checked);
 
-		if( perms_editor == 10 )
+		if( perms_editor == 11 )
 		{ // has full editor rights
 			switch( perms_admin )
 			{
