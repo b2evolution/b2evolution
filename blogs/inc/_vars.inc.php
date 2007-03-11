@@ -249,6 +249,7 @@ $month_abbrev['12'] = NT_('Dec');
 $post_statuses = array (
 	'published' => NT_('Published'),
 	'deprecated' => NT_('Deprecated'),
+	'redirected' => NT_('Redirected'),
 	'protected' => NT_('Protected'),
 	'private' => NT_('Private'),
 	'draft' => NT_('Draft'),
@@ -263,6 +264,9 @@ $view_counts_on_this_page = 0;
 
 /*
  * $Log$
+ * Revision 1.14  2007/03/11 23:57:07  fplanque
+ * item editing: allow setting to 'redirected' status
+ *
  * Revision 1.13  2007/03/05 04:49:17  fplanque
  * better precision for viewcounts
  *

@@ -901,7 +901,7 @@ function bloggergetrecentposts( $m )
 	$MainList = & new ItemList2( $Blog, NULL, NULL, $numposts );
 
 	$MainList->set_filters( array(
-			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated' ),
+			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated', 'redirected' ),
 			'order' => 'DESC',
 			'unit' => 'posts',
 		) );
@@ -1806,7 +1806,7 @@ function metawebloggetrecentposts( $m )
 	$MainList = & new ItemList2( $Blog, NULL, NULL, $numposts );
 
 	$MainList->set_filters( array(
-			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated' ),
+			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated', 'redirected' ),
 			'order' => 'DESC',
 			'unit' => 'posts',
 		) );
@@ -2238,6 +2238,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.132  2007/03/11 23:57:07  fplanque
+ * item editing: allow setting to 'redirected' status
+ *
  * Revision 1.131  2006/12/23 23:37:35  fplanque
  * refactoring / Blog::get_default_cat_ID()
  *

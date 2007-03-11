@@ -439,6 +439,11 @@ class Item extends DataObject
 			param_check_url( 'post_url', $allowed_uri_scheme );
 			$this->set_from_Request( 'url' );
 		}
+		// Note: post_url is not part of the simple form, so this message can be a little bit akward there
+		if( $this->status == 'redirected' && empty($this->url) )
+		{
+			param_error( 'post_url', T_('If you want to redirect this post, you must specify an URL! (Expert mode)') );
+		}
 
 		if( param( 'content', 'html', NULL ) !== NULL ) {
 			$this->set( 'content', format_to_post( get_param('content') ) );
@@ -944,7 +949,7 @@ class Item extends DataObject
 			return false;
 		}
 
-		if( ($this->status == 'draft') || ($this->status == 'deprecated' ) )
+		if( ($this->status == 'draft') || ($this->status == 'deprecated' ) || ($this->status == 'redirected' ) )
 		{ // Post is not published
 
 			if( $display )
@@ -2256,7 +2261,7 @@ class Item extends DataObject
 
 		if( ($this->status == 'deprecated') // Already deprecateded!
 			|| ! ($current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $this->blog_ID )) )
-		{ // User has no right to publish this post now:
+		{ // User has no right to deprecated this post:
 			return false;
 		}
 
@@ -3516,6 +3521,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.162  2007/03/11 23:57:07  fplanque
+ * item editing: allow setting to 'redirected' status
+ *
  * Revision 1.161  2007/03/06 12:18:08  fplanque
  * got rid of dirty Item::content()
  * Advantage: the more link is now independant. it can be put werever people want it

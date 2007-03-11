@@ -98,6 +98,9 @@ echo '<div class="browse_side_item">';
 		<input type="checkbox" name="show_statuses[]" value="deprecated" id="sh_deprecated" class="checkbox" <?php if( in_array( "deprecated", $show_statuses ) ) echo 'checked="checked" '?> />
 		<label for="sh_deprecated"><?php echo T_('Deprecated') ?> <span class="notes">(<?php echo T_('Not published!') ?>)</span></label><br />
 
+		<input type="checkbox" name="show_statuses[]" value="redirected" id="sh_redirected" class="checkbox" <?php if( in_array( "redirected", $show_statuses ) ) echo 'checked="checked" '?> />
+		<label for="sh_deprecated"><?php echo T_('Redirected') ?></label><br />
+
 	 	</div>
 
 		<?php
@@ -257,6 +260,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.12  2007/03/11 23:57:06  fplanque
+ * item editing: allow setting to 'redirected' status
+ *
  * Revision 1.11  2006/12/12 02:53:57  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.

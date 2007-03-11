@@ -70,7 +70,7 @@ class Comment extends DataObject
 	 */
 	var $type;
 	/**
-	 * Comment visibility status: 'published', 'deprecated', 'protected', 'private' or 'draft'
+	 * Comment visibility status: 'published', 'deprecated', 'redirected', 'protected', 'private' or 'draft'
 	 * @var string
 	 */
 	var $status;
@@ -1189,6 +1189,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.60  2007/03/11 23:57:06  fplanque
+ * item editing: allow setting to 'redirected' status
+ *
  * Revision 1.59  2007/02/28 23:37:52  blueyed
  * doc
  *

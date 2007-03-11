@@ -83,7 +83,7 @@ if( $blog )
 
 	// Filter list:
 	$ItemList->set_filters( array(
-			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated' ),
+			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated', 'redirected' ),
 			'posts' => 5,
 		) );
 
@@ -174,6 +174,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2007/03/11 23:57:07  fplanque
+ * item editing: allow setting to 'redirected' status
+ *
  * Revision 1.15  2007/03/05 04:48:15  fplanque
  * IE crap
  *

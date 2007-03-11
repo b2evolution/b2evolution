@@ -681,6 +681,8 @@ class Blog extends DataObject
 				$status = 'draft';
 			elseif( $current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $this->ID ) )
 				$status = 'deprecated';
+			elseif( $current_User->check_perm( 'blog_post_statuses', 'redirected', false, $this->ID ) )
+				$status = 'redirected';
 		}
 		return $status;
 	}
@@ -1333,6 +1335,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.69  2007/03/11 23:57:06  fplanque
+ * item editing: allow setting to 'redirected' status
+ *
  * Revision 1.68  2007/03/08 00:17:42  blueyed
  * More info in assertion for "baseurlroot" and "basehost" and more strict pattern
  *

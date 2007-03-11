@@ -91,7 +91,7 @@ $allow_cross_posting = 1;
 /**
  * Default status for new posts:
  *
- * Possible values: 'published', 'deprecated', 'protected', 'private', 'draft'
+ * Possible values: 'published', 'deprecated', 'protected', 'private', 'draft', 'redirected'
  *
  * @todo fp>This should be moved to the backoffice. Select list for each blog.
  *
