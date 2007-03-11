@@ -47,6 +47,7 @@ $SQL->FROM( 'T_categories INNER JOIN T_postcats ON cat_ID = postcat_cat_ID
 							INNER JOIN T_links ON post_ID = link_itm_ID
 							INNER JOIN T_files ON link_file_ID = file_ID' );
 $SQL->WHERE( 'cat_blog_ID = '.$Blog->ID ); // fp> TODO: want to restrict on images :]
+$SQL->GROUP_BY( 'link_ID' );
 $SQL->ORDER_BY( 'post_'.$Blog->get_setting('orderby').' '.$Blog->get_setting('orderdir')
 								.', post_ID '.$Blog->get_setting('orderdir').', link_ID' );
 
@@ -125,6 +126,9 @@ echo '</table>';
 
 /*
  * $Log$
+ * Revision 1.7  2007/03/11 20:39:44  fplanque
+ * little fix
+ *
  * Revision 1.6  2007/01/23 09:25:39  fplanque
  * Configurable sort order.
  *
