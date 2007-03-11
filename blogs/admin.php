@@ -93,7 +93,7 @@ param( 'mode', 'string', '', true );
  * TODO: Allow setting through GET param (dropdown in backoffice), respecting a checkbox "Use different setting on each computer" (if cookie_state handling is ready)
  */
 $admin_skin = $UserSettings->get( 'admin_skin' );
-$admin_skin_path = dirname(__FILE__).'/'.$adminskins_subdir.'%s/_adminUI.class.php';
+$admin_skin_path = $adminskins_path.'%s/_adminUI.class.php';
 
 if( ! $admin_skin || ! file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
 { // there's no skin for the user
@@ -131,11 +131,11 @@ if( ! $admin_skin || ! file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
 
 			if( $admin_skin_dirs === false )
 			{
-				$Debuglog->add( 'No admin skin found! Check that the path '.dirname(__FILE__).'/'.$adminskins_subdir.' exists.', array('skin','error') );
+				$Debuglog->add( 'No admin skin found! Check that the path '.$adminskins_path.' exists.', array('skin','error') );
 			}
 			elseif( empty($admin_skin_dirs) )
 			{ // No admin skin directories found
-				$Debuglog->add( 'No admin skin found! Check that there are skins in '.dirname(__FILE__).'/'.$adminskins_subdir.'.', array('skin','error') );
+				$Debuglog->add( 'No admin skin found! Check that there are skins in '.$adminskins_path.'.', array('skin','error') );
 			}
 			else
 			{
@@ -156,7 +156,7 @@ $Debuglog->add( 'Using admin skin &laquo;'.$admin_skin.'&raquo;', 'skin' );
 /**
  * Load the AdminUI class for the skin.
  */
-require_once dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_adminUI.class.php';
+require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
 /**
  * This is the Admin UI object which handles the UI for the backoffice.
  *
@@ -221,6 +221,9 @@ $Hit->log();
 
 /*
  * $Log$
+ * Revision 1.22  2007/03/11 20:40:14  fplanque
+ * misuse of globals
+ *
  * Revision 1.21  2007/03/07 02:37:15  fplanque
  * OMG I decided that pregenerating the menus was getting to much of a PITA!
  * It's a zillion problems with the permissions.
