@@ -31,7 +31,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				) );
 		?>
 
-		Original template design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> / <a href="http://skinfaktory.com/">The Skin Faktory</a>.
+		Original template design by <a href="http://fplanque.net/">Fran&ccedil;ois</a> / <a href="http://evofactory.com/">Evo Factory</a>.
 
 		<?php
 			// Display additional credits (see /conf/_advanced.php):
