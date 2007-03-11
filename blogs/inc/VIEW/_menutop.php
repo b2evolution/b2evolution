@@ -35,7 +35,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $io_charset, $rsc_url, $UserSettings, $Debuglog, $Plugins, $generating_static;
 global $month, $month_abbrev, $weekday, $weekday_abbrev; /* for localized calendar */
-global $debug, $htsrv_url;
+global $debug;
 
 header( 'Content-type: text/html; charset='.$io_charset );
 ?>
@@ -74,8 +74,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/dynamic_select.js"></script>
 	<!-- General admin functions: -->
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/admin.js"></script>
-	<!-- include jquery JS: -->
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/<?php echo ($debug ? 'jquery.js' : 'jquery.min.js'); ?>"></script>
+	<!-- include jquery JS (jquery.js if existing and $debug is enabled; jquery.min.js otherwise): -->
+	<script type="text/javascript" src="<?php echo $rsc_url.'js/'.( $debug && file_exists($rsc_path.'js/jquery.js') ? 'jquery.js' : 'jquery.min.js' ) ?>"></script>
 
 	<?php
 	global $UserSettings;
@@ -223,6 +223,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <?php
 /*
  * $Log$
+ * Revision 1.26  2007/03/11 18:04:30  blueyed
+ * Updated jQuery; now uncompressed jquery.js gets used in backoffice if $debug is true and jquery.js exists - otherwise the compressed jquery.min.js gets used.
+ * jquery.js is not meant to get shipped in releases!
+ *
  * Revision 1.25  2006/11/26 23:25:20  blueyed
  * Newline at the end, so "view-source" is nicer
  *
