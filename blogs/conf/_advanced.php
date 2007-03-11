@@ -313,13 +313,26 @@ $cookie_path = preg_replace( '#https?://[^/]+#', '', $baseurl );
  *
  * @global string Default: ( strpos($basehost, '.') ) ? '.'. $basehost : '';
  */
-$cookie_domain = ( strpos($basehost, '.') ? '.'.$basehost : '' );
-// When hosting multiple domains (not just subdomains) on a single instance of b2evo,
-// you may want to try this:
-// $cookie_domain = '.'.$_SERVER['HTTP_HOST'];
-// fp> I think we should make the following (+localhost exception) the default:
-// -- Have a cookie domain of 2 levels only, base on current basehost.
-// $cookie_domain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '.$2', $basehost );
+if( strpos($basehost, '.') === false )
+{	// localhost or windows machine name:
+	$cookie_domain = '';
+}
+elseif( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $basehost ) )
+{	// Use the basehost as it is:
+	$cookie_domain = $basehost;
+}
+else
+{
+	$cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $basehost );
+
+	// When hosting multiple domains (not just subdomains) on a single instance of b2evo,
+	// you may want to try this:
+	// $cookie_domain = '.'.$_SERVER['HTTP_HOST'];
+	// or this: -- Have a cookie domain of 2 levels only, base on current basehost.
+	// $cookie_domain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '.$2', $basehost );
+	// fp> pb with domains like .co.uk !?
+}
+
 // echo $cookie_domain;
 
 /**#@+
