@@ -220,72 +220,6 @@ function blog_update_group_perms( $blog )
 
 
 
-
-/**
- * Translates an given array of permissions to an "easy group".
- *
- * - nomember
- * - member
- * - editor (member+edit posts+delete+edit comments+all filemanager rights)
- * - administrator (editor+edit cats+edit blog)
- * - custom
- *
- * @param array indexed, as the result row from "SELECT * FROM T_coll_user_perms"
- * @return string one of the five groups (nomember, member, editor, admin, custom)
- */
-function blogperms_get_easy( $perms, $context='user' )
-{
-	if( !isset($perms['blog'.$context.'_ismember']) )
-	{
-		return 'nomember';
-	}
-
-	if( !empty( $perms['blog'.$context.'_perm_poststatuses'] ) )
-	{
-		$perms_post = count( explode( ',', $perms['blog'.$context.'_perm_poststatuses'] ) );
-	}
-	else
-	{
-		$perms_post = 0;
-	}
-
-
-	$perms_editor =  $perms_post
-									+(int)$perms['blog'.$context.'_perm_delpost']
-									+(int)$perms['blog'.$context.'_perm_comments']
-									+(int)$perms['blog'.$context.'_perm_media_upload']
-									+(int)$perms['blog'.$context.'_perm_media_browse']
-									+(int)$perms['blog'.$context.'_perm_media_change'];
-
-	$perms_admin =   (int)$perms['blog'.$context.'_perm_properties']
-									+(int)$perms['blog'.$context.'_perm_cats'];
-
-	if( $perms_editor == 10 )
-	{ // has full editor rights
-		switch( $perms_admin )
-		{
-			case 0: return 'editor'; break;
-			case 1: return 'custom'; break;
-			case 2: return 'admin'; break;
-		}
-	}
-	elseif( $perms_editor == 0 )
-	{
-		if( $perms_admin )
-		{
-			return 'custom';
-		}
-		else
-		{
-			return 'member';
-		}
-	}
-	else
-	{
-		return 'custom';
-	}
-}
-
 /**
  * Translates an given array of permissions to an "easy group".
  *
@@ -656,6 +590,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.21  2007/03/11 22:30:07  fplanque
+ * cleaned up group perms
+ *
  * Revision 1.20  2007/03/07 02:38:58  fplanque
  * do some recovery on incorrect $blog
  *

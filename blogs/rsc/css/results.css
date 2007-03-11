@@ -18,8 +18,7 @@ table.grouped {
 /* Table Filters: */
 table.grouped tr.filters td {
 	border-bottom: 1px solid #bbb;
-	border-left: 1px solid #bbb;
-	border-right: 1px solid #bbb;
+	border-left: none;
 	background-color: #ddd;
 	font-size: 84%;
 }

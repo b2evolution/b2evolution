@@ -325,7 +325,7 @@ class DB
 		if( isset($params['halt_on_error']) ) $this->halt_on_error = $params['halt_on_error'];
 		if( isset($params['table_options']) ) $this->table_options = $params['table_options'];
 		if( isset($params['use_transactions']) ) $this->use_transactions = $params['use_transactions'];
-		if( isset($params['debug_dump_rows']) ) $this->debug_dump_rows = $params['debug_dump_rows'];
+		if( isset($params['debug_dump_rows']) ) $this->debug_dump_rows = $params['debug_dump_rows']; // Nb of rows to dump
 		if( isset($params['debug_explain_joins']) ) $this->debug_explain_joins = $params['debug_explain_joins'];
 		if( isset($params['debug_dump_function_trace_for_queries']) ) $this->debug_dump_function_trace_for_queries = $params['debug_dump_function_trace_for_queries'];
 
@@ -1350,6 +1350,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.57  2007/03/11 22:30:08  fplanque
+ * cleaned up group perms
+ *
  * Revision 1.56  2007/02/09 17:28:56  blueyed
  * doc
  *

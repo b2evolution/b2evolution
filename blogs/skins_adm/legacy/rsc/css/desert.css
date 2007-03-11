@@ -260,8 +260,6 @@ table.grouped {
 /* Table Filters: */
 table.grouped tr.filters td {
 	border-bottom: 1px solid #9e9286;
-	border-left: 1px solid #9e9286;
-	border-right: 1px solid #9e9286;
 	background-color: #e3dfd0;
 }
 
