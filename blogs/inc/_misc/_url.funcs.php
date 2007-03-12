@@ -36,7 +36,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param array Info (by reference)
  *        'error': holds error message, if any
  *        'status': HTTP status (e.g. 200 or 404)
- *        'used_method': Used method ("curl", "fopen" or "fsockopen")
+ *        'used_method': Used method ("curl", "fopen", "fsockopen" or null if no method
+ *                       is available)
  * @return string|false The remote page as a string; false in case of error
  */
 function fetch_remote_page( $url, & $info )
@@ -102,6 +103,13 @@ function fetch_remote_page( $url, & $info )
 
 
 	// As a last resort, try fsockopen:
+	if( ! function_exists('fsockopen') )
+	{ // may have been disabled
+		$info['used_method'] = null;
+		$info['error'] = 'No method available to access URL!'
+		return false;
+	}
+
 	$info['used_method'] = 'fsockopen';
 	$url_parsed = parse_url($url);
 	if( empty($url_parsed['scheme']) ) {
@@ -208,6 +216,9 @@ function url_same_protocol( $url, $other_url = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.8  2007/03/12 22:12:58  blueyed
+ * fetch_remote_page(): handle case when fsockopen is disabled
+ *
  * Revision 1.7  2007/03/08 22:55:21  blueyed
  * fetch_remote_page: Added "used_method" to $info and errno to "curl" method.
  *
