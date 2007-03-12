@@ -732,6 +732,8 @@ class ItemList2 extends DataObjectList2
 		$orderby = str_replace( ' ', ',', $this->filters['orderby'] );
 		$orderby_array = explode( ',', $orderby );
 
+		$columns_to_add_to_query = preg_replace( '#^(.+)$#', $this->Cache->dbprefix.'$1 ', $orderby_array );
+
 		// Format each order param with default column names:
 		$orderby_array = preg_replace( '#^(.+)$#', $this->Cache->dbprefix.'$1 '.$order, $orderby_array );
 
@@ -739,7 +741,6 @@ class ItemList2 extends DataObjectList2
 		$orderby_array[] = $this->Cache->dbIDname.' '.$order;
 
 		$order_by = implode( ', ', $orderby_array );
-
 
 		$this->ItemQuery->order_by( $order_by );
 
@@ -863,9 +864,12 @@ class ItemList2 extends DataObjectList2
 		// 1) we get the IDs we need
 		// 2) we get all the other fields matching these IDs
 		// This is more efficient than manipulating all fields at once.
+		//walter: Accordding to the standart, to DISTINCT queries, all columns used 
+		//in ORDER BY must appear in the query. This make que query work with PostgreSQL and
+		// other databases.
 
 		// Step 1:
-		$step1_sql = 'SELECT DISTINCT '.$this->Cache->dbIDname
+		$step1_sql = 'SELECT DISTINCT '.$this->Cache->dbIDname .',' . implode(',',$columns_to_add_to_query)
 									.$this->ItemQuery->get_from()
 									.$this->ItemQuery->get_where()
 									.$this->ItemQuery->get_group_by()
@@ -1847,6 +1851,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.52  2007/03/12 14:02:41  waltercruz
+ * Adding the columns in order by to the query to satisfy the SQL Standarts
+ *
  * Revision 1.51  2007/03/03 03:37:56  fplanque
  * extended prev/next item links
  *
