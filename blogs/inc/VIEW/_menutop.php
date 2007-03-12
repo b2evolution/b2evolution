@@ -48,7 +48,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	// Include head lines, links (to CSS...), sets <base>, ..
 	echo $this->get_headlines();
 
-	global $rsc_url, $htsrv_url;
+	global $rsc_path, $rsc_url, $htsrv_url;
 	?>
 	<script type="text/javascript">
 		// Paths used by JS functions:
@@ -223,6 +223,9 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <?php
 /*
  * $Log$
+ * Revision 1.27  2007/03/12 22:59:32  blueyed
+ * Fixed inclusion of jQuery
+ *
  * Revision 1.26  2007/03/11 18:04:30  blueyed
  * Updated jQuery; now uncompressed jquery.js gets used in backoffice if $debug is true and jquery.js exists - otherwise the compressed jquery.min.js gets used.
  * jquery.js is not meant to get shipped in releases!
