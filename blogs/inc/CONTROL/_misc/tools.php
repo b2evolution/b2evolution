@@ -62,7 +62,7 @@ if( empty($tab) )
 			// TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
 			$current_User->check_perm('options', 'edit', true);
 
-			$DB->query('DELETE FROM T_item__prerendering WHERE 1');
+			$DB->query('DELETE FROM T_item__prerendering WHERE 1=1');
 
 			$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
 

@@ -580,7 +580,7 @@ class Plugins_admin extends Plugins
 		{
 			if( strpos($event, 'RenderItemAs') === 0 )
 			{ // Clear pre-rendered content cache, if RenderItemAs* events get removed:
-				$DB->query( 'DELETE FROM T_item__prerendering WHERE 1' );
+				$DB->query( 'DELETE FROM T_item__prerendering WHERE 1=1' );
 				$ItemCache = & get_Cache( 'ItemCache' );
 				$ItemCache->clear();
 				break;
@@ -741,7 +741,7 @@ class Plugins_admin extends Plugins
 			{
 				if( strpos($event, 'RenderItemAs') === 0 )
 				{ // Clear pre-rendered content cache, if RenderItemAs* events have been added or removed:
-					$DB->query( 'DELETE FROM T_item__prerendering WHERE 1' );
+					$DB->query( 'DELETE FROM T_item__prerendering WHERE 1=1' );
 					$ItemCache = & get_Cache( 'ItemCache' );
 					$ItemCache->clear();
 					break;
@@ -891,7 +891,7 @@ class Plugins_admin extends Plugins
 
 			if( strpos($plugin_event, 'RenderItemAs') === 0 )
 			{ // Clear pre-rendered content cache, if RenderItemAs* events have been added or removed:
-				$DB->query( 'DELETE FROM T_item__prerendering WHERE 1' );
+				$DB->query( 'DELETE FROM T_item__prerendering WHERE 1=1' );
 				$ItemCache = & get_Cache( 'ItemCache' );
 				$ItemCache->clear();
 				break;
@@ -1399,6 +1399,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.37  2007/03/12 14:07:08  waltercruz
+ * Changing the WHERE 1 queries to boolean (WHERE 1=1) queries to satisfy the standarts
+ *
  * Revision 1.36  2007/02/24 23:03:00  blueyed
  * MFB: Fixed "Unknown dependency type" error display
  *

@@ -1180,7 +1180,7 @@ function upgrade_b2evo_tables()
 		if( $old_db_version >= 9000 )
 		{ // Uninstall all ALPHA (potentially incompatible) plugins
 			echo 'Uninstalling all existing plugins... ';
-			$DB->query( 'DELETE FROM T_plugins WHERE 1' );
+			$DB->query( 'DELETE FROM T_plugins WHERE 1=1' );
 			echo "OK.<br />\n";
 		}
 
@@ -1788,6 +1788,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.211  2007/03/12 14:10:10  waltercruz
+ * Changing the WHERE 1 queries to boolean (WHERE 1=1) queries to satisfy the standarts
+ *
  * Revision 1.210  2007/02/21 21:33:43  fplanque
  * allow jpeg extension on new installs/upgrades
  *

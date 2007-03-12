@@ -181,7 +181,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 			}
 
 			// delete everything from locales table
-			$q = $DB->query( 'DELETE FROM T_locales WHERE 1' );
+			$q = $DB->query( 'DELETE FROM T_locales WHERE 1=1' );
 
 			if( !isset( $locales[$current_locale] ) )
 			{ // activate default locale
@@ -424,6 +424,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2007/03/12 14:09:25  waltercruz
+ * Changing the WHERE 1 queries to boolean (WHERE 1=1) queries to satisfy the standarts
+ *
  * Revision 1.11  2006/11/24 18:27:23  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
