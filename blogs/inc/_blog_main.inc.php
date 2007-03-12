@@ -314,24 +314,34 @@ elseif( $disp == 'posts' &&
 { // We are going to display a single post
 	$disp = 'single';
 
-	// EXPERIMENTAL: Check if we want to redirect to a canonical URL for the post
-	// Please document encountered problems.
-	// $redir here allows to force a 'single post' URL for commenting
-	if( $redirect_to_canonical_url && $redir == 'yes' )
-	{	// We want to redirect to the Item's canonical URL:
+	if( $redir == 'yes' )
+	{ // $redir=no here allows to force a 'single post' URL for commenting
 
-		$canoncical_url = $Item->get_permanent_url( '', '', false, '&' );
-		// pre_dump( $canoncical_url, $ReqHost.$ReqURI );
-		// There may be some parameters additional at the end of the URL, but the beginning should be canoncial.
-		if( strpos( $ReqHost.$ReqURI, $Item->get_permanent_url( '', '', false, '&' ) ) !== 0 )
-		{	// The requested URL does not look like the canonical URL for this post,
-			// REDIRECT TO THE CANONICAL URL:
-			// fp> TODO: we're going to lose the additional params, it would be better to keep them...
-			$Debuglog->add( 'Redirecting to canonical URL ['.$canoncical_url.'].' );
-			header_redirect( $canoncical_url, true );
+		// Check if the post has 'redirected' status:
+		if( $Item->status == 'redirected' )
+		{	// Redirect to the URL specified in the post:
+			$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'].' );
+			header_redirect( $Item->url, true );
+		}
+
+		// Check if we want to redirect to a canonical URL for the post
+		// Please document encountered problems.
+		if( $redirect_to_canonical_url && $redir == 'yes' )
+		{	// We want to redirect to the Item's canonical URL:
+
+			$canoncical_url = $Item->get_permanent_url( '', '', false, '&' );
+			// pre_dump( $canoncical_url, $ReqHost.$ReqURI );
+			// There may be some parameters additional at the end of the URL, but the beginning should be canoncial.
+			if( strpos( $ReqHost.$ReqURI, $Item->get_permanent_url( '', '', false, '&' ) ) !== 0 )
+			{	// The requested URL does not look like the canonical URL for this post,
+				// REDIRECT TO THE CANONICAL URL:
+				// fp> TODO: we're going to lose the additional params, it would be better to keep them...
+				$Debuglog->add( 'Redirecting to canonical URL ['.$canoncical_url.'].' );
+				header_redirect( $canoncical_url, true );
+				// EXITED.
+			}
 		}
 	}
-
 }
 elseif( $disp == 'posts' )
 { // default display:
@@ -540,6 +550,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.69  2007/03/12 00:03:47  fplanque
+ * And finally: the redirect action :)
+ *
  * Revision 1.68  2007/01/28 17:50:54  fplanque
  * started moving towards 2.0 skin structure
  *
