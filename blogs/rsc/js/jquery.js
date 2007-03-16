@@ -8,7 +8,7 @@ if(typeof window.jQuery == "undefined") {
  * and GPL (GPL-LICENSE.txt) licenses.
  *
  * $Date$
- * $Rev: 1511 $
+ * $Rev: 1538 $
  */
 
 // Global undefined variable
@@ -1257,7 +1257,7 @@ jQuery.extend({
 	// is the only cross-browser way to do this. --John
 	isFunction: function( fn ) {
 		return !!fn && typeof fn != "string" && !fn.nodeName && 
-			typeof fn[0] == "undefined" && /function/i.test( fn + "" );
+			fn.constructor != Array && /function/i.test( fn + "" );
 	},
 	
 	// check if an element is in a XML document
@@ -1404,12 +1404,12 @@ jQuery.extend({
 
 	curCSS: function(elem, prop, force) {
 		var ret;
-		
+
 		if (prop == "opacity" && jQuery.browser.msie)
 			return jQuery.attr(elem.style, "opacity");
-			
+		
 		if (prop == "float" || prop == "cssFloat")
-		    prop = jQuery.browser.msie ? "styleFloat" : "cssFloat";
+			prop = jQuery.browser.msie ? "styleFloat" : "cssFloat";
 
 		if (!force && elem.style[prop])
 			ret = elem.style[prop];
@@ -1433,10 +1433,8 @@ jQuery.extend({
 				});
 
 		} else if (elem.currentStyle) {
-
 			var newProp = prop.replace(/\-(\w)/g,function(m,c){return c.toUpperCase();});
 			ret = elem.currentStyle[prop] || elem.currentStyle[newProp];
-			
 		}
 
 		return ret;
@@ -1497,7 +1495,7 @@ jQuery.extend({
 					
 				}
 				
-				arg = jQuery.makeArray( div.childNodes[i] );
+				arg = jQuery.makeArray( div.childNodes );
 			}
 
 			if ( arg.length === 0 && !jQuery.nodeName(arg, "form") )
@@ -1529,24 +1527,21 @@ jQuery.extend({
 		};
 		
 		// IE actually uses filters for opacity ... elem is actually elem.style
-		if ( name == "opacity" && jQuery.browser.msie && value != undefined ) {
-			// IE has trouble with opacity if it does not have layout
-			// Force it by setting the zoom level
-			elem.zoom = 1; 
+		if ( name == "opacity" && jQuery.browser.msie ) {
+			if ( value != undefined ) {
+				// IE has trouble with opacity if it does not have layout
+				// Force it by setting the zoom level
+				elem.zoom = 1; 
 
-			// Set the alpha filter to set the opacity
-			return elem.filter = elem.filter.replace(/alpha\([^\)]*\)/gi,"") +
-				( value == 1 ? "" : "alpha(opacity=" + value * 100 + ")" );
+				// Set the alpha filter to set the opacity
+				elem.filter = (elem.filter || "").replace(/alpha\([^)]*\)/,"") +
+					(parseFloat(value).toString() == "NaN" ? "" : "alpha(opacity=" + value * 100 + ")");
+			}
 
-		} else if ( name == "opacity" && jQuery.browser.msie )
 			return elem.filter ? 
-				parseFloat( elem.filter.match(/alpha\(opacity=(.*)\)/)[1] ) / 100 : 1;
+				(parseFloat( elem.filter.match(/opacity=([^)]*)/)[1] ) / 100).toString() : "";
+		}
 		
-		// Mozilla doesn't play well with opacity 1
-		if ( name == "opacity" && jQuery.browser.mozilla && value == 1 )
-			value = 0.9999;
-			
-
 		// Certain attributes only work when accessed via the old DOM 0 way
 		if ( fix[name] ) {
 			if ( value != undefined ) elem[fix[name]] = value;
@@ -1588,7 +1583,8 @@ jQuery.extend({
 	makeArray: function( a ) {
 		var r = [];
 
-		if ( a.constructor != Array )
+		// Need to use typeof to fight Safari childNodes crashes
+		if ( typeof a != "array" )
 			for ( var i = 0, al = a.length; i < al; i++ )
 				r.push( a[i] );
 		else
@@ -4102,11 +4098,14 @@ jQuery.extend({
 		// The styles
 		var y = elem.style;
 		
-		// Store display property
-		var oldDisplay = jQuery.css(elem, "display");
+		if ( prop == "height" || prop == "width" ) {
+			// Store display property
+			var oldDisplay = jQuery.css(elem, "display");
 
-		// Make sure that nothing sneaks out
-		y.overflow = "hidden";
+			// Make sure that nothing sneaks out
+			var oldOverflow = y.overflow;
+			y.overflow = "hidden";
+		}
 
 		// Simple function for setting a style value
 		z.a = function(){
@@ -4115,10 +4114,10 @@ jQuery.extend({
 
 			if ( prop == "opacity" )
 				jQuery.attr(y, "opacity", z.now); // Let attr handle opacity
-			else if ( parseInt(z.now) ) // My hate for IE will never die
+			else {
 				y[prop] = parseInt(z.now) + "px";
-			
-			y.display = "block"; // Set display property to block for animation
+				y.display = "block"; // Set display property to block for animation
+			}
 		};
 
 		// Figure out the maximum number to run to
@@ -4148,12 +4147,12 @@ jQuery.extend({
 			if ( !elem.orig ) elem.orig = {};
 
 			// Remember where we started, so that we can go back to it later
-			elem.orig[prop] = this.cur();
+			elem.orig[prop] = jQuery.attr( elem.style, prop );
 
 			options.show = true;
 
 			// Begin the animation
-			z.custom(0, elem.orig[prop]);
+			z.custom(0, this.cur());
 
 			// Stupid IE, look what you made me do
 			if ( prop != "opacity" )
@@ -4165,12 +4164,12 @@ jQuery.extend({
 			if ( !elem.orig ) elem.orig = {};
 
 			// Remember where we started, so that we can go back to it later
-			elem.orig[prop] = this.cur();
+			elem.orig[prop] = jQuery.attr( elem.style, prop );
 
 			options.hide = true;
 
 			// Begin the animation
-			z.custom(elem.orig[prop], 0);
+			z.custom(this.cur(), 0);
 		};
 		
 		//Simple 'toggle' function
@@ -4178,7 +4177,7 @@ jQuery.extend({
 			if ( !elem.orig ) elem.orig = {};
 
 			// Remember where we started, so that we can go back to it later
-			elem.orig[prop] = this.cur();
+			elem.orig[prop] = jQuery.attr( elem.style, prop );
 
 			if(oldDisplay == "none")  {
 				options.show = true;
@@ -4188,12 +4187,12 @@ jQuery.extend({
 					y[prop] = "1px";
 
 				// Begin the animation
-				z.custom(0, elem.orig[prop]);	
+				z.custom(0, this.cur());	
 			} else {
 				options.hide = true;
 
 				// Begin the animation
-				z.custom(elem.orig[prop], 0);
+				z.custom(this.cur(), 0);
 			}		
 		};
 
@@ -4217,13 +4216,15 @@ jQuery.extend({
 						done = false;
 
 				if ( done ) {
-					// Reset the overflow
-					y.overflow = "";
+					if ( oldDisplay ) {
+						// Reset the overflow
+						y.overflow = oldOverflow;
 					
-					// Reset the display
-					y.display = oldDisplay;
-					if (jQuery.css(elem, "display") == "none")
-						y.display = "block";
+						// Reset the display
+						y.display = oldDisplay;
+						if (jQuery.css(elem, "display") == "none")
+							y.display = "block";
+					}
 
 					// Hide the element if the "hide" operation was done
 					if ( options.hide ) 
@@ -4232,10 +4233,7 @@ jQuery.extend({
 					// Reset the properties, if the item has been hidden or shown
 					if ( options.hide || options.show )
 						for ( var p in elem.curAnim )
-							if (p == "opacity")
-								jQuery.attr(y, p, elem.orig[p]);
-							else
-								y[p] = "";
+							jQuery.attr(y, p, elem.orig[p]);
 				}
 
 				// If a callback was provided, execute it
