@@ -731,15 +731,15 @@ class ItemList2 extends DataObjectList2
 		$orderby = str_replace( ' ', ',', $this->filters['orderby'] );
 		$orderby_array = explode( ',', $orderby );
 
-		$columns_to_add_to_query = preg_replace( '#^(.+)$#', $this->Cache->dbprefix.'$1 ', $orderby_array );
-
 		// Format each order param with default column names:
 		$orderby_array = preg_replace( '#^(.+)$#', $this->Cache->dbprefix.'$1 '.$order, $orderby_array );
+		// walter>fp> $order_cols_to_select = $orderby_array;
 
 		// Add an ID parameter to make sure there is no ambiguity in ordering on similar items:
 		$orderby_array[] = $this->Cache->dbIDname.' '.$order;
 
 		$order_by = implode( ', ', $orderby_array );
+
 
 		$this->ItemQuery->order_by( $order_by );
 
@@ -863,12 +863,13 @@ class ItemList2 extends DataObjectList2
 		// 1) we get the IDs we need
 		// 2) we get all the other fields matching these IDs
 		// This is more efficient than manipulating all fields at once.
-		//walter: Accordding to the standart, to DISTINCT queries, all columns used 
-		//in ORDER BY must appear in the query. This make que query work with PostgreSQL and
-		// other databases.
 
 		// Step 1:
-		$step1_sql = 'SELECT DISTINCT '.$this->Cache->dbIDname .',' . implode(',',$columns_to_add_to_query)
+		// walter> Accordding to the standart, to DISTINCT queries, all columns used
+		// in ORDER BY must appear in the query. This make que query work with PostgreSQL and
+		// other databases.
+		// fp> That can dramatically fatten the query. You must handle this in the postgres class (check that order fields are in select)
+		$step1_sql = 'SELECT DISTINCT '.$this->Cache->dbIDname // .', '.implode( ', ', $order_cols_to_select )
 									.$this->ItemQuery->get_from()
 									.$this->ItemQuery->get_where()
 									.$this->ItemQuery->get_group_by()
@@ -1850,6 +1851,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.54  2007/03/18 01:53:26  fplanque
+ * doc
+ *
  * Revision 1.53  2007/03/18 01:39:54  fplanque
  * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
  * (more to come)
