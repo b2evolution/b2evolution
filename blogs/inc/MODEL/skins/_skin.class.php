@@ -161,7 +161,7 @@ class Skin extends DataObject
 	{
 		global $skins_path, $Messages;
 
-		$rf_main_subpath = $this->folder.'/_main.php';
+		$rf_main_subpath = $this->folder.'/main.page.php';
 		$af_main_path = $skins_path.$rf_main_subpath;
 
 		if( ! is_readable($af_main_path) )
@@ -361,6 +361,10 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2007/03/18 01:39:54  fplanque
+ * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
+ * (more to come)
+ *
  * Revision 1.12  2007/02/05 00:35:43  fplanque
  * small adjustments
  *

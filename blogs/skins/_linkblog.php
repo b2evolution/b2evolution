@@ -3,7 +3,7 @@
  * This is the template that displays the linkblog
  *
  * This file is not meant to be called directly.
- * It is meant to be called by an include in the _main.php template.
+ * It is meant to be called by an include in the main.page.php template.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -107,6 +107,10 @@ echo $linkblog_main_end;
 
 /*
  * $Log$
+ * Revision 1.20  2007/03/18 01:39:55  fplanque
+ * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
+ * (more to come)
+ *
  * Revision 1.19  2007/03/06 12:18:09  fplanque
  * got rid of dirty Item::content()
  * Advantage: the more link is now independant. it can be put werever people want it

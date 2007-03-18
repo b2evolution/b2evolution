@@ -7,7 +7,7 @@
  * This allow to seprate different kinds of feedbacks instead of displaying them mixed together
  *
  * This file is not meant to be called directly.
- * It is meant to be called by an include in the _main.php template.
+ * It is meant to be called by an include in the main.page.php template.
  * To display a feedback, you should call a stub AND pass the right parameters
  * For example: /blogs/index.php?p=1&more=1&c=1&tb=1&pb=1
  * Note: don't code this URL by hand, use the template functions to generate it!
@@ -321,6 +321,10 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.89  2007/03/18 01:39:55  fplanque
+ * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
+ * (more to come)
+ *
  * Revision 1.88  2007/01/26 04:49:17  fplanque
  * cleanup
  *

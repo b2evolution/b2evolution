@@ -48,7 +48,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	//     Besides the used solution should get used everywhere we're outputting html HEAD and
 	//     e.g. want to allow Plugins inserting something there.
 	// fp> Object would be instantiated only once and there would be no need for derived classes. One single encapsulated variable. So object handling here would be bloated.
-	// Use functions. And you only need to initialize critical vars in _vars. BUT even better: how about enabling the killing of superglobals in _main.php?
+	// Use functions. And you only need to initialize critical vars in _vars. BUT even better: how about enabling the killing of superglobals in _main.inc.php?
 	if( isset($evo_html_headlines) ) foreach( $evo_html_headlines as $v )
 	{
 		echo $v;
@@ -79,6 +79,10 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
+ * Revision 1.17  2007/03/18 01:39:54  fplanque
+ * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
+ * (more to come)
+ *
  * Revision 1.16  2007/01/13 22:28:13  fplanque
  * doc
  *

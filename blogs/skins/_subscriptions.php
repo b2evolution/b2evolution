@@ -3,7 +3,7 @@
  * This is the template that displays the user subscriptions form
  *
  * This file is not meant to be called directly.
- * It is meant to be called by an include in the _main.php template.
+ * It is meant to be called by an include in the main.page.php template.
  * To display a feedback, you should call a stub AND pass the right parameters
  * For example: /blogs/index.php?disp=profile
  * Note: don't code this URL by hand, use the template functions to generate it!
@@ -110,6 +110,10 @@ $Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.15  2007/03/18 01:39:55  fplanque
+ * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
+ * (more to come)
+ *
  * Revision 1.14  2006/12/16 01:30:47  fplanque
  * Setting to allow/disable email subscriptions on a per blog basis
  *

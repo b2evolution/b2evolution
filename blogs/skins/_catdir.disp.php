@@ -3,7 +3,7 @@
  * This is the template that displays the category directory for a blog
  *
  * This file is not meant to be called directly.
- * It is meant to be called by an include in the _main.php template.
+ * It is meant to be called by an include in the main.page.php template.
  * To display the archive directory, you should call a stub AND pass the right parameters
  * For example: /blogs/index.php?disp=catdir
  *
@@ -28,6 +28,10 @@ $Plugins->call_by_code( 'evo_Cats', array(
 
 /*
  * $Log$
+ * Revision 1.2  2007/03/18 01:39:55  fplanque
+ * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
+ * (more to come)
+ *
  * Revision 1.1  2007/03/04 21:42:49  fplanque
  * category directory / albums
  *

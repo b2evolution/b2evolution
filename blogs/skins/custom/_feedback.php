@@ -4,7 +4,7 @@
 	 * (comments, trackbak, pingback...)
 	 *
 	 * This file is not meant to be called directly.
-	 * It is meant to be called by an include in the _main.php template.
+	 * It is meant to be called by an include in the main.page.php template.
 	 * To display a feedback, you should call a stub AND pass the right parameters
 	 * For example: /blogs/index.php?p=1&more=1&c=1&tb=1&pb=1
 	 * Note: don't code this URL by hand, use the template functions to generate it!

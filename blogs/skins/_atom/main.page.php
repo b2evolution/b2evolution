@@ -4,27 +4,8 @@
  *
  * See {@link http://atompub.org/2005/07/11/draft-ietf-atompub-format-10.html}
  *
- * This file is not meant to be called directly.
- * It is meant to be called automagically by b2evolution.
- *
- * This file is part of the b2evolution project - {@link http://b2evolution.net/}
- *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- *
- * {@internal Open Source relicensing agreement:
- * Daniel HAHLER grants Francois PLANQUE the right to license
- * Daniel HAHLER's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
- *
  * @package evoskins
  * @subpackage atom
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
- * @author blueyed: Daniel HAHLER.
  *
  * @version $Id$
  */

@@ -3,7 +3,7 @@
  * This is the template that dipatches display of the main area, based on the disp param
  *
  * This file is not meant to be called directly.
- * It is meant to be called by an include in the _main.php template.
+ * It is meant to be called by an include in the main.page.php template.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -44,6 +44,10 @@ if( $disp != 'posts' && $disp != 'single' )
 
 /*
  * $Log$
+ * Revision 1.5  2007/03/18 01:39:55  fplanque
+ * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
+ * (more to come)
+ *
  * Revision 1.4  2007/03/04 21:42:49  fplanque
  * category directory / albums
  *

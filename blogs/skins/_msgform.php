@@ -3,7 +3,7 @@
  * This is the template that displays the message user form
  *
  * This file is not meant to be called directly.
- * It is meant to be called by an include in the _main.php template.
+ * It is meant to be called by an include in the main.page.php template.
  * To display a feedback, you should call a stub AND pass the right parameters
  * For example: /blogs/index.php?disp=msgform&recipient_id=n
  * Note: don't code this URL by hand, use the template functions to generate it!
@@ -196,6 +196,10 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.31  2007/03/18 01:39:55  fplanque
+ * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
+ * (more to come)
+ *
  * Revision 1.30  2006/10/15 21:30:46  blueyed
  * Use url_rel_to_same_host() for redirect_to params.
  *

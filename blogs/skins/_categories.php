@@ -5,7 +5,7 @@
 	 * It calls a plugin by the 'evo_Cats' code, which you may do also directly in your skin.
 	 *
 	 * This file is not meant to be called directly.
-	 * It is meant to be called by an include in the _main.php template.
+	 * It is meant to be called by an include in the main.page.php template.
 	 *
 	 * b2evolution - {@link http://b2evolution.net/}
 	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -52,6 +52,10 @@
 
 /*
  * $Log$
+ * Revision 1.17  2007/03/18 01:39:55  fplanque
+ * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
+ * (more to come)
+ *
  * Revision 1.16  2006/07/06 19:56:29  fplanque
  * no message
  *

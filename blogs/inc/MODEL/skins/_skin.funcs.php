@@ -135,7 +135,7 @@ function skin_provided_by_plugin( $name )
  * @param skin name (directory name)
  * @return boolean true is exists, false if not
  */
-function skin_exists( $name, $filename = '_main.php' )
+function skin_exists( $name, $filename = 'main.page.php' )
 {
 	global $skins_path;
 
@@ -184,6 +184,10 @@ function & skin_install( $skin_folder, $name = NULL )
 
 /*
  * $Log$
+ * Revision 1.17  2007/03/18 01:39:54  fplanque
+ * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
+ * (more to come)
+ *
  * Revision 1.16  2007/01/26 04:52:53  fplanque
  * clean comment popups (skins 2.0)
  *

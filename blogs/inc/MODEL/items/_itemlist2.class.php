@@ -42,7 +42,6 @@ require_once dirname(__FILE__).'/_item.funcs.php';
  *
  * This SECOND implementation will deprecate the first one when finished.
  *
- * @todo Either implement mod_date() or change where it gets used (e.g. /skins/_atom/_main.php)
  * @package evocore
  */
 class ItemList2 extends DataObjectList2
@@ -1851,6 +1850,10 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.53  2007/03/18 01:39:54  fplanque
+ * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
+ * (more to come)
+ *
  * Revision 1.52  2007/03/12 14:02:41  waltercruz
  * Adding the columns in order by to the query to satisfy the SQL Standarts
  *

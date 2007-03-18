@@ -1,11 +1,13 @@
 <?php
 /**
- * This is the main page template.
+ * This is the main/default page template.
  *
- * It is used to display the blog when no specific page template is available.
+ * It is used to display the blog when no specific page template is available to handle the request.
  *
  * @package evoskins
  * @subpackage basic
+ *
+ * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

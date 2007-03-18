@@ -1,14 +1,15 @@
 <?php
 /**
- * This is the main page template.
+ * This is the main/default page template.
  *
- * It is used to display the blog when no specific page template is available.
+ * It is used to display the blog when no specific page template is available to handle the request.
  *
  * @package evoskins
- * @subpackage nifty_corners
+ * @subpackage teal
+ *
+ * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
-
 
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
@@ -29,16 +30,12 @@ switch( $disp )
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 require $skins_path.'_html_header.inc.php';
-// Note: You can customize the default HTML header by copying the 
+// Note: You can customize the default HTML header by copying the
 // _html_header.inc.php file into the current skin folder.
 // -------------------------------- END OF HEADER --------------------------------
 ?>
 
-<div class="wrapper">
-<div class="wrapper2">
-
-<div class="outerwrap">
-<div class="innerwrap">
+<div id="wrapper">
 
 <?php
 	// --------------------------- BLOG LIST INCLUDED HERE -----------------------------
@@ -59,11 +56,10 @@ require $skins_path.'_html_header.inc.php';
 	?>
 </div>
 
-</div>
-</div>
+<div class="bPosts">
 
-<div class="posts">
-<div class="innerwrap">
+<!-- =================================== START OF MAIN AREA =================================== -->
+
 
 <?php
 	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
@@ -71,6 +67,7 @@ require $skins_path.'_html_header.inc.php';
 	// fp>> TODO: I think we should rather forget the messages here so they don't get displayed again.
 	// --------------------------------- END OF MESSAGES ---------------------------------
 ?>
+
 
 <?php
 	if( isset($MainList) )
@@ -85,36 +82,60 @@ require $skins_path.'_html_header.inc.php';
 	}
 ?>
 
-<?php request_title( '<h2>', '</h2>' ) ?>
 
-<!-- =================================== START OF MAIN AREA =================================== -->
+<?php
+	// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+	request_title( '<h2>', '</h2>' );
+	// ------------------------------ END OF REQUEST TITLE -----------------------------
+?>
 
-<?php // ------------------------------------ START OF POSTS ----------------------------------------
+
+<?php
+	if( isset($MainList) )
+	{ // Links to list pages:
+		$MainList->page_links( '<p class="center">'.T_('Pages:').' <strong>', '</strong></p>' );
+	}
+?>
+
+
+<?php
+	// ------------------------------------ START OF POSTS ----------------------------------------
 	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
 
 	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
 	{
-		$MainList->date_if_changed();
-		locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
 	?>
 
-	<div class="bTitle"><h3 class="bTitle"><?php $Item->title(); ?></h3></div>
+	<?php
+		$MainList->date_if_changed();
+	?>
 
-	<div class="bPost" lang="<?php $Item->lang() ?>">
+	<div class="bPost bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
 		<?php
+			locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
 			$Item->anchor(); // Anchor for permalinks to refer to
 		?>
-
 		<div class="bSmallHead">
 		<?php
 			$Item->permanent_link( '#icon#' );
 			echo ' ';
 			$Item->issue_time();
-			echo ', ', T_('Categories'), ': ';
-			$Item->categories();
+			echo ', '.T_('by').' ';
+			$Item->author( '<strong>', '</strong>' );
+			$Item->msgform_link( $Blog->get('msgformurl') );
+			echo ', ';
+			$Item->wordcount();
+			echo ' '.T_('words');
+			echo ', ';
+			$Item->views();
 			echo ' &nbsp; ';
+			locale_flag( $Item->locale, 'h10px' );
+			echo '<br /> ', T_('Categories'), ': ';
+			$Item->categories();
 		?>
 		</div>
+
+		<h3 class="bTitle"><?php $Item->title(); ?></h3>
 
 		<?php
 			// Display images that are linked to this post:
@@ -151,10 +172,10 @@ require $skins_path.'_html_header.inc.php';
 		</div>
 
 		<div class="bSmallPrint">
-			<?php $Item->permanent_link(); ?>
-			<?php $Item->feedback_link( 'comments', ' &bull; ' ) // Link to comments ?>
-			<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
+			<?php $Item->permanent_link( '#', '#', 'permalink_right' ); ?>
 
+			<?php $Item->feedback_link( 'comments', '' ) // Link to comments ?>
+			<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
 			<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
 
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
@@ -169,40 +190,37 @@ require $skins_path.'_html_header.inc.php';
 			$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 			$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
 			require( dirname(__FILE__).'/_feedback.php' );
-			// ---------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
+			// -------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. --------------
+
+			locale_restore_previous();	// Restore previous locale (Blog locale)
 		?>
 	</div>
-<?php
-	locale_restore_previous();	// Restore previous locale (Blog locale)
-} // ---------------------------------- END OF POSTS ------------------------------------ ?>
-
-		<?php
-			// Links to list pages:
-			if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
-   				'prev_text' => '&lt;&lt; '.T_('Previous'),
-   				'next_text' => T_('Next').' &gt;&gt;',
-				) );
-		?>
-		<?php
-			// previous_post( '<p class="center">%</p>' );
-			// next_post( '<p class="center">%</p>' );
-		?>
-
 	<?php
-		// -------------- START OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. --------------
-		// Note: you can customize any of the sub templates included here by
-		// copying the matching php file into your skin directory.
-		// Call the dispatcher:
-		require $skins_path.'_dispatch.inc.php';
-		// --------------- END OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. ---------------
-	?>
+	} // ---------------------------------- END OF POSTS ------------------------------------
 
-</div>
+?>
+
+<?php
+	// Links to list pages:
+	if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>' );
+?>
+
+
+<?php
+	// -------------- START OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. --------------
+	// Note: you can customize any of the sub templates included here by
+	// copying the matching php file into your skin directory.
+	// Call the dispatcher:
+	require $skins_path.'_dispatch.inc.php';
+	// --------------- END OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. ---------------
+
+?>
+
 </div>
 <!-- =================================== START OF SIDEBAR =================================== -->
 
 <div class="bSideBar">
-<div class="innerwrap">
+
 
 	<?php
 		// Display container contents:
@@ -223,16 +241,44 @@ require $skins_path.'_html_header.inc.php';
 				// This will enclose sub-lists in a list:
 				'group_start' => '<ul>',
 				'group_end' => '</ul>',
+				// This will enclose (foot)notes:
+				'notes_start' => '<div class="notes">',
+				'notes_end' => '</div>',
 			) );
 	?>
+
+
+	<?php
+		// -------------------------- LINKBLOG INCLUDED HERE -----------------------------
+		require( dirname(__FILE__).'/_linkblog.php' );
+		// -------------------------------- END OF LINKBLOG ----------------------------------
+	?>
+
+
+	<?php
+	if( empty($generating_static) && ! $Plugins->trigger_event_first_true('CacheIsCollectingContent') )
+	{ // We're not generating static pages nor is a caching plugin collecting the content, so we can display this block
+		// TODO: when this gets a SkinTag plugin this check should get done by the Plugin
+		// fp> will not be a plugin because it's too closely tied to internals (Sessions)
+		// dh> The $Sessions global gets used in two places, in _main.inc.php(!) and here.
+		//     IMHO it should really become a widget! It may become a core plugin.
+		?>
+		<div class="bSideItem">
+			<h3 class="sideItemTitle"><?php echo T_('Who\'s Online?') ?></h3>
+			<?php
+				$Sessions->display_onliners();
+			?>
+		</div>
+		<?php
+	}
+	?>
+
 
 	<p class="center">powered by<br />
 	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $rsc_url; ?>img/b2evolution_logo_80.gif" alt="b2evolution" width="80" height="17" border="0" class="middle" /></a></p>
 
 </div>
-</div>
 
-<div class="clear"><img src="<?php echo $rsc_url; ?>img/blank.gif" width="1" height="1" alt="" /></div>
 
 <?php
 // ------------------------- BODY FOOTER INCLUDED HERE --------------------------
@@ -242,13 +288,11 @@ require $skins_path.'_body_footer.inc.php';
 // ------------------------------- END OF FOOTER --------------------------------
 ?>
 
-</div>
-</div>
 
 <?php
 // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
 require $skins_path.'_html_footer.inc.php';
-// Note: You can customize the default HTML footer by copying the 
+// Note: You can customize the default HTML footer by copying the
 // _html_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------
 ?>

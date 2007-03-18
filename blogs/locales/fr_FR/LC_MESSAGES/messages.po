@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2007-01-25 05:53+0100\n"
-"PO-Revision-Date: 2007-01-25 06:02+0100\n"
+"PO-Revision-Date: 2007-02-26 04:46+0100\n"
 "Last-Translator: Francois PLANQUE <fplanque.net>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -3604,7 +3604,7 @@ msgstr ""
 
 #: ..\..\..\inc\CONTROL\_misc\system.php:212
 msgid "ALL YOUR DATA WOULD BE LOST!"
-msgstr ""
+msgstr "TOUTES VOS DONNEES SERAIENT PERDUES!"
 
 #: ..\..\..\inc\CONTROL\_misc\system.php:213
 msgid "As soon as possible, change the setting <code>$allow_evodb_reset = 0;</code> in your /conf/_basic.config.php."
@@ -3960,7 +3960,7 @@ msgstr "%d abonnements"
 # D:\www\b2evo20\blogs\inc\MODEL\collections\_blog.class.php:207
 #: ..\..\..\inc\MODEL\collections\_blog.class.php:207
 msgid "My photoblog"
-msgstr ""
+msgstr "Mon photoblog"
 
 #: ..\..\..\inc\MODEL\collections\_blog.class.php:208
 #: ..\..\..\inc\MODEL\collections\_blog.class.php:242
@@ -4000,7 +4000,7 @@ msgstr "Blog de groupe"
 # D:\www\b2evo20\blogs\inc\MODEL\collections\_blog.class.php:249
 #: ..\..\..\inc\MODEL\collections\_blog.class.php:249
 msgid "Standard blog"
-msgstr ""
+msgstr "Blog standard"
 
 #: ..\..\..\inc\MODEL\collections\_blog.class.php:273
 msgid "You must provide an URL blog name!"
@@ -4205,7 +4205,7 @@ msgstr "Aide Admin"
 
 #: ..\..\..\inc\MODEL\collections\_componentwidget.class.php:140
 msgid "Inactive / Uninstalled plugin"
-msgstr ""
+msgstr "Plugin inactif / désinstallé"
 
 #: ..\..\..\inc\MODEL\collections\_componentwidget.class.php:144
 #: ..\..\..\inc\MODEL\files\_file.class.php:644
@@ -5245,7 +5245,7 @@ msgstr "Déconnexion de votre compte"
 #: ..\..\..\inc\VIEW\collections\_blogs_permissions_group.form.php:168
 #: ..\..\..\inc\VIEW\sessions\_stats_browserhits.view.php:253
 msgid "Admin"
-msgstr "Administration"
+msgstr "Admin"
 
 #: ..\..\..\inc\MODEL\users\_user.funcs.php:294
 msgid "Go to the back-office..."
@@ -5594,7 +5594,7 @@ msgstr "Priorité"
 # D:\www\b2evo20\blogs\inc\VIEW\collections\_blogs_display.form.php:45
 #: ..\..\..\inc\VIEW\collections\_blogs_display.form.php:45
 msgid "Order by"
-msgstr ""
+msgstr "Trier par"
 
 #: ..\..\..\inc\VIEW\collections\_blogs_display.form.php:45
 msgid "Default ordering of posts."
@@ -7095,7 +7095,7 @@ msgstr "Images"
 # D:\www\b2evo20\blogs\inc\VIEW\files\_file_displaysettings.form.php:46
 #: ..\..\..\inc\VIEW\files\_file_displaysettings.form.php:46
 msgid "Thumbnails"
-msgstr ""
+msgstr "Miniatures"
 
 #: ..\..\..\inc\VIEW\files\_file_displaysettings.form.php:46
 msgid "Check to display thumbnails instead of icons for image files"
@@ -8568,7 +8568,7 @@ msgstr "Les niveaux déterminent la hierarchie des utilisateurs dans les blogs."
 
 #: ..\..\..\inc\VIEW\settings\_set_general.form.php:73
 msgid "Email validation"
-msgstr ""
+msgstr "Validation email"
 
 #: ..\..\..\inc\VIEW\settings\_set_general.form.php:75
 msgid "New users must validate email"
@@ -8789,7 +8789,7 @@ msgstr "Annuler l'installation!"
 
 #: ..\..\..\inc\VIEW\settings\_set_plugins_available.form.php:49
 msgid "Cancel"
-msgstr "Annule"
+msgstr "Annuler"
 
 #: ..\..\..\inc\VIEW\settings\_set_plugins_available.form.php:98
 msgid "Un-Classified"
@@ -9870,7 +9870,7 @@ msgstr "URL non autorisée"
 
 #: ..\..\..\inc\_misc\_param.funcs.php:1490
 msgid "URL must be absolute."
-msgstr ""
+msgstr "L'URL doit être absolue."
 
 # D:\www\b2evo19\blogs\inc\_misc\_misc.funcs.php:1592
 #: ..\..\..\inc\_misc\_param.funcs.php:1497
@@ -10814,15 +10814,14 @@ msgid "Apache optimization..."
 msgstr "Optimisations pour Apache..."
 
 #: ..\..\..\install\_functions_create.php:455
-#, fuzzy
 msgid ""
 "In the <code>/blogs</code> folder there is a file called [<code>sample.htaccess</code>]. You should try renaming it to [<code>.htaccess</code>].\n"
 "\n"
 "This will optimize the way b2evolution is handled by the webserver (if you are using Apache). This file is not active by default because a few hosts would display an error right away when you try to use it. If this happens to you when you rename the file, just remove it and you'll be fine."
 msgstr ""
-"Dans le dossier <code>/blogs</code> ainsi que dans <code>/blogs/admin</code>, vous trouverez deux fichiers appelés [<code>sample.htaccess</code>]. Vous devriez essayer de les renommer en [<code>.htaccess</code>].\n"
+"Dans le dossier <code>/blogs</code>, vous trouverez un fichier nommé[<code>sample.htaccess</code>]. Vous devriez essayer de le renommer en [<code>.htaccess</code>].\n"
 "\n"
-"Ceci optimisera la manière dont votre serveur web (si vous utilisez Apache) gère les requêtes vers b2evolution. Ces fichiers ne sont pas actifs par défaut parce que certains hébergeurs ne les supportent pas et afficheraient une erreur pas forcément très explicite. Si vous obtenez une telle erreur en renommant les fichiers, supprimez les tout simplement pour faire disparaitre l'erreur."
+"Ceci optimisera la manière dont votre serveur web (si vous utilisez Apache) gère les requêtes vers b2evolution. Ce fichiers n'est pas actif par défaut parce que certains hébergeurs ne le supportent pas et afficheraient une erreur pas forcément très explicite. Si vous obtenez une telle erreur en renommant le fichier, supprimez tout simplement le fichier pour faire disparaitre l'erreur."
 
 #: ..\..\..\install\_functions_create.php:462
 msgid "Skins, Stubs, Templates &amp; website integration..."
@@ -11761,7 +11760,7 @@ msgstr "Lire la suite..."
 #: ..\..\..\skins\nifty_corners\_main.php:238
 #: ..\..\..\skins\photoblog\_main.php:239
 msgid "Send a message to the owner of this blog..."
-msgstr ""
+msgstr "Envoyer un messager au propriétaire de ce blog..."
 
 # D:\www\b2evo20\blogs\skins\custom\_main.php:79
 # D:\www\b2evo20\blogs\skins\natural_pink\_main.php:52
@@ -11770,7 +11769,7 @@ msgstr ""
 #: ..\..\..\skins\natural_pink\_main.php:52
 #: ..\..\..\skins\nifty_corners\_main.php:67
 msgid "Header"
-msgstr ""
+msgstr "Entête"
 
 #: ..\..\..\skins\custom\_main.php:157
 msgid "words"

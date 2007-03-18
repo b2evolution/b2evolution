@@ -4,20 +4,8 @@
  *
  * See {@link http://web.resource.org/rss/1.0/}
  *
- * This file is not meant to be called directly.
- * It is meant to be called automagically by b2evolution.
- *
- * This file is part of the b2evolution project - {@link http://b2evolution.net/}
- *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- *
  * @package evoskins
  * @subpackage rdf
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @version $Id$
  */

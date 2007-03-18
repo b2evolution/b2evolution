@@ -3,7 +3,7 @@
  * This is the template that displays the archive directory for a blog
  *
  * This file is not meant to be called directly.
- * It is meant to be called by an include in the _main.php template.
+ * It is meant to be called by an include in the main.page.php template.
  * To display the archive directory, you should call a stub AND pass the right parameters
  * For example: /blogs/index.php?disp=arcdir
  *
@@ -25,6 +25,10 @@ $Plugins->call_by_code( 'evo_Arch', array( 'title'=>'',
 
 /*
  * $Log$
+ * Revision 1.12  2007/03/18 01:39:55  fplanque
+ * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
+ * (more to come)
+ *
  * Revision 1.11  2006/12/14 21:56:25  fplanque
  * minor optimization
  *

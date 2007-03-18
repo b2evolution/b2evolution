@@ -461,7 +461,7 @@ if( !empty( $skin ) )
 				// 'msgform'  => 'msgform.page.php',
 				// 'profile'  => 'profile.page.php',
 				// 'subs'     => 'subscriptions.page.php',
-				// All others will default to _main.php  TODO: rename to default.page.php
+				// All others will default to main.page.php
 			);
 
 		if( !empty($disp_handlers[$disp])
@@ -471,7 +471,7 @@ if( !empty( $skin ) )
 		}
 		else
 		{	// Use the default handler from the skins dir:
-			require $ads_current_skin_path.'_main.php';
+			require $ads_current_skin_path.'main.page.php';
 		}
 	}
 
@@ -489,6 +489,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.71  2007/03/18 01:39:54  fplanque
+ * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
+ * (more to come)
+ *
  * Revision 1.70  2007/03/18 00:31:18  fplanque
  * Delegated MainList init to skin *pages* which need it.
  *
