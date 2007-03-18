@@ -419,67 +419,6 @@ else
 }
 
 
-/*
- * ____________________________ GET POSTS TO DISPLAY ACCORDING TO REQUEST ______________________________
- *
- * fp> Shall we move this to the skins? Sth like get_MainList() ?
- * fp> That would save the '_' detection hack... and maybe some processing when we don't need the MainList.
- * fp> It is tricky though. A lot of navigation things need the mainlist.
- */
-switch( $disp )
-{
-	case 'posts':
-	case 'single':
-	case 'feedback-popup':
-		// We need to load posts for this display:
-
-		// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
-
-		// Note: skins are going to be registered in the DB. There will be a flag to identify feeds.
-		// For now, we use the *existing* '_' prefix.
-		// Note: Feed skin folders should be identidied by sth more descriptive (like a '_feed_' prefix or '.feed'/'.xml' suffix
-		if( !empty($skin) && substr( $skin, 0, 1 ) == '_' )
-		{	// We are displaying an RSS/Atom feed:
-			$items_nb_limit = $Blog->get_setting('posts_per_feed');
-		}
-		else
-		{	// We are displaying something visual
-			$items_nb_limit = $Blog->get_setting('posts_per_page');
-		}
-
-		$MainList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max, $items_nb_limit );
-
-		if( ! $preview )
-		{
-			// pre_dump( $MainList->default_filters );
-			$MainList->load_from_Request( false );
-			// pre_dump( $MainList->filters );
-
-			// Run the query:
-			$MainList->query();
-
-			// Old style globals for category.funcs:
-			$postIDlist = $MainList->get_page_ID_list();
-			$postIDarray = $MainList->get_page_ID_array();
-		}
-		else
-		{	// We want to preview a single post, we are going to fake a lot of things...
-			$MainList->preview_from_request();
-
-			// Legacy for the category display
-			$cat_array = array();
-		}
-
-		param( 'more', 'integer', 0, true );
-		param( 'page', 'integer', 1, true ); // Post page to show
-		param( 'c',    'integer', 0, true ); // Display comments?
-		param( 'tb',   'integer', 0, true ); // Display trackbacks?
-		param( 'pb',   'integer', 0, true ); // Display pingbacks?
-
-		break;
-}
-
-
 $Timer->pause( '_blog_main.inc');
 
 
@@ -518,7 +457,7 @@ if( !empty( $skin ) )
 		$disp_handlers = array(
 				'feedback-popup' => 'feedback_popup.page.php',
 				// 'arcdir'   => 'arcdir.page.php',
-				// 'comments' => 'latestcom.page.php',
+				'comments' => 'latestcom.page.php',
 				// 'msgform'  => 'msgform.page.php',
 				// 'profile'  => 'profile.page.php',
 				// 'subs'     => 'subscriptions.page.php',
@@ -550,6 +489,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.70  2007/03/18 00:31:18  fplanque
+ * Delegated MainList init to skin *pages* which need it.
+ *
  * Revision 1.69  2007/03/12 00:03:47  fplanque
  * And finally: the redirect action :)
  *

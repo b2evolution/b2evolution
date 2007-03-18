@@ -24,9 +24,24 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-$CommentList = & new CommentList( $Blog, "'comment'", array('published'), '',	'',	'DESC',	'',	20 );
+$CommentList = & new CommentList( $Blog, "'comment'", array('published'), '',	'',	'DESC',	'',	$Blog->get_setting('posts_per_feed') );
 
+if( $debug)
+{
+	skin_content_header( 'application/xml' );	// Sets charset!
+}
+else
+{
+	skin_content_header( 'application/atom+xml' );	// Sets charset!
+}
+
+echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 ?>
+<feed xml:lang="<?php $Blog->disp( 'locale', 'xml' ) ?>" xmlns="http://www.w3.org/2005/Atom">
+	<title><?php
+		$Blog->disp( 'name', 'xml' );
+		request_title( ' - ', '', ' - ', 'xml' );
+	?></title>
 	<link rel="alternate" type="text/html" href="<?php $Blog->disp( 'lastcommentsurl', 'xml' ) ?>" />
 	<link rel="self" type="application/atom+xml" href="<?php $Blog->disp( 'comments_atom_url', 'xmlattr' ) ?>" />
 	<id><?php $Blog->disp( 'comments_atom_url', 'xmlattr' ) /* TODO: may need a regenerate_url() */ ?></id>
@@ -52,3 +67,10 @@ $CommentList = & new CommentList( $Blog, "'comment'", array('published'), '',	''
 	<?php
 	} // End of comment loop.
 	?>
+</feed>
+<?php
+	$Hit->log(); // log the hit on this page
+
+	// This is a self contained XML document, make sure there is no additional output:
+	exit();
+?>

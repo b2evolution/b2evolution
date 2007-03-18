@@ -38,6 +38,48 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * Prepare the MainList object for displaying skins.
+ */
+function init_MainList( $items_nb_limit )
+{
+	global $MainList;
+	global $Blog;
+	global $timestamp_min, $timestamp_max;
+	global $preview;
+	global $postIDlist, $postIDarray;
+
+	$MainList = new ItemList2( $Blog, $timestamp_min, $timestamp_max, $items_nb_limit );	// COPY (FUNC)
+
+	if( ! $preview )
+	{
+		// pre_dump( $MainList->default_filters );
+		$MainList->load_from_Request( false );
+		// pre_dump( $MainList->filters );
+
+		// Run the query:
+		$MainList->query();
+
+		// Old style globals for category.funcs:
+		$postIDlist = $MainList->get_page_ID_list();
+		$postIDarray = $MainList->get_page_ID_array();
+	}
+	else
+	{	// We want to preview a single post, we are going to fake a lot of things...
+		$MainList->preview_from_request();
+
+		// Legacy for the category display
+		$cat_array = array();
+	}
+
+	param( 'more', 'integer', 0, true );
+	param( 'page', 'integer', 1, true ); // Post page to show
+	param( 'c',    'integer', 0, true ); // Display comments?
+	param( 'tb',   'integer', 0, true ); // Display trackbacks?
+	param( 'pb',   'integer', 0, true ); // Display pingbacks?
+}
+
+
+/**
  * Validate URL title
  *
  * Using title as a source if url title is empty
@@ -557,6 +599,9 @@ function visibility_select( & $Form, $post_status )
 
 /*
  * $Log$
+ * Revision 1.44  2007/03/18 00:31:18  fplanque
+ * Delegated MainList init to skin *pages* which need it.
+ *
  * Revision 1.43  2007/03/11 23:56:02  fplanque
  * fixed some post editing oddities / variable cleanup (more could be done)
  *

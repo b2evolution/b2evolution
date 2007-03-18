@@ -24,9 +24,14 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-$CommentList = & new CommentList( $Blog, "'comment'", array('published'), '',	'',	'DESC',	'',	20 );
+$CommentList = & new CommentList( $Blog, "'comment'", array('published'), '',	'',	'DESC',	'',	$Blog->get_setting('posts_per_feed') );
 
+skin_content_header( 'application/xml' );	// Sets charset!
+
+echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 ?>
+<!-- generator="<?php echo $app_name; ?>/<?php echo $app_version ?>" -->
+<rdf:RDF xmlns="http://purl.org/rss/1.0/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:admin="http://webns.net/mvcb/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
 <channel rdf:about="<?php $Blog->disp( 'blogurl', 'xmlattr' ) ?>">
 	<title><?php
 		$Blog->disp( 'name', 'xml' );
@@ -66,3 +71,10 @@ while( $Comment = & $CommentList->get_next() )
 	<content:encoded><![CDATA[<?php echo make_rel_links_abs( $Comment->get_content() ); ?>]]></content:encoded>
 </item>
 <?php } // End of comment loop. ?>
+</rdf:RDF>
+<?php
+	$Hit->log(); // log the hit on this page
+
+	// This is a self contained XML document, make sure there is no additional output:
+	exit();
+?>
