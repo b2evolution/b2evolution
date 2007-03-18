@@ -38,7 +38,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Includes:
  */
-require_once dirname(__FILE__).'/../dataobjects/_dataobject.class.php';
+require_once dirname(__FILE__).'/_itemlight.class.php';
+
 
 global $object_def;
 /**
@@ -78,13 +79,12 @@ $object_def['Item'] = array( // definition of the object:
 				),
 		);
 
-
 /**
  * Item Class
  *
  * @package evocore
  */
-class Item extends DataObject
+class Item extends ItemLight
 {
 	/**
 	 * The User who has created the Item (lazy-filled).
@@ -130,13 +130,6 @@ class Item extends DataObject
 	var $assigned_user_ID;
 
 	/**
-	 * Publish date ("Y-m-d H:i:s"). This may be in the future.
-	 * This should get compared to {@link $localtimenow}.
-	 * @var string
-	 */
-	var $issue_date;
-	var $mod_date;
-	/**
 	 * The visibility status of the item.
 	 *
 	 * 'published', 'deprecated', 'protected', 'private' or 'draft'
@@ -153,7 +146,6 @@ class Item extends DataObject
 	 */
 	var $locale;
 	var $title;
-	var $urltitle;
 
 	var $content;
 
@@ -198,28 +190,6 @@ class Item extends DataObject
 	 * @var integer
 	 */
 	var $notifications_ctsk_ID;
-
-	/**
-	 * @var integer
-	 */
-	var $main_cat_ID = 0;
-	/**
-	 * @var Chapter
-	 */
-	var $main_Chapter;
-
-	/**
-	 * Derived from $main_cat_ID
-	 *
-	 * @var integer
-	 */
-	var $blog_ID;
-	/**
-	 * The Blog of the Item (lazy filled, use {@link get_Blog()} to access it.
-	 * @access protected
-	 * @var Blog
-	 */
-	var $Blog;
 
 	/**
 	 * array of IDs or NULL if we don't know...
@@ -284,30 +254,16 @@ class Item extends DataObject
 		$db_cols =  & $object_def[$objtype]['db_cols'];
 
 		// Call parent constructor:
-		parent::DataObject( $dbtable, $dbprefix, $dbIDname, $datecreated_field, $datemodified_field,
-												$creator_field, $lasteditor_field );
-
-		$this->delete_restrictions = array(
-				array( 'table'=>'T_links', 'fk'=>'link_dest_itm_ID', 'msg'=>T_('%d links to source items') ),
-				array( 'table'=>'T_posts', 'fk'=>'post_parent_ID', 'msg'=>T_('%d links to child items') ),
-			);
-
-		$this->delete_cascades = array(
-				array( 'table'=>'T_links', 'fk'=>'link_itm_ID', 'msg'=>T_('%d links to destination items') ),
-				array( 'table'=>'T_postcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
-				array( 'table'=>'T_comments', 'fk'=>'comment_post_ID', 'msg'=>T_('%d comments') ),
-			);
-
-		$this->objtype = $objtype;
+		parent::ItemLight( $db_row, $dbtable, $dbprefix, $dbIDname, $objtype,
+	               $datecreated_field, $datemodified_field,
+	               $creator_field, $lasteditor_field );
 
 		if( $db_row == NULL )
 		{ // New item:
-			$this->ID = 0;
 			if( isset($current_User) )
 			{ // use current user as default, if available (which won't be the case during install)
 				$this->set_creator_User( $current_User );
 			}
-			$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
 			$this->set( 'notifications_status', 'noreq' );
 			// Set the renderer list to 'default' will trigger all 'opt-out' renderers:
 			$this->set( 'renderers', array('default') );
@@ -317,24 +273,18 @@ class Item extends DataObject
 		}
 		else
 		{
-			$this->ID = $db_row->$dbIDname;
 			$this->datecreated = $db_row->$db_cols['datecreated']; // Needed for history display
-			$this->datemodified = $db_row->$db_cols['datemodified']; // Needed for history display
 			$this->creator_user_ID = $db_row->$db_cols['creator_user_ID']; // Needed for history display
 			$this->lastedit_user_ID = $db_row->$db_cols['lastedit_user_ID']; // Needed for history display
 			$this->assigned_user_ID = $db_row->$db_cols['assigned_user_ID'];
-			$this->issue_date = $db_row->$db_cols['datestart'];
-			$this->mod_date = $db_row->$db_cols['datemodified'];
 			$this->status = $db_row->$db_cols['status'];
 			$this->title = $db_row->$db_cols['title'];
 			$this->content = $db_row->$db_cols['content'];
-			$this->main_cat_ID = $db_row->$db_cols['main_cat_ID'];
 			$this->typ_ID = $db_row->$db_cols['typ_ID'];
 			$this->st_ID = $db_row->$db_cols['st_ID'];
 			$this->deadline = $db_row->$db_cols['deadline'];
 			$this->priority = $db_row->$db_cols['priority'];
 			$this->locale = $db_row->$db_cols['locale'];
-			$this->urltitle = $db_row->$db_cols['urltitle'];
 			$this->wordcount = $db_row->$db_cols['wordcount'];
 			$this->notifications_status = $db_row->$db_cols['notifications_status'];
 			$this->notifications_ctsk_ID = $db_row->$db_cols['notifications_ctsk_ID'];
@@ -345,12 +295,6 @@ class Item extends DataObject
 
 			$this->views = $db_row->$db_cols['views'];
 			$this->url = $db_row->$db_cols['url'];			// Should move
-
-			// Derived vars
-			$ChapterCache = & get_Cache( 'ChapterCache' );
-			$this->main_Chapter = & $ChapterCache->get_by_ID( $this->main_cat_ID );
-
-			$this->blog_ID = $this->main_Chapter->blog_ID;
 		}
 	}
 
@@ -504,178 +448,6 @@ class Item extends DataObject
 
 
 	/**
-	 * Generate the permalink for the item.
-	 *
-	 * Note: Each item has an unique permalink at any given time.
-	 * Some admin settings may however change the permalinks for previous items.
-	 * Note: This actually only returns the URL, to get a real link, use {@link Item::get_permanent_link()}
-	 *
-	 * @todo archives modes in clean URL mode
-	 *
-	 * @param string 'urltitle', 'pid', 'archive#id', 'archive#title' or '' to use default setting
-	 * @param string url to use
-	 * @param boolean true to force single post on destination page
-	 * @param string glue between url params
-	 */
-	function get_permanent_url( $permalink_type = '', $blogurl = '', $force_single = false, $glue = '&amp;' )
-	{
-		global $DB, $cacheweekly, $Settings;
-
-		if( empty( $permalink_type ) )
-		{	// Use default from settings:
-			$permalink_type = $Settings->get( 'permalink_type' );
-		}
-
-		if( $force_single && (strpos( $permalink_type, 'archive' ) !== false) )
-		{ // We don't want a page full of posts:
-			$permalink_type = 'force_single';
-		}
-
-		if( empty( $blogurl ) )
-		{
-			$this->get_Blog();
-			$blogurl = $this->Blog->gen_blogurl();
-		}
-
-		$post_date = $this->issue_date;
-
-		switch( $permalink_type )
-		{
-			case 'archive#id':
-				// Link to an archive page:
-				// Determine type of archive page:
-				$this->get_Blog();
-				$dest_type = $this->Blog->get_setting('archive_mode');
-				$anchor = $this->ID;
-				$urltail = 'p'.$this->ID;
-				break;
-
-			case 'archive#title':
-				// Link to an archive page:
-				// Determine type of archive page:
-				$this->get_Blog();
-				$dest_type = $this->Blog->get_setting('archive_mode');
-				$anchor = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $this->title );
-				$urltail = 'p'.$this->ID;
-				break;
-
-			case 'force_single':
-				// Forced Link to individual post:
-				$dest_type = 'postbypost';
-				$urlparam = 'p='.$this->ID.'&amp;redir=no';
-				$urltail = 'p'.$this->ID.'?redir=no';
-				break;
-
-			case 'pid':
-				// Link to individual post:
-				$dest_type = 'postbypost';
-				$urlparam = 'p='.$this->ID;
-				$urltail = 'p'.$this->ID;
-				break;
-
-			case 'urltitle':
-			default:
-				// Link to individual post:
-				$dest_type = 'postbypost';
-				if( !empty( $this->urltitle ) )
-				{
-					$urlparam = 'title='.$this->urltitle;
-					$urltail = $this->urltitle;
-				}
-				else
-				{
-					$urlparam = 'p='.$this->ID;
-					$urltail = 'p'.$this->ID;
-				}
-		}
-
-		switch( $dest_type )
-		{
-			case 'monthly':
-				// Link to a monthly archive page:
-				if( $Settings->get('links_extrapath') == 'disabled' )
-				{ // Use params:
-					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).substr($post_date,5,2), $glue ).'#'.$anchor;
-				}
-				else
-				{ // Use extra path info:
-					$permalink = url_add_tail( $blogurl, mysql2date("/Y/m/", $post_date) ).'#'.$anchor;
-				}
-				break;
-
-			case 'weekly':
-				// Link to a weekly archive page:
-				if((!isset($cacheweekly)) || (empty($cacheweekly[$post_date])))
-				{
-					$cacheweekly[$post_date] = $DB->get_var( 'SELECT '.$DB->week( $DB->quote($post_date), locale_startofweek() ) );
-				}
-				if( $Settings->get('links_extrapath') == 'disabled' )
-				{ // Use params:
-					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).$glue.'w='.$cacheweekly[$post_date], $glue ).'#'.$anchor;
-				}
-				else
-				{ // Use extra path info:
-					$permalink = url_add_tail( $blogurl, mysql2date("/Y/", $post_date).'w'.$cacheweekly[$post_date] ).'/#'.$anchor;
-				}
-				break;
-
-			case 'daily':
-				// Link to a daily archive page:
-				if( $Settings->get('links_extrapath') == 'disabled' )
-				{ // Use params:
-					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).substr($post_date,5,2).substr($post_date,8,2), $glue ).'#'.$anchor;
-				}
-				else
-				{ // Use extra path info:
-					$permalink = url_add_tail( $blogurl, mysql2date("/Y/m/d/", $post_date) ).'#'.$anchor;
-				}
-				break;
-
-			case 'postbypost':
-			default:
-				// Link to a specific post:
-				switch( $Settings->get('links_extrapath') )
-				{
-					case 'disabled':
-						// Use params:
-						$permalink = url_add_param( $blogurl, $urlparam.$glue.'more=1'.$glue.'c=1'.$glue.'tb=1'.$glue.'pb=1', $glue );
-						break;
-
-					case 'short':
-						$permalink = url_add_tail( $blogurl, '/'.$urltail );
-						break;
-
-					case 'y':
-						$permalink = url_add_tail( $blogurl, mysql2date('/Y/', $post_date).$urltail );
-						break;
-
-					case 'ym':
-						$permalink = url_add_tail( $blogurl, mysql2date('/Y/m/', $post_date).$urltail );
-						break;
-
-					case 'ymd':
-						$permalink = url_add_tail( $blogurl, mysql2date('/Y/m/d/', $post_date).$urltail );
-						break;
-
- 					case 'subchap':
-						$permalink = url_add_tail( $blogurl, '/'.$this->main_Chapter->urlname.'/'.$urltail );
-						break;
-
- 					case 'chapters':
-						$permalink = url_add_tail( $blogurl, '/'.$this->main_Chapter->get_url_path().$urltail );
-						break;
-
-					default:
-						debug_die('extra path mode not supported (yet)');
-				}
-				break;
-		}
-
-		return $permalink;
-	}
-
-
-	/**
 	 * Template function: display anchor for permalinks to refer to
 	 *
 	 * @todo archives modes in clean mode
@@ -742,134 +514,6 @@ class Item extends DataObject
 		return $UserCache->get_blog_member_option_list( $this->blog_ID, $this->assigned_user_ID,
 							$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
 							($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */ );
-	}
-
-
-	/**
-	 * Template function: list all the category names
-	 *
-	 * @param string link title, '#' for default, false if you want no links
-	 * @param string string fo display before the MAIN category, 'hide' to ignore main cat
-	 * @param string string fo display after the MAIN category, 'hide' to ignore main cat
-	 * @param string string fo display before OTHER categories, 'hide' to ignore other cats
-	 * @param string string fo display after OTHER categories, 'hide' to ignore other cats
-	 * @param string string fo display before EXTERNAL categories, 'hide' to ignore external cats
-	 * @param string string fo display after EXTERNAL categories, 'hide' to ignore external cats
-	 * @param string separator string
-	 * @param string Output format for each cat, see {@link format_to_output()}
-	 */
-	function categories(
-			$link_title = '#',
-			$before_main='', $after_main='',
-			$before_other='', $after_other='',
-			$before_external='<em>', $after_external='</em>',
-			$separator = ', ',
-			$format = 'htmlbody'
-		)
-	{
-		if( $link_title == '#' )
-		{ /* TRANS: When the categories for a specific post are displayed, the user can click
-					on these cats to browse them, this is the default href title displayed there */
-			$link_title = T_('Browse category');
-		}
-
-		$categoryNames = array();
-		foreach( $this->get_Chapters() as $Chapter )
-		{
-			$cat_name = $Chapter->dget( 'name' );
-
-			if( !empty($link_title) )
-			{ // we want to display links
-				$lBlog = & $Chapter->get_Blog();
-				$cat_name = '<a href="'.$Chapter->get_permanent_url().'" title="'.htmlspecialchars($link_title).'">'.$cat_name.'</a>';
-			}
-
-			if( $Chapter->ID == $this->main_cat_ID )
-			{ // We are displaying the main cat!
-				if( $before_main == 'hide' )
-				{ // ignore main cat !!!
-					continue;
-				}
-				$cat_name = $before_main.$cat_name.$after_main;
-			}
-			elseif( $Chapter->blog_ID == $this->blog_ID )
-			{ // We are displaying another cat in the same blog
-				if( $before_other == 'hide' )
-				{ // ignore main cat !!!
-					continue;
-				}
-				$cat_name = $before_other.$cat_name.$after_other;
-			}
-			else
-			{ // We are displaying an external cat (in another blog)
-				if( $before_external == 'hide' )
-				{ // ignore main cat !!!
-					continue;
-				}
-				$cat_name = $before_external.$cat_name.$after_external;
-			}
-
-			$categoryNames[] = $cat_name;
-		}
-
-		echo format_to_output( implode( $separator, $categoryNames ), $format);
-	}
-
-
-	/**
-	 * Template function: display main category name
-	 *
-	 * @param string Output format, see {@link format_to_output()}
-	 */
-	function main_category( $format = 'htmlbody' )
-	{
-		$Chapter = & $this->get_main_Chapter();
-		$Chapter->disp( 'name', $format );
-	}
-
-
-	/**
-	 * Get list of Chapter objects.
-	 *
-	 * @return array of {@link Chapter chapters} (references)
-	 */
-	function get_Chapters()
-	{
-		global $cache_postcats;
-
-		$ChapterCache = & get_Cache( 'ChapterCache' );
-
-		// Load cache for category associations with current posts
-		cat_load_postcats_cache();
-
-		if( isset($cache_postcats[$this->ID]) )
-		{ // dh> may not be set! (demo logs)
-			$categoryIDs = $cache_postcats[$this->ID];
-		}
-		else $categoryIDs = array();
-
-		$chapters = array();
-		foreach( $categoryIDs as $cat_ID )
-		{
-			$chapters[] = & $ChapterCache->get_by_ID( $cat_ID );
-		}
-
-		return $chapters;
-	}
-
-
-	/**
-	 * Get the main Chapter.
-	 *
-	 * @return Chapter
-	 */
-	function & get_main_Chapter()
-	{
-		$ChapterCache = & get_Cache( 'ChapterCache' );
-		/**
-		 * @var Chapter
-		 */
-		return $ChapterCache->get_by_ID( $this->main_cat_ID );
 	}
 
 
@@ -1485,57 +1129,6 @@ class Item extends DataObject
 
 
 	/**
-	 * returns issue date (datetime) of Item
-	 *
-	 * @param string date/time format: leave empty to use locale default date format
-	 * @param boolean true if you want GMT
-	 */
-	function get_issue_date( $format = '', $useGM = false )
-	{
-		if( empty($format) )
-			$format = locale_datefmt();
-
-		return mysql2date( $format, $this->issue_date, $useGM);
-	}
-
-
-	/**
-	 * Template function: display issue date (datetime) of Item
-	 *
-	 * @param string date/time format: leave empty to use locale default date format
-	 * @param boolean true if you want GMT
-	 */
-	function issue_date( $format = '', $useGM = false )
-	{
-		echo $this->get_issue_date( $format, $useGM );
-	}
-
-
-	/**
-	 * Template function: display issue time (datetime) of Item
-	 *
-	 * @param string date/time format: leave empty to use locale default time format
-	 * @param boolean true if you want GMT
-	 */
-	function issue_time( $format = '', $useGM = false )
-	{
-		if( empty($format) )
-			echo mysql2date( locale_timefmt(), $this->issue_date, $useGM );
-		else
-			echo mysql2date( $format, $this->issue_date, $useGM );
-	}
-
-
-	/**
-	 * Template function: display locale for item
-	 */
-	function lang()
-	{
-		$this->disp( 'locale', 'raw' );
-	}
-
-
-	/**
 	 * Template function: display number of links attached to this Item
 	 */
 	function linkcount()
@@ -1557,28 +1150,6 @@ class Item extends DataObject
 			$LinkCache = & get_Cache( 'LinkCache' );
 			$this->Links = & $LinkCache->get_by_item_ID( $this->ID );
 		}
-	}
-
-
-	/**
-	 * Template function: display locale for item
-	 */
-	function locale()
-	{
-		$this->disp( 'locale', 'raw' );
-	}
-
-
-	/**
-	 * Template function: display language name for item
-	 *
-	 * @param string Output format, see {@link format_to_output()}
-	 */
-	function language( $format = 'htmlbody' )
-	{
-		global $locales;
-		$locale = $locales[ $this->locale ];
-		echo format_to_output( $locale['name'], $format );
 	}
 
 
@@ -1653,36 +1224,6 @@ class Item extends DataObject
 		echo $after;
 
 		return true;
-	}
-
-
-	/**
-	 * Template function: display last mod date (datetime) of Item
-	 *
-	 * @param string date/time format: leave empty to use locale default date format
-	 * @param boolean true if you want GMT
-	 */
-	function mod_date( $format = '', $useGM = false )
-	{
-		if( empty($format) )
-			echo mysql2date( locale_datefmt(), $this->mod_date, $useGM );
-		else
-			echo mysql2date( $format, $this->mod_date, $useGM );
-	}
-
-
-	/**
-	 * Template function: display last mod time (datetime) of Item
-	 *
-	 * @param string date/time format: leave empty to use locale default time format
-	 * @param boolean true if you want GMT
-	 */
-	function mod_time( $format = '', $useGM = false )
-	{
-		if( empty($format) )
-			echo mysql2date( locale_timefmt(), $this->mod_date, $useGM );
-		else
-			echo mysql2date( $format, $this->mod_date, $useGM );
 	}
 
 
@@ -1814,80 +1355,6 @@ class Item extends DataObject
 		}
 
 		return $r;
-	}
-
-
-	/**
-	 * Template function: display permalink for item
-	 *
-	 * Note: This actually only outputs the URL, to display a real link, use {@link Item::permanent_link()}
-	 *
-	 * @param string 'post', 'archive#id' or 'archive#title'
-	 * @param string url to use
-	 */
-	function permanent_url( $mode = '', $blogurl='' )
-	{
-		echo $this->get_permanent_url( $mode, $blogurl );
-	}
-
-
-	/**
-	 * Returns a permalink link to the Item
-	 *
-	 * Note: If you only want the permalink URL, use {@link Item::get_permanent_url()}
-	 *
-	 * @param string link text or special value: '#', '#icon#', '#text#', '#title#' '... $title$ ...'
-	 * @param string link title
-	 * @param string class name
-	 */
-	function get_permanent_link( $text = '#', $title = '#', $class = '' )
-	{
-		global $current_User;
-
-		switch( $text )
-		{
-			case '#':
-				$text = get_icon( 'permalink' ).T_('Permalink');
-				break;
-
-			case '#icon#':
-				$text = get_icon( 'permalink' );
-				break;
-
-			case '#text#':
-				$text = T_('Permalink');
-				break;
-
-			case '#title#':
-				$text = format_to_output( $this->title );
-				break;
-		}
-
-		if( $title == '#' ) $title = T_('Permanent link to full entry');
-
-		$url = $this->get_permanent_url();
-
-		// Display as link
-		$r = '<a href="'.$url.'" title="'.$title.'"';
-		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
-		$r .= '>'.str_replace( '$title$', format_to_output( $this->title ), $text ).'</a>';
-
-		return $r;
-	}
-
-
-	/**
-	 * Displays a permalink link to the Item
-	 *
-	 * Note: If you only want the permalink URL, use {@link Item::permanent_url()}
-	 *
-	 * @param string link text or special value: '#', '#icon#', '#text#', '#title#'
-	 * @param string link title
-	 * @param string class name
-	 */
-	function permanent_link( $text = '#', $title = '#', $class = '' )
-	{
-		echo $this->get_permanent_link( $text, $title, $class );
 	}
 
 
@@ -2526,43 +1993,6 @@ class Item extends DataObject
 
 
 	/**
-	 * Template function: display title for item and link to related URL
-	 *
-	 * @param string String to display before the title if there is something to display
-	 * @param string String to display after the title if there is something to display
-	 * @param boolean false if you don't want to link to related URL (if applicable)
-	 * @param string Output format, see {@link format_to_output()}
-	 */
-	function title(
-		$before = '',        // HTML/text to be displayed before title
-		$after = '',         // HTML/text to be displayed after title
-		$add_link = true,    // Add li  nk to this title?
-		$format = 'htmlbody' )
-	{
-		if( empty($this->title) && $add_link )
-			$title = $this->url;
-		else
-			$title = $this->title;
-
-		if( empty($title) )
-		{ // Nothing to display
-			return;
-		}
-
-		$title = format_to_output( $title, $format );
-
-		if( $add_link && (!empty($this->url)) )
-		{
-			$title = '<a href="'.$this->url.'">'.$title.'</a>';
-		}
-
-		echo $before;
-		echo $title;
-		echo $after;
-	}
-
-
-	/**
 	 * Template function: Displays trackback autodiscovery information
 	 */
 	function trackback_rdf()
@@ -2722,23 +2152,6 @@ class Item extends DataObject
 	{
 		switch( $parname )
 		{
-			case 'main_cat_ID':
-				$r = $this->set_param( 'main_cat_ID', 'number', $parvalue, false );
-				// make sure main cat is in extracat list and there are no duplicates
-				$this->extra_cat_IDs[] = $this->main_cat_ID;
-				$this->extra_cat_IDs = array_unique( $this->extra_cat_IDs );
-				// Update derived property:
-				$this->blog_ID = get_catblog( $this->main_cat_ID ); // This is a derived var
-				return $r;
-
-			case 'extra_cat_IDs':
-				// ARRAY! We do not record this change (yet)
-				$this->extra_cat_IDs = $parvalue;
-				// make sure main cat is in extracat list and there are no duplicates
-				$this->extra_cat_IDs[] = $this->main_cat_ID;
-				$this->extra_cat_IDs = array_unique( $this->extra_cat_IDs );
-				break;
-
 			case 'typ_ID':
 			case 'st_ID':
 				return $this->set_param( $parname, 'number', $parvalue, true );
@@ -2752,11 +2165,6 @@ class Item extends DataObject
 			case 'wordcount':
 				return $this->set_param( 'wordcount', 'number', $parvalue, false );
 
-			case 'issue_date':
-			case 'datestart':
-				$this->issue_date = $parvalue;
-				return $this->set_param( 'datestart', 'date', $parvalue, false );
-
 			case 'deadline':
 				return $this->set_param( 'deadline', 'date', $parvalue, true );
 
@@ -2764,7 +2172,7 @@ class Item extends DataObject
 				return $this->set_renderers( $parvalue );
 
 			default:
-				return $this->set_param( $parname, 'string', $parvalue, $make_null );
+				return parent::set( $parname, $parvalue, $make_null );
 		}
 	}
 
@@ -3521,6 +2929,12 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.163  2007/03/18 03:43:19  fplanque
+ * EXPERIMENTAL
+ * Splitting Item/ItemLight and ItemList/ItemListLight
+ * Goal: Handle Items with less footprint than with their full content
+ * (will be even worse with multiple languages/revisions per Item)
+ *
  * Revision 1.162  2007/03/11 23:57:07  fplanque
  * item editing: allow setting to 'redirected' status
  *

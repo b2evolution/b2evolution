@@ -93,6 +93,10 @@ function & get_Cache( $objectName )
 			$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'\', T_(\'No group\') )' );
 			return $GroupCache;
 
+		case 'ItemCacheLight';
+			$ItemCacheLight = new DataObjectCache( 'ItemLight', false, 'T_posts', 'post_', 'post_ID' ); // COPY (FUNC)
+			return $ItemCacheLight;
+
 		case 'ItemCache';
 			load_class( 'MODEL/items/_itemcache.class.php' );
 			$ItemCache = new ItemCache(); // COPY (FUNC)
@@ -139,6 +143,12 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.15  2007/03/18 03:43:19  fplanque
+ * EXPERIMENTAL
+ * Splitting Item/ItemLight and ItemList/ItemListLight
+ * Goal: Handle Items with less footprint than with their full content
+ * (will be even worse with multiple languages/revisions per Item)
+ *
  * Revision 1.14  2007/01/11 20:44:19  fplanque
  * skin containers proof of concept
  * (no params handling yet though)
