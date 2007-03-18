@@ -492,18 +492,17 @@ class Calendar
 			// fplanque>> note: I am removing the searchframe thing because 1) I don't think it's of any use
 			// and 2) it's brutally inefficient! If someone needs this it should be implemented with A SINGLE
 			// QUERY which gets the last available post (BTW, I think there is already a function for that somwhere)
+			// walter>> As we are just counting items, the ORDER BY db_prefix . date_start doesn't matter. And a side effect
+			// of that is make queries standart compatible (compatible with other databases than MySQL)
 
 			$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.') AS item_count,
-													EXTRACT(YEAR FROM '.$this->dbprefix.'datestart), EXTRACT(MONTH FROM '.$this->dbprefix.'datestart),
 													EXTRACT(DAY FROM '.$this->dbprefix.'datestart) AS myday
 									FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 										INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 									WHERE EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) = \''.$this->year.'\'
 										AND EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) = \''.$this->month.'\'
 										'.$this->ItemQuery->get_where( ' AND ' ).'
-									GROUP BY myday '.$this->ItemQuery->get_group_by( ', ' ).'
-									ORDER BY '.$this->dbprefix.'datestart DESC';
-			// echo $arc_sql;
+									GROUP BY myday '.$this->ItemQuery->get_group_by( ', ' );
 			// echo $this->ItemQuery->where;
 			$arc_result = $DB->get_results( $arc_sql, ARRAY_A );
 
@@ -546,14 +545,12 @@ class Calendar
 		else
 		{ // mode is 'year'
 			// Find months with posts
-			$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.') AS item_count, MONTH('.$this->dbprefix.'datestart) AS mymonth
+			$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.') AS item_count, EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) AS mymonth
 									FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 										INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-									WHERE YEAR('.$this->dbprefix.'datestart) = "'.$this->year.'" '
+									WHERE EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) = \''.$this->year.'\' '
 										.$this->ItemQuery->get_where( ' AND ' ).'
-									GROUP BY mymonth '.$this->ItemQuery->get_group_by( ', ' ).'
-									ORDER BY '.$this->dbprefix.'datestart DESC';
-
+									GROUP BY mymonth '.$this->ItemQuery->get_group_by( ', ' );
 			$arc_result = $DB->get_results( $arc_sql, ARRAY_A );
 
 			if( $DB->num_rows > 0 )
@@ -910,14 +907,14 @@ class Calendar
 					if( $this->params['min_timestamp'] == 'query' )
 					{	// Let's query to find the correct year:
 						if( $row = $DB->get_row(
-								'SELECT YEAR('.$this->dbprefix.'datestart) AS year,
-												MONTH('.$this->dbprefix.'datestart) AS month
+								'SELECT EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) AS year,
+												EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) AS month
 									FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 										INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-									WHERE YEAR('.$this->dbprefix.'datestart) < '.$this->year.'
+									WHERE EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) < '.$this->year.'
 									'.$nav_ItemQuery->get_where( ' AND ' )
 									.$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
-									ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, ABS( '.$use_range_month.' - MONTH('.$this->dbprefix.'datestart) ) ASC
+									ORDER BY EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) DESC, ABS( '.$use_range_month.' - EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) ) ASC
 									LIMIT 1', OBJECT, 0, 'Calendar: find prev year with posts' )
 							)
 						{
@@ -956,20 +953,20 @@ class Calendar
 					if( $this->params['min_timestamp'] == 'query' )
 					{	// Let's query to find the correct month:
 						if( $row = $DB->get_row(
-								'SELECT MONTH('.$this->dbprefix.'datestart) AS month,
-												YEAR('.$this->dbprefix.'datestart) AS year
+								'SELECT EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) AS month,
+												EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) AS year
 								FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 									INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 								WHERE
 								(
-									YEAR('.$this->dbprefix.'datestart) < '.($this->year).'
-									OR ( YEAR('.$this->dbprefix.'datestart) = '.($this->year).'
-												AND MONTH('.$this->dbprefix.'datestart) < '.($this->month).'
+									EXTACT(YEAR FROM '.$this->dbprefix.'datestart) < '.($this->year).'
+									OR ( EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) = '.($this->year).'
+												AND EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) < '.($this->month).'
 											)
 								)
 								'.$nav_ItemQuery->get_where( ' AND ' )
 								 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
-								ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, MONTH('.$this->dbprefix.'datestart) DESC
+								ORDER BY EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) DESC, EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) DESC
 								LIMIT 1',
 								OBJECT,
 								0,
@@ -1011,20 +1008,20 @@ class Calendar
 					if( $this->params['max_timestamp'] == 'query' )
 					{	// Let's query to find the correct month:
 						if( $row = $DB->get_row(
-								'SELECT MONTH('.$this->dbprefix.'datestart) AS month,
-												YEAR('.$this->dbprefix.'datestart) AS year
+								'SELECT EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) AS month,
+												EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) AS year
 								FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 									INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 								WHERE
 								(
-									YEAR('.$this->dbprefix.'datestart) > '.($this->year).'
-									OR ( YEAR('.$this->dbprefix.'datestart) = '.($this->year).'
-												AND MONTH('.$this->dbprefix.'datestart) > '.($this->month).'
+									EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) > '.($this->year).'
+									OR ( EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) = '.($this->year).'
+												AND EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) > '.($this->month).'
 											)
 								)
 								'.$nav_ItemQuery->get_where( ' AND ' )
 								 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
-								ORDER BY YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart) ASC
+								ORDER BY EXTRACT(YEAR FROM '.$this->dbprefix.'datestart), EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) ASC
 								LIMIT 1',
 								OBJECT,
 								0,
@@ -1073,14 +1070,14 @@ class Calendar
 					if( $this->params['max_timestamp'] == 'query' )
 					{	// Let's query to find the correct year:
 					if( $row = $DB->get_row(
-							'SELECT YEAR('.$this->dbprefix.'datestart) AS year,
-											MONTH('.$this->dbprefix.'datestart) AS month
+							'SELECT EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) AS year,
+											EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) AS month
 								FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 									INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-								WHERE YEAR('.$this->dbprefix.'datestart) > '.$this->year.'
+								WHERE EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) > '.$this->year.'
 								 '.$nav_ItemQuery->get_where( ' AND ' )
 								 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
-								ORDER BY YEAR('.$this->dbprefix.'datestart) ASC, ABS( '.$use_range_month.' - MONTH('.$this->dbprefix.'datestart) ) ASC
+								ORDER BY EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) ASC, ABS( '.$use_range_month.' - EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) ) ASC
 								LIMIT 1', OBJECT, 0, 'Calendar: find next year with posts' )
 						)
 						{
@@ -1119,6 +1116,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.38  2007/03/18 16:54:37  waltercruz
+ * Changing the MySQL date functions to the standart (EXTRACT) ones and killing ORDER BY in monthly and year calendar.
+ *
  * Revision 1.37  2007/02/06 12:49:39  waltercruz
  * Changing the date queries to the EXTRACT syntax
  *
