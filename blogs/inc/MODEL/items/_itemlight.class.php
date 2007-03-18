@@ -702,43 +702,6 @@ class ItemLight extends DataObject
 
 
 	/**
-	 * Insert object into DB based on previously recorded changes
-	 *
-	 * @return boolean true on success
-	 */
-	function dbinsert()
-	{
-		debug_die( 'ItemLight: insert not supported' );
-	}
-
-
-
-
-	/**
-	 * Update the DB based on previously recorded changes
-	 *
-	 * @return boolean true on success
-	 */
-	function dbupdate()
-	{
-		debug_die( 'ItemLight: update not supported' );
-	}
-
-
-	/**
-	 * Trigger event AfterItemDelete after calling parent method.
-	 *
-	 * @todo fp> delete related stuff: comments, cats, file links...
-	 *
-	 * @return boolean true on success
-	 */
-	function dbdelete()
-	{
-		debug_die( 'ItemLight: delete not supported' );
-	}
-
-
-	/**
 	 * Get the Blog object for the Item.
 	 *
 	 * @return Blog
@@ -773,6 +736,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2007/03/18 03:49:20  fplanque
+ * fix
+ *
  * Revision 1.1  2007/03/18 03:43:19  fplanque
  * EXPERIMENTAL
  * Splitting Item/ItemLight and ItemList/ItemListLight
