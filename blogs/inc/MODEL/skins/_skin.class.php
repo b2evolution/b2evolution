@@ -146,7 +146,7 @@ class Skin extends DataObject
 		{
 			foreach( $Widget_array as $ComponentWidget )
 			{
-				// Let the Widget dispolay itself (with contextual params):
+				// Let the Widget display itself (with contextual params):
 				$ComponentWidget->display( $params );
 			}
 		}
@@ -361,6 +361,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2007/03/19 21:21:00  blueyed
+ * fixed typo
+ *
  * Revision 1.13  2007/03/18 01:39:54  fplanque
  * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
  * (more to come)
