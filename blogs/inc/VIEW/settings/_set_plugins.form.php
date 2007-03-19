@@ -33,7 +33,6 @@
  * @author fplanque: Francois PLANQUE.
  * @author blueyed: Daniel HAHLER.
  *
- * @todo link to help urls
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -277,6 +276,9 @@ unset($Results); // free memory
 
 /*
  * $Log$
+ * Revision 1.50  2007/03/19 21:22:48  blueyed
+ * doc
+ *
  * Revision 1.49  2007/02/05 22:17:29  blueyed
  * Fixed sorting plugins by description
  *
