@@ -248,6 +248,7 @@ class Results extends Table
 	 *               example: -A-- will sort in ascending order on 2nd column
 	 *               example: ---D will sort in descending order on 4th column
 	 * @param integer number of lines displayed on one page (NULL to disable paging)
+	 *                       dh> 0 should be "no paging" and null just the default (from $UserSettings / 20)
 	 * @param string SQL to get the total count of results
 	 * @param boolean
 	 * @param NULL|string SQL query used to count the total # of rows (if NULL, we'll try to COUNT(*) by ourselves)
@@ -1965,6 +1966,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.50  2007/03/19 21:15:57  blueyed
+ * todo for api change of Results $limit param
+ *
  * Revision 1.49  2007/02/16 17:29:14  waltercruz
  * A more tricky regexp is needed to handle tre FROM part with the EXTRACT syntax
  *
