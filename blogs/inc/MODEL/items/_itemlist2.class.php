@@ -183,7 +183,8 @@ class ItemList2 extends ItemListLight
 		$this->total_pages = 1;
 		$this->page = 1;
 
-		parent::query( false, false, false );
+		// ATTENTION: we skip the parent on purpose here!! fp> refactor
+		DataObjectList2::query( false, false, false, 'PREVIEW QUERY' );
 
 		$Item = & $this->Cache->instantiate( $this->rows[0] );
 
@@ -575,6 +576,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.57  2007/03/19 23:59:18  fplanque
+ * fixed preview
+ *
  * Revision 1.56  2007/03/19 21:57:36  fplanque
  * ItemLists: $cat_focus and $unit extensions
  *
