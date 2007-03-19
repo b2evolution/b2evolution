@@ -142,6 +142,7 @@ class ItemListLight extends DataObjectList2
 				'ts_max' => $timestamp_max,
 				'cat_array' => array(),
 				'cat_modifier' => NULL,
+				'cat_focus' => 'wide',					// Search in extra categories, not just main cat
 				'authors' => NULL,
 				'assignees' => NULL,
 				'author_assignee' => NULL,
@@ -209,6 +210,7 @@ class ItemListLight extends DataObjectList2
 		// Get chapters/categories (and compile those values right away)
 		memorize_param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', $this->default_filters['cat_modifier'], $this->filters['cat_modifier'] );  // List of authors to restrict to
 		memorize_param( 'catsel', 'array', $this->default_filters['cat_array'], $this->filters['cat_array'] );
+		memorize_param( $this->param_prefix.'cat_focus', 'string', $this->default_filters['cat_focus'], $this->filters['cat_focus'] );  // Categories to search on
 		// TEMP until we get this straight:
 		global $cat_array, $cat_modifier;
 		$cat_array = $this->default_filters['cat_array'];
@@ -344,6 +346,8 @@ class ItemListLight extends DataObjectList2
 
 		$this->filters['cat_array'] = get_param( 'cat_array' );
 		$this->filters['cat_modifier'] = get_param( 'cat_modifier' );
+
+		$this->filters['cat_focus'] = param( $this->param_prefix.'cat_focus', 'string', $this->default_filters['cat_focus'], true );
 
 
 		/*
@@ -562,13 +566,15 @@ class ItemListLight extends DataObjectList2
 
 
 		// echo '<br />ItemListLight query';
+		//pre_dump( $this->filters );
 
 		// GENERATE THE QUERY:
 
 		/*
 		 * filtering stuff:
 		 */
-		$this->ItemQuery->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'] );
+		$this->ItemQuery->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'],
+																			$this->filters['cat_focus'] );
 		$this->ItemQuery->where_author( $this->filters['authors'] );
 		$this->ItemQuery->where_assignees( $this->filters['assignees'] );
 		$this->ItemQuery->where_author_assignee( $this->filters['author_assignee'] );
@@ -620,10 +626,11 @@ class ItemListLight extends DataObjectList2
 			$this->total_pages = 1;
 			$this->page = 1;
 		}
-		elseif( !empty($this->filters['ymdhms']) )
-		{ // no restriction if we request a month... some permalinks may point to the archive!
-			// echo 'ARCHIVE - no limits';
-			// $this->total_rows = 1; // TODO: unknown, check...
+		elseif( !empty($this->filters['ymdhms']) // no restriction if we request a month... some permalinks may point to the archive!
+		  || $this->filters['unit'] == 'days'    // We are going to limit to x days: no limit
+		  || $this->filters['unit'] == 'all' )	 // We want ALL results!
+		{
+			$this->total_rows = NULL; // unknown!
 			$this->total_pages = 1;
 			$this->page = 1;
 		}
@@ -645,19 +652,14 @@ class ItemListLight extends DataObjectList2
 			parent::count_total_rows( $sql_count );
 			//echo '<br />'.$this->total_rows;
 		}
-		elseif( $this->filters['unit'] == 'days' )
-		{ // We are going to limit to x days:
-			// $this->total_rows = 1; // TODO: unknown, check...
-			$this->total_pages = 1;
-			$this->page = 1;
-		}
 		else
+		{
 			debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->filters['unit'].' (paged mode is obsolete)' );
-
+		}
 
 
 		/*
-		 * Paging limits:
+		 * Paging LIMITs:
 		 */
 		if( $this->single_post )   // p or title
 		{ // Single post: no paging required!
@@ -665,6 +667,9 @@ class ItemListLight extends DataObjectList2
 		elseif( !empty($this->filters['ymdhms']) )
 		{ // no restriction if we request a month... some permalinks may point to the archive!
 			// echo 'ARCHIVE - no limits';
+		}
+		elseif( $this->filters['unit'] == 'all' )
+		{	// We want ALL results!
 		}
 		elseif( $this->filters['unit'] == 'posts' )
 		{
@@ -745,9 +750,9 @@ class ItemListLight extends DataObjectList2
 									.$this->ItemQuery->get_order_by()
 									.$this->ItemQuery->get_limit();
 
-		echo $DB->format_query( $this->sql );
+		// echo $DB->format_query( $this->sql );
 
-		parent::query( false, false, false );
+		parent::query( false, false, false, 'ItemListLight::query()' );
 	}
 
 
@@ -778,7 +783,8 @@ class ItemListLight extends DataObjectList2
 		/*
 		 * filtering stuff:
 		 */
-		$lastpost_ItemQuery->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'] );
+		$lastpost_ItemQuery->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'],
+																				 $this->filters['cat_focus']  );
 		$lastpost_ItemQuery->where_author( $this->filters['authors'] );
 		$lastpost_ItemQuery->where_assignees( $this->filters['assignees'] );
 		$lastpost_ItemQuery->where_locale( $this->filters['lc'] );
@@ -1428,6 +1434,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.2  2007/03/19 21:57:36  fplanque
+ * ItemLists: $cat_focus and $unit extensions
+ *
  * Revision 1.1  2007/03/18 03:43:19  fplanque
  * EXPERIMENTAL
  * Splitting Item/ItemLight and ItemList/ItemListLight

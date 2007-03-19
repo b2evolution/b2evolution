@@ -70,8 +70,7 @@ class ItemQuery extends SQL
 		$this->dbprefix = $dbprefix;
 		$this->dbIDname = $dbIDname;
 
-		$this->FROM( $this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
-									INNER JOIN T_categories ON postcat_cat_ID = cat_ID ' );
+		$this->FROM( $this->dbtablename );
 	}
 
 
@@ -122,6 +121,8 @@ class ItemQuery extends SQL
 		// Save for future use (permission checks..)
 		$this->blog = $blog;
 
+		$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
+											INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
 
 		$BlogCache = & get_Cache('BlogCache');
 		$current_Blog = $BlogCache->get_by_ID( $blog );
@@ -174,14 +175,29 @@ class ItemQuery extends SQL
 	 * @param Blog
 	 * @param array
 	 * @param string
+	 * @param string 'wide' to search iun extra cats too, 'main' for main cat only
 	 */
-	function where_chapter2( & $Blog, $cat_array, $cat_modifier )
+	function where_chapter2( & $Blog, $cat_array, $cat_modifier, $cat_focus = 'wide' )
 	{
 		// Save for future use (permission checks..)
 		$this->blog = $Blog->ID;
 
+		if( $cat_focus == 'wide' )
+		{
+			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
+												INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+			// fp> we try to restrict as close as possible to the posts but I don't know if it matters
+			$cat_ID_field = 'postcat_cat_ID';
+		}
+		else
+		{
+			$this->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
+			$cat_ID_field = 'post_main_cat_ID';
+		}
+
 		$aggregate_coll_IDs = $Blog->get_setting('aggregate_coll_IDs');
-		if( empty( $aggregate_coll_IDs ) )
+		if( empty( $aggregate_coll_IDs )	// This blog is not an aggregation anyway
+			|| $cat_focus == 'main' )				// We are requesting a narrow search
 		{	// We only want posts from the current blog:
 			$this->WHERE_and( 'cat_blog_ID = '.$Blog->ID );
 		}
@@ -201,14 +217,14 @@ class ItemQuery extends SQL
 			{
 				$eq = 'IN';
 			}
-			$whichcat = 'postcat_cat_ID '. $eq.' ('.implode(',', $cat_array). ') ';
+			$whichcat = $cat_ID_field.' '.$eq.' ('.implode(',', $cat_array). ') ';
 
 			// echo $whichcat;
 			$this->WHERE_and( $whichcat );
 
 			if( $cat_modifier == '*' )
 			{ // We want the categories combined! (i-e posts must be in ALL requested cats)
-				$this->GROUP_BY( $this->dbIDname.' HAVING COUNT(postcat_cat_ID) = '.count($cat_array) );
+				$this->GROUP_BY( $this->dbIDname.' HAVING COUNT('.$cat_ID_field.') = '.count($cat_array) );
 			}
 		}
 	}
@@ -589,6 +605,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.15  2007/03/19 21:57:36  fplanque
+ * ItemLists: $cat_focus and $unit extensions
+ *
  * Revision 1.14  2007/02/14 15:04:35  waltercruz
  * Changing the date queries to the EXTRACT syntax
  *

@@ -243,7 +243,7 @@ class ItemList2 extends ItemListLight
 		// echo $DB->format_query( $step1_sql );
 
 		// Get list of the IDs we need:
-		$ID_list = implode( ',', $DB->get_col( $step1_sql, 0, 'Get ID list for ItemList2 Query' ) );
+		$ID_list = implode( ',', $DB->get_col( $step1_sql, 0, 'ItemList2::Query() Step 1: Get ID list' ) );
 
 		// *** STEP 2 ***
 		$this->sql = 'SELECT *
@@ -261,7 +261,7 @@ class ItemList2 extends ItemListLight
 		//echo $DB->format_query( $this->sql );
 
 		// ATTENTION: we skip the parent on purpose here!! fp> refactor
-		DataObjectList2::query( false, false, false );
+		DataObjectList2::query( false, false, false, 'ItemList2::Query() Step 2' );
 	}
 
 
@@ -453,7 +453,8 @@ class ItemList2 extends ItemListLight
 		/*
 		 * filtering stuff:
 		 */
-		$next_Query->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'] );
+		$next_Query->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'],
+																 $this->filters['cat_focus'] );
 		$next_Query->where_author( $this->filters['authors'] );
 		$next_Query->where_assignees( $this->filters['assignees'] );
 		$next_Query->where_author_assignee( $this->filters['author_assignee'] );
@@ -574,6 +575,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.56  2007/03/19 21:57:36  fplanque
+ * ItemLists: $cat_focus and $unit extensions
+ *
  * Revision 1.55  2007/03/18 03:43:19  fplanque
  * EXPERIMENTAL
  * Splitting Item/ItemLight and ItemList/ItemListLight
