@@ -320,7 +320,8 @@ class Results extends Table
 	 *
 	 * Will only run if it has not executed before.
 	 */
-	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
+	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
+										$query_title = 'Results::Query()' )
 	{
 		global $DB;
 		if( !is_null( $this->rows ) )
@@ -399,7 +400,7 @@ class Results extends Table
 		}
 
 		// Execute query and store results
-		$this->rows = $DB->get_results( $sql );
+		$this->rows = $DB->get_results( $sql, OBJECT, $query_title );
 
 		// Store row count
 		$this->result_num_rows = $DB->num_rows;
@@ -655,7 +656,7 @@ class Results extends Table
 			// echo $sql_count;
 		}
 
-		$this->total_rows = $DB->get_var( $sql_count ); //count total rows
+		$this->total_rows = $DB->get_var( $sql_count, 0, 0, get_class($this).'::count_total_rows()' ); //count total rows
 
 		$this->total_pages = empty($this->limit) ? 1 : ceil($this->total_rows / $this->limit);
 
@@ -1966,6 +1967,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.51  2007/03/19 21:56:45  fplanque
+ * minor
+ *
  * Revision 1.50  2007/03/19 21:15:57  blueyed
  * todo for api change of Results $limit param
  *
