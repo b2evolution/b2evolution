@@ -99,6 +99,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 				<li><strong><?php echo T_('Stub file') ?>: <a href="a_stub.php"><?php echo T_('Blog #1 called through a stub file') ?></a></strong> &nbsp; (a_stub.php)</li>
 				<li><strong><?php echo T_('Custom template') ?>: <a href="a_noskin.php"><?php echo T_('Blog #1 called through a custom template (not a skin)') ?></a></strong> &nbsp; (a_noskin.php)</li>
 				<li><strong><?php echo T_('Custom template') ?>: <a href="multiblogs.php"><?php echo T_('Multiple blogs displayed on the same page') ?></a></strong> &nbsp; (multiblogs.php)</li>
+				<li><strong><?php echo T_('Stub file') ?>: <a href="sitemap_a.php"><?php echo T_('Blog #1 XML sitemap (called through a stub)') ?></a></strong> &nbsp; (sitemap_a.php)</li>
+				<li><strong><?php echo T_('Stub file') ?>: <a href="sitemap_blogs.php"><?php echo T_('Blog #1 aggregated XML sitemap (called through a stub)') ?></a></strong> &nbsp; (sitemap_blogs.php)</li>
 			<?php
 			}
 		?>
@@ -119,7 +121,9 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 
 <div id="rowfooter">
-<a href="http://b2evolution.net/"><?php echo T_('Official website') ?></a> &middot; <a href="http://b2evolution.net/about/license.html"><?php echo T_('GNU GPL license') ?></a>
+<a href="http://b2evolution.net/">b2evolution.net</a>
+&middot; <a href="http://b2evolution.net/about/license.html"><?php echo T_('GNU GPL license') ?></a>
+<?php display_list( $credit_links, ' &middot; ', '', ' &middot; ', ' ', ' ' ); ?>
 </div>
 <?php debug_info(); // output debug info if requested ?>
 </body>
