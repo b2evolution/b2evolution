@@ -102,6 +102,15 @@ function antispam_delete( $string_ID )
  * Note: Letting the database do the LIKE %% match is a little faster than doing in it PHP,
  * not to mention the incredibly long overhead of preloading the list into PHP
  *
+ * @todo dh> IMHO this method is too generic used! It gets used for:
+ *           - comment author name
+ *           - comment/message author email
+ *           - comment content
+ *           - message (email) content
+ *           - validate_url()
+ *           ..and validates all this against the antispam blacklist!
+ *           We should rather differentiate here more and make it pluggable!
+ *
  * @return string blacklisted keyword found or false if no spam detected
  */
 function antispam_check( $haystack )
@@ -317,6 +326,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.19  2007/03/19 21:22:38  blueyed
+ * TODO antispam_check()
+ *
  * Revision 1.18  2006/12/19 17:21:54  blueyed
  * Fixed domain extraction if anchor (#) follows domain name directly. See http://forums.b2evolution.net/viewtopic.php?p=48672#48672
  *
