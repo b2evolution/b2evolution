@@ -258,7 +258,7 @@ class Item extends ItemLight
 	               $datecreated_field, $datemodified_field,
 	               $creator_field, $lasteditor_field );
 
-		if( $db_row == NULL )
+		if( is_null($db_row) )
 		{ // New item:
 			if( isset($current_User) )
 			{ // use current user as default, if available (which won't be the case during install)
@@ -2929,6 +2929,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.164  2007/03/19 23:59:32  fplanque
+ * minor
+ *
  * Revision 1.163  2007/03/18 03:43:19  fplanque
  * EXPERIMENTAL
  * Splitting Item/ItemLight and ItemList/ItemListLight
