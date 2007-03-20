@@ -32,21 +32,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 require_once $model_path.'sessions/_hitlist.class.php';
 
-
 /**
- * Return a formatted percentage (should probably go to _misc.funcs)
- */
-function percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '.' )
-{
-	return number_format( $hit_count * 100 / $hit_total, $decimals, $dec_point, '' ).'&nbsp;%';
-}
-
-
-/**
- * Helper function for "Requested URI" column
- * @param integer Blog ID
- * @param string Requested URI
- * @return string
+ * @var User
  */
 function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
 {
@@ -61,41 +48,33 @@ function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
 		$full_url = $hit_uri;
 	}
 
-	if( strlen($hit_uri) > $max_len )
-	{
-		$hit_uri = '...'.substr( $hit_uri, -$max_len );
-	}
-
-	return '<a href="'.$full_url.'">'.$hit_uri.'</a>';
-}
+// Do we have permission to view all stats (aggregated stats) ?
+$perm_view_all = $current_User->check_perm( 'stats', 'view' );
 
 // We set the default to -1 so that blog=0 will make its way into regenerate_url()s whenever watching global stats.
 memorize_param( 'blog', 'integer', -1 );
 
 $tab = param( 'tab', 'string', 'summary', true );
+if( $tab == 'sessions' && (!$perm_view_all || $blog != 0) )
+{	// Sessions tab is not narrowed down to blog level:
+	$tab = 'summary';
+}
 $AdminUI->set_path( 'stats', $tab );
 $AdminUI->title = T_('View Stats for Blog:');
 
 param( 'action', 'string' );
 
-$blogListButtons = '<a href="'.regenerate_url( array('blog','page'), "blog=0" ).'" class="'.(( 0 == $blog ) ? 'CurrentBlog' : 'OtherBlog').'">'.T_('None').'</a> ';
-for( $curr_blog_ID = blog_list_start();
-			$curr_blog_ID != false;
-			$curr_blog_ID = blog_list_next() )
-{
-	$blogListButtons .= '<a href="'.regenerate_url( array('blog','page'), "blog=$curr_blog_ID" ).'" class="'.(( $curr_blog_ID == $blog ) ? 'CurrentBlog' : 'OtherBlog').'">'.blog_list_iteminfo('shortname',false).'</a> ';
+if( $blog == 0 && $perm_view_all )
+{	// We want to view aggregate stats
 }
-
-if( $blog )
-{
-	$BlogCache = & get_Cache( 'BlogCache' );
-	$Blog = & $BlogCache->get_by_ID($blog); // "Exit to blogs.." link
+else
+{	// Find a blog we can view stats for:
+	if( ! autoselect_blog( 'stats', 'view' ) )
+	{ // No blog could be selected
+		$Messages->add( T_('Sorry, there is no blog you have permission to view stats for.'), 'error' );
+		$action = 'nil';
+	}
 }
-
-
-// Check permission:
-$current_User->check_perm( 'stats', 'view', true );
-
 
 switch( $action )
 {
@@ -144,6 +123,17 @@ switch( $action )
 		break;
 }
 
+if( $perm_view_all )
+{
+	$blogListButtons = $AdminUI->get_html_collection_list( 'stats', 'view',
+					'admin.php?ctrl=stats&amp;tab='.$tab.'&amp;blog=%d', T_('All'),
+					'admin.php?ctrl=stats&amp;tab='.$tab.'&amp;blog=0' );
+}
+else
+{	// No permission to view aggregated stats:
+	$blogListButtons = $AdminUI->get_html_collection_list( 'stats', 'view',
+					'admin.php?ctrl=stats&amp;tab='.$tab.'&amp;blog=%d' );
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -216,6 +206,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.34  2007/03/20 09:53:26  fplanque
+ * Letting boggers view their own stats.
+ * + Letthing admins view the aggregate by default.
+ *
  * Revision 1.33  2007/03/02 01:36:51  fplanque
  * small fixes
  *
