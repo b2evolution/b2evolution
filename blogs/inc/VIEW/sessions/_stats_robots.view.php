@@ -25,6 +25,12 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * View funcs
+ */
+require_once dirname(__FILE__).'/_stats_view.funcs.php';
+
+
 global $blog, $admin_url, $rsc_url;
 
 echo '<h2>'.T_('Robot hits').'</h2>';
@@ -269,6 +275,10 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2007/03/20 09:53:26  fplanque
+ * Letting boggers view their own stats.
+ * + Letthing admins view the aggregate by default.
+ *
  * Revision 1.5  2007/02/10 17:55:25  waltercruz
  * Changing double quotes to single quotes and the MySQL date functions to the standart ones
  *

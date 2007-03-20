@@ -25,6 +25,12 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * View funcs
+ */
+require_once dirname(__FILE__).'/_stats_view.funcs.php';
+
+
 global $blog, $admin_url, $rsc_url;
 
 global $dtyp_normal, $dtyp_searcheng, $dtyp_aggregator, $dtyp_unknown;
@@ -156,6 +162,10 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.7  2007/03/20 09:53:26  fplanque
+ * Letting boggers view their own stats.
+ * + Letthing admins view the aggregate by default.
+ *
  * Revision 1.6  2006/11/26 01:42:10  fplanque
  * doc
  *

@@ -1212,6 +1212,9 @@ class AdminUI_general
 		global $Plugins;
 		global $blog, $loc_transinfo, $ctrl;
 		global $Settings;
+    /**
+		 * @var User
+		 */
 		global $current_User;
 
 		if( !empty($this->_menus) )
@@ -1251,14 +1254,24 @@ class AdminUI_general
 		}
 
 
-		if( $current_User->check_perm( 'stats', 'view' ) )
-		{	// Permission to view stats:
+		if( $current_User->check_perm( 'stats', 'list' ) )
+		{	// Permission to view stats for user's blogs:
+			if( $current_User->check_perm( 'stats', 'view' ) )
+			{	// We have permission to view all stats,
+				// we'll assume that we want to view th aggregate stats and not the current blog stats
+				// fp> TODO: it might be useful to have a user pref for [View aggregate stats by default] vs [View current blog stats by default]
+				$default = 'admin.php?ctrl=stats&amp;blog=0';
+			}
+			else
+			{
+				$default = 'admin.php?ctrl=stats';
+			}
 			$this->add_menu_entries(
 					NULL, // root
 					array(
 						'stats' => array(
 							'text' => T_('Stats'),
-							'href' => 'admin.php?ctrl=stats',
+							'href' => $default,
 							'entries' => array(
 								'summary' => array(
 									'text' => T_('Hit summary'),
@@ -1287,12 +1300,21 @@ class AdminUI_general
 								'domains' => array(
 									'text' => T_('Referring domains'),
 									'href' => 'admin.php?ctrl=stats&amp;tab=domains&amp;blog='.$blog ),
-								'sessions' => array(
-									'text' => T_('Sessions'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;blog='.$blog ),
 							)
 						),
 					) );
+		}
+
+		if( $blog == 0 && $current_User->check_perm( 'stats', 'view' ) )
+		{	// Viewing aggregate + Permission to view stats for ALL blogs:
+			$this->add_menu_entries(
+					'stats',
+					array(
+						'sessions' => array(
+							'text' => T_('Sessions'),
+							'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;blog='.$blog ),
+						)
+				);
 		}
 
 
@@ -1592,6 +1614,10 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.46  2007/03/20 09:53:26  fplanque
+ * Letting boggers view their own stats.
+ * + Letthing admins view the aggregate by default.
+ *
  * Revision 1.45  2007/03/07 04:52:00  fplanque
  * Check perms while building the menu:
  * so much easier and so much more flexible

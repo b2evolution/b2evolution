@@ -238,6 +238,9 @@ class Group extends DataObject
 						}
 						// ... or for any lower priority perm... (no break)
 
+					case 'user':
+						// This is for stats. User perm can grant permissions in the User class
+						// Here it will just allow to list
 					case 'list':
 						// User can only ask for list perm
 						if( $permlevel == 'list' )
@@ -410,6 +413,15 @@ class Group extends DataObject
 		// Check if permission is granted:
 		switch( $permname )
 		{
+			case 'stats':
+				// Wiewing stats is the same perm as being authorized to edit properties: (TODO...)
+				if( $permlevel == 'view' )
+				{
+					return $this->blog_post_statuses[$perm_target_blog]['blog_properties'];
+				}
+				// No other perm can be granted here (TODO...)
+				return false;
+
 			case 'blog_genstatic':
 				// generate static pages is not currently a group permission.  if you are here user is denied already anyway
 				return (false);
@@ -446,6 +458,10 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2007/03/20 09:53:26  fplanque
+ * Letting boggers view their own stats.
+ * + Letthing admins view the aggregate by default.
+ *
  * Revision 1.9  2007/03/07 02:34:29  fplanque
  * Fixed very sneaky bug
  *

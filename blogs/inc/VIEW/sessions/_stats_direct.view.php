@@ -25,6 +25,12 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * View funcs
+ */
+require_once dirname(__FILE__).'/_stats_view.funcs.php';
+
+
 global $blog, $admin_url, $rsc_url;
 
 ?>
@@ -89,6 +95,10 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.4  2007/03/20 09:53:26  fplanque
+ * Letting boggers view their own stats.
+ * + Letthing admins view the aggregate by default.
+ *
  * Revision 1.3  2006/11/24 18:27:26  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

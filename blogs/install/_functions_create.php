@@ -100,7 +100,7 @@ function create_default_data()
 	$Group_Privileged->set( 'name', 'Privileged Bloggers' );
 	$Group_Privileged->set( 'perm_admin', 'visible' );
 	$Group_Privileged->set( 'perm_blogs', 'viewall' );
-	$Group_Privileged->set( 'perm_stats', 'view' );
+	$Group_Privileged->set( 'perm_stats', 'user' );
 	$Group_Privileged->set( 'perm_spamblacklist', 'edit' );
 	$Group_Privileged->set( 'perm_files', 'add' );
 	$Group_Privileged->set( 'perm_options', 'view' );
@@ -611,6 +611,10 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.219  2007/03/20 09:53:26  fplanque
+ * Letting boggers view their own stats.
+ * + Letthing admins view the aggregate by default.
+ *
  * Revision 1.218  2007/03/18 01:39:54  fplanque
  * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
  * (more to come)

@@ -35,18 +35,7 @@ require_once $model_path.'sessions/_hitlist.class.php';
 /**
  * @var User
  */
-function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
-{
-	if( !empty( $hit_blog_ID ) )
-	{
-		$BlogCache = & get_Cache( 'BlogCache' );
-		$tmp_Blog = & $BlogCache->get_by_ID( $hit_blog_ID );
-		$full_url = $tmp_Blog->get('baseurlroot').$hit_uri;
-	}
-	else
-	{
-		$full_url = $hit_uri;
-	}
+global $current_User;
 
 // Do we have permission to view all stats (aggregated stats) ?
 $perm_view_all = $current_User->check_perm( 'stats', 'view' );
@@ -206,7 +195,7 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.34  2007/03/20 09:53:26  fplanque
+ * Revision 1.35  2007/03/20 09:55:06  fplanque
  * Letting boggers view their own stats.
  * + Letthing admins view the aggregate by default.
  *

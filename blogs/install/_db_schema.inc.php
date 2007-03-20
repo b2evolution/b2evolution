@@ -26,7 +26,7 @@ $schema_queries = array(
 			grp_name varchar(50) NOT NULL default '',
 			grp_perm_admin enum('none','hidden','visible') NOT NULL default 'visible',
 			grp_perm_blogs enum('user','viewall','editall') NOT NULL default 'user',
-			grp_perm_stats enum('none','view','edit') NOT NULL default 'none',
+			grp_perm_stats enum('none','user','view','edit') NOT NULL default 'none',
 			grp_perm_spamblacklist enum('none','view','edit') NOT NULL default 'none',
 			grp_perm_options enum('none','view','edit') NOT NULL default 'none',
 			grp_perm_users enum('none','view','edit') NOT NULL default 'none',
@@ -526,6 +526,10 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.54  2007/03/20 09:53:26  fplanque
+ * Letting boggers view their own stats.
+ * + Letthing admins view the aggregate by default.
+ *
  * Revision 1.53  2007/03/11 22:48:19  fplanque
  * handling of permission to redirect posts
  *

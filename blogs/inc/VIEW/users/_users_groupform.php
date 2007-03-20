@@ -108,7 +108,8 @@ $Form->begin_fieldset( T_('Permissions for members of this group') );
 
 	$Form->radio( 'edited_grp_perm_stats', $edited_Group->get('perm_stats'),
 			array(  $perm_none_option,
-							array( 'view', T_('View only') ),
+							array( 'user', T_('User blogs') ), // fp> dirty hack, I'll tie this to blog edit perm for now
+							array( 'view', T_('View all') ),
 							array( 'edit', T_('Full Access') )
 						), T_('Stats') );
 
@@ -165,6 +166,10 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.10  2007/03/20 09:53:26  fplanque
+ * Letting boggers view their own stats.
+ * + Letthing admins view the aggregate by default.
+ *
  * Revision 1.9  2007/01/23 04:20:31  fplanque
  * wording
  *
