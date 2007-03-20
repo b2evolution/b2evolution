@@ -3,11 +3,9 @@
  * This file implements the UI controller for file management.
  *
  * NOTE: $fm_mode gets used for modes, that allow browsing to some other place or
- *       take other actions. A good example is "upload" - you can delete other files while
- *       in upload mode.
- *       "edit_perms" for example is not a mode, but a action.
+ *       take other actions.
  *
- * fp>> There should actually be no modes. Only geeks can understand & use them. And not all geeks might actually ever find an opportunity to want to use them. All we need is a dir selection tree inside of upload and move.
+ * fp>> There should actually be less modes. Only geeks can understand & use them. And not all geeks might actually ever find an opportunity to want to use them. All we need is a dir selection tree inside of upload and move.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -683,12 +681,14 @@ switch( $action )
 			{
 				if( $l_File->unlink() )
 				{
-					$Messages->add( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.') : T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success' );
+					$Messages->add( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
+									: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success' );
 					$fm_Filelist->remove( $l_File );
 				}
 				else
 				{
-					$Messages->add( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).') : T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error' );
+					$Messages->add( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
+									: T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error' );
 				}
 			}
 			$action = 'list';
@@ -1041,7 +1041,7 @@ switch( $action )
 				}
 
 				$oldperms = $l_File->get_perms( 'raw' );
-				$newperms = $l_File->chmod( $chmod );
+				$newperms = $l_File->chmod( octdec( $chmod ) );
 
 				if( $newperms === false )
 				{
@@ -1320,6 +1320,9 @@ switch( $fm_mode )
 				}
 				else debug_die( 'Unhandled file copy/move mode' );
 			}
+
+			// EXIT MODE:
+			$fm_mode = NULL;
 		}
 		break;
 
@@ -1479,6 +1482,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.57  2007/03/20 07:39:08  fplanque
+ * filemanager fixes, including the chmod octal stuff
+ *
  * Revision 1.56  2007/03/07 04:50:04  fplanque
  * fixed perm checks
  *

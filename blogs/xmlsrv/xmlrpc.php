@@ -1214,7 +1214,8 @@ function mwnewMediaObject($m) {
 
 	// chmod uploaded file:
 	$oldumask = umask(0000);
-	@chmod($fileupload_path.$filename, $Settings->get('fm_default_chmod_file'));
+	$chmod = $Settings->get('fm_default_chmod_file');
+	@chmod($fileupload_path.$filename, octdec( $chmod ));
 	umask($oldumask);
 
 	$url = $Blog->get_media_url().$filepath.$filename;
@@ -2238,6 +2239,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.133  2007/03/20 07:39:08  fplanque
+ * filemanager fixes, including the chmod octal stuff
+ *
  * Revision 1.132  2007/03/11 23:57:07  fplanque
  * item editing: allow setting to 'redirected' status
  *

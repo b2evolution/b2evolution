@@ -116,7 +116,7 @@ function load_image( $path, $mimetype )
  * @param string pathname of image file
  * @param string
  * @param integer
- * @param integer permissions
+ * @param string permissions
  * @return string
  */
 function save_image( $imh, $path, $mimetype, $quality = 90, $chmod = NULL )
@@ -147,7 +147,7 @@ function save_image( $imh, $path, $mimetype, $quality = 90, $chmod = NULL )
 			global $Settings;
 			$chmod = $Settings->get('fm_default_chmod_dir');
 		}
-		chmod( $path, $chmod );
+		chmod( $path, octdec( $chmod ) );
 	}
 
 	return $err;
@@ -221,6 +221,9 @@ function generate_thumb( $src_imh, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.7  2007/03/20 07:39:08  fplanque
+ * filemanager fixes, including the chmod octal stuff
+ *
  * Revision 1.6  2007/03/08 00:22:35  blueyed
  * TODO
  *
