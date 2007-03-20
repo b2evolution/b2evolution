@@ -1009,6 +1009,10 @@ class File extends DataObject
 			return false;
 		}
 
+		// Delete thumb caches for old name:
+		// Note: new name = new usage : there is a fair chance we won't need the same cache sizes in the new loc.
+		$this->rm_cache();
+
 		// Get Meta data (before we change name) (we may need to update it later):
 		$this->load_meta();
 
@@ -1071,6 +1075,10 @@ class File extends DataObject
 		{
 			return false;
 		}
+
+		// Delete thumb caches from old location:
+		// Note: new location = new usage : there is a fair chance we won't need the same cache sizes in the new loc.
+		$this->rm_cache();
 
 		// Get Meta data (before we change name) (we may need to update it later):
 		$this->load_meta();
@@ -1171,6 +1179,10 @@ class File extends DataObject
 			$this->dbdelete();
 		}
 
+		//Remove thumb cache:
+		$this->rm_cache();
+
+		// Physically remove file from disk:
 		if( $this->is_dir() )
 		{
 			$unlinked =	@rmdir( $this->_adfp_full_path );
@@ -1199,7 +1211,7 @@ class File extends DataObject
 	 * Change file permissions on disk.
 	 *
 	 * @access public
-	 * @param string|NULL chmod (octal three-digit-format, eg '777'), uses {@link $Settings} for NULL
+	 * @param string chmod (octal three-digit-format, eg '777'), uses {@link $Settings} for NULL
 	 *                    (fm_default_chmod_dir, fm_default_chmod_file)
 	 * @return mixed new permissions on success (octal format), false on failure
 	 */
@@ -1214,8 +1226,7 @@ class File extends DataObject
 				: $Settings->get( 'fm_default_chmod_file' );
 		}
 
-		$chmod = octdec( $chmod );
-		if( @chmod( $this->_adfp_full_path, $chmod ) )
+		if( @chmod( $this->_adfp_full_path, octdec( $chmod ) ) )
 		{
 			clearstatcache();
 			// update current entry
@@ -1501,7 +1512,7 @@ class File extends DataObject
 
 	
 	/**
-	 * Get the full path to the thumbnail for this file.
+	 * Get the full path to the thumbnail cache for this file.
 	 *
 	 * ads = Absolute Directory Slash
 	 *
@@ -1527,6 +1538,22 @@ class File extends DataObject
 
 		return $adp_evocache.'/';
 	}
+
+
+  /**
+	 * Delete cache for a file
+	 */
+	function rm_cache()
+	{
+		// Remove cached elts for teh current file:
+		$ads_filecache = $this->get_ads_evocache( false );
+		rmdir_r( $ads_filecache );
+
+		// In case cache is now empty, delete the folder:
+		$adp_evocache = $this->_dir.'.evocache';
+		@rmdir( $adp_evocache );
+	}
+
 
 	/**
 	 * Get the full path to the thumbanil for this file.
@@ -1699,6 +1726,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.42  2007/03/20 07:43:44  fplanque
+ * .evocache cleanup triggers
+ *
  * Revision 1.41  2007/03/05 02:13:26  fplanque
  * improved dashboard
  *
@@ -1767,231 +1797,5 @@ class File extends DataObject
  *
  * Revision 1.21  2006/11/19 23:43:04  blueyed
  * Optimized icon and $IconLegend handling
- *
- * Revision 1.20  2006/09/30 16:55:58  blueyed
- * $create param for media dir handling, which allows to just get the dir, without creating it.
- *
- * Revision 1.19  2006/09/10 14:50:48  fplanque
- * minor / doc
- *
- * Revision 1.18  2006/09/08 15:33:43  blueyed
- * minor
- *
- * Revision 1.17  2006/08/19 08:50:26  fplanque
- * moved out some more stuff from main
- *
- * Revision 1.16  2006/08/19 07:56:30  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.15  2006/08/05 17:17:59  blueyed
- * todo for windows
- *
- * Revision 1.14  2006/07/12 20:17:13  fplanque
- * minor
- *
- * Revision 1.13  2006/07/07 22:48:26  blueyed
- * Fixed get_tag() to include meta data.
- *
- * Revision 1.12  2006/06/19 20:59:37  fplanque
- * noone should die anonymously...
- *
- * Revision 1.11  2006/04/19 20:13:50  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.10  2006/04/12 19:40:37  fplanque
- * minor fixes
- *
- * Revision 1.9  2006/03/29 23:24:01  blueyed
- * Fixed linking of files.
- *
- * Revision 1.8  2006/03/20 20:06:02  fplanque
- * fixed IMG button, again :(
- *
- * Revision 1.7  2006/03/12 23:08:58  fplanque
- * doc cleanup
- *
- * Revision 1.6  2006/03/12 20:07:00  blueyed
- * re-adding re-moved todo
- *
- * Revision 1.4  2006/03/12 03:03:32  blueyed
- * Fixed and cleaned up "filemanager".
- *
- * Revision 1.2  2006/02/27 23:58:01  blueyed
- * todo
- *
- * Revision 1.1  2006/02/23 21:11:57  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.63  2006/02/13 21:40:30  fplanque
- * fixed memorizing of the mode when uploading/inserting IMGs into posts.
- *
- * Revision 1.62  2006/02/10 22:05:07  fplanque
- * Normalized itm links
- *
- * Revision 1.61  2006/01/26 19:27:58  fplanque
- * no message
- *
- * Revision 1.60  2006/01/20 16:40:56  blueyed
- * Cleanup
- *
- * Revision 1.59  2006/01/10 10:36:31  blueyed
- * Suppress warnings for dangling symlinks
- *
- * Revision 1.58  2006/01/09 21:57:26  blueyed
- * get_fsgroup_name(), get_fsowner_name(): fix for root (ID 0)
- *
- * Revision 1.57  2005/12/19 16:42:03  fplanque
- * minor
- *
- * Revision 1.56  2005/12/16 16:59:13  blueyed
- * (Optional) File owner and group columns in Filemanager.
- *
- * Revision 1.55  2005/12/16 14:57:18  blueyed
- * Valid target for popup link
- *
- * Revision 1.54  2005/12/14 19:33:10  fplanque
- * more responsibility given to the file class, but the file class still can work standalone (without a filemanager)
- *
- * Revision 1.53  2005/12/12 19:21:21  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.52  2005/12/10 02:54:33  blueyed
- * Default chmod moved to $Settings again
- *
- * Revision 1.51  2005/11/24 08:43:34  blueyed
- * doc
- *
- * Revision 1.50  2005/11/22 13:43:33  fplanque
- * doc
- *
- * Revision 1.49  2005/11/22 04:47:59  blueyed
- * rename_to(): return false if file exists!
- *
- * Revision 1.48  2005/11/22 04:15:58  blueyed
- * doc; dbupdate()/dbinsert(): return value
- *
- * Revision 1.47  2005/11/21 18:33:19  fplanque
- * Too many undiscussed changes all around: Massive rollback! :((
- * As said before, I am only taking CLEARLY labelled bugfixes.
- *
- * Revision 1.43  2005/11/18 07:53:05  blueyed
- * use $_FileRoot / $FileRootCache for absolute path, url and name of roots.
- *
- * Revision 1.42  2005/09/06 17:13:54  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.41  2005/08/12 17:41:10  fplanque
- * cleanup
- *
- * Revision 1.40  2005/08/08 18:30:49  fplanque
- * allow inserting of files as IMG or A HREFs from the filemanager
- *
- * Revision 1.39  2005/07/29 17:56:17  fplanque
- * Added functionality to locate files when they're attached to a post.
- * permission checking remains to be done.
- *
- * Revision 1.38  2005/07/26 18:50:39  fplanque
- * enhanced attached file handling
- *
- * Revision 1.37  2005/07/12 22:58:31  blueyed
- * Suppress php's chmod() warnings.
- *
- * Revision 1.36  2005/05/24 15:26:52  fplanque
- * cleanup
- *
- * Revision 1.35  2005/05/17 19:26:07  fplanque
- * FM: copy / move debugging
- *
- * Revision 1.34  2005/05/13 18:41:28  fplanque
- * made file links clickable... finally ! :P
- *
- * Revision 1.33  2005/05/12 18:39:24  fplanque
- * storing multi homed/relative pathnames for file meta data
- *
- * Revision 1.32  2005/05/11 17:53:47  fplanque
- * started multiple roots handling in file meta data
- *
- * Revision 1.31  2005/04/29 18:49:32  fplanque
- * Normalizing, doc, cleanup
- *
- * Revision 1.30  2005/04/28 20:44:20  fplanque
- * normalizing, doc
- *
- * Revision 1.29  2005/04/27 19:05:46  fplanque
- * normalizing, cleanup, documentaion
- *
- * Revision 1.27  2005/04/19 18:04:38  fplanque
- * implemented nested transactions for MySQL
- *
- * Revision 1.26  2005/04/19 16:23:02  fplanque
- * cleanup
- * added FileCache
- * improved meta data handling
- *
- * Revision 1.25  2005/04/15 18:02:59  fplanque
- * finished implementation of properties/meta data editor
- * started implementation of files to items linking
- *
- * Revision 1.24  2005/04/13 17:48:22  fplanque
- * File manager refactoring
- * storing of file meta data through upload
- * displaying or metadate in previews
- *
- * Revision 1.23  2005/02/28 09:06:33  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.22  2005/02/21 00:34:34  blueyed
- * check for defined DB_USER!
- *
- * Revision 1.21  2005/02/18 19:16:15  fplanque
- * started relation restriction/cascading handling
- *
- * Revision 1.20  2005/01/27 13:34:58  fplanque
- * i18n tuning
- *
- * Revision 1.18  2005/01/21 20:47:46  blueyed
- * doc, getLastMod() extended
- *
- * Revision 1.16  2005/01/16 18:32:27  blueyed
- * doc, whitespace
- *
- * Revision 1.15  2005/01/15 20:20:51  blueyed
- * $map_iconsizes merged with $map_iconfiles, removed obsolete getIconSize() (functionality moved to get_icon())
- *
- * Revision 1.14  2005/01/12 20:22:51  fplanque
- * started file/dataobject linking
- *
- * Revision 1.13  2005/01/12 16:07:54  fplanque
- * documentation
- *
- * Revision 1.12  2005/01/08 01:24:18  blueyed
- * filelist refactoring
- *
- * Revision 1.11  2005/01/06 11:31:45  blueyed
- * bugfixes
- *
- * Revision 1.10  2005/01/05 03:04:00  blueyed
- * refactored
- *
- * Revision 1.6  2004/11/03 00:58:02  blueyed
- * update
- *
- * Revision 1.5  2004/10/24 22:55:12  blueyed
- * upload, fixes, ..
- *
- * Revision 1.4  2004/10/23 23:07:16  blueyed
- * case-insensitive for windows!
- *
- * Revision 1.2  2004/10/16 01:31:22  blueyed
- * documentation changes
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.11  2004/10/12 10:27:18  fplanque
- * Edited code documentation.
- *
  */
 ?>

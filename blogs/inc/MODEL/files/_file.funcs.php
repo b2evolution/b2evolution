@@ -215,29 +215,43 @@ function get_dirsize_recursive( $path )
 
 
 /**
- * Deletes a dir recursive, wiping out all subdirectories!!
+ * Deletes a dir recursively, wiping out all subdirectories!!
  *
  * @param string the dir
  */
-function deldir_recursive( $dir )
+function rmdir_r( $path )
 {
-	$toDelete = get_filenames( $dir );
-	$toDelete = array_reverse( $toDelete );
-	$toDelete[] = $dir;
+	$path = trailing_slash( $path );
+	// echo "<br>rmdir_r($path)";
 
-	while( list( $lKey, $lPath ) = each( $toDelete ) )
+	if( $dir = @opendir($path) )
 	{
-		if( is_dir( $lPath ) )
+		while( ( $file = readdir($dir) ) !== false )
 		{
-			rmdir( $lPath );
-		}
-		else
-		{
-			unlink( $lPath );
-		}
-	}
+			if( $file == '.' || $file == '..' )
+			{
+				continue;
+			}
 
-	return true;
+			$adfp_filepath = $path.$file;
+
+			// echo "<br> - $os_filepath ";
+
+			if( is_dir( $adfp_filepath ) )
+			{
+				// echo 'D';
+				rmdir_r( $adfp_filepath );
+			}
+			else
+			{
+				//echo 'F';
+				@unlink( $adfp_filepath );
+			}
+		}
+		closedir($dir);
+
+		@rmdir( $path );
+	}
 }
 
 
@@ -752,8 +766,10 @@ function mkdir_r( $dirName, $chmod = NULL )
 
 
 /*
- * {{{ Revision log:
  * $Log$
+ * Revision 1.52  2007/03/20 07:43:44  fplanque
+ * .evocache cleanup triggers
+ *
  * Revision 1.51  2007/03/04 05:24:52  fplanque
  * some progress on the toolbar menu
  *
@@ -830,199 +846,5 @@ function mkdir_r( $dirName, $chmod = NULL )
  *
  * Revision 1.25  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.24  2006/09/30 16:55:58  blueyed
- * $create param for media dir handling, which allows to just get the dir, without creating it.
- *
- * Revision 1.23  2006/09/30 16:41:00  blueyed
- * Reverted last rev
- *
- * Revision 1.22  2006/09/14 22:06:38  blueyed
- * get_directory_tree(): link to "fm_browser" anchor/id, at the top of the filelist
- *
- * Revision 1.21  2006/08/19 08:50:26  fplanque
- * moved out some more stuff from main
- *
- * Revision 1.20  2006/08/19 07:56:30  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.19  2006/08/03 20:50:25  blueyed
- * Did not mean to commit this (display all user dirs for admin users)
- *
- * Revision 1.17  2006/04/19 20:13:50  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.16  2006/04/18 00:00:59  blueyed
- * *** empty log message ***
- *
- * Revision 1.15  2006/04/14 19:34:40  fplanque
- * folder tree reorganization
- *
- * Revision 1.14  2006/04/13 00:10:52  blueyed
- * cleanup
- *
- * Revision 1.13  2006/04/12 19:12:58  fplanque
- * partial cleanup
- *
- * Revision 1.12  2006/03/26 20:24:19  blueyed
- * doc
- *
- * Revision 1.11  2006/03/26 14:00:49  blueyed
- * Made Filelist constructor more decent
- *
- * Revision 1.10  2006/03/26 02:37:57  blueyed
- * Directory tree next to files list.
- *
- * Revision 1.9  2006/03/24 19:53:35  blueyed
- * str_replace() is not regexp..
- *
- * Revision 1.8  2006/03/24 19:38:21  fplanque
- * fixed nasty regexp
- *
- * Revision 1.7  2006/03/18 14:21:16  blueyed
- * *** empty log message ***
- *
- * Revision 1.6  2006/03/17 18:05:44  fplanque
- * bugfixes
- *
- * Revision 1.5  2006/03/16 19:26:04  fplanque
- * Fixed & simplified media dirs out of web root.
- *
- * Revision 1.4  2006/03/15 22:53:31  blueyed
- * cosmetic
- *
- * Revision 1.3  2006/03/12 23:08:58  fplanque
- * doc cleanup
- *
- * Revision 1.2  2006/03/12 03:03:32  blueyed
- * Fixed and cleaned up "filemanager".
- *
- * Revision 1.1  2006/02/23 21:11:57  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.41  2006/01/09 19:27:57  blueyed
- * Fixed check_canonical_path() for non-existing paths with leading slash.
- *
- * Revision 1.39  2005/12/15 19:12:54  blueyed
- * Typo. consistent wording.
- *
- * Revision 1.38  2005/12/14 19:36:16  fplanque
- * Enhanced file management
- *
- * Revision 1.37  2005/12/12 19:21:22  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.36  2005/12/08 22:35:23  blueyed
- * Merged rel_path_to_base() from post-phoenix
- *
- * Revision 1.35  2005/11/23 23:53:24  blueyed
- * Sorry, encoding messed up (latin1 again).
- *
- * Revision 1.34  2005/11/23 22:52:44  blueyed
- * minor (translation strings)
- *
- * Revision 1.33  2005/11/21 18:33:19  fplanque
- * Too many undiscussed changes all around: Massive rollback! :((
- * As said before, I am only taking CLEARLY labelled bugfixes.
- *
- * Revision 1.30  2005/11/18 07:53:05  blueyed
- * use $_FileRoot / $FileRootCache for absolute path, url and name of roots.
- *
- * Revision 1.29  2005/11/09 02:53:13  blueyed
- * made bytesreadable() more readable
- *
- * Revision 1.28  2005/11/02 20:11:19  fplanque
- * "containing entropy"
- *
- * Revision 1.27  2005/11/02 00:42:30  blueyed
- * Added get_admin_skins() and use it to perform additional checks (if there's a _adminUI.class.php file in there). Thinkl "CVS".. :)
- *
- * Revision 1.26  2005/11/02 00:03:46  blueyed
- * Fixed get_filenames() $basename behaviour.. sorry.
- *
- * Revision 1.25  2005/11/01 21:55:54  blueyed
- * Renamed retrieveFiles() to get_filenames(), added $basename parameter and fixed inner recursion (wrong params where given)
- *
- * Revision 1.24  2005/09/29 15:07:30  fplanque
- * spelling
- *
- * Revision 1.23  2005/09/06 17:13:54  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.22  2005/07/26 18:50:47  fplanque
- * enhanced attached file handling
- *
- * Revision 1.21  2005/06/20 17:40:23  fplanque
- * minor
- *
- * Revision 1.20  2005/05/24 15:26:52  fplanque
- * cleanup
- *
- * Revision 1.19  2005/05/17 19:26:07  fplanque
- * FM: copy / move debugging
- *
- * Revision 1.18  2005/05/13 18:41:28  fplanque
- * made file links clickable... finally ! :P
- *
- * Revision 1.17  2005/05/13 16:49:17  fplanque
- * Finished handling of multiple roots in storing file data.
- * Also removed many full paths passed through URL requests.
- * No full path should ever be seen by the user (only the admins).
- *
- * Revision 1.16  2005/05/12 18:39:24  fplanque
- * storing multi homed/relative pathnames for file meta data
- *
- * Revision 1.15  2005/04/29 18:49:32  fplanque
- * Normalizing, doc, cleanup
- *
- * Revision 1.14  2005/04/28 20:44:20  fplanque
- * normalizing, doc
- *
- * Revision 1.13  2005/04/27 19:05:46  fplanque
- * normalizing, cleanup, documentaion
- *
- * Revision 1.12  2005/04/19 16:23:02  fplanque
- * cleanup
- * added FileCache
- * improved meta data handling
- *
- * Revision 1.11  2005/02/28 09:06:33  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.10  2005/01/15 17:30:08  blueyed
- * regexp_fileman moved to $Settings
- *
- * Revision 1.9  2005/01/13 20:27:07  blueyed
- * doc
- *
- * Revision 1.8  2005/01/05 03:04:00  blueyed
- * refactored
- *
- * Revision 1.7  2004/12/31 17:43:09  blueyed
- * enhanced bytesreadable(), fixed deldir_recursive()
- *
- * Revision 1.6  2004/12/30 16:45:40  fplanque
- * minor changes on file manager user interface
- *
- * Revision 1.5  2004/12/29 02:25:55  blueyed
- * no message
- *
- * Revision 1.3  2004/10/21 00:14:44  blueyed
- * moved
- *
- * Revision 1.2  2004/10/14 18:31:25  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.10  2004/10/12 22:33:40  blueyed
- * minor doc formatation
- *
- * Revision 1.9  2004/10/12 17:22:30  fplanque
- * Edited code documentation.
- * }}}
  */
 ?>
