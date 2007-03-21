@@ -266,7 +266,7 @@ switch( $action )
 		$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $edited_Item ) );
 
 		if( $Messages->count('error') )
-		{	// There hace been some validation errors:
+		{	// There have been some validation errors:
 			// Params we need for tab switching:
 			$tab_switch_params = 'blog='.$blog;
 			break;
@@ -295,9 +295,11 @@ switch( $action )
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
+		// REDIRECT / EXIT
+		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID );
 		// Switch to list mode:
-		$action = 'list';
-		init_list_mode();
+		// $action = 'list';
+		//init_list_mode();
 		break;
 
 
@@ -354,9 +356,11 @@ switch( $action )
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
+		// REDIRECT / EXIT
+		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID );
 		// Switch to list mode:
-		$action = 'list';
-		init_list_mode();
+		// $action = 'list';
+		// init_list_mode();
 		break;
 
 
@@ -383,9 +387,11 @@ switch( $action )
 
 		$Messages->add( T_('Post has been published.'), 'success' );
 
+		// REDIRECT / EXIT
+		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID );
 		// Switch to list mode:
-		$action = 'list';
-		init_list_mode();
+		// $action = 'list';
+		// init_list_mode();
 		break;
 
 
@@ -404,9 +410,11 @@ switch( $action )
 
 		$Messages->add( T_('Post has been deprecated.'), 'success' );
 
+		// REDIRECT / EXIT
+		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID );
 		// Switch to list mode:
-		$action = 'list';
-		init_list_mode();
+		// $action = 'list';
+		// init_list_mode();
 		break;
 
 
@@ -429,9 +437,11 @@ switch( $action )
 			$Messages->add( T_('Post has been deleted.'), 'success' );
 		}
 
+		// REDIRECT / EXIT
+		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID );
 		// Switch to list mode:
-		$action = 'list';
-		init_list_mode();
+		// $action = 'list';
+		// init_list_mode();
 		break;
 
 
@@ -652,11 +662,6 @@ switch( $action )
 
 			switch( $tab )
 			{
-				case 'full':
-					// Display VIEW:
-					$AdminUI->disp_view( 'items/_browse_posts_exp.inc.php' );
-					break;
-
 				case 'list':
 					// Display VIEW:
 					$AdminUI->disp_view( 'items/_browse_posts_list2.view.php' );
@@ -667,9 +672,13 @@ switch( $action )
 					$AdminUI->disp_view( 'items/_browse_tracker.inc.php' );
 					break;
 
+				case 'full':
 				default:
-					debug_die( 'unhandled display type:'.htmlspecialchars($tab) );
+					// Display VIEW:
+					$AdminUI->disp_view( 'items/_browse_posts_exp.inc.php' );
+					break;
 			}
+
 		echo '</td>';
 
 		echo '<td class="browse_right_col">';
@@ -690,6 +699,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2007/03/21 01:44:51  fplanque
+ * item controller: better return to current filterset - step 1
+ *
  * Revision 1.17  2007/03/11 23:56:03  fplanque
  * fixed some post editing oddities / variable cleanup (more could be done)
  *

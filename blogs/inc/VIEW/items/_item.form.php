@@ -56,14 +56,14 @@ global $edit_date, $bozo_start_modified, $creating;
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
 
-$Form = & new Form( NULL, 'item_checkchanges', 'post', 'none' );
-$Form->fieldstart = '<div class="tile">';
-$Form->fieldend = '</div>';
+$Form = & new Form( NULL, 'item_checkchanges', 'post', 'linespan' );
 $Form->labelstart = '<strong>';
 $Form->labelend = "</strong>\n";
 
 
 // ================================ START OF EDIT FORM ================================
+
+$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'post_ID,tab,action', 'filter=restore' ), T_('cancel'), 4, 1 );
 
 $params = array();
 if( !empty( $bozo_start_modified ) )
@@ -335,6 +335,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.39  2007/03/21 01:44:51  fplanque
+ * item controller: better return to current filterset - step 1
+ *
  * Revision 1.38  2007/03/11 23:56:02  fplanque
  * fixed some post editing oddities / variable cleanup (more could be done)
  *

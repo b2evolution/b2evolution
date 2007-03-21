@@ -50,7 +50,7 @@ $postIDarray = $ItemList->get_page_ID_array();
 
 if( $action == 'view' )
 {	// We are displaying a single post:
-	echo '<div class="floatright">'.action_icon( T_('Close post'), 'close', regenerate_url( 'p,action' ), T_('close'), 4, 1 ).'</div>';
+	echo '<div class="floatright">'.action_icon( T_('Close post'), 'close', regenerate_url( 'p,action', 'filter=restore' ), T_('close'), 4, 1 ).'</div>';
 }
 
 // Display title depending on selection params:
@@ -316,6 +316,9 @@ if( $action == 'list' )
 
 /*
  * $Log$
+ * Revision 1.34  2007/03/21 01:44:51  fplanque
+ * item controller: better return to current filterset - step 1
+ *
  * Revision 1.33  2007/03/06 12:18:09  fplanque
  * got rid of dirty Item::content()
  * Advantage: the more link is now independant. it can be put werever people want it

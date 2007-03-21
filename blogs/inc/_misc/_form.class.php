@@ -227,8 +227,8 @@ class Form extends Widget
 
 			case 'linespan':
 				$this->formstart = '';
-				$this->title_fmt = '$title$'."\n"; // TODO: icons
-				$this->no_title_fmt = '';          //           "
+				$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
+				$this->no_title_fmt = '<span style="float:right">$global_icons$</span>&nbsp;'."\n";
 				$this->fieldstart = '<div class="tile" $ID$>';
 				$this->labelstart = '';
 				$this->labelend = "\n";
@@ -2711,6 +2711,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.73  2007/03/21 01:44:51  fplanque
+ * item controller: better return to current filterset - step 1
+ *
  * Revision 1.72  2007/03/11 21:29:09  fplanque
  * cleanup
  *
