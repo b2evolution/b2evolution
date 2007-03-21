@@ -296,7 +296,7 @@ switch( $action )
 		$Messages->add( T_('Post has been created.'), 'success' );
 
 		// REDIRECT / EXIT
-		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID );
+		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID );
 		// Switch to list mode:
 		// $action = 'list';
 		//init_list_mode();
@@ -357,7 +357,7 @@ switch( $action )
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
 		// REDIRECT / EXIT
-		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID );
+		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID );
 		// Switch to list mode:
 		// $action = 'list';
 		// init_list_mode();
@@ -388,7 +388,7 @@ switch( $action )
 		$Messages->add( T_('Post has been published.'), 'success' );
 
 		// REDIRECT / EXIT
-		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID );
+		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID );
 		// Switch to list mode:
 		// $action = 'list';
 		// init_list_mode();
@@ -411,7 +411,7 @@ switch( $action )
 		$Messages->add( T_('Post has been deprecated.'), 'success' );
 
 		// REDIRECT / EXIT
-		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID );
+		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID );
 		// Switch to list mode:
 		// $action = 'list';
 		// init_list_mode();
@@ -438,7 +438,7 @@ switch( $action )
 		}
 
 		// REDIRECT / EXIT
-		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID );
+		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID );
 		// Switch to list mode:
 		// $action = 'list';
 		// init_list_mode();
@@ -699,6 +699,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2007/03/21 02:21:37  fplanque
+ * item controller: highlight current (step 2)
+ *
  * Revision 1.18  2007/03/21 01:44:51  fplanque
  * item controller: better return to current filterset - step 1
  *

@@ -34,8 +34,15 @@ global $ItemList;
 global $Item;
 
 global $action, $dispatcher, $blog, $posts, $poststart, $postend, $ReqURI;
-global $edit_item_url, $delete_item_url, $htsrv_url;
+global $edit_item_url, $delete_item_url, $htsrv_url, $p;
 global $comment_allowed_tags, $comments_use_autobr;
+
+if( $highlight = param( 'highlight', 'integer', NULL ) )
+{	// There are lines we want to highlight:
+	global $rsc_url;
+	echo '<script type="text/javascript" src="'.$rsc_url.'js/fadeout.js"></script>';
+	echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, false);</script>';
+}
 
 
 // Run the query:
@@ -50,7 +57,8 @@ $postIDarray = $ItemList->get_page_ID_array();
 
 if( $action == 'view' )
 {	// We are displaying a single post:
-	echo '<div class="floatright">'.action_icon( T_('Close post'), 'close', regenerate_url( 'p,action', 'filter=restore' ), T_('close'), 4, 1 ).'</div>';
+	echo '<div class="floatright">'.action_icon( T_('Close post'), 'close',
+				regenerate_url( 'p,action', 'filter=restore&amp;highlight='.$p ), T_('close'), 4, 1 ).'</div>';
 }
 
 // Display title depending on selection params:
@@ -85,13 +93,18 @@ $ItemList->display_nav( 'header' );
 while( $Item = & $ItemList->get_item() )
 {
 	?>
-	<div class="bPost bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
+	<div class="bPost bPost<?php $Item->status( 'raw' ); ?>" lang="<?php $Item->lang() ?>">
 		<?php
 		// We don't switch locales in the backoffice, since we use the user pref anyway
 		// Load item's creator user:
 		$Item->get_creator_User();
 		$Item->anchor(); ?>
-		<div class="bSmallHead">
+		<div class="bSmallHead <?php
+		if( $Item->ID == $highlight )
+		{
+			echo 'fadeout-ffff00" id="fadeout-1';
+		}
+	 	?>">
 			<?php
 				echo '<div class="bSmallHeadRight">';
 				locale_flag( $Item->locale, 'h10px' );
@@ -123,6 +136,7 @@ while( $Item = & $ItemList->get_item() )
 				$Item->priority( T_('Priority').': <span class="bPriority">', '</span> &nbsp; ' );
 				$Item->assigned_to( T_('Assigned to:').' <span class="bAssignee">', '</span> &nbsp; ' );
 				$Item->extra_status( T_('Task Status').': <span class="bExtStatus">', '</span>' );
+				echo '&nbsp;';
 
 				echo '<div class="bSmallHeadRight"><span class="bViews">';
 				$Item->views();
@@ -316,6 +330,9 @@ if( $action == 'list' )
 
 /*
  * $Log$
+ * Revision 1.35  2007/03/21 02:21:37  fplanque
+ * item controller: highlight current (step 2)
+ *
  * Revision 1.34  2007/03/21 01:44:51  fplanque
  * item controller: better return to current filterset - step 1
  *

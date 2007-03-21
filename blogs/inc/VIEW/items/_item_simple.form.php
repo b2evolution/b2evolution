@@ -56,7 +56,7 @@ $Form->labelend = "</strong>\n";
 
 // ================================ START OF EDIT FORM ================================
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'post_ID,tab,action', 'filter=restore' ), T_('cancel'), 4, 1 );
+$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'post_ID,tab,action', 'filter=restore&amp;highlight='.$edited_Item->ID ), T_('cancel'), 4, 1 );
 
 $params = array();
 if( !empty( $bozo_start_modified ) )
@@ -251,6 +251,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.32  2007/03/21 02:21:37  fplanque
+ * item controller: highlight current (step 2)
+ *
  * Revision 1.31  2007/03/21 01:44:51  fplanque
  * item controller: better return to current filterset - step 1
  *

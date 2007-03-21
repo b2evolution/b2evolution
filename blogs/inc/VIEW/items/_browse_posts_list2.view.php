@@ -30,6 +30,15 @@ global $ItemList;
 
 global $edit_item_url, $delete_item_url;
 
+if( $highlight = param( 'highlight', 'integer', NULL ) )
+{	// There are lines we want to highlight:
+	$result_fadeout = array( 'post_ID' => array($highlight) );
+}
+else
+{	// Nothing to highlight
+	$result_fadeout = NULL;
+}
+
 
 // Display title depending on selection params:
 echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
@@ -197,11 +206,14 @@ $postIDlist = $ItemList->get_page_ID_list();
 $postIDarray = $ItemList->get_page_ID_array();
 
 // DISPLAY table now:
-$ItemList->display();
+$ItemList->display( NULL, $result_fadeout );
 
 
 /*
  * $Log$
+ * Revision 1.21  2007/03/21 02:21:37  fplanque
+ * item controller: highlight current (step 2)
+ *
  * Revision 1.20  2007/03/05 02:12:56  fplanque
  * minor
  *
