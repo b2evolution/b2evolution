@@ -355,7 +355,7 @@ class Comment extends DataObject
 			if( strlen( $this->author_User->url ) <= 10 ) $makelink = false;
 			if( $after_user == '#' ) $after_user = ' ['.T_('Member').']';
 			$r .= $before_user;
-			if( $makelink ) $r .= '<a href="'.$this->author_User->url.'">';
+			if( $makelink ) $r .= '<a href="'.htmlspecialchars($this->author_User->url).'">';
 			$r .= $this->author_User->preferred_name( $format, false );
 			if( $makelink ) $r .= '</a>';
 			$r .= $after_user;
@@ -366,7 +366,7 @@ class Comment extends DataObject
 			if( $after == '#' ) $after = ' ['.T_('Visitor').']';
 			$r .= $before;
 
-			if( $makelink ) $r .= '<a href="'.$this->author_url.'">';
+			if( $makelink ) $r .= '<a href="'.htmlspecialchars($this->author_url).'">';
 			$r .= $this->dget( 'author', $format );
 			if( $makelink ) $r .= '</a>';
 			$r .= $after;
@@ -1189,6 +1189,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.61  2007/03/22 00:03:40  blueyed
+ * Escape author_url and author_User->url in author_url() template function
+ *
  * Revision 1.60  2007/03/11 23:57:06  fplanque
  * item editing: allow setting to 'redirected' status
  *
