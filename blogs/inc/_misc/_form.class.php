@@ -2128,15 +2128,17 @@ class Form extends Widget
 	 *
 	 * @param string Field name
 	 * @param string Field value
+	 * @param array Optional params. This is e.g. useful for "id".
+	 *              See {@link $_common_params}.
 	 */
-	function hidden( $field_name, $field_value )
+	function hidden( $field_name, $field_value, $field_params = array() )
 	{
 		if( is_array( $field_value ) )
 		{ // this happens for example when we've POSTed an array (for PHP it's an array then)
 			foreach( $field_value as $l_key => $l_value )
 			{
 				// Recursion:
-				$this->hidden( $field_name.'['.$l_key.']', $l_value );
+				$this->hidden( $field_name.'['.$l_key.']', $l_value, $field_params );
 			}
 		}
 		else
@@ -2711,6 +2713,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.74  2007/03/23 14:33:23  blueyed
+ * Re-added $field_params for hidden(), which is needed, e.g. when adding an id to a hidden form element.
+ *
  * Revision 1.73  2007/03/21 01:44:51  fplanque
  * item controller: better return to current filterset - step 1
  *
