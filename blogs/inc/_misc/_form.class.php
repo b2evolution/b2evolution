@@ -1394,19 +1394,16 @@ class Form extends Widget
 				$after_field_highlight = '';
 			}
 
+			$after_field = '';
 			if( param_has_error( $field_name ) )
 			{ // There is an error message for this field, we want to mark the checkboxes with a red border:
 				$r .= '<span class="checkbox_error">';
-				$after_field = '</span>';
+				$after_field .= '</span>';
 			}
-			elseif( $required )
+			if( $required )
 			{	//this field is required
 				$r .= '<span class="checkbox_required">';
-				$after_field = '</span>';
-			}
-			else
-			{
-				$after_field = '';
+				$after_field .= '</span>';
 			}
 
 			$r .= "\t".'<input type="checkbox" name="'.$loop_field_name.'" value="'.$option[1].'" ';
@@ -1671,18 +1668,29 @@ class Form extends Widget
 	 * @param string Note
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - 'value': The selected value
+	 *              - 'force_keys_as_values': Use the key of $field_options for "value" attrib always.
 	 *              - Plus all of {@link select_input_options()}.
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function select_input_array( $field_name, $field_value, $field_options, $field_label, $field_note = NULL, $field_params = array() )
 	{
+		if( isset($field_params['force_keys_as_values']) )
+		{
+			$force_keys_as_values = $field_params['force_keys_as_values'];
+			unset($field_params['force_keys_as_values']); // not an attribute to <select>
+		}
+		else
+		{
+			$force_keys_as_values = false;
+		}
+
 		// Build $options_list
 		$options_list = '';
 
 		foreach( $field_options as $l_key => $l_option )
 		{
 			// Get the value attribute from key if is_string():
-			$l_value = is_string($l_key) ? $l_key : $l_option;
+			$l_value = ($force_keys_as_values || is_string($l_key)) ? $l_key : $l_option;
 
 			$options_list .= '<option value="'.format_to_output($l_value, 'formvalue').'"';
 
@@ -1728,6 +1736,7 @@ class Form extends Widget
 				$input_class = '';
 			}
 		}
+		unset($field_params['required']); // already handled above, do not pass to handle_common_params()
 
 		// Set onchange event on the select, when the select changes, we check the value to display or hide an input text after it
 		$field_params['onchange']= 'check_combo( this.id, this.options[this.selectedIndex].value, "'.$input_class.'")';
@@ -2358,23 +2367,25 @@ class Form extends Widget
 				$loop_radio['checked'] = 'checked';
 			}
 
+			// Unset non-HTML attribs:
+			$label = $loop_radio['label'];
+			$note = isset($loop_radio['note']) ? $loop_radio['note'] : null;
+			$suffix = isset($loop_radio['suffix']) ? $loop_radio['suffix'] : '';
+			unset($loop_radio['label'], $loop_radio['note'], $loop_radio['suffix']);
+
 			// the radio element:
 			$r .= $this->get_input_element( $loop_radio, false );
 
 			// the label:
-			$r .= '<label class="radiooption" for="'.$loop_radio['id'].'">'
-				.$loop_radio['label']
-				.'</label>';
+			$r .= '<label class="radiooption" for="'.$loop_radio['id'].'">'.$label.'</label>';
 
-			if( ! empty($loop_radio['note']) )
+			if( ! empty($note) )
 			{ // Add a note for the current radio option:
-				$r .= '<span class="notes">'.$loop_radio['note'].'</span>';
+				$r .= '<span class="notes">'.$note.'</span>';
 			}
 
-			if( !empty( $loop_radio['suffix'] ) )
-			{ // optional text for radio option (like additional fieldsets or input boxes)
-				$r .= $loop_radio['suffix'];
-			}
+			// optional text for radio option (like additional fieldsets or input boxes)
+			$r .= $suffix;
 
 			// Split radio options by whitespace:
 			$r .= "\n";
@@ -2660,31 +2671,37 @@ class Form extends Widget
 			}
 		}
 
+		// Mark required fields:
+		if( isset($this->_common_params['required']) && $this->_common_params['required'] )
+		{ // add "field_required" class:
+			if( isset($field_params['type']) && $field_params['type'] == 'checkbox' )
+			{ // checkboxes need a span
+				$field_params['input_prefix'] = ( isset($field_params['input_prefix']) ? $field_params['input_prefix'] : '' ).'<span class="checkbox_required">';
+				$field_params['input_suffix'] = '</span>'.( isset($field_params['input_suffix']) ? $field_params['input_suffix'] : '' );
+			}
+			else
+			{
+				$field_params['class'] = isset( $field_params['class'] ) ? $field_params['class'].' field_required' : 'field_required';
+			}
+		}
+
 		// Error handling:
 		if( isset($field_params['name']) && param_has_error( $field_params['name'] ) )
 		{ // There is an error message for this field:
 			if( isset($field_params['type']) && $field_params['type'] == 'checkbox' )
 			{ // checkboxes need a span
+				$field_params['input_prefix'] = ( isset($field_params['input_prefix']) ? $field_params['input_prefix'] : '' ).'<span class="checkbox_error">';
 				$field_params['input_suffix'] = '</span>'.( isset($field_params['input_suffix']) ? $field_params['input_suffix'] : '' );
-				$field_params['input_prefix'] = ( isset($field_params['input_prefix']) ? $field_params['input_prefix'] : '' ).'<span class="checkbox_required">';
 			}
 			else
 			{
-				$field_params['class'] = isset( $field_params['class'] )
-					? $field_params['class'].' field_error'
-					: 'field_error';
+				$field_params['class'] = isset( $field_params['class'] ) ? $field_params['class'].' field_error' : 'field_error';
 			}
 
 			if( $this->disp_param_err_messages_with_fields )
 			{
 				$this->_common_params['note'] .= ' <span class="field_error">'.param_get_error_msg( $field_params['name'] ).'</span>';
 			}
-		}
-		elseif( isset($this->_common_params['required']) && $this->_common_params['required'])
-		{
-			$field_params['class'] = isset( $field_params['class'] )
-				? $field_params['class'].' field_required'
-				: 'field_required';
 		}
 
 		#pre_dump( 'handle_common_params (after)', $field_params );
@@ -2713,6 +2730,11 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.75  2007/03/23 14:47:48  blueyed
+ *  - Display both "required" and "error" states in checklist() and through handle_common_params()
+ * - "force_keys_as_values" param for select_input_array() (Props A. Becker)
+ * - cleanup, minor fixes
+ *
  * Revision 1.74  2007/03/23 14:33:23  blueyed
  * Re-added $field_params for hidden(), which is needed, e.g. when adding an id to a hidden form element.
  *
