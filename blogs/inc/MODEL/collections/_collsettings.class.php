@@ -49,14 +49,17 @@ class CollectionSettings extends AbstractSettings
 	 */
 	var $_defaults = array(
 			'new_feedback_status' => 'draft',  	// 'draft', 'published' or 'deprecated'
-			'chapter_links'  => 'param_num',		 	// 'param_num', 'subchap', 'chapters'
+			'archive_mode'   => 'monthly',			// monthly, weekly, daily, postbypost
+			'archive_links'  => 'param',				// param, extrapath
+			'chapter_links'  => 'param_num',		// 'param_num', 'subchap', 'chapters'
+			'single_links'   => 'param_title',
+			'permalinks'     => 'single',				// single, archive, subchap
 			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet', // ping plugin codes, separated by comma
 			'orderby'        => 'datestart',
-			'orderdir'       => 'DESC', 
-			'what_to_show'   => 'posts',         	// posts, days
+			'orderdir'       => 'DESC',
+			'what_to_show'   => 'posts',        // posts, days
 			'posts_per_page' => '5',
 			'posts_per_feed' => '8',
-			'archive_mode'   => 'monthly',				// monthly, weekly, daily, postbypost
 			'allow_subscriptions' => 0,					// Don't all email subscriptions by default
 			'use_workflow' => 0,								// Don't use workflow by default
 			'aggregate_coll_IDs' => '',
@@ -95,6 +98,11 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.15  2007/03/24 20:41:16  fplanque
+ * Refactored a lot of the link junk.
+ * Made options blog specific.
+ * Some junk still needs to be cleaned out. Will do asap.
+ *
  * Revision 1.14  2007/01/23 09:25:40  fplanque
  * Configurable sort order.
  *

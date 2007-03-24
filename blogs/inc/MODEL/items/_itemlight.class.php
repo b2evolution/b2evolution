@@ -143,6 +143,125 @@ class ItemLight extends DataObject
 	}
 
 
+  /**
+	 * Generate a single post link for the item
+	 *
+	 * @param boolean allow redir to permalink, true | false | 'auto' to prevent redit only if single isn't the current permalink type
+ 	 * @param string base url to use
+	 * @param string glue between url params
+	 */
+	function get_single_url( $allow_redir = true, $blogurl = '', $glue = '&amp;' )
+	{
+		$this->get_Blog();
+
+		if( empty( $blogurl ) )
+		{
+			$blogurl = $this->Blog->gen_blogurl();
+		}
+
+		$single_links = $this->Blog->get_setting('single_links');
+
+ 		if( !empty( $this->urltitle ) && $single_links != 'param_num' )
+		{	// We can and we want to use the url title:
+			$urlparam = 'title='.$this->urltitle;
+			$urltail = $this->urltitle;
+		}
+		else
+		{
+			$urlparam = 'p='.$this->ID;
+			$urltail = 'p'.$this->ID;
+		}
+
+		switch( $single_links )
+		{
+			case 'param_num':
+			case 'param_title':
+				$permalink = url_add_param( $blogurl, $urlparam.$glue.'more=1'.$glue.'c=1'.$glue.'tb=1'.$glue.'pb=1', $glue );
+				break;
+
+			case 'y':
+				$permalink = url_add_tail( $blogurl, mysql2date('/Y/', $this->issue_date).$urltail );
+				break;
+
+			case 'ym':
+				$permalink = url_add_tail( $blogurl, mysql2date('/Y/m/', $this->issue_date).$urltail );
+				break;
+
+			case 'ymd':
+				$permalink = url_add_tail( $blogurl, mysql2date('/Y/m/d/', $this->issue_date).$urltail );
+				break;
+
+ 			case 'subchap':
+				$permalink = url_add_tail( $blogurl, '/'.$this->main_Chapter->urlname.'/'.$urltail );
+				break;
+
+ 			case 'chapters':
+				$permalink = url_add_tail( $blogurl, '/'.$this->main_Chapter->get_url_path().$urltail );
+				break;
+
+			case 'short':
+			default:
+				$permalink = url_add_tail( $blogurl, '/'.$urltail );
+				break;
+		}
+
+		if( $allow_redir == 'auto' )
+		{	// We allow redir only if the permalink is already single.
+			// In other words: we implicitely allow redir if there is no need to redir!
+			// and more useful: we explicitely prevent redir if we know it would take place.
+			$allow_redir = ($this->Blog->get_setting( 'permalinks' ) == 'single');
+		}
+
+		if( ! $allow_redir )
+		{
+			$permalink = url_add_param( $permalink, 'redir=no', $glue );
+		}
+
+		return $permalink;
+	}
+
+
+  /**
+	 * Generate a link to the post in the archives
+	 *
+ 	 * @param string base url to use
+	 * @param string glue between url params
+	 */
+	function get_archive_url( $blogurl = '', $glue = '&amp;' )
+	{
+		$this->get_Blog();
+
+		if( empty( $blogurl ) )
+		{
+			$blogurl = $this->Blog->gen_blogurl();
+		}
+
+		$permalink = $this->Blog->get_archive_url( $this->issue_date, $glue );
+
+		return $permalink.'#'.$this->ID;
+	}
+
+
+  /**
+	 * Generate a link to the post in the category
+	 *
+ 	 * @param string base url to use
+	 * @param string glue between url params
+	 */
+	function get_chapter_url( $blogurl = '', $glue = '&amp;' )
+	{
+		if( empty( $blogurl ) )
+		{
+			$this->get_Blog();
+			$blogurl = $this->Blog->gen_blogurl();
+		}
+
+		$permalink = url_add_tail( $blogurl, '/'.$this->main_Chapter->get_url_path() );
+
+		return $permalink.'#'.$this->ID;
+	}
+
+
 	/**
 	 * Generate the permalink for the item.
 	 *
@@ -152,166 +271,32 @@ class ItemLight extends DataObject
 	 *
 	 * @todo archives modes in clean URL mode
 	 *
-	 * @param string 'urltitle', 'pid', 'archive#id', 'archive#title' or '' to use default setting
-	 * @param string url to use
-	 * @param boolean true to force single post on destination page
+	 * @param string single, archive, subchap
+	 * @param string base url to use
 	 * @param string glue between url params
 	 */
-	function get_permanent_url( $permalink_type = '', $blogurl = '', $force_single = false, $glue = '&amp;' )
+	function get_permanent_url( $permalink_type = '', $blogurl = '', $glue = '&amp;' )
 	{
 		global $DB, $cacheweekly, $Settings;
 
 		if( empty( $permalink_type ) )
-		{	// Use default from settings:
-			$permalink_type = $Settings->get( 'permalink_type' );
-		}
-
-		if( $force_single && (strpos( $permalink_type, 'archive' ) !== false) )
-		{ // We don't want a page full of posts:
-			$permalink_type = 'force_single';
-		}
-
-		if( empty( $blogurl ) )
-		{
+		{	// Use default from collection settings:
 			$this->get_Blog();
-			$blogurl = $this->Blog->gen_blogurl();
+			$permalink_type = $this->Blog->get_setting( 'permalinks' );
 		}
-
-		$post_date = $this->issue_date;
 
 		switch( $permalink_type )
 		{
-			case 'archive#id':
-				// Link to an archive page:
-				// Determine type of archive page:
-				$this->get_Blog();
-				$dest_type = $this->Blog->get_setting('archive_mode');
-				$anchor = $this->ID;
-				$urltail = 'p'.$this->ID;
-				break;
+			case 'archive':
+				return $this->get_archive_url( $blogurl, $glue );
 
-			case 'archive#title':
-				// Link to an archive page:
-				// Determine type of archive page:
-				$this->get_Blog();
-				$dest_type = $this->Blog->get_setting('archive_mode');
-				$anchor = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $this->title );
-				$urltail = 'p'.$this->ID;
-				break;
+			case 'subchap':
+				return $this->get_chapter_url( $blogurl, $glue );
 
-			case 'force_single':
-				// Forced Link to individual post:
-				$dest_type = 'postbypost';
-				$urlparam = 'p='.$this->ID.'&amp;redir=no';
-				$urltail = 'p'.$this->ID.'?redir=no';
-				break;
-
-			case 'pid':
-				// Link to individual post:
-				$dest_type = 'postbypost';
-				$urlparam = 'p='.$this->ID;
-				$urltail = 'p'.$this->ID;
-				break;
-
-			case 'urltitle':
+			case 'single':
 			default:
-				// Link to individual post:
-				$dest_type = 'postbypost';
-				if( !empty( $this->urltitle ) )
-				{
-					$urlparam = 'title='.$this->urltitle;
-					$urltail = $this->urltitle;
-				}
-				else
-				{
-					$urlparam = 'p='.$this->ID;
-					$urltail = 'p'.$this->ID;
-				}
+				return $this->get_single_url( true, $blogurl, $glue );
 		}
-
-		switch( $dest_type )
-		{
-			case 'monthly':
-				// Link to a monthly archive page:
-				if( $Settings->get('links_extrapath') == 'disabled' )
-				{ // Use params:
-					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).substr($post_date,5,2), $glue ).'#'.$anchor;
-				}
-				else
-				{ // Use extra path info:
-					$permalink = url_add_tail( $blogurl, mysql2date("/Y/m/", $post_date) ).'#'.$anchor;
-				}
-				break;
-
-			case 'weekly':
-				// Link to a weekly archive page:
-				if((!isset($cacheweekly)) || (empty($cacheweekly[$post_date])))
-				{
-					$cacheweekly[$post_date] = $DB->get_var( 'SELECT '.$DB->week( $DB->quote($post_date), locale_startofweek() ) );
-				}
-				if( $Settings->get('links_extrapath') == 'disabled' )
-				{ // Use params:
-					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).$glue.'w='.$cacheweekly[$post_date], $glue ).'#'.$anchor;
-				}
-				else
-				{ // Use extra path info:
-					$permalink = url_add_tail( $blogurl, mysql2date("/Y/", $post_date).'w'.$cacheweekly[$post_date] ).'/#'.$anchor;
-				}
-				break;
-
-			case 'daily':
-				// Link to a daily archive page:
-				if( $Settings->get('links_extrapath') == 'disabled' )
-				{ // Use params:
-					$permalink = url_add_param( $blogurl, 'm='.substr($post_date,0,4).substr($post_date,5,2).substr($post_date,8,2), $glue ).'#'.$anchor;
-				}
-				else
-				{ // Use extra path info:
-					$permalink = url_add_tail( $blogurl, mysql2date("/Y/m/d/", $post_date) ).'#'.$anchor;
-				}
-				break;
-
-			case 'postbypost':
-			default:
-				// Link to a specific post:
-				switch( $Settings->get('links_extrapath') )
-				{
-					case 'disabled':
-						// Use params:
-						$permalink = url_add_param( $blogurl, $urlparam.$glue.'more=1'.$glue.'c=1'.$glue.'tb=1'.$glue.'pb=1', $glue );
-						break;
-
-					case 'short':
-						$permalink = url_add_tail( $blogurl, '/'.$urltail );
-						break;
-
-					case 'y':
-						$permalink = url_add_tail( $blogurl, mysql2date('/Y/', $post_date).$urltail );
-						break;
-
-					case 'ym':
-						$permalink = url_add_tail( $blogurl, mysql2date('/Y/m/', $post_date).$urltail );
-						break;
-
-					case 'ymd':
-						$permalink = url_add_tail( $blogurl, mysql2date('/Y/m/d/', $post_date).$urltail );
-						break;
-
- 					case 'subchap':
-						$permalink = url_add_tail( $blogurl, '/'.$this->main_Chapter->urlname.'/'.$urltail );
-						break;
-
- 					case 'chapters':
-						$permalink = url_add_tail( $blogurl, '/'.$this->main_Chapter->get_url_path().$urltail );
-						break;
-
-					default:
-						debug_die('extra path mode not supported (yet)');
-				}
-				break;
-		}
-
-		return $permalink;
 	}
 
 
@@ -576,11 +561,11 @@ class ItemLight extends DataObject
 		switch( $text )
 		{
 			case '#':
-				$text = get_icon( 'permalink' ).T_('Permalink');
+				$text = get_icon( 'permalink', 'imgtag', array('class'=>'icon') ).T_('Permalink');
 				break;
 
 			case '#icon#':
-				$text = get_icon( 'permalink' );
+				$text = get_icon( 'permalink', 'imgtag', array('class'=>'icon') );
 				break;
 
 			case '#text#':
@@ -736,6 +721,11 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2007/03/24 20:41:16  fplanque
+ * Refactored a lot of the link junk.
+ * Made options blog specific.
+ * Some junk still needs to be cleaned out. Will do asap.
+ *
  * Revision 1.2  2007/03/18 03:49:20  fplanque
  * fix
  *

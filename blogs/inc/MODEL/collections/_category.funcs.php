@@ -68,7 +68,7 @@ function cat_create(
 	}
 
 	// Dirty temporary fix:
-	$cat_urlname = preg_replace( '/[^A-Za-z0-9]/', '-', $cat_name );
+	$cat_urlname = preg_replace( '/[^a-z0-9]/', '-', strtolower($cat_name) );
 
 	$sql = "INSERT INTO T_categories( cat_parent_ID, cat_name, cat_blog_ID, cat_urlname )
 					VALUES ( $cat_parent_ID, ".$DB->quote($cat_name).", $cat_blog_ID, ".$DB->quote($cat_urlname)." )";
@@ -773,6 +773,11 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.26  2007/03/24 20:41:16  fplanque
+ * Refactored a lot of the link junk.
+ * Made options blog specific.
+ * Some junk still needs to be cleaned out. Will do asap.
+ *
  * Revision 1.25  2006/12/17 23:42:38  fplanque
  * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
  * Look into Advanced Settings for the aggregating blog.

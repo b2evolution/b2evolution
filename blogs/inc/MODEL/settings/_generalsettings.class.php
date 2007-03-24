@@ -91,7 +91,6 @@ class GeneralSettings extends AbstractSettings
 		'newusers_revalidate_emailchg' => '0',
 		'newusers_level' => '1',
 
-		'permalink_type' => 'urltitle',
 		'regexp_filename' => '^[a-zA-Z0-9\-_.]+$', // TODO: accept spaces and special chars / do full testing on this
 		'regexp_dirname' => '^[a-zA-Z0-9\-_]+$', // TODO: accept spaces and special chars / do full testing on this
 		'reloadpage_timeout' => '300',
@@ -160,6 +159,11 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.29  2007/03/24 20:41:16  fplanque
+ * Refactored a lot of the link junk.
+ * Made options blog specific.
+ * Some junk still needs to be cleaned out. Will do asap.
+ *
  * Revision 1.28  2006/12/15 22:54:14  fplanque
  * allow disabling of password hashing
  *

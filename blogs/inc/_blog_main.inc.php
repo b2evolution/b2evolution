@@ -329,10 +329,10 @@ elseif( $disp == 'posts' &&
 		if( $redirect_to_canonical_url && $redir == 'yes' )
 		{	// We want to redirect to the Item's canonical URL:
 
-			$canoncical_url = $Item->get_permanent_url( '', '', false, '&' );
+			$canoncical_url = $Item->get_permanent_url( '', '', '&' );
 			// pre_dump( $canoncical_url, $ReqHost.$ReqURI );
 			// There may be some parameters additional at the end of the URL, but the beginning should be canoncial.
-			if( strpos( $ReqHost.$ReqURI, $Item->get_permanent_url( '', '', false, '&' ) ) !== 0 )
+			if( strpos( $ReqHost.$ReqURI, $Item->get_permanent_url( '', '', '&' ) ) !== 0 )
 			{	// The requested URL does not look like the canonical URL for this post,
 				// REDIRECT TO THE CANONICAL URL:
 				// fp> TODO: we're going to lose the additional params, it would be better to keep them...
@@ -489,6 +489,11 @@ else
 
 /*
  * $Log$
+ * Revision 1.72  2007/03/24 20:41:16  fplanque
+ * Refactored a lot of the link junk.
+ * Made options blog specific.
+ * Some junk still needs to be cleaned out. Will do asap.
+ *
  * Revision 1.71  2007/03/18 01:39:54  fplanque
  * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
  * (more to come)

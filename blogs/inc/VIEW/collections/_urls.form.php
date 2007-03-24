@@ -156,13 +156,24 @@ $Form->begin_fieldset( T_('Blog URL') );
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('Archive URLs') );
+
+	$Form->radio( 'archive_links', $edited_Blog->get_setting('archive_links'),
+		array(
+				array( 'param', T_('Use param'), T_('Archive links will look like: \'stub?m=20071231\'') ),
+				array( 'extrapath', T_('Use extra-path'), T_('Archive links will look like \'stub/2007/12/31/\'' ) ),
+			), T_('Archive links'), true );
+
+$Form->end_fieldset();
+
+
 $Form->begin_fieldset( T_('Category URLs') );
 
 	$Form->radio( 'chapter_links', $edited_Blog->get_setting('chapter_links'),
 		array(
-				array( 'param_num', T_('Do not use extra path info'), T_('Category links will look like: \'stub?cat=123\'') ),
-				array( 'subchap', T_('Use sub-category'), T_('Category links will look like \'stub/subcat/\'' ) ),
-				array( 'chapters', T_('Use category path'), T_('Category links will look like \'stub/cat/subcat/\'' ) ),
+				array( 'param_num', T_('Use param: cat ID'), T_('Category links will look like: \'stub?cat=123\'') ),
+				array( 'subchap', T_('Use extra-path: sub-category'), T_('Category links will look like \'stub/subcat/\'' ) ),
+				array( 'chapters', T_('Use extra-path: category path'), T_('Category links will look like \'stub/cat/subcat/\'' ) ),
 			), T_('Category links'), true );
 
 $Form->end_fieldset();
@@ -170,7 +181,26 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Post URLs') );
 
-		// TODO
+	$Form->radio( 'single_links', $edited_Blog->get_setting('single_links'),
+		array(
+			  array( 'param_num', T_('Use param: post ID'), T_('Links will look like: \'stub?p=123&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1\'') ),
+			  array( 'param_title', T_('Use param: post title'), T_('Links will look like: \'stub?title=post-title&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1\'') ),
+				array( 'short', T_('Use extra-path: post title'), T_('Links will look like \'stub/post-title\'' ) ),
+				array( 'y', T_('Use extra-path: year'), T_('Links will look like \'stub/2006/post-title\'' ) ),
+				array( 'ym', T_('Use extra-path: year & month'), T_('Links will look like \'stub/2006/12/post-title\'' ) ),
+				array( 'ymd', T_('Use extra-path: year, month & day'), T_('Links will look like \'stub/2006/12/31/post-title\'' ) ),
+				array( 'subchap', T_('Use extra-path: sub-category'), T_('Links will look like \'stub/subcat/post-title\'' ) ),
+				array( 'chapters', T_('Use extra-path: category path'), T_('Links will look like \'stub/cat/subcat/post-title\'' ) ),
+			), T_('Single post links'), true,
+			T_('For example, single post links are used when viewing comments for a post. May be used for permalinks - see below.') );
+			// fp> TODO: check where we really need to force single and where we could use any permalink
+
+	$Form->radio( 'permalinks', $edited_Blog->get_setting('permalinks'),
+		array(
+			  array( 'single', T_('Link to single post') ),
+			  array( 'archive', T_('Link to post in archive') ),
+			  array( 'subchap', T_('Link to post in sub-category') ),
+			), T_('Post permalinks'), true );
 
 $Form->end_fieldset();
 
@@ -182,6 +212,11 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.4  2007/03/24 20:41:16  fplanque
+ * Refactored a lot of the link junk.
+ * Made options blog specific.
+ * Some junk still needs to be cleaned out. Will do asap.
+ *
  * Revision 1.3  2007/01/23 08:06:25  fplanque
  * Simplified!!!
  *

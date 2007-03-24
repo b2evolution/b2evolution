@@ -75,9 +75,6 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	param( 'links_extrapath', 'string', 'disabled' );
 	$Settings->set( 'links_extrapath', $links_extrapath );
 
-	param( 'permalink_type', 'string', true );
-	$Settings->set( 'permalink_type', $permalink_type );
-
 	param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimun password length must be between %d and %d.') );
 	$Settings->set( 'user_minpwdlen', $user_minpwdlen );
 
@@ -131,6 +128,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2007/03/24 20:41:16  fplanque
+ * Refactored a lot of the link junk.
+ * Made options blog specific.
+ * Some junk still needs to be cleaned out. Will do asap.
+ *
  * Revision 1.13  2006/12/15 22:54:14  fplanque
  * allow disabling of password hashing
  *

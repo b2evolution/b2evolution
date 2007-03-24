@@ -448,37 +448,17 @@ class Item extends ItemLight
 
 
 	/**
-	 * Template function: display anchor for permalinks to refer to
-	 *
-	 * @todo archives modes in clean mode
-	 *
-	 * @param string 'id' or 'title'
+	 * Template function: display anchor for permalinks to refer to.
 	 */
-	function anchor( $mode = '' )
+	function anchor()
 	{
 		global $Settings;
 
-		if( empty( $mode ) )
-			$mode = $Settings->get( 'permalink_type' );
+		// In case you have old cafelog permalinks, uncomment the following lines:
+		// $title = preg_replace( '/[^a-zA-Z0-9_\.-]/', '_', $this->title );
+		// echo '<a id="'.$title.'"></a>';
 
-		switch( $mode )
-		{
-			case 'archive#title': // permalink_type
-			case 'title': // explicit choice
-				$title = preg_replace( '/[^a-zA-Z0-9_\.-]/', '_', $this->title );
-				echo '<a id="'.$title.'"></a>';
-				break;
-
-			case 'archive#id': // permalink_type
-			case 'id': // explicit choice
-				echo '<a id="'.$this->ID.'"></a>';
-				break;
-
-
-			case 'pid': // permalink type where we need no ID
-			case 'urltitle': // permalink type where we need no ID
-			default:
-		}
+		echo '<a id="'.$this->ID.'"></a>';
 	}
 
 
@@ -1371,12 +1351,12 @@ class Item extends ItemLight
 	 * @param string Status of feedbacks to count
 	 * @param boolean true to use a popup windows
 	 * @param boolean true to hide if no feedback ('#' for default)
-	 * @param string 'pid' or 'title'; 'none' for NO LINK
+	 * @param string url or '#' for default
 	 * @param string url to use
 	 */
 	function feedback_link( $type = 'feedbacks', $before = '', $after = '',
 													$zero = '#', $one = '#', $more = '#', $title='#', $status = 'published',
-													$use_popup = false,	$hideifnone = '#', $mode = '', $blogurl = '' )
+													$use_popup = false,	$hideifnone = '#', $url = '#', $blogurl = '' )
 	{
 		// dh> TODO:	Add plugin hook, where a Pingback plugin could hook and provide "pingbacks"
 		switch( $type )
@@ -1384,9 +1364,9 @@ class Item extends ItemLight
 			case 'feedbacks':
 				if( $hideifnone === '#' ) $hideifnone = false;
 				if( $title == '#' ) $title = T_('Display feedback / Leave a comment');
-				if( $zero == '#' ) $zero = T_('Send feedback');
-				if( $one == '#' ) $one = T_('1 feedback');
-				if( $more == '#' ) $more = T_('%d feedbacks');
+				if( $zero == '#' ) $zero = T_('Send feedback').' &raquo;';
+				if( $one == '#' ) $one = T_('1 feedback').' &raquo;';
+				if( $more == '#' ) $more = T_('%d feedbacks').' &raquo;';
 				break;
 
 			case 'comments':
@@ -1400,9 +1380,9 @@ class Item extends ItemLight
 						$hideifnone = true;
 				}
 				if( $title == '#' ) $title = T_('Display comments / Leave a comment');
-				if( $zero == '#' ) $zero = T_('Leave a comment');
-				if( $one == '#' ) $one = T_('1 comment');
-				if( $more == '#' ) $more = T_('%d comments');
+				if( $zero == '#' ) $zero = T_('Leave a comment').' &raquo;';
+				if( $one == '#' ) $one = T_('1 comment').' &raquo;';
+				if( $more == '#' ) $more = T_('%d comments').' &raquo;';
 				break;
 
 			case 'trackbacks':
@@ -1413,9 +1393,9 @@ class Item extends ItemLight
 				}
 				if( $hideifnone === '#' ) $hideifnone = false;
 				if( $title == '#' ) $title = T_('Display trackbacks / Get trackback address for this post');
-				if( $zero == '#' ) $zero = T_('Trackback (0)');
-				if( $one == '#' ) $one = T_('Trackback (1)');
-				if( $more == '#' ) $more = T_('Trackbacks (%d)');
+				if( $zero == '#' ) $zero = T_('Trackback (0)').' &raquo;';
+				if( $one == '#' ) $one = T_('Trackback (1)').' &raquo;';
+				if( $more == '#' ) $more = T_('Trackbacks (%d)').' &raquo;';
 				break;
 
 			case 'pingbacks':
@@ -1424,9 +1404,9 @@ class Item extends ItemLight
 				$this->get_Blog();
 				if( $hideifnone === '#' ) $hideifnone = true;
 				if( $title == '#' ) $title = T_('Display pingbacks');
-				if( $zero == '#' ) $zero = T_('Pingback (0)');
-				if( $one == '#' ) $one = T_('Pingback (1)');
-				if( $more == '#' ) $more = T_('Pingbacks (%d)');
+				if( $zero == '#' ) $zero = T_('Pingback (0)').' &raquo;';
+				if( $one == '#' ) $one = T_('Pingback (1)').' &raquo;';
+				if( $more == '#' ) $more = T_('Pingbacks (%d)').' &raquo;';
 				*/
 				return;
 
@@ -1441,10 +1421,9 @@ class Item extends ItemLight
 		if( ($number == 0) && $hideifnone )
 			return false;
 
-		if( $mode != 'none' )
-		{ // We want a link:
-			// We want the permanent URL BUT we want if FORCED to a SINGLE post!
-			$url = $this->get_permanent_url( $mode, $blogurl, true );
+		if( $url == '#' )
+		{ // We want a link to single post:
+			$url = $this->get_single_url( 'auto' );
 		}
 
 
@@ -1519,7 +1498,7 @@ class Item extends ItemLight
 		$one = str_replace( '%s', $edit_comments_link, $one );
 		$more = str_replace( '%s', $edit_comments_link, $more );
 
-		$this->feedback_link( $type, $before, $after, $zero, $one, $more, '', 'draft', '#',	$hideifnone, 'none' );
+		$this->feedback_link( $type, $before, $after, $zero, $one, $more, '', 'draft', '#',	$hideifnone, '' );
 
 
 	}
@@ -2704,9 +2683,9 @@ class Item extends ItemLight
 					.str_pad( T_('Url'), $pad_len ).': '.( empty( $this->url ) ? '-' : str_replace('&amp;', '&', $this->get('url')) )."\n"
 
 					.str_pad( T_('Content'), $pad_len ).': '
-						// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
+						// TODO: We MAY want to force a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 						// TODO: might get moved onto a single line, at the end of the content..
-						.str_replace('&amp;', '&', $this->get_permanent_url( 'pid' ))."\n\n"
+						.str_replace('&amp;', '&', $this->get_permanent_url())."\n\n"
 
 					.$this->get('content')."\n"
 
@@ -2929,6 +2908,11 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.165  2007/03/24 20:41:16  fplanque
+ * Refactored a lot of the link junk.
+ * Made options blog specific.
+ * Some junk still needs to be cleaned out. Will do asap.
+ *
  * Revision 1.164  2007/03/19 23:59:32  fplanque
  * minor
  *

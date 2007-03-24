@@ -92,17 +92,6 @@ $Form->radio( 'links_extrapath', $Settings->get('links_extrapath'),
 											array( 'chapters', T_('Use category path'), T_('Permalinks will look like \'stub/cat/subcat/post-title\'' ) ),
 										), T_('Extra path info'), true );
 
-$Form->radio( 'permalink_type', $Settings->get('permalink_type'),
-							array(  array( 'urltitle', T_('Post called up by its URL title (Recommended)'), T_('Fallback to ID when no URL title available.') ),
-											array( 'pid', T_('Post called up by its ID') ),
-											array( 'archive#id', T_('Post on archive page, located by its ID') ),
-											array( 'archive#title', T_('Post on archive page, located by its title (for Cafelog compatibility)') )
-										), T_('Permalink type'), true );
-
-// fp> TODO: A dynamic javascript preview of how the two settings above combine
-
-// fp> TODO: Move both of these settings to blog/collection settings
-
 $Form->end_fieldset();
 
 // --------------------------------------------
@@ -140,6 +129,11 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.27  2007/03/24 20:41:16  fplanque
+ * Refactored a lot of the link junk.
+ * Made options blog specific.
+ * Some junk still needs to be cleaned out. Will do asap.
+ *
  * Revision 1.26  2006/12/15 22:54:14  fplanque
  * allow disabling of password hashing
  *

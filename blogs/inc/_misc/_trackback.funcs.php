@@ -76,7 +76,7 @@ function trackback(
 	$blog_name = rawurlencode(get_bloginfo('name'));
 	$ItemCache = & get_Cache( 'ItemCache' );
 	$Item = & $ItemCache->get_by_ID( $ID );
-	$url = rawurlencode( $Item->get_permanent_url('', '', false, '&') );
+	$url = rawurlencode( $Item->get_permanent_url('', '', '&') );
 	// dis is the trackback stuff to be sent:
 	$query_string = "title=$title&url=$url&blog_name=$blog_name&excerpt=$excerpt";
 	// echo "url:$trackback_url<br>$sending:$query_string<br />";
@@ -212,6 +212,11 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.12  2007/03/24 20:41:16  fplanque
+ * Refactored a lot of the link junk.
+ * Made options blog specific.
+ * Some junk still needs to be cleaned out. Will do asap.
+ *
  * Revision 1.11  2006/12/12 02:53:57  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.

@@ -770,27 +770,13 @@ class Comment extends DataObject
 	 * Generate permalink to this comment.
 	 *
 	 * Note: This actually only returns the URL, to get a real link, use Comment::get_permanent_link()
-	 *
-	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
-	 * @param string url to use
 	 */
-	function get_permanent_url( $mode = '', $blogurl='' )
+	function get_permanent_url()
 	{
-		global $Settings;
-
-		if( empty( $mode ) )
-			$mode = $Settings->get( 'permalink_type' );
-
-		// some permalink modes are not acceptable here:
-		switch( $mode )
-		{
-			case 'archive#id':
-			case 'archive#title':
-				$mode = 'pid';
-		}
-
 		$this->get_Item();
-		$post_permalink = $this->Item->get_permanent_url( $mode, $blogurl );
+
+		$post_permalink = $this->Item->get_single_url( 'auto' );
+
 		return $post_permalink.'#'.$this->get_anchor();
 	}
 
@@ -1047,8 +1033,8 @@ class Comment extends DataObject
 			$notify_message = T_('Blog').': '.$edited_Blog->get('shortname')
 				.' ( '.str_replace('&amp;', '&', $edited_Blog->get('blogurl'))." )\n"
 				.T_('Post').': '.$edited_Item->get('title')
-				.' ( '.str_replace('&amp;', '&', $edited_Item->get_permanent_url( 'pid' ))." )\n";
-				// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
+				.' ( '.str_replace('&amp;', '&', $edited_Item->get_permanent_url())." )\n";
+				// TODO: fp> We MAY want to force short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 
 			switch( $this->type )
 			{
@@ -1073,7 +1059,8 @@ class Comment extends DataObject
 			}
 
 			$notify_message .=
-				T_('Comment').': '.str_replace('&amp;', '&', $this->get_permanent_url( 'pid' ))."\n" // We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
+				T_('Comment').': '.str_replace('&amp;', '&', $this->get_permanent_url())."\n"
+				// TODO: fp> We MAY want to force a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 				.$this->get('content')."\n\n"
 				.T_('Edit/Delete').': '.$admin_url.'?ctrl=items&blog='.$edited_Blog->ID.'&p='.$edited_Item->ID."\n\n"
 				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
@@ -1189,6 +1176,11 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.62  2007/03/24 20:41:16  fplanque
+ * Refactored a lot of the link junk.
+ * Made options blog specific.
+ * Some junk still needs to be cleaned out. Will do asap.
+ *
  * Revision 1.61  2007/03/22 00:03:40  blueyed
  * Escape author_url and author_User->url in author_url() template function
  *
@@ -1247,135 +1239,5 @@ class Comment extends DataObject
  *
  * Revision 1.43  2006/10/18 00:03:50  blueyed
  * Some forgotten url_rel_to_same_host() additions
- *
- * Revision 1.42  2006/08/29 18:36:17  blueyed
- * doc
- *
- * Revision 1.41  2006/08/29 00:26:11  fplanque
- * Massive changes rolling in ItemList2.
- * This is somehow the meat of version 2.0.
- * This branch has gone officially unstable at this point! :>
- *
- * Revision 1.40  2006/08/19 07:56:30  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.39  2006/08/19 02:15:07  fplanque
- * Half kille dthe pingbacks
- * Still supported in DB in case someone wants to write a plugin.
- *
- * Revision 1.38  2006/07/26 17:15:44  blueyed
- * Replaced "name" attribute with "id" for anchors
- *
- * Revision 1.37  2006/07/04 17:32:29  fplanque
- * no message
- *
- * Revision 1.36  2006/06/22 18:37:47  fplanque
- * fixes
- *
- * Revision 1.35  2006/05/30 20:32:56  blueyed
- * Lazy-instantiate "expensive" properties of Comment and Item.
- *
- * Revision 1.34  2006/05/19 18:15:05  blueyed
- * Merged from v-1-8 branch
- *
- * Revision 1.33.2.1  2006/05/19 15:06:24  fplanque
- * dirty sync
- *
- * Revision 1.33  2006/05/04 10:05:39  blueyed
- * Fixed anchor in notification mails and shortened again, because of length.. probably it does not make sense to have get_anchor() anyway.. dunno..
- *
- * Revision 1.32  2006/05/04 04:07:24  blueyed
- * After posting a comment, add the anchor to the redirect param; also use more distinctive anchor name for comments
- *
- * Revision 1.31  2006/05/02 04:36:24  blueyed
- * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
- *
- * Revision 1.30  2006/05/02 01:27:55  blueyed
- * Moved nofollow handling to basic antispam plugin; added Filter events to Comment class
- *
- * Revision 1.29  2006/05/01 22:20:20  blueyed
- * Made rel="nofollow" optional (enabled); added Antispam settings page
- *
- * Revision 1.28  2006/04/29 23:27:10  blueyed
- * Only trigger update/insert/delete events if parent returns true
- *
- * Revision 1.27  2006/04/24 15:43:35  fplanque
- * no message
- *
- * Revision 1.26  2006/04/21 23:14:16  blueyed
- * Add Messages according to Comment's status.
- *
- * Revision 1.25  2006/04/21 18:10:53  blueyed
- * todos
- *
- * Revision 1.24  2006/04/20 00:00:21  blueyed
- * Fixed delete-link-button
- *
- * Revision 1.23  2006/04/19 22:08:16  blueyed
- * Fixed spam_karma()
- *
- * Revision 1.22  2006/04/19 19:52:27  blueyed
- * url-encode redirect_to param
- *
- * Revision 1.21  2006/04/19 13:05:21  fplanque
- * minor
- *
- * Revision 1.20  2006/04/18 20:17:25  fplanque
- * fast comment status switching
- *
- * Revision 1.19  2006/04/18 19:29:51  fplanque
- * basic comment status implementation
- *
- * Revision 1.18  2006/03/28 22:24:46  blueyed
- * Fixed logical spam karma issues
- *
- * Revision 1.17  2006/03/28 14:12:19  fplanque
- * minor fix
- *
- * Revision 1.16  2006/03/23 22:13:50  blueyed
- * doc
- *
- * Revision 1.15  2006/03/19 17:54:26  blueyed
- * Opt-out for email through message form.
- *
- * Revision 1.14  2006/03/18 23:38:44  blueyed
- * Decent getters; allow_msgform added
- *
- * Revision 1.13  2006/03/18 19:17:53  blueyed
- * Removed remaining use of $img_url
- *
- * Revision 1.12  2006/03/12 23:08:58  fplanque
- * doc cleanup
- *
- * Revision 1.11  2006/03/12 20:58:59  blueyed
- * doc
- *
- * Revision 1.9  2006/03/11 21:50:16  blueyed
- * Display spam_karma with comments
- *
- * Revision 1.8  2006/03/11 12:45:54  blueyed
- * fixed stupid regexp
- *
- * Revision 1.6  2006/03/09 22:29:59  fplanque
- * cleaned up permanent urls
- *
- * Revision 1.5  2006/03/09 21:58:52  fplanque
- * cleaned up permalinks
- *
- * Revision 1.4  2006/03/09 15:23:26  fplanque
- * fixed broken images
- *
- * Revision 1.3  2006/03/06 20:03:40  fplanque
- * comments
- *
- * Revision 1.1  2006/02/23 21:11:57  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.24  2006/01/29 20:36:35  blueyed
- * Renamed Item::getBlog() to Item::get_Blog()
- *
- * Revision 1.23  2006/01/26 23:08:35  blueyed
- * Plugins enhanced. */
+ */
 ?>

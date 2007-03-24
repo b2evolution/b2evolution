@@ -357,9 +357,24 @@ class Blog extends DataObject
 		}
 
 
+		if( param( 'archive_links',   'string', NULL ) !== NULL )
+		{ // Archive link type:
+			$this->set_setting( 'archive_links', get_param( 'archive_links' ) );
+		}
+
 		if( param( 'chapter_links',   'string', NULL ) !== NULL )
-		{ // Chapter permalink type:
+		{ // Chapter link type:
 			$this->set_setting( 'chapter_links', get_param( 'chapter_links' ) );
+		}
+
+		if( param( 'single_links',   'string', NULL ) !== NULL )
+		{ // Single post link type:
+			$this->set_setting( 'single_links', get_param( 'single_links' ) );
+		}
+
+		if( param( 'permalinks',   'string', NULL ) !== NULL )
+		{ // permalinks type:
+			$this->set_setting( 'permalinks', get_param( 'permalinks' ) );
 		}
 
 		if( param( 'blog_skin_ID', 'integer', NULL ) !== NULL )
@@ -643,6 +658,63 @@ class Blog extends DataObject
 
 			default:
 				debug_die( 'Unhandled Blog access type ['.$this->access_type.']' );
+		}
+	}
+
+
+  /**
+	 * Get archive page URL
+	 *
+	 * @param string monthly, weekly, daily
+	 */
+	function get_archive_url( $date, $glue = '&amp;' )
+	{
+		$blogurl = $this->gen_blogurl();
+
+		$archive_links = $this->get_setting('archive_links');
+
+		$archive_type = $this->get_setting('archive_mode');
+
+		switch( $archive_type )
+		{
+			case 'weekly':
+				global $cacheweekly, $DB;
+				if((!isset($cacheweekly)) || (empty($cacheweekly[$date])))
+				{
+					$cacheweekly[$date] = $DB->get_var( 'SELECT '.$DB->week( $DB->quote($date), locale_startofweek() ) );
+				}
+				if( $archive_links == 'param' )
+				{	// Param:
+					return url_add_param( $blogurl, 'm='.mysql2date('Ym', $date).$glue.'w='.$cacheweekly[$date], $glue );
+				}
+				else
+				{ // Use extra path info:
+					return url_add_tail( $blogurl, mysql2date('/Y/m/', $date).'w'.$cacheweekly[$date].'/' );
+				}
+				break;
+
+			case 'daily':
+				if( $archive_links == 'param' )
+				{	// Param:
+					return url_add_param( $blogurl, 'm='.mysql2date('Ymd', $date), $glue );
+				}
+				else
+				{ // Use extra path info:
+					return url_add_tail( $blogurl, mysql2date('/Y/m/d/', $date) );
+				}
+				break;
+
+			case 'monthly':
+			default:
+				if( $archive_links == 'param' )
+				{	// Param:
+					return url_add_param( $blogurl, 'm='.mysql2date('Ym', $date), $glue );
+				}
+				else
+				{ // Use extra path info:
+					return url_add_tail( $blogurl, mysql2date('/Y/m/', $date) );
+				}
+				break;
 		}
 	}
 
@@ -1335,6 +1407,11 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.70  2007/03/24 20:41:16  fplanque
+ * Refactored a lot of the link junk.
+ * Made options blog specific.
+ * Some junk still needs to be cleaned out. Will do asap.
+ *
  * Revision 1.69  2007/03/11 23:57:06  fplanque
  * item editing: allow setting to 'redirected' status
  *
