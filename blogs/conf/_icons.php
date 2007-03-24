@@ -407,7 +407,7 @@ function get_icon_info($name)
 		case 'permalink': return array(
 			'file' => $rsc_subdir.'icons/minipost.gif',
 			'alt'  => T_('Permalink'),
-			'size' => array( 12, 9 ),
+			'size' => array( 11, 13 ),
 		);
 		case 'history': return array(
 			'file' => $rsc_subdir.'icons/clock.png',
@@ -506,6 +506,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.57  2007/03/24 20:35:57  fplanque
+ * minor
+ *
  * Revision 1.56  2007/03/04 05:24:52  fplanque
  * some progress on the toolbar menu
  *
