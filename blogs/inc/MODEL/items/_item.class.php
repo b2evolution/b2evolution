@@ -2017,14 +2017,10 @@ class Item extends ItemLight
 	{
 		global $htsrv_url, $Settings;
 
-		if( $Settings->get('links_extrapath') != 'disabled' )
-		{
-			return $htsrv_url.'trackback.php/'.$this->ID;
-		}
-		else
-		{
-			return $htsrv_url.'trackback.php?tb_id='.$this->ID;
-		}
+		// fp> TODO: get a clean (per blog) setting for this
+		//	return $htsrv_url.'trackback.php/'.$this->ID;
+
+		return $htsrv_url.'trackback.php?tb_id='.$this->ID;
 	}
 
 
@@ -2908,6 +2904,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.166  2007/03/25 10:19:30  fplanque
+ * cleanup
+ *
  * Revision 1.165  2007/03/24 20:41:16  fplanque
  * Refactored a lot of the link junk.
  * Made options blog specific.
