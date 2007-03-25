@@ -99,12 +99,13 @@ class archives_plugin extends Plugin
 	 */
 	function SkinTag( $params )
 	{
-	 	global $Settings, $month;
+	 	global $month;
 
 		/**
-		 * @todo get rid of these globals:
+		 * @todo get rid of this global:
 		 */
-		global $blog, $m;
+		global $m;
+
 		/**
 		 * @var Blog
 		 */
@@ -196,7 +197,7 @@ class archives_plugin extends Plugin
 					}
 					else
 					{	// We want to link to the absolute canonical URL for this archive:
-						archive_link( $arc_year, $arc_month );
+						echo $Blog->gen_archive_url( $arc_year, $arc_month );
 					}
 					echo '">';
 
@@ -222,7 +223,7 @@ class archives_plugin extends Plugin
 					}
 					else
 					{	// We want to link to the absolute canonical URL for this archive:
-						archive_link( $arc_year, $arc_month, $arc_dayofmonth );
+						echo $Blog->gen_archive_url( $arc_year, $arc_month, $arc_dayofmonth );
 					}
 					echo '">';
 
@@ -239,7 +240,7 @@ class archives_plugin extends Plugin
 					}
 					else
 					{	// We want to link to the absolute canonical URL for this archive:
-						archive_link( $arc_year, '', '', $arc_w );
+						echo $Blog->gen_archive_url( $arc_year, NULL, NULL, $arc_w );
 					}
 					echo '">';
 					echo $arc_year.', '.T_('week').' '.$arc_w;
@@ -328,7 +329,7 @@ class ArchiveList extends Results
 		$dbprefix = 'post_',
 		$dbIDname = 'ID' )
 	{
-		global $DB, $Settings;
+		global $DB;
 		global $blog, $cat, $catsel;
 		global $show_statuses;
 		global $author, $assgn, $status;
@@ -567,6 +568,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.38  2007/03/25 10:20:02  fplanque
+ * cleaned up archive urls
+ *
  * Revision 1.37  2007/01/13 18:36:24  fplanque
  * renamed "Skin Tag" plugins into "Widget" plugins
  * but otherwise they remain basically the same & compatible

@@ -582,7 +582,7 @@ class Calendar
 			{ // MONTH CAPTION:
 				if( $this->linktomontharchive )
 				{ // chosen month with link to archives
-					echo '<a href="'.$this->archive_link( $this->year, $this->month, '', '' ).'" title="'.T_('go to month\'s archive').'">';
+					echo '<a href="'.$this->archive_link( $this->year, $this->month ).'" title="'.T_('go to month\'s archive').'">';
 				}
 
 				echo date_i18n($this->monthformat, mktime(0, 0, 0, $this->month, 1, $this->year));
@@ -655,7 +655,7 @@ class Calendar
 			else
 			{
 				echo '<td colspan="'.( $this->mode == 'month' ? '3' : '2' ).'" class="center"><a href="'
-							.$this->archive_link( date('Y'), ( $this->mode == 'month' ? date('m') : '' ), '', '' )
+							.$this->archive_link( date('Y'), ( $this->mode == 'month' ? date('m') : NULL ) )
 							.'">'.T_('Current')
 							.'</a></td>';
 			}
@@ -684,7 +684,7 @@ class Calendar
 					{
 						echo $this->linkpostcellstart;
 					}
-					echo '<a href="'.$this->archive_link( $this->year, $i, '', '' ).'"';
+					echo '<a href="'.$this->archive_link( $this->year, $i ).'"';
 					if( $monthswithposts[ $i ] > 1 && !empty($this->postcount_year_atitle) )
 					{ // display postcount
 						echo ' title="'.sprintf($this->postcount_year_atitle, $monthswithposts[ $i ]).'"';
@@ -774,7 +774,7 @@ class Calendar
 						{
 							echo $this->linkpostcellstart;
 						}
-						echo '<a href="'.$this->archive_link( $this->year, $this->month, date('d',$i), '' ).'"';
+						echo '<a href="'.$this->archive_link( $this->year, $this->month, date('d',$i) ).'"';
 						if( $daysinmonthwithposts[ date('j', $i) ] > 1 && !empty($this->postcount_month_atitle) )
 						{ // display postcount
 							echo ' title="'.sprintf($this->postcount_month_atitle, $daysinmonthwithposts[ date('j', $i) ]).'"';
@@ -825,10 +825,11 @@ class Calendar
 	 * @param string year
 	 * @param string month
 	 * @param string day
-	 * @param string week
 	 */
-	function archive_link( $year, $month, $day = '', $week = '' )
+	function archive_link( $year, $month = NULL, $day = NULL )
 	{
+		global $Blog;
+
 		if( $this->link_type == 'context' )
 		{	// We want to preserve context:
 			$url_params = 'm='.$year;
@@ -840,15 +841,11 @@ class Calendar
 					$url_params .= zeroise($day,2);
 				}
 			}
-			elseif( $week !== '' )  // Note: week # can be 0 !
-			{
-				$url_params .= '&amp;w='.$week;
-			}
 			return regenerate_url( $this->context_isolation, $url_params );
 		}
 		else
 		{	// We want a canonic link:
-			return archive_link( $year, $month, $day, $week, false );
+			return $Blog->gen_archive_url( $year, $month, $day );
 		}
 	}
 
@@ -935,7 +932,7 @@ class Calendar
 
 				if( !empty($prev_year_year) )
 				{	// We have a link to display:
-					$r[] = '<a href="'.$this->archive_link( $prev_year_year, ($this->mode == 'month') ? $prev_year_month : '', '', '' )
+					$r[] = '<a href="'.$this->archive_link( $prev_year_year, ($this->mode == 'month') ? $prev_year_month : NULL )
 									.'" title="'.sprintf(
 												( $this->mode == 'month'
 														? /* Calendar link title to a month in a previous year */ T_('Previous year (%04d-%02d)')
@@ -991,7 +988,7 @@ class Calendar
 				if( !empty($prev_month_year) )
 				{	// We have a link to display:
 					$r[] = '<a href="'
-									.$this->archive_link( $prev_month_year, $prev_month_month, '', '' )
+									.$this->archive_link( $prev_month_year, $prev_month_month )
 									.'" title="'.sprintf( T_('Previous month (%04d-%02d)'), $prev_month_year, $prev_month_month ).'">&lt;</a>';
 				}
 				break;
@@ -1046,7 +1043,7 @@ class Calendar
 				if( !empty($next_month_year) )
 				{	// We have a link to display:
 					$r[] = '<a href="'
-									.$this->archive_link( $next_month_year, $next_month_month, '', '' )
+									.$this->archive_link( $next_month_year, $next_month_month )
 									.'" title="'.sprintf( T_('Next month (%04d-%02d)'), $next_month_year, $next_month_month ).'">&gt;</a>';
 				}
 
@@ -1097,7 +1094,7 @@ class Calendar
 
 				if( !empty($next_year_year) )
 				{	// We have a link to display:
-						$r[] = '<a href="'.$this->archive_link( $next_year_year, ($this->mode == 'month') ? $next_year_month : '', '', '' )
+						$r[] = '<a href="'.$this->archive_link( $next_year_year, ($this->mode == 'month') ? $next_year_month : NULL )
 										.'" title="'.sprintf(
 																	( $this->mode == 'month'
 																			? /* Calendar link title to a month in a following year */ T_('Next year (%04d-%02d)')
@@ -1116,6 +1113,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.39  2007/03/25 10:20:02  fplanque
+ * cleaned up archive urls
+ *
  * Revision 1.38  2007/03/18 16:54:37  waltercruz
  * Changing the MySQL date functions to the standart (EXTRACT) ones and killing ORDER BY in monthly and year calendar.
  *

@@ -663,19 +663,73 @@ class Blog extends DataObject
 
 
   /**
-	 * Get archive page URL
+	 * Generate archive page URL
 	 *
-	 * @param string monthly, weekly, daily
+	 * Note: there ate two similar functions here.
+	 * @see Blog::get_archive_url()
+	 *
+	 * @param string year
+	 * @param string month
+	 * @param string day
+	 * @param string week
 	 */
-	function get_archive_url( $date, $glue = '&amp;' )
+	function gen_archive_url( $year, $month = NULL, $day = NULL, $week = NULL, $glue = '&amp;' )
 	{
 		$blogurl = $this->gen_blogurl();
 
 		$archive_links = $this->get_setting('archive_links');
 
-		$archive_type = $this->get_setting('archive_mode');
+		if( $archive_links == 'param' )
+		{	// We reference by Query
+			$link = url_add_param( $blogurl, 'm=', $glue );
+			$separator = '';
+		}
+		else
+		{	// We reference by extra path info
+			$link = trailing_slash( $blogurl ); // there may already be a slash from a siteurl like 'http://example.com/'
+			$separator = '/';
+		}
 
-		switch( $archive_type )
+		$link .= $year;
+
+		if( !empty( $month ) )
+		{
+			$link .= $separator.zeroise($month,2);
+			if( !empty( $day ) )
+			{
+				$link .= $separator.zeroise($day,2);
+			}
+		}
+		elseif( $week !== '' )  // Note: week # can be 0 !
+		{
+			if( $archive_links == 'param' )
+			{	// We reference by Query
+				$link = url_add_param( $link, 'w='.$week );
+			}
+			else
+			{	// extra path info
+				$link .= '/w'.zeroise($week,2);
+			}
+		}
+
+		$link .= $separator;
+
+		return $link;
+	}
+
+
+  /**
+	 * Get archive page URL
+	 *
+	 * Note: there ate two similar functions here.
+	 *
+	 * @uses Blog::gen_archive_url()
+	 *
+	 * @param string monthly, weekly, daily
+	 */
+	function get_archive_url( $date, $glue = '&amp;' )
+	{
+		switch( $this->get_setting('archive_mode') )
 		{
 			case 'weekly':
 				global $cacheweekly, $DB;
@@ -683,38 +737,16 @@ class Blog extends DataObject
 				{
 					$cacheweekly[$date] = $DB->get_var( 'SELECT '.$DB->week( $DB->quote($date), locale_startofweek() ) );
 				}
-				if( $archive_links == 'param' )
-				{	// Param:
-					return url_add_param( $blogurl, 'm='.mysql2date('Ym', $date).$glue.'w='.$cacheweekly[$date], $glue );
-				}
-				else
-				{ // Use extra path info:
-					return url_add_tail( $blogurl, mysql2date('/Y/m/', $date).'w'.$cacheweekly[$date].'/' );
-				}
+				return $this->gen_archive_url( substr( $date, 0, 4 ), NULL, NULL, $cacheweekly[$date], $glue );
 				break;
 
 			case 'daily':
-				if( $archive_links == 'param' )
-				{	// Param:
-					return url_add_param( $blogurl, 'm='.mysql2date('Ymd', $date), $glue );
-				}
-				else
-				{ // Use extra path info:
-					return url_add_tail( $blogurl, mysql2date('/Y/m/d/', $date) );
-				}
+				return $this->gen_archive_url( substr( $date, 0, 4 ), substr( $date, 5, 2 ), substr( $date, 8, 2 ), NULL, $glue );
 				break;
 
 			case 'monthly':
 			default:
-				if( $archive_links == 'param' )
-				{	// Param:
-					return url_add_param( $blogurl, 'm='.mysql2date('Ym', $date), $glue );
-				}
-				else
-				{ // Use extra path info:
-					return url_add_tail( $blogurl, mysql2date('/Y/m/', $date) );
-				}
-				break;
+				return $this->gen_archive_url( substr( $date, 0, 4 ), substr( $date, 5, 2 ), NULL, NULL, $glue );
 		}
 	}
 
@@ -1407,6 +1439,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.71  2007/03/25 10:20:02  fplanque
+ * cleaned up archive urls
+ *
  * Revision 1.70  2007/03/24 20:41:16  fplanque
  * Refactored a lot of the link junk.
  * Made options blog specific.

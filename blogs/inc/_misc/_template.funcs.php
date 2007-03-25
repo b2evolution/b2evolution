@@ -149,70 +149,6 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 
 
 /**
- * Create a link to archive, using either params or extra path info.
- *
- * @param string year
- * @param string month
- * @param string day
- * @param string week
- * @param boolean show or return
- * @param string link, instead of blogurl
- * @param string GET params for 'file'
- */
-function archive_link( $year, $month, $day = '', $week = '', $show = true, $file = '', $params = '' )
-{
-	global $Settings;
-
-	if( empty($file) )
-		$link = get_bloginfo('blogurl');
-	else
-		$link = $file;
-
-	if( ($Settings->get('links_extrapath') == 'disabled') || (!empty($params)) )
-	{	// We reference by Query: Dirty but explicit permalinks
-		$link = url_add_param( $link, $params );
-		$link = url_add_param( $link, 'm=' );
-		$separator = '';
-	}
-	else
-	{
-		$link = trailing_slash( $link ); // there can already be a slash from a siteurl like 'http://example.com/'
-		$separator = '/';
-	}
-
-	$link .= $year;
-
-	if( !empty( $month ) )
-	{
-		$link .= $separator.zeroise($month,2);
-		if( !empty( $day ) )
-		{
-			$link .= $separator.zeroise($day,2);
-		}
-	}
-	elseif( $week !== '' )  // Note: week # can be 0 !
-	{
-		if( $Settings->get('links_extrapath') == 'disabled' )
-		{	// We reference by Query: Dirty but explicit permalinks
-			$link = url_add_param( $link, 'w='.$week );
-		}
-		else
-		{
-			$link .= '/w'.zeroise($week,2);
-		}
-	}
-
-	$link .= $separator;
-
-	if( $show )
-	{
-		echo $link;
-	}
-	return $link;
-}
-
-
-/**
  * Output a link to current blog.
  *
  * We need this function because if no Blog is currently active (some admin pages or site pages)
@@ -235,6 +171,9 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 
 /*
  * $Log$
+ * Revision 1.20  2007/03/25 10:20:02  fplanque
+ * cleaned up archive urls
+ *
  * Revision 1.19  2007/03/04 21:42:49  fplanque
  * category directory / albums
  *
@@ -255,94 +194,5 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
  *
  * Revision 1.13  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.12  2006/09/10 20:59:18  fplanque
- * extended extra path info setting
- *
- * Revision 1.11  2006/09/07 00:48:55  fplanque
- * lc parameter for locale filtering of posts
- *
- * Revision 1.10  2006/08/24 00:38:18  fplanque
- * allow full control over the default title
- *
- * Revision 1.9  2006/08/19 07:56:31  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.8  2006/08/17 16:32:29  fplanque
- * enhanced titles
- *
- * Revision 1.7  2006/08/05 17:59:52  fplanque
- * minor
- *
- * Revision 1.6  2006/05/12 21:36:00  blueyed
- * Fixed E_NOTICE
- *
- * Revision 1.5  2006/04/19 20:14:03  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.4  2006/03/16 23:22:45  blueyed
- * Fix extra slash in archive_link() for only "siteurl"
- *
- * Revision 1.3  2006/03/12 23:09:01  fplanque
- * doc cleanup
- *
- * Revision 1.2  2006/03/09 15:23:27  fplanque
- * fixed broken images
- *
- * Revision 1.1  2006/02/23 21:12:18  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.15  2005/12/20 18:12:50  fplanque
- * enhanced filtering/titling framework
- *
- * Revision 1.14  2005/12/12 19:44:09  fplanque
- * Use cached objects by reference instead of copying them!!
- *
- * Revision 1.13  2005/12/12 19:21:23  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.12  2005/10/29 20:49:39  matthiasmiller
- * An invalid category previously resulted in either a blank page (with the error indicated in the title) or an incorrectly formed feed. It is almost never meaningful to die over an invalid category when generating a title.
- *
- * Revision 1.11  2005/09/06 17:13:55  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.10  2005/08/26 16:34:51  fplanque
- * no message
- *
- * Revision 1.9  2005/08/25 16:06:45  fplanque
- * Isolated compilation of categories to use in an ItemList.
- * This was one of the oldest bugs on the list! :>
- *
- * Revision 1.8  2005/08/24 18:43:09  fplanque
- * Removed public stats to prevent spamfests.
- * Added context browsing to Archives plugin.
- *
- * Revision 1.7  2005/05/24 18:46:26  fplanque
- * implemented blog email subscriptions (part 1)
- *
- * Revision 1.6  2005/03/15 19:19:48  fplanque
- * minor, moved/centralized some includes
- *
- * Revision 1.5  2005/03/09 19:23:34  blueyed
- * doc
- *
- * Revision 1.4  2005/03/09 14:54:26  fplanque
- * refactored *_title() galore to requested_title()
- *
- * Revision 1.3  2005/02/28 09:06:34  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.2  2004/10/14 18:31:25  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.23  2004/10/12 18:48:34  fplanque
- * Edited code documentation.
- *
  */
 ?>
