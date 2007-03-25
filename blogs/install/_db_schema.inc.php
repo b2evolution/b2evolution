@@ -126,7 +126,6 @@ $schema_queries = array(
 			blog_access_type     VARCHAR(10) NOT NULL DEFAULT 'index.php',
 			blog_siteurl         varchar(120) NOT NULL default '',
 			blog_staticfilename  varchar(30) NULL default NULL,
-			blog_stub            VARCHAR(255) NOT NULL DEFAULT 'stub',
 			blog_urlname         VARCHAR(255) NOT NULL DEFAULT 'urlname',
 			blog_notes           TEXT NULL,
 			blog_keywords        tinytext,
@@ -526,6 +525,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.55  2007/03/25 15:18:57  fplanque
+ * cleanup
+ *
  * Revision 1.54  2007/03/20 09:53:26  fplanque
  * Letting boggers view their own stats.
  * + Letthing admins view the aggregate by default.

@@ -1685,6 +1685,9 @@ function upgrade_b2evo_tables()
 										SET blog_access_type = "relative",
 												blog_siteurl = CONCAT( blog_siteurl, blog_stub )
 									WHERE blog_access_type = "stub"' );
+
+		db_drop_col( 'T_blogs', 'blog_stub' );
+
 		echo "OK.<br />\n";
 	}
 
@@ -1803,6 +1806,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.213  2007/03/25 15:18:57  fplanque
+ * cleanup
+ *
  * Revision 1.212  2007/03/25 15:07:38  fplanque
  * multiblog fixes
  *

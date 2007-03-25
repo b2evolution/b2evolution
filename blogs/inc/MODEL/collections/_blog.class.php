@@ -1006,24 +1006,6 @@ class Blog extends DataObject
 				}
 				debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->get('baseurl').'].' );
 
-			case 'basehost':
-				if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->get('baseurl'), $matches ) )
-				{
-					return $matches[2];
-				}
-				debug_die( 'Blog::get(baseurl)/basehost - assertion failed [baseurl: '.$this->get('baseurl').'].' );
-
-			case 'cookie_domain':
-				$basehost = $this->get('basehost');
-				// Note: we need special treatment for hosts without dots (otherwise cookies won't get set!)
-				return ( strpos( $basehost, '.' ) === false ) ? '' : '.'. $basehost;
-
-			case 'cookie_path':
-				return preg_replace( '#https?://[^/]+#', '', $this->get('baseurl') );
-
-			case 'blogstatsurl':
-				return ''; 						// Deprecated!
-
 			case 'lastcommentsurl':
 				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=comments' );
 
@@ -1378,6 +1360,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.74  2007/03/25 15:18:57  fplanque
+ * cleanup
+ *
  * Revision 1.73  2007/03/25 15:07:38  fplanque
  * multiblog fixes
  *
