@@ -87,19 +87,21 @@ class BlogCache extends DataObjectCache
 
 
 	/**
-	 * Get an object from cache by its url ("siteurl") or based on access_type == 'stub'.
+	 * Get an object from cache by its url ("siteurl")
 	 *
 	 * Load the cache if necessary
 	 *
-	 * This gets used in /index.php to detect blogs according to the requested HostWithPath
+	 * This gets used in /index_multi.php to detect blogs according to the requested HostWithPath
 	 *
-	 * @param string URL of object to load (this should the whole requested URL/path, e.g. "http://mr.example.com/permalink")
+	 * @todo fp> de-factorize. cleanup. make efficient. split access types.
+	 *
+	 * @param string URL of blog to load (should be the whole requested URL/path, e.g. "http://mr.example.com/permalink")
 	 * @param boolean false if you want to return false on error
-	 * @return Blog|false A Blog object on success, false on failure (may also halt!)
+	 * @return Blog A Blog object on success, false on failure (may also halt!)
 	 */
 	function & get_by_url( $req_url, $halt_on_error = true )
 	{
-		global $DB, $Debuglog, $baseurl;
+		global $DB, $Debuglog, $baseurl, $basedomain;
 
 		foreach( array_keys($this->cache_siteurl_abs) as $siteurl_abs )
 		{
@@ -114,22 +116,21 @@ class BlogCache extends DataObjectCache
 
 		$req_url_wo_proto = substr( $req_url, strpos( $req_url, '://' ) ); // req_url without protocol, so it matches http and https below
 
-		// TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
-		$sql = "
-				SELECT *
-				  FROM $this->dbtablename
-				 WHERE (
-				  ( blog_siteurl REGEXP '^https?://'
-				    AND ( ".$DB->quote('http'.$req_url_wo_proto)." LIKE CONCAT( blog_siteurl, '%' )
-				          OR ".$DB->quote('https'.$req_url_wo_proto)." LIKE CONCAT( blog_siteurl, '%' ) ) ) ";
+		$sql = 'SELECT *
+						  FROM T_blogs
+						 WHERE ( blog_access_type = "absolute"
+									    AND ( '.$DB->quote('http'.$req_url_wo_proto).' LIKE CONCAT( blog_siteurl, "%" )
+								          OR '.$DB->quote('https'.$req_url_wo_proto).' LIKE CONCAT( blog_siteurl, "%" ) ) )
+								OR ( blog_access_type = "subdom"
+											AND '.$DB->quote($req_url_wo_proto).' LIKE CONCAT( "://", blog_urlname, ".'.$basedomain.'/%" ) )';
 
 		// Match stubs like "http://base/url/STUB?param=1" on $baseurl
+		/*
 		if( preg_match( "#^$baseurl([^/?]+)#", $req_url, $match ) )
 		{
 			$sql .= "\n OR ( blog_access_type = 'stub' AND blog_stub = '".$match[1]."' )";
 		}
-
-		$sql .= ' ) ';
+		*/
 
 		$row = $DB->get_row( $sql, OBJECT, 0, 'Blog::get_by_url()' );
 
@@ -149,7 +150,7 @@ class BlogCache extends DataObjectCache
 
 
 	/**
-	 * Get an object from cache by its URL name.
+	 * Get a blog from cache by its URL name.
 	 *
 	 * Load the object into cache, if necessary.
 	 *
@@ -259,6 +260,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.19  2007/03/25 15:07:38  fplanque
+ * multiblog fixes
+ *
  * Revision 1.18  2006/12/17 23:44:35  fplanque
  * minor cleanup
  *
@@ -277,46 +281,5 @@ class BlogCache extends DataObjectCache
  *
  * Revision 1.13  2006/11/24 18:27:23  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.12  2006/09/11 22:06:08  blueyed
- * Cleaned up option_list callback handling
- *
- * Revision 1.11  2006/08/21 16:07:43  fplanque
- * refactoring
- *
- * Revision 1.10  2006/08/19 07:56:30  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.9  2006/07/06 19:26:30  fplanque
- * question?
- *
- * Revision 1.8  2006/06/05 15:26:12  blueyed
- * get_by_url: detect regardless of protocol (http or https)
- *
- * Revision 1.7  2006/04/19 20:13:50  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.6  2006/03/18 14:35:47  blueyed
- * todo
- *
- * Revision 1.5  2006/03/17 21:28:40  fplanque
- * no message
- *
- * Revision 1.4  2006/03/17 21:13:13  blueyed
- * Improved caching
- *
- * Revision 1.3  2006/03/16 23:25:50  blueyed
- * Fixed BlogCache::get_by_url(), so "siteurl" type blogs can finally get used.
- *
- * Revision 1.2  2006/03/12 23:08:58  fplanque
- * doc cleanup
- *
- * Revision 1.1  2006/02/23 21:11:57  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.19  2006/01/16 21:22:56  blueyed
- * Fix return by reference.
  */
 ?>

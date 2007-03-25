@@ -316,6 +316,10 @@ class Blog extends DataObject
 				}
   			$this->set( 'siteurl', $blog_siteurl );
 			}
+			else
+			{
+  			$this->set( 'siteurl', '' );
+			}
 		}
 
 
@@ -558,7 +562,7 @@ class Blog extends DataObject
 	 */
 	function gen_blogurl( $type = 'default', $absolute = true )
 	{
-		global $baseurl, $basehost, $basepath, $Settings;
+		global $baseurl, $basedomain, $basepath, $Settings;
 
 		if( preg_match( '#^https?://#', $this->siteurl ) )
 		{
@@ -607,7 +611,7 @@ class Blog extends DataObject
 				return $baseurl.$this->siteurl;
 
 			case 'subdom':
-				return 'http://'.$this->urlname.'.'.$basehost.'/';
+				return 'http://'.$this->urlname.'.'.$basedomain.'/';
 
 			case 'absolute':
 				return $this->siteurl;
@@ -1374,6 +1378,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.73  2007/03/25 15:07:38  fplanque
+ * multiblog fixes
+ *
  * Revision 1.72  2007/03/25 13:20:52  fplanque
  * cleaned up blog base urls
  * needs extensive testing...

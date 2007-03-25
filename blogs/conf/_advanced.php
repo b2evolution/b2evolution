@@ -103,6 +103,11 @@ else
 	die( 'Your baseurl ('.$baseurl.') set in _basic_config.php seems invalid. You probably missed the "http://" prefix or the trailing slash. Please correct that.' );
 }
 
+
+// Get basedomain out of basehost:
+$basedomain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '$2', $basehost );
+
+
 /**
  * Short name of this system (will be used for cookies and notification emails).
  *

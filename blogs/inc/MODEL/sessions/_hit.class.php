@@ -163,13 +163,13 @@ class Hit
 		if( $this->referer_basedomain )
 		{	// This referer has a base domain
 			// Check if we have met it before:
-			$basedomain = $DB->get_row( '
+			$hit_basedomain = $DB->get_row( '
 				SELECT dom_ID
 				  FROM T_basedomains
 				 WHERE dom_name = '.$DB->quote($this->referer_basedomain) );
-			if( !empty( $basedomain->dom_ID ) )
+			if( !empty( $hit_basedomain->dom_ID ) )
 			{	// This basedomain has visited before:
-				$this->referer_domain_ID = $basedomain->dom_ID;
+				$this->referer_domain_ID = $hit_basedomain->dom_ID;
 				// fp> The blacklist handling that was here made no sense.
 			}
 			else
@@ -689,6 +689,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.47  2007/03/25 15:07:38  fplanque
+ * multiblog fixes
+ *
  * Revision 1.46  2007/02/19 13:15:34  waltercruz
  * Changing double quotes to single quotes in queries
  *

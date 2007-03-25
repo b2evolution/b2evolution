@@ -1672,6 +1672,21 @@ function upgrade_b2evo_tables()
 		install_basic_widgets();
 	}
 
+	if( $old_db_version < 9410 )
+	{
+		// Upgrade the blog access types:
+		echo 'Updating blogs access types... ';
+		$DB->query( 'UPDATE T_blogs
+										SET blog_access_type = "absolute"
+									WHERE blog_siteurl LIKE "http://%"
+									   OR blog_siteurl LIKE "https://%"' );
+
+		$DB->query( 'UPDATE T_blogs
+										SET blog_access_type = "relative",
+												blog_siteurl = CONCAT( blog_siteurl, blog_stub )
+									WHERE blog_access_type = "stub"' );
+		echo "OK.<br />\n";
+	}
 
 	/*
 	// fp> have to check if this means kiss your pagerank goodbye
@@ -1788,6 +1803,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.212  2007/03/25 15:07:38  fplanque
+ * multiblog fixes
+ *
  * Revision 1.211  2007/03/12 14:10:10  waltercruz
  * Changing the WHERE 1 queries to boolean (WHERE 1=1) queries to satisfy the standarts
  *

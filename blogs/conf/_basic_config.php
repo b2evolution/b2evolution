@@ -90,7 +90,7 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
  *
  * IMPORTANT: If you want to test b2evolution on your local machine, do NOT use that machine's
  * name in the $baseurl!
- * For example, if you machine is called HOMER, do not use http://homer/b2evolution/blogs/ !
+ * For example, if your machine is called HOMER, do not use http://homer/b2evolution/blogs/ !
  * Use http://localhost/b2evolution/blogs/ instead. And log in on localhost too, not homer!
  * If you don't, login cookies will not hold.
  *

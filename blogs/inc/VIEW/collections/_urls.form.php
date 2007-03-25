@@ -75,7 +75,7 @@ $Form->hidden( 'tab', $tab );
 $Form->hidden( 'blog', $blog );
 
 
-global $baseurl, $basehost;
+global $baseurl, $basedomain;
 
 // determine siteurl type (if not set from update-action)
 if( preg_match('#https?://#', $edited_Blog->get( 'siteurl' ) ) )
@@ -131,10 +131,10 @@ $Form->begin_fieldset( T_('Blog URL') );
 									update_urlpreview( \''.$baseurl.'\'+this.value );" /></span>',
 									'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
 		),
-		array( 'subdom', T_('Subdomain of basehost'),
-									'http://url_name.'.$basehost.'/',
+		array( 'subdom', T_('Subdomain of basedomain'),
+									'http://url_name.'.$basedomain.'/',
 									'',
-									'onclick="update_urlpreview( \'http://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.$basehost.'/\' )"'
+									'onclick="update_urlpreview( \'http://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.$basedomain.'/\' )"'
 		),
 		array( 'absolute', T_('Absolute URL').':',
 									'',
@@ -209,6 +209,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.6  2007/03/25 15:07:38  fplanque
+ * multiblog fixes
+ *
  * Revision 1.5  2007/03/25 13:20:52  fplanque
  * cleaned up blog base urls
  * needs extensive testing...
