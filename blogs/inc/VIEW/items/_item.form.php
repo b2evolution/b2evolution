@@ -141,7 +141,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	if( $use_preview )
 	{ // ---------- PREVIEW ----------
 		load_funcs( '_misc/_url.funcs.php' );
-		$url = url_same_protocol( $Blog->get( 'dynurl' ) );
+		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
 
 		$Form->button( array( 'button', '', T_('Preview'), '', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
 	}
@@ -335,6 +335,10 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.41  2007/03/25 13:19:17  fplanque
+ * temporarily disabled dynamic and static urls.
+ * may become permanent in favor of a caching mechanism.
+ *
  * Revision 1.40  2007/03/21 02:21:37  fplanque
  * item controller: highlight current (step 2)
  *

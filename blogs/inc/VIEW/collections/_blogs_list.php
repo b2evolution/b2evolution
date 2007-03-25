@@ -110,6 +110,7 @@ $Results->cols[] = array(
 
 function disp_static_filename( & $Blog )
 {
+	return 'unsupported';
 	global $current_User;
 	if( $Blog->get('staticfilename') )
 	{
@@ -186,6 +187,10 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.16  2007/03/25 13:19:17  fplanque
+ * temporarily disabled dynamic and static urls.
+ * may become permanent in favor of a caching mechanism.
+ *
  * Revision 1.15  2007/01/23 04:19:50  fplanque
  * handling of blog owners
  *

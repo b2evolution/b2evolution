@@ -222,11 +222,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
    				'next_text' => T_('Next').' &gt;&gt;',
 				) );
 		?>
-		<!--?php next_post(); // activate this if you want a link to the next post in single page mode ?-->
-		<!--?php previous_post(); // activate this if you want a link to the previous post in single page mode ?-->
 		<ul>
-			<li><a href="<?php $Blog->disp( 'staticurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(cached)') ?></span></li>
-			<li><a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(no cache)') ?></span></li>
+			<li><a href="<?php $Blog->disp( 'url', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a></li>
 			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Latest comments') ?></strong></a></li>
 		</ul>
 		<?php // -------------------------- CALENDAR INCLUDED HERE -----------------------------

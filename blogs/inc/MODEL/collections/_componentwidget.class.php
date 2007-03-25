@@ -198,11 +198,8 @@ class ComponentWidget extends DataObject
 						echo $params['block_start'];
 						echo $params['list_start'];
 
-						// $Blog->disp( 'staticurl', 'raw' ) echo T_('Recently') echo T_('(cached)')
-						// $Blog->disp( 'dynurl', 'raw' ) echo T_('Recently') echo T_('(no cache)')
-
 						echo $params['item_start'];
-						echo '<strong><a href="'.$Blog->get('dynurl').'">'.T_('Recently').'</a></strong>';
+						echo '<strong><a href="'.$Blog->get('url').'">'.T_('Recently').'</a></strong>';
 						echo $params['item_end'];
 
 						// fp> TODO: don't display this if archives plugin not installed... or depluginize archives (I'm not sure)
@@ -354,6 +351,10 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2007/03/25 13:19:17  fplanque
+ * temporarily disabled dynamic and static urls.
+ * may become permanent in favor of a caching mechanism.
+ *
  * Revision 1.14  2007/03/04 21:46:39  fplanque
  * category directory / albums
  *

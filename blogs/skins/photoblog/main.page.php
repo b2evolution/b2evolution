@@ -44,7 +44,7 @@ require dirname(__FILE__).'/_bloglist.php';
 <div class="pageHeader">
 
 	<div class="floatright">
-		<a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><?php echo T_('Recently') ?></a>
+		<a href="<?php $Blog->disp( 'url', 'raw' ) ?>"><?php echo T_('Recently') ?></a>
 		|
 		<a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('Index') ?></a>
 		|

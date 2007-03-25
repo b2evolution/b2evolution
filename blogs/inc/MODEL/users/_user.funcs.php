@@ -131,7 +131,7 @@ function get_user_login_link( $before = '', $after = '', $link_text = '', $link_
 	}
 	elseif( isset($edited_Blog) )
 	{ // We are generating a static page
-		$redirect = $edited_Blog->get('dynurl');
+		$redirect = $edited_Blog->get('url'); // was dynurl
 	}
 	else
 	{ // We are in a weird situation
@@ -196,7 +196,7 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
 	}
 	elseif( isset($edited_Blog) )
 	{ // We are generating a static page
-		$redirect = $edited_Blog->get('dynurl');
+		$redirect = $edited_Blog->get('url'); // was dynurl
 	}
 	else
 	{ // We are in a weird situation
@@ -538,6 +538,10 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.28  2007/03/25 13:19:17  fplanque
+ * temporarily disabled dynamic and static urls.
+ * may become permanent in favor of a caching mechanism.
+ *
  * Revision 1.27  2007/03/06 12:23:38  fplanque
  * bugfix
  *
