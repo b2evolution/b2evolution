@@ -80,22 +80,6 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Link options') );
-
-$Form->radio( 'links_extrapath', $Settings->get('links_extrapath'),
-							array(  array( 'disabled', T_('Do not use extra path info'), T_('Permalinks will look like: \'stub?title=post-title&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1\'') ),
-											array( 'short', T_('Only use post URL title'), T_('Permalinks will look like \'stub/post-title\'' ) ),
-											array( 'y', T_('Use year'), T_('Permalinks will look like \'stub/2006/post-title\'' ) ),
-											array( 'ym', T_('Use year & month'), T_('Permalinks will look like \'stub/2006/12/post-title\'' ) ),
-											array( 'ymd', T_('Use year, month & day'), T_('Permalinks will look like \'stub/2006/12/31/post-title\'' ) ),
-											array( 'subchap', T_('Use sub-category'), T_('Permalinks will look like \'stub/subcat/post-title\'' ) ),
-											array( 'chapters', T_('Use category path'), T_('Permalinks will look like \'stub/cat/subcat/post-title\'' ) ),
-										), T_('Extra path info'), true );
-
-$Form->end_fieldset();
-
-// --------------------------------------------
-
 $Form->begin_fieldset( T_('Security options') );
 
 	$Form->text_input( 'user_minpwdlen', (int)$Settings->get('user_minpwdlen'), 2, T_('Minimum password length'), T_('characters.'), array( 'maxlength'=>2, 'required'=>true ) );
@@ -129,6 +113,10 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.28  2007/03/25 13:20:52  fplanque
+ * cleaned up blog base urls
+ * needs extensive testing...
+ *
  * Revision 1.27  2007/03/24 20:41:16  fplanque
  * Refactored a lot of the link junk.
  * Made options blog specific.

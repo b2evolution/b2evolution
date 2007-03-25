@@ -216,7 +216,7 @@ function create_default_data()
 function create_blog(
 	$blog_name,
 	$blog_shortname,
-	$blog_stub,									// This will temporarily be assigned to both STUB and URLNAME
+	$blog_urlname,
 	$blog_staticfilename = '',
 	$blog_tagline = '',
 	$blog_longdesc = '',
@@ -225,7 +225,7 @@ function create_blog(
 	global $DB, $default_locale;
 
 	$query = "INSERT INTO T_blogs( blog_name, blog_shortname, blog_siteurl,
-						blog_stub, blog_urlname, blog_staticfilename,
+						blog_urlname, blog_staticfilename,
 						blog_tagline, blog_longdesc, blog_locale,
 						blog_allowcomments, blog_allowtrackbacks, blog_disp_bloglist,
 						blog_in_bloglist, blog_links_blog_ID )
@@ -233,8 +233,7 @@ function create_blog(
 	$query .= "'".$DB->escape($blog_name)."', ";
 	$query .= "'".$DB->escape($blog_shortname)."', ";
 	$query .= "'', ";
-	$query .= "'".$DB->escape($blog_stub)."', ";
-	$query .= "'".$DB->escape($blog_stub)."', ";		// This one is for urlname
+	$query .= "'".$DB->escape($blog_urlname)."', ";
 	$query .= "'".$DB->escape($blog_staticfilename)."', ";
 	$query .= "'".$DB->escape($blog_tagline)."', ";
 	$query .= "'".$DB->escape($blog_longdesc)."', ";
@@ -286,22 +285,6 @@ function create_demo_contents()
 	$default_blog_longdesc = T_("This is the long description for the blog named '%s'. %s");
 
 	echo "Creating default blogs... ";
-
-	/*
-	$blog_shortname = 'Blog All';
-	$blog_stub = 'all';
-	$blog_more_longdesc = "<br />
-<br />
-<strong>".T_("This blog (blog #1) is actually a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by unchecking 'Include in public blog list' in the blogs admin.")."</strong>";
-	$blog_all_ID = create_blog(
-		sprintf( T_('%s Title'), $blog_shortname ),
-		$blog_shortname,
-		$blog_stub,
-		$blog_stub.'.html',
-		sprintf( T_('Tagline for %s'), $blog_shortname ),
-		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-		4 );
-	*/
 
 	$blog_shortname = 'Blog A';
 	$blog_a_long = sprintf( T_('%s Title'), $blog_shortname );
@@ -611,6 +594,10 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.220  2007/03/25 13:20:52  fplanque
+ * cleaned up blog base urls
+ * needs extensive testing...
+ *
  * Revision 1.219  2007/03/20 09:53:26  fplanque
  * Letting boggers view their own stats.
  * + Letthing admins view the aggregate by default.

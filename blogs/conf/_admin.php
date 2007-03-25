@@ -128,13 +128,4 @@ $use_post_url = 1;  // 1 to enable, 0 to disable
  */
 $report_abuse = 1;
 
-
-/**
- * max length for blog_urlname and blog_stub values
- *
- * (this gets checked when editing/creating blogs).
- *
- * @global int $maxlength_urlname_stub
- */
-$maxlength_urlname_stub = 30;
 ?>

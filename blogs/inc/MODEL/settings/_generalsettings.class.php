@@ -84,8 +84,6 @@ class GeneralSettings extends AbstractSettings
 		'fm_default_chmod_file' => '664',
 		'fm_default_chmod_dir' => '775',
 
-		'links_extrapath' => 'disabled',
-
 		'newusers_canregister' => '0',
 		'newusers_mustvalidate' => '1',
 		'newusers_revalidate_emailchg' => '0',
@@ -159,6 +157,10 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.30  2007/03/25 13:20:52  fplanque
+ * cleaned up blog base urls
+ * needs extensive testing...
+ *
  * Revision 1.29  2007/03/24 20:41:16  fplanque
  * Refactored a lot of the link junk.
  * Made options blog specific.

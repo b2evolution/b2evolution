@@ -177,7 +177,6 @@ class Blog extends DataObject
 			$this->access_type = $db_row->blog_access_type;
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->staticfilename = $db_row->blog_staticfilename;
-			$this->stub = $db_row->blog_stub;
 			$this->urlname = $db_row->blog_urlname;
 			$this->links_blog_ID = $db_row->blog_links_blog_ID;
 			$this->notes = $db_row->blog_notes;
@@ -293,10 +292,11 @@ class Blog extends DataObject
 		}
 
 
-		if( ($siteurl_type = param( 'blog_siteurl_type',   'string', NULL )) !== NULL )
+		if( ($access_type = param( 'blog_access_type', 'string', NULL )) !== NULL )
 		{ // Blog URL parameters:
-			// TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
-			if( $siteurl_type == 'absolute' )
+			$this->set( 'access_type', $access_type );
+
+			if( $access_type == 'absolute' )
 			{
 				$blog_siteurl = param( 'blog_siteurl_absolute', 'string', true );
 				if( !preg_match( '#^https?://.+#', $blog_siteurl ) )
@@ -304,8 +304,9 @@ class Blog extends DataObject
 					$Messages->add( T_('Blog Folder URL').': '
 													.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!'), 'error' );
 				}
+				$this->set( 'siteurl', $blog_siteurl );
 			}
-			else
+			elseif( $access_type == 'relative' )
 			{ // relative siteurl
 				$blog_siteurl = param( 'blog_siteurl_relative', 'string', true );
 				if( preg_match( '#^https?://#', $blog_siteurl ) )
@@ -313,46 +314,7 @@ class Blog extends DataObject
 					$Messages->add( T_('Blog Folder URL').': '
 													.T_('You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!'), 'error' );
 				}
-			}
-			$this->set( 'siteurl', $blog_siteurl );
-
-
-			// Test if "htsrv/" is accessible below blog's baseurl:
-/* fp> This is not in the "specs". htsrv does NOT have to be a subfolder of the blog baseurl.
-   dh> ok. I assumed it in Plugin::get_htsrv_url() and it fails, if someone uses a relative siteurl (and "index.php" as stub).
-
-			// fp> Ideally, it would be possible to choose the location of htsrv for each blog. Even more important with absolute URLs where the htsrv may be on a different domain. (might create cookie issues though)
-			// fp> Assuming htsrv is under the blog baseurl is okay for a default. It is not okay as a requirement.
-
-			// dh> it there something else than that we could test here?
-
-			// TODO: dh> this should be a warning maybe, if fetch_remote_page() fails by itself..
-			global $htsrv_subdir;
-			load_funcs('_misc/_url.funcs.php');
-			fetch_remote_page($this->get('baseurl').$htsrv_subdir, $info);
-			if( $info['status'] == '404' || substr($info['status'], 0, 1) == '5' )
-			{
-				param_error( $siteurl_type == 'absolute' ? 'blog_siteurl_absolute' : 'blog_siteurl_relative',
-					sprintf( T_('The Blog Folder URL does not seem to be correct. Could not access %s (HTTP status %s).'),
-					$this->get('baseurl').$htsrv_subdir, $info['status'] ) );
-			}
-*/
-
-			// Preferred access type:
-			$this->set( 'access_type',   param( 'blog_access_type',   'string', true ) );
-			$this->set( 'stub',          param( 'blog_stub',          'string', true ) );
-
-			// TODO: change * to +
-			// dh> Why? Will there be another way to have no/an empty stub? fp> yes, it's in a TODO somewhere (on the form?)
-			if( ! preg_match( '|^[A-Za-z0-9\-]*$|', $this->urlname ) )
-			{
-				param_error( 'blog_stub', T_('The stub name is invalid.') );
-			}
-
-			if( $this->access_type == 'stub' )
-			{	// fp> If there is a case to leave this blank, comment this out and explain the case. Thanks.
-				// dh> I'm using it with "absolute URL" to have no "stub file" at all..
-				// param_check_not_empty( 'blog_stub', T_('You must provide a stub file name, e-g: a_stub.php') );
+  			$this->set( 'siteurl', $blog_siteurl );
 			}
 		}
 
@@ -596,7 +558,7 @@ class Blog extends DataObject
 	 */
 	function gen_blogurl( $type = 'default', $absolute = true )
 	{
-		global $baseurl, $basepath, $Settings;
+		global $baseurl, $basehost, $basepath, $Settings;
 
 		if( preg_match( '#^https?://#', $this->siteurl ) )
 		{
@@ -609,10 +571,16 @@ class Blog extends DataObject
 
 		if( $type == 'static' )
 		{ // We want the static page, there is no access type option here:
+	debug_die( 'static page currently not supported' );
 			if( is_file( $basepath.$this->siteurl.$this->staticfilename ) )
 			{ // If static page exists:
 				return $base.$this->staticfilename;
 			}
+		}
+
+		if( $type == 'dynamic' )
+		{ // We want to force a dynamic page
+	debug_die( 'dynamic page currently not supported' );
 		}
 
 		switch( $this->access_type )
@@ -623,38 +591,26 @@ class Blog extends DataObject
 					|| preg_match( '#^https?://#', $this->siteurl ) )
 				{ // Safety check! We only do that kind of linking if this is really the default blog...
 					// or if we call by absolute URL
-					return $base.'index.php';
+					return $baseurl.$this->siteurl.'index.php';
 				}
 				// ... otherwise, we add the blog ID:
 
 			case 'index.php':
 				// Access through index.php + blog qualifier
-				if( $Settings->get('links_extrapath') != 'disabled' )
-				{	// We want to use extra path info, use the blog urlname:
-					return $base.'index.php/'.$this->urlname;
-				}
-				else
-				{	// Extra path is disabled, use the blog param:
-					return $base.'index.php?blog='.$this->ID;
-				}
+				return $baseurl.$this->siteurl.'index.php?blog='.$this->ID;
 
-			case 'stub':
-				// Access through stub file
-				$blogurl = $base;
-				if( !empty($this->stub) )
-				{	// fp> if default_stub gets implemented, empty stubs will no longer be allowed.
-					$blogurl .= $this->stub;
-					if( ($type == 'dynamic') && !( preg_match( '#.php$#', $blogurl ) ) )
-					{ // We want to force the dynamic page but the URL is not explicitly dynamic
-						// This is needed when a static page is taking control of domain.com/stub and we want an explicit link to the LATEST content, which can only be gotten at domain.com/stub.php
-						// fp> This creates a small problem with empty stubs (domain.com/.php). This should be fixed by using a fourth blog_access_type: default, index.php, stub, *default_stub* .
-						// Consequence: require the stub field on blog properties form when stub mode is selected
-						$blogurl .= '.php';
-					}
-				}
-				return $blogurl;
+			case 'extrapath':
+				// We want to use extra path info, use the blog urlname:
+				return $baseurl.$this->siteurl.'index.php/'.$this->urlname;
 
-				// fp> TODO: default_stub: return $base  (to be checked)
+			case 'relative':
+				return $baseurl.$this->siteurl;
+
+			case 'subdom':
+				return 'http://'.$this->urlname.'.'.$basehost.'/';
+
+			case 'absolute':
+				return $this->siteurl;
 
 			default:
 				debug_die( 'Unhandled Blog access type ['.$this->access_type.']' );
@@ -1239,11 +1195,10 @@ class Blog extends DataObject
 	 *
 	 * Includes WAY TOO MANY requests because we try to be compatible with MySQL 3.23, bleh!
 	 *
-	 * @param boolean true if you want to try to delete the stub file
 	 * @param boolean true if you want to try to delete the static file
 	 * @param boolean true if you want to echo progress
 	 */
-	function dbdelete( $delete_stub_file = false, $delete_static_file = false, $echo = false )
+	function dbdelete($delete_static_file = false, $echo = false )
 	{
 		global $DB, $cache_blogs, $Messages;
 
@@ -1314,26 +1269,6 @@ class Blog extends DataObject
 		} // / are there cats?
 
 
-		if( $delete_stub_file )
-		{ // Delete stub file
-			if( $echo ) echo '<br />Trying to delete stub file... ';
-			if( ! @unlink( $this->get('dynfilepath') ) )
-			{
-				if( $echo )
-				{
-					echo '<span class="error">';
-					printf(	T_('ERROR! Could not delete! You will have to delete the file [%s] by hand.'),
-									$this->get('dynfilepath') );
-					echo '</span>';
-				}
-				$Messages->add( sprintf( T_('Could not delete stub file [%s]'), $this->get('dynfilepath') ), 'error' );
-			}
-			else
-			{
-				if( $echo ) echo 'OK.';
-				$Messages->add( T_('Deleted blog\'s stub file'), 'success' );
-			}
-		}
 		if( $delete_static_file )
 		{ // Delete static file
 			if( $echo ) echo '<br />Trying to delete static file... ';
@@ -1439,6 +1374,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.72  2007/03/25 13:20:52  fplanque
+ * cleaned up blog base urls
+ * needs extensive testing...
+ *
  * Revision 1.71  2007/03/25 10:20:02  fplanque
  * cleaned up archive urls
  *

@@ -40,22 +40,21 @@ global $Debuglog;
 	<!--
 	// Script to update the Blog URL preview:
 	var blog_baseurl = '<?php echo str_replace( "'", "\'", $edited_Blog->get( 'baseurl' ) ); ?>';
-	var blog_urlappend = '<?php echo str_replace( "'", "\'", substr( $edited_Blog->gen_blogurl(), strlen($edited_Blog->get( 'baseurl' )) ) ); ?>';
 
-	function update_urlpreview( base, append )
+	function update_urlpreview( baseurl )
 	{
-		if( typeof base == 'string' ){ blog_baseurl = base; }
-		if( typeof append == 'string' ){ blog_urlappend = append; }
-
-		text = blog_baseurl + blog_urlappend;
+		if( typeof baseurl == 'string' )
+		{
+			blog_baseurl = baseurl;
+		}
 
 		if( document.getElementById( 'urlpreview' ).hasChildNodes() )
 		{
-			document.getElementById( 'urlpreview' ).firstChild.data = text;
+			document.getElementById( 'urlpreview' ).firstChild.data = blog_baseurl;
 		}
 		else
 		{
-			document.getElementById( 'urlpreview' ).appendChild( document.createTextNode( text ) );
+			document.getElementById( 'urlpreview' ).appendChild( document.createTextNode( blog_baseurl ) );
 		}
 	}
 	//-->
@@ -76,46 +75,23 @@ $Form->hidden( 'tab', $tab );
 $Form->hidden( 'blog', $blog );
 
 
-global $baseurl, $maxlength_urlname_stub;
+global $baseurl, $basehost;
 
 // determine siteurl type (if not set from update-action)
 if( preg_match('#https?://#', $edited_Blog->get( 'siteurl' ) ) )
 { // absolute
-	$blog_siteurl_type = 'absolute';
 	$blog_siteurl_relative = '';
 	$blog_siteurl_absolute = $edited_Blog->get( 'siteurl' );
 }
 else
 { // relative
-	$blog_siteurl_type = 'relative';
 	$blog_siteurl_relative = $edited_Blog->get( 'siteurl' );
 	$blog_siteurl_absolute = 'http://';
 }
 
 $Form->begin_fieldset( T_('Blog URL') );
 
-	$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('Blog URL name'), T_('Used to uniquely identify this blog. Appears in URLs and gets used as default for the media location (see the advanced tab).'), $maxlength_urlname_stub );
-
-	// TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
-	$Form->radio( 'blog_siteurl_type', $blog_siteurl_type,
-		array(
-			array( 'relative',
-							T_('Relative to baseurl').':',
-							'',
-							'<span class="nobr"><code>'.$baseurl.'</code>'
-							.'<input type="text" id="blog_siteurl_relative" name="blog_siteurl_relative" size="30" maxlength="120" value="'.format_to_output( $blog_siteurl_relative, 'formvalue' ).'" onkeyup="update_urlpreview( \''.$baseurl.'\'+this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[0].checked=true; update_urlpreview( \''.$baseurl.'\'+this.value );" /></span>'
-							.'<div class="notes">'.T_('With trailing slash. By default, leave this field empty. If you want to use a subfolder, you must handle it accordingly on the Webserver (e-g: create a subfolder + stub file or use mod_rewrite).').'</div>',
-							'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
-			),
-			array( 'absolute',
-							T_('Absolute URL').':',
-							'',
-							'<input type="text" id="blog_siteurl_absolute" name="blog_siteurl_absolute" size="40" maxlength="120" value="'.format_to_output( $blog_siteurl_absolute, 'formvalue' ).'" onkeyup="update_urlpreview( this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[1].checked=true; update_urlpreview( this.value );" />'.
-							'<span class="notes">'.T_('With trailing slash.').'</span>',
-							'onclick="document.getElementById( \'blog_siteurl_absolute\' ).focus();"'
-			)
-		),
-		T_('Blog Folder URL'), true );
+	$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('Blog URL name'), T_('Used to uniquely identify this blog. Appears in URLs and gets used as default for the media location (see the advanced tab).'), 255 );
 
 	if( $default_blog_ID = $Settings->get('default_blog_ID') )
 	{
@@ -126,30 +102,51 @@ $Form->begin_fieldset( T_('Blog URL') );
 			$defblog = $default_Blog->dget('shortname');
 		}
 	}
-	$Form->radio( 'blog_access_type', $edited_Blog->get( 'access_type' ),
-		array(
-			array( 'default', T_('Automatic detection by index.php'),
-							T_('Match absolute URL or use default blog').
-								' ('.( !isset($defblog)
-									?	/* TRANS: NO current default blog */ T_('No default blog is currently set')
-									: /* TRANS: current default blog */ T_('Current default :').' '.$defblog ).
-								')',
-							'',
-							'onclick="update_urlpreview( false, \'index.php\' );"'
-			),
-			array( 'index.php', T_('Explicit reference on index.php'),
-							T_('You might want to use extra-path info with this.'),
-							'',
-							'onclick="update_urlpreview( false, \'index.php'.( $Settings->get('links_extrapath') != 'disabled' ? "/'+document.getElementById( 'blog_urlname' ).value" : '?blog='.$edited_Blog->ID."'" ).' )"'
-			),
-			array( 'stub', T_('Explicit reference to stub file (Advanced)').':',
-							'',
-							'<label for="blog_stub">'.T_('Stub name').':</label>'.
-							'<input type="text" name="blog_stub" id="blog_stub" size="20" maxlength="'.$maxlength_urlname_stub.'" value="'.$edited_Blog->dget( 'stub', 'formvalue' ).'" onkeyup="update_urlpreview( false, this.value );" onfocus="update_urlpreview( false, this.value ); document.getElementsByName(\'blog_access_type\')[2].checked = true;" />'.
-							'<div class="notes">'.T_("For this to work, you must handle it accordingly on the Webserver (e-g: create a stub file or use mod_rewrite).").'</div>',
-							'onclick="document.getElementById( \'blog_stub\' ).focus();"'
-			),
-		), T_('Preferred access type'), true );
+	$Form->radio( 'blog_access_type', $edited_Blog->get( 'access_type' ), array(
+		array( 'default', T_('Default blog in index.php'),
+										'('.( !isset($defblog)
+											?	/* TRANS: NO current default blog */ T_('No default blog is currently set')
+											: /* TRANS: current default blog */ T_('Current default :').' '.$defblog ).
+										')',
+									'',
+									'onclick="update_urlpreview( \''.$baseurl.'index.php\' );"'
+		),
+		array( 'index.php', T_('Explicit param on index.php'),
+									'index.php?blog=123',
+									'',
+									'onclick="update_urlpreview( \''.$baseurl.'index.php?blog='.$edited_Blog->ID.'\' )"',
+		),
+		array( 'extrapath', T_('Extra path on index.php'),
+									'index.php/url_name',
+									'',
+									'onclick="update_urlpreview( \''.$baseurl.'index.php/\'+document.getElementById( \'blog_urlname\' ).value )"'
+		),
+		array( 'relative', T_('Relative to baseurl').':',
+									'',
+									'<span class="nobr"><code>'.$baseurl.'</code>'
+									.'<input type="text" id="blog_siteurl_relative" name="blog_siteurl_relative" size="35" maxlength="120" value="'
+									.format_to_output( $blog_siteurl_relative, 'formvalue' )
+									.'" onkeyup="update_urlpreview( \''.$baseurl.'\'+this.value );"
+									onfocus="document.getElementsByName(\'blog_access_type\')[3].checked=true;
+									update_urlpreview( \''.$baseurl.'\'+this.value );" /></span>',
+									'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
+		),
+		array( 'subdom', T_('Subdomain of basehost'),
+									'http://url_name.'.$basehost.'/',
+									'',
+									'onclick="update_urlpreview( \'http://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.$basehost.'/\' )"'
+		),
+		array( 'absolute', T_('Absolute URL').':',
+									'',
+									'<input type="text" id="blog_siteurl_absolute" name="blog_siteurl_absolute" size="50" maxlength="120" value="'
+										.format_to_output( $blog_siteurl_absolute, 'formvalue' )
+										.'" onkeyup="update_urlpreview( this.value );"
+										onfocus="document.getElementsByName(\'blog_access_type\')[5].checked=true;
+										update_urlpreview( this.value );" />'.
+										'<span class="notes">'.T_('With trailing slash.').'</span>',
+									'onclick="document.getElementById( \'blog_siteurl_absolute\' ).focus();"'
+		),
+	), T_('Blog base URL'), true );
 
 	$Form->info( T_('URL preview'), '<span id="urlpreview">'.$edited_Blog->gen_blogurl().'</span>' );
 
@@ -212,6 +209,10 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.5  2007/03/25 13:20:52  fplanque
+ * cleaned up blog base urls
+ * needs extensive testing...
+ *
  * Revision 1.4  2007/03/24 20:41:16  fplanque
  * Refactored a lot of the link junk.
  * Made options blog specific.

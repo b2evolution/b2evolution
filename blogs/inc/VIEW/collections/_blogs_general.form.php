@@ -28,7 +28,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $edited_Blog;
 
 
-global $action, $next_action, $blogtemplate, $blog, $tab, $maxlength_urlname_stub;
+global $action, $next_action, $blogtemplate, $blog, $tab;
 
 $Form = new Form();
 
@@ -50,7 +50,7 @@ else
 $Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear' ) );
 	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Full Name'), T_('Will be displayed on top of the blog.') );
 	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname', 'formvalue' ), 12, T_('Short Name'), T_('Will be used in selection menus and throughout the admin interface.') );
-	$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('Blog URL name'), T_('Used to uniquely identify this blog. Appears in URLs and gets used as default for the media location (see the advanced tab).'), $maxlength_urlname_stub );
+	$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('Blog URL name'), T_('Used to uniquely identify this blog. Appears in URLs and gets used as default for the media location (see the advanced tab).'), 255 );
 	$Form->select( 'blog_locale', $edited_Blog->get( 'locale' ), 'locale_options_return', T_('Main Locale'), T_('Determines the language of the navigation links on the blog.') );
 $Form->end_fieldset();
 
@@ -90,6 +90,10 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.20  2007/03/25 13:20:52  fplanque
+ * cleaned up blog base urls
+ * needs extensive testing...
+ *
  * Revision 1.19  2007/01/23 08:57:35  fplanque
  * decrap!
  *

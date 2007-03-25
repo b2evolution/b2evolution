@@ -204,9 +204,8 @@ switch( $action )
 			// Delete from DB:
 			$msg = sprintf( T_('Blog &laquo;%s&raquo; deleted.'), $edited_Blog->dget('name') );
 
-			param( 'delete_stub_file', 'integer', 0 );
 			param( 'delete_static_file', 'integer', 0 );
-			$edited_Blog->dbdelete( $delete_stub_file, $delete_static_file, false );
+			$edited_Blog->dbdelete( $delete_static_file );
 
 			$Messages->add( $msg, 'success' );
 
@@ -378,14 +377,6 @@ switch($action)
 				$Form->hidden( 'blog', $edited_Blog->ID );
 				$Form->hidden( 'confirm', 1 );
 
-				if( is_file( $edited_Blog->get('dynfilepath') ) )
-				{
-					?>
-					<input type="checkbox" id="delete_stub_file" name="delete_stub_file" value="1" />
-					<label for="delete_stub_file"><?php printf( T_('Also try to delete stub file [<strong><a %s>%s</a></strong>]'), 'href="'.$edited_Blog->dget('dynurl').'"', $edited_Blog->dget('dynfilepath') ); ?></label><br />
-					<br />
-					<?php
-				}
 				if( is_file( $edited_Blog->get('staticfilepath') ) )
 				{
 					?>
@@ -431,6 +422,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2007/03/25 13:20:51  fplanque
+ * cleaned up blog base urls
+ * needs extensive testing...
+ *
  * Revision 1.16  2007/01/15 18:48:06  fplanque
  * cleanup
  *
