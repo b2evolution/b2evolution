@@ -27,6 +27,7 @@ $container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID );
 function display_container( $container, $legend_suffix = '' )
 {
 	global $Blog;
+	global $edited_ComponentWidget;
 
 	$Table = & new Table();
 
@@ -38,6 +39,10 @@ function display_container( $container, $legend_suffix = '' )
 	$Table->cols = array(
 			array( 'th' => T_('Widget') ),
 			array( 'th' => T_('Type') ),
+			array(
+				'th' => T_('Move'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap' ),
 			array(
 				'th' => T_('Actions'),
 				'th_class' => 'shrinkwrap',
@@ -54,6 +59,9 @@ function display_container( $container, $legend_suffix = '' )
 	// BODY START:
 	$Table->display_body_start();
 
+  /**
+	 * @var WidgetCache
+	 */
 	$WidgetCache = & get_Cache( 'WidgetCache' );
 	$Widget_array = & $WidgetCache->get_by_coll_container( $Blog->ID, $container );
 
@@ -67,9 +75,21 @@ function display_container( $container, $legend_suffix = '' )
 	}
 	else
 	{
+		$widget_count = 0;
 		foreach( $Widget_array as $ComponentWidget )
 		{
-			$Table->display_line_start();
+			$widget_count++;
+
+			if( isset($edited_ComponentWidget) && $edited_ComponentWidget->ID == $ComponentWidget->ID )
+			{
+				$fadeout = true;
+			}
+			else
+			{
+				$fadeout = false;
+			}
+
+			$Table->display_line_start( false, $fadeout );
 
 			$Table->display_col_start();
 			echo $ComponentWidget->get_name();
@@ -80,6 +100,28 @@ function display_container( $container, $legend_suffix = '' )
 			echo $ComponentWidget->type;
 			$Table->display_col_end();
 
+			// Move
+			$Table->display_col_start();
+			//echo $ComponentWidget->order.' ';
+			if( $widget_count > 1 )
+			{
+				echo action_icon( T_('Move up!'), 'move_up', regenerate_url( 'blog', 'action=move_up&amp;wi_ID='.$ComponentWidget->ID ) );
+			}
+			else
+			{
+				echo get_icon( 'nomove', 'imgtag', array( 'class'=>'action_icon' ) );
+			}
+			if( $widget_count < count($Widget_array))
+			{
+				echo action_icon( T_('Move down!'), 'move_down', regenerate_url( 'blog', 'action=move_down&amp;wi_ID='.$ComponentWidget->ID ) );
+			}
+			else
+			{
+				echo get_icon( 'nomove', 'imgtag', array( 'class'=>'action_icon' ) );
+			}
+			$Table->display_col_end();
+
+			// Actions
 			$Table->display_col_start();
 			echo action_icon( T_('Remove this widget!'), 'delete', regenerate_url( 'blog', 'action=delete&amp;wi_ID='.$ComponentWidget->ID ) );
 			$Table->display_col_end();
@@ -109,9 +151,16 @@ foreach( $container_Widget_array as $container=>$dummy )
 	}
 }
 
+// Fadeout javascript
+global $rsc_url;
+echo '<script type="text/javascript" src="'.$rsc_url.'js/fadeout.js"></script>';
+echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, false);</script>';
 
 /*
  * $Log$
+ * Revision 1.6  2007/03/26 17:12:41  fplanque
+ * allow moving of widgets
+ *
  * Revision 1.5  2007/01/11 20:44:19  fplanque
  * skin containers proof of concept
  * (no params handling yet though)

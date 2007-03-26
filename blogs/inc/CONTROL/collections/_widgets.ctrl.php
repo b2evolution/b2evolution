@@ -47,6 +47,8 @@ switch( $action )
 		break;
 
 	case 'delete':
+	case 'move_up':
+	case 'move_down':
 		param( 'wi_ID', 'integer', true );
 		$WidgetCache = & get_Cache( 'WidgetCache' );
 		$edited_ComponentWidget = & $WidgetCache->get_by_ID( $wi_ID );
@@ -128,6 +130,70 @@ switch( $action )
 					$edited_ComponentWidget->get_name(), T_($container)	), 'success' );
 
 		header_redirect( '?ctrl=widgets&blog='.$Blog->ID );
+		break;
+
+	case 'move_up':
+		// Move the widget up:
+
+		$order = $edited_ComponentWidget->order;
+		$DB->begin();
+
+ 		// Get the previous element
+		$row = $DB->get_row( 'SELECT *
+														FROM T_widget
+													 WHERE wi_coll_ID = '.$Blog->ID.'
+													 	 AND wi_sco_name = '.$DB->quote($edited_ComponentWidget->sco_name).'
+														 AND wi_order < '.$order.'
+													 ORDER BY wi_order DESC
+													 LIMIT 0,1' );
+		if( !empty( $row) )
+		{
+			$prev_ComponentWidget = & new ComponentWidget( $row );
+			$prev_order = $prev_ComponentWidget->order;
+
+			$edited_ComponentWidget->set( 'order', 0 );	// Temporary
+			$edited_ComponentWidget->dbupdate();
+
+			$prev_ComponentWidget->set( 'order', $order );
+			$prev_ComponentWidget->dbupdate();
+
+			$edited_ComponentWidget->set( 'order', $prev_order );
+			$edited_ComponentWidget->dbupdate();
+
+		}
+		$DB->commit();
+		break;
+
+	case 'move_down':
+		// Move the widget down:
+
+		$order = $edited_ComponentWidget->order;
+		$DB->begin();
+
+ 		// Get the next element
+		$row = $DB->get_row( 'SELECT *
+														FROM T_widget
+													 WHERE wi_coll_ID = '.$Blog->ID.'
+													 	 AND wi_sco_name = '.$DB->quote($edited_ComponentWidget->sco_name).'
+														 AND wi_order > '.$order.'
+													 ORDER BY wi_order ASC
+													 LIMIT 0,1' );
+		if( !empty( $row) )
+		{
+			$next_ComponentWidget = & new ComponentWidget( $row );
+			$next_order = $next_ComponentWidget->order;
+
+			$edited_ComponentWidget->set( 'order', 0 );	// Temporary
+			$edited_ComponentWidget->dbupdate();
+
+			$next_ComponentWidget->set( 'order', $order );
+			$next_ComponentWidget->dbupdate();
+
+			$edited_ComponentWidget->set( 'order', $next_order );
+			$edited_ComponentWidget->dbupdate();
+
+		}
+		$DB->commit();
 		break;
 
 	case 'delete':
@@ -217,6 +283,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2007/03/26 17:12:40  fplanque
+ * allow moving of widgets
+ *
  * Revision 1.7  2007/01/14 01:32:11  fplanque
  * more widgets supported! :)
  *

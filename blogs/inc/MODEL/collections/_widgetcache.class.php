@@ -42,7 +42,7 @@ load_class( 'MODEL/collections/_componentwidget.class.php' );
 class WidgetCache extends DataObjectCache
 {
 	/**
-	 * Cache by folder
+	 * Cache by container
 	 * @var array of coll_ID => array of container_name => array of Widget
 	 */
 	var $cache_container_Widget_array = array();
@@ -108,6 +108,9 @@ class WidgetCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.4  2007/03/26 17:12:40  fplanque
+ * allow moving of widgets
+ *
  * Revision 1.3  2007/02/26 03:19:40  fplanque
  * hum... I cannot reproduce the old bug anymore :/
  *

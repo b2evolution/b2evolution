@@ -32,6 +32,7 @@ $core_componentwidget_defs = array(
 		'coll_longdesc'     => NT_('Long Description of this Blog'),
 		'coll_common_links' => NT_('Common Navigation Links'),
 		'coll_page_list'		=> NT_('Page List'),
+		'coll_post_list'		=> NT_('Post List'),
 		'coll_search_form'  => NT_('Content Search Form'),
 		'coll_xml_feeds'    => NT_('XML Feeds (RSS / Atom)'),
 		'user_tools'        => NT_('User Tools'),
@@ -56,6 +57,7 @@ class ComponentWidget extends DataObject
 	var $type;
 	var $code;
 	var $params;
+	var $order;
 
 	/**
 	 * Lazy instantiated
@@ -87,6 +89,7 @@ class ComponentWidget extends DataObject
 			$this->type     = $db_row->wi_type;
 			$this->code     = $db_row->wi_code;
 			$this->params   = $db_row->wi_params;
+			$this->order    = $db_row->wi_order;
 		}
 	}
 
@@ -223,7 +226,12 @@ class ComponentWidget extends DataObject
 
 					case 'coll_page_list':
 						// List of pages:
-						$this->disp_item_list( $params );
+						$this->disp_item_list( $params, 'pages' );
+						return true;
+
+					case 'coll_post_list':
+						// List of posts:
+						$this->disp_item_list( $params, 'posts' );
 						return true;
 
 		      case 'coll_search_form':
@@ -326,22 +334,33 @@ class ComponentWidget extends DataObject
 
 
   /**
+	 * List of items
 	 *
 	 * @param array MUST contain at least the basic display params
+	 * @param string 'pages' or 'posts'
 	 */
-	function disp_item_list( $params )
+	function disp_item_list( $params, $what )
 	{
 		global $Blog;
 
 		// Create ItemList
 		$ItemList = & new ItemListLight( $Blog );
 		// Filter list:
-		$ItemList->set_filters( array(
-				'types' => '1000',					// Restrict to type 1000 (pages)
-				'orderby' => 'title',
-				'order' => 'ASC',
-				'unit' => 'all',						// We want to advertise all items (not just a page or a day)
-			) );
+		if( $what == 'pages' )
+		{
+			$ItemList->set_filters( array(
+					'types' => '1000',					// Restrict to type 1000 (pages)
+					'orderby' => 'title',
+					'order' => 'ASC',
+					'unit' => 'all',						// We want to advertise all items (not just a page or a day)
+				) );
+		}
+		else
+		{	// post list
+			$ItemList->set_filters( array(
+					'unit' => 'all',						// We want to advertise all items (not just a page or a day)
+				) );
+		}
 		// Run the query:
 		$ItemList->query();
 
@@ -353,7 +372,14 @@ class ComponentWidget extends DataObject
 		echo $params['block_start'];
 
 		echo $params['block_title_start'];
-		echo T_('Info pages');
+		if( $what == 'pages' )
+		{
+			echo T_('Info pages');
+		}
+		else
+		{
+			echo T_('Contents');
+		}
 		echo $params['block_title_end'];
 
 		echo $params['list_start'];
@@ -403,6 +429,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2007/03/26 17:12:40  fplanque
+ * allow moving of widgets
+ *
  * Revision 1.17  2007/03/26 14:21:30  fplanque
  * better defaults for pages implementation
  *
