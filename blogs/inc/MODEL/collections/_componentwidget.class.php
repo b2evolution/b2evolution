@@ -333,7 +333,7 @@ class ComponentWidget extends DataObject
 	{
 		global $Blog;
 
-		// Cretae ItemList
+		// Create ItemList
 		$ItemList = & new ItemListLight( $Blog );
 		// Filter list:
 		$ItemList->set_filters( array(
@@ -344,6 +344,11 @@ class ComponentWidget extends DataObject
 			) );
 		// Run the query:
 		$ItemList->query();
+
+		if( ! $ItemList->result_num_rows )
+		{	// Nothing to display:
+			return;
+		}
 
 		echo $params['block_start'];
 
@@ -398,6 +403,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2007/03/26 14:21:30  fplanque
+ * better defaults for pages implementation
+ *
  * Revision 1.16  2007/03/26 12:59:18  fplanque
  * basic pages support
  *

@@ -53,10 +53,10 @@ function init_MainList( $items_nb_limit )
 
 	if( ! $preview )
 	{
-		if( $disp == 'posts' )
-		{	// Get everything except pages:
+		if( $disp == 'page' )
+		{	// Get  pages:
 			$MainList->set_default_filters( array(
-					'types' => '-1000',		// Exverything except pages
+					'types' => '1000',		// pages
 				) );
 		}
 		// else: we are either in single or in page mode
@@ -608,6 +608,9 @@ function visibility_select( & $Form, $post_status )
 
 /*
  * $Log$
+ * Revision 1.46  2007/03/26 14:21:30  fplanque
+ * better defaults for pages implementation
+ *
  * Revision 1.45  2007/03/26 12:59:18  fplanque
  * basic pages support
  *

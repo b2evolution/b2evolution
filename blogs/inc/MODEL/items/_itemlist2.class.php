@@ -359,7 +359,7 @@ class ItemList2 extends ItemListLight
 
 
   /**
-	 *
+	 * Link to previous and next link in collection
 	 */
 	function prevnext_item_links( $params )
 	{
@@ -426,17 +426,6 @@ class ItemList2 extends ItemListLight
 	{
 		global $DB, $ItemCache;
 
-		if( ! $this->single_post )
-		{
-			$r = NULL;
-			return $r;
-		}
-
-		if( !empty( $this->prevnext_Item[$direction] ) )
-		{
-			return $this->prevnext_Item[$direction];
-		}
-
     /**
 		 * @var Item
 		 */
@@ -445,6 +434,18 @@ class ItemList2 extends ItemListLight
 		if( is_null($current_Item) )
 		{
 			debug_die( 'no current item!!!' );
+		}
+
+		if( ! $this->single_post
+			|| $current_Item->typ_ID == 1000 ) // page
+		{	// We are not on a single REGULAR post:
+			$r = NULL;
+			return $r;
+		}
+
+		if( !empty( $this->prevnext_Item[$direction] ) )
+		{
+			return $this->prevnext_Item[$direction];
 		}
 
 		$next_Query = & new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
@@ -569,6 +570,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.59  2007/03/26 14:21:30  fplanque
+ * better defaults for pages implementation
+ *
  * Revision 1.58  2007/03/26 12:59:18  fplanque
  * basic pages support
  *

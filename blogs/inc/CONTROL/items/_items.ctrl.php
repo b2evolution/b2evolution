@@ -498,6 +498,7 @@ function init_list_mode()
 
 	$ItemList->set_default_filters( array(
 			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated', 'redirected' ),
+			'types' => NULL, // All types, TEMPORARY
 		) );
 
 	if( $tab == 'tracker' )
@@ -699,6 +700,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2007/03/26 14:21:30  fplanque
+ * better defaults for pages implementation
+ *
  * Revision 1.19  2007/03/21 02:21:37  fplanque
  * item controller: highlight current (step 2)
  *
