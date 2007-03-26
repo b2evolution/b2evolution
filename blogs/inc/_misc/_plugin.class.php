@@ -275,17 +275,8 @@ class Plugin
 	/**
 	 * The "mother" object, where this Plugin got instantiated from.
 	 *
-	 * Plugins|Plugins_admin|Plugins_admin_no_DB
-	 *
-	 * fp> This is FREAKING INSANE! The only purpose I can see for this is to prevent debugging with pre_dump() of the Plugin!
-	 * fp> There is ONLY ONE "mother". She's not hard to find! (Or at least she shouldn't be!!)
-	 * dh> IMHO it _is_ required
-	 * fp> Required for what? for not using global Plugins?
-	 * dh> For having the reference to the "mother". It may be Plugins or Plugins_admin, but using a global named $Plugins always _could_ work.
-	 *     But I don't see a problem here really, except (sort of) when var_dumping. You may want to use xdebug, which limits this (new version).
-	 * @todo fp> get rid of this!
-	 *
-	 * @var Plugins_admin
+	 * @deprecated since 2.0
+	 * @var Plugins|Plugins_admin
 	 */
 	var $Plugins;
 
@@ -2843,10 +2834,14 @@ class Plugin
 	 */
 	function & __get( $nm )
 	{
+		global $inc_path;
+		require_once $inc_path.'/_misc/_class4.funcs.php';
+		$admin_Plugins = & get_Cache('Plugins_admin'); // we need Plugins_admin here, because Plugin::BeforeEnable may use $Settings
+
 		switch( $nm )
 		{
 			case 'Settings':
-				$this->Plugins->instantiate_Settings( $this, 'Settings' );
+				$admin_Plugins->instantiate_Settings( $this, 'Settings' );
 				if( isset($this->Settings) )
 				{
 					return $this->Settings;
@@ -2854,7 +2849,7 @@ class Plugin
 				break;
 
 			case 'UserSettings':
-				$this->Plugins->instantiate_Settings( $this, 'UserSettings' );
+				$admin_Plugins->instantiate_Settings( $this, 'UserSettings' );
 				if( isset($this->UserSettings) )
 				{
 					return $this->UserSettings;
@@ -2872,6 +2867,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.152  2007/03/26 21:34:59  blueyed
+ * Removed $Plugin->Plugins reference
+ *
  * Revision 1.151  2007/03/26 21:04:12  blueyed
  * Return by reference in __get()
  *

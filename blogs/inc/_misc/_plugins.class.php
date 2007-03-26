@@ -430,8 +430,6 @@ class Plugins
 			$Plugin->name = $Plugin->classname;
 		}
 
-		$Plugin->Plugins = & $this;
-
 		// Memorizes Plugin in code hash array:
 		if( ! empty($this->index_code_ID[ $Plugin->code ]) && $this->index_code_ID[ $Plugin->code ] != $Plugin->ID )
 		{ // The plugin's default code is already in use!
@@ -959,7 +957,7 @@ class Plugins
 	/**
 	 * Trigger an event and return an index of params.
 	 *
-	 * fp> please explain what this is for.
+	 * This is handy to collect return values from all plugins hooking an event.
 	 *
 	 * @param string Event name, see {@link Plugins_admin::get_supported_events()}
 	 * @param array Associative array of parameters for the Plugin
@@ -1808,6 +1806,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.150  2007/03/26 21:34:59  blueyed
+ * Removed $Plugin->Plugins reference
+ *
  * Revision 1.149  2007/02/23 00:21:23  blueyed
  * Fixed Plugins::get_next() if the last Plugin got unregistered; Added AdminBeforeItemEditDelete hook
  *
