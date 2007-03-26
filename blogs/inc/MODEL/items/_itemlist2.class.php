@@ -426,6 +426,12 @@ class ItemList2 extends ItemListLight
 	{
 		global $DB, $ItemCache;
 
+		if( ! $this->single_post )
+		{	// We are not on a single post:
+			$r = NULL;
+			return $r;
+		}
+
     /**
 		 * @var Item
 		 */
@@ -436,9 +442,8 @@ class ItemList2 extends ItemListLight
 			debug_die( 'no current item!!!' );
 		}
 
-		if( ! $this->single_post
-			|| $current_Item->typ_ID == 1000 ) // page
-		{	// We are not on a single REGULAR post:
+		if( $current_Item->typ_ID == 1000 ) // page
+		{	// We are not on a REGULAR post:
 			$r = NULL;
 			return $r;
 		}
@@ -570,6 +575,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.60  2007/03/26 18:51:58  fplanque
+ * fix
+ *
  * Revision 1.59  2007/03/26 14:21:30  fplanque
  * better defaults for pages implementation
  *
