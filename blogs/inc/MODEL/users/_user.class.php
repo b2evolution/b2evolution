@@ -506,7 +506,7 @@ class User extends DataObject
 			case 'cats_post_statuses':
 				// Category permissions...
 				$perm = $this->check_perm_catsusers( $permname, $permlevel, $perm_target );
-				if ( $perm == false )
+				if( ! $perm  )
 				{ // Check groups category permissions...
 					$this->get_Group();
 					$perm = $this->Group->check_perm_catsgroups( $permname, $permlevel, $perm_target );
@@ -687,7 +687,7 @@ class User extends DataObject
 		global $DB;
 		// echo "checkin for $permname >= $permlevel on blog $perm_target_blog<br />";
 
-		if( !isset( $this->blog_post_statuses[$perm_target_blog] ) )
+		if( ! isset( $this->blog_post_statuses[$perm_target_blog] ) )
 		{ // Allowed blog post statuses have not been loaded yet:
 			if( $this->ID == 0 )
 			{ // User not in DB, nothing to load!:
@@ -696,11 +696,11 @@ class User extends DataObject
 
 			// Load now:
 			// echo 'loading allowed statuses';
-			$query = "SELECT *
-								  FROM T_coll_user_perms
-								 WHERE bloguser_blog_ID = $perm_target_blog
-								       AND bloguser_user_ID = $this->ID";
-			// echo $query, '<br />';
+			$query = "
+				SELECT *
+				  FROM T_coll_user_perms
+				 WHERE bloguser_blog_ID = $perm_target_blog
+				   AND bloguser_user_ID = $this->ID";
 			$row = $DB->get_row( $query, ARRAY_A );
 
 			if( empty($row) )
@@ -1182,6 +1182,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.67  2007/03/26 21:03:45  blueyed
+ * Normalized/Whitespace
+ *
  * Revision 1.66  2007/03/20 09:53:26  fplanque
  * Letting boggers view their own stats.
  * + Letthing admins view the aggregate by default.
