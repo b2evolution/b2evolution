@@ -2838,18 +2838,28 @@ class Plugin
 
 	/**
 	 * PHP5 overloading of get method to lazy-load (User)Settings.
+	 *
+	 * @return Reference to the object or null
 	 */
-	function __get( $nm )
+	function & __get( $nm )
 	{
 		switch( $nm )
 		{
 			case 'Settings':
 				$this->Plugins->instantiate_Settings( $this, 'Settings' );
-				return isset($this->Settings) ? $this->Settings : NULL;
+				if( isset($this->Settings) )
+				{
+					return $this->Settings;
+				}
+				break;
 
 			case 'UserSettings':
 				$this->Plugins->instantiate_Settings( $this, 'UserSettings' );
-				return isset($this->UserSettings) ? $this->UserSettings : NULL;
+				if( isset($this->UserSettings) )
+				{
+					return $this->UserSettings;
+				}
+				break;
 		}
 	}
 
@@ -2862,6 +2872,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.151  2007/03/26 21:04:12  blueyed
+ * Return by reference in __get()
+ *
  * Revision 1.150  2007/02/28 23:21:53  blueyed
  * Pass $original_comment to CommentFormSent and "action" to BeforeCommentFormInsert
  *
