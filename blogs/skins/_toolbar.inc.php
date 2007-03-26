@@ -139,7 +139,6 @@ global $admin_url;
 				return;
 			}
 		}
-		// <div></div>alert( 'ya '+elt.innerHTML+' '+x+' '+y );
 
 		// Find offset of parent bottom:
 		var x = elt.offsetLeft;
