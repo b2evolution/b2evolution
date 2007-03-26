@@ -31,6 +31,7 @@ $core_componentwidget_defs = array(
 		'coll_tagline'      => NT_('Blog Tagline'),
 		'coll_longdesc'     => NT_('Long Description of this Blog'),
 		'coll_common_links' => NT_('Common Navigation Links'),
+		'coll_page_list'		=> NT_('Page List'),
 		'coll_search_form'  => NT_('Content Search Form'),
 		'coll_xml_feeds'    => NT_('XML Feeds (RSS / Atom)'),
 		'user_tools'        => NT_('User Tools'),
@@ -220,6 +221,11 @@ class ComponentWidget extends DataObject
 						echo $params['block_end'];
 						return true;
 
+					case 'coll_page_list':
+						// List of pages:
+						$this->disp_item_list( $params );
+						return true;
+
 		      case 'coll_search_form':
 						// Collection search form:
 						echo $params['block_start'];
@@ -319,6 +325,47 @@ class ComponentWidget extends DataObject
 	}
 
 
+  /**
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function disp_item_list( $params )
+	{
+		global $Blog;
+
+		// Cretae ItemList
+		$ItemList = & new ItemListLight( $Blog );
+		// Filter list:
+		$ItemList->set_filters( array(
+				'types' => '1000',					// Restrict to type 1000 (pages)
+				'orderby' => 'title',
+				'order' => 'ASC',
+				'unit' => 'all',						// We want to advertise all items (not just a page or a day)
+			) );
+		// Run the query:
+		$ItemList->query();
+
+		echo $params['block_start'];
+
+		echo $params['block_title_start'];
+		echo T_('Info pages');
+		echo $params['block_title_end'];
+
+		echo $params['list_start'];
+
+		while( $Item = & $ItemList->get_item() )
+		{
+			echo $params['item_start'];
+			$Item->permanent_link('#title#');
+			echo $params['item_end'];
+		}
+
+		echo $params['list_end'];
+
+		echo $params['block_end'];
+	}
+
+
 	/**
 	 * Insert object into DB based on previously recorded changes.
 	 *
@@ -351,6 +398,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2007/03/26 12:59:18  fplanque
+ * basic pages support
+ *
  * Revision 1.15  2007/03/25 13:19:17  fplanque
  * temporarily disabled dynamic and static urls.
  * may become permanent in favor of a caching mechanism.

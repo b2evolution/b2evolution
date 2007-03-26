@@ -145,7 +145,6 @@ class Item extends ItemLight
 	 * @var string
 	 */
 	var $locale;
-	var $title;
 
 	var $content;
 
@@ -175,7 +174,6 @@ class Item extends ItemLight
 	 * @var string
 	 */
 	var $url;          // fp> we may want to move this to the item links which allows multiple and diffrent types of links/urls/files etc.
-	var $typ_ID;
 	var $st_ID;
 	var $deadline = '';
 	var $priority;
@@ -278,9 +276,7 @@ class Item extends ItemLight
 			$this->lastedit_user_ID = $db_row->$db_cols['lastedit_user_ID']; // Needed for history display
 			$this->assigned_user_ID = $db_row->$db_cols['assigned_user_ID'];
 			$this->status = $db_row->$db_cols['status'];
-			$this->title = $db_row->$db_cols['title'];
 			$this->content = $db_row->$db_cols['content'];
-			$this->typ_ID = $db_row->$db_cols['typ_ID'];
 			$this->st_ID = $db_row->$db_cols['st_ID'];
 			$this->deadline = $db_row->$db_cols['deadline'];
 			$this->priority = $db_row->$db_cols['priority'];
@@ -1941,37 +1937,6 @@ class Item extends ItemLight
 
 
 	/**
-	 * Template function: display type of item
-	 *
-	 * @param string
-	 * @param string
-	 * @param string Output format, see {@link format_to_output()}
-	 */
-	function type( $before = '', $after = '', $format = 'htmlbody' )
-	{
-		global $object_def;
-
-		$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
-		$Element = & $ItemTypeCache->get_by_ID( $this->typ_ID, true, !$object_def[$this->objtype]['allow_null']['typ_ID'] /* Do we allow NULL statuses for this object?: */ );
-		if( !$Element )
-		{ // No status:
-			return;
-		}
-
-		$extra_status = $Element->get('name');
-
-		if( $format == 'raw' )
-		{
-			$this->disp( $extra_status, 'raw' );
-		}
-		else
-		{
-			echo $before.format_to_output( T_( $extra_status ), $format ).$after;
-		}
-	}
-
-
-	/**
 	 * Template function: Displays trackback autodiscovery information
 	 */
 	function trackback_rdf()
@@ -2127,7 +2092,6 @@ class Item extends ItemLight
 	{
 		switch( $parname )
 		{
-			case 'typ_ID':
 			case 'st_ID':
 				return $this->set_param( $parname, 'number', $parvalue, true );
 
@@ -2904,6 +2868,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.167  2007/03/26 12:59:18  fplanque
+ * basic pages support
+ *
  * Revision 1.166  2007/03/25 10:19:30  fplanque
  * cleanup
  *

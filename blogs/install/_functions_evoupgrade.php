@@ -1689,6 +1689,13 @@ function upgrade_b2evo_tables()
 		db_drop_col( 'T_blogs', 'blog_stub' );
 
 		echo "OK.<br />\n";
+
+
+		echo 'Adding default Post Types... ';
+		$DB->query( "
+			REPLACE INTO T_itemtypes ( ptyp_ID, ptyp_name )
+			VALUES ( 1000, 'Page' )" );
+		echo "OK.<br />\n";
 	}
 
 	/*
@@ -1806,6 +1813,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.214  2007/03/26 12:59:18  fplanque
+ * basic pages support
+ *
  * Revision 1.213  2007/03/25 15:18:57  fplanque
  * cleanup
  *

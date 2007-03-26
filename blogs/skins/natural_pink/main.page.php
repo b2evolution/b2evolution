@@ -17,6 +17,7 @@ switch( $disp )
 {
 	case 'posts':
 	case 'single':
+	case 'page':
 	case 'feedback-popup':
 		// We need to load posts for this display:
 

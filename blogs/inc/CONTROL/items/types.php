@@ -36,6 +36,7 @@ $AdminUI->set_path( 'options', 'types' );
 $list_title = T_('Item/Post/Page types');
 $default_col_order = '-A';
 $edited_name_maxlen = 40;
+$locked_IDs = array( 1000 ); // Prevent editing of Page type
 $perm_name = 'options';
 $perm_level = 'edit';
 $form_below_list = true;
@@ -59,6 +60,9 @@ require $control_path.'generic/inc/_generic_listeditor.php';
 
 /*
  * $Log$
+ * Revision 1.8  2007/03/26 12:59:18  fplanque
+ * basic pages support
+ *
  * Revision 1.7  2007/03/26 09:34:16  fplanque
  * removed deprecated list editor
  *

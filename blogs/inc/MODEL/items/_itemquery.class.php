@@ -48,6 +48,7 @@ class ItemQuery extends SQL
 	var $author;
 	var $assignees;
 	var $statuses;
+	var $types;
 	var $dstart;
 	var $dstop;
 	var $timestamp_min;
@@ -375,6 +376,36 @@ class ItemQuery extends SQL
 
 
 	/**
+	 * Restrict to specific item types
+	 *
+	 * @param string List of types to restrict to (must have been previously validated)
+	 */
+	function where_types( $types )
+	{
+		$this->types = $types;
+
+		if( empty( $types ) )
+		{
+			return;
+		}
+
+		if( $types == '-' )
+		{	// List is ONLY a MINUS sign (we want only those not assigned)
+			$this->WHERE_and( $this->dbprefix.'ptyp_ID IS NULL' );
+		}
+		elseif( substr( $types, 0, 1 ) == '-' )
+		{	// List starts with MINUS sign:
+			$this->WHERE_and( '( '.$this->dbprefix.'ptyp_ID IS NULL
+			                  OR '.$this->dbprefix.'ptyp_ID NOT IN ('.substr( $types, 1 ).') )' );
+		}
+		else
+		{
+			$this->WHERE_and( $this->dbprefix.'ptyp_ID IN ('.$types.')' );
+		}
+	}
+
+
+	/**
 	 * Restricts to a specific date range. (despite thje 'start' in the name
 	 *
 	 * Priorities:
@@ -605,6 +636,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.16  2007/03/26 12:59:18  fplanque
+ * basic pages support
+ *
  * Revision 1.15  2007/03/19 21:57:36  fplanque
  * ItemLists: $cat_focus and $unit extensions
  *

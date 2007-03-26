@@ -461,20 +461,13 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_author_assignee( $this->filters['author_assignee'] );
 		$next_Query->where_locale( $this->filters['lc'] );
 		$next_Query->where_statuses( $this->filters['statuses'] );
+		$next_Query->where_types( $this->filters['types'] );
 		$next_Query->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 		// $next_Query->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
 		$next_Query->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
 		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
 		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
 		$next_Query->where_visibility( $this->filters['visibility_array'] );
-
-		/**
-		 * Restrict to an item type
-		 */
-		if( !empty( $this->filters['item_type'] ) )
-		{
-			$next_Query->where_and( 'post_ptyp_ID = '.$this->filters['item_type'] );
-		}
 
 		/*
 		 * ORDER BY stuff:
@@ -576,6 +569,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.58  2007/03/26 12:59:18  fplanque
+ * basic pages support
+ *
  * Revision 1.57  2007/03/19 23:59:18  fplanque
  * fixed preview
  *

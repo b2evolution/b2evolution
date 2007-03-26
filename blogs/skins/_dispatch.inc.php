@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( $disp != 'posts' && $disp != 'single' )
+if( $disp != 'posts' && $disp != 'single' && $disp != 'page' )
 { // We must display a sub template:
 	$disp_handlers = array(
 			'arcdir'   => '_arcdir.php',
@@ -44,6 +44,9 @@ if( $disp != 'posts' && $disp != 'single' )
 
 /*
  * $Log$
+ * Revision 1.6  2007/03/26 12:59:18  fplanque
+ * basic pages support
+ *
  * Revision 1.5  2007/03/18 01:39:55  fplanque
  * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
  * (more to come)

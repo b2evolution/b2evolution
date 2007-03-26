@@ -59,7 +59,11 @@ class ItemLight extends DataObject
 	var $issue_date;
 	var $mod_date;
 
+ 	var $title;
+
 	var $urltitle;
+
+ 	var $typ_ID;
 
 	/**
 	 * @var integer
@@ -133,6 +137,8 @@ class ItemLight extends DataObject
 			$this->mod_date = $db_row->post_datemodified;
 			$this->main_cat_ID = $db_row->post_main_cat_ID;
 			$this->urltitle = $db_row->post_urltitle;
+			$this->title = $db_row->post_title;
+			$this->typ_ID = $db_row->post_ptyp_ID;
 
 			// Derived vars
 			$ChapterCache = & get_Cache( 'ChapterCache' );
@@ -280,9 +286,16 @@ class ItemLight extends DataObject
 		global $DB, $cacheweekly, $Settings;
 
 		if( empty( $permalink_type ) )
-		{	// Use default from collection settings:
-			$this->get_Blog();
-			$permalink_type = $this->Blog->get_setting( 'permalinks' );
+		{
+			if( $this->typ_ID == 1000 )
+			{	// Page: force use of single url:
+				$permalink_type = 'single';
+			}
+			else
+			{	// Normal post: Use default from collection settings:
+				$this->get_Blog();
+				$permalink_type = $this->Blog->get_setting( 'permalinks' );
+			}
 		}
 
 		switch( $permalink_type )
@@ -643,6 +656,37 @@ class ItemLight extends DataObject
 
 
 	/**
+	 * Template function: display type of item
+	 *
+	 * @param string
+	 * @param string
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function type( $before = '', $after = '', $format = 'htmlbody' )
+	{
+		global $object_def;
+
+		$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
+		$Element = & $ItemTypeCache->get_by_ID( $this->typ_ID, true, !$object_def[$this->objtype]['allow_null']['typ_ID'] /* Do we allow NULL statuses for this object?: */ );
+		if( !$Element )
+		{ // No status:
+			return;
+		}
+
+		$extra_status = $Element->get('name');
+
+		if( $format == 'raw' )
+		{
+			$this->disp( $extra_status, 'raw' );
+		}
+		else
+		{
+			echo $before.format_to_output( T_( $extra_status ), $format ).$after;
+		}
+	}
+
+
+	/**
 	 * Set param value
 	 *
 	 * By default, all values will be considered strings
@@ -679,6 +723,9 @@ class ItemLight extends DataObject
 			case 'datestart':
 				$this->issue_date = $parvalue;
 				return $this->set_param( 'datestart', 'date', $parvalue, false );
+
+			case 'typ_ID':
+				return $this->set_param( $parname, 'number', $parvalue, true );
 
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
@@ -721,6 +768,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2007/03/26 12:59:18  fplanque
+ * basic pages support
+ *
  * Revision 1.3  2007/03/24 20:41:16  fplanque
  * Refactored a lot of the link junk.
  * Made options blog specific.

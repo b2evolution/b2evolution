@@ -309,10 +309,16 @@ elseif( !empty($preview) )
 {	// Preview
 	$disp = 'single';
 }
-elseif( $disp == 'posts' &&
-	(!empty($p) || !empty($title)) )
+elseif( $disp == 'posts' && !empty($Item) )
 { // We are going to display a single post
-	$disp = 'single';
+	if( $Item->typ_ID == 1000 )
+	{
+		$disp = 'page';
+	}
+	else
+	{
+		$disp = 'single';
+	}
 
 	if( $redir == 'yes' )
 	{ // $redir=no here allows to force a 'single post' URL for commenting
@@ -489,6 +495,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.73  2007/03/26 12:59:18  fplanque
+ * basic pages support
+ *
  * Revision 1.72  2007/03/24 20:41:16  fplanque
  * Refactored a lot of the link junk.
  * Made options blog specific.

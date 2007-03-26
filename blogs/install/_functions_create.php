@@ -169,7 +169,8 @@ function create_default_data()
 	$DB->query( "
 		INSERT INTO T_itemtypes ( ptyp_ID, ptyp_name )
 		VALUES ( 1, 'Post' ),
-					 ( 2, 'Link' )" );
+					 ( 2, 'Link' ),
+					 ( 1000, 'Page' ) " );
 	echo "OK.<br />\n";
 
 
@@ -594,6 +595,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.221  2007/03/26 12:59:18  fplanque
+ * basic pages support
+ *
  * Revision 1.220  2007/03/25 13:20:52  fplanque
  * cleaned up blog base urls
  * needs extensive testing...

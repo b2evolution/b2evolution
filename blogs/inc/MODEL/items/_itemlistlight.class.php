@@ -157,13 +157,13 @@ class ItemListLight extends DataObjectList2
 				'ymdhms_min' => NULL,
 				'ymdhms_max' => NULL,
 				'statuses' => NULL,
+				'types' => NULL,
 				'visibility_array' => array( 'published', 'protected', 'private' ),
 				'orderby' =>  $this->Blog->get_setting('orderby'),
 				'order' => $this->Blog->get_setting('orderdir'),
 				'unit' => $this->Blog->get_setting('what_to_show'),
 				'posts' => $this->limit,
 				'page' => 1,
-				'item_type' => NULL,
 			) );
 	}
 
@@ -245,7 +245,7 @@ class ItemListLight extends DataObjectList2
 		/*
 		 * Restrict to selected item type:
 		 */
-		memorize_param( $this->param_prefix.'item_type', 'integer', $this->default_filters['item_type'], $this->filters['item_type'] );  // List of item types to restrict to);
+		memorize_param( $this->param_prefix.'types', 'integer', $this->default_filters['types'], $this->filters['types'] );  // List of item types to restrict to
 
 		/*
 		 * Restrict by keywords
@@ -379,6 +379,11 @@ class ItemListLight extends DataObjectList2
 		 */
 		$this->filters['statuses'] = param( $this->param_prefix.'status', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', $this->default_filters['statuses'], true );      // List of statuses to restrict to
 
+		/*
+		 * Restrict to selected types:
+		 */
+		$this->filters['types'] = param( $this->param_prefix.'types', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', $this->default_filters['types'], true );      // List of types to restrict to
+
 
 		/*
 		 * Restrict by keywords
@@ -447,9 +452,6 @@ class ItemListLight extends DataObjectList2
 		// 'paged'
 		$this->filters['page'] = param( $this->page_param, 'integer', 1, true );      // List page number in paged display
 		$this->page = $this->filters['page'];
-
-		// Item type
-		$this->filters['item_type'] = param( $this->param_prefix.'item_type', 'integer', $this->default_filters['item_type'], true );  // List of item types to restrict to);
 
 		if( param_errors_detected() )
 		{
@@ -580,20 +582,13 @@ class ItemListLight extends DataObjectList2
 		$this->ItemQuery->where_author_assignee( $this->filters['author_assignee'] );
 		$this->ItemQuery->where_locale( $this->filters['lc'] );
 		$this->ItemQuery->where_statuses( $this->filters['statuses'] );
+		$this->ItemQuery->where_types( $this->filters['types'] );
 		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 		$this->ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
 		$this->ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
 		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
 		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
 		$this->ItemQuery->where_visibility( $this->filters['visibility_array'] );
-
-		/**
-		 * Restrict to an item type
-		 */
-		if( !empty( $this->filters['item_type'] ) )
-		{
-			$this->ItemQuery->where_and( 'post_ptyp_ID = '.$this->filters['item_type'] );
-		}
 
 		/*
 		 * ORDER BY stuff:
@@ -743,7 +738,8 @@ class ItemListLight extends DataObjectList2
 		$this->query_init();
 
 		// QUERY:
-		$this->sql = 'SELECT DISTINCT '.$this->Cache->dbIDname.', post_datestart, post_datemodified, post_urltitle, post_main_cat_ID '
+		$this->sql = 'SELECT DISTINCT '.$this->Cache->dbIDname.', post_datestart, post_datemodified, post_title,
+									post_urltitle, post_main_cat_ID, post_ptyp_ID '
 									.$this->ItemQuery->get_from()
 									.$this->ItemQuery->get_where()
 									.$this->ItemQuery->get_group_by()
@@ -789,21 +785,13 @@ class ItemListLight extends DataObjectList2
 		$lastpost_ItemQuery->where_assignees( $this->filters['assignees'] );
 		$lastpost_ItemQuery->where_locale( $this->filters['lc'] );
 		$lastpost_ItemQuery->where_statuses( $this->filters['statuses'] );
+		$lastpost_ItemQuery->where_types( $this->filters['types'] );
 		$lastpost_ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 		$lastpost_ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
 		$lastpost_ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
 		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
 		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
 		$lastpost_ItemQuery->where_visibility( $this->filters['visibility_array'] );
-
-		/**
-		 * Restrict to an item type
-		 * @todo method of ItemQuery
-		 */
-		if( !empty( $this->filters['item_type'] ) )
-		{
-			$lastpost_ItemQuery->where_and( 'post_ptyp_ID = '.$this->filters['item_type'] );
-		}
 
 		/*
 		 * order by stuff:
@@ -1434,6 +1422,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.3  2007/03/26 12:59:18  fplanque
+ * basic pages support
+ *
  * Revision 1.2  2007/03/19 21:57:36  fplanque
  * ItemLists: $cat_focus and $unit extensions
  *

@@ -46,12 +46,21 @@ function init_MainList( $items_nb_limit )
 	global $Blog;
 	global $timestamp_min, $timestamp_max;
 	global $preview;
+	global $disp;
 	global $postIDlist, $postIDarray;
 
 	$MainList = new ItemList2( $Blog, $timestamp_min, $timestamp_max, $items_nb_limit );	// COPY (FUNC)
 
 	if( ! $preview )
 	{
+		if( $disp == 'posts' )
+		{	// Get everything except pages:
+			$MainList->set_default_filters( array(
+					'types' => '-1000',		// Exverything except pages
+				) );
+		}
+		// else: we are either in single or in page mode
+
 		// pre_dump( $MainList->default_filters );
 		$MainList->load_from_Request( false );
 		// pre_dump( $MainList->filters );
@@ -599,6 +608,9 @@ function visibility_select( & $Form, $post_status )
 
 /*
  * $Log$
+ * Revision 1.45  2007/03/26 12:59:18  fplanque
+ * basic pages support
+ *
  * Revision 1.44  2007/03/18 00:31:18  fplanque
  * Delegated MainList init to skin *pages* which need it.
  *
