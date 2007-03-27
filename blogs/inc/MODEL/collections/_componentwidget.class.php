@@ -57,14 +57,14 @@ class ComponentWidget extends DataObject
 	var $type;
 	var $code;
 	var $params;
-	var $order;
 
 	/**
 	 * Lazy instantiated
 	 * (false if this Widget is not handled by a Plugin)
+	 * @see get_Plugin()
 	 * @var Plugin
 	 */
-	var $Plugin = NULL;
+	var $Plugin;
 
 
 	/**
@@ -429,6 +429,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2007/03/27 18:00:13  blueyed
+ * Fixed E_FATAL: "Cannot redeclare ComponentWidget::$order"; doc
+ *
  * Revision 1.18  2007/03/26 17:12:40  fplanque
  * allow moving of widgets
  *
