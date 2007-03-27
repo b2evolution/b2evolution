@@ -41,14 +41,13 @@ $new_db_version = 9408;
 
 $admin_path_separator = ' :: ';
 
-$app_footer_text = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website").
-									'"><img class="middle" src="'.$rsc_url.'img/b2evolution_logo_100.gif" alt="b2evolution" title="'.
-									T_("visit b2evolution's website").'" width="100" height="22" /></a>
-
-									'.$app_version.'</a>
-		&ndash;
-		<a href="http://b2evolution.net/about/license.html" class="nobr">'.T_('GPL License').'</a>
-		&ndash;
-		<span class="nobr">&copy;2003-2006 by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> &amp; others.</span>';
+$app_footer_text = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website")
+	.'"><img class="middle" src="'.$rsc_url.'img/b2evolution_logo_100.gif" alt="b2evolution" title="'
+	.T_("visit b2evolution's website").'" width="100" height="22" />
+	'.$app_version.'</a>
+	&ndash;
+	<a href="http://b2evolution.net/about/license.html" class="nobr">'.T_('GPL License').'</a>
+	&ndash;
+	<span class="nobr">&copy;2003-2006 by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> &amp; others.</span>';
 
 ?>
