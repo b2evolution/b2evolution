@@ -74,8 +74,15 @@ $Form->begin_form( 'fform', '',
 $Form->hidden( 'plugin_ID', $edit_Plugin->ID );
 
 $Form->begin_fieldset( T_('Plugin info'), array( 'class' => 'clear' ) );
+	// Name:
 	$Form->text_input( 'edited_plugin_name', $edited_plugin_name, 25, T_('Name'), '', array('maxlength' => 255) );
+	// Desc:
 	$Form->text_input( 'edited_plugin_shortdesc', $edited_plugin_shortdesc, 50, T_('Short desc'), '', array('maxlength' => 255) );
+	// Links to manual and readme:
+	if( $edit_Plugin->get_help_link('$help_url') || $edit_Plugin->get_help_link('$readme') )
+	{
+		$Form->info( T_('Manual'), trim( $edit_Plugin->get_help_link('$help_url').' '.$edit_Plugin->get_help_link('$readme') ) );
+	}
 $Form->end_fieldset();
 
 // PluginSettings
@@ -128,44 +135,45 @@ $Form->end_fieldset();
 // (De-)Activate Events (Advanced)
 $Form->begin_fieldset( T_('Plugin events').' ('.T_('Advanced')
 	.') <img src="'.get_icon('expand', 'url').'" id="clickimg_pluginevents" />', array('legend_params' => array( 'onclick' => 'toggle_clickopen(\'pluginevents\')') ) );
-?>
+	?>
 
-<div id="clickdiv_pluginevents">
+	<div id="clickdiv_pluginevents">
 
-<?php
+	<?php
 
-if( $edit_Plugin->status != 'enabled' )
-{
-	echo '<p class="notes">'.T_('Note: the plugin is not enabled.').'</p>';
-}
-
-echo '<p>'.T_('Warning: by disabling plugin events you change the behaviour of the plugin! Only change this, if you know what you are doing.').'</p>';
-
-$enabled_events = $admin_Plugins->get_enabled_events( $edit_Plugin->ID );
-$supported_events = $admin_Plugins->get_supported_events();
-$registered_events = $admin_Plugins->get_registered_events( $edit_Plugin );
-$count = 0;
-foreach( array_keys($supported_events) as $l_event )
-{
-	if( ! in_array( $l_event, $registered_events ) )
+	if( $edit_Plugin->status != 'enabled' )
 	{
-		continue;
+		echo '<p class="notes">'.T_('Note: the plugin is not enabled.').'</p>';
 	}
-	$Form->hidden( 'edited_plugin_displayed_events[]', $l_event ); // to consider only displayed ones on update
-	$Form->checkbox_input( 'edited_plugin_events['.$l_event.']', in_array( $l_event, $enabled_events ), $l_event, array( 'note' => $supported_events[$l_event] ) );
-	$count++;
-}
-if( ! $count )
-{
-	echo T_( 'This plugin has no registered events.' );
-}
-?>
 
-</div>
+	echo '<p>'.T_('Warning: by disabling plugin events you change the behaviour of the plugin! Only change this, if you know what you are doing.').'</p>';
 
-<?php
+	$enabled_events = $admin_Plugins->get_enabled_events( $edit_Plugin->ID );
+	$supported_events = $admin_Plugins->get_supported_events();
+	$registered_events = $admin_Plugins->get_registered_events( $edit_Plugin );
+	$count = 0;
+	foreach( array_keys($supported_events) as $l_event )
+	{
+		if( ! in_array( $l_event, $registered_events ) )
+		{
+			continue;
+		}
+		$Form->hidden( 'edited_plugin_displayed_events[]', $l_event ); // to consider only displayed ones on update
+		$Form->checkbox_input( 'edited_plugin_events['.$l_event.']', in_array( $l_event, $enabled_events ), $l_event, array( 'note' => $supported_events[$l_event] ) );
+		$count++;
+	}
+	if( ! $count )
+	{
+		echo T_( 'This plugin has no registered events.' );
+	}
+	?>
+
+	</div>
+
+	<?php
 $Form->end_fieldset();
 ?>
+
 
 <script type="text/javascript">
 	<!--
@@ -188,6 +196,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.32  2007/03/28 23:10:17  blueyed
+ * Added link to external manual/wiki
+ *
  * Revision 1.31  2007/02/19 23:17:00  blueyed
  * Only display Plugin(User)Settings fieldsets if there is content in them.
  *
