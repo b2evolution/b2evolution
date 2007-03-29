@@ -637,6 +637,8 @@ class Calendar
 			echo $this->headerrowend;
 		}
 
+		// FOOTER :
+
 		if( $this->navigation == 'tfoot' )
 		{ // We want to display navigation in the table footer:
 			echo "<tfoot>\n";
@@ -853,7 +855,7 @@ class Calendar
 	/**
 	 * Get links to navigate between month / year.
 	 *
-	 * Unless 'query' has been specified, this will not do any (time consuming!) queries to check where the posts are.
+	 * Unless min/max_timestamp='query' has been specified, this will not do any (time consuming!) queries to check where the posts are.
 	 *
 	 * @param string 'prev' / 'next'
 	 * @return array
@@ -893,7 +895,7 @@ class Calendar
 				else
 				{
 					$use_range_month = $this->month;
-					$use_range_day = date( 'd', $localtimenow );
+					$use_range_day = 1;	// Note: cannot use current day since all months do not have same number of days
 				}
 
 				/*
@@ -921,7 +923,7 @@ class Calendar
 					}
 					else
 					{ // Let's see if the previous year is in the desired navigation range:
-						$prev_year_ts = mktime( 0, 0, 0, $use_range_month,  $use_range_day,  $this->year-1 );
+						$prev_year_ts = mktime( 0, 0, 0, $use_range_month, $use_range_day,  $this->year-1 );
 						if( $prev_year_ts >= $this->params['min_timestamp'] )
 						{
 							$prev_year_year = date( 'Y', $prev_year_ts );
@@ -976,7 +978,7 @@ class Calendar
 					}
 					else
 					{ // Let's see if the previous month is in the desired navigation range:
-						$prev_month_ts = mktime( 0, 0, 0, $this->month-1,  date( 'd', $localtimenow ),  $this->year );
+						$prev_month_ts = mktime( 0, 0, 0, $this->month-1, 1, $this->year ); // Note: cannot use current day since all months do not have same number of days
 						if( $prev_month_ts >= $this->params['min_timestamp'] )
 						{
 							$prev_month_year = date( 'Y', $prev_month_ts );
@@ -1031,7 +1033,7 @@ class Calendar
 					}
 					else
 					{ // Let's see if the next month is in the desired navigation range:
-						$next_month_ts = mktime( 0, 0, 0, $this->month+1,  date( 'd', $localtimenow ),  $this->year );
+						$next_month_ts = mktime( 0, 0, 0, $this->month+1, 1,  $this->year ); // Note: cannot use current day since all months do not have same number of days
 						if( $next_month_ts <= $this->params['max_timestamp'] )
 						{
 							$next_month_year = date( 'Y', $next_month_ts );
@@ -1056,7 +1058,7 @@ class Calendar
 				else
 				{
 					$use_range_month = $this->month;
-					$use_range_day = date( 'd', $localtimenow );
+					$use_range_day = 1;	// Note: cannot use current day since all months do not have same number of days
 				}
 
 				/*
@@ -1084,7 +1086,7 @@ class Calendar
 					}
 					else
 					{ // Let's see if the next year is in the desired navigation range:
-						$next_year_ts = mktime( 0, 0, 0, $use_range_month,  $use_range_day,  $this->year+1 );
+						$next_year_ts = mktime( 0, 0, 0, $use_range_month, $use_range_day,  $this->year+1 );
 						if( $next_year_ts <= $this->params['max_timestamp'] )
 						{
 							$next_year_year = date( 'Y', $next_year_ts );
@@ -1113,6 +1115,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.40  2007/03/29 10:35:40  fplanque
+ * fix
+ *
  * Revision 1.39  2007/03/25 10:20:02  fplanque
  * cleaned up archive urls
  *
@@ -1150,129 +1155,5 @@ class Calendar
  *
  * Revision 1.28  2006/10/14 19:05:39  blueyed
  * Fixed "mktime() expects parameter 4 to be long, string given" warning; doc
- *
- * Revision 1.27  2006/09/21 20:55:24  blueyed
- * TODO: request for clarification on regression
- *
- * Revision 1.26  2006/07/28 15:27:47  blueyed
- * marked BUG
- *
- * Revision 1.25  2006/07/22 18:21:19  blueyed
- * Fixed doc (min_timestamp/max_timestamp)
- *
- * Revision 1.24  2006/07/12 22:09:49  blueyed
- * Fixed "Notice: A non well formed numeric value encountered" notices + whitespace
- *
- * Revision 1.23  2006/07/12 15:40:50  fplanque
- * save 4 expensive queries
- *
- * Revision 1.22  2006/07/10 20:19:30  blueyed
- * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
- *
- * Revision 1.21  2006/07/07 21:26:49  blueyed
- * Bumped to 1.9-dev
- *
- * Revision 1.20  2006/07/02 21:53:31  blueyed
- * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
- *
- * Revision 1.19  2006/06/16 21:30:57  fplanque
- * Started clean numbering of plugin versions (feel free do add dots...)
- *
- * Revision 1.18  2006/05/30 20:25:35  blueyed
- * typo
- *
- * Revision 1.17  2006/05/30 19:39:55  fplanque
- * plugin cleanup
- *
- * Revision 1.16  2006/04/19 20:14:03  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.15  2006/03/17 18:08:37  blueyed
- * removed false todo
- *
- * Revision 1.13  2006/03/12 23:09:27  fplanque
- * doc cleanup
- *
- * Revision 1.12  2006/02/03 21:58:05  fplanque
- * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
- *
- * Revision 1.11  2006/01/04 20:34:51  fplanque
- * allow filtering on extra statuses
- *
- * Revision 1.10  2005/12/12 19:22:04  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.9  2005/10/03 18:10:08  fplanque
- * renamed post_ID field
- *
- * Revision 1.8  2005/09/06 19:38:29  fplanque
- * bugfixes
- *
- * Revision 1.7  2005/09/06 17:14:12  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.6  2005/09/01 17:11:46  fplanque
- * no message
- *
- *
- * Merged in _calendar.class.php; history below:
- *
- * Revision 1.18  2005/08/31 19:08:51  fplanque
- * Factorized Item query WHERE clause.
- * Fixed calendar contextual accuracy.
- *
- * Revision 1.17  2005/08/26 18:41:31  fplanque
- * bugfix
- *
- * Revision 1.16  2005/08/26 17:52:02  fplanque
- * abstraction
- *
- * Revision 1.15  2005/08/26 16:15:08  fplanque
- * made the whole calendar contextual (wow am I happy about this functionality! :)
- *
- * Revision 1.14  2005/08/25 11:02:11  fplanque
- * moved calendar to a skintag plugin
- *
- * Revision 1.13  2005/05/09 19:07:03  fplanque
- * bugfixes + global access permission
- *
- * Revision 1.12  2005/04/27 19:05:46  fplanque
- * normalizing, cleanup, documentaion
- *
- * Revision 1.10  2005/03/18 01:40:50  blueyed
- * link to prev month fixed
- *
- * Revision 1.9  2005/03/18 00:29:32  blueyed
- * navigation: only link to month/year with posts
- *
- * Revision 1.8  2005/03/07 17:08:20  fplanque
- * made more generic
- *
- * Revision 1.7  2005/02/28 09:06:32  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.6  2005/02/23 19:31:58  blueyed
- * get_weekstartend() fixed
- *
- * Revision 1.5  2005/02/23 04:26:18  blueyed
- * moved global $start_of_week into $locales properties
- *
- * Revision 1.4  2005/02/12 03:58:44  blueyed
- * default to $navigation = 'tfoot', fixed queries that find posts in month or on day, refactored navigation link generation
- *
- * Revision 1.3  2004/12/13 21:29:58  fplanque
- * refactoring
- *
- * Revision 1.2  2004/10/14 18:31:24  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.34  2004/10/11 19:02:04  fplanque
- * Edited code documentation.
- *
- * Revision 1.6  2004/1/15 20:49:14  hansreinders
- * Add more flexibility to calendar
  */
 ?>
