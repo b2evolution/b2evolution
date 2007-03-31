@@ -148,9 +148,15 @@ class ItemList2 extends ItemListLight
 		$item_priority = param( 'item_priority', 'integer', NULL ); // QUESTION: can this be also empty/NULL?
 
 		$post_title = format_to_post( $post_title, 0 );
-		$content = format_to_post( $content );
 
-		$post_renderers = implode( '.', $renderers );
+		// Do some optional filtering on the content
+		// Typically stuff that will help the content to validate
+		// Useful for code display.
+		// Will probably be used for validation also.
+		$Plugins_admin = & get_Cache('Plugins_admin');
+		$Plugins_admin->filter_content( $content /* by ref */, $renderers );
+
+		$content = format_to_post( $content );
 
 		$this->sql = "SELECT
 			0 AS {$this->Cache->dbIDname},
@@ -172,7 +178,7 @@ class ItemList2 extends ItemListLight
 			NULL AS {$this->Cache->dbprefix}notifications_ctsk_ID,
 			".bpost_count_words( $content )." AS {$this->Cache->dbprefix}wordcount,
 			".$DB->quote($post_comment_status)." AS {$this->Cache->dbprefix}comment_status,
-			'".$DB->escape( $post_renderers )."' AS {$this->Cache->dbprefix}renderers,
+			'".$DB->escape( implode( '.', $renderers ) )."' AS {$this->Cache->dbprefix}renderers,
 			".$DB->quote($item_assigned_user_ID)." AS {$this->Cache->dbprefix}assigned_user_ID,
 			".$DB->quote($item_typ_ID)." AS {$this->Cache->dbprefix}ptyp_ID,
 			".$DB->quote($item_st_ID)." AS {$this->Cache->dbprefix}pst_ID,
@@ -575,6 +581,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.61  2007/03/31 22:46:47  fplanque
+ * FilterItemContent event
+ *
  * Revision 1.60  2007/03/26 18:51:58  fplanque
  * fix
  *

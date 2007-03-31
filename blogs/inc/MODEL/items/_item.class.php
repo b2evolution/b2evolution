@@ -361,7 +361,7 @@ class Item extends ItemLight
 	 */
 	function load_from_Request( $force_edit_date = false )
 	{
-		global $default_locale, $allowed_uri_scheme, $Plugins, $current_User;
+		global $default_locale, $allowed_uri_scheme, $current_User;
 
 		if( param( 'post_title', 'html', NULL ) !== NULL ) {
 			$this->set( 'title', format_to_post( get_param('post_title'), 0, 0 ) );
@@ -383,10 +383,6 @@ class Item extends ItemLight
 		if( $this->status == 'redirected' && empty($this->url) )
 		{
 			param_error( 'post_url', T_('If you want to redirect this post, you must specify an URL! (Expert mode)') );
-		}
-
-		if( param( 'content', 'html', NULL ) !== NULL ) {
-			$this->set( 'content', format_to_post( get_param('content') ) );
 		}
 
 		if( ( $force_edit_date || param( 'edit_date', 'integer', 0 ) )
@@ -437,7 +433,22 @@ class Item extends ItemLight
 			$renderers = $Plugins_admin->validate_renderer_list( param( 'renderers', 'array', array() ) );
 			$this->set( 'renderers', $renderers );
 		}
+		else
+		{
+			$renderers = $this->get_renderers_validated();
+		}
 
+		if( ($content = param( 'content', 'html', NULL )) !== NULL )
+		{
+			// Do some optional filtering on the content
+			// Typically stuff that will help the content to validate
+			// Useful for code display.
+			// Will probably be used for validation also.
+			$Plugins_admin = & get_Cache('Plugins_admin');
+			$Plugins_admin->filter_content( $content /* by ref */, $renderers );
+
+			$this->set( 'content', format_to_post( $content ) );
+		}
 
 		return ! param_errors_detected();
 	}
@@ -833,6 +844,7 @@ class Item extends ItemLight
 	function get_content_teaser( $disppage = '#', $stripteaser = '#', $format = 'htmlbody' )
 	{
 		global $Plugins, $preview, $Debuglog;
+		global $more;
 
 		// Get requested content page:
 		if( $disppage === '#' )
@@ -851,7 +863,6 @@ class Item extends ItemLight
 		{ // This is an extended post (has a more section):
 			if( $stripteaser === '#' )
 			{
-				global $more;
 				// If we're in "more" mode and we want to strip the teaser, we'll strip:
 				$stripteaser = ( $more && preg_match('/<!--noteaser-->/', $content_page ) );
 			}
@@ -868,7 +879,7 @@ class Item extends ItemLight
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
 				'Item' => $this,
 				'preview' => $preview,
-				// 'dispmore' => $dispmore  // fp> I see no doc for what this is for, so I don't know how to make it comaptible
+				'dispmore' => ($more != 0),
 			), 'Display' );
 
 		// Character conversions
@@ -944,7 +955,7 @@ class Item extends ItemLight
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
 				'Item' => $this,
 				'preview' => $preview,
-				// 'dispmore' => $dispmore  // fp> I see no doc for what this is for, so I don't know how to make it comaptible
+				'dispmore' => true,
 			), 'Display' );
 
 		// Character conversions
@@ -2868,6 +2879,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.168  2007/03/31 22:46:46  fplanque
+ * FilterItemContent event
+ *
  * Revision 1.167  2007/03/26 12:59:18  fplanque
  * basic pages support
  *

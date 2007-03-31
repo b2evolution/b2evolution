@@ -130,6 +130,8 @@ class Plugins_admin extends Plugins
 				'RenderItemAsXml' => 'Renders content when generated as XML.',
 				'RenderItemAsText' => 'Renders content when generated as plain text.',
 
+ 				'FilterItemContent' => 'Filters the content of a post/item.',
+
 				'FilterCommentAuthor' => 'Filters the comment author.',
 				'FilterCommentAuthorUrl' => 'Filters the URL of the comment author.',
 				'FilterCommentContent' => 'Filters the content of a comment.',
@@ -1394,11 +1396,68 @@ class Plugins_admin extends Plugins
 	}
 
 
+	/**
+	 * Filter (post) contents by calling the relevant filter plugins.
+	 *
+	 * Works very much like render() except that it's called at insert/update time and BEFORE validation.
+	 * Gives an opportunity to do some serious cleanup on what the user has typed.
+	 *
+	 * This uses the lost of renderers, because filtering may need to work in conjunction with rendering,
+	 * e-g: code display: you want to filter out tags before validation and later you want to render color/fixed font.
+	 * For brute force filtering, use 'always' or 'stealth' modes.
+	 * @see Plugins::render()
+	 *
+	 * @param string content to render (by reference)
+	 * @param array renderer codes to use for opt-out, opt-in and lazy
+	 * @return string rendered content
+	 */
+	function filter_content( & $content, $renderers )
+	{
+		// echo 'CALLING FILTERS: '.implode(',',$renderers);
+
+		$params['data'] = & $content;
+
+		$filter_Plugins = $this->get_list_by_event( 'FilterItemContent' );
+
+		foreach( $filter_Plugins as $loop_filter_Plugin )
+		{ // Go through whole list of renders
+			// echo ' ',$loop_RendererPlugin->code, ':';
+
+			switch( $loop_filter_Plugin->apply_rendering )
+			{
+				case 'stealth':
+				case 'always':
+					// echo 'FORCED ';
+					$this->call_method( $loop_filter_Plugin->ID, 'FilterItemContent', $params );
+					break;
+
+				case 'opt-out':
+				case 'opt-in':
+				case 'lazy':
+					if( in_array( $loop_filter_Plugin->code, $renderers ) )
+					{ // Option is activated
+						// echo 'OPT ';
+						$this->call_method( $loop_filter_Plugin->ID, 'FilterItemContent', $params );
+					}
+					// else echo 'NOOPT ';
+					break;
+
+				case 'never':
+					// echo 'NEVER ';
+					break;	// STOP, don't render, go to next renderer
+			}
+		}
+
+		return $content;
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.38  2007/03/31 22:46:47  fplanque
+ * FilterItemContent event
+ *
  * Revision 1.37  2007/03/12 14:07:08  waltercruz
  * Changing the WHERE 1 queries to boolean (WHERE 1=1) queries to satisfy the standarts
  *
