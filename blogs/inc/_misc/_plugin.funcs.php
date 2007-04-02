@@ -169,18 +169,22 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 		}
 	}
 
-
 	if( isset($use_value) )
 	{
 		$set_value = $use_value;
 	}
-	elseif( ( $set_value = get_param('edit_plugin_'.$Plugin->ID.'_set_'.$set_name) ) !== NULL )
+	/*
+	// dh> Removed, because it causes problems on the "restore_defaults" action in /CONTROL/settings/plugins.php:
+	//     The old values get displayed again.
+	//     If it does not cause problems somewhere else, remove it. 2007-03-08.
+	elseif( ( $set_value = param('edit_plugin_'.$Plugin->ID.'_set_'.$set_name) ) !== NULL )
 	{ // use value provided with Request!
 		if( $set_meta['type'] == 'array' )
 		{
 			handle_array_keys_in_plugin_settings($set_value);
 		}
 	}
+	*/
 	else
 	{
 		if( $set_type == 'UserSettings' )
@@ -972,6 +976,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.44  2007/04/02 20:32:57  blueyed
+ * Commented out block that caused problems
+ *
  * Revision 1.43  2007/01/23 08:57:36  fplanque
  * decrap!
  *
