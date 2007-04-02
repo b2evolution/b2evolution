@@ -78,10 +78,10 @@ $Form->begin_fieldset( T_('Plugin info'), array( 'class' => 'clear' ) );
 	$Form->text_input( 'edited_plugin_name', $edited_plugin_name, 25, T_('Name'), '', array('maxlength' => 255) );
 	// Desc:
 	$Form->text_input( 'edited_plugin_shortdesc', $edited_plugin_shortdesc, 50, T_('Short desc'), '', array('maxlength' => 255) );
-	// Links to manual and readme:
-	if( $edit_Plugin->get_help_link('$help_url') || $edit_Plugin->get_help_link('$readme') )
+	// Links to external manual (dh> has been removed from form's global_icons before by fp, but is very useful IMHO):
+	if( $edit_Plugin->get_help_link('$help_url') )
 	{
-		$Form->info( T_('Manual'), trim( $edit_Plugin->get_help_link('$help_url').' '.$edit_Plugin->get_help_link('$readme') ) );
+		$Form->info( T_('Manual'), trim( $edit_Plugin->get_help_link('$help_url') ) );
 	}
 $Form->end_fieldset();
 
@@ -196,8 +196,8 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
- * Revision 1.32  2007/03/28 23:10:17  blueyed
- * Added link to external manual/wiki
+ * Revision 1.33  2007/04/02 20:33:27  blueyed
+ * Added (real) link to external manual/wiki
  *
  * Revision 1.31  2007/02/19 23:17:00  blueyed
  * Only display Plugin(User)Settings fieldsets if there is content in them.
