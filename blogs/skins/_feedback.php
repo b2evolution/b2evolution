@@ -107,7 +107,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 													T_('No %s for this post yet...'), implode( "/", $disp_title) ) .
 								'</p></div>' );
 
-  /**
+	/**
 	 * @var Comment
 	 */
 	while( $Comment = & $CommentList->get_next() )
@@ -321,6 +321,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.90  2007/04/03 19:22:22  blueyed
+ * Fixed WhiteSpace
+ *
  * Revision 1.89  2007/03/18 01:39:55  fplanque
  * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
  * (more to come)
