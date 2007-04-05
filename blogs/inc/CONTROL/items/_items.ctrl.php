@@ -615,6 +615,13 @@ switch( $action )
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
+		$item_title = $edited_Item->title;
+		$item_content = $edited_Item->content;
+
+		// Format content for editing, if we were not already in editing...
+		$Plugins_admin = & get_Cache('Plugins_admin');
+		$Plugins_admin->unfilter_contents( $item_title /* by ref */, $item_content /* by ref */, $edited_Item->get_renderers_validated() );
+
 		// Display VIEW:
 		switch( $tab )
 		{
@@ -700,6 +707,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2007/04/05 22:57:33  fplanque
+ * Added hook: UnfilterItemContents
+ *
  * Revision 1.20  2007/03/26 14:21:30  fplanque
  * better defaults for pages implementation
  *

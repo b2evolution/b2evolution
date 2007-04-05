@@ -126,12 +126,21 @@ class Plugins_admin extends Plugins
 				'AfterItemUpdate' => '',
 				'AppendItemPreviewTransact' => '',
 
+ 				'FilterItemContents' => 'Filters the content of a post/item right after input.',
+ 				'UnfilterItemContents' => 'Unfilters the content of a post/item right before editing.',
+
+ 				// fp> rename to "PreRender"
 				'RenderItemAsHtml' => 'Renders content when generated as HTML.',
 				'RenderItemAsXml' => 'Renders content when generated as XML.',
 				'RenderItemAsText' => 'Renders content when generated as plain text.',
 
- 				'FilterItemContent' => 'Filters the content of a post/item.',
+				// fp> rename to "DispRender"
+				'DisplayItemAsHtml' => 'Called on an item when it gets displayed as HTML.',
+				'DisplayItemAsXml' => 'Called on an item when it gets displayed as XML.',
+				'DisplayItemAsText' => 'Called on an item when it gets displayed as text.',
 
+// fp> These is actually RENDERing, right?
+// TODO: Rename to "DispRender"
 				'FilterCommentAuthor' => 'Filters the comment author.',
 				'FilterCommentAuthorUrl' => 'Filters the URL of the comment author.',
 				'FilterCommentContent' => 'Filters the content of a comment.',
@@ -140,10 +149,8 @@ class Plugins_admin extends Plugins
 				'AfterUserInsert' => '',
 				'AfterUserUpdate' => '',
 
-				'DisplayItemAsHtml' => 'Called on an item when it gets displayed as HTML.',
-				'DisplayItemAsXml' => 'Called on an item when it gets displayed as XML.',
-				'DisplayItemAsText' => 'Called on an item when it gets displayed as text.',
-
+// fp> This is actually RENDERing, right?
+// TODO: Rename to "DispRender"
 				'FilterIpAddress' => 'Called when displaying an IP address.',
 
 				'ItemApplyAsRenderer' => 'Asks the plugin if it wants to apply as a renderer for an item.',
@@ -1411,13 +1418,14 @@ class Plugins_admin extends Plugins
 	 * @param array renderer codes to use for opt-out, opt-in and lazy
 	 * @return string rendered content
 	 */
-	function filter_content( & $content, $renderers )
+	function filter_contents( & $title, & $content, $renderers )
 	{
 		// echo 'CALLING FILTERS: '.implode(',',$renderers);
 
-		$params['data'] = & $content;
+		$params['title'] = & $title;
+		$params['content'] = & $content;
 
-		$filter_Plugins = $this->get_list_by_event( 'FilterItemContent' );
+		$filter_Plugins = $this->get_list_by_event( 'FilterItemContents' );
 
 		foreach( $filter_Plugins as $loop_filter_Plugin )
 		{ // Go through whole list of renders
@@ -1428,7 +1436,7 @@ class Plugins_admin extends Plugins
 				case 'stealth':
 				case 'always':
 					// echo 'FORCED ';
-					$this->call_method( $loop_filter_Plugin->ID, 'FilterItemContent', $params );
+					$this->call_method( $loop_filter_Plugin->ID, 'FilterItemContents', $params );
 					break;
 
 				case 'opt-out':
@@ -1437,7 +1445,7 @@ class Plugins_admin extends Plugins
 					if( in_array( $loop_filter_Plugin->code, $renderers ) )
 					{ // Option is activated
 						// echo 'OPT ';
-						$this->call_method( $loop_filter_Plugin->ID, 'FilterItemContent', $params );
+						$this->call_method( $loop_filter_Plugin->ID, 'FilterItemContents', $params );
 					}
 					// else echo 'NOOPT ';
 					break;
@@ -1450,11 +1458,78 @@ class Plugins_admin extends Plugins
 
 		return $content;
 	}
-}
 
+
+	/**
+	 * UnFilter (post) contents by calling the relevant filter plugins.
+	 *
+	 * This is the opposite of filter_content. It is used to restore some specifcs before editing text.
+	 * For example, this can be used to replace complex sequences of tags with a custome meta-tag,
+	 * e-g: <strong> can become <s> for convenient editing.
+	 *
+	 * This uses the list of renderers, because un/filtering may need to work in conjunction with rendering,
+	 * e-g: code display: you want to filter in/out tags before validation and later you want to render color/fixed font.
+	 * For brute force unfiltering, use 'always' or 'stealth' modes.
+	 * @see Plugins::render()
+	 * @see Plugins::filter()
+	 *
+	 * @todo fp> it would probably make sense to do the unfiltering in reverse order compared to filtering
+	 *
+	 * @param string title to render (by reference)
+	 * @param string content to render (by reference)
+	 * @param array renderer codes to use for opt-out, opt-in and lazy
+	 * @return string rendered content
+	 */
+	function unfilter_contents( & $title, & $content, $renderers )
+	{
+		// echo 'CALLING FILTERS: '.implode(',',$renderers);
+
+		$params['title'] = & $title;
+		$params['content'] = & $content;
+
+		$filter_Plugins = $this->get_list_by_event( 'UnfilterItemContents' );
+
+		// fp> TODO: reverse order
+
+		foreach( $filter_Plugins as $loop_filter_Plugin )
+		{ // Go through whole list of renders
+			// echo ' ',$loop_RendererPlugin->code, ':';
+
+			switch( $loop_filter_Plugin->apply_rendering )
+			{
+				case 'stealth':
+				case 'always':
+					// echo 'FORCED ';
+					$this->call_method( $loop_filter_Plugin->ID, 'UnfilterItemContents', $params );
+					break;
+
+				case 'opt-out':
+				case 'opt-in':
+				case 'lazy':
+					if( in_array( $loop_filter_Plugin->code, $renderers ) )
+					{ // Option is activated
+						// echo 'OPT ';
+						$this->call_method( $loop_filter_Plugin->ID, 'UnfilterItemContents', $params );
+					}
+					// else echo 'NOOPT ';
+					break;
+
+				case 'never':
+					// echo 'NEVER ';
+					break;	// STOP, don't render, go to next renderer
+			}
+		}
+
+		return $content;
+	}
+
+}
 
 /*
  * $Log$
+ * Revision 1.39  2007/04/05 22:57:33  fplanque
+ * Added hook: UnfilterItemContents
+ *
  * Revision 1.38  2007/03/31 22:46:47  fplanque
  * FilterItemContent event
  *

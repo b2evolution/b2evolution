@@ -52,6 +52,7 @@ global $pagenow;
 global $mode, $use_post_url;
 global $use_preview, $post_comment_status, $trackback_url;
 global $edit_date, $bozo_start_modified, $creating;
+global $item_title, $item_content;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
@@ -92,7 +93,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->begin_fieldset( T_('Post contents') );
 
-	$Form->text_input( 'post_title', $edited_Item->title, 48, T_('Title'), '', array('maxlength'=>255) );
+	$Form->text_input( 'post_title', $item_title, 48, T_('Title'), '', array('maxlength'=>255) );
 
 	echo ' <span id="itemform_post_locale">'; // allow wrapping here! (and below)
 	                                          // blueyed>> (Opera would additionally need text/&nbsp; here, but that wraps ugly)
@@ -124,7 +125,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	// ---------------------------- TEXTAREA -------------------------------------
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
-	$Form->textarea_input( 'content', $edited_Item->get( 'content' ), 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content' ) );
+	$Form->textarea_input( 'content', $item_content, 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content' ) );
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';
 	?>
@@ -335,6 +336,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.42  2007/04/05 22:57:33  fplanque
+ * Added hook: UnfilterItemContents
+ *
  * Revision 1.41  2007/03/25 13:19:17  fplanque
  * temporarily disabled dynamic and static urls.
  * may become permanent in favor of a caching mechanism.

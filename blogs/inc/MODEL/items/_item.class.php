@@ -363,10 +363,6 @@ class Item extends ItemLight
 	{
 		global $default_locale, $allowed_uri_scheme, $current_User;
 
-		if( param( 'post_title', 'html', NULL ) !== NULL ) {
-			$this->set( 'title', format_to_post( get_param('post_title'), 0, 0 ) );
-		}
-
 		if( param( 'post_locale', 'string', NULL ) !== NULL ) {
 			$this->set_from_Request( 'locale' );
 		}
@@ -440,14 +436,17 @@ class Item extends ItemLight
 
 		if( ($content = param( 'content', 'html', NULL )) !== NULL )
 		{
+			$post_title = param( 'post_title', 'html', NULL );
+
 			// Do some optional filtering on the content
 			// Typically stuff that will help the content to validate
 			// Useful for code display.
 			// Will probably be used for validation also.
 			$Plugins_admin = & get_Cache('Plugins_admin');
-			$Plugins_admin->filter_content( $content /* by ref */, $renderers );
+			$Plugins_admin->filter_contents( $post_title /* by ref */, $content /* by ref */, $renderers );
 
 			$this->set( 'content', format_to_post( $content ) );
+			$this->set( 'title', format_to_post( $post_title ) );
 		}
 
 		return ! param_errors_detected();
@@ -2879,6 +2878,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.169  2007/04/05 22:57:33  fplanque
+ * Added hook: UnfilterItemContents
+ *
  * Revision 1.168  2007/03/31 22:46:46  fplanque
  * FilterItemContent event
  *

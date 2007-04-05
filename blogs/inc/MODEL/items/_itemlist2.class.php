@@ -147,15 +147,14 @@ class ItemList2 extends ItemListLight
 			$item_deadline = NULL;
 		$item_priority = param( 'item_priority', 'integer', NULL ); // QUESTION: can this be also empty/NULL?
 
-		$post_title = format_to_post( $post_title, 0 );
-
 		// Do some optional filtering on the content
 		// Typically stuff that will help the content to validate
 		// Useful for code display.
 		// Will probably be used for validation also.
 		$Plugins_admin = & get_Cache('Plugins_admin');
-		$Plugins_admin->filter_content( $content /* by ref */, $renderers );
+		$Plugins_admin->filter_contents( $post_title /* by ref */, $content /* by ref */, $renderers );
 
+		$post_title = format_to_post( $post_title );
 		$content = format_to_post( $content );
 
 		$this->sql = "SELECT
@@ -581,6 +580,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.62  2007/04/05 22:57:33  fplanque
+ * Added hook: UnfilterItemContents
+ *
  * Revision 1.61  2007/03/31 22:46:47  fplanque
  * FilterItemContent event
  *
