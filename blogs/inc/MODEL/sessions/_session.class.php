@@ -157,14 +157,22 @@ class Session
 						$old_callback = ini_set( 'unserialize_callback_func', 'session_unserialize_callback' );
 						if( $old_callback === false )
 						{ // this can fail, if "ini_set" has been disabled for security reasons.. :/
-							// TODO: dh> add this to "System check page"?
-							debug_die('ini_set() is disabled! b2evo cannot adjust "unserialize_callback_func" for Session restoring!');
+							// fp> yes and that's the case at OVH, France's largest shared hosting company.
+							// fp> There is no way we're gonna just die here.
+							// debug_die('ini_set() is disabled! b2evo cannot adjust "unserialize_callback_func" for Session restoring!');
+
+							// Brutally load add classes that we might need:
+ 							session_unserialize_load_all_classes();
 						}
 						// TODO: dh> This can fail, if there are special chars in sess_data:
 						//       It will be encoded in $evo_charset _after_ "SET NAMES", but
 						//       get retrieved here, _before_ any "SET NAMES" (if $db_config['connection_charset'] is not set (default))!
 						$this->_data = @unserialize($row->sess_data);
-						ini_set( 'unserialize_callback_func', $old_callback );
+
+						if( $old_callback !== false )
+						{	// Restore the old callback if we changed it:
+							ini_set( 'unserialize_callback_func', $old_callback );
+						}
 
 						if( ! is_array($this->_data) )
 						{
@@ -466,12 +474,12 @@ class Session
 
 /**
  * This gets used as a {@link unserialize()} callback function, which is
- * responsible to load the requested class.
+ * responsible for loading the requested class.
+ *
+ * IMPORTANT: when modifying this, modify the following also:
+ * @see session_unserialize_load_all_classes()
  *
  * @todo Once we require PHP5, we should think about using this as __autoload function.
- *
- * Currently, this just gets used by the {@link Session} class and includes the
- * {@link Comment} class and its dependencies.
  *
  * @return boolean True, if the required class could be loaded; false, if not
  */
@@ -510,8 +518,31 @@ function session_unserialize_callback( $classname )
 }
 
 
+/**
+ * When session_unserialize_callback() cannot be registered to do some smart loading,
+ * then we fall back to this function and load everything with brute force...
+ *
+ * IMPORTANT: when modifying this, modify the following also:
+ * @see session_unserialize_callback()
+ */
+function session_unserialize_load_all_classes()
+{
+	global $model_path;
+
+	require_once $model_path.'collections/_blog.class.php';
+	require_once $model_path.'collections/_collsettings.class.php';
+	require_once $model_path.'comments/_comment.class.php';
+	require_once $model_path.'items/_item.class.php';
+	require_once $model_path.'users/_group.class.php';
+	require_once $model_path.'users/_user.class.php';
+}
+
+
 /*
  * $Log$
+ * Revision 1.39  2007/04/05 21:53:51  fplanque
+ * fix for OVH
+ *
  * Revision 1.38  2007/03/11 18:29:50  blueyed
  * Use is_array for session data check
  *
@@ -551,110 +582,5 @@ function session_unserialize_callback( $classname )
  *
  * Revision 1.26  2006/11/14 21:13:58  blueyed
  * I've spent > 2 hours debugging this charset nightmare and all I've got are those lousy TODOs..
- *
- * Revision 1.25  2006/09/10 00:00:57  blueyed
- * "Solved" Session related todos.
- *
- * Revision 1.24  2006/09/09 23:43:52  blueyed
- * Added param_cookie() and used it for session cookie
- *
- * Revision 1.23  2006/08/20 13:47:25  fplanque
- * extracted param funcs from misc
- *
- * Revision 1.22  2006/08/19 07:56:31  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.21  2006/08/07 23:49:52  blueyed
- * Display Debuglog object stored in session (after redirect) separately.
- *
- * Revision 1.20  2006/08/07 22:37:54  fplanque
- * no message
- *
- * Revision 1.19  2006/08/07 22:29:33  fplanque
- * minor / doc
- *
- * Revision 1.16  2006/08/07 16:49:35  fplanque
- * doc
- *
- * Revision 1.15  2006/08/01 20:02:38  blueyed
- * Fixed bug with sess_lastseen WHERE-clause.
- *
- * Revision 1.14  2006/07/31 15:39:06  blueyed
- * Save Debuglog into Session before redirect and load it from there, if available.
- *
- * Revision 1.13  2006/06/20 21:16:02  blueyed
- * doc/debug
- *
- * Revision 1.12  2006/05/29 19:54:45  fplanque
- * no message
- *
- * Revision 1.11  2006/05/12 21:53:37  blueyed
- * Fixes, cleanup, translation for plugins
- *
- * Revision 1.10  2006/05/04 10:18:41  blueyed
- * Added Session property to skip page content caching event.
- *
- * Revision 1.9  2006/05/04 01:06:05  blueyed
- * debuglog
- *
- * Revision 1.8  2006/05/02 22:25:27  blueyed
- * Comment preview for frontoffice.
- *
- * Revision 1.7  2006/04/21 17:05:08  blueyed
- * cleanup
- *
- * Revision 1.6  2006/04/19 20:13:50  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.5  2006/03/20 18:49:44  fplanque
- * no message
- *
- * Revision 1.4  2006/03/19 19:53:53  blueyed
- * minor
- *
- * Revision 1.3  2006/03/12 23:08:59  fplanque
- * doc cleanup
- *
- * Revision 1.2  2006/03/02 20:05:29  blueyed
- * Fixed/polished stats (linking T_useragents to T_hitlog, not T_sessions again). I've done this the other way around before, but it wasn't my idea.. :p
- *
- * Revision 1.1  2006/02/23 21:11:58  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.45  2006/01/29 15:07:01  blueyed
- * Added reload_data()
- *
- * Revision 1.43  2006/01/22 19:38:45  blueyed
- * Added expiration support through set() for session data.
- *
- * Revision 1.42  2006/01/20 17:08:13  blueyed
- * Save sess_data as NULL (unserialized) if NULL.
- *
- * Revision 1.41  2006/01/20 16:40:56  blueyed
- * Cleanup
- *
- * Revision 1.40  2006/01/14 14:23:07  blueyed
- * "Out of range" fix in dbsave()
- *
- * Revision 1.39  2006/01/12 21:55:13  blueyed
- * Fix
- *
- * Revision 1.38  2006/01/11 18:23:04  blueyed
- * Also update sess_user_ID in DB on shutdown with set_User() and set_user_ID().
- *
- * Revision 1.36  2006/01/11 01:06:37  blueyed
- * Save session data once at shutdown into DB
- *
- * Revision 1.35  2005/12/21 20:38:18  fplanque
- * Session refactoring/doc
- *
- * Revision 1.34  2005/12/12 19:21:23  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.33  2005/11/17 19:35:26  fplanque
- * no message
- *
  */
 ?>
