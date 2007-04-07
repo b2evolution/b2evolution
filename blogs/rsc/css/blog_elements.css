@@ -78,12 +78,15 @@ div.codeblock {
 	border: 1px dotted #aaa;
 	margin: 1ex;
 	padding: 1ex;
-	width: 90%;
 	overflow: auto;
 }
 
 div.codeblock pre {
 	margin: 0;
+}
+
+pre {
+	overflow:hidden;
 }
 
 /* Calendar: */
