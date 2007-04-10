@@ -80,6 +80,16 @@ $minimum_comment_interval = 30;
 
 
 /**
+ * Check antispam blacklist for private messages.
+ *
+ * Do you want to check the antispam blocklist when a message form is submitted?
+ *
+ * @global boolean $antispam_on_message_form
+ */
+$antispam_on_message_form = 1;
+
+
+/**
  * Set the length of the online session time out (in seconds).
  *
  * This is for the Who's Online block. Default: 5 minutes (300s).

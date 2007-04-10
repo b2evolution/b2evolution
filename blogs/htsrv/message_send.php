@@ -113,14 +113,13 @@ param( 'comment_id', 'integer', '' );
 $sender_name = param( 'd', 'string', '' );
 $sender_address = param( 'f', 'string', '' );
 $subject = param( 'g', 'string', '' );
-$message = param( 'h', 'string', '' );
+$message = param( 'h', 'html', '' );	// We accept html but we will NEVER display it
 
 // Prevent register_globals injection!
 $recipient_address = '';
 $recipient_name = '';
 $recipient_User = NULL;
 $Comment = NULL;
-
 
 // Core param validation
 if( empty($sender_name) )
@@ -135,17 +134,19 @@ elseif( !is_email($sender_address) || antispam_check( $sender_address ) ) // TOD
 {
 	$Messages->add( T_('Supplied email address is invalid.'), 'error' );
 }
+
 if( empty($subject) )
 {
 	$Messages->add( T_('Please fill in the subject of your message.'), 'error' );
 }
+
 if( empty( $message ) )
 { // message should not be empty!
 	$Messages->add( T_('Please do not send empty messages.'), 'error' );
 }
-elseif( antispam_check(  strip_tags( $message ) ) )
-{ // lets check the message against the blacklist
-    $Messages->add( T_('Supplied message is invalid.'), 'error' );
+elseif( $antispam_on_message_form && antispam_check( $message ) )
+{ // a blacklisted keyword ha sbeen found in the message:
+	$Messages->add( T_('The supplied message is invalid / appears to be spam.'), 'error' );
 }
 
 
@@ -313,6 +314,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.53  2007/04/10 16:59:10  fplanque
+ * fixed antispam on message form
+ *
  * Revision 1.52  2007/03/09 10:07:53  yabs
  * Added antispam check
  *
