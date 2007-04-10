@@ -59,7 +59,7 @@ class GeneralSettings extends AbstractSettings
 		'antispam_last_update' => '2000-01-01 00:00:00',
 		'antispam_threshold_publish' => '-90',
 		'antispam_threshold_delete' => '100', // do not delete by default!
-		'antispam_block_spam_referers' => '1',
+		'antispam_block_spam_referers' => '0',	// By default, let spam referers go in silently (just don't log them). This is in case the blacklist is too paranoid (social media, etc.)
 
 		'AutoBR' => '0',			// Used for email blogging. fp> TODO: should be replaced by "email renderers/decoders/cleaners"...
 
@@ -157,6 +157,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.31  2007/04/10 17:55:09  fplanque
+ * minor
+ *
  * Revision 1.30  2007/03/25 13:20:52  fplanque
  * cleaned up blog base urls
  * needs extensive testing...
