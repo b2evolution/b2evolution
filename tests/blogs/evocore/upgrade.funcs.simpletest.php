@@ -1086,6 +1086,31 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 		$this->assertEqual( count($r), 0 );
 	}
 
+
+	/**
+	 *
+	 */
+	function test_key_name_is_optional()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				server_url VARCHAR(2047),
+				timestamp INTEGER,
+				salt CHAR(40),
+				UNIQUE (server_url(255), timestamp, salt)
+			)" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE test_1 (
+				server_url VARCHAR(2047),
+				timestamp INTEGER,
+				salt CHAR(40),
+				UNIQUE (server_url(255), timestamp, salt)
+			)" );
+
+		$this->assertEqual( count($r), 0 );
+	}
+
 }
 
 
