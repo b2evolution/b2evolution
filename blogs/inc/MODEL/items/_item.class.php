@@ -1239,7 +1239,7 @@ class Item extends ItemLight
 
 		if( empty($url) )
 		{
-			$url = $this->get_permanent_url( '', '', true );
+			$url = $this->get_permanent_url( '', '', '&amp;' );
 		}
 
 		$page_links = array();
@@ -2878,6 +2878,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.170  2007/04/15 13:34:36  blueyed
+ * Fixed default $url generation in page_links()
+ *
  * Revision 1.169  2007/04/05 22:57:33  fplanque
  * Added hook: UnfilterItemContents
  *
