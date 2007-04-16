@@ -36,12 +36,12 @@ class PluginUnitTestCase extends EvoUnitTestCase
 	 */
 	function & get_fake_Plugin( $classname )
 	{
-		$Plugins = new Plugins_admin_no_DB();
+		$GLOBALS['Plugins_admin'] = new Plugins_admin_no_DB(); // needs to be named "Plugins_admin", so it gets used by get_Cache()!
 
 		$real_Plugin = new $classname();
 
 		// Fake DB entry:
-		$Plugins->index_ID_rows[1] = array(
+		$GLOBALS['Plugins_admin']->index_ID_rows[1] = array(
 			'plug_ID' => 1,
 			'plug_priority' => 50,
 			'plug_classname' => $classname,
@@ -51,8 +51,8 @@ class PluginUnitTestCase extends EvoUnitTestCase
 			'plug_apply_rendering' => 'always',
 			'plug_status' => 'enabled',
 			'plug_version' => $real_Plugin->version );
-		$Plugins->register( 'auto_p_plugin', /* fake DB entry: */ 1 );
-		$Plugin = & $Plugins->get_next();
+		$GLOBALS['Plugins_admin']->register( 'auto_p_plugin', /* fake DB entry: */ 1 );
+		$Plugin = & $GLOBALS['Plugins_admin']->get_next();
 
 		return $Plugin;
 	}
