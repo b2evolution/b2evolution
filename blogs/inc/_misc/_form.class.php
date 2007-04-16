@@ -215,7 +215,7 @@ class Form extends Widget
 				$this->fieldstart = '<fieldset $ID$>'."\n";
 				$this->labelstart = '<div class="label">';
 				$this->labelend = "</div>\n";
-				$this->labelempty = '';
+				$this->labelempty = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
 				$this->inputstart = '<div class="input">';
 				$this->infostart = '<div class="info">';
 				$this->inputend = "</div>\n";
@@ -2730,6 +2730,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.76  2007/04/16 15:46:10  blueyed
+ * Fixed $labelempty for IE6 and "fieldset" layout
+ *
  * Revision 1.75  2007/03/23 14:47:48  blueyed
  *  - Display both "required" and "error" states in checklist() and through handle_common_params()
  * - "force_keys_as_values" param for select_input_array() (Props A. Becker)
