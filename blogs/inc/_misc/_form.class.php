@@ -1906,7 +1906,7 @@ class Form extends Widget
 
 		$r = $this->fieldstart;
 
-		if( !empty($field_label) )
+		if( strlen($field_label) )
 		{
 			$r .= $this->labelstart.$field_label;
 
@@ -2317,6 +2317,8 @@ class Form extends Widget
 	 * @param string Label
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - lines: Options on seperate lines (DIVs) (boolean, default false)
+	 *              NOTE: these params/attribs get used as default for every INPUT field,
+	 *                    overridden by $field_options
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function radio_input( $field_name, $field_value, $field_options, $field_label, $field_params = array() )
@@ -2338,6 +2340,7 @@ class Form extends Widget
 
 		$field_params['id'] = false; // No ID attribute for the label
 		$this->handle_common_params( $field_params, $field_name, $field_label );
+		unset($field_params['id']);  // unset, so it gets handled correctly as default below
 
 		$r = $this->begin_field();
 
@@ -2347,6 +2350,9 @@ class Form extends Widget
 		$count_options = 0; // used for unique IDs (label/radio)
 		foreach( $field_options as $loop_radio )
 		{
+			// Merge defaults from $field_params:
+			$loop_radio = array_merge( $field_params, $loop_radio );
+
 			if( $field_lines ) $r .= "<div>\n";
 
 			// Defaults:
@@ -2551,7 +2557,9 @@ class Form extends Widget
 	{
 		$r = '';
 
-		if( !empty($this->_common_params['label']) )
+		$label = $this->_common_params['label'];
+
+		if( strlen($label) )
 		{
 			$r .= $this->labelstart
 				.'<label'
@@ -2559,7 +2567,7 @@ class Form extends Widget
 					? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
 					: '' )
 				.'>'
-				.$this->_common_params['label'];
+				.format_to_output($label, 'htmlbody');
 
 			if( $this->label_to_the_left )
 			{
@@ -2730,6 +2738,11 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.77  2007/04/16 15:49:59  blueyed
+ * Minor fixes:
+ *  - allow "0" as label
+ *  - format-to-output label
+ *
  * Revision 1.76  2007/04/16 15:46:10  blueyed
  * Fixed $labelempty for IE6 and "fieldset" layout
  *
