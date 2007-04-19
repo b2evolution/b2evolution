@@ -73,6 +73,12 @@ span.NonExistentWikiWord {
 	border-bottom: 1px dotted #ccc;
 }
 
+div.videoblock {
+	text-align: center;
+	margin:auto;
+	overflow: auto;
+}
+
 div.codeblock {
 	background-color: #eee;
 	border: 1px dotted #aaa;
