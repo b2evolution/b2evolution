@@ -1670,6 +1670,8 @@ function upgrade_b2evo_tables()
 
 
 		install_basic_widgets();
+
+		set_upgrade_checkpoint( '9408' );
 	}
 
 	if( $old_db_version < 9410 )
@@ -1696,6 +1698,8 @@ function upgrade_b2evo_tables()
 			REPLACE INTO T_itemtypes ( ptyp_ID, ptyp_name )
 			VALUES ( 1000, 'Page' )" );
 		echo "OK.<br />\n";
+
+		set_upgrade_checkpoint( '9410' );
 	}
 
 	/*
@@ -1813,6 +1817,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.215  2007/04/19 01:51:53  fplanque
+ * upgrade checkpoints
+ *
  * Revision 1.214  2007/03/26 12:59:18  fplanque
  * basic pages support
  *

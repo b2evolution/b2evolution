@@ -36,7 +36,7 @@ $app_banner = '<a href="http://b2evolution.net/"><img src="'.$rsc_url.'img/b2evo
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 9408;
+$new_db_version = 9410;
 
 
 $admin_path_separator = ' :: ';
