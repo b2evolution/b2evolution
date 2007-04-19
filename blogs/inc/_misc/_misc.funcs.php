@@ -1408,7 +1408,10 @@ function debug_die( $additional_info = '' )
 			$backtrace_cli = preg_replace( '~(\S)(\n)(\S)~', '$1  $2$3', $backtrace_cli );
 			$log_message .= "\nBacktrace:\n".$backtrace_cli;
 		}
-		$log_message .= "\n".$_SERVER['REQUEST_URI'].' ('.( isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '-' ).')';
+		if( isset($_SERVER['REQUEST_URI']) )
+		{ // not set in cli/cron
+			$log_message .= "\n".$_SERVER['REQUEST_URI'].' ('.( isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '-' ).')';
+		}
 
 		error_log( str_replace("\n", ' / ', $log_message), 0 /* PHP's system logger */ );
 	}
@@ -2836,6 +2839,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.171  2007/04/19 20:36:42  blueyed
+ * Fixed possible E_NOTICE with REQUEST_URI/cron
+ *
  * Revision 1.170  2007/02/16 11:23:02  blueyed
  * No limits for xdebug_var_dump() in pre_dump()
  *
