@@ -1,0 +1,65 @@
+/* AstonishMe code plugin styles */
+
+.codespan {
+	background-color: #efefef;
+	padding: 0 .5ex;
+}
+
+.amcode {
+	font-weight:bold;
+	margin:.5em 0 .4em 1em;
+}
+
+.codeblock.amc_long {
+	height:24em;
+	overflow:auto; // added by yabba
+}
+
+.codeblock table {
+	border-collapse:collapse;
+}
+.codeblock td {
+	border:1px solid #666;
+	width:100%;
+	padding:0 0 0 33px;
+	text-indent:-28px;
+}
+
+.amc_code_odd { background:#f0f0f0; color:#666; }
+.amc_code_even{ background:#e8e8e8; color:#666; }
+
+/* code plugin line numbers */
+
+td.amc_line { padding:0 5px; font-size:0; width:auto; }
+td.amc_line div { padding-right:9px; height:10px; }
+.codeblock .amc0 { background-position:90% 100%; }
+.codeblock .amc1 { background-position:90% 0%; }
+.codeblock .amc2 { background-position:90% 11%; }
+.codeblock .amc3 { background-position:90% 22%; }
+.codeblock .amc4 { background-position:90% 33%; }
+.codeblock .amc5 { background-position:90% 44%; }
+.codeblock .amc6 { background-position:90% 55%; }
+.codeblock .amc7 { background-position:90% 67%; }
+.codeblock .amc8 { background-position:90% 78%; }
+.codeblock .amc9 { background-position:90% 89%; }
+
+/* XML/HTML syntax highlighting colours */
+
+.codeblock .code_tag {
+	font-weight: bold;
+	color: #c00;
+}
+
+
+/* PHP syntax highlighting colours */
+
+.codeblock .amc_html { color:#000; }
+.codeblock .amc_default { color:#000; }
+.codeblock .amc_keyword { color:#c0c; }
+.codeblock .amc_string { color:#c00; }
+.codeblock .amc_comment { color:#f70; }
+
+.codeblock a:link,
+.codeblock a:visited { color:#00f; }
+.codeblock a:hover{ color:#88f; }
+
