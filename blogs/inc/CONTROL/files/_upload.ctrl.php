@@ -358,7 +358,7 @@ if( isset($_FILES) && count( $_FILES ) )
 			$success_msg .=
 				'<ul>'
 					.'<li>'.T_("Here's the code to display it:").' <input type="text" value="'.$img_tag.'" /></li>'
-					.'<li><a href="#" onclick="if( window.focus && window.opener ){ window.opener.focus(); textarea_replace_selection( window.opener.document.getElementById(\'itemform_post_content\'), \''.format_to_output( $newFile->get_tag(), 'formvalue' ).'\', window.opener.document ); } return false;">'.T_('Add the code to your post !').'</a></li>'
+					.'<li><a href="#" onclick="if( window.focus && window.opener ){ window.opener.focus(); textarea_wrap_selection( window.opener.document.getElementById(\'itemform_post_content\'), \''.format_to_output( $newFile->get_tag(), 'formvalue' ).'\', \'\', 1, window.opener.document ); } return false;">'.T_('Add the code to your post !').'</a></li>'
 				.'</ul>';
 		}
 
@@ -439,6 +439,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2007/04/20 01:42:32  fplanque
+ * removed excess javascript
+ *
  * Revision 1.8  2007/02/22 18:36:57  fplanque
  * better error messages
  *

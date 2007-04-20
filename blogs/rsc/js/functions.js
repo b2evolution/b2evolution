@@ -172,35 +172,50 @@ function toggle_clickopen( id, hide, displayVisible )
 }
 
 
+// deprecated but left for old plugins:
+function textarea_replace_selection( myField, snippet, target_document )
+{
+	textarea_wrap_selection( myField, snippet, '', 1, target_document );
+}
+
 /**
  * Textarea insertion code.
  *
  * TODO: Make the quicktags plugin use this general function.
  * @var element
  * @var text
+ * @var text
+ * @var boolean
  * @var document (needs only be passed from a popup window as window.opener.document)
  */
-function textarea_replace_selection( myField, snippet, target_document )
+function textarea_wrap_selection( myField, before, after, replace, target_document )
 {
 	target_document = target_document || document;
 
-	if( b2evo_Callbacks.trigger_callback( "insert_raw_into_"+myField.id, snippet ) )
+	if( b2evo_Callbacks.trigger_callback( "insert_raw_into_"+myField.id, before+after ) )
 	{
 		return;
 	}
 	if( window.opener && ( typeof window.opener.b2evo_Callbacks != "undefined" ) )
 	{ // we're called in a popup: try that b2evo_Callbacks event
-		if( window.opener.b2evo_Callbacks.trigger_callback( "insert_raw_into_"+myField.id, snippet ) )
+		if( window.opener.b2evo_Callbacks.trigger_callback( "insert_raw_into_"+myField.id, before+after ) )
 		{
 			return;
 		}
 	}
 
-	if (target_document.selection)
+	if(target_document.selection)
 	{ // IE support:
 		myField.focus();
 		sel = target_document.selection.createRange();
-		sel.text = snippet;
+		if( replace )
+		{
+			sel.text = before + after;
+		}
+		else
+		{
+			sel.text = before + sel.text + after;
+		}
 		myField.focus();
 	}
 	else if (myField.selectionStart || myField.selectionStart == '0')
@@ -208,6 +223,7 @@ function textarea_replace_selection( myField, snippet, target_document )
 		var startPos = myField.selectionStart;
 		var endPos = myField.selectionEnd;
 		var cursorPos;
+
 		var scrollTop, scrollLeft;
 		if( myField.type == 'textarea' && typeof myField.scrollTop != 'undefined' )
 		{ // remember old position
@@ -215,10 +231,23 @@ function textarea_replace_selection( myField, snippet, target_document )
 			scrollLeft = myField.scrollLeft;
 		}
 
-		myField.value = myField.value.substring(0, startPos)
-										+ snippet
-										+ myField.value.substring(endPos, myField.value.length);
-		cursorPos = startPos+snippet.length;
+		if( replace )
+		{
+			myField.value = myField.value.substring( 0, startPos)
+											+ before
+											+ after
+											+ myField.value.substring( endPos, myField.value.length);
+			cursorPos = startPos + before.length + after.length;
+		}
+		else
+		{
+			myField.value = myField.value.substring( 0, startPos)
+											+ before
+											+ myField.value.substring(startPos, endPos)
+											+ after
+											+ myField.value.substring( endPos, myField.value.length);
+			cursorPos = endPos + before.length + after.length;
+		}
 
 		if( typeof scrollTop != 'undefined' )
 		{ // scroll to old position
@@ -232,10 +261,11 @@ function textarea_replace_selection( myField, snippet, target_document )
 	}
 	else
 	{ // Default browser support:
-		myField.value += snippet;
+		myField.value += before + after;
 		myField.focus();
 	}
 }
+
 
 
 /**
@@ -420,6 +450,9 @@ var b2evo_Callbacks = new b2evo_Callbacks();
 
 /*
  * $Log$
+ * Revision 1.27  2007/04/20 01:42:32  fplanque
+ * removed excess javascript
+ *
  * Revision 1.26  2007/03/07 19:26:20  blueyed
  * Fix; for IE IIRC
  *

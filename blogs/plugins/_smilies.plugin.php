@@ -22,9 +22,10 @@ class smilies_plugin extends Plugin
 	var $code = 'b2evSmil';
 	var $name = 'Smilies';
 	var $priority = 15;
-	var $version = '1.9.2';
+	var $version = '1.10';
 	var $apply_rendering = 'opt-out';
 	var $group = 'rendering';
+	var $number_of_installs = 3;
 
 	/**
 	 * Text similes search array
@@ -89,7 +90,7 @@ class smilies_plugin extends Plugin
 					'rows' => 10,
 					'cols' => 60,
 					'defaultvalue' => '
-=>       icon_arrow.gif
+ =>       icon_arrow.gif
 :!:      icon_exclaim.gif
 :?:      icon_question.gif
 :idea:   icon_idea.gif
@@ -104,7 +105,7 @@ B)       icon_cool.gif
 :|       icon_neutral.gif
 :-/      icon_confused.gif
 :(       icon_sad.gif
->:(      icon_mad.gif
+ >:(      icon_mad.gif
 :\'(      icon_cry.gif
 |-|      icon_wth.gif
 :>>      icon_mrgreen.gif
@@ -209,55 +210,11 @@ XX(      graydead.gif
 				$smiled[] = $smiley[ 'image'];
 				$smiley[ 'code' ] = str_replace(' ', '', $smiley[ 'code' ]);
 				$grins .= '<img src="'.$smiley[ 'image' ].'" title="'.$smiley[ 'code' ].'" alt="'.$smiley[ 'code' ]
-									.'" class="top" onclick="grin(\''. str_replace("'","\'",$smiley[ 'code' ]). '\');" /> ';
+									.'" class="top" onclick="textarea_wrap_selection( b2evoCanvas, \''. str_replace("'","\'",$smiley[ 'code' ]). '\', \'\', 1 );" /> ';
 			}
 		}
 
-		print('<div class="edit_toolbar">'. $grins. '</div>');
-		ob_start();
-		?>
-		<script type="text/javascript">
-		function grin(tag)
-		{
-			if( typeof b2evo_Callbacks == 'object' )
-			{ // see if there's a callback registered that should handle this:
-				if( b2evo_Callbacks.trigger_callback("insert_raw_into_"+b2evoCanvas.id, tag) )
-				{
-					return;
-				}
-			}
-
-			var myField = b2evoCanvas;
-
-			if (document.selection) {
-				myField.focus();
-				sel = document.selection.createRange();
-				sel.text = tag;
-				myField.focus();
-			}
-			else if (myField.selectionStart || myField.selectionStart == '0') {
-				var startPos = myField.selectionStart;
-				var endPos = myField.selectionEnd;
-				var cursorPos = endPos;
-				myField.value = myField.value.substring(0, startPos)
-								+ tag
-								+ myField.value.substring(endPos, myField.value.length);
-				cursorPos += tag.length;
-				myField.focus();
-				myField.selectionStart = cursorPos;
-				myField.selectionEnd = cursorPos;
-			}
-			else {
-				myField.value += tag;
-				myField.focus();
-			}
-		}
-
-		</script>
-		<?php
-		$grins = ob_get_contents();
-		ob_end_clean();
-		print($grins);
+		echo '<div class="edit_toolbar">'.$grins.'</div>' ;
 
 		return true;
 	}
@@ -436,6 +393,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.39  2007/04/20 01:42:32  fplanque
+ * removed excess javascript
+ *
  * Revision 1.38  2007/01/15 03:55:22  fplanque
  * lowered priority so there is no conflict with other replacements generating smileys.
  *

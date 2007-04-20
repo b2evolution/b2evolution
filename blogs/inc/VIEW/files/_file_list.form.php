@@ -594,7 +594,7 @@ $Form->begin_form();
 						return true;
 					}
 					window.opener.focus();
-					textarea_replace_selection( window.opener.document.getElementById("itemform_post_content"), snippet, window.opener.document );
+					textarea_wrap_selection( window.opener.document.getElementById("itemform_post_content"), snippet, '', 1, window.opener.document );
 					return true;
 				}
 			}
@@ -607,6 +607,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.6  2007/04/20 01:42:32  fplanque
+ * removed excess javascript
+ *
  * Revision 1.5  2007/01/26 02:12:06  fplanque
  * cleaner popup windows
  *
