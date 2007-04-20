@@ -214,6 +214,9 @@ function install_basic_plugins( $old_db_version = 0 )
 		$Plugins_admin->install( 'auto_p_plugin' );
 		$Plugins_admin->install( 'autolinks_plugin' );
 		$Plugins_admin->install( 'texturize_plugin' );
+		$Plugins_admin->install( 'smilies_plugin' );
+		$Plugins_admin->install( 'code_highlight_plugin' );
+		$Plugins_admin->install( 'videoplug_plugin' );
 		// SkinTags:
 		$Plugins_admin->install( 'calendar_plugin' );
 		$Plugins_admin->install( 'archives_plugin' );
@@ -486,6 +489,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.20  2007/04/20 02:31:06  fplanque
+ * more default plugins
+ *
  * Revision 1.19  2007/01/19 09:31:04  fplanque
  * Provision for case sensitive file meta data handling
  *
