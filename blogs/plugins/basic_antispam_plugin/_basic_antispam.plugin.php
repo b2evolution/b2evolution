@@ -53,6 +53,7 @@ class basic_antispam_plugin extends Plugin
 	var $version = '2.0-dev';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
+	var $number_of_installs = 1;
 
 
 	/**
@@ -614,6 +615,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.28  2007/04/20 02:53:13  fplanque
+ * limited number of installs
+ *
  * Revision 1.27  2007/01/30 19:55:04  blueyed
  * Return explictly true in PluginVersionChanged
  *

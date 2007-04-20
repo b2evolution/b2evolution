@@ -26,6 +26,7 @@ class bbcode_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
+	var $number_of_installs = 1;
 
 	/*
 	 * Internal
@@ -212,6 +213,9 @@ class bbcode_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.19  2007/04/20 02:53:13  fplanque
+ * limited number of installs
+ *
  * Revision 1.18  2006/12/26 03:19:12  fplanque
  * assigned a few significant plugin groups
  *

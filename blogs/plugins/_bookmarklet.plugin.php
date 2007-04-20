@@ -31,6 +31,7 @@ class bookmarklet_plugin extends Plugin
 	var $priority = 94;
 	var $version = '1.9-dev';
 	var $author = 'Cafelog team';
+	var $number_of_installs = 1;
 
 
 	/**
@@ -96,6 +97,9 @@ class bookmarklet_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.18  2007/04/20 02:53:13  fplanque
+ * limited number of installs
+ *
  * Revision 1.17  2006/12/12 02:53:57  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.

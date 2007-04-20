@@ -56,6 +56,7 @@ class ping_pingomatic_plugin extends Plugin
 	 */
 	var $apply_rendering = 'never';
 	var $group = 'ping';
+	var $number_of_installs = 1;
 
 
 	/**
@@ -98,6 +99,9 @@ class ping_pingomatic_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.4  2007/04/20 02:53:13  fplanque
+ * limited number of installs
+ *
  * Revision 1.3  2006/11/24 18:27:27  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *

@@ -30,6 +30,7 @@ class autolinks_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
+	var $number_of_installs = 1;
 
 
 	/**
@@ -62,6 +63,9 @@ class autolinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.16  2007/04/20 02:53:13  fplanque
+ * limited number of installs
+ *
  * Revision 1.15  2007/01/17 21:41:05  blueyed
  * todo for useful settings/features
  *

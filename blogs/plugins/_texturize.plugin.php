@@ -18,10 +18,11 @@ class texturize_plugin extends Plugin
 	var $name = 'Texturize';
 	var $priority = 90;
 	var $version = '1.9-dev';
-	var $apply_rendering = 'opt-in';
+	var $apply_rendering = 'opt-out';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
+	var $number_of_installs = 1;
 
 
 	/**
@@ -115,6 +116,9 @@ class texturize_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.15  2007/04/20 02:53:13  fplanque
+ * limited number of installs
+ *
  * Revision 1.14  2006/12/26 03:19:12  fplanque
  * assigned a few significant plugin groups
  *

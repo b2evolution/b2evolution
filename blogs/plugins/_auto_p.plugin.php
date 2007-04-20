@@ -27,6 +27,7 @@ class auto_p_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
+	var $number_of_installs = 1;
 
 	/**
 	 * List of block elements (we want a paragraph before and after), excludes: address, added: td, th
@@ -633,6 +634,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.37  2007/04/20 02:53:13  fplanque
+ * limited number of installs
+ *
  * Revision 1.36  2007/01/17 23:35:58  blueyed
  * Removed obsolete question/todo
  *
