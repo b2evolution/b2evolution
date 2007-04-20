@@ -2738,9 +2738,14 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.78  2007/04/20 03:01:12  fplanque
+ * doc
+ *
  * Revision 1.77  2007/04/16 15:49:59  blueyed
  * Minor fixes:
  *  - allow "0" as label
+fp> once again this should not be documented in the changelog but at the right place in the code
+fp> someday it will just get "cleaned up" -> broken again for lack of a comment. Don't complain then...
  *  - format-to-output label
  *
  * Revision 1.76  2007/04/16 15:46:10  blueyed
