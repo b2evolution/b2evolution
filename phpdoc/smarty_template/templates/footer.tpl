@@ -98,7 +98,7 @@
 
 	<div class="credit">
 	<hr class="separator" />
-	Documentation generated on {$date} by <a href="{$phpdocwebsite}">phpDocumentor {$phpdocversion}</a>
+	Documentation generated on {$date} by <a href="{$phpdocwebsite}">phpDocumentor {$phpdocversion}</a>. This site is hosted and maintained by <a href="http://daniel.hahler.de/">Daniel HAHLER</a> (<a href="http://b2evolution.net/contact/?recipient_id=11">Contact</a>).
 	</div>
 </div>
 </div>
