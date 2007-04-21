@@ -12,9 +12,11 @@
 PHPDOC="/usr/local/pear/PhpDocumentor/phpdoc"
 
 # Set this to the PHP interpreter to use. PHP 5.2+ highly recommended!
-PHP="/home/daniel/cvs/PHP_5_2/sapi/cli/php"
+PHP="/usr/local/bin/php -d memory_limit=1024M"
 export PHP
 
+# halt on any error:
+set -e
 
 # change to script's directory
 cd `dirname $0`
@@ -25,10 +27,10 @@ cd `dirname $0`
 # Generate documentation
 $PHPDOC --title 'b2evolution Technical Documentation (CVS HEAD)' \
 --directory .. \
+--ignore-symlinks on \
 --target build/ \
 --output HTML:Smarty:b2evo \
 --ignore _idna_convert_npdata.ser.inc,Connections/,CVS/,gettext/,simpletest/,Templates/,img/,locales/,rsc/,media/,tests/,doc/,extras/,skins/babyblues/,skins/guadeloupe/,skins/wpc_aubmach/,*.gif,*.jpg,*.png,*.css,*.po*,*.mo*,*.bak,*.html,*.sql,*.xml,*.bpd,*.mpd,*.log,*.htaccess,*_TEST.php \
---hidden off \
 --parseprivate off \
 --defaultpackagename main \
 --defaultcategoryname Documentation \
