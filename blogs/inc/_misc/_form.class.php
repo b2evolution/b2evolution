@@ -2335,7 +2335,11 @@ class Form extends Widget
 
 		if( !isset($field_params['note_format']) )
 		{ // Default field_note for radios:
-			$field_params['note_format'] = '<div><span class="notes">%s</span></div>';
+			$field_params['note_format'] = '<span class="notes">%s</span>';
+			if( $field_lines )
+			{
+				$field_params['note_format'] = '<div>'.$field_params['note_format'].'</div>';
+			}
 		}
 
 		$field_params['id'] = false; // No ID attribute for the label
@@ -2738,6 +2742,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.79  2007/04/23 15:06:28  blueyed
+ * radio_input(): Respect "lines" param for "note_format" default value
+ *
  * Revision 1.78  2007/04/20 03:01:12  fplanque
  * doc
  *
