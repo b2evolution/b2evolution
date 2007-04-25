@@ -128,6 +128,8 @@ $basedomain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '$2', $basehost );
  *
  * You can change the notification email address alone a few lines below.
  *
+ * @todo generate a random instance name at install and have it saved in the global params in the DB
+ *
  * @global string Default: 'b2evo'
  */
 $instance_name = 'b2evo'; // MUST BE A SINGLE WORD! NO SPACES!!
@@ -281,32 +283,6 @@ $obhandler_debug = false;
 
 // ** Cookies **
 
-/*
-blueyed>>TODO:
-- Cookie needs hash of domain name in its name, eg:
-	$cookie_session = 'cookie'.small_hash($Cookies->domain).$instancename.'user'
-	(Because: cookies for .domain.tld have higher priority over .sub.domain.tld, with the same cookie name,
-		the hash would put that into the name)
-	[ Related to PHP bug #32802 (http://bugs.php.net/bug.php?id=32802 - fixed in 5.0.5 (also backported)), but which only affects paths.
-		Also see http://www.faqs.org/rfcs/rfc2965:
-		"If multiple cookies satisfy the criteria above, they are ordered in
-		the Cookie header such that those with more specific Path attributes
-		precede those with less specific.  Ordering with respect to other
-		attributes (e.g., Domain) is unspecified."
-	]
-	- Transform: catch existing cookies, transform to new format
-
-fplanque>>What's a real world scenario where this is a problem?
-blueyed>> e.g. demo.b2evolution.net and b2evolution.net; or example.com and private.example.com (both running (different) b2evo instances (but with same $instancename)
-fplanque>>that's what I thought. This is exactly why we have instance names in the first place. So we won't add a second mecanism. We can however use one of these two enhancements: 1) have the default conf use a $baseurl hash for instance name instead of 'b2evo' or 2) generate a random instance name at install and have it saved in the global params in the DB. NOTE: we also need to check if this can be broken when using b2evo in multiple domain mode.
-- Use object to handle cookies
-	- We need to know for example if a cookie is about to be sent (because then we don't want to send a 304 response).
-
-fplanque>>What's a real world scenario where this is a problem?
-blueyed>>When we detect that the content hasn't changed and are about to send a 304 response code we won't do it if we now that (login) cookies should be sent.
-fplanque>>ok. If you do it, please do it in a generic $Response object which will not only handle cookies but also stuff like charset translations, format_to_output(), etc.
-*/
-
 /**
  * This is the path that will be associated to cookies.
  *
@@ -325,6 +301,13 @@ $cookie_path = preg_replace( '#https?://[^/]+#', '', $baseurl );
  * when there's no dot in it, at least Firefox will not set the cookie. The best
  * example for having no dot in the host name is 'localhost', but it's the case for
  * host names in an intranet also.
+ *
+ * Note: Rememeber domain.com cookies will be sent to sub.domain.com too.
+ * But, see http://www.faqs.org/rfcs/rfc2965:
+ *	"If multiple cookies satisfy the criteria above, they are ordered in
+ *	the Cookie header such that those with more specific Path attributes
+ *	precede those with less specific.  Ordering with respect to other
+ * attributes (e.g., Domain) is unspecified."
  *
  * @global string Default: ( strpos($basehost, '.') ) ? '.'. $basehost : '';
  */
