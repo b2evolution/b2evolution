@@ -70,9 +70,17 @@ p.baseline {
 	border-top: 1px solid #ddd;
 	text-align: center;
 	font-size: 74%;
-	color: #999;
+	color: #888;
 	padding: 1ex;
 	margin: 0;
+}
+p.baseline a,
+p.baseline a {
+	color: #888;
+	text-decoration: none;
+}
+p.baseline a:hover {
+	text-decoration: underline;
 }
 hr {
 	height: 0;
@@ -156,6 +164,7 @@ h2 {
 	margin: 1ex;
 	border-bottom: 1px solid #78a;
 }
+
 
 /* Styles for posts */
 .bPosts {

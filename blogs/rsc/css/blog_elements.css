@@ -69,6 +69,11 @@ span.bIcons
 	margin: 0 0 0 1em;
 }
 
+p.baseline a.contact_link,
+a.contact_link {
+	text-decoration: underline;
+}
+
 span.NonExistentWikiWord {
 	border-bottom: 1px dotted #ccc;
 }

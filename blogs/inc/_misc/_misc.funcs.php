@@ -2698,15 +2698,29 @@ function base_tag( $url, $target = NULL )
 
 /**
  * Display an array as a list:
+ *
+ * @param array
+ * @param string
+ * @param string
+ * @param string
+ * @param string
+ * @param string
  */
-function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_separator = '', $item_start = '<li>', $item_end = '</li>' )
+function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_separator = '',
+												$item_start = '<li>', $item_end = '</li>' )
 {
 	if( !empty( $items ) )
 	{
 		echo $list_start;
 		$first = true;
 		foreach( $items as $item )
-		{
+		{	// For each list item:
+			$link = resolve_link_params( $item );
+			if( empty( $link ) )
+			{
+				continue;
+			}
+
 			if( $first )
 			{
 				$first = false;
@@ -2715,19 +2729,122 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 			{
 				echo $item_separator;
 			}
-			echo $item_start;
-			if( is_array( $item ) )
-			{
-				echo '<a href="'.$item[0].'" target="_blank">'.$item[1].'</a>';
-			}
-			else
-			{
-				echo $item;
-			}
-			echo $item_end;
+			echo $item_start.$link.$item_end;
 		}
 		echo $list_end;
 	}
+}
+
+function display_param_link( $params )
+{
+	echo resolve_link_params( $params );
+}
+
+/**
+ * Resolve a link based on params
+ *
+ * @param array
+ * @return string
+ */
+function resolve_link_params( $item )
+{
+	global $current_locale;
+
+	// echo 'resolve link ';
+
+	if( is_array( $item ) )
+	{
+		if( isset( $item[0] ) )
+		{	// Older format, which displays the same thing for all locales:
+			return generate_link_from_params( $item );
+		}
+		else
+		{	// First get the right locale:
+			// echo $current_locale;
+			foreach( $item as $l_locale => $loc_item )
+			{
+				if( $l_locale == substr( $current_locale, 0, strlen( $l_locale) ) )
+				{	// We found a matching locale:
+
+					if( is_array( $loc_item[0] ) )
+					{	// Randomize:
+						$loc_item = hash_link_params( $loc_item );
+					}
+
+					return generate_link_from_params( $loc_item );
+				}
+			}
+			// No match found!
+			return '';
+		}
+	}
+
+	// Super old format:
+	return $item;
+}
+
+
+/**
+ * Get a link line, based url hash combined with probability percentage in first column
+ *
+ * @param array of arrays
+ */
+function hash_link_params( $link_array )
+{
+	global $ReqHost, $ReqPath;
+
+	static $hash;
+
+	if( !isset($hash) )
+	{
+		$key = $ReqHost.$ReqPath;
+		$hash = 0;
+		for( $i=0; $i<strlen($key); $i++ )
+		{
+			$hash += ord($key[$i]);
+		}
+		$hash = $hash % 100 + 1;
+
+		// $hash = rand( 1, 100 );
+		global $debug, $Debuglog;
+		if( $debug )
+		{
+			// echo "[$hash] ";
+			$Debuglog->add( 'Hash key: '.$hash, 'vars' );
+		}
+	}
+
+	foreach( $link_array as $link_params )
+	{
+		// echo '<br>'.$hash.'-'.$link_params[ 0 ];
+		if( $hash <= $link_params[ 0 ] )
+		{	// select this link!
+			array_shift( $link_params );
+			return $link_params;
+		}
+	}
+	// somehow no match, return 1st element:
+	$link_params = $link_array[0];
+	array_shift( $link_params );
+	return $link_params;
+}
+
+
+/**
+ * Generate a link from params
+ */
+function generate_link_from_params( $link_params )
+{
+	$url = $link_params[0];
+	$text = $link_params[1];
+
+	if( is_array($text) )
+	{
+		$text = hash_link_params( $text );
+		$text = $text[0];
+	}
+
+	return '<a href="'.$url.'">'.$text.'</a>';
 }
 
 
@@ -2839,6 +2956,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.172  2007/04/25 18:47:42  fplanque
+ * MFB 1.10: groovy links
+ *
  * Revision 1.171  2007/04/19 20:36:42  blueyed
  * Fixed possible E_NOTICE with REQUEST_URI/cron
  *

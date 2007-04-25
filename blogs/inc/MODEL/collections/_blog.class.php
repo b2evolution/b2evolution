@@ -1349,7 +1349,7 @@ class Blog extends DataObject
 		echo '<a href="'.url_add_param( $this->get('msgformurl'), 'recipient_id='.$this->owner_user_ID.'&amp;redirect_to='
 					// The URL will be made relative on the next page (this is needed when $htsrv_url is on another domain! -- multiblog situation )
 					.rawurlencode( regenerate_url('','','','&') ) );
-		echo '" title="'.$params['title'].'">'.$params['text'].'</a>';
+		echo '" title="'.$params['title'].'" class="contact_link">'.$params['text'].'</a>';
 		echo $params['after'];
 
 		return true;
@@ -1360,6 +1360,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.75  2007/04/25 18:47:41  fplanque
+ * MFB 1.10: groovy links
+ *
  * Revision 1.74  2007/03/25 15:18:57  fplanque
  * cleanup
  *

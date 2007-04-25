@@ -39,7 +39,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	<p class="baseline">
 		Powered by <a href="http://b2evolution.net/" title="b2evolution home" target="_blank">b2evolution</a>
 		|
-		Skin by <a href="http://skinfaktory.com/" target="_blank">The Skin Faktory</a>
+		<?php display_param_link( $skin_links ) ?> by <a href="http://skinfaktory.com/" target="_blank">The Skin Faktory</a>
 		|
 		<?php
 			// Display additional credits (see /conf/_advanced.php):

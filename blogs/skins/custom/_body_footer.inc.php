@@ -25,14 +25,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			// Display a link to contact the owner of this blog (if owner accepts messages):
 			$Blog->contact_link( array(
 					'before'      => '',
-					'after'       => '. ',
+					'after'       => ' &bull; ',
 					'text'   => T_('Contact'),
 					'title'  => T_('Send a message to the owner of this blog...'),
 				) );
 		?>
-
-		Original template design by <a href="http://fplanque.net/">Fran&ccedil;ois</a> / <a href="http://evofactory.com/">Evo Factory</a>.
-
+		<?php display_param_link( $skin_links ) ?> design by <?php display_param_link( $francois_links ) ?> / <?php display_param_link( $skinfaktory_links ) ?>
+		&bull;
 		<?php
 			// Display additional credits (see /conf/_advanced.php):
  			// If you can add your own credits without removing the defaults, you'll be very cool :))

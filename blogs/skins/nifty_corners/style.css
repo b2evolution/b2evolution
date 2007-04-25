@@ -78,11 +78,14 @@ div#pageFooter {
 	border-top: 1px dotted #000;
 }
 p.baseline {
-	font-size: 70%;
+	font-size: 72%;
 	text-align: center;
 	margin:1ex;
+	color: #444;
 }
-
+p.baseline a {
+	color: #444;
+}
 
 /*
  * General styles:
