@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -715,6 +715,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.66  2007/04/26 00:11:04  fplanque
+ * (c) 2007
+ *
  * Revision 1.65  2007/01/24 00:48:58  fplanque
  * Refactoring
  *

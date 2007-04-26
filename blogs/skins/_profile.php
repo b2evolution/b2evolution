@@ -12,7 +12,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -110,6 +110,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.39  2007/04/26 00:11:04  fplanque
+ * (c) 2007
+ *
  * Revision 1.38  2007/03/18 01:39:55  fplanque
  * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
  * (more to come)

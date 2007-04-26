@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -315,6 +315,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.8  2007/04/26 00:11:13  fplanque
+ * (c) 2007
+ *
  * Revision 1.7  2007/02/10 17:57:16  waltercruz
  * Changing the MySQL date functions to the standart ones
  *

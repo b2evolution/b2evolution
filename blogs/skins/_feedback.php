@@ -14,7 +14,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
  */
@@ -321,6 +321,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.91  2007/04/26 00:11:04  fplanque
+ * (c) 2007
+ *
  * Revision 1.90  2007/04/03 19:22:22  blueyed
  * Fixed WhiteSpace
  *

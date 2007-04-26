@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004 by PROGIDISTRI - {@link http://progidistri.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -2742,6 +2742,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.80  2007/04/26 00:11:07  fplanque
+ * (c) 2007
+ *
  * Revision 1.79  2007/04/23 15:06:28  blueyed
  * radio_input(): Respect "lines" param for "note_format" default value
  *

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
  *
@@ -433,6 +433,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.14  2007/04/26 00:11:05  fplanque
+ * (c) 2007
+ *
  * Revision 1.13  2007/03/11 22:48:19  fplanque
  * handling of permission to redirect posts
  *

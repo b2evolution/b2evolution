@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -216,6 +216,9 @@ function url_same_protocol( $url, $other_url = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.10  2007/04/26 00:11:08  fplanque
+ * (c) 2007
+ *
  * Revision 1.9  2007/03/12 22:39:42  blueyed
  * Fixed just introduced E_PARSE
  *

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal Open Source relicensing agreement:
@@ -90,6 +90,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.21  2007/04/26 00:11:05  fplanque
+ * (c) 2007
+ *
  * Revision 1.20  2007/03/25 13:20:52  fplanque
  * cleaned up blog base urls
  * needs extensive testing...

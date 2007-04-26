@@ -6,7 +6,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -1527,6 +1527,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.40  2007/04/26 00:11:08  fplanque
+ * (c) 2007
+ *
  * Revision 1.39  2007/04/05 22:57:33  fplanque
  * Added hook: UnfilterItemContents
  *

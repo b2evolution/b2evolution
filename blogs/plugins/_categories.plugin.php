@@ -6,7 +6,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -381,6 +381,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.41  2007/04/26 00:11:04  fplanque
+ * (c) 2007
+ *
  * Revision 1.40  2007/01/13 23:36:36  fplanque
  * fixed validation of subcats; I hope...
  *

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -155,6 +155,9 @@ class SkinCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.5  2007/04/26 00:11:12  fplanque
+ * (c) 2007
+ *
  * Revision 1.4  2007/01/14 01:33:34  fplanque
  * losely restrict to *installed* XML feed skins
  *

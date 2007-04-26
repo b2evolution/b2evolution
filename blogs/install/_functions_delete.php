@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package install
  */
@@ -125,6 +125,9 @@ function db_delete()
 
 /*
  * $Log$
+ * Revision 1.32  2007/04/26 00:11:09  fplanque
+ * (c) 2007
+ *
  * Revision 1.31  2007/01/08 02:11:56  fplanque
  * Blogs now make use of installed skins
  * next step: make use of widgets inside of skins

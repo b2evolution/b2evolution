@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -42,6 +42,9 @@ echo '<div class="clear"></div>';
 
 /*
  * $Log$
+ * Revision 1.5  2007/04/26 00:11:05  fplanque
+ * (c) 2007
+ *
  * Revision 1.4  2007/01/08 21:53:51  fplanque
  * typo
  *

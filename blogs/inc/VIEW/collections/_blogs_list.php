@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
@@ -187,6 +187,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.17  2007/04/26 00:11:05  fplanque
+ * (c) 2007
+ *
  * Revision 1.16  2007/03/25 13:19:17  fplanque
  * temporarily disabled dynamic and static urls.
  * may become permanent in favor of a caching mechanism.

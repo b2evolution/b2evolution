@@ -10,7 +10,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package xmlsrv
  *
@@ -2239,6 +2239,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.134  2007/04/26 00:11:14  fplanque
+ * (c) 2007
+ *
  * Revision 1.133  2007/03/20 07:39:08  fplanque
  * filemanager fixes, including the chmod octal stuff
  *

@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -330,6 +330,9 @@ if( $action == 'list' )
 
 /*
  * $Log$
+ * Revision 1.36  2007/04/26 00:11:06  fplanque
+ * (c) 2007
+ *
  * Revision 1.35  2007/03/21 02:21:37  fplanque
  * item controller: highlight current (step 2)
  *

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -264,6 +264,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2007/04/26 00:11:09  fplanque
+ * (c) 2007
+ *
  * Revision 1.6  2007/03/07 02:37:52  fplanque
  * OMG I decided that pregenerating the menus was getting to much of a PITA!
  * It's a zillion problems with the permissions.

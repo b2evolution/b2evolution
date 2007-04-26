@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
  */
@@ -44,6 +44,9 @@ if( $disp != 'posts' && $disp != 'single' && $disp != 'page' )
 
 /*
  * $Log$
+ * Revision 1.7  2007/04/26 00:11:03  fplanque
+ * (c) 2007
+ *
  * Revision 1.6  2007/03/26 12:59:18  fplanque
  * basic pages support
  *

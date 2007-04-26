@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * {@internal License choice
@@ -84,6 +84,9 @@ function replace_special_chars( $str )
 
 /*
  * $Log$
+ * Revision 1.3  2007/04/26 00:11:02  fplanque
+ * (c) 2007
+ *
  * Revision 1.2  2006/12/15 23:31:21  fplanque
  * reauthorized _ in urltitles.
  * No breaking of legacy permalinks.

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
@@ -1817,6 +1817,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.216  2007/04/26 00:11:09  fplanque
+ * (c) 2007
+ *
  * Revision 1.215  2007/04/19 01:51:53  fplanque
  * upgrade checkpoints
  *

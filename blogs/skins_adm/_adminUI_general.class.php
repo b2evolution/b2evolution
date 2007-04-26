@@ -7,7 +7,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -1614,6 +1614,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.47  2007/04/26 00:11:03  fplanque
+ * (c) 2007
+ *
  * Revision 1.46  2007/03/20 09:53:26  fplanque
  * Letting boggers view their own stats.
  * + Letthing admins view the aggregate by default.

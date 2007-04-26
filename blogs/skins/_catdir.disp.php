@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
  */
@@ -28,6 +28,9 @@ $Plugins->call_by_code( 'evo_Cats', array(
 
 /*
  * $Log$
+ * Revision 1.3  2007/04/26 00:11:03  fplanque
+ * (c) 2007
+ *
  * Revision 1.2  2007/03/18 01:39:55  fplanque
  * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
  * (more to come)
