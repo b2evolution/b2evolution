@@ -44,7 +44,7 @@ define( 'TRANSTAG_OPEN', '{{{' );
 define( 'TRANSTAG_CLOSE', '}}}' );
 define( 'CHDIR_TO_BLOGS', '..' );
 define( 'STATIC_POT', $pofilepath.'\static.POT' );
-define( 'DEFAULT_TARGET', 'en-EU' );
+define( 'DEFAULT_TARGET', 'en-US' );
 define( 'DEFAULT_CHARSET', 'iso-8859-1' );
 
 param('highlight_untranslated', 'integer', 0 );
@@ -58,7 +58,7 @@ $targets[ DEFAULT_TARGET ] = '';
 // add targets that use same message file
 foreach( $locales as $key => $value )
 {
-	if( substr($value['messages'], 0, 2 ) == substr( $locales[ DEFAULT_TARGET ]['messages'], 0, 2 ) )
+	if( $value['enabled'] && substr($value['messages'], 0, 2 ) == substr( $locales[ DEFAULT_TARGET ]['messages'], 0, 2 ) )
 	{
 		$targets[ $key ] = '';
 	}
@@ -73,7 +73,7 @@ foreach( $pofiles as $po )
 	// add targets that use same message file
 	foreach( $locales as $key => $value ) if( $key != $target )
 	{
-		if( $value['messages'] == $locales[ $target ]['messages'] )
+		if( $value['enabled'] && $value['messages'] == $locales[ $target ]['messages'] )
 		{
 			$targets[ $key ] = $po;
 		}

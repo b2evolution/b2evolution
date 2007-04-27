@@ -81,7 +81,7 @@ $db_config['connection_charset'] = '';
  *
  * @global string
  */
-$default_locale = 'en-EU';
+$default_locale = 'en-US';
 
 
 /**
@@ -145,21 +145,29 @@ $locales = array(
 										'messages' => 'ee_ET',
 										'enabled' => 1,
 									),
-	'en-EU' => array( 'name' => NT_('English (EU)'),
+	'en-EU' => array( 'name' => NT_('English (EU)'), // not really a valid ISO-3166 code
 										'charset' => 'iso-8859-1',
 										'datefmt' => 'Y-m-d',
 										'timefmt' => 'H:i:s',
 										'startofweek' => 1,
 										'messages' => 'en_EU',
+										'enabled' => 0,
+									),
+	'en-GB' => array( 'name' => NT_('English (GB)'), // correct ISO-3166 code
+										'charset' => 'iso-8859-1',
+										'datefmt' => 'd/m/y',
+										'timefmt' => 'h:i:s a',
+										'startofweek' => 1,
+										'messages' => 'en_GB',
 										'enabled' => 1,
 									),
-	'en-UK' => array( 'name' => NT_('English (UK)'),
+	'en-UK' => array( 'name' => NT_('English (UK)'), // incorrect ISO-3166 code
 										'charset' => 'iso-8859-1',
 										'datefmt' => 'd/m/y',
 										'timefmt' => 'h:i:s a',
 										'startofweek' => 1,
 										'messages' => 'en_UK',
-										'enabled' => 1,
+										'enabled' => 0,
 									),
 	'en-US' => array( 'name' => NT_('English (US)'),
 										'charset' => 'iso-8859-1',
@@ -385,7 +393,7 @@ $locales = array(
 										'messages' => 'ru_RU',
 										'enabled' => 1,
 									),
-	'ru-RU-cp1251' => array( 'name' => NT_('Russian (RU)'),
+	'ru-RU-cp1251' => array( 'name' => NT_('Russian cp1251 (RU)'),
 										'charset' => 'windows-1251',
 										'datefmt' => 'Y-m-d',
 										'timefmt' => 'H:i:s',
