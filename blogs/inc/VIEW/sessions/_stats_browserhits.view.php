@@ -72,7 +72,8 @@ if( count($res_hits) )
 			'direct' => 3,
 			'self' => 4,
 			'blacklist' => 5,
-			'admin' => 6,
+			'spam' => 6,
+			'admin' => 7,
 		);
 
 	$chart[ 'chart_data' ][ 0 ] = array();
@@ -82,6 +83,7 @@ if( count($res_hits) )
 	$chart[ 'chart_data' ][ 4 ] = array();
 	$chart[ 'chart_data' ][ 5 ] = array();
 	$chart[ 'chart_data' ][ 6 ] = array();
+	$chart[ 'chart_data' ][ 7 ] = array();
 
 	$count = 0;
 	foreach( $res_hits as $row_stats )
@@ -98,6 +100,7 @@ if( count($res_hits) )
 				array_unshift( $chart[ 'chart_data' ][ 4 ], 0 );
 				array_unshift( $chart[ 'chart_data' ][ 5 ], 0 );
 				array_unshift( $chart[ 'chart_data' ][ 6 ], 0 );
+				array_unshift( $chart[ 'chart_data' ][ 7 ], 0 );
 		}
 		$col = $col_mapping[$row_stats['referer_type']];
 		$chart [ 'chart_data' ][$col][0] = $row_stats['hits'];
@@ -109,7 +112,8 @@ if( count($res_hits) )
 	array_unshift( $chart[ 'chart_data' ][ 3 ], 'Direct accesses' );	// Translations need to be UTF-8
 	array_unshift( $chart[ 'chart_data' ][ 4 ], 'Self referred' );
 	array_unshift( $chart[ 'chart_data' ][ 5 ], 'Special referrers' );
-	array_unshift( $chart[ 'chart_data' ][ 6 ], 'Admin' );
+	array_unshift( $chart[ 'chart_data' ][ 6 ], 'Referer spam' );
+	array_unshift( $chart[ 'chart_data' ][ 7 ], 'Admin' );
 
 	$chart[ 'canvas_bg' ] = array (
 			'width'  => 780,
@@ -240,6 +244,7 @@ if( count($res_hits) )
 		'search' => 0,
 		'self' => 0,
 		'blacklist' => 0,
+		'spam' => 0,
 		'admin' => 0,
 	);
 	$hits_total = $hits;
@@ -256,6 +261,7 @@ if( count($res_hits) )
 			<th><?php echo T_('Direct accesses') ?></th>
 			<th><?php echo T_('Self referred') ?></th>
 			<th><?php	echo T_('Special referrers') ?></th>
+			<th><?php echo T_('Referer spam') ?></th>
 			<th><?php echo T_('Admin') ?></th>
 			<th class="lastcol"><?php echo T_('Total') ?></th>
 		</tr>
@@ -280,6 +286,7 @@ if( count($res_hits) )
 					<td class="right"><?php echo $hits['direct'] ?></td>
 					<td class="right"><?php echo $hits['self'] ?></td>
 					<td class="right"><?php echo $hits['blacklist'] ?></td>
+					<td class="right"><?php echo $hits['spam'] ?></td>
 					<td class="right"><?php echo $hits['admin'] ?></td>
 					<td class="lastcol right"><?php echo array_sum($hits) ?></td>
 				</tr>
@@ -290,6 +297,7 @@ if( count($res_hits) )
 						'search' => 0,
 						'self' => 0,
 						'blacklist' => 0,
+						'spam' => 0,
 						'admin' => 0,
 					);
 					$last_date = $this_date;	// that'll be the next one
@@ -316,6 +324,7 @@ if( count($res_hits) )
 				<td class="right"><?php echo $hits['direct'] ?></td>
 				<td class="right"><?php echo $hits['self'] ?></td>
 				<td class="right"><?php echo $hits['blacklist'] ?></td>
+				<td class="right"><?php echo $hits['spam'] ?></td>
 				<td class="right"><?php echo $hits['admin'] ?></td>
 				<td class="lastcol right"><?php echo array_sum($hits) ?></td>
 			</tr>
@@ -332,6 +341,7 @@ if( count($res_hits) )
 		<td class="right"><?php echo $hits_total['direct'] ?></td>
 		<td class="right"><?php echo $hits_total['self'] ?></td>
 		<td class="right"><?php echo $hits_total['blacklist'] ?></td>
+		<td class="right"><?php echo $hits_total['spam'] ?></td>
 		<td class="right"><?php echo $hits_total['admin'] ?></td>
 		<td class="lastcol right"><?php echo array_sum($hits_total) ?></td>
 		</tr>
@@ -342,6 +352,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.10  2007/04/27 09:11:37  fplanque
+ * saving "spam" referers again (instead of buggy empty referers)
+ *
  * Revision 1.9  2007/04/26 00:11:12  fplanque
  * (c) 2007
  *

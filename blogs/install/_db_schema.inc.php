@@ -400,7 +400,7 @@ $schema_queries = array(
 			hit_sess_ID        INT UNSIGNED,
 			hit_datetime       DATETIME NOT NULL,
 			hit_uri            VARCHAR(250) DEFAULT NULL,
-			hit_referer_type   ENUM('search','blacklist','referer','direct','self','admin') NOT NULL,
+			hit_referer_type   ENUM('search','blacklist','spam','referer','direct','self','admin') NOT NULL,
 			hit_referer        VARCHAR(250) DEFAULT NULL,
 			hit_referer_dom_ID INT UNSIGNED DEFAULT NULL,
 			hit_blog_ID        int(11) UNSIGNED NULL DEFAULT NULL,
@@ -547,6 +547,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.57  2007/04/27 09:11:37  fplanque
+ * saving "spam" referers again (instead of buggy empty referers)
+ *
  * Revision 1.56  2007/04/26 00:11:09  fplanque
  * (c) 2007
  *

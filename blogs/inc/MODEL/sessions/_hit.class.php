@@ -261,7 +261,7 @@ class Hit
 
 		if( empty($this->referer) )
 		{	// NO referer
-			// This type may be superseeded by admin page
+			// This type may be superseeded and set to 'admin'
 			if( ! $this->detect_admin_page() )
 			{	// Not an admin page:
 				$this->referer_type = 'direct';
@@ -315,10 +315,7 @@ class Hit
 		if( $error = validate_url( $this->referer, $comments_allowed_uri_scheme ) )
 		{ // This is most probably referer spam!!
 			$Debuglog->add( 'detect_referer(): '.$error.' (SPAM)', 'hit');
-			$this->referer_type = 'spam'; // Hazardous
-			$this->referer = false;
-			// dh> QUESTION: add domain to T_basedomains, type 'blacklist' ?
-			// fp> NO, mainly because 'blacklist' is wrong here.
+			$this->referer_type = 'spam';
 
 			if( $Settings->get('antispam_block_spam_referers') )
 			{ // In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
@@ -326,6 +323,8 @@ class Hit
 				exit(); // just in case.
 				// THIS IS THE END!!
 			}
+
+			return; // type "spam"
 		}
 
 
@@ -689,6 +688,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.49  2007/04/27 09:11:37  fplanque
+ * saving "spam" referers again (instead of buggy empty referers)
+ *
  * Revision 1.48  2007/04/26 00:11:11  fplanque
  * (c) 2007
  *

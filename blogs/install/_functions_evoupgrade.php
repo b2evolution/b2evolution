@@ -1518,6 +1518,9 @@ function upgrade_b2evo_tables()
 		echo 'Updating sessions table... ';
 		$DB->query( 'ALTER TABLE T_sessions CHANGE COLUMN sess_data sess_data MEDIUMBLOB DEFAULT NULL' );
 		echo "OK.<br />\n";
+		echo 'Updating hitlog table... ';
+		$DB->query( 'ALTER TABLE fp_hitlog CHANGE COLUMN hit_referer_type hit_referer_type   ENUM(\'search\',\'blacklist\',\'spam\',\'referer\',\'direct\',\'self\',\'admin\') NOT NULL' );
+		echo "OK.<br />\n";
 	}
 
 
@@ -1817,6 +1820,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.217  2007/04/27 09:11:37  fplanque
+ * saving "spam" referers again (instead of buggy empty referers)
+ *
  * Revision 1.216  2007/04/26 00:11:09  fplanque
  * (c) 2007
  *
