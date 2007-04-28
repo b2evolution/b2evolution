@@ -2856,6 +2856,8 @@ class Plugin
 				}
 				break;
 		}
+		$r = null;
+		return $r;
 	}
 
 	/*
@@ -2867,6 +2869,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.154  2007/04/28 22:33:26  blueyed
+ * Fixed "must return reference notice" for __get()
+ *
  * Revision 1.153  2007/04/26 00:11:08  fplanque
  * (c) 2007
  *
