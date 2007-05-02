@@ -1702,8 +1702,25 @@ function upgrade_b2evo_tables()
 			VALUES ( 1000, 'Page' )" );
 		echo "OK.<br />\n";
 
-		set_upgrade_checkpoint( '9410' );
+ 		echo 'Updating columns... ';
+		$DB->query( "ALTER TABLE T_groups CHANGE COLUMN grp_perm_stats grp_perm_stats enum('none','user','view','edit') NOT NULL default 'none'" );
+
+		$DB->query( "ALTER TABLE T_coll_user_perms CHANGE COLUMN bloguser_perm_poststatuses bloguser_perm_poststatuses set('published','deprecated','protected','private','draft','redirected') NOT NULL default ''" );
+
+		$DB->query( "ALTER TABLE T_coll_group_perms CHANGE COLUMN bloggroup_perm_poststatuses bloggroup_perm_poststatuses set('published','deprecated','protected','private','draft','redirected') NOT NULL default ''" );
+
+		$DB->query( "ALTER TABLE T_posts CHANGE COLUMN post_status post_status enum('published','deprecated','protected','private','draft','redirected') NOT NULL default 'published'" );
+
+		$DB->query( "ALTER TABLE T_comments CHANGE COLUMN comment_status comment_status ENUM('published','deprecated','protected','private','draft','redirected') DEFAULT 'published' NOT NULL" );
+
+		$DB->query( "ALTER TABLE T_sessions CHANGE COLUMN sess_data sess_data MEDIUMBLOB DEFAULT NULL" );
+
+		$DB->query( "ALTER TABLE T_hitlog CHANGE COLUMN hit_referer_type hit_referer_type ENUM('search','blacklist','spam','referer','direct','self','admin') NOT NULL" );
+
+		echo "OK.<br />\n";
+
 	}
+
 
 	/*
 	// fp> have to check if this means kiss your pagerank goodbye
@@ -1820,6 +1837,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.219  2007/05/02 18:28:19  fplanque
+ * no message
+ *
  * Revision 1.218  2007/04/27 09:34:45  fplanque
  * oops
  *
