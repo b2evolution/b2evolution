@@ -46,9 +46,11 @@ $app_footer_text = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolu
 	.T_("visit b2evolution's website").'" width="100" height="22" />
 	'.$app_version.'</a>
 	&ndash;
-	<a href="http://b2evolution.net/about/license.html" class="nobr">'.T_('GPL License').'</a>
-	&ndash;
-	<span class="nobr">&copy;2003-2006 by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> &amp; others.</span>';
+		<a href="http://b2evolution.net/about/license.html" class="nobr">'.T_('GPL License').'</a>';
+
+$copyright_text ='<span class="nobr">&copy;2001-2002 by Michel V &amp; others</span>
+		&ndash;
+		<span class="nobr">&copy;2003-2007 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/dev/authors.html">others</a>.</span>';
 
 
 /**
@@ -64,7 +66,7 @@ $app_footer_text = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolu
  */
 $credit_links = array(
 	array( '' => array( array( 10, 'http://evocore.net/', 'PHP framework' ),
-											array( 100, 'http://b2evolution.net/', array( array( 90, 'blog software' ), array( 95, 'blog tool' ), array( 100, 'blogtool' ) ) ),
+											array( 100, 'http://b2evolution.net/', array( array( 85, 'blog software' ), array( 90, 'blog soft' ), array( 95, 'blog tool' ), array( 100, 'blogtool' ) ) ),
 										),
 				),
 	array( // 'fr' => array( 'http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php', 'h&eacute;bergement web' ),
@@ -74,7 +76,12 @@ $credit_links = array(
 				 						  array( 100, 'http://b2evolution.net/about/linux-dedicated-servers-web-hosting.php', array( array( 94, 'dedicated servers' ), array( 100, 'dedicated hosting' ) ) ),
 				 						),
 				),
-	array( '' => array( array( 21, 'http://plusjamaisseul.net/', 'test site' ),
+	array( 'fr' => array( array( 36, 'http://fplanque.net/', 'Fran&ccedil;ois' ),
+											array( 90, 'http://b2evolution.net/about/monetize-blog-money.php', 'adsense' ),
+											array( 100, 'http://b2evolution.net/dev/authors.html', 'evoTeam' ),
+										),
+				 '' => array( array( 21, 'http://plusjamaisseul.net/', 'test site' ),
+				 							array( 36, 'http://fplanque.com/', 'Francois' ),
 											array( 90, 'http://b2evolution.net/about/monetize-blog-money.php', array( array( 71, 'monetize' ), array( 90, 'adsense' ) ) ),
 											array( 100, 'http://b2evolution.net/dev/authors.html', 'evoTeam' ),
 										),

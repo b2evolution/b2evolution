@@ -30,6 +30,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 </div>
 
 <p class="footer"><?php echo $app_footer_text; ?></p>
+<p class="footer"><?php echo $copyright_text; ?></p>
+<p class="footer">
+	<?php
+		// Display additional credits (see /conf/):
+ 		// If you can add your own credits without removing the defaults, you'll be very cool :))
+		// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
+		display_list( $credit_links, T_('Credits').': ', '', '|', ' ', ' ' );
+	?>
+</p>
 
 <?php debug_info(); ?>
 
@@ -38,6 +47,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <?php
 /*
  * $Log$
+ * Revision 1.5  2007/05/02 18:28:05  fplanque
+ * copyright credits logo
+ *
  * Revision 1.4  2007/04/26 00:11:10  fplanque
  * (c) 2007
  *

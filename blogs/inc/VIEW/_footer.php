@@ -37,8 +37,8 @@ if( isset($IconLegend) )
 // Close open divs, etc...
 echo $this->get_body_bottom();
 
-global $app_footer_text;
-echo '<p class="footer">'.$app_footer_text."</p>\n\n";
+global $app_footer_text, $copyright_text;
+echo '<p class="footer">'.$app_footer_text.' &ndash; '.$copyright_text."</p>\n\n";
 
 // CALL PLUGINS NOW:
 global $Plugins;
@@ -76,6 +76,9 @@ debug_info();
 <?php
 /*
  * $Log$
+ * Revision 1.9  2007/05/02 18:28:05  fplanque
+ * copyright credits logo
+ *
  * Revision 1.8  2007/04/26 00:11:11  fplanque
  * (c) 2007
  *
