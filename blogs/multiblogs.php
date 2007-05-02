@@ -175,7 +175,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	<?php
 		// Links to list pages:
-		$MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
+		if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
    			'prev_text' => '&lt;&lt; '.T_('Previous'),
    			'next_text' => T_('Next').' &gt;&gt;',
 			) );
