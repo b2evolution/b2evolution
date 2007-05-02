@@ -37,6 +37,18 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+/**
+ * Do we want robots to index this page? -- Will be use to produce meta robots tag
+ * @global boolean or NULL to ignore
+ */
+$robots_index = NULL;
+
+/**
+ * Do we want robots to follow links on this page? -- Will be use to produce meta robots tag
+ * @global boolean or NULL to ignore
+ */
+$robots_follow = NULL;
+
 
 /**
  * @global boolean Are we running on Command Line Interface instead of a web request?
@@ -44,7 +56,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $is_cli = empty($_SERVER['SERVER_SOFTWARE']) ? true : false;
 $is_web = ! $is_cli;
 // echo ($is_cli ? 'cli' : 'web' );
-
 
 
 // Investigation for following code by Isaac - http://isaacschlueter.com/
@@ -280,6 +291,9 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
 
 /*
  * $Log$
+ * Revision 1.17  2007/05/02 20:39:27  fplanque
+ * meta robots handling
+ *
  * Revision 1.16  2007/04/26 00:11:05  fplanque
  * (c) 2007
  *

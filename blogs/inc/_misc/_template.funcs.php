@@ -149,6 +149,38 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 
 
 /**
+ * Robots tag
+ */
+function robots_tag()
+{
+	global $robots_index, $robots_follow;
+
+	if( is_null($robots_index) && is_null($robots_follow) )
+	{
+		return;
+	}
+
+	$r = '<meta name="robots" content="';
+
+	if( $robots_index === false )
+	 $r .= 'NOINDEX';
+	else
+	 $r .= 'INDEX';
+
+	$r .= ',';
+
+	if( $robots_follow === false )
+	 $r .= 'NOFOLLOW';
+	else
+	 $r .= 'FOLLOW';
+
+	$r .= '" />'."\n";
+
+	echo $r;
+}
+
+
+/**
  * Output a link to current blog.
  *
  * We need this function because if no Blog is currently active (some admin pages or site pages)
@@ -171,6 +203,9 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 
 /*
  * $Log$
+ * Revision 1.22  2007/05/02 20:39:27  fplanque
+ * meta robots handling
+ *
  * Revision 1.21  2007/04/26 00:11:08  fplanque
  * (c) 2007
  *

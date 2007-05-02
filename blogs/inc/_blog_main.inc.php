@@ -380,6 +380,10 @@ elseif( $disp == 'posts' )
     }
   }
 }
+elseif( $disp == 'msgform' )
+{	// We prefer robots not to index these pages:
+	$robots_index = false;
+}
 
 
 /*
@@ -495,6 +499,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.75  2007/05/02 20:39:27  fplanque
+ * meta robots handling
+ *
  * Revision 1.74  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *
