@@ -19,27 +19,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $schema_queries;
 
 $schema_queries = array(
-// PRIVATE >
-	'T_adsense' => array(
-		'Creating table for Adsense stats',
-		"CREATE TABLE T_adsense (
-			ads_ID       int(10) unsigned NOT NULL auto_increment,
-			ads_datetime datetime NOT NULL,
-			ads_from     varchar(255) NOT NULL default '',
-			ads_title    varchar(127) NOT NULL default '',
-			ads_referer  varchar(255) NOT NULL default '',
-			ads_dest     varchar(127) NOT NULL default '',
-			ads_js_browser char(2) NOT NULL default '  ',
-			ads_format   varchar(15) NOT NULL default '',
-			ads_channel  varchar(15) NOT NULL default '',
-			ads_colbord  char(6) NOT NULL default '      ',
-			ads_colbg    char(6) NOT NULL default '      ',
-			ads_collink  char(6) NOT NULL default '      ',
-			ads_coltext  char(6) NOT NULL default '      ',
-			ads_colurl   char(6) NOT NULL default '      ',
-			PRIMARY KEY ads_ID (ads_ID)
-		)" ),
-// < PRIVATE
 
 	'T_groups' => array(
 		'Creating table for Groups',
@@ -547,6 +526,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.58  2007/05/04 21:23:17  fplanque
+ * no message
+ *
  * Revision 1.57  2007/04/27 09:11:37  fplanque
  * saving "spam" referers again (instead of buggy empty referers)
  *
