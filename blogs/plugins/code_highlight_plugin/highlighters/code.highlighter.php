@@ -36,10 +36,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * @package AmCode plugin
  */
 
-/*
- * yabs > would like this to extend an "am_highlighter" class, but not sure how to handle $this->T_()
- */
-class am_code_highlighter extends code_highlight_plugin
+class am_code_highlighter
 {
 	/**
 	 * Text name of language for display
@@ -59,6 +56,19 @@ class am_code_highlighter extends code_highlight_plugin
 
 
 	/**
+	 * Called automatically on class innit
+	 *
+	 * @param object $parent
+	 * @return object am_code_highlighter
+	 */
+	function am_code_highlighter( & $parent )
+	{
+		$this->parent = & $parent;
+		return $this;
+	}
+
+
+	/**
 	 * Highlights code ready for displaying
 	 *
 	 * @param string $block - the code
@@ -67,12 +77,18 @@ class am_code_highlighter extends code_highlight_plugin
 
 	function highlight_code( $block )
 	{
-		return $this->tidy_code_output( '<span class="amc_default">'.$block.'</span>' );
+		return $this->parent->tidy_code_output( '<span class="amc_default">'.$block.'</span>' );
 	}
 
 }
 /**
- * $Log $
+ * $Log$
+ * Revision 1.2  2007/05/04 20:43:08  fplanque
+ * MFB
+ *
+ * Revision 1.1.2.3  2007/04/23 11:59:58  yabs
+ * removed "extend Plugins"
+ *
  *
  */
 ?>

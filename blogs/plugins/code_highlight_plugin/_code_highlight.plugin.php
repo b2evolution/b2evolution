@@ -159,6 +159,8 @@ class code_highlight_plugin extends Plugin
 		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" style="margin-left:8px;" class="quicktags" onclick="codeblock_tag(\'\');" value="'.T_('codeblock').'" />';
 		echo '<input type="button" id="codeblock_xml" title="'.T_('Insert XML codeblock').'" class="quicktags" onclick="codeblock_tag(\'xml\');" value="'.T_('XML').'" />';
 		echo '<input type="button" id="codeblock_php" title="'.T_('Insert PHP codeblock').'" class="quicktags" onclick="codeblock_tag(\'php\');" value="'.T_('PHP').'" />';
+		// yabs > removed until css class is fully functional
+		//echo '<input type="button" id="codeblock_css" title="'.T_('Insert CSS codeblock').'" class="quicktags" onclick="codeblock_tag(\'css\');" value="'.T_('CSS').'" />';
 		echo '</div>';
 
 		?>
@@ -359,49 +361,6 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Formats codeblock ready for displaying
-	 *
-	 * @param array $block ( 2 - attributes, 4 - the code )
-	 * @return string formatted code
-	 */
-	function render_codeblock_callback( $block )
-	{
-
-		/**
-		 * EXPERIMENTAL : Replacement function at end of file
-		 */
-		return $this->render_codeblock_callback_test( $block );
-
-		// set the offset if present - default : 0
-		preg_match( '#line=("|\')([0-9]+?)\1#', $block[2], $match );
-		$offset = ( empty( $match[2] ) ? 0 : $match[2] - 1 );
-
-		// set the language if present - default : code
-		preg_match( '#lang=("|\')([^\1]+?)\1#', $block[2], $match );
-		$language = strtolower( ( empty( $match[2] ) ? 'code' : $match[2] ) );
-
-		if( $code = trim( $block[4] ) )
-		{	// we have a code block
-			// lets use the relevant languages highlighter
-			switch( $language )
-			{
-				case 'php' :
-					$code = $this->highlight_php( $code );
-					break;
-
-				case 'code' :
-				default :
-					$code = $this->highlight_code( $code );
-			}
-
-			// add the line numbers
-			$code = $this->do_numbering( $code, $offset, $language );
-		}
-		return $code;
-	}
-
-
-	/**
 	 * Spits out the styles used
 	 *
 	 * @see Plugin::SkinBeginHtmlHead()
@@ -484,7 +443,7 @@ div.codeblock.amc_short table {
 									.'</code></td></tr>'."\n";
 		}
 		// make "long" value a setting ? - yabs
-		return '<p class="amcode">'.ucfirst( $type ).':</p><div class="codeblock amc_'.$type.' '.( $count < 26 ? 'amc_short' : 'amc_long' ).'"><table>'.$output.'</table></div>';
+		return '<p class="amcode">'.$this->languageCache[ $type ]->language_title.':</p><div class="codeblock amc_'.$type.' '.( $count < 26 ? 'amc_short' : 'amc_long' ).'"><table>'.$output.'</table></div>';
 	}
 
 
@@ -534,7 +493,6 @@ div.codeblock.amc_short table {
 
 
 	/**
-		 * EXPERIMENTAL
 	   * Formats codeblock ready for displaying
 	   * Each language is stored as a classfile
 	   * This would allow new languages to be added more easily
@@ -547,7 +505,7 @@ div.codeblock.amc_short table {
 	   * @param array $block ( 2 - attributes, 4 - the code )
 	   * @return string formatted code
 	   */
-	function render_codeblock_callback_test( $block )
+	function render_codeblock_callback( $block )
 	{
 		// set the offset if present - default : 0
 		preg_match( '#line=("|\')([0-9]+?)\1#', $block[2], $match );
@@ -567,7 +525,7 @@ div.codeblock.amc_short table {
 				{ // language class exists, lets load and cache an instance of it
 					require_once $language_file;
 					$class = 'am_'.$language.'_highlighter';
-					$this->languageCache[ $language ] = & new $class();
+					$this->languageCache[ $language ] = & new $class( $this );
 				}
 				else
 				{	// language class doesn't exists, fallback to default highlighter
@@ -580,7 +538,7 @@ div.codeblock.amc_short table {
 							require_once $language_file;
 							$class = 'am_'.$language.'_highlighter';
 							// add the language to the cache
-							$this->languageCache[ $language ] = & new $class();
+							$this->languageCache[ $language ] = & new $class( $this );
 						}
 						else
 						{ // if we hit this we might as well go to the pub ;)
@@ -602,7 +560,17 @@ div.codeblock.amc_short table {
 
 /**
  * $Log$
- * Revision 1.1  2007/04/20 02:37:03  fplanque
+ * Revision 1.2  2007/05/04 20:43:08  fplanque
+ * MFB
+ *
+ * Revision 1.1.2.4  2007/05/01 09:09:58  yabs
+ * removed css toolbar button
+ *
+ * Revision 1.1.2.3  2007/04/23 11:59:11  yabs
+ * removed old code
+ * pass $this to language classes
+ *
+ * Revision 1.1.2.2  2007/04/20 02:50:14  fplanque
  * code highlight plugin aka AM code plugin
  *
  * Revision 1.1.2.15  2007/04/18 23:37:59  fplanque

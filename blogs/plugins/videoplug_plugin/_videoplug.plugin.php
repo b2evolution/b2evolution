@@ -60,8 +60,15 @@ class videoplug_plugin extends Plugin
 		// Google video:
 		$content = preg_replace( '¤\[video:google:(.+?)]¤', '<div class="videoblock"><embed style="width:400px; height:326px;" id="VideoPlayback" type="application/x-shockwave-flash" src="http://video.google.com/googleplayer.swf?docId=\\1&hl=en" flashvars=""></embed></div>', $content );
 
+		// LiveVideo
+		$content = preg_replace( '¤\[video:livevideo:(.+?)]¤', '<div class="videoblock"><object width="425" height="350"><param name="movie" value="http://www.livevideo.com/flvplayer/embed/\\1"></param><param name="wmode" value="transparent"></param><embed src="http://www.livevideo.com/flvplayer/embed/\\1" type="application/x-shockwave-flash" wmode="transparent" width="425" height="350"></embed></object></div>', $content );
+
+		// iFilm
+		$content = preg_replace( '¤\[video:ifilm:(.+?)]¤', '<div class="videoblock"><embed width="425" height="350" src="http://www.ifilm.com/efp" quality="high" bgcolor="000000" name="efp" align="middle" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="flvbaseclip=\\1"> </embed></div>', $content );
+
 		return true;
 	}
+
 
 
 	/**
@@ -101,6 +108,8 @@ class videoplug_plugin extends Plugin
 		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="quicktags" onclick="videotag(\'youtube\');" value="'.T_('YouTube').'" />';
 		echo '<input type="button" id="video_google" title="'.T_('Insert Google video').'" class="quicktags" onclick="videotag(\'google\');" value="'.T_('Google video').'" />';
 		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="quicktags" onclick="videotag(\'dailymotion\');" value="'.T_('DailyMotion').'" />';
+		echo '<input type="button" id="video_livevideo" title="'.T_('Insert LiveVideo video').'" class="quicktags" onclick="videotag(\'livevideo\');" value="'.T_('LiveVideo').'" />';
+		echo '<input type="button" id="video_ifilm" title="'.T_('Insert iFilm video').'" class="quicktags" onclick="videotag(\'ifilm\');" value="'.T_('iFilm').'" />';
 
 		echo '</div>';
 
@@ -109,7 +118,7 @@ class videoplug_plugin extends Plugin
 			//<![CDATA[
 			function videotag( tag )
 			{
-				var video_ID = prompt('<?php echo T_('Enter video ID from') ?> '+tag+':', '' );
+				var video_ID = prompt('<?php echo TS_('Enter video ID from') ?> '+tag+':', '' );
 				if( ! video_ID )
 				{
 					return;
@@ -131,11 +140,17 @@ class videoplug_plugin extends Plugin
 
 /*
  * $Log$
- * Revision 1.3  2007/04/26 00:11:13  fplanque
+ * Revision 1.4  2007/05/04 20:43:09  fplanque
+ * MFB
+ *
+ * Revision 1.1.2.5  2007/04/25 22:18:09  fplanque
  * (c) 2007
  *
- * Revision 1.2  2007/04/20 02:54:17  fplanque
- * videoplug plugin
+ * Revision 1.1.2.4  2007/04/24 11:45:13  yabs
+ * added a couple more video sources
+ *
+ * Revision 1.1.2.3  2007/04/20 01:44:24  fplanque
+ * added toolbar
  *
  * Revision 1.1.2.2  2007/04/19 01:14:43  fplanque
  * minor

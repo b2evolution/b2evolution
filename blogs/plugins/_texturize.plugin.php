@@ -51,8 +51,19 @@ class texturize_plugin extends Plugin
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-		$content = & $params['data'];
+		// texturize all content not in code/pre blocks
+		$params['data'] = callback_on_non_matching_blocks( $params['data'], '#<(pre|code)[\s\S]+?/\1>#i', array( $this, 'texturize_block' ) );
+	}
 
+
+	/**
+	 * Texturize content
+	 *
+	 * @param string $content
+	 * @return string texturized content
+	 */
+	function texturize_block( $content )
+	{
 		$output = '';
 		$textarr = preg_split("/(<.*>)/Us", $content, -1, PREG_SPLIT_DELIM_CAPTURE); // capture the tags as well as in between
 		$stop = count($textarr); $next = true; // loop stuff
@@ -97,7 +108,7 @@ class texturize_plugin extends Plugin
 		}
 		$content = $output;
 
-		return true;
+		return $content;
 	}
 
 
@@ -116,7 +127,16 @@ class texturize_plugin extends Plugin
 
 /*
  * $Log$
- * Revision 1.15  2007/04/20 02:53:13  fplanque
+ * Revision 1.16  2007/05/04 20:43:08  fplanque
+ * MFB
+ *
+ * Revision 1.13.2.3.2.3  2007/04/24 11:44:42  yabs
+ * minor doc, renamed test function
+ *
+ * Revision 1.13.2.3.2.2  2007/04/22 16:44:46  yabs
+ * testing - ignores code/pre blocks
+ *
+ * Revision 1.13.2.3.2.1  2007/04/20 02:52:01  fplanque
  * limited number of installs
  *
  * Revision 1.14  2006/12/26 03:19:12  fplanque

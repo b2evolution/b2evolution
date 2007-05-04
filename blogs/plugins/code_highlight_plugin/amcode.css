@@ -51,13 +51,17 @@ td.amc_line div { padding-right:9px; height:10px; }
 }
 
 
-/* PHP syntax highlighting colours */
+/* syntax highlighting colours */
 
 .codeblock .amc_html { color:#000; }
 .codeblock .amc_default { color:#000; }
 .codeblock .amc_keyword { color:#c0c; }
 .codeblock .amc_string { color:#c00; }
 .codeblock .amc_comment { color:#f70; }
+.codeblock .amc_attribute { color:#880; }
+.codeblock .amc_class { color:#080; }
+.codeblock .amc_id { color:#0c0; }
+.codeblock .amc_tags { color:#008; }
 
 .codeblock a:link,
 .codeblock a:visited { color:#00f; }

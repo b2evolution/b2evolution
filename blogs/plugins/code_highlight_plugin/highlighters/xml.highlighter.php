@@ -36,10 +36,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * @package AmCode plugin
  */
 
-/*
- * yabs > would like this to extend an "am_highlighter" class, but not sure how to handle $this->T_()
- */
-class am_xml_highlighter extends code_highlight_plugin
+class am_xml_highlighter
 {
 	/**
 	 * Text name of language for display
@@ -48,7 +45,7 @@ class am_xml_highlighter extends code_highlight_plugin
 	 * it would be used to replace the text output above the codeblock instead of ucfirst( language )
 	 *
 	 */
-	var $language_title = 'Xml';
+	var $language_title = 'XML';
 
 
 	/**
@@ -59,22 +56,95 @@ class am_xml_highlighter extends code_highlight_plugin
 
 
 	/**
+	 * Called automatically on class innit
+	 *
+	 * @param object $parent
+	 * @return object am_xml_highlighter
+	 */
+	function am_xml_highlighter( & $parent )
+	{
+		$this->parent = & $parent;
+		return $this;
+	}
+
+
+	/**
 	 * Highlights code ready for displaying
 	 *
 	 * @param string $block - the code
 	 * @return string highlighted code
 	 */
-
 	function highlight_code( $block )
 	{
-		$block = preg_replace( '¤(&lt;.*?&gt;)¤', '<span class="code_tag">\\1</span>', $block );
+		// highlight all < ?xml - ? >, CDATA and comment blocks
+		$block = preg_replace( array(
+						'¤(&lt;\!--(.*?)--&gt;)¤',
+						'¤(&lt;\!\[CDATA\[([\s\S]*?)]]&gt;)¤',
+						'¤(&lt;\?(.*?)\?&gt;)¤' ),
+					array(
+						'<span class="amc_comment">&lt;!&#8722;&#8722;$2&#8722;&#8722;&gt;</span>',
+						'<span class="amc_comment">$1</span>',
+						'<span class="amc_keyword">$1</span>' ),
+						 $block );
+		// highlight remaining tags, attributes and strings
+		$block = callback_on_non_matching_blocks(  $block, '¤<span([\s\S]+?)</span>¤', array( $this, 'highlight_xml_tags' ) );
 
-		return $this->tidy_code_output( '<span class="amc_default">'.$block.'</span>' );
+
+		return $this->parent->tidy_code_output( '<span class="amc_default">'.$block.'</span>' );
 	}
+
+
+	/**
+	 * Highlights xml declarations
+	 *
+	 * @param string $block : 2 - the code
+	 * @return string highlighted declarations
+	 */
+	function highlight_xml_tags( $block )
+	{
+		$block = preg_replace_callback( '¤(&lt;(.*?)&gt;)¤', array( $this, 'highlight_xml' ), $block );
+		return '<span class="amc_default">'.$block.'</span>';
+	}
+
+
+	/**
+	 * Highlights xml tags, attributes and values
+	 *
+	 * @param string $block : 2 - the code
+	 * @return string highlighted xml code
+	 */
+	function highlight_xml( $block )
+	{
+		$block[2] = preg_replace(
+				array( '#^([^\s]+?)(\s)#','#(\s)([^\s]+?)=#i', '#(["\'])([^\1]+?)\1#' ),
+				array( '$1</span><default>$2', '$1<attrib>$2</span>=', '<string>$1$2$1</span>' ),
+				$block[2] );
+
+		return '<span class="amc_keyword">&lt;'.str_replace(
+				array( '<default>', '<attrib>', '<string>' ),
+				array( '<span class="amc_default">', '<span class="amc_attribute">', '<span class="amc_string">' ),
+				$block[2] ).'&gt;</span>';
+	}
+
 
 }
 /**
- * $Log $
+ * $Log$
+ * Revision 1.2  2007/05/04 20:43:09  fplanque
+ * MFB
+ *
+ * Revision 1.1.2.6  2007/04/23 12:00:36  yabs
+ * removed "extend Plugins"
+ *
+ * Revision 1.1.2.5  2007/04/21 08:43:37  yabs
+ * minor docs and code
+ *
+ * Revision 1.1.2.4  2007/04/21 07:40:36  yabs
+ * added in highlighting for comments, cdata & xml declarations
+ *
+ * Revision 1.1.2.3  2007/04/20 12:02:25  yabs
+ * Added in some highlighting for attributes, tags and strings
+ *
  *
  */
 ?>

@@ -40,8 +40,9 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * yabs > would like this to extend an "am_highlighter" class, but not sure how to handle $this->T_()
  * fp> is T_() actually used?
  * fp> you should probably just pass the plugin as argument to the constructor, this way you can call $plugin->T_()
+ * yabs> it's only used in this one class, made the changes :)
  */
-class am_php_highlighter extends code_highlight_plugin
+class am_php_highlighter
 {
 	/**
 	 * Array php functions
@@ -73,6 +74,19 @@ class am_php_highlighter extends code_highlight_plugin
 	 *
 	 */
 	var $strict_mode = false;
+
+
+	/**
+	 * Called automatically on class innit
+	 *
+	 * @param object $parent
+	 * @return object am_php_highlighter
+	 */
+	function am_php_highlighter( & $parent )
+	{
+		$this->parent = & $parent;
+		return $this;
+	}
 
 
 	/**
@@ -113,7 +127,7 @@ class am_php_highlighter extends code_highlight_plugin
 			// gets rid of the < ?php & * / that we added
 			array_slice( explode( "\n",
 			// clean it all up ready for numbering
-			$this->tidy_code_output(
+			$this->parent->tidy_code_output(
 			// find all potential php functions and link relevant ones to the documentation
 			preg_replace_callback( '#([a-z0-9\-_]+?)(\</span>\<span class="amc_keyword">)?\(#i', array( $this, 'link_to_manual' ),
 			// change the php.ini highlight colours to our class names
@@ -144,8 +158,19 @@ class am_php_highlighter extends code_highlight_plugin
 	function link_to_manual( $function )
 	{	// check if $function is a native php function and provide a link to the documentation if true
 		// if not in xhtml strict mode ( setting ) then add target="_blank"
-		return ( in_array( trim( $function[1] ), $this->php_functions['internal'] ) ? sprintf( '<a href="http://www.php.net/function.%1$s" title=" %2$s : '.$function[1].'() "'.( $this->strict_mode ? '' : ' target="_blank"' ).' class="codeblock_external_link">%1$s</a>', trim( $function[1] ), $this->T_( 'Read the PHP.net documentation for' ) ) : $function[1] ).( empty( $function[2] ) ? '' : $function[2] ).'(';
+		return ( in_array( trim( $function[1] ), $this->php_functions['internal'] ) ? sprintf( '<a href="http://www.php.net/function.%1$s" title=" %2$s : '.$function[1].'() "'.( $this->strict_mode ? '' : ' target="_blank"' ).' class="codeblock_external_link">%1$s</a>', trim( $function[1] ), $this->parent->T_( 'Read the PHP.net documentation for' ) ) : $function[1] ).( empty( $function[2] ) ? '' : $function[2] ).'(';
 	}
 
 }
-?>
+
+/**
+ * $Log$
+ * Revision 1.2  2007/05/04 20:43:08  fplanque
+ * MFB
+ *
+ * Revision 1.1.2.3  2007/04/23 12:00:36  yabs
+ * removed "extend Plugins"
+ *
+ */
+
+ ?>
