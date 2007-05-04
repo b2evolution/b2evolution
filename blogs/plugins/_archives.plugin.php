@@ -85,6 +85,7 @@ class archives_plugin extends Plugin
 	 *                - 'block_end' : (Default: '</div>')
 	 *                - 'title' : (Default: T_('Archives'))
 	 *                - 'mode' : 'monthly'|'daily'|'weekly'|'postbypost' (Default: conf.)
+	 *                - 'sort_order' : 'date'|'title' (Default: date - used only if the mode is 'postbypost')
 	 *                - 'link_type' : 'canonic'|'context' (default: canonic)
 	 *                - 'context_isolation' : what params need override when changing date/range (Default: 'm,w,p,title,unit,dstart' )
 	 *                - 'form' : true|false (default: false)
@@ -132,7 +133,15 @@ class archives_plugin extends Plugin
 		if(!isset($params['mode']))
 			$params['mode'] = $Blog->get_setting('archive_mode');
 
-		// Link type:
+		//Sort order (used only in postbypost mode):
+		if($params['mode'] !='postbypost'){
+			$params['sort_order'] = 'date';
+		}
+		if(!isset($params['sort_order']) || $params['sort_order'] == '') {
+			$params['sort_order'] = 'date';
+		}
+
+// Link type:
 		if(!isset($params['link_type'])) $params['link_type'] = 'canonic';
 		if(!isset($params['context_isolation'])) $params['context_isolation'] = 'm,w,p,title,unit,dstart';
 
@@ -161,7 +170,7 @@ class archives_plugin extends Plugin
 			$params['day_date_format'] = $dateformat;
 		}
 
-		$ArchiveList = & new ArchiveList( $params['mode'], $params['limit'], ($params['link_type'] == 'context'),
+		$ArchiveList = & new ArchiveList( $params['mode'], $params['limit'], $params['sort_order'],($params['link_type'] == 'context'),
 																			$this->dbtable, $this->dbprefix, $this->dbIDname );
 
 		echo $params['block_start'];
@@ -324,6 +333,7 @@ class ArchiveList extends Results
 	function ArchiveList(
 		$archive_mode = 'monthly',
 		$limit = 100,
+		$sort_order ='date',
 		$preserve_context = false,
 		$dbtable = 'T_posts',
 		$dbprefix = 'post_',
@@ -394,7 +404,7 @@ class ArchiveList extends Results
 		{
 			case 'monthly':
 				// ------------------------------ MONTHLY ARCHIVES ------------------------------------
-				$sql = 'SELECT YEAR('.$this->dbprefix.'datestart) AS year, MONTH('.$this->dbprefix.'datestart) AS month,
+				$sql = 'SELECT EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) AS year, EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) AS month,
 																	COUNT(DISTINCT postcat_post_ID) AS count '
 													.$this->from
 													.$this->where.'
@@ -404,7 +414,7 @@ class ArchiveList extends Results
 
 			case 'daily':
 				// ------------------------------- DAILY ARCHIVES -------------------------------------
-				$sql = 'SELECT YEAR('.$this->dbprefix.'datestart) AS year, MONTH('.$this->dbprefix.'datestart) AS month,
+				$sql = 'SELECT EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) AS year, MONTH('.$this->dbprefix.'datestart) AS month,
 																	DAYOFMONTH('.$this->dbprefix.'datestart) AS day,
 																	COUNT(DISTINCT postcat_post_ID) AS count '
 													.$this->from
@@ -415,7 +425,7 @@ class ArchiveList extends Results
 
 			case 'weekly':
 				// ------------------------------- WEEKLY ARCHIVES -------------------------------------
-				$sql = 'SELECT YEAR('.$this->dbprefix.'datestart) AS year, '.
+				$sql = 'SELECT EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) AS year, '.
 															$DB->week( $this->dbprefix.'datestart', locale_startofweek() ).' AS week,
 															COUNT(DISTINCT postcat_post_ID) AS count '
 													.$this->from
@@ -431,7 +441,13 @@ class ArchiveList extends Results
 													.$this->from
 													.$this->where
 													.$this->group_by.'
-													ORDER BY '.$this->dbprefix.'datestart DESC';
+													ORDER BY ';
+				if($sort_order == 'title'){
+					$sql .= $this->dbprefix.'title ASC';
+				}
+				else if($sort_order == 'date'){
+					$sql .= $this->dbprefix.'datestart DESC';
+				}
 		}
 
 
@@ -467,22 +483,22 @@ class ArchiveList extends Results
 		{
 			case 'monthly':
 				// ------------------------------ MONTHLY ARCHIVES ------------------------------------
-				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart) ) '
+				$sql_count = 'SELECT COUNT( DISTINCT EXTRACT(YEAR FROM '.$this->dbprefix.'datestart), EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) ) '
 													.$this->from
 													.$this->where;
 				break;
 
 			case 'daily':
 				// ------------------------------- DAILY ARCHIVES -------------------------------------
-				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart),
-																	DAYOFMONTH('.$this->dbprefix.'datestart) ) '
+				$sql_count = 'SELECT COUNT( DISTINCT EXTRACT(YEAR FROM '.$this->dbprefix.'datestart), EXTRACT(MONTH FROM '.$this->dbprefix.'datestart),
+																	EXTRACT(DAY FROM '.$this->dbprefix.'datestart) ) '
 													.$this->from
 													.$this->where;
 				break;
 
 			case 'weekly':
 				// ------------------------------- WEEKLY ARCHIVES -------------------------------------
-				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), '
+				$sql_count = 'SELECT COUNT( DISTINCT EXTRACT(YEAR FROM '.$this->dbprefix.'datestart), '
 													.$DB->week( $this->dbprefix.'datestart', locale_startofweek() ).' ) '
 													.$this->from
 													.$this->where;
@@ -568,6 +584,10 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.40  2007/05/04 01:55:59  waltercruz
+ * Changing the MySQL date functions to the standart ones.
+ * Adding a sort_order parameter to archives plugins, to be used in postbypost mode, with two options: date (posts sorted by date DESC) and title (posts sorted by title ASC).
+ *
  * Revision 1.39  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *
