@@ -2501,9 +2501,10 @@ class Plugin
 	function register_menu_entry( $text, $path = 'tools', $menu_entry_props = array() )
 	{
 		global $AdminUI;
-
+    
 		$menu_entry_props['text'] = $text;
-
+		$menu_entry_props['href'] = 'admin.php?ctrl=tools&amp;tab=plug_ID_'.$this->ID;
+    
 		$AdminUI->add_menu_entries( $path, array( 'plug_ID_'.$this->ID => $menu_entry_props ) );
 	}
 
@@ -2869,6 +2870,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.155  2007/05/06 21:14:19  personman2
+ * Fixed broken link from Tools > Scheduler to Tools > [any plugin tab]
+ *
  * Revision 1.154  2007/04/28 22:33:26  blueyed
  * Fixed "must return reference notice" for __get()
  *
