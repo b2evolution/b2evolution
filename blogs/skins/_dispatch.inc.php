@@ -1,6 +1,9 @@
 <?php
 /**
- * This is the template that dipatches display of the main area, based on the disp param
+ * This is the template that dispatches display of the main area, based on the disp param
+ *
+ * For a quick explanation of b2evo 2.0 skins, please start here:
+ * {@link http://manual.b2evolution.net/Skins_2.0}
  *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the main.page.php template.
@@ -44,6 +47,9 @@ if( $disp != 'posts' && $disp != 'single' && $disp != 'page' )
 
 /*
  * $Log$
+ * Revision 1.8  2007/05/07 18:59:45  fplanque
+ * renamed skin .page.php files to .tpl.php
+ *
  * Revision 1.7  2007/04/26 00:11:03  fplanque
  * (c) 2007
  *

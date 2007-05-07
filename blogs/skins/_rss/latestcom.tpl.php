@@ -2,6 +2,9 @@
 /**
  * This template generates an RSS 0.92 feed for the requested blog's latest comments
  *
+ * For a quick explanation of b2evo 2.0 skins, please start here:
+ * {@link http://manual.b2evolution.net/Skins_2.0}
+ *
  * See {@link http://backend.userland.com/rss092}
  *
  * @package evoskins

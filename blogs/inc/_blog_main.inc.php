@@ -465,13 +465,13 @@ if( !empty( $skin ) )
 		$ads_current_skin_path = $skins_path.$skin.'/';
 
 		$disp_handlers = array(
-				'feedback-popup' => 'feedback_popup.page.php',
-				// 'arcdir'   => 'arcdir.page.php',
-				'comments' => 'latestcom.page.php',
-				// 'msgform'  => 'msgform.page.php',
-				// 'profile'  => 'profile.page.php',
-				// 'subs'     => 'subscriptions.page.php',
-				// All others will default to main.page.php
+				'feedback-popup' => 'feedback_popup.tpl.php',
+				// 'arcdir'   => 'arcdir.tpl.php',
+				'comments' => 'latestcom.tpl.php',
+				// 'msgform'  => 'msgform.tpl.php',
+				// 'profile'  => 'profile.tpl.php',
+				// 'subs'     => 'subscriptions.tpl.php',
+				// All others will default to main.tpl.php
 			);
 
 		if( !empty($disp_handlers[$disp])
@@ -481,7 +481,7 @@ if( !empty( $skin ) )
 		}
 		else
 		{	// Use the default handler from the skins dir:
-			require $ads_current_skin_path.'main.page.php';
+			require $ads_current_skin_path.'main.tpl.php';
 		}
 	}
 
@@ -499,6 +499,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.76  2007/05/07 18:59:45  fplanque
+ * renamed skin .page.php files to .tpl.php
+ *
  * Revision 1.75  2007/05/02 20:39:27  fplanque
  * meta robots handling
  *

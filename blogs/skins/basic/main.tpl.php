@@ -2,6 +2,9 @@
 /**
  * This is the main/default page template.
  *
+ * For a quick explanation of b2evo 2.0 skins, please start here:
+ * {@link http://manual.b2evolution.net/Skins_2.0}
+ *
  * It is used to display the blog when no specific page template is available to handle the request.
  *
  * @package evoskins

@@ -477,7 +477,7 @@ You can download additional skins from the <a href="http://skins.b2evolution.net
 
 You can also create your own skins by duplicating, renaming and customizing any existing skin folder from the /blogs/skins directory.
 
-To start customizing a skin, open its "<code>main.page.php</code>" file in an editor and read the comments in there. And, of course, read the manual on skins!'), $now, $cat_b2evo );
+To start customizing a skin, open its "<code>main.tpl.php</code>" file in an editor and read the comments in there. And, of course, read the manual on skins!'), $now, $cat_b2evo );
 
 
 	// Create newbie posts:
@@ -595,6 +595,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.223  2007/05/07 18:59:45  fplanque
+ * renamed skin .page.php files to .tpl.php
+ *
  * Revision 1.222  2007/04/26 00:11:09  fplanque
  * (c) 2007
  *

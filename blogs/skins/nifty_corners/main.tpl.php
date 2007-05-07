@@ -2,10 +2,13 @@
 /**
  * This is the main/default page template.
  *
+ * For a quick explanation of b2evo 2.0 skins, please start here:
+ * {@link http://manual.b2evolution.net/Skins_2.0}
+ *
  * It is used to display the blog when no specific page template is available to handle the request.
  *
  * @package evoskins
- * @subpackage natural_pink
+ * @subpackage nifty_corners
  *
  * @version $Id$
  */
@@ -26,12 +29,14 @@ require $skins_path.'_html_header.inc.php';
 <div class="wrapper">
 <div class="wrapper2">
 
+<div class="outerwrap">
+<div class="innerwrap">
+
 <?php
-	/**
-	 * --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	 */
-	require( dirname(__FILE__).'/_bloglist.php' );
-	// ----------------------------- END OF BLOG LIST ---------------------------- ?>
+	// --------------------------- BLOG LIST INCLUDED HERE -----------------------------
+	require dirname(__FILE__).'/_bloglist.php';
+	// ------------------------------- END OF BLOG LIST --------------------------------
+?>
 
 <div class="pageHeader">
 	<?php
@@ -46,8 +51,11 @@ require $skins_path.'_html_header.inc.php';
 	?>
 </div>
 
+</div>
+</div>
 
-<div class="bPosts">
+<div class="posts">
+<div class="innerwrap">
 
 <?php
 	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
@@ -78,10 +86,13 @@ require $skins_path.'_html_header.inc.php';
 	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
 	{
 		$MainList->date_if_changed( '<h2>', '</h2>', '' );
+		locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
 	?>
+
+	<div class="bTitle"><h3 class="bTitle"><?php $Item->title(); ?></h3></div>
+
 	<div class="bPost" lang="<?php $Item->lang() ?>">
 		<?php
-			locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
 			$Item->anchor(); // Anchor for permalinks to refer to
 		?>
 
@@ -95,8 +106,6 @@ require $skins_path.'_html_header.inc.php';
 			echo ' &nbsp; ';
 		?>
 		</div>
-
-		<h3 class="bTitle"><?php $Item->title(); ?></h3>
 
 		<?php
 			// Display images that are linked to this post:
@@ -142,7 +151,8 @@ require $skins_path.'_html_header.inc.php';
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 		</div>
 
-		<?php // ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
+		<?php
+			// ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
 			$disp_comments = 1;					// Display the comments if requested
 			$disp_comment_form = 1;			// Display the comments form if comments requested
 			$disp_trackbacks = 1;				// Display the trackbacks if requested
@@ -151,12 +161,11 @@ require $skins_path.'_html_header.inc.php';
 			$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
 			require( dirname(__FILE__).'/_feedback.php' );
 			// ---------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
-
-			locale_restore_previous();	// Restore previous locale (Blog locale)
 		?>
 	</div>
-	<div class="separator" ><img src="rsc/img/separator.gif" width="265" height="14" alt="" /></div>
-<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
+<?php
+	locale_restore_previous();	// Restore previous locale (Blog locale)
+} // ---------------------------------- END OF POSTS ------------------------------------ ?>
 
 		<?php
 			// Links to list pages:
@@ -180,9 +189,11 @@ require $skins_path.'_html_header.inc.php';
 	?>
 
 </div>
+</div>
 <!-- =================================== START OF SIDEBAR =================================== -->
 
 <div class="bSideBar">
+<div class="innerwrap">
 
 	<?php
 		// Display container contents:
@@ -208,6 +219,7 @@ require $skins_path.'_html_header.inc.php';
 
 	<p class="center"><!-- Please help us promote b2evolution and leave this link on your blog. --><a href="http://b2evolution.net/" title="b2evolution: next generation blog software"><img src="../../rsc/img/powered-by-b2evolution-120t.gif" alt="powered by b2evolution free blog software" title="b2evolution: next generation blog software" width="120" height="32" border="0" /></a></p>
 
+</div>
 </div>
 
 <div class="clear"><img src="<?php echo $rsc_url; ?>img/blank.gif" width="1" height="1" alt="" /></div>

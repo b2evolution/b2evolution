@@ -4,6 +4,9 @@
  *
  * See {@link http://backend.userland.com/rss}
  *
+ * For a quick explanation of b2evo 2.0 skins, please start here:
+ * {@link http://manual.b2evolution.net/Skins_2.0}
+ *
  * @package evoskins
  * @subpackage rss
  *

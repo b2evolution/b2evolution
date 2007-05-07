@@ -155,13 +155,13 @@ class Skin extends DataObject
 
 	/**
 	 * Discover containers included in skin file
-	 * @todo
+	 * @todo browse all *.tpl.php
 	 */
 	function discover_containers()
 	{
 		global $skins_path, $Messages;
 
-		$rf_main_subpath = $this->folder.'/main.page.php';
+		$rf_main_subpath = $this->folder.'/main.tpl.php';
 		$af_main_path = $skins_path.$rf_main_subpath;
 
 		if( ! is_readable($af_main_path) )
@@ -361,6 +361,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2007/05/07 18:59:45  fplanque
+ * renamed skin .page.php files to .tpl.php
+ *
  * Revision 1.15  2007/04/26 00:11:12  fplanque
  * (c) 2007
  *

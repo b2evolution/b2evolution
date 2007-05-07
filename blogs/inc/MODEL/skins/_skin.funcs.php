@@ -169,7 +169,7 @@ function skin_provided_by_plugin( $name )
  * @param skin name (directory name)
  * @return boolean true is exists, false if not
  */
-function skin_exists( $name, $filename = 'main.page.php' )
+function skin_exists( $name, $filename = 'main.tpl.php' )
 {
 	global $skins_path;
 
@@ -218,6 +218,9 @@ function & skin_install( $skin_folder, $name = NULL )
 
 /*
  * $Log$
+ * Revision 1.20  2007/05/07 18:59:45  fplanque
+ * renamed skin .page.php files to .tpl.php
+ *
  * Revision 1.19  2007/05/07 18:03:28  fplanque
  * cleaned up skin code a little
  *

@@ -1448,7 +1448,7 @@ class AdminUI_general
 									'text' => T_('Features'),
 									'href' => 'admin.php?ctrl=features' ),
 								'skins' => array(
-									'text' => T_('Skins'),
+									'text' => T_('Installed Skins'),
 									'href' => 'admin.php?ctrl=skins'),
 								'plugins' => array(
 									'text' => T_('Plugins'),
@@ -1614,6 +1614,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.48  2007/05/07 18:59:47  fplanque
+ * renamed skin .page.php files to .tpl.php
+ *
  * Revision 1.47  2007/04/26 00:11:03  fplanque
  * (c) 2007
  *

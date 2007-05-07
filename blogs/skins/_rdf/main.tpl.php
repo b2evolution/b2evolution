@@ -2,6 +2,9 @@
 /**
  * This template generates an RSS 1.0 (RDF) feed for the requested blog's latest posts
  *
+ * For a quick explanation of b2evo 2.0 skins, please start here:
+ * {@link http://manual.b2evolution.net/Skins_2.0}
+ *
  * See {@link http://web.resource.org/rss/1.0/}
  *
  * @package evoskins
