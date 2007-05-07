@@ -127,6 +127,7 @@ class Skin extends DataObject
 		$params = array_merge( array(
 					'block_start' => '<div class="$wi_class$">',
 					'block_end' => '</div>',
+					'block_display_title' => true,
 					'block_title_start' => '<h3>',
 					'block_title_end' => '</h3>',
 					'list_start' => '<ul>',
@@ -137,6 +138,8 @@ class Skin extends DataObject
 					'group_end' => '</ul>',
 					'notes_start' => '<div class="notes">',
 					'notes_end' => '</div>',
+					'link_selected_class' => 'selected',
+					'link_default_class' => '',
 				), $params );
 
    	$WidgetCache = & get_Cache( 'WidgetCache' );
@@ -361,6 +364,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2007/05/07 23:26:19  fplanque
+ * public blog list as a widget
+ *
  * Revision 1.16  2007/05/07 18:59:45  fplanque
  * renamed skin .page.php files to .tpl.php
  *

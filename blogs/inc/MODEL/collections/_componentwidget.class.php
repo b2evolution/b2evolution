@@ -36,7 +36,7 @@ $core_componentwidget_defs = array(
 		'coll_search_form'  => NT_('Content Search Form'),
 		'coll_xml_feeds'    => NT_('XML Feeds (RSS / Atom)'),
 		'user_tools'        => NT_('User Tools'),
-		'admin_help'        => NT_('Admin Help'),
+		'colls_list'				=> NT_('Public blog list'),
 	);
 
 /**
@@ -173,11 +173,12 @@ class ComponentWidget extends DataObject
 					case 'coll_title':
 						// Collection title:
 						echo $params['block_start'];
-						echo $params['block_title_start'];
-						echo '<a href="'.$Blog->get( 'url', 'raw' ).'">';
-						$Blog->disp( 'name', 'htmlbody' );
-						echo '</a>';
-						echo $params['block_title_end'];
+
+						$title = '<a href="'.$Blog->get( 'url', 'raw' ).'">'
+											.$Blog->dget( 'name', 'htmlbody' )
+											.'</a>';
+						$this->disp_title( $params, $title );
+
 						echo $params['block_end'];
 						return true;
 
@@ -238,9 +239,7 @@ class ComponentWidget extends DataObject
 						// Collection search form:
 						echo $params['block_start'];
 
-						echo $params['block_title_start'];
-						echo T_('Search');
-						echo $params['block_title_end'];
+			   		$this->disp_title( $params, T_('Search') );
 
 						form_formstart( $Blog->dget( 'blogurl', 'raw' ), 'search', 'SearchForm' );
 						echo '<p>';
@@ -261,9 +260,8 @@ class ComponentWidget extends DataObject
 						// Available XML feeds:
 						echo $params['block_start'];
 
- 						echo $params['block_title_start'];
-						echo '<img src="'.$rsc_url.'icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> '.T_('XML Feeds');
-						echo $params['block_title_end'];
+						$title = '<img src="'.$rsc_url.'icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> '.T_('XML Feeds');
+			   		$this->disp_title( $params, $title );
 
 						echo $params['list_start'];
 
@@ -314,9 +312,10 @@ class ComponentWidget extends DataObject
 						echo $params['block_end'];
 						return true;
 
-
-					case 'admin_help':
-
+					case 'colls_list':
+						// List of public blogs:
+      			$this->disp_coll_list( $params );
+						return true;
 				}
 				break;
 
@@ -330,6 +329,20 @@ class ComponentWidget extends DataObject
 		}
 
 		echo '<!-- Unkown '.$this->type.' widget: '.$this->code.' -->';
+	}
+
+
+  /**
+	 * @private
+	 */
+	function disp_title( $params, $title )
+	{
+		if( $params['block_display_title'] )
+		{
+			echo $params['block_title_start'];
+			echo $title;
+			echo $params['block_title_end'];
+		}
 	}
 
 
@@ -371,16 +384,14 @@ class ComponentWidget extends DataObject
 
 		echo $params['block_start'];
 
-		echo $params['block_title_start'];
 		if( $what == 'pages' )
 		{
-			echo T_('Info pages');
+   		$this->disp_title( $params, T_('Info pages') );
 		}
 		else
 		{
-			echo T_('Contents');
+			$this->disp_title( $params, T_('Contents') );
 		}
-		echo $params['block_title_end'];
 
 		echo $params['list_start'];
 
@@ -388,6 +399,61 @@ class ComponentWidget extends DataObject
 		{
 			echo $params['item_start'];
 			$Item->permanent_link('#title#');
+			echo $params['item_end'];
+		}
+
+		echo $params['list_end'];
+
+		echo $params['block_end'];
+	}
+
+
+  /**
+	 * List of collections/blogs
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function disp_coll_list( $params )
+	{
+		global $Blog;
+
+		echo $params['block_start'];
+
+		$this->disp_title( $params, T_('Blogs') );
+
+		echo $params['list_start'];
+
+		for( $curr_blog_ID = blog_list_start();
+					$curr_blog_ID != false;
+					 $curr_blog_ID = blog_list_next() )
+		{
+			if( !blog_list_iteminfo( 'in_bloglist', false ) )
+			{ // don't show
+				continue;
+			}
+			echo $params['item_start'];
+
+			if( $curr_blog_ID == $Blog->ID )
+			{ // This is the blog being displayed on this page:
+				$link_class = $params['link_selected_class'];
+			}
+			else
+			{
+				$link_class = $params['link_default_class'];;
+			}
+
+			$blog_link = '<a href="';
+			$blog_link .= blog_list_iteminfo('blogurl', false);
+			$blog_link .= '" class="'.$link_class.'" title="';
+			$blog_link .= format_to_output( blog_list_iteminfo('name', false), 'htmlattr' );
+			$blog_link .= '">';
+			// $blog_link .= $blog_selected_name_before;
+			$blog_link .= format_to_output( blog_list_iteminfo('shortname', false ), 'htmlbody' );
+			// $blog_link .= $blog_selected_name_after;
+			$blog_link .= '</a>';
+
+			echo $blog_link;
+
 			echo $params['item_end'];
 		}
 
@@ -429,6 +495,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2007/05/07 23:26:19  fplanque
+ * public blog list as a widget
+ *
  * Revision 1.20  2007/04/26 00:11:06  fplanque
  * (c) 2007
  *

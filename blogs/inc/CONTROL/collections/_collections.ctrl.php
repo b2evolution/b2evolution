@@ -174,10 +174,6 @@ switch( $action )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 									 VALUES( '.$edited_Blog->ID.', "Sidebar", 8, "core", "user_tools" )' );
 
-			// Add Admin help to all blog Footers:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Footer", 1, "core", "admin_help" )' );
-
 			$Messages->add( T_('Default widgets have been set-up for this blog.'), 'success' );
 
 			$DB->commit();
@@ -422,6 +418,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2007/05/07 23:26:19  fplanque
+ * public blog list as a widget
+ *
  * Revision 1.18  2007/04/26 00:11:07  fplanque
  * (c) 2007
  *

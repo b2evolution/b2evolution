@@ -32,11 +32,23 @@ require $skins_path.'_html_header.inc.php';
 <div class="outerwrap">
 <div class="innerwrap">
 
-<?php
-	// --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	require dirname(__FILE__).'/_bloglist.php';
-	// ------------------------------- END OF BLOG LIST --------------------------------
-?>
+<div class="PageTop">
+	<?php
+		// Display container and contents:
+		$Skin->container( NT_('Page Top'), array(
+				// The following params will be used as defaults for widgets included in this container:
+				'block_start' => '<div class="$wi_class$">',
+				'block_end' => '</div>',
+				'block_display_title' => false,
+				'block_title_start' => '<span>',
+				'block_title_end' => '</span>',
+				'list_start' => '<ul id="bloglist">',
+				'list_end' => '</ul>',
+				'item_start' => '<li>',
+				'item_end' => '</li>',
+			) );
+	?>
+</div>
 
 <div class="pageHeader">
 	<?php
