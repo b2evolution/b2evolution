@@ -137,11 +137,11 @@ class archives_plugin extends Plugin
 		if($params['mode'] !='postbypost'){
 			$params['sort_order'] = 'date';
 		}
-		if(!isset($params['sort_order']) || $params['sort_order'] == '') {
+		elseif(!isset($params['sort_order']) || $params['sort_order'] == '') {
 			$params['sort_order'] = 'date';
 		}
 
-// Link type:
+		// Link type:
 		if(!isset($params['link_type'])) $params['link_type'] = 'canonic';
 		if(!isset($params['context_isolation'])) $params['context_isolation'] = 'm,w,p,title,unit,dstart';
 
@@ -170,7 +170,7 @@ class archives_plugin extends Plugin
 			$params['day_date_format'] = $dateformat;
 		}
 
-		$ArchiveList = & new ArchiveList( $params['mode'], $params['limit'], $params['sort_order'],($params['link_type'] == 'context'),
+		$ArchiveList = & new ArchiveList( $params['mode'], $params['limit'], $params['sort_order'], ($params['link_type'] == 'context'),
 																			$this->dbtable, $this->dbprefix, $this->dbIDname );
 
 		echo $params['block_start'];
@@ -333,7 +333,7 @@ class ArchiveList extends Results
 	function ArchiveList(
 		$archive_mode = 'monthly',
 		$limit = 100,
-		$sort_order ='date',
+		$sort_order = 'date',
 		$preserve_context = false,
 		$dbtable = 'T_posts',
 		$dbprefix = 'post_',
@@ -584,6 +584,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.41  2007/05/07 18:03:27  fplanque
+ * cleaned up skin code a little
+ *
  * Revision 1.40  2007/05/04 01:55:59  waltercruz
  * Changing the MySQL date functions to the standart ones.
  * Adding a sort_order parameter to archives plugins, to be used in postbypost mode, with two options: date (posts sorted by date DESC) and title (posts sorted by title ASC).

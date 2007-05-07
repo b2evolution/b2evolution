@@ -27,7 +27,7 @@ require $skins_path.'_html_header.inc.php';
 <?php
 
 // ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-$Messages->disp( );
+$Messages->disp( '<div class="action_messages">', '</div>' );
 // --------------------------------- END OF MESSAGES ---------------------------------
 
 

@@ -28,6 +28,40 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * Initializes internal states for the most common skin displays.
+ *
+ * For more specific skins, this function should not be called and
+ * equivalent code should be customized within the skin.
+ *
+ * @param string What are we going to display. Most of the time the global $disp should be passed.
+ */
+function skin_init( $disp )
+{
+  /**
+	 * @var Blog
+	 */
+	global $Blog;
+
+	// This is the main template; it may be used to display very different things.
+	// Do inits depending on current $disp:
+	switch( $disp )
+	{
+		case 'posts':
+		case 'single':
+		case 'page':
+		case 'feedback-popup':
+			// We need to load posts for this display:
+
+			// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
+			// Init the MainList object:
+			init_MainList( $Blog->get_setting('posts_per_page') );
+
+			break;
+	}
+}
+
+
+/**
  * Template function: output HTML base tag to current skin
  */
 function skin_base_tag()
@@ -184,6 +218,9 @@ function & skin_install( $skin_folder, $name = NULL )
 
 /*
  * $Log$
+ * Revision 1.19  2007/05/07 18:03:28  fplanque
+ * cleaned up skin code a little
+ *
  * Revision 1.18  2007/04/26 00:11:12  fplanque
  * (c) 2007
  *

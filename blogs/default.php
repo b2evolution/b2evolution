@@ -42,7 +42,9 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 <h1><?php echo T_('Welcome to b2evolution') ?></h1>
 
-<?php $Messages->disp(); ?>
+<?php
+	$Messages->disp( '<div class="action_messages">', '</div>' );
+?>
 
 <?php
 	/**

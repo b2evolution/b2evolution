@@ -272,10 +272,16 @@ class Log
 	 * @param string HTML to display before the log when there is something to display
 	 * @param string HTML to display after the log when there is something to display
 	 */
-	function disp( $before = '<div class="action_messages">', $after = '</div>' )
+	function disp( $before = '<div class="action_messages">', $after = '</div>', $skip_if_preview = true )
 	{
 		if( count($this->messages) )
 		{
+			global $preview;
+			if( $preview )
+			{
+				return;
+			}
+
 			echo $before;
 
 			$this->display( NULL, NULL, true, 'all', NULL, NULL, NULL );
@@ -701,6 +707,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.17  2007/05/07 18:03:28  fplanque
+ * cleaned up skin code a little
+ *
  * Revision 1.16  2007/04/26 00:11:08  fplanque
  * (c) 2007
  *

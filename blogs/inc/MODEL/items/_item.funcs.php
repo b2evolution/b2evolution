@@ -39,6 +39,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 /**
  * Prepare the MainList object for displaying skins.
+ *
+ * @param integer max # of posts on the page
  */
 function init_MainList( $items_nb_limit )
 {
@@ -608,6 +610,9 @@ function visibility_select( & $Form, $post_status )
 
 /*
  * $Log$
+ * Revision 1.48  2007/05/07 18:03:28  fplanque
+ * cleaned up skin code a little
+ *
  * Revision 1.47  2007/04/26 00:11:11  fplanque
  * (c) 2007
  *

@@ -141,7 +141,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
 	{
-	$MainList->date_if_changed();
+	$MainList->date_if_changed( '<h2>', '</h2>', '' );
 	?>
 	<div class="bPost" lang="<?php $Item->lang() ?>">
 		<?php $Item->anchor(); ?>

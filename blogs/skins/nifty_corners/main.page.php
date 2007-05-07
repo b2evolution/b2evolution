@@ -11,23 +11,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
-switch( $disp )
-{
-	case 'posts':
-	case 'single':
-	case 'page':
-	case 'feedback-popup':
-		// We need to load posts for this display:
-
-		// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
-		// Init the MainList object:
-		init_MainList( $Blog->get_setting('posts_per_page') );
-
-		break;
-}
+skin_init( $disp );
 
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
@@ -70,8 +56,7 @@ require $skins_path.'_html_header.inc.php';
 
 <?php
 	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-	if( empty( $preview ) ) $Messages->disp( );
-	// fp>> TODO: I think we should rather forget the messages here so they don't get displayed again.
+	$Messages->disp( '<div class="action_messages">', '</div>' );
 	// --------------------------------- END OF MESSAGES ---------------------------------
 ?>
 
@@ -97,7 +82,7 @@ require $skins_path.'_html_header.inc.php';
 
 	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
 	{
-		$MainList->date_if_changed();
+		$MainList->date_if_changed( '<h2>', '</h2>', '' );
 		locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
 	?>
 
