@@ -1005,11 +1005,11 @@ function bloggergettemplate($m)
 
 	if ($templateType == "main")
 	{
-		$file = $edit_folder.'_main.inc.php';
+		$file = $edit_folder.'main.tpl.php';
 	}
 	elseif ($templateType == "archiveIndex")
 	{
-		$file = $edit_folder.'_archives.php';
+		$file = $edit_folder.'_arcdir.php';
 	}
 	else return; // TODO: handle this cleanly
 
@@ -1087,11 +1087,11 @@ function bloggersettemplate( $m )
 
 	if( $templateType == 'main' )
 	{
-		$file = $edit_folder.'_main.inc.php';
+		$file = $edit_folder.'main.tpl.php';
 	}
 	elseif ($templateType == "archiveIndex")
 	{
-		$file = $edit_folder.'_archives.php';
+		$file = $edit_folder.'_arcdir.php';
 	}
 	else return; // TODO: handle this cleanly
 
@@ -2239,6 +2239,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.135  2007/05/08 18:50:47  fplanque
+ * minor fixes
+ *
  * Revision 1.134  2007/04/26 00:11:14  fplanque
  * (c) 2007
  *
