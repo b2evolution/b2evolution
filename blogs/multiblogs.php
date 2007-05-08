@@ -41,7 +41,13 @@ require_once $inc_path.'_blog_main.inc.php';
 // Make sure includes will check in the current folder!
 $ads_current_skin_path = dirname(__FILE__).'/';
 
+
 # Now, below you'll find the magic template...
+
+
+// This is the main template; it may be used to display very different things.
+// Do inits depending on current $disp:
+skin_init( $disp );
 
 header( 'Content-type: text/html; charset='.$io_charset );
 ?>
@@ -66,29 +72,30 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <div class="pageHeaderContent">
 
 <!-- InstanceBeginEditable name="NavBar2" -->
-	<?php
-	// --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	# this is what will start and end your blog links
-	$blog_list_start = '<div class="NavBar">';
-	$blog_list_end = '</div>';
-	# this is what will separate your blog links
-	$blog_item_start = '';
-	$blog_item_end = '';
-	# This is the class of for the selected blog link:
-	$blog_selected_link_class = 'NavButton2';
-	# This is the class of for the other blog links:
-	$blog_other_link_class = 'NavButton2';
-	# This is additionnal markup before and after the selected blog name
-	$blog_selected_name_before = '<span class="small">';
-	$blog_selected_name_after = '</span>';
-	# This is additionnal markup before and after the other blog names
-	$blog_other_name_before = '<span class="small">';
-	$blog_other_name_after = '</span>';
-	// Include the bloglist
-	require $skins_path.'_bloglist.php';
+<?php
+	// ---------------------------- BLOG LIST INSERTED HERE ------------------------------
+
+	load_class( 'MODEL/collections/_componentwidget.class.php' );
+
+	$colls_list_ComponentWidget = & new ComponentWidget( NULL, 'core', 'colls_list' );
+
+	$colls_list_ComponentWidget->display( array(
+						'block_start' => '<div class="NavBar">',
+						'block_end' => '</div>',
+						'block_display_title' => false,
+						'list_start' => '',
+						'list_end' => '',
+						'item_start' => '',
+						'item_end' => '',
+						'item_selected_start' => '',
+						'item_selected_end' => '',
+						'link_selected_class' => 'NavButton2',
+						'link_default_class' => 'NavButton2',
+				) );
+
 	// ---------------------------------- END OF BLOG LIST ---------------------------------
-	?>
-	<!-- InstanceEndEditable -->
+?>
+<!-- InstanceEndEditable -->
 
 <div class="NavBar">
 <div class="pageTitle">
@@ -208,47 +215,47 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		}
 		else
 		{
-		?>
-
-		<h3>#2: <a href="<?php $Blog_B->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog_B->disp( 'name', 'htmlbody' ) ?></a></h3>
-		<?php
-		$BlogBList = & new ItemList2( $Blog_B, $timestamp_min, $timestamp_max, $posts );
-
-		$BlogBList->set_filters( array(
-				'authors' => $author,
-				'ymdhms' => $m,
-				'week' => $w,
-				'order' => $order,
-				'orderby' => $orderby,
-				'unit' => $unit,
-			) );
-
-		// Run the query:
-		$BlogBList->query();
-
-		while( $Item = & $BlogBList->get_item() )
-		{
 			?>
-			<div class="bPostSide" lang="<?php $Item->lang() ?>">
-				<?php $Item->anchor(); ?>
-				<h3 class="bTitle">
-					<?php $Item->permanent_link( get_icon('permalink') ); ?>
-					<?php $Item->title(); ?>
-				</h3>
-				<div class="bText">
-					<?php
-						// Display CONTENT (teaser only):
-						$Item->content_teaser( array(
-								'before'      => '',
-								'after'       => '',
-								'disppage'    => 1,
-								'stripteaser' => false,
-							) );
-					?>
-				</div>
-			</div>
+
+			<h3>#2: <a href="<?php $Blog_B->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog_B->disp( 'name', 'htmlbody' ) ?></a></h3>
 			<?php
-		}
+			$BlogBList = & new ItemList2( $Blog_B, $timestamp_min, $timestamp_max, $posts );
+
+			$BlogBList->set_filters( array(
+					'authors' => $author,
+					'ymdhms' => $m,
+					'week' => $w,
+					'order' => $order,
+					'orderby' => $orderby,
+					'unit' => $unit,
+				) );
+
+			// Run the query:
+			$BlogBList->query();
+
+			while( $Item = & $BlogBList->get_item() )
+			{
+				?>
+				<div class="bPostSide" lang="<?php $Item->lang() ?>">
+					<?php $Item->anchor(); ?>
+					<h4 class="bTitle">
+						<?php $Item->permanent_link( get_icon('permalink') ); ?>
+						<?php $Item->title(); ?>
+					</h4>
+					<div class="bText">
+						<?php
+							// Display CONTENT (teaser only):
+							$Item->content_teaser( array(
+									'before'      => '',
+									'after'       => '',
+									'disppage'    => 1,
+									'stripteaser' => false,
+								) );
+						?>
+					</div>
+				</div>
+				<?php
+			}
 		}
 		?>
 	</div>
@@ -286,10 +293,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			?>
 			<div class="bPostSide" lang="<?php $Item->lang() ?>">
 				<?php $Item->anchor(); ?>
-				<h3 class="bTitle">
+				<h4 class="bTitle">
 					<?php $Item->permanent_link( get_icon('permalink') ); ?>
-					<?php $Item->title(); ?>
-				</h3>
+					<?php $Item->title( '', '' ); ?>
+				</h4>
 				<div class="bText">
 					<?php
 						// Display CONTENT (teaser only):

@@ -65,6 +65,11 @@ $ads_current_skin_path = dirname(__FILE__).'/';
 
 # Now, below you'll find the main template...
 
+
+// This is the main template; it may be used to display very different things.
+// Do inits depending on current $disp:
+skin_init( $disp );
+
 header( 'Content-type: text/html; charset='.$io_charset );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -93,26 +98,29 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <div class="pageHeaderContent">
 
 <!-- InstanceBeginEditable name="NavBar2" -->
-<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	# this is what will start and end your blog links
-	$blog_list_start = '<div class="NavBar">';
-	$blog_list_end = '</div>';
-	# this is what will separate your blog links
-	$blog_item_start = '';
-	$blog_item_end = '';
-	# This is the class of for the selected blog link:
-	$blog_selected_link_class = 'NavButton2Curr';
-	# This is the class of for the other blog links:
-	$blog_other_link_class = 'NavButton2';
-	# This is additionnal markup before and after the selected blog name
-	$blog_selected_name_before = '<span class="small"><img src="'.$rsc_url.'img/down_small.gif" width="14" height="12" alt="['.T_('Selected').']" title="" class="top" />';
-	$blog_selected_name_after = '</span>';
-	# This is additionnal markup before and after the other blog names
-	$blog_other_name_before = '<span class="small">';
-	$blog_other_name_after = '</span>';
-	// Include the bloglist
-	require( $skins_path.'_bloglist.php');
-	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
+<?php
+	// ---------------------------- BLOG LIST INSERTED HERE ------------------------------
+
+	load_class( 'MODEL/collections/_componentwidget.class.php' );
+
+	$colls_list_ComponentWidget = & new ComponentWidget( NULL, 'core', 'colls_list' );
+
+	$colls_list_ComponentWidget->display( array(
+						'block_start' => '<div class="NavBar">',
+						'block_end' => '</div>',
+						'block_display_title' => false,
+						'list_start' => '',
+						'list_end' => '',
+						'item_start' => '',
+						'item_end' => '',
+						'item_selected_start' => '',
+						'item_selected_end' => '',
+						'link_selected_class' => 'NavButton2',
+						'link_default_class' => 'NavButton2',
+				) );
+
+	// ---------------------------------- END OF BLOG LIST ---------------------------------
+?>
 <!-- InstanceEndEditable -->
 
 <div class="NavBar">
@@ -263,9 +271,23 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<div class="bSideItem">
 		<h3><?php echo T_('Archives') ?></h3>
 		<ul>
-			<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-				require( $skins_path.'_archives.php');
-				// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
+			<?php
+				// -------------------------- ARCHIVES INSERTED HERE -----------------------------
+				// Call the Archives plugin WITH NO MORE LINK AND NO LIST DELIMITERS:
+				$Plugins->call_by_code( 'evo_Arch', array(
+						'title'=>'',
+						'block_start'=>'',
+						'block_end'=>'',
+						'limit'=>12,
+						'more_link'=>'',
+						'list_start'=>'',
+						'list_end'=>'',
+						'line_start'=>'<li>',
+						'line_end'=>'</li>',
+						'day_date_format'=>'',
+					) );
+				// ------------------------------ END OF ARCHIVES --------------------------------
+			?>
 				<li><a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
 		</ul>
 	</div>

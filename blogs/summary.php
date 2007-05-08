@@ -38,28 +38,29 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <div class="pageHeaderContent">
 
 <!-- InstanceBeginEditable name="NavBar2" -->
-<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	$display_blog_list = 1; // forced
+<?php
+	// ---------------------------- BLOG LIST INSERTED HERE ------------------------------
 
-	# this is what will start and end your blog links
-	$blog_list_start = '<div class="NavBar">';
-	$blog_list_end = '</div>';
-	# this is what will separate your blog links
-	$blog_item_start = '';
-	$blog_item_end = '';
-	# This is the class of for the selected blog link:
-	$blog_selected_link_class = 'NavButton2';
-	# This is the class of for the other blog links:
-	$blog_other_link_class = 'NavButton2';
-	# This is additionnal markup before and after the selected blog name
-	$blog_selected_name_before = '<span class="small">';
-	$blog_selected_name_after = '</span>';
-	# This is additionnal markup before and after the other blog names
-	$blog_other_name_before = '<span class="small">';
-	$blog_other_name_after = '</span>';
-	// Include the bloglist
-	require( $skins_path.'_bloglist.php');
-	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
+	load_class( 'MODEL/collections/_componentwidget.class.php' );
+
+	$colls_list_ComponentWidget = & new ComponentWidget( NULL, 'core', 'colls_list' );
+
+	$colls_list_ComponentWidget->display( array(
+						'block_start' => '<div class="NavBar">',
+						'block_end' => '</div>',
+						'block_display_title' => false,
+						'list_start' => '',
+						'list_end' => '',
+						'item_start' => '',
+						'item_end' => '',
+						'item_selected_start' => '',
+						'item_selected_end' => '',
+						'link_selected_class' => 'NavButton2',
+						'link_default_class' => 'NavButton2',
+				) );
+
+	// ---------------------------------- END OF BLOG LIST ---------------------------------
+?>
 <!-- InstanceEndEditable -->
 
 <div class="NavBar">
