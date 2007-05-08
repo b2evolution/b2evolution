@@ -243,6 +243,11 @@ function install_basic_widgets()
 
 	echo 'Installing default widgets... ';
 
+	// Add nlog list to all blog Page Tops:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Page Top", 1, "core", "colls_list"
+							   FROM T_blogs' );
+
 	// Add title to all blog Headers:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							 SELECT blog_ID, "Header", 1, "core", "coll_title"
@@ -484,6 +489,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.23  2007/05/08 19:36:06  fplanque
+ * automatic install of public blog list widget on new blogs
+ *
  * Revision 1.22  2007/05/07 23:26:19  fplanque
  * public blog list as a widget
  *

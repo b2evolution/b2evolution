@@ -65,7 +65,7 @@ $Form->begin_fieldset( T_('Permissions') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('List of public blogs') );
-	$Form->checkbox( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want this blog to be displayed in the list of all public blogs.') );
+	$Form->checkbox( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want this blog to be advertised in the list of all public blogs on this system.') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Feedback options') );
@@ -94,6 +94,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.23  2007/05/08 19:36:06  fplanque
+ * automatic install of public blog list widget on new blogs
+ *
  * Revision 1.22  2007/05/08 00:54:31  fplanque
  * public blog list as a widget
  *

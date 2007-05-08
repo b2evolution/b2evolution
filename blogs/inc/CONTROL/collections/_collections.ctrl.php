@@ -142,6 +142,16 @@ switch( $action )
 			$Messages->add( T_('A default category has been created for this blog.'), 'success' );
 
 			// ADD DEFAULT WIDGETS:
+			if( $edited_Blog->get( 'in_bloglist' ) )
+			{	// This is a public blog, let's give it a public global navigation list by default:
+				$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+										 VALUES( '.$edited_Blog->ID.', "Page Top", 1, "core", "colls_list" )' );
+			}
+			else
+			{	// This is not a public blog, let's give it a restricted navigation list by default:
+				// TODO
+			}
+
 			// Add title to all blog Headers:
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 									 VALUES( '.$edited_Blog->ID.', "Header", 1, "core", "coll_title" )' );
@@ -418,6 +428,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2007/05/08 19:36:06  fplanque
+ * automatic install of public blog list widget on new blogs
+ *
  * Revision 1.19  2007/05/07 23:26:19  fplanque
  * public blog list as a widget
  *
