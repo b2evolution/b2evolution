@@ -102,7 +102,6 @@ class Blog extends DataObject
 	var $allowblogcss = 0;
 	var $allowusercss = 0;
 	var $skin_ID;
-	var $disp_bloglist = 1;
 	var $in_bloglist = 1;
 	var $UID;
 	var $media_location = 'default';
@@ -186,7 +185,6 @@ class Blog extends DataObject
 			$this->allowblogcss = $db_row->blog_allowblogcss;
 			$this->allowusercss = $db_row->blog_allowusercss;
 			$this->skin_ID = $db_row->blog_skin_ID;
-			$this->disp_bloglist = $db_row->blog_disp_bloglist;
 			$this->in_bloglist = $db_row->blog_in_bloglist;
 			$this->media_location = $db_row->blog_media_location;
 			$this->media_subdir = $db_row->blog_media_subdir;
@@ -373,9 +371,6 @@ class Blog extends DataObject
 			// checkboxes (will not get send, if unchecked)
 			$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
 			$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
-
-			$this->set( 'disp_bloglist', param( 'blog_disp_bloglist', 'integer', 0 ) );
-			$this->set( 'in_bloglist',   param( 'blog_in_bloglist',   'integer', 0 ) );
 		}
 
 
@@ -485,6 +480,9 @@ class Blog extends DataObject
 				$this->set( 'owner_user_ID', $owner_User->ID );
 				$this->owner_User = & $owner_User;
 			}
+
+			// Public blog list
+			$this->set( 'in_bloglist',   param( 'blog_in_bloglist',   'integer', 0 ) );
 		}
 
 		return ! param_errors_detected();
@@ -539,7 +537,7 @@ class Blog extends DataObject
 		{
 			case 'ID':
 			case 'allowtrackbacks':
-			case 'disp_bloglist':
+			case 'blog_in_bloglist':
 				return parent::set_param( $parname, 'number', $parvalue );
 				break;
 
@@ -1360,6 +1358,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.77  2007/05/08 00:54:31  fplanque
+ * public blog list as a widget
+ *
  * Revision 1.76  2007/04/26 00:11:05  fplanque
  * (c) 2007
  *

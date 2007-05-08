@@ -135,7 +135,6 @@ $schema_queries = array(
 			blog_allowblogcss    TINYINT(1) NOT NULL default 1,
 			blog_allowusercss    TINYINT(1) NOT NULL default 1,
 			blog_skin_ID         INT(10) UNSIGNED NOT NULL DEFAULT 1,
-			blog_disp_bloglist   TINYINT(1) NOT NULL DEFAULT 1,
 			blog_in_bloglist     TINYINT(1) NOT NULL DEFAULT 1,
 			blog_links_blog_ID   INT(11) NULL DEFAULT NULL,
 			blog_commentsexpire  INT(4) NOT NULL DEFAULT 0,
@@ -526,6 +525,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.59  2007/05/08 00:54:31  fplanque
+ * public blog list as a widget
+ *
  * Revision 1.58  2007/05/04 21:23:17  fplanque
  * no message
  *

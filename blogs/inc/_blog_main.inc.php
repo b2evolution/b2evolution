@@ -444,14 +444,6 @@ $Timer->pause( '_blog_main.inc');
 $Plugins->trigger_event( 'BeforeBlogDisplay', array('skin'=>$skin) );
 
 
-// Set default display params (in case no info was provided by stub file):
-// Displaying of blog list on templates?
-if( !isset($display_blog_list) )
-{ // If not already set in stub:
-	$display_blog_list = $Blog->get('disp_bloglist');
-}
-
-
 if( !empty( $skin ) )
 { // We want to display with a skin now:
 
@@ -499,6 +491,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.77  2007/05/08 00:54:31  fplanque
+ * public blog list as a widget
+ *
  * Revision 1.76  2007/05/07 18:59:45  fplanque
  * renamed skin .page.php files to .tpl.php
  *

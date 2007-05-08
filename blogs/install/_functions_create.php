@@ -228,7 +228,7 @@ function create_blog(
 	$query = "INSERT INTO T_blogs( blog_name, blog_shortname, blog_siteurl,
 						blog_urlname, blog_staticfilename,
 						blog_tagline, blog_longdesc, blog_locale,
-						blog_allowcomments, blog_allowtrackbacks, blog_disp_bloglist,
+						blog_allowcomments, blog_allowtrackbacks,
 						blog_in_bloglist, blog_links_blog_ID )
 	VALUES ( ";
 	$query .= "'".$DB->escape($blog_name)."', ";
@@ -239,7 +239,7 @@ function create_blog(
 	$query .= "'".$DB->escape($blog_tagline)."', ";
 	$query .= "'".$DB->escape($blog_longdesc)."', ";
 	$query .= "'".$DB->escape($default_locale)."', ";
-	$query .= "'post_by_post', 0, 1, 1, $blog_links_blog_ID )";
+	$query .= "'post_by_post', 0, 1, $blog_links_blog_ID )";
 
 	if( ! ($DB->query( $query )) )
 		return false;
@@ -595,6 +595,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.224  2007/05/08 00:54:31  fplanque
+ * public blog list as a widget
+ *
  * Revision 1.223  2007/05/07 18:59:45  fplanque
  * renamed skin .page.php files to .tpl.php
  *

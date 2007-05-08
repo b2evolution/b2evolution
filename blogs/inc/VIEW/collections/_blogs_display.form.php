@@ -70,11 +70,6 @@ $Form->begin_fieldset( T_('Skin and style') );
 	$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to override the blog and skin stylesheet with their own.') );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('List of public blogs') );
-	$Form->checkbox( 'blog_disp_bloglist', $edited_Blog->get( 'disp_bloglist' ), T_('Display public blog list'), T_('Check this if you want to display the list of all blogs on your blog page (if your skin supports this).') );
-	$Form->checkbox( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want this blog to be displayed in the list of all public blogs.') );
-$Form->end_fieldset();
-
 $Form->begin_fieldset( T_('Link blog / Blogroll') );
 	$BlogCache = & get_Cache( 'BlogCache' );
 	$Form->select_object( 'blog_links_blog_ID', $edited_Blog->get( 'links_blog_ID' ), $BlogCache, T_('Default linkblog'), T_('Will be displayed next to this blog (if your skin supports this).'), true );
@@ -87,6 +82,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.11  2007/05/08 00:54:31  fplanque
+ * public blog list as a widget
+ *
  * Revision 1.10  2007/04/26 00:11:05  fplanque
  * (c) 2007
  *

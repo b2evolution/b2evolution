@@ -64,6 +64,10 @@ $Form->begin_fieldset( T_('Permissions') );
 	// fp> TODO: checkbox 'Advanced perms', 'Check to enable advanced user & group permission tabs'
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('List of public blogs') );
+	$Form->checkbox( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want this blog to be displayed in the list of all public blogs.') );
+$Form->end_fieldset();
+
 $Form->begin_fieldset( T_('Feedback options') );
 	$Form->radio( 'blog_allowcomments', $edited_Blog->get( 'allowcomments' ),
 						array(  array( 'always', T_('Always on all posts'), T_('Always allow comments on every posts') ),
@@ -90,6 +94,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.22  2007/05/08 00:54:31  fplanque
+ * public blog list as a widget
+ *
  * Revision 1.21  2007/04/26 00:11:05  fplanque
  * (c) 2007
  *
