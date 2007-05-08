@@ -110,7 +110,7 @@ div.pageHeader h1 {
 	padding: 0;
 }
 
-ul#bloglist {
+div.PageTop ul {
 	background-color: #fff;
 	border-bottom: 1px solid #000;
 	margin: 0 1px;
@@ -118,29 +118,28 @@ ul#bloglist {
 	list-style-type:none;
 	padding: .5ex 0;
 }
-ul#bloglist li {
+div.PageTop ul li {
 	border-right: 1px solid #000;
 	display: inline;
 	padding: .5ex 1em;
 }
 
-a.BlogButton,
-a.BlogButtonCurr {
+div.PageTop a {
 	font-weight: bold;
 	text-decoration: none;
 }
-a.BlogButton {
+div.PageTop a.default {
 	color: #000;
 }
-a.BlogButton:hover {
+div.PageTop a.default:hover {
 	text-decoration: underline;
 	color: #9ae;
 }
-a.BlogButtonCurr,
-a.BlogButtonCurr:visited {
+div.PageTop a.selected,
+div.PageTop a.selected:visited {
 	color: #78a;
 }
-a.BlogButtonCurr:hover {
+div.PageTop a.selected:hover {
 	text-decoration: underline;
 	color: #9ae;
 }

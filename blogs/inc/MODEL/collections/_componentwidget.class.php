@@ -431,14 +431,15 @@ class ComponentWidget extends DataObject
 			{ // don't show
 				continue;
 			}
-			echo $params['item_start'];
 
 			if( $curr_blog_ID == $Blog->ID )
 			{ // This is the blog being displayed on this page:
+  			echo $params['item_selected_start'];
 				$link_class = $params['link_selected_class'];
 			}
 			else
 			{
+				echo $params['item_start'];
 				$link_class = $params['link_default_class'];;
 			}
 
@@ -454,7 +455,14 @@ class ComponentWidget extends DataObject
 
 			echo $blog_link;
 
-			echo $params['item_end'];
+			if( $curr_blog_ID == $Blog->ID )
+			{ // This is the blog being displayed on this page:
+  			echo $params['item_selected_end'];
+			}
+			else
+			{
+				echo $params['item_end'];
+			}
 		}
 
 		echo $params['list_end'];
@@ -495,6 +503,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2007/05/08 00:42:07  fplanque
+ * public blog list as a widget
+ *
  * Revision 1.21  2007/05/07 23:26:19  fplanque
  * public blog list as a widget
  *

@@ -39,12 +39,20 @@ skin_content_header();	// Sets charset!
 // -------------------------------- END OF HEADER --------------------------------
 ?>
 
-<?php
-	/**
-	 * --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	 */
-	require( dirname(__FILE__).'/_bloglist.php' );
-	// ---------------------------------- END OF BLOG LIST ---------------------------------
+	<?php
+		// Display container and contents:
+		$Skin->container( NT_('Page Top'), array(
+				// The following params will be used as defaults for widgets included in this container:
+				'block_start' => '<div class="$wi_class$">',
+				'block_end' => '</div>',
+				'block_display_title' => false,
+				'list_start' =>  T_('Select blog:').' ',
+				'list_end' => '',
+				'item_start' => ' [',
+				'item_end' => '] ',
+				'item_selected_start' => ' [<strong>',
+				'item_selected_end' => '</strong>] ',
+			) );
 	?>
 
 

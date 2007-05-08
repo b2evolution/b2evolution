@@ -90,6 +90,9 @@ code {
 a.discrete {
 	text-decoration: none;
 }
+a.selected {
+	font-weight: bold;
+}
 
 /*
  * Evo Toolbar

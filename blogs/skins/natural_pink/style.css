@@ -98,18 +98,18 @@ h4 {
 /*
  * Blog list on top:
  */
-ul#bloglist {
+div.PageTop ul {
 	border-bottom: 1px dotted #000;
 	margin: 0 1ex;
 	padding: 0;
 	list-style-type:none;
 	padding: .5ex 0;
 }
-ul#bloglist li {
+div.PageTop li {
 	display: inline;
 	padding-right: 1em;
 }
-a.BlogButtonCurr {
+div.PageTop a.selected {
 	color: #f09;
 	font-weight:bold;
 }

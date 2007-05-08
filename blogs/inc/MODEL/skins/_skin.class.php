@@ -134,12 +134,14 @@ class Skin extends DataObject
 					'list_end' => '</ul>',
 					'item_start' => '<li>',
 					'item_end' => '</li>',
+					'item_selected_start' => '<li>',
+					'item_selected_end' => '</li>',
 					'group_start' => '<ul>',
 					'group_end' => '</ul>',
 					'notes_start' => '<div class="notes">',
 					'notes_end' => '</div>',
 					'link_selected_class' => 'selected',
-					'link_default_class' => '',
+					'link_default_class' => 'default',
 				), $params );
 
    	$WidgetCache = & get_Cache( 'WidgetCache' );
@@ -364,6 +366,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2007/05/08 00:42:07  fplanque
+ * public blog list as a widget
+ *
  * Revision 1.17  2007/05/07 23:26:19  fplanque
  * public blog list as a widget
  *
