@@ -1210,6 +1210,42 @@ param( 'import_mode', 'string', 'normal' );
 
 /* ------ FUNCTIONS ------ */
 
+/**
+ * @todo fp> this needs to be deprecated
+ * @todo fp> get rid of the $cache_blogs crap and use $BlogCache only
+ */
+function blog_load_cache()
+{
+	global $DB, $cache_blogs;
+	if( empty($cache_blogs) )
+	{
+		$BlogCache = & get_Cache('BlogCache');
+		$cache_blogs = array();
+
+		foreach( $DB->get_results( "SELECT * FROM T_blogs ORDER BY blog_ID", OBJECT, 'blog_load_cache()' ) as $this_blog )
+		{
+			$cache_blogs[$this_blog->blog_ID] = $this_blog;
+
+			// Add it to BlogCache, so it does not need to load it also again:
+			// NOTE: dh> it may be bad to instantiate all objects, but there's no shadow_cache for rows..
+			$BlogCache->instantiate($this_blog);
+			//echo 'just cached:'.$cache_blogs[$this_blog->blog_ID]->blog_name.'('.$this_blog->blog_ID.')<br />';
+		}
+		$BlogCache->all_loaded = true;
+	}
+}
+
+
+/**
+ * Get name for a given cat
+ */
+function get_catname($cat_ID)
+{
+	$cat = get_the_category_by_ID( $cat_ID );
+	return $cat['cat_name'];
+}
+
+
 function fieldset_cats()
 {
 	global $cache_blogs, $cache_categories;
@@ -1625,6 +1661,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.32  2007/05/09 00:58:54  fplanque
+ * massive cleanup of old functions
+ *
  * Revision 1.31  2007/04/26 00:11:15  fplanque
  * (c) 2007
  *

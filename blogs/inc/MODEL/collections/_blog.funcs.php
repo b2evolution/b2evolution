@@ -338,156 +338,6 @@ function blogperms_from_easy( $easy_group )
 
 
 /**
- * get_bloginfo(-)
- *
- * @deprecated deprecated by Blog::get() This is now a dirty stub
- */
-function get_bloginfo( $show = '', $this_blogparams = '' )
-{
-	global $Blog, $blog;
-
-	$BlogCache = & get_Cache( 'BlogCache' );
-
-	if( empty( $this_blogparams ) )
-	{ // We want the global blog on the page
-		if( isset( $Blog ) )
-			$current_Blog = & $Blog;
-		else
-			$current_Blog = & $BlogCache->get_by_ID($blog);
-	}
-	else
-	{
-		$current_Blog = & $BlogCache->get_by_ID($this_blogparams->blog_ID);
-	}
-
-	return $current_Blog->get( $show );
-}
-
-
-/**
- * @todo fp> this needs to be deprecated
- * @todo fp> get rid of the $cache_blogs crap and use $BlogCache only
- */
-function blog_load_cache()
-{
-	global $DB, $cache_blogs;
-	if( empty($cache_blogs) )
-	{
-		$BlogCache = & get_Cache('BlogCache');
-		$cache_blogs = array();
-
-		foreach( $DB->get_results( "SELECT * FROM T_blogs ORDER BY blog_ID", OBJECT, 'blog_load_cache()' ) as $this_blog )
-		{
-			$cache_blogs[$this_blog->blog_ID] = $this_blog;
-
-			// Add it to BlogCache, so it does not need to load it also again:
-			// NOTE: dh> it may be bad to instantiate all objects, but there's no shadow_cache for rows..
-			$BlogCache->instantiate($this_blog);
-			//echo 'just cached:'.$cache_blogs[$this_blog->blog_ID]->blog_name.'('.$this_blog->blog_ID.')<br />';
-		}
-		$BlogCache->all_loaded = true;
-	}
-}
-
-
-/*****
- * About-the-blog tags
- * Note: these tags go anywhere in the template
- *****/
-
-/**
- * bloginfo(-)
- *
- * Template tag
- *
- * @deprecated deprecated by {@link Blog:disp()}
- */
-function bloginfo( $show='', $format = 'raw', $display = true, $this_blogparams = '' )
-{
-	$content = get_bloginfo( $show, $this_blogparams );
-	$content = format_to_output( $content, $format );
-	if( $display )
-		echo $content;
-	else
-		return $content;
-}
-
-
-/**
- * Start blog iterator
- *
- * blog_list_start(-)
- */
-function blog_list_start( $need = '' )
-{
-	global $cache_blogs, $curr_blogparams, $curr_blog_ID;
-
-	blog_load_cache();
-
-	$curr_blogparams = reset( $cache_blogs );
-	if( $curr_blogparams === false )
-		return false;	// No blog!
-
-	if( (!empty($need)) && (!get_bloginfo($need, $curr_blogparams )) )
-	{	// We need the blog to have a specific criteria that is not met, search on...
-		return blog_list_next( $need );		// This can be recursive
-	}
-
-	$curr_blog_ID = $curr_blogparams->blog_ID;
-	//echo "blogID=", $curr_blog_ID;
-	return $curr_blog_ID;
-}
-
-
-/**
- * Next blog iteration
- *
- * blog_list_next(-)
- */
-function blog_list_next( $need='' )
-{
-	global $cache_blogs, $curr_blogparams, $curr_blog_ID;
-
-	$curr_blogparams = next( $cache_blogs );
-	if( $curr_blogparams === false )
-		return false; // No more blog!
-
-	// echo 'need: ', $need, ' info:',get_bloginfo($need, $curr_blogparams );
-
-	if( (!empty($need)) && (!get_bloginfo($need, $curr_blogparams )) )
-	{ // We need the blog to have a specific criteria that is not met, search on...
-		return blog_list_next( $need );		// This can be recursive
-	}
-
-	$curr_blog_ID = $curr_blogparams->blog_ID;
-	// echo "blogID=", $curr_blog_ID;
-	return $curr_blog_ID;
-}
-
-
-/**
- * blog_list_iteminfo(-)
- *
- * Display info about item
- *
- * fplanque: created
- */
-function blog_list_iteminfo( $what, $show = 'raw' )
-{
-	global $curr_blogparams;
-
-	$raw_info = get_bloginfo( $what, $curr_blogparams );
-
-	if( $show )
-	{
-		echo format_to_output( $raw_info, $show );
-	}
-
-	return $raw_info;
-}
-
-
-/**
  * Check permissions on a given blog (by ID) and autoselect an appropriate blog
  * if necessary.
  *
@@ -517,16 +367,17 @@ function autoselect_blog( $permname, $permlevel = 'any' )
 	if( !$autoselected_blog )
 	{ // No blog is selected so far (or selection was invalid)...
 		// Let's try to find another one:
-		for( $curr_blog_ID = blog_list_start();
-					$curr_blog_ID != false;
-					$curr_blog_ID = blog_list_next() )
+
+    /**
+		 * @var BlogCache
+		 */
+		$BlogCache = & get_Cache( 'BlogCache' );
+
+		// Get first suitable blog
+		$blog_array = $BlogCache->load_user_blogs( $permname, $permlevel, $current_User->ID, 'ID', 1 );
+		if( !empty($blog_array) )
 		{
-			// not good for demouser>edit_cats: if( $current_User->check_perm( 'blog_ismember', 1, false, $curr_blog_ID ) )
-			if( $current_User->check_perm( $permname, $permlevel, false, $curr_blog_ID ) )
-			{ // Current user is a member of this blog... let's select it:
-				$autoselected_blog = $curr_blog_ID;
-				break;
-			}
+			$autoselected_blog = $blog_array[0];
 		}
 	}
 
@@ -536,7 +387,7 @@ function autoselect_blog( $permname, $permlevel = 'any' )
 		{
 			// echo 'autoselected a new blog';
 	   	$BlogCache = & get_Cache( 'BlogCache' );
-			$Blog = $BlogCache->get_by_ID( $blog, true, false );	// COPY !
+			$Blog = & $BlogCache->get_by_ID( $blog, true, false );	// fp> removed copy here. not sure why there was one! and it created a nasty bug.
 		}
 		return true;
 	}
@@ -596,6 +447,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.24  2007/05/09 00:58:55  fplanque
+ * massive cleanup of old functions
+ *
  * Revision 1.23  2007/04/26 00:11:05  fplanque
  * (c) 2007
  *
@@ -628,47 +482,5 @@ function set_working_blog( $new_blog_ID )
  *
  * Revision 1.14  2006/10/08 03:52:09  blueyed
  * Tell BlogCache that it has loaded all.
- *
- * Revision 1.13  2006/10/08 03:40:19  blueyed
- * Instantiate blog objects in deprecated(?) blog_load_cache(), avoiding extra query for each single blog afterwards
- *
- * Revision 1.12  2006/09/05 19:05:33  fplanque
- * refactoring
- *
- * Revision 1.11  2006/08/21 16:07:43  fplanque
- * refactoring
- *
- * Revision 1.10  2006/08/21 00:03:13  fplanque
- * obsoleted some dirty old thing
- *
- * Revision 1.9  2006/08/19 07:56:30  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.8  2006/08/19 02:15:06  fplanque
- * Half kille dthe pingbacks
- * Still supported in DB in case someone wants to write a plugin.
- *
- * Revision 1.7  2006/06/25 21:15:03  fplanque
- * Heavy refactoring of the user blog perms so it stays manageable with a large number of users...
- *
- * Revision 1.6  2006/06/19 20:07:46  fplanque
- * minor
- *
- * Revision 1.5  2006/04/19 20:13:50  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.4  2006/04/11 20:30:46  fplanque
- * yes ping weblogs by default. why not? this drives search engines to the new b2evo blogs...
- *
- * Revision 1.3  2006/04/04 21:57:35  blueyed
- * Do not ping weblogs.com by default (for default/demo blogs)
- *
- * Revision 1.2  2006/03/12 23:08:58  fplanque
- * doc cleanup
- *
- * Revision 1.1  2006/02/23 21:11:57  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
  */
 ?>

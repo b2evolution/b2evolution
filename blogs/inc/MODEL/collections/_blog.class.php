@@ -1184,7 +1184,7 @@ class Blog extends DataObject
 	 */
 	function dbdelete($delete_static_file = false, $echo = false )
 	{
-		global $DB, $cache_blogs, $Messages;
+		global $DB, $Messages;
 
 		// Note: No need to localize the status messages...
 		if( $echo ) echo '<p>MySQL 3.23 compatibility mode!';
@@ -1275,7 +1275,7 @@ class Blog extends DataObject
 		}
 
 		// Unset cache entry:
-		unset( $cache_blogs[$this->ID] );
+		// TODO
 
 		// Delete main (blog) object:
 		parent::dbdelete();
@@ -1358,6 +1358,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.78  2007/05/09 00:58:54  fplanque
+ * massive cleanup of old functions
+ *
  * Revision 1.77  2007/05/08 00:54:31  fplanque
  * public blog list as a widget
  *

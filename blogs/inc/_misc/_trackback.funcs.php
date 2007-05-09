@@ -67,13 +67,13 @@ function trackback(
 	$excerpt,
 	$ID) // post ID
 {
-	global $app_name, $app_version;
+	global $app_name, $app_version, $Blog;
 
 	echo '<p>', T_('Sending trackback to:'), ' ', htmlspecialchars($trackback_url), " ...\n";
 
 	$title = rawurlencode($title);
 	$excerpt = rawurlencode($excerpt);
-	$blog_name = rawurlencode(get_bloginfo('name'));
+	$blog_name = rawurlencode($Blog->get( 'name' ));
 	$ItemCache = & get_Cache( 'ItemCache' );
 	$Item = & $ItemCache->get_by_ID( $ID );
 	$url = rawurlencode( $Item->get_permanent_url('', '', '&') );
@@ -212,6 +212,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.14  2007/05/09 00:58:54  fplanque
+ * massive cleanup of old functions
+ *
  * Revision 1.13  2007/04/26 00:11:08  fplanque
  * (c) 2007
  *

@@ -93,7 +93,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				// TODO: clean solution : work in format_to_output! --- we probably need 'htmlfeed' as 'htmlbody+absolute'
 				echo make_rel_links_abs( $content );
 			?>]]></content:encoded>
-			<comments><?php comments_link( '', 1, 1 ) ?></comments>
+			<comments><?php echo $Item->get_single_url( 'auto' ); ?>#comments</comments>
 		</item>
 		<?php
 		}

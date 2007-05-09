@@ -194,7 +194,7 @@ class categories_plugin extends Plugin
 				}
 				else
 				{
-					$tmp_disp .= get_bloginfo('blogurl');
+					$tmp_disp .= $Blog->gen_blogurl();
 				}
 				$tmp_disp .= '">'.$params['option_all'].'</a>';
 				$tmp_disp .= $this->params['item_end'];
@@ -381,6 +381,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.42  2007/05/09 00:58:55  fplanque
+ * massive cleanup of old functions
+ *
  * Revision 1.41  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *

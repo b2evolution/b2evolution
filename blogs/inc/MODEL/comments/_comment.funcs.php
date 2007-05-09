@@ -218,31 +218,11 @@ function comments_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 }
 
 
-/**
- * Displays link to comments page
- *
- * @deprecated deprecated by {@link Item::feedback_link()}, used in rss2.php
- */
-function comments_link($file='', $tb=0, $pb=0 )
-{
-	global $id;
-	if( ($file == '') || ($file == '/')	)
-		$file = get_bloginfo('blogurl');
-	echo url_add_param( $file, 'p='. $id. '&amp;c=1' );
-	if( $tb == 1 )
-	{ // include trackback
-		echo '&amp;tb=1';
-	}
-	if( $pb == 1 )
-	{ // include pingback
-		echo '&amp;pb=1';
-	}
-	echo '#comments';
-}
-
-
 /*
  * $Log$
+ * Revision 1.11  2007/05/09 00:58:55  fplanque
+ * massive cleanup of old functions
+ *
  * Revision 1.10  2007/04/26 00:11:08  fplanque
  * (c) 2007
  *
