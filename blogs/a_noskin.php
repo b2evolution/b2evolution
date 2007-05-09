@@ -103,7 +103,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	load_class( 'MODEL/collections/_componentwidget.class.php' );
 
-	$colls_list_ComponentWidget = & new ComponentWidget( NULL, 'core', 'colls_list' );
+	$colls_list_ComponentWidget = & new ComponentWidget( NULL, 'core', 'colls_list_public' );
 
 	$colls_list_ComponentWidget->display( array(
 						'block_start' => '<div class="NavBar">',

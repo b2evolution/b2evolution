@@ -217,6 +217,34 @@ class BlogCache extends DataObjectCache
 
 
 	/**
+	 * Load a list of blogs owner by specific ID into the cache
+	 *
+	 * @param integer
+	 * @param string
+	 * @return array of IDs
+	 */
+	function load_owner_blogs( $owner_ID, $order_by = 'ID' )
+	{
+		global $DB, $Debuglog;
+
+		$Debuglog->add( "Loading <strong>$this->objtype(owner={$owner_ID})</strong> into cache", 'dataobjects' );
+
+		$sql = "SELECT *
+		          FROM {$this->dbtablename}
+		         WHERE blog_owner_user_ID = {$owner_ID}
+		         ORDER BY {$this->dbprefix}{$order_by}";
+
+		foreach( $DB->get_results( $sql, OBJECT, 'Load owner blog list' ) as $row )
+		{
+			// Instantiate a custom object
+			$this->instantiate( $row );
+		}
+
+		return $DB->get_col( NULL, 0 );
+	}
+
+
+	/**
 	 * Load blogs a user has permissions for.
 	 *
 	 * @param string permission: 'member' (default), 'browse' (files)
@@ -318,6 +346,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.22  2007/05/09 01:58:57  fplanque
+ * Widget to display other blogs from same owner
+ *
  * Revision 1.21  2007/05/09 01:00:24  fplanque
  * optimized querying for blog lists
  *

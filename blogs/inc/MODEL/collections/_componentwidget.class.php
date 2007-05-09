@@ -36,7 +36,8 @@ $core_componentwidget_defs = array(
 		'coll_search_form'  => NT_('Content Search Form'),
 		'coll_xml_feeds'    => NT_('XML Feeds (RSS / Atom)'),
 		'user_tools'        => NT_('User Tools'),
-		'colls_list'				=> NT_('Public blog list'),
+		'colls_list_public'	=> NT_('Public blog list'),
+		'colls_list_owner'  => NT_('Same owner\'s blog list'),
 	);
 
 /**
@@ -312,9 +313,14 @@ class ComponentWidget extends DataObject
 						echo $params['block_end'];
 						return true;
 
-					case 'colls_list':
+					case 'colls_list_public':
 						// List of public blogs:
-      			$this->disp_coll_list( $params );
+      			$this->disp_coll_list( $params, 'public' );
+						return true;
+
+					case 'colls_list_owner':
+						// List of public blogs:
+      			$this->disp_coll_list( $params, 'owner' );
 						return true;
 				}
 				break;
@@ -413,8 +419,11 @@ class ComponentWidget extends DataObject
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
-	function disp_coll_list( $params )
+	function disp_coll_list( $params, $filter = 'public' )
 	{
+    /**
+		 * @var Blog
+		 */
 		global $Blog;
 
 		echo $params['block_start'];
@@ -423,9 +432,19 @@ class ComponentWidget extends DataObject
 
 		echo $params['list_start'];
 
+    /**
+		 * @var BlogCache
+		 */
 		$BlogCache = & get_Cache( 'BlogCache' );
 
-		$blog_array = $BlogCache->load_public( 'ID' );
+		if( $filter == 'owner' )
+		{	// Load blogs of same owner
+			$blog_array = $BlogCache->load_owner_blogs( $Blog->owner_user_ID, 'ID' );
+		}
+		else
+		{	// Load all public blogs
+			$blog_array = $BlogCache->load_public( 'ID' );
+		}
 
 		foreach( $blog_array as $l_blog_ID )
 		{	// Loop through all public blogs:
@@ -500,6 +519,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2007/05/09 01:58:57  fplanque
+ * Widget to display other blogs from same owner
+ *
  * Revision 1.23  2007/05/09 01:00:24  fplanque
  * optimized querying for blog lists
  *

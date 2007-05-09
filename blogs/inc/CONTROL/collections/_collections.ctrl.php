@@ -145,11 +145,12 @@ switch( $action )
 			if( $edited_Blog->get( 'in_bloglist' ) )
 			{	// This is a public blog, let's give it a public global navigation list by default:
 				$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-										 VALUES( '.$edited_Blog->ID.', "Page Top", 1, "core", "colls_list" )' );
+										 VALUES( '.$edited_Blog->ID.', "Page Top", 1, "core", "colls_list_public" )' );
 			}
 			else
 			{	// This is not a public blog, let's give it a restricted navigation list by default:
-				// TODO
+				$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+										 VALUES( '.$edited_Blog->ID.', "Page Top", 1, "core", "colls_list_owner" )' );
 			}
 
 			// Add title to all blog Headers:
@@ -428,6 +429,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2007/05/09 01:58:57  fplanque
+ * Widget to display other blogs from same owner
+ *
  * Revision 1.20  2007/05/08 19:36:06  fplanque
  * automatic install of public blog list widget on new blogs
  *
