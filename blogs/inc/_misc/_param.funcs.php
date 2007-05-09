@@ -1402,6 +1402,13 @@ function url_add_param( $url, $param, $moredelim = '&amp;' )
 		return $url.$moredelim.$param.$anchor;
 	}
 
+ 	if( ! preg_match( '~(/|\.php.?)$~i', $url ) )
+	{	// blogurl is neither a PHP file nor a slash terminated folder, make it a folder:
+		// add an ending slash (or Apache does redirect to that nayway)
+		// fp> TODO: this should probably be built into all url_add_param() ??
+		$blogurl .= '/';
+	}
+
 	// These are the first params
 	return $url.'?'.$param.$anchor;
 }
@@ -1647,6 +1654,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.36  2007/05/09 00:54:44  fplanque
+ * Attempt to normalize all URLs before adding params
+ *
  * Revision 1.35  2007/04/26 00:11:08  fplanque
  * (c) 2007
  *

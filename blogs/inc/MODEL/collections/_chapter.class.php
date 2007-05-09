@@ -188,12 +188,6 @@ class Chapter extends GenericCategory
 		switch( $link_type )
 		{
 			case 'param_num':
-				if( ! preg_match( '~(/|\.php.?)$~i', $blogurl ) )
-				{	// blogurl is neither a PHP file nor a slash terminated folder, make it a folder:
-					// add an ending slash (or Apache does redirect to that nayway)
-					// fp> TODO: this should probably be built into all url_add_param() ??
-					$blogurl .= '/';
-				}
 				return url_add_param( $blogurl, 'cat='.$this->ID, $glue );
 				/* break; */
 
@@ -282,6 +276,9 @@ class Chapter extends GenericCategory
 
 /*
  * $Log$
+ * Revision 1.10  2007/05/09 00:54:45  fplanque
+ * Attempt to normalize all URLs before adding params
+ *
  * Revision 1.9  2007/04/26 00:11:06  fplanque
  * (c) 2007
  *
