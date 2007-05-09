@@ -62,7 +62,7 @@ $GenericCategoryCache = & new ChapterCache();
 /**
  * Display page header, menus & messages:
  */
-$blogListButtons = $AdminUI->get_html_collection_list( 'blog_cats', '',
+$blogListButtons = $AdminUI->get_html_collection_list( 'blog_cats', 'edit',
 											'?ctrl='.$ctrl.'&amp;blog=%d',
 											T_('List'), '?ctrl=collections&amp;blog=0' );
 
@@ -431,6 +431,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2007/05/09 01:01:29  fplanque
+ * permissions cleanup
+ *
  * Revision 1.16  2007/04/26 00:11:07  fplanque
  * (c) 2007
  *

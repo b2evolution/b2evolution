@@ -77,7 +77,7 @@ class FileRootCache
 
 		// blog/collection media dirs:
 		$BlogCache = & get_Cache( 'BlogCache' );
-		$bloglist = $BlogCache->load_user_blogs( 'browse', $current_User->ID );
+		$bloglist = $BlogCache->load_user_blogs( 'blog_media_browse', $current_User->ID );
 		foreach( $bloglist as $blog_ID )
 		{
 			if( $Root = & $this->get_by_type_and_ID( 'collection', $blog_ID, true ) )
@@ -158,6 +158,9 @@ class FileRootCache
 
 /*
  * $Log$
+ * Revision 1.9  2007/05/09 01:01:32  fplanque
+ * permissions cleanup
+ *
  * Revision 1.8  2007/04/26 00:11:10  fplanque
  * (c) 2007
  *

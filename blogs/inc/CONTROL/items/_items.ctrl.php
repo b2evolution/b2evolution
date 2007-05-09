@@ -104,11 +104,11 @@ switch( $action )
 	case 'list':
 		if( $action == 'list' )
 		{	// We only need view permission
-			$selected = autoselect_blog( 'blog_ismember', 1 );
+			$selected = autoselect_blog( 'blog_ismember', 'view' );
 		}
 		else
 		{	// We need posting permission
-			$selected = autoselect_blog( 'blog_post_statuses', 'any' );
+			$selected = autoselect_blog( 'blog_post_statuses', 'edit' );
 		}
 
 		if( ! $selected  )
@@ -524,7 +524,7 @@ switch( $action )
 	case 'new':
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 		// Generate available blogs list:
-		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_post_statuses', 'any',
+		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_post_statuses', 'edit',
 						'admin.php?ctrl=items&amp;action=new&amp;blog=%d', NULL, '',
 						'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php\', %d )' );
 
@@ -574,7 +574,7 @@ switch( $action )
 		$AdminUI->title = $AdminUI->title_titlearea = T_('Browse blog:');
 
 		// Generate available blogs list:
-		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_ismember', 1, 'admin.php?ctrl=items&amp;blog=%d&amp;tab='.$tab.'&amp;filter=restore' );
+		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_ismember', 'view', 'admin.php?ctrl=items&amp;blog=%d&amp;tab='.$tab.'&amp;filter=restore' );
 
 		/*
 		 * Add sub menu entries:
@@ -707,6 +707,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2007/05/09 01:01:32  fplanque
+ * permissions cleanup
+ *
  * Revision 1.22  2007/04/26 00:11:12  fplanque
  * (c) 2007
  *

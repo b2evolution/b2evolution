@@ -347,7 +347,7 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_', $req_b
  */
 function cat_select( $display_info = true, $form_fields = true )
 {
-	global $allow_cross_posting, $cache_blogs, $cache_categories,
+	global $allow_cross_posting, $cache_categories,
 					$blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
 
 	$r = '<div class="extracats">';
@@ -535,7 +535,7 @@ function cat_select_after_last( $parent_cat_ID, $level )
  */
 function attach_browse_tabs()
 {
-	global $AdminUI, $Blog;
+	global $AdminUI, $Blog, $current_User;
 
 	$AdminUI->add_menu_entries(
 			'items',
@@ -564,15 +564,18 @@ function attach_browse_tabs()
 			);
 	}
 
-	$AdminUI->add_menu_entries(
-			'items',
-			array(
-					'comments' => array(
-						'text' => T_('Comments'),
-						'href' => 'admin.php?ctrl=comments',
-						),
-				)
-		);
+	if( $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
+	{
+		$AdminUI->add_menu_entries(
+				'items',
+				array(
+						'comments' => array(
+							'text' => T_('Comments'),
+							'href' => 'admin.php?ctrl=comments',
+							),
+					)
+			);
+	}
 }
 
 
@@ -610,6 +613,9 @@ function visibility_select( & $Form, $post_status )
 
 /*
  * $Log$
+ * Revision 1.49  2007/05/09 01:01:32  fplanque
+ * permissions cleanup
+ *
  * Revision 1.48  2007/05/07 18:03:28  fplanque
  * cleaned up skin code a little
  *
@@ -669,14 +675,5 @@ function visibility_select( & $Form, $post_status )
  *
  * Revision 1.30  2006/11/23 00:37:35  blueyed
  * Added two more replacements in urltitle_validate and pass charset to htmlentities()
- *
- * Revision 1.29  2006/11/17 23:29:54  blueyed
- * Replaced cat_query() calls with cat_load_cache()
- *
- * Revision 1.28  2006/11/14 00:41:58  blueyed
- * Added some more substitutions to special-char-conversation in urltitle_validate(). Should get outsourced IMHO (TODO).
- *
- * Revision 1.27  2006/10/29 21:20:53  blueyed
- * Replace special characters in generated URL titles
  */
 ?>

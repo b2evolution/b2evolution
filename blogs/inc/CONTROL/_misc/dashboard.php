@@ -33,7 +33,7 @@ if( $blog )
 	}
 }
 
-$blogListButtons = $AdminUI->get_html_collection_list( 'blog_ismember', '',
+$blogListButtons = $AdminUI->get_html_collection_list( 'blog_ismember', 'view',
 											regenerate_url( array('blog'), 'blog=%d' ),
 											T_('Global'), regenerate_url( array('blog'), 'blog=0' ) );
 
@@ -174,6 +174,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2007/05/09 01:01:29  fplanque
+ * permissions cleanup
+ *
  * Revision 1.17  2007/04/26 00:11:15  fplanque
  * (c) 2007
  *

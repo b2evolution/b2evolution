@@ -50,12 +50,12 @@ switch( $action )
 		$Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission:
-		$current_User->check_perm( 'blog_comments', 'any', true, $blog );
+		$current_User->check_perm( 'blog_comments', 'edit', true, $blog );
 		break;
 
 	case 'list':
 	  // Check permission:
-		if( ! autoselect_blog( 'blog_comments', 'any' ) )
+		if( ! autoselect_blog( 'blog_comments', 'edit' ) )
 		{ // No blog could be selected
 			$Messages->add( T_('You have no permission to edit comments.' ), 'error' );
 			$action = 'nil';
@@ -186,7 +186,7 @@ switch( $action )
 		param( 'show_statuses', 'array', array(), true );	// Array of cats to restrict to
 
 		// Generate available blogs list:
-		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_comments', 'any',
+		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_comments', 'edit',
 						$pagenow.'?ctrl=comments&amp;blog=%d', NULL, '' );
 
 		/*
@@ -264,6 +264,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2007/05/09 01:01:32  fplanque
+ * permissions cleanup
+ *
  * Revision 1.7  2007/04/26 00:11:09  fplanque
  * (c) 2007
  *
