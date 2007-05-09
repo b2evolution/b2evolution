@@ -213,9 +213,10 @@ class DataObjectCache
 		$sql = "SELECT *
 		          FROM $this->dbtablename
 		         WHERE $this->dbIDname IN ($req_list)";
-		$objtype = $this->objtype;
+
 		foreach( $DB->get_results( $sql ) as $row )
 		{
+			// Instantiate a custom object
 			$this->instantiate( $row );
 		}
 	}
@@ -292,10 +293,12 @@ class DataObjectCache
 		}
 		elseif( isset( $this->shadow_cache[$obj_ID] ) )
 		{	// Already in shadow, recycle object:
+			// echo "adding shadow {$this->objtype} $obj_ID ";
 			$this->add( $this->shadow_cache[$obj_ID] );
 		}
 		else
 		{ // Not already cached, add new object:
+			// echo "adding new {$this->objtype} $obj_ID ";
 			$this->add( $this->new_obj( $db_row ) );
 		}
 
@@ -581,6 +584,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.31  2007/05/09 01:00:39  fplanque
+ * minor
+ *
  * Revision 1.30  2007/04/26 00:11:09  fplanque
  * (c) 2007
  *
@@ -616,61 +622,5 @@ class DataObjectCache
  *
  * Revision 1.18  2006/10/13 09:58:53  blueyed
  * Removed bogus unset()
- *
- * Revision 1.17  2006/10/08 03:40:19  blueyed
- * Instantiate blog objects in deprecated(?) blog_load_cache(), avoiding extra query for each single blog afterwards
- *
- * Revision 1.16  2006/09/21 16:38:50  blueyed
- * load_list(): use instantiate(), not really tested, but should work.
- *
- * Revision 1.15  2006/09/11 22:29:19  fplanque
- * chapter cleanup
- *
- * Revision 1.14  2006/09/11 22:06:08  blueyed
- * Cleaned up option_list callback handling
- *
- * Revision 1.13  2006/09/11 19:34:34  fplanque
- * fully powered the ChapterCache
- *
- * Revision 1.12  2006/09/10 16:23:00  blueyed
- * suggestion
- *
- * Revision 1.11  2006/09/10 16:16:29  blueyed
- * question
- *
- * Revision 1.10  2006/09/10 14:50:48  fplanque
- * minor / doc
- *
- * Revision 1.9  2006/09/10 00:49:56  blueyed
- * get_None_option_string proposal
- *
- * Revision 1.8  2006/09/09 22:28:08  fplanque
- * ChapterCache Restricts categories to a specific blog
- *
- * Revision 1.7  2006/09/06 21:39:21  fplanque
- * ItemList2 fixes
- *
- * Revision 1.6  2006/08/02 16:34:16  yabs
- * corrected $row to $db_row in function get_by_name()
- *
- * Revision 1.5  2006/06/14 17:26:13  fplanque
- * minor
- *
- * Revision 1.4  2006/04/19 20:13:50  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.3  2006/04/14 19:25:32  fplanque
- * evocore merge with work app
- *
- * Revision 1.2  2006/03/12 23:08:58  fplanque
- * doc cleanup
- *
- * Revision 1.1  2006/02/23 21:11:57  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.34  2006/02/08 12:24:37  blueyed
- * doc
  */
 ?>
