@@ -565,33 +565,33 @@ class AdminUI_general
 			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
 		}
 
-		for( $curr_blog_ID = blog_list_start();
-					$curr_blog_ID != false;
-					$curr_blog_ID = blog_list_next() )
-		{
-			if( ! $current_User->check_perm( $permname, $permlevel, false, $curr_blog_ID ) )
-			{ // Current user doesn't have required permission on this blog...
-				continue;
-			}
+		$BlogCache = & get_Cache( 'BlogCache' );
 
-			$r .= $template[ $curr_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
+		$blog_array = $BlogCache->load_user_blogs( $permname, $permlevel );
 
-			$r .= '<a href="'.sprintf( $url_format, $curr_blog_ID )
-						.'" class="'.( $curr_blog_ID == $blog ? 'CurrentBlog' : 'OtherBlog' ).'"';
+		foreach( $blog_array as $l_blog_ID )
+		{	// Loop through all blogs that match the requested permission:
+
+			$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
+
+			$r .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
+
+			$r .= '<a href="'.sprintf( $url_format, $l_blog_ID )
+						.'" class="'.( $l_blog_ID == $blog ? 'CurrentBlog' : 'OtherBlog' ).'"';
 
 			if( !is_null($onclick) )
 			{	// We want to include an onclick attribute:
-				$r .= ' onclick="'.sprintf( $onclick, $curr_blog_ID ).'"';
+				$r .= ' onclick="'.sprintf( $onclick, $l_blog_ID ).'"';
 			}
 
 			if( !is_null($name) )
 			{	// We want to include a name attribute:
-				$r .= ' name="'.sprintf( $name, $curr_blog_ID ).'"';
+				$r .= ' name="'.sprintf( $name, $l_blog_ID ).'"';
 			}
 
-			$r .= '>'.blog_list_iteminfo( 'shortname', false ).'</a> ';
+			$r .= '>'.$l_Blog->dget( 'shortname', 'htmlbody' ).'</a> ';
 
-			$r .= $template[ $curr_blog_ID == $blog ? 'afterEachSel' : 'afterEach' ];
+			$r .= $template[ $l_blog_ID == $blog ? 'afterEachSel' : 'afterEach' ];
 		}
 
 		$r .= $template['after'];
@@ -1529,6 +1529,13 @@ class AdminUI_general
 		}
 
 
+		$this->add_menu_entries( NULL, array(
+					'adssense' => array(
+						'text' => T_('AdSense'),
+						'href' => 'admin.php?ctrl=adsense',
+					),
+				) );
+
 		// Yet another event with crappy (inexistant) doc.
 		// WHat do we typically call this for?
 		// I don't know if it makes sense to move it here...
@@ -1614,6 +1621,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.49  2007/05/09 01:00:25  fplanque
+ * optimized querying for blog lists
+ *
  * Revision 1.48  2007/05/07 18:59:47  fplanque
  * renamed skin .page.php files to .tpl.php
  *

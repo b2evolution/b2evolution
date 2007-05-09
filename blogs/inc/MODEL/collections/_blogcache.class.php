@@ -190,53 +190,111 @@ class BlogCache extends DataObjectCache
 
 
 	/**
-	 * Load blogs of a user.
+	 * Load a list of public blogs into the cache
 	 *
-	 * @todo make a UNION query when we upgrade to MySQL 4
-	 * @todo Use cache!
-	 *
-	 * @param string criterion: 'member' (default), 'browse'
-	 * @param integer user ID
-	 * @return array The blog IDs
+	 * @param string
+	 * @return array of IDs
 	 */
-	function load_user_blogs( $criterion = 'member', $user_ID )
+	function load_public( $order_by = 'ID' )
 	{
 		global $DB, $Debuglog;
 
-		$Debuglog->add( "Loading <strong>$this->objtype(criterion: $criterion)</strong> into cache", 'dataobjects' );
+		$Debuglog->add( "Loading <strong>$this->objtype(public)</strong> into cache", 'dataobjects' );
 
-		$UserCache = & get_Cache( 'UserCache' );
-		$for_User = & $UserCache->get_by_ID( $user_ID );
+		$sql = "SELECT *
+		          FROM {$this->dbtablename}
+		         WHERE blog_in_bloglist <> 0
+		         ORDER BY {$this->dbprefix}{$order_by}";
 
-		if( !$for_User )
+		foreach( $DB->get_results( $sql, OBJECT, 'Load public blog list' ) as $row )
 		{
-			debug_die( 'load_user_blogs(): User with ID '.$user_ID.' not found!' );
+			// Instantiate a custom object
+			$this->instantiate( $row );
 		}
 
-		$where_user = 'WHERE bloguser_user_ID = '.$user_ID;
-		$where_group = 'WHERE bloggroup_group_ID = '.$for_User->Group->ID;
+		return $DB->get_col( NULL, 0 );
+	}
 
-		if( $criterion == 'browse' )
+
+	/**
+	 * Load blogs a user has permissions for.
+	 *
+	 * @param string permission: 'member' (default), 'browse' (files)
+	 * @param string
+	 * @param integer user ID
+	 * @return array The blog IDs
+	 */
+	function load_user_blogs( $permname = 'blog_ismember', $permlevel = 'view', $user_ID = NULL, $order_by = 'ID', $limit = NULL )
+	{
+		global $DB, $Debuglog;
+
+		$Debuglog->add( "Loading <strong>$this->objtype(permission: $permname)</strong> into cache", 'dataobjects' );
+
+		if( is_null($user_ID) )
 		{
-			$where_user .= ' AND bloguser_perm_media_browse = 1';
-			$where_group .= ' AND bloggroup_perm_media_browse = 1';
+			global $current_User;
+			$user_ID = $current_User->ID;
+			$Group = $current_User->Group;
+		}
+		else
+		{
+			$UserCache = & get_Cache( 'UserCache' );
+			$for_User = & $UserCache->get_by_ID( $user_ID );
+			$Group = $for_User->Group;
 		}
 
-		$bloglist_user = $DB->get_col(
-			'SELECT bloguser_blog_ID
-			   FROM T_coll_user_perms
-			'.$where_user, 0, 'Get user blog list (T_coll_user_perms)' );
+		// First check if we have a global access perm:
+ 		if( $Group->check_perm( 'blogs', $permlevel ) )
+		{ // If group grants a global permission:
+			$this->load_all();
+			return $this->get_ID_array();
+		}
 
-		$bloglist_group = $DB->get_col(
-			'SELECT bloggroup_blog_ID
-			   FROM T_coll_group_perms
-			'.$where_group, 0, 'Get user blog list (T_coll_group_perms)' );
 
-		$bloglist = array_unique( array_merge( $bloglist_user, $bloglist_group ) );
+		$sql = "SELECT DISTINCT T_blogs.*
+		          FROM T_blogs LEFT JOIN T_coll_user_perms ON (blog_ID = bloguser_blog_ID AND bloguser_user_ID = {$user_ID})
+		          		LEFT JOIN T_coll_group_perms ON (blog_ID = bloggroup_blog_ID AND bloggroup_group_ID = {$Group->ID} ) ";
+		switch( $permname )
+		{
+			case 'blog_ismember':
+				$sql .= "WHERE bloguser_ismember <> 0
+										OR bloggroup_ismember <> 0";
+				break;
 
-		$this->load_list( implode( ',', $bloglist ) );
+			case 'blog_post_statuses':
+				$sql .= "WHERE bloguser_perm_poststatuses <> ''
+										OR bloggroup_perm_poststatuses <> ''";
+				break;
 
-		return $bloglist;
+			case 'stats':
+				$permname = 'blog_properties';	// TEMP
+			case 'blog_cats':
+			case 'blog_properties':
+			case 'blog_comments':
+			case 'blog_media_browse':
+				$short_permname = substr( $permname, 5 );
+				$sql .= "WHERE bloguser_perm_{$short_permname} <> 0
+										OR bloggroup_perm_{$short_permname} <> 0";
+				break;
+
+			default:
+				debug_die( 'BlogCache::load_user_blogs() : Unsupported perm ['.$permname.']!' );
+		}
+
+		$sql .= " ORDER BY {$this->dbprefix}{$order_by}";
+
+		if( $limit )
+		{
+			$sql .= " LIMIT {$limit}";
+		}
+
+		foreach( $DB->get_results( $sql, OBJECT, 'Load user blog list' ) as $row )
+		{
+			// Instantiate a custom object
+			$this->instantiate( $row );
+		}
+
+		return $DB->get_col( NULL, 0 );
 	}
 
 
@@ -260,6 +318,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.21  2007/05/09 01:00:24  fplanque
+ * optimized querying for blog lists
+ *
  * Revision 1.20  2007/04/26 00:11:05  fplanque
  * (c) 2007
  *

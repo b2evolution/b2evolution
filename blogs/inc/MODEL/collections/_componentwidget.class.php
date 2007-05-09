@@ -423,16 +423,16 @@ class ComponentWidget extends DataObject
 
 		echo $params['list_start'];
 
-		for( $curr_blog_ID = blog_list_start();
-					$curr_blog_ID != false;
-					 $curr_blog_ID = blog_list_next() )
-		{
-			if( !blog_list_iteminfo( 'in_bloglist', false ) )
-			{ // don't show
-				continue;
-			}
+		$BlogCache = & get_Cache( 'BlogCache' );
 
-			if( $curr_blog_ID == $Blog->ID )
+		$blog_array = $BlogCache->load_public( 'ID' );
+
+		foreach( $blog_array as $l_blog_ID )
+		{	// Loop through all public blogs:
+
+			$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
+
+			if( $l_blog_ID == $Blog->ID )
 			{ // This is the blog being displayed on this page:
   			echo $params['item_selected_start'];
 				$link_class = $params['link_selected_class'];
@@ -443,19 +443,16 @@ class ComponentWidget extends DataObject
 				$link_class = $params['link_default_class'];;
 			}
 
-			$blog_link = '<a href="';
-			$blog_link .= blog_list_iteminfo('blogurl', false);
-			$blog_link .= '" class="'.$link_class.'" title="';
-			$blog_link .= format_to_output( blog_list_iteminfo('name', false), 'htmlattr' );
-			$blog_link .= '">';
+			$blog_link = '<a href="'.$l_Blog->gen_blogurl().'" class="'.$link_class.'" title="'
+										.$l_Blog->dget( 'name', 'htmlattr' ).'">';
 			// $blog_link .= $blog_selected_name_before;
-			$blog_link .= format_to_output( blog_list_iteminfo('shortname', false ), 'htmlbody' );
+			$blog_link .= $l_Blog->dget( 'shortname', 'htmlbody' );
 			// $blog_link .= $blog_selected_name_after;
 			$blog_link .= '</a>';
 
 			echo $blog_link;
 
-			if( $curr_blog_ID == $Blog->ID )
+			if( $l_blog_ID == $Blog->ID )
 			{ // This is the blog being displayed on this page:
   			echo $params['item_selected_end'];
 			}
@@ -503,6 +500,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2007/05/09 01:00:24  fplanque
+ * optimized querying for blog lists
+ *
  * Revision 1.22  2007/05/08 00:42:07  fplanque
  * public blog list as a widget
  *

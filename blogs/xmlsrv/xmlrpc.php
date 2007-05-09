@@ -686,25 +686,26 @@ function bloggergetusersblogs($m)
 
 
 	$resp_array = array();
-	// Loop through all blogs:
-	for( $curr_blog_ID=blog_list_start();
-				$curr_blog_ID!=false;
-				 $curr_blog_ID=blog_list_next() )
-	{
-		if( ! $current_User->check_perm( 'blog_ismember', 1, false, $curr_blog_ID ) )
-		{ // Current user is not a member of this blog...
-			logIO("O","Current user is not a member of this blog.->".$curr_blog_ID);
 
-			continue;
-		}
+	$BlogCache = & get_Cache( 'BlogCache' );
 
-		logIO("O","Current user IS a member of this blog.".$curr_blog_ID);
+	$blog_array = $BlogCache->load_user_blogs( 'blog_ismember', 'view', $current_User->ID, 'ID' );
+
+	foreach( $blog_array as $l_blog_ID )
+	{	// Loop through all blogs that match the requested permission:
+
+		/**
+		 * @var Blog
+		 */
+		$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
+
+		logIO("O","Current user IS a member of this blog.".$l_blog_ID);
 
 		$resp_array[] = new xmlrpcval( array(
-					"blogid" => new xmlrpcval( $curr_blog_ID ),
-					"blogName" => new xmlrpcval( blog_list_iteminfo('shortname', false) ),
-					"url" => new xmlrpcval( blog_list_iteminfo('blogurl', false) ),
-					"isAdmin" => new xmlrpcval( $current_User->check_perm( 'templates', 'any' ) ,'boolean')
+					"blogid" => new xmlrpcval( $l_blog_ID ),
+					"blogName" => new xmlrpcval( $l_Blog->get('shortname') ),
+					"url" => new xmlrpcval( $l_Blog->gen_blogurl() ),
+					"isAdmin" => new xmlrpcval( $current_User->check_perm( 'templates', 'any' ), 'boolean')
 												), 'struct');
 	}
 
@@ -2239,6 +2240,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.136  2007/05/09 01:00:25  fplanque
+ * optimized querying for blog lists
+ *
  * Revision 1.135  2007/05/08 18:50:47  fplanque
  * minor fixes
  *

@@ -71,19 +71,15 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<h2><?php echo T_('Blogs on this system') ?>:</h2>
 	<ul>
 	<?php // --------------------------- BLOG LIST -----------------------------
-		for( $curr_blog_ID = blog_list_start();
-					$curr_blog_ID != false;
-					 $curr_blog_ID = blog_list_next() )
+		for( $l_Blog = & $BlogCache->get_first();
+					! is_null( $l_Blog );
+					 $l_Blog = & $BlogCache->get_next() )
 		{ # by uncommenting the following lines you can hide some blogs
 			// if( $curr_blog_ID == 2 ) continue; // Hide blog 2...
 			echo '<li><strong>';
-			printf( T_('Blog #%d'), $curr_blog_ID );
-			echo ': <a href="';
-			blog_list_iteminfo( 'blogurl', 'raw');
-			echo '" title="';
-			blog_list_iteminfo( 'shortdesc', 'htmlattr');
-			echo '">';
-			blog_list_iteminfo( 'name', 'htmlbody');
+			printf( T_('Blog #%d'), $l_Blog->ID );
+			echo ': <a href="'.$l_Blog->gen_blogurl().'" title="'.$l_Blog->dget( 'shortdesc', 'htmlattr' ).'">';
+			$l_Blog->disp( 'name' );
 			echo '</a></strong>';
 			echo '</li>';
 		}

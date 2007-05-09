@@ -89,18 +89,24 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	$BlogCache = & get_Cache( 'BlogCache' );
 
-	for( $blog = blog_list_start();
-				$blog != false;
-				 $blog = blog_list_next() )
-	{ # by uncommenting the following lines you can hide some blogs
+	$blog_array = $BlogCache->load_public( 'ID' );
+
+	foreach( $blog_array as $blog )
+	{	// Loop through all public blogs:
+		# by uncommenting the following lines you can hide some blogs
 		// if( $blog == 2 ) continue; // Hide blog 2...
+
+    /**
+		 * @var Blog
+		 */
+		$l_Blog = & $BlogCache->get_by_ID( $blog );
+
 		?>
-		<h3><a href="<?php blog_list_iteminfo('blogurl', 'raw' ) ?>" title="<?php blog_list_iteminfo( 'shortdesc', 'htmlattr'); ?>"><?php blog_list_iteminfo( 'name', 'htmlbody'); ?></a></h3>
+		<h3><a href="<?php echo $l_Blog->gen_blogurl(); ?>" title="<?php $l_Blog->disp( 'shortdesc', 'htmlattr' ); ?>"><?php $l_Blog->disp( 'name', 'htmlattr' ); ?></a></h3>
 		<ul>
 		<?php	// Get the 3 last posts for each blog:
-			$Blog_B = & $BlogCache->get_by_ID( $blog );
 
-			$BlogBList = & new ItemList2( $Blog_B, NULL, 'now', 3 );
+			$BlogBList = & new ItemList2( $l_Blog, NULL, 'now', 3 );
 
 			$BlogBList->set_filters( array(
 					'order' => 'DESC',
@@ -121,7 +127,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 				<?php
 			}
 			?>
-			<li><a href="<?php blog_list_iteminfo('blogurl', 'raw' ) ?>"><?php echo T_('More posts...') ?></a></li>
+			<li><a href="<?php echo $l_Blog->gen_blogurl(); ?>"><?php echo T_('More posts...') ?></a></li>
 		</ul>
 		<?php
 	}
@@ -135,7 +141,9 @@ header( 'Content-type: text/html; charset='.$io_charset );
   </tr>
 </table>
 <p class="baseline"><!-- InstanceBeginEditable name="Baseline" -->
-
+<?php
+	debug_info();
+?>
 <!-- InstanceEndEditable --></p>
 </body>
 <!-- InstanceEnd --></html>
