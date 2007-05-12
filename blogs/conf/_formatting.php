@@ -19,9 +19,9 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * Choose the formatting options for your posts:
  *  0 to disable
  *  1 to ensable
- * 
+ *
  * @todo fp>This should be moved to the backoffice. Checbox for each blog.
- *  
+ *
  * @global integer 0|1
  */
 $use_balanceTags = 1;
@@ -33,7 +33,7 @@ $use_balanceTags = 1;
  * 'opt-in'  : option will be used only if user explicitely asks for it
  * 'opt-out' : option will be used by default, but user can refuse
  * 'always'  : option will always be used
- * 
+ *
  * @todo fp> remove and let Auto-P handle the comment formatting.
  */
 $comments_use_autobr = 'opt-out';	// automatically change line breaks to <br />
@@ -45,20 +45,20 @@ $comments_use_autobr = 'opt-out';	// automatically change line breaks to <br />
  * Posts and comments should be checked to see if they contain valid XHTML code
  * and no invalid code (javascript, styles, CSS, etc...)
  */
- 
+
 # Html checking will validate posts and comments to a subset of valid XHTML.
 # This will also do much cleaner security checking than the next option.
 # Note: This option requires the PHP XML module. If your PHP installation doesn't have it
 # disable html_checker and use security_checker.
 /*
- * @todo fp>This should be moved to the backoffice. Checbox for each blog. This checkbox should NOT be editable by the blog owner. 
+ * @todo fp>This should be moved to the backoffice. Checbox for each blog. This checkbox should NOT be editable by the blog owner.
  * Only the system admin should be adble to edit this. Special "Admin" tab on the blog settings.
  */
 $use_html_checker = 1;
 # Security checking will check for illegal javascript hacks in posts/comments
 # and for CSS in comments. However, this may be a bit harsh on your posts :]
 /*
- * @todo fp>This should be moved to the backoffice. Checbox for each blog. This checkbox should NOT be editable by the blog owner. 
+ * @todo fp>This should be moved to the backoffice. Checbox for each blog. This checkbox should NOT be editable by the blog owner.
  * Only the system admin should be adble to edit this. Special "Admin" tab on the blog settings.
  */
 $use_security_checker = 0;
@@ -71,6 +71,13 @@ $use_security_checker = 0;
  */
 $use_strict =  false;
 
+# Set this to true to allow id && style as core attributes for posts
+$posts_allow_css_tweaks = false;
+
+# set this to true to allow id && style as core attributes for comments
+# WARNING : This would allow spammers to post hidden content in comments
+#           enable it at your own risk !
+$comments_allow_css_tweaks = false;
 
 /*
  * HTML Checker params:
@@ -162,7 +169,7 @@ else
 }
 
 // Allowed Attribute classes
-define('A_coreattrs', 'class title');
+define('A_coreattrs', 'class title'.( $posts_allow_css_tweaks ? ' id style' : '' ) );
 define('A_i18n', 'lang xml:lang dir');
 define('A_attrs', A_coreattrs.' '.A_i18n);
 
@@ -441,7 +448,7 @@ define('C_E_a_content', '#PCDATA '.C_E_special.' '.C_E_fontstyle.' '.C_E_phrase.
 define('C_E_pre_content', '#PCDATA a '.C_E_fontstyle.' '.C_E_phrase.' '.C_E_special_pre.' '.C_E_misc_inline );
 
 // Allowed Attribute classes
-define('C_A_coreattrs', 'class title');
+define('C_A_coreattrs', 'class title'.( $comments_allow_css_tweaks ? ' id style' : '' ) );
 define('C_A_i18n', 'lang xml:lang dir');
 define('C_A_attrs', C_A_coreattrs.' '.C_A_i18n);
 define('C_A_cellhalign', 'align char charoff');
