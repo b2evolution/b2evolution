@@ -169,7 +169,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
 {
 	global $use_balanceTags, $use_html_checker, $use_security_checker;
 	global $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme;
-	global $comments_allowed_tags, $comments_allowed_attributes, $comments_allowed_uri_scheme;
+	global $comments_allowed_tags, $comments_allowed_attributes, $comments_allowed_uri_scheme, $comments_allow_css_tweaks;
 	global $io_charset;
 	global $Messages;
 
@@ -231,7 +231,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
 		}
 		// Styling restictions:
 		$matches = array();
-		if( $is_comment && preg_match ('#\s(style|class|id)\s*=#i', $check, $matches) )
+		if( $is_comment && !$comments_allow_css_tweaks && preg_match ('#\s(style|class|id)\s*=#i', $check, $matches) )
 		{
 			$Messages->add( T_('Unallowed CSS markup found: ').htmlspecialchars($matches[1]), 'error' );
 		}
@@ -1933,7 +1933,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word
  */
 function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legend = false )
 {
-	global $basepath, $admin_subdir, $baseurl, $Debuglog,	$IconLegend;
+	global $basepath, $admin_subdir, $baseurl, $Debuglog,	$IconLegend, $use_strict;
 	global $conf_path;
 
 	if( ! function_exists('get_icon_info') )
@@ -2041,8 +2041,10 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 		case 'imgtag':
 			$r = '<img src="'.$baseurl.$icon['file'].'" ';
 
-			// Include non CSS fallbacks:
-			$r .= 'border="0" align="top" ';
+			if( !$use_strict )
+			{	// Include non CSS fallbacks - transitional only:
+				$r .= 'border="0" align="top" ';
+			}
 
 			// Include class (will default to "icon"):
 			if( ! isset( $params['class'] ) )
@@ -2956,6 +2958,10 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.174  2007/05/12 10:13:25  yabs
+ * secuirty checker uses setting for allowing id/style in comments
+ * amended get_icon to respect $use_strict
+ *
  * Revision 1.173  2007/04/26 00:11:08  fplanque
  * (c) 2007
  *
