@@ -555,12 +555,12 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 						'@@@F@@@',
 						'@@@M@@@',
 						),
-					array(  $istoday,
-						T_($weekday[$dateweekday]),
-						T_($weekday_abbrev[$dateweekday]),
-						T_($weekday_letter[$dateweekday]),
-						T_($month[$datemonth]),
-						T_($month_abbrev[$datemonth]) ),
+					array( $istoday,
+						trim(T_($weekday[$dateweekday])),
+						trim(T_($weekday_abbrev[$dateweekday])),
+						trim(T_($weekday_letter[$dateweekday])),
+						trim(T_($month[$datemonth])),
+						trim(T_($month_abbrev[$datemonth])) ),
 					$r );
 		}
 	}
@@ -2958,6 +2958,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.175  2007/05/13 18:31:23  blueyed
+ * Trim special date param replacements in date_i18n(). Fixes http://forums.b2evolution.net/viewtopic.php?p=55213#55213.
+ *
  * Revision 1.174  2007/05/12 10:13:25  yabs
  * secuirty checker uses setting for allowing id/style in comments
  * amended get_icon to respect $use_strict
