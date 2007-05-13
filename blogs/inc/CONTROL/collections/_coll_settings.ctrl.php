@@ -37,8 +37,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Check permissions on requested blog and autoselect an appropriate blog if necessary.
 // This will prevent a fat error when switching tabs and you have restricted perms on blog properties.
-if( autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm check
+if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm check
 {	// We have a blog to work on:
+
+	if( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
+	{	// Selected a new blog:
+		$BlogCache = & get_Cache( 'BlogCache' );
+		$Blog = & $BlogCache->get_by_ID( $blog );
+	}
+
 	/**
 	 * @var Blog
 	 */
@@ -195,6 +202,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2007/05/13 18:49:54  fplanque
+ * made autoselect_blog() more robust under PHP4
+ *
  * Revision 1.14  2007/04/26 00:11:07  fplanque
  * (c) 2007
  *
@@ -206,7 +216,6 @@ $AdminUI->disp_global_footer();
  *
  * Revision 1.11  2006/12/18 03:20:41  fplanque
  * _header will always try to set $Blog.
- * autoselect_blog() will do so also.
  * controllers can use valid_blog_requested() to make sure we have one
  * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
  *

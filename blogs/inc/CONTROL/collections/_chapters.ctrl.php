@@ -431,6 +431,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2007/05/13 18:49:54  fplanque
+ * made autoselect_blog() more robust under PHP4
+ *
  * Revision 1.17  2007/05/09 01:01:29  fplanque
  * permissions cleanup
  *
@@ -442,7 +445,6 @@ $AdminUI->disp_global_footer();
  *
  * Revision 1.14  2006/12/18 03:20:41  fplanque
  * _header will always try to set $Blog.
- * autoselect_blog() will do so also.
  * controllers can use valid_blog_requested() to make sure we have one
  * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
  *

@@ -343,14 +343,15 @@ function blogperms_from_easy( $easy_group )
  *
  * For use in admin
  *
+ * NOTE: we no longer try to set $Blog inside of the function because later global use cannot be safely guaranteed in PHP4.
+ *
  * @param string Permission name that must be given to the {@link $current_User} object.
  * @param string Permission level that must be given to the {@link $current_User} object.
- * @return boolean true on success
+ * @return integer new selected blog
  */
 function autoselect_blog( $permname, $permlevel = 'any' )
 {
 	global $blog;
-	global $Blog;
 	global $current_User;
 
 	$autoselected_blog = $blog;
@@ -381,22 +382,7 @@ function autoselect_blog( $permname, $permlevel = 'any' )
 		}
 	}
 
-	if( $autoselected_blog )
-	{ // a blog is finally selected
-		if( set_working_blog( $autoselected_blog ) )
-		{
-			// echo 'autoselected a new blog';
-	   	$BlogCache = & get_Cache( 'BlogCache' );
-			$Blog = & $BlogCache->get_by_ID( $blog, true, false );	// fp> removed copy here. not sure why there was one! and it created a nasty bug.
-		}
-		return true;
-	}
-
-	echo 'no blog has perm';
-	$blog = 0;
-	$Blog = NULL;
-
-	return false;
+	return $autoselected_blog;
 }
 
 
@@ -447,6 +433,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.25  2007/05/13 18:49:55  fplanque
+ * made autoselect_blog() more robust under PHP4
+ *
  * Revision 1.24  2007/05/09 00:58:55  fplanque
  * massive cleanup of old functions
  *
@@ -470,7 +459,6 @@ function set_working_blog( $new_blog_ID )
  *
  * Revision 1.17  2006/12/18 03:20:41  fplanque
  * _header will always try to set $Blog.
- * autoselect_blog() will do so also.
  * controllers can use valid_blog_requested() to make sure we have one
  * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
  *

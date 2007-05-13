@@ -208,6 +208,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.31  2007/05/13 18:49:55  fplanque
+ * made autoselect_blog() more robust under PHP4
+ *
  * Revision 1.30  2007/04/26 00:11:11  fplanque
  * (c) 2007
  *
@@ -229,7 +232,6 @@ class UserSettings extends AbstractSettings
  *
  * Revision 1.24  2006/12/18 03:20:22  fplanque
  * _header will always try to set $Blog.
- * autoselect_blog() will do so also.
  * controllers can use valid_blog_requested() to make sure we have one
  * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
  *

@@ -58,10 +58,15 @@ if( $blog == 0 && $perm_view_all )
 }
 else
 {	// Find a blog we can view stats for:
-	if( ! autoselect_blog( 'stats', 'view' ) )
+	if( ! $selected = autoselect_blog( 'stats', 'view' ) )
 	{ // No blog could be selected
 		$Messages->add( T_('Sorry, there is no blog you have permission to view stats for.'), 'error' );
 		$action = 'nil';
+	}
+	elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
+	{	// Selected a new blog:
+		$BlogCache = & get_Cache( 'BlogCache' );
+		$Blog = & $BlogCache->get_by_ID( $blog );
 	}
 }
 
@@ -195,6 +200,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.37  2007/05/13 18:49:55  fplanque
+ * made autoselect_blog() more robust under PHP4
+ *
  * Revision 1.36  2007/04/26 00:11:16  fplanque
  * (c) 2007
  *

@@ -55,10 +55,16 @@ switch( $action )
 
 	case 'list':
 	  // Check permission:
-		if( ! autoselect_blog( 'blog_comments', 'edit' ) )
+	  $selected = autoselect_blog( 'blog_comments', 'edit' );
+		if( ! $selected )
 		{ // No blog could be selected
 			$Messages->add( T_('You have no permission to edit comments.' ), 'error' );
 			$action = 'nil';
+		}
+		elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
+		{	// Selected a new blog:
+			$BlogCache = & get_Cache( 'BlogCache' );
+			$Blog = & $BlogCache->get_by_ID( $blog );
 		}
 		break;
 
@@ -264,6 +270,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2007/05/13 18:49:54  fplanque
+ * made autoselect_blog() more robust under PHP4
+ *
  * Revision 1.8  2007/05/09 01:01:32  fplanque
  * permissions cleanup
  *
@@ -280,7 +289,6 @@ $AdminUI->disp_global_footer();
  *
  * Revision 1.4  2006/12/18 03:20:41  fplanque
  * _header will always try to set $Blog.
- * autoselect_blog() will do so also.
  * controllers can use valid_blog_requested() to make sure we have one
  * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
  *
