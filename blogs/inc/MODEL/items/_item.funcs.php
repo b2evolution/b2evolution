@@ -542,11 +542,11 @@ function attach_browse_tabs()
 			array(
 					'full' => array(
 						'text' => T_('Full posts'),
-						'href' => regenerate_url( 'ctrl,tab', 'ctrl=items&amp;tab=full&amp;filter=restore' ),
+						'href' => 'admin.php?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 					'list' => array(
 						'text' => T_('Post list'),
-						'href' => regenerate_url( 'ctrl,tab', 'ctrl=items&amp;tab=list&amp;filter=restore' ),
+						'href' => 'admin.php?ctrl=items&amp;tab=list&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 				)
 		);
@@ -558,7 +558,7 @@ function attach_browse_tabs()
 				array(
 						'tracker' => array(
 							'text' => T_('Tracker'),
-							'href' => regenerate_url( 'ctrl,tab', 'ctrl=items&amp;tab=tracker&amp;filter=restore' ),
+							'href' => 'admin.php?ctrl,tab', 'ctrl=items&amp;tab=tracker&amp;filter=restore&amp;blog='.$Blog->ID,
 							),
 					)
 			);
@@ -571,7 +571,7 @@ function attach_browse_tabs()
 				array(
 						'comments' => array(
 							'text' => T_('Comments'),
-							'href' => 'admin.php?ctrl=comments',
+							'href' => 'admin.php?ctrl=comments&amp;blog='.$Blog->ID,
 							),
 					)
 			);
@@ -613,6 +613,9 @@ function visibility_select( & $Form, $post_status )
 
 /*
  * $Log$
+ * Revision 1.50  2007/05/13 20:44:11  fplanque
+ * url fix
+ *
  * Revision 1.49  2007/05/09 01:01:32  fplanque
  * permissions cleanup
  *
