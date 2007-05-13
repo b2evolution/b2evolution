@@ -594,6 +594,8 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 			default:
 				return $m[0];
 		}' ), $date_format ).'~i'; // case-insensitive?
+	// Allow additional spaces, e.g. "03  May 2007" when format is "d F Y":
+	$date_regexp = preg_replace( '~ +~', '\s+', $date_regexp );
 	// echo $date_format.'...'.$date_regexp;
 
 	// Check that the numbers match the date pattern:
@@ -1654,6 +1656,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.37  2007/05/13 18:36:52  blueyed
+ * param_check_date(): Allow multiple whitespaces
+ *
  * Revision 1.36  2007/05/09 00:54:44  fplanque
  * Attempt to normalize all URLs before adding params
  *
