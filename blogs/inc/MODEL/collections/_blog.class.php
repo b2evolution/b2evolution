@@ -354,15 +354,19 @@ class Blog extends DataObject
 			param_integer_range( 'posts_per_page', 1, 9999, T_('Items/days per page must be between %d and %d.') );
 			$this->set_setting( 'posts_per_page', get_param( 'posts_per_page' ) );
 
-			param_integer_range( 'posts_per_feed', 1, 9999, T_('Items per feed must be between %d and %d.') );
-			$this->set_setting( 'posts_per_feed', get_param( 'posts_per_feed' ) );
-
 			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
 
  			$this->set_setting( 'orderby', param( 'orderby', 'string', true ) );
  			$this->set_setting( 'orderdir', param( 'orderdir', 'string', true ) );
 		}
 
+		if( param( 'feed_content',   'string', NULL ) !== NULL )
+		{ // How much content in feeds?
+			$this->set_setting( 'feed_content', get_param( 'feed_content' ) );
+
+			param_integer_range( 'posts_per_feed', 1, 9999, T_('Items per feed must be between %d and %d.') );
+			$this->set_setting( 'posts_per_feed', get_param( 'posts_per_feed' ) );
+		}
 
 		if( param( 'blog_links_blog_ID',  'integer', -1 ) != -1 )
 		{	// Default display options:
@@ -1358,6 +1362,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.79  2007/05/13 22:53:31  fplanque
+ * allow feeds restricted to post excerpts
+ *
  * Revision 1.78  2007/05/09 00:58:54  fplanque
  * massive cleanup of old functions
  *

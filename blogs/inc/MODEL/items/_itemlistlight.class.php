@@ -739,7 +739,7 @@ class ItemListLight extends DataObjectList2
 
 		// QUERY:
 		$this->sql = 'SELECT DISTINCT '.$this->Cache->dbIDname.', post_datestart, post_datemodified, post_title,
-									post_urltitle, post_main_cat_ID, post_ptyp_ID '
+									post_excerpt, post_urltitle, post_main_cat_ID, post_ptyp_ID '
 									.$this->ItemQuery->get_from()
 									.$this->ItemQuery->get_where()
 									.$this->ItemQuery->get_group_by()
@@ -1427,6 +1427,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.6  2007/05/13 22:53:31  fplanque
+ * allow feeds restricted to post excerpts
+ *
  * Revision 1.5  2007/05/13 22:02:09  fplanque
  * removed bloated $object_def
  *

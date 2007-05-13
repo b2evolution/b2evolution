@@ -2,10 +2,10 @@
 /**
  * This template generates an RSS 2.0 feed for the requested blog's latest posts
  *
- * See {@link http://backend.userland.com/rss}
- *
  * For a quick explanation of b2evo 2.0 skins, please start here:
  * {@link http://manual.b2evolution.net/Skins_2.0}
+ *
+ * See {@link http://backend.userland.com/rss092}
  *
  * @package evoskins
  * @subpackage rss
@@ -17,6 +17,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Note: even if we request the same post as $Item earlier, the following will do more restrictions (dates, etc.)
 // Init the MainList object:
 init_MainList( $Blog->get_setting('posts_per_feed') );
+
+// What level of detail do we want?
+$feed_content = $Blog->get_setting('feed_content');
+if( $feed_content == 'none' )
+{	// We don't want to provide this feed!
+	global $view_path;
+	require $view_path.'errors/_404_not_found.page.php';
+	exit();
+}
+
 
 skin_content_header( 'application/xml' );	// Sets charset!
 
@@ -44,6 +54,34 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			<dc:creator><?php $Item->get_creator_User(); $Item->creator_User->preferred_name('xml') ?></dc:creator>
 			<?php $Item->categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'htmlbody' ) // TODO: "xml" eats away the tags!! ?>
 			<guid isPermaLink="false"><?php $Item->ID() ?>@<?php echo $baseurl ?></guid>
+			<?php
+				if( $feed_content == 'excerpt' )
+				{
+					?>
+			<description><?php
+				$content = $Item->get_excerpt( 'entityencoded' );
+
+				// fp> this is another one of these "oooooh it's just a tiny little change"
+				// and "we only need to make the links absolute in RSS"
+				// and then you get half baked code! The URL LINK stays RELATIVE!! :((
+				// TODO: clean solution : work in format_to_output!
+				echo make_rel_links_abs( $content );
+			?></description>
+			<content:encoded><![CDATA[<?php
+				// Display images that are linked to this post:
+				$content = $Item->get_excerpt( 'htmlbody' );
+
+				// fp> this is another one of these "oooooh it's just a tiny little change"
+				// and "we only need to make the links absolute in RSS"
+				// and then you get half baked code! The URL LINK stays RELATIVE!! :((
+				// TODO: clean solution : work in format_to_output! --- we probably need 'htmlfeed' as 'htmlbody+absolute'
+				echo make_rel_links_abs( $content );
+			?>]]></content:encoded>
+					<?php
+				}
+				elseif( $feed_content == 'normal' )
+				{
+					?>
 			<description><?php
 			  // fp> TODO: make a clear decision on wether or not $before &nd $after get formatted to output or not.
 			  $Item->url_link( '&lt;p&gt;', '&lt;/p&gt;', '%s', array(), 'entityencoded' );
@@ -93,6 +131,9 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				// TODO: clean solution : work in format_to_output! --- we probably need 'htmlfeed' as 'htmlbody+absolute'
 				echo make_rel_links_abs( $content );
 			?>]]></content:encoded>
+					<?php
+				}
+			?>
 			<comments><?php echo $Item->get_single_url( 'auto' ); ?>#comments</comments>
 		</item>
 		<?php

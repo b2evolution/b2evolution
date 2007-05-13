@@ -51,14 +51,12 @@ $Form->begin_fieldset( T_('Content / Posts') );
 												array( 'posts', T_('posts') ),
 											), T_('Display unit'), false,  T_('Do you want to restrict on the number of days or the number of posts?') );
 	$Form->text( 'posts_per_page', $edited_Blog->get_setting('posts_per_page'), 4, T_('Posts/Days per page'), T_('How many days or posts fo you want to display on the home page?'), 4 );
-	$Form->text( 'posts_per_feed', $edited_Blog->get_setting('posts_per_feed'), 4, T_('Posts in RSS/Atom feeds'),  T_('How many of the latest posts do you want to include in RSS & Atom feeds?'), 4 );
 	$Form->radio( 'archive_mode',  $edited_Blog->get_setting('archive_mode'),
 							array(  array( 'monthly', T_('monthly') ),
 											array( 'weekly', T_('weekly') ),
 											array( 'daily', T_('daily') ),
 											array( 'postbypost', T_('post by post') )
 										), T_('Archive grouping'), false,  T_('How do you want to browse the post archives? May also apply to permalinks.') );
-
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Skin and style') );
@@ -82,6 +80,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.12  2007/05/13 22:53:31  fplanque
+ * allow feeds restricted to post excerpts
+ *
  * Revision 1.11  2007/05/08 00:54:31  fplanque
  * public blog list as a widget
  *

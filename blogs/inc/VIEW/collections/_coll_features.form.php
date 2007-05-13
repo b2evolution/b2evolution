@@ -33,6 +33,15 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'features' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
+$Form->begin_fieldset( T_('XML Feeds (RSS, Atom)') );
+	$Form->radio( 'feed_content', $edited_Blog->get_setting('feed_content'),
+								array(  array( 'none', T_('No feeds') ),
+												array( 'title', T_('Titles only') ),
+												array( 'excerpt', T_('Post excerpts') ),
+												array( 'normal', T_('Post contents (stopping at "&lt;!-- more -->")') ),
+											), T_('Feed contents'), false, T_('How much content do you want to make available in feeds?') );
+	$Form->text( 'posts_per_feed', $edited_Blog->get_setting('posts_per_feed'), 4, T_('Posts in RSS/Atom feeds'),  T_('How many of the latest posts do you want to include in RSS & Atom feeds?'), 4 );
+$Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Subscriptions') );
 	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Allow email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post and/or comment.') );
@@ -52,6 +61,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.3  2007/05/13 22:53:31  fplanque
+ * allow feeds restricted to post excerpts
+ *
  * Revision 1.2  2007/04/26 00:11:05  fplanque
  * (c) 2007
  *

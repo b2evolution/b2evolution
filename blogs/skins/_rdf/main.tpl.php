@@ -18,9 +18,20 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Init the MainList object:
 init_MainList( $Blog->get_setting('posts_per_feed') );
 
+// What level of detail do we want?
+$feed_content = $Blog->get_setting('feed_content');
+if( $feed_content == 'none' )
+{	// We don't want to provide this feed!
+	global $view_path;
+	require $view_path.'errors/_404_not_found.page.php';
+	exit();
+}
+
+
 skin_content_header( 'application/xml' );	// Sets charset!
 
 echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
+
 ?>
 <!-- generator="<?php echo $app_name; ?>/<?php echo $app_version ?>" -->
 <rdf:RDF xmlns="http://purl.org/rss/1.0/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:admin="http://webns.net/mvcb/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
@@ -58,6 +69,34 @@ while( $Item = & $MainList->get_item() )
 	<dc:date><?php $Item->issue_date( 'isoZ', true ) ?></dc:date>
 	<dc:creator><?php $Item->creator_User->preferred_name( 'xml' ) ?></dc:creator>
 	<dc:subject><?php $Item->main_category( 'xml' ) ?></dc:subject>
+	<?php
+		if( $feed_content == 'excerpt' )
+		{
+			?>
+	<description><?php
+		$content = $Item->get_excerpt( 'entityencoded' );
+
+		// fp> this is another one of these "oooooh it's just a tiny little change"
+		// and "we only need to make the links absolute in RSS"
+		// and then you get half baked code! The URL LINK stays RELATIVE!! :((
+		// TODO: clean solution : work in format_to_output!
+		echo make_rel_links_abs( $content );
+	?></description>
+	<content:encoded><![CDATA[<?php
+		// Display images that are linked to this post:
+		$content = $Item->get_excerpt( 'htmlbody' );
+
+		// fp> this is another one of these "oooooh it's just a tiny little change"
+		// and "we only need to make the links absolute in RSS"
+		// and then you get half baked code! The URL LINK stays RELATIVE!! :((
+		// TODO: clean solution : work in format_to_output! --- we probably need 'htmlfeed' as 'htmlbody+absolute'
+		echo make_rel_links_abs( $content );
+	?>]]></content:encoded>
+			<?php
+		}
+		elseif( $feed_content == 'normal' )
+		{
+			?>
 	<description><?php
 		// fp> TODO: make a clear decision on wether or not $before &nd $after get formatted to output or not.
 		$Item->url_link( '&lt;p&gt;', '&lt;/p&gt;', '%s', array(), 'entityencoded' );
@@ -106,6 +145,9 @@ while( $Item = & $MainList->get_item() )
 		// TODO: clean solution : work in format_to_output! --- we probably need 'htmlfeed' as 'htmlbody+absolute'
 		echo make_rel_links_abs( $content );
 	?>]]></content:encoded>
+			<?php
+		}
+	?>
 </item>
 <?php
 }

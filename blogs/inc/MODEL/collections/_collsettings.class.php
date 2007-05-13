@@ -59,6 +59,7 @@ class CollectionSettings extends AbstractSettings
 			'orderdir'       => 'DESC',
 			'what_to_show'   => 'posts',        // posts, days
 			'posts_per_page' => '5',
+			'feed_content'   => 'normal',
 			'posts_per_feed' => '8',
 			'allow_subscriptions' => 0,					// Don't all email subscriptions by default
 			'use_workflow' => 0,								// Don't use workflow by default
@@ -98,6 +99,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.17  2007/05/13 22:53:31  fplanque
+ * allow feeds restricted to post excerpts
+ *
  * Revision 1.16  2007/04/26 00:11:06  fplanque
  * (c) 2007
  *

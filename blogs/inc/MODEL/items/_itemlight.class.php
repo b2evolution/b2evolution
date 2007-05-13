@@ -686,6 +686,19 @@ class ItemLight extends DataObject
 
 
 	/**
+	 * Template function: get excerpt
+	 *
+	 * @param string filename to use to display more
+	 * @return string
+	 */
+	function get_excerpt( $format = 'htmlbody' )
+	{
+		// Character conversions
+		return format_to_output( $this->excerpt, $format );
+	}
+
+
+	/**
 	 * Set param value
 	 *
 	 * By default, all values will be considered strings
@@ -767,6 +780,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2007/05/13 22:53:31  fplanque
+ * allow feeds restricted to post excerpts
+ *
  * Revision 1.6  2007/05/13 22:02:07  fplanque
  * removed bloated $object_def
  *

@@ -18,6 +18,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Init the MainList object:
 init_MainList( $Blog->get_setting('posts_per_feed') );
 
+// What level of detail do we want?
+$feed_content = $Blog->get_setting('feed_content');
+if( $feed_content == 'none' )
+{	// We don't want to provide this feed!
+	global $view_path;
+	require $view_path.'errors/_404_not_found.page.php';
+	exit();
+}
+
 if( $debug)
 {
 	skin_content_header( 'application/xml' );	// Sets charset!
@@ -57,6 +66,24 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		<id><?php $Item->permanent_url( 'single' ) ?></id>
 		<published><?php $Item->issue_date( 'isoZ', true ) ?></published>
 		<updated><?php $Item->mod_date( 'isoZ', true ) ?></updated>
+		<?php
+			if( $feed_content == 'excerpt' )
+			{
+				?>
+		<content type="html"><![CDATA[<?php
+				$content = $Item->get_excerpt( 'entityencoded' );
+
+				// fp> this is another one of these "oooooh it's just a tiny little change"
+				// and "we only need to make the links absolute in RSS"
+				// and then you get half baked code! The URL LINK stays RELATIVE!! :((
+				// TODO: clean solution : work in format_to_output!
+				echo make_rel_links_abs( $content );
+		?>]]></content>
+				<?php
+			}
+			elseif( $feed_content == 'normal' )
+			{
+				?>
 		<content type="html"><![CDATA[<?php
 				$Item->url_link( '<p>', '</p>' );
 
@@ -81,6 +108,9 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				// TODO: clean solution : work in format_to_output! --- we probably need 'htmlfeed' as 'htmlbody+absolute'
 				echo make_rel_links_abs( $content );
 		?>]]></content>
+			<?php
+		}
+	?>
 	</entry>
 
 	<?php

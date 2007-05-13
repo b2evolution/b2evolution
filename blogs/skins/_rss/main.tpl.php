@@ -18,9 +18,20 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Init the MainList object:
 init_MainList( $Blog->get_setting('posts_per_feed') );
 
+// What level of detail do we want?
+$feed_content = $Blog->get_setting('feed_content');
+if( $feed_content == 'none' )
+{	// We don't want to provide this feed!
+	global $view_path;
+	require $view_path.'errors/_404_not_found.page.php';
+	exit();
+}
+
+
 skin_content_header( 'application/xml' );	// Sets charset!
 
 echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
+
 ?>
 <!-- generator="<?php echo $app_name; ?>/<?php echo $app_version ?>" -->
 <rss version="0.92">
@@ -39,6 +50,24 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		?>
 		<item>
 			<title><?php $Item->title( '', '', false, 'xml' ) ?></title>
+			<?php
+				if( $feed_content == 'excerpt' )
+				{
+					?>
+			<description><?php
+				$content = $Item->get_excerpt( 'entityencoded' );
+
+				// fp> this is another one of these "oooooh it's just a tiny little change"
+				// and "we only need to make the links absolute in RSS"
+				// and then you get half baked code! The URL LINK stays RELATIVE!! :((
+				// TODO: clean solution : work in format_to_output!
+				echo make_rel_links_abs( $content );
+			?></description>
+					<?php
+				}
+				elseif( $feed_content == 'normal' )
+				{
+					?>
 			<description><?php
 			  // fp> TODO: make a clear decision on wether or not $before &nd $after get formatted to output or not.
 			  $Item->url_link( '&lt;p&gt;', '&lt;/p&gt;', '%s', array(), 'entityencoded' );
@@ -58,13 +87,16 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 
 				$content .= $Item->get_more_link( '', '', '#', '', 1, 'entityencoded' );
 
-				// fp> this is  another one of these "oooooh it's just a tiny little change"
+				// fp> this is another one of these "oooooh it's just a tiny little change"
 				// and "we only need to make the links absolute in RSS"
 				// and then you get half baked code! The URL LINK stays RELATIVE!! :((
 				// TODO: clean solution : work in format_to_output!
 				echo make_rel_links_abs( $content );
 			?></description>
 			<link><?php $Item->permanent_url( 'single' ) ?></link>
+					<?php
+				}
+			?>
 		</item>
 		<?php
 		}
