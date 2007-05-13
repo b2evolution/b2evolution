@@ -1696,12 +1696,6 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
-		echo 'Adding default Post Types... ';
-		$DB->query( "
-			REPLACE INTO T_itemtypes ( ptyp_ID, ptyp_name )
-			VALUES ( 1000, 'Page' )" );
-		echo "OK.<br />\n";
-
  		echo 'Updating columns... ';
 		$DB->query( "ALTER TABLE T_groups CHANGE COLUMN grp_perm_stats grp_perm_stats enum('none','user','view','edit') NOT NULL default 'none'" );
 
@@ -1720,6 +1714,17 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 	}
+
+
+	echo 'Adding default Post Types... ';
+	$DB->query( "
+		REPLACE INTO T_itemtypes ( ptyp_ID, ptyp_name )
+		VALUES ( 1000, 'Page' ),
+					 ( 2000, 'Reserved' ),
+					 ( 3000, 'Reserved' ),
+					 ( 4000, 'Reserved' ),
+					 ( 5000, 'Reserved' ) " );
+	echo "OK.<br />\n";
 
 
 	/*
@@ -1837,6 +1842,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.220  2007/05/13 20:44:52  fplanque
+ * more pages support
+ *
  * Revision 1.219  2007/05/02 18:28:19  fplanque
  * no message
  *

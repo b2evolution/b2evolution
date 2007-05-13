@@ -170,7 +170,11 @@ function create_default_data()
 		INSERT INTO T_itemtypes ( ptyp_ID, ptyp_name )
 		VALUES ( 1, 'Post' ),
 					 ( 2, 'Link' ),
-					 ( 1000, 'Page' ) " );
+					 ( 1000, 'Page' ),
+					 ( 2000, 'Reserved' ),
+					 ( 3000, 'Reserved' ),
+					 ( 4000, 'Reserved' ),
+					 ( 5000, 'Reserved' ) " );
 	echo "OK.<br />\n";
 
 
@@ -531,6 +535,39 @@ This is the extended text. You only see it when you have clicked the "more" link
 
 You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, skin, widgets, etc.) from the Blog Settings tab in the admin interface."), $now, $cat_ann_a );
 
+
+	$info_page = T_("This blog is powered by b2evolution.
+
+You are currently looking at an info page about %s.
+
+Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.
+
+If needed, a skin can format info pages differently from regular posts.");
+
+	// Insert a PAGE:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("About Blog B"), sprintf( $info_page, T_('Blog B') ), $now, $cat_ann_b,
+		array(), 'published', '#', '', '', 'open', array('default'), 1000 );
+
+	// Insert a PAGE:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("About Blog A"), sprintf( $info_page, T_('Blog A') ), $now, $cat_ann_a,
+		array(), 'published', '#', '', '', 'open', array('default'), 1000 );
+
+	// Insert a PAGE:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("About this system"), T_("This blog platform is powered by b2evolution.
+
+You are currently looking at an info page about this system. It is cross-posted among the 3 demo blogs. Thus, this page will be linked on each of these blogs.
+
+Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.
+
+If needed, a skin can format info pages differently from regular posts."), $now, $cat_ann_a,
+		array( $cat_ann_a, $cat_ann_b, $cat_linkblog_b2evo ), 'published', '#', '', '', 'open', array('default'), 1000 );
+
 	echo "OK.<br />\n";
 
 
@@ -595,6 +632,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.225  2007/05/13 20:44:52  fplanque
+ * more pages support
+ *
  * Revision 1.224  2007/05/08 00:54:31  fplanque
  * public blog list as a widget
  *
