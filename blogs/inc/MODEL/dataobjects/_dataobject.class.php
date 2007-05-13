@@ -517,18 +517,9 @@ class DataObject
 	 */
 	function set_param( $parname, $fieldtype, $parvalue, $make_null = false )
 	{
-		global $Debuglog, $object_def;
+		global $Debuglog;
 
-		// Dereference db name for this param:
-		// ATTENTION: the object defs are not yet available for all dataobjects
-		if( isset($this->objtype) && isset($object_def[$this->objtype]['db_cols'][$parname]) )
-		{
-			$dbfield = $object_def[$this->objtype]['db_cols'][$parname];
-		}
-		else
-		{	// definition not available: we assume that the fieldname is the same, with the dbprefix prepended:
-			$dbfield = $this->dbprefix.$parname;
-		}
+		$dbfield = $this->dbprefix.$parname;
 
 		// Set value:
 		// fplanque: Note: I am changing the "make NULL" test to differentiate between 0 and NULL .
@@ -662,6 +653,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2007/05/13 22:02:07  fplanque
+ * removed bloated $object_def
+ *
  * Revision 1.24  2007/04/26 00:11:09  fplanque
  * (c) 2007
  *

@@ -105,7 +105,7 @@ class ItemLight extends DataObject
 	               $datecreated_field = '', $datemodified_field = 'datemodified',
 	               $creator_field = '', $lasteditor_field = '' )
 	{
-		global $object_def, $localtimenow, $default_locale, $current_User;
+		global $localtimenow, $default_locale, $current_User;
 
 		// Call parent constructor:
 		parent::DataObject( $dbtable, $dbprefix, $dbIDname, $datecreated_field, $datemodified_field,
@@ -138,7 +138,8 @@ class ItemLight extends DataObject
 			$this->main_cat_ID = $db_row->post_main_cat_ID;
 			$this->urltitle = $db_row->post_urltitle;
 			$this->title = $db_row->post_title;
-			$this->typ_ID = $db_row->post_ptyp_ID;
+			$this->excerpt = $db_row->post_excerpt;
+			$this->ptyp_ID = $db_row->post_ptyp_ID;
 
 			// Derived vars
 			$ChapterCache = & get_Cache( 'ChapterCache' );
@@ -287,7 +288,7 @@ class ItemLight extends DataObject
 
 		if( empty( $permalink_type ) )
 		{
-			if( $this->typ_ID == 1000 )
+			if( $this->ptyp_ID == 1000 )
 			{	// Page: force use of single url:
 				$permalink_type = 'single';
 			}
@@ -664,10 +665,8 @@ class ItemLight extends DataObject
 	 */
 	function type( $before = '', $after = '', $format = 'htmlbody' )
 	{
-		global $object_def;
-
 		$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
-		$Element = & $ItemTypeCache->get_by_ID( $this->typ_ID, true, !$object_def[$this->objtype]['allow_null']['typ_ID'] /* Do we allow NULL statuses for this object?: */ );
+		$Element = & $ItemTypeCache->get_by_ID( $this->ptyp_ID, true, false );
 		if( !$Element )
 		{ // No status:
 			return;
@@ -724,7 +723,7 @@ class ItemLight extends DataObject
 				$this->issue_date = $parvalue;
 				return $this->set_param( 'datestart', 'date', $parvalue, false );
 
-			case 'typ_ID':
+			case 'ptyp_ID':
 				return $this->set_param( $parname, 'number', $parvalue, true );
 
 			default:
@@ -768,6 +767,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2007/05/13 22:02:07  fplanque
+ * removed bloated $object_def
+ *
  * Revision 1.5  2007/04/26 00:11:12  fplanque
  * (c) 2007
  *

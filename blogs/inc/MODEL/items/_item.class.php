@@ -41,44 +41,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_itemlight.class.php';
 
 
-global $object_def;
-/**
- * Object definition:
- */
-$object_def['Item'] = array( // definition of the object:
-			'db_cols' => array(	// maps properties to colums:
-					'ID'              => 'ID',
-					'creator_user_ID' => 'post_creator_user_ID',
-					'lastedit_user_ID'=> 'post_lastedit_user_ID',
-					'assigned_user_ID'=> 'post_assigned_user_ID',
-					'datecreated'     => 'post_datecreated',
-					'deadline'        => 'post_datedeadline',
-					'datestart'       => 'post_datestart',
-					'datemodified'    => 'post_datemodified',
-					'status'          => 'post_status',
-					'content'         => 'post_content',
-					'title'           => 'post_title',
-					'main_cat_ID'     => 'post_main_cat_ID',
-					'locale'          => 'post_locale',
-					'urltitle'        => 'post_urltitle',
-					'url'             => 'post_url',
-					'notifications_status' => 'post_notifications_status',
-					'notifications_ctsk_ID' => 'post_notifications_ctsk_ID',
-					'wordcount'       => 'post_wordcount',
-					'comment_status'  => 'post_comment_status',
-					'views'           => 'post_views',
-					'renderers'       => 'post_renderers',
-					'st_ID'           => 'post_pst_ID',
-					'typ_ID'          => 'post_ptyp_ID',
-					'priority'        => 'post_priority'
-				),
-			'allow_null' => array( // specifies column nullability:
-					'assigned_user_ID'=> true,
-					'st_ID'           => true,
-					'typ_ID'          => true,
-				),
-		);
-
 /**
  * Item Class
  *
@@ -238,7 +200,7 @@ class Item extends ItemLight
 	               $datecreated_field = 'datecreated', $datemodified_field = 'datemodified',
 	               $creator_field = 'creator_user_ID', $lasteditor_field = 'lastedit_user_ID' )
 	{
-		global $object_def, $localtimenow, $default_locale, $current_User;
+		global $localtimenow, $default_locale, $current_User;
 
 		$this->priorities = array(
 				1 => /* TRANS: Priority name */ T_('1 - Highest'),
@@ -247,9 +209,6 @@ class Item extends ItemLight
 				4 => /* TRANS: Priority name */ T_('4 - Low'),
 				5 => /* TRANS: Priority name */ T_('5 - Lowest'),
 			);
-
-		// Dereference db cols definition for this object:
-		$db_cols =  & $object_def[$objtype]['db_cols'];
 
 		// Call parent constructor:
 		parent::ItemLight( $db_row, $dbtable, $dbprefix, $dbIDname, $objtype,
@@ -271,26 +230,26 @@ class Item extends ItemLight
 		}
 		else
 		{
-			$this->datecreated = $db_row->$db_cols['datecreated']; // Needed for history display
-			$this->creator_user_ID = $db_row->$db_cols['creator_user_ID']; // Needed for history display
-			$this->lastedit_user_ID = $db_row->$db_cols['lastedit_user_ID']; // Needed for history display
-			$this->assigned_user_ID = $db_row->$db_cols['assigned_user_ID'];
-			$this->status = $db_row->$db_cols['status'];
-			$this->content = $db_row->$db_cols['content'];
-			$this->st_ID = $db_row->$db_cols['st_ID'];
-			$this->deadline = $db_row->$db_cols['deadline'];
-			$this->priority = $db_row->$db_cols['priority'];
-			$this->locale = $db_row->$db_cols['locale'];
-			$this->wordcount = $db_row->$db_cols['wordcount'];
-			$this->notifications_status = $db_row->$db_cols['notifications_status'];
-			$this->notifications_ctsk_ID = $db_row->$db_cols['notifications_ctsk_ID'];
-			$this->comment_status = $db_row->$db_cols['comment_status'];			// Comments status
+			$this->datecreated = $db_row->post_datecreated; // Needed for history display
+			$this->creator_user_ID = $db_row->post_creator_user_ID; // Needed for history display
+			$this->lastedit_user_ID = $db_row->post_lastedit_user_ID; // Needed for history display
+			$this->assigned_user_ID = $db_row->post_assigned_user_ID;
+			$this->status = $db_row->post_status;
+			$this->content = $db_row->post_content;
+			$this->pst_ID = $db_row->post_pst_ID;
+			$this->datedeadline = $db_row->post_datedeadline;
+			$this->priority = $db_row->post_priority;
+			$this->locale = $db_row->post_locale;
+			$this->wordcount = $db_row->post_wordcount;
+			$this->notifications_status = $db_row->post_notifications_status;
+			$this->notifications_ctsk_ID = $db_row->post_notifications_ctsk_ID;
+			$this->comment_status = $db_row->post_comment_status;			// Comments status
 
 			// echo 'renderers=', $db_row->post_renderers;
-			$this->renderers = $db_row->$db_cols['renderers'];
+			$this->renderers = $db_row->post_renderers;
 
-			$this->views = $db_row->$db_cols['views'];
-			$this->url = $db_row->$db_cols['url'];			// Should move
+			$this->views = $db_row->post_views;
+			$this->url = $db_row->post_url;			// Should move
 		}
 	}
 
@@ -368,7 +327,7 @@ class Item extends ItemLight
 		}
 
 		if( param( 'item_typ_ID', 'integer', NULL ) !== NULL ) {
-			$this->set_from_Request( 'typ_ID', 'item_typ_ID' );
+			$this->set_from_Request( 'ptyp_ID', 'item_typ_ID' );
 		}
 
 		if( param( 'post_url', 'string', NULL ) !== NULL ) {
@@ -396,9 +355,13 @@ class Item extends ItemLight
 			$this->set_from_Request( 'urltitle' );
 		}
 
+		if( param( 'post_excerpt', 'string', NULL ) !== NULL ) {
+			$this->set_from_Request( 'excerpt' );
+		}
+
 		// Workflow stuff:
 		if( param( 'item_st_ID', 'integer', NULL ) !== NULL ) {
-			$this->set_from_Request( 'st_ID', 'item_st_ID' );
+			$this->set_from_Request( 'pst_ID', 'item_st_ID' );
 		}
 
 		if( param( 'item_assigned_user_ID', 'integer', NULL ) !== NULL ) {
@@ -410,7 +373,7 @@ class Item extends ItemLight
 		}
 
 		if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL ) {
-			$this->set_from_Request( 'deadline', 'item_deadline', true );
+			$this->set_from_Request( 'datedeadline', 'item_deadline', true );
 		}
 
 		// Allow comments for this item (only if set to "post_by_post" for the Blog):
@@ -494,12 +457,9 @@ class Item extends ItemLight
 	 */
 	function get_assigned_user_options()
 	{
-		global $object_def;
-
 		$UserCache = & get_Cache( 'UserCache' );
 		return $UserCache->get_blog_member_option_list( $this->blog_ID, $this->assigned_user_ID,
-							$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
-							($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */ );
+							true,	($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */ );
 	}
 
 
@@ -1081,9 +1041,9 @@ class Item extends ItemLight
 	function deadline_date( $format = '', $useGM = false )
 	{
 		if( empty($format) )
-			echo mysql2date( locale_datefmt(), $this->deadline, $useGM);
+			echo mysql2date( locale_datefmt(), $this->datedeadline, $useGM);
 		else
-			echo mysql2date( $format, $this->deadline, $useGM);
+			echo mysql2date( $format, $this->datedeadline, $useGM);
 	}
 
 
@@ -1096,9 +1056,9 @@ class Item extends ItemLight
 	function deadline_time( $format = '', $useGM = false )
 	{
 		if( empty($format) )
-			echo mysql2date( locale_timefmt(), $this->deadline, $useGM );
+			echo mysql2date( locale_timefmt(), $this->datedeadline, $useGM );
 		else
-			echo mysql2date( $format, $this->deadline, $useGM );
+			echo mysql2date( $format, $this->datedeadline, $useGM );
 	}
 
 
@@ -2102,7 +2062,7 @@ class Item extends ItemLight
 	{
 		switch( $parname )
 		{
-			case 'st_ID':
+			case 'pst_ID':
 				return $this->set_param( $parname, 'number', $parvalue, true );
 
 			case 'content':
@@ -2114,8 +2074,8 @@ class Item extends ItemLight
 			case 'wordcount':
 				return $this->set_param( 'wordcount', 'number', $parvalue, false );
 
-			case 'deadline':
-				return $this->set_param( 'deadline', 'date', $parvalue, true );
+			case 'datedeadline':
+				return $this->set_param( 'datedeadline', 'date', $parvalue, true );
 
 			case 'renderers': // deprecated
 				return $this->set_renderers( $parvalue );
@@ -2206,8 +2166,8 @@ class Item extends ItemLight
 		$this->set( 'url', $post_url );
 		$this->set( 'comment_status', $post_comment_status );
 		$this->set_renderers( $post_renderers );
-		$this->set( 'typ_ID', $item_typ_ID );
-		$this->set( 'st_ID', $item_st_ID );
+		$this->set( 'ptyp_ID', $item_typ_ID );
+		$this->set( 'pst_ID', $item_st_ID );
 
 		// INSERT INTO DB:
 		$this->dbinsert();
@@ -2270,12 +2230,12 @@ class Item extends ItemLight
 	 */
 	function dbupdate()
 	{
-		global $DB, $Plugins, $object_def;
+		global $DB, $Plugins;
 
 		$DB->begin();
 
 		// validate url title
-		if( empty($this->urltitle) || isset($this->dbchanges[$object_def['Item']['db_cols']['urltitle']]) )
+		if( empty($this->urltitle) || isset($this->dbchanges['post_urltitle']) )
 		{ // Url title has changed or is empty
 			// echo 'updating url title';
 			$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID,
@@ -2730,7 +2690,7 @@ class Item extends ItemLight
 	 */
 	function get( $parname )
 	{
-		global $object_def, $post_statuses;
+		global $post_statuses;
 
 		switch( $parname )
 		{
@@ -2753,7 +2713,7 @@ class Item extends ItemLight
 
 			case 't_extra_status':
 				$ItemStatusCache = & get_Cache( 'ItemStatusCache' );
-				if( ! ($Element = & $ItemStatusCache->get_by_ID( $this->st_ID, true, false ) ) )
+				if( ! ($Element = & $ItemStatusCache->get_by_ID( $this->pst_ID, true, false ) ) )
 				{ // No status:
 					return '';
 				}
@@ -2761,13 +2721,13 @@ class Item extends ItemLight
 
 			case 't_type':
 				// Item type (name):
-				if( empty($this->typ_ID) )
+				if( empty($this->ptyp_ID) )
 				{
 					return '';
 				}
 
 				$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
-				$type_Element = & $ItemTypeCache->get_by_ID( $this->typ_ID );
+				$type_Element = & $ItemTypeCache->get_by_ID( $this->ptyp_ID );
 				return $type_Element->get_name();
 
 			case 't_priority':
@@ -2878,6 +2838,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.172  2007/05/13 22:02:07  fplanque
+ * removed bloated $object_def
+ *
  * Revision 1.171  2007/04/26 00:11:11  fplanque
  * (c) 2007
  *

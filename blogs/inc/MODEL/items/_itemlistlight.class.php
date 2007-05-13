@@ -1344,7 +1344,7 @@ class ItemListLight extends DataObjectList2
 	function date_if_changed( $before = '<h2>', $after = '</h2>', $format = '',
 														$before_empty_day = NULL, $after_empty_day = NULL )
 	{
-		if( $this->current_Obj->typ_ID == 1000 )
+		if( $this->current_Obj->ptyp_ID == 1000 )
 		{	// This is not applicable to pages
 			return;
 		}
@@ -1427,6 +1427,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.5  2007/05/13 22:02:09  fplanque
+ * removed bloated $object_def
+ *
  * Revision 1.4  2007/03/26 14:21:30  fplanque
  * better defaults for pages implementation
  *

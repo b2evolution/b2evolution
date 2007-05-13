@@ -486,7 +486,7 @@ class Session
  */
 function session_unserialize_callback( $classname )
 {
-	global $model_path, $object_def;
+	global $model_path;
 
 	switch( strtolower($classname) )
 	{
@@ -541,6 +541,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.42  2007/05/13 22:02:09  fplanque
+ * removed bloated $object_def
+ *
  * Revision 1.41  2007/04/26 00:11:11  fplanque
  * (c) 2007
  *

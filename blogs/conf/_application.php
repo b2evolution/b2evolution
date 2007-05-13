@@ -20,7 +20,7 @@ $app_version = '2.0-dev';
 /**
  * Release date
  */
-$app_date = '2007-04-29';
+$app_date = '2007-05-13';
 
 
 /**
@@ -36,7 +36,7 @@ $app_banner = '<a href="http://b2evolution.net/"><img src="'.$rsc_url.'img/b2evo
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 9410;
+$new_db_version = 9412;
 
 
 $admin_path_separator = ' :: ';

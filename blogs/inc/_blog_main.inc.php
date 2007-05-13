@@ -311,7 +311,7 @@ elseif( !empty($preview) )
 }
 elseif( $disp == 'posts' && !empty($Item) )
 { // We are going to display a single post
-	if( $Item->typ_ID == 1000 )
+	if( $Item->ptyp_ID == 1000 )
 	{
 		$disp = 'page';
 	}
@@ -491,6 +491,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.78  2007/05/13 22:02:06  fplanque
+ * removed bloated $object_def
+ *
  * Revision 1.77  2007/05/08 00:54:31  fplanque
  * public blog list as a widget
  *

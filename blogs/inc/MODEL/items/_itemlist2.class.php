@@ -447,7 +447,7 @@ class ItemList2 extends ItemListLight
 			debug_die( 'no current item!!!' );
 		}
 
-		if( $current_Item->typ_ID == 1000 ) // page
+		if( $current_Item->ptyp_ID == 1000 ) // page
 		{	// We are not on a REGULAR post:
 			$r = NULL;
 			return $r;
@@ -580,6 +580,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.64  2007/05/13 22:02:07  fplanque
+ * removed bloated $object_def
+ *
  * Revision 1.63  2007/04/26 00:11:12  fplanque
  * (c) 2007
  *
