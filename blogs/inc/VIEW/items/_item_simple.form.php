@@ -80,15 +80,16 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 // Fields used in "advanced" form, but not here:
 $Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
-$Form->hidden( 'item_typ_ID', $edited_Item->typ_ID );
+$Form->hidden( 'item_typ_ID', $edited_Item->ptyp_ID );
 $Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
+$Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );
 $Form->hidden( 'post_urltitle', $edited_Item->get( 'urltitle' ) );
 if( $Blog->get_setting( 'use_workflow' ) )
 {	// We want to use workflow properties for this blog:
 	$Form->hidden( 'item_priority', $edited_Item->priority );
 	$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
-	$Form->hidden( 'item_st_ID', $edited_Item->st_ID );
-	$Form->hidden( 'item_deadline', $edited_Item->deadline );
+	$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
+	$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
 }
 $Form->hidden( 'trackback_url', $trackback_url );
 $Form->hidden( 'renderers_displayed', 1 );
@@ -252,6 +253,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.36  2007/05/13 22:03:21  fplanque
+ * basic excerpt support
+ *
  * Revision 1.35  2007/04/26 00:11:07  fplanque
  * (c) 2007
  *

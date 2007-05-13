@@ -1716,16 +1716,22 @@ function upgrade_b2evo_tables()
 	}
 
 
-	echo 'Adding default Post Types... ';
-	$DB->query( "
-		REPLACE INTO T_itemtypes ( ptyp_ID, ptyp_name )
-		VALUES ( 1000, 'Page' ),
-					 ( 2000, 'Reserved' ),
-					 ( 3000, 'Reserved' ),
-					 ( 4000, 'Reserved' ),
-					 ( 5000, 'Reserved' ) " );
-	echo "OK.<br />\n";
+	if( $old_db_version < 9412 )
+	{
+		echo 'Adding default Post Types... ';
+		$DB->query( "
+			REPLACE INTO T_itemtypes ( ptyp_ID, ptyp_name )
+			VALUES ( 1000, 'Page' ),
+						 ( 2000, 'Reserved' ),
+						 ( 3000, 'Reserved' ),
+						 ( 4000, 'Reserved' ),
+						 ( 5000, 'Reserved' ) " );
+		echo "OK.<br />\n";
 
+		echo 'Adding field for post excerpts... ';
+		$DB->query( "ALTER TABLE T_posts ADD COLUMN post_excerpt  text NULL AFTER post_content" );
+		echo "OK.<br />\n";
+	}
 
 	/*
 	// fp> have to check if this means kiss your pagerank goodbye
@@ -1842,6 +1848,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.221  2007/05/13 22:04:48  fplanque
+ * basic excerpt support
+ *
  * Revision 1.220  2007/05/13 20:44:52  fplanque
  * more pages support
  *

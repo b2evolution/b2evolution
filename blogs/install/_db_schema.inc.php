@@ -204,6 +204,7 @@ $schema_queries = array(
 			post_ptyp_ID                int(11) unsigned NULL,
 			post_locale                 VARCHAR(20) NOT NULL DEFAULT 'en-EU',
 			post_content                MEDIUMTEXT NULL,
+			post_excerpt                text NULL,
 			post_title                  text NOT NULL,
 			post_urltitle               VARCHAR(50) NULL DEFAULT NULL,
 			post_url                    VARCHAR(255) NULL DEFAULT NULL,
@@ -525,6 +526,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.60  2007/05/13 22:03:21  fplanque
+ * basic excerpt support
+ *
  * Revision 1.59  2007/05/08 00:54:31  fplanque
  * public blog list as a widget
  *

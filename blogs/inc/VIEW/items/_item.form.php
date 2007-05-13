@@ -102,7 +102,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	echo ' <span id="itemform_typ_ID">';
 	$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
-	$Form->select_object( 'item_typ_ID', $edited_Item->typ_ID, $ItemTypeCache, T_('Type') );
+	$Form->select_object( 'item_typ_ID', $edited_Item->ptyp_ID, $ItemTypeCache, T_('Type') );
 	echo '</span>';
 
 	if( $use_post_url )
@@ -115,6 +115,9 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	{
 		$Form->hidden( 'post_url', '' );
 	}
+
+	// EXCERPT:
+ 	$Form->textarea_input( 'post_excerpt', $edited_Item->get( 'excerpt' ), 2, T_('Excerpt'), array( 'cols' => 40 , 'id' => 'itemform_post_excerpt' ) );
 
 	// --------------------------- TOOLBARS ------------------------------------
 	echo '<div class="edit_toolbars">';
@@ -225,7 +228,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 			echo ' '; // allow wrapping!
 
-			$Form->date( 'item_deadline', $edited_Item->get('deadline'), T_('Deadline') );
+			$Form->date( 'item_deadline', $edited_Item->get('datedeadline'), T_('Deadline') );
 
 		$Form->end_fieldset();
 	}
@@ -336,6 +339,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.44  2007/05/13 22:03:21  fplanque
+ * basic excerpt support
+ *
  * Revision 1.43  2007/04/26 00:11:07  fplanque
  * (c) 2007
  *
