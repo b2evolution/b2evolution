@@ -169,7 +169,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
 {
 	global $use_balanceTags, $use_html_checker, $use_security_checker;
 	global $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme;
-	global $comments_allowed_tags, $comments_allowed_attributes, $comments_allowed_uri_scheme, $comments_allow_css_tweaks;
+	global $comments_allowed_tags, $comments_allowed_attributes, $comments_allowed_uri_scheme;
 	global $io_charset;
 	global $Messages;
 
@@ -231,7 +231,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
 		}
 		// Styling restictions:
 		$matches = array();
-		if( $is_comment && !$comments_allow_css_tweaks && preg_match ('#\s(style|class|id)\s*=#i', $check, $matches) )
+		if( $is_comment && preg_match ('#\s(style|class|id)\s*=#i', $check, $matches) )
 		{
 			$Messages->add( T_('Unallowed CSS markup found: ').htmlspecialchars($matches[1]), 'error' );
 		}
@@ -2958,6 +2958,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.176  2007/05/13 20:49:34  fplanque
+ * removed hack that did inconsistent action upon the HTML and the Security checkers.
+ *
  * Revision 1.175  2007/05/13 18:31:23  blueyed
  * Trim special date param replacements in date_i18n(). Fixes http://forums.b2evolution.net/viewtopic.php?p=55213#55213.
  *
