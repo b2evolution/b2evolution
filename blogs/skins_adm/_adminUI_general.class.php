@@ -1529,14 +1529,7 @@ class AdminUI_general
 		}
 
 
-		$this->add_menu_entries( NULL, array(
-					'adssense' => array(
-						'text' => T_('AdSense'),
-						'href' => 'admin.php?ctrl=adsense',
-					),
-				) );
-
-		// Yet another event with crappy (inexistant) doc.
+		// Yet another event with no doc.
 		// WHat do we typically call this for?
 		// I don't know if it makes sense to move it here...
 		$Plugins->trigger_event( 'AdminAfterMenuInit' );
@@ -1621,6 +1614,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.50  2007/05/14 02:51:18  fplanque
+ * cleanup.
+ *
  * Revision 1.49  2007/05/09 01:00:25  fplanque
  * optimized querying for blog lists
  *
