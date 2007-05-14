@@ -304,12 +304,12 @@ $cookie_path = preg_replace( '#https?://[^/]+#', '', $baseurl );
  * example for having no dot in the host name is 'localhost', but it's the case for
  * host names in an intranet also.
  *
- * Note: Rememeber domain.com cookies will be sent to sub.domain.com too.
+ * Note: ".domain.com" cookies will be sent to sub.domain.com too.
  * But, see http://www.faqs.org/rfcs/rfc2965:
  *	"If multiple cookies satisfy the criteria above, they are ordered in
  *	the Cookie header such that those with more specific Path attributes
  *	precede those with less specific.  Ordering with respect to other
- * attributes (e.g., Domain) is unspecified."
+ *	attributes (e.g., Domain) is unspecified."
  *
  * @global string Default: ( strpos($basehost, '.') ) ? '.'. $basehost : '';
  */
