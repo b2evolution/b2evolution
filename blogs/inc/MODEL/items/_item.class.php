@@ -136,7 +136,7 @@ class Item extends ItemLight
 	 * @var string
 	 */
 	var $url;          // fp> we may want to move this to the item links which allows multiple and diffrent types of links/urls/files etc.
-	var $st_ID;
+	var $pst_ID;
 	var $deadline = '';
 	var $priority;
 
@@ -157,6 +157,15 @@ class Item extends ItemLight
 	 * @var array
 	 */
 	var $extra_cat_IDs = NULL;
+
+  /**
+	 * Array of tags (strings)
+	 *
+	 * Lazy loaded.
+	 *
+	 * @var array
+	 */
+	var $tags = NULL;
 
 	/**
 	 * Array of Links attached to this item.
@@ -196,7 +205,7 @@ class Item extends ItemLight
 	 * @param string User ID field name
 	 * @param string User ID field name
 	 */
-	function Item( $db_row = NULL, $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'post_ID', $objtype = 'Item',
+	function Item( $db_row = NULL, $dbtable = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID', $objtype = 'Item',
 	               $datecreated_field = 'datecreated', $datemodified_field = 'datemodified',
 	               $creator_field = 'creator_user_ID', $lasteditor_field = 'lastedit_user_ID' )
 	{
@@ -351,12 +360,17 @@ class Item extends ItemLight
 			}
 		}
 
+		if( param( 'post_excerpt', 'string', NULL ) !== NULL ) {
+			$this->set_from_Request( 'excerpt' );
+		}
+
 		if( param( 'post_urltitle', 'string', NULL ) !== NULL ) {
 			$this->set_from_Request( 'urltitle' );
 		}
 
-		if( param( 'post_excerpt', 'string', NULL ) !== NULL ) {
-			$this->set_from_Request( 'excerpt' );
+		if( param( 'item_tags', 'string', NULL ) !== NULL ) {
+			$this->set_tags_from_string( get_param('item_tags') );
+			// pre_dump( $this->tags );
 		}
 
 		// Workflow stuff:
@@ -599,7 +613,7 @@ class Item extends ItemLight
 
 				$cache = $DB->get_var( "
 					SELECT itpr_content_prerendered
-						FROM T_item__prerendering
+						FROM T_items__prerendering
 					 WHERE itpr_itm_ID = ".$this->ID."
 						 AND itpr_format = '".$format."'
 					   AND itpr_renderers = '".implode('.', $post_renderers)."'", 0, 0, 'Check prerendered item content' );
@@ -635,7 +649,7 @@ class Item extends ItemLight
 				if( $use_cache )
 				{ // save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
 					$DB->query( "
-						REPLACE INTO T_item__prerendering (itpr_itm_ID, itpr_format, itpr_renderers, itpr_content_prerendered)
+						REPLACE INTO T_items__prerendering (itpr_itm_ID, itpr_format, itpr_renderers, itpr_content_prerendered)
 						 VALUES ( ".$this->ID.", '".$format."', ".$DB->quote(implode('.', $post_renderers)).', '.$DB->quote($this->content_prerendered[$cache_key]).' )', 'Cache prerendered item content' );
 				}
 			}
@@ -1096,6 +1110,40 @@ class Item extends ItemLight
 			$LinkCache = & get_Cache( 'LinkCache' );
 			$this->Links = & $LinkCache->get_by_item_ID( $this->ID );
 		}
+	}
+
+
+  /**
+	 * Get array of tags
+	 *
+	 * Load from DB if necessary
+	 *
+	 * @return array
+	 */
+	function get_tags()
+	{
+		global $DB;
+
+		if( !isset( $this->tags ) )
+		{
+			$this->tags = $DB->get_col(
+											'SELECT tag_name
+											 	 FROM T_items__itemtag INNER JOIN T_items__tag ON itag_tag_ID = tag_ID
+											 	WHERE itag_itm_ID = '.$this->ID.'
+											 	ORDER BY tag_name', 0, 'Get tags for Item' );
+		}
+
+		//pre_dump( $this->tags );
+		return $this->tags;
+	}
+
+
+  /**
+	 * @param string
+	 */
+	function set_tags_from_string( $tags )
+	{
+		$this->tags = explode( ' ', $tags );
 	}
 
 
@@ -2208,6 +2256,9 @@ class Item extends ItemLight
 			// Let's handle the extracats:
 			$this->insert_update_extracats( 'insert' );
 
+			// Let's handle the tags:
+			$this->insert_update_tags( 'insert' );
+
 			$DB->commit();
 
 			$Plugins->trigger_event( 'AfterItemInsert', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
@@ -2255,8 +2306,11 @@ class Item extends ItemLight
 			// Let's handle the extracats:
 			$this->insert_update_extracats( 'update' );
 
+			// Let's handle the extracats:
+			$this->insert_update_tags( 'update' );
+
 			// Empty pre-rendered content cache - any item property may have influence on it:
-			$DB->query( 'DELETE FROM T_item__prerendering WHERE itpr_itm_ID = '.$this->ID );
+			$DB->query( 'DELETE FROM T_items__prerendering WHERE itpr_itm_ID = '.$this->ID );
 			$this->content_prerendered = NULL;
 
 			$DB->commit();
@@ -2291,7 +2345,7 @@ class Item extends ItemLight
 		if( $r = parent::dbdelete() )
 		{
 			// Empty pre-rendered content cache:
-			$DB->query( 'DELETE FROM T_item__prerendering
+			$DB->query( 'DELETE FROM T_items__prerendering
 			                   WHERE itpr_itm_ID = '.$this->ID );
 			$this->content_prerendered = NULL;
 
@@ -2347,6 +2401,62 @@ class Item extends ItemLight
 
 
 	/**
+	 * Save tags to DB
+	 *
+	 * @param string 'insert' | 'update'
+	 */
+	function insert_update_tags( $mode )
+	{
+		global $DB;
+
+		if( isset( $this->tags ) )
+		{ // Okay the tags are defined:
+
+			$DB->begin();
+
+			if( $mode == 'update' )
+			{	// delete previous tag associations:
+				// Note: actual tags never get deleted
+				$DB->query( 'DELETE FROM T_items__itemtag
+											WHERE itag_itm_ID = '.$this->ID, 'delete previous tags' );
+			}
+
+			if( !empty($this->tags) )
+			{
+				// Find the tags that are already in the DB
+				$query = 'SELECT tag_name
+										FROM T_items__tag
+									 WHERE tag_name IN ('.$DB->quote($this->tags).')';
+				$existing_tags = $DB->get_col( $query, 0, 'Find existing tags' );
+
+				$new_tags = array_diff( $this->tags, $existing_tags );
+				//pre_dump($new_tags);
+
+				if( !empty( $new_tags ) )
+				{	// insert new tags:
+					$query = "INSERT INTO T_items__tag( tag_name ) VALUES ";
+					foreach( $new_tags as $tag )
+					{
+						$query .= '( '.$DB->quote($tag).' ),';
+					}
+					$query = substr( $query, 0, strlen( $query ) - 1 );
+					$DB->query( $query, 'insert new tags' );
+				}
+
+				// ASSOC:
+				$query = 'INSERT INTO T_items__itemtag( itag_itm_ID, itag_tag_ID )
+								  SELECT '.$this->ID.', tag_ID
+									  FROM T_items__tag
+									 WHERE tag_name IN ('.$DB->quote($this->tags).')';
+				$DB->query( $query, 'Make tag associations!' );
+			}
+
+			$DB->commit();
+		}
+	}
+
+
+	/**
 	 * Increment the view count of the item directly in DB (if the item's Author is not $current_User).
 	 *
 	 * This method serves TWO purposes (that would break if we used dbupdate() ) :
@@ -2368,7 +2478,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		$DB->query( 'UPDATE T_posts
+		$DB->query( 'UPDATE T_items__item
 		                SET post_views = post_views + 1
 		              WHERE '.$this->dbIDname.' = '.$this->ID );
 
@@ -2838,6 +2948,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.173  2007/05/14 02:47:23  fplanque
+ * (not so) basic Tags framework
+ *
  * Revision 1.172  2007/05/13 22:02:07  fplanque
  * removed bloated $object_def
  *

@@ -50,7 +50,7 @@ global $pagenow;
 
 
 global $mode, $use_post_url;
-global $use_preview, $post_comment_status, $trackback_url;
+global $use_preview, $post_comment_status, $trackback_url, $item_tags;
 global $edit_date, $bozo_start_modified, $creating;
 global $item_title, $item_content;
 
@@ -205,6 +205,14 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->text( 'post_urltitle', $edited_Item->get( 'urltitle' ), 40, T_('URL Title'),
 	             T_('(to be used in permalinks)'), $field_maxlength = 50 ) ;
 
+	?>
+	<div id="itemform_tags">
+		<label for="tags"><strong><?php echo T_('Tags') ?>:</strong>
+		<span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br />
+		<input type="text" name="item_tags" class="large" id="item_tags" value="<?php echo format_to_output( $item_tags, 'formvalue' ); ?>" />
+	</div>
+	<?php
+
 	$Form->end_fieldset();
 
 
@@ -339,6 +347,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.45  2007/05/14 02:47:23  fplanque
+ * (not so) basic Tags framework
+ *
  * Revision 1.44  2007/05/13 22:03:21  fplanque
  * basic excerpt support
  *

@@ -61,9 +61,11 @@ class ItemLight extends DataObject
 
  	var $title;
 
+ 	var $excerpt;
+
 	var $urltitle;
 
- 	var $typ_ID;
+ 	var $ptyp_ID;
 
 	/**
 	 * @var integer
@@ -101,7 +103,7 @@ class ItemLight extends DataObject
 	 * @param string User ID field name
 	 * @param string User ID field name
 	 */
-	function ItemLight( $db_row = NULL, $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'post_ID', $objtype = 'ItemLight',
+	function ItemLight( $db_row = NULL, $dbtable = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID', $objtype = 'ItemLight',
 	               $datecreated_field = '', $datemodified_field = 'datemodified',
 	               $creator_field = '', $lasteditor_field = '' )
 	{
@@ -113,7 +115,7 @@ class ItemLight extends DataObject
 
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_links', 'fk'=>'link_dest_itm_ID', 'msg'=>T_('%d links to source items') ),
-				array( 'table'=>'T_posts', 'fk'=>'post_parent_ID', 'msg'=>T_('%d links to child items') ),
+				array( 'table'=>'T_items__item', 'fk'=>'post_parent_ID', 'msg'=>T_('%d links to child items') ),
 			);
 
 		$this->delete_cascades = array(
@@ -688,6 +690,8 @@ class ItemLight extends DataObject
 	/**
 	 * Template function: get excerpt
 	 *
+	 * @todo do we want excerpts in itemLight or not?
+	 *
 	 * @param string filename to use to display more
 	 * @return string
 	 */
@@ -780,6 +784,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2007/05/14 02:47:23  fplanque
+ * (not so) basic Tags framework
+ *
  * Revision 1.7  2007/05/13 22:53:31  fplanque
  * allow feeds restricted to post excerpts
  *

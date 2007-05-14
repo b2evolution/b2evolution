@@ -199,7 +199,7 @@ function convert_lang_to_locale( $table, $columnlang, $columnID )
  */
 function upgrade_b2evo_tables()
 {
-	global $db_config;
+	global $db_config, $tableprefix;
 	global $baseurl, $old_db_version, $new_db_version;
 	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
 	global $locales, $default_locale;
@@ -1733,11 +1733,39 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 	}
 
+	if( $old_db_version < 9414 )
+	{
+		echo "Renaming tables...";
+		$DB->query( "RENAME TABLE {$tableprefix}item__prerendering TO T_items__prerendering,
+															{$tableprefix}poststatuses TO T_items__status,
+															{$tableprefix}posttypes TO T_items__type,
+															{$tableprefix}posts TO T_items__item" );
+		echo "OK.<br />\n";
+
+		echo "Creating Tag tables...";
+		$DB->query( "CREATE TABLE T_items__tag (
+		      tag_ID   int(11) unsigned not null AUTO_INCREMENT,
+		      tag_name varchar(50)      not null,
+		      primary key (tag_ID),
+		      UNIQUE tag_name( tag_name )
+		    )" );
+
+		$DB->query( "CREATE TABLE T_items__itemtag (
+		      itag_itm_ID int(11) unsigned NOT NULL,
+		      itag_tag_ID int(11) unsigned NOT NULL,
+		      PRIMARY KEY (itag_itm_ID, itag_tag_ID),
+		      UNIQUE tagitem ( itag_tag_ID, itag_itm_ID )
+		    )" );
+		echo "OK.<br />\n";
+	}
+
+
+
 	/*
 	// fp> have to check if this means kiss your pagerank goodbye
 		echo 'Updating URL titles... ';
 		$DB->query( '
-      UPDATE T_posts
+      UPDATE T_items__item
          SET post_urltitle = REPLACE( post_urltitle, "_", "-" )' );
 		echo "OK.<br />\n";
 	}
@@ -1848,6 +1876,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.222  2007/05/14 02:47:23  fplanque
+ * (not so) basic Tags framework
+ *
  * Revision 1.221  2007/05/13 22:04:48  fplanque
  * basic excerpt support
  *

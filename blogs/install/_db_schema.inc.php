@@ -187,9 +187,9 @@ $schema_queries = array(
 			KEY cat_parent_ID (cat_parent_ID)
 		)" ),
 
-	'T_posts' => array(
+	'T_items__item' => array(
 		'Creating table for Posts',
-		"CREATE TABLE T_posts (
+		"CREATE TABLE T_items__item (
 			post_ID                     int(11) unsigned NOT NULL auto_increment,
 			post_parent_ID              int(11) unsigned NULL,
 			post_creator_user_ID        int(11) unsigned NOT NULL,
@@ -309,9 +309,9 @@ $schema_queries = array(
 			PRIMARY KEY ( uset_user_ID, uset_name )
 		)" ),
 
-	'T_item__prerendering' => array(
+	'T_items__prerendering' => array(
 		'Creating item prerendering cache table',
-		'CREATE TABLE T_item__prerendering(
+		'CREATE TABLE T_items__prerendering(
 			itpr_itm_ID                   INT(11) UNSIGNED NOT NULL,
 			itpr_format                   ENUM(\'htmlbody\', \'entityencoded\', \'xml\', \'text\') NOT NULL,
 			itpr_renderers                TEXT NOT NULL,
@@ -320,20 +320,38 @@ $schema_queries = array(
 			PRIMARY KEY (itpr_itm_ID, itpr_format)
 		)' ),
 
-	'T_itemstatuses' => array(
+	'T_items__status' => array(
 		'Creating table for Post Statuses',
-		"CREATE TABLE T_itemstatuses (
+		"CREATE TABLE T_items__status (
 			pst_ID   int(11) unsigned not null AUTO_INCREMENT,
 			pst_name varchar(30)      not null,
 			primary key ( pst_ID )
 		)" ),
 
-	'T_itemtypes' => array(
+	'T_items__type' => array(
 		'Creating table for Post Types',
-		"CREATE TABLE T_itemtypes (
+		"CREATE TABLE T_items__type (
 			ptyp_ID   int(11) unsigned not null AUTO_INCREMENT,
 			ptyp_name varchar(30)      not null,
 			primary key (ptyp_ID)
+		)" ),
+
+	'T_items__tag' => array(
+		'Creating table for Tags',
+		"CREATE TABLE T_items__tag (
+			tag_ID   int(11) unsigned not null AUTO_INCREMENT,
+			tag_name varchar(50)      not null,
+			primary key (tag_ID),
+			UNIQUE tag_name( tag_name )
+		)" ),
+
+	'T_items__itemtag' => array(
+		'Creating table for Post-to-Tag relationships',
+		"CREATE TABLE T_items__itemtag (
+			itag_itm_ID int(11) unsigned NOT NULL,
+			itag_tag_ID int(11) unsigned NOT NULL,
+			PRIMARY KEY (itag_itm_ID, itag_tag_ID),
+			UNIQUE tagitem ( itag_tag_ID, itag_itm_ID )
 		)" ),
 
 	'T_files' => array(
@@ -526,6 +544,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.61  2007/05/14 02:47:23  fplanque
+ * (not so) basic Tags framework
+ *
  * Revision 1.60  2007/05/13 22:03:21  fplanque
  * basic excerpt support
  *
@@ -600,89 +621,5 @@ $schema_queries = array(
  *
  * Revision 1.37  2006/10/01 22:11:42  blueyed
  * Ping services as plugins.
- *
- * Revision 1.36  2006/09/30 23:42:06  blueyed
- * Allow editing the plugin name and short desc of installed plugins
- *
- * Revision 1.35  2006/09/25 20:25:49  blueyed
- * Extended date- and time-format fields for locales to 20 chars. See http://forums.b2evolution.net//viewtopic.php?p=44335#44335
- *
- * Revision 1.34  2006/09/23 19:32:06  blueyed
- * Schema for pre-rendered changes
- *
- * Revision 1.33  2006/09/22 17:26:32  blueyed
- * itpr_format should be NOT NULL (MySQL3 requires this also for a PK and it will never be NULL anyway)
- *
- * Revision 1.32  2006/09/21 16:54:26  blueyed
- * Experimental caching of pre-rendered item content. Added table T_item__prerendering.
- *
- * Revision 1.31  2006/09/10 17:33:02  fplanque
- * started to steam up the categories/chapters
- *
- * Revision 1.30  2006/08/29 22:59:09  blueyed
- * doc
- *
- * Revision 1.29  2006/08/26 16:33:02  fplanque
- * enhanced stats
- *
- * Revision 1.28  2006/08/21 16:07:44  fplanque
- * refactoring
- *
- * Revision 1.27  2006/08/19 02:15:08  fplanque
- * Half kille dthe pingbacks
- * Still supported in DB in case someone wants to write a plugin.
- *
- * Revision 1.26  2006/08/04 22:13:23  blueyed
- * Finished de-abstraction
- *
- * Revision 1.25  2006/08/03 19:39:06  blueyed
- * hit_uri index (needed when checking for page reload)
- *
- * Revision 1.24  2006/08/03 01:53:40  blueyed
- * whitespace
- *
- * Revision 1.23  2006/07/23 17:19:52  blueyed
- * MFB
- *
- * Revision 1.22  2006/07/06 19:59:08  fplanque
- * better logs, better stats, better pruning
- *
- * Revision 1.21  2006/07/03 19:19:14  blueyed
- * Added indices
- *
- * Revision 1.20  2006/06/13 21:49:16  blueyed
- * Merged from 1.8 branch
- *
- * Revision 1.19.2.1  2006/06/13 18:27:51  fplanque
- * fixes
- *
- * Revision 1.19  2006/05/02 23:46:07  blueyed
- * Validate/fixed plugin spam weight handling.
- *
- * Revision 1.18  2006/05/02 04:36:25  blueyed
- * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
- *
- * Revision 1.17  2006/04/22 02:58:05  blueyed
- * Added Id keyword
- *
- * Revision 1.16  2006/04/22 02:36:39  blueyed
- * Validate users on registration through email link (+cleanup around it)
- *
- * Revision 1.15  2006/04/20 17:59:02  blueyed
- * Removed "spam" from hit_referer_type (DB) and summary stats
- *
- * Revision 1.14  2006/04/20 16:31:30  fplanque
- * comment moderation (finished for 1.8)
- *
- * Revision 1.13  2006/04/19 15:56:02  blueyed
- * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
- * and Item::comments to Item::comment_status (Item API change)
- *
- * Revision 1.12  2006/04/11 22:39:50  blueyed
- * Fixed installation of basic plugins, though again more complicated (IMHO)
- *
- * Revision 1.11  2006/04/11 21:22:26  fplanque
- * partial cleanup
- *
  */
 ?>

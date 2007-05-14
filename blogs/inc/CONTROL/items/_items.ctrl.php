@@ -166,6 +166,8 @@ switch( $action )
 		}
 		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
 
+ 		param( 'item_tags', 'string', '' );
+
 		// Trackback addresses (never saved into item)
  		param( 'trackback_url', 'string', '' );
 
@@ -203,6 +205,8 @@ switch( $action )
 		}
 		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
 
+ 		param( 'item_tags', 'string', '' );
+
 		// Trackback addresses (never saved into item)
  		param( 'trackback_url', 'string', '' );
 
@@ -224,6 +228,7 @@ switch( $action )
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p );
 
+  	$item_tags = implode( ' ', $edited_Item->get_tags() );
   	$trackback_url = '';
 
 		// Page title:
@@ -712,6 +717,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2007/05/14 02:47:23  fplanque
+ * (not so) basic Tags framework
+ *
  * Revision 1.24  2007/05/13 18:49:54  fplanque
  * made autoselect_blog() more robust under PHP4
  *

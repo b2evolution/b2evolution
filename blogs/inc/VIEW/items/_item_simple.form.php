@@ -43,7 +43,7 @@ global $Settings;
 global $pagenow;
 
 global $mode, $use_post_url;
-global $use_preview, $post_comment_status, $trackback_url;
+global $use_preview, $post_comment_status, $trackback_url, $item_tags;
 global $edit_date, $bozo_start_modified, $creating;
 global $item_title, $item_content;
 
@@ -91,6 +91,7 @@ if( $Blog->get_setting( 'use_workflow' ) )
 	$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
 	$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
 }
+$Form->hidden( 'item_tags', $item_tags );
 $Form->hidden( 'trackback_url', $trackback_url );
 $Form->hidden( 'renderers_displayed', 1 );
 $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
@@ -253,6 +254,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.37  2007/05/14 02:47:23  fplanque
+ * (not so) basic Tags framework
+ *
  * Revision 1.36  2007/05/13 22:03:21  fplanque
  * basic excerpt support
  *
