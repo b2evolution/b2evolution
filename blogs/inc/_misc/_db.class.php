@@ -445,10 +445,24 @@ class DB
 	 */
 	function quote($str)
 	{
-		if( $str === NULL )
+		if( is_null( $str ) )
+		{
 			return 'NULL';
+		}
+		elseif( is_array( $str ) )
+		{
+			$r = '';
+			foreach( $str as $elt )
+			{
+				$r .= $this->quote($elt).',';
+			}
+			$r = substr( $r, 0, strlen( $r ) - 1 );
+			return $r;
+		}
 		else
+		{
 			return "'".mysql_real_escape_string($str, $this->dbhandle)."'";
+		}
 	}
 
 
@@ -1350,6 +1364,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.59  2007/05/14 02:44:14  fplanque
+ * allow quoting of arrays
+ *
  * Revision 1.58  2007/04/26 00:11:07  fplanque
  * (c) 2007
  *
