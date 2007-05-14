@@ -589,7 +589,7 @@ class Plugins_admin extends Plugins
 		{
 			if( strpos($event, 'RenderItemAs') === 0 )
 			{ // Clear pre-rendered content cache, if RenderItemAs* events get removed:
-				$DB->query( 'DELETE FROM T_item__prerendering WHERE 1=1' );
+				$DB->query( 'DELETE FROM T_items__prerendering WHERE 1=1' );
 				$ItemCache = & get_Cache( 'ItemCache' );
 				$ItemCache->clear();
 				break;
@@ -750,7 +750,7 @@ class Plugins_admin extends Plugins
 			{
 				if( strpos($event, 'RenderItemAs') === 0 )
 				{ // Clear pre-rendered content cache, if RenderItemAs* events have been added or removed:
-					$DB->query( 'DELETE FROM T_item__prerendering WHERE 1=1' );
+					$DB->query( 'DELETE FROM T_items__prerendering WHERE 1=1' );
 					$ItemCache = & get_Cache( 'ItemCache' );
 					$ItemCache->clear();
 					break;
@@ -900,7 +900,7 @@ class Plugins_admin extends Plugins
 
 			if( strpos($plugin_event, 'RenderItemAs') === 0 )
 			{ // Clear pre-rendered content cache, if RenderItemAs* events have been added or removed:
-				$DB->query( 'DELETE FROM T_item__prerendering WHERE 1=1' );
+				$DB->query( 'DELETE FROM T_items__prerendering WHERE 1=1' );
 				$ItemCache = & get_Cache( 'ItemCache' );
 				$ItemCache->clear();
 				break;
@@ -1527,6 +1527,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.41  2007/05/14 02:43:05  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.40  2007/04/26 00:11:08  fplanque
  * (c) 2007
  *

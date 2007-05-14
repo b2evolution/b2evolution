@@ -504,7 +504,7 @@ class Plugins
 						if( ! empty($Plugin->code) )
 						{
 							$DB->query( '
-									DELETE FROM T_item__prerendering
+									DELETE FROM T_items__prerendering
 									 WHERE itpr_renderers REGEXP "^(.*\.)?'.$DB->escape($Plugin->code).'(\..*)?$"' );
 						}
 
@@ -1806,6 +1806,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.152  2007/05/14 02:43:05  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.151  2007/04/26 00:11:08  fplanque
  * (c) 2007
  *

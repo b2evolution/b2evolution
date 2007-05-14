@@ -57,11 +57,11 @@ class ItemType extends DataObject
 	function ItemType( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_itemtypes', 'ptyp_', 'ptyp_ID' );
+		parent::DataObject( 'T_items__type', 'ptyp_', 'ptyp_ID' );
 
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_ityp_col', 'fk'=>'itco_ityp_ID', 'msg'=>T_('%d related collections') ), // "Lignes de missions"
-				array( 'table'=>'T_posts', 'fk'=>'post_ptyp_ID', 'msg'=>T_('%d related items') ), // "Lignes de visit reports"
+				array( 'table'=>'T_items__item', 'fk'=>'post_ptyp_ID', 'msg'=>T_('%d related items') ), // "Lignes de visit reports"
 			);
 
  		if( $db_row != NULL )

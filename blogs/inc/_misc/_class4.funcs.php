@@ -94,7 +94,7 @@ function & get_Cache( $objectName )
 			return $GroupCache;
 
 		case 'ItemCacheLight';
-			$ItemCacheLight = new DataObjectCache( 'ItemLight', false, 'T_posts', 'post_', 'post_ID' ); // COPY (FUNC)
+			$ItemCacheLight = new DataObjectCache( 'ItemLight', false, 'T_items__item', 'post_', 'post_ID' ); // COPY (FUNC)
 			return $ItemCacheLight;
 
 		case 'ItemCache';
@@ -103,7 +103,7 @@ function & get_Cache( $objectName )
 			return $ItemCache;
 
 		case 'ItemStatusCache':
-			$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_itemstatuses\', \'pst_\', \'pst_ID\', NULL, \'\', T_(\'No status\') )' );
+			$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_items__status\', \'pst_\', \'pst_ID\', NULL, \'\', T_(\'No status\') )' );
 			return $ItemStatusCache;
 
 		case 'ItemTypeCache':
@@ -143,6 +143,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.17  2007/05/14 02:43:05  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.16  2007/04/26 00:11:07  fplanque
  * (c) 2007
  *

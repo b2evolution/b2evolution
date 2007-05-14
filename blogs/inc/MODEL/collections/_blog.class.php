@@ -1240,7 +1240,7 @@ class Blog extends DataObject
 
 				// Delete posts
 				if( $echo ) echo '<br />Deleting blog\'s posts... ';
-				$ret = $DB->query(	"DELETE FROM T_posts
+				$ret = $DB->query(	"DELETE FROM T_items__item
 															WHERE post_ID IN ($post_list)" );
 				if( $echo ) printf( '(%d rows)', $ret );
 				$Messages->add( T_('Deleted blog\'s posts'), 'success' );
@@ -1362,6 +1362,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.80  2007/05/14 02:43:04  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.79  2007/05/13 22:53:31  fplanque
  * allow feeds restricted to post excerpts
  *

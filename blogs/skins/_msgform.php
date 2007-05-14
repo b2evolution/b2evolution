@@ -121,7 +121,7 @@ if( empty($subject) )
 	{
 		$row = $DB->get_row( '
 			SELECT post_title
-			  FROM T_posts, T_comments
+			  FROM T_items__item, T_comments
 			 WHERE comment_ID = '.$DB->quote($comment_id).'
 			   AND post_ID = comment_post_ID' );
 
@@ -135,7 +135,7 @@ if( empty($subject) )
 	{
 		$row = $DB->get_row( '
 				SELECT post_title
-				  FROM T_posts
+				  FROM T_items__item
 				 WHERE post_ID = '.$post_id );
 		if( $row )
 		{
@@ -196,6 +196,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.33  2007/05/14 02:43:06  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.32  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *

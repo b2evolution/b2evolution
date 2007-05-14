@@ -64,7 +64,7 @@ class ItemTypeCache extends DataObjectCache
 	function ItemTypeCache()
 	{
 		// Call parent constructor:
-		parent::DataObjectCache( 'ItemType', true, 'T_itemtypes', 'ptyp_', 'ptyp_ID', 'ptyp_name', 'ptyp_ID' );
+		parent::DataObjectCache( 'ItemType', true, 'T_items__type', 'ptyp_', 'ptyp_ID', 'ptyp_name', 'ptyp_ID' );
 	}
 
 
@@ -78,7 +78,7 @@ class ItemTypeCache extends DataObjectCache
 		global $DB;
 
 		$rows = $DB->get_results( 'SELECT *
-																 FROM T_itemtypes
+																 FROM T_items__type
 													 INNER JOIN T_ityp_col ON ityp_ID = itco_ityp_ID
 																WHERE itco_col_ID = '.$col_ID.'
 																ORDER BY ityp_name' );
@@ -157,6 +157,9 @@ class ItemTypeCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.14  2007/05/14 02:43:05  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.13  2007/04/26 00:11:12  fplanque
  * (c) 2007
  *

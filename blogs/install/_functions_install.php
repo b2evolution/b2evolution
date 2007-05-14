@@ -51,7 +51,7 @@ function cleanup_post_quotes( $col_ID = 'ID' )
 
 	echo "Checking for extra quote escaping in posts... ";
 	$query = "SELECT $col_ID, post_title, post_content
-							FROM T_posts
+							FROM T_items__item
 						 WHERE post_title LIKE '%\\\\\\\\\'%'
 						 		OR post_title LIKE '%\\\\\\\\\"%'
 						 		OR post_content LIKE '%\\\\\\\\\'%'
@@ -66,7 +66,7 @@ function cleanup_post_quotes( $col_ID = 'ID' )
 		foreach( $rows as $row )
 		{
 			// echo '<br />'.$row['post_title'];
-			$query = "UPDATE T_posts
+			$query = "UPDATE T_items__item
 								SET post_title = ".$DB->quote( stripslashes( $row['post_title'] ) ).",
 										post_content = ".$DB->quote( stripslashes( $row['post_content'] ) )."
 								WHERE $col_ID = ".$row[$col_ID];
@@ -354,7 +354,7 @@ function create_relations()
 	$DB->query( 'alter table T_comments
 								add constraint FK_comment_post_ID
 											foreign key (comment_post_ID)
-											references T_posts (post_ID)
+											references T_items__item (post_ID)
 											on delete restrict
 											on update restrict' );
 
@@ -366,11 +366,11 @@ function create_relations()
 											on update restrict,
 								add constraint FK_postcat_post_ID
 											foreign key (postcat_post_ID)
-											references T_posts (post_ID)
+											references T_items__item (post_ID)
 											on delete restrict
 											on update restrict' );
 
-	$DB->query( 'alter table T_posts
+	$DB->query( 'alter table T_items__item
 								add constraint FK_post_assigned_user_ID
 											foreign key (post_assigned_user_ID)
 											references T_users (user_ID)
@@ -393,17 +393,17 @@ function create_relations()
 											on update restrict,
 								add constraint FK_post_parent_ID
 											foreign key (post_parent_ID)
-											references T_posts (post_ID)
+											references T_items__item (post_ID)
 											on delete restrict
 											on update restrict,
 								add constraint FK_post_pst_ID
 											foreign key (post_pst_ID)
-											references T_itemstatuses (pst_ID)
+											references T_items__status (pst_ID)
 											on delete restrict
 											on update restrict,
 								add constraint FK_post_ptyp_ID
 											foreign key (post_ptyp_ID)
-											references T_itemtypes (ptyp_ID)
+											references T_items__type (ptyp_ID)
 											on delete restrict
 											on update restrict' );
 
@@ -422,7 +422,7 @@ function create_relations()
 	$DB->query( 'alter table T_links
 								add constraint FK_link_dest_itm_ID
 											foreign key (link_dest_itm_ID)
-											references T_posts (post_ID)
+											references T_items__item (post_ID)
 											on delete restrict
 											on update restrict' );
 	$DB->query( 'alter table T_links
@@ -434,7 +434,7 @@ function create_relations()
 	$DB->query( 'alter table T_links
 								add constraint FK_link_itm_ID
 											foreign key (link_itm_ID)
-											references T_posts (post_ID)
+											references T_items__item (post_ID)
 											on delete restrict
 											on update restrict' );
 
@@ -493,6 +493,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.26  2007/05/14 02:43:06  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.25  2007/05/13 20:44:52  fplanque
  * more pages support
  *

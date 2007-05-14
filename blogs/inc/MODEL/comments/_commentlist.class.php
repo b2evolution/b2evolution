@@ -62,7 +62,7 @@ class CommentList extends DataObjectList
 		parent::DataObjectList( 'T_comments', 'comment_', 'comment_ID', 'Item', NULL, $limit );
 
 		$this->sql = 'SELECT DISTINCT T_comments.*
-									FROM T_comments INNER JOIN T_posts ON comment_post_ID = post_ID ';
+									FROM T_comments INNER JOIN T_items__item ON comment_post_ID = post_ID ';
 
 		if( !empty( $p ) )
 		{	// Restrict to comments on selected post
@@ -174,6 +174,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.8  2007/05/14 02:43:04  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.7  2007/04/26 00:11:08  fplanque
  * (c) 2007
  *

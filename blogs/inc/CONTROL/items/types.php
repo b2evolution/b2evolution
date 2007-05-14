@@ -45,7 +45,7 @@ $form_below_list = true;
  * Delete restrictions
  */
 $delete_restrictions = array(
-		array( 'table'=>'T_posts', 'fk'=>'post_ptyp_ID', 'msg'=>T_('%d related items') ),
+		array( 'table'=>'T_items__item', 'fk'=>'post_ptyp_ID', 'msg'=>T_('%d related items') ),
 	);
 
 $restrict_title = T_('Cannot delete item type');	 //&laquo;%s&raquo;
@@ -54,12 +54,15 @@ $restrict_title = T_('Cannot delete item type');	 //&laquo;%s&raquo;
 // It must be initialized to false before checking the delete restrictions
 $checked_delete = false;
 
-$GenericElementCache = & new GenericCache( 'GenericElement', false, 'T_itemtypes', 'ptyp_', 'ptyp_ID' );
+$GenericElementCache = & new GenericCache( 'GenericElement', false, 'T_items__type', 'ptyp_', 'ptyp_ID' );
 
 require $control_path.'generic/inc/_generic_listeditor.php';
 
 /*
  * $Log$
+ * Revision 1.11  2007/05/14 02:43:04  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.10  2007/05/13 20:44:52  fplanque
  * more pages support
  *

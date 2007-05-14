@@ -49,7 +49,7 @@ $form_below_list = true;
  * Delete restrictions
  */
 $delete_restrictions = array(
-		array( 'table'=>'T_posts', 'fk'=>'post_pst_ID', 'msg'=>T_('%d related items') ),
+		array( 'table'=>'T_items__item', 'fk'=>'post_pst_ID', 'msg'=>T_('%d related items') ),
 	);
 
 $restrict_title = T_('Cannot delete item status');	 //&laquo;%s&raquo;
@@ -58,7 +58,7 @@ $restrict_title = T_('Cannot delete item status');	 //&laquo;%s&raquo;
 // It must be initialized to false before checking the delete restrictions
 $checked_delete = false;
 
-$GenericElementCache = & new GenericCache( 'GenericElement', false, 'T_itemstatuses', 'pst_', 'pst_ID' );
+$GenericElementCache = & new GenericCache( 'GenericElement', false, 'T_items__status', 'pst_', 'pst_ID' );
 
 require $control_path.'generic/inc/_generic_listeditor.php';
 ?>

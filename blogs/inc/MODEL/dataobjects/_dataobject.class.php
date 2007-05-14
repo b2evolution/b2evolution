@@ -573,7 +573,7 @@ class DataObject
 	 * Set a parameter from a Request form value.
 	 *
 	 * @param string Dataobject parameter name
-	 * @param string|NULL Request parameter name (NULL means to use Dataobject param name with its prefix)
+	 * @param string Request parameter name (NULL means to use Dataobject param name with its prefix)
 	 * @param boolean true to set to NULL if empty string value
 	 * @return boolean true, if value has been set/changed, false if not.
 	 */
@@ -653,6 +653,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2007/05/14 02:43:04  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.25  2007/05/13 22:02:07  fplanque
  * removed bloated $object_def
  *

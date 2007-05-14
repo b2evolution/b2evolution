@@ -56,7 +56,7 @@ class categories_plugin extends Plugin
 		$this->short_desc = T_('This skin tag displays the list of available categories for the blog.');
 		$this->long_desc = T_('This skin tag displays the list of available categories and sub-categories for the blog.');
 
-		$this->dbtable = 'T_posts';
+		$this->dbtable = 'T_items__item';
 		$this->dbprefix = 'post_';
 		$this->dbIDname = 'post_ID';
 	}
@@ -381,6 +381,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.43  2007/05/14 02:43:06  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.42  2007/05/09 00:58:55  fplanque
  * massive cleanup of old functions
  *

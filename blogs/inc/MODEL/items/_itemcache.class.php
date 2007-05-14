@@ -60,7 +60,7 @@ class ItemCache extends DataObjectCache
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
-	function ItemCache( $objType = 'Item', $dbtablename = 'T_posts', $dbprefix = 'post_', $dbIDname = 'post_ID' )
+	function ItemCache( $objType = 'Item', $dbtablename = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID' )
 	{
 		parent::DataObjectCache( $objType, false, $dbtablename, $dbprefix, $dbIDname );
 	}
@@ -149,6 +149,9 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.10  2007/05/14 02:43:05  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.9  2007/04/26 00:11:12  fplanque
  * (c) 2007
  *

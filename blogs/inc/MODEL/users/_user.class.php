@@ -129,8 +129,8 @@ class User extends DataObject
 		// fp> These settings should probably be merged with the global database description used by the installer/upgrader. However I'm not sure about how compelx plugins would be able to integrate then...
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_blogs', 'fk'=>'blog_owner_user_ID', 'msg'=>T_('%d blogs owned by this user') ),
-				array( 'table'=>'T_posts', 'fk'=>'post_lastedit_user_ID', 'msg'=>T_('%d posts last edited by this user') ),
-				array( 'table'=>'T_posts', 'fk'=>'post_assigned_user_ID', 'msg'=>T_('%d posts assigned to this user') ),
+				array( 'table'=>'T_items__item', 'fk'=>'post_lastedit_user_ID', 'msg'=>T_('%d posts last edited by this user') ),
+				array( 'table'=>'T_items__item', 'fk'=>'post_assigned_user_ID', 'msg'=>T_('%d posts assigned to this user') ),
 				array( 'table'=>'T_links', 'fk'=>'link_creator_user_ID', 'msg'=>T_('%d links created by this user') ),
 				array( 'table'=>'T_links', 'fk'=>'link_lastedit_user_ID', 'msg'=>T_('%d links last edited by this user') ),
 			);
@@ -140,7 +140,7 @@ class User extends DataObject
 				array( 'table'=>'T_sessions', 'fk'=>'sess_user_ID', 'msg'=>T_('%d sessions opened by this user') ),
 				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_user_ID', 'msg'=>T_('%d user permissions on blogs') ),
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_user_ID', 'msg'=>T_('%d subscriptions') ),
-				array( 'table'=>'T_posts', 'fk'=>'post_creator_user_ID', 'msg'=>T_('%d posts created by this user') ),
+				array( 'table'=>'T_items__item', 'fk'=>'post_creator_user_ID', 'msg'=>T_('%d posts created by this user') ),
 			);
 
 		if( $db_row == NULL )
@@ -264,7 +264,7 @@ class User extends DataObject
 		if( is_null( $this->_num_posts ) )
 		{
 			$this->_num_posts = $DB->get_var( 'SELECT count(*)
-																				FROM T_posts
+																				FROM T_items__item
 																				WHERE post_creator_user_ID = '.$this->ID );
 		}
 
@@ -842,7 +842,7 @@ class User extends DataObject
 		// Get list of posts that are going to be deleted (3.23)
 		$post_list = implode( ',', $DB->get_col( '
 				SELECT post_ID
-				  FROM T_posts
+				  FROM T_items__item
 				 WHERE post_creator_user_ID = '.$this->ID ) );
 
 		if( !empty( $post_list ) )
@@ -1182,6 +1182,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.69  2007/05/14 02:43:05  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.68  2007/04/26 00:11:11  fplanque
  * (c) 2007
  *

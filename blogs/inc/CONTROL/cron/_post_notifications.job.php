@@ -33,7 +33,7 @@ $item_ID = $job_params['item_ID'];
 
 
 // Notify that we are going to take care of that post's post processing:
-$DB->query( 'UPDATE T_posts
+$DB->query( 'UPDATE T_items__item
 								SET post_notifications_status = "started"
 							WHERE post_ID = '.$item_ID.'
 							  AND post_notifications_status = "todo"
@@ -66,6 +66,9 @@ return 1; /* ok */
 
 /*
  * $Log$
+ * Revision 1.6  2007/05/14 02:43:03  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.5  2007/02/26 03:41:16  fplanque
  * doc
  *

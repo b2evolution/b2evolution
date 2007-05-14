@@ -45,7 +45,7 @@ $AdminUI->set_path( 'blogs', 'chapters' );
  */
 $delete_restrictions = array(
 							array( 'table'=>'T_categories', 'fk'=>'cat_parent_ID', 'msg'=>T_('%d sub categories') ),
-							array( 'table'=>'T_posts', 'fk'=>'post_main_cat_ID', 'msg'=>T_('%d posts within category through main cat') ),
+							array( 'table'=>'T_items__item', 'fk'=>'post_main_cat_ID', 'msg'=>T_('%d posts within category through main cat') ),
 							array( 'table'=>'T_postcats', 'fk'=>'postcat_cat_ID', 'msg'=>T_('%d posts within category through extra cat') ),
 					);
 
@@ -431,6 +431,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2007/05/14 02:43:03  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.18  2007/05/13 18:49:54  fplanque
  * made autoselect_blog() more robust under PHP4
  *

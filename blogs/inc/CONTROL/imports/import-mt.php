@@ -856,7 +856,7 @@ param( 'import_mode', 'string', 'normal' );
 
 			// Let's check to see if it's in already
 			if( $post_ID = $DB->get_var( "SELECT post_ID
-																			FROM T_posts
+																			FROM T_items__item
 																		 WHERE post_title = ".$DB->quote($post_title)."
 																		   AND post_datestart = '$post_date'"))
 			{
@@ -1661,6 +1661,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.33  2007/05/14 02:43:04  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.32  2007/05/09 00:58:54  fplanque
  * massive cleanup of old functions
  *

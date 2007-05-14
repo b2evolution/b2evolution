@@ -18,7 +18,7 @@ function db_delete()
 	global $DB;
 
 	echo "Dropping Prerendering cache table...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_item__prerendering' );
+	$DB->query( 'DROP TABLE IF EXISTS T_items__prerendering' );
 
 	echo "Dropping Cron log table...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_cron__log' );
@@ -51,16 +51,16 @@ function db_delete()
 	$DB->query( 'DROP TABLE IF EXISTS T_files' );
 
 	echo "Dropping Posts...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_posts' );
+	$DB->query( 'DROP TABLE IF EXISTS T_items__item' );
 
 	echo "Dropping Categories...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_categories' );
 
 	echo "Dropping Post Statuses...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_itemstatuses' );
+	$DB->query( 'DROP TABLE IF EXISTS T_items__status' );
 
 	echo "Dropping Post Types...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_itemtypes' );
+	$DB->query( 'DROP TABLE IF EXISTS T_items__type' );
 
 	echo "Dropping User Settings...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_usersettings' );
@@ -125,6 +125,9 @@ function db_delete()
 
 /*
  * $Log$
+ * Revision 1.33  2007/05/14 02:43:06  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.32  2007/04/26 00:11:09  fplanque
  * (c) 2007
  *

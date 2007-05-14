@@ -43,7 +43,7 @@ $FileList = & new DataObjectList2( $FileCache );
 $SQL = & new SQL();
 $SQL->SELECT( 'post_ID, file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
 $SQL->FROM( 'T_categories INNER JOIN T_postcats ON cat_ID = postcat_cat_ID
-							INNER JOIN T_posts ON postcat_post_ID = post_ID
+							INNER JOIN T_items__item ON postcat_post_ID = post_ID
 							INNER JOIN T_links ON post_ID = link_itm_ID
 							INNER JOIN T_files ON link_file_ID = file_ID' );
 $SQL->WHERE( 'cat_blog_ID = '.$Blog->ID ); // fp> TODO: want to restrict on images :]
@@ -126,6 +126,9 @@ echo '</table>';
 
 /*
  * $Log$
+ * Revision 1.10  2007/05/14 02:43:07  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.9  2007/04/26 00:11:03  fplanque
  * (c) 2007
  *

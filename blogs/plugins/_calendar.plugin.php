@@ -63,7 +63,7 @@ class calendar_plugin extends Plugin
 		$this->short_desc = T_('This skin tag displays a navigable calendar.');
 		$this->long_desc = T_('Days containing posts are highlighted.');
 
-		$this->dbtable = 'T_posts';
+		$this->dbtable = 'T_items__item';
 		$this->dbprefix = 'post_';
 		$this->dbIDname = 'post_ID';
 	}
@@ -338,7 +338,7 @@ class Calendar
 	{
 		global $Settings, $localtimenow;
 
-		$this->dbtable = 'T_posts';
+		$this->dbtable = 'T_items__item';
 		$this->dbprefix = 'post_';
 		$this->dbIDname = 'post_ID';
 
@@ -1115,6 +1115,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.42  2007/05/14 02:43:06  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.41  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *

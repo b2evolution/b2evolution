@@ -167,7 +167,7 @@ function create_default_data()
 	// Upgrade to Phoenix-Alpha
 	echo 'Creating default Post Types... ';
 	$DB->query( "
-		INSERT INTO T_itemtypes ( ptyp_ID, ptyp_name )
+		INSERT INTO T_items__type ( ptyp_ID, ptyp_name )
 		VALUES ( 1, 'Post' ),
 					 ( 2, 'Link' ),
 					 ( 1000, 'Page' ),
@@ -477,7 +477,7 @@ Note: to be displayed widgets are placed in containers. Each container appears i
 
 You can change the skin used by any blog by editing the blog settings in the admin interface.
 
-You can download additional skins from the <a href="http://skins.b2evolution.net/" traget="_blank">skin site</a>. To install them, unzip them in the /blogs/skins directory, then go to General Settings &gt; Skins in the admin interface and click on "Install new".
+You can download additional skins from the <a href="http://skins.b2evolution.net/" target="_blank">skin site</a>. To install them, unzip them in the /blogs/skins directory, then go to General Settings &gt; Skins in the admin interface and click on "Install new".
 
 You can also create your own skins by duplicating, renaming and customizing any existing skin folder from the /blogs/skins directory.
 
@@ -632,6 +632,9 @@ If needed, a skin can format info pages differently from regular posts."), $now,
 
 /*
  * $Log$
+ * Revision 1.226  2007/05/14 02:43:06  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.225  2007/05/13 20:44:52  fplanque
  * more pages support
  *

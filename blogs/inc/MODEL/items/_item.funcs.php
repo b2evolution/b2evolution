@@ -104,7 +104,7 @@ function init_MainList( $items_nb_limit )
  * @return string validated url title
  */
 function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false,
-															$dbprefix = 'post_', $dbIDname = 'post_ID', $dbtable = 'T_posts' )
+															$dbprefix = 'post_', $dbIDname = 'post_ID', $dbtable = 'T_items__item' )
 {
 	global $DB;
 
@@ -198,7 +198,7 @@ function get_postdata($postid)
 	$sql = 'SELECT post_ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_content, post_title,
 											post_main_cat_ID, cat_blog_ID ';
 	$sql .= ', post_locale, post_url, post_wordcount, post_comment_status, post_views ';
-	$sql .= '	FROM T_posts
+	$sql .= '	FROM T_items__item
 					 INNER JOIN T_categories ON post_main_cat_ID = cat_ID
 					 WHERE post_ID = '.$postid;
 	// Restrict to the statuses we want to show:
@@ -613,6 +613,9 @@ function visibility_select( & $Form, $post_status )
 
 /*
  * $Log$
+ * Revision 1.51  2007/05/14 02:43:05  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.50  2007/05/13 20:44:11  fplanque
  * url fix
  *

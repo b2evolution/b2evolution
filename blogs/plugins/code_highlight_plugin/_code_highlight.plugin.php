@@ -478,7 +478,7 @@ div.codeblock.amc_short table {
 		global $DB, $ItemCache;
 		// find any posts with the previous versions tags
 		$sql = 'select post_id
-							from T_posts
+							from T_items__item
 						 where post_content like \'%<amcode><pre>%\'';
 		$posts = $DB->get_results( $sql );
 		foreach( $posts as $post )
@@ -560,6 +560,9 @@ div.codeblock.amc_short table {
 
 /**
  * $Log$
+ * Revision 1.3  2007/05/14 02:43:06  fplanque
+ * Started renaming tables. There probably won't be a better time than 2.0.
+ *
  * Revision 1.2  2007/05/04 20:43:08  fplanque
  * MFB
  *
