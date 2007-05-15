@@ -26,6 +26,7 @@
  * @version $Id$
  */
 
+echo "** gettext helper tool for b2evolution **\n";
 
 // Check that all external tools are available:
 foreach( array( 'xgettext', 'msgmerge', 'find', 'xargs', 'sed' ) as $testtool )
@@ -57,6 +58,12 @@ function echo_usage()
 	echo "\n";
 	echo "By adding 'convert <locale>' to the command line arguments, you'll convert\n";
 	echo "the locale's messages.PO file to _global.php, which b2evolution uses.\n";
+	echo "\n";
+	echo "E.g.,\n";
+	echo "./xg.php CORE\n";
+	echo "./xg.php CORE merge de_DE\n";
+	echo "..edit .po file..\n";
+	echo "./xg.php CORE convert de_DE\n";
 	echo "\n";
 }
 
@@ -179,7 +186,11 @@ if( $action == 'extract' )
 
 	echo 'Extracting T_() and NT_() strings from all .php files below "'.basename($dir_root).'" into "'.basename($dir_root).'/locales/messages.pot".. ';
 	system( 'find ../ -iname "*.php"'
-					.' | xargs xgettext -o '.escapeshellarg($file_pot).' --no-wrap --add-comments=TRANS --copyright-holder="Francois PLANQUE" --msgid-bugs-address=http://fplanque.net/ --keyword=T_ --keyword=NT_ --keyword=TS_ -F' );
+		.' | xargs xgettext -o '.escapeshellarg($file_pot).' --from-code=iso-8859-15 --no-wrap --add-comments=TRANS --copyright-holder="Francois PLANQUE" --msgid-bugs-address=http://fplanque.net/ --keyword=T_ --keyword=NT_ --keyword=TS_ -F', $return_var );
+	if( $return_var !== 0 )
+	{
+		die("Failed!\n");
+	}
 	echo "[ok]\n";
 
 
