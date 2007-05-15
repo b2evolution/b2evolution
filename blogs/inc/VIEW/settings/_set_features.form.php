@@ -65,8 +65,7 @@ $Form->begin_fieldset( T_('After each new post...') . get_web_help_link('After e
 	$Form->radio_input( 'outbound_notifications_mode', $Settings->get('outbound_notifications_mode'), array(
 			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('No notification about your new content will be sent out.'), 'suffix' => '<br />' ),
 			array( 'value'=>'immediate', 'label'=>T_('Immediate'), 'note'=>T_('This is guaranteed to work but may create an annoying delay after each post.'), 'suffix' => '<br />' ),
-			// dh> TODO: "notify about news" instead of "notify news" below??
-			array( 'value'=>'cron', 'label'=>T_('Asynchronous'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up. You could notify news every minute.') ) ),
+			array( 'value'=>'cron', 'label'=>T_('Asynchronous'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up.') ) ),
 								T_('Outbound pings & email notifications') );
 $Form->end_fieldset();
 
@@ -186,6 +185,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.26  2007/05/15 20:46:36  blueyed
+ * trans-fix: save an extra sentence by using the same phrase as below for note
+ *
  * Revision 1.25  2007/05/15 20:42:00  blueyed
  * trans-todo
  *
