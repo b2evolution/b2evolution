@@ -118,7 +118,8 @@ class videoplug_plugin extends Plugin
 			//<![CDATA[
 			function videotag( tag )
 			{
-				var video_ID = prompt('<?php echo TS_('Enter video ID from') ?> '+tag+':', '' );
+				var p = '<?php echo TS_('Enter video ID from %s:') ?>';
+				var video_ID = prompt( p.replace( /%s/, tag ), '' );
 				if( ! video_ID )
 				{
 					return;
@@ -140,6 +141,9 @@ class videoplug_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.5  2007/05/15 21:22:16  blueyed
+ * Use+replace %s for dynamic value instead of appending some string!
+ *
  * Revision 1.4  2007/05/04 20:43:09  fplanque
  * MFB
  *
