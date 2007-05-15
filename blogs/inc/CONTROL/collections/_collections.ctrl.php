@@ -82,6 +82,7 @@ switch( $action )
 
 		param( 'kind', 'string', true );
 
+		// dh> TODO: "New %s" is probably too generic. What can %s become? (please comment it in "TRANS")
 		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( T_('New %s'), Blog::kind_name($kind) ) ) );
 		break;
 
@@ -429,6 +430,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2007/05/15 18:49:32  blueyed
+ * trans todo
+ *
  * Revision 1.22  2007/05/13 18:49:54  fplanque
  * made autoselect_blog() more robust under PHP4
  *
