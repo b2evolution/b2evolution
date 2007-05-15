@@ -162,7 +162,7 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		// valid:
 		foreach( array(
 			'http://b2evolution.net',
-			'https://www.b2evolution.net',
+			'https://demo.b2evolution.net',
 			'http://user@example.com/path',
 			'http://user:pass@example.com/path',
 			'mailto:example@example.org',
