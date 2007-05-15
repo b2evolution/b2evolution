@@ -1694,7 +1694,7 @@ class Form extends Widget
 
 			$options_list .= '<option value="'.format_to_output($l_value, 'formvalue').'"';
 
-			if( $l_value == $field_value )
+			if( (string)$l_value == (string)$field_value ) // cast to string so "1,2" is != 1
 			{
 				$options_list .= ' selected="selected"';
 			}
@@ -2742,6 +2742,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.81  2007/05/15 14:57:24  blueyed
+ * Fix for Form::select_input_array() "selected"-Handling (cast values to string when comparing)
+ *
  * Revision 1.80  2007/04/26 00:11:07  fplanque
  * (c) 2007
  *
