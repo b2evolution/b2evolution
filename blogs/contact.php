@@ -90,7 +90,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 </div>
 
 
-<div class="pageSubTitle"><!-- InstanceBeginEditable name="SubTitle" --><?php echo T_('This demo displays a form to contact the site admin') ?><!-- InstanceEndEditable --></div>
+<div class="pageSubTitle"><!-- InstanceBeginEditable name="SubTitle" --><?php echo T_('This demo displays a form to contact the site admin.') ?><!-- InstanceEndEditable --></div>
 
 
 <div class="main"><!-- InstanceBeginEditable name="Main" -->
