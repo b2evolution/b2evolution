@@ -76,7 +76,7 @@ switch( $action )
 		if( ! $ForgetfulUser )
 		{ // User does not exist
 			// pretend that the email is sent for avoiding guessing user_login
-			$Messages->add( T_('If you correctly typed in your login, a link to change your password has been sent to your email address.' ), 'success' );
+			$Messages->add( T_('If you correctly typed in your login, a link to change your password has been sent to your registered email address.' ), 'success' );
 			$action = 'req_login';
 			break;
 		}
@@ -395,6 +395,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.93  2007/05/15 18:35:03  blueyed
+ * Use the same string when faking a success message!
+ *
  * Revision 1.92  2007/04/26 00:11:14  fplanque
  * (c) 2007
  *
