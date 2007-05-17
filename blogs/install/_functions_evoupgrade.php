@@ -267,7 +267,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Upgrading posts table... ';
-		$query = "ALTER TABLE T_posts
+		$query = "ALTER TABLE {$tableprefix}posts
 							MODIFY COLUMN post_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
 							ADD COLUMN post_urltitle VARCHAR(50) NULL DEFAULT NULL AFTER post_title,
 							ADD COLUMN post_url VARCHAR(250) NULL DEFAULT NULL AFTER post_urltitle,
@@ -276,11 +276,11 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Generating wordcounts... ';
-		$query = "SELECT ID, post_content FROM T_posts WHERE post_wordcount IS NULL";
+		$query = "SELECT ID, post_content FROM {$tableprefix}posts WHERE post_wordcount IS NULL";
 		$i = 0;
 		foreach( $DB->get_results( $query, ARRAY_A ) as $row )
 		{
-			$query_update_wordcount = "UPDATE T_posts
+			$query_update_wordcount = "UPDATE {$tableprefix}posts
 																SET post_wordcount = " . bpost_count_words($row['post_content']) . "
 																WHERE ID = " . $row['ID'];
 			$DB->query($query_update_wordcount);
@@ -615,11 +615,11 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Upgrading posts table... ';
-		$query = "UPDATE T_posts
+		$query = "UPDATE {$tableprefix}posts
 							SET post_urltitle = NULL";
 		$DB->query( $query );
 
-		$query = "ALTER TABLE T_posts
+		$query = "ALTER TABLE {$tableprefix}posts
 							CHANGE COLUMN post_date post_issue_date datetime NOT NULL default '1000-01-01 00:00:00',
 							ADD COLUMN post_mod_date datetime NOT NULL default '1000-01-01 00:00:00'
 										AFTER post_issue_date,
@@ -633,13 +633,13 @@ function upgrade_b2evo_tables()
 							ADD UNIQUE post_urltitle( post_urltitle )";
 		$DB->query( $query );
 
-		$query = "UPDATE T_posts
+		$query = "UPDATE {$tableprefix}posts
 							SET post_mod_date = post_issue_date";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
 		// convert given languages to locales
-		convert_lang_to_locale( 'T_posts', 'post_locale', 'ID' );
+		convert_lang_to_locale( "{$tableprefix}posts", 'post_locale', 'ID' );
 
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
@@ -811,7 +811,7 @@ function upgrade_b2evo_tables()
 
 
 			echo 'Creating table for Post Statuses... ';
-			$query="CREATE TABLE T_itemstatuses (
+			$query="CREATE TABLE {$tableprefix}poststatuses (
 											pst_ID   int(11) unsigned not null AUTO_INCREMENT,
 											pst_name varchar(30)      not null,
 											primary key ( pst_ID )
@@ -821,7 +821,7 @@ function upgrade_b2evo_tables()
 
 
 			echo 'Creating table for Post Types... ';
-			$query="CREATE TABLE T_itemtypes (
+			$query="CREATE TABLE {$tableprefix}posttypes (
 											ptyp_ID   int(11) unsigned not null AUTO_INCREMENT,
 											ptyp_name varchar(30)      not null,
 											primary key (ptyp_ID)
@@ -948,7 +948,7 @@ function upgrade_b2evo_tables()
 
 
 		echo 'Upgrading posts table... ';
-		$query = "ALTER TABLE T_posts
+		$query = "ALTER TABLE {$tableprefix}posts
 							DROP COLUMN post_karma,
 							DROP COLUMN post_autobr,
 							DROP INDEX post_author,
@@ -980,9 +980,9 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Updating post data... ';
-		$query = 'UPDATE T_posts
+		$query = "UPDATE {$tableprefix}posts
 							SET post_lastedit_user_ID = post_creator_user_ID,
-									post_datecreated = post_datestart';
+									post_datecreated = post_datestart";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
@@ -1086,7 +1086,7 @@ function upgrade_b2evo_tables()
 
 		echo 'Creating default Post Types... ';
 		$DB->query( "
-			INSERT INTO T_itemtypes ( ptyp_ID, ptyp_name )
+			INSERT INTO {$tableprefix}posttypes ( ptyp_ID, ptyp_name )
 			VALUES ( 1, 'Post' ),
 			       ( 2, 'Link' )" );
 		echo "OK.<br />\n";
@@ -1193,7 +1193,7 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 9190 ) // Note: changed from 9200, to include the block below, if DB is not yet on 1.8
 	{	// 1.8 ALPHA (block #2)
 		echo 'Altering Posts table... ';
-		$DB->query( "ALTER TABLE T_posts
+		$DB->query( "ALTER TABLE {$tableprefix}posts
 		             CHANGE post_comments post_comment_status ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open'" );
 		echo "OK.<br />\n";
 
@@ -1239,9 +1239,9 @@ function upgrade_b2evo_tables()
 															cset_value   VARCHAR( 255 ) NULL,
 															PRIMARY KEY ( cset_coll_ID, cset_name )
 											)',
-				18 => 'ALTER TABLE T_posts CHANGE COLUMN post_content post_content          text NULL',
-				19 => 'ALTER TABLE T_posts CHANGE COLUMN post_url post_url              VARCHAR(255) NULL DEFAULT NULL',
-				20 => 'ALTER TABLE T_posts CHANGE COLUMN post_renderers post_renderers        TEXT NOT NULL',
+				18 => "ALTER TABLE {$tableprefix}posts CHANGE COLUMN post_content post_content          text NULL",
+				19 => "ALTER TABLE {$tableprefix}posts CHANGE COLUMN post_url post_url              VARCHAR(255) NULL DEFAULT NULL",
+				20 => "ALTER TABLE {$tableprefix}posts CHANGE COLUMN post_renderers post_renderers        TEXT NOT NULL",
 				21 => 'ALTER TABLE T_comments CHANGE COLUMN comment_author_email comment_author_email varchar(255) NULL',
 				22 => 'ALTER TABLE T_comments CHANGE COLUMN comment_author_url comment_author_url varchar(255) NULL',
 				23 => 'ALTER TABLE T_comments ADD COLUMN comment_spam_karma TINYINT NULL AFTER comment_karma',
@@ -1471,16 +1471,16 @@ function upgrade_b2evo_tables()
 
 
 		echo 'Updating posts... ';
-		db_add_col( 'T_posts', 'post_notifications_status',  'ENUM("noreq","todo","started","finished") NOT NULL DEFAULT "noreq" AFTER post_flags' );
-		db_add_col( 'T_posts', 'post_notifications_ctsk_ID', 'INT(10) unsigned NULL DEFAULT NULL AFTER post_notifications_status' );
+		db_add_col( "{$tableprefix}posts", 'post_notifications_status',  'ENUM("noreq","todo","started","finished") NOT NULL DEFAULT "noreq" AFTER post_flags' );
+		db_add_col( "{$tableprefix}posts", 'post_notifications_ctsk_ID', 'INT(10) unsigned NULL DEFAULT NULL AFTER post_notifications_status' );
 
-		if( db_col_exists('T_posts', 'post_flags') )
+		if( db_col_exists( "{$tableprefix}posts", 'post_flags') )
 		{
-			$DB->query( '
-				UPDATE T_posts
-					 SET post_notifications_status = "finished"
-				 WHERE post_flags LIKE "%pingsdone%"' );
-			db_drop_col( 'T_posts', 'post_flags' );
+			$DB->query( "
+				UPDATE {$tableprefix}posts
+					 SET post_notifications_status = 'finished'
+				 WHERE post_flags LIKE '%pingsdone%'" );
+			db_drop_col( "{$tableprefix}posts", 'post_flags' );
 		}
 
 		echo "OK.<br />\n";
@@ -1511,7 +1511,7 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 9350 )
 	{
 		echo 'Updating post tables... ';
-		$DB->query( 'ALTER TABLE T_posts CHANGE COLUMN post_content post_content MEDIUMTEXT NULL' );
+		$DB->query( "ALTER TABLE {$tableprefix}posts CHANGE COLUMN post_content post_content MEDIUMTEXT NULL" );
 		$DB->query( 'ALTER TABLE T_item__prerendering CHANGE COLUMN itpr_content_prerendered itpr_content_prerendered MEDIUMTEXT NULL' );
 		echo "OK.<br />\n";
 
@@ -1703,7 +1703,7 @@ function upgrade_b2evo_tables()
 
 		$DB->query( "ALTER TABLE T_coll_group_perms CHANGE COLUMN bloggroup_perm_poststatuses bloggroup_perm_poststatuses set('published','deprecated','protected','private','draft','redirected') NOT NULL default ''" );
 
-		$DB->query( "ALTER TABLE T_posts CHANGE COLUMN post_status post_status enum('published','deprecated','protected','private','draft','redirected') NOT NULL default 'published'" );
+		$DB->query( "ALTER TABLE {$tableprefix}posts CHANGE COLUMN post_status post_status enum('published','deprecated','protected','private','draft','redirected') NOT NULL default 'published'" );
 
 		$DB->query( "ALTER TABLE T_comments CHANGE COLUMN comment_status comment_status ENUM('published','deprecated','protected','private','draft','redirected') DEFAULT 'published' NOT NULL" );
 
@@ -1720,7 +1720,7 @@ function upgrade_b2evo_tables()
 	{
 		echo 'Adding default Post Types... ';
 		$DB->query( "
-			REPLACE INTO T_itemtypes ( ptyp_ID, ptyp_name )
+			REPLACE INTO {$tableprefix}posttypes ( ptyp_ID, ptyp_name )
 			VALUES ( 1000, 'Page' ),
 						 ( 2000, 'Reserved' ),
 						 ( 3000, 'Reserved' ),
@@ -1729,7 +1729,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Adding field for post excerpts... ';
-		$DB->query( "ALTER TABLE T_posts ADD COLUMN post_excerpt  text NULL AFTER post_content" );
+		$DB->query( "ALTER TABLE {$tableprefix}posts ADD COLUMN post_excerpt  text NULL AFTER post_content" );
 		echo "OK.<br />\n";
 	}
 
@@ -1758,8 +1758,6 @@ function upgrade_b2evo_tables()
 		    )" );
 		echo "OK.<br />\n";
 	}
-
-
 
 	/*
 	// fp> have to check if this means kiss your pagerank goodbye
@@ -1876,6 +1874,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.223  2007/05/17 20:44:19  fplanque
+ * fixed upgrade.
+ *
  * Revision 1.222  2007/05/14 02:47:23  fplanque
  * (not so) basic Tags framework
  *
