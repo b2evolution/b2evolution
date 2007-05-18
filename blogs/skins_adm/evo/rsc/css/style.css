@@ -571,6 +571,7 @@ div.bSideItem {
 .bSmallHeadRight {
 	float: right;
 	text-align: right;
+	padding-left: 1em; /* do not pad on text in .bSmallHead */
 }
 
 /* Post colors on browse page */
