@@ -523,14 +523,11 @@ div.tabbedpanelblock {
 	border-top: none;
 	margin-top: 0;
 }
+div.panelblock fieldset,
 div.tabbedpanelblock fieldset {
-	border: 1px solid #ddd;
 	margin: 0 0 1ex 0;
 	background-color: #fff;
 	padding: .5ex 1ex;
-}
-div.tabbedpanelblock fieldset fieldset {
-	border: none;
 }
 
 /* browse/ Edit Screen: */
