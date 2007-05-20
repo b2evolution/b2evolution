@@ -1030,10 +1030,10 @@ class Comment extends DataObject
 
 			$subject = sprintf( $subject, $edited_Blog->get('shortname'), $edited_Item->get('title') );
 
-			$notify_message = T_('Blog').': '.$edited_Blog->get('shortname')
-				.' ( '.str_replace('&amp;', '&', $edited_Blog->get('blogurl'))." )\n"
-				.T_('Post').': '.$edited_Item->get('title')
-				.' ( '.str_replace('&amp;', '&', $edited_Item->get_permanent_url())." )\n";
+			$notify_message = T_('Blog').': '.$edited_Blog->get('shortname')."\n"
+				// Mail bloat: .' ( '.str_replace('&amp;', '&', $edited_Blog->get('blogurl'))." )\n"
+				.T_('Post').': '.$edited_Item->get('title')."\n";
+				// Mail bloat: .' ( '.str_replace('&amp;', '&', $edited_Item->get_permanent_url())." )\n";
 				// TODO: fp> We MAY want to force short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 
 			switch( $this->type )
@@ -1062,7 +1062,7 @@ class Comment extends DataObject
 				T_('Comment').': '.str_replace('&amp;', '&', $this->get_permanent_url())."\n"
 				// TODO: fp> We MAY want to force a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 				.$this->get('content')."\n\n"
-				.T_('Edit/Delete').': '.$admin_url.'?ctrl=items&blog='.$edited_Blog->ID.'&p='.$edited_Item->ID."\n\n"
+				.T_('Edit/Delete').': '.$admin_url.'?ctrl=items&blog='.$edited_Blog->ID.'&p='.$edited_Item->ID.'&c=1#c'.$this->ID."\n\n"
 				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
 
 			if( $debug )
@@ -1176,6 +1176,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.64  2007/05/20 20:54:49  fplanque
+ * better comment moderation links
+ *
  * Revision 1.63  2007/04/26 00:11:08  fplanque
  * (c) 2007
  *

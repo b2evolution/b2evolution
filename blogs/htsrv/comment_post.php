@@ -303,23 +303,14 @@ if( !is_logged_in() )
 	{	// Erase cookies:
 		if( !empty($_COOKIE[$cookie_name]) )
 		{
-			// echo "del1<br />";
-			setcookie('comment_author', '', $cookie_expired, '/');
-			setcookie('comment_author', '', $cookie_expired, $cookie_path, $cookie_domain);
 			setcookie( $cookie_name, '', $cookie_expired, $cookie_path, $cookie_domain);
 		}
 		if( !empty($_COOKIE['comment_author_email']) )
 		{
-			// echo "del2<br />";
-			setcookie('comment_author_email', '', $cookie_expired, '/');
-			setcookie('comment_author_email', '', $cookie_expired, $cookie_path, $cookie_domain);
 			setcookie( $cookie_email, '', $cookie_expired, $cookie_path, $cookie_domain);
 		}
 		if( !empty($_COOKIE['comment_author_url']) )
 		{
-			// echo "del3<br />";
-			setcookie('comment_author_url', '', $cookie_expired, '/');
-			setcookie('comment_author_url', '', $cookie_expired, $cookie_path, $cookie_domain);
 			setcookie( $cookie_url, '', $cookie_expired, $cookie_path, $cookie_domain);
 		}
 	}
@@ -363,6 +354,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.111  2007/05/20 20:54:49  fplanque
+ * better comment moderation links
+ *
  * Revision 1.110  2007/04/26 00:11:14  fplanque
  * (c) 2007
  *

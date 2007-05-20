@@ -38,7 +38,7 @@ while( $Comment = & $CommentList->get_next() )
 { // Loop through comments:
 	?>
 	<!-- ========== START of a COMMENT/TB/PB ========== -->
-	<div class="bComment bComment<?php $Comment->status('raw') ?>">
+	<div id="c<?php echo $Comment->ID ?>" class="bComment bComment<?php $Comment->status('raw') ?>">
 		<div class="bSmallHead">
 			<?php
 				echo '<div class="bSmallHeadRight">';
@@ -123,6 +123,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.12  2007/05/20 20:54:49  fplanque
+ * better comment moderation links
+ *
  * Revision 1.11  2007/04/26 00:11:08  fplanque
  * (c) 2007
  *
