@@ -1959,9 +1959,12 @@ class Item extends ItemLight
 	 */
 	function trackback_rdf()
 	{
-		// if (!stristr($_SERVER['HTTP_USER_AGENT'], 'W3C_Validator')) {
-		// fplanque WARNING: this isn't a very clean way to validate :/
-		// fplanque added: html comments (not perfect but better way of validating!)
+		$this->get_Blog();
+		if( ! $this->Blog->get( 'allowtrackbacks' ) )
+		{ // Trackbacks not allowed on this blog:
+			return;
+		}
+
 		echo "<!--\n";
 		echo '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" '."\n";
 		echo '  xmlns:dc="http://purl.org/dc/elements/1.1/"'."\n";
@@ -1979,7 +1982,6 @@ class Item extends ItemLight
 		echo '" />'."\n";
 		echo '</rdf:RDF>';
 		echo "-->\n";
-		// }
 	}
 
 
@@ -2948,6 +2950,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.174  2007/05/20 01:01:35  fplanque
+ * make trackback silent when it should be
+ *
  * Revision 1.173  2007/05/14 02:47:23  fplanque
  * (not so) basic Tags framework
  *
