@@ -187,12 +187,12 @@ else
 /*
  * Magic quotes:
  */
-if( ini_get('magic_quotes_sybase') )
+if( !strcasecmp( ini_get('magic_quotes_sybase'), 'on' ) )
 {
 	$magic_quotes = T_('On').' (magic_quotes_sybase)';
 	$message = 'magic_quotes_sybase = Off';
 }
-elseif( ini_get('magic_quotes_gpc') )
+elseif( get_magic_quotes_gpc() )
 {
 	$magic_quotes = T_('On').' (magic_quotes_gpc)';
 	$message = 'magic_quotes_gpc = Off';
@@ -442,6 +442,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2007/05/20 01:02:32  fplanque
+ * magic quotes fix
+ *
  * Revision 1.16  2007/04/26 00:11:15  fplanque
  * (c) 2007
  *

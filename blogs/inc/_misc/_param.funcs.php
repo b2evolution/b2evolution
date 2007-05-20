@@ -1590,7 +1590,7 @@ function _trapError( $reset = 1 )
  * @param mixed string or array (function is recursive)
  * @return mixed
  */
-if( ini_get('magic_quotes_sybase') ) // overrides "magic_quotes_gpc" and only replaces single quotes with themselves ( "'" => "''" )
+if( !strcasecmp( ini_get('magic_quotes_sybase'), 'on' ) ) // overrides "magic_quotes_gpc" and only replaces single quotes with themselves ( "'" => "''" )
 {
 	/**
 	 * @ignore
@@ -1612,7 +1612,7 @@ if( ini_get('magic_quotes_sybase') ) // overrides "magic_quotes_gpc" and only re
 		return $mixed;
 	}
 }
-elseif( ini_get('magic_quotes_gpc') )
+elseif( get_magic_quotes_gpc() )
 { // That stupid PHP behaviour consisting of adding slashes everywhere is unfortunately on
 	/**
 	 * Remove quotes from input.
@@ -1656,6 +1656,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.38  2007/05/20 01:02:32  fplanque
+ * magic quotes fix
+ *
  * Revision 1.37  2007/05/13 18:36:52  blueyed
  * param_check_date(): Allow multiple whitespaces
  *
