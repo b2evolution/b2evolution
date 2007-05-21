@@ -312,6 +312,10 @@ class AutoPPluginTestCase extends PluginUnitTestCase
 			$this->render( "<ul>\n<li>FOO\nBAR\n</li>\n\n\n</ul>" ) );
 
 		$this->assertEqual(
+			"<ol>\n<li>FOO<br />\nBAR\n</li>\n\n\n</ol>",
+			$this->render( "<ol>\n<li>FOO\nBAR\n</li>\n\n\n</ol>" ) );
+
+		$this->assertEqual(
 			"<div class=\"image_block\">\n<img /></div>",
 			$this->render( "<div class=\"image_block\">\n<img /></div>" ) );
 

@@ -41,7 +41,7 @@ class auto_p_plugin extends Plugin
 
 	var $br_allowed_in = array(
 		// Block level:
-		'address', 'center', 'dl', 'dir', 'div', 'fieldset', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'isindex', 'menu', 'noframes', 'noscript', 'ol', 'p', 'pre',
+		'address', 'center', 'dl', 'dir', 'div', 'fieldset', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'isindex', 'menu', 'noframes', 'noscript', 'p', 'pre',
 		// Inline:
 		'a', 'abbr', 'acronym', 'applet', 'b', 'basefont', 'bdo', 'big', 'button', 'cite', 'code', 'dfn', 'em', 'font', 'i', 'img', 'input', 'iframe', 'kbd', 'label', 'li', 'map', 'object', 'q', 'samp', 'script', 'select', 'small', 'span', 'strong', 'sub', 'sup', 'textarea', 'td', 'th', 'tt', 'var' );
 
@@ -634,6 +634,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.38  2007/05/21 17:44:10  blueyed
+ * Auto-P: Fixed adding linebreaks/BR tags directly in OL elements
+ *
  * Revision 1.37  2007/04/20 02:53:13  fplanque
  * limited number of installs
  *
