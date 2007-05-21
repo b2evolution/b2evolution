@@ -27,6 +27,13 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 // Dity conf switch here because this will be pluginized anyway and using the same App Settings switch as email blloggin was a problem.
 $mms_AutoBR = 1;
 
+
+if( ! isset($HTTP_RAW_POST_DATA) )
+{
+        $HTTP_RAW_POST_DATA = implode("\r\n", file('php://input'));
+}
+
+
 require_once $inc_path.'_main.inc.php';
 
 param( 'login', 'string', '', true );
@@ -742,6 +749,9 @@ exit;
 
 /*
  * $Log$
+ * Revision 1.10  2007/05/21 19:40:15  blueyed
+ * Fixed usage of $HTTP_RAW_POST_DATA global by using php://input stream, if $HTTP_RAW_POST_DATA is not set.
+ *
  * Revision 1.9  2006/12/12 02:53:56  fplanque
  * Activated new item/comments controllers + new editing navigation
  * Some things are unfinished yet. Other things may need more testing.

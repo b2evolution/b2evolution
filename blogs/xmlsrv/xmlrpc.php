@@ -26,12 +26,13 @@
 // Disable Cookies
 $_COOKIE = array();
 
-// Trim requests (used by XML-RPC library); fix for mozBlog and other cases where '<?xml' isn't on the very first line
-if ( isset($HTTP_RAW_POST_DATA) )
+if( ! isset($HTTP_RAW_POST_DATA) )
 {
-	// TODO: dh> xmlrpc should use php://input instead.. see http://bugs.php.net/bug.php?id=22338
-	$HTTP_RAW_POST_DATA = trim( $HTTP_RAW_POST_DATA );
+	$HTTP_RAW_POST_DATA = implode("\r\n", file('php://input'));
 }
+// Trim requests (used by XML-RPC library); fix for mozBlog and other cases where '<?xml' isn't on the very first line
+$HTTP_RAW_POST_DATA = trim( $HTTP_RAW_POST_DATA );
+
 
 /**
  * Set to TRUE to do HTML sanity checking as in the browser interface, set to
@@ -2240,6 +2241,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.137  2007/05/21 19:40:15  blueyed
+ * Fixed usage of $HTTP_RAW_POST_DATA global by using php://input stream, if $HTTP_RAW_POST_DATA is not set.
+ *
  * Revision 1.136  2007/05/09 01:00:25  fplanque
  * optimized querying for blog lists
  *
