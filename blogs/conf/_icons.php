@@ -42,11 +42,11 @@ function get_icon_info($name)
 		);
 		case 'switch-to-admin': return array(
 			'file' => $rsc_subdir.'icons/switch-to-admin.gif',
-			'alt'  => T_('A'),
+			'alt'  => /* TRANS: short for "Switch to _A_dmin" */ T_('A'),
 			'size' => array( 13, 14 ),
 		);
 		case 'switch-to-blog': return array(
-			'file' => $rsc_subdir.'icons/switch-to-blog.gif',
+			'file' => /* TRANS: short for "Switch to _B_log" */ $rsc_subdir.'icons/switch-to-blog.gif',
 			'alt'  => T_('B'),
 			'size' => array( 13, 14 ),
 		);
@@ -506,6 +506,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.58  2007/05/23 22:45:07  blueyed
+ * TRANS comments
+ *
  * Revision 1.57  2007/03/24 20:35:57  fplanque
  * minor
  *
