@@ -1494,6 +1494,7 @@ function debug_info( $force = false )
 	global $debug, $Debuglog, $DB, $obhandler_debug, $Timer, $ReqHost, $ReqPath;
 	global $cache_imgsize, $cache_File;
 	global $Session;
+	global $db_config, $tableprefix;
 
 	if( ! $debug && ! $force )
 	{ // No debug output:
@@ -1642,6 +1643,17 @@ function debug_info( $force = false )
 
 
 	echo '<h3 id="evo_debug_queries">DB</h3>';
+
+	if($db_config)
+	{
+		echo '<pre>',
+		T_('DB Username').': '.$db_config['user']."\n".
+		T_('DB Database').': '.$db_config['name']."\n".
+		T_('DB Host').': '.$db_config['host']."\n".
+		T_('DB tables prefix').': '.$tableprefix."\n".
+		T_('DB connection charset').': '.$db_config['connection_charset']."\n".
+		'</pre>';
+	}
 
 	if( !isset($DB) )
 	{
@@ -2958,6 +2970,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.177  2007/05/23 23:07:53  blueyed
+ * Display DB info (user, database, host, tableprefix, charset) in debug_info()
+ *
  * Revision 1.176  2007/05/13 20:49:34  fplanque
  * removed hack that did inconsistent action upon the HTML and the Security checkers.
  *
