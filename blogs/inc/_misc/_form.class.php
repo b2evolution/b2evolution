@@ -133,6 +133,13 @@ class Form extends Widget
 	 */
 	var $disp_param_err_messages_with_fields = true;
 
+	/**
+	 * Stack of previous used layouts
+	 * @see Form::switch_layout()
+	 * @var array
+	 */
+	var $saved_layouts;
+
 
 	/**
 	 * Constructor
@@ -165,7 +172,7 @@ class Form extends Widget
 			}
 		}
 
-		$this->saved_layout = $layout;
+		$this->saved_layouts = array($layout);
 		$this->switch_layout( NULL );	// "restore" saved layout.
 	}
 
@@ -177,12 +184,14 @@ class Form extends Widget
 	{
 		if( $layout == NULL )
 		{ // we want to restore previous layout:
-			$this->layout = $this->saved_layout;
-			$this->saved_layout = NULL;
+			if( count($this->saved_layouts) )
+			{
+				$this->layout = array_shift($this->saved_layouts);
+			}
 		}
 		else
 		{ // We want to switch to a new layout
-			$this->saved_layout = $this->layout;
+			array_unshift( $this->saved_layouts, $this->layout );
 			$this->layout = $layout;
 		}
 
@@ -2742,6 +2751,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.82  2007/05/23 09:17:04  blueyed
+ * Support for stacking in Form::switch_layout()
+ *
  * Revision 1.81  2007/05/15 14:57:24  blueyed
  * Fix for Form::select_input_array() "selected"-Handling (cast values to string when comparing)
  *
