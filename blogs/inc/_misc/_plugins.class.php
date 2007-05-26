@@ -1203,8 +1203,7 @@ class Plugins
 	 */
 	function call_method_if_active( $plugin_ID, $method, & $params )
 	{
-		if( ! isset($this->index_event_IDs[$method])
-		    || ! in_array( $plugin_ID, $this->index_event_IDs[$method] ) )
+		if( ! $this->has_event($plugin_ID, $method) )
 		{
 			return NULL;
 		}
@@ -1806,6 +1805,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.153  2007/05/26 19:01:29  blueyed
+ * Use has_event() in call_method_if_active()
+ *
  * Revision 1.152  2007/05/14 02:43:05  fplanque
  * Started renaming tables. There probably won't be a better time than 2.0.
  *
