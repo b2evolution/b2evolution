@@ -89,7 +89,7 @@ class GeneralSettings extends AbstractSettings
 		'newusers_revalidate_emailchg' => '0',
 		'newusers_level' => '1',
 
-		'regexp_filename' => '^[a-zA-Z0-9\-_.]+$', // TODO: accept spaces and special chars / do full testing on this
+		'regexp_filename' => '^[a-zA-Z0-9\-_. ]+$', // TODO: accept (spaces and) special chars / do full testing on this
 		'regexp_dirname' => '^[a-zA-Z0-9\-_]+$', // TODO: accept spaces and special chars / do full testing on this
 		'reloadpage_timeout' => '300',
 		'time_difference' => '0',
@@ -157,6 +157,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.33  2007/05/26 21:30:54  blueyed
+ * Allow spaces in filenames by default
+ *
  * Revision 1.32  2007/04/26 00:11:02  fplanque
  * (c) 2007
  *
