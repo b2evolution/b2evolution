@@ -258,20 +258,27 @@ if( $action != 'view_user' )
 	$Plugins->restart();
 	while( $loop_Plugin = & $Plugins->get_next() )
 	{
-		if( ! $loop_Plugin->UserSettings ) // NOTE: this triggers autoloading in PHP5, which is needed for the "hackish" isset($this->UserSettings)-method to see if the settings are queried for editing (required before 1.9)
+		if( ! $loop_Plugin->UserSettings /* NOTE: this triggers autoloading in PHP5, which is needed for the "hackish" isset($this->UserSettings)-method to see if the settings are queried for editing (required before 1.9) */
+			&& ! $Plugins->has_event($loop_Plugin->ID, 'PluginSettingsEditDisplayAfter') )
 		{
 			continue;
 		}
 
-		// We use output buffers here to display the fieldset only, if there's content in there (either from PluginSettings or PluginSettingsEditDisplayAfter).
+		// We use output buffers here to display the fieldset only, if there's content in there (either from PluginUserSettings or PluginSettingsEditDisplayAfter).
 		ob_start();
 		$Form->begin_fieldset( $loop_Plugin->name );
 
 		ob_start();
-		foreach( $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
+		// UserSettings:
+		$plugin_user_settings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
+		if( is_array($plugin_user_settings) )
 		{
-			display_plugin_settings_fieldset_field( $l_name, $l_meta, $loop_Plugin, $Form, 'UserSettings', $edited_User );
+			foreach( $plugin_user_settings as $l_name => $l_meta )
+			{
+				display_plugin_settings_fieldset_field( $l_name, $l_meta, $loop_Plugin, $Form, 'UserSettings', $edited_User );
+			}
 		}
+
 		$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsEditDisplayAfter',
 			$tmp_params = array( 'Form' => & $Form, 'User' => $edited_User ) );
 		$has_contents = strlen( ob_get_contents() );
@@ -375,6 +382,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.49  2007/05/26 19:06:35  blueyed
+ * Trigger PluginUserSettingsEditDisplayAfter also if there are no UserSettings
+ *
  * Revision 1.48  2007/04/26 00:11:13  fplanque
  * (c) 2007
  *
