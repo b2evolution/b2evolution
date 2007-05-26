@@ -247,18 +247,20 @@ class Results extends Table
 	 * @param string default ordering of columns (special syntax) if not specified in the URL params
 	 *               example: -A-- will sort in ascending order on 2nd column
 	 *               example: ---D will sort in descending order on 4th column
-	 * @param integer number of lines displayed on one page (NULL to disable paging)
-	 *                       dh> 0 should be "no paging" and null just the default (from $UserSettings / 20)
+	 * @param integer number of lines displayed on one page (0 to disable paging; null to use $UserSettings/results_per_page)
 	 * @param string SQL to get the total count of results
 	 * @param boolean
 	 * @param NULL|string SQL query used to count the total # of rows (if NULL, we'll try to COUNT(*) by ourselves)
 	 */
-	function Results( $sql, $param_prefix = '', $default_order = '', $limit = 20, $count_sql = NULL, $init_page = true )
+	function Results( $sql, $param_prefix = '', $default_order = '', $limit = null, $count_sql = NULL, $init_page = true )
 	{
+		global $UserSettings;
+
 		parent::Table();
 
 		$this->sql = $sql;
-		$this->limit = $limit;
+
+		$this->limit = is_null($limit) ? $UserSettings->get('results_per_page') : $limit;
 		$this->param_prefix = $param_prefix;
 
 		// Count total rows:
@@ -1967,6 +1969,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.53  2007/05/26 22:21:32  blueyed
+ * Made $limit for Results configurable per user
+ *
  * Revision 1.52  2007/04/26 00:11:08  fplanque
  * (c) 2007
  *

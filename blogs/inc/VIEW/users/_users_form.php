@@ -233,6 +233,9 @@ $Form->begin_fieldset( T_('Preferences') );
 		// To activate focus on first form input text
 		$Form->checkbox( 'edited_user_focusonfirst', $UserSettings->get( 'focus_on_first_input', $edited_User->ID ), T_('Focus on first field'), T_('The focus will automatically go to the first input text field.') );
 
+		// Number of results per page
+		$Form->text( 'edited_user_results_per_page', $UserSettings->get( 'results_per_page', $edited_User->ID ), 3, T_('Results per page'), /* TODO: wording! */ T_('Number of results per page in a default results table.') );
+
 	}
 	else
 	{ // display only
@@ -242,7 +245,9 @@ $Form->begin_fieldset( T_('Preferences') );
 		$Form->info_field( T_('Admin skin'), $value_admin_skin, array( 'note' => T_('The skin defines how the backoffice appears to you.') ) );
 
 		// fp> TODO: a lot of things will not be displayed in view only mode. Do we want that?
+		// dh> no, IMHO.
 
+		$Form->info_field( T_('Results per page'), $UserSettings->get( 'results_per_page', $edited_User->ID ), /* TODO: wording! */ array( 'note' => T_('Number of results per page in a default results table.') ) );
 	}
 
 $Form->end_fieldset();
@@ -382,6 +387,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.50  2007/05/26 22:21:32  blueyed
+ * Made $limit for Results configurable per user
+ *
  * Revision 1.49  2007/05/26 19:06:35  blueyed
  * Trigger PluginUserSettingsEditDisplayAfter also if there are no UserSettings
  *

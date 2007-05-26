@@ -88,14 +88,14 @@ class DataObjectList2 extends FilteredResults
 	 * If provided, executes SQL query via parent Results object
 	 *
 	 * @param DataObjectCache
-	 * @param integer number of lines displayed on one screen
+	 * @param integer number of lines displayed on one screen (null for default [20])
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param string default ordering of columns (special syntax)
 	 */
-	function DataObjectList2( & $Cache, $limit = 20, $param_prefix = '', $default_order = NULL )
+	function DataObjectList2( & $Cache, $limit = null, $param_prefix = '', $default_order = NULL )
 	{
 		// WARNING: we are not passing any SQL query to the Results object
-		// This will make the Results object behave a little buit differently than usual:
+		// This will make the Results object behave a little bit differently than usual:
 		parent::Results( NULL, $param_prefix, $default_order, $limit, NULL, false );
 
 		// The list objects will also be cached in this cache.
@@ -163,8 +163,8 @@ class DataObjectList2 extends FilteredResults
 		$r = $prefix.format_to_output( $r, $format ).$suffix;
 		return $r;
 	}
-	
-	
+
+
 	/**
 	 * Move up the element order in database
 	 *
@@ -174,9 +174,9 @@ class DataObjectList2 extends FilteredResults
 	function move_up( $id )
 	{
 		global $DB, $Messages, $result_fadeout;
-		
+
 		$DB->begin();
-		
+
 		if( ($obj = & $this->Cache->get_by_ID( $id )) === false )
 		{
 			$Messages->head = T_('Cannot edit entry!');
@@ -185,39 +185,39 @@ class DataObjectList2 extends FilteredResults
 			return false;
 		}
 		$order = $obj->order;
-		
-		// Get the ID of the inferior element which his order is the nearest   	
+
+		// Get the ID of the inferior element which his order is the nearest
 		$rows = $DB->get_results( 'SELECT '.$this->Cache->dbIDname
 														 	.' FROM '.$this->Cache->dbtablename
-														 .' WHERE '.$this->Cache->dbprefix.'order < '.$order  
-													.' ORDER BY '.$this->Cache->dbprefix.'order DESC 
+														 .' WHERE '.$this->Cache->dbprefix.'order < '.$order
+													.' ORDER BY '.$this->Cache->dbprefix.'order DESC
 														 		LIMIT 0,1' );
-		
+
 		if( count( $rows ) )
 		{
 			// instantiate the inferior element
 			$obj_inf = & $this->Cache->get_by_ID( $rows[0]->{$this->Cache->dbIDname} );
-			
+
 			//  Update element order
 			$obj->set( 'order', $obj_inf->order );
 			$obj->dbupdate();
-			
+
 			// Update inferior element order
 			$obj_inf->set( 'order', $order );
 			$obj_inf->dbupdate();
-			
+
 			// EXPERIMENTAL FOR FADEOUT RESULT
 			$result_fadeout[$this->Cache->dbIDname][] = $id;
 			$result_fadeout[$this->Cache->dbIDname][] = $obj_inf->ID;
 		}
-		else 
+		else
 		{
-			$Messages->add( T_('This element is already at the top.'), 'error' ); 
-		}	
+			$Messages->add( T_('This element is already at the top.'), 'error' );
+		}
 		$DB->commit();
 	}
 
-	
+
 	/**
 	 * Move down the element order in database
 	 *
@@ -227,9 +227,9 @@ class DataObjectList2 extends FilteredResults
 	function move_down( $id )
 	{
 		global $DB, $Messages, $result_fadeout;
-		
+
 		$DB->begin();
-		
+
 		if( ($obj = & $this->Cache->get_by_ID( $id )) === false )
 		{
 			$Messages->head = T_('Cannot edit entry!');
@@ -238,41 +238,44 @@ class DataObjectList2 extends FilteredResults
 			return false;
 		}
 		$order = $obj->order;
-		
-		// Get the ID of the inferior element which his order is the nearest   	
+
+		// Get the ID of the inferior element which his order is the nearest
 		$rows = $DB->get_results( 'SELECT '.$this->Cache->dbIDname
 														 	.' FROM '.$this->Cache->dbtablename
-														 .' WHERE '.$this->Cache->dbprefix.'order > '.$order  
-													.' ORDER BY '.$this->Cache->dbprefix.'order ASC 
+														 .' WHERE '.$this->Cache->dbprefix.'order > '.$order
+													.' ORDER BY '.$this->Cache->dbprefix.'order ASC
 														 		LIMIT 0,1' );
-		
+
 		if( count( $rows ) )
 		{
 			// instantiate the inferior element
 			$obj_sup = & $this->Cache->get_by_ID( $rows[0]->{$this->Cache->dbIDname} );
-			
+
 			//  Update element order
 			$obj->set( 'order', $obj_sup->order );
 			$obj->dbupdate();
-			
+
 			// Update inferior element order
 			$obj_sup->set( 'order', $order );
 			$obj_sup->dbupdate();
-			
+
 			// EXPERIMENTAL FOR FADEOUT RESULT
 			$result_fadeout[$this->Cache->dbIDname][] = $id;
 			$result_fadeout[$this->Cache->dbIDname][] = $obj_sup->ID;
 		}
-		else 
+		else
 		{
-			$Messages->add( T_('This element is already at the bottom.'), 'error' ); 
-		}	
+			$Messages->add( T_('This element is already at the bottom.'), 'error' );
+		}
 		$DB->commit();
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.9  2007/05/26 22:21:32  blueyed
+ * Made $limit for Results configurable per user
+ *
  * Revision 1.8  2007/04/26 00:11:09  fplanque
  * (c) 2007
  *

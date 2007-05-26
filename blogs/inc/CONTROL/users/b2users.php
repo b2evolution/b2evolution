@@ -324,6 +324,7 @@ if( !$Messages->count('error') )
 			param( 'edited_user_legend', 'integer', 0 );
 			param( 'edited_user_bozo', 'integer', 0 );
 			param( 'edited_user_focusonfirst', 'integer', 0 );
+			param( 'edited_user_results_per_page', 'integer', null );
 
 			if( $Messages->count( 'error' ) )
 			{	// We have found validation errors:
@@ -387,6 +388,12 @@ if( !$Messages->count('error') )
 
 			// Focus on first
 			$UserSettings->set( 'focus_on_first_input', $edited_user_focusonfirst, $edited_User->ID );
+
+			// Results per page
+			if( isset($edited_user_results_per_page) )
+			{
+				$UserSettings->set( 'results_per_page', $edited_user_results_per_page, $edited_User->ID );
+			}
 
 			// Update user settings:
 			if( $UserSettings->dbupdate() ) $Messages->add( T_('User feature settings have been changed.'), 'success');
@@ -807,6 +814,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.49  2007/05/26 22:21:32  blueyed
+ * Made $limit for Results configurable per user
+ *
  * Revision 1.48  2007/04/26 00:11:15  fplanque
  * (c) 2007
  *

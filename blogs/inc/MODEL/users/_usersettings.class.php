@@ -70,6 +70,8 @@ class UserSettings extends AbstractSettings
 		'blogperms_layout' => 'default', // selected view in blog (user/group) perms
 
 		'login_multiple_sessions' => 0, 	// allow multiple concurrent sessions?
+
+		'results_per_page' => 20,
 	);
 
 
@@ -208,6 +210,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.32  2007/05/26 22:21:32  blueyed
+ * Made $limit for Results configurable per user
+ *
  * Revision 1.31  2007/05/13 18:49:55  fplanque
  * made autoselect_blog() more robust under PHP4
  *
