@@ -45,6 +45,7 @@ class ItemQuery extends SQL
 	var $cat;
 	var $catsel;
 	var $show_statuses;
+	var $tags;
 	var $author;
 	var $assignees;
 	var $statuses;
@@ -246,6 +247,29 @@ class ItemQuery extends SQL
 		}
 
 		$this->WHERE_and( statuses_where_clause( $show_statuses, $this->dbprefix, $this->blog ) );
+	}
+
+
+	/**
+	 * Restrict to specific tags
+	 *
+	 * @param string List of tags to restrict to
+	 */
+	function where_tags( $tags )
+	{
+		global $DB;
+
+		$this->tags = $tags;
+
+		if( empty( $tags ) )
+		{
+			return;
+		}
+
+		$tags = explode( ',', $tags );
+
+		$this->FROM_add( 'INNER JOIN T_items__itemtag ON post_ID = itag_itm_ID
+											INNER JOIN T_items__tag ON (itag_tag_ID = tag_ID AND tag_name IN ('.$DB->quote($tags).') )' );
 	}
 
 
@@ -636,6 +660,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.18  2007/05/27 00:35:26  fplanque
+ * tag display + tag filtering
+ *
  * Revision 1.17  2007/04/26 00:11:12  fplanque
  * (c) 2007
  *

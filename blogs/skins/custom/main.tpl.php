@@ -172,6 +172,15 @@ require $skins_path.'_html_header.inc.php';
 			?>
 		</div>
 
+		<?php
+			// List all tags attached to this post:
+			$Item->tags( array(
+					'before' =>         '<div class="bSmallPrint">'.T_('Tags').': ',
+					'after' =>          '</div>',
+					'separator' =>      ', ',
+				) );
+		?>
+
 		<div class="bSmallPrint">
 			<?php $Item->permanent_link( '#', '#', 'permalink_right' ); ?>
 

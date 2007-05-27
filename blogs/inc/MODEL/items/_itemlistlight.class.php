@@ -143,6 +143,7 @@ class ItemListLight extends DataObjectList2
 				'cat_array' => array(),
 				'cat_modifier' => NULL,
 				'cat_focus' => 'wide',					// Search in extra categories, not just main cat
+				'tags' => NULL,
 				'authors' => NULL,
 				'assignees' => NULL,
 				'author_assignee' => NULL,
@@ -215,6 +216,12 @@ class ItemListLight extends DataObjectList2
 		global $cat_array, $cat_modifier;
 		$cat_array = $this->default_filters['cat_array'];
 		$cat_modifier = $this->default_filters['cat_modifier'];
+
+
+		/*
+		 * Restrict to selected tags:
+		 */
+		memorize_param( $this->param_prefix.'tags', 'string', $this->default_filters['tags'], $this->filters['tags'] );
 
 
 		/*
@@ -348,6 +355,12 @@ class ItemListLight extends DataObjectList2
 		$this->filters['cat_modifier'] = get_param( 'cat_modifier' );
 
 		$this->filters['cat_focus'] = param( $this->param_prefix.'cat_focus', 'string', $this->default_filters['cat_focus'], true );
+
+
+		/*
+		 * Restrict to selected tags:
+		 */
+		$this->filters['tags'] = param( $this->param_prefix.'tag', 'string', $this->default_filters['tags'], true );
 
 
 		/*
@@ -577,6 +590,7 @@ class ItemListLight extends DataObjectList2
 		 */
 		$this->ItemQuery->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'],
 																			$this->filters['cat_focus'] );
+		$this->ItemQuery->where_tags( $this->filters['tags'] );
 		$this->ItemQuery->where_author( $this->filters['authors'] );
 		$this->ItemQuery->where_assignees( $this->filters['assignees'] );
 		$this->ItemQuery->where_author_assignee( $this->filters['author_assignee'] );
@@ -837,6 +851,8 @@ class ItemListLight extends DataObjectList2
 		$params = array_merge( array(
 				'category_text' => T_('Category').': ',
 				'categories_text' => T_('Categories').': ',
+				// 'tag_text' => T_('Tag').': ',
+				'tags_text' => T_('Tags').': ',
 			), $params );
 
 		if( empty( $this->filters ) )
@@ -939,6 +955,13 @@ class ItemListLight extends DataObjectList2
 		if( !empty($this->filters['keywords']) )
 		{
 			$title_array['keywords'] = T_('Keyword(s)').': '.$this->filters['keywords'];
+		}
+
+
+		// TAGS:
+		if( !empty($this->filters['tags']) )
+		{
+			$title_array[] = $params['tags_text'].$this->filters['tags'];
 		}
 
 
@@ -1427,6 +1450,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.7  2007/05/27 00:35:26  fplanque
+ * tag display + tag filtering
+ *
  * Revision 1.6  2007/05/13 22:53:31  fplanque
  * allow feeds restricted to post excerpts
  *

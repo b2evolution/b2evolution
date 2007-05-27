@@ -1120,7 +1120,7 @@ class Item extends ItemLight
 	 *
 	 * @return array
 	 */
-	function get_tags()
+	function & get_tags()
 	{
 		global $DB;
 
@@ -1139,11 +1139,15 @@ class Item extends ItemLight
 
 
   /**
-	 * @param string
+	 * Split tags by space or comma
+	 *
+	 * @todo fp> allow tags with spaces when quoted like "long tag". Nota comma should never be allowed in a tag.
+ 	 *
+ 	 * @param string
 	 */
 	function set_tags_from_string( $tags )
 	{
-		$this->tags = explode( ' ', $tags );
+		$this->tags = preg_split( '/[\s,]+/', $tags );
 	}
 
 
@@ -1950,6 +1954,57 @@ class Item extends ItemLight
 		elseif( $extra_status = $this->get('t_extra_status') )
 		{
 			echo $before.format_to_output( $extra_status, $format ).$after;
+		}
+	}
+
+
+
+ 	/**
+	 * Display tags for Item
+	 *
+	 * @param array of params
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function tags( $params = array() )
+	{
+		$params = array_merge( array(
+				'before' =>           '<div>'.T_('Tags').': ',
+				'after' =>            '</div>',
+				'separator' =>        ', ',
+				'links' =>            true,
+			), $params );
+
+		$tags = $this->get_tags();
+
+		if( !empty( $tags ) )
+		{
+			echo $params['before'];
+
+			if( $links = $params['links'] )
+			{
+				$this->get_Blog();
+				$tag_view_url = url_add_param( $this->Blog->gen_blogurl(), 'tag=' );
+			}
+
+			$i = 0;
+			foreach( $tags as $tag )
+			{
+				if( $i++ > 0 )
+				{
+					echo $params['separator'];
+				}
+				if( $links )
+				{
+					echo '<a href="'.$tag_view_url.urlencode( $tag ).'">';
+				}
+				echo htmlspecialchars( $tag );
+				if( $links )
+				{
+					echo '</a>';
+				}
+			}
+
+			echo $params['after'];
 		}
 	}
 
@@ -2950,6 +3005,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.175  2007/05/27 00:35:26  fplanque
+ * tag display + tag filtering
+ *
  * Revision 1.174  2007/05/20 01:01:35  fplanque
  * make trackback silent when it should be
  *
