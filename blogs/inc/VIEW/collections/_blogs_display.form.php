@@ -64,8 +64,8 @@ $Form->begin_fieldset( T_('Skin and style') );
 	$SkinCache = & get_Cache( 'SkinCache' );
 	$SkinCache->load_all();
 	$Form->select_input_object( 'blog_skin_ID', $edited_Blog->skin_ID, $SkinCache, T_('Skin') );
-	$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('A CSS file in the blog media directory will override the default skin stylesheet.') );
-	$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to override the blog and skin stylesheet with their own.') );
+	$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('You will be able to customize the blog\'s skin stylesheet with a file named style.css in the blog\'s media file folder.') );
+	$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to customize the blog and skin stylesheets with a file named style.css in their personal file folder.') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Link blog / Blogroll') );
@@ -80,6 +80,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.13  2007/05/27 00:34:40  fplanque
+ * minor
+ *
  * Revision 1.12  2007/05/13 22:53:31  fplanque
  * allow feeds restricted to post excerpts
  *
