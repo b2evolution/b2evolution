@@ -462,21 +462,23 @@ class ComponentWidget extends DataObject
 				$link_class = $params['link_default_class'];;
 			}
 
-			$blog_link = '<a href="'.$l_Blog->gen_blogurl().'" class="'.$link_class.'" title="'
+			echo '<a href="'.$l_Blog->gen_blogurl().'" class="'.$link_class.'" title="'
 										.$l_Blog->dget( 'name', 'htmlattr' ).'">';
-			// $blog_link .= $blog_selected_name_before;
-			$blog_link .= $l_Blog->dget( 'shortname', 'htmlbody' );
-			// $blog_link .= $blog_selected_name_after;
-			$blog_link .= '</a>';
-
-			echo $blog_link;
 
 			if( $l_blog_ID == $Blog->ID )
 			{ // This is the blog being displayed on this page:
+  			echo $params['item_selected_text_start'];
+				echo $l_Blog->dget( 'shortname', 'htmlbody' );
+  			echo $params['item_selected_text_end'];
+				echo '</a>';
   			echo $params['item_selected_end'];
 			}
 			else
 			{
+  			echo $params['item_text_start'];
+				echo $l_Blog->dget( 'shortname', 'htmlbody' );
+  			echo $params['item_text_end'];
+				echo '</a>';
 				echo $params['item_end'];
 			}
 		}
@@ -519,6 +521,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2007/05/28 01:36:24  fplanque
+ * enhanced blog list widget
+ *
  * Revision 1.24  2007/05/09 01:58:57  fplanque
  * Widget to display other blogs from same owner
  *

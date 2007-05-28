@@ -71,6 +71,9 @@ code {
 	color: #999;
 	font-weight:normal;
 }
+.red {
+	color: #f00;
+}
 .shrinkwrap {
 	width: 1%;
 	white-space:nowrap;

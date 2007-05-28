@@ -134,14 +134,18 @@ class Skin extends DataObject
 					'list_end' => '</ul>',
 					'item_start' => '<li>',
 					'item_end' => '</li>',
+					'link_default_class' => 'default',
+					'item_text_start' => '',
+					'item_text_end' => '',
 					'item_selected_start' => '<li>',
 					'item_selected_end' => '</li>',
+					'link_selected_class' => 'selected',
+					'item_selected_text_start' => '',
+					'item_selected_text_end' => '',
 					'group_start' => '<ul>',
 					'group_end' => '</ul>',
 					'notes_start' => '<div class="notes">',
 					'notes_end' => '</div>',
-					'link_selected_class' => 'selected',
-					'link_default_class' => 'default',
 				), $params );
 
    	$WidgetCache = & get_Cache( 'WidgetCache' );
@@ -366,6 +370,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2007/05/28 01:36:24  fplanque
+ * enhanced blog list widget
+ *
  * Revision 1.18  2007/05/08 00:42:07  fplanque
  * public blog list as a widget
  *
