@@ -31,6 +31,7 @@ global $edited_Blog;
 
 global $Plugins;
 
+global $basepath;
 
 $Form = & new Form( NULL, 'blogadvanced_checkchanges' );
 
@@ -108,7 +109,12 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Static file generation') );
-	$Form->text( 'blog_staticfilename', $edited_Blog->get( 'staticfilename' ), 30, T_('Static filename'), T_('This is the .html file that will be created when you generate a static version of the blog homepage.') );
+	$Form->text_input( 'source_file', $edited_Blog->get_setting( 'source_file' ), 30, T_('Source file'),
+											T_('This is the source .php (stub) file used to generate the static homepage.'),
+											array( 'input_prefix' => "<code>$basepath</code>", 'maxlength' => 255 ) );
+	$Form->text_input( 'static_file', $edited_Blog->get_setting( 'static_file' ), 30, T_('Static file'),
+											T_('This is the .html file that will be created.'),
+											array( 'input_prefix' => "<code>$basepath</code>", 'maxlength' => 255 ) );
 	if( $current_User->check_perm( 'blog_genstatic', 'any', false, $edited_Blog->ID ) )
 	{
 		$Form->info( T_('Static page'), '<a href="admin.php?ctrl=collections&amp;action=GenStatic&amp;blog='.$edited_Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">'.T_('Generate now!').'</a>' );
@@ -135,6 +141,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.19  2007/05/28 01:35:23  fplanque
+ * fixed static page generation
+ *
  * Revision 1.18  2007/04/26 00:11:05  fplanque
  * (c) 2007
  *

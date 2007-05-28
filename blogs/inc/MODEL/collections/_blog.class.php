@@ -91,7 +91,6 @@ class Blog extends DataObject
    * OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
    */
 	var $siteurl;
-	var $staticfilename;
 	var $stub;     // stub file (can be empty/virtual)
 	var $urlname;  // used to identify blog in URLs
 	var $links_blog_ID = 0;
@@ -175,7 +174,6 @@ class Blog extends DataObject
 			$this->locale = $db_row->blog_locale;
 			$this->access_type = $db_row->blog_access_type;
 			$this->siteurl = $db_row->blog_siteurl;
-			$this->staticfilename = $db_row->blog_staticfilename;
 			$this->urlname = $db_row->blog_urlname;
 			$this->links_blog_ID = $db_row->blog_links_blog_ID;
 			$this->notes = $db_row->blog_notes;
@@ -404,9 +402,10 @@ class Blog extends DataObject
 		}
 
 
-		if( param( 'blog_staticfilename', 'string', NULL ) !== NULL )
+		if( param( 'source_file', 'string', NULL ) !== NULL )
 		{	// Static file:
-			$this->set_from_Request( 'staticfilename' );
+			$this->set_setting( 'source_file', get_param( 'source_file' ) );
+			$this->set_setting( 'static_file', param( 'static_file', 'string', '' ) );
 		}
 
 		if( param( 'blog_media_location',  'string', NULL ) !== NULL )
@@ -560,33 +559,19 @@ class Blog extends DataObject
 	 * Generate blog URL
 	 *
 	 * @param string default|dynamic|static
-	 * @param boolean should this be an absolute URL? (otherwise: relative to $baseurl)
 	 */
-	function gen_blogurl( $type = 'default', $absolute = true )
+	function gen_blogurl( $type = 'default' )
 	{
-		global $baseurl, $basedomain, $basepath, $Settings;
-
-		if( preg_match( '#^https?://#', $this->siteurl ) )
-		{
-			$base = $this->siteurl;
-		}
-		else
-		{
-			$base = $absolute ? $baseurl.$this->siteurl : $this->siteurl;
-		}
+		global $baseurl, $basedomain, $Settings;
 
 		if( $type == 'static' )
 		{ // We want the static page, there is no access type option here:
-	debug_die( 'static page currently not supported' );
-			if( is_file( $basepath.$this->siteurl.$this->staticfilename ) )
-			{ // If static page exists:
-				return $base.$this->staticfilename;
-			}
+			debug_die( 'static page currently not supported' );
 		}
 
 		if( $type == 'dynamic' )
 		{ // We want to force a dynamic page
-	debug_die( 'dynamic page currently not supported' );
+			debug_die( 'dynamic page currently not supported' );
 		}
 
 		switch( $this->access_type )
@@ -733,21 +718,21 @@ class Blog extends DataObject
 		{
 			$status = $default_post_status;
 		}
-		if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $this->ID ) )
+		if( ! $current_User->check_perm( 'blog_post!'.$status, 'edit', false, $this->ID ) )
 		{ // We need to find another one:
 			$status = NULL;
 
-			if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $this->ID ) )
+			if( $current_User->check_perm( 'blog_post!published', 'edit', false, $this->ID ) )
 				$status = 'published';
-			elseif( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $this->ID ) )
+			elseif( $current_User->check_perm( 'blog_post!protected', 'edit', false, $this->ID ) )
 				$status = 'protected';
-			elseif( $current_User->check_perm( 'blog_post_statuses', 'private', false, $this->ID ) )
+			elseif( $current_User->check_perm( 'blog_post!private', 'edit', false, $this->ID ) )
 				$status = 'private';
-			elseif( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $this->ID ) )
+			elseif( $current_User->check_perm( 'blog_post!draft', 'edit', false, $this->ID ) )
 				$status = 'draft';
-			elseif( $current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $this->ID ) )
+			elseif( $current_User->check_perm( 'blog_post!deprecated', 'edit', false, $this->ID ) )
 				$status = 'deprecated';
-			elseif( $current_User->check_perm( 'blog_post_statuses', 'redirected', false, $this->ID ) )
+			elseif( $current_User->check_perm( 'blog_post!redirected', 'edit', false, $this->ID ) )
 				$status = 'redirected';
 		}
 		return $status;
@@ -959,9 +944,6 @@ class Blog extends DataObject
 
 		switch( $parname )
 		{
-			case 'suburl':
-				return $this->gen_blogurl( 'default', false );
-
 			case 'blogurl':
 			case 'link':    // RSS wording
 			case 'url':
@@ -973,17 +955,11 @@ class Blog extends DataObject
 			case 'staticurl':
 				return $this->gen_blogurl( 'static' );
 
-			case 'dynfilepath':
-				$r = $basepath.$this->siteurl;
-				if( ! empty($this->stub) )
-				{ // $stub can actually be empty/virtual - not a real php file!
-					$r .= $this->stub.( preg_match( '#.php$#', $this->stub ) ? '' : '.php' );
-				}
-				// TODO: check if the path exists and return false otherwise?!
-				return $r;
+			case 'dynfilepath': // Source file for statuc page
+				return $basepath.$this->get_setting('source_file');
 
 			case 'staticfilepath':
-				return $basepath.$this->siteurl.$this->staticfilename;
+				return $basepath.$this->get_setting('static_file');
 
 			case 'baseurl':
 				if( preg_match( '#^https?://#', $this->siteurl ) )
@@ -1362,6 +1338,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.81  2007/05/28 01:35:22  fplanque
+ * fixed static page generation
+ *
  * Revision 1.80  2007/05/14 02:43:04  fplanque
  * Started renaming tables. There probably won't be a better time than 2.0.
  *

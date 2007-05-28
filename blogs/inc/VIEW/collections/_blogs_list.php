@@ -105,23 +105,18 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 						'th' => T_('Blog URL'),
-						'td' => '<a href="@get(\'blogurl\')@">@get(\'suburl\')@</a>',
+						'td' => '<a href="@get(\'url\')@">@get(\'url\')@</a>',
 					);
 
 function disp_static_filename( & $Blog )
 {
-	return 'unsupported';
 	global $current_User;
-	if( $Blog->get('staticfilename') )
+	if( $r = $Blog->get_setting('static_file') )
 	{
-		$r = '<a href="'.$Blog->get('staticurl').'">';
-		$r .= $Blog->dget('staticfilename');
-		$r .= '</a>';
-
 		if( $current_User->check_perm( 'blog_genstatic', 'any', false, $Blog->ID ) )
 		{
 			$gen_url = '?ctrl=collections&amp;action=GenStatic&amp;blog='.$Blog->ID;
-			$r .= ' [<a href="'.$gen_url.'" title="'.T_('Edit properties...').'">';
+			$r .= ' [<a href="'.$gen_url.'" title="'.T_('Generate static page now!').'">';
 			$r .= /* TRANS: abbrev. for "generate !" */ T_('Gen!');
 			$r .= '</a>]';
 		}
@@ -187,6 +182,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.18  2007/05/28 01:35:23  fplanque
+ * fixed static page generation
+ *
  * Revision 1.17  2007/04/26 00:11:05  fplanque
  * (c) 2007
  *

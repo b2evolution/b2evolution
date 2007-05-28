@@ -102,6 +102,20 @@ $Form->begin_fieldset( T_('Blog URL') );
 			$defblog = $default_Blog->dget('shortname');
 		}
 	}
+
+	$siteurl_relative_warning = '';
+ 	if( ! preg_match( '~(^|/|\.php.?)$~i', $blog_siteurl_relative ) )
+ 	{
+		$siteurl_relative_warning = ' <span class="note red">'.T_('WARNING: it is highly recommended that this ends in with a / or .php !').'</span>';
+	}
+
+	$siteurl_absolute_warning = '';
+ 	if( ! preg_match( '~(^|/|\.php.?)$~i', $blog_siteurl_absolute ) )
+ 	{
+		$siteurl_absolute_warning = ' <span class="note red">'.T_('WARNING: it is highly recommended that this ends in with a / or .php !').'</span>';
+	}
+
+
 	$Form->radio( 'blog_access_type', $edited_Blog->get( 'access_type' ), array(
 		array( 'default', T_('Default blog in index.php'),
 										'('.( !isset($defblog)
@@ -128,7 +142,7 @@ $Form->begin_fieldset( T_('Blog URL') );
 									.format_to_output( $blog_siteurl_relative, 'formvalue' )
 									.'" onkeyup="update_urlpreview( \''.$baseurl.'\'+this.value );"
 									onfocus="document.getElementsByName(\'blog_access_type\')[3].checked=true;
-									update_urlpreview( \''.$baseurl.'\'+this.value );" /></span>',
+									update_urlpreview( \''.$baseurl.'\'+this.value );" /></span>'.$siteurl_relative_warning,
 									'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
 		),
 		array( 'subdom', T_('Subdomain of basedomain'),
@@ -142,8 +156,7 @@ $Form->begin_fieldset( T_('Blog URL') );
 										.format_to_output( $blog_siteurl_absolute, 'formvalue' )
 										.'" onkeyup="update_urlpreview( this.value );"
 										onfocus="document.getElementsByName(\'blog_access_type\')[5].checked=true;
-										update_urlpreview( this.value );" />'.
-										'<span class="notes">'.T_('With trailing slash.').'</span>',
+										update_urlpreview( this.value );" />'.$siteurl_absolute_warning,
 									'onclick="document.getElementById( \'blog_siteurl_absolute\' ).focus();"'
 		),
 	), T_('Blog base URL'), true );
@@ -209,6 +222,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.8  2007/05/28 01:35:23  fplanque
+ * fixed static page generation
+ *
  * Revision 1.7  2007/04/26 00:11:05  fplanque
  * (c) 2007
  *

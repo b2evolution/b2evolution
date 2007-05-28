@@ -222,7 +222,7 @@ function create_blog(
 	$blog_name,
 	$blog_shortname,
 	$blog_urlname,
-	$blog_staticfilename = '',
+	$blog_staticfilename = '', // obsolete
 	$blog_tagline = '',
 	$blog_longdesc = '',
 	$blog_links_blog_ID = 0 )
@@ -230,7 +230,7 @@ function create_blog(
 	global $DB, $default_locale;
 
 	$query = "INSERT INTO T_blogs( blog_name, blog_shortname, blog_siteurl,
-						blog_urlname, blog_staticfilename,
+						blog_urlname,
 						blog_tagline, blog_longdesc, blog_locale,
 						blog_allowcomments, blog_allowtrackbacks,
 						blog_in_bloglist, blog_links_blog_ID )
@@ -239,7 +239,6 @@ function create_blog(
 	$query .= "'".$DB->escape($blog_shortname)."', ";
 	$query .= "'', ";
 	$query .= "'".$DB->escape($blog_urlname)."', ";
-	$query .= "'".$DB->escape($blog_staticfilename)."', ";
 	$query .= "'".$DB->escape($blog_tagline)."', ";
 	$query .= "'".$DB->escape($blog_longdesc)."', ";
 	$query .= "'".$DB->escape($default_locale)."', ";
@@ -632,6 +631,9 @@ If needed, a skin can format info pages differently from regular posts."), $now,
 
 /*
  * $Log$
+ * Revision 1.227  2007/05/28 01:35:23  fplanque
+ * fixed static page generation
+ *
  * Revision 1.226  2007/05/14 02:43:06  fplanque
  * Started renaming tables. There probably won't be a better time than 2.0.
  *
