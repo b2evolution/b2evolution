@@ -369,7 +369,7 @@ function get_user_profile_link( $before = '', $after = '', $link_text = '', $lin
 	}
 	else
 	{
-		$url = url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=profile&amp;redirect_to='.rawurlencode( url_rel_to_same_host(regenerate_url('','','','&'), $Blog->get('blogurl')) ) );
+		$url = url_add_param( $Blog->gen_blogurl(), 'disp=profile&amp;redirect_to='.rawurlencode( url_rel_to_same_host(regenerate_url('','','','&'), $Blog->gen_blogurl()) ) );
 	}
 
 	$r = $before
@@ -403,7 +403,7 @@ function user_subs_link( $before = '', $after = '', $link_text = '', $link_title
 	if( $link_title == '#' ) $link_title = T_('Subscribe to email notifications');
 
 	echo $before;
-	echo '<a href="'.url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=subs&amp;redirect_to='.rawurlencode( url_rel_to_same_host(regenerate_url('','','','&'), $Blog->get('blogurl'))) )
+	echo '<a href="'.url_add_param( $Blog->gen_blogurl(), 'disp=subs&amp;redirect_to='.rawurlencode( url_rel_to_same_host(regenerate_url('','','','&'), $Blog->gen_blogurl())) )
 			.'" title="', $link_title, '">';
 	printf( $link_text, $current_User->login );
 	echo '</a>';
@@ -538,6 +538,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.30  2007/05/28 15:18:31  fplanque
+ * cleanup
+ *
  * Revision 1.29  2007/04/26 00:11:11  fplanque
  * (c) 2007
  *

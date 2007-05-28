@@ -43,7 +43,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		$Blog->disp( 'name', 'xml' );
 		request_title( ' - ', '', ' - ', 'xml' );
 	?></title>
-	<link rel="alternate" type="text/html" href="<?php $Blog->disp( 'blogurl', 'xml' ) ?>" />
+	<link rel="alternate" type="text/html" href="<?php $Blog->disp( 'url', 'xml' ) ?>" />
 	<link rel="self" type="application/atom+xml" href="<?php $Blog->disp( 'atom_url', 'xmlattr' ) ?>" />
 	<id><?php $Blog->disp( 'atom_url', 'xmlattr' ); /* TODO: may need a regenerate_url() */ ?></id>
 	<subtitle><?php $Blog->disp( 'shortdesc', 'xml' ) ?></subtitle>

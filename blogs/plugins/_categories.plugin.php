@@ -238,7 +238,7 @@ class categories_plugin extends Plugin
 				}
 				else
 				{
-					$loop_Blog->disp('blogurl','raw');
+					$loop_Blog->disp('url','raw');
 				}
 				echo '">';
 				$loop_Blog->disp('name');
@@ -381,6 +381,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.44  2007/05/28 15:18:30  fplanque
+ * cleanup
+ *
  * Revision 1.43  2007/05/14 02:43:06  fplanque
  * Started renaming tables. There probably won't be a better time than 2.0.
  *

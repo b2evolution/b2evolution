@@ -108,7 +108,7 @@ if( ! isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
 if( $resolve_extra_path )
 {
 	// Check and Remove blog base URI from ReqPath:
-	$blog_baseuri = substr( $Blog->get('baseurl'), strlen( $Blog->get('baseurlroot') ) );
+	$blog_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get('baseurlroot') ) );
 	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
 
 	if( ($pos = strpos( $ReqPath, $blog_baseuri )) !== false )
@@ -491,6 +491,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.79  2007/05/28 15:18:30  fplanque
+ * cleanup
+ *
  * Revision 1.78  2007/05/13 22:02:06  fplanque
  * removed bloated $object_def
  *

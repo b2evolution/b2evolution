@@ -43,7 +43,7 @@ $Form->begin_form( 'fform', T_('Choose a skin') );
 
 		$selected = ($edited_Blog->skin_ID == $Skin->ID);
 		$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;blog_skin_ID='.$Skin->ID;
-		$preview_url = url_add_param($edited_Blog->get('blogurl'),'tempskin='.rawurlencode($Skin->folder));
+		$preview_url = url_add_param( $edited_Blog->gen_blogurl()), 'tempskin='.rawurlencode($Skin->folder) );
 
 		// Display skinshot:
 		Skin::disp_skinshot( $Skin->folder, 'select', $selected, $select_url, $preview_url );

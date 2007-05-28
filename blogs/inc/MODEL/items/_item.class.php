@@ -137,7 +137,7 @@ class Item extends ItemLight
 	 */
 	var $url;          // fp> we may want to move this to the item links which allows multiple and diffrent types of links/urls/files etc.
 	var $pst_ID;
-	var $deadline = '';
+	var $datedeadline = '';
 	var $priority;
 
 	/**
@@ -2769,7 +2769,7 @@ class Item extends ItemLight
 
 				$cache_by_locale[$notify_locale]['message'] =
 					str_pad( T_('Blog'), $pad_len ).': '.$edited_Blog->get('shortname')
-					.' ( '.str_replace('&amp;', '&', $edited_Blog->get('blogurl'))." )\n"
+					.' ( '.str_replace('&amp;', '&', $edited_Blog->gen_blogurl())." )\n"
 
 					.str_pad( T_('Author'), $pad_len ).': '.$this->creator_User->get('preferredname').' ('.$this->creator_User->get('login').")\n"
 
@@ -2789,7 +2789,7 @@ class Item extends ItemLight
 					."\n-- \n"
 					.T_('Edit/Delete').': '.$admin_url.'?ctrl=items&blog='.$this->blog_ID.'&p='.$this->ID."\n\n"
 
-					.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
+					.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->gen_blogurl(), 'disp=subs' ) )."\n";
 
 				locale_restore_previous();
 			}
@@ -3004,6 +3004,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.177  2007/05/28 15:18:30  fplanque
+ * cleanup
+ *
  * Revision 1.176  2007/05/28 01:33:22  fplanque
  * permissions/fixes
  *

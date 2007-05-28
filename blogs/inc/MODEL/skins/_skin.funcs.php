@@ -76,7 +76,7 @@ function skin_base_tag()
 	{ // No skin used:
 		if( ! empty( $Blog ) )
 		{
-			$base_href = $Blog->get( 'baseurl' );
+			$base_href = $Blog->gen_baseurl();
 		}
 		else
 		{
@@ -218,6 +218,9 @@ function & skin_install( $skin_folder, $name = NULL )
 
 /*
  * $Log$
+ * Revision 1.21  2007/05/28 15:18:31  fplanque
+ * cleanup
+ *
  * Revision 1.20  2007/05/07 18:59:45  fplanque
  * renamed skin .page.php files to .tpl.php
  *

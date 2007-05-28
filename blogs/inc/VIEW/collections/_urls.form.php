@@ -39,7 +39,7 @@ global $Debuglog;
 <script type="text/javascript">
 	<!--
 	// Script to update the Blog URL preview:
-	var blog_baseurl = '<?php echo str_replace( "'", "\'", $edited_Blog->get( 'baseurl' ) ); ?>';
+	var blog_baseurl = '<?php echo str_replace( "'", "\'", $edited_Blog->gen_baseurl() ); ?>';
 
 	function update_urlpreview( baseurl )
 	{
@@ -222,6 +222,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.9  2007/05/28 15:18:30  fplanque
+ * cleanup
+ *
  * Revision 1.8  2007/05/28 01:35:23  fplanque
  * fixed static page generation
  *

@@ -242,7 +242,7 @@ class ComponentWidget extends DataObject
 
 			   		$this->disp_title( $params, T_('Search') );
 
-						form_formstart( $Blog->dget( 'blogurl', 'raw' ), 'search', 'SearchForm' );
+						form_formstart( $Blog->gen_blogurl(), 'search', 'SearchForm' );
 						echo '<p>';
 						$s = get_param( 's' );
 						echo '<input type="text" name="s" size="30" value="'.htmlspecialchars($s).'" class="SearchField" /><br />';
@@ -521,6 +521,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2007/05/28 15:18:30  fplanque
+ * cleanup
+ *
  * Revision 1.25  2007/05/28 01:36:24  fplanque
  * enhanced blog list widget
  *

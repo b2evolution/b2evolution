@@ -2366,41 +2366,12 @@ class Plugin
 	 */
 	function get_plugin_url( $abs = false )
 	{
-		global $ReqHost, $Blog, $plugins_url, $plugins_path, $plugins_subdir;
-
-		if( isset($Blog) && ! is_admin_page() )
-		{
-			$base = $Blog->get('baseurl').$plugins_subdir;
-		}
-		else
-		{
-			$base = $plugins_url;
-		}
-
-		if( strpos( $base, $ReqHost ) !== 0 )
-		{ // the base url does not begin with the requested host:
-
-			// Fix "http:" to "https:":
-			if( strpos( $ReqHost, 'https:' ) === 0 && strpos( $base, 'http:' ) === 0 )
-			{
-				$base_fixed = 'https:'.substr( $base, 5 );
-
-				if( strpos( $base_fixed, $ReqHost ) === 0 )
-				{
-					$base = $base_fixed;
-				}
-			}
-		}
-
-		if( ! $abs && strpos( $base, $ReqHost ) === 0 )
-		{ // cut off $ReqHost if the resulting URL starts with it:
-			$base = substr($base, strlen($ReqHost));
-		}
+		global $plugins_url, $plugins_path;
 
 		// Append sub-path below $plugins_path, if any:
 		$sub_path = preg_replace( ':^'.preg_quote($plugins_path, ':').':', '', dirname($this->classfile_path).'/' );
 
-		return $base.$sub_path;
+		return $plugins_url.$sub_path;
 	}
 
 
@@ -2871,6 +2842,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.157  2007/05/28 15:18:30  fplanque
+ * cleanup
+ *
  * Revision 1.156  2007/05/26 19:05:03  blueyed
  * Return array() in GetDefaultUserSettings, as with GetDefaultSettings
  *

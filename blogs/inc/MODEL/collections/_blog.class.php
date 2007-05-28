@@ -592,7 +592,7 @@ class Blog extends DataObject
 
 			case 'extrapath':
 				// We want to use extra path info, use the blog urlname:
-				return $baseurl.$this->siteurl.'index.php/'.$this->urlname;
+				return $baseurl.$this->siteurl.'index.php/'.$this->urlname.'/';
 
 			case 'relative':
 				return $baseurl.$this->siteurl;
@@ -606,6 +606,46 @@ class Blog extends DataObject
 			default:
 				debug_die( 'Unhandled Blog access type ['.$this->access_type.']' );
 		}
+	}
+
+
+  /**
+	 * Generate the baseurl of the blog (URL of the folder where the blog lives)
+	 *
+	 * @todo test
+	 */
+	function gen_baseurl()
+	{
+		global $baseurl;
+
+		switch( $this->access_type )
+		{
+			case 'default':
+			case 'index.php':
+				return $baseurl.$this->siteurl;
+
+			case 'extrapath':
+				// We want to use extra path info, use the blog urlname:
+				return $baseurl.$this->siteurl.'index.php/'.$this->urlname.'/';
+
+			case 'relative':
+				$url = $baseurl.$this->siteurl;
+				break;
+
+			case 'subdom':
+				return 'http://'.$this->urlname.'.'.$basedomain.'/';
+
+			case 'absolute':
+				$url = $this->siteurl;
+				break;
+
+			default:
+				debug_die( 'Unhandled Blog access type ['.$this->access_type.']' );
+		}
+
+		// For case relative and absolute:
+		return preg_replace( '¤^(.+)/[^/]$¤', '$1/', $url );
+
 	}
 
 
@@ -944,8 +984,8 @@ class Blog extends DataObject
 
 		switch( $parname )
 		{
-			case 'blogurl':
-			case 'link':    // RSS wording
+			case 'blogurl':		// Deprecated
+			case 'link':  		// Deprecated
 			case 'url':
 				return $this->gen_blogurl( 'default' );
 
@@ -955,46 +995,37 @@ class Blog extends DataObject
 			case 'staticurl':
 				return $this->gen_blogurl( 'static' );
 
-			case 'dynfilepath': // Source file for statuc page
+			case 'dynfilepath':
+				// Source file for static page:
 				return $basepath.$this->get_setting('source_file');
 
 			case 'staticfilepath':
+				// Destiantion file for static page:
 				return $basepath.$this->get_setting('static_file');
 
 			case 'baseurl':
-				if( preg_match( '#^https?://#', $this->siteurl ) )
-				{ // We have a specific URL for this blog:
-					return $this->siteurl;
-				}
-				else
-				{ // This blog is located under b2evo's baseurl
-					$r = $baseurl;
-					if( !empty($this->siteurl) )
-					{ // We have a subfolder:
-						$r .= $this->siteurl;
-					}
-					return $r;
-				}
+				return $this->gen_baseurl();
 
 			case 'baseurlroot':
-				if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->get('baseurl'), $matches ) )
+				// fp>> TODO: cleanup
+				if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->gen_baseurl(), $matches ) )
 				{
 					// TODO: shouldn't that include a trailing slash?:
 					return $matches[1];
 				}
-				debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->get('baseurl').'].' );
+				debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->gen_baseurl().'].' );
 
 			case 'lastcommentsurl':
-				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=comments' );
+				return url_add_param( $this->gen_blogurl(), 'disp=comments' );
 
 			case 'arcdirurl':
-				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=arcdir' );
+				return url_add_param( $this->gen_blogurl(), 'disp=arcdir' );
 
 			case 'catdirurl':
-				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=catdir' );
+				return url_add_param( $this->gen_blogurl(), 'disp=catdir' );
 
 			case 'msgformurl':
-				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=msgform' );
+				return url_add_param( $this->gen_blogurl(), 'disp=msgform' );
 
 			case 'description':			// RSS wording
 			case 'shortdesc':
@@ -1338,6 +1369,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.82  2007/05/28 15:18:30  fplanque
+ * cleanup
+ *
  * Revision 1.81  2007/05/28 01:35:22  fplanque
  * fixed static page generation
  *

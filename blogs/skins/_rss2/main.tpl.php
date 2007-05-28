@@ -40,7 +40,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			$Blog->disp( 'name', 'xml' );
 			request_title( ' - ', '', ' - ', 'xml' );
 		?></title>
-		<link><?php $Blog->disp( 'blogurl', 'xml' ) ?></link>
+		<link><?php $Blog->disp( 'url', 'xml' ) ?></link>
 		<description><?php $Blog->disp( 'shortdesc', 'xml' ) ?></description>
 		<language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
 		<docs>http://blogs.law.harvard.edu/tech/rss</docs>

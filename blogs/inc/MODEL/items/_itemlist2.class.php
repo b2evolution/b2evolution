@@ -101,6 +101,7 @@ class ItemList2 extends ItemListLight
 		$post_locale = param( 'post_locale', 'string', $current_User->locale );
 		$content = param( 'content', 'html', true );
 		$post_title = param( 'post_title', 'html', true );
+		$post_excerpt = param( 'post_excerpt', 'string', true );
 		$post_url = param( 'post_url', 'string', '' );
 		$post_category = param( 'post_category', 'integer', true );
 		$post_views = param( 'post_views', 'integer', 0 );
@@ -158,31 +159,32 @@ class ItemList2 extends ItemListLight
 		$content = format_to_post( $content );
 
 		$this->sql = "SELECT
-			0 AS {$this->Cache->dbIDname},
-			$preview_userid AS {$this->Cache->dbprefix}creator_user_ID,
-			$preview_userid AS {$this->Cache->dbprefix}lastedit_user_ID,
-			'$item_issue_date' AS {$this->Cache->dbprefix}datestart,
-			'$item_issue_date' AS {$this->Cache->dbprefix}datecreated,
-			'$item_issue_date' AS {$this->Cache->dbprefix}datemodified,
-			'".$DB->escape($post_status)."' AS {$this->Cache->dbprefix}status,
-			'".$DB->escape($post_locale)."' AS {$this->Cache->dbprefix}locale,
-			'".$DB->escape($content)."' AS {$this->Cache->dbprefix}content,
-			'".$DB->escape($post_title)."' AS {$this->Cache->dbprefix}title,
-			NULL AS {$this->Cache->dbprefix}urltitle,
-			'".$DB->escape($post_url)."' AS {$this->Cache->dbprefix}url,
-			$post_category AS {$this->Cache->dbprefix}main_cat_ID,
-			$post_views AS {$this->Cache->dbprefix}views,
-			'' AS {$this->Cache->dbprefix}flags,
-			'noreq' AS {$this->Cache->dbprefix}notifications_status,
-			NULL AS {$this->Cache->dbprefix}notifications_ctsk_ID,
-			".bpost_count_words( $content )." AS {$this->Cache->dbprefix}wordcount,
-			".$DB->quote($post_comment_status)." AS {$this->Cache->dbprefix}comment_status,
-			'".$DB->escape( implode( '.', $renderers ) )."' AS {$this->Cache->dbprefix}renderers,
-			".$DB->quote($item_assigned_user_ID)." AS {$this->Cache->dbprefix}assigned_user_ID,
-			".$DB->quote($item_typ_ID)." AS {$this->Cache->dbprefix}ptyp_ID,
-			".$DB->quote($item_st_ID)." AS {$this->Cache->dbprefix}pst_ID,
-			".$DB->quote($item_deadline)." AS {$this->Cache->dbprefix}datedeadline,
-			".$DB->quote($item_priority)." AS {$this->Cache->dbprefix}priority";
+			0 AS post_ID,
+			$preview_userid AS post_creator_user_ID,
+			$preview_userid AS post_lastedit_user_ID,
+			'$item_issue_date' AS post_datestart,
+			'$item_issue_date' AS post_datecreated,
+			'$item_issue_date' AS post_datemodified,
+			'".$DB->escape($post_status)."' AS post_status,
+			'".$DB->escape($post_locale)."' AS post_locale,
+			'".$DB->escape($content)."' AS post_content,
+			'".$DB->escape($post_title)."' AS post_title,
+			'".$DB->escape($post_excerpt)."' AS post_excerpt,
+			NULL AS post_urltitle,
+			'".$DB->escape($post_url)."' AS post_url,
+			$post_category AS post_main_cat_ID,
+			$post_views AS post_views,
+			'' AS post_flags,
+			'noreq' AS post_notifications_status,
+			NULL AS post_notifications_ctsk_ID,
+			".bpost_count_words( $content )." AS post_wordcount,
+			".$DB->quote($post_comment_status)." AS post_comment_status,
+			'".$DB->escape( implode( '.', $renderers ) )."' AS post_renderers,
+			".$DB->quote($item_assigned_user_ID)." AS post_assigned_user_ID,
+			".$DB->quote($item_typ_ID)." AS post_ptyp_ID,
+			".$DB->quote($item_st_ID)." AS post_pst_ID,
+			".$DB->quote($item_deadline)." AS post_datedeadline,
+			".$DB->quote($item_priority)." AS post_priority";
 
 		$this->total_rows = 1;
 		$this->total_pages = 1;
@@ -580,6 +582,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.65  2007/05/28 15:18:30  fplanque
+ * cleanup
+ *
  * Revision 1.64  2007/05/13 22:02:07  fplanque
  * removed bloated $object_def
  *
