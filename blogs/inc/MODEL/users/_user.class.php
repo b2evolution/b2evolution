@@ -504,6 +504,12 @@ class User extends DataObject
 		switch( $permname )
 		{ // What permission do we want to check?
 			case 'cats_post_statuses':
+			case 'cats_post!published':
+			case 'cats_post!protected':
+			case 'cats_post!private':
+			case 'cats_post!draft':
+			case 'cats_post!deprecated':
+			case 'cats_post!redirected':
 				// Category permissions...
 				$perm = $this->check_perm_catsusers( $permname, $permlevel, $perm_target );
 				if( ! $perm  )
@@ -516,6 +522,12 @@ class User extends DataObject
 			case 'blog_properties':
 			case 'blog_ismember':
 			case 'blog_post_statuses':
+			case 'blog_post!published':
+			case 'blog_post!protected':
+			case 'blog_post!private':
+			case 'blog_post!draft':
+			case 'blog_post!deprecated':
+			case 'blog_post!redirected':
 			case 'blog_del_post':
 			case 'blog_comments':
 			case 'blog_cats':
@@ -523,7 +535,7 @@ class User extends DataObject
 				// Blog permission to edit its properties...
 				$this->get_Group();
 
-				// Group may grant VIEW acces, FULL access:
+				// Group may grant VIEW access, FULL access:
 				if( $this->Group->check_perm( 'blogs', $permlevel ) )
 				{ // If group grants a global permission:
 					$perm = true;
@@ -533,7 +545,7 @@ class User extends DataObject
 				if( $perm_target > 0 )
 				{ // Check user perm for this blog:
 					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
-					if ( $perm == false )
+					if( $perm == false )
 					{ // Check groups for permissions to this specific blog:
 						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
 					}
@@ -637,6 +649,12 @@ class User extends DataObject
 		switch( $permname )
 		{
 			case 'cats_post_statuses':
+			case 'cats_post!published':
+			case 'cats_post!protected':
+			case 'cats_post!private':
+			case 'cats_post!draft':
+			case 'cats_post!deprecated':
+			case 'cats_post!redirected':
 				// We'll actually pass this on to blog permissions
 				// First we need to create an array of blogs, not cats
 				$perm_target_blogs = array();
@@ -652,7 +670,7 @@ class User extends DataObject
 				// Now we'll check permissions for each blog:
 				foreach( $perm_target_blogs as $loop_blog_ID )
 				{
-					if( ! $this->check_perm( 'blog_post_statuses', $permlevel, false, $loop_blog_ID ) )
+					if( ! $this->check_perm( 'blog_'.substr($permname,5), $permlevel, false, $loop_blog_ID ) )
 					{ // If at least one blog is denied:
 						return false;	// permission denied
 					}
@@ -749,15 +767,19 @@ class User extends DataObject
 				return ($this->level >= 2);
 
 			case 'blog_post_statuses':
-				if( $permlevel == 'any' )
-				{ // Any permission will do:
-					// echo count($this->blog_post_statuses);
-					return ( count($this->blog_post_statuses[$perm_target_blog]['blog_post_statuses']) > 0 );
-				}
+				// echo count($this->blog_post_statuses);
+				return ( count($this->blog_post_statuses[$perm_target_blog]['blog_post_statuses']) > 0 );
 
+			case 'blog_post!published':
+			case 'blog_post!protected':
+			case 'blog_post!private':
+			case 'blog_post!draft':
+			case 'blog_post!deprecated':
+			case 'blog_post!redirected':
 				// We want a specific permission:
-				// echo 'checking :', implode( ',', $this->blog_post_statuses  ), '<br />';
-				return in_array( $permlevel, $this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] );
+				$subperm = substr( $permname, 10 );
+				// echo "checking : $subperm - ", implode( ',', $this->blog_post_statuses[$perm_target_blog]['blog_post_statuses']  ), '<br />';
+				return in_array( $subperm, $this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] );
 
 			default:
 				// echo $permname, '=', $this->blog_post_statuses[$perm_target_blog][$permname], ' ';
@@ -1182,6 +1204,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.70  2007/05/28 01:33:22  fplanque
+ * permissions/fixes
+ *
  * Revision 1.69  2007/05/14 02:43:05  fplanque
  * Started renaming tables. There probably won't be a better time than 2.0.
  *

@@ -377,7 +377,7 @@ function cat_select( $display_info = true, $form_fields = true )
 		{ // run recursively through the cats
 			if( ! blog_has_cats( $l_Blog->ID ) )
 				continue;
-			if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $l_Blog->ID ) )
+			if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) )
 				continue;
 			$r .= '<h4>'.$l_Blog->dget('name')."</h4>\n";
 			$r .= '<table cellspacing="0" class="catselect">'.cat_select_header();
@@ -589,22 +589,22 @@ function visibility_select( & $Form, $post_status )
 
 	$sharing_options = array();
 
-	if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $Blog->ID ) )
+	if( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) )
 		$sharing_options[] = array( 'published', T_('Published (Public)') );
 
-	if( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $Blog->ID ) )
+	if( $current_User->check_perm( 'blog_post!protected', 'edit', false, $Blog->ID ) )
 		$sharing_options[] = array( 'protected', T_('Protected (Members only)') );
 
-	if( $current_User->check_perm( 'blog_post_statuses', 'private', false, $Blog->ID ) )
+	if( $current_User->check_perm( 'blog_post!private', 'edit', false, $Blog->ID ) )
 		$sharing_options[] = array( 'private', T_('Private (You only)') );
 
-	if( $current_User->check_perm( 'blog_post_statuses', 'draft', false, $Blog->ID ) )
+	if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
 		$sharing_options[] = array( 'draft', T_('Draft (Not published!)') );
 
-	if( $current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $Blog->ID ) )
+	if( $current_User->check_perm( 'blog_post!deprecated', 'edit', false, $Blog->ID ) )
 		$sharing_options[] = array( 'deprecated', T_('Deprecated (Not published!)') );
 
-	if( $current_User->check_perm( 'blog_post_statuses', 'redirected', false, $Blog->ID ) )
+	if( $current_User->check_perm( 'blog_post!redirected', 'edit', false, $Blog->ID ) )
 		$sharing_options[] = array( 'redirected', T_('Redirected') );
 
 	$Form->radio( 'post_status', $post_status, $sharing_options, '', true );
@@ -613,6 +613,9 @@ function visibility_select( & $Form, $post_status )
 
 /*
  * $Log$
+ * Revision 1.52  2007/05/28 01:33:22  fplanque
+ * permissions/fixes
+ *
  * Revision 1.51  2007/05/14 02:43:05  fplanque
  * Started renaming tables. There probably won't be a better time than 2.0.
  *

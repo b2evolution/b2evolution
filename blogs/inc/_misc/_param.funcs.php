@@ -1404,12 +1404,6 @@ function url_add_param( $url, $param, $moredelim = '&amp;' )
 		return $url.$moredelim.$param.$anchor;
 	}
 
- 	if( ! preg_match( '~(/|\.php.?)$~i', $url ) )
-	{	// blogurl is neither a PHP file nor a slash terminated folder, make it a folder:
-		// add an ending slash (or Apache does redirect to that nayway)
-		// fp> TODO: this should probably be built into all url_add_param() ??
-		$blogurl .= '/';
-	}
 
 	// These are the first params
 	return $url.'?'.$param.$anchor;
@@ -1656,6 +1650,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.39  2007/05/28 01:33:22  fplanque
+ * permissions/fixes
+ *
  * Revision 1.38  2007/05/20 01:02:32  fplanque
  * magic quotes fix
  *

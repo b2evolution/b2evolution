@@ -436,6 +436,9 @@ function compile_cat_array( $cat, $catsel, & $cat_array, & $cat_modifier, $restr
 }
 
 
+/**
+ * Callback used in compile_cat_array()
+ */
 function cat_req( $parent_cat_ID, $level )
 {
 	global $cat_array;
@@ -451,9 +454,18 @@ function cat_req( $parent_cat_ID, $level )
 	}
 }
 
+/**
+ * Callback used in compile_cat_array()
+ */
+function cat_req_dummy()
+{
+}
 
 /*
  * $Log$
+ * Revision 1.29  2007/05/28 01:33:22  fplanque
+ * permissions/fixes
+ *
  * Revision 1.28  2007/05/09 00:58:55  fplanque
  * massive cleanup of old functions
  *

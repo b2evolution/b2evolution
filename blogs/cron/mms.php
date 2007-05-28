@@ -49,7 +49,7 @@ $post_category = $cat;
 $blog = get_catblog($post_category);
 
 // Check permission:
-$current_User->check_perm( 'blog_post_statuses', 'published', true, $blog );
+$current_User->check_perm( 'blog_post!published', 'edit', true, $blog );
 
 $BlogCache = & get_Cache('BlogCache');
 $Blog = & $BlogCache->get_by_ID($blog);
@@ -749,6 +749,9 @@ exit;
 
 /*
  * $Log$
+ * Revision 1.11  2007/05/28 01:33:22  fplanque
+ * permissions/fixes
+ *
  * Revision 1.10  2007/05/21 19:40:15  blueyed
  * Fixed usage of $HTTP_RAW_POST_DATA global by using php://input stream, if $HTTP_RAW_POST_DATA is not set.
  *

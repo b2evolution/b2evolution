@@ -322,6 +322,12 @@ class Group extends DataObject
 		switch( $permname )
 		{
 			case 'cats_post_statuses':
+			case 'cats_post!published':
+			case 'cats_post!protected':
+			case 'cats_post!private':
+			case 'cats_post!draft':
+			case 'cats_post!deprecated':
+			case 'cats_post!redirected':
 				// We'll actually pass this on to blog permissions
 				// First we need to create an array of blogs, not cats
 				$perm_target_blogs = array();
@@ -334,10 +340,11 @@ class Group extends DataObject
 						$perm_target_blogs[] = $loop_cat_blog_ID;
 					}
 				}
+
 				// Now we'll check permissions for each blog:
 				foreach( $perm_target_blogs as $loop_blog_ID )
 				{
-					if( ! $this->check_perm( 'blog_post_statuses', $permlevel, $loop_blog_ID ) )
+					if( ! $this->check_perm( 'blog_'.substr($permname,5), $permlevel, $loop_blog_ID ) )
 					{ // If at least one blog is denied:
 						return false;	// permission denied
 					}
@@ -427,14 +434,17 @@ class Group extends DataObject
 				return (false);
 
 			case 'blog_post_statuses':
-				if( $permlevel == 'any' )
-				{ // Any prermission will do:
-					// echo count($this->blog_post_statuses);
-					return ( count($this->blog_post_statuses[$perm_target_blog]['blog_post_statuses']) > 0 );
-				}
+				return ( count($this->blog_post_statuses[$perm_target_blog]['blog_post_statuses']) > 0 );
 
+			case 'blog_post!published':
+			case 'blog_post!protected':
+			case 'blog_post!private':
+			case 'blog_post!draft':
+			case 'blog_post!deprecated':
+			case 'blog_post!redirected':
 				// We want a specific permission:
-				// echo 'checking :', implode( ',', $this->blog_post_statuses  ), '<br />';
+				$subperm = substr( $permname, 10 );
+				// echo "checking : $subperm - ", implode( ',', $this->blog_post_statuses[$perm_target_blog]['blog_post_statuses']  ), '<br />';
 				return in_array( $permlevel, $this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] );
 
 			default:
@@ -458,6 +468,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2007/05/28 01:33:22  fplanque
+ * permissions/fixes
+ *
  * Revision 1.11  2007/04/26 00:11:11  fplanque
  * (c) 2007
  *

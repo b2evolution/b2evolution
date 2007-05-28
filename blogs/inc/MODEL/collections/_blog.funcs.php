@@ -352,6 +352,10 @@ function blogperms_from_easy( $easy_group )
 function autoselect_blog( $permname, $permlevel = 'any' )
 {
 	global $blog;
+
+  /**
+	 * @var User
+	 */
 	global $current_User;
 
 	$autoselected_blog = $blog;
@@ -360,7 +364,7 @@ function autoselect_blog( $permname, $permlevel = 'any' )
 	{ // a blog is already selected
 		if( !$current_User->check_perm( $permname, $permlevel, false, $autoselected_blog ) )
 		{ // invalid blog
-			// echo 'current blog was invalid';
+		 	// echo 'current blog was invalid';
 			$autoselected_blog = 0;
 		}
 	}
@@ -433,6 +437,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.26  2007/05/28 01:33:22  fplanque
+ * permissions/fixes
+ *
  * Revision 1.25  2007/05/13 18:49:55  fplanque
  * made autoselect_blog() more robust under PHP4
  *

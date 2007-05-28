@@ -20,7 +20,7 @@ $app_version = '2.0-dev';
 /**
  * Release date
  */
-$app_date = '2007-05-13';
+$app_date = '2007-05-27';
 
 
 /**

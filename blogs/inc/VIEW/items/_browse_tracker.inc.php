@@ -234,7 +234,7 @@ $ItemList->cols[] = array(
 		'td' => '%item_edit_actions( {Obj} )%',
 	);
 
-if( $current_User->check_perm( 'blog_post_statuses', 'any', false, $Blog->ID ) )
+if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 {	// We have permission to add a post with at least one status:
 	$ItemList->global_icon( T_('Add a task...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, T_('New task...'), 3 ,4 );
 }
@@ -254,6 +254,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.16  2007/05/28 01:33:22  fplanque
+ * permissions/fixes
+ *
  * Revision 1.15  2007/04/26 00:11:07  fplanque
  * (c) 2007
  *

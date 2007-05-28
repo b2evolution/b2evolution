@@ -185,7 +185,7 @@ switch( $action )
 		// This is somewhat in between new and edit...
 
 		// Check permission based on DB status:
-		$current_User->check_perm( 'blog_post_statuses', $edited_Item->get( 'status' ), true, $blog );
+		$current_User->check_perm( 'blog_post!'.$edited_Item->get( 'status' ), 'edit', true, $blog );
 
 		$edited_Item->status = param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
@@ -223,7 +223,7 @@ switch( $action )
 	case 'edit':
 		// Check permission:
 		$edited_Item->status = $edited_Item->get( 'status' );
-		$current_User->check_perm( 'blog_post_statuses', $edited_Item->status, true, $blog );
+		$current_User->check_perm( 'blog_post!'.$edited_Item->status, 'edit', true, $blog );
 
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p );
@@ -250,7 +250,7 @@ switch( $action )
 		$post_extracats[] = $post_category;
 		$post_extracats = array_unique( $post_extracats );
 		// Check permission on statuses:
-		$current_User->check_perm( 'cats_post_statuses', $post_status, true, $post_extracats );
+		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
 
 
 		// CREATE NEW POST:
@@ -322,7 +322,7 @@ switch( $action )
 		$post_extracats[] = $post_category;
 		$post_extracats = array_unique( $post_extracats );
 		// Check permission on statuses:
-		$current_User->check_perm( 'cats_post_statuses', $post_status, true, $post_extracats );
+		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
 
 
 		// UPDATE POST:
@@ -380,7 +380,7 @@ switch( $action )
 		$post_status = 'published';
 		// Check permissions:
 		/* TODO: Check extra categories!!! */
-		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
+		$current_User->check_perm( 'blog_post!'.$post_status, 'edit', true, $blog );
 		$current_User->check_perm( 'edit_timestamp', 'any', true ) ;
 
 		$edited_Item->set( 'status', $post_status );
@@ -410,7 +410,7 @@ switch( $action )
 		$post_status = 'deprecated';
 		// Check permissions:
 		/* TODO: Check extra categories!!! */
-		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
+		$current_User->check_perm( 'blog_post!'.$post_status, 'edit', true, $blog );
 
 		$edited_Item->set( 'status', $post_status );
 		$edited_Item->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
@@ -717,6 +717,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.26  2007/05/28 01:33:22  fplanque
+ * permissions/fixes
+ *
  * Revision 1.25  2007/05/14 02:47:23  fplanque
  * (not so) basic Tags framework
  *

@@ -1627,8 +1627,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( ! $current_User->check_perm( 'blog_post_statuses', $this->status, false,
-																			$this->blog_ID ) )
+		if( ! $current_User->check_perm( 'blog_post!'.$this->status, 'edit', false, $this->blog_ID ) )
 		{ // User has no right to edit this post
 			return false;
 		}
@@ -1681,7 +1680,7 @@ class Item extends ItemLight
 		if( ! is_logged_in() ) return false;
 
 		if( ($this->status == 'published') // Already published!
-			|| ! ($current_User->check_perm( 'blog_post_statuses', 'published', false, $this->blog_ID ))
+			|| ! ($current_User->check_perm( 'blog_post!published', 'edit', false, $this->blog_ID ))
 			|| ! ($current_User->check_perm( 'edit_timestamp' ) ) )
 		{ // User has no right to publish this post now:
 			return false;
@@ -1724,7 +1723,7 @@ class Item extends ItemLight
 		if( ! is_logged_in() ) return false;
 
 		if( ($this->status == 'deprecated') // Already deprecateded!
-			|| ! ($current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $this->blog_ID )) )
+			|| ! ($current_User->check_perm( 'blog_post!deprecated', 'edit', false, $this->blog_ID )) )
 		{ // User has no right to deprecated this post:
 			return false;
 		}
@@ -3005,6 +3004,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.176  2007/05/28 01:33:22  fplanque
+ * permissions/fixes
+ *
  * Revision 1.175  2007/05/27 00:35:26  fplanque
  * tag display + tag filtering
  *

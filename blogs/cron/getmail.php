@@ -312,7 +312,7 @@ switch ( $Settings->get('eblog_method') )
 			echo '<p><strong>', T_('Blog ID'), ':</strong> ',$blog_ID,'</p>';
 
 			// Check permission:
-			if( ! $loop_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
+			if( ! $loop_User->check_perm( 'blog_post!published', 'edit', false, $blog_ID ) )
 			{
 				echo "\n", T_('Permission denied.'), '<br />';
 				continue;
@@ -567,7 +567,7 @@ switch ( $Settings->get('eblog_method') )
 
 			// Check permission:
 			echo_message( '&bull;'.sprintf( T_('Checking permissions for user &laquo;%s&raquo; to post to Blog #%d'), $user_login, $blog_ID ).' ' );
-			if(  !$loop_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
+			if(  !$loop_User->check_perm( 'blog_post!published', 'edit', false, $blog_ID ) )
 			{
 				echo_message( '[ ' . T_('Permission denied') . ' ]','red' );
 				continue;
