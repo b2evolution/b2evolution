@@ -145,7 +145,7 @@ function save_image( $imh, $path, $mimetype, $quality = 90, $chmod = NULL )
 		if( $chmod === NULL )
 		{
 			global $Settings;
-			$chmod = $Settings->get('fm_default_chmod_dir');
+			$chmod = $Settings->get('fm_default_chmod_file');
 		}
 		chmod( $path, octdec( $chmod ) );
 	}
@@ -221,6 +221,9 @@ function generate_thumb( $src_imh, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.9  2007/05/28 11:28:22  fplanque
+ * file perm fix / thumbnails
+ *
  * Revision 1.8  2007/04/26 00:11:10  fplanque
  * (c) 2007
  *
