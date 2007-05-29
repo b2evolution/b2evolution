@@ -257,65 +257,16 @@ class Blog extends DataObject
 	{
 		global $Messages, $default_locale, $DB;
 
+		/**
+		 * @var User
+		 */
+		global $current_User;
+
 		if( param( 'blog_name', 'string', NULL ) !== NULL )
 		{ // General params:
 			$this->set_from_Request( 'name' );
 			$this->set( 'shortname',     param( 'blog_shortname',     'string', true ) );
 			$this->set( 'locale',        param( 'blog_locale',        'string', $default_locale ) );
-		}
-
-
-		if( param( 'blog_urlname',   'string', NULL ) !== NULL )
-		{	// check urlname
-			if( param_check_not_empty( 'blog_urlname', T_('You must provide an URL blog name!') ) )
-			{
-				$this->set_from_Request( 'urlname' );
-
-				if( ! preg_match( '|^[A-Za-z0-9\-]+$|', $this->urlname ) )
-				{
-					param_error( 'blog_urlname', T_('The url name is invalid.') );
-				}
-
-				if( $DB->get_var( 'SELECT COUNT(*)
-														 FROM T_blogs
-														WHERE blog_urlname = '.$DB->quote($this->get( 'urlname' )).'
-														  AND blog_ID <> '.$this->ID
-														) )
-				{ // urlname is already in use
-					param_error( 'blog_urlname', T_('This URL name is already in use by another blog. Please choose another name.') );
-				}
-			}
-		}
-
-
-		if( ($access_type = param( 'blog_access_type', 'string', NULL )) !== NULL )
-		{ // Blog URL parameters:
-			$this->set( 'access_type', $access_type );
-
-			if( $access_type == 'absolute' )
-			{
-				$blog_siteurl = param( 'blog_siteurl_absolute', 'string', true );
-				if( !preg_match( '#^https?://.+#', $blog_siteurl ) )
-				{
-					$Messages->add( T_('Blog Folder URL').': '
-													.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!'), 'error' );
-				}
-				$this->set( 'siteurl', $blog_siteurl );
-			}
-			elseif( $access_type == 'relative' )
-			{ // relative siteurl
-				$blog_siteurl = param( 'blog_siteurl_relative', 'string', true );
-				if( preg_match( '#^https?://#', $blog_siteurl ) )
-				{
-					$Messages->add( T_('Blog Folder URL').': '
-													.T_('You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!'), 'error' );
-				}
-  			$this->set( 'siteurl', $blog_siteurl );
-			}
-			else
-			{
-  			$this->set( 'siteurl', '' );
-			}
 		}
 
 
@@ -369,10 +320,6 @@ class Blog extends DataObject
 		if( param( 'blog_links_blog_ID',  'integer', -1 ) != -1 )
 		{	// Default display options:
 			$this->set_from_Request( 'links_blog_ID' );
-
-			// checkboxes (will not get send, if unchecked)
-			$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
-			$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
 		}
 
 
@@ -402,43 +349,6 @@ class Blog extends DataObject
 		}
 
 
-		if( param( 'source_file', 'string', NULL ) !== NULL )
-		{	// Static file:
-			$this->set_setting( 'source_file', get_param( 'source_file' ) );
-			$this->set_setting( 'static_file', param( 'static_file', 'string', '' ) );
-		}
-
-		if( param( 'blog_media_location',  'string', NULL ) !== NULL )
-		{	// Media files location:
-			$this->set_from_Request(   'media_location' );
-			$this->set_media_subdir(    param( 'blog_media_subdir',    'string', '' ) );
-			$this->set_media_fullpath(  param( 'blog_media_fullpath',  'string', '' ) );
-			$this->set_media_url(       param( 'blog_media_url',       'string', '' ) );
-
-			// check params
-			switch( $this->get( 'media_location' ) )
-			{
-				case 'custom': // custom path and URL
-					if( $this->get( 'media_fullpath' ) == '' )
-					{
-						param_error( 'blog_media_fullpath', T_('Media dir location').': '.T_('You must provide the full path of the media directory.') );
-					}
-					if( !preg_match( '#^https?://#', $this->get( 'media_url' ) ) )
-					{
-						param_error( 'blog_media_url', T_('Media dir location').': '
-														.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!') );
-					}
-					break;
-
-				case 'subdir':
-					if( $this->get( 'media_subdir' ) == '' )
-					{
-						param_error( 'blog_media_subdir', T_('Media dir location').': '.T_('You must provide the media subdirectory.') );
-					}
-					break;
-			}
-		}
-
 		if( in_array( 'pings', $groups ) )
 		{ // we want to load the ping checkboxes:
 			$blog_ping_plugins = param( 'blog_ping_plugins', 'array', array() );
@@ -457,35 +367,145 @@ class Blog extends DataObject
 			$this->set_from_Request( 'allowcomments' );
 			$this->set_setting( 'new_feedback_status', param( 'new_feedback_status', 'string', 'draft' ) );
 			$this->set( 'allowtrackbacks', param( 'blog_allowtrackbacks', 'integer', 0 ) );
-		}
-
-		if( param( 'aggregate_coll_IDs', 'string', NULL ) !== NULL )
-		{ // Aggregate list:
-			// fp> TODO: check perms on each aggregated blog (if changed)
-			// fp> TODO: better interface
-			if( !preg_match( '#^([0-9]+(,[0-9]+)*)?$#', get_param( 'aggregate_coll_IDs' ) ) )
-			{
-				param_error( 'aggregate_coll_IDs', T_('Invalid aggregate blog ID list!') );
-			}
-			$this->set_setting( 'aggregate_coll_IDs', get_param( 'aggregate_coll_IDs' ) );
-		}
-
-		if( param( 'owner_login', 'string', NULL ) !== NULL )
-		{ // Permissions:
-			$UserCache = & get_Cache( 'UserCache' );
-			$owner_User = & $UserCache->get_by_login( get_param('owner_login'), false, false );
-			if( empty( $owner_User ) )
-			{
-				param_error( 'owner_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), get_param('owner_login') ) );
-			}
-			else
-			{
-				$this->set( 'owner_user_ID', $owner_User->ID );
-				$this->owner_User = & $owner_User;
-			}
 
 			// Public blog list
 			$this->set( 'in_bloglist',   param( 'blog_in_bloglist',   'integer', 0 ) );
+		}
+
+
+    /*
+		 * ADVANCED ADMIN SETTINGS
+		 */
+		if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+		{	// We have permission to edit advanced admin settings:
+
+			if( param( 'owner_login', 'string', NULL ) !== NULL )
+			{ // Permissions:
+				$UserCache = & get_Cache( 'UserCache' );
+				$owner_User = & $UserCache->get_by_login( get_param('owner_login'), false, false );
+				if( empty( $owner_User ) )
+				{
+					param_error( 'owner_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), get_param('owner_login') ) );
+				}
+				else
+				{
+					$this->set( 'owner_user_ID', $owner_User->ID );
+					$this->owner_User = & $owner_User;
+				}
+			}
+
+
+			if( param( 'blog_urlname',   'string', NULL ) !== NULL )
+			{	// check urlname
+				if( param_check_not_empty( 'blog_urlname', T_('You must provide an URL blog name!') ) )
+				{
+					$this->set_from_Request( 'urlname' );
+
+					if( ! preg_match( '|^[A-Za-z0-9\-]+$|', $this->urlname ) )
+					{
+						param_error( 'blog_urlname', T_('The url name is invalid.') );
+					}
+
+					if( $DB->get_var( 'SELECT COUNT(*)
+															 FROM T_blogs
+															WHERE blog_urlname = '.$DB->quote($this->get( 'urlname' )).'
+															  AND blog_ID <> '.$this->ID
+															) )
+					{ // urlname is already in use
+						param_error( 'blog_urlname', T_('This URL name is already in use by another blog. Please choose another name.') );
+					}
+				}
+			}
+
+
+			if( ($access_type = param( 'blog_access_type', 'string', NULL )) !== NULL )
+			{ // Blog URL parameters:
+				$this->set( 'access_type', $access_type );
+
+				if( $access_type == 'absolute' )
+				{
+					$blog_siteurl = param( 'blog_siteurl_absolute', 'string', true );
+					if( !preg_match( '#^https?://.+#', $blog_siteurl ) )
+					{
+						$Messages->add( T_('Blog Folder URL').': '
+														.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!'), 'error' );
+					}
+					$this->set( 'siteurl', $blog_siteurl );
+				}
+				elseif( $access_type == 'relative' )
+				{ // relative siteurl
+					$blog_siteurl = param( 'blog_siteurl_relative', 'string', true );
+					if( preg_match( '#^https?://#', $blog_siteurl ) )
+					{
+						$Messages->add( T_('Blog Folder URL').': '
+														.T_('You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!'), 'error' );
+					}
+  				$this->set( 'siteurl', $blog_siteurl );
+				}
+				else
+				{
+  				$this->set( 'siteurl', '' );
+				}
+			}
+
+
+			if( get_param( 'blog_links_blog_ID' ) != -1 )
+			{ // checkboxes (will not get send, if unchecked)
+				$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
+				$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
+			}
+
+
+			if( param( 'aggregate_coll_IDs', 'string', NULL ) !== NULL )
+			{ // Aggregate list:
+				// fp> TODO: check perms on each aggregated blog (if changed)
+				// fp> TODO: better interface
+				if( !preg_match( '#^([0-9]+(,[0-9]+)*)?$#', get_param( 'aggregate_coll_IDs' ) ) )
+				{
+					param_error( 'aggregate_coll_IDs', T_('Invalid aggregate blog ID list!') );
+				}
+				$this->set_setting( 'aggregate_coll_IDs', get_param( 'aggregate_coll_IDs' ) );
+			}
+
+			if( param( 'source_file', 'string', NULL ) !== NULL )
+			{	// Static file:
+				$this->set_setting( 'source_file', get_param( 'source_file' ) );
+				$this->set_setting( 'static_file', param( 'static_file', 'string', '' ) );
+			}
+
+
+			if( param( 'blog_media_location',  'string', NULL ) !== NULL )
+			{	// Media files location:
+				$this->set_from_Request(   'media_location' );
+				$this->set_media_subdir(    param( 'blog_media_subdir',    'string', '' ) );
+				$this->set_media_fullpath(  param( 'blog_media_fullpath',  'string', '' ) );
+				$this->set_media_url(       param( 'blog_media_url',       'string', '' ) );
+
+				// check params
+				switch( $this->get( 'media_location' ) )
+				{
+					case 'custom': // custom path and URL
+						if( $this->get( 'media_fullpath' ) == '' )
+						{
+							param_error( 'blog_media_fullpath', T_('Media dir location').': '.T_('You must provide the full path of the media directory.') );
+						}
+						if( !preg_match( '#^https?://#', $this->get( 'media_url' ) ) )
+						{
+							param_error( 'blog_media_url', T_('Media dir location').': '
+															.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!') );
+						}
+						break;
+
+					case 'subdir':
+						if( $this->get( 'media_subdir' ) == '' )
+						{
+							param_error( 'blog_media_subdir', T_('Media dir location').': '.T_('You must provide the media subdirectory.') );
+						}
+						break;
+				}
+			}
+
+
 		}
 
 		return ! param_errors_detected();
@@ -616,7 +636,7 @@ class Blog extends DataObject
 	 */
 	function gen_baseurl()
 	{
-		global $baseurl;
+		global $baseurl, $basedomain;
 
 		switch( $this->access_type )
 		{
@@ -1369,6 +1389,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.83  2007/05/29 01:17:19  fplanque
+ * advanced admin blog settings are now restricted by a special permission
+ *
  * Revision 1.82  2007/05/28 15:18:30  fplanque
  * cleanup
  *

@@ -42,34 +42,6 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'advanced' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
-$Form->begin_fieldset( T_('Media library') );
-global $basepath, $media_subdir;
-$Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
-		array(
-			array( 'none', T_('None') ),
-			array( 'default', T_('Default'),
-				sprintf( T_('subdirectory &quot;%s&quot; (URL blog name) of %s'), $edited_Blog->urlname, $basepath.$media_subdir ) ),
-			array( 'subdir', T_('Subdirectory of media folder').':',
-				'',
-				' <span class="nobr"><code>'.$basepath.$media_subdir.'</code><input
-					type="text" name="blog_media_subdir" size="20" maxlength="255"
-					class="'.( param_has_error('blog_media_subdir') ? 'field_error' : '' ).'"
-					value="'.$edited_Blog->dget( 'media_subdir', 'formvalue' ).'" /></span>', '' ),
-			array( 'custom',
-				T_('Custom location').':',
-				'',
-				'<fieldset>'
-				.'<div class="label">'.T_('directory').':</div><div class="input"><input
-					type="text" name="blog_media_fullpath" size="50" maxlength="255"
-					class="'.( param_has_error('blog_media_fullpath') ? 'field_error' : '' ).'"
-					value="'.$edited_Blog->dget( 'media_fullpath', 'formvalue' ).'" /></div>'
-				.'<div class="label">'.T_('URL').':</div><div class="input"><input
-					type="text" name="blog_media_url" size="50" maxlength="255"
-					class="'.( param_has_error('blog_media_url') ? 'field_error' : '' ).'"
-					value="'.$edited_Blog->dget( 'media_url', 'formvalue' ).'" /></div></fieldset>' )
-		), T_('Media dir location'), true
-	);
-$Form->end_fieldset();
 
 $Form->begin_fieldset( T_('After each new post...') );
 	$ping_plugins = preg_split( '~\s*,\s*~', $edited_Blog->get_setting('ping_plugins'), -1, PREG_SPLIT_NO_EMPTY);
@@ -108,24 +80,58 @@ $Form->begin_fieldset( T_('After each new post...') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Static file generation') );
-	$Form->text_input( 'source_file', $edited_Blog->get_setting( 'source_file' ), 30, T_('Source file'),
-											T_('This is the source .php (stub) file used to generate the static homepage.'),
-											array( 'input_prefix' => "<code>$basepath</code>", 'maxlength' => 255 ) );
-	$Form->text_input( 'static_file', $edited_Blog->get_setting( 'static_file' ), 30, T_('Static file'),
-											T_('This is the .html file that will be created.'),
-											array( 'input_prefix' => "<code>$basepath</code>", 'maxlength' => 255 ) );
-	if( $current_User->check_perm( 'blog_genstatic', 'any', false, $edited_Blog->ID ) )
-	{
-		$Form->info( T_('Static page'), '<a href="admin.php?ctrl=collections&amp;action=GenStatic&amp;blog='.$edited_Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">'.T_('Generate now!').'</a>' );
-	}
-$Form->end_fieldset();
+if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+{	// Permission to edit advanced admin settings
+
+	$Form->begin_fieldset( T_('Aggregation').' ['.T_('Admin').']' );
+		$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Blogs to aggregate'), T_('List blog IDs separated by ,'), 255 );
+	$Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Aggregation') );
-	$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Blogs to aggregate'), T_('List blog IDs separated by ,'), 255 );
-$Form->end_fieldset();
+	$Form->begin_fieldset( T_('Static file generation').' ['.T_('Admin').']' );
+		$Form->text_input( 'source_file', $edited_Blog->get_setting( 'source_file' ), 30, T_('Source file'),
+												T_('This is the source .php (stub) file used to generate the static homepage.'),
+												array( 'input_prefix' => "<code>$basepath</code>", 'maxlength' => 255 ) );
+		$Form->text_input( 'static_file', $edited_Blog->get_setting( 'static_file' ), 30, T_('Static file'),
+												T_('This is the .html file that will be created.'),
+												array( 'input_prefix' => "<code>$basepath</code>", 'maxlength' => 255 ) );
+		if( $current_User->check_perm( 'blog_genstatic', 'any', false, $edited_Blog->ID ) )
+		{
+			$Form->info( T_('Static page'), '<a href="admin.php?ctrl=collections&amp;action=GenStatic&amp;blog='.$edited_Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">'.T_('Generate now!').'</a>' );
+		}
+	$Form->end_fieldset();
 
+
+	$Form->begin_fieldset( T_('Media library').' ['.T_('Admin').']' );
+	global $basepath, $media_subdir;
+	$Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
+			array(
+				array( 'none', T_('None') ),
+				array( 'default', T_('Default'),
+					sprintf( T_('subdirectory &quot;%s&quot; (URL blog name) of %s'), $edited_Blog->urlname, $basepath.$media_subdir ) ),
+				array( 'subdir', T_('Subdirectory of media folder').':',
+					'',
+					' <span class="nobr"><code>'.$basepath.$media_subdir.'</code><input
+						type="text" name="blog_media_subdir" size="20" maxlength="255"
+						class="'.( param_has_error('blog_media_subdir') ? 'field_error' : '' ).'"
+						value="'.$edited_Blog->dget( 'media_subdir', 'formvalue' ).'" /></span>', '' ),
+				array( 'custom',
+					T_('Custom location').':',
+					'',
+					'<fieldset>'
+					.'<div class="label">'.T_('directory').':</div><div class="input"><input
+						type="text" name="blog_media_fullpath" size="50" maxlength="255"
+						class="'.( param_has_error('blog_media_fullpath') ? 'field_error' : '' ).'"
+						value="'.$edited_Blog->dget( 'media_fullpath', 'formvalue' ).'" /></div>'
+					.'<div class="label">'.T_('URL').':</div><div class="input"><input
+						type="text" name="blog_media_url" size="50" maxlength="255"
+						class="'.( param_has_error('blog_media_url') ? 'field_error' : '' ).'"
+						value="'.$edited_Blog->dget( 'media_url', 'formvalue' ).'" /></div></fieldset>' )
+			), T_('Media dir location'), true
+		);
+	$Form->end_fieldset();
+
+}
 
 $Form->begin_fieldset( T_('Meta data') );
 	$Form->text( 'blog_description', $edited_Blog->get( 'description' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
@@ -141,6 +147,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.20  2007/05/29 01:17:20  fplanque
+ * advanced admin blog settings are now restricted by a special permission
+ *
  * Revision 1.19  2007/05/28 01:35:23  fplanque
  * fixed static page generation
  *

@@ -76,7 +76,7 @@ if( !empty( $keywords ) )
 
 $sql = 'SELECT grp_ID, grp_name, bloggroup_perm_poststatuses, bloggroup_ismember,
 													bloggroup_perm_comments, bloggroup_perm_delpost, bloggroup_perm_cats,
-													bloggroup_perm_properties, bloggroup_perm_media_upload,
+													bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,
 													bloggroup_perm_media_browse, bloggroup_perm_media_change
 					FROM T_groups LEFT JOIN T_coll_group_perms ON (
 				 						grp_ID = bloggroup_group_ID
@@ -287,7 +287,8 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Edit<br />cats'),
+						'th_group' => T_('Edit blog settings'),
+						'th' => T_('Cats'),
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_cats',
 						'default_dir' => 'D',
@@ -296,14 +297,26 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Edit<br />blog'),
+						'th_group' => T_('Edit blog settings'),
+						'th' => /* TRANS: Short for blog features */  T_('Feat.'),
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_properties',
 						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'perm_properties\', \''.TS_('Permission to edit blog properties').'\' )%',
+						'td' => '%coll_perm_checkbox( {row}, \'perm_properties\', \''.TS_('Permission to edit blog features').'\' )%',
 						'td_class' => 'center',
 					);
 
+$Results->cols[] = array(
+						'th_group' => T_('Edit blog settings'),
+						'th' => /* TRANS: Short for advanced */  T_('Adv.'),
+						'th_class' => 'checkright',
+						'order' => 'bloggroup_perm_admin',
+						'default_dir' => 'D',
+						'td' => '%coll_perm_checkbox( {row}, \'perm_admin\', \''.TS_('Permission to edit advanced/administrative blog properties').'\' )%',
+						'td_class' => 'center',
+					);
+
+// Media Directory:
 $Results->cols[] = array(
 						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Media directory'),
 						'th' => T_('Upload'),
@@ -433,6 +446,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.15  2007/05/29 01:17:20  fplanque
+ * advanced admin blog settings are now restricted by a special permission
+ *
  * Revision 1.14  2007/04/26 00:11:05  fplanque
  * (c) 2007
  *

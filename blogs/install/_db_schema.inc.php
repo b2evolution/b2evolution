@@ -47,6 +47,7 @@ $schema_queries = array(
 			bloguser_perm_comments tinyint NOT NULL default 0,
 			bloguser_perm_cats tinyint NOT NULL default 0,
 			bloguser_perm_properties tinyint NOT NULL default 0,
+			bloguser_perm_admin tinyint NOT NULL default 0,
 			bloguser_perm_media_upload tinyint NOT NULL default 0,
 			bloguser_perm_media_browse tinyint NOT NULL default 0,
 			bloguser_perm_media_change tinyint NOT NULL default 0,
@@ -126,7 +127,6 @@ $schema_queries = array(
 			blog_locale          VARCHAR(20) NOT NULL DEFAULT 'en-EU',
 			blog_access_type     VARCHAR(10) NOT NULL DEFAULT 'index.php',
 			blog_siteurl         varchar(120) NOT NULL default '',
-			blog_staticfilename  varchar(30) NULL default NULL,
 			blog_urlname         VARCHAR(255) NOT NULL DEFAULT 'urlname',
 			blog_notes           TEXT NULL,
 			blog_keywords        tinytext,
@@ -431,6 +431,7 @@ $schema_queries = array(
 			bloggroup_perm_comments tinyint NOT NULL default 0,
 			bloggroup_perm_cats tinyint NOT NULL default 0,
 			bloggroup_perm_properties tinyint NOT NULL default 0,
+			bloggroup_perm_admin tinyint NOT NULL default 0,
 			bloggroup_perm_media_upload tinyint NOT NULL default 0,
 			bloggroup_perm_media_browse tinyint NOT NULL default 0,
 			bloggroup_perm_media_change tinyint NOT NULL default 0,
@@ -544,6 +545,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.62  2007/05/29 01:17:20  fplanque
+ * advanced admin blog settings are now restricted by a special permission
+ *
  * Revision 1.61  2007/05/14 02:47:23  fplanque
  * (not so) basic Tags framework
  *

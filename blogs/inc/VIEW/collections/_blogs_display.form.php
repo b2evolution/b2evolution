@@ -59,19 +59,24 @@ $Form->begin_fieldset( T_('Content / Posts') );
 										), T_('Archive grouping'), false,  T_('How do you want to browse the post archives? May also apply to permalinks.') );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Skin and style') );
-
-	$SkinCache = & get_Cache( 'SkinCache' );
-	$SkinCache->load_all();
-	$Form->select_input_object( 'blog_skin_ID', $edited_Blog->skin_ID, $SkinCache, T_('Skin') );
-	$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('You will be able to customize the blog\'s skin stylesheet with a file named style.css in the blog\'s media file folder.') );
-	$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to customize the blog and skin stylesheets with a file named style.css in their personal file folder.') );
-$Form->end_fieldset();
-
 $Form->begin_fieldset( T_('Link blog / Blogroll') );
 	$BlogCache = & get_Cache( 'BlogCache' );
 	$Form->select_object( 'blog_links_blog_ID', $edited_Blog->get( 'links_blog_ID' ), $BlogCache, T_('Default linkblog'), T_('Will be displayed next to this blog (if your skin supports this).'), true );
 $Form->end_fieldset();
+
+if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+{	// Permission to edit advanced admin settings
+
+	$Form->begin_fieldset( T_('Skin and style').' ['.T_('Admin').']' );
+
+		$SkinCache = & get_Cache( 'SkinCache' );
+		$SkinCache->load_all();
+		$Form->select_input_object( 'blog_skin_ID', $edited_Blog->skin_ID, $SkinCache, T_('Skin') );
+		$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('You will be able to customize the blog\'s skin stylesheet with a file named style.css in the blog\'s media file folder.') );
+		$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to customize the blog and skin stylesheets with a file named style.css in their personal file folder.') );
+	$Form->end_fieldset();
+
+}
 
 $Form->buttons( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
@@ -80,6 +85,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.14  2007/05/29 01:17:20  fplanque
+ * advanced admin blog settings are now restricted by a special permission
+ *
  * Revision 1.13  2007/05/27 00:34:40  fplanque
  * minor
  *

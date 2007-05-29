@@ -414,6 +414,7 @@ class Group extends DataObject
 				$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloggroup_perm_comments'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_cats'] = $row['bloggroup_perm_cats'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_properties'] = $row['bloggroup_perm_properties'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_admin'] = $row['bloggroup_perm_admin'];
 			}
 		}
 
@@ -468,6 +469,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2007/05/29 01:17:20  fplanque
+ * advanced admin blog settings are now restricted by a special permission
+ *
  * Revision 1.12  2007/05/28 01:33:22  fplanque
  * permissions/fixes
  *

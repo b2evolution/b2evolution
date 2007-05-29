@@ -1759,6 +1759,18 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 	}
 
+
+	echo "Cleanup blogs table...";
+	db_drop_col( 'T_blogs', 'blog_staticfilename' );
+	echo "OK.<br />\n";
+
+	echo "Adding admin permissions...";
+	$DB->query( "ALTER TABLE T_coll_user_perms ADD COLUMN bloguser_perm_admin tinyint NOT NULL default 0 AFTER bloguser_perm_properties" );
+	$DB->query( "ALTER TABLE T_coll_group_perms ADD COLUMN bloggroup_perm_admin tinyint NOT NULL default 0 AFTER bloggroup_perm_properties" );
+	echo "OK.<br />\n";
+
+
+
 	/*
 	// fp> have to check if this means kiss your pagerank goodbye
 		echo 'Updating URL titles... ';
@@ -1874,6 +1886,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.224  2007/05/29 01:17:20  fplanque
+ * advanced admin blog settings are now restricted by a special permission
+ *
  * Revision 1.223  2007/05/17 20:44:19  fplanque
  * fixed upgrade.
  *

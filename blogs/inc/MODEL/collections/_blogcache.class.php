@@ -298,6 +298,7 @@ class BlogCache extends DataObjectCache
 				$permname = 'blog_properties';	// TEMP
 			case 'blog_cats':
 			case 'blog_properties':
+			case 'blog_admin':
 			case 'blog_comments':
 			case 'blog_media_browse':
 				$short_permname = substr( $permname, 5 );
@@ -346,6 +347,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.23  2007/05/29 01:17:20  fplanque
+ * advanced admin blog settings are now restricted by a special permission
+ *
  * Revision 1.22  2007/05/09 01:58:57  fplanque
  * Widget to display other blogs from same owner
  *

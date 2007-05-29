@@ -71,6 +71,7 @@ function blog_update_user_perms( $blog )
 														.', "'.$easy_perms['bloguser_perm_poststatuses']
 														.'", '.$easy_perms['bloguser_perm_delpost'].', '.$easy_perms['bloguser_perm_comments']
 														.', '.$easy_perms['bloguser_perm_cats'].', '.$easy_perms['bloguser_perm_properties']
+														.', '.$easy_perms['bloguser_perm_admin']
 														.', '.$easy_perms['bloguser_perm_media_upload'].', '.$easy_perms['bloguser_perm_media_browse']
 														.', '.$easy_perms['bloguser_perm_media_change'].' ) ';
 		}
@@ -102,6 +103,7 @@ function blog_update_user_perms( $blog )
 			$perm_comments = param( 'blog_perm_comments_'.$loop_user_ID, 'integer', 0 );
 			$perm_cats = param( 'blog_perm_cats_'.$loop_user_ID, 'integer', 0 );
 			$perm_properties = param( 'blog_perm_properties_'.$loop_user_ID, 'integer', 0 );
+			$perm_admin = param( 'blog_perm_admin_'.$loop_user_ID, 'integer', 0 );
 
 			$perm_media_upload = param( 'blog_perm_media_upload_'.$loop_user_ID, 'integer', 0 );
 			$perm_media_browse = param( 'blog_perm_media_browse_'.$loop_user_ID, 'integer', 0 );
@@ -110,13 +112,13 @@ function blog_update_user_perms( $blog )
 			// Update those permissions in DB:
 
 			if( $ismember || count($perm_post) || $perm_delpost || $perm_comments || $perm_cats || $perm_properties
-										|| $perm_media_upload || $perm_media_browse || $perm_media_change )
+										|| $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change )
 			{ // There are some permissions for this user:
 				$ismember = 1;	// Must have this permission
 
 				// insert new perms:
 				$inserted_values[] = " ( $blog, $loop_user_ID, $ismember, '".implode(',',$perm_post)."',
-																	$perm_delpost, $perm_comments, $perm_cats, $perm_properties,
+																	$perm_delpost, $perm_comments, $perm_cats, $perm_properties, $perm_admin,
 																	$perm_media_upload, $perm_media_browse, $perm_media_change )";
 			}
 		}
@@ -127,7 +129,7 @@ function blog_update_user_perms( $blog )
 	{
 		$DB->query( "INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 											bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
-											bloguser_perm_cats, bloguser_perm_properties,
+											bloguser_perm_cats, bloguser_perm_properties, bloguser_perm_admin,
 											bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change)
 									VALUES ".implode( ',', $inserted_values ) );
 	}
@@ -162,6 +164,7 @@ function blog_update_group_perms( $blog )
 														.', "'.$easy_perms['bloguser_perm_poststatuses']
 														.'", '.$easy_perms['bloguser_perm_delpost'].', '.$easy_perms['bloguser_perm_comments']
 														.', '.$easy_perms['bloguser_perm_cats'].', '.$easy_perms['bloguser_perm_properties']
+														.', '.$easy_perms['bloguser_perm_admin']
 														.', '.$easy_perms['bloguser_perm_media_upload'].', '.$easy_perms['bloguser_perm_media_browse']
 														.', '.$easy_perms['bloguser_perm_media_change'].' ) ';
 		}
@@ -193,6 +196,7 @@ function blog_update_group_perms( $blog )
 			$perm_comments = param( 'blog_perm_comments_'.$loop_group_ID, 'integer', 0 );
 			$perm_cats = param( 'blog_perm_cats_'.$loop_group_ID, 'integer', 0 );
 			$perm_properties = param( 'blog_perm_properties_'.$loop_group_ID, 'integer', 0 );
+			$perm_admin = param( 'blog_perm_admin_'.$loop_group_ID, 'integer', 0 );
 
 			$perm_media_upload = param( 'blog_perm_media_upload_'.$loop_group_ID, 'integer', 0 );
 			$perm_media_browse = param( 'blog_perm_media_browse_'.$loop_group_ID, 'integer', 0 );
@@ -201,13 +205,13 @@ function blog_update_group_perms( $blog )
 			// Update those permissions in DB:
 
 			if( $ismember || count($perm_post) || $perm_delpost || $perm_comments || $perm_cats || $perm_properties
-										|| $perm_media_upload || $perm_media_browse || $perm_media_change )
+										|| $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change )
 			{ // There are some permissions for this group:
 				$ismember = 1;	// Must have this permission
 
 				// insert new perms:
 				$inserted_values[] = " ( $blog, $loop_group_ID, $ismember, '".implode(',',$perm_post)."',
-																	$perm_delpost, $perm_comments, $perm_cats, $perm_properties,
+																	$perm_delpost, $perm_comments, $perm_cats, $perm_properties, $perm_admin,
 																	$perm_media_upload, $perm_media_browse, $perm_media_change )";
 			}
 		}
@@ -218,7 +222,7 @@ function blog_update_group_perms( $blog )
 	{
 		$DB->query( "INSERT INTO T_coll_group_perms( bloggroup_blog_ID, bloggroup_group_ID, bloggroup_ismember,
 											bloggroup_perm_poststatuses, bloggroup_perm_delpost, bloggroup_perm_comments,
-											bloggroup_perm_cats, bloggroup_perm_properties,
+											bloggroup_perm_cats, bloggroup_perm_properties, bloggroup_perm_admin,
 											bloggroup_perm_media_upload, bloggroup_perm_media_browse, bloggroup_perm_media_change)
 									VALUES ".implode( ',', $inserted_values ) );
 	}
@@ -263,7 +267,8 @@ function blogperms_get_easy2( $perms, $context='user' )
 									+(int)$perms->{'blog'.$context.'_perm_media_browse'}
 									+(int)$perms->{'blog'.$context.'_perm_media_change'};
 
-	$perms_admin =   (int)$perms->{'blog'.$context.'_perm_properties'}
+	$perms_admin =   (int)$perms->{'blog'.$context.'_perm_admin'}
+									+(int)$perms->{'blog'.$context.'_perm_properties'}
 									+(int)$perms->{'blog'.$context.'_perm_cats'};
 
 	if( $perms_editor == 11 )
@@ -271,8 +276,9 @@ function blogperms_get_easy2( $perms, $context='user' )
 		switch( $perms_admin )
 		{
 			case 0: return 'editor'; break;
-			case 1: return 'custom'; break;
-			case 2: return 'admin'; break;
+			case 1:
+			case 2: return 'custom'; break;
+			case 3: return 'admin'; break;
 		}
 	}
 	elseif( $perms_editor == 0 )
@@ -308,6 +314,7 @@ function blogperms_from_easy( $easy_group )
 		'bloguser_perm_media_upload' => 0,
 		'bloguser_perm_media_browse' => 0,
 		'bloguser_perm_media_change' => 0,
+		'bloguser_perm_admin' => 0,
 		'bloguser_perm_properties' => 0,
 		'bloguser_perm_cats' => 0
 	);
@@ -315,6 +322,7 @@ function blogperms_from_easy( $easy_group )
 	switch( $easy_group )
 	{
 		case 'admin':
+			$r['bloguser_perm_admin'] = 1;
 			$r['bloguser_perm_properties'] = 1;
 			$r['bloguser_perm_cats'] = 1;
 
@@ -437,6 +445,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.27  2007/05/29 01:17:20  fplanque
+ * advanced admin blog settings are now restricted by a special permission
+ *
  * Revision 1.26  2007/05/28 01:33:22  fplanque
  * permissions/fixes
  *

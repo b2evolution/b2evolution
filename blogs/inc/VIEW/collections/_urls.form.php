@@ -89,79 +89,86 @@ else
 	$blog_siteurl_absolute = 'http://';
 }
 
-$Form->begin_fieldset( T_('Blog URL') );
+$Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']' );
 
-	$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('Blog URL name'), T_('Used to uniquely identify this blog. Appears in URLs and gets used as default for the media location (see the advanced tab).'), 255 );
+	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	{	// Permission to edit advanced admin settings
 
-	if( $default_blog_ID = $Settings->get('default_blog_ID') )
-	{
-		$Debuglog->add('Default blog is set to: '.$default_blog_ID);
-		$BlogCache = & get_Cache( 'BlogCache' );
-		if( $default_Blog = & $BlogCache->get_by_ID($default_blog_ID, false) )
-		{ // Default blog exists
-			$defblog = $default_Blog->dget('shortname');
+		$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('Blog URL name'), T_('Used to uniquely identify this blog. Appears in URLs and gets used as default for the media location (see the advanced tab).'), 255 );
+
+		if( $default_blog_ID = $Settings->get('default_blog_ID') )
+		{
+			$Debuglog->add('Default blog is set to: '.$default_blog_ID);
+			$BlogCache = & get_Cache( 'BlogCache' );
+			if( $default_Blog = & $BlogCache->get_by_ID($default_blog_ID, false) )
+			{ // Default blog exists
+				$defblog = $default_Blog->dget('shortname');
+			}
 		}
+
+		$siteurl_relative_warning = '';
+ 		if( ! preg_match( '~(^|/|\.php.?)$~i', $blog_siteurl_relative ) )
+ 		{
+			$siteurl_relative_warning = ' <span class="note red">'.T_('WARNING: it is highly recommended that this ends in with a / or .php !').'</span>';
+		}
+
+		$siteurl_absolute_warning = '';
+ 		if( ! preg_match( '~(^|/|\.php.?)$~i', $blog_siteurl_absolute ) )
+ 		{
+			$siteurl_absolute_warning = ' <span class="note red">'.T_('WARNING: it is highly recommended that this ends in with a / or .php !').'</span>';
+		}
+
+
+		$Form->radio( 'blog_access_type', $edited_Blog->get( 'access_type' ), array(
+			array( 'default', T_('Default blog in index.php'),
+											'('.( !isset($defblog)
+												?	/* TRANS: NO current default blog */ T_('No default blog is currently set')
+												: /* TRANS: current default blog */ T_('Current default :').' '.$defblog ).
+											')',
+										'',
+										'onclick="update_urlpreview( \''.$baseurl.'index.php\' );"'
+			),
+			array( 'index.php', T_('Explicit param on index.php'),
+										'index.php?blog=123',
+										'',
+										'onclick="update_urlpreview( \''.$baseurl.'index.php?blog='.$edited_Blog->ID.'\' )"',
+			),
+			array( 'extrapath', T_('Extra path on index.php'),
+										'index.php/url_name',
+										'',
+										'onclick="update_urlpreview( \''.$baseurl.'index.php/\'+document.getElementById( \'blog_urlname\' ).value )"'
+			),
+			array( 'relative', T_('Relative to baseurl').':',
+										'',
+										'<span class="nobr"><code>'.$baseurl.'</code>'
+										.'<input type="text" id="blog_siteurl_relative" name="blog_siteurl_relative" size="35" maxlength="120" value="'
+										.format_to_output( $blog_siteurl_relative, 'formvalue' )
+										.'" onkeyup="update_urlpreview( \''.$baseurl.'\'+this.value );"
+										onfocus="document.getElementsByName(\'blog_access_type\')[3].checked=true;
+										update_urlpreview( \''.$baseurl.'\'+this.value );" /></span>'.$siteurl_relative_warning,
+										'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
+			),
+			array( 'subdom', T_('Subdomain of basedomain'),
+										'http://url_name.'.$basedomain.'/',
+										'',
+										'onclick="update_urlpreview( \'http://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.$basedomain.'/\' )"'
+			),
+			array( 'absolute', T_('Absolute URL').':',
+										'',
+										'<input type="text" id="blog_siteurl_absolute" name="blog_siteurl_absolute" size="50" maxlength="120" value="'
+											.format_to_output( $blog_siteurl_absolute, 'formvalue' )
+											.'" onkeyup="update_urlpreview( this.value );"
+											onfocus="document.getElementsByName(\'blog_access_type\')[5].checked=true;
+											update_urlpreview( this.value );" />'.$siteurl_absolute_warning,
+										'onclick="document.getElementById( \'blog_siteurl_absolute\' ).focus();"'
+			),
+		), T_('Blog base URL'), true );
+
 	}
 
-	$siteurl_relative_warning = '';
- 	if( ! preg_match( '~(^|/|\.php.?)$~i', $blog_siteurl_relative ) )
- 	{
-		$siteurl_relative_warning = ' <span class="note red">'.T_('WARNING: it is highly recommended that this ends in with a / or .php !').'</span>';
-	}
-
-	$siteurl_absolute_warning = '';
- 	if( ! preg_match( '~(^|/|\.php.?)$~i', $blog_siteurl_absolute ) )
- 	{
-		$siteurl_absolute_warning = ' <span class="note red">'.T_('WARNING: it is highly recommended that this ends in with a / or .php !').'</span>';
-	}
-
-
-	$Form->radio( 'blog_access_type', $edited_Blog->get( 'access_type' ), array(
-		array( 'default', T_('Default blog in index.php'),
-										'('.( !isset($defblog)
-											?	/* TRANS: NO current default blog */ T_('No default blog is currently set')
-											: /* TRANS: current default blog */ T_('Current default :').' '.$defblog ).
-										')',
-									'',
-									'onclick="update_urlpreview( \''.$baseurl.'index.php\' );"'
-		),
-		array( 'index.php', T_('Explicit param on index.php'),
-									'index.php?blog=123',
-									'',
-									'onclick="update_urlpreview( \''.$baseurl.'index.php?blog='.$edited_Blog->ID.'\' )"',
-		),
-		array( 'extrapath', T_('Extra path on index.php'),
-									'index.php/url_name',
-									'',
-									'onclick="update_urlpreview( \''.$baseurl.'index.php/\'+document.getElementById( \'blog_urlname\' ).value )"'
-		),
-		array( 'relative', T_('Relative to baseurl').':',
-									'',
-									'<span class="nobr"><code>'.$baseurl.'</code>'
-									.'<input type="text" id="blog_siteurl_relative" name="blog_siteurl_relative" size="35" maxlength="120" value="'
-									.format_to_output( $blog_siteurl_relative, 'formvalue' )
-									.'" onkeyup="update_urlpreview( \''.$baseurl.'\'+this.value );"
-									onfocus="document.getElementsByName(\'blog_access_type\')[3].checked=true;
-									update_urlpreview( \''.$baseurl.'\'+this.value );" /></span>'.$siteurl_relative_warning,
-									'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
-		),
-		array( 'subdom', T_('Subdomain of basedomain'),
-									'http://url_name.'.$basedomain.'/',
-									'',
-									'onclick="update_urlpreview( \'http://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.$basedomain.'/\' )"'
-		),
-		array( 'absolute', T_('Absolute URL').':',
-									'',
-									'<input type="text" id="blog_siteurl_absolute" name="blog_siteurl_absolute" size="50" maxlength="120" value="'
-										.format_to_output( $blog_siteurl_absolute, 'formvalue' )
-										.'" onkeyup="update_urlpreview( this.value );"
-										onfocus="document.getElementsByName(\'blog_access_type\')[5].checked=true;
-										update_urlpreview( this.value );" />'.$siteurl_absolute_warning,
-									'onclick="document.getElementById( \'blog_siteurl_absolute\' ).focus();"'
-		),
-	), T_('Blog base URL'), true );
-
-	$Form->info( T_('URL preview'), '<span id="urlpreview">'.$edited_Blog->gen_blogurl().'</span>' );
+	// URL Preview 'always displayed)
+	$blogurl = $edited_Blog->gen_blogurl();
+	$Form->info( T_('URL preview'), '<span id="urlpreview">'.$blogurl.'</span>' );
 
 $Form->end_fieldset();
 
@@ -170,8 +177,10 @@ $Form->begin_fieldset( T_('Archive URLs') );
 
 	$Form->radio( 'archive_links', $edited_Blog->get_setting('archive_links'),
 		array(
-				array( 'param', T_('Use param'), T_('Archive links will look like: \'stub?m=20071231\'') ),
-				array( 'extrapath', T_('Use extra-path'), T_('Archive links will look like \'stub/2007/12/31/\'' ) ),
+				array( 'param', T_('Use param'), T_('Archive links will look like ')
+								.url_add_param( $blogurl, 'm=20071231' ) ),
+				array( 'extrapath', T_('Use extra-path'), T_('Archive links will look like ' )
+								.url_add_tail( $blogurl, '/2007/12/31/' ) ),
 			), T_('Archive links'), true );
 
 $Form->end_fieldset();
@@ -181,9 +190,12 @@ $Form->begin_fieldset( T_('Category URLs') );
 
 	$Form->radio( 'chapter_links', $edited_Blog->get_setting('chapter_links'),
 		array(
-				array( 'param_num', T_('Use param: cat ID'), T_('Category links will look like: \'stub?cat=123\'') ),
-				array( 'subchap', T_('Use extra-path: sub-category'), T_('Category links will look like \'stub/subcat/\'' ) ),
-				array( 'chapters', T_('Use extra-path: category path'), T_('Category links will look like \'stub/cat/subcat/\'' ) ),
+				array( 'param_num', T_('Use param: cat ID'), T_('Category links will look like ')
+								.url_add_param( $blogurl, 'cat=123' ) ),
+				array( 'subchap', T_('Use extra-path: sub-category'), T_('Category links will look like ' )
+								.url_add_tail( $blogurl, '/subcat/' ) ),
+				array( 'chapters', T_('Use extra-path: category path'), T_('Category links will look like ' )
+								.url_add_tail( $blogurl, '/cat/subcat/' ) ),
 			), T_('Category links'), true );
 
 $Form->end_fieldset();
@@ -222,6 +234,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.10  2007/05/29 01:17:20  fplanque
+ * advanced admin blog settings are now restricted by a special permission
+ *
  * Revision 1.9  2007/05/28 15:18:30  fplanque
  * cleanup
  *

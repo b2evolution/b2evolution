@@ -1318,29 +1318,6 @@ class AdminUI_general
 		}
 
 
-		if( $current_User->check_perm( 'users', 'view' ) )
-		{	// Permission to view users:
-			$this->add_menu_entries( NULL, array(
-						'users' => array(
-						'text' => T_('Users'),
-						'title' => T_('User management'),
-						'href' => 'admin.php?ctrl=users',
-					),
-				) );
-		}
-		else
-		{	// Only perm to view his own profile:
-			$this->add_menu_entries( NULL, array(
-						'users' => array(
-						'text' => T_('My profile'),
-						'title' => T_('User profile'),
-						'href' => 'admin.php?ctrl=users',
-					),
-				) );
-		}
-
-
-
 		// BLOG SETTINGS:
 		if( $ctrl == 'collections' )
 		{ // We are viewing the blog list, nothing fancy involved:
@@ -1479,6 +1456,28 @@ class AdminUI_general
 		}
 
 
+		if( $current_User->check_perm( 'users', 'view' ) )
+		{	// Permission to view users:
+			$this->add_menu_entries( NULL, array(
+						'users' => array(
+						'text' => T_('Users'),
+						'title' => T_('User management'),
+						'href' => 'admin.php?ctrl=users',
+					),
+				) );
+		}
+		else
+		{	// Only perm to view his own profile:
+			$this->add_menu_entries( NULL, array(
+						'users' => array(
+						'text' => T_('My profile'),
+						'title' => T_('User profile'),
+						'href' => 'admin.php?ctrl=users',
+					),
+				) );
+		}
+
+
 		if( $current_User->check_perm( 'options', 'view' ) )
 		{	// Permission to view settings:
 			// FP> This assumes that we don't let regular users access the tools, including plugin tools.
@@ -1614,6 +1613,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.51  2007/05/29 01:17:19  fplanque
+ * advanced admin blog settings are now restricted by a special permission
+ *
  * Revision 1.50  2007/05/14 02:51:18  fplanque
  * cleanup.
  *

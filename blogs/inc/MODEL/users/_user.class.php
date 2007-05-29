@@ -520,6 +520,7 @@ class User extends DataObject
 				break;
 
 			case 'blog_properties':
+			case 'blog_admin':
 			case 'blog_ismember':
 			case 'blog_post_statuses':
 			case 'blog_post!published':
@@ -730,6 +731,7 @@ class User extends DataObject
 						'blog_comments' => '0',
 						'blog_cats' => '0',
 						'blog_properties' => '0',
+						'blog_admin' => '0',
 					);
 			}
 			else
@@ -748,6 +750,7 @@ class User extends DataObject
 				$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloguser_perm_comments'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_cats'] = $row['bloguser_perm_cats'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_properties'] = $row['bloguser_perm_properties'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_admin'] = $row['bloguser_perm_admin'];
 			}
 		}
 
@@ -1204,6 +1207,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.71  2007/05/29 01:17:20  fplanque
+ * advanced admin blog settings are now restricted by a special permission
+ *
  * Revision 1.70  2007/05/28 01:33:22  fplanque
  * permissions/fixes
  *
