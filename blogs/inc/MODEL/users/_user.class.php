@@ -519,8 +519,6 @@ class User extends DataObject
 				}
 				break;
 
-			case 'blog_properties':
-			case 'blog_admin':
 			case 'blog_ismember':
 			case 'blog_post_statuses':
 			case 'blog_post!published':
@@ -531,12 +529,23 @@ class User extends DataObject
 			case 'blog_post!redirected':
 			case 'blog_del_post':
 			case 'blog_comments':
+			case 'blog_properties':
 			case 'blog_cats':
 			case 'blog_genstatic':
 				// Blog permission to edit its properties...
-				$this->get_Group();
+
+				if( $this->check_perm_blogowner( $perm_target ) )
+				{	// Owner can do *almost* anything:
+					$perm = true;
+					break;
+				}
+
+				/* continue */
+
+			case 'blog_admin': // This is what the owner does not have access to!
 
 				// Group may grant VIEW access, FULL access:
+				$this->get_Group();
 				if( $this->Group->check_perm( 'blogs', $permlevel ) )
 				{ // If group grants a global permission:
 					$perm = true;
@@ -632,6 +641,24 @@ class User extends DataObject
 
 
 	/**
+	 * Check if the user is the owner of the designated blog (whoch gives him a lot of permissions)
+	 *
+	 * @param integer
+	 * @return boolean
+	 */
+	function check_perm_blogowner( $blog_ID )
+	{
+		$BlogCache = & get_Cache('BlogCache');
+    /**
+		 * @var Blog
+		 */
+		$Blog = & $BlogCache->get_by_ID( $blog_ID );
+
+		return ( $Blog->owner_user_ID == $this->ID );
+	}
+
+
+	/**
 	 * Check permission for this user on a set of specified categories
 	 *
 	 * This is not for direct use, please call {@link User::check_perm()} instead
@@ -657,6 +684,7 @@ class User extends DataObject
 			case 'cats_post!deprecated':
 			case 'cats_post!redirected':
 				// We'll actually pass this on to blog permissions
+
 				// First we need to create an array of blogs, not cats
 				$perm_target_blogs = array();
 				foreach( $perm_target_cats as $loop_cat_ID )
@@ -668,6 +696,7 @@ class User extends DataObject
 						$perm_target_blogs[] = $loop_cat_blog_ID;
 					}
 				}
+
 				// Now we'll check permissions for each blog:
 				foreach( $perm_target_blogs as $loop_blog_ID )
 				{
@@ -1207,6 +1236,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.72  2007/05/30 01:18:56  fplanque
+ * blog owner gets all permissions except advanced/admin settings
+ *
  * Revision 1.71  2007/05/29 01:17:20  fplanque
  * advanced admin blog settings are now restricted by a special permission
  *

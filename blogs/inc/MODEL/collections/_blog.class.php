@@ -77,6 +77,7 @@ class Blog extends DataObject
 	var $longdesc;
 
 	var $owner_user_ID;
+	
 	/**
 	 * Lazy filled
 	 * @var User
@@ -1389,6 +1390,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.84  2007/05/30 01:18:56  fplanque
+ * blog owner gets all permissions except advanced/admin settings
+ *
  * Revision 1.83  2007/05/29 01:17:19  fplanque
  * advanced admin blog settings are now restricted by a special permission
  *

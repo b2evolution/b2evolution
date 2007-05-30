@@ -281,17 +281,24 @@ class BlogCache extends DataObjectCache
 
 		$sql = "SELECT DISTINCT T_blogs.*
 		          FROM T_blogs LEFT JOIN T_coll_user_perms ON (blog_ID = bloguser_blog_ID AND bloguser_user_ID = {$user_ID})
-		          		LEFT JOIN T_coll_group_perms ON (blog_ID = bloggroup_blog_ID AND bloggroup_group_ID = {$Group->ID} ) ";
+		          		 LEFT JOIN T_coll_group_perms ON (blog_ID = bloggroup_blog_ID AND bloggroup_group_ID = {$Group->ID} )
+		         WHERE ";
+
+		if( $permname != 'blog_admin' )
+		{	// Only the admin perm is not convered by being the owner of the blog:
+			$sql .= "blog_owner_user_ID = {$user_ID} ";
+		}
+
 		switch( $permname )
 		{
 			case 'blog_ismember':
-				$sql .= "WHERE bloguser_ismember <> 0
-										OR bloggroup_ismember <> 0";
+				$sql .= "OR bloguser_ismember <> 0
+								 OR bloggroup_ismember <> 0";
 				break;
 
 			case 'blog_post_statuses':
-				$sql .= "WHERE bloguser_perm_poststatuses <> ''
-										OR bloggroup_perm_poststatuses <> ''";
+				$sql .= "OR bloguser_perm_poststatuses <> ''
+							   OR bloggroup_perm_poststatuses <> ''";
 				break;
 
 			case 'stats':
@@ -302,8 +309,8 @@ class BlogCache extends DataObjectCache
 			case 'blog_comments':
 			case 'blog_media_browse':
 				$short_permname = substr( $permname, 5 );
-				$sql .= "WHERE bloguser_perm_{$short_permname} <> 0
-										OR bloggroup_perm_{$short_permname} <> 0";
+				$sql .= "OR bloguser_perm_{$short_permname} <> 0
+								 OR bloggroup_perm_{$short_permname} <> 0";
 				break;
 
 			default:
@@ -347,6 +354,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.24  2007/05/30 01:18:56  fplanque
+ * blog owner gets all permissions except advanced/admin settings
+ *
  * Revision 1.23  2007/05/29 01:17:20  fplanque
  * advanced admin blog settings are now restricted by a special permission
  *
