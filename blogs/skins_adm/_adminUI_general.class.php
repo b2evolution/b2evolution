@@ -1216,6 +1216,7 @@ class AdminUI_general
 		 * @var User
 		 */
 		global $current_User;
+		global $Blog;
 
 		if( !empty($this->_menus) )
 		{	// Already initialized!
@@ -1400,13 +1401,19 @@ class AdminUI_general
 							'advanced' => array(
 								'text' => T_('Advanced'),
 								'href' => 'admin.php?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog, ),
-							'perm' => array(
-								'text' => T_('User perms'), // keep label short
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog, ),
-							'permgroup' => array(
-								'text' => T_('Group perms'), // keep label short
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog, ),
 						) );
+
+				if( $Blog->advanced_perms )
+				{
+					$this->add_menu_entries( 'blogs',	array(
+								'perm' => array(
+									'text' => T_('User perms'), // keep label short
+									'href' => 'admin.php?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog, ),
+								'permgroup' => array(
+									'text' => T_('Group perms'), // keep label short
+									'href' => 'admin.php?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog, ),
+							) );
+				}
 			}
 		}
 
@@ -1613,6 +1620,11 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.52  2007/05/31 03:02:24  fplanque
+ * Advanced perms now disabled by default (simpler interface).
+ * Except when upgrading.
+ * Enable advanced perms in blog settings -> features
+ *
  * Revision 1.51  2007/05/29 01:17:19  fplanque
  * advanced admin blog settings are now restricted by a special permission
  *

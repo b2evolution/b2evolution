@@ -278,10 +278,15 @@ class BlogCache extends DataObjectCache
 			return $this->get_ID_array();
 		}
 
-
+		// Note: We only JOIN in the advanced perms if any given blog has them enabled,
+		// otherwise they are ignored!
 		$sql = "SELECT DISTINCT T_blogs.*
-		          FROM T_blogs LEFT JOIN T_coll_user_perms ON (blog_ID = bloguser_blog_ID AND bloguser_user_ID = {$user_ID})
-		          		 LEFT JOIN T_coll_group_perms ON (blog_ID = bloggroup_blog_ID AND bloggroup_group_ID = {$Group->ID} )
+		          FROM T_blogs LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0
+		          																				AND blog_ID = bloguser_blog_ID
+		          																				AND bloguser_user_ID = {$user_ID} )
+		          		 LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0
+		          																	AND blog_ID = bloggroup_blog_ID
+		          																	AND bloggroup_group_ID = {$Group->ID} )
 		         WHERE ";
 
 		if( $permname != 'blog_admin' )
@@ -354,6 +359,11 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.25  2007/05/31 03:02:23  fplanque
+ * Advanced perms now disabled by default (simpler interface).
+ * Except when upgrading.
+ * Enable advanced perms in blog settings -> features
+ *
  * Revision 1.24  2007/05/30 01:18:56  fplanque
  * blog owner gets all permissions except advanced/admin settings
  *

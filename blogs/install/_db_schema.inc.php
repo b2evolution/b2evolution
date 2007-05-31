@@ -121,6 +121,7 @@ $schema_queries = array(
 			blog_shortname       varchar(12) NULL default '',
 			blog_name            varchar(50) NOT NULL default '',
 			blog_owner_user_ID   int(11) unsigned NOT NULL default 1,
+			blog_advanced_perms  TINYINT(1) NOT NULL default 0,
 			blog_tagline         varchar(250) NULL default '',
 			blog_description     varchar(250) NULL default '',
 			blog_longdesc        TEXT NULL DEFAULT NULL,
@@ -545,6 +546,11 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.63  2007/05/31 03:02:23  fplanque
+ * Advanced perms now disabled by default (simpler interface).
+ * Except when upgrading.
+ * Enable advanced perms in blog settings -> features
+ *
  * Revision 1.62  2007/05/29 01:17:20  fplanque
  * advanced admin blog settings are now restricted by a special permission
  *

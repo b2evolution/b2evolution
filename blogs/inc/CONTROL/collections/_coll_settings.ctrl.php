@@ -62,7 +62,16 @@ memorize_param( 'blog', 'integer', -1 );	// Needed when generating static page f
 param_action( 'edit' );
 param( 'tab', 'string', 'general', true );
 
-$AdminUI->set_path( 'blogs' ); // 2nd level will be added below
+if( ( $tab == 'perm' || $tab == 'permgroup' )
+	&& ( empty($blog) || ! $Blog->advanced_perms ) )
+{	// We're trying to access advanced perms but they're disabled!
+	$tab = 'features';	// the screen where you can enable advanced perms
+	if( $action == 'update' )
+	{ // make sure we don't update anything here
+		$action = 'edit';
+	}
+}
+
 
 /**
  * Perform action:
@@ -75,8 +84,6 @@ switch( $action )
 		// Edit collection form (depending on tab):
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
-
-		$AdminUI->append_path_level( $tab );
 		break;
 
 
@@ -132,9 +139,10 @@ switch( $action )
 				break;
 		}
 
-		$AdminUI->append_path_level( $tab );
 		break;
 }
+
+$AdminUI->set_path( 'blogs',  $tab  );
 
 
 /**
@@ -202,6 +210,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2007/05/31 03:02:21  fplanque
+ * Advanced perms now disabled by default (simpler interface).
+ * Except when upgrading.
+ * Enable advanced perms in blog settings -> features
+ *
  * Revision 1.15  2007/05/13 18:49:54  fplanque
  * made autoselect_blog() more robust under PHP4
  *

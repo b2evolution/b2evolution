@@ -20,13 +20,7 @@ $app_version = '2.0-dev';
 /**
  * Release date
  */
-$app_date = '2007-05-28';
-
-
-/**
- * Is displayed on the login screen:
- */
-$app_banner = '<a href="http://b2evolution.net/"><img src="'.$rsc_url.'img/b2evolution_minilogo.png" width="231" height="50" alt="b2evolution" /></a>';
+$app_date = '2007-05-30';
 
 /**
  * This is used to check if the database is up to date.
@@ -36,8 +30,12 @@ $app_banner = '<a href="http://b2evolution.net/"><img src="'.$rsc_url.'img/b2evo
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 9414;
+$new_db_version = 9416;
 
+/**
+ * Is displayed on the login screen:
+ */
+$app_banner = '<a href="http://b2evolution.net/"><img src="'.$rsc_url.'img/b2evolution_minilogo.png" width="231" height="50" alt="b2evolution" /></a>';
 
 $admin_path_separator = ' :: ';
 

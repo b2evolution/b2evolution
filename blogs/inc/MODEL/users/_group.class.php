@@ -380,6 +380,16 @@ class Group extends DataObject
 		global $DB;
 		// echo "checkin for $permname >= $permlevel on blog $perm_target_blog<br />";
 
+		$BlogCache = & get_Cache('BlogCache');
+    /**
+		 * @var Blog
+		 */
+		$Blog = & $BlogCache->get_by_ID( $perm_target_blog );
+		if( ! $Blog->advanced_perms )
+		{	// We do not abide to advanced perms
+			return false;
+		}
+
 		if( !isset( $this->blog_post_statuses[$perm_target_blog] ) )
 		{ // Allowed blog post statuses have not been loaded yet:
 			if( $this->ID == 0 )
@@ -469,6 +479,11 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2007/05/31 03:02:23  fplanque
+ * Advanced perms now disabled by default (simpler interface).
+ * Except when upgrading.
+ * Enable advanced perms in blog settings -> features
+ *
  * Revision 1.13  2007/05/29 01:17:20  fplanque
  * advanced admin blog settings are now restricted by a special permission
  *

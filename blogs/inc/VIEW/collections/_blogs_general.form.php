@@ -55,26 +55,29 @@ $Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// Permission to edit advanced admin settings
-		$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('Blog URL name'), T_('Used to uniquely identify this blog. Appears in URLs and gets used as default for the media location (see the advanced tab).'), 255 );
+	}
+
+	$owner_User = & $edited_Blog->get_owner_User();
+	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	{	// Permission to edit advanced admin settings
+
+		$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL Name'), T_('Used to uniquely identify this blog. Appears in URLs and gets used as default for the media location (see the advanced tab).'), 255 );
+
+		// fp> Note: There are 2 reasons why we don't provide a select here:
+		// 1. If there are 1000 users, it's a pain.
+		// 2. A single blog owner is not necessarily allowed to see all other users.
+		$Form->text( 'owner_login', $owner_User->login, 20, T_('Owner'), T_('Login of this blog\'s owner.') );
+	}
+	else
+	{
+		$Form->info( T_('URL Name'), $edited_Blog->get( 'urlname' ), T_('Used to uniquely identify this blog in URLs.') /* Note: message voluntarily shorter than admin message */ );
+
+		$Form->info( T_('Owner'), $owner_User->login, $owner_User->dget('fullname') );
 	}
 
 	$Form->select( 'blog_locale', $edited_Blog->get( 'locale' ), 'locale_options_return', T_('Main Locale'), T_('Determines the language of the navigation links on the blog.') );
 
 	$Form->end_fieldset();
-
-
-if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
-{	// Permission to edit advanced admin settings
-	$Form->begin_fieldset( T_('Permissions').' ['.T_('Admin').']' );
-		// fp> Note: There are 2 reasons why we don't provide a select here:
-		// 1. If there are 1000 users, it's a pain.
-		// 2. A single blog owner is not necessarily allowed to see all other users.
-		$owner_User = & $edited_Blog->get_owner_User();
-		$Form->text( 'owner_login', $owner_User->login, 20, T_('Owner'), T_('Login of this blog\'s owner.') );
-
-		// fp> TODO: checkbox 'Advanced perms', 'Check to enable advanced user & group permission tabs'
-	$Form->end_fieldset();
-}
 
 
 $Form->begin_fieldset( T_('List of public blogs') );
@@ -107,6 +110,11 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.25  2007/05/31 03:02:23  fplanque
+ * Advanced perms now disabled by default (simpler interface).
+ * Except when upgrading.
+ * Enable advanced perms in blog settings -> features
+ *
  * Revision 1.24  2007/05/29 01:17:20  fplanque
  * advanced admin blog settings are now restricted by a special permission
  *

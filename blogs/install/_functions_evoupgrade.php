@@ -1760,14 +1760,21 @@ function upgrade_b2evo_tables()
 	}
 
 
-	echo "Cleanup blogs table...";
-	db_drop_col( 'T_blogs', 'blog_staticfilename' );
-	echo "OK.<br />\n";
+	if( $old_db_version < 9416 )
+	{
+		echo "Updating blogs table...";
+		$DB->query( "ALTER TABLE T_blogs
+									ADD COLUMN blog_advanced_perms  TINYINT(1) NOT NULL default 0 AFTER blog_owner_user_ID,
+									DROP COLUMN blog_staticfilename" );
+		$DB->query( "UPDATE T_blogs
+									  SET blog_advanced_perms = 1" );
+		echo "OK.<br />\n";
 
-	echo "Adding admin permissions...";
-	$DB->query( "ALTER TABLE T_coll_user_perms ADD COLUMN bloguser_perm_admin tinyint NOT NULL default 0 AFTER bloguser_perm_properties" );
-	$DB->query( "ALTER TABLE T_coll_group_perms ADD COLUMN bloggroup_perm_admin tinyint NOT NULL default 0 AFTER bloggroup_perm_properties" );
-	echo "OK.<br />\n";
+		echo "Adding admin permissions...";
+		$DB->query( "ALTER TABLE T_coll_user_perms ADD COLUMN bloguser_perm_admin tinyint NOT NULL default 0 AFTER bloguser_perm_properties" );
+		$DB->query( "ALTER TABLE T_coll_group_perms ADD COLUMN bloggroup_perm_admin tinyint NOT NULL default 0 AFTER bloggroup_perm_properties" );
+		echo "OK.<br />\n";
+	}
 
 
 
@@ -1886,6 +1893,11 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.225  2007/05/31 03:02:23  fplanque
+ * Advanced perms now disabled by default (simpler interface).
+ * Except when upgrading.
+ * Enable advanced perms in blog settings -> features
+ *
  * Revision 1.224  2007/05/29 01:17:20  fplanque
  * advanced admin blog settings are now restricted by a special permission
  *

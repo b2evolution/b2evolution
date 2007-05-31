@@ -77,12 +77,14 @@ class Blog extends DataObject
 	var $longdesc;
 
 	var $owner_user_ID;
-	
+
 	/**
 	 * Lazy filled
 	 * @var User
 	 */
 	var $owner_User = NULL;
+
+	var $advanced_perms = 0;
 
 	var $locale;
 	var $access_type;
@@ -169,6 +171,7 @@ class Blog extends DataObject
 			$this->shortname = $db_row->blog_shortname;
 			$this->name = $db_row->blog_name;
 			$this->owner_user_ID = $db_row->blog_owner_user_ID;
+			$this->advanced_perms = $db_row->blog_advanced_perms;
 			$this->tagline = $db_row->blog_tagline;
 			$this->shortdesc = $db_row->blog_description;	// description
 			$this->longdesc = $db_row->blog_longdesc;
@@ -360,6 +363,7 @@ class Blog extends DataObject
 		if( in_array( 'features', $groups ) )
 		{ // we want to load the workflow checkboxes:
 			$this->set_setting( 'allow_subscriptions',  param( 'allow_subscriptions', 'integer', 0 ) );
+			$this->set( 'advanced_perms',  param( 'advanced_perms', 'integer', 0 ) );
 			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
 		}
 
@@ -1390,6 +1394,11 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.85  2007/05/31 03:02:22  fplanque
+ * Advanced perms now disabled by default (simpler interface).
+ * Except when upgrading.
+ * Enable advanced perms in blog settings -> features
+ *
  * Revision 1.84  2007/05/30 01:18:56  fplanque
  * blog owner gets all permissions except advanced/admin settings
  *
