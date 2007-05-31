@@ -33,7 +33,6 @@ echo '
 <script type="text/javascript">var htsrv_url = "'.$htsrv_url.'";</script>
 <script type="text/javascript" src="'.$rsc_url.'js/collectionperms.js"></script>';
 
-
 $Form = & new Form( NULL, 'blogperm_checkchanges', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
@@ -71,7 +70,7 @@ if( !empty( $keywords ) )
 	}
 }
 
-$sql = 'SELECT user_ID, user_login, bloguser_perm_poststatuses, bloguser_ismember,
+$sql = 'SELECT user_ID, user_login, user_level, bloguser_perm_poststatuses, bloguser_ismember,
 													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
 													bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,
 													bloguser_perm_media_browse, bloguser_perm_media_change
@@ -169,6 +168,13 @@ $Results->cols[] = array(
 						'td' => '<a href="?ctrl=users&amp;user_ID=$user_ID$">$user_login$</a>',
 					);
 
+$Results->cols[] = array(
+						'th' => /* TRANS: User Level */ T_('L'),
+						'order' => 'user_level',
+						'td' => '$user_level$',
+						'td_class' => 'center',
+					);
+
 
 function coll_perm_checkbox( $row, $perm, $title, $id = NULL )
 {
@@ -262,6 +268,25 @@ $Results->cols[] = array(
 						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Redr'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_status_checkbox( {row}, \'redirected\', \''.TS_('Permission to post into this blog with redirected status').'\' )%',
+						'td_class' => 'center',
+					);
+
+function coll_perm_edit()
+{
+	$r = '<select>';
+	$r .= '<option value="no">No editing</option>';
+	$r .= '<option value="no">Own posts</option>';
+	$r .= '<option value="no">&lt; own level</option>';
+	$r .= '<option value="no">&le; own level</option>';
+	$r .= '<option value="no" selected="selected">All posts</option>';
+	$r .= '</select>';
+	return $r;
+}
+$Results->cols[] = array(
+						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Edit posts<br />/user level'),
+						'th_class' => 'checkright',
+						'default_dir' => 'D',
+						'td' => '%coll_perm_edit()%',
 						'td_class' => 'center',
 					);
 
@@ -444,6 +469,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.22  2007/05/31 03:49:24  fplanque
+ * editing perm concept demo
+ *
  * Revision 1.21  2007/05/29 01:17:20  fplanque
  * advanced admin blog settings are now restricted by a special permission
  *
