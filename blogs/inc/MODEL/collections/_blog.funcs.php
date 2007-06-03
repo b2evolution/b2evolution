@@ -288,7 +288,7 @@ function blogperms_get_easy2( $perms, $context='user' )
 
 	$perm_edit = $perms->{'blog'.$context.'_perm_edit'};
 
-	echo "<br> $perms_contrib $perms_editor $perms_moderator $perms_admin $perm_edit ";
+	// echo "<br> $perms_contrib $perms_editor $perms_moderator $perms_admin $perm_edit ";
 
 	if( $perms_contrib == 4 && $perms_editor == 3 && $perms_moderator == 3 && $perms_admin == 4 && $perm_edit == 'all' )
 	{ // has full editor rights
@@ -501,6 +501,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.29  2007/06/03 02:55:06  fplanque
+ * no message
+ *
  * Revision 1.28  2007/06/03 02:54:18  fplanque
  * Stuff for permission maniacs (admin part only, actual perms checks to be implemented)
  * Newbies will not see this complexity since advanced perms are now disabled by default.
