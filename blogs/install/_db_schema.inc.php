@@ -36,24 +36,6 @@ $schema_queries = array(
 			PRIMARY KEY grp_ID (grp_ID)
 		)" ),
 
-	'T_coll_user_perms' => array(
-		'Creating table for Blog-User permissions',
-		"CREATE TABLE T_coll_user_perms (
-			bloguser_blog_ID int(11) unsigned NOT NULL default 0,
-			bloguser_user_ID int(11) unsigned NOT NULL default 0,
-			bloguser_ismember tinyint NOT NULL default 0,
-			bloguser_perm_poststatuses set('published','deprecated','protected','private','draft','redirected') NOT NULL default '',
-			bloguser_perm_delpost tinyint NOT NULL default 0,
-			bloguser_perm_comments tinyint NOT NULL default 0,
-			bloguser_perm_cats tinyint NOT NULL default 0,
-			bloguser_perm_properties tinyint NOT NULL default 0,
-			bloguser_perm_admin tinyint NOT NULL default 0,
-			bloguser_perm_media_upload tinyint NOT NULL default 0,
-			bloguser_perm_media_browse tinyint NOT NULL default 0,
-			bloguser_perm_media_change tinyint NOT NULL default 0,
-			PRIMARY KEY bloguser_pk (bloguser_blog_ID,bloguser_user_ID)
-		)" ),
-
 	'T_settings' => array(
 		'Creating table for Settings',
 		"CREATE TABLE T_settings (
@@ -421,18 +403,38 @@ $schema_queries = array(
 			primary key (sub_coll_ID, sub_user_ID)
 		)" ),
 
+	'T_coll_user_perms' => array(
+		'Creating table for Blog-User permissions',
+		"CREATE TABLE T_coll_user_perms (
+			bloguser_blog_ID           int(11) unsigned NOT NULL default 0,
+			bloguser_user_ID           int(11) unsigned NOT NULL default 0,
+			bloguser_ismember          tinyint NOT NULL default 0,
+			bloguser_perm_poststatuses set('published','deprecated','protected','private','draft','redirected') NOT NULL default '',
+			bloguser_perm_edit         ENUM('no','own','lt','le','all','redirected') NOT NULL default 'no',
+			bloguser_perm_delpost      tinyint NOT NULL default 0,
+			bloguser_perm_comments     tinyint NOT NULL default 0,
+			bloguser_perm_cats         tinyint NOT NULL default 0,
+			bloguser_perm_properties   tinyint NOT NULL default 0,
+			bloguser_perm_admin        tinyint NOT NULL default 0,
+			bloguser_perm_media_upload tinyint NOT NULL default 0,
+			bloguser_perm_media_browse tinyint NOT NULL default 0,
+			bloguser_perm_media_change tinyint NOT NULL default 0,
+			PRIMARY KEY bloguser_pk (bloguser_blog_ID,bloguser_user_ID)
+		)" ),
+
 	'T_coll_group_perms' => array(
 		'Creating table for blog-group permissions',
 		"CREATE TABLE T_coll_group_perms (
-			bloggroup_blog_ID int(11) unsigned NOT NULL default 0,
-			bloggroup_group_ID int(11) unsigned NOT NULL default 0,
-			bloggroup_ismember tinyint NOT NULL default 0,
+			bloggroup_blog_ID           int(11) unsigned NOT NULL default 0,
+			bloggroup_group_ID          int(11) unsigned NOT NULL default 0,
+			bloggroup_ismember          tinyint NOT NULL default 0,
 			bloggroup_perm_poststatuses set('published','deprecated','protected','private','draft','redirected') NOT NULL default '',
-			bloggroup_perm_delpost tinyint NOT NULL default 0,
-			bloggroup_perm_comments tinyint NOT NULL default 0,
-			bloggroup_perm_cats tinyint NOT NULL default 0,
-			bloggroup_perm_properties tinyint NOT NULL default 0,
-			bloggroup_perm_admin tinyint NOT NULL default 0,
+			bloggroup_perm_edit         ENUM('no','own','lt','le','all','redirected') NOT NULL default 'no',
+			bloggroup_perm_delpost      tinyint NOT NULL default 0,
+			bloggroup_perm_comments     tinyint NOT NULL default 0,
+			bloggroup_perm_cats         tinyint NOT NULL default 0,
+			bloggroup_perm_properties   tinyint NOT NULL default 0,
+			bloggroup_perm_admin        tinyint NOT NULL default 0,
 			bloggroup_perm_media_upload tinyint NOT NULL default 0,
 			bloggroup_perm_media_browse tinyint NOT NULL default 0,
 			bloggroup_perm_media_change tinyint NOT NULL default 0,
@@ -546,6 +548,10 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.64  2007/06/03 02:54:18  fplanque
+ * Stuff for permission maniacs (admin part only, actual perms checks to be implemented)
+ * Newbies will not see this complexity since advanced perms are now disabled by default.
+ *
  * Revision 1.63  2007/05/31 03:02:23  fplanque
  * Advanced perms now disabled by default (simpler interface).
  * Except when upgrading.

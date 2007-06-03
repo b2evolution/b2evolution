@@ -70,7 +70,7 @@ if( !empty( $keywords ) )
 	}
 }
 
-$sql = 'SELECT user_ID, user_login, user_level, bloguser_perm_poststatuses, bloguser_ismember,
+$sql = 'SELECT user_ID, user_login, user_level, bloguser_perm_poststatuses, bloguser_perm_edit, bloguser_ismember,
 													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
 													bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,
 													bloguser_perm_media_browse, bloguser_perm_media_change
@@ -271,14 +271,15 @@ $Results->cols[] = array(
 						'td_class' => 'center',
 					);
 
-function coll_perm_edit()
+function coll_perm_edit( $ID, $perm_edit )
 {
-	$r = '<select>';
-	$r .= '<option value="no">No editing</option>';
-	$r .= '<option value="no">Own posts</option>';
-	$r .= '<option value="no">&lt; own level</option>';
-	$r .= '<option value="no">&le; own level</option>';
-	$r .= '<option value="no" selected="selected">All posts</option>';
+	$r = '<select id="blog_perm_edit_'.$ID.'" name="blog_perm_edit_'.$ID.'"
+					onclick="merge_from_wide( this, '.$ID.' );" >';
+	$r .= '<option value="no" '.( $perm_edit == 'no' ? 'selected="selected"' : '' ).'>No editing</option>';
+	$r .= '<option value="own" '.( $perm_edit == 'own' ? 'selected="selected"' : '' ).'>Own posts</option>';
+	$r .= '<option value="lt" '.( $perm_edit == 'lt' ? 'selected="selected"' : '' ).'>&lt; own level</option>';
+	$r .= '<option value="le" '.( $perm_edit == 'le' ? 'selected="selected"' : '' ).'>&le; own level</option>';
+	$r .= '<option value="all" '.( $perm_edit == 'all' ? 'selected="selected"' : '' ).'>All posts</option>';
 	$r .= '</select>';
 	return $r;
 }
@@ -286,7 +287,7 @@ $Results->cols[] = array(
 						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Edit posts<br />/user level'),
 						'th_class' => 'checkright',
 						'default_dir' => 'D',
-						'td' => '%coll_perm_edit()%',
+						'td' => '%coll_perm_edit(  #user_ID#, #bloguser_perm_edit# )%',
 						'td_class' => 'center',
 					);
 
@@ -420,7 +421,9 @@ function simple_coll_perm_radios( $row )
 	foreach( array(
 								array( 'nomember', T_('Not Member') ),
 								array( 'member', T_('Member') ),
-								array( 'editor', T_('Editor') ),
+								array( 'contrib', T_('Contributor') ),
+								array( 'editor', T_('Publisher') ),
+								array( 'moderator', T_('Moderator') ),
 								array( 'admin',  T_('Admin') ),
 								array( 'custom',  T_('Custom') )
 							) as $lkey => $easy_group )
@@ -469,6 +472,10 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.23  2007/06/03 02:54:18  fplanque
+ * Stuff for permission maniacs (admin part only, actual perms checks to be implemented)
+ * Newbies will not see this complexity since advanced perms are now disabled by default.
+ *
  * Revision 1.22  2007/05/31 03:49:24  fplanque
  * editing perm concept demo
  *

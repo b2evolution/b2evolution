@@ -40,6 +40,9 @@ function toggleall_wide( the_form, id, set )
 			the_form.elements[option].click();
 		}
 	}
+
+	// Select
+	the_form.elements['blog_perm_edit_'+String(id)].value = allchecked[id] ? 'all' : 'no';
 }
 
 
@@ -84,13 +87,36 @@ function merge_from_easy( source, userid )
 	{
 		return;
 	}
+
 	if( source.value == 'custom' )
 	{ // don't change anything
 		return;
 	}
 
-	// reset all checkboxes
+	// reset all checkboxes / selects
 	toggleall_wide( source.form, userid, 0 );
+
+	// Select option
+	switch( source.value )
+	{
+		case 'admin':
+			source.form.elements['blog_perm_edit_'+String(userid)].value = 'all';
+			break;
+
+		case 'moderator':
+			source.form.elements['blog_perm_edit_'+String(userid)].value = 'lt';
+			break;
+
+		case 'editor':
+		case 'contrib':
+			source.form.elements['blog_perm_edit_'+String(userid)].value = 'own';
+			break;
+
+		case 'member':
+		default:
+			source.form.elements['blog_perm_edit_'+String(userid)].value = 'no';
+			break;
+	}
 
 	switch( source.value )
 	{
@@ -98,18 +124,20 @@ function merge_from_easy( source, userid )
 			source.form.elements['blog_perm_admin_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_properties_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_cats_'+String(userid)].checked = 1;
-		case 'editor':
+			source.form.elements['blog_perm_delpost_'+String(userid)].checked = 1;
+		case 'moderator':
+			source.form.elements['blog_perm_comments_'+String(userid)].checked = 1;
+			source.form.elements['blog_perm_redirected_'+String(userid)].checked = 1;
+			source.form.elements['blog_perm_media_change_'+String(userid)].checked = 1;
+		case 'editor':	// publisher
 			source.form.elements['blog_perm_published_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_protected_'+String(userid)].checked = 1;
+			source.form.elements['blog_perm_deprecated_'+String(userid)].checked = 1;
+		case 'contrib':
 			source.form.elements['blog_perm_private_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_draft_'+String(userid)].checked = 1;
-			source.form.elements['blog_perm_deprecated_'+String(userid)].checked = 1;
-			source.form.elements['blog_perm_redirected_'+String(userid)].checked = 1;
-			source.form.elements['blog_perm_delpost_'+String(userid)].checked = 1;
-			source.form.elements['blog_perm_comments_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_media_browse_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_media_upload_'+String(userid)].checked = 1;
-			source.form.elements['blog_perm_media_change_'+String(userid)].checked = 1;
 		case 'member':
 			source.form.elements['blog_ismember_'+String(userid)].click();
 	}
@@ -132,54 +160,63 @@ function merge_from_wide( source, userid )
 			f.elements['checkallspan_state_'+String(userid)].click();
 		}
 	}
+	else if( source.nodeName.toLowerCase() == 'select' )
+	{
+		f = source.form;
+	}
 	else
 	{
 		f = source;
 	}
 
 	var toeasy = '';
-	if( !f.elements['blog_ismember_'+String(userid)].checked )
+	if( ! f.elements['blog_ismember_'+String(userid)].checked )
 	{
 		toeasy = 'nomember';
 	}
 	else
 	{
-		var perms_editor = Number(f.elements['blog_perm_redirected_'+String(userid)].checked)
-										+Number(f.elements['blog_perm_deprecated_'+String(userid)].checked)
-										+Number(f.elements['blog_perm_draft_'+String(userid)].checked)
+		var perms_contrib = Number(f.elements['blog_perm_draft_'+String(userid)].checked)
 										+Number(f.elements['blog_perm_private_'+String(userid)].checked)
-										+Number(f.elements['blog_perm_protected_'+String(userid)].checked)
-										+Number(f.elements['blog_perm_published_'+String(userid)].checked)
-										+Number(f.elements['blog_perm_delpost_'+String(userid)].checked)
-										+Number(f.elements['blog_perm_comments_'+String(userid)].checked)
 										+Number(f.elements['blog_perm_media_upload_'+String(userid)].checked)
-										+Number(f.elements['blog_perm_media_browse_'+String(userid)].checked)
+										+Number(f.elements['blog_perm_media_browse_'+String(userid)].checked);
+
+		var perms_editor = Number(f.elements['blog_perm_deprecated_'+String(userid)].checked)
+										+Number(f.elements['blog_perm_protected_'+String(userid)].checked)
+										+Number(f.elements['blog_perm_published_'+String(userid)].checked);
+
+		var perm_moderator = Number(f.elements['blog_perm_redirected_'+String(userid)].checked)
+										+Number(f.elements['blog_perm_comments_'+String(userid)].checked)
 										+Number(f.elements['blog_perm_media_change_'+String(userid)].checked);
 
 		var perms_admin = Number(f.elements['blog_perm_admin_'+String(userid)].checked)
 										+Number(f.elements['blog_perm_properties_'+String(userid)].checked)
-										+Number(f.elements['blog_perm_cats_'+String(userid)].checked);
+										+Number(f.elements['blog_perm_cats_'+String(userid)].checked)
+										+Number(f.elements['blog_perm_delpost_'+String(userid)].checked);
 
-		if( perms_editor == 11 )
+		var perm_edit = f.elements['blog_perm_edit_'+String(userid)].value;
+
+		// alert( perms_contrib+' '+perms_editor+' '+perm_moderator+' '+perms_admin+' '+perm_edit );
+
+		if( perms_contrib == 4 && perms_editor == 3 && perm_moderator == 3 && perms_admin == 4 && perm_edit == 'all' )
 		{ // has full editor rights
-			switch( perms_admin )
-			{
-				case 0: toeasy = 'editor'; break;
-				case 1:
-				case 2: toeasy = 'custom'; break;
-				case 3: toeasy = 'admin'; break;
-			}
+			toeasy = 'admin';
 		}
-		else if( perms_editor == 0 )
+		else if( perms_contrib == 4 && perms_editor == 3 && perm_moderator == 3 && perms_admin == 0 && perm_edit == 'lt' )
+		{ // moderator
+			toeasy = 'moderator';
+		}
+		else if( perms_contrib == 4 && perms_editor == 3 && perm_moderator == 0 && perms_admin == 0 && perm_edit == 'own' )
+		{ // publisher
+			toeasy = 'editor';
+		}
+		else if( perms_contrib == 4 && perms_editor == 0 && perm_moderator == 0 && perms_admin == 0 && perm_edit == 'own' )
+		{ // contributor
+			toeasy = 'contrib';
+		}
+		else if( perms_contrib == 0 && perms_editor == 0 && perm_moderator == 0  && perms_admin == 0 && perm_edit == 'no' )
 		{
-			if( perms_admin )
-			{
-				toeasy = 'custom';
-			}
-			else
-			{
-				toeasy = 'member';
-			}
+			toeasy = 'member';
 		}
 		else
 		{

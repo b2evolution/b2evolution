@@ -1770,12 +1770,31 @@ function upgrade_b2evo_tables()
 									  SET blog_advanced_perms = 1" );
 		echo "OK.<br />\n";
 
-		echo "Adding admin permissions...";
-		$DB->query( "ALTER TABLE T_coll_user_perms ADD COLUMN bloguser_perm_admin tinyint NOT NULL default 0 AFTER bloguser_perm_properties" );
-		$DB->query( "ALTER TABLE T_coll_group_perms ADD COLUMN bloggroup_perm_admin tinyint NOT NULL default 0 AFTER bloggroup_perm_properties" );
+		echo "Additionnal blog permissions...";
+		$DB->query( "ALTER TABLE T_coll_user_perms
+									ADD COLUMN bloguser_perm_admin tinyint NOT NULL default 0 AFTER bloguser_perm_properties,
+									ADD COLUMN bloguser_perm_edit  ENUM('no','own','lt','le','all','redirected') NOT NULL default 'no' AFTER bloguser_perm_poststatuses" );
+
+		$DB->query( "ALTER TABLE T_coll_group_perms
+									ADD COLUMN bloggroup_perm_admin tinyint NOT NULL default 0 AFTER bloggroup_perm_properties,
+									ADD COLUMN bloggroup_perm_edit  ENUM('no','own','lt','le','all','redirected') NOT NULL default 'no' AFTER bloggroup_perm_poststatuses" );
+
+		// Preserve full admin perms:
+		$DB->query( "UPDATE T_coll_user_perms
+										SET bloguser_perm_admin = 1
+									WHERE bloguser_perm_properties <> 0" );
+		$DB->query( "UPDATE T_coll_group_perms
+										SET bloggroup_perm_admin = 1
+									WHERE bloggroup_perm_properties <> 0" );
+
+		// Preserve full edit perms:
+		$DB->query( "UPDATE T_coll_user_perms
+										SET bloguser_perm_edit = 'all'" );
+		$DB->query( "UPDATE T_coll_user_perms
+										SET bloggroup_perm_edit = 'all'" );
+
 		echo "OK.<br />\n";
 	}
-
 
 
 	/*
@@ -1893,6 +1912,10 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.226  2007/06/03 02:54:18  fplanque
+ * Stuff for permission maniacs (admin part only, actual perms checks to be implemented)
+ * Newbies will not see this complexity since advanced perms are now disabled by default.
+ *
  * Revision 1.225  2007/05/31 03:02:23  fplanque
  * Advanced perms now disabled by default (simpler interface).
  * Except when upgrading.
