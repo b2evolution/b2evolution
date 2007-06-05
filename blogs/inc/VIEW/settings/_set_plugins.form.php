@@ -53,7 +53,7 @@ require_once $inc_path.'_misc/_plugin.funcs.php';
 
 $Results = new Results( '
 	SELECT plug_status, plug_ID, plug_priority, plug_code, plug_apply_rendering FROM T_plugins',
-	'plug_', '-A-' /* by name */, NULL /* no limit */ );
+	'plug_', '-A-' /* by name */, 0 /* no limit */ );
 
 $Results->Cache = & $admin_Plugins;
 
@@ -276,6 +276,9 @@ unset($Results); // free memory
 
 /*
  * $Log$
+ * Revision 1.52  2007/06/05 00:01:21  blueyed
+ * Fixed display of the available plugins Results table, by using 0 for no limit
+ *
  * Revision 1.51  2007/04/26 00:11:12  fplanque
  * (c) 2007
  *
