@@ -1408,10 +1408,8 @@ function debug_die( $additional_info = '' )
 			$backtrace_cli = preg_replace( '~(\S)(\n)(\S)~', '$1  $2$3', $backtrace_cli );
 			$log_message .= "\nBacktrace:\n".$backtrace_cli;
 		}
-		if( isset($_SERVER['REQUEST_URI']) )
-		{ // not set in cli/cron
-			$log_message .= "\n".$_SERVER['REQUEST_URI'].' ('.( isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '-' ).')';
-		}
+		$log_message .= "\nREQUEST_URI:  ".( isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '-' );
+		$log_message .= "\nHTTP_REFERER: ".( isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '-' );
 
 		error_log( str_replace("\n", ' / ', $log_message), 0 /* PHP's system logger */ );
 	}
@@ -2970,6 +2968,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.178  2007/06/05 17:00:02  blueyed
+ * MFB v-1-10: Consistent logging of HTTP_REFERER/REQUEST_URI; fixed possible E_NOTICE
+ *
  * Revision 1.177  2007/05/23 23:07:53  blueyed
  * Display DB info (user, database, host, tableprefix, charset) in debug_info()
  *
