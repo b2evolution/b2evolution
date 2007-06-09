@@ -12,8 +12,11 @@
 PHPDOC="/usr/local/pear/PhpDocumentor/phpdoc"
 
 # Set this to the PHP interpreter to use. PHP 5.2+ highly recommended!
-PHP="/usr/local/bin/php -d memory_limit=1024M"
-export PHP
+export PHP="php -d memory_limit=1024M"
+
+TIMESTAMPFILE="create_new_doc.timestamp"
+
+RSYNC_TARGET="doc.b2evolution.net:/var/www/vhosts/evodoc/web/HEAD/"
 
 # halt on any error:
 set -e
@@ -21,13 +24,24 @@ set -e
 # change to script's directory
 cd `dirname $0`
 
+# Test if there are new files (newer than $TIMESTAMPFILE):
+if [ -e "$TIMESTAMPFILE" ]; then
+	if exec find .. -name 'CVS' -prune -o -type f -newer "$TIMESTAMPFILE" -print -quit|grep -q .; then
+		echo "No new files found. Exiting."
+		exit
+	fi
+else
+	echo "No timestamp file yet."
+fi
+
 # Remove old generated doc
 /bin/rm -rf build/*
 
 # Generate documentation
+echo "Running phpdoc.."
 $PHPDOC --title 'b2evolution Technical Documentation (CVS HEAD)' \
 --directory .. \
---ignore-symlinks on \
+--ignoresymlinks on \
 --target build/ \
 --output HTML:Smarty:b2evo \
 --ignore _idna_convert_npdata.ser.inc,Connections/,CVS/,gettext/,simpletest/,Templates/,img/,locales/,rsc/,media/,tests/,doc/,extras/,skins/babyblues/,skins/guadeloupe/,skins/wpc_aubmach/,*.gif,*.jpg,*.png,*.css,*.po*,*.mo*,*.bak,*.html,*.sql,*.xml,*.bpd,*.mpd,*.log,*.htaccess,*_TEST.php \
@@ -37,8 +51,12 @@ $PHPDOC --title 'b2evolution Technical Documentation (CVS HEAD)' \
 --sourcecode on \
 --readmeinstallchangelog license.txt
 
-# Fix for "duplicated title" - see http://sourceforge.net/tracker/index.php?func=detail&aid=1545418&group_id=11194&atid=111194
-find build/ | xargs grep -l '<div class="ref-title-box">b2evolution technical documentation<h1' | xargs sed -i 's/<div class="ref-title-box">b2evolution technical documentation<h1/<div class="ref-title-box"><h1/'
-
 # Publish it:
-rsync -avt --del build/ doc.b2evolution.net:/var/www/vhosts/evodoc/web/HEAD/
+# First without source files (not so important)
+rsync -avt --del build/ --exclude=__filesource/ "$RSYNC_TARGET"
+rsync -avt --del build/ "$RSYNC_TARGET"
+
+echo "Touching timestamp file"
+touch "$TIMESTAMPFILE"
+
+echo "Done."
