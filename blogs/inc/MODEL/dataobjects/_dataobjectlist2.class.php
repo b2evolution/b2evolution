@@ -35,7 +35,7 @@ require_once dirname(__FILE__).'/../../_misc/_results.class.php';
 
 
 /**
- *
+ * @package evocore
  */
 class FilteredResults extends Results
 {
@@ -273,6 +273,9 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.10  2007/06/11 22:01:52  blueyed
+ * doc fixes
+ *
  * Revision 1.9  2007/05/26 22:21:32  blueyed
  * Made $limit for Results configurable per user
  *

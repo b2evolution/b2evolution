@@ -40,6 +40,7 @@ require_once dirname(__FILE__).'/../dataobjects/_dataobjectcache.class.php';
 
 /**
  * GenericCache Class
+ * @package evocore
  */
 class GenericCache extends DataObjectCache
 {
@@ -70,6 +71,9 @@ class GenericCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.9  2007/06/11 22:01:53  blueyed
+ * doc fixes
+ *
  * Revision 1.8  2007/04/26 00:11:11  fplanque
  * (c) 2007
  *

@@ -39,6 +39,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @todo dh> I wanted to add a MySQL INDEX on the sess_lastseen field, but this "plugin"
  *       is the only real user of this. So, when making this a plugin, this should
  *       add the index perhaps.
+ * @package evocore
  */
 class Sessions extends Widget
 {
@@ -260,6 +261,9 @@ class Sessions extends Widget
 
 /*
  * $Log$
+ * Revision 1.13  2007/06/11 22:01:53  blueyed
+ * doc fixes
+ *
  * Revision 1.12  2007/04/26 00:11:11  fplanque
  * (c) 2007
  *

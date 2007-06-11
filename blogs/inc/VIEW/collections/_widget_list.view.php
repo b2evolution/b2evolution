@@ -24,6 +24,10 @@ global $container_list;
 $WidgetCache = & get_Cache( 'WidgetCache' );
 $container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID );
 
+/**
+ * @param string Title of the container. This gets passed to T_()!
+ * @param string Suffix of legend
+ */
 function display_container( $container, $legend_suffix = '' )
 {
 	global $Blog;
@@ -158,6 +162,9 @@ echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, fal
 
 /*
  * $Log$
+ * Revision 1.8  2007/06/11 22:01:54  blueyed
+ * doc fixes
+ *
  * Revision 1.7  2007/04/26 00:11:05  fplanque
  * (c) 2007
  *

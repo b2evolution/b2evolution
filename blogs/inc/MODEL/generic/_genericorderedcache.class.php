@@ -40,6 +40,7 @@ require_once $inc_path.'MODEL/generic/_genericcache.class.php';
 
 /**
  * GenericOrderedCache Class
+ * @package evocore
  */
 class GenericOrderedCache extends GenericCache
 {
@@ -161,6 +162,9 @@ class GenericOrderedCache extends GenericCache
 
 /*
  * $Log$
+ * Revision 1.7  2007/06/11 22:01:53  blueyed
+ * doc fixes
+ *
  * Revision 1.6  2007/04/26 00:11:11  fplanque
  * (c) 2007
  *

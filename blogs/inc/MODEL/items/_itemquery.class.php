@@ -36,6 +36,7 @@ require_once dirname(__FILE__).'/../../_misc/_sql.class.php';
 
 /**
  * ItemQuery: help constructing queries on Items
+ * @package evocore
  */
 class ItemQuery extends SQL
 {
@@ -660,6 +661,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.19  2007/06/11 22:01:53  blueyed
+ * doc fixes
+ *
  * Revision 1.18  2007/05/27 00:35:26  fplanque
  * tag display + tag filtering
  *
