@@ -185,7 +185,7 @@ switch( $action )
 		// This is somewhat in between new and edit...
 
 		// Check permission based on DB status:
-		$current_User->check_perm( 'blog_post!'.$edited_Item->get( 'status' ), 'edit', true, $blog );
+		$current_User->check_perm( 'item_post!'.$edited_Item->get( 'status' ), 'edit', true, $edited_Item );
 
 		$edited_Item->status = param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
@@ -223,7 +223,7 @@ switch( $action )
 	case 'edit':
 		// Check permission:
 		$edited_Item->status = $edited_Item->get( 'status' );
-		$current_User->check_perm( 'blog_post!'.$edited_Item->status, 'edit', true, $blog );
+		$current_User->check_perm( 'item_post!'.$edited_Item->status, 'edit', true, $edited_Item );
 
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p );
@@ -380,7 +380,7 @@ switch( $action )
 		$post_status = 'published';
 		// Check permissions:
 		/* TODO: Check extra categories!!! */
-		$current_User->check_perm( 'blog_post!'.$post_status, 'edit', true, $blog );
+		$current_User->check_perm( 'item_post!'.$post_status, 'edit', true, $edited_Item );
 		$current_User->check_perm( 'edit_timestamp', 'any', true ) ;
 
 		$edited_Item->set( 'status', $post_status );
@@ -410,7 +410,7 @@ switch( $action )
 		$post_status = 'deprecated';
 		// Check permissions:
 		/* TODO: Check extra categories!!! */
-		$current_User->check_perm( 'blog_post!'.$post_status, 'edit', true, $blog );
+		$current_User->check_perm( 'item_post!'.$post_status, 'edit', true, $edited_Item );
 
 		$edited_Item->set( 'status', $post_status );
 		$edited_Item->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
@@ -717,6 +717,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.27  2007/06/11 01:53:54  fplanque
+ * fix
+ *
  * Revision 1.26  2007/05/28 01:33:22  fplanque
  * permissions/fixes
  *
