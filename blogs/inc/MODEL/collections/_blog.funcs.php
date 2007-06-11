@@ -59,7 +59,7 @@ function blog_update_user_perms( $blog )
 	$inserted_values = array();
 	foreach( $DB->get_col( 'SELECT user_ID FROM T_users' ) as $loop_user_ID )
 	{ // Check new permissions for each user:
-		// echo "getting perms for user : $loop_user_ID <br />";
+		// echo "<br/>getting perms for user : $loop_user_ID <br />";
 
 		$easy_mode = param( 'blog_perm_easy_'.$loop_user_ID, 'string', 'nomember' );
 
@@ -77,7 +77,7 @@ function blog_update_user_perms( $blog )
 														.', '.$easy_perms['bloguser_perm_media_change'].' ) ';
 		}
 		else
-		{
+		{	// Use checkboxes
 			$perm_post = array();
 
 			$ismember = param( 'blog_ismember_'.$loop_user_ID, 'integer', 0 );
@@ -120,7 +120,7 @@ function blog_update_user_perms( $blog )
 				$ismember = 1;	// Must have this permission
 
 				// insert new perms:
-				$inserted_values[] = " ( $blog, $loop_user_ID, $ismember, ".$DB->quote(',',$perm_post).",
+				$inserted_values[] = " ( $blog, $loop_user_ID, $ismember, ".$DB->quote(implode(',',$perm_post)).",
 																	".$DB->quote($perm_edit).",
 																	$perm_delpost, $perm_comments, $perm_cats, $perm_properties, $perm_admin,
 																	$perm_media_upload, $perm_media_browse, $perm_media_change )";
@@ -217,7 +217,7 @@ function blog_update_group_perms( $blog )
 				$ismember = 1;	// Must have this permission
 
 				// insert new perms:
-				$inserted_values[] = " ( $blog, $loop_group_ID, $ismember, ".$DB->quote(',',$perm_post).",
+				$inserted_values[] = " ( $blog, $loop_group_ID, $ismember, ".$DB->quote(implode(',',$perm_post)).",
 																	".$DB->quote($perm_edit).",
 																	$perm_delpost, $perm_comments, $perm_cats, $perm_properties, $perm_admin,
 																	$perm_media_upload, $perm_media_browse, $perm_media_change )";
@@ -501,6 +501,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.30  2007/06/11 01:55:57  fplanque
+ * level based user permissions
+ *
  * Revision 1.29  2007/06/03 02:55:06  fplanque
  * no message
  *

@@ -1627,7 +1627,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( ! $current_User->check_perm( 'blog_post!'.$this->status, 'edit', false, $this->blog_ID ) )
+		if( ! $current_User->check_perm( 'item_post!'.$this->status, 'edit', false, $this ) )
 		{ // User has no right to edit this post
 			return false;
 		}
@@ -1680,7 +1680,7 @@ class Item extends ItemLight
 		if( ! is_logged_in() ) return false;
 
 		if( ($this->status == 'published') // Already published!
-			|| ! ($current_User->check_perm( 'blog_post!published', 'edit', false, $this->blog_ID ))
+			|| ! ($current_User->check_perm( 'item_post!published', 'edit', false, $this ))
 			|| ! ($current_User->check_perm( 'edit_timestamp' ) ) )
 		{ // User has no right to publish this post now:
 			return false;
@@ -1723,7 +1723,7 @@ class Item extends ItemLight
 		if( ! is_logged_in() ) return false;
 
 		if( ($this->status == 'deprecated') // Already deprecateded!
-			|| ! ($current_User->check_perm( 'blog_post!deprecated', 'edit', false, $this->blog_ID )) )
+			|| ! ($current_User->check_perm( 'item_post!deprecated', 'edit', false, $this )) )
 		{ // User has no right to deprecated this post:
 			return false;
 		}
@@ -3004,6 +3004,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.178  2007/06/11 01:55:57  fplanque
+ * level based user permissions
+ *
  * Revision 1.177  2007/05/28 15:18:30  fplanque
  * cleanup
  *

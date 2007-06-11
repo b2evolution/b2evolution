@@ -373,9 +373,10 @@ class Group extends DataObject
 	 *                  - blog_genstatic
 	 * @param string Permission level
 	 * @param integer Permission target blog ID
+	 * @param Item post that we want to edit
 	 * @return boolean 0 if permission denied
 	 */
-	function check_perm_bloggroups( $permname, $permlevel, $perm_target_blog )
+	function check_perm_bloggroups( $permname, $permlevel, $perm_target_blog, $Item = NULL, $User = NULL )
 	{
 		global $DB;
 		// echo "checkin for $permname >= $permlevel on blog $perm_target_blog<br />";
@@ -404,9 +405,20 @@ class Group extends DataObject
 								WHERE bloggroup_blog_ID = $perm_target_blog
 								  AND bloggroup_group_ID = $this->ID";
 
-			if( ($row = $DB->get_row( $query, ARRAY_A )) == NULL )
-			{ // No rights set for this Blog/User
-				return false;	// Permission denied
+			$row = $DB->get_row( $query, ARRAY_A );
+
+			if( empty($row) )
+			{ // No rights set for this Blog/Group: remember this (in order not to have the same query next time)
+				$this->blog_post_statuses[$perm_target_blog] = array(
+						'blog_ismember' => '0',
+						'blog_post_statuses' => array(),
+						'blog_edit' => 'no',
+						'blog_del_post' => '0',
+						'blog_comments' => '0',
+						'blog_cats' => '0',
+						'blog_properties' => '0',
+						'blog_admin' => '0',
+					);
 			}
 			else
 			{ // OK, rights found:
@@ -420,6 +432,7 @@ class Group extends DataObject
 				else
 					$this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] = explode( ',', $bloggroup_perm_post );
 
+				$this->blog_post_statuses[$perm_target_blog]['blog_edit'] = $row['bloggroup_perm_edit'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_del_post'] = $row['bloggroup_perm_delpost'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloggroup_perm_comments'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_cats'] = $row['bloggroup_perm_cats'];
@@ -456,7 +469,45 @@ class Group extends DataObject
 				// We want a specific permission:
 				$subperm = substr( $permname, 10 );
 				// echo "checking : $subperm - ", implode( ',', $this->blog_post_statuses[$perm_target_blog]['blog_post_statuses']  ), '<br />';
-				return in_array( $permlevel, $this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] );
+				$perm = in_array( $subperm, $this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] );
+
+				// TODO: the following probably should be handled by the Item class!
+				if( $perm && $permlevel == 'edit' && !empty($Item) )
+				{	// Can we edit this specific Item?
+					switch( $this->blog_post_statuses[$perm_target_blog]['blog_edit'] )
+					{
+						case 'own':
+							// Own posts only:
+							return ($Item->creator_user_ID == $User->ID);
+
+						case 'lt':
+							// Own + Lower level posts only:
+							if( $Item->creator_user_ID == $User->ID )
+							{
+								return true;
+							}
+							$item_creator_User = & $Item->get_creator_User();
+							return ( $item_creator_User->level < $User->level );
+
+						case 'le':
+							// Own + Lower or equal level posts only:
+							if( $Item->creator_user_ID == $User->ID )
+							{
+								return true;
+							}
+							$item_creator_User = & $Item->get_creator_User();
+							return ( $item_creator_User->level <= $User->level );
+
+						case 'all':
+							return true;
+
+						case 'no':
+						default:
+							return false;
+					}
+				}
+
+				return $perm;
 
 			default:
 				// echo $permname, '=', $this->blog_post_statuses[$perm_target_blog][$permname], ' ';
@@ -479,6 +530,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2007/06/11 01:55:57  fplanque
+ * level based user permissions
+ *
  * Revision 1.14  2007/05/31 03:02:23  fplanque
  * Advanced perms now disabled by default (simpler interface).
  * Except when upgrading.

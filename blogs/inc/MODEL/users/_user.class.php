@@ -476,7 +476,7 @@ class User extends DataObject
 	 *                - either blogusers permission names, see {@link User::check_perm_blogusers()}
 	 * @param string Permission level
 	 * @param boolean Execution will halt if this is !0 and permission is denied
-	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @param mixed Permission target (blog ID, array of cat IDs, Item...)
 	 * @return boolean 0 if permission denied
 	 */
 	function check_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL )
@@ -534,7 +534,7 @@ class User extends DataObject
 			case 'blog_genstatic':
 				// Blog permission to edit its properties...
 
-				if( $this->check_perm_blogowner( $perm_target ) )
+				if( $this->check_perm_blogowner( $perm_target_ID ) )
 				{	// Owner can do *almost* anything:
 					$perm = true;
 					break;
@@ -554,11 +554,48 @@ class User extends DataObject
 
 				if( $perm_target > 0 )
 				{ // Check user perm for this blog:
-					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
+					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID );
 					if( $perm == false )
 					{ // Check groups for permissions to this specific blog:
-						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
+						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID );
 					}
+				}
+				break;
+
+			case 'item_post!published':
+			case 'item_post!protected':
+			case 'item_post!private':
+			case 'item_post!draft':
+			case 'item_post!deprecated':
+			case 'item_post!redirected':
+				// Get the Blog ID
+        /**
+				 * @var Item
+				 */
+				$Item = & $perm_target;
+				$Item->get_Blog();
+				$blog_ID = $Item->Blog->ID;
+
+				if( $this->check_perm_blogowner( $blog_ID ) )
+				{	// Owner can do *almost* anything:
+					$perm = true;
+					break;
+				}
+
+				// Group may grant VIEW access, FULL access:
+				$this->get_Group();
+				if( $this->Group->check_perm( 'blogs', $permlevel ) )
+				{ // If group grants a global permission:
+					$perm = true;
+					break;
+				}
+
+				// Check permissions at the blog level:
+				$blog_permname = 'blog_'.substr( $permname, 5 );
+				$perm = $this->check_perm_blogusers( $blog_permname, $permlevel, $blog_ID, $Item );
+				if( $perm == false )
+				{ // Check groups for permissions to this specific blog:
+					$perm = $this->Group->check_perm_bloggroups( $blog_permname, $permlevel, $blog_ID, $Item, $this );
 				}
 				break;
 
@@ -733,9 +770,10 @@ class User extends DataObject
 	 *                  - blog_genstatic
 	 * @param string Permission level
 	 * @param integer Permission target blog ID
+	 * @param Item Item that we want to edit
 	 * @return boolean 0 if permission denied
 	 */
-	function check_perm_blogusers( $permname, $permlevel, $perm_target_blog )
+	function check_perm_blogusers( $permname, $permlevel, $perm_target_blog, $Item = NULL )
 	{
 		global $DB;
 		// echo "checkin for $permname >= $permlevel on blog $perm_target_blog<br />";
@@ -771,6 +809,7 @@ class User extends DataObject
 				$this->blog_post_statuses[$perm_target_blog] = array(
 						'blog_ismember' => '0',
 						'blog_post_statuses' => array(),
+						'blog_edit' => 'no',
 						'blog_del_post' => '0',
 						'blog_comments' => '0',
 						'blog_cats' => '0',
@@ -790,6 +829,7 @@ class User extends DataObject
 				else
 					$this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] = explode( ',', $bloguser_perm_post );
 
+				$this->blog_post_statuses[$perm_target_blog]['blog_edit'] = $row['bloguser_perm_edit'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_del_post'] = $row['bloguser_perm_delpost'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloguser_perm_comments'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_cats'] = $row['bloguser_perm_cats'];
@@ -811,8 +851,6 @@ class User extends DataObject
 				return false;
 
 			case 'blog_genstatic':
-				return ($this->level >= 2);
-
 			case 'blog_post_statuses':
 				// echo count($this->blog_post_statuses);
 				return ( count($this->blog_post_statuses[$perm_target_blog]['blog_post_statuses']) > 0 );
@@ -826,7 +864,45 @@ class User extends DataObject
 				// We want a specific permission:
 				$subperm = substr( $permname, 10 );
 				// echo "checking : $subperm - ", implode( ',', $this->blog_post_statuses[$perm_target_blog]['blog_post_statuses']  ), '<br />';
-				return in_array( $subperm, $this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] );
+				$perm = in_array( $subperm, $this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] );
+
+				// TODO: the following probably should be handled by the Item class!
+				if( $perm && $permlevel == 'edit' && !empty($Item) )
+				{	// Can we edit this specific Item?
+					switch( $this->blog_post_statuses[$perm_target_blog]['blog_edit'] )
+					{
+						case 'own':
+							// Own posts only:
+							return ($Item->creator_user_ID == $this->ID);
+
+						case 'lt':
+							// Own + Lower level posts only:
+							if( $Item->creator_user_ID == $this->ID )
+							{
+								return true;
+							}
+							$item_creator_User = & $Item->get_creator_User();
+							return ( $item_creator_User->level < $this->level );
+
+						case 'le':
+							// Own + Lower or equal level posts only:
+							if( $Item->creator_user_ID == $this->ID )
+							{
+								return true;
+							}
+							$item_creator_User = & $Item->get_creator_User();
+							return ( $item_creator_User->level <= $this->level );
+
+						case 'all':
+							return true;
+
+						case 'no':
+						default:
+							return false;
+					}
+				}
+
+				return $perm;
 
 			default:
 				// echo $permname, '=', $this->blog_post_statuses[$perm_target_blog][$permname], ' ';
@@ -1251,6 +1327,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.74  2007/06/11 01:55:57  fplanque
+ * level based user permissions
+ *
  * Revision 1.73  2007/05/31 03:02:23  fplanque
  * Advanced perms now disabled by default (simpler interface).
  * Except when upgrading.
