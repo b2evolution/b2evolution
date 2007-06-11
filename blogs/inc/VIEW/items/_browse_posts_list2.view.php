@@ -145,6 +145,11 @@ function item_visibility( $Item )
 	// Display deprecate if current user has the rights:
 	$r .= $Item->get_deprecate_link( ' ', ' ', get_icon( 'deprecate' ), '#', '' );
 
+	if( empty($r) )
+	{	// for IE
+		$r = '&nbsp;';
+	}
+
 	return $r;
 }
 $ItemList->cols[] = array(
@@ -174,6 +179,8 @@ $ItemList->cols[] = array(
 
 /**
  * Edit Actions:
+ *
+ * @param Item
  */
 function item_edit_actions( $Item )
 {
@@ -211,6 +218,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.24  2007/06/11 01:54:39  fplanque
+ * minor
+ *
  * Revision 1.23  2007/05/28 01:33:22  fplanque
  * permissions/fixes
  *
