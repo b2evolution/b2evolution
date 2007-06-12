@@ -104,7 +104,86 @@ function blog_update_perms( $blog, $context = 'user' )
 
 		if( $easy_mode != 'nomember' && $easy_mode != 'custom' )
 		{
-			$easy_perms = blogperms_from_easy( $easy_mode );
+			$easy_perms = array(
+				'bloguser_ismember' => 0,
+				'bloguser_perm_poststatuses' => array(),
+				'bloguser_perm_delpost' => 0,
+				'bloguser_perm_comments' => 0,
+				'bloguser_perm_media_upload' => 0,
+				'bloguser_perm_media_browse' => 0,
+				'bloguser_perm_media_change' => 0,
+				'bloguser_perm_admin' => 0,
+				'bloguser_perm_properties' => 0,
+				'bloguser_perm_cats' => 0
+			);
+
+			if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $blog )
+				 && $easy_mode == 'admin' )
+			{	// We have no permission to give advanced admins perm!
+				$easy_mode = 'owner';
+			}
+			// echo $easy_mode;
+
+			// Select option
+			switch( $easy_mode )
+			{
+				case 'admin':
+				case 'owner':
+					$easy_perms['bloguser_perm_edit'] = 'all';
+					break;
+
+				case 'moderator':
+					$easy_perms['bloguser_perm_edit'] = 'lt';
+					break;
+
+				case 'editor':
+				case 'contrib':
+					$easy_perms['bloguser_perm_edit'] = 'own';
+					break;
+
+				case 'member':
+				default:
+					$easy_perms['bloguser_perm_edit'] = 'no';
+					break;
+			}
+
+			switch( $easy_mode )
+			{
+				case 'admin':
+					$easy_perms['bloguser_perm_admin'] = 1;
+
+				case 'owner':
+					$easy_perms['bloguser_perm_properties'] = 1;
+					$easy_perms['bloguser_perm_cats'] = 1;
+					$easy_perms['bloguser_perm_delpost'] = 1;
+
+				case 'moderator':
+					$easy_perms['bloguser_perm_poststatuses'][] = 'redirected';
+					$easy_perms['bloguser_perm_comments'] = 1;
+					$easy_perms['bloguser_perm_media_upload'] = 1;
+					$easy_perms['bloguser_perm_media_browse'] = 1;
+					$easy_perms['bloguser_perm_media_change'] = 1;
+
+				case 'editor':
+					$easy_perms['bloguser_perm_poststatuses'][] = 'deprecated';
+					$easy_perms['bloguser_perm_poststatuses'][] = 'protected';
+					$easy_perms['bloguser_perm_poststatuses'][] = 'published';
+
+				case 'contrib':
+					$easy_perms['bloguser_perm_poststatuses'][] = 'draft';
+					$easy_perms['bloguser_perm_poststatuses'][] = 'private';
+					$easy_perms['bloguser_perm_media_upload'] = 1;
+					$easy_perms['bloguser_perm_media_browse'] = 1;
+
+				case 'member':
+					$easy_perms['bloguser_ismember'] = 1;
+					break;
+
+				default:
+					die( 'unhandled easy mode' );
+			}
+
+			$easy_perms['bloguser_perm_poststatuses'] = implode( ',', $easy_perms['bloguser_perm_poststatuses'] );
 
 			$inserted_values[] = " ( $blog, $loop_ID, ".$easy_perms['bloguser_ismember']
 														.', '.$DB->quote($easy_perms['bloguser_perm_poststatuses'])
@@ -145,7 +224,15 @@ function blog_update_perms( $blog, $context = 'user' )
 			$perm_comments = param( 'blog_perm_comments_'.$loop_ID, 'integer', 0 );
 			$perm_cats = param( 'blog_perm_cats_'.$loop_ID, 'integer', 0 );
 			$perm_properties = param( 'blog_perm_properties_'.$loop_ID, 'integer', 0 );
-			$perm_admin = param( 'blog_perm_admin_'.$loop_ID, 'integer', 0 );
+
+			if( $current_User->check_perm( 'blog_admin', 'edit', false, $blog ) )
+			{	// We have permission to give advanced admins perm!
+				$perm_admin = param( 'blog_perm_admin_'.$loop_ID, 'integer', 0 );
+			}
+			else
+			{
+				$perm_admin = 0;
+			}
 
 			$perm_media_upload = param( 'blog_perm_media_upload_'.$loop_ID, 'integer', 0 );
 			$perm_media_browse = param( 'blog_perm_media_browse_'.$loop_ID, 'integer', 0 );
@@ -267,91 +354,6 @@ function blogperms_get_easy2( $perms, $context = 'user' )
 
 
 /**
- *
- * @param string "easy group": 'admin', 'editor', 'member'
- * @return array indexed, as the result row from "SELECT * FROM T_coll_user_perms"
- */
-function blogperms_from_easy( $easy_group )
-{
-	$r = array(
-		'bloguser_ismember' => 0,
-		'bloguser_perm_poststatuses' => array(),
-		'bloguser_perm_delpost' => 0,
-		'bloguser_perm_comments' => 0,
-		'bloguser_perm_media_upload' => 0,
-		'bloguser_perm_media_browse' => 0,
-		'bloguser_perm_media_change' => 0,
-		'bloguser_perm_admin' => 0,
-		'bloguser_perm_properties' => 0,
-		'bloguser_perm_cats' => 0
-	);
-
-	// Select option
-	switch( $easy_group )
-	{
-		case 'admin':
-		case 'owner':
-			$r['bloguser_perm_edit'] = 'all';
-			break;
-
-		case 'moderator':
-			$r['bloguser_perm_edit'] = 'lt';
-			break;
-
-		case 'editor':
-		case 'contrib':
-			$r['bloguser_perm_edit'] = 'own';
-			break;
-
-		case 'member':
-		default:
-			$r['bloguser_perm_edit'] = 'no';
-			break;
-	}
-
-	switch( $easy_group )
-	{
-		case 'admin':
-			$r['bloguser_perm_admin'] = 1;
-
-		case 'owner':
-			$r['bloguser_perm_properties'] = 1;
-			$r['bloguser_perm_cats'] = 1;
-			$r['bloguser_perm_delpost'] = 1;
-
-		case 'moderator':
-			$r['bloguser_perm_poststatuses'][] = 'redirected';
-			$r['bloguser_perm_comments'] = 1;
-			$r['bloguser_perm_media_upload'] = 1;
-			$r['bloguser_perm_media_browse'] = 1;
-			$r['bloguser_perm_media_change'] = 1;
-
-		case 'editor':
-			$r['bloguser_perm_poststatuses'][] = 'deprecated';
-			$r['bloguser_perm_poststatuses'][] = 'protected';
-			$r['bloguser_perm_poststatuses'][] = 'published';
-
-		case 'contrib':
-			$r['bloguser_perm_poststatuses'][] = 'draft';
-			$r['bloguser_perm_poststatuses'][] = 'private';
-			$r['bloguser_perm_media_upload'] = 1;
-			$r['bloguser_perm_media_browse'] = 1;
-
-		case 'member':
-			$r['bloguser_ismember'] = 1;
-			break;
-
-		default:
-			die( 'unhandled easy mode' );
-	}
-
-	$r['bloguser_perm_poststatuses'] = implode( ',', $r['bloguser_perm_poststatuses'] );
-
-	return $r;
-}
-
-
-/**
  * Check permissions on a given blog (by ID) and autoselect an appropriate blog
  * if necessary.
  *
@@ -451,6 +453,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.32  2007/06/12 23:51:16  fplanque
+ * non admins can no longer create blog admins
+ *
  * Revision 1.31  2007/06/12 23:16:03  fplanque
  * non admins can no longer change admin blog perms
  *

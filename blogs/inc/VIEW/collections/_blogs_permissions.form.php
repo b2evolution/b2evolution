@@ -196,8 +196,9 @@ function coll_perm_checkbox( $row, $perm, $title, $id = NULL )
 	{
 	 	$r .= ' checked="checked"';
 	}
-	if( ! $permission_to_change_admin && $row->bloguser_perm_admin )
-	{
+	if( ! $permission_to_change_admin
+			&& ($row->bloguser_perm_admin || $perm == 'perm_admin' ) )
+	{ // No permission to touch nOR create admins
 	 	$r .= ' disabled="disabled"';
 	}
 	$r .= ' onclick="merge_from_wide( this, '.$row->user_ID.' );" class="checkbox"
@@ -473,8 +474,9 @@ function simple_coll_perm_radios( $row )
 		{
 			$r .= ' checked="checked"';
 		}
-		if( ! $permission_to_change_admin && $row->bloguser_perm_admin )
-		{
+		if( ! $permission_to_change_admin
+				&& ( $row->bloguser_perm_admin || $easy_group[0] == 'admin' ) )
+		{ // No permission to touch nOR create admins
 	 		$r .= ' disabled="disabled"';
 		}
 		$r .= ' onclick="merge_from_easy( this, '.$row->user_ID.' )" class="radio" />
@@ -516,6 +518,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.25  2007/06/12 23:51:16  fplanque
+ * non admins can no longer create blog admins
+ *
  * Revision 1.24  2007/06/12 23:16:04  fplanque
  * non admins can no longer change admin blog perms
  *
