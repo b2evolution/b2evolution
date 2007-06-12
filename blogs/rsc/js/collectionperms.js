@@ -100,6 +100,7 @@ function merge_from_easy( source, userid )
 	switch( source.value )
 	{
 		case 'admin':
+		case 'owner':
 			source.form.elements['blog_perm_edit_'+String(userid)].value = 'all';
 			break;
 
@@ -122,6 +123,7 @@ function merge_from_easy( source, userid )
 	{
 		case 'admin':
 			source.form.elements['blog_perm_admin_'+String(userid)].checked = 1;
+		case 'owner':
 			source.form.elements['blog_perm_properties_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_cats_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_delpost_'+String(userid)].checked = 1;
@@ -189,32 +191,37 @@ function merge_from_wide( source, userid )
 										+Number(f.elements['blog_perm_comments_'+String(userid)].checked)
 										+Number(f.elements['blog_perm_media_change_'+String(userid)].checked);
 
-		var perms_admin = Number(f.elements['blog_perm_admin_'+String(userid)].checked)
-										+Number(f.elements['blog_perm_properties_'+String(userid)].checked)
+		var perms_owner = Number(f.elements['blog_perm_properties_'+String(userid)].checked)
 										+Number(f.elements['blog_perm_cats_'+String(userid)].checked)
 										+Number(f.elements['blog_perm_delpost_'+String(userid)].checked);
+
+		var perms_admin = Number(f.elements['blog_perm_admin_'+String(userid)].checked);
 
 		var perm_edit = f.elements['blog_perm_edit_'+String(userid)].value;
 
 		// alert( perms_contrib+' '+perms_editor+' '+perm_moderator+' '+perms_admin+' '+perm_edit );
 
-		if( perms_contrib == 4 && perms_editor == 3 && perm_moderator == 3 && perms_admin == 4 && perm_edit == 'all' )
-		{ // has full editor rights
+		if( perms_contrib == 4 && perms_editor == 3 && perm_moderator == 3 && perms_owner == 3 && perms_admin == 1 && perm_edit == 'all' )
+		{ // has full admin rights
 			toeasy = 'admin';
 		}
-		else if( perms_contrib == 4 && perms_editor == 3 && perm_moderator == 3 && perms_admin == 0 && perm_edit == 'lt' )
+		else if( perms_contrib == 4 && perms_editor == 3 && perm_moderator == 3 && perms_owner == 3 && perms_admin == 0 && perm_edit == 'all' )
+		{ // has full editor rights
+			toeasy = 'owner';
+		}
+		else if( perms_contrib == 4 && perms_editor == 3 && perm_moderator == 3 && perms_owner == 0 && perms_admin == 0 && perm_edit == 'lt' )
 		{ // moderator
 			toeasy = 'moderator';
 		}
-		else if( perms_contrib == 4 && perms_editor == 3 && perm_moderator == 0 && perms_admin == 0 && perm_edit == 'own' )
+		else if( perms_contrib == 4 && perms_editor == 3 && perm_moderator == 0 && perms_owner == 0 && perms_admin == 0 && perm_edit == 'own' )
 		{ // publisher
 			toeasy = 'editor';
 		}
-		else if( perms_contrib == 4 && perms_editor == 0 && perm_moderator == 0 && perms_admin == 0 && perm_edit == 'own' )
+		else if( perms_contrib == 4 && perms_editor == 0 && perm_moderator == 0 && perms_owner == 0 && perms_admin == 0 && perm_edit == 'own' )
 		{ // contributor
 			toeasy = 'contrib';
 		}
-		else if( perms_contrib == 0 && perms_editor == 0 && perm_moderator == 0  && perms_admin == 0 && perm_edit == 'no' )
+		else if( perms_contrib == 0 && perms_editor == 0 && perm_moderator == 0 && perms_owner == 0 && perms_admin == 0 && perm_edit == 'no' )
 		{
 			toeasy = 'member';
 		}

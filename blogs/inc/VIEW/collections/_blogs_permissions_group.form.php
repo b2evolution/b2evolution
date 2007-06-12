@@ -25,6 +25,9 @@ global $debug;
 global $UserSettings;
 global $rsc_url, $htsrv_url;
 
+global $Blog, $permission_to_change_admin;
+
+$permission_to_change_admin = $current_User->check_perm( 'blog_admin', 'edit', false, $Blog->ID );
 
 $layout = $UserSettings->param_Request( 'layout', 'blogperms_layout', 'string', 'default' );  // table layout mode
 
@@ -175,6 +178,8 @@ $Results->cols[] = array(
 
 function coll_perm_checkbox( $row, $perm, $title, $id = NULL )
 {
+	global $permission_to_change_admin;
+
 	$r = '<input type="checkbox"';
 	if( !empty($id) )
 	{
@@ -185,6 +190,10 @@ function coll_perm_checkbox( $row, $perm, $title, $id = NULL )
 	{
 	 	$r .= ' checked="checked"';
 	}
+	if( ! $permission_to_change_admin && $row->bloggroup_perm_admin )
+	{
+	 	$r .= ' disabled="disabled"';
+	}
 	$r .= ' onclick="merge_from_wide( this, '.$row->grp_ID.' );" class="checkbox"
 							value="1" title="'.$title.'" />';
 	return $r;
@@ -192,6 +201,8 @@ function coll_perm_checkbox( $row, $perm, $title, $id = NULL )
 
 function coll_perm_status_checkbox( $row, $perm_status, $title )
 {
+	global $permission_to_change_admin;
+
 	if( ! isset( $row->statuses_array ) )
 	{	// NOTE: we are writing directly into the DB result array here, it's a little harsh :/
 		// TODO: make all these perms booleans in the DB:
@@ -211,6 +222,10 @@ function coll_perm_status_checkbox( $row, $perm_status, $title )
 	if( in_array($perm_status, $row->statuses_array) )
 	{
 	 	$r .= ' checked="checked"';
+	}
+	if( ! $permission_to_change_admin && $row->bloggroup_perm_admin )
+	{
+	 	$r .= ' disabled="disabled"';
 	}
 	$r .= ' onclick="merge_from_wide( this, '.$row->grp_ID.' );" class="checkbox"
 							value="1" title="'.$title.'" />';
@@ -268,15 +283,22 @@ $Results->cols[] = array(
 						'td_class' => 'center',
 					);
 
-function coll_perm_edit( $ID, $perm_edit )
+function coll_perm_edit( $row )
 {
-	$r = '<select id="blog_perm_edit_'.$ID.'" name="blog_perm_edit_'.$ID.'"
-					onclick="merge_from_wide( this, '.$ID.' );" >';
-	$r .= '<option value="no" '.( $perm_edit == 'no' ? 'selected="selected"' : '' ).'>No editing</option>';
-	$r .= '<option value="own" '.( $perm_edit == 'own' ? 'selected="selected"' : '' ).'>Own posts</option>';
-	$r .= '<option value="lt" '.( $perm_edit == 'lt' ? 'selected="selected"' : '' ).'>&lt; own level</option>';
-	$r .= '<option value="le" '.( $perm_edit == 'le' ? 'selected="selected"' : '' ).'>&le; own level</option>';
-	$r .= '<option value="all" '.( $perm_edit == 'all' ? 'selected="selected"' : '' ).'>All posts</option>';
+	global $permission_to_change_admin;
+
+	$r = '<select id="blog_perm_edit_'.$row->grp_ID.'" name="blog_perm_edit_'.$row->grp_ID.'"
+					onclick="merge_from_wide( this, '.$row->grp_ID.' );"';
+	if( ! $permission_to_change_admin && $row->bloggroup_perm_admin )
+	{
+	 	$r .= ' disabled="disabled"';
+	}
+	$r .= ' >';
+	$r .= '<option value="no" '.( $row->bloggroup_perm_edit == 'no' ? 'selected="selected"' : '' ).'>No editing</option>';
+	$r .= '<option value="own" '.( $row->bloggroup_perm_edit == 'own' ? 'selected="selected"' : '' ).'>Own posts</option>';
+	$r .= '<option value="lt" '.( $row->bloggroup_perm_edit == 'lt' ? 'selected="selected"' : '' ).'>&lt; own level</option>';
+	$r .= '<option value="le" '.( $row->bloggroup_perm_edit == 'le' ? 'selected="selected"' : '' ).'>&le; own level</option>';
+	$r .= '<option value="all" '.( $row->bloggroup_perm_edit == 'all' ? 'selected="selected"' : '' ).'>All posts</option>';
 	$r .= '</select>';
 	return $r;
 }
@@ -284,7 +306,7 @@ $Results->cols[] = array(
 						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Edit posts<br />/user level'),
 						'th_class' => 'checkright',
 						'default_dir' => 'D',
-						'td' => '%coll_perm_edit(  #grp_ID#, #bloggroup_perm_edit# )%',
+						'td' => '%coll_perm_edit( {row} )%',
 						'td_class' => 'center',
 					);
 
@@ -366,11 +388,22 @@ $Results->cols[] = array(
 						'td_class' => 'center',
 					);
 
+function perm_check_all( $row )
+{
+	global $permission_to_change_admin;
+
+	if( ! $permission_to_change_admin && $row->bloggroup_perm_admin )
+	{
+	 	return '&nbsp;';
+	}
+
+	return '<a href="javascript:toggleall_wide(document.getElementById(\'blogperm_checkchanges\'), '.$row->grp_ID.' );merge_from_wide( document.getElementById(\'blogperm_checkchanges\'), '.$row->grp_ID.' ); setcheckallspan('.$row->grp_ID.');" title="'.TS_('(un)selects all checkboxes using Javascript').'">
+							<span id="checkallspan_'.$row->grp_ID.'">'.TS_('(un)check all').'</span>
+						</a>';
+}
 $Results->cols[] = array(
-						'th' => '',
-						'td' => '<a href="javascript:toggleall_wide(document.getElementById(\\\'blogperm_checkchanges\\\'), $grp_ID$ );merge_from_wide( document.getElementById(\\\'blogperm_checkchanges\\\'), $grp_ID$ ); setcheckallspan( $grp_ID$ );" title="'.TS_('(un)selects all checkboxes using Javascript').'">
-							<span id="checkallspan_$grp_ID$">'.TS_('(un)check all').'</span>
-						</a>',
+						'th' => '&nbsp;',
+						'td' => '%perm_check_all( {row} )%',
 						'td_class' => 'center',
 					);
 
@@ -414,6 +447,8 @@ $Results->cols[] = array(
 
 function simple_coll_perm_radios( $row )
 {
+	global $permission_to_change_admin;
+
 	$r = '';
 	$user_easy_group = blogperms_get_easy2( $row, 'group' );
 	foreach( array(
@@ -422,6 +457,7 @@ function simple_coll_perm_radios( $row )
 								array( 'contrib', T_('Contributor') ),
 								array( 'editor', T_('Publisher') ),
 								array( 'moderator', T_('Moderator') ),
+								array( 'owner',  T_('Owner') ),
 								array( 'admin',  T_('Admin') ),
 								array( 'custom',  T_('Custom') )
 							) as $lkey => $easy_group )
@@ -430,6 +466,10 @@ function simple_coll_perm_radios( $row )
 		if( $easy_group[0] == $user_easy_group )
 		{
 			$r .= ' checked="checked"';
+		}
+		if( ! $permission_to_change_admin && $row->bloggroup_perm_admin )
+		{
+	 		$r .= ' disabled="disabled"';
 		}
 		$r .= ' onclick="merge_from_easy( this, '.$row->grp_ID.' )" class="radio" />
 		<label for="blog_perm_easy_'.$row->grp_ID.'_'.$lkey.'">'.$easy_group[1].'</label> ';
@@ -462,13 +502,16 @@ foreach( $Results->rows as $row )
 {
 	$grp_IDs[] = $row->grp_ID;
 }
-$Form->hidden( 'grp_IDs', implode( ',', $grp_IDs) );
+$Form->hidden( 'group_IDs', implode( ',', $grp_IDs) );
 
 $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'SaveButton' ),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
 /*
  * $Log$
+ * Revision 1.17  2007/06/12 23:16:04  fplanque
+ * non admins can no longer change admin blog perms
+ *
  * Revision 1.16  2007/06/03 02:54:18  fplanque
  * Stuff for permission maniacs (admin part only, actual perms checks to be implemented)
  * Newbies will not see this complexity since advanced perms are now disabled by default.

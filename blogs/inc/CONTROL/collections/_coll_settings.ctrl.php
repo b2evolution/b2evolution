@@ -35,6 +35,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+param_action( 'edit' );
+param( 'tab', 'string', 'general', true );
+
 // Check permissions on requested blog and autoselect an appropriate blog if necessary.
 // This will prevent a fat error when switching tabs and you have restricted perms on blog properties.
 if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm check
@@ -54,13 +57,12 @@ if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm 
 else
 {
 	// Note: we may still have permission to edit categories!!
-	// $Messages->add( T_('Sorry, you have no permission to edit blog properties.'), 'error' );
+	$Messages->add( T_('Sorry, you have no permission to edit blog properties.'), 'error' );
 	$action = 'nil';
+	$tab = '';
 }
 
 memorize_param( 'blog', 'integer', -1 );	// Needed when generating static page for example
-param_action( 'edit' );
-param( 'tab', 'string', 'general', true );
 
 if( ( $tab == 'perm' || $tab == 'permgroup' )
 	&& ( empty($blog) || ! $Blog->advanced_perms ) )
@@ -129,12 +131,12 @@ switch( $action )
 				break;
 
 			case 'perm':
-				blog_update_user_perms( $blog );
+				blog_update_perms( $blog, 'user' );
 				$Messages->add( T_('The blog permissions have been updated'), 'success' );
 				break;
 
 			case 'permgroup':
-				blog_update_group_perms( $blog );
+				blog_update_perms( $blog, 'group' );
 				$Messages->add( T_('The blog permissions have been updated'), 'success' );
 				break;
 		}
@@ -210,6 +212,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2007/06/12 23:16:04  fplanque
+ * non admins can no longer change admin blog perms
+ *
  * Revision 1.16  2007/05/31 03:02:21  fplanque
  * Advanced perms now disabled by default (simpler interface).
  * Except when upgrading.
