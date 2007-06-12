@@ -415,6 +415,7 @@ switch( $action )
 
 		<form action="index.php" method="get">
 			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
+			<input type="hidden" name="confirmed" value="0" />
 
 			<p><?php echo T_('The installation can be done in different ways. Choose one:')?></p>
 
@@ -444,9 +445,9 @@ switch( $action )
 
 			<p>
 			<input type="submit" value="&nbsp; <?php echo T_('GO!')?> &nbsp;"
-				onclick="var dc = document.getElementById( 'deletedb' ); if( dc && dc.checked ) { return confirm( '<?php
+				onclick="var dc = document.getElementById( 'deletedb' ); if( dc && dc.checked ) { if ( confirm( '<?php
 					printf( /* TRANS: %s gets replaced by app name, usually "b2evolution" */ TS_( 'Are you sure you want to delete your existing %s tables?\nDo you have a backup?' ), $app_name );
-					?>' ); }" />
+					?>' ) ) { this.form.confirmed.value = 1; return true; } else return false; }" />
 			</p>
 			</form>
 		<?php
@@ -566,6 +567,31 @@ to
 <p>Then reload this page and a reset option will appear.</p>');
 			break;
 		}
+		if( ! param('confirmed', 'integer', 1) )
+		{
+			?>
+			<p>
+			<?php
+			echo nl2br( htmlspecialchars( sprintf( /* TRANS: %s gets replaced by app name, usually "b2evolution" */ T_( "Are you sure you want to delete your existing %s tables?\nDo you have a backup?" ), $app_name ) ) );
+			?>
+			</p>
+			<p>
+			<form class="inline" name="form" action="index.php" method="post">
+				<input type="hidden" name="action" value="deletedb" />
+				<input type="hidden" name="confirmed" value="1" />
+				<input type="hidden" name="locale" value="<?php echo $default_locale; ?>" />
+				<input type="submit" value="&nbsp; <?php echo T_('I am sure!')?> &nbsp;" />
+			</form>
+
+			<form class="inline" name="form" action="index.php" method="get">
+				<input type="hidden" name="locale" value="<?php echo $default_locale; ?>" />
+				<input type="submit" value="&nbsp; <?php echo T_('CANCEL')?> &nbsp;" />
+			</form>
+			</p>
+			<?php
+			break;
+		}
+
 		// Uninstall Plugins
 // TODO: fp>> I don't trust the plugins to uninstall themselves correctly. There will be tons of lousy poorly written plugins. All I trust them to do is to crash the uninstall procedure. We want a hardcore brute force uninsall! and most users "may NOT want" to even think about "ma-nu-al-ly" removing something from their DB.
 /*
@@ -622,6 +648,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.129  2007/06/12 21:00:02  blueyed
+ * Added non-JS handling of deletedb confirmation
+ *
  * Revision 1.128  2007/04/26 00:11:10  fplanque
  * (c) 2007
  *
