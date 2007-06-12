@@ -26,7 +26,7 @@ cd `dirname $0`
 
 # Test if there are new files (newer than $TIMESTAMPFILE):
 if [ -e "$TIMESTAMPFILE" ]; then
-	if exec find .. -name 'CVS' -prune -o -type f -newer "$TIMESTAMPFILE" -print -quit|grep -q -v .; then
+	if exec find .. -name 'CVS' -prune -o -type f -newer "$TIMESTAMPFILE" -print -quit|grep -q -v -E '.+'; then
 		echo "No new files found. Exiting."
 		exit
 	fi
