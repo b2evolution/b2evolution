@@ -1133,7 +1133,7 @@ class Item extends ItemLight
 											 	ORDER BY tag_name', 0, 'Get tags for Item' );
 		}
 
-		//pre_dump( $this->tags );
+		// pre_dump( $this->tags );
 		return $this->tags;
 	}
 
@@ -1147,7 +1147,15 @@ class Item extends ItemLight
 	 */
 	function set_tags_from_string( $tags )
 	{
-		$this->tags = preg_split( '/[\s,]+/', $tags );
+		if( empty($tags) )
+		{
+			$this->tags = array();
+		}
+		else
+		{
+			$this->tags = preg_split( '/[\s,]+/', $tags );
+		}
+		// pre_dump( $this->tags );
 	}
 
 
@@ -3004,6 +3012,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.179  2007/06/13 23:29:02  fplanque
+ * minor
+ *
  * Revision 1.178  2007/06/11 01:55:57  fplanque
  * level based user permissions
  *
