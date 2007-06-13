@@ -32,16 +32,23 @@ global $Settings;
 
 global $dispatcher;
 
+
 $sql = 'SELECT T_blogs.*, user_login
 					FROM T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID';
+
+
 if( ! $current_User->check_perm( 'blogs', 'view' ) )
 {	// We do not have perm to view all blogs... we need to restrict to those we're a member of:
-	$sql .= ' LEFT JOIN T_coll_user_perms ON ( blog_ID = bloguser_blog_ID
-																					AND bloguser_user_ID ='.$current_User->ID.' )';
-	$sql .= ' LEFT JOIN T_coll_group_perms ON ( blog_ID = bloggroup_blog_ID
-																					AND bloggroup_group_ID ='.$current_User->group_ID.' )';
-	$sql .= ' WHERE bloguser_ismember = 1
-							 OR bloggroup_ismember = 1';
+
+	$sql .= " LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0
+		       																		AND blog_ID = bloguser_blog_ID
+		       																		AND bloguser_user_ID = {$current_User->ID} )
+		       LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0
+		          																AND blog_ID = bloggroup_blog_ID
+		          																AND bloggroup_group_ID = {$current_User->group_ID} )
+		       WHERE blog_owner_user_ID = {$current_User->ID}
+		       				OR bloguser_ismember <> 0
+								 	OR bloggroup_ismember <> 0";
 
 	$no_results = T_('Sorry, you have no permission to edit/view any blog\'s properties.');
 }
@@ -182,6 +189,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.19  2007/06/13 19:06:17  fplanque
+ * debugging
+ *
  * Revision 1.18  2007/05/28 01:35:23  fplanque
  * fixed static page generation
  *

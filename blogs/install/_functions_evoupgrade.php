@@ -1790,22 +1790,11 @@ function upgrade_b2evo_tables()
 		// Preserve full edit perms:
 		$DB->query( "UPDATE T_coll_user_perms
 										SET bloguser_perm_edit = 'all'" );
-		$DB->query( "UPDATE T_coll_user_perms
+		$DB->query( "UPDATE T_coll_group_perms
 										SET bloggroup_perm_edit = 'all'" );
 
 		echo "OK.<br />\n";
 	}
-
-
-	/*
-	// fp> have to check if this means kiss your pagerank goodbye
-		echo 'Updating URL titles... ';
-		$DB->query( '
-      UPDATE T_items__item
-         SET post_urltitle = REPLACE( post_urltitle, "_", "-" )' );
-		echo "OK.<br />\n";
-	}
-	*/
 
 
 	/*
@@ -1912,6 +1901,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.227  2007/06/13 19:06:17  fplanque
+ * debugging
+ *
  * Revision 1.226  2007/06/03 02:54:18  fplanque
  * Stuff for permission maniacs (admin part only, actual perms checks to be implemented)
  * Newbies will not see this complexity since advanced perms are now disabled by default.
@@ -2069,198 +2061,5 @@ function upgrade_b2evo_tables()
  *
  * Revision 1.176  2006/10/01 00:14:58  blueyed
  * plug_classpath should not have get merged already
- *
- * Revision 1.175  2006/09/25 21:59:57  blueyed
- * Whitespace fix
- *
- * Revision 1.174  2006/09/25 20:25:49  blueyed
- * Extended date- and time-format fields for locales to 20 chars. See http://forums.b2evolution.net//viewtopic.php?p=44335#44335
- *
- * Revision 1.173  2006/09/14 19:01:42  blueyed
- * TODO: drop previous/obsolete/duplicate INDEX link_item_ID/link_dest_item_ID
- *
- * Revision 1.172  2006/09/10 20:59:18  fplanque
- * extended extra path info setting
- *
- * Revision 1.171  2006/09/10 17:33:02  fplanque
- * started to steam up the categories/chapters
- *
- * Revision 1.170  2006/08/28 18:28:07  fplanque
- * minor
- *
- * Revision 1.169  2006/08/26 20:30:42  fplanque
- * made URL titles Google friendly
- *
- * Revision 1.168  2006/08/26 19:56:38  blueyed
- * Fixed SQL syntax error and whitespace
- *
- * Revision 1.167  2006/08/26 16:33:02  fplanque
- * enhanced stats
- *
- * Revision 1.166  2006/08/24 21:41:14  fplanque
- * enhanced stats
- *
- * Revision 1.165  2006/08/21 16:07:45  fplanque
- * refactoring
- *
- * Revision 1.164  2006/08/19 07:56:31  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.163  2006/08/17 20:10:23  fplanque
- * fix syntax error
- *
- * Revision 1.162  2006/08/15 21:54:57  blueyed
- * ok.
- *
- * Revision 1.161  2006/08/14 20:19:52  fplanque
- * no message
- *
- * Revision 1.160  2006/08/09 21:30:56  fplanque
- * doc
- *
- * Revision 1.157  2006/08/04 22:13:23  blueyed
- * Finished de-abstraction
- *
- * Revision 1.156  2006/08/03 01:55:24  blueyed
- * Fixed upgrade procedure according to "the plan" (as told by Francois by email).
- *
- * Revision 1.155  2006/07/08 13:33:54  blueyed
- * Autovalidate admin group instead of primary admin user only.
- * Also delegate to req_validatemail action on failure directly instead of providing a link.
- *
- * Revision 1.154  2006/07/08 02:13:38  blueyed
- * Understood the new auto_prune_modes and added conversion of previous "off" value (0).
- *
- * Revision 1.153  2006/07/05 20:07:07  blueyed
- * discussion
- *
- * Revision 1.152  2006/07/05 18:26:01  fplanque
- * no message
- *
- * Revision 1.151  2006/07/04 17:32:30  fplanque
- * no message
- *
- * Revision 1.150  2006/07/03 19:27:48  blueyed
- * Fixed install (user_validated)
- *
- * Revision 1.149  2006/07/02 21:53:31  blueyed
- * time difference as seconds instead of hours; validate user#1 on upgrade; bumped new_db_version to 9300.
- *
- * Revision 1.148  2006/06/22 18:37:47  fplanque
- * fixes
- *
- * Revision 1.146  2006/05/30 21:53:06  blueyed
- * Replaced $EvoConfig->DB with $db_config
- *
- * Revision 1.145  2006/05/17 23:35:42  blueyed
- * cleanup
- *
- * Revision 1.144  2006/05/12 21:34:16  blueyed
- * todo (last commit was lost)
- *
- * Revision 1.143  2006/04/29 17:37:48  blueyed
- * Added basic_antispam_plugin; Moved double-check-referers there; added check, if trackback links to us
- *
- * Revision 1.142  2006/04/27 19:08:15  blueyed
- * todo
- *
- * Revision 1.141  2006/04/20 15:57:44  blueyed
- * Bumped $db_version to 9200
- *
- * Revision 1.140  2006/04/19 15:56:02  blueyed
- * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
- * and Item::comments to Item::comment_status (Item API change)
- *
- * Revision 1.139  2006/04/11 22:39:50  blueyed
- * Fixed installation of basic plugins, though again more complicated (IMHO)
- *
- * Revision 1.138  2006/04/11 21:22:26  fplanque
- * partial cleanup
- *
- * Revision 1.137  2006/04/10 09:27:04  blueyed
- * Fix adding default itemtypes when upgrading from 0.9.x; cleaned up plugins install
- *
- * Revision 1.136  2006/04/06 08:51:34  blueyed
- * Set upgrade checkpoint
- *
- * Revision 1.135  2006/03/12 23:09:26  fplanque
- * doc cleanup
- *
- * Revision 1.134  2006/03/09 20:40:41  fplanque
- * cleanup
- *
- * Revision 1.133  2006/03/07 19:30:23  fplanque
- * comments
- *
- * Revision 1.132  2006/03/06 23:14:23  blueyed
- * Moved _db_schema.inc.php to /install/ folder
- *
- * Revision 1.131  2006/03/06 21:21:59  blueyed
- * doc
- *
- * Revision 1.129  2006/03/04 20:43:29  blueyed
- * Fixed dropping sess_agnt_ID
- *
- * Revision 1.128  2006/03/02 20:05:29  blueyed
- * Fixed/polished stats (linking T_useragents to T_hitlog, not T_sessions again). I've done this the other way around before, but it wasn't my idea.. :p
- *
- * Revision 1.127  2006/02/24 19:59:29  blueyed
- * New install/upgrade, which makes use of db_delta()
- *
- * Revision 1.126  2006/02/13 20:20:10  fplanque
- * minor / cleanup
- *
- * Revision 1.124  2006/02/11 18:53:57  fplanque
- * most people don't have relations installed
- *
- * Revision 1.123  2006/02/11 01:08:20  blueyed
- * Oh what fun it is to drop some "e".
- *
- * Revision 1.122  2006/02/10 22:05:07  fplanque
- * Normalized itm links
- *
- * Revision 1.121  2006/02/03 17:35:17  blueyed
- * post_renderers as TEXT
- *
- * Revision 1.120  2006/01/26 22:43:58  blueyed
- * Added comment_spam_karma field
- *
- * Revision 1.119  2006/01/06 18:58:09  blueyed
- * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
- *
- * Revision 1.117  2006/01/06 00:11:47  blueyed
- * Fix potential SQL error when upgrading from < 0.9 to Phoenix
- *
- * Revision 1.115  2005/12/29 20:20:02  blueyed
- * Renamed T_plugin_settings to T_pluginsettings
- *
- * Revision 1.114  2005/12/22 23:13:40  blueyed
- * Plugins' API changed and handling optimized
- *
- * Revision 1.113  2005/12/19 17:39:56  fplanque
- * Remember prefered browing tab for each user.
- *
- * Revision 1.112  2005/12/14 19:36:16  fplanque
- * Enhanced file management
- *
- * Revision 1.111  2005/12/12 19:22:03  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.110  2005/10/31 01:35:47  blueyed
- * Upgrade to 0.9: adjusted defaults
- *
- * Revision 1.109  2005/10/28 22:33:54  blueyed
- * Removed not used globals for upgrade to 1.6
- *
- * Revision 1.107  2005/10/03 18:10:08  fplanque
- * renamed post_ID field
- *
- * Revision 1.106  2005/10/03 17:26:44  fplanque
- * synched upgrade with fresh DB;
- * renamed user_ID field
- *
- * Revision 1.105  2005/10/03 16:30:42  fplanque
- * fixed hitlog upgrade because daniel didn't do it :((
- *
  */
 ?>
