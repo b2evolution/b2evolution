@@ -5,12 +5,30 @@
  */
 
 div.dashboard_sidebar {
-	width: 20em;
+	width: 16em;
 	float: right;
 	border: 1px solid #999;
 	background-color: #eee;
 	padding: 1em;
 	margin: 0 0 0 1em;
+}
+
+div.dashboard_sidebar h3 {
+	margin: 0;
+}
+
+div.dashboard_sidebar ul {
+	margin: 0;
+	padding: 0 16px;
+}
+
+div.dashboard_sidebar li {
+	list-style: square;
+	margin: 1ex 0;
+	padding: 0;
+}
+div.dashboard_sidebar li li {
+	margin: 0;
 }
 
 .dashboard_post {

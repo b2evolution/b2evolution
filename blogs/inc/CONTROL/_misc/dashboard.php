@@ -58,17 +58,30 @@ if( $blog )
 	echo '<div class="dashboard_sidebar">';
 	echo '<h3>Shortcuts</h3>';
 	echo '<ul>';
-		echo '<li><a href="admin.php?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'">Write a new post...</a></li>';
-		echo '<li><a href="'.$Blog->get('url').'" target="_blank">Open public blog page</a></li>';
+		echo '<li><a href="admin.php?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'">Write a new post &raquo;</a></li>';
+
+ 		echo '<li>Manage:<ul>';
+		echo '<li><a href="admin.php?ctrl=items&tab=full&filter=restore&blog='.$Blog->ID.'">Posts (full) &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=items&tab=list&filter=restore&blog='.$Blog->ID.'">Posts (list) &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=comments&blog='.$Blog->ID.'">Comments &raquo;</a></li>';
+		echo '</ul></li>';
+
 		if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 		{
-			echo '<li><a href="admin.php?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'">Change blog name...</a></li>';
-			echo '<li><a href="admin.php?ctrl=coll_settings&tab=skin&blog='.$Blog->ID.'">Change blog appearance (skin)...</a></li>';
+			echo '<li>Customize blog:<ul>';
+			echo '<li><a href="admin.php?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'">Name &raquo;</a></li>';
+			echo '<li><a href="admin.php?ctrl=coll_settings&tab=skin&blog='.$Blog->ID.'">Appearance (skin) &raquo;</a></li>';
+			echo '<li><a href="admin.php?ctrl=coll_settings&tab=display&blog='.$Blog->ID.'">Post order &raquo;</a></li>';
+			echo '<li><a href="admin.php?ctrl=coll_settings&tab=widgets&blog='.$Blog->ID.'">Widgets &raquo;</a></li>';
+			echo '</ul></li>';
 		}
+
 		if( $current_User->check_perm( 'blog_genstatic', 'any', false, $Blog->ID ) )
 		{
 			echo '<li><a href="admin.php?ctrl=collections&amp;action=GenStatic&amp;blog='.$Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">Generate static page!</a></li>';
 		}
+
+ 		echo '<li><a href="'.$Blog->get('url').'" target="_blank">Open public blog page</a></li>';
 
 		// TODO: dh> display link to "not-approved" (to be moderated) comments, if any. Therefor the comments list must be filterable.
 	echo '</ul>';
@@ -156,13 +169,17 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	echo '<h2>Administrative tasks</h2>';
 
 	echo '<ul>';
-		echo '<li><a href="admin.php?ctrl=users&amp;user_ID='.$current_User->ID.'">Edit my user profile...</a></li>';
+		echo '<li><a href="admin.php?ctrl=users&amp;user_ID='.$current_User->ID.'">Edit my user profile &raquo;</a></li>';
 		if( $current_User->check_perm( 'users', 'edit' ) )
 		{
-			echo '<li><a href="admin.php?ctrl=users&amp;user_ID='.$current_User->ID.'&action=new_user">Add a new user...</a></li>';
+			echo '<li><a href="admin.php?ctrl=users&amp;action=new_user">Create new user &raquo;</a></li>';
+		}
+		if( $current_User->check_perm( 'blogs', 'create' ) )
+		{
+			echo '<li><a href="admin.php?ctrl=collections&amp;action=new">Create new blog &raquo;</a></li>';
 		}
 		// TODO: remember system date check and only remind every 3 months
-		echo '<li><a href="admin.php?ctrl=system">Check if my system is secure...</a></li>';
+		echo '<li><a href="admin.php?ctrl=system">Check if my blog server is secure &raquo;</a></li>';
 	echo '</ul>';
 	// End payload block:
 	$AdminUI->disp_payload_end();
@@ -174,6 +191,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2007/06/13 20:56:02  fplanque
+ * minor
+ *
  * Revision 1.18  2007/05/09 01:01:29  fplanque
  * permissions cleanup
  *
