@@ -1403,7 +1403,7 @@ class AdminUI_general
 								'href' => 'admin.php?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog, ),
 						) );
 
-				if( $Blog->advanced_perms )
+				if( $Blog && $Blog->advanced_perms )
 				{
 					$this->add_menu_entries( 'blogs',	array(
 								'perm' => array(
@@ -1620,6 +1620,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.53  2007/06/14 18:39:04  blueyed
+ * Fixed E_NOTICE if there is no Blog available
+ *
  * Revision 1.52  2007/05/31 03:02:24  fplanque
  * Advanced perms now disabled by default (simpler interface).
  * Except when upgrading.
