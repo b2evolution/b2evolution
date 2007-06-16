@@ -53,7 +53,9 @@ error_reporting( E_ALL );
  *
  * Experimental! This may be changed to use regular files instead/optionally.
  *
- * @global boolean Default: true
+ * @todo Provide logging into normal file instead (more useful for backtraces/multiline error messages)
+ *
+ * @global integer 0: off; 1: log errors; 2: include function backtraces (Default: 1)
  */
 $log_app_errors = 1;
 
@@ -386,10 +388,12 @@ $cookie_expired = time() - 86400;
  */
 $conf_subdir = 'conf/';                  // Subdirectory relative to base
 $conf_path = str_replace( '\\', '/', dirname(__FILE__) ).'/';
-// echo ' conf_path='.$conf_path;
 
-$basepath = preg_replace( '#/'.$conf_subdir.'$#i', '', $conf_path ).'/'; // Remove this file's subpath (fp>made [i]nsensitive to case because of Windows URL oddities)
-// echo '<br/>basepath='.$basepath;
+/**
+ * @global string Path of the base.
+ *                fp> made [i]nsensitive to case because of Windows URL oddities)
+ */
+$basepath = preg_replace( '#/'.$conf_subdir.'$#i', '', $conf_path ).'/';
 
 /**
  * Location of the include folder.
