@@ -95,6 +95,12 @@ class generic_ping_plugin extends Plugin
 					'size' => 50,
 					'note' => T_('The URL of the ping service.').' '.sprintf('E.g. &laquo;%s&raquo;', 'rpc.weblogs.com/RPC2 or rpc.foobar.com:8080'),
 				),
+			'ping_service_extended' => array(
+					'label' => T_('Extended ping?'),
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
+					'note' => T_('Use weblogUpdates.extendedPing method instead of weblogUpdates.ping?'),
+				),
 			'ping_service_name' => array(
 					'label' => T_('Ping service name'),
 					'defaultvalue' => '',
@@ -179,14 +185,28 @@ class generic_ping_plugin extends Plugin
 
 		$url = $this->parse_ping_url( $this->Settings->get( 'ping_service_url' ) );
 
-		$item_Blog = $params['Item']->get_Blog();
+		$Item = $params['Item'];
+		$item_Blog = $Item->get_Blog();
 
 		$client = new xmlrpc_client( $url['path'], $url['host'], $url['port'] );
 		$client->debug = ($debug && $params['display']);
 
-		$message = new xmlrpcmsg("weblogUpdates.ping", array(
-				new xmlrpcval( $item_Blog->get('name') ),
-				new xmlrpcval( $item_Blog->get('url') ) ));
+		if( $this->Settings->get('ping_service_extended') )
+		{
+			$message = new xmlrpcmsg("weblogUpdates.extendedPing", array(
+					new xmlrpcval( $item_Blog->get('name') ),
+					new xmlrpcval( $item_Blog->get('url') ),
+					new xmlrpcval( $Item->get_permanent_url() ),
+					new xmlrpcval( $item_Blog->get('atom_url') ),
+					// TODO: tags..
+					));
+		}
+		else
+		{
+			$message = new xmlrpcmsg("weblogUpdates.ping", array(
+					new xmlrpcval( $item_Blog->get('name') ),
+					new xmlrpcval( $item_Blog->get('url') ) ));
+		}
 		$result = $client->send($message);
 
 		$params['xmlrpcresp'] = $result;
@@ -199,6 +219,9 @@ class generic_ping_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.7  2007/06/16 20:23:21  blueyed
+ * Added "ping_service_extended" setting to use weblogUpdates.extendedPing
+ *
  * Revision 1.6  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *
