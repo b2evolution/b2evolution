@@ -1040,7 +1040,7 @@ function balanceTags($text)
 /**
  * Wrap pre tag around {@link var_dump()} for better debugging.
  *
- * @param,... mixed variable(s) to dump
+ * @param $var__var__var__var__,... mixed variable(s) to dump
  */
 function pre_dump( $var__var__var__var__ )
 {
@@ -2665,6 +2665,8 @@ function is_admin_page()
  * If there's one element in the table, it is returned.
  * If there are at least two elements, the last one is concatenated using $implode_last, while the ones before are imploded using $implode_by.
  *
+ * @todo dh> I don't think using entities/HTML as default for $implode_last is sane!
+ *           Use "&" instead and make sure that the output for HTML is HTML compliant..
  * @todo Support for locales that have a different kind of enumeration?!
  * @return string
  */
@@ -2968,6 +2970,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.179  2007/06/16 19:54:39  blueyed
+ * doc/(-fixes)
+ *
  * Revision 1.178  2007/06/05 17:00:02  blueyed
  * MFB v-1-10: Consistent logging of HTTP_REFERER/REQUEST_URI; fixed possible E_NOTICE
  *
