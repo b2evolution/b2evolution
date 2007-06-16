@@ -271,6 +271,8 @@ class Log
 	 *
 	 * @param string HTML to display before the log when there is something to display
 	 * @param string HTML to display after the log when there is something to display
+	 * @param boolean Skip if previewing?
+	 *        QUESTION: dh> This appears to not display e.g. errors which got inserted?!!
 	 */
 	function disp( $before = '<div class="action_messages">', $after = '</div>', $skip_if_preview = true )
 	{
@@ -707,6 +709,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.18  2007/06/16 19:20:38  blueyed
+ * doc/question
+ *
  * Revision 1.17  2007/05/07 18:03:28  fplanque
  * cleaned up skin code a little
  *
