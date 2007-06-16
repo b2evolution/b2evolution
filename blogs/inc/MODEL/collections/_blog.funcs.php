@@ -360,6 +360,7 @@ function blogperms_get_easy2( $perms, $context = 'user' )
  * For use in admin
  *
  * NOTE: we no longer try to set $Blog inside of the function because later global use cannot be safely guaranteed in PHP4.
+ * dh> What? Please explain the problem. Probably using $GLOBALS directly may have helped here!! So, this is the reason of code duplication all around?
  *
  * @param string Permission name that must be given to the {@link $current_User} object.
  * @param string Permission level that must be given to the {@link $current_User} object.
@@ -453,6 +454,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.33  2007/06/16 19:49:16  blueyed
+ * question
+ *
  * Revision 1.32  2007/06/12 23:51:16  fplanque
  * non admins can no longer create blog admins
  *
