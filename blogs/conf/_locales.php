@@ -135,6 +135,7 @@ $locales = array(
 										'timefmt' => 'H:i:s',
 										'startofweek' => 1,
 										'messages' => 'de_DE',
+										'set_locales' => 'de_DE.latin1 de_DE de',
 										'enabled' => 1,
 									),
 	'ee-ET' => array( 'name' => NT_('Estonia (ET)'),
