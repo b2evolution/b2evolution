@@ -638,7 +638,7 @@ class test_plugin extends Plugin
 	 */
 	function DisplayLoginFormFieldset( & $params )
 	{
-		$params['Form']->info_field( 'TEST plugin', 'This is added by the TEST plugin.' );
+		$params['Form']->info_field( 'TEST plugin', 'This is the TEST plugin hooking the DisplayLoginFormFieldset event.' );
 	}
 
 
@@ -715,6 +715,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.67  2007/06/16 20:28:04  blueyed
+ * Added more info in DisplayLoginFormFieldset event
+ *
  * Revision 1.66  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *
