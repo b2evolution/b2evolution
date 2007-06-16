@@ -501,6 +501,7 @@ switch( $action )
 	case 'download':
 		// TODO: We don't need the Filelist, move UP!
 		// TODO: provide optional zip formats (tgz, ..) - the used lib provides more..
+		// TODO: use "inmemory"=>false, so that you can download bigger archives faster!
 
 		// Exit any special mode we may have been in:
 		$fm_mode = NULL;
@@ -548,6 +549,16 @@ switch( $action )
 		$zipfile->set_options( $options );
 		$zipfile->add_files( $arraylist );
 		$zipfile->create_archive();
+
+		if( $zipfile->error )
+		{
+			foreach($zipfile->error as $v)
+			{
+				$Messages->add( $v, 'error' );
+			}
+			break;
+		}
+
 		$zipfile->download_file();
 		exit;
 		/* EXITED! */
@@ -1482,6 +1493,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.59  2007/06/16 19:40:18  blueyed
+ * Added handling of $zipfile->error
+ *
  * Revision 1.58  2007/04/26 00:11:13  fplanque
  * (c) 2007
  *
