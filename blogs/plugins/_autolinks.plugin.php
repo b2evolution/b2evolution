@@ -17,6 +17,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @todo dh> Provide a setting for:
  *   - marking external and internal (relative URL or on the blog's URL) links with a HTML/CSS class
  *   - add e.g. 'target="_blank"' to external links
+ * @todo Add "max. displayed length setting" and add full title + dots in the middle to shorten it.
+ *       (e.g. plain long URLs with a lot of params and such). This should not cause the layout to
+ *       behave ugly. This should only shorten non-whitespace strings in the link's innerHTML of course.
  *
  * @package plugins
  */
@@ -63,6 +66,9 @@ class autolinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.18  2007/06/16 20:20:53  blueyed
+ * Added todo for ... in links
+ *
  * Revision 1.17  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *
