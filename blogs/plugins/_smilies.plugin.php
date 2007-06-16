@@ -21,11 +21,17 @@ class smilies_plugin extends Plugin
 {
 	var $code = 'b2evSmil';
 	var $name = 'Smilies';
+	/**
+	 * @todo dh> Should get a low priority (e.g. 80) so it does not create icon image
+	 *           tags which then get processed by another plugin.
+	 *           Is there any benefit from a high prio like now? So that we do not
+	 *           match "generated" simlies later?
+	 */
 	var $priority = 15;
 	var $version = '1.10';
 	var $apply_rendering = 'opt-out';
 	var $group = 'rendering';
-	var $number_of_installs = 3;
+	var $number_of_installs = 3; // QUESTION: dh> why 3?
 
 	/**
 	 * Text similes search array
@@ -393,6 +399,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.41  2007/06/16 20:26:44  blueyed
+ * doc
+ *
  * Revision 1.40  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *
