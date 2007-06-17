@@ -22,12 +22,10 @@
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
- * @package plugins: AmCode Plugin
+ * @package plugins AmCode Plugin
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file:
  * @author Yabba: Paul Jones - {@link http://astonishme.co.uk/}
  * @author Stk: Scott Kimler - {@link http://astonishme.co.uk/}
- * }}
  *
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
@@ -83,6 +81,9 @@ class am_code_highlighter
 }
 /**
  * $Log$
+ * Revision 1.3  2007/06/17 13:28:22  blueyed
+ * Fixed doc
+ *
  * Revision 1.2  2007/05/04 20:43:08  fplanque
  * MFB
  *

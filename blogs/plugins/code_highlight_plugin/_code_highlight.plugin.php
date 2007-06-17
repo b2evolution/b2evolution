@@ -24,10 +24,8 @@
  *
  * @package plugins
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file:
  * @author Yabba: Paul Jones - {@link http://astonishme.co.uk/}
  * @author Stk: Scott Kimler - {@link http://astonishme.co.uk/}
- * }}
  *
  * @version $Id$
  */
@@ -560,6 +558,9 @@ div.codeblock.amc_short table {
 
 /**
  * $Log$
+ * Revision 1.4  2007/06/17 13:28:22  blueyed
+ * Fixed doc
+ *
  * Revision 1.3  2007/05/14 02:43:06  fplanque
  * Started renaming tables. There probably won't be a better time than 2.0.
  *
