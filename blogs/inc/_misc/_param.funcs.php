@@ -1577,61 +1577,61 @@ function _trapError( $reset = 1 )
 }
 
 
-
-/**
+/*
  * Clean up the mess PHP has created with its funky quoting everything!
- *
- * @param mixed string or array (function is recursive)
- * @return mixed
  */
-if( !strcasecmp( ini_get('magic_quotes_sybase'), 'on' ) ) // overrides "magic_quotes_gpc" and only replaces single quotes with themselves ( "'" => "''" )
-{
-	/**
-	 * @ignore
-	 */
-	function remove_magic_quotes( $mixed )
-	{
-		if( is_array( $mixed ) )
-		{
-			foreach($mixed as $k => $v)
-			{
-				$mixed[$k] = remove_magic_quotes( $v );
-			}
-		}
-		elseif( is_string($mixed) )
-		{
-			// echo 'Removing slashes ';
-			$mixed = str_replace( '\'\'', '\'', $mixed );
-		}
-		return $mixed;
-	}
-}
-elseif( get_magic_quotes_gpc() )
+if( get_magic_quotes_gpc() )
 { // That stupid PHP behaviour consisting of adding slashes everywhere is unfortunately on
-	/**
-	 * Remove quotes from input.
-	 * This handles magic_quotes_gpc and magic_quotes_sybase PHP settings/variants.
-	 *
-	 * NOTE: you should not use it directly, but one of the param-functions!
-	 *
-	 * @param mixed Value
-	 * @return mixed Value, with magic quotes removed
-	 */
-	function remove_magic_quotes( $mixed )
-	{
-		if( is_array( $mixed ) )
+
+	if( in_array( strtolower(ini_get('magic_quotes_sybase')), array('on', '1', 'true', 'yes') ) )
+	{ // overrides "magic_quotes_gpc" and only replaces single quotes with themselves ( "'" => "''" )
+		/**
+		 * @ignore
+		 */
+		function remove_magic_quotes( $mixed )
 		{
-			foreach($mixed as $k => $v)
+			if( is_array( $mixed ) )
 			{
-				$mixed[$k] = remove_magic_quotes( $v );
+				foreach($mixed as $k => $v)
+				{
+					$mixed[$k] = remove_magic_quotes( $v );
+				}
 			}
+			elseif( is_string($mixed) )
+			{
+				// echo 'Removing slashes ';
+				$mixed = str_replace( '\'\'', '\'', $mixed );
+			}
+			return $mixed;
 		}
-		elseif( is_string($mixed) )
+	}
+	else
+	{
+		/**
+		 * Remove quotes from input.
+		 * This handles magic_quotes_gpc and magic_quotes_sybase PHP settings/variants.
+		 *
+		 * NOTE: you should not use it directly, but one of the param-functions!
+		 *
+		 * @param mixed string or array (function is recursive)
+		 * @return mixed Value, with magic quotes removed
+		 */
+		function remove_magic_quotes( $mixed )
 		{
-			// echo 'Removing slashes ';
-			$mixed = stripslashes( $mixed );
+			if( is_array( $mixed ) )
+			{
+				foreach($mixed as $k => $v)
+				{
+					$mixed[$k] = remove_magic_quotes( $v );
+				}
+			}
+			elseif( is_string($mixed) )
+			{
+				// echo 'Removing slashes ';
+				$mixed = stripslashes( $mixed );
+			}
+			return $mixed;
 		}
-		return $mixed;
 	}
 }
 else
@@ -1646,10 +1646,11 @@ else
 }
 
 
-
-
 /*
  * $Log$
+ * Revision 1.40  2007/06/17 23:39:59  blueyed
+ * Fixed remove_magic_quotes()
+ *
  * Revision 1.39  2007/05/28 01:33:22  fplanque
  * permissions/fixes
  *
