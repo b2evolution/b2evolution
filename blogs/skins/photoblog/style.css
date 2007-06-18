@@ -98,9 +98,7 @@ h2 {
 div.action_messages {
 	margin: 0 2ex;
 }
-.nav_right
-{
-}
+
 .nav_right img
 {
 	vertical-align: top;
@@ -122,6 +120,7 @@ img.no_nav
 	float: right;
 	border: 1px solid #666;
 }
+
 .bPost
 {
 	clear: both;
