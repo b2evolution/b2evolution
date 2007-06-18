@@ -26,6 +26,7 @@ class smilies_plugin extends Plugin
 	 *           tags which then get processed by another plugin.
 	 *           Is there any benefit from a high prio like now? So that we do not
 	 *           match "generated" simlies later?
+	 * fp> There is... I can't remember the exact problem thouh. Probably some interaction with the code highlight or the video plugins.
 	 */
 	var $priority = 15;
 	var $version = '1.10';
@@ -399,6 +400,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.42  2007/06/18 21:21:57  fplanque
+ * doc
+ *
  * Revision 1.41  2007/06/16 20:26:44  blueyed
  * doc
  *
