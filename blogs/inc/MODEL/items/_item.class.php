@@ -1384,6 +1384,11 @@ class Item extends ItemLight
 													$zero = '#', $one = '#', $more = '#', $title='#', $status = 'published',
 													$use_popup = false,	$hideifnone = '#', $url = '#', $blogurl = '' )
 	{
+		if( ! $this->can_see_comments() )
+		{	// Comments disabled
+			return;
+		}
+
 		// dh> TODO:	Add plugin hook, where a Pingback plugin could hook and provide "pingbacks"
 		switch( $type )
 		{
@@ -3012,6 +3017,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.180  2007/06/18 20:59:55  fplanque
+ * do not display link to comments if comments are disabled
+ *
  * Revision 1.179  2007/06/13 23:29:02  fplanque
  * minor
  *
