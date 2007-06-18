@@ -41,7 +41,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <?php
 	// ---------------------------- BLOG LIST INSERTED HERE ------------------------------
 
-	load_class( 'MODEL/collections/_componentwidget.class.php' );
+	load_class( 'MODEL/widgets/_componentwidget.class.php' );
 
 	$colls_list_ComponentWidget = & new ComponentWidget( NULL, 'core', 'colls_list_public' );
 

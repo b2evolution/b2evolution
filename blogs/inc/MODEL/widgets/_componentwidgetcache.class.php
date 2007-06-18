@@ -32,7 +32,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 require_once dirname(__FILE__).'/../dataobjects/_dataobjectcache.class.php';
 
-load_class( 'MODEL/collections/_componentwidget.class.php' );
+load_class( 'MODEL/widgets/_componentwidget.class.php' );
 
 /**
  * Widget Cache Class
@@ -76,7 +76,7 @@ class WidgetCache extends DataObjectCache
 			for( $i = 0; $i < count( $widget_rs ); $i++ )
 			{
 				// fp> NOTE: object COPYing is weird here but it needs to be like this in PHP4 or all abjects from the loop will look the same
-				$ComponentWidget = & new ComponentWidget( $widget_rs[$i] ); // fp> NOTE: no copy because we need copy on the next line anyway!!
+				$ComponentWidget = & $this->new_obj( $widget_rs[$i] ); // fp> NOTE: no copy because we need copy on the next line anyway!!
 				// Add to regular cache (but not with $this->add() because we need a COPY!!):
 				$this->cache[$ComponentWidget->ID] = $ComponentWidget; // COPY!!!! WEIRD BUT NECESSARY / PHP 4 (fp)
 				// This is the cache we're interested in:
@@ -90,6 +90,31 @@ class WidgetCache extends DataObjectCache
 
 		return $this->cache_container_Widget_array[$coll_ID];
 	}
+
+
+	/**
+	 * Instanciate a new object within this cache
+	 */
+	function & new_obj( $row = NULL )
+	{
+		if( $row->wi_type == 'core' )
+		{
+			load_class( 'MODEL/widgets/_'.$row->wi_code.'.widget.php' );
+			$objtype = $row->wi_code.'_Widget';
+		}
+		else
+		{
+			$objtype = 'ComponentWidget';
+		}
+
+		// Instantiate a custom object
+		$obj = new $objtype( $row ); // COPY !!
+
+		return $obj;
+	}
+
+
+
 
 	/**
 	 * @param integer
@@ -108,6 +133,9 @@ class WidgetCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.1  2007/06/18 21:25:48  fplanque
+ * one class per core widget
+ *
  * Revision 1.5  2007/04/26 00:11:06  fplanque
  * (c) 2007
  *

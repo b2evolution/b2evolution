@@ -132,7 +132,7 @@ function & get_Cache( $objectName )
 			return $UserCache;
 
 		case 'WidgetCache':
-			load_class( 'MODEL/collections/_widgetcache.class.php' );
+			load_class( 'MODEL/widgets/_componentwidgetcache.class.php' );
 			$WidgetCache = new WidgetCache(); // COPY (FUNC)
 			return $WidgetCache;
 
@@ -143,6 +143,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.18  2007/06/18 21:25:48  fplanque
+ * one class per core widget
+ *
  * Revision 1.17  2007/05/14 02:43:05  fplanque
  * Started renaming tables. There probably won't be a better time than 2.0.
  *

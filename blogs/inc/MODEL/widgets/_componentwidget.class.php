@@ -25,21 +25,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $core_componentwidget_defs;
-$core_componentwidget_defs = array(
-		'coll_title'        => NT_('Blog Title'),
-		'coll_tagline'      => NT_('Blog Tagline'),
-		'coll_longdesc'     => NT_('Long Description of this Blog'),
-		'coll_common_links' => NT_('Common Navigation Links'),
-		'coll_page_list'		=> NT_('Page List'),
-		'coll_post_list'		=> NT_('Post List'),
-		'coll_search_form'  => NT_('Content Search Form'),
-		'coll_xml_feeds'    => NT_('XML Feeds (RSS / Atom)'),
-		'user_tools'        => NT_('User Tools'),
-		'colls_list_public'	=> NT_('Public blog list'),
-		'colls_list_owner'  => NT_('Same owner\'s blog list'),
-	);
-
 /**
  * ComponentWidget Class
  *
@@ -122,20 +107,13 @@ class ComponentWidget extends DataObject
 
 	/**
 	 * Get name of widget
+	 *
+	 * Should be overriden by core widgets
 	 */
 	function get_name()
 	{
-		global $core_componentwidget_defs;
-
 		switch( $this->type )
 		{
-			case 'core':
-				if( ! empty( $core_componentwidget_defs[ $this->code ] ) )
-				{
-					return T_($core_componentwidget_defs[ $this->code ]);
-				}
-				break;
-
 			case 'plugin':
 				// Make sure Plugin is loaded:
 				if( $this->get_Plugin() )
@@ -151,7 +129,60 @@ class ComponentWidget extends DataObject
 
 
 	/**
+	 * Get desc of widget
+	 *
+	 * Should be overriden by core widgets
+	 */
+	function get_desc()
+	{
+		switch( $this->type )
+		{
+			case 'plugin':
+				// Make sure Plugin is loaded:
+				if( $this->get_Plugin() )
+				{
+					return $this->Plugin->short_desc;
+				}
+				return T_('Inactive / Uninstalled plugin');
+				break;
+		}
+
+		return T_('Unknown');
+	}
+
+  /**
+	 * Unserialize params
+	 */
+	function get_params()
+	{
+		$params = @unserialize( $this->params );
+		if( empty( $params ) )
+		{
+			$params = array();
+		}
+		return $params;
+	}
+
+
+  /**
+	 * Serialize params
+	 */
+	function set_params( $params )
+	{
+		$this->set_param( 'params', 'string', serialize($params) );
+	}
+
+
+	function init_display( $params )
+	{
+		// Customize params to the current widget:
+		$this->disp_params = str_replace( '$wi_class$', 'widget_'.$this->type.'_'.$this->code, $params );
+	}
+
+	/**
 	 * Display the widget!
+	 *
+	 * Should be overriden by core widgets
 	 *
 	 * @todo fp> handle custom params for each widget
 	 *
@@ -163,171 +194,13 @@ class ComponentWidget extends DataObject
 		global $Plugins;
 		global $rsc_url;
 
-		// Customize params to the current widget:
-		$params = str_replace( '$wi_class$', 'widget_'.$this->type.'_'.$this->code, $params );
+		$this->init_display( $params );
 
 		switch( $this->type )
 		{
-			case 'core':
-				switch( $this->code )
-				{
-					case 'coll_title':
-						// Collection title:
-						echo $params['block_start'];
-
-						$title = '<a href="'.$Blog->get( 'url', 'raw' ).'">'
-											.$Blog->dget( 'name', 'htmlbody' )
-											.'</a>';
-						$this->disp_title( $params, $title );
-
-						echo $params['block_end'];
-						return true;
-
-		      case 'coll_tagline':
-						// Collection tagline:
-						echo $params['block_start'];
-						$Blog->disp( 'tagline', 'htmlbody' );
-						echo $params['block_end'];
-						return true;
-
-		      case 'coll_longdesc':
-						// Collection long description:
-						echo $params['block_start'];
-						echo '<p>';
-						$Blog->disp( 'longdesc', 'htmlbody' );
-						echo '</p>';
-						echo $params['block_end'];
-						return true;
-
-		      case 'coll_common_links':
-						// Collection common links:
-						echo $params['block_start'];
-						echo $params['list_start'];
-
-						echo $params['item_start'];
-						echo '<strong><a href="'.$Blog->get('url').'">'.T_('Recently').'</a></strong>';
-						echo $params['item_end'];
-
-						// fp> TODO: don't display this if archives plugin not installed... or depluginize archives (I'm not sure)
-						echo $params['item_start'];
-						echo '<strong><a href="'.$Blog->get('arcdirurl').'">'.T_('Archives').'</a></strong>';
-						echo $params['item_end'];
-
-						// fp> TODO: don't display this if categories plugin not installed... or depluginize categories (I'm not sure)
-						echo $params['item_start'];
-						echo '<strong><a href="'.$Blog->get('catdirurl').'">'.T_('Categories').'</a></strong>';
-						echo $params['item_end'];
-
-						echo $params['item_start'];
-						echo '<strong><a href="'.$Blog->get('lastcommentsurl').'">'.T_('Latest comments').'</a></strong>';
-						echo $params['item_end'];
-
-						echo $params['list_end'];
-						echo $params['block_end'];
-						return true;
-
-					case 'coll_page_list':
-						// List of pages:
-						$this->disp_item_list( $params, 'pages' );
-						return true;
-
-					case 'coll_post_list':
-						// List of posts:
-						$this->disp_item_list( $params, 'posts' );
-						return true;
-
-		      case 'coll_search_form':
-						// Collection search form:
-						echo $params['block_start'];
-
-			   		$this->disp_title( $params, T_('Search') );
-
-						form_formstart( $Blog->gen_blogurl(), 'search', 'SearchForm' );
-						echo '<p>';
-						$s = get_param( 's' );
-						echo '<input type="text" name="s" size="30" value="'.htmlspecialchars($s).'" class="SearchField" /><br />';
-						$sentence = get_param( 'sentence' );
-						echo '<input type="radio" name="sentence" value="AND" id="sentAND" '.( $sentence=='AND' ? 'checked="checked" ' : '' ).'/><label for="sentAND">'.T_('All Words').'</label><br />';
-						echo '<input type="radio" name="sentence" value="OR" id="sentOR" '.( $sentence=='OR' ? 'checked="checked" ' : '' ).'/><label for="sentOR">'.T_('Some Word').'</label><br />';
-						echo '<input type="radio" name="sentence" value="sentence" id="sentence" '.( $sentence=='sentence' ? 'checked="checked" ' : '' ).'/><label for="sentence">'.T_('Entire phrase').'</label>';
-						echo '</p>';
-						echo '<input type="submit" name="submit" class="submit" value="'.T_('Search').'" />';
-						echo '</form>';
-
-						echo $params['block_end'];
-						return true;
-
-					case 'coll_xml_feeds':
-						// Available XML feeds:
-						echo $params['block_start'];
-
-						$title = '<img src="'.$rsc_url.'icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> '.T_('XML Feeds');
-			   		$this->disp_title( $params, $title );
-
-						echo $params['list_start'];
-
-						$SkinCache = & get_Cache( 'SkinCache' );
-						$SkinCache->load_by_type( 'feed' );
-
-						// TODO: this is like touching private parts :>
-						foreach( $SkinCache->cache as $Skin )
-						{
-							if( $Skin->type != 'feed' )
-							{	// This skin cannot be used here...
-								continue;
-							}
-
-							echo $params['item_start'];
-							echo $Skin->name.': ';
-							echo '<a href="'.$Blog->get_item_feed_url( $Skin->folder ).'">'.T_('Posts').'</a>, ';
-							echo '<a href="'.$Blog->get_comment_feed_url( $Skin->folder ).'">'.T_('Comments').'</a>';
-							echo $params['item_end'];
-						}
-
-						echo $params['list_end'];
-
-						echo $params['notes_start'];
-						echo '<a href="http://webreference.fr/2006/08/30/rss_atom_xml" target="_blank" title="External - English">What is RSS?</a>';
-						echo $params['notes_end'];
-
-						echo $params['block_end'];
-						return true;
-
-					case 'user_tools':
-						// User tools:
-						echo $params['block_start'];
-
-						echo $params['block_title_start'];
-						echo T_('User tools');
-						echo $params['block_title_end'];
-
-						echo $params['list_start'];
-						user_login_link( $params['item_start'], $params['item_end'] );
-						user_register_link( $params['item_start'], $params['item_end'] );
-						user_admin_link( $params['item_start'], $params['item_end'] );
-						user_profile_link( $params['item_start'], $params['item_end'] );
-						user_subs_link( $params['item_start'], $params['item_end'] );
-						user_logout_link( $params['item_start'], $params['item_end'] );
-						echo $params['list_end'];
-
-						echo $params['block_end'];
-						return true;
-
-					case 'colls_list_public':
-						// List of public blogs:
-      			$this->disp_coll_list( $params, 'public' );
-						return true;
-
-					case 'colls_list_owner':
-						// List of public blogs:
-      			$this->disp_coll_list( $params, 'owner' );
-						return true;
-				}
-				break;
-
 			case 'plugin':
 				// Call plugin (will return false if Plugin is not enabled):
-				if( $Plugins->call_by_code( $this->code, $params ) )
+				if( $Plugins->call_by_code( $this->code, $this->disp_params ) )
 				{
 					return true;
 				}
@@ -341,13 +214,13 @@ class ComponentWidget extends DataObject
   /**
 	 * @private
 	 */
-	function disp_title( $params, $title )
+	function disp_title( $title )
 	{
-		if( $params['block_display_title'] )
+		if( $this->disp_params['block_display_title'] )
 		{
-			echo $params['block_title_start'];
+			echo $this->disp_params['block_title_start'];
 			echo $title;
-			echo $params['block_title_end'];
+			echo $this->disp_params['block_title_end'];
 		}
 	}
 
@@ -358,7 +231,7 @@ class ComponentWidget extends DataObject
 	 * @param array MUST contain at least the basic display params
 	 * @param string 'pages' or 'posts'
 	 */
-	function disp_item_list( $params, $what )
+	function disp_item_list( $what )
 	{
 		global $Blog;
 
@@ -388,29 +261,29 @@ class ComponentWidget extends DataObject
 			return;
 		}
 
-		echo $params['block_start'];
+		echo $this->disp_params['block_start'];
 
 		if( $what == 'pages' )
 		{
-   		$this->disp_title( $params, T_('Info pages') );
+   		$this->disp_title( $this->disp_params, T_('Info pages') );
 		}
 		else
 		{
-			$this->disp_title( $params, T_('Contents') );
+			$this->disp_title( $this->disp_params, T_('Contents') );
 		}
 
-		echo $params['list_start'];
+		echo $this->disp_params['list_start'];
 
 		while( $Item = & $ItemList->get_item() )
 		{
-			echo $params['item_start'];
+			echo $this->disp_params['item_start'];
 			$Item->permanent_link('#title#');
-			echo $params['item_end'];
+			echo $this->disp_params['item_end'];
 		}
 
-		echo $params['list_end'];
+		echo $this->disp_params['list_end'];
 
-		echo $params['block_end'];
+		echo $this->disp_params['block_end'];
 	}
 
 
@@ -419,18 +292,18 @@ class ComponentWidget extends DataObject
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
-	function disp_coll_list( $params, $filter = 'public' )
+	function disp_coll_list( $filter = 'public' )
 	{
     /**
 		 * @var Blog
 		 */
 		global $Blog;
 
-		echo $params['block_start'];
+		echo $this->disp_params['block_start'];
 
-		$this->disp_title( $params, T_('Blogs') );
+		$this->disp_title( $this->disp_params, T_('Blogs') );
 
-		echo $params['list_start'];
+		echo $this->disp_params['list_start'];
 
     /**
 		 * @var BlogCache
@@ -453,13 +326,13 @@ class ComponentWidget extends DataObject
 
 			if( $l_blog_ID == $Blog->ID )
 			{ // This is the blog being displayed on this page:
-  			echo $params['item_selected_start'];
-				$link_class = $params['link_selected_class'];
+  			echo $this->disp_params['item_selected_start'];
+				$link_class = $this->disp_params['link_selected_class'];
 			}
 			else
 			{
-				echo $params['item_start'];
-				$link_class = $params['link_default_class'];;
+				echo $this->disp_params['item_start'];
+				$link_class = $this->disp_params['link_default_class'];;
 			}
 
 			echo '<a href="'.$l_Blog->gen_blogurl().'" class="'.$link_class.'" title="'
@@ -467,25 +340,25 @@ class ComponentWidget extends DataObject
 
 			if( $l_blog_ID == $Blog->ID )
 			{ // This is the blog being displayed on this page:
-  			echo $params['item_selected_text_start'];
+  			echo $this->disp_params['item_selected_text_start'];
 				echo $l_Blog->dget( 'shortname', 'htmlbody' );
-  			echo $params['item_selected_text_end'];
+  			echo $this->disp_params['item_selected_text_end'];
 				echo '</a>';
-  			echo $params['item_selected_end'];
+  			echo $this->disp_params['item_selected_end'];
 			}
 			else
 			{
-  			echo $params['item_text_start'];
+  			echo $this->disp_params['item_text_start'];
 				echo $l_Blog->dget( 'shortname', 'htmlbody' );
-  			echo $params['item_text_end'];
+  			echo $this->disp_params['item_text_end'];
 				echo '</a>';
-				echo $params['item_end'];
+				echo $this->disp_params['item_end'];
 			}
 		}
 
-		echo $params['list_end'];
+		echo $this->disp_params['list_end'];
 
-		echo $params['block_end'];
+		echo $this->disp_params['block_end'];
 	}
 
 
@@ -521,6 +394,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.1  2007/06/18 21:25:47  fplanque
+ * one class per core widget
+ *
  * Revision 1.26  2007/05/28 15:18:30  fplanque
  * cleanup
  *

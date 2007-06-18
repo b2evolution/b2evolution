@@ -96,7 +96,7 @@ function display_container( $container, $legend_suffix = '' )
 			$Table->display_line_start( false, $fadeout );
 
 			$Table->display_col_start();
-			echo $ComponentWidget->get_name();
+			echo '<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID).'">'.$ComponentWidget->get_name().'</a>';
 			$Table->display_col_end();
 
 			// Note: this is totally useless, but we need more cols for the screen to feel "right":
@@ -162,6 +162,9 @@ echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, fal
 
 /*
  * $Log$
+ * Revision 1.9  2007/06/18 21:25:48  fplanque
+ * one class per core widget
+ *
  * Revision 1.8  2007/06/11 22:01:54  blueyed
  * doc fixes
  *

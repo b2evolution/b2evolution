@@ -15,19 +15,33 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $container;
 
-global $core_componentwidget_defs;
-
 echo '<h2><span class="right_icons">'.action_icon( T_('Cancel!'), 'close', regenerate_url( 'container' ) ).'</span>'
 	.sprintf(T_('Widgets available for insertion into &laquo;%s&raquo;'), $container ).'</h2>';
 
 echo '<ul>';
 
-foreach( $core_componentwidget_defs as $code => $dummy )
+$core_componentwidget_defs = array(
+		'colls_list_public',
+		'colls_list_owner',
+		'coll_logo',
+		'coll_title',
+		'coll_tagline',
+		'coll_longdesc',
+		'coll_common_links',
+		'coll_page_list',
+		'coll_post_list',
+		'coll_search_form',
+		'coll_xml_feeds',
+		'user_tools',
+	);
+foreach( $core_componentwidget_defs as $code )
 {
-	$ComponentWidget = & new ComponentWidget( NULL, 'core', $code );
+	load_class( 'MODEL/widgets/_'.$code.'.widget.php' );
+	$classname = $code.'_Widget';
+	$ComponentWidget = & new $classname( NULL, 'core', $code );
 
 	echo '<li>';
-	echo '<a href="'.regenerate_url( '', 'action=create&amp;type='.$ComponentWidget->type.'&amp;code='.$ComponentWidget->code ).'" title="'.T_('Add this widget to the container').'">';
+	echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code ).'" title="'.T_('Add this widget to the container').'">';
 	echo get_icon( 'new' ).$ComponentWidget->get_name();
 	echo '</a></li>';
 }
@@ -60,6 +74,9 @@ if( ! empty($Plugin_array) )
 
 /*
  * $Log$
+ * Revision 1.7  2007/06/18 21:25:48  fplanque
+ * one class per core widget
+ *
  * Revision 1.6  2007/04/26 00:11:05  fplanque
  * (c) 2007
  *

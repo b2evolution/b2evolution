@@ -116,11 +116,6 @@ require $skins_path.'_html_header.inc.php';
 	{
 	?>
 	
-	<?php
-		//previous_post();	// link to previous post in single page mode
-		//next_post(); 			// link to next post in single page mode
-	?>
-	
 	<div class="bPost bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
 		<?php
 			locale_temp_switch( $Item->locale ); // Temporarily switch to post locale

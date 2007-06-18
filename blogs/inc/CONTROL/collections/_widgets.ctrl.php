@@ -25,7 +25,7 @@ global $AdminUI;
  */
 global $Plugins;
 
-load_class( 'MODEL/collections/_componentwidget.class.php' );
+load_class( 'MODEL/widgets/_componentwidget.class.php' );
 
 param( 'action', 'string', 'list' );
 
@@ -46,6 +46,7 @@ switch( $action )
 		param( 'container', 'string', true, true );	// memorize
 		break;
 
+	case 'edit':
 	case 'delete':
 	case 'move_up':
 	case 'move_down':
@@ -81,6 +82,7 @@ switch( $action )
 {
  	case 'nil':
  	case 'new':
+ 	case 'edit':
 		// Do nothing
 		break;
 
@@ -97,7 +99,7 @@ switch( $action )
 		{
 			case 'core':
 				// Check the requested core widget is valid:
-				if( !isset( $core_componentwidget_defs[$code] ) )
+				if( !file_exists( $inc_path.'MODEL/widgets/_'.$code.'.widget.php' ) )
 				{
 					debug_die( 'Unhandled core widget code' );
 				}
@@ -258,6 +260,9 @@ switch( $action )
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
+		// Display VIEW:
+		$AdminUI->disp_view( 'collections/_widget_list.form.php' );
+
 
 		// End payload block:
 		$AdminUI->disp_payload_end();
@@ -283,6 +288,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2007/06/18 21:25:47  fplanque
+ * one class per core widget
+ *
  * Revision 1.9  2007/04/26 00:11:07  fplanque
  * (c) 2007
  *
