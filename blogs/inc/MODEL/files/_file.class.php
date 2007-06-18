@@ -1662,6 +1662,12 @@ class File extends DataObject
 				$thumb_quality = 90;
 				break;
 
+			case 'fit-640x480';
+				$thumb_width = 640;
+				$thumb_height = 480;
+				$thumb_quality = 90;
+				break;
+
 			case 'fit-320x320';
 				$thumb_width = 320;
 				$thumb_height = 320;
@@ -1726,6 +1732,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.44  2007/06/18 20:59:02  fplanque
+ * minor
+ *
  * Revision 1.43  2007/04/26 00:11:10  fplanque
  * (c) 2007
  *
