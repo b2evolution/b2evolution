@@ -1432,10 +1432,10 @@ class AdminUI_general
 									'text' => T_('Features'),
 									'href' => 'admin.php?ctrl=features' ),
 								'skins' => array(
-									'text' => T_('Installed Skins'),
+									'text' => T_('Skins install'),
 									'href' => 'admin.php?ctrl=skins'),
 								'plugins' => array(
-									'text' => T_('Plugins'),
+									'text' => T_('Plugins install'),
 									'href' => 'admin.php?ctrl=plugins'),
 								'antispam' => array(
 									'text' => T_('Antispam'),
@@ -1620,6 +1620,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.54  2007/06/18 21:13:10  fplanque
+ * minor
+ *
  * Revision 1.53  2007/06/14 18:39:04  blueyed
  * Fixed E_NOTICE if there is no Blog available
  *
