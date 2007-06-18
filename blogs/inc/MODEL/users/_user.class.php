@@ -232,7 +232,7 @@ class User extends DataObject
 
 
 	/**
-	 * Get preferred name of the user, according to {@link $idmode}.
+	 * Get preferred name of the user, according to {@link User::idmode}.
 	 *
 	 * @return string
 	 */
@@ -1327,8 +1327,8 @@ class User extends DataObject
 
 /*
  * $Log$
- * Revision 1.75  2007/06/16 20:32:54  blueyed
- * doc fix?
+ * Revision 1.76  2007/06/18 21:14:57  fplanque
+ * :/
  *
  * Revision 1.74  2007/06/11 01:55:57  fplanque
  * level based user permissions
