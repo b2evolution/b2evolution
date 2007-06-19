@@ -157,10 +157,6 @@ class Session
 						$old_callback = ini_set( 'unserialize_callback_func', 'session_unserialize_callback' );
 						if( $old_callback === false )
 						{ // this can fail, if "ini_set" has been disabled for security reasons.. :/
-							// fp> yes and that's the case at OVH, France's largest shared hosting company.
-							// fp> There is no way we're gonna just die here.
-							// debug_die('ini_set() is disabled! b2evo cannot adjust "unserialize_callback_func" for Session restoring!');
-
 							// Brutally load add classes that we might need:
  							session_unserialize_load_all_classes();
 						}
@@ -541,6 +537,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.43  2007/06/19 22:50:15  blueyed
+ * cleanup
+ *
  * Revision 1.42  2007/05/13 22:02:09  fplanque
  * removed bloated $object_def
  *

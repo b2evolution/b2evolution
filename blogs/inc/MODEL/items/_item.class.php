@@ -370,7 +370,6 @@ class Item extends ItemLight
 
 		if( param( 'item_tags', 'string', NULL ) !== NULL ) {
 			$this->set_tags_from_string( get_param('item_tags') );
-			// pre_dump( $this->tags );
 		}
 
 		// Workflow stuff:
@@ -1133,7 +1132,6 @@ class Item extends ItemLight
 											 	ORDER BY tag_name', 0, 'Get tags for Item' );
 		}
 
-		// pre_dump( $this->tags );
 		return $this->tags;
 	}
 
@@ -1155,7 +1153,6 @@ class Item extends ItemLight
 		{
 			$this->tags = preg_split( '/[\s,]+/', $tags );
 		}
-		// pre_dump( $this->tags );
 	}
 
 
@@ -2499,7 +2496,6 @@ class Item extends ItemLight
 				$existing_tags = $DB->get_col( $query, 0, 'Find existing tags' );
 
 				$new_tags = array_diff( $this->tags, $existing_tags );
-				//pre_dump($new_tags);
 
 				if( !empty( $new_tags ) )
 				{	// insert new tags:
@@ -3017,6 +3013,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.181  2007/06/19 22:49:45  blueyed
+ * cleanup
+ *
  * Revision 1.180  2007/06/18 20:59:55  fplanque
  * do not display link to comments if comments are disabled
  *
