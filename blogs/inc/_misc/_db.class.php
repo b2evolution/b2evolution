@@ -409,6 +409,11 @@ class DB
 			}
 			// echo count($this->dbaliases);
 		}
+
+		if( $debug )
+		{ // Force MySQL strict mode
+			$this->query( 'SET sql_mode = "TRADITIONAL"' );
+		}
 	}
 
 
@@ -1364,6 +1369,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.61  2007/06/19 23:17:52  blueyed
+ * Force MySQL strict mode, if $debug
+ *
  * Revision 1.60  2007/06/19 23:15:08  blueyed
  * doc fixes
  *
