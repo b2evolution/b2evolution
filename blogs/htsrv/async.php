@@ -86,7 +86,7 @@ switch( $action )
 		$r = get_plugin_settings_node_by_path( $Plugin, $set_type, $set_path, /* create: */ false );
 
 		$Form = new Form(); // fake Form
-		display_plugin_settings_fieldset_field( $set_path, $r['set_meta'], $Form, $set_type, $Plugin, NULL, $r['set_node'] );
+		autoform_display_field( $set_path, $r['set_meta'], $Form, $set_type, $Plugin, NULL, $r['set_node'] );
 		exit;
 
 	case 'del_plugin_sett_set':
@@ -115,6 +115,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.23  2007/06/19 20:41:10  fplanque
+ * renamed generic functions to autoform_*
+ *
  * Revision 1.22  2007/06/19 00:03:27  fplanque
  * doc / trying to make sense of automatic settings forms generation.
  *

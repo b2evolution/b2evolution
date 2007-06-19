@@ -410,10 +410,13 @@ if( !$Messages->count('error') )
 					continue;
 				}
 
-				global $inc_path;
-				require_once $inc_path.'_misc/_plugin.funcs.php';
+				load_funcs( '_misc/_plugin.funcs.php' );
 
-				set_Settings_for_Plugin_from_Request( $loop_Plugin, 'UserSettings', $edited_User );
+				// Loop through settings for this plugin:
+				foreach( $loop_Plugin->GetDefaultUserSettings( $dummy = array('for_editing' => true) ) as $set_name => $set_meta )
+				{
+					autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'UserSettings', $edited_User );
+				}
 
 				// Let the plugin handle custom fields:
 				$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array(
@@ -814,6 +817,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.51  2007/06/19 20:41:11  fplanque
+ * renamed generic functions to autoform_*
+ *
  * Revision 1.50  2007/06/19 18:47:27  fplanque
  * Nuked unnecessary Param (or I'm missing something badly :/)
  *

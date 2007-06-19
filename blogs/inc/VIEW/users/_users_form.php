@@ -280,7 +280,7 @@ if( $action != 'view_user' )
 			foreach( $plugin_user_settings as $l_name => $l_meta )
 			{
 				// Display form field for this setting:
-				display_plugin_settings_fieldset_field( $l_name, $l_meta, $Form, 'UserSettings', $loop_Plugin, $edited_User );
+				autoform_display_field( $l_name, $l_meta, $Form, 'UserSettings', $loop_Plugin, $edited_User );
 			}
 		}
 
@@ -387,6 +387,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.53  2007/06/19 20:41:36  fplanque
+ * renamed generic functions to autoform_*
+ *
  * Revision 1.52  2007/06/19 00:03:26  fplanque
  * doc / trying to make sense of automatic settings forms generation.
  *

@@ -563,13 +563,19 @@ switch( $action )
 		if( $edit_Plugin->Settings )
 		{
 			require_once $inc_path.'_misc/_plugin.funcs.php';
-			set_Settings_for_Plugin_from_Request( $edit_Plugin, 'Settings' );
+
+			// Loop through settings for this plugin:
+			foreach( $edit_Plugin->GetDefaultSettings( $dummy = array('for_editing' => true) ) as $set_name => $set_meta )
+			{
+				autoform_set_param_from_request( $set_name, $set_meta, $edit_Plugin, 'Settings' );
+			}
 
 			// Let the plugin handle custom fields:
+			// fp> why can't we call the method directly with $edit_Plugin->PluginSettingsUpdateAction() ??
 			$ok_to_update = $admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params = array() );
 
 			if( $ok_to_update === false )
-			{
+			{	// fp> why do we reset here??
 				$edit_Plugin->Settings->reset();
 			}
 			elseif( $edit_Plugin->Settings->dbupdate() )
@@ -1031,6 +1037,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.79  2007/06/19 20:41:11  fplanque
+ * renamed generic functions to autoform_*
+ *
  * Revision 1.78  2007/06/19 18:47:27  fplanque
  * Nuked unnecessary Param (or I'm missing something badly :/)
  *

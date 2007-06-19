@@ -92,7 +92,7 @@ if( $edit_Plugin->Settings ) // NOTE: this triggers PHP5 autoloading through Plu
 	foreach( $edit_Plugin->GetDefaultSettings( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
 	{
 		// Display form field for this setting:
-		display_plugin_settings_fieldset_field( $l_name, $l_meta, $Form, 'Settings', $edit_Plugin );
+		autoform_display_field( $l_name, $l_meta, $Form, 'Settings', $edit_Plugin );
 	}
 
 	// This can be used add custom input fields or display custom output (e.g. a test link):
@@ -188,6 +188,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.36  2007/06/19 20:41:10  fplanque
+ * renamed generic functions to autoform_*
+ *
  * Revision 1.35  2007/06/19 00:03:26  fplanque
  * doc / trying to make sense of automatic settings forms generation.
  *
