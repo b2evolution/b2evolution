@@ -1538,6 +1538,7 @@ class AdminUI_general
 		// Yet another event with no doc.
 		// WHat do we typically call this for?
 		// I don't know if it makes sense to move it here...
+		// What about http://doc.b2evolution.net/HEAD/plugins/Plugin.html#methodAdminAfterMenuInit ??
 		$Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 	}
@@ -1620,6 +1621,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.55  2007/06/19 22:36:39  blueyed
+ * doc
+ *
  * Revision 1.54  2007/06/18 21:13:10  fplanque
  * minor
  *
