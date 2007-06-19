@@ -318,9 +318,9 @@ class Log
 	 * then you should not log them in the same Log object and you should instantiate separate logs instead.
 	 *
 	 * @param string|NULL Header/title, might be array ( category => msg ),
-	 *                    'container' is then top. NULL for object's default ({@link Log::head}.
+	 *                    'container' is then top. NULL for object's default ({@link Log::$head}.
 	 * @param string|NULL Footer, might be array ( category => msg ), 'container' is then bottom.
-	 *                    NULL for object's default ({@link Log::foot}.
+	 *                    NULL for object's default ({@link Log::$foot}.
 	 * @param boolean to display or return (default: display)
 	 * @param mixed the category of messages to use (category, 'all', list of categories (array)
 	 *              or NULL for {@link $defaultcategory}).
@@ -709,6 +709,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.19  2007/06/19 23:22:28  blueyed
+ * doc fixes
+ *
  * Revision 1.18  2007/06/16 19:20:38  blueyed
  * doc/question
  *
