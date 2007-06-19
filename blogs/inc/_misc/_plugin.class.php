@@ -253,7 +253,7 @@ class Plugin
 	 * This gets instantianted on Plugin registration for PHP4 and through
 	 * overloading in PHP5+, which means on first access.
 	 *
-	 * NOTE: its methods use {@link $current_User::ID} by default, but you may call it
+	 * NOTE: its methods use {@link $current_User::$ID} by default, but you may call it
 	 *       if there's no {@link $current_User} instantiated (yet).
 	 *
 	 * @see GetDefaultUserSettings()
@@ -365,12 +365,12 @@ class Plugin
 	 * Those can then be edited in the backoffice.
 	 *
 	 * You can access them in the plugin through the member object
-	 * {@link Plugin::Settings}, e.g.:
+	 * {@link Plugin::$Settings}, e.g.:
 	 * <code>$this->Settings->get( 'my_param' );</code>
 	 *
 	 * fp> this is unclear: You probably don't need to set or change values (other than the
 	 * defaultvalues), but if you know what you're doing, see
-	 * {@link PluginSettings}, where {@link Plugin::Settings} gets derived from.
+	 * {@link PluginSettings}, where {@link Plugin::$Settings} gets derived from.
 	 *
 	 * NOTE: this method gets called by b2evo when instantiating the plugin
 	 *       settings and when the settings get displayed for editing in the backoffice.
@@ -381,7 +381,7 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters (since 1.9).
 	 *    'for_editing': true, if the settings get queried for editing;
-	 *                   false, if they get queried for instantiating {@link Plugin::Settings}.
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
 	 * @return array
 	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
 	 * and assign an array with the following keys to them (only 'label' is required):
@@ -535,7 +535,7 @@ class Plugin
 	 * @see Plugin::GetDefaultSettings()
 	 * @param array Associative array of parameters.
 	 *    'for_editing': true, if the settings get queried for editing;
-	 *                   false, if they get queried for instantiating {@link Plugin::UserSettings}.
+	 *                   false, if they get queried for instantiating {@link Plugin::$UserSettings}.
 	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
 	function GetDefaultUserSettings( & $params )
@@ -562,7 +562,7 @@ class Plugin
 	 *                     to look for a plugin that provides both events.
 	 *  - 'plugins':
 	 *    A list of plugins, either just the plugin's classname or an array with
-	 *    classname and minimum version of the plugin (see {@link Plugin::version}).
+	 *    classname and minimum version of the plugin (see {@link Plugin::$version}).
 	 *    E.g.: <code>array( 'test_plugin', '1' )</code> to require at least version "1"
 	 *          of the test plugin.
 	 *  - 'app_min': Minimum application (b2evo) version, e.g. "1.9".
@@ -592,7 +592,7 @@ class Plugin
 	 * The DB gets changed accordingly on installing or enabling your Plugin.
 	 *
 	 * If you want to change your DB layout in a new version of your Plugin, simply
-	 * adjust the queries here and increase {@link Plugin::version}, because this will
+	 * adjust the queries here and increase {@link Plugin::$version}, because this will
 	 * request to check the current DB layout against the one you require.
 	 *
 	 * For restrictions see {@link db_delta()}.
@@ -962,6 +962,7 @@ class Plugin
 	 *
 	 * Use this, if your plugin needs configuration before it can be used.
 	 *
+	 * @todo dh> Call this from Plugins::set_Plugin_status()?
 	 * @return true|string True, if the plugin can be enabled/activated,
 	 *                     a string with an error/note otherwise.
 	 */
@@ -976,6 +977,8 @@ class Plugin
 	 * disabled.
 	 *
 	 * You cannot prevent this, but only clean up stuff, if you have to.
+	 *
+	 * @todo dh> Only call this from Plugins::set_Plugin_status(), if it has not been disabled before?! ("status change")
 	 */
 	function BeforeDisable()
 	{
@@ -1726,10 +1729,10 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called as action just before updating the {@link Plugin::Settings plugin's settings}.
+	 * Event handler: Called as action just before updating the {@link Plugin::$Settings plugin's settings}.
 	 *
 	 * The "regular" settings from {@link GetDefaultSettings()} have been set into
-	 * {@link Plugin::Settings}, but get saved into DB after this method has been called.
+	 * {@link Plugin::$Settings}, but get saved into DB after this method has been called.
 	 *
 	 * Use this to catch custom input fields from {@link PluginSettingsEditDisplayAfter()} or
 	 * add notes/errors through {@link Plugin::msg()}.
@@ -1747,7 +1750,7 @@ class Plugin
 
 	/**
 	 * Event handler: Called as action before displaying the "Edit plugin" form,
-	 * which includes the display of the {@link Plugin::Settings plugin's settings}.
+	 * which includes the display of the {@link Plugin::$Settings plugin's settings}.
 	 *
 	 * You may want to use this to check existing settings or display notes about
 	 * something.
@@ -1758,7 +1761,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called after the form to edit the {@link Plugin::Settings} has been
+	 * Event handler: Called after the form to edit the {@link Plugin::$Settings} has been
 	 * displayed.
 	 *
 	 * Use this to add custom input fields (and catch them in {@link PluginSettingsUpdateAction()})
@@ -1794,10 +1797,10 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called as action just before updating the {@link Plugin::UserSettings plugin's user settings}.
+	 * Event handler: Called as action just before updating the {@link Plugin::$UserSettings plugin's user settings}.
 	 *
 	 * The "regular" settings from {@link GetDefaultUserSettings()} have been set into
-	 * {@link Plugin::UserSettings}, but get saved into DB after this method has been called.
+	 * {@link Plugin::$UserSettings}, but get saved into DB after this method has been called.
 	 *
 	 * Use this to catch custom input fields from {@link PluginUserSettingsEditDisplayAfter()} or
 	 * add notes/errors through {@link Plugin::msg()}.
@@ -1815,7 +1818,7 @@ class Plugin
 
 	/**
 	 * Event handler: Called as action before displaying the "Edit user" form,
-	 * which includes the display of the {@link Plugin::UserSettings plugin's user settings}.
+	 * which includes the display of the {@link Plugin::$UserSettings plugin's user settings}.
 	 *
 	 * You may want to use this to check existing settings or display notes about
 	 * something.
@@ -1829,7 +1832,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called after the form to edit the {@link Plugin::UserSettings} has been
+	 * Event handler: Called after the form to edit the {@link Plugin::$UserSettings} has been
 	 * displayed.
 	 *
 	 * Use this to add custom input fields (and catch them in {@link PluginUserSettingsUpdateAction()})
@@ -1866,7 +1869,7 @@ class Plugin
 	 *                {@link $current_User current User} is set and the
 	 *                user is therefor registered.
 	 *
-	 * Use this for example to re-act on specific {@link Plugin::UserSettings user settings},
+	 * Use this for example to re-act on specific {@link Plugin::$UserSettings user settings},
 	 * e.g., call {@link Plugin::forget_events()} to de-activate the plugin for
 	 * the current request.
 	 *
@@ -2721,7 +2724,7 @@ class Plugin
 	/**
 	 * Get the plugin's external help/website URL.
 	 *
-	 * If {@link Plugin::help_url} is empty, it defaults to the manual wiki.
+	 * If {@link Plugin::$help_url} is empty, it defaults to the manual wiki.
 	 *
 	 * @return string
 	 */
@@ -2818,7 +2821,7 @@ class Plugin
 	{
 		global $inc_path;
 		require_once $inc_path.'/_misc/_class4.funcs.php';
-		$admin_Plugins = & get_Cache('Plugins_admin'); // we need Plugins_admin here, because Plugin::BeforeEnable may use $Settings
+		$admin_Plugins = & get_Cache('Plugins_admin'); // we need Plugins_admin here, because Plugin::$BeforeEnable may use $Settings
 
 		switch( $nm )
 		{
@@ -2851,6 +2854,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.159  2007/06/19 22:53:25  blueyed
+ * todos/doc fixes
+ *
  * Revision 1.158  2007/06/19 00:03:26  fplanque
  * doc / trying to make sense of automatic settings forms generation.
  *
