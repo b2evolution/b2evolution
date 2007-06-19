@@ -119,12 +119,12 @@ class test_plugin extends Plugin
 			),
 			'blog' => array(
 				'label' => 'A blog',
-				'type' => 'select_blog',
+				'type' => 'select_blog',  // TODO: does not scale with 500 blogs
 				'allow_none' => true,
 			),
 			'blogs' => array(
 				'label' => 'A set of blogs',
-				'type' => 'select_blog',
+				'type' => 'select_blog',	// TODO: BROKEN + does not scale with 500 blogs
 				'multiple' => true,
 				'allow_none' => true,
 			),
@@ -135,7 +135,7 @@ class test_plugin extends Plugin
 				'entries' => array(
 					'user' => array(
 						'label' => 'A user',
-						'type' => 'select_user',
+						'type' => 'select_user',		// TODO: does not scale with 500 users
 						'allow_none' => true,
 					),
 				),
@@ -715,6 +715,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.68  2007/06/19 00:03:26  fplanque
+ * doc / trying to make sense of automatic settings forms generation.
+ *
  * Revision 1.67  2007/06/16 20:28:04  blueyed
  * Added more info in DisplayLoginFormFieldset event
  *

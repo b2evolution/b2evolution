@@ -173,6 +173,87 @@ class ComponentWidget extends DataObject
 	}
 
 
+  /**
+   * Get definitions for editable params
+   *
+   * EXPERIMENTAL
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		// Demo data:
+		$r = array(
+			'click_me' => array(
+				'label' => 'Click me!',
+				'defaultvalue' => '1',
+				'type' => 'checkbox',
+			),
+			'input_me' => array(
+				'label' => 'How are you?',
+				'defaultvalue' => '',
+				'note' => 'Welcome to b2evolution',
+			),
+			'my_select' => array(
+				'label' => 'Selector',
+				'defaultvalue' => 'one',
+				'type' => 'select',
+				'options' => array( 'sun' => 'Sunday', 'mon' => 'Monday' ),
+			),
+			'a_disabled_one' => array(
+				'label' => 'This one is disabled',
+				'type' => 'checkbox',
+				'defaultvalue' => '1',
+				'disabled' => true, // this can be useful if you detect that something cannot be changed. You probably want to add a 'note' then, too.
+			),
+			'blog' => array(
+				'label' => 'A blog',
+				'type' => 'select_blog',  // TODO: does not scale with 500 blogs
+				'allow_none' => true,
+			),
+			/*
+			'sets' => array(
+				'type' => 'array',
+				'min_count' => 0,
+				'max_count' => 3,
+				'entries' => array(
+					'user' => array(
+						'label' => 'A user',
+						'type' => 'select_user',		// TODO: does not scale with 500 users
+						'allow_none' => true,
+					),
+				),
+			),
+			*/
+			'maxlen' => array(
+				'label' => 'Max',
+				'type' => 'textarea',
+				'maxlength' => 10,
+				'note' => 'Maximum length is 10 here.',
+			),
+		);
+
+		return $r;
+
+	}
+
+  /**
+	 * just a stub for now
+	 */
+	function get_param( $parname )
+	{
+		$params = $this->get_param_definitions( NULL );
+
+		if( isset( $params[$parname]['defaultvalue'] ) )
+		{	// we ahve a default value:
+			return $params[$parname]['defaultvalue'] ;
+		}
+
+		return NULL;
+	}
+
+
 	function init_display( $params )
 	{
 		// Customize params to the current widget:
@@ -394,6 +475,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/19 00:03:26  fplanque
+ * doc / trying to make sense of automatic settings forms generation.
+ *
  * Revision 1.1  2007/06/18 21:25:47  fplanque
  * one class per core widget
  *

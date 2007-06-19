@@ -37,19 +37,22 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Recursive helper function to display a field of the plugin's settings (by manipulating a Form).
  *
+ *
  * This gets used for PluginSettings ("Edit plugin") and PluginUserSettings ("Edit user settings").
  *
  * @todo dh> Allow to move setting sets up and down (order). Control goes into /inc/CONTROL/settings/plugins.php.
+ * @todo NOTE: fp> I'm using this outside of Plugins; I'm not sure about proper factorization yet.
+ *       This should probably be an extension of the Form class. Sth like "AutoForm" ;)
  *
  * @param string Settings path, e.g. 'locales[0]' or 'setting'
  * @param array Meta data for this setting.
- * @param Plugin (by reference)
  * @param Form (by reference)
  * @param string Settings type ('Settings' or 'UserSettings')
+ * @param Plugin|Widget
  * @param mixed Target (User object for 'UserSettings')
  * @param mixed Value to really use (used for recursion into array type settings)
  */
-function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Form, $set_type, $set_target = NULL, $use_value = NULL )
+function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Form, $set_type, $Obj, $set_target = NULL, $use_value = NULL )
 {
 	global $debug;
 	global $htsrv_url;
@@ -118,7 +121,7 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 		{
 			$help_target = $set_meta['help'];
 		}
-		$help_icon = $Plugin->get_help_link( $help_target );
+		$help_icon = $Obj->get_help_link( $help_target );
 	}
 
 	$set_label = isset($set_meta['label']) ? $set_meta['label'] : '';
@@ -173,48 +176,49 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 	{
 		$set_value = $use_value;
 	}
-	/*
-	// dh> Removed, because it causes problems on the "restore_defaults" action in /CONTROL/settings/plugins.php:
-	//     The old values get displayed again.
-	//     If it does not cause problems somewhere else, remove it. 2007-03-08.
-	elseif( ( $set_value = param('edit_plugin_'.$Plugin->ID.'_set_'.$set_name) ) !== NULL )
-	{ // use value provided with Request!
-		if( $set_meta['type'] == 'array' )
-		{
-			handle_array_keys_in_plugin_settings($set_value);
-		}
-	}
-	*/
 	else
 	{
-		if( $set_type == 'UserSettings' )
-		{ // NOTE: this assumes we come here only on recursion or with $use_value set..!
-			$set_value = $Plugin->UserSettings->get( $set_name, $set_target->ID );
-			$error_value = $Plugin->PluginUserSettingsValidateSet( $tmp_params = array(
-				'name' => $set_name,
-				'value' => & $set_value,
-				'meta' => $set_meta,
-				'User' => $set_target,
-				'action' => 'display' ) );
-		}
-		else
-		{ // NOTE: this assumes we come here only on recursion or with $use_value set..!
-			$set_value = $Plugin->$set_type->get( $set_name );
-			$error_value = $Plugin->PluginSettingsValidateSet( $tmp_params = array(
-				'name' => $set_name,
-				'value' => & $set_value,
-				'meta' => $set_meta,
-				'action' => 'display' ) );
+		switch( $set_type )
+		{
+			case 'Widget':
+				$set_value = $Obj->get_param( $set_name );
+				$error_value = NULL;
+				break;
+
+			case 'UserSettings':
+				// NOTE: this assumes we come here only on recursion or with $use_value set..!
+				$set_value = $Obj->UserSettings->get( $set_name, $set_target->ID );
+				$error_value = $Obj->PluginUserSettingsValidateSet( $tmp_params = array(
+					'name' => $set_name,
+					'value' => & $set_value,
+					'meta' => $set_meta,
+					'User' => $set_target,
+					'action' => 'display' ) );
+				break;
+
+			case 'Settings':
+				// NOTE: this assumes we come here only on recursion or with $use_value set..!
+				$set_value = $Obj->Settings->get( $set_name );
+				$error_value = $Obj->PluginSettingsValidateSet( $tmp_params = array(
+					'name' => $set_name,
+					'value' => & $set_value,
+					'meta' => $set_meta,
+					'action' => 'display' ) );
+				break;
+
+			default:
+				debug_die( "unhandled set_type $set_type" );
+				break;
 		}
 
 		if( $error_value )
 		{ // add error
-			param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, NULL, $error_value ); // only add the error to the field
+			param_error( 'edit_plugin_'.$Obj->ID.'_set_'.$set_name, NULL, $error_value ); // only add the error to the field
 		}
 	}
 
 	// Display input element:
-	$input_name = 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name;
+	$input_name = 'edit_plugin_'.$Obj->ID.'_set_'.$set_name;
 	if( substr($set_meta['type'], 0, 6) == 'select' && ! empty($set_meta['multiple']) )
 	{ // a "multiple" select:
 		$input_name .= '[]';
@@ -294,7 +298,7 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 						$fieldset_icons[] = action_icon(
 								T_('Delete set!'),
 								'delete',
-								regenerate_url( 'action', array('action=del_settings_set&amp;set_path='.$set_name.'['.$k.']'.( $set_type == 'UserSettings' ? '&amp;user_ID='.$user_ID : '' ), 'plugin_ID='.$Plugin->ID) ),
+								regenerate_url( 'action', array('action=del_settings_set&amp;set_path='.$set_name.'['.$k.']'.( $set_type == 'UserSettings' ? '&amp;user_ID='.$user_ID : '' ), 'plugin_ID='.$Obj->ID) ),
 								'',
 								5, 0, /* icon/text prio */
 								// attach onclick event to remove the whole fieldset (AJAX):
@@ -303,7 +307,7 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 										var oThis = this;
 										\$.get('{$htsrv_url}async.php', {
 												action: 'del_plugin_sett_set',
-												plugin_ID: '{$Plugin->ID}',
+												plugin_ID: '{$Obj->ID}',
 												user_ID: '$user_ID',
 												set_type: '$set_type',
 												set_path: '{$set_name}[$k]'
@@ -330,13 +334,15 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 						{
 							$l_value = $k;
 						}
-						display_plugin_settings_fieldset_field( $set_name.'['.$k_nb.'][__key__]', $set_meta['key'], $Plugin, $Form, $set_type, $set_target, $l_value );
+						// RECURSE:
+						display_plugin_settings_fieldset_field( $set_name.'['.$k_nb.'][__key__]', $set_meta['key'], $Form, $set_type, $Obj, $set_target, $l_value );
 					}
 
 					foreach( $set_meta['entries'] as $l_set_name => $l_set_entry )
 					{
 						$l_value = isset($set_value[$k][$l_set_name]) ? $set_value[$k][$l_set_name] : NULL;
-						display_plugin_settings_fieldset_field( $set_name.'['.$k_nb.']['.$l_set_name.']', $l_set_entry, $Plugin, $Form, $set_type, $set_target, $l_value );
+						// RECURSE:
+						display_plugin_settings_fieldset_field( $set_name.'['.$k_nb.']['.$l_set_name.']', $l_set_entry, $Form, $set_type, $Obj, $set_target, $l_value );
 					}
 					$Form->end_fieldset();
 					$k_nb++;
@@ -352,14 +358,14 @@ function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Plugin
 				echo action_icon(
 					sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label),
 					'new',
-					regenerate_url( 'action', array('action=add_settings_set', 'set_path='.$set_path.( $set_type == 'UserSettings' ? '&amp;user_ID='.get_param('user_ID') : '' ), 'plugin_ID='.$Plugin->ID) ),
+					regenerate_url( 'action', array('action=add_settings_set', 'set_path='.$set_path.( $set_type == 'UserSettings' ? '&amp;user_ID='.get_param('user_ID') : '' ), 'plugin_ID='.$Obj->ID) ),
 					T_('New set'),
 					5, 1, /* icon/text prio */
 					array('onclick'=> "
 						var oThis = this;
 						\$.get('{$htsrv_url}async.php', {
 								action: 'add_plugin_sett_set',
-								plugin_ID: '{$Plugin->ID}',
+								plugin_ID: '{$Obj->ID}',
 								set_type: '$set_type',
 								set_path: '$set_path'
 							},
@@ -976,6 +982,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.46  2007/06/19 00:03:26  fplanque
+ * doc / trying to make sense of automatic settings forms generation.
+ *
  * Revision 1.45  2007/04/26 00:11:08  fplanque
  * (c) 2007
  *

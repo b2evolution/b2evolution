@@ -46,20 +46,12 @@ global $admin_Plugins;
 global $edited_plugin_name, $edited_plugin_shortdesc, $edited_plugin_priority, $edited_plugin_code, $edited_plugin_apply_rendering;
 global $admin_url;
 
-global $inc_path;
-require_once $inc_path.'_misc/_plugin.funcs.php';
+load_funcs( '_misc/_plugin.funcs.php' );
 
 
 $Form = & new Form( NULL, 'pluginsettings_checkchanges' );
 $Form->hidden_ctrl();
 
-
-// Help icon, if available:
-if( $edit_Plugin->get_help_file() )
-{ // README in JS popup:
-	$Form->global_icon( T_('Local documentation of the plugin'), 'help',
-		url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_class='.$edit_Plugin->classname.'#'.$edit_Plugin->classname.'_settings' ), '', array('use_js_popup'=>true, 'id'=>'anchor_help_popup_'.$edit_Plugin->ID) );
-}
 
 // Info button:
 $Form->global_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_class', 'action=info&amp;plugin_class='.$edit_Plugin->classname ) );
@@ -73,6 +65,8 @@ $Form->begin_form( 'fform', '',
 
 $Form->hidden( 'plugin_ID', $edit_Plugin->ID );
 
+
+// --------------------------- INFO ---------------------------
 $Form->begin_fieldset( T_('Plugin info'), array( 'class' => 'clear' ) );
 	// Name:
 	$Form->text_input( 'edited_plugin_name', $edited_plugin_name, 25, T_('Name'), '', array('maxlength' => 255) );
@@ -81,44 +75,42 @@ $Form->begin_fieldset( T_('Plugin info'), array( 'class' => 'clear' ) );
 	// Links to external manual (dh> has been removed from form's global_icons before by fp, but is very useful IMHO):
 	if( $edit_Plugin->get_help_link('$help_url') )
 	{
-		$Form->info( T_('Manual'), trim( $edit_Plugin->get_help_link('$help_url') ) );
+		$Form->info( T_('Help'), $edit_Plugin->get_help_link('$help_url').' '.$edit_Plugin->get_help_link('$readme') );
 	}
 $Form->end_fieldset();
 
-// PluginSettings
+
+// --------------------------- SETTINGS ---------------------------
 if( $edit_Plugin->Settings ) // NOTE: this triggers PHP5 autoloading through Plugin::__get() and therefor the 'isset($this->Settings)' hack in Plugin::GetDefaultSettings() still works, which is good.
 {
 	global $inc_path;
 	require_once $inc_path.'_misc/_plugin.funcs.php';
 
-	// We use output buffers here to display the fieldset only, if there's content in there (either from PluginSettings or PluginSettingsEditDisplayAfter).
-	ob_start();
-	$Form->begin_fieldset( T_('Plugin settings'), array( 'class' => 'clear' ) );
-
+	// We use output buffers here to only display the fieldset if there's content in there
+	// (either from PluginSettings or PluginSettingsEditDisplayAfter).
 	ob_start();
 	foreach( $edit_Plugin->GetDefaultSettings( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
 	{
-		display_plugin_settings_fieldset_field( $l_name, $l_meta, $edit_Plugin, $Form, 'Settings' );
+		// Display form field for this setting:
+		display_plugin_settings_fieldset_field( $l_name, $l_meta, $Form, 'Settings', $edit_Plugin );
 	}
 
+	// This can be used add custom input fields or display custom output (e.g. a test link):
 	$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditDisplayAfter', $tmp_params = array( 'Form' => & $Form ) );
 
-	$has_contents = strlen( ob_get_contents() );
-	$Form->end_fieldset();
+	$setting_contents = ob_get_contents();
+	ob_end_clean();
 
-	if( $has_contents )
+	if( $setting_contents )
 	{
-		ob_end_flush();
-		ob_end_flush();
-	}
-	else
-	{ // No content, discard output buffers:
-		ob_end_clean();
-		ob_end_clean();
+		$Form->begin_fieldset( T_('Plugin settings'), array( 'class' => 'clear' ) );
+		echo $setting_contents;
+		$Form->end_fieldset();
 	}
 }
 
-// Plugin variables
+
+// --------------------------- VARIABLES ---------------------------
 $Form->begin_fieldset( T_('Plugin variables').' ('.T_('Advanced').')', array( 'class' => 'clear' ) );
 $Form->text_input( 'edited_plugin_code', $edited_plugin_code, 15, T_('Code'), T_('The code to call the plugin by code. This is also used to link renderer plugins to items.'), array('maxlength'=>32) );
 $Form->text_input( 'edited_plugin_priority', $edited_plugin_priority, 4, T_('Priority'), '', array( 'maxlength' => 4 ) );
@@ -132,7 +124,7 @@ $Form->select_input_array( 'edited_plugin_apply_rendering', $edited_plugin_apply
 $Form->end_fieldset();
 
 
-// (De-)Activate Events (Advanced)
+// --------------------------- EVENTS ---------------------------
 $Form->begin_fieldset( T_('Plugin events').' ('.T_('Advanced')
 	.') <img src="'.get_icon('expand', 'url').'" id="clickimg_pluginevents" />', array('legend_params' => array( 'onclick' => 'toggle_clickopen(\'pluginevents\')') ) );
 	?>
@@ -196,6 +188,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.35  2007/06/19 00:03:26  fplanque
+ * doc / trying to make sense of automatic settings forms generation.
+ *
  * Revision 1.34  2007/04/26 00:11:12  fplanque
  * (c) 2007
  *

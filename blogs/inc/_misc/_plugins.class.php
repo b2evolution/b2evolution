@@ -661,9 +661,10 @@ class Plugins
 
 
 	/**
-	 * Instantiate Settings member of class {@link PluginSettings} for the given
-	 * plugin, if it provides default settings (through {@link Plugin::GetDefaultSettings()}
-	 * and {@link Plugin::GetDefaultUserSettings()}).
+	 * Instantiate Settings object (class {@link PluginSettings}) for the given plugin.
+	 *
+	 * The plugin must provide setting definitions (through {@link Plugin::GetDefaultSettings()}
+	 * OR {@link Plugin::GetDefaultUserSettings()}).
 	 *
 	 * @param Plugin
 	 * @param string settings type: "Settings" or "UserSettings"
@@ -679,17 +680,19 @@ class Plugins
 		$defaults = $this->call_method( $Plugin->ID, 'GetDefault'.$set_type, $params = array('for_editing'=>false) );
 
 		if( empty($defaults) )
-		{
+		{	// No settings, no need to instantiate.
 			$Timer->pause( 'plugins_inst_'.$set_type );
 			return NULL;
 		}
 
 		if( ! is_array($defaults) )
-		{
+		{	// invalid data
 			$Debuglog->add( $Plugin->classname.'::GetDefault'.$set_type.'() did not return array!', array('plugins', 'error') );
+			return NULL; // fp> correct me if I'm wrong.
 		}
-		elseif( $set_type == 'UserSettings' )
-		{
+
+		if( $set_type == 'UserSettings' )
+		{	// User specific settings:
 			require_once $model_path.'settings/_pluginusersettings.class.php';
 
 			$Plugin->UserSettings = new PluginUserSettings( $Plugin->ID );
@@ -697,7 +700,7 @@ class Plugins
 			$set_Obj = & $Plugin->UserSettings;
 		}
 		else
-		{
+		{	// Global settings:
 			require_once $model_path.'settings/_pluginsettings.class.php';
 
 			$Plugin->Settings = new PluginSettings( $Plugin->ID );
@@ -705,6 +708,7 @@ class Plugins
 			$set_Obj = & $Plugin->Settings;
 		}
 
+		// Register default values:
 		foreach( $defaults as $l_name => $l_meta )
 		{
 			if( isset($l_meta['layout']) )
@@ -1805,6 +1809,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.154  2007/06/19 00:03:26  fplanque
+ * doc / trying to make sense of automatic settings forms generation.
+ *
  * Revision 1.153  2007/05/26 19:01:29  blueyed
  * Use has_event() in call_method_if_active()
  *

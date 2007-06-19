@@ -59,7 +59,8 @@ if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 //     output only a small part of what the "real controller" does..
 switch( $action )
 {
-	case 'add_plugin_sett_set': // Add a Plugin(User)Settings set (for "array" type settings):
+	case 'add_plugin_sett_set':
+		// Add a Plugin(User)Settings set (for "array" type settings):
 		header('Content-type: text/html; charset='.$io_charset);
 
 		param( 'plugin_ID', 'integer', true );
@@ -71,7 +72,7 @@ switch( $action )
 			bad_request_die('Invalid Plugin.');
 		}
 		param( 'set_type', 'string', '' ); // "Settings" or "UserSettings"
-		if( $set_type != 'Settings' && $set_type != 'UserSettings' )
+		if( $set_type != 'Settings' /* && $set_type != 'UserSettings' */ )
 		{
 			bad_request_die('Invalid set_type param!');
 		}
@@ -85,7 +86,7 @@ switch( $action )
 		$r = get_plugin_settings_node_by_path( $Plugin, $set_type, $set_path, /* create: */ false );
 
 		$Form = new Form(); // fake Form
-		display_plugin_settings_fieldset_field( $set_path, $r['set_meta'], $Plugin, $Form, $set_type = 'Settings', $set_target = NULL, $r['set_node'] );
+		display_plugin_settings_fieldset_field( $set_path, $r['set_meta'], $Form, $set_type, $Plugin, NULL, $r['set_node'] );
 		exit;
 
 	case 'del_plugin_sett_set':
@@ -114,6 +115,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.22  2007/06/19 00:03:27  fplanque
+ * doc / trying to make sense of automatic settings forms generation.
+ *
  * Revision 1.21  2007/04/26 00:11:14  fplanque
  * (c) 2007
  *

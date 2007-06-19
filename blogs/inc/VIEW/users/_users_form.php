@@ -279,7 +279,8 @@ if( $action != 'view_user' )
 		{
 			foreach( $plugin_user_settings as $l_name => $l_meta )
 			{
-				display_plugin_settings_fieldset_field( $l_name, $l_meta, $loop_Plugin, $Form, 'UserSettings', $edited_User );
+				// Display form field for this setting:
+				display_plugin_settings_fieldset_field( $l_name, $l_meta, $Form, 'UserSettings', $loop_Plugin, $edited_User );
 			}
 		}
 
@@ -386,6 +387,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.52  2007/06/19 00:03:26  fplanque
+ * doc / trying to make sense of automatic settings forms generation.
+ *
  * Revision 1.51  2007/05/27 20:04:41  fplanque
  * wording
  *

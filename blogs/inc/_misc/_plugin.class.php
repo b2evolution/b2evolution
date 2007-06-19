@@ -361,19 +361,23 @@ class Plugin
 	// Plugin information (settings, DB layout, ..): {{{
 
 	/**
-	 * Define here default settings that are then available in the backoffice.
+	 * Define default settings here.
+	 * Those can then be edited in the backoffice.
 	 *
 	 * You can access them in the plugin through the member object
 	 * {@link Plugin::Settings}, e.g.:
 	 * <code>$this->Settings->get( 'my_param' );</code>
 	 *
-	 * You probably don't need to set or change values (other than the
+	 * fp> this is unclear: You probably don't need to set or change values (other than the
 	 * defaultvalues), but if you know what you're doing, see
 	 * {@link PluginSettings}, where {@link Plugin::Settings} gets derived from.
 	 *
 	 * NOTE: this method gets called by b2evo when instantiating the plugin
 	 *       settings and when the settings get displayed for editing in the backoffice.
 	 *       In the second case, $params['for_editing'] will be true.
+	 *
+	 * @todo 3.0 fp> 1) This is not an event: RENAME to lowercase (in b2evo 3.0)
+	 * @todo 3.0 fp> 2) This defines more than Default values ::  confusing name
 	 *
 	 * @param array Associative array of parameters (since 1.9).
 	 *    'for_editing': true, if the settings get queried for editing;
@@ -410,6 +414,7 @@ class Plugin
 	 *       </li><li>
 	 *       'cols': number of columns
 	 *       </li></ul>
+	 *     </li><li>
 	 *     'html_textarea': like textarea, but allows html
 	 *     </li><li>
 	 *     'select': a drop down field; you must set 'options' for it:
@@ -418,11 +423,12 @@ class Plugin
 	 *       </li></ul>
 	 *     </li><li>
 	 *     'select_blog': a drop down field, providing all existing blogs (Blog ID is the value or "" if "allow_none" is true)
-	 *                    (since b2evo EVO_NEXT_VERSION)
+	 *                    (WARNING: does not scale - not recommended)
 	 *     </li><li>
 	 *     'select_group': a drop down field, providing all existing groups (Group ID is the value or "" if "allow_none" is true)
 	 *     </li><li>
 	 *     'select_user': a drop down field, providing all existing groups (User ID is the value or "" if "allow_none" is true)
+	 *                    (WARNING: does not scale - not recommended)
 	 *     </li><li>
 	 *     'array': a subset of settings. The value gets automagically (un)serialized through get() and set().
 	 *       The following keys apply to this type:
@@ -432,6 +438,7 @@ class Plugin
 	 *           Note: currently there's no type forcing or checking
 	 *                 for sub-entries involved (e.g., if you have an entry of type "integer", you could get
 	 *                 a non-numeric string there).
+	 * fp> TODO: !!!! very unsafe
 	 *       </li><li>
 	 *       'key': defines the key to use for each entry. This may be a text input for example
 	 *              (with label, note etc). (optional, default is numeric keys, which are not editable)
@@ -520,8 +527,10 @@ class Plugin
 	 * <code>$this->UserSettings->get( 'my_param' );</code>
 	 *
 	 * This method behaves exactly like {@link Plugin::GetDefaultSettings()},
-	 * except that it defines settings specific for users.
+	 * except that it defines user specific settings instead of global settings.
 	 *
+	 * @todo 3.0 fp> 1) This is not an event: RENAME to lowercase (in b2evo 3.0)
+	 * @todo 3.0 fp> 2) This defines more than Default values ::  confusing name
 	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param array Associative array of parameters.
@@ -2842,6 +2851,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.158  2007/06/19 00:03:26  fplanque
+ * doc / trying to make sense of automatic settings forms generation.
+ *
  * Revision 1.157  2007/05/28 15:18:30  fplanque
  * cleanup
  *
@@ -3034,360 +3046,5 @@ class Plugin
  *
  * Revision 1.93  2006/10/01 15:11:08  blueyed
  * Added DisplayItemAs* equivs to RenderItemAs*; removed DisplayItemAllFormats; clearing of pre-rendered cache, according to plugin event changes
- *
- * Revision 1.92  2006/09/30 20:53:49  blueyed
- * Added hook RenderItemAsText, removed general RenderItem
- *
- * Revision 1.91  2006/09/12 00:46:47  fplanque
- * no message
- *
- * Revision 1.90  2006/09/11 22:23:04  blueyed
- * (Re-)enabled AdminDisplayEditorButton for "simple" edit_layout, after adding appropriate doc.
- *
- * Revision 1.89  2006/09/10 19:23:28  blueyed
- * Removed Plugin::code(), ::name(), ::short_desc() and ::long_desc(); Fixes for mt-import.php
- *
- * Revision 1.88  2006/08/31 22:56:12  blueyed
- * Fixed Plugin::get_plugin_url()
- *
- * Revision 1.87  2006/08/30 17:45:28  blueyed
- * Fixed "$help_url"/www Plugin help popups (use target _blank instead); Added "$help_url"/www help Plugin to plugin settings (linking to #Settings)
- *
- * Revision 1.86  2006/08/28 20:16:29  blueyed
- * Added GetCronJobs/ExecCronJob Plugin hooks.
- *
- * Revision 1.85  2006/08/20 19:07:08  blueyed
- * doc fix
- *
- * Revision 1.84  2006/08/19 10:57:40  blueyed
- * doc fixes.
- *
- * Revision 1.83  2006/08/16 19:40:07  blueyed
- * Made get_htsrv_url() also https-aware, fixes the youtube plugin.
- *
- * Revision 1.82  2006/07/31 20:11:28  blueyed
- * Karma: check for "numeric" instead of "integer" return values.
- *
- * Revision 1.81  2006/07/31 16:38:23  blueyed
- * doc
- *
- * Revision 1.80  2006/07/31 15:41:37  yabs
- * Modified 'allow_html' to html_input/html_textarea
- *
- * Revision 1.79  2006/07/31 06:58:47  yabs
- * Added info line to GetDefaultSettings() for : allow_html
- *
- * Revision 1.78  2006/07/26 20:48:33  blueyed
- * Added Plugin event "Logout"
- *
- * Revision 1.77  2006/07/23 20:18:31  fplanque
- * cleanup
- *
- * Revision 1.76  2006/07/17 01:19:25  blueyed
- * Added events: AfterUserInsert, AfterUserUpdate, AfterUserDelete
- *
- * Revision 1.75  2006/07/15 19:53:33  blueyed
- * Re-added get_README_link() for backwards compatibility.
- *
- * Revision 1.74  2006/07/10 22:53:38  blueyed
- * Grouping of plugins added, based on a patch from balupton
- *
- * Revision 1.73  2006/07/10 21:05:40  blueyed
- * Enhanced Plugin::T_():
- * Now also uses a global _global.php file, which may hold all translations in one file.
- *
- * Revision 1.72  2006/07/10 20:19:30  blueyed
- * Fixed PluginInit behaviour. It now gets called on both installed and non-installed Plugins, but with the "is_installed" param appropriately set.
- *
- * Revision 1.71  2006/07/10 18:53:04  blueyed
- * Fixed method def; added doc
- *
- * Revision 1.70  2006/07/07 21:26:04  blueyed
- * Should have tested it.. ;/
- *
- * Revision 1.69  2006/07/07 21:21:16  blueyed
- * Handle deprecated stuff.
- *
- * Revision 1.68  2006/07/06 21:38:45  blueyed
- * Deprecated plugin constructor. Renamed AppendPluginRegister() to PluginInit().
- *
- * Revision 1.67  2006/07/04 17:32:30  fplanque
- * no message
- *
- * Revision 1.66  2006/06/30 22:58:13  blueyed
- * Abstracted charset conversation, not much tested.
- *
- * Revision 1.65  2006/06/25 23:43:34  blueyed
- * doc
- *
- * Revision 1.64  2006/06/19 20:59:14  blueyed
- * minor
- *
- * Revision 1.63  2006/06/10 19:16:17  blueyed
- * DisplayTrackbackAddr event
- *
- * Revision 1.62  2006/06/06 20:35:50  blueyed
- * Plugins can define extra events that they trigger themselves.
- *
- * Revision 1.61  2006/06/05 23:15:00  blueyed
- * cleaned up plugin help links
- *
- * Revision 1.60  2006/06/05 18:02:59  blueyed
- * doc
- *
- * Revision 1.59  2006/06/05 17:44:38  blueyed
- * doc
- *
- * Revision 1.58  2006/06/05 15:48:52  blueyed
- * Fix
- *
- * Revision 1.57  2006/06/05 15:38:29  blueyed
- * Fix
- *
- * Revision 1.56  2006/06/05 15:00:29  blueyed
- * Fix get_plugin_url to use https if ReqHost uses https.
- *
- * Revision 1.55  2006/06/05 14:34:31  blueyed
- * Added get_plugin_url()
- *
- * Revision 1.54  2006/06/05 14:26:42  blueyed
- * doc
- *
- * Revision 1.53  2006/05/30 23:08:59  blueyed
- * doc
- *
- * Revision 1.52  2006/05/30 19:39:55  fplanque
- * plugin cleanup
- *
- * Revision 1.51  2006/05/24 20:43:19  blueyed
- * Pass "Item" as param to Render* event methods.
- *
- * Revision 1.50  2006/05/22 20:35:37  blueyed
- * Passthrough some attribute of plugin settings, allowing to use JS handlers. Also fixed submitting of disabled form elements.
- *
- * Revision 1.49  2006/05/20 01:56:07  blueyed
- * ItemCanComment hook; "disable anonymous feedback" through basic antispam plugin
- *
- * Revision 1.48  2006/05/17 23:35:42  blueyed
- * cleanup
- *
- * Revision 1.47  2006/05/15 22:26:48  blueyed
- * Event hooks for skin plugins.
- *
- * Revision 1.46  2006/05/13 15:46:40  blueyed
- * doc fix
- *
- * Revision 1.45  2006/05/12 21:53:38  blueyed
- * Fixes, cleanup, translation for plugins
- *
- * Revision 1.44  2006/05/05 19:36:23  blueyed
- * New events
- *
- * Revision 1.43  2006/05/04 10:18:41  blueyed
- * Added Session property to skip page content caching event.
- *
- * Revision 1.42  2006/05/02 23:35:22  blueyed
- * Extended karma collecting event(s)
- *
- * Revision 1.41  2006/05/02 04:36:25  blueyed
- * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
- *
- * Revision 1.40  2006/05/02 01:47:58  blueyed
- * Normalization
- *
- * Revision 1.39  2006/05/02 01:27:55  blueyed
- * Moved nofollow handling to basic antispam plugin; added Filter events to Comment class
- *
- * Revision 1.38  2006/05/01 04:25:05  blueyed
- * Normalization
- *
- * Revision 1.37  2006/04/29 01:04:23  blueyed
- * *** empty log message ***
- *
- * Revision 1.36  2006/04/27 20:07:19  blueyed
- * Renamed Plugin::get_htsrv_methods() to GetHtsrvMethods() (normalization)
- *
- * Revision 1.35  2006/04/27 19:44:33  blueyed
- * A plugin can disable events (e.g. after install)
- *
- * Revision 1.34  2006/04/27 19:11:12  blueyed
- * Cleanup; handle broken plugins more decent
- *
- * Revision 1.33  2006/04/22 02:36:38  blueyed
- * Validate users on registration through email link (+cleanup around it)
- *
- * Revision 1.32  2006/04/20 22:24:08  blueyed
- * plugin hooks cleanup
- *
- * Revision 1.31  2006/04/19 20:14:03  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.29  2006/04/19 18:14:12  blueyed
- * Added "no_edit" param to GetDefault(User)Settings
- *
- * Revision 1.28  2006/04/18 21:09:20  blueyed
- * Added hooks to manipulate Items before insert/update/preview; fixes; cleanup
- *
- * Revision 1.27  2006/04/18 17:06:14  blueyed
- * Added "disabled" to plugin (user) settings (Thanks to balupton)
- *
- * Revision 1.26  2006/04/13 01:36:27  blueyed
- * Added interface method to edit Plugin settings (gets already used by YouTube Plugin)
- *
- * Revision 1.25  2006/04/13 01:23:19  blueyed
- * Moved help related functions back to Plugin class
- *
- * Revision 1.24  2006/04/11 22:09:08  blueyed
- * Fixed validation of negative integers (and also allowed "+" at the beginning)
- *
- * Revision 1.23  2006/04/05 19:16:35  blueyed
- * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
- *
- * Revision 1.22  2006/04/04 22:56:12  blueyed
- * Simplified/refactored uninstalling/registering of a plugin (especially the hooking process)
- *
- * Revision 1.21  2006/03/28 22:24:46  blueyed
- * Fixed logical spam karma issues
- *
- * Revision 1.20  2006/03/21 23:17:17  blueyed
- * doc/cleanup
- *
- * Revision 1.19  2006/03/19 22:38:29  blueyed
- * added get_class_id()
- *
- * Revision 1.18  2006/03/19 19:02:51  blueyed
- * New events for captcha plugins
- *
- * Revision 1.17  2006/03/18 19:39:19  blueyed
- * Fixes for pluginsettings; added "valid_range"
- *
- * Revision 1.16  2006/03/15 23:30:20  blueyed
- * Use plugin classname in SQL table name.
- *
- * Revision 1.15  2006/03/15 21:04:36  blueyed
- * Call Plugin::BeforeEnable also on configuration changes and disable the plugin, if it does not say "ok"
- *
- * Revision 1.14  2006/03/12 23:09:01  fplanque
- * doc cleanup
- *
- * Revision 1.13  2006/03/11 15:49:48  blueyed
- * Allow a plugin to not update his settings at all.
- *
- * Revision 1.12  2006/03/11 01:59:00  blueyed
- * Added Plugin::forget_events()
- *
- * Revision 1.11  2006/03/06 22:42:20  blueyed
- * doc fixes
- *
- * Revision 1.10  2006/03/06 22:07:32  blueyed
- * doc, organized events into subsections
- *
- * Revision 1.9  2006/03/06 20:03:40  fplanque
- * comments
- *
- * Revision 1.8  2006/03/03 20:10:21  blueyed
- * doc
- *
- * Revision 1.7  2006/03/02 22:18:24  blueyed
- * New events
- *
- * Revision 1.6  2006/03/02 19:57:52  blueyed
- * Added DisplayIpAddress() and fixed/finished DisplayItemAllFormats()
- *
- * Revision 1.5  2006/03/01 01:07:43  blueyed
- * Plugin(s) polishing
- *
- * Revision 1.4  2006/02/27 16:57:12  blueyed
- * PluginUserSettings - allows a plugin to store user related settings
- *
- * Revision 1.3  2006/02/24 22:22:57  blueyed
- * Fix URL for internal help.
- *
- * Revision 1.2  2006/02/24 22:08:59  blueyed
- * Plugin enhancements
- *
- * Revision 1.1  2006/02/23 21:12:18  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.33  2006/02/15 04:07:16  blueyed
- * minor merge
- *
- * Revision 1.32  2006/02/09 22:05:43  blueyed
- * doc fixes
- *
- * Revision 1.31  2006/02/07 11:14:21  blueyed
- * Help for Plugins improved.
- *
- * Revision 1.25  2006/01/28 21:11:16  blueyed
- * Added helpers for Session data handling.
- *
- * Revision 1.23  2006/01/28 16:59:47  blueyed
- * Removed remove_events_for_this_request() as the problem would be anyway to handle the event where it got called from.
- *
- * Revision 1.21  2006/01/26 23:47:27  blueyed
- * Added password settings type.
- *
- * Revision 1.20  2006/01/26 23:08:36  blueyed
- * Plugins enhanced.
- *
- * Revision 1.19  2006/01/23 01:12:15  blueyed
- * Added get_table_prefix() and remove_events_for_this_request(),
- *
- * Revision 1.18  2006/01/06 18:58:08  blueyed
- * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
- *
- * Revision 1.17  2006/01/06 00:27:06  blueyed
- * Small enhancements to new Plugin system
- *
- * Revision 1.16  2006/01/05 23:57:17  blueyed
- * Enhancements to msg() and debug_log()
- *
- * Revision 1.15  2006/01/04 15:03:52  fplanque
- * enhanced list sorting capabilities
- *
- * Revision 1.14  2005/12/23 19:06:35  blueyed
- * Advanced enabling/disabling of plugin events.
- *
- * Revision 1.13  2005/12/22 23:13:40  blueyed
- * Plugins' API changed and handling optimized
- *
- * Revision 1.12  2005/12/12 19:21:23  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.11  2005/11/25 00:28:04  blueyed
- * doc
- *
- * Revision 1.10  2005/09/06 17:13:55  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.9  2005/06/22 14:46:31  blueyed
- * help_link(): "renderer" => "plugin"
- *
- * Revision 1.8  2005/04/28 20:44:20  fplanque
- * normalizing, doc
- *
- * Revision 1.7  2005/03/14 20:22:20  fplanque
- * refactoring, some cacheing optimization
- *
- * Revision 1.5  2005/03/02 18:30:56  fplanque
- * tedious merging... :/
- *
- * Revision 1.4  2005/02/28 09:06:33  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.3  2005/02/22 03:00:57  blueyed
- * fixed Render() again
- *
- * Revision 1.2  2005/02/20 22:34:40  blueyed
- * doc, help_link(), don't pass $param as reference
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.9  2004/10/12 16:12:18  fplanque
- * Edited code documentation.
- *
  */
 ?>

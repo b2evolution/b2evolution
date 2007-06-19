@@ -261,7 +261,7 @@ switch( $action )
 		$AdminUI->disp_payload_begin();
 
 		// Display VIEW:
-		$AdminUI->disp_view( 'collections/_widget_list.form.php' );
+		$AdminUI->disp_view( 'collections/_widget.form.php' );
 
 
 		// End payload block:
@@ -288,6 +288,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2007/06/19 00:03:27  fplanque
+ * doc / trying to make sense of automatic settings forms generation.
+ *
  * Revision 1.10  2007/06/18 21:25:47  fplanque
  * one class per core widget
  *
