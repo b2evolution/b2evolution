@@ -47,6 +47,7 @@ param( 'action', 'string', '' );
 param( 'login', 'string', '' );
 param( 'email', 'string', '' );
 param( 'locale', 'string', $Settings->get('default_locale') );
+param( 'redirect_to', 'string', '' ); // do not default to $admin_url; "empty" gets handled better in the end (uses $blogurl, if no admin perms).
 
 locale_activate( $locale );
 
@@ -61,7 +62,6 @@ switch( $action )
 		/*
 		 * Do the registration:
 		 */
-		param( 'redirect_to', 'string', $admin_url );
 		param( 'pass1', 'string', '' );
 		param( 'pass2', 'string', '' );
 
@@ -208,13 +208,15 @@ switch( $action )
 /*
  * Default: registration form:
  */
-param( 'redirect_to', 'string', $admin_url );
 // Display reg form:
 require $view_path.'login/_reg_form.php';
 
 
 /*
  * $Log$
+ * Revision 1.85  2007/06/19 23:10:25  blueyed
+ * Better redirect_to handling/fallback
+ *
  * Revision 1.84  2007/04/26 00:11:14  fplanque
  * (c) 2007
  *
