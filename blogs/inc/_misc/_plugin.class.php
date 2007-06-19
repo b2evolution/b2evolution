@@ -2821,7 +2821,7 @@ class Plugin
 	{
 		global $inc_path;
 		require_once $inc_path.'/_misc/_class4.funcs.php';
-		$admin_Plugins = & get_Cache('Plugins_admin'); // we need Plugins_admin here, because Plugin::$BeforeEnable may use $Settings
+		$admin_Plugins = & get_Cache('Plugins_admin'); // we need Plugins_admin here, because Plugin::BeforeEnable() may use $Settings
 
 		switch( $nm )
 		{
@@ -2854,6 +2854,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.160  2007/06/19 22:54:04  blueyed
+ * doc fix
+ *
  * Revision 1.159  2007/06/19 22:53:25  blueyed
  * todos/doc fixes
  *
