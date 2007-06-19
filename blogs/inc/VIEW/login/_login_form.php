@@ -38,6 +38,7 @@ if( $Session->has_User() )
 	if( $tmp_User->validated )
 	{	// User is not validated (he may have been invalidated)
 		// dh> TODO: validate $redirect_to param!
+		//     TODO: prevent "endless loops" with $redirect_to here, too
 		$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $tmp_User->get('login') )
 			.' <a href="'.htmlspecialchars($redirect_to).'">'.T_('Continue').' &raquo;</a>', 'note' );
 	}
@@ -217,6 +218,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.45  2007/06/19 22:50:41  blueyed
+ * todo
+ *
  * Revision 1.44  2007/04/26 00:11:10  fplanque
  * (c) 2007
  *
