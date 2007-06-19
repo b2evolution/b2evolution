@@ -47,12 +47,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param string Settings path, e.g. 'locales[0]' or 'setting'
  * @param array Meta data for this setting.
  * @param Form (by reference)
- * @param string Settings type ('Settings' or 'UserSettings')
+ * @param string Settings type ('Settings' or 'UserSettings' or 'Widget')
  * @param Plugin|Widget
  * @param mixed Target (User object for 'UserSettings')
  * @param mixed Value to really use (used for recursion into array type settings)
  */
-function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Form, $set_type, $Obj, $set_target = NULL, $use_value = NULL )
+function display_plugin_settings_fieldset_field( $set_name, $set_meta, & $Form, $set_type, $Obj,
+																									$set_target = NULL, $use_value = NULL )
 {
 	global $debug;
 	global $htsrv_url;
@@ -606,14 +607,13 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
 /**
  * Set Plugin settings from params.
  *
- * This gets used when saving a user profile (PluginUserSettings) or plugin settings (PluginSettings).
+ * This handled plugin specific params when saving a user profile (PluginUserSettings) or plugin settings (PluginSettings).
  *
  * @param Plugin
- * @param Plugins An object derived from Plugins, probably either {@link $Plugins} or {@link $Plugins_admin}.
  * @param string Type of Settings (either 'Settings' or 'UserSettings').
  * @param mixed Target (User object for 'UserSettings')
  */
-function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_type, $set_target = NULL )
+function set_Settings_for_Plugin_from_Request( & $Plugin, $set_type, $set_target = NULL )
 {
 	global $Messages;
 
@@ -674,36 +674,54 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 			continue;
 		}
 
-		// Ask the plugin if it's ok (through PluginSettingsValidateSet() / PluginUserSettingsValidateSet()):
-		$tmp_params = array(
-			'name' => $l_name,
-			'value' => & $l_value,
-			'meta' => $l_meta,
-			'action' => 'set',
-			);
-		if( $set_type == 'UserSettings' )
+		// Validate form values:
+		$error_value = NULL;
+		switch( $set_type )
 		{
-			global $current_User;
-			$tmp_params['User'] = $set_target;
+			//case 'Widget':
+
+			case 'UserSettings':
+				$error_value = $Plugin->PluginUserSettingsValidateSet( $tmp_params = array(
+					'name' => $l_name,
+					'value' => & $l_value,
+					'meta' => $l_meta,
+					'User' => $set_target,
+					'action' => 'set' ) );
+				// Update the param value, because a plugin might have changed it (through reference):
+				$GLOBALS['edit_plugin_'.$Plugin->ID.'_set_'.$l_name] = $l_value;
+
+				if( empty( $error_value ) )
+				{
+					$Plugin->UserSettings->set( $l_name, $l_value, $set_target->ID );
+				}
+				break;
+
+			case 'Settings':
+				$error_value = $Plugin->PluginSettingsValidateSet( $tmp_params = array(
+					'name' => $l_name,
+					'value' => & $l_value,
+					'meta' => $l_meta,
+					'action' => 'set' ) );
+				// Update the param value, because a plugin might have changed it (through reference):
+				$GLOBALS['edit_plugin_'.$Plugin->ID.'_set_'.$l_name] = $l_value;
+
+				if( empty( $error_value ) )
+				{
+					$Plugin->Settings->set( $l_name, $l_value );
+				}
+				break;
+
+			default:
+				debug_die( "unhandled set_type $set_type" );
+				break;
 		}
-		if( $error = $use_Plugins->call_method( $Plugin->ID, 'Plugin'.$set_type.'ValidateSet', $tmp_params ) )
-		{ // skip this
-			param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $error );
+
+		if( $error_value )
+		{ // A validation error has occured, record error message:
+			param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $error_value );
 			continue;
 		}
 
-		// Update the param value, because a plugin might have changed it (through reference):
-		$GLOBALS['edit_plugin_'.$Plugin->ID.'_set_'.$l_name] = $l_value;
-
-		// Set the setting:
-		if( $set_type == 'UserSettings' )
-		{
-			$Plugin->UserSettings->set( $l_name, $l_value, $set_target->ID );
-		}
-		else
-		{
-			$Plugin->Settings->set( $l_name, $l_value );
-		}
 	}
 }
 
@@ -980,8 +998,11 @@ function handle_array_keys_in_plugin_settings( & $a )
 }
 
 
-/* {{{ Revision log:
+/*
  * $Log$
+ * Revision 1.47  2007/06/19 18:47:27  fplanque
+ * Nuked unnecessary Param (or I'm missing something badly :/)
+ *
  * Revision 1.46  2007/06/19 00:03:26  fplanque
  * doc / trying to make sense of automatic settings forms generation.
  *
@@ -1045,76 +1066,5 @@ function handle_array_keys_in_plugin_settings( & $a )
  *
  * Revision 1.26  2006/10/08 22:13:05  blueyed
  * Added "float" type to Plugin Setting types.
- *
- * Revision 1.25  2006/08/20 22:25:22  fplanque
- * param_() refactoring part 2
- *
- * Revision 1.24  2006/08/20 20:12:33  fplanque
- * param_() refactoring part 1
- *
- * Revision 1.23  2006/08/19 08:50:27  fplanque
- * moved out some more stuff from main
- *
- * Revision 1.22  2006/08/19 07:56:31  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.21  2006/08/08 10:02:26  yabs
- * added "cols" to the list of params that are passed through to $Form
- *
- * Revision 1.20  2006/08/07 09:57:51  blueyed
- * doc
- *
- * Revision 1.19  2006/07/31 15:41:37  yabs
- * Modified 'allow_html' to html_input/html_textarea
- *
- * Revision 1.18  2006/07/31 06:58:02  yabs
- * Added option to plugin settings : allow_html
- *
- * Revision 1.17  2006/05/22 20:35:37  blueyed
- * Passthrough some attribute of plugin settings, allowing to use JS handlers. Also fixed submitting of disabled form elements.
- *
- * Revision 1.16  2006/04/19 20:14:03  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.15  2006/04/19 18:14:12  blueyed
- * Added "no_edit" param to GetDefault(User)Settings
- *
- * Revision 1.14  2006/04/18 17:06:14  blueyed
- * Added "disabled" to plugin (user) settings (Thanks to balupton)
- *
- * Revision 1.13  2006/04/13 01:23:19  blueyed
- * Moved help related functions back to Plugin class
- *
- * Revision 1.12  2006/04/11 22:09:08  blueyed
- * Fixed validation of negative integers (and also allowed "+" at the beginning)
- *
- * Revision 1.11  2006/04/05 19:44:00  blueyed
- * Do not display README-link, if user has no "view-options" perms.
- *
- * Revision 1.10  2006/04/05 19:16:35  blueyed
- * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
- *
- * Revision 1.7  2006/04/04 22:12:34  blueyed
- * Fixed setting usersettings for other users
- *
- * Revision 1.6  2006/03/19 00:11:57  blueyed
- * help icon for fieldsets
- *
- * Revision 1.5  2006/03/18 19:39:19  blueyed
- * Fixes for pluginsettings; added "valid_range"
- *
- * Revision 1.4  2006/03/12 23:09:01  fplanque
- * doc cleanup
- *
- * Revision 1.3  2006/03/11 01:59:00  blueyed
- * Added Plugin::forget_events()
- *
- * Revision 1.2  2006/03/01 01:07:43  blueyed
- * Plugin(s) polishing
- *
- * Revision 1.1  2006/02/27 16:57:12  blueyed
- * PluginUserSettings - allows a plugin to store user related settings
- *
- * }}}
  */
 ?>

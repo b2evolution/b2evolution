@@ -413,7 +413,7 @@ if( !$Messages->count('error') )
 				global $inc_path;
 				require_once $inc_path.'_misc/_plugin.funcs.php';
 
-				set_Settings_for_Plugin_from_Request( $loop_Plugin, $Plugins, 'UserSettings', $edited_User );
+				set_Settings_for_Plugin_from_Request( $loop_Plugin, 'UserSettings', $edited_User );
 
 				// Let the plugin handle custom fields:
 				$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array(
@@ -814,6 +814,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.50  2007/06/19 18:47:27  fplanque
+ * Nuked unnecessary Param (or I'm missing something badly :/)
+ *
  * Revision 1.49  2007/05/26 22:21:32  blueyed
  * Made $limit for Results configurable per user
  *

@@ -122,12 +122,14 @@ function install_plugin_db_schema_action( & $Plugin )
 }
 
 
-
-
-// Actions that delegate to other actions (other than list):
+/*
+ * Action Handling part I
+ * Actions that delegate to other actions (other than list):
+ */
 switch( $action )
 {
 	case 'del_settings_set':
+		// Delete a set from an array type setting:
 		param( 'plugin_ID', 'integer', true );
 		param( 'set_path' );
 
@@ -157,14 +159,16 @@ switch( $action )
 		$action = 'edit_settings';
 
 		break;
-
 }
 
 
+/*
+ * Action Handling part II
+ */
 switch( $action )
 {
-	// Disable a plugin, only if it is "enabled"
 	case 'disable_plugin':
+		// Disable a plugin, only if it is "enabled"
 		$current_User->check_perm( 'options', 'edit', true );
 
 		param( 'plugin_ID', 'integer', true );
@@ -200,8 +204,8 @@ switch( $action )
 		break;
 
 
-	// Try to enable a plugin, only if it is in state "disabled" or "needs_config"
 	case 'enable_plugin':
+		// Try to enable a plugin, only if it is in state "disabled" or "needs_config"
 		$current_User->check_perm( 'options', 'edit', true );
 
 		param( 'plugin_ID', 'integer', true );
@@ -312,7 +316,8 @@ switch( $action )
 		break;
 
 
-	case 'install': // Install a plugin. This may be a two-step action, when DB changes have to be confirmed
+	case 'install':
+		// Install a plugin. This may be a two-step action, when DB changes have to be confirmed
 		$action = 'list';
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -328,7 +333,8 @@ switch( $action )
 		}
 
 
-	case 'install_db_schema': // we come here from the first step ("install")
+	case 'install_db_schema':
+		// we come here from the first step ("install")
 		param( 'plugin_ID', 'integer', 0 );
 
 		if( $plugin_ID )
@@ -461,19 +467,21 @@ switch( $action )
 		param( 'plugin_ID', 'integer', true );
 
 		// Next default action:
-		if( isset($actionArray['update_settings']) && is_array($actionArray['update_settings']) && isset($actionArray['update_settings']['review']) )
-		{ // "Save (and review)"
+		if( isset($actionArray['update_settings'])
+			&& is_array($actionArray['update_settings'])
+			&& isset($actionArray['update_settings']['review']) )
+		{ // "Save (and review)", next action will still be to edit
 			$action = 'edit_settings';
 		}
 		else
-		{
+		{	// Save only, next action: list
 			$action = 'list';
 		}
 
 		$edit_Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
 		if( empty($edit_Plugin) )
 		{
-			$Messages->add( sprintf( T_( 'The plugin with ID %d could not get instantiated.' ), $plugin_ID ), 'error' );
+			$Messages->add( sprintf( T_( 'The plugin with ID %d could not be instantiated.' ), $plugin_ID ), 'error' );
 			$action = 'list';
 			break;
 		}
@@ -489,7 +497,7 @@ switch( $action )
 
 		$default_Plugin = & $admin_Plugins->register($edit_Plugin->classname);
 
-		// Update plugin name and shortdesc:
+		// Update plugin name:
 		// (Only if changed to preserve initial localization feature and therefor also priorize NULL)
 		if( $edit_Plugin->name != $edited_plugin_name )
 		{
@@ -503,6 +511,9 @@ switch( $action )
 				$Messages->add( T_('Plugin name updated.'), 'success' );
 			}
 		}
+
+		// Update plugin shortdesc:
+		// (Only if changed to preserve initial localization feature and therefor also priorize NULL)
 		if( $edit_Plugin->short_desc != $edited_plugin_shortdesc )
 		{
 			$set_to = $edited_plugin_shortdesc == $default_Plugin->short_desc ? NULL : $edited_plugin_shortdesc;
@@ -516,6 +527,7 @@ switch( $action )
 			}
 		}
 
+		// Plugin code
 		$updated = $admin_Plugins->set_code( $edit_Plugin->ID, $edited_plugin_code );
 		if( is_string( $updated ) )
 		{
@@ -527,6 +539,7 @@ switch( $action )
 			$Messages->add( T_('Plugin code updated.'), 'success' );
 		}
 
+		// Plugin priority
 		if( param_check_range( 'edited_plugin_priority', 0, 100, T_('Plugin priority must be numeric (0-100).'), true ) )
 		{
 			$updated = $admin_Plugins->set_priority( $edit_Plugin->ID, $edited_plugin_priority );
@@ -540,17 +553,17 @@ switch( $action )
 			$action = 'edit_settings';
 		}
 
-		// apply_rendering:
+		// Plugin "apply_rendering":
 		if( $admin_Plugins->set_apply_rendering( $edit_Plugin->ID, $edited_plugin_apply_rendering ) )
 		{
 			$Messages->add( T_('Plugin rendering updated.'), 'success' );
 		}
 
-		// Settings:
+		// Plugin specific settings:
 		if( $edit_Plugin->Settings )
 		{
 			require_once $inc_path.'_misc/_plugin.funcs.php';
-			set_Settings_for_Plugin_from_Request( $edit_Plugin, $admin_Plugins, 'Settings' );
+			set_Settings_for_Plugin_from_Request( $edit_Plugin, 'Settings' );
 
 			// Let the plugin handle custom fields:
 			$ok_to_update = $admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params = array() );
@@ -565,7 +578,7 @@ switch( $action )
 			}
 		}
 
-		// Events:
+		// Plugin Events:
 		$registered_events = $admin_Plugins->get_registered_events( $edit_Plugin );
 
 		$enable_events = array();
@@ -1018,6 +1031,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.78  2007/06/19 18:47:27  fplanque
+ * Nuked unnecessary Param (or I'm missing something badly :/)
+ *
  * Revision 1.77  2007/04/26 00:11:14  fplanque
  * (c) 2007
  *
