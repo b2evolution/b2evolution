@@ -44,6 +44,8 @@ class ComponentWidget extends DataObject
 	var $code;
 	var $params;
 
+	var $param_array = NULL;
+
 	/**
 	 * Lazy instantiated
 	 * (false if this Widget is not handled by a Plugin)
@@ -150,28 +152,6 @@ class ComponentWidget extends DataObject
 		return T_('Unknown');
 	}
 
-  /**
-	 * Unserialize params
-	 */
-	function get_params()
-	{
-		$params = @unserialize( $this->params );
-		if( empty( $params ) )
-		{
-			$params = array();
-		}
-		return $params;
-	}
-
-
-  /**
-	 * Serialize params
-	 */
-	function set_params( $params )
-	{
-		$this->set_param( 'params', 'string', serialize($params) );
-	}
-
 
   /**
    * Get definitions for editable params
@@ -194,6 +174,12 @@ class ComponentWidget extends DataObject
 				'label' => 'How are you?',
 				'defaultvalue' => '',
 				'note' => 'Welcome to b2evolution',
+			),
+			'number' => array(
+				'label' => 'Number',
+				'defaultvalue' => '8',
+				'note' => '1-9',
+				'valid_range' => array( 'min'=>1, 'max'=>9 ),
 			),
 			'my_select' => array(
 				'label' => 'Selector',
@@ -238,19 +224,62 @@ class ComponentWidget extends DataObject
 
 	}
 
+
   /**
-	 * just a stub for now
+ 	 * param value
+ 	 *
 	 */
 	function get_param( $parname )
 	{
-		$params = $this->get_param_definitions( NULL );
+		if( is_null( $this->param_array ) )
+		{
+			$this->param_array = @unserialize( $this->params );
+			if( empty( $this->param_array ) )
+			{
+				$this->param_array = array();
+			}
+		}
 
+		if( isset( $this->param_array[$parname] ) )
+		{	// We have a value for this param:
+			return $this->param_array[$parname];
+		}
+
+		// Try default values:
+		$params = $this->get_param_definitions( NULL );
 		if( isset( $params[$parname]['defaultvalue'] ) )
-		{	// we ahve a default value:
+		{	// We ahve a default value:
 			return $params[$parname]['defaultvalue'] ;
 		}
 
 		return NULL;
+	}
+
+
+	/**
+	 * Set param value
+	 *
+	 * @param string parameter name
+	 * @param mixed parameter value
+	 * @return boolean true, if a value has been set; false if it has not changed
+	 */
+	function set( $parname, $parvalue )
+	{
+		$params = $this->get_param_definitions( NULL );
+
+		if( isset( $params[$parname] ) )
+		{	// This is a widget specifc param:
+			$this->param_array[$parname] = $parvalue;
+			// This is what'll be saved to the DB:
+			$this->set_param( 'params', 'string', serialize($this->param_array) );
+			return;
+		}
+
+		switch( $parname )
+		{
+			default:
+				return parent::set_param( $parname, 'string', $parvalue );
+		}
 	}
 
 
@@ -260,6 +289,7 @@ class ComponentWidget extends DataObject
 		$this->disp_params = str_replace( '$wi_class$', 'widget_'.$this->type.'_'.$this->code, $params );
 	}
 
+	
 	/**
 	 * Display the widget!
 	 *
@@ -475,6 +505,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2007/06/19 20:42:53  fplanque
+ * basic demo of widget params handled by autoform_*
+ *
  * Revision 1.2  2007/06/19 00:03:26  fplanque
  * doc / trying to make sense of automatic settings forms generation.
  *

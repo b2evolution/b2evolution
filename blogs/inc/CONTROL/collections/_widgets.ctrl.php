@@ -47,6 +47,7 @@ switch( $action )
 		break;
 
 	case 'edit':
+	case 'update':
 	case 'delete':
 	case 'move_up':
 	case 'move_down':
@@ -133,6 +134,27 @@ switch( $action )
 
 		header_redirect( '?ctrl=widgets&blog='.$Blog->ID );
 		break;
+
+
+	case 'update':
+		// Update Settings
+
+		load_funcs( '_misc/_plugin.funcs.php' );
+
+		// Loop through all widget params:
+		foreach( $edited_ComponentWidget->get_param_definitions( array('for_editing'=>true) ) as $parname => $parmeta )
+		{
+			autoform_set_param_from_request( $parname, $parmeta, $edited_ComponentWidget, 'Widget' );
+		}
+
+		if(	! param_errors_detected() )
+		{	// Update settings:
+			$edited_ComponentWidget->dbupdate();
+			$Messages->add( T_('Widget settings have been updated'), 'success' );
+			$action = 'list';
+		}
+		break;
+
 
 	case 'move_up':
 		// Move the widget up:
@@ -288,6 +310,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2007/06/19 20:42:53  fplanque
+ * basic demo of widget params handled by autoform_*
+ *
  * Revision 1.11  2007/06/19 00:03:27  fplanque
  * doc / trying to make sense of automatic settings forms generation.
  *

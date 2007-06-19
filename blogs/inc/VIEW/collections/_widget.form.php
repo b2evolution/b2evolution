@@ -30,6 +30,7 @@ $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) )
 $Form->begin_form( 'fform', $creating ?  T_('New widget') : T_('Widget') );
 
 $Form->hidden( 'action', $creating ? 'create' : 'update' );
+$Form->hidden( 'wi_ID', $edited_ComponentWidget->ID );
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 
 $Form->begin_fieldset( T_('Properties') );
@@ -45,10 +46,11 @@ $Form->begin_fieldset( T_('Params') );
 
 	//$params = $edited_ComponentWidget->get_params();
 
+	// Loop through all widget params:
 	foreach( $edited_ComponentWidget->get_param_definitions( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
 	{
 		// Display field:
-		display_plugin_settings_fieldset_field( $l_name, $l_meta, $Form, 'Widget', $edited_ComponentWidget );
+		autoform_display_field( $l_name, $l_meta, $Form, 'Widget', $edited_ComponentWidget );
 	}
 
 $Form->end_fieldset();
@@ -68,6 +70,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/19 20:42:53  fplanque
+ * basic demo of widget params handled by autoform_*
+ *
  * Revision 1.1  2007/06/19 00:03:26  fplanque
  * doc / trying to make sense of automatic settings forms generation.
  *

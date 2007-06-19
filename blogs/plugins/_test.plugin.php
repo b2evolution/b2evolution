@@ -101,6 +101,12 @@ class test_plugin extends Plugin
 				'defaultvalue' => '',
 				'note' => 'Welcome to b2evolution',
 			),
+			'number' => array(
+				'label' => 'Number',
+				'defaultvalue' => '8',
+				'note' => '1-9',
+				'valid_range' => array( 'min'=>1, 'max'=>9 ),
+			),
 			'my_select' => array(
 				'label' => 'Selector',
 				'id' => $this->classname.'_my_select',
@@ -715,6 +721,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.69  2007/06/19 20:42:53  fplanque
+ * basic demo of widget params handled by autoform_*
+ *
  * Revision 1.68  2007/06/19 00:03:26  fplanque
  * doc / trying to make sense of automatic settings forms generation.
  *
