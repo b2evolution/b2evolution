@@ -636,7 +636,7 @@ class Plugins
 
 
 	/**
-	 * Init {@link Plugin::Settings} and {@link Plugin::UserSettings}, either by
+	 * Init {@link Plugin::$Settings} and {@link Plugin::$UserSettings}, either by
 	 * unsetting them for PHP5's overloading or instantiating them for PHP4.
 	 *
 	 * @param Plugin
@@ -1809,6 +1809,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.155  2007/06/19 23:15:08  blueyed
+ * doc fixes
+ *
  * Revision 1.154  2007/06/19 00:03:26  fplanque
  * doc / trying to make sense of automatic settings forms generation.
  *

@@ -2310,7 +2310,7 @@ function header_nocache()
 /**
  * Sends HTTP header to redirect to the previous location (which
  * can be given as function parameter, GET parameter (redirect_to),
- * is taken from {@link Hit::referer} or {@link $baseurl}).
+ * is taken from {@link Hit::$referer} or {@link $baseurl}).
  *
  * {@link $Debuglog} and {@link $Messages} get stored in {@link $Session}, so they
  * are available after the redirect.
@@ -2970,6 +2970,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.180  2007/06/19 23:15:08  blueyed
+ * doc fixes
+ *
  * Revision 1.179  2007/06/16 19:54:39  blueyed
  * doc/(-fixes)
  *

@@ -111,7 +111,7 @@ class Filelist
 	 * Will be matched against the filename part (not the path)
 	 * NULL if disabled
 	 *
-	 * Can be a regular expression (see {@link Filelist::_filter_is_regexp}), internally with delimiters/modifiers!
+	 * Can be a regular expression (see {@link Filelist::$_filter_is_regexp}), internally with delimiters/modifiers!
 	 *
 	 * Use {@link set_filter()} to set it.
 	 *
@@ -125,7 +125,7 @@ class Filelist
 	 *
 	 * Use {@link set_filter()} to set it.
 	 *
-	 * @see Filelist::_filter
+	 * @see Filelist::$_filter
 	 * @var boolean
 	 * @access protected
 	 */
@@ -1019,7 +1019,7 @@ class Filelist
 
 
 	/**
-	 * Get the path (and name) of a {@link File} relative to the {@link Filelist::_FileRoot->ads_path}.
+	 * Get the path (and name) of a {@link File} relative to the {@link Filelist::$_FileRoot::$ads_path}.
 	 *
 	 * @param string
 	 * @return string
@@ -1242,6 +1242,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.28  2007/06/19 23:15:08  blueyed
+ * doc fixes
+ *
  * Revision 1.27  2007/04/26 00:11:10  fplanque
  * (c) 2007
  *

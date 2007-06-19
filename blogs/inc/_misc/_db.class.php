@@ -242,7 +242,7 @@ class DB
 
 	/**
 	 * Do we want to explain joins?
-	 * This requires {@link DB::log_queries} to be true.
+	 * This requires {@link DB::$log_queries} to be true.
 	 * @var boolean
 	 */
 	var $debug_explain_joins = false;
@@ -251,7 +251,7 @@ class DB
 	 * Do we want to output a function backtrace for every query?
 	 * Number of stack entries to show (from last to first) (Default: 0); true means 'all'.
 	 *
-	 * This requires {@link DB::log_queries} to be true.
+	 * This requires {@link DB::$log_queries} to be true.
 	 *
 	 * @var integer
 	 */
@@ -259,7 +259,7 @@ class DB
 
 	/**
 	 * Number of rows we want to dump in debug output (0 disables it)
-	 * This requires {@link DB::log_queries} to be true.
+	 * This requires {@link DB::$log_queries} to be true.
 	 * @var integer
 	 */
 	var $debug_dump_rows = 0;
@@ -507,7 +507,7 @@ class DB
 	 *
 	 * @param string Short error (no HTML)
 	 * @param string Extended description/help for the error (for HTML)
-	 * @param string|false Query title; false if {@link DB::last_query} should not get displayed
+	 * @param string|false Query title; false if {@link DB::$last_query} should not get displayed
 	 */
 	function print_error( $title = '', $html_str = '', $query_title = '' )
 	{
@@ -613,7 +613,7 @@ class DB
 			// TODO: this should only replace the table name part(s), not the whole query!
 			// blueyed> I've changed it to replace in table name parts for UPDATE, INSERT and REPLACE, because
 			//          it corrupted serialized data..
-			//          IMHO, a cleaner solution would be to use {T_xxx} in the queries and replace it here. In object properties (e.g. DataObject::dbtablename), only "T_xxx" would get used and surrounded by "{..}" in the queries it creates.
+			//          IMHO, a cleaner solution would be to use {T_xxx} in the queries and replace it here. In object properties (e.g. DataObject::$dbtablename), only "T_xxx" would get used and surrounded by "{..}" in the queries it creates.
 
 			if( preg_match( '~^\s*(UPDATE\s+)(.*?)(\sSET\s.*)$~is', $query, $match ) )
 			{ // replace only between UPDATE and SET:
@@ -1364,6 +1364,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.60  2007/06/19 23:15:08  blueyed
+ * doc fixes
+ *
  * Revision 1.59  2007/05/14 02:44:14  fplanque
  * allow quoting of arrays
  *

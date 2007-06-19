@@ -42,6 +42,7 @@ require_once dirname(__FILE__).'/_widget.class.php';
 /**
  * Results class
  *
+ * @package evocore
  * @todo Support $cols[]['order_rows_callback'] / order_objects_callback also if there's a LIMIT?
  */
 class Results extends Table
@@ -78,13 +79,13 @@ class Results extends Table
 
 	/**
 	 * List of IDs for current page.
-	 * @uses Results::ID_col
+	 * @uses Results::$ID_col
 	 */
 	var $page_ID_list;
 
 	/**
 	 * Array of IDs for current page.
-	 * @uses Results::ID_col
+	 * @uses Results::$ID_col
 	 */
 	var $page_ID_array;
 
@@ -133,7 +134,7 @@ class Results extends Table
 	 * - order: SQL column name(s) to sort by (delimited by comma)
 	 * - order_objects_callback: a PHP callback function (can be array($Object, $method)).
 	 *     This gets three params: $a, $b, $desc.
-	 *     $a and $b are instantiated objects from {@link Results::Cache}
+	 *     $a and $b are instantiated objects from {@link Results::$Cache}
 	 *     $desc is either 'ASC' or 'DESC'. The function has to return -1, 0 or 1,
 	 *     according to if the $a < $b, $a == $b or $a > $b.
 	 * - order_rows_callback: a PHP callback function (can be array($Object, $method)).
@@ -169,8 +170,8 @@ class Results extends Table
 	 *
 	 * Objects get instantiated and grouped by the given property/member value.
 	 *
-	 * NOTE: this requires {@link Result::Cache} to be set and is probably only useful,
-	 *       if you do not use {@link Result::limit}, because grouping appears after
+	 * NOTE: this requires {@link Result::$Cache} to be set and is probably only useful,
+	 *       if you do not use {@link Result::$limit}, because grouping appears after
 	 *       the relevant data has been pulled from DB.
 	 *
 	 * @var mixed string or array
@@ -187,7 +188,7 @@ class Results extends Table
 	 * Definitions for each GROUP column:
 	 * -td
 	 * -td_start. A column with no def will de displayed using
-	 * the default defs from Results::params, that is to say, one of these:
+	 * the default defs from Results::$params, that is to say, one of these:
 	 *   - $this->params['grp_col_start_first'];
 	 *   - $this->params['grp_col_start_last'];
 	 *   - $this->params['grp_col_start'];
@@ -491,7 +492,7 @@ class Results extends Table
 
 
 	/**
-	 * Callback, to sort {@link Result::rows} according to {@link Result::group_by_obj_prop}.
+	 * Callback, to sort {@link Result::$rows} according to {@link Result::$group_by_obj_prop}.
 	 *
 	 * @param array DB row for object A
 	 * @param array DB row for object B
@@ -560,7 +561,7 @@ class Results extends Table
 	/**
 	 * Get a list of IDs for current page
 	 *
-	 * @uses Results::ID_col
+	 * @uses Results::$ID_col
 	 */
 	function get_page_ID_list()
 	{
@@ -577,7 +578,7 @@ class Results extends Table
 	/**
 	 * Get an array of IDs for current page
 	 *
-	 * @uses Results::ID_col
+	 * @uses Results::$ID_col
 	 */
 	function get_page_ID_array()
 	{
@@ -1567,7 +1568,7 @@ class Results extends Table
 
 	/**
 	 *
-	 * @todo Support {@link Results::order_callbacks}
+	 * @todo Support {@link Results::$order_callbacks}
 	 */
 	function move_icons( )
 	{
@@ -1969,6 +1970,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.54  2007/06/19 23:15:08  blueyed
+ * doc fixes
+ *
  * Revision 1.53  2007/05/26 22:21:32  blueyed
  * Made $limit for Results configurable per user
  *
