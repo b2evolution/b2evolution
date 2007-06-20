@@ -328,10 +328,10 @@ class ComponentWidget extends DataObject
 	 */
 	function disp_title( $title )
 	{
-		if( $this->disp_params['block_display_title'] )
+		if( $this->disp_params['block_display_title'] && !empty( $title ) )
 		{
 			echo $this->disp_params['block_title_start'];
-			echo $title;
+			echo format_to_output( $title );
 			echo $this->disp_params['block_title_end'];
 		}
 	}
@@ -506,6 +506,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2007/06/20 13:19:29  fplanque
+ * Free html widget
+ *
  * Revision 1.4  2007/06/20 00:48:18  fplanque
  * some real life widget settings
  *

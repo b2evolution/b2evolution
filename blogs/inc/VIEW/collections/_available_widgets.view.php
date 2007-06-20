@@ -33,6 +33,7 @@ $core_componentwidget_defs = array(
 			'coll_post_list',
 		'*'.T_('Meta contents'),
 			'coll_longdesc',
+			'free_html',
 		'*'.T_('Tools'),
 			'coll_common_links',
 			'coll_search_form',
@@ -95,6 +96,9 @@ echo '</ul></li></ul>';
 
 /*
  * $Log$
+ * Revision 1.9  2007/06/20 13:19:29  fplanque
+ * Free html widget
+ *
  * Revision 1.8  2007/06/20 01:12:49  fplanque
  * groups
  *
