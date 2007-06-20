@@ -265,25 +265,6 @@ require $skins_path.'_html_header.inc.php';
 	?>
 
 
-	<?php
-	if( empty($generating_static) && ! $Plugins->trigger_event_first_true('CacheIsCollectingContent') )
-	{ // We're not generating static pages nor is a caching plugin collecting the content, so we can display this block
-		// TODO: when this gets a SkinTag plugin this check should get done by the Plugin
-		// fp> will not be a plugin because it's too closely tied to internals (Sessions)
-		// dh> The $Sessions global gets used in two places, in _main.inc.php(!) and here.
-		//     IMHO it should really become a widget! It may become a core plugin.
-		?>
-		<div class="bSideItem">
-			<h3 class="sideItemTitle"><?php echo T_('Who\'s Online?') ?></h3>
-			<?php
-				$Sessions->display_onliners();
-			?>
-		</div>
-		<?php
-	}
-	?>
-
-
 	<p class="center"><!-- Please help us promote b2evolution and leave this link on your blog. --><a href="http://b2evolution.net/" title="b2evolution: next generation blog software"><img src="../../rsc/img/powered-by-b2evolution-120t.gif" alt="powered by b2evolution free blog software" title="b2evolution: next generation blog software" width="120" height="32" border="0" /></a></p>
 
 </div>

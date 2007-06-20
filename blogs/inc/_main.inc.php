@@ -569,16 +569,6 @@ else
 /* Login procedure }}} */
 
 
-/**
- * The Sessions class
- */
-require_once $model_path.'sessions/_sessions.class.php';
-/**
- * @global Sessions The Sessions object
- */
-$Sessions = & new Sessions();
-
-
 // Icon legend:
 if( $UserSettings->get('display_icon_legend') )
 {
@@ -641,6 +631,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.78  2007/06/20 23:12:51  fplanque
+ * "Who's online" moved to a plugin
+ *
  * Revision 1.77  2007/04/26 00:11:05  fplanque
  * (c) 2007
  *

@@ -1,9 +1,8 @@
 <?php
 /**
- * This file implements the Sessions class.
+ * This file implements the Whosonline plugin.
  *
- * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
  * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
@@ -23,25 +22,110 @@
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
- * @package evocore
+ * @package plugins
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
- * @author fplanque: Francois PLANQUE.
+ * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
  * @author jeffbearer: Jeff BEARER - {@link http://www.jeffbearer.com/}.
  *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
 /**
+ * Calendar Plugin
+ *
+ * This plugin displays
+ */
+class whosonline_plugin extends Plugin
+{
+	/**
+	 * Variables below MUST be overriden by plugin implementations,
+	 * either in the subclass declaration or in the subclass constructor.
+	 */
+
+	var $name = 'Who\'s online Widget';
+	var $code = 'evo_WhosOnline';
+	var $priority = 96;
+	var $version = '2.0';
+	var $author = 'The b2evo Group';
+	var $group = 'widget';
+
+
+	/**
+	 * Init
+	 */
+	function PluginInit( & $params )
+	{
+		$this->short_desc = T_('This skin tag displays a list of whos is online.');
+		$this->long_desc = T_('All logged in users and guest users who have requested a page in the last 5 minutes are listed.');
+	}
+
+
+  /**
+   * Get definitions for widget specific editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_widget_param_definitions( $params )
+	{
+		$r = array(
+			'contacticons' => array(
+				'label' => T_('Contact icons'),
+				'note' => T_('Display contact icons allowing to send private messages to logged in users.'),
+				'type' => 'checkbox',
+				'defaultvalue' => true,
+			),
+		);
+		return $r;
+	}
+
+
+	/**
+	 * Event handler: SkinTag (widget)
+	 *
+	 * @param array Associative array of parameters.
+	 * @return boolean did we display?
+	 */
+	function SkinTag( $params )
+	{
+		global $generating_static, $Plugins;
+
+		if( ! empty($generating_static) || $Plugins->trigger_event_first_true('CacheIsCollectingContent') )
+		{ // We're not generating static pages nor is a caching plugin collecting the content, so we can display this block
+			return false;
+		}
+
+		echo $params['block_start'];
+
+		echo $params['block_title_start'];
+		echo T_('Who\'s Online?');
+		echo $params['block_title_end'];
+
+		$OnlineSessions = new OnlineSessions();
+
+		$OnlineSessions->display_onliners();
+
+		echo $params['block_end'];
+
+		return true;
+	}
+}
+
+
+/**
+ * This tracks who is online
+ *
  * @todo Move to a "who's online" plugin
  * @todo dh> I wanted to add a MySQL INDEX on the sess_lastseen field, but this "plugin"
  *       is the only real user of this. So, when making this a plugin, this should
  *       add the index perhaps.
  * @package evocore
  */
-class Sessions extends Widget
+class OnlineSessions extends Widget
 {
 	/**
 	 * Number of guests (and users that want to be anonymous)
@@ -261,6 +345,9 @@ class Sessions extends Widget
 
 /*
  * $Log$
+ * Revision 1.1  2007/06/20 23:12:51  fplanque
+ * "Who's online" moved to a plugin
+ *
  * Revision 1.13  2007/06/11 22:01:53  blueyed
  * doc fixes
  *
@@ -275,46 +362,5 @@ class Sessions extends Widget
  *
  * Revision 1.9  2006/11/24 18:27:24  blueyed
  * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.8  2006/08/29 22:59:09  blueyed
- * doc
- *
- * Revision 1.7  2006/08/29 00:26:11  fplanque
- * Massive changes rolling in ItemList2.
- * This is somehow the meat of version 2.0.
- * This branch has gone officially unstable at this point! :>
- *
- * Revision 1.6  2006/08/19 07:56:31  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.5  2006/04/19 20:13:50  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.4  2006/04/11 21:22:25  fplanque
- * partial cleanup
- *
- * Revision 1.3  2006/04/06 09:46:37  blueyed
- * display_onliners(): Wrap "online guests" in same "<ul>" as "online users" (because of left padding/margin)
- *
- * Revision 1.2  2006/03/12 23:08:59  fplanque
- * doc cleanup
- *
- * Revision 1.1  2006/02/23 21:11:58  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.22  2005/12/12 19:21:23  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.21  2005/11/25 14:07:40  fplanque
- * no message
- *
- * Revision 1.19  2005/11/18 03:37:55  blueyed
- * doc
- *
- * Revision 1.18  2005/11/17 19:35:26  fplanque
- * no message
- *
  */
 ?>

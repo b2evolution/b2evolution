@@ -178,67 +178,6 @@ class ComponentWidget extends DataObject
 		}
 
 		return array();
-
-
-		// Demo data:
-		$r = array(
-			'click_me' => array(
-				'label' => 'Click me!',
-				'defaultvalue' => '1',
-				'type' => 'checkbox',
-			),
-			'input_me' => array(
-				'label' => 'How are you?',
-				'defaultvalue' => '',
-				'note' => 'Welcome to b2evolution',
-			),
-			'number' => array(
-				'label' => 'Number',
-				'defaultvalue' => '8',
-				'note' => '1-9',
-				'valid_range' => array( 'min'=>1, 'max'=>9 ),
-			),
-			'my_select' => array(
-				'label' => 'Selector',
-				'defaultvalue' => 'one',
-				'type' => 'select',
-				'options' => array( 'sun' => 'Sunday', 'mon' => 'Monday' ),
-			),
-			'a_disabled_one' => array(
-				'label' => 'This one is disabled',
-				'type' => 'checkbox',
-				'defaultvalue' => '1',
-				'disabled' => true, // this can be useful if you detect that something cannot be changed. You probably want to add a 'note' then, too.
-			),
-			'blog' => array(
-				'label' => 'A blog',
-				'type' => 'select_blog',  // TODO: does not scale with 500 blogs
-				'allow_none' => true,
-			),
-			/*
-			'sets' => array(
-				'type' => 'array',
-				'min_count' => 0,
-				'max_count' => 3,
-				'entries' => array(
-					'user' => array(
-						'label' => 'A user',
-						'type' => 'select_user',		// TODO: does not scale with 500 users
-						'allow_none' => true,
-					),
-				),
-			),
-			*/
-			'maxlen' => array(
-				'label' => 'Max',
-				'type' => 'textarea',
-				'maxlength' => 10,
-				'note' => 'Maximum length is 10 here.',
-			),
-		);
-
-		return $r;
-
 	}
 
 
@@ -582,6 +521,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2007/06/20 23:12:51  fplanque
+ * "Who's online" moved to a plugin
+ *
  * Revision 1.7  2007/06/20 21:42:13  fplanque
  * implemented working widget/plugin params
  *
