@@ -107,7 +107,7 @@ class whosonline_plugin extends Plugin
 
 		$OnlineSessions = new OnlineSessions();
 
-		$OnlineSessions->display_onliners();
+		$OnlineSessions->display_onliners( $params );
 
 		echo $params['block_end'];
 
@@ -119,13 +119,12 @@ class whosonline_plugin extends Plugin
 /**
  * This tracks who is online
  *
- * @todo Move to a "who's online" plugin
  * @todo dh> I wanted to add a MySQL INDEX on the sess_lastseen field, but this "plugin"
  *       is the only real user of this. So, when making this a plugin, this should
  *       add the index perhaps.
  * @package evocore
  */
-class OnlineSessions extends Widget
+class OnlineSessions
 {
 	/**
 	 * Number of guests (and users that want to be anonymous)
@@ -219,18 +218,25 @@ class OnlineSessions extends Widget
 	}
 
 
+	/**
+	 * Template function: Display onliners, both registered users and guests.
+	 *
+	 * @todo get class="" out of here (put it into skins)
+	 */
+	function display_onliners( $params )
+	{
+		$this->display_online_users( $params );
+		$this->display_online_guests( $params );
+	}
 
 	/**
 	 * Template function: Display the registered users who are online
 	 *
 	 * @todo get class="" out of here (put it into skins)
 	 *
-	 * @param string To be displayed before all users
-	 * @param string To be displayed after all users
-	 * @param string Template to display for each user, see {@link replace_callback()}
-	 * @return array containing number of registered users and guests
+	 * @param array
 	 */
-	function display_online_users( $beforeAll = '<ul class="onlineUsers">', $afterAll = '</ul>', $templateEach = '<li class="onlineUser">$user_preferredname$ $user_msgformlink$</li>' )
+	function display_online_users( $params )
 	{
 		global $DB, $Blog;
 		global $generating_static;
@@ -241,7 +247,7 @@ class OnlineSessions extends Widget
 			$this->init();
 		}
 
-		// Note: not all users want to get displayed, so we might have an empty list.
+		// Note: not all users want to appear online, so we might have an empty list.
 		$r = '';
 
 		foreach( $this->_registered_Users as $User )
@@ -250,15 +256,22 @@ class OnlineSessions extends Widget
 			{
 				if( empty($r) )
 				{ // first user
-					$r .= $beforeAll;
+					$r .= $params['list_start'];
 				}
 
-				$r .= $this->replace_vars( $templateEach, array( 'User' => &$User ) );
+				$r .= $params['item_start'];
+				$r .= $User->dget('preferredname');
+				if( $params['contacticons'] )
+				{	// We want contact icons:
+					$r .= $User->get_msgform_link();
+				}
+				$r .= $params['item_end'];
 			}
 		}
+
 		if( !empty($r) )
 		{ // we need to close the list
-			$r .= $afterAll;
+			$r .= $params['list_end'];;
 		}
 
 		echo $r;
@@ -267,10 +280,8 @@ class OnlineSessions extends Widget
 
 	/**
 	 * Template function: Display number of online guests.
-	 *
-	 * @return string
 	 */
-	function display_online_guests( $before = '', $after = '' )
+	function display_online_guests( $params )
 	{
 		global $generating_static;
 		if( isset($generating_static) ) { return; }
@@ -280,71 +291,23 @@ class OnlineSessions extends Widget
 			$this->init();
 		}
 
-		if( empty($before) )
-		{
-			$before = T_('Guest Users:').' ';
-		}
-
-		$r = $before.$this->_count_guests.$after;
+		$r = $params['list_start'];
+		$r .= $params['item_start'];
+		$r .= T_('Guest Users:').' ';
+		$r .= $this->_count_guests;
+		$r .= $params['item_end'];
+		$r .= $params['list_end'];;
 
 		echo $r;
 	}
-
-
-	/**
-	 * Template function: Display onliners, both registered users and guests.
-	 *
-	 * @todo get class="" out of here (put it into skins)
-	 */
-	function display_onliners()
-	{
-		$this->display_online_users();
-
-		// Wrap in the same <ul> class as the online users:
-		$this->display_online_guests( '<ul class="onlineUsers"><li>'.T_('Guest Users:').' ', '</li></ul>' );
-	}
-
-
-	/**
-	 * Widget callback for template vars.
-	 *
-	 * This replaces user properties if set through $user_xxx$ and especially $user_msgformlink$.
-	 *
-	 * This allows to replace template vars, see {@link Widget::replace_callback()}.
-	 *
-	 * @param array
-	 * @param User an optional User object
-	 * @return string
-	 */
-	function replace_callback( $matches, $User = NULL )
-	{
-		if( isset($this->params['User']) && substr($matches[1], 0, 5) == 'user_' )
-		{ // user properties
-			$prop = substr($matches[1], 5);
-			if( $prop == 'msgformlink' )
-			{
-				return $this->params['User']->get_msgform_link();
-			}
-			elseif( $prop = $this->params['User']->get( $prop ) )
-			{
-				return $prop;
-			}
-
-			return false;
-		}
-
-		switch( $matches[1] )
-		{
-			default:
-				return parent::replace_callback( $matches );
-		}
-	}
-
 }
 
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/20 23:36:06  fplanque
+ * cleanup
+ *
  * Revision 1.1  2007/06/20 23:12:51  fplanque
  * "Who's online" moved to a plugin
  *
