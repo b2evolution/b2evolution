@@ -1535,13 +1535,11 @@ class AdminUI_general
 		}
 
 
-		// Yet another event with no doc.
-		// WHat do we typically call this for?
-		// I don't know if it makes sense to move it here...
-		// What about http://doc.b2evolution.net/HEAD/plugins/Plugin.html#methodAdminAfterMenuInit ??
+		// Call AdminAfterMenuInit to notify Plugins that the menu is initialized
+		// E.g. the the livehits_plugin and weather_plugin use it for adding a menu entry.
 		$Plugins->trigger_event( 'AdminAfterMenuInit' );
-
 	}
+
 
 	/**
 	 * Get the top of the HTML <body>.
@@ -1621,6 +1619,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.56  2007/06/20 19:13:13  blueyed
+ * doc
+ *
  * Revision 1.55  2007/06/19 22:36:39  blueyed
  * doc
  *
