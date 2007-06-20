@@ -31,9 +31,8 @@
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @package AmCode plugin
+ * @package plugins
  */
-
 class am_code_highlighter
 {
 	/**
@@ -81,6 +80,9 @@ class am_code_highlighter
 }
 /**
  * $Log$
+ * Revision 1.5  2007/06/20 21:33:23  blueyed
+ * fixed doc
+ *
  * Revision 1.4  2007/06/20 19:16:36  blueyed
  * Fixed doc
  *

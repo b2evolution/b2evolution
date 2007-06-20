@@ -31,10 +31,8 @@
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @package AmCode plugin
- */
-
-/*
+ * @package plugins
+ * @todo
  * yabs > would like this to extend an "am_highlighter" class, but not sure how to handle $this->T_()
  * fp> is T_() actually used?
  * fp> you should probably just pass the plugin as argument to the constructor, this way you can call $plugin->T_()
@@ -163,6 +161,9 @@ class am_php_highlighter
 
 /**
  * $Log$
+ * Revision 1.5  2007/06/20 21:33:23  blueyed
+ * fixed doc
+ *
  * Revision 1.4  2007/06/20 19:16:36  blueyed
  * Fixed doc
  *
