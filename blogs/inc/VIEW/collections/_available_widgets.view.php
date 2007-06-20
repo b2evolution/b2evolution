@@ -21,31 +21,49 @@ echo '<h2><span class="right_icons">'.action_icon( T_('Cancel!'), 'close', regen
 echo '<ul>';
 
 $core_componentwidget_defs = array(
-		'colls_list_public',
-		'colls_list_owner',
-		'coll_logo',
-		'coll_title',
-		'coll_tagline',
-		'coll_longdesc',
-		'coll_common_links',
-		'coll_page_list',
-		'coll_post_list',
-		'coll_search_form',
-		'coll_xml_feeds',
-		'user_tools',
+		'*'.T_('Blog list'),
+			'colls_list_public',
+			'colls_list_owner',
+		'*'.T_('Blog header'),
+			'coll_logo',
+			'coll_title',
+			'coll_tagline',
+		'*'.T_('Blog contents'),
+			'coll_page_list',
+			'coll_post_list',
+		'*'.T_('Meta contents'),
+			'coll_longdesc',
+		'*'.T_('Tools'),
+			'coll_common_links',
+			'coll_search_form',
+			'coll_xml_feeds',
+			'user_tools',
 	);
+$i = 0;
 foreach( $core_componentwidget_defs as $code )
 {
-	load_class( 'MODEL/widgets/_'.$code.'.widget.php' );
-	$classname = $code.'_Widget';
-	$ComponentWidget = & new $classname( NULL, 'core', $code );
+	$i++;
+	if( $code[0] == '*' )
+	{ // group
+		if( $i > 1 )
+		{
+			echo '</ul></li>';
+		}
+		echo '<li><strong>'.substr( $code, 1 ).':</strong><ul>';
+	}
+	else
+	{
+		load_class( 'MODEL/widgets/_'.$code.'.widget.php' );
+		$classname = $code.'_Widget';
+		$ComponentWidget = & new $classname( NULL, 'core', $code );
 
-	echo '<li>';
-	echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code ).'" title="'.T_('Add this widget to the container').'">';
-	echo get_icon( 'new' ).$ComponentWidget->get_name();
-	echo '</a></li>';
+		echo '<li>';
+		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code ).'" title="'.T_('Add this widget to the container').'">';
+		echo get_icon( 'new' ).$ComponentWidget->get_name();
+		echo '</a> <span class="notes">'.$ComponentWidget->get_desc().'</span>';
+		echo '</li>';
+	}
 }
-echo '</ul>';
 
 
 // Now, let's try to get the Plugins that implement a skintag...
@@ -59,21 +77,27 @@ global $Plugins;
 $Plugin_array = $Plugins->get_list_by_event( 'SkinTag' );
 if( ! empty($Plugin_array) )
 { // We have some plugins
-	// echo '<h3>'.T_('Plugins').'</h3>';
-	echo '<ul>';
+
+	echo '</ul></li>';
+	echo '<li><strong>'.T_('Plugins').':</strong><ul>';
+
 	foreach( $Plugin_array as $ID => $Plugin )
 	{
 		echo '<li>';
 		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code ).'" title="'.T_('Add this widget to the container').'">';
 		echo get_icon( 'new' ).$Plugin->name;
-		echo '</a></li>';
+		echo '</a> <span class="notes">'.$Plugin->short_desc.'</span>';
+		echo '</li>';
 	}
-	echo '</ul>';
 }
+echo '</ul></li></ul>';
 
 
 /*
  * $Log$
+ * Revision 1.8  2007/06/20 01:12:49  fplanque
+ * groups
+ *
  * Revision 1.7  2007/06/18 21:25:48  fplanque
  * one class per core widget
  *
