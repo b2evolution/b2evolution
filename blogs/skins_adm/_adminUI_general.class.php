@@ -1536,7 +1536,7 @@ class AdminUI_general
 
 
 		// Call AdminAfterMenuInit to notify Plugins that the menu is initialized
-		// E.g. the the livehits_plugin and weather_plugin use it for adding a menu entry.
+		// E.g. the livehits_plugin and weather_plugin use it for adding a menu entry.
 		$Plugins->trigger_event( 'AdminAfterMenuInit' );
 	}
 
@@ -1619,6 +1619,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.57  2007/06/20 19:13:42  blueyed
+ * fixed doc
+ *
  * Revision 1.56  2007/06/20 19:13:13  blueyed
  * doc
  *
