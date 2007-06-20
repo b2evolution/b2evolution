@@ -21,6 +21,12 @@ global $edited_Blog;
 
 $Form = & new Form( NULL, 'blogadvanced_checkchanges' );
 
+if( $current_User->check_perm( 'options', 'edit', false ) )
+{ // We have permission to modify:
+  $Form->global_icon( T_('Manage installed skins...'), 'properties', 'admin.php?ctrl=skins', T_('Manage skins'), 3, 4 );
+  $Form->global_icon( T_('Install new skin...'), 'new', 'admin.php?ctrl=skins&amp;action=new', T_('Install new'), 3, 4 );
+}
+
 $Form->begin_form( 'fform', T_('Choose a skin') );
 
 	$Form->hidden_ctrl();
@@ -28,7 +34,7 @@ $Form->begin_form( 'fform', T_('Choose a skin') );
 	$Form->hidden( 'tab', 'skin' );
 	$Form->hidden( 'blog',$edited_Blog->ID );
 
-	$Form->begin_fieldset( T_('Available skins') );
+	$Form->begin_fieldset( T_('Installed skins') );
 
 	$SkinCache = & get_Cache( 'SkinCache' );
 	$SkinCache->load_all();
