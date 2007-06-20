@@ -58,6 +58,47 @@ class coll_common_links_Widget extends ComponentWidget
 	}
 
 
+  /**
+   * Get definitions for editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		// Demo data:
+		$r = array(
+			'show_recently' => array(
+				'type' => 'checkbox',
+				'label' => T_('Show "Recently"'),
+				'note' => T_('Go to the most recent posts / the blog\'s home.'),
+				'defaultvalue' => '1',
+			),
+			'show_archives' => array(
+				'type' => 'checkbox',
+				'label' => T_('Show "Archives"'),
+				'note' => T_('Go to the monthly/weekly/daily archive list.'),
+				'defaultvalue' => '1',
+			),
+			'show_categories' => array(
+				'type' => 'checkbox',
+				'label' => T_('Show "Categories"'),
+				'note' => T_('Go to the category tree.'),
+				'defaultvalue' => '1',
+			),
+			'show_latestcomments' => array(
+				'type' => 'checkbox',
+				'label' => T_('Show "Latest comments"'),
+				'note' => T_('Go to the latest comments.'),
+				'defaultvalue' => '1',
+			),
+		);
+
+		return $r;
+
+	}
+
+
 	/**
 	 * Display the widget!
 	 *
@@ -73,23 +114,35 @@ class coll_common_links_Widget extends ComponentWidget
 		echo $this->disp_params['block_start'];
 		echo $this->disp_params['list_start'];
 
-		echo $this->disp_params['item_start'];
-		echo '<strong><a href="'.$Blog->get('url').'">'.T_('Recently').'</a></strong>';
-		echo $this->disp_params['item_end'];
+		if( $this->get_param( 'show_recently' ) )
+		{
+			echo $this->disp_params['item_start'];
+			echo '<strong><a href="'.$Blog->get('url').'">'.T_('Recently').'</a></strong>';
+			echo $this->disp_params['item_end'];
+		}
 
-		// fp> TODO: don't display this if archives plugin not installed... or depluginize archives (I'm not sure)
-		echo $this->disp_params['item_start'];
-		echo '<strong><a href="'.$Blog->get('arcdirurl').'">'.T_('Archives').'</a></strong>';
-		echo $this->disp_params['item_end'];
+		if( $this->get_param( 'show_archives' ) )
+		{
+			// fp> TODO: don't display this if archives plugin not installed... or depluginize archives (I'm not sure)
+			echo $this->disp_params['item_start'];
+			echo '<strong><a href="'.$Blog->get('arcdirurl').'">'.T_('Archives').'</a></strong>';
+			echo $this->disp_params['item_end'];
+		}
 
-		// fp> TODO: don't display this if categories plugin not installed... or depluginize categories (I'm not sure)
-		echo $this->disp_params['item_start'];
-		echo '<strong><a href="'.$Blog->get('catdirurl').'">'.T_('Categories').'</a></strong>';
-		echo $this->disp_params['item_end'];
+		if( $this->get_param( 'show_categories' ) )
+		{
+			// fp> TODO: don't display this if categories plugin not installed... or depluginize categories (I'm not sure)
+			echo $this->disp_params['item_start'];
+			echo '<strong><a href="'.$Blog->get('catdirurl').'">'.T_('Categories').'</a></strong>';
+			echo $this->disp_params['item_end'];
+		}
 
-		echo $this->disp_params['item_start'];
-		echo '<strong><a href="'.$Blog->get('lastcommentsurl').'">'.T_('Latest comments').'</a></strong>';
-		echo $this->disp_params['item_end'];
+		if( $this->get_param( 'show_latestcomments' ) )
+		{
+			echo $this->disp_params['item_start'];
+			echo '<strong><a href="'.$Blog->get('lastcommentsurl').'">'.T_('Latest comments').'</a></strong>';
+			echo $this->disp_params['item_end'];
+		}
 
 		echo $this->disp_params['list_end'];
 		echo $this->disp_params['block_end'];
@@ -101,6 +154,9 @@ class coll_common_links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/20 00:48:17  fplanque
+ * some real life widget settings
+ *
  * Revision 1.1  2007/06/18 21:25:47  fplanque
  * one class per core widget
  *

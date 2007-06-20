@@ -58,6 +58,29 @@ class coll_logo_Widget extends ComponentWidget
 	}
 
 
+  /**
+   * Get definitions for editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		$r = array(
+			'logo_file' => array(
+				'label' => T_('Logo filename'),
+				'note' => T_('The logo file must be uploaded to the root of the Blog\'s media dir'),
+				'defaultvalue' => 'logo.gif',
+				'valid_pattern' => array( 'pattern'=>'¤^[a-z0-9_\-][a-z0-9_.\-]*$¤i',
+																	'error'=>T_('Invalid filename.') ),
+			),
+		);
+
+		return $r;
+
+	}
+
+
 	/**
 	 * Display the widget!
 	 *
@@ -73,7 +96,7 @@ class coll_logo_Widget extends ComponentWidget
 		echo $this->disp_params['block_start'];
 
 		$title = '<a href="'.$Blog->get( 'url', 'raw' ).'">'
-							.'<img src="'.$Blog->get_media_url().'/logo.gif" alt="'.$Blog->dget( 'name', 'htmlattr' ).'" />'
+							.'<img src="'.$Blog->get_media_url().$this->get_param('logo_file').'" alt="'.$Blog->dget( 'name', 'htmlattr' ).'" />'
 							.'</a>';
 		$this->disp_title( $title );
 
@@ -86,6 +109,9 @@ class coll_logo_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/20 00:48:17  fplanque
+ * some real life widget settings
+ *
  * Revision 1.1  2007/06/18 21:25:47  fplanque
  * one class per core widget
  *

@@ -156,13 +156,14 @@ class ComponentWidget extends DataObject
   /**
    * Get definitions for editable params
    *
-   * EXPERIMENTAL
-   *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */
 	function get_param_definitions( $params )
 	{
+		return array();
+
+
 		// Demo data:
 		$r = array(
 			'click_me' => array(
@@ -289,7 +290,7 @@ class ComponentWidget extends DataObject
 		$this->disp_params = str_replace( '$wi_class$', 'widget_'.$this->type.'_'.$this->code, $params );
 	}
 
-	
+
 	/**
 	 * Display the widget!
 	 *
@@ -505,6 +506,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2007/06/20 00:48:18  fplanque
+ * some real life widget settings
+ *
  * Revision 1.3  2007/06/19 20:42:53  fplanque
  * basic demo of widget params handled by autoform_*
  *
