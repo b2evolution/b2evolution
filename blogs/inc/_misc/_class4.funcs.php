@@ -30,10 +30,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Load class file
  */
-function load_class( $class_path )
+function load_class( $class_path, $require = true )
 {
 	global $inc_path;
+	if( ! $require && ! file_exists( $inc_path.$class_path ) )
+	{
+		return false;
+	}
 	require_once $inc_path.$class_path;
+	return true;
 }
 
 
@@ -143,6 +148,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.19  2007/06/20 14:25:00  fplanque
+ * fixes
+ *
  * Revision 1.18  2007/06/18 21:25:48  fplanque
  * one class per core widget
  *

@@ -67,7 +67,7 @@ class colls_list_owner_Widget extends ComponentWidget
 	{
 		$this->init_display( $params );
 
-		$this->disp_coll_list( $this->disp_params, 'owner' );
+		$this->disp_coll_list( 'owner' );
 
 		return true;
 	}
@@ -76,6 +76,9 @@ class colls_list_owner_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/20 14:25:00  fplanque
+ * fixes
+ *
  * Revision 1.1  2007/06/18 21:25:47  fplanque
  * one class per core widget
  *

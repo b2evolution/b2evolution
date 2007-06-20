@@ -377,11 +377,11 @@ class ComponentWidget extends DataObject
 
 		if( $what == 'pages' )
 		{
-   		$this->disp_title( $this->disp_params, T_('Info pages') );
+   		$this->disp_title( T_('Info pages') );
 		}
 		else
 		{
-			$this->disp_title( $this->disp_params, T_('Contents') );
+			$this->disp_title( T_('Contents') );
 		}
 
 		echo $this->disp_params['list_start'];
@@ -506,6 +506,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2007/06/20 14:25:00  fplanque
+ * fixes
+ *
  * Revision 1.5  2007/06/20 13:19:29  fplanque
  * Free html widget
  *
