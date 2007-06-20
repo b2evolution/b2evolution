@@ -60,10 +60,10 @@ function echo_usage()
 	echo "the locale's messages.PO file to _global.php, which b2evolution uses.\n";
 	echo "\n";
 	echo "E.g.,\n";
-	echo "./xg.php CORE\n";
-	echo "./xg.php CORE merge de_DE\n";
-	echo "..edit .po file..\n";
-	echo "./xg.php CORE convert de_DE\n";
+	echo " php -f xg.php CORE\n";
+	echo " php -f xg.php CORE merge de_DE\n";
+	echo " ..edit .po file..\n";
+	echo " php -f xg.php CORE convert de_DE\n";
 	echo "\n";
 }
 
