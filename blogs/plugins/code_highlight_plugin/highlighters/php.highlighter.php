@@ -22,7 +22,7 @@
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
- * @package plugins AmCode Plugin
+ * @package plugins
  *
  * @author Yabba: Paul Jones - {@link http://astonishme.co.uk/}
  * @author Stk: Scott Kimler - {@link http://astonishme.co.uk/}
@@ -163,6 +163,9 @@ class am_php_highlighter
 
 /**
  * $Log$
+ * Revision 1.4  2007/06/20 19:16:36  blueyed
+ * Fixed doc
+ *
  * Revision 1.3  2007/06/17 13:28:22  blueyed
  * Fixed doc
  *
