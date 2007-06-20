@@ -66,6 +66,10 @@ $LinkblogList->set_filters( array(
 // Run the query:
 $LinkblogList->query();
 
+if( ! $LinkblogList->get_num_rows() )
+{ // empty list:
+	return;
+}
 
 // Open the global list
 echo $linkblog_main_start;
@@ -107,6 +111,9 @@ echo $linkblog_main_end;
 
 /*
  * $Log$
+ * Revision 1.22  2007/06/20 23:00:58  blueyed
+ * Do not display anything if linkblog is empty
+ *
  * Revision 1.21  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *
