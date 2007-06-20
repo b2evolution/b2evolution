@@ -110,7 +110,7 @@ class POP3 {
 	 *
 	 * @param string server, overriden by MAILSERVER, if not empty
 	 * @param integer port, default 110
-	 * @return true on success, false on fail
+	 * @return boolean true on success, false on fail
 	 */
 	function connect ($server, $port = 110)
 	{
@@ -181,7 +181,7 @@ class POP3 {
 
 	/**
 	 * Sends the USER command
-	 * @return true or false
+	 * @return boolean
 	 */
 	function user ($user = '') {
 			if( empty($user) ) {
@@ -734,6 +734,9 @@ class POP3 {
 
 /*
  * $Log$
+ * Revision 1.7  2007/06/20 23:00:13  blueyed
+ * doc fixes
+ *
  * Revision 1.6  2007/04/26 00:11:12  fplanque
  * (c) 2007
  *

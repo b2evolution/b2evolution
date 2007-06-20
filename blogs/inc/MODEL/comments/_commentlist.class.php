@@ -158,7 +158,7 @@ class CommentList extends DataObjectList
 	 * Template function: display message if list is empty
 	 *
 	 * @param string String to display if list is empty
-   * @return true if empty
+	 * @return boolean true if empty
 	 */
 	function display_if_empty( $message = '' )
 	{
@@ -174,6 +174,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.9  2007/06/20 23:00:14  blueyed
+ * doc fixes
+ *
  * Revision 1.8  2007/05/14 02:43:04  fplanque
  * Started renaming tables. There probably won't be a better time than 2.0.
  *

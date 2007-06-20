@@ -1931,7 +1931,7 @@ class Results extends Table
 	 * Template function: display message if list is empty
 	 *
 	 * @param string String to display if list is empty
-   * @return true if empty
+	 * @return boolean true if empty
 	 */
 	function display_if_empty( $message = '' )
 	{
@@ -1970,6 +1970,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.55  2007/06/20 23:00:14  blueyed
+ * doc fixes
+ *
  * Revision 1.54  2007/06/19 23:15:08  blueyed
  * doc fixes
  *
