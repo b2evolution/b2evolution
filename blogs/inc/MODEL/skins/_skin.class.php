@@ -123,31 +123,9 @@ class Skin extends DataObject
 
 		// echo '<div>Debug: container: '.$sco_name.'</div>';
 
-		// Make sure we have the basic params we expect:
-		$params = array_merge( array(
-					'block_start' => '<div class="$wi_class$">',
-					'block_end' => '</div>',
-					'block_display_title' => true,
-					'block_title_start' => '<h3>',
-					'block_title_end' => '</h3>',
-					'list_start' => '<ul>',
-					'list_end' => '</ul>',
-					'item_start' => '<li>',
-					'item_end' => '</li>',
-					'link_default_class' => 'default',
-					'item_text_start' => '',
-					'item_text_end' => '',
-					'item_selected_start' => '<li>',
-					'item_selected_end' => '</li>',
-					'link_selected_class' => 'selected',
-					'item_selected_text_start' => '',
-					'item_selected_text_end' => '',
-					'group_start' => '<ul>',
-					'group_end' => '</ul>',
-					'notes_start' => '<div class="notes">',
-					'notes_end' => '</div>',
-				), $params );
-
+    /**
+		 * @var WidgetCache
+		 */
    	$WidgetCache = & get_Cache( 'WidgetCache' );
 		$Widget_array = & $WidgetCache->get_by_coll_container( $Blog->ID, $sco_name );
 
@@ -370,6 +348,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2007/06/20 21:42:13  fplanque
+ * implemented working widget/plugin params
+ *
  * Revision 1.19  2007/05/28 01:36:24  fplanque
  * enhanced blog list widget
  *

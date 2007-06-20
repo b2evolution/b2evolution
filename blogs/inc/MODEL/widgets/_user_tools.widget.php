@@ -25,6 +25,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'MODEL/widgets/_componentwidget.class.php' );
+
 /**
  * ComponentWidget Class
  *
@@ -34,10 +36,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class user_tools_Widget extends ComponentWidget
 {
-  /**
-	 * @var string
+	/**
+	 * Constructor
 	 */
-	var $code = 'user_tools';
+	function user_tools_Widget( $db_row = NULL )
+	{
+		// Call parent constructor:
+		parent::ComponentWidget( $db_row, 'core', 'user_tools' );
+	}
 
 
 	/**
@@ -90,6 +96,9 @@ class user_tools_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/20 21:42:14  fplanque
+ * implemented working widget/plugin params
+ *
  * Revision 1.1  2007/06/18 21:25:48  fplanque
  * one class per core widget
  *

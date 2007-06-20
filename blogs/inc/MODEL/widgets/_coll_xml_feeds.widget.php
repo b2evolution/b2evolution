@@ -25,6 +25,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'MODEL/widgets/_componentwidget.class.php' );
+
 /**
  * ComponentWidget Class
  *
@@ -34,10 +36,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class coll_xml_feeds_Widget extends ComponentWidget
 {
-  /**
-	 * @var string
+	/**
+	 * Constructor
 	 */
-	var $code = 'coll_xml_feeds';
+	function coll_xml_feeds_Widget( $db_row = NULL )
+	{
+		// Call parent constructor:
+		parent::ComponentWidget( $db_row, 'core', 'coll_xml_feeds' );
+	}
 
 
 	/**
@@ -111,6 +117,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/20 21:42:13  fplanque
+ * implemented working widget/plugin params
+ *
  * Revision 1.1  2007/06/18 21:25:47  fplanque
  * one class per core widget
  *

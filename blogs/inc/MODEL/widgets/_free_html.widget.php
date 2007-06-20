@@ -25,6 +25,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'MODEL/widgets/_componentwidget.class.php' );
+
 /**
  * ComponentWidget Class
  *
@@ -34,10 +36,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class free_html_Widget extends ComponentWidget
 {
-  /**
-	 * @var string
+	/**
+	 * Constructor
 	 */
-	var $code = 'free_html';
+	function free_html_Widget( $db_row = NULL )
+	{
+		// Call parent constructor:
+		parent::ComponentWidget( $db_row, 'core', 'free_html' );
+	}
 
 
 	/**
@@ -98,9 +104,9 @@ class free_html_Widget extends ComponentWidget
 		// Collection common links:
 		echo $this->disp_params['block_start'];
 
-		$this->disp_title( $this->get_param( 'title' ) );
+		$this->disp_title( $this->disp_params['title'] );
 
-		echo format_to_output( $this->get_param( 'content' ) );
+		echo format_to_output( $this->disp_params['content'] );
 
 		echo $this->disp_params['block_end'];
 
@@ -111,6 +117,9 @@ class free_html_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/20 21:42:14  fplanque
+ * implemented working widget/plugin params
+ *
  * Revision 1.1  2007/06/20 13:19:29  fplanque
  * Free html widget
  *

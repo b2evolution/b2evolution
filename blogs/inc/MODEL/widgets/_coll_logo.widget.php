@@ -25,6 +25,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'MODEL/widgets/_componentwidget.class.php' );
+
 /**
  * ComponentWidget Class
  *
@@ -34,10 +36,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class coll_logo_Widget extends ComponentWidget
 {
-  /**
-	 * @var string
+	/**
+	 * Constructor
 	 */
-	var $code = 'coll_logo';
+	function coll_logo_Widget( $db_row = NULL )
+	{
+		// Call parent constructor:
+		parent::ComponentWidget( $db_row, 'core', 'coll_logo' );
+	}
 
 
 	/**
@@ -54,7 +60,7 @@ class coll_logo_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Include logo.gif from the blog\'s file root.');
+		return T_('Include a logo/image from the blog\'s file root.');
 	}
 
 
@@ -96,7 +102,7 @@ class coll_logo_Widget extends ComponentWidget
 		echo $this->disp_params['block_start'];
 
 		$title = '<a href="'.$Blog->get( 'url', 'raw' ).'">'
-							.'<img src="'.$Blog->get_media_url().$this->get_param('logo_file').'" alt="'.$Blog->dget( 'name', 'htmlattr' ).'" />'
+							.'<img src="'.$Blog->get_media_url().$this->disp_params['logo_file'].'" alt="'.$Blog->dget( 'name', 'htmlattr' ).'" />'
 							.'</a>';
 		$this->disp_title( $title );
 
@@ -109,6 +115,9 @@ class coll_logo_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2007/06/20 21:42:13  fplanque
+ * implemented working widget/plugin params
+ *
  * Revision 1.2  2007/06/20 00:48:17  fplanque
  * some real life widget settings
  *

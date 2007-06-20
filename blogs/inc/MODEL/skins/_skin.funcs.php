@@ -135,6 +135,41 @@ function skin_content_meta( $type = 'text/html' )
 
 
 /**
+ * Display a Widget.
+ *
+ * This load the widget class, instantiates it, and displays it.
+ *
+ * @param array
+ */
+function skin_widget( $params )
+{
+	if( empty( $params['widget'] ) )
+	{
+		echo 'No widget code provided!';
+		return false;
+	}
+
+	$widget_code = $params['widget'];
+	unset( $params['widget'] );
+
+	if( ! load_class( 'MODEL/widgets/_'.$widget_code.'.widget.php', false ) )
+	{	// For some reason, that widget doesn't seem to exist... (any more?)
+		echo "Invalid widget code provided [$widget_code]!";
+		return false;
+	}
+
+	$widget_classname = $widget_code.'_Widget';
+
+  /**
+	 * @var ComponentWidget
+	 */
+	$Widget = new $widget_classname();	// COPY !!
+
+	return $Widget->display( $params );
+}
+
+
+/**
  * Checks if a skin is provided by a plugin.
  *
  * @uses Plugin::GetProvidedSkins()
@@ -218,6 +253,9 @@ function & skin_install( $skin_folder, $name = NULL )
 
 /*
  * $Log$
+ * Revision 1.22  2007/06/20 21:42:13  fplanque
+ * implemented working widget/plugin params
+ *
  * Revision 1.21  2007/05/28 15:18:31  fplanque
  * cleanup
  *

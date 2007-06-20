@@ -16,24 +16,67 @@
 			<ul>
 				<li>Pages: use out-of-flow posts for general information pages. (fplanque)</li>
 			  <li>You can write Excerpts for posts and use them in XML feeds (instead of full contents). (fplanque) </li>
+				<li>Each blog has now an owner; skins have a link to contact the owner on all default skins (fplanque)</li>
+				<li>Photoblog features (fplanque)</li>
 			</ul>
 		</li>
-		<li>Enhanced Skins:<ul><li>evoSkins 2.0 offering superior flexibility in customizing different views (fplanque) </li>
-		  <li>evoSkins 2.0 implement containers: (fplanque)
+		<li>Enhanced Skins:<ul>
+		  <li>evoSkins 2.0 offering superior flexibility in customizing different views based on what is being displayed ($disp) (fplanque) </li>
+		  <li>evoSkins 2.0 implement widget containers: (fplanque)
 		  	<ul>
 		  		<li>Containers can receive widgets directly from the backoffice. No file editing necessary. (fplanque)</li>
-	  		  <li>Widgets can be provided by plugins (&quot;SkinTag&quot; recycled).</li>
+	  		  <li>Widgets can be provided by plugins (&quot;SkinTag&quot; reloaded).</li>
 		  	  <li>Widgets receive default presentation params from the skin's container in order to automagically adjust their look to the skin they're used in (fplanque).</li>
 	  	  	<li>Widget can be configured to behave/display differently in every location where they are displayed. (fplanque)</li>
+		  		<li>Cascading widget params: overall defaults &lt; widget defaults &lt; container/calltime params &lt; widget specific configs (saved in DB)</li>
 		  	</ul>
 		  </li>
-	    <li>Photoblog features (fplanque)</li>
-	    <li>Widget to display other blogs from same owner (fplanque)</li>
-			</ul>
+	    <li>Default widgets:
+	    	<ul>
+	    		<li> Blog list:
+	    			<ul>
+	    				<li> Public blog list : Display list of all blogs marked as public.</li>
+    					<li>Same owner's blog list : Display list of all blogs owned by the same user.</li>
+ 						</ul>
+	    		</li>
+   				<li> Blog header:
+						<ul>
+							<li> Blog logo : Include a logo/image from the blog's file root.           </li>
+							<li>Blog title : Display blog title</li>
+							<li>Blog tagline :Display blog's tagline     </li>
+						</ul>
+   				</li>
+    			<li> Blog contents:
+    				<ul>
+    					<li>Page list : Display list of all pages           </li>
+   						<li>Post list : Display list of all posts     </li>
+   					</ul>
+    			</li>
+    			<li>Meta contents:
+						<ul>
+							<li>Long Description of this Blog : Display this blog's long description.</li>
+							<li>Free HTML : Display a block of free HTML code.     </li>
+						</ul>
+    			</li>
+    			<li> Tools:
+    				<ul>
+    					<li> Common Navigation Links : Display these links: Recently, Archives, Categories, Latest Comments           </li>
+   						<li>Content Search Form : Display search form           </li>
+    					<li>XML Feeds (RSS / Atom) : Display list of all available XML feeds.           </li>
+    					<li>User Tools : Display user tools: Log in, Admin, Profile, Subscriptions, Log out</li>
+   					</ul>
+    			</li>
+    			<li> Widgets provided by Plugins:
+    				<ul>
+    					<li>  Calendar Widget : This skin tag displays a navigable calendar.           </li>
+   						<li>Archives Widget : This skin tag displays a list of post archives.           </li>
+    					<li>Categories Widget : This skin tag displays the list of available categories for the blog</li>
+    				</ul>
+    			</li>
+    		</ul>
+	    </li>
+	    </ul>
 		</li>
-		<ul>
-			<li>Each blog has now an owner; skins have a link to contact the owner on all default skins (fplanque)</li>
-		</ul>
 		<li>Enhanced Back-office:
       <ul>
       	<li>Reorganized backoffice (fplanque)</li>
@@ -134,7 +177,7 @@
    		</ul>
   	</li>
   </ul>
-	<h2>1.10.1</h2>
+<h2>1.10.1</h2>
 	<ul>
 		<li>HTML Checker can be configured to allow style=&quot;&quot; attributes. (Yabba)</li>
 	  <li>More XHTML Strict when requested. (Yabba) </li>

@@ -99,13 +99,11 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 <!-- InstanceBeginEditable name="NavBar2" -->
 <?php
-	// ---------------------------- BLOG LIST INSERTED HERE ------------------------------
-
-	load_class( 'MODEL/widgets/_componentwidget.class.php' );
-
-	$colls_list_ComponentWidget = & new ComponentWidget( NULL, 'core', 'colls_list_public' );
-
-	$colls_list_ComponentWidget->display( array(
+	// --------------------------------- START OF BLOG LIST --------------------------------
+	skin_widget( array(
+						// CODE for the widget:
+						'widget' => 'colls_list_public',
+						// Optional display params
 						'block_start' => '<div class="NavBar">',
 						'block_end' => '</div>',
 						'block_display_title' => false,
@@ -118,7 +116,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 						'link_selected_class' => 'NavButton2',
 						'link_default_class' => 'NavButton2',
 				) );
-
 	// ---------------------------------- END OF BLOG LIST ---------------------------------
 ?>
 <!-- InstanceEndEditable -->
@@ -221,8 +218,19 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <div class="bSideBar">
 
 	<div class="bSideItem">
-		<h3><?php $Blog->disp( 'name', 'htmlbody' ) ?></h3>
-		<p><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></p>
+
+		<h3><?php
+			// BLOG TITLE:
+			$Blog->disp( 'name', 'htmlbody' );
+			// Note: we could have called the coll_title widget instead, but that would be overkill.
+		?></h3>
+
+		<p><?php
+			// BLOG LONG DESCRIPTION:
+			$Blog->disp( 'longdesc', 'htmlbody' );
+			// Note: we could have called the coll_longdesc widget instead, but that would be overkill.
+		?></p>
+
 		<?php
 			// Links to list pages:
 			if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
@@ -230,31 +238,53 @@ header( 'Content-type: text/html; charset='.$io_charset );
    				'next_text' => T_('Next').' &gt;&gt;',
 				) );
 		?>
-		<ul>
-			<li><a href="<?php $Blog->disp( 'url', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a></li>
-			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Latest comments') ?></strong></a></li>
-		</ul>
-		<?php // -------------------------- CALENDAR INCLUDED HERE -----------------------------
-			// Call the Calendar plugin:
+
+		<?php
+			// --------------------------------- START OF COMMON LINKS --------------------------------
+			// Call the coll_common_links widget:
+			skin_widget( array(
+								// CODE for the widget:
+								'widget' => 'coll_common_links',
+								// Optional display params:
+								'show_recently' => true,
+								'show_archives' => true,
+								'show_categories' => false,
+								'show_latestcomments' => false,
+								'list_start' => '<ul>',
+								'list_end' => '</ul>',
+								'item_start' => '<li>',
+								'item_end' => '</li>',
+						) );
+			// ---------------------------------- END OF COMMON LINKS ---------------------------------
+		?>
+
+		<?php
+			// ------------------------------- START OF CALENDAR ---------------------------------
+			// Call the Calendar plugin (if installed):
 			$Plugins->call_by_code( 'evo_Calr', array(	// Params follow:
-					'block_start'=>'',
-					'block_end'=>'',
-					'title'=>'',			// No title.
+					'block_start' => '',
+					'block_end' => '',
+					'displaycaption' => true,
+					'linktomontharchive' => false,
 				) );
-			// -------------------------------- END OF CALENDAR ---------------------------------- ?>
+			// -------------------------------- END OF CALENDAR ----------------------------------
+		?>
 	</div>
 
-	<div class="bSideItem">
-		<h3 class="sideItemTitle"><?php echo T_('Search') ?></h3>
-		<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), 'search', 'searchform' ) ?>
-				<input type="text" name="s" size="30" value="<?php echo htmlspecialchars($s) ?>" class="s1" />
-				<input type="radio" name="sentence" value="AND" id="sentAND" <?php if( $sentence=='AND' ) echo 'checked="checked" ' ?>/><label for="sentAND"><?php echo T_('All Words') ?></label>
-				<input type="radio" name="sentence" value="OR" id="sentOR" <?php if( $sentence=='OR' ) echo 'checked="checked" ' ?>/><label for="sentOR"><?php echo T_('Some Word') ?></label>
-				<input type="radio" name="sentence" value="sentence" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" ' ?>/><label for="sentence"><?php echo T_('Entire phrase') ?></label>
-			<input type="submit" name="submit" value="<?php echo T_('Search') ?>" />
-			<input type="reset" value="<?php echo T_('Reset form') ?>" />
-		</form>
-	</div>
+	<?php
+		// --------------------------------- START OF SEARCH FORM --------------------------------
+		// Call the coll_search_form widget:
+		skin_widget( array(
+							// CODE for the widget:
+							'widget' => 'coll_search_form',
+							// Optional display params:
+							'block_start' => '<div class="bSideItem">',
+							'block_end' => '</div>',
+							'block_title_start' => '<h3 class="sideItemTitle">',
+							'block_title_end' => '</h3>',
+					) );
+		// ---------------------------------- END OF SEARCH FORM ---------------------------------
+	?>
 
 	<div class="bSideItem">
 		<h3><?php echo T_('Categories') ?></h3>

@@ -69,8 +69,61 @@ class calendar_plugin extends Plugin
 	}
 
 
+  /**
+   * Get definitions for widget specific editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_widget_param_definitions( $params )
+	{
+		$r = array(
+			'displaycaption' => array(
+				'label' => T_('Display caption'),
+				'note' => T_('Display caption on top of calendar'),
+				'type' => 'checkbox',
+				'defaultvalue' => true,
+			),
+			'linktomontharchive' => array(
+				'label' => T_('Link caption to archives'),
+				'note' => T_('The month in the caption can be clicked to see all posts for this month'),
+				'type' => 'checkbox',
+				'defaultvalue' => true,
+			),
+			'headerdisplay' => array(
+				'label' => 'Column headers',
+				'note' => T_('How do you want to display the days of the week in the column headers?'),
+				'type' => 'select',
+				'options' => array( 'e' => 'F', 'D' => 'Fri', 'l' => 'Friday', '' => T_('No header') ),
+				'defaultvalue' => 'D',
+			),
+			'navigation' => array(
+				'label' => 'Navigation arrows',
+				'note' => T_('Where do you want to display the navigation arrows?'),
+				'type' => 'select',
+				'options' => array( 'caption' => T_('Top'), 'tfoot' => T_('Bottom'), '' => T_('No navigation') ),
+				'defaultvalue' => 'tfoot',
+			),
+			'navigation' => array(
+				'label' => 'Navigation arrows',
+				'note' => T_('Where do you want to display the navigation arrows?'),
+				'type' => 'select',
+				'options' => array( 'caption' => T_('Top'), 'tfoot' => T_('Bottom'), '' => T_('No navigation') ),
+				'defaultvalue' => 'tfoot',
+			),
+			'browseyears' => array(
+				'label' => T_('Navigate years'),
+				'note' => T_('Display double arrows for yearly navigation?'),
+				'type' => 'checkbox',
+				'defaultvalue' => true,
+			),
+		);
+		return $r;
+	}
+
+
 	/**
-	 * Event handler: SkinTag
+	 * Event handler: SkinTag (widget)
 	 *
 	 * @param array Associative array of parameters. Valid keys are:
 	 *      - 'block_start' : (Default: '<div class="bSideItem">')
@@ -419,11 +472,9 @@ class Calendar
 		$this->todaycellstart = '<td id="bCalendarToday">';
 		$this->todaycellstartpost = '<td id="bCalendarToday" class="bCalendarLinkPost">';
 
-		// Where do we want to have the navigation arrows?
+		// Where do we want to have the navigation arrows? tfoot or caption
 		$this->navigation = 'tfoot';
-		// Do we want to check if there are posts behind the navigation arrows?
-		// WARNING: this will slow things down...
-		// TODO: $this->check_navigation = false;
+
 		// Do we want arrows to move one year at a time?
 		$this->browseyears = true;
 
@@ -575,7 +626,7 @@ class Calendar
 
 			if( $this->navigation == 'caption' )
 			{
-				echo implode( '&nbsp;', $this->getNavLinks( 'prev' ) );
+				echo implode( '&nbsp;', $this->getNavLinks( 'prev' ) ).'&nbsp;';
 			}
 
 			if( $this->mode == 'month' )
@@ -599,7 +650,7 @@ class Calendar
 
 			if( $this->navigation == 'caption' )
 			{
-				echo implode( '&nbsp;', $this->getNavLinks( 'next' ) );
+				echo '&nbsp;'.implode( '&nbsp;', $this->getNavLinks( 'next' ) );
 			}
 
 			echo $this->monthend;
@@ -1115,6 +1166,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.43  2007/06/20 21:42:15  fplanque
+ * implemented working widget/plugin params
+ *
  * Revision 1.42  2007/05/14 02:43:06  fplanque
  * Started renaming tables. There probably won't be a better time than 2.0.
  *

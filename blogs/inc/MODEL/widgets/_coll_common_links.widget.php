@@ -25,6 +25,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'MODEL/widgets/_componentwidget.class.php' );
+
 /**
  * ComponentWidget Class
  *
@@ -34,10 +36,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class coll_common_links_Widget extends ComponentWidget
 {
-  /**
-	 * @var string
+	/**
+	 * Constructor
 	 */
-	var $code = 'coll_common_links';
+	function coll_common_links_Widget( $db_row = NULL )
+	{
+		// Call parent constructor:
+		parent::ComponentWidget( $db_row, 'core', 'coll_common_links' );
+	}
 
 
 	/**
@@ -66,7 +72,6 @@ class coll_common_links_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		// Demo data:
 		$r = array(
 			'show_recently' => array(
 				'type' => 'checkbox',
@@ -114,14 +119,14 @@ class coll_common_links_Widget extends ComponentWidget
 		echo $this->disp_params['block_start'];
 		echo $this->disp_params['list_start'];
 
-		if( $this->get_param( 'show_recently' ) )
+		if( $this->disp_params['show_recently'] )
 		{
 			echo $this->disp_params['item_start'];
 			echo '<strong><a href="'.$Blog->get('url').'">'.T_('Recently').'</a></strong>';
 			echo $this->disp_params['item_end'];
 		}
 
-		if( $this->get_param( 'show_archives' ) )
+		if( $this->disp_params['show_archives'] )
 		{
 			// fp> TODO: don't display this if archives plugin not installed... or depluginize archives (I'm not sure)
 			echo $this->disp_params['item_start'];
@@ -129,7 +134,7 @@ class coll_common_links_Widget extends ComponentWidget
 			echo $this->disp_params['item_end'];
 		}
 
-		if( $this->get_param( 'show_categories' ) )
+		if( $this->disp_params['show_categories'] )
 		{
 			// fp> TODO: don't display this if categories plugin not installed... or depluginize categories (I'm not sure)
 			echo $this->disp_params['item_start'];
@@ -137,7 +142,7 @@ class coll_common_links_Widget extends ComponentWidget
 			echo $this->disp_params['item_end'];
 		}
 
-		if( $this->get_param( 'show_latestcomments' ) )
+		if( $this->disp_params['show_latestcomments'] )
 		{
 			echo $this->disp_params['item_start'];
 			echo '<strong><a href="'.$Blog->get('lastcommentsurl').'">'.T_('Latest comments').'</a></strong>';
@@ -154,6 +159,9 @@ class coll_common_links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2007/06/20 21:42:13  fplanque
+ * implemented working widget/plugin params
+ *
  * Revision 1.2  2007/06/20 00:48:17  fplanque
  * some real life widget settings
  *

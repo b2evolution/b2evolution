@@ -44,7 +44,17 @@ class ComponentWidget extends DataObject
 	var $code;
 	var $params;
 
+  /**
+	 * Array of params which have been customized for this widget instance
+	 *
+	 * This is saved to the DB as a serialized string ($params)
+	 */
 	var $param_array = NULL;
+
+  /**
+	 * Array of params used during display()
+	 */
+	var $disp_params;
 
 	/**
 	 * Lazy instantiated
@@ -57,8 +67,10 @@ class ComponentWidget extends DataObject
 
 	/**
 	 * Constructor
+	 *
+	 * @param object data row from db
 	 */
-	function ComponentWidget( $db_row = NULL, $type = 'core', $code = NULL, $params = NULL )
+	function ComponentWidget( $db_row = NULL, $type = 'core', $code = NULL )
 	{
 		// Call parent constructor:
 		parent::DataObject( 'T_widget', 'wi_', 'wi_ID' );
@@ -67,7 +79,6 @@ class ComponentWidget extends DataObject
 		{	// We are creating an object here:
 			$this->set( 'type', $type );
 			$this->set( 'code', $code );
-			// $this->set( 'params', $params );
 		}
 		else
 		{	// Wa are loading an object:
@@ -114,16 +125,14 @@ class ComponentWidget extends DataObject
 	 */
 	function get_name()
 	{
-		switch( $this->type )
+		if( $this->type == 'plugin' )
 		{
-			case 'plugin':
-				// Make sure Plugin is loaded:
-				if( $this->get_Plugin() )
-				{
-					return $this->Plugin->name;
-				}
-				return T_('Inactive / Uninstalled plugin');
-				break;
+			// Make sure Plugin is loaded:
+			if( $this->get_Plugin() )
+			{
+				return $this->Plugin->name;
+			}
+			return T_('Inactive / Uninstalled plugin');
 		}
 
 		return T_('Unknown');
@@ -137,16 +146,14 @@ class ComponentWidget extends DataObject
 	 */
 	function get_desc()
 	{
-		switch( $this->type )
+		if( $this->type == 'plugin' )
 		{
-			case 'plugin':
-				// Make sure Plugin is loaded:
-				if( $this->get_Plugin() )
-				{
-					return $this->Plugin->short_desc;
-				}
-				return T_('Inactive / Uninstalled plugin');
-				break;
+			// Make sure Plugin is loaded:
+			if( $this->get_Plugin() )
+			{
+				return $this->Plugin->short_desc;
+			}
+			return T_('Inactive / Uninstalled plugin');
 		}
 
 		return T_('Unknown');
@@ -161,6 +168,15 @@ class ComponentWidget extends DataObject
 	 */
 	function get_param_definitions( $params )
 	{
+		if( $this->type == 'plugin' )
+		{
+			// Make sure Plugin is loaded:
+			if( $this->get_Plugin() )
+			{
+				return $this->Plugin->get_widget_param_definitions( $params );
+			}
+		}
+
 		return array();
 
 
@@ -227,19 +243,29 @@ class ComponentWidget extends DataObject
 
 
   /**
+	 * Load param array
+	 */
+	function load_param_array()
+	{
+		if( is_null( $this->param_array ) )
+		{	// Param array has not been loaded yet
+			$this->param_array = @unserialize( $this->params );
+
+			if( empty( $this->param_array ) )
+			{	// No saved param values were found:
+				$this->param_array = array();
+			}
+		}
+	}
+
+
+  /**
  	 * param value
  	 *
 	 */
 	function get_param( $parname )
 	{
-		if( is_null( $this->param_array ) )
-		{
-			$this->param_array = @unserialize( $this->params );
-			if( empty( $this->param_array ) )
-			{
-				$this->param_array = array();
-			}
-		}
+		$this->load_param_array();
 
 		if( isset( $this->param_array[$parname] ) )
 		{	// We have a value for this param:
@@ -284,8 +310,56 @@ class ComponentWidget extends DataObject
 	}
 
 
+  /**
+	 * Prepare display params
+	 */
 	function init_display( $params )
 	{
+		// Generate widget defaults array:
+		$widget_defaults = array();
+		$defs = $this->get_param_definitions( array() );
+		foreach( $defs as $parname => $parmeta )
+		{
+			if( isset( $parmeta['defaultvalue'] ) )
+			{
+				$widget_defaults[ $parname ] = $parmeta['defaultvalue'];
+			}
+			else
+			{
+				$widget_defaults[ $parname ] = NULL;
+			}
+		}
+
+		// Load DB configuration:
+		$this->load_param_array();
+
+		// Merge basic defaults < widget defaults < container params < DB params
+		// note: when called with skin_widget it falls back to basic defaults < widget defaults < calltime params < array()
+		$params = array_merge( array(
+					'block_start' => '<div class="$wi_class$">',
+					'block_end' => '</div>',
+					'block_display_title' => true,
+					'block_title_start' => '<h3>',
+					'block_title_end' => '</h3>',
+					'list_start' => '<ul>',
+					'list_end' => '</ul>',
+					'item_start' => '<li>',
+					'item_end' => '</li>',
+					'link_default_class' => 'default',
+					'item_text_start' => '',
+					'item_text_end' => '',
+					'item_selected_start' => '<li>',
+					'item_selected_end' => '</li>',
+					'link_selected_class' => 'selected',
+					'item_selected_text_start' => '',
+					'item_selected_text_end' => '',
+					'group_start' => '<ul>',
+					'group_end' => '</ul>',
+					'notes_start' => '<div class="notes">',
+					'notes_end' => '</div>',
+				), $widget_defaults, $params, $this->param_array );
+
+
 		// Customize params to the current widget:
 		$this->disp_params = str_replace( '$wi_class$', 'widget_'.$this->type.'_'.$this->code, $params );
 	}
@@ -319,7 +393,9 @@ class ComponentWidget extends DataObject
 				break;
 		}
 
-		echo '<!-- Unkown '.$this->type.' widget: '.$this->code.' -->';
+		echo "Widget $this->type : $this->code did not provide a display() method! ";
+
+		return false;
 	}
 
 
@@ -506,6 +582,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2007/06/20 21:42:13  fplanque
+ * implemented working widget/plugin params
+ *
  * Revision 1.6  2007/06/20 14:25:00  fplanque
  * fixes
  *

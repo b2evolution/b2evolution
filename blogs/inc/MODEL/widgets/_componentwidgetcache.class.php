@@ -103,6 +103,7 @@ class WidgetCache extends DataObjectCache
 		{
 			if( ! load_class( 'MODEL/widgets/_'.$row->wi_code.'.widget.php', false ) )
 			{	// For some reason, that widget doesn't seem to exist... (any more?)
+				// echo "Widget $row->wi_code could not be loaded! ";
 				// TODO: replace with dummy widget in order to give a chance to clean up.
 				$r = NULL;
 				return $r;
@@ -119,8 +120,6 @@ class WidgetCache extends DataObjectCache
 
 		return $obj;
 	}
-
-
 
 
 	/**
@@ -140,6 +139,9 @@ class WidgetCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.3  2007/06/20 21:42:13  fplanque
+ * implemented working widget/plugin params
+ *
  * Revision 1.2  2007/06/20 14:25:00  fplanque
  * fixes
  *

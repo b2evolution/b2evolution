@@ -73,13 +73,11 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 <!-- InstanceBeginEditable name="NavBar2" -->
 <?php
-	// ---------------------------- BLOG LIST INSERTED HERE ------------------------------
-
-	load_class( 'MODEL/widgets/_componentwidget.class.php' );
-
-	$colls_list_ComponentWidget = & new ComponentWidget( NULL, 'core', 'colls_list_public' );
-
-	$colls_list_ComponentWidget->display( array(
+	// --------------------------------- START OF BLOG LIST --------------------------------
+	skin_widget( array(
+						// CODE for the widget:
+						'widget' => 'colls_list_public',
+						// Optional display params
 						'block_start' => '<div class="NavBar">',
 						'block_end' => '</div>',
 						'block_display_title' => false,
@@ -92,7 +90,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 						'link_selected_class' => 'NavButton2',
 						'link_default_class' => 'NavButton2',
 				) );
-
 	// ---------------------------------- END OF BLOG LIST ---------------------------------
 ?>
 <!-- InstanceEndEditable -->

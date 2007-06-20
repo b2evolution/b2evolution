@@ -378,6 +378,7 @@ class Plugin
 	 *
 	 * @todo 3.0 fp> 1) This is not an event: RENAME to lowercase (in b2evo 3.0)
 	 * @todo 3.0 fp> 2) This defines more than Default values ::  confusing name
+	 * @todo name tentative get_general_param_definitions()
 	 *
 	 * @param array Associative array of parameters (since 1.9).
 	 *    'for_editing': true, if the settings get queried for editing;
@@ -531,6 +532,7 @@ class Plugin
 	 *
 	 * @todo 3.0 fp> 1) This is not an event: RENAME to lowercase (in b2evo 3.0)
 	 * @todo 3.0 fp> 2) This defines more than Default values ::  confusing name
+	 * @todo name tentative get_user_param_definitions()
 	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param array Associative array of parameters.
@@ -539,6 +541,18 @@ class Plugin
 	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
 	function GetDefaultUserSettings( & $params )
+	{
+		return array();
+	}
+
+
+  /**
+   * Get definitions for widget specific editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_widget_param_definitions( $params )
 	{
 		return array();
 	}
@@ -2854,6 +2868,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.161  2007/06/20 21:42:14  fplanque
+ * implemented working widget/plugin params
+ *
  * Revision 1.160  2007/06/19 22:54:04  blueyed
  * doc fix
  *
