@@ -30,17 +30,6 @@ $skin = '';
 # You should not have to change this.
 $show_statuses = array();
 
-# You could *force* a specific link blog here with this setting: (otherwise, default will be used)
-# $linkblog = 4;
-
-# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
-# Example: $linkblog_cat = '4,6,7';
-$linkblog_cat = '';
-
-# This is the array if categories to restrict the linkblog to (non recursive)
-# Example: $linkblog_catsel = array( 4, 6, 7 );
-$linkblog_catsel = array( );
-
 # Here you can set a limit before which posts will be ignored
 # You can use a unix timestamp value or 'now' which will hide all posts in the past
 $timestamp_min = '';
@@ -322,9 +311,20 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		</ul>
 	</div>
 
-	<?php // -------------------------- LINKBLOG INCLUDED HERE -----------------------------
-		require( $skins_path.'_linkblog.php' );
-		// -------------------------------- END OF LINKBLOG ---------------------------------- ?>
+	<?php
+		// --------------------------------- START OF LINKBLOG --------------------------------
+		// Call the coll_search_form widget:
+		skin_widget( array(
+							// CODE for the widget:
+							'widget' => 'linkblog',
+							// Optional display params:
+							'block_start' => '<div class="bSideItem">',
+							'block_end' => '</div>',
+							'block_title_start' => '<h3 class="sideItemTitle">',
+							'block_title_end' => '</h3>',
+					) );
+		// ---------------------------------- END OF LINKBLOG ---------------------------------
+	?>
 
 
 	<div class="bSideItem">

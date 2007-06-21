@@ -231,7 +231,6 @@ require $skins_path.'_html_header.inc.php';
 
 <div class="bSideBar">
 
-
 	<?php
 		// Display container contents:
 		$Skin->container( NT_('Sidebar'), array(
@@ -256,14 +255,6 @@ require $skins_path.'_html_header.inc.php';
 				'notes_end' => '</div>',
 			) );
 	?>
-
-
-	<?php
-		// -------------------------- LINKBLOG INCLUDED HERE -----------------------------
-		require( dirname(__FILE__).'/_linkblog.php' );
-		// -------------------------------- END OF LINKBLOG ----------------------------------
-	?>
-
 
 	<p class="center"><!-- Please help us promote b2evolution and leave this link on your blog. --><a href="http://b2evolution.net/" title="b2evolution: next generation blog software"><img src="../../rsc/img/powered-by-b2evolution-120t.gif" alt="powered by b2evolution free blog software" title="b2evolution: next generation blog software" width="120" height="32" border="0" /></a></p>
 

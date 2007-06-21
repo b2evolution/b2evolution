@@ -415,6 +415,126 @@ class ComponentWidget extends DataObject
 
 
   /**
+	 * List of items by category
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function disp_cat_item_list()
+	{
+		global $BlogCache, $Blog;
+
+		$linkblog = $Blog->get('links_blog_ID');
+
+		if( ! $linkblog )
+		{	// No linkblog blog requested for this blog
+			return;
+		}
+
+		// Load the linkblog blog:
+		$link_Blog = & $BlogCache->get_by_ID( $linkblog, false );
+
+		if( empty($link_Blog) )
+		{
+			echo $linkblog_main_start.T_('The requested Blog doesn\'t exist any more!').$linkblog_main_end;
+			return;
+		}
+
+
+		# global linkblog delimiters:
+		if(!isset($linkblog_main_start)) $linkblog_main_start = '<div class="bSideItem"><h3>'.
+																															T_('Linkblog').'</h3>';
+		if(!isset($linkblog_main_end)) $linkblog_main_end = '</div>';
+		# Category delimiters:
+		if(!isset($linkblog_catname_before)) $linkblog_catname_before = '<h4>';
+		if(!isset($linkblog_catname_after)) $linkblog_catname_after = '</h4><ul>';
+		if(!isset($linkblog_catlist_end)) $linkblog_catlist_end = '</ul>';
+		# Item delimiters:
+		if(!isset($linkblog_item_before)) $linkblog_item_before = '<li>';
+		if(!isset($linkblog_item_after)) $linkblog_item_after = '</li>';
+
+
+		# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
+		# Example: $linkblog_cat = '4,6,7';
+		$linkblog_cat = '';
+
+		# This is the array if categories to restrict the linkblog to (non recursive)
+		# Example: $linkblog_catsel = array( 4, 6, 7 );
+		$linkblog_catsel = array();
+
+		// Compile cat array stuff:
+		$linkblog_cat_array = array();
+		$linkblog_cat_modifier = '';
+		compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $linkblog );
+
+		$LinkblogList = & new ItemListLight( $link_Blog );
+
+		$LinkblogList->set_filters( array(
+				'cat_array' => $linkblog_cat_array,
+				'cat_modifier' => $linkblog_cat_modifier,
+				'orderby' => 'main_cat_ID title',
+				'order' => 'ASC',
+				'unit' => 'all',
+			) );
+
+		// Run the query:
+		$LinkblogList->query();
+
+		if( ! $LinkblogList->get_num_rows() )
+		{ // empty list:
+			return;
+		}
+
+		echo $this->disp_params['block_start'];
+
+ 		$this->disp_title( T_('Linkblog') );
+
+		echo $this->disp_params['list_start'];
+
+    /**
+		 * @var ItemLight
+		 */
+		while( $Item = & $LinkblogList->get_category_group() )
+		{
+			// Open new cat:
+			echo $this->disp_params['item_start'];
+			$Item->main_category();
+			echo $this->disp_params['group_start'];
+
+			while( $Item = & $LinkblogList->get_item() )
+			{
+				echo $this->disp_params['item_start'];
+
+				$Item->title( '', ' ', true );
+
+				/*
+				$Item->content_teaser( array(
+						'before'      => '',
+						'after'       => ' ',
+						'disppage'    => 1,
+						'stripteaser' => false,
+					) );
+
+				$Item->more_link( '', ' ', T_('more').' &raquo;' );
+				*/
+
+				// $Item->permanent_link( '#icon#' );
+
+				echo $this->disp_params['item_end'];
+			}
+
+			// Close cat
+			echo $this->disp_params['group_end'];
+			echo $this->disp_params['item_end'];
+		}
+
+		// Close the global list
+		echo $this->disp_params['list_end'];
+
+		echo $this->disp_params['block_end'];
+	}
+
+
+  /**
 	 * List of collections/blogs
 	 *
 	 * @param array MUST contain at least the basic display params
@@ -521,6 +641,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2007/06/21 00:44:36  fplanque
+ * linkblog now a widget
+ *
  * Revision 1.8  2007/06/20 23:12:51  fplanque
  * "Who's online" moved to a plugin
  *

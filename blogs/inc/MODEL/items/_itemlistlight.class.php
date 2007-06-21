@@ -752,7 +752,7 @@ class ItemListLight extends DataObjectList2
 		$this->query_init();
 
 		// QUERY:
-		$this->sql = 'SELECT DISTINCT '.$this->Cache->dbIDname.', post_datestart, post_datemodified, post_title,
+		$this->sql = 'SELECT DISTINCT '.$this->Cache->dbIDname.', post_datestart, post_datemodified, post_title, post_url,
 									post_excerpt, post_urltitle, post_main_cat_ID, post_ptyp_ID '
 									.$this->ItemQuery->get_from()
 									.$this->ItemQuery->get_where()
@@ -1450,6 +1450,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.8  2007/06/21 00:44:37  fplanque
+ * linkblog now a widget
+ *
  * Revision 1.7  2007/05/27 00:35:26  fplanque
  * tag display + tag filtering
  *

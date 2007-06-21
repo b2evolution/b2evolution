@@ -39,6 +39,8 @@ $core_componentwidget_defs = array(
 			'coll_search_form',
 			'coll_xml_feeds',
 			'user_tools',
+		'*'.T_('Other contents'),
+			'linkblog',
 	);
 $i = 0;
 foreach( $core_componentwidget_defs as $code )
@@ -96,6 +98,9 @@ echo '</ul></li></ul>';
 
 /*
  * $Log$
+ * Revision 1.10  2007/06/21 00:44:36  fplanque
+ * linkblog now a widget
+ *
  * Revision 1.9  2007/06/20 13:19:29  fplanque
  * Free html widget
  *

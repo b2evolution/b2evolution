@@ -30,17 +30,6 @@ $blog = 1;
 # You should not have to change this.
 $show_statuses = array();
 
-# You could *force* a specific link blog here with this setting: (otherwise, default will be used)
-# $linkblog = 4;
-
-# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
-# Example: $linkblog_cat = '4,6,7';
-$linkblog_cat = '';
-
-# This is the array if categories to restrict the linkblog to (non recursive)
-# Example: $linkblog_catsel = array( 4, 6, 7 );
-$linkblog_catsel = array( );
-
 # Here you can set a limit before which posts will be ignored
 # You can use a unix timestamp value or 'now' which will hide all posts in the past
 $timestamp_min = '';

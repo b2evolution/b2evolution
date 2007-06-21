@@ -131,11 +131,7 @@ class Item extends ItemLight
 	 * @var string
 	 */
 	var $comment_status;
-	/**
-	 * External URL the item links to (if any).
-	 * @var string
-	 */
-	var $url;          // fp> we may want to move this to the item links which allows multiple and diffrent types of links/urls/files etc.
+
 	var $pst_ID;
 	var $datedeadline = '';
 	var $priority;
@@ -258,7 +254,6 @@ class Item extends ItemLight
 			$this->renderers = $db_row->post_renderers;
 
 			$this->views = $db_row->post_views;
-			$this->url = $db_row->post_url;			// Should move
 		}
 	}
 
@@ -3017,6 +3012,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.183  2007/06/21 00:44:37  fplanque
+ * linkblog now a widget
+ *
  * Revision 1.182  2007/06/20 21:42:13  fplanque
  * implemented working widget/plugin params
  *

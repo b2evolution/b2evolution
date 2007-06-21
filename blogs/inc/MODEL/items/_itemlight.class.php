@@ -65,6 +65,12 @@ class ItemLight extends DataObject
 
 	var $urltitle;
 
+	/**
+	 * External URL the item links to (if any).
+	 * @var string
+	 */
+	var $url;
+
  	var $ptyp_ID;
 
 	/**
@@ -142,6 +148,7 @@ class ItemLight extends DataObject
 			$this->title = $db_row->post_title;
 			$this->excerpt = $db_row->post_excerpt;
 			$this->ptyp_ID = $db_row->post_ptyp_ID;
+			$this->url = $db_row->post_url;
 
 			// Derived vars
 			$ChapterCache = & get_Cache( 'ChapterCache' );
@@ -784,6 +791,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2007/06/21 00:44:37  fplanque
+ * linkblog now a widget
+ *
  * Revision 1.8  2007/05/14 02:47:23  fplanque
  * (not so) basic Tags framework
  *

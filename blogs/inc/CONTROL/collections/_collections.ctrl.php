@@ -263,10 +263,6 @@ switch( $action )
 				$blog = $edited_Blog->ID;
 				# This setting retricts posts to those published, thus hiding drafts.
 				$show_statuses = array();
-				# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
-				$linkblog_cat = '';
-				# This is the array if categories to restrict the linkblog to (non recursive)
-				$linkblog_catsel = array( );
 				# Here you can set a limit before which posts will be ignored
 				$timestamp_min = '';
 				# Here you can set a limit after which posts will be ignored
@@ -430,6 +426,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2007/06/21 00:44:36  fplanque
+ * linkblog now a widget
+ *
  * Revision 1.24  2007/05/28 01:35:23  fplanque
  * fixed static page generation
  *
