@@ -435,11 +435,13 @@ class ComponentWidget extends DataObject
 
 		if( empty($link_Blog) )
 		{
+			// TODO: $linkblog_main_start is not defined here, is it?
 			echo $linkblog_main_start.T_('The requested Blog doesn\'t exist any more!').$linkblog_main_end;
 			return;
 		}
 
 
+		// TODO: all the vars below cannot be defined here..
 		# global linkblog delimiters:
 		if(!isset($linkblog_main_start)) $linkblog_main_start = '<div class="bSideItem"><h3>'.
 																															T_('Linkblog').'</h3>';
@@ -641,6 +643,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2007/06/21 23:28:18  blueyed
+ * todos
+ *
  * Revision 1.9  2007/06/21 00:44:36  fplanque
  * linkblog now a widget
  *
