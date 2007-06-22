@@ -20,6 +20,9 @@ global $Blog;
 
 global $is_admin_page;
 
+/**
+ * @var User
+ */
 global $current_User;
 
 global $admin_url;
@@ -31,10 +34,10 @@ global $admin_url;
 <div class="actions_right">
 	<ul>
  	<li class="menu_close" onmouseover="evo_menu_show(this)" onmouseout="evo_menu_hide(this)">
-		<?php	user_profile_link( '', '', T_('My profile').' '.get_icon('dropdown') ); ?>
+		<?php	user_profile_link( '<strong>', '</strong>', '%s '.get_icon('dropdown') ); ?>
 		<ul>
 		<?php
-			user_profile_link( '<li>', '</li>', T_('User profile:').' %s' );
+			user_profile_link( '<li>', '</li>', T_('User profile').' (%s)' );
 			user_subs_link( '<li>', '</li>', T_('Email subscriptions') );
 
 			// ADMIN SKINS:
@@ -43,6 +46,7 @@ global $admin_url;
 				$admin_skins = get_admin_skins();
 				if( count( $admin_skins ) > 1 )
 				{	// We have several admin skins available: display switcher:
+					echo '<li class="separator"><hr /></li>';
 					// echo '<li class="menu_close" onmouseover="evo_menu_show(this)" onmouseout="evo_menu_hide(this)">';
 					// echo '<a href="#">'.T_('test').' '.get_icon('dropdown').'</a>';
 					// echo '<ul>';
@@ -54,6 +58,10 @@ global $admin_url;
 					// echo '</li>';
 				}
 			}
+
+		echo '<li class="separator"><hr /></li>';
+
+		user_logout_link( '<li>', '</li>', T_('Logout') );
 		?>
 		</ul>
 	</li>
@@ -81,8 +89,27 @@ global $admin_url;
 			// Note: if <strong></strong> is inside of the link, rollover fails in IE7
 		?></strong>
     <ul style="width:22ex;"><!-- size because of HR in IE7 -->
-			<?php user_admin_link( '<li>', '</li>', T_('Admin interface'), '#' ) ?>
+			<?php user_admin_link( '<li>', '</li>', T_('Admin dashboard'), '#' ) ?>
  			<?php blog_home_link( '<li>', '</li>', T_('Blog home'), T_('Home page') ); ?>
+			<?php
+				$perm_spam = $current_User->check_perm( 'spamblacklist', 'view', false );
+				$perm_options = $current_User->check_perm( 'options', 'view', false );
+				if( $perm_spam || $perm_options )
+				{ ?>
+					<li class="separator"><hr /></li>
+					<?php
+					if( $perm_options )
+					{ ?>
+					<li><a href="<?php echo $admin_url ?>?ctrl=system">About this server</a></li>
+						<?php
+					}
+					if( $perm_spam )
+					{ ?>
+					<li><a href="<?php echo $admin_url ?>?ctrl=antispam">Antispam blacklist</a></li>
+						<?php
+					}
+				}
+			?>
 			<li class="separator"><hr /></li>
       <li><a href="http://b2evolution.net/" target="_blank"><?php echo T_('Open b2evolution.net') ?></a></li>
       <li><a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Open Support forums') ?></a></li>
