@@ -249,7 +249,6 @@ function require_js( $js_file )
   // If not, print it and add it to the array, so the next plugin won't add it again
   if ( empty( $required_js ) or !in_array( strtolower( $js_url ), $required_js ) )
   {
-    echo "<script type=\"text/javascript\" src=\"$js_url\"></script>\n";
     if (empty( $required_js ) ) $required_js = array();
     $required_js[] = $js_url;
   }
@@ -257,8 +256,25 @@ function require_js( $js_file )
 }
 
 
+function add_html_head_lines()
+{
+  global $required_js;
+  if ( !empty( $required_js ) )
+  {
+    foreach ( $required_js as $js_url )
+    {
+      echo "<script type=\"text/javascript\" src=\"$js_url\"></script>\n";
+    }
+  }
+}
+
+
+
 /*
  * $Log$
+ * Revision 1.24  2007/06/22 15:44:25  personman2
+ * Moved output of require_js() to another callback, as Daniel suggested
+ *
  * Revision 1.23  2007/06/22 02:30:12  personman2
  * Added require_js() function to add javascript files.  Can be called from a skin or from a plugin using the SkinBeginHtmlHead hook.
  *
