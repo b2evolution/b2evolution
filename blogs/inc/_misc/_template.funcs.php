@@ -201,8 +201,67 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 }
 
 
+
+/**
+ * Add a requested javascript file, but only if it hasn't been added already
+ *
+ * Accepts absolute urls, filenames (with or without the '.js') relative to the rsc/js directory and certain aliases, like 'jquery' and 'jquery_debug'
+ * If 'jquery' is used and $debug is set to true, the 'jquery_debug' is automatically swapped in.
+ * Any javascript added to the page is also added to the $required_js array, which is then checked to prevent adding the same code twice
+ *
+ * @param string alias, url or filename (relative to rsc/js) for javascript file
+ */
+function require_js( $js_file )
+{
+  global $required_js, $rsc_url, $debug;
+  
+  $js_aliases = array(
+    'jquery' => 'jquery.min.js',
+    'jquery_debug' => 'jquery.js',
+    'jquery_min' => 'jquery.min.js'
+    );
+    
+  // First get the real filename or url
+  
+  if ( stristr( $js_file, 'http://' ) )
+  {
+    // It's an absolute url
+    $js_url = $js_file;
+  }
+  elseif ( !empty( $js_aliases[$js_file]) )
+  {
+    // It's an alias
+    if ( $js_file == 'jquery' and $debug ) $js_file = 'jquery_debug';
+    $js_url = $rsc_url . 'js/' . $js_aliases[$js_file];
+  }
+  elseif ( strtolower( substr( $js_file, -3 ) ) != '.js' )
+  {
+    // The file was named without the .js, so add it on
+    $js_url = $rsc_url . 'js/' . $js_file.'.js';
+  }
+  else
+  {
+    // The filename was given, just add on the rest of the url
+    $js_url = $rsc_url . 'js/' . $js_file;
+  }
+
+  // Then check to see if it's already been added
+  // If not, print it and add it to the array, so the next plugin won't add it again
+  if ( empty( $required_js ) or !in_array( strtolower( $js_url ), $required_js ) )
+  {
+    echo "<script type=\"text/javascript\" src=\"$js_url\"></script>\n";
+    if (empty( $required_js ) ) $required_js = array();
+    $required_js[] = $js_url;
+  }
+  
+}
+
+
 /*
  * $Log$
+ * Revision 1.23  2007/06/22 02:30:12  personman2
+ * Added require_js() function to add javascript files.  Can be called from a skin or from a plugin using the SkinBeginHtmlHead hook.
+ *
  * Revision 1.22  2007/05/02 20:39:27  fplanque
  * meta robots handling
  *
