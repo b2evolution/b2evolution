@@ -72,7 +72,7 @@ if( $blog )
 			echo '<li><a href="admin.php?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'">Name &raquo;</a></li>';
 			echo '<li><a href="admin.php?ctrl=coll_settings&tab=skin&blog='.$Blog->ID.'">Appearance (skin) &raquo;</a></li>';
 			echo '<li><a href="admin.php?ctrl=coll_settings&tab=display&blog='.$Blog->ID.'">Post order &raquo;</a></li>';
-			echo '<li><a href="admin.php?ctrl=coll_settings&tab=widgets&blog='.$Blog->ID.'">Widgets &raquo;</a></li>';
+			echo '<li><a href="admin.php?ctrl=widgets&blog='.$Blog->ID.'">Widgets &raquo;</a></li>';
 			echo '</ul></li>';
 		}
 
@@ -81,7 +81,7 @@ if( $blog )
 			echo '<li><a href="admin.php?ctrl=collections&amp;action=GenStatic&amp;blog='.$Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">Generate static page!</a></li>';
 		}
 
- 		echo '<li><a href="'.$Blog->get('url').'" target="_blank">Open public blog page</a></li>';
+ 		echo '<li><a href="'.$Blog->get('url').'" target="_blank">View this blog</a></li>';
 
 		// TODO: dh> display link to "not-approved" (to be moderated) comments, if any. Therefor the comments list must be filterable.
 	echo '</ul>';
@@ -193,6 +193,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2007/06/22 23:46:43  fplanque
+ * bug fixes
+ *
  * Revision 1.20  2007/06/13 23:29:03  fplanque
  * minor
  *

@@ -57,6 +57,9 @@ switch( $action )
 		// Take blog from here!
 		// echo $edited_ComponentWidget->coll_ID;
  		set_working_blog( $edited_ComponentWidget->coll_ID );
+		$BlogCache = & get_Cache( 'BlogCache' );
+		$Blog = & $BlogCache->get_by_ID( $blog );
+
 		break;
 
 	default:
@@ -310,6 +313,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2007/06/22 23:46:43  fplanque
+ * bug fixes
+ *
  * Revision 1.12  2007/06/19 20:42:53  fplanque
  * basic demo of widget params handled by autoform_*
  *
