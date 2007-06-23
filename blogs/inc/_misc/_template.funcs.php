@@ -203,7 +203,8 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 
 
 /**
- * Add a requested javascript file, but only if it hasn't been added already
+ * Memorize that a specific javascript file will be required by the current page.
+ * All requested files will be included in the page head only once (when add_html_head_lines is called)
  *
  * Accepts absolute urls, filenames (with or without the '.js') relative to the rsc/js directory and certain aliases, like 'jquery' and 'jquery_debug'
  * If 'jquery' is used and $debug is set to true, the 'jquery_debug' is automatically swapped in.
@@ -223,43 +224,46 @@ function require_js( $js_file )
     
   // First get the real filename or url
   
-  if ( stristr( $js_file, 'http://' ) )
-  {
-    // It's an absolute url
+  if( stristr( $js_file, 'http://' ) )
+  { // It's an absolute url
     $js_url = $js_file;
   }
-  elseif ( !empty( $js_aliases[$js_file]) )
-  {
-    // It's an alias
+  elseif( !empty( $js_aliases[$js_file]) )
+  { // It's an alias
     if ( $js_file == 'jquery' and $debug ) $js_file = 'jquery_debug';
     $js_url = $rsc_url . 'js/' . $js_aliases[$js_file];
   }
   elseif ( strtolower( substr( $js_file, -3 ) ) != '.js' )
-  {
-    // The file was named without the .js, so add it on
-    $js_url = $rsc_url . 'js/' . $js_file.'.js';
+  { // The file was named without the .js, so add it on
+    $js_url = $rsc_url.'js/'.$js_file.'.js';
   }
   else
-  {
-    // The filename was given, just add on the rest of the url
-    $js_url = $rsc_url . 'js/' . $js_file;
+  { // The filename was given, just add on the rest of the url
+    $js_url = $rsc_url.'js/'.$js_file;
   }
 
-  // Then check to see if it's already been added
-  // If not, print it and add it to the array, so the next plugin won't add it again
+  // Then check to see if it has already been added
   if ( empty( $required_js ) or !in_array( strtolower( $js_url ), $required_js ) )
-  {
-    if (empty( $required_js ) ) $required_js = array();
+  { // Not required before, add it to the array, so the next plugin won't add it again
+    if (empty( $required_js ) )
+    {	// fp> TODO: move to vars.inc - JS injection if autoglobals is on!
+    	 $required_js = array();
+		}
     $required_js[] = $js_url;
   }
   
 }
 
 
+/**
+ * fp> TODO rename to include_required_files()
+ * fp> TODO also handle CSS
+ * fp> TODO use in backoffice too.
+ */
 function add_html_head_lines()
 {
   global $required_js;
-  if ( !empty( $required_js ) )
+  if( !empty( $required_js ) )
   {
     foreach ( $required_js as $js_url )
     {
@@ -272,6 +276,9 @@ function add_html_head_lines()
 
 /*
  * $Log$
+ * Revision 1.25  2007/06/23 00:12:26  fplanque
+ * doc
+ *
  * Revision 1.24  2007/06/22 15:44:25  personman2
  * Moved output of require_js() to another callback, as Daniel suggested
  *
