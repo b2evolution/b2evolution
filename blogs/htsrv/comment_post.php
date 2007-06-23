@@ -257,7 +257,7 @@ if( $Messages->count('error') )
 }
 
 if( $action == 'preview' )
-{ // set the Comment into user's session and redirect. _feedback.php of the skin should display it.
+{ // set the Comment into user's session and redirect.
 	$Comment->set( 'original_content', $original_comment ); // used in the textarea input field again
 	$Session->set( 'core.preview_Comment', $Comment );
 	$Session->set( 'core.no_CachePageContent', 1 );
@@ -354,6 +354,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.112  2007/06/23 22:04:17  fplanque
+ * minor
+ *
  * Revision 1.111  2007/05/20 20:54:49  fplanque
  * better comment moderation links
  *
