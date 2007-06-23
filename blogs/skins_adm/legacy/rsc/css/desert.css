@@ -730,7 +730,7 @@ input.SearchField {
 
 
 /* Calendar: */
-caption.bCalendarCaption {
+table.bCalendarTable caption {
 	border: 1px solid #e1ddce;
 	background-color: #efede0;
 	border-bottom: 0;

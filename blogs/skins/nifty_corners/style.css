@@ -260,7 +260,7 @@ input.SearchField
 }
 
 /* Calendar: */
-caption.bCalendarCaption {
+table.bCalendarTable caption {
 	border: 1px solid #ccc;
 	background-color: #eee;
 	border-bottom: 0;

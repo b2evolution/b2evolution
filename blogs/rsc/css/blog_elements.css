@@ -101,7 +101,7 @@ pre {
 }
 
 /* Calendar: */
-table.bCalendarTable caption.bCalendarCaption {
+table.bCalendarTable caption {
 	font-size: 105%;
 	font-weight: bold;
 	margin: auto;

@@ -445,7 +445,7 @@ class Calendar
 		$this->tablestart = '<table class="bCalendarTable" cellspacing="0" summary="Monthly calendar with links to each day\'s posts">'."\n";
 		$this->tableend = '</table>';
 
-		$this->monthstart = '<caption class="bCalendarCaption">';
+		$this->monthstart = '<caption>';
 		$this->monthend = "</caption>\n";
 
 		$this->rowstart = '<tr class="bCalendarRow">' . "\n";
@@ -1166,6 +1166,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.44  2007/06/23 22:06:47  fplanque
+ * CSS cleanup
+ *
  * Revision 1.43  2007/06/20 21:42:15  fplanque
  * implemented working widget/plugin params
  *
