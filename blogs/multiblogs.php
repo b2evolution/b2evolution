@@ -132,26 +132,15 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<?php $Item->issue_time();	echo ', ', T_('Categories'), ': ';	$Item->categories() ?>
 		</div>
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
-		<div class="bText">
-			<?php
-				// Increment view count of first post on page:
-				$Item->count_view( false );
 
-				// Display CONTENT:
-				$Item->content_teaser( array(
-						'before'      => '',
-						'after'       => '',
-					) );
-				$Item->more_link();
-				$Item->content_extension( array(
-						'before'      => '',
-						'after'       => '',
-					) );
+		<?php
+			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+			require $skins_path.'_item_content.inc.php';
+			// Note: You can customize the default item feedback by copying the generic
+			// /skins/_item_feedback.inc.php file into the current skin folder.
+			// -------------------------- END OF POST CONTENT -------------------------
+		?>
 
-				// Links to post pages (for multipage posts):
-				$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
-			?>
-		</div>
 		<div class="bSmallPrint">
 			<?php $Item->feedback_link( 'comments', '', ' &bull; ' ) /* Link to comments */ ?>
 			<?php $Item->feedback_link( 'trackbacks', '', ' &bull; ' ) /* Link to trackbacks */ ?>
@@ -162,15 +151,11 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		</div>
 
 		<?php
-		// ---------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
-		$disp_comments = 1;          // Display the comments if requested
-		$disp_comment_form = 1;      // Display the comments form if comments requested
-		$disp_trackbacks = 1;        // Display the trackbacks if requested
-
-		$disp_trackback_url = 1;   // Disp  lay the trackbal URL if trackbacks requested
-		$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
-		require $skins_path.'_feedback.php';
-		// ------------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------------
+			// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
+			require $skins_path.'_item_feedback.inc.php';
+			// Note: You can customize the default item feedback by copying the generic
+			// /skins/_item_feedback.inc.php file into the current skin folder.
+			// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
 		?>
 	</div>
 <?php

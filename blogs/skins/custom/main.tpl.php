@@ -5,7 +5,8 @@
  * For a quick explanation of b2evo 2.0 skins, please start here:
  * {@link http://manual.b2evolution.net/Skins_2.0}
  *
- * It is used to display the blog when no specific page template is available to handle the request.
+ * The main page template is used to display the blog when no specific page template is available
+ * to handle the request (based on $disp).
  *
  * @package evoskins
  * @subpackage custom
@@ -21,41 +22,20 @@ skin_init( $disp );
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 require $skins_path.'_html_header.inc.php';
-// Note: You can customize the default HTML header by copying the
-// _html_header.inc.php file into the current skin folder.
+// Note: You can customize the default HTML header by copying the generic
+// /skins/_html_header.inc.php file into the current skin folder.
 // -------------------------------- END OF HEADER --------------------------------
 ?>
 
-<div id="wrapper">
 
-<div class="PageTop">
-	<?php
-		// Display container and contents:
-		$Skin->container( NT_('Page Top'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start' => '<div class="$wi_class$">',
-				'block_end' => '</div>',
-				'block_display_title' => false,
-				'list_start' => '<ul>',
-				'list_end' => '</ul>',
-				'item_start' => '<li>',
-				'item_end' => '</li>',
-			) );
-	?>
-</div>
+<?php
+// ------------------------- BODY HEADER INCLUDED HERE --------------------------
+require $skins_path.'_body_header.inc.php';
+// Note: You can customize the default BODY heder by copying the generic
+// /skins/_body_footer.inc.php file into the current skin folder.
+// ------------------------------- END OF FOOTER --------------------------------
+?>
 
-<div class="pageHeader">
-	<?php
-		// Display container and contents:
-		$Skin->container( NT_('Header'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start' => '<div class="$wi_class$">',
-				'block_end' => '</div>',
-				'block_title_start' => '<h1>',
-				'block_title_end' => '</h1>',
-			) );
-	?>
-</div>
 
 <div class="bPosts">
 
@@ -139,38 +119,12 @@ require $skins_path.'_html_header.inc.php';
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
 
 		<?php
-			// Display images that are linked to this post:
-			$Item->images( array(
-					'before' =>              '<div class="bImages">',
-					'before_image' =>        '<div class="image_block">',
-					'before_image_legend' => '<div class="image_legend">',
-					'after_image_legend' =>  '</div>',
-					'after_image' =>         '</div>',
-					'after' =>               '</div>',
-					'image_size' =>          'fit-320x320'
-				) );
+			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+			require $skins_path.'_item_content.inc.php';
+			// Note: You can customize the default item feedback by copying the generic
+			// /skins/_item_feedback.inc.php file into the current skin folder.
+			// -------------------------- END OF POST CONTENT -------------------------
 		?>
-
-		<div class="bText">
-			<?php
-				// Increment view count!
-				$Item->count_view( false );
-
-				// Display CONTENT:
-				$Item->content_teaser( array(
-						'before'      => '',
-						'after'       => '',
-					) );
-				$Item->more_link();
-				$Item->content_extension( array(
-						'before'      => '',
-						'after'       => '',
-					) );
-
-				// Links to post pages (for multipage posts):
-				$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
-			?>
-		</div>
 
 		<?php
 			// List all tags attached to this post:
@@ -192,16 +146,14 @@ require $skins_path.'_html_header.inc.php';
 		</div>
 
 		<?php
-			// ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
-			$disp_comments = 1;					// Display the comments if requested
-			$disp_comment_form = 1;			// Display the comments form if comments requested
-			$disp_trackbacks = 1;				// Display the trackbacks if requested
+			// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
+			require $skins_path.'_item_feedback.inc.php';
+			// Note: You can customize the default item feedback by copying the generic
+			// /skins/_item_feedback.inc.php file into the current skin folder.
+			// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+		?>
 
-			$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-			$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
-			require( dirname(__FILE__).'/_feedback.php' );
-			// -------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. --------------
-
+		<?php
 			locale_restore_previous();	// Restore previous locale (Blog locale)
 		?>
 	</div>
@@ -232,6 +184,7 @@ require $skins_path.'_html_header.inc.php';
 <div class="bSideBar">
 
 	<?php
+		// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
 		$Skin->container( NT_('Sidebar'), array(
 				// The following (optional) params will be used as defaults for widgets included in this container:
@@ -254,6 +207,7 @@ require $skins_path.'_html_header.inc.php';
 				'notes_start' => '<div class="notes">',
 				'notes_end' => '</div>',
 			) );
+		// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 	?>
 
 	<p class="center"><!-- Please help us promote b2evolution and leave this link on your blog. --><a href="http://b2evolution.net/" title="b2evolution: next generation blog software"><img src="../../rsc/img/powered-by-b2evolution-120t.gif" alt="powered by b2evolution free blog software" title="b2evolution: next generation blog software" width="120" height="32" border="0" /></a></p>

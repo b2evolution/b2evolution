@@ -101,81 +101,51 @@ require $skins_path.'_html_header.inc.php';
 
 	<div class="bTitle"><h3 class="bTitle"><?php $Item->title(); ?></h3></div>
 
-	<div class="bPost" lang="<?php $Item->lang() ?>">
-		<?php
-			$Item->anchor(); // Anchor for permalinks to refer to
-		?>
-
-		<div class="bSmallHead">
-		<?php
-			$Item->permanent_link( '#icon#' );
-			echo ' ';
-			$Item->issue_time();
-			echo ', ', T_('Categories'), ': ';
-			$Item->categories();
-			echo ' &nbsp; ';
-		?>
-		</div>
-
-		<?php
-			// Display images that are linked to this post:
-			$Item->images( array(
-					'before' =>              '<div class="bImages">',
-					'before_image' =>        '<div class="image_block">',
-					'before_image_legend' => '<div class="image_legend">',
-					'after_image_legend' =>  '</div>',
-					'after_image' =>         '</div>',
-					'after' =>               '</div>',
-					'image_size' =>          'fit-320x320'
-				) );
-		?>
-
-		<div class="bText">
+		<div class="bPost" lang="<?php $Item->lang() ?>">
 			<?php
-				// Increment view count!
-				$Item->count_view( false );
+				$Item->anchor(); // Anchor for permalinks to refer to
+			?>
+	
+			<div class="bSmallHead">
+			<?php
+				$Item->permanent_link( '#icon#' );
+				echo ' ';
+				$Item->issue_time();
+				echo ', ', T_('Categories'), ': ';
+				$Item->categories();
+				echo ' &nbsp; ';
+			?>
+			</div>
 
-				// Display CONTENT:
-				$Item->content_teaser( array(
-						'before'      => '',
-						'after'       => '',
-					) );
-				$Item->more_link();
-				$Item->content_extension( array(
-						'before'      => '',
-						'after'       => '',
-					) );
+			<?php
+				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+				require $skins_path.'_item_content.inc.php';
+				// Note: You can customize the default item feedback by copying the generic
+				// /skins/_item_feedback.inc.php file into the current skin folder.
+				// -------------------------- END OF POST CONTENT -------------------------
+			?>
 
-				// Links to post pages (for multipage posts):
-				$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
+			<div class="bSmallPrint">
+				<?php $Item->permanent_link(); ?>
+				<?php $Item->feedback_link( 'comments', ' &bull; ' ) // Link to comments ?>
+				<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
+	
+				<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
+	
+				<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
+			</div>
+	
+			<?php
+				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
+				require $skins_path.'_item_feedback.inc.php';
+				// Note: You can customize the default item feedback by copying the generic
+				// /skins/_item_feedback.inc.php file into the current skin folder.
+				// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
 			?>
 		</div>
-
-		<div class="bSmallPrint">
-			<?php $Item->permanent_link(); ?>
-			<?php $Item->feedback_link( 'comments', ' &bull; ' ) // Link to comments ?>
-			<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
-
-			<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
-
-			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
-		</div>
-
-		<?php
-			// ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
-			$disp_comments = 1;					// Display the comments if requested
-			$disp_comment_form = 1;			// Display the comments form if comments requested
-			$disp_trackbacks = 1;				// Display the trackbacks if requested
-
-			$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-			$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
-			require( dirname(__FILE__).'/_feedback.php' );
-			// ---------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
-		?>
-	</div>
-<?php
-	locale_restore_previous();	// Restore previous locale (Blog locale)
-} // ---------------------------------- END OF POSTS ------------------------------------ ?>
+	<?php
+		locale_restore_previous();	// Restore previous locale (Blog locale)
+	} // ---------------------------------- END OF POSTS ------------------------------------ ?>
 
 		<?php
 			// Links to list pages:

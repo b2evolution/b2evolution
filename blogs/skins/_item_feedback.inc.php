@@ -20,6 +20,22 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+if( file_exists( $ads_current_skin_path.'_item_feedback.inc.php' ) )
+{	// The skin has a customized handler, use that one instead:
+	require $ads_current_skin_path.'_item_feedback.inc.php';
+	return;
+}
+
+
+// Display filters:
+// You can change these and call this template multiple time if you want to separate comments from trackbacks
+$disp_comments = 1;					// Display the comments if requested
+$disp_comment_form = 1;			// Display the comments form if comments requested
+$disp_trackbacks = 1;				// Display the trackbacks if requested
+$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
+$disp_pingbacks = 1;        // pingbacks (deprecated)
+
+
 
 if( empty($c) )
 {	// Comments not requested
@@ -69,7 +85,7 @@ if( $disp_trackbacks )
 if( $disp_pingbacks )
 {
 	$type_list[] = "'pingback'";
-	$disp_title[] = T_("Pingbacks");
+	// $disp_title[] = T_("Pingbacks");  // stealh pingbacks (let the old ones appear as comments)
 	echo '<a id="pingbacks"></a>';
 }
 
@@ -321,6 +337,10 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.1  2007/06/23 22:09:30  fplanque
+ * feedback and item content templates.
+ * Interim check-in before massive changes ahead.
+ *
  * Revision 1.91  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *

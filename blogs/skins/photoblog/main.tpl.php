@@ -154,26 +154,13 @@ require $skins_path.'_html_header.inc.php';
 
 			</div>
 
-			<div class="bText">
-				<?php
-					// Increment view count!
-					$Item->count_view( false );
-
-					// Display CONTENT:
-					$Item->content_teaser( array(
-							'before'      => '',
-							'after'       => '',
-						) );
-					$Item->more_link();
-					$Item->content_extension( array(
-							'before'      => '',
-							'after'       => '',
-						) );
-
-					// Links to post pages (for multipage posts):
-					$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
-				?>
-			</div>
+			<?php
+				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+				require $skins_path.'_item_content.inc.php';
+				// Note: You can customize the default item feedback by copying the generic
+				// /skins/_item_feedback.inc.php file into the current skin folder.
+				// -------------------------- END OF POST CONTENT -------------------------
+			?>
 
 			<div class="bSmallPrint">
 			<?php
@@ -184,15 +171,11 @@ require $skins_path.'_html_header.inc.php';
 		</div>
 
 		<?php
-			// ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
-			$disp_comments = 1;					// Display the comments if requested
-			$disp_comment_form = 1;			// Display the comments form if comments requested
-			$disp_trackbacks = 1;				// Display the trackbacks if requested
-
-			$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-			$disp_pingbacks = 0;        // Don't display the pingbacks (deprecated)
-			require( dirname(__FILE__).'/_feedback.php' );
-			// -------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. --------------
+			// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
+			require $skins_path.'_item_feedback.inc.php';
+			// Note: You can customize the default item feedback by copying the generic
+			// /skins/_item_feedback.inc.php file into the current skin folder.
+			// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
 		?>
 
 		<?php
