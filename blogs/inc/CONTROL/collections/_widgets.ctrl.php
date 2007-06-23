@@ -94,19 +94,16 @@ switch( $action )
 		// Add a Widget to container:
 		if( !in_array( $container, $container_list ) )
 		{
-			$Messages->add( T_('You can only add to containers of the current skin.'), 'error' );
-			$action = 'list';
-			break;
+			$Messages->add( T_('WARNING: you are adding to a container that does not seem to be part of the current skin.'), 'error' );
 		}
 
 		switch( $type )
 		{
 			case 'core':
 				// Check the requested core widget is valid:
-				if( !file_exists( $inc_path.'MODEL/widgets/_'.$code.'.widget.php' ) )
-				{
-					debug_die( 'Unhandled core widget code' );
-				}
+				load_class( 'MODEL/widgets/_'.$code.'.widget.php' );
+				$objtype = $code.'_Widget';
+				$edited_ComponentWidget = & new $objtype();
 				break;
 
 			case 'plugin':
@@ -118,14 +115,13 @@ switch( $action )
 				{
 					debug_die( 'Requested plugin does not support SkinTag' );
 				}
+				$edited_ComponentWidget = & new ComponentWidget( NULL, 'plugin', $code, array() );
 				break;
 
 			default:
 				debug_die( 'Unhandled widget type' );
 		}
 
-
-		$edited_ComponentWidget = & new ComponentWidget( NULL, $type, $code, array() );
 		$edited_ComponentWidget->set( 'coll_ID', $Blog->ID );
 		$edited_ComponentWidget->set( 'sco_name', $container );
 
@@ -313,6 +309,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2007/06/23 22:05:17  fplanque
+ * fixes
+ *
  * Revision 1.13  2007/06/22 23:46:43  fplanque
  * bug fixes
  *

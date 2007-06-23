@@ -99,6 +99,8 @@ a.selected {
 
 /*
  * Evo Toolbar
+ * Note: ther emay be some properties that seem overkill but the fact is we need to override
+ * any too general styles a skin may want to bring in for its own body/general display.
  */
 div#evo_toolbar {
 	background-color: ThreeDFace;
@@ -106,6 +108,7 @@ div#evo_toolbar {
 	color: ButtonText;
 	border-top: 1px solid ThreeDHighlight;
 	border-bottom: 1px solid ThreeDShadow;
+	text-align: left;
 }
 div#evo_toolbar a {
 	border: 1px solid ThreeDFace;
@@ -173,7 +176,9 @@ div#evo_toolbar li ul li a:hover {
 div#evo_toolbar li.separator {
 	padding: 0;
 }
-
+div#evo_toolbar hr {
+	display: block;
+}
 /*
 {{{ Messages
 */

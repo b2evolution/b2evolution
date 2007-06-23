@@ -83,7 +83,7 @@ class coll_search_form_Widget extends ComponentWidget
 		form_formstart( $Blog->gen_blogurl(), 'search', 'SearchForm' );
 		echo '<p>';
 		$s = get_param( 's' );
-		echo '<input type="text" name="s" size="30" value="'.htmlspecialchars($s).'" class="SearchField" /><br />';
+		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars($s).'" class="SearchField" /><br />';
 		$sentence = get_param( 'sentence' );
 		echo '<input type="radio" name="sentence" value="AND" id="sentAND" '.( $sentence=='AND' ? 'checked="checked" ' : '' ).'/><label for="sentAND">'.T_('All Words').'</label><br />';
 		echo '<input type="radio" name="sentence" value="OR" id="sentOR" '.( $sentence=='OR' ? 'checked="checked" ' : '' ).'/><label for="sentOR">'.T_('Some Word').'</label><br />';
@@ -101,6 +101,9 @@ class coll_search_form_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2007/06/23 22:05:16  fplanque
+ * fixes
+ *
  * Revision 1.2  2007/06/20 21:42:13  fplanque
  * implemented working widget/plugin params
  *
