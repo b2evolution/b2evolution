@@ -435,24 +435,11 @@ class ComponentWidget extends DataObject
 
 		if( empty($link_Blog) )
 		{
-			// TODO: $linkblog_main_start is not defined here, is it?
-			echo $linkblog_main_start.T_('The requested Blog doesn\'t exist any more!').$linkblog_main_end;
+			echo $this->disp_params['block_start'];
+			echo T_('The requested Blog doesn\'t exist any more!');
+  		echo $this->disp_params['block_end'];
 			return;
 		}
-
-
-		// TODO: all the vars below cannot be defined here..
-		# global linkblog delimiters:
-		if(!isset($linkblog_main_start)) $linkblog_main_start = '<div class="bSideItem"><h3>'.
-																															T_('Linkblog').'</h3>';
-		if(!isset($linkblog_main_end)) $linkblog_main_end = '</div>';
-		# Category delimiters:
-		if(!isset($linkblog_catname_before)) $linkblog_catname_before = '<h4>';
-		if(!isset($linkblog_catname_after)) $linkblog_catname_after = '</h4><ul>';
-		if(!isset($linkblog_catlist_end)) $linkblog_catlist_end = '</ul>';
-		# Item delimiters:
-		if(!isset($linkblog_item_before)) $linkblog_item_before = '<li>';
-		if(!isset($linkblog_item_after)) $linkblog_item_after = '</li>';
 
 
 		# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
@@ -643,6 +630,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2007/06/23 00:12:38  fplanque
+ * cleanup
+ *
  * Revision 1.10  2007/06/21 23:28:18  blueyed
  * todos
  *
