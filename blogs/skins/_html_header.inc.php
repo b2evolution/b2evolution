@@ -24,6 +24,7 @@ skin_content_header();	// Sets charset!
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<?php skin_content_meta(); /* Charset for static pages */ ?>
+	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<?php add_html_head_lines() /* Add javascript and css files included by plugins and skin */ ?>
 	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
 	<title><?php
@@ -31,7 +32,6 @@ skin_content_header();	// Sets charset!
 		 ) );
 		$Blog->disp('name', 'htmlhead');
 	?></title>
-	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
 	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
 	<?php robots_tag(); ?>
