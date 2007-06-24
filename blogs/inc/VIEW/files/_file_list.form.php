@@ -534,7 +534,7 @@ $Form->begin_form();
 
 	if( $countFiles )
 	{{{ // include JS
-		// TODO: remove these javascript functions to an external .js file and include them through $this->add_headline()
+		// TODO: remove these javascript functions to an external .js file and include them through add_headline()
 		?>
 		<script type="text/javascript">
 			<!--
@@ -607,6 +607,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.8  2007/06/24 22:35:57  fplanque
+ * cleanup
+ *
  * Revision 1.7  2007/04/26 00:11:10  fplanque
  * (c) 2007
  *

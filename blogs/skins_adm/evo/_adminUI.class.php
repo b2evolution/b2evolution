@@ -43,17 +43,13 @@ class AdminUI extends AdminUI_general
 {
 
 	/**
-	 * Get HTML head lines, links (to CSS files especially).
-	 *
-	 * @return string Calls parent::get_headlines()
+	 * Display doctype + <head>...</head> section
 	 */
-	function get_headlines()
+	function disp_html_head()
 	{
-		global $mode;
-
 		require_css( 'skins_adm/evo/rsc/css/style.css', TRUE, 'Blue' );
 
-		return parent::get_headlines();
+		parent::disp_html_head();
 	}
 
 

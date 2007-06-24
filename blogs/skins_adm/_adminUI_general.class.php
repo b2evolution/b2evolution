@@ -43,13 +43,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class AdminUI_general
 {
-
-	/**
-	 * List of the headlines to output.
-	 * @var array
-	 */
-	var $headlines = array();
-
 	/**
 	 * Visual path seperator (used in html title, ..)
 	 *
@@ -980,33 +973,6 @@ class AdminUI_general
 
 
 	/**
-	 * Add a headline for HTML <head>.
-	 *
-	 * @param string The line that should be added to <head>.
-	 */
-	function add_headline( $headline )
-	{
-		$this->headlines[] = $headline;
-	}
-
-
-	/**
-	 * Get the headlines for HTML <head> (CSS files especially).
-	 *
-	 * To define headlines for a derived skin, add entries to
-	 * {@link $headlines} and "return parent::get_headlines();".
-	 *
-	 * @return string The concatenated headlines to output in HTML <head>.
-	 */
-	function get_headlines()
-	{
-		$r = implode( "\n\t", $this->headlines )."\n\t";
-
-		return $r;
-	}
-
-
-	/**
 	 *
 	 * @todo Move generation of blog list to this class!
 	 *
@@ -1618,6 +1584,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.59  2007/06/24 22:35:57  fplanque
+ * cleanup
+ *
  * Revision 1.58  2007/06/24 15:43:34  personman2
  * Reworking the process for a skin or plugin to add js and css files to a blog display.  Removed the custom header for nifty_corners.
  *

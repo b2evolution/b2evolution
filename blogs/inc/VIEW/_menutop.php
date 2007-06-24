@@ -45,9 +45,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<title><?php echo $this->get_html_title(); ?></title>
 	<meta name="ROBOTS" content="NOINDEX, NOFOLLOW" />
 	<?php
-	// Include head lines, links (to CSS...), sets <base>, ..
-	$this->get_headlines();
-
 	global $rsc_path, $rsc_url, $htsrv_url;
 	
 	$paths_script = "
@@ -234,8 +231,8 @@ JS;
 <?php
 /*
  * $Log$
- * Revision 1.31  2007/06/24 22:26:48  fplanque
- * no message
+ * Revision 1.32  2007/06/24 22:35:57  fplanque
+ * cleanup
  *
  * Revision 1.30  2007/06/24 20:09:06  personman2
  * switching to require_css and require_js in admin skins

@@ -75,14 +75,12 @@ class AdminUI extends AdminUI_general
 
 
 	/**
-	 * Get HTML head lines, links (to CSS files especially).
-	 *
-	 * @return string Calls parent::get_headlines()
+	 * Display doctype + <head>...</head> section
 	 */
-	function get_headlines()
+	function disp_html_head()
 	{
 		global $mode, $rsc_url, $adminskins_path;
-		
+
 		require_css ( 'skins_adm/legacy/rsc/css/variation.css', TRUE, 'Variation' );
 		require_css ( 'skins_adm/legacy/rsc/css/desert.css', TRUE, 'Desert' );
 		require_css ( 'skins_adm/legacy/rsc/css/legacy.css', TRUE, 'Legacy' );
@@ -95,7 +93,7 @@ class AdminUI extends AdminUI_general
 		// Style switcher:
 		require_js( 'styleswitcher.js' );
 
-		return parent::get_headlines();
+		parent::disp_html_head();
 	}
 
 
