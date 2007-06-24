@@ -205,11 +205,12 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
  * Memorize that a specific javascript file will be required by the current page.
  * All requested files will be included in the page head only once (when headlines is called)
  *
- * Accepts absolute urls, filenames (with or without the '.js') relative to the rsc/js directory and certain aliases, like 'jquery' and 'jquery_debug'
+ * Accepts absolute urls, filenames relative to the rsc/js directory and certain aliases, like 'jquery' and 'jquery_debug'
  * If 'jquery' is used and $debug is set to true, the 'jquery_debug' is automatically swapped in.
  * Any javascript added to the page is also added to the $required_js array, which is then checked to prevent adding the same code twice
  *
  * @param string alias, url or filename (relative to rsc/js) for javascript file
+ * @param boolean relative_to_base.  False (default) if the file is in the rsc/js folder.  True to make it relative
  */
 function require_js( $js_file, $relative_to_base = FALSE )
 {
@@ -232,10 +233,6 @@ function require_js( $js_file, $relative_to_base = FALSE )
     if ( $js_file == '#jquery#' and $debug ) $js_file = '#jquery_debug#';
     $js_file = $js_aliases[$js_file];
   }
-  elseif ( strtolower( substr( $js_file, -3 ) ) != '.js' )
-  { // The file was named without the .js, so add it on
-    $js_file = $js_file . '.js';
-  }
   
   if ( $relative_to_base or $absolute )
   {
@@ -257,7 +254,17 @@ function require_js( $js_file, $relative_to_base = FALSE )
   
 }
 
-
+/**
+ * Memorize that a specific css that file will be required by the current page.
+ * All requested files will be included in the page head only once (when headlines is called)
+ *
+ * Accepts absolute urls, filenames relative to the rsc/css directory.  Set $relative_to_base to TRUE to prevent this function from adding on the rsc_path
+ *
+ * @param string alias, url or filename (relative to rsc/js) for javascript file
+ * @param boolean relative_to_base.  False (default) if the file is in the rsc/css folder.  True to make it relative
+ * @param string title.  The title for the link tag
+ * @param string media.  ie, 'print'
+ */
 function require_css( $css_file, $relative_to_base = FALSE, $title = NULL, $media = NULL )
 {
   global $required_css, $rsc_url, $debug;
@@ -275,11 +282,7 @@ function require_css( $css_file, $relative_to_base = FALSE, $title = NULL, $medi
   { // It's an alias
     $css_url = $css_aliases[$css_file];
   }
-  elseif ( strtolower( substr( $css_file, -4 ) ) != '.css' )
-  { // The file was named without the .css, so add it on
-    $css_url = $css_file.'.css';
-  }
-  
+ 
   if ( $relative_to_base or $absolute )
   {
     $css_url = $css_file;
@@ -327,6 +330,9 @@ function add_headline($headline)
 
 /*
  * $Log$
+ * Revision 1.30  2007/06/24 20:19:00  personman2
+ * Don't add .js or .css on when they're not there.  Added documentation for require_css
+ *
  * Revision 1.29  2007/06/24 19:43:39  personman2
  * changing backoffice over to new js and css handling
  *
