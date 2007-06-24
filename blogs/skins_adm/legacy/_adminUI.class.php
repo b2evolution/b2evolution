@@ -77,6 +77,7 @@ class AdminUI extends AdminUI_general
 	/**
 	 * Get HTML head lines, links (to CSS files especially).
 	 *
+	 * @return string Calls parent::get_headlines()
 	 */
 	function get_headlines()
 	{
@@ -94,6 +95,7 @@ class AdminUI extends AdminUI_general
 		// Style switcher:
 		require_js( 'styleswitcher.js' );
 
+		return parent::get_headlines();
 	}
 
 

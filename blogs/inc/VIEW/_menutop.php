@@ -225,7 +225,7 @@ JS;
 
 	// CALL PLUGINS NOW:
 	global $Plugins;
-	//$Plugins->trigger_event( 'AdminEndHtmlHead', array() );
+	$Plugins->trigger_event( 'AdminEndHtmlHead', array() );
 	?>
 	<?php add_html_head_lines() ?>
 
@@ -234,6 +234,9 @@ JS;
 <?php
 /*
  * $Log$
+ * Revision 1.31  2007/06/24 22:26:48  fplanque
+ * no message
+ *
  * Revision 1.30  2007/06/24 20:09:06  personman2
  * switching to require_css and require_js in admin skins
  *
