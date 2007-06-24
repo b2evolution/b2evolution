@@ -155,7 +155,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 			<?php
 				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-				skin_include( '_item_feedback.inc.php' );
+				skin_include( '_item_feedback.inc.php', array(
+						'before_section_title' => '<h4>',
+						'after_section_title'  => '</h4>',
+					) );
 				// Note: You can customize the default item feedback by copying the generic
 				// /skins/_item_feedback.inc.php file into the current skin folder.
 				// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------

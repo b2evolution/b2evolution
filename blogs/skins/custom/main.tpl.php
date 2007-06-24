@@ -1,6 +1,9 @@
 <?php
 /**
- * This is the main/default page template.
+ * This is the main/default page template for the "custom" skin.
+ *
+ * This skin only uses one single template which includes most of its features.
+ * It will also rely on default includes for specific dispays (like the comment form).
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
  * {@link http://manual.b2evolution.net/Skins_2.0}
@@ -28,13 +31,40 @@ skin_include( '_html_header.inc.php' );
 ?>
 
 
-<?php
-// ------------------------- BODY HEADER INCLUDED HERE --------------------------
-skin_include( '_body_header.inc.php' );
-// Note: You can customize the default BODY heder by copying the generic
-// /skins/_body_footer.inc.php file into the current skin folder.
-// ------------------------------- END OF FOOTER --------------------------------
-?>
+<div id="wrapper">
+
+<div class="PageTop">
+	<?php
+		// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
+		// Display container and contents:
+		$Skin->container( NT_('Page Top'), array(
+				// The following params will be used as defaults for widgets included in this container:
+				'block_start' => '<div class="$wi_class$">',
+				'block_end' => '</div>',
+				'block_display_title' => false,
+				'list_start' => '<ul>',
+				'list_end' => '</ul>',
+				'item_start' => '<li>',
+				'item_end' => '</li>',
+			) );
+		// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
+	?>
+</div>
+
+<div class="pageHeader">
+	<?php
+		// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
+		// Display container and contents:
+		$Skin->container( NT_('Header'), array(
+				// The following params will be used as defaults for widgets included in this container:
+				'block_start' => '<div class="$wi_class$">',
+				'block_end' => '</div>',
+				'block_title_start' => '<h1>',
+				'block_title_end' => '</h1>',
+			) );
+		// ----------------------------- END OF "Header" CONTAINER -----------------------------
+	?>
+</div>
 
 
 <!-- =================================== START OF MAIN AREA =================================== -->
@@ -148,7 +178,10 @@ skin_include( '_body_header.inc.php' );
 
 			<?php
 				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-				skin_include( '_item_feedback.inc.php' );
+				skin_include( '_item_feedback.inc.php', array(
+						'before_section_title' => '<h4>',
+						'after_section_title'  => '</h4>',
+					) );
 				// Note: You can customize the default item feedback by copying the generic
 				// /skins/_item_feedback.inc.php file into the current skin folder.
 				// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
@@ -219,13 +252,37 @@ skin_include( '_body_header.inc.php' );
 </div>
 
 
-<?php
-// ------------------------- BODY FOOTER INCLUDED HERE --------------------------
-skin_include( '_body_footer.inc.php' );
-// Note: You can customize the default BODY footer by copying the
-// _body_footer.inc.php file into the current skin folder.
-// ------------------------------- END OF FOOTER --------------------------------
-?>
+<!-- =================================== START OF FOOTER =================================== -->
+<div id="pageFooter">
+	<?php
+		// Display container and contents:
+		$Skin->container( NT_("Footer"), array(
+				// The following params will be used as defaults for widgets included in this container:
+			) );
+		// Note: Double quotes have been used around "Footer" only for test purposes.
+	?>
+	<p class="baseline">
+
+		<?php
+			// Display a link to contact the owner of this blog (if owner accepts messages):
+			$Blog->contact_link( array(
+					'before'      => '',
+					'after'       => ' &bull; ',
+					'text'   => T_('Contact'),
+					'title'  => T_('Send a message to the owner of this blog...'),
+				) );
+		?>
+		<?php display_param_link( $skin_links ) ?> design by <?php display_param_link( $francois_links ) ?> / <?php display_param_link( $skinfaktory_links ) ?>
+		&bull;
+		<?php
+			// Display additional credits (see /conf/):
+ 			// If you can add your own credits without removing the defaults, you'll be very cool :))
+		 	// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
+			display_list( $credit_links, T_('Credits').': ', ' ', '|', ' ', ' ' );
+		?>
+	</p>
+</div>
+</div>
 
 
 <?php

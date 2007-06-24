@@ -28,6 +28,8 @@ $params = array_merge( array(
 		'disp_trackbacks'	   =>	true,
 		'disp_trackback_url' =>	true,
 		'disp_pingbacks'	   =>	true,
+		'before_section_title' => '<h3>',
+		'after_section_title'  => '</h3>',
 	), $params );
 
 
@@ -62,12 +64,16 @@ echo '<a id="feedbacks"></a>';
 
 $type_list = array();
 $disp_title = array();
+
 if( $params['disp_comments'] )
 {	// We requested to display comments
 	if( $Item->can_see_comments() )
 	{ // User can see a comments
 		$type_list[] = "'comment'";
-		$disp_title[] = T_("Comments");
+		if( $title = $Item->get_feedback_title( 'comments' ) )
+		{
+			$disp_title[] = $title;
+		}
 	}
 	else
 	{ // Use cannot see comments
@@ -75,25 +81,34 @@ if( $params['disp_comments'] )
 	}
 	echo '<a id="comments"></a>';
 }
+
 if( $params['disp_trackbacks'] )
 {
 	$type_list[] = "'trackback'";
-	$disp_title[] = T_("Trackbacks");
+	if( $title = $Item->get_feedback_title( 'trackbacks' ) )
+	{
+		$disp_title[] = $title;
+	}
 	echo '<a id="trackbacks"></a>';
 }
+
 if( $params['disp_pingbacks'] )
 {
 	$type_list[] = "'pingback'";
-	// $disp_title[] = T_("Pingbacks");  // stealh pingbacks (let the old ones appear as comments)
+	if( $title = $Item->get_feedback_title( 'pingbacks' ) )
+	{
+		$disp_title[] = $title;
+	}
 	echo '<a id="pingbacks"></a>';
 }
 
 if( $params['disp_trackback_url'] )
 { // We want to display the trackback URL:
-	?>
-	<h4><?php echo T_('Trackback address for this post:') ?></h4>
 
-	<?php
+	echo $params['before_section_title'];
+	echo T_('Trackback address for this post');
+	echo $params['after_section_title'];
+
 	/*
 	 * Trigger plugin event, which could display a captcha form, before generating a whitelisted URL:
 	 */
@@ -108,19 +123,14 @@ if( $params['disp_trackback_url'] )
 
 if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks']  )
 {
-	?>
 
-	<!-- Title for comments, tbs, pbs... -->
-	<h4><?php echo implode( ", ", $disp_title) ?>:</h4>
+	echo $params['before_section_title'];
+	echo implode( ', ', $disp_title);
+	echo $params['after_section_title'];
 
-	<?php
 	$CommentList = & new CommentList( NULL, implode(',', $type_list), array('published'), $Item->ID, '', 'ASC' );
 
-	$CommentList->display_if_empty(
-								'<div class="bComment"><p>' .
-								sprintf( /* TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST... */
-													T_('No %s for this post yet...'), implode( "/", $disp_title) ) .
-								'</p></div>' );
+	// $CommentList->display_if_empty( '<div class="bComment"><p>'.T_('No feedback for this post yet...').'</p></div>' );
 
 	/**
 	 * @var Comment
@@ -174,8 +184,7 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 	// _______________________________________________________________
 
 	// Display count of comments to be moderated:
-	$Item->feedback_moderation( 'feedbacks', '<div class="moderation_msg"><p>', '</p></div>',
-			T_('This post has no feedback awaiting moderation...'),
+	$Item->feedback_moderation( 'feedbacks', '<div class="moderation_msg"><p>', '</p></div>', '',
 			T_('This post has 1 feedback awaiting moderation... %s'),
 			T_('This post has %d feedbacks awaiting moderation... %s') );
 
@@ -231,11 +240,12 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 			$preview_Comment = NULL;
 		}
 
-		?>
-		<h4 class="bCommentLeaveHead"><?php echo T_('Leave a comment') ?>:</h4>
 
-		<!-- form to add a comment -->
-		<?php
+		echo $params['before_section_title'];
+		echo T_('Leave a comment');
+		echo $params['after_section_title'];
+
+
 		$Form = & new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID );
 		$Form->begin_form( 'bComment', '', array( 'target' => '_self' ) );
 
@@ -336,6 +346,9 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 
 /*
  * $Log$
+ * Revision 1.3  2007/06/24 22:26:34  fplanque
+ * improved feedback template
+ *
  * Revision 1.2  2007/06/24 01:05:31  fplanque
  * skin_include() now does all the template magic for skins 2.0.
  * .disp.php templates still need to be cleaned up.

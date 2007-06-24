@@ -1371,13 +1371,12 @@ class Item extends ItemLight
 	 * @param string Link title
 	 * @param string Status of feedbacks to count
 	 * @param boolean true to use a popup windows
-	 * @param boolean true to hide if no feedback ('#' for default)
 	 * @param string url or '#' for default
 	 * @param string url to use
 	 */
 	function feedback_link( $type = 'feedbacks', $before = '', $after = '',
 													$zero = '#', $one = '#', $more = '#', $title='#', $status = 'published',
-													$use_popup = false,	$hideifnone = '#', $url = '#', $blogurl = '' )
+													$use_popup = false,	$url = '#', $blogurl = '' )
 	{
 		if( ! $this->can_see_comments() )
 		{	// Comments disabled
@@ -1388,7 +1387,6 @@ class Item extends ItemLight
 		switch( $type )
 		{
 			case 'feedbacks':
-				if( $hideifnone === '#' ) $hideifnone = false;
 				if( $title == '#' ) $title = T_('Display feedback / Leave a comment');
 				if( $zero == '#' ) $zero = T_('Send feedback').' &raquo;';
 				if( $one == '#' ) $one = T_('1 feedback').' &raquo;';
@@ -1396,17 +1394,18 @@ class Item extends ItemLight
 				break;
 
 			case 'comments':
-				if( ! $this->can_see_comments() )
-					return false;
-				if( $hideifnone === '#' )
+				if( $title == '#' ) $title = T_('Display comments / Leave a comment');
+				if( $zero == '#' )
 				{
 					if( $this->can_comment( NULL ) ) // NULL, because we do not want to display errors here!
-						$hideifnone = false;
+					{
+						$zero = T_('Leave a comment').' &raquo;';
+					}
 					else
-						$hideifnone = true;
+					{
+						$zero = '';
+					}
 				}
-				if( $title == '#' ) $title = T_('Display comments / Leave a comment');
-				if( $zero == '#' ) $zero = T_('Leave a comment').' &raquo;';
 				if( $one == '#' ) $one = T_('1 comment').' &raquo;';
 				if( $more == '#' ) $more = T_('%d comments').' &raquo;';
 				break;
@@ -1417,35 +1416,36 @@ class Item extends ItemLight
 				{ // Trackbacks not allowed on this blog:
 					return;
 				}
-				if( $hideifnone === '#' ) $hideifnone = false;
 				if( $title == '#' ) $title = T_('Display trackbacks / Get trackback address for this post');
-				if( $zero == '#' ) $zero = T_('Trackback (0)').' &raquo;';
-				if( $one == '#' ) $one = T_('Trackback (1)').' &raquo;';
-				if( $more == '#' ) $more = T_('Trackbacks (%d)').' &raquo;';
+				if( $zero == '#' ) $zero = T_('Send a trackback').' &raquo;';
+				if( $one == '#' ) $one = T_('1 trackback').' &raquo;';
+				if( $more == '#' ) $more = T_('%d trackbacks').' &raquo;';
 				break;
 
 			case 'pingbacks':
 				// Obsolete, but left for skin compatibility
-				/* dh> left here as a reference for pingbacks plugin:
 				$this->get_Blog();
-				if( $hideifnone === '#' ) $hideifnone = true;
+				if( ! $this->Blog->get( 'allowtrackbacks' ) )
+				{ // Trackbacks not allowed on this blog:
+					// We'll consider pingbacks to follow the same restriction
+					return;
+				}
 				if( $title == '#' ) $title = T_('Display pingbacks');
-				if( $zero == '#' ) $zero = T_('Pingback (0)').' &raquo;';
-				if( $one == '#' ) $one = T_('Pingback (1)').' &raquo;';
-				if( $more == '#' ) $more = T_('Pingbacks (%d)').' &raquo;';
-				*/
-				return;
-
+				if( $zero == '#' ) $zero = T_('No pingback yet').' &raquo;';
+				if( $one == '#' ) $one = T_('1 pingback').' &raquo;';
+				if( $more == '#' ) $more = T_('%d pingbacks').' &raquo;';
 				break;
 
 			default:
 				debug_die( "Unknown feedback type [$type]" );
 		}
 
-		$number = generic_ctp_number( $this->ID, $type, $status );
+		$link_text = $this->get_feedback_title( $type, $zero, $one, $more, $status );
 
-		if( ($number == 0) && $hideifnone )
+		if( empty($link_text) )
+		{	// No link, no display...
 			return false;
+		}
 
 		if( $url == '#' )
 		{ // We want a link to single post:
@@ -1466,23 +1466,75 @@ class Item extends ItemLight
 				echo ' onclick="return pop_up_window( \''.$popup_url.'\', \'evo_comments\' )"';
 			}
 			echo '>';
-		}
-
-		if( $number == 0 )
-			echo $zero;
-		elseif( $number == 1 )
-			echo $one;
-		elseif( $number > 1 )
-			echo str_replace( '%d', $number, $more );
-
-		if( !empty( $url ) )
-		{
+			echo $link_text;
 			echo '</a>';
+		}
+		else
+		{
+			echo $link_text;
 		}
 
 		echo $after;
 	}
 
+
+	/**
+	 * Template function: Displays link to feedback page (under some conditions)
+	 *
+	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
+	 * @param string Link text to display when there are 0 comments
+	 * @param string Link text to display when there is 1 comment
+	 * @param string Link text to display when there are >1 comments (include %d for # of comments)
+	 * @param string Status of feedbacks to count
+	 */
+	function get_feedback_title( $type = 'feedbacks',	$zero = '#', $one = '#', $more = '#', $status = 'published' )
+	{
+		if( ! $this->can_see_comments() )
+		{	// Comments disabled
+			return NULL;
+		}
+
+		// dh> TODO:	Add plugin hook, where a Pingback plugin could hook and provide "pingbacks"
+		switch( $type )
+		{
+			case 'feedbacks':
+				if( $zero == '#' ) $zero = '';
+				if( $one == '#' ) $one = T_('1 feedback');
+				if( $more == '#' ) $more = T_('%d feedbacks');
+				break;
+
+			case 'comments':
+				if( $zero == '#' ) $zero = '';
+				if( $one == '#' ) $one = T_('1 comment');
+				if( $more == '#' ) $more = T_('%d comments');
+				break;
+
+			case 'trackbacks':
+				if( $zero == '#' ) $zero = '';
+				if( $one == '#' ) $one = T_('1 trackback');
+				if( $more == '#' ) $more = T_('%d trackbacks)');
+				break;
+
+			case 'pingbacks':
+				// Obsolete, but left for skin compatibility
+				if( $zero == '#' ) $zero = '';
+				if( $one == '#' ) $one = T_('1 pingback');
+				if( $more == '#' ) $more = T_('%d pingbacks');
+				break;
+
+			default:
+				debug_die( "Unknown feedback type [$type]" );
+		}
+
+		$number = generic_ctp_number( $this->ID, $type, $status );
+
+		if( $number == 0 )
+			return $zero;
+		elseif( $number == 1 )
+			return $one;
+		elseif( $number > 1 )
+			return str_replace( '%d', $number, $more );
+	}
 
 
 	/**
@@ -1498,8 +1550,7 @@ class Item extends ItemLight
 	 * @param boolean true to hide if no feedback
 	 */
 	function feedback_moderation( $type = 'feedbacks', $before = '', $after = '',
-													$zero = '#', $one = '#', $more = '#', $edit_comments_link = '#',
-													$hideifnone = true )
+													$zero = '', $one = '#', $more = '#', $edit_comments_link = '#' )
 	{
 		/**
 		 * @var User
@@ -1524,7 +1575,7 @@ class Item extends ItemLight
 		$one = str_replace( '%s', $edit_comments_link, $one );
 		$more = str_replace( '%s', $edit_comments_link, $more );
 
-		$this->feedback_link( $type, $before, $after, $zero, $one, $more, '', 'draft', '#',	$hideifnone, '' );
+		$this->feedback_link( $type, $before, $after, $zero, $one, $more, '', 'draft', '#', '' );
 
 
 	}
@@ -3012,6 +3063,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.184  2007/06/24 22:26:34  fplanque
+ * improved feedback template
+ *
  * Revision 1.183  2007/06/21 00:44:37  fplanque
  * linkblog now a widget
  *
