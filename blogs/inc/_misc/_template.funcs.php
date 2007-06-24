@@ -230,11 +230,11 @@ function require_js( $js_file, $relative_to_base = FALSE )
   elseif( !empty( $js_aliases[$js_file]) )
   { // It's an alias
     if ( $js_file == '#jquery#' and $debug ) $js_file = '#jquery_debug#';
-    $js_url = $js_aliases[$js_file];
+    $js_file = $js_aliases[$js_file];
   }
   elseif ( strtolower( substr( $js_file, -3 ) ) != '.js' )
   { // The file was named without the .js, so add it on
-    $js_url = $rsc_url.'js/'.$js_file.'.js';
+    $js_file = $js_file . '.js';
   }
   
   if ( $relative_to_base or $absolute )
@@ -243,7 +243,7 @@ function require_js( $js_file, $relative_to_base = FALSE )
   } 
   else
   { // Add on the $rsc_url
-    $js_url = $rsc_url.'js/'.$js_file;
+    $js_url = $rsc_url . 'js/' . $js_file;
   }
 
   // Then check to see if it has already been added
@@ -327,8 +327,8 @@ function add_headline($headline)
 
 /*
  * $Log$
- * Revision 1.28  2007/06/24 17:48:40  personman2
- * changed jquery alias to #jquery#
+ * Revision 1.29  2007/06/24 19:43:39  personman2
+ * changing backoffice over to new js and css handling
  *
  * Revision 1.26  2007/06/24 01:05:31  fplanque
  * skin_include() now does all the template magic for skins 2.0.

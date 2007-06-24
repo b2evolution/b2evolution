@@ -49,44 +49,48 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	echo $this->get_headlines();
 
 	global $rsc_path, $rsc_url, $htsrv_url;
-	?>
-	<script type="text/javascript">
+	
+	$paths_script = "
+	<script type=\"text/javascript\">
 		// Paths used by JS functions:
-		var imgpath_expand = '<?php echo get_icon( 'expand', 'url' ); ?>';
-		var imgpath_collapse = '<?php echo get_icon( 'collapse', 'url' ); ?>';
-		var htsrv_url = '<?php echo $htsrv_url ?>';
-	</script>
+		var imgpath_expand = '" . get_icon( 'expand', 'url' ) . "';
+		var imgpath_collapse = '" . get_icon( 'collapse', 'url' ) . "';
+		var htsrv_url = '$htsrv_url';
+	</script>";
+	add_headline( $paths_script );
 
-	<!-- script allowing to check and uncheck all boxes in forms -->
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/functions.js"></script>
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/form_extensions.js"></script>
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/anchorposition.js"></script>
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/date.js"></script>
-	<script type="text/javascript">
+ 	// script allowing to check and uncheck all boxes in forms 
+	require_js( 'functions.js');
+	require_js( 'form_extensions.js');
+	require_js( 'anchorposition.js');
+	require_js( 'date.js');
+	
+	$date_overrides_script = "
+	<script type=\"text/javascript\">
 		// Override vars used by date.js (and calendarpopup.js, if present)
-		var MONTH_NAMES=new Array( '<?php echo implode("','", array_map('T_',$month)) ?>','<?php echo implode("','", array_map('trim', array_map( 'T_', $month_abbrev ))) ?>' );
-		var DAY_NAMES=new Array('<?php echo implode("','", array_map('T_', $weekday)) ?>','<?php echo implode("','", array_map('T_',$weekday_abbrev)) ?>');
-	</script>
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/popupwindow.js"></script>
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/calendarpopup.js"></script>
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/rollovers.js"></script>
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/extracats.js"></script>
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/dynamic_select.js"></script>
-	<!-- General admin functions: -->
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/admin.js"></script>
-	<!-- include jquery JS (jquery.js if existing and $debug is enabled; jquery.min.js otherwise): -->
-	<script type="text/javascript" src="<?php echo $rsc_url.'js/'.( $debug && file_exists($rsc_path.'js/jquery.js') ? 'jquery.js' : 'jquery.min.js' ) ?>"></script>
+		var MONTH_NAMES=new Array( '" . implode("','", array_map('T_',$month)) ."','" . implode("','", array_map('trim', array_map( 'T_', $month_abbrev ))) . "' );
+		var DAY_NAMES=new Array('" . implode("','", array_map('T_', $weekday)) . "','" . implode("','", array_map('T_',$weekday_abbrev)) . "');
+	</script>";
+	add_headline( $date_overrides_script );
+	
+	require_js( 'popupwindow.js' );
+	require_js( 'calendarpopup.js' );
+	require_js( 'rollovers.js' );
+	require_js( 'extracats.js' );
+	require_js( 'dynamic_select.js' );
+	require_js( 'admin.js' );
+	require_js( '#jquery#' );
 
-	<?php
 	global $UserSettings;
 	if( $UserSettings->get('control_form_abortions') )
 	{	// Activate bozo validator
-		echo '<script type="text/javascript" src="'.$rsc_url.'js/bozo_validator.js"></script>';
+		require_js( 'bozo_validator.js' );
 	}
 
 	if( $UserSettings->get('focus_on_first_input') )
 	{	// Activate focus on first form <input type="text">:
-		echo '<script type="text/javascript">addEvent( window, "load", focus_on_first_input, false );</script>';
+		$focus_on_first = '<script type="text/javascript">addEvent( window, "load", focus_on_first_input, false );</script>';
+		add_headline( $focus_on_first );
 	}
 
 	global $Debuglog;
@@ -97,13 +101,15 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			|| ($this->get_path_range(0,1) == array('blogs', 'permgroup') ) )
 	{{{ // -- Inject javascript ----------------
 		// gets initialized in _footer.php
-		?>
+		
+		$begin_script = <<<JS
 		<script type="text/javascript">
 		<!--
 		  var allchecked = Array();
 		  var idprefix;
+JS;
+			add_headline( $begin_script );
 
-			<?php
 			switch( $this->get_path(0) )
 			{
 				case 'files': // {{{
@@ -113,7 +119,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 				 * @param string the form name
 				 * @param string the checkbox(es) element(s) name
 				 * @param string number/name of the checkall set to use. Defaults to 0 and is needed when there are several "checkall-sets" on one page.
-				 */ ?>
+				 */ 
+				$toggleCheckboxes_script = "
 				function toggleCheckboxes(the_form, the_elements, set_name )
 				{
 					if( typeof set_name == 'undefined' )
@@ -142,7 +149,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 					}
 					setcheckallspan( set_name );
 				}
-				<?php // }}}
+";
+				add_headline( $toggleCheckboxes_script );
 				break;
 			}
 
@@ -152,7 +160,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			 *
 			 * @param integer|string number or name of the checkall "set" to use
 			 * @param boolean force setting to true/false
-			 */ ?>
+			 */ 
+			$setcheckallspan_script = "
 			function setcheckallspan( set_name, set )
 			{
 				if( typeof(allchecked[set_name]) == 'undefined' || typeof(set) != 'undefined' )
@@ -162,11 +171,11 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 				if( allchecked[set_name] )
 				{
-					var replace = document.createTextNode('<?php echo TS_('uncheck all') ?>');
+					var replace = document.createTextNode('" . TS_('uncheck all') . "');
 				}
 				else
 				{
-					var replace = document.createTextNode('<?php echo TS_('check all') ?>');
+					var replace = document.createTextNode('" . TS_('check all') . "');
 				}
 
 				if( document.getElementById( idprefix+'_'+String(set_name) ) )
@@ -175,14 +184,14 @@ header( 'Content-type: text/html; charset='.$io_charset );
 				}
 				//else alert('no element with id '+idprefix+'_'+String(set_name));
 			}
-
-			<?php
+";
+			add_headline( $setcheckallspan_script );
 			/**
 			 * inits the checkall functionality.
 			 *
 			 * @param string the prefix of the IDs where the '(un)check all' text should be set
 			 * @param boolean initial state of the text (if there is no checkbox with ID htmlid + '_state_' + nr)
-			 */ ?>
+			 */ $initcheckall_script = <<<JS
 			function initcheckall( htmlid, init )
 			{
 				// initialize array
@@ -210,19 +219,24 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			}
 			//-->
 		</script>
-		<?php
+JS;
+		add_headline( $initcheckall_script );
 	}}}
 
 	// CALL PLUGINS NOW:
 	global $Plugins;
-	$Plugins->trigger_event( 'AdminEndHtmlHead', array() );
+	//$Plugins->trigger_event( 'AdminEndHtmlHead', array() );
 	?>
+	<?php add_html_head_lines() ?>
 
 </head>
 
 <?php
 /*
  * $Log$
+ * Revision 1.29  2007/06/24 19:43:40  personman2
+ * changing backoffice over to new js and css handling
+ *
  * Revision 1.28  2007/04/26 00:11:11  fplanque
  * (c) 2007
  *
