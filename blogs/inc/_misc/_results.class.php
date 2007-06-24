@@ -1937,7 +1937,7 @@ class Results extends Table
 	{
 		if( empty($message) )
 		{ // Default message:
-			$message = T_('Sorry, there is nothing to display...');
+			$message = '<p>'.T_('Sorry, there is nothing to display...').'</p>';
 		}
 
 		if( $this->result_num_rows == 0 )
@@ -1970,6 +1970,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.56  2007/06/24 22:19:18  fplanque
+ * minor
+ *
  * Revision 1.55  2007/06/20 23:00:14  blueyed
  * doc fixes
  *
