@@ -46,7 +46,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<meta name="ROBOTS" content="NOINDEX, NOFOLLOW" />
 	<?php
 	// Include head lines, links (to CSS...), sets <base>, ..
-	echo $this->get_headlines();
+	$this->get_headlines();
 
 	global $rsc_path, $rsc_url, $htsrv_url;
 	
@@ -234,8 +234,8 @@ JS;
 <?php
 /*
  * $Log$
- * Revision 1.29  2007/06/24 19:43:40  personman2
- * changing backoffice over to new js and css handling
+ * Revision 1.30  2007/06/24 20:09:06  personman2
+ * switching to require_css and require_js in admin skins
  *
  * Revision 1.28  2007/04/26 00:11:11  fplanque
  * (c) 2007

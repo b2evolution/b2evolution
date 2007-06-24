@@ -77,25 +77,23 @@ class AdminUI extends AdminUI_general
 	/**
 	 * Get HTML head lines, links (to CSS files especially).
 	 *
-	 * @return string Calls parent::get_headlines()
 	 */
 	function get_headlines()
 	{
 		global $mode, $rsc_url, $adminskins_path;
-
-		$this->headlines[] = '<link href="skins_adm/legacy/rsc/css/variation.css" rel="stylesheet" type="text/css" title="Variation" />';
-		$this->headlines[] = '<link href="skins_adm/legacy/rsc/css/desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />';
-		$this->headlines[] = '<link href="skins_adm/legacy/rsc/css/legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />';
+		
+		require_css ( 'skins_adm/legacy/rsc/css/variation.css', TRUE, 'Variation' );
+		require_css ( 'skins_adm/legacy/rsc/css/desert.css', TRUE, 'Desert' );
+		require_css ( 'skins_adm/legacy/rsc/css/legacy.css', TRUE, 'Legacy' );
 
 		if( is_file( $adminskins_path.'/legacy/rsc/css/custom.css' ) )
 		{
-			$this->headlines[] = '<link href="skins_adm/legacy/rsc/css/custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />';
+			require_css ( 'skins_adm/legacy/rsc/css/custom.css', TRUE, 'Custom' );
 		}
 
 		// Style switcher:
-		$this->headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/styleswitcher.js?v=2"></script>';
+		require_js( 'styleswitcher.js' );
 
-		return parent::get_headlines();
 	}
 
 

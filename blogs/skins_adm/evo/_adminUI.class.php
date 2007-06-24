@@ -50,10 +50,8 @@ class AdminUI extends AdminUI_general
 	function get_headlines()
 	{
 		global $mode;
-
-		$this->headlines[] = '<link href="skins_adm/evo/rsc/css/style.css" rel="stylesheet" type="text/css" title="Blue" />';
-
-		return parent::get_headlines();
+		
+		require_css( 'skins_adm/evo/rsc/css/style.css', TRUE, 'Blue' );
 	}
 
 
