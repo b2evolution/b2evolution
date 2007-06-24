@@ -14,22 +14,25 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( file_exists( $ads_current_skin_path.'_item_content.inc.php' ) )
-{	// The skin has a customized handler, use that one instead:
-	require $ads_current_skin_path.'_item_content.inc.php';
-	return;
-}
+// Default params:
+$params = array_merge( array(
+		'image_size'	=>	'fit-400x320',
+	), $params );
 
-// Display images that are linked to this post:
-$Item->images( array(
-		'before' =>              '<div class="bImages">',
-		'before_image' =>        '<div class="image_block">',
-		'before_image_legend' => '<div class="image_legend">',
-		'after_image_legend' =>  '</div>',
-		'after_image' =>         '</div>',
-		'after' =>               '</div>',
-		'image_size' =>          'fit-400x320'
-	) );
+
+if( !empty($params['image_size']) )
+{
+	// Display images that are linked to this post:
+	$Item->images( array(
+			'before' =>              '<div class="bImages">',
+			'before_image' =>        '<div class="image_block">',
+			'before_image_legend' => '<div class="image_legend">',
+			'after_image_legend' =>  '</div>',
+			'after_image' =>         '</div>',
+			'after' =>               '</div>',
+			'image_size' =>					 $params['image_size'],
+		) );
+}
 ?>
 
 <div class="bText">
@@ -56,6 +59,10 @@ $Item->images( array(
 <?php
 /*
  * $Log$
+ * Revision 1.2  2007/06/24 01:05:31  fplanque
+ * skin_include() now does all the template magic for skins 2.0.
+ * .disp.php templates still need to be cleaned up.
+ *
  * Revision 1.1  2007/06/23 22:09:29  fplanque
  * feedback and item content templates.
  * Interim check-in before massive changes ahead.

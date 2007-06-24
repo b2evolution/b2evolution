@@ -20,41 +20,40 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( file_exists( $ads_current_skin_path.'_item_feedback.inc.php' ) )
-{	// The skin has a customized handler, use that one instead:
-	require $ads_current_skin_path.'_item_feedback.inc.php';
-	return;
-}
+
+// Default params:
+$params = array_merge( array(
+		'disp_comments'      =>	true,
+		'disp_comment_form'	 =>	true,
+		'disp_trackbacks'	   =>	true,
+		'disp_trackback_url' =>	true,
+		'disp_pingbacks'	   =>	true,
+	), $params );
 
 
-// Display filters:
-// You can change these and call this template multiple time if you want to separate comments from trackbacks
-$disp_comments = 1;					// Display the comments if requested
-$disp_comment_form = 1;			// Display the comments form if comments requested
-$disp_trackbacks = 1;				// Display the trackbacks if requested
-$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-$disp_pingbacks = 1;        // pingbacks (deprecated)
+global $c, $tb, $pb, $comment_allowed_tags, $comments_use_autobr;
 
+global $cookie_name, $cookie_email, $cookie_url;
 
 
 if( empty($c) )
 {	// Comments not requested
-	$disp_comments = 0;					// DO NOT Display the comments if not requested
-	$disp_comment_form = 0;			// DO NOT Display the comments form if not requested
+	$params['disp_comments'] = false;					// DO NOT Display the comments if not requested
+	$params['disp_comment_form'] = false;			// DO NOT Display the comments form if not requested
 }
 
 if( empty($tb) || !$Blog->get( 'allowtrackbacks' ) )
 {	// Trackback not requested or not allowed
-	$disp_trackbacks = 0;				// DO NOT Display the trackbacks if not requested
-	$disp_trackback_url = 0;		// DO NOT Display the trackback URL if not requested
+	$params['disp_trackbacks'] = false;				// DO NOT Display the trackbacks if not requested
+	$params['disp_trackback_url'] = false;		// DO NOT Display the trackback URL if not requested
 }
 
 if( empty($pb) )
 {	// Pingback not requested
-	$disp_pingbacks = 0;				// DO NOT Display the pingbacks if not requested
+	$params['disp_pingbacks'] = false;				// DO NOT Display the pingbacks if not requested
 }
 
-if( ! ($disp_comments || $disp_comment_form || $disp_trackbacks || $disp_trackback_url || $disp_pingbacks ) )
+if( ! ($params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] ) )
 {	// Nothing more to do....
 	return false;
 }
@@ -63,7 +62,7 @@ echo '<a id="feedbacks"></a>';
 
 $type_list = array();
 $disp_title = array();
-if( $disp_comments )
+if( $params['disp_comments'] )
 {	// We requested to display comments
 	if( $Item->can_see_comments() )
 	{ // User can see a comments
@@ -72,24 +71,24 @@ if( $disp_comments )
 	}
 	else
 	{ // Use cannot see comments
-		$disp_comments = false;
+		$params['disp_comments'] = false;
 	}
 	echo '<a id="comments"></a>';
 }
-if( $disp_trackbacks )
+if( $params['disp_trackbacks'] )
 {
 	$type_list[] = "'trackback'";
 	$disp_title[] = T_("Trackbacks");
 	echo '<a id="trackbacks"></a>';
 }
-if( $disp_pingbacks )
+if( $params['disp_pingbacks'] )
 {
 	$type_list[] = "'pingback'";
 	// $disp_title[] = T_("Pingbacks");  // stealh pingbacks (let the old ones appear as comments)
 	echo '<a id="pingbacks"></a>';
 }
 
-if( $disp_trackback_url )
+if( $params['disp_trackback_url'] )
 { // We want to display the trackback URL:
 	?>
 	<h4><?php echo T_('Trackback address for this post:') ?></h4>
@@ -107,7 +106,7 @@ if( $disp_trackback_url )
 }
 
 
-if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
+if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks']  )
 {
 	?>
 
@@ -184,7 +183,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 
 	// Comment form:
-	if( $disp_comment_form && $Item->can_comment() )
+	if( $params['disp_comment_form'] && $Item->can_comment() )
 	{ // We want to display the comments form and the item can be commented on:
 
 		// Default form params:
@@ -337,6 +336,10 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/24 01:05:31  fplanque
+ * skin_include() now does all the template magic for skins 2.0.
+ * .disp.php templates still need to be cleaned up.
+ *
  * Revision 1.1  2007/06/23 22:09:30  fplanque
  * feedback and item content templates.
  * Interim check-in before massive changes ahead.

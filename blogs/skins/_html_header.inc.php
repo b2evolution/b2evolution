@@ -12,11 +12,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( file_exists( $ads_current_skin_path.'_html_header.inc.php' ) )
-{	// The skin has a customized handler, use that one instead:
-	require $ads_current_skin_path.'_html_header.inc.php';
-	return;
-}
+require_js( 'functions.js' );
+require_js( 'rollovers.js' );
 
 skin_content_header();	// Sets charset!
 ?>
@@ -35,7 +32,7 @@ skin_content_header();	// Sets charset!
 	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
 	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
 	<?php robots_tag(); ?>
-	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
+	<meta name="generator" content="b2evolution <?php app_version(); ?>" /> <!-- Please leave this for stats -->
 	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 	<link rel="stylesheet" href="style.css" type="text/css" />
@@ -43,8 +40,6 @@ skin_content_header();	// Sets charset!
 		$Blog->disp( 'blog_css', 'raw');
 		$Blog->disp( 'user_css', 'raw');
 	?>
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/functions.js"></script>
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/rollovers.js"></script>
 </head>
 
 <body>

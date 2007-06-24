@@ -114,54 +114,57 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <!-- =================================== START OF MAIN AREA =================================== -->
 
 <div class="bPosts">
-<h2>#1: <a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog->disp( 'name', 'htmlbody' ) ?></a></h2>
-<?php request_title( '<h2>', '</h2>' ) ?>
+	<h2>#1: <a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog->disp( 'name', 'htmlbody' ) ?></a></h2>
+	<?php request_title( '<h2>', '</h2>' ) ?>
 
-<?php // ------------------------------------ START OF POSTS ----------------------------------------
-	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
+	<?php // ------------------------------------ START OF POSTS ----------------------------------------
+		if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
 
-	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
-	{
-		$MainList->date_if_changed( '<h2>', '</h2>', '' );
-		?>
+		if( isset($MainList) ) while( $Item = & $MainList->get_item() )
+		{
+			$MainList->date_if_changed( '<h2>', '</h2>', '' );
+			?>
 
-	<div class="bPost" lang="<?php $Item->lang() ?>">
-		<?php $Item->anchor(); ?>
-		<div class="bSmallHead">
-		<?php $Item->permanent_link( get_icon('permalink') ); ?>
-		<?php $Item->issue_time();	echo ', ', T_('Categories'), ': ';	$Item->categories() ?>
+		<div class="bPost" lang="<?php $Item->lang() ?>">
+			<?php $Item->anchor(); ?>
+			<div class="bSmallHead">
+			<?php $Item->permanent_link( get_icon('permalink') ); ?>
+			<?php $Item->issue_time();	echo ', ', T_('Categories'), ': ';	$Item->categories() ?>
+			</div>
+			<h3 class="bTitle"><?php $Item->title(); ?></h3>
+
+			<?php
+				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+				skin_include( '_item_content.inc.php', array(
+						'image_size'	=>	'fit-400x320',
+					) );
+				// Note: You can customize the default item feedback by copying the generic
+				// /skins/_item_feedback.inc.php file into the current skin folder.
+				// -------------------------- END OF POST CONTENT -------------------------
+			?>
+
+			<div class="bSmallPrint">
+				<?php $Item->feedback_link( 'comments', '', ' &bull; ' ) /* Link to comments */ ?>
+				<?php $Item->feedback_link( 'trackbacks', '', ' &bull; ' ) /* Link to trackbacks */ ?>
+
+				<?php $Item->trackback_rdf() /* trackback autodiscovery information */ ?>
+
+				<?php	$Item->permanent_link(); ?>
+			</div>
+
+			<?php
+				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
+				skin_include( '_item_feedback.inc.php' );
+				// Note: You can customize the default item feedback by copying the generic
+				// /skins/_item_feedback.inc.php file into the current skin folder.
+				// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+			?>
 		</div>
-		<h3 class="bTitle"><?php $Item->title(); ?></h3>
+	<?php
+		} // ---------------------------------- END OF POSTS ------------------------------------
+	?>
 
-		<?php
-			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-			require $skins_path.'_item_content.inc.php';
-			// Note: You can customize the default item feedback by copying the generic
-			// /skins/_item_feedback.inc.php file into the current skin folder.
-			// -------------------------- END OF POST CONTENT -------------------------
-		?>
-
-		<div class="bSmallPrint">
-			<?php $Item->feedback_link( 'comments', '', ' &bull; ' ) /* Link to comments */ ?>
-			<?php $Item->feedback_link( 'trackbacks', '', ' &bull; ' ) /* Link to trackbacks */ ?>
-
-			<?php $Item->trackback_rdf() /* trackback autodiscovery information */ ?>
-
-			<?php	$Item->permanent_link(); ?>
-		</div>
-
-		<?php
-			// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-			require $skins_path.'_item_feedback.inc.php';
-			// Note: You can customize the default item feedback by copying the generic
-			// /skins/_item_feedback.inc.php file into the current skin folder.
-			// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
-		?>
-	</div>
-<?php
-	} // ---------------------------------- END OF POSTS ------------------------------------
-?>
-
+	
 	<?php
 		// Links to list pages:
 		if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
@@ -170,13 +173,17 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			) );
 	?>
 
+
 	<?php
-		// -------------- START OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. --------------
+		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
+		skin_include( '$disp$', array(
+				'disp_posts'  => '',		// We already handled this case above
+				'disp_single' => '',		// We already handled this case above
+				'disp_page'   => '',		// We already handled this case above
+			) );
 		// Note: you can customize any of the sub templates included here by
-		// copying the matching php file into the same directory as this file.
-		// Call the dispatcher:
-		require $skins_path.'_dispatch.inc.php';
-		// --------------- END OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. ---------------
+		// copying the matching php file into your skin directory.
+		// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
 	?>
 
 </div>

@@ -19,7 +19,7 @@ init_MainList( $Blog->get_setting('posts_per_page') );
 
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
-require $skins_path.'_html_header.inc.php';
+skin_include( '_html_header.inc.php' );
 // Note: You can customize the default HTML header by copying the
 // _html_header.inc.php file into the current skin folder.
 // -------------------------------- END OF HEADER --------------------------------
@@ -44,7 +44,7 @@ request_title( '<h2>', '</h2>', ' - ', 'htmlbody', array(
 while( $Item = & $MainList->get_item() )
 {
 	// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-	require $skins_path.'_item_feedback.inc.php';
+	skin_include( '_item_feedback.inc.php' );
 	// Note: You can customize the default item feedback by copying the generic
 	// /skins/_item_feedback.inc.php file into the current skin folder.
 	// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
@@ -55,7 +55,7 @@ while( $Item = & $MainList->get_item() )
 
 <?php
 // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
-require $skins_path.'_html_footer.inc.php';
+skin_include( '_html_footer.inc.php' );
 // Note: You can customize the default HTML footer by copying the
 // _html_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------

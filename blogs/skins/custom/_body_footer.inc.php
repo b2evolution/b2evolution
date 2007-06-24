@@ -11,9 +11,9 @@
  * @subpackage custom
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
-
 ?>
 
+<!-- =================================== START OF FOOTER =================================== -->
 <div id="pageFooter">
 	<?php
 		// Display container and contents:

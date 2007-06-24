@@ -20,7 +20,7 @@ skin_init( $disp );
 
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
-require $skins_path.'_html_header.inc.php';
+skin_include( '_html_header.inc.php' );
 // Note: You can customize the default HTML header by copying the 
 // _html_header.inc.php file into the current skin folder.
 // -------------------------------- END OF HEADER --------------------------------
@@ -112,7 +112,9 @@ require $skins_path.'_html_header.inc.php';
 
 			<?php
 				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-				require $skins_path.'_item_content.inc.php';
+				skin_include( '_item_content.inc.php', array(
+						'image_size'	=>	'fit-400x320',
+					) );
 				// Note: You can customize the default item feedback by copying the generic
 				// /skins/_item_feedback.inc.php file into the current skin folder.
 				// -------------------------- END OF POST CONTENT -------------------------
@@ -130,7 +132,7 @@ require $skins_path.'_html_header.inc.php';
 	
 			<?php
 				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-				require $skins_path.'_item_feedback.inc.php';
+				skin_include( '_item_feedback.inc.php' );
 				// Note: You can customize the default item feedback by copying the generic
 				// /skins/_item_feedback.inc.php file into the current skin folder.
 				// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
@@ -143,25 +145,26 @@ require $skins_path.'_html_header.inc.php';
 		<div class="separator" ><img src="rsc/img/separator.gif" width="265" height="14" alt="" /></div>
 	<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
 
-		<?php
-			// Links to list pages:
-			if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
-   				'prev_text' => '&lt;&lt; '.T_('Previous'),
-   				'next_text' => T_('Next').' &gt;&gt;',
-				) );
-		?>
-		<?php
-			// previous_post( '<p class="center">%</p>' );
-			// next_post( '<p class="center">%</p>' );
-		?>
+	
+	<?php
+		// Links to list pages:
+		if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
+   			'prev_text' => '&lt;&lt; '.T_('Previous'),
+   			'next_text' => T_('Next').' &gt;&gt;',
+			) );
+	?>
+
 
 	<?php
-		// -------------- START OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. --------------
+		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
+		skin_include( '$disp$', array(
+				'disp_posts'  => '',		// We already handled this case above
+				'disp_single' => '',		// We already handled this case above
+				'disp_page'   => '',		// We already handled this case above
+			) );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.
-		// Call the dispatcher:
-		require $skins_path.'_dispatch.inc.php';
-		// --------------- END OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. ---------------
+		// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
 	?>
 
 </div>
@@ -199,7 +202,7 @@ require $skins_path.'_html_header.inc.php';
 
 <?php
 // ------------------------- BODY FOOTER INCLUDED HERE --------------------------
-require $skins_path.'_body_footer.inc.php';
+skin_include( '_body_footer.inc.php' );
 // Note: You can customize the default BODY footer by copying the
 // _body_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------
@@ -210,7 +213,7 @@ require $skins_path.'_body_footer.inc.php';
 
 <?php
 // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
-require $skins_path.'_html_footer.inc.php';
+skin_include( '_html_footer.inc.php' );
 // Note: You can customize the default HTML footer by copying the 
 // _html_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------

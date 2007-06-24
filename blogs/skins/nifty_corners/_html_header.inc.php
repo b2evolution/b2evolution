@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the header include template.
+ * This is the HTML header include template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
  * {@link http://manual.b2evolution.net/Skins_2.0}
@@ -13,23 +13,27 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+require_js( 'functions.js' );
+require_js( 'rollovers.js' );
+
 skin_content_header();	// Sets charset!
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<?php skin_content_meta(); /* Charset for static pages */ ?>
+	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
+	<?php add_html_head_lines() /* Add javascript and css files included by plugins and skin */ ?>
 	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
 	<title><?php
 		request_title( '', ' - ', ' - ', 'htmlhead', array(
 		 ) );
 		$Blog->disp('name', 'htmlhead');
 	?></title>
-	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
 	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
 	<?php robots_tag(); ?>
-	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
+	<meta name="generator" content="b2evolution <?php app_version(); ?>" /> <!-- Please leave this for stats -->
 	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 	<link rel="stylesheet" href="style.css" type="text/css" />
@@ -39,8 +43,6 @@ skin_content_header();	// Sets charset!
 		$Blog->disp( 'blog_css', 'raw');
 		$Blog->disp( 'user_css', 'raw');
 	?>
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/functions.js"></script>
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/rollovers.js"></script>
 	<script type="text/javascript" src="rsc/nifty_corners.js"></script>
 	<script type="text/javascript">
 		window.onload=function()
@@ -60,5 +62,5 @@ skin_content_header();	// Sets charset!
 <?php
 // ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
 require $skins_path.'_toolbar.inc.php';
-// -------------------------------- END OF HEADER --------------------------------
+// ------------------------------- END OF TOOLBAR --------------------------------
 ?>

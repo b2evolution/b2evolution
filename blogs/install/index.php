@@ -35,8 +35,8 @@ if( ! $config_is_done )
 require_once $conf_path.'_upgrade.php';
 require_once $inc_path.'_misc/_class4.funcs.php';
 require_once $misc_inc_path.'_log.class.php';
-$Debuglog = new Log( 'note' );
-$Messages = new Log('error');
+$Debuglog = & new Log( 'note' );
+$Messages = & new Log('error');
 require_once $misc_inc_path.'_misc.funcs.php'; // db funcs
 require_once $inc_path.'_vars.inc.php';
 require_once $misc_inc_path.'_db.class.php';
@@ -46,7 +46,6 @@ require_once $model_path.'items/_item.class.php';
 require_once $model_path.'items/_item.funcs.php';
 require_once $misc_inc_path.'_form.funcs.php';
 require_once $model_path.'users/_user.funcs.php';
-require_once $model_path.'skins/_skin.funcs.php';
 require_once $misc_inc_path.'_timer.class.php';
 require_once $misc_inc_path.'_plugins.class.php';
 require_once dirname(__FILE__).'/_functions_install.php';
@@ -648,6 +647,10 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.130  2007/06/24 01:05:31  fplanque
+ * skin_include() now does all the template magic for skins 2.0.
+ * .disp.php templates still need to be cleaned up.
+ *
  * Revision 1.129  2007/06/12 21:00:02  blueyed
  * Added non-JS handling of deletedb confirmation
  *

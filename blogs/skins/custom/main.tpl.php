@@ -21,7 +21,7 @@ skin_init( $disp );
 
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
-require $skins_path.'_html_header.inc.php';
+skin_include( '_html_header.inc.php' );
 // Note: You can customize the default HTML header by copying the generic
 // /skins/_html_header.inc.php file into the current skin folder.
 // -------------------------------- END OF HEADER --------------------------------
@@ -30,157 +30,161 @@ require $skins_path.'_html_header.inc.php';
 
 <?php
 // ------------------------- BODY HEADER INCLUDED HERE --------------------------
-require $skins_path.'_body_header.inc.php';
+skin_include( '_body_header.inc.php' );
 // Note: You can customize the default BODY heder by copying the generic
 // /skins/_body_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------
 ?>
 
 
+<!-- =================================== START OF MAIN AREA =================================== -->
 <div class="bPosts">
 
-<!-- =================================== START OF MAIN AREA =================================== -->
-
-
-<?php
-	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-	$Messages->disp( '<div class="action_messages">', '</div>' );
-	// --------------------------------- END OF MESSAGES ---------------------------------
-?>
-
-
-<?php
-	if( isset($MainList) )
-	{ // Links to previous and next post in single post mode:
-		$MainList->prevnext_item_links( array(
-				'block_start' => '<table class="prevnext_post"><tr>',
-				'prev_start'  => '<td>',
-				'prev_end'    => '</td>',
-				'next_start'  => '<td class="right">',
-				'next_end'    => '</td>',
-				'block_end'   => '</tr></table>',
-			) );
-	}
-?>
-
-
-<?php
-	// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
-	request_title( '<h2>', '</h2>' );
-	// ------------------------------ END OF REQUEST TITLE -----------------------------
-?>
-
-
-<?php
-	if( isset($MainList) )
-	{ // Links to list pages:
-		$MainList->page_links( '<p class="center">'.T_('Pages:').' <strong>', '</strong></p>' );
-	}
-?>
-
-
-<?php
-	// ------------------------------------ START OF POSTS ----------------------------------------
-	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
-
-	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
-	{
-	?>
 
 	<?php
-		$MainList->date_if_changed( '<h2>', '</h2>', '' );
+		// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
+		$Messages->disp( '<div class="action_messages">', '</div>' );
+		// --------------------------------- END OF MESSAGES ---------------------------------
 	?>
 
-	<div class="bPost bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
-		<?php
-			locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
-			$Item->anchor(); // Anchor for permalinks to refer to
-		?>
-		<div class="bSmallHead">
-		<?php
-			$Item->permanent_link( '#icon#' );
-			echo ' ';
-			$Item->issue_time();
-			echo ', '.T_('by').' ';
-			$Item->author( '<strong>', '</strong>' );
-			$Item->msgform_link( $Blog->get('msgformurl') );
-			echo ', ';
-			$Item->wordcount();
-			echo ' '.T_('words');
-			echo ', ';
-			$Item->views();
-			echo ' &nbsp; ';
-			locale_flag( $Item->locale, 'h10px' );
-			echo '<br /> ', T_('Categories'), ': ';
-			$Item->categories();
-		?>
-		</div>
 
-		<h3 class="bTitle"><?php $Item->title(); ?></h3>
-
-		<?php
-			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-			require $skins_path.'_item_content.inc.php';
-			// Note: You can customize the default item feedback by copying the generic
-			// /skins/_item_feedback.inc.php file into the current skin folder.
-			// -------------------------- END OF POST CONTENT -------------------------
-		?>
-
-		<?php
-			// List all tags attached to this post:
-			$Item->tags( array(
-					'before' =>         '<div class="bSmallPrint">'.T_('Tags').': ',
-					'after' =>          '</div>',
-					'separator' =>      ', ',
+	<?php
+		if( isset($MainList) )
+		{ // Links to previous and next post in single post mode:
+			$MainList->prevnext_item_links( array(
+					'block_start' => '<table class="prevnext_post"><tr>',
+					'prev_start'  => '<td>',
+					'prev_end'    => '</td>',
+					'next_start'  => '<td class="right">',
+					'next_end'    => '</td>',
+					'block_end'   => '</tr></table>',
 				) );
-		?>
+		}
+	?>
 
-		<div class="bSmallPrint">
-			<?php $Item->permanent_link( '#', '#', 'permalink_right' ); ?>
 
-			<?php $Item->feedback_link( 'comments', '' ) // Link to comments ?>
-			<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
-			<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
-
-			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
-		</div>
-
-		<?php
-			// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-			require $skins_path.'_item_feedback.inc.php';
-			// Note: You can customize the default item feedback by copying the generic
-			// /skins/_item_feedback.inc.php file into the current skin folder.
-			// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
-		?>
-
-		<?php
-			locale_restore_previous();	// Restore previous locale (Blog locale)
-		?>
-	</div>
 	<?php
-	} // ---------------------------------- END OF POSTS ------------------------------------
-
-?>
-
-<?php
-	// Links to list pages:
-	if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>' );
-?>
+		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+		request_title( '<h2>', '</h2>' );
+		// ------------------------------ END OF REQUEST TITLE -----------------------------
+	?>
 
 
-<?php
-	// -------------- START OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. --------------
-	// Note: you can customize any of the sub templates included here by
-	// copying the matching php file into your skin directory.
-	// Call the dispatcher:
-	require $skins_path.'_dispatch.inc.php';
-	// --------------- END OF INCLUDES FOR LATEST COMMENTS, MY PROFILE, ETC. ---------------
+	<?php
+		if( isset($MainList) )
+		{ // Links to list pages:
+			$MainList->page_links( '<p class="center">'.T_('Pages:').' <strong>', '</strong></p>' );
+		}
+	?>
 
-?>
+
+	<?php
+		// --------------------------------- START OF POSTS -------------------------------------
+		if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
+
+		if( isset($MainList) ) while( $Item = & $MainList->get_item() )
+		{
+		?>
+
+		<?php
+			$MainList->date_if_changed( '<h2>', '</h2>', '' );
+		?>
+
+		<div class="bPost bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
+			<?php
+				locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
+				$Item->anchor(); // Anchor for permalinks to refer to
+			?>
+			<div class="bSmallHead">
+			<?php
+				$Item->permanent_link( '#icon#' );
+				echo ' ';
+				$Item->issue_time();
+				echo ', '.T_('by').' ';
+				$Item->author( '<strong>', '</strong>' );
+				$Item->msgform_link( $Blog->get('msgformurl') );
+				echo ', ';
+				$Item->wordcount();
+				echo ' '.T_('words');
+				echo ', ';
+				$Item->views();
+				echo ' &nbsp; ';
+				locale_flag( $Item->locale, 'h10px' );
+				echo '<br /> ', T_('Categories'), ': ';
+				$Item->categories();
+			?>
+			</div>
+
+			<h3 class="bTitle"><?php $Item->title(); ?></h3>
+
+			<?php
+				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+				skin_include( '_item_content.inc.php', array(
+						'image_size'	=>	'fit-400x320',
+					) );
+				// Note: You can customize the default item feedback by copying the generic
+				// /skins/_item_feedback.inc.php file into the current skin folder.
+				// -------------------------- END OF POST CONTENT -------------------------
+			?>
+
+			<?php
+				// List all tags attached to this post:
+				$Item->tags( array(
+						'before' =>         '<div class="bSmallPrint">'.T_('Tags').': ',
+						'after' =>          '</div>',
+						'separator' =>      ', ',
+					) );
+			?>
+
+			<div class="bSmallPrint">
+				<?php $Item->permanent_link( '#', '#', 'permalink_right' ); ?>
+
+				<?php $Item->feedback_link( 'comments', '' ) // Link to comments ?>
+				<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
+				<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
+
+				<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
+			</div>
+
+			<?php
+				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
+				skin_include( '_item_feedback.inc.php' );
+				// Note: You can customize the default item feedback by copying the generic
+				// /skins/_item_feedback.inc.php file into the current skin folder.
+				// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+			?>
+
+			<?php
+				locale_restore_previous();	// Restore previous locale (Blog locale)
+			?>
+		</div>
+		<?php
+		} // ---------------------------------- END OF POSTS ------------------------------------
+
+	?>
+
+	<?php
+		// Links to list pages:
+		if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>' );
+	?>
+
+
+	<?php
+		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
+		skin_include( '$disp$', array(
+				'disp_posts'  => '',		// We already handled this case above
+				'disp_single' => '',		// We already handled this case above
+				'disp_page'   => '',		// We already handled this case above
+			) );
+		// Note: you can customize any of the sub templates included here by
+		// copying the matching php file into your skin directory.
+		// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
+	?>
 
 </div>
-<!-- =================================== START OF SIDEBAR =================================== -->
 
+
+<!-- =================================== START OF SIDEBAR =================================== -->
 <div class="bSideBar">
 
 	<?php
@@ -217,7 +221,7 @@ require $skins_path.'_body_header.inc.php';
 
 <?php
 // ------------------------- BODY FOOTER INCLUDED HERE --------------------------
-require $skins_path.'_body_footer.inc.php';
+skin_include( '_body_footer.inc.php' );
 // Note: You can customize the default BODY footer by copying the
 // _body_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------
@@ -226,7 +230,7 @@ require $skins_path.'_body_footer.inc.php';
 
 <?php
 // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
-require $skins_path.'_html_footer.inc.php';
+skin_include( '_html_footer.inc.php' );
 // Note: You can customize the default HTML footer by copying the
 // _html_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------

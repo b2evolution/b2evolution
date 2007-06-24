@@ -31,6 +31,8 @@
  * Initialize everything:
  */
 require_once dirname(__FILE__).'/_main.inc.php';
+
+require_once $model_path.'skins/_skin.funcs.php';
 require_once $model_path.'items/_itemlist2.class.php';
 
 $Timer->start( '_blog_main.inc' );
@@ -491,6 +493,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.80  2007/06/24 01:05:31  fplanque
+ * skin_include() now does all the template magic for skins 2.0.
+ * .disp.php templates still need to be cleaned up.
+ *
  * Revision 1.79  2007/05/28 15:18:30  fplanque
  * cleanup
  *

@@ -62,6 +62,68 @@ function skin_init( $disp )
 
 
 /**
+ * Include a sub-template at the current position
+ *
+ * @todo plugin hook to handle a special disp
+ */
+function skin_include( $template_name, $params = array() )
+{
+	global $skins_path, $ads_current_skin_path, $disp;
+
+	// Globals that may be needed by the template:
+	global $Blog, $MainList, $Item;
+	global $Plugins, $Skin;
+	global $current_User, $Hit, $Session;
+	global $skin_url, $htsrv_url;
+	global $credit_links, $skin_links, $francois_links, $skinfaktory_links;
+
+	if( $template_name == '$disp$' )
+	{ // This is a special case.
+		// We are going to include a template based on $disp:
+
+		// Default display handlers:
+		$disp_handlers = array_merge( array(
+				'disp_posts'    => '_posts.disp.php',
+				'disp_single'   => '_single.disp.php',
+				'disp_page'     => '_page.disp.php',
+				'disp_arcdir'   => '_arcdir.php',
+				'disp_catdir'   => '_catdir.disp.php',
+				'disp_comments' => '_lastcomments.php',
+				'disp_msgform'  => '_msgform.php',
+				'disp_profile'  => '_profile.php',
+				'disp_subs'     => '_subscriptions.php',
+			), $params );
+
+		$template_name = $disp_handlers['disp_'.$disp];
+
+		if( !isset( $template_name ) )
+		{
+			printf( '<div class="skin_error">'.T_('Unhandled disp type [%s]').'</div>', $disp );
+			return;
+		}
+
+		if( empty( $template_name ) )
+		{	// The caller asked not to display this handler
+			return;
+		}
+	}
+
+	if( file_exists( $ads_current_skin_path.$template_name ) )
+	{	// The skin has a customized handler, use that one instead:
+		require $ads_current_skin_path.$template_name;
+	}
+	elseif( file_exists( $skins_path.$template_name ) )
+	{	// Use the default template:
+		require $skins_path.$template_name;
+	}
+	else
+	{
+		printf( '<div class="skin_error">'.T_('Sub template [%s] not found.').'</div>', $template_name );
+	}
+}
+
+
+/**
  * Template function: output HTML base tag to current skin
  */
 function skin_base_tag()
@@ -251,8 +313,20 @@ function & skin_install( $skin_folder, $name = NULL )
 }
 
 
+
+function app_version()
+{
+	global $app_version;
+	echo $app_version;
+}
+
+
 /*
  * $Log$
+ * Revision 1.23  2007/06/24 01:05:31  fplanque
+ * skin_include() now does all the template magic for skins 2.0.
+ * .disp.php templates still need to be cleaned up.
+ *
  * Revision 1.22  2007/06/20 21:42:13  fplanque
  * implemented working widget/plugin params
  *

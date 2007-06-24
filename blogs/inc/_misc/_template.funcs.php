@@ -27,7 +27,6 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
- * @author cafelog (team)
  * @author fplanque: Francois PLANQUE.
  *
  * @version $Id$
@@ -276,6 +275,10 @@ function add_html_head_lines()
 
 /*
  * $Log$
+ * Revision 1.26  2007/06/24 01:05:31  fplanque
+ * skin_include() now does all the template magic for skins 2.0.
+ * .disp.php templates still need to be cleaned up.
+ *
  * Revision 1.25  2007/06/23 00:12:26  fplanque
  * doc
  *

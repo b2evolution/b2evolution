@@ -302,7 +302,6 @@ require_once $model_path.'items/_itemtype.class.php';
 require_once $model_path.'items/_link.class.php';
 require_once $model_path.'comments/_comment.funcs.php';
 require_once $model_path.'items/_item.funcs.php';
-require_once $model_path.'skins/_skin.funcs.php';
 require_once $model_path.'comments/_commentlist.class.php';
 require_once $model_path.'sessions/_hitlog.funcs.php';     // referer logging
 require_once dirname(__FILE__).'/_misc/_form.funcs.php';
@@ -631,6 +630,10 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.79  2007/06/24 01:05:31  fplanque
+ * skin_include() now does all the template magic for skins 2.0.
+ * .disp.php templates still need to be cleaned up.
+ *
  * Revision 1.78  2007/06/20 23:12:51  fplanque
  * "Who's online" moved to a plugin
  *

@@ -227,6 +227,15 @@ p.error {
 }
 /* }}} */
 
+/* include errors, wrong params, deleted blog, etc... */
+div.skin_error {
+	border: 2px dotted #d99;
+	background:#fbf2ee;
+	color:#e00;
+	padding: 1em;
+	margin: 1em;
+}
+
 /*
  * Debug output formatting:
  */
