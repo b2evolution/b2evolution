@@ -22,7 +22,6 @@ skin_content_header();	// Sets charset!
 <head>
 	<?php skin_content_meta(); /* Charset for static pages */ ?>
 	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
-	<?php add_html_head_lines() /* Add javascript and css files included by plugins and skin */ ?>
 	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
 	<title><?php
 		request_title( '', ' - ', ' - ', 'htmlhead', array(
@@ -36,6 +35,7 @@ skin_content_header();	// Sets charset!
 	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 	<link rel="stylesheet" href="style.css" type="text/css" />
+	<?php add_html_head_lines() /* Add javascript and css files included by plugins and skin */ ?>
 	<?php
 		$Blog->disp( 'blog_css', 'raw');
 		$Blog->disp( 'user_css', 'raw');

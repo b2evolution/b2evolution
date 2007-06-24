@@ -17,7 +17,23 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
 skin_init( $disp );
-
+require_css( 'rsc/nifty_corners.css', TRUE, 'Nifty Corners' ); 
+require_css( 'rsc/nifty_print.css', TRUE, 'Print', 'print' );
+require_js( 'rsc/nifty_corners.js', TRUE );
+$custom_js = <<<JS
+<script type="text/javascript">
+	window.onload=function()
+	{
+		if(!NiftyCheck())
+				return;
+		Rounded("div.outerwrap","all","transparent","#fff","");
+		Rounded("div.posts","all","transparent","#fff","");
+		Rounded("div.bSideBar","all","transparent","#fff","");
+		Rounded("div.bTitle","top","#fff","#06a3c4","smooth");
+	}
+</script>
+JS;
+add_headline( $custom_js );
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php' );

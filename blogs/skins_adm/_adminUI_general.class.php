@@ -407,7 +407,6 @@ class AdminUI_general
 	function disp_html_head()
 	{
 		global $view_path;
-
 		require $view_path.'_menutop.php';
 	}
 
@@ -1619,6 +1618,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.58  2007/06/24 15:43:34  personman2
+ * Reworking the process for a skin or plugin to add js and css files to a blog display.  Removed the custom header for nifty_corners.
+ *
  * Revision 1.57  2007/06/20 19:13:42  blueyed
  * fixed doc
  *

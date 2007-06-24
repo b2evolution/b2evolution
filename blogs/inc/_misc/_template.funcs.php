@@ -203,7 +203,7 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 
 /**
  * Memorize that a specific javascript file will be required by the current page.
- * All requested files will be included in the page head only once (when add_html_head_lines is called)
+ * All requested files will be included in the page head only once (when headlines is called)
  *
  * Accepts absolute urls, filenames (with or without the '.js') relative to the rsc/js directory and certain aliases, like 'jquery' and 'jquery_debug'
  * If 'jquery' is used and $debug is set to true, the 'jquery_debug' is automatically swapped in.
@@ -211,7 +211,7 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
  *
  * @param string alias, url or filename (relative to rsc/js) for javascript file
  */
-function require_js( $js_file )
+function require_js( $js_file, $relative_to_base = FALSE )
 {
   global $required_js, $rsc_url, $debug;
   
@@ -222,36 +222,88 @@ function require_js( $js_file )
     );
     
   // First get the real filename or url
-  
+  $absolute = FALSE;
   if( stristr( $js_file, 'http://' ) )
   { // It's an absolute url
     $js_url = $js_file;
+    $absolute = TRUE;
   }
   elseif( !empty( $js_aliases[$js_file]) )
   { // It's an alias
     if ( $js_file == 'jquery' and $debug ) $js_file = 'jquery_debug';
-    $js_url = $rsc_url . 'js/' . $js_aliases[$js_file];
+    $js_url = $js_aliases[$js_file];
   }
   elseif ( strtolower( substr( $js_file, -3 ) ) != '.js' )
   { // The file was named without the .js, so add it on
     $js_url = $rsc_url.'js/'.$js_file.'.js';
   }
+  
+  if ( $relative_to_base or $absolute )
+  {
+    $js_url = $js_file;
+  } 
   else
-  { // The filename was given, just add on the rest of the url
+  { // Add on the $rsc_url
     $js_url = $rsc_url.'js/'.$js_file;
   }
 
   // Then check to see if it has already been added
   if ( empty( $required_js ) or !in_array( strtolower( $js_url ), $required_js ) )
   { // Not required before, add it to the array, so the next plugin won't add it again
-    if (empty( $required_js ) )
-    {	// fp> TODO: move to vars.inc - JS injection if autoglobals is on!
-    	 $required_js = array();
-		}
+		$start_script_tag = '<script type="text/javascript" src="';
+		$end_script_tag = '"></script>';
+		add_headline( $start_script_tag . $js_url . $end_script_tag );
     $required_js[] = $js_url;
   }
   
 }
+
+
+function require_css( $css_file, $relative_to_base = FALSE, $title = NULL, $media = NULL )
+{
+  global $required_css, $rsc_url, $debug;
+  
+  $css_aliases = array();
+    
+  // First get the real filename or url
+  $absolute = FALSE;
+  if( stristr( $css_file, 'http://' ) )
+  { // It's an absolute url
+    $css_url = $css_file;
+    $absolute = TRUE;
+  }
+  elseif( !empty( $css_aliases[$css_file]) )
+  { // It's an alias
+    $css_url = $css_aliases[$css_file];
+  }
+  elseif ( strtolower( substr( $css_file, -4 ) ) != '.css' )
+  { // The file was named without the .css, so add it on
+    $css_url = $css_file.'.css';
+  }
+  
+  if ( $relative_to_base or $absolute )
+  {
+    $css_url = $css_file;
+  }
+  else
+  { // The add on the $rsc_url
+    $css_url = $rsc_url . 'css/' . $css_file;
+  }
+
+  // Then check to see if it has already been added
+  if ( empty( $required_css ) or !in_array( strtolower( $css_url ), $required_css ) )
+  { // Not required before, add it to the array, so it won't be added again
+		$start_link_tag = '<link rel="stylesheet"';
+		if ( !empty( $title ) ) $start_link_tag .= ' title="' . $title . '"';
+		if ( !empty( $media ) ) $start_link_tag .= ' media="' . $media . '"';
+		$start_link_tag .= ' type="text/css" href="';
+		$end_link_tag = '" />';
+		add_headline( $start_link_tag . $css_url . $end_link_tag );
+    $required_css[] = $css_url;
+  }
+  
+}
+
 
 
 /**
@@ -261,20 +313,24 @@ function require_js( $js_file )
  */
 function add_html_head_lines()
 {
-  global $required_js;
-  if( !empty( $required_js ) )
-  {
-    foreach ( $required_js as $js_url )
-    {
-      echo "<script type=\"text/javascript\" src=\"$js_url\"></script>\n";
-    }
-  }
+  global $headlines;
+  $r = implode( "\n\t", $headlines )."\n\t";
+  echo $r;
 }
 
+
+function add_headline($headline)
+{
+  global $headlines;
+  $headlines[] = $headline;
+}
 
 
 /*
  * $Log$
+ * Revision 1.27  2007/06/24 15:43:33  personman2
+ * Reworking the process for a skin or plugin to add js and css files to a blog display.  Removed the custom header for nifty_corners.
+ *
  * Revision 1.26  2007/06/24 01:05:31  fplanque
  * skin_include() now does all the template magic for skins 2.0.
  * .disp.php templates still need to be cleaned up.

@@ -368,7 +368,15 @@ class test_plugin extends Plugin
 		$params['Form']->end_fieldset( 'Foo' );
 	}
 
+	/**
+	 * @see Plugin::SkinBeginHtmlHead()
+	 */
 
+  function SkinBeginHtmlHead()
+  {
+    require_js( 'jquery');
+  }
+  
 	/**
 	 * @see Plugin::AdminBeforeItemEditCreate()
 	 */
@@ -721,6 +729,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.70  2007/06/24 15:43:33  personman2
+ * Reworking the process for a skin or plugin to add js and css files to a blog display.  Removed the custom header for nifty_corners.
+ *
  * Revision 1.69  2007/06/19 20:42:53  fplanque
  * basic demo of widget params handled by autoform_*
  *

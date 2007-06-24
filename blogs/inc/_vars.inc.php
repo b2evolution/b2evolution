@@ -57,6 +57,11 @@ $is_cli = empty($_SERVER['SERVER_SOFTWARE']) ? true : false;
 $is_web = ! $is_cli;
 // echo ($is_cli ? 'cli' : 'web' );
 
+// Initialize some variables for template functions
+$required_js = array();
+$required_css = array();
+$headlines = array();
+
 
 // Investigation for following code by Isaac - http://isaacschlueter.com/
 // $debug = true;
@@ -291,6 +296,9 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
 
 /*
  * $Log$
+ * Revision 1.18  2007/06/24 15:43:33  personman2
+ * Reworking the process for a skin or plugin to add js and css files to a blog display.  Removed the custom header for nifty_corners.
+ *
  * Revision 1.17  2007/05/02 20:39:27  fplanque
  * meta robots handling
  *

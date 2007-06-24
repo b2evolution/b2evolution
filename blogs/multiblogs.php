@@ -66,6 +66,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 	<!-- InstanceEndEditable -->
 <link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
+<?php add_html_head_lines(); ?>
 </head>
 <body>
 <div class="pageHeader">

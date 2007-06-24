@@ -33,6 +33,7 @@ skin_content_header();	// Sets charset!
 	</title>
 	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
+	<?php add_html_head_lines() ?>
 </head>
 <body>
 <?php
