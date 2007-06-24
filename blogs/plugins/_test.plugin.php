@@ -374,7 +374,7 @@ class test_plugin extends Plugin
 
   function SkinBeginHtmlHead()
   {
-    require_js( 'jquery');
+    require_js( '#jquery#');
   }
   
 	/**
@@ -729,6 +729,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.71  2007/06/24 17:48:40  personman2
+ * changed jquery alias to #jquery#
+ *
  * Revision 1.70  2007/06/24 15:43:33  personman2
  * Reworking the process for a skin or plugin to add js and css files to a blog display.  Removed the custom header for nifty_corners.
  *

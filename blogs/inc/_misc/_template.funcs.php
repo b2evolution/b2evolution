@@ -216,9 +216,8 @@ function require_js( $js_file, $relative_to_base = FALSE )
   global $required_js, $rsc_url, $debug;
   
   $js_aliases = array(
-    'jquery' => 'jquery.min.js',
-    'jquery_debug' => 'jquery.js',
-    'jquery_min' => 'jquery.min.js'
+    '#jquery#' => 'jquery.min.js',
+    '#jquery_debug#' => 'jquery.js',
     );
     
   // First get the real filename or url
@@ -230,7 +229,7 @@ function require_js( $js_file, $relative_to_base = FALSE )
   }
   elseif( !empty( $js_aliases[$js_file]) )
   { // It's an alias
-    if ( $js_file == 'jquery' and $debug ) $js_file = 'jquery_debug';
+    if ( $js_file == '#jquery#' and $debug ) $js_file = '#jquery_debug#';
     $js_url = $js_aliases[$js_file];
   }
   elseif ( strtolower( substr( $js_file, -3 ) ) != '.js' )
@@ -328,8 +327,8 @@ function add_headline($headline)
 
 /*
  * $Log$
- * Revision 1.27  2007/06/24 15:43:33  personman2
- * Reworking the process for a skin or plugin to add js and css files to a blog display.  Removed the custom header for nifty_corners.
+ * Revision 1.28  2007/06/24 17:48:40  personman2
+ * changed jquery alias to #jquery#
  *
  * Revision 1.26  2007/06/24 01:05:31  fplanque
  * skin_include() now does all the template magic for skins 2.0.
