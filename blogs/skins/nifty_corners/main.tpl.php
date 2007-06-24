@@ -17,30 +17,39 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
 skin_init( $disp );
-require_css( 'rsc/nifty_corners.css', TRUE, 'Nifty Corners' ); 
-require_css( 'rsc/nifty_print.css', TRUE, 'Print', 'print' );
-require_js( 'rsc/nifty_corners.js', TRUE );
-$custom_js = <<<JS
-<script type="text/javascript">
-	window.onload=function()
-	{
-		if(!NiftyCheck())
-				return;
-		Rounded("div.outerwrap","all","transparent","#fff","");
-		Rounded("div.posts","all","transparent","#fff","");
-		Rounded("div.bSideBar","all","transparent","#fff","");
-		Rounded("div.bTitle","top","#fff","#06a3c4","smooth");
-	}
-</script>
-JS;
+?>
+
+
+<?php
+// -------------------------- HTML HEADER INCLUDED HERE --------------------------
+// Initializations:
+require_css( 'rsc/nifty_corners.css', true, 'Nifty Corners' );
+require_css( 'rsc/nifty_print.css', true, 'Print', 'print' );
+require_js( 'rsc/nifty_corners.js', true );
+$custom_js = <<<HEREDOC
+	<script type="text/javascript">
+		<!--
+		window.onload=function()
+		{
+			if(!NiftyCheck())
+					return;
+			Rounded("div.outerwrap","all","transparent","#fff","");
+			Rounded("div.posts","all","transparent","#fff","");
+			Rounded("div.bSideBar","all","transparent","#fff","");
+			Rounded("div.bTitle","top","#fff","#06a3c4","smooth");
+		}
+		// -->
+	</script>
+HEREDOC;
 add_headline( $custom_js );
 
-// -------------------------- HTML HEADER INCLUDED HERE --------------------------
+// Include the HTML HEAD:
 skin_include( '_html_header.inc.php' );
-// Note: You can customize the default HTML header by copying the 
+// Note: You can customize the default HTML header by copying the
 // _html_header.inc.php file into the current skin folder.
 // -------------------------------- END OF HEADER --------------------------------
 ?>
+
 
 <div class="wrapper">
 <div class="wrapper2">
