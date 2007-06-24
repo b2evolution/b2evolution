@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements evoSkins support functions.
+ * This file implements Template tags for use withing skins.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -28,7 +28,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Initializes internal states for the most common skin displays.
+ * Template tag. Initializes internal states for the most common skin displays.
  *
  * For more specific skins, this function should not be called and
  * equivalent code should be customized within the skin.
@@ -62,7 +62,7 @@ function skin_init( $disp )
 
 
 /**
- * Include a sub-template at the current position
+ * Template tag. Include a sub-template at the current position
  *
  * @todo plugin hook to handle a special disp
  */
@@ -124,7 +124,9 @@ function skin_include( $template_name, $params = array() )
 
 
 /**
- * Template function: output HTML base tag to current skin
+ * Template tag. Output HTML base tag to current skin.
+ *
+ * This is needed for relative css and img includes.
  */
 function skin_base_tag()
 {
@@ -157,7 +159,7 @@ function skin_base_tag()
 
 
 /**
- * Output content-type header
+ * Template tag. Output content-type header
  * 
  * We use this method when we are NOT generating a static page
  *
@@ -177,7 +179,7 @@ function skin_content_header( $type = 'text/html' )
 
 
 /**
- * Output content-type http_equiv meta tag
+ * Template tag. Output content-type http_equiv meta tag
  * 
  * We use this method when we ARE generating a static page
  *
@@ -197,7 +199,7 @@ function skin_content_meta( $type = 'text/html' )
 
 
 /**
- * Display a Widget.
+ * Template tag. Display a Widget.
  *
  * This load the widget class, instantiates it, and displays it.
  *
@@ -234,6 +236,8 @@ function skin_widget( $params )
 /**
  * Checks if a skin is provided by a plugin.
  *
+ * Used by front-end.
+ *
  * @uses Plugin::GetProvidedSkins()
  * @return false|integer False in case no plugin provides the skin or ID of the first plugin that provides it.
  */
@@ -263,6 +267,8 @@ function skin_provided_by_plugin( $name )
  * Checks if a skin exists. This can either be a regular skin directory
  * or can be in the list {@link Plugin::GetProvidedSkins()}.
  *
+ * Used by front-end.
+ *
  * @param skin name (directory name)
  * @return boolean true is exists, false if not
  */
@@ -286,34 +292,8 @@ function skin_exists( $name, $filename = 'main.tpl.php' )
 
 
 /**
- * Install a skin
- *
- * @todo do not install if skin doesn't exist. Important for upgrade. Need to NOT fail if ZERO skins installed though :/
- *
- * @param string
- * @param string NULL for default
- * @return Skin
+ * Template tag.
  */
-function & skin_install( $skin_folder, $name = NULL )
-{
-	load_class( 'MODEL/skins/_skin.class.php' );
-	$edited_Skin = new Skin(); // COPY (FUNC)
-
-	$edited_Skin->set( 'name', empty( $name) ? $skin_folder : $name );
-	$edited_Skin->set( 'folder', $skin_folder );
-	$edited_Skin->set( 'type', substr($skin_folder,0,1) == '_' ? 'feed' : 'normal' );
-
-	// Look for containers in skin file:
-	$edited_Skin->discover_containers();
-
-	// INSERT NEW SKIN INTO DB:
-	$edited_Skin->dbinsert();
-
-	return $edited_Skin;
-}
-
-
-
 function app_version()
 {
 	global $app_version;
@@ -323,6 +303,9 @@ function app_version()
 
 /*
  * $Log$
+ * Revision 1.24  2007/06/24 18:28:56  fplanque
+ * refactored skin install
+ *
  * Revision 1.23  2007/06/24 01:05:31  fplanque
  * skin_include() now does all the template magic for skins 2.0.
  * .disp.php templates still need to be cleaned up.
@@ -367,34 +350,5 @@ function app_version()
  *
  * Revision 1.10  2006/10/08 22:59:31  blueyed
  * Added GetProvidedSkins and DisplaySkin hooks. Allow for optimization in Plugins::trigger_event_first_return()
- *
- * Revision 1.9  2006/09/05 22:29:21  fplanque
- * fixed content types (I hope)
- *
- * Revision 1.8  2006/08/18 17:23:58  fplanque
- * Visual skin selector
- *
- * Revision 1.7  2006/08/02 13:00:51  fplanque
- * detect incomplete upgrade of conf file
- *
- * Revision 1.6  2006/07/25 18:38:38  fplanque
- * fixed skin list
- *
- * Revision 1.5  2006/07/24 00:05:44  fplanque
- * cleaned up skins
- *
- * Revision 1.4  2006/07/04 17:32:29  fplanque
- * no message
- *
- * Revision 1.3  2006/03/24 19:40:49  blueyed
- * Only use absolute URLs if necessary because of used <base/> tag. Added base_tag()/skin_base_tag(); deprecated skinbase()
- *
- * Revision 1.2  2006/03/12 23:08:59  fplanque
- * doc cleanup
- *
- * Revision 1.1  2006/02/23 21:11:58  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
  */
 ?>

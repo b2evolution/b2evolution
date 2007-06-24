@@ -171,15 +171,28 @@ function create_default_settings( $override = array() )
  */
 function install_basic_skins()
 {
+	load_class( 'MODEL/skins/_skin.class.php' );
+
 	echo 'Installing default skins... ';
 
-	skin_install( 'custom' );
-	skin_install( 'natural_pink' );
-	skin_install( 'nifty_corners' );
-	skin_install( 'photoblog' );
+	$Skin = new Skin();
+	$Skin->install( 'custom' );
 
-	skin_install( '_atom', 'Atom' );
-	skin_install( '_rss2', 'RSS 2.0' );
+	$Skin = new Skin();
+	$Skin->install( 'natural_pink' );
+
+	$Skin = new Skin();
+	$Skin->install( 'nifty_corners' );
+
+	$Skin = new Skin();
+	$Skin->install( 'photoblog' );
+
+
+	$Skin = new Skin();
+	$Skin->install( '_atom', 'Atom' );
+
+	$Skin = new Skin();
+	$Skin->install( '_rss2', 'RSS 2.0' );
 
 	echo "OK.<br />\n";
 }
@@ -493,6 +506,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.27  2007/06/24 18:28:55  fplanque
+ * refactored skin install
+ *
  * Revision 1.26  2007/05/14 02:43:06  fplanque
  * Started renaming tables. There probably won't be a better time than 2.0.
  *

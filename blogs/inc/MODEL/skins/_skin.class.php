@@ -77,6 +77,28 @@ class Skin extends DataObject
 
 
 	/**
+	 * Install a skin
+	 *
+	 * @todo do not install if skin doesn't exist. Important for upgrade. Need to NOT fail if ZERO skins installed though :/
+	 *
+	 * @param string
+	 * @param string NULL for default
+	 */
+	function install( $skin_folder, $name = NULL )
+	{
+		$this->set( 'name', empty( $name) ? $skin_folder : $name );
+		$this->set( 'folder', $skin_folder );
+		$this->set( 'type', substr($skin_folder,0,1) == '_' ? 'feed' : 'normal' );
+
+		// Look for containers in skin file:
+		$this->discover_containers();
+
+		// INSERT NEW SKIN INTO DB:
+		$this->dbinsert();
+	}
+
+
+	/**
 	 *
 	 */
 	function get_name()
@@ -348,6 +370,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2007/06/24 18:28:55  fplanque
+ * refactored skin install
+ *
  * Revision 1.20  2007/06/20 21:42:13  fplanque
  * implemented working widget/plugin params
  *

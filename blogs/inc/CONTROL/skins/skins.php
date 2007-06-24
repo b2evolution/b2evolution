@@ -21,6 +21,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'MODEL/skins/_skin.class.php' );
+
 // Check permission to display:
 $current_User->check_perm( 'options', 'view', true );
 
@@ -52,7 +54,8 @@ switch( $action )
 		$current_User->check_perm( 'options', 'edit', true );
 
 		// CREATE NEW SKIN:
-		$edited_Skin = & skin_install( $skin_folder );
+		$edited_Skin = & new Skin();
+		$edited_Skin->install( $skin_folder );
 
 		$Messages->add( T_('Skin has been installed.'), 'success' );
 
@@ -188,6 +191,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2007/06/24 18:28:56  fplanque
+ * refactored skin install
+ *
  * Revision 1.9  2007/04/26 00:11:15  fplanque
  * (c) 2007
  *

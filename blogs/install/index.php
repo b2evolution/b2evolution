@@ -46,7 +46,6 @@ require_once $model_path.'items/_item.class.php';
 require_once $model_path.'items/_item.funcs.php';
 require_once $misc_inc_path.'_form.funcs.php';
 require_once $model_path.'users/_user.funcs.php';
-require_once $model_path.'skins/_skin.funcs.php';
 require_once $misc_inc_path.'_timer.class.php';
 require_once $misc_inc_path.'_plugins.class.php';
 require_once dirname(__FILE__).'/_functions_install.php';
@@ -648,8 +647,8 @@ to
 <?php
 /*
  * $Log$
- * Revision 1.131  2007/06/24 17:38:28  fplanque
- * revert
+ * Revision 1.132  2007/06/24 18:28:55  fplanque
+ * refactored skin install
  *
  * Revision 1.129  2007/06/12 21:00:02  blueyed
  * Added non-JS handling of deletedb confirmation
