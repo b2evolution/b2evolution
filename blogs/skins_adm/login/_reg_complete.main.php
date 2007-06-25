@@ -34,7 +34,7 @@ $page_title = T_('Registration complete');
 $page_icon = 'icon_register.gif';
 require dirname(__FILE__).'/_html_header.inc.php';
 
-
+// dh> TODO: this form is not really required and only used for the info fields below.
 $Form =& new Form( $htsrv_url_sensitive.'login.php', 'login', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
@@ -48,9 +48,16 @@ $Form->info( T_('Email'), $email );
 $Form->end_fieldset();
 
 // Now the user has been logged in automatically at the end of the registration progress.
-// Allow him to go to the blogs, though he will see the "validate account" screen then, if he has not clicked
-// the validation link yet and validation is required.
-echo '<p class="center"><a href="'.$baseurl.'">'.T_('Go to blogs').'</a></p>';
+// Allow him to proceed or go to the blogs, though he will see the "validate account" screen then,
+// if he has not clicked the validation link yet and validation is required.
+if( empty($redirect_to) )
+{
+	$redirect_to = $baseurl; // dh> this was the old behaviour, I think there could be a better default
+}
+echo '<p class="center"><a href="'
+	.htmlspecialchars(url_rel_to_same_host($redirect_to, $htsrv_url_sensitive))
+	.'">'.T_('Continue').' &raquo;</a> '; // dh> TODO: this does not seem to be sensible for dir=rtl.
+echo '</p>';
 
 
 $Form->end_form();
@@ -59,6 +66,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/25 23:19:07  blueyed
+ * Use $redirect_to (and fallback only to $baseurl) for "Continue" link in favor of too generic "Go to blogs link"
+ *
  * Revision 1.1  2007/06/25 11:02:38  fplanque
  * MODULES (refactored MVC)
  *
