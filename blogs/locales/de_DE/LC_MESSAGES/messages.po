@@ -7538,9 +7538,8 @@ msgid "Note: You are already logged in as %s!"
 msgstr "Beachte: Du bist schon als %s eingeloggt!"
 
 #: ..\..\..\inc\VIEW\login\_login_form.php:42
-#, fuzzy
 msgid "Continue"
-msgstr "Weiter..."
+msgstr "Weiter"
 
 #: ..\..\..\inc\VIEW\login\_login_form.php:51
 msgid "Login form"
