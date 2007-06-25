@@ -461,10 +461,14 @@ if( !empty( $skin ) )
 		$disp_handlers = array(
 				'feedback-popup' => 'feedback_popup.tpl.php',
 				// 'arcdir'   => 'arcdir.tpl.php',
-				'comments' => 'latestcom.tpl.php',
+				'comments'       => 'latestcom.tpl.php',
+				'posts'          => 'items.main.php',
+				'single'         => 'single.main.php',
+				'page'           => 'page.main.php',
 				// 'msgform'  => 'msgform.tpl.php',
 				// 'profile'  => 'profile.tpl.php',
 				// 'subs'     => 'subscriptions.tpl.php',
+
 				// All others will default to main.tpl.php
 			);
 
@@ -493,6 +497,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.81  2007/06/25 01:21:28  fplanque
+ * minor / interim
+ *
  * Revision 1.80  2007/06/24 01:05:31  fplanque
  * skin_include() now does all the template magic for skins 2.0.
  * .disp.php templates still need to be cleaned up.
