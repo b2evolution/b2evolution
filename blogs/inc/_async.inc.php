@@ -60,6 +60,9 @@ if( !empty($set_target) )
 
 /*
  * $Log$
+ * Revision 1.9  2007/06/25 10:58:50  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.8  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *
@@ -83,6 +86,5 @@ if( !empty($set_target) )
  *
  * Revision 1.1.2.1  2006/06/12 20:00:33  fplanque
  * one too many massive syncs...
- *
  */
 ?>

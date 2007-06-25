@@ -189,7 +189,7 @@ switch( $action )
 		$Session->set_User( $new_User );
 
 		// Display confirmation screen:
-		require $view_path.'login/_reg_complete.php';
+		require $adminskins_path.'login/_reg_complete.main.php';
 
 		exit();
 		break;
@@ -199,7 +199,7 @@ switch( $action )
 		/*
 		 * Registration disabled:
 		 */
-		require $view_path.'login/_reg_disabled.php';
+		require $adminskins_path.'login/_reg_disabled.php';
 
 		exit();
 }
@@ -209,11 +209,14 @@ switch( $action )
  * Default: registration form:
  */
 // Display reg form:
-require $view_path.'login/_reg_form.php';
+require $adminskins_path.'login/_reg_form.main.php';
 
 
 /*
  * $Log$
+ * Revision 1.86  2007/06/25 10:58:50  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.85  2007/06/19 23:10:25  blueyed
  * Better redirect_to handling/fallback
  *

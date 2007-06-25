@@ -6,6 +6,8 @@
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @version $Id$
  */
 
 /**
@@ -17,7 +19,7 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 /**
  * Load DB class
  */
-require_once dirname(__FILE__).'/_misc/_db.class.php';
+require_once dirname(__FILE__).'/_core/model/db/_db.class.php';
 
 /**
  * Database connection (connection opened here)
@@ -26,4 +28,10 @@ require_once dirname(__FILE__).'/_misc/_db.class.php';
  */
 $DB = & new DB( $db_config );
 
+/*
+ * $Log$
+ * Revision 1.9  2007/06/25 10:58:51  fplanque
+ * MODULES (refactored MVC)
+ *
+ */
 ?>

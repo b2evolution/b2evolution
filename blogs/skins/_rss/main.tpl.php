@@ -22,8 +22,8 @@ init_MainList( $Blog->get_setting('posts_per_feed') );
 $feed_content = $Blog->get_setting('feed_content');
 if( $feed_content == 'none' )
 {	// We don't want to provide this feed!
-	global $view_path;
-	require $view_path.'errors/_404_not_found.page.php';
+	global $skins_path;
+	require $skins_path.'_404_not_found.main.php';
 	exit();
 }
 

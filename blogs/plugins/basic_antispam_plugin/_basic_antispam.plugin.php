@@ -457,7 +457,7 @@ class basic_antispam_plugin extends Plugin
 		/**
 		 * IDNA converter class
 		 */
-		require_once $misc_inc_path.'ext/_idna_convert.class.php';
+		load_funcs('_ext/idna/_idna_convert.class.php');
 		$IDNA = new Net_IDNA_php4();
 
 		$have_idn_name = false;
@@ -615,6 +615,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.30  2007/06/25 11:02:32  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.29  2007/04/26 00:11:05  fplanque
  * (c) 2007
  *

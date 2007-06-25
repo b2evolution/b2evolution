@@ -49,7 +49,7 @@ function create_tables()
 	global $inc_path;
 
 	require_once dirname(__FILE__).'/_db_schema.inc.php';
-	require_once $inc_path.'_misc/_upgrade.funcs.php';
+	load_class('_core/model/db/_upgrade.funcs.php');
 
 	// Alter DB to match DB schema:
 	install_make_db_schema_current( true );
@@ -65,7 +65,7 @@ function create_default_data()
 	global $DB;
 
 	// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
-	load_class('_misc/_plugins_admin_no_db.class.php');
+	load_class('plugins/model/_plugins_admin_no_db.class.php');
 	global $Plugins;
 	$Plugins = new Plugins_admin_no_DB(); // COPY
 
@@ -631,6 +631,9 @@ If needed, a skin can format info pages differently from regular posts."), $now,
 
 /*
  * $Log$
+ * Revision 1.228  2007/06/25 11:02:29  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.227  2007/05/28 01:35:23  fplanque
  * fixed static page generation
  *

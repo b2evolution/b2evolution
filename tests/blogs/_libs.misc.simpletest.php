@@ -14,8 +14,8 @@ global $inc_path;
 /**
  * Includes
  */
-require_once $inc_path.'_misc/ext/_idna_convert.class.php';
-require_once $inc_path.'_misc/_htmlchecker.class.php';
+load_funcs('_ext/idna/_idna_convert.class.php');
+load_class( 'xhtml_validator/_xhtml_validator.class.php' );
 
 
 /**

@@ -171,7 +171,7 @@ function create_default_settings( $override = array() )
  */
 function install_basic_skins()
 {
-	load_class( 'MODEL/skins/_skin.class.php' );
+	load_class( 'skins/model/_skin.class.php' );
 
 	echo 'Installing default skins... ';
 
@@ -214,7 +214,7 @@ function install_basic_skins()
  */
 function install_basic_plugins( $old_db_version = 0 )
 {
-	load_class('_misc/_plugins_admin.class.php');
+	load_class('plugins/model/_plugins_admin.class.php');
 
 	$Plugins_admin = & new Plugins_admin();
 
@@ -506,6 +506,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.28  2007/06/25 11:02:30  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.27  2007/06/24 18:28:55  fplanque
  * refactored skin install
  *

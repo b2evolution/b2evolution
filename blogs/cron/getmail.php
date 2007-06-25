@@ -94,7 +94,7 @@ switch ( $Settings->get('eblog_method') )
 
 		// error_reporting( E_ALL );
 
-		require_once $inc_path.'_misc/ext/_pop3.class.php';
+		load_class('_ext/xmlrpc/_pop3.class.php');
 
 		$pop3 = new POP3();
 		$port = $Settings->get('eblog_server_port') ? $Settings->get('eblog_server_port') : '110';

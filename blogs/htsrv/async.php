@@ -45,7 +45,7 @@ param( 'action', 'string', '' );
 // Check global permission:
 if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 {	// No permission to access admin...
-	require $view_path.'errors/_access_denied.inc.php';
+	require $adminskins_path.'_access_denied.main.php';
 }
 
 
@@ -78,7 +78,7 @@ switch( $action )
 		}
 		param( 'set_path', '/^\w+(?:\[\w+\])+$/', '' );
 
-		load_funcs('_misc/_plugin.funcs.php');
+		load_funcs('plugins/_plugin.funcs.php');
 
 		// Init the new setting set:
 		_set_setting_by_path( $Plugin, $set_type, $set_path, array() );
@@ -115,6 +115,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.24  2007/06/25 10:58:49  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.23  2007/06/19 20:41:10  fplanque
  * renamed generic functions to autoform_*
  *

@@ -32,27 +32,28 @@ if( ! $config_is_done )
 	$rsc_url = '../rsc/';
 }
 
-require_once $conf_path.'_upgrade.php';
-require_once $inc_path.'_misc/_class4.funcs.php';
-require_once $misc_inc_path.'_log.class.php';
+require_once $inc_path.'_core/_class4.funcs.php';
+
+load_class('_core/model/_log.class.php');
 $Debuglog = & new Log( 'note' );
 $Messages = & new Log('error');
-require_once $misc_inc_path.'_misc.funcs.php'; // db funcs
+load_funcs('_core/_misc.funcs.php');
+require_once $conf_path.'_upgrade.php';
 require_once $inc_path.'_vars.inc.php';
-require_once $misc_inc_path.'_db.class.php';
-require_once $model_path.'collections/_blog.funcs.php';
-require_once $model_path.'collections/_category.funcs.php';
-require_once $model_path.'items/_item.class.php';
-require_once $model_path.'items/_item.funcs.php';
-require_once $misc_inc_path.'_form.funcs.php';
-require_once $model_path.'users/_user.funcs.php';
-require_once $misc_inc_path.'_timer.class.php';
-require_once $misc_inc_path.'_plugins.class.php';
+load_class('/_core/model/db/_db.class.php');
+load_funcs('collections/model/_blog.funcs.php');
+load_funcs('collections/model/_category.funcs.php');
+load_class('items/model/_item.class.php');
+load_funcs('items/model/_item.funcs.php');
+load_funcs('users/model/_user.funcs.php');
+load_funcs( '_core/ui/forms/_form.funcs.php' );
+load_class('_core/model/_timer.class.php');
+load_class('plugins/model/_plugins.class.php');
 require_once dirname(__FILE__).'/_functions_install.php';
 
 $Timer = & new Timer('main');
 
-require_once $inc_path.'_misc/_param.funcs.php';
+load_class('_core/_param.funcs.php');
 param( 'action', 'string', 'default' );
 param( 'locale', 'string' );
 
@@ -647,6 +648,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.133  2007/06/25 11:02:31  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.132  2007/06/24 18:28:55  fplanque
  * refactored skin install
  *

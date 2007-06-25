@@ -213,7 +213,7 @@ function upgrade_b2evo_tables()
 	global $schema_queries, $inc_path;
 
 	require_once dirname(__FILE__).'/_db_schema.inc.php';
-	require_once $inc_path.'_misc/_upgrade.funcs.php';
+	load_class('_core/model/db/_upgrade.funcs.php');
 
 
 	// Check DB version:
@@ -1865,7 +1865,7 @@ function upgrade_b2evo_tables()
 		if( ! $confirmed_db_upgrade )
 		{
 			global $action, $locale;
-			require_once $inc_path.'_misc/_form.class.php';
+			load_funcs( '_core/ui/forms/_form.class.php' );
 			$Form = & new Form( NULL, '', 'post' );
 			$Form->begin_form( 'fform', T_('Upgrade database') );
 			$Form->begin_fieldset();
@@ -1901,6 +1901,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.228  2007/06/25 11:02:30  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.227  2007/06/13 19:06:17  fplanque
  * debugging
  *

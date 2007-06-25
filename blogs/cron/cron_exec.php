@@ -5,6 +5,8 @@
  * Example to use CLI:
  * >c:\php4\php cron_exec.php
  * >c:\php4\php-cli cron_exec.php
+ *
+ * @version $Id$
  */
 
 
@@ -21,7 +23,7 @@ require_once $inc_path .'_main.inc.php';
 /**
  * Cron support functions
  */
-require_once $model_path.'cron/_cron.funcs.php';
+load_funcs( '/cron/_cron.funcs.php' );
 
 $quiet = 0;
 if( $is_cli )
@@ -197,4 +199,11 @@ if( ! $is_cli )
 	</html>
 	<?php
 }
+
+/*
+ * $Log$
+ * Revision 1.14  2007/06/25 10:58:48  fplanque
+ * MODULES (refactored MVC)
+ *
+ */
 ?>

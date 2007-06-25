@@ -107,10 +107,16 @@ if (ini_get('register_globals') && !$this->mosConfig_register_globals)
 }
 */
 
+
+/**
+ * class loader
+ */
+require_once $inc_path.'_core/_class4.funcs.php';
+
 /**
  * Load logging class
  */
-require_once dirname(__FILE__).'/_misc/_log.class.php';
+load_class('_core/model/_log.class.php');
 /**
  * Debug message log for debugging only (initialized here).
  *
@@ -130,7 +136,7 @@ $Messages = & new Log( 'error' );
 /**
  * Start timer:
  */
-require_once dirname(__FILE__).'/_misc/_timer.class.php';
+load_class('_core/model/_timer.class.php');
 $Timer = & new Timer('total');
 
 $Timer->start( '_main.inc' );
@@ -166,7 +172,7 @@ if( !$debug )
 /**
  * Miscellaneous functions
  */
-require_once dirname(__FILE__).'/_misc/_misc.funcs.php';
+load_funcs('_core/_misc.funcs.php');
 
 
 /**
@@ -178,8 +184,8 @@ require_once dirname(__FILE__).'/_connect_db.inc.php';
 /**
  * Load settings class
  */
-require_once $model_path.'settings/_generalsettings.class.php';
-require_once $model_path.'users/_usersettings.class.php';
+load_class('settings/model/_generalsettings.class.php');
+load_class('users/model/_usersettings.class.php');
 /**
  * Interface to general settings
  *
@@ -216,9 +222,9 @@ $localtimenow = $servertimenow + $time_difference;
 /**
  * The Hit class
  */
-require_once $model_path.'sessions/_hit.class.php';
-// fp> The following constructor requires this right now, but it should not! this shoukd be loaded later.
-require_once $inc_path.'_misc/_param.funcs.php';
+load_class('sessions/model/_hit.class.php');
+// fp> The following constructor requires this right now, but it should not! this should be loaded later.
+load_class('_core/_param.funcs.php');
 /**
  * @global Hit The Hit object
  */
@@ -229,7 +235,7 @@ $Hit = & new Hit();
  * The Session class.
  * It has to be instantiated before the "SessionLoaded" hook.
  */
-require_once $model_path.'sessions/_session.class.php';
+load_class('sessions/model/_session.class.php');
 /**
  * The Session object
  * @global Session
@@ -245,7 +251,7 @@ $Session = & new Session();
  * This is done quite early here to give an early hook ("SessionLoaded") to plugins (though it might also be moved just after $DB init when there is reason for a hook there).
  * The {@link dnsbl_antispam_plugin} is an example that uses this to check the user's IP against a list of DNS blacklists.
  */
-require_once dirname(__FILE__).'/_misc/_plugins.class.php';
+load_class('plugins/model/_plugins.class.php');
 /**
  * @global Plugins The Plugin management object
  */
@@ -283,31 +289,29 @@ if( empty($generating_static) )
 /**
  * Includes:
  */
-$Timer->start( '_main.inc:requires' );
-require_once $inc_path.'_misc/_class4.funcs.php';
-require_once $model_path.'dataobjects/_dataobjectcache.class.php';	// Base class
-require_once $model_path.'generic/_genericelement.class.php';
-require_once $model_path.'generic/_genericcache.class.php';	// Base class
-require_once $model_path.'collections/_blog.class.php';
-require_once $model_path.'collections/_blog.funcs.php';
-require_once $model_path.'collections/_category.funcs.php';
-require_once $model_path.'items/_item.funcs.php';
-require_once $model_path.'users/_user.funcs.php';
-require_once $inc_path.'_misc/_resultsel.class.php';
-require_once $inc_path.'_misc/_template.funcs.php';    // function to be called from templates
-require_once $model_path.'files/_file.class.php';
-require_once $model_path.'files/_filetype.class.php';
-require_once $model_path.'files/_filetypecache.class.php';
-require_once $model_path.'items/_itemtype.class.php';
-require_once $model_path.'items/_link.class.php';
-require_once $model_path.'comments/_comment.funcs.php';
-require_once $model_path.'items/_item.funcs.php';
-require_once $model_path.'comments/_commentlist.class.php';
-require_once $model_path.'sessions/_hitlog.funcs.php';     // referer logging
-require_once dirname(__FILE__).'/_misc/_form.funcs.php';
-require_once dirname(__FILE__).'/_misc/_form.class.php';
-require_once $model_path.'items/_itemquery.class.php';
-require_once dirname(__FILE__).'/_misc/ext/_swfcharts.php';
+$Timer->start('_main.inc:requires');
+load_class('_core/model/dataobjects/_dataobjectcache.class.php');
+load_class('generic/model/_genericelement.class.php');
+load_class('generic/model/_genericcache.class.php');
+load_class('collections/model/_blog.class.php');
+load_funcs('collections/model/_blog.funcs.php');
+load_funcs('collections/model/_category.funcs.php');
+load_funcs('items/model/_item.funcs.php');
+load_funcs('users/model/_user.funcs.php');
+load_class('_core/_template.funcs.php');
+load_class('files/model/_file.class.php');
+load_class('files/model/_filetype.class.php');
+load_class('files/model/_filetypecache.class.php');
+load_class('items/model/_itemtype.class.php');
+load_class('items/model/_link.class.php');
+load_funcs('comments/model/_comment.funcs.php');
+load_funcs('items/model/_item.funcs.php');
+load_class('comments/model/_commentlist.class.php');
+load_funcs('sessions/model/_hitlog.funcs.php');     // referer logging
+load_funcs('_core/ui/forms/_form.funcs.php');
+load_funcs('_core/ui/forms/_form.class.php');
+load_class('items/model/_itemquery.class.php');
+load_funcs('_ext/_swfcharts.php');
 
 
 $Timer->pause( '_main.inc:requires' );
@@ -574,7 +578,7 @@ if( $UserSettings->get('display_icon_legend') )
 	/**
 	 * Icon Legend
 	 */
-	require_once dirname(__FILE__).'/_misc/_iconlegend.class.php';
+	load_funcs( '_core/ui/_iconlegend.class.php' );
 	$IconLegend = & new IconLegend();
 }
 
@@ -630,6 +634,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.80  2007/06/25 10:58:51  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.79  2007/06/24 01:05:31  fplanque
  * skin_include() now does all the template magic for skins 2.0.
  * .disp.php templates still need to be cleaned up.

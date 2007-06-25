@@ -10,6 +10,9 @@
 	php_flag register_globals off
 </IfModule>
 
+# PHP5
+# This may need to be in each folder:
+# AddHandler application/x-httpd-php5 .php
 
 # CLEAN URLS:
 # If you're using Apache 2, you may wish to try this if clean URLs don't work:

@@ -87,7 +87,7 @@ $default_locale = 'en-US';
 /**
  * Load locale related functions: (we need NT_() here)
  */
-require_once $model_path.'settings/_locale.funcs.php';
+require_once $inc_path.'locales/_locale.funcs.php';
 
 
 /**

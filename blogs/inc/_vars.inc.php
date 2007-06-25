@@ -296,6 +296,9 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
 
 /*
  * $Log$
+ * Revision 1.19  2007/06/25 10:58:51  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.18  2007/06/24 15:43:33  personman2
  * Reworking the process for a skin or plugin to add js and css files to a blog display.  Removed the custom header for nifty_corners.
  *
@@ -321,128 +324,5 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
  * Fixed link to b2evo CVS browsing interface in file docblocks
  *
  * Revision 1.10  2006/11/13 13:45:23  blueyed
- * doc
- *
- * Revision 1.9  2006/06/13 21:49:14  blueyed
- * Merged from 1.8 branch
- *
- * Revision 1.8.2.2  2006/06/13 18:27:50  fplanque
- * fixes
- *
- * Revision 1.8  2006/04/19 20:13:48  fplanque
- * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.7  2006/03/24 19:40:49  blueyed
- * Only use absolute URLs if necessary because of used <base/> tag. Added base_tag()/skin_base_tag(); deprecated skinbase()
- *
- * Revision 1.6  2006/03/20 21:38:56  blueyed
- * doc
- *
- * Revision 1.4  2006/03/19 17:53:46  blueyed
- * doc
- *
- * Revision 1.3  2006/03/17 00:07:50  blueyed
- * Fixes for blog-siteurl support
- *
- * Revision 1.2  2006/03/12 23:08:53  fplanque
- * doc cleanup
- *
- * Revision 1.1  2006/02/23 21:11:55  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.30  2006/02/10 20:37:10  blueyed
- * *** empty log message ***
- *
- * Revision 1.29  2006/01/22 22:47:29  blueyed
- * Fix for $ReqPath/$ReqURI detection.
- *
- * Revision 1.28  2006/01/02 19:43:57  fplanque
- * just a little new year cleanup
- *
- * Revision 1.27  2005/12/14 19:36:16  fplanque
- * Enhanced file management
- *
- * Revision 1.26  2005/12/12 19:21:23  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.25  2005/12/10 00:07:24  blueyed
- * Require /conf/_application.php in /conf/_config.php to allow easily overriding it.
- *
- * Revision 1.24  2005/10/06 21:15:24  blueyed
- * Spelling
- *
- * Revision 1.23  2005/10/03 16:30:43  fplanque
- * fixed hitlog upgrade because daniel didn't do it :((
- *
- * Revision 1.22  2005/09/28 12:28:19  yabs
- * minor changes
- *
- * Revision 1.21  2005/09/06 17:13:55  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.20  2005/04/28 20:44:20  fplanque
- * normalizing, doc
- *
- * Revision 1.19  2005/03/13 21:13:48  blueyed
- * include application vars
- *
- * Revision 1.18  2005/03/13 19:46:53  blueyed
- * application config layer
- *
- * Revision 1.17  2005/03/08 14:18:43  fplanque
- * doc
- *
- * Revision 1.16  2005/03/07 00:06:18  blueyed
- * admin UI refactoring, part three
- *
- * Revision 1.15  2005/02/28 09:06:34  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.14  2005/02/28 01:32:32  blueyed
- * Hitlog refactoring, part uno.
- *
- * Revision 1.13  2005/02/18 18:12:46  blueyed
- * $instance_name
- *
- * Revision 1.11  2005/02/02 01:41:17  blueyed
- * improced $ReqUri/$ReqPath building
- *
- * Revision 1.10  2005/01/21 23:59:11  blueyed
- * forgotten..
- *
- * Revision 1.9  2005/01/21 23:49:32  blueyed
- * created debuglog group 'vars'
- *
- * Revision 1.8  2005/01/13 19:53:51  fplanque
- * Refactoring... mostly by Fabrice... not fully checked :/
- *
- * Revision 1.7  2005/01/11 23:02:13  blueyed
- * fixed/improved antispan-admin
- *
- * Revision 1.5  2004/11/22 17:48:20  fplanque
- * skin cosmetics
- *
- * Revision 1.4  2004/11/17 16:18:04  fplanque
- * backoffice skinning experiment
- *
- * Revision 1.3  2004/11/15 18:57:05  fplanque
- * cosmetics
- *
- * Revision 1.2  2004/10/14 18:31:25  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.66  2004/10/12 18:48:34  fplanque
- * Edited code documentation.
- *
- * Revision 1.13  2003/8/28 1:59:34  jupiterx
- * Misc. code cleanup; replaced simple preg_match()es with stropos() for speed; new smiliescmp() just because there was room for improvement; Changed perl-style (#) comments to //
- *
- * Revision 1.1.1.1.2.1  2003/8/31 6:23:31  sakichan
- * Security fixes for various XSS vulnerability and SQL injection vulnerability
  */
 ?>

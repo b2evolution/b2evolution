@@ -10,9 +10,7 @@
 require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 
 
-global $inc_path;
-
-require_once( $inc_path.'MODEL/users/_usercache.class.php' );
+load_class( 'users/model/_usercache.class.php' );
 
 
 /**

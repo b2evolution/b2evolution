@@ -12,7 +12,7 @@ require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 
 global $inc_path;
 
-require_once( $inc_path.'_misc/_url.funcs.php' );
+load_funcs( '_core/_url.funcs.php' );
 
 
 /**

@@ -82,7 +82,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 <?php // --------------------------- BLOG LIST -----------------------------
 
-	load_class( 'MODEL/items/_itemlist2.class.php' );
+	load_class('items/model/_itemlist.class.php');
 
 	$BlogCache = & get_Cache( 'BlogCache' );
 

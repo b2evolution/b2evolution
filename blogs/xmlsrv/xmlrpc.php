@@ -45,8 +45,8 @@ $HTTP_RAW_POST_DATA = trim( $HTTP_RAW_POST_DATA );
 $xmlrpc_htmlchecking = true;
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
-require_once $inc_path.'_misc/ext/_xmlrpc.php';
-require_once $model_path.'items/_itemlist2.class.php';
+load_funcs('_ext/xmlrpc/_xmlrpc.php');
+load_class('items/model/_itemlist.class.php');
 
 if( CANUSEXMLRPC !== TRUE )
 { // We cannot use XML-RPC: send a error response ( "1 Unknown method" ).
@@ -1170,7 +1170,7 @@ function mwnewMediaObject($m) {
 	}
 
 	// Check valid filename/extension:
-	load_funcs('MODEL/files/_file.funcs.php');
+	load_funcs('files/model/_file.funcs.php');
 	if( $error_filename = validate_filename($filename) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
@@ -1656,7 +1656,6 @@ function mweditpost($m)
 //
 // NB Requires a change to the _trackback library
 //
-// 			load_funcs( '_misc/_trackback.funcs.php' );
 // function trackbacks( $post_trackbacks, $content, $post_title, $post_ID )
 
 // first extract these from posting as post_trackbacks array, then rest is easy
@@ -1680,7 +1679,7 @@ function mweditpost($m)
 		if ($no_of_trackbacks > 0)
 		{
 			logIO("O","Calling Trackbacks  ...");
-			load_funcs( '_misc/_trackback.funcs.php' );
+			load_funcs('comments/_trackback.funcs.php');
  			$result = trackbacks( $trackbacks, $content, $post_title, $post_ID );
 			logIO("O","Returned from  Trackbacks  ...");
  		}
@@ -2107,7 +2106,7 @@ function _mw_get_cat_IDs($contentstruct, $blog_ID, $empty_struct_ok = false)
 // dh> NOTE: some tools may use different API entry points, e.g. for extended methods.. (But I'm not sure..)
 // fp> from a security standpoint it would make a lot of sense to disable any rpc that is not needed
 
-require_once $inc_path.'_misc/ext/_xmlrpcs.php'; // This will add generic remote calls
+load_funcs('_ext/xmlrpc/_xmlrpcs.php'); // This will add generic remote calls
 
 $s = new xmlrpc_server(
 	array(
@@ -2241,6 +2240,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.138  2007/06/25 11:02:42  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.137  2007/05/21 19:40:15  blueyed
  * Fixed usage of $HTTP_RAW_POST_DATA global by using php://input stream, if $HTTP_RAW_POST_DATA is not set.
  *

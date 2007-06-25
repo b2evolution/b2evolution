@@ -405,9 +405,6 @@ $basepath = preg_replace( '#/'.$conf_subdir.'$#i', '', $conf_path ).'/';
 $inc_subdir = 'inc/';   		             	// Subdirectory relative to base
 $inc_path = $basepath.$inc_subdir; 		   	// You should not need to change this
 $misc_inc_path = $inc_path.'_misc/';	   	// You should not need to change this
-$model_path = $inc_path.'MODEL/';	  		 	// You should not need to change this
-$view_path = $inc_path.'VIEW/';						// You should not need to change this
-$control_path = $inc_path.'CONTROL/';			// You should not need to change this
 
 /**
  * Location of the HTml SeRVices folder.

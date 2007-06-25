@@ -11,8 +11,8 @@
  * @package tests
  */
 require_once(dirname(__FILE__).'/../blogs/conf/_config.php');
-require_once(dirname(__FILE__).'/../blogs/'.$core_subdir.'_misc.funcs.php');
-require_once(dirname(__FILE__).'/../blogs/'.$lib_subdir.'_xmlrpc.php');
+load_funcs('_core/_misc.funcs.php');
+load_funcs('_ext/xmlrpc/_xmlrpc.php');
 
 echo '<h1>XML-RPC tests</h1>';
 
@@ -25,7 +25,7 @@ switch( $target )
 	case 'local':
 		$test_user = 'admin';
 		$test_pass = 'testpwd';
-		load_funcs( '_misc/ext/_xmlrpc.php' );
+		load_funcs('_ext/xmlrpc/_xmlrpc.php' );
 		$client = new xmlrpc_client('/b2evo/blogs/'.$xmlsrv_subdir.'xmlrpc.php', 'localhost', 8088);
 		break;
 		

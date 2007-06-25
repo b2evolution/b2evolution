@@ -399,8 +399,8 @@ class AdminUI_general
 	 */
 	function disp_html_head()
 	{
-		global $view_path;
-		require $view_path.'_menutop.php';
+		global $adminskin_path;
+		require $adminskin_path.'_html_header.inc.php';
 	}
 
 
@@ -425,9 +425,9 @@ class AdminUI_general
 	 */
 	function disp_global_footer()
 	{
-		global $view_path;
+		global $adminskin_path;
 
-		require $view_path.'_footer.php';
+		require $adminskin_path.'_html_footer.inc.php';
 	}
 
 
@@ -493,7 +493,7 @@ class AdminUI_general
 
 
 	/**
-	 * Display a view (from the inc/VIEWS/ hierarchy )
+	 * Display a view
 	 *
 	 * Note: doing the require inside of a function has the side effect of forcing the view
 	 * to declare any global object it wants to use. This can be a little tedious but on the
@@ -506,7 +506,7 @@ class AdminUI_general
 	 */
 	function disp_view( $view_name, $view_params = array() )
 	{
-		global $view_path;
+		global $inc_path;
 
 		// THESE ARE THE GLOBALS WE WANT TO MAKE AVAILABLE TO ALL VIEWS:
 		global $action;
@@ -514,13 +514,10 @@ class AdminUI_general
 
 		global $DB;	// Note: not sure it's agood idea to let the views hit on the db...
 
-		global $model_path;		// TEMP (for object inclusion)
-		global $misc_inc_path;
-
 		global $current_User;
 
 
-		require $view_path.$view_name;
+		require $inc_path.$view_name;
 	}
 
 
@@ -1584,6 +1581,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.60  2007/06/25 11:02:33  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.59  2007/06/24 22:35:57  fplanque
  * cleanup
  *

@@ -376,18 +376,18 @@ switch( $action )
 	case 'lostpassword':
 		// Lost password:
 		// Display retrieval form:
-		require $view_path.'login/_lostpass_form.php';
+		require $adminskins_path.'login/_lostpass_form.main.php';
 		break;
 
 	case 'req_validatemail':
 		// Send email validation link by mail (initial form and action)
 		// Display validation form:
-		require $view_path.'login/_validate_form.php';
+		require $adminskins_path.'login/_validate_form.main.php';
 		break;
 
 	default:
 		// Display login form
-		require $view_path.'login/_login_form.php';
+		require $adminskins_path.'login/_login_form.main.php';
 }
 
 exit();
@@ -395,6 +395,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.94  2007/06/25 10:58:49  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.93  2007/05/15 18:35:03  blueyed
  * Use the same string when faking a success message!
  *

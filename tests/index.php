@@ -11,7 +11,7 @@ require dirname(__FILE__).'/config.php';
 
 if( empty($action) )
 { // display menu:
-	require_once $inc_path.'MODEL/files/_file.funcs.php';
+	load_funcs('files/model/_file.funcs.php');
 	?>
 
 	<html>

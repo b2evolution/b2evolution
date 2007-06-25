@@ -36,10 +36,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-/**
- * Required class
- */
-require_once $GLOBALS['inc_path'].'_misc/_results.class.php';
+load_funcs('_core/ui/results/_results.class.php');
 
 
 
@@ -584,6 +581,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.43  2007/06/25 11:02:31  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.42  2007/05/14 02:43:06  fplanque
  * Started renaming tables. There probably won't be a better time than 2.0.
  *

@@ -53,7 +53,7 @@ require_once $inc_path.'_main.inc.php';
 // Check global permission:
 if( ! $current_User->check_perm( 'admin', 'any' ) )
 {	// No permission to access admin...
-	require $view_path.'errors/_access_denied.inc.php';
+	require $adminskins_path.'_access_denied.main.php';
 }
 
 
@@ -214,13 +214,16 @@ if( !isset($ctrl_mappings[$ctrl]) )
 }
 
 // Call the requested controller:
-require $control_path.$ctrl_mappings[$ctrl];
+require $inc_path.$ctrl_mappings[$ctrl];
 
 // log the hit on this page (according to settings) if the admin_skin hasn't already done so:
 $Hit->log();
 
 /*
  * $Log$
+ * Revision 1.24  2007/06/25 10:58:47  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.23  2007/04/26 00:11:14  fplanque
  * (c) 2007
  *

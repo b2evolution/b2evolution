@@ -10,9 +10,7 @@
 require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 
 
-global $inc_path;
-
-require_once( $inc_path.'MODEL/items/_item.funcs.php' );
+load_funcs('items/model/_item.funcs.php');
 
 
 /**

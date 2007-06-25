@@ -32,8 +32,8 @@
  */
 require_once dirname(__FILE__).'/_main.inc.php';
 
-require_once $model_path.'skins/_skin.funcs.php';
-require_once $model_path.'items/_itemlist2.class.php';
+load_funcs('skins/_skin.funcs.php');
+load_class('items/model/_itemlist.class.php');
 
 $Timer->start( '_blog_main.inc' );
 
@@ -62,7 +62,7 @@ $BlogCache = & get_Cache( 'BlogCache' );
 $Blog = & $BlogCache->get_by_ID( $blog, false );
 if( empty( $Blog ) )
 {
-	require $view_path.'errors/_404_blog_not_found.page.php'; // error & exit
+	require $skins_path.'_404_blog_not_found.main.php'; // error & exit
 	// EXIT.
 }
 
@@ -240,7 +240,7 @@ if( $resolve_extra_path )
 
 		if( $path_error == 404 )
 		{	// The request points to something we won't be able to resolve:
-			require $view_path.'errors/_404_not_found.page.php'; // error & exit
+			require $skins_path.'_404_not_found.main.php'; // error & exit
 		}
 	}
 }
@@ -288,7 +288,7 @@ if( !empty($p) || !empty($title) )
 	if( empty( $Item ) )
 	{	// Post doesn't exist! Let's go 404!
 		// fp> TODO: ->viewing_allowed() for draft, private, protected and deprecated...
-		require $view_path.'errors/_404_not_found.page.php'; // error & exit
+		require $skins_path.'_404_not_found.main.php'; // error & exit
 	}
 }
 
@@ -304,7 +304,7 @@ if( !empty($p) || !empty($title) )
  */
 if( $stats || $disp == 'stats' )
 {	// This used to be a spamfest...
-	require $view_path.'errors/_410_stats_gone.page.php'; // error & exit
+	require $skins_path.'_410_stats_gone.main.php'; // error & exit
 	// EXIT.
 }
 elseif( !empty($preview) )
@@ -417,7 +417,7 @@ if( isset( $skin ) )
 	}
 
 	// EXPERIMENTAL:
-	load_class( 'MODEL/skins/_skin.class.php' );
+	load_class( 'skins/model/_skin.class.php' );
 	$Skin = & new Skin();
 
 }
@@ -497,6 +497,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.82  2007/06/25 10:58:50  fplanque
+ * MODULES (refactored MVC)
+ *
  * Revision 1.81  2007/06/25 01:21:28  fplanque
  * minor / interim
  *

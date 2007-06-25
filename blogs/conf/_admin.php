@@ -20,7 +20,7 @@ $default_ctrl = 'dashboard';
 /**
  * Controller mappings.
  *
- * For each controller name, we associate a controller file to be found in /inc/CONTROLLERS/ .
+ * For each controller name, we associate a controller file to be found in /inc/ .
  * The advantage of this indirection is that it is easy to reorganize the controllers into
  * subdirectories by modules. It is also easy to deactivate some controllers if you don't
  * want to provide this functionality on a given installation.
@@ -32,32 +32,32 @@ $default_ctrl = 'dashboard';
  * @global array
  */
 $ctrl_mappings = array(
-		'antispam'     => 'antispam/antispam.php',
-		'chapters'     => 'collections/_chapters.ctrl.php',
-		'collections'  => 'collections/_collections.ctrl.php',
-		'coll_settings'=> 'collections/_coll_settings.ctrl.php',
+		'antispam'     => 'antispam/antispam_list.ctrl.php',
+		'chapters'     => 'chapters/chapters.ctrl.php',
+		'collections'  => 'collections/collections.ctrl.php',
+		'coll_settings'=> 'collections/coll_settings.ctrl.php',
 		'comments'     => 'comments/_comments.ctrl.php',
-		'crontab'      => 'cron/crontab.php',
-		'dashboard'    => '_misc/dashboard.php',
-		'features'     => 'settings/features.php',
-		'files'        => 'files/files.php',
-		'fileset'      => 'files/fileset.php',
-		'filetypes'    => 'files/filetypes.php',
-		'items'        => 'items/_items.ctrl.php',
-		'itemstatuses' => 'items/statuses.php',
-		'itemtypes'    => 'items/types.php',
-		'locales'      => 'settings/locales.php',
-		'mtimport'     => 'imports/import-mt.php',
-		'plugins'      => 'settings/plugins.php',
-		'settings'     => 'settings/settings.php',
-		'set_antispam' => 'settings/antispam.php',
-		'skins'        => 'skins/skins.php',
-		'stats'        => 'sessions/stats.php',
-		'system'       => '_misc/system.php',
-		'tools'        => '_misc/tools.php',
-		'users'        => 'users/b2users.php',
-		'upload'       => 'files/_upload.ctrl.php',
-		'widgets'      => 'collections/_widgets.ctrl.php',
+		'crontab'      => 'cron/cronjobs.ctrl.php',
+		'dashboard'    => 'dashboard/dashboard.ctrl.php',
+		'features'     => 'settings/features.ctrl.php',
+		'files'        => 'files/files.ctrl.php',
+		'fileset'      => 'files/file_settings.ctrl.php',
+		'filetypes'    => 'files/file_types.ctrl.php',
+		'items'        => 'items/items.ctrl.php',
+		'itemstatuses' => 'items/item_statuses.ctrl.php',
+		'itemtypes'    => 'items/item_types.ctrl.php',
+		'locales'      => 'locales/locales.ctrl.php',
+		'mtimport'     => 'tools/mtimport.ctrl.php',
+		'plugins'      => 'plugins/plugins.ctrl.php',
+		'settings'     => 'settings/settings.ctrl.php',
+		'set_antispam' => 'antispam/antispam_settings.ctrl.php',
+		'skins'        => 'skins/skins.ctrl.php',
+		'stats'        => 'sessions/stats.ctrl.php',
+		'system'       => 'tools/system.ctrl.php',
+		'tools'        => 'tools/tools.ctrl.php',
+		'users'        => 'users/users.ctrl.php',
+		'upload'       => 'files/upload.ctrl.php',
+		'widgets'      => 'widgets/widgets.ctrl.php',
 	);
 
 
