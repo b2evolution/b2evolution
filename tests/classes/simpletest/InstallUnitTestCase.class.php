@@ -23,8 +23,10 @@ class InstallUnitTestCase extends DbUnitTestCase
 {
 	/**
 	 * Number of basic plugins to test for being installed.
+	 *
+	 * @see install_basic_plugins()
 	 */
-	var $nr_of_basic_plugins = 9;
+	var $nr_of_basic_plugins = 12;
 
 
 	/**
@@ -45,8 +47,11 @@ class InstallUnitTestCase extends DbUnitTestCase
 	function tearDown()
 	{
 		// Test if item types (which get installed for Phoenix-Alpha) are present:
+		// fp> What is this test good for?
 		$this->assertEqual(
-			$this->test_DB->get_col( 'SELECT ptyp_name FROM T_items__type' ), array('Post', 'Link') );
+			$this->test_DB->get_var( 'SELECT ptyp_name
+																	FROM T_items__type
+																 ORDER BY ptyp_ID' ), 'Post' );
 
 		parent::tearDown();
 	}

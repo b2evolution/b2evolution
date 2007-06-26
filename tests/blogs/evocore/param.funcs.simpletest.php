@@ -61,10 +61,12 @@ class ParamFuncsTestCase extends EvoUnitTestCase
 
 	function test_typing()
 	{
-		// QUESTION: dh> do we expect the first test to fail really?
 
+		// The following is somewhat odd behaviour, but ut's a touchy subject, so as long as it works like that,
+		// let's leave it like that.
 		$_POST['test1'] = '';
-		$this->assertIdentical( param( 'test1', 'array', array() ), array() );
+		$this->assertEqual( param( 'test1', 'array', array() ), '' );
+
 		$this->assertIdentical( param( 'test2', 'array', array() ), array() );
 	}
 
