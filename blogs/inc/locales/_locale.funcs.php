@@ -34,7 +34,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_MAIN_INIT') && !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -956,6 +956,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/26 02:40:54  fplanque
+ * security checks
+ *
  * Revision 1.1  2007/06/25 11:00:37  fplanque
  * MODULES (refactored MVC)
  *

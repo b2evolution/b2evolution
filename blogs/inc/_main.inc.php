@@ -51,6 +51,7 @@
  *
  * @version $Id$
  */
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 if( $maintenance_mode )
 {
@@ -634,6 +635,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.81  2007/06/26 02:40:53  fplanque
+ * security checks
+ *
  * Revision 1.80  2007/06/25 10:58:51  fplanque
  * MODULES (refactored MVC)
  *

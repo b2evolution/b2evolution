@@ -28,7 +28,7 @@
  * @author Stk: Scott Kimler - {@link http://astonishme.co.uk/}
  *
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * @package plugins
@@ -80,6 +80,9 @@ class am_code_highlighter
 }
 /**
  * $Log$
+ * Revision 1.6  2007/06/26 02:40:54  fplanque
+ * security checks
+ *
  * Revision 1.5  2007/06/20 21:33:23  blueyed
  * fixed doc
  *

@@ -62,7 +62,7 @@
  *
  */
 
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * @package plugins
@@ -558,6 +558,9 @@ div.codeblock.amc_short table {
 
 /**
  * $Log$
+ * Revision 1.5  2007/06/26 02:40:53  fplanque
+ * security checks
+ *
  * Revision 1.4  2007/06/17 13:28:22  blueyed
  * Fixed doc
  *

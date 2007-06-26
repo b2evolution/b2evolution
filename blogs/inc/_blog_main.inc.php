@@ -25,7 +25,7 @@
  * @version $Id$
  */
 
-// NOTE: it is okay to call this file before including config!
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Initialize everything:
@@ -497,6 +497,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.83  2007/06/26 02:40:53  fplanque
+ * security checks
+ *
  * Revision 1.82  2007/06/25 10:58:50  fplanque
  * MODULES (refactored MVC)
  *

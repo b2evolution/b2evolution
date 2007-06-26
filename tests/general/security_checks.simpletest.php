@@ -70,6 +70,7 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 		'conf/_upgrade.php',
 		'inc/_blog_main.inc.php',
 		'inc/_main.inc.php',
+		'inc/locales/_locale.funcs.php',
 	);
 
 	function SecurityChecksTestCase()

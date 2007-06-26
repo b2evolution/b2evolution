@@ -4,6 +4,8 @@
  * @subpackage xmlrpc {@link http://xmlrpc.usefulinc.com/doc/}
  * @copyright Edd Dumbill <edd@usefulinc.com> (C) 1999-2002
  */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
 // by Edd Dumbill (C) 1999-2002
 // <edd@usefulinc.com>
 // $Id$
@@ -39,8 +41,6 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
-
-if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 	// XML RPC Server class
 	// requires: _xmlrpc.php
@@ -548,6 +548,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	
 /*
  * $Log$
+ * Revision 1.2  2007/06/26 02:40:54  fplanque
+ * security checks
+ *
  * Revision 1.1  2007/06/25 10:59:17  fplanque
  * MODULES (refactored MVC)
  *
