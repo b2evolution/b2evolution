@@ -1471,7 +1471,7 @@ switch( $fm_mode )
 
 	case 'link_item':
 		// Links dialog:
-		$AdminUI->disp_view( 'files/views/_files_links.view.php' );
+		$AdminUI->disp_view( 'files/views/_file_links.view.php' );
 		break;
 }
 
@@ -1492,6 +1492,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/26 02:19:47  fplanque
+ * fix
+ *
  * Revision 1.1  2007/06/25 10:59:52  fplanque
  * MODULES (refactored MVC)
  *
