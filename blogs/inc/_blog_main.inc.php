@@ -469,7 +469,7 @@ if( !empty( $skin ) )
 				// 'profile'  => 'profile.tpl.php',
 				// 'subs'     => 'subscriptions.tpl.php',
 
-				// All others will default to main.tpl.php
+				// All others will default to index.main.php
 			);
 
 		if( !empty($disp_handlers[$disp])
@@ -479,7 +479,7 @@ if( !empty( $skin ) )
 		}
 		else
 		{	// Use the default handler from the skins dir:
-			require $ads_current_skin_path.'main.tpl.php';
+			require $ads_current_skin_path.'index.main.php';
 		}
 	}
 
@@ -497,6 +497,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.84  2007/06/27 02:23:24  fplanque
+ * new default template for skins named index.main.php
+ *
  * Revision 1.83  2007/06/26 02:40:53  fplanque
  * security checks
  *

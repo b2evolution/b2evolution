@@ -170,7 +170,7 @@ class Skin extends DataObject
 	{
 		global $skins_path, $Messages;
 
-		$rf_main_subpath = $this->folder.'/main.tpl.php';
+		$rf_main_subpath = $this->folder.'/index.main.php';
 		$af_main_path = $skins_path.$rf_main_subpath;
 
 		if( ! is_readable($af_main_path) )
@@ -370,6 +370,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/27 02:23:24  fplanque
+ * new default template for skins named index.main.php
+ *
  * Revision 1.1  2007/06/25 11:01:32  fplanque
  * MODULES (refactored MVC)
  *

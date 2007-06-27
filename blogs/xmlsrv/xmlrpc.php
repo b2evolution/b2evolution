@@ -1007,7 +1007,7 @@ function bloggergettemplate($m)
 
 	if ($templateType == "main")
 	{
-		$file = $edit_folder.'main.tpl.php';
+		$file = $edit_folder.'index.main.php';
 	}
 	elseif ($templateType == "archiveIndex")
 	{
@@ -1089,7 +1089,7 @@ function bloggersettemplate( $m )
 
 	if( $templateType == 'main' )
 	{
-		$file = $edit_folder.'main.tpl.php';
+		$file = $edit_folder.'index.main.php';
 	}
 	elseif ($templateType == "archiveIndex")
 	{
@@ -2240,6 +2240,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.139  2007/06/27 02:23:32  fplanque
+ * new default template for skins named index.main.php
+ *
  * Revision 1.138  2007/06/25 11:02:42  fplanque
  * MODULES (refactored MVC)
  *

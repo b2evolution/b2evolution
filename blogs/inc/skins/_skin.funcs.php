@@ -272,7 +272,7 @@ function skin_provided_by_plugin( $name )
  * @param skin name (directory name)
  * @return boolean true is exists, false if not
  */
-function skin_exists( $name, $filename = 'main.tpl.php' )
+function skin_exists( $name, $filename = 'index.main.php' )
 {
 	global $skins_path;
 
@@ -303,6 +303,9 @@ function app_version()
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/27 02:23:25  fplanque
+ * new default template for skins named index.main.php
+ *
  * Revision 1.1  2007/06/25 11:01:28  fplanque
  * MODULES (refactored MVC)
  *
