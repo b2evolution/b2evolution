@@ -813,11 +813,13 @@ function param_extend_list( $var, $var_ext_array, $save_prefix = true )
 
 /**
  * Compiles the cat array from $cat (recursive + optional modifiers) and $catsel[] (non recursive)
- * and keeps those values available for future reference
+ * and keeps those values available for future reference (category widget)
  */
 function param_compile_cat_array( $restrict_to_blog = 0, $cat_default = NULL, $catsel_default = array() )
 {
-	// For now, we'll also need those as globals!
+	// For now, we'll need those as globals!
+	// fp> this is used for the categories widget
+	// fp> we want might to use a $set_globals params to compile_cat_array()
 	global $cat_array, $cat_modifier;
 
 	$cat = param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', $cat_default, true ); // List of cats to restrict to
@@ -1648,6 +1650,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/29 00:24:43  fplanque
+ * $cat_array cleanup tentative
+ *
  * Revision 1.1  2007/06/25 10:58:53  fplanque
  * MODULES (refactored MVC)
  *

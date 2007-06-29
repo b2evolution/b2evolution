@@ -211,9 +211,11 @@ class ItemListLight extends DataObjectList2
 		memorize_param( 'catsel', 'array', $this->default_filters['cat_array'], $this->filters['cat_array'] );
 		memorize_param( $this->param_prefix.'cat_focus', 'string', $this->default_filters['cat_focus'], $this->filters['cat_focus'] );  // Categories to search on
 		// TEMP until we get this straight:
-		global $cat_array, $cat_modifier;
-		$cat_array = $this->default_filters['cat_array'];
-		$cat_modifier = $this->default_filters['cat_modifier'];
+		// fp> this would only be used for the categories widget and setting it here overwtrites the interesting values when a post list widget is tirggered
+		// fp> if we need it here we want to use a $set_globals params to this function
+		// global $cat_array, $cat_modifier;
+		// $cat_array = $this->default_filters['cat_array'];
+		// $cat_modifier = $this->default_filters['cat_modifier'];
 
 
 		/*
@@ -1448,6 +1450,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/29 00:24:43  fplanque
+ * $cat_array cleanup tentative
+ *
  * Revision 1.1  2007/06/25 11:00:27  fplanque
  * MODULES (refactored MVC)
  *

@@ -135,6 +135,7 @@ class categories_plugin extends Plugin
 
 		// This is what will separate the category links:
 		if(!isset($params['item_start'])) $params['item_start'] = '<li>';
+		if(!isset($params['item_selected_start'])) $params['item_selected_start'] = '<li class="selected">';
 		if(!isset($params['item_end'])) $params['item_end'] = "</li>\n";
 
 		// This is what will enclose the sub chapter lists:
@@ -155,7 +156,6 @@ class categories_plugin extends Plugin
 
 		// Save params for others functions:
 		$this->params = $params;
-
 
 		/**
 		 * @var ChapterCache
@@ -291,11 +291,19 @@ class categories_plugin extends Plugin
 	 */
 	function cat_line( $Chapter, $level )
 	{
-		$r = $this->params['item_start'];
+		global $cat_array;
+
+		if( in_array( $Chapter->ID, $cat_array ) )
+		{ // This category is in the current selection
+			$r = $this->params['item_selected_start'];
+		}
+		else
+		{
+			$r = $this->params['item_start'];
+		}
 
 		if( $this->params['form'] )
 		{	// We want to add form fields:
-			global $cat_array;
 			$r .= '<label><input type="checkbox" name="catsel[]" value="'.$Chapter->ID.'" class="checkbox"';
 			if( in_array( $Chapter->ID, $cat_array ) )
 			{ // This category is in the current selection
@@ -381,6 +389,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.45  2007/06/29 00:24:43  fplanque
+ * $cat_array cleanup tentative
+ *
  * Revision 1.44  2007/05/28 15:18:30  fplanque
  * cleanup
  *
