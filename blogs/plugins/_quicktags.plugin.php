@@ -38,6 +38,9 @@ class quicktags_plugin extends Plugin
 	/**
 	 * Display a toolbar
 	 *
+	 * @todo dh> This seems to be a lot of Javascript. Please try exporting it in a
+	 *       (dynamically created) .js src file. Then we could use cache headers
+	 *       to let the browser cache it.
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
@@ -403,6 +406,9 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.28  2007/06/29 23:12:18  blueyed
+ * todo
+ *
  * Revision 1.27  2007/06/29 23:10:01  blueyed
  * - Cleaned up code duplication in b2evoInsertTag()
  * - Added get_selected_text_for_ID-JS callback
