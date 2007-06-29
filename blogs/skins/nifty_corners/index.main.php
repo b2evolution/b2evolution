@@ -17,10 +17,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
 skin_init( $disp );
-?>
 
 
-<?php
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 // Initializations:
 require_css( 'rsc/nifty_corners.css', true, 'Nifty Corners' );

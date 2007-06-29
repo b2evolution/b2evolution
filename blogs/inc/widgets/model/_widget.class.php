@@ -287,7 +287,7 @@ class ComponentWidget extends DataObject
 					'link_default_class' => 'default',
 					'item_text_start' => '',
 					'item_text_end' => '',
-					'item_selected_start' => '<li>',
+					'item_selected_start' => '<li class="selected">',
 					'item_selected_end' => '</li>',
 					'link_selected_class' => 'selected',
 					'item_selected_text_start' => '',
@@ -630,6 +630,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/29 00:25:02  fplanque
+ * minor
+ *
  * Revision 1.1  2007/06/25 11:01:57  fplanque
  * MODULES (refactored MVC)
  *
