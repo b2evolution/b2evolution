@@ -305,81 +305,42 @@ class quicktags_plugin extends Plugin
 			document.write('</div>');
 		}
 
-		// insertion code
+		/**
+		 * insertion code
+		 */
 		function b2evoInsertTag( myField, i )
 		{
-			/* undocumented thing that seems broken whenever some text is selected :
-			if( typeof b2evo_Callbacks == 'object' )
-			{ // see if there's a callback registered that should handle this:
-				if( ! b2evoCheckOpenTags(i) || b2evoButtons[i].tagEnd == '')
+			// we need to know if something is selected.
+			// First, ask plugins, then try IE and Mozilla.
+			var sel_text = b2evo_Callbacks.trigger_callback("get_selected_text_for_"+myField.id);
+			var focus_when_finished = false; // used for IE
+
+			if( sel_text == null )
+			{ // detect selection:
+				//IE support
+				if(document.selection)
 				{
-					if( b2evo_Callbacks.trigger_callback("insert_raw_into_"+myField.id, b2evoButtons[i].tagStart) )
-					{
-						b2evoAddTag(i);
-						return;
-					}
+					myField.focus();
+					var sel = document.selection.createRange();
+					sel_text = sel.text;
+					focus_when_finished = true;
 				}
-				else
+				//MOZILLA/NETSCAPE support
+				else if(myField.selectionStart || myField.selectionStart == '0')
 				{
-					if( b2evo_Callbacks.trigger_callback("insert_raw_into_"+myField.id, b2evoButtons[i].tagEnd) )
-					{
-						b2evoRemoveTag(i);
-						return;
-					}
+					var startPos = myField.selectionStart;
+					var endPos = myField.selectionEnd;
+					sel_text = (startPos != endPos);
 				}
 			}
-			*/
 
-			//IE support
-			if(document.selection)
-			{
-				myField.focus();
-				sel = document.selection.createRange();
-				if (sel.text.length > 0)
-				{
-					textarea_wrap_selection( myField, b2evoButtons[i].tagStart, b2evoButtons[i].tagEnd, 0 );
-				}
-				else
-				{
-					if( !b2evoCheckOpenTags(i) || b2evoButtons[i].tagEnd == '')
-					{
-						textarea_wrap_selection( myField, b2evoButtons[i].tagStart, '', 0 );
-						b2evoAddTag(i);
-					}
-					else
-					{
-						textarea_wrap_selection( myField, '', b2evoButtons[i].tagEnd, 0 );
-						b2evoRemoveTag(i);
-					}
-				}
-			}
-			//MOZILLA/NETSCAPE support
-			else if(myField.selectionStart || myField.selectionStart == '0')
-			{
-				var startPos = myField.selectionStart;
-				var endPos = myField.selectionEnd;
-
-				if (startPos != endPos)
-				{ // some text selected
-					textarea_wrap_selection( myField, b2evoButtons[i].tagStart, b2evoButtons[i].tagEnd, 0 );
-				}
-				else
-				{
-					if (!b2evoCheckOpenTags(i) || b2evoButtons[i].tagEnd == '')
-					{
-						textarea_wrap_selection( myField, b2evoButtons[i].tagStart, '', 0 );
-						b2evoAddTag(i);
-					}
-					else
-					{
-						textarea_wrap_selection( myField, '', b2evoButtons[i].tagEnd, 0 );
-						b2evoRemoveTag(i);
-					}
-				}
+			if( sel_text )
+			{ // some text selected
+				textarea_wrap_selection( myField, b2evoButtons[i].tagStart, b2evoButtons[i].tagEnd, 0 );
 			}
 			else
-			{ // Browser not especially supported
-				if (!b2evoCheckOpenTags(i) || b2evoButtons[i].tagEnd == '')
+			{
+				if( !b2evoCheckOpenTags(i) || b2evoButtons[i].tagEnd == '')
 				{
 					textarea_wrap_selection( myField, b2evoButtons[i].tagStart, '', 0 );
 					b2evoAddTag(i);
@@ -390,7 +351,12 @@ class quicktags_plugin extends Plugin
 					b2evoRemoveTag(i);
 				}
 			}
+			if(focus_when_finished)
+			{
+				myField.focus();
+			}
 		}
+
 
 		function b2evoInsertLink(myField, i, defaultValue)
 		{
@@ -437,6 +403,10 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.27  2007/06/29 23:10:01  blueyed
+ * - Cleaned up code duplication in b2evoInsertTag()
+ * - Added get_selected_text_for_ID-JS callback
+ *
  * Revision 1.26  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *
