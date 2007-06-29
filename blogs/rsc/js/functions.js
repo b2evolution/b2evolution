@@ -181,7 +181,6 @@ function textarea_replace_selection( myField, snippet, target_document )
 /**
  * Textarea insertion code.
  *
- * TODO: Make the quicktags plugin use this general function.
  * @var element
  * @var text
  * @var text
@@ -192,18 +191,31 @@ function textarea_wrap_selection( myField, before, after, replace, target_docume
 {
 	target_document = target_document || document;
 
-	if( b2evo_Callbacks.trigger_callback( "insert_raw_into_"+myField.id, before+after ) )
+	var hook_params = {
+		'element': myField,
+		'before': before,
+		'after': after,
+		'replace': replace,
+		'target_document': target_document
+	};
+
+	// First try, if a JavaScript callback is registered to handle this.
+	// E.g. the tinymce_plugin uses registers "wrap_selection_for_itemform_post_content"
+	//      to replace the (non-)selection
+	if( b2evo_Callbacks.trigger_callback( "wrap_selection_for_"+myField.id, hook_params ) )
 	{
 		return;
 	}
-	if( window.opener && ( typeof window.opener.b2evo_Callbacks != "undefined" ) )
-	{ // we're called in a popup: try that b2evo_Callbacks event
-		if( window.opener.b2evo_Callbacks.trigger_callback( "insert_raw_into_"+myField.id, before+after ) )
+	if( window.opener.b2evo_Callbacks
+		&& ( typeof window.opener.b2evo_Callbacks != "undefined" ) )
+	{ // callback in parent document (e.g. "Files" popup)
+		if( window.opener.b2evo_Callbacks.trigger_callback( "wrap_selection_for_"+myField.id, hook_params ) )
 		{
 			return;
 		}
 	}
 
+	// Basic handling:
 	if(target_document.selection)
 	{ // IE support:
 		myField.focus();
@@ -234,18 +246,18 @@ function textarea_wrap_selection( myField, before, after, replace, target_docume
 		if( replace )
 		{
 			myField.value = myField.value.substring( 0, startPos)
-											+ before
-											+ after
-											+ myField.value.substring( endPos, myField.value.length);
+				+ before
+				+ after
+				+ myField.value.substring( endPos, myField.value.length);
 			cursorPos = startPos + before.length + after.length;
 		}
 		else
 		{
 			myField.value = myField.value.substring( 0, startPos)
-											+ before
-											+ myField.value.substring(startPos, endPos)
-											+ after
-											+ myField.value.substring( endPos, myField.value.length);
+				+ before
+				+ myField.value.substring(startPos, endPos)
+				+ after
+				+ myField.value.substring( endPos, myField.value.length);
 			cursorPos = endPos + before.length + after.length;
 		}
 
@@ -265,8 +277,6 @@ function textarea_wrap_selection( myField, before, after, replace, target_docume
 		myField.focus();
 	}
 }
-
-
 
 /**
  * Open or close a filter area (by use of CSS style).
@@ -414,12 +424,13 @@ b2evo_Callbacks.prototype = {
 	 * @param mixed argument2
 	 * ...
 	 * @return boolean true, if any callback returned true
+	 *                 null, if no callback registered
 	 */
 	trigger_callback : function(event, args) {
 
 		if( typeof this.eventHandlers[event] == "undefined" )
 		{
-			return false;
+			return null;
 		}
 
 		var r = false;
@@ -450,6 +461,10 @@ var b2evo_Callbacks = new b2evo_Callbacks();
 
 /*
  * $Log$
+ * Revision 1.28  2007/06/29 23:42:30  blueyed
+ * - Fixed b2evoCallback in textarea_wrap_selection: uses "wrap_selection_for_" callback now instead of "insert_raw_into_"
+ * - trigger_callback now returns null if no callback is registered
+ *
  * Revision 1.27  2007/04/20 01:42:32  fplanque
  * removed excess javascript
  *
