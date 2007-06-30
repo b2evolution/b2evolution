@@ -42,18 +42,18 @@
  *        6) Auto-senses code block length
  *        7) BBCode tags pass through and allow to highlight the code
  *        8) No accidental smilie rendering
- * 				9) PHP Syntax highlighting
- * 			 10) Variable start line numbers
- * 			 11) Links php functions to the php.net documentation
- * 			 12) Code is preserved if plugin uninstalled ( stored as : <!--amphp--><pre>&lt;php echo 'hello world'; ?&gt;</pre><!--/amphp--> )
+ *        9) PHP Syntax highlighting
+ *       10) Variable start line numbers
+ *       11) Links php functions to the php.net documentation
+ *       12) Code is preserved if plugin uninstalled ( stored as : <!--amphp--><pre>&lt;php echo 'hello world'; ?&gt;</pre><!--/amphp--> )
  *
- *		To use:
- * 				************************************** THIS WILL NEED REWRITING ******************************************
- *				* Upload and install the plugin via the back office
- *				* Paste your code between <amcode> </amcode> tags
- * 				* Paste your php between <amphp> </amphp> tags
- * 				* start from any line number with the line attribute
- * 				* <amcode line="99"> or <amphp line="999">
+ *    To use:
+ *        ************************************** THIS WILL NEED REWRITING ******************************************
+ *        * Upload and install the plugin via the back office
+ *        * Paste your code between <amcode> </amcode> tags
+ *        * Paste your php between <amphp> </amphp> tags
+ *        * start from any line number with the line attribute
+ *        * <amcode line="99"> or <amphp line="999">
  *
  * @todo fp> for semantic purposes, <code> </code> should be automagically added
  * yabs > I assume you mean that <code> block </code> should also be converted/highlighted
@@ -166,15 +166,13 @@ class code_highlight_plugin extends Plugin
 			//<![CDATA[
 			function codespan_tag( lang )
 			{
-				tag = '<codespan>';
-
-				textarea_wrap_selection( b2evoCanvas, tag, '</codespan>', 0 );
+				tag = '[codespan]';
+				textarea_wrap_selection( b2evoCanvas, tag, '[/codespan]', 0 );
 			}
 			function codeblock_tag( lang )
 			{
-				tag = '<codeblock lang="'+lang+'" line="1">';
-
-				textarea_wrap_selection( b2evoCanvas, tag, '</codeblock>', 0 );
+				tag = '[codeblock lang="'+lang+'" line="1"]';
+				textarea_wrap_selection( b2evoCanvas, tag, '[/codeblock]', 0 );
 			}
 			//]]>
 		</script>
@@ -198,15 +196,16 @@ class code_highlight_plugin extends Plugin
 
 		// Note : This regex is different from the original - just in case it gets moved again ;)
 
-		// change all <codeblock> segments before format_to_post() gets a hold of them
+		// change all [codeblock] segments before format_to_post() gets a hold of them
 		// 1 - amcode or codeblock
 		// 2 - attribs : lang &| line
 		// 3 - code block
-		$content = preg_replace_callback( '#\<(codeblock)([^>]*?)>([\s\S]+?)?\</\1>#i',
-								array( $this, 'filter_codeblock_callback' ), $content );
-
-		// Quick and dirty escaping of inline code <codespan>:
-		$content = preg_replace_callback( '#<codespan>(.*?)</codespan>#',
+		$content = preg_replace_callback( '# ([<[]) (codeblock) ([^>\]]*?) ([>\]])' // opening tag
+				.'(.*?)' // element content
+				.'\1/\2\4#six', // closing tag
+				array( $this, 'filter_codeblock_callback' ), $content );
+		// Quick and dirty escaping of inline code [codespan]:
+		$content = preg_replace_callback( '#([<[])codespan([>\]])(.*?)\1codespan\2>#is',
 								array( $this, 'filter_codespan_callback' ), $content );
 
 		return true;
@@ -216,13 +215,13 @@ class code_highlight_plugin extends Plugin
 	/**
 	 * Format codespan for display
 	 *
-	 * This is a bit quick 'n dirty.
-	 * We might want to unfilter this too.
-	 * We might want to highlight this too (based on a lang attribute).
+	 * @todo This is a bit quick 'n dirty.
+	 * @todo We might want to unfilter this too.
+	 * @todo We might want to highlight this too (based on a lang attribute).
 	 */
 	function filter_codespan_callback( $matches )
 	{
-		$code = $matches[1];
+		$code = $matches[3];
 
 		return '<code class="codespan">'.str_replace( array( '&', '<', '>' ), array( '&amp;', '&lt;', '&gt;' ), $code).'</code>';
 	}
@@ -335,13 +334,13 @@ class code_highlight_plugin extends Plugin
 	/**
 	 * Formats code ready for the database
 	 *
-	 * @param array $block ( 2 - attributes, 3 - the code )
+	 * @param array $block ( 3 - attributes, 5 - the code )
 	 * @return string formatted code || empty
 	 */
 	function filter_codeblock_callback( $block )
 	{ // if code block exists then tidy everything up for the database, otherwise just remove the pointless tag
-		return ( empty( $block[3] ) ||  !trim( $block[3] ) ? '' : '<!-- codeblock'.$block[2].' --><pre><code>'
-						.str_replace( array( '&', '<', '>' ), array( '&amp;', '&lt;', '&gt;' ), $block[3] )
+		return ( empty( $block[5] ) ||  !trim( $block[5] ) ? '' : '<!-- codeblock'.$block[3].' --><pre><code>'
+						.str_replace( array( '&', '<', '>' ), array( '&amp;', '&lt;', '&gt;' ), $block[5] )
 						.'</code></pre><!-- /codeblock -->' );
 	}
 
@@ -491,18 +490,18 @@ div.codeblock.amc_short table {
 
 
 	/**
-	   * Formats codeblock ready for displaying
-	   * Each language is stored as a classfile
-	   * This would allow new languages to be added more easily
-	   * It would also allow Geshi to be used as the highlighter with no code changes ;)
-	   *
-	   * Replaces both (current) highlighter functions
-	   *
-	   * ..... still requires some more thought though :p
-	   *
-	   * @param array $block ( 2 - attributes, 4 - the code )
-	   * @return string formatted code
-	   */
+	 * Formats codeblock ready for displaying
+	 * Each language is stored as a classfile
+	 * This would allow new languages to be added more easily
+	 * It would also allow Geshi to be used as the highlighter with no code changes ;)
+	 *
+	 * Replaces both (current) highlighter functions
+	 *
+	 * ..... still requires some more thought though :p
+	 *
+	 * @param array $block ( 2 - attributes, 4 - the code )
+	 * @return string formatted code
+	 */
 	function render_codeblock_callback( $block )
 	{
 		// set the offset if present - default : 0
@@ -558,6 +557,11 @@ div.codeblock.amc_short table {
 
 /**
  * $Log$
+ * Revision 1.6  2007/06/30 00:58:56  blueyed
+ * - Use [codeblock] and [codespan] by default, but still allow
+ *   <codeblock>/<codespan>
+ * - Minor cleanup (whitespace and such)
+ *
  * Revision 1.5  2007/06/26 02:40:53  fplanque
  * security checks
  *
@@ -617,7 +621,7 @@ div.codeblock.amc_short table {
  * made some minor changes to the doc
  * made a few minor code changes ( line="99" etc )
  * added in styles for admin area
- * added in <code><php> tags
+ * added in <code><php></code> tags
  * added a fair few comments
  *
  * Revision 1.1.2.5  2007/03/31 22:42:44  fplanque
