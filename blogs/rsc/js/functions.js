@@ -206,7 +206,8 @@ function textarea_wrap_selection( myField, before, after, replace, target_docume
 	{
 		return;
 	}
-	if( window.opener.b2evo_Callbacks
+	if( window.opener
+		&& window.opener.b2evo_Callbacks
 		&& ( typeof window.opener.b2evo_Callbacks != "undefined" ) )
 	{ // callback in parent document (e.g. "Files" popup)
 		if( window.opener.b2evo_Callbacks.trigger_callback( "wrap_selection_for_"+myField.id, hook_params ) )
@@ -461,6 +462,9 @@ var b2evo_Callbacks = new b2evo_Callbacks();
 
 /*
  * $Log$
+ * Revision 1.29  2007/06/30 21:05:17  fplanque
+ * fixed for FF; I hope.
+ *
  * Revision 1.28  2007/06/29 23:42:30  blueyed
  * - Fixed b2evoCallback in textarea_wrap_selection: uses "wrap_selection_for_" callback now instead of "insert_raw_into_"
  * - trigger_callback now returns null if no callback is registered
