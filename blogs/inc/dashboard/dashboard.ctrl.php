@@ -69,10 +69,10 @@ if( $blog )
 		if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 		{
 			echo '<li>Customize blog:<ul>';
-			echo '<li><a href="admin.php?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'">Name &raquo;</a></li>';
-			echo '<li><a href="admin.php?ctrl=coll_settings&tab=skin&blog='.$Blog->ID.'">Appearance (skin) &raquo;</a></li>';
-			echo '<li><a href="admin.php?ctrl=coll_settings&tab=display&blog='.$Blog->ID.'">Post order &raquo;</a></li>';
-			echo '<li><a href="admin.php?ctrl=widgets&blog='.$Blog->ID.'">Widgets &raquo;</a></li>';
+			echo '<li><a href="admin.php?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'">'.T_('Blog name').' &raquo;</a></li>';
+			echo '<li><a href="admin.php?ctrl=coll_settings&tab=skin&blog='.$Blog->ID.'">'.T_('Blog skin').' &raquo;</a></li>';
+			echo '<li><a href="admin.php?ctrl=widgets&blog='.$Blog->ID.'">'.T_('Blog widgets').' &raquo;</a></li>';
+			echo '<li><a href="admin.php?ctrl=coll_settings&tab=display&blog='.$Blog->ID.'">'.T_('Blog display order').' &raquo;</a></li>';
 			echo '</ul></li>';
 		}
 
@@ -193,6 +193,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/30 20:37:37  fplanque
+ * UI changes
+ *
  * Revision 1.1  2007/06/25 10:59:50  fplanque
  * MODULES (refactored MVC)
  *

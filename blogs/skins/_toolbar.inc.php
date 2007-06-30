@@ -89,15 +89,11 @@ global $admin_url;
 			// Note: if <strong></strong> is inside of the link, rollover fails in IE7
 		?></strong>
     <ul style="width:22ex;"><!-- size because of HR in IE7 -->
-			<?php user_admin_link( '<li>', '</li>', T_('Admin dashboard'), '#' ) ?>
- 			<?php blog_home_link( '<li>', '</li>', T_('Blog home'), T_('Home page') ); ?>
 			<?php
 				$perm_spam = $current_User->check_perm( 'spamblacklist', 'view', false );
 				$perm_options = $current_User->check_perm( 'options', 'view', false );
 				if( $perm_spam || $perm_options )
-				{ ?>
-					<li class="separator"><hr /></li>
-					<?php
+				{
 					if( $perm_options )
 					{ ?>
 					<li><a href="<?php echo $admin_url ?>?ctrl=system">About this server</a></li>
@@ -108,9 +104,9 @@ global $admin_url;
 					<li><a href="<?php echo $admin_url ?>?ctrl=antispam">Antispam blacklist</a></li>
 						<?php
 					}
+					echo '<li class="separator"><hr /></li>';
 				}
 			?>
-			<li class="separator"><hr /></li>
       <li><a href="http://b2evolution.net/" target="_blank"><?php echo T_('Open b2evolution.net') ?></a></li>
       <li><a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Open Support forums') ?></a></li>
       <li><a href="http://manual.b2evolution.net/" target="_blank"><?php echo T_('Open Online manual') ?></a></li>
@@ -135,18 +131,28 @@ global $admin_url;
 				// View link:
 				blog_home_link( '<li>', '</li>', T_('See'), T_('See') );
 
+  			// Manage link:
+				user_admin_link( '<li>', '</li>', T_('Manage'), T_('Go to admin dashboard') );
+
   			// Write link:
 				echo '<li><a href="'.$admin_url.'?ctrl=items&amp;action=new'.$blog_param.'">'.T_('Write').'</a></li>';
 
-  			// Edit / Browse (which word?) link:
-				echo '<li><a href="'.$admin_url.'?ctrl=items&amp;filter=restore'.$blog_param.'">'.T_('Browse').'</a></li>';
-
-  			// Moderate link:
-				// echo '<li><a href="'.$admin_url.'?ctrl=comments'.$blog_param.'">'.T_('Moderate').'</a></li>';
-
   			// Upload link:
 				echo '<li><a href="'.$admin_url.'?ctrl=files'.$blog_param.'">'.T_('Upload').'</a></li>';
-  			// Other?
+
+				// Customize current blog
+				if( isset($Blog) && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+				{	// We have permission to edit blog properties:
+ 					echo '<li class="menu_close" onmouseover="evo_menu_show(this)" onmouseout="evo_menu_hide(this)">';
+						echo '<a href="'.$admin_url.'?ctrl=coll_settings'.$blog_param.'">'.T_('Customize').' '.get_icon('dropdown').'</a>';
+						echo '<ul>';
+						echo '<li><a href="'.$admin_url.'?ctrl=coll_settings'.$blog_param.'">'.T_('Blog name').'</a></li>';
+						echo '<li><a href="'.$admin_url.'?ctrl=coll_settings&tab=skin'.$blog_param.'">'.T_('Blog skin').'</a></li>';
+						echo '<li><a href="'.$admin_url.'?ctrl=widgets'.$blog_param.'">'.T_('Blog widgets').'</a></li>';
+						echo '<li><a href="'.$admin_url.'?ctrl=coll_settings&tab=display'.$blog_param.'">'.T_('Blog display order').'</a></li>';
+						echo '</ul>';
+					echo '</li>';
+				}
 			}
   	?>
 	</li>
