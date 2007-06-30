@@ -16,6 +16,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $cookie_name, $cookie_email;
 
 // Parameters
 $redirect_to = param( 'redirect_to', 'string', '' ); // pass-through (hidden field)
@@ -151,7 +152,7 @@ if( empty($subject) )
 $Form = new Form( $htsrv_url.'message_send.php' );
 	$Form->begin_form( 'bComment' );
 
-	$Form->hidden( 'blog', $blog );
+	$Form->hidden( 'blog', $Blog->ID );
 	$Form->hidden( 'recipient_id', $recipient_id );
 	$Form->hidden( 'post_id', $post_id );
 	$Form->hidden( 'comment_id', $comment_id );
@@ -196,6 +197,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.34  2007/06/30 01:25:15  fplanque
+ * fixes
+ *
  * Revision 1.33  2007/05/14 02:43:06  fplanque
  * Started renaming tables. There probably won't be a better time than 2.0.
  *
