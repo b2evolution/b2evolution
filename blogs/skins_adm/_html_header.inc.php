@@ -223,14 +223,17 @@ JS;
 	// CALL PLUGINS NOW:
 	global $Plugins;
 	$Plugins->trigger_event( 'AdminEndHtmlHead', array() );
-	?>
-	<?php add_html_head_lines() ?>
 
+	include_headlines(); // Add javascript and css files included by plugins and skin
+?>
 </head>
 
 <?php
 /*
  * $Log$
+ * Revision 1.2  2007/06/30 22:03:34  fplanque
+ * cleanup
+ *
  * Revision 1.1  2007/06/25 11:02:35  fplanque
  * MODULES (refactored MVC)
  *

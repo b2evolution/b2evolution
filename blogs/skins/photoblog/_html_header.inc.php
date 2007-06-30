@@ -38,7 +38,7 @@ skin_content_header();	// Sets charset!
 	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 	<link rel="stylesheet" href="style.css" type="text/css" />
-	<?php add_html_head_lines() /* Add javascript and css files included by plugins and skin */ ?>
+	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 	<?php
 		$Blog->disp( 'blog_css', 'raw');
 		$Blog->disp( 'user_css', 'raw');

@@ -57,7 +57,7 @@ $page_icon = 'icon_login.gif';
   fp> TODO: find a javascript way to preload more stuff (like icons) WITHOUT delaying the browser autocomplete of the login & password fields
 	dh>
 	// include jquery JS:
-	$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/'.($debug ? 'jquery.js' : 'jquery.min.js').'"></script>';
+	require_js( '#jquery#' );
 
 	$(function(){
 	 alert("Document is ready");
@@ -65,13 +65,14 @@ $page_icon = 'icon_login.gif';
 	See also http://www.texotela.co.uk/code/jquery/preload/ - might be a good opportunity to take a look at jQuery for you.. :)
  */
 
-$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/functions.js"></script>';
+
+require_js( 'functions.js' );
 
 $transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 if( $transmit_hashed_password )
 { // Include JS for client-side password hashing:
-	$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/md5.js"></script>';
-	$evo_html_headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/sha1.js"></script>';
+	require_js( 'md5.js' );
+	require_js( 'sha1.js' );
 }
 
 /**
@@ -218,6 +219,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/30 22:03:34  fplanque
+ * cleanup
+ *
  * Revision 1.1  2007/06/25 11:02:37  fplanque
  * MODULES (refactored MVC)
  *

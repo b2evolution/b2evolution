@@ -34,27 +34,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<title><?php echo $app_shortname.$admin_path_separator.$page_title ?></title>
 	<meta name="ROBOTS" content="NOINDEX" />
 	<link href="<?php echo $rsc_url ?>css/login.css" rel="stylesheet" type="text/css" />
-	<?php
-// fp>SUSPECT:
-	// Insert HEAD lines, which have been defined before this _header.php file gets included:
-	// fp> what is this useful for?
-	// dh> TODO: currently this may be affected by register_globals=ON
-	// fp> then initialize it to empty somewhere before using it!
-	// dh> TODO: fp, is this ok? It should maybe be a func and available everywhere we output <HEAD> tags..?
-	// fp> it's not okay if it can be overriden wyth reg globs on
-	// dh> it could be set to NULL in e.g. _vars.php,
-	//     BUT this feels bloated (to init all possibly used vars), only to let _login_form.php add something here.
-	//     Instead of using an array directly, we could use an object (which holds an array).
-	//     Besides the used solution should get used everywhere we're outputting html HEAD and
-	//     e.g. want to allow Plugins inserting something there.
-	// fp> Object would be instantiated only once and there would be no need for derived classes. One single encapsulated variable. So object handling here would be bloated.
-	// Use functions. And you only need to initialize critical vars in _vars. BUT even better: how about enabling the killing of superglobals in _main.inc.php?
-	if( isset($evo_html_headlines) ) foreach( $evo_html_headlines as $v )
-	{
-		echo $v;
-	}
-// SUSPECT<fp
-	?>
+	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 </head>
 <body>
 
@@ -79,6 +59,9 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/30 22:03:34  fplanque
+ * cleanup
+ *
  * Revision 1.1  2007/06/25 11:18:46  fplanque
  * MODULES (refactored MVC)
  *

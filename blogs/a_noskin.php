@@ -71,17 +71,17 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	?></title>
 <!-- InstanceEndEditable -->
 <!-- InstanceBeginEditable name="head" -->
-<?php skin_content_meta(); /* Charset for static pages */ ?>
-<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
-<?php skin_base_tag(); /* You're not using any skin here but this won't hurt. However it will be very helpfull to have this here when you make the switch to a skin! */ ?>
-<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
-<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
-<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
-<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
-<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
-<!-- InstanceEndEditable -->
-<link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
-<?php add_html_head_lines(); ?>
+	<?php skin_content_meta(); /* Charset for static pages */ ?>
+	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
+	<?php skin_base_tag(); /* You're not using any skin here but this won't hurt. However it will be very helpfull to have this here when you make the switch to a skin! */ ?>
+	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
+	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
+	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
+	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
+	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
+	<!-- InstanceEndEditable -->
+	<link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
+	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 </head>
 <body>
 <div class="pageHeader">

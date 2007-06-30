@@ -307,20 +307,9 @@ function require_css( $css_file, $relative_to_base = FALSE, $title = NULL, $medi
 }
 
 
-
 /**
- * fp> TODO rename to include_required_files()
- * fp> TODO also handle CSS
- * fp> TODO use in backoffice too.
+ *
  */
-function add_html_head_lines()
-{
-  global $headlines;
-  $r = implode( "\n\t", $headlines )."\n\t";
-  echo $r;
-}
-
-
 function add_headline($headline)
 {
   global $headlines;
@@ -328,8 +317,22 @@ function add_headline($headline)
 }
 
 
+/**
+ *
+ */
+function include_headlines()
+{
+  global $headlines;
+  $r = implode( "\n\t", $headlines )."\n\t";
+  echo $r;
+}
+
+
 /*
  * $Log$
+ * Revision 1.2  2007/06/30 22:03:34  fplanque
+ * cleanup
+ *
  * Revision 1.1  2007/06/25 10:58:53  fplanque
  * MODULES (refactored MVC)
  *
