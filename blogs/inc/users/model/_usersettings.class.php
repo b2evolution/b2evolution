@@ -67,9 +67,9 @@ class UserSettings extends AbstractSettings
 		'fm_showdate'       => 'compact',
 		'fm_allowfiltering' => 'simple',
 
-		'blogperms_layout' => 'default', // selected view in blog (user/group) perms
+		'blogperms_layout' => 'default',	// selected view in blog (user/group) perms
 
-		'login_multiple_sessions' => 0, 	// allow multiple concurrent sessions?
+		'login_multiple_sessions' => 1, 	// allow multiple concurrent sessions? (PARAMOUNT ON DEMO SERVER)
 
 		'results_per_page' => 20,
 	);
@@ -210,6 +210,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/30 22:10:32  fplanque
+ * changed default
+ *
  * Revision 1.1  2007/06/25 11:01:48  fplanque
  * MODULES (refactored MVC)
  *
