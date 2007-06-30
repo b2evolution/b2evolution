@@ -73,8 +73,8 @@ function skin_include( $template_name, $params = array() )
 	// Globals that may be needed by the template:
 	global $Blog, $MainList, $Item;
 	global $Plugins, $Skin;
-	global $current_User, $Hit, $Session;
-	global $skin_url, $htsrv_url;
+	global $current_User, $Hit, $Session, $Settings;
+	global $skin_url, $htsrv_url, $htsrv_url_sensitive;
 	global $credit_links, $skin_links, $francois_links, $skinfaktory_links;
 
 	if( $template_name == '$disp$' )
@@ -303,6 +303,9 @@ function app_version()
 
 /*
  * $Log$
+ * Revision 1.3  2007/06/30 20:37:50  fplanque
+ * fixes
+ *
  * Revision 1.2  2007/06/27 02:23:25  fplanque
  * new default template for skins named index.main.php
  *

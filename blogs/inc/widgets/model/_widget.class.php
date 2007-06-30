@@ -290,6 +290,7 @@ class ComponentWidget extends DataObject
 					'item_selected_start' => '<li class="selected">',
 					'item_selected_end' => '</li>',
 					'link_selected_class' => 'selected',
+					'link_type' => 'canonic',		// 'canonic' | 'context' (context will regenrate URL injecting/replacing a single filter)
 					'item_selected_text_start' => '',
 					'item_selected_text_end' => '',
 					'group_start' => '<ul>',
@@ -339,10 +340,20 @@ class ComponentWidget extends DataObject
 
 
   /**
-	 * @private
+   * Note: a container can prevent display of titles with 'block_display_title'
+   * This is useful for the lists in the headers
+   * fp> I'm not sur if this param should be overridable by widgets themselves (priority problem)
+   * Maybe an "auto" setting.
+   *
+	 * @protected
 	 */
-	function disp_title( $title )
+	function disp_title( $title = NULL )
 	{
+		if( is_null($title) )
+		{
+			$title = & $this->disp_params['title'];
+		}
+
 		if( $this->disp_params['block_display_title'] && !empty( $title ) )
 		{
 			echo $this->disp_params['block_title_start'];
@@ -630,6 +641,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2007/06/30 20:37:50  fplanque
+ * fixes
+ *
  * Revision 1.2  2007/06/29 00:25:02  fplanque
  * minor
  *
