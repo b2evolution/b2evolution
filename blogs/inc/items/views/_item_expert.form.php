@@ -116,9 +116,6 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		$Form->hidden( 'post_url', '' );
 	}
 
-	// EXCERPT:
- 	$Form->textarea_input( 'post_excerpt', $edited_Item->get( 'excerpt' ), 2, T_('Excerpt'), array( 'cols' => 40 , 'id' => 'itemform_post_excerpt' ) );
-
 	// --------------------------- TOOLBARS ------------------------------------
 	echo '<div class="edit_toolbars">';
 	// CALL PLUGINS NOW:
@@ -210,6 +207,11 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		<label for="tags"><strong><?php echo T_('Tags') ?>:</strong>
 		<span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br />
 		<input type="text" name="item_tags" class="large" id="item_tags" value="<?php echo format_to_output( $item_tags, 'formvalue' ); ?>" />
+	</div>
+
+	<div id="itemform_post_excerpt">
+		<label for="post_excerpt"><strong><?php echo T_('Excerpt') ?>:</strong></label><br />
+		<textarea name="post_excerpt" rows="2" class="large" id="post_excerpt"><?php $edited_Item->disp( 'excerpt', 'formvalue' ) ?></textarea>
 	</div>
 	<?php
 
@@ -347,6 +349,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.2  2007/06/30 21:23:19  fplanque
+ * moved excerpt
+ *
  * Revision 1.1  2007/06/25 11:00:29  fplanque
  * MODULES (refactored MVC)
  *
