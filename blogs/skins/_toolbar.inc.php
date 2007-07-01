@@ -25,7 +25,7 @@ global $is_admin_page;
  */
 global $current_User;
 
-global $admin_url;
+global $home_url, $admin_url;
 
 ?>
 
@@ -84,12 +84,14 @@ global $admin_url;
 <ul>
 	<li class="menu_close" onmouseover="evo_menu_show(this)" onmouseout="evo_menu_hide(this)">
 		<strong><?php
-			$evo_toolbar_title = 'b2evolution '.get_icon('dropdown');
-			user_admin_link( '', '', $evo_toolbar_title, '#', $evo_toolbar_title );
+			echo '<a href="'.$home_url.'">b2evolution '.get_icon('dropdown').'</a>';
 			// Note: if <strong></strong> is inside of the link, rollover fails in IE7
 		?></strong>
     <ul style="width:22ex;"><!-- size because of HR in IE7 -->
 			<?php
+				echo '<li><a href="'.$home_url.'">'.T_('Home').'</a></li>';
+				echo '<li class="separator"><hr /></li>';
+
 				$perm_spam = $current_User->check_perm( 'spamblacklist', 'view', false );
 				$perm_options = $current_User->check_perm( 'options', 'view', false );
 				if( $perm_spam || $perm_options )
@@ -117,7 +119,7 @@ global $admin_url;
   	<?php
 			if( $is_admin_page || $current_User->check_perm( 'admin', 'visible' ) )
 			{ // We are already in admin or we have permission to view admin options:
-				if( isset($Blog) )
+				if( !empty($Blog) )
 				{
 					$blog_param = '&amp;blog='.$Blog->ID;
 				}

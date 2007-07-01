@@ -69,6 +69,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 </head>
 <body>
+
+<?php
+// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
+require $skins_path.'_toolbar.inc.php';
+// ------------------------------- END OF TOOLBAR --------------------------------
+?>
+
 <div class="pageHeader">
 <div class="pageHeaderContent">
 

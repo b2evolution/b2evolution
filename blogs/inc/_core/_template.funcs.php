@@ -189,7 +189,7 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 {
 	global $Blog, $baseurl;
 
-	if( isset( $Blog ) )
+	if( !empty( $Blog ) )
 	{
   	echo $before.'<a href="'.$Blog->get( 'url' ).'">'.$blog_text.'</a>'.$after;
 	}
@@ -330,6 +330,9 @@ function include_headlines()
 
 /*
  * $Log$
+ * Revision 1.3  2007/07/01 03:57:20  fplanque
+ * toolbar eveywhere
+ *
  * Revision 1.2  2007/06/30 22:03:34  fplanque
  * cleanup
  *

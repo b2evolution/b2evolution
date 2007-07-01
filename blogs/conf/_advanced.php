@@ -68,6 +68,14 @@ $demo_mode = false;
 
 
 /**
+ * URL of the Home link at the top left.
+ *
+ * By default this is the base url. And unless you do a complex installation, there is no need to change this.
+ */
+$home_url = $baseurl;
+
+
+/**
  * Comments: Set this to 1 to require e-mail and name, or 0 to allow comments
  * without e-mail/name.
  * @global boolean $require_name_email

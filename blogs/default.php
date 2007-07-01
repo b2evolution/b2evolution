@@ -35,6 +35,15 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<link href="rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+
+<?php
+// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
+require $skins_path.'_toolbar.inc.php';
+// ------------------------------- END OF TOOLBAR --------------------------------
+?>
+
+<div class="wrapper">
+
 <div id="rowheader2">
 <h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="<?php echo $rsc_url ?>img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" /></a></h1>
 <div id="tagline"><?php echo T_('Multilingual multiuser multi-blog engine.') ?></div>
@@ -124,5 +133,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <?php display_list( $credit_links, ' &middot; ', '', ' &middot; ', ' ', ' ' ); ?>
 </div>
 <?php debug_info(); // output debug info if requested ?>
+</div>
 </body>
 </html>

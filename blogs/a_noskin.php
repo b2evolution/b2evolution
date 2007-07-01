@@ -84,6 +84,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 </head>
 <body>
+
+<?php
+// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
+require $skins_path.'_toolbar.inc.php';
+// ------------------------------- END OF TOOLBAR --------------------------------
+?>
+
 <div class="pageHeader">
 <div class="pageHeaderContent">
 
@@ -263,28 +270,30 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		// --------------------------------- START OF SEARCH FORM --------------------------------
 		// Call the coll_search_form widget:
 		skin_widget( array(
-							// CODE for the widget:
-							'widget' => 'coll_search_form',
-							// Optional display params:
-							'block_start' => '<div class="bSideItem">',
-							'block_end' => '</div>',
-							'block_title_start' => '<h3 class="sideItemTitle">',
-							'block_title_end' => '</h3>',
-					) );
+				// CODE for the widget:
+				'widget' => 'coll_search_form',
+				// Optional display params:
+				'block_start' => '<div class="bSideItem">',
+				'block_end' => '</div>',
+				'block_title_start' => '<h3 class="sideItemTitle">',
+				'block_title_end' => '</h3>',
+			) );
 		// ---------------------------------- END OF SEARCH FORM ---------------------------------
 	?>
 
-	<div class="bSideItem">
-		<h3><?php echo T_('Categories') ?></h3>
-		<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ) ) ?>
-		<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
-			require( $skins_path.'_categories.php');
-			// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
-		<br />
-		<input type="submit" value="<?php echo T_('Get selection') ?>" />
-		<input type="reset" value="<?php echo T_('Reset form') ?>" />
-		</form>
-	</div>
+	<?php
+		// --------------------------------- START OF CATEGORY LIST --------------------------------
+		skin_widget( array(
+				// CODE for the widget:
+				'widget' => 'coll_category_list',
+				// Optional display params
+				'block_start' => '<div class="bSideItem">',
+				'block_end' => '</div>',
+				'block_title_start' => '<h3 class="sideItemTitle">',
+				'block_title_end' => '</h3>',
+			) );
+		// ---------------------------------- END OF CATEGORY LIST ---------------------------------
+	?>
 
 	<div class="bSideItem">
 		<h3><?php echo T_('Archives') ?></h3>
@@ -325,38 +334,35 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		// ---------------------------------- END OF LINKBLOG ---------------------------------
 	?>
 
+	<?php
+		// --------------------------------- START OF USER TOOLS --------------------------------
+		skin_widget( array(
+				// CODE for the widget:
+				'widget' => 'user_tools',
+				// Optional display params
+				'block_start' => '<div class="bSideItem">',
+				'block_end' => '</div>',
+				'block_title_start' => '<h3 class="sideItemTitle">',
+				'block_title_end' => '</h3>',
+			) );
+		// ---------------------------------- END OF USER TOOLS ---------------------------------
+	?>
 
-	<div class="bSideItem">
-		<h3><?php echo T_('Misc') ?></h3>
-		<ul>
-			<?php
-				// Administrative links:
-				user_login_link( '<li>', '</li>' );
-				user_register_link( '<li>', '</li>' );
-				user_admin_link( '<li>', '</li>' );
-				user_profile_link( '<li>', '</li>' );
-				user_subs_link( '<li>', '</li>' );
-				user_logout_link( '<li>', '</li>' );
-			?>
-		</ul>
-	</div>
+	<?php
+		// --------------------------------- START OF XML FEEDS --------------------------------
+		skin_widget( array(
+				// CODE for the widget:
+				'widget' => 'coll_xml_feeds',
+				// Optional display params
+				'block_start' => '<div class="bSideItem">',
+				'block_end' => '</div>',
+				'block_title_start' => '<h3 class="sideItemTitle">',
+				'block_title_end' => '</h3>',
+			) );
+		// ---------------------------------- END OF XML FEEDS ---------------------------------
+	?>
 
-	<div class="bSideItem">
-		<h3><?php echo T_('Syndicate this blog') ?> <img src="<?php echo $rsc_url ?>img/xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
-
-
-			<ul>
-				<li><a href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>">RSS 0.92 (Userland)</a></li>
-				<li><a href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>">RSS 1.0 (RDF)</a></li>
-				<li><a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>">RSS 2.0 (Userland)</a></li>
-				<li><a href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>">Atom 0.3</a></li>
-			</ul>
-			<a href="http://webreference.fr/2006/08/30/rss_atom_xml" title="External - English">What is RSS?</a>
-
-	</div>
-
-	<p class="center">powered by<br />
-	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $rsc_url ?>img/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="middle" /></a></p>
+	<p class="center"><!-- Please help us promote b2evolution and leave this link on your blog. --><a href="http://b2evolution.net/" title="b2evolution: next generation blog software"><img src="rsc/img/powered-by-b2evolution-120t.gif" alt="powered by b2evolution free blog software" title="b2evolution: next generation blog software" width="120" height="32" border="0" /></a></p>
 
 </div>
 <!-- InstanceEndEditable --></div>
@@ -364,7 +370,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
   <tr>
   <td class="cartouche">Original page design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> </td>
 
-	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
+	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="rsc/img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
   </tr>
 </table>
 <p class="baseline"><!-- InstanceBeginEditable name="Baseline" -->

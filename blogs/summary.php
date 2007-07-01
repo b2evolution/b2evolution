@@ -21,6 +21,8 @@ require_once dirname(__FILE__).'/conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
+load_funcs( 'skins/_skin.funcs.php' );
+
 header( 'Content-type: text/html; charset='.$io_charset );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -34,6 +36,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 </head>
 <body>
+
+<?php
+// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
+require $skins_path.'_toolbar.inc.php';
+// ------------------------------- END OF TOOLBAR --------------------------------
+?>
+
 <div class="pageHeader">
 <div class="pageHeaderContent">
 

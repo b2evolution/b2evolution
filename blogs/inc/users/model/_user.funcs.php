@@ -316,7 +316,14 @@ function get_user_admin_link( $before = '', $after = '', $link_text = '', $link_
 	if( $link_title == '#' ) $link_title = T_('Go to the back-office...');
 	// add the blog param to $page if it is not already in there
 
-	$url = url_add_param( $admin_url, 'blog='.$blog );
+	if( !empty( $blog ) )
+	{
+		$url = url_add_param( $admin_url, 'blog='.$blog );
+	}
+	else
+	{
+		$url = $admin_url;
+	}
 
 	$r = $before;
 	$r .= '<a href="'.$url.'" title="'.$link_title.'">';
@@ -360,7 +367,7 @@ function get_user_profile_link( $before = '', $after = '', $link_text = '', $lin
 	}
 	if( $link_title == '#' ) $link_title = T_('Edit your profile');
 
-	if( $is_admin_page )
+	if( $is_admin_page || empty( $Blog ) )
 	{
 		$url = $admin_url.'?ctrl=users&amp;user_ID='.$current_User->ID;
 	}
@@ -391,7 +398,7 @@ function user_subs_link( $before = '', $after = '', $link_text = '', $link_title
 		return false;
 	}
 
-	if( ! $Blog->get_setting( 'allow_subscriptions' ) )
+	if( empty( $Blog ) || ! $Blog->get_setting( 'allow_subscriptions' ) )
 	{
 		return false;
 	}
@@ -535,6 +542,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.2  2007/07/01 03:57:20  fplanque
+ * toolbar eveywhere
+ *
  * Revision 1.1  2007/06/25 11:01:47  fplanque
  * MODULES (refactored MVC)
  *
