@@ -234,7 +234,7 @@ echo '<div class="browse_side_item">';
 				'block_title_start' => '<legend>',
 				'block_title_end' => '</legend>',
 				'link_type' => 'context',
-				'use_form' => 'embedded',
+				'use_form' => 1,
 			) );
 		// ---------------------------------- END OF CATEGORY LIST ---------------------------------
 
@@ -263,6 +263,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.3  2007/07/01 15:12:28  fplanque
+ * simplified 'use_form'
+ *
  * Revision 1.2  2007/07/01 03:55:04  fplanque
  * category plugin replaced by widget
  *

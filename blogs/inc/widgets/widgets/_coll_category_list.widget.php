@@ -87,14 +87,10 @@ class coll_category_list_Widget extends ComponentWidget
 					'note' => T_('The "All categories" link allows to reset the filter. Leave blank if you want no such option.'),
 				),
 			'use_form' => array(
-					'type' => 'select',
+					'type' => 'checkbox',
 					'label' => T_('Use form'),
-					'defaultvalue' => 'no',
-					'options' => array(
-							'no' => T_('No'),
-							'standalone' => T_('Stand alone'),
-							'embedded' => T_('Embedded in global form')
-						),
+					'defaultvalue' => 0,
+					'note' => T_('Add checkboxes to allow selection of multiple categories.'),
 				),
 		);
 
@@ -213,7 +209,7 @@ class coll_category_list_Widget extends ComponentWidget
 
 
 
-		if( $this->disp_params['use_form'] != 'no' )
+		if( $this->disp_params['use_form'] )
 		{	// We want to add form fields:
 		?>
 			<div class="tile">
@@ -263,7 +259,7 @@ class coll_category_list_Widget extends ComponentWidget
 			$r = $this->disp_params['item_start'];
 		}
 
-		if( $this->disp_params['use_form'] != 'no' )
+		if( $this->disp_params['use_form'] )
 		{	// We want to add form fields:
 			$r .= '<label><input type="checkbox" name="catsel[]" value="'.$Chapter->ID.'" class="checkbox"';
 			if( in_array( $Chapter->ID, $cat_array ) )
@@ -286,7 +282,7 @@ class coll_category_list_Widget extends ComponentWidget
 
 		$r .= '">'.$Chapter->dget('name').'</a>';
 
-		if( $this->disp_params['use_form'] != 'no' )
+		if( $this->disp_params['use_form'] )
 		{	// We want to add form fields:
 			$r .= '</label>';
 		}
@@ -351,6 +347,9 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/07/01 15:12:28  fplanque
+ * simplified 'use_form'
+ *
  * Revision 1.1  2007/07/01 03:55:04  fplanque
  * category plugin replaced by widget
  *
