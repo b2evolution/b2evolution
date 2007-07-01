@@ -33,6 +33,7 @@ $core_componentwidget_defs = array(
 		'*'.T_('Blog contents'),
 			'coll_page_list',
 			'coll_post_list',
+			'coll_category_list',
 		'*'.T_('Meta contents'),
 			'coll_longdesc',
 			'free_html',
@@ -100,6 +101,9 @@ echo '</ul></li></ul>';
 
 /*
  * $Log$
+ * Revision 1.2  2007/07/01 03:55:05  fplanque
+ * category plugin replaced by widget
+ *
  * Revision 1.1  2007/06/25 11:02:01  fplanque
  * MODULES (refactored MVC)
  *

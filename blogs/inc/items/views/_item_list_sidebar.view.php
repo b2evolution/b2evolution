@@ -30,6 +30,7 @@ global $Plugins;
 
 global $tab, $show_past, $show_future, $show_statuses, $s, $sentence, $exact, $author, $assgn, $status;
 
+load_funcs( 'skins/_skin.funcs.php' );
 
 echo '<div class="browse_side_item">';
 
@@ -223,21 +224,19 @@ echo '<div class="browse_side_item">';
 			echo '</fieldset>';
 		}
 
-
-
-		// CATEGORIES:
-		// Call the Categories plugin:
-		$Plugins->call_by_code( 'evo_Cats', array( // Parameters follow:
-				'block_start'=>'<fieldset>',
-				'block_end'=>"</fieldset>\n",
-				'title'=>'<legend>'.T_('Categories')."</legend>\n",
-				'collist_start'=>'<ul>',
-				'collist_end'=>"</ul>\n",
-				'coll_start'=>'<li><strong>',
-				'coll_end'=>"</strong></li>\n",
-				'link_type'=>'context', 							// Preserve page context
-				'form'=>true,                         // add form fields (radio buttons)
-			)	);
+		// --------------------------------- START OF CATEGORY LIST --------------------------------
+		skin_widget( array(
+				// CODE for the widget:
+				'widget' => 'coll_category_list',
+				// Optional display params
+				'block_start' => '<fieldset>',
+				'block_end' => '</fieldset>',
+				'block_title_start' => '<legend>',
+				'block_title_end' => '</legend>',
+				'link_type' => 'context',
+				'use_form' => 'embedded',
+			) );
+		// ---------------------------------- END OF CATEGORY LIST ---------------------------------
 
 
 		// ARCHIVES:
@@ -264,6 +263,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.2  2007/07/01 03:55:04  fplanque
+ * category plugin replaced by widget
+ *
  * Revision 1.1  2007/06/25 11:00:30  fplanque
  * MODULES (refactored MVC)
  *

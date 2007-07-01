@@ -294,9 +294,9 @@ function install_basic_widgets()
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							 SELECT blog_ID, "Sidebar", 6, "core", "coll_search_form"
 							   FROM T_blogs' );
-	// Add Categories plugin to all blog Sidebars:
+	// Add categories list to all blog Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 7, "plugin", "evo_Cats"
+							 SELECT blog_ID, "Sidebar", 7, "core", "coll_category_list"
 							   FROM T_blogs' );
 	// Add XML feeds to all blogs Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
@@ -506,6 +506,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.29  2007/07/01 03:55:04  fplanque
+ * category plugin replaced by widget
+ *
  * Revision 1.28  2007/06/25 11:02:30  fplanque
  * MODULES (refactored MVC)
  *

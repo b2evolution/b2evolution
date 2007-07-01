@@ -15,19 +15,23 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-// Call the Categories plugin:
-$Plugins->call_by_code( 'evo_Cats', array(
-			// 'block_title_start' => '<h2>',
-			// 'block_title_end'   => '</h2>',
-			// 'title'             => T_('Categories'),
-			'title'             => '',	// Title already displayed by request_title()
-		  'block_start'       => '',
-		  'block_end'         => ''
-		)
-	);
+// --------------------------------- START OF CATEGORY LIST --------------------------------
+skin_widget( array(
+		// CODE for the widget:
+		'widget' => 'coll_category_list',
+		// Optional display params
+		'block_start' => '',
+		'block_end' => '',
+		'block_display_title' => false,
+	) );
+// ---------------------------------- END OF CATEGORY LIST ---------------------------------
+
 
 /*
  * $Log$
+ * Revision 1.4  2007/07/01 03:55:04  fplanque
+ * category plugin replaced by widget
+ *
  * Revision 1.3  2007/04/26 00:11:03  fplanque
  * (c) 2007
  *
