@@ -174,12 +174,15 @@ class ItemQuery extends SQL
 	 * @param Blog
 	 * @param array
 	 * @param string
-	 * @param string 'wide' to search iun extra cats too, 'main' for main cat only
+	 * @param string 'wide' to search in extra cats too, 'main' for main cat only
 	 */
 	function where_chapter2( & $Blog, $cat_array, $cat_modifier, $cat_focus = 'wide' )
 	{
 		// Save for future use (permission checks..)
 		$this->blog = $Blog->ID;
+		$this->Blog = $Blog;
+		$this->cat_array = $cat_array;
+		$this->cat_modifier = $cat_modifier;
 
 		if( $cat_focus == 'wide' )
 		{
@@ -657,6 +660,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.2  2007/07/01 03:58:08  fplanque
+ * cat_array cleanup/debug
+ *
  * Revision 1.1  2007/06/25 11:00:28  fplanque
  * MODULES (refactored MVC)
  *

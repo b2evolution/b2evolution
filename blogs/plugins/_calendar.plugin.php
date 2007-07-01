@@ -50,10 +50,15 @@ class calendar_plugin extends Plugin
 	var $name = 'Calendar Widget';
 	var $code = 'evo_Calr';
 	var $priority = 20;
-	var $version = '1.9-dev';
+	var $version = '2.0';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 
+
+  /**
+	 * @var ItemQuery
+	 */
+	var $ItemQuery;
 
 	/**
 	 * Init
@@ -167,7 +172,7 @@ class calendar_plugin extends Plugin
 	function SkinTag( $params )
 	{
 		global $Settings, $month;
-		global $blog, $cat, $catsel;
+		global $Blog, $cat_array, $cat_modifier;
 		global $show_statuses;
 		global $author, $assgn, $status;
 		global $m, $w, $dstart, $timestamp_min, $timestamp_max;
@@ -244,7 +249,7 @@ class calendar_plugin extends Plugin
 		if( $Calendar->link_type == 'context' )
 		{	// We want to preserve the current context:
 			// * - - Restrict to selected blog/categories:
-			$Calendar->ItemQuery->where_chapter( $blog, $cat, $catsel );
+			$Calendar->ItemQuery->where_chapter2( $Blog, $cat_array, $cat_modifier );
 
 			// * Restrict to the statuses we want to show:
 			$Calendar->ItemQuery->where_visibility( $show_statuses );
@@ -267,7 +272,7 @@ class calendar_plugin extends Plugin
 		else
 		{	// We want to preserve only the minimal context:
 			// * - - Restrict to selected blog/categories:
-			$Calendar->ItemQuery->where_chapter( $blog, '', array() );
+			$Calendar->ItemQuery->where_chapter2( $Blog, array(), '' );
 
 			// * Restrict to the statuses we want to show:
 			$Calendar->ItemQuery->where_visibility( $show_statuses );
@@ -867,6 +872,7 @@ class Calendar
 		echo $this->rowend;
 
 		echo $this->tableend;
+
 	}  // display(-)
 
 
@@ -919,18 +925,21 @@ class Calendar
 
 		$r = array();
 
-		// WE NEED SPECIAL QUERY PARAMS WHEN MOVING THOUGH MONTHS ( NO dstart especially! )
-		$nav_ItemQuery = & new ItemQuery( $this->dbtable, $this->dbprefix, $this->dbIDname );	// TEMP object
-		// Restrict to selected blog/categories:
-		$nav_ItemQuery->where_chapter( $this->ItemQuery->blog, $this->ItemQuery->cat, $this->ItemQuery->catsel );
-		// Restrict to the statuses we want to show:
-		$nav_ItemQuery->where_visibility( $this->ItemQuery->show_statuses );
-		// Restrict to selected authors:
-		$nav_ItemQuery->where_author( $this->ItemQuery->author );
-		// if a month is specified in the querystring, load that month:
-		$nav_ItemQuery->where_datestart( /* NO m */'', /* NO w */'', /* NO dstart */'', '', $this->ItemQuery->timestamp_min, $this->ItemQuery->timestamp_max );
-		// Keyword search stuff:
-		$nav_ItemQuery->where_keywords( $this->ItemQuery->keywords, $this->ItemQuery->phrase, $this->ItemQuery->exact );
+		if( $this->params['min_timestamp'] == 'query' || $this->params['max_timestamp'] == 'query' )
+		{ // Do inits:
+			// WE NEED SPECIAL QUERY PARAMS WHEN MOVING THOUGH MONTHS ( NO dstart especially! )
+			$nav_ItemQuery = & new ItemQuery( $this->dbtable, $this->dbprefix, $this->dbIDname );	// TEMP object
+			// Restrict to selected blog/categories:
+			$nav_ItemQuery->where_chapter2( $this->ItemQuery->Blog, $this->ItemQuery->cat_array, $this->ItemQuery->cat_modifier );
+			// Restrict to the statuses we want to show:
+			$nav_ItemQuery->where_visibility( $this->ItemQuery->show_statuses );
+			// Restrict to selected authors:
+			$nav_ItemQuery->where_author( $this->ItemQuery->author );
+			// if a month is specified in the querystring, load that month:
+			$nav_ItemQuery->where_datestart( /* NO m */'', /* NO w */'', /* NO dstart */'', '', $this->ItemQuery->timestamp_min, $this->ItemQuery->timestamp_max );
+			// Keyword search stuff:
+			$nav_ItemQuery->where_keywords( $this->ItemQuery->keywords, $this->ItemQuery->phrase, $this->ItemQuery->exact );
+		}
 
 		switch( $direction )
 		{
@@ -1166,6 +1175,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.45  2007/07/01 03:58:08  fplanque
+ * cat_array cleanup/debug
+ *
  * Revision 1.44  2007/06/23 22:06:47  fplanque
  * CSS cleanup
  *
