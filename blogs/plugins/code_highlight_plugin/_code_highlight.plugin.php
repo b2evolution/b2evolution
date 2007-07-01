@@ -166,13 +166,15 @@ class code_highlight_plugin extends Plugin
 			//<![CDATA[
 			function codespan_tag( lang )
 			{
-				tag = '[codespan]';
-				textarea_wrap_selection( b2evoCanvas, tag, '[/codespan]', 0 );
+				tag = '<codespan>';
+
+				textarea_wrap_selection( b2evoCanvas, tag, '</codespan>', 0 );
 			}
 			function codeblock_tag( lang )
 			{
-				tag = '[codeblock lang="'+lang+'" line="1"]';
-				textarea_wrap_selection( b2evoCanvas, tag, '[/codeblock]', 0 );
+				tag = '<codeblock lang="'+lang+'" line="1">';
+
+				textarea_wrap_selection( b2evoCanvas, tag, '</codeblock>', 0 );
 			}
 			//]]>
 		</script>
@@ -196,16 +198,15 @@ class code_highlight_plugin extends Plugin
 
 		// Note : This regex is different from the original - just in case it gets moved again ;)
 
-		// change all [codeblock] segments before format_to_post() gets a hold of them
+		// change all <codeblock> segments before format_to_post() gets a hold of them
 		// 1 - amcode or codeblock
 		// 2 - attribs : lang &| line
 		// 3 - code block
-		$content = preg_replace_callback( '# ([<[]) (codeblock) ([^>\]]*?) ([>\]])' // opening tag
-				.'(.*?)' // element content
-				.'\1/\2\4#six', // closing tag
-				array( $this, 'filter_codeblock_callback' ), $content );
-		// Quick and dirty escaping of inline code [codespan]:
-		$content = preg_replace_callback( '#([<[])codespan([>\]])(.*?)\1codespan\2>#is',
+		$content = preg_replace_callback( '#\<(codeblock)([^>]*?)>([\s\S]+?)?\</\1>#i',
+								array( $this, 'filter_codeblock_callback' ), $content );
+
+		// Quick and dirty escaping of inline code <codespan>:
+		$content = preg_replace_callback( '#<codespan>(.*?)</codespan>#',
 								array( $this, 'filter_codespan_callback' ), $content );
 
 		return true;
@@ -221,7 +222,7 @@ class code_highlight_plugin extends Plugin
 	 */
 	function filter_codespan_callback( $matches )
 	{
-		$code = $matches[3];
+		$code = $matches[1];
 
 		return '<code class="codespan">'.str_replace( array( '&', '<', '>' ), array( '&amp;', '&lt;', '&gt;' ), $code).'</code>';
 	}
@@ -334,13 +335,13 @@ class code_highlight_plugin extends Plugin
 	/**
 	 * Formats code ready for the database
 	 *
-	 * @param array $block ( 3 - attributes, 5 - the code )
+	 * @param array $block ( 2 - attributes, 3 - the code )
 	 * @return string formatted code || empty
 	 */
 	function filter_codeblock_callback( $block )
 	{ // if code block exists then tidy everything up for the database, otherwise just remove the pointless tag
-		return ( empty( $block[5] ) ||  !trim( $block[5] ) ? '' : '<!-- codeblock'.$block[3].' --><pre><code>'
-						.str_replace( array( '&', '<', '>' ), array( '&amp;', '&lt;', '&gt;' ), $block[5] )
+		return ( empty( $block[3] ) ||  !trim( $block[3] ) ? '' : '<!-- codeblock'.$block[2].' --><pre><code>'
+						.str_replace( array( '&', '<', '>' ), array( '&amp;', '&lt;', '&gt;' ), $block[3] )
 						.'</code></pre><!-- /codeblock -->' );
 	}
 
@@ -557,10 +558,8 @@ div.codeblock.amc_short table {
 
 /**
  * $Log$
- * Revision 1.6  2007/06/30 00:58:56  blueyed
- * - Use [codeblock] and [codespan] by default, but still allow
- *   <codeblock>/<codespan>
- * - Minor cleanup (whitespace and such)
+ * Revision 1.7  2007/07/01 03:59:49  fplanque
+ * rollback until clean implementation
  *
  * Revision 1.5  2007/06/26 02:40:53  fplanque
  * security checks
@@ -621,7 +620,7 @@ div.codeblock.amc_short table {
  * made some minor changes to the doc
  * made a few minor code changes ( line="99" etc )
  * added in styles for admin area
- * added in <code><php></code> tags
+ * added in <code><php> tags
  * added a fair few comments
  *
  * Revision 1.1.2.5  2007/03/31 22:42:44  fplanque
