@@ -109,6 +109,7 @@ header('Content-Type: text/html; charset='.$io_charset);
 	<link href="../rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div class="wrapper">
 <div id="rowheader" >
 	<h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="<?php echo $rsc_url; ?>img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" /></a></h1>
 	<div id="tagline"><?php echo T_('Multilingual multiuser multi-blog engine.') ?></div>
@@ -641,6 +642,7 @@ to
 	// the following comment gets checked in the automatic install script of demo.b2evolution.net:
 ?>
 <!-- b2evo-install-end -->
+</div>
 </body>
 </html>
 
@@ -648,6 +650,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.134  2007/07/01 18:47:11  fplanque
+ * fixes
+ *
  * Revision 1.133  2007/06/25 11:02:31  fplanque
  * MODULES (refactored MVC)
  *
@@ -705,95 +710,5 @@ to
  *
  * Revision 1.114  2006/10/01 15:23:28  blueyed
  * Fixed install
- *
- * Revision 1.113  2006/09/26 11:23:40  blueyed
- * Completed titles for $action
- *
- * Revision 1.112  2006/09/25 20:11:40  blueyed
- * More distinct HTML title, just for upgrade now; TODO
- *
- * Revision 1.111  2006/09/10 14:16:37  blueyed
- * trans doc
- *
- * Revision 1.110  2006/08/20 13:47:26  fplanque
- * extracted param funcs from misc
- *
- * Revision 1.109  2006/07/31 15:37:52  blueyed
- * Fixed JS error, if there's no "deletedb" option available.
- *
- * Revision 1.108  2006/07/04 17:32:30  fplanque
- * no message
- *
- * Revision 1.107  2006/07/02 21:50:50  blueyed
- * Fixed charset init for install
- *
- * Revision 1.106  2006/06/25 23:41:58  blueyed
- * The archive plugin requires Results itself now.
- *
- * Revision 1.105  2006/06/19 20:59:38  fplanque
- * noone should die anonymously...
- *
- * Revision 1.103  2006/06/14 17:26:13  fplanque
- * minor
- *
- * Revision 1.102  2006/05/30 21:53:06  blueyed
- * Replaced $EvoConfig->DB with $db_config
- *
- * Revision 1.101  2006/05/28 22:27:13  blueyed
- * Basic config file
- *
- * Revision 1.100  2006/05/19 18:15:06  blueyed
- * Merged from v-1-8 branch
- *
- * Revision 1.99  2006/05/02 03:01:15  blueyed
- * fix
- *
- * Revision 1.98  2006/04/29 01:24:05  blueyed
- * More decent charset support;
- * unresolved issues include:
- *  - front office still forces the blog's locale/charset!
- *  - if there's content in utf8, it cannot get displayed with an I/O charset of latin1
- *
- * Revision 1.97  2006/04/11 22:28:58  blueyed
- * cleanup
- *
- * Revision 1.96  2006/04/11 21:22:26  fplanque
- * partial cleanup
- *
- * Revision 1.95  2006/04/10 09:27:04  blueyed
- * Fix adding default itemtypes when upgrading from 0.9.x; cleaned up plugins install
- *
- * Revision 1.94  2006/04/06 08:52:27  blueyed
- * Validate install "misc" requirements ("tokenizer" support for now)
- *
- * Revision 1.93  2006/03/10 19:04:58  fplanque
- * minor
- *
- * Revision 1.92  2006/02/23 22:17:31  blueyed
- * fix path
- *
- * Revision 1.91  2006/02/23 21:12:33  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.89  2006/02/11 01:08:20  blueyed
- * Oh what fun it is to drop some "e".
- *
- * Revision 1.88  2006/02/03 19:36:40  fplanque
- * Log::display is insane compared to the simplicity of echo :]
- *
- * Revision 1.86  2006/02/02 00:49:33  blueyed
- * Use class Plugins_no_DB for $Plugins on "newdb" action
- *
- * Revision 1.85  2006/01/30 16:09:34  blueyed
- * doc
- *
- * Revision 1.83  2006/01/26 23:08:36  blueyed
- * Plugins enhanced.
- *
- * Revision 1.82  2006/01/14 20:45:10  blueyed
- * do not dump function trace on DB errors during install/config when not appropriate.
- *
  */
 ?>

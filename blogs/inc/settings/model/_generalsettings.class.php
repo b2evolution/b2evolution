@@ -140,8 +140,8 @@ class GeneralSettings extends AbstractSettings
 					.'<p>You have schema version &laquo;'.(integer)$this->get( 'db_version' ).'&raquo;, '
 					.'but we would need &laquo;'.(integer)$new_db_version.'&raquo;.</p>';
 			}
-			global $inc_path;
-			require $inc_path.'_conf_error.inc.php'; // error & exit
+			global $adminskins_path;
+			require $adminskins_path.'conf_error.main.php'; // error & exit
 		}
 
 		$DB->halt_on_error = $save_DB_halt_on_error;
@@ -154,6 +154,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.2  2007/07/01 18:47:11  fplanque
+ * fixes
+ *
  * Revision 1.1  2007/06/25 11:01:21  fplanque
  * MODULES (refactored MVC)
  *

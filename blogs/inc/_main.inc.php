@@ -161,7 +161,7 @@ elseif( !isset( $locales[$default_locale] ) )
 }
 if( isset( $error_message ) )
 { // error & exit
-	require dirname(__FILE__).'/_conf_error.inc.php';
+	require dirname(__FILE__).'/../skins_adm/conf_error.main.php';
 }
 
 if( !$debug )
@@ -635,6 +635,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.82  2007/07/01 18:47:11  fplanque
+ * fixes
+ *
  * Revision 1.81  2007/06/26 02:40:53  fplanque
  * security checks
  *
