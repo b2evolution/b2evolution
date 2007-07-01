@@ -4,6 +4,9 @@
 
 /* Global page layout */
 body {
+}
+
+div.wrapper {
 	margin: 1ex;
 }
 
