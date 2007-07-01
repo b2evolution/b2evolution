@@ -179,6 +179,9 @@ function install_basic_skins()
 	$Skin->install( 'custom' );
 
 	$Skin = new Skin();
+	$Skin->install( 'evopress' );
+
+	$Skin = new Skin();
 	$Skin->install( 'natural_pink' );
 
 	$Skin = new Skin();
@@ -506,6 +509,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.30  2007/07/01 18:49:40  fplanque
+ * evopress skin (tentative)
+ *
  * Revision 1.29  2007/07/01 03:55:04  fplanque
  * category plugin replaced by widget
  *
