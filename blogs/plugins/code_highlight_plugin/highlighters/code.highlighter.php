@@ -46,6 +46,14 @@ class am_code_highlighter
 
 
 	/**
+	 * Name of language that was desired by user
+	 * This can be used to make geshi simpler to implement
+	 *
+	 */
+	var $requested_language;
+
+
+	/**
 	 * Boolean are we in strict mode ?
 	 *
 	 */
@@ -80,6 +88,9 @@ class am_code_highlighter
 }
 /**
  * $Log$
+ * Revision 1.7  2007/07/03 10:44:23  yabs
+ * minor change
+ *
  * Revision 1.6  2007/06/26 02:40:54  fplanque
  * security checks
  *
