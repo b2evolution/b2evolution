@@ -166,15 +166,15 @@ class code_highlight_plugin extends Plugin
 			//<![CDATA[
 			function codespan_tag( lang )
 			{
-				tag = '<codespan>';
+				tag = '[codespan]';
 
-				textarea_wrap_selection( b2evoCanvas, tag, '</codespan>', 0 );
+				textarea_wrap_selection( b2evoCanvas, tag, '[/codespan]', 0 );
 			}
 			function codeblock_tag( lang )
 			{
-				tag = '<codeblock lang="'+lang+'" line="1">';
+				tag = '[codeblock lang="'+lang+'" line="1"]';
 
-				textarea_wrap_selection( b2evoCanvas, tag, '</codeblock>', 0 );
+				textarea_wrap_selection( b2evoCanvas, tag, '[/codeblock]', 0 );
 			}
 			//]]>
 		</script>
@@ -198,15 +198,15 @@ class code_highlight_plugin extends Plugin
 
 		// Note : This regex is different from the original - just in case it gets moved again ;)
 
-		// change all <codeblock> segments before format_to_post() gets a hold of them
+		// change all <codeblock> || [codeblock]  segments before format_to_post() gets a hold of them
 		// 1 - amcode or codeblock
 		// 2 - attribs : lang &| line
 		// 3 - code block
-		$content = preg_replace_callback( '#\<(codeblock)([^>]*?)>([\s\S]+?)?\</\1>#i',
+		$content = preg_replace_callback( '#[<\[](codeblock)([^>\]]*?)[>\]]([\s\S]+?)?[<\[]/\1[>\]]#i',
 								array( $this, 'filter_codeblock_callback' ), $content );
 
-		// Quick and dirty escaping of inline code <codespan>:
-		$content = preg_replace_callback( '#<codespan>(.*?)</codespan>#',
+		// Quick and dirty escaping of inline code <codespan> || [codespan]:
+		$content = preg_replace_callback( '#[<\[]codespan[>\]](.*?)[<\[]/codespan[>\]]#',
 								array( $this, 'filter_codespan_callback' ), $content );
 
 		return true;
@@ -354,7 +354,7 @@ class code_highlight_plugin extends Plugin
 	 */
 	function format_to_edit( $block )
 	{
-		return '<codeblock'.$block[1].'>'.str_replace( array( '&lt;', '&gt;', '&amp;' ), array( '<', '>', '&' ), $block[2] ).'</codeblock>';
+		return '[codeblock'.$block[1].']'.str_replace( array( '&lt;', '&gt;', '&amp;' ), array( '<', '>', '&' ), $block[2] ).'[/codeblock]';
 	}
 
 
@@ -546,6 +546,7 @@ div.codeblock.amc_short table {
 					}
 				}
 			}
+			$this->languageCache[ $language ]->requested_language = $language;
 			$this->languageCache[ $language ]->strict_mode = $this->Settings->get( 'strict' );
 			$code = $this->languageCache[ $language ]->highlight_code( $code );
 			// add the line numbers
@@ -558,6 +559,9 @@ div.codeblock.amc_short table {
 
 /**
  * $Log$
+ * Revision 1.8  2007/07/03 10:45:00  yabs
+ * changed <codeblock/span> to [codeblock/span]
+ *
  * Revision 1.7  2007/07/01 03:59:49  fplanque
  * rollback until clean implementation
  *
