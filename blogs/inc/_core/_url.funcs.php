@@ -29,9 +29,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Fetch remote page
  *
- * Attempt to retrieve a remote page, first with cURL, then fopen, then fsockopen.
- * @todo fp> order should be cURL, then fsockopen, then fopen.
+ * Attempt to retrieve a remote page, first with cURL, then fsockopen, then fopen.
  *
+ * @todo dh> Should we try remaining methods, if the previous one(s) failed?
  * @param string URL
  * @param array Info (by reference)
  *        'error': holds error message, if any
@@ -71,7 +71,77 @@ function fetch_remote_page( $url, & $info )
 	}
 
 
-	// URL FOPEN (fallback to fsockopen, if fopen() fails):
+	// FSOCKOPEN:
+	if( function_exists('fsockopen') ) // may have been disabled
+	{
+		$info['used_method'] = 'fsockopen';
+		$url_parsed = parse_url($url);
+		if( empty($url_parsed['scheme']) ) {
+			$url_parsed = parse_url('http://'.$url);
+		}
+
+		$host = $url_parsed['host'];
+		$port = ( empty($url_parsed['port']) ? 80 : $url_parsed['port'] );
+		$path = empty($url_parsed['path']) ? '/' : $url_parsed['path'];
+		if( ! empty($url_parsed['query']) )
+		{
+			$path .= '?'.$url_parsed['query'];
+		}
+
+		$out = "GET $path HTTP/1.0\r\n";
+		$out .= "Host: $host:$port\r\n";
+		$out .= "Connection: Close\r\n\r\n";
+
+		$fp = @fsockopen($host, $port, $errno, $errstr, 30);
+		if( ! $fp )
+		{
+			$info['error'] = $errstr.' (#'.$errno.')';
+			return false;
+		}
+
+		// Set timeout for data:
+		if( function_exists('stream_set_timeout') )
+			stream_set_timeout( $fp, 20 ); // PHP 4.3.0
+		else
+			socket_set_timeout( $fp, 20 ); // PHP 4
+
+		// Send request:
+		fwrite($fp, $out);
+
+		// Read response:
+		$r = '';
+		// First line:
+		$s = fgets($fp, 4096);
+		if( ! preg_match( '~^HTTP/\d+\.\d+ (\d+)~', $s, $match ) )
+		{
+			$info['error'] = 'Invalid response.';
+			$r = false;
+		}
+		else
+		{
+			$info['status'] = $match[1];
+
+			$foundBody = false;
+			while( ! feof($fp) )
+			{
+				$s = fgets($fp, 4096);
+				if( $s == "\r\n" )
+				{
+					$foundBody = true;
+					continue;
+				}
+				if( $foundBody )
+				{
+					$r .= $s;
+				}
+			}
+		}
+		fclose($fp);
+		return $r;
+	}
+
+
+	// URL FOPEN:
 	if( ini_get('allow_url_fopen') && function_exists('stream_get_meta_data') /* PHP 4.3, may also be disabled!? */ )
 	{
 		$info['used_method'] = 'fopen';
@@ -102,79 +172,10 @@ function fetch_remote_page( $url, & $info )
 	}
 
 
-	// As a last resort, try fsockopen:
-	if( ! function_exists('fsockopen') )
-	{ // may have been disabled
-		$info['used_method'] = null;
-		$info['error'] = 'No method available to access URL!';
-		return false;
-	}
-
-	$info['used_method'] = 'fsockopen';
-	$url_parsed = parse_url($url);
-	if( empty($url_parsed['scheme']) ) {
-		$url_parsed = parse_url('http://'.$url);
-	}
-
-	$host = $url_parsed['host'];
-	$port = ( empty($url_parsed['port']) ? 80 : $url_parsed['port'] );
-	$path = empty($url_parsed['path']) ? '/' : $url_parsed['path'];
-	if( ! empty($url_parsed['query']) )
-	{
-		$path .= '?'.$url_parsed['query'];
-	}
-
-	$out = "GET $path HTTP/1.0\r\n";
-	$out .= "Host: $host:$port\r\n";
-	$out .= "Connection: Close\r\n\r\n";
-
-	$fp = @fsockopen($host, $port, $errno, $errstr, 30);
-	if( ! $fp )
-	{
-		$info['error'] = $errstr.' (#'.$errno.')';
-		return false;
-	}
-
-	// Set timeout for data:
-	if( function_exists('stream_set_timeout') )
-		stream_set_timeout( $fp, 20 ); // PHP 4.3.0
-	else
-		socket_set_timeout( $fp, 20 ); // PHP 4
-
-	// Send request:
-	fwrite($fp, $out);
-
-	// Read response:
-	$r = '';
-	// First line:
-	$s = fgets($fp, 4096);
-	if( ! preg_match( '~^HTTP/\d+\.\d+ (\d+)~', $s, $match ) )
-	{
-		$info['error'] = 'Invalid response.';
-		$r = false;
-	}
-	else
-	{
-		$info['status'] = $match[1];
-
-		$foundBody = false;
-		while( ! feof($fp) )
-		{
-			$s = fgets($fp, 4096);
-			if( $s == "\r\n" )
-			{
-				$foundBody = true;
-				continue;
-			}
-			if( $foundBody )
-			{
-				$r .= $s;
-			}
-		}
-	}
-	fclose($fp);
-
-	return $r;
+	// All failed:
+	$info['used_method'] = null;
+	$info['error'] = 'No method available to access URL!';
+	return false;
 }
 
 
@@ -216,6 +217,9 @@ function url_same_protocol( $url, $other_url = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.2  2007/07/03 22:16:15  blueyed
+ * Solved todo: changed order to "cURL, fsockopen, fopen" for fetch_remote_page
+ *
  * Revision 1.1  2007/06/25 10:58:54  fplanque
  * MODULES (refactored MVC)
  *
