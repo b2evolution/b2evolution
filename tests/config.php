@@ -46,20 +46,7 @@ if( !defined( 'TMPDIR' ) )
 define( 'EVO_MAIN_INIT', 'SIMPLETEST' );
 require_once EVODIR.'blogs/conf/_config.php';
 
-
-// Load all .class.php and .funcs.php files:
 require_once $inc_path.'_core/_class4.funcs.php';
-load_funcs('files/model/_file.funcs.php');
-
-$includes = get_filenames( $inc_path, true, false );
-foreach( $includes as $include_file )
-{
-	if( ! preg_match( '~\.(funcs|class)\.php$~', $include_file ) )
-	{
-		continue;
-	}
-	require_once $include_file;
-}
 
 
 /**

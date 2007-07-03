@@ -11,6 +11,22 @@
  */
 require_once( dirname(__FILE__).'/HtmlReporterShowPasses.class.php' );
 
+load_funcs( '_core/_misc.funcs.php' );
+
+load_class( '_core/model/_log.class.php' );
+load_class( 'files/model/_filerootcache.class.php' );
+load_class( 'files/model/_filecache.class.php' );
+load_class( 'files/model/_filetypecache.class.php' );
+load_class( '_core/model/_timer.class.php' );
+load_class( 'plugins/model/_plugins_admin.class.php' );
+load_class( 'plugins/model/_plugins_admin_no_db.class.php' );
+load_class( 'settings/model/_generalsettings.class.php' );
+load_class( 'users/model/_usersettings.class.php' );
+load_class( 'users/model/_user.class.php' );
+load_class( 'users/model/_usercache.class.php' );
+load_class( 'files/model/_file.class.php' );
+load_class( 'files/model/_filetype.class.php' );
+
 
 /**
  * Class EvoUnitTestCase

@@ -38,7 +38,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Includes:
  */
-load_class('/items/model/_itemlight.class.php');
+load_class('items/model/_itemlight.class.php');
+load_funcs('items/model/_item.funcs.php');
 
 
 /**
@@ -3063,6 +3064,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.2  2007/07/03 23:21:32  blueyed
+ * Fixed includes/requires in/for tests
+ *
  * Revision 1.1  2007/06/25 11:00:24  fplanque
  * MODULES (refactored MVC)
  *

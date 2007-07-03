@@ -16,6 +16,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_funcs('_core/_param.funcs.php');
+
+
 /**
  * Create a DB version checkpoint
  *
@@ -1901,6 +1904,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.229  2007/07/03 23:21:32  blueyed
+ * Fixed includes/requires in/for tests
+ *
  * Revision 1.228  2007/06/25 11:02:30  fplanque
  * MODULES (refactored MVC)
  *

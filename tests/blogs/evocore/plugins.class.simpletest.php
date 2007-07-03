@@ -11,6 +11,8 @@
  */
 require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 
+load_class('plugins/_plugin.class.php');
+
 
 /**
  * @package tests
