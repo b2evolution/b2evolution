@@ -44,9 +44,16 @@ require_once $inc_path.'_main.inc.php';
 
 param( 'plugin_ID', 'integer', true );
 param( 'method', 'string', '' );
-param( 'params', 'string', '' );
+param( 'params', 'string', null ); // serialized
 
-$params = @unserialize($params);
+if( is_null($params) )
+{ // Default:
+	$params = array();
+}
+else
+{ // params given. This may result in "false", but this means that unserializing failed.
+	$params = @unserialize($params);
+}
 
 
 if( $plugin_ID )
@@ -83,6 +90,9 @@ if( $plugin_ID )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.10  2007/07/04 21:11:11  blueyed
+ * $params default to array()
+ *
  * Revision 1.9  2007/04/26 00:11:14  fplanque
  * (c) 2007
  *
