@@ -75,7 +75,6 @@ class Plugins_admin extends Plugins
 	 *  - PluginSettingsEditDisplayAfter (Called after standard plugin settings are displayed for editing)
 	 *  - PluginSettingsValidateSet (Called before setting a plugin's setting in the backoffice)
 	 *  - PluginUserSettingsUpdateAction (Called as action before updating the plugin's user settings)
-	 *  - PluginUserSettingsEditAction (Called as action before editing the plugin's settings)
 	 *  - PluginUserSettingsEditDisplayAfter (Called after displaying normal user settings)
 	 *  - PluginUserSettingsValidateSet (Called before setting a plugin's user setting in the backoffice)
 	 *  - PluginVersionChanged (Called when we detect a version change)
@@ -209,6 +208,8 @@ class Plugins_admin extends Plugins
 
 				'GetCronJobs' => 'Gets a list of implemented cron jobs.',
 				'GetProvidedSkins' => 'Get a list of "skins" handled by the plugin.',
+
+				'PluginUserSettingsEditAction' => 'Called as action before editing a user\'s settings.',
 			);
 
 
@@ -1527,6 +1528,10 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.2  2007/07/04 23:37:29  blueyed
+ * PluginUserSettingsEditAction gets triggered and therefor needs to be in the
+ * list of "available events", so Plugins can actually hook there.
+ *
  * Revision 1.1  2007/06/25 11:00:46  fplanque
  * MODULES (refactored MVC)
  *
