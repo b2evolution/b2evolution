@@ -33,7 +33,7 @@ class auto_p_plugin extends Plugin
 	 * List of block elements (we want a paragraph before and after), excludes: address, added: td, th
 	 * @var string
 	 */
-	var $block_tags = 'blockquote|dd|div|dl|dt|fieldset|form|h[1-6]|hr|li|ol|p|pre|select|table|td|th|ul';
+	var $block_tags = 'blockquote|dd|div|dl|dt|fieldset|form|h[1-6]|hr|li|ol|p|pre|select|script|table|td|th|ul';
 
 
 	var $p_allowed_in = array('address', 'applet', 'blockquote', 'body', 'button', 'center', 'dd', 'del', 'div', 'fieldset', 'form', 'iframe', 'ins', 'li', 'map', 'noframes', 'noscript', 'object', 'td', 'th' );
@@ -43,7 +43,7 @@ class auto_p_plugin extends Plugin
 		// Block level:
 		'address', 'center', 'dl', 'dir', 'div', 'fieldset', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'isindex', 'menu', 'noframes', 'noscript', 'p', 'pre',
 		// Inline:
-		'a', 'abbr', 'acronym', 'applet', 'b', 'basefont', 'bdo', 'big', 'button', 'cite', 'code', 'dfn', 'em', 'font', 'i', 'img', 'input', 'iframe', 'kbd', 'label', 'li', 'map', 'object', 'q', 'samp', 'script', 'select', 'small', 'span', 'strong', 'sub', 'sup', 'textarea', 'td', 'th', 'tt', 'var' );
+		'a', 'abbr', 'acronym', 'applet', 'b', 'basefont', 'bdo', 'big', 'button', 'cite', 'code', 'dfn', 'em', 'font', 'i', 'img', 'input', 'iframe', 'kbd', 'label', 'li', 'map', 'object', 'q', 'samp', 'select', 'small', 'span', 'strong', 'sub', 'sup', 'textarea', 'td', 'th', 'tt', 'var' );
 
 
 	/**
@@ -634,6 +634,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.39  2007/07/04 19:52:00  blueyed
+ * Auto-P: Do not add BR in SCRIPT, nor wrap it in a paragraph
+ *
  * Revision 1.38  2007/05/21 17:44:10  blueyed
  * Auto-P: Fixed adding linebreaks/BR tags directly in OL elements
  *

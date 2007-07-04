@@ -323,6 +323,11 @@ class AutoPPluginTestCase extends PluginUnitTestCase
 			"<p><img class=\"foo\"/> <img class=\"bar\"  /></p>",
 			$this->render('<img class="foo"/> <img class="bar"  />') );
 
+		// Do not add BR in SCRIPT, nor wrap it in a paragraph:
+		$this->assertEqual(
+			"<p>foo</p>\n\n<script>\n\n</script>\n\n<p>bar</p>",
+			$this->render("foo\n\n<script>\n\n</script>\n\nbar") );
+
 	}
 
 }
