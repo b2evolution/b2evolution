@@ -41,6 +41,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'users/model/_group.class.php' );
+load_funcs( 'collections/model/_category.funcs.php' );
+
 /**
  * Used for fresh install
  */
@@ -631,6 +634,9 @@ If needed, a skin can format info pages differently from regular posts."), $now,
 
 /*
  * $Log$
+ * Revision 1.230  2007/07/04 21:10:25  blueyed
+ * More test include fixes
+ *
  * Revision 1.229  2007/06/27 02:23:24  fplanque
  * new default template for skins named index.main.php
  *
