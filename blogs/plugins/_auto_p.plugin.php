@@ -100,8 +100,9 @@ class auto_p_plugin extends Plugin
 
 		$content = preg_replace( "~(\r\n|\r)~", "\n", $content ); // cross-platform newlines
 
-		// Handle blocks, splitted by "<!--more-->", "<!--nextpage-->" or "<!--noteaser-->":
-		$content_parts = preg_split( '~(<!--(?:more|nextpage|noteaser)-->)~', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
+		// Handle blocks, splitted by comments. This includes especially the "meta-comments"
+		// ("<!--more-->", "<!--nextpage-->" or "<!--noteaser-->"):
+		$content_parts = preg_split( '~(<!--.*?-->)~s', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
 		$content_parts[] = '';
 
 		$content = '';
@@ -634,6 +635,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.40  2007/07/04 19:59:12  blueyed
+ * Auto-P: Do not add BR in html comments, nor wrap it in a P
+ *
  * Revision 1.39  2007/07/04 19:52:00  blueyed
  * Auto-P: Do not add BR in SCRIPT, nor wrap it in a paragraph
  *

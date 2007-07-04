@@ -328,6 +328,11 @@ class AutoPPluginTestCase extends PluginUnitTestCase
 			"<p>foo</p>\n\n<script>\n\n</script>\n\n<p>bar</p>",
 			$this->render("foo\n\n<script>\n\n</script>\n\nbar") );
 
+		// Do not add BR in html comments, nor wrap it in a P:
+		$this->assertEqual(
+			"<!-- \n\n foo \n\n --><p> bar </p><!-- \n\n foo \n\n -->",
+			$this->render("<!-- \n\n foo \n\n --> bar <!-- \n\n foo \n\n -->") );
+
 	}
 
 }
