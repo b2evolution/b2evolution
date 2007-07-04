@@ -300,7 +300,7 @@ switch( $action )
 					}
 				}
 
-				$admin_Plugins->unregister($default_Plugin);
+				$admin_Plugins->unregister($default_Plugin, true);
 			}
 		}
 
@@ -1037,6 +1037,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2007/07/04 23:38:27  blueyed
+ * Fixed unregistration of plugin instances to get the default code.
+ *
  * Revision 1.1  2007/06/25 11:00:43  fplanque
  * MODULES (refactored MVC)
  *
