@@ -46,7 +46,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<meta name="ROBOTS" content="NOINDEX, NOFOLLOW" />
 	<?php
 	global $rsc_path, $rsc_url, $htsrv_url;
-	
+
 	$paths_script = "
 	<script type=\"text/javascript\">
 		// Paths used by JS functions:
@@ -56,12 +56,12 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	</script>";
 	add_headline( $paths_script );
 
- 	// script allowing to check and uncheck all boxes in forms 
+ 	// script allowing to check and uncheck all boxes in forms
 	require_js( 'functions.js');
 	require_js( 'form_extensions.js');
 	require_js( 'anchorposition.js');
 	require_js( 'date.js');
-	
+
 	$date_overrides_script = "
 	<script type=\"text/javascript\">
 		// Override vars used by date.js (and calendarpopup.js, if present)
@@ -69,7 +69,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		var DAY_NAMES=new Array('" . implode("','", array_map('T_', $weekday)) . "','" . implode("','", array_map('T_',$weekday_abbrev)) . "');
 	</script>";
 	add_headline( $date_overrides_script );
-	
+
 	require_js( 'popupwindow.js' );
 	require_js( 'calendarpopup.js' );
 	require_js( 'rollovers.js' );
@@ -98,7 +98,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			|| ($this->get_path_range(0,1) == array('blogs', 'permgroup') ) )
 	{{{ // -- Inject javascript ----------------
 		// gets initialized in _footer.php
-		
+
 		$begin_script = <<<JS
 		<script type="text/javascript">
 		<!--
@@ -109,14 +109,14 @@ JS;
 
 			switch( $this->get_path(0) )
 			{
-				case 'files': // {{{
+				case 'files':
 				/**
 				 * Toggles status of a bunch of checkboxes in a form
 				 *
 				 * @param string the form name
 				 * @param string the checkbox(es) element(s) name
 				 * @param string number/name of the checkall set to use. Defaults to 0 and is needed when there are several "checkall-sets" on one page.
-				 */ 
+				 */
 				$toggleCheckboxes_script = "
 				function toggleCheckboxes(the_form, the_elements, set_name )
 				{
@@ -157,7 +157,7 @@ JS;
 			 *
 			 * @param integer|string number or name of the checkall "set" to use
 			 * @param boolean force setting to true/false
-			 */ 
+			 */
 			$setcheckallspan_script = "
 			function setcheckallspan( set_name, set )
 			{
@@ -231,6 +231,9 @@ JS;
 <?php
 /*
  * $Log$
+ * Revision 1.3  2007/07/04 23:36:10  blueyed
+ * Fixed folding
+ *
  * Revision 1.2  2007/06/30 22:03:34  fplanque
  * cleanup
  *
