@@ -133,8 +133,37 @@ class code_highlight_plugin extends Plugin
 					'defaultvalue' => '0', // use transitional as default
 					'note' => $this->T_( 'If enabled this will remove the \' target="_blank" \' from the PHP documentation links' ),
 				),
+			'toolbar_default' => array(
+					'label' => $this->T_( 'Display code toolbar' ),
+					'type' => 'checkbox',
+					'defaultvalue' => '1',
+					'note' => $this->T_( 'Tick this to display the code toolbar in expert mode.' ),
+				),
 			);
 		return $r;
+	}
+
+
+
+	/**
+	 * Allowing the user to override the display of the toolbar.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @see PluginSettings
+	 * @see Plugin::PluginSettingsValidateSet()
+	 *
+	 * @return array
+	 */
+	function GetDefaultUserSettings()
+	{
+		return array(
+				'display_toolbar' => array(
+					'label' => T_( 'Display code toolbar' ),
+					'defaultvalue' => $this->Settings->get('toolbar_default'),
+					'type' => 'checkbox',
+					'note' => $this->T_( 'Tick this to display the code toolbar in expert mode' ),
+				),
+			);
 	}
 
 
@@ -146,8 +175,8 @@ class code_highlight_plugin extends Plugin
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		if( $params['edit_layout'] == 'simple' )
-		{	// This is too complex for simple mode, don't display it:
+		if( $params['edit_layout'] == 'simple' || !$this->UserSettings->get( 'display_toolbar' )  )
+		{	// This is too complex for simple mode, or user doesn't want the toolbar, don't display it:
 			return false;
 		}
 
@@ -559,6 +588,10 @@ div.codeblock.amc_short table {
 
 /**
  * $Log$
+ * Revision 1.9  2007/07/05 07:59:34  yabs
+ * added user setting for display toolbar on EdB's suggestion :
+ * http://edb.evoblog.com/blogstuff/thoughts-while-i-clear-my-head
+ *
  * Revision 1.8  2007/07/03 10:45:00  yabs
  * changed <codeblock/span> to [codeblock/span]
  *
