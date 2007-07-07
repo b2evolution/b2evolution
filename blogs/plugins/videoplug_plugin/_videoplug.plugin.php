@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the GMcode plugin for b2evolution
+ * This file implements the Video Plug plugin for b2evolution
  *
  * GreyMatter style formatting
  *
@@ -13,7 +13,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * Replaces GreyMatter markup in HTML (not XML).
+ * Replaces Video Plug markup in HTML (not XML).
  *
  * @package plugins
  */
@@ -26,7 +26,7 @@ class videoplug_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '1.10';
+	var $version = '2.0';
 	var $number_of_installs = 1;
 
 
@@ -141,6 +141,9 @@ class videoplug_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.6  2007/07/07 22:21:34  fplanque
+ * doc
+ *
  * Revision 1.5  2007/05/15 21:22:16  blueyed
  * Use+replace %s for dynamic value instead of appending some string!
  *
