@@ -328,8 +328,8 @@ if( $use_strict )
 		'table' => A_attrs.' summary width border frame rules cellspacing cellpadding',  // Strict
 		'caption' => A_attrs,						// Strict
 		'tr' => A_attrs.' '.A_cellhalign.' '.A_cellvalign,	// Strict
-		'th' => A_attrs.' abbr axis headers scope rowspan colspan'.A_cellhalign.' '.A_cellvalign,	// Strict
-		'td' => A_attrs.' abbr axis headers scope rowspan colspan'.A_cellhalign.' '.A_cellvalign,	// Strict
+		'th' => A_attrs.' abbr axis headers scope rowspan colspan '.A_cellhalign.' '.A_cellvalign,	// Strict
+		'td' => A_attrs.' abbr axis headers scope rowspan colspan '.A_cellhalign.' '.A_cellvalign,	// Strict
 	);
 }
 else
@@ -364,8 +364,8 @@ else
 		'table' => A_attrs.' summary width border frame rules cellspacing cellpadding align bgcolor',								// Transitional
 		'caption' => A_attrs.' align',																								// Transitional
 		'tr' => A_attrs.' '.A_cellhalign.' '.A_cellvalign.' bgcolor',																// Transitional
-		'th' => A_attrs.' abbr axis headers scope rowspan colspan'.A_cellhalign.' '.A_cellvalign.' nowrap bgcolor width height',	// Transitional
-		'td' => A_attrs.' abbr axis headers scope rowspan colspan'.A_cellhalign.' '.A_cellvalign.' nowrap bgcolor width height',	// Transitional
+		'th' => A_attrs.' abbr axis headers scope rowspan colspan '.A_cellhalign.' '.A_cellvalign.' nowrap bgcolor width height',	// Transitional
+		'td' => A_attrs.' abbr axis headers scope rowspan colspan '.A_cellhalign.' '.A_cellvalign.' nowrap bgcolor width height',	// Transitional
 	);
 }
 $allowed_attributes += array
