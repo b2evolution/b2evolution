@@ -210,7 +210,8 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	</div>
 
 	<div id="itemform_post_excerpt">
-		<label for="post_excerpt"><strong><?php echo T_('Excerpt') ?>:</strong></label><br />
+		<label for="post_excerpt"><strong><?php echo T_('Excerpt') ?>:</strong>
+		<span class="notes"><?php echo T_('(for XML feeds)') ?></span></label><br />
 		<textarea name="post_excerpt" rows="2" class="large" id="post_excerpt"><?php $edited_Item->disp( 'excerpt', 'formvalue' ) ?></textarea>
 	</div>
 	<?php
@@ -349,6 +350,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.3  2007/07/09 19:07:44  fplanque
+ * minor
+ *
  * Revision 1.2  2007/06/30 21:23:19  fplanque
  * moved excerpt
  *

@@ -74,6 +74,7 @@ code {
 .red {
 	color: #f00;
 }
+
 .shrinkwrap {
 	width: 1%;
 	white-space:nowrap;
@@ -96,6 +97,14 @@ a.discrete {
 a.selected {
 	font-weight: bold;
 }
+
+ul.expanded li, 
+ol.expanded li
+{
+	margin-top: 2ex;
+	margin-bottom: 2ex;
+}
+
 
 /*
  * Evo Toolbar

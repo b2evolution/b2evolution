@@ -137,7 +137,7 @@ class code_highlight_plugin extends Plugin
 					'label' => $this->T_( 'Display code toolbar' ),
 					'type' => 'checkbox',
 					'defaultvalue' => '1',
-					'note' => $this->T_( 'Tick this to display the code toolbar in expert mode.' ),
+					'note' => $this->T_( 'Check this to display the code toolbar in expert mode (indivdual users can override this).' ),
 				),
 			);
 		return $r;
@@ -161,7 +161,7 @@ class code_highlight_plugin extends Plugin
 					'label' => T_( 'Display code toolbar' ),
 					'defaultvalue' => $this->Settings->get('toolbar_default'),
 					'type' => 'checkbox',
-					'note' => $this->T_( 'Tick this to display the code toolbar in expert mode' ),
+					'note' => $this->T_( 'Check this to display the code toolbar in expert mode' ),
 				),
 			);
 	}
@@ -588,6 +588,9 @@ div.codeblock.amc_short table {
 
 /**
  * $Log$
+ * Revision 1.10  2007/07/09 19:07:44  fplanque
+ * minor
+ *
  * Revision 1.9  2007/07/05 07:59:34  yabs
  * added user setting for display toolbar on EdB's suggestion :
  * http://edb.evoblog.com/blogstuff/thoughts-while-i-clear-my-head
