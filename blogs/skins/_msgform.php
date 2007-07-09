@@ -14,9 +14,9 @@
  *
  * @package evoskins
  *
- * @todo dh> A user/blog might want to accept only mails from logged in users
+ * @todo dh> A user/blog might want to accept only mails from logged in users (fp>yes!)
  * @todo dh> For logged in users the From name and address should be not editable/displayed
- *           (the same as when commenting).
+ *           (the same as when commenting). (fp>yes!!!)
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -196,6 +196,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.36  2007/07/09 20:15:59  fplanque
+ * doc
+ *
  * Revision 1.35  2007/07/09 20:03:59  blueyed
  * - Prefer current User's name+email instead of the ones from comment remember-me cookies
  * - todos
