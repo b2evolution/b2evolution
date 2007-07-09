@@ -170,43 +170,81 @@ class Skin extends DataObject
 	{
 		global $skins_path, $Messages;
 
-		$rf_main_subpath = $this->folder.'/index.main.php';
-		$af_main_path = $skins_path.$rf_main_subpath;
+		$this->container_list = array();
 
-		if( ! is_readable($af_main_path) )
+		if( ! $dir = @opendir($skins_path.$this->folder) )
 		{
-			$Messages->add( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
+			$Messages->add( 'Cannot open skin directory.', 'error' ); // No trans
 			return false;
 		}
 
-		$file_contents = @file_get_contents( $af_main_path );
-		if( ! is_string($file_contents) )
+		while( ( $file = readdir($dir) ) !== false )
 		{
-			$Messages->add( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
-			return false;
+			$rf_main_subpath = $this->folder.'/'.$file;
+			$af_main_path = $skins_path.$rf_main_subpath;
+
+			if( !is_file( $af_main_path ) || ! preg_match( '¤\.php$¤', $file ) )
+			{ // Not a php template file
+				continue;
+			}
+
+			if( ! is_readable($af_main_path) )
+			{
+				$Messages->add( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
+				continue;
+			}
+
+			$file_contents = @file_get_contents( $af_main_path );
+			if( ! is_string($file_contents) )
+			{
+				$Messages->add( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
+				continue;
+			}
+
+
+			// if( ! preg_match_all( '~ \$Skin->container\( .*? (\' (.+?) \' )|(" (.+?) ") ~xmi', $file_contents, $matches ) )
+			if( ! preg_match_all( '~ \$Skin->container\( .*? ((\' (.+?) \')|(" (.+?) ")) ~xmi', $file_contents, $matches ) )
+			{	// No containers in this file
+				continue;
+			}
+
+			// Merge matches from the two regexp parts (due to regexp "|" )
+			$container_list = array_merge( $matches[3], $matches[5] );
+
+			$c = 0;
+			foreach( $container_list as $container )
+			{
+				if( empty($container) )
+				{	// regexp empty match
+					continue;
+				}
+
+				$c++;
+
+				if( in_array( $container, $this->container_list ) )
+				{	// we already have that one
+					continue;
+				}
+
+				$this->container_list[] = $container;
+			}
+
+			if( $c )
+			{
+				$Messages->add( sprintf( T_('%d containers have been found in skin template &laquo;%s&raquo;.'), $c, $rf_main_subpath ), 'success' );
+			}
 		}
-
-
-		// if( ! preg_match_all( '~ \$Skin->container\( .*? (\' (.+?) \' )|(" (.+?) ") ~xmi', $file_contents, $matches ) )
-		if( ! preg_match_all( '~ \$Skin->container\( .*? ((\' (.+?) \')|(" (.+?) ")) ~xmi', $file_contents, $matches ) )
-		{
-			$Messages->add( sprintf( T_('No containers found in skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
-			return false;
-		}
-
-		// Merge matches from the two regexp parts (due to regexp "|" )
-		$container_list = array_merge( $matches[3], $matches[5] );
-
-		// Filter out empty elements (due to regexp "|" )
-		$this->container_list = array_filter( $container_list, create_function( '$a', 'return !empty($a);' ) );
 
 		// pre_dump( $this->container_list );
 
+		if( empty($this->container_list) )
+		{
+			$Messages->add( T_('No containers found in this skin!'), 'error' );
+			return false;
+		}
 
-		$Messages->add( sprintf( T_('%d containers have been found in the skin file.'), count( $this->container_list ) ), 'success' );
 		return true;
 	}
-
 
 	/**
 	 * @return array
@@ -370,6 +408,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2007/07/09 19:49:29  fplanque
+ * Look for containers in all skin templates.
+ *
  * Revision 1.2  2007/06/27 02:23:24  fplanque
  * new default template for skins named index.main.php
  *
