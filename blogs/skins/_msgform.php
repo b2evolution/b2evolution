@@ -13,6 +13,10 @@
  * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
+ *
+ * @todo dh> A user/blog might want to accept only mails from logged in users
+ * @todo dh> For logged in users the From name and address should be not editable/displayed
+ *           (the same as when commenting).
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -26,31 +30,26 @@ $comment_id = param( 'comment_id', 'integer', '' );
 $subject = param( 'subject', 'string', '' );
 
 
-// If the user has the cookies set from commenting use those as a default from.
-if( isset($_COOKIE[$cookie_name]) )
+// User's preferred name or the stored value in her cookie (from commenting):
+$email_author = '';
+if( is_logged_in() )
+{
+	$email_author = $current_User->get_preferred_name();
+}
+if( ! strlen($email_author) && isset($_COOKIE[$cookie_name]) )
 {
 	$email_author = trim($_COOKIE[$cookie_name]);
 }
-elseif( is_logged_in() )
-{
-	$email_author = $current_User->get('preferredname');
-}
-else
-{
-	$email_author = '';
-}
 
-if( isset($_COOKIE[$cookie_email]) )
-{
-	$email_author_address = trim($_COOKIE[$cookie_email]);
-}
-elseif( is_logged_in() )
+// User's email address or the stored value in her cookie (from commenting):
+$email_author_address = '';
+if( is_logged_in() )
 {
 	$email_author_address = $current_User->email;
 }
-else
+if( ! strlen($email_author_address) && isset($_COOKIE[$cookie_email]) )
 {
-	$email_author_address = '';
+	$email_author_address = trim($_COOKIE[$cookie_email]);
 }
 
 $recipient_User = NULL;
@@ -197,6 +196,10 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.35  2007/07/09 20:03:59  blueyed
+ * - Prefer current User's name+email instead of the ones from comment remember-me cookies
+ * - todos
+ *
  * Revision 1.34  2007/06/30 01:25:15  fplanque
  * fixes
  *
