@@ -107,6 +107,13 @@ label.radiooption {
 	background-color: #fff; /* dh> change to "transparent"? */
 	padding: .5ex 1ex;
 }
+
+legend {
+	font-weight: bold;
+	color: #888;
+}
+
+
 .fform fieldset fieldset {
 	border: none;
 	margin: 1ex;

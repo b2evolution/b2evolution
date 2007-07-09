@@ -1476,13 +1476,6 @@ class AdminUI_general
 		}
 
 
-		$this->add_menu_entries( NULL, array(
-					'adssense' => array(
-						'text' => T_('AdSense'),
-						'href' => 'admin.php?ctrl=adsense',
-					),
-				) );
-
 		// Call AdminAfterMenuInit to notify Plugins that the menu is initialized
 		// E.g. the livehits_plugin and weather_plugin use it for adding a menu entry.
 		$Plugins->trigger_event( 'AdminAfterMenuInit' );
@@ -1544,6 +1537,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.62  2007/07/09 23:03:04  fplanque
+ * cleanup of admin skins; especially evo
+ *
  * Revision 1.61  2007/07/09 21:24:11  fplanque
  * cleanup of admin page top
  *

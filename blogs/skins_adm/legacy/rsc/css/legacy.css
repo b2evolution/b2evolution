@@ -8,7 +8,7 @@
  * @package admin
  */
 
-@import url(desert.css);	/* based on desert.css */
+@import url(legbase.css);
 
 /* Titles */
 #TitleArea h1 {
@@ -134,44 +134,6 @@ div.PostActionsArea input:hover {
 input.DeleteButton:hover {
 	background-color: #fec;
 	background-image: url(../img/legacy-button.gif);
-}
-
-/* Tables: */
-
-table.grouped
-{
-	border: 1px solid #999;
-}
-
-table.grouped tr {
-	background-color: #eee;
-}
-table.grouped tr:hover,
-table.grouped tr.odd:hover {
-	background-color: #ccc;
-}
-table.grouped td {
-	border-left: 1px solid #999;
-}
-
-table.grouped tr.odd {
-	background-color: #ddd;
-}
-
-table.grouped th,
-table.grouped tr.total td {
-	border-bottom: 1px solid #999;
-	border-left: 1px solid #999;
-	color: #fff;
-	background-color: #abc;
-}
-
-tr.group td {
-	color: #999;
-	background-color: #ccc;
-	border-left: 0;
-	border-top: 1px solid #999;
-	border-bottom: 1px solid #999;
 }
 
 /* Page layout: */

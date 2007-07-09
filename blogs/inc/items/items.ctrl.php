@@ -583,7 +583,7 @@ switch( $action )
 	case 'list':
 		// We're displaying a list of posts:
 
-		$AdminUI->title = $AdminUI->title_titlearea = T_('Browse blog:');
+		$AdminUI->title = $AdminUI->title_titlearea = T_('Browse blog');
 
 		// Generate available blogs list:
 		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_ismember', 'view', 'admin.php?ctrl=items&amp;blog=%d&amp;tab='.$tab.'&amp;filter=restore' );
@@ -719,6 +719,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2007/07/09 23:03:04  fplanque
+ * cleanup of admin skins; especially evo
+ *
  * Revision 1.1  2007/06/25 11:00:24  fplanque
  * MODULES (refactored MVC)
  *

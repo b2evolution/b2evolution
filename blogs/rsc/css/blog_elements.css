@@ -131,6 +131,11 @@ td.bCalendarEmptyCell {
 .bCalendarLinkPost {
 	font-weight: bold;
 }
+#bCalendarToday {
+	background-color: #f6eeee;
+	border: 1px solid #900;
+}
+
 /* TODO: not very unique IDs! (prev/next) - used in Calendar at least*/
 td#prev,
 td#next {
