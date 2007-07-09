@@ -204,6 +204,21 @@ if( !$Messages->count('error') )
 			break;
 
 
+		case 'change_admin_skin':
+			// Skin switch from menu
+			param( 'new_admin_skin', 'string', true );
+	    param( 'redirect_to', 'string', '' );
+
+	    $UserSettings->set( 'admin_skin', $new_admin_skin );
+			$UserSettings->dbupdate();
+			$Messages->add( sprintf( T_('Admin skin changed to &laquo;%s&raquo;'), $new_admin_skin ), 'success' );
+
+      header_nocache();
+			header_redirect();
+			/* EXITED */
+			break;
+
+
 		case 'userupdate':
 			// Update existing user OR create new user:
 			if( empty($edited_User) || !is_object($edited_User) )
@@ -814,6 +829,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2007/07/09 20:11:53  fplanque
+ * admin skin switcher
+ *
  * Revision 1.1  2007/06/25 11:01:44  fplanque
  * MODULES (refactored MVC)
  *

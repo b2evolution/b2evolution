@@ -52,7 +52,8 @@ global $home_url, $admin_url;
 					// echo '<ul>';
 					foreach( $admin_skins as $admin_skin )
 					{
-						echo '<li><a href="'.regenerate_url().'">TEST - '.$admin_skin.'</a></li>';
+						echo '<li><a href="admin.php?ctrl=users&amp;action=change_admin_skin&amp;new_admin_skin='
+											.rawurlencode($admin_skin).'">Admin skin: '.$admin_skin.'</a></li>';
 					}
 					// echo '</ul>';
 					// echo '</li>';
