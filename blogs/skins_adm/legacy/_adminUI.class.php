@@ -105,19 +105,19 @@ class AdminUI extends AdminUI_general
 	function get_page_head()
 	{
 		global $htsrv_url_sensitive, $baseurl, $admin_url, $rsc_url, $Blog;
+		global $app_shortname, $app_version;
 
 		$r = '
 		<div id="header">
 			<div id="headfunctions">
-				'.T_('Color scheme:').'
+				'.$app_shortname.' v <strong>'.$app_version.'</strong> &middot;
+				'.T_('Color:').'
 				<a href="#" onclick="StyleSwitcher.setActiveStyleSheet(\'Variation\'); return false;" title="Variation (Default)">V</a>'
 				.'&middot;<a href="#" onclick="StyleSwitcher.setActiveStyleSheet(\'Desert\'); return false;" title="Desert">D</a>'
 				.'&middot;<a href="#" onclick="StyleSwitcher.setActiveStyleSheet(\'Legacy\'); return false;" title="Legacy">L</a>'
 				.( is_file( dirname(__FILE__).'/rsc/css/custom.css' ) ? '&middot;<a href="#" onclick="StyleSwitcher.setActiveStyleSheet(\'Custom\'); return false;" title="Custom">C</a>' : '' )
 				.'
-			</div>
-
-			<div id="headinfo">'.$this->get_head_info().'</div>'
+			</div>'
 
 			// Display MAIN menu:
 			.$this->get_html_menu().'

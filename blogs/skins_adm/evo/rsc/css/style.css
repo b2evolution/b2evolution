@@ -290,34 +290,7 @@ table.grouped th a.basic_sort_link:hover {
 	background-color: #efede0;
 	border: 1px solid #e1ddce; /* force moz to display float before */
 }
-#evologo {
-	float: left;
-	margin: 2px 1ex 0;
-	border: 0;
-	/* border: 1px solid #00f; */
-}
-#headfunctions {
-	float:right;
-	margin-right: 1ex;
-	color: #b0b0b0;
-}
-#headfunctions a {
-	padding: 1px;
-	color: #b0b0b0;
-	background-color: transparent;
-	text-decoration: none;
-}
-#headfunctions a:hover {
-	color: #000;
-	background-color: #f0e0e0;
-	text-decoration: none;
-}
-#headinfo {
-	padding-top: .5ex;
-	padding-left: 1em;
-	color: #b0b0b0;
-	white-space: nowrap;
-}
+
 #header h1 {
 	margin: 0;
 	padding: .5ex;

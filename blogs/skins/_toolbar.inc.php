@@ -18,7 +18,7 @@ if( ! is_logged_in() )
 
 global $Blog;
 
-global $is_admin_page;
+global $is_admin_page, $localtimenow;
 
 /**
  * @var User
@@ -65,6 +65,8 @@ global $home_url, $admin_url;
 		user_logout_link( '<li>', '</li>', T_('Logout') );
 		?>
 		</ul>
+	</li>
+	<li class="time"><?php echo date( locale_shorttimefmt(), $localtimenow ); ?></li>
 	</li>
 	<?php
 		if( $is_admin_page )

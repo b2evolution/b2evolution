@@ -48,16 +48,7 @@ class AdminUI_general
 	 *
 	 * @var string
 	 */
-	var $pathSeparator;
-
-	/**
-	 * The Logo for the admin.
-	 *
-	 * Defaults to {@link $app_admin_logo} if not set.
-	 *
-	 * @var string
-	 */
-	var $admin_logo;
+	var $pathSeparator = ' &rsaquo; ';
 
 	/*-------------------------------------------------------------------*/
 	/*- The members below should not get overridden in a derived class. -*/
@@ -121,18 +112,6 @@ class AdminUI_general
 		global $htsrv_url, $baseurl;
 
 		$this->mode = $mode;
-
-		if( is_null($this->admin_logo) )
-		{
-			global $app_admin_logo;
-			$this->admin_logo = $app_admin_logo;
-		}
-
-		if( is_null($this->pathSeparator) )
-		{
-			global $admin_path_separator;
-			$this->pathSeparator = $admin_path_separator;
-		}
 
 		$this->init_templates();
 	}
@@ -1497,6 +1476,13 @@ class AdminUI_general
 		}
 
 
+		$this->add_menu_entries( NULL, array(
+					'adssense' => array(
+						'text' => T_('AdSense'),
+						'href' => 'admin.php?ctrl=adsense',
+					),
+				) );
+
 		// Call AdminAfterMenuInit to notify Plugins that the menu is initialized
 		// E.g. the livehits_plugin and weather_plugin use it for adding a menu entry.
 		$Plugins->trigger_event( 'AdminAfterMenuInit' );
@@ -1536,8 +1522,6 @@ class AdminUI_general
 
 		$r = '
 		<div id="header">
-			'.$this->admin_logo.'
-
 			<div id="headinfo">
 				<span id="headfunctions">'
 					// Note: if we log in with another user, we may not have the perms to come back to the same place any more, thus: redirect to admin home.
@@ -1547,7 +1531,6 @@ class AdminUI_general
 				</span>
 
 				'.$app_shortname.' v <strong>'.$app_version.'</strong>
-				&middot; '.$this->get_head_info().'
 			</div>
 
 			<h1>'.$this->get_title_for_titlearea().'</h1>
@@ -1557,30 +1540,13 @@ class AdminUI_general
 		return $r;
 	}
 
-
-	/**
-	 * Get default head info (local time, GMT, Login).
-	 *
-	 * @return string
-	 */
-	function get_head_info()
-	{
-		global $app_shortname, $app_version, $pagenow, $obhandler_debug, $localtimenow, $servertimenow, $current_User;
-
-		$r = '';
-
-		if( !$obhandler_debug )
-		{ // don't display changing time when we want to test obhandler
-			$r .= $app_shortname.' v <strong>'.$app_version.'</strong> &middot; '.T_('Time:').' <strong>'.date_i18n( locale_timefmt(), $localtimenow ).'</strong>';
-		}
-
-		return $r;
-	}
-
 }
 
 /*
  * $Log$
+ * Revision 1.61  2007/07/09 21:24:11  fplanque
+ * cleanup of admin page top
+ *
  * Revision 1.60  2007/06/25 11:02:33  fplanque
  * MODULES (refactored MVC)
  *

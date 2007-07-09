@@ -342,7 +342,7 @@ table.grouped tr.total td{
 	background: url(../img/bg.gif) repeat-x bottom;
 	font-size:85%;
 	line-height:normal;
-	padding:0;
+	padding: 0;
 	margin:0;
 }
 #TitleArea {
@@ -351,17 +351,10 @@ table.grouped tr.total td{
 	padding: 0;
 	border-top: 1px solid #fff;	/* force moz to display float before */
 }
-#evologo {
-	float:left;
-	padding-left: 1em;
-	padding-right: 1em;
-	vertical-align: middle;
-	border: 0;
-}
+
 #headfunctions {
-	line-height: 200%;
 	float:right;
-	margin-right: 1em;
+	margin: 3px 1em;
 	color: #b0b0b0;
 }
 #headfunctions a {
@@ -375,12 +368,7 @@ table.grouped tr.total td{
 	background-color: #f0e0e0;
 	text-decoration: none;
 }
-#headinfo {
-	padding-left: 1em;
-	line-height: 200%;
-	color: #b0b0b0;
-	white-space: nowrap;
-}
+
 .panelbody {
 	margin: 0;
 	padding: 0;

@@ -415,6 +415,16 @@ function locale_timefmt()
 	return $locales[$current_locale]['timefmt'];
 }
 
+/**
+ * Returns the current locale's default short time format
+ */
+function locale_shorttimefmt()
+{
+	global $locales, $current_locale;
+
+	return str_replace( ':s', '', $locales[$current_locale]['timefmt'] );
+}
+
 
 function locale_datetimefmt( $separator = ' ' )
 {
@@ -956,6 +966,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.3  2007/07/09 21:24:12  fplanque
+ * cleanup of admin page top
+ *
  * Revision 1.2  2007/06/26 02:40:54  fplanque
  * security checks
  *

@@ -188,6 +188,12 @@ div#evo_toolbar li.separator {
 div#evo_toolbar hr {
 	display: block;
 }
+
+div#evo_toolbar .time {
+	margin: 0 1ex;
+	color: GrayText;
+}
+
 /*
 {{{ Messages
 */

@@ -31,7 +31,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<title><?php echo $app_shortname.$admin_path_separator.$page_title ?></title>
+	<title><?php echo $app_shortname.' &rsaquo; '.$page_title ?></title>
 	<meta name="ROBOTS" content="NOINDEX" />
 	<link href="<?php echo $rsc_url ?>css/login.css" rel="stylesheet" type="text/css" />
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
@@ -59,6 +59,9 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
+ * Revision 1.3  2007/07/09 21:24:11  fplanque
+ * cleanup of admin page top
+ *
  * Revision 1.2  2007/06/30 22:03:34  fplanque
  * cleanup
  *
