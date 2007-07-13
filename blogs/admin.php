@@ -2,6 +2,10 @@
 /**
  * This is the main dispatcher for the admin interface.
  *
+ * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT PHP IS NOT PROPERLY INSTALLED
+ * ON YOUR WEB SERVER. IF YOU DON'T KNOW WHAT THIS MEANS, CONTACT YOUR SERVER ADMINISTRATOR
+ * OR YOUR HOSTING COMPANY.
+ *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
@@ -221,6 +225,9 @@ $Hit->log();
 
 /*
  * $Log$
+ * Revision 1.25  2007/07/13 23:47:36  fplanque
+ * New start pages!
+ *
  * Revision 1.24  2007/06/25 10:58:47  fplanque
  * MODULES (refactored MVC)
  *

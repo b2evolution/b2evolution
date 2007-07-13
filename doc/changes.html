@@ -1,835 +1,936 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US"><!-- InstanceBegin template="/Templates/evo_distrib_2.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-	<title>b2evolution: Version history</title>
+	<!-- InstanceBeginEditable name="doctitle" -->
+	<title>b2evolution</title>
+	<!-- InstanceEndEditable -->
+	<link href="../blogs/rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
+	<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
+	<!-- InstanceParam name="lang" type="text" value="en-US" --> 
 </head>
 
 <body>
-	<img src="../blogs/rsc/img/b2evolution_logo_360.gif" alt="b2evolution" />
-	<h1>Changelog</h1>
-	<p>Only public releases are listed here.</p>
+	<div class="wrapper1">
+	<div class="wrapper2">
+	<div class="wrapper3">
+		<span class="version_top"><!-- InstanceBeginEditable name="Version" -->Plublic release changelog<!-- InstanceEndEditable --></span>	
+	
+		<a href="http://b2evolution.net/" target="_blank"><img src="../blogs/rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
+		
+		<div class="menu_top"><!-- InstanceBeginEditable name="MenuTop" --> 
+			<span class="floatright"> After install: <a href="../blogs/index.php">Blogs</a> &bull; <a href="../blogs/admin.php">Admin</a> </span> 
+			Before install: <a href="../index.html">Hello!</a> &bull; <a href="changes.html">Changelog</a> &bull; <a href="../blogs/install/index.php">Installer</a> 
+		<!-- InstanceEndEditable --></div>
+		
+		<!-- InstanceBeginEditable name="Main" -->
+		<div class="block1">
+		<div class="block2">
+		<div class="block3">
 
-	<h2>2.0-dev (CVS)</h2>
-	<ul>
-		<li>Enhanced Blogs:
+			<h1>2.0 series</h1>
+			<p>Plugins from 1.10 will generally work with this version.</p>
+			<p>Skins from 1.10 need some changes (<a href="http://manual.b2evolution.net/Upgrade_from_1.10.x_to_2.0.x">upgrade instructions</a>). NOTE: the 2.0 skintags are not final yet!</p>
+			<h2>2.0-alpha &quot;Chicago&quot;</h2>
 			<ul>
-				<li>Pages: use out-of-flow posts for general information pages. (fplanque)</li>
-			  <li>You can write Excerpts for posts and use them in XML feeds (instead of full contents). (fplanque) </li>
-				<li>Each blog has now an owner; skins have a link to contact the owner on all default skins (fplanque)</li>
-				<li>Photoblog features (fplanque)</li>
-			</ul>
-		</li>
-		<li>Enhanced Skins:<ul>
-		  <li>evoSkins 2.0 offering superior flexibility in customizing different views based on what is being displayed ($disp) (fplanque) </li>
-		  <li>evoSkins 2.0 implement widget containers: (fplanque)
-		  	<ul>
-		  		<li>Containers can receive widgets directly from the backoffice. No file editing necessary. (fplanque)</li>
-	  		  <li>Widgets can be provided by plugins (&quot;SkinTag&quot; reloaded).</li>
-		  	  <li>Widgets receive default presentation params from the skin's container in order to automagically adjust their look to the skin they're used in (fplanque).</li>
-	  	  	<li>Widget can be configured to behave/display differently in every location where they are displayed. (fplanque)</li>
-		  		<li>Cascading widget params: overall defaults &lt; widget defaults &lt; container/calltime params &lt; widget specific configs (saved in DB)</li>
-		  	</ul>
-		  </li>
-	    <li>Default widgets:
-	    	<ul>
-	    		<li> Blog list:
-	    			<ul>
-	    				<li> Public blog list : Display list of all blogs marked as public.</li>
-    					<li>Same owner's blog list : Display list of all blogs owned by the same user.</li>
- 						</ul>
-	    		</li>
-   				<li> Blog header:
+				<li>Enhanced Blogs:
+					<ul>
+						<li>Pages: use out-of-flow posts for general information pages. (fplanque)</li>
+						<li>You can write Excerpts for posts and use them in XML feeds (instead of full contents). (fplanque) </li>
+						<li>Each blog has now an owner; skins have a link to contact the owner on all default skins (fplanque)</li>
+						<li>Photoblog features (fplanque)</li>
+					</ul>
+				</li>
+				<li>Enhanced Skins:<ul>
+					<li>evoSkins 2.0 offering superior flexibility in customizing different views based on what is being displayed ($disp) (fplanque) </li>
+					<li>evoSkins 2.0 implement widget containers: (fplanque)
 						<ul>
-							<li> Blog logo : Include a logo/image from the blog's file root.           </li>
-							<li>Blog title : Display blog title</li>
-							<li>Blog tagline :Display blog's tagline     </li>
+							<li>Containers can receive widgets directly from the backoffice. No file editing necessary. (fplanque)</li>
+							<li>Widgets can be provided by plugins (&quot;SkinTag&quot; reloaded).</li>
+							<li>Widgets receive default presentation params from the skin's container in order to automagically adjust their look to the skin they're used in (fplanque).</li>
+							<li>Widget can be configured to behave/display differently in every location where they are displayed. (fplanque)</li>
+							<li>Cascading widget params: overall defaults &lt; widget defaults &lt; container/calltime params &lt; widget specific configs (saved in DB)</li>
 						</ul>
-   				</li>
-    			<li> Blog contents:
-    				<ul>
-    					<li>Page list : Display list of all pages           </li>
-   						<li>Post list : Display list of all posts     </li>
-   					</ul>
-    			</li>
-    			<li>Meta contents:
+					</li>
+					<li>Default widgets:
 						<ul>
-							<li>Long Description of this Blog : Display this blog's long description.</li>
-							<li>Free HTML : Display a block of free HTML code.     </li>
+							<li> Blog list:
+								<ul>
+									<li> Public blog list : Display list of all blogs marked as public.</li>
+									<li>Same owner's blog list : Display list of all blogs owned by the same user.</li>
+								</ul>
+							</li>
+							<li> Blog header:
+								<ul>
+									<li> Blog logo : Include a logo/image from the blog's file root.           </li>
+									<li>Blog title : Display blog title</li>
+									<li>Blog tagline :Display blog's tagline     </li>
+								</ul>
+							</li>
+							<li> Blog contents:
+								<ul>
+									<li>Page list : Display list of all pages           </li>
+									<li>Post list : Display list of all posts     </li>
+								</ul>
+							</li>
+							<li>Meta contents:
+								<ul>
+									<li>Long Description of this Blog : Display this blog's long description.</li>
+									<li>Free HTML : Display a block of free HTML code.     </li>
+								</ul>
+							</li>
+							<li> Tools:
+								<ul>
+									<li> Common Navigation Links : Display these links: Recently, Archives, Categories, Latest Comments           </li>
+									<li>Content Search Form : Display search form           </li>
+									<li>XML Feeds (RSS / Atom) : Display list of all available XML feeds.           </li>
+									<li>User Tools : Display user tools: Log in, Admin, Profile, Subscriptions, Log out</li>
+								</ul>
+							</li>
+							<li> Other contents:
+								<ul>
+									<li> Linkblog Display : list of entries from the linkblog, grouped by category.</li>
+								</ul>
+							</li>
+							<li> Widgets provided by Plugins:
+								<ul>
+									<li>Calendar Widget : This skin tag displays a navigable calendar.</li>
+									<li>Archives Widget : This skin tag displays a list of post archives.</li>
+									<li>Categories Widget : This skin tag displays the list of available categories for the blog</li>
+									<li>Who's online : This skin tag displays who is online</li>
+								</ul>
+							</li>
 						</ul>
-    			</li>
-    			<li> Tools:
-    				<ul>
-    					<li> Common Navigation Links : Display these links: Recently, Archives, Categories, Latest Comments           </li>
-   						<li>Content Search Form : Display search form           </li>
-    					<li>XML Feeds (RSS / Atom) : Display list of all available XML feeds.           </li>
-    					<li>User Tools : Display user tools: Log in, Admin, Profile, Subscriptions, Log out</li>
-   					</ul>
-    			</li>
-          <li> Other contents:
-						<ul>
-    					<li> Linkblog Display : list of entries from the linkblog, grouped by category.</li>
-   					</ul>
-    			</li>
-    			<li> Widgets provided by Plugins:
-    				<ul>
-    					<li>Calendar Widget : This skin tag displays a navigable calendar.</li>
-   						<li>Archives Widget : This skin tag displays a list of post archives.</li>
-    					<li>Categories Widget : This skin tag displays the list of available categories for the blog</li>
-    					<li>Who's online : This skin tag displays who is online</li>
-   					</ul>
-    			</li>
-   			</ul>
-	    </li>
-	    <li>Links to move to previous &amp; next post in single post display mode. (fplanque)</li>
-		</ul>
-		</li>
-		<li>Enhanced Back-office:
-      <ul>
-      	<li>Reorganized backoffice (fplanque)</li>
-     	  <li>Removed annoying "ping" screen after posting/editing (fplanque)</li>
-        <li>Dashboard (fplanque)</li>
-        <li>New category/chapter management interface (fplanque)</li>
-      </ul>
-    </li>
-    <li>Enhanced Filemanager:
-			<ul>
-				<li>Added integrated File editor into the File manager. Allows editing of skin files. (fplanque)</li>
-				<li>Massive refactoring of the File Manager / interface cleanup (fplanque).</li>
-				<li>Automatic generation and caching of thumbnails for images in the File Manager. (fplanque)</li>
-				<li>Ability to create (photoblog) posts with selected files in file manager. (fplanque)</li>
-			</ul>
-		</li>
-    <li>Enhanced Security:
-    	<ul>
-    		<li>Backoffice system checks page to help secure your server and assist in troubleshooting (fplanque)</li>
-   		  <li>Login form: If Javascript is available the password gets hashed by the client before it gets sent "over the wire". It uses a random salt generated by the server for this on every login attempt. <br />
-    		It's still recommended to set $htsrv_url_sensitive to an SSL URL, but at least this helps a bit. Plugins which need the raw password can hook into the new LoginAttemptNeedsRawPassword event and return true there. (blueyed)</li>
- 		  </ul>
-    </li>
-    <li>Enhanced Configuration
-      <ul>
-      	<li>Several options can now be set on a per Blog basis in the backoffice:
-        		<ul>
-        			<li>Default ordering of posts: by date, by title, by priority... (fplanque) </li>
-        			<li>Number of posts (or days) per page to display (fplanque)</li>
-        			<li>Number of posts for RSS/Atom feeds (fplanque)</li>
-        			<li>Content of feeds (excerpts, full posts...) (fplanque)</li>
-        			<li>Archive mode (monthly, weekly, daily...) (fplanque)</li>
-        			<li>Permalink and other link formats (fplanque)</li>
-        			<li>Allowing users to subscribe to email notifications (fplanque)</li>
-     			</ul>
-     		</li>
-   	    <li>Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs. Look into Advanced Settings for the aggregating blog. (fplanque)</li>
-        <li>Made default chmod settings for dirs/files editable (blueyed)</li>
-        <li>Workflow properties are now hidden by default. Can be enabled on a per blog basis (fplanque)</li>
-        <li>User feature settings can be reset to defaults, including PluginUserSettings (blueyed)</li>
-        <li>&quot;Multiple sessions per user&quot; setting. This will ensure logout from public computers if unchecked. (blueyed)</li>
-      </ul>
-    </li>
-    <li>Enhanced User permissions:
-    	<ul>
-    		<li>Each blog now has a unique "owner" &mdash; multiple blogs belonging to the same owner can be interlinked. (fplanque) </li>
-    		<li>For single user blogs there is no longer a need to set advanced permissions, just assign the owner. (fplanque)</li>
-    		<li>Blog owners can now have control over their blog settings without necessarily having control over their blog url and other sensitive settings. (fplanque)</li>
-   			<li>Blog owners can be given permission to view stats on their own blog (and only their blog). (fplanque)</li>
-   			<li>Advanced permissons can be enabled on a blog by blog basis when needed (fplanque)</li>
-    		<li>Advanced permissions include ability to give edit perm only for posts written by users with a lower level, or equal level. (fplanque)</li>
-    	</ul>
-    </li>
-    <li>Enhanced SEO:
-    	<ul>
-    		<li>Automatic XML sitemap generation (fplanque)</li>
-   		</ul>
-    </li>
-    <ul>
- 			<li>Made permalinks / URL titles Google friendly (fplanque)</li>
-	  	<li>Clean category/chapter URLs (fplanque)</li>
- 	  	<li>Added a wide variety of permalink formats to chose from (fplanque)</li>
- 	  	<li>New post visibility status 'redirect': allows to redirect old posts to a new location. (fplanque)</li>
-  	  <li>301 redirects of post requests to their canonical permalink URL (useful to unify older URLs) (fplanque)</li>
-  	  <li>301 redirects of category requests to their canonical URL (useful to unify older URLs) (fplanque)</li>
-  	  <li>All redirects are now either 301 or 303 (No more stinkin' 302s) (fplanque)</li>
- 	  </ul>
-    <li>Enhanced evoCore framework:
-      <ul>
-      	<li>Posts can be filtered by locale, e.g: ?lc=fr or ?lc=fr-FR (more to come) (fplanque)</li>
-     	  <li>Category searches can be focuses 'wide' (including extra categories) or 'main' (main category only) (fplanque) </li>
-        <li>Better precision for viewcounts (fplanque)</li>
-        <li>Replacing of special characters in auto-generated URL titles (blueyed)</li>
-        <li>Entities support for HTML checker (blueyed)</li>
-        <li>Optimized speed/memory usage</li>
-        <li>Multiple plugins/skins can require the same css or javascript and it will only be included once (personman, fplanque)</li>
-        <li>A lot of refactoring (fplanque)</li>
-      </ul>
-    </li>
-    <li>Enhanced stability :
-      <ul>
-				<li>Many fixes in XML-RPC APIs</li>
-					<li>Fixed URL modes for Blogs (fplanque) </li>
-					<li>Fixed and enhanced item/file links (fplanque)</li>
-					<li>Several fixes in the Weekly Archives (fplanque)</li>
-     	</ul>
-    </li>
-    <li>Enhanced Plugins:
-			<ul>
-				<li>Added events: LoginAttemptNeedsRawPassword, AdminDisplayCommentFormFieldset, SkinEndHtmlBody, AdminBeforeItemEditDelete</li>
-			</ul>
-		</li>
-	  <li>Enhanced purity :&gt;&gt; Cleanup of depreciated features: (rarely used... If needed, please implement them as plugins):
-      	<ul>
-      		<li>Pingbacks are dead. R.I.P. (not enough value over maintenance time)</li>
-      		<li>User skin switching. Only the admin can switch skins now.</li>
-      		<li>...postcounts for categories will probably die soon (not enough value over processing time</li>
-   		</ul>
-  	</li>
-  </ul>
-<h2>1.10.1</h2>
-	<ul>
-		<li>HTML Checker can be configured to allow style=&quot;&quot; attributes. (Yabba)</li>
-	  <li>More XHTML Strict when requested. (Yabba) </li>
-	  <li>Skin code cleaned up a little bit (100% backward compatible).</li>
-	  <li><a href="http://jquery.com/">jQuery</a> now gets shipped with b2evo in /blogs/rsc/js/jquery.min.js. It gets included in all backoffice pages. (blueyed)</li>
-	</ul>
-	<h2>1.10.0-beta</h2>
-	<ul>
-	<li>Antispam filtering on private/email messages.</li>
-	<li>Improved spam defeating methods. </li>
-	<li>"Contact the admin" link on all skins.</li>
-	<li>New bundled plugins :
-    <ul>
-    	<li>Added Sitemaps plugin(blueyed, fplanque)</li>
-    	<li>Added Code highlight plugin (yabba, fplanque)</li>
-    	<li>Added Video plug plgin (fplanque)</li>
-    	<li>Updated Quicktags plugin (fplanque)</li>
-    </ul>
-  </li>
-	<li>New bundled skins :    	
-		<ul>
-    		<li>Added l33t_gray skin (demented kitty)</li>
-    		<li>Added Miami Blue (miami condo real estate)</li>
- 		</ul>
-	</li>
-	<li>Bug fixes :		
-		<ul>
-			<li>Fixed logging of refering spam (when spam refs are not blocked)</li>
-				<li>Fixed group permissions</li>
-				<li>Fixed "Undeclared entity error" with the htmlchecker, e.g. if "&nbsp;" got used. (blueyed)</li>
-				<li>Locales have been standardize to ISO-3166 </li>
-				<li>Additional bug fixes.</li>
-		</ul>
-	<li>Developer stuff:
-    <ul>
-    	<li>Standardized Meta robots handling with robots_tag(); set $robots_index and $robots_follow to NULL if you want to completely with a plugin. Set them to true within a plugin to have them handled by the core. </li>
-   	</ul>
-	  <ul>
-			<li>Added hooks: FilterItemContents, UnfilterItemContents (fplanque)</li>
-				<li>Improved hooks: LoginAttempt, MessageFormSent. (blueyed)</li>
-				<li>Less javascript required for toolbars.</li>
-		</ul>
-	</ul>
-	<h2>1.9.3 &quot;Rainforest&quot; (Stable)</h2>
-	<ul>
-		<li>Fixed "basic antispam de-activates itself". (blueyed)</li>
-		<li>Fixed inclusion of sub-categories in item list (e.g. ?cat=1). (blueyed)</li>
-		<li>Fixed handling of formats in pre-rendering content. You should delete the cache from the "Tools" menu after upgrading. (blueyed)</li>
-		<li>Some more minor fixes.</li>
-	</ul>
-
-	<h2>1.9.2 &quot;Kyoto&quot; (Stable)</h2>
-	<ul>
-		<li>Bug fixes</li>
-		<li>Enhanced security</li>
-		<li>Moved some advanced plugins to <a href="http://plugins.b2evolution.net/">plugins.b2evolution.net</a></li>
-	</ul>
-
-	<h2>1.9.1-beta &quot;Chris&quot;</h2>
-	<ul>
-		<li>Enhanced security</li>
-		<li>Minor bug fixes </li>
-	</ul>
-
-	<h2>1.9-beta &quot;Casino Royale&quot;</h2>
-	<ul>
-		<li>Enhanced stats (fplanque)</li>
-		<li>Different item edit views: simple, advanced (blueyed, fplanque)</li>
-		<li>Fixed previewing, if $redirect_to_postblog setting is used (blueyed)</li>
-		<li>Cleaned up blog management (fplanque) </li>
-		<li>Stay in same blog when accessing blog settings (fplanque)</li>
-		<li>Visual skin selector (fplanque)</li>
-		<li>Filemanager: basic image preview while browsing (blueyed)</li>
-		<li>Post contents get pre-rendered and cached at edit time in order to speed up complex displays.
-			The cache data gets invalidated automatically, e.g. if a plugin gets updated.
-			However, just in case, there's a "Delete item cache" action in the "Tools".</li>
-		<li>Ping services are now implemented as plugins with b2evolution.net and Pingomatic included.
-			There is also a "Generic ping plugin" which can be used for common RPC ping services. (blueyed)</li>
-		<li>Different modes of hitlog/session pruning: per page, as cron job or "off" (fplanque, blueyed)</li>
-		<li>Bonus template for standalone contact form. (fplanque) </li>
-		<li>Enhanced result tables (progidistri, fplanque, blueyed) </li>
-		<li>Enhanced handling of locale dateformats (especially when editing posts with other date format chars than "d", "m" and "Y"/"y") (blueyed)</li>
-		<li>mailto:-links and relative links are valid again are get converted to absolute ones in feeds (blueyed)</li>
-		<li>Added $htsrv_url_sensitive config variable which gets used where password are involved (blueyed)</li>
-		<li>"Time difference" can now handle values like "1.5" hours. (blueyed, balupton)</li>
-		<li>Plugins
-			<ul>
-				<li>Enhanced smilies plugin (Yabba)</li>
-				<li>Plugins can get localized/translated (blueyed)</li>
-				<li>Plugin name and short description of installed plugins can be edited by the admin (blueyed)</li>
-				<li>Plugins should not use a constructor anymore, but the PluginInit() method instead. The previous AppendPluginRegister() method has been "renamed" to PluginInit(). (blueyed)</li>
-				<li>Plugins can be grouped (see Plugin::group and Plugin::sub_group) (balupton, blueyed)</li>
-				<li>Added b2evo_Callbacks Javascript object to help plugins interact with the textarea and each other (blueyed)</li>
-				<li>Optimized expensive queries in calendar plugin (fplanque)</li>
-				<li>Added events/hooks: Logout, DisplayTrackbackAddr, GetCronJobs, ExecCronJob</li>
-				<li>Added hook RenderItemAsText, removed general RenderItem</li>
-				<li>Added hooks DisplayItemAsHtml, DisplayItemAsXml and DisplayItemAsText;
-				    removed general DisplayItemAllFormats (blueyed)</li>
-				<li>Added hook ItemApplyAsRenderer for lazy renderers, which asks the Plugin
-				    if it wants to get added or removed as a renderer (blueyed)</li>
-				<li>Added hooks GetProvidedSkins and DisplaySkin, so a Plugin can register skin handlers, e.g.
-				    for displaying something like Google Sitemaps (blueyed)</li>
-				<li>Added hook ItemSendPing: gets called, when pinging for new items (blueyed)</li>
-			</ul>
-		</li>
-		<li>
-			Developer stuff:
-			<ul>
-				<li>Enhanced form abortion detection javascript (fplanque)</li>
-				<li>Application errors (from debug_die()) now get logged like normal PHP errors. See $log_app_errors in /conf/_advanced.php. Experimental. (blueyed)</li>
-				<li>Charset handling improved; added $force_io_charset_if_accepted setting (blueyed)</li>
-				<li>Cleaned up skins (fplanque) </li>
-				<li>Optimized performance of (Abstract)Settings, especially get() (blueyed)</li>
-				<li>Debuglog gets saved in user's session, to simplify debugging when redirects get used, e.g. when a comment gets posted (blueyed, yabba)</li>
-			</ul>
-		</li>
-	</ul>
-
-	<h2>1.8.7 &quot;Tokyo&quot; (Stable release)</h2>
-	<ul>
-		<li>Enhanced security.</li>
-	</ul>
-
-	<h2>1.8.6 &quot;Anne&quot; (Stable release)</h2>
-	<ul>
-		<li>Fixed displaying yearly archives (fplanque)</li>
-		<li>Enhanced Security </li>
-	</ul>
-
-	<h2>1.8.5 &quot;Oktoberfest&quot; (Stable release)</h2>
-	<ul>
-		<li>Fixed file upload restriction on allowed filetypes (blueyed)</li>
-		<li>ldap_plugin: Fixed fatal error when setting group for new user (blueyed)</li>
-		<li>Fixed fatal error in next_posts_link() if used on a non-item page, e.g. msgform (blueyed)</li>
-		<li>Do not override $db_config['connection_charset'], if set (blueyed)</li>
-		<li>Fixed possible fatal error during install (while collecting col_info for CREATE and DROP queries) (blueyed)</li>
-		<li>Fixed Javascript in blog permission editing tab (blueyed)</li>
-		<li>Fixed Movable Type import tool (blueyed)</li>
-		<li>Fixed upgrade from b2/cafelog (blueyed)</li>
-		<li>Plugin API: Added "app_min" dependency; Deprecated "api_min" dependency (blueyed)</li>
-		<li>Many more minor fixes (blueyed)</li>
-	</ul>
-
-
-	<h2>1.8.2 &quot;Serenity&quot; (Stable release)</h2>
-	<ul>
-		<li>Avoid generating ambiguous passwords (blueyed, fplanque)</li>
-		<li>Auto-P plugin fixes (blueyed)</li>
-		<li>Removed dependency on PHP tokenizer extension (blueyed)</li>
-		<li>Fixed feedback submission in basic and wpc_default skins (blueyed)</li>
-		<li>next_post() and previous_post() template functions allow limiting to current blog and do that by default now (blueyed)</li>
-		<li>Minor bug fixes </li>
-		<li>Japanese localization (jmuto) </li>
-	</ul>
-
-
-	<h2>1.8.1 &quot;Milestone&quot; (Release Candidate)</h2>
-	<ul>
-		<li>Members of the admin user group (not just user #1) can easily validate their account with 1 click (blueyed)</li>
-		<li>More improvements to account validation through email (blueyed)</li>
-		<li>Fixed static page generation (fplanque)</li>
-		<li>Fixed feed stubs, especially for blogs that allow skin switching</li>
-		<li>Fixed "Ban" URLs on the stats pages</li>
-		<li>Fixed output for windows-1251/cp1251 (cyrillic) charset (blueyed)</li>
-		<li>Reintroduced the previous ru-RU locale next to the new ru-RU-cp1251 </li>
-		<li>Fixed display by date mode (fplanque)</li>
-		<li>Fixed next/previous post links</li>
-		<li>Moved credits to the real bottom of the skins </li>
-		<li>
-			Plugins enhancements:
-			<ul>
-				<li>API: Added Plugin::get_plugin_url() method</li>
-				<li>Added events: AfterUserInsert, AfterUserUpdate, AfterUserDelete</li>
-				<li>Fixed the Auto-P plugin again (blueyed)</li>
-				<li>LDAP plugin: Fixed creating new usergroups based on template group (blueyed)</li>
-			</ul>
-		</li>
-	</ul>
-
-
-	<h2>1.8 &quot;Summer Beta&quot;</h2>
-	<ul>
-		<li>Validation of email address to activate user's account on registration (enabled by default) (blueyed)</li>
-		<li>Users and anonymous visitors can opt-out from receiving emails through message form (blueyed)</li>
-		<li>Extended plugin architecture: (blueyed)
-			<ul>
-				<li>Event-driven instantiation of Plugins</li>
-				<li>Interface for Settings and UserSettings</li>
-				<li>Easy setup for a database schema a plugin wants</li>
-			</ul>
-		</li>
-
-		<li>
-		Antispam:
-		<ul>
-			<li>Basic guestbook spambot defeating techniques -- basic spambots account for over 90% of the comment spam!! (fplanque)</li>
-			<li>Comment moderation (enabled for each blog by default) (fplanque)</li>
-			<li>Broadened keyword matching (fplanque)</li>
-			<li>Publish/Delete comments based on spam karma threshold, reported by plugins (blueyed)</li>
-			<li>
-				"Basic Antispam Plugin":
+					</li>
+					<li>Links to move to previous &amp; next post in single post display mode. (fplanque)</li>
+				</ul>
+				</li>
+				<li>Enhanced Back-office:
+					<ul>
+						<li>Reorganized backoffice (fplanque)</li>
+						<li>Removed annoying "ping" screen after posting/editing (fplanque)</li>
+						<li>Dashboard (fplanque)</li>
+						<li>New category/chapter management interface (fplanque)</li>
+					</ul>
+				</li>
+				<li>Enhanced Filemanager:
+					<ul>
+						<li>Added integrated File editor into the File manager. Allows editing of skin files. (fplanque)</li>
+						<li>Massive refactoring of the File Manager / interface cleanup (fplanque).</li>
+						<li>Automatic generation and caching of thumbnails for images in the File Manager. (fplanque)</li>
+						<li>Ability to create (photoblog) posts with selected files in file manager. (fplanque)</li>
+					</ul>
+				</li>
+				<li>Enhanced Security:
+					<ul>
+						<li>Backoffice system checks page to help secure your server and assist in troubleshooting (fplanque)</li>
+						<li>Login form: If Javascript is available the password gets hashed by the client before it gets sent "over the wire". It uses a random salt generated by the server for this on every login attempt. <br />
+						It's still recommended to set $htsrv_url_sensitive to an SSL URL, but at least this helps a bit. Plugins which need the raw password can hook into the new LoginAttemptNeedsRawPassword event and return true there. (blueyed)</li>
+					</ul>
+				</li>
+				<li>Enhanced Configuration
+					<ul>
+						<li>Several options can now be set on a per Blog basis in the backoffice:
+								<ul>
+									<li>Default ordering of posts: by date, by title, by priority... (fplanque) </li>
+									<li>Number of posts (or days) per page to display (fplanque)</li>
+									<li>Number of posts for RSS/Atom feeds (fplanque)</li>
+									<li>Content of feeds (excerpts, full posts...) (fplanque)</li>
+									<li>Archive mode (monthly, weekly, daily...) (fplanque)</li>
+									<li>Permalink and other link formats (fplanque)</li>
+									<li>Allowing users to subscribe to email notifications (fplanque)</li>
+							</ul>
+						</li>
+						<li>Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs. Look into Advanced Settings for the aggregating blog. (fplanque)</li>
+						<li>Made default chmod settings for dirs/files editable (blueyed)</li>
+						<li>Workflow properties are now hidden by default. Can be enabled on a per blog basis (fplanque)</li>
+						<li>User feature settings can be reset to defaults, including PluginUserSettings (blueyed)</li>
+						<li>&quot;Multiple sessions per user&quot; setting. This will ensure logout from public computers if unchecked. (blueyed)</li>
+					</ul>
+				</li>
+				<li>Enhanced User permissions:
+					<ul>
+						<li>Each blog now has a unique "owner" &mdash; multiple blogs belonging to the same owner can be interlinked. (fplanque) </li>
+						<li>For single user blogs there is no longer a need to set advanced permissions, just assign the owner. (fplanque)</li>
+						<li>Blog owners can now have control over their blog settings without necessarily having control over their blog url and other sensitive settings. (fplanque)</li>
+						<li>Blog owners can be given permission to view stats on their own blog (and only their blog). (fplanque)</li>
+						<li>Advanced permissons can be enabled on a blog by blog basis when needed (fplanque)</li>
+						<li>Advanced permissions include ability to give edit perm only for posts written by users with a lower level, or equal level. (fplanque)</li>
+					</ul>
+				</li>
+				<li>Enhanced SEO:
+					<ul>
+						<li>Automatic XML sitemap generation (fplanque)</li>
+					</ul>
+				</li>
 				<ul>
-					<li>Double-checking referers moved there (blueyed)</li>
-					<li>Option to check content in trackbacks about link to your blog; enabled by default (blueyed)</li>
-					<li><a href="http://en.wikipedia.org/wiki/Nofollow">rel="nofollow"</a> is now optional and used for 48 hours by default (blueyed)</li>
-					<li>Option to disable feedback from anonymous visitors (blueyed)</li>
+					<li>Made permalinks / URL titles Google friendly (fplanque)</li>
+					<li>Clean category/chapter URLs (fplanque)</li>
+					<li>Added a wide variety of permalink formats to chose from (fplanque)</li>
+					<li>New post visibility status 'redirect': allows to redirect old posts to a new location. (fplanque)</li>
+					<li>301 redirects of post requests to their canonical permalink URL (useful to unify older URLs) (fplanque)</li>
+					<li>301 redirects of category requests to their canonical URL (useful to unify older URLs) (fplanque)</li>
+					<li>All redirects are now either 301 or 303 (No more stinkin' 302s) (fplanque)</li>
+				</ul>
+				<li>Enhanced evoCore framework:
+					<ul>
+						<li>Posts can be filtered by locale, e.g: ?lc=fr or ?lc=fr-FR (more to come) (fplanque)</li>
+						<li>Category searches can be focuses 'wide' (including extra categories) or 'main' (main category only) (fplanque) </li>
+						<li>Better precision for viewcounts (fplanque)</li>
+						<li>Replacing of special characters in auto-generated URL titles (blueyed)</li>
+						<li>Entities support for HTML checker (blueyed)</li>
+						<li>Optimized speed/memory usage</li>
+						<li>Multiple plugins/skins can require the same css or javascript and it will only be included once (personman, fplanque)</li>
+						<li>A lot of refactoring (fplanque)</li>
+					</ul>
+				</li>
+				<li>Enhanced stability :
+					<ul>
+						<li>Many fixes in XML-RPC APIs</li>
+							<li>Fixed URL modes for Blogs (fplanque) </li>
+							<li>Fixed and enhanced item/file links (fplanque)</li>
+							<li>Several fixes in the Weekly Archives (fplanque)</li>
+					</ul>
+				</li>
+				<li>Enhanced Plugins:
+					<ul>
+						<li>Added events: LoginAttemptNeedsRawPassword, AdminDisplayCommentFormFieldset, SkinEndHtmlBody, AdminBeforeItemEditDelete</li>
+					</ul>
+				</li>
+				<li>Enhanced purity :&gt;&gt; Cleanup of depreciated features: (rarely used... If needed, please implement them as plugins):
+						<ul>
+							<li>Pingbacks are dead. R.I.P. (not enough value over maintenance time)</li>
+							<li>User skin switching. Only the admin can switch skins now.</li>
+							<li>...postcounts for categories will probably die soon (not enough value over processing time</li>
+					</ul>
+				</li>
+			</ul>
+
+		</div>
+		</div>
+		</div>
+
+		<div class="block1">
+		<div class="block2">
+		<div class="block3">
+		
+			<h1>1.10 &quot;Florida&quot; series</h1>
+			<p>Skins from 1.9 can be used in this version.</p>
+			<h2>1.10.2 &quot;Florida&quot; (Stable)</h2>
+			<ul>
+				<li>Standardized links to RSS feeds.</li>
+				<li>Minor fixes.</li>
+			</ul>
+
+			<h2>1.10.1-beta &quot;Orlando&quot;</h2>
+			<ul>
+				<li>Email notifications for comments now include a link that positions the browser directly on the new comment for quicker editing/deleting. (fplanque)</li>
+				<li>HTML Checker can be configured to allow style=&quot;&quot; attributes. (Yabba)</li>
+				<li>More XHTML Strict when requested. (Yabba) </li>
+				<li>Skin code cleaned up a little bit (100% backward compatible).</li>
+				<li><a href="http://jquery.com/">jQuery</a> now gets shipped with b2evo in /blogs/rsc/js/jquery.min.js. It gets included in all backoffice pages. (blueyed)</li>
+				<li>Made trackback completely silent when disabled, for even less spam.</li>
+				<li>Fixes
+					<ul>
+						<li>Fixed fatal error, if ini_set() is disabled</li>
+						<li>Some more little fixes reported by our devoted testers in the Forums. Thank you! :)</li>
+					</ul>
+				</li>
+			</ul>
+
+		<h2>1.10.0-beta &quot;Miami&quot;</h2>
+			<ul>
+			<li>Antispam filtering on private/email messages.</li>
+			<li>Improved spam defeating methods. </li>
+			<li>"Contact the admin" link on all skins.</li>
+			<li>New bundled plugins :
+				<ul>
+					<li>Added Sitemaps plugin(blueyed, fplanque)</li>
+					<li>Added Code highlight plugin (yabba, fplanque)</li>
+					<li>Added Video plug plgin (fplanque)</li>
+					<li>Updated Quicktags plugin (fplanque)</li>
 				</ul>
 			</li>
-			<li>DNS Blacklist antispam plugin (blueyed)</li>
-			<li>Blocking requests where the referer has been detected as spam is now optional. Also it does not block requests to the backoffice any longer. (blueyed)</li>
-		</ul>
-	</li>
-
-	<li>
-		Usability:
-		<ul>
-			<li>"Exit to blogs..." link respects selected blog (blueyed)</li>
-			<li>Preview for comments in frontoffice (blueyed)</li>
-		</ul>
-	</li>
-
-	<li>ItemList2 class which will replace ItemList. Better performance, security, stability and new features:
-		<ul>
-		<li>Filtering of posts on assignees with assgn=1 or assgn=1,2 or assgn=-1,2 or assgn=-</li>
-		<li>Filtering of posts on extra statuses with status=1 or status=1,2 or status=-1,2 or status=-</li>
-		</ul>
-	</li>
-
-	<li>Scheduled tasks (cron) framework (fplanque)
-		<ul>
-			<li>Automatic retrieval of antispam blacklist (fplanque) </li>
-		</ul>
-	</li>
-	<li>db_delta() functionality that allows easier upgrading (blueyed)</li>
-
-	<li>MySQL 5 strict mode compatibility (blueyed)</li>
-	<li>Fixed/Rewritten Auto-P plugin (blueyed)</li>
-	<li>ETag-header- and GZip-compression-support moved into transport optimizer plugin (blueyed)</li>
-	<li>Removed no longer supported Geeklog and Miniblog upgraders. (It is still possible to upgrade from those by upgrading to b2evo 0.9 and then to b2evo 1.x</li>
-
-	<li>Added /conf/_basic_config.php which holds just the basic settings (as _config.php before, but without the including the other files).
-	You should merge your settings from _config.php to _basic_config.php.</li>
-
-	<li>Many many many bug fixes... </li>
-
-</ul>
-
-
-
-
-
-
-<h2>1.6 &quot;Phoenix Alpha&quot; </h2>
-<p>The main focus of this new version was to remove the b2 legacy code from the evoCore framework in order to move to a more stable, reliable and scalable architecture (with Objects and all the rest...). This was mostly behind the scenes work without immediate features to show off for gratification. However, the new evoCore now allows to add functionnality more quickly and more efficiently.</p>
-<p>Anyway, there are already quite a few new features available: </p>
-<ul>
-	<li>File manager (blueyed)</li>
-	<li>Multiple domain support (blueyed, fplanque) (TODO: (cookie/admin) Debugging!)</li>
-	<li>Mailing lists: Subscriptions for new posts and/or new comments (fplanque)</li>
-	<li>Who's online? (jeffbearer, blueyed, fplanque)</li>
-	<li>Email form to contact authors without revealing their email address (jeffbearer, blueyed, fplanque)</li>
-	<li>Paged display in antispam (fplanque)</li>
-	<li>Improved hit logging (bluyed, fplanque)</li>
-	<li>Stats enhanced with Flash charts (fplanque)</li>
-	<li>Added options to allow a blog stylesheet or a user stylesheet to override the skin stylesheet.  (edgester) (TODO: Only the "custom" skin works with the options at the moment. Other skins must be modified.)</li>
-	<li>Lost password: sends a link to allow password changing instead of generating a new password right away (blueyed)</li>
-	<li>New setting in the blog's advanced tab for choosing the comment's policy on a per blog basis. You can now choose if you want to allow comments on a blog, if you want to be able to disable them on each post, or if you don't want any comments at all (gorgeb)</li>
-	<li>Added Global Features section to admin settings (halton)
-		<ul>
-			<li>Online help: started implementation (halton) (TODO: online help server, relocate function)</li>
-			<li>Blog by email: moved settings from config file, started alternate implementation (halton)</li>
-		</ul>
-	</li>
-	<li>Post editing extensions:
-		<ul>
-			<li>Alternative backoffice layout(s). A skin can be chosen in the backoffice user profile. (fplanque, blueyed)</li>
-			<li>&quot;Deprecate now&quot; function (fplanque) </li>
-		</ul>
-	</li>
-	<li>Post browsing extensions:
-	<ul>
-		<li>Complete contextual browsing: you can combine several filters: author, month, category, etc (fplanque) </li>
-		<li>Browse by author (fplanque) </li>
-		<li>Calendar: Links to next/prev month/year are only provided if there are posts in that direction (blueyed)</li>
-		<li>Calendar: Fixed contextual accuracy (fplanque) </li>
-		<li>Fixed ability to select multiple authors at once (via URL params) (fplanque) </li>
-		<li>Added ability to combine categories in search (fplanque) </li>
-		<li>New URL parameter 'dstart' allows to start browsing at specified date (same fprmat as 'm'). useful with unit = 'days'.</li>
-		<li>New URL parameter 'unit' allows overriding of configuration to select what to display: 'posts' or 'days' (fplanque)</li>
-		<li>Slightly enhanced week handling (weeks start on sunday or monday depending on user locale) (requires MySQL &gt;= 4) (fplanque)</li>
-	</ul>
-	</li>
-	<li>Post extensions (fplanque)
-	<ul>
-		<li>Extra status</li>
-		<li>Post type</li>
-		<li>Popup calendar for dates</li>
-		<li>Assigned to</li>
-		<li>Priority</li>
-		<li>Deadline</li>
-		<li>Counting number of views for each item (template tag $Item-&gt;views()) (jeffbearer, blueyed, fplanque)</li>
-	</ul>
-	</li>
-	<li>Permissions:
-		<ul>
-			<li>Group based blog permissions (halton)</li>
-			<li>Extended group permissions (fplanque)</li>
-			<li>Blog permissions presets; Member, Editor, Admin (blueyed, fplanque)</li>
-		</ul>
-	</li>
-	<li>Packaged plugins:
-		<ul>
-			<li>Wacko markup plugin (fplanque)</li>
-			<li>WikiLinks plugin (fplanque)</li>
-			<li>LDAP authentification plugin (blueyed)</li>
-			<li>Some previously built-in features have been moved to plugins (fplanque)</li>
-		</ul>
-	</li>
-	<li>Code:
-		<ul>
-			<li>Day at the start of the week moved to properties of the locales (blueyed)</li>
-			<li>Subpaths now include trailing slashes (that was another odd b2 legacy...) (blueyed, fplanque)</li>
-			<li>User profile validity checking (fplanque, blueyed)</li>
-			<li>AdminUI object that allows easy skinning of the backoffice (blueyed, fplanque)</li>
-			<li>Enhanced debugging (blueyed)</li>
-			<li>Unit tests in /tests, using simpletest framework (blueyed)</li>
-		</ul>
-	</li>
-	<li>Fixes:
-		<ul>
-			<li>Fixed Mozilla/Firefox's scrolling to the top of the textarea when clicking on toolbar buttons</li>
-			<li>Atom 1.0 compatibility</li>
-			<li>And many more.. (yabba...)</li>
-		</ul>
-	</li>
-</ul>
-
-<h2>0.9.1 "Dawn"</h2>
-	<ul>
-		<li>Scalability: Speed improvements, especially on loaded systems. </li>
-		<li>Referer spam gets detected early and triggers an error message in order to save resources on the server. </li>
-		<li>Antispam: complete comment text will be searched for blacklisted keywords.</li>
-		<li>Antispam: HTML entities can now be used in keywords. </li>
-		<li>Extended browsing capabilities (fplanque) </li>
-		<li>Trackbacks &amp; Pingbacks will be shown on the &quot;last comments&quot; page </li>
-		<li>Restricted URL input into feedback to defeat comment spam </li>
-		<li>Use of rel=&quot;nofollow&quot; for feedback author URLs to defeat comment spam </li>
-		<li>Removed public statistics in order not to attract referer spam. </li>
-		<li>The antispam blacklist is not displayed by default anylonger if it gets longer than 100 entries (and it will indeed get much longer than that...) </li>
-		<li>Wacko markup plugin (fplanque)</li>
-		<li>WikiLinks plugin (fplanque)</li>
-	</ul>
-
-	<h2>0.9.0.12 "Amsterdam"</h2>
-	<ul>
-		<li>New locales</li>
-		<li>New skin (&quot;natural pink&quot;)</li>
-		<li>Security fixes </li>
-		<li>Minor bug fixes</li>
-	</ul>
-	<h2>0.9.0.11 "Paris"</h2>
-	<ul>
-		<li>New locales (fi-FI,en-NZ)</li>
-		<li>Updated locales (it-IT, zh-TW,ja-JP...)</li>
-		<li>Antispam blacklist checking: (fplanque)
-			<ul>
-				<li>has been made case insensitive</li>
-				<li>when cleaning up, comment text will also be searched in addition to the comment url</li>
-				<li>spam filter preview lists display the IP address of the spammer</li>
+			<li>New bundled skins :    	
+				<ul>
+						<li>Added l33t_gray skin (demented kitty)</li>
+						<li>Added Miami Blue (miami condo real estate)</li>
+				</ul>
+			</li>
+			<li>Bug fixes :		
+				<ul>
+					<li>Fixed logging of refering spam (when spam refs are not blocked)</li>
+						<li>Fixed group permissions</li>
+						<li>Fixed "Undeclared entity error" with the htmlchecker, e.g. if "&nbsp;" got used. (blueyed)</li>
+						<li>Locales have been standardize to ISO-3166 </li>
+						<li>Additional bug fixes.</li>
+				</ul>
+			<li>Developer stuff:
+				<ul>
+					<li>Standardized Meta robots handling with robots_tag(); set $robots_index and $robots_follow to NULL if you want to completely with a plugin. Set them to true within a plugin to have them handled by the core. </li>
+				</ul>
+				<ul>
+					<li>Added hooks: FilterItemContents, UnfilterItemContents (fplanque)</li>
+						<li>Improved hooks: LoginAttempt, MessageFormSent. (blueyed)</li>
+						<li>Less javascript required for toolbars.</li>
+				</ul>
 			</ul>
-		</li>
-		<li>Fixed and enhanced weekly archives. They now display the post count and the week number. (fplanque)</li>
-		<li>Auto pruning of stats after a given # of days ($stats_autoprune) (fplanque)</li>
-		<li>Changed display order in stat summary</li>
-		<li>Updated $blacklList and $search_engines</li>
-		<li>Minor bug fixes</li>
-	</ul>
 
-	<h2>0.9.0.10 &quot;Copenhagen&quot;</h2>
-	<ul>
-		<li>Fixed broken upgrade in &quot;Madrid&quot;</li>
-		<li>Updated locales</li>
-		<li>Allow moving of categories between blogs ( conf/_admin : $allow_moving_chapters = true; )</li>
-		<li>Allow moving of posts between blogs ( conf/_admin : $allow_cross_posting = 3; )</li>
-		<li>Allow redirecting to main blog if post is permalinked through wrong blog ( conf/_advanced : $redirect_to_postblog = true; )</li>
-	</ul>
+		</div>
+		</div>
+		</div>
 
-	<h2>0.9.0.9 &quot;Madrid&quot;</h2>
-	<ul>
-		<li>Updated locales (Lucas, Walter, Mago, Jun and the others... ;) </li>
-		<li>New default style for the backoffice (fplanque)</li>
-		<li>Style switcher for the back-office (fplanque). You can add your own style into /blogs/admin, simply by naming it custom.css . The style switcher will recognize it automatically.</li>
-		<li>Extended IIS compatibility (isaac, blueyed, fplanque)</li>
-		<li>Weekly archives offset fixed</li>
-		<li>Minor bug fixes</li>
-		<li>Additional code documentation (fplanque)</li>
-		<li>Movable Type import script improved</li>
-		<li>Smiley toolbar is disabled by default (to enable it, open /plugins/toolbars/_smilies.toolbar.php and change <code>var $display = false;</code> to <code>var $display = true;</code>)</li>
-	</ul>
+		<div class="block1">
+		<div class="block2">
+		<div class="block3">
 
-	<h2>0.9.0.8 &quot;Oslo&quot;</h2>
-	<ul>
-		<li>Upgrade procedure will fix /' and /&quot; in older comments (fplanque) </li>
-		<li>&quot;(un)check all&quot; button on permissions page (blueyed)</li>
-		<li>New template tags for &quot;edit post&quot; and &quot;edit comment&quot; (fplanque, kiesow) </li>
-		<li>New XHTML checker definition with extended support of XHTML 1.0 tags. Transitional by default. Strict definition provided but commented out (fplanque) </li>
-		<li>Full compatibility with w.bloggar (fplanque) </li>
-		<li>bugfixes... (fplanque, blueyed) </li>
-		<li>security fixes (fplanque) </li>
-	</ul>
-
-	<h2>0.9.0.5 &quot;Berlin&quot; </h2>
-	<ul>
-		<li>A load of little bug fixes (blueyed, fplanque) </li>
-		<li>Movable Type Import (blueyed)</li>
-		<li>Geeklog Import (jeffbearer)</li>
-		<li>Upgrade procedure will fix /' and /&quot; in older posts (fplanque) </li>
-		<li>pt-BR localization is back and enhanced (walter)</li>
-		<li>Added switch for easy disabling of category selection checkboxes in _categories.php (fplanque)</li>
-		<li>Added more customizations options to the Calendar (fplanque)</li>
-		<li>WordPress CSS compatible skins [wpc_*] </li>
-	</ul>
-
-	<h2>0.9.0 &quot;Europe&quot; </h2>
-	<ul>
-		<li>Install and start using b2evo without editing a single config file  (fplanque) </li>
-		<li>Localized install screens (blueyed) </li>
-		<li>Most settings moved to backoffice</li>
-		<li>Improved antispam with full control on what you report to the centralized blacklist  (fplanque)</li>
-		<li>RSS &amp; Atom Feeds for Comments (fplanque) </li>
-		<li>Comment authors are automatically identified with their profile if they are logged in (fplanque) </li>
-		<li>Comment permalinks (fplanque)</li>
-		<li>New template tags (object oriented) (this is the visible part of the code cleaning iceberg ;) (fplanque) </li>
-		<li>Enhanced Calendar (counts posts, links to archive of month, browse by year...)  (blueyed)</li>
-		<li>More link type options (fplanque)</li>
-		<li>Search Engine Friendly Permalinks: use post title in the url (URL titles) (fplanque)</li>
-		<li>Community blogs: protected posts are now restricted to blog members and are no longer visible by any logged in user. (fplanque)</li>
-		<li>Optional output buffer handling, which provides ETags-support and handles gzip compression. (blueyed)</li>
-		<li>Plug-in system, with value added plugins included: (fplanque)
+			<h1>1.9  series</h1>
+			<p>Skins from 1.8 can be used in this version.</p>
+			<h2>1.9.3 &quot;Rainforest&quot; (Stable)</h2>
 			<ul>
-				<li>Texturize plugin.</li>
-				<li>Auto-P plugin.</li>
-				<li>Textile 2.0 plugin. </li>
+				<li>Fixed "basic antispam de-activates itself". (blueyed)</li>
+				<li>Fixed inclusion of sub-categories in item list (e.g. ?cat=1). (blueyed)</li>
+				<li>Fixed handling of formats in pre-rendering content. You should delete the cache from the "Tools" menu after upgrading. (blueyed)</li>
+				<li>Some more minor fixes.</li>
+			</ul>
+		
+			<h2>1.9.2 &quot;Kyoto&quot; (Stable)</h2>
+			<ul>
+				<li>Bug fixes</li>
+				<li>Enhanced security</li>
+				<li>Moved some advanced plugins to <a href="http://plugins.b2evolution.net/">plugins.b2evolution.net</a></li>
+			</ul>
+		
+			<h2>1.9.1-beta &quot;Chris&quot;</h2>
+			<ul>
+				<li>Enhanced security</li>
+				<li>Minor bug fixes </li>
+			</ul>
+		
+			<h2>1.9-beta &quot;Casino Royale&quot;</h2>
+			<ul>
+				<li>Enhanced stats (fplanque)</li>
+				<li>Different item edit views: simple, advanced (blueyed, fplanque)</li>
+				<li>Fixed previewing, if $redirect_to_postblog setting is used (blueyed)</li>
+				<li>Cleaned up blog management (fplanque) </li>
+				<li>Stay in same blog when accessing blog settings (fplanque)</li>
+				<li>Visual skin selector (fplanque)</li>
+				<li>Filemanager: basic image preview while browsing (blueyed)</li>
+				<li>Post contents get pre-rendered and cached at edit time in order to speed up complex displays.
+					The cache data gets invalidated automatically, e.g. if a plugin gets updated.
+					However, just in case, there's a "Delete item cache" action in the "Tools".</li>
+				<li>Ping services are now implemented as plugins with b2evolution.net and Pingomatic included.
+					There is also a "Generic ping plugin" which can be used for common RPC ping services. (blueyed)</li>
+				<li>Different modes of hitlog/session pruning: per page, as cron job or "off" (fplanque, blueyed)</li>
+				<li>Bonus template for standalone contact form. (fplanque) </li>
+				<li>Enhanced result tables (progidistri, fplanque, blueyed) </li>
+				<li>Enhanced handling of locale dateformats (especially when editing posts with other date format chars than "d", "m" and "Y"/"y") (blueyed)</li>
+				<li>mailto:-links and relative links are valid again are get converted to absolute ones in feeds (blueyed)</li>
+				<li>Added $htsrv_url_sensitive config variable which gets used where password are involved (blueyed)</li>
+				<li>"Time difference" can now handle values like "1.5" hours. (blueyed, balupton)</li>
+				<li>Plugins
+					<ul>
+						<li>Enhanced smilies plugin (Yabba)</li>
+						<li>Plugins can get localized/translated (blueyed)</li>
+						<li>Plugin name and short description of installed plugins can be edited by the admin (blueyed)</li>
+						<li>Plugins should not use a constructor anymore, but the PluginInit() method instead. The previous AppendPluginRegister() method has been "renamed" to PluginInit(). (blueyed)</li>
+						<li>Plugins can be grouped (see Plugin::group and Plugin::sub_group) (balupton, blueyed)</li>
+						<li>Added b2evo_Callbacks Javascript object to help plugins interact with the textarea and each other (blueyed)</li>
+						<li>Optimized expensive queries in calendar plugin (fplanque)</li>
+						<li>Added events/hooks: Logout, DisplayTrackbackAddr, GetCronJobs, ExecCronJob</li>
+						<li>Added hook RenderItemAsText, removed general RenderItem</li>
+						<li>Added hooks DisplayItemAsHtml, DisplayItemAsXml and DisplayItemAsText;
+								removed general DisplayItemAllFormats (blueyed)</li>
+						<li>Added hook ItemApplyAsRenderer for lazy renderers, which asks the Plugin
+								if it wants to get added or removed as a renderer (blueyed)</li>
+						<li>Added hooks GetProvidedSkins and DisplaySkin, so a Plugin can register skin handlers, e.g.
+								for displaying something like Google Sitemaps (blueyed)</li>
+						<li>Added hook ItemSendPing: gets called, when pinging for new items (blueyed)</li>
+					</ul>
+				</li>
+				<li>
+					Developer stuff:
+					<ul>
+						<li>Enhanced form abortion detection javascript (fplanque)</li>
+						<li>Application errors (from debug_die()) now get logged like normal PHP errors. See $log_app_errors in /conf/_advanced.php. Experimental. (blueyed)</li>
+						<li>Charset handling improved; added $force_io_charset_if_accepted setting (blueyed)</li>
+						<li>Cleaned up skins (fplanque) </li>
+						<li>Optimized performance of (Abstract)Settings, especially get() (blueyed)</li>
+						<li>Debuglog gets saved in user's session, to simplify debugging when redirects get used, e.g. when a comment gets posted (blueyed, yabba)</li>
+					</ul>
+				</li>
+			</ul>
+		
+		</div>
+		</div>
+		</div>
+
+		<div class="block1">
+		<div class="block2">
+		<div class="block3">
+
+			<h1>1.8 series</h1>
+			<p>Skins from 1.6 will need some changes.</p>
+			<h2>1.8.7 &quot;Tokyo&quot; (Stable)</h2>
+			<ul>
+				<li>Enhanced security.</li>
+			</ul>
+		
+			<h2>1.8.6 &quot;Anne&quot; (Stable)</h2>
+			<ul>
+				<li>Fixed displaying yearly archives (fplanque)</li>
+				<li>Enhanced Security </li>
+			</ul>
+		
+			<h2>1.8.5 &quot;Oktoberfest&quot; (Stable)</h2>
+			<ul>
+				<li>Fixed file upload restriction on allowed filetypes (blueyed)</li>
+				<li>ldap_plugin: Fixed fatal error when setting group for new user (blueyed)</li>
+				<li>Fixed fatal error in next_posts_link() if used on a non-item page, e.g. msgform (blueyed)</li>
+				<li>Do not override $db_config['connection_charset'], if set (blueyed)</li>
+				<li>Fixed possible fatal error during install (while collecting col_info for CREATE and DROP queries) (blueyed)</li>
+				<li>Fixed Javascript in blog permission editing tab (blueyed)</li>
+				<li>Fixed Movable Type import tool (blueyed)</li>
+				<li>Fixed upgrade from b2/cafelog (blueyed)</li>
+				<li>Plugin API: Added "app_min" dependency; Deprecated "api_min" dependency (blueyed)</li>
+				<li>Many more minor fixes (blueyed)</li>
+			</ul>
+		
+			<h2>1.8.2 &quot;Serenity&quot; (Stable)</h2>
+			<ul>
+				<li>Avoid generating ambiguous passwords (blueyed, fplanque)</li>
+				<li>Auto-P plugin fixes (blueyed)</li>
+				<li>Removed dependency on PHP tokenizer extension (blueyed)</li>
+				<li>Fixed feedback submission in basic and wpc_default skins (blueyed)</li>
+				<li>next_post() and previous_post() template functions allow limiting to current blog and do that by default now (blueyed)</li>
+				<li>Minor bug fixes </li>
+				<li>Japanese localization (jmuto) </li>
+			</ul>
+		
+			<h2>1.8.1-RC &quot;Milestone&quot;</h2>
+			<ul>
+				<li>Members of the admin user group (not just user #1) can easily validate their account with 1 click (blueyed)</li>
+				<li>More improvements to account validation through email (blueyed)</li>
+				<li>Fixed static page generation (fplanque)</li>
+				<li>Fixed feed stubs, especially for blogs that allow skin switching</li>
+				<li>Fixed "Ban" URLs on the stats pages</li>
+				<li>Fixed output for windows-1251/cp1251 (cyrillic) charset (blueyed)</li>
+				<li>Reintroduced the previous ru-RU locale next to the new ru-RU-cp1251 </li>
+				<li>Fixed display by date mode (fplanque)</li>
+				<li>Fixed next/previous post links</li>
+				<li>Moved credits to the real bottom of the skins </li>
+				<li>
+					Plugins enhancements:
+					<ul>
+						<li>API: Added Plugin::get_plugin_url() method</li>
+						<li>Added events: AfterUserInsert, AfterUserUpdate, AfterUserDelete</li>
+						<li>Fixed the Auto-P plugin again (blueyed)</li>
+						<li>LDAP plugin: Fixed creating new usergroups based on template group (blueyed)</li>
+					</ul>
+				</li>
+			</ul>
+		
+			<h2>1.8-beta &quot;Summer Beta&quot;</h2>
+			<ul>
+				<li>Validation of email address to activate user's account on registration (enabled by default) (blueyed)</li>
+				<li>Users and anonymous visitors can opt-out from receiving emails through message form (blueyed)</li>
+				<li>Extended plugin architecture: (blueyed)
+					<ul>
+						<li>Event-driven instantiation of Plugins</li>
+						<li>Interface for Settings and UserSettings</li>
+						<li>Easy setup for a database schema a plugin wants</li>
+					</ul>
+				</li>
+		
+				<li>
+				Antispam:
+				<ul>
+					<li>Basic guestbook spambot defeating techniques -- basic spambots account for over 90% of the comment spam!! (fplanque)</li>
+					<li>Comment moderation (enabled for each blog by default) (fplanque)</li>
+					<li>Broadened keyword matching (fplanque)</li>
+					<li>Publish/Delete comments based on spam karma threshold, reported by plugins (blueyed)</li>
+					<li>
+						"Basic Antispam Plugin":
+						<ul>
+							<li>Double-checking referers moved there (blueyed)</li>
+							<li>Option to check content in trackbacks about link to your blog; enabled by default (blueyed)</li>
+							<li><a href="http://en.wikipedia.org/wiki/Nofollow">rel="nofollow"</a> is now optional and used for 48 hours by default (blueyed)</li>
+							<li>Option to disable feedback from anonymous visitors (blueyed)</li>
+						</ul>
+					</li>
+					<li>DNS Blacklist antispam plugin (blueyed)</li>
+					<li>Blocking requests where the referer has been detected as spam is now optional. Also it does not block requests to the backoffice any longer. (blueyed)</li>
+				</ul>
+			</li>
+		
+			<li>
+				Usability:
+				<ul>
+					<li>"Exit to blogs..." link respects selected blog (blueyed)</li>
+					<li>Preview for comments in frontoffice (blueyed)</li>
+				</ul>
+			</li>
+		
+			<li>ItemList2 class which will replace ItemList. Better performance, security, stability and new features:
+				<ul>
+				<li>Filtering of posts on assignees with assgn=1 or assgn=1,2 or assgn=-1,2 or assgn=-</li>
+				<li>Filtering of posts on extra statuses with status=1 or status=1,2 or status=-1,2 or status=-</li>
+				</ul>
+			</li>
+		
+			<li>Scheduled tasks (cron) framework (fplanque)
+				<ul>
+					<li>Automatic retrieval of antispam blacklist (fplanque) </li>
+				</ul>
+			</li>
+			<li>db_delta() functionality that allows easier upgrading (blueyed)</li>
+		
+			<li>MySQL 5 strict mode compatibility (blueyed)</li>
+			<li>Fixed/Rewritten Auto-P plugin (blueyed)</li>
+			<li>ETag-header- and GZip-compression-support moved into transport optimizer plugin (blueyed)</li>
+			<li>Removed no longer supported Geeklog and Miniblog upgraders. (It is still possible to upgrade from those by upgrading to b2evo 0.9 and then to b2evo 1.x</li>
+		
+			<li>Added /conf/_basic_config.php which holds just the basic settings (as _config.php before, but without the including the other files).
+			You should merge your settings from _config.php to _basic_config.php.</li>
+		
+			<li>Many many many bug fixes... </li>
 		</ul>
-		</li>
-		<li>Comments can be closed / open / disabled (post per post). (fplanque) </li>
-		<li>Full locale support instead of lightweight language support.</li>
-		<li>Locales can be fully administered in the backoffice now. (blueyed)</li>
-		<li>b2evo will redirect to correct blog if permalinks point to wrong one (fplanque) </li>
-		<li>Blogrolls have been renamed to Linkblogs which should be a little easier to understand. </li>
-	<li>Backoffice improvements. </li>
-	</ul>
+		
+		</div>
+		</div>
+		</div>
 
-	<h2>0.8.9</h2>
-	<ul>
-		<li><strong>new Basic skin with NO CSS for beginners</strong> (forgot to mention that before ;) </li>
-		<li>Private blogs: assign individual user rights for each blog</li>
-		<li>User groups / Roles based security</li>
-		<li>Comments can be set open or closed on a post by post basis</li>
-		<li>Several conf options moved from the _conf files to the backoffice. </li>
-		<li>More blog dependant settings</li>
-		<li>Users can choose if they want to receive notifications or not for new comments/trackbacks/etc on their posts </li>
-		<li>The HTML checker now allows tables in posts by default </li>
-		<li>Made RSS 2 valid. Added icon to feedvalidator.org.</li>
-		<li>Atom 0.3 support. </li>
-		<li>Quicktags made compatible with mozilla (ron)</li>
-		<li>Automatic loading of /conf/hacks.php if this file exists </li>
-	</ul>
+		<div class="block1">
+		<div class="block2">
+		<div class="block3">
+		
+			<h1>1.6 &quot;Phoenix&quot; series</h1>
+			<p>Skins from 0.x will need some changes.</p>
+			<h2>1.6-alpha &quot;Phoenix Alpha&quot; </h2>
+		<p>The main focus of this new version was to remove the b2 legacy code from the evoCore framework in order to move to a more stable, reliable and scalable architecture (with Objects and all the rest...). This was mostly behind the scenes work without immediate features to show off for gratification. However, the new evoCore now allows to add functionnality more quickly and more efficiently.</p>
+		<p>Anyway, there are already quite a few new features available: </p>
+		<ul>
+			<li>File manager (blueyed)</li>
+			<li>Multiple domain support (blueyed, fplanque) (TODO: (cookie/admin) Debugging!)</li>
+			<li>Mailing lists: Subscriptions for new posts and/or new comments (fplanque)</li>
+			<li>Who's online? (jeffbearer, blueyed, fplanque)</li>
+			<li>Email form to contact authors without revealing their email address (jeffbearer, blueyed, fplanque)</li>
+			<li>Paged display in antispam (fplanque)</li>
+			<li>Improved hit logging (bluyed, fplanque)</li>
+			<li>Stats enhanced with Flash charts (fplanque)</li>
+			<li>Added options to allow a blog stylesheet or a user stylesheet to override the skin stylesheet.  (edgester) (TODO: Only the "custom" skin works with the options at the moment. Other skins must be modified.)</li>
+			<li>Lost password: sends a link to allow password changing instead of generating a new password right away (blueyed)</li>
+			<li>New setting in the blog's advanced tab for choosing the comment's policy on a per blog basis. You can now choose if you want to allow comments on a blog, if you want to be able to disable them on each post, or if you don't want any comments at all (gorgeb)</li>
+			<li>Added Global Features section to admin settings (halton)
+				<ul>
+					<li>Online help: started implementation (halton) (TODO: online help server, relocate function)</li>
+					<li>Blog by email: moved settings from config file, started alternate implementation (halton)</li>
+				</ul>
+			</li>
+			<li>Post editing extensions:
+				<ul>
+					<li>Alternative backoffice layout(s). A skin can be chosen in the backoffice user profile. (fplanque, blueyed)</li>
+					<li>&quot;Deprecate now&quot; function (fplanque) </li>
+				</ul>
+			</li>
+			<li>Post browsing extensions:
+			<ul>
+				<li>Complete contextual browsing: you can combine several filters: author, month, category, etc (fplanque) </li>
+				<li>Browse by author (fplanque) </li>
+				<li>Calendar: Links to next/prev month/year are only provided if there are posts in that direction (blueyed)</li>
+				<li>Calendar: Fixed contextual accuracy (fplanque) </li>
+				<li>Fixed ability to select multiple authors at once (via URL params) (fplanque) </li>
+				<li>Added ability to combine categories in search (fplanque) </li>
+				<li>New URL parameter 'dstart' allows to start browsing at specified date (same fprmat as 'm'). useful with unit = 'days'.</li>
+				<li>New URL parameter 'unit' allows overriding of configuration to select what to display: 'posts' or 'days' (fplanque)</li>
+				<li>Slightly enhanced week handling (weeks start on sunday or monday depending on user locale) (requires MySQL &gt;= 4) (fplanque)</li>
+			</ul>
+			</li>
+			<li>Post extensions (fplanque)
+			<ul>
+				<li>Extra status</li>
+				<li>Post type</li>
+				<li>Popup calendar for dates</li>
+				<li>Assigned to</li>
+				<li>Priority</li>
+				<li>Deadline</li>
+				<li>Counting number of views for each item (template tag $Item-&gt;views()) (jeffbearer, blueyed, fplanque)</li>
+			</ul>
+			</li>
+			<li>Permissions:
+				<ul>
+					<li>Group based blog permissions (halton)</li>
+					<li>Extended group permissions (fplanque)</li>
+					<li>Blog permissions presets; Member, Editor, Admin (blueyed, fplanque)</li>
+				</ul>
+			</li>
+			<li>Packaged plugins:
+				<ul>
+					<li>Wacko markup plugin (fplanque)</li>
+					<li>WikiLinks plugin (fplanque)</li>
+					<li>LDAP authentification plugin (blueyed)</li>
+					<li>Some previously built-in features have been moved to plugins (fplanque)</li>
+				</ul>
+			</li>
+			<li>Code:
+				<ul>
+					<li>Day at the start of the week moved to properties of the locales (blueyed)</li>
+					<li>Subpaths now include trailing slashes (that was another odd b2 legacy...) (blueyed, fplanque)</li>
+					<li>User profile validity checking (fplanque, blueyed)</li>
+					<li>AdminUI object that allows easy skinning of the backoffice (blueyed, fplanque)</li>
+					<li>Enhanced debugging (blueyed)</li>
+					<li>Unit tests in /tests, using simpletest framework (blueyed)</li>
+				</ul>
+			</li>
+			<li>Fixes:
+				<ul>
+					<li>Fixed Mozilla/Firefox's scrolling to the top of the textarea when clicking on toolbar buttons</li>
+					<li>Atom 1.0 compatibility</li>
+					<li>And many more.. (yabba...)</li>
+				</ul>
+			</li>
+		</ul>
+		
+		</div>
+		</div>
+		</div>
 
-	<h2>0.8.7</h2>
-	<ul>
-		<li>Dynamic Anti-Spam table, with one-click referer bans</li>
-		<li>Antispam deluxe: search referrer	logs and comments for newly identified spammers (funky M) </li>
-		<li>Centralized blacklist management: share spam list with all b2evo users. (funky M) </li>
-		<li>Pruning of old stats</li>
-		<li>Moblogging support</li>
-		<li>Quick publishing button for drafts</li>
-		<li>Backoffice relooked</li>
-		<li>Fixed category editing (changing parent)</li>
-		<li>Ping to Technorati</li>
-		<li>Minor bug fixes</li>
-	</ul>
+		<div class="block1">
+		<div class="block2">
+		<div class="block3">
 
-	<h2>0.8.6.2</h2>
-	<ul>
-		<li>Spell checker doesn't require PERL any more (moved to PHP)</li>
-		<li>Fixed lost password retrieval</li>
-		<li>Added quicktag button for &lt;!--nextpage--&gt;</li>
-		<li>Better trackback</li>
-		<li>Better pingback</li>
-		<li>Default skin checking (too many people set it up improperly).</li>
-		<li>Minor bug fixes (but a lot of them! :P)</li>
-	</ul>
+			<h1>0.9 series</h1>
+			<h2>0.9.2 "Sparkle" (Stable)</h2>
+<ul>
 
-	<h2>0.8.6.1</h2>
-	<ul>
-		<li>Fixed displaying/hiding private/protected posts</li>
-		<li>Fixed display of blogroll categories</li>
-		<li>Fixed XML special chars handling in pings</li>
-		<li>Fixed spellchecker</li>
-		<li>We now display an error message in case of a skin misconfiguration so that bloggers realize new readers cannot access their blog!</li>
-		<li>New comment notices now include an edit/delete link for fast spam handling</li>
-		<li>Enhanced paged display in back-office</li>
-		<li>Display and translation fixes</li>
-	</ul>
-
-	<h2>0.8.6 (Final release)</h2>
-	<ul>
-		<li>Minor bug fixes</li>
-	</ul>
-
-	<h2>0.8.5.5-Release Candidate</h2>
-	<ul>
 		<li>Bug fixes</li>
-		<li>Login screens cleaned up</li>
+		<li>More spam detecting techiques (fplanque)</li>
+		<li>More locales: Basque eu_ES, Icelandic is-IS, Polish pl-PL, Estonian ee-ET, Russian ru-RU</li>
 	</ul>
 
-	<h2>0.8.5.3-beta</h2>
-	<ul>
-		<li>Passwords are now stored encrypted in the database (by Swirlee)</li>
-		<li>Security pacthes (by Sakichan)</li>
-		<li><strong>Heavy</strong> code refactoring.</li>
-		<li>New template functions: user_login_link(), user_register_link(), user_logout_link(), user_admin_link(), user_profile_link()</li>
-		<li>New login/registering system.</li>
-		<li>You can login directly on whichever function page you want. b2edit.php, b2browse.php, b2stats.php, etc... pick the backoffice homepage you prefer.</li>
-		<li>New post statuses: protected, private and deprecated</li>
-		<li><strong>Complete b2evo bookmarklet and sidebar</strong></li>
-		<li><strong>You can now switch to another blog in the middle of a post and preserve all your current edits</strong> (uses javascript)</li>
-		<li><strong>Comment spam prevention (vig-rx syndrome)</strong>: blocks comments and posts containing blacklisted URLs (if you have had vig-rx posting on your blog, you know why you need this ;) This also applies to referrer spam.</li>
-		<li>Smilies are now displayed in their correct chosen order. They are not displayed when they are deactivated.</li>
-		<li>$allow_cross_posting = 0 will disable cross posting among multiple categories.</li>
-		<li>Stats summary.</li>
-		<li>Fully configurable directory structure.</li>
-	</ul>
+		<h2> 0.9.1 "Dawn" (Stable)</h2>
+			<ul>
+				<li>Scalability: Speed improvements, especially on loaded systems. </li>
+				<li>Referer spam gets detected early and triggers an error message in order to save resources on the server. </li>
+				<li>Antispam: complete comment text will be searched for blacklisted keywords.</li>
+				<li>Antispam: HTML entities can now be used in keywords. </li>
+				<li>Extended browsing capabilities (fplanque) </li>
+				<li>Trackbacks &amp; Pingbacks will be shown on the &quot;last comments&quot; page </li>
+				<li>Restricted URL input into feedback to defeat comment spam </li>
+				<li>Use of rel=&quot;nofollow&quot; for feedback author URLs to defeat comment spam </li>
+				<li>Removed public statistics in order not to attract referer spam. </li>
+				<li>The antispam blacklist is not displayed by default anylonger if it gets longer than 100 entries (and it will indeed get much longer than that...) </li>
+				<li>Wacko markup plugin (fplanque)</li>
+				<li>WikiLinks plugin (fplanque)</li>
+			</ul>
 
-	<h2>0.8.3-beta1</h2>
-	<ul>
-		<li>Blog list moved to a standalone skin module + it is disabled by default in the conf. Too many people seem to be confused about having this on their blog template. Enabling is a easy as setting $display_blog_list = 1; at any time (main switch in b2evo_conf.php).</li>
-		<li>Code refactoring</li>
-		<li>New front page for 'my blogs' explaining a little more what's going on there ;)</li>
-		<li>Cross posting among multiple blogs has been disabled by default. Again too many people seem to be confused about this. Enabling is as easy as setting $allow_cross_posting = 2; in b2evo_conf.php.</li>
-		<li>Fixed filtering by author</li>
-		<li>wordcount support (by Swirlee)</li>
-		<li><strong>Full localization even without gettext!</strong></li>
-	</ul>
+			<h2>0.9.0.12 "Amsterdam" (Stable)</h2>
+			<ul>
+				<li>New locales</li>
+				<li>New skin (&quot;natural pink&quot;)</li>
+				<li>Security fixes </li>
+				<li>Minor bug fixes</li>
+			</ul>
+			<h2>0.9.0.11 "Paris" (Stable)</h2>
+			<ul>
+				<li>New locales (fi-FI,en-NZ)</li>
+				<li>Updated locales (it-IT, zh-TW,ja-JP...)</li>
+				<li>Antispam blacklist checking: (fplanque)
+					<ul>
+						<li>has been made case insensitive</li>
+						<li>when cleaning up, comment text will also be searched in addition to the comment url</li>
+						<li>spam filter preview lists display the IP address of the spammer</li>
+					</ul>
+				</li>
+				<li>Fixed and enhanced weekly archives. They now display the post count and the week number. (fplanque)</li>
+				<li>Auto pruning of stats after a given # of days ($stats_autoprune) (fplanque)</li>
+				<li>Changed display order in stat summary</li>
+				<li>Updated $blacklList and $search_engines</li>
+				<li>Minor bug fixes</li>
+			</ul>
+		
+			<h2>0.9.0.10 &quot;Copenhagen&quot; (Stable)</h2>
+			<ul>
+				<li>Fixed broken upgrade in &quot;Madrid&quot;</li>
+				<li>Updated locales</li>
+				<li>Allow moving of categories between blogs ( conf/_admin : $allow_moving_chapters = true; )</li>
+				<li>Allow moving of posts between blogs ( conf/_admin : $allow_cross_posting = 3; )</li>
+				<li>Allow redirecting to main blog if post is permalinked through wrong blog ( conf/_advanced : $redirect_to_postblog = true; )</li>
+			</ul>
+		
+			<h2>0.9.0.9 &quot;Madrid&quot; (Stable)</h2>
+			<ul>
+				<li>Updated locales (Lucas, Walter, Mago, Jun and the others... ;) </li>
+				<li>New default style for the backoffice (fplanque)</li>
+				<li>Style switcher for the back-office (fplanque). You can add your own style into /blogs/admin, simply by naming it custom.css . The style switcher will recognize it automatically.</li>
+				<li>Extended IIS compatibility (isaac, blueyed, fplanque)</li>
+				<li>Weekly archives offset fixed</li>
+				<li>Minor bug fixes</li>
+				<li>Additional code documentation (fplanque)</li>
+				<li>Movable Type import script improved</li>
+				<li>Smiley toolbar is disabled by default (to enable it, open /plugins/toolbars/_smilies.toolbar.php and change <code>var $display = false;</code> to <code>var $display = true;</code>)</li>
+			</ul>
+		
+			<h2>0.9.0.8 &quot;Oslo&quot; (Stable)</h2>
+			<ul>
+				<li>Upgrade procedure will fix /' and /&quot; in older comments (fplanque) </li>
+				<li>&quot;(un)check all&quot; button on permissions page (blueyed)</li>
+				<li>New template tags for &quot;edit post&quot; and &quot;edit comment&quot; (fplanque, kiesow) </li>
+				<li>New XHTML checker definition with extended support of XHTML 1.0 tags. Transitional by default. Strict definition provided but commented out (fplanque) </li>
+				<li>Full compatibility with w.bloggar (fplanque) </li>
+				<li>bugfixes... (fplanque, blueyed) </li>
+				<li>security fixes (fplanque) </li>
+			</ul>
+		
+			<h2>0.9.0.5 &quot;Berlin&quot;  (Stable)</h2>
+			<ul>
+				<li>A load of little bug fixes (blueyed, fplanque) </li>
+				<li>Movable Type Import (blueyed)</li>
+				<li>Geeklog Import (jeffbearer)</li>
+				<li>Upgrade procedure will fix /' and /&quot; in older posts (fplanque) </li>
+				<li>pt-BR localization is back and enhanced (walter)</li>
+				<li>Added switch for easy disabling of category selection checkboxes in _categories.php (fplanque)</li>
+				<li>Added more customizations options to the Calendar (fplanque)</li>
+				<li>WordPress CSS compatible skins [wpc_*] </li>
+			</ul>
+		
+			<h2>0.9.0 &quot;Europe&quot;  (Stable)</h2>
+			<ul>
+				<li>Install and start using b2evo without editing a single config file  (fplanque) </li>
+				<li>Localized install screens (blueyed) </li>
+				<li>Most settings moved to backoffice</li>
+				<li>Improved antispam with full control on what you report to the centralized blacklist  (fplanque)</li>
+				<li>RSS &amp; Atom Feeds for Comments (fplanque) </li>
+				<li>Comment authors are automatically identified with their profile if they are logged in (fplanque) </li>
+				<li>Comment permalinks (fplanque)</li>
+				<li>New template tags (object oriented) (this is the visible part of the code cleaning iceberg ;) (fplanque) </li>
+				<li>Enhanced Calendar (counts posts, links to archive of month, browse by year...)  (blueyed)</li>
+				<li>More link type options (fplanque)</li>
+				<li>Search Engine Friendly Permalinks: use post title in the url (URL titles) (fplanque)</li>
+				<li>Community blogs: protected posts are now restricted to blog members and are no longer visible by any logged in user. (fplanque)</li>
+				<li>Optional output buffer handling, which provides ETags-support and handles gzip compression. (blueyed)</li>
+				<li>Plug-in system, with value added plugins included: (fplanque)
+					<ul>
+						<li>Texturize plugin.</li>
+						<li>Auto-P plugin.</li>
+						<li>Textile 2.0 plugin. </li>
+				</ul>
+				</li>
+				<li>Comments can be closed / open / disabled (post per post). (fplanque) </li>
+				<li>Full locale support instead of lightweight language support.</li>
+				<li>Locales can be fully administered in the backoffice now. (blueyed)</li>
+				<li>b2evo will redirect to correct blog if permalinks point to wrong one (fplanque) </li>
+				<li>Blogrolls have been renamed to Linkblogs which should be a little easier to understand. </li>
+			<li>Backoffice improvements. </li>
+			</ul>
+		
+			<h1>0.8 series</h1>
+			<h2>0.8.9 (Stable)</h2>
+			<ul>
+				<li><strong>new Basic skin with NO CSS for beginners</strong> (forgot to mention that before ;) </li>
+				<li>Private blogs: assign individual user rights for each blog</li>
+				<li>User groups / Roles based security</li>
+				<li>Comments can be set open or closed on a post by post basis</li>
+				<li>Several conf options moved from the _conf files to the backoffice. </li>
+				<li>More blog dependant settings</li>
+				<li>Users can choose if they want to receive notifications or not for new comments/trackbacks/etc on their posts </li>
+				<li>The HTML checker now allows tables in posts by default </li>
+				<li>Made RSS 2 valid. Added icon to feedvalidator.org.</li>
+				<li>Atom 0.3 support. </li>
+				<li>Quicktags made compatible with mozilla (ron)</li>
+				<li>Automatic loading of /conf/hacks.php if this file exists </li>
+			</ul>
+		
+			<h2>0.8.7 (Stable)</h2>
+			<ul>
+				<li>Dynamic Anti-Spam table, with one-click referer bans</li>
+				<li>Antispam deluxe: search referrer	logs and comments for newly identified spammers (funky M) </li>
+				<li>Centralized blacklist management: share spam list with all b2evo users. (funky M) </li>
+				<li>Pruning of old stats</li>
+				<li>Moblogging support</li>
+				<li>Quick publishing button for drafts</li>
+				<li>Backoffice relooked</li>
+				<li>Fixed category editing (changing parent)</li>
+				<li>Ping to Technorati</li>
+				<li>Minor bug fixes</li>
+			</ul>
+		
+			<h2>0.8.6.2 (Stable)</h2>
+			<ul>
+				<li>Spell checker doesn't require PERL any more (moved to PHP)</li>
+				<li>Fixed lost password retrieval</li>
+				<li>Added quicktag button for &lt;!--nextpage--&gt;</li>
+				<li>Better trackback</li>
+				<li>Better pingback</li>
+				<li>Default skin checking (too many people set it up improperly).</li>
+				<li>Minor bug fixes (but a lot of them! :P)</li>
+			</ul>
+		
+			<h2>0.8.6.1 (Stable)</h2>
+			<ul>
+				<li>Fixed displaying/hiding private/protected posts</li>
+				<li>Fixed display of blogroll categories</li>
+				<li>Fixed XML special chars handling in pings</li>
+				<li>Fixed spellchecker</li>
+				<li>We now display an error message in case of a skin misconfiguration so that bloggers realize new readers cannot access their blog!</li>
+				<li>New comment notices now include an edit/delete link for fast spam handling</li>
+				<li>Enhanced paged display in back-office</li>
+				<li>Display and translation fixes</li>
+			</ul>
+		
+			<h2>0.8.6  (Stable)</h2>
+			<ul>
+				<li>Minor bug fixes</li>
+			</ul>
+		
+			<h2>0.8.5.5-RC</h2>
+			<ul>
+				<li>Bug fixes</li>
+				<li>Login screens cleaned up</li>
+			</ul>
+		
+			<h2>0.8.5.3-beta</h2>
+			<ul>
+				<li>Passwords are now stored encrypted in the database (by Swirlee)</li>
+				<li>Security pacthes (by Sakichan)</li>
+				<li><strong>Heavy</strong> code refactoring.</li>
+				<li>New template functions: user_login_link(), user_register_link(), user_logout_link(), user_admin_link(), user_profile_link()</li>
+				<li>New login/registering system.</li>
+				<li>You can login directly on whichever function page you want. b2edit.php, b2browse.php, b2stats.php, etc... pick the backoffice homepage you prefer.</li>
+				<li>New post statuses: protected, private and deprecated</li>
+				<li><strong>Complete b2evo bookmarklet and sidebar</strong></li>
+				<li><strong>You can now switch to another blog in the middle of a post and preserve all your current edits</strong> (uses javascript)</li>
+				<li><strong>Comment spam prevention (vig-rx syndrome)</strong>: blocks comments and posts containing blacklisted URLs (if you have had vig-rx posting on your blog, you know why you need this ;) This also applies to referrer spam.</li>
+				<li>Smilies are now displayed in their correct chosen order. They are not displayed when they are deactivated.</li>
+				<li>$allow_cross_posting = 0 will disable cross posting among multiple categories.</li>
+				<li>Stats summary.</li>
+				<li>Fully configurable directory structure.</li>
+			</ul>
+		
+			<h2>0.8.3-beta</h2>
+			<ul>
+				<li>Blog list moved to a standalone skin module + it is disabled by default in the conf. Too many people seem to be confused about having this on their blog template. Enabling is a easy as setting $display_blog_list = 1; at any time (main switch in b2evo_conf.php).</li>
+				<li>Code refactoring</li>
+				<li>New front page for 'my blogs' explaining a little more what's going on there ;)</li>
+				<li>Cross posting among multiple blogs has been disabled by default. Again too many people seem to be confused about this. Enabling is as easy as setting $allow_cross_posting = 2; in b2evo_conf.php.</li>
+				<li>Fixed filtering by author</li>
+				<li>wordcount support (by Swirlee)</li>
+				<li><strong>Full localization even without gettext!</strong></li>
+			</ul>
+		
+			<h2>0.8.3-alpha</h2>
+			<ul>
+				<li>Cookie fix when using b2evo on a special port number</li>
+				<li>Fixed many PHP notices</li>
+				<li><strong>Gettext internationalization</strong></li>
+				<li>xml:lang and lang attribute handling</li>
+				<li>charset handling</li>
+				<li>Better XHTML compliance (moving towards Strict)</li>
+				<li>XML-RPC Blogger API now supports draft publishing</li>
+				<li>Checking PHP version on install</li>
+				<li>Better UTF-8 support</li>
+			</ul>
+		
+			<h2>0.8.2 (Stable)</h2>
+			<ul>
+				<li>Security fixes</li>
+				<li>Fixed pingbacks in b2mail.php</li>
+				<li>Fixed taborder in b2edit.php</li>
+			</ul>
+		
+			<h2>0.8.2-RC3</h2>
+			<ul>
+				<li>Fixed user reported bugs</li>
+				<li>Tootips + shortcut keys on tag buttons</li>
+				<li>Fixed timezone handling</li>
+			</ul>
+		
+			<h2>0.8.2-RC2</h2>
+			<ul>
+				<li>Categories ordered by name</li>
+				<li>Fixed time difference for new post dates</li>
+				<li>Fixed bug preventing from editing comment dates</li>
+			</ul>
+		
+			<h2>0.8.2-RC1</h2>
+			<ul>
+				<li>Ability to link each post to an URL</li>
+				<li>Dynamic blogroll (the blogroll is just another blog on the system)</li>
+				<li>Supports multiple blogs per page</li>
+				<li>Supporting special blog #1 aggregating all blogs on the system</li>
+				<li>Sending email notifications with significant 'from' address</li>
+				<li>Checking if comment authors' email addresses are valid</li>
+				<li>Fixed calendar some more (hum... legacy...)</li>
+				<li>Clean links for monthly/weekly/daily/post-by-post archives, including from calendar. (e-g: /blog/2003/06/ )</li>
+				<li>Archives show number of posts per month or day</li>
+				<li>Ability to limit number of archive links displayed</li>
+				<li>Ability to display full archive directory in main display area</li>
+				<li>Categories show number of posts per cat</li>
+				<li>Not accepting HTML tags in comments by default for security reasons.</li>
+				<li>single_month_title(-) now displays day of month or week number when available</li>
+				<li>Search can now be done on all words (AND), some words (OR) or whole sentence (&quot;&quot;)</li>
+				<li>Displayed stats on blogs are filtered by the current blog</li>
+				<li>Slightly enhanced backoffice stats view, including ability to delete spam hits from stats</li>
+				<li>New &amp; improved edit screen</li>
+				<li>Support for <a href="http://www.textism.com/tools/textile/">textile</a></li>
+				<li>New preview</li>
+				<li>Better post browsing in backoffice</li>
+				<li>In back-office: ability to display past or future posts only</li>
+				<li>In back-office: ability to display draft or published posts only</li>
+				<li>Supports using blogs as upcomming events calendars</li>
+				<li>Ability to limit viewable posts between two datestamps.</li>
+				<li>evoSkins now include a skininfo.html file for your information.</li>
+				<li>Automatically set wanted permissions and owner on newly created stub files</li>
+				<li>plain text urls, email, aim and icq addresses will be automatically converted to links, whereever they are displayed</li>
+				<li>Integrated XHTML validator (by Sakichan)</li>
+				<li>Filtering of illegal tags</li>
+				<li>cleaned up RSS feeds, better compliance to RSS 2 spec</li>
+				<li>Using GM times in RSS feeds (it's the only ones Syndirella can handle)</li>
+				<li>fixed bug with /archives/ page</li>
+				<li>Better cookie management. Cookies will be shared between www.yoursite.com and yoursite.com. However, if there are multiple b2evolution installs on the same site those will not share cookies (this is especially important if /~username/ subdirectories are used...)</li>
+				<li>Support for non permanent cookies</li>
+				<li>Some more code cleanup</li>
+				<li>Some more security fixes</li>
+			</ul>
+		
+			<h2>0.8.0 (Stable)</h2>
+				<ul>
+					<li>Fixed calendar</li>
+					<li>Cosmetic changes</li>
+				</ul>
+		
+			<h2>0.8.0-RC3</h2>
+				<ul>
+					<li>Fixed relative path includes</li>
+					<li>Fixed file upload</li>
+					<li>Cosmetic and skin changes, new skin: 'guadeloupe'.</li>
+				</ul>
+		
+			<h2>0.8.0-RC2</h2>
+			<ul>
+			<li>Fixed bookmarklet</li>
+				<li>Fixed sidebar</li>
+			</ul>
+		
+			<h2>0.8.0-RC1</h2>
+			<ul>
+				<li>Fixed skin switcher when PHP register globals is ON. (Don't forget to delete the skin cookie if you have been using previous versions)</li>
+				<li>Support for b2 old-style blog templates</li>
+			</ul>
 
-	<h2>0.8.3-alpha1</h2>
-	<ul>
-		<li>Cookie fix when using b2evo on a special port number</li>
-		<li>Fixed many PHP notices</li>
-		<li><strong>Gettext internationalization</strong></li>
-		<li>xml:lang and lang attribute handling</li>
-		<li>charset handling</li>
-		<li>Better XHTML compliance (moving towards Strict)</li>
-		<li>XML-RPC Blogger API now supports draft publishing</li>
-		<li>Checking PHP version on install</li>
-		<li>Better UTF-8 support</li>
-	</ul>
-
-	<h2>0.8.2 (Final release)</h2>
-	<ul>
-		<li>Security fixes</li>
-		<li>Fixed pingbacks in b2mail.php</li>
-		<li>Fixed taborder in b2edit.php</li>
-	</ul>
-
-	<h2>0.8.2-RC3</h2>
-	<ul>
-		<li>Fixed user reported bugs</li>
-		<li>Tootips + shortcut keys on tag buttons</li>
-		<li>Fixed timezone handling</li>
-	</ul>
-
-	<h2>0.8.2-RC2</h2>
-	<ul>
-		<li>Categories ordered by name</li>
-		<li>Fixed time difference for new post dates</li>
-		<li>Fixed bug preventing from editing comment dates</li>
-	</ul>
-
-	<h2>0.8.2-RC1</h2>
-	<ul>
-		<li>Ability to link each post to an URL</li>
-		<li>Dynamic blogroll (the blogroll is just another blog on the system)</li>
-		<li>Supports multiple blogs per page</li>
-		<li>Supporting special blog #1 aggregating all blogs on the system</li>
-		<li>Sending email notifications with significant 'from' address</li>
-		<li>Checking if comment authors' email addresses are valid</li>
-		<li>Fixed calendar some more (hum... legacy...)</li>
-		<li>Clean links for monthly/weekly/daily/post-by-post archives, including from calendar. (e-g: /blog/2003/06/ )</li>
-		<li>Archives show number of posts per month or day</li>
-		<li>Ability to limit number of archive links displayed</li>
-		<li>Ability to display full archive directory in main display area</li>
-		<li>Categories show number of posts per cat</li>
-		<li>Not accepting HTML tags in comments by default for security reasons.</li>
-		<li>single_month_title(-) now displays day of month or week number when available</li>
-		<li>Search can now be done on all words (AND), some words (OR) or whole sentence (&quot;&quot;)</li>
-		<li>Displayed stats on blogs are filtered by the current blog</li>
-		<li>Slightly enhanced backoffice stats view, including ability to delete spam hits from stats</li>
-		<li>New &amp; improved edit screen</li>
-		<li>Support for <a href="http://www.textism.com/tools/textile/">textile</a></li>
-		<li>New preview</li>
-		<li>Better post browsing in backoffice</li>
-		<li>In back-office: ability to display past or future posts only</li>
-		<li>In back-office: ability to display draft or published posts only</li>
-		<li>Supports using blogs as upcomming events calendars</li>
-		<li>Ability to limit viewable posts between two datestamps.</li>
-		<li>evoSkins now include a skininfo.html file for your information.</li>
-		<li>Automatically set wanted permissions and owner on newly created stub files</li>
-		<li>plain text urls, email, aim and icq addresses will be automatically converted to links, whereever they are displayed</li>
-		<li>Integrated XHTML validator (by Sakichan)</li>
-		<li>Filtering of illegal tags</li>
-		<li>cleaned up RSS feeds, better compliance to RSS 2 spec</li>
-		<li>Using GM times in RSS feeds (it's the only ones Syndirella can handle)</li>
-		<li>fixed bug with /archives/ page</li>
-		<li>Better cookie management. Cookies will be shared between www.yoursite.com and yoursite.com. However, if there are multiple b2evolution installs on the same site those will not share cookies (this is especially important if /~username/ subdirectories are used...)</li>
-		<li>Support for non permanent cookies</li>
-		<li>Some more code cleanup</li>
-		<li>Some more security fixes</li>
-	</ul>
-
-	<h2>0.8.0 (Final release)</h2>
-		<ul>
-			<li>Fixed calendar</li>
-			<li>Cosmetic changes</li>
-		</ul>
-
-	<h2>0.8.0-RC3</h2>
-		<ul>
-			<li>Fixed relative path includes</li>
-			<li>Fixed file upload</li>
-			<li>Cosmetic and skin changes, new skin: 'guadeloupe'.</li>
-		</ul>
-
-	<h2>0.8.0-RC2</h2>
-	<ul>
-	<li>Fixed bookmarklet</li>
-		<li>Fixed sidebar</li>
-	</ul>
-
-	<h2>0.8.0-RC1</h2>
-	<ul>
-		<li>Fixed skin switcher when PHP register globals is ON. (Don't forget to delete the skin cookie if you have been using previous versions)</li>
-		<li>Support for b2 old-style blog templates</li>
-	</ul>
-
+		</div>
+		</div>
+		</div>
+<!-- InstanceEndEditable -->
+		
+		<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->
+			Online resources: <a href="http://b2evolution.net/" target="_blank">Official website</a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank">Find a host</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">Forums</a>
+		<!-- InstanceEndEditable --></div>
+	
+		<div class="copyright">
+		Copyright &copy; 2003-2007 by <a href="http://fplanque.com/" target="_blank">Fran&ccedil;ois Planque</a> &amp; <a href="http://b2evolution.net/dev/authors.html" target="_blank">others</a> &middot;<!-- InstanceBeginEditable name="CopyrightTail" --><a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a><!-- InstanceEndEditable --></div>
+	</div>
+	</div>
+	</div>
 </body>
-</html>
+<!-- InstanceEnd --></html>

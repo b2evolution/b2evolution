@@ -1,6 +1,10 @@
 <?php
 /**
- * This is the main public interface file!
+ * This is the main public interface file.
+ *
+ * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT PHP IS NOT PROPERLY INSTALLED
+ * ON YOUR WEB SERVER. IF YOU DON'T KNOW WHAT THIS MEANS, CONTACT YOUR SERVER ADMINISTRATOR
+ * OR YOUR HOSTING COMPANY.
  *
  * This file is NOT mandatory. You can delete it if you want.
  * You can also replace the contents of this file with contents similar to the contents

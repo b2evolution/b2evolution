@@ -465,7 +465,7 @@ if( !empty( $skin ) )
 				'posts'          => 'items.main.php',
 				'single'         => 'single.main.php',
 				'page'           => 'page.main.php',
-				// 'msgform'  => 'msgform.tpl.php',
+				'msgform'        => 'msgform.main.php',
 				// 'profile'  => 'profile.tpl.php',
 				// 'subs'     => 'subscriptions.tpl.php',
 
@@ -497,6 +497,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.85  2007/07/13 23:47:36  fplanque
+ * New start pages!
+ *
  * Revision 1.84  2007/06/27 02:23:24  fplanque
  * new default template for skins named index.main.php
  *

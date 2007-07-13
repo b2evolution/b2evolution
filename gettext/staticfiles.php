@@ -316,20 +316,24 @@ switch( $action )
 
 				// Sort the targets by their translated name
 				$sortedTargets = $targets;
-				uksort( $sortedTargets, create_function( '$a,$b', 'return strcasecmp( T_( $GLOBALS[\'locales\'][$a][\'name\'] ), T_( $GLOBALS[\'locales\'][$b][\'name\'] ) );' ) );
+				ksort( $sortedTargets );
 
-				$trans_available = "\t".'<ul>'."\n";
+				$trans_available = "\n";
 				foreach( $sortedTargets as $ttarget => $ttargetmessagefile )
 				{ // the link to the static html file for that target message file
 					$linkto = str_replace('.src.', ( $ttarget != DEFAULT_TARGET ) ? ".$ttarget." : '.', basename($srcfile) );
 
 					$trans_available .=
-					"\t\t".'<li><a href="'.$linkto.'">'.locale_flag($ttarget, 'w16px', 'flag', '', false, $path_to_root.'blogs/rsc/flags').T_( $locales[$ttarget]['name'] ).'</a></li>'."\n";
+					'<a href="'.$linkto.'" title="'.T_( $locales[$ttarget]['name'] ).'">'
+					.locale_flag($ttarget, 'h10px', 'flag', '', false, $path_to_root.'blogs/rsc/flags')
+					.'</a>'."\n";
 				}
-				$trans_available .= "\t</ul>";
+				$trans_available .= "\n";
 
 				$text = str_replace( TRANSTAG_OPEN.'trans_available'.TRANSTAG_CLOSE, $trans_available, $text );
 
+				// Current lang:
+				$text = str_replace( TRANSTAG_OPEN.'trans_current'.TRANSTAG_CLOSE, T_( $locales[$target]['name'] ), $text );
 
 				// standard replacements
 				$search = array(

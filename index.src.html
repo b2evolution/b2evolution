@@ -1,62 +1,83 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{{{trans_locale}}}" lang="{{{trans_locale}}}"><!-- InstanceBegin template="/Templates/b2evodistrib.dwt" codeOutsideHTMLIsLocked="false" -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{{{trans_locale}}}" lang="{{{trans_locale}}}"><!-- InstanceBegin template="/Templates/evo_distrib_2_doc.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<!-- InstanceBeginEditable name="doctitle" -->
 <meta http-equiv="Content-Type" content="text/html; charset={{{trans_charset}}}" />
 <title>{{{b2evo package}}}: {{{Start page}}}</title>
-<!-- InstanceEndEditable --><link href="blogs/rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
+<!-- InstanceEndEditable -->
+	<link href="blogs/rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
 	<!-- InstanceParam name="lang" type="text" value="{{{trans_locale}}}" --> 
 </head>
+
 <body>
-	<div class="wrapper">
-	<div id="rowheader" >
-		<h1><a href="http://b2evolution.net/" title="{{{b2evolution: official site}}}"><img src="blogs/rsc/img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
-		<div id="tagline">{{{Multilingual multiuser multi-blog engine.}}}</div>
-		<h1 id="version">{{{Version}}}: 2.0-dev</h1>
-		<div id="quicklinks">
-			{{{b2evo package}}}: 
-			<a href="index.src.html">{{{Start page}}}</a> &middot; 
-			<a href="blogs/install/index.php?locale=%7B%7B%7Btrans_locale%7D%7D%7D">{{{Install}}}</a> &middot; 
-			<a href="blogs/index.php">{{{Blogs}}}</a> &middot; 
-			<a href="blogs/admin.php">{{{Admin}}}</a> &middot; 
-			{{{Online}}}: 
-			<a href="http://manual.b2evolution.net/">{{{Manual}}}</a> &middot; 
-			<a href="http://forums.b2evolution.net/">{{{Forums}}}</a> 
-		</div>
-	</div>
-	<div class="installSideBar">
-		<p>{{{Available translations for this page:}}}</p>
-		{{{trans_available}}}
-	</div>
-	<!-- InstanceBeginEditable name="Main" -->
-<h1>{{{Welcome!}}}</h1>
-<p>
-	{{{b2evolution is a professional blog engine. It supports multiple blogs, edited by multiple users and in multiple languages.  Plus, it's free, it's open-source (GPL) and it runs virtually anywhere (PHP 4 / MySQL 3.23)!}}}</p>
-<p>{{{You will find complete information on the official <a href="http://b2evolution.net/">b2evolution website</a>.}}} </p>
-<p>{{{<strong>WARNING:</strong> This is a BETA release. There are still bugs we know of, but we consider the software is globally operational! :-&gt;}}}</p>
-<p>{{{NOTE: This version is and will continue to be fully supported in the upgrading scheme and procedures.}}}</p>
-<h2>{{{Quickstart instructions:}}}</h2>
-<p>{{{You can set up b2evolution in just a few minutes. Just follow the instructions matching your situation:}}}</p>
-<ul class="expanded">
-
-	<li><strong><a href="doc/install_new.src.html">{{{Installing b2evolution from scratch}}}</a></strong></li>
+	<div class="wrapper1">
+	<div class="wrapper2">
+	<div class="wrapper3">
+		<span class="version_top">{{{Version}}} 2.0-alpha<!-- InstanceBeginEditable name="Version2" --><!-- InstanceEndEditable --></span>	
 	
-	<li><strong><a href="doc/upgradefrom_b2evo.src.html">{{{Upgrading from a previous version of b2evolution}}}</a></strong></li>
+		<a href="http://b2evolution.net/" target="_blank"><img src="blogs/rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
+		
+		<div class="menu_top"> 
+			<span class="floatright"> {{{After install}}}: <a href="blogs/index.php">{{{Blogs}}}</a> &bull; <a href="blogs/admin.php">{{{Admin}}}</a> </span> 
+			{{{Before install}}}: <a href="index.src.html">{{{Hello!}}}</a> &bull; <a href="doc/changes.html">{{{Changelog}}}</a> &bull; <a href="blogs/install/index.php?locale=%7B%7B%7Btrans_locale%7D%7D%7D">{{{Installer}}}</a> <!-- InstanceBeginEditable name="MenuTop2" --><!-- InstanceEndEditable -->		</div>
+		
+		<!-- InstanceBeginEditable name="Main" -->
+		<div class="block1">
+		<div class="block2">
+		<div class="block3">
+			<h1>{{{Hello!}}}</h1>
+			<p>{{{You are about to install the b2evolution  multilingual multiuser multiblog engine. You can learn more about b2evolution by visiting <a href="http://b2evolution.net/" target="_blank">b2evolution.net</a> .}}} </p>
+			<p>{{{Below are some quick instructions designed to help you. Please pick your prefered language and read on...}}}</p>
+			<p>Current language: <strong>{{{trans_current}}}</strong> &middot; change: {{{trans_available}}}</p>
+			</div>
+		</div>
+		</div>
 
-	<li><strong>{{{Upgrading from other blog software:}}}</strong>
-<ul>
-<li><strong><a href="doc/upgradefrom_b2.src.html">{{{Cafelog/b2}}}</a></strong></li>
-<li><strong><a href="doc/upgradefrom_mt.src.html">{{{Movable Type}}}</a></strong></li>
-<!-- <li><strong><a href="doc/upfrom_wordpress.src.html">{{{WordPress}}}</a></strong></li> -->
-</ul>
-</li>
-	</ul>
-<!-- InstanceEndEditable -->
-	<div id="rowfooter">
-		<a href="http://b2evolution.net/">{{{official website}}}</a> &middot; 
-		<a href="http://b2evolution.net/about/license.html">{{{GNU GPL license}}}</a> &middot; 
-		<a href="http://fplanque.net/contact/">{{{contact}}}: Fran&ccedil;ois PLANQUE</a>
+		<div class="block1">
+		<div class="block2">
+		<div class="block3">
+			<h1>{{{Quickstart instructions}}}</h1>
+			<p>{{{If you don't have a webserver yet, check out our selection of <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank">recommended web hosting companies</a> which offer easy, automated install of b2evolution.}}}</p>
+			<p>{{{If you already have a PHP/MySQL webserver, you can set up this copy of b2evolution in just a few minutes. Just follow the instructions matching your situation:}}}</p>
+			<ul class="expanded">
+			
+				<li><strong><a href="doc/install_new.src.html">{{{Installing b2evolution from scratch}}} &raquo;</a></strong></li>
+				
+				<li><strong><a href="doc/upgradefrom_b2evo.src.html">{{{Upgrading from a previous version of b2evolution}}} &raquo;</a></strong></li>
+			
+				<li>{{{Upgrading from other blog software:}}}
+					<ul>
+					<li><strong><a href="doc/upgradefrom_b2.src.html">{{{Cafelog/b2}}}  &raquo;</a></strong></li>
+					<li><strong><a href="doc/upgradefrom_mt.src.html">{{{Movable Type}}}  &raquo;</a></strong></li>
+					</ul>
+					</li>
+				</ul>
+		</div>
+		</div>
+		</div>
+
+		<div class="block1">
+		<div class="block2">
+		<div class="block3">
+			<h2>{{{Beta software}}}</h2>
+			<p>{{{This is an ALPHA / BETA release!}}}</p>
+			<p>{{{There are still bugs we know of, but we consider the software is globally operational! The most important thing you need to know about ALPHA / BETA releases is that nothing is to be considered final, including skintags and the plugin API.}}}</p>
+			<p class="note">{{{NOTE: This version is and will continue to be fully supported in the upgrading scheme and procedures.}}}</p>
+		</div>
+		</div>
+		</div>
+
+		<!-- InstanceEndEditable -->
+		
+		<div class="menu_bottom">
+			{{{Online resources}}}: <a href="http://b2evolution.net/" target="_blank">{{{Official website}}}</a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank">{{{Find a host}}}</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">{{{Manual}}}</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">{{{Forums}}}</a><!-- InstanceBeginEditable name="MenuBottom2" --><!-- InstanceEndEditable -->
+		</div>
+	
+		<div class="copyright">
+		Copyright &copy; 2003-2007 by <a href="http://fplanque.com/" target="_blank">Fran&ccedil;ois Planque</a> &amp; <a href="http://b2evolution.net/dev/authors.html" target="_blank">others</a> &middot;<a href="http://b2evolution.net/about/license.html" target="_blank">{{{GNU GPL license}}}</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">{{{Contact}}}</a><!-- InstanceBeginEditable name="CopyrightTail2" --><!-- InstanceEndEditable --></div>
+	</div>
 	</div>
 	</div>
 </body>

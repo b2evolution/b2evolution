@@ -1,62 +1,68 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{{{trans_locale}}}" lang="{{{trans_locale}}}"><!-- InstanceBegin template="/Templates/b2evodistrib.dwt" codeOutsideHTMLIsLocked="false" -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{{{trans_locale}}}" lang="{{{trans_locale}}}"><!-- InstanceBegin template="/Templates/evo_distrib_2_doc.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<!-- InstanceBeginEditable name="doctitle" -->
 <meta http-equiv="Content-Type" content="text/html; charset={{{trans_charset}}}" />
 <title>{{{b2evo package}}}: {{{Installing b2evolution from scratch}}}</title>
-<!-- InstanceEndEditable --><link href="../blogs/rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
+<!-- InstanceEndEditable -->
+	<link href="../blogs/rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
 	<!-- InstanceParam name="lang" type="text" value="{{{trans_locale}}}" --> 
 </head>
-<body>
-	<div class="wrapper">
-	<div id="rowheader" >
-		<h1><a href="http://b2evolution.net/" title="{{{b2evolution: official site}}}"><img src="../blogs/rsc/img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
-		<div id="tagline">{{{Multilingual multiuser multi-blog engine.}}}</div>
-		<h1 id="version">{{{Version}}}: 2.0-dev</h1>
-		<div id="quicklinks">
-			{{{b2evo package}}}: 
-			<a href="../index.src.html">{{{Start page}}}</a> &middot; 
-			<a href="../blogs/install/index.php?locale=%7B%7B%7Btrans_locale%7D%7D%7D">{{{Install}}}</a> &middot; 
-			<a href="../blogs/index.php">{{{Blogs}}}</a> &middot; 
-			<a href="../blogs/admin.php">{{{Admin}}}</a> &middot; 
-			{{{Online}}}: 
-			<a href="http://manual.b2evolution.net/">{{{Manual}}}</a> &middot; 
-			<a href="http://forums.b2evolution.net/">{{{Forums}}}</a> 
-		</div>
-	</div>
-	<div class="installSideBar">
-		<p>{{{Available translations for this page:}}}</p>
-		{{{trans_available}}}
-	</div>
-	<!-- InstanceBeginEditable name="Main" -->
-<h1>{{{Installing b2evolution from scratch}}}</h1>
 
-<p>{{{To install b2evolution you need a web server. Nowadays, renting a server from a hosting company is cheap. Check out our selection of <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php">hosting offers</a>.}}} </p>
-<p>{{{Before you begin, please note that some network features of b2evolution require you to agree our simple <a href="http://b2evolution.net/about/terms.html">Terms of service</a>.}}}</p>
-<p>{{{Once you have unzipped the b2evolution distribution:}}}</p>
-<ol class="expanded">
-	<li>{{{On your server, try to create a new (empty) MySQL database for b2evolution (For example, you can call it "b2evolution". The exact procedure to create a new database depends on your host/server setup. Alternatively, you can also use an existing database which b2evolution will share with existing applications.)}}}<br />
-	<br />
-	<span class="small"><strong>{{{Note:}}}</strong> {{{b2evolution will create about 25 tables in the database you select. Unless you changed the config, all these tables' names will be prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. Your existing tables will not be affected in any way.}}}</span></li>
-	<li>{{{Upload the b2evolution files to your website.}}}<br />
-	<br />
-	<span class="small"><strong>{{{Note:}}} </strong>{{{Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. Otherwise, it's best to upload the files to a subdirectory of your webserver. You can keep the <code>/blogs</code> subdirectory name, but you can also choose another.}}}<br />
-	</span>
-<br />
-{{{Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/yourfolder</code> ...}}}</li>
-  <li>{{{Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> . Then, simply follow the on screen instructions.<br />
-<br />
-The installer will ask you a few questions, create required database tables and configure b2evolution for you.}}} </li>
-<li>{{{Check to make sure the new installation works.}}}</li>
-<li>{{{On production servers, it is recommended that you delete the <code>/install</code> subfolder.}}}</li>
-<li>{{{After basic install is done, there are a few <a href="http://manual.b2evolution.net/Tricky_stuff">tricky things you may need to take care of</a> (online manual).}}}</li>
-</ol>
+<body>
+	<div class="wrapper1">
+	<div class="wrapper2">
+	<div class="wrapper3">
+		<span class="version_top">{{{Version}}} 2.0-alpha<!-- InstanceBeginEditable name="Version2" --><!-- InstanceEndEditable --></span>	
+	
+		<a href="http://b2evolution.net/" target="_blank"><img src="../blogs/rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
+		
+		<div class="menu_top"> 
+			<span class="floatright"> {{{After install}}}: <a href="../blogs/index.php">{{{Blogs}}}</a> &bull; <a href="../blogs/admin.php">{{{Admin}}}</a> </span> 
+			{{{Before install}}}: <a href="../index.src.html">{{{Hello!}}}</a> &bull; <a href="changes.html">{{{Changelog}}}</a> &bull; <a href="../blogs/install/index.php?locale=%7B%7B%7Btrans_locale%7D%7D%7D">{{{Installer}}}</a> <!-- InstanceBeginEditable name="MenuTop2" --><!-- InstanceEndEditable -->		</div>
+		
+		<!-- InstanceBeginEditable name="Main" -->
+		<div class="block1">
+		<div class="block2">
+		<div class="block3">
+
+			<h1>{{{Installing b2evolution from scratch}}}</h1>
+			
+			<p>{{{To install b2evolution you need a PHP/MySQL web server (see <a href="http://manual.b2evolution.net/System_requirements" target="_blank">requirements</a>). Renting a fast server from a reputable hosting company is getting cheaper every day. Check out our  <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php">recommended hosting offers</a>.}}} </p>
+			<p class="note">{{{Before you begin, please note that some network features of b2evolution require you to agree our simple <a href="http://b2evolution.net/about/terms.html">Terms of service</a>.}}}</p>
+			<p>{{{Once you have unzipped the b2evolution distribution on your local computer:}}}</p>
+			<ol class="expanded">
+				<li>{{{On your server, try to create a new (empty) MySQL database for b2evolution (For example, you can call it "b2evolution". The exact procedure to create a new database depends on your host/server setup. Alternatively, you can also use an existing database which b2evolution will share with existing applications.)}}}<br />
+				<br />
+				<span class="note"><strong>{{{Note:}}}</strong> {{{b2evolution will create about 25 tables in the database you select. Unless you changed the config, all these tables' names will be prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. Your existing tables will not be affected in any way.}}}</span></li>
+				<li>{{{Upload the b2evolution files to your website.}}}<br />
+				<br />
+				<span class="note"><strong>{{{Note:}}} </strong>{{{Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. Otherwise, it's best to upload the files to a subdirectory of your webserver. You can keep the <code>/blogs</code> subdirectory name, but you can also choose another.}}}<br />
+				</span>
+			<br />
+			{{{Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/yourfolder</code> ...}}}</li>
+				<li>{{{Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> . Then, simply follow the on screen instructions.<br />
+			<br />
+			The installer will ask you a few questions, create required database tables and configure b2evolution for you.}}} </li>
+			<li>{{{Check to make sure the new installation works.}}}</li>
+			<li>{{{On production servers, it is recommended that you delete the <code>/install</code> subfolder.}}}</li>
+			<li>{{{After basic install is done, there are a few <a href="http://manual.b2evolution.net/Tricky_stuff">tricky things you may need to take care of</a> (online manual).}}}</li>
+			</ol>
+			
+		</div>
+		</div>
+		</div>
 <!-- InstanceEndEditable -->
-	<div id="rowfooter">
-		<a href="http://b2evolution.net/">{{{official website}}}</a> &middot; 
-		<a href="http://b2evolution.net/about/license.html">{{{GNU GPL license}}}</a> &middot; 
-		<a href="http://fplanque.net/contact/">{{{contact}}}: Fran&ccedil;ois PLANQUE</a>
+		
+		<div class="menu_bottom">
+			{{{Online resources}}}: <a href="http://b2evolution.net/" target="_blank">{{{Official website}}}</a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank">{{{Find a host}}}</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">{{{Manual}}}</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">{{{Forums}}}</a><!-- InstanceBeginEditable name="MenuBottom2" --><!-- InstanceEndEditable -->
+		</div>
+	
+		<div class="copyright">
+		Copyright &copy; 2003-2007 by <a href="http://fplanque.com/" target="_blank">Fran&ccedil;ois Planque</a> &amp; <a href="http://b2evolution.net/dev/authors.html" target="_blank">others</a> &middot;<a href="http://b2evolution.net/about/license.html" target="_blank">{{{GNU GPL license}}}</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">{{{Contact}}}</a><!-- InstanceBeginEditable name="CopyrightTail2" --><!-- InstanceEndEditable --></div>
+	</div>
 	</div>
 	</div>
 </body>
