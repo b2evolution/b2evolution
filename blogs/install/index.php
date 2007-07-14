@@ -103,61 +103,39 @@ switch( $action ) {
 header('Content-Type: text/html; charset='.$io_charset);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US"><!-- InstanceBegin template="/Templates/evo_distrib_2.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<!-- InstanceBeginEditable name="doctitle" -->
 	<title><?php echo T_('b2evo installer').( $title ? ': '.$title : '' ) ?></title>
-	<link href="../rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
+	<!-- InstanceEndEditable -->
+	<link href="../rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
+	<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
+	<!-- InstanceParam name="lang" type="text" value="en-US" --> 
 </head>
+
 <body>
-<div class="wrapper">
-<div id="rowheader" >
-	<h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="<?php echo $rsc_url; ?>img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" /></a></h1>
-	<div id="tagline"><?php echo T_('Multilingual multiuser multi-blog engine.') ?></div>
-	<h1 id="version"><?php echo T_('Installer for version '), ' ', $app_version ?></h1>
-	<div id="quicklinks">
+	<div class="wrapper1">
+	<div class="wrapper2">
+	<div class="wrapper3">
+		<span class="version_top"><!-- InstanceBeginEditable name="Version" --><?php echo T_('Installer for version ').' '. $app_version ?><!-- InstanceEndEditable --></span>	
+	
+		<a href="http://b2evolution.net/" target="_blank"><img src="../rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
+		
+		<div class="menu_top"><!-- InstanceBeginEditable name="MenuTop" --> 
+			<span class="floatright"><?php echo T_('After install') ?>: <a href="../index.php"><?php echo T_('Blogs') ?></a> &middot;
+			<a href="../admin.php"><?php echo T_('Admin') ?></a>
+			</span>
 		<?php echo T_('Current installation') ?>:
 		<a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Install menu') ?></a> &middot;
-		<a href="phpinfo.php"><?php echo T_('PHP info') ?></a> &middot;
-		<a href="../index.php"><?php echo T_('Go to Blogs') ?></a> &middot;
-		<a href="../admin.php"><?php echo T_('Go to Admin') ?></a> &middot;
-		<?php echo T_('Online') ?>:
-		<a href="http://manual.b2evolution.net/"><?php echo T_('Manual') ?></a> &middot;
-		<a href="http://forums.b2evolution.net/"><?php echo T_('Forums') ?></a>
-	</div>
-</div>
-
-
+		<a href="phpinfo.php"><?php echo T_('PHP info') ?></a> 
+		<!-- InstanceEndEditable --></div>
+		
+		<!-- InstanceBeginEditable name="Main" -->
+		<div class="block1">
+		<div class="block2">
+		<div class="block3">
 <?php
-// Locales selector:
-if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($action == 'menu') )
-{
-	?>
-	<div class="installSideBar">
-	<h2><?php echo T_('Language / Locale')?></h2>
-	<p><?php echo T_('Choose a default language/locale for your b2evo installation.')?></p>
-
-	<ul>
-
-	<?php
-	// present available locales on first screen
-	foreach( $locales as $lkey => $lvalue )
-	{
-		echo "\n<li>";
-		if( $default_locale == $lkey ) echo '<strong>';
-		echo ' <a href="index.php?action='.$action.'&amp;locale='.$lkey.'">';
-		locale_flag( $lkey, 'w16px', 'flag', '', true, $rsc_url.'flags' );
-		echo T_( $lvalue['name'] );
-		echo '</a>';
-		if( $default_locale == $lkey ) echo '</strong>';
-		echo '</li>';
-
-	}
-	?>
-	</ul>
-	</div>
-	<?php
-}
-
 
 if( $config_is_done || (($action != 'start') && ($action != 'default') && ($action != 'conf')) )
 { // Connect to DB:
@@ -468,7 +446,14 @@ to
 		}
 		?>
 
-		<hr />
+	</div>
+	</div>
+	</div>
+
+	<div class="block1">
+	<div class="block2">
+	<div class="block3">
+
 		<h2><?php echo T_('Base config recap...')?></h2>
 
 		<p><?php printf( T_('If you don\'t see correct settings here, STOP before going any further, and <a %s>update your base configuration</a>.'), 'href="index.php?action=start&amp;locale='.$default_locale.'"' ) ?></p>
@@ -629,27 +614,71 @@ to
 
 ?>
 
-<div id="rowfooter">
-	<a href="http://b2evolution.net/"><?php echo T_('official website') ?></a> &middot;
-	<a href="http://b2evolution.net/about/license.html"><?php echo T_('GNU GPL license') ?></a> &middot;
-	<a href="http://fplanque.net/About/index.html"><?php echo T_('contact') ?>: Fran&ccedil;ois PLANQUE</a>
+</div>
+</div>
 </div>
 
 <?php
-	debug_info(); // output debug info if requested
+// Locales selector:
+if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($action == 'menu') )
+{
+	?>
+	<div class="block1">
+	<div class="block2">
+	<div class="block3">
+	<h2><?php echo T_('Language / Locale')?> - Temporarily misplaced</h2>
+	<p><?php echo T_('Choose a default language/locale for your b2evo installation.')?></p>
 
+	<?php
+	// present available locales on first screen
+	foreach( $locales as $lkey => $lvalue )
+	{
+		if( $default_locale == $lkey ) echo '<strong>';
+		echo ' <a href="index.php?action='.$action.'&amp;locale='.$lkey.'">';
+		locale_flag( $lkey, 'w16px', 'flag', '', true, $rsc_url.'flags' );
+		echo T_( $lvalue['name'] );
+		echo '</a>';
+		if( $default_locale == $lkey ) echo '</strong>';
+		echo ' &middot; ';
 
+	}
+	?>
+	</div>
+	</div>
+	</div>
+	<?php
+}
+?>
+<!-- InstanceEndEditable -->
+		
+		<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->
+			<?php echo T_('Online resources') ?>: <a href="http://b2evolution.net/" target="_blank"><?php echo T_('Official website') ?></a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank"><?php echo T_('Find a host') ?></a> &bull; <a href="http://manual.b2evolution.net/" target="_blank"><?php echo T_('Manual') ?></a> &bull; <a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Forums') ?></a>
+		<!-- InstanceEndEditable --></div>
+	
+		<div class="copyright">
+		Copyright &copy; 2003-2007 by <a href="http://fplanque.com/" target="_blank">Fran&ccedil;ois Planque</a> &amp; <a href="http://b2evolution.net/dev/authors.html" target="_blank">others</a> &middot;<!-- InstanceBeginEditable name="CopyrightTail" --><a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
+		<!-- InstanceEndEditable --></div>
+	</div>
+	</div>
+	</div>
+
+	<!-- InstanceBeginEditable name="BodyFoot" -->
+	<?php
+		debug_info(); // output debug info if requested
 	// the following comment gets checked in the automatic install script of demo.b2evolution.net:
 ?>
 <!-- b2evo-install-end -->
-</div>
+	<!-- InstanceEndEditable -->
 </body>
-</html>
+<!-- InstanceEnd --></html>
 
 
 <?php
 /*
  * $Log$
+ * Revision 1.135  2007/07/14 00:24:53  fplanque
+ * New installer design.
+ *
  * Revision 1.134  2007/07/01 18:47:11  fplanque
  * fixes
  *
