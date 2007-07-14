@@ -12,7 +12,7 @@
 
 .codeblock.amc_long {
 	height:24em;
-	overflow:auto; // added by yabba
+	overflow:auto;
 }
 
 .codeblock table {
