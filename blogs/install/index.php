@@ -103,7 +103,7 @@ switch( $action ) {
 header('Content-Type: text/html; charset='.$io_charset);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US"><!-- InstanceBegin template="/Templates/evo_distrib_2.dwt" codeOutsideHTMLIsLocked="false" -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/evo_distrib_2.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<!-- InstanceBeginEditable name="doctitle" -->
@@ -111,10 +111,12 @@ header('Content-Type: text/html; charset='.$io_charset);
 	<!-- InstanceEndEditable -->
 	<link href="../rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
-	<!-- InstanceParam name="lang" type="text" value="en-US" --> 
+	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" --> 
 </head>
 
 <body>
+	<!-- InstanceBeginEditable name="BodyHead" --><!-- InstanceEndEditable -->
+
 	<div class="wrapper1">
 	<div class="wrapper2">
 	<div class="wrapper3">
@@ -655,8 +657,7 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 			<?php echo T_('Online resources') ?>: <a href="http://b2evolution.net/" target="_blank"><?php echo T_('Official website') ?></a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank"><?php echo T_('Find a host') ?></a> &bull; <a href="http://manual.b2evolution.net/" target="_blank"><?php echo T_('Manual') ?></a> &bull; <a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Forums') ?></a>
 		<!-- InstanceEndEditable --></div>
 	
-		<div class="copyright">
-		Copyright &copy; 2003-2007 by <a href="http://fplanque.com/" target="_blank">Fran&ccedil;ois Planque</a> &amp; <a href="http://b2evolution.net/dev/authors.html" target="_blank">others</a> &middot;<!-- InstanceBeginEditable name="CopyrightTail" --><a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
+		<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright © 2003-2007 by François Planque & others · <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
 		<!-- InstanceEndEditable --></div>
 	</div>
 	</div>
@@ -676,6 +677,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.136  2007/07/14 02:44:22  fplanque
+ * New default page design.
+ *
  * Revision 1.135  2007/07/14 00:24:53  fplanque
  * New installer design.
  *
