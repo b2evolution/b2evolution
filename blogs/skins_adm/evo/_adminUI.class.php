@@ -127,6 +127,58 @@ class AdminUI extends AdminUI_general
 
 		return $r;
 	}
+
+	/**
+	 * Get a template by name and depth.
+	 *
+	 * @param string The template name ('main', 'sub').
+	 * @return array
+	 */
+	function get_template( $name, $depth = 0 )
+	{
+		switch( $name )
+		{
+			case 'main':
+				// main level
+				global $app_shortname, $app_version;
+
+				return array(
+					'before' => '<div id="mainmenu"><ul>',
+					'after' => "</ul>\n<p class=\"center\">$app_shortname v <strong>$app_version</strong></p>\n</div>",
+					'beforeEach' => '<li>',
+					'afterEach' => '</li>',
+					'beforeEachSel' => '<li class="current">',
+					'afterEachSel' => '</li>',
+					'beforeEachSelWithSub' => '<li class="parent">',
+					'afterEachSelWithSub' => '</li>',
+					'_props' => array(
+						/**
+						 * @todo Move to new skin (recurse for subentries if an entry is selected)
+						'recurseSelected' => true,
+						*/
+					),
+				);
+				break;
+
+
+			case 'CollectionList':
+				// Template for a list of Collections (Blogs)
+				return array(
+						'before' => '',
+						'after' => '',
+						'beforeEach' => '',
+						'afterEach' => '',
+						'beforeEachSel' => '',
+						'afterEachSel' => '',
+					);
+
+
+			default:
+				// Delegate to parent class:
+				return parent::get_template( $name, $depth );
+		}
+	}
+
 }
 
 ?>

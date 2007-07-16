@@ -34,15 +34,16 @@ if( isset($IconLegend) )
 	$IconLegend->display_legend();
 }
 
-// Close open divs, etc...
-echo $this->get_body_bottom();
-
 global $app_footer_text, $copyright_text;
-echo '<p class="footer">'.$app_footer_text.' &ndash; '.$copyright_text."</p>\n\n";
+echo '<div class="footer">'.$app_footer_text.' &ndash; '.$copyright_text."</div>\n\n";
 
 // CALL PLUGINS NOW:
 global $Plugins;
 $Plugins->trigger_event( 'AdminAfterPageFooter', array() );
+
+
+// Close open divs, etc...
+echo $this->get_body_bottom();
 
 
 if( $this->get_path(0) == 'files'
@@ -76,6 +77,10 @@ debug_info();
 <?php
 /*
  * $Log$
+ * Revision 1.2  2007/07/16 02:53:04  fplanque
+ * checking in mods needed by the chicago adminskin,
+ * so that incompatibilities with legacy & evo can be detected early.
+ *
  * Revision 1.1  2007/06/25 11:02:34  fplanque
  * MODULES (refactored MVC)
  *

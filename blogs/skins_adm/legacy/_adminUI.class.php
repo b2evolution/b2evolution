@@ -66,6 +66,16 @@ class AdminUI extends AdminUI_general
 				}
 				break;
 
+			case 'CollectionList':
+				// Template for a list of Collections (Blogs)
+				return array(
+						'before' => '',
+						'after' => '',
+						'beforeEach' => '',
+						'afterEach' => '',
+						'beforeEachSel' => '',
+						'afterEachSel' => '',
+					);
 
 			default:
 				// Delegate to parent class:

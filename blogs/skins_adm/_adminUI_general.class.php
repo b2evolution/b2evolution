@@ -767,7 +767,7 @@ class AdminUI_general
 
 						return array(
 							'before' => '<div id="mainmenu"><ul>',
-							'after' => "</ul>\n<p class=\"center\">$app_shortname v <strong>$app_version</strong></p>\n</div>",
+							'after' => '</ul></div>',
 							'beforeEach' => '<li>',
 							'afterEach' => '</li>',
 							'beforeEachSel' => '<li class="current">',
@@ -829,17 +829,8 @@ class AdminUI_general
 			case 'CollectionList':
 				// Template for a list of Collections (Blogs)
 				return array(
-						'before' => '',
-						'after' => '',
-						'beforeEach' => '',
-						'afterEach' => '',
-						'beforeEachSel' => '',
-						'afterEachSel' => '',
-					);
-				// fp>> I'll use the following as soon as I have time to play with the CSS:
-				return array(
-						'before' => '<ul class="submenu">',
-						'after' => '</ul>',
+						'before' => '<div id="coll_list"><ul>',
+						'after' => '</ul></div>',
 						'beforeEach' => '<li>',
 						'afterEach' => '</li>',
 						'beforeEachSel' => '<li class="current">',
@@ -1537,6 +1528,10 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.63  2007/07/16 02:53:04  fplanque
+ * checking in mods needed by the chicago adminskin,
+ * so that incompatibilities with legacy & evo can be detected early.
+ *
  * Revision 1.62  2007/07/09 23:03:04  fplanque
  * cleanup of admin skins; especially evo
  *
