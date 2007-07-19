@@ -45,6 +45,10 @@ error_reporting( E_ALL );
 // Try uncommmenting the following line:
 // ini_set( 'memory_limit', '16M' );
 
+// NOTE: If you're using PHP newer than 5.2.1, the default is 128M
+//       and because the memory management/reporting has changed 16M
+//       would be probably still too less.
+
 
 /**
  * Log application errors through {@link error_log() PHP's logging facilities}?
