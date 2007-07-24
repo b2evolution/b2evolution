@@ -134,6 +134,7 @@ class Plugins_admin extends Plugins
 				'RenderItemAsText' => 'Renders content when generated as plain text.',
 
 				// fp> rename to "DispRender"
+				// dh> TODO: those do not get called anymore!
 				'DisplayItemAsHtml' => 'Called on an item when it gets displayed as HTML.',
 				'DisplayItemAsXml' => 'Called on an item when it gets displayed as XML.',
 				'DisplayItemAsText' => 'Called on an item when it gets displayed as text.',
@@ -1528,6 +1529,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.3  2007/07/24 23:29:25  blueyed
+ * todo
+ *
  * Revision 1.2  2007/07/04 23:37:29  blueyed
  * PluginUserSettingsEditAction gets triggered and therefor needs to be in the
  * list of "available events", so Plugins can actually hook there.

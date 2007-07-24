@@ -189,6 +189,7 @@ class Table extends Widget
 {
 	/**
 	 * Display parameters
+	 * @todo document
 	 */
 	var $params = NULL;
 
@@ -238,7 +239,7 @@ class Table extends Widget
 	 *
 	 * Lazy fills $this->params
 	 *
-	 * @param array
+	 * @param array ***please document***
 	 * @param array Fadeout settings array( 'key column' => array of values ) or 'session'
 	 */
 	function display_init( $display_params = NULL, $fadeout = NULL )
@@ -779,6 +780,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.2  2007/07/24 23:29:26  blueyed
+ * todo
+ *
  * Revision 1.1  2007/06/25 10:59:01  fplanque
  * MODULES (refactored MVC)
  *

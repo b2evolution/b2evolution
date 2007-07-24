@@ -762,7 +762,7 @@ class Results extends Table
 	 *
 	 * This is useful when manually displaying, i-e: not by using Results::display()
  	*
-	 * @param array
+	 * @param array ***please document***
 	 * @param array Fadeout settings array( 'key column' => array of values ) or 'session'
  	 */
 	function display_init( $display_params = NULL, $fadeout = NULL )
@@ -1966,6 +1966,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.2  2007/07/24 23:29:25  blueyed
+ * todo
+ *
  * Revision 1.1  2007/06/25 10:59:03  fplanque
  * MODULES (refactored MVC)
  *
