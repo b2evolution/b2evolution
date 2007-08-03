@@ -377,6 +377,11 @@ class Plugin
 	 *       In the second case, $params['for_editing'] will be true.
 	 *
 	 * @todo 3.0 fp> 1) This is not an event: RENAME to lowercase (in b2evo 3.0)
+	 *           dh> Not only events are CamelCase, but "interactions" with the Plugins(_admin) class, too!
+	 *               Maybe it should get prefixed with "Plugin"?!
+	 *               The intention is: all interfacing methods are camel-cased. That makes a lot of sense,
+	 *               given the provided helpers (get_plugin_url etc).
+	 *               This applies to the other todos below, too.
 	 * @todo 3.0 fp> 2) This defines more than Default values ::  confusing name
 	 * @todo name tentative get_general_param_definitions()
 	 *
@@ -2384,20 +2389,29 @@ class Plugin
 	 * Get the absolute URL to the plugin's directory (where the plugins classfile is).
 	 * Trailing slash included.
 	 *
-	 * This is either below {@link $plugins_url}, if no Blog is set or we're in the
-	 * backoffice, or the "plugins" directory below the Blog's URL root otherwise.
-	 *
-	 * @param string Get absolute URL? (or cut off $ReqHost at the beginning)
+	 * @param string Get absolute URL? (or make it relative to $ReqHost)
 	 * @return string
 	 */
 	function get_plugin_url( $abs = false )
 	{
 		global $plugins_url, $plugins_path;
 
-		// Append sub-path below $plugins_path, if any:
+		// Get sub-path below $plugins_path, if any:
 		$sub_path = preg_replace( ':^'.preg_quote($plugins_path, ':').':', '', dirname($this->classfile_path).'/' );
 
-		return $plugins_url.$sub_path;
+		$r = $plugins_url.$sub_path;
+
+		// Use the same protocol as with current host (so includes from within https do not fail when on http):
+		load_funcs('_core/_url.funcs.php');
+		$r = url_same_protocol($r);
+
+		// Make it relative to current host, if absolute is not required:
+		if( ! $abs )
+		{
+			global $ReqHost;
+			$r = url_rel_to_same_host($r, $ReqHost);
+		}
+		return $r;
 	}
 
 
@@ -2868,6 +2882,10 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.2  2007/08/03 20:40:49  blueyed
+ * - doc for todos/discussion
+ * - Made get_plugin_url more usable again
+ *
  * Revision 1.1  2007/06/25 11:00:41  fplanque
  * MODULES (refactored MVC)
  *
