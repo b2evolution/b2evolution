@@ -216,14 +216,19 @@ if( $action == 'extract' )
 
 	if( $mode == 'CORE' )
 	{ // Replace header "vars" in first 20 lines:
+		// TODO: extract version from /conf directory
 		system( 'sed -i 1,20"'
-						.'s/PACKAGE/b2evolution/;'
-						.'s/VERSION/1.6-CVS/;'
-						.'s/# SOME DESCRIPTIVE TITLE./# b2evolution - Language file/;'
-						.'s/(C) YEAR/(C) 2003-'.date('Y').'/;'
-						.'s/YEAR(?!-MO)/'.date('Y').'/;'
-						.'s/CHARSET/iso-8859-1/;'
-						.'" '.escapeshellarg($file_pot) );
+			.'s/PACKAGE/b2evolution/;'
+			.'s/VERSION/2.0/;'
+			.'s/# SOME DESCRIPTIVE TITLE./# b2evolution - Language file/;'
+			.'s/(C) YEAR/(C) 2003-'.date('Y').'/;'
+			.'s/YEAR(?!-MO)/'.date('Y').'/;'
+			.'s/CHARSET/iso-8859-1/;'
+			.'" '.escapeshellarg($file_pot) );
+	}
+	else
+	{
+		// TODO: try to detect usage with a plugin and s&r accordingly
 	}
 	echo "[ok]\n";
 
