@@ -83,14 +83,21 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 
 		case 'comments':
 			// We are requesting the latest comments:
+			global $Item;
+			if (isset( $Item )){
+			$r[] = T_('Latest comments on ').$Item->get('title');
+			}
+			else
+			{
 			$r[] = T_('Latest comments');
+			}
 			break;
 
 		case 'feedback-popup':
 			// We are requesting the comments on a specific post:
 			// Should be in first position
 			$Item = & $MainList->get_by_idx( 0 );
-			$r[] = T_('Feeback on ').$Item->get('title');
+			$r[] = T_('Feedback on ').$Item->get('title');
 			break;
 
 		case 'profile':
@@ -330,6 +337,9 @@ function include_headlines()
 
 /*
  * $Log$
+ * Revision 1.4  2007/08/05 17:23:33  waltercruz
+ * Feed of the comments on a specific post. Just add the &id=? or &title=? to the URL
+ *
  * Revision 1.3  2007/07/01 03:57:20  fplanque
  * toolbar eveywhere
  *
