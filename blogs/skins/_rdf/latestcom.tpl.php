@@ -14,7 +14,14 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-$CommentList = & new CommentList( $Blog, "'comment'", array('published'), '',	'',	'DESC',	'',	$Blog->get_setting('posts_per_feed') );
+if (isset($Item))
+{
+  $CommentList = & new CommentList( $Blog, "'comment'", array('published'), $Item->ID,	'',	'DESC',	'','');
+}
+else
+{
+  $CommentList = & new CommentList( $Blog, "'comment'", array('published'), '',	'',	'DESC',	'',	$Blog->get_setting('posts_per_feed') );
+}
 
 skin_content_header( 'application/xml' );	// Sets charset!
 
