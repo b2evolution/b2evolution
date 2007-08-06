@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 if (isset($Item))
 {
-  $CommentList = & new CommentList( $Blog, "'comment'", array('published'), $p= $Item->ID,	'',	'DESC',	'','');
+  $CommentList = & new CommentList( $Blog, "'comment'", array('published'), $Item->ID,	'',	'DESC',	'','');
 }
 else
 {
