@@ -1485,7 +1485,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called to ask the plugin for the spam karma of a comment.
+	 * Event handler: Called to ask the plugin for the spam karma of a comment/trackback.
 	 *
 	 * This gets called just before the comment gets stored.
 	 *
@@ -2882,6 +2882,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.3  2007/08/11 17:59:05  blueyed
+ * Mention also trackback in GetSpamKarmaForComment doc
+ *
  * Revision 1.2  2007/08/03 20:40:49  blueyed
  * - doc for todos/discussion
  * - Made get_plugin_url more usable again
