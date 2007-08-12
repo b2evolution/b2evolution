@@ -116,7 +116,7 @@ B)       icon_cool.gif
 :\'(      icon_cry.gif
 |-|      icon_wth.gif
 :>>      icon_mrgreen.gif
-:yes:    grayyes.gif,
+:yes:    grayyes.gif
 ;D       graysmilewinkgrin.gif
 :P       graybigrazz.gif
 :))      graylaugh.gif
@@ -400,6 +400,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.43  2007/08/12 19:44:41  blueyed
+ * Fixed :yes: smilie
+ *
  * Revision 1.42  2007/06/18 21:21:57  fplanque
  * doc
  *
