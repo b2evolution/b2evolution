@@ -43,8 +43,7 @@ $UserSettings->param_Request( 'plugins_disp_avail', 'plugins_disp_avail', 'integ
 // Check permission to display:
 $current_User->check_perm( 'options', 'view', true );
 
-load_class('plugins/model/_plugins_admin.class.php');
-$admin_Plugins = new Plugins_admin();
+$admin_Plugins = get_Cache( 'Plugins_admin' );
 $admin_Plugins->restart();
 
 // Pre-walk list of plugins
@@ -1037,6 +1036,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2007/08/21 22:32:31  blueyed
+ * Use get_Cache() for singleton $Plugins_admin instance. This fixes at least the installation of flickr_plugin.
+ *
  * Revision 1.2  2007/07/04 23:38:27  blueyed
  * Fixed unregistration of plugin instances to get the default code.
  *

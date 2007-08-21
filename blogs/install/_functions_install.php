@@ -217,9 +217,7 @@ function install_basic_skins()
  */
 function install_basic_plugins( $old_db_version = 0 )
 {
-	load_class('plugins/model/_plugins_admin.class.php');
-
-	$Plugins_admin = & new Plugins_admin();
+	$Plugins_admin = & get_Cache('Plugins_admin');
 
 	if( $old_db_version < 9100 )
 	{
@@ -509,6 +507,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.31  2007/08/21 22:32:31  blueyed
+ * Use get_Cache() for singleton $Plugins_admin instance. This fixes at least the installation of flickr_plugin.
+ *
  * Revision 1.30  2007/07/01 18:49:40  fplanque
  * evopress skin (tentative)
  *
