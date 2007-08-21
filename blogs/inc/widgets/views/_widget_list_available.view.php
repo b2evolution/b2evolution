@@ -81,6 +81,14 @@ foreach( $core_componentwidget_defs as $code )
 global $Plugins;
 
 $Plugin_array = $Plugins->get_list_by_event( 'SkinTag' );
+// Remove the plugins, which have no code, because this gets used to install them:
+foreach( $Plugin_array as $k => $v )
+{
+	if( empty($v->code) )
+	{
+		unset($Plugin_array[$k]);
+	}
+}
 if( ! empty($Plugin_array) )
 { // We have some plugins
 
@@ -101,6 +109,9 @@ echo '</ul></li></ul>';
 
 /*
  * $Log$
+ * Revision 1.3  2007/08/21 22:28:29  blueyed
+ * Do not display plugins which then fail to install in the widgets list
+ *
  * Revision 1.2  2007/07/01 03:55:05  fplanque
  * category plugin replaced by widget
  *
