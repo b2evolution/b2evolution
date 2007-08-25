@@ -119,6 +119,7 @@ class POFile
 		$sources = array();
 		$loc_vars = array();
 		$this->msgids = array();
+		$is_fuzzy = false;
 		foreach ($lines as $line)
 		{
 			// echo 'LINE:', $line, '<br />';
@@ -130,6 +131,11 @@ class POFile
 					{
 						$untranslated++;
 						// echo 'untranslated: ', $msgid, '<br />';
+					}
+					elseif( $is_fuzzy )
+					{
+						$fuzzy++;
+						// echo 'fuzzy: ', $msgid, "<br />\n";
 					}
 					else
 					{
@@ -157,6 +163,7 @@ class POFile
 				$msgid = '';
 				$msgstr = '';
 				$sources = array();
+				$is_fuzzy = false;
 			}
 			elseif( ($status=='-') && preg_match( '#^msgid "(.*)"#', $line, $matches))
 			{	// Encountered an original text
@@ -191,7 +198,9 @@ class POFile
 				// echo '<br />';
 			}
 			elseif(strpos($line,'#, fuzzy') === 0)
-				$fuzzy++;
+			{
+				$is_fuzzy = true;
+			}
 		}
 
 		if( $echo_source_info )
