@@ -11898,84 +11898,229 @@ msgstr "Diese Demo-Vorlage zeigt eine Zusammenfassung der letzten Einträge in al
 msgid "More posts..."
 msgstr "Mehr Einträge..."
 
-#, fuzzy
-#~ msgid "Color scheme:"
-#~ msgstr "Schliessen Sheet"
+#~ msgid "English (GB)"
+#~ msgstr "Englisch (GB)"
+
+#~ msgid "Russian cp1251 (RU)"
+#~ msgstr "Russisch cp1251 (RU)"
+
+#~ msgid "Blog #1 XML sitemap (called through a stub)"
+#~ msgstr "Blog #1 XML Sitemap (aufgerufen durch eine Stub Datei)"
+
+#~ msgid "Blog #1 aggregated XML sitemap (called through a stub)"
+#~ msgstr "Blog #1 zu einer XMl Sitemap zusammengefasst (aufgerufen durch eine Stub Datei)"
+
+#~ msgid "Your account has already been validated."
+#~ msgstr "Deine E-Mail-Adresse wurde bereits validiert."
 
 #, fuzzy
-#~ msgid "Installed Skins"
-#~ msgstr "Installierte Plugins"
+#~ msgid "The file does not seem to be a valid upload! It may exceed the upload_max_filesize directive in php.ini."
+#~ msgstr "Die Datei überschreitet die upload_max_filesize Einstellung in php.ini."
 
 #, fuzzy
-#~ msgid "Page Top"
+#~ msgid "Item/Post/Page types"
+#~ msgstr "Eintragstypen"
+
+#, fuzzy
+#~ msgid "Cannot delete item type"
+#~ msgstr "Kann Eintragsstatus nicht löschen"
+
+#, fuzzy
+#~ msgid "Sorry, there is no blog you have permission to view stats for."
+#~ msgstr "Sorry, du hast keine Rechte, um Blogeigenschaften zu ändern oder anzugucken."
+
+#, fuzzy
+#~ msgid "%d group permission defintions"
+#~ msgstr "%d definierte Benutzerrechte"
+
+#, fuzzy
+#~ msgid "%d widgets"
+#~ msgstr "%d Zeilen"
+
+#, fuzzy
+#~ msgid "%d hits"
+#~ msgstr "%d Zeilen"
+
+#, fuzzy
+#~ msgid "Page List"
 #~ msgstr "Seiten"
 
 #, fuzzy
-#~ msgid "See"
-#~ msgstr "Sel"
+#~ msgid "Post List"
+#~ msgstr "Eintragsliste"
 
 #, fuzzy
-#~ msgid "Open b2evolution.net"
-#~ msgstr "Pinge b2evolution.net"
+#~ msgid "Info pages"
+#~ msgstr "1 Seite"
 
 #, fuzzy
-#~ msgid "Home page"
-#~ msgstr "Nächste Seite"
+#~ msgid "Contents"
+#~ msgstr "Inhalt"
 
 #, fuzzy
-#~ msgid "Blog home"
-#~ msgstr "Blog ID"
+#~ msgid "Follow up:"
+#~ msgstr "Erlaube HochladenDatei hochladen"
 
 #, fuzzy
-#~ msgid "Admin interface"
-#~ msgstr "Admin-Skin"
+#~ msgid "Redirected"
+#~ msgstr "Missbilligt"
 
 #, fuzzy
-#~ msgid "Email subscriptions"
-#~ msgstr "Blog Abos"
+#~ msgid "Publ"
+#~ msgstr "Öffentlich"
 
 #, fuzzy
-#~ msgid "User profile:"
+#~ msgid "Prot"
+#~ msgstr "Eintrag"
+
+#, fuzzy
+#~ msgid "Priv"
+#~ msgstr "Privat"
+
+#, fuzzy
+#~ msgid "Drft"
+#~ msgstr "Entwurf"
+
+#, fuzzy
+#~ msgid "Depr"
+#~ msgstr "Missbilligen"
+
+#, fuzzy
+#~ msgid "Redr"
+#~ msgstr "Lesen"
+
+#, fuzzy
+#~ msgid "Permission to post into this blog with redirected status"
+#~ msgstr "Erlaubnis, um missbilligte Einträge in diesem Blog zu erstellen"
+
+#, fuzzy
+#~ msgid "XML Feeds (RSS, Atom)"
+#~ msgstr "XML Feeds"
+
+#, fuzzy
+#~ msgid "No feeds"
+#~ msgstr "Keine Dateien"
+
+#, fuzzy
+#~ msgid "Titles only"
+#~ msgstr "Nur Anzeige"
+
+#, fuzzy
+#~ msgid "Post excerpts"
+#~ msgstr "Inhalt des Eintrags"
+
+#, fuzzy
+#~ msgid "Feed contents"
+#~ msgstr "Angegebener Inhalt"
+
+#, fuzzy
+#~ msgid "Default blog in index.php"
+#~ msgstr "Standard-Blog auf index.php"
+
+#, fuzzy
+#~ msgid "Blog base URL"
+#~ msgstr "Blog URL"
+
+#, fuzzy
+#~ msgid "Archive URLs"
+#~ msgstr "Archive"
+
+#, fuzzy
+#~ msgid "Archive links"
+#~ msgstr "Archive"
+
+#, fuzzy
+#~ msgid "Use param: post title"
 #~ msgstr "Benutzerprofil"
 
 #, fuzzy
-#~ msgid "iFilm"
-#~ msgstr "Fehlgeschlagen"
+#~ msgid "Use extra-path: post title"
+#~ msgstr "Benutze Extra-Path Info"
 
 #, fuzzy
-#~ msgid "DailyMotion"
-#~ msgstr "Anzeige-Optionen"
+#~ msgid "Use extra-path: year"
+#~ msgstr "Benutze Extra-Path Info"
 
 #, fuzzy
-#~ msgid "YouTube"
-#~ msgstr "Di"
+#~ msgid "Single post links"
+#~ msgstr "Onlinehilfe-Links"
 
 #, fuzzy
-#~ msgid "Video"
-#~ msgstr "Alle ansehen"
+#~ msgid "Link to single post"
+#~ msgstr "Eintrag editieren"
 
 #, fuzzy
-#~ msgid "Ordered List [Alt-O]"
-#~ msgstr "Ungeordnete Liste [Alt-U]"
+#~ msgid "Link to post in archive"
+#~ msgstr "gehe zum Monatsarchiv"
 
 #, fuzzy
-#~ msgid "EMphasis [Alt-I]"
-#~ msgstr "hervorgehoben [Alt-E]"
+#~ msgid "Post permalinks"
+#~ msgstr "Permalink"
 
 #, fuzzy
-#~ msgid "STRong [Alt-B]"
-#~ msgstr "kräftig [Alt-S]"
+#~ msgid "cancel"
+#~ msgstr "Abbrechen!"
+
+#~ msgid "Excerpt"
+#~ msgstr "Auszug"
 
 #, fuzzy
-#~ msgid "DELeted"
-#~ msgstr "gelöscht [Alt-D]"
+#~ msgid "Tags"
+#~ msgstr "Aufgabe"
+
+#~ msgid "Sub-Type"
+#~ msgstr "Unter-Typ"
 
 #, fuzzy
-#~ msgid "Blog A"
-#~ msgstr "Blog"
+#~ msgid "Go to blogs"
+#~ msgstr "Gehe zu Blogs"
 
 #, fuzzy
-#~ msgid "About Blog A"
+#~ msgid "Referer spam"
+#~ msgstr "Referer"
+
+#, fuzzy
+#~ msgid "Multiple sessions"
+#~ msgstr "Standardrechte"
+
+#, fuzzy
+#~ msgid "User blogs"
+#~ msgstr "Benutzer-Agenten"
+
+#, fuzzy
+#~ msgid "Invalid email link: %s."
+#~ msgstr "Ungültige Übertragung."
+
+#, fuzzy
+#~ msgid "Invalid email link."
+#~ msgstr "Ungültige Übertragung."
+
+#, fuzzy
+#~ msgid "Supplied email address (%s) is invalid."
+#~ msgstr "Die angegebene E-Mail Adresse ist ungültig."
+
+#, fuzzy
+#~ msgid "Invalid email address."
+#~ msgstr "Ungültige Anforderung, um Deine E-Mail-Adresse zu validieren."
+
+#, fuzzy
+#~ msgid "Invalid URL format (%s)."
+#~ msgstr "Ungültiger URL"
+
+#, fuzzy
+#~ msgid "URI scheme \"%s\" not allowed."
+#~ msgstr "URI Schema nicht erlaubt"
+
+#, fuzzy
+#~ msgid "Category directory"
+#~ msgstr "Kein Verzeichnis."
+
+#, fuzzy
+#~ msgid "Feeback on "
+#~ msgstr "Feedback Optionen"
+
+#, fuzzy
+#~ msgid "About Blog B"
 #~ msgstr "Gehe zu Blogs"
 
 #, fuzzy
@@ -11983,226 +12128,81 @@ msgstr "Mehr Einträge..."
 #~ msgstr "Blog"
 
 #, fuzzy
-#~ msgid "About Blog B"
+#~ msgid "About Blog A"
 #~ msgstr "Gehe zu Blogs"
 
 #, fuzzy
-#~ msgid "Feeback on "
-#~ msgstr "Feedback Optionen"
+#~ msgid "Blog A"
+#~ msgstr "Blog"
 
 #, fuzzy
-#~ msgid "Category directory"
-#~ msgstr "Kein Verzeichnis."
+#~ msgid "DELeted"
+#~ msgstr "gelöscht [Alt-D]"
 
 #, fuzzy
-#~ msgid "URI scheme \"%s\" not allowed."
-#~ msgstr "URI Schema nicht erlaubt"
+#~ msgid "STRong [Alt-B]"
+#~ msgstr "kräftig [Alt-S]"
 
 #, fuzzy
-#~ msgid "Invalid URL format (%s)."
-#~ msgstr "Ungültiger URL"
+#~ msgid "EMphasis [Alt-I]"
+#~ msgstr "hervorgehoben [Alt-E]"
 
 #, fuzzy
-#~ msgid "Invalid email address."
-#~ msgstr "Ungültige Anforderung, um Deine E-Mail-Adresse zu validieren."
+#~ msgid "Ordered List [Alt-O]"
+#~ msgstr "Ungeordnete Liste [Alt-U]"
 
 #, fuzzy
-#~ msgid "Supplied email address (%s) is invalid."
-#~ msgstr "Die angegebene E-Mail Adresse ist ungültig."
+#~ msgid "Video"
+#~ msgstr "Alle ansehen"
 
 #, fuzzy
-#~ msgid "Invalid email link."
-#~ msgstr "Ungültige Übertragung."
+#~ msgid "YouTube"
+#~ msgstr "Di"
 
 #, fuzzy
-#~ msgid "Invalid email link: %s."
-#~ msgstr "Ungültige Übertragung."
+#~ msgid "DailyMotion"
+#~ msgstr "Anzeige-Optionen"
 
 #, fuzzy
-#~ msgid "User blogs"
-#~ msgstr "Benutzer-Agenten"
+#~ msgid "iFilm"
+#~ msgstr "Fehlgeschlagen"
 
 #, fuzzy
-#~ msgid "Multiple sessions"
-#~ msgstr "Standardrechte"
-
-#, fuzzy
-#~ msgid "Referer spam"
-#~ msgstr "Referer"
-
-#, fuzzy
-#~ msgid "Go to blogs"
-#~ msgstr "Gehe zu Blogs"
-
-#~ msgid "Sub-Type"
-#~ msgstr "Unter-Typ"
-
-#, fuzzy
-#~ msgid "Tags"
-#~ msgstr "Aufgabe"
-
-#~ msgid "Excerpt"
-#~ msgstr "Auszug"
-
-#, fuzzy
-#~ msgid "cancel"
-#~ msgstr "Abbrechen!"
-
-#, fuzzy
-#~ msgid "Post permalinks"
-#~ msgstr "Permalink"
-
-#, fuzzy
-#~ msgid "Link to post in archive"
-#~ msgstr "gehe zum Monatsarchiv"
-
-#, fuzzy
-#~ msgid "Link to single post"
-#~ msgstr "Eintrag editieren"
-
-#, fuzzy
-#~ msgid "Single post links"
-#~ msgstr "Onlinehilfe-Links"
-
-#, fuzzy
-#~ msgid "Use extra-path: year"
-#~ msgstr "Benutze Extra-Path Info"
-
-#, fuzzy
-#~ msgid "Use extra-path: post title"
-#~ msgstr "Benutze Extra-Path Info"
-
-#, fuzzy
-#~ msgid "Use param: post title"
+#~ msgid "User profile:"
 #~ msgstr "Benutzerprofil"
 
 #, fuzzy
-#~ msgid "Archive links"
-#~ msgstr "Archive"
+#~ msgid "Email subscriptions"
+#~ msgstr "Blog Abos"
 
 #, fuzzy
-#~ msgid "Archive URLs"
-#~ msgstr "Archive"
+#~ msgid "Admin interface"
+#~ msgstr "Admin-Skin"
 
 #, fuzzy
-#~ msgid "Blog base URL"
-#~ msgstr "Blog URL"
+#~ msgid "Blog home"
+#~ msgstr "Blog ID"
 
 #, fuzzy
-#~ msgid "Default blog in index.php"
-#~ msgstr "Standard-Blog auf index.php"
+#~ msgid "Home page"
+#~ msgstr "Nächste Seite"
 
 #, fuzzy
-#~ msgid "Feed contents"
-#~ msgstr "Angegebener Inhalt"
+#~ msgid "Open b2evolution.net"
+#~ msgstr "Pinge b2evolution.net"
 
 #, fuzzy
-#~ msgid "Post excerpts"
-#~ msgstr "Inhalt des Eintrags"
+#~ msgid "See"
+#~ msgstr "Sel"
 
 #, fuzzy
-#~ msgid "Titles only"
-#~ msgstr "Nur Anzeige"
-
-#, fuzzy
-#~ msgid "No feeds"
-#~ msgstr "Keine Dateien"
-
-#, fuzzy
-#~ msgid "XML Feeds (RSS, Atom)"
-#~ msgstr "XML Feeds"
-
-#, fuzzy
-#~ msgid "Permission to post into this blog with redirected status"
-#~ msgstr "Erlaubnis, um missbilligte Einträge in diesem Blog zu erstellen"
-
-#, fuzzy
-#~ msgid "Redr"
-#~ msgstr "Lesen"
-
-#, fuzzy
-#~ msgid "Depr"
-#~ msgstr "Missbilligen"
-
-#, fuzzy
-#~ msgid "Drft"
-#~ msgstr "Entwurf"
-
-#, fuzzy
-#~ msgid "Priv"
-#~ msgstr "Privat"
-
-#, fuzzy
-#~ msgid "Prot"
-#~ msgstr "Eintrag"
-
-#, fuzzy
-#~ msgid "Publ"
-#~ msgstr "Öffentlich"
-
-#, fuzzy
-#~ msgid "Redirected"
-#~ msgstr "Missbilligt"
-
-#, fuzzy
-#~ msgid "Follow up:"
-#~ msgstr "Erlaube HochladenDatei hochladen"
-
-#, fuzzy
-#~ msgid "Contents"
-#~ msgstr "Inhalt"
-
-#, fuzzy
-#~ msgid "Info pages"
-#~ msgstr "1 Seite"
-
-#, fuzzy
-#~ msgid "Post List"
-#~ msgstr "Eintragsliste"
-
-#, fuzzy
-#~ msgid "Page List"
+#~ msgid "Page Top"
 #~ msgstr "Seiten"
 
 #, fuzzy
-#~ msgid "%d hits"
-#~ msgstr "%d Zeilen"
+#~ msgid "Installed Skins"
+#~ msgstr "Installierte Plugins"
 
 #, fuzzy
-#~ msgid "%d widgets"
-#~ msgstr "%d Zeilen"
-
-#, fuzzy
-#~ msgid "%d group permission defintions"
-#~ msgstr "%d definierte Benutzerrechte"
-
-#, fuzzy
-#~ msgid "Sorry, there is no blog you have permission to view stats for."
-#~ msgstr "Sorry, du hast keine Rechte, um Blogeigenschaften zu ändern oder anzugucken."
-
-#, fuzzy
-#~ msgid "Cannot delete item type"
-#~ msgstr "Kann Eintragsstatus nicht löschen"
-
-#, fuzzy
-#~ msgid "Item/Post/Page types"
-#~ msgstr "Eintragstypen"
-
-#, fuzzy
-#~ msgid "The file does not seem to be a valid upload! It may exceed the upload_max_filesize directive in php.ini."
-#~ msgstr "Die Datei überschreitet die upload_max_filesize Einstellung in php.ini."
-
-#~ msgid "Your account has already been validated."
-#~ msgstr "Deine E-Mail-Adresse wurde bereits validiert."
-
-#~ msgid "Blog #1 aggregated XML sitemap (called through a stub)"
-#~ msgstr "Blog #1 zu einer XMl Sitemap zusammengefasst (aufgerufen durch eine Stub Datei)"
-
-#~ msgid "Blog #1 XML sitemap (called through a stub)"
-#~ msgstr "Blog #1 XML Sitemap (aufgerufen durch eine Stub Datei)"
-
-#~ msgid "Russian cp1251 (RU)"
-#~ msgstr "Russisch cp1251 (RU)"
-
-#~ msgid "English (GB)"
-#~ msgstr "Englisch (GB)"
+#~ msgid "Color scheme:"
+#~ msgstr "Schliessen Sheet"
