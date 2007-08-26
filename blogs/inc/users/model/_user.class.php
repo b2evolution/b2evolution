@@ -332,7 +332,7 @@ class User extends DataObject
 	 */
 	function get_media_url()
 	{
-		global $baseurl, $media_subdir, $Settings, $Debuglog;
+		global $media_url, $Settings, $Debuglog;
 
 		if( ! $Settings->get( 'fm_enable_roots_user' ) )
 		{	// User directories are disabled:
@@ -340,7 +340,7 @@ class User extends DataObject
 			return false;
 		}
 
-		return $baseurl.$media_subdir.'users/'.$this->login.'/';
+		return $media_url.'users/'.$this->login.'/';
 	}
 
 
@@ -1324,6 +1324,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2007/08/26 17:05:58  blueyed
+ * MFB: Use $media_url in get_media_url
+ *
  * Revision 1.1  2007/06/25 11:01:45  fplanque
  * MODULES (refactored MVC)
  *
