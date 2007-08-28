@@ -1361,6 +1361,45 @@ class Item extends ItemLight
 
 
 	/**
+	 * Template function: Displays link to the feed for comments on this item
+	 *
+	 * @param string Type of feedback to link to (rss2/atom)
+	 * @param string String to display before the link (if comments are to be displayed)
+	 * @param string String to display after the link (if comments are to be displayed)
+	 * @param string Link title
+	 */
+	function feed_link( $type = 'atom', $before = '', $after = '',$title='#')
+	{
+		if( ! $this->can_see_comments() )
+		{	// Comments disabled
+			return;
+		}
+		if (!in_array($type,array('atom','rss2'))){
+				debug_die( "Unknown feed type [$type]" );
+		}
+
+		if( $title == '#' ) $title = T_('RSS feed for comments on this post');
+
+		$url = $this->get_comment_feed_url('_' . $type);
+ 
+		echo $before;
+		echo '<a href="'.$url .'">' . $title . '</a>';
+		echo $after;
+	}
+
+	/**
+	 * Get URL to display the post comments in an XML feed.
+	 *
+	 * @param string
+	 */
+	function get_comment_feed_url( $skin_folder_name )
+	{
+	$this->load_Blog();
+		return url_add_param( $this->Blog->get_tempskin_url( $skin_folder_name ), 'disp=comments&amp;title=' . $this->urltitle);
+	}
+
+
+	/**
 	 * Template function: Displays link to feedback page (under some conditions)
 	 *
 	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
@@ -1477,6 +1516,8 @@ class Item extends ItemLight
 
 		echo $after;
 	}
+
+
 
 
 	/**
@@ -3064,6 +3105,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.3  2007/08/28 02:43:40  waltercruz
+ * Template function to get the rss link to the feeds of the comments on each post
+ *
  * Revision 1.2  2007/07/03 23:21:32  blueyed
  * Fixed includes/requires in/for tests
  *
