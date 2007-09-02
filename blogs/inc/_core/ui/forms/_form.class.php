@@ -1670,6 +1670,7 @@ class Form extends Widget
 	 * @param string field name
 	 * @param mixed Initial value
 	 * @param array Options. If an associative key (string) is used, this gets the value attribute.
+	 *              NOTE: numeric strings get converted to integers by PHP!
 	 * @param string Field label to be display before the field
 	 * @param string Note
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
@@ -2748,6 +2749,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/02 19:23:42  blueyed
+ * doc
+ *
  * Revision 1.1  2007/06/25 10:59:01  fplanque
  * MODULES (refactored MVC)
  *
