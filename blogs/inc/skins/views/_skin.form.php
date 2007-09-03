@@ -60,7 +60,14 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 										true // separate lines
 								 );
 
-		$container_ul = '<ul><li>'.implode( '</li><li>', $edited_Skin->get_containers() ).'</li></ul>';
+		if( $skin_containers = $edited_Skin->get_containers() )
+		{
+			$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers ).'</li></ul>';
+		}
+		else
+		{
+			$container_ul = '-';
+		}
 		$Form->info( T_('Containers'), $container_ul );
 
 	$Form->end_fieldset();
@@ -71,6 +78,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/03 20:07:50  blueyed
+ * Fixed display of empty container lists in "Skins install" detail form
+ *
  * Revision 1.1  2007/06/25 11:01:36  fplanque
  * MODULES (refactored MVC)
  *
