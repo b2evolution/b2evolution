@@ -612,7 +612,7 @@ if( !$Messages->count('error') )
 			param( 'plugin_ID', 'integer', true );
 			param( 'set_path' );
 
-			$admin_Plugins = new Plugins_admin();
+			$admin_Plugins = & get_Cache('Plugins_admin');
 			$admin_Plugins->restart();
 			$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 
@@ -631,7 +631,7 @@ if( !$Messages->count('error') )
 			param( 'plugin_ID', 'integer', true );
 			param( 'set_path', 'string', '' );
 
-			$admin_Plugins = new Plugins_admin();
+			$admin_Plugins = & get_Cache('Plugins_admin');
 			$admin_Plugins->restart();
 			$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 
@@ -829,6 +829,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/03 23:47:37  blueyed
+ * Use singleton Plugins_admin
+ *
  * Revision 1.2  2007/07/09 20:11:53  fplanque
  * admin skin switcher
  *
