@@ -46,6 +46,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class Widget
 {
 	/**
+	 * Display parameters.
+	 * Example params would be 'block_start' and 'block_end'.
+	 * Params may contain special variables that will be replaced by replace_vars()
+	 * Different types of Widgets will expect different parameters.
+	 * @var array
+	 */
+	var $params = NULL;
+
+	/**
 	 * Title of the widget (to be displayed)
 	 */
 	var $title;
@@ -55,6 +64,23 @@ class Widget
 	 * @see global_icon()
 	 */
 	var $global_icons = array();
+
+
+	/**
+	 * Constructor
+	 *
+	 * @param string template name to get from $AdminUI
+	 */
+	function Widget( $ui_template = NULL )
+	{
+		global $AdminUI;
+
+		if( !empty( $ui_template ) )
+		{ // Get template params from Admin Skin:
+			$this->params = $AdminUI->get_template( $ui_template );
+		}
+	}
+
 
 	/**
 	 * Registers a global action icon
@@ -76,6 +102,24 @@ class Widget
 			'icon_weight'  => $icon_weight,
 			'word_weight'  => $word_weight,
 			'link_attribs' => $link_attribs );
+	}
+
+
+  /**
+	 * Display a template param without replacing variables
+	 */
+	function disp_template_raw( $param_name )
+	{
+		echo $this->params[ $param_name ];
+	}
+
+
+  /**
+	 * Display a template param with its variables replaced
+	 */
+	function disp_template_replaced( $param_name )
+	{
+		echo $this->replace_vars( $this->params[ $param_name ] );
 	}
 
 
@@ -187,12 +231,6 @@ class Widget
  */
 class Table extends Widget
 {
-	/**
-	 * Display parameters
-	 * @todo document
-	 */
-	var $params = NULL;
-
 	/**
 	 * Total number of pages
 	 */
@@ -780,6 +818,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/03 18:32:50  fplanque
+ * enhanced dashboard / comment moderation
+ *
  * Revision 1.2  2007/07/24 23:29:26  blueyed
  * todo
  *

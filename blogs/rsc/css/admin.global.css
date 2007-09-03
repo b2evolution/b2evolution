@@ -49,6 +49,12 @@ div.dashboard_sidebar li li {
 	margin: 0;
 }
 
+.dashboard_action_area {
+	padding: 1ex 0;
+	font-size: 84%;
+}
+
+
 /*
  * Categories selection table:
  */

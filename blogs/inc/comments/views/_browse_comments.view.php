@@ -38,22 +38,25 @@ global $dispatcher;
 /*
  * Display comments:
  */
-?>
-<div class="bFeedback">
-<h2><?php echo T_('Feedback (Comments, Trackbacks...)') ?></h2>
-<?php
+$block_item_Widget = & new Widget( 'block_item' );
+
+$block_item_Widget->title = T_('Feedback (Comments, Trackbacks...)');
+$block_item_Widget->disp_template_replaced( 'block_start' );
+
 
 $CommentList->display_if_empty( '<div class="bComment"><p>'.T_('No feedback yet...').'</p></div>' );
 
 // Display list of comments:
 require dirname(__FILE__).'/_comment_list.inc.php';
 
-?>
-</div>
+$block_item_Widget->disp_template_replaced( 'block_end' );
 
-<?php
+
 /*
  * $Log$
+ * Revision 1.2  2007/09/03 18:32:50  fplanque
+ * enhanced dashboard / comment moderation
+ *
  * Revision 1.1  2007/06/25 10:59:42  fplanque
  * MODULES (refactored MVC)
  *

@@ -71,8 +71,7 @@ while( $Comment = & $CommentList->get_next() )
 			<?php
 			$comment_Item = & $Comment->get_Item();
 			echo T_('In response to:')
-				.' <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$comment_Item->ID
-				.'" title="'.T_('Edit this task...').'">'.$comment_Item->dget('title').'</a>';
+				.' <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$comment_Item->ID.'">'.$comment_Item->dget('title').'</a>';
 			?>
 		</div>
 		<div class="bCommentTitle">
@@ -123,6 +122,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/03 18:32:50  fplanque
+ * enhanced dashboard / comment moderation
+ *
  * Revision 1.1  2007/06/25 10:59:43  fplanque
  * MODULES (refactored MVC)
  *

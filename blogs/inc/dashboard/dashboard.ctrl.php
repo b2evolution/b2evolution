@@ -59,15 +59,139 @@ if( $blog )
 
 	load_class('items/model/_itemlist.class.php');
 
-	$template = $AdminUI->get_template( 'block_item' );
-	$Widget = & new Widget();
+	$block_item_Widget = & new Widget( 'block_item' );
+
+
+	/*
+	 * COMMENTS:
+	 */
+	$CommentList = & new CommentList( $Blog, "'comment','trackback','pingback'", array( 'draft' ), '',	'',	'DESC',	'',	20 );
+
+	if( $CommentList->result_num_rows )
+	{	// We have drafts
+
+		$block_item_Widget->title = T_('Comments awaiting moderation');
+		$block_item_Widget->disp_template_replaced( 'block_start' );
+
+		while( $Comment = & $CommentList->get_next() )
+		{ // Loop through comments:
+
+			echo '<div class="dashboard_post">';
+			echo '<h3 class="dashboard_post_title">';
+
+			switch( $Comment->get( 'type' ) )
+			{
+				case 'comment': // Display a comment:
+					echo T_('Comment from:');
+					break;
+
+				case 'trackback': // Display a trackback:
+					echo T_('Trackback from:');
+					break;
+
+				case 'pingback': // Display a pingback:
+					echo T_('Pingback from:');
+					break;
+			}
+			echo ' ';
+			$Comment->author();
+
+			$comment_Item = & $Comment->get_Item();
+			echo ' '.T_('in response to:')
+					.' <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$comment_Item->ID.'">'.$comment_Item->dget('title').'</a>';
+
+			echo '</h3>';
+
+			echo '<div class="notes">';
+			if( $Comment->author_url( '', 'Url: <span class="bUrl">', '</span> &bull; ' )
+					&& $current_User->check_perm( 'spamblacklist', 'edit' ) )
+			{ // There is an URL and we have permission to ban...
+				// TODO: really ban the base domain! - not by keyword
+				echo ' <a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(get_ban_domain($Comment->author_url))
+					.'">'.get_icon( 'ban' ).'</a> ';
+			}
+			$Comment->author_email( '', 'Email: <span class="bEmail">', '</span> &bull; ' );
+			$Comment->author_ip( 'IP: <span class="bIP">', '</span> &bull; ' );
+			$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No Spam Karma') );
+			echo '</div>';
+		 ?>
+
+
+		<div class="small">
+			<?php $Comment->content() ?>
+		</div>
+
+		<div class="dashboard_action_area">
+		<?php
+			// Display edit button if current user has the rights:
+			$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton');
+
+			// Display publish NOW button if current user has the rights:
+			$Comment->publish_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', true );
+
+			// Display deprecate button if current user has the rights:
+			$Comment->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton', '&amp;', true );
+
+			// Display delete button if current user has the rights:
+			$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton');
+		?>
+		</div>
+
+
+		<?php
+			echo '</div>';
+		}
+
+		$block_item_Widget->disp_template_raw( 'block_end' );
+	}
+
+
+	/*
+	 * RECENT DRAFTS
+	 */
+	// Create empty List:
+	$ItemList = & new ItemList2( $Blog, NULL, NULL );
+
+	// Filter list:
+	$ItemList->set_filters( array(
+			'visibility_array' => array( 'draft' ),
+			'orderby' => 'datemodified',
+			'order' => 'DESC',
+			'posts' => 15,
+		) );
+
+	// Get ready for display (runs the query):
+	$ItemList->display_init();
+
+	if( $ItemList->result_num_rows )
+	{	// We have drafts
+
+		$block_item_Widget->title = T_('Recent drafts');
+		$block_item_Widget->disp_template_replaced( 'block_start' );
+
+		while( $Item = & $ItemList->get_item() )
+		{
+			echo '<div class="dashboard_post" lang="'.$Item->get('locale').'">';
+			// We don't switch locales in the backoffice, since we use the user pref anyway
+			// Load item's creator user:
+			$Item->get_creator_User();
+
+			echo '<h3 class="dashboard_post_title">';
+			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget( 'title' ).'</a>';
+			echo '</h3>';
+
+			echo '</div>';
+		}
+
+		$block_item_Widget->disp_template_raw( 'block_end' );
+	}
 
 
 	/*
 	 * RECENTLY EDITED
 	 */
-	$Widget->title = T_('Recently edited');
-	echo $Widget->replace_vars( $template['block_start'] );
+	$block_item_Widget->title = T_('Recently edited');
+	$block_item_Widget->disp_template_replaced( 'block_start' );
 
 	// Create empty List:
 	$ItemList = & new ItemList2( $Blog, NULL, NULL );
@@ -117,58 +241,19 @@ if( $blog )
 		echo '</div>';
 	}
 
-	echo $template['block_end'];
-
-
-	/*
-	 * RECENT DRAFTS
-	 */
-	// Create empty List:
-	$ItemList = & new ItemList2( $Blog, NULL, NULL );
-
-	// Filter list:
-	$ItemList->set_filters( array(
-			'visibility_array' => array( 'draft' ),
-			'orderby' => 'datemodified',
-			'order' => 'DESC',
-			'posts' => 15,
-		) );
-
-	// Get ready for display (runs the query):
-	$ItemList->display_init();
-
-	if( $ItemList->result_num_rows )
-	{	// We have drafts
-
-		$Widget->title = T_('Recent drafts');
-		echo $Widget->replace_vars( $template['block_start'] );
-
-		while( $Item = & $ItemList->get_item() )
-		{
-			echo '<div class="dashboard_post" lang="'.$Item->get('locale').'">';
-			// We don't switch locales in the backoffice, since we use the user pref anyway
-			// Load item's creator user:
-			$Item->get_creator_User();
-
-			echo '<h3 class="dashboard_post_title">';
-			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget( 'title' ).'</a>';
-			echo '</h3>';
-
-			echo '</div>';
-		}
-
-		echo $template['block_end'];
-	}
-
-	// fp> TODO: comments
+	$block_item_Widget->disp_template_raw( 'block_end' );
 
 
 	echo '</td><td>';
 
-	$template = $AdminUI->get_template( 'side_item' );
-	$Widget = & new Widget();
-	$Widget->title = T_('Manage your blog');
-	echo $Widget->replace_vars( $template['block_start'] );
+	/*
+	 * RIGHT COL
+	 */
+
+	$side_item_Widget = & new Widget( 'side_item' );
+
+	$side_item_Widget->title = T_('Manage your blog');
+	$side_item_Widget->disp_template_replaced( 'block_start' );
 
 	echo '<div class="dashboard_sidebar">';
 	echo '<ul>';
@@ -186,17 +271,15 @@ if( $blog )
 		}
 
  		echo '<li><a href="'.$Blog->get('url').'">View this blog</a></li>';
-
-		// TODO: dh> display link to "not-approved" (to be moderated) comments, if any. Therefor the comments list must be filterable.
 	echo '</ul>';
 	echo '</div>';
 
-	echo $template['block_end'];
+	$side_item_Widget->disp_template_raw( 'block_end' );
 
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 	{
-		$Widget->title = T_('Customize your blog');
-		echo $Widget->replace_vars( $template['block_start'] );
+		$side_item_Widget->title = T_('Customize your blog');
+		$side_item_Widget->disp_template_replaced( 'block_start' );
 
 		echo '<div class="dashboard_sidebar">';
 		echo '<ul>';
@@ -209,7 +292,7 @@ if( $blog )
 		echo '</ul>';
 		echo '</div>';
 
-		echo $template['block_end'];
+		$side_item_Widget->disp_template_raw( 'block_end' );
 	}
 
 
@@ -231,29 +314,61 @@ else
 }
 
 
+/*
+ * Administrative tasks
+ */
+
 if( $current_User->check_perm( 'options', 'edit' ) )
 {	// We have some serious admin privilege:
 	// Begin payload block:
 	$AdminUI->disp_payload_begin();
 
-	echo '<h2>Administrative tasks</h2>';
+	echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr><td>';
 
-	echo '<ul>';
-		echo '<li><a href="admin.php?ctrl=users&amp;user_ID='.$current_User->ID.'">Edit my user profile &raquo;</a></li>';
-		if( $current_User->check_perm( 'users', 'edit' ) )
-		{
-			echo '<li><a href="admin.php?ctrl=users&amp;action=new_user">Create new user &raquo;</a></li>';
-		}
-		if( $current_User->check_perm( 'blogs', 'create' ) )
-		{
-			echo '<li><a href="admin.php?ctrl=collections&amp;action=new">Create new blog &raquo;</a></li>';
-		}
-		echo '<li><a href="admin.php?ctrl=skins">Install a skin &raquo;</a></li>';
-		echo '<li><a href="admin.php?ctrl=plugins">Install a plugin &raquo;</a></li>';
-		// TODO: remember system date check and only remind every 3 months
-		echo '<li><a href="admin.php?ctrl=system">Check if my blog server is secure &raquo;</a></li>';
-	echo '</ul>';
-	// End payload block:
+	$block_item_Widget = & new Widget( 'block_item' );
+
+	$block_item_Widget->title = T_('Info');
+	$block_item_Widget->disp_template_replaced( 'block_start' );
+
+	echo '<p>Please be advised that this is <strong>Alpha</strong> software. Many things may still change.</p>';
+
+ 	echo '<p>We especially recommend you wait until next release before porting your skins to the new skin architecture.</p>';
+
+	$block_item_Widget->disp_template_replaced( 'block_end' );
+
+
+	echo '</td><td>';
+
+		/*
+		 * RIGHT COL
+		 */
+		$side_item_Widget = & new Widget( 'side_item' );
+
+		$side_item_Widget->title = T_('Administrative tasks');
+		$side_item_Widget->disp_template_replaced( 'block_start' );
+
+		echo '<div class="dashboard_sidebar">';
+		echo '<ul>';
+			if( $current_User->check_perm( 'users', 'edit' ) )
+			{
+				echo '<li><a href="admin.php?ctrl=users&amp;action=new_user">Create new user &raquo;</a></li>';
+			}
+			if( $current_User->check_perm( 'blogs', 'create' ) )
+			{
+				echo '<li><a href="admin.php?ctrl=collections&amp;action=new">Create new blog &raquo;</a></li>';
+			}
+			echo '<li><a href="admin.php?ctrl=skins">Install a skin &raquo;</a></li>';
+			echo '<li><a href="admin.php?ctrl=plugins">Install a plugin &raquo;</a></li>';
+			// TODO: remember system date check and only remind every 3 months
+			echo '<li><a href="admin.php?ctrl=system">Check if this blog server is secure &raquo;</a></li>';
+		echo '</ul>';
+		echo '</div>';
+
+		$side_item_Widget->disp_template_raw( 'block_end' );
+
+ 	echo '</td></tr></table>';
+
+ 	// End payload block:
 	$AdminUI->disp_payload_end();
 }
 
@@ -262,6 +377,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/03 18:32:50  fplanque
+ * enhanced dashboard / comment moderation
+ *
  * Revision 1.3  2007/09/03 16:44:31  fplanque
  * chicago admin skin
  *
