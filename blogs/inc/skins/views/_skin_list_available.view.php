@@ -30,7 +30,11 @@ $skin_folders = get_filenames( $skins_path, false, true, true, false, true );
 
 foreach( $skin_folders as $skin_folder )
 {
-  if( $SkinCache->get_by_folder( $skin_folder, false ) )
+	if( ! strlen($skin_folder) || $skin_folder[0] == '.' || $skin_folder == 'CVS' )
+	{
+		continue;
+	}
+	if( $SkinCache->get_by_folder( $skin_folder, false ) )
 	{	// Already installed...
 		continue;
 	}
@@ -44,6 +48,9 @@ echo '<div class="clear"></div>';
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/03 20:11:06  blueyed
+ * Skip hidden and CVS folders in $skin_folder
+ *
  * Revision 1.1  2007/06/25 11:01:39  fplanque
  * MODULES (refactored MVC)
  *
