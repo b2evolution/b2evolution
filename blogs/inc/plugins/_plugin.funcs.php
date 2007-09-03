@@ -234,6 +234,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 
 		case 'select':
+			$params['force_keys_as_values'] = true; // so that numeric keys get used as values! autoform_validate_param_value() checks for the keys only.
 			$Form->select_input_array( $input_name, $set_value, $parmeta['options'], $set_label, NULL, $params );
 			break;
 
@@ -997,6 +998,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/03 23:45:56  blueyed
+ * Use always the array key as value for "select" settings.
+ *
  * Revision 1.1  2007/06/25 11:00:42  fplanque
  * MODULES (refactored MVC)
  *
