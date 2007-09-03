@@ -93,12 +93,13 @@ class quicktags_plugin extends Plugin
 				,'<?php echo T_('DELeted') ?>'
 			);
 
+		/*
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
 				'b2evo_bold'
 				,'b', 'font-weight:bold;'
 				,'<b>','</b>'
 				,'b'
-				,'<?php echo T_('STRong [Alt-B]') ?>'
+				,'<?php echo T_('Bold [Alt-B]') ?>'
 			);
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
@@ -106,8 +107,9 @@ class quicktags_plugin extends Plugin
 				,'i', 'font-style:italic;'
 				,'<i>','</i>'
 				,'i'
-				,'<?php echo T_('EMphasis [Alt-I]') ?>'
+				,'<?php echo T_('Italic [Alt-I]') ?>'
 			);
+		*/
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
 				'b2evo_strong'
@@ -406,6 +408,9 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.29  2007/09/03 16:46:58  fplanque
+ * minor
+ *
  * Revision 1.28  2007/06/29 23:12:18  blueyed
  * todo
  *

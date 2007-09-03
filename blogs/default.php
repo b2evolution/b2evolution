@@ -72,13 +72,12 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			<?php
 				$Messages->disp( '<div class="action_messages">', '</div>' );
 				
-				echo '<p>'.T_('You have successfully installed b2evolution.').'</p>';
+				echo '<p><strong>'.T_('You have successfully installed b2evolution.').'</strong></p>';
 				
-				echo '<p>'.T_('You haven\'t set a default blog yet. Thus, you see this default page.');
+				echo '<p>'.T_('You haven\'t set a default blog yet. Thus, you see this default page.').'</p>';
 				
 				?>
-				<p><a href="<?php echo $admin_url ?>?ctrl=settings&amp;tab=general"><?php echo T_( 'Set a default blog' ) ?> &raquo;</a></p>
-			</p>
+				<p><strong><a href="<?php echo $admin_url ?>?ctrl=settings&amp;tab=general"><?php echo T_( 'Set a default blog' ) ?> &raquo;</a></strong></p>
 
 		</div>
 		</div>

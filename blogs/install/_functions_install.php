@@ -234,7 +234,6 @@ function install_basic_plugins( $old_db_version = 0 )
 		// SkinTags:
 		$Plugins_admin->install( 'calendar_plugin' );
 		$Plugins_admin->install( 'archives_plugin' );
-		$Plugins_admin->install( 'categories_plugin' );
 		echo "OK.<br />\n";
 	}
 
@@ -507,6 +506,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.32  2007/09/03 16:46:58  fplanque
+ * minor
+ *
  * Revision 1.31  2007/08/21 22:32:31  blueyed
  * Use get_Cache() for singleton $Plugins_admin instance. This fixes at least the installation of flickr_plugin.
  *

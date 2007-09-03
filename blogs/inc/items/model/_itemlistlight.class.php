@@ -158,7 +158,7 @@ class ItemListLight extends DataObjectList2
 				'statuses' => NULL,
 				'types' => '-1000',							// All types except pages
 				'visibility_array' => array( 'published', 'protected', 'private' ),
-				'orderby' =>  $this->Blog->get_setting('orderby'),
+				'orderby' => $this->Blog->get_setting('orderby'),
 				'order' => $this->Blog->get_setting('orderdir'),
 				'unit' => $this->Blog->get_setting('what_to_show'),
 				'posts' => $this->limit,
@@ -1450,6 +1450,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/03 16:46:58  fplanque
+ * minor
+ *
  * Revision 1.2  2007/06/29 00:24:43  fplanque
  * $cat_array cleanup tentative
  *
