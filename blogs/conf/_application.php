@@ -38,9 +38,7 @@ $new_db_version = 9416;
 $app_banner = '<a href="http://b2evolution.net/"><img src="'.$rsc_url.'img/b2evolution_minilogo.png" width="231" height="50" alt="b2evolution" /></a>';
 
 $app_footer_text = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website")
-	.'"><img class="middle" src="'.$rsc_url.'img/b2evolution_logo_100.gif" alt="b2evolution" title="'
-	.T_("visit b2evolution's website").'" width="100" height="22" />
-	'.$app_version.'</a>
+	.'"><strong>b2evolution '.$app_version.'</strong></a>
 	&ndash;
 		<a href="http://b2evolution.net/about/license.html" class="nobr">'.T_('GPL License').'</a>';
 

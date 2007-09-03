@@ -98,6 +98,8 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_body_bottom()
 	{
+		global $rsc_url;
+
 		$r = '';
 
 		if( empty($this->mode) )
@@ -105,7 +107,11 @@ class AdminUI extends AdminUI_general
 			$r .= "\n\t</div>";
 		}
 
-		return $r."</div>\n";
+		$r .= "</div>\n";	// Close right col.
+
+		$r .= '<img src="'.$rsc_url.'/img/blank.gif" width="1" height="1" />';
+
+		return $r;
 	}
 
 

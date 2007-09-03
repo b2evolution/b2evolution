@@ -57,14 +57,12 @@ global $item_title, $item_content;
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
 
-$Form = & new Form( NULL, 'item_checkchanges', 'post', 'linespan' );
+$Form = & new Form( NULL, 'item_checkchanges', 'post' );
 $Form->labelstart = '<strong>';
 $Form->labelend = "</strong>\n";
 
 
 // ================================ START OF EDIT FORM ================================
-
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'post_ID,tab,action', 'filter=restore&amp;highlight='.$edited_Item->ID ), T_('cancel'), 4, 1 );
 
 $params = array();
 if( !empty( $bozo_start_modified ) )
@@ -93,6 +91,8 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->begin_fieldset( T_('Post contents') );
 
+	$Form->switch_layout( 'linespan' );
+
 	$Form->text_input( 'post_title', $item_title, 48, T_('Title'), '', array('maxlength'=>255) );
 
 	echo ' <span id="itemform_post_locale">'; // allow wrapping here! (and below)
@@ -115,6 +115,8 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	{
 		$Form->hidden( 'post_url', '' );
 	}
+
+ 	$Form->switch_layout( NULL );
 
 	// --------------------------- TOOLBARS ------------------------------------
 	echo '<div class="edit_toolbars">';
@@ -183,9 +185,10 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	if( $current_User->check_perm( 'edit_timestamp' ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
-		?>
-		<div id="itemform_edit_timestamp">
-		<?php
+
+		echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
+		$Form->switch_layout( 'linespan' );
+
 		$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), T_('Issue date') );
 		echo ' '; // allow wrapping!
 		$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '' );
@@ -194,10 +197,12 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		{ // If not checked, create time will be used...
 			$Form->checkbox( 'edit_date', $edit_date, '', T_('Edit') );
 		}
-		?>
-		</div>
-		<?php
+
+		$Form->switch_layout( NULL );
+		echo '</div>';
 	}
+
+	$Form->switch_layout( 'linespan' );
 
 	$Form->text( 'post_urltitle', $edited_Item->get( 'urltitle' ), 40, T_('URL Title'),
 	             T_('(to be used in permalinks)'), $field_maxlength = 50 ) ;
@@ -214,7 +219,9 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		<span class="notes"><?php echo T_('(for XML feeds)') ?></span></label><br />
 		<textarea name="post_excerpt" rows="2" class="large" id="post_excerpt"><?php $edited_Item->disp( 'excerpt', 'formvalue' ) ?></textarea>
 	</div>
+
 	<?php
+	$Form->switch_layout( NULL );
 
 	$Form->end_fieldset();
 
@@ -224,6 +231,9 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	if( $Blog->get_setting( 'use_workflow' ) )
 	{	// We want to use workflow properties for this blog:
 		$Form->begin_fieldset( T_('Workflow properties'), array( 'id' => 'itemform_workflow_props' ) );
+
+			echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
+			$Form->switch_layout( 'linespan' );
 
 			$Form->select_object( 'item_priority', NULL, $edited_Item, T_('Priority'), '', true, '', 'priority_options' );
 
@@ -240,6 +250,9 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 			echo ' '; // allow wrapping!
 
 			$Form->date( 'item_deadline', $edited_Item->get('datedeadline'), T_('Deadline') );
+
+			$Form->switch_layout( NULL );
+			echo '</div>';
 
 		$Form->end_fieldset();
 	}
@@ -286,7 +299,9 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->begin_fieldset( T_('Visibility / Sharing'), array( 'id' => 'itemform_visibility' ) );
 
+	$Form->switch_layout( 'linespan' );
 	visibility_select( $Form, $edited_Item->status );
+	$Form->switch_layout( NULL );
 
 	$Form->end_fieldset();
 
@@ -350,6 +365,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/03 16:44:28  fplanque
+ * chicago admin skin
+ *
  * Revision 1.3  2007/07/09 19:07:44  fplanque
  * minor
  *

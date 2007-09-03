@@ -231,13 +231,30 @@ class Form extends Widget
 				$this->formend = '';
 				break;
 
+			case 'chicago':		// Temporary dirty hack
+				$this->formstart = '';
+				$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
+				$this->no_title_fmt = '<span style="float:right">$global_icons$</span>'."\n";
+				$this->fieldstart = '<fieldset $ID$>'."\n";
+				$this->labelstart = '<div class="label">';
+				$this->labelend = "</div>\n";
+				$this->labelempty = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
+				$this->inputstart = '<div class="input">';
+				$this->infostart = '<div class="info">';
+				$this->inputend = "</div>\n";
+				$this->fieldend = "</fieldset>\n\n";
+				$this->buttonsstart = '<fieldset><div class="input">';
+				$this->buttonsend = "</div></fieldset>\n\n";
+				$this->formend = '';
+				break;
+
 			case 'linespan':
 				$this->formstart = '';
 				$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 				$this->no_title_fmt = '<span style="float:right">$global_icons$</span>&nbsp;'."\n";
 				$this->fieldstart = '<div class="tile" $ID$>';
-				$this->labelstart = '';
-				$this->labelend = "\n";
+				$this->labelstart = '<strong>';
+				$this->labelend = "</strong>\n";
 				$this->labelempty = '';
 				$this->inputstart = '';
 				$this->infostart = '';
@@ -425,6 +442,30 @@ class Form extends Widget
 				$r .= "</th></tr>\n";
 				break;
 
+			case 'chicago':
+				// Temporary dirty hack:
+				$r = '<div class="fieldset_title"><div class="fieldset_title_right"><div class="fieldset_title_bg">';
+
+				if( $title != '' )
+				{ // there is a title to display
+					if( !empty( $icons ) )
+					{
+						$r .= '<span class="fieldset_icons">';
+						foreach( $icons as $icon )
+						{
+							$r .= $icon;
+						}
+						$r .= '</span>';
+					}
+					$r .= $title;
+				}
+
+				$r .= "</div></div></div>\n";
+
+				$r .= '<fieldset>';
+
+				break;
+
 			default:
 				if( ! empty($field_params['legend_params']) )
 				{
@@ -471,6 +512,11 @@ class Form extends Widget
 		{
 			case 'table':
 				$r = '';
+				break;
+
+			case 'chicago':
+				// temporary dirty hack:
+				$r = '</fieldset>';
 				break;
 
 			default:
@@ -2749,6 +2795,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/03 16:44:28  fplanque
+ * chicago admin skin
+ *
  * Revision 1.2  2007/09/02 19:23:42  blueyed
  * doc
  *

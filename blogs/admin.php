@@ -123,9 +123,9 @@ if( ! $admin_skin || ! file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
 			$Debuglog->add( 'The default admin skin ['.$admin_skin.'] does not exist!', array('skin','error') );
 		}
 
-		if( file_exists(sprintf( $admin_skin_path, 'legacy' )) )
+		if( file_exists(sprintf( $admin_skin_path, 'chicago' )) )
 		{ // 'legacy' does exist
-			$admin_skin = 'legacy';
+			$admin_skin = 'chicago';
 
 			$Debuglog->add( 'Falling back to legacy admin skin.', 'skin' );
 		}
@@ -225,6 +225,9 @@ $Hit->log();
 
 /*
  * $Log$
+ * Revision 1.26  2007/09/03 16:44:28  fplanque
+ * chicago admin skin
+ *
  * Revision 1.25  2007/07/13 23:47:36  fplanque
  * New start pages!
  *

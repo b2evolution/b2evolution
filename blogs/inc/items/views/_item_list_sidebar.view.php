@@ -20,6 +20,10 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
+ * @var AdminUI
+ */
+global $AdminUI;
+/**
  * @var Blog
  */
 global $Blog;
@@ -32,9 +36,11 @@ global $tab, $show_past, $show_future, $show_statuses, $s, $sentence, $exact, $a
 
 load_funcs( 'skins/_skin.funcs.php' );
 
-echo '<div class="browse_side_item">';
+$Widget = & new Widget();
+$template = $AdminUI->get_template( 'side_item' );
 
-	echo '<h2>'.$Blog->dget( 'name', 'htmlbody' ).'</h2>';
+$Widget->title = $Blog->dget( 'name', 'htmlbody' );
+echo $Widget->replace_vars( $template['block_start'] );
 
 	// CALENDAR:
 	// Call the Calendar plugin:
@@ -55,9 +61,12 @@ echo '<div class="browse_side_item">';
 	}
 	*/
 
-echo '</div>';
+echo $template['block_end'];
 
-echo '<div class="browse_side_item">';
+$Widget = & new Widget();
+$Widget->title = T_('Filters');
+$Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 4, 4 );
+echo $Widget->replace_vars( $template['block_start'] );
 
 	$Form = & new Form( NULL, 'resetform', 'get', 'none' );
 
@@ -65,11 +74,6 @@ echo '<div class="browse_side_item">';
 
 		$Form->hidden_ctrl();
 		$Form->submit( array( 'submit', T_('Search'), 'search', '', 'float:right' ) );
-
-		echo '<h3>'.T_('Filters').'</h3>';
-
-		// TODO: style this better...
-		echo '<p><a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset">'.T_('Reset all filters!').'</a></p>';
 
 		$Form->hidden( 'tab', $tab );
 		$Form->hidden( 'blog', $Blog->ID );
@@ -259,10 +263,13 @@ echo '<div class="browse_side_item">';
 
 	$Form->end_form();
 
-echo '</div>';
+echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/03 16:44:28  fplanque
+ * chicago admin skin
+ *
  * Revision 1.3  2007/07/01 15:12:28  fplanque
  * simplified 'use_form'
  *

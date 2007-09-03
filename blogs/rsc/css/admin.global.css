@@ -4,28 +4,27 @@
  * This should be included with every skin and overridden when needed.
  */
 
-div.dashboard_sidebar {
-	width: 16em;
-	float: right;
-	border: 1px solid #999;
-	background-color: #eee;
-	padding: 1em;
-	margin: 0 0 0 1em;
+table.browse {
+	width: 100%;
+}
+table.browse td {
+	vertical-align:top;
 }
 
-div.dashboard_sidebar h3 {
-	margin: 0;
+div.dashboard_sidebar {
+	margin: 0 1em;
 }
 
 div.dashboard_sidebar ul {
 	margin: 0;
-	padding: 0 16px;
+	padding: 0 0 0 16px;
 }
 
 div.dashboard_sidebar li {
 	list-style: square;
 	margin: 1ex 0;
 	padding: 0;
+	white-space: nowrap;
 }
 div.dashboard_sidebar li li {
 	margin: 0;

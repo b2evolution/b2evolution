@@ -149,6 +149,7 @@ div#evo_toolbar li {
 }
 div#evo_toolbar li ul {
   position: absolute;
+	z-index: 100;
 	background-color: ThreeDFace;
 	border: 1px solid;
 	padding: 1px;

@@ -55,48 +55,28 @@ if( $blog )
 
 	echo '<h2>'.$Blog->dget( 'name' ).'</h2>';
 
-	echo '<div class="dashboard_sidebar">';
-	echo '<h3>Shortcuts</h3>';
-	echo '<ul>';
-		echo '<li><a href="admin.php?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'">Write a new post &raquo;</a></li>';
-
- 		echo '<li>Manage:<ul>';
-		echo '<li><a href="admin.php?ctrl=items&tab=full&filter=restore&blog='.$Blog->ID.'">Posts (full) &raquo;</a></li>';
-		echo '<li><a href="admin.php?ctrl=items&tab=list&filter=restore&blog='.$Blog->ID.'">Posts (list) &raquo;</a></li>';
-		echo '<li><a href="admin.php?ctrl=comments&blog='.$Blog->ID.'">Comments &raquo;</a></li>';
-		echo '</ul></li>';
-
-		if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
-		{
-			echo '<li>Customize blog:<ul>';
-			echo '<li><a href="admin.php?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'">'.T_('Blog name').' &raquo;</a></li>';
-			echo '<li><a href="admin.php?ctrl=coll_settings&tab=skin&blog='.$Blog->ID.'">'.T_('Blog skin').' &raquo;</a></li>';
-			echo '<li><a href="admin.php?ctrl=widgets&blog='.$Blog->ID.'">'.T_('Blog widgets').' &raquo;</a></li>';
-			echo '<li><a href="admin.php?ctrl=coll_settings&tab=display&blog='.$Blog->ID.'">'.T_('Blog display order').' &raquo;</a></li>';
-			echo '</ul></li>';
-		}
-
-		if( $current_User->check_perm( 'blog_genstatic', 'any', false, $Blog->ID ) )
-		{
-			echo '<li><a href="admin.php?ctrl=collections&amp;action=GenStatic&amp;blog='.$Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">Generate static page!</a></li>';
-		}
-
- 		echo '<li><a href="'.$Blog->get('url').'" target="_blank">View this blog</a></li>';
-
-		// TODO: dh> display link to "not-approved" (to be moderated) comments, if any. Therefor the comments list must be filterable.
-	echo '</ul>';
-	echo '</div>';
-
-	echo '<h3>Latest posts</h3>';
+	echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr><td>';
 
 	load_class('items/model/_itemlist.class.php');
+
+	$template = $AdminUI->get_template( 'block_item' );
+	$Widget = & new Widget();
+
+
+	/*
+	 * RECENTLY EDITED
+	 */
+	$Widget->title = T_('Recently edited');
+	echo $Widget->replace_vars( $template['block_start'] );
 
 	// Create empty List:
 	$ItemList = & new ItemList2( $Blog, NULL, NULL );
 
 	// Filter list:
 	$ItemList->set_filters( array(
-			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated', 'redirected' ),
+			'visibility_array' => array( 'published', 'protected', 'private', 'deprecated', 'redirected' ),
+			'orderby' => 'datemodified',
+			'order' => 'DESC',
 			'posts' => 5,
 		) );
 
@@ -105,47 +85,136 @@ if( $blog )
 
 	while( $Item = & $ItemList->get_item() )
 	{
-		?>
-		<div class="dashboard_post" lang="<?php $Item->lang() ?>">
-			<?php
+		echo '<div class="dashboard_post" lang="'.$Item->get('locale').'">';
+		// We don't switch locales in the backoffice, since we use the user pref anyway
+		// Load item's creator user:
+		$Item->get_creator_User();
+
+		// Display images that are linked to this post:
+		$Item->images( array(
+				'before' =>              '<div class="dashboard_thumbnails">',
+				'before_image' =>        '',
+				'before_image_legend' => NULL,	// No legend
+				'after_image_legend' =>  NULL,
+				'after_image' =>         '',
+				'after' =>               '</div>',
+				'image_size' =>          'fit-80x80'
+			) );
+
+		echo '<h3 class="dashboard_post_title">';
+		echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget( 'title' ).'</a>';
+
+		echo ' <span class="dashboard_post_details">';
+		$Item->status();
+		echo ' &bull; ';
+		$Item->views();
+		echo '</span>';
+		echo '</h3>';
+
+		echo '<div class="small">'.$Item->get_content_excerpt( 150 ).'</div>';
+
+		echo '<div style="clear:left;">'.get_icon('pixel').'</div>'; // IE crap
+		echo '</div>';
+	}
+
+	echo $template['block_end'];
+
+
+	/*
+	 * RECENT DRAFTS
+	 */
+	// Create empty List:
+	$ItemList = & new ItemList2( $Blog, NULL, NULL );
+
+	// Filter list:
+	$ItemList->set_filters( array(
+			'visibility_array' => array( 'draft' ),
+			'orderby' => 'datemodified',
+			'order' => 'DESC',
+			'posts' => 15,
+		) );
+
+	// Get ready for display (runs the query):
+	$ItemList->display_init();
+
+	if( $ItemList->result_num_rows )
+	{	// We have drafts
+
+		$Widget->title = T_('Recent drafts');
+		echo $Widget->replace_vars( $template['block_start'] );
+
+		while( $Item = & $ItemList->get_item() )
+		{
+			echo '<div class="dashboard_post" lang="'.$Item->get('locale').'">';
 			// We don't switch locales in the backoffice, since we use the user pref anyway
 			// Load item's creator user:
 			$Item->get_creator_User();
 
-			// Display images that are linked to this post:
-			$Item->images( array(
-					'before' =>              '<div class="dashboard_thumbnails">',
-					'before_image' =>        '',
-					'before_image_legend' => NULL,	// No legend
-					'after_image_legend' =>  NULL,
-					'after_image' =>         '',
-					'after' =>               '</div>',
-					'image_size' =>          'fit-80x80'
-				) );
-
 			echo '<h3 class="dashboard_post_title">';
 			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget( 'title' ).'</a>';
-
-			echo ' <span class="dashboard_post_details">';
-			$Item->status();
-			echo ' &bull; ';
-			$Item->views();
-			echo '</span>';
 			echo '</h3>';
 
-			echo '<div class="small">'.$Item->get_content_excerpt( 150 ).'</div>';
+			echo '</div>';
+		}
 
-			echo '<div style="clear:left;">'.get_icon('pixel').'</div>'; // IE crap
-			?>
-		</div>
-		<?php
+		echo $template['block_end'];
+	}
+
+	// fp> TODO: comments
+
+
+	echo '</td><td>';
+
+	$template = $AdminUI->get_template( 'side_item' );
+	$Widget = & new Widget();
+	$Widget->title = T_('Manage your blog');
+	echo $Widget->replace_vars( $template['block_start'] );
+
+	echo '<div class="dashboard_sidebar">';
+	echo '<ul>';
+		echo '<li><a href="admin.php?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'">Write a new post &raquo;</a></li>';
+
+ 		echo '<li>Browse:<ul>';
+		echo '<li><a href="admin.php?ctrl=items&tab=full&filter=restore&blog='.$Blog->ID.'">Posts (full) &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=items&tab=list&filter=restore&blog='.$Blog->ID.'">Posts (list) &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=comments&blog='.$Blog->ID.'">Comments &raquo;</a></li>';
+		echo '</ul></li>';
+
+		if( $current_User->check_perm( 'blog_genstatic', 'any', false, $Blog->ID ) )
+		{
+			echo '<li><a href="admin.php?ctrl=collections&amp;action=GenStatic&amp;blog='.$Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">Generate static page!</a></li>';
+		}
+
+ 		echo '<li><a href="'.$Blog->get('url').'">View this blog</a></li>';
+
+		// TODO: dh> display link to "not-approved" (to be moderated) comments, if any. Therefor the comments list must be filterable.
+	echo '</ul>';
+	echo '</div>';
+
+	echo $template['block_end'];
+
+	if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+	{
+		$Widget->title = T_('Customize your blog');
+		echo $Widget->replace_vars( $template['block_start'] );
+
+		echo '<div class="dashboard_sidebar">';
+		echo '<ul>';
+
+		echo '<li><a href="admin.php?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'">'.T_('Blog name').' &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=coll_settings&tab=skin&blog='.$Blog->ID.'">'.T_('Blog skin').' &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=widgets&blog='.$Blog->ID.'">'.T_('Blog widgets').' &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=coll_settings&tab=display&blog='.$Blog->ID.'">'.T_('Blog display order').' &raquo;</a></li>';
+
+		echo '</ul>';
+		echo '</div>';
+
+		echo $template['block_end'];
 	}
 
 
-	// fp> TODO: drafts
+ 	echo '</td></tr></table>';
 
-
-	echo '<div class="clear"></div>';
 
 	// End payload block:
 	$AdminUI->disp_payload_end();
@@ -154,6 +223,7 @@ else
 {	// We're on the GLOBAL tab...
 
 	$AdminUI->disp_payload_begin();
+	echo '<h2>Select a blog</h2>';
 	// Display blog list VIEW:
 	$AdminUI->disp_view( 'collections/views/_coll_list.view.php' );
 	$AdminUI->disp_payload_end();
@@ -187,12 +257,14 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	$AdminUI->disp_payload_end();
 }
 
-
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/03 16:44:31  fplanque
+ * chicago admin skin
+ *
  * Revision 1.2  2007/06/30 20:37:37  fplanque
  * UI changes
  *

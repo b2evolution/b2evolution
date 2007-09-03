@@ -506,7 +506,7 @@ function init_list_mode()
 	load_class('items/model/_itemlist.class.php');
 
 	// Create empty List:
-	$ItemList = new ItemList2( $Blog, NULL, NULL ); // COPY (func)
+	$ItemList = new ItemList2( $Blog, NULL, NULL, $UserSettings->get('results_per_page') ); // COPY (func)
 
 	$ItemList->set_default_filters( array(
 			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated', 'redirected' ),
@@ -573,6 +573,9 @@ switch( $action )
 							),
 					)
 			);
+
+		$AdminUI->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'post_ID,tab,action', 'filter=restore&amp;highlight='.$edited_Item->ID ), T_('cancel'), 4, 1 );
+
 		break;
 
 	case 'view':
@@ -607,6 +610,7 @@ $AdminUI->disp_html_head();
 
 // Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 $AdminUI->disp_body_top();
+
 
 /**
  * Display payload:
@@ -719,6 +723,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/03 16:44:31  fplanque
+ * chicago admin skin
+ *
  * Revision 1.2  2007/07/09 23:03:04  fplanque
  * cleanup of admin skins; especially evo
  *

@@ -50,14 +50,12 @@ global $item_title, $item_content;
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
 
-$Form = & new Form( NULL, 'item_checkchanges', 'post', 'linespan' );
+$Form = & new Form( NULL, 'item_checkchanges', 'post' );
 $Form->labelstart = '<strong>';
 $Form->labelend = "</strong>\n";
 
 
 // ================================ START OF EDIT FORM ================================
-
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'post_ID,tab,action', 'filter=restore&amp;highlight='.$edited_Item->ID ), T_('cancel'), 4, 1 );
 
 $params = array();
 if( !empty( $bozo_start_modified ) )
@@ -107,7 +105,11 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 
 	$Form->begin_fieldset( T_('Post contents') );
 
+	echo '<div class="edit_fieldgroup">';
+	$Form->switch_layout( 'linespan' );
 	$Form->text_input( 'post_title', $item_title, 48, T_('Title'), '', array('maxlength'=>255) );
+	$Form->switch_layout( NULL );
+	echo '</div>';
 
 	// --------------------------- TOOLBARS ------------------------------------
 	echo '<div class="edit_toolbars">';
@@ -170,10 +172,9 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 
 	if( $current_User->check_perm( 'edit_timestamp' ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
-		?>
-		<br />
-		<div id="itemform_edit_timestamp">
-		<?php
+		echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
+		$Form->switch_layout( 'linespan' );
+
 		$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), T_('Issue date') );
 		echo ' '; // allow wrapping!
 		$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '' );
@@ -182,9 +183,9 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 		{ // If not checked, create time will be used...
 			$Form->checkbox( 'edit_date', $edit_date, '', T_('Edit') );
 		}
-		?>
-		</div>
-		<?php
+
+		$Form->switch_layout( NULL );
+		echo '</div>';
 	}
 
 	$Form->end_fieldset();
@@ -213,7 +214,9 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 
 	$Form->begin_fieldset( T_('Visibility / Sharing'), array( 'id' => 'itemform_visibility' ) );
 
+	$Form->switch_layout( 'linespan' );
 	visibility_select( $Form, $edited_Item->status );
+	$Form->switch_layout( NULL );
 
 	$Form->end_fieldset();
 
@@ -254,6 +257,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/03 16:44:28  fplanque
+ * chicago admin skin
+ *
  * Revision 1.1  2007/06/25 11:00:32  fplanque
  * MODULES (refactored MVC)
  *

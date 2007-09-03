@@ -51,7 +51,7 @@ class GeneralSettings extends AbstractSettings
 	 * @var array
 	 */
 	var $_defaults = array(
-		'admin_skin' => 'legacy',
+		'admin_skin' => 'chicago',
 
 		'antispam_last_update' => '2000-01-01 00:00:00',
 		'antispam_threshold_publish' => '-90',
@@ -154,6 +154,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/03 16:44:28  fplanque
+ * chicago admin skin
+ *
  * Revision 1.2  2007/07/01 18:47:11  fplanque
  * fixes
  *

@@ -31,6 +31,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+load_funcs( '_core/ui/_uiwidget.class.php' );
+
+
 /**
  * The general Admin UI class. It provides functions to handle the UI part of the
  * Backoffice.
@@ -41,7 +44,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @package admin
  * @todo CODE DOCUMENTATION!!!
  */
-class AdminUI_general
+class AdminUI_general extends Widget
 {
 	/**
 	 * Visual path seperator (used in html title, ..)
@@ -431,7 +434,9 @@ class AdminUI_general
 
 			//echo ' disp_submenu-BEGIN ';
 			$path = array( $this->get_path(0) );
-			echo $this->get_html_menu( $path, 'sub' );
+			$r = $this->get_html_menu( $path, 'sub' );
+
+			echo $this->replace_vars( $r );
 			//echo ' disp_submenu-END ';
 
 			$this->displayed_sub_begin = 1;
@@ -798,7 +803,7 @@ class AdminUI_general
 
 
 			case 'sub':
-				// submenu, we support just one sub-level (by default)
+				// a payload block with embedded submenu
 				return array(
 						'before' => '<div class="pt">'
 							."\n".'<ul class="hack">'
@@ -807,7 +812,9 @@ class AdminUI_general
 							."\n</ul>"
 							."\n".'<div class="panelblocktabs">'
 							."\n".'<ul class="tabs">',
-						'after' => "</ul>\n</div>\n</div>"
+						'after' => "</ul>\n"
+							.'<span style="float:right">$global_icons$</span>'
+							."</div>\n</div>"
 							."\n".'<div class="tabbedpanelblock">',
 						'empty' => '<div class="panelblock">',
 						'beforeEach' => '<li>',
@@ -819,7 +826,7 @@ class AdminUI_general
 
 
 			case 'block':
-				// a payload block, anywhere "below" submenu. Gets used by disp_payload_begin()/disp_payload_end()
+				// an additional payload block, anywhere after the one with the submenu. Used by disp_payload_begin()/disp_payload_end()
 				return array(
 						'begin' => '<div class="panelblock">',
 						'end' => "\n</div>",
@@ -930,8 +937,21 @@ class AdminUI_general
 				return array(
 					'layout' => 'fieldset',
 				);
-
 			// TODO: add default settings for 'table', 'fieldset', etc...
+
+			case 'block_item':
+				return array(
+						'block_start' => '<div class="block_item">
+															<h3><span style="float:right">$global_icons$</span>$title$</h3>',
+						'block_end' => '</div>',
+					);
+
+			case 'side_item':
+				return array(
+						'block_start' => '<div class="browse_side_item">
+															<h3><span style="float:right">$global_icons$</span>$title$</h3>',
+						'block_end' => '</div>',
+					);
 
 			default:
 				debug_die( 'Unknown $name for AdminUI::get_template(): '.var_export($name, true) /* PHP 4.2 ! */ );
@@ -1467,6 +1487,14 @@ class AdminUI_general
 		}
 
 
+		$this->add_menu_entries( NULL, array(
+					'adsense' => array(
+						'text' => T_('AdSense'),
+						'title' => T_('AdSense stats'),
+						'href' => 'admin.php?ctrl=adsense',
+					),
+				) );
+
 		// Call AdminAfterMenuInit to notify Plugins that the menu is initialized
 		// E.g. the livehits_plugin and weather_plugin use it for adding a menu entry.
 		$Plugins->trigger_event( 'AdminAfterMenuInit' );
@@ -1528,6 +1556,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.64  2007/09/03 16:44:28  fplanque
+ * chicago admin skin
+ *
  * Revision 1.63  2007/07/16 02:53:04  fplanque
  * checking in mods needed by the chicago adminskin,
  * so that incompatibilities with legacy & evo can be detected early.
