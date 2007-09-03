@@ -56,7 +56,7 @@ global $Settings;
 
 global $UserSettings;
 
-global $fm_hide_dirtree, $create_name, $ads_list_path;
+global $fm_hide_dirtree, $create_name, $ads_list_path, $rsc_url;
 
 ?>
 
@@ -333,9 +333,14 @@ global $fm_hide_dirtree, $create_name, $ads_list_path;
 	</tbody>
 </table>
 
+<img src="'.$rsc_url.'/img/blank.gif" width="1" height="1" /><!-- for IE -->
+
 <?php
 /*
  * $Log$
+ * Revision 1.2  2007/09/03 19:36:06  fplanque
+ * chicago admin skin
+ *
  * Revision 1.1  2007/06/25 10:59:58  fplanque
  * MODULES (refactored MVC)
  *

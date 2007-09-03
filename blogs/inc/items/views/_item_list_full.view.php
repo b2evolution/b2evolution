@@ -55,19 +55,45 @@ global $postIDarray;
 $postIDarray = $ItemList->get_page_ID_array();
 
 
+
+$block_item_Widget = & new Widget( 'block_item' );
+
 if( $action == 'view' )
 {	// We are displaying a single post:
-	echo '<div class="floatright">'.action_icon( T_('Close post'), 'close',
-				regenerate_url( 'p,action', 'filter=restore&amp;highlight='.$p ), T_('close'), 4, 1 ).'</div>';
+	$block_item_Widget->title = $ItemList->get_filter_title( '', '', ' - ', NULL, 'htmlbody' );
+	$block_item_Widget->global_icon( T_('Close post'), 'close',
+				regenerate_url( 'p,action', 'filter=restore&amp;highlight='.$p ), T_('close'), 4, 1 );
+}
+else
+{	// We are displaying multiple posts
+	$block_item_Widget->title = T_('Full posts');
+	$block_item_Widget->global_icon( T_('New post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post...'), 3, 4 );
 }
 
-// Display title depending on selection params:
-echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
+$block_item_Widget->disp_template_replaced( 'block_start' );
 
-// Initialize things in order to be ready for displaying.
-$display_params = array(
-					'header_start' => '<div class="NavBar center"><div class="floatright">'
-								.action_icon( T_('New post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post...'), 3, 4 ).'</div>',
+
+
+if( $action == 'view' )
+{
+	// Initialize things in order to be ready for displaying.
+	$display_params = array(
+					'header_start' => '',
+						'header_text_single' => '',
+					'header_end' => '',
+					'footer_start' => '',
+						'footer_text_single' => '',
+					'footer_end' => ''
+				);
+}
+else
+{ // Not a single post!
+	// Display title depending on selection params:
+	echo $ItemList->get_filter_title( '<h3>', '</h3>', '<br />', NULL, 'htmlbody' );
+
+	// Initialize things in order to be ready for displaying.
+	$display_params = array(
+					'header_start' => '<div class="NavBar center">',
 						'header_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
 						'header_text_single' => T_('1 page'),
 					'header_end' => '</div>',
@@ -80,8 +106,10 @@ $display_params = array(
 							'list_next_text' => T_('...'),
 							'list_span' => 11,
 							'scroll_list_range' => 5,
-					'footer_end' => "",
+					'footer_end' => ''
 				);
+}
+
 $ItemList->display_init( $display_params );
 
 // Display navigation:
@@ -323,13 +351,14 @@ while( $Item = & $ItemList->get_item() )
 // Display navigation:
 $ItemList->display_nav( 'footer' );
 
-if( $action == 'list' )
-{
-	echo '<p class="center">'.action_icon( T_('New post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post...'), 3, 4 ).'</p>';
-}
+
+$block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/03 19:36:06  fplanque
+ * chicago admin skin
+ *
  * Revision 1.1  2007/06/25 11:00:30  fplanque
  * MODULES (refactored MVC)
  *

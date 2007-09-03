@@ -157,13 +157,19 @@ foreach( $container_Widget_array as $container=>$dummy )
 	}
 }
 
-// Fadeout javascript
 global $rsc_url;
+
+echo '<img src="'.$rsc_url.'/img/blank.gif" width="1" height="1" /><!-- for IE -->';
+
+// Fadeout javascript
 echo '<script type="text/javascript" src="'.$rsc_url.'js/fadeout.js"></script>';
 echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, false);</script>';
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/03 19:36:06  fplanque
+ * chicago admin skin
+ *
  * Revision 1.1  2007/06/25 11:02:01  fplanque
  * MODULES (refactored MVC)
  *
