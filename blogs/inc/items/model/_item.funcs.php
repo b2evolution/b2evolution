@@ -416,7 +416,7 @@ function cat_select( $display_info = true, $form_fields = true )
 
 	if( $current_User->check_perm( 'blog_cats', '', false, $blog ) )
 	{
-		$r .= '<div><a href="admin.php?ctrl=chapters&amp;action=new">'.T_('Add a new category').' &raquo;</a></div>';
+		$r .= '<div><a href="admin.php?ctrl=chapters&amp;action=new&amp;blog='.$blog.'">'.T_('Add a new category').' &raquo;</a></div>';
 	}
 
 	$r .= '</div>';
@@ -613,6 +613,9 @@ function visibility_select( & $Form, $post_status )
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/03 20:01:53  blueyed
+ * Fixed "Add a new category »" link (blog param)
+ *
  * Revision 1.2  2007/09/03 16:44:28  fplanque
  * chicago admin skin
  *
