@@ -100,6 +100,9 @@ the $AdminUI->foo() structural calls would move to the dispatcher.
 
 param( 'action', 'string', 'list' );
 
+// Init fadeout result array:
+$result_fadeout = array();
+
 if( param( $GenericCategoryCache->dbIDname, 'integer', NULL, true, false, false ) )
 {
 	if( ($edited_GenericCategory = & $GenericCategoryCache->get_by_ID( ${$GenericCategoryCache->dbIDname}, false, true, $subset_ID )) === false )
@@ -228,9 +231,9 @@ switch( $action )
 			if( $edited_GenericCategory->dbupdate() !== false )
 			{
 				$Messages->add( T_('Element updated.'), 'success' ); //ToDO change htis
-				// Add the ID of the updated element to the result fadeout
-				$result_fadeout[$edited_GenericCategory->dbIDname][] = $edited_GenericCategory->ID;
 			}
+			// Add the ID of the updated element to the result fadeout
+			$result_fadeout[$edited_GenericCategory->dbIDname][] = $edited_GenericCategory->ID;
 			$action = 'list';
 		}
 		else
@@ -423,6 +426,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/04 13:47:48  fplanque
+ * fixed fadeout
+ *
  * Revision 1.3  2007/09/04 13:33:26  fplanque
  * Fixed display for category screen.
  *

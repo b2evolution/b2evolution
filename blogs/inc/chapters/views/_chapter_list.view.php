@@ -36,6 +36,8 @@ global $permission_to_edit;
 
 global $subset_ID;
 
+global $result_fadeout;
+
 $line_class = 'odd';
 
 
@@ -49,13 +51,14 @@ $line_class = 'odd';
 function cat_line( $Chapter, $level )
 {
 	global $line_class, $result_fadeout, $permission_to_edit, $current_User, $Settings;
+	global $GenericCategoryCache;
 
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
 	$r = '<tr id="tr-'.$Chapter->ID.'"class="'.$line_class.
 					// Fadeout?
-					( in_array( $Chapter->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">
+					( in_array( $Chapter->ID, $result_fadeout[$GenericCategoryCache->dbIDname] ) ? ' fadeout-ffff00': '' ).'">
 					<td class="firstcol shrinkwrap">'.
 						$Chapter->ID.'
 				</td>';
@@ -162,7 +165,7 @@ if( $permission_to_edit )
 						);
 }
 
-$Table->display_init();
+$Table->display_init( NULL, $result_fadeout );
 
 $Table->display_list_start();
 
@@ -190,6 +193,9 @@ if( ! $Settings->get('allow_moving_chapters') )
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/04 13:47:48  fplanque
+ * fixed fadeout
+ *
  * Revision 1.2  2007/09/04 13:23:18  fplanque
  * Fixed display for category screen.
  *
