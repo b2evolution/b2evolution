@@ -80,8 +80,13 @@ $facilitate_exploits = '<p>'.T_('When enabled, this feature is known to facilita
 $change_ini = '<p>'.T_('If possible, change this setting to <code>%s</code> in your php.ini or ask your hosting provider about it.').'</p>';
 
 
-echo '<h2>'.T_('System checks').'</h2>';
+echo '<h2>'.T_('About this system').'</h2>';
 
+$block_item_Widget = & new Widget( 'block_item' );
+
+
+$block_item_Widget->title = 'b2evolution';
+$block_item_Widget->disp_template_replaced( 'block_start' );
 
 /**
  * b2evo version
@@ -105,9 +110,41 @@ else
 }
 
 
+/*
+ * /install/ folder
+ */
+$install_removed = ! is_dir( $basepath.$install_subdir );
+init_system_check( 'Install folder', $install_removed ?  T_('Deleted') : T_('Not deleted') );
+if( ! $install_removed )
+{
+	disp_system_check( 'warning', T_('For maximum security, it is recommended that you delete your /blogs/install/ folder once you are done with install or upgrade.') );
+
+	init_system_check( 'Database reset', $allow_evodb_reset ?  T_('Allowed!') : T_('Forbidden') );
+	if( $allow_evodb_reset )
+	{
+  	disp_system_check( 'error', '<p>'.T_('Currently, anyone who accesses your install folder could entirely reset your b2evolution database.')."</p>\n"
+  	 .'<p>'.T_('ALL YOUR DATA WOULD BE LOST!')."</p>\n"
+  	 .'<p>'.T_('As soon as possible, change the setting <code>$allow_evodb_reset = 0;</code> in your /conf/_basic.config.php.').'</p>' );
+	}
+	else
+	{
+		disp_system_check( 'ok' );
+	}
+}
+else
+{
+	disp_system_check( 'ok' );
+}
+
+$block_item_Widget->disp_template_raw( 'block_end' );
+
+
 /**
  * Time
  */
+$block_item_Widget->title = T_('Time');
+$block_item_Widget->disp_template_replaced( 'block_start' );
+
 init_system_check( 'Server time', date_i18n( locale_datetimefmt( ' - ' ), $servertimenow ) );
 disp_system_check( 'note' );
 
@@ -116,6 +153,13 @@ disp_system_check( 'note' );
 
 init_system_check( 'b2evolution time', date_i18n( locale_datetimefmt( ' - ' ), $localtimenow ) );
 disp_system_check( 'note' );
+
+$block_item_Widget->disp_template_raw( 'block_end' );
+
+
+
+$block_item_Widget->title = T_('PHP');
+$block_item_Widget->disp_template_replaced( 'block_start' );
 
 /*
  * PHP version
@@ -246,7 +290,7 @@ $memory_limit = ini_get('memory_limit');
 if( empty($memory_limit) )
 {
 	init_system_check( 'PHP memory_limit', T_('n.a.') );
-	disp_system_check( 'warning' );
+	disp_system_check( 'note' );
 }
 else
 {
@@ -289,33 +333,12 @@ else
 	disp_system_check( 'ok' );
 }
 
+$block_item_Widget->disp_template_raw( 'block_end' );
 
-/*
- * /install/ folder
- */
-$install_removed = ! is_dir( $basepath.$install_subdir );
-init_system_check( 'Install folder', $install_removed ?  T_('Deleted') : T_('Not deleted') );
-if( ! $install_removed )
-{
-	disp_system_check( 'warning', T_('For maximum security, it is recommended that you delete your /blogs/install/ folder once you are done with install or upgrade.') );
 
-	init_system_check( 'Database reset', $allow_evodb_reset ?  T_('Allowed!') : T_('Forbidden') );
-	if( $allow_evodb_reset )
-	{
-  	disp_system_check( 'error', '<p>'.T_('Currently, anyone who accesses your install folder could entirely reset your b2evolution database.')."</p>\n"
-  	 .'<p>'.T_('ALL YOUR DATA WOULD BE LOST!')."</p>\n"
-  	 .'<p>'.T_('As soon as possible, change the setting <code>$allow_evodb_reset = 0;</code> in your /conf/_basic.config.php.').'</p>' );
-	}
-	else
-	{
-		disp_system_check( 'ok' );
-	}
-}
-else
-{
-	disp_system_check( 'ok' );
-}
-// "interesting ones":
+
+$block_item_Widget->title = T_('MySQL');
+$block_item_Widget->disp_template_replaced( 'block_start' );
 
 /*
  * MySQL "SET NAMES"
@@ -350,6 +373,7 @@ else
 	disp_system_check( 'ok' );
 }
 
+$block_item_Widget->disp_template_raw( 'block_end' );
 
 
 /*
@@ -358,6 +382,9 @@ else
  * unix: ?
  * fp> Note: I'm going to use this for thumbnails for now, but I plan to use it for other things like small stats & status graphics.
  */
+$block_item_Widget->title = T_('GD Library (image handling)');
+$block_item_Widget->disp_template_replaced( 'block_start' );
+
 $gd_info = function_exists( 'gd_info' ) ? gd_info() : array( 'GD Version' => NULL );
 $gd_version = $gd_info['GD Version'];
 init_system_check( 'GD Library version', isset($gd_version) ? $gd_version : T_('Not installed') );
@@ -417,6 +444,7 @@ else
 
 	// pre_dump( $gd_info );
 }
+$block_item_Widget->disp_template_raw( 'block_end' );
 
 
 
@@ -442,6 +470,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/04 15:29:16  fplanque
+ * interface cleanup
+ *
  * Revision 1.1  2007/06/25 11:01:42  fplanque
  * MODULES (refactored MVC)
  *

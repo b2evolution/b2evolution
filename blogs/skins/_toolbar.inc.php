@@ -93,6 +93,9 @@ global $home_url, $admin_url;
     <ul style="width:22ex;"><!-- size because of HR in IE7 -->
 			<?php
 				echo '<li><a href="'.$home_url.'">'.T_('Home').'</a></li>';
+
+				user_admin_link( '<li>', '</li>', T_('Dashboard'), T_('Go to admin dashboard') );
+
 				echo '<li class="separator"><hr /></li>';
 
 				$perm_spam = $current_User->check_perm( 'spamblacklist', 'view', false );
@@ -101,7 +104,7 @@ global $home_url, $admin_url;
 				{
 					if( $perm_options )
 					{ ?>
-					<li><a href="<?php echo $admin_url ?>?ctrl=system">About this server</a></li>
+					<li><a href="<?php echo $admin_url ?>?ctrl=system">About this system</a></li>
 						<?php
 					}
 					if( $perm_spam )
