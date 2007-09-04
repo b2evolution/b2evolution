@@ -43,6 +43,8 @@ global $Plugins;
 
 $Form = & new Form( NULL, 'antispam_checkchanges' );
 
+$Form->global_icon( T_('Antispam blacklist').' &raquo;', NULL, '?ctrl=antispam', NULL, 0, 5 );
+
 $Form->begin_form( 'fform', T_('Antispam Settings') );
 $Form->hiddens_by_key( get_memorized() );
 
@@ -92,6 +94,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.1  2007/09/04 14:56:20  fplanque
+ * antispam cleanup
+ *
  * Revision 1.1  2007/06/25 10:59:23  fplanque
  * MODULES (refactored MVC)
  *

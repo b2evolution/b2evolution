@@ -326,6 +326,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.1  2007/09/04 14:56:18  fplanque
+ * antispam cleanup
+ *
  * Revision 1.1  2007/06/25 10:59:18  fplanque
  * MODULES (refactored MVC)
  *
@@ -343,122 +346,5 @@ function get_ban_domain( $url )
  *
  * Revision 1.16  2006/11/16 22:43:17  blueyed
  * resume/pause antispam_url timer instead of start/stopping, because it may get called more than once
- *
- * Revision 1.15  2006/08/19 07:56:30  fplanque
- * Moved a lot of stuff out of the automatic instanciation in _main.inc
- *
- * Revision 1.14  2006/07/05 21:57:20  blueyed
- * trans
- *
- * Revision 1.13  2006/07/05 21:56:01  blueyed
- * trans
- *
- * Revision 1.12  2006/07/04 17:32:29  fplanque
- * no message
- *
- * Revision 1.11  2006/07/01 23:27:49  fplanque
- * better base domain isolation
- *
- * Revision 1.10  2006/06/26 23:09:34  fplanque
- * Really working cronjob environment :)
- *
- * Revision 1.9  2006/05/30 21:59:46  blueyed
- * Fixed E_FATAL with polling of blacklist..
- *
- * Revision 1.8  2006/05/19 18:15:05  blueyed
- * Merged from v-1-8 branch
- *
- * Revision 1.7.2.1  2006/05/19 15:06:24  fplanque
- * dirty sync
- *
- * Revision 1.7  2006/05/12 21:53:37  blueyed
- * Fixes, cleanup, translation for plugins
- *
- * Revision 1.6  2006/04/28 11:16:17  blueyed
- * test, doc
- *
- * Revision 1.5  2006/04/27 20:10:34  fplanque
- * changed banning of domains. Suggest a prefix by default.
- *
- * Revision 1.4  2006/04/19 22:26:24  blueyed
- * cleanup/polish
- *
- * Revision 1.3  2006/04/07 22:43:20  blueyed
- * removed wrong todo
- *
- * Revision 1.2  2006/03/12 23:08:58  fplanque
- * doc cleanup
- *
- * Revision 1.1  2006/02/23 21:11:57  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.20  2005/12/12 19:21:21  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.19  2005/11/18 22:05:41  fplanque
- * no message
- *
- * Revision 1.18  2005/11/18 18:32:42  fplanque
- * Fixed xmlrpc logging insanity
- * (object should have been passed by reference but you can't pass NULL by ref)
- * And the code was geeky/unreadable anyway.
- *
- * Revision 1.17  2005/11/16 22:33:46  blueyed
- * removed rudimentary dnsrbl feature
- *
- * Revision 1.16  2005/10/28 20:26:43  blueyed
- * Handle failed update of antispam strings correctly.
- *
- * Revision 1.15  2005/10/28 02:37:37  blueyed
- * Normalized AbstractSettings API
- *
- * Revision 1.14  2005/09/19 14:13:03  fplanque
- * no message
- *
- * Revision 1.13  2005/09/17 18:13:21  blueyed
- * Typo, whitespace.
- *
- * Revision 1.12  2005/09/07 17:40:22  fplanque
- * enhanced antispam
- *
- * Revision 1.11  2005/09/06 17:13:54  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.10  2005/08/08 22:54:41  blueyed
- * Re-activated /admin/antispam, with slight improvements. Still needs a lot more love.
- *
- * Revision 1.9  2005/04/20 18:37:59  fplanque
- * Relocation of javascripts and CSS files to their proper places...
- *
- * Revision 1.8  2005/04/19 20:39:37  jwedgeco
- * I forgot to add the copyright and license text. I added it.
- *
- * Revision 1.7  2005/04/19 20:34:11  jwedgeco
- * Added Real-time DNS blacklist support.
- * Configure in conf/advanced.php.
- *
- * Revision 1.6  2005/02/28 09:06:32  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.5  2005/02/25 02:26:37  blueyed
- * start of hitlog refactoring
- *
- * Revision 1.4  2004/10/17 20:18:37  fplanque
- * minor changes
- *
- * Revision 1.3  2004/10/16 15:28:51  vegarg
- * Added copyright notes to all files I can remember I have edited.
- *
- * Revision 1.2  2004/10/14 18:31:24  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.35  2004/10/12 17:22:29  fplanque
- * Edited code documentation.
- *
  */
 ?>

@@ -23,7 +23,26 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-echo '<h2>'.T_('Banned domains blacklist').'</h2>';
+echo '<a href="?ctrl=set_antispam" style="float: right;"><strong>'.T_('Antispam settings').' &raquo;</strong></a>';
+echo '<h2>'.T_('Antispam blacklist').'</h2>';
+
+// ADD KEYWORD FORM:
+if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'add' here once it's mature.
+{ // add keyword or domain
+	global $keyword;
+
+	$Form = & new Form( NULL, 'antispam_add', 'post', '' );
+	$Form->begin_form('fform');
+		$Form->hidden_ctrl();
+		$Form->hidden( 'action', 'ban' );
+		$Form->text( 'keyword', $keyword, 30, T_('Add a banned keyword'), '', 80 ); // TODO: add note
+		/*
+		 * TODO: explicitly add a domain?
+		 * $add_Form->text( 'domain', $domain, 30, T_('Add a banned domain'), 'note..', 80 ); // TODO: add note
+		 */
+	$Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveButton' ) ) );
+}
+
 
 echo '<p class="center">'.T_('Any URL containing one of the following keywords will be banned from posts, comments and logs.');
 if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
@@ -163,6 +182,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.1  2007/09/04 14:56:19  fplanque
+ * antispam cleanup
+ *
  * Revision 1.1  2007/06/25 10:59:22  fplanque
  * MODULES (refactored MVC)
  *

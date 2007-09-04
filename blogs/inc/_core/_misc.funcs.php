@@ -54,7 +54,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Dependencies
  */
-load_funcs('antispam/_antispam.funcs.php');
+load_funcs('antispam/model/_antispam.funcs.php');
 load_funcs('files/model/_file.funcs.php');
 
 
@@ -2969,6 +2969,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/04 14:56:20  fplanque
+ * antispam cleanup
+ *
  * Revision 1.1  2007/06/25 10:58:52  fplanque
  * MODULES (refactored MVC)
  *

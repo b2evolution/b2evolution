@@ -130,7 +130,7 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 
 // Display VIEW:
-$AdminUI->disp_view( 'antispam/_antispam_settings.form.php' );
+$AdminUI->disp_view( 'antispam/views/_antispam_settings.form.php' );
 
 // End payload block:
 $AdminUI->disp_payload_end();
@@ -140,6 +140,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/04 14:56:19  fplanque
+ * antispam cleanup
+ *
  * Revision 1.1  2007/06/25 10:59:24  fplanque
  * MODULES (refactored MVC)
  *
