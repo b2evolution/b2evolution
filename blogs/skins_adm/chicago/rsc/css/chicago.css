@@ -321,7 +321,9 @@ table.grouped th {
 	padding: 0;
 	border-left-color: #9db0bc;
 }
-table.grouped th a.basic_sort_link {
+table.grouped th a.basic_sort_link,
+table.grouped th span {
+	display: block;
 	padding: 2px 8px;
 }
 table.grouped th a.basic_sort_link:hover {

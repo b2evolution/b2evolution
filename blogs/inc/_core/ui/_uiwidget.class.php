@@ -657,7 +657,7 @@ class Table extends Widget
 						}
 						elseif( $th_title )
 						{ // the column can't be ordered, but we still have a header defined:
-							echo $th_title;
+							echo '<span>'.$th_title.'</span>';
 						}
 						// </td>
 						echo $this->params['colhead_end'];
@@ -818,6 +818,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/04 13:23:18  fplanque
+ * Fixed display for category screen.
+ *
  * Revision 1.3  2007/09/03 18:32:50  fplanque
  * enhanced dashboard / comment moderation
  *

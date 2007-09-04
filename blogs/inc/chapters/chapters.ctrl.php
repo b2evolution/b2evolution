@@ -422,15 +422,15 @@ echo '<script type="text/javascript" src="'.$rsc_url.'js/fadeout.js"></script>';
 echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, false);</script>';
 
 
-// End payload block:
-$AdminUI->disp_payload_end();
-
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/04 13:23:18  fplanque
+ * Fixed display for category screen.
+ *
  * Revision 1.1  2007/06/25 10:59:24  fplanque
  * MODULES (refactored MVC)
  *

@@ -64,13 +64,13 @@ function cat_line( $Chapter, $level )
 	{	// We have permission permission to edit:
 		$edit_url = regenerate_url( 'action,'.$Chapter->dbIDname, $Chapter->dbIDname.'='.$Chapter->ID.'&amp;action=edit' );
 		$r .= '<td>
-						<label style="padding-left: '.($level).'em;"><a href="'.$edit_url.'" title="'.T_('Edit...').'">'.$Chapter->dget('name').'</a></label>
+						<strong style="padding-left: '.($level).'em;"><a href="'.$edit_url.'" title="'.T_('Edit...').'">'.$Chapter->dget('name').'</a></strong>
 					 </td>';
 	}
 	else
 	{
 		$r .= '<td>
-						 <label style="padding-left: '.($level).'em;">'.$Chapter->dget('name').'</label>
+						 <strong style="padding-left: '.($level).'em;">'.$Chapter->dget('name').'</strong>
 					 </td>';
 	}
 
@@ -140,38 +140,42 @@ $callbacks = array(
 
 //____________________________________ Display generic categories _____________________________________
 
-echo '<table class="grouped" cellspacing="0">
-			<tr>
-				<th colspan="4" class="results_title">
-					<div class="results_title">';
+$Table = & new Table();
 
+$Table->title = T_('Categories for blog:').' '.$Blog->dget('name');
 
-if( $permission_to_edit )
-{	// We have permission permission to edit, so display global icon to add nex genereic element:
-	echo '<span class="right_icons">'
-				.action_icon( T_('Add an element...'), 'new', regenerate_url( 'action,'.$GenericCategoryCache->dbIDname, 'action=new' ), T_('Add element'), 3, 4 ).'
-				</span>';
-}
+$Table->global_icon( T_('Add an element...'), 'new', regenerate_url( 'action,'.$GenericCategoryCache->dbIDname, 'action=new' ), T_('Add element'), 3, 4  );
 
-echo T_('Categories for blog:').' '.$Blog->dget('name').'
-					</div>
-				</th>
-			</tr>
-			<tr>
-				<th class="firstcol shrinkwrap right">'.T_('ID').'</th>
-				<th>'.T_('Name').'</th>
-				<th>'.T_('URL name').'</th>';
-
+$Table->cols[] = array(
+						'th' => T_('ID'),
+					);
+$Table->cols[] = array(
+						'th' => T_('Name'),
+					);
+$Table->cols[] = array(
+						'th' => T_('URL name'),
+					);
 if( $permission_to_edit )
 {	// We have permission permission to edit, so display action column:
-	echo '<th class="lastcol">'.T_('Actions').'</th>';
+	$Table->cols[] = array(
+							'th' => T_('Actions'),
+						);
 }
 
-echo '</tr>';
+$Table->display_init();
+
+$Table->display_list_start();
+
+$Table->display_head();
+
+$Table->display_body_start();
 
 echo $GenericCategoryCache->recurse( $callbacks, $subset_ID );
 
-echo '</table>';
+$Table->display_body_end();
+
+$Table->display_list_end();
+
 
 /* fp> TODO: maybe... (a general group move of posts would be more useful actually)
 echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same collection (smallest category number).').'</p>';
@@ -186,6 +190,9 @@ if( ! $Settings->get('allow_moving_chapters') )
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/04 13:23:18  fplanque
+ * Fixed display for category screen.
+ *
  * Revision 1.1  2007/06/25 10:59:27  fplanque
  * MODULES (refactored MVC)
  *
