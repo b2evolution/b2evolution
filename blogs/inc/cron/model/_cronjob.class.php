@@ -90,6 +90,9 @@ class Cronjob extends DataObject
 		{
 			case 'params':
 				return $this->set_param( 'params', 'string', serialize($parvalue), false );
+
+			case 'name':
+				return $this->set_param( $parname, 'string', substr( $parvalue, 0, 50 ), false );
 		}
 
 		return $this->set_param( $parname, 'string', $parvalue, $make_null );
@@ -116,6 +119,9 @@ class Cronjob extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/04 22:08:31  fplanque
+ * fixes
+ *
  * Revision 1.1  2007/06/25 10:59:47  fplanque
  * MODULES (refactored MVC)
  *
