@@ -332,7 +332,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	echo '<p>Please be advised that this is <strong>Alpha</strong> software. Many things may still change.</p>';
 
- 	echo '<p>We especially recommend you wait until next release before porting your skins to the new skin architecture.</p>';
+ 	echo '<p>We especially recommend you wait until next release before investing too much time in porting your skins to the new skin architecture.</p>';
 
 	$block_item_Widget->disp_template_replaced( 'block_end' );
 
@@ -377,6 +377,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/04 15:36:07  fplanque
+ * minor
+ *
  * Revision 1.4  2007/09/03 18:32:50  fplanque
  * enhanced dashboard / comment moderation
  *
