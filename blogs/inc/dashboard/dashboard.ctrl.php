@@ -15,6 +15,8 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
+ * @todo add 5 plugin hooks
+ *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -61,14 +63,17 @@ if( $blog )
 
 	$block_item_Widget = & new Widget( 'block_item' );
 
+	$nb_blocks_displayed = 0;
 
 	/*
 	 * COMMENTS:
 	 */
-	$CommentList = & new CommentList( $Blog, "'comment','trackback','pingback'", array( 'draft' ), '',	'',	'DESC',	'',	20 );
+	$CommentList = & new CommentList( $Blog, "'comment','trackback','pingback'", array( 'draft' ), '',	'',	'DESC',	'',	5 );
 
 	if( $CommentList->result_num_rows )
 	{	// We have drafts
+
+		$nb_blocks_displayed++;
 
 		$block_item_Widget->title = T_('Comments awaiting moderation');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
@@ -82,33 +87,37 @@ if( $blog )
 			switch( $Comment->get( 'type' ) )
 			{
 				case 'comment': // Display a comment:
-					echo T_('Comment from:');
+					echo T_('Comment from');
 					break;
 
 				case 'trackback': // Display a trackback:
-					echo T_('Trackback from:');
+					echo T_('Trackback from');
 					break;
 
 				case 'pingback': // Display a pingback:
-					echo T_('Pingback from:');
+					echo T_('Pingback from');
 					break;
 			}
-			echo ' ';
+			echo ' <strong>';
 			$Comment->author();
+			echo '</strong>';
 
 			$comment_Item = & $Comment->get_Item();
-			echo ' '.T_('in response to:')
-					.' <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$comment_Item->ID.'">'.$comment_Item->dget('title').'</a>';
+			echo ' '.T_('in response to')
+					.' <a href="?ctrl=items&amp;blog='.$comment_Item->blog_ID.'&amp;p='.$comment_Item->ID.'"><strong>'.$comment_Item->dget('title').'</strong></a>';
 
 			echo '</h3>';
 
 			echo '<div class="notes">';
-			if( $Comment->author_url( '', 'Url: <span class="bUrl">', '</span> &bull; ' )
-					&& $current_User->check_perm( 'spamblacklist', 'edit' ) )
-			{ // There is an URL and we have permission to ban...
-				// TODO: really ban the base domain! - not by keyword
-				echo ' <a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(get_ban_domain($Comment->author_url))
-					.'">'.get_icon( 'ban' ).'</a> ';
+			if( $Comment->author_url( '', 'Url: <span class="bUrl">', '</span>' ) )
+			{
+				if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+				{ // There is an URL and we have permission to ban...
+					// TODO: really ban the base domain! - not by keyword
+					echo ' <a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(get_ban_domain($Comment->author_url))
+						.'">'.get_icon( 'ban' ).'</a> ';
+				}
+				echo ' &bull; ';
 			}
 			$Comment->author_email( '', 'Email: <span class="bEmail">', '</span> &bull; ' );
 			$Comment->author_ip( 'IP: <span class="bIP">', '</span> &bull; ' );
@@ -157,7 +166,7 @@ if( $blog )
 			'visibility_array' => array( 'draft' ),
 			'orderby' => 'datemodified',
 			'order' => 'DESC',
-			'posts' => 15,
+			'posts' => 5,
 		) );
 
 	// Get ready for display (runs the query):
@@ -165,6 +174,8 @@ if( $blog )
 
 	if( $ItemList->result_num_rows )
 	{	// We have drafts
+
+		$nb_blocks_displayed++;
 
 		$block_item_Widget->title = T_('Recent drafts');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
@@ -190,9 +201,6 @@ if( $blog )
 	/*
 	 * RECENTLY EDITED
 	 */
-	$block_item_Widget->title = T_('Recently edited');
-	$block_item_Widget->disp_template_replaced( 'block_start' );
-
 	// Create empty List:
 	$ItemList = & new ItemList2( $Blog, NULL, NULL );
 
@@ -207,41 +215,75 @@ if( $blog )
 	// Get ready for display (runs the query):
 	$ItemList->display_init();
 
-	while( $Item = & $ItemList->get_item() )
-	{
-		echo '<div class="dashboard_post" lang="'.$Item->get('locale').'">';
-		// We don't switch locales in the backoffice, since we use the user pref anyway
-		// Load item's creator user:
-		$Item->get_creator_User();
+	if( $ItemList->result_num_rows )
+	{	// We have recent edits
 
-		// Display images that are linked to this post:
-		$Item->images( array(
-				'before' =>              '<div class="dashboard_thumbnails">',
-				'before_image' =>        '',
-				'before_image_legend' => NULL,	// No legend
-				'after_image_legend' =>  NULL,
-				'after_image' =>         '',
-				'after' =>               '</div>',
-				'image_size' =>          'fit-80x80'
-			) );
+		$nb_blocks_displayed++;
 
-		echo '<h3 class="dashboard_post_title">';
-		echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget( 'title' ).'</a>';
+		$block_item_Widget->title = T_('Recently edited');
+		$block_item_Widget->disp_template_replaced( 'block_start' );
 
-		echo ' <span class="dashboard_post_details">';
-		$Item->status();
-		echo ' &bull; ';
-		$Item->views();
-		echo '</span>';
-		echo '</h3>';
+		while( $Item = & $ItemList->get_item() )
+		{
+			echo '<div class="dashboard_post" lang="'.$Item->get('locale').'">';
+			// We don't switch locales in the backoffice, since we use the user pref anyway
+			// Load item's creator user:
+			$Item->get_creator_User();
 
-		echo '<div class="small">'.$Item->get_content_excerpt( 150 ).'</div>';
+			// Display images that are linked to this post:
+			$Item->images( array(
+					'before' =>              '<div class="dashboard_thumbnails">',
+					'before_image' =>        '',
+					'before_image_legend' => NULL,	// No legend
+					'after_image_legend' =>  NULL,
+					'after_image' =>         '',
+					'after' =>               '</div>',
+					'image_size' =>          'fit-80x80'
+				) );
 
-		echo '<div style="clear:left;">'.get_icon('pixel').'</div>'; // IE crap
-		echo '</div>';
+			echo '<h3 class="dashboard_post_title">';
+			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget( 'title' ).'</a>';
+
+			echo ' <span class="dashboard_post_details">';
+			$Item->status();
+			echo ' &bull; ';
+			$Item->views();
+			echo '</span>';
+			echo '</h3>';
+
+			echo '<div class="small">'.$Item->get_content_excerpt( 150 ).'</div>';
+
+			echo '<div style="clear:left;">'.get_icon('pixel').'</div>'; // IE crap
+			echo '</div>';
+		}
+
+		$block_item_Widget->disp_template_raw( 'block_end' );
 	}
 
-	$block_item_Widget->disp_template_raw( 'block_end' );
+
+	if( $nb_blocks_displayed == 0 )
+	{	// We haven't displayed anything yet!
+
+		$nb_blocks_displayed++;
+
+		$block_item_Widget->title = T_('Getting started');
+		$block_item_Widget->disp_template_replaced( 'block_start' );
+
+		echo '<p><strong>'.T_('Welcome to your new blog\'s dashboard!').'</strong></p>';
+
+		echo '<p>'.T_('Use the links on the right to write a first post or to customize your blog.').'</p>';
+
+		echo '<p>'.T_('You can see your blog page at any time by clicking "See" in the b2evolution toolbar at the top of this page.').'</p>';
+
+ 		echo '<p>'.T_('You can come back here at any time by clicking "Manage" in that same evobar.').'</p>';
+
+		$block_item_Widget->disp_template_raw( 'block_end' );
+	}
+
+
+	/*
+	 * DashboardBlogMain to be added here (anyone?)
+	 */
 
 
 	echo '</td><td>';
@@ -296,6 +338,11 @@ if( $blog )
 	}
 
 
+	/*
+	 * DashboardBlogSide to be added here (anyone?)
+	 */
+
+
  	echo '</td></tr></table>';
 
 
@@ -311,6 +358,10 @@ else
 	$AdminUI->disp_view( 'collections/views/_coll_list.view.php' );
 	$AdminUI->disp_payload_end();
 
+
+	/*
+	 * DashboardGlobalMain to be added here (anyone?)
+	 */
 }
 
 
@@ -336,35 +387,42 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	$block_item_Widget->disp_template_replaced( 'block_end' );
 
+	/*
+	 * DashboardAdminMain to be added here (anyone?)
+	 */
 
 	echo '</td><td>';
 
-		/*
-		 * RIGHT COL
-		 */
-		$side_item_Widget = & new Widget( 'side_item' );
+	/*
+	 * RIGHT COL
+	 */
+	$side_item_Widget = & new Widget( 'side_item' );
 
-		$side_item_Widget->title = T_('Administrative tasks');
-		$side_item_Widget->disp_template_replaced( 'block_start' );
+	$side_item_Widget->title = T_('Administrative tasks');
+	$side_item_Widget->disp_template_replaced( 'block_start' );
 
-		echo '<div class="dashboard_sidebar">';
-		echo '<ul>';
-			if( $current_User->check_perm( 'users', 'edit' ) )
-			{
-				echo '<li><a href="admin.php?ctrl=users&amp;action=new_user">Create new user &raquo;</a></li>';
-			}
-			if( $current_User->check_perm( 'blogs', 'create' ) )
-			{
-				echo '<li><a href="admin.php?ctrl=collections&amp;action=new">Create new blog &raquo;</a></li>';
-			}
-			echo '<li><a href="admin.php?ctrl=skins">Install a skin &raquo;</a></li>';
-			echo '<li><a href="admin.php?ctrl=plugins">Install a plugin &raquo;</a></li>';
-			// TODO: remember system date check and only remind every 3 months
-			echo '<li><a href="admin.php?ctrl=system">Check if this blog server is secure &raquo;</a></li>';
-		echo '</ul>';
-		echo '</div>';
+	echo '<div class="dashboard_sidebar">';
+	echo '<ul>';
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{
+			echo '<li><a href="admin.php?ctrl=users&amp;action=new_user">Create new user &raquo;</a></li>';
+		}
+		if( $current_User->check_perm( 'blogs', 'create' ) )
+		{
+			echo '<li><a href="admin.php?ctrl=collections&amp;action=new">Create new blog &raquo;</a></li>';
+		}
+		echo '<li><a href="admin.php?ctrl=skins">Install a skin &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=plugins">Install a plugin &raquo;</a></li>';
+		// TODO: remember system date check and only remind every 3 months
+		echo '<li><a href="admin.php?ctrl=system">Check if this blog server is secure &raquo;</a></li>';
+	echo '</ul>';
+	echo '</div>';
 
-		$side_item_Widget->disp_template_raw( 'block_end' );
+	$side_item_Widget->disp_template_raw( 'block_end' );
+
+	/*
+	 * DashboardAdminSide to be added here (anyone?)
+	 */
 
  	echo '</td></tr></table>';
 
@@ -377,6 +435,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2007/09/04 19:50:04  fplanque
+ * dashboard cleanup
+ *
  * Revision 1.5  2007/09/04 15:36:07  fplanque
  * minor
  *
