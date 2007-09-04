@@ -81,47 +81,42 @@ $AdminUI->disp_payload_begin();
 
 
 if( empty($tab) )
-{ // Event AdminToolPayload for each Plugin:
+{
+
+	$block_item_Widget = & new Widget( 'block_item' );
+
+
+	// Event AdminToolPayload for each Plugin:
 	$tool_plugins = $Plugins->get_list_by_event( 'AdminToolPayload' );
 	foreach( $tool_plugins as $loop_Plugin )
 	{
-		echo '<div class="panelblock">';
-		echo '<h2>';
-		echo format_to_output($loop_Plugin->name);
-		echo '</h2>';
+		$block_item_Widget->title = format_to_output($loop_Plugin->name);
+		$block_item_Widget->disp_template_replaced( 'block_start' );
 		$Plugins->call_method_if_active( $loop_Plugin->ID, 'AdminToolPayload', $params = array() );
-		echo '</div>';
+		$block_item_Widget->disp_template_raw( 'block_end' );
 	}
 
 
 	// TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
 	if( $current_User->check_perm('options', 'edit') )
 	{ // default admin actions:
-		?>
-
-		<div class="panelblock">
-			<h2><?php echo T_('Contents cached in the database') ?></h2>
-			<ul>
-				<li><a href="<?php echo regenerate_url('action', 'action=del_itemprecache') ?>"><?php echo T_('Delete pre-renderered item cache.') ?></a></li>
-			</ul>
-		</div>
-
-		<?php
+		$block_item_Widget->title = T_('Contents cached in the database');
+		$block_item_Widget->disp_template_replaced( 'block_start' );
+		echo '&raquo; <a href="'.regenerate_url('action', 'action=del_itemprecache').'">'.T_('Delete pre-renderered item cache.').'</a>';
+		$block_item_Widget->disp_template_raw( 'block_end' );
 	}
 
 
 	// fp> TODO: pluginize MT! :P
+	$block_item_Widget->title = T_('Movable Type Import');
+	$block_item_Widget->disp_template_replaced( 'block_start' );
 	?>
-
-	<div class="panelblock">
-		<h2><?php echo T_('Movable Type Import') ?></h2>
 		<ol>
 			<li><?php echo T_('Use MT\'s export functionnality to create a .TXT file containing your posts;') ?></li>
 			<li><?php printf( T_('Follow the insctructions in the <a %s>MT migration utility</a>.'), ' href="?ctrl=mtimport"' ) ?></li>
 		</ol>
-	</div>
-
 	<?php
+	$block_item_Widget->disp_template_raw( 'block_end' );
 }
 elseif( $tab_Plugin )
 { // Plugin tab
@@ -152,6 +147,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/04 14:57:07  fplanque
+ * interface cleanup
+ *
  * Revision 1.1  2007/06/25 11:01:42  fplanque
  * MODULES (refactored MVC)
  *

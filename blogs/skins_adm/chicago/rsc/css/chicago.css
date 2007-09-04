@@ -314,12 +314,12 @@ table.grouped {
 }
 table.grouped tr.filters td {
 	background-color: #E0E9F0;
-	border-bottom-color: #9db0bc;
-}	
+	border-color: #9db0bc;
+}
 table.grouped th {
 	background-color: #CCDCE6;
 	padding: 0;
-	border-left-color: #9db0bc;
+	border-color: #9db0bc;
 }
 table.grouped th a.basic_sort_link,
 table.grouped th span {
@@ -344,7 +344,11 @@ table.grouped tr.odd:hover {
 	background-color: #DBE5ED;
 }
 table.grouped td {
-	border-left-color: #9db0bc;
+	border-color: #9db0bc;
+}
+table.grouped tr.group td {
+	border-color: #9db0bc;
+	background-color: #C3D5E2;
 }
 
 /*

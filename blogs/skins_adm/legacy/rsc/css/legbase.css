@@ -429,6 +429,12 @@ td.browse_right_col {
 	vertical-align:top;
 	padding: 1ex 0 0 0;
 }
+.block_item {
+	border: 1px solid #eee7e0;
+	background-color: #fff;
+	padding: 1ex;
+	margin: 0 0 1em 0;
+}
 .browse_side_item {
 	border: 1px solid #eee7e0;
 	background-color: #fff;

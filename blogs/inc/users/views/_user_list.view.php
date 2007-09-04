@@ -160,7 +160,7 @@ $Results->cols[] = array(
 						'th' => T_('Login'),
 						'th_class' => 'shrinkwrap',
 						'order' => 'user_login',
-						'td' => '<a href="?ctrl=users&amp;user_ID=$user_ID$">$user_login$</a>',
+						'td' => '<a href="?ctrl=users&amp;user_ID=$user_ID$"><strong>$user_login$</strong></a>',
 					);
 
 $Results->cols[] = array(
@@ -270,6 +270,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/04 14:57:07  fplanque
+ * interface cleanup
+ *
  * Revision 1.1  2007/06/25 11:01:52  fplanque
  * MODULES (refactored MVC)
  *
