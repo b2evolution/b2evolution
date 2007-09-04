@@ -124,11 +124,14 @@ switch( $action )
 			$Messages->add( T_('Sorry, you have no permission to post yet.'), 'error' );
 			$action = 'nil';
 		}
-		elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
-		{	// Selected a new blog:
-			$BlogCache = & get_Cache( 'BlogCache' );
-			$Blog = & $BlogCache->get_by_ID( $blog );
-
+		else
+		{
+			if( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
+			{	// Selected a new blog:
+				$BlogCache = & get_Cache( 'BlogCache' );
+				$Blog = & $BlogCache->get_by_ID( $blog );
+			}
+			
 			// Where are we going to redirect to?
 			param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID ) );
 		}
@@ -732,6 +735,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/04 22:25:18  fplanque
+ * fix
+ *
  * Revision 1.4  2007/09/04 22:16:33  fplanque
  * in context editing of posts
  *
