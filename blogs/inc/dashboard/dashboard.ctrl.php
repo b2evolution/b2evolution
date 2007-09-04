@@ -187,11 +187,18 @@ if( $blog )
 			// Load item's creator user:
 			$Item->get_creator_User();
 
+			echo '<div class="dashboard_float_actions">';
+			$Item->edit_link( '', '', '#', '#', 'ActionButton' );
+			echo ' ';
+			$Item->publish_link( '', '', '#', '#', 'PublishButton' );
+			echo '</div>';
+
 			echo '<h3 class="dashboard_post_title">';
 			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget( 'title' ).'</a>';
 			echo '</h3>';
 
 			echo '</div>';
+
 		}
 
 		$block_item_Widget->disp_template_raw( 'block_end' );
@@ -230,6 +237,19 @@ if( $blog )
 			// Load item's creator user:
 			$Item->get_creator_User();
 
+			echo '<div class="dashboard_float_actions">';
+			$Item->edit_link( '', '', '#', '#', 'ActionButton' );
+			echo '</div>';
+
+			echo '<h3 class="dashboard_post_title">';
+			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget( 'title' ).'</a>';
+			echo ' <span class="dashboard_post_details">';
+			$Item->status();
+			echo ' &bull; ';
+			$Item->views();
+			echo '</span>';
+			echo '</h3>';
+
 			// Display images that are linked to this post:
 			$Item->images( array(
 					'before' =>              '<div class="dashboard_thumbnails">',
@@ -240,16 +260,6 @@ if( $blog )
 					'after' =>               '</div>',
 					'image_size' =>          'fit-80x80'
 				) );
-
-			echo '<h3 class="dashboard_post_title">';
-			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget( 'title' ).'</a>';
-
-			echo ' <span class="dashboard_post_details">';
-			$Item->status();
-			echo ' &bull; ';
-			$Item->views();
-			echo '</span>';
-			echo '</h3>';
 
 			echo '<div class="small">'.$Item->get_content_excerpt( 150 ).'</div>';
 
@@ -435,6 +445,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2007/09/04 22:16:33  fplanque
+ * in context editing of posts
+ *
  * Revision 1.6  2007/09/04 19:50:04  fplanque
  * dashboard cleanup
  *

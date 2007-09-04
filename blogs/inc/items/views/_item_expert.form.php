@@ -53,6 +53,7 @@ global $mode, $use_post_url;
 global $use_preview, $post_comment_status, $trackback_url, $item_tags;
 global $edit_date, $bozo_start_modified, $creating;
 global $item_title, $item_content;
+global $redirect_to;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
@@ -77,6 +78,7 @@ $Form->hidden( 'action', $creating ? 'create' : 'update' );
 $Form->hidden( 'blog', $Blog->ID );
 if( isset( $mode ) )   $Form->hidden( 'mode', $mode );	// used by bookmarklet
 if( isset( $edited_Item ) )   $Form->hidden( 'post_ID', $edited_Item->ID );
+$Form->hidden( 'redirect_to', $redirect_to );
 
 // In case we send this to the blog for a preview :
 $Form->hidden( 'preview', 1 );
@@ -365,6 +367,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/04 22:16:33  fplanque
+ * in context editing of posts
+ *
  * Revision 1.4  2007/09/03 16:44:28  fplanque
  * chicago admin skin
  *

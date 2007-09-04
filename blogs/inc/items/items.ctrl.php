@@ -82,6 +82,9 @@ switch( $action )
 		// Load the blog we're in:
 		$Blog = & $edited_Item->get_Blog();
 		set_working_blog( $Blog->ID );
+
+		// Where are we going to redirect to?
+		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID ) );
 		break;
 
 	case 'update':
@@ -98,6 +101,9 @@ switch( $action )
 		// Load the blog we're in:
 		$Blog = & $edited_Item->get_Blog();
 		set_working_blog( $Blog->ID );
+
+		// Where are we going to redirect to?
+		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID ) );
 		break;
 
 	case 'new':
@@ -122,6 +128,9 @@ switch( $action )
 		{	// Selected a new blog:
 			$BlogCache = & get_Cache( 'BlogCache' );
 			$Blog = & $BlogCache->get_by_ID( $blog );
+
+			// Where are we going to redirect to?
+			param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID ) );
 		}
 		break;
 
@@ -308,7 +317,7 @@ switch( $action )
 		$Messages->add( T_('Post has been created.'), 'success' );
 
 		// REDIRECT / EXIT
-		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID );
+		header_redirect( $redirect_to );
 		// Switch to list mode:
 		// $action = 'list';
 		//init_list_mode();
@@ -369,7 +378,7 @@ switch( $action )
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
 		// REDIRECT / EXIT
-		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID );
+		header_redirect( $redirect_to );
 		// Switch to list mode:
 		// $action = 'list';
 		// init_list_mode();
@@ -400,7 +409,7 @@ switch( $action )
 		$Messages->add( T_('Post has been published.'), 'success' );
 
 		// REDIRECT / EXIT
-		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID );
+		header_redirect( $redirect_to );
 		// Switch to list mode:
 		// $action = 'list';
 		// init_list_mode();
@@ -423,7 +432,7 @@ switch( $action )
 		$Messages->add( T_('Post has been deprecated.'), 'success' );
 
 		// REDIRECT / EXIT
-		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID );
+		header_redirect( $redirect_to );
 		// Switch to list mode:
 		// $action = 'list';
 		// init_list_mode();
@@ -450,7 +459,7 @@ switch( $action )
 		}
 
 		// REDIRECT / EXIT
-		header_redirect( $pagenow.'?ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID );
+		header_redirect( $redirect_to );
 		// Switch to list mode:
 		// $action = 'list';
 		// init_list_mode();
@@ -574,7 +583,7 @@ switch( $action )
 					)
 			);
 
-		$AdminUI->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'post_ID,tab,action', 'filter=restore&amp;highlight='.$edited_Item->ID ), T_('cancel'), 4, 1 );
+		$AdminUI->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('cancel'), 4, 1 );
 
 		break;
 
@@ -723,6 +732,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/04 22:16:33  fplanque
+ * in context editing of posts
+ *
  * Revision 1.3  2007/09/03 16:44:31  fplanque
  * chicago admin skin
  *

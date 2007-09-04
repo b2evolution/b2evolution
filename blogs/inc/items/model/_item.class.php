@@ -1360,6 +1360,7 @@ class Item extends ItemLight
 	}
 
 
+// >>SUSPECT
 	/**
 	 * Template function: Displays link to the feed for comments on this item
 	 *
@@ -1397,6 +1398,7 @@ class Item extends ItemLight
 	$this->load_Blog();
 		return url_add_param( $this->Blog->get_tempskin_url( $skin_folder_name ), 'disp=comments&amp;title=' . $this->urltitle);
 	}
+// <<SUSPECT
 
 
 	/**
@@ -1516,8 +1518,6 @@ class Item extends ItemLight
 
 		echo $after;
 	}
-
-
 
 
 	/**
@@ -1715,9 +1715,8 @@ class Item extends ItemLight
 	 * @param string link text
 	 * @param string link title
 	 * @param string class name
-	 * @param string page url for the delete action
 	 */
-	function get_edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $actionurl = '#' )
+	function get_edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $save_context = true )
 	{
 		global $current_User, $admin_url;
 
@@ -1737,13 +1736,15 @@ class Item extends ItemLight
 
 		if( $title == '#' ) $title = T_('Edit this post...');
 
-		if( $actionurl == '#' )
+		$actionurl = $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$this->ID;
+   	if( $save_context )
 		{
-			$actionurl = $admin_url.'?ctrl=items&amp;action=edit&amp;p=';
+			$actionurl .= '&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
 		}
 
+
 		$r = $before;
-		$r .= '<a href="'.$actionurl.$this->ID;
+		$r .= '<a href="'.$actionurl;
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 		$r .=  '>'.$text.'</a>';
@@ -1756,9 +1757,9 @@ class Item extends ItemLight
 	/**
 	 * @see Item::get_edit_link()
 	 */
-	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $actionurl = '#' )
+	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $save_context = true )
 	{
-		echo $this->get_edit_link( $before, $after, $text, $title, $class, $actionurl );
+		echo $this->get_edit_link( $before, $after, $text, $title, $class, $save_context );
 	}
 
 
@@ -1774,7 +1775,7 @@ class Item extends ItemLight
 	 * @param string class name
 	 * @param string glue between url params
 	 */
-	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
+	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true )
 	{
 		global $current_User, $admin_url;
 
@@ -1792,6 +1793,10 @@ class Item extends ItemLight
 
 		$r = $before;
 		$r .= '<a href="'.$admin_url.'?ctrl=items'.$glue.'action=publish'.$glue.'post_ID='.$this->ID;
+   	if( $save_context )
+		{
+			$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
+		}
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 		$r .= '>'.$text.'</a>';
@@ -1801,9 +1806,9 @@ class Item extends ItemLight
 	}
 
 
-	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
+	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true )
 	{
-		echo $this->get_publish_link( $before, $after, $text, $title, $class, $glue );
+		echo $this->get_publish_link( $before, $after, $text, $title, $class, $glue, $save_context );
 	}
 
 
@@ -3105,6 +3110,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/04 22:16:33  fplanque
+ * in context editing of posts
+ *
  * Revision 1.3  2007/08/28 02:43:40  waltercruz
  * Template function to get the rss link to the feeds of the comments on each post
  *

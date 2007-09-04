@@ -42,15 +42,24 @@ div.dashboard_sidebar li li {
 }
 .dashboard_thumbnails {
 	float:left;
-	margin: 2px 4px 2px 0;
+	margin-right: 2px;
 }
-.dashboard_post_title {
-	font-size: 110%;
-	margin: 0;
+.dashboard_thumbnails img {
+	border: 1px solid #000;
+	margin-right: 2px;
+}
+h3.dashboard_post_title {
+	font-size: 108%;
+	margin: 0 1em 1ex 0;
 }
 
 .dashboard_action_area {
 	padding: 1ex 0;
+	font-size: 84%;
+}
+.dashboard_float_actions {
+	float: left;
+	padding: 3px 8px 3px 0;
 	font-size: 84%;
 }
 
