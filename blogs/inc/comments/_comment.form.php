@@ -31,13 +31,20 @@ global $edited_Comment;
  */
 global $Plugins;
 
-global $comments_use_autobr, $mode, $month, $tab;
+global $comments_use_autobr, $mode, $month, $tab, $redirect_to;
 
 $Form = & new Form( NULL, 'post', 'post', 'linespan' );
 
-$Form->begin_form( 'eform' );
+$Form->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('cancel'), 4, 1 );
+
+$comment_Item = & $edited_Comment->get_Item();
+$title = T_('In response to:').' <a href="?ctrl=items&amp;blog='.$comment_Item->blog_ID.'&amp;p='.$comment_Item->ID.'"><strong>'.$comment_Item->dget('title').'</strong></a>';
+
+$Form->begin_form( 'eform', $title );
+
 $Form->hidden( 'ctrl', 'comments' );
 $Form->hidden( 'action', 'update' );
+$Form->hidden( 'redirect_to', $redirect_to );
 $Form->hidden( 'comment_ID', $edited_Comment->ID );
 ?>
 
@@ -168,6 +175,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/04 19:51:27  fplanque
+ * in-context comment editing
+ *
  * Revision 1.1  2007/06/25 10:59:38  fplanque
  * MODULES (refactored MVC)
  *

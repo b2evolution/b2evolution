@@ -32,7 +32,6 @@ global $UserSettings;
 
 param( 'action', 'string', 'list' );
 
-
 /*
  * Init the objects we want to work on.
  */
@@ -53,6 +52,9 @@ switch( $action )
 
 		// Check permission:
 		$current_User->check_perm( 'blog_comments', 'edit', true, $blog );
+
+		// Where are we going to redirect to?
+		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment->item_ID, '&' ) );
 		break;
 
 	case 'list':
@@ -140,8 +142,7 @@ switch( $action )
 
 		$Messages->add( T_('Comment has been updated.'), 'success' );
 
-		$location = url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment->item_ID, '&' );
-		header_redirect( $location );
+		header_redirect( $redirect_to );
 		/* exited */
 		break;
 
@@ -153,8 +154,7 @@ switch( $action )
 
 		$Messages->add( T_('Comment has been published.'), 'success' );
 
-		$location = url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment->item_ID, '&' );
-		header_redirect( $location );
+		header_redirect( $redirect_to );
 		/* exited */
 		break;
 
@@ -166,8 +166,7 @@ switch( $action )
 
 		$Messages->add( T_('Comment has been deprecated.'), 'success' );
 
-		$location = url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment->item_ID, '&' );
-		header_redirect( $location );
+		header_redirect( $redirect_to );
 		/* exited */
 		break;
 
@@ -180,8 +179,7 @@ switch( $action )
 
 		$Messages->add( T_('Comment has been deleted.'), 'success' );
 
-		$location = url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment->item_ID, '&' );
-		header_redirect( $location );
+		header_redirect( $redirect_to );
 		break;
 
 
@@ -272,6 +270,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/04 19:51:27  fplanque
+ * in-context comment editing
+ *
  * Revision 1.1  2007/06/25 10:59:39  fplanque
  * MODULES (refactored MVC)
  *

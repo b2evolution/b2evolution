@@ -496,7 +496,7 @@ class Comment extends DataObject
 	 * @param string class name
 	 * @return boolean
 	 */
-	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
+	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true )
 	{
 		global $current_User, $admin_url;
 
@@ -514,6 +514,10 @@ class Comment extends DataObject
 
 		echo $before;
 		echo '<a href="'.$admin_url.'?ctrl=comments&amp;action=edit&amp;comment_ID='.$this->ID;
+   	if( $save_context )
+		{
+			echo $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
+		}
 		echo '" title="'.$title.'"';
 		if( !empty( $class ) ) echo ' class="'.$class.'"';
 		echo '>'.$text.'</a>';
@@ -533,7 +537,7 @@ class Comment extends DataObject
 	 * @param string class name
 	 * @param boolean true to make this a button instead of a link
 	 */
-	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button  = false )
+	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button = false, $glue = '&amp;', $save_context = true )
 	{
 		global $current_User, $admin_url;
 
@@ -560,6 +564,10 @@ class Comment extends DataObject
 		if( $title == '#' ) $title = T_('Delete this comment');
 
 		$url = $admin_url.'?ctrl=comments&amp;action=delete&amp;comment_ID='.$this->ID;
+   	if( $save_context )
+		{
+			$url .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
+		}
 
 		echo $before;
 		if( $button )
@@ -596,7 +604,7 @@ class Comment extends DataObject
 	 * @param string glue between url params
 	 * @param boolean save context?
 	 */
-	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = false )
+	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true )
 	{
 		global $current_User, $admin_url;
 
@@ -615,12 +623,10 @@ class Comment extends DataObject
 
 		$r = $before;
 		$r .= '<a href="';
-		//if( $save_context )
+		$r .= $admin_url.'?ctrl=comments'.$glue.'action=deprecate'.$glue.'comment_ID='.$this->ID;
+   	if( $save_context )
 		{
-		}
-		//else
-		{
-			$r .= $admin_url.'?ctrl=comments'.$glue.'action=deprecate'.$glue.'comment_ID='.$this->ID;
+			$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
 		}
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
@@ -642,7 +648,7 @@ class Comment extends DataObject
 	 * @param string glue between url params
 	 * @param boolean save context?
 	 */
-	function deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = false )
+	function deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true )
 	{
 		echo $this->get_deprecate_link( $before, $after, $text, $title, $class, $glue, $save_context );
 	}
@@ -659,7 +665,7 @@ class Comment extends DataObject
 	 * @param string glue between url params
 	 * @param boolean save context?
 	 */
-	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = false )
+	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true )
 	{
 		global $current_User, $admin_url;
 
@@ -678,12 +684,10 @@ class Comment extends DataObject
 
 		$r = $before;
 		$r .= '<a href="';
-		//if( $save_context )
+		$r .= $admin_url.'?ctrl=comments'.$glue.'action=publish'.$glue.'comment_ID='.$this->ID;
+   	if( $save_context )
 		{
-		}
-		//else
-		{
-			$r .= $admin_url.'?ctrl=comments'.$glue.'action=publish'.$glue.'comment_ID='.$this->ID;
+			$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
 		}
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
@@ -705,7 +709,7 @@ class Comment extends DataObject
 	 * @param string glue between url params
 	 * @param boolean save context?
 	 */
-	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = false )
+	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true )
 	{
 		echo $this->get_publish_link( $before, $after, $text, $title, $class, $glue, $save_context );
 	}
@@ -1173,6 +1177,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/04 19:51:26  fplanque
+ * in-context comment editing
+ *
  * Revision 1.1  2007/06/25 10:59:40  fplanque
  * MODULES (refactored MVC)
  *

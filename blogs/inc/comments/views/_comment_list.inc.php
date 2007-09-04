@@ -79,17 +79,18 @@ while( $Comment = & $CommentList->get_next() )
 			switch( $Comment->get( 'type' ) )
 			{
 				case 'comment': // Display a comment:
-					echo T_('Comment from:') ?>
+					echo T_('Comment from') ?>
 					<?php break;
 
 				case 'trackback': // Display a trackback:
-					echo T_('Trackback from:') ?>
+					echo T_('Trackback from') ?>
 					<?php break;
 
 				case 'pingback': // Display a pingback:
-					echo T_('Pingback from:') ?>
+					echo T_('Pingback from') ?>
 					<?php break;
 			}
+		echo ': ';
 		?>
 		<?php $Comment->author() ?>
 		</div>
@@ -122,6 +123,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/04 19:51:28  fplanque
+ * in-context comment editing
+ *
  * Revision 1.2  2007/09/03 18:32:50  fplanque
  * enhanced dashboard / comment moderation
  *
