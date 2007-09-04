@@ -280,6 +280,10 @@ class ComponentWidget extends DataObject
 					'block_display_title' => true,
 					'block_title_start' => '<h3>',
 					'block_title_end' => '</h3>',
+					'collist_start' => '',
+					'collist_end' => '',
+					'coll_start' => '<h4>',
+					'coll_end' => '</h4>',
 					'list_start' => '<ul>',
 					'list_end' => '</ul>',
 					'item_start' => '<li>',
@@ -641,6 +645,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/04 19:48:33  fplanque
+ * small fixes
+ *
  * Revision 1.3  2007/06/30 20:37:50  fplanque
  * fixes
  *

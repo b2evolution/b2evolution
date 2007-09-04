@@ -557,7 +557,7 @@ $force_upload_forbiddenext = array( 'cgi', 'exe', 'htaccess', 'htpasswd', 'php',
 /**
  * Admin can configure max file upload size, but he won't be able to set it higher than this "max max" value.
  */
-$upload_maxmaxkb = 2048;
+$upload_maxmaxkb = 10000;
 
 /**
  * The admin can configure the regexp for valid file names in the Settings interface

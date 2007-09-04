@@ -15,12 +15,12 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible to {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '2.0-alpha';
+$app_version = '2.0.0-alpha';
 
 /**
  * Release date
  */
-$app_date = '2007-07-11';
+$app_date = '2007-09-04';
 
 /**
  * This is used to check if the database is up to date.
@@ -38,8 +38,8 @@ $new_db_version = 9416;
 $app_banner = '<a href="http://b2evolution.net/"><img src="'.$rsc_url.'img/b2evolution_minilogo.png" width="231" height="50" alt="b2evolution" /></a>';
 
 $app_footer_text = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website")
-	.'"><strong>b2evolution '.$app_version.'</strong></a>
-	&ndash;
+		.'"><strong>b2evolution '.$app_version.'</strong></a>
+		&ndash;
 		<a href="http://b2evolution.net/about/license.html" class="nobr">'.T_('GPL License').'</a>';
 
 $copyright_text ='<span class="nobr">&copy;2001-2002 by Michel V &amp; others</span>

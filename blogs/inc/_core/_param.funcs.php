@@ -157,6 +157,8 @@ function param( $var, $type = '', $default = '', $memorize = false,
 				else
 				{
 					$GLOBALS[$var] = trim( strip_tags($GLOBALS[$var]) );
+					// Make sure the string is a single line
+					$GLOBALS[$var] = preg_replace( '¤\r|\n¤', '', $GLOBALS[$var] );
 				}
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
 				break;
@@ -1262,7 +1264,7 @@ function get_memorized( $ignore = '' )
  * @param mixed|string Alternative URL we want to point to if not the current URL (may be absolute if BASE tag gets used)
  * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
  */
-function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $moredelim = '&amp;' )
+function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $glue = '&amp;' )
 {
 	global $Debuglog, $global_param_list, $ReqHost, $ReqPath;
 	global $base_tag_set;
@@ -1370,7 +1372,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $moredelim 
 
 	if( !empty( $params ) )
 	{
-		$url = url_add_param( $url, implode( $moredelim, $params ), $moredelim );
+		$url = url_add_param( $url, implode( $glue, $params ), $glue );
 	}
 	// if( isset($Debuglog) ) $Debuglog->add( 'regenerate_url(): ['.$url.']', 'params' );
 	return $url;
@@ -1384,7 +1386,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $moredelim 
  * @param string params to add
  * @param string delimiter to use for more params
  */
-function url_add_param( $url, $param, $moredelim = '&amp;' )
+function url_add_param( $url, $param, $glue = '&amp;' )
 {
 	if( empty($param) )
 	{
@@ -1403,7 +1405,7 @@ function url_add_param( $url, $param, $moredelim = '&amp;' )
 
 	if( strpos( $url, '?' ) !== false )
 	{ // There are already params in the URL
-		return $url.$moredelim.$param.$anchor;
+		return $url.$glue.$param.$anchor;
 	}
 
 
@@ -1650,6 +1652,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/04 19:48:33  fplanque
+ * small fixes
+ *
  * Revision 1.2  2007/06/29 00:24:43  fplanque
  * $cat_array cleanup tentative
  *
