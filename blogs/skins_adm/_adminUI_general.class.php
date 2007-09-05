@@ -1487,6 +1487,7 @@ class AdminUI_general extends Widget
 		}
 
 
+		/*
 		$this->add_menu_entries( NULL, array(
 					'adsense' => array(
 						'text' => T_('AdSense'),
@@ -1494,6 +1495,7 @@ class AdminUI_general extends Widget
 						'href' => 'admin.php?ctrl=adsense',
 					),
 				) );
+		*/
 
 		// Call AdminAfterMenuInit to notify Plugins that the menu is initialized
 		// E.g. the livehits_plugin and weather_plugin use it for adding a menu entry.
@@ -1556,6 +1558,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.65  2007/09/05 00:06:03  fplanque
+ * no message
+ *
  * Revision 1.64  2007/09/03 16:44:28  fplanque
  * chicago admin skin
  *
