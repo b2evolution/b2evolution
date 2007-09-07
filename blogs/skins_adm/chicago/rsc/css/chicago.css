@@ -640,22 +640,56 @@ input.SearchField {
 }
 
 fieldset.extracats {
-	border: 1px solid #eee7e0;
-	padding: 0 0 0 1ex;
-	margin: 1ex 1em 1ex 0;
+	padding: 0;
 	overflow: visible;
 }
 fieldset.extracats div.extracats {
-	/* border: 1px solid #f00; */
+  /*	border: 1px solid #f00; */
 	height: 44ex;
 	overflow: auto;
-	padding: 0 1ex 0 0;
-	margin: 0 0 0 0;
+	padding: 0;
+	margin: 0;
+}
+fieldset.extracats div.extracats div {
+	/* border: 1px solid #0f0; */
+	margin: 0;
+	padding: 0;
+}
+table.catselect {
+	width:100%;
+	border-left: none;
+	border-right: none;
+	border-top: none;
+	border-color: #9db0bc;
+}
+table.catselect th {
+	background-color: #CCDCE6;
+	border-color: #9db0bc;
+}
+table.catselect tr.group td {
+	border-color: #9db0bc;
+	background-color: #C3D5E2;
+}
+table.catselect tr.even,
+table.catselect tr.even input {
+	background-color: #fff;
+}
+table.catselect tr.odd,
+table.catselect tr.odd input {
+	background-color: #f1f6f8;
+}
+table.catselect tr:hover,
+table.catselect tr:hover input {
+	background-color: #DBE5ED;
+}
+table.catselect th.selector,
+table.catselect td.selector {
+	border-color: #9db0bc;
 }
 .extracatnote {
 	/* display: block; */
-	font-size: 80%;
-	margin: 1ex 0;
+	font-size: 84%;
+	margin: 1ex;
 	padding: 0;
 	color: #999;
 	/* border: 1px solid #f00; */

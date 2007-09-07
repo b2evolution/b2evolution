@@ -350,18 +350,14 @@ function cat_select( $display_info = true, $form_fields = true )
 	global $allow_cross_posting, $cache_categories,
 					$blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
 
-	$r = '<div class="extracats">';
-
-	if( $display_info )
-	{
-		$r .= '<p class="extracatnote">'
-				.T_('Select main category in target blog and optionally check additional categories')
-				.'</p>';
-	}
+	$r = '<div class="extracats"><div>';
 
 	$cat_select_form_fields = $form_fields;
 
 	cat_load_cache(); // make sure the caches are loaded
+
+	$r .= '<table cellspacing="0" class="catselect">';
+	$r .= cat_select_header();
 
 	if( $allow_cross_posting >= 2 )
 	{ // If BLOG cross posting enabled, go through all blogs with cats:
@@ -377,49 +373,58 @@ function cat_select( $display_info = true, $form_fields = true )
 		{ // run recursively through the cats
 			if( ! blog_has_cats( $l_Blog->ID ) )
 				continue;
+
 			if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) )
 				continue;
-			$r .= '<h4>'.$l_Blog->dget('name')."</h4>\n";
-			$r .= '<table cellspacing="0" class="catselect">'.cat_select_header();
+
+			$r .= '<tr class="group"><td colspan="3">'.$l_Blog->dget('name')."</td></tr>\n";
+			$current_blog_ID = $l_Blog->ID;	// Global needed in callbacks
 			$r .= cat_children( $cache_categories, $l_Blog->ID, NULL, 'cat_select_before_first',
 										'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
-			$r .= '</table>';
-		}
-
-		if( $display_info )
-		{
-			if( $allow_cross_posting >= 3 )
-			{
-				$r .= '<p class="extracatnote">'.T_('Note: Moving posts across blogs is enabled. Use with caution.').'</p> ';
-			}
-			$r .= '<p class="extracatnote">'.T_('Note: Cross posting among multiple blogs is enabled.').'</p>';
 		}
 	}
 	else
 	{ // BLOG Cross posting is disabled. Current blog only:
 		$current_blog_ID = $blog;
-		$r .= '<table cellspacing="0" class="catselect">'.cat_select_header();
 		$r .= cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
 									'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
-		$r .= '</table>';
 
-		if( $display_info )
-		{
-			$r .= '<p class="extracatnote">';
-			if( $allow_cross_posting )
-				$r .= T_('Note: Cross posting among multiple blogs is currently disabled.');
-			else
-				$r .= T_('Note: Cross posting among multiple categories is currently disabled.');
-			$r .= '</p>';
-		}
 	}
+
+	$r .= '</table>';
 
 	if( $current_User->check_perm( 'blog_cats', '', false, $blog ) )
 	{
-		$r .= '<div><a href="admin.php?ctrl=chapters&amp;action=new&amp;blog='.$blog.'">'.T_('Add a new category').' &raquo;</a></div>';
+		$r .= '<p class="extracatnote"><a href="admin.php?ctrl=chapters&amp;action=new&amp;blog='.$blog.'">'.T_('Add a new category').' &raquo;</a></p>';
 	}
 
-	$r .= '</div>';
+	if( $display_info )
+	{
+		$r .= '<p class="extracatnote">'
+				.T_('Select main category in target blog and optionally check additional categories')
+				.'</p>';
+
+		$r .= '<p class="extracatnote">';
+		if( $allow_cross_posting >= 3 )
+		{
+			$r .= T_('Note: Moving posts across blogs is enabled. Use with caution.');
+		}
+		elseif( $allow_cross_posting >= 2 )
+		{
+			$r .= T_('Note: Cross posting among multiple blogs is enabled.');
+		}
+		elseif( $allow_cross_posting )
+		{
+			$r .= T_('Note: Cross posting among multiple blogs is currently disabled.');
+		}
+		else
+		{
+			$r .= T_('Note: Cross posting among multiple categories is currently disabled.');
+		}
+		$r .= '</p>';
+	}
+
+	$r .= '</div></div>';
 
 	return $r;
 }
@@ -613,6 +618,9 @@ function visibility_select( & $Form, $post_status )
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/07 20:11:18  fplanque
+ * Better category selector
+ *
  * Revision 1.3  2007/09/03 20:01:53  blueyed
  * Fixed "Add a new category »" link (blog param)
  *

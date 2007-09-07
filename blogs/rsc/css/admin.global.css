@@ -79,24 +79,30 @@ table.catselect th {
 }
 table.catselect td {
 	padding: .2ex 1ex;
+}
+table.catselect tr.group td {
+	border-top: 1px solid #bbb;
+	border-bottom: 1px solid #bbb;
+	background-color: #ccc;
+	font-weight: bold;
+}
+table.catselect tr.odd,
+table.catselect tr.odd input {
 	background-color: #eee;
 }
-table.catselect input {
-	background-color: #eee;
+table.catselect tr.even,
+table.catselect tr.even input {
+	background-color:#ddd;
+}
+table.catselect tr:hover,
+table.catselect tr:hover input {
+	background-color:#ccc;
 }
 table.catselect th.selector,
 table.catselect td.selector {
 	width: 1%;
 	text-align:center;
 	border-right: 1px solid #bbb;
-}
-table.catselect tr:hover td,
-table.catselect tr.even:hover td {
-	background-color:#ccc;
-}
-table.catselect tr.even td,
-table.catselect tr.even input {
-	background-color:#ddd;
 }
 
 

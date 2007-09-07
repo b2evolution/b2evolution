@@ -643,18 +643,18 @@ input.SearchField {
 	clear: both;
 }
 
-fieldset.extracats {
-	border: 1px solid #eee7e0;
+div.tabbedpanelblock fieldset.extracats {
+	/* border: 1px solid #eee7e0; */
 	padding: 0 0 0 1ex;
-	margin: 1ex 1em 1ex 0;
+	margin: 0 0 1ex 0;
 	overflow: visible;
 }
 fieldset.extracats div.extracats {
 	/* border: 1px solid #f00; */
 	height: 44ex;
 	overflow: auto;
-	padding: 0 1ex 0 0;
-	margin: 0 0 0 0;
+	padding-top: 1ex;
+	margin: 0;
 }
 .extracatnote {
 	/* display: block; */

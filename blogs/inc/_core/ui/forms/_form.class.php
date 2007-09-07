@@ -462,7 +462,7 @@ class Form extends Widget
 
 				$r .= "</div></div></div>\n";
 
-				$r .= '<fieldset>';
+				$r .= '<fieldset'.get_field_attribs_as_string($field_params).'>'."\n";
 
 				break;
 
@@ -2795,6 +2795,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/07 20:11:18  fplanque
+ * Better category selector
+ *
  * Revision 1.3  2007/09/03 16:44:28  fplanque
  * chicago admin skin
  *
