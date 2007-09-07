@@ -424,7 +424,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		echo '<li><a href="admin.php?ctrl=skins">Install a skin &raquo;</a></li>';
 		echo '<li><a href="admin.php?ctrl=plugins">Install a plugin &raquo;</a></li>';
 		// TODO: remember system date check and only remind every 3 months
-		echo '<li><a href="admin.php?ctrl=system">Check if this blog server is secure &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=system">Check system &amp; security &raquo;</a></li>';
 	echo '</ul>';
 	echo '</div>';
 
@@ -445,6 +445,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2007/09/07 20:11:40  fplanque
+ * minor
+ *
  * Revision 1.7  2007/09/04 22:16:33  fplanque
  * in context editing of posts
  *
