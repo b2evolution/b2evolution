@@ -99,21 +99,22 @@ while( $Comment = & $CommentList->get_next() )
 		</div>
 		</div>
 		<div class="CommentActionsArea">
-		<?php
-			$Comment->permanent_link( '#', '#', 'permalink_right' );
+			<?php
+				$Comment->permanent_link( '#', '#', 'permalink_right' );
 
-			// Display edit button if current user has the rights:
-			$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton');
+				// Display edit button if current user has the rights:
+				$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton');
 
-			// Display publish NOW button if current user has the rights:
-			$Comment->publish_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', true );
+				// Display publish NOW button if current user has the rights:
+				$Comment->publish_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', true );
 
-			// Display deprecate button if current user has the rights:
-			$Comment->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton', '&amp;', true );
+				// Display deprecate button if current user has the rights:
+				$Comment->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton', '&amp;', true );
 
-			// Display delete button if current user has the rights:
-			$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton');
-		?>
+				// Display delete button if current user has the rights:
+				$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton');
+			?>
+   		<div class="clear"></div>
 		</div>
 
 	</div>
@@ -123,6 +124,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/07 21:11:10  fplanque
+ * superstylin' (not even close)
+ *
  * Revision 1.3  2007/09/04 19:51:28  fplanque
  * in-context comment editing
  *

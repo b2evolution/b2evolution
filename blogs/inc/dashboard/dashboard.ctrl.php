@@ -144,6 +144,7 @@ if( $blog )
 			// Display delete button if current user has the rights:
 			$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton');
 		?>
+		<div class="clear"></div>
 		</div>
 
 
@@ -191,6 +192,7 @@ if( $blog )
 			$Item->edit_link( '', '', '#', '#', 'ActionButton' );
 			echo ' ';
 			$Item->publish_link( '', '', '#', '#', 'PublishButton' );
+			echo '<img src="'.$rsc_url.'/img/blank.gif">';
 			echo '</div>';
 
 			echo '<h3 class="dashboard_post_title">';
@@ -445,6 +447,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2007/09/07 21:11:11  fplanque
+ * superstylin' (not even close)
+ *
  * Revision 1.8  2007/09/07 20:11:40  fplanque
  * minor
  *

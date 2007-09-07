@@ -259,7 +259,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 		$Form->submit( array( 'submit', T_('Search'), 'search' ) );
 
 		// TODO: style this better:
-		echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset" class="ActionButton">'.T_('Reset all filters!').'</a>';
+		echo '&nbsp; <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset">'.T_('Reset all filters!').'</a>';
 
 	$Form->end_form();
 
@@ -267,6 +267,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/07 21:11:10  fplanque
+ * superstylin' (not even close)
+ *
  * Revision 1.4  2007/09/03 16:44:28  fplanque
  * chicago admin skin
  *

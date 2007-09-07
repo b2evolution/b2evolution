@@ -377,20 +377,30 @@ h4 {
  */
 a.ActionButton,
 a.DeleteButton,
-a.PublishButton {
-	background-color: #ddd;
+a.PublishButton,
+a.permalink_right {
 	text-decoration: none;
+	float: left;
 	padding: 2px 1ex;
-	border: 1px solid #aaa;
+	margin-right: 4px;
+	border: 1px solid #9db0bc;
 	white-space: nowrap;
+	background: #fefefe url(../img/whitebar24.png) repeat-x center;
 }
+a.permalink_right {
+	float: right;
+	margin: 0;
+}
+
 a.ActionButton:hover,
 a.DeleteButton:hover,
-a.PublishButton:hover {
+a.PublishButton:hover,
+a.permalink_right:hover {
 	text-decoration: underline;
 	background-color: #eee;
 }
-a.ActionButton:hover {
+a.ActionButton:hover,
+a.permalink_right:hover {
 	color: #00b;
 	border: 1px solid #00b;
 }
@@ -436,8 +446,8 @@ td.browse_right_col {
 }
 
 div.NavBar {
-	background-color: #efede0;
-	border: 1px solid #e1ddce;
+	background-color: #F1F6F8;
+	border: 1px solid #becdd6;
 	padding: 1ex;
 	margin: 0 0 1ex 0;
 }
@@ -447,9 +457,9 @@ div.NavBar table {
 div.PostActionsArea,
 div.CommentActionsArea {
 	clear: both;
-	background-color: #efede0;
-	border-top: 1px solid #e1ddce;
-	border-bottom: 1px solid #e1ddce;
+	background-color: #F1F6F8;
+	border-top: 1px solid #becdd6;
+	border-bottom: 1px solid #becdd6;
 	padding: 1ex;
 	margin: 0;
 }
@@ -465,7 +475,7 @@ div.bSideItem {
 	padding: 1ex;
 	margin: 0;
 	color: #929292;
-	border-bottom: 1px solid #e1ddce;
+	border-bottom: 1px solid #becdd6;
 }
 .bSmallHeadRight {
 	float: right;
@@ -476,7 +486,7 @@ div.bSideItem {
 div.bComment, /* Entire comment block */
 form.bComment /* New comment form */
 {
-	border: 1px solid #eee7e0;
+	border: 1px solid #becdd6;
 	padding: 0;
 	margin: 1ex;
 }
@@ -511,7 +521,7 @@ div.bPost {
 	margin: 0 0 1ex 0;
 }
 div.bPostpublished {
-	border: 1px solid #e1ddce;
+	border: 1px solid #becdd6;
 	background-color: #fff;
 }
 .bPostpublished span.bStatus,
@@ -586,9 +596,6 @@ div.bCommentdeprecated > div.bSmallHead /* Direct child only */
 	margin: 0;
 	padding: 0;
 }
-a.permalink_right {
-	margin: .3ex .3ex 0 0;
-}
 
 .bSideItem ul,
 .browse_side_item ul,
@@ -637,6 +644,7 @@ input.SearchField {
 {
 	margin: 1ex 0;
 	clear: both;
+	border: 1px solid #becdd6;
 }
 
 fieldset.extracats {

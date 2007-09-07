@@ -241,6 +241,8 @@ while( $Item = & $ItemList->get_item() )
 				trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'), $Item->ID);
 				echo '</a>';
 			} ?>
+
+   		<div class="clear"></div>
 		</div>
 
 		<?php
@@ -356,6 +358,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/07 21:11:10  fplanque
+ * superstylin' (not even close)
+ *
  * Revision 1.2  2007/09/03 19:36:06  fplanque
  * chicago admin skin
  *
