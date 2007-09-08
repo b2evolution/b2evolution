@@ -125,7 +125,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	                        '%regenerate_url( \'action\', \'ftyp_ID=$ftyp_ID$&amp;action=delete\')%' ),
 						);
 
-  $Results->global_icon( T_('Add a file type...'), 'new', regenerate_url( 'action', 'action=new'), T_('Add file type'), 3, 4  );
+  $Results->global_icon( T_('Create a new file type...'), 'new', regenerate_url( 'action', 'action=new'), T_('New file type').' &raquo;', 3, 4  );
 }
 
 
@@ -133,6 +133,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/08 20:23:03  fplanque
+ * action icons / wording
+ *
  * Revision 1.1  2007/06/25 11:00:12  fplanque
  * MODULES (refactored MVC)
  *

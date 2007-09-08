@@ -82,8 +82,8 @@ $Results->title = T_('Groups & Users');
  */
 if( $current_User->check_perm( 'users', 'edit', false ) )
 { // create new user link
-	$Results->global_icon( T_('Add a user...'), 'new', '?ctrl=users&amp;action=new_user', T_('Add user'), 3, 4  );
-	$Results->global_icon( T_('Add a group...'), 'new', '?ctrl=users&amp;action=new_group', T_('Add group'), 3, 4  );
+	$Results->global_icon( T_('Create a new user...'), 'new', '?ctrl=users&amp;action=new_user', T_('Add user').' &raquo;', 3, 4  );
+	$Results->global_icon( T_('Create a new group...'), 'new', '?ctrl=users&amp;action=new_group', T_('Add group').' &raquo;', 3, 4  );
 }
 
 
@@ -270,6 +270,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/08 20:23:04  fplanque
+ * action icons / wording
+ *
  * Revision 1.2  2007/09/04 14:57:07  fplanque
  * interface cleanup
  *

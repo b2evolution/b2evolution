@@ -128,7 +128,7 @@ if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, 
 
 if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, false ) )
 {	// We have permission permission to edit:
-	$Results->global_icon( T_('Add an element...'), 'new', regenerate_url( 'action,'.$GenericElementCache->dbIDname, 'action=new' ), T_('Add element'), 3, 4 );
+	$Results->global_icon( T_('Create a new element...'), 'new', regenerate_url( 'action,'.$GenericElementCache->dbIDname, 'action=new' ), T_('New element').' &raquo;', 3, 4 );
 }
 
 // EXPERIMENTAL
@@ -138,6 +138,9 @@ $Results->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/08 20:23:03  fplanque
+ * action icons / wording
+ *
  * Revision 1.1  2007/06/25 11:00:20  fplanque
  * MODULES (refactored MVC)
  *

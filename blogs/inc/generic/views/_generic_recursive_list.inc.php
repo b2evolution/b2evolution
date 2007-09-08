@@ -147,7 +147,7 @@ echo '<table class="grouped" cellspacing="0">
 if( $permission_to_edit )
 {	// We have permission permission to edit, so display global icon to add nex genereic element:
 	echo '<span class="right_icons">'
-				.action_icon( T_('Add an element...'), 'new', regenerate_url( 'action,'.$GenericCategoryCache->dbIDname, 'action=new' ), T_('Add element'), 3, 4 ).'
+				.action_icon( T_('Create a new element...'), 'new', regenerate_url( 'action,'.$GenericCategoryCache->dbIDname, 'action=new' ), T_('Add element').' &raquo;', 3, 4 ).'
 				</span>';
 }
 
@@ -173,6 +173,9 @@ echo '</table>';
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/08 20:23:04  fplanque
+ * action icons / wording
+ *
  * Revision 1.1  2007/06/25 11:00:21  fplanque
  * MODULES (refactored MVC)
  *

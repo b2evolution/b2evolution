@@ -229,6 +229,11 @@ if( $blog )
 
 		$nb_blocks_displayed++;
 
+		if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+		{	// We have permission to add a post with at least one status:
+			$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, T_('New post').' &raquo;', 3, 4 );
+		}
+
 		$block_item_Widget->title = T_('Recently edited');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
@@ -318,6 +323,11 @@ if( $blog )
 		echo '<li><a href="admin.php?ctrl=items&tab=list&filter=restore&blog='.$Blog->ID.'">Posts (list) &raquo;</a></li>';
 		echo '<li><a href="admin.php?ctrl=comments&blog='.$Blog->ID.'">Comments &raquo;</a></li>';
 		echo '</ul></li>';
+
+		if( $current_User->check_perm( 'blog_cats', '', false, $Blog->ID ) )
+		{
+			echo '<li><a href="admin.php?ctrl=chapters&blog='.$Blog->ID.'">'.T_('Edit categories').' &raquo;</a></li>';
+		}
 
 		if( $current_User->check_perm( 'blog_genstatic', 'any', false, $Blog->ID ) )
 		{
@@ -447,6 +457,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2007/09/08 20:23:04  fplanque
+ * action icons / wording
+ *
  * Revision 1.9  2007/09/07 21:11:11  fplanque
  * superstylin' (not even close)
  *

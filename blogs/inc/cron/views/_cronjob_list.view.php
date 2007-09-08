@@ -72,7 +72,7 @@ $Results->title = T_('Scheduled jobs') . get_web_help_link('scheduler');
 $Results->global_icon( T_('Refresh'), 'refresh', regenerate_url(), T_('Refresh'), 3, 4 );
 if( $current_User->check_perm( 'options', 'edit', false, NULL ) )
 {	// Permission to edit settings:
-	$Results->global_icon( T_('Refresh'), 'new', regenerate_url( 'action,cjob_ID', 'action=new' ), T_('Add job'), 3, 4 );
+	$Results->global_icon( T_('Create a new scheduled job...'), 'new', regenerate_url( 'action,cjob_ID', 'action=new' ), T_('New job').' &raquo;', 3, 4 );
 }
 
 /**
@@ -168,6 +168,9 @@ echo '<p>[<a href="'.$cron_url.'cron_exec.php" onclick="return pop_up_window( \'
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/08 20:23:03  fplanque
+ * action icons / wording
+ *
  * Revision 1.1  2007/06/25 10:59:49  fplanque
  * MODULES (refactored MVC)
  *

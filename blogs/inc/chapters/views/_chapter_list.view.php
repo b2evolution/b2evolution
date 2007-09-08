@@ -147,7 +147,7 @@ $Table = & new Table();
 
 $Table->title = T_('Categories for blog:').' '.$Blog->dget('name');
 
-$Table->global_icon( T_('Add an element...'), 'new', regenerate_url( 'action,'.$GenericCategoryCache->dbIDname, 'action=new' ), T_('Add element'), 3, 4  );
+$Table->global_icon( T_('Create a new category...'), 'new', regenerate_url( 'action,'.$GenericCategoryCache->dbIDname, 'action=new' ), T_('New category').' &raquo;', 3, 4  );
 
 $Table->cols[] = array(
 						'th' => T_('ID'),
@@ -193,6 +193,9 @@ if( ! $Settings->get('allow_moving_chapters') )
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/08 20:23:03  fplanque
+ * action icons / wording
+ *
  * Revision 1.4  2007/09/08 18:21:13  blueyed
  * isset() check for $result_fadeout[$GenericCategoryCache->dbIDname], failed for "cat_ID" in chapters controller
  *

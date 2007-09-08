@@ -67,7 +67,7 @@ if( $action == 'view' )
 else
 {	// We are displaying multiple posts
 	$block_item_Widget->title = T_('Full posts');
-	$block_item_Widget->global_icon( T_('New post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post...'), 3, 4 );
+	$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post').' &raquo;', 3, 4 );
 }
 
 $block_item_Widget->disp_template_replaced( 'block_start' );
@@ -358,6 +358,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/08 20:23:04  fplanque
+ * action icons / wording
+ *
  * Revision 1.3  2007/09/07 21:11:10  fplanque
  * superstylin' (not even close)
  *

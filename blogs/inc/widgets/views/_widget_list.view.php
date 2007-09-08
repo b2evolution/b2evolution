@@ -39,8 +39,8 @@ function display_container( $container, $legend_suffix = '' )
 
 	$Table->title = T_($container).$legend_suffix;
 
-	$Table->global_icon( T_('Add new widget...'), 'new',
-			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), T_('Add widget'), 3, 4 );
+	$Table->global_icon( T_('Add a widget...'), 'new',
+			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), /* TRANS: note this is NOT a NEW widget */ T_('Add widget').' &raquo;', 3, 4 );
 
 	$Table->cols = array(
 			array( 'th' => T_('Widget') ),
@@ -167,6 +167,9 @@ echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, fal
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/08 20:23:04  fplanque
+ * action icons / wording
+ *
  * Revision 1.2  2007/09/03 19:36:06  fplanque
  * chicago admin skin
  *
