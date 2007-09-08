@@ -175,11 +175,12 @@ function install_basic_skins()
 
 	echo 'Installing default skins... ';
 
-	$Skin = new Skin();
-	$Skin->install( 'custom' );
-
+	// Note: Skin #1 will we used by default by auto-installed blogs.
 	$Skin = new Skin();
 	$Skin->install( 'evopress' );
+
+	$Skin = new Skin();
+	$Skin->install( 'custom' );
 
 	$Skin = new Skin();
 	$Skin->install( 'natural_pink' );
@@ -506,6 +507,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.33  2007/09/08 23:46:38  fplanque
+ * made evopress the new default skin
+ *
  * Revision 1.32  2007/09/03 16:46:58  fplanque
  * minor
  *
