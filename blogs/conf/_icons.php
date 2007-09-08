@@ -37,7 +37,7 @@ function get_icon_info($name)
 
 		case 'dropdown': return array(
 			'file' => $rsc_subdir.'icons/dropdown.gif',
-			'alt'  => T_('¤'),
+			'alt'  => '¤',
 			'size' => array( 11, 8 ),
 		);
 		case 'switch-to-admin': return array(
@@ -512,6 +512,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.60  2007/09/08 23:20:14  fplanque
+ * gettext update
+ *
  * Revision 1.59  2007/09/08 19:31:28  fplanque
  * cleanup of XML feeds for comments on individual posts.
  *
