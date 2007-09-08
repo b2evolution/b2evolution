@@ -35,3 +35,8 @@ div.moderation_msg
 	border: 1px dotted #fa9;
 	color: #e70;
 }
+
+div.feedback_feed_msg {
+	margin: 2em 2ex;
+	text-align: right;
+}

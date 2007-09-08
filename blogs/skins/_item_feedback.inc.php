@@ -190,6 +190,14 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 
 	// _______________________________________________________________
 
+	// Display link for comments feed:
+	$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
+
+	// _______________________________________________________________
+
+
+
+
 
 	// Comment form:
 	if( $params['disp_comment_form'] && $Item->can_comment() )
@@ -346,6 +354,9 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/08 19:31:28  fplanque
+ * cleanup of XML feeds for comments on individual posts.
+ *
  * Revision 1.3  2007/06/24 22:26:34  fplanque
  * improved feedback template
  *

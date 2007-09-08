@@ -1360,7 +1360,6 @@ class Item extends ItemLight
 	}
 
 
-// >>SUSPECT
 	/**
 	 * Template function: Displays link to the feed for comments on this item
 	 *
@@ -1369,36 +1368,37 @@ class Item extends ItemLight
 	 * @param string String to display after the link (if comments are to be displayed)
 	 * @param string Link title
 	 */
-	function feed_link( $type = 'atom', $before = '', $after = '',$title='#')
+	function feedback_feed_link( $skin = '_rss2', $before = '', $after = '', $title='#' )
 	{
 		if( ! $this->can_see_comments() )
 		{	// Comments disabled
 			return;
 		}
-		if (!in_array($type,array('atom','rss2'))){
-				debug_die( "Unknown feed type [$type]" );
+
+		if( $title == '#' )
+		{
+			$title = get_icon( 'feed' ).' '.T_('Comment feed for this post');
 		}
 
-		if( $title == '#' ) $title = T_('RSS feed for comments on this post');
+		$url = $this->get_feedback_feed_url($skin);
 
-		$url = $this->get_comment_feed_url('_' . $type);
- 
 		echo $before;
-		echo '<a href="'.$url .'">' . $title . '</a>';
+		echo '<a href="'.$url.'">'.format_to_output($title).'</a>';
 		echo $after;
 	}
+
 
 	/**
 	 * Get URL to display the post comments in an XML feed.
 	 *
 	 * @param string
 	 */
-	function get_comment_feed_url( $skin_folder_name )
+	function get_feedback_feed_url( $skin_folder_name )
 	{
-	$this->load_Blog();
-		return url_add_param( $this->Blog->get_tempskin_url( $skin_folder_name ), 'disp=comments&amp;title=' . $this->urltitle);
+		$this->load_Blog();
+
+		return url_add_param( $this->Blog->get_tempskin_url( $skin_folder_name ), 'disp=comments&amp;p='.$this->ID);
 	}
-// <<SUSPECT
 
 
 	/**
@@ -3110,6 +3110,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/08 19:31:28  fplanque
+ * cleanup of XML feeds for comments on individual posts.
+ *
  * Revision 1.4  2007/09/04 22:16:33  fplanque
  * in context editing of posts
  *

@@ -501,11 +501,20 @@ function get_icon_info($name)
 			'alt'  => '&gt;',
 			'size' => array( 14, 14 ),
 		);
+
+		case 'feed': return array(
+			'file' => $rsc_subdir.'icons/feed-icon-16x16.gif',
+			'alt'	 => T_('XML Feed'),
+			'size' => array( 16, 16 ),
+		);
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.59  2007/09/08 19:31:28  fplanque
+ * cleanup of XML feeds for comments on individual posts.
+ *
  * Revision 1.58  2007/05/23 22:45:07  blueyed
  * TRANS comments
  *
