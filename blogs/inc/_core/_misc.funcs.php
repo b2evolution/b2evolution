@@ -2720,7 +2720,7 @@ function base_tag( $url, $target = NULL )
  * @param string
  */
 function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_separator = '',
-												$item_start = '<li>', $item_end = '</li>' )
+												$item_start = '<li>', $item_end = '</li>', $force_hash = NULL )
 {
 	if( !empty( $items ) )
 	{
@@ -2728,7 +2728,7 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 		$first = true;
 		foreach( $items as $item )
 		{	// For each list item:
-			$link = resolve_link_params( $item );
+			$link = resolve_link_params( $item, $force_hash );
 			if( empty( $link ) )
 			{
 				continue;
@@ -2759,7 +2759,7 @@ function display_param_link( $params )
  * @param array
  * @return string
  */
-function resolve_link_params( $item )
+function resolve_link_params( $item, $force_hash = NULL )
 {
 	global $current_locale;
 
@@ -2781,7 +2781,7 @@ function resolve_link_params( $item )
 
 					if( is_array( $loc_item[0] ) )
 					{	// Randomize:
-						$loc_item = hash_link_params( $loc_item );
+						$loc_item = hash_link_params( $loc_item, $force_hash );
 					}
 
 					return generate_link_from_params( $loc_item );
@@ -2802,13 +2802,17 @@ function resolve_link_params( $item )
  *
  * @param array of arrays
  */
-function hash_link_params( $link_array )
+function hash_link_params( $link_array, $force_hash = NULL )
 {
 	global $ReqHost, $ReqPath;
 
 	static $hash;
 
-	if( !isset($hash) )
+	if( !is_null($force_hash) )
+	{
+		$hash = $force_hash;
+	}
+	elseif( !isset($hash) )
 	{
 		$key = $ReqHost.$ReqPath;
 		$hash = 0;
@@ -2822,16 +2826,17 @@ function hash_link_params( $link_array )
 		global $debug, $Debuglog;
 		if( $debug )
 		{
-			// echo "[$hash] ";
 			$Debuglog->add( 'Hash key: '.$hash, 'vars' );
 		}
 	}
+	//	echo "[$hash] ";
 
 	foreach( $link_array as $link_params )
 	{
 		// echo '<br>'.$hash.'-'.$link_params[ 0 ];
 		if( $hash <= $link_params[ 0 ] )
 		{	// select this link!
+			// pre_dump( $link_params );
 			array_shift( $link_params );
 			return $link_params;
 		}
@@ -2969,6 +2974,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/08 18:38:08  fplanque
+ * MFB
+ *
  * Revision 1.2  2007/09/04 14:56:20  fplanque
  * antispam cleanup
  *
