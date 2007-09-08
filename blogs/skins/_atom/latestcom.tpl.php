@@ -14,13 +14,15 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if (isset($Item))
-{
-  $CommentList = & new CommentList( $Blog, "'comment'", array('published'), $Item->ID,	'',	'DESC',	'','');
+if( isset($Item) )
+{	// Comments for a specific Item:
+  $CommentList = & new CommentList( $Blog, "'comment'", array('published'), $Item->ID,
+  																	'', 'DESC', '', $Blog->get_setting('posts_per_feed') );
 }
 else
-{
-  $CommentList = & new CommentList( $Blog, "'comment'", array('published'), '',	'',	'DESC',	'',	$Blog->get_setting('posts_per_feed') );
+{	// Comments for the blog:
+  $CommentList = & new CommentList( $Blog, "'comment'", array('published'), '',
+  																	'',	'DESC',	'',	$Blog->get_setting('posts_per_feed') );
 }
 
 if( $debug)
