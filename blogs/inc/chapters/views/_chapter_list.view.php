@@ -58,7 +58,7 @@ function cat_line( $Chapter, $level )
 
 	$r = '<tr id="tr-'.$Chapter->ID.'"class="'.$line_class.
 					// Fadeout?
-					( in_array( $Chapter->ID, $result_fadeout[$GenericCategoryCache->dbIDname] ) ? ' fadeout-ffff00': '' ).'">
+					( isset($result_fadeout[$GenericCategoryCache->dbIDname]) && in_array( $Chapter->ID, $result_fadeout[$GenericCategoryCache->dbIDname] ) ? ' fadeout-ffff00': '' ).'">
 					<td class="firstcol shrinkwrap">'.
 						$Chapter->ID.'
 				</td>';
@@ -193,6 +193,9 @@ if( ! $Settings->get('allow_moving_chapters') )
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/08 18:21:13  blueyed
+ * isset() check for $result_fadeout[$GenericCategoryCache->dbIDname], failed for "cat_ID" in chapters controller
+ *
  * Revision 1.3  2007/09/04 13:47:48  fplanque
  * fixed fadeout
  *
