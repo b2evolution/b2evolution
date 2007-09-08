@@ -22,6 +22,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $cookie_name, $cookie_email;
 
+global $DB;
+
 // Parameters
 $redirect_to = param( 'redirect_to', 'string', '' ); // pass-through (hidden field)
 $recipient_id = param( 'recipient_id', 'integer', '' );
@@ -196,6 +198,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.37  2007/09/08 14:50:02  fplanque
+ * FIX
+ *
  * Revision 1.36  2007/07/09 20:15:59  fplanque
  * doc
  *
