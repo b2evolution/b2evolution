@@ -67,7 +67,6 @@ global $home_url, $admin_url;
 		</ul>
 	</li>
 	<li class="time"><?php echo date( locale_shorttimefmt(), $localtimenow ); ?></li>
-	</li>
 	<?php
 		if( $is_admin_page )
 		{
@@ -121,7 +120,6 @@ global $home_url, $admin_url;
 		</ul>
 	</li>
 
-  <li>
   	<?php
 			if( $is_admin_page || $current_User->check_perm( 'admin', 'visible' ) )
 			{ // We are already in admin or we have permission to view admin options:
@@ -155,15 +153,14 @@ global $home_url, $admin_url;
 						echo '<a href="'.$admin_url.'?ctrl=coll_settings'.$blog_param.'">'.T_('Customize').' '.get_icon('dropdown').'</a>';
 						echo '<ul>';
 						echo '<li><a href="'.$admin_url.'?ctrl=coll_settings'.$blog_param.'">'.T_('Blog name').'</a></li>';
-						echo '<li><a href="'.$admin_url.'?ctrl=coll_settings&tab=skin'.$blog_param.'">'.T_('Blog skin').'</a></li>';
+						echo '<li><a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin'.$blog_param.'">'.T_('Blog skin').'</a></li>';
 						echo '<li><a href="'.$admin_url.'?ctrl=widgets'.$blog_param.'">'.T_('Blog widgets').'</a></li>';
-						echo '<li><a href="'.$admin_url.'?ctrl=coll_settings&tab=display'.$blog_param.'">'.T_('Blog display order').'</a></li>';
+						echo '<li><a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=display'.$blog_param.'">'.T_('Blog display order').'</a></li>';
 						echo '</ul>';
 					echo '</li>';
 				}
 			}
   	?>
-	</li>
 </ul>
 
 </div>
