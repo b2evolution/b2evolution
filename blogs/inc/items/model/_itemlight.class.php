@@ -250,7 +250,7 @@ class ItemLight extends DataObject
 
 		$permalink = $this->Blog->get_archive_url( $this->issue_date, $glue );
 
-		return $permalink.'#'.$this->ID;
+		return $permalink.'#bPost'.$this->ID;
 	}
 
 
@@ -270,7 +270,7 @@ class ItemLight extends DataObject
 
 		$permalink = url_add_tail( $blogurl, '/'.$this->main_Chapter->get_url_path() );
 
-		return $permalink.'#'.$this->ID;
+		return $permalink.'#bPost'.$this->ID;
 	}
 
 
@@ -787,6 +787,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/09 09:15:59  yabs
+ * validation
+ *
  * Revision 1.1  2007/06/25 11:00:26  fplanque
  * MODULES (refactored MVC)
  *

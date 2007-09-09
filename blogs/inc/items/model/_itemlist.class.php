@@ -367,17 +367,26 @@ class ItemList2 extends ItemListLight
 	 */
 	function prevnext_item_links( $params )
 	{
-		echo( $params['block_start'] );
-		$this->prev_item_link( $params['prev_start'], $params['prev_end'] );
-		$this->next_item_link( $params['next_start'], $params['next_end'] );
-		echo( $params['block_end'] );
+		if( !isset( $params[ 'prev_text' ] ) ) $params[ 'prev_text' ] = '&laquo; $title$';
+		if( !isset( $params[ 'prev_no_item' ] ) ) $params[ 'prev_no_item' ] = '';
+		if( !isset( $params[ 'next_text' ] ) ) $params[ 'next_text' ] = '&raquo; $title$';
+		if( !isset( $params[ 'next_no_item' ] ) ) $params[ 'next_no_item' ] = '';
+
+		$output = $this->prev_item_link( $params['prev_start'], $params['prev_end'], $params[ 'prev_text' ], $params[ 'prev_no_item' ], false );
+		$output .= $this->next_item_link( $params['next_start'], $params['next_end'], $params[ 'next_text' ], $params[ 'next_no_item' ], false );
+		if( $output )
+		{	// we have some output, lets wrap it
+			echo( $params['block_start'] );
+			echo $output;
+			echo( $params['block_end'] );
+		}
 	}
 
 
 	/**
 	 * Skip to previous
 	 */
-	function prev_item_link( $before = '', $after = '', $text = '&laquo; $title$', $no_item = '' )
+	function prev_item_link( $before = '', $after = '', $text = '&laquo; $title$', $no_item = '', $display = true )
 	{
     /**
 		 * @var Item
@@ -386,21 +395,23 @@ class ItemList2 extends ItemListLight
 
 		if( !is_null($prev_Item) )
 		{
-			echo $before;
-			$prev_Item->permanent_link( $text );
-			echo $after;
+			$output = $before;
+			$output .= $prev_Item->get_permanent_link( $text );
+			$output .= $after;
 		}
 		else
 		{
-			echo $no_item;
+			$output = $no_item;
 		}
+		if( $display ) echo $output;
+		return $output;
 	}
 
 
 	/**
 	 * Skip to next
 	 */
-	function next_item_link(  $before = '', $after = '', $text = '$title$ &raquo;', $no_item = '' )
+	function next_item_link(  $before = '', $after = '', $text = '$title$ &raquo;', $no_item = '', $display = true )
 	{
     /**
 		 * @var Item
@@ -409,14 +420,16 @@ class ItemList2 extends ItemListLight
 
 		if( !is_null($next_Item) )
 		{
-			echo $before;
-			$next_Item->permanent_link( $text );
-			echo $after;
+			$output = $before;
+			$output .= $next_Item->get_permanent_link( $text );
+			$output .= $after;
 		}
 		else
 		{
-			echo $no_item;
+			$output = $no_item;
 		}
+		if( $display ) echo $output;
+		return $output;
 	}
 
 	/**
@@ -579,6 +592,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/09 09:15:59  yabs
+ * validation
+ *
  * Revision 1.1  2007/06/25 11:00:26  fplanque
  * MODULES (refactored MVC)
  *

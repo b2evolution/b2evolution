@@ -437,7 +437,7 @@ class Item extends ItemLight
 		// $title = preg_replace( '/[^a-zA-Z0-9_\.-]/', '_', $this->title );
 		// echo '<a id="'.$title.'"></a>';
 
-		echo '<a id="'.$this->ID.'"></a>';
+		echo '<a id="bPost'.$this->ID.'"></a>';
 	}
 
 
@@ -3110,6 +3110,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.6  2007/09/09 09:15:59  yabs
+ * validation
+ *
  * Revision 1.5  2007/09/08 19:31:28  fplanque
  * cleanup of XML feeds for comments on individual posts.
  *
