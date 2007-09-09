@@ -89,7 +89,7 @@ global $home_url, $admin_url;
 			echo '<a href="'.$home_url.'">b2evolution '.get_icon('dropdown').'</a>';
 			// Note: if <strong></strong> is inside of the link, rollover fails in IE7
 		?></strong>
-    <ul style="width:22ex;"><!-- size because of HR in IE7 -->
+    <ul>
 			<?php
 				echo '<li><a href="'.$home_url.'">'.T_('Home').'</a></li>';
 
