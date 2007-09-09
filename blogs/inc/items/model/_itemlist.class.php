@@ -362,19 +362,22 @@ class ItemList2 extends ItemListLight
 	}
 
 
+
   /**
 	 * Link to previous and next link in collection
 	 */
 	function prevnext_item_links( $params )
 	{
-		if( !isset( $params[ 'prev_text' ] ) ) $params[ 'prev_text' ] = '&laquo; $title$';
-		if( !isset( $params[ 'prev_no_item' ] ) ) $params[ 'prev_no_item' ] = '';
-		if( !isset( $params[ 'next_text' ] ) ) $params[ 'next_text' ] = '&raquo; $title$';
-		if( !isset( $params[ 'next_no_item' ] ) ) $params[ 'next_no_item' ] = '';
+		$params = array_merge( array(
+									'prev_text' => '&laquo; $title$',
+									'prev_no_item' => '',
+									'next_text' => '$title$ &raquo;',
+									'next_no_item' => '',
+								), $params );
 
 		$output = $this->prev_item_link( $params['prev_start'], $params['prev_end'], $params[ 'prev_text' ], $params[ 'prev_no_item' ], false );
 		$output .= $this->next_item_link( $params['next_start'], $params['next_end'], $params[ 'next_text' ], $params[ 'next_no_item' ], false );
-		if( $output )
+		if( !empty( $output ) )
 		{	// we have some output, lets wrap it
 			echo( $params['block_start'] );
 			echo $output;
@@ -431,6 +434,7 @@ class ItemList2 extends ItemListLight
 		if( $display ) echo $output;
 		return $output;
 	}
+
 
 	/**
 	 * Skip to previous/next Item
@@ -592,6 +596,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/09 12:51:58  fplanque
+ * cleanup
+ *
  * Revision 1.2  2007/09/09 09:15:59  yabs
  * validation
  *
