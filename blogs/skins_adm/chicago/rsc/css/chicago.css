@@ -78,13 +78,12 @@ a:hover {
 #coll_list li {
 	list-style: none;
 	float: left;
-	text-align:center;
 	height: 21px;
 }
 
 #mainmenu li a,
 #coll_list li a {
-	float: left;
+	float: left; /* This line needed by IE6, not necessary for IE7 */
 	display: block;
 	height: 15px;
 	padding: 4px 9px;
