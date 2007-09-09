@@ -78,11 +78,13 @@ a:hover {
 #coll_list li {
 	list-style: none;
 	float: left;
+	text-align:center;
 	height: 21px;
 }
 
 #mainmenu li a,
 #coll_list li a {
+	float: left;
 	display: block;
 	height: 15px;
 	padding: 4px 9px;
@@ -111,7 +113,7 @@ a:hover {
 .panelbody {
 	margin: 0;
 	padding: 0;
-	/* border:	1px solid #f00; */ 
+	/* border:	1px solid #f00; */
 }
 .left_col {
 	vertical-align: top;
@@ -135,9 +137,9 @@ a:hover {
 
 
 /*
- * Page top messages 
+ * Page top messages
  */
-div.action_messages 
+div.action_messages
 {
 	margin:1ex 1em;
 }
@@ -206,7 +208,7 @@ div.pan_br {
 }
 
 
-/* 
+/*
  * Tabs:
  */
 table.tabs {
@@ -287,7 +289,7 @@ table.tabs td.current a:hover {
 	background: url(../img/title_right.gif) no-repeat right top;
 }
 .fieldset_title_bg {
-	background: url(../img/title_bg.png) repeat-x;	
+	background: url(../img/title_bg.png) repeat-x;
 	padding: 4px 6px 0 6px;
 	height: 18px;
 	font-weight: bold;
@@ -352,7 +354,7 @@ table.grouped tr.group td {
 }
 
 /*
- * Titles 
+ * Titles
  */
 h2 {
 	margin-top: 0ex;
@@ -372,8 +374,8 @@ h4 {
 }
 
 
-/* 
- * Links and buttons: 
+/*
+ * Links and buttons:
  */
 a.ActionButton,
 a.DeleteButton,
@@ -425,7 +427,7 @@ div.edit_actions input.SaveButton:hover {
 
 
 /*
- * browse/ Edit Screen: 
+ * browse/ Edit Screen:
  */
 td.browse_left_col {
 }
@@ -492,8 +494,8 @@ form.bComment /* New comment form */
 }
 
 
-/* 
- * Post colors on browse page 
+/*
+ * Post colors on browse page
  */
 .bDate,
 .bTime,
@@ -623,7 +625,7 @@ input.SearchField {
 
 
 /*
- * Write/compose Screen 
+ * Write/compose Screen
  */
 .left_col fieldset,
 .right_col fieldset  {
@@ -735,7 +737,7 @@ div.edit_actions {
 
 
 /*
- * Permissions: 
+ * Permissions:
  */
 span.checkall,
 th.checkright {
