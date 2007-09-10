@@ -146,8 +146,8 @@ class Blog extends DataObject
 			);
 
 		$this->delete_cascades = array(
-				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user permission defintions') ),
-				array( 'table'=>'T_coll_group_perms', 'fk'=>'bloggroup_blog_ID', 'msg'=>T_('%d group permission defintions') ),
+				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user permission definitions') ),
+				array( 'table'=>'T_coll_group_perms', 'fk'=>'bloggroup_blog_ID', 'msg'=>T_('%d group permission definitions') ),
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_coll_ID', 'msg'=>T_('%d subscriptions') ),
 				array( 'table'=>'T_widget', 'fk'=>'wi_coll_ID', 'msg'=>T_('%d widgets') ),
 				array( 'table'=>'T_hitlog', 'fk'=>'hit_blog_ID', 'msg'=>T_('%d hits') ),
@@ -1391,6 +1391,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/10 13:24:13  waltercruz
+ * Mispelled word correction
+ *
  * Revision 1.1  2007/06/25 10:59:31  fplanque
  * MODULES (refactored MVC)
  *
