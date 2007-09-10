@@ -157,7 +157,7 @@ div#evo_toolbar li ul {
 	border-left-color: ThreeDHighlight;
 	border-bottom-color: ThreeDShadow;
 	border-right-color: ThreeDShadow;
-	width:23ex; /* required for interdebt exploiter */
+	width: 25ex; /* prevent page wide dropdowns in IE6; nicer hover in IE7 */
 }
 div#evo_toolbar li.menu_open ul {
 	display: block;
