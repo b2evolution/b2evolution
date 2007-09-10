@@ -134,8 +134,8 @@ if( $resolve_extra_path )
 		}
 		// pre_dump( $path_elements );
 
-		if( isset( $path_elements[0] ) && preg_match( '#.+\.php[0-9]?$#', $path_elements[0] ) )
-		{ // Ignore element ending with .php
+		if( isset( $path_elements[0] ) && preg_match( '#.*\.php[0-9]?$#', $path_elements[0] ) )
+		{ // Ignore element ending with .php (fp: note: may be just '.php')
 			array_shift( $path_elements );
 			$Debuglog->add( 'Ignoring *.php in extra path info' , 'params' );
 		}
@@ -497,6 +497,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.86  2007/09/10 15:35:23  fplanque
+ * .php in blog url fix
+ *
  * Revision 1.85  2007/07/13 23:47:36  fplanque
  * New start pages!
  *
