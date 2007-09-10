@@ -2785,7 +2785,7 @@ class Item extends ItemLight
 			$edited_Cronjob->set( 'name', sprintf( T_('Send notifications for &laquo;%s&raquo;'), strip_tags($this->title) ) );
 
 			// controller:
-			$edited_Cronjob->set( 'controller', 'cron/_post_notifications.job.php' );
+			$edited_Cronjob->set( 'controller', 'cron/jobs/_post_notifications.job.php' );
 
 			// params: specify which post this job is supposed to send notifications for:
 			$edited_Cronjob->set( 'params', array( 'item_ID' => $this->ID ) );
@@ -3110,6 +3110,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.8  2007/09/10 14:53:04  fplanque
+ * cron fix
+ *
  * Revision 1.7  2007/09/09 12:51:58  fplanque
  * cleanup
  *
