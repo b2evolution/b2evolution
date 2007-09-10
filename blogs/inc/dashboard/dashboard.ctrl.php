@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @todo add 5 plugin hooks
+ * @todo add 5 plugin hooks. Will be widgetized later (same as SkinTag became Widgets)
  *
  * @version $Id$
  */
@@ -457,6 +457,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2007/09/10 14:53:35  fplanque
+ * doc
+ *
  * Revision 1.10  2007/09/08 20:23:04  fplanque
  * action icons / wording
  *
