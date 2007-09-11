@@ -91,11 +91,9 @@ $head .= <<<EOB
 </head>
 <body>
 <div id="header">
-<a href="http://b2evolution.net"><img id="evologo" src="{$rsc_url}img/b2evolution_minilogo2.png" alt="b2evolution"  title="visit b2evolution's website" width="185" height="40" /></a>
 	<div id="headinfo">
-		<br /><span style="font-size:150%; font-weight:bold">Import Movable Type into b2evolution</span>
+		<span style="font-size:150%; font-weight:bold">Import Movable Type into b2evolution</span>
 	</div>
-</div>
 EOB;
 
 $conf_file = $conf_path.'_config.php';
@@ -134,7 +132,8 @@ param( 'import_mode', 'string', 'normal' );
 		echo ( $tab == $import_mode ) ? '<li class="current">' : '<li>';
 		echo '<a href="admin.php?ctrl=mtimport&amp;import_mode='.$tab.( !empty($exportedfile) ? '&amp;exportedfile='.$exportedfile : '' ).'">'.ucwords($tab).'</a></li>';
 	}
-?></ul></div>
+?></ul>
+</div>
 
 <div style="padding-top:1em;clear:both;">
 <?php
@@ -988,15 +987,14 @@ param( 'import_mode', 'string', 'normal' );
 				{
 					$old_content = $post_content;
 					// convert tags to lowercase
-					$post_content = preg_replace( "/(<\/?)(\w+)([^>]*>)/e", "'\\1'.strtolower('\\2').'\\3'", $post_content);
+					$post_content = stripslashes( preg_replace( "¤(</?)(\w+)([^>]*>)¤e", "'\\1'.strtolower('\\2').'\\3'", $post_content ) );
 
 					// close br, hr and img tags
-					$post_content = preg_replace( array('/<(br)>/', '/<(hr\s?.*?)>/', '/<(img\s.*?)>/'), '<\\1 />', remove_magic_quotes($post_content) );
+					$post_content = preg_replace( array('¤<(br)>¤', '¤<(hr\s?.*?)>¤', '¤<(img\s.*?)>¤'), '<\\1 />', $post_content );
+
 
 					// add quotes for href tags that don't have them
-					$post_content = preg_replace( '|href=([^"\'][^\s>"\']+)["\']?|', 'href="$1"', $post_content );
-
-					$post_content = preg_replace( array('/<(br)>/', '/<(hr\s?.*?)>/', '/<(img\s.*?)>/'), '<\\1 />', remove_magic_quotes($post_content) );
+					$post_content = preg_replace( '¤href=([^"\'][^\s>"\']+)["\']?¤', 'href="$1"', $post_content );
 
 					if( $post_content != $old_content )
 					{
@@ -1197,7 +1195,7 @@ param( 'import_mode', 'string', 'normal' );
 <div class="panelinfo">
 	<p>
 		Feel free to <a href="http://thequod.de/contact">contact me</a> in case of suggestions, bugs and lack of clarity.
-		Of course, you're also welcome to <a href="https://sourceforge.net/donate/index.php?user_id=663176">donate to me</a> or <a href="http://sourceforge.net/donate/index.php?group_id=85535">the b2evolution project</a>.. :)
+		Of course, you're also welcome to <a href="https://sourceforge.net/donate/index.php?user_id=663176">donate to me</a> or <a href="http://b2evolution.net/dev/donations.php">the b2evolution project</a>.. :)
 	</p>
 </div>
 <div class="clear">
@@ -1489,13 +1487,14 @@ function import_data_extract_authors_cats()
  */
 function renderer_list()
 {
-	global $Plugins, $renderers;
+	global $renderers;
 
-	$Plugins->discover();
+	$admin_Plugins = & get_Cache('Plugins_admin'); // use Plugins_admin, because a plugin might be disabled
+	$admin_Plugins->discover();
 
 	$renderers = array('default');
-	$Plugins->restart();	 // make sure iterator is at start position
-	while( $loop_RendererPlugin = & $Plugins->get_next() )
+	$admin_Plugins->restart();	 // make sure iterator is at start position
+	while( $loop_RendererPlugin = & $admin_Plugins->get_next() )
 	{ // Go through whole list of renders
 		// echo ' ',$loop_RendererPlugin->code;
 		if( empty($loop_RendererPlugin->code) )
@@ -1621,7 +1620,7 @@ function chooseexportfile()
 	{
 		?>
 		<form action="admin.php" class="center">
-			<p>First, choose a file to import (.TXT files from /admin dir):</p>
+			<p>First, choose a file to import (.TXT files from the b2evolution base directory):</p>
 			<select name="exportedfile" onChange="submit()">
 				<?php echo $r ?>
 			</select>
@@ -1661,6 +1660,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/11 21:43:48  fplanque
+ * fixed MT importer
+ *
  * Revision 1.1  2007/06/25 11:01:40  fplanque
  * MODULES (refactored MVC)
  *
