@@ -5,15 +5,19 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>my b2evolution:</title>
 <!-- TemplateEndEditable --> 
+<link rel="stylesheet" href="../blogs/rsc/css/fp02.css" type="text/css" />
 <!-- TemplateBeginEditable name="head" -->
 <!-- TemplateEndEditable --> 
-<link rel="stylesheet" href="../blogs/rsc/css/fp02.css" type="text/css" />
 </head>
 <body>
+<!-- TemplateBeginEditable name="ToolBar" -->
+<!-- TemplateEndEditable -->
+
 <div class="pageHeader">
 <div class="pageHeaderContent">
 
-<!-- TemplateBeginEditable name="NavBar2" --><!-- TemplateEndEditable -->
+<!-- TemplateBeginEditable name="NavBar2" -->
+<!-- TemplateEndEditable -->
 
 <div class="NavBar">
 <div class="pageTitle">
@@ -40,6 +44,6 @@
 	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="../blogs/rsc/img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
   </tr>
 </table>
-<p class="baseline"><!-- TemplateBeginEditable name="Baseline" --><!-- TemplateEndEditable --></p>
+<!-- TemplateBeginEditable name="Baseline" --><!-- TemplateEndEditable -->
 </body>
 </html>

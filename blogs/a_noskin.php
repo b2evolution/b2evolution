@@ -70,6 +70,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		request_title( ' - ', '', ' - ', 'htmlhead' );
 	?></title>
 <!-- InstanceEndEditable -->
+<link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 <!-- InstanceBeginEditable name="head" -->
 	<?php skin_content_meta(); /* Charset for static pages */ ?>
 	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
@@ -79,17 +80,18 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
 	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
-	<!-- InstanceEndEditable -->
-	<link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
+	<!-- InstanceEndEditable -->
 </head>
 <body>
+<!-- InstanceBeginEditable name="ToolBar" -->
+	<?php
+		// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
+		require $skins_path.'_toolbar.inc.php';
+		// ------------------------------- END OF TOOLBAR --------------------------------
+	?>
+<!-- InstanceEndEditable -->
 
-<?php
-// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
-require $skins_path.'_toolbar.inc.php';
-// ------------------------------- END OF TOOLBAR --------------------------------
-?>
 
 <div class="pageHeader">
 <div class="pageHeaderContent">
@@ -124,7 +126,7 @@ require $skins_path.'_toolbar.inc.php';
 </div>
 
 <div class="pageHeaderEnd"></div>
-
+	  
 </div>
 </div>
 
@@ -133,8 +135,42 @@ require $skins_path.'_toolbar.inc.php';
 
 
 <div class="main"><!-- InstanceBeginEditable name="Main" -->
+
 <div class="bPosts">
-	<?php request_title( '<h2>', '</h2>' ) ?>
+
+	<?php
+		// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
+		$Messages->disp( '<div class="action_messages">', '</div>' );
+		// --------------------------------- END OF MESSAGES ---------------------------------
+	?>
+
+	<?php
+		if( isset($MainList) )
+		{ // Links to previous and next post in single post mode:
+			$MainList->prevnext_item_links( array(
+					'block_start' => '<table class="prevnext_post"><tr>',
+					'prev_start'  => '<td>',
+					'prev_end'    => '</td>',
+					'next_start'  => '<td class="right">',
+					'next_end'    => '</td>',
+					'block_end'   => '</tr></table>',
+				) );
+		}
+	?>
+
+	<?php
+		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+		request_title( '<h2>', '</h2>' );
+		// ------------------------------ END OF REQUEST TITLE -----------------------------
+	?>
+
+	<?php
+		if( isset($MainList) )
+		{ // Links to list pages:
+			$MainList->page_links( '<p class="center"><strong>', '</strong></p>' );
+		}
+	?>
+
 
 	<!-- =================================== START OF MAIN AREA =================================== -->
 
@@ -163,6 +199,15 @@ require $skins_path.'_toolbar.inc.php';
 				// -------------------------- END OF POST CONTENT -------------------------
 			?>
 
+			<?php
+				// List all tags attached to this post:
+				$Item->tags( array(
+						'before' =>         '<div class="bSmallPrint">'.T_('Tags').': ',
+						'after' =>          '</div>',
+						'separator' =>      ', ',
+					) );
+			?>
+
 			<div class="bSmallPrint">
 				<?php $Item->feedback_link( 'comments', '', ' &bull; ' ) // Link to comments ?>
 				<?php $Item->feedback_link( 'trackbacks', '', ' &bull; ' ) // Link to trackbacks ?>
@@ -187,9 +232,9 @@ require $skins_path.'_toolbar.inc.php';
 
 	<?php
 		// Links to list pages:
-		if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
-   			'prev_text' => '&lt;&lt; '.T_('Previous'),
-   			'next_text' => T_('Next').' &gt;&gt;',
+		if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '#', array(
+   			'prev_text' => '&lt;&lt;',
+   			'next_text' => '&gt;&gt;',
 			) );
 	?>
 
@@ -295,29 +340,16 @@ require $skins_path.'_toolbar.inc.php';
 		// ---------------------------------- END OF CATEGORY LIST ---------------------------------
 	?>
 
-	<div class="bSideItem">
-		<h3><?php echo T_('Archives') ?></h3>
-		<ul>
-			<?php
-				// -------------------------- ARCHIVES INSERTED HERE -----------------------------
-				// Call the Archives plugin WITH NO MORE LINK AND NO LIST DELIMITERS:
-				$Plugins->call_by_code( 'evo_Arch', array(
-						'title'=>'',
-						'block_start'=>'',
-						'block_end'=>'',
-						'limit'=>12,
-						'more_link'=>'',
-						'list_start'=>'',
-						'list_end'=>'',
-						'line_start'=>'<li>',
-						'line_end'=>'</li>',
-						'day_date_format'=>'',
-					) );
-				// ------------------------------ END OF ARCHIVES --------------------------------
-			?>
-				<li><a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
-		</ul>
-	</div>
+	<?php
+		// -------------------------- ARCHIVES INSERTED HERE -----------------------------
+		$Plugins->call_by_code( 'evo_Arch', array(
+				'block_start' => '<div class="bSideItem">',
+				'block_end' => '</div>',
+				'block_title_start' => '<h3>',
+				'block_title_end' => '</h3>',
+			) );
+		// ------------------------------ END OF ARCHIVES --------------------------------
+	?>
 
 	<?php
 		// --------------------------------- START OF LINKBLOG --------------------------------
@@ -367,17 +399,17 @@ require $skins_path.'_toolbar.inc.php';
 </div>
 <!-- InstanceEndEditable --></div>
 <table cellspacing="3" class="wide">
-  <tr>
+  <tr> 
   <td class="cartouche">Original page design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> </td>
-
+    
 	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="rsc/img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
   </tr>
 </table>
-<p class="baseline"><!-- InstanceBeginEditable name="Baseline" -->
+<!-- InstanceBeginEditable name="Baseline" -->
 <?php
 	$Hit->log();  // log the hit on this page
 	debug_info(); // output debug info if requested
 ?>
-<!-- InstanceEndEditable --></p>
+<!-- InstanceEndEditable -->
 </body>
 <!-- InstanceEnd --></html>

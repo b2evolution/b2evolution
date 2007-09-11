@@ -115,37 +115,30 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		return;
 	}
 
+	global $xmlrpcI4;
+	global $xmlrpcInt;
+	global $xmlrpcDouble;
+	global $xmlrpcBoolean;
+	global $xmlrpcString;
+	global $xmlrpcDateTime;
+	global $xmlrpcBase64;
+	global $xmlrpcArray;
+	global $xmlrpcStruct;
 
-	// G. Giunta 2005/01/29: declare global these variables,
-	// so that xmlrpc.inc will work even if included from within a function
-	// NB: it will give warnings in PHP3, so we comment it out
-	// Milosch: Next round, maybe we should explicitly request these via $GLOBALS where used.
-	if (phpversion() >= '4')
-	{
-		global $xmlrpcI4;
-		global $xmlrpcInt;
-		global $xmlrpcDouble;
-		global $xmlrpcBoolean;
-		global $xmlrpcString;
-		global $xmlrpcDateTime;
-		global $xmlrpcBase64;
-		global $xmlrpcArray;
-		global $xmlrpcStruct;
+	global $xmlrpcTypes;
+	global $xmlrpc_valid_parents;
+	global $xmlEntities;
+	global $xmlrpcerr;
+	global $xmlrpcstr;
+	global $xmlrpc_defencoding;
+	global $xmlrpc_internalencoding;
+	global $xmlrpcName;
+	global $xmlrpcVersion;
+	global $xmlrpcerruser;
+	global $xmlrpcerrxml;
+	global $xmlrpc_backslash;
+	global $_xh;
 
-		global $xmlrpcTypes;
-		global $xmlrpc_valid_parents;
-		global $xmlEntities;
-		global $xmlrpcerr;
-		global $xmlrpcstr;
-		global $xmlrpc_defencoding;
-		global $xmlrpc_internalencoding;
-		global $xmlrpcName;
-		global $xmlrpcVersion;
-		global $xmlrpcerruser;
-		global $xmlrpcerrxml;
-		global $xmlrpc_backslash;
-		global $_xh;
-	}
 	$xmlrpcI4='i4';
 	$xmlrpcInt='int';
 	$xmlrpcBoolean='boolean';

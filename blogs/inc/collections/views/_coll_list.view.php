@@ -78,9 +78,16 @@ $Results->cols[] = array(
 
 function disp_coll_name( $coll_name, $coll_ID )
 {
-	global $current_User;
-	if( $current_User->check_perm( 'blog_properties', 'edit', false, $coll_ID ) )
-	{
+	global $current_User, $ctrl;
+	if( $ctrl == 'dashboard' )
+	{	// Dashboard
+		$edit_url = regenerate_url( 'ctrl', 'ctrl=dashboard&amp;blog='.$coll_ID );
+		$r = '<a href="'.$edit_url.'">';
+		$r .= $coll_name;
+		$r .= '</a>';
+	}
+	elseif( $current_User->check_perm( 'blog_properties', 'edit', false, $coll_ID ) )
+	{	// Blog setting & can edit
 		$edit_url = regenerate_url( 'ctrl', 'ctrl=coll_settings&amp;blog='.$coll_ID );
 		$r = '<a href="'.$edit_url.'" title="'.T_('Edit properties...').'">';
 		$r .= $coll_name;
@@ -166,7 +173,7 @@ function disp_actions( $curr_blog_ID )
 
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
 	{
-		$r .= action_icon( T_('Delete this blog...'), 'delete', regenerate_url( '', 'action=delete&amp;blog='.$curr_blog_ID ) );
+		$r .= action_icon( T_('Delete this blog...'), 'delete', regenerate_url( 'ctrl', 'ctrl=collections&amp;action=delete&amp;blog='.$curr_blog_ID ) );
 	}
 
 	if( empty($r) )
@@ -189,6 +196,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/11 20:57:51  fplanque
+ * minor fixes
+ *
  * Revision 1.1  2007/06/25 10:59:37  fplanque
  * MODULES (refactored MVC)
  *

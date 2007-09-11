@@ -56,7 +56,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
 	<title>Multiblog demo<?php request_title( ' - ', '', ' - ', 'htmlhead' ) ?></title>
-	<!-- InstanceEndEditable -->
+	<!-- InstanceEndEditable --> 
+<link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 <!-- InstanceBeginEditable name="head" -->
 	<?php skin_base_tag(); /* You're not using any skin here but this won't hurt. However it will be very helpful to have this here when you make the switch to a skin! */ ?>
 	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
@@ -64,17 +65,16 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
 	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
-	<!-- InstanceEndEditable -->
-	<link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
-	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
+	<!-- InstanceEndEditable --> 
 </head>
 <body>
-
-<?php
-// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
-require $skins_path.'_toolbar.inc.php';
-// ------------------------------- END OF TOOLBAR --------------------------------
-?>
+<!-- InstanceBeginEditable name="ToolBar" -->
+	<?php
+		// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
+		require $skins_path.'_toolbar.inc.php';
+		// ------------------------------- END OF TOOLBAR --------------------------------
+	?>
+<!-- InstanceEndEditable -->
 
 <div class="pageHeader">
 <div class="pageHeaderContent">
@@ -341,12 +341,12 @@ require $skins_path.'_toolbar.inc.php';
 	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="rsc/img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
   </tr>
 </table>
-<p class="baseline"><!-- InstanceBeginEditable name="Baseline" -->
+<!-- InstanceBeginEditable name="Baseline" -->
 </p>
 <?php
 	$Hit->log();  // log the hit on this page
 	debug_info(); // output debug info if requested
 ?>
-<p><!-- Note: don't mess with the template here :/ --><!-- InstanceEndEditable --></p>
+<p><!-- Note: don't mess with the template here :/ --><!-- InstanceEndEditable -->
 </body>
 <!-- InstanceEnd --></html>

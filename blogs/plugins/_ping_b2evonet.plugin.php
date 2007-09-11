@@ -84,7 +84,7 @@ class ping_b2evonet_plugin extends Plugin
 		$item_Blog = $params['Item']->get_Blog();
 
 		$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
-		$client->debug = ($debug && $params['display']);
+		$client->debug = ( $debug == 2 ); 
 
 		$message = new xmlrpcmsg( 'b2evo.ping', array(
 				new xmlrpcval('id') ,			// Reserved
@@ -107,6 +107,9 @@ class ping_b2evonet_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.6  2007/09/11 20:57:51  fplanque
+ * minor fixes
+ *
  * Revision 1.5  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *

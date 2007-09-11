@@ -92,7 +92,7 @@ if( isset($MainList) ) while( $Item = & $MainList->get_item() )
 
 		<p class="postmetadata alt">
 			<small>
-				This entry was posted	on <?php $Item->issue_time( 'F jS, Y' ); ?> at <?php $Item->issue_time(); ?> ?>
+				This entry was posted	on <?php $Item->issue_time( 'F jS, Y' ); ?> at <?php $Item->issue_time(); ?>
 				and is filed under <?php $Item->categories(); ?>.
 				<!-- You can follow any responses to this entry through the RSS feed. -->
 				<?php $Item->edit_link( '', '' ); ?>

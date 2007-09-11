@@ -55,7 +55,7 @@ class videoplug_plugin extends Plugin
 		$content = preg_replace( '¤\[video:youtube:(.+?)]¤', '<div class="videoblock"><object width="425" height="350"><param name="movie" value="http://www.youtube.com/v/\\1"></param><param name="wmode" value="transparent"></param><embed src="http://www.youtube.com/v/\\1" type="application/x-shockwave-flash" wmode="transparent" width="425" height="350"></embed></object></div>', $content );
 
 		// Dailymotion:
-		$content = preg_replace( '¤\[video:dailymotion:(.+?)]¤', '<div class="videoblock"><object width="425" height="356"><param name="movie" value="http://www.dailymotion.com/swf/\\1"></param><param name="allowfullscreen" value="true"></param><embed src="http://www.dailymotion.com/swf/\\1" type="application/x-shockwave-flash" width="425" height="356" allowfullscreen="true"></embed></object></div>', $content );
+		$content = preg_replace( '¤\[video:dailymotion:(.+?)]¤', '<div class="videoblock"><object width="425" height="335"><param name="movie" value="http://www.dailymotion.com/swf/\\1"></param><param name="allowfullscreen" value="true"></param><embed src="http://www.dailymotion.com/swf/\\1" type="application/x-shockwave-flash" width="425" height="335" allowfullscreen="true"></embed></object></div>', $content );
 
 		// Google video:
 		$content = preg_replace( '¤\[video:google:(.+?)]¤', '<div class="videoblock"><embed style="width:400px; height:326px;" id="VideoPlayback" type="application/x-shockwave-flash" src="http://video.google.com/googleplayer.swf?docId=\\1&hl=en" flashvars=""></embed></div>', $content );
@@ -141,6 +141,9 @@ class videoplug_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.7  2007/09/11 20:57:51  fplanque
+ * minor fixes
+ *
  * Revision 1.6  2007/07/07 22:21:34  fplanque
  * doc
  *

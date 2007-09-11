@@ -50,6 +50,30 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		return;
 	}
 
+	global $xmlrpcI4;
+	global $xmlrpcInt;
+	global $xmlrpcDouble;
+	global $xmlrpcBoolean;
+	global $xmlrpcString;
+	global $xmlrpcDateTime;
+	global $xmlrpcBase64;
+	global $xmlrpcArray;
+	global $xmlrpcStruct;
+
+	global $xmlrpcTypes;
+	global $xmlrpc_valid_parents;
+	global $xmlEntities;
+	global $xmlrpcerr;
+	global $xmlrpcstr;
+	global $xmlrpc_defencoding;
+	global $xmlrpc_internalencoding;
+	global $xmlrpcName;
+	global $xmlrpcVersion;
+	global $xmlrpcerruser;
+	global $xmlrpcerrxml;
+	global $xmlrpc_backslash;
+	global $_xh;
+
 	// listMethods: either a string, or nothing
 	$_xmlrpcs_listMethods_sig = array(array($xmlrpcArray, $xmlrpcString), array($xmlrpcArray));
 	$_xmlrpcs_listMethods_doc = 'This method lists all the methods that the XML-RPC server knows how to dispatch';
@@ -548,6 +572,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	
 /*
  * $Log$
+ * Revision 1.3  2007/09/11 20:57:52  fplanque
+ * minor fixes
+ *
  * Revision 1.2  2007/06/26 02:40:54  fplanque
  * security checks
  *

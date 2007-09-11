@@ -30,18 +30,19 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
 <title><?php echo T_('Summary Demo'); ?></title>
-<!-- InstanceEndEditable -->
-<!-- InstanceBeginEditable name="head" -->
- <!-- InstanceEndEditable -->
+<!-- InstanceEndEditable --> 
 <link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
+<!-- InstanceBeginEditable name="head" -->
+ <!-- InstanceEndEditable --> 
 </head>
 <body>
-
-<?php
-// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
-require $skins_path.'_toolbar.inc.php';
-// ------------------------------- END OF TOOLBAR --------------------------------
-?>
+<!-- InstanceBeginEditable name="ToolBar" -->
+	<?php
+		// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
+		require $skins_path.'_toolbar.inc.php';
+		// ------------------------------- END OF TOOLBAR --------------------------------
+	?>
+<!-- InstanceEndEditable -->
 
 <div class="pageHeader">
 <div class="pageHeaderContent">
@@ -146,10 +147,10 @@ require $skins_path.'_toolbar.inc.php';
 	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="rsc/img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
   </tr>
 </table>
-<p class="baseline"><!-- InstanceBeginEditable name="Baseline" -->
+<!-- InstanceBeginEditable name="Baseline" -->
 <?php
 	debug_info();
 ?>
-<!-- InstanceEndEditable --></p>
+<!-- InstanceEndEditable -->
 </body>
 <!-- InstanceEnd --></html>
