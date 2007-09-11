@@ -98,7 +98,7 @@ function skin_include( $template_name, $params = array() )
 
 		if( !isset( $template_name ) )
 		{
-			printf( '<div class="skin_error">'.T_('Unhandled disp type [%s]').'</div>', $disp );
+			printf( '<div class="skin_error">Unhandled disp type [%s]</div>', $disp );
 			return;
 		}
 
@@ -118,7 +118,7 @@ function skin_include( $template_name, $params = array() )
 	}
 	else
 	{
-		printf( '<div class="skin_error">'.T_('Sub template [%s] not found.').'</div>', $template_name );
+		printf( '<div class="skin_error">Sub template [%s] not found.</div>', $template_name );
 	}
 }
 
@@ -303,6 +303,9 @@ function app_version()
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/11 23:10:39  fplanque
+ * translation updates
+ *
  * Revision 1.4  2007/09/11 21:07:09  fplanque
  * minor fixes
  *

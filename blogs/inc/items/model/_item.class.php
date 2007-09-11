@@ -1554,7 +1554,7 @@ class Item extends ItemLight
 			case 'trackbacks':
 				if( $zero == '#' ) $zero = '';
 				if( $one == '#' ) $one = T_('1 trackback');
-				if( $more == '#' ) $more = T_('%d trackbacks)');
+				if( $more == '#' ) $more = T_('%d trackbacks');
 				break;
 
 			case 'pingbacks':
@@ -3110,6 +3110,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.9  2007/09/11 23:10:39  fplanque
+ * translation updates
+ *
  * Revision 1.8  2007/09/10 14:53:04  fplanque
  * cron fix
  *

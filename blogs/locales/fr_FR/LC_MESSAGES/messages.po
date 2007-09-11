@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2007-09-08 23:43+0200\n"
-"PO-Revision-Date: 2007-09-09 00:02+0100\n"
+"POT-Creation-Date: 2007-09-12 01:07+0200\n"
+"PO-Revision-Date: 2007-09-12 01:08+0100\n"
 "Last-Translator: Francois PLANQUE <fplanque.net>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-SourceCharset: iso-8859-1\n"
 
-#: ..\..\..\a_noskin.php:152
+#: ..\..\..\a_noskin.php:188
 #: ..\..\..\multiblogs.php:140
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:853
 #: ..\..\..\inc\items\views\_item_expert.form.php:293
@@ -35,8 +35,15 @@ msgstr ""
 msgid "Categories"
 msgstr "Catégories"
 
-#: ..\..\..\a_noskin.php:191
-#: ..\..\..\a_noskin.php:232
+#: ..\..\..\a_noskin.php:205
+#: ..\..\..\inc\items\model\_item.class.php:2076
+#: ..\..\..\inc\items\model\_itemlistlight.class.php:855
+#: ..\..\..\inc\items\views\_item_expert.form.php:214
+#: ..\..\..\skins\custom\index.main.php:163
+msgid "Tags"
+msgstr "Tags"
+
+#: ..\..\..\a_noskin.php:277
 #: ..\..\..\multiblogs.php:182
 #: ..\..\..\inc\items\views\_item_list_full.view.php:103
 #: ..\..\..\skins\basic\index.main.php:172
@@ -49,8 +56,7 @@ msgstr "Catégories"
 msgid "Previous"
 msgstr "Précédente"
 
-#: ..\..\..\a_noskin.php:192
-#: ..\..\..\a_noskin.php:233
+#: ..\..\..\a_noskin.php:278
 #: ..\..\..\multiblogs.php:183
 #: ..\..\..\inc\items\views\_item_list_full.view.php:104
 #: ..\..\..\skins\basic\index.main.php:173
@@ -63,34 +69,22 @@ msgstr "Précédente"
 msgid "Next"
 msgstr "Suivante"
 
-#: ..\..\..\a_noskin.php:299
-#: ..\..\..\inc\items\views\_item_list_sidebar.view.php:251
-#: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:133
-#: ..\..\..\plugins\_archives.plugin.php:127
-#: ..\..\..\skins\basic\index.main.php:177
-msgid "Archives"
-msgstr "Archives"
-
-#: ..\..\..\a_noskin.php:318
-msgid "more..."
-msgstr "suite..."
-
 #: ..\..\..\contact.php:46
-#: ..\..\..\contact.php:88
+#: ..\..\..\contact.php:89
 msgid "Contact Form Demo"
 msgstr "Demo Formulaire de contact"
 
 # D:\www\b2evo19\blogs\contact.php:95
-#: ..\..\..\contact.php:98
+#: ..\..\..\contact.php:99
 msgid "This demo displays a form to contact the site admin."
 msgstr "Cette demo affiche un formulaire permettant de contacter l'administrateur du site"
 
 # D:\www\b2evo19\blogs\contact.php:125
-#: ..\..\..\contact.php:127
+#: ..\..\..\contact.php:128
 msgid "Thank you for your message. I will reply as soon as possible."
 msgstr "Merci pour votre message. Je répondrai dès que possible."
 
-#: ..\..\..\contact.php:130
+#: ..\..\..\contact.php:131
 msgid "Send another message?"
 msgstr "Envoyer un autre message?"
 
@@ -203,15 +197,15 @@ msgid "Misc"
 msgstr "Divers"
 
 #: ..\..\..\summary.php:32
-#: ..\..\..\summary.php:74
+#: ..\..\..\summary.php:75
 msgid "Summary Demo"
 msgstr "Démo Résumé"
 
-#: ..\..\..\summary.php:84
+#: ..\..\..\summary.php:85
 msgid "This demo template displays a summary of last posts in all blogs"
 msgstr "Ce gabarit de démo affiche un résumé des derniers articles dans tous les blogs"
 
-#: ..\..\..\summary.php:136
+#: ..\..\..\summary.php:137
 msgid "More posts..."
 msgstr "Plus d'articles..."
 
@@ -386,7 +380,7 @@ msgstr "Site web"
 #: ..\..\..\conf\_icons.php:273
 #: ..\..\..\inc\collections\collections.ctrl.php:75
 #: ..\..\..\inc\files\views\_file_browse.view.php:278
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1802
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1808
 msgid "New"
 msgstr "Nouveau"
 
@@ -1175,7 +1169,7 @@ msgstr "Merci de ne pas envoyer de message vide."
 
 #: ..\..\..\htsrv\message_send.php:149
 msgid "The supplied message is invalid / appears to be spam."
-msgstr ""
+msgstr "Le message entré semble invalide / semble être un spam."
 
 #: ..\..\..\htsrv\message_send.php:160
 msgid "Message sent from your comment:"
@@ -1930,7 +1924,7 @@ msgstr "Re-chercher"
 #. TRANS: file actions; edit, rename, copy, ..
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:174
 #: ..\..\..\inc\chapters\views\_chapter_list.view.php:164
-#: ..\..\..\inc\collections\views\_coll_list.view.php:180
+#: ..\..\..\inc\collections\views\_coll_list.view.php:187
 #: ..\..\..\inc\cron\views\_cronjob_list.view.php:154
 #: ..\..\..\inc\files\views\_filetype_list.view.php:117
 #: ..\..\..\inc\files\views\_file_links.view.php:124
@@ -2218,7 +2212,7 @@ msgstr "Catégorie"
 #: ..\..\..\inc\items\model\_item.class.php:2872
 #: ..\..\..\inc\items\model\_item.class.php:2877
 #: ..\..\..\inc\items\views\_item_list_table.view.php:79
-#: ..\..\..\skins\_toolbar.inc.php:74
+#: ..\..\..\skins\_toolbar.inc.php:73
 msgid "Blog"
 msgstr "Blog"
 
@@ -2230,7 +2224,7 @@ msgstr "Catégorie parente"
 #: ..\..\..\inc\chapters\views\_chapter.form.php:65
 #: ..\..\..\inc\chapters\views\_chapter_list.view.php:156
 #: ..\..\..\inc\chapters\views\_chapter_move.form.php:55
-#: ..\..\..\inc\collections\views\_coll_list.view.php:96
+#: ..\..\..\inc\collections\views\_coll_list.view.php:103
 #: ..\..\..\inc\comments\_comment.form.php:59
 #: ..\..\..\inc\cron\views\_cronjob_list.view.php:120
 #: ..\..\..\inc\files\views\_filetype_list.view.php:73
@@ -2457,12 +2451,12 @@ msgstr "%d catégories liées"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:149
 #, php-format
-msgid "%d user permission defintions"
+msgid "%d user permission definitions"
 msgstr "%d définitions de permissions utilisateur"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:150
 #, php-format
-msgid "%d group permission defintions"
+msgid "%d group permission definitions"
 msgstr "%d définitions de permissions groupe"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:151
@@ -2474,13 +2468,13 @@ msgstr "%d abonnements"
 #: ..\..\..\inc\collections\model\_blog.class.php:152
 #, php-format
 msgid "%d widgets"
-msgstr ""
+msgstr "%d widgets"
 
 # D:\www\b2evo19\blogs\_header.php:224
 #: ..\..\..\inc\collections\model\_blog.class.php:153
 #, php-format
 msgid "%d hits"
-msgstr ""
+msgstr "%d hits"
 
 # D:\www\b2evo20\blogs\inc\MODEL\collections\_blog.class.php:207
 #: ..\..\..\inc\collections\model\_blog.class.php:205
@@ -2662,17 +2656,17 @@ msgstr "Aggrégation"
 #: ..\..\..\inc\sessions\views\_stats_browserhits.view.php:265
 #: ..\..\..\inc\users\model\_user.funcs.php:315
 #: ..\..\..\install\index.php:129
-#: ..\..\..\skins\_toolbar.inc.php:78
+#: ..\..\..\skins\_toolbar.inc.php:77
 msgid "Admin"
 msgstr "Admin"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:90
 msgid "Blogs to aggregate"
-msgstr ""
+msgstr "Blogs à aggréger"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:90
 msgid "List blog IDs separated by ,"
-msgstr ""
+msgstr "Listez les n°s des blogs séparés par des ,"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:94
 msgid "Static file generation"
@@ -2680,7 +2674,7 @@ msgstr "Génération d'un fichier statique"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:95
 msgid "Source file"
-msgstr ""
+msgstr "Fichier source"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:96
 msgid "This is the source .php (stub) file used to generate the static homepage."
@@ -2692,7 +2686,7 @@ msgstr "Fichier Statique"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:99
 msgid "This is the .html file that will be created."
-msgstr ""
+msgstr "Il s'agit du fichier .html qui sera créé."
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:103
 msgid "Static page"
@@ -2700,7 +2694,7 @@ msgstr "Page statique"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:103
 msgid "Generate now!"
-msgstr ""
+msgstr "Générer maintenant!"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:108
 msgid "Media library"
@@ -2862,7 +2856,7 @@ msgstr "Direction"
 
 #: ..\..\..\inc\collections\views\_coll_display.form.php:50
 #: ..\..\..\inc\cron\views\_cronjob.view.php:44
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1044
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1050
 msgid "days"
 msgstr "jours"
 
@@ -2952,7 +2946,7 @@ msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:38
 msgid "XML Feeds (RSS, Atom)"
-msgstr ""
+msgstr "Flux XML (RSS, Atom)"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:40
 msgid "No feeds"
@@ -2960,11 +2954,11 @@ msgstr "Pas de flux"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:41
 msgid "Titles only"
-msgstr ""
+msgstr "Titres uniquement"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:42
 msgid "Post excerpts"
-msgstr ""
+msgstr "Extraits des articles"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:43
 msgid "Post contents (stopping at \"&lt;!-- more -->\")"
@@ -2972,7 +2966,7 @@ msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:44
 msgid "Feed contents"
-msgstr ""
+msgstr "Contenu des flux"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:44
 msgid "How much content do you want to make available in feeds?"
@@ -2980,7 +2974,7 @@ msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:45
 msgid "Posts in RSS/Atom feeds"
-msgstr ""
+msgstr "Articles dans les flux RSS/Atom"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:45
 msgid "How many of the latest posts do you want to include in RSS & Atom feeds?"
@@ -3001,11 +2995,11 @@ msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:54
 msgid "Multiple authors"
-msgstr ""
+msgstr "Auteurs multiples"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:55
 msgid "Use advanced perms"
-msgstr ""
+msgstr "Utiliser les permissions avancées"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:55
 msgid "This will turn on the advanced User and Group permissions tabs for this blog."
@@ -3024,7 +3018,7 @@ msgid "General parameters"
 msgstr "Paramètres généraux"
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:52
-#: ..\..\..\inc\collections\views\_coll_list.view.php:102
+#: ..\..\..\inc\collections\views\_coll_list.view.php:109
 msgid "Full Name"
 msgstr "Nom Complet"
 
@@ -3054,7 +3048,7 @@ msgstr "Utilisé pour identifier ce blog de manière unique. Apparait dans les URL
 #: ..\..\..\inc\collections\views\_coll_general.form.php:69
 #: ..\..\..\inc\collections\views\_coll_general.form.php:75
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:463
-#: ..\..\..\inc\collections\views\_coll_list.view.php:108
+#: ..\..\..\inc\collections\views\_coll_list.view.php:115
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:469
 #: ..\..\..\inc\files\views\_file_list.inc.php:141
 msgid "Owner"
@@ -3063,7 +3057,7 @@ msgstr "Propriétaire"
 # D:\www\b2evo20\blogs\inc\VIEW\collections\_blogs_general.form.php:62
 #: ..\..\..\inc\collections\views\_coll_general.form.php:69
 msgid "Login of this blog's owner."
-msgstr ""
+msgstr "Identifiant du propriétaire de ce blog."
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:73
 msgid "Used to uniquely identify this blog in URLs."
@@ -3086,9 +3080,8 @@ msgid "Include in public blog list"
 msgstr "Inclure dans la liste des blogs publics"
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:84
-#, fuzzy
 msgid "Check this if you want this blog to be advertised in the list of all public blogs on this system."
-msgstr "Cochez si vous voulez que ce blog soit inclus dans la liste des blogs publics."
+msgstr "Cochez si vous voulez que ce blog soit inclu dans la liste des blogs publics de ce système."
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:87
 msgid "Feedback options"
@@ -3268,9 +3261,8 @@ msgstr "Redr"
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:285
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:291
-#, fuzzy
 msgid "Permission to post into this blog with redirected status"
-msgstr "Permission de poster dans ce blog avec le statut déprécié"
+msgstr "Permission de poster dans ce blog avec le statut redirigé"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:309
@@ -3306,9 +3298,8 @@ msgstr "Permission d'éditer les commentaires dans ce blog"
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:341
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:351
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:361
-#, fuzzy
 msgid "Edit blog settings"
-msgstr "Modifier les réglages du plugin!"
+msgstr "Modifier les réglages du blog"
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:337
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:342
@@ -3339,9 +3330,8 @@ msgstr "Av."
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:361
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:366
-#, fuzzy
 msgid "Permission to edit advanced/administrative blog properties"
-msgstr "Permission de modifier les propriétés de ce blog"
+msgstr "Permission de modifier les propriétés avancées/administratives de ce blog"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:367
@@ -3357,7 +3347,7 @@ msgstr "Répertoire média"
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:373
 #: ..\..\..\inc\files\views\_filetype_list.view.php:106
 #: ..\..\..\inc\files\views\_file_upload.view.php:298
-#: ..\..\..\skins\_toolbar.inc.php:149
+#: ..\..\..\skins\_toolbar.inc.php:147
 msgid "Upload"
 msgstr "Uploader"
 
@@ -3380,7 +3370,7 @@ msgstr "Permission de lister le contenu du dossier média de ce blog"
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:386
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:391
-#: ..\..\..\skins\_toolbar.inc.php:146
+#: ..\..\..\skins\_toolbar.inc.php:144
 msgid "Write"
 msgstr "Ecrire"
 
@@ -3431,21 +3421,18 @@ msgstr "Membre"
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:460
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:466
-#, fuzzy
 msgid "Contributor"
-msgstr "Continuer"
+msgstr "Contributeur"
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:461
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:467
-#, fuzzy
 msgid "Publisher"
-msgstr "Publié"
+msgstr "Editeur"
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:462
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:468
-#, fuzzy
 msgid "Moderator"
-msgstr "Modérer..."
+msgstr "Modérateur"
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:465
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:471
@@ -3481,32 +3468,31 @@ msgstr "Liste des blogs"
 msgid "New blog..."
 msgstr "Nouveau blog..."
 
-#: ..\..\..\inc\collections\views\_coll_list.view.php:85
-#: ..\..\..\inc\collections\views\_coll_list.view.php:159
+#: ..\..\..\inc\collections\views\_coll_list.view.php:92
+#: ..\..\..\inc\collections\views\_coll_list.view.php:166
 #: ..\..\..\inc\files\views\_file_list.inc.php:386
 msgid "Edit properties..."
 msgstr "Editer les propriétés..."
 
-#: ..\..\..\inc\collections\views\_coll_list.view.php:114
+#: ..\..\..\inc\collections\views\_coll_list.view.php:121
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:92
 msgid "Blog URL"
 msgstr "URL blog"
 
-#: ..\..\..\inc\collections\views\_coll_list.view.php:126
-#, fuzzy
+#: ..\..\..\inc\collections\views\_coll_list.view.php:133
 msgid "Generate static page now!"
-msgstr "Génération d'une page statique pour le blog [%s]"
+msgstr "Générer une page statique maintenant!"
 
 #. TRANS: abbrev. for "generate !"
-#: ..\..\..\inc\collections\views\_coll_list.view.php:127
+#: ..\..\..\inc\collections\views\_coll_list.view.php:134
 msgid "Gen!"
 msgstr "Gen!"
 
-#: ..\..\..\inc\collections\views\_coll_list.view.php:138
+#: ..\..\..\inc\collections\views\_coll_list.view.php:145
 msgid "Static File"
 msgstr "Fichier Statique"
 
-#: ..\..\..\inc\collections\views\_coll_list.view.php:144
+#: ..\..\..\inc\collections\views\_coll_list.view.php:151
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:992
 #: ..\..\..\inc\locales\_locale_settings.form.php:85
 #: ..\..\..\inc\locales\_locale_settings.form.php:267
@@ -3514,11 +3500,11 @@ msgstr "Fichier Statique"
 msgid "Locale"
 msgstr "Locale"
 
-#: ..\..\..\inc\collections\views\_coll_list.view.php:164
+#: ..\..\..\inc\collections\views\_coll_list.view.php:171
 msgid "Edit categories..."
 msgstr "Editer les catégories..."
 
-#: ..\..\..\inc\collections\views\_coll_list.view.php:169
+#: ..\..\..\inc\collections\views\_coll_list.view.php:176
 msgid "Delete this blog..."
 msgstr "Supprimer ce blog..."
 
@@ -3561,7 +3547,6 @@ msgid "WARNING: it is highly recommended that this ends in with a / or .php !"
 msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:123
-#, fuzzy
 msgid "Default blog in index.php"
 msgstr "Blog par défaut sur index.php"
 
@@ -3577,14 +3562,12 @@ msgid "Current default :"
 msgstr "Par défaut actuel :"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:131
-#, fuzzy
 msgid "Explicit param on index.php"
 msgstr "Référence explicite sur index.php"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:136
-#, fuzzy
 msgid "Extra path on index.php"
-msgstr "Utiliser les extra path infos"
+msgstr "Chemin étendu sur index.php"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:141
 msgid "Relative to baseurl"
@@ -3599,23 +3582,20 @@ msgid "Absolute URL"
 msgstr "URL absolue"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:165
-#, fuzzy
 msgid "Blog base URL"
-msgstr "URL blog"
+msgstr "URLde base du blog"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:171
 msgid "URL preview"
 msgstr "Prévisu URL"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:176
-#, fuzzy
 msgid "Archive URLs"
-msgstr "Archives"
+msgstr "URLs des archives"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:180
-#, fuzzy
 msgid "Use param"
-msgstr "Perms utilisateur"
+msgstr "Utiliser param"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:180
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:182
@@ -3623,14 +3603,12 @@ msgid "Archive links will look like "
 msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:182
-#, fuzzy
 msgid "Use extra-path"
-msgstr "Utiliser le chemin d'accès à la catégorie"
+msgstr "Utiliser chemin étendu"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:184
-#, fuzzy
 msgid "Archive links"
-msgstr "Archives"
+msgstr "Liens vers archives"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:189
 msgid "Category URLs"
@@ -3638,26 +3616,23 @@ msgstr "URLs des catégories"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:193
 msgid "Use param: cat ID"
-msgstr ""
+msgstr "Utiliser param: cat ID"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:193
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:195
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:197
-#, fuzzy
 msgid "Category links will look like "
-msgstr "Liens des catégories"
+msgstr "Les liens vers les catégories ressembleront à"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:195
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:214
-#, fuzzy
 msgid "Use extra-path: sub-category"
-msgstr "Utiliser la sous-catégorie"
+msgstr "Utiliser chemin étendu: sous-catégorie"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:197
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:215
-#, fuzzy
 msgid "Use extra-path: category path"
-msgstr "Utiliser le chemin d'accès à la catégorie"
+msgstr "Utiliser chemin étendu: chemin d'accès à la catégorie"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:199
 msgid "Category links"
@@ -3669,26 +3644,23 @@ msgstr "URLs des articles"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:208
 msgid "Use param: post ID"
-msgstr ""
+msgstr "Utiliser param: post ID"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:208
-#, fuzzy
 msgid "Links will look like: 'stub?p=123&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1'"
-msgstr "Les permaliens ressembleront à 'stub?title=titre-article&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1'."
+msgstr "Les liens ressembleront à 'stub?o=123&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1'."
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:209
-#, fuzzy
 msgid "Use param: post title"
-msgstr "Profil utilisateur"
+msgstr "Utiliser param: titre URL"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:209
-#, fuzzy
 msgid "Links will look like: 'stub?title=post-title&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1'"
-msgstr "Les permaliens ressembleront à 'stub?title=titre-article&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1'."
+msgstr "Les liens ressembleront à 'stub?title=titre-article&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1'."
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:210
 msgid "Use extra-path: post title"
-msgstr ""
+msgstr "Utiliser chemin étendu: titre URL de l'article"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:210
 msgid "Links will look like 'stub/post-title'"
@@ -3727,33 +3699,28 @@ msgid "Links will look like 'stub/cat/subcat/post-title'"
 msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:216
-#, fuzzy
 msgid "Single post links"
-msgstr "Liens d'aide en ligne"
+msgstr "Liens vers articles"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:217
 msgid "For example, single post links are used when viewing comments for a post. May be used for permalinks - see below."
 msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:222
-#, fuzzy
 msgid "Link to single post"
-msgstr "Edition d'un article"
+msgstr "Lien vers l'article seul"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:223
-#, fuzzy
 msgid "Link to post in archive"
-msgstr "aller à l'archive de ce mois"
+msgstr "Lien vers l'article dans les archives"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:224
-#, fuzzy
 msgid "Link to post in sub-category"
-msgstr "Utiliser la sous-catégorie"
+msgstr "Lien vers l'article dans une sous-catégorie"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:225
-#, fuzzy
 msgid "Post permalinks"
-msgstr "Permalien"
+msgstr "Permalien des articles"
 
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:53
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:124
@@ -3765,13 +3732,12 @@ msgstr "Perms utilisateurs"
 #. TRANS: User Level
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:180
 msgid "L"
-msgstr ""
+msgstr "N"
 
 #: ..\..\..\inc\comments\_comment.form.php:38
 #: ..\..\..\inc\items\items.ctrl.php:589
-#, fuzzy
 msgid "cancel"
-msgstr "Annuler"
+msgstr "annuler"
 
 #: ..\..\..\inc\comments\_comment.form.php:41
 #: ..\..\..\inc\comments\views\_comment_list.inc.php:73
@@ -4076,9 +4042,8 @@ msgstr "Pas de Spam Karma"
 
 #: ..\..\..\inc\comments\views\_comment_list.inc.php:82
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:90
-#, fuzzy
 msgid "Comment from"
-msgstr "Commentaire de:"
+msgstr "Commentaire de"
 
 #: ..\..\..\inc\comments\views\_comment_list.inc.php:86
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:94
@@ -4209,12 +4174,12 @@ msgid "Scheduled at"
 msgstr "Planifié à"
 
 #: ..\..\..\inc\cron\views\_cronjob.view.php:48
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1053
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1059
 msgid "hours"
 msgstr "heures"
 
 #: ..\..\..\inc\cron\views\_cronjob.view.php:52
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1063
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1069
 msgid "minutes"
 msgstr "minutes"
 
@@ -4247,14 +4212,12 @@ msgid "Scheduled jobs"
 msgstr "Tâches planifiées"
 
 #: ..\..\..\inc\cron\views\_cronjob_list.view.php:75
-#, fuzzy
 msgid "Create a new scheduled job..."
-msgstr "Nouvelle tâche planifiée"
+msgstr "Créer une nouvelle tâche planifiée..."
 
 #: ..\..\..\inc\cron\views\_cronjob_list.view.php:75
-#, fuzzy
 msgid "New job"
-msgstr "Nouveau blog"
+msgstr "Nouvelle tâche"
 
 #: ..\..\..\inc\cron\views\_cronjob_list.view.php:87
 msgid "Pending"
@@ -4326,25 +4289,22 @@ msgid "Global"
 msgstr "Global"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:78
-#, fuzzy
 msgid "Comments awaiting moderation"
-msgstr "Cet article n'a aucune réaction en attente de modération..."
+msgstr "Commentaires en attente de modération"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:106
-#, fuzzy
 msgid "in response to"
-msgstr "En réponse à:"
+msgstr "en réponse à"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:181
 msgid "Recent drafts"
-msgstr ""
+msgstr "Brouillons récents"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:234
 #: ..\..\..\inc\items\views\_item_list_full.view.php:70
 #: ..\..\..\inc\items\views\_item_list_table.view.php:203
-#, fuzzy
 msgid "Write a new post..."
-msgstr "Après chaque nouvel article..."
+msgstr "Rédiger un nouvel article..."
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:234
 #: ..\..\..\inc\items\views\_item_list_full.view.php:70
@@ -4353,14 +4313,12 @@ msgid "New post"
 msgstr "Nouvel article"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:237
-#, fuzzy
 msgid "Recently edited"
-msgstr "Récemment"
+msgstr "Récemment édités"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:286
-#, fuzzy
 msgid "Getting started"
-msgstr "Les réglages ont été mis à jour."
+msgstr "Premiers pas"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:289
 msgid "Welcome to your new blog's dashboard!"
@@ -4380,46 +4338,40 @@ msgstr ""
 
 # D:\www\b2evo20\blogs\inc\MODEL\collections\_blog.class.php:249
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:314
-#, fuzzy
 msgid "Manage your blog"
-msgstr "Blog standard"
+msgstr "Gérez votre blog"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:329
-#, fuzzy
 msgid "Edit categories"
-msgstr "Editer les catégories..."
+msgstr "Editer les catégories"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:345
 msgid "Customize your blog"
 msgstr "Personnalisez votre blog"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:351
-#: ..\..\..\skins\_toolbar.inc.php:157
-#, fuzzy
+#: ..\..\..\skins\_toolbar.inc.php:155
 msgid "Blog name"
-msgstr "Nom URL"
+msgstr "Nom du blog"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:352
-#: ..\..\..\skins\_toolbar.inc.php:158
-#, fuzzy
+#: ..\..\..\skins\_toolbar.inc.php:156
 msgid "Blog skin"
-msgstr "Pas d'habillage"
+msgstr "Habillage du blog"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:353
-#: ..\..\..\skins\_toolbar.inc.php:159
-#, fuzzy
+#: ..\..\..\skins\_toolbar.inc.php:157
 msgid "Blog widgets"
-msgstr "Liste des blogs"
+msgstr "Widgets du blog"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:354
-#: ..\..\..\skins\_toolbar.inc.php:160
+#: ..\..\..\skins\_toolbar.inc.php:158
 msgid "Blog display order"
-msgstr ""
+msgstr "Order d'affiche du blog"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:423
-#, fuzzy
 msgid "Administrative tasks"
-msgstr "Administration"
+msgstr "Tâches administratives"
 
 #: ..\..\..\inc\files\files.ctrl.php:115
 #: ..\..\..\inc\files\upload.ctrl.php:99
@@ -4702,9 +4654,8 @@ msgstr "Impossible de déplacer &laquo;%s&raquo; vers &laquo;%s&raquo;."
 
 #: ..\..\..\inc\files\file_settings.ctrl.php:107
 #: ..\..\..\inc\files\file_settings.ctrl.php:121
-#, fuzzy
 msgid "Invalid CHMOD value. Use 3 digits."
-msgstr "Valeur CHMOD invalide."
+msgstr "Valeur CHMOD invalide. Utilisez 3 chiffres."
 
 #: ..\..\..\inc\files\file_settings.ctrl.php:131
 #, php-format
@@ -4786,9 +4737,9 @@ msgstr "Veuillez sélectionner un fichier local à uploader."
 
 #. TRANS: %s will be replaced by the difference
 #: ..\..\..\inc\files\upload.ctrl.php:246
-#, fuzzy, php-format
+#, php-format
 msgid "The file is too large: %s but the maximum allowed is %s."
-msgstr "Le fichier est trop gros de %s. La taille maximale autorisée est: %s."
+msgstr "Le fichier est trop gros: %s alors que le macimum autorisé est de %s."
 
 #: ..\..\..\inc\files\upload.ctrl.php:264
 msgid "The file exceeds the upload_max_filesize directive in php.ini."
@@ -4811,9 +4762,8 @@ msgid "Unknown error."
 msgstr "Erreur inconnue."
 
 #: ..\..\..\inc\files\upload.ctrl.php:295
-#, fuzzy
 msgid "The file does not seem to be a valid upload! It may exceed the upload_max_filesize directive in php.ini."
-msgstr "Le fichier uploadé dépasse la taille maximale upload_max_filesize définie dans php.ini."
+msgstr "Le fichier ne semble pas être un upload valide! Il dépasse peut être la taille maximale upload_max_filesize définie dans php.ini."
 
 #: ..\..\..\inc\files\upload.ctrl.php:325
 msgid "An unknown error occurred when moving the uploaded file on the server."
@@ -5146,9 +5096,8 @@ msgid "Delete this file type!"
 msgstr "Supprimer ce type de fichier!"
 
 #: ..\..\..\inc\files\views\_filetype_list.view.php:128
-#, fuzzy
 msgid "Create a new file type..."
-msgstr "Ajouter un type de fichier..."
+msgstr "Créer un nouveau type de fichier..."
 
 #: ..\..\..\inc\files\views\_file_browse.view.php:73
 msgid "Filter is a regular expression"
@@ -5190,7 +5139,7 @@ msgstr "Cacher l'arborescence"
 # D:\www\b2evo20\blogs\inc\VIEW\files\_files_browse.inc.php:171
 #: ..\..\..\inc\files\views\_file_browse.view.php:171
 msgid "View one folder per page"
-msgstr ""
+msgstr "Voir un dossier par pahe"
 
 #: ..\..\..\inc\files\views\_file_browse.view.php:171
 msgid "Folder mode"
@@ -5695,7 +5644,7 @@ msgstr "Cochez pour activer le gestionnaire de fichiers."
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:179
 msgid "Accessible file roots"
-msgstr ""
+msgstr "Racines de fichiers accessibles"
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:180
 msgid "Enable blog directories"
@@ -5906,9 +5855,8 @@ msgstr "Dupliquer..."
 #: ..\..\..\inc\generic\views\_generic_list.inc.php:126
 #: ..\..\..\inc\generic\views\_generic_ordered_list.inc.php:131
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:150
-#, fuzzy
 msgid "Create a new element..."
-msgstr "Ajouter un élément..."
+msgstr "Créer un nouvel élément..."
 
 # D:\www\b2evo\blogs\inc\VIEW\generic\_generic_list.inc.php:122
 # D:\www\b2evo\blogs\inc\VIEW\generic\_generic_ordered_list.inc.php:127
@@ -5980,9 +5928,8 @@ msgid "View post & comments"
 msgstr "Voir articles & commentaires"
 
 #: ..\..\..\inc\items\items.ctrl.php:601
-#, fuzzy
 msgid "Browse blog"
-msgstr "Parcourir le blog:"
+msgstr "Parcourir le blog"
 
 #: ..\..\..\inc\items\item_statuses.ctrl.php:41
 #: ..\..\..\skins_adm\_adminUI_general.class.php:1409
@@ -6001,14 +5948,12 @@ msgid "Cannot delete item status"
 msgstr "Impossible de supprimer le statut d'objet!"
 
 #: ..\..\..\inc\items\item_types.ctrl.php:36
-#, fuzzy
 msgid "Item/Post/Page types"
-msgstr "Types d'articles"
+msgstr "Types d'Objets/Articles/Pages"
 
 #: ..\..\..\inc\items\item_types.ctrl.php:51
-#, fuzzy
 msgid "Cannot delete item type"
-msgstr "Impossible de supprimer le statut d'objet!"
+msgstr "Impossible de supprimer le type d'obje"
 
 #. TRANS: Priority name
 #: ..\..\..\inc\items\model\_item.class.php:212
@@ -6037,7 +5982,7 @@ msgstr "5 - La plus basse"
 
 #: ..\..\..\inc\items\model\_item.class.php:345
 msgid "If you want to redirect this post, you must specify an URL! (Expert mode)"
-msgstr ""
+msgstr "Si vous voulez rediroger cet article, vous devez spécifier une URL! (Mode expert)"
 
 #: ..\..\..\inc\items\model\_item.class.php:351
 #: ..\..\..\inc\items\model\_itemlist.class.php:124
@@ -6059,15 +6004,13 @@ msgstr "Cet article n'est pas publié. Vous ne pouvez pas laisser de commentaire.
 #  TRANS: this is the default text for the extended post "more" link
 #. TRANS: this is the default text for the extended post "more" link
 #: ..\..\..\inc\items\model\_item.class.php:1023
-#, fuzzy
 msgid "Read more"
-msgstr "Lire la suite!"
+msgstr "Lire la suite"
 
 #. TRANS: this is the default text displayed once the more link has been activated
 #: ..\..\..\inc\items\model\_item.class.php:1036
-#, fuzzy
 msgid "Follow up:"
-msgstr "Autoriser l'upload"
+msgstr "Suite:"
 
 #: ..\..\..\inc\items\model\_item.class.php:1185
 msgid "Send email to post author"
@@ -6086,9 +6029,8 @@ msgid "Pages:"
 msgstr "Pages:"
 
 #: ..\..\..\inc\items\model\_item.class.php:1380
-#, fuzzy
 msgid "Comment feed for this post"
-msgstr "Les commentaires sont fermés pour cet article."
+msgstr "Flux de commentaires pour cet article"
 
 #: ..\..\..\inc\items\model\_item.class.php:1432
 msgid "Display feedback / Leave a comment"
@@ -6120,46 +6062,38 @@ msgid "Display trackbacks / Get trackback address for this post"
 msgstr "Afficher les trackbacks / Obtenir l'adresse de trackback pour cet article"
 
 #: ..\..\..\inc\items\model\_item.class.php:1462
-#, fuzzy
 msgid "Send a trackback"
-msgstr "Envoi d'un trackaback à:"
+msgstr "Envoyer un trackaback"
 
 #: ..\..\..\inc\items\model\_item.class.php:1463
 #: ..\..\..\inc\items\model\_item.class.php:1556
-#, fuzzy
 msgid "1 trackback"
-msgstr "1 Trackback"
+msgstr "1 trackback"
 
 #: ..\..\..\inc\items\model\_item.class.php:1464
-#, fuzzy, php-format
+#: ..\..\..\inc\items\model\_item.class.php:1557
+#, php-format
 msgid "%d trackbacks"
-msgstr "%d Trackbacks"
+msgstr "%d trackbacks"
 
 #: ..\..\..\inc\items\model\_item.class.php:1475
 msgid "Display pingbacks"
 msgstr "Afficher les pingbacks"
 
 #: ..\..\..\inc\items\model\_item.class.php:1476
-#, fuzzy
 msgid "No pingback yet"
-msgstr "Pas de pingbacks à envoyer."
+msgstr "Pas de pingback pour l'instant"
 
 #: ..\..\..\inc\items\model\_item.class.php:1477
 #: ..\..\..\inc\items\model\_item.class.php:1563
-#, fuzzy
 msgid "1 pingback"
-msgstr "Pingbacks"
+msgstr "1 pingback"
 
 #: ..\..\..\inc\items\model\_item.class.php:1478
 #: ..\..\..\inc\items\model\_item.class.php:1564
-#, fuzzy, php-format
+#, php-format
 msgid "%d pingbacks"
-msgstr "Pingbacks"
-
-#: ..\..\..\inc\items\model\_item.class.php:1557
-#, fuzzy, php-format
-msgid "%d trackbacks)"
-msgstr "%d Trackbacks"
+msgstr "%d pingbacks"
 
 #: ..\..\..\inc\items\model\_item.class.php:1607
 msgid "Moderate these feedbacks"
@@ -6212,14 +6146,6 @@ msgstr "Configuration des plug-ins"
 #: ..\..\..\inc\items\model\_item.class.php:2014
 msgid "No renderer plugins are installed."
 msgstr "Aucun plugin de formattage de texte n'est installé."
-
-#: ..\..\..\inc\items\model\_item.class.php:2076
-#: ..\..\..\inc\items\model\_itemlistlight.class.php:855
-#: ..\..\..\inc\items\views\_item_expert.form.php:214
-#: ..\..\..\skins\custom\index.main.php:163
-#, fuzzy
-msgid "Tags"
-msgstr "Tâche"
 
 #: ..\..\..\inc\items\model\_item.class.php:2228
 msgid "No views"
@@ -6290,12 +6216,11 @@ msgid "Pinging %s..."
 msgstr "Ping de %s..."
 
 #: ..\..\..\inc\items\model\_item.funcs.php:398
-#, fuzzy
 msgid "Add a new category"
-msgstr "Ajouter une nouvelle catégorie..."
+msgstr "Ajouter une nouvelle catégorie"
 
 #: ..\..\..\inc\items\model\_item.funcs.php:404
-#: ..\..\..\inc\tools\mtimport.ctrl.php:1260
+#: ..\..\..\inc\tools\mtimport.ctrl.php:1258
 msgid "Select main category in target blog and optionally check additional categories"
 msgstr "Sélectionnez la catégorie principale dans le blog cible; cochez éventuellement des catégories additionnelles"
 
@@ -6324,7 +6249,7 @@ msgid "Extra"
 msgstr "Extra"
 
 #: ..\..\..\inc\items\model\_item.funcs.php:472
-#: ..\..\..\inc\tools\mtimport.ctrl.php:1300
+#: ..\..\..\inc\tools\mtimport.ctrl.php:1298
 msgid "Select as MAIN category"
 msgstr "Sélectionner en tant que catégorie PRINCIPALE"
 
@@ -6507,9 +6432,8 @@ msgid "Excerpt"
 msgstr "Extrait"
 
 #: ..\..\..\inc\items\views\_item_expert.form.php:221
-#, fuzzy
 msgid "(for XML feeds)"
-msgstr "Flux XML"
+msgstr "(pour les flux XML)"
 
 #: ..\..\..\inc\items\views\_item_expert.form.php:235
 msgid "Workflow properties"
@@ -6696,9 +6620,8 @@ msgid "Reset all filters!"
 msgstr "Réinitialiser tous les filtres!"
 
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:68
-#, fuzzy
 msgid "Reset filters"
-msgstr "Réinitialiser tous les filtres"
+msgstr "RAZ filtres"
 
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:76
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:259
@@ -6769,6 +6692,13 @@ msgstr "Auteurs"
 msgid "Statuses"
 msgstr "Statuts"
 
+#: ..\..\..\inc\items\views\_item_list_sidebar.view.php:251
+#: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:133
+#: ..\..\..\plugins\_archives.plugin.php:127
+#: ..\..\..\skins\basic\index.main.php:177
+msgid "Archives"
+msgstr "Archives"
+
 #. TRANS: abbrev for info
 #: ..\..\..\inc\items\views\_item_list_table.view.php:170
 #: ..\..\..\inc\items\views\_item_list_track.view.php:208
@@ -6797,18 +6727,16 @@ msgid "Assigned"
 msgstr "Assigné"
 
 #: ..\..\..\inc\items\views\_item_list_track.view.php:239
-#, fuzzy
 msgid "Create a new task..."
-msgstr "Créer un blog maintenant..."
+msgstr "Créer une nouvelle tâche..."
 
 #: ..\..\..\inc\items\views\_item_list_track.view.php:239
-#, fuzzy
 msgid "New task"
-msgstr "Nouvelle tâche..."
+msgstr "Nouvelle tâche"
 
 #: ..\..\..\inc\items\views\inc\_item_links.inc.php:53
 msgid "This post is linked to..."
-msgstr ""
+msgstr "Cet article est lié à..."
 
 #: ..\..\..\inc\items\views\inc\_item_links.inc.php:67
 msgid "Position"
@@ -7161,7 +7089,7 @@ msgid "Calculate time difference"
 msgstr "Calculer le décalage horaire"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:246
-#: ..\..\..\inc\tools\mtimport.ctrl.php:383
+#: ..\..\..\inc\tools\mtimport.ctrl.php:382
 msgid "Default locale"
 msgstr "Locale par défaut"
 
@@ -7334,7 +7262,7 @@ msgid "The &laquo;%s&raquo; plugin (#%d) has been uninstalled."
 msgstr "Le plugin &laquo;%s&raquo; (n°%d) a été désinstallé."
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:483
-#, fuzzy, php-format
+#, php-format
 msgid "The plugin with ID %d could not be instantiated."
 msgstr "Le plugin avec l'ID %d n'a pas pu être instancié."
 
@@ -7663,9 +7591,9 @@ msgstr "Le plugin requiert au minium la version %s de %s, mais vous avez la vers
 
 # D:\www\b2evo19\blogs\inc\_misc\_plugins.class.php:1095
 #: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1315
-#, fuzzy, php-format
+#, php-format
 msgid "Unknown dependency type (%s). This probably means that the plugin is not compatible and you have to upgrade your %s installation."
-msgstr "Type de dépendance inconnue. Ceci signifie probablement que le plugin n'est pas compatible et que vous devez mettre à jour votre installation de %s."
+msgstr "Type de dépendance inconnue (%s). Ceci signifie probablement que le plugin n'est pas compatible et que vous devez mettre à jour votre installation de %s."
 
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:75
 msgid "Installed plugins"
@@ -7746,7 +7674,7 @@ msgstr "Installer nouveau"
 # D:\www\b2evo20\blogs\inc\VIEW\settings\_set_plugins_available.form.php:47
 #: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:47
 msgid "Plugins available for installation"
-msgstr ""
+msgstr "Plugins disponibles à l'installation"
 
 #: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:49
 #: ..\..\..\inc\skins\views\_skin_list_available.view.php:26
@@ -7818,9 +7746,8 @@ msgid "View Stats for Blog:"
 msgstr "Stats pour le Blog:"
 
 #: ..\..\..\inc\sessions\stats.ctrl.php:60
-#, fuzzy
 msgid "Sorry, there is no blog you have permission to view stats for."
-msgstr "Désolé, vous n'avez la permission de poster pour l'instant."
+msgstr "Désolé, il n'y a aucun blog pour lequel vous ayez la permission de voir les stats."
 
 #: ..\..\..\inc\sessions\stats.ctrl.php:80
 #, php-format
@@ -7899,9 +7826,8 @@ msgid "Special referrers"
 msgstr "Référents spéciaux"
 
 #: ..\..\..\inc\sessions\views\_stats_browserhits.view.php:264
-#, fuzzy
 msgid "Referer spam"
-msgstr "Référents"
+msgstr "Spam référent"
 
 #: ..\..\..\inc\sessions\views\_stats_browserhits.view.php:266
 #: ..\..\..\inc\sessions\views\_stats_browserhits.view.php:338
@@ -8465,7 +8391,7 @@ msgstr ""
 
 #: ..\..\..\inc\settings\views\_general.form.php:42
 msgid "General Settings"
-msgstr "Paramètres généraux"
+msgstr "Réglages généraux"
 
 #: ..\..\..\inc\settings\views\_general.form.php:52
 msgid "Display options"
@@ -8537,7 +8463,7 @@ msgstr "Longueur minimale des mots de passe"
 
 #: ..\..\..\inc\settings\views\_general.form.php:87
 msgid "characters."
-msgstr ""
+msgstr "caractères."
 
 #: ..\..\..\inc\settings\views\_general.form.php:89
 msgid "Login password hashing"
@@ -8569,19 +8495,19 @@ msgstr "Durée (en secondes) devant s'écouler avant qu'une requête sur une même U
 
 #: ..\..\..\inc\skins\skins.ctrl.php:38
 msgid "Cannot edit skin!"
-msgstr "Impossible d'éditer la skin!"
+msgstr "Impossible d'éditer l'habillage!"
 
 #: ..\..\..\inc\skins\skins.ctrl.php:39
 msgid "Requested skin is not installed any longer."
-msgstr "La skin demandée n'existe plus."
+msgstr "L'habillage demandé n'existe plus."
 
 #: ..\..\..\inc\skins\skins.ctrl.php:60
 msgid "Skin has been installed."
-msgstr "La skin a été installée."
+msgstr "L'habillage a été installée."
 
 #: ..\..\..\inc\skins\skins.ctrl.php:84
 msgid "Skin properties updated."
-msgstr ""
+msgstr "Propriétés de l'habillage mises à jour."
 
 #: ..\..\..\inc\skins\skins.ctrl.php:127
 #, php-format
@@ -8597,16 +8523,6 @@ msgstr ""
 #, php-format
 msgid "Uninstall skin &laquo;%s&raquo;?"
 msgstr ""
-
-#: ..\..\..\inc\skins\_skin.funcs.php:101
-#, fuzzy, php-format
-msgid "Unhandled disp type [%s]"
-msgstr "Partie d'email de type non géré."
-
-#: ..\..\..\inc\skins\_skin.funcs.php:121
-#, fuzzy, php-format
-msgid "Sub template [%s] not found."
-msgstr "Répertoire %s introuvable."
 
 # D:\www\b2evo20\blogs\inc\MODEL\skins\_skin.class.php:58
 #: ..\..\..\inc\skins\model\_skin.class.php:58
@@ -8626,14 +8542,13 @@ msgid "Cannot read skin file &laquo;%s&raquo;!"
 msgstr ""
 
 #: ..\..\..\inc\skins\model\_skin.class.php:234
-#, fuzzy, php-format
+#, php-format
 msgid "%d containers have been found in skin template &laquo;%s&raquo;."
-msgstr "Le lien a été retiré de &laquo;%s&raquo;"
+msgstr "%d containers ont été trouvés dans le gabarit &laquo;%s&raquo;."
 
 #: ..\..\..\inc\skins\model\_skin.class.php:242
-#, fuzzy
 msgid "No containers found in this skin!"
-msgstr "Les commentaires ne sont pas autorisés dans ce blog"
+msgstr "Aucun container n'a été trouvé dans cet habillage!"
 
 #: ..\..\..\inc\skins\model\_skin.class.php:354
 msgid "Select this skin!"
@@ -8658,14 +8573,12 @@ msgid "Pick a skin:"
 msgstr "Choisissez un habillage:"
 
 #: ..\..\..\inc\skins\views\_coll_skin.view.php:28
-#, fuzzy
 msgid "Manage installed skins..."
-msgstr "Habillages installés"
+msgstr "Gérer les habillages installés..."
 
 #: ..\..\..\inc\skins\views\_coll_skin.view.php:28
-#, fuzzy
 msgid "Manage skins"
-msgstr "Habillages disponibles"
+msgstr "Gestion skins"
 
 #: ..\..\..\inc\skins\views\_coll_skin.view.php:29
 #: ..\..\..\inc\skins\views\_skin_list.view.php:79
@@ -8750,26 +8663,26 @@ msgstr ""
 msgid "Skins available for installation"
 msgstr "Skins prêtes à être installées"
 
-#: ..\..\..\inc\tools\mtimport.ctrl.php:337
+#: ..\..\..\inc\tools\mtimport.ctrl.php:336
 #: ..\..\..\inc\users\views\_user.form.php:100
 #: ..\..\..\inc\users\views\_user.form.php:105
 msgid "User group"
 msgstr "Groupe utilisateur"
 
-#: ..\..\..\inc\tools\mtimport.ctrl.php:338
+#: ..\..\..\inc\tools\mtimport.ctrl.php:337
 #: ..\..\..\inc\users\views\_user.form.php:108
 #, php-format
 msgid "See <a %s>online manual</a> for details."
 msgstr "Consultez le <a %s>manuel en ligne</a> pour les détails."
 
-#: ..\..\..\inc\tools\mtimport.ctrl.php:339
+#: ..\..\..\inc\tools\mtimport.ctrl.php:338
 #: ..\..\..\inc\users\views\_user_list.view.php:211
 #: ..\..\..\inc\users\views\_user_list.view.php:246
 #: ..\..\..\skins\_profile.php:95
 msgid "Level"
 msgstr "Niveau"
 
-#: ..\..\..\inc\tools\mtimport.ctrl.php:1289
+#: ..\..\..\inc\tools\mtimport.ctrl.php:1287
 msgid "Select as an additionnal category"
 msgstr "Sélectionner en tant que catégorie additionnelle"
 
@@ -8790,9 +8703,8 @@ msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:83
 #: ..\..\..\install\_functions_create.php:564
-#, fuzzy
 msgid "About this system"
-msgstr "Blogs présents sur ce système"
+msgstr "A propos de ce système"
 
 #: ..\..\..\inc\tools\system.ctrl.php:99
 #, php-format
@@ -8838,9 +8750,8 @@ msgid "As soon as possible, change the setting <code>$allow_evodb_reset = 0;</co
 msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:145
-#, fuzzy
 msgid "Time"
-msgstr "Heure:"
+msgstr "Heure"
 
 #: ..\..\..\inc\tools\system.ctrl.php:161
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:188
@@ -8900,9 +8811,8 @@ msgid "The XML extension is not loaded."
 msgstr "L'extension XML n'est pas chargée."
 
 #: ..\..\..\inc\tools\system.ctrl.php:340
-#, fuzzy
 msgid "MySQL"
-msgstr "Serveur MySQL"
+msgstr " MySQL"
 
 #: ..\..\..\inc\tools\system.ctrl.php:366
 msgid "Yes"
@@ -9011,9 +8921,9 @@ msgid "You cannot edit the groups of user &laquo;admin&raquo; or &laquo;demouser
 msgstr "En mode démo, vous ne pouvez pas modifier le profil de &laquo;admin&raquo; ou de &laquo;demouser&raquo;!"
 
 #: ..\..\..\inc\users\users.ctrl.php:214
-#, fuzzy, php-format
+#, php-format
 msgid "Admin skin changed to &laquo;%s&raquo;"
-msgstr "Ajouter un nouvel ensemble de &laquo;%s&raquo;"
+msgstr "L'habillage admin &laquo;%s&raquo; a été sélectionné"
 
 #: ..\..\..\inc\users\users.ctrl.php:235
 msgid "You are only allowed to update your own profile!"
@@ -9274,7 +9184,7 @@ msgstr "Inscrivez vous pour ouvrir un compte..."
 
 #: ..\..\..\inc\users\model\_user.funcs.php:243
 #: ..\..\..\skins\_toolbar.inc.php:65
-#: ..\..\..\skins\_toolbar.inc.php:80
+#: ..\..\..\skins\_toolbar.inc.php:79
 #: ..\..\..\skins_adm\_access_denied.main.php:23
 #: ..\..\..\skins_adm\_adminUI_general.class.php:1542
 #: ..\..\..\skins_adm\_adminUI_general.class.php:1544
@@ -9290,18 +9200,16 @@ msgid "Go to the back-office..."
 msgstr "Atteindre l'interface d'administration..."
 
 #: ..\..\..\inc\users\model\_user.funcs.php:362
-#, fuzzy
 msgid "Profile"
-msgstr "Profil (%s)"
+msgstr "Profil"
 
 #: ..\..\..\inc\users\model\_user.funcs.php:368
 msgid "Edit your profile"
 msgstr "Edition de votre profil"
 
 #: ..\..\..\inc\users\model\_user.funcs.php:406
-#, fuzzy
 msgid "Subscribe"
-msgstr "S'abonner (%s)"
+msgstr "S'abonner"
 
 #: ..\..\..\inc\users\model\_user.funcs.php:407
 msgid "Subscribe to email notifications"
@@ -9424,9 +9332,8 @@ msgid "Full Access"
 msgstr "Accès complet"
 
 #: ..\..\..\inc\users\views\_group.form.php:111
-#, fuzzy
 msgid "User blogs"
-msgstr "Login utilisateur"
+msgstr "Blogs utilisateur"
 
 #: ..\..\..\inc\users\views\_group.form.php:114
 #: ..\..\..\skins_adm\_adminUI_general.class.php:1226
@@ -9581,9 +9488,8 @@ msgstr "Cochez ceci pour être apparaitre comme connecté lorsque vous visitez le 
 
 #: ..\..\..\inc\users\views\_user.form.php:167
 #: ..\..\..\inc\users\views\_user.form.php:180
-#, fuzzy
 msgid "Multiple sessions"
-msgstr "Permissions fichier par défaut"
+msgstr "Sessions multiples"
 
 #: ..\..\..\inc\users\views\_user.form.php:168
 msgid "Check this if you want to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will disconnect you on the previous one."
@@ -9678,9 +9584,8 @@ msgstr "Le focus sera automatiquement placé sur le premier champ de saisie texte
 
 #: ..\..\..\inc\users\views\_user.form.php:237
 #: ..\..\..\inc\users\views\_user.form.php:249
-#, fuzzy
 msgid "Results per page"
-msgstr "Articles/Jours par page"
+msgstr "Résultats par page"
 
 #: ..\..\..\inc\users\views\_user.form.php:237
 #: ..\..\..\inc\users\views\_user.form.php:249
@@ -9766,18 +9671,16 @@ msgid "Groups & Users"
 msgstr "Groupes & Utilisateurs"
 
 #: ..\..\..\inc\users\views\_user_list.view.php:85
-#, fuzzy
 msgid "Create a new user..."
-msgstr "Créer un blog maintenant..."
+msgstr "Créer un nouvel utilisateur..."
 
 #: ..\..\..\inc\users\views\_user_list.view.php:85
 msgid "Add user"
 msgstr "Ajouter utilisateur"
 
 #: ..\..\..\inc\users\views\_user_list.view.php:86
-#, fuzzy
 msgid "Create a new group..."
-msgstr "Création d'un nouveau groupe"
+msgstr "Créer un nouveau groupe..."
 
 #: ..\..\..\inc\users\views\_user_list.view.php:86
 msgid "Add group"
@@ -9831,9 +9734,8 @@ msgid "Widget &laquo;%s&raquo; has been added to container &laquo;%s&raquo;."
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets.ctrl.php:154
-#, fuzzy
 msgid "Widget settings have been updated"
-msgstr "Les réglages du plugin ont été mis à jour."
+msgstr "Les réglages du widget ont été mis à jour"
 
 #: ..\..\..\inc\widgets\widgets.ctrl.php:226
 #, php-format
@@ -9847,19 +9749,16 @@ msgstr "Plugin inactif / désinstallé"
 
 # C:\www\b2evo18\blogs\plugins\_auto_p.plugin.php:76
 #: ..\..\..\inc\widgets\model\_widget.class.php:410
-#, fuzzy
 msgid "Info pages"
-msgstr "Ignorer les tags"
+msgstr "Pages d'info"
 
 #: ..\..\..\inc\widgets\model\_widget.class.php:414
-#, fuzzy
 msgid "Contents"
 msgstr "Contenu"
 
 #: ..\..\..\inc\widgets\model\_widget.class.php:454
-#, fuzzy
 msgid "The requested Blog doesn't exist any more!"
-msgstr "Le blog demandé n'existe pas (plus?)"
+msgstr "Le blog demandé n'existe plus!"
 
 #: ..\..\..\inc\widgets\model\_widget.class.php:493
 #: ..\..\..\inc\widgets\widgets\_linkblog.widget.php:54
@@ -9867,9 +9766,8 @@ msgid "Linkblog"
 msgstr "Linkblog"
 
 #: ..\..\..\inc\widgets\views\_widget.form.php:32
-#, fuzzy
 msgid "New widget"
-msgstr "Nouvel ensemble"
+msgstr "Nouveau widget"
 
 # D:\www\b2evo20\blogs\inc\VIEW\collections\_widget_list.view.php:39
 #: ..\..\..\inc\widgets\views\_widget.form.php:32
@@ -9878,19 +9776,16 @@ msgid "Widget"
 msgstr "Widget"
 
 #: ..\..\..\inc\widgets\views\_widget.form.php:40
-#, fuzzy
 msgid "Widget type"
-msgstr "Type d'agent"
+msgstr "Type de widget"
 
 #: ..\..\..\inc\widgets\views\_widget.form.php:47
-#, fuzzy
 msgid "Params"
-msgstr "Perms"
+msgstr "Params"
 
 #: ..\..\..\inc\widgets\views\_widget_list.view.php:42
-#, fuzzy
 msgid "Add a widget..."
-msgstr "Ajout un nouveau widget..."
+msgstr "Ajouter un widget..."
 
 #. TRANS: note this is NOT a NEW widget
 #: ..\..\..\inc\widgets\views\_widget_list.view.php:43
@@ -9927,19 +9822,16 @@ msgid "Widgets available for insertion into &laquo;%s&raquo;"
 msgstr ""
 
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:29
-#, fuzzy
 msgid "Blog header"
-msgstr "Blog n°%d"
+msgstr "Entête du blog"
 
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:33
-#, fuzzy
 msgid "Blog contents"
-msgstr "Contenu de l'article"
+msgstr "Contenu du blog"
 
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:37
-#, fuzzy
 msgid "Meta contents"
-msgstr "Contenu de l'article"
+msgstr "Meta infos"
 
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:40
 #: ..\..\..\skins_adm\_adminUI_general.class.php:1445
@@ -9948,9 +9840,8 @@ msgid "Tools"
 msgstr "Outils"
 
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:45
-#, fuzzy
 msgid "Other contents"
-msgstr "Contenu de l'article"
+msgstr "Autres contenus"
 
 # D:\www\b2evo20\blogs\inc\VIEW\collections\_available_widgets.view.php:30
 # D:\www\b2evo20\blogs\inc\VIEW\collections\_available_widgets.view.php:53
@@ -9968,51 +9859,44 @@ msgid "Same owner's blog list"
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_colls_list_owner.widget.php:63
-#, fuzzy
 msgid "Display list of all blogs owned by the same user."
-msgstr "%d blogs appartenant à cet utilisateur"
+msgstr "Affiche la liste de tous les blogs appartenant au même utilisateur."
 
 #: ..\..\..\inc\widgets\widgets\_colls_list_public.widget.php:54
-#, fuzzy
 msgid "Public blog list"
-msgstr "Afficher la liste des blogs publics"
+msgstr "Lliste des blogs publics"
 
 #: ..\..\..\inc\widgets\widgets\_colls_list_public.widget.php:63
 msgid "Display list of all blogs marked as public."
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:54
-#, fuzzy
 msgid "Category list"
-msgstr "Liens des catégories"
+msgstr "Liste des catégories"
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:63
 msgid "Display list of categories; click filters on selected category"
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:78
-#, fuzzy
 msgid "Block title"
-msgstr "Titre du Blog"
+msgstr "Titre du bloc"
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:84
-#, fuzzy
 msgid "Option \"All\""
-msgstr "Options"
+msgstr "Options \"Toutes\""
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:87
 msgid "The \"All categories\" link allows to reset the filter. Leave blank if you want no such option."
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:91
-#, fuzzy
 msgid "Use form"
-msgstr "Valeurs par défaut"
+msgstr "Utiliser formulaire"
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:93
-#, fuzzy
 msgid "Add checkboxes to allow selection of multiple categories."
-msgstr "Cochez pour autoriser la création de nouveaux dossiers."
+msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:217
 msgid "ANY"
@@ -10036,42 +9920,36 @@ msgid "Display these links: Recently, Archives, Categories, Latest Comments"
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:78
-#, fuzzy
 msgid "Show \"Recently\""
-msgstr "Récemment"
+msgstr "Afficher \"Récemment\""
 
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:79
 msgid "Go to the most recent posts / the blog's home."
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:84
-#, fuzzy
 msgid "Show \"Archives\""
-msgstr "Archives"
+msgstr "Afficher \"Archives\""
 
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:85
 msgid "Go to the monthly/weekly/daily archive list."
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:90
-#, fuzzy
 msgid "Show \"Categories\""
-msgstr "Catégories"
+msgstr "Afficher \"Catégories\""
 
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:91
-#, fuzzy
 msgid "Go to the category tree."
-msgstr "Nouvelle catégorie créée."
+msgstr "Aller à l'arborescence des catégories."
 
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:96
-#, fuzzy
 msgid "Show \"Latest comments\""
-msgstr "Derniers commentaires"
+msgstr "Afficher \"Derniers commentaires\""
 
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:97
-#, fuzzy
 msgid "Go to the latest comments."
-msgstr "Derniers commentaires"
+msgstr "Aller aux derniers commentaires."
 
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:125
 #: ..\..\..\skins\photoblog\index.main.php:48
@@ -10079,50 +9957,44 @@ msgid "Recently"
 msgstr "Récemment"
 
 #: ..\..\..\inc\widgets\widgets\_coll_logo.widget.php:54
-#, fuzzy
 msgid "Blog logo"
-msgstr "Liste des blogs"
+msgstr "Logo du blog"
 
 #: ..\..\..\inc\widgets\widgets\_coll_logo.widget.php:63
 msgid "Include a logo/image from the blog's file root."
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_logo.widget.php:77
-#, fuzzy
 msgid "Logo filename"
-msgstr "Nom du fichier"
+msgstr "Nom du fichier logo"
 
 #: ..\..\..\inc\widgets\widgets\_coll_logo.widget.php:78
 msgid "The logo file must be uploaded to the root of the Blog's media dir"
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_logo.widget.php:81
-#, fuzzy
 msgid "Invalid filename."
-msgstr "Nom de fichier invalide!"
+msgstr "Nom de fichier invalide."
 
 #: ..\..\..\inc\widgets\widgets\_coll_longdesc.widget.php:54
 msgid "Long Description of this Blog"
 msgstr "Description Longue de ce Blog"
 
 #: ..\..\..\inc\widgets\widgets\_coll_longdesc.widget.php:63
-#, fuzzy
 msgid "Display this blog's long description."
-msgstr "Abonnements au blog supprimés"
+msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_page_list.widget.php:54
 msgid "Page list"
 msgstr "Liste des pages"
 
 #: ..\..\..\inc\widgets\widgets\_coll_page_list.widget.php:63
-#, fuzzy
 msgid "Display list of all pages"
-msgstr "Afficher la légende des icônes"
+msgstr "Afficher la liste de toutes les pages"
 
 #: ..\..\..\inc\widgets\widgets\_coll_post_list.widget.php:63
-#, fuzzy
 msgid "Display list of all posts"
-msgstr "Toujours sur tous les articles"
+msgstr "Afficher la liste de tous les articles"
 
 #: ..\..\..\inc\widgets\widgets\_coll_search_form.widget.php:54
 msgid "Content Search Form"
@@ -10141,23 +10013,20 @@ msgid "Some Word"
 msgstr "N'importe quel mot"
 
 #: ..\..\..\inc\widgets\widgets\_coll_tagline.widget.php:54
-#, fuzzy
 msgid "Blog tagline"
-msgstr "Signature du Blog"
+msgstr "Signature du blog"
 
 #: ..\..\..\inc\widgets\widgets\_coll_tagline.widget.php:63
-#, fuzzy
 msgid "Display blog's tagline"
-msgstr "Afficher la liste des blogs publics"
+msgstr "Afficher la signature du blog"
 
 #: ..\..\..\inc\widgets\widgets\_coll_title.widget.php:54
 msgid "Blog title"
 msgstr "Titre du Blog"
 
 #: ..\..\..\inc\widgets\widgets\_coll_title.widget.php:63
-#, fuzzy
 msgid "Display blog title"
-msgstr "Afficher la liste des blogs publics"
+msgstr "Afficher le titre du blog"
 
 # D:\www\b2evo20\blogs\inc\MODEL\collections\_componentwidget.class.php:35
 #: ..\..\..\inc\widgets\widgets\_coll_xml_feeds.widget.php:54
@@ -10165,9 +10034,8 @@ msgid "XML Feeds (RSS / Atom)"
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_xml_feeds.widget.php:63
-#, fuzzy
 msgid "Display list of all available XML feeds."
-msgstr "Afficher les plugins disponibles."
+msgstr "Afficher la liste des flux XML disponibles."
 
 #: ..\..\..\inc\widgets\widgets\_coll_xml_feeds.widget.php:82
 msgid "XML Feeds"
@@ -10175,16 +10043,15 @@ msgstr "Flux XML"
 
 #: ..\..\..\inc\widgets\widgets\_free_html.widget.php:54
 msgid "Free HTML"
-msgstr ""
+msgstr "HTML libre"
 
 #: ..\..\..\inc\widgets\widgets\_free_html.widget.php:63
 msgid "Display a block of free HTML code."
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_free_html.widget.php:83
-#, fuzzy
 msgid "Block content"
-msgstr "Contenu de l'article"
+msgstr "Contenu du bloc"
 
 #: ..\..\..\inc\widgets\widgets\_linkblog.widget.php:63
 msgid "Display list of entries from the linkblog, grouped by category."
@@ -10299,29 +10166,24 @@ msgid "If you have obtained this error by clicking on a link INSIDE of this site
 msgstr "Si vous avez obtenu cette erreur en cliquant sur un lien A L'INTERIEUR de ce site, merci de signaler le lien erroné à l'administrateur."
 
 #: ..\..\..\inc\_core\_misc.funcs.php:1647
-#, fuzzy
 msgid "DB Username"
-msgstr "Nom d'utilisateur MySQL"
+msgstr "Nom d'utilisateur BD"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:1648
-#, fuzzy
 msgid "DB Database"
-msgstr "Base MySQL"
+msgstr "Nom de la BD"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:1649
-#, fuzzy
 msgid "DB Host"
-msgstr "1 article"
+msgstr "Serveur BD"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:1650
-#, fuzzy
 msgid "DB tables prefix"
-msgstr "Préfixe des tables MySQL"
+msgstr "Préfixe des tables BD"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:1651
-#, fuzzy
 msgid "DB connection charset"
-msgstr "connexion"
+msgstr "Jeu de caractères de la connexion BD"
 
 #: ..\..\..\inc\_core\_param.funcs.php:107
 #, php-format
@@ -10348,44 +10210,40 @@ msgid "The phone number is invalid."
 msgstr "Le numéro de téléphone est invalide."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1477
-#, fuzzy, php-format
+#, php-format
 msgid "Invalid email link: %s."
-msgstr "Soumission invalide."
+msgstr ""
 
 #: ..\..\..\inc\_core\_param.funcs.php:1478
-#, fuzzy
 msgid "Invalid email link."
-msgstr "Soumission invalide."
+msgstr ""
 
 #: ..\..\..\inc\_core\_param.funcs.php:1483
-#, fuzzy, php-format
+#, php-format
 msgid "Supplied email address (%s) is invalid."
-msgstr "L'adresse email fournie n'est pas valide."
+msgstr "L'adresse email fournie (%s) n'est pas valide."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1484
-#, fuzzy
 msgid "Invalid email address."
-msgstr "Demande de validation d'email invalide!"
+msgstr ""
 
 #: ..\..\..\inc\_core\_param.funcs.php:1497
-#, fuzzy, php-format
+#, php-format
 msgid "Invalid URL format (%s)."
-msgstr "Format d'heure invalide."
+msgstr "Format d'URL invalide (%s)."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1498
-#, fuzzy
 msgid "Invalid URL format."
-msgstr "Format d'heure invalide."
+msgstr "Format d'URL invalide."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1506
-#, fuzzy, php-format
+#, php-format
 msgid "URI scheme \"%s\" not allowed."
-msgstr "Type d'URI non autorisé"
+msgstr "Type d'URI  \"%s\" non autorisé."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1507
-#, fuzzy
 msgid "URI scheme not allowed."
-msgstr "Type d'URI non autorisé"
+msgstr "Type d'URI non autorisé."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1514
 #, php-format
@@ -10397,9 +10255,9 @@ msgid "URL not allowed"
 msgstr "URL non autorisée"
 
 #: ..\..\..\inc\_core\_param.funcs.php:1522
-#, fuzzy, php-format
+#, php-format
 msgid "URL \"%s\" must be absolute."
-msgstr "L'URL doit être absolue."
+msgstr "L'URL  \"%s\" doit être absolue."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1522
 msgid "URL must be absolute."
@@ -10407,9 +10265,9 @@ msgstr "L'URL doit être absolue."
 
 # D:\www\b2evo19\blogs\inc\_misc\_misc.funcs.php:1592
 #: ..\..\..\inc\_core\_param.funcs.php:1529
-#, fuzzy, php-format
+#, php-format
 msgid "URL \"%s\" must be a full path starting with \"/\" or an anchor starting with \"#\"."
-msgstr "L'URL doit être un chemin d'accès commençant par \"/\" ou une ancre commençant par \"#\"."
+msgstr "L'URL \"%s\" doit être un chemin d'accès commençant par \"/\" ou une ancre commençant par \"#\"."
 
 # D:\www\b2evo19\blogs\inc\_misc\_misc.funcs.php:1592
 #: ..\..\..\inc\_core\_param.funcs.php:1530
@@ -10417,24 +10275,20 @@ msgid "URL must be a full path starting with \"/\" or an anchor starting with \"
 msgstr "L'URL doit être un chemin d'accès commençant par \"/\" ou une ancre commençant par \"#\"."
 
 #: ..\..\..\inc\_core\_template.funcs.php:68
-#, fuzzy
 msgid "Archive directory"
 msgstr "Liste des Archives"
 
 #: ..\..\..\inc\_core\_template.funcs.php:69
-#, fuzzy
 msgid "Category directory"
-msgstr "Aucun répertoire."
+msgstr "Liste des Categories"
 
 #: ..\..\..\inc\_core\_template.funcs.php:88
-#, fuzzy
 msgid "Latest comments on "
-msgstr "Derniers commentaires"
+msgstr "Commentaires récents sur"
 
 #: ..\..\..\inc\_core\_template.funcs.php:100
-#, fuzzy
 msgid "Feedback on "
-msgstr "Options des réactions"
+msgstr "Réactions à"
 
 #: ..\..\..\inc\_core\_template.funcs.php:105
 #: ..\..\..\skins\_toolbar.inc.php:40
@@ -10516,16 +10370,16 @@ msgstr "Ordre ascendant"
 msgid "Descending order"
 msgstr "Ordre descendant"
 
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:803
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:809
 msgid "Today"
 msgstr "Aujourd'hui"
 
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:808
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:809
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:814
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:815
 msgid "Select date"
 msgstr "Sélectionnez une date"
 
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1308
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1314
 msgid ""
 "You have modified this form but you haven't submitted it yet.\\n"
 "You are about to lose your edits.\\n"
@@ -10535,7 +10389,7 @@ msgstr ""
 "Vous êtes sur le point de perdre vos modifications.\\n"
 "Etes-vous sûr?"
 
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1312
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1318
 #, php-format
 msgid ""
 "You have modified the form \\\"%s\\\"\\n"
@@ -10831,9 +10685,8 @@ msgid "Installer for version "
 msgstr "Installateur de la version"
 
 #: ..\..\..\install\index.php:128
-#, fuzzy
 msgid "After install"
-msgstr "Non installé"
+msgstr "Après installation"
 
 #: ..\..\..\install\index.php:131
 msgid "Current installation"
@@ -11132,7 +10985,7 @@ msgstr "Pour des raisons de sécurité, la fonction de remise à zéro est désactivé
 # D:\www\b2evo19\blogs\install\index.php:442
 #. TRANS: %s gets replaced by app name, usually "b2evolution"
 #: ..\..\..\install\index.php:563
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Are you sure you want to delete your existing %s tables?\n"
 "Do you have a backup?"
@@ -11158,7 +11011,7 @@ msgstr "Choisissez une langue/locale par défaut pour votre installation de b2evo
 
 #: ..\..\..\install\index.php:657
 msgid "Online resources"
-msgstr ""
+msgstr "Ressources en ligne"
 
 #: ..\..\..\install\index.php:657
 msgid "Official website"
@@ -11166,7 +11019,7 @@ msgstr "Site web officiel"
 
 #: ..\..\..\install\index.php:657
 msgid "Find a host"
-msgstr ""
+msgstr "Trouvez un hébergeur"
 
 #: ..\..\..\install\index.php:657
 msgid "Manual"
@@ -11261,7 +11114,6 @@ msgid "Skins, Stubs, Templates &amp; website integration..."
 msgstr "Habillages, Stubs, Gabarits &amp; et intégration web..."
 
 #: ..\..\..\install\_functions_create.php:452
-#, fuzzy
 msgid ""
 "By default, blogs are displayed using a skin. (More on skins in another post.)\n"
 "\n"
@@ -11277,13 +11129,15 @@ msgid ""
 "\n"
 "Either way, make sure you go to the blogs admin and set the correct access method for your blog. When using a stub or a template, you must also set its filename in the 'Stub name' field. Otherwise, the permalinks will not function properly."
 msgstr ""
-"Par défaut, tous les blogs pré-installés sont affichés grâce à un habillage (skin). (Plus d'infos sur les habillages dans un autre article.)\n"
+"Par défaut, les blogs sont affichés dans un habillage (skin). (Plus d'infos sur les habillages dans un autre article.)\n"
 "\n"
 "Ceci signifie que vous accédez aux blogs au travers de '<code>index.php</code>', qui charge des paramètres par défaut depuis la base de données et passe ensuite la main à un habillage (skin) pour l'affichage.\n"
 "\n"
 "Alternativement, si vous ne voulez pas utiliser les paramètres par défaut de la base et que vous voulez, par exemple, forcer l'utilisation d'un habillage, d'une catégorie ou d'un blog particulier, vous pouvez créer un fichier stub tel que le fichier '<code>a_stub.php</code>' fourni et accéder à votre blog au travers de ce fichier stub en lieu et place de index.php .\n"
 "\n"
 "Finalement, si vous avez besoin de personnalisations très particulières, vous pourriez également utiliser des gabarits spécifiques à la place des habillages. Dans ce cas, accédez à votre blog au travers d'un gabarit tel que le fichier '<code>a_noskin.php</code>' fourni.\n"
+"\n"
+"Si vous voulez intégrer b2evolution à un site web complexe, vous voudrez probablement le faire une copiant du code depuis <code>a_noskin.php</code> dans une page de votre site.\n"
 "\n"
 "Vous trouverez plus d'informations dans les fichiers stub/gabarit eux mêmes. Ouvrez les dans un editeur de texte et lisez les commentaires qu'ils contiennent.\n"
 "\n"
@@ -11308,7 +11162,6 @@ msgid "About skins..."
 msgstr "A propos des habillages (skins)..."
 
 #: ..\..\..\install\_functions_create.php:478
-#, fuzzy
 msgid ""
 "By default, b2evolution blogs are displayed using a skin.\n"
 "\n"
@@ -11320,15 +11173,15 @@ msgid ""
 "\n"
 "To start customizing a skin, open its \"<code>index.main.php</code>\" file in an editor and read the comments in there. And, of course, read the manual on skins!"
 msgstr ""
-"A l'installation, les différents blogs de b2evolution sont affichés en utilisant un habillage (skin) par défaut.\n"
+"Par défaut, les blogs b2evolution sont affichés en utilisant un habillage (skin).\n"
 "\n"
-"Les lecteurs peuvent choisir un nouvel habillage en utilisant le sélecteur integré dans la plupart des habillages.\n"
+"Vous pouvez changer l'habillage utilisé par n'importe quel blog en éditant les paramètres du blog dans l'interface d'administration.\n"
 "\n"
-"Vous pouvez changer l'habillage par défaut utilisé par n'importe quel blog en éditant les paramètres du blog dans l'interface d'administration. Vous pouvez aussi forcer l'utilisation de l'habillage par défaut pour tout le monde.\n"
+"Vous pouvez télécharger des habillages complémentaires depuis le <a href=\"http://skins.b2evolution.net/\" target=\"_blank\">site des skins</a>. Pour les installer, dézippez les dans le répertoire /blogs/skins; ensuite allez dans Réglages Généraux &gt; Habillages dans l'interface d'admin et cliquez sur \"Installer nouveau\".\n"
 "\n"
-"Sinon, vous pouvez restreindre les habillages disponibles en supprimant certains d'entre eux du répertoire /blogs/skins. Vous pouvez égalemenet créer de nouveaux habillages en dupliquant, renommant et personnalisant n'importe quel dossier d'habillage.\n"
+"Vous pouvez également créer vos propres habillages en duplicant, renommant et personnalisant n'importe quel dossier d'habillage existant dans le répertoire /blogs/skins.\n"
 "\n"
-"Pour commencer la personnalisation d'un habillage, ouvrez son fichier '<code>_main.php</code>' dans un éditeur et lisez les commentaires qui s'y trouvent. Et, bien sûr, lisez le manuel sur les habillages evoSkins!"
+"Pour commencer la personnalisation d'un habillage, ouvrez son fichier '<code>index.main.php</code>' dans un éditeur et lisez les commentaires qui s'y trouvent. Et, bien sûr, lisez le manuel sur les habillages/skins!"
 
 #: ..\..\..\install\_functions_create.php:492
 msgid "This is a multipage post"
@@ -11439,7 +11292,7 @@ msgstr ""
 
 #: ..\..\..\install\_functions_create.php:552
 msgid "About Blog B"
-msgstr ""
+msgstr "A propos du Blog B"
 
 #: ..\..\..\install\_functions_create.php:552
 msgid "Blog B"
@@ -11447,7 +11300,7 @@ msgstr "Blog B"
 
 #: ..\..\..\install\_functions_create.php:558
 msgid "About Blog A"
-msgstr ""
+msgstr "A propos du Blog A"
 
 #: ..\..\..\install\_functions_create.php:558
 msgid "Blog A"
@@ -11620,7 +11473,7 @@ msgstr "Rendu des commentaire"
 # D:\www\b2evo19\blogs\plugins\_bbcode.plugin.php:108
 #: ..\..\..\plugins\_bbcode.plugin.php:110
 msgid "If enabled the BBcode in comments will be rendered"
-msgstr ""
+msgstr "Cochez pour interpréter le BBcode dans les commentaires"
 
 # D:\www\b2evo19\blogs\plugins\_bbcode.plugin.php:114
 #: ..\..\..\plugins\_bbcode.plugin.php:116
@@ -11663,36 +11516,31 @@ msgid "Days containing posts are highlighted."
 msgstr "Les jours contenant des articles sont mis en valeur."
 
 #: ..\..\..\plugins\_calendar.plugin.php:87
-#, fuzzy
 msgid "Display caption"
-msgstr "Options d'affichage"
+msgstr "Afficher la légende"
 
 #: ..\..\..\plugins\_calendar.plugin.php:88
-#, fuzzy
 msgid "Display caption on top of calendar"
-msgstr "Afficher la légende des icônes"
+msgstr "Afficher la légende au dessus du calendrier"
 
 #: ..\..\..\plugins\_calendar.plugin.php:93
-#, fuzzy
 msgid "Link caption to archives"
-msgstr "Options de liens"
+msgstr "Lier la légende aux archives"
 
 #: ..\..\..\plugins\_calendar.plugin.php:94
 msgid "The month in the caption can be clicked to see all posts for this month"
 msgstr ""
 
 #: ..\..\..\plugins\_calendar.plugin.php:100
-#, fuzzy
 msgid "How do you want to display the days of the week in the column headers?"
-msgstr "Combien de jours de stats voulez vous conserver dans la base de données?"
+msgstr ""
 
 # D:\www\b2evo20\blogs\skins\custom\_main.php:79
 # D:\www\b2evo20\blogs\skins\natural_pink\_main.php:52
 # D:\www\b2evo20\blogs\skins\nifty_corners\_main.php:67
 #: ..\..\..\plugins\_calendar.plugin.php:102
-#, fuzzy
 msgid "No header"
-msgstr "Entête"
+msgstr "Pas d'entête"
 
 #: ..\..\..\plugins\_calendar.plugin.php:107
 #: ..\..\..\plugins\_calendar.plugin.php:114
@@ -11701,9 +11549,8 @@ msgstr ""
 
 #: ..\..\..\plugins\_calendar.plugin.php:109
 #: ..\..\..\plugins\_calendar.plugin.php:116
-#, fuzzy
 msgid "Top"
-msgstr "A"
+msgstr "Haut"
 
 #: ..\..\..\plugins\_calendar.plugin.php:109
 #: ..\..\..\plugins\_calendar.plugin.php:116
@@ -11712,9 +11559,8 @@ msgstr "Bas"
 
 #: ..\..\..\plugins\_calendar.plugin.php:109
 #: ..\..\..\plugins\_calendar.plugin.php:116
-#, fuzzy
 msgid "No navigation"
-msgstr "Notifications"
+msgstr "Pas de navigation"
 
 #: ..\..\..\plugins\_calendar.plugin.php:120
 msgid "Navigate years"
@@ -11793,9 +11639,8 @@ msgid "The URL of the ping service."
 msgstr "L'URL du service de ping."
 
 #: ..\..\..\plugins\_generic_ping.plugin.php:99
-#, fuzzy
 msgid "Extended ping?"
-msgstr "Article étendu"
+msgstr "Ping étendu?"
 
 #: ..\..\..\plugins\_generic_ping.plugin.php:102
 msgid "Use weblogUpdates.extendedPing method instead of weblogUpdates.ping?"
@@ -11880,24 +11725,20 @@ msgid "This plugin will display a toolbar with buttons to quickly insert HTML ta
 msgstr "Ce plugin affichera une barre d'outils permettant l'insertion rapide de tags HTML autour du texte sélectionné."
 
 #: ..\..\..\plugins\_quicktags.plugin.php:85
-#, fuzzy
 msgid "INSerted"
-msgstr "Démarrée"
+msgstr "INSéré"
 
 #: ..\..\..\plugins\_quicktags.plugin.php:93
-#, fuzzy
 msgid "DELeted"
 msgstr "Supprimé"
 
 #: ..\..\..\plugins\_quicktags.plugin.php:102
-#, fuzzy
 msgid "Bold [Alt-B]"
-msgstr "Suite [Alt-M]"
+msgstr "Gras [Alt-B]"
 
 #: ..\..\..\plugins\_quicktags.plugin.php:110
-#, fuzzy
 msgid "Italic [Alt-I]"
-msgstr "Texte rajouté [Alt-I]"
+msgstr "Italique [Alt-I]"
 
 #: ..\..\..\plugins\_quicktags.plugin.php:119
 msgid "STRong [Alt-S]"
@@ -11921,16 +11762,15 @@ msgstr "Bloc Citation [Alt-B]"
 
 #: ..\..\..\plugins\_quicktags.plugin.php:159
 msgid "PREformatted text [Alt-R]"
-msgstr ""
+msgstr "Text PREformatté [Alt-R]"
 
 #: ..\..\..\plugins\_quicktags.plugin.php:167
 msgid "Unordered List [Alt-U]"
 msgstr "Liste non ordonnée [Alt-U]"
 
 #: ..\..\..\plugins\_quicktags.plugin.php:175
-#, fuzzy
 msgid "Ordered List [Alt-O]"
-msgstr "Liste non ordonnée [Alt-U]"
+msgstr "Liste ordonnée [Alt-O]"
 
 #: ..\..\..\plugins\_quicktags.plugin.php:183
 msgid "List Item [Alt-L]"
@@ -12049,18 +11889,16 @@ msgstr ""
 "\t\t\t%%%codeblock%%%<br />"
 
 #: ..\..\..\plugins\_whosonline.plugin.php:62
-#, fuzzy
 msgid "This skin tag displays a list of whos is online."
-msgstr "Ce skin tag affiche la liste des archives d'articles."
+msgstr "Ce skin tag affiche la liste des personnes connectées."
 
 #: ..\..\..\plugins\_whosonline.plugin.php:63
 msgid "All logged in users and guest users who have requested a page in the last 5 minutes are listed."
 msgstr ""
 
 #: ..\..\..\plugins\_whosonline.plugin.php:77
-#, fuzzy
 msgid "Contact icons"
-msgstr "Contact"
+msgstr ""
 
 #: ..\..\..\plugins\_whosonline.plugin.php:78
 msgid "Display contact icons allowing to send private messages to logged in users."
@@ -12146,7 +11984,7 @@ msgstr "Le commentaire semble être un doublon."
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:111
 msgid "Display computer code in a post."
-msgstr ""
+msgstr "Afficher du code informatique dans un article."
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:112
 msgid "Display computer code easily.  This plugin renders character entities on the fly, so you can cut-and-paste normal code directly into your posts and it will always look like normal code, even when editing the post (i.e., no preprocessing of the code is required). Include line numbers (customizable starting number).  The best part about the line numbers - visitors can cut-and-paste the code from your post, leaving the line numbers behind! Accepts BBcode tags and does not render smilies.  Colouration of PHP code, plus PHP manual links for PHP functions. Easy to install and easy to use. No hacks. Degrades nicely, if the plugin is off.  Styling completely customizable via your skins CSS file."
@@ -12154,17 +11992,16 @@ msgstr ""
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:131
 msgid "XHTML strict"
-msgstr ""
+msgstr "XHTML strict"
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:134
 msgid "If enabled this will remove the ' target=\"_blank\" ' from the PHP documentation links"
-msgstr ""
+msgstr "Cochez pour enelever les  ' target=\"_blank\" ' des liens de documentation vers PHP.net"
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:137
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:161
-#, fuzzy
 msgid "Display code toolbar"
-msgstr "Options d'affichage"
+msgstr ""
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:140
 msgid "Check this to display the code toolbar in expert mode (indivdual users can override this)."
@@ -12176,39 +12013,39 @@ msgstr ""
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:185
 msgid "Insert codespan"
-msgstr ""
+msgstr "Insérer un codespan (code en ligne)"
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:185
 msgid "codespan"
-msgstr ""
+msgstr "codespan"
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:186
 msgid "Insert codeblock"
-msgstr ""
+msgstr "Insérer un codeblock (bloc de code)"
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:186
 msgid "codeblock"
-msgstr ""
+msgstr "codeblock"
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:187
 msgid "Insert XML codeblock"
-msgstr ""
+msgstr "Insérer un codeblock XML"
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:188
 msgid "Insert PHP codeblock"
-msgstr ""
+msgstr "Insérer un codeblock PHP"
 
 #: ..\..\..\plugins\code_highlight_plugin\highlighters\php.highlighter.php:157
 msgid "Read the PHP.net documentation for"
-msgstr ""
+msgstr "Lire la documentation de PHP.net pour"
 
 #: ..\..\..\plugins\videoplug_plugin\_videoplug.plugin.php:38
 msgid "Video plug for a few popular video sites."
-msgstr ""
+msgstr "Insert vidéo pour quelques sites connus de partage de vidéo."
 
 #: ..\..\..\plugins\videoplug_plugin\_videoplug.plugin.php:39
 msgid "This is a basic video plug pluigin. Use it by entering [video:youtube:123xyz] or [video:dailymotion:123xyz] into your post, where 123xyz is the ID of the video."
-msgstr ""
+msgstr "Cecu est un plugin d'insert de vidéos basique. Utilisez le en entrant[video:youtube:123xyz] ou [video:dailymotion:123xyz] dans le texte de votre article, en remplaçant 123xyz par l'identifiant unique de votre video."
 
 #: ..\..\..\plugins\videoplug_plugin\_videoplug.plugin.php:107
 msgid "Video"
@@ -12216,7 +12053,7 @@ msgstr "Video"
 
 #: ..\..\..\plugins\videoplug_plugin\_videoplug.plugin.php:108
 msgid "Insert Youtube video"
-msgstr ""
+msgstr "Insérer une vidéo Youtube"
 
 #: ..\..\..\plugins\videoplug_plugin\_videoplug.plugin.php:108
 msgid "YouTube"
@@ -12224,7 +12061,7 @@ msgstr "YouTube"
 
 #: ..\..\..\plugins\videoplug_plugin\_videoplug.plugin.php:109
 msgid "Insert Google video"
-msgstr ""
+msgstr "Insérer une vidéo Google"
 
 #: ..\..\..\plugins\videoplug_plugin\_videoplug.plugin.php:109
 msgid "Google video"
@@ -12232,7 +12069,7 @@ msgstr "Google video"
 
 #: ..\..\..\plugins\videoplug_plugin\_videoplug.plugin.php:110
 msgid "Insert DailyMotion video"
-msgstr ""
+msgstr "Insérer un vidéo DailyMotion"
 
 #: ..\..\..\plugins\videoplug_plugin\_videoplug.plugin.php:110
 msgid "DailyMotion"
@@ -12240,7 +12077,7 @@ msgstr "DailyMotion"
 
 #: ..\..\..\plugins\videoplug_plugin\_videoplug.plugin.php:111
 msgid "Insert LiveVideo video"
-msgstr ""
+msgstr "Insérer une vidéo LiveVideo"
 
 #: ..\..\..\plugins\videoplug_plugin\_videoplug.plugin.php:111
 msgid "LiveVideo"
@@ -12248,7 +12085,7 @@ msgstr "LiveVideo"
 
 #: ..\..\..\plugins\videoplug_plugin\_videoplug.plugin.php:112
 msgid "Insert iFilm video"
-msgstr ""
+msgstr "Insérer une vidéo iFilm"
 
 #: ..\..\..\plugins\videoplug_plugin\_videoplug.plugin.php:112
 msgid "iFilm"
@@ -12275,9 +12112,8 @@ msgid "Send a message to the owner of this blog..."
 msgstr "Envoyer un messager au propriétaire de ce blog..."
 
 #: ..\..\..\skins\_item_feedback.inc.php:109
-#, fuzzy
 msgid "Trackback address for this post"
-msgstr "Adresse de trackback pour cet article:"
+msgstr "Adresse de trackback pour cet article"
 
 #: ..\..\..\skins\_item_feedback.inc.php:149
 #: ..\..\..\skins\basic\_item_feedback.inc.php:135
@@ -12416,7 +12252,7 @@ msgstr "Yahoo I.M."
 #: ..\..\..\skins\_subscriptions.php:50
 #: ..\..\..\skins_adm\_adminUI_general.class.php:1377
 msgid "Global settings"
-msgstr "Paramètres généraux"
+msgstr "Réglages généraux"
 
 #: ..\..\..\skins\_subscriptions.php:60
 msgid "Blog subscriptions"
@@ -12427,49 +12263,46 @@ msgid "Subscriptions are not allowed for this blog."
 msgstr "Les abonnements ne sont pas autorisés dans ce blog"
 
 #: ..\..\..\skins\_toolbar.inc.php:41
-#, fuzzy
 msgid "Email subscriptions"
-msgstr "Autoriser les abonnements email"
+msgstr "Abonnements email"
 
-#: ..\..\..\skins\_toolbar.inc.php:74
-#: ..\..\..\skins\_toolbar.inc.php:95
+#: ..\..\..\skins\_toolbar.inc.php:73
+#: ..\..\..\skins\_toolbar.inc.php:94
 #: ..\..\..\skins_adm\login\_reg_disabled.main.php:40
 msgid "Home"
 msgstr "Page d'accueil"
 
-#: ..\..\..\skins\_toolbar.inc.php:97
+#: ..\..\..\skins\_toolbar.inc.php:96
 #: ..\..\..\skins_adm\_adminUI_general.class.php:1183
 msgid "Dashboard"
 msgstr "Tableau de bord"
 
-#: ..\..\..\skins\_toolbar.inc.php:97
-#: ..\..\..\skins\_toolbar.inc.php:143
-#, fuzzy
+#: ..\..\..\skins\_toolbar.inc.php:96
+#: ..\..\..\skins\_toolbar.inc.php:141
 msgid "Go to admin dashboard"
-msgstr "Aller à l'admin"
+msgstr "Aller au tableau de bord"
+
+#: ..\..\..\skins\_toolbar.inc.php:117
+msgid "Open b2evolution.net"
+msgstr "Ouvrir b2evolution.net"
 
 #: ..\..\..\skins\_toolbar.inc.php:118
-#, fuzzy
-msgid "Open b2evolution.net"
-msgstr "Ping de b2evolution.net"
-
-#: ..\..\..\skins\_toolbar.inc.php:119
 msgid "Open Support forums"
 msgstr ""
 
-#: ..\..\..\skins\_toolbar.inc.php:120
+#: ..\..\..\skins\_toolbar.inc.php:119
 msgid "Open Online manual"
 msgstr ""
 
-#: ..\..\..\skins\_toolbar.inc.php:140
+#: ..\..\..\skins\_toolbar.inc.php:138
 msgid "See"
 msgstr "Voir"
 
-#: ..\..\..\skins\_toolbar.inc.php:143
+#: ..\..\..\skins\_toolbar.inc.php:141
 msgid "Manage"
 msgstr "Gérer"
 
-#: ..\..\..\skins\_toolbar.inc.php:155
+#: ..\..\..\skins\_toolbar.inc.php:153
 msgid "Customize"
 msgstr "Personnaliser"
 
@@ -12479,9 +12312,8 @@ msgstr "Personnaliser"
 #: ..\..\..\skins\natural_pink\index.main.php:35
 #: ..\..\..\skins\nifty_corners\index.main.php:61
 #: ..\..\..\skins\photoblog\index.main.php:32
-#, fuzzy
 msgid "Page Top"
-msgstr "Pages"
+msgstr "Haut de page"
 
 #: ..\..\..\skins\basic\index.main.php:50
 msgid "Select blog:"
@@ -12647,14 +12479,12 @@ msgid "Group perms"
 msgstr "Perms groupe"
 
 #: ..\..\..\skins_adm\_adminUI_general.class.php:1387
-#, fuzzy
 msgid "Skins install"
-msgstr "La skin a été installée."
+msgstr "Install skins"
 
 #: ..\..\..\skins_adm\_adminUI_general.class.php:1390
-#, fuzzy
 msgid "Plugins install"
-msgstr "Infos plugin"
+msgstr "Install plugins"
 
 #: ..\..\..\skins_adm\_adminUI_general.class.php:1396
 msgid "Regional"
@@ -12828,6 +12658,10 @@ msgid "Activate my account!"
 msgstr "Activer mon compte!"
 
 #, fuzzy
+#~ msgid "%d trackbacks)"
+#~ msgstr "%d Trackbacks"
+
+#, fuzzy
 #~ msgid "AdSense aggregation"
 #~ msgstr "Aggrégation"
 #~ msgid "Clicks"
@@ -12836,6 +12670,10 @@ msgstr "Activer mon compte!"
 #, fuzzy
 #~ msgid "Date / time"
 #~ msgstr "Date Heure"
+
+#, fuzzy
+#~ msgid "Br"
+#~ msgstr "B"
 
 #, fuzzy
 #~ msgid "Page"
@@ -12862,12 +12700,26 @@ msgstr "Activer mon compte!"
 #~ msgstr "Date"
 
 #, fuzzy
+#~ msgid "Insert AdSense block"
+#~ msgstr "Insérer un codeblock (bloc de code)"
+
+#, fuzzy
+#~ msgid "Table of contents"
+#~ msgstr "Contenu de l'article"
+
+#, fuzzy
 #~ msgid "next"
 #~ msgstr "Suivante"
 
 #, fuzzy
 #~ msgid "Atom"
 #~ msgstr "à "
+
+#, fuzzy
+#~ msgid "AdSense stats"
+#~ msgstr "Aggrégation"
+#~ msgid "more..."
+#~ msgstr "suite..."
 #~ msgid "Selected"
 #~ msgstr "Sélectionné"
 #~ msgid "(cached)"
