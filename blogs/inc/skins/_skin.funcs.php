@@ -75,7 +75,7 @@ function skin_include( $template_name, $params = array() )
 	global $Plugins, $Skin;
 	global $current_User, $Hit, $Session, $Settings;
 	global $skin_url, $htsrv_url, $htsrv_url_sensitive;
-	global $credit_links, $skin_links, $francois_links, $skinfaktory_links;
+	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 
 	if( $template_name == '$disp$' )
 	{ // This is a special case.
@@ -303,6 +303,9 @@ function app_version()
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/11 21:07:09  fplanque
+ * minor fixes
+ *
  * Revision 1.3  2007/06/30 20:37:50  fplanque
  * fixes
  *
