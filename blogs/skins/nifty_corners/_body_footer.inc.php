@@ -26,7 +26,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				) );
 		?>
 		Original <?php display_param_link( $skin_links ) ?> by <a href="http://severinelandrieu.com/">S&eacute;verine Landrieu</a>
-		&amp; <?php display_param_link( $fplanque_links ) ?>
+		&amp; <?php display_param_link( $francois_links ) ?>
 		&bull;
 		<?php
 			// Display additional credits (see /conf/):

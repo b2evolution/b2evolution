@@ -443,6 +443,12 @@ class Form extends Widget
 				break;
 
 			case 'chicago':
+				if( ! empty($field_params['legend_params']) )
+				{
+					$legend_params = $field_params['legend_params'];
+					unset( $field_params['legend_params'] );
+				}
+
 				// Temporary dirty hack:
 				$r = '<div class="fieldset_title"><div class="fieldset_title_right"><div class="fieldset_title_bg">';
 
@@ -2795,6 +2801,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/11 08:23:44  yabs
+ * minor bug fix
+ *
  * Revision 1.4  2007/09/07 20:11:18  fplanque
  * Better category selector
  *

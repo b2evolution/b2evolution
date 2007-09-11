@@ -381,8 +381,8 @@ class AdminUI_general extends Widget
 	 */
 	function disp_html_head()
 	{
-		global $adminskin_path;
-		require $adminskin_path.'_html_header.inc.php';
+		global $adminskins_path;
+		require $adminskins_path.'_html_header.inc.php';
 	}
 
 
@@ -407,9 +407,9 @@ class AdminUI_general extends Widget
 	 */
 	function disp_global_footer()
 	{
-		global $adminskin_path;
+		global $adminskins_path;
 
-		require $adminskin_path.'_html_footer.inc.php';
+		require $adminskins_path.'_html_footer.inc.php';
 	}
 
 
@@ -1558,6 +1558,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.66  2007/09/11 08:21:29  yabs
+ * minor bug fix
+ *
  * Revision 1.65  2007/09/05 00:06:03  fplanque
  * no message
  *
