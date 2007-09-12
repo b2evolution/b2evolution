@@ -196,7 +196,7 @@ if( $action == 'extract' )
 
 	// Replace various things (see comments)
 	echo 'Automagically search&replace in messages.pot.. ';
-	$search = array('~\r~'); // TODO: may need to be '\\r' (or even more escaped ;p)
+	$search = array('~\r~'); // TODO: may need to be '\\r' (or even more escaped)
 	$replace = array('');
 
 	$data = file_get_contents( $file_pot );
@@ -204,10 +204,8 @@ if( $action == 'extract' )
 
 	// Convert forward slashes (unix) in paths to backward slashes (windows)
 	$function = ''; // used as callback
-	if( $mode == 'CORE' )
-	{ // make paths relative to the .po files
-		$function .= '$m[0] = str_replace( " ../", " ../../../", $m[0] );';
-	}
+	// make paths relative to the .po files (this was used for CORE previously only, but matches also plugins)
+	$function .= '$m[0] = str_replace( " ../", " ../../../", $m[0] );';
 	$function .= 'return str_replace( "/", "\\\\", $m[0] );';
 
 	$data = preg_replace_callback( '~^#: (.*)$~m', create_function( '$m', $function ), $data );
