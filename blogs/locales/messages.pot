@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2007-09-12 01:07+0200\n"
+"POT-Creation-Date: 2007-09-12 03:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -479,6 +479,7 @@ msgstr ""
 
 #: ..\..\..\conf\_icons.php:431
 #: ..\..\..\conf\_icons.php:436
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:324
 #: ..\..\..\inc\items\model\_item.funcs.php:578
 #: ..\..\..\inc\items\views\_item_expert.form.php:315
 #: ..\..\..\inc\items\views\_item_list_full.view.php:273
@@ -1793,6 +1794,7 @@ msgstr ""
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:27
 #: ..\..\..\inc\antispam\views\_antispam_settings.form.php:46
+#: ..\..\..\skins\_toolbar.inc.php:110
 msgid "Antispam blacklist"
 msgstr ""
 
@@ -3288,7 +3290,7 @@ msgstr ""
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:373
 #: ..\..\..\inc\files\views\_filetype_list.view.php:106
 #: ..\..\..\inc\files\views\_file_upload.view.php:298
-#: ..\..\..\skins\_toolbar.inc.php:147
+#: ..\..\..\skins\_toolbar.inc.php:145
 msgid "Upload"
 msgstr ""
 
@@ -3311,7 +3313,7 @@ msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:386
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:391
-#: ..\..\..\skins\_toolbar.inc.php:144
+#: ..\..\..\skins\_toolbar.inc.php:142
 msgid "Write"
 msgstr ""
 
@@ -4259,8 +4261,28 @@ msgstr ""
 msgid "Manage your blog"
 msgstr ""
 
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:319
+msgid "Write a new post"
+msgstr ""
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:322
+msgid "Posts (full)"
+msgstr ""
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:323
+msgid "Posts (list)"
+msgstr ""
+
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:329
 msgid "Edit categories"
+msgstr ""
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:334
+msgid "Generate static page!"
+msgstr ""
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:337
+msgid "View this blog"
 msgstr ""
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:345
@@ -4268,27 +4290,47 @@ msgid "Customize your blog"
 msgstr ""
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:351
-#: ..\..\..\skins\_toolbar.inc.php:155
+#: ..\..\..\skins\_toolbar.inc.php:153
 msgid "Blog name"
 msgstr ""
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:352
-#: ..\..\..\skins\_toolbar.inc.php:156
+#: ..\..\..\skins\_toolbar.inc.php:154
 msgid "Blog skin"
 msgstr ""
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:353
-#: ..\..\..\skins\_toolbar.inc.php:157
+#: ..\..\..\skins\_toolbar.inc.php:155
 msgid "Blog widgets"
 msgstr ""
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:354
-#: ..\..\..\skins\_toolbar.inc.php:158
+#: ..\..\..\skins\_toolbar.inc.php:156
 msgid "Blog display order"
 msgstr ""
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:423
 msgid "Administrative tasks"
+msgstr ""
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:430
+msgid "Create new user"
+msgstr ""
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:434
+msgid "Create new blog"
+msgstr ""
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:436
+msgid "Install a skin"
+msgstr ""
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:437
+msgid "Install a plugin"
+msgstr ""
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:439
+msgid "Check system &amp; security"
 msgstr ""
 
 #: ..\..\..\inc\files\files.ctrl.php:115
@@ -8379,7 +8421,7 @@ msgstr ""
 
 #: ..\..\..\inc\skins\model\_skin.class.php:62
 #, possible-php-format
-msgid "%d link containers"
+msgid "%d linked containers"
 msgstr ""
 
 #: ..\..\..\inc\skins\model\_skin.class.php:193
@@ -8544,6 +8586,7 @@ msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:83
 #: ..\..\..\install\_functions_create.php:564
+#: ..\..\..\skins\_toolbar.inc.php:106
 msgid "About this system"
 msgstr ""
 
@@ -11947,6 +11990,10 @@ msgstr ""
 msgid "Email subscriptions"
 msgstr ""
 
+#: ..\..\..\skins\_toolbar.inc.php:56
+msgid "Admin skin:"
+msgstr ""
+
 #: ..\..\..\skins\_toolbar.inc.php:73
 #: ..\..\..\skins\_toolbar.inc.php:94
 #: ..\..\..\skins_adm\login\_reg_disabled.main.php:40
@@ -11959,31 +12006,31 @@ msgid "Dashboard"
 msgstr ""
 
 #: ..\..\..\skins\_toolbar.inc.php:96
-#: ..\..\..\skins\_toolbar.inc.php:141
+#: ..\..\..\skins\_toolbar.inc.php:139
 msgid "Go to admin dashboard"
 msgstr ""
 
-#: ..\..\..\skins\_toolbar.inc.php:117
+#: ..\..\..\skins\_toolbar.inc.php:115
 msgid "Open b2evolution.net"
 msgstr ""
 
-#: ..\..\..\skins\_toolbar.inc.php:118
+#: ..\..\..\skins\_toolbar.inc.php:116
 msgid "Open Support forums"
 msgstr ""
 
-#: ..\..\..\skins\_toolbar.inc.php:119
+#: ..\..\..\skins\_toolbar.inc.php:117
 msgid "Open Online manual"
 msgstr ""
 
-#: ..\..\..\skins\_toolbar.inc.php:138
+#: ..\..\..\skins\_toolbar.inc.php:136
 msgid "See"
 msgstr ""
 
-#: ..\..\..\skins\_toolbar.inc.php:141
+#: ..\..\..\skins\_toolbar.inc.php:139
 msgid "Manage"
 msgstr ""
 
-#: ..\..\..\skins\_toolbar.inc.php:153
+#: ..\..\..\skins\_toolbar.inc.php:151
 msgid "Customize"
 msgstr ""
 

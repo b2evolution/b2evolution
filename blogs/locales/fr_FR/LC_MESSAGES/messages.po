@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2007-09-12 01:07+0200\n"
-"PO-Revision-Date: 2007-09-12 01:08+0100\n"
+"POT-Creation-Date: 2007-09-12 03:00+0200\n"
+"PO-Revision-Date: 2007-09-12 03:15+0100\n"
 "Last-Translator: Francois PLANQUE <fplanque.net>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -102,7 +102,7 @@ msgstr "Vous avez installé b2evolution avec succès."
 
 #: ..\..\..\default.php:77
 msgid "You haven't set a default blog yet. Thus, you see this default page."
-msgstr ""
+msgstr "Vous n'avez pas choisi de blog par défaut pour l'instant. En conséquence, vous voyez cette page par défaut."
 
 #: ..\..\..\default.php:80
 msgid "Set a default blog"
@@ -132,7 +132,7 @@ msgstr "Gabarits &amp; fonctions bonus"
 
 #: ..\..\..\default.php:134
 msgid "These templates demonstrate more advanced uses of b2evolution. These do not make use of skins. The only way to change their look and feel is to edit their PHP template."
-msgstr ""
+msgstr "Ces gabarits montrent des utilisations plus avancées de b2evolution. Ces gabarits n'utilisent pas d'habillage (skin). La seule manière de les personnaliser est d'éditer les fichiers PHP correspondants."
 
 # D:\www\b2evo\blogs\default.php:95
 #: ..\..\..\default.php:141
@@ -156,7 +156,7 @@ msgstr "Sitemap XML pour le Blog #1 (appelé par un fichier stub)"
 # D:\www\b2evo\blogs\default.php:95
 #: ..\..\..\default.php:145
 msgid "Blog #1 aggregated XML sitemap (called through a stub)"
-msgstr ""
+msgstr "Sitemap XML aggregé pour le blog #1 (appelé par un fichier stub)"
 
 #: ..\..\..\default.php:149
 msgid "Summary of latest posts in all blogs"
@@ -494,6 +494,7 @@ msgstr "Bloqué"
 
 #: ..\..\..\conf\_icons.php:431
 #: ..\..\..\conf\_icons.php:436
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:324
 #: ..\..\..\inc\items\model\_item.funcs.php:578
 #: ..\..\..\inc\items\views\_item_expert.form.php:315
 #: ..\..\..\inc\items\views\_item_list_full.view.php:273
@@ -1102,7 +1103,7 @@ msgstr "Désolé, l'email contenant le lien permettant de valider et d'activer vot
 #: ..\..\..\htsrv\login.php:322
 #, php-format
 msgid "We have already sent you %d email(s) with a validation link."
-msgstr ""
+msgstr "Nous vous avons déjà envoyé %d email(s) contenant un lien de validation."
 
 #: ..\..\..\htsrv\login.php:327
 msgid "You have no email address with your profile, therefore we cannot validate it. Please give your email address below."
@@ -1833,6 +1834,7 @@ msgstr "Réglages antispam"
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:27
 #: ..\..\..\inc\antispam\views\_antispam_settings.form.php:46
+#: ..\..\..\skins\_toolbar.inc.php:110
 msgid "Antispam blacklist"
 msgstr "Lliste noire antispam"
 
@@ -2281,7 +2283,7 @@ msgstr "Nouveau..."
 
 #: ..\..\..\inc\chapters\views\_chapter_list.view.php:90
 msgid "Move to a different blog..."
-msgstr ""
+msgstr "Déplacer vers un autre blog..."
 
 #: ..\..\..\inc\chapters\views\_chapter_list.view.php:92
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:79
@@ -3268,7 +3270,7 @@ msgstr "Permission de poster dans ce blog avec le statut redirigé"
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:309
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:315
 msgid "Edit posts<br />/user level"
-msgstr ""
+msgstr "Editer articles<br />/niveau utilisateur"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:318
@@ -3347,7 +3349,7 @@ msgstr "Répertoire média"
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:373
 #: ..\..\..\inc\files\views\_filetype_list.view.php:106
 #: ..\..\..\inc\files\views\_file_upload.view.php:298
-#: ..\..\..\skins\_toolbar.inc.php:147
+#: ..\..\..\skins\_toolbar.inc.php:145
 msgid "Upload"
 msgstr "Uploader"
 
@@ -3370,7 +3372,7 @@ msgstr "Permission de lister le contenu du dossier média de ce blog"
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:386
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:391
-#: ..\..\..\skins\_toolbar.inc.php:144
+#: ..\..\..\skins\_toolbar.inc.php:142
 msgid "Write"
 msgstr "Ecrire"
 
@@ -3575,7 +3577,7 @@ msgstr "Relatif à baseurl"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:151
 msgid "Subdomain of basedomain"
-msgstr ""
+msgstr "Sous domaine du domaine de base"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:156
 msgid "Absolute URL"
@@ -3600,7 +3602,7 @@ msgstr "Utiliser param"
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:180
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:182
 msgid "Archive links will look like "
-msgstr ""
+msgstr "Les liens vers les archives ressembleront à"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:182
 msgid "Use extra-path"
@@ -3622,7 +3624,7 @@ msgstr "Utiliser param: cat ID"
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:195
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:197
 msgid "Category links will look like "
-msgstr "Les liens vers les catégories ressembleront à"
+msgstr "Les liens ressembleront à "
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:195
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:214
@@ -3664,39 +3666,39 @@ msgstr "Utiliser chemin étendu: titre URL de l'article"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:210
 msgid "Links will look like 'stub/post-title'"
-msgstr ""
+msgstr "Les liens ressembleront à 'stub/titre-article'"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:211
 msgid "Use extra-path: year"
-msgstr ""
+msgstr "Utiliser chemin étendu: année"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:211
 msgid "Links will look like 'stub/2006/post-title'"
-msgstr ""
+msgstr "Les liens ressembleront à 'stub/2006/titre-article'"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:212
 msgid "Use extra-path: year & month"
-msgstr ""
+msgstr "Utiliser chemin étendu: année & mois"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:212
 msgid "Links will look like 'stub/2006/12/post-title'"
-msgstr ""
+msgstr "Les liens ressembleront à 'stub/2006/12/titre-article'"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:213
 msgid "Use extra-path: year, month & day"
-msgstr ""
+msgstr "Utiliser chemin étendu: année, mois & jour"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:213
 msgid "Links will look like 'stub/2006/12/31/post-title'"
-msgstr ""
+msgstr "Les liens ressembleront à 'stub/2006/12/31/titre-article'"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:214
 msgid "Links will look like 'stub/subcat/post-title'"
-msgstr ""
+msgstr "Les liens ressembleront à 'stub/sous-cat/titre-article'"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:215
 msgid "Links will look like 'stub/cat/subcat/post-title'"
-msgstr ""
+msgstr "Les liens ressembleront à 'stub/cat/sous-cat/titre-article'"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:216
 msgid "Single post links"
@@ -4322,56 +4324,96 @@ msgstr "Premiers pas"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:289
 msgid "Welcome to your new blog's dashboard!"
-msgstr ""
+msgstr "Bienvenue sur le tableau de bord de votre nouveau blog!"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:291
 msgid "Use the links on the right to write a first post or to customize your blog."
-msgstr ""
+msgstr "Utilisez les liens sur la droite pour rédiger votre premier article ou personnaliser votre blog."
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:293
 msgid "You can see your blog page at any time by clicking \"See\" in the b2evolution toolbar at the top of this page."
-msgstr ""
+msgstr "Vous pouvez voir la page de de votre blog à tout moment en cliquant sur \"Voir\" dans la barre d'outils b2evolution en haut de cette page."
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:295
 msgid "You can come back here at any time by clicking \"Manage\" in that same evobar."
-msgstr ""
+msgstr "Vous pouvez revenir ici à tout moment en cliquanr sur \"Gérer\" dans cette même evobar."
 
 # D:\www\b2evo20\blogs\inc\MODEL\collections\_blog.class.php:249
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:314
 msgid "Manage your blog"
 msgstr "Gérez votre blog"
 
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:319
+msgid "Write a new post"
+msgstr "Rédiger un nouvel article"
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:322
+msgid "Posts (full)"
+msgstr "Articles (complets)"
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:323
+msgid "Posts (list)"
+msgstr "Articles (liste)"
+
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:329
 msgid "Edit categories"
 msgstr "Editer les catégories"
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:334
+msgid "Generate static page!"
+msgstr "Générer une page statique!"
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:337
+msgid "View this blog"
+msgstr "Voir ce blog"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:345
 msgid "Customize your blog"
 msgstr "Personnalisez votre blog"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:351
-#: ..\..\..\skins\_toolbar.inc.php:155
+#: ..\..\..\skins\_toolbar.inc.php:153
 msgid "Blog name"
 msgstr "Nom du blog"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:352
-#: ..\..\..\skins\_toolbar.inc.php:156
+#: ..\..\..\skins\_toolbar.inc.php:154
 msgid "Blog skin"
 msgstr "Habillage du blog"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:353
-#: ..\..\..\skins\_toolbar.inc.php:157
+#: ..\..\..\skins\_toolbar.inc.php:155
 msgid "Blog widgets"
 msgstr "Widgets du blog"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:354
-#: ..\..\..\skins\_toolbar.inc.php:158
+#: ..\..\..\skins\_toolbar.inc.php:156
 msgid "Blog display order"
-msgstr "Order d'affiche du blog"
+msgstr "Ordre d'affichage du blog"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:423
 msgid "Administrative tasks"
 msgstr "Tâches administratives"
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:430
+msgid "Create new user"
+msgstr "Créer un nouvel utilisateur"
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:434
+msgid "Create new blog"
+msgstr "Créer un nouveau blog"
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:436
+msgid "Install a skin"
+msgstr "Installer un habillage"
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:437
+msgid "Install a plugin"
+msgstr "Installer un plugin"
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:439
+msgid "Check system &amp; security"
+msgstr "Vérifier système &amp; sécurité"
 
 #: ..\..\..\inc\files\files.ctrl.php:115
 #: ..\..\..\inc\files\upload.ctrl.php:99
@@ -5148,7 +5190,7 @@ msgstr "Mode dossiers"
 # D:\www\b2evo20\blogs\inc\VIEW\files\_files_browse.inc.php:176
 #: ..\..\..\inc\files\views\_file_browse.view.php:176
 msgid "View all files and subfolders on a single page"
-msgstr ""
+msgstr "Voir tous les fichiers et sous-dossiers sur une seule page"
 
 #: ..\..\..\inc\files\views\_file_browse.view.php:176
 msgid "Flat mode"
@@ -8512,34 +8554,34 @@ msgstr "Propriétés de l'habillage mises à jour."
 #: ..\..\..\inc\skins\skins.ctrl.php:127
 #, php-format
 msgid "Skin &laquo;%s&raquo; uninstalled."
-msgstr ""
+msgstr "Habillage &laquo;%s&raquo; désinstallé."
 
 #: ..\..\..\inc\skins\skins.ctrl.php:138
 #, php-format
 msgid "Cannot uninstall skin &laquo;%s&raquo;"
-msgstr ""
+msgstr "Impossible de désinstaller l'habillage &laquo;%s&raquo;"
 
 #: ..\..\..\inc\skins\skins.ctrl.php:172
 #, php-format
 msgid "Uninstall skin &laquo;%s&raquo;?"
-msgstr ""
+msgstr "Désinstaller l'habillage &laquo;%s&raquo;?"
 
 # D:\www\b2evo20\blogs\inc\MODEL\skins\_skin.class.php:58
 #: ..\..\..\inc\skins\model\_skin.class.php:58
 #, php-format
 msgid "%d blogs using this skin"
-msgstr ""
+msgstr "%d blogs utilisant cet habillage"
 
 #: ..\..\..\inc\skins\model\_skin.class.php:62
 #, php-format
-msgid "%d link containers"
-msgstr ""
+msgid "%d linked containers"
+msgstr "%d containers liés"
 
 #: ..\..\..\inc\skins\model\_skin.class.php:193
 #: ..\..\..\inc\skins\model\_skin.class.php:200
 #, php-format
 msgid "Cannot read skin file &laquo;%s&raquo;!"
-msgstr ""
+msgstr "Impossible de lire le fichier d'habillage &laquo;%s&raquo;!"
 
 #: ..\..\..\inc\skins\model\_skin.class.php:234
 #, php-format
@@ -8611,7 +8653,7 @@ msgstr "Nom de l'habillage"
 # D:\www\b2evo20\blogs\inc\VIEW\skins\_skin.form.php:51
 #: ..\..\..\inc\skins\views\_skin.form.php:51
 msgid "As seen by blog owners"
-msgstr ""
+msgstr "Tel que vu par les propriétaires de blogs"
 
 #: ..\..\..\inc\skins\views\_skin.form.php:56
 msgid "Normal"
@@ -8657,7 +8699,7 @@ msgstr "Dossier de l'habillage"
 # D:\www\b2evo20\blogs\inc\VIEW\skins\_skin_list.view.php:69
 #: ..\..\..\inc\skins\views\_skin_list.view.php:71
 msgid "Reload containers!"
-msgstr ""
+msgstr "Recharger les containers!"
 
 #: ..\..\..\inc\skins\views\_skin_list_available.view.php:27
 msgid "Skins available for installation"
@@ -8703,6 +8745,7 @@ msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:83
 #: ..\..\..\install\_functions_create.php:564
+#: ..\..\..\skins\_toolbar.inc.php:106
 msgid "About this system"
 msgstr "A propos de ce système"
 
@@ -8820,11 +8863,11 @@ msgstr "Oui"
 
 #: ..\..\..\inc\tools\system.ctrl.php:369
 msgid "UTF-8 is not supported by your MySQL server."
-msgstr ""
+msgstr "UTF-8 n'est pas supporté par votre serveur MySQL."
 
 #: ..\..\..\inc\tools\system.ctrl.php:385
 msgid "GD Library (image handling)"
-msgstr ""
+msgstr "Bibliothèque GD (gestion des images)"
 
 #: ..\..\..\inc\tools\system.ctrl.php:390
 msgid "Not installed"
@@ -8864,7 +8907,7 @@ msgstr "%d entrées de cache retirées."
 
 #: ..\..\..\inc\tools\tools.ctrl.php:103
 msgid "Contents cached in the database"
-msgstr ""
+msgstr "Contenus en cache dans la base de données"
 
 # D:\www\b2evo19\blogs\inc\CONTROL\_misc\tools.php:113
 #: ..\..\..\inc\tools\tools.ctrl.php:105
@@ -9367,7 +9410,7 @@ msgstr "Modifier %s"
 #: ..\..\..\inc\users\views\_group.form.php:130
 #, php-format
 msgid "Edit all, including %s"
-msgstr ""
+msgstr "Edit tout, y compris %s"
 
 #: ..\..\..\inc\users\views\_group.form.php:131
 msgid "This setting will further restrict any media file permissions on specific blogs."
@@ -9406,7 +9449,7 @@ msgstr "User level"
 #: ..\..\..\inc\users\views\_user.form.php:122
 #: ..\..\..\skins\_profile.php:59
 msgid "Email communications"
-msgstr ""
+msgstr "Communications email"
 
 #: ..\..\..\inc\users\views\_user.form.php:124
 msgid "Send an email"
@@ -9590,7 +9633,7 @@ msgstr "Résultats par page"
 #: ..\..\..\inc\users\views\_user.form.php:237
 #: ..\..\..\inc\users\views\_user.form.php:249
 msgid "Number of rows displayed in results tables."
-msgstr ""
+msgstr "Nombre de lignes affichées dans les tableaux de résultats."
 
 #: ..\..\..\inc\users\views\_user.form.php:307
 #: ..\..\..\skins\_profile.php:93
@@ -9656,7 +9699,7 @@ msgstr "YahooIM"
 
 #: ..\..\..\inc\users\views\_user.form.php:376
 msgid "This will reset all your user settings."
-msgstr ""
+msgstr "Ceci va réinitialiser vos réglages utilisateur."
 
 #: ..\..\..\inc\users\views\_user.form.php:376
 msgid "This cannot be undone."
@@ -9814,7 +9857,7 @@ msgstr "Supprimer ce widget!"
 # D:\www\b2evo20\blogs\inc\VIEW\collections\_widget_list.view.php:108
 #: ..\..\..\inc\widgets\views\_widget_list.view.php:156
 msgid "[NOT INCLUDED IN SELECTED SKIN!]"
-msgstr ""
+msgstr "[NON PRESENT DANS L'HABILLAGE SELECTIONNE!]"
 
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:21
 #, php-format
@@ -9856,7 +9899,7 @@ msgstr "Plugins"
 
 #: ..\..\..\inc\widgets\widgets\_colls_list_owner.widget.php:54
 msgid "Same owner's blog list"
-msgstr ""
+msgstr "Liste des blogs du même propriétaire"
 
 #: ..\..\..\inc\widgets\widgets\_colls_list_owner.widget.php:63
 msgid "Display list of all blogs owned by the same user."
@@ -9868,7 +9911,7 @@ msgstr "Lliste des blogs publics"
 
 #: ..\..\..\inc\widgets\widgets\_colls_list_public.widget.php:63
 msgid "Display list of all blogs marked as public."
-msgstr ""
+msgstr "Afficher la liste de tous les blogs marqués comme publics."
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:54
 msgid "Category list"
@@ -9876,7 +9919,7 @@ msgstr "Liste des catégories"
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:63
 msgid "Display list of categories; click filters on selected category"
-msgstr ""
+msgstr "Afficher la liste des catégories; un clic filtre sur la catégorie désignée"
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:78
 msgid "Block title"
@@ -9913,7 +9956,7 @@ msgstr "TOUTES"
 # D:\www\b2evo20\blogs\inc\MODEL\collections\_componentwidget.class.php:33
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:54
 msgid "Common Navigation Links"
-msgstr ""
+msgstr "Liens de navigation courants"
 
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:63
 msgid "Display these links: Recently, Archives, Categories, Latest Comments"
@@ -9962,7 +10005,7 @@ msgstr "Logo du blog"
 
 #: ..\..\..\inc\widgets\widgets\_coll_logo.widget.php:63
 msgid "Include a logo/image from the blog's file root."
-msgstr ""
+msgstr "Inclure un logo/image depuis la racine de fichiers du blog."
 
 #: ..\..\..\inc\widgets\widgets\_coll_logo.widget.php:77
 msgid "Logo filename"
@@ -9982,7 +10025,7 @@ msgstr "Description Longue de ce Blog"
 
 #: ..\..\..\inc\widgets\widgets\_coll_longdesc.widget.php:63
 msgid "Display this blog's long description."
-msgstr ""
+msgstr "Afficher la description longue de ce blog."
 
 #: ..\..\..\inc\widgets\widgets\_coll_page_list.widget.php:54
 msgid "Page list"
@@ -10002,7 +10045,7 @@ msgstr "Formulaire de Recherche sur le Contenu"
 
 #: ..\..\..\inc\widgets\widgets\_coll_search_form.widget.php:63
 msgid "Display search form"
-msgstr ""
+msgstr "Afficher formulaire de recherche"
 
 #: ..\..\..\inc\widgets\widgets\_coll_search_form.widget.php:88
 msgid "All Words"
@@ -10031,7 +10074,7 @@ msgstr "Afficher le titre du blog"
 # D:\www\b2evo20\blogs\inc\MODEL\collections\_componentwidget.class.php:35
 #: ..\..\..\inc\widgets\widgets\_coll_xml_feeds.widget.php:54
 msgid "XML Feeds (RSS / Atom)"
-msgstr ""
+msgstr "Flux XML (RSS / Atom )"
 
 #: ..\..\..\inc\widgets\widgets\_coll_xml_feeds.widget.php:63
 msgid "Display list of all available XML feeds."
@@ -10047,7 +10090,7 @@ msgstr "HTML libre"
 
 #: ..\..\..\inc\widgets\widgets\_free_html.widget.php:63
 msgid "Display a block of free HTML code."
-msgstr ""
+msgstr "Afficher un bloc de code HTML libre."
 
 #: ..\..\..\inc\widgets\widgets\_free_html.widget.php:83
 msgid "Block content"
@@ -10212,11 +10255,11 @@ msgstr "Le numéro de téléphone est invalide."
 #: ..\..\..\inc\_core\_param.funcs.php:1477
 #, php-format
 msgid "Invalid email link: %s."
-msgstr ""
+msgstr "Lien email invalide: %s."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1478
 msgid "Invalid email link."
-msgstr ""
+msgstr "Lien email invalide."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1483
 #, php-format
@@ -10225,7 +10268,7 @@ msgstr "L'adresse email fournie (%s) n'est pas valide."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1484
 msgid "Invalid email address."
-msgstr ""
+msgstr "Adresse email invalide."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1497
 #, php-format
@@ -10940,12 +10983,12 @@ msgstr "Création des tables de b2evolution..."
 # D:\www\b2evo20\blogs\install\index.php:506
 #: ..\..\..\install\index.php:495
 msgid "Creating minimum default data..."
-msgstr ""
+msgstr "Création des données par défait minimales..."
 
 # D:\www\b2evo20\blogs\install\index.php:512
 #: ..\..\..\install\index.php:501
 msgid "Installing sample contents..."
-msgstr ""
+msgstr "Installation des contenus d'exemple..."
 
 #: ..\..\..\install\index.php:506
 msgid "Installation successful!"
@@ -11545,7 +11588,7 @@ msgstr "Pas d'entête"
 #: ..\..\..\plugins\_calendar.plugin.php:107
 #: ..\..\..\plugins\_calendar.plugin.php:114
 msgid "Where do you want to display the navigation arrows?"
-msgstr ""
+msgstr "Où voulez-vous afficher les flèches de navigation?"
 
 #: ..\..\..\plugins\_calendar.plugin.php:109
 #: ..\..\..\plugins\_calendar.plugin.php:116
@@ -11568,7 +11611,7 @@ msgstr "Naviguer dans les années"
 
 #: ..\..\..\plugins\_calendar.plugin.php:121
 msgid "Display double arrows for yearly navigation?"
-msgstr ""
+msgstr "Afficher des doubles flèches pour la navigation par année?"
 
 #: ..\..\..\plugins\_calendar.plugin.php:494
 #: ..\..\..\plugins\_calendar.plugin.php:498
@@ -11898,11 +11941,11 @@ msgstr ""
 
 #: ..\..\..\plugins\_whosonline.plugin.php:77
 msgid "Contact icons"
-msgstr ""
+msgstr "Icônes de contact"
 
 #: ..\..\..\plugins\_whosonline.plugin.php:78
 msgid "Display contact icons allowing to send private messages to logged in users."
-msgstr ""
+msgstr "Afficher des icônes de contact permettant d'envoyer un message privé aux utilisateurs identifiés."
 
 #: ..\..\..\plugins\_whosonline.plugin.php:105
 msgid "Who's Online?"
@@ -12001,7 +12044,7 @@ msgstr "Cochez pour enelever les  ' target=\"_blank\" ' des liens de documentati
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:137
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:161
 msgid "Display code toolbar"
-msgstr ""
+msgstr "Afficher la barre d'outil de code"
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:140
 msgid "Check this to display the code toolbar in expert mode (indivdual users can override this)."
@@ -12266,6 +12309,10 @@ msgstr "Les abonnements ne sont pas autorisés dans ce blog"
 msgid "Email subscriptions"
 msgstr "Abonnements email"
 
+#: ..\..\..\skins\_toolbar.inc.php:56
+msgid "Admin skin:"
+msgstr "Habillage Adim:"
+
 #: ..\..\..\skins\_toolbar.inc.php:73
 #: ..\..\..\skins\_toolbar.inc.php:94
 #: ..\..\..\skins_adm\login\_reg_disabled.main.php:40
@@ -12278,31 +12325,31 @@ msgid "Dashboard"
 msgstr "Tableau de bord"
 
 #: ..\..\..\skins\_toolbar.inc.php:96
-#: ..\..\..\skins\_toolbar.inc.php:141
+#: ..\..\..\skins\_toolbar.inc.php:139
 msgid "Go to admin dashboard"
 msgstr "Aller au tableau de bord"
 
-#: ..\..\..\skins\_toolbar.inc.php:117
+#: ..\..\..\skins\_toolbar.inc.php:115
 msgid "Open b2evolution.net"
 msgstr "Ouvrir b2evolution.net"
 
-#: ..\..\..\skins\_toolbar.inc.php:118
+#: ..\..\..\skins\_toolbar.inc.php:116
 msgid "Open Support forums"
-msgstr ""
+msgstr "Ouvrir le forum de support"
 
-#: ..\..\..\skins\_toolbar.inc.php:119
+#: ..\..\..\skins\_toolbar.inc.php:117
 msgid "Open Online manual"
-msgstr ""
+msgstr "Ouvrir le manuel en ligne"
 
-#: ..\..\..\skins\_toolbar.inc.php:138
+#: ..\..\..\skins\_toolbar.inc.php:136
 msgid "See"
 msgstr "Voir"
 
-#: ..\..\..\skins\_toolbar.inc.php:141
+#: ..\..\..\skins\_toolbar.inc.php:139
 msgid "Manage"
 msgstr "Gérer"
 
-#: ..\..\..\skins\_toolbar.inc.php:153
+#: ..\..\..\skins\_toolbar.inc.php:151
 msgid "Customize"
 msgstr "Personnaliser"
 
@@ -12581,7 +12628,7 @@ msgstr "Veuillez entrer votre login ci-dessous."
 # D:\www\b2evo20\blogs\inc\VIEW\login\_lostpass_form.php:49
 #: ..\..\..\skins_adm\login\_lostpass_form.main.php:49
 msgid "An email will be sent to your registered email address immediately."
-msgstr ""
+msgstr "Un email va être envoyé à votre adresse email enregistrée immédiatement."
 
 #: ..\..\..\skins_adm\login\_lostpass_form.main.php:50
 msgid "As soon as you receive the email, click on the link therein to change your password."
@@ -12642,7 +12689,7 @@ msgstr "Merci de confirmer votre adresse email ci-dessous."
 # D:\www\b2evo20\blogs\inc\VIEW\login\_validate_form.php:52
 #: ..\..\..\skins_adm\login\_validate_form.main.php:52
 msgid "An email will be sent to this address immediately."
-msgstr ""
+msgstr "Un email va être envoyé à cette adresse immédiatement."
 
 #: ..\..\..\skins_adm\login\_validate_form.main.php:53
 msgid "As soon as you receive the email, click on the link therein to activate your account."
@@ -12730,8 +12777,6 @@ msgstr "Activer mon compte!"
 #~ msgstr "Derniers commentaires"
 #~ msgid "Get selection"
 #~ msgstr "Obtenir sélection"
-#~ msgid "Syndicate this blog"
-#~ msgstr "Syndiquez ce blog"
 #~ msgid "Default page for b2evolution"
 #~ msgstr "Page par défaut de b2evoltution"
 #~ msgid "Multilingual multiuser multi-blog engine."

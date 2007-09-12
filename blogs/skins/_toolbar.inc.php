@@ -53,7 +53,7 @@ global $home_url, $admin_url;
 					foreach( $admin_skins as $admin_skin )
 					{
 						echo '<li><a href="admin.php?ctrl=users&amp;action=change_admin_skin&amp;new_admin_skin='
-											.rawurlencode($admin_skin).'">Admin skin: '.$admin_skin.'</a></li>';
+											.rawurlencode($admin_skin).'">'.T_('Admin skin:').' '.$admin_skin.'</a></li>';
 					}
 					// echo '</ul>';
 					// echo '</li>';
@@ -102,14 +102,12 @@ global $home_url, $admin_url;
 				if( $perm_spam || $perm_options )
 				{
 					if( $perm_options )
-					{ ?>
-					<li><a href="<?php echo $admin_url ?>?ctrl=system">About this system</a></li>
-						<?php
+					{
+						echo '<li><a href="'.$admin_url.'?ctrl=system">'.T_('About this system').'</a></li>';
 					}
 					if( $perm_spam )
-					{ ?>
-					<li><a href="<?php echo $admin_url ?>?ctrl=antispam">Antispam blacklist</a></li>
-						<?php
+					{
+						echo '<li><a href="'.$admin_url.'?ctrl=antispam">'.T_('Antispam blacklist').'</a></li>';
 					}
 					echo '<li class="separator"><hr /></li>';
 				}

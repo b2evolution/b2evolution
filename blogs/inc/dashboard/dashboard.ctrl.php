@@ -316,12 +316,12 @@ if( $blog )
 
 	echo '<div class="dashboard_sidebar">';
 	echo '<ul>';
-		echo '<li><a href="admin.php?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'">Write a new post &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'">'.T_('Write a new post').' &raquo;</a></li>';
 
  		echo '<li>Browse:<ul>';
-		echo '<li><a href="admin.php?ctrl=items&tab=full&filter=restore&blog='.$Blog->ID.'">Posts (full) &raquo;</a></li>';
-		echo '<li><a href="admin.php?ctrl=items&tab=list&filter=restore&blog='.$Blog->ID.'">Posts (list) &raquo;</a></li>';
-		echo '<li><a href="admin.php?ctrl=comments&blog='.$Blog->ID.'">Comments &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=items&tab=full&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (full)').' &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=items&tab=list&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (list)').' &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=comments&blog='.$Blog->ID.'">'.T_('Comments').' &raquo;</a></li>';
 		echo '</ul></li>';
 
 		if( $current_User->check_perm( 'blog_cats', '', false, $Blog->ID ) )
@@ -331,10 +331,10 @@ if( $blog )
 
 		if( $current_User->check_perm( 'blog_genstatic', 'any', false, $Blog->ID ) )
 		{
-			echo '<li><a href="admin.php?ctrl=collections&amp;action=GenStatic&amp;blog='.$Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">Generate static page!</a></li>';
+			echo '<li><a href="admin.php?ctrl=collections&amp;action=GenStatic&amp;blog='.$Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">'.T_('Generate static page!').'</a></li>';
 		}
 
- 		echo '<li><a href="'.$Blog->get('url').'">View this blog</a></li>';
+ 		echo '<li><a href="'.$Blog->get('url').'">'.T_('View this blog').'</a></li>';
 	echo '</ul>';
 	echo '</div>';
 
@@ -427,16 +427,16 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	echo '<ul>';
 		if( $current_User->check_perm( 'users', 'edit' ) )
 		{
-			echo '<li><a href="admin.php?ctrl=users&amp;action=new_user">Create new user &raquo;</a></li>';
+			echo '<li><a href="admin.php?ctrl=users&amp;action=new_user">'.T_('Create new user').' &raquo;</a></li>';
 		}
 		if( $current_User->check_perm( 'blogs', 'create' ) )
 		{
-			echo '<li><a href="admin.php?ctrl=collections&amp;action=new">Create new blog &raquo;</a></li>';
+			echo '<li><a href="admin.php?ctrl=collections&amp;action=new">'.T_('Create new blog').' &raquo;</a></li>';
 		}
-		echo '<li><a href="admin.php?ctrl=skins">Install a skin &raquo;</a></li>';
-		echo '<li><a href="admin.php?ctrl=plugins">Install a plugin &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=skins">'.T_('Install a skin').' &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=plugins">'.T_('Install a plugin').' &raquo;</a></li>';
 		// TODO: remember system date check and only remind every 3 months
-		echo '<li><a href="admin.php?ctrl=system">Check system &amp; security &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=system">'.T_('Check system &amp; security').' &raquo;</a></li>';
 	echo '</ul>';
 	echo '</div>';
 
@@ -457,6 +457,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2007/09/12 01:18:32  fplanque
+ * translation updates
+ *
  * Revision 1.11  2007/09/10 14:53:35  fplanque
  * doc
  *

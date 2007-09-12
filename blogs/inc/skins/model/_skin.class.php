@@ -59,7 +59,7 @@ class Skin extends DataObject
 			);
 
 		$this->delete_cascades = array(
-				array( 'table'=>'T_skins__container', 'fk'=>'sco_skin_ID', 'msg'=>T_('%d link containers') ),
+				array( 'table'=>'T_skins__container', 'fk'=>'sco_skin_ID', 'msg'=>T_('%d linked containers') ),
 			);
 
 		if( is_null($db_row) )
@@ -408,6 +408,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/12 01:18:32  fplanque
+ * translation updates
+ *
  * Revision 1.3  2007/07/09 19:49:29  fplanque
  * Look for containers in all skin templates.
  *
