@@ -399,10 +399,12 @@ function get_icon_info($name)
 			'alt'  => T_('Help'),
 			'size' => array( 16, 16 ),
 		);
-		case 'webhelp': return array(
-			'file' => $rsc_subdir.'icons/icon_help.gif',
+		case 'manual': return array(
+			'file' => $rsc_subdir.'icons/manual.gif',
+			'rollover' => true,
 			'alt'  => T_('Help'),
-			'size' => array( 15, 15 ),
+			'legend' => T_('Online Manual'),
+			'size' => array( 16, 15 ),
 		);
 		case 'permalink': return array(
 			'file' => $rsc_subdir.'icons/minipost.gif',
@@ -512,6 +514,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.61  2007/09/12 21:00:30  fplanque
+ * UI improvements
+ *
  * Revision 1.60  2007/09/08 23:20:14  fplanque
  * gettext update
  *

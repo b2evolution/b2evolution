@@ -66,7 +66,7 @@ $SQL->ORDER_BY( '*, ctsk_ID' );
 
 $Results = & new Results( $SQL->get(), 'crontab_', '-A' );
 
-$Results->title = T_('Scheduled jobs') . get_web_help_link('scheduler');
+$Results->title = T_('Scheduled jobs').get_manual_link('scheduler');
 
 
 $Results->global_icon( T_('Refresh'), 'refresh', regenerate_url(), T_('Refresh'), 3, 4 );
@@ -168,6 +168,9 @@ echo '<p>[<a href="'.$cron_url.'cron_exec.php" onclick="return pop_up_window( \'
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/12 21:00:31  fplanque
+ * UI improvements
+ *
  * Revision 1.2  2007/09/08 20:23:03  fplanque
  * action icons / wording
  *

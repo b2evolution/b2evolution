@@ -36,7 +36,7 @@ $Form->begin_form( 'fform', T_('New scheduled job') );
 	$Form->hiddens_by_key( get_memorized( 'action' ) );
 	$Form->hidden( 'action', 'create' );
 
-	$Form->begin_fieldset( T_('Job details') . get_web_help_link('scheduler_job_form') );
+	$Form->begin_fieldset( T_('Job details').get_manual_link('scheduler_job_form') );
 
 		$Form->select_input_array( 'cjob_type', NULL, $cron_job_names, T_('Job type') );
 
@@ -58,6 +58,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/12 21:00:31  fplanque
+ * UI improvements
+ *
  * Revision 1.1  2007/06/25 10:59:48  fplanque
  * MODULES (refactored MVC)
  *

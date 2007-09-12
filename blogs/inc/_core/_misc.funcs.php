@@ -2578,19 +2578,17 @@ function format_french_phone( $phone )
  *        The topic should be in a format like [\w]+(/[\w]+)*, e.g features/online_help.
  * @return string
  */
-function get_web_help_link( $topic )
+function get_manual_link( $topic )
 {
 	global $Settings, $current_locale, $app_shortname, $app_version;
 
 	if( $Settings->get('webhelp_enabled') )
 	{
-		$webhelp_link = ' <a target="_blank" href="http://manual.b2evolution.net/redirect/'.str_replace(" ","_",strtolower($topic))
-							.'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version.'">' . get_icon('webhelp') . '</a>';
+		$manual_url = 'http://manual.b2evolution.net/redirect/'.str_replace(" ","_",strtolower($topic)).'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version;
 
-//		$webhelp_link = ' <a target="_blank" href="http://manual.b2evolution.net/redirect/'.$topic
-//			.'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version.'">[?]</a>';
+		$webhelp_link = action_icon( T_('Open relevant page in online manual'), 'manual', $manual_url, T_('Manual'), 5, 1, array( 'target' => '_blank' ) );
 
-		return $webhelp_link;
+		return ' '.$webhelp_link;
 	}
 	else
 	{
@@ -2974,6 +2972,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/12 21:00:30  fplanque
+ * UI improvements
+ *
  * Revision 1.3  2007/09/08 18:38:08  fplanque
  * MFB
  *

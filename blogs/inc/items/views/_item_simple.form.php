@@ -105,7 +105,7 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 	<?php
 	// ############################ POST CONTENTS #############################
 
-	$Form->begin_fieldset( T_('Post contents') );
+	$Form->begin_fieldset( T_('Post contents').get_manual_link('post_contents_fieldset') );
 
 	echo '<div class="edit_fieldgroup">';
 	$Form->switch_layout( 'linespan' );
@@ -259,6 +259,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/12 21:00:31  fplanque
+ * UI improvements
+ *
  * Revision 1.3  2007/09/04 22:16:33  fplanque
  * in context editing of posts
  *

@@ -53,7 +53,7 @@ $Form->begin_fieldset( T_('Display options') );
 
 $BlogCache = & get_Cache( 'BlogCache' );
 $Form->select_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default blog to display'),
-											T_('This blog will be displayed on index.php .'), true );
+										T_('This blog will be displayed on index.php.').' <a href="admin.php?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>', true );
 
 $Form->end_fieldset();
 
@@ -115,6 +115,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/12 21:00:32  fplanque
+ * UI improvements
+ *
  * Revision 1.1  2007/06/25 11:01:27  fplanque
  * MODULES (refactored MVC)
  *

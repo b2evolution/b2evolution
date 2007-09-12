@@ -113,7 +113,7 @@ if( $edit_Plugin->Settings ) // NOTE: this triggers PHP5 autoloading through Plu
 $Form->begin_fieldset( T_('Plugin variables').' ('.T_('Advanced').')', array( 'class' => 'clear' ) );
 $Form->text_input( 'edited_plugin_code', $edited_plugin_code, 15, T_('Code'), T_('The code to call the plugin by code. This is also used to link renderer plugins to items.'), array('maxlength'=>32) );
 $Form->text_input( 'edited_plugin_priority', $edited_plugin_priority, 4, T_('Priority'), '', array( 'maxlength' => 4 ) );
-$render_note = get_web_help_link('Plugin/apply_rendering');
+$render_note = get_manual_link('Plugin/apply_rendering');
 if( empty( $edited_plugin_code ) )
 {
 	$render_note .= ' '.T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
@@ -187,6 +187,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/12 21:00:32  fplanque
+ * UI improvements
+ *
  * Revision 1.1  2007/06/25 11:00:55  fplanque
  * MODULES (refactored MVC)
  *

@@ -91,7 +91,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	<?php
 	// ############################ POST CONTENTS #############################
 
-	$Form->begin_fieldset( T_('Post contents') );
+	$Form->begin_fieldset( T_('Post contents').get_manual_link('post_contents_fieldset') );
 
 	$Form->switch_layout( 'linespan' );
 
@@ -367,6 +367,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.6  2007/09/12 21:00:31  fplanque
+ * UI improvements
+ *
  * Revision 1.5  2007/09/04 22:16:33  fplanque
  * in context editing of posts
  *

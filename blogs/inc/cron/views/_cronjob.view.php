@@ -33,7 +33,7 @@ $Form->global_icon( T_('Close sheet'), 'close', regenerate_url( 'action,cjob_ID'
 
 $Form->begin_form( 'fform', T_('Scheduled job') );
 
-	$Form->begin_fieldset( T_('Job details') . get_web_help_link('scheduler_job_info') );
+	$Form->begin_fieldset( T_('Job details').get_manual_link('scheduler_job_info') );
 
 		$Form->info( T_('Job #'), $cjob_row->ctsk_ID );
 		$Form->info( T_('Job name'), $cjob_row->ctsk_name );
@@ -56,7 +56,7 @@ $Form->begin_form( 'fform', T_('Scheduled job') );
 
 	$Form->end_fieldset();
 
-	$Form->begin_fieldset( T_('Execution details') . get_web_help_link('scheduler_execution_info') );
+	$Form->begin_fieldset( T_('Execution details').get_manual_link('scheduler_execution_info') );
 
 		if( empty( $cjob_row->clog_status ) )
 		{
@@ -77,6 +77,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/12 21:00:31  fplanque
+ * UI improvements
+ *
  * Revision 1.1  2007/06/25 10:59:49  fplanque
  * MODULES (refactored MVC)
  *

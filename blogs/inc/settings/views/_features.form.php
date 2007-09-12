@@ -59,12 +59,12 @@ $Form->hidden( 'ctrl', 'features' );
 $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'features' );
 
-$Form->begin_fieldset( T_('Online Help') . get_web_help_link('online help'));
+$Form->begin_fieldset( T_('Online Help').get_manual_link('online help'));
 	$Form->checkbox_input( 'webhelp_enabled', $Settings->get('webhelp_enabled'), T_('Online Help links'), array( 'note' => T_('Online help links provide context sensitive help to certain features.' ) ) );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('After each new post...') . get_web_help_link('After each post settings'));
+$Form->begin_fieldset( T_('After each new post...').get_manual_link('after_each_post_settings') );
 	$Form->radio_input( 'outbound_notifications_mode', $Settings->get('outbound_notifications_mode'), array(
 			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('No notification about your new content will be sent out.'), 'suffix' => '<br />' ),
 			array( 'value'=>'immediate', 'label'=>T_('Immediate'), 'note'=>T_('This is guaranteed to work but may create an annoying delay after each post.'), 'suffix' => '<br />' ),
@@ -72,7 +72,7 @@ $Form->begin_fieldset( T_('After each new post...') . get_web_help_link('After e
 								T_('Outbound pings & email notifications') );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') );
+$Form->begin_fieldset( T_('Blog by email').get_manual_link('blog_by_email') );
 
 	$Form->checkbox_input( 'eblog_enabled', $Settings->get('eblog_enabled'), T_('Enable Blog by email'),
 		array( 'note' => T_('Check to enable the Blog by email feature.' ), 'onclick' =>
@@ -133,7 +133,7 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Hit & session logging') . get_web_help_link('Hit logging') );
+$Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit_logging') );
 
 	$Form->checklist( array(
 			array( 'log_public_hits', 1, T_('on every public page'), $Settings->get('log_public_hits') ),
@@ -171,7 +171,7 @@ $Form->begin_fieldset( T_('Hit & session logging') . get_web_help_link('Hit logg
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Categories') . get_web_help_link('categories'), array( 'id'=>'categories') );
+$Form->begin_fieldset( T_('Categories').get_manual_link('categories_global_settings'), array( 'id'=>'categories') );
 	$Form->checkbox_input( 'allow_moving_chapters', $Settings->get('allow_moving_chapters'), T_('Allow moving categories'), array( 'note' => T_('Check to allow moving categories accross blogs. (Caution: can break pre-existing permalinks!)' ) ) );
 $Form->end_fieldset();
 
@@ -188,6 +188,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/12 21:00:32  fplanque
+ * UI improvements
+ *
  * Revision 1.1  2007/06/25 11:01:23  fplanque
  * MODULES (refactored MVC)
  *

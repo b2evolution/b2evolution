@@ -1600,7 +1600,17 @@ class Form extends Widget
 			$field_options = $field_object->$field_object_callback( $field_value, $allow_none );
 		}
 
-		return $this->select_input_options( $field_name, $field_options, $field_label, '', $field_params );
+		if( isset($field_params['note']) )
+		{
+			$field_note = $field_params['note'];
+			unset( $field_params['note'] );
+		}
+		else
+		{
+			$field_note = '';
+		}
+
+		return $this->select_input_options( $field_name, $field_options, $field_label, $field_note, $field_params );
 	}
 
 
@@ -2801,6 +2811,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.6  2007/09/12 21:00:30  fplanque
+ * UI improvements
+ *
  * Revision 1.5  2007/09/11 08:23:44  yabs
  * minor bug fix
  *
