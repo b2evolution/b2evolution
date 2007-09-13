@@ -848,7 +848,7 @@ msgstr "Bitte gib Deinen Namen an."
 
 #: ..\..\..\htsrv\comment_post.php:123 ..\..\..\htsrv\message_send.php:131
 msgid "Please fill in your email."
-msgstr "Bitte gib Deine E-Mail Feld an."
+msgstr "Bitte gib Deine E-Mail an."
 
 #: ..\..\..\htsrv\comment_post.php:129
 msgid "Supplied name is invalid."
@@ -856,7 +856,7 @@ msgstr "Der angegebene Name ist ungültig."
 
 #: ..\..\..\htsrv\comment_post.php:135 ..\..\..\htsrv\message_send.php:135
 msgid "Supplied email address is invalid."
-msgstr "Die angegebene E-Mail Adresse ist ungültig."
+msgstr "Die angegebene E-Mail-Adresse ist ungültig."
 
 #: ..\..\..\htsrv\comment_post.php:145 ..\..\..\htsrv\trackback.php:118
 #: ..\..\..\inc\comments\_comments.ctrl.php:112
@@ -899,7 +899,7 @@ msgstr "Dein Kommentar wurde übermittelt. Er wird erscheinen, sobald er freigege
 
 #: ..\..\..\htsrv\login.php:79 ..\..\..\htsrv\login.php:133
 msgid "If you correctly typed in your login, a link to change your password has been sent to your registered email address."
-msgstr "Wenn Du dein Login richtig angegeben hast, wurde ein Link, mit dem Du Dein Passwort ändern kannst, an Deine hier registrierte E-Mail Adresse verschickt."
+msgstr "Wenn Du dein Login richtig angegeben hast, wurde ein Link, mit dem Du Dein Passwort ändern kannst, an Deine hier registrierte E-Mail-Adresse verschickt."
 
 #: ..\..\..\htsrv\login.php:89
 msgid "You cannot reset this account in demo mode."
@@ -907,7 +907,7 @@ msgstr "Du kannst diesen Benutzer im Demo-Modus nicht ändern."
 
 #: ..\..\..\htsrv\login.php:101
 msgid "You have no email address with your profile, therefore we cannot reset your password."
-msgstr "Du hast keine E-Mail Adresse für Dein Profil, deshalb können wir das Passwort nicht zurücksetzen."
+msgstr "Du hast keine E-Mail-Adresse für Dein Profil, deshalb können wir das Passwort nicht zurücksetzen."
 
 #: ..\..\..\htsrv\login.php:102
 msgid "Please try contacting the admin."
@@ -1004,7 +1004,7 @@ msgstr "Es wurden bereits %d Email(s) mit einem Validierungslink versendet."
 
 #: ..\..\..\htsrv\login.php:327
 msgid "You have no email address with your profile, therefore we cannot validate it. Please give your email address below."
-msgstr "Du hast keine E-Mail Adresse für Dein Profil, deshalb können wir sie nicht validieren. Bitte gib Deine E-Mail-Adresse unten an."
+msgstr "Du hast keine E-Mail-Adresse für Dein Profil, deshalb können wir sie nicht validieren. Bitte gib Deine E-Mail-Adresse unten an."
 
 #: ..\..\..\htsrv\login.php:340
 #, php-format
@@ -1312,7 +1312,7 @@ msgstr "Illegalen Wert für Parameter &laquo;%s&raquo; empfangen!"
 #: ..\..\..\inc\_core\_param.funcs.php:462
 #: ..\..\..\inc\users\model\_user.funcs.php:494
 msgid "The email address is invalid."
-msgstr "Die E-Mail Adresse ist ungültig."
+msgstr "Die E-Mail-Adresse ist ungültig."
 
 #: ..\..\..\inc\_core\_param.funcs.php:478
 #, php-format
@@ -1356,11 +1356,11 @@ msgstr "Ungültiger E-Mail Link."
 #: ..\..\..\inc\_core\_param.funcs.php:1483
 #, php-format
 msgid "Supplied email address (%s) is invalid."
-msgstr "Die angegebene E-Mail Adresse (%s) ist ungültig."
+msgstr "Die angegebene E-Mail-Adresse (%s) ist ungültig."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1484
 msgid "Invalid email address."
-msgstr "Ungültige E-Mail Adresse."
+msgstr "Ungültige E-Mail-Adresse."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1497
 #, php-format
@@ -9633,7 +9633,7 @@ msgstr "Deine ICQ UIN muss eine Nummer sein, Buchstaben sind nicht erlaubt."
 #: ..\..\..\inc\users\model\_user.funcs.php:490
 #: ..\..\..\inc\users\users.ctrl.php:285
 msgid "Please enter an e-mail address."
-msgstr "Bitte gib eine E-Mail Adresse an."
+msgstr "Bitte gib eine E-Mail-Adresse an."
 
 #: ..\..\..\inc\users\model\_user.funcs.php:532
 msgid "The password must be different from your login."
@@ -12171,7 +12171,7 @@ msgstr "VORSCHAU Kommentar von:"
 #: ..\..\..\skins\_item_feedback.inc.php:282
 #: ..\..\..\skins\basic\_item_feedback.inc.php:206
 msgid "Your email address will <strong>not</strong> be displayed on this site."
-msgstr "Deine E-Mail Adresse wird <strong>nicht</strong> angezeigt."
+msgstr "Deine E-Mail-Adresse wird <strong>nicht</strong> angezeigt."
 
 #: ..\..\..\skins\_item_feedback.inc.php:283
 #: ..\..\..\skins\basic\_item_feedback.inc.php:211
@@ -12203,7 +12203,7 @@ msgstr "Erlaube Nachrichten-Formular"
 
 #: ..\..\..\skins\_item_feedback.inc.php:315
 msgid "Allow users to contact you through a message form (your email will NOT be displayed.)"
-msgstr "Erlaube Benutzern, Dich über ein Nachrichten-Formular zu kontaktieren (Deine E-Mail Adresse wird NICHT angezeigt)."
+msgstr "Erlaube Benutzern, Dich über ein Nachrichten-Formular zu kontaktieren (Deine E-Mail-Adresse wird NICHT angezeigt)."
 
 # TRANS: Used as mail subject; %s gets replaced by an item's title
 #: ..\..\..\skins\_msgform.php:132
@@ -12229,7 +12229,7 @@ msgstr "Dein Name."
 
 #: ..\..\..\skins\_msgform.php:172
 msgid "Your email address. (Will <strong>not</strong> be displayed on this site.)"
-msgstr "Deine E-Mail Adresse. (Wird <strong>nicht</strong> auf dieser Seite angezeigt.)"
+msgstr "Deine E-Mail-Adresse. (Wird <strong>nicht</strong> auf dieser Seite angezeigt.)"
 
 #: ..\..\..\skins\_msgform.php:173
 msgid "Subject of email message."
@@ -12640,9 +12640,8 @@ msgstr "Es wurde eine E-Mail an Deine E-Mail-Adresse gesendet. Bitte klicke auf 
 # TRANS: Text for submit button to request an activation link by email
 #: ..\..\..\skins_adm\login\_lostpass_form.main.php:56
 #: ..\..\..\skins_adm\login\_validate_form.main.php:61
-#, fuzzy
 msgid "Send me an email now!"
-msgstr "Schicke eine E-Mail"
+msgstr "Schicke mir eine E-Mail!"
 
 #: ..\..\..\skins_adm\login\_reg_complete.main.php:33
 msgid "Registration complete"
