@@ -80,7 +80,19 @@ if( isset($MainList) ) while( $Item = & $MainList->get_item() )
 
 		<p class="postmetadata">Posted in <?php $Item->categories(); ?>
 		| <?php $Item->edit_link( '', ' | '); ?>
-		<?php $Item->feedback_link( 'feedbacks', '' ) ?></p>
+			<?php
+				// Link to comments, trackbacks, etc.:
+				$Item->feedback_link( array(
+								'type' => 'feedbacks',
+								'link_before' => '',
+								'link_after' => '',
+								'link_text_zero' => '#',
+								'link_text_one' => '#',
+								'link_text_more' => '#',
+								'link_title' => '#',
+								'use_popup' => false,
+							) );
+			?>
 	</div>
 
 	<?php

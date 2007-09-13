@@ -124,7 +124,19 @@ skin_content_header();	// Sets charset!
 			?>
 
 			<small>
-				<?php $Item->feedback_link( 'feedbacks', '', ' &bull; ' ) // Link to comments, trackback... ?>
+				<?php
+					// Link to comments, trackbacks, etc.:
+					$Item->feedback_link( array(
+									'type' => 'feedbacks',
+									'link_before' => '',
+									'link_after' => ' &bull; ',
+									'link_text_zero' => '#',
+									'link_text_one' => '#',
+									'link_text_more' => '#',
+									'link_title' => '#',
+									'use_popup' => false,
+								) );
+				?>
 				<?php $Item->edit_link( '', ' &bull; ' ) // Link to backoffice for editing ?>
 				<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 				<?php $Item->permanent_link(); ?>

@@ -1406,52 +1406,54 @@ class Item extends ItemLight
 	/**
 	 * Template function: Displays link to feedback page (under some conditions)
 	 *
-	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
-	 * @param string String to display before the link (if comments are to be displayed)
-	 * @param string String to display after the link (if comments are to be displayed)
-	 * @param string Link text to display when there are 0 comments
-	 * @param string Link text to display when there is 1 comment
-	 * @param string Link text to display when there are >1 comments (include %d for # of comments)
-	 * @param string Link title
-	 * @param string Status of feedbacks to count
-	 * @param boolean true to use a popup windows
-	 * @param string url or '#' for default
-	 * @param string url to use
+	 * @param array
 	 */
-	function feedback_link( $type = 'feedbacks', $before = '', $after = '',
-													$zero = '#', $one = '#', $more = '#', $title='#', $status = 'published',
-													$use_popup = false,	$url = '#', $blogurl = '' )
+	function feedback_link( $params )
 	{
 		if( ! $this->can_see_comments() )
 		{	// Comments disabled
 			return;
 		}
 
+		$params = array_merge( array(
+									'type' => 'feedbacks',
+									'status' => 'published',
+									'link_before' => '',
+									'link_after' => '',
+									'link_text_zero' => '#',
+									'link_text_one' => '#',
+									'link_text_more' => '#',
+									'link_title' => '#',
+									'use_popup' => false,
+									'url' => '#',
+								), $params );
+
+
 		// dh> TODO:	Add plugin hook, where a Pingback plugin could hook and provide "pingbacks"
-		switch( $type )
+		switch( $params['type'] )
 		{
 			case 'feedbacks':
-				if( $title == '#' ) $title = T_('Display feedback / Leave a comment');
-				if( $zero == '#' ) $zero = T_('Send feedback').' &raquo;';
-				if( $one == '#' ) $one = T_('1 feedback').' &raquo;';
-				if( $more == '#' ) $more = T_('%d feedbacks').' &raquo;';
+				if( $params['link_title'] == '#' ) $params['link_title'] = T_('Display feedback / Leave a comment');
+				if( $params['link_text_zero'] == '#' ) $params['link_text_zero'] = T_('Send feedback').' &raquo;';
+				if( $params['link_text_one'] == '#' ) $params['link_text_one'] = T_('1 feedback').' &raquo;';
+				if( $params['link_text_more'] == '#' ) $params['link_text_more'] = T_('%d feedbacks').' &raquo;';
 				break;
 
 			case 'comments':
-				if( $title == '#' ) $title = T_('Display comments / Leave a comment');
-				if( $zero == '#' )
+				if( $params['link_title'] == '#' ) $params['link_title'] = T_('Display comments / Leave a comment');
+				if( $params['link_text_zero'] == '#' )
 				{
 					if( $this->can_comment( NULL ) ) // NULL, because we do not want to display errors here!
 					{
-						$zero = T_('Leave a comment').' &raquo;';
+						$params['link_text_zero'] = T_('Leave a comment').' &raquo;';
 					}
 					else
 					{
-						$zero = '';
+						$params['link_text_zero'] = '';
 					}
 				}
-				if( $one == '#' ) $one = T_('1 comment').' &raquo;';
-				if( $more == '#' ) $more = T_('%d comments').' &raquo;';
+				if( $params['link_text_one'] == '#' ) $params['link_text_one'] = T_('1 comment').' &raquo;';
+				if( $params['link_text_more'] == '#' ) $params['link_text_more'] = T_('%d comments').' &raquo;';
 				break;
 
 			case 'trackbacks':
@@ -1460,10 +1462,10 @@ class Item extends ItemLight
 				{ // Trackbacks not allowed on this blog:
 					return;
 				}
-				if( $title == '#' ) $title = T_('Display trackbacks / Get trackback address for this post');
-				if( $zero == '#' ) $zero = T_('Send a trackback').' &raquo;';
-				if( $one == '#' ) $one = T_('1 trackback').' &raquo;';
-				if( $more == '#' ) $more = T_('%d trackbacks').' &raquo;';
+				if( $params['link_title'] == '#' ) $params['link_title'] = T_('Display trackbacks / Get trackback address for this post');
+				if( $params['link_text_zero'] == '#' ) $params['link_text_zero'] = T_('Send a trackback').' &raquo;';
+				if( $params['link_text_one'] == '#' ) $params['link_text_one'] = T_('1 trackback').' &raquo;';
+				if( $params['link_text_more'] == '#' ) $params['link_text_more'] = T_('%d trackbacks').' &raquo;';
 				break;
 
 			case 'pingbacks':
@@ -1474,39 +1476,39 @@ class Item extends ItemLight
 					// We'll consider pingbacks to follow the same restriction
 					return;
 				}
-				if( $title == '#' ) $title = T_('Display pingbacks');
-				if( $zero == '#' ) $zero = T_('No pingback yet').' &raquo;';
-				if( $one == '#' ) $one = T_('1 pingback').' &raquo;';
-				if( $more == '#' ) $more = T_('%d pingbacks').' &raquo;';
+				if( $params['link_title'] == '#' ) $params['link_title'] = T_('Display pingbacks');
+				if( $params['link_text_zero'] == '#' ) $params['link_text_zero'] = T_('No pingback yet').' &raquo;';
+				if( $params['link_text_one'] == '#' ) $params['link_text_one'] = T_('1 pingback').' &raquo;';
+				if( $params['link_text_more'] == '#' ) $params['link_text_more'] = T_('%d pingbacks').' &raquo;';
 				break;
 
 			default:
-				debug_die( "Unknown feedback type [$type]" );
+				debug_die( "Unknown feedback type [{$params['type']}]" );
 		}
 
-		$link_text = $this->get_feedback_title( $type, $zero, $one, $more, $status );
+		$link_text = $this->get_feedback_title( $params['type'], $params['link_text_zero'], $params['link_text_one'], $params['link_text_more'], $params['status'] );
 
 		if( empty($link_text) )
 		{	// No link, no display...
 			return false;
 		}
 
-		if( $url == '#' )
+		if( $params['url'] == '#' )
 		{ // We want a link to single post:
-			$url = $this->get_single_url( 'auto' );
+			$params['url'] = $this->get_single_url( 'auto' );
 		}
 
 
-		echo $before;
+		echo $params['link_before'];
 
-		if( !empty( $url ) )
+		if( !empty( $params['url'] ) )
 		{
-			echo '<a href="'.$url;
-			echo '#'.$type.'" ';	// Position on feedback
-			echo 'title="'.$title.'"';
-			if( $use_popup )
+			echo '<a href="'.$params['url'];
+			echo '#'.$params['type'].'" ';	// Position on feedback
+			echo 'title="'.$params['link_title'].'"';
+			if( $params['use_popup'] )
 			{	// Special URL if we can open a popup (i-e if JS is enabled):
-				$popup_url = url_add_param( $url, 'disp=feedback-popup' );
+				$popup_url = url_add_param( $params['url'], 'disp=feedback-popup' );
 				echo ' onclick="return pop_up_window( \''.$popup_url.'\', \'evo_comments\' )"';
 			}
 			echo '>';
@@ -1518,12 +1520,12 @@ class Item extends ItemLight
 			echo $link_text;
 		}
 
-		echo $after;
+		echo $params['link_after'];
 	}
 
 
 	/**
-	 * Template function: Displays link to feedback page (under some conditions)
+	 * Get text depending on number of comments
 	 *
 	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
 	 * @param string Link text to display when there are 0 comments
@@ -1594,12 +1596,26 @@ class Item extends ItemLight
 	 * @param boolean true to hide if no feedback
 	 */
 	function feedback_moderation( $type = 'feedbacks', $before = '', $after = '',
-													$zero = '', $one = '#', $more = '#', $edit_comments_link = '#' )
+													$zero = '', $one = '#', $more = '#', $edit_comments_link = '#', $params = array() )
 	{
 		/**
 		 * @var User
 		 */
 		global $current_User;
+
+    $params = array_merge( array(
+									'type' => 'feedbacks',
+									'block_before' => '',
+									'blo_after' => '',
+									'link_text_zero' => '#',
+									'link_text_one' => '#',
+									'link_text_more' => '#',
+									'link_title' => '#',
+									'use_popup' => false,
+									'url' => '#',
+    							'type' => 'feedbacks',
+									'' => '',
+								), $params );
 
 		if( isset($current_User) && $current_User->check_perm( 'blog_comments', 'any', false,	$this->blog_ID ) )
 		{	// We jave permission to edit comments:
@@ -1619,8 +1635,12 @@ class Item extends ItemLight
 		$one = str_replace( '%s', $edit_comments_link, $one );
 		$more = str_replace( '%s', $edit_comments_link, $more );
 
-		$this->feedback_link( $type, $before, $after, $zero, $one, $more, '', 'draft', '#', '' );
+		$r = $this->get_feedback_title( $type, $zero, $one, $more, 'draft' );
 
+		if( !empty( $r ) )
+		{
+			echo $before.$r.$after;
+		}
 
 	}
 
@@ -3112,6 +3132,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.11  2007/09/13 19:16:14  fplanque
+ * feedback_link() cleanup
+ *
  * Revision 1.10  2007/09/13 02:37:22  fplanque
  * special cases
  *

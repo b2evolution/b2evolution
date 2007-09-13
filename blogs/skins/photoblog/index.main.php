@@ -141,9 +141,19 @@ skin_include( '_html_header.inc.php' );
 
 			<div class="bSmallHead">
 
-				<?php $Item->feedback_link( 'feedbacks', '<div class="action_right">', '</div>',
-								get_icon( 'nocomment' ), get_icon( 'comments' ), get_icon( 'comments' ),
-								'#', 'published', true ) // Link to comments ?>
+				<?php
+					// Link to comments, trackbacks, etc.:
+					$Item->feedback_link( array(
+									'type' => 'feedbacks',
+									'link_before' => '<div class="action_right">',
+									'link_after' => '</div>',
+									'link_text_zero' => get_icon( 'nocomment' ),
+									'link_text_one' => get_icon( 'comments' ),
+									'link_text_more' => get_icon( 'comments' ),
+									'link_title' => '#',
+									'use_popup' => true,
+								) );
+				 ?>
 
 				<div class="action_right"><?php $Item->permanent_link( T_('Permalink'), '#' ); ?></div>
 
