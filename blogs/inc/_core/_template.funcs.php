@@ -85,7 +85,7 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			// We are requesting the latest comments:
 			global $Item;
 			if (isset( $Item )){
-			$r[] = T_('Latest comments on ').$Item->get('title');
+			$r[] = sprintf( /* TRANS: %s is an item title */ T_('Latest comments on %s'), $Item->get('title') );
 			}
 			else
 			{
@@ -97,7 +97,7 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			// We are requesting the comments on a specific post:
 			// Should be in first position
 			$Item = & $MainList->get_by_idx( 0 );
-			$r[] = T_('Feedback on ').$Item->get('title');
+			$r[] = sprintf( /* TRANS: %s is an item title */ T_('Feedback on %s'), $Item->get('title') );
 			break;
 
 		case 'profile':
@@ -337,6 +337,9 @@ function include_headlines()
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/13 23:39:50  blueyed
+ * trans: use printf
+ *
  * Revision 1.4  2007/08/05 17:23:33  waltercruz
  * Feed of the comments on a specific post. Just add the &id=? or &title=? to the URL
  *
