@@ -177,6 +177,8 @@ class SafeHtmlChecker
 	 */
 	function tag_open($parser, $tag, $attrs)
 	{
+		global $debug;
+	
 		// echo "processing tag: $tag <br />\n";
 		$this->last_checked_pos = xml_get_current_byte_index($this->parser);
 
@@ -219,7 +221,7 @@ class SafeHtmlChecker
 			{ // Must this attribute be checked for URIs
 				$matches = array();
 				$value = trim($value);
-				if( $error = validate_url( $value, $this->allowed_uri_scheme ) )
+				if( $error = validate_url( $value, $this->allowed_uri_scheme, false, $debug ) )
 				{
 					$this->html_error( T_('Found invalid URL: ').$error );
 				}
@@ -280,6 +282,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/13 02:37:22  fplanque
+ * special cases
+ *
  * Revision 1.1  2007/06/25 11:02:27  fplanque
  * MODULES (refactored MVC)
  *

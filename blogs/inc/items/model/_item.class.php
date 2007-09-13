@@ -869,9 +869,10 @@ class Item extends ItemLight
 				'after'       => '',
 				'disppage'    => '#',
 				'format'      => 'htmlbody',
+				'force_more'  => false,
 			), $params );
 
-		$r = $this->get_content_extension( $params['disppage'], $params['format'] );
+		$r = $this->get_content_extension( $params['disppage'], $params['force_more'], $params['format'] );
 
 		if( !empty($r) )
 		{
@@ -886,14 +887,15 @@ class Item extends ItemLight
 	 * Template function: get content extension of item (part after "<!-- more -->")
 	 *
 	 * @param mixed page number to display specific page, # for url parameter
+	 * @param boolean
 	 * @param string filename to use to display more
 	 * @return string
 	 */
-	function get_content_extension( $disppage = '#', $format = 'htmlbody' )
+	function get_content_extension( $disppage = '#', $force_more = false, $format = 'htmlbody' )
 	{
 		global $Plugins, $more, $preview;
 
-		if( ! $more )
+		if( ! $more && ! $force_more )
 		{	// NOT in more mode:
 			return NULL;
 		}
@@ -3110,6 +3112,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.10  2007/09/13 02:37:22  fplanque
+ * special cases
+ *
  * Revision 1.9  2007/09/11 23:10:39  fplanque
  * translation updates
  *

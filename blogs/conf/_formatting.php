@@ -74,6 +74,8 @@ $use_strict =  false;
 # Set this to true to allow id && style as core attributes for posts
 $posts_allow_css_tweaks = false;
 
+$posts_allow_javascript = false;
+
 # set this to true to allow id && style as core attributes for comments
 # WARNING : This would allow spammers to post hidden content in comments
 #           enable it at your own risk !
@@ -169,7 +171,8 @@ else
 }
 
 // Allowed Attribute classes
-define('A_coreattrs', 'class title'.( $posts_allow_css_tweaks ? ' id style' : '' ) );
+define('A_coreattrs', 'class title'.( $posts_allow_css_tweaks ? ' id style' : '' )
+					.( $posts_allow_javascript ? ' onmouseover onmouseout onclick' : '' )  );
 define('A_i18n', 'lang xml:lang dir');
 define('A_attrs', A_coreattrs.' '.A_i18n);
 
@@ -421,7 +424,10 @@ $allowed_uri_scheme = array
 	'aim',
 	'icq'
 );
-
+if( $posts_allow_javascript )
+{
+	$allowed_uri_scheme[] = 'javascript';
+}
 
 // DEFINITION of allowed XHTML code for COMMENTS (posted from the public blog pages)
 
