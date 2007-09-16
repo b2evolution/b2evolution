@@ -91,6 +91,7 @@ class videoplug_plugin extends Plugin
 	/**
 	 * Display a toolbar in admin
 	 * dh>> Do the service names, e.g. "YouTube" have to be marked for i18n?
+	 * fp> nope
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -140,6 +141,9 @@ class videoplug_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.9  2007/09/16 22:16:46  fplanque
+ * minor
+ *
  * Revision 1.8  2007/09/16 03:04:21  blueyed
  * fixed doc. added question about using i18n for service names
  *
