@@ -58,6 +58,20 @@ function addEvent( elm, evType, fn, useCapture )
 
 
 /**
+ * Browser status changed. 
+ * Warning: This is disabled in modern browsers.
+ */
+function setstatus( message )
+{
+	window.status = message;
+	return true;
+}
+function resetstatus()
+{
+	window.status = 'Done';
+}
+
+/**
  * Opens a window, centers it and makes sure it gets focus.
  */
 function pop_up_window( href, target, width, height, params )
@@ -462,6 +476,9 @@ var b2evo_Callbacks = new b2evo_Callbacks();
 
 /*
  * $Log$
+ * Revision 1.30  2007/09/16 22:06:37  fplanque
+ * minor
+ *
  * Revision 1.29  2007/06/30 21:05:17  fplanque
  * fixed for FF; I hope.
  *
