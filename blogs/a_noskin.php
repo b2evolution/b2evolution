@@ -209,8 +209,32 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			?>
 
 			<div class="bSmallPrint">
-				<?php $Item->feedback_link( 'comments', '', ' &bull; ' ) // Link to comments ?>
-				<?php $Item->feedback_link( 'trackbacks', '', ' &bull; ' ) // Link to trackbacks ?>
+				<?php
+					// Link to comments, trackbacks, etc.:
+					$Item->feedback_link( array(
+									'type' => 'comments',
+									'link_before' => '',
+									'link_after' => ' &bull; ',
+									'link_text_zero' => '#',
+									'link_text_one' => '#',
+									'link_text_more' => '#',
+									'link_title' => '#',
+									'use_popup' => true,
+								) );
+				 ?>
+				<?php
+					// Link to comments, trackbacks, etc.:
+					$Item->feedback_link( array(
+									'type' => 'trackbacks',
+									'link_before' => '',
+									'link_after' => ' &bull; ',
+									'link_text_zero' => '#',
+									'link_text_one' => '#',
+									'link_text_more' => '#',
+									'link_title' => '#',
+									'use_popup' => true,
+								) );
+				 ?>
 
 				<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 
