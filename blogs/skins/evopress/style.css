@@ -451,83 +451,6 @@ ol li, #sidebar ul ol li {
 
 
 
-/* Begin Form Elements */
-#searchform {
-	margin: 10px auto;
-	padding: 5px 3px; 
-	text-align: center;
-	}
-
-#sidebar #searchform #s {
-	width: 108px;
-	padding: 2px;
-	}
-
-#sidebar #searchsubmit {
-	padding: 1px;
-	}
-
-select {
-	width: 130px;
-	}
-
-#commentform input {
-	width: 170px;
-	padding: 2px;
-	margin: 5px 5px 1px 0;
-	}
-
-#commentform textarea {
-	width: 100%;
-	padding: 2px;
-	}
-
-#commentform #submit {
-	margin: 0;
-	float: right;
-	}
-/* End Form Elements */
-
-
-
-/* Begin Comments*/
-.alt {
-	margin: 0;
-	padding: 10px;
-	}
-
-.commentlist {
-	padding: 0;
-	text-align: justify;
-	}
-
-.commentlist li {
-	margin: 15px 0 3px;
-	padding: 5px 10px 3px;
-	list-style: none;
-	}
-
-.commentlist p {
-	margin: 10px 5px 10px 0;
-	}
-
-#commentform p {
-	margin: 5px 0;
-	}
-
-.nocomments {
-	text-align: center;
-	margin: 0;
-	padding: 0;
-	}
-
-.commentmetadata {
-	margin: 0;
-	display: block;
-	}
-/* End Comments */
-
-
 
 /* Begin Sidebar */
 #sidebar
@@ -540,44 +463,32 @@ select {
 #sidebar form {
 	margin: 0;
 	}
+	
+
+#sidebar .note,
+#sidebar .notes {
+	margin-top: 1ex;
+	font-size: 100%;
+}
+
+table.bCalendarTable {
+	font-size: 100%;
+	width: 155px;
+}
+table.bCalendarTable caption {
+	font-size: 130%;
+}
+table.bCalendarTable th {
+	font-size: 100%;
+}
+
+input.SearchField {
+	width: 182px;
+	padding: 2px;
+	}
 /* End Sidebar */
 
 
-
-/* Begin Calendar */
-#wp-calendar {
-	empty-cells: show;
-	margin: 10px auto 0;
-	width: 155px;
-	}
-
-#wp-calendar #next a {
-	padding-right: 10px;
-	text-align: right;
-	}
-
-#wp-calendar #prev a {
-	padding-left: 10px;
-	text-align: left;
-	}
-
-#wp-calendar a {
-	display: block;
-	}
-
-#wp-calendar caption {
-	text-align: center;
-	width: 100%;
-	}
-
-#wp-calendar td {
-	padding: 3px 0;
-	text-align: center;
-	}
-
-#wp-calendar td.pad:hover { /* Doesn't work in IE */
-	background-color: #fff; }
-/* End Calendar */
 
 
 
@@ -638,23 +549,6 @@ form.bComment /* New comment form */
 div.moderation_msg
 {
 	margin: 1ex 0;
-}
-
-#sidebar .note,
-#sidebar .notes {
-	margin-top: 1ex;
-	font-size: 100%;
-}
-
-table.bCalendarTable {
-	font-size: 100%;
-	width: 155px;
-}
-table.bCalendarTable caption {
-	font-size: 130%;
-}
-table.bCalendarTable th {
-	font-size: 100%;
 }
 
 
