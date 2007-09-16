@@ -11022,13 +11022,12 @@ msgid "Upgrade from a previous version"
 msgstr ""
 
 #: ..\..\..\install\index.php:83
-#, fuzzy
 msgid "New Install"
-msgstr "Installieren"
+msgstr "Neue Installation"
 
 #: ..\..\..\install\index.php:87
 msgid "Upgrade from Cafelog/b2"
-msgstr ""
+msgstr "Upgrade von Cafelog/b2"
 
 #: ..\..\..\install\index.php:91 ..\..\..\install\index.php:418
 msgid "Delete b2evolution tables"
@@ -11047,9 +11046,8 @@ msgid "Installer for version "
 msgstr "Installer für Version"
 
 #: ..\..\..\install\index.php:128
-#, fuzzy
 msgid "After install"
-msgstr "Nicht installiert"
+msgstr "Nach der Installation"
 
 #: ..\..\..\install\index.php:131
 msgid "Current installation"
@@ -11229,22 +11227,20 @@ msgid "The installation can be done in different ways. Choose one:"
 msgstr "Die Installation kann auf verschiedene Weise erfolgen. Wähle eine:"
 
 #: ..\..\..\install\index.php:404
-#, fuzzy
 msgid "<strong>New Install</strong>: Install b2evolution database tables."
-msgstr "<strong>Neue Installation</strong>: Installiere b2evolution Datenbank-Tabellen mit Beispieldaten."
+msgstr "<strong>Neue Installation</strong>: Installiere b2evolution Datenbank-Tabellen."
 
 #: ..\..\..\install\index.php:407
 msgid "Also install sample blogs &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users."
-msgstr ""
+msgstr "Installiere auch Beispielblogs &amp; Beispielinhalte. Die Beispieleinträge erklären verschiedene Features von b2evolution. Dies wird neuen Benutzern sehr empfohlen."
 
 #: ..\..\..\install\index.php:411
 msgid "<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version. <strong>WARNING:</strong> If you have modified your database, this operation may fail. Make sure you have a backup."
 msgstr "<strong>Upgrade von einer früheren b2evolution Version</strong>: Upgrade deine Datenbank-Tabellen, um sie mit der jetzigen Version kompatibel zu machen! <strong>WARNUNG:</strong> Wenn Du Deine Datenbank verändert hast, kann diese Operation fehlschlagen. Stelle sicher, dass Du ein Backup hast."
 
 #: ..\..\..\install\index.php:419
-#, fuzzy
 msgid "If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Any non-b2evolution tables will remain untouched though."
-msgstr "Falls du schon b2evolution-Tabellen installiert hast und neu anfangen möchtest, musst du die b2evolution-Tabellen löschen bevor du neu installieren kannst. <strong>WARNUNG: All deine b2evolution-Datenbank-Tabellen und Daten werden verloren sein!!!</strong> Deine Cafelog/b2- oder andere Datenbank-Tabellen, falls vorhanden, werden in keinster Weise berührt."
+msgstr "Falls Du schon b2evolution-Tabellen installiert hast und neu anfangen möchtest, musst Du die b2evolution-Tabellen vor einer neuen Installation löschen. <strong>WARNUNG: All deine b2evolution-Datenbank-Tabellen und Daten werden verloren sein!!!</strong> Andere Datenbank-Tabellen, falls vorhanden, werden in keinster Weise berührt."
 
 #: ..\..\..\install\index.php:422
 msgid "<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location..."
@@ -11258,7 +11254,7 @@ msgstr "LOS!"
 #: ..\..\..\install\index.php:430
 #, php-format
 msgid "Are you sure you want to delete your existing %s tables?\\nDo you have a backup?"
-msgstr ""
+msgstr "Bist Du sicher, dass Du die %s Tabellen löschen möchtest?\\nHast Du ein Backup?"
 
 #: ..\..\..\install\index.php:439
 msgid "Need to start anew?"
@@ -11312,18 +11308,16 @@ msgid "Note that password carefully! It is a <em>random</em> password that is gi
 msgstr "Achte auf das Passwort! Es ist ein <em>zufälliges</em> Passwort, das dir bei der Installation generiert wird. Natürlich kannst du es in deinem Benutzerprofil ändern, aber falls du es verlierst, wirst du die Datenbank-Tabellen löschen und neu installieren müssen."
 
 #: ..\..\..\install\index.php:525
-#, fuzzy
 msgid "Upgrading data in existing b2evolution database..."
-msgstr "Upgrade Daten in vorhandener b2evolution-Datenbank"
+msgstr "Upgrade Daten in vorhandener b2evolution-Datenbank..."
 
 #: ..\..\..\install\index.php:530
 msgid "Upgrade completed successfully!"
 msgstr "Upgrade erfolgreich beendet!"
 
 #: ..\..\..\install\index.php:545
-#, fuzzy
 msgid "Deleting b2evolution tables from the datatase..."
-msgstr "Lösche b2evolution-Tabellen aus der Datenbank"
+msgstr "Lösche b2evolution-Tabellen aus der Datenbank..."
 
 #: ..\..\..\install\index.php:550
 msgid "For security reasons, the reset feature is disabled by default."
@@ -11339,7 +11333,7 @@ msgstr ""
 
 #: ..\..\..\install\index.php:611
 msgid "Reset done!"
-msgstr "Zurücksetzung erfolgt!"
+msgstr "Zurücksetzung beendet!"
 
 #: ..\..\..\install\index.php:612
 msgid "Back to menu"
@@ -11354,23 +11348,20 @@ msgid "Choose a default language/locale for your b2evo installation."
 msgstr "Wähle eine Standard-Sprache/Locale für deine b2evo Installation."
 
 #: ..\..\..\install\index.php:657
-#, fuzzy
 msgid "Find a host"
-msgstr "Verstecke vergangene"
+msgstr "Finde einen Host"
 
 #: ..\..\..\install\index.php:657
-#, fuzzy
 msgid "Forums"
-msgstr "Firma"
+msgstr "Forum"
 
 #: ..\..\..\install\index.php:657
 msgid "Manual"
 msgstr "Anleitung"
 
 #: ..\..\..\install\index.php:657
-#, fuzzy
 msgid "Official website"
-msgstr "offizielle Website"
+msgstr "Offizielle Website"
 
 #: ..\..\..\install\index.php:657
 msgid "Online resources"
@@ -11792,13 +11783,12 @@ msgid "Unordered List [Alt-U]"
 msgstr "Ungeordnete Liste [Alt-U]"
 
 #: ..\..\..\plugins\_quicktags.plugin.php:175
-#, fuzzy
 msgid "Ordered List [Alt-O]"
-msgstr "Ungeordnete Liste [Alt-U]"
+msgstr "Geordnete Liste [Alt-O]"
 
 #: ..\..\..\plugins\_quicktags.plugin.php:183
 msgid "List Item [Alt-L]"
-msgstr "Listenelement [Alt-E]"
+msgstr "Listenelement [Alt-L]"
 
 #: ..\..\..\plugins\_quicktags.plugin.php:191
 msgid "IMaGe [Alt-G]"
