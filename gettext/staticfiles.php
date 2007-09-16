@@ -41,6 +41,8 @@ $Debuglog = new Log();
 $pofilepath = dirname(__FILE__).'/langfiles';
 
 // ------------------- CONFIG ------------------------
+// TODO: use other markers and do not use it for replacement tags like
+//       {{{trans_current}}}, which only gets replaced by the current locale
 define( 'TRANSTAG_OPEN', '{{{' );
 define( 'TRANSTAG_CLOSE', '}}}' );
 define( 'CHDIR_TO_BLOGS', '..' );
@@ -395,9 +397,16 @@ switch( $action )
 				// remove DW tags
 				$text = preg_replace( '/<!-- Instance(Begin|End|Param).*? -->/', '', $text );
 
-				$fh = fopen( $newfilename, 'w' );
-				fwrite( $fh, $text );
-				fclose( $fh );
+				$fh = @fopen( $newfilename, 'w' );
+				if( ! $fh )
+				{
+					log_( sprintf('<p class="error">Could not open %s for writing!</p>', $newfilename) );
+				}
+				else
+				{
+					fwrite( $fh, $text );
+					fclose( $fh );
+				}
 			}
 			log_('');
 		}
