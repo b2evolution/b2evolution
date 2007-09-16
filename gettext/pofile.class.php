@@ -30,7 +30,7 @@ class POFile
 
 	function POFile($filename)
 	{
-		$this->filename = $filename;
+		$this->filename = str_replace( '\\', '/', $filename );
 	}
 
 	/**
@@ -224,31 +224,38 @@ class POFile
  */
 class POTFile extends POFile
 {
+	/**
+	 * @return boolean
+	 */
 	function write()
 	{
 		global $targets, $locales;
 
 		log_('Writing POTFile '.$this->filename.'..');
-		$fh = fopen( $this->filename, 'w' );
-		fwrite($fh, '# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Francois PLANQUE
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
-msgid ""
-msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
-"Content-Transfer-Encoding: 8bit\n"
-
-');
+		$fh = @fopen( $this->filename, 'w' );
+		if( ! $fh )
+		{
+			log_( sprintf('<p class="error">Could not open %s for writing.</p>', $this->filename) );
+			return false;
+		}
+		fwrite($fh, '# SOME DESCRIPTIVE TITLE.'."\n"
+			.'# Copyright (C) YEAR Francois PLANQUE'."\n"
+			.'# This file is distributed under the same license as the PACKAGE package.'."\n"
+			.'# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.'."\n"
+			.'#'."\n"
+			.'#, fuzzy'."\n"
+			.'msgid ""'."\n"
+			.'msgstr ""'."\n"
+			.'"Project-Id-Version: PACKAGE VERSION\n"'."\n"
+			.'"Report-Msgid-Bugs-To: http://fplanque.net/\n"'."\n"
+			.'"POT-Creation-Date: 2004-04-26 03:00+0200\n"'."\n"
+			.'"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"'."\n"
+			.'"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"'."\n"
+			.'"Language-Team: LANGUAGE <LL@li.org>\n"'."\n"
+			.'"MIME-Version: 1.0\n"'."\n"
+			.'"Content-Type: text/plain; charset=CHARSET\n"'."\n"
+			.'"Content-Transfer-Encoding: 8bit\n"'."\n"
+		);
 
 		$count = 0;
 
@@ -270,6 +277,7 @@ msgstr ""
 		fclose( $fh );
 
 		log_($count.' msgids written.');
+		return true;
 	}
 
 }
