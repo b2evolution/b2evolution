@@ -2,8 +2,6 @@
 /**
  * This file implements the Video Plug plugin for b2evolution
  *
- * GreyMatter style formatting
- *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -92,6 +90,7 @@ class videoplug_plugin extends Plugin
 
 	/**
 	 * Display a toolbar in admin
+	 * dh>> Do the service names, e.g. "YouTube" have to be marked for i18n?
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -141,6 +140,9 @@ class videoplug_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.8  2007/09/16 03:04:21  blueyed
+ * fixed doc. added question about using i18n for service names
+ *
  * Revision 1.7  2007/09/11 20:57:51  fplanque
  * minor fixes
  *
