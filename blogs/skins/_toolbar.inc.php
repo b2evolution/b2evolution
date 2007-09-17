@@ -27,9 +27,18 @@ global $current_User;
 
 global $home_url, $admin_url;
 
+/**
+ * @var Hit
+ */
+global $Hit;
 ?>
 
-<div id="evo_toolbar">
+<div id="evo_toolbar"<?php
+	if( $Hit->is_safari )
+	{	// Safari has color display issues...
+		echo ' class="evo_toolbar_safari"';
+	}
+?>>
 
 <div class="actions_right">
 	<ul>

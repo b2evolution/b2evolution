@@ -113,11 +113,14 @@ ol.expanded li
  */
 div#evo_toolbar {
 	background-color: ThreeDFace;
-	font: menu;
 	color: ButtonText;
 	border-top: 1px solid ThreeDHighlight;
 	border-bottom: 1px solid ThreeDShadow;
 	text-align: left;
+	/* font: menu; /* -- poorly supported */
+	font-size: 11px;
+	font-family: "Microsoft sans serif", sans-serif, Arial, Helvetica;
+	
 }
 div#evo_toolbar a {
 	border: 1px solid ThreeDFace;
@@ -183,6 +186,9 @@ div#evo_toolbar li ul li a {
 div#evo_toolbar li ul li a:hover {
 	background-color: Highlight;
 	color: HighlightText;
+}
+div#evo_toolbar.evo_toolbar_safari li ul li a:hover {
+	background-color: #36d;
 }
 div#evo_toolbar li.separator {
 	padding: 0;

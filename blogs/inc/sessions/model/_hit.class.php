@@ -135,12 +135,13 @@ class Hit
 	 * 
 	 * @var integer
 	 */
-	var $is_lynx;
-	var $is_gecko;
-	var $is_winIE;
-	var $is_macIE;
-	var $is_opera;
-	var $is_NS4;
+	var $is_lynx = false;
+	var $is_gecko = false;
+	var $is_winIE = false;
+	var $is_macIE = false;
+	var $is_safari = false;
+	var $is_opera = false;
+	var $is_NS4 = false;
 	/**#@-*/
 
 
@@ -371,7 +372,7 @@ class Hit
 				$this->is_lynx = 1;
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($this->user_agent, 'Gecko') !== false)
+			elseif(strpos($this->user_agent, 'Gecko/') !== false)	// We don't want to see Safari as Gecko
 			{
 				$this->is_gecko = 1;
 				$this->agent_type = 'browser';
@@ -384,6 +385,12 @@ class Hit
 			elseif(strpos($this->user_agent, 'MSIE') !== false && strpos($this->user_agent, 'Mac') !== false)
 			{
 				$this->is_macIE = 1;
+				$this->agent_type = 'browser';
+			}
+			elseif(strpos($this->user_agent, 'Safari/') !== false)
+			{
+				$this->is_safari = true;
+				$Debuglog->add( 'Safari', 'hit' );
 				$this->agent_type = 'browser';
 			}
 			elseif(strpos($this->user_agent, 'Opera') !== false)
@@ -404,6 +411,8 @@ class Hit
 			}
 		}
 		$this->is_IE = (($this->is_macIE) || ($this->is_winIE));
+
+		$Debuglog->add( 'browser detection done', 'hit' );
 
 
 		/*
@@ -688,6 +697,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/17 02:36:25  fplanque
+ * CSS improvements
+ *
  * Revision 1.1  2007/06/25 11:00:57  fplanque
  * MODULES (refactored MVC)
  *
