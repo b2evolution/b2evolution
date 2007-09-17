@@ -93,30 +93,40 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->begin_fieldset( T_('Post contents').get_manual_link('post_contents_fieldset') );
 
-	$Form->switch_layout( 'linespan' );
+	$Form->switch_layout( 'none' );
 
-	$Form->text_input( 'post_title', $item_title, 48, T_('Title'), '', array('maxlength'=>255) );
+	echo '<table cellspacing="0" class="compose_layout"><tr>';
+	echo '<td width="1%"><strong>'.T_('Title').':</strong></td>';
+	echo '<td width="97%" class="input">';
+	$Form->text_input( 'post_title', $item_title, 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+	echo '</td>';
+	echo '<td width="1%">&nbsp;&nbsp;<strong>'.T_('Language').':</strong></td>';
+	echo '<td width="1%" class="input">';
+	$Form->select( 'post_locale', $edited_Item->get( 'locale' ), 'locale_options_return', '' );
+	echo '</td></tr></table>';
 
-	echo ' <span id="itemform_post_locale">'; // allow wrapping here! (and below)
-	                                          // blueyed>> (Opera would additionally need text/&nbsp; here, but that wraps ugly)
-	$Form->select( 'post_locale', $edited_Item->get( 'locale' ), 'locale_options_return', T_('Language') );
-	echo '</span>';
-
-	echo ' <span id="itemform_typ_ID">';
-	$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
-	$Form->select_object( 'item_typ_ID', $edited_Item->ptyp_ID, $ItemTypeCache, T_('Type') );
-	echo '</span>';
-
+	echo '<table cellspacing="0" class="compose_layout"><tr>';
 	if( $use_post_url )
 	{
-		echo ' <span id="itemform_post_url">';
-		$Form->text( 'post_url', $edited_Item->get( 'url' ), 40, T_('Link to url'), '', 255 );
-		echo '</span>';
+		echo '<td width="1%"><strong>'.T_('Link to url').':</strong></td>';
+		echo '<td class="input">';
+		$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+		echo '</td>';
 	}
 	else
 	{
+		echo '<td>';
 		$Form->hidden( 'post_url', '' );
+		echo '</td>';
 	}
+
+	echo '<td width="1%">&nbsp;&nbsp;<strong>'.T_('Type').':</strong></td>';
+	echo '<td width="1%" class="input">';
+	$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
+	$Form->select_object( 'item_typ_ID', $edited_Item->ptyp_ID, $ItemTypeCache, '' );
+	echo '</td>';
+
+	echo '</tr></table>';
 
  	$Form->switch_layout( NULL );
 
@@ -367,6 +377,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.7  2007/09/17 20:04:40  fplanque
+ * UI improvements
+ *
  * Revision 1.6  2007/09/12 21:00:31  fplanque
  * UI improvements
  *

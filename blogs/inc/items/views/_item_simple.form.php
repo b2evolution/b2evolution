@@ -107,11 +107,16 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 
 	$Form->begin_fieldset( T_('Post contents').get_manual_link('post_contents_fieldset') );
 
-	echo '<div class="edit_fieldgroup">';
-	$Form->switch_layout( 'linespan' );
-	$Form->text_input( 'post_title', $item_title, 48, T_('Title'), '', array('maxlength'=>255) );
+	$Form->switch_layout( 'none' );
+
+	echo '<table cellspacing="0" class="compose_layout"><tr>';
+	echo '<td width="1%"><strong>'.T_('Title').':</strong></td>';
+	echo '<td class="input">';
+	$Form->text_input( 'post_title', $item_title, 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+	echo '</td>';
+	echo '</tr></table>';
+
 	$Form->switch_layout( NULL );
-	echo '</div>';
 
 	// --------------------------- TOOLBARS ------------------------------------
 	echo '<div class="edit_toolbars">';
@@ -259,6 +264,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/17 20:04:40  fplanque
+ * UI improvements
+ *
  * Revision 1.4  2007/09/12 21:00:31  fplanque
  * UI improvements
  *

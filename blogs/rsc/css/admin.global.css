@@ -65,6 +65,21 @@ h3.dashboard_post_title {
 
 
 /*
+ * Compose screen:
+ */
+table.compose_layout {
+	width: 100%;
+}
+table.compose_layout td {
+	white-space: nowrap;
+	padding: 1px;
+}
+table.compose_layout td.input {
+	padding: 1px 5px;
+}
+ 
+ 
+/*
  * Categories selection table:
  */
 table.catselect {
@@ -246,7 +261,9 @@ div.tile {
 }
 
 
-
+/*
+ * System checks
+ */ 
 div.system_check {
 	margin: 1ex 0;
 	border-top: 1px solid #ddd;

@@ -427,7 +427,7 @@ div.edit_actions input.SaveButton:hover {
 
 
 /*
- * browse/ Edit Screen:
+ * browse Screen:
  */
 td.browse_left_col {
 }
@@ -632,10 +632,6 @@ input.SearchField {
 	padding: 4px 8px;
 }
 
-.edit_fieldgroup {
-	margin: 0;
-}
-
 .bSideItem fieldset div,
 .browse_side_item fieldset div {
 	margin: 1ex 0ex;
@@ -717,6 +713,16 @@ div.edit_toolbar {
 	margin: 1px auto;
 	width: 98%;
 }
+div.edit_toolbar input {
+	background: #fefefe url(../img/whitebar24.png) repeat-x center;
+	border: 1px solid #becdd6;
+	margin: 0 1px;
+	padding: 0 1px;
+}
+div.edit_toolbar input:hover {
+	border-color: #00f;
+}
+
 div.edit_area {
 	width: 100%;
 	text-align: center;

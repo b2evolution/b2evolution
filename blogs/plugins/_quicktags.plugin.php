@@ -129,7 +129,7 @@ class quicktags_plugin extends Plugin
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
 				'b2evo_code'
-				,'code', 'font-family:mono;'
+				,'code', ''
 				,'<code>','</code>'
 				,'c'
 				,'<?php echo T_('CODE [Alt-C]') ?>'
@@ -153,7 +153,7 @@ class quicktags_plugin extends Plugin
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
 				'b2evo_pre'
-				,'pre', 'font-family:mono;'
+				,'pre', ''
 				,'<pre>','</pre>'
 				,'r'
 				,'<?php echo T_('PREformatted text [Alt-R]') ?>'
@@ -408,6 +408,9 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.30  2007/09/17 20:04:40  fplanque
+ * UI improvements
+ *
  * Revision 1.29  2007/09/03 16:46:58  fplanque
  * minor
  *
