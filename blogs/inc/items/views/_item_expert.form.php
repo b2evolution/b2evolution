@@ -101,7 +101,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->text_input( 'post_title', $item_title, 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 	echo '</td>';
 	echo '<td width="1%">&nbsp;&nbsp;<strong>'.T_('Language').':</strong></td>';
-	echo '<td width="1%" class="input">';
+	echo '<td width="1%" class="select">';
 	$Form->select( 'post_locale', $edited_Item->get( 'locale' ), 'locale_options_return', '' );
 	echo '</td></tr></table>';
 
@@ -121,7 +121,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	}
 
 	echo '<td width="1%">&nbsp;&nbsp;<strong>'.T_('Type').':</strong></td>';
-	echo '<td width="1%" class="input">';
+	echo '<td width="1%" class="select">';
 	$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
 	$Form->select_object( 'item_typ_ID', $edited_Item->ptyp_ID, $ItemTypeCache, '' );
 	echo '</td>';
@@ -377,6 +377,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.8  2007/09/17 20:11:43  fplanque
+ * UI improvements
+ *
  * Revision 1.7  2007/09/17 20:04:40  fplanque
  * UI improvements
  *
