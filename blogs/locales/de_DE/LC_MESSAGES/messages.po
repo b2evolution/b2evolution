@@ -11031,7 +11031,7 @@ msgstr "Upgrade von Cafelog/b2"
 
 #: ..\..\..\install\index.php:91 ..\..\..\install\index.php:418
 msgid "Delete b2evolution tables"
-msgstr "Lösche b2evolution Tabellen"
+msgstr "Lösche b2evolution-Tabellen"
 
 #: ..\..\..\install\index.php:95 ..\..\..\install\index.php:342
 msgid "Base configuration"
@@ -11282,17 +11282,16 @@ msgid "Admin email"
 msgstr "Admin-E-Mail"
 
 #: ..\..\..\install\index.php:491
-#, fuzzy
 msgid "Creating b2evolution tables..."
-msgstr "Lösche b2evolution Tabellen"
+msgstr "Erstelle b2evolution-Tabellen..."
 
 #: ..\..\..\install\index.php:495
 msgid "Creating minimum default data..."
-msgstr ""
+msgstr "Erstelle minimale Standarddaten..."
 
 #: ..\..\..\install\index.php:501
 msgid "Installing sample contents..."
-msgstr ""
+msgstr "Installiere Beispielinhalte..."
 
 #: ..\..\..\install\index.php:506
 msgid "Installation successful!"
@@ -11365,7 +11364,7 @@ msgstr "Offizielle Website"
 
 #: ..\..\..\install\index.php:657
 msgid "Online resources"
-msgstr ""
+msgstr "Online-Resourcen"
 
 #: ..\..\..\multiblogs.php:107
 msgid "Multiblog demo"
