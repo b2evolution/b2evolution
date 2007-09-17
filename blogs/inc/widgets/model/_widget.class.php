@@ -575,7 +575,7 @@ class ComponentWidget extends DataObject
 
 			$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
 
-			if( $l_blog_ID == $Blog->ID )
+			if( $Blog && $l_blog_ID == $Blog->ID )
 			{ // This is the blog being displayed on this page:
   			echo $this->disp_params['item_selected_start'];
 				$link_class = $this->disp_params['link_selected_class'];
@@ -589,19 +589,19 @@ class ComponentWidget extends DataObject
 			echo '<a href="'.$l_Blog->gen_blogurl().'" class="'.$link_class.'" title="'
 										.$l_Blog->dget( 'name', 'htmlattr' ).'">';
 
-			if( $l_blog_ID == $Blog->ID )
+			if( $Blog && $l_blog_ID == $Blog->ID )
 			{ // This is the blog being displayed on this page:
-  			echo $this->disp_params['item_selected_text_start'];
+				echo $this->disp_params['item_selected_text_start'];
 				echo $l_Blog->dget( 'shortname', 'htmlbody' );
-  			echo $this->disp_params['item_selected_text_end'];
+				echo $this->disp_params['item_selected_text_end'];
 				echo '</a>';
-  			echo $this->disp_params['item_selected_end'];
+				echo $this->disp_params['item_selected_end'];
 			}
 			else
 			{
-  			echo $this->disp_params['item_text_start'];
+				echo $this->disp_params['item_text_start'];
 				echo $l_Blog->dget( 'shortname', 'htmlbody' );
-  			echo $this->disp_params['item_text_end'];
+				echo $this->disp_params['item_text_end'];
 				echo '</a>';
 				echo $this->disp_params['item_end'];
 			}
@@ -645,6 +645,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/17 18:03:52  blueyed
+ * Fixed cases for no $Blog, e.g. with contact.php
+ *
  * Revision 1.4  2007/09/04 19:48:33  fplanque
  * small fixes
  *

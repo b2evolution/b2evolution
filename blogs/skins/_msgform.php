@@ -153,7 +153,10 @@ if( empty($subject) )
 $Form = new Form( $htsrv_url.'message_send.php' );
 	$Form->begin_form( 'bComment' );
 
-	$Form->hidden( 'blog', $Blog->ID );
+	if( $Blog )
+	{
+		$Form->hidden( 'blog', $Blog->ID );
+	}
 	$Form->hidden( 'recipient_id', $recipient_id );
 	$Form->hidden( 'post_id', $post_id );
 	$Form->hidden( 'comment_id', $comment_id );
@@ -198,6 +201,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.38  2007/09/17 18:03:52  blueyed
+ * Fixed cases for no $Blog, e.g. with contact.php
+ *
  * Revision 1.37  2007/09/08 14:50:02  fplanque
  * FIX
  *
