@@ -19,14 +19,15 @@
 body {
 	margin: 0;
 	padding: 0;
-	background-color: #fff;
+	background-color: #ced8de;
 	color: #000;
 	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
 	font-size: 84%;
 }
 
 .wrapper {
-	background: url(../img/foot24.png) repeat-x bottom;
+	background: #fff url(../img/foot24.png) repeat-x bottom;
+	padding-top: 10px;
 }
 
 /*
@@ -45,7 +46,7 @@ a:hover {
  * Main menu
  */
 #mainmenu {
-	margin: 10px 0 0 0;
+	margin: 0;
 	border-top: 1px solid #fafafa;
 	background: url(../img/bluebar_shadow.gif) repeat-x bottom;
 	padding: 0px 0 4px 0;
@@ -771,16 +772,22 @@ div.system_check {
 
 
 /*
- * Footer
+ * Footer (60 pixels)
  */
 .footer {
 	clear: both;
-	height: 20px;
 	margin: 0;
-	padding: 40px 0 0 0;
-	text-align: center;
-	font-size: 74%;
+	height: 60px;
 }
 .footer a {
 	color: #000;
+}
+
+.footer_logo {
+	float: right;
+	margin: 10px 30px 0 0;
+}
+.footer .copyright {
+	padding: 32px 0 0 35px;
+	font-size: 74%;
 }

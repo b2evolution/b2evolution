@@ -1554,10 +1554,23 @@ class AdminUI_general extends Widget
 		return $r;
 	}
 
+
+  /**
+	 * Get the footer text
+	 */
+	function get_footer_contents()
+	{
+		global $app_footer_text, $copyright_text;
+
+		return '<div class="footer">'.$app_footer_text.' &ndash; '.$copyright_text."</div>\n\n";
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.67  2007/09/17 01:36:39  fplanque
+ * look 'ma: just spent 5 hours on a smooth sized footer logo :P
+ *
  * Revision 1.66  2007/09/11 08:21:29  yabs
  * minor bug fix
  *

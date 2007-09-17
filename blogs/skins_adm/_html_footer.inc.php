@@ -34,8 +34,7 @@ if( isset($IconLegend) )
 	$IconLegend->display_legend();
 }
 
-global $app_footer_text, $copyright_text;
-echo '<div class="footer">'.$app_footer_text.' &ndash; '.$copyright_text."</div>\n\n";
+echo $this->get_footer_contents();
 
 // CALL PLUGINS NOW:
 global $Plugins;
@@ -77,6 +76,9 @@ debug_info();
 <?php
 /*
  * $Log$
+ * Revision 1.3  2007/09/17 01:36:39  fplanque
+ * look 'ma: just spent 5 hours on a smooth sized footer logo :P
+ *
  * Revision 1.2  2007/07/16 02:53:04  fplanque
  * checking in mods needed by the chicago adminskin,
  * so that incompatibilities with legacy & evo can be detected early.

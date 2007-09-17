@@ -100,9 +100,8 @@ class AdminUI extends AdminUI_general
 		return $r;
 	}
 
-
 	/**
-	 * Close open div.
+	 * Get the end of the HTML <body>. Close open divs, etc...
 	 *
 	 * @return string
 	 */
@@ -111,6 +110,23 @@ class AdminUI extends AdminUI_general
 		return "\n</div>\n</div>\n";
 	}
 
+  /**
+	 * Get the footer text
+	 */
+	function get_footer_contents()
+	{
+		global $app_footer_text, $copyright_text;
+		global $adminskins_url;
+
+
+		$r = '<div class="footer">';
+
+		$r .= '<a href="http://b2evolution.net/" class="footer_logo"><img src="'.$adminskins_url.'chicago/rsc/img/b2evolution-footer-logo-blue-bg.gif" alt="Powered by b2evolution" width="142" height="43" longdesc="http://b2evolution.net/" /></a>';
+
+		$r .= '<div class="copyright">'.$app_footer_text.' &ndash; '.$copyright_text."</div></div>\n\n";
+
+		return $r;
+	}
 
 	/**
 	 * Get a template by name and depth.
