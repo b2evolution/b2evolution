@@ -192,3 +192,12 @@ form.bComment fieldset div.info
 input.invisible{
 	visibility: hidden;
 }
+
+
+
+/* Browser specific */
+body#body_mac.body_firefox input[type=text],
+body#body_mac.body_firefox select,
+body#body_mac.body_firefox textarea {
+	border: 1px solid #999;
+}

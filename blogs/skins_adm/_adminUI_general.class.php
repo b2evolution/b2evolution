@@ -395,7 +395,13 @@ class AdminUI_general extends Widget
 	{
 		global $skins_path;
 
-		echo "<body>\n";
+    /**
+		 * @var Hit
+		 */
+		global $Hit;
+
+		// #body_win and .body_firefox (for example) can be used to customize CSS per plaform/browser
+		echo '<body id="body_'.$Hit->agent_platform.'" class="body_'.$Hit->agent_name.'">'."\n";
 
 		require $skins_path.'_toolbar.inc.php';
 
@@ -1568,6 +1574,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.68  2007/09/18 00:00:59  fplanque
+ * firefox mac specific forms
+ *
  * Revision 1.67  2007/09/17 01:36:39  fplanque
  * look 'ma: just spent 5 hours on a smooth sized footer logo :P
  *

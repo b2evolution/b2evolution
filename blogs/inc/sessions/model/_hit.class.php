@@ -105,6 +105,34 @@ class Hit
 	 */
 	var $user_agent;
 
+  /**
+	 * The user agent name, eg "safari"
+	 * @var string
+	 */
+	var $agent_name;
+
+  /**
+	 * The user agent platform, eg "mac"
+	 * @var string
+	 */
+	var $agent_platform;
+
+	/**#@+
+	 * Detected browser.
+	 *
+	 * @var integer
+	 */
+	var $is_lynx = false;
+	var $is_firefox = false;
+	var $is_gecko = false;
+	var $is_winIE = false;
+	var $is_macIE = false;
+	var $is_safari = false;
+	var $is_opera = false;
+	var $is_NS4 = false;
+	/**#@-*/
+
+
 	/**
 	 * The user's remote host.
 	 * Use {@link get_remote_host()} to access it (lazy filled).
@@ -130,19 +158,7 @@ class Hit
 	 */
 	var $agent_ID;
 
-	/**#@+
-	 * Detected browser.
-	 * 
-	 * @var integer
-	 */
-	var $is_lynx = false;
-	var $is_gecko = false;
-	var $is_winIE = false;
-	var $is_macIE = false;
-	var $is_safari = false;
-	var $is_opera = false;
-	var $is_NS4 = false;
-	/**#@-*/
+
 
 
 	/**
@@ -370,49 +386,74 @@ class Hit
 			if(strpos($this->user_agent, 'Lynx') !== false)
 			{
 				$this->is_lynx = 1;
+				$this->agent_name = 'lynx';
+				$this->agent_type = 'browser';
+			}
+			elseif(strpos($this->user_agent, 'Firefox/') !== false)
+			{
+				$this->is_firefox = 1;
+				$this->agent_name = 'firefox';
 				$this->agent_type = 'browser';
 			}
 			elseif(strpos($this->user_agent, 'Gecko/') !== false)	// We don't want to see Safari as Gecko
 			{
 				$this->is_gecko = 1;
+				$this->agent_name = 'gecko';
 				$this->agent_type = 'browser';
 			}
 			elseif(strpos($this->user_agent, 'MSIE') !== false && strpos($this->user_agent, 'Win') !== false)
 			{
 				$this->is_winIE = 1;
+				$this->agent_name = 'msie';
 				$this->agent_type = 'browser';
 			}
 			elseif(strpos($this->user_agent, 'MSIE') !== false && strpos($this->user_agent, 'Mac') !== false)
 			{
 				$this->is_macIE = 1;
+				$this->agent_name = 'msie';
 				$this->agent_type = 'browser';
 			}
 			elseif(strpos($this->user_agent, 'Safari/') !== false)
 			{
 				$this->is_safari = true;
-				$Debuglog->add( 'Safari', 'hit' );
+				$this->agent_name = 'safari';
 				$this->agent_type = 'browser';
 			}
 			elseif(strpos($this->user_agent, 'Opera') !== false)
 			{
 				$this->is_opera = 1;
+				$this->agent_name = 'opera';
 				$this->agent_type = 'browser';
 			}
 			elseif(strpos($this->user_agent, 'Nav') !== false || preg_match('/Mozilla\/4\./', $this->user_agent))
 			{
 				$this->is_NS4 = 1;
+				$this->agent_name = 'nav4';
 				$this->agent_type = 'browser';
 			}
+
+			if( strpos($this->user_agent, 'Win') !== false)
+			{
+				$this->agent_platform = 'win';
+			}
+			elseif( strpos($this->user_agent, 'Mac') !== false)
+			{
+				$this->agent_platform = 'mac';
+			}
+
 
 			if( $this->user_agent != strip_tags($this->user_agent) )
 			{ // then they have tried something funky, putting HTML or PHP into the user agent
 				$Debuglog->add( 'detect_useragent(): '.T_('bad char in User Agent'), 'hit');
+				$this->agent_name = '';
+				$this->agent_platform = '';
 				$this->user_agent = '';
 			}
 		}
 		$this->is_IE = (($this->is_macIE) || ($this->is_winIE));
 
-		$Debuglog->add( 'browser detection done', 'hit' );
+		$Debuglog->add( 'Agent name: '.$this->agent_name, 'hit' );
+		$Debuglog->add( 'Agent platform: '.$this->agent_platform, 'hit' );
 
 
 		/*
@@ -697,6 +738,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/18 00:00:59  fplanque
+ * firefox mac specific forms
+ *
  * Revision 1.2  2007/09/17 02:36:25  fplanque
  * CSS improvements
  *

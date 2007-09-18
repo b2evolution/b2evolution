@@ -33,12 +33,7 @@ global $home_url, $admin_url;
 global $Hit;
 ?>
 
-<div id="evo_toolbar"<?php
-	if( $Hit->is_safari )
-	{	// Safari has color display issues...
-		echo ' class="evo_toolbar_safari"';
-	}
-?>>
+<div id="evo_toolbar" class="evo_toolbar_<?php echo $Hit->agent_name; ?>">
 
 <div class="actions_right">
 	<ul>
