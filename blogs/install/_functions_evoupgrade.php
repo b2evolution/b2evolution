@@ -29,7 +29,7 @@ load_funcs('_core/_param.funcs.php');
  */
 function set_upgrade_checkpoint( $version )
 {
-	global $DB;
+	global $DB, $script_start_time, $locale;
 
 	echo "Creating DB schema version checkpoint at $version... ";
 
@@ -45,7 +45,18 @@ function set_upgrade_checkpoint( $version )
 	}
 	$DB->query( $query );
 
-	echo "OK.<br />\n";
+	$elapsed_time = time() - $script_start_time;
+
+	echo "OK. (Elapsed upgrade time: $elapsed_time seconds)<br />\n";
+	flush();
+
+	if( $elapsed_time > ini_get( 'max_execution_time' ) - 10 )
+	{
+		echo 'We are reaching the time limit for this script. Please click <a href="index.php?locale='.$locale.'&amp;action=evoupgrade">continue</a>...';
+		// Dirty temporary solution:
+		exit();
+	}
+
 }
 
 
@@ -246,6 +257,12 @@ function upgrade_b2evo_tables()
 	}
 
 
+
+	// Try to obtain some serious time to do some serious processing (5 minutes)
+	@set_time_limit( 300 );
+
+
+
 	if( $old_db_version < 8010 )
 	{
 		echo 'Upgrading users table... ';
@@ -290,6 +307,8 @@ function upgrade_b2evo_tables()
 			$i++;
 		}
 		echo "OK. ($i rows updated)<br />\n";
+
+		set_upgrade_checkpoint( '8010' );
 	}
 
 
@@ -300,6 +319,8 @@ function upgrade_b2evo_tables()
 							SET user_pass = MD5(user_pass)";
 		$DB->query( $query );
 		echo "OK.<br />\n";
+
+		set_upgrade_checkpoint( '8020' );
 	}
 
 
@@ -334,6 +355,8 @@ function upgrade_b2evo_tables()
 			$i++;
 		}
 		echo "OK. ($i rows updated)<br />\n";
+
+		set_upgrade_checkpoint( '8030' );
 	}
 
 
@@ -366,6 +389,8 @@ function upgrade_b2evo_tables()
 							ADD COLUMN last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00'";
 		$DB->query( $query );
 		echo "OK.<br />\n";
+
+		set_upgrade_checkpoint( '8040' );
 	}
 
 
@@ -585,7 +610,7 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 8060 )
-	{{{ // upgrade to 0.9
+	{ // upgrade to 0.9
 		// Important check:
 		$stub_list = $DB->get_col( "SELECT blog_stub
 																	FROM T_blogs
@@ -746,7 +771,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		set_upgrade_checkpoint( '8060' );
-	}}}
+	}
 
 
 	if( $old_db_version < 8062 )
@@ -760,6 +785,8 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 8064 )
 	{ // upgrade to 0.9.0.6
 		cleanup_comment_quotes();
+
+		set_upgrade_checkpoint( '8064' );
 	}
 
 
@@ -768,10 +795,12 @@ function upgrade_b2evo_tables()
 		echo 'Adding catpost index... ';
 		$DB->query( 'ALTER TABLE T_postcats ADD UNIQUE catpost ( postcat_cat_ID, postcat_post_ID )' );
 		echo "OK.<br />\n";
+
+		set_upgrade_checkpoint( '8066' );
 	}
 
 
-	if( $old_db_version < 9000 )
+	if( $old_db_version < 8800 )
 	{ // ---------------------------------- upgrade to 1.6 "phoenix ALPHA"
 
 		echo 'Dropping old Hitlog table... ';
@@ -859,6 +888,12 @@ function upgrade_b2evo_tables()
 									)" );	// fp> the unique key was only named in version 1.9. Crap. Put the name back here to save as many souls as possible. bulk has not upgraded from 0.9 yet :/
 			echo "OK.<br />\n";
 
+		set_upgrade_checkpoint( '8820' );
+	}
+
+
+	if( $old_db_version < 8840 )
+	{
 
 			echo 'Creating table for user agents... ';
 			$DB->query( "CREATE TABLE T_useragents (
@@ -935,6 +970,13 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
+		set_upgrade_checkpoint( '8840' );
+	}
+
+
+	if( $old_db_version < 8850 )
+	{
+
 		echo 'Updating relative URLs... ';
 		// We need to move the slashes to the end:
 		$query = "UPDATE T_blogs
@@ -949,6 +991,12 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
+		set_upgrade_checkpoint( '8850' );
+	}
+
+
+	if( $old_db_version < 8855 )
+	{
 
 		echo 'Upgrading posts table... ';
 		$query = "ALTER TABLE {$tableprefix}posts
@@ -982,6 +1030,14 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
+		set_upgrade_checkpoint( '8855' );
+	}
+
+
+	if( $old_db_version < 8860 )
+	{
+
+
 		echo 'Updating post data... ';
 		$query = "UPDATE {$tableprefix}posts
 							SET post_lastedit_user_ID = post_creator_user_ID,
@@ -990,14 +1046,24 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
-		echo 'Upgrading users table... ';
-		$query = 'ALTER TABLE T_users
+		task_begin( 'Upgrading users table... ' );
+		$DB->query( 'UPDATE T_users
+									  SET dateYMDhour = \'2000-01-01 00:00:00\'
+									WHERE dateYMDhour = \'0000-00-00 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_users
+							MODIFY COLUMN dateYMDhour DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\',
 							CHANGE COLUMN ID user_ID int(11) unsigned NOT NULL auto_increment,
 							MODIFY COLUMN user_icq int(11) unsigned DEFAULT 0 NOT NULL,
-							ADD COLUMN user_showonline tinyint(1) NOT NULL default 1 AFTER user_notify';
-		$DB->query( $query );
-		echo "OK.<br />\n";
+							ADD COLUMN user_showonline tinyint(1) NOT NULL default 1 AFTER user_notify' );
+		task_end();
 
+
+		set_upgrade_checkpoint( '8860' );
+	}
+
+
+	if( $old_db_version < 8900 )
+	{
 
 		echo 'Setting new defaults... ';
 		$query = 'INSERT INTO T_settings (set_name, set_value)
@@ -1029,12 +1095,20 @@ function upgrade_b2evo_tables()
 		}
 
 
-		echo 'Altering comments table... ';
-		$DB->query( "ALTER TABLE T_comments
-									MODIFY COLUMN comment_post_ID		int(11) unsigned NOT NULL default '0'" );
-		echo "OK.<br />\n";
+		task_begin( 'Altering comments table...' );
+		$DB->query( 'UPDATE T_comments
+									  SET comment_date = \'2000-01-01 00:00:00\'
+									WHERE comment_date = \'0000-00-00 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_comments
+									MODIFY COLUMN comment_date DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\',
+									MODIFY COLUMN comment_post_ID		int(11) unsigned NOT NULL default 0' );
+		task_end();
 
+		set_upgrade_checkpoint( '8900' );
+	}
 
+	if( $old_db_version < 9000 )
+	{
 		echo 'Altering Posts to Categories table... ';
 		$DB->query( "ALTER TABLE T_postcats
 									MODIFY COLUMN postcat_post_ID int(11) unsigned NOT NULL,
@@ -1193,6 +1267,7 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9100' );
 	}
 
+
 	if( $old_db_version < 9190 ) // Note: changed from 9200, to include the block below, if DB is not yet on 1.8
 	{	// 1.8 ALPHA (block #2)
 		echo 'Altering Posts table... ';
@@ -1204,77 +1279,118 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9190' );
 	}
 
-	if( $old_db_version < 9200 )
+
+	if( $old_db_version < 9192 )
 	{ // 1.8 ALPHA (block #3) - The payload that db_delta() handled before
 
 		// This is a fix, which broke upgrade to 1.8 (from 1.6) in MySQL strict mode (inserted after 1.8 got released!):
 		if( $DB->get_row( 'SHOW COLUMNS FROM T_hitlog LIKE "hit_referer_type"' ) )
 		{ // a niiiiiiiice extra check :p
-			echo 'Deleting all "spam" hitlog entries... ';
+			task_begin( 'Deleting all "spam" hitlog entries... ' );
 			$DB->query( '
 					DELETE FROM T_hitlog
 					 WHERE hit_referer_type = "spam"' );
-			echo "OK.<br />\n";
+			task_end();
 		}
 
-		// TODO: change to "regular" output schema
-		foreach( array (
-				0 => 'ALTER TABLE T_users CHANGE COLUMN user_firstname user_firstname varchar(50) NULL',
-				1 => 'ALTER TABLE T_users CHANGE COLUMN user_lastname user_lastname varchar(50) NULL',
-				2 => 'ALTER TABLE T_users CHANGE COLUMN user_nickname user_nickname varchar(50) NULL',
-				3 => 'ALTER TABLE T_users CHANGE COLUMN user_icq user_icq int(11) unsigned NULL',
-				4 => 'ALTER TABLE T_users CHANGE COLUMN user_email user_email varchar(255) NOT NULL',
-				5 => 'ALTER TABLE T_users CHANGE COLUMN user_url user_url varchar(255) NULL',
-				6 => 'ALTER TABLE T_users CHANGE COLUMN user_ip user_ip varchar(15) NULL',
-				7 => 'ALTER TABLE T_users CHANGE COLUMN user_domain user_domain varchar(200) NULL',
-				8 => 'ALTER TABLE T_users CHANGE COLUMN user_browser user_browser varchar(200) NULL',
-				9 => 'ALTER TABLE T_users CHANGE COLUMN user_aim user_aim varchar(50) NULL',
-				10 => 'ALTER TABLE T_users CHANGE COLUMN user_msn user_msn varchar(100) NULL',
-				11 => 'ALTER TABLE T_users CHANGE COLUMN user_yim user_yim varchar(50) NULL',
-				12 => 'ALTER TABLE T_users ADD COLUMN user_allow_msgform TINYINT NOT NULL DEFAULT \'1\' AFTER user_idmode',
-				13 => 'ALTER TABLE T_users ADD COLUMN user_validated TINYINT(1) NOT NULL DEFAULT 0 AFTER user_grp_ID',
-				14 => 'ALTER TABLE T_blogs CHANGE COLUMN blog_media_subdir blog_media_subdir VARCHAR( 255 ) NULL',
-				15 => 'ALTER TABLE T_blogs CHANGE COLUMN blog_media_fullpath blog_media_fullpath VARCHAR( 255 ) NULL',
-				16 => 'ALTER TABLE T_blogs CHANGE COLUMN blog_media_url blog_media_url VARCHAR( 255 ) NULL',
-				17 => 'CREATE TABLE T_coll_settings (
+		task_begin( 'Upgrading users table... ' );
+		$DB->query( 'ALTER TABLE T_users
+										CHANGE COLUMN user_firstname user_firstname varchar(50) NULL,
+										CHANGE COLUMN user_lastname user_lastname varchar(50) NULL,
+										CHANGE COLUMN user_nickname user_nickname varchar(50) NULL,
+										CHANGE COLUMN user_icq user_icq int(11) unsigned NULL,
+										CHANGE COLUMN user_email user_email varchar(255) NOT NULL,
+										CHANGE COLUMN user_url user_url varchar(255) NULL,
+										CHANGE COLUMN user_ip user_ip varchar(15) NULL,
+										CHANGE COLUMN user_domain user_domain varchar(200) NULL,
+										CHANGE COLUMN user_browser user_browser varchar(200) NULL,
+										CHANGE COLUMN user_aim user_aim varchar(50) NULL,
+										CHANGE COLUMN user_msn user_msn varchar(100) NULL,
+										CHANGE COLUMN user_yim user_yim varchar(50) NULL,
+										ADD COLUMN user_allow_msgform TINYINT NOT NULL DEFAULT \'1\' AFTER user_idmode,
+										ADD COLUMN user_validated TINYINT(1) NOT NULL DEFAULT 0 AFTER user_grp_ID' );
+		task_end();
+
+		task_begin( 'Creating blog settings...' );
+		$DB->query( 'CREATE TABLE T_coll_settings (
 															cset_coll_ID INT(11) UNSIGNED NOT NULL,
 															cset_name    VARCHAR( 30 ) NOT NULL,
 															cset_value   VARCHAR( 255 ) NULL,
 															PRIMARY KEY ( cset_coll_ID, cset_name )
-											)',
-				18 => "ALTER TABLE {$tableprefix}posts CHANGE COLUMN post_content post_content          text NULL",
-				19 => "ALTER TABLE {$tableprefix}posts CHANGE COLUMN post_url post_url              VARCHAR(255) NULL DEFAULT NULL",
-				20 => "ALTER TABLE {$tableprefix}posts CHANGE COLUMN post_renderers post_renderers        TEXT NOT NULL",
-				21 => 'ALTER TABLE T_comments CHANGE COLUMN comment_author_email comment_author_email varchar(255) NULL',
-				22 => 'ALTER TABLE T_comments CHANGE COLUMN comment_author_url comment_author_url varchar(255) NULL',
-				23 => 'ALTER TABLE T_comments ADD COLUMN comment_spam_karma TINYINT NULL AFTER comment_karma',
-				24 => 'ALTER TABLE T_comments ADD COLUMN comment_allow_msgform TINYINT NOT NULL DEFAULT \'0\' AFTER comment_spam_karma',
-				25 => 'ALTER TABLE T_hitlog CHANGE COLUMN hit_referer_type hit_referer_type   ENUM(\'search\',\'blacklist\',\'referer\',\'direct\') NOT NULL',
-				26 => 'ALTER TABLE T_hitlog ADD COLUMN hit_agnt_ID        INT UNSIGNED NULL AFTER hit_remote_addr',
-				27 => 'ALTER TABLE T_links ADD INDEX link_itm_ID( link_itm_ID )',
-				28 => 'ALTER TABLE T_links ADD INDEX link_dest_itm_ID (link_dest_itm_ID)',
-				30 => 'ALTER TABLE T_plugins CHANGE COLUMN plug_priority plug_priority        TINYINT NOT NULL default 50',
-				31 => 'ALTER TABLE T_plugins ADD COLUMN plug_code            VARCHAR(32) NULL AFTER plug_classname',
-				32 => 'ALTER TABLE T_plugins ADD COLUMN plug_apply_rendering ENUM( \'stealth\', \'always\', \'opt-out\', \'opt-in\', \'lazy\', \'never\' ) NOT NULL DEFAULT \'never\' AFTER plug_code',
-				33 => 'ALTER TABLE T_plugins ADD COLUMN plug_version         VARCHAR(42) NOT NULL default \'0\' AFTER plug_apply_rendering',
-				34 => 'ALTER TABLE T_plugins ADD COLUMN plug_status          ENUM( \'enabled\', \'disabled\', \'needs_config\', \'broken\' ) NOT NULL AFTER plug_version',
-				35 => 'ALTER TABLE T_plugins ADD COLUMN plug_spam_weight     TINYINT UNSIGNED NOT NULL DEFAULT 1 AFTER plug_status',
-				36 => 'ALTER TABLE T_plugins ADD UNIQUE plug_code( plug_code )',
-				37 => 'ALTER TABLE T_plugins ADD INDEX plug_status( plug_status )',
-				38 => 'CREATE TABLE T_pluginsettings (
+											)' );
+		task_end();
+		set_upgrade_checkpoint( '9192' );
+	}
+
+
+	if( $old_db_version < 9195 )
+	{
+		task_begin( 'Upgrading posts table... ' );
+		$DB->query( 'ALTER TABLE '.$tableprefix.'posts
+										CHANGE COLUMN post_content post_content         text NULL,
+										CHANGE COLUMN post_url post_url              		VARCHAR(255) NULL DEFAULT NULL,
+										CHANGE COLUMN post_renderers post_renderers     TEXT NOT NULL' );
+		task_end();
+
+		task_begin( 'Upgrading comments table... ' );
+		$DB->query( 'ALTER TABLE T_comments
+										CHANGE COLUMN comment_author_email comment_author_email varchar(255) NULL,
+										CHANGE COLUMN comment_author_url comment_author_url varchar(255) NULL,
+										ADD COLUMN comment_spam_karma TINYINT NULL AFTER comment_karma,
+										ADD COLUMN comment_allow_msgform TINYINT NOT NULL DEFAULT \'0\' AFTER comment_spam_karma' );
+		task_end();
+
+		set_upgrade_checkpoint( '9195' );
+	}
+
+
+	if( $old_db_version < 9200 )
+	{
+		task_begin( 'Upgrading hitlog table... ' );
+		$DB->query( 'ALTER TABLE T_hitlog
+										CHANGE COLUMN hit_referer_type hit_referer_type   ENUM(\'search\',\'blacklist\',\'referer\',\'direct\') NOT NULL,
+										ADD COLUMN hit_agnt_ID        INT UNSIGNED NULL AFTER hit_remote_addr' );
+		task_end();
+
+		task_begin( 'Upgrading post links table... ' );
+		$DB->query( 'ALTER TABLE T_links
+										ADD INDEX link_itm_ID( link_itm_ID ),
+										ADD INDEX link_dest_itm_ID (link_dest_itm_ID)' );
+		task_end();
+
+		task_begin( 'Upgrading plugins table... ' );
+		$DB->query( 'ALTER TABLE T_plugins
+										CHANGE COLUMN plug_priority plug_priority        TINYINT NOT NULL default 50,
+										ADD COLUMN plug_code            VARCHAR(32) NULL AFTER plug_classname,
+										ADD COLUMN plug_apply_rendering ENUM( \'stealth\', \'always\', \'opt-out\', \'opt-in\', \'lazy\', \'never\' ) NOT NULL DEFAULT \'never\' AFTER plug_code,
+										ADD COLUMN plug_version         VARCHAR(42) NOT NULL default \'0\' AFTER plug_apply_rendering,
+										ADD COLUMN plug_status          ENUM( \'enabled\', \'disabled\', \'needs_config\', \'broken\' ) NOT NULL AFTER plug_version,
+										ADD COLUMN plug_spam_weight     TINYINT UNSIGNED NOT NULL DEFAULT 1 AFTER plug_status,
+										ADD UNIQUE plug_code( plug_code ),
+										ADD INDEX plug_status( plug_status )' );
+		task_end();
+
+		task_begin( 'Creating plugin settings table... ' );
+		$DB->query( 'CREATE TABLE T_pluginsettings (
 															pset_plug_ID INT(11) UNSIGNED NOT NULL,
 															pset_name VARCHAR( 30 ) NOT NULL,
 															pset_value TEXT NULL,
 															PRIMARY KEY ( pset_plug_ID, pset_name )
-											)',
-				39 => 'CREATE TABLE T_pluginusersettings (
+											)' );
+		task_end();
+
+		task_begin( 'Creating plugin user settings table... ' );
+		$DB->query( 'CREATE TABLE T_pluginusersettings (
 															puset_plug_ID INT(11) UNSIGNED NOT NULL,
 															puset_user_ID INT(11) UNSIGNED NOT NULL,
 															puset_name VARCHAR( 30 ) NOT NULL,
 															puset_value TEXT NULL,
 															PRIMARY KEY ( puset_plug_ID, puset_user_ID, puset_name )
-											)',
-				41 => 'CREATE TABLE T_cron__task(
+											)' );
+		task_end();
+
+		task_begin( 'Creating scheduled tasks table... ' );
+		$DB->query( 'CREATE TABLE T_cron__task(
 												 ctsk_ID              int(10) unsigned      not null AUTO_INCREMENT,
 												 ctsk_start_datetime  datetime              not null,
 												 ctsk_repeat_after    int(10) unsigned,
@@ -1282,23 +1398,29 @@ function upgrade_b2evo_tables()
 												 ctsk_controller      varchar(50)           not null,
 												 ctsk_params          text,
 												 primary key (ctsk_ID)
-											)',
-				42 => 'CREATE TABLE T_cron__log(
+											)' );
+		task_end();
+
+		task_begin( 'Creating cron log table... ' );
+		$DB->query( 'CREATE TABLE T_cron__log(
 															 clog_ctsk_ID              int(10) unsigned   not null,
 															 clog_realstart_datetime   datetime           not null,
 															 clog_realstop_datetime    datetime,
 															 clog_status               enum(\'started\',\'finished\',\'error\',\'timeout\') not null default \'started\',
 															 clog_messages             text,
 															 primary key (clog_ctsk_ID)
-											)',
+											)' );
+		task_end();
 
-				// This is "DEFAULT 1" in the 0.9.0.11 dump.. - changed in 0.9.2?!
-				43 => 'ALTER TABLE T_blogs ALTER COLUMN blog_allowpingbacks SET DEFAULT 0',
+		task_begin( 'Upgrading blogs table... ' );
+		// blog_allowpingbacks is "DEFAULT 1" in the 0.9.0.11 dump.. - changed in 0.9.2?!
+		$DB->query( 'ALTER TABLE T_blogs
+										ALTER COLUMN blog_allowpingbacks SET DEFAULT 0,
+    								CHANGE COLUMN blog_media_subdir blog_media_subdir VARCHAR( 255 ) NULL,
+										CHANGE COLUMN blog_media_fullpath blog_media_fullpath VARCHAR( 255 ) NULL,
+										CHANGE COLUMN blog_media_url blog_media_url VARCHAR( 255 ) NULL' );
+		task_end();
 
-			) as $query )
-		{
-			$DB->query($query);
-		}
 
 		set_upgrade_checkpoint( '9200' ); // at 1.8 "Summer Beta" release
 	}
@@ -1387,6 +1509,7 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9310' );
 	}
 
+
 	if( $old_db_version < 9315 )
 	{
 		echo 'Altering locales table... ';
@@ -1396,7 +1519,7 @@ function upgrade_b2evo_tables()
 
 		echo 'Creating item prerendering cache table... ';
 		$DB->query( "
-				CREATE TABLE T_item__prerendering(
+				CREATE TABLE {$tableprefix}item__prerendering(
 					itpr_itm_ID                   INT(11) UNSIGNED NOT NULL,
 					itpr_format                   ENUM('htmlbody', 'entityencoded', 'xml', 'text') NOT NULL,
 					itpr_renderers                TEXT NOT NULL,
@@ -1431,7 +1554,8 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9320' );
 	}
 
-	if( $old_db_version < 9330 )
+
+	if( $old_db_version < 9326 )
 	{
 		echo 'Removing obsolete settings... ';
 		$DB->query( 'DELETE FROM T_settings WHERE set_name = "upload_allowedext"' );
@@ -1473,21 +1597,35 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
+		set_upgrade_checkpoint( '9326' );
+	}
+
+
+	if( $old_db_version < 9328 )
+	{
 		echo 'Updating posts... ';
 		db_add_col( "{$tableprefix}posts", 'post_notifications_status',  'ENUM("noreq","todo","started","finished") NOT NULL DEFAULT "noreq" AFTER post_flags' );
 		db_add_col( "{$tableprefix}posts", 'post_notifications_ctsk_ID', 'INT(10) unsigned NULL DEFAULT NULL AFTER post_notifications_status' );
+		echo "OK.<br />\n";
+		set_upgrade_checkpoint( '9328' );
+	}
 
+
+	if( $old_db_version < 9330 )
+	{
 		if( db_col_exists( "{$tableprefix}posts", 'post_flags') )
 		{
+			echo 'Updating post notifications... ';
 			$DB->query( "
 				UPDATE {$tableprefix}posts
 					 SET post_notifications_status = 'finished'
 				 WHERE post_flags LIKE '%pingsdone%'" );
 			db_drop_col( "{$tableprefix}posts", 'post_flags' );
+			echo "OK.<br />\n";
 		}
-
-		echo "OK.<br />\n";
+		set_upgrade_checkpoint( '9330' );
 	}
+
 
 	if( $old_db_version < 9340 )
 	{
@@ -1507,23 +1645,43 @@ function upgrade_b2evo_tables()
 					' );
 		}
 		echo "OK.<br />\n";
+
+		set_upgrade_checkpoint( '9340' );
 	}
 
 	// ____________________________ 1.10: ____________________________
 
-	if( $old_db_version < 9350 )
+	if( $old_db_version < 9345 )
 	{
-		echo 'Updating post tables... ';
+		echo 'Updating post table... ';
 		$DB->query( "ALTER TABLE {$tableprefix}posts CHANGE COLUMN post_content post_content MEDIUMTEXT NULL" );
-		$DB->query( 'ALTER TABLE T_item__prerendering CHANGE COLUMN itpr_content_prerendered itpr_content_prerendered MEDIUMTEXT NULL' );
 		echo "OK.<br />\n";
+		set_upgrade_checkpoint( '9345' );
+	}
 
+	if( $old_db_version < 9346 )
+	{
+		echo 'Updating prerendering table... ';
+		$DB->query( "ALTER TABLE {$tableprefix}item__prerendering CHANGE COLUMN itpr_content_prerendered itpr_content_prerendered MEDIUMTEXT NULL" );
+		echo "OK.<br />\n";
+		set_upgrade_checkpoint( '9346' );
+	}
+
+	if( $old_db_version < 9348 )
+	{
 		echo 'Updating sessions table... ';
 		$DB->query( 'ALTER TABLE T_sessions CHANGE COLUMN sess_data sess_data MEDIUMBLOB DEFAULT NULL' );
 		echo "OK.<br />\n";
+		set_upgrade_checkpoint( '9348' );
+	}
+
+	if( $old_db_version < 9350 )
+	{
 		echo 'Updating hitlog table... ';
 		$DB->query( 'ALTER TABLE T_hitlog CHANGE COLUMN hit_referer_type hit_referer_type   ENUM(\'search\',\'blacklist\',\'spam\',\'referer\',\'direct\',\'self\',\'admin\') NOT NULL' );
 		echo "OK.<br />\n";
+
+		set_upgrade_checkpoint( '9350' );
 	}
 
 
@@ -1573,6 +1731,7 @@ function upgrade_b2evo_tables()
          AND set_value <> 0' );
 		echo "OK.<br />\n";
 
+		set_upgrade_checkpoint( '9406' );
 	}
 
 
@@ -1680,7 +1839,8 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9408' );
 	}
 
-	if( $old_db_version < 9410 )
+
+	if( $old_db_version < 9409 )
 	{
 		// Upgrade the blog access types:
 		echo 'Updating blogs access types... ';
@@ -1707,7 +1867,15 @@ function upgrade_b2evo_tables()
 		$DB->query( "ALTER TABLE T_coll_group_perms CHANGE COLUMN bloggroup_perm_poststatuses bloggroup_perm_poststatuses set('published','deprecated','protected','private','draft','redirected') NOT NULL default ''" );
 
 		$DB->query( "ALTER TABLE {$tableprefix}posts CHANGE COLUMN post_status post_status enum('published','deprecated','protected','private','draft','redirected') NOT NULL default 'published'" );
+		echo "OK.<br />\n";
 
+		set_upgrade_checkpoint( '9409' );
+	}
+
+
+	if( $old_db_version < 9410 )
+	{
+ 		echo 'Updating columns... ';
 		$DB->query( "ALTER TABLE T_comments CHANGE COLUMN comment_status comment_status ENUM('published','deprecated','protected','private','draft','redirected') DEFAULT 'published' NOT NULL" );
 
 		$DB->query( "ALTER TABLE T_sessions CHANGE COLUMN sess_data sess_data MEDIUMBLOB DEFAULT NULL" );
@@ -1716,10 +1884,11 @@ function upgrade_b2evo_tables()
 
 		echo "OK.<br />\n";
 
+		set_upgrade_checkpoint( '9410' );
 	}
 
 
-	if( $old_db_version < 9412 )
+	if( $old_db_version < 9411 )
 	{
 		echo 'Adding default Post Types... ';
 		$DB->query( "
@@ -1730,10 +1899,16 @@ function upgrade_b2evo_tables()
 						 ( 4000, 'Reserved' ),
 						 ( 5000, 'Reserved' ) " );
 		echo "OK.<br />\n";
+		set_upgrade_checkpoint( '9411' );
+	}
 
+
+	if( $old_db_version < 9412 )
+	{
 		echo 'Adding field for post excerpts... ';
 		$DB->query( "ALTER TABLE {$tableprefix}posts ADD COLUMN post_excerpt  text NULL AFTER post_content" );
 		echo "OK.<br />\n";
+		set_upgrade_checkpoint( '9412' );
 	}
 
 	if( $old_db_version < 9414 )
@@ -1760,6 +1935,8 @@ function upgrade_b2evo_tables()
 		      UNIQUE tagitem ( itag_tag_ID, itag_itm_ID )
 		    )" );
 		echo "OK.<br />\n";
+
+		set_upgrade_checkpoint( '9414' );
 	}
 
 
@@ -1797,34 +1974,60 @@ function upgrade_b2evo_tables()
 										SET bloggroup_perm_edit = 'all'" );
 
 		echo "OK.<br />\n";
+
+		set_upgrade_checkpoint( '9416' );
 	}
 
 
+	task_begin( 'Normalizing columns...' );
+	$DB->query( 'ALTER TABLE T_blogs
+									ALTER COLUMN blog_shortname SET DEFAULT \'\',
+									ALTER COLUMN blog_tagline SET DEFAULT \'\',
+									CHANGE COLUMN blog_description blog_description     varchar(250) NULL default \'\',
+									ALTER COLUMN blog_siteurl SET DEFAULT \'\'' );
+	task_end();
+
+	task_begin( 'Normalizing dates...' );
+	$DB->query( 'UPDATE T_users
+									SET dateYMDhour = \'2000-01-01 00:00:00\'
+								WHERE dateYMDhour = \'0000-00-00 00:00:00\'' );
+	$DB->query( 'ALTER TABLE T_users
+								MODIFY COLUMN dateYMDhour DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+	$DB->query( 'UPDATE T_comments
+									SET comment_date = \'2000-01-01 00:00:00\'
+								WHERE comment_date = \'0000-00-00 00:00:00\'' );
+	$DB->query( 'ALTER TABLE T_comments
+								MODIFY COLUMN comment_date DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+	task_end();
+
+
+
 	/*
-	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 100),
-	 *       to avoid the following:
-	 *   - You go to /install/
-	 *   - the (e.g.) column-rename above does not get caught, because $old_db_version is the same as $new_db_version (which has not changed)
-	 *   - Below, a new DB column gets added by db_delta(), because it's missing
-	 *   - The data from the old column does not get copied
-	 *   - The old column does not get removed
+	 * ADD UPGRADES HERE.
+	 *
+	 * ALL DB CHANGES MUST BE EXPLICITELY CARRIED OUT. DO NOT RELY ON SCHEMA UPDATES!
+	 * Schema updates do not survive after several incremental changes.
+	 *
+	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 100).
 	 */
 
 
-
+	// Just in case, make sure the db schema version is upto date at the end.
 	if( $old_db_version != $new_db_version )
-	{
-		// Update DB schema version to $new_db_version
+	{ // Update DB schema version to $new_db_version
 		set_upgrade_checkpoint( $new_db_version );
 	}
 
 
 	// This has to be at the end because plugin install may fail if the DB schema is not current (matching Plugins class).
-	// NOTE: if this fails (e.g. fatal error in one of the plugins), it will not get repeated
+	// Only new default plugins will be installed, based on $old_db_version.
+	// dh> NOTE: if this fails (e.g. fatal error in one of the plugins), it will not get repeated
 	install_basic_plugins( $old_db_version );
 
 
-	// Check DB schema:
+	/*
+	 * Check to make sure the DB schema is up to date:
+	 */
 	$upgrade_db_deltas = array(); // This holds changes to make, if any (just all queries)
 
 	foreach( $schema_queries as $table => $query_info )
@@ -1904,6 +2107,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.230  2007/09/19 02:54:16  fplanque
+ * bullet proof upgrade
+ *
  * Revision 1.229  2007/07/03 23:21:32  blueyed
  * Fixed includes/requires in/for tests
  *

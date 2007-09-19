@@ -52,7 +52,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	<div class="wrapper1">
 	<div class="wrapper2">
-	<div class="wrapper3">
 		<span class="version_top"><!-- InstanceBeginEditable name="Version" --><?php echo T_('Default page') ?><!-- InstanceEndEditable --></span>	
 	
 		<a href="http://b2evolution.net/" target="_blank"><img src="rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
@@ -159,15 +158,18 @@ header( 'Content-type: text/html; charset='.$io_charset );
 </div>
 </div>
 <!-- InstanceEndEditable -->
+	</div>
 		
-		<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->Powered by <a href="http://b2evolution.net/" target="_blank">b2evolution</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">Forums</a>
+	<div class="body_fade_out">
+		
+	<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->Powered by <a href="http://b2evolution.net/" target="_blank">b2evolution</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">Forums</a>
 		<!-- InstanceEndEditable --></div>
 	
-		<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->
+	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->
 		<a href="contact.php"><?php echo T_('Contact the admin') ?></a>
 		<?php display_list( $credit_links, ' &middot; ', '', ' &middot; ', ' ', ' ' ); ?>
 		<!-- InstanceEndEditable --></div>
-	</div>
+		
 	</div>
 	</div>
 

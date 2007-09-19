@@ -59,7 +59,7 @@ $schema_queries = array(
 			user_ip varchar(15) NULL,
 			user_domain varchar(200) NULL,
 			user_browser varchar(200) NULL,
-			dateYMDhour datetime NOT NULL,
+			dateYMDhour datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
 			user_level int unsigned DEFAULT 0 NOT NULL,
 			user_aim varchar(50) NULL,
 			user_msn varchar(100) NULL,
@@ -233,7 +233,7 @@ $schema_queries = array(
 			comment_author_email varchar(255) NULL,
 			comment_author_url varchar(255) NULL,
 			comment_author_IP varchar(23) NOT NULL default '',
-			comment_date datetime NOT NULL,
+			comment_date datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
 			comment_content text NOT NULL,
 			comment_karma int(11) NOT NULL default '0',
 			comment_spam_karma TINYINT NULL,
@@ -548,6 +548,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.67  2007/09/19 02:54:16  fplanque
+ * bullet proof upgrade
+ *
  * Revision 1.66  2007/06/26 02:43:16  fplanque
  * cleanup
  *

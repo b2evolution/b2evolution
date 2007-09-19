@@ -15,13 +15,15 @@ body {
 	background-repeat: repeat-x;	
 }
 .wrapper2 {
+	width: 730px;
+	margin: auto;
+}
+
+.body_fade_out {
 	background-image: url(../img/distrib/bottom_shade.jpg);
 	background-repeat: repeat-x;
 	background-position: bottom;
-}
-.wrapper3 {
-	width: 730px;
-	margin: auto;
+	height: 92px;
 }
 
 .version_top {

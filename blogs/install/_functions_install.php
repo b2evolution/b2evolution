@@ -10,6 +10,27 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+/**
+ * This will offer other display methods in the future
+ */
+function task_begin( $title )
+{
+	echo $title;
+}
+
+
+/**
+ * This will offer other display methods in the future
+ */
+function task_end()
+{
+	echo "OK.<br />\n";
+	flush();
+}
+
+
+
 /**
  * check_db_version(-)
  *
@@ -507,6 +528,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.34  2007/09/19 02:54:16  fplanque
+ * bullet proof upgrade
+ *
  * Revision 1.33  2007/09/08 23:46:38  fplanque
  * made evopress the new default skin
  *

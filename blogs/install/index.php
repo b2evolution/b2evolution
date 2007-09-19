@@ -26,6 +26,7 @@ define( 'EVO_MAIN_INIT', true );
  */
 define( 'EVO_IS_INSTALLING', true );
 
+$script_start_time = time();
 
 if( ! $config_is_done )
 {	// Base config is not done yet, try to guess some values needed for correct display:
@@ -119,7 +120,6 @@ header('Content-Type: text/html; charset='.$io_charset);
 
 	<div class="wrapper1">
 	<div class="wrapper2">
-	<div class="wrapper3">
 		<span class="version_top"><!-- InstanceBeginEditable name="Version" --><?php echo T_('Installer for version ').' '. $app_version ?><!-- InstanceEndEditable --></span>	
 	
 		<a href="http://b2evolution.net/" target="_blank"><img src="../rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
@@ -652,14 +652,17 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 }
 ?>
 <!-- InstanceEndEditable -->
+	</div>
 		
-		<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->
+	<div class="body_fade_out">
+		
+	<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->
 			<?php echo T_('Online resources') ?>: <a href="http://b2evolution.net/" target="_blank"><?php echo T_('Official website') ?></a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank"><?php echo T_('Find a host') ?></a> &bull; <a href="http://manual.b2evolution.net/" target="_blank"><?php echo T_('Manual') ?></a> &bull; <a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Forums') ?></a>
 		<!-- InstanceEndEditable --></div>
 	
-		<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright © 2003-2007 by François Planque & others · <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
+	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright © 2003-2007 by François Planque & others · <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
 		<!-- InstanceEndEditable --></div>
-	</div>
+		
 	</div>
 	</div>
 
@@ -677,6 +680,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.137  2007/09/19 02:54:16  fplanque
+ * bullet proof upgrade
+ *
  * Revision 1.136  2007/07/14 02:44:22  fplanque
  * New default page design.
  *
