@@ -15,7 +15,6 @@
 
 	<div class="wrapper1">
 	<div class="wrapper2">
-	<div class="wrapper3">
 		<span class="version_top"><!-- TemplateBeginEditable name="Version" --><!-- TemplateEndEditable --></span>	
 	
 		<a href="http://b2evolution.net/" target="_blank"><img src="../blogs/rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
@@ -34,13 +33,16 @@
 		</div>
 		</div>
 		<!-- TemplateEndEditable -->
+	</div>
 		
-		<div class="menu_bottom"><!-- TemplateBeginEditable name="MenuBottom" -->
+	<div class="body_fade_out">
+		
+	<div class="menu_bottom"><!-- TemplateBeginEditable name="MenuBottom" -->
 			Online resources: <a href="http://b2evolution.net/" target="_blank">Official website</a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank">Find a host</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">Forums</a>
 		<!-- TemplateEndEditable --></div>
 	
-		<div class="copyright"><!-- TemplateBeginEditable name="CopyrightTail" -->Copyright © 2003-2007 by François Planque & others · <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a><!-- TemplateEndEditable --></div>
-	</div>
+	<div class="copyright"><!-- TemplateBeginEditable name="CopyrightTail" -->Copyright © 2003-2007 by François Planque & others · <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a><!-- TemplateEndEditable --></div>
+		
 	</div>
 	</div>
 
