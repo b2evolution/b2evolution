@@ -1066,7 +1066,7 @@ class ItemListLight extends DataObjectList2
 		elseif( !empty($this->filters['ymdhms']) )
 		{ // no restriction if we request a month... some permalinks may point to the archive!
 		}
-		elseif( $this->filters['unit'] == 'posts' )
+		elseif( $this->filters['unit'] == 'posts' || $this->filters['unit'] == 'all' )
 		{ // We're going to page, so there's no real limit here...
 		}
 		elseif( $this->filters['unit'] == 'days' )
@@ -1450,6 +1450,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/19 20:03:18  yabs
+ * minor bug fix ( http://forums.b2evolution.net/viewtopic.php?p=60493#60493 )
+ *
  * Revision 1.3  2007/09/03 16:46:58  fplanque
  * minor
  *
