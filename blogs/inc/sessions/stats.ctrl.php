@@ -53,7 +53,7 @@ param( 'action', 'string' );
 if( $blog == 0 && $perm_view_all )
 {	// We want to view aggregate stats
 }
-else
+elseif( $blog == 0 )
 {	// Find a blog we can view stats for:
 	if( ! $selected = autoselect_blog( 'stats', 'view' ) )
 	{ // No blog could be selected
@@ -197,6 +197,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/19 09:41:57  yabs
+ * minor bug fix
+ *
  * Revision 1.1  2007/06/25 11:00:56  fplanque
  * MODULES (refactored MVC)
  *
