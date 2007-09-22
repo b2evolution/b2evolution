@@ -242,7 +242,7 @@ class Plugins
 
 	/**
 	 * Sets the status of a Plugin in DB and registers it into the internal indices when "enabled".
-	 * Otherwise it gets unregisterd, but only when we're not in {@link Plugins_admin}, because we
+	 * Otherwise it gets unregistered, but only when we're not in {@link Plugins_admin}, because we
 	 * want to keep it in then in our indices.
 	 *
 	 * {@internal
@@ -1806,6 +1806,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/22 22:11:18  fplanque
+ * minor
+ *
  * Revision 1.1  2007/06/25 11:00:45  fplanque
  * MODULES (refactored MVC)
  *

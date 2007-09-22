@@ -249,7 +249,7 @@ class Results extends Table
 	 * @param boolean
 	 * @param NULL|string SQL query used to count the total # of rows (if NULL, we'll try to COUNT(*) by ourselves)
 	 */
-	function Results( $sql, $param_prefix = '', $default_order = '', $limit = null, $count_sql = NULL, $init_page = true )
+	function Results( $sql, $param_prefix = '', $default_order = '', $limit = NULL, $count_sql = NULL, $init_page = true )
 	{
 		global $UserSettings;
 
@@ -1966,6 +1966,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/22 22:11:18  fplanque
+ * minor
+ *
  * Revision 1.2  2007/07/24 23:29:25  blueyed
  * todo
  *

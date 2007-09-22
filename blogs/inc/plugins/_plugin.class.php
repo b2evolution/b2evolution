@@ -1033,9 +1033,12 @@ class Plugin
 	// Item events: {{{
 
 	/**
-	 * Event handler: Called when rendering item/post contents as HTML.
+	 * Event handler: Called when rendering item/post contents as HTML. (CACHED)
 	 *
-	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 * The rendered content will be *cached* and the cached content will be reused on subsequent displays.
+	 * Use {@link DisplayItemAsHtml()} instead if you want to do rendering at display time.
+	 *
+ 	 * Note: You have to change $params['data'] (which gets passed by reference).
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
@@ -2882,6 +2885,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/22 22:11:18  fplanque
+ * minor
+ *
  * Revision 1.3  2007/08/11 17:59:05  blueyed
  * Mention also trackback in GetSpamKarmaForComment doc
  *
