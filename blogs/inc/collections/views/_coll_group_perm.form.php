@@ -174,7 +174,7 @@ $Results->grp_cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Group'),
 						'order' => 'grp_name',
-						'td' => '<a href="?ctrl=groups&amp;grp_ID=$grp_ID$">$grp_name$</a>',
+						'td' => '<a href="?ctrl=users&amp;grp_ID=$grp_ID$">$grp_name$</a>',
 					);
 
 
@@ -444,7 +444,7 @@ $Results->cols = array(); // RESET!
 $Results->cols[] = array(
 						'th' => T_('Login'),
 						'order' => 'user_login',
-						'td' => '<a href="?ctrl=users&amp;user_ID=$grp_ID$">$grp_name$</a>',
+						'td' => '<a href="?ctrl=users&amp;grp_ID=$grp_ID$">$grp_name$</a>',
 					);
 
 
@@ -513,6 +513,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/22 21:56:40  fplanque
+ * fixed links
+ *
  * Revision 1.1  2007/06/25 10:59:36  fplanque
  * MODULES (refactored MVC)
  *
