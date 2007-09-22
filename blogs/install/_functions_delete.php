@@ -15,116 +15,23 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function db_delete()
 {
-	global $DB;
+	global $DB, $db_config;
 
-	echo "Dropping Prerendering cache table...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_items__prerendering' );
+	echo "Disabling foreign key checks...<br />\n";
+	$DB->query( 'SET FOREIGN_KEY_CHECKS=0' );
 
-	echo "Dropping Cron log table...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_cron__log' );
-
-	echo "Dropping Cron tasks table...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_cron__task' );
-
-	echo "Dropping Collection settings table...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_coll_settings' );
-
-	echo "Dropping Filetypes table...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_filetypes' );
-
-	echo "Dropping Antispam table...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_antispam' );
-
-	echo "Dropping Hit-Logs...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_hitlog' );
-
-	echo "Dropping Comments...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_comments' );
-
-	echo "Dropping Categories-to-Posts relationships...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_postcats' );
-
-	echo "Dropping Links...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_links' );
-
-	echo "Dropping Files...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_files' );
-
-	echo "Dropping Posts...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_items__item' );
-
-	echo "Dropping Categories...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_categories' );
-
-	echo "Dropping Post Statuses...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_items__status' );
-
-	echo "Dropping Post Types...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_items__type' );
-
-	echo "Dropping User Settings...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_usersettings' );
-
-	echo "Dropping User sessions...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_sessions' );
-
-	echo "Dropping User permissions on Blogs...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_coll_user_perms' );
-
-	echo "Dropping User subscriptions on Blogs...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_subscriptions' );
-
-	echo "Dropping Users...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_users' );
-
-	echo "Dropping Group permissions on Blogs...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_coll_group_perms' );
-
-	echo "Dropping Groups...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_groups' );
-
-	echo "Dropping Widgets...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_widget' );
-
-	echo "Dropping Blogs...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_blogs' );
-
-	echo "Dropping skin containers...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_skins__container' );
-
-	echo "Dropping skins...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_skins__skin' );
-
-	echo "Dropping Settings...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_settings' );
-
-	echo "Dropping Locales...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_locales' );
-
-	echo "Dropping User Settings...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_usersettings' );
-
-	echo "Dropping Plugin Events...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_pluginevents' );
-
-	echo "Dropping Plugin Settings...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_pluginsettings' );
-
-	echo "Dropping Plugin User Settings...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_pluginusersettings' );
-
-	echo "Dropping Plugins registrations...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_plugins' );
-
-	echo "Dropping base domains...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_basedomains' );
-
-	echo "Dropping user agents...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_useragents' );
+	foreach( $db_config['aliases'] as $alias => $tablename )
+	{
+		echo "Dropping $tablename table...<br />\n";
+		$DB->query( 'DROP TABLE IF EXISTS '.$tablename );
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.34  2007/09/22 22:12:10  fplanque
+ * automated deletion
+ *
  * Revision 1.33  2007/05/14 02:43:06  fplanque
  * Started renaming tables. There probably won't be a better time than 2.0.
  *
