@@ -1486,7 +1486,7 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
 		}
 		elseif( ! preg_match('~^           # start
 			([a-z][a-z0-9+.\-]*)             # scheme
-			://                              # authority absolute URLs only
+			:(//)?                           # authorize absolute URLs only ( // not present in clsid: or mailto: urls)
 			(\w+(:\w+)?@)?                   # username or username and password (optional)
 			[a-z0-9]([a-z0-9.\-])*           # Don t allow anything too funky like entities
 			(:[0-9]+)?                       # optional port specification
@@ -1652,6 +1652,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/22 19:23:56  fplanque
+ * various fixes & enhancements
+ *
  * Revision 1.3  2007/09/04 19:48:33  fplanque
  * small fixes
  *

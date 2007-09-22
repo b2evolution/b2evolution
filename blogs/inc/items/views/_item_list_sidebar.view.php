@@ -51,16 +51,6 @@ echo $Widget->replace_vars( $template['block_start'] );
 			'link_type'=>'context', 		// Preserve page context
 		) );
 
-	/*
-	// TODO: a specific field for the backoffice, at the bottom of the page
-	// would be used for moderation rules.
-	if( $Blog->get( 'notes' ) )
-	{
-		echo '<h3>'.T_('Notes').'</h3>';
-		$Blog->disp( 'notes', 'htmlbody' );
-	}
-	*/
-
 echo $template['block_end'];
 
 $Widget = & new Widget();
@@ -267,6 +257,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.6  2007/09/22 19:23:56  fplanque
+ * various fixes & enhancements
+ *
  * Revision 1.5  2007/09/07 21:11:10  fplanque
  * superstylin' (not even close)
  *

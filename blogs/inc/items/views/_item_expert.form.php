@@ -318,6 +318,16 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->end_fieldset();
 
 
+	// ################### TEXT RENDERERS ###################
+
+	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
+
+	// fp> TODO: there should be no param call here (shld be in controller)
+	$edited_Item->renderer_checkboxes( param('renderers', 'array', NULL) );
+
+	$Form->end_fieldset();
+
+
 	// ################### COMMENT STATUS ###################
 
 	if( $Blog->allowcomments == 'post_by_post' )
@@ -337,16 +347,6 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 		$Form->end_fieldset();
 	}
-
-
-	// ################### TEXT RENDERERS ###################
-
-	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
-
-	// fp> TODO: there should be no param call here (shld be in controller)
-	$edited_Item->renderer_checkboxes( param('renderers', 'array', NULL) );
-
-	$Form->end_fieldset();
 
 	?>
 
@@ -377,6 +377,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.9  2007/09/22 19:23:56  fplanque
+ * various fixes & enhancements
+ *
  * Revision 1.8  2007/09/17 20:11:43  fplanque
  * UI improvements
  *

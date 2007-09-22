@@ -715,6 +715,17 @@ switch( $action )
 					break;
 			}
 
+			// TODO: a specific field for the backoffice, at the bottom of the page
+			// would be used for moderation rules.
+			if( $Blog->get( 'notes' ) )
+			{
+				$block_item_Widget = & new Widget( 'block_item' );
+				$block_item_Widget->title = T_('Notes');
+				$block_item_Widget->disp_template_replaced( 'block_start' );
+				$Blog->disp( 'notes', 'htmlbody' );
+				$block_item_Widget->disp_template_replaced( 'block_end' );
+			}
+
 		echo '</td>';
 
 		echo '<td class="browse_right_col">';
@@ -735,6 +746,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2007/09/22 19:23:56  fplanque
+ * various fixes & enhancements
+ *
  * Revision 1.5  2007/09/04 22:25:18  fplanque
  * fix
  *

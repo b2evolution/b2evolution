@@ -999,7 +999,8 @@ function balanceTags($text)
 			// Tag Cleaning
 
 			// Push if not img or br or hr
-			if($tag != 'br' && $tag != 'img' && $tag != 'hr') {
+			if($tag != 'br' && $tag != 'img' && $tag != 'hr' && $tag != 'param')
+			{
 				$stacksize = array_push ($tagstack, $tag);
 			}
 
@@ -2972,6 +2973,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/22 19:23:56  fplanque
+ * various fixes & enhancements
+ *
  * Revision 1.4  2007/09/12 21:00:30  fplanque
  * UI improvements
  *

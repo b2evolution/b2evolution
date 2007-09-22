@@ -74,7 +74,11 @@ $use_strict =  false;
 # Set this to true to allow id && style as core attributes for posts
 $posts_allow_css_tweaks = false;
 
+# ONLY CHANGE THE FOLLOWING IF YOU KNOW WHAT YOU'RE DOING
 $posts_allow_javascript = false;
+$posts_allow_script_tags = false;
+$posts_allow_iframes = false;
+$posts_allow_objects = false;
 
 # set this to true to allow id && style as core attributes for comments
 # WARNING : This would allow spammers to post hidden content in comments
@@ -96,16 +100,25 @@ $comments_allow_css_tweaks = false;
 /**
  * Allowed Entity classes
  */
+if( $posts_allow_script_tags )
+{
+	define( 'E_script_tags', 'script noscript' );
+}
+else
+{
+	define( 'E_script_tags', '' );
+}
+
 if( $use_strict )
 {
 	define('E_special_pre', 'br span bdo');			// Strict
-	define('E_special', E_special_pre.' img');		// Strict
+	define('E_special', E_special_pre.' img '.E_script_tags);		// Strict
 }
 else
 {
 	define('E_special_extra', 'img' );							// Transitional
 	define('E_special_basic', 'br span bdo' );			// Transitional
-	define('E_special', E_special_basic.' '.E_special_extra );	// Transitional
+	define('E_special', E_special_basic.' '.E_special_extra.' '.E_script_tags );	// Transitional
 }
 
 if( $use_strict )
@@ -154,11 +167,25 @@ else
 	define('E_blocktext', 'pre hr blockquote address center');	// Transitional
 }
 
-define('E_block', 'p '.E_heading.' div '.E_list.' '.E_blocktext.' fieldset table');
+if( $posts_allow_iframes )
+{
+	define('E_block', 'p '.E_heading.' div '.E_list.' '.E_blocktext.' fieldset table iframe');
+}
+else
+{
+	define('E_block', 'p '.E_heading.' div '.E_list.' '.E_blocktext.' fieldset table');
+}
 
 if( $use_strict ) define('E_Bblock', E_block.' '.E_misc );			// Strict only
 
-define('E_Flow', '#PCDATA '.E_block.' '.E_inline.' '.E_misc );
+if( $posts_allow_objects )
+{
+	define('E_Flow', '#PCDATA '.E_block.' '.E_inline.' '.E_misc.' object' );
+}
+else
+{
+	define('E_Flow', '#PCDATA '.E_block.' '.E_inline.' '.E_misc );
+}
 define('E_a_content', '#PCDATA '.E_special.' '.E_fontstyle.' '.E_phrase.' '.E_misc_inline );
 
 if( $use_strict )
@@ -196,6 +223,7 @@ $allowed_tags = array
 	'ul' => 'li',
 	'ol' => 'li',
 );
+
 if( !$use_strict )
 {
 	$allowed_tags += array
@@ -304,6 +332,15 @@ $allowed_tags += array
 	'th' => E_Flow,
 	'td' => E_Flow,
 );
+
+if( $posts_allow_script_tags )
+{
+	$allowed_tags += array
+	(
+		'script' => '#PCDATA',
+		'noscript' => E_Flow,
+	);
+}
 
 // Array showing allowed attributes for tags
 if( $use_strict )
@@ -424,10 +461,53 @@ $allowed_uri_scheme = array
 	'aim',
 	'icq'
 );
+
 if( $posts_allow_javascript )
 {
 	$allowed_uri_scheme[] = 'javascript';
 }
+
+if( $posts_allow_script_tags )
+{
+	$allowed_attributes += array
+	(
+		'script' => 'type',
+		'noscript' => '',
+	);
+}
+
+if( $posts_allow_iframes )
+{
+	$allowed_tags += array
+	(
+		'iframe' => '',
+	);
+	$allowed_attributes += array
+	(
+ 		'iframe' => A_attrs.' '.A_TextAlign.' src width height frameborder marginwidth marginheight scrolling',		// Transitional
+	);
+}
+
+if( $posts_allow_objects )
+{
+	$allowed_tags += array
+	(
+		'object' => 'param embed',
+	  'param' => '',
+	  'embed' => '',
+	);
+	$allowed_attributes += array
+	(
+	  'object' => 'codebase classid id height width align',
+	  'param' => 'name value',
+	  'embed' => 'src type height width wmode quality bgcolor name align allowScriptAccess pluginspage',
+	);
+	$allowed_uri_scheme[] = 'clsid';
+}
+
+
+
+// -----------------------------------------------------------------------------
 
 // DEFINITION of allowed XHTML code for COMMENTS (posted from the public blog pages)
 

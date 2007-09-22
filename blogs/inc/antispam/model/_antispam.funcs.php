@@ -146,10 +146,10 @@ function antispam_check( $haystack )
  */
 function antispam_report_abuse( $abuse_string )
 {
-	global $debug, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri;
+	global $debug, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri, $antispam_test_for_real;
 	global $baseurl, $Messages;
 
-	if( preg_match( '#^http://localhost[/:]#', $baseurl) && ( $antispamsrv_host != 'localhost' ) )
+	if( preg_match( '#^http://localhost[/:]#', $baseurl) && ( $antispamsrv_host != 'localhost' ) && empty( $antispam_test_for_real )  )
 	{ // Local install can only report to local test server
 		$Messages->add( T_('Reporting abuse to b2evolution aborted (Running on localhost).'), 'error' );
 		return(false);
@@ -326,6 +326,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/22 19:23:56  fplanque
+ * various fixes & enhancements
+ *
  * Revision 1.1  2007/09/04 14:56:18  fplanque
  * antispam cleanup
  *
