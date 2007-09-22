@@ -72,8 +72,12 @@ $sql = "SELECT T_users.*, grp_ID, grp_name, COUNT(blog_ID) AS nb_blogs
 				 GROUP BY user_ID
 				 ORDER BY grp_name, *";
 
+$count_sql = 'SELECT COUNT(*)
+							 	FROM T_users
+							 WHERE '.$where_clause.' 1';
 
-$Results = & new Results( $sql, 'user_', '-A' );
+
+$Results = & new Results( $sql, 'user_', '-A', NULL, $count_sql );
 
 $Results->title = T_('Groups & Users');
 
@@ -270,6 +274,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/22 22:11:40  fplanque
+ * fixed user list navigation
+ *
  * Revision 1.3  2007/09/08 20:23:04  fplanque
  * action icons / wording
  *
