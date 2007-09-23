@@ -378,7 +378,8 @@ class ComponentWidget extends DataObject
 		global $Blog;
 
 		// Create ItemList
-		$ItemList = & new ItemListLight( $Blog );
+		// Note: we pass a widget specific prefix in order to make sure to never interfere with the mainlist
+		$ItemList = & new ItemListLight( $Blog, NULL, NULL, 20, 'ItemCacheLight', $this->code.'_' );
 		// Filter list:
 		if( $what == 'pages' )
 		{
@@ -387,7 +388,7 @@ class ComponentWidget extends DataObject
 					'orderby' => 'title',
 					'order' => 'ASC',
 					'unit' => 'all',						// We want to advertise all items (not just a page or a day)
-				) );
+				), false );
 		}
 		else
 		{	// post list
@@ -645,6 +646,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2007/09/23 18:57:15  fplanque
+ * filter handling fixes
+ *
  * Revision 1.5  2007/09/17 18:03:52  blueyed
  * Fixed cases for no $Blog, e.g. with contact.php
  *

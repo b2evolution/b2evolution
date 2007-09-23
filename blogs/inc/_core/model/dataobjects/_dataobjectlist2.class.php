@@ -59,6 +59,29 @@ class FilteredResults extends Results
 
 		return ( $this->filters != $this->default_filters );
 	}
+
+
+  /**
+	 * Show every active filter that is not the same as the defaults
+	 */
+	function dump_active_filters()
+	{
+		foreach( $this->default_filters as $key => $value )
+		{
+			if( !isset( $this->filters[$key] ) )
+			{	// SOme value has not been copied over from defaults to active or specifically set:
+				if( !is_null($value)) // Note: NULL value ar enot copied over. that's normal.
+				{	// A NON NULL value is missing
+					pre_dump( 'no active value for default '.$key );
+				}
+			}
+			elseif( $value != $this->filters[$key] )
+			{
+				pre_dump( 'default '.$key, $value );
+				pre_dump( 'active '.$key, $this->filters[$key] );
+			}
+		}
+	}
 }
 
 
@@ -270,6 +293,9 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/23 18:57:15  fplanque
+ * filter handling fixes
+ *
  * Revision 1.1  2007/06/25 10:58:57  fplanque
  * MODULES (refactored MVC)
  *

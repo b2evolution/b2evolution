@@ -66,6 +66,8 @@ function init_MainList( $items_nb_limit )
 		// pre_dump( $MainList->default_filters );
 		$MainList->load_from_Request( false );
 		// pre_dump( $MainList->filters );
+		// echo '<br/>'.( $MainList->is_filtered() ? 'filtered' : 'NOT filtered' );
+		// $MainList->dump_active_filters();
 
 		// Run the query:
 		$MainList->query();
@@ -618,6 +620,9 @@ function visibility_select( & $Form, $post_status )
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/23 18:57:15  fplanque
+ * filter handling fixes
+ *
  * Revision 1.4  2007/09/07 20:11:18  fplanque
  * Better category selector
  *

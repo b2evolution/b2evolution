@@ -186,8 +186,9 @@ class ItemListLight extends DataObjectList2
 	 * This will also set back the GLOBALS !!! needed for regenerate_url().
 	 *
 	 * @param array
+	 * @param boolean
 	 */
-	function set_filters( $filters )
+	function set_filters( $filters, $memorize = true )
 	{
 		// Activate the filterset (fallback to default filter when a value is not set):
 		$this->filters = array_merge( $this->default_filters, $filters );
@@ -195,111 +196,116 @@ class ItemListLight extends DataObjectList2
 		// Activate preset filters if necessary:
 		$this->activate_preset_filters();
 
-		// set back the GLOBALS !!! needed for regenerate_url() :
-
-		/*
-		 * Selected filter preset:
-		 */
-		memorize_param( $this->param_prefix.'filter_preset', 'string', $this->default_filters['filter_preset'], $this->filters['filter_preset'] );  // List of authors to restrict to
-
-
-		/*
-		 * Blog & Chapters/categories restrictions:
-		 */
-		// Get chapters/categories (and compile those values right away)
-		memorize_param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', $this->default_filters['cat_modifier'], $this->filters['cat_modifier'] );  // List of authors to restrict to
-		memorize_param( 'catsel', 'array', $this->default_filters['cat_array'], $this->filters['cat_array'] );
-		memorize_param( $this->param_prefix.'cat_focus', 'string', $this->default_filters['cat_focus'], $this->filters['cat_focus'] );  // Categories to search on
-		// TEMP until we get this straight:
-		// fp> this would only be used for the categories widget and setting it here overwtrites the interesting values when a post list widget is tirggered
-		// fp> if we need it here we want to use a $set_globals params to this function
-		// global $cat_array, $cat_modifier;
-		// $cat_array = $this->default_filters['cat_array'];
-		// $cat_modifier = $this->default_filters['cat_modifier'];
-
-
-		/*
-		 * Restrict to selected tags:
-		 */
-		memorize_param( $this->param_prefix.'tags', 'string', $this->default_filters['tags'], $this->filters['tags'] );
-
-
-		/*
-		 * Restrict to selected authors:
-		 */
-		memorize_param( $this->param_prefix.'author', 'string', $this->default_filters['authors'], $this->filters['authors'] );  // List of authors to restrict to
-
-		/*
-		 * Restrict to selected assignees:
-		 */
-		memorize_param( $this->param_prefix.'assgn', 'string', $this->default_filters['assignees'], $this->filters['assignees'] );  // List of assignees to restrict to
-
-		/*
-		 * Restrict to selected author OR assignee:
-		 */
-		memorize_param( $this->param_prefix.'author_assignee', 'string', $this->default_filters['author_assignee'], $this->filters['author_assignee'] );
-
-		/*
-		 * Restrict to selected locale:
-		 */
-		memorize_param( $this->param_prefix.'lc', 'string', $this->default_filters['lc'], $this->filters['lc'] );  // Locale to restrict to
-
-		/*
-		 * Restrict to selected statuses:
-		 */
-		memorize_param( $this->param_prefix.'status', 'string', $this->default_filters['statuses'], $this->filters['statuses'] );  // List of statuses to restrict to
-
-		/*
-		 * Restrict to selected item type:
-		 */
-		memorize_param( $this->param_prefix.'types', 'integer', $this->default_filters['types'], $this->filters['types'] );  // List of item types to restrict to
-
-		/*
-		 * Restrict by keywords
-		 */
-		memorize_param( $this->param_prefix.'s', 'string', $this->default_filters['keywords'], $this->filters['keywords'] );			 // Search string
-		memorize_param( $this->param_prefix.'sentence', 'string', $this->default_filters['phrase'], $this->filters['phrase'] ); // Search for sentence or for words
-		memorize_param( $this->param_prefix.'exact', 'integer', $this->default_filters['exact'], $this->filters['exact'] );     // Require exact match of title or contents
-
-		/*
-		 * Specific Item selection?
-		 */
-		memorize_param( $this->param_prefix.'m', 'integer', $this->default_filters['ymdhms'], $this->filters['ymdhms'] );          // YearMonth(Day) to display
-		memorize_param( $this->param_prefix.'w', 'integer', $this->default_filters['week'], $this->filters['week'] );            // Week number
-		memorize_param( $this->param_prefix.'dstart', 'integer', $this->default_filters['ymdhms_min'], $this->filters['ymdhms_min'] ); // YearMonth(Day) to start at
-		memorize_param( $this->param_prefix.'dstop', 'integer', $this->default_filters['ymdhms_max'], $this->filters['ymdhms_max'] ); // YearMonth(Day) to start at
-
-		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
-		if( is_null($this->default_filters['ts_min'])
-			&& is_null($this->default_filters['ts_max'] ) )
-		{	// We have not set a strict default -> we allow overridding:
-			memorize_param( $this->param_prefix.'show_past', 'integer', 0, ($this->filters['ts_min'] == 'now') ? 0 : 1 );
-			memorize_param( $this->param_prefix.'show_future', 'integer', 0, ($this->filters['ts_max'] == 'now') ? 0 : 1 );
-		}
-
-		/*
-		 * Restrict to the statuses we want to show:
-		 */
-		// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
-		memorize_param( $this->param_prefix.'show_statuses', 'array', $this->default_filters['visibility_array'], $this->filters['visibility_array'] );	// Array of sharings to restrict to
-
-		/*
-		 * OLD STYLE orders:
-		 */
-		memorize_param( $this->param_prefix.'order', 'string', $this->default_filters['order'], $this->filters['order'] );   		// ASC or DESC
-		memorize_param( $this->param_prefix.'orderby', 'string', $this->default_filters['orderby'], $this->filters['orderby'] );  // list of fields to order by (TODO: change that crap)
-
-		/*
-		 * Paging limits:
-		 */
-		memorize_param( $this->param_prefix.'unit', 'string', $this->default_filters['unit'], $this->filters['unit'] );    		// list unit: 'posts' or 'days'
-
-		memorize_param( $this->param_prefix.'posts', 'integer', $this->default_filters['posts'], $this->filters['posts'] ); 			// # of units to display on the page
+		// Funky oldstyle params:
 		$this->limit = $this->filters['posts']; // for compatibility with parent class
-
-		// 'paged'
-		memorize_param( $this->page_param, 'integer', 1, $this->filters['page'] );      // List page number in paged display
 		$this->page = $this->filters['page'];
+
+
+		if( $memorize )
+		{	// set back the GLOBALS !!! needed for regenerate_url() :
+
+			/*
+			 * Selected filter preset:
+			 */
+			memorize_param( $this->param_prefix.'filter_preset', 'string', $this->default_filters['filter_preset'], $this->filters['filter_preset'] );  // List of authors to restrict to
+
+
+			/*
+			 * Blog & Chapters/categories restrictions:
+			 */
+			// Get chapters/categories (and compile those values right away)
+			memorize_param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', $this->default_filters['cat_modifier'], $this->filters['cat_modifier'] );  // List of authors to restrict to
+			memorize_param( 'catsel', 'array', $this->default_filters['cat_array'], $this->filters['cat_array'] );
+			memorize_param( $this->param_prefix.'cat_focus', 'string', $this->default_filters['cat_focus'], $this->filters['cat_focus'] );  // Categories to search on
+			// TEMP until we get this straight:
+			// fp> this would only be used for the categories widget and setting it here overwtrites the interesting values when a post list widget is tirggered
+			// fp> if we need it here we want to use a $set_globals params to this function
+			// global $cat_array, $cat_modifier;
+			// $cat_array = $this->default_filters['cat_array'];
+			// $cat_modifier = $this->default_filters['cat_modifier'];
+
+
+			/*
+			 * Restrict to selected tags:
+			 */
+			memorize_param( $this->param_prefix.'tags', 'string', $this->default_filters['tags'], $this->filters['tags'] );
+
+
+			/*
+			 * Restrict to selected authors:
+			 */
+			memorize_param( $this->param_prefix.'author', 'string', $this->default_filters['authors'], $this->filters['authors'] );  // List of authors to restrict to
+
+			/*
+			 * Restrict to selected assignees:
+			 */
+			memorize_param( $this->param_prefix.'assgn', 'string', $this->default_filters['assignees'], $this->filters['assignees'] );  // List of assignees to restrict to
+
+			/*
+			 * Restrict to selected author OR assignee:
+			 */
+			memorize_param( $this->param_prefix.'author_assignee', 'string', $this->default_filters['author_assignee'], $this->filters['author_assignee'] );
+
+			/*
+			 * Restrict to selected locale:
+			 */
+			memorize_param( $this->param_prefix.'lc', 'string', $this->default_filters['lc'], $this->filters['lc'] );  // Locale to restrict to
+
+			/*
+			 * Restrict to selected statuses:
+			 */
+			memorize_param( $this->param_prefix.'status', 'string', $this->default_filters['statuses'], $this->filters['statuses'] );  // List of statuses to restrict to
+
+			/*
+			 * Restrict to selected item type:
+			 */
+			memorize_param( $this->param_prefix.'types', 'integer', $this->default_filters['types'], $this->filters['types'] );  // List of item types to restrict to
+
+			/*
+			 * Restrict by keywords
+			 */
+			memorize_param( $this->param_prefix.'s', 'string', $this->default_filters['keywords'], $this->filters['keywords'] );			 // Search string
+			memorize_param( $this->param_prefix.'sentence', 'string', $this->default_filters['phrase'], $this->filters['phrase'] ); // Search for sentence or for words
+			memorize_param( $this->param_prefix.'exact', 'integer', $this->default_filters['exact'], $this->filters['exact'] );     // Require exact match of title or contents
+
+			/*
+			 * Specific Item selection?
+			 */
+			memorize_param( $this->param_prefix.'m', 'integer', $this->default_filters['ymdhms'], $this->filters['ymdhms'] );          // YearMonth(Day) to display
+			memorize_param( $this->param_prefix.'w', 'integer', $this->default_filters['week'], $this->filters['week'] );            // Week number
+			memorize_param( $this->param_prefix.'dstart', 'integer', $this->default_filters['ymdhms_min'], $this->filters['ymdhms_min'] ); // YearMonth(Day) to start at
+			memorize_param( $this->param_prefix.'dstop', 'integer', $this->default_filters['ymdhms_max'], $this->filters['ymdhms_max'] ); // YearMonth(Day) to start at
+
+			// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
+			if( is_null($this->default_filters['ts_min'])
+				&& is_null($this->default_filters['ts_max'] ) )
+			{	// We have not set a strict default -> we allow overridding:
+				memorize_param( $this->param_prefix.'show_past', 'integer', 0, ($this->filters['ts_min'] == 'now') ? 0 : 1 );
+				memorize_param( $this->param_prefix.'show_future', 'integer', 0, ($this->filters['ts_max'] == 'now') ? 0 : 1 );
+			}
+
+			/*
+			 * Restrict to the statuses we want to show:
+			 */
+			// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
+			memorize_param( $this->param_prefix.'show_statuses', 'array', $this->default_filters['visibility_array'], $this->filters['visibility_array'] );	// Array of sharings to restrict to
+
+			/*
+			 * OLD STYLE orders:
+			 */
+			memorize_param( $this->param_prefix.'order', 'string', $this->default_filters['order'], $this->filters['order'] );   		// ASC or DESC
+			memorize_param( $this->param_prefix.'orderby', 'string', $this->default_filters['orderby'], $this->filters['orderby'] );  // list of fields to order by (TODO: change that crap)
+
+			/*
+			 * Paging limits:
+			 */
+			memorize_param( $this->param_prefix.'unit', 'string', $this->default_filters['unit'], $this->filters['unit'] );    		// list unit: 'posts' or 'days'
+
+			memorize_param( $this->param_prefix.'posts', 'integer', $this->default_filters['posts'], $this->filters['posts'] ); 			// # of units to display on the page
+
+			// 'paged'
+			memorize_param( $this->page_param, 'integer', 1, $this->filters['page'] );      // List page number in paged display
+		}
 	}
 
 
@@ -311,6 +317,12 @@ class ItemListLight extends DataObjectList2
 	 */
 	function load_from_Request( $use_filters = true )
 	{
+		// fp> 2007-09-23> Let's always start with clean filters.
+		// If we don't do this, then $this->filters will end up with filters in a different order than $this->default_filters.
+		// And orders are different, then $this->is_filtered() will say it's filtered even if it's not.
+		$this->filters = $this->default_filters;
+
+
 		if( $use_filters )
 		{
 			// Do we want to restore filters or do we want to create a new filterset
@@ -477,7 +489,7 @@ class ItemListLight extends DataObjectList2
 			return true;
 		}
 
-		// echo ' Got filters from URL?:'.($this->is_filtered() ? 'YES' : 'NO');
+		//echo ' Got filters from URL?:'.($this->is_filtered() ? 'YES' : 'NO');
 		//pre_dump( $this->default_filters );
 		//pre_dump( $this->filters );
 
@@ -1450,6 +1462,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/23 18:57:15  fplanque
+ * filter handling fixes
+ *
  * Revision 1.4  2007/09/19 20:03:18  yabs
  * minor bug fix ( http://forums.b2evolution.net/viewtopic.php?p=60493#60493 )
  *
