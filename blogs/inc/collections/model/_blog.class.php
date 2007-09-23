@@ -276,9 +276,23 @@ class Blog extends DataObject
 			$this->set_setting( 'archive_links', get_param( 'archive_links' ) );
 		}
 
-		if( param( 'chapter_links',   'string', NULL ) !== NULL )
+		if( ($chapter_links = param( 'chapter_links', 'string', NULL )) !== NULL )
 		{ // Chapter link type:
-			$this->set_setting( 'chapter_links', get_param( 'chapter_links' ) );
+			$this->set_setting( 'chapter_links', $chapter_links  );
+			if( $chapter_links == 'chapters_prefix' ){
+				$category_prefix = param( 'category_prefix', 'string', NULL );
+				if( ! preg_match( '|^[A-Za-z0-9\-]+$|', $category_prefix)
+						|| preg_match( '|^[A-Za-z][0-9]*$|', $category_prefix ) )
+				{
+						$Messages->add( T_('Categories Prefix').': '
+														.T_('Invalid prefix for categories'), 'error' );
+				}
+				$this->set_setting( 'category_prefix', $category_prefix);
+				} 
+				else
+				{
+					$this->set_setting( 'category_prefix', '');
+				}
 		}
 
 		if( param( 'single_links',   'string', NULL ) !== NULL )
@@ -442,11 +456,11 @@ class Blog extends DataObject
 						$Messages->add( T_('Blog Folder URL').': '
 														.T_('You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!'), 'error' );
 					}
-  				$this->set( 'siteurl', $blog_siteurl );
+	 				$this->set( 'siteurl', $blog_siteurl );
 				}
 				else
 				{
-  				$this->set( 'siteurl', '' );
+	 				$this->set( 'siteurl', '' );
 				}
 			}
 
@@ -775,7 +789,6 @@ class Blog extends DataObject
 		 */
 		global $current_User;
 		global $default_post_status;
-
 		if( empty( $status ) )
 		{
 			$status = $default_post_status;
@@ -1128,7 +1141,6 @@ class Blog extends DataObject
 	function get_setting( $parname )
 	{
 		$this->load_CollectionSettings();
-
 		return $this->CollectionSettings->get( $this->ID, $parname );
 	}
 
@@ -1391,6 +1403,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/23 16:10:35  waltercruz
+ * Adding a option to categories URL to have a user configurable prefix
+ *
  * Revision 1.2  2007/09/10 13:24:13  waltercruz
  * Mispelled word correction
  *

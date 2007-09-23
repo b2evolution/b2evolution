@@ -199,6 +199,11 @@ class Chapter extends GenericCategory
 			default:
 				return url_add_tail( $blogurl, '/'.$this->get_url_path() );
 				/* break; */
+			case 'chapters_prefix':
+			default:
+				$prefix = $this->Blog->get_setting( 'category_prefix' );
+				return url_add_tail( $blogurl, '/'. $prefix . '/' . $this->get_url_path() );
+				/* break; */
 		}
 	}
 
@@ -276,6 +281,9 @@ class Chapter extends GenericCategory
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/23 16:10:35  waltercruz
+ * Adding a option to categories URL to have a user configurable prefix
+ *
  * Revision 1.1  2007/06/25 10:59:25  fplanque
  * MODULES (refactored MVC)
  *

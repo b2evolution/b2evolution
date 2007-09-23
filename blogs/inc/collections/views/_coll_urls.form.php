@@ -196,6 +196,9 @@ $Form->begin_fieldset( T_('Category URLs') );
 								.url_add_tail( $blogurl, '/subcat/' ) ),
 				array( 'chapters', T_('Use extra-path: category path'), T_('Category links will look like ' )
 								.url_add_tail( $blogurl, '/cat/subcat/' ) ),
+				array( 'chapters_prefix', T_('Use extra-path: category path (with prefix)'), T_('Category links will look like ' )
+								.url_add_tail( $blogurl, '/prefix/cat/subcat/' ) .'<input type="text" id="category_prefix" name="category_prefix" size="50" maxlength="120" value="'
+								.format_to_output($edited_Blog->get_setting( 'category_prefix' ), 'formvalue' ) . '" />'),
 			), T_('Category links'), true );
 
 $Form->end_fieldset();
@@ -234,6 +237,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/23 16:10:35  waltercruz
+ * Adding a option to categories URL to have a user configurable prefix
+ *
  * Revision 1.1  2007/06/25 10:59:38  fplanque
  * MODULES (refactored MVC)
  *
