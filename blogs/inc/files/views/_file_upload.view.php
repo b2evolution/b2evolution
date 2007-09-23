@@ -182,7 +182,7 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 
 		if( count( $failedFiles ) )
 		{
-			Log::display( '', '', T_('Some file uploads failed. Please check the errors below.'), 'error' );
+			echo '<p class="error">'.T_('Some file uploads failed. Please check the errors below.').'</p>';
 		}
 		?>
 
@@ -208,7 +208,7 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 						{ // This is a failed upload:
 							echo '<li class="invalid" title="'
 											./* TRANS: will be displayed as title for failed file uploads */ T_('Invalid submission.').'">';
-							Log::display( '', '', $lMessage, 'error' );
+							echo '<p class="error">'.$lMessage.'</p>';
 						}
 						else
 						{ // Not a failed upload, display normal block:
@@ -303,6 +303,9 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/23 18:55:16  fplanque
+ * attempting to debloat. The Log class is insane.
+ *
  * Revision 1.1  2007/06/25 11:00:05  fplanque
  * MODULES (refactored MVC)
  *

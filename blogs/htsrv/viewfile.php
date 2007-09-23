@@ -221,12 +221,12 @@ switch( $viewtype )
 		}
 		else
 		{
-			Log::display( '', '', sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selected_File->get_rdfs_rel_path( $selected_File ) ), 'error' );
+			echo '<p class="error">'.sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selected_File->get_rdfs_rel_path( $selected_File ) ).'</p>';
 		}
 		break;
 
 	default:
-			Log::display( '', '', sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selected_File->dget('name') ), 'error' );
+		echo '<p class="error">'.sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selected_File->dget('name') ).'</p>';
 		break;
 }
 
@@ -239,6 +239,9 @@ debug_info();
 <?php
 /*
  * $Log$
+ * Revision 1.16  2007/09/23 18:55:17  fplanque
+ * attempting to debloat. The Log class is insane.
+ *
  * Revision 1.15  2007/04/26 00:11:14  fplanque
  * (c) 2007
  *

@@ -76,12 +76,6 @@ class Log
 	var $foot = '';
 
 	/**
-	 * Should {@link Log::add()} automatically output the messages?
-	 * @var boolean
-	 */
-	var $dump_add = false;
-
-	/**
 	 * Cache for {@link Log::count()}
 	 * @var array
 	 */
@@ -135,7 +129,7 @@ class Log
 	 *        Can also be an array of categories to add the same message to.
 	 * @param boolean Dump (output) this directly?
 	 */
-	function add( $message, $category = NULL, $dump_this_add = false )
+	function add( $message, $category = NULL )
 	{
 		if( $category === NULL )
 		{ // By default, we use the default category:
@@ -158,12 +152,6 @@ class Log
 				$this->_count[$category] = 0;
 			}
 			$this->_count[$category]++;
-
-
-			if( $this->dump_add || $dump_this_add )
-			{
-				Log::display( '', '', $message, $category );
-			}
 		}
 	}
 
@@ -284,11 +272,12 @@ class Log
 				return;
 			}
 
-			echo $before;
+			$disp = $this->display( NULL, NULL, false, 'all', NULL, NULL, NULL );
 
-			$this->display( NULL, NULL, true, 'all', NULL, NULL, NULL );
-
-			echo $after;
+			if( !empty( $disp ) )
+			{
+				echo $before.$disp.$after;
+			}
 		}
 	}
 
@@ -305,13 +294,6 @@ class Log
 	 *   and set a css class for it (by default 'log_'.$category gets used).
 	 * - You can suppress the outer div or set a css class for it (defaults to
 	 *   'log_container').
-	 *
-	 * You can also call this function static (without creating an object), like:
-	 *   <code>
-	 *   Log::display( 'head', 'foot', 'message' );
-	 *   </code>
-	 *   Please note: when called static, it will always display, because $display
-	 *                equals true.
 	 *
 	 * @todo Make this simple!
 	 * start by getting rid of the $category selection and the special cases for 'all'. If you don't want to display ALL messages,
@@ -344,11 +326,8 @@ class Log
 		{
 			$category = isset( $this, $this->defaultcategory ) ? $this->defaultcategory : 'error';
 		}
-		if( !is_bool($display) )
-		{ // We have just a string - static use case
-			$messages = array( $category => array($display) );
-		}
-		elseif( !$this->count( $category ) )
+
+		if( !$this->count( $category ) )
 		{ // no messages
 			return false;
 		}
@@ -440,52 +419,6 @@ class Log
 		}
 
 		return $disp;
-	}
-
-
-	/**
-	 * Wrapper for {@link Log::display()}: use header/footer dependent on message count
-	 * (one or more).
-	 *
-	 * @param string header/title for one message (default: empty), might be array
-	 *               ( category => msg ), 'container' is then top
-	 * @param string|NULL header/title (if more than one message) - NULL means "use $head1"
-	 * @param string footer (if one message) (default: empty), might be array
-	 *               ( category => msg ), 'container' is then bottom
-	 * @param string|NULL footer (if more than one message) - NULL means "use $foot1"
-	 * @param boolean to display or return (default: true)
-	 * @param mixed the category of messages to use (category, 'all', or list of categories (array); NULL for default category)
-	 * @param string the CSS class of the messages div tag (default: 'log_'.$category)
-	 * @param string the style to use, 'ul', 'p', 'br'
-	 *               (default: 'br' for single message, 'ul' for more)
-	 * @param mixed the outer div, may be false
-	 * @return boolean false, if no messages; else true (and outputs if $display)
-	 */
-	function display_cond( $head1 = '', $head_more = '', $foot1 = '', $foot_more = '',
-													$display = true, $category = 'all', $cssclass = NULL,
-													$style = NULL, $outerdivclass = 'log_container' )
-	{
-		if( is_null( $head_more ) )
-		{
-			$head_more = $head1;
-		}
-
-		if( is_null( $foot_more ) )
-		{
-			$foot_more = $foot1;
-		}
-
-		switch( $this->count( $category ) )
-		{
-			case 0:
-				return false;
-
-			case 1:
-				return $this->display( $head1, $foot1, $display, $category, $cssclass, $style );
-
-			default:
-				return $this->display( $head_more, $foot_more, $display, $category, $cssclass, $style );
-		}
 	}
 
 
@@ -676,14 +609,6 @@ class Log_noop {
 	/**
 	 * This is a no-operation method.
 	 */
-	function display_cond()
-	{
-	}
-
-
-	/**
-	 * This is a no-operation method.
-	 */
 	function display_paragraphs()
 	{
 	}
@@ -709,6 +634,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/23 18:55:17  fplanque
+ * attempting to debloat. The Log class is insane.
+ *
  * Revision 1.1  2007/06/25 10:58:55  fplanque
  * MODULES (refactored MVC)
  *

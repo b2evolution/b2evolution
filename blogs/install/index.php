@@ -150,8 +150,6 @@ if( $config_is_done || (($action != 'start') && ($action != 'default') && ($acti
 
 	if( $DB->error )
 	{ // restart conf
-		// TODO: Use title/headline, or just:
-		// Log::display( T_('MySQL error!'), '', T_('Check your database config settings below and update them if necessary...') );
 		echo '<p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p>';
 		$action = 'start';
 	}
@@ -680,6 +678,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.138  2007/09/23 18:55:17  fplanque
+ * attempting to debloat. The Log class is insane.
+ *
  * Revision 1.137  2007/09/19 02:54:16  fplanque
  * bullet proof upgrade
  *

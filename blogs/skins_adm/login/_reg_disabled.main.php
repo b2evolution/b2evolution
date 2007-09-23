@@ -33,7 +33,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $page_title = T_('Registration Currently Disabled');
 require dirname(__FILE__).'/_html_header.inc.php';
 
-Log::display( '', '', T_('User registration is currently not allowed.'), 'error' );
+echo '<p class="error">'.T_('User registration is currently not allowed.').'</p>';
 
 ?>
 <p class="center">
@@ -45,6 +45,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/23 18:55:17  fplanque
+ * attempting to debloat. The Log class is insane.
+ *
  * Revision 1.1  2007/06/25 11:02:39  fplanque
  * MODULES (refactored MVC)
  *

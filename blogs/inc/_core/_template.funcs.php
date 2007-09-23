@@ -84,12 +84,13 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 		case 'comments':
 			// We are requesting the latest comments:
 			global $Item;
-			if (isset( $Item )){
-			$r[] = sprintf( /* TRANS: %s is an item title */ T_('Latest comments on %s'), $Item->get('title') );
+			if( isset( $Item ) )
+			{
+				$r[] = sprintf( /* TRANS: %s is an item title */ T_('Latest comments on %s'), $Item->get('title') );
 			}
 			else
 			{
-			$r[] = T_('Latest comments');
+				$r[] = T_('Latest comments');
 			}
 			break;
 
@@ -337,6 +338,9 @@ function include_headlines()
 
 /*
  * $Log$
+ * Revision 1.6  2007/09/23 18:55:17  fplanque
+ * attempting to debloat. The Log class is insane.
+ *
  * Revision 1.5  2007/09/13 23:39:50  blueyed
  * trans: use printf
  *
