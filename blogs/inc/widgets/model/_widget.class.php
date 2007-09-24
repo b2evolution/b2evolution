@@ -553,7 +553,7 @@ class ComponentWidget extends DataObject
 
 		echo $this->disp_params['block_start'];
 
-		$this->disp_title( $this->disp_params, T_('Blogs') );
+		$this->disp_title( T_('Blogs') );
 
 		echo $this->disp_params['list_start'];
 
@@ -646,6 +646,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2007/09/24 12:08:24  yabs
+ * minor bug fix
+ *
  * Revision 1.6  2007/09/23 18:57:15  fplanque
  * filter handling fixes
  *
