@@ -33,6 +33,8 @@ $params = array_merge( array(
 		'disp_pingbacks'	   =>	true,
 		'before_section_title' => '<h3>',
 		'after_section_title'  => '</h3>',
+		'form_title_start' => '<h3>',
+		'form_title_end'  => '</h3>',
 	), $params );
 
 
@@ -266,9 +268,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	}
 
 
-	echo $params['before_section_title'];
+	echo $params['form_title_start'];
 	echo T_('Leave a comment');
-	echo $params['after_section_title'];
+	echo $params['form_title_end'];
 
 
 	$Form = & new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID );
@@ -370,6 +372,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.6  2007/09/26 21:54:00  fplanque
+ * minor
+ *
  * Revision 1.5  2007/09/16 22:07:06  fplanque
  * cleaned up feedback form
  *
