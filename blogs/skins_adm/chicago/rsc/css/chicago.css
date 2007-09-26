@@ -310,42 +310,56 @@ table.tabs td.current a:hover {
 /*
  * Result tables:
  */
-table.grouped {
+table.grouped,
+#fm_browser,
+table.filelist {
 	margin-top: 0;
 	border-color: #9db0bc;
 }
-table.grouped tr.filters td {
+table.grouped tr.filters td,
+#fm_bar,
+table.filelist tr.listfooter td {
 	background-color: #E0E9F0;
 	border-color: #9db0bc;
 }
-table.grouped th {
+table.grouped th,
+table.filelist th {
 	background-color: #CCDCE6;
 	padding: 0;
 	border-color: #9db0bc;
 }
 table.grouped th a.basic_sort_link,
-table.grouped th span {
+table.grouped th span,
+table.filelist th a.basic_sort_link,
+table.filelist th span {
 	display: block;
 	padding: 2px 8px;
 }
-table.grouped th a.basic_sort_link:hover {
+table.grouped th a.basic_sort_link:hover,
+table.filelist th a.basic_sort_link:hover {
 	background-color: #BACEDF;
 }
-table.grouped th a.basic_current {
+table.grouped th a.basic_current,
+table.filelist th a.basic_current {
 	padding: 2px 8px;
 	background-color: #BACEDF;
 }
-table.grouped tr.even {
+table.grouped tr.even,
+table.filelist tr.even {
 	background-color: #fff;
 }
-table.grouped tr.odd {
+table.grouped tr.odd,
+table.filelist tr.odd {
 	background-color: #f1f6f8;
 }
 table.grouped tr.even:hover,
-table.grouped tr.odd:hover {
+table.grouped tr.odd:hover,
+table.filelist tr.even:hover,
+table.filelist tr.odd:hover {
 	background-color: #DBE5ED;
 }
-table.grouped td {
+table.grouped td,
+table.filelist td {
 	border-color: #9db0bc;
 }
 table.grouped tr.group td {
@@ -741,6 +755,24 @@ div.edit_actions {
 	text-align: right;
 }
 
+
+/*
+ * File manager:
+ */
+#fm_browser {
+	margin: 0;
+}
+#fm_dirtree {
+	border-color: #9db0bc;
+	background-color: #fff;
+}
+#fm_files {
+	border-color: #9db0bc;
+	background-color: #E0E9F0;
+}
+.toolbaritem  {
+	padding: 4px 0;
+}
 
 /*
  * Permissions:

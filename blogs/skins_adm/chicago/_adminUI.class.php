@@ -283,6 +283,14 @@ class AdminUI extends AdminUI_general
 				);
 			// TODO: add default settings for 'table', 'fieldset', etc...
 
+			case 'file_browser':
+				return array(
+						'block_start' => '<div class="block_item_wrap"><div class="fieldset_title"><div class="fieldset_title_right"><div class="fieldset_title_bg">
+																		<span style="float:right">$global_icons$</span>$title$
+																	</div></div></div>',
+						'block_end' => '</div>',
+					);
+
 			case 'block_item':
 				return array(
 						'block_start' => '<div class="block_item_wrap"><div class="fieldset_title"><div class="fieldset_title_right"><div class="fieldset_title_bg">

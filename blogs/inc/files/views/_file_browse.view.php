@@ -58,9 +58,28 @@ global $UserSettings;
 
 global $fm_hide_dirtree, $create_name, $ads_list_path, $rsc_url;
 
+global $fm_FileRoot, $path;
+
+/**
+ * @var Item
+ */
+global $edited_Item;
 ?>
 
 <!-- FILE BROWSER -->
+
+<?php
+	$Widget = & new Widget( 'file_browser' );
+	$Widget->global_icon( T_('Upload...'), '', 'admin.php?ctrl=upload&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path), T_('Upload').' &raquo;', 1, 5 );
+
+	if( !empty($edited_Item) )
+	{ // Return to post editing:
+		$Widget->global_icon( T_('Close file manager'), 'close', '?ctrl=items&amp;p='.$edited_Item->ID );
+	}
+
+	$Widget->title = T_('File browser');
+	$Widget->disp_template_replaced( 'block_start' );
+?>
 
 <table id="fm_browser" cellspacing="0" cellpadding="0">
 	<thead>
@@ -333,11 +352,14 @@ global $fm_hide_dirtree, $create_name, $ads_list_path, $rsc_url;
 	</tbody>
 </table>
 
-<img src="'.$rsc_url.'/img/blank.gif" width="1" height="1" /><!-- for IE -->
-
 <?php
+	$Widget->disp_template_raw( 'block_end' );
+
 /*
  * $Log$
+ * Revision 1.3  2007/09/26 21:53:23  fplanque
+ * file manager / file linking enhancements
+ *
  * Revision 1.2  2007/09/03 19:36:06  fplanque
  * chicago admin skin
  *

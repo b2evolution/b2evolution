@@ -65,7 +65,6 @@ switch( $action )
 		}
 		else
 		{	// We could not find the link to edit:
-			$Messages->head = T_('Cannot edit link!');
 			$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
 			unset( $edited_Link );
 			unset( $link_ID );
@@ -495,6 +494,8 @@ switch( $action )
 		$p = $edited_Item->ID;
 		init_list_mode();
 		$action = 'view';
+		// REDIRECT / EXIT
+ 		header_redirect( regenerate_url( '', 'p='.$edited_Item->ID, '', '&' ) );
 		break;
 
 
@@ -746,6 +747,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2007/09/26 21:53:24  fplanque
+ * file manager / file linking enhancements
+ *
  * Revision 1.6  2007/09/22 19:23:56  fplanque
  * various fixes & enhancements
  *

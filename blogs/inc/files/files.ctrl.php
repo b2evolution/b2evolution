@@ -2,10 +2,12 @@
 /**
  * This file implements the UI controller for file management.
  *
- * NOTE: $fm_mode gets used for modes, that allow browsing to some other place or
- *       take other actions.
+ * NOTE: $fm_mode is used for modes. Modes stay visible when browsing to a different location.
+ * Examples of modes: link item, copy file.
+ * Actions disappear if you browse to a different location.
+ * Examples of actions: file properties, file edit.
  *
- * fp>> There should actually be less modes. Only geeks can understand & use them. And not all geeks might actually ever find an opportunity to want to use them. All we need is a dir selection tree inside of upload and move.
+ * fp>> Movr/copy should not be a mode (too geeky). All we need is a dir selection tree inside of upload and move.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -89,11 +91,17 @@ else
 
 
 /**
- * @global string The file manager mode we're in ('fm_upload', 'fm_cmr')
+ * @global string The file manager mode we're in ('fm_upload', 'fm_move')
  */
 $fm_mode = param( 'fm_mode', 'string', NULL, true );
 
 $action = param_action();
+
+if( !empty($action) && $fm_mode != 'link_item' )
+{	// The only mode which can tolerate simultaneous actions at this time is link_item
+	// file_move & file_copy shouldn't actually be modes
+	$fm_mode = '';
+}
 
 // Get root:
 $ads_list_path = false; // false by default, gets set if we have a valid root
@@ -372,9 +380,6 @@ switch( $action )
 	case 'update_file':
 		// Update File:
 
-		// Exit any special mode we may have been in:
-		$fm_mode = NULL;
-
 		if( $demo_mode )
 		{
 			$Messages->add( 'Sorry, you cannot update files in demo mode!', 'error' );
@@ -390,8 +395,6 @@ switch( $action )
 		if( ! $edit_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
 		{
 			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edit_File->dget('name') ), 'error' );
-	 		// Leave special display mode:
-			$fm_mode = NULL;
 			break;
 		}
 
@@ -470,7 +473,6 @@ if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 	$LinkCache = & get_Cache( 'LinkCache' );
 	if( ($edited_Link = & $LinkCache->get_by_ID( $link_ID, false )) === false )
 	{	// We could not find the link to edit:
-		$Messages->head = T_('Cannot edit link!');
 		$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
 		unset( $edited_Link );
 		forget_param( 'link_ID' );
@@ -495,16 +497,12 @@ if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 	}
 }
 
-
 switch( $action )
 {
 	case 'download':
 		// TODO: We don't need the Filelist, move UP!
 		// TODO: provide optional zip formats (tgz, ..) - the used lib provides more..
 		// TODO: use "inmemory"=>false, so that you can download bigger archives faster!
-
-		// Exit any special mode we may have been in:
-		$fm_mode = NULL;
 
 		$action_title = T_('Download');
 
@@ -567,9 +565,6 @@ switch( $action )
 	case 'rename':
 		// TODO: We don't need the Filelist, move UP!
 		// Rename a file:
-
-		// Exit any special mode we may have been in:
-		$fm_mode = NULL;
 
 		// This will not allow to overwrite existing files, the same way Windows and MacOS do not allow it. Adding an option will only clutter the interface and satisfy geeks only.
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
@@ -655,18 +650,16 @@ switch( $action )
 						$old_name, $new_name ), 'success' );
 			}
 
-			$action = 'list';
+			// REDIRECT / EXIT
+ 			header_redirect( regenerate_url( '', '', '', '&' ) );
+ 		  // $action = 'list';
 		}
-
 		break;
 
 
 	case 'delete':
 		// TODO: We don't need the Filelist, move UP!
 		// Delete a file or directory:
-
-		// Exit any special mode we may have been in:
-		$fm_mode = NULL;
 
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
@@ -737,9 +730,6 @@ switch( $action )
 	case 'make_posts':
 		// TODO: We don't need the Filelist, move UP!
 		// Make posts with selected images:
-
-		// Exit any special mode we may have been in:
-		$fm_mode = NULL;
 
 		if( ! $selected_Filelist->count() )
 		{
@@ -842,9 +832,6 @@ switch( $action )
 		// TODO: We don't need the Filelist, move UP!
 		// Edit Text File
 
-		// Exit any special mode we may have been in:
-		$fm_mode = NULL;
-
 		// Check permission!
  		$current_User->check_perm( 'files', 'edit', true );
 
@@ -877,9 +864,6 @@ switch( $action )
 		// TODO: We don't need the Filelist, move UP!
 		// Edit File properties (Meta Data)
 
-		// Exit any special mode we may have been in:
-		$fm_mode = NULL;
-
 		// Check permission!
  		$current_User->check_perm( 'files', 'edit', true );
 
@@ -890,10 +874,7 @@ switch( $action )
 
 	case 'update_properties':
 		// TODO: We don't need the Filelist, move UP!
-		// Update File properties (Meta Data); on success this ends the file_properties mode: {{{
-
-		// Exit any special mode we may have been in:
-		$fm_mode = NULL;
+		// Update File properties (Meta Data); on success this ends the file_properties mode:
 
 		// Check permission!
  		$current_User->check_perm( 'files', 'edit', true );
@@ -915,10 +896,6 @@ switch( $action )
 		{
 			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $edit_File->dget('name') ), 'note' );
 		}
-
-		// Leave special display mode:
-		$fm_mode = NULL;
-		// }}}
 		break;
 
 
@@ -929,16 +906,16 @@ switch( $action )
 		// Note: we are not modifying any file here, we're just linking it
 		// we only need read perm on file, but we'll need write perm on destination object (to be checked below)
 
-		if( !$selected_Filelist->count() )
-		{
-			$Messages->add( T_('Nothing selected.'), 'error' );
-			break;
-		}
-
-		$edit_File = & $selected_Filelist->get_by_idx(0);
-
 		if( isset($edited_Item) )
 		{
+			if( !$selected_Filelist->count() )
+			{
+				$Messages->add( T_('Nothing selected.'), 'error' );
+				break;
+			}
+
+			$edit_File = & $selected_Filelist->get_by_idx(0);
+
 			// check item EDIT permissions:
 			$current_User->check_perm( 'item', 'edit', true, $edited_Item );
 
@@ -956,12 +933,18 @@ switch( $action )
 			$DB->commit();
 
 			$Messages->add( T_('Selected file has been linked to item.'), 'success' );
+
+			// In case the mode had been closed, reopen it:
+			$fm_mode = 'link_item';
 		}
 		// Plug extensions/hacks here!
 		else
 		{	// No Item to link to - end link_item mode.
 			$fm_mode = NULL;
 		}
+
+		// REDIRECT / EXIT
+ 		header_redirect( regenerate_url( '', '', '', '&' ) );
 		break;
 
 
@@ -974,6 +957,7 @@ switch( $action )
 
 		if( !isset( $edited_Link ) )
 		{
+			$action = 'list';
 			break;
 		}
 
@@ -990,15 +974,15 @@ switch( $action )
 		forget_param( 'link_ID' );
 
 		$Messages->add( $msg, 'success' );
+		$action = 'list';
+		// REDIRECT / EXIT
+ 		header_redirect( regenerate_url( '', '', '', '&' ) );
 		break;
 
 
 	case 'edit_perms':
 		// TODO: We don't need the Filelist, move UP!
 		// Edit file or directory permissions:
-
-		// Exit any special mode we may have been in:
-		$fm_mode = NULL;
 
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
@@ -1383,13 +1367,13 @@ $AdminUI->disp_body_top();
 </script>
 <?php
 
+$AdminUI->disp_payload_begin();
 
 /*
  * Display payload:
  */
 if( !empty($action ) && $action != 'list' && $action != 'nil' )
 {
-	$AdminUI->disp_payload_begin();
 
 	// Action displays:
 	switch( $action )
@@ -1428,9 +1412,8 @@ if( !empty($action ) && $action != 'list' && $action != 'nil' )
 			$AdminUI->disp_view( 'files/views/_file_browse_set.form.php' );
 			break;
 
-		default:
+		case 'download':
 			// Deferred action message:
-			// fp> When does this happen??
 			if( isset($action_title) )
 			{
 				echo "\n<h2>$action_title</h2>\n";
@@ -1451,16 +1434,12 @@ if( !empty($action ) && $action != 'list' && $action != 'nil' )
 				}
 			}
 	}
-
-	// End payload block:
-	$AdminUI->disp_payload_end();
 }
 
 
-// Begin payload block (if action, this is the second payload block)
-$AdminUI->disp_payload_begin();
-
-// FM modes displays:
+/*
+ * Diplay mode payload:
+ */
 switch( $fm_mode )
 {
 	case 'file_copy':
@@ -1492,6 +1471,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/26 21:53:24  fplanque
+ * file manager / file linking enhancements
+ *
  * Revision 1.2  2007/06/26 02:19:47  fplanque
  * fix
  *

@@ -266,8 +266,15 @@ class Table extends Widget
 	var $no_results_text;
 
 
-	function Table()
+	/**
+	 * Constructor
+	 *
+	 * @param string template name to get from $AdminUI
+	 */
+	function Table( $ui_template = NULL )
 	{
+		parent::Widget( $ui_template );
+
 		$this->no_results_text = T_('No results.');
 	}
 
@@ -818,6 +825,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/26 21:53:23  fplanque
+ * file manager / file linking enhancements
+ *
  * Revision 1.4  2007/09/04 13:23:18  fplanque
  * Fixed display for category screen.
  *

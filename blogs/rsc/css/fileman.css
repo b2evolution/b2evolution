@@ -99,6 +99,9 @@ table.filelist td {
 	border-left: 1px solid #bbb;
 	padding: 2px 4px;
 }
+table.filelist .firstcol {
+	border-left: none;
+}
 
 
 /* Table headers/footers: */
@@ -173,6 +176,7 @@ table.filelist td.perms {
 table.filelist tr.listfooter td {
 	/* Temporary colors, needs overriding */
 	border-top: 1px solid #bbb;
+	border-left: none;
 	background-color: #ddd;
 }
 

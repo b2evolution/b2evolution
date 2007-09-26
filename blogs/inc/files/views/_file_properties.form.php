@@ -35,7 +35,7 @@ global $edit_File;
 
 $Form = & new Form( NULL, 'fm_properties_checkchanges' );
 
-$Form->global_icon( T_('Close properties!'), 'close', regenerate_url('fm_mode') );
+$Form->global_icon( T_('Close properties!'), 'close', regenerate_url() );
 
 $Form->begin_form( 'fform', T_('File properties') );
 	$Form->hidden_ctrl();
@@ -74,6 +74,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/26 21:53:23  fplanque
+ * file manager / file linking enhancements
+ *
  * Revision 1.1  2007/06/25 11:00:05  fplanque
  * MODULES (refactored MVC)
  *

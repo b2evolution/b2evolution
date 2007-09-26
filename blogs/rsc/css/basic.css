@@ -117,10 +117,11 @@ div#evo_toolbar {
 	border-top: 1px solid ThreeDHighlight;
 	border-bottom: 1px solid ThreeDShadow;
 	text-align: left;
+	margin: 0;
 	/* font: menu; /* -- poorly supported */
 	font-size: 11px;
 	font-family: "Microsoft sans serif", sans-serif, Arial, Helvetica;
-	
+
 }
 div#evo_toolbar a {
 	border: 1px solid ThreeDFace;

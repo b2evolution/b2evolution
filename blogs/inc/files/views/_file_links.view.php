@@ -37,11 +37,8 @@ global $edited_Item;
 
 $Form = & new Form( NULL, 'fm_links', 'post', 'fieldset' );
 
-$Form->global_icon( T_('Quit link mode!'), 'close', regenerate_url( 'fm_mode' ) );
 
-$Form->begin_form( 'fform', sprintf( T_('Files linked to &laquo;%s&raquo; %s :'),
-				'<a href="?ctrl=items&amp;blog='.$edited_Item->blog_ID.'&amp;p='.$edited_Item->ID.'" title="'.T_('View this post...').'">'.$edited_Item->dget('title').'</a>',
-				$edited_Item->get_edit_link( '', '', get_icon( 'edit' ) ) ) );
+$Form->begin_form( 'fform' );
 
 $Form->hidden_ctrl();
 
@@ -52,7 +49,18 @@ $Results = & new Results(
 						WHERE link_itm_ID = '.$edited_Item->ID,
 					'link_' );
 
-$Results->title = T_('Existing links');
+$Results->title = sprintf( T_('Files linked to &laquo;%s&raquo;'),
+				'<a href="?ctrl=items&amp;blog='.$edited_Item->blog_ID.'&amp;p='.$edited_Item->ID.'" title="'
+				.T_('View this post...').'">'.$edited_Item->dget('title').'</a>' );
+
+if( $current_User->check_perm( 'item_post!'.$edited_Item->status, 'edit', false, $edited_Item ) )
+{ // User has permission to edit this post
+	$Results->global_icon( T_('Edit this post...'), 'edit', '?ctrl=items&amp;action=edit&amp;p='.$edited_Item->ID, T_('Edit') );
+}
+
+// Close link mode and continue in File Manager (remember the Item_ID though):
+$Results->global_icon( T_('Quit link mode!'), 'close', regenerate_url( 'fm_mode' ) );
+
 
 // TYPE COLUMN:
 function file_type( & $row )
@@ -139,6 +147,9 @@ $Form->end_form( );
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/26 21:53:23  fplanque
+ * file manager / file linking enhancements
+ *
  * Revision 1.1  2007/06/25 11:00:01  fplanque
  * MODULES (refactored MVC)
  *

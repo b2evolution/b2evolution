@@ -945,6 +945,13 @@ class AdminUI_general extends Widget
 				);
 			// TODO: add default settings for 'table', 'fieldset', etc...
 
+			case 'file_browser':
+				return array(
+						'block_start' => '<div class="block_item">
+															<h3><span style="float:right">$global_icons$</span>$title$</h3>',
+						'block_end' => '</div>',
+					);
+
 			case 'block_item':
 				return array(
 						'block_start' => '<div class="block_item">
@@ -1574,6 +1581,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.69  2007/09/26 21:53:23  fplanque
+ * file manager / file linking enhancements
+ *
  * Revision 1.68  2007/09/18 00:00:59  fplanque
  * firefox mac specific forms
  *
