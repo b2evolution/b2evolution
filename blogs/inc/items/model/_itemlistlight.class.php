@@ -322,7 +322,6 @@ class ItemListLight extends DataObjectList2
 		// And orders are different, then $this->is_filtered() will say it's filtered even if it's not.
 		$this->filters = $this->default_filters;
 
-
 		if( $use_filters )
 		{
 			// Do we want to restore filters or do we want to create a new filterset
@@ -338,6 +337,10 @@ class ItemListLight extends DataObjectList2
 					// We want to reset the memorized filterset:
 					global $Session;
 					$Session->delete( $this->filterset_name );
+
+					// Memorize global variables:
+					$this->set_filters( array(), true );
+
 					// We have applied no filterset:
 					return false;
 					/* BREAK */
@@ -558,10 +561,13 @@ class ItemListLight extends DataObjectList2
 
 		$filters = $Session->get( $this->filterset_name );
 
+		/*
+		fp> 2007-09-26> even if there are no filters, we need to "set" them in order to set global variables like $show_statuses
 		if( empty($filters) )
 		{ // We have no saved filters:
 			return false;
 		}
+		*/
 
 		$Debuglog->add( 'Restoring filterset <strong>'.$this->filterset_name.'</strong>', 'filters' );
 
@@ -1462,6 +1468,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.6  2007/09/26 20:26:36  fplanque
+ * improved ItemList filters
+ *
  * Revision 1.5  2007/09/23 18:57:15  fplanque
  * filter handling fixes
  *

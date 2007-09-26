@@ -34,6 +34,11 @@ global $Plugins;
 
 global $tab, $show_past, $show_future, $show_statuses, $s, $sentence, $exact, $author, $assgn, $status;
 
+/**
+ * @vat ItemList
+ */
+global $ItemList;
+
 load_funcs( 'skins/_skin.funcs.php' );
 
 $Widget = & new Widget();
@@ -55,7 +60,10 @@ echo $template['block_end'];
 
 $Widget = & new Widget();
 $Widget->title = T_('Filters');
-$Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 4, 4 );
+if( $ItemList->is_filtered() )
+{	// List is filtered, offer option to reset filters:
+	$Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 4, 4 );
+}
 echo $Widget->replace_vars( $template['block_start'] );
 
 	$Form = & new Form( NULL, 'resetform', 'get', 'none' );
@@ -248,8 +256,11 @@ echo $Widget->replace_vars( $template['block_start'] );
 
 		$Form->submit( array( 'submit', T_('Search'), 'search' ) );
 
-		// TODO: style this better:
-		echo '&nbsp; <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset">'.T_('Reset all filters!').'</a>';
+		if( $ItemList->is_filtered() )
+		{
+			// TODO: style this better:
+			echo '&nbsp; <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset">'.T_('Reset all filters!').'</a>';
+		}
 
 	$Form->end_form();
 
@@ -257,6 +268,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.7  2007/09/26 20:26:36  fplanque
+ * improved ItemList filters
+ *
  * Revision 1.6  2007/09/22 19:23:56  fplanque
  * various fixes & enhancements
  *

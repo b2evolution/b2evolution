@@ -67,6 +67,10 @@ if( $action == 'view' )
 else
 {	// We are displaying multiple posts
 	$block_item_Widget->title = T_('Full posts');
+	if( $ItemList->is_filtered() )
+	{	// List is filtered, offer option to reset filters:
+		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters') );
+	}
 	$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post').' &raquo;', 3, 4 );
 }
 
@@ -220,6 +224,9 @@ while( $Item = & $ItemList->get_item() )
 
 			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="ActionButton">'.T_('View...').'</a>';
 
+			echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_item&amp;item_ID='.$Item->ID )
+							.'" class="ActionButton">'.T_('Files...').'</a>';
+
 			// Display edit button if current user has the rights:
 			$Item->edit_link( ' ', ' ', '#', '#', 'ActionButton' );
 
@@ -358,6 +365,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/26 20:26:36  fplanque
+ * improved ItemList filters
+ *
  * Revision 1.4  2007/09/08 20:23:04  fplanque
  * action icons / wording
  *
