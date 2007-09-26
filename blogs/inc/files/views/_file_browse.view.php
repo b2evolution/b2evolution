@@ -70,7 +70,7 @@ global $edited_Item;
 
 <?php
 	$Widget = & new Widget( 'file_browser' );
-	$Widget->global_icon( T_('Upload...'), '', 'admin.php?ctrl=upload&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path), T_('Upload').' &raquo;', 1, 5 );
+	$Widget->global_icon( T_('Upload...'), '', regenerate_url( 'ctrl', 'ctrl=upload' ), T_('Upload').' &raquo;', 1, 5 );
 
 	if( !empty($edited_Item) )
 	{ // Return to post editing:
@@ -335,7 +335,7 @@ global $edited_Item;
 						$Form->hidden( 'upload_quickmode', 1 );
 						// The following is mainly a hint to the browser.
 						$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
-						$Form->hiddens_by_key( get_memorized('ctrl,fm_mode') );
+						$Form->hiddens_by_key( get_memorized('ctrl') );
 						echo '<div>';
 						echo '<input name="uploadfile[]" type="file" size="10" />';
 						echo '<input class="ActionButton" type="submit" value="'.T_('Upload!').'" />';
@@ -357,6 +357,9 @@ global $edited_Item;
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/26 23:32:39  fplanque
+ * upload context saving
+ *
  * Revision 1.3  2007/09/26 21:53:23  fplanque
  * file manager / file linking enhancements
  *

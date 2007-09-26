@@ -55,6 +55,9 @@ $current_User->check_perm( 'files', 'add', true );
 
 $AdminUI->set_path( 'files', 'upload' );
 
+// Params that may need to be passed through:
+param( 'fm_mode', 'string', NULL, true );
+param( 'item_ID', 'integer', NULL, true );
 
 $action = param_action();
 
@@ -179,9 +182,6 @@ if( empty($ads_list_path) )
 
 
 
-/*
- * upload mode
- */
 // Check permissions:
 if( ! $Settings->get('upload_enabled') )
 { // Upload is globally disabled
@@ -376,23 +376,28 @@ if( isset($_FILES) && count( $_FILES ) )
 	}
 	if( empty($failedFiles) )
 	{ // quick mode or no failed files, Go back to Browsing
-		header_redirect( 'admin.php?ctrl=files&root='.$fm_FileRoot->ID.'&path='.rawurlencode($path) );
+		// header_redirect( 'admin.php?ctrl=files&root='.$fm_FileRoot->ID.'&path='.rawurlencode($path) );
+		header_redirect( regenerate_url( 'ctrl', 'ctrl=files', '', '&' ) );
 	}
 }
 
 
 // Update sub-menu:
-$AdminUI->add_menu_entries(
-		'files',
-		array(
-				'browse' => array(
-					'text' => T_('Browse'),
-					'href' => 'admin.php?ctrl=files&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
-				'upload' => array(
-					'text' => T_('Upload multiple'),
-					'href' => 'admin.php?ctrl=upload&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
-			)
-	);
+if( $current_User->check_perm( 'files', 'add' ) )
+{ // Permission to upload: (no subtabs needed otherwise)
+	$AdminUI->add_menu_entries(
+			'files',
+			array(
+					'browse' => array(
+						'text' => T_('Browse'),
+						'href' => regenerate_url( 'ctrl', 'ctrl=files' ) ),
+					'upload' => array(
+						'text' => T_('Upload multiple'),
+						'href' => regenerate_url( 'ctrl', 'ctrl=upload' ) ),
+				)
+		);
+}
+
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -404,33 +409,7 @@ $AdminUI->disp_body_top();
 /*
  * Display payload:
  */
-
-		// Deferred action message:
-		if( isset($action_title) )
-		{
-			echo "\n<h2>$action_title</h2>\n";
-		}
-
-		if( isset($action_msg) )
-		{
-			echo $action_msg;
-
-			if( isset( $js_focus ) )
-			{ // we want to auto-focus a field
-				echo '
-				<script type="text/javascript">
-					<!--
-					'.$js_focus.'.focus();
-					// -->
-				</script>';
-			}
-		}
-
-
-
-		// Upload dialog:
-		$AdminUI->disp_view( 'files/views/_file_upload.view.php' );
-
+$AdminUI->disp_view( 'files/views/_file_upload.view.php' );
 
 
 // Display body bottom, debug info and close </html>:
@@ -439,6 +418,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/26 23:32:39  fplanque
+ * upload context saving
+ *
  * Revision 1.1  2007/06/25 10:59:53  fplanque
  * MODULES (refactored MVC)
  *

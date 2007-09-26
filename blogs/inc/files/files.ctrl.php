@@ -191,23 +191,6 @@ $Debuglog->add( 'FM _ads_list_path: '.var_export( $ads_list_path, true ), 'files
 $Debuglog->add( 'path: '.var_export( $path, true ), 'files' );
 
 
-// Update sub-menu:
-if( $current_User->check_perm( 'files', 'add' ) )
-{ // Permission to upload: (no subtabs needed otherwise)
-	$AdminUI->add_menu_entries(
-			'files',
-			array(
-					'browse' => array(
-						'text' => T_('Browse'),
-						'href' => 'admin.php?ctrl=files&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
-					'upload' => array(
-						'text' => T_('Upload multiple'),
-						'href' => 'admin.php?ctrl=upload&amp;root='.$fm_FileRoot->ID.'&amp;path='.rawurlencode($path) ),
-				)
-		);
-}
-
-
 /**
  * A list of filepaths which are selected in the FM list.
  *
@@ -496,6 +479,7 @@ if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 		unset( $item_ID );
 	}
 }
+
 
 switch( $action )
 {
@@ -1339,6 +1323,23 @@ switch( $fm_mode )
 }
 
 
+// Update sub-menu:
+if( $current_User->check_perm( 'files', 'add' ) )
+{ // Permission to upload: (no subtabs needed otherwise)
+	$AdminUI->add_menu_entries(
+			'files',
+			array(
+					'browse' => array(
+						'text' => T_('Browse'),
+						'href' => regenerate_url( 'ctrl', 'ctrl=files' ) ),
+					'upload' => array(
+						'text' => T_('Upload multiple'),
+						'href' => regenerate_url( 'ctrl', 'ctrl=upload' ) ),
+				)
+		);
+}
+
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -1471,6 +1472,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/26 23:32:39  fplanque
+ * upload context saving
+ *
  * Revision 1.3  2007/09/26 21:53:24  fplanque
  * file manager / file linking enhancements
  *
