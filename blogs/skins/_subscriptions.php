@@ -26,6 +26,10 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * @var DB
+ */
+global $DB;
 
 if( ! is_logged_in() )
 { // must be logged in!
@@ -110,6 +114,9 @@ $Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.17  2007/09/28 09:29:03  fplanque
+ * fixes
+ *
  * Revision 1.16  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *

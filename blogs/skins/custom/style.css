@@ -137,10 +137,10 @@ div.top_menu li {
 }
 div.top_menu a {
 	text-decoration: none;
+	color: #000;
 }
 div.top_menu a:hover {
 	text-decoration: underline;
-	color: #000;
 }
 
 div.PageTop a {
