@@ -62,6 +62,31 @@ class FilteredResults extends Results
 
 
   /**
+	 * Get every active filter that is not the same as the defaults
+	 */
+	function get_active_filters()
+	{
+		$r = array();
+
+		foreach( $this->default_filters as $key => $value )
+		{
+			if( !isset( $this->filters[$key] ) )
+			{	// Some value has not been copied over from defaults to active or specifically set:
+				if( !is_null($value)) // Note: NULL value are not copied over. that's normal.
+				{	// A NON NULL value is missing
+					$r[] = $key;
+				}
+			}
+			elseif( $value != $this->filters[$key] )
+			{
+				$r[] = $key;
+			}
+		}
+		return $r;
+	}
+
+
+  /**
 	 * Show every active filter that is not the same as the defaults
 	 */
 	function dump_active_filters()
@@ -293,6 +318,9 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/28 09:28:36  fplanque
+ * per blog advanced SEO settings
+ *
  * Revision 1.2  2007/09/23 18:57:15  fplanque
  * filter handling fixes
  *

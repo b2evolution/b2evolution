@@ -103,7 +103,7 @@ if( init_charsets( $current_charset ) )
  * baseurl/blog-urlname/2006/12/                    -> points to a monthly archive
  * baseurl/blog-urlname/2006/12/31/                 -> points to a daily archive
  * baseurl/blog-urlname/2006/w53/                   -> points to a weekly archive
- * baseurl/blog-urlname/junk/.../junk/chap-urlname/ -> points to a single chapter (because of ending slash)
+ * baseurl/blog-urlname/junk/.../junk/chap-urlname/ -> points to a single chapter/category (because of ending slash)
  * Note: category names cannot be named like this [a-z][0-9]+
  */
 if( ! isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
@@ -334,7 +334,7 @@ elseif( $disp == 'posts' && !empty($Item) )
 
 		// Check if we want to redirect to a canonical URL for the post
 		// Please document encountered problems.
-		if( $redirect_to_canonical_url && $redir == 'yes' )
+		if( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
 		{	// We want to redirect to the Item's canonical URL:
 
 			$canoncical_url = $Item->get_permanent_url( '', '', '&' );
@@ -350,41 +350,6 @@ elseif( $disp == 'posts' && !empty($Item) )
 			}
 		}
 	}
-}
-elseif( $disp == 'posts' )
-{ // default display:
-	// EXPERIMENTAL: Check if we want to redirect to a canonical URL for the category
-	// Please document encountered problems.
-	if( $redirect_to_canonical_url && $redir == 'yes' )
-	{
-    param_compile_cat_array();  // fp> is this overkill here?
-
-    if( preg_match( '|^[0-9]+$|', $cat ) )
-    { // We are requesting a specific category (either byparam or extra path)
-		  // Check if this was a complex request or just a category request:
-      // fp> Note: catsel[]= will not be redirected on purpose
-		  if( empty($_SERVER['QUERY_STRING'])		// no additional param
-			  || preg_match( '|^cat=[0-9]+$|', $_SERVER['QUERY_STRING'] ) )	// just a single cat param and nothing else
-		  {	// This was just a category request, let's check if the URL was canonical:
-        if( !isset( $Chapter ) )
-        {
-					$ChapterCache = & get_Cache( 'ChapterCache' );
-					$Chapter = & $ChapterCache->get_by_ID( $cat_array[0], false );
-        }
-			  $canoncical_url = $Chapter->get_permanent_url( NULL, NULL, '&' );
-			  if( $ReqHost.$ReqURI != $canoncical_url )
-			  {
-				  // REDIRECT TO THE CANONICAL URL:
-				  // fp> TODO: we're going to lose the additional params, it would be better to keep them...
-				  header_redirect( $canoncical_url, true );
-			  }
-		  }
-    }
-  }
-}
-elseif( $disp == 'msgform' )
-{	// We prefer robots not to index these pages:
-	$robots_index = false;
 }
 
 
@@ -497,6 +462,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.87  2007/09/28 09:28:36  fplanque
+ * per blog advanced SEO settings
+ *
  * Revision 1.86  2007/09/10 15:35:23  fplanque
  * .php in blog url fix
  *

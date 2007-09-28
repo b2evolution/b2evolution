@@ -61,6 +61,18 @@ class CollectionSettings extends AbstractSettings
 			'allow_subscriptions' => 0,					// Don't all email subscriptions by default
 			'use_workflow' => 0,								// Don't use workflow by default
 			'aggregate_coll_IDs' => '',
+			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
+			'canonical_cat_urls' => 1,					// Redirect categories to their canonical Url?
+			'default_noindex' => '0',						// META NOINDEX on Default blog page
+			'paged_noindex' => '1',							// META NOINDEX on following blog pages
+			'archive_noindex' => '1',						// META NOINDEX on Archive pages
+			'category_noindex' => '1',					// META NOINDEX on Category pages
+			'filtered_noindex' => '1',					// META NOINDEX on other filtered pages
+			'arcdir_noindex' => '1',						// META NOINDEX on Archive directory
+			'catdir_noindex' => '1',						// META NOINDEX on Category directory
+			'feedback-popup_noindex' => '1',		// META NOINDEX on Feedback popups
+			'msgform_noindex' => '1',						// META NOINDEX on Message forms
+			'special_noindex' => '1',						// META NOINDEX on other special pages
 		);
 
 
@@ -96,6 +108,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/28 09:28:36  fplanque
+ * per blog advanced SEO settings
+ *
  * Revision 1.1  2007/06/25 10:59:33  fplanque
  * MODULES (refactored MVC)
  *

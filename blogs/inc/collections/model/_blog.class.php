@@ -389,6 +389,23 @@ class Blog extends DataObject
 		}
 
 
+		if( in_array( 'seo', $groups ) )
+		{ // we want to load the workflow checkboxes:
+			$this->set_setting( 'canonical_item_urls',  param( 'canonical_item_urls', 'integer', 0 ) );
+			$this->set_setting( 'canonical_cat_urls',  param( 'canonical_cat_urls', 'integer', 0 ) );
+			$this->set_setting( 'default_noindex',  param( 'default_noindex', 'integer', 0 ) );
+			$this->set_setting( 'paged_noindex',  param( 'paged_noindex', 'integer', 0 ) );
+			$this->set_setting( 'archive_noindex',  param( 'archive_noindex', 'integer', 0 ) );
+			$this->set_setting( 'category_noindex',  param( 'category_noindex', 'integer', 0 ) );
+			$this->set_setting( 'filtered_noindex',  param( 'filtered_noindex', 'integer', 0 ) );
+			$this->set_setting( 'arcdir_noindex',  param( 'arcdir_noindex', 'integer', 0 ) );
+			$this->set_setting( 'catdir_noindex',  param( 'catdir_noindex', 'integer', 0 ) );
+			$this->set_setting( 'feedback-popup_noindex',  param( 'feedback-popup_noindex', 'integer', 0 ) );
+			$this->set_setting( 'msgform_noindex',  param( 'msgform_noindex', 'integer', 0 ) );
+			$this->set_setting( 'special_noindex',  param( 'special_noindex', 'integer', 0 ) );
+		}
+
+
     /*
 		 * ADVANCED ADMIN SETTINGS
 		 */
@@ -1420,6 +1437,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/28 09:28:36  fplanque
+ * per blog advanced SEO settings
+ *
  * Revision 1.4  2007/09/28 02:25:00  fplanque
  * Menu widgets
  *

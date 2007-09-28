@@ -1363,6 +1363,9 @@ class AdminUI_general extends Widget
 							'urls' => array(
 								'text' => T_('URLs'),
 								'href' => 'admin.php?ctrl=coll_settings&amp;tab=urls&amp;blog='.$blog, ),
+							'seo' => array(
+								'text' => T_('SEO'),
+								'href' => 'admin.php?ctrl=coll_settings&amp;tab=seo&amp;blog='.$blog, ),
 							'advanced' => array(
 								'text' => T_('Advanced'),
 								'href' => 'admin.php?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog, ),
@@ -1581,6 +1584,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.70  2007/09/28 09:28:36  fplanque
+ * per blog advanced SEO settings
+ *
  * Revision 1.69  2007/09/26 21:53:23  fplanque
  * file manager / file linking enhancements
  *

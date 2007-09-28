@@ -157,6 +157,8 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 
 /**
  * Robots tag
+ *
+ * Outputs the robots meta tag if necessary
  */
 function robots_tag()
 {
@@ -338,6 +340,9 @@ function include_headlines()
 
 /*
  * $Log$
+ * Revision 1.7  2007/09/28 09:28:36  fplanque
+ * per blog advanced SEO settings
+ *
  * Revision 1.6  2007/09/23 18:55:17  fplanque
  * attempting to debloat. The Log class is insane.
  *

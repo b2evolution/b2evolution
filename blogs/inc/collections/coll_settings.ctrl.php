@@ -114,6 +114,14 @@ switch( $action )
 				}
 				break;
 
+			case 'seo':
+				if( $edited_Blog->load_from_Request( array( 'seo' ) ) )
+				{ // Commit update to the DB:
+					$edited_Blog->dbupdate();
+					$Messages->add( T_('The blog settings have been updated'), 'success' );
+				}
+				break;
+
 			case 'skin':
 				if( $edited_Blog->load_from_Request( array() ) )
 				{ // Commit update to the DB:
@@ -189,6 +197,10 @@ switch( $AdminUI->get_path(1) )
 		$AdminUI->disp_view( 'collections/views/_coll_urls.form.php' );
 		break;
 
+	case 'seo':
+		$AdminUI->disp_view( 'collections/views/_coll_seo.form.php' );
+		break;
+
 	case 'advanced':
 		$AdminUI->disp_view( 'collections/views/_coll_advanced.form.php' );
 		break;
@@ -212,6 +224,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/28 09:28:36  fplanque
+ * per blog advanced SEO settings
+ *
  * Revision 1.1  2007/06/25 10:59:30  fplanque
  * MODULES (refactored MVC)
  *

@@ -42,6 +42,17 @@ function skin_init( $disp )
 	 */
 	global $Blog;
 
+	global $robots_index;
+
+	global $redir, $ReqHost, $ReqURI;
+
+	global $Chapter;
+
+  /**
+	 * @var ItemList2
+	 */
+	global $MainList;
+
 	// This is the main template; it may be used to display very different things.
 	// Do inits depending on current $disp:
 	switch( $disp )
@@ -55,7 +66,97 @@ function skin_init( $disp )
 			// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
 			// Init the MainList object:
 			init_MainList( $Blog->get_setting('posts_per_page') );
+			break;
+	}
 
+	// SEO stuff:
+	switch( $disp )
+	{
+		case 'posts':
+			// Get list of active filters:
+			$active_filters = $MainList->get_active_filters();
+
+			if( !empty($active_filters) )
+			{	// The current page is being filtered...
+
+				if( array_diff( $active_filters, array( 'page' ) ) == array() )
+				{ // This is just a follow "paged" page
+					if( $Blog->get_setting( 'paged_noindex' ) )
+					{	// We prefer robots not to index category pages:
+						$robots_index = false;
+					}
+				}
+				elseif( array_diff( $active_filters, array( 'cat_array', 'cat_modifier', 'cat_focus', 'page' ) ) == array() )
+				{ // This is a category page
+					if( $Blog->get_setting( 'category_noindex' ) )
+					{	// We prefer robots not to index category pages:
+						$robots_index = false;
+					}
+
+					if(  array_diff( $active_filters, array( 'cat_array' ) ) == array() && count($MainList->filters['cat_array']) == 1 )
+					{	// We are on a single cat page:
+						// echo 'SINGLE CAT PAGE';
+						// EXPERIMENTAL: Please document encountered problems.
+						if( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
+						{ // Check if the URL was canonical:
+					    if( !isset( $Chapter ) )
+					    {
+								$ChapterCache = & get_Cache( 'ChapterCache' );
+								$Chapter = & $ChapterCache->get_by_ID( $MainList->filters['cat_array'][0], false );
+					    }
+							$canoncical_url = $Chapter->get_permanent_url( NULL, NULL, '&' );
+							if( $ReqHost.$ReqURI != $canoncical_url )
+							{
+								// REDIRECT TO THE CANONICAL URL:
+								// fp> TODO: we're going to lose the additional params, it would be better to keep them...
+								// fp> what additional params actually?
+								header_redirect( $canoncical_url, true );
+							}
+					  }
+
+					}
+				}
+				elseif( array_diff( $active_filters, array( 'ymdhms', 'week', 'page' ) ) == array() )
+				{ // This is an archive page
+					if( $Blog->get_setting( 'archive_noindex' ) )
+					{	// We prefer robots not to index archive pages:
+						$robots_index = false;
+					}
+				}
+				else
+				{	// Other filtered pages:
+					if( $Blog->get_setting( 'filtered_noindex' ) )
+					{	// We prefer robots not to index other filtered pages:
+						$robots_index = false;
+					}
+				}
+			}
+			else
+			{	// This is the default blog page
+				if( $Blog->get_setting( 'default_noindex' ) )
+				{	// We prefer robots not to index archive pages:
+					$robots_index = false;
+				}
+			}
+
+			break;
+
+		case 'feedback-popup':
+		case 'arcdir':
+		case 'catdir':
+		case 'msgform':
+			if( $Blog->get_setting( $disp.'_noindex' ) )
+			{	// We prefer robots not to index these pages:
+				$robots_index = false;
+			}
+			break;
+
+		case 'profile':
+		case 'subs':
+			if( $Blog->get_setting( 'special_noindex' ) )
+			{	// We prefer robots not to index these pages:
+				$robots_index = false;
+			}
 			break;
 	}
 }
@@ -303,6 +404,9 @@ function app_version()
 
 /*
  * $Log$
+ * Revision 1.6  2007/09/28 09:28:36  fplanque
+ * per blog advanced SEO settings
+ *
  * Revision 1.5  2007/09/11 23:10:39  fplanque
  * translation updates
  *

@@ -25,7 +25,7 @@ global $is_admin_page, $localtimenow;
  */
 global $current_User;
 
-global $home_url, $admin_url;
+global $home_url, $admin_url, $debug, $robots_index;
 
 /**
  * @var Hit
@@ -160,6 +160,11 @@ global $Hit;
 						echo '<li><a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=display'.$blog_param.'">'.T_('Blog display order').'</a></li>';
 						echo '</ul>';
 					echo '</li>';
+				}
+
+				if( $debug && $robots_index === false )
+				{
+					echo '<li class="time">NO INDEX</li>';
 				}
 			}
   	?>
