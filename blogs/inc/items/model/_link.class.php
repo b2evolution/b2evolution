@@ -60,10 +60,12 @@ class Link extends DataObject
 
 			// source of link:
 			$ItemCache = & get_Cache( 'ItemCache' );
-			$this->Item     = & $ItemCache->get_by_ID( $db_row->link_itm_ID );
+			$this->Item = & $ItemCache->get_by_ID( $db_row->link_itm_ID );
 
 			$FileCache = & get_Cache( 'FileCache' );
-			$this->File     = & $FileCache->get_by_ID( $db_row->link_file_ID, true, false );
+			// fp> do not halt on error. For some reason (ahem bug) a file can disappear and if we fail here then we won't be
+			// able to delete the link
+			$this->File = & $FileCache->get_by_ID( $db_row->link_file_ID, false, false );
 		}
 		else
 		{	// New object:
@@ -92,6 +94,9 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/28 02:15:45  fplanque
+ * fix
+ *
  * Revision 1.1  2007/06/25 11:00:28  fplanque
  * MODULES (refactored MVC)
  *
