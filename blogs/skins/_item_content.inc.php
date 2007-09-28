@@ -16,7 +16,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Default params:
 $params = array_merge( array(
-		'image_size'	=>	'fit-400x320',
+		'image_size'	     => 'fit-400x320',
+		'before_more_link' => '<p class="bMore">',
+		'after_more_link'  => '</p>',
+		'more_link_text'   => '#',
 	), $params );
 
 
@@ -45,7 +48,7 @@ if( !empty($params['image_size']) )
 				'before'      => '',
 				'after'       => '',
 			) );
-		$Item->more_link();
+		$Item->more_link( $params['before_more_link'], $params['after_more_link'], $params['more_link_text'] );
 		$Item->content_extension( array(
 				'before'      => '',
 				'after'       => '',
@@ -59,6 +62,9 @@ if( !empty($params['image_size']) )
 <?php
 /*
  * $Log$
+ * Revision 1.3  2007/09/28 02:18:10  fplanque
+ * minor
+ *
  * Revision 1.2  2007/06/24 01:05:31  fplanque
  * skin_include() now does all the template magic for skins 2.0.
  * .disp.php templates still need to be cleaned up.

@@ -20,7 +20,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  *  0 to disable
  *  1 to ensable
  *
- * @todo fp>This should be moved to the backoffice. Checbox for each blog.
+ * @todo fp>This should be moved to the backoffice. Checkbox for each blog.
  *
  * @global integer 0|1
  */

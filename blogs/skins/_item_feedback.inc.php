@@ -298,8 +298,8 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	{ // User is not logged in:
 		// Note: we use funky field names to defeat the most basic guestbook spam bots
 		$Form->text( 'u', $comment_author, 40, T_('Name'), '', 100, 'bComment' );
-		$Form->text( 'i', $comment_author_email, 40, T_('Email'), T_('Your email address will <strong>not</strong> be displayed on this site.'), 100, 'bComment' );
-		$Form->text( 'o', $comment_author_url, 40, T_('Site/Url'), T_('Your URL will be displayed.'), 100, 'bComment' );
+		$Form->text( 'i', $comment_author_email, 40, T_('Email'), '<br />'.T_('Your email address will <strong>not</strong> be displayed on this site.'), 100, 'bComment' );
+		$Form->text( 'o', $comment_author_url, 40, T_('Site/Url'), '<br />'.T_('Your URL will be displayed.'), 100, 'bComment' );
 	}
 
 	echo '<div class="comment_toolbars">';
@@ -372,6 +372,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.7  2007/09/28 02:18:10  fplanque
+ * minor
+ *
  * Revision 1.6  2007/09/26 21:54:00  fplanque
  * minor
  *
