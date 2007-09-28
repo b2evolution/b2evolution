@@ -41,6 +41,7 @@ $core_componentwidget_defs = array(
 			'coll_common_links',
 			'coll_search_form',
 			'coll_xml_feeds',
+			'menu_link',
 			'user_tools',
 		'*'.T_('Other contents'),
 			'linkblog',
@@ -109,6 +110,9 @@ echo '</ul></li></ul>';
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/28 02:17:48  fplanque
+ * Menu widgets
+ *
  * Revision 1.3  2007/08/21 22:28:29  blueyed
  * Do not display plugins which then fail to install in the widgets list
  *

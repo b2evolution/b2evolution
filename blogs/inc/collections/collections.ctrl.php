@@ -161,6 +161,19 @@ switch( $action )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 									 VALUES( '.$edited_Blog->ID.', "Header", 2, "core", "coll_tagline" )' );
 
+			// Add home link to all blogs Menus:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
+									 VALUES( '.$edited_Blog->ID.', "Menu", 1, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'home'))).'" )' );
+			// Add info pages to all blogs Menus:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+									 VALUES( '.$edited_Blog->ID.', "Menu", 2, "core", "coll_page_list" )' );
+			// Add contact link to all blogs Menus:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
+									 VALUES( '.$edited_Blog->ID.', "Menu", 3, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'ownercontact'))).'" )' );
+			// Add login link to all blogs Menus:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
+									 VALUES( '.$edited_Blog->ID.', "Menu", 4, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'login'))).'" )' );
+
 			// Add Calendar plugin to all blog Sidebars:
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 									 VALUES( '.$edited_Blog->ID.', "Sidebar", 1, "plugin", "evo_Calr" )' );
@@ -182,9 +195,6 @@ switch( $action )
 			// Add XML feeds to all blogs Sidebars:
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 									 VALUES( '.$edited_Blog->ID.', "Sidebar", 7, "core", "coll_xml_feeds" )' );
-			// Add User tools to all blogs Sidebars:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 8, "core", "user_tools" )' );
 
 			$Messages->add( T_('Default widgets have been set-up for this blog.'), 'success' );
 
@@ -426,6 +436,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/28 02:17:49  fplanque
+ * Menu widgets
+ *
  * Revision 1.2  2007/07/01 03:55:05  fplanque
  * category plugin replaced by widget
  *

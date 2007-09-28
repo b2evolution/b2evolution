@@ -292,6 +292,23 @@ function install_basic_widgets()
 							 SELECT blog_ID, "Header", 2, "core", "coll_tagline"
 							   FROM T_blogs' );
 
+	// Add home link to all blogs Menus:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
+							 SELECT blog_ID, "Menu", 1, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'home'))).'"
+							   FROM T_blogs' );
+	// Add info pages to all blogs Menus:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Menu", 2, "core", "coll_page_list"
+							   FROM T_blogs' );
+	// Add contact link to all blogs Menus:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
+							 SELECT blog_ID, "Menu", 3, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'ownercontact'))).'"
+							   FROM T_blogs' );
+	// Add login link to all blogs Menus:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
+							 SELECT blog_ID, "Menu", 4, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'login'))).'"
+							   FROM T_blogs' );
+
 	// Add Calendar plugin to all blog Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							 SELECT blog_ID, "Sidebar", 1, "plugin", "evo_Calr"
@@ -323,10 +340,6 @@ function install_basic_widgets()
 	// Add XML feeds to all blogs Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							 SELECT blog_ID, "Sidebar", 8, "core", "coll_xml_feeds"
-							   FROM T_blogs' );
-	// Add User tools to all blogs Sidebars:
-	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 9, "core", "user_tools"
 							   FROM T_blogs' );
 
 	echo "OK.<br />\n";
@@ -528,6 +541,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.35  2007/09/28 02:17:48  fplanque
+ * Menu widgets
+ *
  * Revision 1.34  2007/09/19 02:54:16  fplanque
  * bullet proof upgrade
  *

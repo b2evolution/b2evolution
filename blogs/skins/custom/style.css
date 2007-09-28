@@ -97,8 +97,8 @@ div#wrapper {
 
 div.pageHeader {
 	padding: 1ex;
-	margin: 0 1px 1ex 1px;
-	border-bottom: 1px solid #ddd;
+	margin: 0 1px 0 1px;
+	border-bottom: 1px solid #000;
 	text-align: center;
 	background: #78a;
 }
@@ -122,6 +122,25 @@ div.PageTop ul li {
 	border-right: 1px solid #000;
 	display: inline;
 	padding: .5ex 1em;
+}
+
+div.top_menu ul {
+	background-color: #ddd;
+	margin: 0 1px;
+	padding: 0;
+	list-style-type:none;
+	padding: .5ex 0;
+}
+div.top_menu li {
+	display: inline;
+	padding: .5ex 0 .5ex 1em;
+}
+div.top_menu a {
+	text-decoration: none;
+}
+div.top_menu a:hover {
+	text-decoration: underline;
+	color: #000;
 }
 
 div.PageTop a {

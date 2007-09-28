@@ -66,6 +66,28 @@ skin_include( '_html_header.inc.php' );
 	?>
 </div>
 
+<div class="top_menu">
+	<ul>
+	<?php
+		// ------------------------- "Top Navigation" CONTAINER EMBEDDED HERE --------------------------
+		// Display container and contents:
+		// Note: this container is designed to be a single <ul> list
+		$Skin->container( NT_('Menu'), array(
+				// The following params will be used as defaults for widgets included in this container:
+				'block_start' => '',
+				'block_end' => '',
+				'block_display_title' => false,
+				'list_start' => '',
+				'list_end' => '',
+				'item_start' => '<li>',
+				'item_end' => '</li>',
+			) );
+		// ----------------------------- END OF "Top Navigation" CONTAINER -----------------------------
+	?>
+	</ul>
+	&nbsp;
+</div>
+
 
 <!-- =================================== START OF MAIN AREA =================================== -->
 <div class="bPosts">

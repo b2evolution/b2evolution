@@ -106,27 +106,35 @@ function user_pass_ok( $login, $pass, $pass_is_md5 = false )
  */
 function user_login_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	echo get_user_login_link( $before, $after, $link_text, $link_title );
-}
-
-
-/**
- * Template tag: Get link to login
- */
-function get_user_login_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
-{
-	global $htsrv_url_sensitive, $edited_Blog, $generating_static;
-
 	if( is_logged_in() ) return false;
 
 	if( $link_text == '' ) $link_text = T_('Log in');
 	if( $link_title == '#' ) $link_title = T_('Log in if you have an account...');
 
+	$r = $before;
+	$r .= '<a href="'.get_login_url().'" title="'.$link_title.'">';
+	$r .= $link_text;
+	$r .= '</a>';
+	$r .= $after;
+
+	echo $r;
+}
+
+
+/**
+ * Get url to login
+ *
+ * @return string
+ */
+function get_login_url()
+{
+	global $htsrv_url_sensitive, $edited_Blog, $generating_static;
+
 	if( !isset($generating_static) )
 	{ // We are not generating a static page here:
 		$redirect = regenerate_url( '', '', '', '&' );
 	}
-	elseif( isset($edited_Blog) )
+	elseif( isset($edited_Blog) ) // fp> this is a shady test!! :/
 	{ // We are generating a static page
 		$redirect = $edited_Blog->get('url'); // was dynurl
 	}
@@ -140,14 +148,8 @@ function get_user_login_link( $before = '', $after = '', $link_text = '', $link_
 		$redirect = '?redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $htsrv_url_sensitive ) );
 	}
 
-	$r = $before;
-	$r .= '<a href="'.$htsrv_url_sensitive.'login.php'.$redirect.'" title="'.$link_title.'">';
-	$r .= $link_text;
-	$r .= '</a>';
-	$r .= $after;
-	return $r;
+	return $htsrv_url_sensitive.'login.php'.$redirect;
 }
-
 
 /**
  * Template tag: Output a link to new user registration
@@ -542,6 +544,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/28 02:17:48  fplanque
+ * Menu widgets
+ *
  * Revision 1.2  2007/07/01 03:57:20  fplanque
  * toolbar eveywhere
  *
