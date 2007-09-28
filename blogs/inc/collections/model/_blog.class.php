@@ -456,11 +456,11 @@ class Blog extends DataObject
 						$Messages->add( T_('Blog Folder URL').': '
 														.T_('You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!'), 'error' );
 					}
-	 				$this->set( 'siteurl', $blog_siteurl );
+  				$this->set( 'siteurl', $blog_siteurl );
 				}
 				else
 				{
-	 				$this->set( 'siteurl', '' );
+  				$this->set( 'siteurl', '' );
 				}
 			}
 
@@ -789,6 +789,7 @@ class Blog extends DataObject
 		 */
 		global $current_User;
 		global $default_post_status;
+
 		if( empty( $status ) )
 		{
 			$status = $default_post_status;
@@ -1141,6 +1142,7 @@ class Blog extends DataObject
 	function get_setting( $parname )
 	{
 		$this->load_CollectionSettings();
+
 		return $this->CollectionSettings->get( $this->ID, $parname );
 	}
 
@@ -1389,20 +1391,38 @@ class Blog extends DataObject
 
 
 		echo $params['before'];
-		echo '<a href="'.url_add_param( $this->get('msgformurl'), 'recipient_id='.$this->owner_user_ID.'&amp;redirect_to='
-					// The URL will be made relative on the next page (this is needed when $htsrv_url is on another domain! -- multiblog situation )
-					.rawurlencode( regenerate_url('','','','&') ) );
-		echo '" title="'.$params['title'].'" class="contact_link">'.$params['text'].'</a>';
+		echo '<a href="'.$this->get_contact_url(true).'" title="'.$params['title'].'" class="contact_link">'
+					.$params['text'].'</a>';
 		echo $params['after'];
 
 		return true;
 	}
 
 
+  /**
+	 * @param boolean do we want to redirect back to where we came from after message?
+	 */
+	function get_contact_url( $with_redirect = true )
+	{
+		$r = url_add_param( $this->get('msgformurl'), 'recipient_id='.$this->owner_user_ID );
+
+		if( $with_redirect )
+		{
+			$r .= '&amp;redirect_to='
+					// The URL will be made relative on the next page (this is needed when $htsrv_url is on another domain! -- multiblog situation )
+					.rawurlencode( regenerate_url('','','','&') );
+		}
+
+		return $r;
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/28 02:25:00  fplanque
+ * Menu widgets
+ *
  * Revision 1.3  2007/09/23 16:10:35  waltercruz
  * Adding a option to categories URL to have a user configurable prefix
  *
