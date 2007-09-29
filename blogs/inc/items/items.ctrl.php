@@ -83,7 +83,7 @@ switch( $action )
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?
-		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID ) );
+		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;highlight='.$edited_Item->ID ) );
 		break;
 
 	case 'update':
@@ -102,7 +102,7 @@ switch( $action )
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?
-		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID ) );
+		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;highlight='.$edited_Item->ID ) );
 		break;
 
 	case 'new':
@@ -130,9 +130,9 @@ switch( $action )
 				$BlogCache = & get_Cache( 'BlogCache' );
 				$Blog = & $BlogCache->get_by_ID( $blog );
 			}
-			
+
 			// Where are we going to redirect to?
-			param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID ) );
+			param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&amp;filter=restore&amp;blog='.$Blog->ID ) );
 		}
 		break;
 
@@ -586,7 +586,6 @@ switch( $action )
 							),
 					)
 			);
-
 		$AdminUI->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('cancel'), 4, 1 );
 
 		break;
@@ -747,6 +746,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2007/09/29 09:50:32  yabs
+ * validation
+ *
  * Revision 1.7  2007/09/26 21:53:24  fplanque
  * file manager / file linking enhancements
  *
