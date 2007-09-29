@@ -126,7 +126,9 @@ switch( $action )
 				if( $edited_Blog->load_from_Request( array() ) )
 				{ // Commit update to the DB:
 					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog skin selection has been updated'), 'success' );
+					$Messages->add( T_('The blog skin has been changed.') 
+										.' <a href="'.$admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
+					header_redirect( $edited_Blog->gen_blogurl() );
 				}
 				break;
 
@@ -224,6 +226,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2007/09/29 03:42:12  fplanque
+ * skin install UI improvements
+ *
  * Revision 1.2  2007/09/28 09:28:36  fplanque
  * per blog advanced SEO settings
  *

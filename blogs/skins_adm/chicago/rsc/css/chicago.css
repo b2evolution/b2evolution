@@ -787,16 +787,16 @@ th.checkright {
  * Skin selection:
  */
 div.skinshot {
-	background-color: #efede0;
+	background-color: #E0E9F0;
 }
 div.skinshot_placeholder {
-	background: #e1ddce;
+	background: #BED1E0;
 }
 div.skinshot div.current {
 	border: 1px solid #d00;
 }
 div.skinshot_noshot {
-	color: #765;
+	color: #555;
 }
 
 

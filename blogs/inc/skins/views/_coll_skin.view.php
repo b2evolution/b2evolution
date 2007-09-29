@@ -20,23 +20,19 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Blog;
 
+global $admin_url;
 
-$Form = & new Form( NULL, 'blogadvanced_checkchanges' );
+$block_item_Widget = & new Widget( 'block_item' );
+
+$block_item_Widget->title = T_('Choose a skin');
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
-  $Form->global_icon( T_('Manage installed skins...'), 'properties', 'admin.php?ctrl=skins', T_('Manage skins'), 3, 4 );
-  $Form->global_icon( T_('Install new skin...'), 'new', 'admin.php?ctrl=skins&amp;action=new', T_('Install new'), 3, 4 );
+  $block_item_Widget->global_icon( T_('Manage installed skins...'), 'properties', 'admin.php?ctrl=skins', T_('Manage skins'), 3, 4 );
+  $block_item_Widget->global_icon( T_('Install new skin...'), 'new', 'admin.php?ctrl=skins&amp;action=new&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $admin_url)), T_('Install new'), 3, 4 );
 }
 
-$Form->begin_form( 'fform', T_('Choose a skin') );
-
-	$Form->hidden_ctrl();
-	$Form->hidden( 'action', 'update' );
-	$Form->hidden( 'tab', 'skin' );
-	$Form->hidden( 'blog',$edited_Blog->ID );
-
-	$Form->begin_fieldset( T_('Installed skins') );
+$block_item_Widget->disp_template_replaced( 'block_start' );
 
 	$SkinCache = & get_Cache( 'SkinCache' );
 	$SkinCache->load_all();
@@ -59,12 +55,13 @@ $Form->begin_form( 'fform', T_('Choose a skin') );
 
 	echo '<div class="clear"></div>';
 
-	$Form->end_fieldset( );
-
-$Form->end_form();
+$block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/29 03:42:12  fplanque
+ * skin install UI improvements
+ *
  * Revision 1.1  2007/06/25 11:01:36  fplanque
  * MODULES (refactored MVC)
  *

@@ -356,8 +356,8 @@ class Skin extends DataObject
 		}
 		else
 		{
-			$select_a_begin = '';
-			$select_a_end = '';
+			$select_a_begin = '<a href="'.$function_url.'" title="'.T_('Install NOW!').'">';
+			$select_a_end = '</a>';
 		}
 
 		echo '<div class="skinshot">';
@@ -367,10 +367,22 @@ class Skin extends DataObject
 			echo ' current';
 		}
 		echo '">';
-		if( file_exists( $skins_path.$skin_folder.'/skinshot.jpg' ) )
+		if( file_exists( $skins_path.$skin_folder.'/skinshot.png' ) )
+		{
+			echo $select_a_begin;
+			echo '<img src="'.$skins_url.$skin_folder.'/skinshot.png" width="240" height="180" alt="'.$skin_folder.'" />';
+			echo $select_a_end;
+		}
+		elseif( file_exists( $skins_path.$skin_folder.'/skinshot.jpg' ) )
 		{
 			echo $select_a_begin;
 			echo '<img src="'.$skins_url.$skin_folder.'/skinshot.jpg" width="240" height="180" alt="'.$skin_folder.'" />';
+			echo $select_a_end;
+		}
+		elseif( file_exists( $skins_path.$skin_folder.'/skinshot.gif' ) )
+		{
+			echo $select_a_begin;
+			echo '<img src="'.$skins_url.$skin_folder.'/skinshot.gif" width="240" height="180" alt="'.$skin_folder.'" />';
 			echo $select_a_end;
 		}
 		else
@@ -386,7 +398,7 @@ class Skin extends DataObject
 			switch( $function )
 			{
 				case 'install':
-					echo '<a href="?ctrl=skins&amp;action=create&amp;skin_folder='.rawurlencode($skin_folder).'" title="'.T_('Install NOW!').'">';
+					echo '<a href="'.$function_url.'" title="'.T_('Install NOW!').'">';
 					echo T_('Install NOW!').'</a>';
 					break;
 
@@ -408,6 +420,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2007/09/29 03:42:12  fplanque
+ * skin install UI improvements
+ *
  * Revision 1.4  2007/09/12 01:18:32  fplanque
  * translation updates
  *

@@ -40,7 +40,8 @@ $Form->begin_fieldset( T_('Canonical URL control').get_manual_link('canonical_ur
 	$Form->checkbox( 'canonical_cat_urls', $edited_Blog->get_setting( 'canonical_cat_urls' ), T_('Categories'), T_('301 redirect to canonical URL') );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Blog content pages indexing') );	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Default blog page'), T_('META NOINDEX') );
+$Form->begin_fieldset( T_('Blog content pages indexing') );
+	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Default blog page'), T_('META NOINDEX') );
 	$Form->checkbox( 'paged_noindex', $edited_Blog->get_setting( 'paged_noindex' ), T_('Following blog pages'), T_('META NOINDEX').' - '.T_('Page 2,3,4...') );
 	$Form->checkbox( 'archive_noindex', $edited_Blog->get_setting( 'archive_noindex' ), T_('Archive pages'), T_('META NOINDEX') );
 	$Form->checkbox( 'category_noindex', $edited_Blog->get_setting( 'category_noindex' ), T_('Category pages'), T_('META NOINDEX') );
@@ -63,6 +64,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/29 03:42:12  fplanque
+ * skin install UI improvements
+ *
  * Revision 1.1  2007/09/28 09:28:36  fplanque
  * per blog advanced SEO settings
  *

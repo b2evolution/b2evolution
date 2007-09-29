@@ -28,6 +28,8 @@ $current_User->check_perm( 'options', 'view', true );
 
 param( 'action', 'string', 'list' );
 
+param( 'redirect_to', 'string', '?ctrl=skins' );
+
 if( param( 'skin_ID', 'integer', '', true) )
 {// Load file type:
 	$SkinCache = & get_Cache( 'SkinCache' );
@@ -63,7 +65,7 @@ switch( $action )
  		$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
 
 		// PREVENT RELOAD & Switch to list mode:
-		header_redirect( '?ctrl=skins' );
+		header_redirect( $redirect_to );
 		break;
 
 
@@ -191,6 +193,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2007/09/29 03:42:13  fplanque
+ * skin install UI improvements
+ *
  * Revision 1.1  2007/06/25 11:01:31  fplanque
  * MODULES (refactored MVC)
  *
