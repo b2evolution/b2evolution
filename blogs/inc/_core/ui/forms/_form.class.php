@@ -468,15 +468,25 @@ class Form extends Widget
 				$r = str_replace( '$fieldset_attribs$', get_field_attribs_as_string($field_params), $this->template['fieldset_begin'] );
 				// $r = '<fieldset'.get_field_attribs_as_string($field_params).'>'."\n";
 
-				if( $title != '' )
+				if( $title == '' )
+				{ // there is no title, remove the placeholder
+					$r = str_replace( '$title_attribs$', '', $r );
+				}
+				else
 				{ // there is a title to display
 					$r = str_replace( '$fieldset_title$', $title, $r );
 
-					if( !empty($legend_params) )
+					if( empty($legend_params) )
+					{ // there are no legend_params, remove the placeholder
+						$r = str_replace( '$title_attribs$', '', $r );
+					}
+					else
 					{
 						$r = str_replace( '$title_attribs$', get_field_attribs_as_string($legend_params), $r );
 					}
 				}
+
+
 
 				$this->_opentags['fieldset']++;
 		}
@@ -2784,6 +2794,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.8  2007/09/29 09:48:55  yabs
+ * minor bug fixes
+ *
  * Revision 1.7  2007/09/29 03:08:24  fplanque
  * a little cleanup of the form class, hopefully fixing the plugin screen
  *
