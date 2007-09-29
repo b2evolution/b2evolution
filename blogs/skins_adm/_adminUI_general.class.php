@@ -938,12 +938,29 @@ class AdminUI_general extends Widget
 				'sort_type' => 'basic'
 				);
 
+			case 'compact_form':
 			case 'Form':
 				// Default Form settings:
 				return array(
 					'layout' => 'fieldset',
+					'formstart' => '',
+					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
+					'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
+															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
+					'fieldset_end' => '</fieldset>'."\n",
+					'fieldstart' => '<fieldset $ID$>'."\n",
+					'labelstart' => '<div class="label">',
+					'labelend' => "</div>\n",
+					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
+					'inputstart' => '<div class="input">',
+					'infostart' => '<div class="info">',
+					'inputend' => "</div>\n",
+					'fieldend' => "</fieldset>\n\n",
+					'buttonsstart' => '<fieldset><div class="input">',
+					'buttonsend' => "</div></fieldset>\n\n",
+					'formend' => '',
 				);
-			// TODO: add default settings for 'table', 'fieldset', etc...
 
 			case 'file_browser':
 				return array(
@@ -1584,6 +1601,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.71  2007/09/29 03:08:24  fplanque
+ * a little cleanup of the form class, hopefully fixing the plugin screen
+ *
  * Revision 1.70  2007/09/28 09:28:36  fplanque
  * per blog advanced SEO settings
  *

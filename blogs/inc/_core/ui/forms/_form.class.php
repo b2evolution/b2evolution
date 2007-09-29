@@ -156,7 +156,7 @@ class Form extends Widget
 		$this->form_method = $form_method;
 		$this->enctype = $enctype;
 
-		if( is_null( $layout ) )
+		if( is_null( $layout ) || $layout == 'split' )
 		{
 			if( is_object($AdminUI) )
 			{ // Get default skin setting:
@@ -168,9 +168,35 @@ class Form extends Widget
 				$layout = 'fieldset';
 			}
 		}
+		elseif( $layout == 'compact' )
+		{
+			$template = $AdminUI->get_template( 'compact_form' );
+			$layout = $template['layout'];
+		}
 
 		$this->saved_layouts = array($layout);
 		$this->switch_layout( NULL );	// "restore" saved layout.
+
+		// Temporary hack:
+		if( !empty($template ) )
+		{
+			//pre_dump($template);
+			$this->template = $template;
+			$this->formstart =    $template['formstart'];
+			$this->title_fmt =    $template['title_fmt'];
+			$this->no_title_fmt = $template['no_title_fmt'];
+			$this->fieldstart =   $template['fieldstart'];
+			$this->labelstart =   $template['labelstart'];
+			$this->labelend =     $template['labelend'];
+			$this->labelempty =   $template['labelempty'];
+			$this->inputstart =   $template['inputstart'];
+			$this->infostart =    $template['infostart'];
+			$this->inputend =     $template['inputend'];
+			$this->fieldend =     $template['fieldend'];
+			$this->buttonsstart = $template['buttonsstart'];
+			$this->buttonsend =   $template['buttonsend'];
+			$this->formend =      $template['formend'];
+		}
 	}
 
 
@@ -409,10 +435,9 @@ class Form extends Widget
 	 * @param string the title of the fieldset
 	 * @param string the field params to the fieldset
 	 *               additionally 'legend_params' can be used to give an array of field params
-	 * @param array the icons action of the fieldset
 	 * @return true|string true (if output) or the generated HTML if not outputting
 	 */
-	function begin_fieldset( $title = '', $field_params = array(), $icons = array() )
+	function begin_fieldset( $title = '', $field_params = array() )
 	{
 		if( !isset($field_params['class']) )
 		{
@@ -427,77 +452,30 @@ class Form extends Widget
 
 				if( $title != '' )
 				{ // there is a title to display
-					if( !empty( $icons ) )
-					{
-						$r .= '<span class="fieldset_icons">';
-						foreach( $icons as $icon )
-						{
-							$r .= $icon;
-						}
-						$r .= '</span>';
-					}
 					$r .= $title;
 				}
 
 				$r .= "</th></tr>\n";
 				break;
 
-			case 'chicago':
+			default:
 				if( ! empty($field_params['legend_params']) )
-				{
+				{	// We have params specifically passed for the title
 					$legend_params = $field_params['legend_params'];
 					unset( $field_params['legend_params'] );
 				}
 
-				// Temporary dirty hack:
-				$r = '<div class="fieldset_title"><div class="fieldset_title_right"><div class="fieldset_title_bg">';
+				$r = str_replace( '$fieldset_attribs$', get_field_attribs_as_string($field_params), $this->template['fieldset_begin'] );
+				// $r = '<fieldset'.get_field_attribs_as_string($field_params).'>'."\n";
 
 				if( $title != '' )
 				{ // there is a title to display
-					if( !empty( $icons ) )
+					$r = str_replace( '$fieldset_title$', $title, $r );
+
+					if( !empty($legend_params) )
 					{
-						$r .= '<span class="fieldset_icons">';
-						foreach( $icons as $icon )
-						{
-							$r .= $icon;
-						}
-						$r .= '</span>';
+						$r = str_replace( '$title_attribs$', get_field_attribs_as_string($legend_params), $r );
 					}
-					$r .= $title;
-				}
-
-				$r .= "</div></div></div>\n";
-
-				$r .= '<fieldset'.get_field_attribs_as_string($field_params).'>'."\n";
-
-				break;
-
-			default:
-				if( ! empty($field_params['legend_params']) )
-				{
-					$legend_params = $field_params['legend_params'];
-					unset( $field_params['legend_params'] );
-				}
-
-				$r = '<fieldset'.get_field_attribs_as_string($field_params).'>'."\n";
-
-				if( $title != '' || isset($legend_params) )
-				{ // there is a legend tag (or explicit params for it) to display
-					if( !empty( $icons ) )
-					{
-						$r .= '<div class="fieldset_icons">';
-						foreach( $icons as $icon )
-						{
-							$r .= $icon;
-						}
-						$r .= '</div>';
-					}
-					$r .= '<legend';
-					if( isset($legend_params) )
-					{
-						$r .= get_field_attribs_as_string($legend_params);
-					}
-					$r .= '>'.$title."</legend>\n";
 				}
 
 				$this->_opentags['fieldset']++;
@@ -520,13 +498,8 @@ class Form extends Widget
 				$r = '';
 				break;
 
-			case 'chicago':
-				// temporary dirty hack:
-				$r = '</fieldset>';
-				break;
-
 			default:
-				$r = "</fieldset>\n";
+				$r = $this->template['fieldset_end'];
 				$this->_opentags['fieldset']--;
 		}
 
@@ -2811,6 +2784,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.7  2007/09/29 03:08:24  fplanque
+ * a little cleanup of the form class, hopefully fixing the plugin screen
+ *
  * Revision 1.6  2007/09/12 21:00:30  fplanque
  * UI improvements
  *

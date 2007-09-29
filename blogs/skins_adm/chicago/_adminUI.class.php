@@ -276,12 +276,54 @@ class AdminUI extends AdminUI_general
 				);
 
 
+			case 'compact_form':
+				// Default Form settings:
+				return array(
+					'layout' => 'chicago',		// Temporary dirty hack
+					'formstart' => '<div class="fieldset_title"><div class="fieldset_title_right">',
+
+					'title_fmt' => '<div class="fieldset_title_bg" $title_attribs$><span style="float:right">$global_icons$</span>$title$</div></div></div><fieldset>'."\n",
+					'no_title_fmt' => '<div class="fieldset_title_bg" $title_attribs$><span style="float:right">$global_icons$</span>&nbsp;</div></div></div><fieldset>'."\n",
+					'fieldset_begin' => '<h2 $title_attribs$>$fieldset_title$</h2>',
+					'fieldset_end' => '',
+					'fieldstart' => '<fieldset $ID$>'."\n",
+					'labelstart' => '<div class="label">',
+					'labelend' => "</div>\n",
+					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
+					'inputstart' => '<div class="input">',
+					'infostart' => '<div class="info">',
+					'inputend' => "</div>\n",
+					'fieldend' => "</fieldset>\n\n",
+					'buttonsstart' => '<fieldset><div class="input">',
+					'buttonsend' => "</div></fieldset>\n\n",
+					'formend' => '</fieldset>'."\n",
+				);
+
+
 			case 'Form':
 				// Default Form settings:
 				return array(
 					'layout' => 'chicago',		// Temporary dirty hack
+					'formstart' => '',
+					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
+					'fieldstart' => '<fieldset $ID$>'."\n",
+					'fieldset_begin' => '<div class="fieldset_title"><div class="fieldset_title_right">
+																<div class="fieldset_title_bg" $title_attribs$>$fieldset_title$</div></div></div>
+																<fieldset $fieldset_attribs$>'."\n",
+					'fieldset_end' => '</fieldset>'."\n",
+					'labelstart' => '<div class="label">',
+					'labelend' => "</div>\n",
+					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
+					'inputstart' => '<div class="input">',
+					'infostart' => '<div class="info">',
+					'inputend' => "</div>\n",
+					'fieldend' => "</fieldset>\n\n",
+					'buttonsstart' => '<fieldset><div class="input">',
+					'buttonsend' => "</div></fieldset>\n\n",
+					'formend' => '',
 				);
-			// TODO: add default settings for 'table', 'fieldset', etc...
+
 
 			case 'file_browser':
 				return array(
