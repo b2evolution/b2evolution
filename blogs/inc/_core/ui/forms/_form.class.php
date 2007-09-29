@@ -156,7 +156,7 @@ class Form extends Widget
 		$this->form_method = $form_method;
 		$this->enctype = $enctype;
 
-		if( is_null( $layout ) || $layout == 'split' )
+		if( is_null( $layout ) || $layout == 'split' || $layout == 'none' )
 		{
 			if( is_object($AdminUI) )
 			{ // Get default skin setting:
@@ -2794,6 +2794,11 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.9  2007/09/29 11:18:35  yabs
+ * minor bug fix
+ *
+ * There's still a problem with the login form that needs fixing
+ *
  * Revision 1.8  2007/09/29 09:48:55  yabs
  * minor bug fixes
  *
