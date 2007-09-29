@@ -116,6 +116,25 @@ div.PageTop a.selected {
 
 
 /*
+ * Menu on top:
+ */
+div.top_menu ul {
+	margin: 0;
+	padding: 0;
+	list-style-type:none;
+	padding: .5ex 0;
+}
+div.top_menu li {
+	display: inline;
+	padding-right: 1em;
+}
+div.top_menu a.selected {
+	color: #f09;
+	font-weight:bold;
+}
+
+
+/*
  * Header styles:
  */
 div.pageHeader h1 {

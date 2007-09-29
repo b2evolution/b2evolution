@@ -18,7 +18,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Do inits depending on current $disp:
 skin_init( $disp );
 
-
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 // Initializations:
 require_css( 'rsc/nifty_corners.css', true, 'Nifty Corners' );
@@ -57,6 +56,7 @@ skin_include( '_html_header.inc.php' );
 
 <div class="PageTop">
 	<?php
+		// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
 		// Display container and contents:
 		$Skin->container( NT_('Page Top'), array(
 				// The following params will be used as defaults for widgets included in this container:
@@ -68,21 +68,24 @@ skin_include( '_html_header.inc.php' );
 				'item_start' => '<li>',
 				'item_end' => '</li>',
 			) );
+		// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
 	?>
 </div>
 
-<div class="pageHeader">
-	<?php
-		// Display container and contents:
-		$Skin->container( NT_('Header'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start' => '<div class="$wi_class$">',
-				'block_end' => '</div>',
-				'block_title_start' => '<h1>',
-				'block_title_end' => '</h1>',
-			) );
-	?>
-</div>
+	<div class="pageHeader">
+		<?php
+			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
+			// Display container and contents:
+			$Skin->container( NT_('Header'), array(
+					// The following params will be used as defaults for widgets included in this container:
+					'block_start' => '<div class="$wi_class$">',
+					'block_end' => '</div>',
+					'block_title_start' => '<h1>',
+					'block_title_end' => '</h1>',
+				) );
+			// ----------------------------- END OF "Header" CONTAINER -----------------------------
+		?>
+	</div>
 
 </div>
 </div>
@@ -90,30 +93,59 @@ skin_include( '_html_header.inc.php' );
 <div class="posts">
 <div class="innerwrap">
 
-<?php
-	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-	$Messages->disp( '<div class="action_messages">', '</div>' );
-	// --------------------------------- END OF MESSAGES ---------------------------------
-?>
-
-<?php
-	if( isset($MainList) )
-	{ // Links to previous and next post in single post mode:
-		$MainList->prevnext_item_links( array(
-				'block_start' => '<table class="prevnext_post"><tr>',
-				'prev_start'  => '<td>',
-				'prev_end'    => '</td>',
-				'next_start'  => '<td class="right">',
-				'next_end'    => '</td>',
-				'block_end'   => '</tr></table>' ) );
-	}
-?>
-
-<?php request_title( '<h2>', '</h2>' ) ?>
-
 <!-- =================================== START OF MAIN AREA =================================== -->
 
-<?php // ------------------------------------ START OF POSTS ----------------------------------------
+<div class="top_menu">
+	<ul>
+	<?php
+		// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
+		// Display container and contents:
+		$Skin->container( NT_('Menu'), array(
+				// The following params will be used as defaults for widgets included in this container:
+				'block_start' => '',
+				'block_end' => '',
+				'block_display_title' => false,
+				'list_start' => '',
+				'list_end' => '',
+				'item_start' => '<li>',
+				'item_end' => '</li>',
+			) );
+		// ----------------------------- END OF "Menu" CONTAINER -----------------------------
+	?>
+	</ul>
+</div>
+
+	<?php
+		// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
+		$Messages->disp( '<div class="action_messages">', '</div>' );
+		// --------------------------------- END OF MESSAGES ---------------------------------
+	?>
+
+
+	<?php
+		if( isset($MainList) )
+		{ // Links to previous and next post in single post mode:
+			$MainList->prevnext_item_links( array(
+					'block_start' => '<table class="prevnext_post"><tr>',
+					'prev_start'  => '<td>',
+					'prev_end'    => '</td>',
+					'next_start'  => '<td class="right">',
+					'next_end'    => '</td>',
+					'block_end'   => '</tr></table>',
+				) );
+		}
+	?>
+
+
+	<?php
+		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+		request_title( '<h2>', '</h2>' );
+		// ------------------------------ END OF REQUEST TITLE -----------------------------
+	?>
+
+
+<?php
+	// ------------------------------------ START OF POSTS ----------------------------------------
 	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
 
 	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
@@ -230,7 +262,7 @@ skin_include( '_html_header.inc.php' );
 <div class="innerwrap">
 
 	<?php
-		// Display container contents:
+		// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 		$Skin->container( NT_('Sidebar'), array(
 				// The following (optional) params will be used as defaults for widgets included in this container:
 				// This will enclose each widget in a block:
@@ -248,7 +280,11 @@ skin_include( '_html_header.inc.php' );
 				// This will enclose sub-lists in a list:
 				'group_start' => '<ul>',
 				'group_end' => '</ul>',
+				// This will enclose (foot)notes:
+				'notes_start' => '<div class="notes">',
+				'notes_end' => '</div>',
 			) );
+		// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 	?>
 
 	<p class="center"><!-- Please help us promote b2evolution and leave this link on your blog. --><a href="http://b2evolution.net/" title="b2evolution: next generation blog software"><img src="../../rsc/img/powered-by-b2evolution-120t.gif" alt="powered by b2evolution free blog software" title="b2evolution: next generation blog software" width="120" height="32" border="0" /></a></p>

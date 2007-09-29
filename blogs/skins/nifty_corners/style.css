@@ -95,7 +95,8 @@ a:visited {
 	color: #666;
 	text-decoration:none;
 }
-a:hover {
+a:hover,
+div.top_menu a:hover {
 	color: #c0c;
 	text-decoration:underline;
 }
@@ -129,6 +130,23 @@ div.PageTop li {
 }
 a.selected {
 	color: #06a3c4;
+	font-weight:bold;
+}
+
+/*
+ * Menu on top:
+ */
+div.top_menu ul {
+	margin: 4px 1ex 2px 1ex;
+	padding: 0 0 2px 0;
+	list-style-type:none;
+}
+div.top_menu li {
+	display: inline;
+	padding-right: 2ex;
+}
+div.top_menu a {
+	color: #999;
 	font-weight:bold;
 }
 

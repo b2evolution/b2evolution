@@ -578,3 +578,27 @@ div#header li a:hover {
 div#header li a.selected {
 	text-decoration: underline;
 }
+
+/* Top menu */
+div.top_menu ul {
+	float:left;
+	margin: 0 24px;
+	padding: 0;
+	list-style-type:none;
+	padding: 8px 0 0 0;
+	font-size: 108%;
+}
+div.top_menu li {
+	display: inline;
+	padding: 0 1em 0 0;
+}
+div.top_menu a {
+	font-weight: bold;
+}
+div.top_menu a:hover {
+	color: #666;
+	text-decoration: underline;
+}
+div.top_menu a.selected {
+	text-decoration: underline;
+}

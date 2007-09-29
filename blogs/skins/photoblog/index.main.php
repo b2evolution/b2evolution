@@ -44,16 +44,23 @@ skin_include( '_html_header.inc.php' );
 
 <div class="pageHeader">
 
-	<div class="floatright">
-		<a href="<?php $Blog->disp( 'url', 'raw' ) ?>"><?php echo T_('Recently') ?></a>
-		|
-		<a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('Index') ?></a>
-		|
-		<a href="<?php $Blog->disp( 'catdirurl', 'raw' ) ?>"><?php echo T_('Albums') ?></a>
+	<div class="top_menu floatright">
 		<?php
-			user_login_link( ' | ', ' ' );
-			user_register_link( ' | ', ' ' );
+			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
+			// Display container and contents:
+			$Skin->container( NT_('Menu'), array(
+					// The following params will be used as defaults for widgets included in this container:
+					'block_start' => '',
+					'block_end' => '',
+					'block_display_title' => false,
+					'list_start' => '',
+					'list_end' => '',
+					'item_start' => ' ',
+					'item_end' => ' | ',
+				) );
+			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 		?>
+		<a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('Index') ?></a>
 	</div>
 	
 	<h1 id="pageTitle"><a href="<?php $Blog->disp( 'url', 'raw' ) ?>"><?php $Blog->disp( 'name', 'htmlbody' ) ?></a></h1>

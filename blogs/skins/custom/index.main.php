@@ -69,7 +69,7 @@ skin_include( '_html_header.inc.php' );
 <div class="top_menu">
 	<ul>
 	<?php
-		// ------------------------- "Top Navigation" CONTAINER EMBEDDED HERE --------------------------
+		// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
 		// Display container and contents:
 		// Note: this container is designed to be a single <ul> list
 		$Skin->container( NT_('Menu'), array(
@@ -82,7 +82,7 @@ skin_include( '_html_header.inc.php' );
 				'item_start' => '<li>',
 				'item_end' => '</li>',
 			) );
-		// ----------------------------- END OF "Top Navigation" CONTAINER -----------------------------
+		// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 	?>
 	</ul>
 	&nbsp;
