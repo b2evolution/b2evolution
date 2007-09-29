@@ -276,23 +276,9 @@ class Blog extends DataObject
 			$this->set_setting( 'archive_links', get_param( 'archive_links' ) );
 		}
 
-		if( ($chapter_links = param( 'chapter_links', 'string', NULL )) !== NULL )
+		if( param( 'chapter_links',   'string', NULL ) !== NULL )
 		{ // Chapter link type:
-			$this->set_setting( 'chapter_links', $chapter_links  );
-			if( $chapter_links == 'chapters_prefix' ){
-				$category_prefix = param( 'category_prefix', 'string', NULL );
-				if( ! preg_match( '|^[A-Za-z0-9\-]+$|', $category_prefix)
-						|| preg_match( '|^[A-Za-z][0-9]*$|', $category_prefix ) )
-				{
-						$Messages->add( T_('Categories Prefix').': '
-														.T_('Invalid prefix for categories'), 'error' );
-				}
-				$this->set_setting( 'category_prefix', $category_prefix);
-				} 
-				else
-				{
-					$this->set_setting( 'category_prefix', '');
-				}
+			$this->set_setting( 'chapter_links', get_param( 'chapter_links' ) );
 		}
 
 		if( param( 'single_links',   'string', NULL ) !== NULL )
@@ -1437,14 +1423,14 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2007/09/29 01:50:50  fplanque
+ * temporary rollback; waiting for new version
+ *
  * Revision 1.5  2007/09/28 09:28:36  fplanque
  * per blog advanced SEO settings
  *
  * Revision 1.4  2007/09/28 02:25:00  fplanque
  * Menu widgets
- *
- * Revision 1.3  2007/09/23 16:10:35  waltercruz
- * Adding a option to categories URL to have a user configurable prefix
  *
  * Revision 1.2  2007/09/10 13:24:13  waltercruz
  * Mispelled word correction
