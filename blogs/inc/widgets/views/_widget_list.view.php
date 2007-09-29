@@ -129,6 +129,7 @@ function display_container( $container, $legend_suffix = '' )
 
 			// Actions
 			$Table->display_col_start();
+			echo action_icon( T_('Edit widget settings!'), 'edit', regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ) );
 			echo action_icon( T_('Remove this widget!'), 'delete', regenerate_url( 'blog', 'action=delete&amp;wi_ID='.$ComponentWidget->ID ) );
 			$Table->display_col_end();
 
@@ -167,6 +168,9 @@ echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, fal
 
 /*
  * $Log$
+ * Revision 1.4  2007/09/29 08:18:21  yabs
+ * UI - added edit to actions
+ *
  * Revision 1.3  2007/09/08 20:23:04  fplanque
  * action icons / wording
  *
