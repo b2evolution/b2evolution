@@ -164,8 +164,28 @@ class Form extends Widget
 				$layout = $template['layout'];
 			}
 			else
-			{
+			{	// This happens for comment forms for example...
 				$layout = 'fieldset';
+				$template = array(
+					'layout' => 'fieldset',
+					'formstart' => '',
+					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
+					'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
+															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
+					'fieldset_end' => '</fieldset>'."\n",
+					'fieldstart' => '<fieldset $ID$>'."\n",
+					'labelstart' => '<div class="label">',
+					'labelend' => "</div>\n",
+					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
+					'inputstart' => '<div class="input">',
+					'infostart' => '<div class="info">',
+					'inputend' => "</div>\n",
+					'fieldend' => "</fieldset>\n\n",
+					'buttonsstart' => '<fieldset><div class="input">',
+					'buttonsend' => "</div></fieldset>\n\n",
+					'formend' => '',
+				);
 			}
 		}
 		elseif( $layout == 'compact' )
@@ -468,25 +488,16 @@ class Form extends Widget
 				$r = str_replace( '$fieldset_attribs$', get_field_attribs_as_string($field_params), $this->template['fieldset_begin'] );
 				// $r = '<fieldset'.get_field_attribs_as_string($field_params).'>'."\n";
 
-				if( $title == '' )
-				{ // there is no title, remove the placeholder
+				$r = str_replace( '$fieldset_title$', $title, $r );
+
+				if( empty($legend_params) )
+				{ // there are no legend_params, remove the placeholder
 					$r = str_replace( '$title_attribs$', '', $r );
 				}
 				else
-				{ // there is a title to display
-					$r = str_replace( '$fieldset_title$', $title, $r );
-
-					if( empty($legend_params) )
-					{ // there are no legend_params, remove the placeholder
-						$r = str_replace( '$title_attribs$', '', $r );
-					}
-					else
-					{
-						$r = str_replace( '$title_attribs$', get_field_attribs_as_string($legend_params), $r );
-					}
+				{
+					$r = str_replace( '$title_attribs$', get_field_attribs_as_string($legend_params), $r );
 				}
-
-
 
 				$this->_opentags['fieldset']++;
 		}
@@ -2794,6 +2805,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.10  2007/09/30 05:00:45  fplanque
+ * fixes
+ *
  * Revision 1.9  2007/09/29 11:18:35  yabs
  * minor bug fix
  *
