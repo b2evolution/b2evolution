@@ -39,13 +39,13 @@ skin_include( '_html_header.inc.php' );
 		// Display container and contents:
 		$Skin->container( NT_('Page Top'), array(
 				// The following params will be used as defaults for widgets included in this container:
-				'block_start' => '<div class="$wi_class$">',
-				'block_end' => '</div>',
+				'block_start'         => '<div class="$wi_class$">',
+				'block_end'           => '</div>',
 				'block_display_title' => false,
-				'list_start' => '<ul>',
-				'list_end' => '</ul>',
-				'item_start' => '<li>',
-				'item_end' => '</li>',
+				'list_start'          => '<ul>',
+				'list_end'            => '</ul>',
+				'item_start'          => '<li>',
+				'item_end'            => '</li>',
 			) );
 		// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
 	?>
@@ -57,10 +57,10 @@ skin_include( '_html_header.inc.php' );
 		// Display container and contents:
 		$Skin->container( NT_('Header'), array(
 				// The following params will be used as defaults for widgets included in this container:
-				'block_start' => '<div class="$wi_class$">',
-				'block_end' => '</div>',
+				'block_start'       => '<div class="$wi_class$">',
+				'block_end'         => '</div>',
 				'block_title_start' => '<h1>',
-				'block_title_end' => '</h1>',
+				'block_title_end'   => '</h1>',
 			) );
 		// ----------------------------- END OF "Header" CONTAINER -----------------------------
 	?>
@@ -74,13 +74,13 @@ skin_include( '_html_header.inc.php' );
 		// Note: this container is designed to be a single <ul> list
 		$Skin->container( NT_('Menu'), array(
 				// The following params will be used as defaults for widgets included in this container:
-				'block_start' => '',
-				'block_end' => '',
+				'block_start'         => '',
+				'block_end'           => '',
 				'block_display_title' => false,
-				'list_start' => '',
-				'list_end' => '',
-				'item_start' => '<li>',
-				'item_end' => '</li>',
+				'list_start'          => '',
+				'list_end'            => '',
+				'item_start'          => '<li>',
+				'item_end'            => '</li>',
 			) );
 		// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 	?>
@@ -117,7 +117,14 @@ skin_include( '_html_header.inc.php' );
 
 	<?php
 		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
-		request_title( '<h2>', '</h2>' );
+		request_title( array(
+				'title_before'=> '<h2>',
+				'title_after' => '</h2>',
+				'title_none'  => '',
+				'glue'        => ' - ',
+				'title_single_disp' => true,
+				'format'      => 'htmlbody',
+			) );
 		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?>
 

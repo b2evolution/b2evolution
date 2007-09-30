@@ -99,7 +99,18 @@ skin_include( '_html_header.inc.php' );
 	}
 ?>
 
-<?php request_title( '<h2>', '</h2>' ) ?>
+<?php
+	// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+	request_title( array(
+			'title_before'=> '<h2>',
+			'title_after' => '</h2>',
+			'title_none'  => '',
+			'glue'        => ' - ',
+			'title_single_disp' => true,
+			'format'      => 'htmlbody',
+		) );
+	// ------------------------------ END OF REQUEST TITLE -----------------------------
+?>
 
 <!-- =================================== START OF MAIN AREA =================================== -->
 

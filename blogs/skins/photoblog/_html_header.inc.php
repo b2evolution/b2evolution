@@ -25,11 +25,15 @@ skin_content_header();	// Sets charset!
 	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
 	<title><?php
-		request_title( '', ' - ', ' - ', 'htmlhead', array(
-				'category_text' => T_('Album').': ',
-				'categories_text' => T_('Albums').': ',
-		 ) );
-		$Blog->disp('name', 'htmlhead');
+		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+		request_title( array(
+			'auto_pilot'      => 'seo_title',
+			'arcdir_text'     => T_('Index'),
+			'catdir_text'     => T_('Albums'),
+			'category_text'   => T_('Album').': ',
+			'categories_text' => T_('Albums').': ',
+		) );
+		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?></title>
 	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
 	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />

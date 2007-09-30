@@ -39,7 +39,16 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 <feed xml:lang="<?php $Blog->disp( 'locale', 'xml' ) ?>" xmlns="http://www.w3.org/2005/Atom">
 	<title><?php
 		$Blog->disp( 'name', 'xml' );
-		request_title( ' - ', '', ' - ', 'xml' );
+		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+		request_title( array(
+				'title_before'=> ' - ',
+				'title_after' => '',
+				'title_none'  => '',
+				'glue'        => ' - ',
+				'title_single_disp' => true,
+				'format'      => 'xml',
+			) );
+		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?></title>
 	<link rel="alternate" type="text/html" href="<?php $Blog->disp( 'lastcommentsurl', 'xml' ) ?>" />
 	<link rel="self" type="application/atom+xml" href="<?php $Blog->disp( 'comments_atom_url', 'xmlattr' ) ?>" />

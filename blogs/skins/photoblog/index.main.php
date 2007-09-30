@@ -75,7 +75,6 @@ skin_include( '_html_header.inc.php' );
 	$Messages->disp( '<div class="action_messages">', '</div>' );
 	// --------------------------------- END OF MESSAGES ---------------------------------
 	?>
-	
 
 	<?php
 		if( isset($MainList) )
@@ -90,7 +89,6 @@ skin_include( '_html_header.inc.php' );
 		}
 	?>
 
-
 	<?php
 		if( isset($MainList) )
 		{ // Links to previous and next post in single post mode:
@@ -101,19 +99,22 @@ skin_include( '_html_header.inc.php' );
 		}
 	?>
 
-
 	<?php
-	// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
-	request_title( '<h2>', '</h2>', ' - ', 'htmlbody', array(
+		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+		request_title( array(
+				'title_before'=> '<h2>',
+				'title_after' => '</h2>',
+				'title_none'  => '<h2>&nbsp;</h2>',
+				'glue'        => ' - ',
+				'title_single_disp' => false,
+				'format'      => 'htmlbody',
 				'arcdir_text' => T_('Index'),
 				'catdir_text' => T_('Albums'),
 				'category_text' => T_('Album').': ',
 				'categories_text' => T_('Albums').': ',
-		 ), false, '<h2>&nbsp;</h2>' );
-	// ------------------------------ END OF REQUEST TITLE -----------------------------
+			) );
+		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?>
-
-
 
 	<?php
 	// ------------------------------------ START OF POSTS ----------------------------------------

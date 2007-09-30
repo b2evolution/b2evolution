@@ -114,7 +114,18 @@ skin_include( '_html_header.inc.php' );
 		}
 	?>
 
-	<?php request_title( '<h2 class="evo_req_title">', '</h2>', ' - ', 'htmlbody', array(), false ) ?>
+	<?php
+		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+		request_title( array(
+				'title_before'=> '<h2 class="evo_req_title">',
+				'title_after' => '</h2>',
+				'title_none'  => '',
+				'glue'        => ' - ',
+				'title_single_disp' => false,
+				'format'      => 'htmlbody',
+			) );
+		// ------------------------------ END OF REQUEST TITLE -----------------------------
+	?>
 
 	<!-- =================================== START OF MAIN AREA =================================== -->
 

@@ -26,11 +26,12 @@ skin_content_header();	// Sets charset!
 	<?php skin_content_meta(); /* Charset for static pages */ ?>
 	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
 	<title><?php
-		request_title( '', ' - ', ' - ', 'htmlhead', array(
-		 ) );
-		$Blog->disp('name', 'htmlhead');
-	?>
-	</title>
+		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+		request_title( array(
+			'auto_pilot'      => 'seo_title',
+		) );
+		// ------------------------------ END OF REQUEST TITLE -----------------------------
+	?></title>
 	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
 	<?php include_headlines() ?>
@@ -86,7 +87,18 @@ skin_content_header();	// Sets charset!
 	}
 	?>
 
-	<?php request_title( '<h2>', '</h2>' ) ?>
+	<?php
+		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+		request_title( array(
+				'title_before'=> '<h2>',
+				'title_after' => '</h2>',
+				'title_none'  => '',
+				'glue'        => ' - ',
+				'title_single_disp' => true,
+				'format'      => 'htmlbody',
+			) );
+		// ------------------------------ END OF REQUEST TITLE -----------------------------
+	?>
 
 	<?php	// ---------------------------------- START OF POSTS --------------------------------------
 	if( isset($MainList) ) $MainList->display_if_empty();	// Display message if no post

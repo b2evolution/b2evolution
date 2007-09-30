@@ -66,8 +66,11 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
 	<title><?php
-		$Blog->disp('name', 'htmlhead');
-		request_title( ' - ', '', ' - ', 'htmlhead' );
+		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+		request_title( array(
+			'auto_pilot'      => 'seo_title',
+		) );
+		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?></title>
 <!-- InstanceEndEditable -->
 <link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
@@ -160,7 +163,14 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	<?php
 		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
-		request_title( '<h2>', '</h2>' );
+		request_title( array(
+				'title_before'=> '<h2>',
+				'title_after' => '</h2>',
+				'title_none'  => '',
+				'glue'        => ' - ',
+				'title_single_disp' => true,
+				'format'      => 'htmlbody',
+			) );
 		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?>
 

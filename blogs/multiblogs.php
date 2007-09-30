@@ -55,8 +55,18 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/Standard.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
-	<title>Multiblog demo<?php request_title( ' - ', '', ' - ', 'htmlhead' ) ?></title>
-	<!-- InstanceEndEditable --> 
+	<title><?php
+		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+		request_title( array(
+			'title_before'=> '',
+			'title_after' => ' - ',
+			'title_none'  => '',
+			'glue'        => ' - ',
+			'format'      => 'htmlhead',
+		) );
+		// ------------------------------ END OF REQUEST TITLE -----------------------------
+	?>Multiblog Demo</title>
+	<!-- InstanceEndEditable -->
 <link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 <!-- InstanceBeginEditable name="head" -->
 	<?php skin_base_tag(); /* You're not using any skin here but this won't hurt. However it will be very helpful to have this here when you make the switch to a skin! */ ?>
@@ -123,7 +133,19 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 <div class="bPosts">
 	<h2>#1: <a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog->disp( 'name', 'htmlbody' ) ?></a></h2>
-	<?php request_title( '<h2>', '</h2>' ) ?>
+
+	<?php
+		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+		request_title( array(
+				'title_before'=> '<h2>',
+				'title_after' => '</h2>',
+				'title_none'  => '',
+				'glue'        => ' - ',
+				'title_single_disp' => true,
+				'format'      => 'htmlbody',
+			) );
+		// ------------------------------ END OF REQUEST TITLE -----------------------------
+	?>
 
 	<?php // ------------------------------------ START OF POSTS ----------------------------------------
 		if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post

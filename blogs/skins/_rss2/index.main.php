@@ -38,7 +38,16 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 	<channel>
 		<title><?php
 			$Blog->disp( 'name', 'xml' );
-			request_title( ' - ', '', ' - ', 'xml' );
+			// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+			request_title( array(
+					'title_before'=> ' - ',
+					'title_after' => '',
+					'title_none'  => '',
+					'glue'        => ' - ',
+					'title_single_disp' => true,
+					'format'      => 'xml',
+				) );
+			// ------------------------------ END OF REQUEST TITLE -----------------------------
 		?></title>
 		<link><?php $Blog->disp( 'url', 'xml' ) ?></link>
 		<description><?php $Blog->disp( 'shortdesc', 'xml' ) ?></description>

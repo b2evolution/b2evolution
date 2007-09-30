@@ -47,27 +47,45 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @todo single post: posts do no get proper checking (wether they are in the requested blog or wether their permissions match user rights,
  * thus the title sometimes gets displayed even when it should not. We need to pre-query the ItemList instead!!
  * @todo make it complete with all possible params!
- * @todo fp> get_request_title() if needed
  *
- * @param string prefix to display if a title is generated
- * @param string suffix to display if a title is generated
- * @param string glue to use if multiple title elements are generated
- * @param string format to output, default 'htmlbody'
  * @param array params
- * @param boolean do we want to display title for single posts
- * @param default text to display if nothing else
  */
-function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'htmlbody',
-												$params = array(), $disp_single_title = true, $default = '' )
+function request_title( $params = array() )
 {
 	global $MainList, $preview, $disp;
 
 	$r = array();
 
 	$params = array_merge( array(
-			'arcdir_text' => T_('Archive directory'),
-			'catdir_text' => T_('Category directory'),
+			'auto_pilot'          => 'none',
+			'title_before'        => '',
+			'title_after'         => '',
+			'title_none'          => '',
+			'title_single_disp'   => true,
+			'title_single_before' => '#',
+			'title_single_after'  => '#',
+			'title_page_disp'     => true,
+			'title_page_before'   => '#',
+			'title_page_after'    => '#',
+			'glue'                => ' - ',
+			'format'              => 'htmlbody',
+			'arcdir_text'         => T_('Archive directory'),
+			'catdir_text'         => T_('Category directory'),
 		), $params );
+
+	if( $params['auto_pilot'] == 'seo_title' )
+	{	// We want to use the SEO title autopilot. Do overrides:
+		global $Blog;
+		$params['format'] = 'htmlhead';
+		$params['title_after'] = $params['glue'].$Blog->get('name');
+		$params['title_single_after'] = '';
+		$params['title_page_after'] = '';
+		$params['title_none'] = $Blog->dget('name','htmlhead');
+	}
+
+
+	$before = $params['title_before'];
+	$after = $params['title_after'];
 
 	switch( $disp )
 	{
@@ -117,17 +135,26 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			break;
 
 		case 'single':
+		case 'page':
 			// We are displaying a single message:
 			if( $preview )
 			{	// We are requesting a post preview:
 				$r[] = T_('PREVIEW');
 			}
-			elseif( $disp_single_title && isset( $MainList ) )
+			elseif( $params['title_'.$disp.'_disp'] && isset( $MainList ) )
 			{
 				$r = array_merge( $r, $MainList->get_filter_titles( array( 'visibility', 'hide_future' ), $params ) );
 			}
-			break;		
-	
+			if( $params['title_'.$disp.'_before'] != '#' )
+			{
+				$before = $params['title_'.$disp.'_before'];
+			}
+			if( $params['title_'.$disp.'_after'] != '#' )
+			{
+				$after = $params['title_'.$disp.'_after'];
+			}
+			break;
+
 		default:
 			if( isset( $MainList ) )
 			{
@@ -139,12 +166,12 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 
 	if( ! empty( $r ) )
 	{
-		$r = implode( $glue, $r );
-		$r = $prefix.format_to_output( $r, $format ).$suffix;
+		$r = implode( $params['glue'], $r );
+		$r = $before.format_to_output( $r, $params['format'] ).$after;
 	}
-	elseif( !empty( $default ) )
+	elseif( !empty( $params['title_none'] ) )
 	{
-		$r = $default;
+		$r = $params['title_none'];
 	}
 
 	if( !empty( $r ) )
@@ -340,6 +367,9 @@ function include_headlines()
 
 /*
  * $Log$
+ * Revision 1.8  2007/09/30 04:55:34  fplanque
+ * request_title() cleanup
+ *
  * Revision 1.7  2007/09/28 09:28:36  fplanque
  * per blog advanced SEO settings
  *

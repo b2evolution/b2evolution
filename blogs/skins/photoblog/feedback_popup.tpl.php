@@ -35,8 +35,14 @@ $Messages->disp( '<div class="action_messages">', '</div>' );
 
 
 // ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
-request_title( '<h2>', '</h2>', ' - ', 'htmlbody', array(
-	 ), false, '<h2>&nbsp;</h2>' );
+request_title( array(
+		'title_before'=> '<h2>',
+		'title_after' => '</h2>',
+		'title_none'  => '<h2>&nbsp;</h2>',
+		'glue'        => ' - ',
+		'title_single_disp' => false,
+		'format'      => 'htmlbody',
+	) );
 // ------------------------------ END OF REQUEST TITLE -----------------------------
 
 
