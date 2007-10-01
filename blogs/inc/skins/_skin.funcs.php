@@ -195,13 +195,13 @@ function skin_include( $template_name, $params = array() )
 				'disp_subs'     => '_subscriptions.php',
 			), $params );
 
-		$template_name = ( empty( $disp_handlers['disp_'.$disp] ) ? null : $disp_handlers['disp_'.$disp] );
-
-		if( !isset( $template_name ) )
+		if( !isset( $disp_handlers['disp_'.$disp] ) )
 		{
 			printf( '<div class="skin_error">Unhandled disp type [%s]</div>', $disp );
 			return;
 		}
+
+		$template_name = $disp_handlers['disp_'.$disp];
 
 		if( empty( $template_name ) )
 		{	// The caller asked not to display this handler
@@ -408,6 +408,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.9  2007/10/01 13:37:28  fplanque
+ * fix
+ *
  * Revision 1.8  2007/10/01 08:03:57  yabs
  * minor fix
  *
