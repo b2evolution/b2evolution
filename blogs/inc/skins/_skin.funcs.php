@@ -195,7 +195,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_subs'     => '_subscriptions.php',
 			), $params );
 
-		$template_name = $disp_handlers['disp_'.$disp];
+		$template_name = ( empty( $disp_handlers['disp_'.$disp] ) ? null : $disp_handlers['disp_'.$disp] );
 
 		if( !isset( $template_name ) )
 		{
@@ -261,11 +261,11 @@ function skin_base_tag()
 
 /**
  * Template tag. Output content-type header
- * 
+ *
  * We use this method when we are NOT generating a static page
  *
  * @see skin_content_meta()
- * 
+ *
  * @param string content-type; override for RSS feeds
  */
 function skin_content_header( $type = 'text/html' )
@@ -281,7 +281,7 @@ function skin_content_header( $type = 'text/html' )
 
 /**
  * Template tag. Output content-type http_equiv meta tag
- * 
+ *
  * We use this method when we ARE generating a static page
  *
  * @see skin_content_header()
@@ -408,6 +408,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.8  2007/10/01 08:03:57  yabs
+ * minor fix
+ *
  * Revision 1.7  2007/10/01 01:06:31  fplanque
  * Skin/template functions cleanup.
  *
