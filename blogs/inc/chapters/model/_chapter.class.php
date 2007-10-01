@@ -185,6 +185,12 @@ class Chapter extends GenericCategory
 			$blogurl = $this->Blog->gen_blogurl();
 		}
 
+		if( in_array( $link_type, array('subchap', 'chapters' ) ) )
+		{
+			$this->get_Blog();
+			$category_prefix = $this->Blog->get_setting('category_prefix');
+		}
+
 		switch( $link_type )
 		{
 			case 'param_num':
@@ -192,12 +198,26 @@ class Chapter extends GenericCategory
 				/* break; */
 
 			case 'subchap':
-				return url_add_tail( $blogurl, '/'.$this->urlname.'/' );
+				if( !empty( $category_prefix ) )
+				{
+					return url_add_tail( $blogurl, '/' . $category_prefix . '/' . $this->urlname.'/' );
+				}
+				else
+				{
+					return url_add_tail( $blogurl, '/'.$this->urlname.'/' );
+				}
 				/* break; */
 
 			case 'chapters':
 			default:
-				return url_add_tail( $blogurl, '/'.$this->get_url_path() );
+				if( !empty( $category_prefix ) )
+				{
+					return url_add_tail( $blogurl, '/'. $category_prefix . '/' . $this->get_url_path() );
+				}
+				else
+				{
+					return url_add_tail( $blogurl, '/'.$this->get_url_path() );
+				}
 				/* break; */
 		}
 	}
@@ -276,6 +296,9 @@ class Chapter extends GenericCategory
 
 /*
  * $Log$
+ * Revision 1.4  2007/10/01 13:41:06  waltercruz
+ * Category prefix, trying to make the code more b2evo style
+ *
  * Revision 1.3  2007/09/29 01:50:49  fplanque
  * temporary rollback; waiting for new version
  *

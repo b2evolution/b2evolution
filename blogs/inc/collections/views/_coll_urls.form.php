@@ -57,6 +57,20 @@ global $Debuglog;
 			document.getElementById( 'urlpreview' ).appendChild( document.createTextNode( blog_baseurl ) );
 		}
 	}
+
+	function show_hide_chapter_prefix(ob){
+		var fldset = document.getElementById( 'category_prefix_container' );
+		if( ob.value == 'param_num' )
+		{
+			fldset.style.display = 'none';
+			var category_prefix_ob = document.getElementById( 'category_prefix' );
+			category_prefix_ob.value = '';
+		}
+		else
+		{
+			fldset.style.display = '';
+		}
+	}
 	//-->
 </script>
 
@@ -191,12 +205,29 @@ $Form->begin_fieldset( T_('Category URLs') );
 	$Form->radio( 'chapter_links', $edited_Blog->get_setting('chapter_links'),
 		array(
 				array( 'param_num', T_('Use param: cat ID'), T_('Category links will look like ')
-								.url_add_param( $blogurl, 'cat=123' ) ),
+								.url_add_param( $blogurl, 'cat=123' ),'', 'onclick="show_hide_chapter_prefix(this);"'),
 				array( 'subchap', T_('Use extra-path: sub-category'), T_('Category links will look like ' )
-								.url_add_tail( $blogurl, '/subcat/' ) ),
+								.url_add_tail( $blogurl, '/subcat/' ), '', 'onclick="show_hide_chapter_prefix(this);"' ),
 				array( 'chapters', T_('Use extra-path: category path'), T_('Category links will look like ' )
-								.url_add_tail( $blogurl, '/cat/subcat/' ) ),
+								.url_add_tail( $blogurl, '/cat/subcat/' ), '', 'onclick="show_hide_chapter_prefix(this);"' ),
 			), T_('Category links'), true );
+
+$show_prefix = ($edited_Blog->get_setting('chapter_links') != 'param_num') ? true : false ;
+
+if ($show_prefix)
+{
+	$style_container_prefix = '';
+}
+else
+{
+	$style_container_prefix = 'style="display:none"';
+}
+
+echo ('<div id="category_prefix_container"' . $style_container_prefix . '>');
+	$Form->text_input( 'category_prefix', $edited_Blog->get_setting( 'category_prefix' ), 30, T_('Prefix'),
+												T_('A optional prefix to be added to the URLs of the categories'),
+												array('maxlength' => 120) );
+echo('</div>');
 
 $Form->end_fieldset();
 
@@ -234,6 +265,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.4  2007/10/01 13:41:07  waltercruz
+ * Category prefix, trying to make the code more b2evo style
+ *
  * Revision 1.3  2007/09/29 01:50:50  fplanque
  * temporary rollback; waiting for new version
  *

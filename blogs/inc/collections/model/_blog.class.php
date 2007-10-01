@@ -281,6 +281,24 @@ class Blog extends DataObject
 			$this->set_setting( 'chapter_links', get_param( 'chapter_links' ) );
 		}
 
+		if( param( 'category_prefix',   'string', NULL) !== NULL )
+		{
+			$category_prefix = get_param( 'category_prefix' );
+			if ( !empty( $category_prefix ) )
+			{
+				if( ! preg_match( '|^[A-Za-z0-9\-]+$|', $category_prefix) || 
+				preg_match( '|^[A-Za-z][0-9]*$|', $category_prefix ) )
+				{
+					$Messages->add( T_('Categories Prefix').': ' .T_('Invalid prefix for categories'), 'error' );
+				}
+				$this->set_setting( 'category_prefix', $category_prefix);
+			}
+			else
+			{
+				$this->set_setting( 'category_prefix', '');
+			}
+		}
+
 		if( param( 'single_links',   'string', NULL ) !== NULL )
 		{ // Single post link type:
 			$this->set_setting( 'single_links', get_param( 'single_links' ) );
@@ -1423,6 +1441,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2007/10/01 13:41:07  waltercruz
+ * Category prefix, trying to make the code more b2evo style
+ *
  * Revision 1.6  2007/09/29 01:50:50  fplanque
  * temporary rollback; waiting for new version
  *
