@@ -149,7 +149,7 @@ global $Hit;
 				echo '<li><a href="'.$admin_url.'?ctrl=files'.$blog_param.'">'.T_('Upload').'</a></li>';
 
 				// Customize current blog
-				if( isset($Blog) && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+				if( isset($Blog) && is_object($Blog) && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 				{	// We have permission to edit blog properties:
  					echo '<li class="menu_close" onmouseover="evo_menu_show(this)" onmouseout="evo_menu_hide(this)">';
 						echo '<a href="'.$admin_url.'?ctrl=coll_settings'.$blog_param.'">'.T_('Customize').' '.get_icon('dropdown').'</a>';
