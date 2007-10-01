@@ -43,7 +43,7 @@ skin_content_header();	// Sets charset!
 
 	<?php
 		// Display container and contents:
-		$Skin->container( NT_('Page Top'), array(
+		skin_container( NT_('Page Top'), array(
 				// The following params will be used as defaults for widgets included in this container:
 				'block_start' => '<div class="$wi_class$">',
 				'block_end' => '</div>',
@@ -70,21 +70,24 @@ skin_content_header();	// Sets charset!
 
 	<?php
 	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-	$Messages->disp( '<div class="action_messages">', '</div>' );
+	messages( array(
+			'block_start' => '<div class="action_messages">',
+			'block_end'   => '</div>',
+		) );
 	// --------------------------------- END OF MESSAGES ---------------------------------
 	?>
 
   <?php
-	if( isset($MainList) )
-	{ // Links to previous and next post in single post mode:
-		$MainList->prevnext_item_links( array(
+		// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
+		item_prevnext_links( array(
 				'block_start' => '',
 				'prev_start'  => '',
 				'prev_end'    => ' :',
 				'next_start'  => ': ',
 				'next_end'    => '',
-				'block_end'   => '' ) );
-	}
+				'block_end'   => '',
+			) );
+		// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 	?>
 
 	<?php
@@ -188,16 +191,21 @@ skin_content_header();	// Sets charset!
 
 	<hr>
 
+
 	<div align="center">
-		<strong>
 		<?php
-			// Links to list pages:
-			if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
+			// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+			mainlist_page_links( array(
+					'block_start' => '<p class="center"><strong>',
+					'block_end' => '</strong></p>',
+					'links_format' => '$prev$ :: $next$',
    				'prev_text' => '&lt;&lt; '.T_('Previous'),
    				'next_text' => T_('Next').' &gt;&gt;',
 				) );
+			// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 		?>
-		::
+
+		<strong>
 		<a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('Archives') ?></a>
 		</strong>
 

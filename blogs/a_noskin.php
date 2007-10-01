@@ -143,22 +143,24 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	<?php
 		// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-		$Messages->disp( '<div class="action_messages">', '</div>' );
+		messages( array(
+			'block_start' => '<div class="action_messages">',
+			'block_end'   => '</div>',
+		) );
 		// --------------------------------- END OF MESSAGES ---------------------------------
 	?>
 
 	<?php
-		if( isset($MainList) )
-		{ // Links to previous and next post in single post mode:
-			$MainList->prevnext_item_links( array(
-					'block_start' => '<table class="prevnext_post"><tr>',
-					'prev_start'  => '<td>',
-					'prev_end'    => '</td>',
-					'next_start'  => '<td class="right">',
-					'next_end'    => '</td>',
-					'block_end'   => '</tr></table>',
-				) );
-		}
+		// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
+		item_prevnext_links( array(
+				'block_start' => '<table class="prevnext_post"><tr>',
+				'prev_start'  => '<td>',
+				'prev_end'    => '</td>',
+				'next_start'  => '<td class="right">',
+				'next_end'    => '</td>',
+				'block_end'   => '</tr></table>',
+			) );
+		// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 	?>
 
 	<?php
@@ -175,10 +177,12 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	?>
 
 	<?php
-		if( isset($MainList) )
-		{ // Links to list pages:
-			$MainList->page_links( '<p class="center"><strong>', '</strong></p>' );
-		}
+		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+		mainlist_page_links( array(
+				'block_start' => '<p class="center"><strong>',
+				'block_end' => '</strong></p>',
+			) );
+		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	?>
 
 
@@ -263,13 +267,15 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		</div>
 	<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
 
-
 	<?php
-		// Links to list pages:
-		if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '#', array(
+		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+		mainlist_page_links( array(
+				'block_start' => '<p class="center"><strong>',
+				'block_end' => '</strong></p>',
    			'prev_text' => '&lt;&lt;',
    			'next_text' => '&gt;&gt;',
 			) );
+		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	?>
 
 
@@ -306,11 +312,15 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		?></p>
 
 		<?php
-			// Links to list pages:
-			if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
+			// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+			mainlist_page_links( array(
+					'block_start' => '<p class="center"><strong>',
+					'block_end' => '</strong></p>',
+					'links_format' => '$prev$ :: $next$',
    				'prev_text' => '&lt;&lt; '.T_('Previous'),
    				'next_text' => T_('Next').' &gt;&gt;',
 				) );
+			// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 		?>
 
 		<?php

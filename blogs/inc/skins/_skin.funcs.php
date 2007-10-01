@@ -335,6 +335,19 @@ function skin_widget( $params )
 
 
 /**
+	 * Display a container
+	 *
+	 * @param string
+	 * @param array
+ */
+function skin_container( $sco_name, $params = array() )
+{
+	global $Skin;
+
+	$Skin->container( $sco_name, $params );
+}
+
+/**
  * Checks if a skin is provided by a plugin.
  *
  * Used by front-end.
@@ -392,18 +405,12 @@ function skin_exists( $name, $filename = 'index.main.php' )
 }
 
 
-/**
- * Template tag.
- */
-function app_version()
-{
-	global $app_version;
-	echo $app_version;
-}
-
 
 /*
  * $Log$
+ * Revision 1.7  2007/10/01 01:06:31  fplanque
+ * Skin/template functions cleanup.
+ *
  * Revision 1.6  2007/09/28 09:28:36  fplanque
  * per blog advanced SEO settings
  *

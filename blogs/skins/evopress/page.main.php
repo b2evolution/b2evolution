@@ -48,7 +48,10 @@ skin_include( '_body_header.inc.php' );
 
 <?php
 	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-	$Messages->disp( '<div class="action_messages">', '</div>' );
+	messages( array(
+			'block_start' => '<div class="action_messages">',
+			'block_end'   => '</div>',
+		) );
 	// --------------------------------- END OF MESSAGES ---------------------------------
 ?>
 

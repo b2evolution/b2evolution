@@ -37,7 +37,7 @@ skin_include( '_html_header.inc.php' );
 	<?php
 		// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
 		// Display container and contents:
-		$Skin->container( NT_('Page Top'), array(
+		skin_container( NT_('Page Top'), array(
 				// The following params will be used as defaults for widgets included in this container:
 				'block_start'         => '<div class="$wi_class$">',
 				'block_end'           => '</div>',
@@ -55,7 +55,7 @@ skin_include( '_html_header.inc.php' );
 	<?php
 		// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
 		// Display container and contents:
-		$Skin->container( NT_('Header'), array(
+		skin_container( NT_('Header'), array(
 				// The following params will be used as defaults for widgets included in this container:
 				'block_start'       => '<div class="$wi_class$">',
 				'block_end'         => '</div>',
@@ -72,7 +72,7 @@ skin_include( '_html_header.inc.php' );
 		// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
 		// Display container and contents:
 		// Note: this container is designed to be a single <ul> list
-		$Skin->container( NT_('Menu'), array(
+		skin_container( NT_('Menu'), array(
 				// The following params will be used as defaults for widgets included in this container:
 				'block_start'         => '',
 				'block_end'           => '',
@@ -92,31 +92,30 @@ skin_include( '_html_header.inc.php' );
 <!-- =================================== START OF MAIN AREA =================================== -->
 <div class="bPosts">
 
-
 	<?php
 		// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-		$Messages->disp( '<div class="action_messages">', '</div>' );
+		messages( array(
+				'block_start' => '<div class="action_messages">',
+				'block_end'   => '</div>',
+			) );
 		// --------------------------------- END OF MESSAGES ---------------------------------
 	?>
 
-
 	<?php
-		if( isset($MainList) )
-		{ // Links to previous and next post in single post mode:
-			$MainList->prevnext_item_links( array(
-					'block_start' => '<table class="prevnext_post"><tr>',
-					'prev_start'  => '<td>',
-					'prev_end'    => '</td>',
-					'next_start'  => '<td class="right">',
-					'next_end'    => '</td>',
-					'block_end'   => '</tr></table>',
-				) );
-		}
+		// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
+		item_prevnext_links( array(
+				'block_start' => '<table class="prevnext_post"><tr>',
+				'prev_start'  => '<td>',
+				'prev_end'    => '</td>',
+				'next_start'  => '<td class="right">',
+				'next_end'    => '</td>',
+				'block_end'   => '</tr></table>',
+			) );
+		// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 	?>
 
-
 	<?php
-		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+		// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
 		request_title( array(
 				'title_before'=> '<h2>',
 				'title_after' => '</h2>',
@@ -125,15 +124,16 @@ skin_include( '_html_header.inc.php' );
 				'title_single_disp' => true,
 				'format'      => 'htmlbody',
 			) );
-		// ------------------------------ END OF REQUEST TITLE -----------------------------
+		// ----------------------------- END OF REQUEST TITLE ----------------------------
 	?>
 
-
 	<?php
-		if( isset($MainList) )
-		{ // Links to list pages:
-			$MainList->page_links( '<p class="center">'.T_('Pages:').' <strong>', '</strong></p>' );
-		}
+		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+		mainlist_page_links( array(
+				'block_start' => '<p class="center">'.T_('Pages:').' <strong>',
+				'block_end' => '</strong></p>',
+			) );
+		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	?>
 
 
@@ -249,10 +249,16 @@ skin_include( '_html_header.inc.php' );
 
 	?>
 
-	<?php
-		// Links to list pages:
-		if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>' );
-	?>
+			<?php
+				// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+				mainlist_page_links( array(
+						'block_start' => '<p class="center"><strong>',
+						'block_end' => '</strong></p>',
+   					'prev_text' => '&lt;&lt;',
+   					'next_text' => '&gt;&gt;',
+					) );
+				// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+			?>
 
 
 	<?php
@@ -276,7 +282,7 @@ skin_include( '_html_header.inc.php' );
 	<?php
 		// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
-		$Skin->container( NT_('Sidebar'), array(
+		skin_container( NT_('Sidebar'), array(
 				// The following (optional) params will be used as defaults for widgets included in this container:
 				// This will enclose each widget in a block:
 				'block_start' => '<div class="bSideItem $wi_class$">',
@@ -309,7 +315,7 @@ skin_include( '_html_header.inc.php' );
 <div id="pageFooter">
 	<?php
 		// Display container and contents:
-		$Skin->container( NT_("Footer"), array(
+		skin_container( NT_("Footer"), array(
 				// The following params will be used as defaults for widgets included in this container:
 			) );
 		// Note: Double quotes have been used around "Footer" only for test purposes.

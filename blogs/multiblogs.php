@@ -221,15 +221,17 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		} // ---------------------------------- END OF POSTS ------------------------------------
 	?>
 
-	
 	<?php
-		// Links to list pages:
-		if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
+		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+		mainlist_page_links( array(
+				'block_start' => '<p class="center"><strong>',
+				'block_end' => '</strong></p>',
+				'links_format' => '$prev$ :: $next$',
    			'prev_text' => '&lt;&lt; '.T_('Previous'),
    			'next_text' => T_('Next').' &gt;&gt;',
 			) );
+		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	?>
-
 
 	<?php
 		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------

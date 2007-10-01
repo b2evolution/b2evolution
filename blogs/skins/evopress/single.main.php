@@ -48,23 +48,25 @@ skin_include( '_body_header.inc.php' );
 
 <?php
 	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-	$Messages->disp( '<div class="action_messages">', '</div>' );
+	messages( array(
+			'block_start' => '<div class="action_messages">',
+			'block_end'   => '</div>',
+		) );
 	// --------------------------------- END OF MESSAGES ---------------------------------
 ?>
 
 
 <?php
-	if( isset($MainList) )
-	{ // Links to previous and next post in single post mode:
-		$MainList->prevnext_item_links( array(
-				'block_start' => '<table class="prevnext_post"><tr>',
-				'prev_start'  => '<td>',
-				'prev_end'    => '</td>',
-				'next_start'  => '<td class="right">',
-				'next_end'    => '</td>',
-				'block_end'   => '</tr></table>',
-			) );
-	}
+	// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
+	item_prevnext_links( array(
+			'block_start' => '<table class="prevnext_post"><tr>',
+			'prev_start'  => '<td>',
+			'prev_end'    => '</td>',
+			'next_start'  => '<td class="right">',
+			'next_end'    => '</td>',
+			'block_end'   => '</tr></table>',
+		) );
+	// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 ?>
 
 

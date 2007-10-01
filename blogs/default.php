@@ -69,7 +69,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			<h1><?php echo T_('It Works !') ?></h1>
 			
 			<?php
-				$Messages->disp( '<div class="action_messages">', '</div>' );
+				messages( array(
+			'block_start' => '<div class="action_messages">',
+			'block_end'   => '</div>',
+		) );
 				
 				echo '<p><strong>'.T_('You have successfully installed b2evolution.').'</strong></p>';
 				

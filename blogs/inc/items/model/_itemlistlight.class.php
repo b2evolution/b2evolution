@@ -1424,22 +1424,15 @@ class ItemListLight extends DataObjectList2
 	/**
 	 * Template tag
 	 */
-	function page_links( $before = '#', $after = '#', $format = '#', $params = array(), $single = '' )
+	function page_links( $params = array() )
 	{
 		global $generating_static;
 
-		if( $this->total_pages <= 1 )
-		{	// Single page:
-			echo $single;
-			return;
-		}
-
-		if( $format == '#' )
-		{
-			$format = '$prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$';
-		}
-
 		$default_params = array(
+				'block_start' => '<p class="center">',
+				'block_end' => '</p>',
+				'block_single' => '',
+				'links_format' => '#',
 				'page_url' => '', // All generated links will refer to the current page
 				'prev_text' => '&lt;&lt;',
 				'next_text' => '&gt;&gt;',
@@ -1458,9 +1451,21 @@ class ItemListLight extends DataObjectList2
 		// Use defaults + overrides:
 		$params = array_merge( $default_params, $params );
 
-		echo $before;
-		echo $this->replace_vars( $format, $params );
-		echo $after;
+		if( $this->total_pages <= 1 )
+		{	// Single page:
+			echo $params['block_single'];
+			return;
+		}
+
+		if( $params['links_format'] == '#' )
+		{
+			$params['links_format'] = '$prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$';
+		}
+
+
+		echo $params['block_start'];
+		echo $this->replace_vars( $params['links_format'], $params );
+		echo $params['block_end'];
 	}
 
 
@@ -1468,6 +1473,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.7  2007/10/01 01:06:31  fplanque
+ * Skin/template functions cleanup.
+ *
  * Revision 1.6  2007/09/26 20:26:36  fplanque
  * improved ItemList filters
  *

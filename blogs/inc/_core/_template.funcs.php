@@ -365,8 +365,59 @@ function include_headlines()
 }
 
 
+/**
+ * Template tag.
+ */
+function app_version()
+{
+	global $app_version;
+	echo $app_version;
+}
+
+
+/**
+ * Stub: Links to previous and next post in single post mode
+ */
+function item_prevnext_links( $params = array() )
+{
+	global $MainList;
+
+	if( isset($MainList) )
+	{
+		$MainList->prevnext_item_links( $params );
+	}
+}
+
+
+/**
+ * Stub
+ */
+function messages( $params = array() )
+{
+	global $Messages;
+
+	$Messages->disp( $params['block_start'], $params['block_end'] );
+}
+
+
+/**
+ * Stub: Links to list pages:
+ */
+function mainlist_page_links( $params = array() )
+{
+	global $MainList;
+
+	if( isset($MainList) )
+	{
+		$MainList->page_links( $params );
+	}
+}
+
 /*
  * $Log$
+ * Revision 1.9  2007/10/01 01:06:31  fplanque
+ * Skin/template functions cleanup.
+ *
  * Revision 1.8  2007/09/30 04:55:34  fplanque
  * request_title() cleanup
  *

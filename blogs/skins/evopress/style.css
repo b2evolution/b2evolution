@@ -53,6 +53,7 @@ body {
 	} 
 
 #content {
+	clear: both;
 	font-size: 1.2em
 	}
 
@@ -585,7 +586,7 @@ div.top_menu ul {
 	margin: 0 24px;
 	padding: 0;
 	list-style-type:none;
-	padding: 8px 0 0 0;
+	padding: 8px 0 8px 0;
 	font-size: 108%;
 }
 div.top_menu li {

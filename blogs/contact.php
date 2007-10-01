@@ -104,7 +104,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 <?php
 	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-	$Messages->disp( '<div class="action_messages">', '</div>' );
+	messages( array(
+			'block_start' => '<div class="action_messages">',
+			'block_end'   => '</div>',
+		) );
 	// --------------------------------- END OF MESSAGES ---------------------------------
 ?>
 

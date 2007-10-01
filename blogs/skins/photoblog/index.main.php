@@ -29,7 +29,7 @@ skin_include( '_html_header.inc.php' );
 <div class="PageTop">
 	<?php
 		// Display container and contents:
-		$Skin->container( NT_('Page Top'), array(
+		skin_container( NT_('Page Top'), array(
 				// The following params will be used as defaults for widgets included in this container:
 				'block_start' => '<div class="$wi_class$">',
 				'block_end' => '</div>',
@@ -48,7 +48,7 @@ skin_include( '_html_header.inc.php' );
 		<?php
 			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			$Skin->container( NT_('Menu'), array(
+			skin_container( NT_('Menu'), array(
 					// The following params will be used as defaults for widgets included in this container:
 					'block_start' => '',
 					'block_end' => '',
@@ -72,21 +72,25 @@ skin_include( '_html_header.inc.php' );
 
 	<?php
 	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-	$Messages->disp( '<div class="action_messages">', '</div>' );
+	messages( array(
+			'block_start' => '<div class="action_messages">',
+			'block_end'   => '</div>',
+		) );
 	// --------------------------------- END OF MESSAGES ---------------------------------
 	?>
 
 	<?php
-		if( isset($MainList) )
-		{ // Links to list pages:
-			$MainList->page_links( '<div class="nav_right">', '</div>', '$next$ $prev$', array(
+		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+		mainlist_page_links( array(
+				'block_start' => '<div class="nav_right">',
+				'block_end' => '</div>',
+				'links_format' => '$next$ $prev$',
 				'prev_text' => '<img src="img/prev.gif" width="29" height="29" alt="'.T_('Previous').'" title="'.T_('Previous').'" />',
 				'next_text' => '<img src="img/next.gif" width="29" height="29" alt="'.T_('Next').'" title="'.T_('Next').'" />',
 				'no_prev_text' => '',
 				'no_next_text' => '<img src="'.$rsc_url.'/img/blank.gif" width="29" height="29" alt="" class="no_nav" />',
-
 			) );
-		}
+		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	?>
 
 	<?php

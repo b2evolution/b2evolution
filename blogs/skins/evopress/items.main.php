@@ -41,7 +41,10 @@ skin_include( '_body_header.inc.php' );
 
 <?php
 	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-	$Messages->disp( '<div class="action_messages">', '</div>' );
+	messages( array(
+			'block_start' => '<div class="action_messages">',
+			'block_end'   => '</div>',
+		) );
 	// --------------------------------- END OF MESSAGES ---------------------------------
 ?>
 
@@ -106,8 +109,14 @@ if( isset($MainList) ) while( $Item = & $MainList->get_item() )
 ?>
 
 <?php
-	// Links to list pages:
-	if( isset($MainList) ) $MainList->page_links( '<div class="navigation">', '</div>' );
+	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+	mainlist_page_links( array(
+			'block_start' => '<div class="navigation">',
+			'block_end' => '</div>',
+   		'prev_text' => '&lt;&lt;',
+   		'next_text' => '&gt;&gt;',
+		) );
+	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 ?>
 
 

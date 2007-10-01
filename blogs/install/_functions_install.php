@@ -201,6 +201,9 @@ function install_basic_skins()
 	$Skin->install( 'evopress' );
 
 	$Skin = new Skin();
+	$Skin->install( 'asevo' );
+
+	$Skin = new Skin();
 	$Skin->install( 'custom' );
 
 	$Skin = new Skin();
@@ -541,6 +544,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.36  2007/10/01 01:06:31  fplanque
+ * Skin/template functions cleanup.
+ *
  * Revision 1.35  2007/09/28 02:17:48  fplanque
  * Menu widgets
  *

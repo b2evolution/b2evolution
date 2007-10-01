@@ -32,7 +32,7 @@ skin_include( '_html_header.inc.php' );
 <div class="PageTop">
 	<?php
 		// Display container and contents:
-		$Skin->container( NT_('Page Top'), array(
+		skin_container( NT_('Page Top'), array(
 				// The following params will be used as defaults for widgets included in this container:
 				'block_start' => '<div class="$wi_class$">',
 				'block_end' => '</div>',
@@ -48,7 +48,7 @@ skin_include( '_html_header.inc.php' );
 <div class="pageHeader">
 	<?php
 		// Display container and contents:
-		$Skin->container( NT_('Header'), array(
+		skin_container( NT_('Header'), array(
 				// The following params will be used as defaults for widgets included in this container:
 				'block_start' => '<div class="$wi_class$">',
 				'block_end' => '</div>',
@@ -62,7 +62,7 @@ skin_include( '_html_header.inc.php' );
 		<?php
 			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			$Skin->container( NT_('Menu'), array(
+			skin_container( NT_('Menu'), array(
 					// The following params will be used as defaults for widgets included in this container:
 					'block_start' => '',
 					'block_end' => '',
@@ -82,21 +82,24 @@ skin_include( '_html_header.inc.php' );
 
 <?php
 	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-	$Messages->disp( '<div class="action_messages">', '</div>' );
+	messages( array(
+			'block_start' => '<div class="action_messages">',
+			'block_end'   => '</div>',
+		) );
 	// --------------------------------- END OF MESSAGES ---------------------------------
 ?>
 
 <?php
-	if( isset($MainList) )
-	{ // Links to previous and next post in single post mode:
-		$MainList->prevnext_item_links( array(
-				'block_start' => '<table class="prevnext_post"><tr>',
-				'prev_start'  => '<td>',
-				'prev_end'    => '</td>',
-				'next_start'  => '<td class="right">',
-				'next_end'    => '</td>',
-				'block_end'   => '</tr></table>' ) );
-	}
+	// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
+	item_prevnext_links( array(
+			'block_start' => '<table class="prevnext_post"><tr>',
+			'prev_start'  => '<td>',
+			'prev_end'    => '</td>',
+			'next_start'  => '<td class="right">',
+			'next_end'    => '</td>',
+			'block_end'   => '</tr></table>',
+		) );
+	// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 ?>
 
 <?php
@@ -202,13 +205,16 @@ skin_include( '_html_header.inc.php' );
 		<div class="separator" ><img src="rsc/img/separator.gif" width="265" height="14" alt="" /></div>
 	<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
 
-	
 	<?php
-		// Links to list pages:
-		if( isset($MainList) ) $MainList->page_links( '<p class="center"><strong>', '</strong></p>', '$prev$ :: $next$', array(
+		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+		mainlist_page_links( array(
+				'block_start' => '<p class="center"><strong>',
+				'block_end' => '</strong></p>',
+				'links_format' => '$prev$ :: $next$',
    			'prev_text' => '&lt;&lt; '.T_('Previous'),
    			'next_text' => T_('Next').' &gt;&gt;',
 			) );
+		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	?>
 
 
@@ -231,7 +237,7 @@ skin_include( '_html_header.inc.php' );
 
 	<?php
 		// Display container contents:
-		$Skin->container( NT_('Sidebar'), array(
+		skin_container( NT_('Sidebar'), array(
 				// The following (optional) params will be used as defaults for widgets included in this container:
 				// This will enclose each widget in a block:
 				'block_start' => '<div class="bSideItem $wi_class$">',
