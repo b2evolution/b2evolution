@@ -183,7 +183,7 @@ skin_include( '_html_header.inc.php' );
 									'link_text_one' => '#',
 									'link_text_more' => '#',
 									'link_title' => '#',
-									'use_popup' => true,
+									'use_popup' => false,
 								) );
 				 ?>
 				<?php
@@ -196,7 +196,7 @@ skin_include( '_html_header.inc.php' );
 									'link_text_one' => '#',
 									'link_text_more' => '#',
 									'link_title' => '#',
-									'use_popup' => true,
+									'use_popup' => false,
 								) );
 				 ?>
 

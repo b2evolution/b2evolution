@@ -233,7 +233,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 									'link_text_one' => '#',
 									'link_text_more' => '#',
 									'link_title' => '#',
-									'use_popup' => true,
+									'use_popup' => false,
 								) );
 				 ?>
 				<?php
@@ -246,7 +246,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 									'link_text_one' => '#',
 									'link_text_more' => '#',
 									'link_title' => '#',
-									'use_popup' => true,
+									'use_popup' => false,
 								) );
 				 ?>
 
