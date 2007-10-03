@@ -174,9 +174,9 @@ class GenericCategoryCache extends GenericCache
 			{	// No specific subset requested, we are going to reveal all subsets
 
 				// Make sure everything has been loaded:
-    		$this->load_all();
+				$this->load_all();
 
-    		echo 'REVEALING ALL SUBSETS in a row. Is this needed?';
+				#echo 'REVEALING ALL SUBSETS in a row. Is this needed?';
 
 				foreach( $this->subset_cache as $subset_ID => $dummy )
 				{
@@ -376,6 +376,9 @@ class GenericCategoryCache extends GenericCache
 
 /*
  * $Log$
+ * Revision 1.2  2007/10/03 02:03:49  blueyed
+ * Commented "REVEALING ALL SUBSETS in a row. Is this needed?" output
+ *
  * Revision 1.1  2007/06/25 11:00:16  fplanque
  * MODULES (refactored MVC)
  *
