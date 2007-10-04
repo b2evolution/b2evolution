@@ -63,8 +63,6 @@ global $Debuglog;
 		if( ob.value == 'param_num' )
 		{
 			fldset.style.display = 'none';
-			var category_prefix_ob = document.getElementById( 'category_prefix' );
-			category_prefix_ob.value = '';
 		}
 		else
 		{
@@ -265,6 +263,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.5  2007/10/04 00:44:21  waltercruz
+ * Not erasing category prefix in javascript.
+ *
  * Revision 1.4  2007/10/01 13:41:07  waltercruz
  * Category prefix, trying to make the code more b2evo style
  *
