@@ -136,7 +136,7 @@ class Blog extends DataObject
 	 */
 	function Blog( $db_row = NULL )
 	{
-		global $basepath, $media_subdir;
+		global $basepath;
 
 		// Call parent constructor:
 		parent::DataObject( 'T_blogs', 'blog_', 'blog_ID' );
@@ -1441,6 +1441,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2007/10/05 00:09:23  blueyed
+ * Nuked unnecessary global statement
+ *
  * Revision 1.7  2007/10/01 13:41:07  waltercruz
  * Category prefix, trying to make the code more b2evo style
  *
