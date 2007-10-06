@@ -223,7 +223,9 @@ if( $resolve_extra_path )
 					$Chapter = & $ChapterCache->get_by_urlname( $last_part, false );
 					if( empty( $Chapter ) )
 					{	// We could not match a chapter...
-						$path_error = 404;
+						// We are going to consider this to be a post title with a misplaced trailing slash.
+						// That happens when upgrading from WP for example.
+						$title = $last_part; // Will be sought later
 					}
 					else
 					{	// We could match a chapter from the extra path:
@@ -337,15 +339,18 @@ elseif( $disp == 'posts' && !empty($Item) )
 		if( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
 		{	// We want to redirect to the Item's canonical URL:
 
-			$canoncical_url = $Item->get_permanent_url( '', '', '&' );
-			// pre_dump( $canoncical_url, $ReqHost.$ReqURI );
-			// There may be some parameters additional at the end of the URL, but the beginning should be canoncial.
-			if( strpos( $ReqHost.$ReqURI, $Item->get_permanent_url( '', '', '&' ) ) !== 0 )
+			$canonical_url = $Item->get_permanent_url( '', '', '&' );
+
+			$requested_crop = preg_replace( '¤\?.*$¤', '', $ReqHost.$ReqURI );
+			$canonical_crop = preg_replace( '¤\?.*$¤', '', $canonical_url );
+			// pre_dump( $requested_crop, $canonical_crop );
+
+			if( $requested_crop != $canonical_crop )
 			{	// The requested URL does not look like the canonical URL for this post,
 				// REDIRECT TO THE CANONICAL URL:
-				// fp> TODO: we're going to lose the additional params, it would be better to keep them...
-				$Debuglog->add( 'Redirecting to canonical URL ['.$canoncical_url.'].' );
-				header_redirect( $canoncical_url, true );
+				// fp> TODO: we might be losing additional params, it would be better to keep them... (but we have redir=no for that)
+				$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].' );
+				header_redirect( $canonical_url, true );
 				// EXITED.
 			}
 		}
@@ -462,6 +467,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.88  2007/10/06 21:26:16  fplanque
+ * WP url decoding compatibility + cleanup
+ *
  * Revision 1.87  2007/09/28 09:28:36  fplanque
  * per blog advanced SEO settings
  *
@@ -587,7 +595,7 @@ else
  * bleh
  *
  * Revision 1.48  2006/11/14 21:56:11  blueyed
- * Debuglog-entry, when redirecting to $canoncical_url
+ * Debuglog-entry, when redirecting to $canonical_url
  *
  * Revision 1.47  2006/11/11 20:33:14  blueyed
  * Moved BeforeBlogDisplay hook to after $skin has been determined
