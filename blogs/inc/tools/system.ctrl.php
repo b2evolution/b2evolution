@@ -64,7 +64,7 @@ function disp_system_check( $condition, $message = '' )
 	echo '</div>';
 	echo '<div class="system_check_value_'.$condition.'">';
 	echo $syscheck_value;
-	echo '</div>';
+	echo '&nbsp;</div>';
 	if( !empty( $message ) )
 	{
 		echo '<div class="system_check_message_'.$condition.'">';
@@ -482,6 +482,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2007/10/06 21:31:51  fplanque
+ * minor
+ *
  * Revision 1.3  2007/10/01 19:02:23  fplanque
  * MySQL version check
  *
