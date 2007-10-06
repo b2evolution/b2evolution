@@ -166,32 +166,36 @@ class Form extends Widget
 			else
 			{	// This happens for comment forms for example...
 				$layout = 'fieldset';
-				$template = array(
-					'layout' => 'fieldset',
-					'formstart' => '',
-					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
-					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
-					'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
-															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
-					'fieldset_end' => '</fieldset>'."\n",
-					'fieldstart' => '<fieldset $ID$>'."\n",
-					'labelstart' => '<div class="label">',
-					'labelend' => "</div>\n",
-					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
-					'inputstart' => '<div class="input">',
-					'infostart' => '<div class="info">',
-					'inputend' => "</div>\n",
-					'fieldend' => "</fieldset>\n\n",
-					'buttonsstart' => '<fieldset><div class="input">',
-					'buttonsend' => "</div></fieldset>\n\n",
-					'formend' => '',
-				);
 			}
 		}
 		elseif( $layout == 'compact' )
 		{
 			$template = $AdminUI->get_template( 'compact_form' );
 			$layout = $template['layout'];
+		}
+
+		if( !isset($template) && $layout == 'fieldset' )
+		{	// happens on login screen &nd after $laout seeting above
+			$template = array(
+				'layout' => 'fieldset',
+				'formstart' => '',
+				'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+				'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
+				'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
+														.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
+				'fieldset_end' => '</fieldset>'."\n",
+				'fieldstart' => '<fieldset $ID$>'."\n",
+				'labelstart' => '<div class="label">',
+				'labelend' => "</div>\n",
+				'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
+				'inputstart' => '<div class="input">',
+				'infostart' => '<div class="info">',
+				'inputend' => "</div>\n",
+				'fieldend' => "</fieldset>\n\n",
+				'buttonsstart' => '<fieldset><div class="input">',
+				'buttonsend' => "</div></fieldset>\n\n",
+				'formend' => '',
+			);
 		}
 
 		$this->saved_layouts = array($layout);
@@ -2805,6 +2809,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.11  2007/10/06 21:04:15  fplanque
+ * temporary fix
+ *
  * Revision 1.10  2007/09/30 05:00:45  fplanque
  * fixes
  *
