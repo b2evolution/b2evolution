@@ -27,8 +27,6 @@ skin_content_header();	// Sets charset!
 		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
 		request_title( array(
 			'auto_pilot'      => 'seo_title',
-			'category_text'   => T_('Album').': ',
-			'categories_text' => T_('Albums').': ',
 		) );
 		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?></title>
