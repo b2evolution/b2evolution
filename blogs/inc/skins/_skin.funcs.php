@@ -93,8 +93,12 @@ function skin_init( $disp )
 						$robots_index = false;
 					}
 
-					if(  array_diff( $active_filters, array( 'cat_array' ) ) == array() && count($MainList->filters['cat_array']) == 1 )
+					global $cat, $catsel;
+					if( empty( $catsel ) && preg_match( '¤[0-9]+¤', $cat ) )
 					{	// We are on a single cat page:
+						// NOTE: we must have selected EXACTLY ONE CATEGORY thrpught the cat parameter
+						// BUT: - this can resolved to including children
+						//      - selecting exactly one cat through catsel[] is NOT OK since not equivalent (will exclude children)
 						// echo 'SINGLE CAT PAGE';
 						// EXPERIMENTAL: Please document encountered problems.
 						if( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
@@ -408,6 +412,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.10  2007/10/06 21:31:40  fplanque
+ * Category redirector fix
+ *
  * Revision 1.9  2007/10/01 13:37:28  fplanque
  * fix
  *
