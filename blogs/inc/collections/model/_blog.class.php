@@ -281,22 +281,14 @@ class Blog extends DataObject
 			$this->set_setting( 'chapter_links', get_param( 'chapter_links' ) );
 		}
 
-		if( param( 'category_prefix',   'string', NULL) !== NULL )
+		if( param( 'category_prefix', 'string', NULL) !== NULL )
 		{
 			$category_prefix = get_param( 'category_prefix' );
-			if ( !empty( $category_prefix ) )
+			if( ! preg_match( '|^([A-Za-z0-9\-_]+(/[A-Za-z0-9\-_]+)*)?$|', $category_prefix) )
 			{
-				if( ! preg_match( '|^[A-Za-z0-9\-]+$|', $category_prefix) || 
-				preg_match( '|^[A-Za-z][0-9]*$|', $category_prefix ) )
-				{
-					$Messages->add( T_('Categories Prefix').': ' .T_('Invalid prefix for categories'), 'error' );
-				}
-				$this->set_setting( 'category_prefix', $category_prefix);
+				param_error( 'category_prefix', T_('Invalid category prefix.') );
 			}
-			else
-			{
-				$this->set_setting( 'category_prefix', '');
-			}
+			$this->set_setting( 'category_prefix', $category_prefix);
 		}
 
 		if( param( 'single_links',   'string', NULL ) !== NULL )
@@ -1441,6 +1433,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2007/10/06 21:17:25  fplanque
+ * cleanup
+ *
  * Revision 1.8  2007/10/05 00:09:23  blueyed
  * Nuked unnecessary global statement
  *

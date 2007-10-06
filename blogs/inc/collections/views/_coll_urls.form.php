@@ -210,22 +210,22 @@ $Form->begin_fieldset( T_('Category URLs') );
 								.url_add_tail( $blogurl, '/cat/subcat/' ), '', 'onclick="show_hide_chapter_prefix(this);"' ),
 			), T_('Category links'), true );
 
-$show_prefix = ($edited_Blog->get_setting('chapter_links') != 'param_num') ? true : false ;
+	$show_prefix = ($edited_Blog->get_setting('chapter_links') != 'param_num') ? true : false ;
 
-if ($show_prefix)
-{
-	$style_container_prefix = '';
-}
-else
-{
-	$style_container_prefix = 'style="display:none"';
-}
+	if ($show_prefix)
+	{
+		$style_container_prefix = '';
+	}
+	else
+	{
+		$style_container_prefix = 'style="display:none"';
+	}
 
-echo ('<div id="category_prefix_container"' . $style_container_prefix . '>');
-	$Form->text_input( 'category_prefix', $edited_Blog->get_setting( 'category_prefix' ), 30, T_('Prefix'),
-												T_('A optional prefix to be added to the URLs of the categories'),
-												array('maxlength' => 120) );
-echo('</div>');
+	echo ('<div id="category_prefix_container"' . $style_container_prefix . '>');
+		$Form->text_input( 'category_prefix', $edited_Blog->get_setting( 'category_prefix' ), 30, T_('Prefix'),
+													T_('A optional prefix to be added to the URLs of the categories'),
+													array('maxlength' => 120) );
+	echo('</div>');
 
 $Form->end_fieldset();
 
@@ -263,6 +263,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.6  2007/10/06 21:17:26  fplanque
+ * cleanup
+ *
  * Revision 1.5  2007/10/04 00:44:21  waltercruz
  * Not erasing category prefix in javascript.
  *
