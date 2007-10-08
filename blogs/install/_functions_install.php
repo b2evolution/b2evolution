@@ -207,6 +207,9 @@ function install_basic_skins()
 	$Skin->install( 'custom' );
 
 	$Skin = new Skin();
+	$Skin->install( 'evocamp' );
+
+	$Skin = new Skin();
 	$Skin->install( 'natural_pink' );
 
 	$Skin = new Skin();
@@ -540,6 +543,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.38  2007/10/08 21:30:19  fplanque
+ * evocamp skin
+ *
  * Revision 1.37  2007/10/08 08:32:56  fplanque
  * widget fixes
  *
