@@ -195,11 +195,12 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->begin_fieldset( T_('Advanced properties'), array( 'id' => 'itemform_adv_props' ) );
 
+ 	$Form->switch_layout( 'linespan' );
+
 	if( $current_User->check_perm( 'edit_timestamp' ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
 
 		echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
-		$Form->switch_layout( 'linespan' );
 
 		$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), T_('Issue date') );
 		echo ' '; // allow wrapping!
@@ -210,23 +211,23 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 			$Form->checkbox( 'edit_date', $edit_date, '', T_('Edit') );
 		}
 
-		$Form->switch_layout( NULL );
 		echo '</div>';
 	}
 
-	$Form->switch_layout( 'linespan' );
 
+	echo '<div id="itemform_urltitle" class="edit_fieldgroup">';
 	$Form->text( 'post_urltitle', $edited_Item->get( 'urltitle' ), 40, T_('URL Title'),
 	             T_('(to be used in permalinks)'), $field_maxlength = 50 ) ;
-
+	echo '</div>';
 	?>
-	<div id="itemform_tags">
+
+	<div id="itemform_tags" class="edit_fieldgroup">
 		<label for="item_tags"><strong><?php echo T_('Tags') ?>:</strong>
 		<span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br />
-		<input type="text" name="item_tags" class="large" id="item_tags" value="<?php echo format_to_output( $item_tags, 'formvalue' ); ?>" />
+		<input type="text" name="item_tags" class="large form_text_input" id="item_tags" value="<?php echo format_to_output( $item_tags, 'formvalue' ); ?>" />
 	</div>
 
-	<div id="itemform_post_excerpt">
+	<div id="itemform_post_excerpt" class="edit_fieldgroup">
 		<label for="post_excerpt"><strong><?php echo T_('Excerpt') ?>:</strong>
 		<span class="notes"><?php echo T_('(for XML feeds)') ?></span></label><br />
 		<textarea name="post_excerpt" rows="2" cols="25" class="large" id="post_excerpt"><?php $edited_Item->disp( 'excerpt', 'formvalue' ) ?></textarea>
@@ -377,6 +378,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.12  2007/10/08 08:32:00  fplanque
+ * nicer forms
+ *
  * Revision 1.11  2007/09/29 16:17:50  fplanque
  * minor
  *

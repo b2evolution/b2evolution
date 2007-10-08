@@ -76,7 +76,8 @@ echo $Widget->replace_vars( $template['block_start'] );
 		$Form->hidden( 'tab', $tab );
 		$Form->hidden( 'blog', $Blog->ID );
 
-		$Form->begin_fieldset( T_('Posts to show') );
+		echo '<fieldset>';
+		echo '<legend>'.T_('Posts to show').'</legend>';
 		?>
 		<div>
 
@@ -111,10 +112,11 @@ echo $Widget->replace_vars( $template['block_start'] );
 	 	</div>
 
 		<?php
-		$Form->end_fieldset();
+		echo '</fieldset>';
 
 
-		$Form->begin_fieldset( T_('Title / Text contains'), array( 'class'=>'Text' ) );
+		echo '<fieldset>';
+		echo '<legend>'.T_('Title / Text contains').'</legend>';
 
 		echo $Form->inputstart;
 		?>
@@ -141,7 +143,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 		</div>
 
 		<?php
-		$Form->end_fieldset();
+		echo '</fieldset>';
 
 
 		/*
@@ -268,6 +270,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.8  2007/10/08 08:32:00  fplanque
+ * nicer forms
+ *
  * Revision 1.7  2007/09/26 20:26:36  fplanque
  * improved ItemList filters
  *

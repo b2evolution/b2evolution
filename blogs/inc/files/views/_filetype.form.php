@@ -46,7 +46,7 @@ global $action;
 $creating = is_create_action( $action );
 
 
-$Form = & new Form( NULL, 'ftyp_checkchanges' );
+$Form = & new Form( NULL, 'ftyp_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Delete this filetype!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
@@ -110,6 +110,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.2  2007/10/08 08:31:59  fplanque
+ * nicer forms
+ *
  * Revision 1.1  2007/06/25 11:00:08  fplanque
  * MODULES (refactored MVC)
  *

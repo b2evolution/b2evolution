@@ -279,6 +279,15 @@ table.tabs td.current a:hover {
 /*
  * Forms:
  */
+textarea,
+input.form_text_input,
+input.form_date_input,
+input.SearchField {
+	background: #FFFFFF url(../img/shadow-in.png) no-repeat left top;
+	border: 1px solid #9db0bc;
+	padding: 2px
+} 
+ 
 .fieldset_title {
 	width: 100%;
 	margin-top: 1ex;
@@ -631,9 +640,8 @@ div.bCommentdeprecated > div.bSmallHead /* Direct child only */
 
 
 input.SearchField {
-	width: 96%;
-	margin: .5ex auto 0 auto;
-	padding: 2px;
+	width: 95%;
+	margin: .5ex 2px 0 2px;
 }
 
 
@@ -723,7 +731,7 @@ div.edit_toolbars {
 div.edit_toolbar {
 	background-color: #f1f6f8;
 	border: 1px solid #becdd6;
-	padding: 1px;
+	padding: 1px 2px;
 	margin: 1px auto;
 	width: 98%;
 }
@@ -755,6 +763,9 @@ div.edit_actions {
 	text-align: right;
 }
 
+.edit_fieldgroup {
+	margin: 2px 0;
+}
 
 /*
  * File manager:

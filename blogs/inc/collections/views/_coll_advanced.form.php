@@ -115,7 +115,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 				array( 'subdir', T_('Subdirectory of media folder').':',
 					'',
 					' <span class="nobr"><code>'.$basepath.$media_subdir.'</code><input
-						type="text" name="blog_media_subdir" size="20" maxlength="255"
+						type="text" name="blog_media_subdir" class="form_text_input" size="20" maxlength="255"
 						class="'.( param_has_error('blog_media_subdir') ? 'field_error' : '' ).'"
 						value="'.$edited_Blog->dget( 'media_subdir', 'formvalue' ).'" /></span>', '' ),
 				array( 'custom',
@@ -123,11 +123,11 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 					'',
 					'<fieldset>'
 					.'<div class="label">'.T_('directory').':</div><div class="input"><input
-						type="text" name="blog_media_fullpath" size="50" maxlength="255"
+						type="text" class="form_text_input" name="blog_media_fullpath" size="50" maxlength="255"
 						class="'.( param_has_error('blog_media_fullpath') ? 'field_error' : '' ).'"
 						value="'.$edited_Blog->dget( 'media_fullpath', 'formvalue' ).'" /></div>'
 					.'<div class="label">'.T_('URL').':</div><div class="input"><input
-						type="text" name="blog_media_url" size="50" maxlength="255"
+						type="text" class="form_text_input" name="blog_media_url" size="50" maxlength="255"
 						class="'.( param_has_error('blog_media_url') ? 'field_error' : '' ).'"
 						value="'.$edited_Blog->dget( 'media_url', 'formvalue' ).'" /></div></fieldset>' )
 			), T_('Media dir location'), true
@@ -150,6 +150,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.2  2007/10/08 08:31:59  fplanque
+ * nicer forms
+ *
  * Revision 1.1  2007/06/25 10:59:34  fplanque
  * MODULES (refactored MVC)
  *

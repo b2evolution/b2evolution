@@ -784,6 +784,10 @@ class Form extends Widget
 		}
 		*/
 
+		// Give it a class, so it can be selected for CSS in IE6
+		if( empty($field_params['class']) ) $field_params['class'] = 'form_date_input';
+		else $field_params['class'] .= ' form_date_input';
+
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
@@ -2809,6 +2813,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.12  2007/10/08 08:31:59  fplanque
+ * nicer forms
+ *
  * Revision 1.11  2007/10/06 21:04:15  fplanque
  * temporary fix
  *

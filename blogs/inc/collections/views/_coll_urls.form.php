@@ -153,7 +153,7 @@ $Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']' );
 			array( 'relative', T_('Relative to baseurl').':',
 										'',
 										'<span class="nobr"><code>'.$baseurl.'</code>'
-										.'<input type="text" id="blog_siteurl_relative" name="blog_siteurl_relative" size="35" maxlength="120" value="'
+										.'<input type="text" id="blog_siteurl_relative" class="form_text_input" name="blog_siteurl_relative" size="35" maxlength="120" value="'
 										.format_to_output( $blog_siteurl_relative, 'formvalue' )
 										.'" onkeyup="update_urlpreview( \''.$baseurl.'\'+this.value );"
 										onfocus="document.getElementsByName(\'blog_access_type\')[3].checked=true;
@@ -167,7 +167,7 @@ $Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']' );
 			),
 			array( 'absolute', T_('Absolute URL').':',
 										'',
-										'<input type="text" id="blog_siteurl_absolute" name="blog_siteurl_absolute" size="50" maxlength="120" value="'
+										'<input type="text" id="blog_siteurl_absolute" class="form_text_input" name="blog_siteurl_absolute" size="50" maxlength="120" value="'
 											.format_to_output( $blog_siteurl_absolute, 'formvalue' )
 											.'" onkeyup="update_urlpreview( this.value );"
 											onfocus="document.getElementsByName(\'blog_access_type\')[5].checked=true;
@@ -263,6 +263,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.7  2007/10/08 08:31:59  fplanque
+ * nicer forms
+ *
  * Revision 1.6  2007/10/06 21:17:26  fplanque
  * cleanup
  *
