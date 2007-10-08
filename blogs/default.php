@@ -78,9 +78,9 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			
 			<?php
 				messages( array(
-			'block_start' => '<div class="action_messages">',
-			'block_end'   => '</div>',
-		) );
+						'block_start' => '<div class="action_messages">',
+						'block_end'   => '</div>',
+					) );
 
 				if( count( $BlogCache->cache ) == 0 )
 				{	// There is no blog on this system!
