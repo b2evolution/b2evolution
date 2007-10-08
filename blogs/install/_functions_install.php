@@ -328,21 +328,17 @@ function install_basic_widgets()
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							 SELECT blog_ID, "Sidebar", 4, "core", "coll_common_links"
 							   FROM T_blogs' );
-	// Add info pages to all blogs Sidebars:
-	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 5, "core", "coll_page_list"
-							   FROM T_blogs' );
 	// Add search form to all blogs Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 6, "core", "coll_search_form"
+							 SELECT blog_ID, "Sidebar", 5, "core", "coll_search_form"
 							   FROM T_blogs' );
 	// Add categories list to all blog Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 7, "core", "coll_category_list"
+							 SELECT blog_ID, "Sidebar", 6, "core", "coll_category_list"
 							   FROM T_blogs' );
 	// Add XML feeds to all blogs Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 8, "core", "coll_xml_feeds"
+							 SELECT blog_ID, "Sidebar", 7, "core", "coll_xml_feeds"
 							   FROM T_blogs' );
 
 	echo "OK.<br />\n";
@@ -544,6 +540,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.37  2007/10/08 08:32:56  fplanque
+ * widget fixes
+ *
  * Revision 1.36  2007/10/01 01:06:31  fplanque
  * Skin/template functions cleanup.
  *

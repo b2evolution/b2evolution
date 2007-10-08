@@ -203,13 +203,13 @@ class Skin extends DataObject
 
 
 			// if( ! preg_match_all( '~ \$Skin->container\( .*? (\' (.+?) \' )|(" (.+?) ") ~xmi', $file_contents, $matches ) )
-			if( ! preg_match_all( '~ \$Skin->container\( .*? ((\' (.+?) \')|(" (.+?) ")) ~xmi', $file_contents, $matches ) )
+			if( ! preg_match_all( '~ (\$Skin->|skin_)container\( .*? ((\' (.+?) \')|(" (.+?) ")) ~xmi', $file_contents, $matches ) )
 			{	// No containers in this file
 				continue;
 			}
 
 			// Merge matches from the two regexp parts (due to regexp "|" )
-			$container_list = array_merge( $matches[3], $matches[5] );
+			$container_list = array_merge( $matches[4], $matches[6] );
 
 			$c = 0;
 			foreach( $container_list as $container )
@@ -420,6 +420,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2007/10/08 08:32:56  fplanque
+ * widget fixes
+ *
  * Revision 1.5  2007/09/29 03:42:12  fplanque
  * skin install UI improvements
  *
