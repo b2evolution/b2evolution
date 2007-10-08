@@ -55,8 +55,11 @@ if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm 
 	$edited_Blog = & $Blog;
 }
 else
-{
+{	// We could not find a blog we have edit perms on...
 	// Note: we may still have permission to edit categories!!
+	// redirect to blog list:
+	header_redirect( '?ctrl=collections' );
+	// EXITED:
 	$Messages->add( T_('Sorry, you have no permission to edit blog properties.'), 'error' );
 	$action = 'nil';
 	$tab = '';
@@ -226,6 +229,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2007/10/08 10:24:49  fplanque
+ * UI improvement
+ *
  * Revision 1.3  2007/09/29 03:42:12  fplanque
  * skin install UI improvements
  *
