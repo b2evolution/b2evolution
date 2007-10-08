@@ -504,7 +504,7 @@ to
 		echo '<h2>'.T_('Installation successful!').'</h2>';
 
 		echo '<p><strong>';
-		printf( T_('Now you can <a %s>log in</a> with the login "admin" and password "%s".'), 'href="'.$admin_url.'"', $random_password );
+		printf( T_('Now you can <a %s>log in</a> with the login "admin" and password "<evo:password>%s</evo:password>".'), 'href="'.$admin_url.'"', $random_password );
 		echo '</strong></p>';
 
 		echo '<p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>';
@@ -678,6 +678,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.139  2007/10/08 21:31:23  fplanque
+ * auto install doc
+ *
  * Revision 1.138  2007/09/23 18:55:17  fplanque
  * attempting to debloat. The Log class is insane.
  *
