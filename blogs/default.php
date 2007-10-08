@@ -62,24 +62,40 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<!-- InstanceEndEditable --></div>
 		
 		<!-- InstanceBeginEditable name="Main" -->
+		<?php
+			/**
+			 * @var BlogCache
+			 */
+			$BlogCache = & get_Cache('BlogCache');
+			$BlogCache->load_all();
+		?>
+
 		<div class="block1">
 		<div class="block2">
 		<div class="block3">
 
-			<h1><?php echo T_('It Works !') ?></h1>
+			<h1><?php echo T_('Welcome to b2evolution') ?></h1>
 			
 			<?php
 				messages( array(
 			'block_start' => '<div class="action_messages">',
 			'block_end'   => '</div>',
 		) );
-				
-				echo '<p><strong>'.T_('You have successfully installed b2evolution.').'</strong></p>';
-				
-				echo '<p>'.T_('You haven\'t set a default blog yet. Thus, you see this default page.').'</p>';
-				
+
+				if( count( $BlogCache->cache ) == 0 )
+				{	// There is no blog on this system!
+					echo '<p><strong>'.T_('b2evolution is installed and ready but you haven\'t created any blog on this system yet.').'</strong></p>';
+
+					echo '<p><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Create a first blog' ).' &raquo;</a></p>';
+				}
+				else
+				{
+					echo '<p><strong>'.T_('You have successfully installed b2evolution.').'</strong></p>';
+
+					echo '<p>'.T_('You haven\'t set a default blog yet. Thus, you see this default page.').'</p>';
+
 				?>
-				<p><strong><a href="<?php echo $admin_url ?>?ctrl=settings&amp;tab=general"><?php echo T_( 'Set a default blog' ) ?> &raquo;</a></strong></p>
+				<p><a href="<?php echo $admin_url ?>?ctrl=settings&amp;tab=general"><?php echo T_( 'Set a default blog' ) ?> &raquo;</a></p>
 
 		</div>
 		</div>
@@ -90,19 +106,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<div class="block3">
 
 	<h2><?php echo T_('Blogs on this system') ?></h2>
-	<?php
-	/**
-	 * @var BlogCache
-	 */
-	$BlogCache = & get_Cache('BlogCache');
-	$BlogCache->load_all();
-	if( count( $BlogCache->cache ) == 0 )
-	{	// There is no blog on this system!
-		echo '<p><strong>'.T_('b2evolution is installed and ready but you haven\'t created any blog on this system yet.').'</strong></p>';
-	}
-	else
-	{
-	?>
 
 	<ul>
 	<?php // --------------------------- BLOG LIST -----------------------------
@@ -122,7 +125,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		?>
 	</ul>
 
-	<?php		echo '<p><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Add a new blog' ).' &raquo;</a></p>';
+		<?php
+			echo '<p><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Add a new blog' ).' &raquo;</a></p>';
 		?>
 		</div>
 		</div>
@@ -131,7 +135,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<div class="block1">
 		<div class="block2">
 		<div class="block3">
- 
+
  	<h2><?php echo T_('Bonus templates &amp; features') ?></h2>
 	<p class="note"><?php echo T_('These templates demonstrate more advanced uses of b2evolution. These do not make use of skins. The only way to change their look and feel is to edit their PHP template.') ?></p>
 	<ul>
