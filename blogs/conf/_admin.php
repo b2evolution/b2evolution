@@ -58,6 +58,7 @@ $ctrl_mappings = array(
 		'users'        => 'users/users.ctrl.php',
 		'upload'       => 'files/upload.ctrl.php',
 		'widgets'      => 'widgets/widgets.ctrl.php',
+		'wpimport'     => 'tools/wpimport.ctrl.php',
 	);
 
 

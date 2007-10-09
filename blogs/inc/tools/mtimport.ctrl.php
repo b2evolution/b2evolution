@@ -92,7 +92,8 @@ $head .= <<<EOB
 <body>
 <div id="header">
 	<div id="headinfo">
-		<span style="font-size:150%; font-weight:bold">Import Movable Type into b2evolution</span>
+		<span style="font-size:150%; font-weight:bold">Movable Type to b2evolution importer</span>
+		[<a href="admin.php?ctrl=tools">Back to b2evolution</a>]
 	</div>
 EOB;
 
@@ -1660,6 +1661,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.3  2007/10/09 01:18:12  fplanque
+ * Hari's WordPress importer
+ *
  * Revision 1.2  2007/09/11 21:43:48  fplanque
  * fixed MT importer
  *

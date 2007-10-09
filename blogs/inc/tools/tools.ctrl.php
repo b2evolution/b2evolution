@@ -113,10 +113,17 @@ if( empty($tab) )
 	?>
 		<ol>
 			<li><?php echo T_('Use MT\'s export functionnality to create a .TXT file containing your posts;') ?></li>
-			<li><?php printf( T_('Follow the insctructions in the <a %s>MT migration utility</a>.'), ' href="?ctrl=mtimport"' ) ?></li>
+			<li><?php printf( T_('Follow the insctructions in <a %s>Daniel\'s Movable Type Importer</a>.'), ' href="?ctrl=mtimport"' ) ?></li>
 		</ol>
 	<?php
 	$block_item_Widget->disp_template_raw( 'block_end' );
+
+
+	$block_item_Widget->title = T_('WordPress Import');
+	$block_item_Widget->disp_template_replaced( 'block_start' );
+	printf( '<p>'.T_('You can import contents from your WordPress 2.3 database into your b2evolution database by using <a %s>Hari\'s WordPress Importer</a>.').'</p>', ' href="?ctrl=wpimport"' );
+	$block_item_Widget->disp_template_raw( 'block_end' );
+
 }
 elseif( $tab_Plugin )
 { // Plugin tab
@@ -147,6 +154,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2007/10/09 01:18:12  fplanque
+ * Hari's WordPress importer
+ *
  * Revision 1.2  2007/09/04 14:57:07  fplanque
  * interface cleanup
  *
