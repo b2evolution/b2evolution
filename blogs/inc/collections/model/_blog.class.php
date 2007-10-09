@@ -717,38 +717,43 @@ class Blog extends DataObject
 
 		if( $archive_links == 'param' )
 		{	// We reference by Query
-			$link = url_add_param( $blogurl, 'm=', $glue );
 			$separator = '';
 		}
 		else
 		{	// We reference by extra path info
-			$link = trailing_slash( $blogurl ); // there may already be a slash from a siteurl like 'http://example.com/'
 			$separator = '/';
 		}
 
-		$link .= $year;
+		$datestring = $separator.$year.$separator;
 
 		if( !empty( $month ) )
 		{
-			$link .= $separator.zeroise($month,2);
+			$datestring .= zeroise($month,2).$separator;
 			if( !empty( $day ) )
 			{
-				$link .= $separator.zeroise($day,2);
+				$datestring .= zeroise($day,2).$separator;
 			}
 		}
 		elseif( $week !== '' )  // Note: week # can be 0 !
 		{
 			if( $archive_links == 'param' )
 			{	// We reference by Query
-				$link = url_add_param( $link, 'w='.$week );
+				$datestring .= $glue.'w='.$week;
 			}
 			else
 			{	// extra path info
-				$link .= '/w'.zeroise($week,2);
+				$datestring .= 'w'.zeroise($week,2).'/';
 			}
 		}
 
-		$link .= $separator;
+		if( $archive_links == 'param' )
+		{	// We reference by Query
+			$link = url_add_param( $blogurl, 'm='.$datestring, $glue );
+		}
+		else
+		{	// We reference by extra path info
+			$link = url_add_tail( $blogurl, $datestring ); // there may already be a slash from a siteurl like 'http://example.com/'
+		}
 
 		return $link;
 	}
@@ -1433,6 +1438,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2007/10/09 02:10:50  fplanque
+ * URL fixes
+ *
  * Revision 1.9  2007/10/06 21:17:25  fplanque
  * cleanup
  *

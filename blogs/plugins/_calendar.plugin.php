@@ -887,6 +887,9 @@ class Calendar
 	 */
 	function archive_link( $year, $month = NULL, $day = NULL )
 	{
+    /**
+		 * @var Blog
+		 */
 		global $Blog;
 
 		if( $this->link_type == 'context' )
@@ -1175,6 +1178,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.46  2007/10/09 02:10:50  fplanque
+ * URL fixes
+ *
  * Revision 1.45  2007/07/01 03:58:08  fplanque
  * cat_array cleanup/debug
  *

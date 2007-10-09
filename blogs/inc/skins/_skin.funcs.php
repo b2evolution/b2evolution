@@ -86,8 +86,8 @@ function skin_init( $disp )
 						$robots_index = false;
 					}
 				}
-				elseif( array_diff( $active_filters, array( 'cat_array', 'cat_modifier', 'cat_focus', 'page' ) ) == array() )
-				{ // This is a category page
+				elseif( array_diff( $active_filters, array( 'cat_array', 'cat_modifier', 'cat_focus' ) ) == array() )
+				{ // This is a category home page (note: subsequent pages are a different story)
 					if( $Blog->get_setting( 'category_noindex' ) )
 					{	// We prefer robots not to index category pages:
 						$robots_index = false;
@@ -122,6 +122,7 @@ function skin_init( $disp )
 				}
 				elseif( array_diff( $active_filters, array( 'ymdhms', 'week', 'page' ) ) == array() )
 				{ // This is an archive page
+					// echo 'archive page';
 					if( $Blog->get_setting( 'archive_noindex' ) )
 					{	// We prefer robots not to index archive pages:
 						$robots_index = false;
@@ -412,6 +413,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.11  2007/10/09 02:10:50  fplanque
+ * URL fixes
+ *
  * Revision 1.10  2007/10/06 21:31:40  fplanque
  * Category redirector fix
  *
