@@ -281,7 +281,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		<div id="itemform_trackbacks">
 			<label for="trackback_url"><strong><?php echo T_('Trackback URLs') ?>:</strong>
 			<span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br />
-			<input type="text" name="trackback_url" class="large" id="trackback_url" value="<?php echo format_to_output( $trackback_url, 'formvalue' ); ?>" />
+			<input type="text" name="trackback_url" class="large form_text_input" id="trackback_url" value="<?php echo format_to_output( $trackback_url, 'formvalue' ); ?>" />
 		</div>
 		<?php
 
@@ -378,6 +378,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.13  2007/10/09 15:03:43  waltercruz
+ * Minor css fix
+ *
  * Revision 1.12  2007/10/08 08:32:00  fplanque
  * nicer forms
  *
