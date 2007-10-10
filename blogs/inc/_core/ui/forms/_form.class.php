@@ -175,10 +175,10 @@ class Form extends Widget
 		}
 
 		if( !isset($template) && $layout == 'fieldset' )
-		{	// happens on login screen &nd after $laout seeting above
+		{	// happens on login screen and after $layout setting above
 			$template = array(
 				'layout' => 'fieldset',
-				'formstart' => '',
+				'formstart' => '<div>',// required before (no_)title_fmt for validation
 				'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
 				'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
 				'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
@@ -194,7 +194,7 @@ class Form extends Widget
 				'fieldend' => "</fieldset>\n\n",
 				'buttonsstart' => '<fieldset><div class="input">',
 				'buttonsend' => "</div></fieldset>\n\n",
-				'formend' => '',
+				'formend' => '</div>',
 			);
 		}
 
@@ -265,7 +265,7 @@ class Form extends Widget
 				break;
 
 			case 'fieldset':
-				$this->formstart = '';
+				$this->formstart = '<div>';// required before (no_)title_fmt for validation
 				$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 				$this->no_title_fmt = '<span style="float:right">$global_icons$</span>'."\n";
 				$this->fieldstart = '<fieldset $ID$>'."\n";
@@ -278,11 +278,11 @@ class Form extends Widget
 				$this->fieldend = "</fieldset>\n\n";
 				$this->buttonsstart = '<fieldset><div class="input">';
 				$this->buttonsend = "</div></fieldset>\n\n";
-				$this->formend = '';
+				$this->formend = '</div>';
 				break;
 
 			case 'chicago':		// Temporary dirty hack
-				$this->formstart = '';
+				$this->formstart = '<div>';// required before (no_)title_fmt for validation
 				$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 				$this->no_title_fmt = '<span style="float:right">$global_icons$</span>'."\n";
 				$this->fieldstart = '<fieldset $ID$>'."\n";
@@ -295,7 +295,7 @@ class Form extends Widget
 				$this->fieldend = "</fieldset>\n\n";
 				$this->buttonsstart = '<fieldset><div class="input">';
 				$this->buttonsend = "</div></fieldset>\n\n";
-				$this->formend = '';
+				$this->formend = '</div>';
 				break;
 
 			case 'linespan':
@@ -1367,11 +1367,9 @@ class Form extends Widget
 
 		$r .= $this->formend;
 
-		// Display all buffered hidden fields in a DIV (for XHTML):
-		foreach( $this->hiddens as $hidden )
-		{
-			$r .= $hidden;
-		}
+
+		// Display all buffered hidden fields in a 0 height DIV (for XHTML):
+		$r .= '<div style="height:0">'.implode( '', $this->hiddens ).'</div>';
 
 		// $r .= '</div>';
 		$r .= "\n</form>\n\n";
@@ -2813,6 +2811,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.13  2007/10/10 10:52:26  yabs
+ * validation - linsepan/blockspan/default are probably still invalid
+ *
  * Revision 1.12  2007/10/08 08:31:59  fplanque
  * nicer forms
  *
