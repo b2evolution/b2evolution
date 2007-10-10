@@ -190,8 +190,11 @@ class ItemListLight extends DataObjectList2
 	 */
 	function set_filters( $filters, $memorize = true )
 	{
-		// Activate the filterset (fallback to default filter when a value is not set):
-		$this->filters = array_merge( $this->default_filters, $filters );
+		if( !empty( $filters ) )
+		{	// Note if $filters == NULL it fails in PHP5
+			// Activate the filterset (fallback to default filter when a value is not set):
+			$this->filters = array_merge( $this->default_filters, $filters );
+		}
 
 		// Activate preset filters if necessary:
 		$this->activate_preset_filters();
@@ -1473,6 +1476,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.8  2007/10/10 09:02:36  fplanque
+ * PHP5 fix
+ *
  * Revision 1.7  2007/10/01 01:06:31  fplanque
  * Skin/template functions cleanup.
  *
