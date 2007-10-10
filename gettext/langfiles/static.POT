@@ -20,6 +20,7 @@ msgstr ""
 #: ../../doc/upgradefrom_b2.src.html:7
 #: ../../doc/upgradefrom_b2evo.src.html:7
 #: ../../doc/upgradefrom_mt.src.html:7
+#: ../../doc/upgradefrom_wp.src.html:7
 msgid "b2evo package"
 msgstr ""
 
@@ -27,117 +28,129 @@ msgstr ""
 msgid "Start page"
 msgstr ""
 
-#: ../../index.src.html:20
-#: ../../doc/install_new.src.html:20
-#: ../../doc/upgradefrom_b2.src.html:20
-#: ../../doc/upgradefrom_b2evo.src.html:20
-#: ../../doc/upgradefrom_mt.src.html:20
+#: ../../index.src.html:19
+#: ../../doc/install_new.src.html:19
+#: ../../doc/upgradefrom_b2.src.html:19
+#: ../../doc/upgradefrom_b2evo.src.html:19
+#: ../../doc/upgradefrom_mt.src.html:19
+#: ../../doc/upgradefrom_wp.src.html:19
 msgid "Version"
 msgstr ""
 
-#: ../../index.src.html:25
-#: ../../doc/install_new.src.html:25
-#: ../../doc/upgradefrom_b2.src.html:25
-#: ../../doc/upgradefrom_b2evo.src.html:25
-#: ../../doc/upgradefrom_mt.src.html:25
+#: ../../index.src.html:24
+#: ../../doc/install_new.src.html:24
+#: ../../doc/upgradefrom_b2.src.html:24
+#: ../../doc/upgradefrom_b2evo.src.html:24
+#: ../../doc/upgradefrom_mt.src.html:24
+#: ../../doc/upgradefrom_wp.src.html:24
 msgid "After install"
 msgstr ""
 
-#: ../../index.src.html:25
-#: ../../doc/install_new.src.html:25
-#: ../../doc/upgradefrom_b2.src.html:25
-#: ../../doc/upgradefrom_b2evo.src.html:25
-#: ../../doc/upgradefrom_mt.src.html:25
+#: ../../index.src.html:24
+#: ../../doc/install_new.src.html:24
+#: ../../doc/upgradefrom_b2.src.html:24
+#: ../../doc/upgradefrom_b2evo.src.html:24
+#: ../../doc/upgradefrom_mt.src.html:24
+#: ../../doc/upgradefrom_wp.src.html:24
 msgid "Blogs"
 msgstr ""
 
+#: ../../index.src.html:24
+#: ../../doc/install_new.src.html:24
+#: ../../doc/upgradefrom_b2.src.html:24
+#: ../../doc/upgradefrom_b2evo.src.html:24
+#: ../../doc/upgradefrom_mt.src.html:24
+#: ../../doc/upgradefrom_wp.src.html:24
+msgid "Admin"
+msgstr ""
+
 #: ../../index.src.html:25
 #: ../../doc/install_new.src.html:25
 #: ../../doc/upgradefrom_b2.src.html:25
 #: ../../doc/upgradefrom_b2evo.src.html:25
 #: ../../doc/upgradefrom_mt.src.html:25
-msgid "Admin"
-msgstr ""
-
-#: ../../index.src.html:26
-#: ../../doc/install_new.src.html:26
-#: ../../doc/upgradefrom_b2.src.html:26
-#: ../../doc/upgradefrom_b2evo.src.html:26
-#: ../../doc/upgradefrom_mt.src.html:26
+#: ../../doc/upgradefrom_wp.src.html:25
 msgid "Before install"
 msgstr ""
 
-#: ../../index.src.html:26
-#: ../../index.src.html:32
-#: ../../doc/install_new.src.html:26
-#: ../../doc/upgradefrom_b2.src.html:26
-#: ../../doc/upgradefrom_b2evo.src.html:26
-#: ../../doc/upgradefrom_mt.src.html:26
+#: ../../index.src.html:25
+#: ../../index.src.html:31
+#: ../../doc/install_new.src.html:25
+#: ../../doc/upgradefrom_b2.src.html:25
+#: ../../doc/upgradefrom_b2evo.src.html:25
+#: ../../doc/upgradefrom_mt.src.html:25
+#: ../../doc/upgradefrom_wp.src.html:25
 msgid "Hello!"
 msgstr ""
 
-#: ../../index.src.html:26
-#: ../../doc/install_new.src.html:26
-#: ../../doc/upgradefrom_b2.src.html:26
-#: ../../doc/upgradefrom_b2evo.src.html:26
-#: ../../doc/upgradefrom_mt.src.html:26
+#: ../../index.src.html:25
+#: ../../doc/install_new.src.html:25
+#: ../../doc/upgradefrom_b2.src.html:25
+#: ../../doc/upgradefrom_b2evo.src.html:25
+#: ../../doc/upgradefrom_mt.src.html:25
+#: ../../doc/upgradefrom_wp.src.html:25
 msgid "Changelog"
 msgstr ""
 
-#: ../../index.src.html:26
-#: ../../doc/install_new.src.html:26
-#: ../../doc/upgradefrom_b2.src.html:26
-#: ../../doc/upgradefrom_b2evo.src.html:26
-#: ../../doc/upgradefrom_mt.src.html:26
+#: ../../index.src.html:25
+#: ../../doc/install_new.src.html:25
+#: ../../doc/upgradefrom_b2.src.html:25
+#: ../../doc/upgradefrom_b2evo.src.html:25
+#: ../../doc/upgradefrom_mt.src.html:25
+#: ../../doc/upgradefrom_wp.src.html:25
 msgid "Installer"
 msgstr ""
 
-#: ../../index.src.html:33
+#: ../../index.src.html:32
 msgid "You are about to install the b2evolution  multilingual multiuser multiblog engine. You can learn more about b2evolution by visiting <a %s>b2evolution.net</a> ."
 msgstr ""
 
-#: ../../index.src.html:34
+#: ../../index.src.html:33
 msgid "Below are some quick instructions designed to help you. Please pick your prefered language and read on..."
 msgstr ""
 
-#: ../../index.src.html:35
+#: ../../index.src.html:34
 msgid "trans_current"
 msgstr ""
 
-#: ../../index.src.html:43
+#: ../../index.src.html:42
 msgid "Quickstart instructions"
 msgstr ""
 
-#: ../../index.src.html:44
+#: ../../index.src.html:43
 msgid "If you don't have a webserver yet, check out our selection of <a %s>recommended web hosting companies</a> which offer easy, automated install of b2evolution."
 msgstr ""
 
-#: ../../index.src.html:45
+#: ../../index.src.html:44
 msgid "If you already have a PHP/MySQL webserver, you can set up this copy of b2evolution in just a few minutes. Just follow the instructions matching your situation:"
 msgstr ""
 
-#: ../../index.src.html:48
+#: ../../index.src.html:47
 #: ../../doc/install_new.src.html:7
-#: ../../doc/install_new.src.html:33
+#: ../../doc/install_new.src.html:32
 msgid "Installing b2evolution from scratch"
 msgstr ""
 
-#: ../../index.src.html:50
+#: ../../index.src.html:49
 #: ../../doc/upgradefrom_b2evo.src.html:7
-#: ../../doc/upgradefrom_b2evo.src.html:33
+#: ../../doc/upgradefrom_b2evo.src.html:32
 msgid "Upgrading from a previous version of b2evolution"
 msgstr ""
 
-#: ../../index.src.html:52
+#: ../../index.src.html:51
 msgid "Upgrading from other blog software:"
 msgstr ""
 
+#: ../../index.src.html:53
+msgid "WordPress"
+msgstr ""
+
 #: ../../index.src.html:54
-msgid "Cafelog/b2"
+msgid "Movable Type"
 msgstr ""
 
 #: ../../index.src.html:55
-msgid "Movable Type"
+msgid "Cafelog/b2"
 msgstr ""
 
 #: ../../index.src.html:66
@@ -156,116 +169,124 @@ msgstr ""
 msgid "NOTE: This version is and will continue to be fully supported in the upgrading scheme and procedures."
 msgstr ""
 
-#: ../../index.src.html:77
-#: ../../doc/install_new.src.html:62
-#: ../../doc/upgradefrom_b2.src.html:50
-#: ../../doc/upgradefrom_b2evo.src.html:59
-#: ../../doc/upgradefrom_mt.src.html:49
+#: ../../index.src.html:80
+#: ../../doc/install_new.src.html:64
+#: ../../doc/upgradefrom_b2.src.html:52
+#: ../../doc/upgradefrom_b2evo.src.html:61
+#: ../../doc/upgradefrom_mt.src.html:51
+#: ../../doc/upgradefrom_wp.src.html:49
 msgid "Online resources"
 msgstr ""
 
-#: ../../index.src.html:77
-#: ../../doc/install_new.src.html:62
-#: ../../doc/upgradefrom_b2.src.html:50
-#: ../../doc/upgradefrom_b2evo.src.html:59
-#: ../../doc/upgradefrom_mt.src.html:49
+#: ../../index.src.html:80
+#: ../../doc/install_new.src.html:64
+#: ../../doc/upgradefrom_b2.src.html:52
+#: ../../doc/upgradefrom_b2evo.src.html:61
+#: ../../doc/upgradefrom_mt.src.html:51
+#: ../../doc/upgradefrom_wp.src.html:49
 msgid "Official website"
 msgstr ""
 
-#: ../../index.src.html:77
-#: ../../doc/install_new.src.html:62
-#: ../../doc/upgradefrom_b2.src.html:50
-#: ../../doc/upgradefrom_b2evo.src.html:59
-#: ../../doc/upgradefrom_mt.src.html:49
+#: ../../index.src.html:80
+#: ../../doc/install_new.src.html:64
+#: ../../doc/upgradefrom_b2.src.html:52
+#: ../../doc/upgradefrom_b2evo.src.html:61
+#: ../../doc/upgradefrom_mt.src.html:51
+#: ../../doc/upgradefrom_wp.src.html:49
 msgid "Find a host"
 msgstr ""
 
-#: ../../index.src.html:77
-#: ../../doc/install_new.src.html:62
-#: ../../doc/upgradefrom_b2.src.html:50
-#: ../../doc/upgradefrom_b2evo.src.html:59
-#: ../../doc/upgradefrom_mt.src.html:49
+#: ../../index.src.html:80
+#: ../../doc/install_new.src.html:64
+#: ../../doc/upgradefrom_b2.src.html:52
+#: ../../doc/upgradefrom_b2evo.src.html:61
+#: ../../doc/upgradefrom_mt.src.html:51
+#: ../../doc/upgradefrom_wp.src.html:49
 msgid "Manual"
 msgstr ""
 
-#: ../../index.src.html:77
-#: ../../doc/install_new.src.html:62
-#: ../../doc/upgradefrom_b2.src.html:50
-#: ../../doc/upgradefrom_b2evo.src.html:59
-#: ../../doc/upgradefrom_mt.src.html:49
+#: ../../index.src.html:80
+#: ../../doc/install_new.src.html:64
+#: ../../doc/upgradefrom_b2.src.html:52
+#: ../../doc/upgradefrom_b2evo.src.html:61
+#: ../../doc/upgradefrom_mt.src.html:51
+#: ../../doc/upgradefrom_wp.src.html:49
 msgid "Forums"
 msgstr ""
 
-#: ../../index.src.html:80
-#: ../../doc/install_new.src.html:65
-#: ../../doc/upgradefrom_b2.src.html:53
-#: ../../doc/upgradefrom_b2evo.src.html:62
-#: ../../doc/upgradefrom_mt.src.html:52
+#: ../../index.src.html:83
+#: ../../doc/install_new.src.html:67
+#: ../../doc/upgradefrom_b2.src.html:55
+#: ../../doc/upgradefrom_b2evo.src.html:64
+#: ../../doc/upgradefrom_mt.src.html:54
+#: ../../doc/upgradefrom_wp.src.html:52
 msgid "GNU GPL license"
 msgstr ""
 
-#: ../../index.src.html:80
-#: ../../doc/install_new.src.html:65
-#: ../../doc/upgradefrom_b2.src.html:53
-#: ../../doc/upgradefrom_b2evo.src.html:62
-#: ../../doc/upgradefrom_mt.src.html:52
+#: ../../index.src.html:83
+#: ../../doc/install_new.src.html:67
+#: ../../doc/upgradefrom_b2.src.html:55
+#: ../../doc/upgradefrom_b2evo.src.html:64
+#: ../../doc/upgradefrom_mt.src.html:54
+#: ../../doc/upgradefrom_wp.src.html:52
 msgid "Contact"
 msgstr ""
 
-#: ../../doc/install_new.src.html:35
+#: ../../doc/install_new.src.html:34
 msgid "To install b2evolution you need a PHP/MySQL web server (see <a %s>requirements</a>). Renting a fast server from a reputable hosting company is getting cheaper every day. Check out our  <a %s>recommended hosting offers</a>."
 msgstr ""
 
-#: ../../doc/install_new.src.html:36
-#: ../../doc/upgradefrom_b2evo.src.html:34
-#: ../../doc/upgradefrom_mt.src.html:33
+#: ../../doc/install_new.src.html:35
+#: ../../doc/upgradefrom_b2evo.src.html:33
+#: ../../doc/upgradefrom_mt.src.html:32
+#: ../../doc/upgradefrom_wp.src.html:32
 msgid "Before you begin, please note that some network features of b2evolution require you to agree our simple <a %s>Terms of service</a>."
 msgstr ""
 
-#: ../../doc/install_new.src.html:37
+#: ../../doc/install_new.src.html:36
 msgid "Once you have unzipped the b2evolution distribution on your local computer:"
 msgstr ""
 
-#: ../../doc/install_new.src.html:39
+#: ../../doc/install_new.src.html:38
 msgid "On your server, try to create a new (empty) MySQL database for b2evolution (For example, you can call it \"b2evolution\". The exact procedure to create a new database depends on your host/server setup. Alternatively, you can also use an existing database which b2evolution will share with existing applications.)"
 msgstr ""
 
-#: ../../doc/install_new.src.html:41
-#: ../../doc/install_new.src.html:44
+#: ../../doc/install_new.src.html:40
+#: ../../doc/install_new.src.html:43
 msgid "Note:"
 msgstr ""
 
-#: ../../doc/install_new.src.html:41
+#: ../../doc/install_new.src.html:40
 msgid "b2evolution will create about 25 tables in the database you select. Unless you changed the config, all these tables' names will be prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. Your existing tables will not be affected in any way."
 msgstr ""
 
-#: ../../doc/install_new.src.html:42
+#: ../../doc/install_new.src.html:41
 msgid "Upload the b2evolution files to your website."
 msgstr ""
 
-#: ../../doc/install_new.src.html:44
+#: ../../doc/install_new.src.html:43
 msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. Otherwise, it's best to upload the files to a subdirectory of your webserver. You can keep the <code>/blogs</code> subdirectory name, but you can also choose another."
 msgstr ""
 
-#: ../../doc/install_new.src.html:47
+#: ../../doc/install_new.src.html:46
 msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/yourfolder</code> ..."
 msgstr ""
 
-#: ../../doc/install_new.src.html:48
+#: ../../doc/install_new.src.html:47
 msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you a few questions, create required database tables and configure b2evolution for you."
 msgstr ""
 
-#: ../../doc/install_new.src.html:51
-#: ../../doc/upgradefrom_b2evo.src.html:45
+#: ../../doc/install_new.src.html:50
+#: ../../doc/upgradefrom_b2evo.src.html:44
 msgid "Check to make sure the new installation works."
 msgstr ""
 
-#: ../../doc/install_new.src.html:52
-#: ../../doc/upgradefrom_b2evo.src.html:47
+#: ../../doc/install_new.src.html:51
+#: ../../doc/upgradefrom_b2evo.src.html:46
 msgid "On production servers, it is recommended that you delete the <code>/install</code> subfolder."
 msgstr ""
 
-#: ../../doc/install_new.src.html:53
+#: ../../doc/install_new.src.html:52
 msgid "After basic install is done, there are a few <a %s>tricky things you may need to take care of</a> (online manual)."
 msgstr ""
 
@@ -273,84 +294,103 @@ msgstr ""
 msgid "Upgrading from Cafelog/b2"
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:33
+#: ../../doc/upgradefrom_b2.src.html:32
 msgid "Upgrading from b2/Cafelog"
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:35
+#: ../../doc/upgradefrom_b2.src.html:34
 msgid "If you would like to upgrade from the original b2/Cafelog (versions 0.5.x up to 0.6.2), please follow these steps:"
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:38
+#: ../../doc/upgradefrom_b2.src.html:37
 msgid "Do <strong>not</strong> install the current version of b2evolution right now. Instead, download b2evolution version 1.x. You can download  <a %s>almost any version of b2evolution here</a>."
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:40
+#: ../../doc/upgradefrom_b2.src.html:39
 msgid "Follow the instructions incuded in b2evolution 1.x to upgrade from b2/Cafelog."
 msgstr ""
 
-#: ../../doc/upgradefrom_b2.src.html:42
+#: ../../doc/upgradefrom_b2.src.html:41
 msgid "Come back to the current version of b2evolution and <a %s>upgrade from b2evolution 1.x to the current version</a>."
 msgstr ""
 
-#: ../../doc/upgradefrom_b2evo.src.html:36
+#: ../../doc/upgradefrom_b2evo.src.html:35
 msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, hacks, third party plugins, etc..."
 msgstr ""
 
-#: ../../doc/upgradefrom_b2evo.src.html:37
+#: ../../doc/upgradefrom_b2evo.src.html:36
 msgid "You should also backup your database if you can. This functionality should be provided by your host."
 msgstr ""
 
-#: ../../doc/upgradefrom_b2evo.src.html:38
+#: ../../doc/upgradefrom_b2evo.src.html:37
 msgid "Delete <strong>all your existing b2evolution files from your site</strong> before uploading the new ones! Some of the old files may not be compatible with this new version and will cause it to fail! This will also ensure you don't keep unnecessary files on your server after upgrading. Plus, it's better for security."
 msgstr ""
 
-#: ../../doc/upgradefrom_b2evo.src.html:39
+#: ../../doc/upgradefrom_b2evo.src.html:38
 msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you can't reuse your customized files, including  /conf, skins, blog templates, stubfiles, etc. as they are!<br /> <br /> That means you will have to customize all these files again. We're sorry but, due to the pace of development and adding of new features, we cannot guarantee that anything will work if you keep older files in place. <strong>However</strong>, since you have backed up all these files in step 1, you can try to partially reuse them once the upgrade process is done. See step 8 below."
 msgstr ""
 
-#: ../../doc/upgradefrom_b2evo.src.html:42
+#: ../../doc/upgradefrom_b2evo.src.html:41
 msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you basic configuration settings (unless you have already updated /conf/_config.php before uploading), then allow you to run a database upgrade from any b2evolution version to the new one."
 msgstr ""
 
-#: ../../doc/upgradefrom_b2evo.src.html:46
+#: ../../doc/upgradefrom_b2evo.src.html:45
 msgid "Check the online manual for <a %s>specific upgrade instructions</a> to your new version of b2evolution."
 msgstr ""
 
-#: ../../doc/upgradefrom_b2evo.src.html:48
+#: ../../doc/upgradefrom_b2evo.src.html:47
 msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly."
 msgstr ""
 
 #: ../../doc/upgradefrom_mt.src.html:7
-#: ../../doc/upgradefrom_mt.src.html:32
+#: ../../doc/upgradefrom_mt.src.html:31
 msgid "Upgrading from Movable Type"
 msgstr ""
 
-#: ../../doc/upgradefrom_mt.src.html:34
+#: ../../doc/upgradefrom_mt.src.html:33
 msgid "This procedure has been tested with Movable Type version 2.661 but should also work with other versions. You can't break anything by trying anyway..."
 msgstr ""
 
-#: ../../doc/upgradefrom_mt.src.html:36
+#: ../../doc/upgradefrom_mt.src.html:35
 msgid "Use MT's export functionnality to create a .TXT file containing your posts."
 msgstr ""
 
-#: ../../doc/upgradefrom_mt.src.html:37
+#: ../../doc/upgradefrom_mt.src.html:36
+#: ../../doc/upgradefrom_wp.src.html:35
 msgid "<a %s>Install b2evolution in the regular way.</a>"
 msgstr ""
 
-#: ../../doc/upgradefrom_mt.src.html:38
+#: ../../doc/upgradefrom_mt.src.html:37
 msgid "Once b2evo is up and running, copy your .TXT export file into the /blogs/admin folder on your server."
 msgstr ""
 
-#: ../../doc/upgradefrom_mt.src.html:39
+#: ../../doc/upgradefrom_mt.src.html:38
 msgid "In the admin, go to the Tools tab and launch the MT migration utility."
 msgstr ""
 
-#: ../../doc/upgradefrom_mt.src.html:40
+#: ../../doc/upgradefrom_mt.src.html:39
 msgid "Follow the instructions on screen."
 msgstr ""
 
-#: ../../doc/upgradefrom_mt.src.html:41
+#: ../../doc/upgradefrom_mt.src.html:40
+#: ../../doc/upgradefrom_wp.src.html:38
 msgid "Import will only take a few seconds/minutes depending on how many posts you import."
+msgstr ""
+
+#: ../../doc/upgradefrom_wp.src.html:7
+#: ../../doc/upgradefrom_wp.src.html:31
+msgid "Upgrading from WordPress"
+msgstr ""
+
+#: ../../doc/upgradefrom_wp.src.html:33
+msgid "This procedure has been tested with WordPress version 2.3. It will not work with prior versions. It may work with superior versions. You can't break your WordPress by trying anyway..."
+msgstr ""
+
+#: ../../doc/upgradefrom_wp.src.html:36
+msgid "Once b2evo is up and running, in the admin, go to the Tools tab and launch the WordPress import utility."
+msgstr ""
+
+#: ../../doc/upgradefrom_wp.src.html:37
+msgid "Follow the instructions on screen and provide connection information to your WordPress database (Read Only)"
 msgstr ""
 
