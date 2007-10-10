@@ -128,7 +128,16 @@ else
 }
 
 
-// Get basedomain out of basehost:
+/**
+ * Base domain of b2evolution.
+ *
+ * By default we try to extract it automagically from $basehost (itself extracted from $abaseurl)
+ * But you may need to adjust this manually.
+ *
+ * @todo does anyone have a clean way of handling stuff like .co.uk ?
+ *
+ * @global string
+ */
 $basedomain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '$2', $basehost );
 
 
