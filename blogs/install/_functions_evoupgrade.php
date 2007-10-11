@@ -231,31 +231,7 @@ function upgrade_b2evo_tables()
 
 
 	// Check DB version:
-	check_db_version();
-
-	if( $old_db_version == $new_db_version )
-	{ // Probably no need to update, but check current DB schema first
-		$db_schema_needs_update = false;
-		foreach( $schema_queries as $table => $query_info )
-		{
-			if( db_delta( $query_info[1], array('drop_column', 'drop_index') ) )
-			{
-				$db_schema_needs_update = true;
-				break;
-			}
-		}
-
-		if( ! $db_schema_needs_update )
-		{
-			echo '<p>'.T_('The database schema is already up to date. There is nothing to do.').'</p>';
-			printf( '<p>'.T_('Now you can <a %s>log in</a> with your usual %s username and password.').'</p>', 'href="'.$admin_url.'"', 'b2evolution' );
-			return false;
-		}
-
-		// We come here, if $old_db_version and $new_db_version are the same, but the schema needs upgrade (_db_schema.inc.php has changed)..
-		// We'll upgrade to the new schema below (at the end)..
-	}
-
+	check_db_version();	// MIGHT DIE
 
 
 	// Try to obtain some serious time to do some serious processing (5 minutes)
@@ -2000,6 +1976,12 @@ function upgrade_b2evo_tables()
 								MODIFY COLUMN comment_date DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
 	task_end();
 
+	task_begin( 'Normalizing cron jobs...' );
+	$DB->query( 'UPDATE T_cron__task
+									SET ctsk_controller = REPLACE(ctsk_controller, "cron/_", "cron/jobs/_" )
+								WHERE ctsk_controller LIKE "cron/_%"' );
+	task_end();
+
 
 
 	/*
@@ -2044,7 +2026,11 @@ function upgrade_b2evo_tables()
 		}
 	}
 
-	if( ! empty($upgrade_db_deltas) )
+	if( empty($upgrade_db_deltas) )
+	{
+		echo '<p>'.T_('The database schema is up to date.').'</p>';
+	}
+	else
 	{
 		// delta queries have to be confirmed or executed now..
 
@@ -2107,6 +2093,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.231  2007/10/11 14:02:48  fplanque
+ * simplified
+ *
  * Revision 1.230  2007/09/19 02:54:16  fplanque
  * bullet proof upgrade
  *
