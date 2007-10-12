@@ -177,7 +177,6 @@ function skin_include( $template_name, $params = array() )
 	global $skins_path, $ads_current_skin_path, $disp;
 
 	// Globals that may be needed by the template:
-	global $DB; // required by _subscriptions.php
 	global $Blog, $MainList, $Item;
 	global $Plugins, $Skin;
 	global $current_User, $Hit, $Session, $Settings;
@@ -414,8 +413,8 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
- * Revision 1.12  2007/10/11 17:35:31  yabs
- * bugfix -$DB is required by skins/_subscriptions.php
+ * Revision 1.13  2007/10/12 05:26:59  fplanque
+ * global $DB has been added to _subscriptions already and its use should not be encouraged. Therefore I don't want it available by default. _subscriptions.php should be cleaned up at some point.
  *
  * Revision 1.11  2007/10/09 02:10:50  fplanque
  * URL fixes
