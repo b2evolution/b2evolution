@@ -2933,8 +2933,8 @@ function url_rel_to_same_host( $url, $target_url )
  */
 function url_absolute( $url, $host = NULL )
 {
-	if( preg_match( '~^\w+://~', $url ) )
-	{ // URL is relative already:
+	if( preg_match( '~^(\w+:)?//~', $url ) )
+	{ // URL is relative already ("//foo/bar" is absolute - leaving the protocol out):
 		return $url;
 	}
 
@@ -2973,6 +2973,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.6  2007/10/25 18:29:41  blueyed
+ * PasteFromBranch: Fixed url_absolute for '//foo/bar'
+ *
  * Revision 1.5  2007/09/22 19:23:56  fplanque
  * various fixes & enhancements
  *
