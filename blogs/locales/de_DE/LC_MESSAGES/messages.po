@@ -8300,7 +8300,7 @@ msgstr "keine Anfrage - keine Parameter!"
 
 #: ..\..\..\inc\sessions\model\_hitlog.funcs.php:324
 msgid "no query string found"
-msgstr "kein Anfrage-Zeichenkette gefunden"
+msgstr "keine Anfrage-Zeichenkette gefunden"
 
 #: ..\..\..\inc\sessions\stats.ctrl.php:49
 msgid "View Stats for Blog:"
