@@ -136,6 +136,7 @@ class Form extends Widget
 	 * @var array
 	 */
 	var $saved_layouts;
+	var $saved_templates;
 
 
 	/**
@@ -199,28 +200,9 @@ class Form extends Widget
 		}
 
 		$this->saved_layouts = array($layout);
+		$this->saved_templates = array($template);
 		$this->switch_layout( NULL );	// "restore" saved layout.
 
-		// Temporary hack:
-		if( !empty($template ) )
-		{
-			//pre_dump($template);
-			$this->template = $template;
-			$this->formstart =    $template['formstart'];
-			$this->title_fmt =    $template['title_fmt'];
-			$this->no_title_fmt = $template['no_title_fmt'];
-			$this->fieldstart =   $template['fieldstart'];
-			$this->labelstart =   $template['labelstart'];
-			$this->labelend =     $template['labelend'];
-			$this->labelempty =   $template['labelempty'];
-			$this->inputstart =   $template['inputstart'];
-			$this->infostart =    $template['infostart'];
-			$this->inputend =     $template['inputend'];
-			$this->fieldend =     $template['fieldend'];
-			$this->buttonsstart = $template['buttonsstart'];
-			$this->buttonsend =   $template['buttonsend'];
-			$this->formend =      $template['formend'];
-		}
 	}
 
 
@@ -234,120 +216,142 @@ class Form extends Widget
 			if( count($this->saved_layouts) )
 			{
 				$this->layout = array_shift($this->saved_layouts);
+				// Temporary hack:
+				$template = array_shift($this->saved_templates);
+				if( !empty($template ) )
+				{
+					//pre_dump($template);
+					$this->template =     $template;
+					$this->formstart =    $template['formstart'];
+					$this->title_fmt =    $template['title_fmt'];
+					$this->no_title_fmt = $template['no_title_fmt'];
+					$this->fieldstart =   $template['fieldstart'];
+					$this->labelstart =   $template['labelstart'];
+					$this->labelend =     $template['labelend'];
+					$this->labelempty =   $template['labelempty'];
+					$this->inputstart =   $template['inputstart'];
+					$this->infostart =    $template['infostart'];
+					$this->inputend =     $template['inputend'];
+					$this->fieldend =     $template['fieldend'];
+					$this->buttonsstart = $template['buttonsstart'];
+					$this->buttonsend =   $template['buttonsend'];
+					$this->formend =      $template['formend'];
+				}
 			}
 		}
 		else
 		{ // We want to switch to a new layout
 			array_unshift( $this->saved_layouts, $this->layout );
 			$this->layout = $layout;
-		}
 
-		switch( $this->layout )
-		{
-			case 'table':
-				$this->formstart = '<table cellspacing="0" class="fform">'."\n";
-				// Note: no thead in here until you can safely add a tbody to the rest of the content...
-				$this->title_fmt = '<tr class="formtitle"><th colspan="2"><div class="results_title">'
-														.'<span class="right_icons">$global_icons$</span>'
-														.'$title$</div></th></tr>'."\n";
-				$this->no_title_fmt = '<tr><th colspan="2"><span class="right_icons">$global_icons$</span></th></tr>'."\n";
-				$this->fieldstart = '<tr $ID$>'."\n";
-				$this->labelstart = '<td class="label">';
-				$this->labelend = "</td>\n";
-				$this->labelempty = '<td class="label">&nbsp;</td>'."\n";
-				$this->inputstart = '<td class="input">';
-				$this->infostart = '<td class="info">';
-				$this->inputend = "</td>\n";
-				$this->fieldend = "</tr>\n\n";
-				$this->buttonsstart = '<tr class="buttons"><td colspan="2">';
-				$this->buttonsend = "</td></tr>\n";
-				$this->formend = "</table>\n";
-				break;
+			switch( $this->layout )
+			{
+				case 'table':
+					$this->formstart = '<table cellspacing="0" class="fform">'."\n";
+					// Note: no thead in here until you can safely add a tbody to the rest of the content...
+					$this->title_fmt = '<tr class="formtitle"><th colspan="2"><div class="results_title">'
+															.'<span class="right_icons">$global_icons$</span>'
+															.'$title$</div></th></tr>'."\n";
+					$this->no_title_fmt = '<tr><th colspan="2"><span class="right_icons">$global_icons$</span></th></tr>'."\n";
+					$this->fieldstart = '<tr $ID$>'."\n";
+					$this->labelstart = '<td class="label">';
+					$this->labelend = "</td>\n";
+					$this->labelempty = '<td class="label">&nbsp;</td>'."\n";
+					$this->inputstart = '<td class="input">';
+					$this->infostart = '<td class="info">';
+					$this->inputend = "</td>\n";
+					$this->fieldend = "</tr>\n\n";
+					$this->buttonsstart = '<tr class="buttons"><td colspan="2">';
+					$this->buttonsend = "</td></tr>\n";
+					$this->formend = "</table>\n";
+					break;
 
-			case 'fieldset':
-				$this->formstart = '<div>';// required before (no_)title_fmt for validation
-				$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
-				$this->no_title_fmt = '<span style="float:right">$global_icons$</span>'."\n";
-				$this->fieldstart = '<fieldset $ID$>'."\n";
-				$this->labelstart = '<div class="label">';
-				$this->labelend = "</div>\n";
-				$this->labelempty = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
-				$this->inputstart = '<div class="input">';
-				$this->infostart = '<div class="info">';
-				$this->inputend = "</div>\n";
-				$this->fieldend = "</fieldset>\n\n";
-				$this->buttonsstart = '<fieldset><div class="input">';
-				$this->buttonsend = "</div></fieldset>\n\n";
-				$this->formend = '</div>';
-				break;
+				case 'fieldset':
+					$this->formstart = '<div>';// required before (no_)title_fmt for validation
+					$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
+					$this->no_title_fmt = '<span style="float:right">$global_icons$</span>'."\n";
+					$this->fieldstart = '<fieldset $ID$>'."\n";
+					$this->labelstart = '<div class="label">';
+					$this->labelend = "</div>\n";
+					$this->labelempty = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
+					$this->inputstart = '<div class="input">';
+					$this->infostart = '<div class="info">';
+					$this->inputend = "</div>\n";
+					$this->fieldend = "</fieldset>\n\n";
+					$this->buttonsstart = '<fieldset><div class="input">';
+					$this->buttonsend = "</div></fieldset>\n\n";
+					$this->formend = '</div>';
+					break;
 
-			case 'chicago':		// Temporary dirty hack
-				$this->formstart = '<div>';// required before (no_)title_fmt for validation
-				$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
-				$this->no_title_fmt = '<span style="float:right">$global_icons$</span>'."\n";
-				$this->fieldstart = '<fieldset $ID$>'."\n";
-				$this->labelstart = '<div class="label">';
-				$this->labelend = "</div>\n";
-				$this->labelempty = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
-				$this->inputstart = '<div class="input">';
-				$this->infostart = '<div class="info">';
-				$this->inputend = "</div>\n";
-				$this->fieldend = "</fieldset>\n\n";
-				$this->buttonsstart = '<fieldset><div class="input">';
-				$this->buttonsend = "</div></fieldset>\n\n";
-				$this->formend = '</div>';
-				break;
+				case 'chicago':		// Temporary dirty hack
+					$this->formstart = '<div>';// required before (no_)title_fmt for validation
+					$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
+					$this->no_title_fmt = '<span style="float:right">$global_icons$</span>'."\n";
+					$this->fieldstart = '<fieldset $ID$>'."\n";
+					$this->labelstart = '<div class="label">';
+					$this->labelend = "</div>\n";
+					$this->labelempty = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
+					$this->inputstart = '<div class="input">';
+					$this->infostart = '<div class="info">';
+					$this->inputend = "</div>\n";
+					$this->fieldend = "</fieldset>\n\n";
+					$this->buttonsstart = '<fieldset><div class="input">';
+					$this->buttonsend = "</div></fieldset>\n\n";
+					$this->formend = '</div>';
+					break;
 
-			case 'linespan':
-				$this->formstart = '';
-				$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
-				$this->no_title_fmt = '<span style="float:right">$global_icons$</span>&nbsp;'."\n";
-				$this->fieldstart = '<div class="tile" $ID$>';
-				$this->labelstart = '<strong>';
-				$this->labelend = "</strong>\n";
-				$this->labelempty = '';
-				$this->inputstart = '';
-				$this->infostart = '';
-				$this->inputend = "\n";
-				$this->fieldend = "</div>\n";
-				$this->buttonsstart = '';
-				$this->buttonsend = "\n";
-				$this->formend = '';
-				break;
+				case 'linespan':
+					$this->formstart = '';
+					$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
+					$this->no_title_fmt = '<span style="float:right">$global_icons$</span>&nbsp;'."\n";
+					$this->fieldstart = '<div class="tile" $ID$>';
+					$this->labelstart = '<strong>';
+					$this->labelend = "</strong>\n";
+					$this->labelempty = '';
+					$this->inputstart = '';
+					$this->infostart = '';
+					$this->inputend = "\n";
+					$this->fieldend = "</div>\n";
+					$this->buttonsstart = '';
+					$this->buttonsend = "\n";
+					$this->formend = '';
+					break;
 
-			case 'blockspan':
-				$this->formstart = '';
-				$this->title_fmt = '$title$'."\n"; // TODO: icons
-				$this->no_title_fmt = '';          //           "
-				$this->fieldstart = '<span class="block" $ID$>';
-				$this->labelstart = '';
-				$this->labelend = "\n";
-				$this->labelempty = '';
-				$this->inputstart = '';
-				$this->infostart = '';
-				$this->inputend = "\n";
-				$this->fieldend = '</span>'.get_icon( 'pixel' )."\n";
-				$this->buttonsstart = '';
-				$this->buttonsend = "\n";
-				$this->formend = '';
-				break;
+				case 'blockspan':
+					$this->formstart = '';
+					$this->title_fmt = '$title$'."\n"; // TODO: icons
+					$this->no_title_fmt = '';          //           "
+					$this->fieldstart = '<span class="block" $ID$>';
+					$this->labelstart = '';
+					$this->labelend = "\n";
+					$this->labelempty = '';
+					$this->inputstart = '';
+					$this->infostart = '';
+					$this->inputend = "\n";
+					$this->fieldend = '</span>'.get_icon( 'pixel' )."\n";
+					$this->buttonsstart = '';
+					$this->buttonsend = "\n";
+					$this->formend = '';
+					break;
 
-			default:
-				// "none" (no layout)
-				$this->formstart = '';
-				$this->title_fmt = '$title$'."\n"; // TODO: icons
-				$this->no_title_fmt = '';          //           "
-				$this->fieldstart = ''; // fp> shall we still use $ID$ here ?
-				$this->labelstart = '';
-				$this->labelend = "\n";
-				$this->labelempty = '';
-				$this->inputstart = '';
-				$this->infostart = '';
-				$this->inputend = "\n";
-				$this->fieldend = "\n";
-				$this->buttonsstart = '';
-				$this->buttonsend = "\n";
-				$this->formend = '';
+				default:
+					// "none" (no layout)
+					$this->formstart = '';
+					$this->title_fmt = '$title$'."\n"; // TODO: icons
+					$this->no_title_fmt = '';          //           "
+					$this->fieldstart = ''; // fp> shall we still use $ID$ here ?
+					$this->labelstart = '';
+					$this->labelend = "\n";
+					$this->labelempty = '';
+					$this->inputstart = '';
+					$this->infostart = '';
+					$this->inputend = "\n";
+					$this->fieldend = "\n";
+					$this->buttonsstart = '';
+					$this->buttonsend = "\n";
+					$this->formend = '';
+			}
+
 		}
 	}
 
@@ -2811,6 +2815,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.14  2007/10/29 01:24:49  fplanque
+ * no message
+ *
  * Revision 1.13  2007/10/10 10:52:26  yabs
  * validation - linsepan/blockspan/default are probably still invalid
  *

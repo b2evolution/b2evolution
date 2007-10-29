@@ -33,7 +33,7 @@ global $Plugins;
 
 global $comments_use_autobr, $mode, $month, $tab, $redirect_to;
 
-$Form = & new Form( NULL, 'post', 'post', 'linespan' );
+$Form = & new Form( NULL, 'comment_checkchanges', 'post' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('cancel'), 4, 1 );
 
@@ -50,17 +50,17 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 <div class="left_col">
 
-	<fieldset>
-		<legend><?php echo T_('Comment contents') ?></legend>
 
-		<?php
-		if( ! $edited_Comment->get_author_User() )
-		{ // This is not a member comment
-			$Form->text( 'newcomment_author', $edited_Comment->author, 20, T_('Name'), '', 100 );
-			$Form->text( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), '', 100 );
-			$Form->text( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('URL'), '', 100 );
-		}
-		?>
+	<?php
+	$Form->begin_fieldset( T_('Comment contents') );
+
+	if( ! $edited_Comment->get_author_User() )
+	{ // This is not a member comment
+		$Form->text( 'newcomment_author', $edited_Comment->author, 20, T_('Name'), '', 100 );
+		$Form->text( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), '', 100 );
+		$Form->text( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('URL'), '', 100 );
+	}
+	?>
 
 	<div class="edit_toolbars">
 	<?php // --------------------------- TOOLBARS ------------------------------------
@@ -107,32 +107,37 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 	?>
 	</div>
-	</fieldset>
-
-	<fieldset>
-		<legend><?php echo T_('Advanced properties') ?></legend>
-
-		<?php
-		if( $current_User->check_perm( 'edit_timestamp' ) )
-		{	// ------------------------------------ TIME STAMP -------------------------------------
-			echo '<div id="itemform_edit_timestamp">';
-			$Form->date( 'comment_issue_date', $edited_Comment->date, T_('Comment date') );
-			echo ' '; // allow wrapping!
-			$Form->time( 'comment_issue_time', $edited_Comment->date, '' );
-			echo '</div>';
-		}
-
-		// --------------------------- AUTOBR --------------------------------------
-		// fp> TODO: this should be Auto-P and handled by the Auto-P plugin
-		?>
-		<input type="checkbox" class="checkbox" name="post_autobr" value="1"
-		<?php	if( $comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out' ) echo ' checked="checked"' ?>
-			id="autobr" tabindex="6" />
-		<label for="autobr"><strong><?php echo T_('Auto-BR') ?></strong></label>
-
-	</fieldset>
 
 	<?php
+	$Form->end_fieldset();
+
+	$Form->begin_fieldset( T_('Advanced properties') );
+
+ 	$Form->switch_layout( 'linespan' );
+
+	if( $current_User->check_perm( 'edit_timestamp' ) )
+	{	// ------------------------------------ TIME STAMP -------------------------------------
+		echo '<div id="itemform_edit_timestamp">';
+		$Form->date( 'comment_issue_date', $edited_Comment->date, T_('Comment date') );
+		echo ' '; // allow wrapping!
+		$Form->time( 'comment_issue_time', $edited_Comment->date, '' );
+		echo '</div>';
+	}
+
+	// --------------------------- AUTOBR --------------------------------------
+	// fp> TODO: this should be Auto-P and handled by the Auto-P plugin
+	?>
+	<input type="checkbox" class="checkbox" name="post_autobr" value="1"
+	<?php	if( $comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out' ) echo ' checked="checked"' ?>
+		id="autobr" tabindex="6" />
+	<label for="autobr"><strong><?php echo T_('Auto-BR') ?></strong></label>
+
+	<?php
+
+	$Form->switch_layout( NULL );
+
+	$Form->end_fieldset();
+
 	// ####################### PLUGIN FIELDSETS #########################
 
 	$Plugins->trigger_event( 'AdminDisplayCommentFormFieldset', array( 'Form' => & $Form, 'Comment' => & $edited_Comment, 'edit_layout' => NULL ) );
@@ -142,21 +147,24 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 <div class="right_col">
 
-	<fieldset>
-		<legend><?php echo T_('Comment info') ?></legend>
-		<p><strong><?php echo T_('Author') ?>:</strong> <?php echo $edited_Comment->author() ?></p>
-		<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $edited_Comment->type; ?></p>
-		<p><strong><?php echo T_('IP address') ?>:</strong> <?php
-			// Display IP address and allow plugins to filter it, e.g. the DNSBL plugin will add a link to check the IP:
-			echo $Plugins->get_trigger_event( 'FilterIpAddress', array('format'=>'htmlbody', 'data'=>$edited_Comment->author_IP), 'data' ); ?></p>
-		<p><strong><?php echo T_('Spam Karma') ?>:</strong> <?php $edited_Comment->spam_karma(); ?></p>
-		<p><strong><?php echo T_('Item') ?>:</strong> <?php
-			$comment_Item = & $edited_Comment->get_Item();
-			$comment_Item->permanent_link();
-			$comment_Item->edit_link(); ?></p>
-	</fieldset>
+	<?php
+		$Form->begin_fieldset( T_('Advanced properties') );
+	?>
+
+	<p><strong><?php echo T_('Author') ?>:</strong> <?php echo $edited_Comment->author() ?></p>
+	<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $edited_Comment->type; ?></p>
+	<p><strong><?php echo T_('IP address') ?>:</strong> <?php
+		// Display IP address and allow plugins to filter it, e.g. the DNSBL plugin will add a link to check the IP:
+		echo $Plugins->get_trigger_event( 'FilterIpAddress', array('format'=>'htmlbody', 'data'=>$edited_Comment->author_IP), 'data' ); ?></p>
+	<p><strong><?php echo T_('Spam Karma') ?>:</strong> <?php $edited_Comment->spam_karma(); ?></p>
+	<p><strong><?php echo T_('Item') ?>:</strong> <?php
+		$comment_Item = & $edited_Comment->get_Item();
+		$comment_Item->permanent_link();
+		$comment_Item->edit_link(); ?></p>
 
 	<?php
+		$Form->end_fieldset();
+
 		$Form->begin_fieldset( T_('Visibility'), array( 'id' => 'commentform_visibility' ) );
 
 		$sharing_options[] = array( 'published', T_('Published (Public)') );
@@ -175,6 +183,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.3  2007/10/29 01:24:49  fplanque
+ * no message
+ *
  * Revision 1.2  2007/09/04 19:51:27  fplanque
  * in-context comment editing
  *
