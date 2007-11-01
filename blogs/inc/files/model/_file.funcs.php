@@ -621,6 +621,7 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 	// We'll go through files in current dir:
 	$Nodelist = & new Filelist( $Root, trailing_slash($ads_full_path) );
 	$Nodelist->load();
+	$Nodelist->sort( 'name' );
 	$has_sub_dirs = $Nodelist->count_dirs();
 
 	$id_path = 'id_path_'.$instance_ID.md5( $ads_full_path );
@@ -637,16 +638,12 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 	 	$r['opened'] = NULL;
 	}
 
-	// Optional radio input to select this path:
+
 	if( $radios )
-	{
+	{ // Optional radio input to select this path:
 		$root_and_path = format_to_output( implode( '::', array($Root->ID, $rds_rel_path) ), 'formvalue' );
 
-		$r['string'] .= '<input'
-			.' type="radio"'
-			.' name="root_and_path"'
-			.' value="'.$root_and_path.'"'
-			.' id="radio_'.$id_path.'"';
+		$r['string'] .= '<input type="radio" name="root_and_path" value="'.$root_and_path.'" id="radio_'.$id_path.'"';
 
 		if( $r['opened'] )
 		{	// This is the current open path
@@ -767,6 +764,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 
 /*
  * $Log$
+ * Revision 1.2  2007/11/01 03:36:09  fplanque
+ * fixed file sorting in tree
+ *
  * Revision 1.1  2007/06/25 10:59:54  fplanque
  * MODULES (refactored MVC)
  *
