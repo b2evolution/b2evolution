@@ -190,6 +190,10 @@ class ItemListLight extends DataObjectList2
 	 */
 	function set_filters( $filters, $memorize = true )
 	{
+		if( ! is_array($filters) )
+		{
+			$filters = array($filters);
+		}
 		if( !empty( $filters ) )
 		{	// Note if $filters == NULL it fails in PHP5
 			// Activate the filterset (fallback to default filter when a value is not set):
@@ -1476,6 +1480,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.9  2007/11/01 03:19:34  blueyed
+ * Fix for array_merge in PHP5, props yettyn
+ *
  * Revision 1.8  2007/10/10 09:02:36  fplanque
  * PHP5 fix
  *
