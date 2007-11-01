@@ -140,10 +140,19 @@ global $edited_Item;
 				{ // provide list of roots to choose from
 					?>
 					<select name="new_root" onchange="this.form.submit();">
-
 					<?php
+					$optgroup = '';
 					foreach( $rootlist as $l_FileRoot )
 					{
+						if( ($typegroupname = $l_FileRoot->get_typegroupname()) != $optgroup )
+						{ // We're entering a new group:
+							if( ! empty($optgroup) )
+							{
+								echo '</optgroup>';
+							}
+							echo '<optgroup label="'.T_($typegroupname).'">';
+							$optgroup = $typegroupname;
+						}
 						echo '<option value="'.$l_FileRoot->ID.'"';
 
 						if( $fm_Filelist->_FileRoot && $fm_Filelist->_FileRoot->ID == $l_FileRoot->ID )
@@ -153,8 +162,11 @@ global $edited_Item;
 
 						echo '>'.format_to_output( $l_FileRoot->name )."</option>\n";
 					}
+					if( ! empty($optgroup) )
+					{
+						echo '</optgroup>';
+					}
 					?>
-
 					</select>
 					<script type="text/javascript">
 						<!--
@@ -256,7 +268,11 @@ global $edited_Item;
 				{
 					echo '<td id="fm_dirtree">';
 
-					echo get_directory_tree( NULL, NULL, $ads_list_path );
+					// Version with all roots displayed
+					//echo get_directory_tree( NULL, NULL, $ads_list_path );
+
+					// Version with only the current root displayed:
+					echo get_directory_tree( $fm_Filelist->_FileRoot, $fm_Filelist->_FileRoot->ads_path, $ads_list_path );
 
 					echo '</td>';
 				}
@@ -276,6 +292,7 @@ global $edited_Item;
 							&& $current_User->check_perm( 'files', 'add' ) )
 				{ // dir or file creation is enabled and we're allowed to add files:
 					global $create_type;
+
 					$Form = & new Form( NULL, 'fmbar_create_checkchanges', 'post', 'none' );
 					$Form->begin_form( 'toolbaritem' );
 						$Form->hidden( 'action', 'createnew' );
@@ -356,6 +373,9 @@ global $edited_Item;
 
 /*
  * $Log$
+ * Revision 1.6  2007/11/01 04:31:25  fplanque
+ * Better root browsing (roots are groupes by type + only one root is shown at a time)
+ *
  * Revision 1.5  2007/11/01 01:40:59  fplanque
  * fixed : dir creation was losing item_ID
  *

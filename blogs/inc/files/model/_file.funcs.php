@@ -574,129 +574,147 @@ function rel_path_to_base( $path )
 /**
  * Get the directories of the supplied path as a radio button tree.
  *
+ * @todo fp> Make a DirTree class (those static hacks suck)
+ *
  * @param FileRoot A single root or NULL for all available.
  * @param string the root path to use
  * @param boolean add radio buttons ?
  * @param string used by recursion
  * @return string
  */
-function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_full_path = NULL, $radios = false, $rds_rel_path = NULL )
+function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_full_path = NULL, $radios = false, $rds_rel_path = NULL, $is_recursing = false )
 {
 	static $js_closeClickIDs; // clickopen IDs that should get closed
 	static $instance_ID = 0;
 
-	// ________________________ Handle Roots ______________________
-	if( $Root === NULL )
-	{ // This is the top level call:
+	if( ! $is_recursing )
+	{	// This is not a recursive call (yet):
+		// Init:
 		$instance_ID++;
 		$js_closeClickIDs = array();
-
-		$FileRootCache = & get_Cache( 'FileRootCache' );
-		$_roots = $FileRootCache->get_available_FileRoots();
-
-		$r = '<ul class="clicktree">';
-		foreach( $_roots as $l_Root )
-		{
-			$subR = get_directory_tree( $l_Root, $l_Root->ads_path, $ads_selected_full_path, $radios, '' );
-			if( !empty( $subR['string'] ) )
-			{
-				$r .= '<li>'.$subR['string'].'</li>';
-			}
-		}
-
-		$r .= '</ul>';
-
-		if( ! empty($js_closeClickIDs) )
-		{ // there are IDs of checkboxes that we want to close
-			$r .= "\n".'<script type="text/javascript">toggle_clickopen( \''
-						.implode( "' );\ntoggle_clickopen( '", $js_closeClickIDs )
-						."' );\n</script>";
-		}
-
-		return $r;
-	}
-	// _______________________________________________________________________
-
-
-	// We'll go through files in current dir:
-	$Nodelist = & new Filelist( $Root, trailing_slash($ads_full_path) );
-	$Nodelist->load();
-	$Nodelist->sort( 'name' );
-	$has_sub_dirs = $Nodelist->count_dirs();
-
-	$id_path = 'id_path_'.$instance_ID.md5( $ads_full_path );
-
-	$r['string'] = '<span class="folder_in_tree">';
-
-	// echo '<br />'. $rds_rel_path . ' - '.$ads_full_path;
-	if( $ads_full_path == $ads_selected_full_path )
-	{	// This is the current open path
-	 	$r['opened'] = true;
+		$ret = '<ul class="clicktree">';
 	}
 	else
 	{
-	 	$r['opened'] = NULL;
+		$ret = '';
 	}
 
+	// ________________________ Handle Roots ______________________
+	if( $Root === NULL )
+	{ // We want to list all roots:
+		$FileRootCache = & get_Cache( 'FileRootCache' );
+		$_roots = $FileRootCache->get_available_FileRoots();
 
-	if( $radios )
-	{ // Optional radio input to select this path:
-		$root_and_path = format_to_output( implode( '::', array($Root->ID, $rds_rel_path) ), 'formvalue' );
-
-		$r['string'] .= '<input type="radio" name="root_and_path" value="'.$root_and_path.'" id="radio_'.$id_path.'"';
-
-		if( $r['opened'] )
-		{	// This is the current open path
-			$r['string'] .= ' checked="checked"';
+		foreach( $_roots as $l_Root )
+		{
+			$subR = get_directory_tree( $l_Root, $l_Root->ads_path, $ads_selected_full_path, $radios, '', true );
+			if( !empty( $subR['string'] ) )
+			{
+				$ret .= '<li>'.$subR['string'].'</li>';
+			}
 		}
-
-		//.( ! $has_sub_dirs ? ' style="margin-right:'.get_icon( 'collapse', 'size', array( 'size' => 'width' ) ).'px"' : '' )
-		$r['string'] .= ' /> &nbsp; &nbsp;';
-	}
-
-	// Folder Icon + Name:
-	$url = regenerate_url( 'root,path', 'root='.$Root->ID.'&amp;path='.$rds_rel_path );
-	$label = action_icon( T_('Open this directory in the file manager'), 'folder', $url )
-		.'<a href="'.$url.'"
-		title="'.T_('Open this directory in the file manager').'">'
-		.( empty($rds_rel_path) ? $Root->name : basename( $ads_full_path ) )
-		.'</a>';
-
-	// Handle potential subdir:
-	if( ! $has_sub_dirs )
-	{	// No subirs
-		$r['string'] .= get_icon( 'expand', 'noimg', array( 'class'=>'' ) ).'&nbsp;'.$label.'</span>';
-		return $r;
 	}
 	else
-	{ // Process subdirs
-		$r['string'] .= get_icon( 'collapse', 'imgtag', array(
-					'onclick' => 'toggle_clickopen(\''.$id_path.'\');',
-					'id' => 'clickimg_'.$id_path
-				) )
-			.'&nbsp;'.$label.'</span>'
-			.'<ul class="clicktree" id="clickdiv_'.$id_path.'">'."\n";
+	{
+		// We'll go through files in current dir:
+		$Nodelist = & new Filelist( $Root, trailing_slash($ads_full_path) );
+		$Nodelist->load();
+		$Nodelist->sort( 'name' );
+		$has_sub_dirs = $Nodelist->count_dirs();
 
-		while( $l_File = & $Nodelist->get_next( 'dir' ) )
+		$id_path = 'id_path_'.$instance_ID.md5( $ads_full_path );
+
+		$r['string'] = '<span class="folder_in_tree">';
+
+		// echo '<br />'. $rds_rel_path . ' - '.$ads_full_path;
+		if( $ads_full_path == $ads_selected_full_path )
+		{	// This is the current open path
+	 		$r['opened'] = true;
+		}
+		else
 		{
-			$rSub = get_directory_tree( $Root, $l_File->get_full_path(), $ads_selected_full_path, $radios, $l_File->get_rdfs_rel_path() );
+	 		$r['opened'] = NULL;
+		}
 
-			if( $rSub['opened'] )
-			{ // pass opened status on, if given
-				$r['opened'] = $rSub['opened'];
+
+		if( $radios )
+		{ // Optional radio input to select this path:
+			$root_and_path = format_to_output( implode( '::', array($Root->ID, $rds_rel_path) ), 'formvalue' );
+
+			$r['string'] .= '<input type="radio" name="root_and_path" value="'.$root_and_path.'" id="radio_'.$id_path.'"';
+
+			if( $r['opened'] )
+			{	// This is the current open path
+				$r['string'] .= ' checked="checked"';
 			}
 
-			$r['string'] .= '<li>'.$rSub['string'].'</li>';
+			//.( ! $has_sub_dirs ? ' style="margin-right:'.get_icon( 'collapse', 'size', array( 'size' => 'width' ) ).'px"' : '' )
+			$r['string'] .= ' /> &nbsp; &nbsp;';
 		}
 
-		if( !$r['opened'] )
-		{
-			$js_closeClickIDs[] = $id_path;
+		// Folder Icon + Name:
+		$url = regenerate_url( 'root,path', 'root='.$Root->ID.'&amp;path='.$rds_rel_path );
+		$label = action_icon( T_('Open this directory in the file manager'), 'folder', $url )
+			.'<a href="'.$url.'"
+			title="'.T_('Open this directory in the file manager').'">'
+			.( empty($rds_rel_path) ? $Root->name : basename( $ads_full_path ) )
+			.'</a>';
+
+		// Handle potential subdir:
+		if( ! $has_sub_dirs )
+		{	// No subirs
+			$r['string'] .= get_icon( 'expand', 'noimg', array( 'class'=>'' ) ).'&nbsp;'.$label.'</span>';
 		}
-		$r['string'] .= '</ul>';
+		else
+		{ // Process subdirs
+			$r['string'] .= get_icon( 'collapse', 'imgtag', array( 'onclick' => 'toggle_clickopen(\''.$id_path.'\');',
+						'id' => 'clickimg_'.$id_path
+					) )
+				.'&nbsp;'.$label.'</span>'
+				.'<ul class="clicktree" id="clickdiv_'.$id_path.'">'."\n";
+
+			while( $l_File = & $Nodelist->get_next( 'dir' ) )
+			{
+				$rSub = get_directory_tree( $Root, $l_File->get_full_path(), $ads_selected_full_path, $radios, $l_File->get_rdfs_rel_path(), true );
+
+				if( $rSub['opened'] )
+				{ // pass opened status on, if given
+					$r['opened'] = $rSub['opened'];
+				}
+
+				$r['string'] .= '<li>'.$rSub['string'].'</li>';
+			}
+
+			if( !$r['opened'] )
+			{
+				$js_closeClickIDs[] = $id_path;
+			}
+			$r['string'] .= '</ul>';
+		}
+
+   	if( $is_recursing )
+		{
+			return $r;
+		}
+		else
+		{
+			$ret .= '<li>'.$r['string'].'</li>';
+		}
 	}
 
-	return $r;
+	if( ! $is_recursing )
+	{
+ 		$ret .= '</ul>';
+
+		if( ! empty($js_closeClickIDs) )
+		{ // there are IDs of checkboxes that we want to close
+			$ret .= "\n".'<script type="text/javascript">toggle_clickopen( \''
+						.implode( "' );\ntoggle_clickopen( '", $js_closeClickIDs )
+						."' );\n</script>";
+		}
+	}
+
+	return $ret;
 }
 
 
@@ -764,6 +782,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 
 /*
  * $Log$
+ * Revision 1.3  2007/11/01 04:31:25  fplanque
+ * Better root browsing (roots are groupes by type + only one root is shown at a time)
+ *
  * Revision 1.2  2007/11/01 03:36:09  fplanque
  * fixed file sorting in tree
  *
