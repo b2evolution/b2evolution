@@ -136,7 +136,7 @@ switch( $action )
 			// Create default category:
       load_class( 'chapters/model/_chapter.class.php' );
 			$edited_Chapter = & new Chapter( NULL, $edited_Blog->ID );
-			$edited_Chapter->set( 'name', T_('Main category') );
+			$edited_Chapter->set( 'name', T_('Uncategorized') );
 			$edited_Chapter->set( 'urlname', 'main' );
 			$edited_Chapter->dbinsert();
 
@@ -436,6 +436,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2007/11/01 19:50:28  fplanque
+ * minor
+ *
  * Revision 1.3  2007/09/28 02:17:49  fplanque
  * Menu widgets
  *

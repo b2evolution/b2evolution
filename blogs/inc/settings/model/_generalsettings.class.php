@@ -69,10 +69,10 @@ class GeneralSettings extends AbstractSettings
 
 		'fm_enabled' => '1',
 		'fm_enable_create_dir' => '1',
-		'fm_enable_create_file' => '0',
+		'fm_enable_create_file' => '1',
 		'fm_enable_roots_blog' => '1',
 		// 'fm_enable_roots_group' => '0',  // TO DO
-		'fm_enable_roots_user' => '0',
+		'fm_enable_roots_user' => '1',
 		'fm_enable_roots_skins' => '1',
 
 		'fm_showtypes' => '0',
@@ -154,6 +154,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.4  2007/11/01 19:50:39  fplanque
+ * minor
+ *
  * Revision 1.3  2007/09/03 16:44:28  fplanque
  * chicago admin skin
  *
