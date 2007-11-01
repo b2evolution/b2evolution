@@ -45,12 +45,12 @@ $Form->begin_form( 'fform' );
 	$Form->begin_fieldset( T_('Lost password ?') );
 
 	echo '<ol>';
-	echo '<li>'.T_('Please enter your login below.').'</li>';
+	echo '<li>'.T_('Please enter your login below. Do <strong>NOT</strong> enter your e-mail address!').'</li>';
 	echo '<li>'.T_('An email will be sent to your registered email address immediately.').'</li>';
 	echo '<li>'.T_('As soon as you receive the email, click on the link therein to change your password.').'</li>';
 	echo '</ol>';
 
-	$Form->text( 'login', $login, 16, T_('Login'), '', 20 , 'input_text' );
+	$Form->text( 'login', $login, 16, T_('Login'), '', 20, 'input_text' );
 
 	echo $Form->fieldstart.$Form->inputstart;
 	$Form->submit_input( array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me an email now!'), 'class' => 'ActionButton' ) );
@@ -64,6 +64,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.2  2007/11/01 19:52:13  fplanque
+ * UI
+ *
  * Revision 1.1  2007/06/25 11:02:37  fplanque
  * MODULES (refactored MVC)
  *

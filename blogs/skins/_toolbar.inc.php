@@ -101,6 +101,13 @@ global $Hit;
 
 				echo '<li class="separator"><hr /></li>';
 
+
+				if( $current_User->check_perm( 'blogs', 'create' ) )
+				{
+					echo '<li><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_('Create new blog').'</a></li>';
+					echo '<li class="separator"><hr /></li>';
+				}
+
 				$perm_spam = $current_User->check_perm( 'spamblacklist', 'view', false );
 				$perm_options = $current_User->check_perm( 'options', 'view', false );
 				if( $perm_spam || $perm_options )
@@ -136,6 +143,9 @@ global $Hit;
 
 				// fp> The plan is to have drop downs for each of those menu entries in order to access any authorized blog immediately
 
+  			// Dashboard link:
+				user_admin_link( '<li>', '</li>', T_('Dashboard'), T_('Go to admin dashboard') );
+
 				// View link:
 				blog_home_link( '<li>', '</li>', T_('See'), T_('See') );
 
@@ -143,7 +153,7 @@ global $Hit;
 				echo '<li><a href="'.$admin_url.'?ctrl=items&amp;action=new'.$blog_param.'">'.T_('Write').'</a></li>';
 
   			// Manage link:
-				user_admin_link( '<li>', '</li>', T_('Manage'), T_('Go to admin dashboard') );
+				echo '<li><a href="'.$admin_url.'?ctrl=items'.$blog_param.'">'.T_('Manage').'</a></li>';
 
   			// Upload link:
 				echo '<li><a href="'.$admin_url.'?ctrl=files'.$blog_param.'">'.T_('Upload').'</a></li>';
@@ -154,10 +164,9 @@ global $Hit;
  					echo '<li class="menu_close" onmouseover="evo_menu_show(this)" onmouseout="evo_menu_hide(this)">';
 						echo '<a href="'.$admin_url.'?ctrl=coll_settings'.$blog_param.'">'.T_('Customize').' '.get_icon('dropdown').'</a>';
 						echo '<ul>';
-						echo '<li><a href="'.$admin_url.'?ctrl=coll_settings'.$blog_param.'">'.T_('Blog name').'</a></li>';
+						echo '<li><a href="'.$admin_url.'?ctrl=coll_settings'.$blog_param.'">'.T_('Blog properties').'</a></li>';
 						echo '<li><a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin'.$blog_param.'">'.T_('Blog skin').'</a></li>';
 						echo '<li><a href="'.$admin_url.'?ctrl=widgets'.$blog_param.'">'.T_('Blog widgets').'</a></li>';
-						echo '<li><a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=display'.$blog_param.'">'.T_('Blog display order').'</a></li>';
 						echo '<li><a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=urls'.$blog_param.'">'.T_('Blog URLs').'</a></li>';
 						echo '</ul>';
 					echo '</li>';
