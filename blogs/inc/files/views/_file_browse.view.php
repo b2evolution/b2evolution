@@ -276,7 +276,6 @@ global $edited_Item;
 							&& $current_User->check_perm( 'files', 'add' ) )
 				{ // dir or file creation is enabled and we're allowed to add files:
 					global $create_type;
-
 					$Form = & new Form( NULL, 'fmbar_create_checkchanges', 'post', 'none' );
 					$Form->begin_form( 'toolbaritem' );
 						$Form->hidden( 'action', 'createnew' );
@@ -357,6 +356,9 @@ global $edited_Item;
 
 /*
  * $Log$
+ * Revision 1.5  2007/11/01 01:40:59  fplanque
+ * fixed : dir creation was losing item_ID
+ *
  * Revision 1.4  2007/09/26 23:32:39  fplanque
  * upload context saving
  *

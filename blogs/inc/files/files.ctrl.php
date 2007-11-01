@@ -215,6 +215,40 @@ foreach( $fm_selected as $l_source_path )
 
 
 
+/*
+ * Load editable objects:
+ */
+if( param( 'link_ID', 'integer', NULL, false, false, false ) )
+{
+	$LinkCache = & get_Cache( 'LinkCache' );
+	if( ($edited_Link = & $LinkCache->get_by_ID( $link_ID, false )) === false )
+	{	// We could not find the link to edit:
+		$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
+		unset( $edited_Link );
+		forget_param( 'link_ID' );
+		unset( $link_ID );
+	}
+}
+
+
+/*
+ * Load linkable objects:
+ */
+if( param( 'item_ID', 'integer', NULL, true, false, false ) )
+{ // Load Requested iem:
+	$ItemCache = & get_Cache( 'ItemCache' );
+	if( ($edited_Item = & $ItemCache->get_by_ID( $item_ID, false )) === false )
+	{	// We could not find the contact to link:
+		$Messages->head = T_('Cannot link Item!');
+		$Messages->add( T_('Requested item does not exist any longer.'), 'error' );
+		unset( $edited_Item );
+		forget_param( 'item_ID' );
+		unset( $item_ID );
+	}
+}
+
+
+
 // Check actions that need early processing:
 if( $action == 'createnew' )
 {
@@ -446,39 +480,6 @@ if( ! in_array( $fm_order, array( 'name', 'path', 'type', 'size', 'lastmod', 'pe
 }
 param( 'fm_orderasc', '', NULL, true );
 $fm_Filelist->sort( $fm_order, $fm_orderasc );
-
-
-/*
- * Load editable objects:
- */
-if( param( 'link_ID', 'integer', NULL, false, false, false ) )
-{
-	$LinkCache = & get_Cache( 'LinkCache' );
-	if( ($edited_Link = & $LinkCache->get_by_ID( $link_ID, false )) === false )
-	{	// We could not find the link to edit:
-		$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
-		unset( $edited_Link );
-		forget_param( 'link_ID' );
-		unset( $link_ID );
-	}
-}
-
-
-/*
- * Load linkable objects:
- */
-if( param( 'item_ID', 'integer', NULL, true, false, false ) )
-{ // Load Requested iem:
-	$ItemCache = & get_Cache( 'ItemCache' );
-	if( ($edited_Item = & $ItemCache->get_by_ID( $item_ID, false )) === false )
-	{	// We could not find the contact to link:
-		$Messages->head = T_('Cannot link Item!');
-		$Messages->add( T_('Requested item does not exist any longer.'), 'error' );
-		unset( $edited_Item );
-		forget_param( 'item_ID' );
-		unset( $item_ID );
-	}
-}
 
 
 switch( $action )
@@ -1472,6 +1473,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2007/11/01 01:41:00  fplanque
+ * fixed : dir creation was losing item_ID
+ *
  * Revision 1.4  2007/09/26 23:32:39  fplanque
  * upload context saving
  *
