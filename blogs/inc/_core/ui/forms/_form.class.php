@@ -70,16 +70,11 @@ class Form extends Widget
 	var $_opentags = array( 'fieldset' => 0 );
 
 	/**
-	 * Suffix for LABELs. Only gets used, if {@link $label_to_the_left} is true.
+	 * Suffix for LABELs.
 	 * @var string
 	 */
 	var $label_suffix = ':';
 
-	/**
-	 * Display order of <label> and <input>.
-	 * @var boolean
-	 */
-	var $label_to_the_left = true;
 
 	/**
 	 * Common params shared between methods.
@@ -373,7 +368,7 @@ class Form extends Widget
 		{
 			$this->_common_params = array();
 		}
-		// Remember these, to make them available to get_label() for !$label_to_the_left
+		// Remember these, to make them available to get_label()
 		if( isset($field_name) )
 		{
 			$this->_common_params['name'] = $field_name;
@@ -400,10 +395,7 @@ class Form extends Widget
 			$r .= $this->_common_params['field_prefix'];
 		}
 
-		if( $this->label_to_the_left )
-		{
-			$r .= $this->get_label();
-		}
+		$r .= $this->get_label();
 
 		$r .= $this->inputstart;
 
@@ -431,14 +423,7 @@ class Form extends Widget
 			$this->_common_params['note_format'] = $field_note_format;
 		}
 
-		if( !$this->label_to_the_left )
-		{ // label to the right:
-			$r = $this->get_label();
-		}
-		else
-		{ // label has been displayed in begin_field()
-			$r = '';
-		}
+		$r = '';
 
 		if( !empty($this->_common_params['note']) )
 		{ // We have a note
@@ -544,7 +529,7 @@ class Form extends Widget
 	 * @param string The name of the input field. This gets used for id also, if no id given in $field_params.
 	 * @param string Initial value
 	 * @param integer Size of the input field
-	 * @param string Label displayed with the field (in front by default, see {@link $label_to_the_left}).
+	 * @param string Label displayed with the field
 	 * @param string "help" note (Should provide something useful, otherwise leave it empty)
 	 * @param array Extended attributes/params.
 	 *                 - 'maxlength': if not set, $field_size gets used (use '' to disable it)
@@ -1982,12 +1967,7 @@ class Form extends Widget
 		if( strlen($field_label) )
 		{
 			$r .= $this->labelstart.$field_label;
-
-			if( $this->label_to_the_left )
-			{
-				$r .= $this->label_suffix;
-			}
-
+			$r .= $this->label_suffix;
 			$r .= $this->labelend;
 		}
 		else
@@ -2625,7 +2605,6 @@ class Form extends Widget
 
 	/**
 	 * Get the label of a field. This is used by {@link begin_field()} or {@link end_field()},
-	 * according to {@link $label_to_the_left}
 	 *
 	 * @access protected
 	 * @return string
@@ -2646,10 +2625,7 @@ class Form extends Widget
 				.'>'
 				.format_to_output($label, 'htmlbody');
 
-			if( $this->label_to_the_left )
-			{
-				$r .= $this->label_suffix;
-			}
+			$r .= $this->label_suffix;
 
 			$r .= '</label>'
 				.$this->labelend;
@@ -2815,6 +2791,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.15  2007/11/01 19:52:46  fplanque
+ * better comment forms
+ *
  * Revision 1.14  2007/10/29 01:24:49  fplanque
  * no message
  *

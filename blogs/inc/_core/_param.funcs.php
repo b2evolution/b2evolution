@@ -1486,9 +1486,11 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
 		}
 		elseif( ! preg_match('~^           # start
 			([a-z][a-z0-9+.\-]*)             # scheme
-			:(//)?                           # authorize absolute URLs only ( // not present in clsid: or mailto: urls)
+			://                              # authorize absolute URLs only ( // not present in clsid: -- problem? ; mailto: handled above)
 			(\w+(:\w+)?@)?                   # username or username and password (optional)
-			[a-z0-9]([a-z0-9.\-])*           # Don t allow anything too funky like entities
+			[a-z0-9]([a-z0-9\-])+            # Don t allow anything too funky like entities
+			\.                               # require at least 1 dot
+			[a-z0-9]([a-z0-9.\-])+           # Don t allow anything too funky like entities
 			(:[0-9]+)?                       # optional port specification
 			~ix', $url, $match) )
 		{ // Cannot validate URL structure
@@ -1652,6 +1654,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.5  2007/11/01 19:52:46  fplanque
+ * better comment forms
+ *
  * Revision 1.4  2007/09/22 19:23:56  fplanque
  * various fixes & enhancements
  *

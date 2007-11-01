@@ -119,9 +119,7 @@ if( $params['disp_trackback_url'] )
 	 */
 	if( ! $Plugins->trigger_event_first_true( 'DisplayTrackbackAddr', array('Item' => & $Item, 'template' => '<code>%url%</code>') ) )
 	{ // No plugin displayed a payload, so we just display the default:
-		?>
-		<code><?php $Item->trackback_url() ?></code>
-		<?php
+		echo '<p class="trackback_url"><a href="'.$Item->get_trackback_url().'">'.T_('Trackback URL (right click and copy shortcut/link location)').'</a></p>';
 	}
 }
 
@@ -225,7 +223,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	// Default form params:
 	$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
 	$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
-	$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
+	$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : 'http://';
 	$comment_content = '';
 
 	// PREVIEW:
@@ -273,7 +271,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	echo $params['form_title_end'];
 
 
-	$Form = & new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID );
+	$Form = & new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post' );
 	$Form->begin_form( 'bComment', '', array( 'target' => '_self' ) );
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
@@ -298,8 +296,8 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	{ // User is not logged in:
 		// Note: we use funky field names to defeat the most basic guestbook spam bots
 		$Form->text( 'u', $comment_author, 40, T_('Name'), '', 100, 'bComment' );
-		$Form->text( 'i', $comment_author_email, 40, T_('Email'), '<br />'.T_('Your email address will <strong>not</strong> be displayed on this site.'), 100, 'bComment' );
-		$Form->text( 'o', $comment_author_url, 40, T_('Site/Url'), '<br />'.T_('Your URL will be displayed.'), 100, 'bComment' );
+		$Form->text( 'i', $comment_author_email, 40, T_('Email'), '<br />'.T_('Your email address will <strong>not</strong> be revealed on this site.'), 100, 'bComment' );
+		$Form->text( 'o', $comment_author_url, 40, T_('Website'), '<br />'.T_('Your URL will be displayed.'), 100, 'bComment' );
 	}
 
 	echo '<div class="comment_toolbars">';
@@ -314,31 +312,29 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 	// set b2evoCanvas for plugins
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "p" );</script>';
+
 	$comment_options = array();
-	$Form->output = false;
-	$Form->label_to_the_left = false;
-	$old_label_suffix = $Form->label_suffix;
-	$Form->label_suffix = '';
-	$Form->switch_layout('inline');
+
 	if( substr($comments_use_autobr,0,4) == 'opt-')
 	{
-		$comment_options[] = $Form->checkbox_input( 'comment_autobr', ($comments_use_autobr == 'opt-out'), T_('Auto-BR'), array(
-			'note' => '('.T_('Line breaks become &lt;br /&gt;').')', 'tabindex' => 6 ) );
+		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_autobr" tabindex="6"'
+													.( ($comments_use_autobr == 'opt-out') ? ' checked="checked"' : '' )
+													.' value="1" /> '.T_('Auto-BR').'</label>'
+													.' <span class="note">('.T_('Line breaks become &lt;br /&gt;').')</span>';
 	}
+
 	if( ! is_logged_in() )
 	{ // User is not logged in:
-		$comment_options[] = $Form->checkbox_input( 'comment_cookies', true, T_('Remember me'), array(
-			'note' => '('.T_('Set cookies for name, email and url').')', 'tabindex' => 7 ) );
+		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_cookies" tabindex="7"'
+													.' checked="checked" value="1" /> '.T_('Remember me').'</label>'
+													.' <span class="note">('.T_('Name, email &amp; website').')</span>';
 		// TODO: If we got info from cookies, Add a link called "Forget me now!" (without posting a comment).
 
-		$comment_options[] = $Form->checkbox_input( 'comment_allow_msgform', true, T_('Allow message form'), array(
-			'note' => '('.T_('Allow users to contact you through a message form (your email will NOT be displayed.)').')', 'tabindex' => 8 ) );
+		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_allow_msgform" tabindex="8"'
+													.' checked="checked" value="1" /> '.T_('Allow message form').'</label>'
+													.' <span class="note">('.T_('Allow users to contact you through a message form (your email will <strong>not</strong> be revealed.').')</span>';
 		// TODO: If we have an email in a cookie, Add links called "Add a contact icon to all my previous comments" and "Remove contact icon from all my previous comments".
 	}
-	$Form->output = true;
-	$Form->label_to_the_left = true;
-	$Form->label_suffix = $old_label_suffix;
-	$Form->switch_layout(NULL);
 
 	if( ! empty($comment_options) )
 	{
@@ -372,6 +368,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.8  2007/11/01 19:52:46  fplanque
+ * better comment forms
+ *
  * Revision 1.7  2007/09/28 02:18:10  fplanque
  * minor
  *

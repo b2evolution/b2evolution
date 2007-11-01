@@ -135,14 +135,22 @@ if( ! $User )
 		$Messages->add( T_('Supplied email address is invalid.'), 'error' );
 	}
 
-	// add 'http://' if no protocol defined for URL
-	$url = ((!stristr($url, '://')) && ($url != '')) ? 'http://' . $url : $url;
-	if( strlen($url) < 7 ){
+
+	if( !stristr($url, '://') && !stristr($url, '@') )
+	{ // add 'http://' if no protocol defined for URL; but not if the user seems to be entering an email address alone
+		$url = 'http://'.$url;
+	}
+
+	if( strlen($url) <= 8 )
+	{	// ex: https:// is 8 chars
 		$url = '';
 	}
-	if( $error = validate_url( $url, $comments_allowed_uri_scheme ) )
+
+	// Note: as part of the validation we require teh url to be absolute; otherwise we cannot detect bozos typing in
+	// a title for their comment or whatever...
+	if( $error = validate_url( $url, $comments_allowed_uri_scheme, true ) )
 	{
-		$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
+		$Messages->add( T_('Supplied website address is invalid: ').$error, 'error' );
 	}
 }
 
@@ -354,6 +362,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.114  2007/11/01 19:52:47  fplanque
+ * better comment forms
+ *
  * Revision 1.113  2007/07/09 21:24:12  fplanque
  * cleanup of admin page top
  *
