@@ -42,6 +42,7 @@ global $UserSettings;
 
 global $upload_quickmode, $failedFiles, $ads_list_path;
 
+global $fm_FileRoot;
 ?>
 
 <script type="text/javascript">
@@ -169,16 +170,50 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 	// Begin payload block:
 	$this->disp_payload_begin();
 
-	$Form = & new Form( NULL, 'fm_upload_checkchanges', 'post', 'fieldset', 'multipart/form-data' );
 
-	$Form->global_icon( T_('Quit upload mode!'), 'close', regenerate_url( 'ctrl,fm_mode', 'ctrl=files' ) );
+	$Widget = & new Widget( 'file_browser' );
 
-	$Form->begin_form( 'fform', T_('File upload') );
+	$Widget->global_icon( T_('Quit upload mode!'), 'close', regenerate_url( 'ctrl,fm_mode', 'ctrl=files' ) );
 
+	$Widget->title = T_('File upload');
+	$Widget->disp_template_replaced( 'block_start' );
+
+
+	$Form = & new Form( NULL, 'fm_upload_checkchanges', 'post', 'none', 'multipart/form-data' );
+	$Form->begin_form( 'fform' );
 		$Form->hidden_ctrl();
 		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); // Just a hint for the browser.
 		$Form->hidden( 'upload_quickmode', $upload_quickmode );
 		$Form->hiddens_by_key( get_memorized() );
+
+?>
+
+<table id="fm_browser" cellspacing="0" cellpadding="0">
+	<thead>
+		<tr>
+			<td colspan="2" id="fm_bar">
+			<?php
+
+			?>
+			</td>
+		</tr>
+	</thead>
+
+	<tbody>
+		<tr>
+			<?php
+				echo '<td id="fm_dirtree">';
+
+				// Version with all roots displayed
+				echo get_directory_tree( NULL, NULL, $ads_list_path, true );
+
+				// Version with only the current root displayed:
+				// echo get_directory_tree( $fm_FileRoot, $fm_FileRoot->ads_path, $ads_list_path, true );
+
+				echo '</td>';
+
+				echo '<td id="fm_files">';
+
 
 		if( count( $failedFiles ) )
 		{
@@ -187,9 +222,7 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 		?>
 
 		<?php /* DIV to prevent the "Upload into" fieldset from wrapping below the "Files to upload" box (on any browser), because padding/margin of the fieldset does not affect the width of the both boxes */ ?>
-		<div class="box_files_to_upload">
-		<fieldset class="files_to_upload">
-			<legend><?php echo T_('Files to upload') ?></legend>
+			<p><?php echo T_('Files to upload') ?></p>
 			<ul id="uploadfileinputs">
 				<?php
 					if( empty($failedFiles) )
@@ -256,6 +289,11 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 
 			<p class="uploadfileinputs"><a href="#" onclick="addAnotherFileInput(); return false;" class="small"><?php echo T_('Add another file'); ?></a></p>
 
+			<?php
+				$Form->buttons( array( array( 'submit', '', T_('Upload to server now'), 'ActionButton' ),
+																array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+			?>
+
 			<p class="note">
 				<?php
 				$restrictNotes = array();
@@ -279,30 +317,26 @@ global $upload_quickmode, $failedFiles, $ads_list_path;
 				echo implode( '<br />', $restrictNotes ).'<br />';
 				?>
 			</p>
-		</fieldset>
-		</div>
 
-		<div class="box_upload_into">
-		<fieldset class="upload_into">
-			<legend><?php echo T_('Upload files into:'); ?></legend>
-			<?php
-				echo get_directory_tree( NULL, NULL, $ads_list_path, true );
-			?>
-		</fieldset>
-		</div>
-
-		<div class="clear"></div>
+		</td>
+		</tr>
+	</tbody>
+</table>
 
 <?php
 
-	$Form->end_form( array( array( 'submit', '', T_('Upload'), 'ActionButton' ),
-													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+	$Form->end_form();
+
+	$Widget->disp_template_raw( 'block_end' );
 
 	// End payload block:
 	$this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.3  2007/11/01 05:27:31  fplanque
+ * Upload screen refactoring - step 1
+ *
  * Revision 1.2  2007/09/23 18:55:16  fplanque
  * attempting to debloat. The Log class is insane.
  *
