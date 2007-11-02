@@ -575,6 +575,24 @@ class Item extends ItemLight
 	}
 
 
+  /**
+	 * Template function: Check if user can can rate this post
+	 *
+	 * @return boolean true if user can post, false if s/he cannot
+	 */
+	function can_rate()
+	{
+		$this->get_Blog();
+
+		if( $this->Blog->get_setting('allow_rating') == 'never' )
+		{
+			return false;
+		}
+
+		return true; // OK, user can rate!
+	}
+
+
 	/**
 	 * Get the prerendered content. If it has not been generated yet, it will.
 	 *
@@ -3132,6 +3150,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.12  2007/11/02 01:54:46  fplanque
+ * comment ratings
+ *
  * Revision 1.11  2007/09/13 19:16:14  fplanque
  * feedback_link() cleanup
  *

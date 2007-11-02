@@ -232,10 +232,13 @@ $schema_queries = array(
 			comment_author varchar(100) NULL,
 			comment_author_email varchar(255) NULL,
 			comment_author_url varchar(255) NULL,
-			comment_author_IP varchar(23) NOT NULL default '',
-			comment_date datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
-			comment_content text NOT NULL,
-			comment_karma int(11) NOT NULL default '0',
+			comment_author_IP  varchar(23) NOT NULL default '',
+			comment_date       datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
+			comment_content    text NOT NULL,
+			comment_rating     TINYINT(1) NULL DEFAULT NULL,
+			comment_featured   TINYINT(1) NOT NULL DEFAULT 0,
+			comment_nofollow   TINYINT(1) NOT NULL DEFAULT 1,
+			comment_karma      INT(11) NOT NULL default '0',
 			comment_spam_karma TINYINT NULL,
 			comment_allow_msgform TINYINT NOT NULL DEFAULT '0',
 			PRIMARY KEY comment_ID (comment_ID),
@@ -548,6 +551,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.68  2007/11/02 01:52:51  fplanque
+ * comment ratings
+ *
  * Revision 1.67  2007/09/19 02:54:16  fplanque
  * bullet proof upgrade
  *

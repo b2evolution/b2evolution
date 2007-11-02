@@ -74,6 +74,8 @@ else
 	param( 'comment_allow_msgform', 'integer', 0 ); // checkbox
 }
 
+param( 'comment_rating', 'integer', NULL );
+
 $now = date( 'Y-m-d H:i:s', $localtimenow );
 
 
@@ -93,6 +95,7 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 		'anon_name' => & $author,
 		'anon_email' => & $email,
 		'anon_url' => & $url,
+		'rating' => & $comment_rating,
 		'anon_allow_msgform' => & $comment_allow_msgform,
 		'anon_cookies' => & $comment_cookies,
 		'User' => & $User,
@@ -182,6 +185,10 @@ else
 	$Comment->set( 'author_url', $url );
 	$Comment->set( 'allow_msgform', $comment_allow_msgform );
 }
+if( $commented_Item->can_rate() )
+{	// Comment rating:
+	$Comment->set( 'rating', $comment_rating );
+}
 $Comment->set( 'author_IP', $Hit->IP );
 $Comment->set( 'date', $now );
 $Comment->set( 'content', $comment );
@@ -254,7 +261,7 @@ if( $Messages->count('error') )
 	<body>
 	<?php
 	$Messages->display( T_('Cannot post comment, please correct these errors:'),
-	'[<a href="javascript:history.go(-1)">'. T_('Back to comment editing') . '</a>]' );
+	'[<a href="javascript:history.go(-1)">'.T_('Back to comment editing').'</a>]' );
 
 	debug_info();  // output debug info, useful to see what a plugin might have done
 	?>
@@ -362,6 +369,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.115  2007/11/02 01:57:57  fplanque
+ * comment ratings
+ *
  * Revision 1.114  2007/11/01 19:52:47  fplanque
  * better comment forms
  *

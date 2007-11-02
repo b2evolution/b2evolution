@@ -161,30 +161,32 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 				switch( $Comment->get( 'type' ) )
 				{
 					case 'comment': // Display a comment:
-						echo T_('Comment from:').' ';
+						$Comment->permanent_link( T_('Comment') );
+						echo ' '.T_('from:').' ';
 						$Comment->author();
 						$Comment->msgform_link( $Blog->get('msgformurl') );
 						$Comment->author_url( '', ' &middot; ', '' );
 						break;
 
 					case 'trackback': // Display a trackback:
-						echo T_('Trackback from:') ?>
-						<?php $Comment->author( '', '#', '', '#', 'htmlbody', true ) ?>
-						<?php break;
+						$Comment->permanent_link( T_('Trackback') );
+						echo ' '.T_('from:').' ';
+						$Comment->author( '', '#', '', '#', 'htmlbody', true );
+						break;
 
 					case 'pingback': // Display a pingback:
-						echo T_('Pingback from:') ?>
-						<?php $Comment->author( '', '#', '', '#', 'htmlbody', true ) ?>
-						<?php break;
+						$Comment->permanent_link( T_('Pingback') );
+						echo ' '.T_('from:').' ';
+						$Comment->author( '', '#', '', '#', 'htmlbody', true );
+						break;
 				}
 			?>
 			</div>
+			<?php $Comment->rating(); ?>
 			<div class="bCommentText">
 				<?php $Comment->content() ?>
 			</div>
 			<div class="bCommentSmallPrint">
-				<?php $Comment->permanent_link( '#', '#', 'permalink_right' ); ?>
-
 				<?php $Comment->edit_link( '', '', '#', '#', 'permalink_right' ); /* Link to backoffice for editing */ ?>
 				<?php $Comment->delete_link( '', '', '#', '#', 'permalink_right' ); /* Link to backoffice for deleting */ ?>
 
@@ -220,49 +222,53 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 if( $params['disp_comment_form'] && $Item->can_comment() )
 { // We want to display the comments form and the item can be commented on:
 
-	// Default form params:
-	$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
-	$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
-	$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : 'http://';
-	$comment_content = '';
 
-	// PREVIEW:
-	$preview_Comment = $Session->get('core.preview_Comment');
 
-	if( $preview_Comment )
-	{
-		if( $preview_Comment->item_ID == $Item->ID )
+	if( $Comment = $Session->get('core.preview_Comment') )
+	{	// We have a comment to preview
+		if( $Comment->item_ID == $Item->ID )
 		{ // display PREVIEW:
 			?>
 			<div class="bComment" id="comment_preview">
 				<div class="bCommentTitle">
 				<?php
 					echo T_('PREVIEW Comment from:').' ';
-					$preview_Comment->author();
-					$preview_Comment->msgform_link( $Blog->get('msgformurl') );
-					$preview_Comment->author_url( '', ' &middot; ', '' );
+					$Comment->author();
+					$Comment->msgform_link( $Blog->get('msgformurl') );
+					$Comment->author_url( '', ' &middot; ', '' );
 				?>
 				</div>
 				<div class="bCommentText">
-					<?php $preview_Comment->content() ?>
+					<?php $Comment->content() ?>
 				</div>
 				<div class="bCommentSmallPrint">
-					<?php $preview_Comment->date() ?> @ <?php $preview_Comment->time( 'H:i' ) ?>
+					<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
 				</div>
 			</div>
 
 			<?php
 			// Form fields:
-			$comment_content = $preview_Comment->original_content;
+			$comment_content = $Comment->original_content;
 			// for visitors:
-			$comment_author = $preview_Comment->author;
-			$comment_author_email = $preview_Comment->author_email;
-			$comment_author_url = $preview_Comment->author_url;
+			$comment_author = $Comment->author;
+			$comment_author_email = $Comment->author_email;
+			$comment_author_url = $Comment->author_url;
 		}
 
 		// delete any preview comment from session data:
 		$Session->delete( 'core.preview_Comment' );
-		$preview_Comment = NULL;
+	}
+	else
+	{ // New comment:
+		$Comment = & new Comment();
+		$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
+		$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
+		$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
+		if( empty($comment_author_url) )
+		{	// Even if we have a blank cookie, let's reset this to remind the bozos what it's for
+			$comment_author_url = 'http://';
+		}
+		$comment_content = '';
 	}
 
 
@@ -298,6 +304,15 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 		$Form->text( 'u', $comment_author, 40, T_('Name'), '', 100, 'bComment' );
 		$Form->text( 'i', $comment_author_email, 40, T_('Email'), '<br />'.T_('Your email address will <strong>not</strong> be revealed on this site.'), 100, 'bComment' );
 		$Form->text( 'o', $comment_author_url, 40, T_('Website'), '<br />'.T_('Your URL will be displayed.'), 100, 'bComment' );
+	}
+
+	if( $Item->can_rate() )
+	{	// Comment rating:
+		$Form->begin_fieldset();
+			echo $Form->begin_field( NULL, T_('Your vote'), true );
+			$Comment->rating_input();
+			echo $Form->end_field();
+		$Form->end_fieldset();
 	}
 
 	echo '<div class="comment_toolbars">';
@@ -368,6 +383,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.9  2007/11/02 01:55:57  fplanque
+ * comment ratings
+ *
  * Revision 1.8  2007/11/01 19:52:46  fplanque
  * better comment forms
  *

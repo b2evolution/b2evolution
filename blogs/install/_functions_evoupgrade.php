@@ -1955,33 +1955,44 @@ function upgrade_b2evo_tables()
 	}
 
 
-	task_begin( 'Normalizing columns...' );
-	$DB->query( 'ALTER TABLE T_blogs
-									ALTER COLUMN blog_shortname SET DEFAULT \'\',
-									ALTER COLUMN blog_tagline SET DEFAULT \'\',
-									CHANGE COLUMN blog_description blog_description     varchar(250) NULL default \'\',
-									ALTER COLUMN blog_siteurl SET DEFAULT \'\'' );
-	task_end();
+	if( $old_db_version < 9500 )
+	{
+		task_begin( 'Normalizing columns...' );
+		$DB->query( 'ALTER TABLE T_blogs
+										ALTER COLUMN blog_shortname SET DEFAULT \'\',
+										ALTER COLUMN blog_tagline SET DEFAULT \'\',
+										CHANGE COLUMN blog_description blog_description     varchar(250) NULL default \'\',
+										ALTER COLUMN blog_siteurl SET DEFAULT \'\'' );
+		task_end();
 
-	task_begin( 'Normalizing dates...' );
-	$DB->query( 'UPDATE T_users
-									SET dateYMDhour = \'2000-01-01 00:00:00\'
-								WHERE dateYMDhour = \'0000-00-00 00:00:00\'' );
-	$DB->query( 'ALTER TABLE T_users
-								MODIFY COLUMN dateYMDhour DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
-	$DB->query( 'UPDATE T_comments
-									SET comment_date = \'2000-01-01 00:00:00\'
-								WHERE comment_date = \'0000-00-00 00:00:00\'' );
-	$DB->query( 'ALTER TABLE T_comments
-								MODIFY COLUMN comment_date DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
-	task_end();
+		task_begin( 'Normalizing dates...' );
+		$DB->query( 'UPDATE T_users
+										SET dateYMDhour = \'2000-01-01 00:00:00\'
+									WHERE dateYMDhour = \'0000-00-00 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_users
+									MODIFY COLUMN dateYMDhour DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'UPDATE T_comments
+										SET comment_date = \'2000-01-01 00:00:00\'
+									WHERE comment_date = \'0000-00-00 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_comments
+									MODIFY COLUMN comment_date DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		task_end();
 
-	task_begin( 'Normalizing cron jobs...' );
-	$DB->query( 'UPDATE T_cron__task
-									SET ctsk_controller = REPLACE(ctsk_controller, "cron/_", "cron/jobs/_" )
-								WHERE ctsk_controller LIKE "cron/_%"' );
-	task_end();
+		task_begin( 'Normalizing cron jobs...' );
+		$DB->query( 'UPDATE T_cron__task
+										SET ctsk_controller = REPLACE(ctsk_controller, "cron/_", "cron/jobs/_" )
+									WHERE ctsk_controller LIKE "cron/_%"' );
+		task_end();
 
+		task_begin( 'Extending comments table...' );
+		$DB->query( 'ALTER TABLE T_comments
+									ADD COLUMN comment_rating     TINYINT(1) NULL DEFAULT NULL AFTER comment_content,
+									ADD COLUMN comment_featured   TINYINT(1) NOT NULL DEFAULT 0 AFTER comment_rating,
+									ADD COLUMN comment_nofollow   TINYINT(1) NOT NULL DEFAULT 1 AFTER comment_featured;');
+		task_end();
+
+		set_upgrade_checkpoint( '9500' );
+	}
 
 
 	/*
@@ -2093,6 +2104,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.232  2007/11/02 01:53:34  fplanque
+ * comment ratings
+ *
  * Revision 1.231  2007/10/11 14:02:48  fplanque
  * simplified
  *
