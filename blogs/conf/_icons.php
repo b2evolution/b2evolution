@@ -509,11 +509,25 @@ function get_icon_info($name)
 			'alt'	 => T_('XML Feed'),
 			'size' => array( 16, 16 ),
 		);
+
+		case 'star_on': return array(
+			'file' => $rsc_subdir.'icons/star_small.gif',
+			'alt'	 => '*',
+			'size' => array( 12, 12 ),
+		);
+		case 'star_off': return array(
+			'file' => $rsc_subdir.'icons/star_small_gray.gif',
+			'alt'	 => '-',
+			'size' => array( 12, 12 ),
+		);
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.62  2007/11/02 01:42:16  fplanque
+ * comment ratings
+ *
  * Revision 1.61  2007/09/12 21:00:30  fplanque
  * UI improvements
  *

@@ -61,6 +61,7 @@ class CollectionSettings extends AbstractSettings
 			'allow_subscriptions' => 0,					// Don't all email subscriptions by default
 			'use_workflow' => 0,								// Don't use workflow by default
 			'aggregate_coll_IDs' => '',
+			'allow_rating'   => 'never',
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
 			'canonical_cat_urls' => 1,					// Redirect categories to their canonical Url?
 			'default_noindex' => '0',						// META NOINDEX on Default blog page
@@ -108,6 +109,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.3  2007/11/02 01:46:53  fplanque
+ * comment ratings
+ *
  * Revision 1.2  2007/09/28 09:28:36  fplanque
  * per blog advanced SEO settings
  *

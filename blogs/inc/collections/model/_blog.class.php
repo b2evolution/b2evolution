@@ -378,6 +378,7 @@ class Blog extends DataObject
 		{ // Feedback options:
 			$this->set_from_Request( 'allowcomments' );
 			$this->set_setting( 'new_feedback_status', param( 'new_feedback_status', 'string', 'draft' ) );
+			$this->set_setting( 'allow_rating', param( 'allow_rating', 'string', 'never' ) );
 			$this->set( 'allowtrackbacks', param( 'blog_allowtrackbacks', 'integer', 0 ) );
 
 			// Public blog list
@@ -1438,6 +1439,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2007/11/02 01:44:29  fplanque
+ * comment ratings
+ *
  * Revision 1.10  2007/10/09 02:10:50  fplanque
  * URL fixes
  *

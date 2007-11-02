@@ -123,6 +123,9 @@ class Comment extends DataObject
 		if( $db_row == NULL )
 		{
 			// echo 'null comment';
+			$this->rating = NULL;
+			$this->featured = 0;
+			$this->nofollow = 1;
 		}
 		else
 		{
@@ -145,6 +148,9 @@ class Comment extends DataObject
 			$this->author_IP = $db_row['comment_author_IP'];
 			$this->date = $db_row['comment_date'];
 			$this->content = $db_row['comment_content'];
+			$this->rating = $db_row['comment_rating'];
+			$this->featured = $db_row['comment_featured'];
+			$this->nofollow = $db_row['comment_nofollow'];
 			$this->spam_karma = $db_row['comment_spam_karma'];
 			$this->allow_msgform = $db_row['comment_allow_msgform'];
 		}
@@ -217,6 +223,9 @@ class Comment extends DataObject
 	{
 		switch( $parname )
 		{
+			case 'rating':
+				return parent::set_param( $parname, 'string', $parvalue, true );
+
 			default:
 				return parent::set_param( $parname, 'string', $parvalue );
 		}
@@ -913,6 +922,97 @@ class Comment extends DataObject
 
 
 	/**
+	 * Template tag:  display rating
+	 */
+	function rating( $params = array() )
+	{
+		if( empty( $this->rating ) )
+		{
+			return false;
+		}
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => '',
+				'after'       => '',
+			), $params );
+
+		echo $params['before'];
+
+		for( $i=1; $i<=5; $i++ )
+		{
+			if( $i <= $this->rating )
+			{
+				echo get_icon( 'star_on', 'imgtag', array( 'class'=>'middle' ) );
+			}
+			else
+			{
+				echo get_icon( 'star_off', 'imgtag', array( 'class'=>'middle' ) );
+			}
+		}
+
+		echo $params['after'];
+	}
+
+  /**
+	 * Rating input
+	 */
+	function rating_input( $params = array() )
+	{
+		$params = array_merge( array(
+									'before'    => '',
+									'after'     => '',
+									'label_low'  => T_('Poor'),
+									'label_high' => T_('Excellent'),
+								), $params );
+
+		echo $params['before'];
+
+		echo $params['label_low'];
+
+		for( $i=1; $i<=5; $i++ )
+		{
+			echo '<input type="radio" class="radio" name="comment_rating" value="'.$i.'"';
+			if( $this->rating == $i )
+			{
+				echo ' checked="checked"';
+			}
+			echo ' />';
+		}
+
+		echo $params['label_high'];
+
+		echo $params['after'];
+	}
+
+
+  /**
+	 * Rating reset input
+	 */
+	function rating_none_input( $params = array() )
+	{
+		$params = array_merge( array(
+									'before'    => '',
+									'after'     => '',
+									'label'     => T_('No rating'),
+								), $params );
+
+		echo $params['before'];
+
+		echo '<label><input type="radio" class="radio" name="comment_rating" value="0"';
+		if( empty($this->rating) )
+		{
+			echo ' checked="checked"';
+		}
+		echo ' />';
+
+		echo $params['label'].'</label>';
+
+		echo $params['after'];
+	}
+
+
+	/**
 	 * Template function: display status of comment
 	 *
 	 * Statuses:
@@ -1177,6 +1277,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2007/11/02 01:50:54  fplanque
+ * comment ratings
+ *
  * Revision 1.2  2007/09/04 19:51:26  fplanque
  * in-context comment editing
  *

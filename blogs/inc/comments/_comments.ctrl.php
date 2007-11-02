@@ -129,6 +129,9 @@ switch( $action )
 			}
 		}
 
+		param( 'comment_rating', 'integer', NULL );
+		$edited_Comment->set_from_Request( 'rating' );
+
 		param( 'comment_status', 'string', 'published' );
 		$edited_Comment->set_from_Request( 'status', 'comment_status' );
 
@@ -243,7 +246,7 @@ switch( $action )
 		$AdminUI->disp_payload_begin();
 
 		// Display VIEW:
-		$AdminUI->disp_view( 'comments/_comment.form.php' );
+		$AdminUI->disp_view( 'comments/views/_comment.form.php' );
 
 
 		// End payload block:
@@ -270,6 +273,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2007/11/02 01:51:55  fplanque
+ * comment ratings
+ *
  * Revision 1.2  2007/09/04 19:51:27  fplanque
  * in-context comment editing
  *
