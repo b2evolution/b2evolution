@@ -116,11 +116,11 @@ a:hover {
 	/* border:	1px solid #f00; */
 }
 .left_col {
+	clear: both;
 	vertical-align: top;
 	float: left;
 	width: 65.5%;
-	clear: left;
-	/* border:	1px solid #f00; */
+	/* border:	1px solid #f00;*/
 	margin: 0;
 	padding: 0;
 	overflow: hidden;

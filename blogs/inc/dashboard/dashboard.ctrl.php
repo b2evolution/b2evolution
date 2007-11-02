@@ -348,10 +348,11 @@ if( $blog )
 		echo '<div class="dashboard_sidebar">';
 		echo '<ul>';
 
-		echo '<li><a href="admin.php?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'">'.T_('Blog name').' &raquo;</a></li>';
-		echo '<li><a href="admin.php?ctrl=coll_settings&tab=skin&blog='.$Blog->ID.'">'.T_('Blog skin').' &raquo;</a></li>';
-		echo '<li><a href="admin.php?ctrl=widgets&blog='.$Blog->ID.'">'.T_('Blog widgets').' &raquo;</a></li>';
-		echo '<li><a href="admin.php?ctrl=coll_settings&tab=display&blog='.$Blog->ID.'">'.T_('Blog display order').' &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID.'">'.T_('Blog properties').' &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=coll_settings&amp;tab=features&amp;blog='.$Blog->ID.'">'.T_('Blog features').' &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=coll_settings&amp;tab=skin&amp;blog='.$Blog->ID.'">'.T_('Blog skin').' &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=widgets&amp;blog='.$Blog->ID.'">'.T_('Blog widgets').' &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=coll_settings&amp;tab=urls&amp;blog='.$Blog->ID.'">'.T_('Blog URLs').' &raquo;</a></li>';
 
 		echo '</ul>';
 		echo '</div>';
@@ -457,6 +458,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2007/11/02 02:47:06  fplanque
+ * refactored blog settings / UI
+ *
  * Revision 1.12  2007/09/12 01:18:32  fplanque
  * translation updates
  *

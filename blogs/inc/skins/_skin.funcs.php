@@ -225,6 +225,10 @@ function skin_include( $template_name, $params = array() )
 	else
 	{
 		printf( '<div class="skin_error">Sub template [%s] not found.</div>', $template_name );
+		if( !empty($current_User) && $current_User->level == 10 )
+		{
+			printf( '<div class="skin_error">User level 10 help info: [%s]</div>', $ads_current_skin_path.$template_name );
+		}
 	}
 }
 
@@ -413,6 +417,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.14  2007/11/02 02:41:25  fplanque
+ * refactored blog settings / UI
+ *
  * Revision 1.13  2007/10/12 05:26:59  fplanque
  * global $DB has been added to _subscriptions already and its use should not be encouraged. Therefore I don't want it available by default. _subscriptions.php should be cleaned up at some point.
  *

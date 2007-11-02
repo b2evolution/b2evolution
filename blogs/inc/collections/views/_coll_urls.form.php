@@ -58,7 +58,8 @@ global $Debuglog;
 		}
 	}
 
-	function show_hide_chapter_prefix(ob){
+	function show_hide_chapter_prefix(ob)
+	{
 		var fldset = document.getElementById( 'category_prefix_container' );
 		if( ob.value == 'param_num' )
 		{
@@ -210,22 +211,22 @@ $Form->begin_fieldset( T_('Category URLs') );
 								.url_add_tail( $blogurl, '/cat/subcat/' ), '', 'onclick="show_hide_chapter_prefix(this);"' ),
 			), T_('Category links'), true );
 
-	$show_prefix = ($edited_Blog->get_setting('chapter_links') != 'param_num') ? true : false ;
 
-	if ($show_prefix)
-	{
-		$style_container_prefix = '';
-	}
-	else
-	{
-		$style_container_prefix = 'style="display:none"';
-	}
-
-	echo ('<div id="category_prefix_container"' . $style_container_prefix . '>');
+	echo '<div id="category_prefix_container">';
 		$Form->text_input( 'category_prefix', $edited_Blog->get_setting( 'category_prefix' ), 30, T_('Prefix'),
 													T_('A optional prefix to be added to the URLs of the categories'),
 													array('maxlength' => 120) );
-	echo('</div>');
+	echo '</div>';
+	if( $edited_Blog->get_setting( 'chapter_links' ) == 'param_num' )
+	{ ?>
+	<script type="text/javascript">
+		<!--
+		var fldset = document.getElementById( 'category_prefix_container' );
+		fldset.style.display = 'none';
+		//-->
+	</script>
+	<?php
+	}
 
 $Form->end_fieldset();
 
@@ -263,6 +264,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.8  2007/11/02 02:39:07  fplanque
+ * refactored blog settings / UI
+ *
  * Revision 1.7  2007/10/08 08:31:59  fplanque
  * nicer forms
  *

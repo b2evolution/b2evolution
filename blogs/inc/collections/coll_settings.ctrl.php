@@ -100,7 +100,6 @@ switch( $action )
 		switch( $tab )
 		{
 			case 'general':
-			case 'display':
 			case 'urls':
 				if( $edited_Blog->load_from_Request( array() ) )
 				{ // Commit update to the DB:
@@ -194,10 +193,6 @@ switch( $AdminUI->get_path(1) )
 		$AdminUI->disp_view( 'skins/views/_coll_skin.view.php' );
 		break;
 
-	case 'display':
-		$AdminUI->disp_view( 'collections/views/_coll_display.form.php' );
-		break;
-
 	case 'urls':
 		$AdminUI->disp_view( 'collections/views/_coll_urls.form.php' );
 		break;
@@ -229,6 +224,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2007/11/02 02:45:51  fplanque
+ * refactored blog settings / UI
+ *
  * Revision 1.4  2007/10/08 10:24:49  fplanque
  * UI improvement
  *

@@ -205,9 +205,9 @@ switch( $action )
 			$BlogCache->add( $edited_Blog );
 
 			// We want to highlight the edited object on next list display:
- 			$Session->set( 'fadeout_array', array( 'blog_ID' => array($edited_Blog->ID) ) );
+ 			// $Session->set( 'fadeout_array', array( 'blog_ID' => array($edited_Blog->ID) ) );
 
-			header_redirect( 'admin.php?ctrl=collections&blog=0' ); // will save $Messages into Session
+			header_redirect( 'admin.php?ctrl=coll_settings&tab=features&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
 		break;
 
@@ -436,6 +436,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2007/11/02 02:46:27  fplanque
+ * refactored blog settings / UI
+ *
  * Revision 1.4  2007/11/01 19:50:28  fplanque
  * minor
  *

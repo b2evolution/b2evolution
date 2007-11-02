@@ -270,10 +270,10 @@ div.edit_actions input.DeleteButton:hover {
 }
 
 .left_col {
+	clear: both;
 	vertical-align: top;
 	float: left;
 	width: 65%;
-	clear: left;
 	/* border:	1px solid #f00; */
 	margin: 0;
 	padding: 0;

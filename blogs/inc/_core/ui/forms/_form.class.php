@@ -1164,6 +1164,36 @@ class Form extends Widget
 	}
 
 
+	/*
+	 * EXPERIMENTAL: simpler method of obtaining basic checkboxes
+	 */
+	function checkbox_basic_input( $field_name, $field_checked, $field_label, $field_params = array() )
+	{
+		$field_params['name'] = $field_name;
+		$field_params['type'] = 'checkbox';
+
+		if( !isset($field_params['value']) )
+		{
+			$field_params['value'] = 1;
+		}
+
+		if( $field_checked )
+		{
+			$field_params['checked'] = 'checked';
+		}
+
+		if( !isset($field_params['class']) )
+		{
+			$field_params['class'] = 'checkbox';
+		}
+
+		echo '<label>';
+		echo $this->get_input_element($field_params);
+		echo $field_label;
+		echo '</label>';
+	}
+
+
 	/**
 	 * Builds a checkbox field
 	 *
@@ -2791,6 +2821,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.16  2007/11/02 02:39:57  fplanque
+ * refactored blog settings / UI
+ *
  * Revision 1.15  2007/11/01 19:52:46  fplanque
  * better comment forms
  *

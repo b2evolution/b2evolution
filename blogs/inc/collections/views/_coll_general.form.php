@@ -80,28 +80,38 @@ $Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear
 	$Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('List of public blogs') );
-	$Form->checkbox( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want this blog to be advertised in the list of all public blogs on this system.') );
+$Form->begin_fieldset( T_('Content / Posts') );
+	$Form->select_input_array( 'orderby', $edited_Blog->get_setting('orderby'), array(
+												'datestart' => T_('Date issued (Default)'),
+												//'datedeadline' => T_('Deadline'),
+												'title'     => T_('Title'),
+												'datecreated' => T_('Date created'),
+												'datemodified' => T_('Date last modified'),
+												'urltitle'     => T_('URL Title'),
+												'priority'     => T_('Priority'),
+											), T_('Order by'), T_('Default ordering of posts.') );
+	$Form->select_input_array( 'orderdir', $edited_Blog->get_setting('orderdir'), array(
+												'ASC'  => T_('Ascending'),
+												'DESC' => T_('Descending'), ), T_('Direction') );
+	$Form->radio( 'what_to_show', $edited_Blog->get_setting('what_to_show'),
+								array(  array( 'days', T_('days') ),
+												array( 'posts', T_('posts') ),
+											), T_('Display unit'), false,  T_('Do you want to restrict on the number of days or the number of posts?') );
+	$Form->text( 'posts_per_page', $edited_Blog->get_setting('posts_per_page'), 4, T_('Posts/Days per page'), T_('How many days or posts fo you want to display on the home page?'), 4 );
+	$Form->radio( 'archive_mode',  $edited_Blog->get_setting('archive_mode'),
+							array(  array( 'monthly', T_('monthly') ),
+											array( 'weekly', T_('weekly') ),
+											array( 'daily', T_('daily') ),
+											array( 'postbypost', T_('post by post') )
+										), T_('Archive grouping'), false,  T_('How do you want to browse the post archives? May also apply to permalinks.') );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Feedback options') );
-	$Form->radio( 'blog_allowcomments', $edited_Blog->get( 'allowcomments' ),
-						array(  array( 'always', T_('Always on all posts'), T_('Always allow comments on every posts') ),
-						array( 'post_by_post', T_('Can be disabled on a per post basis'),  T_('Comments can be disabled on each post separatly') ),
-						array( 'never', T_('No comments are allowed in this blog'), T_('Never allow any comments in this blog') ),
-					), T_('Allow comments'), true );
 
-	$status_options = array(
-			'draft'      => T_('Draft'),
-			'published'  => T_('Published'),
-			'deprecated' => T_('Deprecated')
-		);
-	$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
-				T_('New feedback status'), T_('This status will be assigned to any new comment/trackback (unless overriden by plugins).') );
-
-	$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Allow trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
-
+$Form->begin_fieldset( T_('Description') );
+	$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is diplayed under the blog name on the blog template.'), 250 );
+	$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This is displayed on the blog template.'), 50, 'large' );
 $Form->end_fieldset();
+
 
 $Form->buttons( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
@@ -110,6 +120,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.2  2007/11/02 02:38:29  fplanque
+ * refactored blog settings / UI
+ *
  * Revision 1.1  2007/06/25 10:59:36  fplanque
  * MODULES (refactored MVC)
  *

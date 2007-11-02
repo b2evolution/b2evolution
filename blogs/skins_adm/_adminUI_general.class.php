@@ -1356,9 +1356,6 @@ class AdminUI_general extends Widget
 							'skin' => array(
 								'text' => T_('Skin'),
 								'href' => 'admin.php?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog, ),
-							'display' => array(
-								'text' => T_('Display'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=display&amp;blog='.$blog, ),
 							'widgets' => array(
 								'text' => T_('Widgets'),
 								'href' => 'admin.php?ctrl=widgets&amp;blog='.$blog, ),
@@ -1601,6 +1598,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.72  2007/11/02 02:37:37  fplanque
+ * refactored blog settings / UI
+ *
  * Revision 1.71  2007/09/29 03:08:24  fplanque
  * a little cleanup of the form class, hopefully fixing the plugin screen
  *
