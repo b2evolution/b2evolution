@@ -92,7 +92,7 @@ class GeneralSettings extends AbstractSettings
 		'time_difference' => '0',
 		'timeout_sessions' => '604800',     // seconds (604800 == 7 days)
 		'upload_enabled' => '1',
-		'upload_maxkb' => '100',
+		'upload_maxkb' => '2048',
 
 		'user_minpwdlen' => '5',
 		'js_passwd_hashing' => '1',					// Use JS password hashing by default
@@ -154,6 +154,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.5  2007/11/03 04:57:51  fplanque
+ * no message
+ *
  * Revision 1.4  2007/11/01 19:50:39  fplanque
  * minor
  *
