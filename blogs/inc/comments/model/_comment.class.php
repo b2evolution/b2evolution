@@ -933,8 +933,8 @@ class Comment extends DataObject
 
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before'      => '',
-				'after'       => '',
+				'before'      => '<div class="comment_rating">',
+				'after'       => '</div>',
 			), $params );
 
 		echo $params['before'];
@@ -1277,6 +1277,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2007/11/03 04:56:03  fplanque
+ * permalink / title links cleanup
+ *
  * Revision 1.3  2007/11/02 01:50:54  fplanque
  * comment ratings
  *

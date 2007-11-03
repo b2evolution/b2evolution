@@ -73,7 +73,10 @@ while( $Item = & $MainList->get_item() )
 	?>
 
 <item rdf:about="<?php $Item->permanent_url( 'single' ) ?>">
-	<title><?php $Item->title( '', '', false, 'xml' ) ?></title>
+	<title><?php $Item->title( array(
+				'format' => 'xml',
+				'link_type' => 'none',
+			) ); ?></title>
 	<link><?php $Item->permanent_url( 'single' ) ?></link>
 	<dc:date><?php $Item->issue_date( 'isoZ', true ) ?></dc:date>
 	<dc:creator><?php $Item->creator_User->preferred_name( 'xml' ) ?></dc:creator>

@@ -156,7 +156,10 @@ skin_include( '_html_header.inc.php' );
 			?>
 			<div class="bSmallHead">
 			<?php
-				$Item->permanent_link( '#icon#' );
+				// Permalink:
+				$Item->permanent_link( array(
+						'text' => '#icon#',
+					) );
 				echo ' ';
 				$Item->issue_time();
 				echo ', '.T_('by').' ';
@@ -196,7 +199,12 @@ skin_include( '_html_header.inc.php' );
 			?>
 
 			<div class="bSmallPrint">
-				<?php $Item->permanent_link( '#', '#', 'permalink_right' ); ?>
+				<?php
+					// Permalink:
+					$Item->permanent_link( array(
+							'class' => 'permalink_right',
+						) );
+				?>
 
 				<?php
 					// Link to comments, trackbacks, etc.:

@@ -58,7 +58,10 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			$Comment->get_Item();
 			?>
 		<item>
-			<title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
+			<title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( array(
+				'format' => 'xml',
+				'link_type' => 'none',
+			) ); ?></title>
 			<pubDate><?php $Comment->time( 'r', true ); ?></pubDate>
 			<dc:creator><?php $Comment->author( '', '#', '', '#', 'xml' ); ?></dc:creator>
 			<guid isPermaLink="false">c<?php $Comment->ID() ?>@<?php echo $baseurl ?></guid>

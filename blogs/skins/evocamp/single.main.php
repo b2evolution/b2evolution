@@ -72,7 +72,7 @@ skin_include( '_body_header.inc.php' );
 				$Item->anchor(); // Anchor for permalinks to refer to
 			?>
 
-			<h2><?php $Item->permanent_link( '#title#' ); ?></h2>
+			<h2><?php $Item->title(); ?></h2>
 
 			<p class="postinfo">By <?php $Item->author(); ?> on <?php $Item->issue_time('M j, Y') ?>
 			| In <?php $Item->categories(', ') ?>	|

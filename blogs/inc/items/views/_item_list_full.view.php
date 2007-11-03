@@ -220,7 +220,9 @@ while( $Item = & $ItemList->get_item() )
 
 		<div class="PostActionsArea">
 			<?php
-			$Item->permanent_link( '#', '#', 'permalink_right' );
+			$Item->permanent_link( array(
+					'class' => 'permalink_right',
+				) );
 
 			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="ActionButton">'.T_('View...').'</a>';
 
@@ -365,6 +367,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.6  2007/11/03 04:56:03  fplanque
+ * permalink / title links cleanup
+ *
  * Revision 1.5  2007/09/26 20:26:36  fplanque
  * improved ItemList filters
  *

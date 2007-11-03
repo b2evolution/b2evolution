@@ -40,7 +40,7 @@ $Form->begin_fieldset( T_('Canonical URL control').get_manual_link('canonical_ur
 	$Form->checkbox( 'canonical_cat_urls', $edited_Blog->get_setting( 'canonical_cat_urls' ), T_('Categories'), T_('301 redirect to canonical URL') );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Blog content pages indexing') );
+$Form->begin_fieldset( T_('Indexing of content pages') );
 	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Default blog page'), T_('META NOINDEX') );
 	$Form->checkbox( 'paged_noindex', $edited_Blog->get_setting( 'paged_noindex' ), T_('Following blog pages'), T_('META NOINDEX').' - '.T_('Page 2,3,4...') );
 	$Form->checkbox( 'archive_noindex', $edited_Blog->get_setting( 'archive_noindex' ), T_('Archive pages'), T_('META NOINDEX') );
@@ -48,12 +48,26 @@ $Form->begin_fieldset( T_('Blog content pages indexing') );
 	$Form->checkbox( 'filtered_noindex', $edited_Blog->get_setting( 'filtered_noindex' ), T_('Other filtered pages'), T_('META NOINDEX') );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Special features pages indexing') );
+$Form->begin_fieldset( T_('Indexing of special feature pages') );
 	$Form->checkbox( 'arcdir_noindex', $edited_Blog->get_setting( 'arcdir_noindex' ), T_('Archive directory'), T_('META NOINDEX') );
 	$Form->checkbox( 'catdir_noindex', $edited_Blog->get_setting( 'catdir_noindex' ), T_('Category directory'), T_('META NOINDEX') );
 	$Form->checkbox( 'feedback-popup_noindex', $edited_Blog->get_setting( 'feedback-popup_noindex' ), T_('Comment popups'), T_('META NOINDEX') );
 	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), T_('Message forms'), T_('META NOINDEX').' - '.T_('Keyword searched, etc.') );
 	$Form->checkbox( 'special_noindex', $edited_Blog->get_setting( 'special_noindex' ), T_('Other special pages'), T_('META NOINDEX').' - '.T_('User profile form, etc.') );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Internal link flows') );
+	$Form->radio( 'permalinks', $edited_Blog->get_setting('permalinks'), array(
+			  array( 'single', T_('Link to single post') ),
+			  array( 'archive', T_('Link to post in archive') ),
+			  array( 'subchap', T_('Link to post in sub-category') ),
+			), T_('Permanent links'), true );
+	$Form->radio( 'title_link_type', $edited_Blog->get_setting( 'title_link_type' ), array(
+			  array( 'permalink', T_('Link to the permanent url of the post') ),
+			  array( 'linkto_url', T_('Link to the "link to URL" specified in the post (if any)') ),
+			  array( 'none', T_('No links on titles') ),
+			), T_('Post titles'), true );
+
 $Form->end_fieldset();
 
 
@@ -64,6 +78,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.3  2007/11/03 04:56:03  fplanque
+ * permalink / title links cleanup
+ *
  * Revision 1.2  2007/09/29 03:42:12  fplanque
  * skin install UI improvements
  *

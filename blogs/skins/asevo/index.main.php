@@ -146,13 +146,13 @@ skin_include( '_html_header.inc.php' );
 			<?php
     		$Item->edit_link( '', '', '#', '#', 'floatright small' ); // Link to backoffice for editing
 			?>
-			<h1 class="evo_post_title"><?php
-			$Item->permanent_link( '#title#' );
-			?></h1>
+			<h1 class="evo_post_title"><?php $Item->title(); ?></h1>
 
 			<div class="evo_post_head">
 			<?php
-				$Item->permanent_link( '#icon#' );
+				$Item->permanent_link( array(
+						'text' => '#icon#',
+					) );
 				echo ' ';
 				$Item->issue_date();
 				echo ' ';

@@ -420,7 +420,9 @@ class ComponentWidget extends DataObject
 		while( $Item = & $ItemList->get_item() )
 		{
 			echo $this->disp_params['item_start'];
-			$Item->permanent_link('#title#');
+			$Item->title( array(
+					'link_type' => 'permalink',
+				) );
 			echo $this->disp_params['item_end'];
 		}
 
@@ -435,7 +437,7 @@ class ComponentWidget extends DataObject
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
-	function disp_cat_item_list()
+	function disp_cat_item_list( $link_type = 'linkto_url' )
 	{
 		global $BlogCache, $Blog;
 
@@ -509,7 +511,9 @@ class ComponentWidget extends DataObject
 			{
 				echo $this->disp_params['item_start'];
 
-				$Item->title( '', ' ', true );
+				$Item->title( array(
+						'link_type' => $link_type,
+					) );
 
 				/*
 				$Item->content_teaser( array(
@@ -522,7 +526,6 @@ class ComponentWidget extends DataObject
 				$Item->more_link( '', ' ', T_('more').' &raquo;' );
 				*/
 
-				// $Item->permanent_link( '#icon#' );
 
 				echo $this->disp_params['item_end'];
 			}
@@ -646,6 +649,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2007/11/03 04:56:04  fplanque
+ * permalink / title links cleanup
+ *
  * Revision 1.7  2007/09/24 12:08:24  yabs
  * minor bug fix
  *

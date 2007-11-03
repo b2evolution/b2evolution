@@ -291,17 +291,14 @@ class ItemLight extends DataObject
 	{
 		global $DB, $cacheweekly, $Settings;
 
-		if( empty( $permalink_type ) )
-		{
-			if( $this->ptyp_ID == 1000 )
-			{	// Page: force use of single url:
-				$permalink_type = 'single';
-			}
-			else
-			{	// Normal post: Use default from collection settings:
-				$this->get_Blog();
-				$permalink_type = $this->Blog->get_setting( 'permalinks' );
-			}
+		if( $this->ptyp_ID == 1000 )
+		{	// Page: force use of single url:
+			$permalink_type = 'single';
+		}
+		elseif( empty( $permalink_type ) )
+		{ // Use default from collection settings:
+			$this->get_Blog();
+			$permalink_type = $this->Blog->get_setting( 'permalinks' );
 		}
 
 		switch( $permalink_type )
@@ -614,50 +611,87 @@ class ItemLight extends DataObject
 	 *
 	 * Note: If you only want the permalink URL, use {@link Item::permanent_url()}
 	 *
-	 * @param string link text or special value: '#', '#icon#', '#text#', '#title#'
+	 * @param string link text or special value:
 	 * @param string link title
 	 * @param string class name
 	 */
-	function permanent_link( $text = '#', $title = '#', $class = '' )
+	function permanent_link( $params = array() )
 	{
-		echo $this->get_permanent_link( $text, $title, $class );
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => '',
+				'after'       => '',
+				'text'        => '#',	// possible special values: '#', '#icon#', '#text#', '#title#'
+				'title'       => '#',
+				'class'       => '',
+			//	'format'      => 'htmlbody',
+			), $params );
+
+		$link = $this->get_permanent_link( $params['text'], $params['title'], $params['class'] );
+
+		if( !empty( $link ) )
+		{
+			echo $params['before'];
+			echo $link;
+			echo $params['after'];
+		}
 	}
 
 
 	/**
 	 * Template function: display title for item and link to related URL
-	 *
-	 * @param string String to display before the title if there is something to display
-	 * @param string String to display after the title if there is something to display
-	 * @param boolean false if you don't want to link to related URL (if applicable)
-	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function title(
-		$before = '',        // HTML/text to be displayed before title
-		$after = '',         // HTML/text to be displayed after title
-		$add_link = true,    // Add li  nk to this title?
-		$format = 'htmlbody' )
+	function title( $params = array() )
 	{
-		if( empty($this->title) && $add_link )
-			$title = $this->url;
-		else
-			$title = $this->title;
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => '',
+				'after'       => '',
+				'format'      => 'htmlbody',
+				'link_type'   => '#',
+			), $params );
 
-		if( empty($title) )
-		{ // Nothing to display
+		$title = format_to_output( $this->title, $params['format'] );
+
+		if( empty( $title ) )
+		{
 			return;
 		}
 
-		$title = format_to_output( $title, $format );
-
-		if( $add_link && (!empty($this->url)) )
-		{
-			$title = '<a href="'.$this->url.'">'.$title.'</a>';
+		if( $params['link_type'] == '#' )
+		{	// Use default link type from settings:
+			$this->get_Blog();
+			$params['link_type'] = $this->Blog->get_setting( 'title_link_type' );
 		}
 
-		echo $before;
-		echo $title;
-		echo $after;
+		switch( $params['link_type'] )
+		{
+			case 'permalink':
+				$url = $this->get_permanent_url();
+				break;
+
+			case 'linkto_url':
+				$url = $this->url;
+				break;
+
+			case 'admin_view':
+      	$url = '?ctrl=items&amp;blog='.$this->blog_ID.'&amp;p='.$this->ID;
+				break;
+
+			case 'none':
+			default:
+		}
+
+		echo $params['before'];
+		if( !empty($url) )
+		{
+			echo '<a href="'.$url.'">'.$title.'</a>';
+		}
+		else
+		{
+			echo $title;
+		}
+		echo $params['after'];
 	}
 
 
@@ -787,6 +821,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2007/11/03 04:56:04  fplanque
+ * permalink / title links cleanup
+ *
  * Revision 1.3  2007/09/09 12:51:58  fplanque
  * cleanup
  *

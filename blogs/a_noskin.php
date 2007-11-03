@@ -198,7 +198,11 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<div class="bPost" lang="<?php $Item->lang() ?>">
 			<?php $Item->anchor(); ?>
 			<div class="bSmallHead">
-			<?php $Item->permanent_link( '#icon#' ); ?>
+			<?php
+				$Item->permanent_link( array(
+						'text' => '#icon#',
+					) );
+			?>
 			<?php $Item->issue_time();	echo ', ', T_('Categories'), ': ';	$Item->categories() ?>
 			</div>
 			<h3 class="bTitle"><?php $Item->title(); ?></h3>

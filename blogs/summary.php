@@ -128,7 +128,11 @@ header( 'Content-type: text/html; charset='.$io_charset );
 				?>
 				<li lang="<?php $Item->lang() ?>">
 					<?php $Item->issue_date() ?>:
-					<?php $Item->permanent_link( '#title#' ) ?>
+					<?php
+						$Item->title( array(
+								'link_type' => 'permalink',
+							) );
+					?>
 					<span class="small">[<?php $Item->lang() ?>]</span>
 				</li>
 				<?php

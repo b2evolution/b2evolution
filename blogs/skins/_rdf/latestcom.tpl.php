@@ -71,7 +71,10 @@ while( $Comment = & $CommentList->get_next() )
 	$Comment->get_Item();
 	?>
 <item rdf:about="<?php $Comment->permanent_url() ?>">
-	<title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
+	<title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( array(
+				'format' => 'xml',
+				'link_type' => 'none',
+			) ); ?></title>
 	<link><?php $Comment->permanent_url() ?></link>
 	<dc:date><?php $Comment->date( 'isoZ', true ); ?></dc:date>
 	<dc:creator><?php $Comment->author( '', '#', '', '#', 'xml' ) ?></dc:creator>

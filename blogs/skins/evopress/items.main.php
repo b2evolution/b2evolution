@@ -73,7 +73,7 @@ if( isset($MainList) ) while( $Item = & $MainList->get_item() )
 			$Item->anchor(); // Anchor for permalinks to refer to
 		?>
 
-		<h2><?php $Item->permanent_link( '#title#' ); ?></h2>
+		<h2><?php $Item->title(); ?></h2>
 		<small><?php $Item->issue_time( 'F jS, Y' ); ?> <!-- by <?php $Item->author( '<strong>', '</strong>' ); ?> --></small>
 
 		<?php

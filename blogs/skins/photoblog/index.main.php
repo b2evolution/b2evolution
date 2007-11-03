@@ -167,7 +167,13 @@ skin_include( '_html_header.inc.php' );
 								) );
 				 ?>
 
-				<div class="action_right"><?php $Item->permanent_link( T_('Permalink'), '#' ); ?></div>
+				<div class="action_right">
+				<?php
+					$Item->permanent_link( array(
+							'text' => T_('Permalink'),
+						) );
+				?>
+				</div>
 
 				<?php $Item->edit_link( '<div class="action_right">', '</div>', T_('Edit...'), T_('Edit title/description...') ) // Link to backoffice for editing ?>
 

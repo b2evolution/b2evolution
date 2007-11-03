@@ -80,7 +80,7 @@ if( isset($MainList) ) while( $Item = & $MainList->get_item() )
 	?>
 	<div class="post post<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
 
-		<h2><?php $Item->permanent_link( '#title#' ); ?></h2>
+		<h2><?php $Item->title(); ?></h2>
 
 		<?php
 			// ---------------------- POST CONTENT INCLUDED HERE ----------------------

@@ -55,7 +55,10 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			$Comment->get_Item();
 			?>
 		<item>
-			<title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
+			<title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( array(
+				'format' => 'xml',
+				'link_type' => 'none',
+			) ); ?></title>
 			<description><?php echo make_rel_links_abs( $Comment->get_content('entityencoded') ); ?></description>
 			<link><?php $Comment->permanent_url() ?></link>
 		</item>

@@ -58,7 +58,10 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		{
 		?>
 		<item>
-			<title><?php $Item->title( '', '', false, 'xml' ) ?></title>
+			<title><?php $Item->title( array(
+				'format' => 'xml',
+				'link_type' => 'none',
+			) ); ?></title>
 			<?php
 				if( $feed_content == 'excerpt' )
 				{

@@ -169,7 +169,9 @@ skin_include( '_html_header.inc.php' );
 	
 			<div class="bSmallHead">
 			<?php
-				$Item->permanent_link( '#icon#' );
+   			$Item->permanent_link( array(
+					'text' => '#icon#',
+				) );
 				echo ' ';
 				$Item->issue_time();
 				echo ', ', T_('Categories'), ': ';

@@ -231,7 +231,7 @@ $Form->begin_fieldset( T_('Category URLs') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Post URLs') );
+$Form->begin_fieldset( T_('Single post URLs') );
 
 	$Form->radio( 'single_links', $edited_Blog->get_setting('single_links'),
 		array(
@@ -247,13 +247,6 @@ $Form->begin_fieldset( T_('Post URLs') );
 			T_('For example, single post links are used when viewing comments for a post. May be used for permalinks - see below.') );
 			// fp> TODO: check where we really need to force single and where we could use any permalink
 
-	$Form->radio( 'permalinks', $edited_Blog->get_setting('permalinks'),
-		array(
-			  array( 'single', T_('Link to single post') ),
-			  array( 'archive', T_('Link to post in archive') ),
-			  array( 'subchap', T_('Link to post in sub-category') ),
-			), T_('Post permalinks'), true );
-
 $Form->end_fieldset();
 
 
@@ -264,6 +257,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.9  2007/11/03 04:56:03  fplanque
+ * permalink / title links cleanup
+ *
  * Revision 1.8  2007/11/02 02:39:07  fplanque
  * refactored blog settings / UI
  *

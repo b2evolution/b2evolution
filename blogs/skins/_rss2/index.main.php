@@ -57,7 +57,10 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		<ttl>60</ttl>
 		<?php while( $Item = & $MainList->get_item() ) {	?>
 		<item>
-			<title><?php $Item->title( '', '', false, 'xml' ) ?></title>
+			<title><?php $Item->title( array(
+				'format' => 'xml',
+				'link_type' => 'none',
+			) ); ?></title>
 			<link><?php $Item->permanent_url( 'single' ) ?></link>
 			<pubDate><?php $Item->issue_date( 'r', true ) ?></pubDate>
 			<dc:creator><?php $Item->get_creator_User(); $Item->creator_User->preferred_name('xml') ?></dc:creator>

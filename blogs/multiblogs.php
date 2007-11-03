@@ -158,7 +158,11 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<div class="bPost" lang="<?php $Item->lang() ?>">
 			<?php $Item->anchor(); ?>
 			<div class="bSmallHead">
-			<?php $Item->permanent_link( get_icon('permalink') ); ?>
+			<?php
+				$Item->permanent_link( array(
+						'text' => '#icon#',
+					) );
+			?>
 			<?php $Item->issue_time();	echo ', ', T_('Categories'), ': ';	$Item->categories() ?>
 			</div>
 			<h3 class="bTitle"><?php $Item->title(); ?></h3>
@@ -287,7 +291,11 @@ header( 'Content-type: text/html; charset='.$io_charset );
 				<div class="bPostSide" lang="<?php $Item->lang() ?>">
 					<?php $Item->anchor(); ?>
 					<h4 class="bTitle">
-						<?php $Item->permanent_link( get_icon('permalink') ); ?>
+						<?php
+							$Item->permanent_link( array(
+									'text' => '#icon#',
+								) );
+						?>
 						<?php $Item->title(); ?>
 					</h4>
 					<div class="bText">
@@ -342,8 +350,12 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			<div class="bPostSide" lang="<?php $Item->lang() ?>">
 				<?php $Item->anchor(); ?>
 				<h4 class="bTitle">
-					<?php $Item->permanent_link( get_icon('permalink') ); ?>
-					<?php $Item->title( '', '' ); ?>
+					<?php
+						$Item->permanent_link( array(
+								'text' => '#icon#',
+							) );
+					?>
+					<?php $Item->title(); ?>
 				</h4>
 				<div class="bText">
 					<?php

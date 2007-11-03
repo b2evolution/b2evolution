@@ -61,7 +61,10 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		<title type="text"><?php
 			echo format_to_output( T_('In response to:'), 'xml' ).' ';
 			$Comment->get_Item();
-			$Comment->Item->title( '', '', false, 'xml' ) ?></title>
+			$Comment->Item->title( array(
+				'format' => 'xml',
+				'link_type' => 'none',
+			) ); ?></title>
 		<link rel="alternate" type="text/html" href="<?php $Comment->permanent_url() ?>" />
 		<author>
 			<name><?php $Comment->author( '', '#', '', '#', 'xml' ) ?></name>

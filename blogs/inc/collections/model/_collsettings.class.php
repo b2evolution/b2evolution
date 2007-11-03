@@ -74,6 +74,7 @@ class CollectionSettings extends AbstractSettings
 			'feedback-popup_noindex' => '1',		// META NOINDEX on Feedback popups
 			'msgform_noindex' => '1',						// META NOINDEX on Message forms
 			'special_noindex' => '1',						// META NOINDEX on other special pages
+			'title_link_type' => 'permalink',
 		);
 
 
@@ -109,6 +110,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.4  2007/11/03 04:56:03  fplanque
+ * permalink / title links cleanup
+ *
  * Revision 1.3  2007/11/02 01:46:53  fplanque
  * comment ratings
  *

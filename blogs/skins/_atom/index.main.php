@@ -66,7 +66,10 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		?>
 
 	<entry>
-		<title type="text"><?php $Item->title( '', '', false, 'xml' ) ?></title>
+		<title type="text"><?php $Item->title( array(
+				'format' => 'xml',
+				'link_type' => 'none',
+			) ); ?></title>
 		<link rel="alternate" type="text/html" href="<?php $Item->permanent_url( 'single' ) ?>" />
 		<author>
 			<name><?php $Item->creator_User->preferred_name( 'xml' ) ?></name>

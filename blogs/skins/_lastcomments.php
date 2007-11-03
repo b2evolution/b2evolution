@@ -30,7 +30,9 @@ while( $Comment = & $CommentList->get_next() )
 	<div class="bComment">
 		<h3 class="bTitle">
 			<?php echo T_('In response to:') ?>
-			<?php $Comment->Item->permanent_link( '#title#' ) ?>
+			<?php $Comment->Item->title( array(
+					'link_type' => 'permalink',
+				) ); ?>
 		</h3>
 		<div class="bCommentTitle">
 			<?php $Comment->author() ?>
@@ -53,6 +55,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.34  2007/11/03 04:56:04  fplanque
+ * permalink / title links cleanup
+ *
  * Revision 1.33  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *

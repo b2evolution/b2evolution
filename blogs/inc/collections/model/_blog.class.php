@@ -296,10 +296,6 @@ class Blog extends DataObject
 			$this->set_setting( 'single_links', get_param( 'single_links' ) );
 		}
 
-		if( param( 'permalinks',   'string', NULL ) !== NULL )
-		{ // permalinks type:
-			$this->set_setting( 'permalinks', get_param( 'permalinks' ) );
-		}
 
 		if( param( 'blog_skin_ID', 'integer', NULL ) !== NULL )
 		{	// Default blog:
@@ -400,6 +396,8 @@ class Blog extends DataObject
 			$this->set_setting( 'feedback-popup_noindex',  param( 'feedback-popup_noindex', 'integer', 0 ) );
 			$this->set_setting( 'msgform_noindex',  param( 'msgform_noindex', 'integer', 0 ) );
 			$this->set_setting( 'special_noindex',  param( 'special_noindex', 'integer', 0 ) );
+			$this->set_setting( 'title_link_type',  param( 'title_link_type', 'string', '' ) );
+			$this->set_setting( 'permalinks',  param( 'permalinks', 'string', '' ) );
 		}
 
 
@@ -1439,6 +1437,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2007/11/03 04:56:03  fplanque
+ * permalink / title links cleanup
+ *
  * Revision 1.11  2007/11/02 01:44:29  fplanque
  * comment ratings
  *
