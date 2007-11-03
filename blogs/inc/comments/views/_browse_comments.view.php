@@ -44,7 +44,7 @@ $block_item_Widget->title = T_('Feedback (Comments, Trackbacks...)');
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 
-$CommentList->display_if_empty( '<div class="bComment"><p>'.T_('No feedback yet...').'</p></div>' );
+$CommentList->display_if_empty();
 
 // Display list of comments:
 require dirname(__FILE__).'/_comment_list.inc.php';
@@ -54,6 +54,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.3  2007/11/03 21:04:26  fplanque
+ * skin cleanup
+ *
  * Revision 1.2  2007/09/03 18:32:50  fplanque
  * enhanced dashboard / comment moderation
  *

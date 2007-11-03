@@ -1379,28 +1379,28 @@ class ItemListLight extends DataObjectList2
 
 
 	/**
-	 * Template function: Display the date if it has changed since last call
+	 * Template tag: Display the date if it has changed since last call
 	 *
 	 * Optionally also displays empty dates in between.
 	 *
-	 * @param string string to display before the date (if changed)
-	 * @param string string to display after the date (if changed)
-	 * @param string date/time format: leave empty to use locale default time format
-	 * @param string|NULL string to display before any empty dates. Set to NULL in order not to display empty dates.
-	 * @param string|NULL string to display after any empty dates.
+	 * @param array
 	 */
-	function date_if_changed( $before = '<h2>', $after = '</h2>', $format = '',
-														$before_empty_day = NULL, $after_empty_day = NULL )
+	function date_if_changed( $params = array() )
 	{
 		if( $this->current_Obj->ptyp_ID == 1000 )
 		{	// This is not applicable to pages
 			return;
 		}
 
-		if( empty($format) )
-		{	// No format specified, use default locale format:
-			$format =	locale_datefmt();
-		}
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => '<h2>',
+				'after'       => '</h2>',
+				'empty_day_display' => false,
+				'empty_day_before' => '<h2>',
+				'empty_day_after'  => '</h2>',
+				'date_format' => '#',
+			), $params );
 
 		// Get a timestamp for the date WITHOUT the time:
 		$current_item_date = mysql2datestamp( $this->current_Obj->issue_date );
@@ -1408,21 +1408,28 @@ class ItemListLight extends DataObjectList2
 		if( $current_item_date != $this->last_displayed_date )
 		{	// Date has changed...
 
-			if( !empty($before_empty_day) && !empty($this->last_displayed_date) )
+
+			if( $params['date_format'] == '#' )
+			{	// No format specified, use default locale format:
+				$params['date_format'] = locale_datefmt();
+			}
+
+			if( $params['empty_day_display'] && !empty($this->last_displayed_date) )
 			{	// We want to display ALL dates from the previous to the current:
 				while( $this->last_displayed_date < $current_item_date-86400 )
 				{
 					$this->last_displayed_date += 86400;	// Add one day's worth of seconds
-					echo date_sprintf( $before_empty_day, $this->last_displayed_date )
-							.date_i18n( $format, $this->last_displayed_date )
-							.date_sprintf( $after_empty_day, $this->last_displayed_date );
+					echo date_sprintf( $params['empty_day_before'], $this->last_displayed_date )
+							.date_i18n( $params['date_format'], $this->last_displayed_date )
+							.date_sprintf( $params['empty_day_after'], $this->last_displayed_date );
 				}
 			}
 
 			// Display the new current date:
-			echo date_sprintf( $before, $current_item_date )
-					.date_i18n( $format, $current_item_date )
-					.date_sprintf( $after, $current_item_date );
+			echo date_sprintf( $params['before'], $this->last_displayed_date )
+					.date_i18n( $params['date_format'], $current_item_date )
+					.date_sprintf( $params['after'], $this->last_displayed_date );
+
 			$this->last_displayed_date = $current_item_date;
 		}
 	}
@@ -1480,6 +1487,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.10  2007/11/03 21:04:27  fplanque
+ * skin cleanup
+ *
  * Revision 1.9  2007/11/01 03:19:34  blueyed
  * Fix for array_merge in PHP5, props yettyn
  *

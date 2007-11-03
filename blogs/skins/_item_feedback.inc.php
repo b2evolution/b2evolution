@@ -145,8 +145,6 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 
 	$CommentList = & new CommentList( NULL, implode(',', $type_list), array('published'), $Item->ID, '', 'ASC' );
 
-	// $CommentList->display_if_empty( '<div class="bComment"><p>'.T_('No feedback for this post yet...').'</p></div>' );
-
 	/**
 	 * @var Comment
 	 */
@@ -383,6 +381,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.10  2007/11/03 21:04:28  fplanque
+ * skin cleanup
+ *
  * Revision 1.9  2007/11/02 01:55:57  fplanque
  * comment ratings
  *

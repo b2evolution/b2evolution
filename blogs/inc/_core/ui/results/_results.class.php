@@ -1926,19 +1926,23 @@ class Results extends Table
 	/**
 	 * Template function: display message if list is empty
 	 *
-	 * @param string String to display if list is empty
 	 * @return boolean true if empty
 	 */
-	function display_if_empty( $message = '' )
+	function display_if_empty( $params = array() )
 	{
-		if( empty($message) )
-		{ // Default message:
-			$message = '<p>'.T_('Sorry, there is nothing to display...').'</p>';
-		}
-
 		if( $this->result_num_rows == 0 )
 		{
-			echo $message;
+			// Make sure we are not missing any param:
+			$params = array_merge( array(
+					'before'      => '<p class="msg_nothing">',
+					'after'       => '</p>',
+					'msg_empty'   => T_('Sorry, there is nothing to display...'),
+				), $params );
+
+			echo $params['before'];
+			echo $params['msg_empty'];
+			echo $params['after'];
+
 			return true;
 		}
 		return false;
@@ -1966,6 +1970,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.4  2007/11/03 21:04:26  fplanque
+ * skin cleanup
+ *
  * Revision 1.3  2007/09/22 22:11:18  fplanque
  * minor
  *

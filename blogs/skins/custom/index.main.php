@@ -139,41 +139,64 @@ skin_include( '_html_header.inc.php' );
 
 	<?php
 		// --------------------------------- START OF POSTS -------------------------------------
-		if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
+		// Display message if no post:
+		display_if_empty();
 
-		if( isset($MainList) ) while( $Item = & $MainList->get_item() )
-		{
+		while( $Item = & mainlist_get_item() )
+		{	// For each blog post, do everything below up to the closing curly brace "}"
 		?>
 
 		<?php
-			$MainList->date_if_changed( '<h2>', '</h2>', '' );
+			// ------------------------------ DATE SEPARATOR ------------------------------
+			$MainList->date_if_changed( array(
+					'before'      => '<h2>',
+					'after'       => '</h2>',
+					'date_format' => '#',
+				) );
 		?>
 
-		<div class="bPost bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
+		<div class="bPost bPost<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
+
 			<?php
-				locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
-				$Item->anchor(); // Anchor for permalinks to refer to
+				$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
+				$Item->anchor(); // Anchor for permalinks to refer to.
 			?>
+
 			<div class="bSmallHead">
 			<?php
 				// Permalink:
 				$Item->permanent_link( array(
 						'text' => '#icon#',
 					) );
-				echo ' ';
-				$Item->issue_time();
-				echo ', '.T_('by').' ';
-				$Item->author( '<strong>', '</strong>' );
-				$Item->msgform_link( $Blog->get('msgformurl') );
+				$Item->issue_time( array(
+						'before'    => ' ',
+						'after'     => '',
+					));
+				$Item->author( array(
+						'before'    => ', '.T_('by').' <strong>',
+						'after'     => '</strong>',
+					) );
+				$Item->msgform_link();
 				echo ', ';
 				$Item->wordcount();
 				echo ' '.T_('words');
-				echo ', ';
-				$Item->views();
-				echo ' &nbsp; ';
-				locale_flag( $Item->locale, 'h10px' );
-				echo '<br /> ', T_('Categories'), ': ';
-				$Item->categories();
+				// echo ', ';
+				// $Item->views();
+				$Item->locale_flag( array(
+						'before'    => ' &nbsp; ',
+						'after'     => '',
+					) );
+			?>
+			<br />
+			<?php
+				$Item->categories( array(
+					'before'          => T_('Categories').': ',
+					'after'           => ' ',
+					'include_main'    => true,
+					'include_other'   => true,
+					'include_external'=> true,
+					'link_categories' => true,
+				) );
 			?>
 			</div>
 

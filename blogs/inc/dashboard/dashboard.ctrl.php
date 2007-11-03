@@ -251,8 +251,10 @@ if( $blog )
 			echo '<h3 class="dashboard_post_title">';
 			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget( 'title' ).'</a>';
 			echo ' <span class="dashboard_post_details">';
-			$Item->status();
-			echo ' &bull; ';
+			$Item->status( array(
+					'before' => '',
+					'after'  => ' &bull; ',
+				) );
 			$Item->views();
 			echo '</span>';
 			echo '</h3>';
@@ -458,6 +460,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2007/11/03 21:04:26  fplanque
+ * skin cleanup
+ *
  * Revision 1.13  2007/11/02 02:47:06  fplanque
  * refactored blog settings / UI
  *

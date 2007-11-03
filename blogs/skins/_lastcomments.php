@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $CommentList = & new CommentList( $Blog, "'comment','trackback','pingback'", array('published'), '',	'',	'DESC',	'',	20 );
 
-$CommentList->display_if_empty( '<div class="bComment"><p>'.T_('No comment yet...').'</p></div>' );
+$CommentList->display_if_empty();
 
 while( $Comment = & $CommentList->get_next() )
 { // Loop through comments:
@@ -55,6 +55,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.35  2007/11/03 21:04:28  fplanque
+ * skin cleanup
+ *
  * Revision 1.34  2007/11/03 04:56:04  fplanque
  * permalink / title links cleanup
  *

@@ -55,7 +55,9 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		<docs>http://blogs.law.harvard.edu/tech/rss</docs>
 		<admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $app_version ?>"/>
 		<ttl>60</ttl>
-		<?php while( $Item = & $MainList->get_item() ) {	?>
+		<?php while( $Item = & mainlist_get_item() )
+		{	// For each blog post, do everything below up to the closing curly brace "}"
+			?>
 		<item>
 			<title><?php $Item->title( array(
 				'format' => 'xml',
@@ -64,7 +66,24 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			<link><?php $Item->permanent_url( 'single' ) ?></link>
 			<pubDate><?php $Item->issue_date( 'r', true ) ?></pubDate>
 			<dc:creator><?php $Item->get_creator_User(); $Item->creator_User->preferred_name('xml') ?></dc:creator>
-			<?php $Item->categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'htmlbody' ) // TODO: "xml" eats away the tags!! ?>
+			<?php
+				$Item->categories( array(
+					'before'          => '',
+					'after'           => '',
+					'include_main'    => true,
+					'include_other'   => true,
+					'include_external'=> true,
+					'before_main'     => '<category domain="main">',
+					'after_main'      => '</category>',
+					'before_other'    => '<category domain="alt">',
+					'after_other'     => '</category>',
+					'before_external' => '<category domain="external">',
+					'after_external'  => '</category>',
+					'link_categories' => false,
+					'separator'       => "\n",
+					'format'          => 'htmlbody', // TODO: "xml" eats away the tags!!
+				) );
+			?>
 			<guid isPermaLink="false"><?php $Item->ID() ?>@<?php echo $baseurl ?></guid>
 			<?php
 				if( $feed_content == 'excerpt' )

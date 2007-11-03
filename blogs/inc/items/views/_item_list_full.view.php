@@ -125,7 +125,7 @@ $ItemList->display_nav( 'header' );
 while( $Item = & $ItemList->get_item() )
 {
 	?>
-	<div class="bPost bPost<?php $Item->status( 'raw' ); ?>" lang="<?php $Item->lang() ?>">
+	<div class="bPost bPost<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
 		<?php
 		// We don't switch locales in the backoffice, since we use the user pref anyway
 		// Load item's creator user:
@@ -139,14 +139,16 @@ while( $Item = & $ItemList->get_item() )
 	 	?>">
 			<?php
 				echo '<div class="bSmallHeadRight">';
-				locale_flag( $Item->locale, 'h10px' );
+				$Item->locale_flag();
 				echo '</div>';
 
 				echo '<span class="bDate">';
 				$Item->issue_date();
-				echo '</span> @ <span class="bTime">';
-				$Item->issue_time( 'H:i' );
 				echo '</span>';
+				$Item->issue_time( array(
+						'before'      => ' @ <span class="bTime">',
+						'after'      => '</span>',
+					) );
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 				echo ' ', T_('by'), ' <acronym title="';
 				$Item->creator_User->login();
@@ -157,10 +159,10 @@ while( $Item = & $ItemList->get_item() )
 				echo '</span></acronym>';
 
 				echo '<div class="bSmallHeadRight">';
-				echo T_('Visibility').': ';
-				echo '<span class="bStatus">';
-				$Item->status();
-				echo '</span>';
+				$Item->status( array(
+						'before' => T_('Visibility').': <span class="bStatus">',
+						'after'  => '</span>',
+					) );
 				echo '</div>';
 
 				echo '<br />';
@@ -174,9 +176,16 @@ while( $Item = & $ItemList->get_item() )
 				$Item->views();
 				echo '</span></div>';
 
-				echo '<br />'.T_('Categories').': <span class="bCategories">';
-				$Item->categories( false );
-				echo '</span>';
+				echo '<br />';
+
+				$Item->categories( array(
+					'before'          => T_('Categories').': <span class="bCategories">',
+					'after'           => '</span>',
+					'include_main'    => true,
+					'include_other'   => true,
+					'include_external'=> true,
+					'link_categories' => false,
+				) );
 			?>
 		</div>
 
@@ -285,10 +294,11 @@ while( $Item = & $ItemList->get_item() )
 
 			$CommentList = new CommentList( NULL, "'comment','trackback','pingback'", array(), $Item->ID, '', 'ASC' );
 
-			$CommentList->display_if_empty(
-										'<div class="bComment"><p>' .
-										T_('No feedback for this post yet...') .
-										'</p></div>' );
+			$CommentList->display_if_empty( array(
+					'before'    => '<div class="bComment"><p>',
+					'after'     => '</p></div>',
+					'msg_empty' => T_('No feedback for this post yet...'),
+				) );
 
 			// Display list of comments:
 			require $inc_path.'comments/views/_comment_list.inc.php';
@@ -367,6 +377,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.7  2007/11/03 21:04:27  fplanque
+ * skin cleanup
+ *
  * Revision 1.6  2007/11/03 04:56:03  fplanque
  * permalink / title links cleanup
  *

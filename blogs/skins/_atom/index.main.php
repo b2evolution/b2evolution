@@ -59,8 +59,8 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 	<generator uri="http://b2evolution.net/" version="<?php echo $app_version ?>"><?php echo $app_name ?></generator>
 	<updated><?php echo gmdate('Y-m-d\TH:i:s\Z'); ?></updated>
 	<?php
-	while( $Item = & $MainList->get_item() )
-	{
+	while( $Item = & mainlist_get_item() )
+	{	// For each blog post, do everything below up to the closing curly brace "}"
 		// Load Item's creator User:
 		$Item->get_creator_User();
 		?>

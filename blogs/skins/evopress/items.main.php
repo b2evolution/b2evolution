@@ -62,19 +62,27 @@ skin_include( '_body_header.inc.php' );
 ?>
 
 <?php
-if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
+// Display message if no post:
+display_if_empty();
 
-if( isset($MainList) ) while( $Item = & $MainList->get_item() )
-{
+while( $Item = & mainlist_get_item() )
+{	// For each blog post, do everything below up to the closing curly brace "}"
 ?>
-	<div class="post post<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
+	<div class="post post<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
+
 		<?php
-			locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
-			$Item->anchor(); // Anchor for permalinks to refer to
+			$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
+			$Item->anchor(); // Anchor for permalinks to refer to.
 		?>
 
 		<h2><?php $Item->title(); ?></h2>
-		<small><?php $Item->issue_time( 'F jS, Y' ); ?> <!-- by <?php $Item->author( '<strong>', '</strong>' ); ?> --></small>
+		<small>
+			<?php
+				$Item->issue_time( array(
+						'time_format' => 'F jS, Y',
+					) );
+			?>
+		</small>
 
 		<?php
 			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
@@ -86,20 +94,30 @@ if( isset($MainList) ) while( $Item = & $MainList->get_item() )
 			// -------------------------- END OF POST CONTENT -------------------------
 		?>
 
-		<p class="postmetadata">Posted in <?php $Item->categories(); ?>
-		| <?php $Item->edit_link( '', ' | '); ?>
+		<p class="postmetadata">
+			<?php
+				$Item->categories( array(
+					'before'          => T_('Posted in').' ',
+					'after'           => ' ',
+					'include_main'    => true,
+					'include_other'   => true,
+					'include_external'=> true,
+					'link_categories' => true,
+				) );
+			?>
+			<?php $Item->edit_link( ' | ', ''); ?>
 			<?php
 				// Link to comments, trackbacks, etc.:
 				$Item->feedback_link( array(
-								'type' => 'feedbacks',
-								'link_before' => '',
-								'link_after' => '',
-								'link_text_zero' => '#',
-								'link_text_one' => '#',
-								'link_text_more' => '#',
-								'link_title' => '#',
-								'use_popup' => false,
-							) );
+						'type' => 'feedbacks',
+						'link_before' => ' | ',
+						'link_after' => '',
+						'link_text_zero' => '#',
+						'link_text_one' => '#',
+						'link_text_more' => '#',
+						'link_title' => '#',
+						'use_popup' => false,
+					) );
 			?>
 	</div>
 

@@ -50,8 +50,8 @@ request_title( array(
 
 
 // Normally, there should only be one item to display...
-while( $Item = & $MainList->get_item() )
-{
+while( $Item = & mainlist_get_item() )
+{	// For each blog post, do everything below up to the closing curly brace "}"
 	// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 	skin_include( '_item_feedback.inc.php', array(
 			'before_section_title' => '<h4>',

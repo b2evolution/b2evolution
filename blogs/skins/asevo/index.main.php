@@ -131,16 +131,17 @@ skin_include( '_html_header.inc.php' );
 	<!-- =================================== START OF MAIN AREA =================================== -->
 
 	<?php // ------------------------------------ START OF POSTS ----------------------------------------
-		if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
+		// Display message if no post:
+		display_if_empty();
 
-		if( isset($MainList) ) while( $Item = & $MainList->get_item() )
-		{
-		// $MainList->date_if_changed( '<h2>', '</h2>', '' );
+		while( $Item = & mainlist_get_item() )
+		{	// For each blog post, do everything below up to the closing curly brace "}"
 		?>
 		<div class="evo_post" lang="<?php $Item->lang() ?>">
+
 			<?php
-				locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
-				$Item->anchor(); // Anchor for permalinks to refer to
+				$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
+				$Item->anchor(); // Anchor for permalinks to refer to.
 			?>
 
 			<?php
@@ -155,10 +156,19 @@ skin_include( '_html_header.inc.php' );
 					) );
 				echo ' ';
 				$Item->issue_date();
-				echo ' ';
-				$Item->issue_time( 'H:i' );
-				echo ', ', T_('Categories'), ': ';
-				$Item->categories();
+				$Item->issue_time( array(
+						'time_format' => 'H:i',
+					) );
+			?>
+			<?php
+				$Item->categories( array(
+					'before'          => ', '.T_('Categories').': ',
+					'after'           => ' ',
+					'include_main'    => true,
+					'include_other'   => true,
+					'include_external'=> true,
+					'link_categories' => true,
+				) );
 			?>
 			</div>
 

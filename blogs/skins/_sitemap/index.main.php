@@ -52,14 +52,15 @@ echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <?php
-while( $Item = & $MainList->get_item() )
-{ ?>
+while( $Item = & mainlist_get_item() )
+{	// For each blog post, do everything below up to the closing curly brace "}"
+	?>
 	<url>
 		<loc><?php $Item->permanent_url( 'single' ) ?></loc>
 		<lastmod><?php $Item->mod_date( 'isoZ', true ) ?></lastmod>
 		<priority>0.9</priority>
 	</url>
-<?php
+	<?php
 } ?>
 </urlset>
 <?php

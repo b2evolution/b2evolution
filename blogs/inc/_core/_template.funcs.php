@@ -413,8 +413,48 @@ function mainlist_page_links( $params = array() )
 	}
 }
 
+
+/**
+ * Stub
+ *
+ * @return Item
+ */
+function & mainlist_get_item()
+{
+	global $MainList;
+
+	if( isset($MainList) )
+	{
+		return $MainList->get_item();
+	}
+
+	$r = NULL;
+	return $r;
+}
+
+
+/**
+ * Stub
+ *
+ * @return boolean true if empty MainList
+ */
+function display_if_empty( $params = array() )
+{
+	global $MainList;
+
+	if( isset($MainList) )
+	{
+		return $MainList->display_if_empty( $params );
+	}
+
+	return NULL;
+}
+
 /*
  * $Log$
+ * Revision 1.10  2007/11/03 21:04:25  fplanque
+ * skin cleanup
+ *
  * Revision 1.9  2007/10/01 01:06:31  fplanque
  * Skin/template functions cleanup.
  *

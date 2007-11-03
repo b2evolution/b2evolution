@@ -329,19 +329,32 @@ class ItemLight extends DataObject
 	 * @param string separator string
 	 * @param string Output format for each cat, see {@link format_to_output()}
 	 */
-	function categories(
-			$link_title = '#',
-			$before_main='', $after_main='',
-			$before_other='', $after_other='',
-			$before_external='<em>', $after_external='</em>',
-			$separator = ', ',
-			$format = 'htmlbody'
-		)
+	function categories( $params = array() )
 	{
-		if( $link_title == '#' )
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'          => ' ',
+				'after'           => ' ',
+				'include_main'    => true,
+				'include_other'   => true,
+				'include_external'=> true,
+				'before_main'     => '',
+				'after_main'      => '',
+				'before_other'    => '',
+				'after_other'     => '',
+				'before_external' => '<em>',
+				'after_external'  => '</em>',
+				'separator'       => ', ',
+				'link_categories' => true,
+				'link_title'      => '#',
+				'format'          => 'htmlbody',
+			), $params );
+
+
+		if( $params['link_title'] == '#' )
 		{ /* TRANS: When the categories for a specific post are displayed, the user can click
 					on these cats to browse them, this is the default href title displayed there */
-			$link_title = T_('Browse category');
+			$params['link_title'] = T_('Browse category');
 		}
 
 		$categoryNames = array();
@@ -349,41 +362,43 @@ class ItemLight extends DataObject
 		{
 			$cat_name = $Chapter->dget( 'name' );
 
-			if( !empty($link_title) )
+			if( $params['link_categories'] )
 			{ // we want to display links
 				$lBlog = & $Chapter->get_Blog();
-				$cat_name = '<a href="'.$Chapter->get_permanent_url().'" title="'.htmlspecialchars($link_title).'">'.$cat_name.'</a>';
+				$cat_name = '<a href="'.$Chapter->get_permanent_url().'" title="'.htmlspecialchars($params['link_title']).'">'.$cat_name.'</a>';
 			}
 
 			if( $Chapter->ID == $this->main_cat_ID )
 			{ // We are displaying the main cat!
-				if( $before_main == 'hide' )
+				if( !$params['include_main'] )
 				{ // ignore main cat !!!
 					continue;
 				}
-				$cat_name = $before_main.$cat_name.$after_main;
+				$cat_name = $params['before_main'].$cat_name.$params['after_main'];
 			}
 			elseif( $Chapter->blog_ID == $this->blog_ID )
 			{ // We are displaying another cat in the same blog
-				if( $before_other == 'hide' )
+				if( !$params['include_other'] )
 				{ // ignore main cat !!!
 					continue;
 				}
-				$cat_name = $before_other.$cat_name.$after_other;
+				$cat_name = $params['before_other'].$cat_name.$params['after_other'];
 			}
 			else
 			{ // We are displaying an external cat (in another blog)
-				if( $before_external == 'hide' )
+				if( !$params['include_external'] )
 				{ // ignore main cat !!!
 					continue;
 				}
-				$cat_name = $before_external.$cat_name.$after_external;
+				$cat_name = $params['before_external'].$cat_name.$params['after_external'];
 			}
 
 			$categoryNames[] = $cat_name;
 		}
 
-		echo format_to_output( implode( $separator, $categoryNames ), $format);
+		echo $params['before'];
+		echo format_to_output( implode( $params['separator'], $categoryNames ), $params['format'] );
+ 		echo $params['after'];
 	}
 
 
@@ -477,12 +492,26 @@ class ItemLight extends DataObject
 	 * @param string date/time format: leave empty to use locale default time format
 	 * @param boolean true if you want GMT
 	 */
-	function issue_time( $format = '', $useGM = false )
+	function issue_time( $params = array() )
 	{
-		if( empty($format) )
-			echo mysql2date( locale_timefmt(), $this->issue_date, $useGM );
-		else
-			echo mysql2date( $format, $this->issue_date, $useGM );
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => ' ',
+				'after'       => ' ',
+				'time_format' => '#',
+				'use_GMT'     => false,
+			), $params );
+
+		if( $params['time_format'] == '#' )
+		{
+			$params['time_format'] = locale_timefmt();
+		}
+
+		echo $params['before'];
+
+		echo mysql2date( $params['time_format'], $this->issue_date, $params['use_GMT'] );
+
+		echo $params['after'];
 	}
 
 
@@ -501,6 +530,36 @@ class ItemLight extends DataObject
 	function locale()
 	{
 		$this->disp( 'locale', 'raw' );
+	}
+
+
+	/**
+	 * Template tag
+	 */
+	function locale_flag( $params = array() )
+	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => ' ',
+				'after'       => ' ',
+				'collection'  => 'h10px',
+				'format'      => 'htmlbody',
+				'class'       => 'flag',
+				'align'       => '',
+			), $params );
+
+		echo $params['before'];
+		echo locale_flag( $this->locale, $params['collection'], $params['class'], $params['align'] );
+		echo $params['after'];
+	}
+
+
+	/**
+	 * Template function: Temporarily switch to this post's locale
+	 */
+	function locale_temp_switch()
+	{
+		locale_temp_switch( $this->locale );
 	}
 
 
@@ -821,6 +880,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2007/11/03 21:04:27  fplanque
+ * skin cleanup
+ *
  * Revision 1.4  2007/11/03 04:56:04  fplanque
  * permalink / title links cleanup
  *

@@ -57,14 +57,19 @@ skin_include( '_body_header.inc.php' );
 
 
 <?php
-if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
+// Display message if no post:
+display_if_empty();
 
-if( isset($MainList) ) while( $Item = & $MainList->get_item() )
-{
-	locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
-	$Item->anchor(); // Anchor for permalinks to refer to
+while( $Item = & mainlist_get_item() )
+{	// For each blog post, do everything below up to the closing curly brace "}"
 	?>
-	<div class="post post<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
+
+	<?php
+		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
+		$Item->anchor(); // Anchor for permalinks to refer to.
+	?>
+
+	<div class="post post<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
 
 		<h2><?php $Item->title(); ?></h2>
 

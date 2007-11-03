@@ -578,6 +578,7 @@ function date_sprintf( $string, $timestamp )
 
 	return preg_replace_callback( '/%\{(.*?)\}/', 'date_sprintf_callback', $string );
 }
+
 function date_sprintf_callback( $matches )
 {
 	global $date_sprintf_timestamp;
@@ -2973,6 +2974,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.7  2007/11/03 21:04:25  fplanque
+ * skin cleanup
+ *
  * Revision 1.6  2007/10/25 18:29:41  blueyed
  * PasteFromBranch: Fixed url_absolute for '//foo/bar'
  *

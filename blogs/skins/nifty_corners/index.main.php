@@ -152,21 +152,31 @@ skin_include( '_html_header.inc.php' );
 
 <?php
 	// ------------------------------------ START OF POSTS ----------------------------------------
-	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
+	// Display message if no post:
+	display_if_empty();
 
-	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
-	{
-		$MainList->date_if_changed( '<h2>', '</h2>', '' );
-		locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
+	while( $Item = & mainlist_get_item() )
+	{	// For each blog post, do everything below up to the closing curly brace "}"
 	?>
 
-	<div class="bTitle"><h3 class="bTitle"><?php $Item->title(); ?></h3></div>
+	<?php
+	// ------------------------------ DATE SEPARATOR ------------------------------
+	$MainList->date_if_changed( array(
+			'before'      => '<h2>',
+			'after'       => '</h2>',
+			'date_format' => '#',
+		) );
+	?>
+
+	<?php
+		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
+		$Item->anchor(); // Anchor for permalinks to refer to.
+	?>
+
+	<div class="bTitle" lang="<?php $Item->lang() ?>"><h3 class="bTitle"><?php $Item->title(); ?></h3></div>
 
 		<div class="bPost" lang="<?php $Item->lang() ?>">
-			<?php
-				$Item->anchor(); // Anchor for permalinks to refer to
-			?>
-	
+
 			<div class="bSmallHead">
 			<?php
    			$Item->permanent_link( array(
@@ -174,9 +184,16 @@ skin_include( '_html_header.inc.php' );
 				) );
 				echo ' ';
 				$Item->issue_time();
-				echo ', ', T_('Categories'), ': ';
-				$Item->categories();
-				echo ' &nbsp; ';
+			?>
+			<?php
+				$Item->categories( array(
+					'before'          => ', '.T_('Categories').': ',
+					'after'           => ' ',
+					'include_main'    => true,
+					'include_other'   => true,
+					'include_external'=> true,
+					'link_categories' => true,
+				) );
 			?>
 			</div>
 
@@ -235,7 +252,7 @@ skin_include( '_html_header.inc.php' );
 				// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
 			?>
 		</div>
-	<?php
+		<?php
 		locale_restore_previous();	// Restore previous locale (Blog locale)
 	} // ---------------------------------- END OF POSTS ------------------------------------ ?>
 

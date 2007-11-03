@@ -54,8 +54,8 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		<language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
 		<docs>http://blogs.law.harvard.edu/tech/rss</docs>
 		<?php
-		while( $Item = & $MainList->get_item() )
-		{
+		while( $Item = & mainlist_get_item() )
+		{	// For each blog post, do everything below up to the closing curly brace "}"
 		?>
 		<item>
 			<title><?php $Item->title( array(

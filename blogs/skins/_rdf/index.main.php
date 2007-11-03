@@ -58,7 +58,10 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 	<sy:updateBase>2000-01-01T12:00+00:00</sy:updateBase>
 	<items>
 		<rdf:Seq>
-		<?php while( $Item = & $MainList->get_item() ) { ?>
+		<?php
+		while( $Item = & mainlist_get_item() )
+		{	// For each blog post, do everything below up to the closing curly brace "}"
+			?>
 			<rdf:li rdf:resource="<?php $Item->permanent_url( 'single' ) ?>"/>
 		<?php } ?>
 		</rdf:Seq>
@@ -66,8 +69,8 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 </channel>
 <?php
 $MainList->restart();
-while( $Item = & $MainList->get_item() )
-{
+while( $Item = & mainlist_get_item() )
+{	// For each blog post, do everything below up to the closing curly brace "}"
 	// Load Item's creator User:
 	$Item->get_creator_User();
 	?>

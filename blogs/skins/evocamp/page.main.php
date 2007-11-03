@@ -61,21 +61,21 @@ skin_include( '_body_header.inc.php' );
 
 
 	<?php
-	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
+		// Display message if no post:
+		display_if_empty();
 
-	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
-	{
-	?>
-		<?php
-			locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
-			$Item->anchor(); // Anchor for permalinks to refer to
+		while( $Item = & mainlist_get_item() )
+		{	// For each blog post, do everything below up to the closing curly brace "}"
 		?>
 
-		<h2 class="sectionhead" lang="<?php $Item->lang() ?>"><?php $Item->edit_link( '', '', '#', '#', 'floatright' ); ?><?php $Item->title(); ?></h2>
+			<?php
+				$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
+				$Item->anchor(); // Anchor for permalinks to refer to.
+			?>
 
-		<div class="post post<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
+			<h2 class="sectionhead" lang="<?php $Item->lang() ?>"><?php $Item->edit_link( '', '', '#', '#', 'floatright' ); ?><?php $Item->title(); ?></h2>
 
-
+			<div class="post post<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
 
 			<?php
 				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
@@ -87,24 +87,24 @@ skin_include( '_body_header.inc.php' );
 				// -------------------------- END OF POST CONTENT -------------------------
 			?>
 
-		</div>
+			</div>
 
-		<?php
-			// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-			skin_include( '_item_feedback.inc.php', array(
-					'before_section_title' => '<h3 class="feedback_section">',
-					'after_section_title'  => '</h3>',
-					'form_title_start' => '<h3 class="comment_form_title">',
-					'form_title_end'  => '</h3>',
-				) );
-			// Note: You can customize the default item feedback by copying the generic
-			// /skins/_item_feedback.inc.php file into the current skin folder.
-			// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
-		?>
+			<?php
+				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
+				skin_include( '_item_feedback.inc.php', array(
+						'before_section_title' => '<h3 class="feedback_section">',
+						'after_section_title'  => '</h3>',
+						'form_title_start' => '<h3 class="comment_form_title">',
+						'form_title_end'  => '</h3>',
+					) );
+				// Note: You can customize the default item feedback by copying the generic
+				// /skins/_item_feedback.inc.php file into the current skin folder.
+				// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+			?>
 
-		<?php
-		locale_restore_previous();	// Restore previous locale (Blog locale)
-	}
+			<?php
+			locale_restore_previous();	// Restore previous locale (Blog locale)
+		}
 	?>
 
 	</div>

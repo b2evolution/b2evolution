@@ -236,7 +236,6 @@ function locale_temp_switch( $locale )
 	}
 
 	// $Timer->stop( 'locale_temp_switch' );
-
 	return false;
 }
 
@@ -966,6 +965,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.4  2007/11/03 21:04:27  fplanque
+ * skin cleanup
+ *
  * Revision 1.3  2007/07/09 21:24:12  fplanque
  * cleanup of admin page top
  *

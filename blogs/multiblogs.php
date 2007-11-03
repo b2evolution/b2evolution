@@ -148,11 +148,20 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	?>
 
 	<?php // ------------------------------------ START OF POSTS ----------------------------------------
-		if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
+		// Display message if no post:
+		display_if_empty();
 
-		if( isset($MainList) ) while( $Item = & $MainList->get_item() )
-		{
-			$MainList->date_if_changed( '<h2>', '</h2>', '' );
+		while( $Item = & mainlist_get_item() )
+		{	// For each blog post, do everything below up to the closing curly brace "}"
+			?>
+
+			<?php
+			// ------------------------------ DATE SEPARATOR ------------------------------
+			$MainList->date_if_changed( array(
+					'before'      => '<h2>',
+					'after'       => '</h2>',
+					'date_format' => '#',
+				) );
 			?>
 
 		<div class="bPost" lang="<?php $Item->lang() ?>">
@@ -163,7 +172,19 @@ header( 'Content-type: text/html; charset='.$io_charset );
 						'text' => '#icon#',
 					) );
 			?>
-			<?php $Item->issue_time();	echo ', ', T_('Categories'), ': ';	$Item->categories() ?>
+			<?php
+				$Item->issue_time(); // Post issue time
+			?>
+			<?php
+				$Item->categories( array(
+					'before'          => ', '.T_('Categories').': ',
+					'after'           => ' ',
+					'include_main'    => true,
+					'include_other'   => true,
+					'include_external'=> true,
+					'link_categories' => true,
+				) );
+			?>
 			</div>
 			<h3 class="bTitle"><?php $Item->title(); ?></h3>
 

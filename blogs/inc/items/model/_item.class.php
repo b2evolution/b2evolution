@@ -304,14 +304,21 @@ class Item extends ItemLight
 	 * @param string String to display after author name
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function author( $before = '', $after = '', $format = 'htmlbody' )
+	function author( $params = array() )
 	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => ' ',
+				'after'       => ' ',
+				'format'      => 'htmlbody',
+			), $params );
+
 		// Load User
 		$this->get_creator_User();
 
-		echo $before;
-		echo $this->creator_User->preferred_name( $format, false );
-		echo $after;
+		echo $params['before'];
+		echo $this->creator_User->preferred_name( $params['format'], false );
+		echo $params['after'];
 	}
 
 
@@ -1186,8 +1193,19 @@ class Item extends ItemLight
 	 * @param string class name
 	 * @return boolean true, if a link was displayed; false if there's no email address for the Item's author.
 	 */
-	function msgform_link( $form_url, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
+	function msgform_link( $params = array() )
 	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => ' ',
+				'after'       => ' ',
+				'text'        => '#',
+				'title'       => '#',
+				'class'       => '',
+				'format'      => 'htmlbody',
+				'form_url'    => '#current_blog#',
+			), $params );
+
 		$this->get_creator_User();
 
 		if( empty($this->creator_User->email) )
@@ -1199,17 +1217,23 @@ class Item extends ItemLight
 			return false;
 		}
 
-		$form_url = url_add_param( $form_url, 'recipient_id='.$this->creator_User->ID.'&amp;post_id='.$this->ID
-			.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $form_url)) );
+		if( $params['form_url'] == '#current_blog#' )
+		{	// Get
+			global $Blog;
+			$params['form_url'] = $Blog->get('msgformurl');
+		}
 
-		if( $title == '#' ) $title = T_('Send email to post author');
-		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
+		$params['form_url'] = url_add_param( $params['form_url'], 'recipient_id='.$this->creator_User->ID.'&amp;post_id='.$this->ID
+			.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $params['form_url'])) );
 
-		echo $before;
-		echo '<a href="'.$form_url.'" title="'.$title.'"';
-		if( !empty( $class ) ) echo ' class="'.$class.'"';
-		echo '>'.$text.'</a>';
-		echo $after;
+		if( $params['title'] == '#' ) $params['title'] = T_('Send email to post author');
+		if( $params['text'] == '#' ) $params['text'] = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $params['title'] ) );
+
+		echo $params['before'];
+		echo '<a href="'.$params['form_url'].'" title="'.$params['title'].'"';
+		if( !empty( $params['class'] ) ) echo ' class="'.$params['class'].'"';
+		echo '>'.$params['text'].'</a>';
+		echo $params['after'];
 
 		return true;
 	}
@@ -2068,18 +2092,35 @@ class Item extends ItemLight
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function status( $format = 'htmlbody' )
+	function status( $params = array() )
 	{
 		global $post_statuses;
 
-		if( $format == 'raw' )
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => '',
+				'after'       => '',
+				'format'      => 'htmlbody',
+			), $params );
+
+		echo $params['before'];
+
+		if( $params['format'] == 'raw' )
 		{
-			$this->disp( 'status', 'raw' );
+			status_raw();
 		}
 		else
 		{
-			echo format_to_output( $this->get('t_status'), $format );
+			echo format_to_output( $this->get('t_status'), $params['format'] );
 		}
+
+		echo $params['after'];
+	}
+
+
+	function status_raw()
+	{
+		echo $this->status;
 	}
 
 
@@ -3150,6 +3191,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.13  2007/11/03 21:04:26  fplanque
+ * skin cleanup
+ *
  * Revision 1.12  2007/11/02 01:54:46  fplanque
  * comment ratings
  *

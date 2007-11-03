@@ -154,23 +154,25 @@ class CommentList extends DataObjectList
 	/**
 	 * Template function: display message if list is empty
 	 *
-	 * @param string String to display if list is empty
 	 * @return boolean true if empty
 	 */
-	function display_if_empty( $message = '' )
+	function display_if_empty( $params = array() )
 	{
-		if( empty($message) )
-		{	// Default message:
-			$message = T_('No comment yet...');
-		}
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'msg_empty'   => T_('No comment yet...'),
+			), $params );
 
-		return parent::display_if_empty( $message );
+		return parent::display_if_empty( $params );
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.2  2007/11/03 21:04:26  fplanque
+ * skin cleanup
+ *
  * Revision 1.1  2007/06/25 10:59:42  fplanque
  * MODULES (refactored MVC)
  *

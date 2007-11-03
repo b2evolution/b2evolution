@@ -122,18 +122,19 @@ skin_include( '_html_header.inc.php' );
 
 	<?php
 	// ------------------------------------ START OF POSTS ----------------------------------------
-	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
+	// Display message if no post:
+	display_if_empty();
 
-	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
-	{
+	while( $Item = & mainlist_get_item() )
+	{	// For each blog post, do everything below up to the closing curly brace "}"
 	?>
 	
-	<div class="bPost bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
-		<?php
-			locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
-			$Item->anchor(); // Anchor for permalinks to refer to
-		?>
+	<div class="bPost bPost<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
 
+		<?php
+			$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
+			$Item->anchor(); // Anchor for permalinks to refer to.
+		?>
 
 		<?php
 			// Display images that are linked to this post:
@@ -194,9 +195,15 @@ skin_include( '_html_header.inc.php' );
 
 			<div class="bSmallPrint">
 			<?php
-					echo T_('Albums'), ': ';
-					$Item->categories();
-				?>
+				$Item->categories( array(
+					'before'          => T_('Albums').': ',
+					'after'           => ' ',
+					'include_main'    => true,
+					'include_other'   => true,
+					'include_external'=> true,
+					'link_categories' => true,
+				) );
+			?>
 			</div>
 		</div>
 

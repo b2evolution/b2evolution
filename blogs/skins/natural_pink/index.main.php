@@ -118,18 +118,28 @@ skin_include( '_html_header.inc.php' );
 <!-- =================================== START OF MAIN AREA =================================== -->
 
 <?php // ------------------------------------ START OF POSTS ----------------------------------------
-	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
+	// Display message if no post:
+	display_if_empty();
 
-	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
-	{
-		$MainList->date_if_changed( '<h2>', '</h2>', '' );
-	?>
+	while( $Item = & mainlist_get_item() )
+	{	// For each blog post, do everything below up to the closing curly brace "}"
+		?>
+
+		<?php
+		// ------------------------------ DATE SEPARATOR ------------------------------
+		$MainList->date_if_changed( array(
+				'before'      => '<h2>',
+				'after'       => '</h2>',
+				'date_format' => '#',
+			) );
+		?>
 		<div class="bPost" lang="<?php $Item->lang() ?>">
+
 			<?php
-				locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
-				$Item->anchor(); // Anchor for permalinks to refer to
+				$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
+				$Item->anchor(); // Anchor for permalinks to refer to.
 			?>
-	
+
 			<div class="bSmallHead">
 			<?php
    			$Item->permanent_link( array(
@@ -137,9 +147,16 @@ skin_include( '_html_header.inc.php' );
 				) );
 				echo ' ';
 				$Item->issue_time();
-				echo ', ', T_('Categories'), ': ';
-				$Item->categories();
-				echo ' &nbsp; ';
+			?>
+			<?php
+				$Item->categories( array(
+					'before'          => ', '.T_('Categories').': ',
+					'after'           => ' ',
+					'include_main'    => true,
+					'include_other'   => true,
+					'include_external'=> true,
+					'link_categories' => true,
+				) );
 			?>
 			</div>
 	

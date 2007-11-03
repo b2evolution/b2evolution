@@ -61,35 +61,59 @@ skin_include( '_body_header.inc.php' );
 
 
 	<?php
-	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
+		// Display message if no post:
+		display_if_empty();
 
-	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
-	{
-	?>
-		<div class="post post<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
+		while( $Item = & mainlist_get_item() )
+		{	// For each blog post, do everything below up to the closing curly brace "}"
+		?>
+		<div class="post post<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
+
 			<?php
-				locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
-				$Item->anchor(); // Anchor for permalinks to refer to
+				$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
+				$Item->anchor(); // Anchor for permalinks to refer to.
 			?>
 
 			<h2><?php $Item->title(); ?></h2>
 
-			<p class="postinfo">By <?php $Item->author(); ?> on <?php $Item->issue_time('M j, Y') ?>
-			| In <?php $Item->categories(', ') ?>	|
-				<?php
-					// Link to comments, trackbacks, etc.:
-					$Item->feedback_link( array(
-									'type' => 'feedbacks',
-									'link_before' => '',
-									'link_after' => '',
-									'link_text_zero' => '#',
-									'link_text_one' => '#',
-									'link_text_more' => '#',
-									'link_title' => '#',
-									'use_popup' => false,
-								) );
-				?>
-				<?php $Item->edit_link( ' | ', ''); ?>
+			<p class="postinfo">
+			<?php
+      	$Item->author( array(
+					'before'       => T_('By'),
+					'after'        => ' ',
+				) );
+			?>
+			<?php
+				$Item->issue_time( array(
+						'before'      => /* TRANS: date */ T_('on '),
+						'after'       => '',
+						'time_format' => 'M j, Y',
+					) );
+			?>
+			<?php
+				$Item->categories( array(
+						'before'          => ' | '.T_('In '),
+						'after'           => ' ',
+						'include_main'    => true,
+						'include_other'   => true,
+						'include_external'=> true,
+						'link_categories' => true,
+					) );
+			?>
+			<?php
+				// Link to comments, trackbacks, etc.:
+				$Item->feedback_link( array(
+						'type' => 'feedbacks',
+						'link_before' => ' | ',
+						'link_after' => '',
+						'link_text_zero' => '#',
+						'link_text_one' => '#',
+						'link_text_more' => '#',
+						'link_title' => '#',
+						'use_popup' => false,
+					) );
+			?>
+			<?php $Item->edit_link( ' | ', ''); ?>
 
 			<?php
 				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
@@ -117,8 +141,8 @@ skin_include( '_body_header.inc.php' );
 		?>
 
 		<?php
-		locale_restore_previous();	// Restore previous locale (Blog locale)
-	}
+			locale_restore_previous();	// Restore previous locale (Blog locale)
+		}
 	?>
 
 	<?php

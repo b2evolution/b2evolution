@@ -104,75 +104,91 @@ skin_content_header();	// Sets charset!
 	?>
 
 	<?php	// ---------------------------------- START OF POSTS --------------------------------------
-	if( isset($MainList) ) $MainList->display_if_empty();	// Display message if no post
+		// Display message if no post:
+		display_if_empty();
 
-	if( isset($MainList) ) while( $Item = & $MainList->get_item() )
-	{
-		$MainList->date_if_changed( '<h2>', '</h2>', '' );
-		$Item->anchor();
-		locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
+		while( $Item = & mainlist_get_item() )
+		{	// For each blog post, do everything below up to the closing curly brace "}"
 		?>
 
-		<h3>
-			<?php $Item->issue_time(); ?>
-			<a href="<?php $Item->permanent_url() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" border="0" align="absmiddle" /></a>
-			<?php $Item->title(); ?>
-		</h3>
-
-		<blockquote>
-
-			<small>
 			<?php
-				echo T_('Categories'), ': ';
-				$Item->categories();
+			// ------------------------------ DATE SEPARATOR ------------------------------
+			$MainList->date_if_changed( array(
+					'before'      => '<h2>',
+					'after'       => '</h2>',
+					'date_format' => '#',
+				) );
 			?>
-			</small>
 
 			<?php
-				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-				skin_include( '_item_content.inc.php', array(
-						'image_size'	=>	'fit-400x320',
+				$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
+				$Item->anchor(); // Anchor for permalinks to refer to.
+			?>
+
+			<h3>
+				<?php $Item->issue_time(); ?>
+				<a href="<?php $Item->permanent_url() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" border="0" align="absmiddle" /></a>
+				<?php $Item->title(); ?>
+			</h3>
+
+			<blockquote>
+
+				<?php
+					$Item->categories( array(
+						'before'          => '<small>'.T_('Categories').': ',
+						'after'           => '</small>',
+						'include_main'    => true,
+						'include_other'   => true,
+						'include_external'=> true,
+						'link_categories' => true,
+					) );
+				?>
+
+				<?php
+					// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+					skin_include( '_item_content.inc.php', array(
+							'image_size'	=>	'fit-400x320',
+						) );
+					// Note: You can customize the default item feedback by copying the generic
+					// /skins/_item_feedback.inc.php file into the current skin folder.
+					// -------------------------- END OF POST CONTENT -------------------------
+				?>
+
+				<small>
+					<?php
+						// Link to comments, trackbacks, etc.:
+						$Item->feedback_link( array(
+										'type' => 'feedbacks',
+										'link_before' => '',
+										'link_after' => ' &bull; ',
+										'link_text_zero' => '#',
+										'link_text_one' => '#',
+										'link_text_more' => '#',
+										'link_title' => '#',
+										'use_popup' => false,
+									) );
+					?>
+					<?php $Item->edit_link( '', ' &bull; ' ) // Link to backoffice for editing ?>
+					<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
+					<?php $Item->permanent_link(); ?>
+				</small>
+
+			</blockquote>
+
+			<?php
+				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
+				skin_include( '_item_feedback.inc.php', array(
+						'before_section_title' => '<h4>',
+						'after_section_title'  => '</h4>',
 					) );
 				// Note: You can customize the default item feedback by copying the generic
 				// /skins/_item_feedback.inc.php file into the current skin folder.
-				// -------------------------- END OF POST CONTENT -------------------------
+				// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
 			?>
 
-			<small>
-				<?php
-					// Link to comments, trackbacks, etc.:
-					$Item->feedback_link( array(
-									'type' => 'feedbacks',
-									'link_before' => '',
-									'link_after' => ' &bull; ',
-									'link_text_zero' => '#',
-									'link_text_one' => '#',
-									'link_text_more' => '#',
-									'link_title' => '#',
-									'use_popup' => false,
-								) );
-				?>
-				<?php $Item->edit_link( '', ' &bull; ' ) // Link to backoffice for editing ?>
-				<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
-				<?php $Item->permanent_link(); ?>
-			</small>
-
-		</blockquote>
-
-		<?php
-			// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-			skin_include( '_item_feedback.inc.php', array(
-					'before_section_title' => '<h4>',
-					'after_section_title'  => '</h4>',
-				) );
-			// Note: You can customize the default item feedback by copying the generic
-			// /skins/_item_feedback.inc.php file into the current skin folder.
-			// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
-		?>
-
-		<?php
-			locale_restore_previous();	// Restore previous locale (Blog locale)
-		?>
+			<?php
+				locale_restore_previous();	// Restore previous locale (Blog locale)
+			?>
 	<?php } // --------------------------------- END OF POSTS ----------------------------------- ?>
 
 
