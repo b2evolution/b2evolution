@@ -113,7 +113,12 @@ skin_include( '_body_header.inc.php' );
 						'use_popup' => false,
 					) );
 			?>
-			<?php $Item->edit_link( ' | ', ''); ?>
+			<?php
+				$Item->edit_link( array( // Link to backoffice for editing
+						'before'    => ' | ',
+						'after'     => '',
+					) );
+			?>
 
 			<?php
 				// ---------------------- POST CONTENT INCLUDED HERE ----------------------

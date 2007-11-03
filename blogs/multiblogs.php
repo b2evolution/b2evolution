@@ -226,8 +226,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 								) );
 				 ?>
 
-				<?php $Item->trackback_rdf() /* trackback autodiscovery information */ ?>
-
 				<?php	$Item->permanent_link(); ?>
 			</div>
 

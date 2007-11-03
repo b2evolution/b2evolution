@@ -189,8 +189,11 @@ if( $blog )
 			$Item->get_creator_User();
 
 			echo '<div class="dashboard_float_actions">';
-			$Item->edit_link( '', '', '#', '#', 'ActionButton' );
-			echo ' ';
+			$Item->edit_link( array( // Link to backoffice for editing
+					'before'    => ' ',
+					'after'     => ' ',
+					'class'     => 'ActionButton'
+				) );
 			$Item->publish_link( '', '', '#', '#', 'PublishButton' );
 			echo '<img src="'.$rsc_url.'/img/blank.gif">';
 			echo '</div>';
@@ -245,7 +248,11 @@ if( $blog )
 			$Item->get_creator_User();
 
 			echo '<div class="dashboard_float_actions">';
-			$Item->edit_link( '', '', '#', '#', 'ActionButton' );
+			$Item->edit_link( array( // Link to backoffice for editing
+					'before'    => ' ',
+					'after'     => ' ',
+					'class'     => 'ActionButton'
+				) );
 			echo '</div>';
 
 			echo '<h3 class="dashboard_post_title">';
@@ -460,6 +467,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2007/11/03 23:54:39  fplanque
+ * skin cleanup continued
+ *
  * Revision 1.14  2007/11/03 21:04:26  fplanque
  * skin cleanup
  *

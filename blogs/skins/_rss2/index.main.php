@@ -64,7 +64,14 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				'link_type' => 'none',
 			) ); ?></title>
 			<link><?php $Item->permanent_url( 'single' ) ?></link>
-			<pubDate><?php $Item->issue_date( 'r', true ) ?></pubDate>
+			<?php
+				$Item->issue_date( array(
+						'before'      => '<pubDate>',
+						'after'       => '</pubDate>',
+						'date_format' => 'r',
+   					'use_GMT'     => true,
+					) );
+			?>
 			<dc:creator><?php $Item->get_creator_User(); $Item->creator_User->preferred_name('xml') ?></dc:creator>
 			<?php
 				$Item->categories( array(

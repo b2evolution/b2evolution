@@ -76,7 +76,14 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			<?php $Item->creator_User->url( '<uri>', "</uri>\n", 'xml' ) ?>
 		</author>
 		<id><?php $Item->permanent_url( 'single' ) ?></id>
-		<published><?php $Item->issue_date( 'isoZ', true ) ?></published>
+		<?php
+			$Item->issue_date( array(
+					'before'      => '<published>',
+					'after'       => '</published>',
+					'date_format' => 'isoZ',
+   				'use_GMT'     => true,
+				) );
+		?>
 		<updated><?php $Item->mod_date( 'isoZ', true ) ?></updated>
 		<?php
 			if( $feed_content == 'excerpt' )

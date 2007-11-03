@@ -81,7 +81,14 @@ while( $Item = & mainlist_get_item() )
 				'link_type' => 'none',
 			) ); ?></title>
 	<link><?php $Item->permanent_url( 'single' ) ?></link>
-	<dc:date><?php $Item->issue_date( 'isoZ', true ) ?></dc:date>
+	<?php
+		$Item->issue_date( array(
+				'before'      => '<dc:date>',
+				'after'       => '</dc:date>',
+				'date_format' => 'isoZ',
+   			'use_GMT'     => true,
+			) );
+	?>
 	<dc:creator><?php $Item->creator_User->preferred_name( 'xml' ) ?></dc:creator>
 	<dc:subject><?php $Item->main_category( 'xml' ) ?></dc:subject>
 	<?php

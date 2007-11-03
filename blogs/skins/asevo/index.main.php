@@ -145,8 +145,13 @@ skin_include( '_html_header.inc.php' );
 			?>
 
 			<?php
-    		$Item->edit_link( '', '', '#', '#', 'floatright small' ); // Link to backoffice for editing
+				$Item->edit_link( array( // Link to backoffice for editing
+						'before'    => ' ',
+						'after'     => ' ',
+						'class'     => 'floatright small'
+					) );
 			?>
+
 			<h1 class="evo_post_title"><?php $Item->title(); ?></h1>
 
 			<div class="evo_post_head">
@@ -154,13 +159,17 @@ skin_include( '_html_header.inc.php' );
 				$Item->permanent_link( array(
 						'text' => '#icon#',
 					) );
-				echo ' ';
-				$Item->issue_date();
+
+				$Item->issue_date( array(
+						'before'      => ' ',
+						'after'       => ' ',
+						'date_format' => '#',
+					) );
+
 				$Item->issue_time( array(
 						'time_format' => 'H:i',
 					) );
-			?>
-			<?php
+
 				$Item->categories( array(
 					'before'          => ', '.T_('Categories').': ',
 					'after'           => ' ',
@@ -209,8 +218,6 @@ skin_include( '_html_header.inc.php' );
 									'use_popup' => false,
 								) );
 				 ?>
-
-				<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 			</div>
 
 			<?php

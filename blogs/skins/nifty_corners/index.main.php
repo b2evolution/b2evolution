@@ -208,8 +208,9 @@ skin_include( '_html_header.inc.php' );
 			?>
 
 			<div class="bSmallPrint">
-				<?php $Item->permanent_link(); ?>
 				<?php
+					$Item->permanent_link();
+
 					// Link to comments, trackbacks, etc.:
 					$Item->feedback_link( array(
 									'type' => 'comments',
@@ -221,8 +222,7 @@ skin_include( '_html_header.inc.php' );
 									'link_title' => '#',
 									'use_popup' => false,
 								) );
-				?>
-				<?php
+
 					// Link to comments, trackbacks, etc.:
 					$Item->feedback_link( array(
 									'type' => 'trackbacks',
@@ -234,11 +234,12 @@ skin_include( '_html_header.inc.php' );
 									'link_title' => '#',
 									'use_popup' => false,
 								) );
-				?>
 
-				<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
-	
-				<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
+					$Item->edit_link( array( // Link to backoffice for editing
+							'before'    => ' &bull; ',
+							'after'     => '',
+						) );
+				?>
 			</div>
 	
 			<?php

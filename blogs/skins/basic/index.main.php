@@ -168,8 +168,14 @@ skin_content_header();	// Sets charset!
 										'use_popup' => false,
 									) );
 					?>
-					<?php $Item->edit_link( '', ' &bull; ' ) // Link to backoffice for editing ?>
-					<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
+
+					<?php
+						$Item->edit_link( array( // Link to backoffice for editing
+								'before'    => '',
+								'after'     => ' &bull; ',
+							) );
+					?>
+
 					<?php $Item->permanent_link(); ?>
 				</small>
 

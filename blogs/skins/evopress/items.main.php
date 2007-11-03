@@ -105,7 +105,14 @@ while( $Item = & mainlist_get_item() )
 					'link_categories' => true,
 				) );
 			?>
-			<?php $Item->edit_link( ' | ', ''); ?>
+
+			<?php
+				$Item->edit_link( array( // Link to backoffice for editing
+						'before'    => ' | ',
+						'after'     => '',
+					) );
+			?>
+
 			<?php
 				// Link to comments, trackbacks, etc.:
 				$Item->feedback_link( array(

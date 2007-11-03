@@ -1773,14 +1773,8 @@ class Item extends ItemLight
 
 	/**
 	 * Provide link to edit a post if user has edit rights
-	 *
-	 * @param string to display before link
-	 * @param string to display after link
-	 * @param string link text
-	 * @param string link title
-	 * @param string class name
 	 */
-	function get_edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $save_context = true )
+	function get_edit_link( $params = array() )
 	{
 		global $current_User, $admin_url;
 
@@ -1796,34 +1790,46 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( $text == '#' ) $text = get_icon( 'edit' ).' '.T_('Edit...');
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'       => ' ',
+				'after'        => ' ',
+				'text'         => '#',
+				'title'        => '#',
+				'class'        => '',
+				'save_context' => true,
+			), $params );
 
-		if( $title == '#' ) $title = T_('Edit this post...');
+
+		if( $params['text'] == '#' ) $params['text'] = get_icon( 'edit' ).' '.T_('Edit...');
+
+		if( $params['title'] == '#' ) $params['title'] = T_('Edit this post...');
 
 		$actionurl = $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$this->ID;
-   	if( $save_context )
+   	if( $params['save_context'] )
 		{
 			$actionurl .= '&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
 		}
 
 
-		$r = $before;
+		$r = $params['before'];
 		$r .= '<a href="'.$actionurl;
-		$r .= '" title="'.$title.'"';
-		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
-		$r .=  '>'.$text.'</a>';
-		$r .=  $after;
+		$r .= '" title="'.$params['title'].'"';
+		if( !empty( $params['class'] ) ) $r .= ' class="'.$params['class'].'"';
+		$r .=  '>'.$params['text'].'</a>';
+		$r .= $params['after'];
 
 		return $r;
 	}
 
 
 	/**
+	 * Template tag
 	 * @see Item::get_edit_link()
 	 */
-	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $save_context = true )
+	function edit_link( $params = array() )
 	{
-		echo $this->get_edit_link( $before, $after, $text, $title, $class, $save_context );
+		echo $this->get_edit_link( $params );
 	}
 
 
@@ -2197,6 +2203,8 @@ class Item extends ItemLight
 
 	/**
 	 * Template function: Displays trackback autodiscovery information
+	 *
+	 * TODO: build into headers
 	 */
 	function trackback_rdf()
 	{
@@ -2206,7 +2214,6 @@ class Item extends ItemLight
 			return;
 		}
 
-		echo "<!--\n";
 		echo '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" '."\n";
 		echo '  xmlns:dc="http://purl.org/dc/elements/1.1/"'."\n";
 		echo '  xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">'."\n";
@@ -2222,7 +2229,6 @@ class Item extends ItemLight
 		$this->trackback_url();
 		echo '" />'."\n";
 		echo '</rdf:RDF>';
-		echo "-->\n";
 	}
 
 
@@ -3191,6 +3197,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.14  2007/11/03 23:54:38  fplanque
+ * skin cleanup continued
+ *
  * Revision 1.13  2007/11/03 21:04:26  fplanque
  * skin cleanup
  *

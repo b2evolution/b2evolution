@@ -174,7 +174,15 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	
 	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->
 		<a href="contact.php"><?php echo T_('Contact the admin') ?></a>
-		<?php display_list( $credit_links, ' &middot; ', '', ' &middot; ', ' ', ' ' ); ?>
+		<?php
+			credits( array(
+					'list_start'  => ' &middot; ',
+					'list_end'    => ' ',
+					'separator'   => ' &middot; ',
+					'item_start'  => ' ',
+					'item_end'    => ' ',
+				) );
+		?>
 		<!-- InstanceEndEditable --></div>
 		
 	</div>

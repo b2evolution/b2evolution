@@ -73,7 +73,16 @@ skin_include( '_body_header.inc.php' );
 				$Item->anchor(); // Anchor for permalinks to refer to.
 			?>
 
-			<h2 class="sectionhead" lang="<?php $Item->lang() ?>"><?php $Item->edit_link( '', '', '#', '#', 'floatright' ); ?><?php $Item->title(); ?></h2>
+			<h2 class="sectionhead" lang="<?php $Item->lang() ?>">
+				<?php
+					$Item->edit_link( array( // Link to backoffice for editing
+							'before'    => '',
+							'after'     => '',
+							'class'     => 'floatright',
+						) );
+				?>
+				<?php $Item->title(); ?>
+			</h2>
 
 			<div class="post post<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
 

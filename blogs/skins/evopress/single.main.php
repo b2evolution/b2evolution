@@ -121,7 +121,12 @@ while( $Item = & mainlist_get_item() )
 					) );
 				?>
 				<!-- You can follow any responses to this entry through the RSS feed. -->
-				<?php $Item->edit_link( '', '' ); ?>
+				<?php
+					$Item->edit_link( array( // Link to backoffice for editing
+							'before'    => '',
+							'after'     => '',
+						) );
+				?>
 			</small>
 		</p>
 

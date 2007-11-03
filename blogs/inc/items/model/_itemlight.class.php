@@ -319,14 +319,6 @@ class ItemLight extends DataObject
 	/**
 	 * Template function: list all the category names
 	 *
-	 * @param string link title, '#' for default, false if you want no links
-	 * @param string string fo display before the MAIN category, 'hide' to ignore main cat
-	 * @param string string fo display after the MAIN category, 'hide' to ignore main cat
-	 * @param string string fo display before OTHER categories, 'hide' to ignore other cats
-	 * @param string string fo display after OTHER categories, 'hide' to ignore other cats
-	 * @param string string fo display before EXTERNAL categories, 'hide' to ignore external cats
-	 * @param string string fo display after EXTERNAL categories, 'hide' to ignore external cats
-	 * @param string separator string
 	 * @param string Output format for each cat, see {@link format_to_output()}
 	 */
 	function categories( $params = array() )
@@ -338,12 +330,12 @@ class ItemLight extends DataObject
 				'include_main'    => true,
 				'include_other'   => true,
 				'include_external'=> true,
-				'before_main'     => '',
-				'after_main'      => '',
-				'before_other'    => '',
-				'after_other'     => '',
-				'before_external' => '<em>',
-				'after_external'  => '</em>',
+				'before_main'     => '',       // string fo display before the MAIN category,
+				'after_main'      => '',       // string fo display after the MAIN category
+				'before_other'    => '',       // string fo display before OTHER categories
+				'after_other'     => '',       // string fo display after OTHER categories
+				'before_external' => '<em>',   // string fo display before EXTERNAL categories
+				'after_external'  => '</em>',  // string fo display after EXTERNAL categories,
 				'separator'       => ', ',
 				'link_categories' => true,
 				'link_title'      => '#',
@@ -462,56 +454,58 @@ class ItemLight extends DataObject
 	/**
 	 * returns issue date (datetime) of Item
 	 *
-	 * @param string date/time format: leave empty to use locale default date format
-	 * @param boolean true if you want GMT
 	 */
-	function get_issue_date( $format = '', $useGM = false )
+	function get_issue_date( $params = array() )
 	{
-		if( empty($format) )
-			$format = locale_datefmt();
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => ' ',
+				'after'       => ' ',
+				'date_format' => '#',
+				'use_GMT'     => false,
+			), $params );
 
-		return mysql2date( $format, $this->issue_date, $useGM);
+		if( $params['date_format'] == '#' )
+		{
+			$params['date_format'] = locale_datefmt();
+		}
+
+		return $params['before'].mysql2date( $params['date_format'], $this->issue_date, $params['use_GMT'] ).$params['after'];
 	}
 
 
 	/**
 	 * Template function: display issue date (datetime) of Item
 	 *
-	 * @param string date/time format: leave empty to use locale default date format
-	 * @param boolean true if you want GMT
 	 */
-	function issue_date( $format = '', $useGM = false )
+	function issue_date( $params = array() )
 	{
-		echo $this->get_issue_date( $format, $useGM );
+		echo $this->get_issue_date( $params );
 	}
 
 
 	/**
 	 * Template function: display issue time (datetime) of Item
 	 *
-	 * @param string date/time format: leave empty to use locale default time format
-	 * @param boolean true if you want GMT
 	 */
 	function issue_time( $params = array() )
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before'      => ' ',
-				'after'       => ' ',
 				'time_format' => '#',
-				'use_GMT'     => false,
 			), $params );
 
-		if( $params['time_format'] == '#' )
+		if( !isset($params['date_format']) )
 		{
-			$params['time_format'] = locale_timefmt();
+			$params['date_format'] = $params['time_format'];
 		}
 
-		echo $params['before'];
+		if( $params['date_format'] == '#' )
+		{
+			$params['date_format'] = locale_timefmt();
+		}
 
-		echo mysql2date( $params['time_format'], $this->issue_date, $params['use_GMT'] );
-
-		echo $params['after'];
+		echo $this->get_issue_date( $params );
 	}
 
 
@@ -880,6 +874,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2007/11/03 23:54:38  fplanque
+ * skin cleanup continued
+ *
  * Revision 1.5  2007/11/03 21:04:27  fplanque
  * skin cleanup
  *

@@ -168,26 +168,33 @@ skin_include( '_html_header.inc.php' );
 				$Item->permanent_link( array(
 						'text' => '#icon#',
 					) );
+
 				$Item->issue_time( array(
 						'before'    => ' ',
 						'after'     => '',
 					));
+
 				$Item->author( array(
 						'before'    => ', '.T_('by').' <strong>',
 						'after'     => '</strong>',
 					) );
+
 				$Item->msgform_link();
 				echo ', ';
+
 				$Item->wordcount();
 				echo ' '.T_('words');
 				// echo ', ';
 				// $Item->views();
+
 				$Item->locale_flag( array(
 						'before'    => ' &nbsp; ',
 						'after'     => '',
 					) );
 			?>
+
 			<br />
+
 			<?php
 				$Item->categories( array(
 					'before'          => T_('Categories').': ',
@@ -227,9 +234,7 @@ skin_include( '_html_header.inc.php' );
 					$Item->permanent_link( array(
 							'class' => 'permalink_right',
 						) );
-				?>
 
-				<?php
 					// Link to comments, trackbacks, etc.:
 					$Item->feedback_link( array(
 									'type' => 'comments',
@@ -241,8 +246,7 @@ skin_include( '_html_header.inc.php' );
 									'link_title' => '#',
 									'use_popup' => false,
 								) );
-				?>
-				<?php
+
 					// Link to comments, trackbacks, etc.:
 					$Item->feedback_link( array(
 									'type' => 'trackbacks',
@@ -254,10 +258,12 @@ skin_include( '_html_header.inc.php' );
 									'link_title' => '#',
 									'use_popup' => false,
 								) );
-				?>
-				<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
 
-				<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
+					$Item->edit_link( array( // Link to backoffice for editing
+							'before'    => ' &bull; ',
+							'after'     => '',
+						) );
+				?>
 			</div>
 
 			<?php
@@ -277,19 +283,18 @@ skin_include( '_html_header.inc.php' );
 		</div>
 		<?php
 		} // ---------------------------------- END OF POSTS ------------------------------------
-
 	?>
 
-			<?php
-				// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-				mainlist_page_links( array(
-						'block_start' => '<p class="center"><strong>',
-						'block_end' => '</strong></p>',
-   					'prev_text' => '&lt;&lt;',
-   					'next_text' => '&gt;&gt;',
-					) );
-				// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
-			?>
+	<?php
+		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+		mainlist_page_links( array(
+				'block_start' => '<p class="center"><strong>',
+				'block_end' => '</strong></p>',
+   			'prev_text' => '&lt;&lt;',
+   			'next_text' => '&gt;&gt;',
+			) );
+		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+	?>
 
 
 	<?php
@@ -352,7 +357,6 @@ skin_include( '_html_header.inc.php' );
 		// Note: Double quotes have been used around "Footer" only for test purposes.
 	?>
 	<p class="baseline">
-
 		<?php
 			// Display a link to contact the owner of this blog (if owner accepts messages):
 			$Blog->contact_link( array(
@@ -368,7 +372,13 @@ skin_include( '_html_header.inc.php' );
 			// Display additional credits (see /conf/):
  			// If you can add your own credits without removing the defaults, you'll be very cool :))
 		 	// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
-			display_list( $credit_links, T_('Credits').': ', ' ', '|', ' ', ' ' );
+			credits( array(
+					'list_start'  => T_('Credits').': ',
+					'list_end'    => ' ',
+					'separator'   => '|',
+					'item_start'  => ' ',
+					'item_end'    => ' ',
+				) );
 		?>
 	</p>
 </div>

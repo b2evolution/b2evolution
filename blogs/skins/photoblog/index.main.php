@@ -168,18 +168,32 @@ skin_include( '_html_header.inc.php' );
 								) );
 				 ?>
 
-				<div class="action_right">
 				<?php
 					$Item->permanent_link( array(
+							'before'    => '<div class="action_right">',
+							'after'     => '</div>',
 							'text' => T_('Permalink'),
 						) );
 				?>
-				</div>
 
-				<?php $Item->edit_link( '<div class="action_right">', '</div>', T_('Edit...'), T_('Edit title/description...') ) // Link to backoffice for editing ?>
+				<?php
+					$Item->edit_link( array( // Link to backoffice for editing
+							'before'    => '<div class="action_right">',
+							'after'     => '</div>',
+							'text'      => T_('Edit...'),
+              'title'     => T_('Edit title/description...'),
+						) );
+				?>
 
 				<h3 class="bTitle"><?php $Item->title(); ?></h3>
-				<span class="timestamp"><?php $Item->issue_date( locale_datefmt().' H:i' ); ?></span>
+
+				<?php
+					$Item->issue_date( array(
+							'before'      => '<span class="timestamp">',
+							'after'       => '</span>',
+							'date_format' => locale_datefmt().' H:i',
+						) );
+				?>
 
 			</div>
 

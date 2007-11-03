@@ -142,13 +142,17 @@ while( $Item = & $ItemList->get_item() )
 				$Item->locale_flag();
 				echo '</div>';
 
-				echo '<span class="bDate">';
-				$Item->issue_date();
-				echo '</span>';
+				$Item->issue_date( array(
+						'before'      => '<span class="bDate">',
+						'after'       => '</span>',
+						'date_format' => '#',
+					) );
+
 				$Item->issue_time( array(
 						'before'      => ' @ <span class="bTime">',
 						'after'      => '</span>',
 					) );
+
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 				echo ' ', T_('by'), ' <acronym title="';
 				$Item->creator_User->login();
@@ -239,7 +243,11 @@ while( $Item = & $ItemList->get_item() )
 							.'" class="ActionButton">'.T_('Files...').'</a>';
 
 			// Display edit button if current user has the rights:
-			$Item->edit_link( ' ', ' ', '#', '#', 'ActionButton' );
+			$Item->edit_link( array( // Link to backoffice for editing
+					'before'    => ' ',
+					'after'     => ' ',
+					'class'     => 'ActionButton'
+				) );
 
 			// Display publish NOW button if current user has the rights:
 			$Item->publish_link( ' ', ' ', '#', '#', 'PublishButton');
@@ -377,6 +385,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.8  2007/11/03 23:54:39  fplanque
+ * skin cleanup continued
+ *
  * Revision 1.7  2007/11/03 21:04:27  fplanque
  * skin cleanup
  *

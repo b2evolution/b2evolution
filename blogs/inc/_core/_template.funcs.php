@@ -450,8 +450,32 @@ function display_if_empty( $params = array() )
 	return NULL;
 }
 
+
+/**
+ * Template tag
+ */
+function credits( $params = array() )
+{
+	global $credit_links;
+
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'list_start'  => ' ',
+			'list_end'    => ' ',
+			'item_start'  => ' ',
+			'item_end'    => ' ',
+			'separator'   => ',',
+			'after_item'  => '#',
+		), $params );
+
+	display_list( $credit_links, $params['list_start'], $params['list_end'], $params['separator'], $params['item_start'], $params['item_end'] );
+}
+
 /*
  * $Log$
+ * Revision 1.11  2007/11/03 23:54:39  fplanque
+ * skin cleanup continued
+ *
  * Revision 1.10  2007/11/03 21:04:25  fplanque
  * skin cleanup
  *

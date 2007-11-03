@@ -83,7 +83,12 @@ while( $Item = & mainlist_get_item() )
 			// -------------------------- END OF POST CONTENT -------------------------
 		?>
 
-		<?php $Item->edit_link( '<p>', '</p>' ); ?>
+		<?php
+			$Item->edit_link( array( // Link to backoffice for editing
+					'before'    => '<p>',
+					'after'     => '</p>',
+				) );
+		?>
 
 	</div>
 

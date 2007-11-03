@@ -35,7 +35,13 @@ Credits: <a href="http://skinfaktory.com/">skin makers</a>
 // Display additional credits (see /conf/):
 // If you can add your own credits without removing the defaults, you'll be very cool :))
 // Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
-display_list( $credit_links, ' &bull; ', '', ' &bull; ', ' ', ' ' );
+credits( array(
+		'list_start'  => ' &bull; ',
+		'list_end'    => ' ',
+		'separator'   => ' &bull; ',
+		'item_start'  => ' ',
+		'item_end'    => ' ',
+	) );
 ?>
 
 </p>

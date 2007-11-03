@@ -127,8 +127,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			{
 				?>
 				<li lang="<?php $Item->lang() ?>">
-					<?php $Item->issue_date() ?>:
 					<?php
+						$Item->issue_date( array(
+								'before'      => ' ',
+								'after'       => ' ',
+								'date_format' => '#',
+							) );
+
 						$Item->title( array(
 								'link_type' => 'permalink',
 							) );
