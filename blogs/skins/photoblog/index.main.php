@@ -94,13 +94,21 @@ skin_include( '_html_header.inc.php' );
 	?>
 
 	<?php
-		if( isset($MainList) )
-		{ // Links to previous and next post in single post mode:
-			echo '<div class="nav_right">';
-			$MainList->next_item_link( '', ' ', '<img src="img/next.gif" width="29" height="29" alt="'.T_('Next').'" title="'.T_('Next').'" />', '<img src="'.$rsc_url.'/img/blank.gif" width="29" height="29" alt="" class="no_nav" />' );
-			$MainList->prev_item_link( '', '', '<img src="img/prev.gif" width="29" height="29" alt="'.T_('Previous').'" title="'.T_('Previous').'" />' );
-			echo '</div>';
-		}
+		// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
+		item_prevnext_links( array(
+				'template' => '$next$$prev$',
+				'block_start' => '<div class="nav_right">',
+				'next_start'  => '',
+				'next_text' => '<img src="img/next.gif" width="29" height="29" alt="'.T_('Next').'" title="'.T_('Next').'" />',
+				'next_no_item' => '<img src="'.$rsc_url.'/img/blank.gif" width="29" height="29" alt="" class="no_nav" />',
+				'next_end'    => ' ',
+				'prev_start'  => '',
+				'prev_text' => '<img src="img/prev.gif" width="29" height="29" alt="'.T_('Previous').'" title="'.T_('Previous').'" />',
+				'prev_no_item' => '',
+				'prev_end'    => '',
+				'block_end'   => '</div>',
+			) );
+		// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 	?>
 
 	<?php
@@ -166,9 +174,7 @@ skin_include( '_html_header.inc.php' );
 									'link_title' => '#',
 									'use_popup' => true,
 								) );
-				 ?>
 
-				<?php
 					$Item->permanent_link( array(
 							'before'    => '<div class="action_right">',
 							'after'     => '</div>',

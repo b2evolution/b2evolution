@@ -54,23 +54,23 @@ skin_include( '_html_header.inc.php' );
 <div class="outerwrap">
 <div class="innerwrap">
 
-<div class="PageTop">
-	<?php
-		// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		skin_container( NT_('Page Top'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start' => '<div class="$wi_class$">',
-				'block_end' => '</div>',
-				'block_display_title' => false,
-				'list_start' => '<ul>',
-				'list_end' => '</ul>',
-				'item_start' => '<li>',
-				'item_end' => '</li>',
-			) );
-		// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
-	?>
-</div>
+	<div class="PageTop">
+		<?php
+			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
+			// Display container and contents:
+			skin_container( NT_('Page Top'), array(
+					// The following params will be used as defaults for widgets included in this container:
+					'block_start' => '<div class="$wi_class$">',
+					'block_end' => '</div>',
+					'block_display_title' => false,
+					'list_start' => '<ul>',
+					'list_end' => '</ul>',
+					'item_start' => '<li>',
+					'item_end' => '</li>',
+				) );
+			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
+		?>
+	</div>
 
 	<div class="pageHeader">
 		<?php
@@ -182,12 +182,14 @@ skin_include( '_html_header.inc.php' );
    			$Item->permanent_link( array(
 					'text' => '#icon#',
 				) );
-				echo ' ';
-				$Item->issue_time();
-			?>
-			<?php
+
+				$Item->issue_time( array(
+						'before'    => ' ',
+						'after'     => ', ',
+					) );
+
 				$Item->categories( array(
-					'before'          => ', '.T_('Categories').': ',
+					'before'          => T_('Categories').': ',
 					'after'           => ' ',
 					'include_main'    => true,
 					'include_other'   => true,

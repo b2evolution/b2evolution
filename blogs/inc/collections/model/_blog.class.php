@@ -1447,7 +1447,7 @@ class Blog extends DataObject
 
 
 	/**
-	 * Template tag
+	 * Template tag: display a link leading to the contact form for the owner of the current Blog.
 	 */
 	function contact_link( $params )
 	{
@@ -1459,8 +1459,8 @@ class Blog extends DataObject
 
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before'      => '',
-				'after'       => '',
+				'before'      => ' ',
+				'after'       => ' ',
 				'text'        => 'Contact', // Note: left untranslated, should be translated in skin anyway
 				'title'       => 'Send a message to the owner of this blog...',
 			), $params );
@@ -1496,6 +1496,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2007/11/04 17:55:12  fplanque
+ * More cleanup
+ *
  * Revision 1.13  2007/11/04 01:10:57  fplanque
  * skin cleanup continued
  *

@@ -369,14 +369,19 @@ class ItemList2 extends ItemListLight
 	function prevnext_item_links( $params )
 	{
 		$params = array_merge( array(
+									'template' => '$prev$$next$',
 									'prev_text' => '&laquo; $title$',
 									'prev_no_item' => '',
 									'next_text' => '$title$ &raquo;',
 									'next_no_item' => '',
 								), $params );
 
-		$output = $this->prev_item_link( $params['prev_start'], $params['prev_end'], $params[ 'prev_text' ], $params[ 'prev_no_item' ], false );
-		$output .= $this->next_item_link( $params['next_start'], $params['next_end'], $params[ 'next_text' ], $params[ 'next_no_item' ], false );
+		$prev = $this->prev_item_link( $params['prev_start'], $params['prev_end'], $params[ 'prev_text' ], $params[ 'prev_no_item' ], false );
+		$next = $this->next_item_link( $params['next_start'], $params['next_end'], $params[ 'next_text' ], $params[ 'next_no_item' ], false );
+
+		$output = str_replace( '$prev$', $prev, $params['template'] );
+		$output = str_replace( '$next$', $next, $output );
+
 		if( !empty( $output ) )
 		{	// we have some output, lets wrap it
 			echo( $params['block_start'] );
@@ -596,6 +601,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.4  2007/11/04 17:55:13  fplanque
+ * More cleanup
+ *
  * Revision 1.3  2007/09/09 12:51:58  fplanque
  * cleanup
  *

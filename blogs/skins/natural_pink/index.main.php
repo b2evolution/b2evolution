@@ -143,14 +143,16 @@ skin_include( '_html_header.inc.php' );
 			<div class="bSmallHead">
 			<?php
    			$Item->permanent_link( array(
-					'text' => '#icon#',
-				) );
-				echo ' ';
-				$Item->issue_time();
-			?>
-			<?php
+						'text' => '#icon#',
+					) );
+
+				$Item->issue_time( array(
+						'before'    => ' ',
+						'after'     => ', ',
+					) );
+
 				$Item->categories( array(
-					'before'          => ', '.T_('Categories').': ',
+					'before'          => T_('Categories').': ',
 					'after'           => ' ',
 					'include_main'    => true,
 					'include_other'   => true,
