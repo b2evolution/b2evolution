@@ -413,9 +413,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	$block_item_Widget->title = T_('Info');
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 
-	echo '<p>Please be advised that this is <strong>Alpha</strong> software. Many things may still change.</p>';
+	echo '<p>Please be advised that this is beta software. A few things may still change until the stable release.</p>';
 
- 	echo '<p>We especially recommend you wait until next release before investing too much time in porting your skins to the new skin architecture.</p>';
+	
 
 	$block_item_Widget->disp_template_replaced( 'block_end' );
 
@@ -467,6 +467,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2007/11/04 21:22:25  fplanque
+ * version bump
+ *
  * Revision 1.15  2007/11/03 23:54:39  fplanque
  * skin cleanup continued
  *

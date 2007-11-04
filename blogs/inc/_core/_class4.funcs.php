@@ -44,7 +44,6 @@ function load_class( $class_path, $require = true )
 
 /**
  * Load functions file
- * @todo dupe of load_class()?! (without the return value use case..)
  */
 function load_funcs( $funcs_path )
 {
@@ -149,8 +148,8 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
- * Revision 1.2  2007/11/02 20:39:49  blueyed
- * load_funcs: todo
+ * Revision 1.3  2007/11/04 21:22:56  fplanque
+ * version bump
  *
  * Revision 1.1  2007/06/25 10:58:52  fplanque
  * MODULES (refactored MVC)
