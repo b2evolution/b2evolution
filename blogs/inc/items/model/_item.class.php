@@ -966,8 +966,14 @@ class Item extends ItemLight
 	 *
 	 * @todo merge with inc_viewcount
 	 */
-	function count_view( $allow_multiple_counts_per_page = false )
+	function count_view( $params = array() )
 	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'allow_multiple_counts_per_page' => false,
+			), $params );
+
+
 		global $Hit, $preview, $Debuglog;
 
 		if( $preview )
@@ -985,7 +991,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( ! $allow_multiple_counts_per_page )
+		if( ! $params['allow_multiple_counts_per_page'] )
 		{	// Check that we don't increase multiple viewcounts on the same page
 			// This make the assumption that the first post in a list is "viewed" and the other are not (necesarily)
 			global $view_counts_on_this_page;
@@ -1005,9 +1011,12 @@ class Item extends ItemLight
 	}
 
 
-	function more_link( $before = '<p class="bMore">', $after = '</p>', $more_link_text = '#', $more_anchor = '#', $disppage = '#', $format = 'htmlbody' )
+	/**
+	 * Template tag
+	 */
+	function more_link( $params = array() )
 	{
-		echo $this->get_more_link( $before, $after, $more_link_text, $more_anchor, $disppage, $format );
+		echo $this->get_more_link( $params );
 	}
 
 
@@ -1016,23 +1025,33 @@ class Item extends ItemLight
 	 *
 	 * @param string string to display before more link
 	 * @param string string to display after more link
-	 * @param string text to display as the more link
-	 * @param string text to display as the more anchor (once the more link has been clicked)
-	 * @param mixed page number to display specific page, # for url parameter
+	 * @param string
+	 * @param string
+	 * @param mixed
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function get_more_link( $before = '<p class="bMore">', $after = '</p>', $more_link_text = '#', $more_anchor = '#', $disppage = '#', $format = 'htmlbody' )
+	function get_more_link( $params = array() )
 	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => '<p class="bMore">',
+				'after'       => '</p>',
+				'link_text'   => '#',		// text to display as the more link
+				'anchor_text' => '#',		// text to display as the more anchor (once the more link has been clicked)
+				'disppage'    => '#',		// page number to display specific page, # for url parameter
+				'format'      => 'htmlbody',
+			), $params );
+
 		global $more;
 
 		// Get requested content page:
-		if( $disppage === '#' )
+		if( $params['disppage'] === '#' )
 		{ // We want to display the page requested by the user:
 			global $page;
-			$disppage = $page;
+			$params['disppage'] = $page;
 		}
 
-		$content_page = $this->get_content_page( $disppage, $format ); // cannot include format_to_output() because of the magic below.. eg '<!--more-->' will get stripped in "xml"
+		$content_page = $this->get_content_page( $params['disppage'], $params['format'] ); // cannot include format_to_output() because of the magic below.. eg '<!--more-->' will get stripped in "xml"
 		// pre_dump($content_page);
 
 		$content_parts = explode( '<!--more-->', $content_page );
@@ -1045,26 +1064,26 @@ class Item extends ItemLight
 
 		if( ! $more )
 		{	// We're NOT in "more" mode:
-			if( $more_link_text == '#' )
+			if( $params['link_text'] == '#' )
 			{ // TRANS: this is the default text for the extended post "more" link
-				$more_link_text = T_('Read more').' &raquo;';
+				$params['link_text'] = T_('Read more').' &raquo;';
 			}
 
-			return format_to_output( $before
+			return format_to_output( $params['before']
 						.'<a href="'.$this->get_permanent_url().'#more'.$this->ID.'">'
-						.$more_link_text.'</a>'
-						.$after, $format );
+						.$params['link_text'].'</a>'
+						.$params['after'], $params['format'] );
 		}
 		elseif( ! preg_match('/<!--noteaser-->/', $content_page ) )
 		{	// We are in mode mode and we're not hiding the teaser:
 			// (if we're higin the teaser we display this as a normal page ie: no anchor)
-			if( $more_anchor == '#' )
+			if( $params['anchor_text'] == '#' )
 			{ // TRANS: this is the default text displayed once the more link has been activated
-				$more_anchor = '<p class="bMore">'.T_('Follow up:').'</p>';
+				$params['anchor_text'] = '<p class="bMore">'.T_('Follow up:').'</p>';
 			}
 
 			return format_to_output( '<a id="more'.$this->ID.'" name="more'.$this->ID.'"></a>'
-							.$more_anchor, $format );
+							.$params['anchor_text'], $params['format'] );
 		}
 	}
 
@@ -3197,6 +3216,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.15  2007/11/04 01:10:57  fplanque
+ * skin cleanup continued
+ *
  * Revision 1.14  2007/11/03 23:54:38  fplanque
  * skin cleanup continued
  *

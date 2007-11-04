@@ -31,7 +31,9 @@ $Item->images( array(
 <div>
 	<?php
 		// Increment view count of first post on page:
-		$Item->count_view( false );
+		$Item->count_view( array(
+				'allow_multiple_counts_per_page' => false,
+			) );
 
 		// Display CONTENT:
 		$Item->content_teaser( array(
@@ -52,6 +54,9 @@ $Item->images( array(
 <?php
 /*
  * $Log$
+ * Revision 1.2  2007/11/04 01:10:57  fplanque
+ * skin cleanup continued
+ *
  * Revision 1.1  2007/06/23 22:09:30  fplanque
  * feedback and item content templates.
  * Interim check-in before massive changes ahead.

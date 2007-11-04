@@ -212,7 +212,11 @@ while( $Item = & $ItemList->get_item() )
 			<div class="bText">
 				<?php
 					// Uncomment this in case you wnt to count view in backoffice:
-					// $Item->count_view( false );
+					/*
+					$Item->count_view( array(
+							'allow_multiple_counts_per_page' => false,
+						) );
+					*/
 
 					// Display CONTENT:
 					$Item->content_teaser( array(
@@ -385,6 +389,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.9  2007/11/04 01:10:57  fplanque
+ * skin cleanup continued
+ *
  * Revision 1.8  2007/11/03 23:54:39  fplanque
  * skin cleanup continued
  *

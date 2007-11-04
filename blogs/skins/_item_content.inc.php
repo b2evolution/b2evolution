@@ -40,15 +40,21 @@ if( !empty($params['image_size']) )
 
 <div class="bText">
 	<?php
-		// Increment view count!
-		$Item->count_view( false );
+		// Increment view count of first post on page:
+		$Item->count_view( array(
+				'allow_multiple_counts_per_page' => false,
+			) );
 
 		// Display CONTENT:
 		$Item->content_teaser( array(
 				'before'      => '',
 				'after'       => '',
 			) );
-		$Item->more_link( $params['before_more_link'], $params['after_more_link'], $params['more_link_text'] );
+		$Item->more_link( array(
+				'before'    => $params['before_more_link'],
+				'after'     => $params['after_more_link'],
+				'link_text' => $params['more_link_text'],
+			) );
 		$Item->content_extension( array(
 				'before'      => '',
 				'after'       => '',
@@ -62,6 +68,9 @@ if( !empty($params['image_size']) )
 <?php
 /*
  * $Log$
+ * Revision 1.4  2007/11/04 01:10:57  fplanque
+ * skin cleanup continued
+ *
  * Revision 1.3  2007/09/28 02:18:10  fplanque
  * minor
  *

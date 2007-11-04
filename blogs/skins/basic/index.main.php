@@ -60,11 +60,20 @@ skin_content_header();	// Sets charset!
 
 	<hr>
 	<div align="center">
-		<h1><?php $Blog->disp( 'name', 'htmlbody' ) ?></h1>
-		<p><?php $Blog->disp( 'tagline', 'htmlbody' ) ?></p>
+		<h1><?php $Blog->name() ?></h1>
+		<?php
+			$Blog->tagline( array(
+					'before'    => '<p>',
+					'after'     => '</p>',
+				) );
+		?>
 	</div>
-	<hr>
-	<small><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></small>
+	<?php
+		$Blog->longdesc( array(
+				'before'    => '<hr><small>',
+				'after'     => '</small>',
+			) );
+	?>
 
 	<hr>
 

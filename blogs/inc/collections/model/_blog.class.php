@@ -1348,15 +1348,74 @@ class Blog extends DataObject
 	}
 
 
-	/**
+	/*
 	 * Template function: display name of blog
 	 *
-	 * @param string Output format, see {@link format_to_output()}
+	 * Template tag
 	 */
-	function name( $format = 'htmlbody' )
+	function name( $params = array() )
 	{
-		$this->disp( 'name', $format );
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => ' ',
+				'after'       => ' ',
+				'format'      => 'htmlbody',
+			), $params );
+
+		if( !empty( $this->name ) )
+		{
+			echo $params['before'];
+			$this->disp( 'name', $params['format'] );
+			echo $params['after'];
+		}
 	}
+
+
+	/*
+	 * Template function: display name of blog
+	 *
+	 * Template tag
+	 */
+	function tagline( $params = array() )
+	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => ' ',
+				'after'       => ' ',
+				'format'      => 'htmlbody',
+			), $params );
+
+		if( !empty( $this->tagline ) )
+		{
+			echo $params['before'];
+			$this->disp( 'tagline', $params['format'] );
+			echo $params['after'];
+		}
+	}
+
+
+	/*
+	 * Template function: display name of blog
+	 *
+	 * Template tag
+	 */
+	function longdesc( $params = array() )
+	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => ' ',
+				'after'       => ' ',
+				'format'      => 'htmlbody',
+			), $params );
+
+		if( !empty( $this->longdesc ) )
+		{
+			echo $params['before'];
+			$this->disp( 'longdesc', $params['format'] );
+			echo $params['after'];
+		}
+	}
+
 
 
 	/**
@@ -1437,6 +1496,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2007/11/04 01:10:57  fplanque
+ * skin cleanup continued
+ *
  * Revision 1.12  2007/11/03 04:56:03  fplanque
  * permalink / title links cleanup
  *

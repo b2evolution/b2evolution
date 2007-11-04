@@ -136,7 +136,12 @@ while( $Item = & mainlist_get_item() )
 
 		$content .= $Item->get_content_teaser( 1, false, 'entityencoded' );
 
-		$content .= $Item->get_more_link( '', '', '#', '', 1, 'entityencoded' );
+		$content .= $Item->get_more_link( array(
+						'before'    => '',
+						'after'     => '',
+						'disppage'  => 1,
+						'format'    => 'entityencoded',
+					) );
 
 		// fp> this is another one of these "oooooh it's just a tiny little change"
 		// and "we only need to make the links absolute in RSS"
@@ -159,7 +164,11 @@ while( $Item = & mainlist_get_item() )
 
 		$content .= $Item->get_content_teaser( 1, false );
 
-		$content .= $Item->get_more_link( '', '', '#', '', 1 );
+		$content .= $Item->get_more_link( array(
+						'before'    => '',
+						'after'     => '',
+						'disppage'  => 1,
+					) );
 
 		// fp> this is another one of these "oooooh it's just a tiny little change"
 		// and "we only need to make the links absolute in RSS"

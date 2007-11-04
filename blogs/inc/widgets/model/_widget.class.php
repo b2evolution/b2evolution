@@ -523,7 +523,11 @@ class ComponentWidget extends DataObject
 						'stripteaser' => false,
 					) );
 
-				$Item->more_link( '', ' ', T_('more').' &raquo;' );
+				$Item->more_link( array(
+						'before'    => '',
+						'after'     => '',
+						'link_text' => T_('more').' &raquo;',
+					) );
 				*/
 
 
@@ -649,6 +653,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2007/11/04 01:10:57  fplanque
+ * skin cleanup continued
+ *
  * Revision 1.8  2007/11/03 04:56:04  fplanque
  * permalink / title links cleanup
  *
