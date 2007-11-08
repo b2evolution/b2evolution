@@ -425,10 +425,12 @@ function & mainlist_get_item()
 
 	if( isset($MainList) )
 	{
-		return $MainList->get_item();
+		$r = $MainList->get_item();
 	}
-
-	$r = NULL;
+	else
+	{
+		$r = NULL;
+	}
 	return $r;
 }
 
@@ -473,6 +475,9 @@ function credits( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.12  2007/11/08 17:54:23  blueyed
+ * mainlist_get_item(): fixed return by reference (patch by Austriaco)
+ *
  * Revision 1.11  2007/11/03 23:54:39  fplanque
  * skin cleanup continued
  *
