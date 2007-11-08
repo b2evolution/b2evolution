@@ -2330,7 +2330,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 
 	// fp> get this out
 	if( empty($redirect_to) )
-	{ // see if there's a redirect_to request param given (where & is encoded as &amp;):
+	{
 		$redirect_to = param( 'redirect_to', 'string', '' );
 
 		if( empty($redirect_to) )
@@ -2352,6 +2352,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 	// <fp
 
 	/* fp>why do we need this?
+	   dh>because Location: redirects are supposed to be absolute.
 	if( substr($redirect_to, 0, 1) == '/' )
 	{ // relative URL, prepend current host:
 		global $ReqHost;
@@ -2974,6 +2975,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.8  2007/11/08 17:46:45  blueyed
+ * doc
+ *
  * Revision 1.7  2007/11/03 21:04:25  fplanque
  * skin cleanup
  *
