@@ -190,13 +190,8 @@ class ItemListLight extends DataObjectList2
 	 */
 	function set_filters( $filters, $memorize = true )
 	{
-		if( ! is_array($filters) )
-		{
-			$filters = array($filters);
-		}
 		if( !empty( $filters ) )
-		{	// Note if $filters == NULL it fails in PHP5
-			// Activate the filterset (fallback to default filter when a value is not set):
+		{ // Activate the filterset (fallback to default filter when a value is not set):
 			$this->filters = array_merge( $this->default_filters, $filters );
 		}
 
@@ -575,6 +570,11 @@ class ItemListLight extends DataObjectList2
 			return false;
 		}
 		*/
+
+		if( empty($filters) )
+		{ // set_filters() expects array
+			$filters = array();
+		}
 
 		$Debuglog->add( 'Restoring filterset <strong>'.$this->filterset_name.'</strong>', 'filters' );
 
@@ -1487,6 +1487,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.11  2007/11/11 23:43:37  blueyed
+ * Proper fix for array_merge warnings (http://forums.b2evolution.net/viewtopic.php?t=12944); Props Afwas
+ *
  * Revision 1.10  2007/11/03 21:04:27  fplanque
  * skin cleanup
  *
