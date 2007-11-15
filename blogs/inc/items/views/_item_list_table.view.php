@@ -185,7 +185,12 @@ $ItemList->cols[] = array(
 function item_edit_actions( $Item )
 {
 	// Display edit button if current user has the rights:
-	$r = $Item->get_edit_link( ' ', ' ', get_icon( 'edit' ), '#', '' );
+	$r = $Item->get_edit_link( array(
+		'before' => ' ',
+		'after' => ' ',
+		'text' => get_icon( 'edit' ),
+		'title' => '#',
+		'class' => '' ) );
 
 	// Display delete button if current user has the rights:
 	$r .= $Item->get_delete_link( ' ', ' ', get_icon( 'delete' ), '#', '', false );
@@ -224,6 +229,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.4  2007/11/15 23:51:18  blueyed
+ * Use new API for Item::get_edit_link; Props Afwas
+ *
  * Revision 1.3  2007/09/26 20:26:36  fplanque
  * improved ItemList filters
  *
