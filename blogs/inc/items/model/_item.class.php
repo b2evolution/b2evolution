@@ -1792,6 +1792,14 @@ class Item extends ItemLight
 
 	/**
 	 * Provide link to edit a post if user has edit rights
+	 *
+	 * @param array Params:
+	 *  - 'before': to display before link
+	 *  - 'after':    to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': CSS class name
+	 *  - 'save_context': redirect to current URL?
 	 */
 	function get_edit_link( $params = array() )
 	{
@@ -3216,6 +3224,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.16  2007/11/15 23:45:41  blueyed
+ * (Re-)Added phpdoc for get_edit_link
+ *
  * Revision 1.15  2007/11/04 01:10:57  fplanque
  * skin cleanup continued
  *
