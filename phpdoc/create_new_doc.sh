@@ -15,6 +15,7 @@ PHPDOC="/usr/local/pear/PhpDocumentor/phpdoc"
 export PHP="php -d memory_limit=1024M"
 
 TIMESTAMPFILE="create_new_doc.timestamp"
+TIMESTAMPFILE_PHPDOC="create_new_doc.phpdoc.timestamp"
 
 RSYNC_TARGET="doc.b2evolution.net:/var/www/vhosts/evodoc/web/HEAD/"
 
@@ -34,24 +35,39 @@ else
 	echo "No timestamp file yet."
 fi
 
-# Remove old generated doc
-/bin/rm -rf build/*
 
-# Generate documentation
-echo "Running phpdoc.."
-$PHPDOC --title 'b2evolution Technical Documentation (CVS HEAD)' \
---directory .. \
---ignoresymlinks on \
---target build/ \
---output HTML:Smarty:b2evo \
---ignore _idna_convert_npdata.ser.inc,Connections/,CVS/,gettext/,simpletest/,Templates/,img/,locales/,rsc/,media/,tests/,doc/,extras/,skins/babyblues/,skins/guadeloupe/,skins/wpc_aubmach/,*.gif,*.jpg,*.png,*.css,*.po*,*.mo*,*.bak,*.html,*.sql,*.xml,*.bpd,*.mpd,*.log,*.htaccess,*_TEST.php \
---parseprivate off \
---defaultpackagename main \
---defaultcategoryname Documentation \
---sourcecode on \
---readmeinstallchangelog license.txt
+# Run phpdoc, if necessary:
+NEED_PHPDOC_BUILD=1
+if [ -e "$TIMESTAMPFILE_PHPDOC" ]; then
+	if exec find .. -name 'CVS' -prune -o -type f -newer "$TIMESTAMPFILE_PHPDOC" -print -quit|grep -q -v -E '.+'; then
+		echo "phpdoc generated files are uptodate."
+		NEED_PHPDOC_BUILD=0
+	fi
+fi
 
-# Publish it:
+if [ $NEED_PHPDOC_BUILD = 1 ]; then
+	# Remove old generated doc
+	/bin/rm -rf build/*
+
+	# Generate documentation
+	echo "Running phpdoc.."
+	$PHPDOC --title 'b2evolution Technical Documentation (CVS HEAD)' \
+	--directory .. \
+	--ignoresymlinks on \
+	--target build/ \
+	--output HTML:Smarty:b2evo \
+	--ignore _idna_convert_npdata.ser.inc,Connections/,CVS/,gettext/,simpletest/,Templates/,img/,locales/,rsc/,media/,tests/,doc/,extras/,skins/babyblues/,skins/guadeloupe/,skins/wpc_aubmach/,*.gif,*.jpg,*.png,*.css,*.po*,*.mo*,*.bak,*.html,*.sql,*.xml,*.bpd,*.mpd,*.log,*.htaccess,*_TEST.php \
+	--parseprivate off \
+	--defaultpackagename main \
+	--defaultcategoryname Documentation \
+	--sourcecode on \
+	--readmeinstallchangelog license.txt
+fi
+
+touch "$TIMESTAMPFILE_PHPDOC"
+
+
+# Publish it via rsync:
 # First without source files (not so important)
 rsync -avt --del build/ --exclude=__filesource/ "$RSYNC_TARGET"
 rsync -avt --del build/ "$RSYNC_TARGET"
