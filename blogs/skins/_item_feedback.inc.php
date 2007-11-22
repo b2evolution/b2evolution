@@ -43,6 +43,11 @@ global $c, $tb, $pb, $comment_allowed_tags, $comments_use_autobr;
 global $cookie_name, $cookie_email, $cookie_url;
 
 
+if( ! $Item->can_see_comments() )
+{	// Comments are disabled for this post
+	return;
+}
+
 if( empty($c) )
 {	// Comments not requested
 	$params['disp_comments'] = false;					// DO NOT Display the comments if not requested
@@ -381,6 +386,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.11  2007/11/22 17:53:39  fplanque
+ * filemanager display cleanup, especially in IE (not perfect)
+ *
  * Revision 1.10  2007/11/03 21:04:28  fplanque
  * skin cleanup
  *

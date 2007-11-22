@@ -91,11 +91,14 @@ global $edited_Item;
 					// Title for checkbox and its label
 					$titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalue' );
 
+					echo '<div class="toolbaritem">';
+
 					$Form = & new Form( NULL, 'fmbar_filter_checkchanges', 'get', 'none' );
-					$Form->begin_form( 'toolbaritem' );
+					$Form->begin_form();
 					$Form->hidden_ctrl();
 					$Form->hiddens_by_key( get_memorized(), array('fm_filter', 'fm_filter_regex') );
 					?>
+
 					<label for="fm_filter" class="tooltitle"><?php echo T_('Filter') ?>:</label>
 					<input type="text" name="fm_filter" id="fm_filter"
 						value="<?php echo format_to_output( $fm_Filelist->get_filter( false ), 'formvalue' ) ?>"
@@ -124,6 +127,8 @@ global $edited_Item;
 						<?php
 					}
 				$Form->end_form();
+
+				echo '</div>';
 			}
 			?>
 
@@ -293,8 +298,9 @@ global $edited_Item;
 				{ // dir or file creation is enabled and we're allowed to add files:
 					global $create_type;
 
+					echo '<div class="toolbaritem">';
 					$Form = & new Form( NULL, 'fmbar_create_checkchanges', 'post', 'none' );
-					$Form->begin_form( 'toolbaritem' );
+					$Form->begin_form();
 						$Form->hidden( 'action', 'createnew' );
 						$Form->hidden_ctrl();
 						$Form->hiddens_by_key( get_memorized() );
@@ -336,6 +342,7 @@ global $edited_Item;
 					<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
 					<?php
 					$Form->end_form();
+					echo '</div>';
 				}
 
 
@@ -345,8 +352,9 @@ global $edited_Item;
 				if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) )
 				{	// Upload is enabled and we have permission to use it...
 					echo "<!-- QUICK UPLOAD: -->\n";
+					echo '<div class="toolbaritem">';
 					$Form = & new Form( NULL, 'fmbar_quick_upload', 'post', 'none', 'multipart/form-data' );
-					$Form->begin_form( 'toolbaritem' );
+					$Form->begin_form();
 						$Form->hidden( 'ctrl', 'upload' );
 						$Form->hidden( 'upload_quickmode', 1 );
 						// The following is mainly a hint to the browser.
@@ -357,6 +365,7 @@ global $edited_Item;
 						echo '<input class="ActionButton" type="submit" value="'.T_('Upload!').'" />';
 						echo '</div>';
 					$Form->end_form();
+					echo '</div>';
 				}
 
 				echo '</div>';
@@ -373,6 +382,9 @@ global $edited_Item;
 
 /*
  * $Log$
+ * Revision 1.7  2007/11/22 17:53:39  fplanque
+ * filemanager display cleanup, especially in IE (not perfect)
+ *
  * Revision 1.6  2007/11/01 04:31:25  fplanque
  * Better root browsing (roots are groupes by type + only one root is shown at a time)
  *

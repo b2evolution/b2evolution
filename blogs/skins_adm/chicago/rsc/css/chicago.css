@@ -785,6 +785,24 @@ div.edit_actions {
 	padding: 4px 0;
 }
 
+div.upload_title {
+	background-color: #BACEDF;
+	border-bottom-color: #9DB0BC;
+}
+
+ul#uploadfileinputs li {
+	background-color: #E0E9F0; 
+	border-bottom-color: #9DB0BC;
+}
+p.uploadfileinputs {
+	background-color: #CCDCE6; 
+	border-bottom-color: #9DB0BC;
+}
+
+div.upload_foot .note {
+	color: #777;
+}
+
 /*
  * Permissions:
  */

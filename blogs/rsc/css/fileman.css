@@ -22,11 +22,14 @@ div#fileman_toolbars_bottom {
 	padding: 0 .5ex;
 }
 .toolbaritem {
-	margin-left: 1ex;
+	margin: 0 6px 0 1em;
 	float:right;
 	white-space:nowrap;
+	text-align: right;
 }
-
+.toolbaritem form {
+	width: 20%; /* For IE7 */
+}
 
 #fm_browser {
 	clear: both;
@@ -248,6 +251,16 @@ ul.iconlegend li {
 	/* margin-bottom:.5ex; */
 }
 
+div.upload_title {
+	font-weight: bold;
+	padding: 3px 1ex;
+	background-color: #ccc;
+	border-bottom: 1px solid #bbb;
+}
+input.upload_file {
+	width: 70%;
+}
+
 ul#uploadfileinputs {
 	list-style:none;
 	margin:0;
@@ -255,9 +268,10 @@ ul#uploadfileinputs {
 }
 ul#uploadfileinputs li, /* Info block about a file to upload */
 p.uploadfileinputs {    /* Link to add a new info block */
-	background-color:#efede0; /* Temp color, needs overriding */
-	margin:1ex 0;
+	background-color:#ddd; /* Temp color, needs overriding */
+	margin: 0;
 	padding:1ex;
+	border-bottom: 1px solid #bbb;
 }
 ul#uploadfileinputs li.invalid
 {	/* Upload block displayed when upload has failed: */
@@ -267,13 +281,13 @@ ul#uploadfileinputs label {
 	font-weight:bold;
 }
 
+div.upload_foot {
+	margin: 1ex;
+}
+
 div#FM_anchor {
 	padding:2ex 0;
 	text-align:center;
 }
 
-div.panelblock fieldset.cmr_submit
-{
-	text-align:center;
-	border:none;
-}
+

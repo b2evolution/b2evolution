@@ -143,14 +143,18 @@ global $fm_FileRoot;
 		{ // handle rollover images ('close' by default is one).
 			?>
 			closeLink.className = 'rollover';
-			if( typeof setupRollovers == 'function' ) { setupRollovers(); }
+			if( typeof setupRollovers == 'function' )
+			{
+				setupRollovers();
+			}
 			<?php
 		}
 		?>
-		closeImage.setAttribute( 'onclick', "document.getElementById('uploadfileinputs').removeChild(this.parentNode.parentNode);" ); // TODO: setting onclick this way may not work in IE. (try attachEvent then)
-		closeLink.style.cssFloat = 'right';
+		closeImage.setAttribute( 'onclick', "document.getElementById('uploadfileinputs').removeChild(this.parentNode.parentNode);" ); // TODO: setting onclick this way DOES NOT work in IE. (try attachEvent then)
+		closeLink.style.cssFloat = 'right';		// standard (not working in IE)
+		closeLink.style.styleFloat = 'right'; // IE
 
-		appendLabelAndInputElements( newLI, '<?php echo TS_('Choose a file'); ?>:', false, 'input', 'uploadfile[]', '20', '0', 'file', '' );
+		appendLabelAndInputElements( newLI, '<?php echo TS_('Choose a file'); ?>:', false, 'input', 'uploadfile[]', '70', '0', 'file', 'upload_file' );
 		<?php
 		if( $UserSettings->get('fm_uploadwithproperties') )
 		{	// We want file properties on the upload form:
@@ -171,6 +175,14 @@ global $fm_FileRoot;
 	$this->disp_payload_begin();
 
 
+	$Form = & new Form( NULL, 'fm_upload_checkchanges', 'post', 'none', 'multipart/form-data' );
+	$Form->begin_form( 'fform' );
+		$Form->hidden_ctrl();
+		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); // Just a hint for the browser.
+		$Form->hidden( 'upload_quickmode', $upload_quickmode );
+		$Form->hiddens_by_key( get_memorized() );
+
+
 	$Widget = & new Widget( 'file_browser' );
 
 	$Widget->global_icon( T_('Quit upload mode!'), 'close', regenerate_url( 'ctrl,fm_mode', 'ctrl=files' ) );
@@ -179,13 +191,6 @@ global $fm_FileRoot;
 	$Widget->disp_template_replaced( 'block_start' );
 
 
-	$Form = & new Form( NULL, 'fm_upload_checkchanges', 'post', 'none', 'multipart/form-data' );
-	$Form->begin_form( 'fform' );
-		$Form->hidden_ctrl();
-		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); // Just a hint for the browser.
-		$Form->hidden( 'upload_quickmode', $upload_quickmode );
-		$Form->hiddens_by_key( get_memorized() );
-
 ?>
 
 <table id="fm_browser" cellspacing="0" cellpadding="0">
@@ -193,7 +198,7 @@ global $fm_FileRoot;
 		<tr>
 			<td colspan="2" id="fm_bar">
 			<?php
-
+				echo '&nbsp;'; // todo
 			?>
 			</td>
 		</tr>
@@ -221,8 +226,8 @@ global $fm_FileRoot;
 		}
 		?>
 
-		<?php /* DIV to prevent the "Upload into" fieldset from wrapping below the "Files to upload" box (on any browser), because padding/margin of the fieldset does not affect the width of the both boxes */ ?>
-			<p><?php echo T_('Files to upload') ?></p>
+			<div class="upload_title"><?php echo T_('Files to upload') ?></div>
+
 			<ul id="uploadfileinputs">
 				<?php
 					if( empty($failedFiles) )
@@ -253,7 +258,7 @@ global $fm_FileRoot;
 						?>
 
 						<label><?php echo T_('Choose a file'); ?>:</label>
-						<input name="uploadfile[]" size="20" type="file" /><br />
+						<input name="uploadfile[]" size="70" type="file" class="upload_file" /><br />
 
 						<?php
 						if( $UserSettings->get('fm_uploadwithproperties') )
@@ -289,34 +294,34 @@ global $fm_FileRoot;
 
 			<p class="uploadfileinputs"><a href="#" onclick="addAnotherFileInput(); return false;" class="small"><?php echo T_('Add another file'); ?></a></p>
 
-			<?php
-				$Form->buttons( array( array( 'submit', '', T_('Upload to server now'), 'ActionButton' ),
-																array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
-			?>
+			<div class="upload_foot">
+				<input type="submit" value="<?php echo format_to_output( T_('Upload to server now'), 'formvalue' ); ?>" class="ActionButton" >
+				<input type="reset" value="<?php echo format_to_output( T_('Reset'), 'formvalue' ); ?>" class="ResetButton">
 
-			<p class="note">
-				<?php
-				$restrictNotes = array();
+				<p class="note">
+					<?php
+					$restrictNotes = array();
 
-				// Get list of recognized file types (others are not allowed to get uploaded)
-				// dh> because FiletypeCache/DataObjectCache has no interface for getting a list, this dirty query seems less dirty to me.
-				$allowed_extensions = $DB->get_col( 'SELECT ftyp_extensions FROM T_filetypes WHERE ftyp_allowed != 0' );
-				$allowed_extensions = implode( ' ', $allowed_extensions ); // implode with space, ftyp_extensions can hold many, separated by space
-				// into array:
-				$allowed_extensions = preg_split( '~\s+~', $allowed_extensions, -1, PREG_SPLIT_NO_EMPTY );
-				// readable:
-				$allowed_extensions = implode_with_and($allowed_extensions);
+					// Get list of recognized file types (others are not allowed to get uploaded)
+					// dh> because FiletypeCache/DataObjectCache has no interface for getting a list, this dirty query seems less dirty to me.
+					$allowed_extensions = $DB->get_col( 'SELECT ftyp_extensions FROM T_filetypes WHERE ftyp_allowed != 0' );
+					$allowed_extensions = implode( ' ', $allowed_extensions ); // implode with space, ftyp_extensions can hold many, separated by space
+					// into array:
+					$allowed_extensions = preg_split( '~\s+~', $allowed_extensions, -1, PREG_SPLIT_NO_EMPTY );
+					// readable:
+					$allowed_extensions = implode_with_and($allowed_extensions);
 
-				$restrictNotes[] = '<strong>'.T_('Allowed file extensions').'</strong>: '.$allowed_extensions;
+					$restrictNotes[] = '<strong>'.T_('Allowed file extensions').'</strong>: '.$allowed_extensions;
 
-				if( $Settings->get( 'upload_maxkb' ) )
-				{ // We want to restrict on file size:
-					$restrictNotes[] = '<strong>'.T_('Maximum allowed file size').'</strong>: '.bytesreadable( $Settings->get( 'upload_maxkb' )*1024 );
-				}
+					if( $Settings->get( 'upload_maxkb' ) )
+					{ // We want to restrict on file size:
+						$restrictNotes[] = '<strong>'.T_('Maximum allowed file size').'</strong>: '.bytesreadable( $Settings->get( 'upload_maxkb' )*1024 );
+					}
 
-				echo implode( '<br />', $restrictNotes ).'<br />';
-				?>
-			</p>
+					echo implode( '<br />', $restrictNotes ).'<br />';
+					?>
+				</p>
+			</div>
 
 		</td>
 		</tr>
@@ -325,15 +330,18 @@ global $fm_FileRoot;
 
 <?php
 
-	$Form->end_form();
-
 	$Widget->disp_template_raw( 'block_end' );
+
+	$Form->end_form();
 
 	// End payload block:
 	$this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.4  2007/11/22 17:53:39  fplanque
+ * filemanager display cleanup, especially in IE (not perfect)
+ *
  * Revision 1.3  2007/11/01 05:27:31  fplanque
  * Upload screen refactoring - step 1
  *

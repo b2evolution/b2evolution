@@ -535,6 +535,18 @@ class Item extends ItemLight
 			return false;
 		}
 
+		$this->get_Blog();
+
+		if( $this->Blog->allowcomments == 'never')
+		{
+			return false;
+		}
+
+		if( $this->Blog->allowcomments == 'always')
+		{
+			return true;
+		}
+
 		if( $this->comment_status == 'disabled'  )
 		{ // Comments are disabled on this post
 			return false;
@@ -569,12 +581,6 @@ class Item extends ItemLight
 				echo $after_error;
 			}
 
-			return false;
-		}
-
-		$this->get_Blog();
-		if( $this->Blog->allowcomments == 'never')
-		{
 			return false;
 		}
 
@@ -3224,6 +3230,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.17  2007/11/22 17:53:39  fplanque
+ * filemanager display cleanup, especially in IE (not perfect)
+ *
  * Revision 1.16  2007/11/15 23:45:41  blueyed
  * (Re-)Added phpdoc for get_edit_link
  *
