@@ -152,7 +152,7 @@ class Form extends Widget
 		$this->form_method = $form_method;
 		$this->enctype = $enctype;
 
-		if( empty( $layout ) || $layout == 'split' || $layout == 'none' )
+		if( empty( $layout ) || $layout == 'split' || $layout == 'none' || $layout == 'fieldset' )
 		{
 			if( is_object($AdminUI) )
 			{ // Get default skin setting:
@@ -2817,6 +2817,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.18  2007/11/22 15:24:54  fplanque
+ * fix
+ *
  * Revision 1.17  2007/11/22 14:16:43  fplanque
  * antispam / banning cleanup
  *
