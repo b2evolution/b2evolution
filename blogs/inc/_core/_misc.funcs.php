@@ -64,6 +64,7 @@ load_funcs('files/model/_file.funcs.php');
  * Format a string/content for being output
  *
  * @author fplanque
+ * @todo htmlspecialchars() takes a charset argument, which we could provide ($evo_charset?)
  * @param string raw text
  * @param string format, can be one of the following
  * - raw: do nothing
@@ -119,8 +120,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'formvalue':
 			// use as a form value: escapes &, quotes and < > but leaves code alone
-			$content = htmlspecialchars( $content );           // Handles &, ", < and >
-			$content = str_replace("'", '&#039;', $content );  // Handles '
+			$content = htmlspecialchars( $content, ENT_QUOTES );  // Handles &, ", ', < and >
 			break;
 
 		case 'xml':
@@ -2975,6 +2975,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.9  2007/11/22 12:16:47  blueyed
+ * format_to_output(): use ENT_QUOTES for htmlspecialchars (format=formvalue)
+ *
  * Revision 1.8  2007/11/08 17:46:45  blueyed
  * doc
  *
