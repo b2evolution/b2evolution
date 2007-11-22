@@ -2330,7 +2330,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 
 	// fp> get this out
 	if( empty($redirect_to) )
-	{
+	{ // see if there's a redirect_to request param given (where & is encoded as &amp;):
 		$redirect_to = param( 'redirect_to', 'string', '' );
 
 		if( empty($redirect_to) )
@@ -2975,6 +2975,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.10  2007/11/22 13:24:46  fplanque
+ * no message
+ *
  * Revision 1.9  2007/11/22 12:16:47  blueyed
  * format_to_output(): use ENT_QUOTES for htmlspecialchars (format=formvalue)
  *
