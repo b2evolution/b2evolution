@@ -938,6 +938,26 @@ class AdminUI_general extends Widget
 				'sort_type' => 'basic'
 				);
 
+			case 'blockspan_form':
+				// blockspan Form settings:
+				return array(
+					'layout' => 'blockspan',		// Temporary dirty hack
+					'formstart' => '',
+					'title_fmt' => '$title$'."\n", // TODO: icons
+					'no_title_fmt' => '',          //           "
+					'fieldstart' => '<span class="block" $ID$>',
+					'labelstart' => '',
+					'labelend' => "\n",
+					'labelempty' => '',
+					'inputstart' => '',
+					'infostart' => '',
+					'inputend' => "\n",
+					'fieldend' => '</span>'.get_icon( 'pixel' )."\n",
+					'buttonsstart' => '',
+					'buttonsend' => "\n",
+					'formend' => '',
+				);
+
 			case 'compact_form':
 			case 'Form':
 				// Default Form settings:
@@ -1598,6 +1618,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.73  2007/11/22 14:16:43  fplanque
+ * antispam / banning cleanup
+ *
  * Revision 1.72  2007/11/02 02:37:37  fplanque
  * refactored blog settings / UI
  *

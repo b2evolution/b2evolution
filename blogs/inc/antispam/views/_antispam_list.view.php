@@ -31,11 +31,11 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 { // add keyword or domain
 	global $keyword;
 
-	$Form = & new Form( NULL, 'antispam_add', 'post', '' );
-	$Form->begin_form('fform');
+	$Form = & new Form( NULL, 'antispam_add', 'post', 'compact' );
+	$Form->begin_form( 'fform', T_('Add a banned keyword') );
 		$Form->hidden_ctrl();
 		$Form->hidden( 'action', 'ban' );
-		$Form->text( 'keyword', $keyword, 30, T_('Add a banned keyword'), '', 80 ); // TODO: add note
+		$Form->text( 'keyword', $keyword, 50, T_('Keyword/phrase to ban'), '', 80 ); // TODO: add note
 		/*
 		 * TODO: explicitly add a domain?
 		 * $add_Form->text( 'domain', $domain, 30, T_('Add a banned domain'), 'note..', 80 ); // TODO: add note
@@ -182,6 +182,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.2  2007/11/22 14:16:43  fplanque
+ * antispam / banning cleanup
+ *
  * Revision 1.1  2007/09/04 14:56:19  fplanque
  * antispam cleanup
  *

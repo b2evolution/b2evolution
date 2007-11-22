@@ -24,7 +24,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $keyword, $report_abuse;
 
-$Form = & new Form( NULL, 'antispam_ban' );
+global $row_stats;	// for hit functions
+
+$Form = & new Form( NULL, 'antispam_ban', 'post', 'compact' );
 
 $Form->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
 
@@ -35,6 +37,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	$Form->hidden( 'confirm', 'confirm' );
 
 	// Check for junk:
+
 	// Check for potentially affected logged hits:
 	$sql = 'SELECT hit_ID, UNIX_TIMESTAMP(hit_datetime) as hit_datetime, hit_uri, hit_referer, dom_name,
 									hit_blog_ID, hit_remote_addr, blog_shortname
@@ -60,7 +63,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 		<table class="grouped" cellspacing="0">
 			<thead>
 			<tr>
-				<th><?php echo T_('Date') ?></th>
+				<th class="firstcol"><?php echo T_('Date') ?></th>
 				<th><?php echo T_('Referer') ?></th>
 				<th><?php echo T_('Ref. IP') ?></th>
 				<th><?php echo T_('Target Blog') ?></th>
@@ -73,7 +76,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 			foreach( $res_affected_hits as $row_stats )
 			{
 				?>
-				<tr <?php if($count%2 == 1) echo 'class="odd"' ?>>
+				<tr class="<?php echo ($count%2 == 1) ? 'odd' : 'even' ?>">
 					<td class="firstcol"><?php stats_time() ?></td>
 					<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 					<td><?php stats_hit_remote_addr() ?></td>
@@ -115,7 +118,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 		<table class="grouped" cellspacing="0">
 			<thead>
 			<tr>
-				<th><?php echo T_('Date') ?></th>
+				<th class="firstcol"><?php echo T_('Date') ?></th>
 				<th><?php echo T_('Author') ?></th>
 				<th><?php echo T_('Auth. URL') ?></th>
 				<th><?php echo T_('Auth. IP') ?></th>
@@ -128,7 +131,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 			foreach( $res_affected_comments as $row_stats )
 			{ // TODO: new Comment( $row_stats )
 				?>
-				<tr <?php if($count%2 == 1) echo 'class="odd"' ?>>
+				<tr class="<?php echo ($count%2 == 1) ? 'odd' : 'even' ?>">
 				<td class="firstcol"><?php echo mysql2date(locale_datefmt().' '.locale_timefmt(), $row_stats['comment_date'] ); ?></td>
 				<td><?php echo $row_stats['comment_author'] ?></a></td>
 				<td><?php echo $row_stats['comment_author_url'] ?></td>
@@ -190,8 +193,23 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 
 $Form->end_form();
 
+
+$Form = & new Form( NULL, 'antispam_add', 'post', 'compact' );
+$Form->begin_form( 'fform', T_('Add a banned keyword') );
+	$Form->hidden_ctrl();
+	$Form->hidden( 'action', 'ban' );
+	$Form->text( 'keyword', $keyword, 50, T_('Keyword/phrase to ban'), '', 80 ); // TODO: add note
+	/*
+	 * TODO: explicitly add a domain?
+	 * $add_Form->text( 'domain', $domain, 30, T_('Add a banned domain'), 'note..', 80 ); // TODO: add note
+	 */
+$Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveButton' ) ) );
+
 /*
  * $Log$
+ * Revision 1.2  2007/11/22 14:16:43  fplanque
+ * antispam / banning cleanup
+ *
  * Revision 1.1  2007/09/04 14:56:19  fplanque
  * antispam cleanup
  *

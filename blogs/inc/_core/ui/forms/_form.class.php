@@ -152,7 +152,7 @@ class Form extends Widget
 		$this->form_method = $form_method;
 		$this->enctype = $enctype;
 
-		if( is_null( $layout ) || $layout == 'split' || $layout == 'none' )
+		if( empty( $layout ) || $layout == 'split' || $layout == 'none' )
 		{
 			if( is_object($AdminUI) )
 			{ // Get default skin setting:
@@ -160,38 +160,34 @@ class Form extends Widget
 				$layout = $template['layout'];
 			}
 			else
-			{	// This happens for comment forms for example...
+			{	// This happens for comment forms & login screen for example...
+				$template = array(
+					'layout' => 'fieldset',
+					'formstart' => '<div>',// required before (no_)title_fmt for validation
+					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
+					'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
+															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
+					'fieldset_end' => '</fieldset>'."\n",
+					'fieldstart' => '<fieldset $ID$>'."\n",
+					'labelstart' => '<div class="label">',
+					'labelend' => "</div>\n",
+					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
+					'inputstart' => '<div class="input">',
+					'infostart' => '<div class="info">',
+					'inputend' => "</div>\n",
+					'fieldend' => "</fieldset>\n\n",
+					'buttonsstart' => '<fieldset><div class="input">',
+					'buttonsend' => "</div></fieldset>\n\n",
+					'formend' => '</div>',
+				);
 				$layout = 'fieldset';
 			}
 		}
-		elseif( $layout == 'compact' )
+		else
 		{
-			$template = $AdminUI->get_template( 'compact_form' );
+			$template = $AdminUI->get_template( $layout.'_form' );
 			$layout = $template['layout'];
-		}
-
-		if( !isset($template) && $layout == 'fieldset' )
-		{	// happens on login screen and after $layout setting above
-			$template = array(
-				'layout' => 'fieldset',
-				'formstart' => '<div>',// required before (no_)title_fmt for validation
-				'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
-				'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
-				'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
-														.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
-				'fieldset_end' => '</fieldset>'."\n",
-				'fieldstart' => '<fieldset $ID$>'."\n",
-				'labelstart' => '<div class="label">',
-				'labelend' => "</div>\n",
-				'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
-				'inputstart' => '<div class="input">',
-				'infostart' => '<div class="info">',
-				'inputend' => "</div>\n",
-				'fieldend' => "</fieldset>\n\n",
-				'buttonsstart' => '<fieldset><div class="input">',
-				'buttonsend' => "</div></fieldset>\n\n",
-				'formend' => '</div>',
-			);
 		}
 
 		$this->saved_layouts = array($layout);
@@ -2821,6 +2817,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.17  2007/11/22 14:16:43  fplanque
+ * antispam / banning cleanup
+ *
  * Revision 1.16  2007/11/02 02:39:57  fplanque
  * refactored blog settings / UI
  *

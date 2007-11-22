@@ -277,7 +277,7 @@ class AdminUI extends AdminUI_general
 
 
 			case 'compact_form':
-				// Default Form settings:
+				// Compact Form settings:
 				return array(
 					'layout' => 'chicago',		// Temporary dirty hack
 					'formstart' => '<div class="fieldset_title"><div class="fieldset_title_right">',
