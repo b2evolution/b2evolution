@@ -1944,8 +1944,9 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word
  */
 function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legend = false )
 {
-	global $basepath, $admin_subdir, $baseurl, $Debuglog,	$IconLegend, $use_strict;
+	global $admin_subdir, $Debuglog, $IconLegend, $use_strict;
 	global $conf_path;
+	global $rsc_path, $rsc_url;
 
 	if( ! function_exists('get_icon_info') )
 	{
@@ -1970,7 +1971,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 
 		case 'file':
-			return $basepath.$icon['file'];
+			return $rsc_path.$icon['file'];
 			/* BREAK */
 
 
@@ -2015,7 +2016,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			/* BREAK */
 
 		case 'url':
-			return $baseurl.$icon['file'];
+			return $rsc_url.$icon['file'];
 			/* BREAK */
 
 		case 'size':
@@ -2023,7 +2024,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			{
 				$Debuglog->add( 'No iconsize for ['.$iconKey.']', 'icons' );
 
-				$icon['size'] = imgsize( $icon['file'] );
+				$icon['size'] = imgsize( $rsc_path.$icon['file'] );
 			}
 
 			switch( $params['size'] )
@@ -2050,7 +2051,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 
 		case 'imgtag':
-			$r = '<img src="'.$baseurl.$icon['file'].'" ';
+			$r = '<img src="'.$rsc_url.$icon['file'].'" ';
 
 			if( !$use_strict )
 			{	// Include non CSS fallbacks - transitional only:
@@ -2107,7 +2108,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 		case 'noimg':
 			$blank_icon = get_icon_info('pixel');
 
-			$r = '<img src="'.$baseurl.$blank_icon['file'].'" ';
+			$r = '<img src="'.$rsc_url.$blank_icon['file'].'" ';
 
 			// Include non CSS fallbacks:
 			$r .= 'border="0" align="top" ';
@@ -2975,6 +2976,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.11  2007/11/22 22:53:14  blueyed
+ * get_icon_info(): relative to $rsc_url/$rsc_path (instead of $rsc_subdir)
+ *
  * Revision 1.10  2007/11/22 13:24:46  fplanque
  * no message
  *
