@@ -2331,7 +2331,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 
 	// fp> get this out
 	if( empty($redirect_to) )
-	{ // see if there's a redirect_to request param given (where & is encoded as &amp;):
+	{ // see if there's a redirect_to request param given:
 		$redirect_to = param( 'redirect_to', 'string', '' );
 
 		if( empty($redirect_to) )
@@ -2976,6 +2976,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.12  2007/11/23 14:54:31  fplanque
+ * no message
+ *
  * Revision 1.11  2007/11/22 22:53:14  blueyed
  * get_icon_info(): relative to $rsc_url/$rsc_path (instead of $rsc_subdir)
  *
