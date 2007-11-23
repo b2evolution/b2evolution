@@ -1770,19 +1770,18 @@ function metawebloggetrecentposts( $m )
 	global $blog;
 
 	$blog_ID = $m->getParam(0);
-		logIO("O","In metawebloggetrecentposts, current blog_id is ...". $blog_ID);
 	$blog_ID = $blog_ID->scalarval();
-			logIO("O","In metawebloggetrecentposts, current blog_id is ...". $blog_ID);
+	logIO("O","In metawebloggetrecentposts, current blog_id is ...". $blog_ID);
+
 	$username = $m->getParam(1);
-		logIO("O","In metawebloggetrecentposts, current username is ...". $username);
 	$username = $username->scalarval();
-			logIO("O","In metawebloggetrecentposts, current username is ...". $username);
+	logIO("O","In metawebloggetrecentposts, current username is ...". $username);
+
 	$password = $m->getParam(2);
 	$password = $password->scalarval();
 	$numposts = $m->getParam(3);
-			logIO("O","In metawebloggetrecentposts, current numposts is ...". $numposts);
 	$numposts = $numposts->scalarval();
-				logIO("O","In metawebloggetrecentposts, current numposts is ...". $numposts);
+	logIO("O","In metawebloggetrecentposts, current numposts is ...". $numposts);
 
 	if( ! user_pass_ok($username, $password) )
 	{
@@ -2240,6 +2239,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.140  2007/11/23 09:55:04  blueyed
+ * Fix "Catchable fatal error" in metawebloggetrecentposts()
+ *
  * Revision 1.139  2007/06/27 02:23:32  fplanque
  * new default template for skins named index.main.php
  *
