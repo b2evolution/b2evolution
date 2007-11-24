@@ -507,6 +507,12 @@ div.bSideItem {
 	text-align: right;
         padding-left: 1em; /* do not pad on text in .bSmallHead */
 }
+.bSmallPrint {
+	border-top: 1px solid #becdd6;
+	font-size: 85%;
+	padding: 1ex;
+	color: #929292;
+}
 
 div.bComment, /* Entire comment block */
 form.bComment /* New comment form */
