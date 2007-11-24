@@ -67,7 +67,8 @@ $log_app_errors = 1;
 /**
  * Demo mode
  *  - Do not allow update of files in the file manager
- *  - don't allow changes to the 'demouser' and 'admin' account/group
+ *  - Do not allow changes to the 'demouser' and 'admin' account/group
+ *  - Blog media directories can only be configured to be inside of {@link $media_path}
  * @global boolean Default: false
  */
 $demo_mode = false;

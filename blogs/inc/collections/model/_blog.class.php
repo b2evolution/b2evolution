@@ -511,6 +511,7 @@ class Blog extends DataObject
 				switch( $this->get( 'media_location' ) )
 				{
 					case 'custom': // custom path and URL
+						global $demo_mode, $media_path;
 						if( $this->get( 'media_fullpath' ) == '' )
 						{
 							param_error( 'blog_media_fullpath', T_('Media dir location').': '.T_('You must provide the full path of the media directory.') );
@@ -520,12 +521,37 @@ class Blog extends DataObject
 							param_error( 'blog_media_url', T_('Media dir location').': '
 															.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!') );
 						}
+						if( $demo_mode )
+						{
+							if( strpos($this->get('media_fullpath'), $media_path) !== 0 )
+							{
+								param_error( 'blog_media_fullpath', T_('Media dir location').': in demo mode the path must be inside of $media_path.' );
+							}
+						}
 						break;
 
 					case 'subdir':
+						global $media_path;
 						if( $this->get( 'media_subdir' ) == '' )
 						{
 							param_error( 'blog_media_subdir', T_('Media dir location').': '.T_('You must provide the media subdirectory.') );
+						}
+						else
+						{ // Test if it's below $media_path (subdir!)
+							$canonical_path = get_canonical_path($media_path.$this->get( 'media_subdir' ));
+							if( strpos($canonical_path, $media_path) !== 0 )
+							{
+								param_error( 'blog_media_subdir', T_('Media dir location').': '.sprintf(T_('Invalid subdirectory &laquo;%s&raquo;.'), format_to_output($this->get('media_subdir'))) );
+							}
+							else
+							{
+								// Validate if it's a valid directory name:
+								$subdir = substr($canonical_path, strlen($media_path));
+								if( $error = validate_dirname($subdir) )
+								{
+									param_error( 'blog_media_subdir', T_('Media dir location').': '.$error );
+								}
+							}
 						}
 						break;
 				}
@@ -1494,6 +1520,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2007/11/24 18:35:55  blueyed
+ * - demo_mode: Blog media directories can only be configured to be inside of {@link $media_path}
+ * - check that blog media subdirs are valid (sub)directories
+ *
  * Revision 1.15  2007/11/24 17:24:50  blueyed
  * Add $media_path
  *
