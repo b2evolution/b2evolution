@@ -233,7 +233,18 @@ while( $Item = & $ItemList->get_item() )
 					$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
 				?>
 			</div>
+
 		</div>
+
+		<?php
+			// List all tags attached to this post:
+			$Item->tags( array(
+					'url' =>            regenerate_url( 'tag' ),
+					'before' =>         '<div class="bSmallPrint">'.T_('Tags').': ',
+					'after' =>          '</div>',
+					'separator' =>      ', ',
+				) );
+		?>
 
 		<div class="PostActionsArea">
 			<?php
@@ -389,6 +400,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.10  2007/11/24 21:24:14  fplanque
+ * display tags in backoffice
+ *
  * Revision 1.9  2007/11/04 01:10:57  fplanque
  * skin cleanup continued
  *

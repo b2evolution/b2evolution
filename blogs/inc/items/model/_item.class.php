@@ -2197,6 +2197,7 @@ class Item extends ItemLight
 				'after' =>            '</div>',
 				'separator' =>        ', ',
 				'links' =>            true,
+				'url' =>              '#',
 			), $params );
 
 		$tags = $this->get_tags();
@@ -2207,8 +2208,13 @@ class Item extends ItemLight
 
 			if( $links = $params['links'] )
 			{
-				$this->get_Blog();
-				$tag_view_url = url_add_param( $this->Blog->gen_blogurl(), 'tag=' );
+				$tag_view_url = $params['url'];
+				if( $tag_view_url == '#' )
+				{
+					$this->get_Blog();
+					$tag_view_url = $this->Blog->gen_blogurl();
+				}
+				$tag_view_url = url_add_param( $tag_view_url, 'tag=' );
 			}
 
 			$i = 0;
@@ -3230,6 +3236,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.18  2007/11/24 21:24:14  fplanque
+ * display tags in backoffice
+ *
  * Revision 1.17  2007/11/22 17:53:39  fplanque
  * filemanager display cleanup, especially in IE (not perfect)
  *
