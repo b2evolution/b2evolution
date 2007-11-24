@@ -185,7 +185,8 @@ $Form->end_form();
 					// We then hash with the salt using SHA1 (fp> can't we do that with md5 again, in order to load 1 less Javascript library?)
 					// NOTE: MD5 is kind of "weak" and therefor we also use SHA1
 					form.pwd_hashed.value = hex_sha1( hex_md5(form.pwd.value) + form.pwd_salt.value );
-					form.pwd.value = "hashed_<?php echo $Session->ID /* to detect cookie problems */ ?>";
+					form.pwd.value = "padding_padding_padding_padding_padding_padding_hashed_<?php echo $Session->ID /* to detect cookie problems */ ?>";
+					// (paddings to make it look like encryption on screen. When the string changes to just one more or one less *, it looks like the browser is changing the password on the fly)
 				}
 				return true;
 			}, false );
@@ -219,6 +220,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.3  2007/11/24 21:25:40  fplanque
+ * make password encryption look like encryption
+ *
  * Revision 1.2  2007/06/30 22:03:34  fplanque
  * cleanup
  *

@@ -448,7 +448,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 				if( empty($pwd_salt_sess) )
 				{ // no salt stored in session: either cookie problem or the user had already tried logging in (from another window for example)
 					$Debuglog->add( 'Empty salt_sess!', 'login' );
-					if( substr($pass, 0, 7) == 'hashed_' && substr($pass, 7) == $Session->ID )
+					if( ($pos = strpos( $pass, '_hashed_' ) ) && substr($pass, $pos+8) == $Session->ID )
 					{ // session ID matches, no cookie problem
 						$Messages->add( T_('The login window has expired. Please try again.'), 'login_error' );
 						$Debuglog->add( 'Session ID matches.', 'login' );
@@ -635,6 +635,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.83  2007/11/24 21:25:40  fplanque
+ * make password encryption look like encryption
+ *
  * Revision 1.82  2007/07/01 18:47:11  fplanque
  * fixes
  *
