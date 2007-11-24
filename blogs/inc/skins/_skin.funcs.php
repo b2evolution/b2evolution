@@ -43,6 +43,7 @@ function skin_init( $disp )
 	global $Blog;
 
 	global $robots_index;
+	global $seo_page_type;
 
 	global $redir, $ReqHost, $ReqURI;
 
@@ -70,8 +71,18 @@ function skin_init( $disp )
 	}
 
 	// SEO stuff:
+	$seo_page_type = NULL;
 	switch( $disp )
 	{
+		// CONTENT PAGES:
+		case 'single':
+			$seo_page_type = 'Single post page';
+			break;
+
+		case 'page':
+			$seo_page_type = '"Page" page';
+			break;
+
 		case 'posts':
 			// Get list of active filters:
 			$active_filters = $MainList->get_active_filters();
@@ -81,6 +92,7 @@ function skin_init( $disp )
 
 				if( array_diff( $active_filters, array( 'page' ) ) == array() )
 				{ // This is just a follow "paged" page
+					$seo_page_type = 'Next page';
 					if( $Blog->get_setting( 'paged_noindex' ) )
 					{	// We prefer robots not to index category pages:
 						$robots_index = false;
@@ -88,6 +100,7 @@ function skin_init( $disp )
 				}
 				elseif( array_diff( $active_filters, array( 'cat_array', 'cat_modifier', 'cat_focus' ) ) == array() )
 				{ // This is a category home page (note: subsequent pages are a different story)
+					$seo_page_type = 'Category page';
 					if( $Blog->get_setting( 'category_noindex' ) )
 					{	// We prefer robots not to index category pages:
 						$robots_index = false;
@@ -120,9 +133,18 @@ function skin_init( $disp )
 
 					}
 				}
+				elseif( array_diff( $active_filters, array( 'tags' ) ) == array() )
+				{ // This is a tag page
+					$seo_page_type = 'Tag page';
+					if( $Blog->get_setting( 'tag_noindex' ) )
+					{	// We prefer robots not to index tag pages:
+						$robots_index = false;
+					}
+				}
 				elseif( array_diff( $active_filters, array( 'ymdhms', 'week', 'page' ) ) == array() )
 				{ // This is an archive page
 					// echo 'archive page';
+					$seo_page_type = 'Date archive page';
 					if( $Blog->get_setting( 'archive_noindex' ) )
 					{	// We prefer robots not to index archive pages:
 						$robots_index = false;
@@ -130,6 +152,7 @@ function skin_init( $disp )
 				}
 				else
 				{	// Other filtered pages:
+					$seo_page_type = 'Other filtered page';
 					if( $Blog->get_setting( 'filtered_noindex' ) )
 					{	// We prefer robots not to index other filtered pages:
 						$robots_index = false;
@@ -138,6 +161,7 @@ function skin_init( $disp )
 			}
 			else
 			{	// This is the default blog page
+				$seo_page_type = 'Default page';
 				if( $Blog->get_setting( 'default_noindex' ) )
 				{	// We prefer robots not to index archive pages:
 					$robots_index = false;
@@ -146,10 +170,33 @@ function skin_init( $disp )
 
 			break;
 
+		// SPECIAL FEATURE PAGES:
 		case 'feedback-popup':
+			$seo_page_type = 'Comment popup';
+			if( $Blog->get_setting( $disp.'_noindex' ) )
+			{	// We prefer robots not to index these pages:
+				$robots_index = false;
+			}
+			break;
+
 		case 'arcdir':
+			$seo_page_type = 'Date archive directory';
+			if( $Blog->get_setting( $disp.'_noindex' ) )
+			{	// We prefer robots not to index these pages:
+				$robots_index = false;
+			}
+			break;
+
 		case 'catdir':
+			$seo_page_type = 'Category directory';
+			if( $Blog->get_setting( $disp.'_noindex' ) )
+			{	// We prefer robots not to index these pages:
+				$robots_index = false;
+			}
+			break;
+
 		case 'msgform':
+			$seo_page_type = 'Contact form';
 			if( $Blog->get_setting( $disp.'_noindex' ) )
 			{	// We prefer robots not to index these pages:
 				$robots_index = false;
@@ -158,6 +205,7 @@ function skin_init( $disp )
 
 		case 'profile':
 		case 'subs':
+			$seo_page_type = 'Special feature page';
 			if( $Blog->get_setting( 'special_noindex' ) )
 			{	// We prefer robots not to index these pages:
 				$robots_index = false;
@@ -417,6 +465,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.15  2007/11/24 21:41:12  fplanque
+ * additional SEO settings
+ *
  * Revision 1.14  2007/11/02 02:41:25  fplanque
  * refactored blog settings / UI
  *

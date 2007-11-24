@@ -78,6 +78,8 @@ global $Debuglog;
 
 global $blog, $tab;
 
+global $preset;
+
 $Form = new Form();
 
 $Form->begin_form( 'fform' );
@@ -186,6 +188,32 @@ $Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']' );
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('URL Presets') );
+	$Form->info_field( T_('Available presets'),
+													'<a href="?ctrl=coll_settings&amp;tab=urls&amp;blog='.$edited_Blog->ID.'&amp;preset=awall">Aaron Wall</a>'
+											.' | <a href="?ctrl=coll_settings&amp;tab=urls&amp;blog='.$edited_Blog->ID.'&amp;preset=sspencer">Stephan Spencer</a>' );
+	switch( $preset )
+	{
+		case 'awall':
+			$seo_author = '<a href="http://www.seobook.com/" target="_blank">Aaron Wall</a>';
+			$seo_site = '<a href="http://www.seobook.com/" target="_blank">SEO Book</a>';
+			break;
+
+		case 'sspencer':
+			$seo_author = '<a href="http://www.stephanspencer.com/" target="_blank">Stephan Spencer</a>';
+			$seo_site = '<a href="http://www.netconcepts.com/" target="_blank">NetConcepts</a>';
+			break;
+	}
+
+	if( !empty($seo_author) )
+	{
+	 	$Form->info_field( T_('Selected presets'),
+			sprintf( T_('You can review the URL settings recommended by <strong>%s</strong> below. Click the "Save!" button to apply these settings. For more advanced optimization, visit <strong>%s</strong>.'),
+								$seo_author, $seo_site ) );
+	}
+$Form->end_fieldset();
+
+
 $Form->begin_fieldset( T_('Archive URLs') );
 
 	$Form->radio( 'archive_links', $edited_Blog->get_setting('archive_links'),
@@ -257,6 +285,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.10  2007/11/24 21:41:12  fplanque
+ * additional SEO settings
+ *
  * Revision 1.9  2007/11/03 04:56:03  fplanque
  * permalink / title links cleanup
  *

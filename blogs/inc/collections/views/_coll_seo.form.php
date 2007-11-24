@@ -25,6 +25,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Blog;
 
+global $preset;
 
 $Form = & new Form( NULL, 'coll_features_checkchanges' );
 
@@ -35,6 +36,31 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'seo' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
+$Form->begin_fieldset( T_('SEO Presets') );
+	$Form->info_field( T_('Available presets'),
+													'<a href="?ctrl=coll_settings&amp;tab=seo&amp;blog='.$edited_Blog->ID.'&amp;preset=awall">Aaron Wall</a>'
+											.' | <a href="?ctrl=coll_settings&amp;tab=seo&amp;blog='.$edited_Blog->ID.'&amp;preset=sspencer">Stephan Spencer</a>' );
+	switch( $preset )
+	{
+		case 'awall':
+			$seo_author = '<a href="http://www.seobook.com/" target="_blank">Aaron Wall</a>';
+			$seo_site = '<a href="http://www.seobook.com/" target="_blank">SEO Book</a>';
+			break;
+
+		case 'sspencer':
+			$seo_author = '<a href="http://www.stephanspencer.com/" target="_blank">Stephan Spencer</a>';
+			$seo_site = '<a href="http://www.netconcepts.com/" target="_blank">NetConcepts</a>';
+			break;
+	}
+
+	if( !empty($seo_author) )
+	{
+	 	$Form->info_field( T_('Selected presets'),
+			sprintf( T_('You can review the SEO settings recommended by <strong>%s</strong> below. Click the "Save!" button to apply these settings. For more advanced optimization, visit <strong>%s</strong>.'),
+								$seo_author, $seo_site ) );
+	}
+$Form->end_fieldset();
+
 $Form->begin_fieldset( T_('Canonical URL control').get_manual_link('canonical_url_control') );
 	$Form->checkbox( 'canonical_item_urls', $edited_Blog->get_setting( 'canonical_item_urls' ), T_('Posts / Pages'), T_('301 redirect to canonical URL') );
 	$Form->checkbox( 'canonical_cat_urls', $edited_Blog->get_setting( 'canonical_cat_urls' ), T_('Categories'), T_('301 redirect to canonical URL') );
@@ -42,17 +68,19 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Indexing of content pages') );
 	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Default blog page'), T_('META NOINDEX') );
-	$Form->checkbox( 'paged_noindex', $edited_Blog->get_setting( 'paged_noindex' ), T_('Following blog pages'), T_('META NOINDEX').' - '.T_('Page 2,3,4...') );
-	$Form->checkbox( 'archive_noindex', $edited_Blog->get_setting( 'archive_noindex' ), T_('Archive pages'), T_('META NOINDEX') );
+	$Form->checkbox( 'paged_noindex', $edited_Blog->get_setting( 'paged_noindex' ), T_('"Next" blog pages'), T_('META NOINDEX').' - '.T_('Page 2,3,4...') );
+	$Form->checkbox( 'paged_nofollowto', $edited_Blog->get_setting( 'paged_nofollowto' ), '', T_('NOFOLLOW on links to').' '.T_('Page 2,3,4...') );
+	$Form->checkbox( 'archive_noindex', $edited_Blog->get_setting( 'archive_noindex' ), T_('"By date" archive pages'), T_('META NOINDEX') );
 	$Form->checkbox( 'category_noindex', $edited_Blog->get_setting( 'category_noindex' ), T_('Category pages'), T_('META NOINDEX') );
-	$Form->checkbox( 'filtered_noindex', $edited_Blog->get_setting( 'filtered_noindex' ), T_('Other filtered pages'), T_('META NOINDEX') );
+	$Form->checkbox( 'tag_noindex', $edited_Blog->get_setting( 'tag_noindex' ), T_('Tag pages'), T_('META NOINDEX') );
+	$Form->checkbox( 'filtered_noindex', $edited_Blog->get_setting( 'filtered_noindex' ), T_('Other filtered pages'), T_('META NOINDEX').' - '.T_('Keyword searched, etc.') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Indexing of special feature pages') );
 	$Form->checkbox( 'arcdir_noindex', $edited_Blog->get_setting( 'arcdir_noindex' ), T_('Archive directory'), T_('META NOINDEX') );
 	$Form->checkbox( 'catdir_noindex', $edited_Blog->get_setting( 'catdir_noindex' ), T_('Category directory'), T_('META NOINDEX') );
 	$Form->checkbox( 'feedback-popup_noindex', $edited_Blog->get_setting( 'feedback-popup_noindex' ), T_('Comment popups'), T_('META NOINDEX') );
-	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), T_('Message forms'), T_('META NOINDEX').' - '.T_('Keyword searched, etc.') );
+	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), T_('Contact forms'), T_('META NOINDEX') );
 	$Form->checkbox( 'special_noindex', $edited_Blog->get_setting( 'special_noindex' ), T_('Other special pages'), T_('META NOINDEX').' - '.T_('User profile form, etc.') );
 $Form->end_fieldset();
 
@@ -78,6 +106,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.4  2007/11/24 21:41:12  fplanque
+ * additional SEO settings
+ *
  * Revision 1.3  2007/11/03 04:56:03  fplanque
  * permalink / title links cleanup
  *

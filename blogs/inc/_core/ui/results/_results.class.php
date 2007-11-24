@@ -232,6 +232,11 @@ class Results extends Table
 	var $functions_area;
 
 
+  /**
+	 * Should there be nofollows on page navigation
+	 */
+	var $nofollow_pagenav = false;
+
 	/**
 	 * Constructor
 	 *
@@ -1663,13 +1668,13 @@ class Results extends Table
 		switch( $matches[1] )
 		{
 			case 'start' :
-				//total number of rows in the sql query
-				return  ( ($this->page-1)*$this->limit+1 );
+				return ( ($this->page-1)*$this->limit+1 );
 
 			case 'end' :
 				return ( min( $this->total_rows, $this->page*$this->limit ) );
 
 			case 'total_rows' :
+				//total number of rows in the sql query
 				return ( $this->total_rows );
 
 			case 'page' :
@@ -1681,20 +1686,34 @@ class Results extends Table
 				return ( $this->total_pages );
 
 			case 'prev' :
-				//inits the link to previous page
-				return ( $this->page > 1 )
-					? '<a href="'
-						.regenerate_url( $this->page_param, $this->page_param.'='.($this->page-1), $this->params['page_url'] )
-						.'">'.$this->params['prev_text'].'</a>'
-					: $this->params['no_prev_text'];
+				// inits the link to previous page
+				if ( $this->page <= 1 )
+				{
+					return $this->params['no_prev_text'];
+				}
+				$r = '<a href="'
+						.regenerate_url( $this->page_param, $this->page_param.'='.($this->page-1), $this->params['page_url'] ).'"';
+				if( $this->nofollow_pagenav )
+				{	// We want to NOFOLLOW page navigation
+					$r .= ' rel="nofollow"';
+				}
+				$r .= '>'.$this->params['prev_text'].'</a>';
+				return $r;
 
 			case 'next' :
-				//inits the link to next page
-				return ( $this->page < $this->total_pages )
-					? '<a href="'
-						.regenerate_url( $this->page_param, $this->page_param.'='.($this->page+1), $this->params['page_url'] )
-						.'">'.$this->params['next_text'].'</a>'
-					: $this->params['no_next_text'];
+				// inits the link to next page
+				if( $this->page >= $this->total_pages )
+				{
+					return $this->params['no_next_text'];
+				}
+				$r = '<a href="'
+						.regenerate_url( $this->page_param, $this->page_param.'='.($this->page+1), $this->params['page_url'] ).'"';
+				if( $this->nofollow_pagenav )
+				{	// We want to NOFOLLOW page navigation
+					$r .= ' rel="nofollow"';
+				}
+				$r .= '>'.$this->params['next_text'].'</a>';
+				return $r;
 
 			case 'list' :
 				//inits the page list
@@ -1838,8 +1857,12 @@ class Results extends Table
 			else
 			{ //a link for non-current pages
 				$list .= '<a href="'
-					.regenerate_url( $this->page_param, $this->page_param.'='.$i, $page_url )
-					.'">'.$i.'</a> ';
+					.regenerate_url( $this->page_param, $this->page_param.'='.$i, $page_url ).'"';
+				if( $this->nofollow_pagenav )
+				{	// We want to NOFOLLOW page navigation
+					$list .=  ' rel="nofollow"';
+				}
+				$list .= '>'.$i.'</a> ';
 			}
 		}
 		return $list;
@@ -1970,6 +1993,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.5  2007/11/24 21:41:12  fplanque
+ * additional SEO settings
+ *
  * Revision 1.4  2007/11/03 21:04:26  fplanque
  * skin cleanup
  *

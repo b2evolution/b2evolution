@@ -386,8 +386,10 @@ class Blog extends DataObject
 			$this->set_setting( 'canonical_cat_urls',  param( 'canonical_cat_urls', 'integer', 0 ) );
 			$this->set_setting( 'default_noindex',  param( 'default_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_noindex',  param( 'paged_noindex', 'integer', 0 ) );
+			$this->set_setting( 'paged_nofollowto',  param( 'paged_nofollowto', 'integer', 0 ) );
 			$this->set_setting( 'archive_noindex',  param( 'archive_noindex', 'integer', 0 ) );
 			$this->set_setting( 'category_noindex',  param( 'category_noindex', 'integer', 0 ) );
+			$this->set_setting( 'tag_noindex',  param( 'tag_noindex', 'integer', 0 ) );
 			$this->set_setting( 'filtered_noindex',  param( 'filtered_noindex', 'integer', 0 ) );
 			$this->set_setting( 'arcdir_noindex',  param( 'arcdir_noindex', 'integer', 0 ) );
 			$this->set_setting( 'catdir_noindex',  param( 'catdir_noindex', 'integer', 0 ) );
@@ -1520,6 +1522,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2007/11/24 21:41:12  fplanque
+ * additional SEO settings
+ *
  * Revision 1.16  2007/11/24 18:35:55  blueyed
  * - demo_mode: Blog media directories can only be configured to be inside of {@link $media_path}
  * - check that blog media subdirs are valid (sub)directories

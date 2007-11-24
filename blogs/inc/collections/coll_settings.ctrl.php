@@ -89,8 +89,79 @@ switch( $action )
 		// Edit collection form (depending on tab):
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
-		break;
 
+		param( 'preset', 'string', '' );
+
+		switch( $tab )
+		{
+			case 'urls':
+				switch( $preset )
+				{
+					case 'awall':
+						$edited_Blog->set_setting( 'archive_links', 'extrapath' );
+						$edited_Blog->set_setting( 'chapter_links', 'chapters' );
+						$edited_Blog->set_setting( 'single_links', 'ymd' );
+						break;
+
+					case 'sspencer':
+						$edited_Blog->set_setting( 'archive_links', 'extrapath' );
+						$edited_Blog->set_setting( 'chapter_links', 'chapters' );
+						$edited_Blog->set_setting( 'single_links', 'chapters' );
+						break;
+				}
+				break;
+
+			case 'seo':
+				switch( $preset )
+				{
+					case 'awall':
+						$edited_Blog->set_setting( 'canonical_item_urls', 1 );
+						$edited_Blog->set_setting( 'canonical_cat_urls', 1 );
+
+						$edited_Blog->set_setting( 'default_noindex', 0 );
+						$edited_Blog->set_setting( 'paged_noindex', 1 );
+						$edited_Blog->set_setting( 'paged_nofollowto', 0 );
+						$edited_Blog->set_setting( 'archive_noindex', 1 );
+						$edited_Blog->set_setting( 'category_noindex', 0 );
+						$edited_Blog->set_setting( 'tag_noindex', 0 );
+						$edited_Blog->set_setting( 'filtered_noindex', 1 ); // temporary
+
+						$edited_Blog->set_setting( 'arcdir_noindex', 1 );
+						$edited_Blog->set_setting( 'catdir_noindex', 0 );
+						$edited_Blog->set_setting( 'feedback-popup_noindex', 1 );
+						$edited_Blog->set_setting( 'msgform_noindex', 1 );
+						$edited_Blog->set_setting( 'special_noindex', 1 ); // temporary
+
+						$edited_Blog->set_setting( 'permalinks', 'single' );
+						$edited_Blog->set_setting( 'title_link_type', 'permalink' );
+						break;
+
+					case 'sspencer':
+						$edited_Blog->set_setting( 'canonical_item_urls', 1 );
+						$edited_Blog->set_setting( 'canonical_cat_urls', 1 );
+
+						$edited_Blog->set_setting( 'default_noindex', 0 );
+						$edited_Blog->set_setting( 'paged_noindex', 1 );
+						$edited_Blog->set_setting( 'paged_nofollowto', 1 );
+						$edited_Blog->set_setting( 'archive_noindex', 1 );
+						$edited_Blog->set_setting( 'category_noindex', 0 );
+						$edited_Blog->set_setting( 'tag_noindex', 0 );
+						$edited_Blog->set_setting( 'filtered_noindex', 1 ); // temporary
+
+						$edited_Blog->set_setting( 'arcdir_noindex', 1 );
+						$edited_Blog->set_setting( 'catdir_noindex', 0 );
+						$edited_Blog->set_setting( 'feedback-popup_noindex', 1 );
+						$edited_Blog->set_setting( 'msgform_noindex', 1 );
+						$edited_Blog->set_setting( 'special_noindex', 1 ); // temporary
+
+						$edited_Blog->set_setting( 'permalinks', 'single' );
+						$edited_Blog->set_setting( 'title_link_type', 'permalink' );
+						break;
+				}
+				break;
+
+		}
+		break;
 
 	case 'update':
 		// Update DB:
@@ -224,6 +295,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2007/11/24 21:41:12  fplanque
+ * additional SEO settings
+ *
  * Revision 1.5  2007/11/02 02:45:51  fplanque
  * refactored blog settings / UI
  *

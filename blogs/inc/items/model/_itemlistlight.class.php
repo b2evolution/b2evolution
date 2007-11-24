@@ -1476,6 +1476,10 @@ class ItemListLight extends DataObjectList2
 			$params['links_format'] = '$prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$';
 		}
 
+ 		if( $this->Blog->get_setting( 'paged_nofollowto' ) )
+		{	// We prefer robots not to follow to pages:
+			$this-> nofollow_pagenav = true;
+		}
 
 		echo $params['block_start'];
 		echo $this->replace_vars( $params['links_format'], $params );
@@ -1487,6 +1491,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.12  2007/11/24 21:41:12  fplanque
+ * additional SEO settings
+ *
  * Revision 1.11  2007/11/11 23:43:37  blueyed
  * Proper fix for array_merge warnings (http://forums.b2evolution.net/viewtopic.php?t=12944); Props Afwas
  *

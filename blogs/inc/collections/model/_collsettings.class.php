@@ -66,8 +66,10 @@ class CollectionSettings extends AbstractSettings
 			'canonical_cat_urls' => 1,					// Redirect categories to their canonical Url?
 			'default_noindex' => '0',						// META NOINDEX on Default blog page
 			'paged_noindex' => '1',							// META NOINDEX on following blog pages
+			'paged_nofollowto' => '0',          // NOFOLLOW on links to following blog pages
 			'archive_noindex' => '1',						// META NOINDEX on Archive pages
 			'category_noindex' => '1',					// META NOINDEX on Category pages
+			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
 			'filtered_noindex' => '1',					// META NOINDEX on other filtered pages
 			'arcdir_noindex' => '1',						// META NOINDEX on Archive directory
 			'catdir_noindex' => '1',						// META NOINDEX on Category directory
@@ -110,6 +112,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.5  2007/11/24 21:41:12  fplanque
+ * additional SEO settings
+ *
  * Revision 1.4  2007/11/03 04:56:03  fplanque
  * permalink / title links cleanup
  *

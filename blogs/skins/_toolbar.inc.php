@@ -25,7 +25,7 @@ global $is_admin_page, $localtimenow;
  */
 global $current_User;
 
-global $home_url, $admin_url, $debug, $robots_index;
+global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
 
 /**
  * @var Hit
@@ -173,9 +173,22 @@ global $Hit;
 					echo '</li>';
 				}
 
-				if( $debug && $robots_index === false )
+				if( $debug )
 				{
-					echo '<li class="time">NO INDEX</li>';
+					echo '<li class="time">';
+					if( !empty($seo_page_type) )
+					{	// Set in skin_init()
+						echo $seo_page_type.': ';
+					}
+					if( $robots_index === false )
+					{
+						echo 'NO INDEX';
+					}
+					else
+					{
+						echo 'do index';
+					}
+					echo '</li>';
 				}
 			}
   	?>
