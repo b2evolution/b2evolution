@@ -113,13 +113,23 @@ while( $Item = & mainlist_get_item() )
 				<?php
 					$Item->categories( array(
 						'before'          => ' '.T_('and is filed under').' ',
-						'after'           => ' ',
+						'after'           => '.',
 						'include_main'    => true,
 						'include_other'   => true,
 						'include_external'=> true,
 						'link_categories' => true,
 					) );
 				?>
+
+				<?php
+					// List all tags attached to this post:
+					$Item->tags( array(
+							'before' =>         ' '.T_('Tags').': ',
+							'after' =>          ' ',
+							'separator' =>      ', ',
+						) );
+				?>
+
 				<!-- You can follow any responses to this entry through the RSS feed. -->
 				<?php
 					$Item->edit_link( array( // Link to backoffice for editing

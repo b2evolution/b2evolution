@@ -278,6 +278,12 @@ margin: 5px 0px;
 clear: left;
 }
 
+.posttags {
+	clear: both;
+	text-align: center;
+	color: #777;
+}
+
 #footer {
 padding: 0;
 margin: 0 auto;
