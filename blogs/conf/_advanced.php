@@ -65,7 +65,9 @@ $log_app_errors = 1;
 
 
 /**
- * Demo mode: don't allow changes to the 'demouser' and 'admin' account.
+ * Demo mode
+ *  - Do not allow update of files in the file manager
+ *  - don't allow changes to the 'demouser' and 'admin' account/group
  * @global boolean Default: false
  */
 $demo_mode = false;

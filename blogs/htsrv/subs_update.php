@@ -55,9 +55,9 @@ if( $checkuser_id != $current_User->ID )
 	bad_request_die( 'You are not logged in under the same account you are trying to modify.' );
 }
 
-if( $demo_mode && ($current_User->login == 'demouser') )
+if( $demo_mode && ($current_User->ID == 1 || $current_User->login == 'demouser') )
 {
-	bad_request_die( 'Demo mode: you can\'t edit the demouser profile!<br />[<a href="javascript:history.go(-1)">'
+	bad_request_die( 'Demo mode: you can\'t edit the admin/demouser profile!<br />[<a href="javascript:history.go(-1)">'
 				. T_('Back to profile') . '</a>]' );
 }
 
@@ -132,6 +132,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.22  2007/11/24 17:34:15  blueyed
+ * Add User->ID check for demo_mode where only login==demouser was checked (profile/subs update)
+ *
  * Revision 1.21  2007/04/26 00:11:14  fplanque
  * (c) 2007
  *
