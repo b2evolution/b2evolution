@@ -280,7 +280,7 @@ class User extends DataObject
 	 */
 	function get_media_dir( $create = true )
 	{
-		global $basepath, $media_subdir, $Messages, $Settings, $Debuglog;
+		global $media_path, $Messages, $Settings, $Debuglog;
 
 		if( ! $Settings->get( 'fm_enable_roots_user' ) )
 		{	// User directories are disabled:
@@ -288,7 +288,7 @@ class User extends DataObject
 			return false;
 		}
 
-		$userdir = get_canonical_path( $basepath.$media_subdir.'users/'.$this->login.'/' );
+		$userdir = get_canonical_path( $media_path.'users/'.$this->login.'/' );
 
 		if( $create && ! is_dir( $userdir ) )
 		{
@@ -1324,6 +1324,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2007/11/24 17:24:50  blueyed
+ * Add $media_path
+ *
  * Revision 1.2  2007/08/26 17:05:58  blueyed
  * MFB: Use $media_url in get_media_url
  *

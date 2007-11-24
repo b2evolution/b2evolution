@@ -136,8 +136,6 @@ class Blog extends DataObject
 	 */
 	function Blog( $db_row = NULL )
 	{
-		global $basepath;
-
 		// Call parent constructor:
 		parent::DataObject( 'T_blogs', 'blog_', 'blog_ID' );
 
@@ -868,7 +866,7 @@ class Blog extends DataObject
 	 */
 	function get_media_dir( $create = true )
 	{
-		global $basepath, $media_subdir, $Messages, $Settings, $Debuglog;
+		global $media_path, $Messages, $Settings, $Debuglog;
 
 		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
 		{ // User directories are disabled:
@@ -879,11 +877,11 @@ class Blog extends DataObject
 		switch( $this->media_location )
 		{
 			case 'default':
-				$mediadir = get_canonical_path( $basepath.$media_subdir.'blogs/'.$this->urlname.'/' );
+				$mediadir = get_canonical_path( $media_path.'blogs/'.$this->urlname.'/' );
 				break;
 
 			case 'subdir':
-				$mediadir = get_canonical_path( $basepath.$media_subdir.$this->media_subdir );
+				$mediadir = get_canonical_path( $media_path.$this->media_subdir );
 				break;
 
 			case 'custom':
@@ -1496,6 +1494,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2007/11/24 17:24:50  blueyed
+ * Add $media_path
+ *
  * Revision 1.14  2007/11/04 17:55:12  fplanque
  * More cleanup
  *

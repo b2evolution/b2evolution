@@ -525,6 +525,7 @@ $install_subdir = 'install/';            // Subdirectory relative to base
  * @global string $media_subdir
  */
 $media_subdir = 'media/';                // Subdirectory relative to base
+$media_path = $basepath.$media_subdir;   // You should not need to change this
 $media_url = $baseurl.$media_subdir;     // You should not need to change this
 
 

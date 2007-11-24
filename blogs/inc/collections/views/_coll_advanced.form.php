@@ -106,15 +106,15 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 
 
 	$Form->begin_fieldset( T_('Media library').' ['.T_('Admin').']' );
-	global $basepath, $media_subdir;
+	global $media_path;
 	$Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 			array(
 				array( 'none', T_('None') ),
 				array( 'default', T_('Default'),
-					sprintf( T_('subdirectory &quot;%s&quot; (URL blog name) of %s'), $edited_Blog->urlname, $basepath.$media_subdir ) ),
+					sprintf( T_('subdirectory &quot;%s&quot; (URL blog name) of %s'), $edited_Blog->urlname, $media_path ) ),
 				array( 'subdir', T_('Subdirectory of media folder').':',
 					'',
-					' <span class="nobr"><code>'.$basepath.$media_subdir.'</code><input
+					' <span class="nobr"><code>'.$media_path.'</code><input
 						type="text" name="blog_media_subdir" class="form_text_input" size="20" maxlength="255"
 						class="'.( param_has_error('blog_media_subdir') ? 'field_error' : '' ).'"
 						value="'.$edited_Blog->dget( 'media_subdir', 'formvalue' ).'" /></span>', '' ),
@@ -150,6 +150,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.3  2007/11/24 17:24:50  blueyed
+ * Add $media_path
+ *
  * Revision 1.2  2007/10/08 08:31:59  fplanque
  * nicer forms
  *
