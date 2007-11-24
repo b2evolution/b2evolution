@@ -44,8 +44,8 @@ function get_icon_info($name)
 			'size' => array( 13, 14 ),
 		);
 		case 'switch-to-blog': return array(
-			'file' => /* TRANS: short for "Switch to _B_log" */ 'icons/switch-to-blog.gif',
-			'alt'  => T_('B'),
+			'file' => 'icons/switch-to-blog.gif',
+			'alt'  => /* TRANS: short for "Switch to _B_log" */ T_('B'),
 			'size' => array( 13, 14 ),
 		);
 
@@ -523,6 +523,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.64  2007/11/24 15:23:13  fplanque
+ * minor
+ *
  * Revision 1.63  2007/11/22 22:53:14  blueyed
  * get_icon_info(): relative to $rsc_url/$rsc_path (instead of $rsc_subdir)
  *
