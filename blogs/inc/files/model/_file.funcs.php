@@ -359,7 +359,7 @@ function no_trailing_slash( $path )
  * Returns canonicalized pathname of a directory + ending slash
  *
  * @param string absolute path to be reduced ending with slash
- * @return string absolute reduced path, slash terminated or NULL if the path doesn't exist
+ * @return string absolute reduced path, slash terminated or NULL if the path could not get canonicalized.
  */
 function get_canonical_path( $ads_path )
 {
@@ -782,6 +782,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 
 /*
  * $Log$
+ * Revision 1.4  2007/11/24 18:09:32  blueyed
+ * fix doc
+ *
  * Revision 1.3  2007/11/01 04:31:25  fplanque
  * Better root browsing (roots are groupes by type + only one root is shown at a time)
  *
