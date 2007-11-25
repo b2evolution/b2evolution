@@ -124,9 +124,18 @@ if( ! empty($root) )
 		$fm_FileRoot = false;
 	}
 }
+else
+{	// try to get it for the current Blog
+	$fm_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $Blog->ID );
+	if( ! $fm_FileRoot || ! isset( $available_Roots[$fm_FileRoot->ID] ) )
+	{ // Root not found or not in list of available ones
+		$fm_FileRoot = false;
+	}
+}
 
 if( ! $fm_FileRoot )
-{ // No root requested (or the requested is invalid), get the first one available:
+{ // No root requested (or the requested is invalid),
+	// get the first one available:
 	if( $available_Roots
 	    && ( $tmp_keys = array_keys( $available_Roots ) )
 	    && $first_Root = & $available_Roots[ $tmp_keys[0] ] )
@@ -1473,6 +1482,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2007/11/25 20:03:12  fplanque
+ * if no fileroot requested, try to select the one matching the current blog
+ *
  * Revision 1.5  2007/11/01 01:41:00  fplanque
  * fixed : dir creation was losing item_ID
  *
