@@ -192,6 +192,12 @@ if( $resolve_extra_path )
 							$m = $path_elements[$i++];
 							$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'params' );
 
+							// Also use the prefered posts per page for archives (may be NULL, in which case the blog default will be used later on)
+							if( ! $posts = $Blog->get_setting( 'archive_posts_per_page' ) )
+							{ // use blog default
+								$posts = $Blog->get_setting( 'posts_per_page' );
+							}
+
 							if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
 							{ // We'll consider this to be the month
 								$m .= $path_elements[$i++];
@@ -230,6 +236,11 @@ if( $resolve_extra_path )
 					else
 					{	// We could match a chapter from the extra path:
 						$cat = $Chapter->ID;
+						// Also use the prefered posts per page for a cat
+						if( ! $posts = $Blog->get_setting( 'chapter_posts_per_page' ) )
+						{ // use blog default
+							$posts = $Blog->get_setting( 'posts_per_page' );
+						}
 			    }
 				}
 				else
@@ -467,6 +478,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.89  2007/11/25 14:28:17  fplanque
+ * additional SEO settings
+ *
  * Revision 1.88  2007/10/06 21:26:16  fplanque
  * WP url decoding compatibility + cleanup
  *

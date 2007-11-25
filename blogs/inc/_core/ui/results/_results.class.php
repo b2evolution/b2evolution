@@ -1692,7 +1692,7 @@ class Results extends Table
 					return $this->params['no_prev_text'];
 				}
 				$r = '<a href="'
-						.regenerate_url( $this->page_param, $this->page_param.'='.($this->page-1), $this->params['page_url'] ).'"';
+						.regenerate_url( $this->page_param, (($this->page > 2) ? $this->page_param.'='.($this->page-1) : ''), $this->params['page_url'] ).'"';
 				if( $this->nofollow_pagenav )
 				{	// We want to NOFOLLOW page navigation
 					$r .= ' rel="nofollow"';
@@ -1788,7 +1788,7 @@ class Results extends Table
 	{
 		if( $this->first() > 1 )
 		{ //the list doesn't contain the first page
-			return '<a href="'.regenerate_url( $this->page_param, $this->page_param.'=1', $page_url ).'">1</a>';
+			return '<a href="'.regenerate_url( $this->page_param, '', $page_url ).'">1</a>';
 		}
 		else
 		{ //the list already contains the first page
@@ -1857,7 +1857,7 @@ class Results extends Table
 			else
 			{ //a link for non-current pages
 				$list .= '<a href="'
-					.regenerate_url( $this->page_param, $this->page_param.'='.$i, $page_url ).'"';
+					.regenerate_url( $this->page_param, ( $i>1 ? $this->page_param.'='.$i : '' ), $page_url ).'"';
 				if( $this->nofollow_pagenav )
 				{	// We want to NOFOLLOW page navigation
 					$list .=  ' rel="nofollow"';
@@ -1993,6 +1993,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.6  2007/11/25 14:28:17  fplanque
+ * additional SEO settings
+ *
  * Revision 1.5  2007/11/24 21:41:12  fplanque
  * additional SEO settings
  *

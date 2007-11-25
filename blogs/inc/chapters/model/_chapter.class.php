@@ -167,9 +167,11 @@ class Chapter extends GenericCategory
 	 *
 	 * @param string|NULL 'param_num', 'subchap', 'chapters'
 	 * @param string|NULL url to use
+	 * @param integer category page to link to, default:1
+	 * @param integer|NULL number of posts per page (used for param_num only)
 	 * @param string glue between url params
 	 */
-	function get_permanent_url( $link_type = NULL, $blogurl = NULL, $glue = '&amp;' )
+	function get_permanent_url( $link_type = NULL, $blogurl = NULL, $paged = 1, $chapter_posts_per_page = NULL, $glue = '&amp;' )
 	{
 		global $DB, $cacheweekly, $Settings;
 
@@ -188,21 +190,30 @@ class Chapter extends GenericCategory
 		switch( $link_type )
 		{
 			case 'param_num':
-				return url_add_param( $blogurl, 'cat='.$this->ID, $glue );
-				/* break; */
+				$r = url_add_param( $blogurl, 'cat='.$this->ID, $glue );
+				if( empty($chapter_posts_per_page) )
+				{	// Use default from Blog
+					$this->get_Blog();
+					$chapter_posts_per_page = $this->Blog->get_setting( 'chapter_posts_per_page' );
+				}
+				if( !empty($chapter_posts_per_page) && $chapter_posts_per_page != $this->Blog->get_setting( 'posts_per_page' ) )
+				{	// We want a specific post per page count:
+					$r = url_add_param( $r, 'posts='.$chapter_posts_per_page, $glue );
+				}
+				break;
 
 			case 'subchap':
 				$this->get_Blog();
 				$category_prefix = $this->Blog->get_setting('category_prefix');
 				if( !empty( $category_prefix ) )
 				{
-					return url_add_tail( $blogurl, '/' . $category_prefix . '/' . $this->urlname.'/' );
+					$r = url_add_tail( $blogurl, '/' . $category_prefix . '/' . $this->urlname.'/' );
 				}
 				else
 				{
-					return url_add_tail( $blogurl, '/'.$this->urlname.'/' );
+					$r = url_add_tail( $blogurl, '/'.$this->urlname.'/' );
 				}
-				/* break; */
+				break;
 
 			case 'chapters':
 			default:
@@ -210,14 +221,21 @@ class Chapter extends GenericCategory
 				$category_prefix = $this->Blog->get_setting('category_prefix');
 				if( !empty( $category_prefix ) )
 				{
-					return url_add_tail( $blogurl, '/'. $category_prefix . '/' . $this->get_url_path() );
+					$r = url_add_tail( $blogurl, '/'. $category_prefix . '/' . $this->get_url_path() );
 				}
 				else
 				{
-					return url_add_tail( $blogurl, '/'.$this->get_url_path() );
+					$r = url_add_tail( $blogurl, '/'.$this->get_url_path() );
 				}
-				/* break; */
+				break;
 		}
+
+		if( $paged > 1 )
+		{
+			$r = url_add_param( $r, 'paged='.$paged, $glue );
+		}
+
+		return $r;
 	}
 
 
@@ -294,6 +312,9 @@ class Chapter extends GenericCategory
 
 /*
  * $Log$
+ * Revision 1.6  2007/11/25 14:28:17  fplanque
+ * additional SEO settings
+ *
  * Revision 1.5  2007/10/06 21:17:25  fplanque
  * cleanup
  *

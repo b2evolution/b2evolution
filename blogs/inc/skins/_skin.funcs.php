@@ -98,7 +98,7 @@ function skin_init( $disp )
 						$robots_index = false;
 					}
 				}
-				elseif( array_diff( $active_filters, array( 'cat_array', 'cat_modifier', 'cat_focus' ) ) == array() )
+				elseif( array_diff( $active_filters, array( 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
 				{ // This is a category home page (note: subsequent pages are a different story)
 					$seo_page_type = 'Category page';
 					if( $Blog->get_setting( 'category_noindex' ) )
@@ -119,9 +119,12 @@ function skin_init( $disp )
 					    if( !isset( $Chapter ) )
 					    {
 								$ChapterCache = & get_Cache( 'ChapterCache' );
+                /**
+								 * @var Chapter
+								 */
 								$Chapter = & $ChapterCache->get_by_ID( $MainList->filters['cat_array'][0], false );
 					    }
-							$canoncical_url = $Chapter->get_permanent_url( NULL, NULL, '&' );
+							$canoncical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
 							if( $ReqHost.$ReqURI != $canoncical_url )
 							{
 								// REDIRECT TO THE CANONICAL URL:
@@ -133,7 +136,7 @@ function skin_init( $disp )
 
 					}
 				}
-				elseif( array_diff( $active_filters, array( 'tags' ) ) == array() )
+				elseif( array_diff( $active_filters, array( 'tags', 'posts', 'page' ) ) == array() )
 				{ // This is a tag page
 					$seo_page_type = 'Tag page';
 					if( $Blog->get_setting( 'tag_noindex' ) )
@@ -465,6 +468,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.16  2007/11/25 14:28:18  fplanque
+ * additional SEO settings
+ *
  * Revision 1.15  2007/11/24 21:41:12  fplanque
  * additional SEO settings
  *

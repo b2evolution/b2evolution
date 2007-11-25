@@ -214,7 +214,7 @@ $Form->begin_fieldset( T_('URL Presets') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Archive URLs') );
+$Form->begin_fieldset( T_('Date archive URLs') );
 
 	$Form->radio( 'archive_links', $edited_Blog->get_setting('archive_links'),
 		array(
@@ -222,7 +222,10 @@ $Form->begin_fieldset( T_('Archive URLs') );
 								.url_add_param( $blogurl, 'm=20071231' ) ),
 				array( 'extrapath', T_('Use extra-path'), T_('Archive links will look like ' )
 								.url_add_tail( $blogurl, '/2007/12/31/' ) ),
-			), T_('Archive links'), true );
+			), T_('Date archive links'), true );
+
+	$Form->text( 'archive_posts_per_page', $edited_Blog->get_setting('archive_posts_per_page'), 4, T_('Posts/Days per page'),
+								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
 
 $Form->end_fieldset();
 
@@ -240,21 +243,32 @@ $Form->begin_fieldset( T_('Category URLs') );
 			), T_('Category links'), true );
 
 
-	echo '<div id="category_prefix_container">';
-		$Form->text_input( 'category_prefix', $edited_Blog->get_setting( 'category_prefix' ), 30, T_('Prefix'),
-													T_('A optional prefix to be added to the URLs of the categories'),
-													array('maxlength' => 120) );
-	echo '</div>';
-	if( $edited_Blog->get_setting( 'chapter_links' ) == 'param_num' )
-	{ ?>
-	<script type="text/javascript">
-		<!--
-		var fldset = document.getElementById( 'category_prefix_container' );
-		fldset.style.display = 'none';
-		//-->
-	</script>
-	<?php
-	}
+		echo '<div id="category_prefix_container">';
+			$Form->text_input( 'category_prefix', $edited_Blog->get_setting( 'category_prefix' ), 30, T_('Prefix'),
+														T_('An optional prefix to be added to the URLs of the categories'),
+														array('maxlength' => 120) );
+		echo '</div>';
+		if( $edited_Blog->get_setting( 'chapter_links' ) == 'param_num' )
+		{ ?>
+		<script type="text/javascript">
+			<!--
+			var fldset = document.getElementById( 'category_prefix_container' );
+			fldset.style.display = 'none';
+			//-->
+		</script>
+		<?php
+		}
+
+	$Form->text( 'chapter_posts_per_page', $edited_Blog->get_setting('chapter_posts_per_page'), 4, T_('Posts/Days per page'),
+								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
+
+$Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_('Tag URLs') );
+
+	$Form->text( 'tag_posts_per_page', $edited_Blog->get_setting('tag_posts_per_page'), 4, T_('Posts/Days per page'),
+								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
 
 $Form->end_fieldset();
 
@@ -285,6 +299,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.11  2007/11/25 14:28:17  fplanque
+ * additional SEO settings
+ *
  * Revision 1.10  2007/11/24 21:41:12  fplanque
  * additional SEO settings
  *

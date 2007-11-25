@@ -46,11 +46,19 @@ class CollectionSettings extends AbstractSettings
 	 */
 	var $_defaults = array(
 			'new_feedback_status' => 'draft',  	// 'draft', 'published' or 'deprecated'
+
 			'archive_mode'   => 'monthly',			// monthly, weekly, daily, postbypost
 			'archive_links'  => 'param',				// param, extrapath
+			'archive_posts_per_page' => '100',
+
 			'chapter_links'  => 'param_num',		// 'param_num', 'subchap', 'chapters'
+			'chapter_posts_per_page' => NULL,
+
+			'tag_posts_per_page' => NULL,
+
 			'single_links'   => 'param_title',
 			'permalinks'     => 'single',				// single, archive, subchap
+
 			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet', // ping plugin codes, separated by comma
 			'orderby'        => 'datestart',
 			'orderdir'       => 'DESC',
@@ -112,6 +120,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.6  2007/11/25 14:28:17  fplanque
+ * additional SEO settings
+ *
  * Revision 1.5  2007/11/24 21:41:12  fplanque
  * additional SEO settings
  *

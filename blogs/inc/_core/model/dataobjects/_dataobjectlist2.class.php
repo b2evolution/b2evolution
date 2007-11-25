@@ -61,6 +61,20 @@ class FilteredResults extends Results
 	}
 
 
+	/**
+	 * Get a specific active filter
+	 */
+	function get_active_filter( $key )
+	{
+		if( isset($this->filters[$key]) )
+		{
+			return $this->filters[$key];
+		}
+
+		return NULL;
+	}
+
+
   /**
 	 * Get every active filter that is not the same as the defaults
 	 */
@@ -318,6 +332,9 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.4  2007/11/25 14:28:17  fplanque
+ * additional SEO settings
+ *
  * Revision 1.3  2007/09/28 09:28:36  fplanque
  * per blog advanced SEO settings
  *

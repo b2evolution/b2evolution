@@ -99,13 +99,19 @@ switch( $action )
 				{
 					case 'awall':
 						$edited_Blog->set_setting( 'archive_links', 'extrapath' );
+						$edited_Blog->set_setting( 'archive_posts_per_page', NULL );
 						$edited_Blog->set_setting( 'chapter_links', 'chapters' );
+						$edited_Blog->set_setting( 'chapter_posts_per_page', NULL );
+						$edited_Blog->set_setting( 'tag_posts_per_page', NULL );
 						$edited_Blog->set_setting( 'single_links', 'ymd' );
 						break;
 
 					case 'sspencer':
 						$edited_Blog->set_setting( 'archive_links', 'extrapath' );
+						$edited_Blog->set_setting( 'archive_posts_per_page', NULL );
 						$edited_Blog->set_setting( 'chapter_links', 'chapters' );
+						$edited_Blog->set_setting( 'chapter_posts_per_page', NULL );
+						$edited_Blog->set_setting( 'tag_posts_per_page', NULL );
 						$edited_Blog->set_setting( 'single_links', 'chapters' );
 						break;
 				}
@@ -295,6 +301,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2007/11/25 14:28:18  fplanque
+ * additional SEO settings
+ *
  * Revision 1.6  2007/11/24 21:41:12  fplanque
  * additional SEO settings
  *

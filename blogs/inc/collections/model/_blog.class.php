@@ -272,11 +272,15 @@ class Blog extends DataObject
 		if( param( 'archive_links',   'string', NULL ) !== NULL )
 		{ // Archive link type:
 			$this->set_setting( 'archive_links', get_param( 'archive_links' ) );
+			$this->set_setting( 'archive_posts_per_page', param( 'archive_posts_per_page', 'integer', NULL ), true );
 		}
 
 		if( param( 'chapter_links',   'string', NULL ) !== NULL )
 		{ // Chapter link type:
 			$this->set_setting( 'chapter_links', get_param( 'chapter_links' ) );
+			$this->set_setting( 'chapter_posts_per_page', param( 'chapter_posts_per_page', 'integer', NULL ), true );
+
+			$this->set_setting( 'tag_posts_per_page', param( 'tag_posts_per_page', 'integer', NULL ), true );
 		}
 
 		if( param( 'category_prefix', 'string', NULL) !== NULL )
@@ -774,6 +778,12 @@ class Blog extends DataObject
 		if( $archive_links == 'param' )
 		{	// We reference by Query
 			$link = url_add_param( $blogurl, 'm='.$datestring, $glue );
+
+			$archive_posts_per_page = $this->get_setting( 'archive_posts_per_page' );
+			if( !empty($archive_posts_per_page) && $archive_posts_per_page != $this->get_setting( 'posts_per_page' ) )
+			{	// We want a specific post per page count:
+				$link = url_add_param( $link, 'posts='.$archive_posts_per_page, $glue );
+			}
 		}
 		else
 		{	// We reference by extra path info
@@ -814,6 +824,30 @@ class Blog extends DataObject
 			default:
 				return $this->gen_archive_url( substr( $date, 0, 4 ), substr( $date, 5, 2 ), NULL, NULL, $glue );
 		}
+	}
+
+
+  /**
+	 * Generate a tag url on this blog
+	 */
+	function gen_tag_url( $tag, $tag_view_url = NULL, $tag_posts_per_page = NULL, $glue = '&amp;' )
+	{
+		if( empty($tag_view_url) || $tag_view_url == '#' )
+		{
+			$tag_view_url = $this->gen_blogurl();
+		}
+		$r = url_add_param( $tag_view_url, 'tag='.urlencode( $tag ) );
+
+		if( empty($tag_posts_per_page) )
+		{	// Use default from Blog
+			$tag_posts_per_page = $this->get_setting( 'tag_posts_per_page' );
+		}
+		if( !empty($tag_posts_per_page) && $tag_posts_per_page != $this->get_setting( 'posts_per_page' ) )
+		{	// We want a specific post per page count:
+			$r = url_add_param( $r, 'posts='.$tag_posts_per_page, $glue );
+		}
+
+		return $r;
 	}
 
 
@@ -1195,10 +1229,15 @@ class Blog extends DataObject
 	 *
 	 * @return boolean true, if the value has been set, false if it has not changed.
 	 */
-	function set_setting( $parname, $value )
+	function set_setting( $parname, $value, $make_null = false )
 	{
 	 	// Make sure collection settings are loaded
 		$this->load_CollectionSettings();
+
+		if( $make_null && empty($value) )
+		{
+			$value = NULL;
+		}
 
 		return $this->CollectionSettings->set( $this->ID, $parname, $value );
 	}
@@ -1522,6 +1561,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2007/11/25 14:28:17  fplanque
+ * additional SEO settings
+ *
  * Revision 1.17  2007/11/24 21:41:12  fplanque
  * additional SEO settings
  *

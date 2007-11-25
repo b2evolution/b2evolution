@@ -660,9 +660,11 @@ class ItemListLight extends DataObjectList2
 			$this->total_pages = 1;
 			$this->page = 1;
 		}
+		/*
 		elseif( !empty($this->filters['ymdhms']) // no restriction if we request a month... some permalinks may point to the archive!
-		  || $this->filters['unit'] == 'days'    // We are going to limit to x days: no limit
-		  || $this->filters['unit'] == 'all' )	 // We want ALL results!
+		*/
+		elseif( $this->filters['unit'] == 'days'    // We are going to limit to x days: no limit
+			 	 || $this->filters['unit'] == 'all' )	 // We want ALL results!
 		{
 			$this->total_rows = NULL; // unknown!
 			$this->total_pages = 1;
@@ -698,10 +700,13 @@ class ItemListLight extends DataObjectList2
 		if( $this->single_post )   // p or title
 		{ // Single post: no paging required!
 		}
-		elseif( !empty($this->filters['ymdhms']) )
-		{ // no restriction if we request a month... some permalinks may point to the archive!
-			// echo 'ARCHIVE - no limits';
-		}
+		/*
+			fp> 2007-11-25 : a very high post count can now be configured in the admin for this. Default is 100.
+			elseif( !empty($this->filters['ymdhms']) )
+			{ // no restriction if we request a month... some permalinks may point to the archive!
+				// echo 'ARCHIVE - no limits';
+			}
+		*/
 		elseif( $this->filters['unit'] == 'all' )
 		{	// We want ALL results!
 		}
@@ -1491,6 +1496,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.13  2007/11/25 14:28:17  fplanque
+ * additional SEO settings
+ *
  * Revision 1.12  2007/11/24 21:41:12  fplanque
  * additional SEO settings
  *
