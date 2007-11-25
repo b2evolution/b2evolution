@@ -166,6 +166,12 @@ class DataObjectList2 extends FilteredResults
 	}
 
 
+	function & get_row_by_idx( $idx )
+	{
+		return $this->rows[ $idx ];
+	}
+
+
 	/**
 	 * Instantiate an object for requested row and cache it:
 	 */
@@ -332,6 +338,9 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.5  2007/11/25 19:47:15  fplanque
+ * cleaned up photo/media index a little bit
+ *
  * Revision 1.4  2007/11/25 14:28:17  fplanque
  * additional SEO settings
  *

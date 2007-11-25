@@ -1164,6 +1164,9 @@ class Blog extends DataObject
 			case 'catdirurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=catdir' );
 
+			case 'mediaidxurl':
+				return url_add_param( $this->gen_blogurl(), 'disp=mediaidx' );
+
 			case 'msgformurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=msgform' );
 
@@ -1588,6 +1591,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2007/11/25 19:47:15  fplanque
+ * cleaned up photo/media index a little bit
+ *
  * Revision 1.19  2007/11/25 18:20:38  fplanque
  * additional SEO settings
  *

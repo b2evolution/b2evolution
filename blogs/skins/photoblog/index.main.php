@@ -60,7 +60,7 @@ skin_include( '_html_header.inc.php' );
 				) );
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 		?>
-		<a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('Index') ?></a>
+		<a href="<?php $Blog->disp( 'mediaidxurl', 'raw' ) ?>"><?php echo T_('Index') ?></a>
 	</div>
 	
 	<h1 id="pageTitle"><a href="<?php $Blog->disp( 'url', 'raw' ) ?>"><?php $Blog->disp( 'name', 'htmlbody' ) ?></a></h1>

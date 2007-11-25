@@ -540,18 +540,27 @@ class ItemList2 extends ItemListLight
     /*
 		 * Position right after the current element depending on current sorting params
 		 *
-		 * fp> WARNING: This only works with the FIRST order param!
-		 * If there are several items on the same issuedatetime for example, they'll all get skipped at once!
-		 * You cannot put several criterias combined with AND!!! (you would need stuf like a>a0 OR (a=a0 AND b>b0) etc.
-		 * This is too complex, so I'm going to call this function a "skip to next" that cannot digg into details
+		 * If there are several items on the same issuedatetime for example, we'll then differentite on post ID
+		 * WARNING: you cannot combine criterias with AND here; you need stuf like a>a0 OR (a=a0 AND b>b0)
 		 */
 		switch( $orderby_array[0] )
 		{
 			case 'datestart':
 				// special var name:
-				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
-																.$operator
-																.$DB->quote($current_Item->issue_date) );
+				$next_Query->WHERE_and( '( '
+																	.$this->Cache->dbprefix.$orderby_array[0]
+																	.$operator
+																	.$DB->quote($current_Item->issue_date)
+																	.' OR ( '
+                                    .$this->Cache->dbprefix.$orderby_array[0]
+																		.' = '
+																		.$DB->quote($current_Item->issue_date)
+																		.' AND '
+																		.$this->Cache->dbIDname
+																		.$operator
+																		.$current_Item->ID
+																	.') )'
+																 );
 				break;
 
 			case 'title':
@@ -559,9 +568,20 @@ class ItemList2 extends ItemListLight
 			case 'datemodified':
 			case 'urltitle':
 			case 'priority':	// Note: will skip to next priority level
-				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
+				$next_Query->WHERE_and( '( '
+																.$this->Cache->dbprefix.$orderby_array[0]
 																.$operator
-																.$DB->quote($current_Item->{$orderby_array[0]}) );
+																.$DB->quote($current_Item->{$orderby_array[0]})
+																.' OR ( '
+                                  .$this->Cache->dbprefix.$orderby_array[0]
+																	.' = '
+																	.$DB->quote($current_Item->{$orderby_array[0]})
+																	.' AND '
+																	.$this->Cache->dbIDname
+																	.$operator
+																	.$current_Item->ID
+																.') )'
+															);
 				break;
 
 			default:
@@ -601,6 +621,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.5  2007/11/25 19:47:15  fplanque
+ * cleaned up photo/media index a little bit
+ *
  * Revision 1.4  2007/11/04 17:55:13  fplanque
  * More cleanup
  *
