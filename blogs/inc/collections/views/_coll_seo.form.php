@@ -71,7 +71,8 @@ $Form->begin_fieldset( T_('Indexing of content pages') );
 	$Form->checkbox( 'paged_noindex', $edited_Blog->get_setting( 'paged_noindex' ), T_('"Next" blog pages'), T_('META NOINDEX').' - '.T_('Page 2,3,4...') );
 	$Form->checkbox( 'paged_nofollowto', $edited_Blog->get_setting( 'paged_nofollowto' ), '', T_('NOFOLLOW on links to').' '.T_('Page 2,3,4...') );
 	$Form->checkbox( 'archive_noindex', $edited_Blog->get_setting( 'archive_noindex' ), T_('"By date" archive pages'), T_('META NOINDEX') );
-	$Form->checkbox( 'category_noindex', $edited_Blog->get_setting( 'category_noindex' ), T_('Category pages'), T_('META NOINDEX') );
+	$Form->checkbox( 'archive_nofollowto', $edited_Blog->get_setting( 'archive_nofollowto' ), '', T_('NOFOLLOW on links to').' '.T_('date archives') );
+	$Form->checkbox( 'chapter_noindex', $edited_Blog->get_setting( 'chapter_noindex' ), T_('Category pages'), T_('META NOINDEX') );
 	$Form->checkbox( 'tag_noindex', $edited_Blog->get_setting( 'tag_noindex' ), T_('Tag pages'), T_('META NOINDEX') );
 	$Form->checkbox( 'filtered_noindex', $edited_Blog->get_setting( 'filtered_noindex' ), T_('Other filtered pages'), T_('META NOINDEX').' - '.T_('Keyword searched, etc.') );
 $Form->end_fieldset();
@@ -106,6 +107,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.5  2007/11/25 18:20:38  fplanque
+ * additional SEO settings
+ *
  * Revision 1.4  2007/11/24 21:41:12  fplanque
  * additional SEO settings
  *

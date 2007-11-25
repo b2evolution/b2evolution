@@ -196,19 +196,18 @@ class archives_plugin extends Plugin
 						echo ' /> ';
 					}
 
-					echo '<a href="';
+					$text = T_($month[zeroise($arc_month,2)]).' '.$arc_year;
+
 					if( $params['link_type'] == 'context' )
 					{	// We want to preserve current browsing context:
-						echo regenerate_url( $params['context_isolation'], 'm='.$arc_m );
+						echo '<a rel="nofollow" href="'.regenerate_url( $params['context_isolation'], 'm='.$arc_m ).'">'.$text.'</a>';
 					}
 					else
 					{	// We want to link to the absolute canonical URL for this archive:
-						echo $Blog->gen_archive_url( $arc_year, $arc_month );
+						echo $Blog->gen_archive_link( $text, T_('View monthly archive'), $arc_year, $arc_month );
 					}
-					echo '">';
 
-					echo T_($month[zeroise($arc_month,2)]),' ',$arc_year;
-					echo '</a> <span class="dimmed">('.$arc_count.')</span>';
+					echo ' <span class="dimmed">('.$arc_count.')</span>';
 					break;
 
 				case 'daily':
@@ -222,61 +221,61 @@ class archives_plugin extends Plugin
 						echo ' /> ';
 					}
 
-					echo '<a href="';
+					$text = mysql2date($params['day_date_format'], $arc_year.'-'.zeroise($arc_month,2).'-'.zeroise($arc_dayofmonth,2).' 00:00:00');
+
 					if( $params['link_type'] == 'context' )
 					{	// We want to preserve current browsing context:
-						echo regenerate_url( $params['context_isolation'], 'm='.$arc_m );
+						echo '<a rel="nofollow" href="'.regenerate_url( $params['context_isolation'], 'm='.$arc_m ).'">'.$text.'</a>';
 					}
 					else
 					{	// We want to link to the absolute canonical URL for this archive:
-						echo $Blog->gen_archive_url( $arc_year, $arc_month, $arc_dayofmonth );
+						echo $Blog->gen_archive_link( $text, T_('View daily archive'), $arc_year, $arc_month, $arc_dayofmonth );
 					}
-					echo '">';
 
-					echo mysql2date($params['day_date_format'], $arc_year.'-'.zeroise($arc_month,2).'-'.zeroise($arc_dayofmonth,2).' 00:00:00');
-					echo '</a> <span class="dimmed">('.$arc_count.')</span>';
+					echo ' <span class="dimmed">('.$arc_count.')</span>';
 					break;
 
 				case 'weekly':
 					// --------------------------------- WEEKLY ARCHIVES --------------------------------------
-					echo '<a href="';
+
+					$text = $arc_year.', '.T_('week').' '.$arc_w;
+
 					if( $params['link_type'] == 'context' )
 					{	// We want to preserve current browsing context:
-						echo regenerate_url( $params['context_isolation'], 'm='.$arc_year.'&amp;w='.$arc_w );
+						echo '<a rel="nofollow" href="'.regenerate_url( $params['context_isolation'], 'm='.$arc_year.'&amp;w='.$arc_w ).'">'.$text.'</a>';
 					}
 					else
 					{	// We want to link to the absolute canonical URL for this archive:
-						echo $Blog->gen_archive_url( $arc_year, NULL, NULL, $arc_w );
+						echo $Blog->gen_archive_link( $text, T_('View weekly archive'), $arc_year, NULL, NULL, $arc_w );
 					}
-					echo '">';
-					echo $arc_year.', '.T_('week').' '.$arc_w;
-					echo '</a> <span class="dimmed">('.$arc_count.')</span>';
+					echo ' <span class="dimmed">('.$arc_count.')</span>';
 					break;
 
 				case 'postbypost':
 				default:
 					// -------------------------------- POST BY POST ARCHIVES ---------------------------------
-					echo '<a href="';
+
+					if( $post_title)
+					{
+						$text = strip_tags($post_title);
+					}
+					else
+					{
+						$text = $post_ID;
+					}
+
 					if( $params['link_type'] == 'context' )
 					{	// We want to preserve current browsing context:
-						echo regenerate_url( $params['context_isolation'], 'p='.$post_ID );
+						echo '<a rel="nofollow" href="'.regenerate_url( $params['context_isolation'], 'p='.$post_ID ).'">'.$text.'</a>';
 					}
 					else
 					{	// We want to link to the absolute (canonical) URL for this archive:
 						// fp> TODO: This is NOT canonical. To go to the canonical, we'd need a 'light' itemlist (which does not load too much data)
 						// fp> Note: there may be a "redirect to canonical" anyway. Not optimal, but at least this is less broken than it was before.
-						echo url_add_param( $Blog->get('url'), 'p='.$post_ID.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1' );
+						// fp> THIS IS ALL OBSOLETE. There is a better way to have a post list with a specific widget.
+						// TO BE DELETED (waiting for photoblog cleanup)
+						echo '<a href="'.url_add_param( $Blog->get('url'), 'p='.$post_ID.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1' ).'">'.$text.'</a>';
 					}
-					echo '">';
-					if ($post_title)
-					{
-						echo strip_tags($post_title);
-					}
-					else
-					{
-						echo $post_ID;
-					}
-					echo '</a>';
 			}
 
 			echo $params['line_end'];
@@ -581,6 +580,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.44  2007/11/25 18:20:37  fplanque
+ * additional SEO settings
+ *
  * Revision 1.43  2007/06/25 11:02:31  fplanque
  * MODULES (refactored MVC)
  *

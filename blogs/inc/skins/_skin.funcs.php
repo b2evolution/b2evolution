@@ -101,7 +101,7 @@ function skin_init( $disp )
 				elseif( array_diff( $active_filters, array( 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
 				{ // This is a category home page (note: subsequent pages are a different story)
 					$seo_page_type = 'Category page';
-					if( $Blog->get_setting( 'category_noindex' ) )
+					if( $Blog->get_setting( 'chapter_noindex' ) )
 					{	// We prefer robots not to index category pages:
 						$robots_index = false;
 					}
@@ -468,6 +468,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.17  2007/11/25 18:20:38  fplanque
+ * additional SEO settings
+ *
  * Revision 1.16  2007/11/25 14:28:18  fplanque
  * additional SEO settings
  *

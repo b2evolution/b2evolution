@@ -47,13 +47,6 @@ class CollectionSettings extends AbstractSettings
 	var $_defaults = array(
 			'new_feedback_status' => 'draft',  	// 'draft', 'published' or 'deprecated'
 
-			'archive_mode'   => 'monthly',			// monthly, weekly, daily, postbypost
-			'archive_links'  => 'param',				// param, extrapath
-			'archive_posts_per_page' => '100',
-
-			'chapter_links'  => 'param_num',		// 'param_num', 'subchap', 'chapters'
-			'chapter_posts_per_page' => NULL,
-
 			'tag_posts_per_page' => NULL,
 
 			'single_links'   => 'param_title',
@@ -73,11 +66,22 @@ class CollectionSettings extends AbstractSettings
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
 			'canonical_cat_urls' => 1,					// Redirect categories to their canonical Url?
 			'default_noindex' => '0',						// META NOINDEX on Default blog page
+
 			'paged_noindex' => '1',							// META NOINDEX on following blog pages
 			'paged_nofollowto' => '0',          // NOFOLLOW on links to following blog pages
+
+			'archive_mode'   => 'monthly',			// monthly, weekly, daily, postbypost
+			'archive_links'  => 'param',				// param, extrapath
+			'archive_posts_per_page' => '100',
 			'archive_noindex' => '1',						// META NOINDEX on Archive pages
-			'category_noindex' => '1',					// META NOINDEX on Category pages
+			'archive_nofollowto' => '0',        // NOFOLLOW on links to archive pages
+
+			'chapter_links'  => 'param_num',		// 'param_num', 'subchap', 'chapters'
+			'chapter_posts_per_page' => NULL,
+			'chapter_noindex' => '1',						// META NOINDEX on Category pages
+
 			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
+
 			'filtered_noindex' => '1',					// META NOINDEX on other filtered pages
 			'arcdir_noindex' => '1',						// META NOINDEX on Archive directory
 			'catdir_noindex' => '1',						// META NOINDEX on Category directory
@@ -120,6 +124,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.7  2007/11/25 18:20:38  fplanque
+ * additional SEO settings
+ *
  * Revision 1.6  2007/11/25 14:28:17  fplanque
  * additional SEO settings
  *

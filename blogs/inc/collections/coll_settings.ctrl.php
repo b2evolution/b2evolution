@@ -128,7 +128,8 @@ switch( $action )
 						$edited_Blog->set_setting( 'paged_noindex', 1 );
 						$edited_Blog->set_setting( 'paged_nofollowto', 0 );
 						$edited_Blog->set_setting( 'archive_noindex', 1 );
-						$edited_Blog->set_setting( 'category_noindex', 0 );
+						$edited_Blog->set_setting( 'archive_nofollowto', 0 );
+						$edited_Blog->set_setting( 'chapter_noindex', 0 );
 						$edited_Blog->set_setting( 'tag_noindex', 0 );
 						$edited_Blog->set_setting( 'filtered_noindex', 1 ); // temporary
 
@@ -150,7 +151,8 @@ switch( $action )
 						$edited_Blog->set_setting( 'paged_noindex', 1 );
 						$edited_Blog->set_setting( 'paged_nofollowto', 1 );
 						$edited_Blog->set_setting( 'archive_noindex', 1 );
-						$edited_Blog->set_setting( 'category_noindex', 0 );
+						$edited_Blog->set_setting( 'archive_nofollowto', 1 );
+						$edited_Blog->set_setting( 'chapter_noindex', 0 );
 						$edited_Blog->set_setting( 'tag_noindex', 0 );
 						$edited_Blog->set_setting( 'filtered_noindex', 1 ); // temporary
 
@@ -301,6 +303,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2007/11/25 18:20:38  fplanque
+ * additional SEO settings
+ *
  * Revision 1.7  2007/11/25 14:28:18  fplanque
  * additional SEO settings
  *

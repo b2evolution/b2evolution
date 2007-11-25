@@ -158,12 +158,8 @@ class calendar_plugin extends Plugin
 	 *      - 'browseyears' : boolean  Do we want arrows to move one year at a time?
 	 *      - 'min_timestamp' : Minimum unix timestamp the user can browse too or 'query' (Default: 2000-01-01)
 	 *      - 'max_timestamp' : Maximum unix timestamp the user can browse too or 'query' (Default: now + 1 year )
-	 *      - 'postcount_month_cell'
-	 *      - 'postcount_month_cell_one'
 	 *      - 'postcount_month_atitle'
 	 *      - 'postcount_month_atitle_one'
-	 *      - 'postcount_year_cell'
-	 *      - 'postcount_year_cell_one'
 	 *      - 'postcount_year_atitle'
 	 *      - 'postcount_year_atitle_one'
 	 *      - 'link_type' : 'canonic'|'context' (default: canonic)
@@ -220,12 +216,8 @@ class calendar_plugin extends Plugin
 		if( isset($params['todaycellstartpost']) ) $Calendar->set( 'todaycellstartpost', $params['todaycellstartpost'] );
 		if( isset($params['navigation']) ) $Calendar->set( 'navigation', $params['navigation'] );
 		if( isset($params['browseyears']) ) $Calendar->set( 'browseyears', $params['browseyears'] );
-		if( isset($params['postcount_month_cell']) ) $Calendar->set( 'postcount_month_cell', $params['postcount_month_cell'] );
-		if( isset($params['postcount_month_cell_one']) ) $Calendar->set( 'postcount_month_cell_one', $params['postcount_month_cell_one'] );
 		if( isset($params['postcount_month_atitle']) ) $Calendar->set( 'postcount_month_atitle', $params['postcount_month_atitle'] );
 		if( isset($params['postcount_month_atitle_one']) ) $Calendar->set( 'postcount_month_atitle_one', $params['postcount_month_atitle_one'] );
-		if( isset($params['postcount_year_cell']) ) $Calendar->set( 'postcount_year_cell', $params['postcount_year_cell'] );
-		if( isset($params['postcount_year_cell_one']) ) $Calendar->set( 'postcount_year_cell_one', $params['postcount_year_cell_one'] );
 		if( isset($params['postcount_year_atitle']) ) $Calendar->set( 'postcount_year_atitle', $params['postcount_year_atitle'] );
 		if( isset($params['postcount_year_atitle_one']) ) $Calendar->set( 'postcount_year_atitle_one', $params['postcount_year_atitle_one'] );
 		// Link type:
@@ -489,12 +481,8 @@ class Calendar
 		 * - set to '' (empty) to disable
 		 * - %d gets replaced with the number of posts on that day/month
 		 */
-		$this->postcount_month_cell = '';                           // in table cell (behind day)
-		$this->postcount_month_cell_one = '';                       //  -- " -- [for single post]
 		$this->postcount_month_atitle = T_('%d posts'); 						// in archive links title tag
 		$this->postcount_month_atitle_one = T_('1 post');  					//  -- " -- [for single post]
-		$this->postcount_year_cell   = '';
-		$this->postcount_year_cell_one   = '';
 		$this->postcount_year_atitle = T_('%d posts'); 							// in archive links title tag
 		$this->postcount_year_atitle_one = T_('1 post'); 						// in archive links title tag
 		/**#@-*/
@@ -636,16 +624,15 @@ class Calendar
 
 			if( $this->mode == 'month' )
 			{ // MONTH CAPTION:
+				$text = date_i18n($this->monthformat, mktime(0, 0, 0, $this->month, 1, $this->year));
+
 				if( $this->linktomontharchive )
 				{ // chosen month with link to archives
-					echo '<a href="'.$this->archive_link( $this->year, $this->month ).'" title="'.T_('go to month\'s archive').'">';
+					echo $this->archive_link( $text, T_('View monthly archive'), $this->year, $this->month );
 				}
-
-				echo date_i18n($this->monthformat, mktime(0, 0, 0, $this->month, 1, $this->year));
-
-				if( $this->linktomontharchive )
-				{ // close link to month archive
-					echo '</a>';
+				else
+				{
+					echo $text;
 				}
 			}
 			else
@@ -712,10 +699,9 @@ class Calendar
 			}
 			else
 			{
-				echo '<td colspan="'.( $this->mode == 'month' ? '3' : '2' ).'" class="center"><a href="'
-							.$this->archive_link( date('Y'), ( $this->mode == 'month' ? date('m') : NULL ) )
-							.'">'.T_('Current')
-							.'</a></td>';
+				echo '<td colspan="'.( $this->mode == 'month' ? '3' : '2' ).'" class="center">'
+							.$this->archive_link( T_('Current'), '', date('Y'), ( $this->mode == 'month' ? date('m') : NULL ) )
+							.'</td>';
 			}
 			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->today_is_visible ).'" id="next">';
 			echo implode( '&nbsp;', $this->getNavLinks( 'next' ) );
@@ -742,38 +728,29 @@ class Calendar
 					{
 						echo $this->linkpostcellstart;
 					}
-					echo '<a href="'.$this->archive_link( $this->year, $i ).'"';
 					if( $monthswithposts[ $i ] > 1 && !empty($this->postcount_year_atitle) )
 					{ // display postcount
-						echo ' title="'.sprintf($this->postcount_year_atitle, $monthswithposts[ $i ]).'"';
+						$title = sprintf($this->postcount_year_atitle, $monthswithposts[ $i ]);
 					}
 					elseif( !empty($this->postcount_year_atitle_one) )
 					{ // display postcount for one post
-						echo ' title="'.sprintf($this->postcount_year_atitle_one, 1).'"';
+						$title = sprintf($this->postcount_year_atitle_one, 1);
 					}
-					echo '>';
+					else
+					{
+						$title = '';
+					}
+					echo $this->archive_link( T_($month_abbrev[ zeroise($i, 2) ]), $title, $this->year, $i );
 				}
 				elseif( $this->month == $i )
 				{ // current month
 					echo $this->todaycellstart;
+					echo T_($month_abbrev[ zeroise($i, 2) ]);
 				}
 				else
 				{
 					echo $this->cellstart;
-				}
-				echo T_($month_abbrev[ zeroise($i, 2) ]);
-
-				if( isset($monthswithposts[ $i ]) )
-				{ // close anchor and show how many posts we have for this month
-					if( $monthswithposts[ $i ] > 1 && !empty($this->postcount_year_cell) )
-					{ // display postcount
-						printf($this->postcount_year_cell, $monthswithposts[ $i ]);
-					}
-					elseif( !empty($this->postcount_year_cell_one) )
-					{ // display postcount for one post
-						printf($this->postcount_year_cell_one, 1);
-					}
-					echo '</a>';
+					echo T_($month_abbrev[ zeroise($i, 2) ]);
 				}
 				echo $this->cellend;
 				if( $i == 4 || $i == 8 )
@@ -832,37 +809,29 @@ class Calendar
 						{
 							echo $this->linkpostcellstart;
 						}
-						echo '<a href="'.$this->archive_link( $this->year, $this->month, date('d',$i) ).'"';
 						if( $daysinmonthwithposts[ date('j', $i) ] > 1 && !empty($this->postcount_month_atitle) )
 						{ // display postcount
-							echo ' title="'.sprintf($this->postcount_month_atitle, $daysinmonthwithposts[ date('j', $i) ]).'"';
+							$title = sprintf($this->postcount_month_atitle, $daysinmonthwithposts[ date('j', $i) ]);
 						}
 						elseif( !empty($this->postcount_month_atitle_one) )
 						{ // display postcount for one post
-							echo ' title="'.sprintf($this->postcount_month_atitle_one, 1).'"';
+							$title = sprintf($this->postcount_month_atitle_one, 1);
 						}
-						echo '>';
+						else
+						{
+							$title = '';
+						}
+						echo $this->archive_link( date('j',$i), $title, $this->year, $this->month, date('d',$i) );
 					}
 					elseif ($calendartoday)
 					{
 						echo $this->todaycellstart;
+						echo date('j',$i);
 					}
 					else
 					{
 						echo $this->cellstart;
-					}
-					echo date('j',$i);
-					if( isset($daysinmonthwithposts[ date('j', $i) ]) )
-					{
-						if( $daysinmonthwithposts[ date('j', $i) ] > 1 && !empty($this->postcount_month_cell) )
-						{ // display postcount
-							printf($this->postcount_month_cell, $daysinmonthwithposts[ date('j', $i) ]);
-						}
-						elseif( !empty($this->postcount_month_cell_one) )
-						{ // display postcount for one post
-							printf($this->postcount_month_cell_one, 1);
-						}
-						echo '</a>';
+						echo date('j',$i);
 					}
 					echo $this->cellend;
 				}
@@ -881,11 +850,13 @@ class Calendar
 	 *
 	 * Can make contextual links.
 	 *
+	 * @param string
+	 * @param string
 	 * @param string year
 	 * @param string month
 	 * @param string day
 	 */
-	function archive_link( $year, $month = NULL, $day = NULL )
+	function archive_link( $text, $title, $year, $month = NULL, $day = NULL )
 	{
     /**
 		 * @var Blog
@@ -903,11 +874,11 @@ class Calendar
 					$url_params .= zeroise($day,2);
 				}
 			}
-			return regenerate_url( $this->context_isolation, $url_params );
+			return '<a rel="nofollow" href="'.regenerate_url( $this->context_isolation, $url_params ).'">'.format_to_output($text).'</a>';
 		}
 		else
 		{	// We want a canonic link:
-			return $Blog->gen_archive_url( $year, $month, $day );
+			return $Blog->gen_archive_link( $text, $title, $year, $month, $day );
 		}
 	}
 
@@ -997,13 +968,11 @@ class Calendar
 
 				if( !empty($prev_year_year) )
 				{	// We have a link to display:
-					$r[] = '<a href="'.$this->archive_link( $prev_year_year, ($this->mode == 'month') ? $prev_year_month : NULL )
-									.'" title="'.sprintf(
+					$r[] = $this->archive_link( '&lt;&lt;', sprintf(
 												( $this->mode == 'month'
 														? /* Calendar link title to a month in a previous year */ T_('Previous year (%04d-%02d)')
 														: /* Calendar link title to a previous year */ T_('Previous year (%04d)') ),
-												$prev_year_year, $prev_year_month )
-									.'">&lt;&lt;</a>';
+												$prev_year_year, $prev_year_month ), $prev_year_year, ($this->mode == 'month') ? $prev_year_month : NULL ) ;
 				}
 
 
@@ -1052,9 +1021,7 @@ class Calendar
 
 				if( !empty($prev_month_year) )
 				{	// We have a link to display:
-					$r[] = '<a href="'
-									.$this->archive_link( $prev_month_year, $prev_month_month )
-									.'" title="'.sprintf( T_('Previous month (%04d-%02d)'), $prev_month_year, $prev_month_month ).'">&lt;</a>';
+					$r[] = $this->archive_link( '&lt;', sprintf( T_('Previous month (%04d-%02d)'), $prev_month_year, $prev_month_month ), $prev_month_year, $prev_month_month );
 				}
 				break;
 
@@ -1107,9 +1074,7 @@ class Calendar
 
 				if( !empty($next_month_year) )
 				{	// We have a link to display:
-					$r[] = '<a href="'
-									.$this->archive_link( $next_month_year, $next_month_month )
-									.'" title="'.sprintf( T_('Next month (%04d-%02d)'), $next_month_year, $next_month_month ).'">&gt;</a>';
+					$r[] = $this->archive_link( '&gt;', sprintf( T_('Next month (%04d-%02d)'), $next_month_year, $next_month_month ), $next_month_year, $next_month_month );
 				}
 
 
@@ -1159,13 +1124,11 @@ class Calendar
 
 				if( !empty($next_year_year) )
 				{	// We have a link to display:
-						$r[] = '<a href="'.$this->archive_link( $next_year_year, ($this->mode == 'month') ? $next_year_month : NULL )
-										.'" title="'.sprintf(
+						$r[] = $this->archive_link( '&gt;&gt;', sprintf(
 																	( $this->mode == 'month'
 																			? /* Calendar link title to a month in a following year */ T_('Next year (%04d-%02d)')
 																			: /* Calendar link title to a following year */ T_('Next year (%04d)') ),
-																	$next_year_year, $next_year_month )
-										.'">&gt;&gt;</a>';
+																	$next_year_year, $next_year_month ), $next_year_year, ($this->mode == 'month') ? $next_year_month : NULL );
 					}
 				}
 				break;
@@ -1178,6 +1141,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.47  2007/11/25 18:20:38  fplanque
+ * additional SEO settings
+ *
  * Revision 1.46  2007/10/09 02:10:50  fplanque
  * URL fixes
  *

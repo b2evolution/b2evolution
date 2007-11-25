@@ -392,7 +392,8 @@ class Blog extends DataObject
 			$this->set_setting( 'paged_noindex',  param( 'paged_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_nofollowto',  param( 'paged_nofollowto', 'integer', 0 ) );
 			$this->set_setting( 'archive_noindex',  param( 'archive_noindex', 'integer', 0 ) );
-			$this->set_setting( 'category_noindex',  param( 'category_noindex', 'integer', 0 ) );
+			$this->set_setting( 'archive_nofollowto',  param( 'archive_nofollowto', 'integer', 0 ) );
+			$this->set_setting( 'chapter_noindex',  param( 'chapter_noindex', 'integer', 0 ) );
 			$this->set_setting( 'tag_noindex',  param( 'tag_noindex', 'integer', 0 ) );
 			$this->set_setting( 'filtered_noindex',  param( 'filtered_noindex', 'integer', 0 ) );
 			$this->set_setting( 'arcdir_noindex',  param( 'arcdir_noindex', 'integer', 0 ) );
@@ -789,6 +790,32 @@ class Blog extends DataObject
 		{	// We reference by extra path info
 			$link = url_add_tail( $blogurl, $datestring ); // there may already be a slash from a siteurl like 'http://example.com/'
 		}
+
+		return $link;
+	}
+
+
+	/**
+	 *
+	 * @uses Blog::gen_archive_url()
+	 */
+	function gen_archive_link( $text, $title, $year, $month = NULL, $day = NULL, $week = NULL, $glue = '&amp;' )
+	{
+		$link = '<a';
+
+		if( $this->get_setting( 'archive_nofollowto' ) )
+		{
+			$link .= ' rel="nofollow"';
+		}
+
+ 		if( !empty($title) )
+		{
+			$link .= ' title="'.format_to_output( $title, 'htmlattr' ).'"';
+		}
+
+		$link .= ' href="'.$this->gen_archive_url( $year, $month, $day, $week, $glue ).'" >';
+		$link .= format_to_output( $text );
+		$link .= '</a>';
 
 		return $link;
 	}
@@ -1561,6 +1588,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2007/11/25 18:20:38  fplanque
+ * additional SEO settings
+ *
  * Revision 1.18  2007/11/25 14:28:17  fplanque
  * additional SEO settings
  *
