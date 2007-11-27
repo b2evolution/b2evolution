@@ -64,6 +64,35 @@ class coll_xml_feeds_Widget extends ComponentWidget
 	}
 
 
+  /**
+   * Get definitions for editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		global $use_strict;
+		$r = array(
+			'title' => array(
+				'label' => T_( 'Title' ),
+				'size' => 40,
+				'note' => T_( 'This is the title to display, %icon% will be replaced by the feed icon' ),
+				'defaultvalue' => '%icon% '.T_('XML Feeds'),
+			),
+			'info_link' => array(
+				'label' => T_( 'New Window' ),
+				'type' => 'checkbox',
+				'note' => T_( 'Check this to add target="_blank" to the info link' ),
+				'defaultvalue' => !$use_strict,
+			),
+		);
+
+		return $r;
+
+	}
+
+
 	/**
 	 * Display the widget!
 	 *
@@ -79,7 +108,7 @@ class coll_xml_feeds_Widget extends ComponentWidget
 		// Available XML feeds:
 		echo $this->disp_params['block_start'];
 
-		$title = '<img src="'.$rsc_url.'icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> '.T_('XML Feeds');
+		$title = str_replace( '%icon%', '<img src="'.$rsc_url.'icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> ', $this->disp_params['title']);
 		$this->disp_title( $title );
 
 		echo $this->disp_params['list_start'];
@@ -105,7 +134,7 @@ class coll_xml_feeds_Widget extends ComponentWidget
 		echo $this->disp_params['list_end'];
 
 		echo $this->disp_params['notes_start'];
-		echo '<a href="http://webreference.fr/2006/08/30/rss_atom_xml" target="_blank" title="External - English">What is RSS?</a>';
+		echo '<a href="http://webreference.fr/2006/08/30/rss_atom_xml"'.( $this->disp_params[ 'info_link' ] ? ' target="_blank"' : '' ).' title="External - English">What is RSS?</a>';
 		echo $this->disp_params['notes_end'];
 
 		echo $this->disp_params['block_end'];
@@ -117,6 +146,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/11/27 10:02:04  yabs
+ * added params
+ *
  * Revision 1.1  2007/06/25 11:02:23  fplanque
  * MODULES (refactored MVC)
  *
