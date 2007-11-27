@@ -138,6 +138,7 @@ class ItemListLight extends DataObjectList2
 				'filter_preset' => NULL,
 				'ts_min' => $timestamp_min,
 				'ts_max' => $timestamp_max,
+				'ts_created_max' => NULL,
 				'cat_array' => array(),
 				'cat_modifier' => NULL,
 				'cat_focus' => 'wide',					// Search in extra categories, not just main cat
@@ -627,6 +628,7 @@ class ItemListLight extends DataObjectList2
 		$this->ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
 		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
 		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
+		$this->ItemQuery->where_datecreated( $this->filters['ts_created_max'] );
 		$this->ItemQuery->where_visibility( $this->filters['visibility_array'] );
 
 		/*
@@ -1496,6 +1498,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.14  2007/11/27 22:31:57  fplanque
+ * debugged blog moderation
+ *
  * Revision 1.13  2007/11/25 14:28:17  fplanque
  * additional SEO settings
  *

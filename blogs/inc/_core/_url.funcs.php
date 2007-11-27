@@ -76,7 +76,8 @@ function fetch_remote_page( $url, & $info )
 	{
 		$info['used_method'] = 'fsockopen';
 		$url_parsed = parse_url($url);
-		if( empty($url_parsed['scheme']) ) {
+		if( empty($url_parsed['scheme']) )
+		{
 			$url_parsed = parse_url('http://'.$url);
 		}
 
@@ -88,9 +89,15 @@ function fetch_remote_page( $url, & $info )
 			$path .= '?'.$url_parsed['query'];
 		}
 
-		$out = "GET $path HTTP/1.0\r\n";
-		$out .= "Host: $host:$port\r\n";
-		$out .= "Connection: Close\r\n\r\n";
+		$out = "GET $path HTTP/1.1\r\n";
+		$out .= 'Host: '.$host;
+		if( !empty($url_parsed['port']) )
+		{	// we don't want to add :80 if not specified. remote end may not resolve it. (e-g b2evo multiblog does not)
+			$out .= ':'.$port;
+		}
+		$out .= "\r\nConnection: Close\r\n\r\n";
+
+		// pre_dump($out);
 
 		$fp = @fsockopen($host, $port, $errno, $errstr, 30);
 		if( ! $fp )
@@ -217,6 +224,9 @@ function url_same_protocol( $url, $other_url = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.3  2007/11/27 22:31:57  fplanque
+ * debugged blog moderation
+ *
  * Revision 1.2  2007/07/03 22:16:15  blueyed
  * Solved todo: changed order to "cURL, fsockopen, fopen" for fetch_remote_page
  *

@@ -593,6 +593,25 @@ class ItemQuery extends SQL
 
 
 	/**
+	 * Restricts creation date to a specific date range.
+	 *
+ 	 * @param mixed Do not show posts CREATED after this timestamp
+	 */
+	function where_datecreated( $timestamp_created_max = 'now' )
+	{
+		global $time_difference;
+
+		if( !empty($timestamp_created_max) )
+		{ // Hide posts after
+			// echo 'after';
+			$date_max = date('Y-m-d H:i:s', $timestamp_created_max + $time_difference );
+			$this->WHERE_and( $this->dbprefix.'datecreated <= \''. $date_max.'\'' );
+		}
+
+	}
+
+
+	/**
 	 * Restrict with keywords
 	 *
 	 * @param string Keyword search string
@@ -660,6 +679,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.3  2007/11/27 22:31:57  fplanque
+ * debugged blog moderation
+ *
  * Revision 1.2  2007/07/01 03:58:08  fplanque
  * cat_array cleanup/debug
  *
