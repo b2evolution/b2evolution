@@ -203,8 +203,6 @@ class coll_category_list_Widget extends ComponentWidget
 					echo $this->disp_params['list_end'];
 				}
 			}
-
-			echo $this->disp_params['list_end'];
 		}
 
 
@@ -347,6 +345,9 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2007/11/27 10:01:05  yabs
+ * validation
+ *
  * Revision 1.2  2007/07/01 15:12:28  fplanque
  * simplified 'use_form'
  *

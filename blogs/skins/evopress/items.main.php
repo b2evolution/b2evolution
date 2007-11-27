@@ -135,6 +135,7 @@ while( $Item = & mainlist_get_item() )
 						'use_popup' => false,
 					) );
 			?>
+			</p>
 	</div>
 
 	<?php
