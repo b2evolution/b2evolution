@@ -38,7 +38,7 @@ $maintenance_mode = 0;
 
 
 // Below is an alternative hardcore version of maintenance mode.
-// This one will bloc the install script too.
+// This one will block the install script too.
 // Remove /* and */ to activate.
 /*
 header('HTTP/1.0 503 Service Unavailable');
