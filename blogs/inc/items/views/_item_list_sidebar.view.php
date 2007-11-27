@@ -107,7 +107,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 		<label for="sh_deprecated"><?php echo T_('Deprecated') ?> <span class="notes">(<?php echo T_('Not published!') ?>)</span></label><br />
 
 		<input type="checkbox" name="show_statuses[]" value="redirected" id="sh_redirected" class="checkbox" <?php if( in_array( "redirected", $show_statuses ) ) echo 'checked="checked" '?> />
-		<label for="sh_deprecated"><?php echo T_('Redirected') ?></label><br />
+		<label for="sh_redirected"><?php echo T_('Redirected') ?></label><br />
 
 	 	</div>
 
@@ -270,6 +270,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.9  2007/11/27 22:33:42  fplanque
+ * bugfix
+ *
  * Revision 1.8  2007/10/08 08:32:00  fplanque
  * nicer forms
  *
