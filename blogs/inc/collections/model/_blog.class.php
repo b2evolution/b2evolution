@@ -530,7 +530,8 @@ class Blog extends DataObject
 						}
 						if( $demo_mode )
 						{
-							if( strpos($this->get('media_fullpath'), $media_path) !== 0 )
+							$canonical_fullpath = get_canonical_path($this->get('media_fullpath'));
+							if( ! $canonical_fullpath || strpos($canonical_fullpath, $media_path) !== 0 )
 							{
 								param_error( 'blog_media_fullpath', T_('Media dir location').': in demo mode the path must be inside of $media_path.' );
 							}
@@ -546,7 +547,7 @@ class Blog extends DataObject
 						else
 						{ // Test if it's below $media_path (subdir!)
 							$canonical_path = get_canonical_path($media_path.$this->get( 'media_subdir' ));
-							if( strpos($canonical_path, $media_path) !== 0 )
+							if( ! $canonical_path || strpos($canonical_path, $media_path) !== 0 )
 							{
 								param_error( 'blog_media_subdir', T_('Media dir location').': '.sprintf(T_('Invalid subdirectory &laquo;%s&raquo;.'), format_to_output($this->get('media_subdir'))) );
 							}
@@ -1591,6 +1592,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2007/11/27 02:37:09  blueyed
+ * Use canonical path when checking if path is inside of media_path!
+ *
  * Revision 1.20  2007/11/25 19:47:15  fplanque
  * cleaned up photo/media index a little bit
  *
