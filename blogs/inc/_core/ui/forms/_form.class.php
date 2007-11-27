@@ -169,7 +169,7 @@ class Form extends Widget
 					'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
 															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
 					'fieldset_end' => '</fieldset>'."\n",
-					'fieldstart' => '<fieldset $ID$>'."\n",
+					'fieldstart' => '<fieldset$ID$>'."\n",
 					'labelstart' => '<div class="label">',
 					'labelend' => "</div>\n",
 					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
@@ -244,7 +244,7 @@ class Form extends Widget
 															.'<span class="right_icons">$global_icons$</span>'
 															.'$title$</div></th></tr>'."\n";
 					$this->no_title_fmt = '<tr><th colspan="2"><span class="right_icons">$global_icons$</span></th></tr>'."\n";
-					$this->fieldstart = '<tr $ID$>'."\n";
+					$this->fieldstart = '<tr$ID$>'."\n";
 					$this->labelstart = '<td class="label">';
 					$this->labelend = "</td>\n";
 					$this->labelempty = '<td class="label">&nbsp;</td>'."\n";
@@ -261,7 +261,7 @@ class Form extends Widget
 					$this->formstart = '<div>';// required before (no_)title_fmt for validation
 					$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt = '<span style="float:right">$global_icons$</span>'."\n";
-					$this->fieldstart = '<fieldset $ID$>'."\n";
+					$this->fieldstart = '<fieldset$ID$>'."\n";
 					$this->labelstart = '<div class="label">';
 					$this->labelend = "</div>\n";
 					$this->labelempty = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
@@ -278,7 +278,7 @@ class Form extends Widget
 					$this->formstart = '<div>';// required before (no_)title_fmt for validation
 					$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt = '<span style="float:right">$global_icons$</span>'."\n";
-					$this->fieldstart = '<fieldset $ID$>'."\n";
+					$this->fieldstart = '<fieldset$ID$>'."\n";
 					$this->labelstart = '<div class="label">';
 					$this->labelend = "</div>\n";
 					$this->labelempty = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
@@ -295,7 +295,7 @@ class Form extends Widget
 					$this->formstart = '';
 					$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt = '<span style="float:right">$global_icons$</span>&nbsp;'."\n";
-					$this->fieldstart = '<div class="tile" $ID$>';
+					$this->fieldstart = '<div class="tile"$ID$>';
 					$this->labelstart = '<strong>';
 					$this->labelend = "</strong>\n";
 					$this->labelempty = '';
@@ -312,7 +312,7 @@ class Form extends Widget
 					$this->formstart = '';
 					$this->title_fmt = '$title$'."\n"; // TODO: icons
 					$this->no_title_fmt = '';          //           "
-					$this->fieldstart = '<span class="block" $ID$>';
+					$this->fieldstart = '<span class="block"$ID$>';
 					$this->labelstart = '';
 					$this->labelend = "\n";
 					$this->labelempty = '';
@@ -378,7 +378,7 @@ class Form extends Widget
 		// This is useful to show/hide the whole field by JS.
 		if( !empty(	$this->_common_params['id'] ) )
 		{
-			$ffield_id = 'id="ffield_'.$this->_common_params['id'].'" ';
+			$ffield_id = ' id="ffield_'.$this->_common_params['id'].'" ';
 		}
 		else
 		{	// No ID in case there's no id/name given for a field.
@@ -1257,6 +1257,9 @@ class Form extends Widget
 	 */
 	function begin_form( $form_class = NULL, $form_title = '', $form_params = array() )
 	{
+		global $use_strict;
+		if( $use_strict ) unset( $form_params[ 'target' ] );// target isn't valid for XHTML Strict
+
 		$this->handle_common_params( $form_params, NULL /* "name" attribute is deprecated in xhtml */ );
 
 		if( ! empty($this->form_name) )
@@ -1290,7 +1293,6 @@ class Form extends Widget
 			$bozo_start_modified = true;
 			unset( $form_params['bozo_start_modified'] );
 		}
-
 		$r = "\n\n<form".get_field_attribs_as_string($form_params).">\n";
 
 		// $r .= '<div>'; // for XHTML (dh> removed 'style="display:inline"' because it's buggy with FireFox 1.0.x, at least at the "Write" admin page; see http://forums.b2evolution.net/viewtopic.php?t=10130)
@@ -1989,6 +1991,18 @@ class Form extends Widget
 		$this->handle_common_params( $field_params, NULL, $field_label );
 
 		$r = $this->fieldstart;
+
+		// Start the new form field and inject an automatic DOM id
+		// This is useful to show/hide the whole field by JS.
+		if( !empty(	$this->_common_params['id'] ) )
+		{
+			$ffield_id = ' id="ffield_'.$this->_common_params['id'].'" ';
+		}
+		else
+		{	// No ID in case there's no id/name given for a field.
+			$ffield_id = '';
+		}
+		$r = str_replace( '$ID$', $ffield_id, $this->fieldstart );
 
 		if( strlen($field_label) )
 		{
@@ -2817,6 +2831,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.19  2007/11/27 10:43:10  yabs
+ * validation
+ *
  * Revision 1.18  2007/11/22 15:24:54  fplanque
  * fix
  *
