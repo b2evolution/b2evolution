@@ -77,13 +77,13 @@ class coll_xml_feeds_Widget extends ComponentWidget
 			'title' => array(
 				'label' => T_( 'Title' ),
 				'size' => 40,
-				'note' => T_( 'This is the title to display, %icon% will be replaced by the feed icon' ),
-				'defaultvalue' => '%icon% '.T_('XML Feeds'),
+				'note' => T_( 'This is the title to display, $icon$ will be replaced by the feed icon' ),
+				'defaultvalue' => '$icon$ '.T_('XML Feeds'),
 			),
 			'info_link' => array(
 				'label' => T_( 'New Window' ),
 				'type' => 'checkbox',
-				'note' => T_( 'Check this to add target="_blank" to the info link' ),
+				'note' => T_( 'Check this to add target="_blank" to the "What is RSS?" link' ),
 				'defaultvalue' => !$use_strict,
 			),
 		);
@@ -108,7 +108,8 @@ class coll_xml_feeds_Widget extends ComponentWidget
 		// Available XML feeds:
 		echo $this->disp_params['block_start'];
 
-		$title = str_replace( '%icon%', '<img src="'.$rsc_url.'icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> ', $this->disp_params['title']);
+		$title = str_replace( '$icon$', '<img src="'.$rsc_url.'icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> ', $this->disp_params['title']);
+			// fp> TODO: support for different icon sizes and backgrounds (at least black and white; mid grey would be cool also)
 		$this->disp_title( $title );
 
 		echo $this->disp_params['list_start'];
@@ -146,6 +147,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2007/11/28 17:50:24  fplanque
+ * normalization
+ *
  * Revision 1.2  2007/11/27 10:02:04  yabs
  * added params
  *
