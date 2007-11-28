@@ -216,6 +216,7 @@ $db_config['aliases'] = array(
 		'T_files'               => $tableprefix.'files',
 		'T_filetypes'           => $tableprefix.'filetypes',
 		'T_groups'              => $tableprefix.'groups',
+		'T_global__cache'       => $tableprefix.'global__cache',
 		'T_hitlog'              => $tableprefix.'hitlog',
 		'T_items__item'         => $tableprefix.'items__item',
 		'T_items__itemtag'      => $tableprefix.'items__itemtag',
@@ -593,7 +594,7 @@ $cron_timeout_delay = 1800; // 30 minutes
 
 
 // ----- CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
-$evonetsrv_host = 'b2evolution.net';
+$evonetsrv_host = 'rpc.b2evolution.net';
 $evonetsrv_port = 80;
 $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 

@@ -176,7 +176,7 @@ class AbstractSettings
 		$whereList = array();
 
 		if( $this->cache_by_col_keys && isset($arg1) )
-		{
+		{ // The number of column keys to cache by is > 0
 			$testCache = $this->cache;
 			$args = array( $arg1, $arg2, $arg3 );
 
@@ -199,7 +199,7 @@ class AbstractSettings
 			}
 		}
 		else
-		{ // we're about to load everything
+		{ // We cache everything at once!
 			$this->all_loaded = true;
 		}
 
@@ -709,6 +709,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.2  2007/11/28 16:38:20  fplanque
+ * minor
+ *
  * Revision 1.1  2007/06/25 11:01:20  fplanque
  * MODULES (refactored MVC)
  *

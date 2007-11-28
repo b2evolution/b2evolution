@@ -190,7 +190,6 @@ function antispam_report_abuse( $abuse_string )
 /**
  * Request abuse list from central blacklist.
  *
- * @param boolean Display while fetching it?
  * @return boolean true = success, false = error
  */
 function antispam_poll_abuse()
@@ -326,6 +325,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.3  2007/11/28 16:38:21  fplanque
+ * minor
+ *
  * Revision 1.2  2007/09/22 19:23:56  fplanque
  * various fixes & enhancements
  *

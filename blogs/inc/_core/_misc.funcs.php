@@ -853,7 +853,7 @@ function xmlrpc_displayresult( $result, $display = true, $log = '' )
  * @param Log object to add messages to
  * @return boolean true = success, false = error
  */
-function xmlrpc_logresult( $result, & $message_Log )
+function xmlrpc_logresult( $result, & $message_Log, $log_payload = true )
 {
 	if( ! $result )
 	{ // We got no response:
@@ -884,8 +884,11 @@ function xmlrpc_logresult( $result, & $message_Log )
 		$out = $value;
 	}
 
-	$message_Log->add( T_('Response').': '.$out, 'success' );
-
+	if( $log_payload )
+	{
+		$message_Log->add( T_('Response').': '.$out, 'success' );
+	}
+	
 	return true;
 }
 
@@ -2976,6 +2979,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.13  2007/11/28 16:38:21  fplanque
+ * minor
+ *
  * Revision 1.12  2007/11/23 14:54:31  fplanque
  * no message
  *
