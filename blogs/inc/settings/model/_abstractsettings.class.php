@@ -281,8 +281,7 @@ class AbstractSettings
 		{
 			case 1:
 				$this->_load( $col_key1 );
-
-				if( isset($this->cache[ $col_key1 ]->unserialized) )
+				if( !empty($this->cache[ $col_key1 ]->unserialized) )
 				{	// The value has been unserialized before:
 					$r = $this->cache[ $col_key1 ]->value;
 				}
@@ -476,7 +475,7 @@ class AbstractSettings
 
 		$atCache->value = $value;
 		$atCache->dbUptodate = false;
-		$atCache->unserialized = true;
+		$atCache->unserialized = false; // We haven't tried to unserialize the value yet
 
 		$Debuglog->add( $debugMsg.' SET!', 'settings' );
 
@@ -709,6 +708,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.3  2007/11/28 16:57:50  fplanque
+ * bugfix when trying to access a serialized value rigth after setting it
+ *
  * Revision 1.2  2007/11/28 16:38:20  fplanque
  * minor
  *
