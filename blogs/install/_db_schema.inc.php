@@ -44,6 +44,14 @@ $schema_queries = array(
 			PRIMARY KEY ( set_name )
 		)" ),
 
+	'T_global__cache' => array(
+		'Creating table for Caches',
+		"CREATE TABLE T_global__cache (
+			cach_name VARCHAR( 30 ) NOT NULL ,
+			cach_cache MEDIUMBLOB NULL ,
+			PRIMARY KEY ( cach_name )
+		)" ),
+
 	'T_users' => array(
 		'Creating table for Users',
 		"CREATE TABLE T_users (
@@ -551,6 +559,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.71  2007/11/28 17:29:44  fplanque
+ * Support for getting updates from b2evolution.net
+ *
  * Revision 1.70  2007/11/03 22:38:34  fplanque
  * no message
  *

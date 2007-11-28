@@ -41,6 +41,7 @@ $blogListButtons = $AdminUI->get_html_collection_list( 'blog_ismember', 'view',
 
 $AdminUI->set_path( 'dashboard' );
 
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -48,7 +49,6 @@ $AdminUI->disp_html_head();
 $AdminUI->disp_body_top();
 
 
-// fp> Note: don't bother with T_() yet. This is going to change too often.
 
 if( $blog )
 {	// We want to look at a specific blog:
@@ -410,12 +410,31 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	$block_item_Widget = & new Widget( 'block_item' );
 
-	$block_item_Widget->title = T_('Info');
+	$block_item_Widget->title = T_('Updates from b2evolution.net');
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 
-	echo '<p>Please be advised that this is beta software. A few things may still change until the stable release.</p>';
 
-	
+	// EXPERIMENTAL
+	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+	b2evonet_get_updates();
+	// Display info & error messages
+	echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
+
+
+	/**
+	 * @var AbstractSettings
+	 */
+	global $global_Cache;
+	$updates_array = $global_Cache->get( 'evonet_updates' );
+	if( !empty($updates_array) )
+	{	// We have managed to get updates (right now or in the past):
+		echo '<p>'.$updates_array['version_status_msg'].'</p>';
+		if( !empty($updates_array['extra_msg']) )
+		{
+			echo '<p>'.$updates_array['extra_msg'].'</p>';
+		}
+	}
+
 
 	$block_item_Widget->disp_template_replaced( 'block_end' );
 
@@ -467,6 +486,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2007/11/28 17:29:45  fplanque
+ * Support for getting updates from b2evolution.net
+ *
  * Revision 1.16  2007/11/04 21:22:25  fplanque
  * version bump
  *

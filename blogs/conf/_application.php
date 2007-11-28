@@ -15,12 +15,12 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible to {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '2.1.1-beta';
+$app_version = '2.2.0-beta';
 
 /**
  * Release date
  */
-$app_date = '2007-11-22';
+$app_date = '2007-11-28';
 
 /**
  * This is used to check if the database is up to date.

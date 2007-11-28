@@ -248,6 +248,13 @@ $Session = & new Session();
 
 
 /**
+ * @global AbstractSettings
+ */
+$global_Cache = & new AbstractSettings( 'T_global__cache', array( 'cach_name' ), 'cach_cache', 1 );
+
+
+
+/**
  * Plugins init.
  * This is done quite early here to give an early hook ("SessionLoaded") to plugins (though it might also be moved just after $DB init when there is reason for a hook there).
  * The {@link dnsbl_antispam_plugin} is an example that uses this to check the user's IP against a list of DNS blacklists.
@@ -635,6 +642,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.84  2007/11/28 17:29:45  fplanque
+ * Support for getting updates from b2evolution.net
+ *
  * Revision 1.83  2007/11/24 21:25:40  fplanque
  * make password encryption look like encryption
  *

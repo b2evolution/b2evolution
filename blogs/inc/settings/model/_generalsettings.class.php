@@ -58,6 +58,9 @@ class GeneralSettings extends AbstractSettings
 		'antispam_threshold_delete' => '100', // do not delete by default!
 		'antispam_block_spam_referers' => '0',	// By default, let spam referers go in silently (just don't log them). This is in case the blacklist is too paranoid (social media, etc.)
 
+		'evonet_last_update' => '1196000000',		// just around the time we implemented this ;)
+		'evonet_last_attempt' => '1196000000',		// just around the time we implemented this ;)
+
 		'AutoBR' => '0',			// Used for email blogging. fp> TODO: should be replaced by "email renderers/decoders/cleaners"...
 
 		'log_public_hits' => '1',
@@ -124,7 +127,7 @@ class GeneralSettings extends AbstractSettings
 		$DB->show_errors = false;
 
 		// Init through the abstract constructor. This should be the first DB connection.
-		parent::AbstractSettings( 'T_settings', array( 'set_name' ), 'set_value' );
+		parent::AbstractSettings( 'T_settings', array( 'set_name' ), 'set_value', 0 );
 
 
 		// check DB version:
@@ -154,6 +157,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.6  2007/11/28 17:29:44  fplanque
+ * Support for getting updates from b2evolution.net
+ *
  * Revision 1.5  2007/11/03 04:57:51  fplanque
  * no message
  *
