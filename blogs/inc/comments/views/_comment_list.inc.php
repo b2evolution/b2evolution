@@ -95,6 +95,7 @@ while( $Comment = & $CommentList->get_next() )
 		<?php $Comment->author() ?>
 		</div>
 		<div class="bCommentText">
+			<?php $Comment->rating(); ?>
 			<?php $Comment->content() ?>
 		</div>
 		</div>
@@ -124,6 +125,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.5  2007/11/29 21:00:10  fplanque
+ * comment ratings shown in BO
+ *
  * Revision 1.4  2007/09/07 21:11:10  fplanque
  * superstylin' (not even close)
  *
