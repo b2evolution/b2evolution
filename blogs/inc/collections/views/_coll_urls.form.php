@@ -196,20 +196,20 @@ $Form->begin_fieldset( T_('URL Presets') );
 	{
 		case 'awall':
 			$seo_author = '<a href="http://www.seobook.com/" target="_blank">Aaron Wall</a>';
-			$seo_site = '<a href="http://www.seobook.com/" target="_blank">SEO Book</a>';
+			$seo_site = 'For more optimization tips, visit <strong><a href="http://www.seobook.com/" target="_blank">SEO Book</a></strong>.';
 			break;
 
 		case 'sspencer':
 			$seo_author = '<a href="http://www.stephanspencer.com/" target="_blank">Stephan Spencer</a>';
-			$seo_site = '<a href="http://www.netconcepts.com/" target="_blank">NetConcepts</a>';
+			$seo_site = 'For more advanced optimization, visit <strong><a href="http://www.netconcepts.com/" target="_blank">NetConcepts</a></strong>.';
 			break;
 	}
 
 	if( !empty($seo_author) )
 	{
 	 	$Form->info_field( T_('Selected presets'),
-			sprintf( T_('You can review the URL settings recommended by <strong>%s</strong> below. Click the "Save!" button to apply these settings. For more advanced optimization, visit <strong>%s</strong>.'),
-								$seo_author, $seo_site ) );
+			sprintf( T_('You can review the URL settings recommended by <strong>%s</strong> below. Click the "Save!" button to apply these settings.'),
+								$seo_author ).' '.$seo_site );
 	}
 $Form->end_fieldset();
 
@@ -299,6 +299,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.12  2007/11/29 21:23:35  fplanque
+ * Changed wording.
+ *
  * Revision 1.11  2007/11/25 14:28:17  fplanque
  * additional SEO settings
  *
