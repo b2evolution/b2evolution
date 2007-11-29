@@ -1028,13 +1028,6 @@ class Item extends ItemLight
 
   /**
 	 * Display more link
-	 *
-	 * @param string string to display before more link
-	 * @param string string to display after more link
-	 * @param string
-	 * @param string
-	 * @param mixed
-	 * @param string Output format, see {@link format_to_output()}
 	 */
 	function get_more_link( $params = array() )
 	{
@@ -2291,29 +2284,39 @@ class Item extends ItemLight
 
 	/**
 	 * Template function: Display link to item related url
-	 *
-	 * @param string string to display before the link (if exists)
-	 * @param string string to display after the link (if exists)
-	 * @param string Link text to use (%s gets replaced by the URL).
-	 * @param array Attributes for the <a> tag (if the href attribute is set, %s gets replaced by the URL).
-	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function url_link( $before = '', $after = '', $text = '%s', $attribs = array(), $format = 'htmlbody' )
+	function url_link( $params = array() )
 	{
-		if( ! empty( $this->url ) )
+		if( empty( $this->url ) )
 		{
-			if( isset($attribs['href']) )
-			{	// We have specified our own href attribute for the link:!
-				$attribs['href'] = str_replace( '%s', $this->url, $attribs['href'] );
-			}
-			else
-			{ // Use default href:
-				$attribs['href'] = $this->url;
-			}
-			echo $before;
-			echo format_to_output( '<a'.get_field_attribs_as_string( $attribs ).'>'.str_replace( '%s', $this->url, $text ).'</a>', $format );
-			echo $after;
+			return;
 		}
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'        => ' ',
+				'after'         => ' ',
+				'text_template' => '$url$',
+				'url_template'  => '$url$',
+				'target'        => '',
+				'format'        => 'htmlbody',
+			), $params );
+
+		$r = $params['before'];
+
+		$r .= '<a href="'.str_replace( '$url$', $this->url, $params['url_template'] ).'"';
+
+		if( !empty( $params['target'] ) )
+		{
+			$r .= ' target="'.$params['target'].'"';
+		}
+
+		$r .= '>'.str_replace( '$url$', $this->url, $params['text_template'] ).'</a>';
+
+		$r .= $params['after'];
+
+		echo format_to_output( $r, $params['format'] );
+
 	}
 
 
@@ -3230,6 +3233,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.20  2007/11/29 20:53:45  fplanque
+ * Fixed missing url link in basically all skins ...
+ *
  * Revision 1.19  2007/11/25 14:28:17  fplanque
  * additional SEO settings
  *

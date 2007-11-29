@@ -104,7 +104,11 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			{
 				?>
 		<content type="html"><![CDATA[<?php
-				$Item->url_link( '<p>', '</p>' );
+				// URL link, if the post has one:
+				$Item->url_link( array(
+						'before'        => '<p>',
+						'after'         => '</p>',
+					) );
 
 				// Display images that are linked to this post:
 				$content = $Item->get_images( array(

@@ -17,6 +17,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Default params:
 $params = array_merge( array(
 		'image_size'	     => 'fit-400x320',
+		'before_url_link'  => '<p class="post_link">'.T_('Link:').' ',
+		'after_url_link'   => '</p>',
 		'before_more_link' => '<p class="bMore">',
 		'after_more_link'  => '</p>',
 		'more_link_text'   => '#',
@@ -45,6 +47,15 @@ if( !empty($params['image_size']) )
 				'allow_multiple_counts_per_page' => false,
 			) );
 
+		// URL link, if the post has one:
+		$Item->url_link( array(
+				'before'        => $params['before_url_link'],
+				'after'         => $params['after_url_link'],
+				'text_template' => '$url$',
+				'url_template'  => '$url$',
+				'target'        => '',
+			) );
+
 		// Display CONTENT:
 		$Item->content_teaser( array(
 				'before'      => '',
@@ -68,6 +79,9 @@ if( !empty($params['image_size']) )
 <?php
 /*
  * $Log$
+ * Revision 1.5  2007/11/29 20:53:45  fplanque
+ * Fixed missing url link in basically all skins ...
+ *
  * Revision 1.4  2007/11/04 01:10:57  fplanque
  * skin cleanup continued
  *

@@ -96,6 +96,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			<?php
 				if( $feed_content == 'excerpt' )
 				{
+
 					?>
 			<description><?php
 				$content = $Item->get_excerpt( 'entityencoded' );
@@ -107,7 +108,6 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				echo make_rel_links_abs( $content );
 			?></description>
 			<content:encoded><![CDATA[<?php
-				// Display images that are linked to this post:
 				$content = $Item->get_excerpt( 'htmlbody' );
 
 				// fp> this is another one of these "oooooh it's just a tiny little change"
@@ -117,13 +117,19 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				echo make_rel_links_abs( $content );
 			?>]]></content:encoded>
 					<?php
+
 				}
 				elseif( $feed_content == 'normal' )
 				{
+
 					?>
 			<description><?php
-			  // fp> TODO: make a clear decision on wether or not $before &nd $after get formatted to output or not.
-			  $Item->url_link( '&lt;p&gt;', '&lt;/p&gt;', '%s', array(), 'entityencoded' );
+				// URL link, if the post has one:
+				$Item->url_link( array(
+						'before'        => '<p>',
+						'after'         => '</p>',
+						'format'        => 'entityencoded',
+					) );
 
 				// Display images that are linked to this post:
 				$content = $Item->get_images( array(
@@ -152,7 +158,11 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				echo make_rel_links_abs( $content );
 			?></description>
 			<content:encoded><![CDATA[<?php
-				$Item->url_link( '<p>', '</p>' );
+				// URL link, if the post has one:
+				$Item->url_link( array(
+						'before'        => '<p>',
+						'after'         => '</p>',
+					) );
 
 				// Display images that are linked to this post:
 				$content = $Item->get_images( array(

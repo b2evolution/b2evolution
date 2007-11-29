@@ -120,8 +120,12 @@ while( $Item = & mainlist_get_item() )
 		{
 			?>
 	<description><?php
-		// fp> TODO: make a clear decision on wether or not $before &nd $after get formatted to output or not.
-		$Item->url_link( '&lt;p&gt;', '&lt;/p&gt;', '%s', array(), 'entityencoded' );
+		// URL link, if the post has one:
+		$Item->url_link( array(
+				'before'        => '<p>',
+				'after'         => '</p>',
+				'format'        => 'entityencoded',
+			) );
 
 		// Display images that are linked to this post:
 		$content = $Item->get_images( array(
@@ -150,7 +154,12 @@ while( $Item = & mainlist_get_item() )
 		echo make_rel_links_abs( $content );
 	?></description>
 	<content:encoded><![CDATA[<?php
-		$Item->url_link( '<p>', '</p>' );
+		// URL link, if the post has one:
+		$Item->url_link( array(
+				'before'        => '<p>',
+				'after'         => '</p>',
+			) );
+
 		// Display images that are linked to this post:
 		$content = $Item->get_images( array(
 				'before' =>              '<div>',
