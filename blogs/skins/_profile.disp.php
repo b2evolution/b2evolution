@@ -110,6 +110,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.1  2007/11/29 19:29:23  fplanque
+ * normalized skin filenames
+ *
  * Revision 1.39  2007/04/26 00:11:04  fplanque
  * (c) 2007
  *

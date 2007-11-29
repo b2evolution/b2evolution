@@ -55,6 +55,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.1  2007/11/29 19:29:22  fplanque
+ * normalized skin filenames
+ *
  * Revision 1.35  2007/11/03 21:04:28  fplanque
  * skin cleanup
  *

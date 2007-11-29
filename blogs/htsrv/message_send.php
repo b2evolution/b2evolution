@@ -2,7 +2,7 @@
 /**
  * This file sends an email to the user!
  *
- * It's the form action for {@link _msgform.php}.
+ * It's the form action for {@link _msgform.disp.php}.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -314,6 +314,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.55  2007/11/29 19:29:22  fplanque
+ * normalized skin filenames
+ *
  * Revision 1.54  2007/04/26 00:11:14  fplanque
  * (c) 2007
  *

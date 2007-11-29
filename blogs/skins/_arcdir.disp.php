@@ -25,6 +25,9 @@ $Plugins->call_by_code( 'evo_Arch', array( 'title'=>'',
 
 /*
  * $Log$
+ * Revision 1.1  2007/11/29 19:29:22  fplanque
+ * normalized skin filenames
+ *
  * Revision 1.13  2007/04/26 00:11:03  fplanque
  * (c) 2007
  *

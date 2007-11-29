@@ -1011,7 +1011,7 @@ function bloggergettemplate($m)
 	}
 	elseif ($templateType == "archiveIndex")
 	{
-		$file = $edit_folder.'_arcdir.php';
+		$file = $edit_folder.'_arcdir.disp.php';
 	}
 	else return; // TODO: handle this cleanly
 
@@ -1093,7 +1093,7 @@ function bloggersettemplate( $m )
 	}
 	elseif ($templateType == "archiveIndex")
 	{
-		$file = $edit_folder.'_arcdir.php';
+		$file = $edit_folder.'_arcdir.disp.php';
 	}
 	else return; // TODO: handle this cleanly
 
@@ -2239,6 +2239,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.141  2007/11/29 19:29:24  fplanque
+ * normalized skin filenames
+ *
  * Revision 1.140  2007/11/23 09:55:04  blueyed
  * Fix "Catchable fatal error" in metawebloggetrecentposts()
  *

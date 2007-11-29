@@ -201,6 +201,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.1  2007/11/29 19:29:22  fplanque
+ * normalized skin filenames
+ *
  * Revision 1.39  2007/09/22 19:23:56  fplanque
  * various fixes & enhancements
  *

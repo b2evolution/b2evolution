@@ -240,16 +240,17 @@ function skin_include( $template_name, $params = array() )
 
 		// Default display handlers:
 		$disp_handlers = array_merge( array(
-				'disp_posts'    => '_posts.disp.php',
-				'disp_single'   => '_single.disp.php',
-				'disp_page'     => '_page.disp.php',
-				'disp_arcdir'   => '_arcdir.php',
-				'disp_catdir'   => '_catdir.disp.php',
-				'disp_comments' => '_lastcomments.php',
-				'disp_mediaidx' => '_mediaidx.disp.php',
-				'disp_msgform'  => '_msgform.php',
-				'disp_profile'  => '_profile.php',
-				'disp_subs'     => '_subscriptions.php',
+				'disp_arcdir'         => '_arcdir.disp.php',
+				'disp_catdir'         => '_catdir.disp.php',
+				'disp_comments'       => '_comments.disp.php',
+				'disp_feedback-popup' => '_feedback_popup.disp.php',
+				'disp_mediaidx'       => '_mediaidx.disp.php',
+				'disp_msgform'        => '_msgform.disp.php',
+				'disp_page'           => '_page.disp.php',
+				'disp_posts'          => '_posts.disp.php',
+				'disp_profile'        => '_profile.disp.php',
+				'disp_single'         => '_single.disp.php',
+				'disp_subs'           => '_subs.disp.php',
 			), $params );
 
 		if( !isset( $disp_handlers['disp_'.$disp] ) )
@@ -469,6 +470,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.19  2007/11/29 19:29:22  fplanque
+ * normalized skin filenames
+ *
  * Revision 1.18  2007/11/25 19:47:15  fplanque
  * cleaned up photo/media index a little bit
  *
@@ -485,7 +489,7 @@ function skin_exists( $name, $filename = 'index.main.php' )
  * refactored blog settings / UI
  *
  * Revision 1.13  2007/10/12 05:26:59  fplanque
- * global $DB has been added to _subscriptions already and its use should not be encouraged. Therefore I don't want it available by default. _subscriptions.php should be cleaned up at some point.
+ * global $DB has been added to _subscriptions already and its use should not be encouraged. Therefore I don't want it available by default. _subs.disp.php should be cleaned up at some point.
  *
  * Revision 1.11  2007/10/09 02:10:50  fplanque
  * URL fixes

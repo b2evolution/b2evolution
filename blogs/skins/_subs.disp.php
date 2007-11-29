@@ -114,6 +114,9 @@ $Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.1  2007/11/29 19:29:23  fplanque
+ * normalized skin filenames
+ *
  * Revision 1.17  2007/09/28 09:29:03  fplanque
  * fixes
  *

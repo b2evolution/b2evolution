@@ -123,7 +123,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		}
 		
 		// The form, per se:
-		require $skins_path.'_msgform.php';
+		require $skins_path.'_msgform.disp.php';
 	}
 	else
 	{	// We are coming back after sending a message:
