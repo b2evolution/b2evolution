@@ -55,7 +55,7 @@ class archives_plugin extends Plugin
 	var $name = 'Archives Widget';
 	var $code = 'evo_Arch';
 	var $priority = 50;
-	var $version = '1.9-dev';
+	var $version = '2.2';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 
@@ -580,6 +580,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.45  2007/11/29 21:52:22  fplanque
+ * minor
+ *
  * Revision 1.44  2007/11/25 18:20:37  fplanque
  * additional SEO settings
  *

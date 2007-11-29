@@ -50,7 +50,7 @@ class calendar_plugin extends Plugin
 	var $name = 'Calendar Widget';
 	var $code = 'evo_Calr';
 	var $priority = 20;
-	var $version = '2.0';
+	var $version = '2.2';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 
@@ -1141,6 +1141,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.48  2007/11/29 21:52:22  fplanque
+ * minor
+ *
  * Revision 1.47  2007/11/25 18:20:38  fplanque
  * additional SEO settings
  *
