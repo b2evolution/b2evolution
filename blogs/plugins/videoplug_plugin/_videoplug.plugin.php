@@ -24,7 +24,7 @@ class videoplug_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '2.0';
+	var $version = '2.2';
 	var $number_of_installs = 1;
 
 
@@ -49,17 +49,20 @@ class videoplug_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
+		// fp> removed some embeds to make it xhtml compliant, using only object. (Hari style ;)
+		// anyone, feel free to clean up the ones that have no object tag at all.
+
 		// Youtube:
-		$content = preg_replace( '¤\[video:youtube:(.+?)]¤', '<div class="videoblock"><object width="425" height="350"><param name="movie" value="http://www.youtube.com/v/\\1"></param><param name="wmode" value="transparent"></param><embed src="http://www.youtube.com/v/\\1" type="application/x-shockwave-flash" wmode="transparent" width="425" height="350"></embed></object></div>', $content );
+		$content = preg_replace( '¤\[video:youtube:(.+?)]¤', '<div class="videoblock"><object data="http://www.youtube.com/v/\\1" type="application/x-shockwave-flash" wmode="transparent" width="425" height="350"><param name="movie" value="http://www.youtube.com/v/\\1"></param><param name="wmode" value="transparent"></param></object></div>', $content );
 
 		// Dailymotion:
-		$content = preg_replace( '¤\[video:dailymotion:(.+?)]¤', '<div class="videoblock"><object width="425" height="335"><param name="movie" value="http://www.dailymotion.com/swf/\\1"></param><param name="allowfullscreen" value="true"></param><embed src="http://www.dailymotion.com/swf/\\1" type="application/x-shockwave-flash" width="425" height="335" allowfullscreen="true"></embed></object></div>', $content );
+		$content = preg_replace( '¤\[video:dailymotion:(.+?)]¤', '<div class="videoblock"><object data="http://www.dailymotion.com/swf/\\1" type="application/x-shockwave-flash" width="425" height="335" allowfullscreen="true"><param name="movie" value="http://www.dailymotion.com/swf/\\1"></param><param name="allowfullscreen" value="true"></param></object></div>', $content );
 
 		// Google video:
 		$content = preg_replace( '¤\[video:google:(.+?)]¤', '<div class="videoblock"><embed style="width:400px; height:326px;" id="VideoPlayback" type="application/x-shockwave-flash" src="http://video.google.com/googleplayer.swf?docId=\\1&hl=en" flashvars=""></embed></div>', $content );
 
 		// LiveVideo
-		$content = preg_replace( '¤\[video:livevideo:(.+?)]¤', '<div class="videoblock"><object width="425" height="350"><param name="movie" value="http://www.livevideo.com/flvplayer/embed/\\1"></param><param name="wmode" value="transparent"></param><embed src="http://www.livevideo.com/flvplayer/embed/\\1" type="application/x-shockwave-flash" wmode="transparent" width="425" height="350"></embed></object></div>', $content );
+		$content = preg_replace( '¤\[video:livevideo:(.+?)]¤', '<div class="videoblock"><object src="http://www.livevideo.com/flvplayer/embed/\\1" type="application/x-shockwave-flash" wmode="transparent" width="425" height="350"><param name="movie" value="http://www.livevideo.com/flvplayer/embed/\\1"></param><param name="wmode" value="transparent"></param></object></div>', $content );
 
 		// iFilm
 		$content = preg_replace( '¤\[video:ifilm:(.+?)]¤', '<div class="videoblock"><embed width="425" height="350" src="http://www.ifilm.com/efp" quality="high" bgcolor="000000" name="efp" align="middle" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="flvbaseclip=\\1"> </embed></div>', $content );
@@ -141,6 +144,9 @@ class videoplug_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.10  2007/11/29 21:52:06  fplanque
+ * Hari style embed removal
+ *
  * Revision 1.9  2007/09/16 22:16:46  fplanque
  * minor
  *
