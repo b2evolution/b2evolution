@@ -811,6 +811,10 @@ class File extends DataObject
 				{
 					$this->_fsgroup_name = $posix_group['name'];
 				}
+				else
+				{ // fallback to gid:
+					$this->_fsgroup_name = $gid;
+				}
 			}
 		}
 
@@ -836,6 +840,10 @@ class File extends DataObject
 				if( is_array($posix_user) )
 				{
 					$this->_fsowner_name = $posix_user['name'];
+				}
+				else
+				{ // fallback to uid:
+					$this->_fsowner_name = $uid;
 				}
 			}
 		}
@@ -1738,6 +1746,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2007/11/29 00:07:19  blueyed
+ * Fallback to uid/gid for file owner/group, if name is unknown
+ *
  * Revision 1.1  2007/06/25 10:59:54  fplanque
  * MODULES (refactored MVC)
  *
