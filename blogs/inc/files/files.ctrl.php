@@ -124,7 +124,7 @@ if( ! empty($root) )
 		$fm_FileRoot = false;
 	}
 }
-elseif( $Blog )
+elseif( !empty($Blog) )
 {	// try to get it for the current Blog
 	$fm_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $Blog->ID );
 	if( ! $fm_FileRoot || ! isset( $available_Roots[$fm_FileRoot->ID] ) )
@@ -1482,6 +1482,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2007/11/29 19:47:41  fplanque
+ * minor
+ *
  * Revision 1.7  2007/11/29 00:00:46  blueyed
  * Fix E_NOTICE + "requested blog without ID" fatal error
  *
