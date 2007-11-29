@@ -130,6 +130,15 @@ skin_include( '_body_header.inc.php' );
 				// -------------------------- END OF POST CONTENT -------------------------
 			?>
 
+			<?php
+				// List all tags attached to this post:
+				$Item->tags( array(
+						'before' =>         '<div class="posttags">'.T_('Tags').': ',
+						'after' =>          '</div>',
+						'separator' =>      ', ',
+					) );
+			?>
+
 		</div>
 
 		<?php

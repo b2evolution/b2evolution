@@ -178,6 +178,13 @@ skin_include( '_html_header.inc.php' );
 					'include_external'=> true,
 					'link_categories' => true,
 				) );
+
+				// List all tags attached to this post:
+				$Item->tags( array(
+						'before' =>         ', '.T_('Tags').': ',
+						'after' =>          ' ',
+						'separator' =>      ', ',
+					) );
 			?>
 			</div>
 

@@ -241,7 +241,7 @@ switch( $action )
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p );
 
-  	$item_tags = implode( ' ', $edited_Item->get_tags() );
+  	$item_tags = implode( ', ', $edited_Item->get_tags() );
   	$trackback_url = '';
 
 		// Page title:
@@ -746,6 +746,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2007/11/29 22:47:15  fplanque
+ * tags everywhere + debug
+ *
  * Revision 1.9  2007/11/08 17:48:41  blueyed
  * Fixed encoding of redirect_to
  *

@@ -224,6 +224,16 @@ skin_include( '_html_header.inc.php' );
 					'link_categories' => true,
 				) );
 			?>
+
+			<?php
+				// List all tags attached to this post:
+				$Item->tags( array(
+						'before' =>         ' &bull; '.T_('Tags').': ',
+						'after' =>          ' ',
+						'separator' =>      ', ',
+					) );
+			?>
+
 			</div>
 		</div>
 

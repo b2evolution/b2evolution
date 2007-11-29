@@ -223,7 +223,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	<div id="itemform_tags" class="edit_fieldgroup">
 		<label for="item_tags"><strong><?php echo T_('Tags') ?>:</strong>
-		<span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br />
+		<span class="notes"><?php echo T_('(Separate by coma (,))') ?></span></label><br />
 		<input type="text" name="item_tags" class="large form_text_input" id="item_tags" value="<?php echo format_to_output( $item_tags, 'formvalue' ); ?>" />
 	</div>
 
@@ -258,7 +258,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 			echo ' '; // allow wrapping!
 
 			$ItemStatusCache = & get_Cache( 'ItemStatusCache' );
-			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true ), 	T_('Task status') );
+			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true ), T_('Task status') );
 
 			echo ' '; // allow wrapping!
 
@@ -378,6 +378,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.14  2007/11/29 22:47:13  fplanque
+ * tags everywhere + debug
+ *
  * Revision 1.13  2007/10/09 15:03:43  waltercruz
  * Minor css fix
  *

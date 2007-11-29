@@ -1194,8 +1194,11 @@ class Item extends ItemLight
 		}
 		else
 		{
-			$this->tags = preg_split( '/[\s,]+/', $tags );
+			$this->tags = preg_split( '/[;,]+/', $tags );
 		}
+		array_walk( $this->tags, create_function( '& $tag', '$tag = strtolower(trim($tag));' ) );
+		$this->tags = array_unique( $this->tags );
+
 		// pre_dump( $this->tags );
 	}
 
@@ -3233,6 +3236,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.21  2007/11/29 22:47:12  fplanque
+ * tags everywhere + debug
+ *
  * Revision 1.20  2007/11/29 20:53:45  fplanque
  * Fixed missing url link in basically all skins ...
  *
