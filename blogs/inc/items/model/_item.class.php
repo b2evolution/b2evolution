@@ -1198,7 +1198,7 @@ class Item extends ItemLight
 		}
 		array_walk( $this->tags, create_function( '& $tag', '$tag = strtolower(trim($tag));' ) );
 		$this->tags = array_unique( $this->tags );
-
+		$this->tags = array_diff( $this->tags, array('') );	// empty element can sneak in when ending with ,,
 		// pre_dump( $this->tags );
 	}
 
@@ -3236,6 +3236,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.22  2007/11/30 21:37:29  fplanque
+ * removed empty tags
+ *
  * Revision 1.21  2007/11/29 22:47:12  fplanque
  * tags everywhere + debug
  *
