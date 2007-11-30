@@ -1012,8 +1012,6 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8860 )
 	{
-
-
 		echo 'Updating post data... ';
 		$query = "UPDATE {$tableprefix}posts
 							SET post_lastedit_user_ID = post_creator_user_ID,
@@ -1995,6 +1993,27 @@ function upgrade_b2evo_tables()
 	}
 
 
+	if( $old_db_version < 9600 )
+	{	// 2.2.0
+		task_begin( 'Creating global cache table...' );
+		$DB->query( 'CREATE TABLE T_global__cache (
+							      cach_name VARCHAR( 30 ) NOT NULL ,
+							      cach_cache MEDIUMBLOB NULL ,
+							      PRIMARY KEY ( cach_name )
+							    )' );
+		task_end();
+
+		task_begin( 'Altering posts table...' );
+		$DB->query( 'ALTER TABLE T_items__item
+										MODIFY COLUMN post_datestart DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\',
+										MODIFY COLUMN post_datemodified DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\',
+										ADD COLUMN post_order    float NULL AFTER post_priority,
+										ADD COLUMN post_featured tinyint(1) NOT NULL DEFAULT 0 AFTER post_order,
+										ADD INDEX post_order( post_order )' );
+		task_end();
+	}
+
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -2104,6 +2123,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.233  2007/11/30 01:46:12  fplanque
+ * db upgrade
+ *
  * Revision 1.232  2007/11/02 01:53:34  fplanque
  * comment ratings
  *

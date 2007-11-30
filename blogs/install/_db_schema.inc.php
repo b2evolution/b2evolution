@@ -186,10 +186,10 @@ $schema_queries = array(
 			post_creator_user_ID        int(11) unsigned NOT NULL,
 			post_lastedit_user_ID       int(11) unsigned NULL,
 			post_assigned_user_ID       int(11) unsigned NULL,
-			post_datestart              datetime NOT NULL,
+			post_datestart              DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_datedeadline           datetime NULL,
 			post_datecreated            datetime NULL,
-			post_datemodified           datetime NOT NULL,
+			post_datemodified           DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_status                 enum('published','deprecated','protected','private','draft','redirected') NOT NULL default 'published',
 			post_pst_ID                 int(11) unsigned NULL,
 			post_ptyp_ID                int(11) unsigned NULL,
@@ -208,6 +208,8 @@ $schema_queries = array(
 			post_commentsexpire         DATETIME DEFAULT NULL,
 			post_renderers              TEXT NOT NULL,
 			post_priority               int(11) unsigned null,
+			post_order                  float NULL,
+			post_featured               tinyint(1) NOT NULL DEFAULT 0,
 			PRIMARY KEY post_ID( post_ID ),
 			UNIQUE post_urltitle( post_urltitle ),
 			INDEX post_datestart( post_datestart ),
@@ -217,7 +219,8 @@ $schema_queries = array(
 			INDEX post_parent_ID( post_parent_ID ),
 			INDEX post_assigned_user_ID( post_assigned_user_ID ),
 			INDEX post_ptyp_ID( post_ptyp_ID ),
-			INDEX post_pst_ID( post_pst_ID )
+			INDEX post_pst_ID( post_pst_ID ),
+			INDEX post_order( post_order )
 		)" ),
 
 	'T_postcats' => array(
@@ -559,6 +562,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.72  2007/11/30 01:46:12  fplanque
+ * db upgrade
+ *
  * Revision 1.71  2007/11/28 17:29:44  fplanque
  * Support for getting updates from b2evolution.net
  *
