@@ -223,7 +223,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	<div id="itemform_tags" class="edit_fieldgroup">
 		<label for="item_tags"><strong><?php echo T_('Tags') ?>:</strong>
-		<span class="notes"><?php echo T_('(Separate by coma (,))') ?></span></label><br />
+		<span class="notes"><?php echo T_('(Separate by comma (,))') ?></span></label><br />
 		<input type="text" name="item_tags" class="large form_text_input" id="item_tags" value="<?php echo format_to_output( $item_tags, 'formvalue' ); ?>" />
 	</div>
 
@@ -378,6 +378,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.15  2007/11/30 01:45:52  fplanque
+ * minor
+ *
  * Revision 1.14  2007/11/29 22:47:13  fplanque
  * tags everywhere + debug
  *
