@@ -1468,7 +1468,7 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
 	//
 	if( preg_match( '~^\w+:~', $url ) )
 	{ // there's a scheme and therefor an absolute URL:
-		if( substr($url, 0, 6) == 'mailto' )
+		if( substr($url, 0, 7) == 'mailto:' )
 		{ // mailto:link
 			preg_match( '~^(mailto):(.*?)(\?.*)?$~', $url, $match );
 			if( ! $match )
@@ -1482,6 +1482,13 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
 				return $verbose
 					? sprintf( T_('Supplied email address (%s) is invalid.'), htmlspecialchars($match[2]) )
 					: T_('Invalid email address.');
+			}
+		}
+		elseif( substr($url, 0, 6) == 'clsid:' )
+		{ // clsid:link
+			if( ! preg_match( '¤^(clsid):([a-fA-F0-9\-]+)$¤', $url, $match) )
+			{
+				return T_('Invalid class ID format');
 			}
 		}
 		elseif( ! preg_match('~^           # start
@@ -1654,6 +1661,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.6  2007/11/30 23:24:16  fplanque
+ * support for clsid again
+ *
  * Revision 1.5  2007/11/01 19:52:46  fplanque
  * better comment forms
  *
