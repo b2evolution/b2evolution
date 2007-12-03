@@ -3559,7 +3559,7 @@ msgstr ""
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:469
 #: ..\..\..\inc\files\views\_file_list.inc.php:141
 msgid "Owner"
-msgstr "BesitzerSonstiges"
+msgstr "Besitzer"
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:73
 msgid "Used to uniquely identify this blog in URLs."
