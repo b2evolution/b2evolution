@@ -31,9 +31,6 @@ background: #73a0c5 url('img/kubrickheader.jpg') no-repeat bottom center;
 }
 
 #headerimg 	{
-margin: 7px 9px 0;
-height: 192px;
-width: 740px;
 font-size: 1.2em;
 text-align: center;
 color: white;
@@ -215,17 +212,10 @@ background: url("img/kubrickbg-ltr.jpg");
 }
 
 #header {
-background-color: #73a0c5;
 margin: 0 0 0 1px;
 padding: 0;
 height: 200px;
 width: 758px;
-}
-
-#headerimg {
-margin: 0;
-height: 200px;
-width: 100%;
 }
 
 .narrowcolumn {
