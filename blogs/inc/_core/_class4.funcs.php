@@ -75,7 +75,7 @@ function & get_Cache( $objectName )
 			return $BlogCache;
 
 		case 'ChapterCache':
-      load_class( 'chapters/model/_chaptercache.class.php' );
+			load_class( 'chapters/model/_chaptercache.class.php' );
 			$ChapterCache = new ChapterCache(); // COPY (FUNC)
 			return $ChapterCache;
 
@@ -148,6 +148,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/06 20:04:34  blueyed
+ * Fix indent
+ *
  * Revision 1.3  2007/11/04 21:22:56  fplanque
  * version bump
  *
