@@ -2712,7 +2712,7 @@ class Item extends ItemLight
 			if( !empty($this->tags) )
 			{
 				// Find the tags that are already in the DB
-				$query = 'SELECT tag_name
+				$query = 'SELECT LOWER( tag_name )
 										FROM T_items__tag
 									 WHERE tag_name IN ('.$DB->quote($this->tags).')';
 				$existing_tags = $DB->get_col( $query, 0, 'Find existing tags' );
@@ -3236,6 +3236,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.23  2007/12/08 14:43:36  yabs
+ * bugfix ( http://forums.b2evolution.net/viewtopic.php?t=13482 )
+ *
  * Revision 1.22  2007/11/30 21:37:29  fplanque
  * removed empty tags
  *
