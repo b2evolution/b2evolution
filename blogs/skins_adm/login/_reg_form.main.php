@@ -69,13 +69,7 @@ $Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20
 
 	$Plugins->trigger_event( 'DisplayRegisterFormFieldset', array( 'Form' => & $Form ) );
 
-	echo $Form->fieldstart;
-	echo $Form->inputstart;
-	?>
-	<input type="submit" name="submit" value="<?php echo T_('Register!') ?>" class="search" />
-	<?php
-	echo $Form->inputend;
-	echo $Form->fieldend;
+	$Form->buttons_input( array( array('name'=>'submit', 'value'=>T_('Register!'), 'class'=>'ActionInput') ) );
 
 $Form->end_fieldset();
 $Form->end_form(); // display hidden fields etc
@@ -90,6 +84,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.3  2007/12/09 22:59:22  blueyed
+ * login and register form: Use Form::buttons_input for buttons
+ *
  * Revision 1.2  2007/12/09 03:12:34  blueyed
  * Fix layout of register form
  *

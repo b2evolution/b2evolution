@@ -134,19 +134,16 @@ $Form->begin_form( 'fform' );
 	// Allow a plugin to add fields/payload
 	$Plugins->trigger_event( 'DisplayLoginFormFieldset', array( 'Form' => & $Form ) );
 
-	echo $Form->fieldstart;
-	echo $Form->inputstart;
-
-	$Form->submit( array( 'login_action[login]', T_('Log in!'), 'search' ) );
-
+	// Submit button(s):
+	$submit_buttons = array( array( 'name'=>'login_action[login]', 'value'=>T_('Log in!'), 'class'=>'search' ) );
 	if( strpos( $redirect_to, $admin_url ) !== 0
 		&& strpos( $ReqHost.$redirect_to, $admin_url ) !== 0 // if $redirect_to is relative
 		&& ! is_admin_page() )
 	{ // provide button to log straight into backoffice, if we would not go there anyway
-		$Form->submit( array( 'login_action[redirect_to_backoffice]', T_('Log into backoffice!'), 'search' ) );
+		$submit_buttons[] = array( 'name'=>'login_action[redirect_to_backoffice]', 'value'=>T_('Log into backoffice!'), 'class'=>'search' );
 	}
-	echo $Form->inputend;
-	echo $Form->fieldend;
+
+	$Form->buttons_input($submit_buttons);
 
 	$Form->end_fieldset();
 
@@ -220,6 +217,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/09 22:59:22  blueyed
+ * login and register form: Use Form::buttons_input for buttons
+ *
  * Revision 1.3  2007/11/24 21:25:40  fplanque
  * make password encryption look like encryption
  *
