@@ -446,6 +446,7 @@ class DB
 	/**
 	 * Quote a value, either in single quotes (and escaped) or if it's NULL as 'NULL'.
 	 *
+	 * @param string|array|null
 	 * @return string Quoted (and escaped) value or 'NULL'.
 	 */
 	function quote($str)
@@ -1404,6 +1405,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.3  2007/12/09 21:25:22  blueyed
+ * doc
+ *
  * Revision 1.2  2007/10/01 19:02:23  fplanque
  * MySQL version check
  *
