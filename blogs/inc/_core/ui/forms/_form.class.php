@@ -487,6 +487,9 @@ class Form extends Widget
 					$r = str_replace( '$title_attribs$', get_field_attribs_as_string($legend_params), $r );
 				}
 
+				// Remove any empty legend tags: they cause a small gap in the fieldset border (FF 2.0.0.11)
+				$r = preg_replace('~<legend[^>]*></legend>~', '', $r);
+
 				$this->_opentags['fieldset']++;
 		}
 
@@ -2830,6 +2833,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.22  2007/12/09 21:24:13  blueyed
+ * empty LEGEND display fix for FF2
+ *
  * Revision 1.21  2007/12/09 21:17:26  blueyed
  * Display fix for IE6, which needs the DIV.label for buttonsstart
  *
