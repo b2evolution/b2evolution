@@ -152,48 +152,47 @@ class Form extends Widget
 		$this->form_method = $form_method;
 		$this->enctype = $enctype;
 
-		if( empty( $layout ) || $layout == 'split' || $layout == 'none' || $layout == 'fieldset' )
+		if( is_object($AdminUI) )
 		{
-			if( is_object($AdminUI) )
+			if( empty( $layout ) || $layout == 'split' || $layout == 'none' || $layout == 'fieldset' )
 			{ // Get default skin setting:
 				$template = $AdminUI->get_template( 'Form' );
 				$layout = $template['layout'];
 			}
 			else
-			{	// This happens for comment forms & login screen for example...
-				$template = array(
-					'layout' => 'fieldset',
-					'formstart' => '<div>',// required before (no_)title_fmt for validation
-					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
-					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
-					'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
-															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
-					'fieldset_end' => '</fieldset>'."\n",
-					'fieldstart' => '<fieldset$ID$>'."\n",
-					'labelstart' => '<div class="label">',
-					'labelend' => "</div>\n",
-					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
-					'inputstart' => '<div class="input">',
-					'infostart' => '<div class="info">',
-					'inputend' => "</div>\n",
-					'fieldend' => "</fieldset>\n\n",
-					'buttonsstart' => '<fieldset><div class="input">',
-					'buttonsend' => "</div></fieldset>\n\n",
-					'formend' => '</div>',
-				);
-				$layout = 'fieldset';
+			{
+				$template = $AdminUI->get_template( $layout.'_form' );
+				$layout = $template['layout'];
 			}
 		}
 		else
-		{
-			$template = $AdminUI->get_template( $layout.'_form' );
-			$layout = $template['layout'];
+		{	// This happens for comment forms & login screen for example...
+			$template = array(
+				'layout' => 'fieldset',
+				'formstart' => '<div>',// required before (no_)title_fmt for validation
+				'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+				'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
+				'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
+														.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
+				'fieldset_end' => '</fieldset>'."\n",
+				'fieldstart' => '<fieldset$ID$>'."\n",
+				'labelstart' => '<div class="label">',
+				'labelend' => "</div>\n",
+				'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
+				'inputstart' => '<div class="input">',
+				'infostart' => '<div class="info">',
+				'inputend' => "</div>\n",
+				'fieldend' => "</fieldset>\n\n",
+				'buttonsstart' => '<fieldset><div class="input">',
+				'buttonsend' => "</div></fieldset>\n\n",
+				'formend' => '</div>',
+			);
+			$layout = 'fieldset';
 		}
 
 		$this->saved_layouts = array($layout);
 		$this->saved_templates = array($template);
 		$this->switch_layout( NULL );	// "restore" saved layout.
-
 	}
 
 
@@ -2831,6 +2830,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.20  2007/12/09 03:22:22  blueyed
+ * Fix "Fatal error: Call to a member function get_template() on a non-object in /blogs/inc/_core/ui/forms/_form.class.php on line 189", when using an "inline" form where AdminUI is not available; this is the reason why the "Add an OpenID to your user profile" page fails for b2evo 2.2
+ *
  * Revision 1.19  2007/11/27 10:43:10  yabs
  * validation
  *
