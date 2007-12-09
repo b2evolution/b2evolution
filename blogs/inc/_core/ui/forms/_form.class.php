@@ -183,7 +183,7 @@ class Form extends Widget
 				'infostart' => '<div class="info">',
 				'inputend' => "</div>\n",
 				'fieldend' => "</fieldset>\n\n",
-				'buttonsstart' => '<fieldset><div class="input">',
+				'buttonsstart' => '<fieldset><div class="label"></div><div class="input">', // DIV.label for IE6
 				'buttonsend' => "</div></fieldset>\n\n",
 				'formend' => '</div>',
 			);
@@ -268,7 +268,7 @@ class Form extends Widget
 					$this->infostart = '<div class="info">';
 					$this->inputend = "</div>\n";
 					$this->fieldend = "</fieldset>\n\n";
-					$this->buttonsstart = '<fieldset><div class="input">';
+					$this->buttonsstart = '<fieldset><div class="label"></div><div class="input">'; // DIV.label for IE6
 					$this->buttonsend = "</div></fieldset>\n\n";
 					$this->formend = '</div>';
 					break;
@@ -285,7 +285,7 @@ class Form extends Widget
 					$this->infostart = '<div class="info">';
 					$this->inputend = "</div>\n";
 					$this->fieldend = "</fieldset>\n\n";
-					$this->buttonsstart = '<fieldset><div class="input">';
+					$this->buttonsstart = '<fieldset><div class="label"></div><div class="input">'; // DIV.label for IE6
 					$this->buttonsend = "</div></fieldset>\n\n";
 					$this->formend = '</div>';
 					break;
@@ -2830,6 +2830,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.21  2007/12/09 21:17:26  blueyed
+ * Display fix for IE6, which needs the DIV.label for buttonsstart
+ *
  * Revision 1.20  2007/12/09 03:22:22  blueyed
  * Fix "Fatal error: Call to a member function get_template() on a non-object in /blogs/inc/_core/ui/forms/_form.class.php on line 189", when using an "inline" form where AdminUI is not available; this is the reason why the "Add an OpenID to your user profile" page fails for b2evo 2.2
  *
