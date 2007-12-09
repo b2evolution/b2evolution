@@ -46,7 +46,7 @@ $Form->begin_form( 'fform' );
 $Form->hidden( 'action', 'register');
 $Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 
-echo $Form->fieldstart;
+$Form->begin_fieldset();
 
 $Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20, 'class'=>'input_text', 'required'=>true ) );
 
@@ -68,15 +68,16 @@ $Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20
 	$Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Preferred language') );
 
 	$Plugins->trigger_event( 'DisplayRegisterFormFieldset', array( 'Form' => & $Form ) );
-	?>
 
-	<fieldset>
-		<div class="input">
-			<input type="submit" name="submit" value="<?php echo T_('Register!') ?>" class="search" />
-		</div>
-	</fieldset>
-</fieldset>
-<?php
+	echo $Form->fieldstart;
+	echo $Form->inputstart;
+	?>
+	<input type="submit" name="submit" value="<?php echo T_('Register!') ?>" class="search" />
+	<?php
+	echo $Form->inputend;
+	echo $Form->fieldend;
+
+$Form->end_fieldset();
 $Form->end_form(); // display hidden fields etc
 ?>
 
@@ -89,6 +90,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/09 03:12:34  blueyed
+ * Fix layout of register form
+ *
  * Revision 1.1  2007/06/25 11:02:40  fplanque
  * MODULES (refactored MVC)
  *
