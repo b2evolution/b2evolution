@@ -275,7 +275,7 @@ switch( $action )
 			break;
 		}
 
-		if( ! $Settings->get('newusers_mustvalidate') || $current_User->validated )
+		if( $current_User->validated || ! $Settings->get('newusers_mustvalidate') )
 		{ // validating emails is not activated/necessary (check this after login, so it gets not "announced")
 			$action = '';
 			break;
@@ -395,6 +395,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.95  2007/12/10 01:05:23  blueyed
+ * Improve check performance
+ *
  * Revision 1.94  2007/06/25 10:58:49  fplanque
  * MODULES (refactored MVC)
  *
