@@ -538,6 +538,9 @@ unset($pass);
 
 
 // Check if the user needs to be validated, but is not yet:
+// TODO: dh> this block prevents registration, if you are logged in already, but not validated!
+//       (e.g. when registered as "foo", you cannot register as "bar" until you logout (but there's no link in sight)
+//        or validate the "foo" account)
 if( ! empty($current_User)
 		&& ! $current_User->validated
 		&& param('action', 'string', '') != 'logout' ) // fp> TODO: non validated users should be automatically logged out
@@ -642,6 +645,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.85  2007/12/10 00:45:33  blueyed
+ * todo
+ *
  * Revision 1.84  2007/11/28 17:29:45  fplanque
  * Support for getting updates from b2evolution.net
  *
