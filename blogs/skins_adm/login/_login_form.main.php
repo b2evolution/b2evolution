@@ -195,18 +195,29 @@ $Form->end_form();
 
 
 <div class="login_actions" style="text-align:right">
-	<?php user_register_link( '', '', '', '#', true /*disp_when_logged_in*/ )?>
-
-
 	<?php
+	$links = array();
+	if( $link = get_user_register_link( '', '', '', '#', true /*disp_when_logged_in*/ ) )
+	{
+		$links[] = $link;
+	}
+
 	if( empty($login_required)
+		&& $action != 'req_validatemail'
 		&& strpos($redirect_to, $admin_url) !== 0
 		&& strpos($ReqHost.$redirect_to, $admin_url ) !== 0 )
 	{ // No login required, allow to pass through
 		// TODO: dh> validate redirect_to param?!
-		echo ' &middot; <a href="'.htmlspecialchars(url_rel_to_same_host($redirect_to, $ReqHost)).'">'
+		$links[] = '<a href="'.htmlspecialchars(url_rel_to_same_host($redirect_to, $ReqHost)).'">'
 		./* Gets displayed as link to the location on the login form if no login is required */ T_('Abort login!').'</a>';
 	}
+
+	if( is_logged_in() )
+	{ // if we arrive here, but are logged in, provide an option to logout (e.g. during the email
+	  // validation procedure)
+		$links[] = get_user_logout_link();
+	}
+	echo implode( ' &middot; ', $links );
 	?>
 </div>
 
@@ -217,6 +228,10 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.5  2007/12/10 01:04:30  blueyed
+ * - Properly implode action links
+ * - Provide logout link, if the user is logged in already
+ *
  * Revision 1.4  2007/12/09 22:59:22  blueyed
  * login and register form: Use Form::buttons_input for buttons
  *
