@@ -170,9 +170,10 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
  * @param string
  * @param string
  * @param boolean Display the link, if the user is already logged in? (this is used by the login form)
+ * @param string Where to redirect
  * @return string
  */
-function get_user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#', $disp_when_logged_in = false )
+function get_user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#', $disp_when_logged_in = false, $redirect = null )
 {
 	global $htsrv_url_sensitive, $Settings, $edited_Blog, $generating_static;
 
@@ -189,17 +190,20 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
 	if( $link_text == '' ) $link_text = T_('Register...');
 	if( $link_title == '#' ) $link_title = T_('Register to open an account...');
 
-	if( !isset($generating_static) )
-	{ // We are not generating a static page here:
-		$redirect = regenerate_url( '', '', '', '&' );
-	}
-	elseif( isset($edited_Blog) )
-	{ // We are generating a static page
-		$redirect = $edited_Blog->get('url'); // was dynurl
-	}
-	else
-	{ // We are in a weird situation
-		$redirect = '';
+	if( ! isset($redirect) )
+	{
+		if( !isset($generating_static) )
+		{ // We are not generating a static page here:
+			$redirect = regenerate_url( '', '', '', '&' );
+		}
+		elseif( isset($edited_Blog) )
+		{ // We are generating a static page
+			$redirect = $edited_Blog->get('url'); // was dynurl
+		}
+		else
+		{ // We are in a weird situation
+			$redirect = '';
+		}
 	}
 
 	if( ! empty($redirect) )
@@ -544,6 +548,10 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/10 01:22:04  blueyed
+ * Pass on redirect_to param from login form through the register... link to the register form.
+ * get_user_register_link: added $redirect param for injection
+ *
  * Revision 1.3  2007/09/28 02:17:48  fplanque
  * Menu widgets
  *

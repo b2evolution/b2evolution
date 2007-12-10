@@ -120,7 +120,7 @@ $Form->begin_form( 'fform' );
 	$Form->text_input( 'login', $login, 16, T_('Login'), '', array( 'maxlength' => 20, 'class' => 'input_text' ) );
 
 	$pwd_note = '<a href="'.$htsrv_url_sensitive.'login.php?action=lostpassword&amp;redirect_to='
-								.rawurlencode( url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+		.rawurlencode( url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 	if( !empty($login) )
 	{
 		$pwd_note .= '&amp;login='.rawurlencode($login);
@@ -197,7 +197,7 @@ $Form->end_form();
 <div class="login_actions" style="text-align:right">
 	<?php
 	$links = array();
-	if( $link = get_user_register_link( '', '', '', '#', true /*disp_when_logged_in*/ ) )
+	if( $link = get_user_register_link( '', '', '', '#', true /*disp_when_logged_in*/, $redirect_to ) )
 	{
 		$links[] = $link;
 	}
@@ -228,6 +228,10 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.6  2007/12/10 01:22:04  blueyed
+ * Pass on redirect_to param from login form through the register... link to the register form.
+ * get_user_register_link: added $redirect param for injection
+ *
  * Revision 1.5  2007/12/10 01:04:30  blueyed
  * - Properly implode action links
  * - Provide logout link, if the user is logged in already
