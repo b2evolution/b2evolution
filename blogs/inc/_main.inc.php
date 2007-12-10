@@ -543,6 +543,7 @@ unset($pass);
 //        or validate the "foo" account)
 if( ! empty($current_User)
 		&& ! $current_User->validated
+		&& $Settings->get('newusers_mustvalidate') // same check as in login.php
 		&& param('action', 'string', '') != 'logout' ) // fp> TODO: non validated users should be automatically logged out
 {
 	if( $action != 'req_validatemail' && $action != 'validatemail' )
@@ -645,6 +646,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.86  2007/12/10 01:06:33  blueyed
+ * Apply same check as in login.php: if a user is not validated, but validation is turned off then do not require him to validate
+ *
  * Revision 1.85  2007/12/10 00:45:33  blueyed
  * todo
  *
