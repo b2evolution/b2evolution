@@ -41,13 +41,9 @@ error_reporting( E_ALL );
 // ini_set( 'display_errors', 'on' );
 
 // If you get blank pages, PHP may be crashing because it doesn't have enough memory.
-// The default is 8 MB (set in php.ini)
+// The default is 8 MB (in PHP < 5.2) and 128 MB (in PHP > 5.2)
 // Try uncommmenting the following line:
-// ini_set( 'memory_limit', '16M' );
-
-// NOTE: If you're using PHP newer than 5.2.1, the default is 128M
-//       and because the memory management/reporting has changed 16M
-//       would be probably still too less.
+// ini_set( 'memory_limit', '32M' );
 
 
 /**
