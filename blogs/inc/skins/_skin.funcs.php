@@ -307,6 +307,7 @@ function skin_base_tag()
 		}
 		else
 		{
+			global $baseurl;
 			$base_href = $baseurl;
 		}
 	}
@@ -470,6 +471,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.20  2007/12/16 21:53:15  blueyed
+ * skin_base_tag: globalize baseurl, if used
+ *
  * Revision 1.19  2007/11/29 19:29:22  fplanque
  * normalized skin filenames
  *
