@@ -164,22 +164,34 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 				switch( $Comment->get( 'type' ) )
 				{
 					case 'comment': // Display a comment:
-						$Comment->permanent_link( T_('Comment') );
-						echo ' '.T_('from:').' ';
+						$Comment->permanent_link( array(
+								'before'    => '',
+								'after'     => ' '.T_('from:').' ',
+								'text' 			=> T_('Comment'),
+								'nofollow'	=> true,
+							) );
 						$Comment->author();
 						$Comment->msgform_link( $Blog->get('msgformurl') );
 						$Comment->author_url( '', ' &middot; ', '' );
 						break;
 
 					case 'trackback': // Display a trackback:
-						$Comment->permanent_link( T_('Trackback') );
-						echo ' '.T_('from:').' ';
+						$Comment->permanent_link( array(
+								'before'    => '',
+								'after'     => ' '.T_('from:').' ',
+								'text' 			=> T_('Trackback'),
+								'nofollow'	=> true,
+							) );
 						$Comment->author( '', '#', '', '#', 'htmlbody', true );
 						break;
 
 					case 'pingback': // Display a pingback:
-						$Comment->permanent_link( T_('Pingback') );
-						echo ' '.T_('from:').' ';
+						$Comment->permanent_link( array(
+								'before'    => '',
+								'after'     => ' '.T_('from:').' ',
+								'text' 			=> T_('Pingback'),
+								'nofollow'	=> true,
+							) );
 						$Comment->author( '', '#', '', '#', 'htmlbody', true );
 						break;
 				}
@@ -386,6 +398,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.12  2007/12/18 23:51:33  fplanque
+ * nofollow handling in comment urls
+ *
  * Revision 1.11  2007/11/22 17:53:39  fplanque
  * filemanager display cleanup, especially in IE (not perfect)
  *

@@ -225,6 +225,13 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 		$Form->end_fieldset();
 
+		$Form->begin_fieldset( T_('Links') );
+
+		$Form->checkbox_basic_input( 'comment_nofollow', $edited_Comment->nofollow, T_('Nofollow website URL') );
+		// TODO: apply to all links
+
+		$Form->end_fieldset();
+
 		$Form->begin_fieldset( T_('Feedback info') );
 	?>
 
@@ -246,6 +253,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/18 23:51:33  fplanque
+ * nofollow handling in comment urls
+ *
  * Revision 1.1  2007/11/25 19:50:09  fplanque
  * missing files!!!
  *

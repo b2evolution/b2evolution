@@ -133,7 +133,10 @@ switch( $action )
 		$edited_Comment->set_from_Request( 'rating' );
 
 		param( 'comment_status', 'string', 'published' );
-		$edited_Comment->set_from_Request( 'status', 'comment_status' );
+		$edited_Comment->set_from_Request( 'status' );
+
+		param( 'comment_nofollow', 'integer', 0 );
+		$edited_Comment->set_from_Request( 'nofollow' );
 
 		if( $Messages->count('error') )
 		{	// There have been some validation errors:
@@ -273,6 +276,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/18 23:51:33  fplanque
+ * nofollow handling in comment urls
+ *
  * Revision 1.3  2007/11/02 01:51:55  fplanque
  * comment ratings
  *

@@ -42,7 +42,12 @@ while( $Comment = & $CommentList->get_next() )
 			<?php $Comment->content() ?>
 		</div>
 		<div class="bCommentSmallPrint">
-			<?php $Comment->permanent_link( '#', '#', 'permalink_right' ); ?>
+			<?php
+				$Comment->permanent_link( array(
+						'class'    => 'permalink_right',
+						'nofollow' => true,
+					) );
+			?>
 			<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
 			<?php $Comment->edit_link( ' &middot; ' ) /* Link to backoffice for editing */ ?>
 			<?php $Comment->delete_link( ' &middot; ' ); /* Link to backoffice for deleting */ ?>
@@ -55,6 +60,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/18 23:51:33  fplanque
+ * nofollow handling in comment urls
+ *
  * Revision 1.1  2007/11/29 19:29:22  fplanque
  * normalized skin filenames
  *

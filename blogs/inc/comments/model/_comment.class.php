@@ -111,6 +111,7 @@ class Comment extends DataObject
 	 */
 	var $allow_msgform;
 
+	var $nofollow;
 
 	/**
 	 * Constructor
@@ -454,7 +455,12 @@ class Comment extends DataObject
 		$r = $before;
 		if( $makelink )
 		{
-			$r .= '<a href="'.$url.'">';
+			$r .= '<a ';
+			if( $this->nofollow )
+			{
+				$r .= 'rel="nofollow" ';
+			}
+			$r .= 'href="'.$url.'">';
 		}
 		$r .= ( empty($linktext) ? $url : $linktext );
 		if( $makelink ) $r .= '</a>';
@@ -814,7 +820,7 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 */
-	function get_permanent_link( $text = '#', $title = '#', $class = '' )
+	function get_permanent_link( $text = '#', $title = '#', $class = '', $nofollow = false )
 	{
 		global $current_User, $baseurl;
 
@@ -840,6 +846,7 @@ class Comment extends DataObject
 		// Display as link
 		$r = '<a href="'.$url.'" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
+		if( !empty( $nofollow ) ) $r .= ' rel="nofollow"';
 		$r .= '>'.$text.'</a>';
 
 		return $r;
@@ -850,14 +857,22 @@ class Comment extends DataObject
 	 * Displays a permalink link to the Comment
 	 *
 	 * Note: If you only want the permalink URL, use Comment::permanent_url()
-	 *
-	 * @param string link text
-	 * @param string link title
-	 * @param string class name
 	 */
-	function permanent_link( $text = '#', $title = '#', $class = '' )
+	function permanent_link( $params = array() )
 	{
-		echo $this->get_permanent_link( $text, $title, $class );
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => ' ',
+				'after'       => ' ',
+				'text'        => '#',
+				'title'       => '#',
+				'class'       => '',
+				'nofollow'    => false,
+			), $params );
+
+		echo $params['before'];
+		echo $this->get_permanent_link( $params['text'], $params['title'], $params['class'], $params['nofollow'] );
+		echo $params['after'];
 	}
 
 
@@ -1277,6 +1292,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2007/12/18 23:51:32  fplanque
+ * nofollow handling in comment urls
+ *
  * Revision 1.4  2007/11/03 04:56:03  fplanque
  * permalink / title links cleanup
  *

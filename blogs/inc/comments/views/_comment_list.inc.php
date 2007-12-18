@@ -101,7 +101,9 @@ while( $Comment = & $CommentList->get_next() )
 		</div>
 		<div class="CommentActionsArea">
 			<?php
-				$Comment->permanent_link( '#', '#', 'permalink_right' );
+				$Comment->permanent_link( array(
+						'class'    => 'permalink_right'
+					) );
 
 				// Display edit button if current user has the rights:
 				$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton');
@@ -125,6 +127,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.6  2007/12/18 23:51:33  fplanque
+ * nofollow handling in comment urls
+ *
  * Revision 1.5  2007/11/29 21:00:10  fplanque
  * comment ratings shown in BO
  *
