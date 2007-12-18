@@ -672,12 +672,16 @@ switch( $action )
 			break;
 		}
 
+		// this returns NULL for code as it's seen as a duplicate plugin
 		$default_Plugin = & $admin_Plugins->register($edit_Plugin->classname);
+
+		// grab a raw copy of the plugin
+		$raw_Plugin = new $edit_Plugin->classname();
 
 		// Params for/"from" form:
 		$edited_plugin_name = $default_Plugin->name;
 		$edited_plugin_shortdesc = $default_Plugin->short_desc;
-		$edited_plugin_code = $default_Plugin->code;
+		$edited_plugin_code = $raw_Plugin->code;
 		$edited_plugin_priority = $default_Plugin->priority;
 		$edited_plugin_apply_rendering = $default_Plugin->apply_rendering;
 
@@ -1036,6 +1040,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/18 10:24:50  yabs
+ * bugfix ( http://forums.b2evolution.net/viewtopic.php?t=13589 )
+ *
  * Revision 1.3  2007/08/21 22:32:31  blueyed
  * Use get_Cache() for singleton $Plugins_admin instance. This fixes at least the installation of flickr_plugin.
  *
