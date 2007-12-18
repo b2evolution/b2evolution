@@ -441,7 +441,7 @@ class ComponentWidget extends DataObject
 	{
 		global $BlogCache, $Blog;
 
-		$linkblog = $Blog->get('links_blog_ID');
+		$linkblog = $this->disp_params[ 'linkblog_ID' ];
 
 		if( ! $linkblog )
 		{	// No linkblog blog requested for this blog
@@ -473,14 +473,16 @@ class ComponentWidget extends DataObject
 		$linkblog_cat_modifier = '';
 		compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $linkblog );
 
-		$LinkblogList = & new ItemListLight( $link_Blog );
+		$limit = ( $this->disp_params[ 'linkblog_limit' ] ? $this->disp_params[ 'linkblog_limit' ] : 999999 );
+
+		$LinkblogList = & new ItemListLight( $link_Blog, NULL, NULL, $limit );
 
 		$LinkblogList->set_filters( array(
 				'cat_array' => $linkblog_cat_array,
 				'cat_modifier' => $linkblog_cat_modifier,
 				'orderby' => 'main_cat_ID title',
 				'order' => 'ASC',
-				'unit' => 'all',
+				'unit' => 'posts',
 			) );
 
 		// Run the query:
@@ -493,7 +495,7 @@ class ComponentWidget extends DataObject
 
 		echo $this->disp_params['block_start'];
 
- 		$this->disp_title( T_('Linkblog') );
+ 		$this->disp_title( $this->disp_params[ 'title' ] );
 
 		echo $this->disp_params['list_start'];
 
@@ -653,6 +655,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2007/12/18 10:26:58  yabs
+ * adding params
+ *
  * Revision 1.9  2007/11/04 01:10:57  fplanque
  * skin cleanup continued
  *

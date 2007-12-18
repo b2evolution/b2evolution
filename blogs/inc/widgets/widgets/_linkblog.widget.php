@@ -51,7 +51,11 @@ class linkblog_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Linkblog');
+		$this->init_display( array() );
+		$title = T_('Linkblog');
+		if( $this->disp_params[ 'widget_name' ] )
+			$title .= ' ( '.$this->disp_params[ 'widget_name' ].' )';
+		return $title;
 	}
 
 
@@ -61,6 +65,45 @@ class linkblog_Widget extends ComponentWidget
 	function get_desc()
 	{
 		return T_('Display list of entries from the linkblog, grouped by category.');
+	}
+
+
+  /**
+   * Get definitions for editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		global $Blog;
+		// Demo data:
+		$r = array(
+			'widget_name' => array(
+				'label' => T_( 'Widget name' ),
+				'size' => 60,
+				'note' => T_( 'This is the name displayed in the widget list' ),
+			),
+			'title' => array(
+				'label' => 'Block title',
+				'size' => 60,
+				'defaultvalue' => T_('Linkblog'),
+				'note' => T_( 'This is title to display in your skin' ),
+			),
+			'linkblog_ID' => array(
+				'label' => T_( 'Linkblog' ),
+				'size' => 4,
+				'defaultvalue' => $Blog->get('links_blog_ID'),
+				'note' => T_( 'This is ID number of the blog to use as a linkblog' ),
+			),
+			'linkblog_limit' => array(
+				'label' => T_( 'Display' ),
+				'size' => 4,
+				'note' => T_( 'This is the maximum number of links to display, leave empty for all links' ),
+			),
+		);
+
+		return $r;
 	}
 
 
@@ -83,6 +126,9 @@ class linkblog_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/18 10:27:30  yabs
+ * adding params
+ *
  * Revision 1.1  2007/06/25 11:02:26  fplanque
  * MODULES (refactored MVC)
  *
