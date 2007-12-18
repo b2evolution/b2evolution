@@ -67,9 +67,9 @@ function trackback(
 	$excerpt,
 	$ID) // post ID
 {
-	global $app_name, $app_version, $Blog;
+	global $app_name, $app_version, $Blog, $Messages;
 
-	echo '<p>', T_('Sending trackback to:'), ' ', htmlspecialchars($trackback_url), " ...\n";
+	$trackback_message = T_('Sending trackback to:').' '.htmlspecialchars($trackback_url).' ';
 
 	$title = rawurlencode($title);
 	$excerpt = rawurlencode($excerpt);
@@ -84,7 +84,7 @@ function trackback(
 	$result = '';
 	if (strstr($trackback_url, '?'))
 	{
-		echo '[get]';
+		$Messages->add( $trackback_message.'[get]', 'note' );
 		$trackback_url .= "&".$query_string;;
 		flush();
 		if( $fp = fopen($trackback_url, 'r') )
@@ -107,7 +107,7 @@ function trackback(
 	}
 	else
 	{
-		echo '[post]';
+		$Messages->add( $trackback_message.'[post]', 'note' );
 		$trackback_url = parse_url($trackback_url);
 		if( ! empty($trackback_url['host']) && ! empty($trackback_url['path']) )
 		{ // Only try trackback if we have host and path:
@@ -176,7 +176,7 @@ function trackback(
 	{
 		$result_message = T_('No valid trackback response. Maybe the given url is not a Trackback url.') . ' &quot;' . $result . '&quot;';
 	}
-	echo '<br />', T_('Response:'), ' ', strip_tags($result_message), "</p>\n";
+	$Messages->add( T_('Response:').' '.strip_tags($result_message), 'note' );
 	return $result;
 }
 
@@ -212,6 +212,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/18 10:25:58  yabs
+ * bugfix ( http://forums.b2evolution.net/viewtopic.php?t=13583 )
+ *
  * Revision 1.1  2007/06/25 10:59:40  fplanque
  * MODULES (refactored MVC)
  *
