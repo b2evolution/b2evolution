@@ -55,20 +55,22 @@ $Form->hidden( 'blog', $edited_Blog->ID );
 
 $Form->begin_fieldset( T_('Feedback options') );
 	$Form->radio( 'blog_allowcomments', $edited_Blog->get( 'allowcomments' ),
-						array(  array( 'always', T_('Always on all posts'), T_('Always allow comments on every post'),
+						array(  array( 'always', T_('Allow on all posts'), T_('Always allow comments on every post'),
 										'', 'onclick="show_hide_feedback_details(this);"'),
 						array( 'post_by_post', T_('Can be disabled on a per post basis'),  T_('Comments can be disabled on each post separatly'),
 										'', 'onclick="show_hide_feedback_details(this);"'),
 						array( 'never', T_('No comments are allowed in this blog'), T_('Never allow any comments in this blog'),
 										'', 'onclick="show_hide_feedback_details(this);"'),
-					), T_('Allow comments'), true );
+					), T_('Comments'), true );
 
 	echo '<div id="feedback_details_container">';
 
 	$Form->radio( 'allow_rating', $edited_Blog->get_setting( 'allow_rating' ),
 						array(  array( 'always', T_('Always') ),
 										array( 'never', T_('Never') ),
-					), T_('Allow rating'), true );
+					), T_('Ratings'), true );
+
+	$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
 
 	$status_options = array(
 			'draft'      => T_('Draft'),
@@ -77,8 +79,6 @@ $Form->begin_fieldset( T_('Feedback options') );
 		);
 	$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
 				T_('New feedback status'), T_('This status will be assigned to any new comment/trackback (unless overriden by plugins).') );
-
-	$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Allow trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
 
 	echo '</div>';
 
@@ -103,11 +103,11 @@ $Form->begin_fieldset( T_('XML Feeds (RSS, Atom)') );
 												array( 'excerpt', T_('Post excerpts') ),
 												array( 'normal', T_('Post contents (stopping at "&lt;!-- more -->")') ),
 											), T_('Feed contents'), false, T_('How much content do you want to make available in feeds?') );
-	$Form->text( 'posts_per_feed', $edited_Blog->get_setting('posts_per_feed'), 4, T_('Posts in RSS/Atom feeds'),  T_('How many of the latest posts do you want to include in RSS & Atom feeds?'), 4 );
+	$Form->text( 'posts_per_feed', $edited_Blog->get_setting('posts_per_feed'), 4, T_('Posts in feeds'),  T_('How many of the latest posts do you want to include in RSS & Atom feeds?'), 4 );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Subscriptions') );
-	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Allow email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post and/or comment.') );
+	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post and/or comment.') );
 	// TODO: checkbox 'Enable RSS/Atom feeds'
 	// TODO2: which feeds (skins)?
 $Form->end_fieldset();
@@ -148,6 +148,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.3  2007/12/18 23:50:40  fplanque
+ * minor
+ *
  * Revision 1.2  2007/11/02 01:49:16  fplanque
  * comment ratings
  *

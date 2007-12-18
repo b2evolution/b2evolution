@@ -13,8 +13,8 @@ function b2evonet_get_updates()
 	$attempt_every = 3600*4; // 4 hours
 
 	/* DEBUG: *
-	$update_every = 30;
-	$attempt_every = 15;
+	$update_every = 10;
+	$attempt_every = 5;
 	*/
 
 	$servertime_last_update = $Settings->get( 'evonet_last_update' );
