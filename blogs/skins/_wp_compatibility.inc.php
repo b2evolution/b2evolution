@@ -13,6 +13,15 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+/**
+ * WP compatibility - UNSUPPORTED
+ */
+global $siteurl;
+$siteurl = $Blog->get('url');
+
+
+
 /**
  * WP compatibility - UNSUPPORTED
  */
@@ -51,6 +60,20 @@ function wp_list_cats()
 	// ---------------------------------- END OF CATEGORY LIST ---------------------------------
 }
 
+function wp_tag_cloud()
+{
+	skin_widget( array(
+			// CODE for the widget:
+			'widget' => 'coll_tag_cloud',
+			// Optional display params
+			'block_start' => '<div class="tag_cloud">',
+			'block_end' => '</div>',
+			'block_title_start' => '<h3 class="sideItemTitle">',
+			'title' => 'Tag Cloud:',
+			'block_title_end' => '</h3>',
+		) );
+}
+
 function get_permalink()
 {
 	global $Item;
@@ -74,6 +97,11 @@ function the_content()
 	// Note: You can customize the default item feedback by copying the generic
 	// /skins/_item_feedback.inc.php file into the current skin folder.
 	// -------------------------- END OF POST CONTENT -------------------------
+}
+
+function is_home()
+{
+	return is_default_page();
 }
 
 function is_page()
@@ -198,6 +226,9 @@ function next_posts_link( $link_text = 'Next' )
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/20 22:59:51  fplanque
+ * more WP tags
+ *
  * Revision 1.1  2007/12/19 18:41:34  fplanque
  * WordPress compatibility layer
  *
