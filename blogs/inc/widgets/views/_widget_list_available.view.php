@@ -34,6 +34,7 @@ $core_componentwidget_defs = array(
 			'coll_page_list',
 			'coll_post_list',
 			'coll_category_list',
+			'coll_tag_cloud',
 		'*'.T_('Meta contents'),
 			'coll_longdesc',
 			'free_html',
@@ -110,6 +111,9 @@ echo '</ul></li></ul>';
 
 /*
  * $Log$
+ * Revision 1.5  2007/12/20 22:59:34  fplanque
+ * TagCloud widget prototype
+ *
  * Revision 1.4  2007/09/28 02:17:48  fplanque
  * Menu widgets
  *

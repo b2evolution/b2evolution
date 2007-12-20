@@ -54,6 +54,15 @@ function skin_init( $disp )
 	 */
 	global $MainList;
 
+
+  /**
+   * This will give more detail when $disp == 'posts'; otherwise it will have the same content as $disp
+	 * @var string
+	 */
+	global $disp_detail;
+
+	$disp_detail = $disp;
+
 	// This is the main template; it may be used to display very different things.
 	// Do inits depending on current $disp:
 	switch( $disp )
@@ -92,6 +101,7 @@ function skin_init( $disp )
 
 				if( array_diff( $active_filters, array( 'page' ) ) == array() )
 				{ // This is just a follow "paged" page
+					$disp_detail = 'posts-next';
 					$seo_page_type = 'Next page';
 					if( $Blog->get_setting( 'paged_noindex' ) )
 					{	// We prefer robots not to index category pages:
@@ -100,6 +110,7 @@ function skin_init( $disp )
 				}
 				elseif( array_diff( $active_filters, array( 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
 				{ // This is a category home page (note: subsequent pages are a different story)
+					$disp_detail = 'posts-cat';
 					$seo_page_type = 'Category page';
 					if( $Blog->get_setting( 'chapter_noindex' ) )
 					{	// We prefer robots not to index category pages:
@@ -138,6 +149,7 @@ function skin_init( $disp )
 				}
 				elseif( array_diff( $active_filters, array( 'tags', 'posts', 'page' ) ) == array() )
 				{ // This is a tag page
+					$disp_detail = 'posts-tag';
 					$seo_page_type = 'Tag page';
 					if( $Blog->get_setting( 'tag_noindex' ) )
 					{	// We prefer robots not to index tag pages:
@@ -147,6 +159,7 @@ function skin_init( $disp )
 				elseif( array_diff( $active_filters, array( 'ymdhms', 'week', 'page' ) ) == array() )
 				{ // This is an archive page
 					// echo 'archive page';
+					$disp_detail = 'posts-date';
 					$seo_page_type = 'Date archive page';
 					if( $Blog->get_setting( 'archive_noindex' ) )
 					{	// We prefer robots not to index archive pages:
@@ -155,6 +168,7 @@ function skin_init( $disp )
 				}
 				else
 				{	// Other filtered pages:
+					$disp_detail = 'posts-filtered';
 					$seo_page_type = 'Other filtered page';
 					if( $Blog->get_setting( 'filtered_noindex' ) )
 					{	// We prefer robots not to index other filtered pages:
@@ -164,6 +178,7 @@ function skin_init( $disp )
 			}
 			else
 			{	// This is the default blog page
+				$disp_detail = 'posts-default';
 				$seo_page_type = 'Default page';
 				if( $Blog->get_setting( 'default_noindex' ) )
 				{	// We prefer robots not to index archive pages:
@@ -215,6 +230,18 @@ function skin_init( $disp )
 			}
 			break;
 	}
+}
+
+
+/**
+ * Tells if we are on the default blog page
+ *
+ * @return boolean
+ */
+function is_default_page()
+{
+	global $disp_detail;
+	return ($disp_detail == 'posts-default' );
 }
 
 
@@ -469,8 +496,12 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 
 
+
 /*
  * $Log$
+ * Revision 1.21  2007/12/20 22:59:34  fplanque
+ * TagCloud widget prototype
+ *
  * Revision 1.20  2007/12/16 21:53:15  blueyed
  * skin_base_tag: globalize baseurl, if used
  *

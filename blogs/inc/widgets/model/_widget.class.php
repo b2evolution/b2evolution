@@ -301,6 +301,8 @@ class ComponentWidget extends DataObject
 					'group_end' => '</ul>',
 					'notes_start' => '<div class="notes">',
 					'notes_end' => '</div>',
+					'tag_cloud_start' => '<p class="tag_cloud">',
+					'tag_cloud_end' => '</p>',
 				), $widget_defaults, $params, $this->param_array );
 
 
@@ -655,6 +657,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2007/12/20 22:59:34  fplanque
+ * TagCloud widget prototype
+ *
  * Revision 1.11  2007/12/20 10:48:51  fplanque
  * doc
  *
