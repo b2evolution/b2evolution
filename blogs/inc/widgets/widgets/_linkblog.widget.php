@@ -54,7 +54,9 @@ class linkblog_Widget extends ComponentWidget
 		$this->init_display( array() );
 		$title = T_('Linkblog');
 		if( $this->disp_params[ 'widget_name' ] )
+		{ // TODO: generalize for all widgets + revert (put custom name first)
 			$title .= ' ( '.$this->disp_params[ 'widget_name' ].' )';
+		}
 		return $title;
 	}
 
@@ -100,6 +102,7 @@ class linkblog_Widget extends ComponentWidget
 				'label' => T_( 'Display' ),
 				'size' => 4,
 				'note' => T_( 'This is the maximum number of links to display, leave empty for all links' ),
+// TODO: put 100 as the default, 1000 as the max and don't lie about the illusion of ifinity :p
 			),
 		);
 
@@ -126,6 +129,9 @@ class linkblog_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2007/12/20 10:48:50  fplanque
+ * doc
+ *
  * Revision 1.2  2007/12/18 10:27:30  yabs
  * adding params
  *

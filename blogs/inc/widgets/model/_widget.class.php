@@ -473,7 +473,7 @@ class ComponentWidget extends DataObject
 		$linkblog_cat_modifier = '';
 		compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $linkblog );
 
-		$limit = ( $this->disp_params[ 'linkblog_limit' ] ? $this->disp_params[ 'linkblog_limit' ] : 999999 );
+		$limit = ( $this->disp_params[ 'linkblog_limit' ] ? $this->disp_params[ 'linkblog_limit' ] : 1000 ); // Note: 1000 will already kill the display
 
 		$LinkblogList = & new ItemListLight( $link_Blog, NULL, NULL, $limit );
 
@@ -655,6 +655,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2007/12/20 10:48:51  fplanque
+ * doc
+ *
  * Revision 1.10  2007/12/18 10:26:58  yabs
  * adding params
  *
