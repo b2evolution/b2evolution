@@ -49,7 +49,7 @@ class BlogCache extends DataObjectCache
 	var $cache_siteurl_abs = array();
 
 	/**
-	 * Cache by urlname 
+	 * Cache by urlname
 	 * @var array
 	 */
 	var $cache_urlname = array();
@@ -259,15 +259,16 @@ class BlogCache extends DataObjectCache
 		{
 			global $current_User;
 			$user_ID = $current_User->ID;
-			$Group = $current_User->Group;
+			$for_User = $current_User;
 		}
 		else
 		{
 			$UserCache = & get_Cache( 'UserCache' );
 			$for_User = & $UserCache->get_by_ID( $user_ID );
-			$Group = $for_User->Group;
 		}
+		$for_User->get_Group();// ensure Group is set
 
+		$Group = $for_User->Group;
 		// First check if we have a global access perm:
  		if( $Group->check_perm( 'blogs', $permlevel ) )
 		{ // If group grants a global permission:
@@ -356,6 +357,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/20 12:01:56  yabs
+ * bug fix
+ *
  * Revision 1.1  2007/06/25 10:59:32  fplanque
  * MODULES (refactored MVC)
  *
