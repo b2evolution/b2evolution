@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * WP compatibility - UNSUPPORTED
+ * WP compatibility variable - UNSUPPORTED.
  */
 global $siteurl;
 $siteurl = $Blog->get('url');
@@ -23,14 +23,28 @@ $siteurl = $Blog->get('url');
 
 
 /**
- * WP compatibility - UNSUPPORTED
+ * WP compatibility template tag - UNSUPPORTED.
  */
 function bloginfo( $param )
 {
 	global $Blog;
+
+	/*
+	switch( $param )
+	{
+		case 'comments_rss2_url':
+			$param = '';
+			break;
+	}
+	*/
+
 	echo $Blog->disp( $param );
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function get_calendar()
 {
 	global $Plugins;
@@ -41,10 +55,16 @@ function get_calendar()
 			'block_end' => '',
 			'displaycaption' => true,
 			'linktomontharchive' => false,
+			'headerdisplay' => 'e',
+			'tablestart' => '<table id="wp-calendar" class="bCalendarTable" cellspacing="0" summary="Monthly calendar with links to each day\'s posts">'."\n",
 		) );
 	// -------------------------------- END OF CALENDAR ----------------------------------
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function wp_list_cats()
 {
 	// --------------------------------- START OF CATEGORY LIST --------------------------------
@@ -60,6 +80,10 @@ function wp_list_cats()
 	// ---------------------------------- END OF CATEGORY LIST ---------------------------------
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function wp_tag_cloud()
 {
 	skin_widget( array(
@@ -71,15 +95,26 @@ function wp_tag_cloud()
 			'block_title_start' => '<h3 class="sideItemTitle">',
 			'title' => 'Tag Cloud:',
 			'block_title_end' => '</h3>',
+			'max_tags' => 100,
+			'min_size' => 8,
+			'max_size' => 22,
 		) );
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function get_permalink()
 {
 	global $Item;
 	$Item->permanent_url();
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function the_title()
 {
 	global $Item;
@@ -88,6 +123,10 @@ function the_title()
 	 ) );
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function the_content()
 {
 	// ---------------------- POST CONTENT INCLUDED HERE ----------------------
@@ -99,11 +138,19 @@ function the_content()
 	// -------------------------- END OF POST CONTENT -------------------------
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function is_home()
 {
 	return is_default_page();
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function is_page()
 {
 	global $disp;
@@ -111,6 +158,21 @@ function is_page()
 	return ($disp == 'page');
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
+function is_tag()
+{
+	global $disp_detail;
+
+	return ($disp_detail == 'posts-tag' );
+}
+
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function the_time( $format = '#' )
 {
 	global $Item;
@@ -119,12 +181,20 @@ function the_time( $format = '#' )
 		) );
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function trackback_url()
 {
 	global $Item;
 	$Item->trackback_url();
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function comments_popup_link( $zero = '#', $one = '#', $more = '#' )
 {
 	global $Item;
@@ -135,19 +205,27 @@ function comments_popup_link( $zero = '#', $one = '#', $more = '#' )
 									'link_after' => '',
 									'link_text_zero' => $zero,
 									'link_text_one' => $one,
-									'link_text_more' => $more,
+									'link_text_more' => str_replace( '%', '%d', $more ),
 									'link_title' => '#',
 									'use_popup' => false,
 									'url' => '#',
 								) );
 }
 
-function comments_rss_link()
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
+function comments_rss_link( $link_text = 'Comments RSS', $commentsrssfilename = 'nolongerused' )
 {
 	global $Item;
-	$Item->feedback_feed_link();
+	$Item->feedback_feed_link( '_rss2', '', '', $link_text );
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function the_category( $separator )
 {
 	global $Item;
@@ -170,6 +248,10 @@ function the_category( $separator )
 			) );
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function the_tags( $before = 'Tags: ', $sep = ', ', $after = '' )
 {
 	global $Item;
@@ -182,12 +264,20 @@ function the_tags( $before = 'Tags: ', $sep = ', ', $after = '' )
 			) );
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function edit_post_link()
 {
 	global $Item;
 	$Item->edit_link();
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function comments_template()
 {
 	// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
@@ -200,9 +290,17 @@ function comments_template()
 	// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function previous_posts_link( $link_text = 'Previous' )
 {
 	global $MainList;
+	if( !isset($MainList) )
+	{
+		return;
+	}
 	$MainList->page_links( array(
 				'block_start' => ' ',
 				'block_end' => ' ',
@@ -212,9 +310,17 @@ function previous_posts_link( $link_text = 'Previous' )
 			) );
 }
 
+
+/**
+ * WP compatibility template tag - UNSUPPORTED.
+ */
 function next_posts_link( $link_text = 'Next' )
 {
 	global $MainList;
+	if( !isset($MainList) )
+	{
+		return;
+	}
 	$MainList->page_links( array(
 				'block_start' => ' ',
 				'block_end' => ' ',
@@ -224,8 +330,12 @@ function next_posts_link( $link_text = 'Next' )
 			) );
 }
 
+
 /*
  * $Log$
+ * Revision 1.3  2007/12/21 21:52:38  fplanque
+ * improved WP tags
+ *
  * Revision 1.2  2007/12/20 22:59:51  fplanque
  * more WP tags
  *
