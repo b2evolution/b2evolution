@@ -79,11 +79,29 @@ class coll_tag_cloud_Widget extends ComponentWidget
 					'defaultvalue' => T_('Tag cloud'),
 					'maxlength' => 100,
 				),
+			'max_tags' => array(
+					'type' => 'integer',
+					'label' => T_('Max # of tags'),
+					'size' => 4,
+					'defaultvalue' => 50,
+				),
 			'tag_separator' => array(
 					'type' => 'text',
 					'label' => T_('Tag separator'),
 					'defaultvalue' => ' ',
 					'maxlength' => 100,
+				),
+			'tag_min_size' => array(
+					'type' => 'integer',
+					'label' => T_('Min size'),
+					'size' => 3,
+					'defaultvalue' => 8,
+				),
+			'tag_max_size' => array(
+					'type' => 'integer',
+					'label' => T_('Max size'),
+					'size' => 3,
+					'defaultvalue' => 22,
 				),
 		);
 
@@ -112,18 +130,41 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 		global $DB;
 
-		$sql = 'SELECT tag_name, COUNT(itag_itm_ID) AS tag_count
+		$sql = 'SELECT LOWER(tag_name) AS tag_name, COUNT(itag_itm_ID) AS tag_count
 						  FROM T_items__tag INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID
 					  				INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID
 					  				INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 						 WHERE cat_blog_ID = '.$Blog->ID.'
 						 GROUP BY tag_name
-						 ORDER BY tag_name';
+						 ORDER BY tag_count DESC
+						 LIMIT '.$this->disp_params['max_tags'];
 
 		$results = $DB->get_results( $sql, OBJECT, 'Get tags' );
 
 		// pre_dump( $results );
 
+		if( empty($results) )
+		{	// No tags!
+			return;
+		}
+
+		$max_count = $results[0]->tag_count;
+		$min_count = $results[count($results)-1]->tag_count;
+		$count_span = max( 1, $max_count - $min_count );
+		$max_size = $this->disp_params['max_size'];
+		$min_size = $this->disp_params['min_size'];
+		$size_span = $max_size - $min_size;
+
+		function tag_cloud_cmp($a, $b)
+		{
+			if ($a->tag_name == $b->tag_name)
+			{
+				return 0;
+			}
+			return ($a->tag_name < $b->tag_name) ? -1 : 1;
+		}
+
+		usort($results, 'tag_cloud_cmp');
 
 		echo $this->disp_params['block_start'];
 
@@ -137,7 +178,8 @@ class coll_tag_cloud_Widget extends ComponentWidget
 			{
 				echo $this->disp_params['tag_separator'];
 			}
-			echo '<a href="'.$Blog->gen_tag_url( $row->tag_name ).'" title="'
+			$size = floor( $row->tag_count * $size_span / $count_span + $min_size );
+			echo '<a href="'.$Blog->gen_tag_url( $row->tag_name ).'" style="font-size: '.$size.'pt;" title="'
 						.sprintf( T_('%d posts'), $row->tag_count ).'">'.format_to_output($row->tag_name).'</a>';
 			$count++;
 		}
@@ -152,6 +194,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/21 21:50:28  fplanque
+ * tag cloud sizing
+ *
  * Revision 1.1  2007/12/20 22:59:34  fplanque
  * TagCloud widget prototype
  *
