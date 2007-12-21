@@ -618,8 +618,47 @@ function visibility_select( & $Form, $post_status )
 }
 
 
+
+/**
+ * Template tag: Link to an item identified by its url title / slug / name
+ *
+ * Note: this will query the database. Thus, in most situations it will make more sense
+ * to use a hardcoded link. This tag can be useful for prototyping location independant
+ * sites.
+ */
+function item_ink_by_urltitle( $params = array() )
+{
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'urltitle'    => NULL,  // MUST BE SPECIFIED
+			'before'      => ' ',
+			'after'       => ' ',
+			'text'        => '#',
+		), $params );
+
+  /**
+	 * @var ItemCache
+	 */
+	$ItemCache = & get_Cache( 'ItemCache' );
+
+  /**
+	 * @var Item
+	 */
+	$Item = & $ItemCache->get_by_urltitle( $params['urltitle'], false );
+
+	if( empty($Item) )
+	{
+		return false;
+	}
+
+	$Item->permanent_link( $params );
+}
+
 /*
  * $Log$
+ * Revision 1.6  2007/12/21 21:52:51  fplanque
+ * added tag
+ *
  * Revision 1.5  2007/09/23 18:57:15  fplanque
  * filter handling fixes
  *
