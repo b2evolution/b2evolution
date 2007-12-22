@@ -517,6 +517,11 @@ class Comment extends DataObject
 
 		if( ! is_logged_in() ) return false;
 
+		if( empty($this->ID) )
+		{	// Happens in Preview
+			return false;
+		}
+
 		$this->get_Item();
 
 		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
@@ -557,6 +562,11 @@ class Comment extends DataObject
 		global $current_User, $admin_url;
 
 		if( ! is_logged_in() ) return false;
+
+		if( empty($this->ID) )
+		{	// Happens in Preview
+			return false;
+		}
 
 		$this->get_Item();
 
@@ -1292,6 +1302,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2007/12/22 17:24:35  fplanque
+ * cleanup
+ *
  * Revision 1.5  2007/12/18 23:51:32  fplanque
  * nofollow handling in comment urls
  *

@@ -87,11 +87,8 @@ $Comment = & $params['Comment'];
 </cite>
 
 <?php
-	if( ! empty($Comment->ID) )
-	{	// NOT a preview comment:
-		$Comment->edit_link( '', '', '#', '#', 'permalink_right' ); /* Link to backoffice for editing */
-		$Comment->delete_link( '', '', '#', '#', 'permalink_right' ); /* Link to backoffice for deleting */
-	}
+	$Comment->edit_link( '', '', '#', '#', 'permalink_right' ); /* Link to backoffice for editing */
+	$Comment->delete_link( '', '', '#', '#', 'permalink_right' ); /* Link to backoffice for deleting */
 ?>
 </p>
 
@@ -105,6 +102,9 @@ $Comment = & $params['Comment'];
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/22 17:24:35  fplanque
+ * cleanup
+ *
  * Revision 1.1  2007/12/22 16:41:05  fplanque
  * Modular feedback template.
  *
