@@ -151,8 +151,8 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		$max_count = $results[0]->tag_count;
 		$min_count = $results[count($results)-1]->tag_count;
 		$count_span = max( 1, $max_count - $min_count );
-		$max_size = $this->disp_params['max_size'];
-		$min_size = $this->disp_params['min_size'];
+		$max_size = $this->disp_params['tag_max_size'];
+		$min_size = $this->disp_params['tag_min_size'];
 		$size_span = $max_size - $min_size;
 
 		function tag_cloud_cmp($a, $b)
@@ -194,6 +194,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2007/12/22 17:19:35  fplanque
+ * bugfix
+ *
  * Revision 1.2  2007/12/21 21:50:28  fplanque
  * tag cloud sizing
  *
