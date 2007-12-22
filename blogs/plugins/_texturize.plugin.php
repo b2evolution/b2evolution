@@ -17,8 +17,8 @@ class texturize_plugin extends Plugin
 	var $code = 'b2WPTxrz';
 	var $name = 'Texturize';
 	var $priority = 90;
-	var $version = '1.9-dev';
-	var $apply_rendering = 'opt-out';
+	var $version = '2.2-dev';
+	var $apply_rendering = 'opt-in';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -127,6 +127,9 @@ class texturize_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.17  2007/12/22 21:02:50  fplanque
+ * minor
+ *
  * Revision 1.16  2007/05/04 20:43:08  fplanque
  * MFB
  *

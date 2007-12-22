@@ -82,12 +82,12 @@ class Skin extends DataObject
 	 * @todo do not install if skin doesn't exist. Important for upgrade. Need to NOT fail if ZERO skins installed though :/
 	 *
 	 * @param string
-	 * @param string NULL for default
+	 * @param string NULL for default  (used by installer; TODO: override with class for Atom ans RSS 2.0)
 	 */
 	function install( $skin_folder, $name = NULL )
 	{
-		$this->set( 'name', empty( $name) ? $skin_folder : $name );
-		$this->set( 'folder', $skin_folder );
+		$this->set( 'folder', $skin_folder );	// Must be set before name for get_default_name() to work
+		$this->set( 'name', empty( $name ) ? $this->get_default_name() : $name );
 		$this->set( 'type', substr($skin_folder,0,1) == '_' ? 'feed' : 'normal' );
 
 		// Look for containers in skin file:
@@ -98,8 +98,17 @@ class Skin extends DataObject
 	}
 
 
+  /**
+	 * Get default name for the skin.
+	 * Note: the admin can customize it.
+	 */
+	function get_default_name()
+	{
+		return $this->folder;
+	}
+
 	/**
-	 *
+	 * Get the customized name for the skin.
 	 */
 	function get_name()
 	{
@@ -420,6 +429,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2007/12/22 21:02:50  fplanque
+ * minor
+ *
  * Revision 1.6  2007/10/08 08:32:56  fplanque
  * widget fixes
  *
