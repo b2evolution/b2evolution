@@ -213,6 +213,9 @@ function install_basic_skins()
 	$Skin->install( 'natural_pink' );
 
 	$Skin = new Skin();
+	$Skin->install( 'miami_blue' );
+
+	$Skin = new Skin();
 	$Skin->install( 'nifty_corners' );
 
 	$Skin = new Skin();
@@ -543,6 +546,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.39  2007/12/22 16:59:41  fplanque
+ * Miami blue 2.x
+ *
  * Revision 1.38  2007/10/08 21:30:19  fplanque
  * evocamp skin
  *
