@@ -166,6 +166,36 @@ class ComponentWidget extends DataObject
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */
+	function get_full_param_definitions( $params )
+	{
+		$r = array_merge( array(
+				'widget_name' => array(
+					'label' => T_( 'Widget Name' ),
+					'size' => 60,
+					'note' => T_( 'This is the name display on your widget list' ),
+				),
+				'widget_ID' => array(
+					'label' => T_( 'Widget ID' ),
+					'size' => 60,
+					'note' => T_( 'This replaces $wi_ID$ in your skins containers' ),
+				),
+				'widget_css_class' => array(
+					'label' => T_( 'Widget Classname' ),
+					'size' => 60,
+					'note' => T_( 'This replaces $wi_class$ in your skins containers' ),
+				),
+			), $this->get_param_definitions( $params ) );
+
+			return $r;
+	}
+
+
+	/**
+   * Get definitions for editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
 	function get_param_definitions( $params )
 	{
 		if( $this->type == 'plugin' )
@@ -205,14 +235,13 @@ class ComponentWidget extends DataObject
 	function get_param( $parname )
 	{
 		$this->load_param_array();
-
 		if( isset( $this->param_array[$parname] ) )
 		{	// We have a value for this param:
 			return $this->param_array[$parname];
 		}
 
 		// Try default values:
-		$params = $this->get_param_definitions( NULL );
+		$params = $this->get_full_param_definitions( NULL );
 		if( isset( $params[$parname]['defaultvalue'] ) )
 		{	// We ahve a default value:
 			return $params[$parname]['defaultvalue'] ;
@@ -231,7 +260,7 @@ class ComponentWidget extends DataObject
 	 */
 	function set( $parname, $parvalue )
 	{
-		$params = $this->get_param_definitions( NULL );
+		$params = $this->get_full_param_definitions( NULL );
 
 		if( isset( $params[$parname] ) )
 		{	// This is a widget specifc param:
@@ -256,7 +285,7 @@ class ComponentWidget extends DataObject
 	{
 		// Generate widget defaults array:
 		$widget_defaults = array();
-		$defs = $this->get_param_definitions( array() );
+		$defs = $this->get_full_param_definitions( array() );
 		foreach( $defs as $parname => $parmeta )
 		{
 			if( isset( $parmeta['defaultvalue'] ) )
@@ -301,13 +330,12 @@ class ComponentWidget extends DataObject
 					'group_end' => '</ul>',
 					'notes_start' => '<div class="notes">',
 					'notes_end' => '</div>',
-					'tag_cloud_start' => '<p class="tag_cloud">',
-					'tag_cloud_end' => '</p>',
 				), $widget_defaults, $params, $this->param_array );
 
-
 		// Customize params to the current widget:
-		$this->disp_params = str_replace( '$wi_class$', 'widget_'.$this->type.'_'.$this->code, $params );
+		$widget_css_class = 'widget_'.$this->type.'_'.$this->code.( empty( $params[ 'widget_css_class' ] ) ? '' : ' '.$params[ 'widget_css_class' ] );
+		$widget_ID = $params[ 'widget_ID' ];
+		$this->disp_params = str_replace( array( '$wi_ID$', '$wi_class$' ), array( $widget_ID, $widget_css_class ), $params );
 	}
 
 
@@ -475,7 +503,7 @@ class ComponentWidget extends DataObject
 		$linkblog_cat_modifier = '';
 		compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $linkblog );
 
-		$limit = ( $this->disp_params[ 'linkblog_limit' ] ? $this->disp_params[ 'linkblog_limit' ] : 1000 ); // Note: 1000 will already kill the display
+		$limit = ( $this->disp_params[ 'linkblog_limit' ] ? $this->disp_params[ 'linkblog_limit' ] : 999999 );
 
 		$LinkblogList = & new ItemListLight( $link_Blog, NULL, NULL, $limit );
 
@@ -657,11 +685,8 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
- * Revision 1.12  2007/12/20 22:59:34  fplanque
- * TagCloud widget prototype
- *
- * Revision 1.11  2007/12/20 10:48:51  fplanque
- * doc
+ * Revision 1.13  2007/12/22 17:02:14  yabs
+ * adding core parameters for css id/classname and widget list title
  *
  * Revision 1.10  2007/12/18 10:26:58  yabs
  * adding params
