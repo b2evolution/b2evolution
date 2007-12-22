@@ -317,6 +317,8 @@ class ComponentWidget extends DataObject
 					'group_end' => '</ul>',
 					'notes_start' => '<div class="notes">',
 					'notes_end' => '</div>',
+					'tag_cloud_start' => '<p class="tag_cloud">',
+					'tag_cloud_end' => '</p>',
 				), $widget_defaults, $params, $this->param_array );
 
 		// Customize params to the current widget:
@@ -490,7 +492,7 @@ class ComponentWidget extends DataObject
 		$linkblog_cat_modifier = '';
 		compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $linkblog );
 
-		$limit = ( $this->disp_params[ 'linkblog_limit' ] ? $this->disp_params[ 'linkblog_limit' ] : 999999 );
+		$limit = ( $this->disp_params[ 'linkblog_limit' ] ? $this->disp_params[ 'linkblog_limit' ] : 1000 ); // Note: 1000 will already kill the display
 
 		$LinkblogList = & new ItemListLight( $link_Blog, NULL, NULL, $limit );
 
@@ -672,11 +674,20 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2007/12/22 21:09:53  fplanque
+ * meh!!
+ *
  * Revision 1.14  2007/12/22 19:52:55  yabs
  * cleanup from adding core params
  *
  * Revision 1.13  2007/12/22 17:02:14  yabs
  * adding core parameters for css id/classname and widget list title
+ *
+ * Revision 1.12  2007/12/20 22:59:34  fplanque
+ * TagCloud widget prototype
+ *
+ * Revision 1.11  2007/12/20 10:48:51  fplanque
+ * doc
  *
  * Revision 1.10  2007/12/18 10:26:58  yabs
  * adding params
