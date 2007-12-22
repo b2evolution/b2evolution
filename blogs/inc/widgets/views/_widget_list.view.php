@@ -98,7 +98,10 @@ function display_container( $container, $legend_suffix = '' )
 			$Table->display_line_start( false, $fadeout );
 
 			$Table->display_col_start();
-			echo '<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID).'">'.$ComponentWidget->get_name().'</a>';
+			$ComponentWidget->init_display( array() );
+			$widget_name = $ComponentWidget->disp_params[ 'widget_name' ];
+			$widget_name = ( $widget_name ? ' ( '.$widget_name.' )' : '' );
+			echo '<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID).'">'.$ComponentWidget->get_name().$widget_name.'</a>';
 			$Table->display_col_end();
 
 			// Note: this is totally useless, but we need more cols for the screen to feel "right":
@@ -168,6 +171,9 @@ echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, fal
 
 /*
  * $Log$
+ * Revision 1.5  2007/12/22 16:57:01  yabs
+ * adding core parameters for css id/classname and widget list title
+ *
  * Revision 1.4  2007/09/29 08:18:21  yabs
  * UI - added edit to actions
  *

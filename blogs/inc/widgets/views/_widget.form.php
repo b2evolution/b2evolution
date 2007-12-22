@@ -49,7 +49,7 @@ $Form->begin_fieldset( T_('Params') );
 	//$params = $edited_ComponentWidget->get_params();
 
 	// Loop through all widget params:
-	foreach( $edited_ComponentWidget->get_param_definitions( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
+	foreach( $edited_ComponentWidget->get_full_param_definitions( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
 	{
 		// Display field:
 		autoform_display_field( $l_name, $l_meta, $Form, 'Widget', $edited_ComponentWidget );
@@ -72,6 +72,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/22 16:57:01  yabs
+ * adding core parameters for css id/classname and widget list title
+ *
  * Revision 1.1  2007/06/25 11:01:59  fplanque
  * MODULES (refactored MVC)
  *
