@@ -51,12 +51,7 @@ class linkblog_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		$this->init_display( array() );
 		$title = T_('Linkblog');
-		if( $this->disp_params[ 'widget_name' ] )
-		{ // TODO: generalize for all widgets + revert (put custom name first)
-			$title .= ' ( '.$this->disp_params[ 'widget_name' ].' )';
-		}
 		return $title;
 	}
 
@@ -81,11 +76,6 @@ class linkblog_Widget extends ComponentWidget
 		global $Blog;
 		// Demo data:
 		$r = array(
-			'widget_name' => array(
-				'label' => T_( 'Widget name' ),
-				'size' => 60,
-				'note' => T_( 'This is the name displayed in the widget list' ),
-			),
 			'title' => array(
 				'label' => 'Block title',
 				'size' => 60,
@@ -129,6 +119,9 @@ class linkblog_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/22 17:05:13  yabs
+ * removing obsolete params
+ *
  * Revision 1.3  2007/12/20 10:48:50  fplanque
  * doc
  *

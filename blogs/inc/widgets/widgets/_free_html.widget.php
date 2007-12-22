@@ -51,11 +51,7 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		$this->init_display( array() );
 		$title = T_( 'Free HTML' );
-		if( $this->disp_params[ 'widget_name' ] )
-		$title = $this->disp_params[ 'widget_name' ].' ( '.$title.' )';
-
 		return $title;
 	}
 
@@ -79,11 +75,6 @@ class free_html_Widget extends ComponentWidget
 	{
 		// Demo data:
 		$r = array(
-			'widget_name' => array(
-				'label' => T_( 'Widget name' ),
-				'size' => 60,
-				'note' => T_( 'This is the name displayed in the widget list' ),
-			),
 			'title' => array(
 				'label' => 'Block title',
 				'size' => 60,
@@ -127,6 +118,9 @@ class free_html_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/22 17:02:50  yabs
+ * removing obsolete params
+ *
  * Revision 1.3  2007/11/28 23:23:18  yabs
  * clarification of params
  *
