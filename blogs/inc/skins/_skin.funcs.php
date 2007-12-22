@@ -37,7 +37,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function skin_init( $disp )
 {
-  /**
+	/**
 	 * @var Blog
 	 */
 	global $Blog;
@@ -48,20 +48,22 @@ function skin_init( $disp )
 	global $redir, $ReqHost, $ReqURI;
 
 	global $Chapter;
+	global $Debuglog;
 
-  /**
+	/**
 	 * @var ItemList2
 	 */
 	global $MainList;
 
-
-  /**
-   * This will give more detail when $disp == 'posts'; otherwise it will have the same content as $disp
+	/**
+	 * This will give more detail when $disp == 'posts'; otherwise it will have the same content as $disp
 	 * @var string
 	 */
 	global $disp_detail;
 
 	$disp_detail = $disp;
+
+	$Debuglog->add('skin_init: '.$disp, 'skin');
 
 	// This is the main template; it may be used to display very different things.
 	// Do inits depending on current $disp:
@@ -499,6 +501,10 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.22  2007/12/22 00:19:27  blueyed
+ * - add debuglog to skin_init
+ * - fix indent
+ *
  * Revision 1.21  2007/12/20 22:59:34  fplanque
  * TagCloud widget prototype
  *
