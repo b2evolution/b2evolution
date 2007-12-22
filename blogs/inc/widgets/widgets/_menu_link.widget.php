@@ -72,21 +72,23 @@ class menu_link_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		$r = array(
-			'link_type' => array(
-				'label' => 'Link Type',
-				'note' => T_('What do you want to link to?'),
-				'type' => 'select',
-				'options' => array(
-											'home' => T_('Blog home'),
-											'arcdir' => T_('Archive directory'),
-											'catdir' => T_('Category directory'),
-											'latestcomments' => T_('Latest comments'),
-											'ownercontact' => T_('Blog owner contact form'),
-											'login' => T_('Log in form'),
-										 ),
-				'defaultvalue' => 'home',
-			),
+		$r = array_merge( parent::get_param_definitions( $params ),
+			array(
+				'link_type' => array(
+					'label' => 'Link Type',
+					'note' => T_('What do you want to link to?'),
+					'type' => 'select',
+					'options' => array(
+												'home' => T_('Blog home'),
+												'arcdir' => T_('Archive directory'),
+												'catdir' => T_('Category directory'),
+												'latestcomments' => T_('Latest comments'),
+												'ownercontact' => T_('Blog owner contact form'),
+												'login' => T_('Log in form'),
+											 ),
+					'defaultvalue' => 'home',
+				),
+			)
 		);
 
 		return $r;
@@ -156,6 +158,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/22 19:55:00  yabs
+ * cleanup from adding core params
+ *
  * Revision 1.1  2007/09/28 02:17:48  fplanque
  * Menu widgets
  *

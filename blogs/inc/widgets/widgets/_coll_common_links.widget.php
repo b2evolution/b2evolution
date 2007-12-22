@@ -72,31 +72,33 @@ class coll_common_links_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		$r = array(
-			'show_recently' => array(
-				'type' => 'checkbox',
-				'label' => T_('Show "Recently"'),
-				'note' => T_('Go to the most recent posts / the blog\'s home.'),
-				'defaultvalue' => '1',
-			),
-			'show_archives' => array(
-				'type' => 'checkbox',
-				'label' => T_('Show "Archives"'),
-				'note' => T_('Go to the monthly/weekly/daily archive list.'),
-				'defaultvalue' => '1',
-			),
-			'show_categories' => array(
-				'type' => 'checkbox',
-				'label' => T_('Show "Categories"'),
-				'note' => T_('Go to the category tree.'),
-				'defaultvalue' => '1',
-			),
-			'show_latestcomments' => array(
-				'type' => 'checkbox',
-				'label' => T_('Show "Latest comments"'),
-				'note' => T_('Go to the latest comments.'),
-				'defaultvalue' => '1',
-			),
+		$r = array_merge( parent::get_param_definitions( $params ),
+				array(
+				'show_recently' => array(
+					'type' => 'checkbox',
+					'label' => T_('Show "Recently"'),
+					'note' => T_('Go to the most recent posts / the blog\'s home.'),
+					'defaultvalue' => '1',
+				),
+				'show_archives' => array(
+					'type' => 'checkbox',
+					'label' => T_('Show "Archives"'),
+					'note' => T_('Go to the monthly/weekly/daily archive list.'),
+					'defaultvalue' => '1',
+				),
+				'show_categories' => array(
+					'type' => 'checkbox',
+					'label' => T_('Show "Categories"'),
+					'note' => T_('Go to the category tree.'),
+					'defaultvalue' => '1',
+				),
+				'show_latestcomments' => array(
+					'type' => 'checkbox',
+					'label' => T_('Show "Latest comments"'),
+					'note' => T_('Go to the latest comments.'),
+					'defaultvalue' => '1',
+				),
+			)
 		);
 
 		return $r;
@@ -159,6 +161,9 @@ class coll_common_links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/22 19:55:00  yabs
+ * cleanup from adding core params
+ *
  * Revision 1.1  2007/06/25 11:02:06  fplanque
  * MODULES (refactored MVC)
  *

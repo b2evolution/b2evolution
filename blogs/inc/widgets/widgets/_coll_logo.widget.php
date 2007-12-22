@@ -72,14 +72,16 @@ class coll_logo_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		$r = array(
-			'logo_file' => array(
-				'label' => T_('Logo filename'),
-				'note' => T_('The logo file must be uploaded to the root of the Blog\'s media dir'),
-				'defaultvalue' => 'logo.gif',
-				'valid_pattern' => array( 'pattern'=>'¤^[a-z0-9_\-][a-z0-9_.\-]*$¤i',
-																	'error'=>T_('Invalid filename.') ),
-			),
+		$r = array_merge( parent::get_param_definitions( $params ),
+				array(
+				'logo_file' => array(
+					'label' => T_('Logo filename'),
+					'note' => T_('The logo file must be uploaded to the root of the Blog\'s media dir'),
+					'defaultvalue' => 'logo.gif',
+					'valid_pattern' => array( 'pattern'=>'¤^[a-z0-9_\-][a-z0-9_.\-]*$¤i',
+																		'error'=>T_('Invalid filename.') ),
+				),
+			)
 		);
 
 		return $r;
@@ -115,6 +117,9 @@ class coll_logo_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/22 19:55:00  yabs
+ * cleanup from adding core params
+ *
  * Revision 1.1  2007/06/25 11:02:11  fplanque
  * MODULES (refactored MVC)
  *

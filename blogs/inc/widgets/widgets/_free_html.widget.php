@@ -74,16 +74,18 @@ class free_html_Widget extends ComponentWidget
 	function get_param_definitions( $params )
 	{
 		// Demo data:
-		$r = array(
-			'title' => array(
-				'label' => 'Block title',
-				'size' => 60,
-			),
-			'content' => array(
-				'type' => 'html_textarea',
-				'label' => T_('Block content'),
-				'rows' => 10,
-			),
+		$r = array_merge( parent::get_param_definitions( $params ),
+			array(
+				'title' => array(
+					'label' => 'Block title',
+					'size' => 60,
+				),
+				'content' => array(
+					'type' => 'html_textarea',
+					'label' => T_('Block content'),
+					'rows' => 10,
+				),
+			)
 		);
 
 		return $r;
@@ -118,6 +120,9 @@ class free_html_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.5  2007/12/22 19:55:00  yabs
+ * cleanup from adding core params
+ *
  * Revision 1.4  2007/12/22 17:02:50  yabs
  * removing obsolete params
  *

@@ -72,7 +72,8 @@ class coll_tag_cloud_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		$r = array(
+		$r = array_merge( parent::get_param_definitions( $params ),
+			array(
 			'title' => array(
 					'type' => 'text',
 					'label' => T_('Block title'),
@@ -103,6 +104,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 					'size' => 3,
 					'defaultvalue' => 22,
 				),
+			)
 		);
 
 		// add limit default 100
@@ -194,6 +196,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/22 19:55:00  yabs
+ * cleanup from adding core params
+ *
  * Revision 1.3  2007/12/22 17:19:35  fplanque
  * bugfix
  *

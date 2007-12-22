@@ -73,19 +73,21 @@ class coll_xml_feeds_Widget extends ComponentWidget
 	function get_param_definitions( $params )
 	{
 		global $use_strict;
-		$r = array(
-			'title' => array(
-				'label' => T_( 'Title' ),
-				'size' => 40,
-				'note' => T_( 'This is the title to display, $icon$ will be replaced by the feed icon' ),
-				'defaultvalue' => '$icon$ '.T_('XML Feeds'),
-			),
-			'info_link' => array(
-				'label' => T_( 'New Window' ),
-				'type' => 'checkbox',
-				'note' => T_( 'Check this to add target="_blank" to the "What is RSS?" link' ),
-				'defaultvalue' => !$use_strict,
-			),
+		$r = array_merge( parent::get_param_definitions( $params ),
+			array(
+				'title' => array(
+					'label' => T_( 'Title' ),
+					'size' => 40,
+					'note' => T_( 'This is the title to display, $icon$ will be replaced by the feed icon' ),
+					'defaultvalue' => '$icon$ '.T_('XML Feeds'),
+				),
+				'info_link' => array(
+					'label' => T_( 'New Window' ),
+					'type' => 'checkbox',
+					'note' => T_( 'Check this to add target="_blank" to the "What is RSS?" link' ),
+					'defaultvalue' => !$use_strict,
+				),
+			)
 		);
 
 		return $r;
@@ -147,6 +149,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/22 19:55:00  yabs
+ * cleanup from adding core params
+ *
  * Revision 1.3  2007/11/28 17:50:24  fplanque
  * normalization
  *

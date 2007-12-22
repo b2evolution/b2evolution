@@ -143,7 +143,7 @@ switch( $action )
 		load_funcs('plugins/_plugin.funcs.php');
 
 		// Loop through all widget params:
-		foreach( $edited_ComponentWidget->get_full_param_definitions( array('for_editing'=>true) ) as $parname => $parmeta )
+		foreach( $edited_ComponentWidget->get_param_definitions( array('for_editing'=>true) ) as $parname => $parmeta )
 		{
 			autoform_set_param_from_request( $parname, $parmeta, $edited_ComponentWidget, 'Widget' );
 		}
@@ -311,6 +311,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2007/12/22 19:52:17  yabs
+ * cleanup from adding core params
+ *
  * Revision 1.2  2007/12/22 16:56:35  yabs
  * adding core parameters for css id/classname and widget list title
  *

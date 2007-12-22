@@ -160,19 +160,19 @@ class ComponentWidget extends DataObject
 	}
 
 
-  /**
+	/**
    * Get definitions for editable params
    *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */
-	function get_full_param_definitions( $params )
+	function get_param_definitions( $params )
 	{
-		$r = array_merge( array(
+		$r = array(
 				'widget_name' => array(
 					'label' => T_( 'Widget Name' ),
 					'size' => 60,
-					'note' => T_( 'This is the name display on your widget list' ),
+					'note' => T_( 'This is the name displayed on your widget list' ),
 				),
 				'widget_ID' => array(
 					'label' => T_( 'Widget ID' ),
@@ -184,34 +184,21 @@ class ComponentWidget extends DataObject
 					'size' => 60,
 					'note' => T_( 'This replaces $wi_class$ in your skins containers' ),
 				),
-			), $this->get_param_definitions( $params ) );
+			);
 
-			return $r;
-	}
-
-
-	/**
-   * Get definitions for editable params
-   *
-	 * @see Plugin::GetDefaultSettings()
-	 * @param local params like 'for_editing' => true
-	 */
-	function get_param_definitions( $params )
-	{
 		if( $this->type == 'plugin' )
 		{
 			// Make sure Plugin is loaded:
 			if( $this->get_Plugin() )
 			{
-				return $this->Plugin->get_widget_param_definitions( $params );
+				$r = array_merge( $r, $this->Plugin->get_widget_param_definitions( $params ) );
 			}
 		}
-
-		return array();
+		return $r;
 	}
 
 
-  /**
+	/**
 	 * Load param array
 	 */
 	function load_param_array()
@@ -241,7 +228,7 @@ class ComponentWidget extends DataObject
 		}
 
 		// Try default values:
-		$params = $this->get_full_param_definitions( NULL );
+		$params = $this->get_param_definitions( NULL );
 		if( isset( $params[$parname]['defaultvalue'] ) )
 		{	// We ahve a default value:
 			return $params[$parname]['defaultvalue'] ;
@@ -260,7 +247,7 @@ class ComponentWidget extends DataObject
 	 */
 	function set( $parname, $parvalue )
 	{
-		$params = $this->get_full_param_definitions( NULL );
+		$params = $this->get_param_definitions( NULL );
 
 		if( isset( $params[$parname] ) )
 		{	// This is a widget specifc param:
@@ -285,7 +272,7 @@ class ComponentWidget extends DataObject
 	{
 		// Generate widget defaults array:
 		$widget_defaults = array();
-		$defs = $this->get_full_param_definitions( array() );
+		$defs = $this->get_param_definitions( array() );
 		foreach( $defs as $parname => $parmeta )
 		{
 			if( isset( $parmeta['defaultvalue'] ) )
@@ -685,6 +672,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2007/12/22 19:52:55  yabs
+ * cleanup from adding core params
+ *
  * Revision 1.13  2007/12/22 17:02:14  yabs
  * adding core parameters for css id/classname and widget list title
  *

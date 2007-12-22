@@ -75,25 +75,27 @@ class linkblog_Widget extends ComponentWidget
 	{
 		global $Blog;
 		// Demo data:
-		$r = array(
-			'title' => array(
-				'label' => 'Block title',
-				'size' => 60,
-				'defaultvalue' => T_('Linkblog'),
-				'note' => T_( 'This is title to display in your skin' ),
-			),
-			'linkblog_ID' => array(
-				'label' => T_( 'Linkblog' ),
-				'size' => 4,
-				'defaultvalue' => $Blog->get('links_blog_ID'),
-				'note' => T_( 'This is ID number of the blog to use as a linkblog' ),
-			),
-			'linkblog_limit' => array(
-				'label' => T_( 'Display' ),
-				'size' => 4,
-				'note' => T_( 'This is the maximum number of links to display, leave empty for all links' ),
-// TODO: put 100 as the default, 1000 as the max and don't lie about the illusion of ifinity :p
-			),
+		$r = array_merge( parent::get_param_definitions( $params ),
+			array(
+				'title' => array(
+					'label' => 'Block title',
+					'size' => 60,
+					'defaultvalue' => T_('Linkblog'),
+					'note' => T_( 'This is title to display in your skin' ),
+				),
+				'linkblog_ID' => array(
+					'label' => T_( 'Linkblog' ),
+					'size' => 4,
+					'defaultvalue' => $Blog->get('links_blog_ID'),
+					'note' => T_( 'This is ID number of the blog to use as a linkblog' ),
+				),
+				'linkblog_limit' => array(
+					'label' => T_( 'Display' ),
+					'size' => 4,
+					'note' => T_( 'This is the maximum number of links to display : default is a really big number ;)' ),
+	// TODO: put 100 as the default, 1000 as the max and don't lie about the illusion of ifinity :p
+				),
+			)
 		);
 
 		return $r;
@@ -119,8 +121,8 @@ class linkblog_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.4  2007/12/22 17:05:13  yabs
- * removing obsolete params
+ * Revision 1.5  2007/12/22 19:55:00  yabs
+ * cleanup from adding core params
  *
  * Revision 1.3  2007/12/20 10:48:50  fplanque
  * doc
