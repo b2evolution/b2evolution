@@ -284,6 +284,13 @@ function comments_template()
 	skin_include( '_item_feedback.inc.php', array(
 			'before_section_title' => '<h3>',
 			'after_section_title'  => '</h3>',
+			'comment_list_start'  => "\n<ol>\n",
+			'comment_list_end'  => "\n</ol>\n",
+			'comment_start'  => '<li>',
+			'comment_end'  => '</li>',
+	    'preview_start'  => '<ul><li id="comment_preview">',
+	    'preview_end'    => '</li></ul>',
+	    'comment_template'   => '_item_comment_wp.inc.php',	// The template used for displaying individual comments (including preview)
 		) );
 	// Note: You can customize the default item feedback by copying the generic
 	// /skins/_item_feedback.inc.php file into the current skin folder.
@@ -333,6 +340,9 @@ function next_posts_link( $link_text = 'Next' )
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/22 16:41:05  fplanque
+ * Modular feedback template.
+ *
  * Revision 1.3  2007/12/21 21:52:38  fplanque
  * improved WP tags
  *
