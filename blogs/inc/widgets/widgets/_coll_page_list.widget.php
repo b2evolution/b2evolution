@@ -46,6 +46,38 @@ class coll_page_list_Widget extends ComponentWidget
 	}
 
 
+  /**
+   * Get definitions for editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		$r = array_merge( array(
+				'title' => array(
+					'label' => 'Block title',
+					'size' => 60,
+					'defaultvalue' => T_('Pages'),
+					'note' => T_( 'This is title to display in your skin.' ),
+				),
+				'pagelist_blog_ID' => array(
+					'label' => T_( 'Blog' ),
+					'size' => 4,
+					'note' => T_( 'This is ID number of the blog to use, leave empty for the current blog.' ),
+				),
+				'pagelist_limit' => array(
+					'label' => T_( 'Display' ),
+					'size' => 4,
+					'defaultvalue' => 20,
+					'note' => T_( 'This is the maximum number of pages to display.' ),
+				),
+			), parent::get_param_definitions( $params )	);
+
+		return $r;
+	}
+
+
 	/**
 	 * Get name of widget
 	 */
@@ -83,6 +115,9 @@ class coll_page_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/23 15:44:39  yabs
+ * adding params
+ *
  * Revision 1.1  2007/06/25 11:02:16  fplanque
  * MODULES (refactored MVC)
  *

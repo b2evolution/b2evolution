@@ -411,9 +411,14 @@ class ComponentWidget extends DataObject
 	{
 		global $Blog;
 
+		$blogCache = get_Cache( 'BlogCache' );
+		$list_blog = ( $what == 'pages' ? $this->disp_params[ 'pagelist_blog_ID' ] : $this->disp_params[ 'postlist_blog_ID' ] );
+		$listBlog = ( $list_blog ? $blogCache->get_by_ID( $list_blog ) : $Blog );
+
 		// Create ItemList
 		// Note: we pass a widget specific prefix in order to make sure to never interfere with the mainlist
-		$ItemList = & new ItemListLight( $Blog, NULL, NULL, 20, 'ItemCacheLight', $this->code.'_' );
+		$limit = ( $what == 'pages' ? $this->disp_params[ 'pageslist_limit' ] : $this->disp_params[ 'postlist_limit' ] );
+		$ItemList = & new ItemListLight( $listBlog, NULL, NULL, $limit, 'ItemCacheLight', $this->code.'_' );
 		// Filter list:
 		if( $what == 'pages' )
 		{
@@ -427,7 +432,7 @@ class ComponentWidget extends DataObject
 		else
 		{	// post list
 			$ItemList->set_filters( array(
-					'unit' => 'all',						// We want to advertise all items (not just a page or a day)
+					'unit' => 'posts',						// We want to advertise all items (not just a page or a day)
 				) );
 		}
 		// Run the query:
@@ -440,14 +445,7 @@ class ComponentWidget extends DataObject
 
 		echo $this->disp_params['block_start'];
 
-		if( $what == 'pages' )
-		{
-   		$this->disp_title( T_('Info pages') );
-		}
-		else
-		{
-			$this->disp_title( T_('Contents') );
-		}
+		$this->disp_title( $this->disp_params[ 'title' ] );
 
 		echo $this->disp_params['list_start'];
 
@@ -689,6 +687,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2007/12/23 15:44:22  yabs
+ * adding params
+ *
  * Revision 1.18  2007/12/23 15:07:07  fplanque
  * Clean widget name
  *
