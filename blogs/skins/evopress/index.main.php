@@ -37,6 +37,27 @@ skin_include( '_body_header.inc.php' );
 ?>
 
 
+
+<div class="top_menu top_menu_narrow">
+	<ul>
+	<?php
+		// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
+		// Display container and contents:
+		skin_container( NT_('Menu'), array(
+				// The following params will be used as defaults for widgets included in this container:
+				'block_start' => '',
+				'block_end' => '',
+				'block_display_title' => false,
+				'list_start' => '',
+				'list_end' => '',
+				'item_start' => '<li>',
+				'item_end' => '</li>',
+			) );
+		// ----------------------------- END OF "Menu" CONTAINER -----------------------------
+	?>
+	</ul>
+</div>
+
 <div id="content" class="narrowcolumn">
 
 	<?php

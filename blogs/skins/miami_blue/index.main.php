@@ -305,7 +305,7 @@ skin_include( '_html_header.inc.php' );
 					'title'  => T_('Send a message to the owner of this blog...'),
 				) );
 		?>
-		<a href="http://www.sunnyislesmiamirealestate.com/b2evolution-skins/">Miami blue skin</a>
+		<a href="http://www.sunnyislesmiamirealestate.com/b2evolution-skins/" target="_blank">Miami blue skin</a>
 		&bull;
 		<?php
 			// Display additional credits (see /conf/):

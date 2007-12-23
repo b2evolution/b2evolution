@@ -30,7 +30,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 		<br />
 
-		Credits: <a href="http://www.solostream.com">Blog Design</a>
+		Credits: <a href="http://www.solostream.com" target="_blank">Blog Design</a>
 		<?php
 		// Display additional credits (see /conf/):
 		// If you can add your own credits without removing the defaults, you'll be very cool :))

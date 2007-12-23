@@ -202,3 +202,8 @@ table.image_index td {
 table.image_index td:hover {
 	background: #777;
 }
+
+#pageFooter a
+{
+	color: #aaa;
+}

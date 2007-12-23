@@ -43,16 +43,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	<p class="baseline">
 		Powered by <a href="http://b2evolution.net/" title="b2evolution: next generation blog software" target="_blank">b2evolution</a>
 		|
-		<?php display_param_link( $skin_links ) ?> by <a href="http://skinfaktory.com/" target="_blank">The Skin Faktory</a>
-		|
+		Credits:
+		<?php display_param_link( $skin_links ) ?>
 		<?php
 			// Display additional credits (see /conf/):
  			// If you can add your own credits without removing the defaults, you'll be very cool :))
 		 	// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 			credits( array(
-					'list_start'  => T_('Credits').': ',
+					'list_start'  => ' | ',
 					'list_end'    => ' ',
-					'separator'   => '|',
+					'separator'   => ' | ',
 					'item_start'  => ' ',
 					'item_end'    => ' ',
 				) );

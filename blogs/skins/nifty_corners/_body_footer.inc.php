@@ -25,7 +25,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					'title'  => T_('Send a message to the owner of this blog...'),
 				) );
 		?>
-		Original <?php display_param_link( $skin_links ) ?> by <a href="http://severinelandrieu.com/">S&eacute;verine Landrieu</a>
+		<?php display_param_link( $skin_links ) ?> by <a href="http://severinelandrieu.com/" target="_blank">S&eacute;verine Landrieu</a>
 		&amp; <?php display_param_link( $fplanque_links ) ?>
 		&bull;
 		<?php

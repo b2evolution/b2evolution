@@ -2731,8 +2731,10 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 	{
 		echo $list_start;
 		$first = true;
+
 		foreach( $items as $item )
 		{	// For each list item:
+
 			$link = resolve_link_params( $item, $force_hash );
 			if( empty( $link ) )
 			{
@@ -2753,6 +2755,9 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 	}
 }
 
+/**
+ *
+ */
 function display_param_link( $params )
 {
 	echo resolve_link_params( $params );
@@ -2806,10 +2811,11 @@ function resolve_link_params( $item, $force_hash = NULL )
  * Get a link line, based url hash combined with probability percentage in first column
  *
  * @param array of arrays
+ * @param display for a specific hash key
  */
 function hash_link_params( $link_array, $force_hash = NULL )
 {
-	global $ReqHost, $ReqPath;
+	global $ReqHost, $ReqPath, $ReqURI;
 
 	static $hash;
 
@@ -2820,6 +2826,13 @@ function hash_link_params( $link_array, $force_hash = NULL )
 	elseif( !isset($hash) )
 	{
 		$key = $ReqHost.$ReqPath;
+
+		global $Blog;
+		if( !empty($Blog) && strpos( $Blog->get_setting('single_links'), 'param_' ) === 0 )
+		{	// We are on a blog that doesn't even have clean URLs for posts
+			$key .= $ReqURI;
+		}
+
 		$hash = 0;
 		for( $i=0; $i<strlen($key); $i++ )
 		{
@@ -2867,7 +2880,7 @@ function generate_link_from_params( $link_params )
 		$text = $text[0];
 	}
 
-	return '<a href="'.$url.'">'.$text.'</a>';
+	return '<a href="'.$url.'" target="_blank">'.$text.'</a>';
 }
 
 
@@ -2979,6 +2992,9 @@ function make_rel_links_abs( $s, $host = NULL )
 
 /*
  * $Log$
+ * Revision 1.14  2007/12/23 19:43:58  fplanque
+ * trans fat reduction :p
+ *
  * Revision 1.13  2007/11/28 16:38:21  fplanque
  * minor
  *

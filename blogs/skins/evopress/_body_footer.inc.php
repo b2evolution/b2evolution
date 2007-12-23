@@ -28,19 +28,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			) );
 		?>
 
-		Powered by <a href="http://b2evolution.net/" title="b2evolution home" target="_blank">b2evolution</a>
-
-		+ <a href="http://www.evopress.org/" target="_blank">evopress skin</a>
-
-		<br />
-
-		Credits: <a href="http://binarybonsai.com/kubrick/">Michael Heilemann</a>
+		<a href="http://www.evopress.org/" target="_blank">Design</a> by <a href="http://binarybonsai.com/" target="_blank">Michael</a>
 		<?php
 		// Display additional credits (see /conf/):
 		// If you can add your own credits without removing the defaults, you'll be very cool :))
 		// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 		credits( array(
-				'list_start'  => ' | ',
+				'list_start'  => ' | '.T_('Credits').': ',
 				'list_end'    => ' ',
 				'separator'   => '|',
 				'item_start'  => ' ',
