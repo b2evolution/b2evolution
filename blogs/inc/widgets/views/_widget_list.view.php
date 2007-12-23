@@ -99,8 +99,14 @@ function display_container( $container, $legend_suffix = '' )
 
 			$Table->display_col_start();
 			$ComponentWidget->init_display( array() );
-			$widget_name = $ComponentWidget->disp_params[ 'widget_name' ];
-			$widget_name = ( $widget_name ? $widget_name.' ( <strong>'.$ComponentWidget->get_name().'</strong> )' : $ComponentWidget->get_name() );
+			$widget_name =  '<strong>'.$ComponentWidget->disp_params[ 'widget_name' ].'</strong>';
+			if( $ComponentWidget->disp_params[ 'widget_name' ] != $ComponentWidget->get_name() )
+			{
+				$widget_name .= ' ('.$ComponentWidget->get_name().')';
+			}
+			else
+			{
+			}
 			echo '<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID).'">'.$widget_name.'</a>';
 			$Table->display_col_end();
 
@@ -171,6 +177,9 @@ echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, fal
 
 /*
  * $Log$
+ * Revision 1.7  2007/12/23 14:14:25  fplanque
+ * Enhanced widget name display
+ *
  * Revision 1.6  2007/12/22 23:24:45  yabs
  * cleanup from adding core params
  *

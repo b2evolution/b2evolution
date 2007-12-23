@@ -133,7 +133,7 @@ switch( $action )
 		$Messages->add( sprintf( T_('Widget &laquo;%s&raquo; has been added to container &laquo;%s&raquo;.'),
 					$edited_ComponentWidget->get_name(), T_($container)	), 'success' );
 
-		$action = 'edit'; // display the widget settings form
+		header_redirect( '?ctrl=widgets&action=edit&wi_ID='.$edited_ComponentWidget->ID );
 		break;
 
 
@@ -146,6 +146,12 @@ switch( $action )
 		foreach( $edited_ComponentWidget->get_param_definitions( array('for_editing'=>true) ) as $parname => $parmeta )
 		{
 			autoform_set_param_from_request( $parname, $parmeta, $edited_ComponentWidget, 'Widget' );
+		}
+
+		// SPECIAL treatments:
+		if( empty($edited_ComponentWidget->param_array['widget_name']) )
+		{	// Default name, don't store:
+			$edited_ComponentWidget->set( 'widget_name', $edited_ComponentWidget->get_name() );
 		}
 
 		if(	! param_errors_detected() )
@@ -311,6 +317,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2007/12/23 14:14:26  fplanque
+ * Enhanced widget name display
+ *
  * Revision 1.4  2007/12/23 13:01:14  yabs
  * behaviour change - after install display widget settings form
  *

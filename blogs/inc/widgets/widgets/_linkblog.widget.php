@@ -75,28 +75,26 @@ class linkblog_Widget extends ComponentWidget
 	{
 		global $Blog;
 		// Demo data:
-		$r = array_merge( parent::get_param_definitions( $params ),
-			array(
+		$r = array_merge( array(
 				'title' => array(
 					'label' => 'Block title',
 					'size' => 60,
 					'defaultvalue' => T_('Linkblog'),
-					'note' => T_( 'This is title to display in your skin' ),
+					'note' => T_( 'This is title to display in your skin.' ),
 				),
 				'linkblog_ID' => array(
 					'label' => T_( 'Linkblog' ),
 					'size' => 4,
 					'defaultvalue' => $Blog->get('links_blog_ID'),
-					'note' => T_( 'This is ID number of the blog to use as a linkblog' ),
+					'note' => T_( 'This is ID number of the blog to use as a linkblog.' ),
 				),
 				'linkblog_limit' => array(
 					'label' => T_( 'Display' ),
 					'size' => 4,
-					'note' => T_( 'This is the maximum number of links to display : default is a really big number ;)' ),
-	// TODO: put 100 as the default, 1000 as the max and don't lie about the illusion of ifinity :p
+					'defaultvalue' => 100,
+					'note' => T_( 'This is the maximum number of links to display.' ),
 				),
-			)
-		);
+			), parent::get_param_definitions( $params )	);
 
 		return $r;
 	}
@@ -121,6 +119,9 @@ class linkblog_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.6  2007/12/23 14:14:25  fplanque
+ * Enhanced widget name display
+ *
  * Revision 1.5  2007/12/22 19:55:00  yabs
  * cleanup from adding core params
  *

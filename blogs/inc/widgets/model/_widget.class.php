@@ -170,19 +170,20 @@ class ComponentWidget extends DataObject
 	{
 		$r = array(
 				'widget_name' => array(
-					'label' => T_( 'Widget Name' ),
-					'size' => 60,
-					'note' => T_( 'This is the name displayed on your widget list' ),
-				),
-				'widget_ID' => array(
-					'label' => T_( 'Widget ID' ),
-					'size' => 60,
-					'note' => T_( 'This replaces $wi_ID$ in your skins containers' ),
+					'label' => T_( 'Name' ),
+					'size' => 20,
+					'note' => T_( 'Name displayed on your widget list.'),
+					'defaultvalue' => $this->get_name(),
 				),
 				'widget_css_class' => array(
-					'label' => T_( 'Widget Classname' ),
-					'size' => 60,
-					'note' => T_( 'This replaces $wi_class$ in your skins containers' ),
+					'label' => T_( 'CSS Class' ),
+					'size' => 20,
+					'note' => T_( 'Replaces $wi_class$ in your skins containers.'),
+				),
+				'widget_ID' => array(
+					'label' => T_( 'DOM ID' ),
+					'size' => 20,
+					'note' => T_( 'Replaces $wi_ID$ in your skins containers.'),
 				),
 			);
 
@@ -677,6 +678,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2007/12/23 14:14:25  fplanque
+ * Enhanced widget name display
+ *
  * Revision 1.16  2007/12/23 13:00:37  yabs
  * doc & validation
  *

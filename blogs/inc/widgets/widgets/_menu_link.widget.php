@@ -72,8 +72,7 @@ class menu_link_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		$r = array_merge( parent::get_param_definitions( $params ),
-			array(
+		$r = array_merge( array(
 				'link_type' => array(
 					'label' => 'Link Type',
 					'note' => T_('What do you want to link to?'),
@@ -88,8 +87,7 @@ class menu_link_Widget extends ComponentWidget
 											 ),
 					'defaultvalue' => 'home',
 				),
-			)
-		);
+			), parent::get_param_definitions( $params )	);
 
 		return $r;
 
@@ -158,6 +156,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2007/12/23 14:14:25  fplanque
+ * Enhanced widget name display
+ *
  * Revision 1.2  2007/12/22 19:55:00  yabs
  * cleanup from adding core params
  *

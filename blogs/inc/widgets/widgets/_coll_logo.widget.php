@@ -72,8 +72,7 @@ class coll_logo_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		$r = array_merge( parent::get_param_definitions( $params ),
-				array(
+		$r = array_merge( array(
 				'logo_file' => array(
 					'label' => T_('Logo filename'),
 					'note' => T_('The logo file must be uploaded to the root of the Blog\'s media dir'),
@@ -81,8 +80,7 @@ class coll_logo_Widget extends ComponentWidget
 					'valid_pattern' => array( 'pattern'=>'¤^[a-z0-9_\-][a-z0-9_.\-]*$¤i',
 																		'error'=>T_('Invalid filename.') ),
 				),
-			)
-		);
+			), parent::get_param_definitions( $params )	);
 
 		return $r;
 
@@ -117,6 +115,9 @@ class coll_logo_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2007/12/23 14:14:25  fplanque
+ * Enhanced widget name display
+ *
  * Revision 1.2  2007/12/22 19:55:00  yabs
  * cleanup from adding core params
  *

@@ -74,8 +74,7 @@ class free_html_Widget extends ComponentWidget
 	function get_param_definitions( $params )
 	{
 		// Demo data:
-		$r = array_merge( parent::get_param_definitions( $params ),
-			array(
+		$r = array_merge( array(
 				'title' => array(
 					'label' => 'Block title',
 					'size' => 60,
@@ -85,8 +84,7 @@ class free_html_Widget extends ComponentWidget
 					'label' => T_('Block content'),
 					'rows' => 10,
 				),
-			)
-		);
+			), parent::get_param_definitions( $params )	);
 
 		return $r;
 
@@ -120,6 +118,9 @@ class free_html_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.6  2007/12/23 14:14:25  fplanque
+ * Enhanced widget name display
+ *
  * Revision 1.5  2007/12/22 19:55:00  yabs
  * cleanup from adding core params
  *

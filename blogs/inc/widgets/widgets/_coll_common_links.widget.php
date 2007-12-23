@@ -72,8 +72,7 @@ class coll_common_links_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		$r = array_merge( parent::get_param_definitions( $params ),
-				array(
+		$r = array_merge( array(
 				'show_recently' => array(
 					'type' => 'checkbox',
 					'label' => T_('Show "Recently"'),
@@ -98,8 +97,7 @@ class coll_common_links_Widget extends ComponentWidget
 					'note' => T_('Go to the latest comments.'),
 					'defaultvalue' => '1',
 				),
-			)
-		);
+			), parent::get_param_definitions( $params )	);
 
 		return $r;
 
@@ -161,6 +159,9 @@ class coll_common_links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2007/12/23 14:14:25  fplanque
+ * Enhanced widget name display
+ *
  * Revision 1.2  2007/12/22 19:55:00  yabs
  * cleanup from adding core params
  *
