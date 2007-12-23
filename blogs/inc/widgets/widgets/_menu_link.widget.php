@@ -61,21 +61,31 @@ class menu_link_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
+		return T_('Menu link');
+	}
+
+
+	/**
+	 * Get a very short desc. Used in the widget list when the default name is overriden.
+	 *
+	 * MAY be overriden by core widgets. Example: menu link widget.
+	 */
+	function get_short_desc()
+	{
 		global $menu_link_widget_link_types;
 
 		$this->load_param_array();
 
 		if( !empty($this->param_array['link_type']) )
 		{
-			$name = $menu_link_widget_link_types[$this->param_array['link_type']].' '.T_('link');
+			return $menu_link_widget_link_types[$this->param_array['link_type']].' '.T_('link');
 		}
 		else
-		{	// The default is home
-			$name = T_('Menu link');
+		{
+			return $this->get_name();
 		}
-
-		return $name;
 	}
+
 
 
   /**
@@ -108,8 +118,7 @@ class menu_link_Widget extends ComponentWidget
 				),
 			), parent::get_param_definitions( $params )	);
 
-		// Special override!
-		$r['widget_name']['defaultvalue'] = $menu_link_widget_link_types['home'];
+		$r['widget_name']['defaultvalue'] = $menu_link_widget_link_types['home'].' '.T_('link');
 
 		return $r;
 
@@ -178,7 +187,7 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.4  2007/12/23 14:50:20  fplanque
+ * Revision 1.5  2007/12/23 15:07:07  fplanque
  * Clean widget name
  *
  * Revision 1.3  2007/12/23 14:14:25  fplanque

@@ -100,12 +100,9 @@ function display_container( $container, $legend_suffix = '' )
 			$Table->display_col_start();
 			$ComponentWidget->init_display( array() );
 			$widget_name =  '<strong>'.$ComponentWidget->disp_params[ 'widget_name' ].'</strong>';
-			if( $ComponentWidget->disp_params[ 'widget_name' ] != $ComponentWidget->get_name() )
-			{
-				$widget_name .= ' ('.$ComponentWidget->get_name().')';
-			}
-			else
-			{
+			if( $ComponentWidget->disp_params[ 'widget_name' ] != $ComponentWidget->get_short_desc() )
+			{	// The name is customized and the short desc may be relevant additional info
+				$widget_name .= ' ('.$ComponentWidget->get_short_desc().')';
 			}
 			echo '<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID).'">'.$widget_name.'</a>';
 			$Table->display_col_end();
@@ -177,6 +174,9 @@ echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, fal
 
 /*
  * $Log$
+ * Revision 1.8  2007/12/23 15:07:07  fplanque
+ * Clean widget name
+ *
  * Revision 1.7  2007/12/23 14:14:25  fplanque
  * Enhanced widget name display
  *

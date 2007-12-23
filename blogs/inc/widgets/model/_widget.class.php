@@ -140,6 +140,17 @@ class ComponentWidget extends DataObject
 
 
 	/**
+	 * Get a very short desc. Used in the widget list when the default name is overriden.
+	 *
+	 * MAY be overriden by core widgets. Example: menu link widget.
+	 */
+	function get_short_desc()
+	{
+		return $this->get_name();
+	}
+
+
+	/**
 	 * Get desc of widget
 	 *
 	 * Should be overriden by core widgets
@@ -678,6 +689,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2007/12/23 15:07:07  fplanque
+ * Clean widget name
+ *
  * Revision 1.17  2007/12/23 14:14:25  fplanque
  * Enhanced widget name display
  *
