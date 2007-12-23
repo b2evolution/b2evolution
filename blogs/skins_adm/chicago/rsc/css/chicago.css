@@ -286,8 +286,13 @@ input.SearchField {
 	background: #FFFFFF url(../img/shadow-in.png) no-repeat left top;
 	border: 1px solid #9db0bc;
 	padding: 2px
-} 
- 
+}
+input.field_error,
+select.field_error,
+textarea.field_error {
+	background:#fbf2ee;
+	border: 1px solid #d99;
+}
 .fieldset_title {
 	width: 100%;
 	margin-top: 1ex;
@@ -611,6 +616,18 @@ div.bCommentdeprecated span.bStatus {
 div.bCommentdeprecated > div.bSmallHead /* Direct child only */
 {
 	border-bottom: 1px dashed #000;
+}
+
+.bPostredirected {
+	border: 1px solid #dd0;
+	background-color: #ffe;
+}
+.bPostredirected span.bStatus {
+	color: #dd0;
+}
+.bPostredirected > div.bSmallHead /* Direct child only */
+{
+	border-bottom: 1px solid #dd0;
 }
 
 .bContent,
