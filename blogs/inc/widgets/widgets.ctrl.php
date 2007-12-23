@@ -133,7 +133,7 @@ switch( $action )
 		$Messages->add( sprintf( T_('Widget &laquo;%s&raquo; has been added to container &laquo;%s&raquo;.'),
 					$edited_ComponentWidget->get_name(), T_($container)	), 'success' );
 
-		header_redirect( '?ctrl=widgets&blog='.$Blog->ID );
+		$action = 'edit'; // display the widget settings form
 		break;
 
 
@@ -311,6 +311,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/23 13:01:14  yabs
+ * behaviour change - after install display widget settings form
+ *
  * Revision 1.3  2007/12/22 19:52:17  yabs
  * cleanup from adding core params
  *
