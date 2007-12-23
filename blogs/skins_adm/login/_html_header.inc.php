@@ -59,6 +59,9 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/23 20:10:49  fplanque
+ * removed suspects
+ *
  * Revision 1.3  2007/07/09 21:24:11  fplanque
  * cleanup of admin page top
  *
@@ -85,7 +88,7 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
  * Renamed $admin_path_seprator to $admin_path_separator and AdminUI_general::pathSeperator to AdminUI::pathSeparator
  *
  * Revision 1.11  2006/12/03 00:18:38  fplanque
- * SUSPECT code. Not releasable. Discussion by email.
+ * Not releasable. Discussion by email.
  *
  * Revision 1.10  2006/11/28 02:52:26  fplanque
  * doc

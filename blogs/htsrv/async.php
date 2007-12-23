@@ -50,7 +50,7 @@ if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 
 
 
-// fp>SUSPECT:
+
 // fp> Does the following have an HTTP fallback when Javascript/AJ is not available?
 // dh> yes, but not through this file..
 // dh> IMHO it does not make sense to let the "normal controller" handle the AJAX call
@@ -100,7 +100,7 @@ switch( $action )
 		exit;
 
 }
-// SUSPECT<fp
+
 
 
 /**
@@ -115,6 +115,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.25  2007/12/23 20:10:49  fplanque
+ * removed suspects
+ *
  * Revision 1.24  2007/06/25 10:58:49  fplanque
  * MODULES (refactored MVC)
  *
@@ -143,7 +146,7 @@ echo '-collapse='.$collapse;
  * doc
  *
  * Revision 1.14  2006/12/02 22:57:37  fplanque
- * SUSPECT code. Not releasable. Discussion by email.
+ * Not releasable. Discussion by email.
  *
  * Revision 1.13  2006/11/29 03:25:53  blueyed
  * Enhanced password hashing during login: get the password salt through async request + cleanup

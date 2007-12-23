@@ -1118,7 +1118,6 @@ class Comment extends DataObject
 		/*
 		 * We have a list of email addresses to notify:
 		 */
-// fp>SUSPECT
 		// TODO: dh> this reveals the comments author's email address to all subscribers!!
 		//           $notify_from should get used by default, unless the user has opted in to be the sender!
 		// fp>If the subscriber has permission to moderate the comments, he SHOULD receive the email address.
@@ -1135,7 +1134,6 @@ class Comment extends DataObject
 			global $notify_from;
 			$mail_from = $notify_from;
 		}
-// SUSPECT<fp
 
 		// Send emails:
 		foreach( $notify_array as $notify_email => $notify_locale )
@@ -1302,6 +1300,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2007/12/23 20:10:49  fplanque
+ * removed suspects
+ *
  * Revision 1.6  2007/12/22 17:24:35  fplanque
  * cleanup
  *
@@ -1364,7 +1365,7 @@ class Comment extends DataObject
  * Otherwise, I can't code!
  *
  * Revision 1.52  2006/12/03 18:10:22  fplanque
- * SUSPECT code. Not releasable. Discussion by email.
+ * Not releasable. Discussion by email.
  *
  * Revision 1.51  2006/11/26 02:30:39  fplanque
  * doc / todo

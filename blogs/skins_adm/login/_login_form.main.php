@@ -96,7 +96,6 @@ $Form->begin_form( 'fform' );
 		$Form->hidden( 'sessID', $sessID );
 	}
 
-// fp>SUSPECT
 	if( $transmit_hashed_password )
 	{ // used by JS-password encryption/hashing:
 		$pwd_salt = $Session->get('core.pwd_salt');
@@ -111,7 +110,6 @@ $Form->begin_form( 'fform' );
 		$Form->hidden( 'pwd_salt', $pwd_salt );
 		$Form->hidden( 'pwd_hashed', '' ); // gets filled by JS
 	}
-// SUSPECT<fp
 
 	$Form->begin_fieldset();
 
@@ -165,7 +163,6 @@ $Form->end_form();
 
 
 	<?php
-// fp>SUSPECT
 	if( $transmit_hashed_password )
 	{
 		?>
@@ -189,7 +186,6 @@ $Form->end_form();
 			}, false );
 		<?php
 	}
-// <fp
 	?>
 </script>
 
@@ -228,6 +224,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.7  2007/12/23 20:10:49  fplanque
+ * removed suspects
+ *
  * Revision 1.6  2007/12/10 01:22:04  blueyed
  * Pass on redirect_to param from login form through the register... link to the register form.
  * get_user_register_link: added $redirect param for injection
@@ -309,7 +308,7 @@ require dirname(__FILE__).'/_html_footer.inc.php';
  * keeping the login hashing
  *
  * Revision 1.24  2006/12/03 20:11:18  fplanque
- * SUSPECT code. Not releasable. Discussion by email.
+ * Not releasable. Discussion by email.
  *
  * Revision 1.23  2006/11/29 20:04:35  blueyed
  * More cleanup for login-password hashing
