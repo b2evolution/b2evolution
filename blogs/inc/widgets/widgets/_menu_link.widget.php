@@ -27,6 +27,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'widgets/model/_widget.class.php' );
 
+global $menu_link_widget_link_types;
+$menu_link_widget_link_types = array(
+		'home' => T_('Blog home'),
+		'arcdir' => T_('Archive directory'),
+		'catdir' => T_('Category directory'),
+		'latestcomments' => T_('Latest comments'),
+		'ownercontact' => T_('Blog owner contact form'),
+		'login' => T_('Log in form')
+	);
+
 /**
  * ComponentWidget Class
  *
@@ -51,7 +61,20 @@ class menu_link_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Menu Link');
+		global $menu_link_widget_link_types;
+
+		$this->load_param_array();
+
+		if( !empty($this->param_array['link_type']) )
+		{
+			$name = $menu_link_widget_link_types[$this->param_array['link_type']].' '.T_('link');
+		}
+		else
+		{	// The default is home
+			$name = T_('Menu link');
+		}
+
+		return $name;
 	}
 
 
@@ -72,22 +95,21 @@ class menu_link_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $menu_link_widget_link_types;
+
 		$r = array_merge( array(
 				'link_type' => array(
 					'label' => 'Link Type',
 					'note' => T_('What do you want to link to?'),
 					'type' => 'select',
-					'options' => array(
-												'home' => T_('Blog home'),
-												'arcdir' => T_('Archive directory'),
-												'catdir' => T_('Category directory'),
-												'latestcomments' => T_('Latest comments'),
-												'ownercontact' => T_('Blog owner contact form'),
-												'login' => T_('Log in form'),
-											 ),
+					'options' => $menu_link_widget_link_types,
 					'defaultvalue' => 'home',
+					'onchange' => 'document.getElementById("edit_plugin_'.$this->ID.'_set_widget_name").value = this.options[this.selectedIndex].text+" '.TS_('link').'";',
 				),
 			), parent::get_param_definitions( $params )	);
+
+		// Special override!
+		$r['widget_name']['defaultvalue'] = $menu_link_widget_link_types['home'];
 
 		return $r;
 
@@ -156,6 +178,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/23 14:50:20  fplanque
+ * Clean widget name
+ *
  * Revision 1.3  2007/12/23 14:14:25  fplanque
  * Enhanced widget name display
  *
