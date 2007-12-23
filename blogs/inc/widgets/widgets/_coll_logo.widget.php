@@ -55,6 +55,25 @@ class coll_logo_Widget extends ComponentWidget
 	}
 
 
+	/**
+	 * Get a very short desc. Used in the widget list.
+	 *
+	 * MAY be overriden by core widgets. Example: menu link widget.
+	 */
+	function get_short_desc()
+	{
+		$this->load_param_array();
+		if( !empty($this->param_array['logo_file'] ) )
+		{
+			return $this->param_array['logo_file'];
+		}
+		else
+		{
+			return $this->get_name();
+		}
+	}
+
+
   /**
 	 * Get short description
 	 */
@@ -115,6 +134,9 @@ class coll_logo_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/23 17:47:59  fplanque
+ * fixes
+ *
  * Revision 1.3  2007/12/23 14:14:25  fplanque
  * Enhanced widget name display
  *

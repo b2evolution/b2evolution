@@ -139,20 +139,7 @@ switch( $action )
 
 	case 'update':
 		// Update Settings
-
-		load_funcs('plugins/_plugin.funcs.php');
-
-		// Loop through all widget params:
-		foreach( $edited_ComponentWidget->get_param_definitions( array('for_editing'=>true) ) as $parname => $parmeta )
-		{
-			autoform_set_param_from_request( $parname, $parmeta, $edited_ComponentWidget, 'Widget' );
-		}
-
-		// SPECIAL treatments:
-		if( empty($edited_ComponentWidget->param_array['widget_name']) )
-		{	// Default name, don't store:
-			$edited_ComponentWidget->set( 'widget_name', $edited_ComponentWidget->get_name() );
-		}
+		$edited_ComponentWidget->load_from_Request();
 
 		if(	! param_errors_detected() )
 		{	// Update settings:
@@ -317,6 +304,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2007/12/23 17:47:59  fplanque
+ * fixes
+ *
  * Revision 1.5  2007/12/23 14:14:26  fplanque
  * Enhanced widget name display
  *

@@ -79,7 +79,7 @@ skin_include( '_body_header.inc.php' );
 			<p class="postinfo">
 			<?php
       	$Item->author( array(
-					'before'       => T_('By'),
+					'before'       => T_('By').' ',
 					'after'        => ' ',
 				) );
 			?>

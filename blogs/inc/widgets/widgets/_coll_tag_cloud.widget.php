@@ -46,6 +46,21 @@ class coll_tag_cloud_Widget extends ComponentWidget
 	}
 
 
+  /**
+	 * Load params
+	 */
+	function load_from_Request()
+	{
+		parent::load_from_Request();
+
+		// SPECIAL treatments:
+		if( empty($this->param_array['tag_separator']) )
+		{	// Default name, don't store:
+			$this->set( 'tag_separator', ' ' );
+		}
+	}
+
+
 	/**
 	 * Get name of widget
 	 */
@@ -194,6 +209,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.7  2007/12/23 17:47:59  fplanque
+ * fixes
+ *
  * Revision 1.6  2007/12/23 16:16:18  fplanque
  * Wording improvements
  *

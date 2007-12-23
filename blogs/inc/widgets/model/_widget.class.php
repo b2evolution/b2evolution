@@ -118,6 +118,27 @@ class ComponentWidget extends DataObject
 	}
 
 
+  /**
+	 * Load params
+	 */
+	function load_from_Request()
+	{
+		load_funcs('plugins/_plugin.funcs.php');
+
+		// Loop through all widget params:
+		foreach( $this->get_param_definitions( array('for_editing'=>true) ) as $parname => $parmeta )
+		{
+			autoform_set_param_from_request( $parname, $parmeta, $this, 'Widget' );
+		}
+
+		// SPECIAL treatments:
+		if( empty($this->param_array['widget_name']) )
+		{	// Default name, don't store:
+			$this->set( 'widget_name', $this->get_name() );
+		}
+	}
+
+
 	/**
 	 * Get name of widget
 	 *
@@ -687,6 +708,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2007/12/23 17:47:59  fplanque
+ * fixes
+ *
  * Revision 1.20  2007/12/23 16:16:17  fplanque
  * Wording improvements
  *

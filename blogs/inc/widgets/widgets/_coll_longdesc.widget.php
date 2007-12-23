@@ -60,7 +60,9 @@ class coll_longdesc_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display this blog\'s long description.');
+		global $Blog;
+		return sprintf( T_('Long description from the blog\'s <a %s>general settings</a>.'),
+						'href="?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'"' );
 	}
 
 
@@ -89,6 +91,9 @@ class coll_longdesc_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/23 17:47:59  fplanque
+ * fixes
+ *
  * Revision 1.1  2007/06/25 11:02:13  fplanque
  * MODULES (refactored MVC)
  *
