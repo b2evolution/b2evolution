@@ -66,7 +66,7 @@ class menu_link_Widget extends ComponentWidget
 
 
 	/**
-	 * Get a very short desc. Used in the widget list when the default name is overriden.
+	 * Get a very short desc. Used in the widget list.
 	 *
 	 * MAY be overriden by core widgets. Example: menu link widget.
 	 */
@@ -187,6 +187,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.6  2007/12/23 16:16:18  fplanque
+ * Wording improvements
+ *
  * Revision 1.5  2007/12/23 15:07:07  fplanque
  * Clean widget name
  *

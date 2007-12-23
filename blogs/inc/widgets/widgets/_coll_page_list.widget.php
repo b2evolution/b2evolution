@@ -92,7 +92,7 @@ class coll_page_list_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display list of all pages');
+		return T_('List of all pages; click goes to page.');
 	}
 
 
@@ -115,6 +115,9 @@ class coll_page_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2007/12/23 16:16:18  fplanque
+ * Wording improvements
+ *
  * Revision 1.2  2007/12/23 15:44:39  yabs
  * adding params
  *

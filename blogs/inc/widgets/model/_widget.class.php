@@ -140,7 +140,7 @@ class ComponentWidget extends DataObject
 
 
 	/**
-	 * Get a very short desc. Used in the widget list when the default name is overriden.
+	 * Get a very short desc. Used in the widget list.
 	 *
 	 * MAY be overriden by core widgets. Example: menu link widget.
 	 */
@@ -687,6 +687,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2007/12/23 16:16:17  fplanque
+ * Wording improvements
+ *
  * Revision 1.19  2007/12/23 15:44:22  yabs
  * adding params
  *

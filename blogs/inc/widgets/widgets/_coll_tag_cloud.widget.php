@@ -60,7 +60,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display a cloud of all tags');
+		return T_('Cloud of all tags; click filters blog on selected tag.');
 	}
 
 
@@ -194,6 +194,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.6  2007/12/23 16:16:18  fplanque
+ * Wording improvements
+ *
  * Revision 1.5  2007/12/23 14:14:25  fplanque
  * Enhanced widget name display
  *

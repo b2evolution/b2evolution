@@ -20,31 +20,29 @@ global $container;
 echo '<h2><span class="right_icons">'.action_icon( T_('Cancel!'), 'close', regenerate_url( 'container' ) ).'</span>'
 	.sprintf(T_('Widgets available for insertion into &laquo;%s&raquo;'), $container ).'</h2>';
 
-echo '<ul>';
 
 $core_componentwidget_defs = array(
-		'*'.T_('Blog list'),
-			'colls_list_public',
-			'colls_list_owner',
-		'*'.T_('Blog header'),
-			'coll_logo',
-			'coll_title',
-			'coll_tagline',
-		'*'.T_('Blog contents'),
-			'coll_page_list',
-			'coll_post_list',
+		'*'.T_('General purpose widgets'),
+			'free_html',
+		'*'.T_('Different ways of listing the blog contents'),
 			'coll_category_list',
 			'coll_tag_cloud',
-		'*'.T_('Meta contents'),
+			'coll_post_list',
+			'coll_page_list',
+			'coll_xml_feeds',
+		'*'.T_('Meta info for the blog'),
+			'coll_title',
+			'coll_tagline',
 			'coll_longdesc',
-			'free_html',
-		'*'.T_('Tools'),
+			'coll_logo',
+		'*'.T_('Blog navigation'),
+			'menu_link',
 			'coll_common_links',
 			'coll_search_form',
-			'coll_xml_feeds',
-			'menu_link',
 			'user_tools',
-		'*'.T_('Other contents'),
+		'*'.T_('Other'),
+			'colls_list_public',
+			'colls_list_owner',
 			'linkblog',
 	);
 $i = 0;
@@ -55,9 +53,9 @@ foreach( $core_componentwidget_defs as $code )
 	{ // group
 		if( $i > 1 )
 		{
-			echo '</ul></li>';
+			echo '</ul>';
 		}
-		echo '<li><strong>'.substr( $code, 1 ).':</strong><ul>';
+		echo '<h3>'.substr( $code, 1 ).':</h3><ul>';
 	}
 	else
 	{
@@ -67,7 +65,7 @@ foreach( $core_componentwidget_defs as $code )
 
 		echo '<li>';
 		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code ).'" title="'.T_('Add this widget to the container').'">';
-		echo get_icon( 'new' ).$ComponentWidget->get_name();
+		echo get_icon( 'new' ).'<strong>'.$ComponentWidget->get_name().'</strong>';
 		echo '</a> <span class="notes">'.$ComponentWidget->get_desc().'</span>';
 		echo '</li>';
 	}
@@ -94,23 +92,26 @@ foreach( $Plugin_array as $k => $v )
 if( ! empty($Plugin_array) )
 { // We have some plugins
 
-	echo '</ul></li>';
-	echo '<li><strong>'.T_('Plugins').':</strong><ul>';
+	echo '</ul>';
+	echo '<h3>'.T_('Plugins').':</h3><ul>';
 
 	foreach( $Plugin_array as $ID => $Plugin )
 	{
 		echo '<li>';
 		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code ).'" title="'.T_('Add this widget to the container').'">';
-		echo get_icon( 'new' ).$Plugin->name;
+		echo get_icon( 'new' ).'<strong>'.$Plugin->name.'</strong>';
 		echo '</a> <span class="notes">'.$Plugin->short_desc.'</span>';
 		echo '</li>';
 	}
 }
-echo '</ul></li></ul>';
+echo '</ul>';
 
 
 /*
  * $Log$
+ * Revision 1.6  2007/12/23 16:16:18  fplanque
+ * Wording improvements
+ *
  * Revision 1.5  2007/12/20 22:59:34  fplanque
  * TagCloud widget prototype
  *

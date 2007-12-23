@@ -60,7 +60,7 @@ class coll_category_list_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display list of categories; click filters on selected category');
+		return T_('List of all categories; click filters blog on selected category.');
 	}
 
 
@@ -345,6 +345,9 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.6  2007/12/23 16:16:18  fplanque
+ * Wording improvements
+ *
  * Revision 1.5  2007/12/23 14:14:25  fplanque
  * Enhanced widget name display
  *

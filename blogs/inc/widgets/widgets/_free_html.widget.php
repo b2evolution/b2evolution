@@ -61,7 +61,7 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display a block of free HTML code.');
+		return T_('Custom text/HTML of your choice.');
 	}
 
 
@@ -118,6 +118,9 @@ class free_html_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.7  2007/12/23 16:16:18  fplanque
+ * Wording improvements
+ *
  * Revision 1.6  2007/12/23 14:14:25  fplanque
  * Enhanced widget name display
  *

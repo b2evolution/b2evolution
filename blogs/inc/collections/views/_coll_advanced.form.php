@@ -92,11 +92,11 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 
 
 	$Form->begin_fieldset( T_('Static file generation').' ['.T_('Admin').']' );
-		$Form->text_input( 'source_file', $edited_Blog->get_setting( 'source_file' ), 30, T_('Source file'),
-												T_('This is the source .php (stub) file used to generate the static homepage.'),
+		$Form->text_input( 'source_file', $edited_Blog->get_setting( 'source_file' ), 25, T_('Source file'),
+												T_('.php (stub) file used to generate the static homepage.'),
 												array( 'input_prefix' => "<code>$basepath</code>", 'maxlength' => 255 ) );
-		$Form->text_input( 'static_file', $edited_Blog->get_setting( 'static_file' ), 30, T_('Static file'),
-												T_('This is the .html file that will be created.'),
+		$Form->text_input( 'static_file', $edited_Blog->get_setting( 'static_file' ), 25, T_('Destination file'),
+												T_('.html file that will be created.'),
 												array( 'input_prefix' => "<code>$basepath</code>", 'maxlength' => 255 ) );
 		if( $current_User->check_perm( 'blog_genstatic', 'any', false, $edited_Blog->ID ) )
 		{
@@ -105,13 +105,12 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	$Form->end_fieldset();
 
 
-	$Form->begin_fieldset( T_('Media library').' ['.T_('Admin').']' );
+	$Form->begin_fieldset( T_('Media directory location').' ['.T_('Admin').']' );
 	global $media_path;
 	$Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 			array(
 				array( 'none', T_('None') ),
-				array( 'default', T_('Default'),
-					sprintf( T_('subdirectory &quot;%s&quot; (URL blog name) of %s'), $edited_Blog->urlname, $media_path ) ),
+				array( 'default', T_('Default'), $media_path.$edited_Blog->urlname.'/' ),
 				array( 'subdir', T_('Subdirectory of media folder').':',
 					'',
 					' <span class="nobr"><code>'.$media_path.'</code><input
@@ -130,7 +129,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 						type="text" class="form_text_input" name="blog_media_url" size="50" maxlength="255"
 						class="'.( param_has_error('blog_media_url') ? 'field_error' : '' ).'"
 						value="'.$edited_Blog->dget( 'media_url', 'formvalue' ).'" /></div></fieldset>' )
-			), T_('Media dir location'), true
+			), T_('Media directory'), true
 		);
 	$Form->end_fieldset();
 
@@ -150,6 +149,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/23 16:16:17  fplanque
+ * Wording improvements
+ *
  * Revision 1.3  2007/11/24 17:24:50  blueyed
  * Add $media_path
  *

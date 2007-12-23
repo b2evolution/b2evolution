@@ -49,9 +49,9 @@ else
 
 $Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear' ) );
 
-	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Full Name'), T_('Will be displayed on top of the blog.') );
+	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Title'), T_('Will be displayed on top of the blog.') );
 
-	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname', 'formvalue' ), 12, T_('Short Name'), T_('Will be used in selection menus and throughout the admin interface.') );
+	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname', 'formvalue' ), 12, T_('Short name'), T_('Will be used in selection menus and throughout the admin interface.') );
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// Permission to edit advanced admin settings
@@ -61,7 +61,9 @@ $Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// Permission to edit advanced admin settings
 
-		$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL Name'), T_('Used to uniquely identify this blog. Appears in URLs and gets used as default for the media location (see the advanced tab).'), 255 );
+		$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL "filename"'),
+				sprintf( T_('"slug" used to uniquely identify this blog in URLs. Also used as <a %s>default media folder</a>.'),
+					'href="?ctrl=coll_settings&tab=advanced&blog='.$blog.'"'), 255 );
 
 		// fp> Note: There are 2 reasons why we don't provide a select here:
 		// 1. If there are 1000 users, it's a pain.
@@ -87,7 +89,7 @@ $Form->begin_fieldset( T_('Content / Posts') );
 												'title'     => T_('Title'),
 												'datecreated' => T_('Date created'),
 												'datemodified' => T_('Date last modified'),
-												'urltitle'     => T_('URL Title'),
+												'urltitle'     => T_('URL "filename"'),
 												'priority'     => T_('Priority'),
 											), T_('Order by'), T_('Default ordering of posts.') );
 	$Form->select_input_array( 'orderdir', $edited_Blog->get_setting('orderdir'), array(
@@ -120,6 +122,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.3  2007/12/23 16:16:17  fplanque
+ * Wording improvements
+ *
  * Revision 1.2  2007/11/02 02:38:29  fplanque
  * refactored blog settings / UI
  *

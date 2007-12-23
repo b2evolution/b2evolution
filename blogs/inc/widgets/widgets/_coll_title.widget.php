@@ -60,7 +60,28 @@ class coll_title_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display blog title');
+		global $Blog;
+		return sprintf( T_('&laquo;%s&raquo; from the blog\'s <a %s>general settings</a>.'),
+				'<strong>'.$Blog->dget('name').'</strong>', 'href="?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'"' );
+	}
+
+
+  /**
+   * Get definitions for editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		global $Blog;
+
+		$r = parent::get_param_definitions( $params );
+
+		$r['widget_name']['defaultvalue'] = $Blog->dget('name');
+
+		return $r;
+
 	}
 
 
@@ -92,6 +113,9 @@ class coll_title_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/23 16:16:18  fplanque
+ * Wording improvements
+ *
  * Revision 1.1  2007/06/25 11:02:22  fplanque
  * MODULES (refactored MVC)
  *

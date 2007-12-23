@@ -216,8 +216,8 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 
 	echo '<div id="itemform_urltitle" class="edit_fieldgroup">';
-	$Form->text( 'post_urltitle', $edited_Item->get( 'urltitle' ), 40, T_('URL Title'),
-	             T_('(to be used in permalinks)'), $field_maxlength = 50 ) ;
+	$Form->text( 'post_urltitle', $edited_Item->get( 'urltitle' ), 40, T_('URL "filename"'),
+	             T_('("slug" to be used in permalinks)'), $field_maxlength = 50 ) ;
 	echo '</div>';
 	?>
 
@@ -378,6 +378,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.16  2007/12/23 16:16:17  fplanque
+ * Wording improvements
+ *
  * Revision 1.15  2007/11/30 01:45:52  fplanque
  * minor
  *
