@@ -438,7 +438,7 @@ class ComponentWidget extends DataObject
 
 		// Create ItemList
 		// Note: we pass a widget specific prefix in order to make sure to never interfere with the mainlist
-		$limit = ( $what == 'pages' ? $this->disp_params[ 'pageslist_limit' ] : $this->disp_params[ 'postlist_limit' ] );
+		$limit = ( $what == 'pages' ? $this->disp_params[ 'pagelist_limit' ] : $this->disp_params[ 'postlist_limit' ] );
 		$ItemList = & new ItemListLight( $listBlog, NULL, NULL, $limit, 'ItemCacheLight', $this->code.'_' );
 		// Filter list:
 		if( $what == 'pages' )
@@ -708,6 +708,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2007/12/23 18:11:53  yabs
+ * bug fix
+ *
  * Revision 1.21  2007/12/23 17:47:59  fplanque
  * fixes
  *
