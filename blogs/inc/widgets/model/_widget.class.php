@@ -322,8 +322,11 @@ class ComponentWidget extends DataObject
 				), $widget_defaults, $params, $this->param_array );
 
 		// Customize params to the current widget:
+		// add additional css classes if required
 		$widget_css_class = 'widget_'.$this->type.'_'.$this->code.( empty( $params[ 'widget_css_class' ] ) ? '' : ' '.$params[ 'widget_css_class' ] );
-		$widget_ID = $params[ 'widget_ID' ];
+		// add custom id if required, default to generic id for validation purposes
+		$widget_ID = ( $params[ 'widget_ID' ] ? $params[ 'widget_ID' ] : 'widget_'.$this->type.'_'.$this->code.'_'.$this->ID );
+		// replace the values
 		$this->disp_params = str_replace( array( '$wi_ID$', '$wi_class$' ), array( $widget_ID, $widget_css_class ), $params );
 	}
 
@@ -674,6 +677,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2007/12/23 13:00:37  yabs
+ * doc & validation
+ *
  * Revision 1.15  2007/12/22 21:09:53  fplanque
  * meh!!
  *
