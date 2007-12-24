@@ -466,7 +466,9 @@ class ComponentWidget extends DataObject
 
 		echo $this->disp_params['block_start'];
 
-		$this->disp_title( $this->disp_params[ 'title' ] );
+		$title = sprintf( ( $this->disp_params[ 'link_title' ] ? '<a href="'.$listBlog->gen_baseurl().'">%s</a>' : '%s' ), $this->disp_params[ 'title' ] );
+
+		$this->disp_title( $title );
 
 		echo $this->disp_params['list_start'];
 
@@ -476,6 +478,9 @@ class ComponentWidget extends DataObject
 			$Item->title( array(
 					'link_type' => 'permalink',
 				) );
+			if( $this->disp_params[ 'disp_excerpt' ] )
+				echo '<p>'.$Item->dget( 'excerpt', 'htmlbody' ).'</p>';// no formatting in excerpts
+
 			echo $this->disp_params['item_end'];
 		}
 
@@ -708,6 +713,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2007/12/24 14:21:04  yabs
+ * adding params
+ *
  * Revision 1.24  2007/12/24 12:06:07  yabs
  * bugfix "order" is a reserved name, used by wi_order
  *

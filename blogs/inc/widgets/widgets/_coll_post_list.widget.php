@@ -61,6 +61,12 @@ class coll_post_list_Widget extends ComponentWidget
 					'size' => 60,
 					'defaultvalue' => T_('Contents'),
 				),
+				'link_title' => array(
+					'label' => T_( 'Link title' ),
+					'note' => T_( 'Link the title to the blog?' ),
+					'type' => 'checkbox',
+					'defaultvalue' => true,
+				),
 				'disp_order' => array(
 					'label' => T_('Order'),
 					'note' => T_('Order to display items'),
@@ -73,6 +79,12 @@ class coll_post_list_Widget extends ComponentWidget
 					'note' => T_( 'Max items to display.' ),
 					'size' => 4,
 					'defaultvalue' => 20,
+				),
+				'disp_excerpt' => array(
+					'label' => T_( 'Excerpt' ),
+					'note' => T_( 'Display item excerpt.' ),
+					'type' => 'checkbox',
+					'defaultvalue' => false,
 				),
 				'blog_ID' => array(
 					'label' => T_( 'Blog' ),
@@ -122,6 +134,9 @@ class coll_post_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.6  2007/12/24 14:21:17  yabs
+ * adding params
+ *
  * Revision 1.5  2007/12/24 12:05:31  yabs
  * bugfix "order" is a reserved name, used by wi_order
  *
