@@ -99,7 +99,7 @@ class CommentList extends DataObjectList
 
 
 		// order by stuff
-		if( (!empty($order)) && ((strtoupper($order) != 'ASC') && (strtoupper($order) != 'DESC')))
+		if( (!empty($order)) && !in_array( strtoupper($order), array( 'ASC', 'DESC', 'RANDOM' ) ) )
 		{
 			$order='DESC';
 		}
@@ -121,6 +121,7 @@ class CommentList extends DataObjectList
 			}
 		}
 
+		if( $order == 'RANDOM' ) $orderby = 'RAND()';
 
 		$this->sql .= "ORDER BY $orderby";
 		if( !empty( $this->limit ) )
@@ -170,6 +171,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.3  2007/12/24 10:36:07  yabs
+ * adding random order
+ *
  * Revision 1.2  2007/11/03 21:04:26  fplanque
  * skin cleanup
  *

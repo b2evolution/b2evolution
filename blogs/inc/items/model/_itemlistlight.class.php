@@ -635,18 +635,24 @@ class ItemListLight extends DataObjectList2
 		 * ORDER BY stuff:
 		 */
 		$order = $this->filters['order'];
+		if( strtoupper( $order ) == 'RANDOM' )
+		{
+			$order_by = 'RAND()';
+		}
+		else
+		{
+			$orderby = str_replace( ' ', ',', $this->filters['orderby'] );
+			$orderby_array = explode( ',', $orderby );
 
-		$orderby = str_replace( ' ', ',', $this->filters['orderby'] );
-		$orderby_array = explode( ',', $orderby );
+			// Format each order param with default column names:
+			$orderby_array = preg_replace( '#^(.+)$#', $this->Cache->dbprefix.'$1 '.$order, $orderby_array );
+			// walter>fp> $order_cols_to_select = $orderby_array;
 
-		// Format each order param with default column names:
-		$orderby_array = preg_replace( '#^(.+)$#', $this->Cache->dbprefix.'$1 '.$order, $orderby_array );
-		// walter>fp> $order_cols_to_select = $orderby_array;
+			// Add an ID parameter to make sure there is no ambiguity in ordering on similar items:
+			$orderby_array[] = $this->Cache->dbIDname.' '.$order;
 
-		// Add an ID parameter to make sure there is no ambiguity in ordering on similar items:
-		$orderby_array[] = $this->Cache->dbIDname.' '.$order;
-
-		$order_by = implode( ', ', $orderby_array );
+			$order_by = implode( ', ', $orderby_array );
+		}
 
 
 		$this->ItemQuery->order_by( $order_by );
@@ -1498,6 +1504,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.15  2007/12/24 10:37:19  yabs
+ * adding random order
+ *
  * Revision 1.14  2007/11/27 22:31:57  fplanque
  * debugged blog moderation
  *
