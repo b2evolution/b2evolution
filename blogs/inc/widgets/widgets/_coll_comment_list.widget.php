@@ -68,12 +68,6 @@ class coll_comment_list_Widget extends ComponentWidget
 				'defaultvalue' => true,
 				'type' => 'checkbox',
 			),
-			'nofollow' => array(
-				'label' => T_( 'Nofollow link'),
-				'note' => T_( 'add nofollow to link' ),
-				'defaultvalue' => true,
-				'type' => 'checkbox',
-			),
 			'hover_text' => array(
 				'label' => T_( 'Hover text'),
 				'note' => T_( 'Text to show when hovering over the link' ),
@@ -81,7 +75,7 @@ class coll_comment_list_Widget extends ComponentWidget
 				'defaultvalue' => T_( 'Read the full comment' ),
 				'type' => 'text',
 			),
-			'order' => array(
+			'disp_order' => array(
 				'label' => t_('Order'),
 				'note' => T_('Order to display items'),
 				'type' => 'select',
@@ -140,7 +134,7 @@ class coll_comment_list_Widget extends ComponentWidget
 		// Create ItemList
 		// Note: we pass a widget specific prefix in order to make sure to never interfere with the mainlist
 		$limit = $this->disp_params[ 'limit' ];
-		$order = $this->disp_params[ 'order' ];
+		$order = $this->disp_params[ 'disp_order' ];
 
 		$CommentList = & new CommentList( $listBlog, "'comment','trackback','pingback'", array('published'), '',	'',	$order,	'',	$limit );
 
@@ -172,6 +166,9 @@ class coll_comment_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/24 12:05:31  yabs
+ * bugfix "order" is a reserved name, used by wi_order
+ *
  * Revision 1.1  2007/12/24 11:02:42  yabs
  * added to cvs
  *

@@ -61,7 +61,7 @@ class coll_post_list_Widget extends ComponentWidget
 					'size' => 60,
 					'defaultvalue' => T_('Contents'),
 				),
-				'order' => array(
+				'disp_order' => array(
 					'label' => T_('Order'),
 					'note' => T_('Order to display items'),
 					'type' => 'select',
@@ -122,6 +122,9 @@ class coll_post_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.5  2007/12/24 12:05:31  yabs
+ * bugfix "order" is a reserved name, used by wi_order
+ *
  * Revision 1.4  2007/12/24 11:01:22  yabs
  * adding random order
  *

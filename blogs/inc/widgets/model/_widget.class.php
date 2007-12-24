@@ -445,14 +445,14 @@ class ComponentWidget extends DataObject
 			$ItemList->set_filters( array(
 					'types' => '1000',					// Restrict to type 1000 (pages)
 					'orderby' => 'title',
-					'order' => ( $this->disp_params[ 'order' ] ? $this->disp_params[ 'order' ] : 'desc' ),
+					'order' => ( $this->disp_params[ 'disp_order' ] ? $this->disp_params[ 'disp_order' ] : 'desc' ),
 					'unit' => 'posts',
 				), false );
 		}
 		else
 		{	// post list
 			$ItemList->set_filters( array(
-					'order' => ( $this->disp_params[ 'order' ] ? $this->disp_params[ 'order' ] : 'desc' ),
+					'order' => ( $this->disp_params[ 'disp_order' ] ? $this->disp_params[ 'disp_order' ] : 'desc' ),
 					'unit' => 'posts',						// We want to advertise all items (not just a page or a day)
 				) );
 		}
@@ -708,6 +708,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2007/12/24 12:06:07  yabs
+ * bugfix "order" is a reserved name, used by wi_order
+ *
  * Revision 1.23  2007/12/24 11:00:47  yabs
  * adding random order
  *
