@@ -433,12 +433,11 @@ class ComponentWidget extends DataObject
 		global $Blog;
 
 		$blogCache = get_Cache( 'BlogCache' );
-		$list_blog = ( $what == 'pages' ? $this->disp_params[ 'pagelist_blog_ID' ] : $this->disp_params[ 'postlist_blog_ID' ] );
-		$listBlog = ( $list_blog ? $blogCache->get_by_ID( $list_blog ) : $Blog );
+		$listBlog = ( $this->disp_params[ 'blog_ID' ] ? $blogCache->get_by_ID( $this->disp_params[ 'blog_ID' ] ) : $Blog );
 
 		// Create ItemList
 		// Note: we pass a widget specific prefix in order to make sure to never interfere with the mainlist
-		$limit = ( $what == 'pages' ? $this->disp_params[ 'pagelist_limit' ] : $this->disp_params[ 'postlist_limit' ] );
+		$limit = $this->disp_params[ 'limit' ];
 		$ItemList = & new ItemListLight( $listBlog, NULL, NULL, $limit, 'ItemCacheLight', $this->code.'_' );
 		// Filter list:
 		if( $what == 'pages' )
@@ -446,13 +445,14 @@ class ComponentWidget extends DataObject
 			$ItemList->set_filters( array(
 					'types' => '1000',					// Restrict to type 1000 (pages)
 					'orderby' => 'title',
-					'order' => 'ASC',
-					'unit' => 'all',						// We want to advertise all items (not just a page or a day)
+					'order' => ( $this->disp_params[ 'order' ] ? $this->disp_params[ 'order' ] : 'desc' ),
+					'unit' => 'posts',
 				), false );
 		}
 		else
 		{	// post list
 			$ItemList->set_filters( array(
+					'order' => ( $this->disp_params[ 'order' ] ? $this->disp_params[ 'order' ] : 'desc' ),
 					'unit' => 'posts',						// We want to advertise all items (not just a page or a day)
 				) );
 		}
@@ -708,6 +708,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2007/12/24 11:00:47  yabs
+ * adding random order
+ *
  * Revision 1.22  2007/12/23 18:11:53  yabs
  * bug fix
  *

@@ -56,21 +56,28 @@ class coll_page_list_Widget extends ComponentWidget
 	{
 		$r = array_merge( array(
 				'title' => array(
-					'label' => 'Block title',
+					'label' => T_('Block title'),
+					'note' => T_( 'Title to display in your skin.' ),
 					'size' => 60,
 					'defaultvalue' => T_('Pages'),
-					'note' => T_( 'This is title to display in your skin.' ),
 				),
-				'pagelist_blog_ID' => array(
-					'label' => T_( 'Blog' ),
-					'size' => 4,
-					'note' => T_( 'This is ID number of the blog to use, leave empty for the current blog.' ),
+				'order' => array(
+					'label' => T_('Order'),
+					'note' => T_('Order to display items'),
+					'type' => 'select',
+					'options' => array( 'DESC' => T_( 'Newest to oldest' ), 'ASC' => T_( 'Oldest to newest' ), 'RANDOM' => T_( 'Random selection' ) ),
+					'defaultvalue' => 'DESC',
 				),
-				'pagelist_limit' => array(
+				'limit' => array(
 					'label' => T_( 'Display' ),
+					'note' => T_( 'Max items to display.' ),
 					'size' => 4,
 					'defaultvalue' => 20,
-					'note' => T_( 'This is the maximum number of pages to display.' ),
+				),
+				'blog_ID' => array(
+					'label' => T_( 'Blog' ),
+					'note' => T_( 'ID of the blog to use, leave empty for the current blog.' ),
+					'size' => 4,
 				),
 			), parent::get_param_definitions( $params )	);
 
@@ -115,6 +122,9 @@ class coll_page_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/24 11:01:21  yabs
+ * adding random order
+ *
  * Revision 1.3  2007/12/23 16:16:18  fplanque
  * Wording improvements
  *
