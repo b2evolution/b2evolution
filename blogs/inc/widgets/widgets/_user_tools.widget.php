@@ -46,6 +46,68 @@ class user_tools_Widget extends ComponentWidget
 	}
 
 
+  /**
+   * Get definitions for editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		$r = array_merge( array(
+			'title' => array(
+				'label' => t_('Block title'),
+				'note' => T_( 'Title to display in your skin.' ),
+				'size' => 40,
+				'defaultvalue' => T_('User tools'),
+			),
+			'user_login_link' => array(
+				'label' => T_( 'Login link'),
+				'size' => 40,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'Login' ),
+			),
+			'user_logout_link' => array(
+				'label' => T_( 'Logout link'),
+				'size' => 40,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'Logout' ),
+			),
+			'user_profile_link' => array(
+				'label' => T_( 'Profile link'),
+				'size' => 40,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'Profile' ),
+			),
+			'user_subs_link' => array(
+				'label' => T_( 'Subscriptions link'),
+				'size' => 40,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'Subscriptions' ),
+			),
+			'user_admin_link' => array(
+				'label' => T_( 'Admin link'),
+				'size' => 40,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'Admin' ),
+			),
+			'user_register_link' => array(
+				'label' => T_( 'Register link'),
+				'size' => 40,
+				'note' => T_( 'Link text to display' ),
+				'type' => 'text',
+				'defaultvalue' => T_( 'Register' ),
+			),
+		), parent::get_param_definitions( $params )	);
+
+		return $r;
+	}
+
 	/**
 	 * Get name of widget
 	 */
@@ -81,12 +143,12 @@ class user_tools_Widget extends ComponentWidget
 		echo $this->disp_params['block_title_end'];
 
 		echo $this->disp_params['list_start'];
-		user_login_link( $this->disp_params['item_start'], $this->disp_params['item_end'] );
-		user_register_link( $this->disp_params['item_start'], $this->disp_params['item_end'] );
-		user_admin_link( $this->disp_params['item_start'], $this->disp_params['item_end'] );
-		user_profile_link( $this->disp_params['item_start'], $this->disp_params['item_end'] );
-		user_subs_link( $this->disp_params['item_start'], $this->disp_params['item_end'] );
-		user_logout_link( $this->disp_params['item_start'], $this->disp_params['item_end'] );
+		user_login_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_login_link' ] );
+		user_register_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_register_link' ] );
+		user_admin_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_admin_link' ] );
+		user_profile_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_profile_link' ] );
+		user_subs_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_subs_link' ] );
+		user_logout_link( $this->disp_params['item_start'], $this->disp_params['item_end'], $this->disp_params[ 'user_logout_link' ] );
 		echo $this->disp_params['list_end'];
 
 		echo $this->disp_params['block_end'];
@@ -96,6 +158,9 @@ class user_tools_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2007/12/25 16:39:35  yabs
+ * adding params
+ *
  * Revision 1.1  2007/06/25 11:02:27  fplanque
  * MODULES (refactored MVC)
  *
