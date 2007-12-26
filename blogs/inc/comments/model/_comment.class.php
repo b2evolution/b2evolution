@@ -355,28 +355,19 @@ class Comment extends DataObject
 	{
 		global $Plugins;
 
-		$r = '';
-
 		if( $this->get_author_User() )
 		{ // Author is a user
 			if( strlen( $this->author_User->url ) <= 10 ) $makelink = false;
 			if( $after_user == '#' ) $after_user = ' ['.T_('Member').']';
-			$r .= $before_user;
-			if( $makelink ) $r .= '<a href="'.htmlspecialchars($this->author_User->url).'">';
-			$r .= $this->author_User->preferred_name( $format, false );
-			if( $makelink ) $r .= '</a>';
-			$r .= $after_user;
+
+			$r = $this->get_author_url_link( format_to_output( $this->author_User->get_preferred_name(), $format ), $before_user, $after_user, $makelink );
 		}
 		else
 		{ // Display info recorded at edit time:
 			if( strlen( $this->author_url ) <= 10 ) $makelink = false;
 			if( $after == '#' ) $after = ' ['.T_('Visitor').']';
-			$r .= $before;
 
-			if( $makelink ) $r .= '<a href="'.htmlspecialchars($this->author_url).'">';
-			$r .= $this->dget( 'author', $format );
-			if( $makelink ) $r .= '</a>';
-			$r .= $after;
+			$r = $this->get_author_url_link( $this->dget( 'author', $format ), $before_user, $after_user, $makelink );
 		}
 
 		$Plugins->trigger_event( 'FilterCommentAuthor', array( 'data' => & $r, 'makelink' => $makelink, 'Comment' => $this ) );
@@ -432,7 +423,7 @@ class Comment extends DataObject
 
 
 	/**
-	 * Template function: display link to comment author's provided URL
+	 * Get link to comment author's provided URL
 	 *
 	 * @param string String to display for link: leave empty to display URL
 	 * @param string String to display before link, if link exists
@@ -440,7 +431,7 @@ class Comment extends DataObject
 	 * @param boolean false if you want NO html link
 	 * @return boolean true if URL has been displayed
 	 */
-	function author_url( $linktext='', $before='', $after='', $makelink = true )
+	function get_author_url_link( $linktext='', $before='', $after='', $makelink = true )
 	{
 		global $Plugins;
 
@@ -468,8 +459,26 @@ class Comment extends DataObject
 
 		$Plugins->trigger_event( 'FilterCommentAuthorUrl', array( 'data' => & $r, 'makelink' => $makelink, 'Comment' => $this ) );
 
-		echo $r;
-		return true;
+		return $r;
+	}
+
+
+  /**
+	 * Template function: display link to comment author's provided URL
+	 *
+	 * @param string String to display for link: leave empty to display URL
+	 * @param string String to display before link, if link exists
+	 * @param string String to display after link, if link exists
+	 * @param boolean false if you want NO html link
+	 * @return boolean true if URL has been displayed
+	 */
+	function author_url( $linktext='', $before='', $after='', $makelink = true )
+	{
+		$r = $this->get_author_url_link( $linktext, $before, $after, $makelink );
+		if( !empty( $r ) )
+		{
+			echo $r;
+		}
 	}
 
 
@@ -1300,6 +1309,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2007/12/26 20:04:26  fplanque
+ * fixed missing nofollow handling
+ *
  * Revision 1.7  2007/12/23 20:10:49  fplanque
  * removed suspects
  *
