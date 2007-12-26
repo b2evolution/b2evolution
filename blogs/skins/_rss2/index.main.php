@@ -95,7 +95,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			<guid isPermaLink="false"><?php $Item->ID() ?>@<?php echo $baseurl ?></guid>
 			<?php
 				if( $feed_content == 'excerpt' )
-				{
+				{	// EXCERPTS ---------------------------------------------------------------------
 
 					?>
 			<description><?php
@@ -119,8 +119,9 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 					<?php
 
 				}
-				elseif( $feed_content == 'normal' )
-				{
+				elseif( $feed_content == 'normal'
+							|| $feed_content == 'full' )
+				{	// POST CONTENTS -----------------------------------------------------------------
 
 					?>
 			<description><?php
@@ -144,12 +145,19 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 
 				$content .= $Item->get_content_teaser( 1, false, 'entityencoded' );
 
-				$content .= $Item->get_more_link( array(
-						'before'    => '',
-						'after'     => '',
-						'disppage'  => 1,
-						'format'    => 'entityencoded',
-					) );
+				if( $feed_content == 'normal' )
+				{	// Teasers only
+					$content .= $Item->get_more_link( array(
+							'before'    => '',
+							'after'     => '',
+							'disppage'  => 1,
+							'format'    => 'entityencoded',
+						) );
+				}
+				else
+				{	// Full contents
+					$content .= $Item->get_content_extension( 1, true, 'entityencoded' );
+				}
 
 				// fp> this is another one of these "oooooh it's just a tiny little change"
 				// and "we only need to make the links absolute in RSS"
@@ -177,11 +185,18 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 
 				$content .= $Item->get_content_teaser( 1, false );
 
-				$content .= $Item->get_more_link( array(
-						'before'    => '',
-						'after'     => '',
-						'disppage'  => 1,
-					) );
+				if( $feed_content == 'normal' )
+				{	// Teasers only
+					$content .= $Item->get_more_link( array(
+							'before'    => '',
+							'after'     => '',
+							'disppage'  => 1,
+						) );
+				}
+				else
+				{	// Full contents
+					$content .= $Item->get_content_extension( 1, true );
+				}
 
 				// fp> this is another one of these "oooooh it's just a tiny little change"
 				// and "we only need to make the links absolute in RSS"

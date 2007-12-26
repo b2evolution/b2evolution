@@ -101,8 +101,9 @@ $Form->begin_fieldset( T_('XML Feeds (RSS, Atom)') );
 								array(  array( 'none', T_('No feeds') ),
 												array( 'title', T_('Titles only') ),
 												array( 'excerpt', T_('Post excerpts') ),
-												array( 'normal', T_('Post contents (stopping at "&lt;!-- more -->")') ),
-											), T_('Feed contents'), false, T_('How much content do you want to make available in feeds?') );
+												array( 'normal', T_('Standard post contents (stopping at "&lt;!-- more -->")') ),
+												array( 'full', T_('Full post contents (including after "&lt;!-- more -->")') ),
+											), T_('Feed contents'), true, T_('How much content do you want to make available in feeds?') );
 	$Form->text( 'posts_per_feed', $edited_Blog->get_setting('posts_per_feed'), 4, T_('Posts in feeds'),  T_('How many of the latest posts do you want to include in RSS & Atom feeds?'), 4 );
 $Form->end_fieldset();
 
@@ -148,6 +149,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/26 17:21:17  fplanque
+ * Anne's pony about full posts in RSS
+ *
  * Revision 1.3  2007/12/18 23:50:40  fplanque
  * minor
  *

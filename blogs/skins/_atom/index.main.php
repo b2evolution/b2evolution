@@ -87,7 +87,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		<updated><?php $Item->mod_date( 'isoZ', true ) ?></updated>
 		<?php
 			if( $feed_content == 'excerpt' )
-			{
+			{	// EXCERPTS ---------------------------------------------------------------------
 				?>
 		<content type="html"><![CDATA[<?php
 				$content = $Item->get_excerpt( 'entityencoded' );
@@ -100,8 +100,9 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		?>]]></content>
 				<?php
 			}
-			elseif( $feed_content == 'normal' )
-			{
+			elseif( $feed_content == 'normal'
+						|| $feed_content == 'full' )
+			{	// POST CONTENTS -----------------------------------------------------------------
 				?>
 		<content type="html"><![CDATA[<?php
 				// URL link, if the post has one:
@@ -123,11 +124,18 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 
 				$content .= $Item->get_content_teaser( 1, false );
 
-				$content .= $Item->get_more_link( array(
-						'before'    => '',
-						'after'     => '',
-						'disppage'  => 1,
-					) );
+				if( $feed_content == 'normal' )
+				{	// Teasers only
+					$content .= $Item->get_more_link( array(
+							'before'    => '',
+							'after'     => '',
+							'disppage'  => 1,
+						) );
+				}
+				else
+				{	// Full contents
+					$content .= $Item->get_content_extension( 1, true );
+				}
 
 				// fp> this is another one of these "oooooh it's just a tiny little change"
 				// and "we only need to make the links absolute in RSS"

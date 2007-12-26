@@ -64,7 +64,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			) ); ?></title>
 			<?php
 				if( $feed_content == 'excerpt' )
-				{
+				{	// EXCERPTS ---------------------------------------------------------------------
 					?>
 			<description><?php
 				$content = $Item->get_excerpt( 'entityencoded' );
@@ -77,8 +77,9 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			?></description>
 					<?php
 				}
-				elseif( $feed_content == 'normal' )
-				{
+				elseif( $feed_content == 'normal'
+							|| $feed_content == 'full' )
+				{	// POST CONTENTS -----------------------------------------------------------------
 					?>
 			<description><?php
 				// URL link, if the post has one:
@@ -101,12 +102,19 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 
 				$content .= $Item->get_content_teaser( 1, false, 'entityencoded' );
 
-				$content .= $Item->get_more_link( array(
-						'before'    => '',
-						'after'     => '',
-						'disppage'  => 1,
-						'format'    => 'entityencoded',
-					) );
+				if( $feed_content == 'normal' )
+				{	// Teasers only
+					$content .= $Item->get_more_link( array(
+							'before'    => '',
+							'after'     => '',
+							'disppage'  => 1,
+							'format'    => 'entityencoded',
+						) );
+				}
+				else
+				{	// Full contents
+					$content .= $Item->get_content_extension( 1, true, 'entityencoded' );
+				}
 
 				// fp> this is another one of these "oooooh it's just a tiny little change"
 				// and "we only need to make the links absolute in RSS"
