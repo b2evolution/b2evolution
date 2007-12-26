@@ -445,14 +445,14 @@ class ComponentWidget extends DataObject
 			$ItemList->set_filters( array(
 					'types' => '1000',					// Restrict to type 1000 (pages)
 					'orderby' => 'title',
-					'order' => ( $this->disp_params[ 'disp_order' ] ? $this->disp_params[ 'disp_order' ] : 'desc' ),
+					'order' => ( $this->disp_params[ 'disp_order' ] ? $this->disp_params[ 'disp_order' ] : 'ASC' ),
 					'unit' => 'posts',
 				), false );
 		}
 		else
 		{	// post list
 			$ItemList->set_filters( array(
-					'order' => ( $this->disp_params[ 'disp_order' ] ? $this->disp_params[ 'disp_order' ] : 'desc' ),
+					'order' => ( $this->disp_params[ 'disp_order' ] ? $this->disp_params[ 'disp_order' ] : 'DESC' ),
 					'unit' => 'posts',						// We want to advertise all items (not just a page or a day)
 				) );
 		}
@@ -713,6 +713,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2007/12/26 18:15:29  fplanque
+ * minor
+ *
  * Revision 1.25  2007/12/24 14:21:04  yabs
  * adding params
  *
