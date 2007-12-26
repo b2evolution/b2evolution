@@ -721,9 +721,11 @@ switch( $action )
 			{
 				$block_item_Widget = & new Widget( 'block_item' );
 				$block_item_Widget->title = T_('Notes');
-				// show a quicklink to edit if user has permission
+				// show a quicklink to edit if user has permission:
+/* fp> TODO: use an action icon (will appear on the right)
 				if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
 					$block_item_Widget->title .=	' <a href="?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#ffield_blog_notes">'.get_icon( 'edit' ).'</a>';
+*/
 				$block_item_Widget->disp_template_replaced( 'block_start' );
 				$Blog->disp( 'notes', 'htmlbody' );
 				$block_item_Widget->disp_template_replaced( 'block_end' );
@@ -749,6 +751,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2007/12/26 17:58:31  fplanque
+ * minor
+ *
  * Revision 1.11  2007/12/26 11:27:14  yabs
  * ui improvement
  *
