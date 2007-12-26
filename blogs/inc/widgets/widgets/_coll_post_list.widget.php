@@ -71,7 +71,7 @@ class coll_post_list_Widget extends ComponentWidget
 					'label' => T_('Order'),
 					'note' => T_('Order to display items'),
 					'type' => 'select',
-					'options' => array( 'DESC' => T_( 'Newest to oldest' ), 'ASC' => T_( 'Oldest to newest' ), 'RANDOM' => T_( 'Random selection' ) ),
+					'options' => array( 'DESC' => T_( 'Newest to oldest' ), 'ASC' => T_( 'Oldest to newest' ), 'RAND' => T_( 'Random selection' ) ),
 					'defaultvalue' => 'DESC',
 				),
 				'limit' => array(
@@ -134,6 +134,9 @@ class coll_post_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.8  2007/12/26 23:12:48  yabs
+ * changing RANDOM to RAND
+ *
  * Revision 1.7  2007/12/26 20:04:54  fplanque
  * minor
  *

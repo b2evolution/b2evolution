@@ -71,8 +71,8 @@ class coll_page_list_Widget extends ComponentWidget
 					'label' => T_('Order'),
 					'note' => T_('Order to display items'),
 					'type' => 'select',
-					'options' => array( 'DESC' => T_( 'Newest to oldest' ), 'ASC' => T_( 'Oldest to newest' ), 'RANDOM' => T_( 'Random selection' ) ),
-					'defaultvalue' => 'DESC',
+					'options' => array( 'DESC' => T_( 'Alphabetical ( Z - A )' ), 'ASC' => T_( 'Alphabetical ( A - Z )' ), 'RAND' => T_( 'Random selection' ) ),
+					'defaultvalue' => 'ASC',
 				),
 				'limit' => array(
 					'label' => T_( 'Display' ),
@@ -134,6 +134,9 @@ class coll_page_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.8  2007/12/26 23:12:48  yabs
+ * changing RANDOM to RAND
+ *
  * Revision 1.7  2007/12/26 20:04:54  fplanque
  * minor
  *

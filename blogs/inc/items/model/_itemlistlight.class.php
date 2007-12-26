@@ -644,7 +644,7 @@ class ItemListLight extends DataObjectList2
 		 * ORDER BY stuff:
 		 */
 		$order = $this->filters['order'];
-		if( strtoupper( $order ) == 'RANDOM' )
+		if( strtoupper( $order ) == 'RAND' )
 		{
 			$order_by = 'RAND()';
 		}
@@ -1513,6 +1513,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.18  2007/12/26 23:12:00  yabs
+ * changing RANDOM to RAND
+ *
  * Revision 1.17  2007/12/26 17:53:24  fplanque
  * minor
  *
