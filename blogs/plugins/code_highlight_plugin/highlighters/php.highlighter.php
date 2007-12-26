@@ -161,6 +161,9 @@ class am_php_highlighter
 
 /**
  * $Log$
+ * Revision 1.7  2007/12/26 17:34:25  fplanque
+ * no message
+ *
  * Revision 1.6  2007/06/26 02:40:54  fplanque
  * security checks
  *
@@ -180,5 +183,4 @@ class am_php_highlighter
  * removed "extend Plugins"
  *
  */
-
- ?>
+?>
