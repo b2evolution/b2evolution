@@ -37,6 +37,7 @@ load_class('_core/model/db/_sql.class.php');
 class ItemQuery extends SQL
 {
 	var $p;
+	var $pl;
 	var $title;
 	var $blog;
 	var $cat;
@@ -97,6 +98,31 @@ class ItemQuery extends SQL
 			$this->WHERE_and( $this->dbprefix.'urltitle = '.$DB->quote($title) );
 			$r = true;
 		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Restrict to a specific list of posts
+	 */
+	function where_ID_list( $pl = '' )
+	{
+		$r = false;
+
+		$this->pl = $pl;
+
+		if( empty( $pl ) ) return $r; // nothing to do
+
+		$p_ID_list = array();
+		$p_id_list = explode( ',', $this->pl );
+		foreach( $p_id_list as $p_id )
+			$p_ID_list[] = intval( $p_id );// make sure they're all numbers
+
+		$this->pl = implode( ',',$p_ID_list );
+
+		$this->WHERE_and( $this->dbIDname.' in( '.$this->pl.' )' );
+		$r = true;
 
 		return $r;
 	}
@@ -679,6 +705,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/26 11:27:47  yabs
+ * added post_ID_list to filters
+ *
  * Revision 1.3  2007/11/27 22:31:57  fplanque
  * debugged blog moderation
  *

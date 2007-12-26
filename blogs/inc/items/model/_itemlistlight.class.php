@@ -151,6 +151,7 @@ class ItemListLight extends DataObjectList2
 				'phrase' => 'AND',
 				'exact' => 0,
 				'post_ID' => NULL,
+				'post_ID_list' => NULL,
 				'post_title' => NULL,
 				'ymdhms' => NULL,
 				'week' => NULL,
@@ -430,6 +431,12 @@ class ItemListLight extends DataObjectList2
 		$this->filters['post_ID'] = param( $this->param_prefix.'p', 'integer', $this->default_filters['post_ID'] );          // Specific post number to display
 		$this->filters['post_title'] = param( $this->param_prefix.'title', 'string', $this->default_filters['post_title'] );	  // urtitle of post to display
 
+
+		/*
+		 * multiple Item selection ?
+		 */
+		$this->filters['post_ID_list'] = param( $this->param_prefix.'pl', 'string', $this->default_filters['post_ID_list'] );  // Specific list of post numbers to display
+
 		$this->single_post = !empty($this->filters['post_ID']) || !empty($this->filters['post_title']);
 
 
@@ -625,6 +632,7 @@ class ItemListLight extends DataObjectList2
 		$this->ItemQuery->where_types( $this->filters['types'] );
 		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 		$this->ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
+		$this->ItemQuery->where_ID_list( $this->filters['post_ID_list'] );
 		$this->ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
 		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
 		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
@@ -1504,6 +1512,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.16  2007/12/26 11:27:47  yabs
+ * added post_ID_list to filters
+ *
  * Revision 1.15  2007/12/24 10:37:19  yabs
  * adding random order
  *
