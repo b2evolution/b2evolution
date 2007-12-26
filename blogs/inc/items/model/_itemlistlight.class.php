@@ -437,6 +437,7 @@ class ItemListLight extends DataObjectList2
 		 */
 		$this->filters['post_ID_list'] = param( $this->param_prefix.'pl', 'string', $this->default_filters['post_ID_list'] );  // Specific list of post numbers to display
 
+
 		$this->single_post = !empty($this->filters['post_ID']) || !empty($this->filters['post_title']);
 
 
@@ -1512,6 +1513,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.17  2007/12/26 17:53:24  fplanque
+ * minor
+ *
  * Revision 1.16  2007/12/26 11:27:47  yabs
  * added post_ID_list to filters
  *

@@ -114,14 +114,16 @@ class ItemQuery extends SQL
 
 		if( empty( $pl ) ) return $r; // nothing to do
 
-		$p_ID_list = array();
+		$p_ID_array = array();
 		$p_id_list = explode( ',', $this->pl );
 		foreach( $p_id_list as $p_id )
-			$p_ID_list[] = intval( $p_id );// make sure they're all numbers
+		{
+			$p_ID_array[] = intval( $p_id );// make sure they're all numbers
+		}
 
-		$this->pl = implode( ',',$p_ID_list );
+		$this->pl = implode( ',', $p_ID_array );
 
-		$this->WHERE_and( $this->dbIDname.' in( '.$this->pl.' )' );
+		$this->WHERE_and( $this->dbIDname.' IN( '.$this->pl.' )' );
 		$r = true;
 
 		return $r;
@@ -705,6 +707,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.5  2007/12/26 17:53:25  fplanque
+ * minor
+ *
  * Revision 1.4  2007/12/26 11:27:47  yabs
  * added post_ID_list to filters
  *
