@@ -61,9 +61,9 @@ class coll_page_list_Widget extends ComponentWidget
 					'size' => 60,
 					'defaultvalue' => T_('Pages'),
 				),
-				'link_title' => array(
-					'label' => T_( 'Link title' ),
-					'note' => T_( 'Link the title to the blog?' ),
+				'title_link' => array(
+					'label' => T_('Link to blog'),
+					'note' => T_('Link the block title to the blog?'),
 					'type' => 'checkbox',
 					'defaultvalue' => false,
 				),
@@ -134,6 +134,9 @@ class coll_page_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.7  2007/12/26 20:04:54  fplanque
+ * minor
+ *
  * Revision 1.6  2007/12/24 14:21:17  yabs
  * adding params
  *

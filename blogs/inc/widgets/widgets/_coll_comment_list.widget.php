@@ -62,19 +62,6 @@ class coll_comment_list_Widget extends ComponentWidget
 				'size' => 40,
 				'defaultvalue' => T_('Recent comments'),
 			),
-			'link_author' => array(
-				'label' => T_( 'Author link'),
-				'note' => T_( 'Link the author to their url' ),
-				'defaultvalue' => true,
-				'type' => 'checkbox',
-			),
-			'hover_text' => array(
-				'label' => T_( 'Hover text'),
-				'note' => T_( 'Text to show when hovering over the link' ),
-				'size' => 40,
-				'defaultvalue' => T_( 'Read the full comment' ),
-				'type' => 'text',
-			),
 			'disp_order' => array(
 				'label' => t_('Order'),
 				'note' => T_('Order to display items'),
@@ -87,6 +74,19 @@ class coll_comment_list_Widget extends ComponentWidget
 				'note' => T_( 'Max items to display.' ),
 				'size' => 4,
 				'defaultvalue' => 20,
+			),
+			'author_links' => array(
+				'label' => T_( 'Link to author'),
+				'note' => T_( 'Link the author to their url' ),
+				'defaultvalue' => true,
+				'type' => 'checkbox',
+			),
+			'hover_text' => array(
+				'label' => T_( 'Hover text'),
+				'note' => T_( 'Text to show when hovering over the link' ),
+				'size' => 40,
+				'defaultvalue' => T_( 'Read the full comment' ),
+				'type' => 'text',
 			),
 			'blog_ID' => array(
 				'label' => T_( 'Blog' ),
@@ -143,12 +143,16 @@ class coll_comment_list_Widget extends ComponentWidget
 		echo $this->disp_params[ 'block_title_start' ].$this->disp_params[ 'title' ].$this->disp_params[ 'block_title_end' ];
 
 		echo $this->disp_params[ 'list_start' ];
+
+    /**
+		 * @var Comment
+		 */
 		while( $Comment = & $CommentList->get_next() )
 		{ // Loop through comments:
 			// Load comment's Item object:
 			$Comment->get_Item();
 			echo $this->disp_params[ 'item_start' ];
-			$Comment->author( '', ' ', '', ' ', 'htmlbody', $this->disp_params[ 'link_author' ] );
+			$Comment->author( '', ' ', '', ' ', 'htmlbody', $this->disp_params[ 'author_links' ] );
 			echo T_( 'on ' );
 			$Comment->permanent_link( array(
 				'text'        => $Comment->Item->title,
@@ -166,6 +170,9 @@ class coll_comment_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2007/12/26 20:04:54  fplanque
+ * minor
+ *
  * Revision 1.2  2007/12/24 12:05:31  yabs
  * bugfix "order" is a reserved name, used by wi_order
  *

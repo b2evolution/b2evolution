@@ -466,7 +466,7 @@ class ComponentWidget extends DataObject
 
 		echo $this->disp_params['block_start'];
 
-		$title = sprintf( ( $this->disp_params[ 'link_title' ] ? '<a href="'.$listBlog->gen_baseurl().'">%s</a>' : '%s' ), $this->disp_params[ 'title' ] );
+		$title = sprintf( ( $this->disp_params[ 'title_link' ] ? '<a href="'.$listBlog->gen_blogurl().'" rel="nofollow">%s</a>' : '%s' ), $this->disp_params[ 'title' ] );
 
 		$this->disp_title( $title );
 
@@ -713,6 +713,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.27  2007/12/26 20:04:54  fplanque
+ * minor
+ *
  * Revision 1.26  2007/12/26 18:15:29  fplanque
  * minor
  *

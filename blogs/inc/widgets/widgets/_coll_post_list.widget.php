@@ -57,15 +57,15 @@ class coll_post_list_Widget extends ComponentWidget
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_('Block title'),
-					'note' => T_( 'Title to display in your skin.' ),
+					'note' => T_('Title to display in your skin.'),
 					'size' => 60,
 					'defaultvalue' => T_('Contents'),
 				),
-				'link_title' => array(
-					'label' => T_( 'Link title' ),
-					'note' => T_( 'Link the title to the blog?' ),
+				'title_link' => array(
+					'label' => T_('Link to blog'),
+					'note' => T_('Link the block title to the blog?'),
 					'type' => 'checkbox',
-					'defaultvalue' => true,
+					'defaultvalue' => false,
 				),
 				'disp_order' => array(
 					'label' => T_('Order'),
@@ -134,6 +134,9 @@ class coll_post_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.7  2007/12/26 20:04:54  fplanque
+ * minor
+ *
  * Revision 1.6  2007/12/24 14:21:17  yabs
  * adding params
  *

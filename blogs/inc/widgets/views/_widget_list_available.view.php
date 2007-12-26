@@ -27,9 +27,9 @@ $core_componentwidget_defs = array(
 		'*'.T_('Different ways of listing the blog contents'),
 			'coll_category_list',
 			'coll_tag_cloud',
-			'coll_comment_list',
 			'coll_post_list',
 			'coll_page_list',
+			'coll_comment_list',
 			'coll_xml_feeds',
 		'*'.T_('Meta info for the blog'),
 			'coll_title',
@@ -110,6 +110,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.8  2007/12/26 20:04:54  fplanque
+ * minor
+ *
  * Revision 1.7  2007/12/24 14:53:49  yabs
  * adding coll_comment_list widget
  *
