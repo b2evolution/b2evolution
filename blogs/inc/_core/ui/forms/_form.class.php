@@ -1782,7 +1782,10 @@ class Form extends Widget
 
 			$options_list .= '<option value="'.format_to_output($l_value, 'formvalue').'"';
 
-			if( (string)$l_value == (string)$field_value ) // cast to string so "1,2" is != 1
+			if(
+					( is_array( $field_value ) && in_array( $l_value, $field_value ) ) ||
+					( !is_array( $field_value ) && (string)$l_value == (string)$field_value ) // cast to string so "1,2" is != 1
+				)
 			{
 				$options_list .= ' selected="selected"';
 			}
@@ -2833,6 +2836,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.23  2007/12/26 17:42:31  yabs
+ * bugfix ( http://forums.b2evolution.net/viewtopic.php?t=13649 )
+ *
  * Revision 1.22  2007/12/09 21:24:13  blueyed
  * empty LEGEND display fix for FF2
  *
