@@ -38,7 +38,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<!-- InstanceBeginEditable name="head" -->
 	<base href="<?php echo $baseurl ?>" />
 	<!-- InstanceEndEditable -->
-	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" --> 
+	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" -->
 </head>
 
 <body>
@@ -52,54 +52,63 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	<div class="wrapper1">
 	<div class="wrapper2">
-		<span class="version_top"><!-- InstanceBeginEditable name="Version" --><?php echo T_('Default page') ?><!-- InstanceEndEditable --></span>	
-	
+		<span class="version_top"><!-- InstanceBeginEditable name="Version" --><?php echo T_('Default page') ?><!-- InstanceEndEditable --></span>
+
 		<a href="http://b2evolution.net/" target="_blank"><img src="rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
-		
-		<div class="menu_top"><!-- InstanceBeginEditable name="MenuTop" --> 
-			<span class="floatright"><a href="<?php echo $baseurl ?>">Home</a> &bull; <a href="<?php echo $admin_url ?>">Admin</a> </span> 
+
+		<div class="menu_top"><!-- InstanceBeginEditable name="MenuTop" -->
+			<span class="floatright"><a href="<?php echo $baseurl ?>">Home</a> &bull; <a href="<?php echo $admin_url ?>">Admin</a> </span>
 			&nbsp;
 		<!-- InstanceEndEditable --></div>
-		
+
 		<!-- InstanceBeginEditable name="Main" -->
 		<?php
-			/**
-			 * @var BlogCache
-			 */
-			$BlogCache = & get_Cache('BlogCache');
-			$BlogCache->load_all();
-		?>
+		/**
+		 * @var BlogCache
+		 */
+		$BlogCache = & get_Cache('BlogCache');
+		$BlogCache->load_all();
 
-		<div class="block1">
-		<div class="block2">
-		<div class="block3">
+		if( $pagenow == 'index.php' || count( $BlogCache->cache ) == 0 )
+		{	// This page is actually included by the index.html page OR there are no blogs
+			?>
+			<div class="block1">
+			<div class="block2">
+			<div class="block3">
 
-			<h1><?php echo T_('Welcome to b2evolution') ?></h1>
-			
+				<h1><?php echo T_('Welcome to b2evolution') ?></h1>
+
+				<?php
+					messages( array(
+							'block_start' => '<div class="action_messages">',
+							'block_end'   => '</div>',
+						) );
+
+					if( count( $BlogCache->cache ) == 0 )
+					{	// There is no blog on this system!
+						echo '<p><strong>'.T_('b2evolution is installed and ready but you haven\'t created any blog on this system yet.').'</strong></p>';
+
+						echo '<p><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Create a first blog' ).' &raquo;</a></p>';
+					}
+					else
+					{
+						echo '<p><strong>'.T_('You have successfully installed b2evolution.').'</strong></p>';
+
+						echo '<p>'.T_('You haven\'t set a default blog yet. Thus, you see this default page.').'</p>';
+						?>
+						<p><a href="<?php echo $admin_url ?>?ctrl=settings&amp;tab=general"><?php echo T_( 'Set a default blog' ) ?> &raquo;</a></p>
+						<?php
+					}
+					?>
+			</div>
+			</div>
+			</div>
 			<?php
-				messages( array(
-						'block_start' => '<div class="action_messages">',
-						'block_end'   => '</div>',
-					) );
+		}
 
-				if( count( $BlogCache->cache ) == 0 )
-				{	// There is no blog on this system!
-					echo '<p><strong>'.T_('b2evolution is installed and ready but you haven\'t created any blog on this system yet.').'</strong></p>';
-
-					echo '<p><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Create a first blog' ).' &raquo;</a></p>';
-				}
-				else
-				{
-					echo '<p><strong>'.T_('You have successfully installed b2evolution.').'</strong></p>';
-
-					echo '<p>'.T_('You haven\'t set a default blog yet. Thus, you see this default page.').'</p>';
-
-				?>
-				<p><a href="<?php echo $admin_url ?>?ctrl=settings&amp;tab=general"><?php echo T_( 'Set a default blog' ) ?> &raquo;</a></p>
-
-		</div>
-		</div>
-		</div>
+		if( count( $BlogCache->cache ) )
+		{	// There are blogs on this system!
+		?>
 
 		<div class="block1">
 		<div class="block2">
@@ -157,21 +166,21 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		<li><strong><a href="contact.php"><?php echo T_('A standalone admin-contact page for your site') ?></a></strong> &nbsp; <span class="note">(contact.php)</span></li>
 	</ul>
 
+	</div>
+	</div>
+	</div>
 	<?php
 	}
 ?>
 
-</div>
-</div>
-</div>
 <!-- InstanceEndEditable -->
 	</div>
-		
+
 	<div class="body_fade_out">
-		
+
 	<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->Powered by <a href="http://b2evolution.net/" target="_blank">b2evolution</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">Forums</a>
 		<!-- InstanceEndEditable --></div>
-	
+
 	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->
 		<a href="contact.php"><?php echo T_('Contact the admin') ?></a>
 		<?php
@@ -184,7 +193,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 				) );
 		?>
 		<!-- InstanceEndEditable --></div>
-		
+
 	</div>
 	</div>
 

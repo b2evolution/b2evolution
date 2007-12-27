@@ -416,9 +416,11 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	// EXPERIMENTAL
 	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+	// Let's clear any remaining messages that should already have been displayed before...
+	$Messages->clear( 'all' );
 	b2evonet_get_updates();
 	// Display info & error messages
-	echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
+	echo $Messages->display( NULL, NULL, false, 'error', NULL, NULL, 'action_messages' );
 
 
 	/**
@@ -466,6 +468,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		echo '<li><a href="admin.php?ctrl=plugins">'.T_('Install a plugin').' &raquo;</a></li>';
 		// TODO: remember system date check and only remind every 3 months
 		echo '<li><a href="admin.php?ctrl=system">'.T_('Check system &amp; security').' &raquo;</a></li>';
+		echo '<li><a href="'.$baseurl.'default.php">'.T_('View default page').' &raquo;</a></li>';
 	echo '</ul>';
 	echo '</div>';
 
@@ -486,6 +489,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2007/12/27 21:40:31  fplanque
+ * improved default page
+ *
  * Revision 1.17  2007/11/28 17:29:45  fplanque
  * Support for getting updates from b2evolution.net
  *

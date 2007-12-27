@@ -66,7 +66,14 @@ if( empty($blog) )
 	if( empty($blog) )
 	{ // Still no blog requested, use default
 		$blog = $Settings->get('default_blog_ID');
-		$Debuglog->add( 'Using default blog '.$blog, 'detectblog' );
+		if( (($Blog = & $BlogCache->get_by_ID( $blog, false, false )) !== false) )
+		{ // We found a matching blog:
+			$Debuglog->add( 'Using default blog '.$blog, 'detectblog' );
+		}
+		else
+		{
+			$blog = NULL;
+		}
 	}
 
 	if( empty($blog) )
