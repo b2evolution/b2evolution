@@ -30,7 +30,7 @@ function set_new_form_action( form, newaction )
 
 		if( form.attributes.getNamedItem('action').value != newaction )
 		{ // Still old value, did not work.
-			alert('Cannot set new form action.');
+			alert('set_new_form_action: Cannot set new form action (Safari workaround).');
 			return false;
 		}
 	}
