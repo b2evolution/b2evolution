@@ -162,6 +162,7 @@ function create_default_settings( $override = array() )
 		'db_version' => $new_db_version,
 		'default_locale' => $default_locale,
 		'newusers_grp_ID' => $Group_Users->ID,
+		'default_blog_ID' => 1,
 	);
 
 	$settings = array_merge( array_keys($defaults), array_keys($override) );
@@ -196,9 +197,21 @@ function install_basic_skins()
 
 	echo 'Installing default skins... ';
 
-	// Note: Skin #1 will we used by default by auto-installed blogs.
+	// Note: Skin #1 will we used by Blog A
 	$Skin = new Skin();
 	$Skin->install( 'evopress' );
+
+	// Note: Skin #2 will we used by Blog B
+	$Skin = new Skin();
+	$Skin->install( 'evocamp' );
+
+	// Note: Skin #3 will we used by Linkblog
+	$Skin = new Skin();
+	$Skin->install( 'miami_blue' );
+
+	// Note: Skin #4 will we used by Photoblog
+	$Skin = new Skin();
+	$Skin->install( 'photoblog' );
 
 	$Skin = new Skin();
 	$Skin->install( 'asevo' );
@@ -207,19 +220,10 @@ function install_basic_skins()
 	$Skin->install( 'custom' );
 
 	$Skin = new Skin();
-	$Skin->install( 'evocamp' );
-
-	$Skin = new Skin();
 	$Skin->install( 'natural_pink' );
 
 	$Skin = new Skin();
-	$Skin->install( 'miami_blue' );
-
-	$Skin = new Skin();
 	$Skin->install( 'nifty_corners' );
-
-	$Skin = new Skin();
-	$Skin->install( 'photoblog' );
 
 
 	$Skin = new Skin();
@@ -342,9 +346,14 @@ function install_basic_widgets()
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							 SELECT blog_ID, "Sidebar", 6, "core", "coll_category_list"
 							   FROM T_blogs' );
+	// Add linkblog to blog Sidebars for blog A & B:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
+							 SELECT blog_ID, "Sidebar", 7, "core", "linkblog", \'a:6:{s:5:"title";s:8:"Blogroll";s:11:"linkblog_ID";s:1:"3";s:14:"linkblog_limit";s:3:"100";s:11:"widget_name";s:8:"Linkblog";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\'
+							   FROM T_blogs
+							  WHERE blog_ID <= 2' );
 	// Add XML feeds to all blogs Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 7, "core", "coll_xml_feeds"
+							 SELECT blog_ID, "Sidebar", 8, "core", "coll_xml_feeds"
 							   FROM T_blogs' );
 
 	echo "OK.<br />\n";
@@ -546,6 +555,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.40  2007/12/27 23:56:07  fplanque
+ * Better out of the box experience
+ *
  * Revision 1.39  2007/12/22 16:59:41  fplanque
  * Miami blue 2.x
  *

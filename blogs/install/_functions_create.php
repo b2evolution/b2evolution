@@ -228,6 +228,7 @@ function create_blog(
 	$blog_staticfilename = '', // obsolete
 	$blog_tagline = '',
 	$blog_longdesc = '',
+	$blog_skin_ID = 1,
 	$blog_links_blog_ID = 0 )
 {
 	global $DB, $default_locale;
@@ -236,7 +237,7 @@ function create_blog(
 						blog_urlname,
 						blog_tagline, blog_longdesc, blog_locale,
 						blog_allowcomments, blog_allowtrackbacks,
-						blog_in_bloglist, blog_links_blog_ID )
+						blog_in_bloglist, blog_skin_ID, blog_links_blog_ID )
 	VALUES ( ";
 	$query .= "'".$DB->escape($blog_name)."', ";
 	$query .= "'".$DB->escape($blog_shortname)."', ";
@@ -245,7 +246,7 @@ function create_blog(
 	$query .= "'".$DB->escape($blog_tagline)."', ";
 	$query .= "'".$DB->escape($blog_longdesc)."', ";
 	$query .= "'".$DB->escape($default_locale)."', ";
-	$query .= "'post_by_post', 0, 1, $blog_links_blog_ID )";
+	$query .= "'post_by_post', 0, 1, $blog_skin_ID, $blog_links_blog_ID )";
 
 	if( ! ($DB->query( $query )) )
 		return false;
@@ -303,6 +304,7 @@ function create_demo_contents()
 		$blog_stub.'.html',
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
+		1, // Skin ID
 		3 );	// !!! Linkblofg ID
 
 	$blog_shortname = 'Blog B';
@@ -314,6 +316,7 @@ function create_demo_contents()
 		$blog_stub.'.html',
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
+		2, // Skin ID
 		3 );	// !!! Linkblofg ID
 
 	$blog_shortname = 'Linkblog';
@@ -322,12 +325,13 @@ function create_demo_contents()
 <br />
 <strong>'.T_("The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.").'</strong>';
 	$blog_linkblog_ID = create_blog(
-		sprintf( T_('%s Title'), $blog_shortname ),
+		'Linkblog',
 		$blog_shortname,
 		$blog_stub,
 		$blog_stub.'.html',
-		sprintf( T_('Tagline for %s'), $blog_shortname ),
+		T_('Some interesting links...'),
 		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
+		3, // SKin ID
 		0 /* no Link blog */ );
 
 	echo "OK.<br />\n";
@@ -430,7 +434,40 @@ function create_demo_contents()
 	$edited_Item->insert( 1, 'Support forums', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-EU', '', 'http://forums.b2evolution.net/', 'disabled', array() );
 
 
-	global $query, $timestamp;
+
+ 	$info_page = T_("This blog is powered by b2evolution.
+
+You are currently looking at an info page about %s.
+
+Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.
+
+If needed, a skin can format info pages differently from regular posts.");
+
+	// Insert a PAGE:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("About Blog B"), sprintf( $info_page, T_('Blog B') ), $now, $cat_ann_b,
+		array(), 'published', '#', '', '', 'open', array('default'), 1000 );
+
+	// Insert a PAGE:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("About Blog A"), sprintf( $info_page, T_('Blog A') ), $now, $cat_ann_a,
+		array(), 'published', '#', '', '', 'open', array('default'), 1000 );
+
+	// Insert a PAGE:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("About this system"), T_("This blog platform is powered by b2evolution.
+
+You are currently looking at an info page about this system. It is cross-posted among the 3 demo blogs. Thus, this page will be linked on each of these blogs.
+
+Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.
+
+If needed, a skin can format info pages differently from regular posts."), $now, $cat_ann_a,
+		array( $cat_ann_a, $cat_ann_b, $cat_linkblog_b2evo ), 'published', '#', '', '', 'open', array('default'), 1000 );
+
+
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -461,7 +498,7 @@ If you want to integrate a b2evolution blog into a complex website, you'll proba
 
 You will find more information in the stub/template files themselves. Open them in a text editor and read the comments in there.
 
-Either way, make sure you go to the blogs admin and set the correct access method for your blog. When using a stub or a template, you must also set its filename in the 'Stub name' field. Otherwise, the permalinks will not function properly."), $now, $cat_b2evo );
+Either way, make sure you go to the blogs admin and set the correct access method/URL for your blog. Otherwise, the permalinks will not function properly."), $now, $cat_b2evo );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -483,7 +520,9 @@ You can download additional skins from the <a href="http://skins.b2evolution.net
 
 You can also create your own skins by duplicating, renaming and customizing any existing skin folder from the /blogs/skins directory.
 
-To start customizing a skin, open its "<code>index.main.php</code>" file in an editor and read the comments in there. And, of course, read the manual on skins!'), $now, $cat_b2evo );
+To start customizing a skin, open its "<code>index.main.php</code>" file in an editor and read the comments in there. Note: you can also edit skins in the "Files" tab of the admin interface.
+
+And, of course, read the <a href="http://manual.b2evolution.net/Skins_2.0" target="_blank">manual on skins</a>!'), $now, $cat_b2evo );
 
 
 	// Create newbie posts:
@@ -532,43 +571,13 @@ This is the extended text. You only see it when you have clicked the "more" link
 <ul>
 	<li><strong>Blog A</strong>: You are currently looking at it. It contains a few sample posts, using simple features of b2evolution.</li>
 	<li><strong>Blog B</strong>: You can access it from a link at the top of the page. It contains information about more advanced features.</li>
-	<li><strong>Linkblog</strong>: The linkblog is included by default in the sidebar of both Blog A &amp; Blog B.</li>
+	<li><strong>Linkblog</strong>: By default, the linkblog is included as a \"Blogroll\" in the sidebar of both Blog A &amp; Blog B.</li>
 </ul>
 
 You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, skin, widgets, etc.) from the Blog Settings tab in the admin interface."), $now, $cat_ann_a );
 
 
-	$info_page = T_("This blog is powered by b2evolution.
 
-You are currently looking at an info page about %s.
-
-Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.
-
-If needed, a skin can format info pages differently from regular posts.");
-
-	// Insert a PAGE:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("About Blog B"), sprintf( $info_page, T_('Blog B') ), $now, $cat_ann_b,
-		array(), 'published', '#', '', '', 'open', array('default'), 1000 );
-
-	// Insert a PAGE:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("About Blog A"), sprintf( $info_page, T_('Blog A') ), $now, $cat_ann_a,
-		array(), 'published', '#', '', '', 'open', array('default'), 1000 );
-
-	// Insert a PAGE:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("About this system"), T_("This blog platform is powered by b2evolution.
-
-You are currently looking at an info page about this system. It is cross-posted among the 3 demo blogs. Thus, this page will be linked on each of these blogs.
-
-Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.
-
-If needed, a skin can format info pages differently from regular posts."), $now, $cat_ann_a,
-		array( $cat_ann_a, $cat_ann_b, $cat_linkblog_b2evo ), 'published', '#', '', '', 'open', array('default'), 1000 );
 
 	echo "OK.<br />\n";
 
@@ -634,6 +643,9 @@ If needed, a skin can format info pages differently from regular posts."), $now,
 
 /*
  * $Log$
+ * Revision 1.231  2007/12/27 23:56:06  fplanque
+ * Better out of the box experience
+ *
  * Revision 1.230  2007/07/04 21:10:25  blueyed
  * More test include fixes
  *
