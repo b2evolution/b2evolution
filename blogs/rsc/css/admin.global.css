@@ -80,8 +80,8 @@ table.compose_layout td.input {
 table.compose_layout td.select {
 	padding: 1px 0 1px 5px;
 }
- 
- 
+
+
 /*
  * Categories selection table:
  */
@@ -266,7 +266,7 @@ div.tile {
 
 /*
  * System checks
- */ 
+ */
 div.system_check {
 	margin: 1ex 0;
 	border-top: 1px solid #ddd;
@@ -323,4 +323,25 @@ table.coll_kind td.coll_kind {
 }
 td.coll_kind h3 {
 	margin: 0;
+}
+
+div.seo_presets {
+	text-align: center;
+	margin: 1ex;
+}
+div.seo_presets a {
+	margin: 1ex;
+}
+div.seo_presets img {
+	border: 1px solid #000;
+}
+div.seo_presets a:hover img,
+div.seo_presets a.current img {
+	border: 1px solid #f00;
+}
+div.seo_message {
+	text-align: center;
+	font-size: 84%;
+	margin: 2ex 1ex;
+	line-height: 150%;
 }

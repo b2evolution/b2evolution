@@ -27,6 +27,8 @@ global $edited_Blog;
 
 global $preset;
 
+global $rsc_url;
+
 ?>
 <script type="text/javascript">
 	<!--
@@ -59,12 +61,29 @@ $Form->hidden( 'tab', 'seo' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
 $Form->begin_fieldset( T_('SEO Presets') );
-	$Form->info_field( T_('Available presets'),
-													'<a href="?ctrl=coll_settings&amp;tab=seo&amp;blog='.$edited_Blog->ID.'&amp;preset=awall">Aaron Wall</a>'
-											.' | <a href="?ctrl=coll_settings&amp;tab=seo&amp;blog='.$edited_Blog->ID.'&amp;preset=abeal">Andy Beal</a>'
-											.' | <a href="?ctrl=coll_settings&amp;tab=seo&amp;blog='.$edited_Blog->ID.'&amp;preset=mgray">Michael Gray</a>'
-											.' | <a href="?ctrl=coll_settings&amp;tab=seo&amp;blog='.$edited_Blog->ID.'&amp;preset=rfishkin">Rand Fishkin</a>'
-											.' | <a href="?ctrl=coll_settings&amp;tab=seo&amp;blog='.$edited_Blog->ID.'&amp;preset=sspencer">Stephan Spencer</a>' );
+
+	$available_presets = array( 'awall' => 'Aaron Wall',
+                              'abeal' => 'Andy Beal',
+                              'mgray' => 'Michael Gray',
+                              'rfishkin' => 'Rand Fishkin',
+                              'sspencer' => 'Stephan Spencer' );
+
+  $preset_html = '';
+	foreach( $available_presets as $preset_code => $preset_name )
+	{
+		$preset_html .= '<a href="?ctrl=coll_settings&amp;tab=seo&amp;blog='.$edited_Blog->ID.'&amp;preset='
+												.$preset_code.'" title="'.$preset_name.'"';
+		if( $preset == $preset_code )
+		{
+			$preset_html .= ' class="current"';
+		}
+		$preset_html .= '><img alt="'.$preset_name.'" src="'
+												.$rsc_url.'/img/people/'.$preset_code.'.png" width="124" height="180" /></a>';
+	}
+
+
+	echo '<div class="seo_presets">'.$preset_html.'</div>';
+
 	switch( $preset )
 	{
 		case 'awall':
@@ -95,9 +114,10 @@ $Form->begin_fieldset( T_('SEO Presets') );
 
 	if( !empty($seo_author) )
 	{
-	 	$Form->info_field( T_('Selected presets'),
-			sprintf( T_('You can review the SEO settings recommended by <strong>%s</strong> below. Click the "Save!" button to apply these settings.'),
-								$seo_author ).' '.$seo_site );
+	 	echo '<div class="seo_message">';
+		printf( T_('You can review the SEO settings recommended by <strong>%s</strong> below. Click the "Save!" button to apply these settings.'),
+								$seo_author );
+		echo '<br/>'.$seo_site.'</div>';
 	}
 $Form->end_fieldset();
 
@@ -140,9 +160,7 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 								.url_add_tail( $blogurl, '<strong>/subcat/post-title</strong>' ) ),
 				array( 'chapters', T_('Use extra-path: category path'), T_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/cat/subcat/post-title</strong>' ) ),
-			), T_('Permalink scheme'), true,
-			T_('For example, single post links are used when viewing comments for a post. May be used for permalinks - see below.') );
-			// fp> TODO: check where we really need to force single and where we could use any permalink
+			), T_('Permalink scheme'), true );
 
 	$Form->checkbox( 'canonical_item_urls', $edited_Blog->get_setting( 'canonical_item_urls' ),
 			T_('Make canoncial'), T_('301 redirect to canonical URL') );
@@ -162,7 +180,7 @@ $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_s
 	$Form->checkbox( 'archive_noindex', $edited_Blog->get_setting( 'archive_noindex' ), T_('Indexing'), T_('META NOINDEX') );
 	$Form->checkbox( 'archive_nofollowto', $edited_Blog->get_setting( 'archive_nofollowto' ), T_('Follow TO'), T_('NOFOLLOW on links to').' '.T_('date archives') );
 
-	$Form->text( 'archive_posts_per_page', $edited_Blog->get_setting('archive_posts_per_page'), 4, T_('Posts/Days per page'),
+	$Form->text( 'archive_posts_per_page', $edited_Blog->get_setting('archive_posts_per_page'), 4, T_('Posts per page'),
 								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
 
 	$Form->checkbox( 'arcdir_noindex', $edited_Blog->get_setting( 'arcdir_noindex' ), T_('Archive directory'), T_('META NOINDEX') );
@@ -201,7 +219,7 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo'
 
 	$Form->checkbox( 'chapter_noindex', $edited_Blog->get_setting( 'chapter_noindex' ), T_('Indexing'), T_('META NOINDEX') );
 
-	$Form->text( 'chapter_posts_per_page', $edited_Blog->get_setting('chapter_posts_per_page'), 4, T_('Posts/Days per page'),
+	$Form->text( 'chapter_posts_per_page', $edited_Blog->get_setting('chapter_posts_per_page'), 4, T_('Posts per page'),
 								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
 
 	$Form->checkbox( 'catdir_noindex', $edited_Blog->get_setting( 'catdir_noindex' ), T_('Category directory'), T_('META NOINDEX') );
@@ -212,18 +230,21 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo') );
 
 	$Form->checkbox( 'tag_noindex', $edited_Blog->get_setting( 'tag_noindex' ), T_('Indexing'), T_('META NOINDEX') );
 
-	$Form->text( 'tag_posts_per_page', $edited_Blog->get_setting('tag_posts_per_page'), 4, T_('Posts/Days per page'),
+	$Form->text( 'tag_posts_per_page', $edited_Blog->get_setting('tag_posts_per_page'), 4, T_('Posts per page'),
 								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
 
 	$Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
-	$Form->checkbox( 'filtered_noindex', $edited_Blog->get_setting( 'filtered_noindex' ), T_('Other filtered posts pages'), T_('META NOINDEX').' - '.T_('Keyword searched, etc.') );
+	$Form->checkbox( 'filtered_noindex', $edited_Blog->get_setting( 'filtered_noindex' ), T_('Other filtered posts pages'), T_('META NOINDEX').' - '.T_('Filtered by keyword search, by author, etc.') );
 
-	$Form->checkbox( 'feedback-popup_noindex', $edited_Blog->get_setting( 'feedback-popup_noindex' ), T_('Comment popups'), T_('META NOINDEX') );
-	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), T_('Contact forms'), T_('META NOINDEX') );
-	$Form->checkbox( 'special_noindex', $edited_Blog->get_setting( 'special_noindex' ), T_('Other special pages'), T_('META NOINDEX').' - '.T_('User profile form, etc.') );
+	$Form->checkbox( 'feedback-popup_noindex', $edited_Blog->get_setting( 'feedback-popup_noindex' ), T_('Comment popups'),
+										T_('META NOINDEX').' - '.T_('For skins with comment popups only.') );
+	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), T_('Contact forms'),
+										T_('META NOINDEX').' - '.T_('WARNING: Letting search engines index contact forms will attract spam.') );
+	$Form->checkbox( 'special_noindex', $edited_Blog->get_setting( 'special_noindex' ), T_('Other special pages'),
+										T_('META NOINDEX').' - '.T_('Pages with no index setting of their own... yet.') );
 $Form->end_fieldset();
 
 
@@ -231,9 +252,13 @@ $Form->end_form( array(
 	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
+echo '<p class="note right">SEO portraits kindly provided by <a href="http://www.seomoz.org/" target="_blank">SEOmoz</a>.</p>';
 
 /*
  * $Log$
+ * Revision 1.8  2007/12/27 18:20:00  fplanque
+ * cosmetics
+ *
  * Revision 1.7  2007/12/27 01:58:48  fplanque
  * additional SEO
  *

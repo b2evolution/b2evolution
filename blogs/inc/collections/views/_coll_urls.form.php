@@ -254,9 +254,7 @@ $Form->begin_fieldset( T_('Single post URLs') );
 								.url_add_tail( $blogurl, '<strong>/subcat/post-title</strong>' ) ),
 				array( 'chapters', T_('Use extra-path: category path'), T_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/cat/subcat/post-title</strong>' ) ),
-			), T_('Single post URLs'), true,
-			T_('For example, single post links are used when viewing comments for a post. May be used for permalinks - see below.') );
-			// fp> TODO: check where we really need to force single and where we could use any permalink
+			), T_('Single post URLs'), true );
 
 $Form->end_fieldset();
 
@@ -268,6 +266,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.14  2007/12/27 18:20:00  fplanque
+ * cosmetics
+ *
  * Revision 1.13  2007/12/27 01:58:48  fplanque
  * additional SEO
  *
