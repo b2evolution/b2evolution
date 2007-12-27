@@ -20,8 +20,14 @@ function set_new_form_action( form, newaction )
 	var saved_action = form.attributes.getNamedItem('action').value;
 	form.attributes.getNamedItem('action').value = newaction;
 
+	// requested host+directory, used for Opera workaround below
+	var reqdir = location.host + location.pathname;
+	reqdir = reqdir.replace(/(\/)[^\/]*$/, "$1");
+
 	// FIX for Safari (2.0.2, OS X 10.4.3) - (Konqueror does not fail here)
-	if( form.attributes.getNamedItem('action').value != newaction )
+	if( form.attributes.getNamedItem('action').value != newaction
+		&& form.attributes.getNamedItem('action').value != reqdir+newaction /* Opera 9.25: action holds the complete URL, not just the given filename */
+	)
 	{ // Setting form.action failed! (This is the case for Safari)
 		// NOTE: checking "form.action == saved_action" (or through document.getElementById()) does not work - Safari uses the input element then
 		{ // _Setting_ form.action however sets the form's action attribute (not the input element) on Safari
