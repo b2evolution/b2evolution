@@ -27,6 +27,28 @@ global $edited_Blog;
 
 global $preset;
 
+?>
+<script type="text/javascript">
+	<!--
+	function show_hide_chapter_prefix(ob)
+	{
+		var fldset = document.getElementById( 'category_prefix_container' );
+		if( ob.value == 'param_num' )
+		{
+			fldset.style.display = 'none';
+		}
+		else
+		{
+			fldset.style.display = '';
+		}
+	}
+	//-->
+</script>
+
+<?php
+
+$blogurl = $edited_Blog->gen_blogurl();
+
 $Form = & new Form( NULL, 'coll_features_checkchanges' );
 
 $Form->begin_form( 'fform' );
@@ -39,12 +61,30 @@ $Form->hidden( 'blog', $edited_Blog->ID );
 $Form->begin_fieldset( T_('SEO Presets') );
 	$Form->info_field( T_('Available presets'),
 													'<a href="?ctrl=coll_settings&amp;tab=seo&amp;blog='.$edited_Blog->ID.'&amp;preset=awall">Aaron Wall</a>'
+											.' | <a href="?ctrl=coll_settings&amp;tab=seo&amp;blog='.$edited_Blog->ID.'&amp;preset=abeal">Andy Beal</a>'
+											.' | <a href="?ctrl=coll_settings&amp;tab=seo&amp;blog='.$edited_Blog->ID.'&amp;preset=mgray">Michael Gray</a>'
+											.' | <a href="?ctrl=coll_settings&amp;tab=seo&amp;blog='.$edited_Blog->ID.'&amp;preset=rfishkin">Rand Fishkin</a>'
 											.' | <a href="?ctrl=coll_settings&amp;tab=seo&amp;blog='.$edited_Blog->ID.'&amp;preset=sspencer">Stephan Spencer</a>' );
 	switch( $preset )
 	{
 		case 'awall':
 			$seo_author = '<a href="http://www.seobook.com/" target="_blank">Aaron Wall</a>';
 			$seo_site = 'For more SEO tips, visit <strong><a href="http://www.seobook.com/" target="_blank">SEO Book</a></strong>.';
+			break;
+
+		case 'abeal':
+			$seo_author = '<a href="http://www.marketingpilgrim.com/" target="_blank">Andy Beal</a>';
+			$seo_site = 'For more advanced optimization, visit <strong><a href="http://www.marketingpilgrim.com/" target="_blank">Marketing Pilgrim</a></strong>.';
+			break;
+
+		case 'mgray':
+			$seo_author = '<a href="http://www.wolf-howl.com/" target="_blank">Michael Gray</a>';
+			$seo_site = 'For more advanced optimization, visit <strong><a href="http://www.wolf-howl.com/" target="_blank">Graywolf\'s SEO blog</a></strong>.';
+			break;
+
+		case 'rfishkin':
+			$seo_author = '<a href="http://www.seomoz.org/team/randfish" target="_blank">Rand Fishkin</a>';
+			$seo_site = 'For more advanced optimization, visit <strong><a href="http://www.seomoz.org/" target="_blank">SEOmoz</a></strong>.';
 			break;
 
 		case 'sspencer':
@@ -61,42 +101,129 @@ $Form->begin_fieldset( T_('SEO Presets') );
 	}
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Canonical URL control').get_manual_link('canonical_url_control') );
-	$Form->checkbox( 'canonical_item_urls', $edited_Blog->get_setting( 'canonical_item_urls' ), T_('Posts / Pages'), T_('301 redirect to canonical URL') );
-	$Form->checkbox( 'canonical_cat_urls', $edited_Blog->get_setting( 'canonical_cat_urls' ), T_('Categories'), T_('301 redirect to canonical URL') );
-$Form->end_fieldset();
-
-$Form->begin_fieldset( T_('Indexing of content pages') );
+$Form->begin_fieldset( T_('Main page / post list').get_manual_link('main_page_seo') );
 	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Default blog page'), T_('META NOINDEX') );
 	$Form->checkbox( 'paged_noindex', $edited_Blog->get_setting( 'paged_noindex' ), T_('"Next" blog pages'), T_('META NOINDEX').' - '.T_('Page 2,3,4...') );
 	$Form->checkbox( 'paged_nofollowto', $edited_Blog->get_setting( 'paged_nofollowto' ), '', T_('NOFOLLOW on links to').' '.T_('Page 2,3,4...') );
-	$Form->checkbox( 'archive_noindex', $edited_Blog->get_setting( 'archive_noindex' ), T_('"By date" archive pages'), T_('META NOINDEX') );
-	$Form->checkbox( 'archive_nofollowto', $edited_Blog->get_setting( 'archive_nofollowto' ), '', T_('NOFOLLOW on links to').' '.T_('date archives') );
-	$Form->checkbox( 'chapter_noindex', $edited_Blog->get_setting( 'chapter_noindex' ), T_('Category pages'), T_('META NOINDEX') );
-	$Form->checkbox( 'tag_noindex', $edited_Blog->get_setting( 'tag_noindex' ), T_('Tag pages'), T_('META NOINDEX') );
-	$Form->checkbox( 'filtered_noindex', $edited_Blog->get_setting( 'filtered_noindex' ), T_('Other filtered pages'), T_('META NOINDEX').' - '.T_('Keyword searched, etc.') );
-$Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Indexing of special feature pages') );
-	$Form->checkbox( 'arcdir_noindex', $edited_Blog->get_setting( 'arcdir_noindex' ), T_('Archive directory'), T_('META NOINDEX') );
-	$Form->checkbox( 'catdir_noindex', $edited_Blog->get_setting( 'catdir_noindex' ), T_('Category directory'), T_('META NOINDEX') );
-	$Form->checkbox( 'feedback-popup_noindex', $edited_Blog->get_setting( 'feedback-popup_noindex' ), T_('Comment popups'), T_('META NOINDEX') );
-	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), T_('Contact forms'), T_('META NOINDEX') );
-	$Form->checkbox( 'special_noindex', $edited_Blog->get_setting( 'special_noindex' ), T_('Other special pages'), T_('META NOINDEX').' - '.T_('User profile form, etc.') );
-$Form->end_fieldset();
-
-$Form->begin_fieldset( T_('Internal link flows') );
-	$Form->radio( 'permalinks', $edited_Blog->get_setting('permalinks'), array(
-			  array( 'single', T_('Link to single post') ),
-			  array( 'archive', T_('Link to post in archive') ),
-			  array( 'subchap', T_('Link to post in sub-category') ),
-			), T_('Permanent links'), true );
 	$Form->radio( 'title_link_type', $edited_Blog->get_setting( 'title_link_type' ), array(
 			  array( 'permalink', T_('Link to the permanent url of the post') ),
 			  array( 'linkto_url', T_('Link to the "link to URL" specified in the post (if any)') ),
 			  array( 'none', T_('No links on titles') ),
 			), T_('Post titles'), true );
+	// TODO: checkbox display "permalink" separately from the title
+ 	$Form->radio( 'permalinks', $edited_Blog->get_setting('permalinks'), array(
+			  array( 'single', T_('Link to single post') ),
+			  array( 'archive', T_('Link to post in archive') ),
+			  array( 'subchap', T_('Link to post in sub-category') ),
+			), T_('Permalinks'), true );
+$Form->end_fieldset();
 
+
+$Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_link('single_post_pages_seo') );
+
+	$Form->radio( 'single_links', $edited_Blog->get_setting('single_links'),
+		array(
+			  array( 'param_num', T_('Use param: post ID'), T_('E-g: ')
+			  				.url_add_param( $blogurl, '<strong>p=123&amp;more=1</strong>' ) ),
+			  array( 'param_title', T_('Use param: post title'), T_('E-g: ')
+			  				.url_add_param( $blogurl, '<strong>title=post-title&amp;more=1</strong>' ) ),
+				array( 'short', T_('Use extra-path: post title'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/post-title</strong>' ) ),
+				array( 'y', T_('Use extra-path: year'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/2006/post-title</strong>' ) ),
+				array( 'ym', T_('Use extra-path: year & month'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/2006/12/post-title</strong>' ) ),
+				array( 'ymd', T_('Use extra-path: year, month & day'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/2006/12/31/post-title</strong>' ) ),
+				array( 'subchap', T_('Use extra-path: sub-category'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/subcat/post-title</strong>' ) ),
+				array( 'chapters', T_('Use extra-path: category path'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/cat/subcat/post-title</strong>' ) ),
+			), T_('Permalink scheme'), true,
+			T_('For example, single post links are used when viewing comments for a post. May be used for permalinks - see below.') );
+			// fp> TODO: check where we really need to force single and where we could use any permalink
+
+	$Form->checkbox( 'canonical_item_urls', $edited_Blog->get_setting( 'canonical_item_urls' ),
+			T_('Make canoncial'), T_('301 redirect to canonical URL') );
+
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_seo') );
+
+	$Form->radio( 'archive_links', $edited_Blog->get_setting('archive_links'),
+		array(
+				array( 'param', T_('Use param'), T_('E-g: ')
+								.url_add_param( $blogurl, '<strong>m=20071231</strong>' ) ),
+				array( 'extrapath', T_('Use extra-path'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/2007/12/31/</strong>' ) ),
+			), T_('Date archive URLs'), true );
+
+	$Form->checkbox( 'archive_noindex', $edited_Blog->get_setting( 'archive_noindex' ), T_('Indexing'), T_('META NOINDEX') );
+	$Form->checkbox( 'archive_nofollowto', $edited_Blog->get_setting( 'archive_nofollowto' ), T_('Follow TO'), T_('NOFOLLOW on links to').' '.T_('date archives') );
+
+	$Form->text( 'archive_posts_per_page', $edited_Blog->get_setting('archive_posts_per_page'), 4, T_('Posts/Days per page'),
+								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
+
+	$Form->checkbox( 'arcdir_noindex', $edited_Blog->get_setting( 'arcdir_noindex' ), T_('Archive directory'), T_('META NOINDEX') );
+
+	$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo') );
+
+	$Form->radio( 'chapter_links', $edited_Blog->get_setting('chapter_links'),
+		array(
+				array( 'param_num', T_('Use param: cat ID'), T_('E-g: ')
+								.url_add_param( $blogurl, '<strong>cat=123</strong>' ),'', 'onclick="show_hide_chapter_prefix(this);"'),
+				array( 'subchap', T_('Use extra-path: sub-category'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/subcat/</strong>' ), '', 'onclick="show_hide_chapter_prefix(this);"' ),
+				array( 'chapters', T_('Use extra-path: category path'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/cat/subcat/</strong>' ), '', 'onclick="show_hide_chapter_prefix(this);"' ),
+			), T_('Category URLs'), true );
+
+		echo '<div id="category_prefix_container">';
+			$Form->text_input( 'category_prefix', $edited_Blog->get_setting( 'category_prefix' ), 30, T_('Prefix'),
+														T_('An optional prefix to be added to the URLs of the categories'),
+														array('maxlength' => 120) );
+		echo '</div>';
+		if( $edited_Blog->get_setting( 'chapter_links' ) == 'param_num' )
+		{ ?>
+		<script type="text/javascript">
+			<!--
+			var fldset = document.getElementById( 'category_prefix_container' );
+			fldset.style.display = 'none';
+			//-->
+		</script>
+		<?php
+		}
+
+	$Form->checkbox( 'canonical_cat_urls', $edited_Blog->get_setting( 'canonical_cat_urls' ), T_('Make canonical'), T_('301 redirect to canonical URL') );
+
+	$Form->checkbox( 'chapter_noindex', $edited_Blog->get_setting( 'chapter_noindex' ), T_('Indexing'), T_('META NOINDEX') );
+
+	$Form->text( 'chapter_posts_per_page', $edited_Blog->get_setting('chapter_posts_per_page'), 4, T_('Posts/Days per page'),
+								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
+
+	$Form->checkbox( 'catdir_noindex', $edited_Blog->get_setting( 'catdir_noindex' ), T_('Category directory'), T_('META NOINDEX') );
+
+	$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo') );
+
+	$Form->checkbox( 'tag_noindex', $edited_Blog->get_setting( 'tag_noindex' ), T_('Indexing'), T_('META NOINDEX') );
+
+	$Form->text( 'tag_posts_per_page', $edited_Blog->get_setting('tag_posts_per_page'), 4, T_('Posts/Days per page'),
+								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
+
+	$Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
+	$Form->checkbox( 'filtered_noindex', $edited_Blog->get_setting( 'filtered_noindex' ), T_('Other filtered posts pages'), T_('META NOINDEX').' - '.T_('Keyword searched, etc.') );
+
+	$Form->checkbox( 'feedback-popup_noindex', $edited_Blog->get_setting( 'feedback-popup_noindex' ), T_('Comment popups'), T_('META NOINDEX') );
+	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), T_('Contact forms'), T_('META NOINDEX') );
+	$Form->checkbox( 'special_noindex', $edited_Blog->get_setting( 'special_noindex' ), T_('Other special pages'), T_('META NOINDEX').' - '.T_('User profile form, etc.') );
 $Form->end_fieldset();
 
 
@@ -107,6 +234,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.7  2007/12/27 01:58:48  fplanque
+ * additional SEO
+ *
  * Revision 1.6  2007/11/29 21:23:35  fplanque
  * Changed wording.
  *

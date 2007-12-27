@@ -246,6 +246,7 @@ class Blog extends DataObject
 		}
 	}
 
+
 	/**
 	 * Load data from Request form fields.
 	 *
@@ -726,6 +727,168 @@ class Blog extends DataObject
 		// For case relative and absolute:
 		return preg_replace( '¤^(.+)/[^/]$¤', '$1/', $url );
 
+	}
+
+
+  /**
+	 * Load presets
+	 *
+	 * @param string
+	 */
+	function load_presets( $set_name )
+	{
+		switch( $set_name )
+		{
+			case 'awall':
+				$this->set_setting( 'archive_links', 'extrapath' );
+				$this->set_setting( 'archive_posts_per_page', NULL );
+				$this->set_setting( 'chapter_links', 'chapters' );
+				$this->set_setting( 'chapter_posts_per_page', NULL );
+				$this->set_setting( 'tag_posts_per_page', NULL );
+				$this->set_setting( 'single_links', 'ymd' );
+
+				$this->set_setting( 'canonical_item_urls', 1 );
+				$this->set_setting( 'canonical_cat_urls', 1 );
+
+				$this->set_setting( 'default_noindex', 0 );
+				$this->set_setting( 'paged_noindex', 1 );
+				$this->set_setting( 'paged_nofollowto', 0 );
+				$this->set_setting( 'archive_noindex', 1 );
+				$this->set_setting( 'archive_nofollowto', 0 );
+				$this->set_setting( 'chapter_noindex', 0 );
+				$this->set_setting( 'tag_noindex', 0 );
+				$this->set_setting( 'filtered_noindex', 1 ); // temporary
+
+				$this->set_setting( 'arcdir_noindex', 1 );
+				$this->set_setting( 'catdir_noindex', 0 );
+				$this->set_setting( 'feedback-popup_noindex', 1 );
+				$this->set_setting( 'msgform_noindex', 1 );
+				$this->set_setting( 'special_noindex', 1 ); // temporary
+
+				$this->set_setting( 'permalinks', 'single' );
+				$this->set_setting( 'title_link_type', 'permalink' );
+				break;
+
+			case 'abeal':
+				$this->set_setting( 'archive_links', 'extrapath' );
+				$this->set_setting( 'archive_posts_per_page', 10 );
+				$this->set_setting( 'chapter_links', 'subchap' );
+				$this->set_setting( 'chapter_posts_per_page', 10 );
+				$this->set_setting( 'tag_posts_per_page', 10 );
+				$this->set_setting( 'single_links', 'short' );
+
+				$this->set_setting( 'canonical_item_urls', 1 );
+				$this->set_setting( 'canonical_cat_urls', 1 );
+
+				$this->set_setting( 'default_noindex', 0 );
+				$this->set_setting( 'paged_noindex', 1 );
+				$this->set_setting( 'paged_nofollowto', 0 );
+				$this->set_setting( 'archive_noindex', 1 );
+				$this->set_setting( 'archive_nofollowto', 0 );
+				$this->set_setting( 'chapter_noindex', 1 );
+				$this->set_setting( 'tag_noindex', 1 );
+				$this->set_setting( 'filtered_noindex', 1 ); // temporary
+
+				$this->set_setting( 'arcdir_noindex', 0 );
+				$this->set_setting( 'catdir_noindex', 0 );
+				$this->set_setting( 'feedback-popup_noindex', 0 );
+				$this->set_setting( 'msgform_noindex', 1 );
+				$this->set_setting( 'special_noindex', 1 ); // temporary
+
+				$this->set_setting( 'permalinks', 'single' );
+				$this->set_setting( 'title_link_type', 'permalink' );
+				break;
+
+			case 'mgray':
+				$this->set_setting( 'archive_links', 'extrapath' );
+				$this->set_setting( 'archive_posts_per_page', 20 );
+				$this->set_setting( 'chapter_links', 'chapters' );
+				$this->set_setting( 'chapter_posts_per_page', 20 );
+				$this->set_setting( 'tag_posts_per_page', 20 );
+				$this->set_setting( 'single_links', 'chapters' );
+
+				$this->set_setting( 'canonical_item_urls', 1 );
+				$this->set_setting( 'canonical_cat_urls', 1 );
+
+				$this->set_setting( 'default_noindex', 0 );
+				$this->set_setting( 'paged_noindex', 1 );
+				$this->set_setting( 'paged_nofollowto', 0 );
+				$this->set_setting( 'archive_noindex', 1 );
+				$this->set_setting( 'archive_nofollowto', 0 );
+				$this->set_setting( 'chapter_noindex', 0 );
+				$this->set_setting( 'tag_noindex', 1 );
+				$this->set_setting( 'filtered_noindex', 1 ); // temporary
+
+				$this->set_setting( 'arcdir_noindex', 1 );
+				$this->set_setting( 'catdir_noindex', 0 );
+				$this->set_setting( 'feedback-popup_noindex', 1 );
+				$this->set_setting( 'msgform_noindex', 1 );
+				$this->set_setting( 'special_noindex', 1 ); // temporary
+
+				$this->set_setting( 'permalinks', 'single' );
+				$this->set_setting( 'title_link_type', 'permalink' );
+				break;
+
+			case 'rfishkin':
+				$this->set_setting( 'archive_links', 'extrapath' );
+				$this->set_setting( 'archive_posts_per_page', 50 );
+				$this->set_setting( 'chapter_links', 'subchap' );
+				$this->set_setting( 'chapter_posts_per_page', 50 );
+				$this->set_setting( 'tag_posts_per_page', 50 );
+				$this->set_setting( 'single_links', 'short' );
+
+				$this->set_setting( 'canonical_item_urls', 1 );
+				$this->set_setting( 'canonical_cat_urls', 1 );
+
+				$this->set_setting( 'default_noindex', 0 );
+				$this->set_setting( 'paged_noindex', 1 );
+				$this->set_setting( 'paged_nofollowto', 1 );
+				$this->set_setting( 'archive_noindex', 1 );
+				$this->set_setting( 'archive_nofollowto', 1 );
+				$this->set_setting( 'chapter_noindex', 0 );
+				$this->set_setting( 'tag_noindex', 0 );
+				$this->set_setting( 'filtered_noindex', 1 ); // temporary
+
+				$this->set_setting( 'arcdir_noindex', 1 );
+				$this->set_setting( 'catdir_noindex', 1 );
+				$this->set_setting( 'feedback-popup_noindex', 0 );
+				$this->set_setting( 'msgform_noindex', 1 );
+				$this->set_setting( 'special_noindex', 1 ); // temporary
+
+				$this->set_setting( 'permalinks', 'single' );
+				$this->set_setting( 'title_link_type', 'permalink' );
+				break;
+
+			case 'sspencer':
+				$this->set_setting( 'archive_links', 'extrapath' );
+				$this->set_setting( 'archive_posts_per_page', NULL );
+				$this->set_setting( 'chapter_links', 'chapters' );
+				$this->set_setting( 'chapter_posts_per_page', NULL );
+				$this->set_setting( 'tag_posts_per_page', NULL );
+				$this->set_setting( 'single_links', 'chapters' );
+
+				$this->set_setting( 'canonical_item_urls', 1 );
+				$this->set_setting( 'canonical_cat_urls', 1 );
+
+				$this->set_setting( 'default_noindex', 0 );
+				$this->set_setting( 'paged_noindex', 1 );
+				$this->set_setting( 'paged_nofollowto', 1 );
+				$this->set_setting( 'archive_noindex', 1 );
+				$this->set_setting( 'archive_nofollowto', 1 );
+				$this->set_setting( 'chapter_noindex', 0 );
+				$this->set_setting( 'tag_noindex', 0 );
+				$this->set_setting( 'filtered_noindex', 1 ); // temporary
+
+				$this->set_setting( 'arcdir_noindex', 1 );
+				$this->set_setting( 'catdir_noindex', 0 );
+				$this->set_setting( 'feedback-popup_noindex', 1 );
+				$this->set_setting( 'msgform_noindex', 1 );
+				$this->set_setting( 'special_noindex', 1 ); // temporary
+
+				$this->set_setting( 'permalinks', 'single' );
+				$this->set_setting( 'title_link_type', 'permalink' );
+				break;
+		}
 	}
 
 
@@ -1592,6 +1755,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2007/12/27 01:58:48  fplanque
+ * additional SEO
+ *
  * Revision 1.21  2007/11/27 02:37:09  blueyed
  * Use canonical path when checking if path is inside of media_path!
  *

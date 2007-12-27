@@ -104,7 +104,7 @@ else
 	$blog_siteurl_absolute = 'http://';
 }
 
-$Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']' );
+$Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']'.get_manual_link('blog_url_settings') );
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// Permission to edit advanced admin settings
@@ -181,36 +181,10 @@ $Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']' );
 
 	}
 
-	// URL Preview 'always displayed)
+	// URL Preview (always displayed)
 	$blogurl = $edited_Blog->gen_blogurl();
 	$Form->info( T_('URL preview'), '<span id="urlpreview">'.$blogurl.'</span>' );
 
-$Form->end_fieldset();
-
-
-$Form->begin_fieldset( T_('URL Presets') );
-	$Form->info_field( T_('Available presets'),
-													'<a href="?ctrl=coll_settings&amp;tab=urls&amp;blog='.$edited_Blog->ID.'&amp;preset=awall">Aaron Wall</a>'
-											.' | <a href="?ctrl=coll_settings&amp;tab=urls&amp;blog='.$edited_Blog->ID.'&amp;preset=sspencer">Stephan Spencer</a>' );
-	switch( $preset )
-	{
-		case 'awall':
-			$seo_author = '<a href="http://www.seobook.com/" target="_blank">Aaron Wall</a>';
-			$seo_site = 'For more optimization tips, visit <strong><a href="http://www.seobook.com/" target="_blank">SEO Book</a></strong>.';
-			break;
-
-		case 'sspencer':
-			$seo_author = '<a href="http://www.stephanspencer.com/" target="_blank">Stephan Spencer</a>';
-			$seo_site = 'For more advanced optimization, visit <strong><a href="http://www.netconcepts.com/" target="_blank">NetConcepts</a></strong>.';
-			break;
-	}
-
-	if( !empty($seo_author) )
-	{
-	 	$Form->info_field( T_('Selected presets'),
-			sprintf( T_('You can review the URL settings recommended by <strong>%s</strong> below. Click the "Save!" button to apply these settings.'),
-								$seo_author ).' '.$seo_site );
-	}
 $Form->end_fieldset();
 
 
@@ -218,14 +192,11 @@ $Form->begin_fieldset( T_('Date archive URLs') );
 
 	$Form->radio( 'archive_links', $edited_Blog->get_setting('archive_links'),
 		array(
-				array( 'param', T_('Use param'), T_('Archive links will look like ')
-								.url_add_param( $blogurl, 'm=20071231' ) ),
-				array( 'extrapath', T_('Use extra-path'), T_('Archive links will look like ' )
-								.url_add_tail( $blogurl, '/2007/12/31/' ) ),
-			), T_('Date archive links'), true );
-
-	$Form->text( 'archive_posts_per_page', $edited_Blog->get_setting('archive_posts_per_page'), 4, T_('Posts/Days per page'),
-								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
+				array( 'param', T_('Use param'), T_('E-g: ')
+								.url_add_param( $blogurl, '<strong>m=20071231</strong>' ) ),
+				array( 'extrapath', T_('Use extra-path'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/2007/12/31/</strong>' ) ),
+			), T_('Date archive URLs'), true );
 
 $Form->end_fieldset();
 
@@ -234,13 +205,13 @@ $Form->begin_fieldset( T_('Category URLs') );
 
 	$Form->radio( 'chapter_links', $edited_Blog->get_setting('chapter_links'),
 		array(
-				array( 'param_num', T_('Use param: cat ID'), T_('Category links will look like ')
-								.url_add_param( $blogurl, 'cat=123' ),'', 'onclick="show_hide_chapter_prefix(this);"'),
-				array( 'subchap', T_('Use extra-path: sub-category'), T_('Category links will look like ' )
-								.url_add_tail( $blogurl, '/subcat/' ), '', 'onclick="show_hide_chapter_prefix(this);"' ),
-				array( 'chapters', T_('Use extra-path: category path'), T_('Category links will look like ' )
-								.url_add_tail( $blogurl, '/cat/subcat/' ), '', 'onclick="show_hide_chapter_prefix(this);"' ),
-			), T_('Category links'), true );
+				array( 'param_num', T_('Use param: cat ID'), T_('E-g: ')
+								.url_add_param( $blogurl, '<strong>cat=123</strong>' ),'', 'onclick="show_hide_chapter_prefix(this);"'),
+				array( 'subchap', T_('Use extra-path: sub-category'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/subcat/</strong>' ), '', 'onclick="show_hide_chapter_prefix(this);"' ),
+				array( 'chapters', T_('Use extra-path: category path'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/cat/subcat/</strong>' ), '', 'onclick="show_hide_chapter_prefix(this);"' ),
+			), T_('Category URLs'), true );
 
 
 		echo '<div id="category_prefix_container">';
@@ -259,16 +230,6 @@ $Form->begin_fieldset( T_('Category URLs') );
 		<?php
 		}
 
-	$Form->text( 'chapter_posts_per_page', $edited_Blog->get_setting('chapter_posts_per_page'), 4, T_('Posts/Days per page'),
-								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
-
-$Form->end_fieldset();
-
-
-$Form->begin_fieldset( T_('Tag URLs') );
-
-	$Form->text( 'tag_posts_per_page', $edited_Blog->get_setting('tag_posts_per_page'), 4, T_('Posts/Days per page'),
-								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
 
 $Form->end_fieldset();
 
@@ -277,15 +238,23 @@ $Form->begin_fieldset( T_('Single post URLs') );
 
 	$Form->radio( 'single_links', $edited_Blog->get_setting('single_links'),
 		array(
-			  array( 'param_num', T_('Use param: post ID'), T_('Links will look like: \'stub?p=123&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1\'') ),
-			  array( 'param_title', T_('Use param: post title'), T_('Links will look like: \'stub?title=post-title&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1\'') ),
-				array( 'short', T_('Use extra-path: post title'), T_('Links will look like \'stub/post-title\'' ) ),
-				array( 'y', T_('Use extra-path: year'), T_('Links will look like \'stub/2006/post-title\'' ) ),
-				array( 'ym', T_('Use extra-path: year & month'), T_('Links will look like \'stub/2006/12/post-title\'' ) ),
-				array( 'ymd', T_('Use extra-path: year, month & day'), T_('Links will look like \'stub/2006/12/31/post-title\'' ) ),
-				array( 'subchap', T_('Use extra-path: sub-category'), T_('Links will look like \'stub/subcat/post-title\'' ) ),
-				array( 'chapters', T_('Use extra-path: category path'), T_('Links will look like \'stub/cat/subcat/post-title\'' ) ),
-			), T_('Single post links'), true,
+			  array( 'param_num', T_('Use param: post ID'), T_('E-g: ')
+			  				.url_add_param( $blogurl, '<strong>p=123&amp;more=1</strong>' ) ),
+			  array( 'param_title', T_('Use param: post title'), T_('E-g: ')
+			  				.url_add_param( $blogurl, '<strong>title=post-title&amp;more=1</strong>' ) ),
+				array( 'short', T_('Use extra-path: post title'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/post-title</strong>' ) ),
+				array( 'y', T_('Use extra-path: year'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/2006/post-title</strong>' ) ),
+				array( 'ym', T_('Use extra-path: year & month'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/2006/12/post-title</strong>' ) ),
+				array( 'ymd', T_('Use extra-path: year, month & day'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/2006/12/31/post-title</strong>' ) ),
+				array( 'subchap', T_('Use extra-path: sub-category'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/subcat/post-title</strong>' ) ),
+				array( 'chapters', T_('Use extra-path: category path'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/cat/subcat/post-title</strong>' ) ),
+			), T_('Single post URLs'), true,
 			T_('For example, single post links are used when viewing comments for a post. May be used for permalinks - see below.') );
 			// fp> TODO: check where we really need to force single and where we could use any permalink
 
@@ -299,6 +268,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.13  2007/12/27 01:58:48  fplanque
+ * additional SEO
+ *
  * Revision 1.12  2007/11/29 21:23:35  fplanque
  * Changed wording.
  *

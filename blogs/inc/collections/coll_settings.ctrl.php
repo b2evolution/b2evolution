@@ -92,83 +92,8 @@ switch( $action )
 
 		param( 'preset', 'string', '' );
 
-		switch( $tab )
-		{
-			case 'urls':
-				switch( $preset )
-				{
-					case 'awall':
-						$edited_Blog->set_setting( 'archive_links', 'extrapath' );
-						$edited_Blog->set_setting( 'archive_posts_per_page', NULL );
-						$edited_Blog->set_setting( 'chapter_links', 'chapters' );
-						$edited_Blog->set_setting( 'chapter_posts_per_page', NULL );
-						$edited_Blog->set_setting( 'tag_posts_per_page', NULL );
-						$edited_Blog->set_setting( 'single_links', 'ymd' );
-						break;
+		$edited_Blog->load_presets( $preset );
 
-					case 'sspencer':
-						$edited_Blog->set_setting( 'archive_links', 'extrapath' );
-						$edited_Blog->set_setting( 'archive_posts_per_page', NULL );
-						$edited_Blog->set_setting( 'chapter_links', 'chapters' );
-						$edited_Blog->set_setting( 'chapter_posts_per_page', NULL );
-						$edited_Blog->set_setting( 'tag_posts_per_page', NULL );
-						$edited_Blog->set_setting( 'single_links', 'chapters' );
-						break;
-				}
-				break;
-
-			case 'seo':
-				switch( $preset )
-				{
-					case 'awall':
-						$edited_Blog->set_setting( 'canonical_item_urls', 1 );
-						$edited_Blog->set_setting( 'canonical_cat_urls', 1 );
-
-						$edited_Blog->set_setting( 'default_noindex', 0 );
-						$edited_Blog->set_setting( 'paged_noindex', 1 );
-						$edited_Blog->set_setting( 'paged_nofollowto', 0 );
-						$edited_Blog->set_setting( 'archive_noindex', 1 );
-						$edited_Blog->set_setting( 'archive_nofollowto', 0 );
-						$edited_Blog->set_setting( 'chapter_noindex', 0 );
-						$edited_Blog->set_setting( 'tag_noindex', 0 );
-						$edited_Blog->set_setting( 'filtered_noindex', 1 ); // temporary
-
-						$edited_Blog->set_setting( 'arcdir_noindex', 1 );
-						$edited_Blog->set_setting( 'catdir_noindex', 0 );
-						$edited_Blog->set_setting( 'feedback-popup_noindex', 1 );
-						$edited_Blog->set_setting( 'msgform_noindex', 1 );
-						$edited_Blog->set_setting( 'special_noindex', 1 ); // temporary
-
-						$edited_Blog->set_setting( 'permalinks', 'single' );
-						$edited_Blog->set_setting( 'title_link_type', 'permalink' );
-						break;
-
-					case 'sspencer':
-						$edited_Blog->set_setting( 'canonical_item_urls', 1 );
-						$edited_Blog->set_setting( 'canonical_cat_urls', 1 );
-
-						$edited_Blog->set_setting( 'default_noindex', 0 );
-						$edited_Blog->set_setting( 'paged_noindex', 1 );
-						$edited_Blog->set_setting( 'paged_nofollowto', 1 );
-						$edited_Blog->set_setting( 'archive_noindex', 1 );
-						$edited_Blog->set_setting( 'archive_nofollowto', 1 );
-						$edited_Blog->set_setting( 'chapter_noindex', 0 );
-						$edited_Blog->set_setting( 'tag_noindex', 0 );
-						$edited_Blog->set_setting( 'filtered_noindex', 1 ); // temporary
-
-						$edited_Blog->set_setting( 'arcdir_noindex', 1 );
-						$edited_Blog->set_setting( 'catdir_noindex', 0 );
-						$edited_Blog->set_setting( 'feedback-popup_noindex', 1 );
-						$edited_Blog->set_setting( 'msgform_noindex', 1 );
-						$edited_Blog->set_setting( 'special_noindex', 1 ); // temporary
-
-						$edited_Blog->set_setting( 'permalinks', 'single' );
-						$edited_Blog->set_setting( 'title_link_type', 'permalink' );
-						break;
-				}
-				break;
-
-		}
 		break;
 
 	case 'update':
@@ -207,7 +132,7 @@ switch( $action )
 				if( $edited_Blog->load_from_Request( array() ) )
 				{ // Commit update to the DB:
 					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog skin has been changed.') 
+					$Messages->add( T_('The blog skin has been changed.')
 										.' <a href="'.$admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
 					header_redirect( $edited_Blog->gen_blogurl() );
 				}
@@ -303,6 +228,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2007/12/27 01:58:49  fplanque
+ * additional SEO
+ *
  * Revision 1.8  2007/11/25 18:20:38  fplanque
  * additional SEO settings
  *
