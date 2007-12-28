@@ -367,7 +367,7 @@ class Comment extends DataObject
 			if( strlen( $this->author_url ) <= 10 ) $makelink = false;
 			if( $after == '#' ) $after = ' ['.T_('Visitor').']';
 
-			$r = $this->get_author_url_link( $this->dget( 'author', $format ), $before_user, $after_user, $makelink );
+			$r = $this->get_author_url_link( $this->dget( 'author', $format ), $before, $after, $makelink );
 		}
 
 		$Plugins->trigger_event( 'FilterCommentAuthor', array( 'data' => & $r, 'makelink' => $makelink, 'Comment' => $this ) );
@@ -1309,6 +1309,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2007/12/28 13:24:29  fplanque
+ * bugfix
+ *
  * Revision 1.8  2007/12/26 20:04:26  fplanque
  * fixed missing nofollow handling
  *
