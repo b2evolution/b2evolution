@@ -357,17 +357,37 @@ class Comment extends DataObject
 
 		if( $this->get_author_User() )
 		{ // Author is a user
-			if( strlen( $this->author_User->url ) <= 10 ) $makelink = false;
+			if( strlen( $this->author_User->url ) <= 10 )
+			{
+				$makelink = false;
+			}
 			if( $after_user == '#' ) $after_user = ' ['.T_('Member').']';
 
-			$r = $this->get_author_url_link( format_to_output( $this->author_User->get_preferred_name(), $format ), $before_user, $after_user, $makelink );
+			$author_name = format_to_output( $this->author_User->get_preferred_name(), $format );
+
+			$before = $before_user;
+			$after = $after_user;
+
 		}
 		else
 		{ // Display info recorded at edit time:
-			if( strlen( $this->author_url ) <= 10 ) $makelink = false;
+			if( strlen( $this->author_url ) <= 10 )
+			{
+				$makelink = false;
+			}
 			if( $after == '#' ) $after = ' ['.T_('Visitor').']';
 
-			$r = $this->get_author_url_link( $this->dget( 'author', $format ), $before, $after, $makelink );
+			$author_name = $this->dget( 'author', $format );
+
+		}
+
+		if( $makelink )
+		{	// Make a link:
+			$r = $this->get_author_url_link( $author_name, $before, $after, true );
+		}
+		else
+		{	// Display the name: (NOTE: get_author_url_link( with nolink option ) would NOT handle this correctly when url is empty
+			$r = $before.$author_name.$after;
 		}
 
 		$Plugins->trigger_event( 'FilterCommentAuthor', array( 'data' => & $r, 'makelink' => $makelink, 'Comment' => $this ) );
@@ -1309,6 +1329,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2007/12/28 13:45:33  fplanque
+ * bugfix again
+ *
  * Revision 1.9  2007/12/28 13:24:29  fplanque
  * bugfix
  *
