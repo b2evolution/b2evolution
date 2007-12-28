@@ -356,6 +356,15 @@ function install_basic_widgets()
 							 SELECT blog_ID, "Sidebar", 8, "core", "coll_xml_feeds"
 							   FROM T_blogs' );
 
+	// Add Tag Cloud to all blog Sidebar2:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
+							 SELECT blog_ID, "Sidebar 2", 1, "core", "free_html", \'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:77:"This is the "Sidebar 2" container. You can place any widget you like in here.";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\'
+							   FROM T_blogs' );
+
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Sidebar 2", 2, "core", "coll_post_list"
+							   FROM T_blogs' );
+
 	echo "OK.<br />\n";
 }
 
@@ -555,6 +564,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.41  2007/12/28 00:13:02  fplanque
+ * no message
+ *
  * Revision 1.40  2007/12/27 23:56:07  fplanque
  * Better out of the box experience
  *

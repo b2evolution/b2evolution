@@ -24,13 +24,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			) );
 		?>
 
-		Powered by <a href="http://b2evolution.net/" title="b2evolution home" target="_blank">b2evolution</a>
+		<a href="http://www.evocamp.com/" target="_blank">evoCamp skin</a>
 
-		+ <a href="http://www.evocamp.com/" target="_blank">evoCamp skin</a>
-
-		<br />
-
-		Credits: <a href="http://www.solostream.com" target="_blank">Blog Design</a>
+		| Credits: <a href="http://www.solostream.com" target="_blank">Blog Design</a>
 		<?php
 		// Display additional credits (see /conf/):
 		// If you can add your own credits without removing the defaults, you'll be very cool :))
