@@ -386,27 +386,12 @@ function create_demo_contents()
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Danny', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://brendoman.com/dbc', 'disabled', array() );
-
-	// Insert a post into linkblog:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Yabba', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-UK', '', 'http://www.innervisions.org.uk/babbles/', 'disabled', array() );
-
-	// Insert a post into linkblog:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Halton', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://browsermonkey.com/', 'disabled', array() );
-
-	// Insert a post into linkblog:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
 	$edited_Item->insert( 1, 'Topanga', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://www.tenderfeelings.be', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'EdB', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://wonderwinds.com/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Danny', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://brendoman.com/dbc', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -416,22 +401,37 @@ function create_demo_contents()
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
+	$edited_Item->insert( 1, 'Yabba', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-UK', '', 'http://www.innervisions.org.uk/babbles/', 'disabled', array() );
+
+	// Insert a post into linkblog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, 'EdB', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://wonderwinds.com/', 'disabled', array() );
+
+	// Insert a post into linkblog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
 	$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 'http://fplanque.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'b2evolution home', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-EU', '', 'http://b2evolution.net/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Blog news', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://b2evolution.net/news.php', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'User manual', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-EU', '', 'http://manual.b2evolution.net/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Webhosting', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://b2evolution.net/web-hosting/blog/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Support forums', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-EU', '', 'http://forums.b2evolution.net/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Manual', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://manual.b2evolution.net/', 'disabled', array() );
+
+	// Insert a post into linkblog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, 'Support', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://forums.b2evolution.net/', 'disabled', array() );
 
 
 
@@ -643,6 +643,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.232  2007/12/28 21:34:52  fplanque
+ * no message
+ *
  * Revision 1.231  2007/12/27 23:56:06  fplanque
  * Better out of the box experience
  *
