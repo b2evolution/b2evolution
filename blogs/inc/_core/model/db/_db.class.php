@@ -164,6 +164,7 @@ class DB
 	 *
 	 * Recommended settings: ' ENGINE=InnoDB '
 	 * Development settings: ' ENGINE=InnoDB DEFAULT CHARSET=utf8 '
+	 * @todo dh> If the query itself uses already e.g. "CHARACTER SET latin1" it should not get overridden..
 	 * @var string
 	 */
 	var $table_options = '';
@@ -679,6 +680,7 @@ class DB
 		{ // No aliases, but table_options:
 			if( preg_match( '#^ \s* create \s* table \s #ix', $query) )
 			{ // Query is a table creation, we add table options:
+				$query = preg_replace( '~;\s*$~', '', $query ); // remove any ";" at the end
 				$query .= $this->table_options;
 			}
 		}
@@ -1405,6 +1407,10 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.4  2007/12/28 18:59:26  blueyed
+ * - Fix for table_options and trailing semicolon
+ * - todo about table_options
+ *
  * Revision 1.3  2007/12/09 21:25:22  blueyed
  * doc
  *
