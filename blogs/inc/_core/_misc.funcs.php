@@ -888,7 +888,7 @@ function xmlrpc_logresult( $result, & $message_Log, $log_payload = true )
 	{
 		$message_Log->add( T_('Response').': '.$out, 'success' );
 	}
-	
+
 	return true;
 }
 
@@ -2990,8 +2990,28 @@ function make_rel_links_abs( $s, $host = NULL )
 }
 
 
+/**
+ *
+ */
+function disp_url( $url, $max_length = NULL )
+{
+	if( !empty($max_length) && strlen($url) > $max_length )
+	{
+		$disp_url = htmlspecialchars(substr( $url, 0, $max_length-1 )).'&hellip;';
+	}
+	else
+	{
+		$disp_url = htmlspecialchars($url);
+	}
+	echo '<a href="'.$url.'">'.$disp_url.'</a>';
+}
+
+
 /*
  * $Log$
+ * Revision 1.15  2007/12/29 18:55:32  fplanque
+ * better antispam banning screen
+ *
  * Revision 1.14  2007/12/23 19:43:58  fplanque
  * trans fat reduction :p
  *

@@ -81,7 +81,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 					<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 					<td><?php stats_hit_remote_addr() ?></td>
 					<td><?php echo format_to_output( $row_stats['blog_shortname'], 'htmlbody' ); ?></td>
-					<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
+					<td><?php disp_url( $row_stats['hit_uri'], 50 ); ?></td>
 				</tr>
 				<?php
 				$count++;
@@ -123,6 +123,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 				<th><?php echo T_('Auth. URL') ?></th>
 				<th><?php echo T_('Auth. IP') ?></th>
 				<th><?php echo T_('Content starts with...') ?></th>
+				<th><?php echo T_('Action') ?></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -134,7 +135,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 				<tr class="<?php echo ($count%2 == 1) ? 'odd' : 'even' ?>">
 				<td class="firstcol"><?php echo mysql2date(locale_datefmt().' '.locale_timefmt(), $row_stats['comment_date'] ); ?></td>
 				<td><?php echo $row_stats['comment_author'] ?></a></td>
-				<td><?php echo $row_stats['comment_author_url'] ?></td>
+				<td><?php disp_url( $row_stats['comment_author_url'], 50 ); ?></td>
 				<td><?php echo $row_stats['comment_author_IP'] ?></td>
 				<td><?php
 				$comment_content = strip_tags( $row_stats['comment_content'] );
@@ -148,6 +149,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 					echo $comment_content;
 				}
 				?></td>
+				<td><?php echo action_icon( T_('Edit...'), 'edit', '?ctrl=comments&action=edit&comment_ID='.$row_stats['comment_ID'] ) ?></td>
 				</tr>
 				<?php
 			$count++;
@@ -207,6 +209,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.3  2007/12/29 18:55:32  fplanque
+ * better antispam banning screen
+ *
  * Revision 1.2  2007/11/22 14:16:43  fplanque
  * antispam / banning cleanup
  *
