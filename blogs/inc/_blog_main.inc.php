@@ -384,17 +384,9 @@ if( isset( $skin ) )
 {	// A skin has been requested by folder_name (url or stub):
 
 	// Check validity of requested skin name:
-	if( ereg( '([^-A-Za-z0-9._]|\.\.)', $skin ) )
+	if( preg_match( '~([^-A-Za-z0-9._]|\.\.)~', $skin ) )
 	{
 		debug_die( 'The requested skin name is invalid.' );
-	}
-
-	// Because a lot of bloggers will delete skins, we have to make this fool proof with extra checking:
-	if( !empty( $skin ) && !skin_exists( $skin ) )
-	{ // We want to use a skin, but it doesn't exist!
-		$err_msg = sprintf( T_('The skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file.'),
-			htmlspecialchars($skin), $Blog->dget('shortname'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=display&amp;action=edit&amp;blog='.$Blog->ID.'"' );
-		debug_die( $err_msg );
 	}
 
 	// EXPERIMENTAL:
@@ -409,6 +401,16 @@ else
 	$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
 
 	$skin = $Skin->folder;
+}
+
+// Because a lot of bloggers will delete skins, we have to make this fool proof with extra checking:
+if( !empty( $skin ) && !skin_exists( $skin ) )
+{ // We want to use a skin, but it doesn't exist!
+	$err_msg = sprintf( T_('The skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file.'),
+		htmlspecialchars($skin),
+		$Blog->dget('shortname'),
+		'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$Blog->ID.'"' );
+	debug_die( $err_msg );
 }
 
 
@@ -497,6 +499,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.91  2008/01/04 23:18:11  blueyed
+ * Use preg_match instead of ereg; Move skin-does-not-exist debug_die further down
+ *
  * Revision 1.90  2007/11/29 19:29:22  fplanque
  * normalized skin filenames
  *
