@@ -257,10 +257,9 @@ class auto_p_plugin extends Plugin
 				$new_blocks[$count_new_blocks] = '';
 
 				$line_copy = $line;
-				preg_match( '~^(.*?)(<\s*/\s*(\w+)(\s+[^>]*?)?>)~is', $line_copy, $match );
 
 				while( preg_match( '~^(.*?)(<\s*/\s*(\w+)(\s+[^>]*?)?>)~is', $line_copy, $match )
-					&& ! (preg_match( '~^(.*?)(<\s*'.$match[3].'(\s+[^>]*?(\s*/\s*)?)?>)~is', $new_blocks[$count_new_blocks].$match[1] )) )
+					&& !(preg_match( '~^(.*?)(<\s*'.$match[3].'(\s+[^>]*?(\s*/\s*)?)?>)~is', $new_blocks[$count_new_blocks].$match[1] )) )
 				{ // a closing tag:
 					$new_blocks[$count_new_blocks] .= $match[0];
 					$line_copy = substr($line_copy, strlen($match[0]));
@@ -289,14 +288,15 @@ class auto_p_plugin extends Plugin
 				$looking_for_close_tag = array();
 			}
 
-			if( preg_match( '~^(.*?)(<\s*(\w+)(\s+[^>]*)?(\s*/\s*)?>)~is', $line, $match ) )
+			if( preg_match( '~^(.*?)(<\s*(\w+)(\s+[^>/]*)?(\s*/\s*)?>)~is', $line, $match ) )
 			{ // a opening tag:
 				$tag = $match[3];
 				$pos_after_tag = strlen($match[0]);
-				while( ! empty($match[4]) )
+
+				while( ! empty($match[5]) /* "/" */ )
 				{ // self-closing tag, find next:
 					$tag = false;
-					if( preg_match( '~^(.*?)(<\s*(\w+)(\s+[^>]*)?(\s*/\s*)?>)~is', substr($line, $pos_after_tag), $match ) )
+					if( preg_match( '~^(.*?)(<\s*(\w+)(\s+[^>/]*)?(\s*/\s*)?>)~is', substr($line, $pos_after_tag), $match ) )
 					{
 						$tag = $match[3];
 						$pos_after_tag += strlen($match[0]);
@@ -635,6 +635,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.41  2008/01/04 23:14:20  blueyed
+ * Fix auto_p_plugin to not pee in the middle of some tags
+ *
  * Revision 1.40  2007/07/04 19:59:12  blueyed
  * Auto-P: Do not add BR in html comments, nor wrap it in a P
  *

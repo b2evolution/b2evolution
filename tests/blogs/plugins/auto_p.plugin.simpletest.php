@@ -333,6 +333,9 @@ class AutoPPluginTestCase extends PluginUnitTestCase
 			"<!-- \n\n foo \n\n --><p> bar </p><!-- \n\n foo \n\n -->",
 			$this->render("<!-- \n\n foo \n\n --> bar <!-- \n\n foo \n\n -->") );
 
+		$this->assertEqual(
+			'<p><span foo="bar"></span><foo></p>',
+			$this->render('<span foo="bar"></span><foo>') );
 	}
 
 }
