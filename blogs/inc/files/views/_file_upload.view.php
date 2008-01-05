@@ -187,7 +187,7 @@ global $fm_FileRoot;
 
 	$Widget->global_icon( T_('Quit upload mode!'), 'close', regenerate_url( 'ctrl,fm_mode', 'ctrl=files' ) );
 
-	$Widget->title = T_('File upload');
+	$Widget->title = T_('File upload').get_manual_link('upload_multiple');
 	$Widget->disp_template_replaced( 'block_start' );
 
 
@@ -339,6 +339,9 @@ global $fm_FileRoot;
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/05 02:26:06  fplanque
+ * doc
+ *
  * Revision 1.4  2007/11/22 17:53:39  fplanque
  * filemanager display cleanup, especially in IE (not perfect)
  *

@@ -77,7 +77,7 @@ global $edited_Item;
 		$Widget->global_icon( T_('Close file manager'), 'close', '?ctrl=items&amp;p='.$edited_Item->ID );
 	}
 
-	$Widget->title = T_('File browser');
+	$Widget->title = T_('File browser').get_manual_link('file_browser');
 	$Widget->disp_template_replaced( 'block_start' );
 ?>
 
@@ -382,6 +382,9 @@ global $edited_Item;
 
 /*
  * $Log$
+ * Revision 1.8  2008/01/05 02:26:06  fplanque
+ * doc
+ *
  * Revision 1.7  2007/11/22 17:53:39  fplanque
  * filemanager display cleanup, especially in IE (not perfect)
  *
