@@ -1155,7 +1155,8 @@ class Blog extends DataObject
 			{ // add error
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), rel_path_to_base($mediadir) ), 'error' );
+					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), rel_path_to_base($mediadir) )
+								.get_manual_link('directory_creation_error'), 'error' );
 				}
 				return false;
 			}
@@ -1163,7 +1164,8 @@ class Blog extends DataObject
 			{ // add error
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created."), rel_path_to_base($mediadir) ), 'error' );
+					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created."), rel_path_to_base($mediadir) )
+								.get_manual_link('directory_creation_error'), 'error' );
 				}
 				return false;
 			}
@@ -1755,6 +1757,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2008/01/05 17:54:43  fplanque
+ * UI/help improvements
+ *
  * Revision 1.22  2007/12/27 01:58:48  fplanque
  * additional SEO
  *

@@ -296,7 +296,8 @@ class User extends DataObject
 			{ // add error
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The user's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), rel_path_to_base($userdir) ), 'error' );
+					$Messages->add( sprintf( T_("The user's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), rel_path_to_base($userdir) )
+							.get_manual_link('directory_creation_error'), 'error' );
 				}
 				return false;
 			}
@@ -304,7 +305,8 @@ class User extends DataObject
 			{ // add error
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The user's media directory &laquo;%s&raquo; could not be created."), rel_path_to_base($userdir) ), 'error' );
+					$Messages->add( sprintf( T_("The user's media directory &laquo;%s&raquo; could not be created."), rel_path_to_base($userdir) )
+							.get_manual_link('directory_creation_error'), 'error' );
 				}
 				return false;
 			}
@@ -1324,6 +1326,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2008/01/05 17:54:44  fplanque
+ * UI/help improvements
+ *
  * Revision 1.3  2007/11/24 17:24:50  blueyed
  * Add $media_path
  *

@@ -39,7 +39,7 @@ $edited_Chapter = & $edited_GenericCategory;
  */
 global $GenericCategoryCache;
 
-global $action, $subset_ID;
+global $Settings, $action, $subset_ID;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
@@ -57,7 +57,12 @@ $Form->begin_fieldset( T_('Properties') );
 
 	// We're essentially double checking here...
 	$edited_Blog = & $edited_Chapter->get_Blog();
-	$Form->info( T_('Blog'), $edited_Blog->dget('name') );
+	$move = '';
+	if( $Settings->get('allow_moving_chapters') )
+	{ // If moving cats between blogs is allowed:
+		$move = ' '.action_icon( T_('Move to a different blog...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$edited_Chapter->ID.'&amp;action=move' ), T_('Move') );
+	}
+	$Form->info( T_('Blog'), $edited_Blog->dget('name').$move );
 
 	$Form->select_input_options( $edited_Chapter->dbprefix.'parent_ID',
 				$GenericCategoryCache->recurse_select( $edited_Chapter->parent_ID, $subset_ID, true, NULL, 0, array($edited_Chapter->ID) ), T_('Parent category') );
@@ -82,6 +87,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/05 17:54:43  fplanque
+ * UI/help improvements
+ *
  * Revision 1.1  2007/06/25 10:59:26  fplanque
  * MODULES (refactored MVC)
  *
