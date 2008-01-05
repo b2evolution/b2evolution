@@ -166,8 +166,8 @@ $AdminUI->set_path( 'blogs',  $tab  );
 /**
  * Display page header, menus & messages:
  */
-$blogListButtons = $AdminUI->get_html_collection_list( 'blog_properties', 'edit',
-											'?ctrl=coll_settings&amp;action=edit&amp;blog=%d&amp;tab='.$tab,
+$AdminUI->set_coll_list_params( 'blog_properties', 'edit',
+											array( 'ctrl' => 'coll_settings', 'tab' => $tab, 'action' => 'edit' ),
 											T_('List'), '?ctrl=collections&amp;blog=0' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -228,6 +228,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2008/01/05 02:28:17  fplanque
+ * enhanced blog selector (bloglist_buttons)
+ *
  * Revision 1.9  2007/12/27 01:58:49  fplanque
  * additional SEO
  *

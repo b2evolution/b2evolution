@@ -71,6 +71,10 @@ class AdminUI extends AdminUI_general
 				return array(
 						'before' => '',
 						'after' => '',
+						'select_start' => '<div class="collection_select">',
+						'select_end' => '</div>',
+						'buttons_start' => '',
+						'buttons_end' => '',
 						'beforeEach' => '',
 						'afterEach' => '',
 						'beforeEachSel' => '',
@@ -156,9 +160,7 @@ class AdminUI extends AdminUI_general
 
 		$r .= '
 			<div id="TitleArea">
-				<h1><strong>'.$this->get_title_for_titlearea().'</strong>
-				'.$this->get_bloglist_buttons( '', '' ).'
-				</h1>
+				<h1>'.$this->get_bloglist_buttons( '<strong>'.$this->get_title_for_titlearea().'</strong> ' ).'</h1>
 			</div>
 
 			<div class="panelbody">'

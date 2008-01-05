@@ -89,7 +89,7 @@ class AdminUI extends AdminUI_general
 
 		$r .= $this->get_page_head();
 
-		$r .= $this->get_bloglist_buttons( '', '' );
+		$r .= $this->get_bloglist_buttons();
 
 		$r .= '<div class="panelbody">'
 			."\n\n";

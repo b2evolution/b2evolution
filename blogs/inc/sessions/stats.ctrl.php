@@ -116,14 +116,12 @@ switch( $action )
 
 if( $perm_view_all )
 {
-	$blogListButtons = $AdminUI->get_html_collection_list( 'stats', 'view',
-					'admin.php?ctrl=stats&amp;tab='.$tab.'&amp;blog=%d', T_('All'),
+	$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab ), T_('All'),
 					'admin.php?ctrl=stats&amp;tab='.$tab.'&amp;blog=0' );
 }
 else
 {	// No permission to view aggregated stats:
-	$blogListButtons = $AdminUI->get_html_collection_list( 'stats', 'view',
-					'admin.php?ctrl=stats&amp;tab='.$tab.'&amp;blog=%d' );
+	$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab ) );
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -197,6 +195,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/05 02:28:17  fplanque
+ * enhanced blog selector (bloglist_buttons)
+ *
  * Revision 1.2  2007/09/19 09:41:57  yabs
  * minor bug fix
  *

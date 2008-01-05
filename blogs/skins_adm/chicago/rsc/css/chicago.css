@@ -107,6 +107,21 @@ a:hover {
 }
 
 
+div.collection_select select {
+	border: 1px solid #9f9f9f;
+	height: 19px;
+	margin: 1px;
+	vertical-align: middle;
+	/* Would need some special IE settings... */
+}
+div.collection_select input {
+	font-size: 12px;
+	vertical-align: middle;
+	height: 21px;
+	padding: 0 1px;
+}
+
+
 /*
  * Main area layout:
  */
@@ -141,7 +156,7 @@ a:hover {
  */
 div.action_messages
 {
-	margin:1ex 1em;
+	margin:12px 17px 16px 16px;
 }
 
 
@@ -814,11 +829,11 @@ div.upload_title {
 }
 
 ul#uploadfileinputs li {
-	background-color: #E0E9F0; 
+	background-color: #E0E9F0;
 	border-bottom-color: #9DB0BC;
 }
 p.uploadfileinputs {
-	background-color: #CCDCE6; 
+	background-color: #CCDCE6;
 	border-bottom-color: #9DB0BC;
 }
 

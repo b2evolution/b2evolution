@@ -198,8 +198,8 @@ switch( $action )
 		param( 'show_statuses', 'array', array(), true );	// Array of cats to restrict to
 
 		// Generate available blogs list:
-		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_comments', 'edit',
-						$pagenow.'?ctrl=comments&amp;blog=%d', NULL, '' );
+		$AdminUI->set_coll_list_params( 'blog_comments', 'edit',
+						array( 'ctrl' => 'comments' ), NULL, '' );
 
 		/*
 		 * Add sub menu entries:
@@ -276,6 +276,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/05 02:28:17  fplanque
+ * enhanced blog selector (bloglist_buttons)
+ *
  * Revision 1.4  2007/12/18 23:51:33  fplanque
  * nofollow handling in comment urls
  *

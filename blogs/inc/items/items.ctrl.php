@@ -549,9 +549,9 @@ switch( $action )
 	case 'new':
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 		// Generate available blogs list:
-		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_post_statuses', 'edit',
-						'admin.php?ctrl=items&amp;action=new&amp;blog=%d', NULL, '',
-						'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php\', %d )' );
+		$AdminUI->set_coll_list_params( 'blog_post_statuses', 'edit',
+						array( 'ctrl' => 'items', 'action' => 'new' ), NULL, '',
+						'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php\', %s )' );
 
 		// We don't check the following earlier, because we want the blog switching buttons to be available:
 		if( ! blog_has_cats( $blog ) )
@@ -601,7 +601,7 @@ switch( $action )
 		$AdminUI->title = $AdminUI->title_titlearea = T_('Browse blog');
 
 		// Generate available blogs list:
-		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_ismember', 'view', 'admin.php?ctrl=items&amp;blog=%d&amp;tab='.$tab.'&amp;filter=restore' );
+		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'tab' => $tab, 'filter' => 'restore' ) );
 
 		/*
 		 * Add sub menu entries:
@@ -751,6 +751,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2008/01/05 02:28:17  fplanque
+ * enhanced blog selector (bloglist_buttons)
+ *
  * Revision 1.12  2007/12/26 17:58:31  fplanque
  * minor
  *

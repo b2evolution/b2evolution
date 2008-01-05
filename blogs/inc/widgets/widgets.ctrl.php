@@ -237,8 +237,8 @@ switch( $action )
 /**
  * Display page header, menus & messages:
  */
-$blogListButtons = $AdminUI->get_html_collection_list( 'blog_properties', 'edit',
-											'?ctrl=widgets&amp;blog=%d', T_('List'), '?ctrl=collections&amp;blog=0' );
+$AdminUI->set_coll_list_params( 'blog_properties', 'edit', array( 'ctrl' => 'widgets' ),
+			T_('List'), '?ctrl=collections&amp;blog=0' );
 
 $AdminUI->set_path( 'blogs', 'widgets' );
 
@@ -304,6 +304,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2008/01/05 02:28:17  fplanque
+ * enhanced blog selector (bloglist_buttons)
+ *
  * Revision 1.6  2007/12/23 17:47:59  fplanque
  * fixes
  *

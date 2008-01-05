@@ -105,6 +105,37 @@ class AdminUI_general extends Widget
 	var $title_titlearea;
 	var $title_titlearea_appendix = '';
 
+  /**
+   * Collection List buttons: title for 'all' button
+	 * @var string
+	 */
+	var $coll_list_all_title = NULL;
+  /**
+   * Collection List buttons: url for 'all' button
+	 * @var string
+	 */
+	var $coll_list_all_url = '';
+  /**
+   * Collection List buttons: permission name to test on to decide wether or not to display buttons
+	 * @var string
+	 */
+	var $coll_list_permname = NULL;
+  /**
+   * Collection List buttons: minimum level required to display button
+	 * @var mixed
+	 */
+	var $coll_list_permlevel = 1;
+  /**
+   * Collection List buttons: params of the url used for the buttons
+	 * @var array
+	 */
+	var $coll_list_url_params = array();
+  /**
+   * Collection List buttons: javascript to execute on click of a button
+	 * @var string
+	 */
+	var $coll_list_onclick = NULL;
+
 
 	/**
 	 * Constructor.
@@ -512,66 +543,142 @@ class AdminUI_general extends Widget
 
 
 	/**
-	 * Returns the list of available Collections (aka Blogs) to work on.
-	 *
-	 * @todo Use BlogCache(?)
-	 * @todo Use a template (i wanna make an UL/LI/A list structure in newer skins)
+	 * Set params for blog list.
 	 *
 	 * @param string name of required permission needed to display the blog in the list
 	 * @param string level of required permission needed to display the blog in the list
 	 * @param string Url format string for elements, with %d for blog number.
 	 * @param string Title for "all" button
 	 * @param string URL for "all" button
-	 * @param string onclick attribute format string, with %d for blog number.
-	 * @param string name attribute for each button (%d for blog number)
+	 * @param string onclick attribute format string, with %s for blog number. (NOTE: %s so that we can use this.value when selected through list)
+	 */
+	function set_coll_list_params( $permname = 'blog_ismember', $permlevel = 1, $url_params = array(),
+							$all_title = NULL, $all_url = '', $onclick = NULL )
+	{
+		$this->coll_list_all_title = $all_title;
+		$this->coll_list_all_url = $all_url;
+		$this->coll_list_permname = $permname;
+		$this->coll_list_permlevel = $permlevel;
+		$this->coll_list_url_params = $url_params;
+		$this->coll_list_onclick = $onclick;
+	}
+
+
+	/**
+	 * Returns list of buttons for available Collections (aka Blogs) to work on.
+	 *
 	 * @return string HTML
 	 */
-	function get_html_collection_list( $permname = 'blog_ismember', $permlevel = 1, $url_format = '?blog=%d',
-							$all_title = NULL, $all_url = '', $onclick = NULL, $name = NULL )
+	function get_bloglist_buttons( $title = '' )
 	{
-		global $current_User, $blog;
+		global $current_User, $blog, $pagenow;
+
+		$max_buttons = 7;
+
+		if( empty( $this->coll_list_permname ) )
+		{	// We have not requested a list of blogs to be displayed
+			return;
+		}
+
+		// Prepare url params:
+		$url_params = '?';
+		$form_params = '';
+		foreach( $this->coll_list_url_params as $name => $value )
+		{
+			$url_params .= $name.'='.$value.'&amp;';
+			$form_params .= '<input type="hidden" name="'.$name.'" value="'.$value.'" />';
+		}
 
 		$template = $this->get_template( 'CollectionList' );
 
-		$r = $template['before'];
-
-		if( !is_null($all_title) )
-		{	// We want to add an "all" button
-			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
-			$r .= '<a href="'.$all_url
-						.'" class="'.( $blog == 0 ? 'CurrentBlog' : 'OtherBlog' ).'">'
-						.$all_title.'</a> ';
-			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
-		}
-
 		$BlogCache = & get_Cache( 'BlogCache' );
 
-		$blog_array = $BlogCache->load_user_blogs( $permname, $permlevel );
+		$blog_array = $BlogCache->load_user_blogs( $this->coll_list_permname, $this->coll_list_permlevel );
+
+
+		$buttons = '';
+		$select_options = '';
+		$count = 0;
+		$current_is_displayed = false;
 
 		foreach( $blog_array as $l_blog_ID )
 		{	// Loop through all blogs that match the requested permission:
 
 			$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
 
-			$r .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
+			$count++;
 
-			$r .= '<a href="'.sprintf( $url_format, $l_blog_ID )
-						.'" class="'.( $l_blog_ID == $blog ? 'CurrentBlog' : 'OtherBlog' ).'"';
+			if( $count < $max_buttons
+					|| ($current_is_displayed && $count == $max_buttons )
+					|| $l_blog_ID == $blog )
+			{	// Not too many yet OR current blog, add blog as a button:
+				$buttons .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
 
-			if( !is_null($onclick) )
-			{	// We want to include an onclick attribute:
-				$r .= ' onclick="'.sprintf( $onclick, $l_blog_ID ).'"';
+				$buttons .= '<a href="'.$url_params.'blog='.$l_blog_ID
+							.'" class="'.( $l_blog_ID == $blog ? 'CurrentBlog' : 'OtherBlog' ).'"';
+
+				if( !is_null($this->coll_list_onclick) )
+				{	// We want to include an onclick attribute:
+					$buttons .= ' onclick="'.sprintf( $this->coll_list_onclick, $l_blog_ID ).'"';
+				}
+
+				$buttons .= '>'.$l_Blog->dget( 'shortname', 'htmlbody' ).'</a> ';
+
+				if( $l_blog_ID == $blog )
+				{
+   				$current_is_displayed = true;
+					$buttons .= $template['afterEachSel'];
+				}
+				else
+				{
+					$buttons .= $template['afterEach'];
+				}
 			}
 
-			if( !is_null($name) )
-			{	// We want to include a name attribute:
-				$r .= ' name="'.sprintf( $name, $l_blog_ID ).'"';
+			// Add item select list:
+			$select_options .= '<option value="'.$l_blog_ID.'"';
+			if( $l_blog_ID == $blog )
+			{
+				$select_options .= ' selected="selected"';
 			}
-
-			$r .= '>'.$l_Blog->dget( 'shortname', 'htmlbody' ).'</a> ';
-
-			$r .= $template[ $l_blog_ID == $blog ? 'afterEachSel' : 'afterEach' ];
+			$select_options .= '>'.$l_Blog->dget( 'shortname', 'formvalue' ).'</option>';
 		}
+
+		$r = $template['before'];
+
+		$r .= $template['select_start'];
+		if( $count > $max_buttons )
+		{	// We could not display all blogs as buttons
+			$r .= '<form action="'.$pagenow.'" method="get">';
+			$r .= $form_params;
+			$r .= '<select name="blog" onchange="';
+			if( empty( $this->coll_list_onclick ) )
+			{	// Just submit...
+				$r .= 'this.form.submit();';
+			}
+			else
+			{
+				$r .= sprintf( $this->coll_list_onclick, 'this.value' );
+			}
+			$r .= '">'.$select_options.'</select>';
+			$r .= '<input type="submit" value="Go" /></form>';
+		}
+		$r .= $template['select_end'];
+
+		$r .= $title;
+
+		if( !empty($this->coll_list_all_title) )
+		{	// We want to add an "all" button
+			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
+			$r .= '<a href="'.$this->coll_list_all_url
+						.'" class="'.( $blog == 0 ? 'CurrentBlog' : 'OtherBlog' ).'">'
+						.$this->coll_list_all_title.'</a> ';
+			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
+		}
+
+		$r .= $template['buttons_start'];
+		$r .= $buttons;
+		$r .= $template['buttons_end'];
 
 		$r .= $template['after'];
 
@@ -842,8 +949,12 @@ class AdminUI_general extends Widget
 			case 'CollectionList':
 				// Template for a list of Collections (Blogs)
 				return array(
-						'before' => '<div id="coll_list"><ul>',
-						'after' => '</ul></div>',
+						'before' => '<div id="coll_list">',
+						'after' => '</div>',
+						'select_start' => '<ul><div class="collection_select">',
+						'select_end' => '</div>',
+						'buttons_start' => '',
+						'buttons_end' => '</ul>',
 						'beforeEach' => '<li>',
 						'afterEach' => '</li>',
 						'beforeEachSel' => '<li class="current">',
@@ -1005,23 +1116,6 @@ class AdminUI_general extends Widget
 
 			default:
 				debug_die( 'Unknown $name for AdminUI::get_template(): '.var_export($name, true) /* PHP 4.2 ! */ );
-		}
-	}
-
-
-	/**
-	 *
-	 * @todo Move generation of blog list to this class!
-	 *
-	 * @return string
-	 */
-	function get_bloglist_buttons( $before = '', $after = '' )
-	{
-		global $blogListButtons;
-
-		if( !empty($blogListButtons) )
-		{
-			return $before.$blogListButtons.$after;
 		}
 	}
 
@@ -1618,6 +1712,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.74  2008/01/05 02:28:17  fplanque
+ * enhanced blog selector (bloglist_buttons)
+ *
  * Revision 1.73  2007/11/22 14:16:43  fplanque
  * antispam / banning cleanup
  *

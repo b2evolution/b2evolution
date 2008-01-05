@@ -345,3 +345,8 @@ div.seo_message {
 	margin: 2ex 1ex;
 	line-height: 150%;
 }
+
+div.collection_select {
+	padding: 0 1ex;
+	float: right;
+}

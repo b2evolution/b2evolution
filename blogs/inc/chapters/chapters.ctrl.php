@@ -62,9 +62,8 @@ $GenericCategoryCache = & new ChapterCache();
 /**
  * Display page header, menus & messages:
  */
-$blogListButtons = $AdminUI->get_html_collection_list( 'blog_cats', 'edit',
-											'?ctrl='.$ctrl.'&amp;blog=%d',
-											T_('List'), '?ctrl=collections&amp;blog=0' );
+$AdminUI->set_coll_list_params( 'blog_cats', 'edit',
+		array( 'ctrl' => $ctrl ),	T_('List'), '?ctrl=collections&amp;blog=0' );
 
 // Restrict to chapters of the specific blog:
 $subset_ID = $blog;
@@ -426,6 +425,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/05 02:28:17  fplanque
+ * enhanced blog selector (bloglist_buttons)
+ *
  * Revision 1.4  2007/09/04 13:47:48  fplanque
  * fixed fadeout
  *

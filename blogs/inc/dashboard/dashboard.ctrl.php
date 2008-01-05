@@ -35,9 +35,7 @@ if( $blog )
 	}
 }
 
-$blogListButtons = $AdminUI->get_html_collection_list( 'blog_ismember', 'view',
-											regenerate_url( array('blog'), 'blog=%d' ),
-											T_('Global'), regenerate_url( array('blog'), 'blog=0' ) );
+$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array(), T_('Global'), '?blog=0' );
 
 $AdminUI->set_path( 'dashboard' );
 
@@ -489,6 +487,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2008/01/05 02:28:17  fplanque
+ * enhanced blog selector (bloglist_buttons)
+ *
  * Revision 1.18  2007/12/27 21:40:31  fplanque
  * improved default page
  *

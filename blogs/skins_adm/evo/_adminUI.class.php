@@ -82,7 +82,7 @@ class AdminUI extends AdminUI_general
 		<div id="payload">
 		';
 
-		$r .= $this->get_bloglist_buttons( '<div id="TitleArea">', '</div>' );
+		$r .= $this->get_bloglist_buttons();
 
 		// Display info & error messages
 		$r .= $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
@@ -170,8 +170,12 @@ class AdminUI extends AdminUI_general
 			case 'CollectionList':
 				// Template for a list of Collections (Blogs)
 				return array(
-						'before' => '',
-						'after' => '',
+						'before' => '<div id="TitleArea">',
+						'after' => '</div>',
+						'select_start' => '<div class="collection_select">',
+						'select_end' => '</div>',
+						'buttons_start' => '',
+						'buttons_end' => '',
 						'beforeEach' => '',
 						'afterEach' => '',
 						'beforeEachSel' => '',

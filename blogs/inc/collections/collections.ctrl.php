@@ -317,8 +317,8 @@ switch( $action )
 if( strpos( $action, 'new' ) === false )
 { // Not creating a new blog:
 	// fp> TODO: fall back to ctrl=chapters when no perm for blog_properties
-	$blogListButtons = $AdminUI->get_html_collection_list( 'blog_properties', 'edit',
-												'?ctrl=coll_settings&amp;tab=general&amp;blog=%d',
+	$AdminUI->set_coll_list_params( 'blog_properties', 'edit',
+												array( 'ctrl' => 'coll_settings', 'tab' => 'general' ),
 												T_('List'), '?ctrl=collections&amp;blog=0' );
 }
 
@@ -436,6 +436,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2008/01/05 02:28:17  fplanque
+ * enhanced blog selector (bloglist_buttons)
+ *
  * Revision 1.5  2007/11/02 02:46:27  fplanque
  * refactored blog settings / UI
  *
