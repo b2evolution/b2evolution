@@ -1206,9 +1206,10 @@ function upgrade_b2evo_tables()
 				(7, 'doc', 'Microsoft Word file', 'application/msword', 'doc.gif', 'external', 1),
 				(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'xls.gif', 'external', 1),
 				(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 1),
-				(10, 'pps', 'Powerpoint slideshow', 'pps', 'pps.gif', 'external', 1),
-				(11, 'zip', 'Zip archive', 'application/zip', 'zip.gif', 'external', 1),
-				(12, 'php php3 php4 php5 php6', 'Php files', 'application/x-httpd-php', 'php.gif', 'text', 0)
+				(10, 'pps', 'Slideshow', 'pps', 'pps.gif', 'external', 1),
+				(11, 'zip', 'ZIP archive', 'application/zip', 'zip.gif', 'external', 1),
+				(12, 'php php3 php4 php5 php6', 'PHP script', 'application/x-httpd-php', 'php.gif', 'text', 0),
+				(13, 'css', 'Style sheet', 'text/css', '', 'text', 1)
 			" );
 		echo "OK.<br />\n";
 
@@ -2123,6 +2124,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.234  2008/01/05 00:24:35  blueyed
+ * Create same filetypes when upgrading as when installing (DRY anyone?)
+ *
  * Revision 1.233  2007/11/30 01:46:12  fplanque
  * db upgrade
  *
