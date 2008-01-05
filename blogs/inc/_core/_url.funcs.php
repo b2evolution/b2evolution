@@ -222,8 +222,137 @@ function url_same_protocol( $url, $other_url = NULL )
 }
 
 
+/**
+ * Try to make $url relative to $target_url, if scheme, host, user and pass matches.
+ *
+ * This is useful for redirect_to params, to keep them short and avoid mod_security
+ * rejecting the request as "Not Acceptable" (whole URL as param).
+ *
+ * @param string URL to handle
+ * @param string URL where we want to make $url relative to
+ * @return string
+ */
+function url_rel_to_same_host( $url, $target_url )
+{
+	$parsed_url = @parse_url( $url );
+	if( ! $parsed_url )
+	{ // invalid url
+		return $url;
+	}
+	if( empty($parsed_url['scheme']) || empty($parsed_url['host']) )
+	{ // no protocol or host information
+		return $url;
+	}
+
+	$target_url = @parse_url( $target_url );
+	if( ! $target_url )
+	{ // invalid url
+		return $url;
+	}
+	if( ! empty($target_url['scheme']) && $target_url['scheme'] != $parsed_url['scheme'] )
+	{ // scheme/protocol is different
+		return $url;
+	}
+	if( ! empty($target_url['host']) )
+	{
+		if( empty($target_url['scheme']) || $target_url['host'] != $parsed_url['host'] )
+		{ // target has no scheme (but a host) or hosts differ
+			return $url;
+		}
+
+		if( @$target_url['port'] != @$parsed_url['port'] )
+			return $url;
+		if( @$target_url['user'] != @$parsed_url['user'] )
+			return $url;
+		if( @$target_url['pass'] != @$parsed_url['pass'] )
+			return $url;
+	}
+
+	// We can make the URL relative:
+	$r = '';
+	if( ! empty($parsed_url['path']) )
+		$r .= $parsed_url['path'];
+	if( ! empty($parsed_url['query']) )
+		$r .= '?'.$parsed_url['query'];
+	if( ! empty($parsed_url['fragment']) )
+		$r .= '?'.$parsed_url['fragment'];
+
+	return $r;
+}
+
+
+/**
+ * Make an $url absolute according to $host, if it is not absolute yet.
+ *
+ * @param string URL
+ * @param string Host (including protocol, e.g. 'http://example.com'); defaults to {@link $ReqHost}
+ * @return string
+ */
+function url_absolute( $url, $host = NULL )
+{
+	if( preg_match( '~^(\w+:)?//~', $url ) )
+	{ // URL is relative already ("//foo/bar" is absolute - leaving the protocol out):
+		return $url;
+	}
+
+	if( empty($host) )
+	{
+		global $ReqHost;
+		$host = $ReqHost;
+	}
+	return $host.$url;
+}
+
+
+/**
+ * Make links in $s absolute.
+ *
+ * It searches for "src" and "href" HTML tag attributes and makes the absolute.
+ *
+ * @uses url_absolute()
+ * @param string content
+ * @param string Hostname including scheme, e.g. http://example.com; defaults to $ReqHost
+ * @return string
+ */
+function make_rel_links_abs( $s, $host = NULL )
+{
+	if( empty($host) )
+	{
+		global $ReqHost;
+		$host = $ReqHost;
+	}
+
+	$s = preg_replace_callback( '~(<[^>]+?)\b((?:src|href)\s*=\s*)(["\'])?([^\\3]+?)(\\3)~i', create_function( '$m', '
+		return $m[1].$m[2].$m[3].url_absolute($m[4], "'.$host.'").$m[5];' ), $s );
+	return $s;
+}
+
+
+/**
+ * Display an URL, constrained to a max length
+ *
+ * @param string
+ * @param integer
+ */
+function disp_url( $url, $max_length = NULL )
+{
+	if( !empty($max_length) && strlen($url) > $max_length )
+	{
+		$disp_url = htmlspecialchars(substr( $url, 0, $max_length-1 )).'&hellip;';
+	}
+	else
+	{
+		$disp_url = htmlspecialchars($url);
+	}
+	echo '<a href="'.$url.'">'.$disp_url.'</a>';
+}
+
+
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.4  2008/01/05 02:25:23  fplanque
+ * refact
+ *
  * Revision 1.3  2007/11/27 22:31:57  fplanque
  * debugged blog moderation
  *

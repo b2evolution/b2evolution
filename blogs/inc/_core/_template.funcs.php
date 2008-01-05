@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements misc functions to be called from the templates.
+ * This file implements misc functions that handle output of the HTML page.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -32,6 +32,122 @@
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
+/**
+ * Sends HTTP header to redirect to the previous location (which
+ * can be given as function parameter, GET parameter (redirect_to),
+ * is taken from {@link Hit::$referer} or {@link $baseurl}).
+ *
+ * {@link $Debuglog} and {@link $Messages} get stored in {@link $Session}, so they
+ * are available after the redirect.
+ *
+ * NOTE: This function {@link exit() exits} the php script execution.
+ *
+ * @todo fp> do NOT allow $redirect_to = NULL. This leads to spaghetti code and unpredictable behavior.
+ *
+ * @param string URL to redirect to (overrides detection)
+ * @param boolean is this a permanent redirect? if true, send a 301; otherwise a 303
+ */
+function header_redirect( $redirect_to = NULL, $permanent = false )
+{
+	global $Hit, $baseurl, $Blog, $htsrv_url_sensitive;
+	global $Session, $Debuglog, $Messages;
+
+	// fp> get this out
+	if( empty($redirect_to) )
+	{ // see if there's a redirect_to request param given:
+		$redirect_to = param( 'redirect_to', 'string', '' );
+
+		if( empty($redirect_to) )
+		{
+			if( ! empty($Hit->referer) )
+			{
+				$redirect_to = $Hit->referer;
+			}
+			elseif( isset($Blog) && is_object($Blog) )
+			{
+				$redirect_to = $Blog->get('url');
+			}
+			else
+			{
+				$redirect_to = $baseurl;
+			}
+		}
+	}
+	// <fp
+
+	/* fp>why do we need this?
+	   dh>because Location: redirects are supposed to be absolute.
+	if( substr($redirect_to, 0, 1) == '/' )
+	{ // relative URL, prepend current host:
+		global $ReqHost;
+
+		$redirect_to = $ReqHost.$redirect_to;
+	}
+	*/
+
+	if( strpos($redirect_to, $htsrv_url_sensitive) === 0 /* we're going somewhere on $htsrv_url_sensitive */
+	 || strpos($redirect_to, $baseurl) === 0   /* we're going somewhere on $baseurl */ )
+	{
+		// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
+		// Also remove "action" get param to avoid unwanted actions
+		// blueyed> Removed the removing of "action" here, as it is used to trigger certain views. Instead, "confirm(ed)?" gets removed now
+		// fp> which views please (important to list in order to remove asap)
+		// dh> sorry, don't remember
+		// TODO: fp> action should actually not be used to trigger views. This should be changed at some point.
+		$redirect_to = preg_replace( '~(?<=\?|&) (login|pwd|confirm(ed)?) = [^&]+ ~x', '', $redirect_to );
+	}
+
+
+	$status = $permanent ? 301 : 303;
+ 	$Debuglog->add('Redirecting to '.$redirect_to.' (status '.$status.')');
+
+	// Transfer of Debuglog to next page:
+	if( $Debuglog->count('all') )
+	{ // Save Debuglog into Session, so that it's available after redirect (gets loaded by Session constructor):
+		$sess_Debuglogs = $Session->get('Debuglogs');
+		if( empty($sess_Debuglogs) )
+			$sess_Debuglogs = array();
+
+		$sess_Debuglogs[] = $Debuglog;
+		$Session->set( 'Debuglogs', $sess_Debuglogs, 60 /* expire in 60 seconds */ );
+	}
+
+	// Transfer of Messages to next page:
+	if( $Messages->count('all') )
+	{ // Set Messages into user's session, so they get restored on the next page (after redirect):
+		$Session->set( 'Messages', $Messages );
+	}
+
+	$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
+
+ 	// see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+	if( $permanent )
+	{	// This should be a permanent move redirect!
+		header( 'HTTP/1.1 301 Moved Permanently' );
+	}
+	else
+	{	// This should be a "follow up" redirect
+		// Note: Also see http://de3.php.net/manual/en/function.header.php#50588 and the other comments around
+		header( 'HTTP/1.1 303 See Other' );
+	}
+
+	header( 'Location: '.$redirect_to, true, $status ); // explictly setting the status is required for (fast)cgi
+	exit();
+}
+
+
+/**
+ * Sends HTTP headers to avoid caching of the page.
+ */
+function header_nocache()
+{
+	header('Expires: Tue, 25 Mar 2003 05:00:00 GMT');
+	header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+	header('Cache-Control: no-cache, must-revalidate');
+	header('Pragma: no-cache');
+}
 
 
 /**
@@ -183,6 +299,27 @@ function request_title( $params = array() )
 
 
 /**
+ * Returns a "<base />" tag and remembers that we've used it ({@link regenerate_url()} needs this).
+ *
+ * @param string URL to use (this gets used as base URL for all relative links on the HTML page)
+ * @return string
+ */
+function base_tag( $url, $target = NULL )
+{
+	global $base_tag_set;
+
+	$base_tag_set = true;
+	echo '<base href="'.$url.'"';
+
+	if( !empty($target) )
+	{
+		echo ' target="'.$target.'"';
+	}
+	echo ' />';
+}
+
+
+/**
  * Robots tag
  *
  * Outputs the robots meta tag if necessary
@@ -252,12 +389,12 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 function require_js( $js_file, $relative_to_base = FALSE )
 {
   global $required_js, $rsc_url, $debug;
-  
+
   $js_aliases = array(
     '#jquery#' => 'jquery.min.js',
     '#jquery_debug#' => 'jquery.js',
     );
-    
+
   // First get the real filename or url
   $absolute = FALSE;
   if( stristr( $js_file, 'http://' ) )
@@ -270,11 +407,11 @@ function require_js( $js_file, $relative_to_base = FALSE )
     if ( $js_file == '#jquery#' and $debug ) $js_file = '#jquery_debug#';
     $js_file = $js_aliases[$js_file];
   }
-  
+
   if ( $relative_to_base or $absolute )
   {
     $js_url = $js_file;
-  } 
+  }
   else
   { // Add on the $rsc_url
     $js_url = $rsc_url . 'js/' . $js_file;
@@ -288,7 +425,7 @@ function require_js( $js_file, $relative_to_base = FALSE )
 		add_headline( $start_script_tag . $js_url . $end_script_tag );
     $required_js[] = $js_url;
   }
-  
+
 }
 
 /**
@@ -305,9 +442,9 @@ function require_js( $js_file, $relative_to_base = FALSE )
 function require_css( $css_file, $relative_to_base = FALSE, $title = NULL, $media = NULL )
 {
   global $required_css, $rsc_url, $debug;
-  
+
   $css_aliases = array();
-    
+
   // First get the real filename or url
   $absolute = FALSE;
   if( stristr( $css_file, 'http://' ) )
@@ -319,7 +456,7 @@ function require_css( $css_file, $relative_to_base = FALSE, $title = NULL, $medi
   { // It's an alias
     $css_url = $css_aliases[$css_file];
   }
- 
+
   if ( $relative_to_base or $absolute )
   {
     $css_url = $css_file;
@@ -340,7 +477,7 @@ function require_css( $css_file, $relative_to_base = FALSE, $title = NULL, $medi
 		add_headline( $start_link_tag . $css_url . $end_link_tag );
     $required_css[] = $css_url;
   }
-  
+
 }
 
 
@@ -373,6 +510,22 @@ function app_version()
 	global $app_version;
 	echo $app_version;
 }
+
+
+/**
+ * Displays an empty or a full bullet based on boolean
+ *
+ * @param boolean true for full bullet, false for empty bullet
+ */
+function bullet( $bool )
+{
+	if( $bool )
+		return get_icon( 'bullet_full', 'imgtag' );
+
+	return get_icon( 'bullet_empty', 'imgtag' );
+}
+
+
 
 
 /**
@@ -473,8 +626,14 @@ function credits( $params = array() )
 	display_list( $credit_links, $params['list_start'], $params['list_end'], $params['separator'], $params['item_start'], $params['item_end'] );
 }
 
+
+
+
 /*
  * $Log$
+ * Revision 1.13  2008/01/05 02:25:23  fplanque
+ * refact
+ *
  * Revision 1.12  2007/11/08 17:54:23  blueyed
  * mainlist_get_item(): fixed return by reference (patch by Austriaco)
  *

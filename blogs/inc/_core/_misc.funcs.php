@@ -2165,20 +2165,6 @@ function form_date( $date, $time = '' )
 
 
 /**
- * Displays an empty or a full bullet based on boolean
- *
- * @param boolean true for full bullet, false for empty bullet
- */
-function bullet( $bool )
-{
-	if( $bool )
-		return get_icon( 'bullet_full', 'imgtag' );
-
-	return get_icon( 'bullet_empty', 'imgtag' );
-}
-
-
-/**
  * Get list of client IP addresses from REMOTE_ADDR and HTTP_X_FORWARDED_FOR,
  * in this order. '' is used when no IP could be found.
  *
@@ -2297,122 +2283,6 @@ function generate_random_passwd( $length = 8 )
 	// O (letter) vs 0 (digit)
 
 	return generate_random_key( $length, 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789' );
-}
-
-
-/**
- * Sends HTTP headers to avoid caching of the page.
- */
-function header_nocache()
-{
-	header('Expires: Tue, 25 Mar 2003 05:00:00 GMT');
-	header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-	header('Cache-Control: no-cache, must-revalidate');
-	header('Pragma: no-cache');
-}
-
-
-/**
- * Sends HTTP header to redirect to the previous location (which
- * can be given as function parameter, GET parameter (redirect_to),
- * is taken from {@link Hit::$referer} or {@link $baseurl}).
- *
- * {@link $Debuglog} and {@link $Messages} get stored in {@link $Session}, so they
- * are available after the redirect.
- *
- * NOTE: This function {@link exit() exits} the php script execution.
- *
- * @todo fp> do NOT allow $redirect_to = NULL. This leads to spaghetti code and unpredictable behavior.
- *
- * @param string URL to redirect to (overrides detection)
- * @param boolean is this a permanent redirect? if true, send a 301; otherwise a 303
- */
-function header_redirect( $redirect_to = NULL, $permanent = false )
-{
-	global $Hit, $baseurl, $Blog, $htsrv_url_sensitive;
-	global $Session, $Debuglog, $Messages;
-
-	// fp> get this out
-	if( empty($redirect_to) )
-	{ // see if there's a redirect_to request param given:
-		$redirect_to = param( 'redirect_to', 'string', '' );
-
-		if( empty($redirect_to) )
-		{
-			if( ! empty($Hit->referer) )
-			{
-				$redirect_to = $Hit->referer;
-			}
-			elseif( isset($Blog) && is_object($Blog) )
-			{
-				$redirect_to = $Blog->get('url');
-			}
-			else
-			{
-				$redirect_to = $baseurl;
-			}
-		}
-	}
-	// <fp
-
-	/* fp>why do we need this?
-	   dh>because Location: redirects are supposed to be absolute.
-	if( substr($redirect_to, 0, 1) == '/' )
-	{ // relative URL, prepend current host:
-		global $ReqHost;
-
-		$redirect_to = $ReqHost.$redirect_to;
-	}
-	*/
-
-	if( strpos($redirect_to, $htsrv_url_sensitive) === 0 /* we're going somewhere on $htsrv_url_sensitive */
-	 || strpos($redirect_to, $baseurl) === 0   /* we're going somewhere on $baseurl */ )
-	{
-		// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
-		// Also remove "action" get param to avoid unwanted actions
-		// blueyed> Removed the removing of "action" here, as it is used to trigger certain views. Instead, "confirm(ed)?" gets removed now
-		// fp> which views please (important to list in order to remove asap)
-		// dh> sorry, don't remember
-		// TODO: fp> action should actually not be used to trigger views. This should be changed at some point.
-		$redirect_to = preg_replace( '~(?<=\?|&) (login|pwd|confirm(ed)?) = [^&]+ ~x', '', $redirect_to );
-	}
-
-
-	$status = $permanent ? 301 : 303;
- 	$Debuglog->add('Redirecting to '.$redirect_to.' (status '.$status.')');
-
-	// Transfer of Debuglog to next page:
-	if( $Debuglog->count('all') )
-	{ // Save Debuglog into Session, so that it's available after redirect (gets loaded by Session constructor):
-		$sess_Debuglogs = $Session->get('Debuglogs');
-		if( empty($sess_Debuglogs) )
-			$sess_Debuglogs = array();
-
-		$sess_Debuglogs[] = $Debuglog;
-		$Session->set( 'Debuglogs', $sess_Debuglogs, 60 /* expire in 60 seconds */ );
-	}
-
-	// Transfer of Messages to next page:
-	if( $Messages->count('all') )
-	{ // Set Messages into user's session, so they get restored on the next page (after redirect):
-		$Session->set( 'Messages', $Messages );
-	}
-
-	$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
-
- 	// see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-	if( $permanent )
-	{	// This should be a permanent move redirect!
-		header( 'HTTP/1.1 301 Moved Permanently' );
-	}
-	else
-	{	// This should be a "follow up" redirect
-		// Note: Also see http://de3.php.net/manual/en/function.header.php#50588 and the other comments around
-		header( 'HTTP/1.1 303 See Other' );
-	}
-
-	header( 'Location: '.$redirect_to, true, $status ); // explictly setting the status is required for (fast)cgi
-	exit();
 }
 
 
@@ -2694,27 +2564,6 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = ' &amp; ' )
 
 
 /**
- * Returns a "<base />" tag and remembers that we've used it ({@link regenerate_url()} needs this).
- *
- * @param string URL to use (this gets used as base URL for all relative links on the HTML page)
- * @return string
- */
-function base_tag( $url, $target = NULL )
-{
-	global $base_tag_set;
-
-	$base_tag_set = true;
-	echo '<base href="'.$url.'"';
-
-	if( !empty($target) )
-	{
-		echo ' target="'.$target.'"';
-	}
-	echo ' />';
-}
-
-
-/**
  * Display an array as a list:
  *
  * @param array
@@ -2755,16 +2604,18 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 	}
 }
 
+
 /**
- *
+ * Credits stuff.
  */
 function display_param_link( $params )
 {
 	echo resolve_link_params( $params );
 }
 
+
 /**
- * Resolve a link based on params
+ * Resolve a link based on params (credits stuff)
  *
  * @param array
  * @return string
@@ -2867,7 +2718,7 @@ function hash_link_params( $link_array, $force_hash = NULL )
 
 
 /**
- * Generate a link from params
+ * Generate a link from params (credits stuff)
  */
 function generate_link_from_params( $link_params )
 {
@@ -2884,131 +2735,11 @@ function generate_link_from_params( $link_params )
 }
 
 
-/**
- * Try to make $url relative to $target_url, if scheme, host, user and pass matches.
- *
- * This is useful for redirect_to params, to keep them short and avoid mod_security
- * rejecting the request as "Not Acceptable" (whole URL as param).
- *
- * @param string URL to handle
- * @param string URL where we want to make $url relative to
- * @return string
- */
-function url_rel_to_same_host( $url, $target_url )
-{
-	$parsed_url = @parse_url( $url );
-	if( ! $parsed_url )
-	{ // invalid url
-		return $url;
-	}
-	if( empty($parsed_url['scheme']) || empty($parsed_url['host']) )
-	{ // no protocol or host information
-		return $url;
-	}
-
-	$target_url = @parse_url( $target_url );
-	if( ! $target_url )
-	{ // invalid url
-		return $url;
-	}
-	if( ! empty($target_url['scheme']) && $target_url['scheme'] != $parsed_url['scheme'] )
-	{ // scheme/protocol is different
-		return $url;
-	}
-	if( ! empty($target_url['host']) )
-	{
-		if( empty($target_url['scheme']) || $target_url['host'] != $parsed_url['host'] )
-		{ // target has no scheme (but a host) or hosts differ
-			return $url;
-		}
-
-		if( @$target_url['port'] != @$parsed_url['port'] )
-			return $url;
-		if( @$target_url['user'] != @$parsed_url['user'] )
-			return $url;
-		if( @$target_url['pass'] != @$parsed_url['pass'] )
-			return $url;
-	}
-
-	// We can make the URL relative:
-	$r = '';
-	if( ! empty($parsed_url['path']) )
-		$r .= $parsed_url['path'];
-	if( ! empty($parsed_url['query']) )
-		$r .= '?'.$parsed_url['query'];
-	if( ! empty($parsed_url['fragment']) )
-		$r .= '?'.$parsed_url['fragment'];
-
-	return $r;
-}
-
-
-/**
- * Make an $url absolute according to $host, if it is not absolute yet.
- *
- * @param string URL
- * @param string Host (including protocol, e.g. 'http://example.com'); defaults to {@link $ReqHost}
- * @return string
- */
-function url_absolute( $url, $host = NULL )
-{
-	if( preg_match( '~^(\w+:)?//~', $url ) )
-	{ // URL is relative already ("//foo/bar" is absolute - leaving the protocol out):
-		return $url;
-	}
-
-	if( empty($host) )
-	{
-		global $ReqHost;
-		$host = $ReqHost;
-	}
-	return $host.$url;
-}
-
-
-/**
- * Make links in $s absolute.
- *
- * It searches for "src" and "href" HTML tag attributes and makes the absolute.
- *
- * @uses url_absolute()
- * @param string content
- * @param string Hostname including scheme, e.g. http://example.com; defaults to $ReqHost
- * @return string
- */
-function make_rel_links_abs( $s, $host = NULL )
-{
-	if( empty($host) )
-	{
-		global $ReqHost;
-		$host = $ReqHost;
-	}
-
-	$s = preg_replace_callback( '~(<[^>]+?)\b((?:src|href)\s*=\s*)(["\'])?([^\\3]+?)(\\3)~i', create_function( '$m', '
-		return $m[1].$m[2].$m[3].url_absolute($m[4], "'.$host.'").$m[5];' ), $s );
-	return $s;
-}
-
-
-/**
- *
- */
-function disp_url( $url, $max_length = NULL )
-{
-	if( !empty($max_length) && strlen($url) > $max_length )
-	{
-		$disp_url = htmlspecialchars(substr( $url, 0, $max_length-1 )).'&hellip;';
-	}
-	else
-	{
-		$disp_url = htmlspecialchars($url);
-	}
-	echo '<a href="'.$url.'">'.$disp_url.'</a>';
-}
-
-
 /*
  * $Log$
+ * Revision 1.16  2008/01/05 02:25:23  fplanque
+ * refact
+ *
  * Revision 1.15  2007/12/29 18:55:32  fplanque
  * better antispam banning screen
  *
