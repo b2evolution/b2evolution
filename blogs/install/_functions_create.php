@@ -72,7 +72,7 @@ function create_default_data()
 	global $Plugins;
 	$Plugins = new Plugins_admin_no_DB(); // COPY
 
-	// upgrade to 0.8.7
+	// added in 0.8.7
 	echo 'Creating default blacklist entries... ';
 	$query = "INSERT INTO T_antispam(aspm_string) VALUES ".
 	"('online-casino'), ('penis-enlargement'), ".
@@ -85,7 +85,7 @@ function create_default_data()
 	echo "OK.<br />\n";
 
 
-	// upgrade to 0.8.9
+	// added in 0.8.9
 	echo 'Creating default groups... ';
 	$Group_Admins = new Group(); // COPY !
 	$Group_Admins->set( 'name', 'Administrators' );
@@ -167,7 +167,7 @@ function create_default_data()
 	echo "OK.<br />\n";
 
 
-	// Upgrade to Phoenix-Alpha
+	// added in Phoenix-Alpha
 	echo 'Creating default Post Types... ';
 	$DB->query( "
 		INSERT INTO T_items__type ( ptyp_ID, ptyp_name )
@@ -181,7 +181,7 @@ function create_default_data()
 	echo "OK.<br />\n";
 
 
-	// Upgrade to Phoenix-Beta
+	// added in Phoenix-Beta
 	echo 'Creating default file types... ';
 	// Contribs: feel free to add more types here...
 	// TODO: dh> shouldn't they get localized to the app's default locale?
@@ -643,6 +643,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.233  2008/01/05 17:18:30  blueyed
+ * fix doc
+ *
  * Revision 1.232  2007/12/28 21:34:52  fplanque
  * no message
  *
