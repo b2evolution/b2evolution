@@ -310,13 +310,16 @@ if( count($res_hits) )
 
 	</table>
 
-	<img src="'.$rsc_url.'/img/blank.gif" width="1" height="1" /><!-- for IE -->
+	<img src="<?php global $rsc_url; echo $rsc_url ?>img/blank.gif" width="1" height="1" /><!-- for IE -->
 	<?php
 }
 
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/05 17:17:36  blueyed
+ * Fix output of rsc_url
+ *
  * Revision 1.2  2007/09/03 19:36:06  fplanque
  * chicago admin skin
  *

@@ -166,7 +166,7 @@ foreach( $container_Widget_array as $container=>$dummy )
 
 global $rsc_url;
 
-echo '<img src="'.$rsc_url.'/img/blank.gif" width="1" height="1" /><!-- for IE -->';
+echo '<img src="'.$rsc_url.'img/blank.gif" width="1" height="1" /><!-- for IE -->';
 
 // Fadeout javascript
 echo '<script type="text/javascript" src="'.$rsc_url.'js/fadeout.js"></script>';
@@ -174,6 +174,9 @@ echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, fal
 
 /*
  * $Log$
+ * Revision 1.9  2008/01/05 17:17:36  blueyed
+ * Fix output of rsc_url
+ *
  * Revision 1.8  2007/12/23 15:07:07  fplanque
  * Clean widget name
  *
