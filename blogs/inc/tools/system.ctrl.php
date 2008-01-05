@@ -384,6 +384,39 @@ else
 	disp_system_check( 'ok' );
 }
 
+
+/*
+ * Note about process user:
+ */
+$process_uid = null;
+$process_user = null;
+$process_gid = null;
+$process_group = null;
+if( function_exists('posix_geteuid') )
+{
+	$process_uid = posix_geteuid();
+
+	if( function_exists('posix_getpwuid')
+		&& ($process_user = posix_getpwuid($process_uid)) )
+	{
+		$process_user = $process_user['name'];
+	}
+}
+if( function_exists('posix_getegid') )
+{
+	$process_gid = posix_getegid();
+
+	if( function_exists('posix_getgrgid')
+		&& ($process_group = posix_getgrgid($process_group)) )
+	{
+		$process_group = $process_group['name'];
+	}
+}
+init_system_check( 'Process user', sprintf( '%s (uid %s), group %s (gid %s)',
+	($process_user ? $process_user : '?'), ($process_uid ? $process_uid : '?'),
+	($process_group ? $process_group : '?'), ($process_gid ? $process_gid : '?') ) );
+disp_system_check( 'note' );
+
 $block_item_Widget->disp_template_raw( 'block_end' );
 
 
@@ -482,6 +515,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/05 22:02:55  blueyed
+ * Add info about process user and her group
+ *
  * Revision 1.4  2007/10/06 21:31:51  fplanque
  * minor
  *
