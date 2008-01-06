@@ -35,15 +35,14 @@ $Form->hidden( 'action', $creating ? 'create' : 'update' );
 $Form->hidden( 'wi_ID', $edited_ComponentWidget->ID );
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 
+// Display properties:
 $Form->begin_fieldset( T_('Properties') );
-
 	$Form->info( T_('Widget type'), $edited_ComponentWidget->get_name() );
-
  	$Form->info( T_('Description'), $edited_ComponentWidget->get_desc() );
-
 $Form->end_fieldset();
 
 
+// Display (editable) parameters:
 $Form->begin_fieldset( T_('Params') );
 
 	//$params = $edited_ComponentWidget->get_params();
@@ -56,6 +55,14 @@ $Form->begin_fieldset( T_('Params') );
 	}
 
 $Form->end_fieldset();
+
+
+// TODO: allow the widget to display information, e.g. the coll_category_list
+//       widget could say which blogs it affects. (Maybe this would be useful
+//       for all even, so a default info field(set)).
+//       Does a callback make sense? Then we should have a action hook too, to
+//       catch any params/settings maybe? Although this could be done in the
+//       same hook in most cases probably. (dh)
 
 
 if( $creating )
@@ -72,6 +79,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.4  2008/01/06 15:35:54  blueyed
+ * doc, todo
+ *
  * Revision 1.3  2007/12/22 19:53:19  yabs
  * cleanup from adding core params
  *

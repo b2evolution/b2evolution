@@ -40,6 +40,9 @@ class ComponentWidget extends DataObject
 	 */
 	var $sco_name;
 	var $order;
+	/**
+	 * @var string Type of the plugin ("core" or "plugin")
+	 */
 	var $type;
 	var $code;
 	var $params;
@@ -300,6 +303,11 @@ class ComponentWidget extends DataObject
 
   /**
 	 * Prepare display params
+	 *
+	 * @todo Document default params and default values.
+	 *       This might link to a wiki page, too.
+	 *
+	 * @param array
 	 */
 	function init_display( $params )
 	{
@@ -308,14 +316,10 @@ class ComponentWidget extends DataObject
 		$defs = $this->get_param_definitions( array() );
 		foreach( $defs as $parname => $parmeta )
 		{
-			if( isset( $parmeta['defaultvalue'] ) )
-			{
-				$widget_defaults[ $parname ] = $parmeta['defaultvalue'];
-			}
-			else
-			{
-				$widget_defaults[ $parname ] = NULL;
-			}
+			// take default value:
+			$widget_defaults[ $parname ] = isset( $parmeta['defaultvalue'] )
+				? $parmeta['defaultvalue']
+				: NULL;
 		}
 
 		// Load DB configuration:
@@ -713,6 +717,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2008/01/06 15:36:17  blueyed
+ * doc, todo
+ *
  * Revision 1.27  2007/12/26 20:04:54  fplanque
  * minor
  *
