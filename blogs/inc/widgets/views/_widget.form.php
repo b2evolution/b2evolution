@@ -57,7 +57,7 @@ $Form->begin_fieldset( T_('Params') );
 $Form->end_fieldset();
 
 
-// TODO: allow the widget to display information, e.g. the coll_category_list
+// dh> TODO: allow the widget to display information, e.g. the coll_category_list
 //       widget could say which blogs it affects. (Maybe this would be useful
 //       for all even, so a default info field(set)).
 //       Does a callback make sense? Then we should have a action hook too, to
@@ -79,6 +79,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/06 17:52:50  fplanque
+ * minor/doc
+ *
  * Revision 1.4  2008/01/06 15:35:54  blueyed
  * doc, todo
  *

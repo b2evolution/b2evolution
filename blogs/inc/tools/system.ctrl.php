@@ -216,6 +216,49 @@ $block_item_Widget->disp_template_raw( 'block_end' );
 $block_item_Widget->title = T_('PHP');
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
+
+/*
+ * Note about process user:
+ */
+$process_uid = null;
+$process_user = null;
+$process_gid = null;
+$process_group = null;
+// User ID:
+if( function_exists('posix_geteuid') )
+{
+	$process_uid = posix_geteuid();
+
+	if( function_exists('posix_getpwuid')
+		&& ($process_user = posix_getpwuid($process_uid)) )
+	{
+		$process_user = $process_user['name'];
+	}
+
+	// Group ID:
+	if( function_exists('posix_getegid') )
+	{
+		$process_gid = posix_getegid();
+
+		if( function_exists('posix_getgrgid')
+			&& ($process_group = posix_getgrgid($process_group)) )
+		{
+			$process_group = $process_group['name'];
+		}
+	}
+
+	$running_as = sprintf( '%s (uid %s), group %s (gid %s)',
+	($process_user ? $process_user : '?'), ($process_uid ? $process_uid : '?'),
+	($process_group ? $process_group : '?'), ($process_gid ? $process_gid : '?') );
+}
+else
+{
+	$running_as = '('.T_('Unkown').')';
+}
+init_system_check( 'PHP process running as', $running_as );
+disp_system_check( 'note' );
+
+
 /*
  * PHP version
  */
@@ -385,40 +428,7 @@ else
 }
 
 
-/*
- * Note about process user:
- */
-$process_uid = null;
-$process_user = null;
-$process_gid = null;
-$process_group = null;
-if( function_exists('posix_geteuid') )
-{
-	$process_uid = posix_geteuid();
-
-	if( function_exists('posix_getpwuid')
-		&& ($process_user = posix_getpwuid($process_uid)) )
-	{
-		$process_user = $process_user['name'];
-	}
-}
-if( function_exists('posix_getegid') )
-{
-	$process_gid = posix_getegid();
-
-	if( function_exists('posix_getgrgid')
-		&& ($process_group = posix_getgrgid($process_group)) )
-	{
-		$process_group = $process_group['name'];
-	}
-}
-init_system_check( 'Process user', sprintf( '%s (uid %s), group %s (gid %s)',
-	($process_user ? $process_user : '?'), ($process_uid ? $process_uid : '?'),
-	($process_group ? $process_group : '?'), ($process_gid ? $process_gid : '?') ) );
-disp_system_check( 'note' );
-
 $block_item_Widget->disp_template_raw( 'block_end' );
-
 
 
 /*
@@ -515,6 +525,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2008/01/06 17:52:50  fplanque
+ * minor/doc
+ *
  * Revision 1.5  2008/01/05 22:02:55  blueyed
  * Add info about process user and her group
  *

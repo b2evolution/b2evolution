@@ -70,7 +70,7 @@ class coll_category_list_Widget extends ComponentWidget
    * Get definitions for editable params
    *
 	 * @see Plugin::GetDefaultSettings()
-	 * @param local params
+	 * @param array local params
 	 *  - 'title': block title (string, default "Categories")
 	 *  - 'option_all': "All categories" link title, empty to disable (string, default "All")
 	 *  - 'use_form': Add checkboxes to allow selection of multiple categories (boolean)
@@ -361,6 +361,9 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.8  2008/01/06 17:52:50  fplanque
+ * minor/doc
+ *
  * Revision 1.7  2008/01/06 15:35:34  blueyed
  * - added "disp_names_for_coll_list" param
  * -doc

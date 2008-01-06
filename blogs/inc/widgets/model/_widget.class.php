@@ -316,10 +316,14 @@ class ComponentWidget extends DataObject
 		$defs = $this->get_param_definitions( array() );
 		foreach( $defs as $parname => $parmeta )
 		{
-			// take default value:
-			$widget_defaults[ $parname ] = isset( $parmeta['defaultvalue'] )
-				? $parmeta['defaultvalue']
-				: NULL;
+			if( isset( $parmeta['defaultvalue'] ) )
+			{
+				$widget_defaults[ $parname ] = $parmeta['defaultvalue'];
+			}
+			else
+			{
+				$widget_defaults[ $parname ] = NULL;
+			}
 		}
 
 		// Load DB configuration:
@@ -717,8 +721,8 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
- * Revision 1.28  2008/01/06 15:36:17  blueyed
- * doc, todo
+ * Revision 1.29  2008/01/06 17:52:50  fplanque
+ * minor/doc
  *
  * Revision 1.27  2007/12/26 20:04:54  fplanque
  * minor
