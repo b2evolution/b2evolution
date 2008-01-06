@@ -85,7 +85,6 @@ function fit_into_constraint( $src_width, $src_height, $max_width, $max_height )
 function load_image( $path, $mimetype )
 {
 	$err = NULL;
-	$err_info = NULL;
 	$imh = NULL;
 
 	switch( $mimetype )
@@ -98,14 +97,17 @@ function load_image( $path, $mimetype )
 			$imh = imagecreatefromgif( $path );  // dh> TODO: this can fail, if $path is not a valid gif! Handle this.
 			break;
 
+		case 'image/png':
+			$imh = imagecreatefrompng( $path );  // dh> TODO: this can fail, if $path is not a valid png! Handle this.
+			break;
+
  		default:
 			// Unrecognized mime type
-			$err = 'Emime';	// Sort error code
-			$err_info = $mimetype;
+			$err = '!Unsupported format '.$mimetype.' (load_image)';
 			break;
 	}
 
-	return array( $err, $err_info, $imh );
+	return array( $err, $imh );
 }
 
 
@@ -133,9 +135,13 @@ function save_image( $imh, $path, $mimetype, $quality = 90, $chmod = NULL )
 			imagegif( $imh, $path );
 			break;
 
+		case 'image/png':
+			imagepng( $imh, $path );
+			break;
+
  		default:
 			// Unrecognized mime type
-			$err = 'Emime';	// Sort error code
+			$err = '!Unsupported format '.$mimetype.' (save_image)';
 			break;
 	}
 
@@ -211,7 +217,7 @@ function generate_thumb( $src_imh, $thumb_width, $thumb_height )
 	$dest_imh = imagecreatetruecolor( $dest_width, $dest_height ); // Create a black image
 	if( ! imagecopyresampled( $dest_imh, $src_imh, 0, 0, 0, 0, $dest_width, $dest_height, $src_width, $src_height ) )
 	{
-		return array( 'Eresample', $dest_imh );
+		return array( '!GD-library internal error (resample)', $dest_imh );
 	}
 
 	// TODO: imageinterlace();
@@ -221,6 +227,9 @@ function generate_thumb( $src_imh, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/06 04:23:49  fplanque
+ * thumbnail enhancement
+ *
  * Revision 1.1  2007/06/25 10:59:57  fplanque
  * MODULES (refactored MVC)
  *

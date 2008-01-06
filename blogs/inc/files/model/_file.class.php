@@ -1461,14 +1461,17 @@ class File extends DataObject
 			debug_die( 'Can only thumb images');
 		}
 
-		if( $public_access_to_media
-			&& $af_thumb_path = $this->get_af_thumb_path( $size_name, NULL, false ) )
-		{ // If the thumbnail was already cached, we could publicly access it:
-			if( @is_file( $af_thumb_path ) )
-			{	// The thumb IS already cache! :)
-				// Let's point directly into the cache:
-				$url = $this->_FileRoot->ads_url.dirname($this->_rdfp_rel_path).'/.evocache/'.$this->_name.'/'.$size_name.'.'.$this->get_ext();
-				return $url;
+		if( $public_access_to_media )
+		{
+			$af_thumb_path = $this->get_af_thumb_path( $size_name, NULL, false );
+			if( $af_thumb_path[0] != '!' )
+			{ // If the thumbnail was already cached, we could publicly access it:
+				if( @is_file( $af_thumb_path ) )
+				{	// The thumb IS already in cache! :)
+					// Let's point directly into the cache:
+					$url = $this->_FileRoot->ads_url.dirname($this->_rdfp_rel_path).'/.evocache/'.$this->_name.'/'.$size_name.'.'.$this->get_ext();
+					return $url;
+				}
 			}
 		}
 
@@ -1518,20 +1521,20 @@ class File extends DataObject
 		return '';
 	}
 
-	
+
 	/**
 	 * Get the full path to the thumbnail cache for this file.
 	 *
 	 * ads = Absolute Directory Slash
 	 *
 	 * @param boolean shall we create the dir if it doesn't exist?
-	 * @return string or NULL if can't be obtained
+	 * @return string absolute path or !error
 	 */
 	function get_ads_evocache( $create_if_needed = false )
 	{
 		if( strpos( $this->_dir, '/.evocache/' ) !== false )
 		{	// We are already in an evocahce folder: refuse to go further!
-			return NULL;
+			return '!Recursive caching not allowed';
 		}
 
 		$adp_evocache = $this->_dir.'.evocache/'.$this->_name;
@@ -1540,7 +1543,7 @@ class File extends DataObject
 		{	// Create the directory:
 			if( ! mkdir_r( $adp_evocache ) )
 			{	// Could not create
-				return NULL;
+				return '!.evocache folder read/write error! Check filesystem permissions.';
 			}
 		}
 
@@ -1553,13 +1556,23 @@ class File extends DataObject
 	 */
 	function rm_cache()
 	{
+		global $Messages;
+
 		// Remove cached elts for teh current file:
 		$ads_filecache = $this->get_ads_evocache( false );
-		rmdir_r( $ads_filecache );
+		if( $ads_filecache[0] == '!' )
+		{
+			// This creates unwanted noise
+			// $Messages->add( 'Cannot remove .evocache for file. - '.$ads_filecache, 'error' );
+		}
+		else
+		{
+			rmdir_r( $ads_filecache );
 
-		// In case cache is now empty, delete the folder:
-		$adp_evocache = $this->_dir.'.evocache';
-		@rmdir( $adp_evocache );
+			// In case cache is now empty, delete the folder:
+			$adp_evocache = $this->_dir.'.evocache';
+			@rmdir( $adp_evocache );
+		}
 	}
 
 
@@ -1571,7 +1584,7 @@ class File extends DataObject
 	 * @param string size name
 	 * @param string mimetype of thumbnail (NULL if we're ready to take wathever is available)
 	 * @param boolean shall we create the dir if it doesn't exist?
-	 * @return string or NULL if can't be obtained
+	 * @return string absolte filename or !error
 	 */
 	function get_af_thumb_path( $size_name, $thumb_mimetype = NULL, $create_evocache_if_needed = false )
 	{
@@ -1586,31 +1599,34 @@ class File extends DataObject
 		}
 
 		// Get the filename of the thumbnail
-		if( $ads_evocache = $this->get_ads_evocache( $create_evocache_if_needed ) )
-		{
+		$ads_evocache = $this->get_ads_evocache( $create_evocache_if_needed );
+		if( $ads_evocache[0] != '!' )
+		{	// Not an error
 			return $ads_evocache.$size_name.'.'.$this->get_ext();
 		}
 
-		return NULL;
+		// error
+		return $ads_evocache;
 	}
 
 
 	/**
-	 *Save thumbnail for file
+	 * Save thumbnail for file
 	 *
 	 * @param resource
 	 * @param string size name
-	 * @param string miemtype of thumbnail
+	 * @param string mimetype of thumbnail
 	 * @param string short error code
 	 */
 	function save_thumb_to_cache( $thumb_imh, $size_name, $thumb_mimetype, $thumb_quality = 90 )
 	{
-		if( $af_thumb_path = $this->get_af_thumb_path( $size_name, $thumb_mimetype, true ) )
+		$af_thumb_path = $this->get_af_thumb_path( $size_name, $thumb_mimetype, true );
+		if( $af_thumb_path[0] != '!' )
 		{	// We obtained a path for the thumbnail to be saved:
 			return save_image( $thumb_imh, $af_thumb_path, $thumb_mimetype, $thumb_quality );
 		}
 
-		return 'Ewr-access';
+		return $af_thumb_path;	// !Error code
 	}
 
 
@@ -1623,16 +1639,17 @@ class File extends DataObject
 	 */
 	function output_cached_thumb( $size_name, $thumb_mimetype )
 	{
-		if( $af_thumb_path = $this->get_af_thumb_path( $size_name, $thumb_mimetype, false ) )
+		$af_thumb_path = $this->get_af_thumb_path( $size_name, $thumb_mimetype, false );
+		if( $af_thumb_path[0] != '!' )
 		{	// We obtained a path for the thumbnail to be saved:
 			if( ! file_exists( $af_thumb_path ) )
 			{	// The thumbnail was not found...
-				return 'Enotcached';
+				return '!Thumbnail not found in .evocache'; // WARNING: exact wording match on return
 			}
 
 			if( ! is_readable( $af_thumb_path ) )
 			{
-				return 'Eread';
+				return '!Thumbnail read error! Check filesystem permissions.';
 			}
 
  			header('Content-type: '.$thumb_mimetype );
@@ -1642,7 +1659,7 @@ class File extends DataObject
 			return NULL;
 		}
 
-		return 'Erd-access';
+		return $af_thumb_path;	// !Error code
 	}
 
 
@@ -1701,11 +1718,11 @@ class File extends DataObject
 		// Try to output the cached thumbnail:
 		$err = $this->output_cached_thumb( $size_name, $mimetype );
 
-		if( $err == 'Enotcached' )
+		if( $err == '!Thumbnail not found in .evocache' )
 		{	// The thumbnail wasn't already in the cache, try to generate and cache it now:
 			$err = NULL;		// Short error code
 
-			list( $err, $err_info, $src_imh ) = load_image( $this->get_full_path(), $mimetype );
+			list( $err, $src_imh ) = load_image( $this->get_full_path(), $mimetype );
 			if( empty( $err ) )
 			{
 				list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_width, $thumb_height );
@@ -1726,16 +1743,22 @@ class File extends DataObject
 			}
 		}
 
+		// ERROR IMAGE
 		if( !empty( $err ) )
 		{	// Generate an error image and try to squeeze an error message inside:
 			// Note: we write small and close to the upper left in order to have as much text as possible on small thumbs
+			$err = substr( $err, 1 ); // crop 1st car
+			$car_width = ceil( ($thumb_width-4)/6 );
+			// $err = 'w='.$car_width.' '.$err;
+			$err = wordwrap( $err, $car_width, "\n" );
+			$err = split( "\n", $err );	// split into lines
   		$im_handle = imagecreatetruecolor( $thumb_width, $thumb_height ); // Create a black image
 			$text_color = imagecolorallocate( $im_handle, 255, 0, 0 );
-			imagestring( $im_handle, 2, 2, 1, $err, $text_color);
-			if( !empty( $err_info ) )
-			{	// Additional info
-				$text_color = imagecolorallocate( $im_handle, 255, 255, 255 );
-				imagestring( $im_handle, 2, 2, 12, $err_info, $text_color);
+			$y = 0;
+			foreach( $err as $err_string )
+			{
+				imagestring( $im_handle, 2, 2, $y, $err_string, $text_color);
+				$y += 11;
 			}
 			header('Content-type: image/png' );
 			imagepng( $im_handle );
@@ -1746,6 +1769,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/06 04:23:49  fplanque
+ * thumbnail enhancement
+ *
  * Revision 1.2  2007/11/29 00:07:19  blueyed
  * Fallback to uid/gid for file owner/group, if name is unknown
  *
