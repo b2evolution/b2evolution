@@ -1156,7 +1156,7 @@ class Blog extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), rel_path_to_base($mediadir) )
-								.get_manual_link('directory_creation_error'), 'error' );
+								.get_manual_link('media_file_permission_errors'), 'error' );
 				}
 				return false;
 			}
@@ -1757,6 +1757,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2008/01/06 18:47:08  fplanque
+ * enhanced system checks
+ *
  * Revision 1.23  2008/01/05 17:54:43  fplanque
  * UI/help improvements
  *

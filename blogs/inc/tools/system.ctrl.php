@@ -111,10 +111,44 @@ else
 
 
 /*
+ * Media folder
+ */
+if( ! is_dir( $media_path ) )
+{
+	$mediadir_msg = 'Media directory doesn\'t exist.';
+	$mediadir_status = 'error';
+}
+elseif( ! is_readable( $media_path ) )
+{
+	$mediadir_msg = 'Media directory is not redable.';
+	$mediadir_status = 'error';
+}
+elseif( ! is_writable( $media_path ) )
+{
+	$mediadir_msg = 'Media directory is not writable.';
+	$mediadir_status = 'error';
+}
+else
+{
+	$mediadir_msg = 'Ok';
+	$mediadir_status = 'ok';
+}
+
+$mediadir_long = '';
+if( $mediadir_status == 'error' )
+{
+	$mediadir_long = '<p>'.T_('You will not be able to upload files/images and b2evolution will not be able to generate thumbnails.')."</p>\n"
+	.'<p>'.T_('Your host requires that you set special file permissions on your media directory.').get_manual_link('media_file_permission_errors')."</p>\n";
+}
+init_system_check( 'Media directory', $mediadir_msg.' - '.$media_path );
+disp_system_check( $mediadir_status, $mediadir_long );
+
+
+/*
  * /install/ folder
  */
 $install_removed = ! is_dir( $basepath.$install_subdir );
-init_system_check( 'Install folder', $install_removed ?  T_('Deleted') : T_('Not deleted') );
+init_system_check( 'Install folder', $install_removed ?  T_('Deleted') : T_('Not deleted').' - '.$basepath.$install_subdir );
 if( ! $install_removed )
 {
 	disp_system_check( 'warning', T_('For maximum security, it is recommended that you delete your /blogs/install/ folder once you are done with install or upgrade.') );
@@ -136,10 +170,11 @@ else
 	disp_system_check( 'ok' );
 }
 
+
 $block_item_Widget->disp_template_raw( 'block_end' );
 
 
-/**
+/*
  * Time
  */
 $block_item_Widget->title = T_('Time');
@@ -220,11 +255,9 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 /*
  * Note about process user:
  */
+// User ID:
 $process_uid = null;
 $process_user = null;
-$process_gid = null;
-$process_group = null;
-// User ID:
 if( function_exists('posix_geteuid') )
 {
 	$process_uid = posix_geteuid();
@@ -234,29 +267,41 @@ if( function_exists('posix_geteuid') )
 	{
 		$process_user = $process_user['name'];
 	}
-
-	// Group ID:
-	if( function_exists('posix_getegid') )
-	{
-		$process_gid = posix_getegid();
-
-		if( function_exists('posix_getgrgid')
-			&& ($process_group = posix_getgrgid($process_group)) )
-		{
-			$process_group = $process_group['name'];
-		}
-	}
-
-	$running_as = sprintf( '%s (uid %s), group %s (gid %s)',
-	($process_user ? $process_user : '?'), ($process_uid ? $process_uid : '?'),
-	($process_group ? $process_group : '?'), ($process_gid ? $process_gid : '?') );
+	
+	$running_as = sprintf( '%s (uid %s)',
+		($process_user ? $process_user : '?'), ($process_uid ? $process_uid : '?') );
 }
 else
 {
 	$running_as = '('.T_('Unkown').')';
 }
-init_system_check( 'PHP process running as', $running_as );
+init_system_check( 'PHP running as USER:', $running_as );
 disp_system_check( 'note' );
+
+
+// Group ID:
+$process_gid = null;
+$process_group = null;
+if( function_exists('posix_getegid') )
+{
+	$process_gid = posix_getegid();
+
+	if( function_exists('posix_getgrgid')
+		&& ($process_group = posix_getgrgid($process_gid)) )
+	{
+		$process_group = $process_group['name'];
+	}
+
+	$running_as = sprintf( '%s (gid %s)',
+		($process_group ? $process_group : '?'), ($process_gid ? $process_gid : '?') );
+}
+else
+{
+	$running_as = '('.T_('Unkown').')';
+}
+init_system_check( 'PHP running as GROUP:', $running_as );
+disp_system_check( 'note' );
+
 
 
 /*
@@ -525,6 +570,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2008/01/06 18:47:08  fplanque
+ * enhanced system checks
+ *
  * Revision 1.6  2008/01/06 17:52:50  fplanque
  * minor/doc
  *
