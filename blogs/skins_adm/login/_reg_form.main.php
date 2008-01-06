@@ -30,6 +30,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_funcs( '_core/_url.funcs.php' );
 
 /**
  * Include page header:
@@ -84,6 +85,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.4  2008/01/06 17:10:58  blueyed
+ * Fix call to undefined function when accessing register.php and _url.funcs.php has not been loaded
+ *
  * Revision 1.3  2007/12/09 22:59:22  blueyed
  * login and register form: Use Form::buttons_input for buttons
  *
