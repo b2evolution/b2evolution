@@ -1216,7 +1216,7 @@ class Plugins
 	/**
 	 * Call a specific plugin by its code.
 	 *
-	 * This will call the SkinTag event handler.
+	 * This will call the {@link Plugin::SkinTag()} event handler.
 	 *
 	 * @param string plugin code
 	 * @param array Associative array of parameters (gets passed to the plugin)
@@ -1806,6 +1806,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/06 15:36:36  blueyed
+ * doc
+ *
  * Revision 1.2  2007/09/22 22:11:18  fplanque
  * minor
  *
