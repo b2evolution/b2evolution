@@ -349,6 +349,7 @@ if( strlen($redirect_to) )
 {
 	// Make it relative to the form's target, in case it has been set absolute (and can be made relative).
 	// Just in case it gets sent absolute. This should not trigger this warning then..!
+	load_funcs( '_core/_url.funcs.php' );
 	$redirect_to = url_rel_to_same_host($redirect_to, $htsrv_url_sensitive);
 
 	if( !preg_match( '#^/|(https?://[a-z\-.]*'.str_replace( '.', '\.', $cookie_domain ).')#i', $redirect_to ) )
@@ -395,6 +396,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.96  2008/01/06 16:42:27  blueyed
+ * Fix call to undefined function when accessing admin.php and _url.funcs.php has not been loaded
+ *
  * Revision 1.95  2007/12/10 01:05:23  blueyed
  * Improve check performance
  *
