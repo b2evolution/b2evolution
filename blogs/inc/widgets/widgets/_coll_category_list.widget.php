@@ -6,6 +6,7 @@
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2008 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -19,6 +20,7 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  *
  * @version $Id$
@@ -68,7 +70,11 @@ class coll_category_list_Widget extends ComponentWidget
    * Get definitions for editable params
    *
 	 * @see Plugin::GetDefaultSettings()
-	 * @param local params like 'for_editing' => true
+	 * @param local params
+	 *  - 'title': block title (string, default "Categories")
+	 *  - 'option_all': "All categories" link title, empty to disable (string, default "All")
+	 *  - 'use_form': Add checkboxes to allow selection of multiple categories (boolean)
+	 *  - 'disp_names_for_coll_list': Display blog names, if this is an aggregated blog? (boolean)
 	 */
 	function get_param_definitions( $params )
 	{
@@ -92,7 +98,13 @@ class coll_category_list_Widget extends ComponentWidget
 					'defaultvalue' => 0,
 					'note' => T_('Add checkboxes to allow selection of multiple categories.'),
 				),
-			), parent::get_param_definitions( $params )	);
+			'disp_names_for_coll_list' => array(
+					'type' => 'checkbox',
+					'label' => T_('Display blog names'),
+					'defaultvalue' => 1, /* previous behaviour */
+					'note' => T_('Display blog names, if this is an aggregated blog.'),
+				),
+			), parent::get_param_definitions( $params ) );
 
 		return $r;
 
@@ -179,20 +191,24 @@ class coll_category_list_Widget extends ComponentWidget
 					continue;
 				}
 
-				echo $this->disp_params['coll_start'];
-				echo '<a href="';
-				if( $this->disp_params['link_type'] == 'context' )
-				{	// We want to preserve current browsing context:
-					echo regenerate_url( 'blog,cats,catsel', 'blog='.$curr_blog_ID );
-				}
-				else
+				// Display blog title, if requested:
+				if( $this->disp_params['disp_names_for_coll_list'] )
 				{
-					$loop_Blog->disp('url','raw');
+					echo $this->disp_params['coll_start'];
+					echo '<a href="';
+					if( $this->disp_params['link_type'] == 'context' )
+					{	// We want to preserve current browsing context:
+						echo regenerate_url( 'blog,cats,catsel', 'blog='.$curr_blog_ID );
+					}
+					else
+					{
+						$loop_Blog->disp('url','raw');
+					}
+					echo '">';
+					$loop_Blog->disp('name');
+					echo '</a>';
+					echo $this->disp_params['coll_end'];
 				}
-				echo '">';
-				$loop_Blog->disp('name');
-				echo '</a>';
-				echo $this->disp_params['coll_end'];
 
 				$r = $ChapterCache->recurse( $callbacks, $curr_blog_ID );
 
@@ -345,6 +361,10 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.7  2008/01/06 15:35:34  blueyed
+ * - added "disp_names_for_coll_list" param
+ * -doc
+ *
  * Revision 1.6  2007/12/23 16:16:18  fplanque
  * Wording improvements
  *
