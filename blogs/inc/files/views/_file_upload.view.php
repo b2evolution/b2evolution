@@ -40,7 +40,7 @@ global $Settings;
 
 global $UserSettings;
 
-global $upload_quickmode, $failedFiles, $ads_list_path;
+global $upload_quickmode, $failedFiles, $ads_list_path, $uploadwithproperties;
 
 global $fm_FileRoot;
 ?>
@@ -156,10 +156,10 @@ global $fm_FileRoot;
 
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Choose a file'); ?>:', false, 'input', 'uploadfile[]', '70', '0', 'file', 'upload_file' );
 		<?php
-		if( $UserSettings->get('fm_uploadwithproperties') )
+		if( $uploadwithproperties )
 		{	// We want file properties on the upload form:
 			?>
-		appendLabelAndInputElements( newLI, '<?php echo TS_('Filename on server (optional)'); ?>:', false, 'input', 'uploadfile_name[]', '20', '80', 'text', '' );
+		appendLabelAndInputElements( newLI, '<?php echo TS_('Filename on server (optional)'); ?>:', false, 'input', 'uploadfile_name[]', '50', '80', 'text', '' );
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Long title'); ?>:', true, 'input', 'uploadfile_title[]', '50', '255', 'text', 'large' );
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Alternative text (useful for images)'); ?>:', true, 'input', 'uploadfile_alt[]', '50', '255', 'text', 'large' );
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Caption/Description of the file'); ?>:', true, 'textarea', 'uploadfile_desc[]', '38', '3', '', 'large' );
@@ -198,7 +198,14 @@ global $fm_FileRoot;
 		<tr>
 			<td colspan="2" id="fm_bar">
 			<?php
-				echo '&nbsp;'; // todo
+				if( $uploadwithproperties )
+				{
+					echo '<a href="'.regenerate_url( 'uploadwithproperties', 'uploadwithproperties=0' ).'">'.T_('Hide advanced upload properties').'</a>';
+				}
+				else
+				{
+					echo '<a href="'.regenerate_url( 'uploadwithproperties', 'uploadwithproperties=1' ).'">'.T_('Show advanced upload properties').'</a>';
+				}
 			?>
 			</td>
 		</tr>
@@ -261,11 +268,11 @@ global $fm_FileRoot;
 						<input name="uploadfile[]" size="70" type="file" class="upload_file" /><br />
 
 						<?php
-						if( $UserSettings->get('fm_uploadwithproperties') )
+						if( $uploadwithproperties )
 						{	// We want file properties on the upload form:
 							?>
 							<label><?php echo T_('Filename on server (optional)'); ?>:</label>
-							<input name="uploadfile_name[]" type="text" size="20" maxlength="80"
+							<input name="uploadfile_name[]" type="text" size="50" maxlength="80"
 								value="<?php echo ( isset( $uploadfile_name[$lKey] ) ? format_to_output( $uploadfile_name[$lKey], 'formvalue' ) : '' ) ?>" /><br />
 
 							<label><?php echo T_('Long title'); ?>:</label><br />
@@ -339,6 +346,9 @@ global $fm_FileRoot;
 
 /*
  * $Log$
+ * Revision 1.6  2008/01/06 05:16:33  fplanque
+ * enhanced upload
+ *
  * Revision 1.5  2008/01/05 02:26:06  fplanque
  * doc
  *

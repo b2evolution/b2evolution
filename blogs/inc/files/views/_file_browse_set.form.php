@@ -39,6 +39,23 @@ $Form->global_icon( T_('Close settings!'), 'close', regenerate_url() );
 
 $Form->begin_form( 'fform', T_('Display settings') );
 
+if( $current_User->check_perm( 'options', 'edit', false ) )
+{	// TODO: better perm check
+	echo '<p class="note">'.T_('See also:').' ';
+
+  /**
+	 * @var FileRoot
+	 */
+	global $fm_FileRoot;
+	if( $fm_FileRoot->type == 'collection' )
+	{
+		echo T_('Blog Settings').' &gt; '.T_('Advanced').' &gt; <a href="?ctrl=coll_settings&tab=advanced&blog='.$fm_FileRoot->in_type_ID.'">'
+					.T_('Media directory location').'</a> &bull; ';
+	}
+
+	echo T_('Global settings').' &gt; <a href="?ctrl=fileset">'.T_('Files').'</a> &amp; <a href="?ctrl=filetypes">'.T_('File types').'</a></p>';
+}
+
 	$Form->hidden_ctrl();
 	$Form->hiddens_by_key( get_memorized() );
 
@@ -64,10 +81,9 @@ $Form->begin_form( 'fform', T_('Display settings') );
 		$Form->checkbox( 'option_dirsattop', !$UserSettings->get('fm_dirsnotattop'), T_('Folders first'), T_('Check to always display folders before files') );
 		$Form->checkbox( 'option_recursivedirsize', $UserSettings->get('fm_recursivedirsize'), T_('Folder sizes'), T_('Check to compute recursive size of folders') );
 		$Form->radio_input( 'option_allowfiltering', $UserSettings->get('fm_allowfiltering'), array(
-				array( 'value'=>'no', 'label'=>T_('No') ),
+				array( 'value'=>'no', 'label'=>T_('Don\'t show') ),
 				array( 'value'=>'simple', 'label'=>T_('Simple') ),
-				array( 'value'=>'regexp', 'label'=>T_('With regular expressions') ) ), T_('Allow filtering') );
-		$Form->checkbox( 'option_uploadwithproperties', $UserSettings->get('fm_uploadwithproperties'), T_('Upload with properties'), T_('Check to add file properties to the upload form') );
+				array( 'value'=>'regexp', 'label'=>T_('With regular expressions') ) ), T_('Filter box') );
 	$Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'actionArray[update_settings]', T_('Update !'), 'ActionButton'),
@@ -75,6 +91,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update_settings]', T_('Upd
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/06 05:16:32  fplanque
+ * enhanced upload
+ *
  * Revision 1.1  2007/06/25 10:59:58  fplanque
  * MODULES (refactored MVC)
  *

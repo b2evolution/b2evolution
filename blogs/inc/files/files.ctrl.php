@@ -391,7 +391,6 @@ switch( $action )
 
 		$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
 		$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
-		$UserSettings->set( 'fm_uploadwithproperties', param( 'option_uploadwithproperties', 'integer', 0 ) );
 		$UserSettings->set( 'fm_allowfiltering',   param( 'option_allowfiltering', 'string', 'simple' ) );
 
 		if( $UserSettings->dbupdate() )
@@ -1482,6 +1481,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2008/01/06 05:16:33  fplanque
+ * enhanced upload
+ *
  * Revision 1.8  2007/11/29 19:47:41  fplanque
  * minor
  *

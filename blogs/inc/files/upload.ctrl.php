@@ -61,6 +61,17 @@ param( 'item_ID', 'integer', NULL, true );
 
 $action = param_action();
 
+// Standard vs Advanced mode
+param( 'uploadwithproperties', 'integer', NULL, false );
+if( !is_null($uploadwithproperties) )
+{
+	$UserSettings->set( 'fm_uploadwithproperties', $uploadwithproperties );
+	$UserSettings->dbupdate();
+}
+else
+{
+	$uploadwithproperties = $UserSettings->get( 'fm_uploadwithproperties' );
+}
 
 // INIT params:
 if( param( 'root_and_path', 'string', '', false ) /* not memorized (default) */ && strpos( $root_and_path, '::' ) )
@@ -418,6 +429,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/06 05:16:33  fplanque
+ * enhanced upload
+ *
  * Revision 1.2  2007/09/26 23:32:39  fplanque
  * upload context saving
  *
