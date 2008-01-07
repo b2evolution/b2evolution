@@ -391,7 +391,7 @@ function create_demo_contents()
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Danny', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://brendoman.com/dbc', 'disabled', array() );
+	$edited_Item->insert( 1, 'Danny', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://personman.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -643,6 +643,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.234  2008/01/07 03:00:52  fplanque
+ * minor
+ *
  * Revision 1.233  2008/01/05 17:18:30  blueyed
  * fix doc
  *

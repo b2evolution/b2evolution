@@ -358,7 +358,7 @@ function install_basic_widgets()
 
 	// Add Tag Cloud to all blog Sidebar2:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-							 SELECT blog_ID, "Sidebar 2", 1, "core", "free_html", \'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:77:"This is the "Sidebar 2" container. You can place any widget you like in here.";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\'
+							 SELECT blog_ID, "Sidebar 2", 1, "core", "free_html", \'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\'
 							   FROM T_blogs' );
 
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
@@ -564,6 +564,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.42  2008/01/07 03:00:52  fplanque
+ * minor
+ *
  * Revision 1.41  2007/12/28 00:13:02  fplanque
  * no message
  *
