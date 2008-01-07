@@ -111,7 +111,7 @@ function skin_init( $disp )
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
-				{ // This is a category home page (note: subsequent pages are a different story)
+				{ // This is a category page
 					$disp_detail = 'posts-cat';
 					$seo_page_type = 'Category page';
 					if( $Blog->get_setting( 'chapter_noindex' ) )
@@ -122,11 +122,10 @@ function skin_init( $disp )
 					global $cat, $catsel;
 					if( empty( $catsel ) && preg_match( '¤[0-9]+¤', $cat ) )
 					{	// We are on a single cat page:
-						// NOTE: we must have selected EXACTLY ONE CATEGORY thrpught the cat parameter
+						// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
 						// BUT: - this can resolved to including children
 						//      - selecting exactly one cat through catsel[] is NOT OK since not equivalent (will exclude children)
 						// echo 'SINGLE CAT PAGE';
-						// EXPERIMENTAL: Please document encountered problems.
 						if( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
 						{ // Check if the URL was canonical:
 					    if( !isset( $Chapter ) )
@@ -146,7 +145,6 @@ function skin_init( $disp )
 								header_redirect( $canoncical_url, true );
 							}
 					  }
-
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'tags', 'posts', 'page' ) ) == array() )
@@ -156,6 +154,18 @@ function skin_init( $disp )
 					if( $Blog->get_setting( 'tag_noindex' ) )
 					{	// We prefer robots not to index tag pages:
 						$robots_index = false;
+					}
+
+					if( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
+					{ // Check if the URL was canonical:
+						$canoncical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
+						if( $ReqHost.$ReqURI != $canoncical_url )
+						{
+							// REDIRECT TO THE CANONICAL URL:
+							// fp> TODO: we're going to lose the additional params, it would be better to keep them...
+							// fp> what additional params actually?
+							header_redirect( $canoncical_url, true );
+						}
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'ymdhms', 'week', 'page' ) ) == array() )
@@ -501,6 +511,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.23  2008/01/07 02:53:27  fplanque
+ * cleaner tag urls
+ *
  * Revision 1.22  2007/12/22 00:19:27  blueyed
  * - add debuglog to skin_init
  * - fix indent

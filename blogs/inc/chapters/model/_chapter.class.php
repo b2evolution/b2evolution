@@ -207,7 +207,7 @@ class Chapter extends GenericCategory
 				$category_prefix = $this->Blog->get_setting('category_prefix');
 				if( !empty( $category_prefix ) )
 				{
-					$r = url_add_tail( $blogurl, '/' . $category_prefix . '/' . $this->urlname.'/' );
+					$r = url_add_tail( $blogurl, '/'.$category_prefix.'/'.$this->urlname.'/' );
 				}
 				else
 				{
@@ -312,6 +312,9 @@ class Chapter extends GenericCategory
 
 /*
  * $Log$
+ * Revision 1.7  2008/01/07 02:53:27  fplanque
+ * cleaner tag urls
+ *
  * Revision 1.6  2007/11/25 14:28:17  fplanque
  * additional SEO settings
  *

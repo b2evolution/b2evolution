@@ -154,8 +154,23 @@ if( $resolve_extra_path )
 		// Do we still have extra path info to decode?
 		if( count($path_elements) )
 		{
-			// Does the pathinfo end with a / ?
-			if( substr( $path_string, -1 ) != '/' )
+			// Does the pathinfo end with a / or a ; ?
+			$last_char = substr( $path_string, -1 );
+			if( $last_char == ';' )
+			{	// ENDING SEMI COLUMN -> We'll consider this to be a tag page
+				$last_part = $path_elements[count($path_elements)-1];
+				$tag = substr( $last_part, 0, strlen($last_part)-1 );
+				$tag = urldecode($tag);
+				$tag = strip_tags($tag);	// security
+				// pre_dump( $tag );
+
+				// # of posts per page:
+ 				if( ! $posts = $Blog->get_setting( 'tag_posts_per_page' ) )
+				{ // use blog default
+					$posts = $Blog->get_setting( 'posts_per_page' );
+				}
+			}
+			elseif( $last_char != '/' )
 			{ // NO ENDING SLASH -> We'll consider this to be a ref to a post:
 				// Set a lot of defaults as if we had received a complex URL:
 				$m = '';
@@ -499,6 +514,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.92  2008/01/07 02:53:26  fplanque
+ * cleaner tag urls
+ *
  * Revision 1.91  2008/01/04 23:18:11  blueyed
  * Use preg_match instead of ereg; Move skin-does-not-exist debug_die further down
  *

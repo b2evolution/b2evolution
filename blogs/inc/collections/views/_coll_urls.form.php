@@ -70,6 +70,19 @@ global $Debuglog;
 			fldset.style.display = '';
 		}
 	}
+
+	function show_hide_tag_prefix(ob)
+	{
+		var fldset = document.getElementById( 'tag_prefix_container' );
+		if( ob.value == 'param_num' )
+		{
+			fldset.style.display = 'none';
+		}
+		else
+		{
+			fldset.style.display = '';
+		}
+	}
 	//-->
 </script>
 
@@ -230,6 +243,35 @@ $Form->begin_fieldset( T_('Category URLs') );
 		<?php
 		}
 
+$Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_('Tag page URLs') );
+
+	$Form->radio( 'tag_links', $edited_Blog->get_setting('tag_links'),
+		array(
+				array( 'param', T_('Use param'), T_('E-g: ')
+								.url_add_param( $blogurl, '<strong>tag=mytag</strong>' ),'', 'onclick="show_hide_tag_prefix(this);"'),
+				array( 'semicol', T_('Use extra-path'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/mytag;</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
+			), T_('Tag page URLs'), true );
+
+
+		echo '<div id="tag_prefix_container">';
+			$Form->text_input( 'tag_prefix', $edited_Blog->get_setting( 'tag_prefix' ), 30, T_('Prefix'),
+														T_('An optional prefix to be added to the URLs of the tag pages'),
+														array('maxlength' => 120) );
+		echo '</div>';
+		if( $edited_Blog->get_setting( 'tag_links' ) == 'param' )
+		{ ?>
+		<script type="text/javascript">
+			<!--
+			var fldset = document.getElementById( 'tag_prefix_container' );
+			fldset.style.display = 'none';
+			//-->
+		</script>
+		<?php
+		}
 
 $Form->end_fieldset();
 
@@ -266,6 +308,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.15  2008/01/07 02:53:27  fplanque
+ * cleaner tag urls
+ *
  * Revision 1.14  2007/12/27 18:20:00  fplanque
  * cosmetics
  *

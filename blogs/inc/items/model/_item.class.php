@@ -2193,7 +2193,6 @@ class Item extends ItemLight
 				'after' =>            '</div>',
 				'separator' =>        ', ',
 				'links' =>            true,
-				'url' =>              '#',
 			), $params );
 
 		$tags = $this->get_tags();
@@ -2216,7 +2215,7 @@ class Item extends ItemLight
 				}
 				if( $links )
 				{	// We want links
-					echo '<a href="'.$this->Blog->gen_tag_url( $tag, $params['url'] ).'">';
+					echo '<a href="'.$this->Blog->gen_tag_url( $tag ).'">';
 				}
 				echo htmlspecialchars( $tag );
 				if( $links )
@@ -3236,6 +3235,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.24  2008/01/07 02:53:27  fplanque
+ * cleaner tag urls
+ *
  * Revision 1.23  2007/12/08 14:43:36  yabs
  * bugfix ( http://forums.b2evolution.net/viewtopic.php?t=13482 )
  *

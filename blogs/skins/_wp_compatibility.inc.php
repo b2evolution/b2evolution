@@ -260,7 +260,6 @@ function the_tags( $before = 'Tags: ', $sep = ', ', $after = '' )
 				'after' =>            $after,
 				'separator' =>        $sep,
 				'links' =>            true,
-				'url' =>              '#',
 			) );
 }
 
@@ -340,6 +339,9 @@ function next_posts_link( $link_text = 'Next' )
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/07 02:53:27  fplanque
+ * cleaner tag urls
+ *
  * Revision 1.4  2007/12/22 16:41:05  fplanque
  * Modular feedback template.
  *

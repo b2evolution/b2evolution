@@ -279,10 +279,8 @@ class Blog extends DataObject
 		if( param( 'chapter_links',   'string', NULL ) !== NULL )
 		{ // Chapter link type:
 			$this->set_setting( 'chapter_links', get_param( 'chapter_links' ) );
-			$this->set_setting( 'chapter_posts_per_page', param( 'chapter_posts_per_page', 'integer', NULL ), true );
-
-			$this->set_setting( 'tag_posts_per_page', param( 'tag_posts_per_page', 'integer', NULL ), true );
 		}
+
 
 		if( param( 'category_prefix', 'string', NULL) !== NULL )
 		{
@@ -293,6 +291,28 @@ class Blog extends DataObject
 			}
 			$this->set_setting( 'category_prefix', $category_prefix);
 		}
+
+		if( param( 'tag_links',   'string', NULL ) !== NULL )
+		{ // Tag page link type:
+			$this->set_setting( 'tag_links', get_param( 'tag_links' ) );
+		}
+
+		if( param( 'tag_prefix', 'string', NULL) !== NULL )
+		{
+			$category_prefix = get_param( 'tag_prefix' );
+			if( ! preg_match( '|^([A-Za-z0-9\-_]+(/[A-Za-z0-9\-_]+)*)?$|', $category_prefix) )
+			{
+				param_error( 'tag_prefix', T_('Invalid category prefix.') );
+			}
+			$this->set_setting( 'tag_prefix', $category_prefix);
+		}
+
+		if( param( 'chapter_posts_per_page', 'integer', NULL ) !== NULL )
+		{ // Chapter link type:
+			$this->set_setting( 'chapter_posts_per_page', get_param( 'chapter_posts_per_page' ), true );
+			$this->set_setting( 'tag_posts_per_page', param( 'tag_posts_per_page', 'integer', NULL ), true );
+		}
+
 
 		if( param( 'single_links',   'string', NULL ) !== NULL )
 		{ // Single post link type:
@@ -389,6 +409,7 @@ class Blog extends DataObject
 		{ // we want to load the workflow checkboxes:
 			$this->set_setting( 'canonical_item_urls',  param( 'canonical_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_cat_urls',  param( 'canonical_cat_urls', 'integer', 0 ) );
+			$this->set_setting( 'canonical_tag_urls',  param( 'canonical_tag_urls', 'integer', 0 ) );
 			$this->set_setting( 'default_noindex',  param( 'default_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_noindex',  param( 'paged_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_nofollowto',  param( 'paged_nofollowto', 'integer', 0 ) );
@@ -745,10 +766,15 @@ class Blog extends DataObject
 				$this->set_setting( 'chapter_links', 'chapters' );
 				$this->set_setting( 'chapter_posts_per_page', NULL );
 				$this->set_setting( 'tag_posts_per_page', NULL );
+				$this->set_setting( 'tag_links', 'semicol' );
 				$this->set_setting( 'single_links', 'ymd' );
 
 				$this->set_setting( 'canonical_item_urls', 1 );
 				$this->set_setting( 'canonical_cat_urls', 1 );
+				$this->set_setting( 'canonical_tag_urls', 1 );
+
+				$this->set_setting( 'category_prefix', '' );
+				$this->set_setting( 'tag_prefix', '' );
 
 				$this->set_setting( 'default_noindex', 0 );
 				$this->set_setting( 'paged_noindex', 1 );
@@ -775,10 +801,15 @@ class Blog extends DataObject
 				$this->set_setting( 'chapter_links', 'subchap' );
 				$this->set_setting( 'chapter_posts_per_page', 10 );
 				$this->set_setting( 'tag_posts_per_page', 10 );
+				$this->set_setting( 'tag_links', 'semicol' );
 				$this->set_setting( 'single_links', 'short' );
 
 				$this->set_setting( 'canonical_item_urls', 1 );
 				$this->set_setting( 'canonical_cat_urls', 1 );
+				$this->set_setting( 'canonical_tag_urls', 1 );
+
+				$this->set_setting( 'category_prefix', '' );
+				$this->set_setting( 'tag_prefix', '' );
 
 				$this->set_setting( 'default_noindex', 0 );
 				$this->set_setting( 'paged_noindex', 1 );
@@ -805,10 +836,15 @@ class Blog extends DataObject
 				$this->set_setting( 'chapter_links', 'chapters' );
 				$this->set_setting( 'chapter_posts_per_page', 20 );
 				$this->set_setting( 'tag_posts_per_page', 20 );
+				$this->set_setting( 'tag_links', 'semicol' );
 				$this->set_setting( 'single_links', 'chapters' );
 
 				$this->set_setting( 'canonical_item_urls', 1 );
 				$this->set_setting( 'canonical_cat_urls', 1 );
+				$this->set_setting( 'canonical_tag_urls', 1 );
+
+				$this->set_setting( 'category_prefix', '' );
+				$this->set_setting( 'tag_prefix', '' );
 
 				$this->set_setting( 'default_noindex', 0 );
 				$this->set_setting( 'paged_noindex', 1 );
@@ -835,10 +871,15 @@ class Blog extends DataObject
 				$this->set_setting( 'chapter_links', 'subchap' );
 				$this->set_setting( 'chapter_posts_per_page', 50 );
 				$this->set_setting( 'tag_posts_per_page', 50 );
+				$this->set_setting( 'tag_links', 'semicol' );
 				$this->set_setting( 'single_links', 'short' );
 
 				$this->set_setting( 'canonical_item_urls', 1 );
 				$this->set_setting( 'canonical_cat_urls', 1 );
+				$this->set_setting( 'canonical_tag_urls', 1 );
+
+				$this->set_setting( 'category_prefix', '' );
+				$this->set_setting( 'tag_prefix', '' );
 
 				$this->set_setting( 'default_noindex', 0 );
 				$this->set_setting( 'paged_noindex', 1 );
@@ -861,14 +902,19 @@ class Blog extends DataObject
 
 			case 'sspencer':
 				$this->set_setting( 'archive_links', 'extrapath' );
-				$this->set_setting( 'archive_posts_per_page', NULL );
+				$this->set_setting( 'archive_posts_per_page', 10 );
 				$this->set_setting( 'chapter_links', 'chapters' );
-				$this->set_setting( 'chapter_posts_per_page', NULL );
-				$this->set_setting( 'tag_posts_per_page', NULL );
+				$this->set_setting( 'chapter_posts_per_page', 10 );
+				$this->set_setting( 'tag_posts_per_page', 10 );
+				$this->set_setting( 'tag_links', 'semicol' );
 				$this->set_setting( 'single_links', 'chapters' );
 
 				$this->set_setting( 'canonical_item_urls', 1 );
 				$this->set_setting( 'canonical_cat_urls', 1 );
+				$this->set_setting( 'canonical_tag_urls', 1 );
+
+				$this->set_setting( 'category_prefix', 'category' );
+				$this->set_setting( 'tag_prefix', 'tag' );
 
 				$this->set_setting( 'default_noindex', 0 );
 				$this->set_setting( 'paged_noindex', 1 );
@@ -1021,21 +1067,37 @@ class Blog extends DataObject
   /**
 	 * Generate a tag url on this blog
 	 */
-	function gen_tag_url( $tag, $tag_view_url = NULL, $tag_posts_per_page = NULL, $glue = '&amp;' )
+	function gen_tag_url( $tag, $paged = 1, $glue = '&amp;' )
 	{
-		if( empty($tag_view_url) || $tag_view_url == '#' )
+		$link_type = $this->get_setting( 'tag_links' );
+		switch( $link_type )
 		{
-			$tag_view_url = $this->gen_blogurl();
-		}
-		$r = url_add_param( $tag_view_url, 'tag='.urlencode( $tag ) );
+			case 'param':
+				$r = url_add_param( $this->gen_blogurl(), 'tag='.urlencode( $tag ) );
 
-		if( empty($tag_posts_per_page) )
-		{	// Use default from Blog
-			$tag_posts_per_page = $this->get_setting( 'tag_posts_per_page' );
+				$tag_posts_per_page = $this->get_setting( 'tag_posts_per_page' );
+				if( !empty($tag_posts_per_page) && $tag_posts_per_page != $this->get_setting( 'posts_per_page' ) )
+				{	// We want a specific post per page count:
+					$r = url_add_param( $r, 'posts='.$tag_posts_per_page, $glue );
+				}
+				break;
+
+			case 'semicol':
+			default:
+				$tag_prefix = $this->get_setting('tag_prefix');
+				if( !empty( $tag_prefix ) )
+				{
+					$r = url_add_tail( $this->gen_blogurl(), '/'.$tag_prefix.'/'.urlencode( $tag ).';' );
+				}
+				else
+				{
+					$r = url_add_tail( $this->gen_blogurl(), '/'.urlencode( $tag ).';' );
+				}
 		}
-		if( !empty($tag_posts_per_page) && $tag_posts_per_page != $this->get_setting( 'posts_per_page' ) )
-		{	// We want a specific post per page count:
-			$r = url_add_param( $r, 'posts='.$tag_posts_per_page, $glue );
+
+		if( $paged > 1 )
+		{	// We want a specific page:
+			$r = url_add_param( $r, 'paged='.$paged, $glue );
 		}
 
 		return $r;
@@ -1757,6 +1819,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2008/01/07 02:53:26  fplanque
+ * cleaner tag urls
+ *
  * Revision 1.24  2008/01/06 18:47:08  fplanque
  * enhanced system checks
  *

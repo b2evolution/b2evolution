@@ -44,6 +44,20 @@ global $rsc_url;
 			fldset.style.display = '';
 		}
 	}
+
+
+	function show_hide_tag_prefix(ob)
+	{
+		var fldset = document.getElementById( 'tag_prefix_container' );
+		if( ob.value == 'param_num' )
+		{
+			fldset.style.display = 'none';
+		}
+		else
+		{
+			fldset.style.display = '';
+		}
+	}
 	//-->
 </script>
 
@@ -185,7 +199,7 @@ $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_s
 
 	$Form->checkbox( 'arcdir_noindex', $edited_Blog->get_setting( 'arcdir_noindex' ), T_('Archive directory'), T_('META NOINDEX') );
 
-	$Form->end_fieldset();
+$Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo') );
 
@@ -228,6 +242,33 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo'
 
 $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo') );
 
+	$Form->radio( 'tag_links', $edited_Blog->get_setting('tag_links'),
+		array(
+				array( 'param', T_('Use param'), T_('E-g: ')
+								.url_add_param( $blogurl, '<strong>tag=mytag</strong>' ),'', 'onclick="show_hide_tag_prefix(this);"'),
+				array( 'semicol', T_('Use extra-path'), T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/mytag;</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
+			), T_('Tag page URLs'), true );
+
+
+	echo '<div id="tag_prefix_container">';
+		$Form->text_input( 'tag_prefix', $edited_Blog->get_setting( 'tag_prefix' ), 30, T_('Prefix'),
+													T_('An optional prefix to be added to the URLs of the tag pages'),
+													array('maxlength' => 120) );
+	echo '</div>';
+	if( $edited_Blog->get_setting( 'tag_links' ) == 'param' )
+	{ ?>
+	<script type="text/javascript">
+		<!--
+		var fldset = document.getElementById( 'tag_prefix_container' );
+		fldset.style.display = 'none';
+		//-->
+	</script>
+	<?php
+	}
+
+	$Form->checkbox( 'canonical_tag_urls', $edited_Blog->get_setting( 'canonical_tag_urls' ), T_('Make canonical'), T_('301 redirect to canonical URL') );
+
 	$Form->checkbox( 'tag_noindex', $edited_Blog->get_setting( 'tag_noindex' ), T_('Indexing'), T_('META NOINDEX') );
 
 	$Form->text( 'tag_posts_per_page', $edited_Blog->get_setting('tag_posts_per_page'), 4, T_('Posts per page'),
@@ -256,6 +297,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.9  2008/01/07 02:53:27  fplanque
+ * cleaner tag urls
+ *
  * Revision 1.8  2007/12/27 18:20:00  fplanque
  * cosmetics
  *

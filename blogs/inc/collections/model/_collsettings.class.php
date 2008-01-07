@@ -63,8 +63,8 @@ class CollectionSettings extends AbstractSettings
 			'use_workflow' => 0,								// Don't use workflow by default
 			'aggregate_coll_IDs' => '',
 			'allow_rating'   => 'never',
+
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
-			'canonical_cat_urls' => 1,					// Redirect categories to their canonical Url?
 			'default_noindex' => '0',						// META NOINDEX on Default blog page
 
 			'paged_noindex' => '1',							// META NOINDEX on following blog pages
@@ -77,10 +77,15 @@ class CollectionSettings extends AbstractSettings
 			'archive_nofollowto' => '0',        // NOFOLLOW on links to archive pages
 
 			'chapter_links'  => 'param_num',		// 'param_num', 'subchap', 'chapters'
+			'canonical_cat_urls' => 1,					// Redirect categories to their canonical Url?
 			'chapter_posts_per_page' => NULL,
 			'chapter_noindex' => '1',						// META NOINDEX on Category pages
+			'category_prefix' => '',
 
+			'tag_links'  => 'param',						// 'param', 'semicol'
+			'canonical_tag_urls' => 1,					// Redirect tag pages to their canonical Url?
 			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
+			'tag_prefix' => '',
 
 			'filtered_noindex' => '1',					// META NOINDEX on other filtered pages
 			'arcdir_noindex' => '1',						// META NOINDEX on Archive directory
@@ -124,6 +129,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.8  2008/01/07 02:53:26  fplanque
+ * cleaner tag urls
+ *
  * Revision 1.7  2007/11/25 18:20:38  fplanque
  * additional SEO settings
  *
