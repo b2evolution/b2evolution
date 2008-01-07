@@ -7,6 +7,12 @@
  *
  * This is meant to be included in a page template.
  *
+ * @todo dh> with disabled JavaScript the expanded submenu boxes
+ *           for "Customize" do not get moved to the correct
+ *           place/screen offset.
+ *           I think the display of the submenus should get done
+ *           only with JS in this case (and not with hover).
+ *
  * @package evoskins
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
