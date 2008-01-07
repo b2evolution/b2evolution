@@ -14,6 +14,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_funcs( '_core/_url.funcs.php' );
+
 if( isset($Item) )
 {	// Comments for a specific Item:
   $CommentList = & new CommentList( $Blog, "'comment'", array('published'), $Item->ID,
