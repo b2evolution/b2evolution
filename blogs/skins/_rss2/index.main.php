@@ -7,6 +7,9 @@
  *
  * See {@link http://backend.userland.com/rss092}
  *
+ * @todo iTunes podcast tags: http://www.apple.com/itunes/store/podcaststechspecs.html
+ * Note: itunes support: .m4a, .mp3, .mov, .mp4, .m4v, and .pdf.
+ *
  * @package evoskins
  * @subpackage rss
  *
@@ -96,6 +99,13 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			?>
 			<guid isPermaLink="false"><?php $Item->ID() ?>@<?php echo $baseurl ?></guid>
 			<?php
+				// PODCAST ------------------------------------------------------------------------
+				if( $Item->ptyp_ID == 2000 )
+				{	// This is a podcast Item !
+					echo '<enclosure url="'.$Item->url.'" />';
+					// TODO: add length="12216320" type="audio/mpeg"
+				}
+
 				if( $feed_content == 'excerpt' )
 				{	// EXCERPTS ---------------------------------------------------------------------
 
@@ -127,11 +137,12 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 
 					?>
 			<description><?php
-				// URL link, if the post has one:
+				// URL link, if the post has one: (TODO: move below the text, because in summaries or podcasts it blows to have this on top)
 				$Item->url_link( array(
 						'before'        => '<p>',
 						'after'         => '</p>',
 						'format'        => 'entityencoded',
+						'podcast'       => false,
 					) );
 
 				// Display images that are linked to this post:
@@ -172,6 +183,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				$Item->url_link( array(
 						'before'        => '<p>',
 						'after'         => '</p>',
+						'podcast'       => false,
 					) );
 
 				// Display images that are linked to this post:

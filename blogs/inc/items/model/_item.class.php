@@ -2285,10 +2285,15 @@ class Item extends ItemLight
 
 
 	/**
-	 * Template function: Display link to item related url
+	 * Template function: Display link to item related url.
+	 *
+	 * By default the link is displayed as a link.
+	 * Optionally some smart stuff may happen.
 	 */
 	function url_link( $params = array() )
 	{
+		global $rsc_url;
+
 		if( empty( $this->url ) )
 		{
 			return;
@@ -2302,23 +2307,43 @@ class Item extends ItemLight
 				'url_template'  => '$url$',
 				'target'        => '',
 				'format'        => 'htmlbody',
+				'podcast'       => '#',						// handle as podcast. # means depending on post type
+				'before_podplayer' => '<div class="podplayer">',
+				'after_podplayer'  => '</div>',
 			), $params );
 
-		$r = $params['before'];
-
-		$r .= '<a href="'.str_replace( '$url$', $this->url, $params['url_template'] ).'"';
-
-		if( !empty( $params['target'] ) )
-		{
-			$r .= ' target="'.$params['target'].'"';
+		if( $params['podcast'] == '#' )
+		{	// Check if this post is a podcast
+			$params['podcast'] = ( $this->ptyp_ID == 2000 );
 		}
 
-		$r .= '>'.str_replace( '$url$', $this->url, $params['text_template'] ).'</a>';
+		if( $params['podcast'] && $params['format'] == 'htmlbody' )
+		{	// We want podcast display:
 
-		$r .= $params['after'];
+			echo $params['before_podplayer'];
 
-		echo format_to_output( $r, $params['format'] );
+			echo '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" width="200" height="20" id="dewplayer" align="middle"><param name="wmode" value="transparent"><param name="allowScriptAccess" value="sameDomain" /><param name="movie" value="'.$rsc_url.'swf/dewplayer.swf?mp3='.$this->url.'&amp;showtime=1" /><param name="quality" value="high" /><param name="bgcolor" value="" /><embed src="'.$rsc_url.'swf/dewplayer.swf?mp3='.$this->url.'&amp;showtime=1" quality="high" bgcolor="" width="200" height="20" name="dewplayer" wmode="transparent" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></embed></object>';
 
+			echo $params['after_podplayer'];
+
+		}
+		else
+		{
+			$r = $params['before'];
+
+			$r .= '<a href="'.str_replace( '$url$', $this->url, $params['url_template'] ).'"';
+
+			if( !empty( $params['target'] ) )
+			{
+				$r .= ' target="'.$params['target'].'"';
+			}
+
+			$r .= '>'.str_replace( '$url$', $this->url, $params['text_template'] ).'</a>';
+
+			$r .= $params['after'];
+
+			echo format_to_output( $r, $params['format'] );
+		}
 	}
 
 
@@ -3235,6 +3260,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.25  2008/01/08 03:31:51  fplanque
+ * podcast support
+ *
  * Revision 1.24  2008/01/07 02:53:27  fplanque
  * cleaner tag urls
  *

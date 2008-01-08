@@ -174,7 +174,7 @@ function create_default_data()
 		VALUES ( 1, 'Post' ),
 					 ( 2, 'Link' ),
 					 ( 1000, 'Page' ),
-					 ( 2000, 'Reserved' ),
+					 ( 2000, 'Podcast' ),
 					 ( 3000, 'Reserved' ),
 					 ( 4000, 'Reserved' ),
 					 ( 5000, 'Reserved' ) " );
@@ -200,7 +200,11 @@ function create_default_data()
 			(10, 'pps', 'Slideshow', 'pps', 'pps.gif', 'external', 1),
 			(11, 'zip', 'ZIP archive', 'application/zip', 'zip.gif', 'external', 1),
 			(12, 'php php3 php4 php5 php6', 'PHP script', 'application/x-httpd-php', 'php.gif', 'text', 0),
-			(13, 'css', 'Style sheet', 'text/css', '', 'text', 1)
+			(13, 'css', 'Style sheet', 'text/css', '', 'text', 1),
+			(14, 'mp3', 'MPEG audio file', 'audio/mpeg', '', 'browser', 1)
+			(15, 'm4a', 'MPEG audio file', 'audio/x-m4a', '', 'browser', 1)
+			(16, 'mp4', 'MPEG video', 'video/mp4', '', 'browser', 1)
+			(17, 'mov', 'Quicktime video', 'video/quicktime', '', 'browser', 1)
 		" );
 	echo "OK.<br />\n";
 
@@ -643,6 +647,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.235  2008/01/08 03:31:50  fplanque
+ * podcast support
+ *
  * Revision 1.234  2008/01/07 03:00:52  fplanque
  * minor
  *

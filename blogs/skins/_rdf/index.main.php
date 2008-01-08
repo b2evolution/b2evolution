@@ -128,6 +128,7 @@ while( $Item = & mainlist_get_item() )
 				'before'        => '<p>',
 				'after'         => '</p>',
 				'format'        => 'entityencoded',
+				'podcast'       => false,
 			) );
 
 		// Display images that are linked to this post:
@@ -168,6 +169,7 @@ while( $Item = & mainlist_get_item() )
 		$Item->url_link( array(
 				'before'        => '<p>',
 				'after'         => '</p>',
+				'podcast'       => false,
 			) );
 
 		// Display images that are linked to this post:

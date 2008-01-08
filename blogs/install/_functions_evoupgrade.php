@@ -2015,6 +2015,13 @@ function upgrade_b2evo_tables()
 	}
 
 
+	// 2.3.2
+  echo 'Creating PodCast Post Type... ';
+	$DB->query( "
+		REPLACE INTO T_items__type ( ptyp_ID, ptyp_name )
+		VALUES ( 2000, 'Podcast' )" );
+	echo "OK.<br />\n";
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -2124,6 +2131,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.235  2008/01/08 03:31:50  fplanque
+ * podcast support
+ *
  * Revision 1.234  2008/01/05 00:24:35  blueyed
  * Create same filetypes when upgrading as when installing (DRY anyone?)
  *

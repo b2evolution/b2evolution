@@ -54,6 +54,7 @@ if( !empty($params['image_size']) )
 				'text_template' => '$url$',
 				'url_template'  => '$url$',
 				'target'        => '',
+				'podcast'       => '#',        // auto display mp3 player if post type is podcast (=> false, to disable)
 			) );
 
 		// Display CONTENT:
@@ -79,6 +80,9 @@ if( !empty($params['image_size']) )
 <?php
 /*
  * $Log$
+ * Revision 1.6  2008/01/08 03:31:51  fplanque
+ * podcast support
+ *
  * Revision 1.5  2007/11/29 20:53:45  fplanque
  * Fixed missing url link in basically all skins ...
  *

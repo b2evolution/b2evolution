@@ -111,6 +111,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				$Item->url_link( array(
 						'before'        => '<p>',
 						'after'         => '</p>',
+						'podcast'       => false,
 					) );
 
 				// Display images that are linked to this post:

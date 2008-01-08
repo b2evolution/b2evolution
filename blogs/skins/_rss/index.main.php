@@ -89,6 +89,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 						'before'        => '<p>',
 						'after'         => '</p>',
 						'format'        => 'entityencoded',
+						'podcast'       => false,
 					) );
 
 				// Display images that are linked to this post:
