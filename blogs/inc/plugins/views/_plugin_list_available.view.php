@@ -196,8 +196,25 @@ $Table->display_body_end();
 
 $Table->display_list_end();
 
+
+// Note about how to make plugins available for installation.
+// It should make clear that the above list are not all available plugins (e.g. through an online channel)!
+global $plugins_path;
+echo '<p>';
+echo T_('The above plugins are those already installed into your "plugins" directory.');
+echo "</p>\n<p>";
+printf( T_('You can find more plugins online at %s or other channels.'), '<a href="http://plugins.b2evolution.net/">plugins.b2evolution.net</a>');
+echo "</p>\n<p>";
+printf( T_('To make a plugin available for installation, extract it into the "%s" directory on the server.'),
+	rel_path_to_base($plugins_path) );
+echo '</p>';
+
+
 /*
  * $Log$
+ * Revision 1.2  2008/01/08 00:10:45  blueyed
+ * Info about getting new plugins on the "available plugins" view
+ *
  * Revision 1.1  2007/06/25 11:00:54  fplanque
  * MODULES (refactored MVC)
  *
