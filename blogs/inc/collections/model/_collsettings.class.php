@@ -47,8 +47,6 @@ class CollectionSettings extends AbstractSettings
 	var $_defaults = array(
 			'new_feedback_status' => 'draft',  	// 'draft', 'published' or 'deprecated'
 
-			'tag_posts_per_page' => NULL,
-
 			'single_links'   => 'param_title',
 			'permalinks'     => 'single',				// single, archive, subchap
 
@@ -84,6 +82,7 @@ class CollectionSettings extends AbstractSettings
 
 			'tag_links'  => 'param',						// 'param', 'semicol'
 			'canonical_tag_urls' => 1,					// Redirect tag pages to their canonical Url?
+			'tag_posts_per_page' => NULL,
 			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
 			'tag_prefix' => '',
 
@@ -129,6 +128,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.9  2008/01/08 03:28:11  fplanque
+ * minor
+ *
  * Revision 1.8  2008/01/07 02:53:26  fplanque
  * cleaner tag urls
  *
