@@ -201,9 +201,9 @@ function create_default_data()
 			(11, 'zip', 'ZIP archive', 'application/zip', 'zip.gif', 'external', 1),
 			(12, 'php php3 php4 php5 php6', 'PHP script', 'application/x-httpd-php', 'php.gif', 'text', 0),
 			(13, 'css', 'Style sheet', 'text/css', '', 'text', 1),
-			(14, 'mp3', 'MPEG audio file', 'audio/mpeg', '', 'browser', 1)
-			(15, 'm4a', 'MPEG audio file', 'audio/x-m4a', '', 'browser', 1)
-			(16, 'mp4', 'MPEG video', 'video/mp4', '', 'browser', 1)
+			(14, 'mp3', 'MPEG audio file', 'audio/mpeg', '', 'browser', 1),
+			(15, 'm4a', 'MPEG audio file', 'audio/x-m4a', '', 'browser', 1),
+			(16, 'mp4', 'MPEG video', 'video/mp4', '', 'browser', 1),
 			(17, 'mov', 'Quicktime video', 'video/quicktime', '', 'browser', 1)
 		" );
 	echo "OK.<br />\n";
@@ -647,6 +647,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.236  2008/01/08 19:35:00  personman2
+ * Adding missing commas to install function
+ *
  * Revision 1.235  2008/01/08 03:31:50  fplanque
  * podcast support
  *
