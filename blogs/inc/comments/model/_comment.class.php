@@ -1134,8 +1134,12 @@ class Comment extends DataObject
 		$item_author_User = & $edited_Item->get_creator_User();
 		if( $item_author_User->notify
 				&& ( ! empty( $item_author_User->email ) ) )
-		{ // Author wants to be notified:
-			$notify_array[$item_author_User->email] = $item_author_User->locale;
+		{ // Author wants to be notified, as long as the comment isn't from the author:
+			if( ! ($this->get_author_User() 
+				&& $item_author_User->login == $this->author_User->login))
+				{
+					$notify_array[$item_author_User->email] = $item_author_User->locale;
+				}
 		}
 
 		if( ! count($notify_array) )
@@ -1329,6 +1333,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2008/01/08 20:15:21  personman2
+ * Post author no longer gets emails when he comments on his own post
+ *
  * Revision 1.10  2007/12/28 13:45:33  fplanque
  * bugfix again
  *
