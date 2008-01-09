@@ -39,6 +39,12 @@ class CommentList extends DataObjectList
 	 * Constructor
 	 *
 	 * @param Blog can pass NULL if $p is passed
+	 * @param string
+	 * @param array
+	 * @param
+	 * @param string Order ("ASC"/"DESC")
+	 * @param string List of fields to order by (separated by " ")
+	 * @param integer Limit
 	 */
 	function CommentList(
 		$Blog,
@@ -58,8 +64,12 @@ class CommentList extends DataObjectList
 		// Call parent constructor:
 		parent::DataObjectList( 'T_comments', 'comment_', 'comment_ID', 'Item', NULL, $limit );
 
-		$this->sql = 'SELECT DISTINCT T_comments.*
-									FROM T_comments INNER JOIN T_items__item ON comment_post_ID = post_ID ';
+		// We use "GROUP BY" instead of "DISTINCT", because the latter expands
+		// to "GROUP BY T_comments.*" and there's no index then
+		$this->sql = '
+			SELECT T_comments.*
+			  FROM T_comments FORCE INDEX(comment_date_ID, comment_date) # table scan is expensive
+			 INNER JOIN T_items__item ON comment_post_ID = post_ID ';
 
 		if( !empty( $p ) )
 		{	// Restrict to comments on selected post
@@ -67,8 +77,9 @@ class CommentList extends DataObjectList
 		}
 		else
 		{
-			$this->sql .= 'INNER JOIN T_postcats ON post_ID = postcat_post_ID
-										INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID ';
+			$this->sql .= '
+				INNER JOIN T_postcats ON post_ID = postcat_post_ID
+				INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID ';
 
 			$aggregate_coll_IDs = $Blog->get_setting('aggregate_coll_IDs');
 			if( empty( $aggregate_coll_IDs ) )
@@ -106,7 +117,7 @@ class CommentList extends DataObjectList
 
 		if(empty($orderby))
 		{
-			$orderby = 'comment_date '.$order;
+			$orderby = 'comment_date '.$order.', comment_ID '.$order;
 		}
 		else
 		{
@@ -121,9 +132,26 @@ class CommentList extends DataObjectList
 			}
 		}
 
+		// GROUP BY, based on ORDER BY (trying to match any index, e.g. comment_date_ID)
+		$comment_order = preg_match_all( '~\bcomment_\w+\b~', $orderby, $matches );
+		if( ! $matches )
+		{
+			$this->sql .= "\nGROUP BY comment_ID";
+		}
+		else
+		{
+			$groupby_array = $matches[0];
+			if( ! in_array('comment_ID', $groupby_array) )
+			{ // ID should always be there to satisfy "DISTINCT" simulation
+				$groupby_array[] = 'comment_ID';
+			}
+			$this->sql .= "\nGROUP BY ".implode(', ', $groupby_array);
+		}
+
 		if( $order == 'RANDOM' ) $orderby = 'RAND()';
 
-		$this->sql .= "ORDER BY $orderby";
+		$this->sql .= "\nORDER BY $orderby";
+
 		if( !empty( $this->limit ) )
 		{
 			$this->sql .= ' LIMIT '.$this->limit;
@@ -171,6 +199,10 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.4  2008/01/09 00:25:51  blueyed
+ * Vastly improve performance in CommentList for large number of comments:
+ * - add index comment_date_ID; and force it in the SQL (falling back to comment_date)
+ *
  * Revision 1.3  2007/12/24 10:36:07  yabs
  * adding random order
  *
