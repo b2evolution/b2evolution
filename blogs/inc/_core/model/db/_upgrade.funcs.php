@@ -100,6 +100,46 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 	// Split the queries into $items, by their type:
 	foreach( $queries as $qry )
 	{
+		// Remove any comments from the SQL:
+		$n = strlen($qry);
+		$in_string = false;
+		for( $i = 0; $i < $n; $i++ )
+		{
+			if( $qry[$i] == '\\' )
+			{ // backslash/escape; skip
+				continue;
+			}
+			if( $qry[$i] == '"' || $qry[$i] == "'" )
+			{
+				if( ! $in_string )
+				{ // string begins:
+					$in_string = $qry[$i];
+				}
+				if( $qry[$i] === $in_string )
+				{
+					$in_string = false;
+				}
+			}
+			elseif( $in_string === false )
+			{ // not in string, check for comment start:
+				if( $qry[$i] == '#' || substr($qry, $i, 3) == '-- ' )
+				{ // comment start
+					// search for newline
+					for( $j = $i+1; $j < $n; $j++ )
+					{
+						if( $qry[$j] == "\n" || $qry[$j] == "\r" )
+						{
+							break;
+						}
+					}
+					// remove comment
+					$qry = substr($qry, 0, $i).substr($qry, $j);
+					$n = strlen($qry);
+					continue;
+				}
+			}
+		}
+
 		if( preg_match( '|^(\s*CREATE TABLE\s+)(IF NOT EXISTS\s+)?([^\s(]+)(.*)$|is', $qry, $match) )
 		{
 			$tablename = db_delta_remove_backticks(preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[3] ));
@@ -1165,6 +1205,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.2  2008/01/09 00:22:17  blueyed
+ * db_delta(): remove comments from queries
+ *
  * Revision 1.1  2007/06/25 10:59:00  fplanque
  * MODULES (refactored MVC)
  *

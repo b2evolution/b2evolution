@@ -1111,6 +1111,22 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 		$this->assertEqual( count($r), 0 );
 	}
 
+
+	/**
+	 * Test that comments get removed from the given SQL
+	 */
+	function test_comments_get_removed()
+	{
+		$sql = 'CREATE TABLE test_1 (
+				i INT # comment
+			)#';
+		$sql_clean = 'CREATE TABLE test_1 (
+				i INT '.'
+			)';
+		$r = db_delta( $sql );
+		$this->assertEqual( $sql_clean, $r['test_1'][0]['queries'][0] );
+	}
+
 }
 
 
