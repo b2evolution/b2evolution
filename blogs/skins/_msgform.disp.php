@@ -25,6 +25,10 @@ global $cookie_name, $cookie_email;
 global $DB;
 
 // Parameters
+/* TODO: dh> params should get remembered, e.g. if somebody clicks on the
+ *       login/logout link from the msgform page.
+ *       BUT, for the logout link remembering it here is too late normally.. :/
+ */
 $redirect_to = param( 'redirect_to', 'string', '' ); // pass-through (hidden field)
 $recipient_id = param( 'recipient_id', 'integer', '' );
 $post_id = param( 'post_id', 'integer', '' );
@@ -201,6 +205,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/09 00:26:07  blueyed
+ * todo
+ *
  * Revision 1.1  2007/11/29 19:29:22  fplanque
  * normalized skin filenames
  *
