@@ -136,7 +136,7 @@ $Form->begin_fieldset( T_('Email communications') );
 			$Form->info( T_('Validated email'), ( $edited_User->get('validated') ? T_('yes') : T_('no') ), T_('Has this email address been validated (through confirmation email)?') );
 		}
 		$Form->checkbox( 'edited_user_allow_msgform', $edited_User->get('allow_msgform'), T_('Message form'), T_('Check this to allow receiving emails through a message form.') );
-		$Form->checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc.') );
+		$Form->checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive a notification whenever someone else comments on one of <strong>your</strong> posts.') );
 
 	}
 	else
@@ -386,6 +386,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/10 19:59:52  fplanque
+ * reduced comment PITA
+ *
  * Revision 1.1  2007/06/25 11:01:51  fplanque
  * MODULES (refactored MVC)
  *

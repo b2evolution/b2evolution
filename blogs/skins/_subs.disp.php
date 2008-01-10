@@ -57,7 +57,7 @@ $Form->begin_form( 'bComment' );
 
 		$Form->text( 'newuser_email', $current_User->get( 'email' ), 40, T_('Email'), '', 100, 'bComment' );
 
-		$Form->checkbox( 'newuser_notify', $current_User->get( 'notify' ), T_('Notifications'), T_('Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc.') );
+		$Form->checkbox( 'newuser_notify', $current_User->get( 'notify' ), T_('Notifications'), T_('Check this to receive a notification whenever someone else comments on one of <strong>your</strong> posts.') );
 
 	$Form->end_fieldset();
 
@@ -114,6 +114,9 @@ $Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/10 19:59:52  fplanque
+ * reduced comment PITA
+ *
  * Revision 1.1  2007/11/29 19:29:23  fplanque
  * normalized skin filenames
  *

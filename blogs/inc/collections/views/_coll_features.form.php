@@ -78,7 +78,7 @@ $Form->begin_fieldset( T_('Feedback options') );
 			'deprecated' => T_('Deprecated')
 		);
 	$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
-				T_('New feedback status'), T_('This status will be assigned to any new comment/trackback (unless overriden by plugins).') );
+				T_('New feedback status'), T_('This status will be assigned to new comments/trackbacks from non moderators (unless overriden by plugins).') );
 
 	echo '</div>';
 
@@ -149,6 +149,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/10 19:59:51  fplanque
+ * reduced comment PITA
+ *
  * Revision 1.4  2007/12/26 17:21:17  fplanque
  * Anne's pony about full posts in RSS
  *

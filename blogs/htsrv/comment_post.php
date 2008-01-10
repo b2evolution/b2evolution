@@ -56,6 +56,9 @@ param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 )
 
 if( is_logged_in() )
 {
+  /**
+	 * @var User
+	 */
 	$User = & $current_User;
 	$author = null;
 	$email = null;
@@ -185,6 +188,7 @@ else
 	$Comment->set( 'author_url', $url );
 	$Comment->set( 'allow_msgform', $comment_allow_msgform );
 }
+
 if( $commented_Item->can_rate() )
 {	// Comment rating:
 	$Comment->set( 'rating', $comment_rating );
@@ -195,8 +199,14 @@ $Comment->set( 'content', $comment );
 
 $commented_Item->get_Blog(); // Make sure Blog is loaded
 
-// Assign default status for new comments:
-$Comment->set( 'status', $commented_Item->Blog->get_setting('new_feedback_status') );
+if( !empty($User) && $User->check_perm( 'blog_comments', 'edit', false ) )
+{	// User has perm to moderate comments, publish automatically:
+	$Comment->set( 'status', 'published' );
+}
+else
+{ // Assign default status for new comments:
+	$Comment->set( 'status', $commented_Item->Blog->get_setting('new_feedback_status') );
+}
 
 if( $action != 'preview' )
 {
@@ -369,6 +379,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.116  2008/01/10 19:59:52  fplanque
+ * reduced comment PITA
+ *
  * Revision 1.115  2007/11/02 01:57:57  fplanque
  * comment ratings
  *

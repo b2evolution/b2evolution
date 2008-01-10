@@ -1096,10 +1096,11 @@ class Comment extends DataObject
 	/**
 	 * Send email notifications to subscribed users:
 	 *
+	 * @todo fp> SEPARATE MODERATION notifications from SUBSCRIPTION notifications
 	 * @todo shall we notify suscribers of blog were this is in extra-cat?
 	 * @todo cache message by locale like {@link Item::send_email_notifications()}
 	 * @todo dh> Indicator in url to see where the user came from (&from=subnote ["subscription notification"]) - Problem: too long urls.
-	 * @todo dh> "Beautify" like {@link Item::send_email_notifications()} ?
+	 * @todo dh> "Beautify" like {@link Item::send_email_notifications()} ? fp > sure
 	 * @todo Should include "visibility status" in the mail to the Item's Author
 	 */
 	function send_email_notifications()
@@ -1134,10 +1135,10 @@ class Comment extends DataObject
 		$item_author_User = & $edited_Item->get_creator_User();
 		if( $item_author_User->notify
 				&& ( ! empty( $item_author_User->email ) ) )
-		{ // Author wants to be notified, as long as the comment isn't from the author:
-			if( ! ($this->get_author_User() 
-				&& $item_author_User->login == $this->author_User->login))
-				{
+		{ // Author wants to be notified...
+			if( ! ($this->get_author_User() // comment is from registered user
+							&& $item_author_User->login == $this->author_User->login) ) // comment is from same user as post
+				{	// Author is not commenting on his own post...
 					$notify_array[$item_author_User->email] = $item_author_User->locale;
 				}
 		}
@@ -1333,6 +1334,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2008/01/10 19:59:51  fplanque
+ * reduced comment PITA
+ *
  * Revision 1.11  2008/01/08 20:15:21  personman2
  * Post author no longer gets emails when he comments on his own post
  *
