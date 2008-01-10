@@ -64,12 +64,8 @@ class CommentList extends DataObjectList
 		// Call parent constructor:
 		parent::DataObjectList( 'T_comments', 'comment_', 'comment_ID', 'Item', NULL, $limit );
 
-		// We use "GROUP BY" instead of "DISTINCT", because the latter expands
-		// to "GROUP BY T_comments.*" and there's no index then
-		$this->sql = '
-			SELECT T_comments.*
-			  FROM T_comments FORCE INDEX(comment_date_ID, comment_date) # table scan is expensive
-			 INNER JOIN T_items__item ON comment_post_ID = post_ID ';
+		$this->sql = 'SELECT DISTINCT T_comments.*
+									FROM T_comments INNER JOIN T_items__item ON comment_post_ID = post_ID ';
 
 		if( !empty( $p ) )
 		{	// Restrict to comments on selected post
@@ -77,9 +73,8 @@ class CommentList extends DataObjectList
 		}
 		else
 		{
-			$this->sql .= '
-				INNER JOIN T_postcats ON post_ID = postcat_post_ID
-				INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID ';
+			$this->sql .= 'INNER JOIN T_postcats ON post_ID = postcat_post_ID
+										INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID ';
 
 			$aggregate_coll_IDs = $Blog->get_setting('aggregate_coll_IDs');
 			if( empty( $aggregate_coll_IDs ) )
@@ -132,26 +127,9 @@ class CommentList extends DataObjectList
 			}
 		}
 
-		// GROUP BY, based on ORDER BY (trying to match any index, e.g. comment_date_ID)
-		$comment_order = preg_match_all( '~\bcomment_\w+\b~', $orderby, $matches );
-		if( ! $matches )
-		{
-			$this->sql .= "\nGROUP BY comment_ID";
-		}
-		else
-		{
-			$groupby_array = $matches[0];
-			if( ! in_array('comment_ID', $groupby_array) )
-			{ // ID should always be there to satisfy "DISTINCT" simulation
-				$groupby_array[] = 'comment_ID';
-			}
-			$this->sql .= "\nGROUP BY ".implode(', ', $groupby_array);
-		}
-
 		if( $order == 'RANDOM' ) $orderby = 'RAND()';
 
-		$this->sql .= "\nORDER BY $orderby";
-
+		$this->sql .= "ORDER BY $orderby";
 		if( !empty( $this->limit ) )
 		{
 			$this->sql .= ' LIMIT '.$this->limit;
@@ -199,6 +177,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/10 19:56:58  fplanque
+ * moved to v-3-0
+ *
  * Revision 1.4  2008/01/09 00:25:51  blueyed
  * Vastly improve performance in CommentList for large number of comments:
  * - add index comment_date_ID; and force it in the SQL (falling back to comment_date)

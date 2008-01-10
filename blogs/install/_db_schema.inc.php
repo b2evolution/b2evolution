@@ -255,8 +255,7 @@ $schema_queries = array(
 			PRIMARY KEY comment_ID (comment_ID),
 			KEY comment_post_ID (comment_post_ID),
 			KEY comment_date (comment_date),
-			KEY comment_type (comment_type),
-			KEY comment_date_ID (comment_date, comment_ID) -- used in CommentList
+			KEY comment_type (comment_type)
 		)" ),
 
 	'T_locales' => array(
@@ -563,6 +562,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.74  2008/01/10 19:57:37  fplanque
+ * moved to v-3-0
+ *
  * Revision 1.73  2008/01/09 00:25:51  blueyed
  * Vastly improve performance in CommentList for large number of comments:
  * - add index comment_date_ID; and force it in the SQL (falling back to comment_date)
