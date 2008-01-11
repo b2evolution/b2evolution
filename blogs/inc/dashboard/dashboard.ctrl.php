@@ -76,6 +76,9 @@ if( $blog )
 		$block_item_Widget->title = T_('Comments awaiting moderation');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
+    /**
+		 * @var Comment
+		 */
 		while( $Comment = & $CommentList->get_next() )
 		{ // Loop through comments:
 
@@ -487,6 +490,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2008/01/11 19:18:30  fplanque
+ * bugfixes
+ *
  * Revision 1.19  2008/01/05 02:28:17  fplanque
  * enhanced blog selector (bloglist_buttons)
  *

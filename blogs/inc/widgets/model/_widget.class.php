@@ -366,7 +366,7 @@ class ComponentWidget extends DataObject
 		// add additional css classes if required
 		$widget_css_class = 'widget_'.$this->type.'_'.$this->code.( empty( $params[ 'widget_css_class' ] ) ? '' : ' '.$params[ 'widget_css_class' ] );
 		// add custom id if required, default to generic id for validation purposes
-		$widget_ID = ( $params[ 'widget_ID' ] ? $params[ 'widget_ID' ] : 'widget_'.$this->type.'_'.$this->code.'_'.$this->ID );
+		$widget_ID = ( !empty($params[ 'widget_ID' ]) ? $params[ 'widget_ID' ] : 'widget_'.$this->type.'_'.$this->code.'_'.$this->ID );
 		// replace the values
 		$this->disp_params = str_replace( array( '$wi_ID$', '$wi_class$' ), array( $widget_ID, $widget_css_class ), $params );
 	}
@@ -721,6 +721,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.30  2008/01/11 19:18:30  fplanque
+ * bugfixes
+ *
  * Revision 1.29  2008/01/06 17:52:50  fplanque
  * minor/doc
  *

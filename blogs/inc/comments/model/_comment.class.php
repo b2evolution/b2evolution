@@ -498,7 +498,9 @@ class Comment extends DataObject
 		if( !empty( $r ) )
 		{
 			echo $r;
+			return true;
 		}
+		return false;
 	}
 
 
@@ -1334,6 +1336,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2008/01/11 19:18:29  fplanque
+ * bugfixes
+ *
  * Revision 1.12  2008/01/10 19:59:51  fplanque
  * reduced comment PITA
  *
