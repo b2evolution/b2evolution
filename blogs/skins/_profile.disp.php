@@ -60,7 +60,7 @@ $ProfileForm->begin_fieldset( T_('Email communications') );
 
 	$ProfileForm->text_input( 'newuser_email', $current_User->get( 'email' ), 40, T_('Email'), '', array( 'maxlength' => 100, 'class' => 'bComment' ) );
 	$ProfileForm->checkbox( 'newuser_allow_msgform', $current_User->get('allow_msgform'), T_('Message form'), T_('Check this to allow receiving emails through a message form.') );
-	$ProfileForm->checkbox( 'newuser_notify', $current_User->get( 'notify' ), T_('Notifications'), T_('Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc.') );
+	$ProfileForm->checkbox( 'newuser_notify', $current_User->get( 'notify' ), T_('Notifications'), T_('Check this to receive a notification whenever someone else comments on one of <strong>your</strong> posts.') );
 
 $ProfileForm->end_fieldset();
 
@@ -110,6 +110,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/11 19:18:14  fplanque
+ * minor
+ *
  * Revision 1.1  2007/11/29 19:29:23  fplanque
  * normalized skin filenames
  *
