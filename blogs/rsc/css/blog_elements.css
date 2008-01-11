@@ -20,6 +20,10 @@ table.prevnext_post a {
 	font-size: 110%;
 }
 
+div.podplayer {
+	margin: 1em 0;
+}
+
 .FigZone {
 	text-align: center;
 	margin: 8px;
