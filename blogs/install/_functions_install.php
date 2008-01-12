@@ -64,42 +64,6 @@ function check_db_version()
 
 
 /**
- * Clean up extra quotes in posts
- */
-function cleanup_post_quotes( $col_ID = 'ID' )
-{
-  global $DB;
-
-	echo "Checking for extra quote escaping in posts... ";
-	$query = "SELECT $col_ID, post_title, post_content
-							FROM T_items__item
-						 WHERE post_title LIKE '%\\\\\\\\\'%'
-						 		OR post_title LIKE '%\\\\\\\\\"%'
-						 		OR post_content LIKE '%\\\\\\\\\'%'
-						 		OR post_content LIKE '%\\\\\\\\\"%' ";
-	/* FP: the above looks overkill, but MySQL is really full of surprises...
-					tested on 4.0.14-nt */
-	// echo $query;
-	$rows = $DB->get_results( $query, ARRAY_A );
-	if( $DB->num_rows )
-	{
-		echo 'Updating '.$DB->num_rows.' posts... ';
-		foreach( $rows as $row )
-		{
-			// echo '<br />'.$row['post_title'];
-			$query = "UPDATE T_items__item
-								SET post_title = ".$DB->quote( stripslashes( $row['post_title'] ) ).",
-										post_content = ".$DB->quote( stripslashes( $row['post_content'] ) )."
-								WHERE $col_ID = ".$row[$col_ID];
-			// echo '<br />'.$query;
-			$DB->query( $query );
-		}
-	}
-	echo "OK.<br />\n";
-
-}
-
-/**
  * Clean up extra quotes in comments
  */
 function cleanup_comment_quotes()
@@ -564,6 +528,10 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.43  2008/01/12 19:25:58  blueyed
+ * - Fix install from < 0.8: Make function "cleanup_post_quotes" inline and fix table name
+ * - Only check max_execution_time when > 0 (not disabled)
+ *
  * Revision 1.42  2008/01/07 03:00:52  fplanque
  * minor
  *

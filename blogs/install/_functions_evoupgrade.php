@@ -45,18 +45,19 @@ function set_upgrade_checkpoint( $version )
 	}
 	$DB->query( $query );
 
+
 	$elapsed_time = time() - $script_start_time;
 
 	echo "OK. (Elapsed upgrade time: $elapsed_time seconds)<br />\n";
 	flush();
 
-	if( $elapsed_time > ini_get( 'max_execution_time' ) - 10 )
+	$max_exe_time = ini_get( 'max_execution_time' );
+	if( $max_exe_time && $elapsed_time > $max_exe_time - 10 )
 	{
 		echo 'We are reaching the time limit for this script. Please click <a href="index.php?locale='.$locale.'&amp;action=evoupgrade">continue</a>...';
 		// Dirty temporary solution:
 		exit();
 	}
-
 }
 
 
@@ -752,7 +753,32 @@ function upgrade_b2evo_tables()
 
 	if( $old_db_version < 8062 )
 	{ // upgrade to 0.9.0.4
-		cleanup_post_quotes('ID');
+		echo "Checking for extra quote escaping in posts... ";
+		$query = "SELECT ID, post_title, post_content
+								FROM {$tableprefix}posts
+							 WHERE post_title LIKE '%\\\\\\\\\'%'
+									OR post_title LIKE '%\\\\\\\\\"%'
+									OR post_content LIKE '%\\\\\\\\\'%'
+									OR post_content LIKE '%\\\\\\\\\"%' ";
+		/* FP: the above looks overkill, but MySQL is really full of surprises...
+						tested on 4.0.14-nt */
+		// echo $query;
+		$rows = $DB->get_results( $query, ARRAY_A );
+		if( $DB->num_rows )
+		{
+			echo 'Updating '.$DB->num_rows.' posts... ';
+			foreach( $rows as $row )
+			{
+				// echo '<br />'.$row['post_title'];
+				$query = "UPDATE {$tableprefix}posts
+									SET post_title = ".$DB->quote( stripslashes( $row['post_title'] ) ).",
+											post_content = ".$DB->quote( stripslashes( $row['post_content'] ) )."
+									WHERE ID = ".$row['ID'];
+				// echo '<br />'.$query;
+				$DB->query( $query );
+			}
+		}
+		echo "OK.<br />\n";
 
 		set_upgrade_checkpoint( '8062' );
 	}
@@ -2131,6 +2157,10 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.236  2008/01/12 19:25:58  blueyed
+ * - Fix install from < 0.8: Make function "cleanup_post_quotes" inline and fix table name
+ * - Only check max_execution_time when > 0 (not disabled)
+ *
  * Revision 1.235  2008/01/08 03:31:50  fplanque
  * podcast support
  *
