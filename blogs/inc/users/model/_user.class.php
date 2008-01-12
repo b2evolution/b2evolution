@@ -677,7 +677,7 @@ class User extends DataObject
 
 
 	/**
-	 * Check if the user is the owner of the designated blog (whoch gives him a lot of permissions)
+	 * Check if the user is the owner of the designated blog (which gives him a lot of permissions)
 	 *
 	 * @param integer
 	 * @return boolean
@@ -1326,6 +1326,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/12 01:02:30  fplanque
+ * minor
+ *
  * Revision 1.4  2008/01/05 17:54:44  fplanque
  * UI/help improvements
  *
