@@ -46,9 +46,9 @@ class coll_post_list_Widget extends ComponentWidget
 	}
 
 
-  /**
-   * Get definitions for editable params
-   *
+	/**
+	 * Get definitions for editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */
@@ -106,7 +106,7 @@ class coll_post_list_Widget extends ComponentWidget
 	}
 
 
-  /**
+	/**
 	 * Get short description
 	 */
 	function get_desc()
@@ -134,6 +134,9 @@ class coll_post_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.9  2008/01/12 17:36:39  blueyed
+ * fix indent
+ *
  * Revision 1.8  2007/12/26 23:12:48  yabs
  * changing RANDOM to RAND
  *
