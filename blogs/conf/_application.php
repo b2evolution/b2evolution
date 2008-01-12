@@ -44,7 +44,7 @@ $app_footer_text = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolu
 
 $copyright_text ='<span class="nobr">&copy;2001-2002 by Michel V &amp; others</span>
 		&ndash;
-		<span class="nobr">&copy;2003-2007 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/dev/authors.html">others</a>.</span>';
+		<span class="nobr">&copy;2003-2008 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/dev/authors.html">others</a>.</span>';
 
 
 /**

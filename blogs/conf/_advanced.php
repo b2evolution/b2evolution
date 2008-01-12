@@ -120,6 +120,10 @@ if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $baseurl, $matches ) )
 	// echo "baseurlroot=$baseurlroot <br />";
 	$basehost = $matches[2];
 	// echo "basehost=$basehost <br />";
+	$baseport =  $matches[4];
+	// echo "baseport=$baseport <br />";
+	$basesubpath =  $matches[5];
+	// echo "basesubpath=$basesubpath <br />";
 }
 else
 {
@@ -398,6 +402,7 @@ $conf_path = str_replace( '\\', '/', dirname(__FILE__) ).'/';
  *                fp> made [i]nsensitive to case because of Windows URL oddities)
  */
 $basepath = preg_replace( '#/'.$conf_subdir.'$#i', '', $conf_path ).'/';
+//echo $basepath;
 
 /**
  * Location of the include folder.
