@@ -842,7 +842,7 @@ function xmlrpc_displayresult( $result, $display = true, $log = '' )
 
 	if( $display ) echo T_('Response').': '.$out."<br />\n";
 
-	return true;
+	return $value;
 }
 
 
@@ -2737,6 +2737,9 @@ function generate_link_from_params( $link_params )
 
 /*
  * $Log$
+ * Revision 1.17  2008/01/12 00:53:27  fplanque
+ * fix tests
+ *
  * Revision 1.16  2008/01/05 02:25:23  fplanque
  * refact
  *
