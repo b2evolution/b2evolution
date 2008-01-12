@@ -47,14 +47,14 @@ class ComponentWidget extends DataObject
 	var $code;
 	var $params;
 
-  /**
+	/**
 	 * Array of params which have been customized for this widget instance
 	 *
 	 * This is saved to the DB as a serialized string ($params)
 	 */
 	var $param_array = NULL;
 
-  /**
+	/**
 	 * Array of params used during display()
 	 */
 	var $disp_params;
@@ -121,7 +121,7 @@ class ComponentWidget extends DataObject
 	}
 
 
-  /**
+	/**
 	 * Load params
 	 */
 	function load_from_Request()
@@ -196,8 +196,8 @@ class ComponentWidget extends DataObject
 
 
 	/**
-   * Get definitions for editable params
-   *
+	 * Get definitions for editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */
@@ -251,7 +251,7 @@ class ComponentWidget extends DataObject
 	}
 
 
-  /**
+	/**
  	 * param value
  	 *
 	 */
@@ -286,7 +286,7 @@ class ComponentWidget extends DataObject
 		$params = $this->get_param_definitions( NULL );
 
 		if( isset( $params[$parname] ) )
-		{	// This is a widget specifc param:
+		{	// This is a widget specific param:
 			$this->param_array[$parname] = $parvalue;
 			// This is what'll be saved to the DB:
 			$this->set_param( 'params', 'string', serialize($this->param_array) );
@@ -301,7 +301,7 @@ class ComponentWidget extends DataObject
 	}
 
 
-  /**
+	/**
 	 * Prepare display params
 	 *
 	 * @todo Document default params and default values.
@@ -406,12 +406,12 @@ class ComponentWidget extends DataObject
 	}
 
 
-  /**
-   * Note: a container can prevent display of titles with 'block_display_title'
-   * This is useful for the lists in the headers
-   * fp> I'm not sur if this param should be overridable by widgets themselves (priority problem)
-   * Maybe an "auto" setting.
-   *
+	/**
+	 * Note: a container can prevent display of titles with 'block_display_title'
+	 * This is useful for the lists in the headers
+	 * fp> I'm not sur if this param should be overridable by widgets themselves (priority problem)
+	 * Maybe an "auto" setting.
+	 *
 	 * @protected
 	 */
 	function disp_title( $title = NULL )
@@ -430,23 +430,24 @@ class ComponentWidget extends DataObject
 	}
 
 
-  /**
+	/**
 	 * List of items
 	 *
-	 * @param array MUST contain at least the basic display params
 	 * @param string 'pages' or 'posts'
 	 */
 	function disp_item_list( $what )
 	{
 		global $Blog;
+		global $timestamp_min, $timestamp_max;
 
 		$blogCache = get_Cache( 'BlogCache' );
+		// TODO: dh> does it make sense to die in $blogCache, in case the blog does not exist anymore?
 		$listBlog = ( $this->disp_params[ 'blog_ID' ] ? $blogCache->get_by_ID( $this->disp_params[ 'blog_ID' ] ) : $Blog );
 
 		// Create ItemList
 		// Note: we pass a widget specific prefix in order to make sure to never interfere with the mainlist
 		$limit = $this->disp_params[ 'limit' ];
-		$ItemList = & new ItemListLight( $listBlog, NULL, NULL, $limit, 'ItemCacheLight', $this->code.'_' );
+		$ItemList = & new ItemListLight( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCacheLight', $this->code.'_' );
 		// Filter list:
 		if( $what == 'pages' )
 		{
@@ -498,7 +499,7 @@ class ComponentWidget extends DataObject
 	}
 
 
-  /**
+	/**
 	 * List of items by category
 	 *
 	 * @param array MUST contain at least the basic display params
@@ -506,6 +507,7 @@ class ComponentWidget extends DataObject
 	function disp_cat_item_list( $link_type = 'linkto_url' )
 	{
 		global $BlogCache, $Blog;
+		global $timestamp_min, $timestamp_max;
 
 		$linkblog = $this->disp_params[ 'linkblog_ID' ];
 
@@ -541,7 +543,7 @@ class ComponentWidget extends DataObject
 
 		$limit = ( $this->disp_params[ 'linkblog_limit' ] ? $this->disp_params[ 'linkblog_limit' ] : 1000 ); // Note: 1000 will already kill the display
 
-		$LinkblogList = & new ItemListLight( $link_Blog, NULL, NULL, $limit );
+		$LinkblogList = & new ItemListLight( $link_Blog, $timestamp_min, $timestamp_max, $limit );
 
 		$LinkblogList->set_filters( array(
 				'cat_array' => $linkblog_cat_array,
@@ -565,7 +567,7 @@ class ComponentWidget extends DataObject
 
 		echo $this->disp_params['list_start'];
 
-    /**
+		/**
 		 * @var ItemLight
 		 */
 		while( $Item = & $LinkblogList->get_category_group() )
@@ -614,14 +616,14 @@ class ComponentWidget extends DataObject
 	}
 
 
-  /**
+	/**
 	 * List of collections/blogs
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
 	function disp_coll_list( $filter = 'public' )
 	{
-    /**
+		/**
 		 * @var Blog
 		 */
 		global $Blog;
@@ -632,7 +634,7 @@ class ComponentWidget extends DataObject
 
 		echo $this->disp_params['list_start'];
 
-    /**
+		/**
 		 * @var BlogCache
 		 */
 		$BlogCache = & get_Cache( 'BlogCache' );
@@ -721,6 +723,10 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2008/01/12 18:21:50  blueyed
+ *  - use $timestamp_min, $timestamp_max for ItemListLight instances (fixes displaying of posts from the future in coll_post_list widget
+ * - typo, todo, fix indent
+ *
  * Revision 1.30  2008/01/11 19:18:30  fplanque
  * bugfixes
  *
