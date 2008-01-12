@@ -87,22 +87,18 @@ $post_default_title = ''; // posts submitted via the xmlrpc interface get that t
  */
 $xmlrpc_procs = array();
 
+
 // fp> TODO: auto detec .api files and loop
+// fp> TODO: This should eventually move to plugins
 include_once dirname(__FILE__).'/apis/_blogger.api.php';
 include_once dirname(__FILE__).'/apis/_b2.api.php';
 include_once dirname(__FILE__).'/apis/_metaweblog.api.php';
 include_once dirname(__FILE__).'/apis/_mt.api.php';
 
 
-
-
-/**** SERVER FUNCTIONS ARRAY ****/
-// dh> TODO: Plugin hook here, so that Plugins can provide own callbacks?!
-// fp> The current implementation of this file is not optimal (file is way too large)
-// fp> xmlrpc.php should actually only be a switcher and it should load the function to execute once it has been identified
-// fp> maybe it would make sense to register xmlrpc apis/functions in a DB table
+// fp> xmlrpc.php should actually only load the function/plugin to execute once it has been identified
+// fp> maybe it would make sense to register xmlrpc apis/functions in a DB table (before making plugins)
 // fp> it would probably make sense to have *all* xmlrpc methods implemented as plugins (maybe 1 plugin per API; it should be possible to add a single func to an API with an additional plugin)
-// dh> NOTE: some tools may use different API entry points, e.g. for extended methods.. (But I'm not sure..)
 // fp> from a security standpoint it would make a lot of sense to disable any rpc that is not needed
 
 load_funcs('_ext/xmlrpc/_xmlrpcs.php'); // This will add generic remote calls
@@ -222,6 +218,9 @@ function _b2_or_mt_get_categories( $type, $m )
 
 /*
  * $Log$
+ * Revision 1.143  2008/01/12 02:13:44  fplanque
+ * XML-RPC debugging
+ *
  * Revision 1.142  2008/01/12 00:03:44  fplanque
  * refact of XML-RPC
  *

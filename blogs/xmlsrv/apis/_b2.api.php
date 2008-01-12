@@ -48,6 +48,10 @@ function b2_newpost($m)
 	$content = $m->getParam(4);
 	$content = $content->scalarval();
 
+	$publish  = $m->getParam(5);
+	$publish = $publish->scalarval();
+	$status = $publish ? 'published' : 'draft';
+
 	$post_title = $m->getParam(6);
 	$post_title = $post_title->scalarval();
 
@@ -64,6 +68,9 @@ function b2_newpost($m)
 	}
 
 	$UserCache = & get_Cache( 'UserCache' );
+  /**
+	 * @var User
+	 */
 	$current_User = & $UserCache->get_by_login( $username );
 
 	// Check if category exists
@@ -72,10 +79,10 @@ function b2_newpost($m)
 		return new xmlrpcresp(0, $xmlrpcerruser+5, 'Requested category does not exist.'); // user error 5
 	}
 
-	$blog_ID = get_catblog($category);
+	$blog = get_catblog($category);
 
 	// Check permission:
-	if( ! $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
+	if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $blog ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+2, 'Permission denied.'); // user error 2
 	}
@@ -100,17 +107,26 @@ function b2_newpost($m)
 
 	// INSERT NEW POST INTO DB:
 	$edited_Item = & new Item();
-	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $now, $category, array(), 'published', $current_User->locale );
-	if( $DB->error )
+	$edited_Item->set('title', $post_title);
+	$edited_Item->set('content', $content);
+	$edited_Item->set('datestart', $now);
+	$edited_Item->set('main_cat_ID', $category);
+	$edited_Item->set('extra_cat_IDs', array($category) );
+	$edited_Item->set('status', $status);
+	$edited_Item->set('locale', $current_User->locale );
+	$edited_Item->set_creator_User($current_User);
+	$edited_Item->dbinsert();
+
+	if( ! $edited_Item->ID )
 	{ // DB error
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+		return new xmlrpcresp(0, $xmlrpcerruser+9, 'Error while inserting item: '.$DB->last_error ); // user error 9
 	}
 
 	logIO( 'O', 'Handling notifications...' );
 	// Execute or schedule notifications & pings:
 	$edited_Item->handle_post_processing();
 
-	return new xmlrpcresp(new xmlrpcval($post_ID));
+	return new xmlrpcresp(new xmlrpcval($edited_Item->ID));
 }
 
 
@@ -120,8 +136,6 @@ $b2getcategories_doc='given a blogID, gives a struct that list categories in tha
 $b2getcategories_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
 /**
  * b2.getCategories
- *
- * B2 API
  *
  * Gets also used for mt.getCategoryList. Is this correct?
  *
@@ -144,11 +158,9 @@ $b2_getPostURL_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $x
 /**
  * b2.getPostURL
  *
- * B2 API
- *
  * @param xmlrpcmsg XML-RPC Message
- *					0 blogid (string): Unique identifier of the blog to query
- *					1 ?
+ *					0 ? NO LONGER USED (was: blogid (string): Unique identifier of the blog to query)
+ *					1 ? (string)
  *					2 username (string): Login for a Blogger user who is member of the blog.
  *					3 password (string): Password for said username.
  *					4 post_ID (string): Post to query
@@ -158,9 +170,6 @@ function b2_getposturl($m)
 {
 	global $xmlrpcerruser;
 	global $siteurl;
-
-	$blog_ID = $m->getParam(0);
-	$blog_ID = $blog_ID->scalarval();
 
 	$username = $m->getParam(2);
 	$username = $username->scalarval();
@@ -177,22 +186,28 @@ function b2_getposturl($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
-	$UserCache = & get_Cache( 'UserCache' );
-	$current_User = & $UserCache->get_by_login( $username );
-
-	// Check permission:
-	if( ! $current_User->check_perm( 'blog_ismember', 1, false, $blog_ID ) )
-	{
-		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
-				'Permission denied.' );
-	}
-
 	$ItemCache = & get_Cache( 'ItemCache' );
+  /**
+	 * @var Item
+	 */
 	if( ( $Item = & $ItemCache->get_by_ID( $post_ID ) ) === false )
 	{ // Post does not exist
 		return new xmlrpcresp(0, $xmlrpcerruser+7,
 						'This post ID ('.$post_ID.') does not correspond to any post here.' );
 	}
+
+	$Blog = & $Item->get_Blog();
+
+	$UserCache = & get_Cache( 'UserCache' );
+	$current_User = & $UserCache->get_by_login( $username );
+
+	// Check permission:
+	if( ! $current_User->check_perm( 'blog_ismember', 1, false, $Blog->ID ) )
+	{
+		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
+				'Permission denied.' );
+	}
+
 
 	return new xmlrpcresp( new xmlrpcval( $Item->get_permanent_url() ) );
 }

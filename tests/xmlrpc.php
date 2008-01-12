@@ -45,6 +45,19 @@ $bloggerAPIappkey = 'testkey';
 
 	// ----------------------------------------------------------------------------------------------------
 
+	echo '<h2>blogger.getUserInfo</h2>';
+	$client->debug = false;
+	$message = new xmlrpcmsg( 'blogger.getUserInfo', array(
+														new xmlrpcval($bloggerAPIappkey),
+														new xmlrpcval($test_user),
+														new xmlrpcval($test_pass)
+													)  );
+	$result = $client->send($message);
+	$ret = xmlrpc_displayresult( $result );
+	pre_dump( $ret );
+
+	// ----------------------------------------------------------------------------------------------------
+
 	echo '<h2>blogger.getUsersBlogs</h2>';
 	$client->debug = false;
 	$message = new xmlrpcmsg( 'blogger.getUsersBlogs', array(
@@ -79,19 +92,49 @@ $bloggerAPIappkey = 'testkey';
 
 	// ----------------------------------------------------------------------------------------------------
 
+	echo '<h2>b2.newPost</h2>';
+	$post_text = 'XML-RPC b2.newPost : random # '.rand( 1, 10000 );
+	echo 'Post_text : '.$post_text;
+	$client->debug = false;
+	$message = new xmlrpcmsg( 'b2.newPost', array(
+														new xmlrpcval(''),
+														new xmlrpcval(''),
+														new xmlrpcval($test_user),
+														new xmlrpcval($test_pass),
+														new xmlrpcval( "<p>$post_text</p>\n" ),
+														new xmlrpcval(true,"boolean"),		// Published
+														new xmlrpcval( $post_text ),	// TITLE
+														new xmlrpcval(1), // Category
+														new xmlrpcval('') // Date
+													)  );
+	$result = $client->send($message);
+	$ret = xmlrpc_displayresult( $result );
+	if( empty($ret)  )
+	{
+		die( 'ERROR' );
+	}
+	$msg_ID = xmlrpc_decode_recurse($result->value());
+	echo '<p>OK - Message ID: '.$msg_ID.'</p>';
+
+	// ----------------------------------------------------------------------------------------------------
+
 	echo '<h2>blogger.newPost</h2>';
 	$post_text = 'XML-RPC post : random # '.rand( 1, 10000 );
 	echo 'Post_text : '.$post_text;
 	$client->debug = false;
+
+	$content = "<title>$post_text</title>
+							<p>$post_text</p>\n";
+	$content .= '<category>2,03</category>';
+
+
 	$message = new xmlrpcmsg( 'blogger.newPost', array(
 														new xmlrpcval($bloggerAPIappkey),
 														new xmlrpcval(1),
 														new xmlrpcval($test_user),
 														new xmlrpcval($test_pass),
-														new xmlrpcval( "<title>$post_text</title>
-														<category>1</category>
-														<p>$post_text</p>\n" ),
-														new xmlrpcval(false	,"boolean")		// DRAFT !!
+														new xmlrpcval( $content ),
+														new xmlrpcval(true,"boolean")		// published
 													)  );
 	$result = $client->send($message);
 	$ret = xmlrpc_displayresult( $result );
@@ -111,7 +154,7 @@ $bloggerAPIappkey = 'testkey';
 														new xmlrpcval(1),
 														new xmlrpcval($test_user),
 														new xmlrpcval($test_pass),
-														new xmlrpcval(3, 'int' ),
+														new xmlrpcval(5, 'int' ),
 													)  );
 	$result = $client->send($message);
 	$ret = xmlrpc_displayresult( $result );
@@ -149,9 +192,13 @@ $bloggerAPIappkey = 'testkey';
 	echo '</p>';
 
 
-	if( strpos( $ret[1]['content'], 'XML-RPC post :' ) )
+	if( strpos( $ret[2]['content'], 'XML-RPC post :' ) )
 	{	// This is a previous XML-RPC test post
-		$delete_post = $ret[1]['postid'];
+		$delete_post = $ret[2]['postid'];
+	}
+	if( strpos( $ret[3]['content'], 'XML-RPC b2.newPost :' ) )
+	{	// This is a previous XML-RPC test post
+		$delete_post2 = $ret[3]['postid'];
 	}
 
 
@@ -210,6 +257,23 @@ $bloggerAPIappkey = 'testkey';
 
 	// ----------------------------------------------------------------------------------------------------
 
+	echo '<h2>b2.getPostURL</h2>';
+	$client->debug = false;
+	$message = new xmlrpcmsg( 'b2.getPostURL', array(
+														new xmlrpcval(0),
+														new xmlrpcval(''),
+														new xmlrpcval($test_user),
+														new xmlrpcval($test_pass),
+														new xmlrpcval($msg_ID),
+													)  );
+	$result = $client->send($message);
+	$ret = xmlrpc_displayresult( $result );
+	// pre_dump( $ret );
+
+	echo 'OK - <a href="'.$ret.'">'.$ret.'</a>';
+
+	// ----------------------------------------------------------------------------------------------------
+
 	echo '<h2>blogger.deletePost</h2>';
 	if( empty( $delete_post ) )
 	{
@@ -229,7 +293,33 @@ $bloggerAPIappkey = 'testkey';
 		// pre_dump( $ret );
 		if( $ret == 1 )
 		{
-			echo 'OK';
+			echo "OK<br/>\n";
+		}
+		else
+		{
+			die('ERROR');
+		}
+	}
+
+	if( empty( $delete_post2 ) )
+	{
+		echo 'no post2 to delete yet. run again.';
+	}
+	else
+	{
+		$client->debug = false;
+		$message = new xmlrpcmsg( 'blogger.deletePost', array(
+															new xmlrpcval($bloggerAPIappkey),
+															new xmlrpcval( $delete_post2 ),
+															new xmlrpcval($test_user),
+															new xmlrpcval($test_pass),
+														)  );
+		$result = $client->send($message);
+		$ret = xmlrpc_displayresult( $result );
+		// pre_dump( $ret );
+		if( $ret == 1 )
+		{
+			echo "OK<br/>\n";
 		}
 		else
 		{
@@ -239,10 +329,7 @@ $bloggerAPIappkey = 'testkey';
 
 	// ----------------------------------------------------------------------------------------------------
 
-// blogger.getUserInfo
-
-// b2.newPost
-// b2.getPostURL
+// Missing tests:
 
 // mt.getPostCategories
 // mt.setPostCategories

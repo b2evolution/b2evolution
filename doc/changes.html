@@ -32,7 +32,7 @@
 			<h1>2.x &quot;Nevada&quot; series</h1>
 			<p>Skins version 2 are pretty stable starting at version 2.1.</p>
 
-			<h2>2.4.0</h2>
+			<h2>2.4.0-rc2</h2>
 			<ul>
 				<li>Admin screens: Select list for installs with more than 7 blogs. (fplanque)</li>
 				<li>Podcast support:
@@ -61,7 +61,11 @@
 				<li>Additional help icons in the admin interface. (fplanque)</li>
 				<li>XML-RPC has been debugged and reorganized. Each API is now in its own file:
 					<ul>
-						<li>Blogger API</li>
+						<li>Blogger API:
+							<ul>
+								<li>blogger.newPost no longer requires a cat ID (&lt;category&gt;123&lt;/category&gt;) to be passed. It will use the first/default cat available in the targetted blog.</li>
+							</ul>
+						</li>
 						<li>b2 API</li>
 						<li>MetaWeblog API</li>
 						<li>Movable Type API</li>

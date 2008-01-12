@@ -750,6 +750,7 @@ function xmlrpc_getposttitle($content)
 
 /**
  * Also used by post by mail
+ *
  * @deprecated by xmlrpc_getpostcategories()
  */
 function xmlrpc_getpostcategory($content)
@@ -773,6 +774,8 @@ function xmlrpc_getpostcategory($content)
  */
 function xmlrpc_getpostcategories($content)
 {
+	$cats = array();
+
 	if( preg_match('~<category>(\d+\s*(,\s*\d*)*)</category>~i', $content, $match) )
 	{
 		$cats = preg_split('~\s*,\s*~', $match[1], -1, PREG_SPLIT_NO_EMPTY);
@@ -780,10 +783,9 @@ function xmlrpc_getpostcategories($content)
 		{
 			$cats[$k] = (int)$v;
 		}
-		return $cats;
 	}
 
-	return false;
+	return $cats;
 }
 
 
@@ -2737,6 +2739,9 @@ function generate_link_from_params( $link_params )
 
 /*
  * $Log$
+ * Revision 1.18  2008/01/12 02:13:44  fplanque
+ * XML-RPC debugging
+ *
  * Revision 1.17  2008/01/12 00:53:27  fplanque
  * fix tests
  *

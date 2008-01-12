@@ -20,8 +20,6 @@ $bloggernewpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $
 /**
  * blogger.newPost makes a new post to a designated blog.
  *
- * BLOGGER API
- *
  * Optionally, will publish the blog after making the post. (In b2evo, this means the
  * new post will be in 'published' state).
  * On success, it returns the unique ID of the new post (usually a seven-digit number
@@ -51,14 +49,19 @@ function blogger_newpost( $m )
 
 	logIO('I','Called function: blogger.newPost');
 
-	$username = $m->getParam(2);
-	$password = $m->getParam(3);
-	$content  = $m->getParam(4);
-	$publish  = $m->getParam(5);
+	$blog = $m->getParam(1);
+	$blog = $blog->scalarval();
 
+	$username = $m->getParam(2);
 	$username = $username->scalarval();
+
+	$password = $m->getParam(3);
 	$password = $password->scalarval();
+
+	$content  = $m->getParam(4);
 	$content = $content->scalarval();
+
+	$publish  = $m->getParam(5);
 	$publish = $publish->scalarval();
 	$status = $publish ? 'published' : 'draft';
 	logIO('I',"Publish: $publish -> Status: $status");
@@ -75,12 +78,24 @@ function blogger_newpost( $m )
 
 	$post_categories = xmlrpc_getpostcategories($content);
 
-	if( ! $post_categories )
+	if( empty( $post_categories ) )
 	{ // There were no categories passed in the content:
-		return new xmlrpcresp(0, $xmlrpcerruser+5, 'No category given.'); // user error 5
+
+		// Get the Blog we want to post in:
+  	$BlogCache = & get_Cache( 'BlogCache' );
+		$Blog = & $BlogCache->get_by_ID( $blog );
+
+		if( ! $main_cat = $Blog->get_default_cat_ID() )
+		{
+			return new xmlrpcresp(0, $xmlrpcerruser+5, 'No default category found for this blog.'); // user error 5
+		}
+	}
+	else
+	{
+		// echo '<!-- Cats: '.implode(',',$post_categories).' -->';
+		$main_cat = array_shift($post_categories);
 	}
 
-	$main_cat = array_shift($post_categories);
 	logIO('I', 'Main cat: '.$main_cat);
 
 	// Check if category exists
@@ -90,10 +105,10 @@ function blogger_newpost( $m )
 		return new xmlrpcresp(0, $xmlrpcerruser+5, 'Requested category does not exist.'); // user error 5
 	}
 
-	$blog_ID = get_catblog($main_cat);
+	$blog = get_catblog($main_cat);
 
 	// Check permission:
-	if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $blog_ID ) )
+	if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $blog ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+2, 'Permission denied.'); // user error 2
 	}
@@ -231,10 +246,10 @@ function blogger_editpost($m)
 		$main_cat = $edited_Item->main_cat_ID;
 	}
 
-	$blog_ID = get_catblog($main_cat);
+	$blog = get_catblog($main_cat);
 
 	// Check permission:
-	if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $blog_ID ) )
+	if( ! $current_User->check_perm( 'blog_post_statuses', $status, false, $blog ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
 				'Permission denied.' );
@@ -576,8 +591,8 @@ function blogger_getrecentposts( $m )
 {
 	global $xmlrpcerruser, $DB;
 
-	$blog_ID = $m->getParam(1);
-	$blog_ID = $blog_ID->scalarval();
+	$blog = $m->getParam(1);
+	$blog = $blog->scalarval();
 
 	$username = $m->getParam(2);
 	$username = $username->scalarval();
@@ -598,14 +613,14 @@ function blogger_getrecentposts( $m )
 	$current_User = & $UserCache->get_by_login( $username );
 
 	// Check permission:
-	if( ! $current_User->check_perm( 'blog_ismember', 1, false, $blog_ID ) )
+	if( ! $current_User->check_perm( 'blog_ismember', 1, false, $blog ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+2, 'Permission denied.' ); // user error 2
 	}
 
 
 	$BlogCache = & get_Cache( 'BlogCache' );
-	$Blog = & $BlogCache->get_by_ID( $blog_ID );
+	$Blog = & $BlogCache->get_by_ID( $blog );
 
 	// Get the posts to display:
 	$MainList = & new ItemList2( $Blog, NULL, NULL, $numposts );
