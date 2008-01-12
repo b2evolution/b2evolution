@@ -358,7 +358,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			header('Content-Type: text/xml');
 			header('Content-Length: ' . (int)strlen($payload));
 
-			logIO( 'O', "service() response:\n".$payload );
+			// logIO( "service() response:\n".$payload );
 
 			print $payload;
 		}
@@ -515,14 +515,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
 			// now to deal with the method
 			$methName = $m->method();
-			logIO( 'I', 'Called method:'.$methName );
+			logIO( $methName, true );
 			$sysCall = ereg("^system\.", $methName);
 			$dmap = $sysCall ? $_xmlrpcs_dmap : $this->dmap;
 
 			if (!isset($dmap[$methName]['function']))
 			{
 				// No such method
-				logIO( 'O', 'No such method:'.$methName );
+				logIO( 'No such method:'.$methName );
 				return new xmlrpcresp(0,
 					$xmlrpcerr['unknown_method'],
 					$xmlrpcstr['unknown_method']);
@@ -536,7 +536,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				if(!$ok)
 				{
 					// Didn't match.
-					logIO( 'O', 'Invalid signature.' );
+					logIO( 'Invalid signature.' );
 					return new xmlrpcresp(
 						0,
 						$xmlrpcerr['incorrect_params'],
@@ -569,9 +569,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			print $r->serialize();
 		}
 	}
-	
+
 /*
  * $Log$
+ * Revision 1.4  2008/01/12 08:06:15  fplanque
+ * more xmlrpc tests
+ *
  * Revision 1.3  2007/09/11 20:57:52  fplanque
  * minor fixes
  *

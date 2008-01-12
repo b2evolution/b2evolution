@@ -1022,7 +1022,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		{
 			global $debug_xmlrpc_logging;
 
-			$this->port=$port; $this->server=$server; $this->path=$path;
+			$this->port=$port;
+			$this->server=$server;
+			$this->path=$path;
 			$this->debug = $debug_xmlrpc_logging;
 		}
 

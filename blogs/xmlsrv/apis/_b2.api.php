@@ -122,7 +122,7 @@ function b2_newpost($m)
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'Error while inserting item: '.$DB->last_error ); // user error 9
 	}
 
-	logIO( 'O', 'Handling notifications...' );
+	logIO( 'Handling notifications...' );
 	// Execute or schedule notifications & pings:
 	$edited_Item->handle_post_processing();
 
@@ -228,4 +228,10 @@ $xmlrpc_procs["b2.getPostURL"] = array(
 				"signature" => $b2_getPostURL_sig,
 				"docstring" => $b2_getPostURL_doc );
 
+/*
+ * $Log$
+ * Revision 1.3  2008/01/12 08:06:15  fplanque
+ * more xmlrpc tests
+ *
+ */
 ?>

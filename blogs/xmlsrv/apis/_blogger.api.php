@@ -47,7 +47,7 @@ function blogger_newpost( $m )
 	global $DB;
 	global $Settings, $Messages;
 
-	logIO('I','Called function: blogger.newPost');
+	logIO('Called function: blogger.newPost');
 
 	$blog = $m->getParam(1);
 	$blog = $blog->scalarval();
@@ -64,11 +64,11 @@ function blogger_newpost( $m )
 	$publish  = $m->getParam(5);
 	$publish = $publish->scalarval();
 	$status = $publish ? 'published' : 'draft';
-	logIO('I',"Publish: $publish -> Status: $status");
+	logIO("Publish: $publish -> Status: $status");
 
 	if( !user_pass_ok($username,$password) )
 	{
-		logIO('O', "Wrong username/password combination <strong>$username / $password</strong>");
+		logIO( "Wrong username/password combination <strong>$username / $password</strong>");
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
@@ -96,7 +96,7 @@ function blogger_newpost( $m )
 		$main_cat = array_shift($post_categories);
 	}
 
-	logIO('I', 'Main cat: '.$main_cat);
+	logIO( 'Main cat: '.$main_cat);
 
 	// Check if category exists
 	if( get_the_category_by_ID( $main_cat, false ) === false )
@@ -147,13 +147,13 @@ function blogger_newpost( $m )
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'Error while inserting item: '.$DB->last_error ); // user error 9
 	}
 
-	logIO('O', "Posted ! ID: $edited_Item->ID");
+	logIO( "Posted ! ID: $edited_Item->ID");
 
-	logIO( 'O', 'Handling notifications...' );
+	logIO( 'Handling notifications...' );
 	// Execute or schedule notifications & pings:
 	$edited_Item->handle_post_processing();
 
-	logIO("O","All done.");
+	logIO("All done.");
 
 	return new xmlrpcresp(new xmlrpcval($edited_Item->ID));
 }
@@ -192,7 +192,7 @@ function blogger_editpost($m)
 	global $DB;
 	global $Messages;
 
-	logIO('I','Called function: blogger.editPost');
+	logIO('Called function: blogger.editPost');
 
 	// return new xmlrpcresp(0, $xmlrpcerruser+50, 'blogger_editpost' );
 
@@ -226,7 +226,7 @@ function blogger_editpost($m)
 	$publish = $m->getParam(5);
 	$publish = $publish->scalarval();
 	$status = $publish ? 'published' : 'draft';
-	logIO('I',"Publish: $publish -> Status: $status");
+	logIO("Publish: $publish -> Status: $status");
 
 	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
@@ -283,7 +283,7 @@ function blogger_editpost($m)
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
 
-	logIO( 'O', 'Handling notifications...' );
+	logIO( 'Handling notifications...' );
 	// Execute or schedule notifications & pings:
 	$edited_Item->handle_post_processing();
 
@@ -393,7 +393,7 @@ function blogger_getusersblogs($m)
 
 	$password = $m->getParam(2);
 	$password = $password->scalarval();
-	logIO("O","entered blogger_getusersblogs.");
+	logIO("entered blogger_getusersblogs.");
 
 
 	if( ! user_pass_ok($username,$password) )
@@ -401,12 +401,12 @@ function blogger_getusersblogs($m)
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
-	logIO("O","user approved.");
+	logIO("user approved.");
 
 
 	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
-	logIO("O","Got Current user (ID ".$current_User->ID.')');
+	logIO("Got Current user (ID ".$current_User->ID.')');
 
 
 	$resp_array = array();
@@ -423,7 +423,7 @@ function blogger_getusersblogs($m)
 		 */
 		$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
 
-		logIO("O","Current user IS a member of this blog.".$l_blog_ID);
+		logIO("Current user IS a member of this blog.".$l_blog_ID);
 
 		$resp_array[] = new xmlrpcval( array(
 					"blogid" => new xmlrpcval( $l_blog_ID ),
@@ -706,5 +706,10 @@ $xmlrpc_procs["blogger.getRecentPosts"] = array(
 				"signature" => $bloggergetrecentposts_sig,
 				"docstring" => $bloggergetrecentposts_doc );
 
-
+/*
+ * $Log$
+ * Revision 1.3  2008/01/12 08:06:15  fplanque
+ * more xmlrpc tests
+ *
+ */
 ?>

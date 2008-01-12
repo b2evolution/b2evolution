@@ -13,6 +13,8 @@
  * @version $Id$
  */
 
+// use xmlrpc_debugmsg() to add debug messages to responses;
+
 /**
  * Initialize everything:
  */
@@ -34,7 +36,7 @@ $HTTP_RAW_POST_DATA = trim( $HTTP_RAW_POST_DATA );
  * browser interface)
 	* @todo fp> have a global setting with 3 options: check|nocheck|userdef => each then has his own setting to define if his tool does the checking or not.
 	* fp> Also, there should be a permission to say if members of a given group can or cannot post insecure content. If they cannot, then they cannot disable the sanity check
-	* fp> note: if allowed unsecure posting, disabling the sanity cjecker should also be allowed in the html backoffice
+	* fp> note: if allowed unsecure posting, disabling the sanity checker should also be allowed in the html backoffice
  */
 $xmlrpc_htmlchecking = true;
 require_once dirname(__FILE__).'/../conf/_config.php';
@@ -112,7 +114,7 @@ $s = new xmlrpc_server( $xmlrpc_procs );
  *
  * @return boolean Have we logged?
  */
-function logIO($io,$msg)
+function logIO( $msg, $newline = false )
 {
 	global $debug_xmlrpc_logging;
 
@@ -121,11 +123,13 @@ function logIO($io,$msg)
 		return false;
 	}
 
-	$date = date('Y-m-d H:i:s ');
-	$iot = ($io == 'I') ? ' Input: ' : ' Output: ';
-
 	$fp = fopen( dirname(__FILE__).'/xmlrpc.log', 'a+' );
-	fwrite($fp, $date.$iot.$msg."\n");
+	if( $newline )
+	{
+		$date = date('Y-m-d H:i:s ');
+		fwrite( $fp, "\n\n".$date );
+	}
+	fwrite($fp, $msg."\n");
 	fclose($fp);
 
 	return true;
@@ -218,6 +222,9 @@ function _b2_or_mt_get_categories( $type, $m )
 
 /*
  * $Log$
+ * Revision 1.144  2008/01/12 08:06:15  fplanque
+ * more xmlrpc tests
+ *
  * Revision 1.143  2008/01/12 02:13:44  fplanque
  * XML-RPC debugging
  *
