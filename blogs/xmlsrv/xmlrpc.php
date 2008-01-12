@@ -39,6 +39,7 @@ $HTTP_RAW_POST_DATA = trim( $HTTP_RAW_POST_DATA );
 	* fp> note: if allowed unsecure posting, disabling the sanity checker should also be allowed in the html backoffice
  */
 $xmlrpc_htmlchecking = true;
+
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 load_funcs('_ext/xmlrpc/_xmlrpc.php');
@@ -51,31 +52,6 @@ if( CANUSEXMLRPC !== TRUE )
 	die( $errResponse->serialize() );
 }
 
-
-// Handle "Really Simple Discovery":
-// fp> TODO: this should probably be moved over to the main pages
-if ( isset( $_GET['rsd'] ) )
-{ // http://archipelago.phrasewise.com/rsd
-	header('Content-type: text/xml; charset=' . $evo_charset, true);
-
-	?>
-	<?php echo '<?xml version="1.0" encoding="'.$evo_charset.'"?'.'>'; ?>
-	<rsd version="1.0" xmlns="http://archipelago.phrasewise.com/rsd">
-	  <service>
-	    <engineName>b2evolution</engineName>
-	    <engineLink>http://b2evolution.net/</engineLink>
-	    <homePageLink><?php echo $baseurl ?></homePageLink>
-	    <apis>
-	      <api name="Blogger" preferred="true" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php" />
-	      <api name="b2" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php" />
-	      <api name="MetaWeblog" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php" />
-	      <api name="Movable Type" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php" />
-	    </apis>
-	  </service>
-	</rsd>
-	<?php
-	exit;
-}
 
 // We can't display standard error messages. We must return XMLRPC responses.
 $DB->halt_on_error = false;
@@ -105,9 +81,11 @@ include_once dirname(__FILE__).'/apis/_mt.api.php';
 
 load_funcs('_ext/xmlrpc/_xmlrpcs.php'); // This will add generic remote calls
 
+// DO THE SERVING:
 $s = new xmlrpc_server( $xmlrpc_procs );
 
 
+// --------------------------------------- SUPPORT FUNCTIONS ----------------------------------------
 
 /**
  * Used for logging, only if {@link $debug_xmlrpc_logging} is true
@@ -219,9 +197,11 @@ function _b2_or_mt_get_categories( $type, $m )
 
 
 
-
 /*
  * $Log$
+ * Revision 1.145  2008/01/12 22:51:11  fplanque
+ * RSD support
+ *
  * Revision 1.144  2008/01/12 08:06:15  fplanque
  * more xmlrpc tests
  *

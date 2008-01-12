@@ -2,7 +2,8 @@
 /**
  * XML-RPC : Blogger API
  *
- * see {@link http://www.blogger.com/developers/api/1_docs/}
+ * @see http://manual.b2evolution.net/Blogger_API
+ * @see http://www.blogger.com/developers/api/1_docs/
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -708,6 +709,9 @@ $xmlrpc_procs["blogger.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.4  2008/01/12 22:51:11  fplanque
+ * RSD support
+ *
  * Revision 1.3  2008/01/12 08:06:15  fplanque
  * more xmlrpc tests
  *

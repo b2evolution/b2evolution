@@ -3,6 +3,7 @@
  * XML-RPC : Blogger API
  *
  * this is used by w.bloggar for example
+ * @see http://manual.b2evolution.net/B2_API
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -230,6 +231,9 @@ $xmlrpc_procs["b2.getPostURL"] = array(
 
 /*
  * $Log$
+ * Revision 1.4  2008/01/12 22:51:11  fplanque
+ * RSD support
+ *
  * Revision 1.3  2008/01/12 08:06:15  fplanque
  * more xmlrpc tests
  *

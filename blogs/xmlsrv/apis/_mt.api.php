@@ -2,6 +2,8 @@
 /**
  * XML-RPC : Movable Type API (partial)
  *
+ * @see http://manual.b2evolution.net/MovableType_API
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -219,6 +221,9 @@ $xmlrpc_procs["mt.getPostCategories"] = array(
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/12 22:51:11  fplanque
+ * RSD support
+ *
  * Revision 1.2  2008/01/12 08:06:15  fplanque
  * more xmlrpc tests
  *

@@ -2,7 +2,8 @@
 /**
  * XML-RPC : MetaWeblog API
  *
- * See {@link http://www.xmlrpc.com/metaWeblogApi}
+ * @see http://manual.b2evolution.net/MetaWeblog_API
+ * @see http://www.xmlrpc.com/metaWeblogApi
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -825,6 +826,9 @@ $xmlrpc_procs["metaWeblog.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.4  2008/01/12 22:51:11  fplanque
+ * RSD support
+ *
  * Revision 1.3  2008/01/12 08:12:03  fplanque
  * more xmlrpc tests
  *
