@@ -121,7 +121,7 @@ $bloggerAPIappkey = 'testkey';
 	//pre_dump( $ret );
 	if( is_array( $ret ) )foreach( $ret as $a )
 	{
-		echo '<li>'.$a['categoryName'].'</li>';
+		echo '<li><a href="'.$a['htmlUrl'].'">'.$a['description'].'</a></li>';
 	}
 
 	// ----------------------------------------------------------------------------------------------------

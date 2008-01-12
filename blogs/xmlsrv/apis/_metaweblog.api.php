@@ -554,7 +554,7 @@ $mwgetcats_doc = 'Get categories of a post, MetaWeblog API-style';
  *
  * @see http://www.xmlrpc.com/metaWeblogApi#metawebloggetcategories
  */
-function mw_getcats( $m )
+function mw_getcategories( $m )
 {
 	global $xmlrpcerruser, $DB;
 
@@ -606,8 +606,8 @@ function mw_getcats( $m )
 		}
 		$data[] = new xmlrpcval( array(
 				'categoryId' => new xmlrpcval( $row->cat_ID ), // not in RFC (http://www.xmlrpc.com/metaWeblogApi)
-				'description' => new xmlrpcval( $row->cat_name ), // not in RFC (http://www.xmlrpc.com/metaWeblogApi)
-				'categoryName' => new xmlrpcval( $row->cat_name ),
+				'description' => new xmlrpcval( $row->cat_name ),
+				'categoryName' => new xmlrpcval( $row->cat_name ), // not in RFC (http://www.xmlrpc.com/metaWeblogApi)
 				'htmlUrl' => new xmlrpcval( $Chapter->get_permanent_url() ),
 				'rssUrl' => new xmlrpcval( url_add_param($Chapter->get_permanent_url(), 'tempskin=_rss2') )
 			//	mb_convert_encoding( $row->cat_name, "utf-8", "iso-8859-1")  )
@@ -813,7 +813,7 @@ $xmlrpc_procs["metaWeblog.getPost"] = array(
 				"docstring" => $mwgetpost_doc );
 
 $xmlrpc_procs["metaWeblog.getCategories"] = array(
-				"function" => "mw_getcats",
+				"function" => "mw_getcategories",
 				"signature" => $mwgetcats_sig,
 				"docstring" => $mwgetcats_doc );
 
@@ -825,6 +825,9 @@ $xmlrpc_procs["metaWeblog.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/12 08:12:03  fplanque
+ * more xmlrpc tests
+ *
  * Revision 1.2  2008/01/12 08:06:15  fplanque
  * more xmlrpc tests
  *
