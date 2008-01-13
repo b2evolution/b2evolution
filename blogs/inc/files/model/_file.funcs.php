@@ -34,6 +34,20 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+if( ! function_exists('fnmatch') )
+{
+	/**
+	 * A replacement for fnmatch() which needs PHP 4.3 and a POSIX compliant system (Windows is not).
+	 *
+	 * @author jk at ricochetsolutions dot com {@link http://php.net/manual/function.fnmatch.php#71725}
+	 */
+	function fnmatch($pattern, $string)
+	{
+	   return preg_match( '#^'.strtr(preg_quote($pattern, '#'), array('\*' => '.*', '\?' => '.')).'$#i', $string);
+	}
+}
+
+
 /**
  * Converts bytes to readable bytes/kb/mb/gb, like "12.45mb"
  *
@@ -178,20 +192,6 @@ function get_admin_skins()
 		}
 	}
 	return $r;
-}
-
-
-if( ! function_exists('fnmatch') )
-{
-    /**
-     * A replacement for fnmatch() which needs PHP 4.3 and a POSIX compliant system (Windows is not).
-     *
-     * @author jk at ricochetsolutions dot com {@link http://php.net/manual/function.fnmatch.php#71725}
-     */
-   function fnmatch($pattern, $string)
-   {
-       return preg_match( '#^'.strtr(preg_quote($pattern, '#'), array('\*' => '.*', '\?' => '.')).'$#i', $string);
-   }
 }
 
 
@@ -389,64 +389,6 @@ function get_canonical_path( $ads_path )
 
 
 /**
- * Returns canonicalized absolute pathname as with realpath(), except it will
- * also translate paths that don't exist on the system.
- *
- * @deprecated overly complex
- * @todo remove
- *
- * @param string the path to be translated
- * @return array [0] = the translated path (with trailing slash); [1] = TRUE|FALSE (path exists?)
- */
-function check_canonical_path( $path )
-{
-	$path = str_replace( '\\', '/', $path );
-	$pwd = realpath( $path );
-
-	if( !empty($pwd) )
-	{ // path exists
-		$pwd = str_replace( '\\', '/', $pwd);
-		if( substr( $pwd, -1 ) !== '/' )
-		{
-			$pwd .= '/';
-		}
-		return array( $pwd, true );
-	}
-	else
-	{ // no realpath
-		$pwd = '';
-		$strArr = preg_split( '#/#', $path, -1, PREG_SPLIT_NO_EMPTY );
-		$pwdArr = array();
-		$j = 0;
-		for( $i = 0; $i < count($strArr); $i++ )
-		{
-			if( $strArr[$i] != '..' )
-			{
-				if( $strArr[$i] != '.' )
-				{
-					$pwdArr[$j] = $strArr[$i];
-					$j++;
-				}
-			}
-			else
-			{
-				array_pop( $pwdArr );
-				$j--;
-			}
-		}
-
-		$r_path = implode('/', $pwdArr).'/';
-
-		if( strpos( ltrim($path), '/' ) === 0 )
-		{ // There was at least one slash at the beginning
-			$r_path = '/'.$r_path;
-		}
-		return array( $r_path, false );
-	}
-}
-
-
-/**
  * Check for valid filename and extension of the filename (no path allowed). (MB)
  *
  * @uses $FiletypeCache, $settings or $force_regexp_filename form _advanced.php
@@ -513,28 +455,25 @@ function validate_dirname( $dirname )
 {
 	global $Settings, $force_regexp_dirname;
 
-	if( !empty( $force_regexp_dirname ) )
-	{ // Use the regexp from _advanced.php
-		if( preg_match( ':'.str_replace( ':', '\:', $force_regexp_dirname ).':', $dirname ) )
-		{ // Valid dirname
-			return;
+	if( $dirname != '..' )
+	{
+		if( !empty( $force_regexp_dirname ) )
+		{ // Use the regexp from _advanced.php
+			if( preg_match( ':'.str_replace( ':', '\:', $force_regexp_dirname ).':', $dirname ) )
+			{ // Valid dirname
+				return;
+			}
 		}
 		else
-		{ // Invalid filename
-			return sprintf( T_('&laquo;%s&raquo; is not a valid directory name.'), $dirname );
+		{ // Use the regexp from SETTINGS
+			if( preg_match( ':'.str_replace( ':', '\:', $Settings->get( 'regexp_dirname' ) ).':', $dirname ) )
+			{ // Valid dirname
+				return;
+			}
 		}
 	}
-	else
-	{ // Use the regexp from SETTINGS
-		if( preg_match( ':'.str_replace( ':', '\:', $Settings->get( 'regexp_dirname' ) ).':', $dirname ) )
-		{ // Valid dirname
-			return;
-		}
-		else
-		{ // Invalid dirname
-			return sprintf( T_('&laquo;%s&raquo; is not a valid directory name.'), $dirname );
-		}
-	}
+
+	return sprintf( T_('&laquo;%s&raquo; is not a valid directory name.'), $dirname );
 }
 
 
@@ -542,7 +481,7 @@ function validate_dirname( $dirname )
  * Return the path without the leading {@link $basepath}, or if not
  * below {@link $basepath}, just the basename of it.
  *
- *         Do not use this for file handling. but "just" displaying!
+ * Do not use this for file handling.  JUST for displaying! (DEBUG MESSAGE added)
  *
  * @param string Path
  * @return string Relative path or even base name.
@@ -782,6 +721,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/13 19:43:07  fplanque
+ * fixed file upload though metaweblog
+ *
  * Revision 1.4  2007/11/24 18:09:32  blueyed
  * fix doc
  *

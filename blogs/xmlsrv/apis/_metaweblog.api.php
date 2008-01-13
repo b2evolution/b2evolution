@@ -157,14 +157,15 @@ $mwnewMediaObject_sig = array(array(
  * @todo extensive permissions
  *
  * @param xmlrpcmsg XML-RPC Message
- *					0 appkey (string): Unique identifier/passcode of the application sending the post.
- *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .)
- *					1 blogid (string): Unique identifier of the blog the post will be added to.
+ *					0 blogid (string): Unique identifier of the blog the post will be added to.
  *						Currently ignored in b2evo, in favor of the category.
- *					2 username (string): Login for a Blogger user who has permission to edit the given
+ *					1 username (string): Login for a Blogger user who has permission to edit the given
  *						post (either the user who originally created it or an admin of the blog).
- *					3 password (string): Password for said username.
- *					4 numposts (integer): number of posts to retrieve.
+ *					2 password (string): Password for said username.
+ *					3 struct (struct)
+ * 							- name : filename
+ * 							- type : mimetype
+ * 							- bits : base64 encoded file
  * @return xmlrpcresp XML-RPC Response
  */
 function mw_newmediaobject($m)
@@ -172,108 +173,128 @@ function mw_newmediaobject($m)
 	global $xmlrpcerruser; // import user errcode value
 	global $Settings, $baseurl,$fileupload_allowedtypes;
 
-	logIO("start of _newmediaobject...");
 	$blog = $m->getParam(0);
 	$blog = $blog->scalarval();
+
 	$username = $m->getParam(1);
 	$username = $username->scalarval();
+
 	$password = $m->getParam(2);
 	$password = $password->scalarval();
+
+	$xcontent = $m->getParam(3);
+
 	if( !user_pass_ok($username, $password) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 				 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
+
 	if( ! $Settings->get('upload_enabled') )
 	{
-		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
 				 'Object upload not allowed ');
 	}
+
+
 	$BlogCache = & get_Cache('BlogCache');
 	$Blog = & $BlogCache->get_by_ID($blog);
 
 	// Get the main data - and decode it properly for the image - sorry, binary object
-	$xcontent = $m->getParam(3);
 	$contentstruct = xmlrpc_decode_recurse($xcontent);
-	logIO( 'Got first contentstruct!'."\n");
 
-	// This call seems to go wrong from Marsedit under certain circumstances - Tor 04012005
-	$data = $contentstruct['bits']; // decoding was done transparantly by xmlrpclibs xmlrpc_decode
-	logIO( 'Have decoded data data?'."\n");
-
-	// TODO: check filesize
-	$filename = $contentstruct['name'];
-	logIO( 'Found filename ->'. $filename ."\n");
-	$type = $contentstruct['type'];
-	logIO( 'Done type ->'. $type ."\n");
 	$data = $contentstruct['bits'];
-	logIO( 'Done bits ' ."\n");
+
+	$type = $contentstruct['type'];
+	logIO( 'Received MIME type: '.$type );
+
+	$rf_filepath = $contentstruct['name'];
+	logIO( 'Received filepath: '.$rf_filepath );
+	// Avoid problems:
+	$rf_filepath = strtolower($rf_filepath);
+	$rf_filepath = preg_replace( '¤[^a-z0-9\-_./]¤', '-', $rf_filepath);
+	logIO( 'Sanitized filepath: '.$rf_filepath );
+
+ 	load_funcs('files/model/_file.funcs.php');
 
 	// Split into path + name:
-	$filepath = dirname($filename);
-	$filename = basename($filename);
+	$filepath_parts = explode( '/', $rf_filepath );
+	$filename = array_pop( $filepath_parts );
 
-	$filepath_parts = explode('/', $filepath);
-	if( in_array('..', $filepath_parts) )
-	{ // invalid relative path:
-		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
-			'Invalid relative part in file path: '.$filepath);
-	}
-
-	// Check valid filename/extension:
-	load_funcs('files/model/_file.funcs.php');
-	if( $error_filename = validate_filename($filename) )
+	// Check valid filename/extension: (includes check for locked filenames)
+	logIO( 'File name: '.$filename );
+	if( $error_filename = validate_filename( $filename, false ) )
 	{
-		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+		return new xmlrpcresp(0, $xmlrpcerruser+4, // user error 4
 			'Invalid objecttype for upload ('.$filename.'): '.$error_filename);
 	}
+
+	// Check valid path parts:
+	$rds_subpath = '';
+	foreach( $filepath_parts as $filepath_part )
+	{
+		if( empty($filepath_part) || $filepath_part == '.' )
+		{	// self ref not useful
+			continue;
+		}
+
+		if( $error = validate_dirname($filepath_part) )
+		{ // invalid relative path:
+			logIO( $error );
+			return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
+				$error );
+		}
+
+		$rds_subpath .= $filepath_part.'/';
+	}
+	logIO( 'Subpath: '.$rds_subpath );
 
 	$fileupload_path = $Blog->get_media_dir();
 	if( ! $fileupload_path )
 	{
-		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+		return new xmlrpcresp(0, $xmlrpcerruser+5, // user error 5
 			'Error accessing Blog media directory.');
 	}
 
-	// Handle subdirs, if any:
-	if( strlen($filepath) && $filepath != '.' )
+	// Create subdirs, if necessary:
+	if( !empty($rds_subpath) )
 	{
-		$fileupload_path .= $filepath;
-		if( ! mkdir_r(dirname($fileupload_path)) )
-		{
-			return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+		$fileupload_path = $fileupload_path.$rds_subpath;
+		if( ! mkdir_r( $fileupload_path ) )
+		{	// Dir didn't already exist and could not be created
+			return new xmlrpcresp(0, $xmlrpcerruser+6, // user error 6
 				'Error creating sub directories: '.rel_path_to_base($fileupload_path));
 		}
 	}
 
-	logIO( 'fileupload_path ->'. $fileupload_path ."\n");
-	$fh = @fopen($fileupload_path.$filename, 'wb');
-	logIO( 'Managed to open file ->'. $filename ."\n");
-	if (!$fh)
+	$afs_filepath = $fileupload_path.$filename;
+	logIO( 'Saving to: '.$afs_filepath );
+	$fh = @fopen( $afs_filepath, 'wb' );
+	if( !$fh )
 	{
-		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+		logIO( 'Error opening file' );
+		return new xmlrpcresp(0, $xmlrpcerruser+7, // user error 7
 			'Error opening file for writing.');
 	}
 
-	logIO( 'Managed to open file for writing ->'. $fileupload_path.$filename."\n");
 	$ok = @fwrite($fh, $data);
 	@fclose($fh);
 
 	if (!$ok)
 	{
-		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
+		logIO( 'Error writing to file' );
+		return new xmlrpcresp(0, $xmlrpcerruser+8, // user error 8
 			'Error while writing to file.');
 	}
 
 	// chmod uploaded file:
-	$oldumask = umask(0000);
 	$chmod = $Settings->get('fm_default_chmod_file');
-	@chmod($fileupload_path.$filename, octdec( $chmod ));
-	umask($oldumask);
+	logIO( 'chmod to: '.$chmod );
+	@chmod( $afs_filepath, octdec( $chmod ) );
 
-	$url = $Blog->get_media_url().$filepath.$filename;
-	logIO( 'Full returned filename ->'. $fileupload_path . '/' . $filename ."\n");
-	logIO( 'Full returned url ->'. $url ."\n");
+	$url = $Blog->get_media_url().$rds_subpath.$filename;
+	logIO( 'URL of new file: '.$url );
+
 
 	// - return URL as XML
 	$urlstruct = new xmlrpcval(array(
@@ -834,6 +855,9 @@ $xmlrpc_procs["metaWeblog.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.7  2008/01/13 19:43:07  fplanque
+ * fixed file upload though metaweblog
+ *
  * Revision 1.6  2008/01/13 04:07:12  fplanque
  * XML-RPC API debugging
  *
