@@ -173,6 +173,7 @@ $bloggereditpost_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $x
  * On error, it will return a fault with an error message.
  *
  * @see http://www.blogger.com/developers/api/1_docs/xmlrpc_editPost.html
+ * @see http://www.sixapart.com/developers/xmlrpc/blogger_api/bloggereditpost.html
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -716,6 +717,9 @@ $xmlrpc_procs["blogger.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.7  2008/01/13 19:43:26  fplanque
+ * minor
+ *
  * Revision 1.6  2008/01/13 04:07:12  fplanque
  * XML-RPC API debugging
  *

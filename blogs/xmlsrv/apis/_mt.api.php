@@ -210,8 +210,25 @@ $xmlrpc_procs["mt.getPostCategories"] = array(
 				"signature" => $mt_getPostCategories_sig,
 				"docstring" => $mt_getPostCategories_doc );
 
+
+/*
+	Missing:
+
+	- mt.supportedTextFilters
+	- mt.supportedMethods
+  - mt.publishPost
+  - mt.getTrackbackPings
+  - mt.getRecentPostTitles
+
+	http://www.sixapart.com/developers/xmlrpc/movable_type_api/
+*/
+
+
 /*
  * $Log$
+ * Revision 1.5  2008/01/13 19:43:26  fplanque
+ * minor
+ *
  * Revision 1.4  2008/01/13 03:12:06  fplanque
  * XML-RPC API debugging
  *
