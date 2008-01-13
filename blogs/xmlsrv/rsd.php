@@ -20,6 +20,10 @@ header('Content-type: text/xml; charset=UTF-8', true);
 
 require_once dirname(__FILE__).'/../conf/_config.php';
 
+require_once $inc_path.'_main.inc.php';
+
+param( 'blog', 'integer', NULL );
+
 echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 ?>
 <rsd version="1.0" xmlns="http://archipelago.phrasewise.com/rsd">
@@ -28,22 +32,30 @@ echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 	  <engineLink>http://b2evolution.net/</engineLink>
 	  <homePageLink><?php echo $baseurl; ?></homePageLink>
 	  <apis>
-	    <api name="MetaWeblog" preferred="true" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php">
+	    <api name="MetaWeblog" preferred="true" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php"<?php
+	    	if( !empty($blog) ) { echo ' blogID="'.$blog.'"'; }
+	    	?>>
 				<settings>
 					<docs>http://manual.b2evolution.net/MetaWeblog_API</docs>
 				</settings>
 			</api>
-	    <api name="MovableType" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php">
+	    <api name="MovableType" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php"<?php
+	    	if( !empty($blog) ) { echo ' blogID="'.$blog.'"'; }
+	    	?>>
 				<settings>
 					<docs>http://manual.b2evolution.net/MovableType_API</docs>
 				</settings>
 			</api>
-	    <api name="Blogger" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php">
+	    <api name="Blogger" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php"<?php
+	    	if( !empty($blog) ) { echo ' blogID="'.$blog.'"'; }
+	    	?>>
 				<settings>
 					<docs>http://manual.b2evolution.net/Blogger_API</docs>
 				</settings>
 			</api>
-	    <api name="b2" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php">
+	    <api name="b2" preferred="false" apiLink="<?php echo $xmlsrv_url; ?>xmlrpc.php"<?php
+	    	if( !empty($blog) ) { echo ' blogID="'.$blog.'"'; }
+	    	?>>
 				<settings>
 					<docs>http://manual.b2evolution.net/B2_API</docs>
 				</settings>
@@ -55,6 +67,9 @@ echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/13 03:10:22  fplanque
+ * Enhanced RSD
+ *
  * Revision 1.1  2008/01/12 22:51:11  fplanque
  * RSD support
  *
