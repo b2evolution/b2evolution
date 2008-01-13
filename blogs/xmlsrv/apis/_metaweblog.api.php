@@ -19,6 +19,32 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * Decode the dateCreated
+ *
+ * @param struct
+ * @return string MYSQL date
+ */
+function _mw_decode_postdate( $contentstruct, $now_if_empty = true )
+{
+	global $Settings;
+
+	$postdate = NULL;
+
+	if( ! empty($contentstruct['dateCreated']) )
+	{
+		$postdate = $contentstruct['dateCreated'];
+		logIO( 'Using contentstruct dateCreated: '.$postdate );
+	}
+	elseif( $now_if_empty );
+	{
+		$postdate = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
+		logIO( 'No contentstruct dateCreated, using now: '.$postdate );
+	}
+
+	return $postdate;
+}
+
+/**
  *
  * @param array struct
  * @param integer blog ID
@@ -168,7 +194,7 @@ function mw_newmediaobject($m)
 
 	// Get the main data - and decode it properly for the image - sorry, binary object
 	$xcontent = $m->getParam(3);
-	$contentstruct = xmlrpc_decode($xcontent);
+	$contentstruct = xmlrpc_decode_recurse($xcontent);
 	logIO( 'Got first contentstruct!'."\n");
 
 	// This call seems to go wrong from Marsedit under certain circumstances - Tor 04012005
@@ -305,46 +331,33 @@ function mw_newpost($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
-	$contentstruct = xmlrpc_decode($xcontent); //this does not work properly.... need better decoding
-	logIO("finished getting contentstruct ...");
+	$contentstruct = xmlrpc_decode_recurse($xcontent);
+	logIO( 'Decoded xcontent' );
 
 	$post_title = $contentstruct['title'];
 	//	$content = format_to_post($contentstruct['description']);
 	$content = $contentstruct['description'];
-	logIO("finished getting title ...".$post_title);
-
 
 	// Categories:
 	$cat_IDs = _mw_get_cat_IDs($contentstruct, $blog_ID);
 
 	if( ! is_array($cat_IDs) )
 	{ // error:
-		return $cat_IDs;
-	}
-
-
-	if( empty($contentstruct['dateCreated']) )
-	{
-		$postdate = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
-		logIO("no contentstruct dateCreated, using now...".$postdate);
-	}
-	else
-	{
-		$postdate = $contentstruct['dateCreated'];
-		logIO("finished getting contentstruct dateCreated...".$postdate);
+		return $cat_IDs;	// This can be a preformatted error message
 	}
 
 	// Check permission:
 	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache->get_by_login( $username );
 	logIO("currentuser ...". $current_User->ID);
-
 	if( ! $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
 	{
 		logIO("user error 9 ...");
 		return new xmlrpcresp(0, $xmlrpcerruser+2, 'Permission denied.'); // user error 2
 	}
 	logIO("finished checking permissions ...");
+
+	$post_date = _mw_decode_postdate( $contentstruct, true );
 
 	// CHECK and FORMAT content - error occur after this line
 	//$post_title = format_to_post($post_title, 0, 0);
@@ -362,7 +375,8 @@ function mw_newpost($m)
 	// INSERT NEW POST INTO DB:
 	// Tor - comment this out to stop inserts into database
 	$edited_Item = & new Item();
-	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $postdate, $cat_IDs[0], $cat_IDs, $status, $current_User->locale );
+
+	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $post_date, $cat_IDs[0], $cat_IDs, $status, $current_User->locale );
 
 	if( $DB->error )
 	{	// DB error
@@ -383,16 +397,16 @@ function mw_newpost($m)
 $mweditpost_doc='Edits a post, blogger-api like, +title +category +postdate';
 $mweditpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcStruct,$xmlrpcBoolean));
 /**
- * metaWeblog.EditPost (metaWeblog.editPost)
+ * metaWeblog.editPost (metaWeblog.editPost)
  *
- * mw API
+ * @see http://www.xmlrpc.com/metaWeblogApi#basicEntrypoints
  *
- * Tor - TODO
+ * @todo Tor - TODO
  *		- Sort out sql select with blog ID
  *		- screws up posts with multiple categories
  *		  partly due to the fact that Movable Type calls to this API are different to Metaweblog API calls when handling categories.
  */
-function mw_editpost($m)
+function mw_editpost( $m )
 {
 	global $xmlrpcerruser; // import user errcode value
 	global $DB;
@@ -400,32 +414,29 @@ function mw_editpost($m)
 	global $Messages;
 	global $xmlrpc_htmlchecking;
 
-	logIO("start of mw_editpost...");
 	$post_ID = $m->getParam(0);
 	$post_ID = $post_ID->scalarval();
-	logIO("finished getting post_ID ...".$post_ID);
 
-	// Username/Password
 	$username = $m->getParam(1);
 	$username = $username->scalarval();
-	logIO("finished getting username ...");
+
 	$password = $m->getParam(2);
 	$password = $password->scalarval();
-	logIO("finished getting password ...".$password);
+
 	if( ! user_pass_ok($username,$password) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
-	logIO("finished checking password ...");
 
-	// getParam(4) should now be a flag for publish or draft
+	$xcontent = $m->getParam(3);
+	$contentstruct = xmlrpc_decode_recurse($xcontent);
+	logIO("Decoded xcontent");
+
 	$xstatus = $m->getParam(4);
 	$xstatus = $xstatus->scalarval();
 	$status = $xstatus ? 'published' : 'draft';
 	logIO("Publish: $xstatus -> Status: $status");
-	logIO("finished getting xstatus ->". $xstatus);
-
 
 	// Get Item:
 	$ItemCache = & get_Cache( 'ItemCache' );
@@ -445,28 +456,18 @@ function mw_editpost($m)
 	logIO("finished checking permissions ...");
 
 
-	$xcontent = $m->getParam(3);
-//	$xcontent = $xcontent->scalarval();
-	logIO("finished getting xcontent ...");
-	$contentstruct = xmlrpc_decode($xcontent); //this does not work properly.... need better decoding
-	logIO("finished getting contentstruct ...");
-
+	$post_date = _mw_decode_postdate( $contentstruct, false );
 
 	// Categories:
-	$cat_IDs = _mw_get_cat_IDs($contentstruct, $blog_ID, true /* empty is ok */);
-
+	$cat_IDs = _mw_get_cat_IDs( $contentstruct, $edited_Item->blog_ID, true /* empty is ok */ );
 	if( ! is_array($cat_IDs) )
 	{ // error:
 		return $cat_IDs;
 	}
 
-
 	$post_title = $contentstruct['title'];
 	$content = $contentstruct['description'];
 	logIO("finished getting title ...".$post_title);
-
-	$postdate = $contentstruct['dateCreated'];
-	logIO("finished getting contentstruct dateCreated...".$postdate);
 
 
 	if( ! empty($xmlrpc_htmlchecking) )
@@ -490,11 +491,11 @@ function mw_editpost($m)
 	$edited_Item->set( 'title', $post_title );
 	$edited_Item->set( 'content', $content );
 	$edited_Item->set( 'status', $status );
-	if( ! empty($postdate) )
+	if(  empty($post_date) )
 	{
-		$edited_Item->set( 'datestart', $postdate );
+		$edited_Item->set( 'issue_date', $post_date );
 	}
-	if( ! empty($cat_IDs) )
+	if( !empty($cat_IDs) )
 	{ // Update cats:
 		$edited_Item->set('main_cat_ID', $cat_IDs[0]);
 
@@ -509,6 +510,7 @@ function mw_editpost($m)
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
 
+	/*
 	// Time to perform trackbacks NB NOT WORKING YET
 	//
 	// NB Requires a change to the _trackback library
@@ -542,7 +544,9 @@ function mw_editpost($m)
  		}
 
 	}
-	return new xmlrpcresp(new xmlrpcval($post_ID));
+	*/
+
+	return new xmlrpcresp( new xmlrpcval( 1, 'boolean' ) );
 }
 
 
@@ -721,73 +725,71 @@ function mw_getrecentposts( $m )
 
 
 
-$mwgetpost_doc = 'fetches a post, blogger-api like';
+$mwgetpost_doc = 'Fetches a post, blogger-api like';
 $mwgetpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
 /**
  * metaweblog.getPost retieves a given post.
  *
- * This API call is not documented on
- * {@link http://www.blogger.com/developers/api/1_docs/}
+ * @see http://www.xmlrpc.com/metaWeblogApi#basicEntrypoints
  *
  * @param xmlrpcmsg XML-RPC Message
- *					0 appkey (string): Unique identifier/passcode of the application sending the post.
- *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .)
- *					1 postid (string): Unique identifier of the post to be deleted.
- *					2 username (string): Login for a Blogger user who has permission to edit the given
+ *					0 postid (string): Unique identifier of the post to be deleted.
+ *					1 username (string): Login for a Blogger user who has permission to edit the given
  *						post (either the user who originally created it or an admin of the blog).
- *					3 password (string): Password for said username.
+ *					2 password (string): Password for said username.
  * @return xmlrpcresp XML-RPC Response
  */
 function mw_getpost($m)
 {
-
 	global $xmlrpcerruser;
 
 	$post_ID = $m->getParam(0);
 	$post_ID = $post_ID->scalarval();
+
 	$username = $m->getParam(1);
 	$username = $username->scalarval();
+
 	$password = $m->getParam(2);
 	$password = $password->scalarval();
-	if( user_pass_ok($username,$password) )
-	{
-		$postdata = get_postdata($post_ID);
-		if( $postdata['Date'] != '' )
-		{
-			$post_date = mysql2date("U", $postdata["Date"]);
-			$post_date = gmdate("Ymd", $post_date)."T".gmdate("H:i:s", $post_date);
-			$content = $postdata["Content"];
-							// Kludge to fix library problem str_replace(#10,'',$content)
-			$content = str_replace("\n",'',$content); // Tor - kludge to fix bug in xmlrpc libraries
-			$struct = new xmlrpcval(array(
-					'link'              => new xmlrpcval(''),
-					'title'             => new xmlrpcval($postdata["Title"]),
-					'description'       => new xmlrpcval($content),
-					'dateCreated'       => new xmlrpcval($post_date,"dateTime.iso8601"),
-					'userid'            => new xmlrpcval(""),
-					'postid'            => new xmlrpcval($post_ID),
-					'content'           => new xmlrpcval($content),
-					'permalink'         => new xmlrpcval(""),
-					'categories'        => new xmlrpcval($postdata["Category"]),
-					'mt_excerpt'        => new xmlrpcval($content),
-					'mt_allow_comments' => new xmlrpcval("",'int'),
-					'mt_allow_pings'    => new xmlrpcval("",'int'),
-					'mt_text_more'      => new xmlrpcval("")
-				),"struct");
-			$resp = $struct;
-			return new xmlrpcresp($resp);
-		}
-		else
-		{
-		return new xmlrpcresp(0, $xmlrpcerruser+7, // user error 7
-					 "No such post #$post_ID");
-		}
-	}
-	else
+
+	if( ! user_pass_ok( $username, $password ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
+
+	$ItemCache = & get_Cache( 'ItemCache' );
+  /**
+	 * @var Item
+	 */
+	if( ! ($edited_Item = & $ItemCache->get_by_ID( $post_ID, false ) ) )
+	{
+		return new xmlrpcresp(0, $xmlrpcerruser+7, 'No such post.');	// user error 7
+	}
+
+	$post_date = mysql2date( "U", $edited_Item->issue_date );
+	$post_date = gmdate("Ymd", $post_date)."T".gmdate("H:i:s", $post_date);
+
+	$struct = new xmlrpcval(array(
+			'link'              => new xmlrpcval($edited_Item->get_permanent_url()),
+			'title'             => new xmlrpcval($edited_Item->title),
+			'description'       => new xmlrpcval($edited_Item->content),
+			'dateCreated'       => new xmlrpcval($post_date,"dateTime.iso8601"),
+			'userid'            => new xmlrpcval($edited_Item->creator_user_ID),
+			'postid'            => new xmlrpcval($edited_Item->ID),
+			'content'           => new xmlrpcval($edited_Item->content),
+			'permalink'         => new xmlrpcval($edited_Item->get_permanent_url()),
+			'categories'        => new xmlrpcval($edited_Item->main_cat_ID),	// TODO: CATEGORY NAMES!
+			/*
+			'mt_excerpt'        => new xmlrpcval($edited_Item->excerpt),
+			'mt_allow_comments' => new xmlrpcval($edited_Item->comment_status,'int'), // TODO: convert, looking for doc!!?
+			'mt_allow_pings'    => new xmlrpcval($edited_Item->notifications_status,'int'), // TODO: convert
+			'mt_text_more'      => new xmlrpcval("")	// Doc?
+			*/
+		),"struct");
+	$resp = $struct;
+
+	return new xmlrpcresp($resp);
 }
 
 
@@ -826,6 +828,9 @@ $xmlrpc_procs["metaWeblog.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/13 03:12:06  fplanque
+ * XML-RPC API debugging
+ *
  * Revision 1.4  2008/01/12 22:51:11  fplanque
  * RSD support
  *

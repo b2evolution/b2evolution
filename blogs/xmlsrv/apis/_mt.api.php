@@ -38,6 +38,8 @@ function mt_setPostCategories($m)
 	$password = $password->scalarval();
 
  	$xcontent = $m->getParam(3); // This is now an array of structs
+	$contentstruct = xmlrpc_decode_recurse($xcontent);
+	logIO("Decoded xcontent");
 
 	if( ! user_pass_ok($username,$password) )
 	{
@@ -45,32 +47,17 @@ function mt_setPostCategories($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
-	// The number of objects ie categories:
-	$iSize = $xcontent->arraysize();
-	logIO("finished getting - iSize ...".$iSize); // number of categories entry has set
-
-	logIO("finished getting contentstruct ...");
 	$categories = array();
 	$category = NULL;
-	if( $iSize > 0 )
+	foreach( $contentstruct as $catstruct )
 	{
-		for($i=0;$i<$iSize;$i++)
+		logIO( 'Category ID: '.$catstruct['categoryId'] ) ;
+		if( !empty($catstruct['isPrimary']) )
 		{
-			logIO("finished getting - i ...>".$i); // works!
-			$struct = $xcontent->arraymem($i); // get a struct object from array
-			$tempcat = $struct->structmem('categoryId');
-			$tempcat = $tempcat->scalarval();
-			$tempPrimary = $struct->structmem('isPrimary'); // Start finding the primary category
-			$tempPrimary = $tempPrimary->scalarval();
-			if($tempPrimary != 0)
-			{
-				logIO("got primary category and there should only be one...".$tempcat);
-				$category = $tempcat;
-			}
-			logIO("finished getting - tempcat ...".$tempcat); // works!
-			$categories[$i] = $tempcat;
-			logIO("finished getting - categories ...".$categories[$i]);
+			logIO("got primary category and there should only be one...".$tempcat);
+			$category = $catstruct['categoryId'];
 		}
+		$categories[] = $catstruct['categoryId'];
 	}
 
 	if( empty( $categories ) )
@@ -84,22 +71,26 @@ function mt_setPostCategories($m)
 		$category = $categories[0];
 	}
 
+	logIO( 'Main Cat: '.$category.' - Other: '.implode(',',$categories) );
+
 	// UPDATE POST CATEGORIES IN DB:
-	logIO("bpost_update - category ...".$category); // works!
 	$ItemCache = & get_Cache( 'ItemCache' );
 	if( ! ($edited_Item = & $ItemCache->get_by_ID( $post_ID ) ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+7, "No such post (#$post_ID)."); // user error 7
 	}
+	logIO( 'Item ('.$edited_Item->ID.'): '.$edited_Item->title );
 	$edited_Item->set( 'main_cat_ID', $category );
 	$edited_Item->set( 'extra_cat_IDs', $categories );
 
-	if( ! $edited_Item->dbupdate() )
+	if( $edited_Item->dbupdate() === false )
 	{
+		logIO( 'Update failed.' );
 		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
 					 'Update failed.');
 	}
 
+	logIO( 'OK.' );
 	return new xmlrpcresp(new xmlrpcval(1));
 }
 
@@ -221,6 +212,9 @@ $xmlrpc_procs["mt.getPostCategories"] = array(
 
 /*
  * $Log$
+ * Revision 1.4  2008/01/13 03:12:06  fplanque
+ * XML-RPC API debugging
+ *
  * Revision 1.3  2008/01/12 22:51:11  fplanque
  * RSD support
  *

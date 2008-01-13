@@ -288,7 +288,7 @@ function blogger_editpost($m)
 	// Execute or schedule notifications & pings:
 	$edited_Item->handle_post_processing();
 
-	return new xmlrpcresp(new xmlrpcval("1", "boolean"));
+	return new xmlrpcresp( new xmlrpcval( 1, 'boolean' ) );
 }
 
 
@@ -709,6 +709,9 @@ $xmlrpc_procs["blogger.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/13 03:12:06  fplanque
+ * XML-RPC API debugging
+ *
  * Revision 1.4  2008/01/12 22:51:11  fplanque
  * RSD support
  *

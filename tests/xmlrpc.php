@@ -70,7 +70,7 @@ $bloggerAPIappkey = 'testkey';
 	// pre_dump( $ret );
 	if( is_array( $ret ) )foreach( $ret as $a )
 	{
-		echo '<li>'.$a['blogName'].'</li>';
+		echo '<li><a href="'.$a['url'].'">'.$a['blogName'].'</a></li>';
 	}
 
  	// ----------------------------------------------------------------------------------------------------
@@ -155,6 +155,52 @@ $bloggerAPIappkey = 'testkey';
 
 	// ----------------------------------------------------------------------------------------------------
 
+	echo '<h2>metaWeblog.editPost</h2>';
+	$client->debug = false;
+	$message = new xmlrpcmsg( 'metaWeblog.editPost', array(
+			new xmlrpcval( $msg_ID ), // post ID
+			new xmlrpcval( $test_user ),
+			new xmlrpcval( $test_pass ),
+			new xmlrpcval( array(
+					'title'             => new xmlrpcval($post_text),
+					'description'       => new xmlrpcval( $post_text."\n* Edited *" ),
+					'categories'        => new xmlrpcval( array(
+                        							new xmlrpcval( 'News' ),
+																			new xmlrpcval( 'Fun' )
+																	), 'array' ),
+				), 'struct' ),
+			new xmlrpcval( true, 'boolean' ),		// Published
+		) );
+	$result = $client->send($message);
+	$ret = xmlrpc_displayresult( $result );
+	// pre_dump( $ret );
+	if( $ret == 1 )
+	{
+		echo 'OK';
+	}
+	else
+	{
+		die('ERROR');
+	}
+
+	// ----------------------------------------------------------------------------------------------------
+
+	echo '<h2>metaWeblog.getPost</h2>';
+	$client->debug = false;
+	$message = new xmlrpcmsg( 'metaWeblog.getPost', array(
+														new xmlrpcval($msg_ID),
+														new xmlrpcval($test_user),
+														new xmlrpcval($test_pass),
+													)  );
+	$result = $client->send($message);
+	$ret = xmlrpc_displayresult( $result );
+	pre_dump( $ret );
+
+ 	echo '<p>Content: '.htmlspecialchars($ret['content']);
+	echo '</p>';
+
+	// ----------------------------------------------------------------------------------------------------
+
 	echo '<h2>b2.newPost</h2>';
 	$post_text = 'XML-RPC b2.newPost : random # '.rand( 1, 10000 );
 	echo 'Post_text : '.$post_text;
@@ -213,7 +259,7 @@ $bloggerAPIappkey = 'testkey';
 													)  );
 	$result = $client->send($message);
 	$ret = xmlrpc_displayresult( $result );
-	// pre_dump( $ret );
+	pre_dump( $ret );
 	if( is_array( $ret ) )foreach( $ret as $a )
 	{
 		echo '<li>'.$a['categoryName'].'</li>';
@@ -482,6 +528,4 @@ $bloggerAPIappkey = 'testkey';
 // Missing tests:
 
 // metaWeblog.newMediaObject
-// metaWeblog.EditPost
-// metaweblog.getPost
 ?>
