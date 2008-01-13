@@ -4,6 +4,7 @@
  *
  * @see http://manual.b2evolution.net/Blogger_API
  * @see http://www.blogger.com/developers/api/1_docs/
+ * @see http://www.sixapart.com/developers/xmlrpc/blogger_api/
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -28,6 +29,7 @@ $bloggernewpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $
  * On error, it will return some error message.
  *
  * @see http://www.blogger.com/developers/api/1_docs/xmlrpc_newPost.html
+ * @see http://www.sixapart.com/developers/xmlrpc/blogger_api/bloggernewpost.html
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -295,12 +297,13 @@ function blogger_editpost($m)
 
 
 $bloggerdeletepost_doc = 'Deletes a post, blogger-api like';
-$bloggerdeletepost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
+$bloggerdeletepost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcBoolean));
 /**
  * blogger.deletePost deletes a given post.
  *
  * This API call is not documented on
  * {@link http://www.blogger.com/developers/api/1_docs/}
+ * @see http://www.sixapart.com/developers/xmlrpc/blogger_api/bloggerdeletepost.html
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -371,6 +374,7 @@ $bloggergetusersblogs_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcStrin
  * (isAdmin).
  *
  * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_getUsersBlogs.html}
+ * @see http://www.sixapart.com/developers/xmlrpc/blogger_api/bloggergetusersblogs.html
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -450,6 +454,7 @@ $bloggergetuserinfo_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString,
  * Data returned: userid, firstname, lastname, nickname, email, and url.
  *
  * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_getUserInfo.html}
+ * @see http://www.sixapart.com/developers/xmlrpc/blogger_api/bloggergetuserinfo.html
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -508,6 +513,7 @@ $bloggergetpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $
  *
  * This API call is not documented on
  * {@link http://www.blogger.com/developers/api/1_docs/}
+ * @see http://www.sixapart.com/developers/xmlrpc/blogger_api/bloggergetpost.html
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -576,6 +582,7 @@ $bloggergetrecentposts_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcSt
  *
  * This API call is not documented on
  * {@link http://www.blogger.com/developers/api/1_docs/}
+ * @see http://www.sixapart.com/developers/xmlrpc/blogger_api/bloggergetrecentposts.html
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -709,6 +716,9 @@ $xmlrpc_procs["blogger.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.6  2008/01/13 04:07:12  fplanque
+ * XML-RPC API debugging
+ *
  * Revision 1.5  2008/01/13 03:12:06  fplanque
  * XML-RPC API debugging
  *

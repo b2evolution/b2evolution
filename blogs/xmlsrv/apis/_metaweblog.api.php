@@ -686,6 +686,9 @@ function mw_getrecentposts( $m )
 	xmlrpc_debugmsg( 'Items:'.$MainList->result_num_rows );
 
 	$data = array();
+  /**
+	 * @var Item
+	 */
 	while( $Item = & $MainList->get_item() )
 	{
 		xmlrpc_debugmsg( 'Item:'.$Item->title.
@@ -712,11 +715,14 @@ function mw_getrecentposts( $m )
 				"title" => new xmlrpcval($Item->title),
 				"description" => new xmlrpcval($content),
 				"link" => new xmlrpcval($Item->url),
+				'publish' => new xmlrpcval(($Item->status == 'published'),'boolean'),
+				/*
 				"permalink" => new xmlrpcval($Item->urltitle),
 				"mt_excerpt" => new xmlrpcval($content),
 				"mt_allow_comments" => new xmlrpcval('1'),
 				"mt_allow_pings" => new xmlrpcval('1'),
 				"mt_text_more" => new xmlrpcval('')
+				*/
 			),"struct");
 	}
 	$resp = new xmlrpcval($data, "array");
@@ -828,6 +834,9 @@ $xmlrpc_procs["metaWeblog.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.6  2008/01/13 04:07:12  fplanque
+ * XML-RPC API debugging
+ *
  * Revision 1.5  2008/01/13 03:12:06  fplanque
  * XML-RPC API debugging
  *
