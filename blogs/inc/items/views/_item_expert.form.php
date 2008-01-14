@@ -155,7 +155,6 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	if( $use_preview )
 	{ // ---------- PREVIEW ----------
-		load_funcs( '_core/_url.funcs.php' );
 		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
 
 		$Form->button( array( 'button', '', T_('Preview'), '', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
@@ -378,6 +377,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.17  2008/01/14 23:41:47  fplanque
+ * cleanup load_funcs( urls ) in main because it is ubiquitously used
+ *
  * Revision 1.16  2007/12/23 16:16:17  fplanque
  * Wording improvements
  *

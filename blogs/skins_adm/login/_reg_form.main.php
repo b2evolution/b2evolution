@@ -30,7 +30,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_funcs( '_core/_url.funcs.php' );
 
 /**
  * Include page header:
@@ -85,6 +84,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/14 23:41:48  fplanque
+ * cleanup load_funcs( urls ) in main because it is ubiquitously used
+ *
  * Revision 1.4  2008/01/06 17:10:58  blueyed
  * Fix call to undefined function when accessing register.php and _url.funcs.php has not been loaded
  *

@@ -298,6 +298,7 @@ if( empty($generating_static) )
  * Includes:
  */
 $Timer->start('_main.inc:requires');
+load_funcs('_core/_url.funcs.php');
 load_class('_core/model/dataobjects/_dataobjectcache.class.php');
 load_class('generic/model/_genericelement.class.php');
 load_class('generic/model/_genericcache.class.php');
@@ -646,6 +647,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.87  2008/01/14 23:41:47  fplanque
+ * cleanup load_funcs( urls ) in main because it is ubiquitously used
+ *
  * Revision 1.86  2007/12/10 01:06:33  blueyed
  * Apply same check as in login.php: if a user is not validated, but validation is turned off then do not require him to validate
  *

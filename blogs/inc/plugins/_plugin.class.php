@@ -2405,7 +2405,6 @@ class Plugin
 		$r = $plugins_url.$sub_path;
 
 		// Use the same protocol as with current host (so includes from within https do not fail when on http):
-		load_funcs('_core/_url.funcs.php');
 		$r = url_same_protocol($r);
 
 		// Make it relative to current host, if absolute is not required:
@@ -2885,6 +2884,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/14 23:41:47  fplanque
+ * cleanup load_funcs( urls ) in main because it is ubiquitously used
+ *
  * Revision 1.4  2007/09/22 22:11:18  fplanque
  * minor
  *

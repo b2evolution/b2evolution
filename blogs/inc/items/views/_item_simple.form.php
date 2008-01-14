@@ -143,7 +143,6 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 
 	if( $use_preview )
 	{ // ---------- PREVIEW ----------
-		load_funcs( '_core/_url.funcs.php' );
 		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
 
 		$Form->button( array( 'button', '', T_('Preview'), '', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
@@ -264,6 +263,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.6  2008/01/14 23:41:47  fplanque
+ * cleanup load_funcs( urls ) in main because it is ubiquitously used
+ *
  * Revision 1.5  2007/09/17 20:04:40  fplanque
  * UI improvements
  *
