@@ -21,7 +21,6 @@ require_once $inc_path.'_core/_class4.funcs.php';
 
 load_funcs('_core/_misc.funcs.php');
 load_funcs('_ext/xmlrpc/_xmlrpc.php');
-load_funcs('_ext/xmlrpc/_xmlrpc.php' );
 
 echo '<h1>XML-RPC tests</h1>';
 
@@ -45,7 +44,52 @@ $bloggerAPIappkey = 'testkey';
 
 	// ----------------------------------------------------------------------------------------------------
 
+	echo '<h2>system.listMethods</h2>';
+	flush();
+	$client->debug = false;
+	$message = new xmlrpcmsg( 'system.listMethods' );
+	$result = $client->send($message);
+	$ret = xmlrpc_displayresult( $result );
+	//pre_dump( $ret );
+
+	// ----------------------------------------------------------------------------------------------------
+
+	echo '<h2>system.getCapabilities</h2>';
+	flush();
+	$client->debug = false;
+	$message = new xmlrpcmsg( 'system.getCapabilities' );
+	$result = $client->send($message);
+	$ret = xmlrpc_displayresult( $result );
+	pre_dump( $ret );
+
+	// ----------------------------------------------------------------------------------------------------
+
+	echo '<h2>system.methodHelp</h2>';
+	flush();
+	$client->debug = false;
+	$message = new xmlrpcmsg( 'system.methodHelp', array(
+														new xmlrpcval( 'system.multicall' ),
+													)  );
+	$result = $client->send($message);
+	$ret = xmlrpc_displayresult( $result );
+	pre_dump( $ret );
+
+	// ----------------------------------------------------------------------------------------------------
+
+	echo '<h2>system.methodSignature</h2>';
+	flush();
+	$client->debug = false;
+	$message = new xmlrpcmsg( 'system.methodSignature', array(
+														new xmlrpcval( 'system.multicall' ),
+													)  );
+	$result = $client->send($message);
+	$ret = xmlrpc_displayresult( $result );
+	pre_dump( $ret );
+
+	// ----------------------------------------------------------------------------------------------------
+
 	echo '<h2>blogger.getUserInfo</h2>';
+	flush();
 	$client->debug = false;
 	$message = new xmlrpcmsg( 'blogger.getUserInfo', array(
 														new xmlrpcval($bloggerAPIappkey),
@@ -59,6 +103,7 @@ $bloggerAPIappkey = 'testkey';
 	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>blogger.getUsersBlogs</h2>';
+	flush();
 	$client->debug = false;
 	$message = new xmlrpcmsg( 'blogger.getUsersBlogs', array(
 														new xmlrpcval($bloggerAPIappkey),
@@ -76,6 +121,7 @@ $bloggerAPIappkey = 'testkey';
  	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>b2.getCategories</h2>';
+	flush();
 	$client->debug = false;
 	$message = new xmlrpcmsg( 'b2.getCategories', array(
 														new xmlrpcval(1),
@@ -93,6 +139,7 @@ $bloggerAPIappkey = 'testkey';
  	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>mt.getCategoryList</h2>';
+	flush();
 	$client->debug = false;
 	$message = new xmlrpcmsg( 'mt.getCategoryList', array(
 														new xmlrpcval(1),
@@ -110,6 +157,7 @@ $bloggerAPIappkey = 'testkey';
  	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>metaWeblog.getCategories</h2>';
+	flush();
 	$client->debug = false;
 	$message = new xmlrpcmsg( 'metaWeblog.getCategories', array(
 														new xmlrpcval(1),
@@ -127,6 +175,7 @@ $bloggerAPIappkey = 'testkey';
 	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>metaWeblog.newPost</h2>';
+	flush();
 	$post_text = 'XML-RPC metaWeblog.newPost : random # '.rand( 1, 10000 );
 	echo 'Post_text : '.$post_text;
 	$client->debug = false;
@@ -156,6 +205,7 @@ $bloggerAPIappkey = 'testkey';
 	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>metaWeblog.editPost</h2>';
+	flush();
 	$client->debug = false;
 	$message = new xmlrpcmsg( 'metaWeblog.editPost', array(
 			new xmlrpcval( $msg_ID ), // post ID
@@ -186,6 +236,7 @@ $bloggerAPIappkey = 'testkey';
 	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>metaWeblog.getPost</h2>';
+	flush();
 	$client->debug = false;
 	$message = new xmlrpcmsg( 'metaWeblog.getPost', array(
 														new xmlrpcval($msg_ID),
@@ -202,6 +253,7 @@ $bloggerAPIappkey = 'testkey';
 	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>b2.newPost</h2>';
+	flush();
 	$post_text = 'XML-RPC b2.newPost : random # '.rand( 1, 10000 );
 	echo 'Post_text : '.$post_text;
 	$client->debug = false;
@@ -228,6 +280,7 @@ $bloggerAPIappkey = 'testkey';
 	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>mt.setPostCategories</h2>';
+	flush();
 	$client->debug = false;
 	$message = new xmlrpcmsg( 'mt.setPostCategories', array(
 														new xmlrpcval( $msg_ID ),
@@ -251,6 +304,7 @@ $bloggerAPIappkey = 'testkey';
 	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>mt.getPostCategories</h2>';
+	flush();
 	$client->debug = false;
 	$message = new xmlrpcmsg( 'mt.getPostCategories', array(
 														new xmlrpcval( $msg_ID ),
@@ -267,6 +321,7 @@ $bloggerAPIappkey = 'testkey';
 
 	// ----------------------------------------------------------------------------------------------------
 	echo '<h2>blogger.newPost</h2>';
+	flush();
 	$post_text = 'XML-RPC post : random # '.rand( 1, 10000 );
 	echo 'Post_text : '.$post_text;
 	$client->debug = false;
@@ -296,6 +351,7 @@ $bloggerAPIappkey = 'testkey';
 	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>metaWeblog.getRecentPosts</h2>';
+	flush();
 	$client->debug = false;
 	$message = new xmlrpcmsg( 'metaWeblog.getRecentPosts', array(
 														new xmlrpcval(1), // blog
@@ -315,6 +371,7 @@ $bloggerAPIappkey = 'testkey';
 	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>blogger.getRecentPosts</h2>';
+	flush();
 	$client->debug = false;
 	$message = new xmlrpcmsg( 'blogger.getRecentPosts', array(
 														new xmlrpcval($bloggerAPIappkey),
@@ -375,6 +432,7 @@ $bloggerAPIappkey = 'testkey';
 	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>blogger.editPost</h2>';
+	flush();
 	$client->debug = false;
 
 	// Add something to message:
@@ -403,6 +461,7 @@ $bloggerAPIappkey = 'testkey';
 	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>blogger.getPost</h2>';
+	flush();
 	$client->debug = false;
 	$message = new xmlrpcmsg( 'blogger.getPost', array(
 														new xmlrpcval($bloggerAPIappkey),
@@ -428,6 +487,7 @@ $bloggerAPIappkey = 'testkey';
 	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>b2.getPostURL</h2>';
+	flush();
 	$client->debug = false;
 	$message = new xmlrpcmsg( 'b2.getPostURL', array(
 														new xmlrpcval(0),
@@ -445,6 +505,7 @@ $bloggerAPIappkey = 'testkey';
 	// ----------------------------------------------------------------------------------------------------
 
 	echo '<h2>blogger.deletePost</h2>';
+	flush();
 	if( empty( $delete_post ) )
 	{
 		echo 'no post to delete yet. run again.';
@@ -457,6 +518,7 @@ $bloggerAPIappkey = 'testkey';
 															new xmlrpcval( $delete_post ),
 															new xmlrpcval($test_user),
 															new xmlrpcval($test_pass),
+															new xmlrpcval(0,'boolean'),
 														)  );
 		$result = $client->send($message);
 		$ret = xmlrpc_displayresult( $result );
@@ -483,6 +545,7 @@ $bloggerAPIappkey = 'testkey';
 															new xmlrpcval( $delete_post2 ),
 															new xmlrpcval($test_user),
 															new xmlrpcval($test_pass),
+															new xmlrpcval(0,'boolean'),
 														)  );
 		$result = $client->send($message);
 		$ret = xmlrpc_displayresult( $result );
@@ -509,6 +572,7 @@ $bloggerAPIappkey = 'testkey';
 															new xmlrpcval( $delete_post3 ),
 															new xmlrpcval($test_user),
 															new xmlrpcval($test_pass),
+															new xmlrpcval(0,'boolean'),
 														)  );
 		$result = $client->send($message);
 		$ret = xmlrpc_displayresult( $result );

@@ -581,7 +581,7 @@ $debug_no_register_shutdown = 0;
 
 
 /**
- * XMLRPC logging. Set this to 1 to log XMLRPC calls/responses (into /xmlsrv/xmlrpc.log).
+ * XMLRPC logging. Set this to 1 to log XMLRPC calls received by this server (into /xmlsrv/xmlrpc.log).
  *
  * @global int $debug_xmlrpc_logging Default: 0
  */
