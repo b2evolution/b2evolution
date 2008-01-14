@@ -33,7 +33,7 @@ class auto_p_plugin extends Plugin
 	 * List of block elements (we want a paragraph before and after), excludes: address, added: td, th
 	 * @var string
 	 */
-	var $block_tags = 'blockquote|dd|div|dl|dt|fieldset|form|h[1-6]|hr|li|ol|p|pre|select|script|table|td|th|ul';
+	var $block_tags = 'blockquote|dd|div|dl|dt|fieldset|form|h[1-6]|hr|li|object|ol|p|pre|select|script|table|td|th|ul';
 
 
 	var $p_allowed_in = array('address', 'applet', 'blockquote', 'body', 'button', 'center', 'dd', 'del', 'div', 'fieldset', 'form', 'iframe', 'ins', 'li', 'map', 'noframes', 'noscript', 'object', 'td', 'th' );
@@ -635,6 +635,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.42  2008/01/14 18:08:48  blueyed
+ * Add OBJECT to list of block tags (i.e. no P/BR therein)
+ *
  * Revision 1.41  2008/01/04 23:14:20  blueyed
  * Fix auto_p_plugin to not pee in the middle of some tags
  *
