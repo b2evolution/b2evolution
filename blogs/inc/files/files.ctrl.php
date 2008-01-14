@@ -601,7 +601,7 @@ switch( $action )
 					continue;
 				}
 			}
-			elseif( $error_dirname = validate_dirname( $new_names[$loop_src_File->get_md5_ID()], $allow_locked_filetypes ) )
+			elseif( $error_dirname = validate_dirname( $new_names[$loop_src_File->get_md5_ID()] ) )
 			{ // directory name
 				$confirmed = 0;
 				param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $error_dirname );
@@ -1481,6 +1481,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2008/01/14 00:00:53  fplanque
+ * removed extra param
+ *
  * Revision 1.9  2008/01/06 05:16:33  fplanque
  * enhanced upload
  *
