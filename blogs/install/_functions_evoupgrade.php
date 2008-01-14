@@ -53,7 +53,7 @@ function set_upgrade_checkpoint( $version )
 
 	$max_exe_time = ini_get( 'max_execution_time' );
 	if( $max_exe_time && $elapsed_time > $max_exe_time - 10 )
-	{
+	{ // Max exe time not disabled and we're recahing the end
 		echo 'We are reaching the time limit for this script. Please click <a href="index.php?locale='.$locale.'&amp;action=evoupgrade">continue</a>...';
 		// Dirty temporary solution:
 		exit();
@@ -2157,6 +2157,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.237  2008/01/14 07:33:32  fplanque
+ * Daniel, stop putting the comments in the log! They're more useful in the code!
+ *
  * Revision 1.236  2008/01/12 19:25:58  blueyed
  * - Fix install from < 0.8: Make function "cleanup_post_quotes" inline and fix table name
  * - Only check max_execution_time when > 0 (not disabled)
