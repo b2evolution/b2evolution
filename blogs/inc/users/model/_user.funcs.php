@@ -91,13 +91,7 @@ function user_pass_ok( $login, $pass, $pass_is_md5 = false )
 	}
 	// echo 'got data for: ', $User->login;
 
-	if( !$pass_is_md5 )
-	{
-		$pass = md5( $pass );
-	}
-	// echo 'pass: ', $pass, '/', $User->pass;
-
-	return ( $pass == $User->pass );
+	return $User->check_password( $pass, $pass_is_md5 );
 }
 
 
@@ -548,6 +542,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/14 07:22:07  fplanque
+ * Refactoring
+ *
  * Revision 1.4  2007/12/10 01:22:04  blueyed
  * Pass on redirect_to param from login form through the register... link to the register form.
  * get_user_register_link: added $redirect param for injection

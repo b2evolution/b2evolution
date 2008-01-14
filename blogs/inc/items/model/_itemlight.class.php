@@ -81,6 +81,8 @@ class ItemLight extends DataObject
 	/**
 	 * Derived from $main_cat_ID
 	 *
+	 * This is set at instanciation.
+	 *
 	 * @var integer
 	 */
 	var $blog_ID;
@@ -874,6 +876,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2008/01/14 07:22:07  fplanque
+ * Refactoring
+ *
  * Revision 1.6  2007/11/03 23:54:38  fplanque
  * skin cleanup continued
  *

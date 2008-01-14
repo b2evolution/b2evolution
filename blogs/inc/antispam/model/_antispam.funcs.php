@@ -156,7 +156,7 @@ function antispam_report_abuse( $abuse_string )
 	}
 
 	// Construct XML-RPC client:
-	load_funcs('_ext/xmlrpc/_xmlrpc.php' );
+	load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port);
 	$client->debug = $debug;
 
@@ -197,7 +197,7 @@ function antispam_poll_abuse()
 	global $Messages, $Settings, $baseurl, $debug, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri;
 
 	// Construct XML-RPC client:
-	load_funcs('_ext/xmlrpc/_xmlrpc.php' );
+	load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port);
 	$client->debug = $debug;
 
@@ -325,6 +325,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.4  2008/01/14 07:22:06  fplanque
+ * Refactoring
+ *
  * Revision 1.3  2007/11/28 16:38:21  fplanque
  * minor
  *

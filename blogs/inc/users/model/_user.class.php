@@ -464,11 +464,29 @@ class User extends DataObject
 	}
 
 
+  /**
+	 * Check password
+	 *
+	 * @param string password
+	 * @param boolean Is the password parameter already MD5()'ed?
+	 * @return boolean
+	 */
+	function check_password( $pass, $pass_is_md5 = false )
+	{
+		if( !$pass_is_md5 )
+		{
+			$pass = md5( $pass );
+		}
+		// echo 'pass: ', $pass, '/', $this->pass;
+
+		return ( $pass == $this->pass );
+	}
+
+
 	/**
 	 * Check permission for this user
 	 *
 	 * @param string Permission name, can be one of:
-	 *                - 'upload'
 	 *                - 'edit_timestamp'
 	 *                - 'cats_post_statuses', see {@link User::check_perm_catsusers()}
 	 *                - either group permission names, see {@link Group::check_perm()}
@@ -572,8 +590,8 @@ class User extends DataObject
 				 * @var Item
 				 */
 				$Item = & $perm_target;
-				$Item->get_Blog();
-				$blog_ID = $Item->Blog->ID;
+				// fp> I believe we don't need this: $Item->get_Blog();
+				$blog_ID = $Item->blog_ID;
 
 				if( $this->check_perm_blogowner( $blog_ID ) )
 				{	// Owner can do *almost* anything:
@@ -1326,6 +1344,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2008/01/14 07:22:07  fplanque
+ * Refactoring
+ *
  * Revision 1.5  2008/01/12 01:02:30  fplanque
  * minor
  *

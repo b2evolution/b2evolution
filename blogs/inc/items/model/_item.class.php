@@ -3070,7 +3070,7 @@ class Item extends ItemLight
 	{
 		global $Plugins, $baseurl, $Messages;
 
-		load_funcs('_ext/xmlrpc/_xmlrpc.php' );
+		load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
 		$this->load_Blog();
 		$ping_plugins = array_unique(explode(',', $this->Blog->get_setting('ping_plugins')));
@@ -3260,6 +3260,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.26  2008/01/14 07:22:07  fplanque
+ * Refactoring
+ *
  * Revision 1.25  2008/01/08 03:31:51  fplanque
  * podcast support
  *

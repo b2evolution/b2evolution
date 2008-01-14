@@ -28,7 +28,7 @@ global $current_User;
 
 if( $blog )
 {
-	if( ! $current_User->check_perm( 'blog_ismember', '', false, $blog ) )
+	if( ! $current_User->check_perm( 'blog_ismember', 1, false, $blog ) )
 	{	// We don't have permission for the requested blog (may happen if we come to admin from a link on a different blog)
 		set_working_blog( 0 );
 		unset( $Blog );
@@ -490,6 +490,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2008/01/14 07:22:08  fplanque
+ * Refactoring
+ *
  * Revision 1.20  2008/01/11 19:18:30  fplanque
  * bugfixes
  *

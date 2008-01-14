@@ -42,8 +42,7 @@ $xmlrpc_htmlchecking = true;
 
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
-load_funcs('_ext/xmlrpc/_xmlrpc.php');
-load_class('items/model/_itemlist.class.php');
+load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
 if( CANUSEXMLRPC !== TRUE )
 { // We cannot use XML-RPC: send a error response ( "1 Unknown method" ).
@@ -66,139 +65,28 @@ $post_default_title = ''; // posts submitted via the xmlrpc interface get that t
 $xmlrpc_procs = array();
 
 
-// fp> TODO: auto detec .api files and loop
-// fp> TODO: This should eventually move to plugins
-include_once dirname(__FILE__).'/apis/_blogger.api.php';
-include_once dirname(__FILE__).'/apis/_b2.api.php';
-include_once dirname(__FILE__).'/apis/_metaweblog.api.php';
-include_once dirname(__FILE__).'/apis/_mt.api.php';
+// Load APIs:
+include_once $inc_path.'xmlrpc/apis/_blogger.api.php';
+include_once $inc_path.'xmlrpc/apis/_b2.api.php';
+include_once $inc_path.'xmlrpc/apis/_metaweblog.api.php';
+include_once $inc_path.'xmlrpc/apis/_mt.api.php';
 
 
-// fp> xmlrpc.php should actually only load the function/plugin to execute once it has been identified
+// fp> xmlrpc.php should actually only load the function/api/plugin to execute once it has been identified
 // fp> maybe it would make sense to register xmlrpc apis/functions in a DB table (before making plugins)
 // fp> it would probably make sense to have *all* xmlrpc methods implemented as plugins (maybe 1 plugin per API; it should be possible to add a single func to an API with an additional plugin)
-// fp> from a security standpoint it would make a lot of sense to disable any rpc that is not needed
 
-load_funcs('_ext/xmlrpc/_xmlrpcs.php'); // This will add generic remote calls
+load_funcs('xmlrpc/model/_xmlrpcs.funcs.php'); // This will add generic remote calls
 
 // DO THE SERVING:
 $s = new xmlrpc_server( $xmlrpc_procs );
 
 
-// --------------------------------------- SUPPORT FUNCTIONS ----------------------------------------
-
-/**
- * Used for logging, only if {@link $debug_xmlrpc_logging} is true
- *
- * @return boolean Have we logged?
- */
-function logIO( $msg, $newline = false )
-{
-	global $debug_xmlrpc_logging;
-
-	if( ! $debug_xmlrpc_logging )
-	{
-		return false;
-	}
-
-	$fp = fopen( dirname(__FILE__).'/xmlrpc.log', 'a+' );
-	if( $newline )
-	{
-		$date = date('Y-m-d H:i:s ');
-		fwrite( $fp, "\n\n".$date );
-	}
-	fwrite($fp, $msg."\n");
-	fclose($fp);
-
-	return true;
-}
-
-
-/**
- * Returns a string replaced by stars, for passwords.
- *
- * @param string the source string
- * @return string same length, but only stars
- */
-function starify( $string )
-{
-	return str_repeat( '*', strlen( $string ) );
-}
-
-
-/**
- * Helper for {@link b2_getcategories()} and {@link mt_getPostCategories()}, because they differ
- * only in the "categoryId" case ("categoryId" (b2) vs "categoryID" (MT))
- *
- * @param string Type, either "b2" or "mt"
- * @param xmlrpcmsg XML-RPC Message
- *					0 blogid (string): Unique identifier of the blog to query
- *					1 username (string): Login for a Blogger user who is member of the blog.
- *					2 password (string): Password for said username.
- * @return xmlrpcresp XML-RPC Response
- */
-function _b2_or_mt_get_categories( $type, $m )
-{
-	global $xmlrpcerruser, $DB;
-
-	$blog = $m->getParam(0);
-	$blog = $blog->scalarval();
-
-	$username = $m->getParam(1);
-	$username = $username->scalarval();
-
-	$password = $m->getParam(2);
-	$password = $password->scalarval();
-
-	if( ! user_pass_ok($username,$password) )
-	{
-		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
-					 'Wrong username/password combination '.$username.' / '.starify($password));
-	}
-
-	$sql = 'SELECT *
-					FROM T_categories ';
-
-	$BlogCache = & get_Cache('BlogCache');
-	$current_Blog = $BlogCache->get_by_ID( $blog );
-	$aggregate_coll_IDs = $current_Blog->get_setting('aggregate_coll_IDs');
-	if( empty( $aggregate_coll_IDs ) )
-	{	// We only want posts from the current blog:
-		$sql .= 'WHERE cat_blog_ID ='.$current_Blog->ID;
-	}
-	else
-	{	// We are aggregating posts from several blogs:
-		$sql .= 'WHERE cat_blog_ID IN ('.$aggregate_coll_IDs.')';
-	}
-
-	$sql .= " ORDER BY cat_name ASC";
-
-	$rows = $DB->get_results( $sql );
-	if( $DB->error )
-	{ // DB error
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-	}
-
-	xmlrpc_debugmsg( 'Categories:'.count($rows) );
-
-	$categoryIdName = ( $type == 'b2' ? 'categoryID' : 'categoryId' );
-	$data = array();
-	foreach( $rows as $row )
-	{
-		$data[] = new xmlrpcval( array(
-				$categoryIdName => new xmlrpcval($row->cat_ID),
-				'categoryName' => new xmlrpcval( $row->cat_name )
-			//	mb_convert_encoding( $row->cat_name, "utf-8", "iso-8859-1")  )
-			), 'struct' );
-	}
-
-	return new xmlrpcresp( new xmlrpcval($data, "array") );
-}
-
-
-
 /*
  * $Log$
+ * Revision 1.146  2008/01/14 07:22:08  fplanque
+ * Refactoring
+ *
  * Revision 1.145  2008/01/12 22:51:11  fplanque
  * RSD support
  *

@@ -37,7 +37,7 @@ function b2evonet_get_updates()
 	$Settings->dbupdate();
 
 	// Construct XML-RPC client:
-	load_funcs('_ext/xmlrpc/_xmlrpc.php' );
+	load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port );
 	//$client->debug = $debug;
 
