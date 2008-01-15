@@ -96,7 +96,7 @@ $Form->begin_fieldset( T_('Feedback options') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('XML Feeds (RSS, Atom)') );
+$Form->begin_fieldset( T_('RSS/Atom feeds') );
 	$Form->radio( 'feed_content', $edited_Blog->get_setting('feed_content'),
 								array(  array( 'none', T_('No feeds') ),
 												array( 'title', T_('Titles only') ),
@@ -149,6 +149,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.6  2008/01/15 08:19:40  fplanque
+ * blog footer text tag
+ *
  * Revision 1.5  2008/01/10 19:59:51  fplanque
  * reduced comment PITA
  *

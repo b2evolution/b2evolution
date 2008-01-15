@@ -256,7 +256,7 @@ skin_include( '_html_header.inc.php' );
 		// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
 	?>
 
-	
+
 </div>
 <!-- =================================== START OF SIDEBAR =================================== -->
 
@@ -296,6 +296,14 @@ skin_include( '_html_header.inc.php' );
 
 <div id="pageFooter">
 	<p class="baseline">
+		<?php
+			// Display footer text (text can be edited in Blog Settings):
+			$Blog->footer_text( array(
+					'before'      => '',
+					'after'       => ' &bull; ',
+				) );
+		?>
+
     <?php
 			// Display a link to contact the owner of this blog (if owner accepts messages):
 			$Blog->contact_link( array(
@@ -305,8 +313,10 @@ skin_include( '_html_header.inc.php' );
 					'title'  => T_('Send a message to the owner of this blog...'),
 				) );
 		?>
+
 		<a href="http://www.sunnyislesmiamirealestate.com/b2evolution-skins/" target="_blank">Miami blue skin</a>
 		&bull;
+
 		<?php
 			// Display additional credits (see /conf/):
  			// If you can add your own credits without removing the defaults, you'll be very cool :))

@@ -373,6 +373,11 @@ class Blog extends DataObject
 			$this->set( 'longdesc', format_to_post( get_param( 'blog_longdesc' ), 0, 0 ) );
 		}
 
+		if( param( 'blog_footer_text', 'html', NULL ) !== NULL )
+		{ // Blog footer:
+			$this->set_setting( 'blog_footer_text', get_param( 'blog_footer_text' ) );
+		}
+
 		if( param( 'blog_notes',   'html', NULL ) !== NULL )
 		{	// HTML notes:
 			$this->set( 'notes', format_to_post( get_param( 'blog_notes' ), 0, 0 ) );
@@ -1340,6 +1345,37 @@ class Blog extends DataObject
 	}
 
 
+  /**
+	 * Callback user for footer_text()
+	 */
+	function replace_callback( $matches )
+	{
+		global $localtimenow;
+
+		switch( $matches[1] )
+		{
+			case 'year':
+				// for copyrigth year
+				return date( 'Y', $localtimenow );
+
+			case 'owner':
+        /**
+				 * @var User
+				 */
+				$owner_User = $this->get_owner_User();
+				$owner = $owner_User->get( 'fullname' );
+				if( empty($owner) )
+				{
+					$owner = $owner_User->get_preferred_name();
+				}
+				return $owner;
+
+			default:
+				return $matches[1];
+		}
+	}
+
+
 	/**
 	 * Get a param.
 	 *
@@ -1798,6 +1834,33 @@ class Blog extends DataObject
 	}
 
 
+	/**
+	 * Template tag: display footer text for the current Blog.
+	 */
+	function footer_text( $params )
+	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => ' ',
+				'after'       => ' ',
+			), $params );
+
+		$text = $this->get_setting( 'blog_footer_text' );
+		$text = preg_replace_callback( '¤\$([a-z]+)\$¤', array( $this, 'replace_callback' ), $text );
+
+		if( empty($text) )
+		{
+			return false;
+		}
+
+		echo $params['before'];
+		echo $text;
+		echo $params['after'];
+
+		return true;
+	}
+
+
   /**
 	 * @param boolean do we want to redirect back to where we came from after message?
 	 */
@@ -1819,6 +1882,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2008/01/15 08:19:36  fplanque
+ * blog footer text tag
+ *
  * Revision 1.25  2008/01/07 02:53:26  fplanque
  * cleaner tag urls
  *

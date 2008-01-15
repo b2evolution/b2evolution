@@ -25,9 +25,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					'title'  => T_('Send a message to the owner of this blog...'),
 				) );
 		?>
+
+		<?php
+			// Display footer text (text can be edited in Blog Settings):
+			$Blog->footer_text( array(
+					'before'      => '',
+					'after'       => '<br />',
+				) );
+		?>
+
 		<?php display_param_link( $skin_links ) ?> by <a href="http://severinelandrieu.com/" target="_blank">S&eacute;verine Landrieu</a>
-		&amp; <?php display_param_link( $fplanque_links ) ?>
-		&bull;
+		&amp; <?php display_param_link( $fplanque_links ) ?> &bull;
+
 		<?php
 			// Display additional credits (see /conf/):
  			// If you can add your own credits without removing the defaults, you'll be very cool :))

@@ -41,22 +41,30 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <div id="pageFooter">
 
 	<p class="baseline">
-		Powered by <a href="http://b2evolution.net/" title="b2evolution: next generation blog software" target="_blank">b2evolution</a>
-		|
-		Credits:
-		<?php display_param_link( $skin_links ) ?>
+		<?php
+			// Display footer text (text can be edited in Blog Settings):
+			$Blog->footer_text( array(
+					'before'      => '',
+					'after'       => ' | ',
+				) );
+		?>
+
+		Credits: <?php display_param_link( $skin_links ) ?> |
+
 		<?php
 			// Display additional credits (see /conf/):
  			// If you can add your own credits without removing the defaults, you'll be very cool :))
 		 	// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 			credits( array(
-					'list_start'  => ' | ',
-					'list_end'    => ' ',
+					'list_start'  => '',
+					'list_end'    => ' | ',
 					'separator'   => ' | ',
 					'item_start'  => ' ',
 					'item_end'    => ' ',
 				) );
 		?>
+
+		Powered by <a href="http://b2evolution.net/" title="b2evolution: next generation blog software" target="_blank">b2evolution</a>
 	</p>
 
 </div>

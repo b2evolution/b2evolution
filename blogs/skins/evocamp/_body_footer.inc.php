@@ -15,6 +15,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <div id="footer">
 	<p>
 		<?php
+			// Display footer text (text can be edited in Blog Settings):
+			$Blog->footer_text( array(
+					'before'      => '',
+					'after'       => ' | ',
+				) );
+		?>
+
+		<?php
 		// Display a link to contact the owner of this blog (if owner accepts messages):
 		$Blog->contact_link( array(
 				'before'      => '',

@@ -16,6 +16,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <!-- =================================== START OF FOOTER =================================== -->
 <div class="foot_zone">
 <div class="inner_wrapper">
+	<?php
+		// Display footer text (text can be edited in Blog Settings):
+		$Blog->footer_text( array(
+				'before'      => '<p class="baseline">',
+				'after'       => '</p>',
+			) );
+	?>
+
 	<p class="baseline">
 		<?php
 			// Display a link to contact the owner of this blog (if owner accepts messages):
@@ -26,8 +34,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					'title'  => T_('Send a message to the owner of this blog...'),
 				) );
 		?>
-		<?php display_param_link( $skin_links ) ?> by <a href="http://asevo.com/">Asevo</a>
-		|
+
+		<?php display_param_link( $skin_links ) ?> by <a href="http://asevo.com/">Asevo</a> |
+
 		<?php
 			// Display additional credits (see /conf/):
 			// If you can add your own credits without removing the defaults, you'll be very cool :))

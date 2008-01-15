@@ -358,6 +358,14 @@ skin_include( '_html_header.inc.php' );
 	?>
 	<p class="baseline">
 		<?php
+			// Display footer text (text can be edited in Blog Settings):
+			$Blog->footer_text( array(
+					'before'      => '',
+					'after'       => ' &bull; ',
+				) );
+		?>
+
+		<?php
 			// Display a link to contact the owner of this blog (if owner accepts messages):
 			$Blog->contact_link( array(
 					'before'      => '',
@@ -366,8 +374,9 @@ skin_include( '_html_header.inc.php' );
 					'title'  => T_('Send a message to the owner of this blog...'),
 				) );
 		?>
-		<?php display_param_link( $skin_links ) ?> design by <?php display_param_link( $francois_links ) ?> / <?php display_param_link( $skinfaktory_links ) ?>
-		&bull;
+
+		<?php display_param_link( $skin_links ) ?> design by <?php display_param_link( $francois_links ) ?> / <?php display_param_link( $skinfaktory_links ) ?> &bull;
+
 		<?php
 			// Display additional credits (see /conf/):
  			// If you can add your own credits without removing the defaults, you'll be very cool :))

@@ -93,6 +93,8 @@ class CollectionSettings extends AbstractSettings
 			'msgform_noindex' => '1',						// META NOINDEX on Message forms
 			'special_noindex' => '1',						// META NOINDEX on other special pages
 			'title_link_type' => 'permalink',
+
+			'blog_footer_text' => '&copy;$year$ by $owner$',
 		);
 
 
@@ -128,6 +130,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.10  2008/01/15 08:19:36  fplanque
+ * blog footer text tag
+ *
  * Revision 1.9  2008/01/08 03:28:11  fplanque
  * minor
  *
