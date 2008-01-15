@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the b2evolution package.
 # François PLANQUE <http://fplanque.net/>, 2003
 #
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
