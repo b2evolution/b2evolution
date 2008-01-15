@@ -3,14 +3,13 @@
 # This file is distributed under the same license as the b2evolution package.
 # François PLANQUE <http://fplanque.net/>, 2003
 #
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: b2evolution 0.9\n"
+"Project-Id-Version: b2evolution 2.3\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2007-12-28 01:16+0100\n"
-"PO-Revision-Date: 2007-12-28 01:29+0100\n"
-"Last-Translator: Francois PLANQUE <fplanque.net>\n"
+"PO-Revision-Date: 2008-01-13 21:51+0100\n"
+"Last-Translator: Olivier Daury <http://daury.net>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -110,7 +109,7 @@ msgstr "Page par défaut"
 
 #: ..\..\..\default.php:79
 msgid "Welcome to b2evolution"
-msgstr "Bienvenue dans b2evoltution"
+msgstr "Bienvenue dans b2evolution"
 
 #: ..\..\..\default.php:89
 msgid "b2evolution is installed and ready but you haven't created any blog on this system yet."
@@ -1136,13 +1135,13 @@ msgstr "Vous n'avez pas d'adresse email associée à votre profil, en conséquence 
 #: ..\..\..\htsrv\login.php:340
 #, php-format
 msgid "WARNING: you are trying to log in on <strong>%s</strong> but we expect you to log in on <strong>%s</strong>. If this is due to an automatic redirect, this will prevent you from successfully loging in. You must either fix your webserver configuration, or your %s configuration in order for these two URLs to match."
-msgstr ""
+msgstr "ATTENTION: vous essayez de vous connecter sur <strong>%s</strong> mais nous attendions a ce que vous vous connectiez sur <strong>%s</strong>. Si ceci est dû à une redirection automatique, cela va vous empêcher de vous authentifier avec succès. Vous devez soit corriger la configuration de votre serveur Web ou la configuration de %s pour que ces deux URLs concordent."
 
 # D:\www\b2evo20\blogs\htsrv\login.php:323
 #: ..\..\..\htsrv\login.php:356
 #, php-format
 msgid "WARNING: you are trying to log in to <strong>%s</strong> but your cookie domain is <strong>%s</strong>. You will not be able to successfully log in to the requested domain until you fix your cookie domain in your %s configuration."
-msgstr ""
+msgstr "ATTENTION: vous essayez de vous authentifier sur <strong>%s</strong> mais nous attendions a ce que vous vous authentifier sur <strong>%s </strong>. Si ceci est dû à une redirection automatique, cela va vous empêcher de vous authentifier avec succès. Vous devez soit corriger la configuration de votre serveur Web ou la configuration de %s pour que ces deux URLs concordent."
 
 # D:\www\b2evo\blogs\htsrv\message_send.php:41
 #: ..\..\..\htsrv\message_send.php:62
@@ -1870,7 +1869,7 @@ msgstr "Ajouter un mot clef interdit"
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:201
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:38
 msgid "Keyword/phrase to ban"
-msgstr ""
+msgstr "Mot/Phrase a bannir"
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:206
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:43
@@ -1885,7 +1884,7 @@ msgstr "Réglages antispam"
 #: ..\..\..\inc\antispam\views\_antispam_settings.form.php:46
 #: ..\..\..\skins\_toolbar.inc.php:121
 msgid "Antispam blacklist"
-msgstr "Lliste noire antispam"
+msgstr "Liste noire antispam"
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:47
 msgid "Any URL containing one of the following keywords will be banned from posts, comments and logs."
@@ -2959,7 +2958,7 @@ msgstr "Abonnements email"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:111
 msgid "Allow users to subscribe and receive email notifications for each new post and/or comment."
-msgstr ""
+msgstr "Permet aux utilisateurs de s'abonner et de recevoir des notifications par e-mail pour chaque nouveau poste et / ou commentaires."
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:116
 msgid "List of public blogs"
@@ -3607,7 +3606,7 @@ msgstr "Un blog optimisé pour l'édition de groupe/collaborative. Les articles pe
 # D:\www\b2evo20\blogs\inc\VIEW\collections\_coll_sel_type.form.php:41
 #: ..\..\..\inc\collections\views\_coll_sel_type.view.php:41
 msgid "Your selection here will pre-configure your blog in order to optimize it for a particular use. Nothing is final though. You can change all the settings at any time and any kind of blog can be transformed into any other at any time."
-msgstr ""
+msgstr "Votre sélection ici pré-configurera votre blog afin de l'optimiser pour une utilisation particulière. Même si rien n'est définitif finalement. Vous pourrez changer tous les paramètres à tout moment et n'importe quel type de blog peut se transformer en un autre à tout moment."
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:63
 msgid "SEO Presets"
@@ -3621,7 +3620,7 @@ msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:124
 msgid "Main page / post list"
-msgstr ""
+msgstr "Page principale / Liste des articles"
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:125
 msgid "Default blog page"
@@ -3660,7 +3659,7 @@ msgstr ""
 # D:\www\b2cvs20\blogs\inc\collections\views\_coll_seo.form.php:66
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:130
 msgid "Link to the permanent url of the post"
-msgstr ""
+msgstr "Lien vers l'URL permanente de ce message"
 
 # D:\www\b2cvs20\blogs\inc\collections\views\_coll_seo.form.php:67
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:131
@@ -3828,7 +3827,7 @@ msgstr "Articles par page"
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:223
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:234
 msgid "Leave empty to use blog default"
-msgstr ""
+msgstr "Laisser ce champ vide pour utiliser le blog par défaut"
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:186
 #: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:33
@@ -3860,7 +3859,7 @@ msgstr "Préfixe"
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:204
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:219
 msgid "An optional prefix to be added to the URLs of the categories"
-msgstr ""
+msgstr "Un préfixe optionnel à ajouter à l'URL des catégories"
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:218
 msgid "Make canonical"
@@ -3886,7 +3885,7 @@ msgstr "Autres page d'articles filtrées"
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:240
 msgid "Filtered by keyword search, by author, etc."
-msgstr ""
+msgstr "Filtré par recherche de mot-clé, par auteur, etc."
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:242
 msgid "Comment popups"
@@ -3894,7 +3893,7 @@ msgstr "Popups de commentaires"
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:243
 msgid "For skins with comment popups only."
-msgstr ""
+msgstr "Uniquement pour les habillages avec fenêtres de commentaire."
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:244
 msgid "Contact forms"
@@ -3902,7 +3901,7 @@ msgstr "Formulaires de contact"
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:245
 msgid "WARNING: Letting search engines index contact forms will attract spam."
-msgstr ""
+msgstr "AVERTISSEMENT: Laisser les moteurs de recherche indexer les formulaires de contact attirera les spams."
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:246
 msgid "Other special pages"
@@ -6068,7 +6067,7 @@ msgstr "Permissions dossier par défaut"
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:198
 msgid "Default CHMOD (UNIX permissions) for new directories created by the file manager."
-msgstr ""
+msgstr "Défaut CHMOD (permissions UNIX) pour les nouveaux répertoires créés par le gestionnaire de fichiers."
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:201
 msgid "Default file permissions"
@@ -6076,7 +6075,7 @@ msgstr "Permissions fichier par défaut"
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:201
 msgid "Default CHMOD (UNIX permissions) for new files created by the file manager."
-msgstr ""
+msgstr "Défaut CHMOD (permissions UNIX) pour les nouveaux fichiers créés par le gestionnaire de fichiers."
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:212
 msgid "Valid filename"
@@ -8760,7 +8759,7 @@ msgstr "Autoriser le déplacement de catégories"
 
 #: ..\..\..\inc\settings\views\_features.form.php:175
 msgid "Check to allow moving categories accross blogs. (Caution: can break pre-existing permalinks!)"
-msgstr ""
+msgstr "Cochez pour permettre le déplacement des catégories à travers les blogs. (Attention: peut briser les permaliens pré-existants !)"
 
 #: ..\..\..\inc\settings\views\_general.form.php:42
 msgid "General Settings"
@@ -8844,7 +8843,7 @@ msgstr "Hashage des mots de passe"
 
 #: ..\..\..\inc\settings\views\_general.form.php:89
 msgid "Check to enable the login form to hash the password with Javascript before transmitting it. This provides extra security on non-SSL connections."
-msgstr ""
+msgstr "Cochez pour permettre au formulaire d'authentification de hasher le mot de passe avec Javascript avant de la transmettre. Cela offre une sécurité supplémentaire dans le cadre de connexions non-SSL."
 
 #: ..\..\..\inc\settings\views\_general.form.php:95
 msgid "Timeouts"
@@ -9071,7 +9070,7 @@ msgstr "b2evolution include des mesures additionnelles afin de ne pas être affec
 #: ..\..\..\inc\tools\system.ctrl.php:80
 #, php-format
 msgid "If possible, change this setting to <code>%s</code> in your php.ini or ask your hosting provider about it."
-msgstr ""
+msgstr "Si possible, modifier ce paramètre à <code>%s</code> dans votre fichier php.ini ou demandez à votre hébergeur à ce sujet."
 
 #: ..\..\..\inc\tools\system.ctrl.php:83
 #: ..\..\..\install\_functions_create.php:461
@@ -9082,7 +9081,7 @@ msgstr "A propos de ce système"
 #: ..\..\..\inc\tools\system.ctrl.php:99
 #, php-format
 msgid "This version is old. You should check for newer releases on <a %s>b2evolution.net</a>."
-msgstr ""
+msgstr "Cette version est ancienne. Vous devriez vérifier les versions récentes sur <a %s>b2evolution.net</a>."
 
 #: ..\..\..\inc\tools\system.ctrl.php:104
 #, php-format
@@ -9169,7 +9168,7 @@ msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:340
 msgid "post_max_size should be larger than upload_max_filesize"
-msgstr ""
+msgstr "Post_max_size doit être plus grand que upload_max_filesize"
 
 #: ..\..\..\inc\tools\system.ctrl.php:347
 msgid "n.a."
@@ -9177,11 +9176,11 @@ msgstr "n.a."
 
 #: ..\..\..\inc\tools\system.ctrl.php:359
 msgid "The memory_limit is very low. Some features of b2evolution will fail to work;"
-msgstr ""
+msgstr "Le memory_limit est très faible. Certaines fonctionnalités de b2evolution ne pourront pas fonctionner;"
 
 #: ..\..\..\inc\tools\system.ctrl.php:363
 msgid "The memory_limit is low. Some features of b2evolution may fail to work;"
-msgstr ""
+msgstr "Le memory_limit est faible. Certaines fonctionnalités de b2evolution pourraient ne pas fonctionner;"
 
 #: ..\..\..\inc\tools\system.ctrl.php:374
 msgid "Loaded"
@@ -9205,7 +9204,7 @@ msgstr "Non installé"
 
 #: ..\..\..\inc\tools\system.ctrl.php:405
 msgid "You will not be able to automatically generate thumbnails for images."
-msgstr ""
+msgstr "Vous ne serez pas en mesure de générer automatiquement des vignettes pour les images."
 
 #: ..\..\..\inc\tools\system.ctrl.php:411
 #: ..\..\..\inc\tools\system.ctrl.php:421
@@ -9215,19 +9214,19 @@ msgstr "Lecture/Ecriture"
 
 #: ..\..\..\inc\tools\system.ctrl.php:414
 msgid "You will not be able to automatically generate thumbnails for JPG images."
-msgstr ""
+msgstr "Vous ne serez pas en mesure de générer automatiquement des vignettes pour les images JPG."
 
 #: ..\..\..\inc\tools\system.ctrl.php:424
 msgid "You will not be able to automatically generate thumbnails for PNG images."
-msgstr ""
+msgstr "Vous ne serez pas en mesure de générer automatiquement des vignettes pour les images PNG."
 
 #: ..\..\..\inc\tools\system.ctrl.php:446
 msgid "You will not be able to automatically generate thumbnails for GIF images."
-msgstr ""
+msgstr "Vous ne serez pas en mesure de générer automatiquement des vignettes pour les images GIF."
 
 #: ..\..\..\inc\tools\system.ctrl.php:450
 msgid "Thumbnails for GIF images will be generated as PNG or JPG."
-msgstr ""
+msgstr "Les vignettes pour les images GIF seront générés comme PNG ou JPG."
 
 # D:\www\b2evo19\blogs\inc\CONTROL\_misc\tools.php:74
 #: ..\..\..\inc\tools\tools.ctrl.php:66
@@ -9264,7 +9263,7 @@ msgstr "Import WordPress"
 #: ..\..\..\inc\tools\tools.ctrl.php:124
 #, php-format
 msgid "You can import contents from your WordPress 2.3 database into your b2evolution database by using <a %s>Hari's WordPress Importer</a>."
-msgstr ""
+msgstr "Vous pouvez importer le contenu de la base de données de WordPress 2.3  dans la base de données de b2evolution en utilisant <a %s> Hari's WordPress Importeur</a>."
 
 #: ..\..\..\inc\users\users.ctrl.php:62
 msgid "You have no permission to view other users or groups!"
@@ -9878,7 +9877,7 @@ msgstr "Sessions multiples"
 
 #: ..\..\..\inc\users\views\_user.form.php:168
 msgid "Check this if you want to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will disconnect you on the previous one."
-msgstr ""
+msgstr "Cochez cette option si vous voulez vous connecter à partir de différents ordinateurs / navigateurs à la fois. Sinon, se connectez depuis un autre ordinateur / navigateur vous déconnectera sur le précédent."
 
 #: ..\..\..\inc\users\views\_user.form.php:193
 msgid "New password"
@@ -10111,7 +10110,7 @@ msgstr "Supprimer cet utilisateur!"
 
 #: ..\..\..\inc\widgets\widgets.ctrl.php:99
 msgid "WARNING: you are adding to a container that does not seem to be part of the current skin."
-msgstr ""
+msgstr "ATTENTION: vous ajoutez à un conteneur qui ne semble pas faire partie de l'habillage."
 
 #: ..\..\..\inc\widgets\widgets.ctrl.php:133
 #, php-format
@@ -10138,11 +10137,11 @@ msgstr "Nom affiché dans la liste des widgets."
 
 #: ..\..\..\inc\widgets\model\_widget.class.php:211
 msgid "CSS Class"
-msgstr ""
+msgstr "Classe CSS"
 
 #: ..\..\..\inc\widgets\model\_widget.class.php:213
 msgid "Replaces $wi_class$ in your skins containers."
-msgstr ""
+msgstr "Remplace $wi_class$ dans les conteneurs de vos habillages."
 
 #: ..\..\..\inc\widgets\model\_widget.class.php:216
 msgid "DOM ID"
@@ -10186,7 +10185,7 @@ msgstr "Ajouter widget"
 # D:\www\b2evo20\blogs\inc\VIEW\collections\_widget_list.view.php:64
 #: ..\..\..\inc\widgets\views\_widget_list.view.php:78
 msgid "There is no widget in this container yet."
-msgstr ""
+msgstr "Il n'y a pas encore de widget dans ce conteneur."
 
 #: ..\..\..\inc\widgets\views\_widget_list.view.php:120
 #: ..\..\..\inc\_core\ui\results\_results.class.php:1598
@@ -10214,7 +10213,7 @@ msgstr "[NON PRESENT DANS L'HABILLAGE SELECTIONNE!]"
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:21
 #, php-format
 msgid "Widgets available for insertion into &laquo;%s&raquo;"
-msgstr ""
+msgstr "Widgets disponibles pour insertion dans &laquo;%s&raquo;"
 
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:25
 msgid "General purpose widgets"
@@ -10222,7 +10221,7 @@ msgstr ""
 
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:27
 msgid "Different ways of listing the blog contents"
-msgstr ""
+msgstr "Différentes façons de lister le contenu du blog"
 
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:34
 msgid "Meta info for the blog"
@@ -10230,7 +10229,7 @@ msgstr ""
 
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:39
 msgid "Blog navigation"
-msgstr ""
+msgstr "Navigation du blog"
 
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:44
 msgid "Other"
@@ -10241,7 +10240,7 @@ msgstr "Autres"
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:68
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:102
 msgid "Add this widget to the container"
-msgstr ""
+msgstr "Ajoute ce widget au conteneur"
 
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:97
 msgid "Plugins"
@@ -10257,7 +10256,7 @@ msgstr "Affiche la liste de tous les blogs appartenant au même utilisateur."
 
 #: ..\..\..\inc\widgets\widgets\_colls_list_public.widget.php:54
 msgid "Public blog list"
-msgstr "Lliste des blogs publics"
+msgstr "Liste des blogs publics"
 
 #: ..\..\..\inc\widgets\widgets\_colls_list_public.widget.php:63
 msgid "Display list of all blogs marked as public."
@@ -10292,7 +10291,7 @@ msgstr "Utiliser formulaire"
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:93
 msgid "Add checkboxes to allow selection of multiple categories."
-msgstr ""
+msgstr "Ajoute les cases à cocher pour permettre la sélection de plusieurs catégories."
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:215
 msgid "ANY"
@@ -10311,7 +10310,7 @@ msgstr "TOUTES"
 #: ..\..\..\inc\widgets\widgets\_coll_post_list.widget.php:60
 #: ..\..\..\inc\widgets\widgets\_user_tools.widget.php:60
 msgid "Title to display in your skin."
-msgstr ""
+msgstr "Titre a afficher dans votre skin"
 
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:63
 msgid "Recent comments"
@@ -10326,18 +10325,18 @@ msgstr ""
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:69
 #: ..\..\..\inc\widgets\widgets\_coll_post_list.widget.php:74
 msgid "Newest to oldest"
-msgstr ""
+msgstr "Du plus récent au plus ancien"
 
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:69
 #: ..\..\..\inc\widgets\widgets\_coll_post_list.widget.php:74
 msgid "Oldest to newest"
-msgstr ""
+msgstr "Du plus vieux au plus récent"
 
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:69
 #: ..\..\..\inc\widgets\widgets\_coll_page_list.widget.php:74
 #: ..\..\..\inc\widgets\widgets\_coll_post_list.widget.php:74
 msgid "Random selection"
-msgstr ""
+msgstr "Sélection aléatoire"
 
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:73
 #: ..\..\..\inc\widgets\widgets\_coll_page_list.widget.php:78
@@ -10354,7 +10353,7 @@ msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:79
 msgid "Link to author"
-msgstr ""
+msgstr "Lien vers l'auteur"
 
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:80
 msgid "Link the author to their url"
@@ -10370,13 +10369,13 @@ msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:88
 msgid "Read the full comment"
-msgstr ""
+msgstr "Lire l'intégralité du commentaire"
 
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:93
 #: ..\..\..\inc\widgets\widgets\_coll_page_list.widget.php:91
 #: ..\..\..\inc\widgets\widgets\_coll_post_list.widget.php:91
 msgid "ID of the blog to use, leave empty for the current blog."
-msgstr ""
+msgstr "ID du blog à utiliser, laisser vide pour le blog courant."
 
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:107
 msgid "Comment list"
@@ -10400,7 +10399,7 @@ msgstr "Liens de navigation courants"
 
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:63
 msgid "Display these links: Recently, Archives, Categories, Latest Comments"
-msgstr ""
+msgstr "Afficher ces liens: Récemment, les archives, les catégories, les derniers commentaires"
 
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:78
 msgid "Show \"Recently\""
@@ -10465,7 +10464,7 @@ msgstr "Description Longue de ce Blog"
 #: ..\..\..\inc\widgets\widgets\_coll_longdesc.widget.php:64
 #, php-format
 msgid "Long description from the blog's <a %s>general settings</a>."
-msgstr ""
+msgstr "Longue description du blog a partir des <a %s>paramètres généraux</a>."
 
 #: ..\..\..\inc\widgets\widgets\_coll_page_list.widget.php:65
 #: ..\..\..\inc\widgets\widgets\_coll_post_list.widget.php:65
@@ -10485,11 +10484,11 @@ msgstr "Ordre"
 
 #: ..\..\..\inc\widgets\widgets\_coll_page_list.widget.php:74
 msgid "Alphabetical ( Z - A )"
-msgstr ""
+msgstr "Alphabétique ( Z - A )"
 
 #: ..\..\..\inc\widgets\widgets\_coll_page_list.widget.php:74
 msgid "Alphabetical ( A - Z )"
-msgstr ""
+msgstr "Alphabétique ( A - Z )"
 
 #: ..\..\..\inc\widgets\widgets\_coll_page_list.widget.php:85
 #: ..\..\..\inc\widgets\widgets\_coll_post_list.widget.php:85
@@ -10541,11 +10540,11 @@ msgstr ""
 #: ..\..\..\inc\widgets\widgets\_coll_tag_cloud.widget.php:69
 #: ..\..\..\inc\widgets\widgets\_coll_tag_cloud.widget.php:94
 msgid "Tag cloud"
-msgstr ""
+msgstr "Nuage de tag"
 
 #: ..\..\..\inc\widgets\widgets\_coll_tag_cloud.widget.php:78
 msgid "Cloud of all tags; click filters blog on selected tag."
-msgstr ""
+msgstr "Nuage de tag. Clique filtre les blogs en fonction du tag sélectionné."
 
 #: ..\..\..\inc\widgets\widgets\_coll_tag_cloud.widget.php:99
 msgid "Max # of tags"
@@ -10557,11 +10556,11 @@ msgstr "Séparateur de tag"
 
 #: ..\..\..\inc\widgets\widgets\_coll_tag_cloud.widget.php:111
 msgid "Min size"
-msgstr ""
+msgstr "Taille minimale"
 
 #: ..\..\..\inc\widgets\widgets\_coll_tag_cloud.widget.php:117
 msgid "Max size"
-msgstr ""
+msgstr "Taille maximale"
 
 #: ..\..\..\inc\widgets\widgets\_coll_tag_cloud.widget.php:198
 #: ..\..\..\plugins\_calendar.plugin.php:484
@@ -10586,7 +10585,7 @@ msgstr "Liste de tous les flux XML disponibles."
 # D:\www\b2cvs20\blogs\inc\widgets\widgets\_coll_xml_feeds.widget.php:80
 #: ..\..\..\inc\widgets\widgets\_coll_xml_feeds.widget.php:80
 msgid "This is the title to display, $icon$ will be replaced by the feed icon"
-msgstr ""
+msgstr "Ceci est le titre à afficher, $icon$ sera remplacé par l'icône des flux"
 
 #: ..\..\..\inc\widgets\widgets\_coll_xml_feeds.widget.php:81
 msgid "XML Feeds"
@@ -10621,15 +10620,15 @@ msgstr "Linkblog"
 
 #: ..\..\..\inc\widgets\widgets\_linkblog.widget.php:64
 msgid "Display list of entries from the linkblog, grouped by category."
-msgstr ""
+msgstr "Affiche la liste des entrées du linkblog, groupés par catégorie."
 
 #: ..\..\..\inc\widgets\widgets\_linkblog.widget.php:83
 msgid "This is title to display in your skin."
-msgstr ""
+msgstr "Ceci est le titre à afficher dans votre skin"
 
 #: ..\..\..\inc\widgets\widgets\_linkblog.widget.php:89
 msgid "This is ID number of the blog to use as a linkblog."
-msgstr ""
+msgstr "Ceci est le numéro d'identification du blog à utiliser comme un linkblog."
 
 #: ..\..\..\inc\widgets\widgets\_linkblog.widget.php:95
 msgid "This is the maximum number of links to display."
@@ -10720,7 +10719,7 @@ msgstr "Outils Utilisateur"
 
 #: ..\..\..\inc\widgets\widgets\_user_tools.widget.php:125
 msgid "Display user tools: Log in, Admin, Profile, Subscriptions, Log out"
-msgstr ""
+msgstr "Affichez les outils des utilisateurs: Connectez-vous, Admin, Profil, les abonnements, déconnection"
 
 #: ..\..\..\inc\xhtml_validator\_xhtml_validator.class.php:169
 msgid "Parser error: "
@@ -11541,7 +11540,7 @@ msgstr "<strong>Nouvelle installation</strong>: Installer les tables b2evolution
 # D:\www\b2evo20\blogs\install\index.php:425
 #: ..\..\..\install\index.php:405
 msgid "Also install sample blogs &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users."
-msgstr ""
+msgstr "Installe également un échantillon de blogs et un échantillon de contenu. Les exemples d'articles expliquent plusieurs caractéristiques de b2evolution. Ceci est hautement recommandé pour les nouveaux utilisateurs."
 
 #: ..\..\..\install\index.php:409
 msgid "<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version. <strong>WARNING:</strong> If you have modified your database, this operation may fail. Make sure you have a backup."
@@ -11616,7 +11615,7 @@ msgstr "Installation terminée avec succès!"
 #: ..\..\..\install\index.php:507
 #, php-format
 msgid "Now you can <a %s>log in</a> with the login \"admin\" and password \"<evo:password>%s</evo:password>\"."
-msgstr "Vous pouvez maintenant <a %s>vous connecter</a> avec l'identifiant \"admin\" et le mot de passe <evo:password>%s</evo:password>\"."
+msgstr "Vous pouvez maintenant <a %s>vous connecter</a> avec l'identifiant \"admin\" et le mot de passe \"<evo:password>%s</evo:password>\"."
 
 #: ..\..\..\install\index.php:510
 msgid "Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew."
@@ -11751,6 +11750,13 @@ msgid ""
 "\n"
 "If needed, a skin can format info pages differently from regular posts."
 msgstr ""
+"Ce blog est hébergé par b2evolution.\n"
+"\n"
+"Vous consultez actuellement la page à propos du %s.\n"
+"\n"
+"Les pages d'information ressemblent beaucoup à des articles habituels, sauf qu'ils ne figurent pas dans le flux régulier des articles. Ils apparaissent à la place comme pages d'informations dans la barre latérale. \n"
+"\n"
+"Si nécessaire, un skin peut afficher les pages \"à propos\" de façon différentes des articles réguliers."
 
 #: ..\..\..\install\_functions_create.php:449
 msgid "About Blog B"
@@ -11778,6 +11784,13 @@ msgid ""
 "\n"
 "If needed, a skin can format info pages differently from regular posts."
 msgstr ""
+"Ce blog est hébergé par b2evolution.\n"
+"\n"
+"Vous consultez actuellement une page d'information concernant ce système. Elle est publiée sur les 3 blogs de démonstration. De plus, cette page est liée à chacun de ces blogs.\n"
+"\n"
+"Les pages \"à propos\" ressemblent beaucoup à des articles habituels, sauf qu'ils ne figurent pas dans le flux régulier des articles. Ils apparaissent à la place comme pages d'informations dans la barre latérale. \n"
+"\n"
+"Si nécessaire, un skin peut afficher les pages d'information de façon différentes des articles réguliers."
 
 #: ..\..\..\install\_functions_create.php:475
 msgid "Clean Permalinks!"
@@ -11803,7 +11816,7 @@ msgid ""
 "\n"
 "This will optimize the way b2evolution is handled by the webserver (if you are using Apache). This file is not active by default because a few hosts would display an error right away when you try to use it. If this happens to you when you rename the file, just remove it and you'll be fine."
 msgstr ""
-"Dans le dossier <code>/blogs</code>, vous trouverez un fichier nommé[<code>sample.htaccess</code>]. Vous devriez essayer de le renommer en [<code>.htaccess</code>].\n"
+"Dans le dossier <code>/blogs</code>, vous trouverez un fichier nommé [<code>sample.htaccess</code>]. Vous devriez essayer de le renommer en [<code>.htaccess</code>].\n"
 "\n"
 "Ceci optimisera la manière dont votre serveur web (si vous utilisez Apache) gère les requêtes vers b2evolution. Ce fichiers n'est pas actif par défaut parce que certains hébergeurs ne le supportent pas et afficheraient une erreur pas forcément très explicite. Si vous obtenez une telle erreur en renommant le fichier, supprimez tout simplement le fichier pour faire disparaitre l'erreur."
 
@@ -11854,6 +11867,11 @@ msgid ""
 "\n"
 "Note: to be displayed widgets are placed in containers. Each container appears in a specific place on a skin. If you change the skin of your blog, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using."
 msgstr ""
+"Les blogs B2evolution sont installés par défaut avec une sélection de Widgets. Par exemple, la barre latérale de ce blog comprend des Widgets comme le calendrier, un champ de recherche, une liste de catégories, une liste de flux XML, etc. \n"
+"\n"
+"Vous pouvez ajouter, supprimer et réorganiser les Widgets depuis l'onglet Paramètres du blog dans l'interface d'administration. \n"
+"\n"
+"Remarque: pour être affiché les Widgets sont placés dans des conteneurs. Chaque conteneur apparaît dans un endroit spécifique sur l'habillage. Si vous changez l'habillage de votre blog, le nouvel habillage peut ne pas utiliser les mêmes conteneurs que le précédent. Assurez-vous de placer vos Widgets dans des conteneurs qui existent dans l'habillage que vous utilisez."
 
 #: ..\..\..\install\_functions_create.php:515
 msgid "About skins..."
@@ -11978,6 +11996,14 @@ msgid ""
 "\n"
 "You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, skin, widgets, etc.) from the Blog Settings tab in the admin interface."
 msgstr ""
+"Trois blogs ont été créés avec un échantillon de contenu: \n"
+"<ul>\n"
+"\t<li><strong>Blog A</strong>: Vous lisez celui-ci. Il contient quelques exemples d'articles, en utilisant de simples fonctionnalités de b2evolution.</li>\n"
+"\t<li><strong>Blog B</strong>: Vous pouvez y accéder à partir d'un lien en haut de la page. Il contient des informations sur les fonctionnalités plus avancées.</li>\n"
+"\t<li><strong>Linkblog</strong>: par défaut, le linkblog est inclus comme un \"Blogroll\" dans la barre latérale de chacun des blogs A &amp; B. </li>\n"
+"</ul>\n"
+"\n"
+"Vous pouvez ajouter de nouveaux blogs, supprimer les blogs indésirables et personnaliser les blogs existants (titre, barre latérale, habillage, Widgets, etc.) à partir de l'onglet Paramètres du Blog dans l'interface d'administration."
 
 #: ..\..\..\install\_functions_create.php:594
 msgid "Hi, this is a comment.<br />To delete a comment, just log in, and view the posts' comments, there you will have the option to edit or delete them."
@@ -12056,12 +12082,12 @@ msgstr "Voir l'archive du mois"
 # D:\www\b2cvs20\blogs\plugins\_archives.plugin.php:232
 #: ..\..\..\plugins\_archives.plugin.php:232
 msgid "View daily archive"
-msgstr ""
+msgstr "Voir les archives quotidiennes"
 
 # D:\www\b2cvs20\blogs\plugins\_archives.plugin.php:249
 #: ..\..\..\plugins\_archives.plugin.php:249
 msgid "View weekly archive"
-msgstr ""
+msgstr "Voir les archives hebdomadaires"
 
 #: ..\..\..\plugins\_autolinks.plugin.php:44
 msgid "Make URLs clickable"
@@ -12311,7 +12337,7 @@ msgstr "Ping étendu?"
 
 #: ..\..\..\plugins\_generic_ping.plugin.php:102
 msgid "Use weblogUpdates.extendedPing method instead of weblogUpdates.ping?"
-msgstr ""
+msgstr "Utilise weblogUpdates.extendedPing lieu de la méthode weblogUpdates.ping?"
 
 #: ..\..\..\plugins\_generic_ping.plugin.php:105
 msgid "Ping service name"
@@ -12508,6 +12534,9 @@ msgid ""
 "\t\t\t\t\t\t\tTo disable a smiley, just add one or more spaces to the start of its setting<br />\n"
 "\t\t\t\t\t\t\tYou can add new smiley images by uploading the images to the %s folder."
 msgstr ""
+"Ceci est la liste des émoticons [un par ligne], dans le format: char_sequence image_file // commentaire optionnel <br/>\n"
+"\t\t\t\t\t\t\t Pour désactiver un émoticons, il suffit d'ajouter un ou plusieurs espaces au début<br/>\n"
+"\t\t\t\t\t\t\t Vous pouvez ajouter de nouvelles images d'émoticons en téléchargeant les images dans le dossier %s ."
 
 #: ..\..\..\plugins\_texturize.plugin.php:33
 msgid "Smart quotes + additional typographic replacements."
@@ -12561,7 +12590,7 @@ msgstr "Ce skin tag affiche la liste des personnes connectées."
 
 #: ..\..\..\plugins\_whosonline.plugin.php:63
 msgid "All logged in users and guest users who have requested a page in the last 5 minutes are listed."
-msgstr ""
+msgstr "Tous les utilisateurs enregistrés et les invités qui ont demandé une page dans les 5 dernières minutes sont listés."
 
 #: ..\..\..\plugins\_whosonline.plugin.php:77
 msgid "Contact icons"
@@ -12599,6 +12628,9 @@ msgid ""
 "<p>The plugin will stop expanding AdSense blocks when a limit is reached (3 by default).</p>\n"
 "<p>Look for version 2.0 for multiple AdSense format support.</p>"
 msgstr ""
+"<p>Ce plugin vous permet d'insérer facilement AdSense dans vos articles (tapez simplement [adsense:], ou utiliser le bouton de la barre d'outils en mode expert). </p>\n"
+"<p>Le plugin va arrêter l'expansion des blocs AdSense lorsque la limite est atteinte (3 par défaut).</p>\n"
+"<p>Rechercher la version 2.0 pour le support de plusieurs AdSense.</p>"
 
 #: ..\..\..\plugins\adsense_plugin\_adsense.plugin.php:79
 msgid "Maximum number of AdSense blocks the plugin should expand in post contents. Google terms typically set the limit to 3. You may wish to set it to less if you add blocks into the sidebar."
@@ -12695,11 +12727,11 @@ msgstr "Afficher la barre d'outil de code"
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:140
 msgid "Check this to display the code toolbar in expert mode (indivdual users can override this)."
-msgstr ""
+msgstr "Cochez pour afficher la barre d'outils code en mode expert (les utilisateurs peuvent contourner ce comportement)."
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:164
 msgid "Check this to display the code toolbar in expert mode"
-msgstr ""
+msgstr "Cochez pour afficher la barre d'outils code en mode expert"
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:185
 msgid "Insert codespan"
@@ -12850,7 +12882,7 @@ msgstr "Se rappeler de moi"
 # D:\www\b2cvs20\blogs\skins\_item_feedback.inc.php:343
 #: ..\..\..\skins\_item_comment_form.inc.php:145
 msgid "Name, email &amp; website"
-msgstr ""
+msgstr "Nom, e-mail &amp; site Web"
 
 #: ..\..\..\skins\_item_comment_form.inc.php:149
 msgid "Allow message form"
@@ -13144,7 +13176,7 @@ msgstr "Posté dans"
 #. TRANS: date
 #: ..\..\..\skins\evopress\single.main.php:125
 msgid "This entry was posted on "
-msgstr "Cette entrée a été postée le"
+msgstr "Cette entrée a été postée le "
 
 #. TRANS: time
 #: ..\..\..\skins\evopress\single.main.php:131
@@ -13372,7 +13404,7 @@ msgstr "Abandonner l'identification!"
 # D:\www\b2cvs20\blogs\skins_adm\login\_lostpass_form.main.php:48
 #: ..\..\..\skins_adm\login\_lostpass_form.main.php:48
 msgid "Please enter your login below. Do <strong>NOT</strong> enter your e-mail address!"
-msgstr ""
+msgstr "S'il vous plait, entrer votre identifiant ci-dessous. <strong>NE PAS</strong> saisir votre adresse e-mail !"
 
 # D:\www\b2evo20\blogs\inc\VIEW\login\_lostpass_form.php:49
 #: ..\..\..\skins_adm\login\_lostpass_form.main.php:49
