@@ -40,7 +40,7 @@ function get_icon_info($name)
 		);
 		case 'switch-to-admin': return array(
 			'file' => 'icons/switch-to-admin.gif',
-			'alt'  => /* TRANS: short for "Switch to _A_dmin" */ T_('A'),
+			'alt'  => /* TRANS: short for "Switch to _A_dmin" */ T_('A'), // TODO: conflicts with "Ascending" (below)!
 			'size' => array( 13, 14 ),
 		);
 		case 'switch-to-blog': return array(
@@ -523,6 +523,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.65  2008/01/16 23:55:48  blueyed
+ * todo about trans conflict!
+ *
  * Revision 1.64  2007/11/24 15:23:13  fplanque
  * minor
  *
