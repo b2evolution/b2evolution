@@ -21,8 +21,7 @@ function set_new_form_action( form, newaction )
 	form.attributes.getNamedItem('action').value = newaction;
 
 	// requested host+directory, used for Opera workaround below
-	var reqdir = location.host + location.pathname;
-	reqdir = reqdir.replace(/(\/)[^\/]*$/, "$1");
+	var reqdir = location.href.replace(/(\/)[^\/]*$/, "$1");
 
 	// FIX for Safari (2.0.2, OS X 10.4.3) - (Konqueror does not fail here)
 	if( form.attributes.getNamedItem('action').value != newaction
