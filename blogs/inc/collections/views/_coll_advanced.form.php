@@ -62,7 +62,7 @@ $Form->begin_fieldset( T_('After each new post...') );
 			$displayed_ping_plugin = true;
 
 			$checked = in_array( $loop_Plugin->code, $ping_plugins );
-			$Form->checkbox_input( 'blog_ping_plugins[]', $checked, /* TRANS: verb */ T_('Ping ').$loop_Plugin->ping_service_name, array('value'=>$loop_Plugin->code, 'note'=>$loop_Plugin->ping_service_note) );
+			$Form->checkbox_input( 'blog_ping_plugins[]', $checked, /* TRANS: %s is a ping service name */ sprintf( T_('Ping %s'), $loop_Plugin->ping_service_name ), array('value'=>$loop_Plugin->code, 'note'=>$loop_Plugin->ping_service_note) );
 
 			while( ($key = array_search($loop_Plugin->code, $ping_plugins)) !== false )
 			{
@@ -153,6 +153,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.6  2008/01/17 00:12:42  blueyed
+ * trans: "Ping " => "Ping %s"
+ *
  * Revision 1.5  2008/01/15 08:19:40  fplanque
  * blog footer text tag
  *
