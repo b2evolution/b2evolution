@@ -232,8 +232,7 @@ function create_blog(
 	$blog_staticfilename = '', // obsolete
 	$blog_tagline = '',
 	$blog_longdesc = '',
-	$blog_skin_ID = 1,
-	$blog_links_blog_ID = 0 )
+	$blog_skin_ID = 1 )
 {
 	global $DB, $default_locale;
 
@@ -241,7 +240,7 @@ function create_blog(
 						blog_urlname,
 						blog_tagline, blog_longdesc, blog_locale,
 						blog_allowcomments, blog_allowtrackbacks,
-						blog_in_bloglist, blog_skin_ID, blog_links_blog_ID )
+						blog_in_bloglist, blog_skin_ID )
 	VALUES ( ";
 	$query .= "'".$DB->escape($blog_name)."', ";
 	$query .= "'".$DB->escape($blog_shortname)."', ";
@@ -250,7 +249,7 @@ function create_blog(
 	$query .= "'".$DB->escape($blog_tagline)."', ";
 	$query .= "'".$DB->escape($blog_longdesc)."', ";
 	$query .= "'".$DB->escape($default_locale)."', ";
-	$query .= "'post_by_post', 0, 1, $blog_skin_ID, $blog_links_blog_ID )";
+	$query .= "'post_by_post', 0, 1, $blog_skin_ID )";
 
 	if( ! ($DB->query( $query )) )
 		return false;
@@ -315,8 +314,7 @@ function create_demo_contents()
 		$blog_stub.'.html',
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-		1, // Skin ID
-		3 );	// !!! Linkblofg ID
+		1 ); // Skin ID
 
 	$blog_shortname = 'Blog B';
 	$blog_stub = 'b';
@@ -327,8 +325,7 @@ function create_demo_contents()
 		$blog_stub.'.html',
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-		2, // Skin ID
-		3 );	// !!! Linkblofg ID
+		2 ); // Skin ID
 
 	$blog_shortname = 'Linkblog';
 	$blog_stub = 'links';
@@ -342,8 +339,7 @@ function create_demo_contents()
 		$blog_stub.'.html',
 		T_('Some interesting links...'),
 		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-		3, // SKin ID
-		0 /* no Link blog */ );
+		3 ); // SKin ID
 
 	echo "OK.<br />\n";
 
@@ -654,6 +650,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.238  2008/01/17 18:10:11  fplanque
+ * deprecated linkblog_ID blog param
+ *
  * Revision 1.237  2008/01/17 17:43:53  fplanque
  * cleaner urls by default
  *

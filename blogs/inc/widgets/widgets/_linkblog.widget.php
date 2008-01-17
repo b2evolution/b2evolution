@@ -85,7 +85,7 @@ class linkblog_Widget extends ComponentWidget
 				'linkblog_ID' => array(
 					'label' => T_( 'Linkblog' ),
 					'size' => 4,
-					'defaultvalue' => $Blog->get('links_blog_ID'),
+					'defaultvalue' => $Blog->get('links_blog_ID'),	// Here we conveniently recycle the previous value from its deprecated links_blog_ID param. We will eventually drop that field from teh database.
 					'note' => T_( 'This is ID number of the blog to use as a linkblog.' ),
 				),
 				'linkblog_limit' => array(
@@ -119,6 +119,9 @@ class linkblog_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.7  2008/01/17 18:10:12  fplanque
+ * deprecated linkblog_ID blog param
+ *
  * Revision 1.6  2007/12/23 14:14:25  fplanque
  * Enhanced widget name display
  *

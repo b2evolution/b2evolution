@@ -117,11 +117,6 @@ $Form->begin_fieldset( T_('List of public blogs') );
 	$Form->checkbox( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want this blog to be advertised in the list of all public blogs on this system.') );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Link blog / Blogroll') );
-	$BlogCache = & get_Cache( 'BlogCache' );
-	$Form->select_object( 'blog_links_blog_ID', $edited_Blog->get( 'links_blog_ID' ), $BlogCache, T_('Default linkblog'), T_('Will be displayed next to this blog (if your skin supports this).'), true );
-$Form->end_fieldset();
-
 if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 {	// Permission to edit advanced admin settings
 
@@ -149,6 +144,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.7  2008/01/17 18:10:11  fplanque
+ * deprecated linkblog_ID blog param
+ *
  * Revision 1.6  2008/01/15 08:19:40  fplanque
  * blog footer text tag
  *

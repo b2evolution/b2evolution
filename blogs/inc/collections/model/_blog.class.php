@@ -347,12 +347,6 @@ class Blog extends DataObject
 			$this->set_setting( 'posts_per_feed', get_param( 'posts_per_feed' ) );
 		}
 
-		if( param( 'blog_links_blog_ID',  'integer', -1 ) != -1 )
-		{	// Default display options:
-			$this->set_from_Request( 'links_blog_ID' );
-		}
-
-
 		if( param( 'blog_description', 'string', NULL ) !== NULL )
 		{	// Description:
 			$this->set_from_Request( 'shortdesc', 'blog_description' );
@@ -404,6 +398,9 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_subscriptions',  param( 'allow_subscriptions', 'integer', 0 ) );
 			$this->set( 'advanced_perms',  param( 'advanced_perms', 'integer', 0 ) );
 			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
+
+			$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
+			$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
 		}
 
 		if( param( 'blog_allowcomments',   'string', NULL ) !== NULL )
@@ -514,13 +511,6 @@ class Blog extends DataObject
 				{
   				$this->set( 'siteurl', '' );
 				}
-			}
-
-
-			if( get_param( 'blog_links_blog_ID' ) != -1 )
-			{ // checkboxes (will not get send, if unchecked)
-				$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
-				$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
 			}
 
 
@@ -1893,6 +1883,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2008/01/17 18:10:09  fplanque
+ * deprecated linkblog_ID blog param
+ *
  * Revision 1.27  2008/01/17 14:38:30  fplanque
  * Item Footer template tag
  *
