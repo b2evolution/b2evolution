@@ -1,21 +1,15 @@
 <?php
 /**
- * This file is a stub file for displaying a blog, using evoSkins.
+ * THIS IS ACTUALLY A DUPLICATE OF blog1.php . We leave this file here because some ancient doc still refers to it.
  *
- * This file will set some display parameters and then let b2evolution handle
- * the display by calling an evoSkin. (skins are in the /skins folder.)
+ * This is a stub file for displaying a b2evolution blog.
  *
- * Note: You only need to use this stub file for advanced use of b2evolution.
- * Most of the time, calling your blog through index.php will be enough.
- *
- * Same display without using skins: a_noskin.php
+ * A stub file is used to anchor a particular blog in a particular location of your website.
+ * More info: {@link http://manual.b2evolution.net/Stub_file}
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
- *
- * @package evoskins
- * @subpackage noskin
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  */
 
 # First, select which blog you want to display here!
@@ -24,7 +18,7 @@
 $blog = 1;
 
 # You could *force* a specific skin here with this setting: (otherwise, default will be used)
-# $skin = 'basic';
+# $skin = 'custom';
 
 # This setting retricts posts to those published, thus hiding drafts.
 # You should not have to change this.
@@ -43,6 +37,8 @@ $timestamp_max = 'now';
 
 /**
  * That's it, now let b2evolution do the rest! :)
+ * Note: if you put this file in a subdirectory, you will need to adjust the path below, for example:
+ * require_once dirname(__FILE__).'/../conf/_config.php';
  */
 require_once dirname(__FILE__).'/conf/_config.php';
 

@@ -153,7 +153,6 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			if( !empty( $first_Blog ) )
 			{
 			?>
-				<li><strong><a href="a_stub.php"><?php echo T_('Blog #1 called through a stub file') ?></a></strong> &nbsp; <span class="note">(a_stub.php)</span></li>
 				<li><strong><a href="a_noskin.php"><?php echo T_('Blog #1 called through a custom template (not a skin)') ?></a></strong> &nbsp; <span class="note">(a_noskin.php)</span></li>
 				<li><strong><a href="multiblogs.php"><?php echo T_('Multiple blogs displayed on the same page') ?></a></strong> &nbsp; <span class="note">(multiblogs.php)</span></li>
 				<li><strong><a href="sitemap_a.php"><?php echo T_('Blog #1 XML sitemap (called through a stub)') ?></a></strong> &nbsp; <span class="note">(sitemap_a.php)</span></li>
