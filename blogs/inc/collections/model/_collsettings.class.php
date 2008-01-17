@@ -47,9 +47,6 @@ class CollectionSettings extends AbstractSettings
 	var $_defaults = array(
 			'new_feedback_status' => 'draft',  	// 'draft', 'published' or 'deprecated'
 
-			'single_links'   => 'param_title',
-			'permalinks'     => 'single',				// single, archive, subchap
-
 			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet', // ping plugin codes, separated by comma
 			'orderby'        => 'datestart',
 			'orderdir'       => 'DESC',
@@ -69,22 +66,25 @@ class CollectionSettings extends AbstractSettings
 			'paged_nofollowto' => '0',          // NOFOLLOW on links to following blog pages
 
 			'archive_mode'   => 'monthly',			// monthly, weekly, daily, postbypost
-			'archive_links'  => 'param',				// param, extrapath
+			'archive_links'  => 'extrapath',		// param, extrapath
 			'archive_posts_per_page' => '100',
 			'archive_noindex' => '1',						// META NOINDEX on Archive pages
 			'archive_nofollowto' => '0',        // NOFOLLOW on links to archive pages
 
-			'chapter_links'  => 'param_num',		// 'param_num', 'subchap', 'chapters'
+			'chapter_links'  => 'chapters',			// 'param_num', 'subchap', 'chapters'
 			'canonical_cat_urls' => 1,					// Redirect categories to their canonical Url?
 			'chapter_posts_per_page' => NULL,
 			'chapter_noindex' => '1',						// META NOINDEX on Category pages
 			'category_prefix' => '',
 
-			'tag_links'  => 'param',						// 'param', 'semicol'
+			'tag_links'  => 'semicol',					// 'param', 'semicol'
 			'canonical_tag_urls' => 1,					// Redirect tag pages to their canonical Url?
 			'tag_posts_per_page' => NULL,
 			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
 			'tag_prefix' => '',
+
+			'single_links'   => 'ymd',
+			'permalinks'     => 'single',				// single, archive, subchap
 
 			'filtered_noindex' => '1',					// META NOINDEX on other filtered pages
 			'arcdir_noindex' => '1',						// META NOINDEX on Archive directory
@@ -132,6 +132,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.12  2008/01/17 17:43:52  fplanque
+ * cleaner urls by default
+ *
  * Revision 1.11  2008/01/17 14:38:30  fplanque
  * Item Footer template tag
  *

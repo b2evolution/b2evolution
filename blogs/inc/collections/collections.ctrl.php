@@ -123,6 +123,23 @@ switch( $action )
 
 			$Messages->add( T_('The new blog has been created.'), 'success' );
 
+
+			// Change access mode if a stub file exists:
+			$stub_filename = 'blog'.$edited_Blog->ID.'.php';
+			if( is_file( $basepath.$stub_filename ) )
+			{	// Stub file exists and is waiting ;)
+				$DB->query( 'UPDATE T_blogs
+												SET blog_access_type = "relative",
+														blog_siteurl = "'.$stub_filename.'"
+											WHERE blog_ID = '.$edited_Blog->ID );
+				$Messages->add( sprintf(T_('The new blog has been associated with the stub file &laquo;%s&raquo;.'), $stub_filename ), 'success' );
+			}
+			else
+			{
+				$Messages->add( sprintf(T_('No stub file named &laquo;%s&raquo; was found.'), $stub_filename ), 'info' );
+			}
+
+
 			// Set default user permissions for this blog (All permissions for the current user)
 			// Proceed insertions:
 			$DB->query( "
@@ -436,6 +453,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2008/01/17 17:43:55  fplanque
+ * cleaner urls by default
+ *
  * Revision 1.6  2008/01/05 02:28:17  fplanque
  * enhanced blog selector (bloglist_buttons)
  *

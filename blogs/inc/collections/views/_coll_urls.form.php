@@ -149,7 +149,7 @@ $Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']'.get_manual_link('blog
 
 		$Form->radio( 'blog_access_type', $edited_Blog->get( 'access_type' ), array(
 			array( 'default', T_('Default blog in index.php'),
-											'('.( !isset($defblog)
+											$baseurl.'index.php ('.( !isset($defblog)
 												?	/* TRANS: NO current default blog */ T_('No default blog is currently set')
 												: /* TRANS: current default blog */ T_('Current default :').' '.$defblog ).
 											')',
@@ -157,12 +157,12 @@ $Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']'.get_manual_link('blog
 										'onclick="update_urlpreview( \''.$baseurl.'index.php\' );"'
 			),
 			array( 'index.php', T_('Explicit param on index.php'),
-										'index.php?blog=123',
+										$baseurl.'index.php?blog='.$edited_Blog->ID,
 										'',
 										'onclick="update_urlpreview( \''.$baseurl.'index.php?blog='.$edited_Blog->ID.'\' )"',
 			),
 			array( 'extrapath', T_('Extra path on index.php'),
-										'index.php/url_name',
+										$baseurl.'index.php/'.$edited_Blog->get( 'urlname' ),
 										'',
 										'onclick="update_urlpreview( \''.$baseurl.'index.php/\'+document.getElementById( \'blog_urlname\' ).value )"'
 			),
@@ -308,6 +308,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.16  2008/01/17 17:43:52  fplanque
+ * cleaner urls by default
+ *
  * Revision 1.15  2008/01/07 02:53:27  fplanque
  * cleaner tag urls
  *

@@ -255,7 +255,14 @@ function create_blog(
 	if( ! ($DB->query( $query )) )
 		return false;
 
-	return $DB->insert_id;  // blog ID
+	$ID = $DB->insert_id;  // blog ID
+
+	$DB->query( 'UPDATE T_blogs
+									SET blog_access_type = "relative",
+											blog_siteurl = "blog'.$ID.'.php"
+								WHERE blog_ID = '.$ID );
+
+	return $ID;
 }
 
 
@@ -647,6 +654,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.237  2008/01/17 17:43:53  fplanque
+ * cleaner urls by default
+ *
  * Revision 1.236  2008/01/08 19:35:00  personman2
  * Adding missing commas to install function
  *
