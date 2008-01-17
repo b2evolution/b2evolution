@@ -135,14 +135,19 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 
 }
 
-$Form->begin_fieldset( T_('Meta data') );
+$Form->begin_fieldset( T_('Meta data').get_manual_link('blog_meta_data') );
 	// TODO: move stuff to coll_settings
 	$Form->text( 'blog_description', $edited_Blog->get( 'description' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
 	$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
 	$Form->text( 'blog_footer_text', $edited_Blog->get_setting( 'blog_footer_text' ), 60, T_('Blog footer'), sprintf(
 		T_('Use &lt;br /&gt; to insert a line break. You might want to put your copyright or <a href="%s" target="_blank">creative commons</a> notice here.'),
 		'http://creativecommons.org/license/' ), 1000, 'large' );
-	$Form->textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 5, T_('Notes'), T_('Additional info. Appears in the backoffice.'), 50, 'large' );
+	$Form->textarea( 'single_item_footer_text', $edited_Blog->get_setting( 'single_item_footer_text' ), 2, T_('Single post footer'),
+		T_('This will be displayed after each post in single post view.'), 50, 'large' );
+	$Form->textarea( 'xml_item_footer_text', $edited_Blog->get_setting( 'xml_item_footer_text' ), 2, T_('Post footer in RSS/Atom'),
+		T_('This will be appended to each post in your RSS/Atom feeds.'), 50, 'large' );
+	$Form->textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 5, T_('Notes'),
+		T_('Additional info. Appears in the backoffice.'), 50, 'large' );
 $Form->end_fieldset();
 
 
@@ -153,6 +158,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.7  2008/01/17 14:38:30  fplanque
+ * Item Footer template tag
+ *
  * Revision 1.6  2008/01/17 00:12:42  blueyed
  * trans: "Ping " => "Ping %s"
  *

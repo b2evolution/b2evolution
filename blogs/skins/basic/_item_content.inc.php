@@ -48,12 +48,22 @@ $Item->images( array(
 
 		// Links to post pages (for multipage posts):
 		$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
+
+		// Display Item footer text (text can be edited in Blog Settings):
+		$Item->footer( array(
+				'mode'        => '#',				// Will detect 'single' from $disp automatically
+				'block_start' => '<div class="item_footer">',
+				'block_end'   => '</div>',
+			) );
 	?>
 </div>
 
 <?php
 /*
  * $Log$
+ * Revision 1.3  2008/01/17 14:38:33  fplanque
+ * Item Footer template tag
+ *
  * Revision 1.2  2007/11/04 01:10:57  fplanque
  * skin cleanup continued
  *

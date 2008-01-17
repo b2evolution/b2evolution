@@ -74,12 +74,22 @@ if( !empty($params['image_size']) )
 
 		// Links to post pages (for multipage posts):
 		$Item->page_links( '<p class="right">'.T_('Pages:').' ', '</p>', ' &middot; ' );
+
+		// Display Item footer text (text can be edited in Blog Settings):
+		$Item->footer( array(
+				'mode'        => '#',				// Will detect 'single' from $disp automatically
+				'block_start' => '<div class="item_footer">',
+				'block_end'   => '</div>',
+			) );
 	?>
 </div>
 
 <?php
 /*
  * $Log$
+ * Revision 1.7  2008/01/17 14:38:32  fplanque
+ * Item Footer template tag
+ *
  * Revision 1.6  2008/01/08 03:31:51  fplanque
  * podcast support
  *

@@ -206,6 +206,7 @@ global $Hit;
 <script type="text/javascript">
 	function evo_menu_show( elt )
 	{
+		// console.log( 'evo_menu_show on ', elt );
 		// window.status = elt.nodeName;
 
 		child = elt.firstChild;
@@ -235,6 +236,7 @@ global $Hit;
 	}
 	function evo_menu_hide( elt )
 	{
+		// console.log( 'evo_menu_hide on ', elt );
 		elt.className = 'menu_close'; // This is for IE6 which has no li:hover support
 	}
 </script>

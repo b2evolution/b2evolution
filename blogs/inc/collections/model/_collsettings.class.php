@@ -95,6 +95,8 @@ class CollectionSettings extends AbstractSettings
 			'title_link_type' => 'permalink',
 
 			'blog_footer_text' => '&copy;$year$ by $owner$',
+			'single_item_footer_text' => '',
+			'xml_item_footer_text' => '<p><small>Powered by <a href="http://b2evolution.net/">b2evolution</a>.</small></p>',
 		);
 
 
@@ -130,6 +132,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.11  2008/01/17 14:38:30  fplanque
+ * Item Footer template tag
+ *
  * Revision 1.10  2008/01/15 08:19:36  fplanque
  * blog footer text tag
  *

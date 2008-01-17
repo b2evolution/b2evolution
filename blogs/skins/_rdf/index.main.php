@@ -104,6 +104,14 @@ while( $Item = & mainlist_get_item() )
 		// and then you get half baked code! The URL LINK stays RELATIVE!! :((
 		// TODO: clean solution : work in format_to_output!
 		echo make_rel_links_abs( $content );
+
+		// Display Item footer text (text can be edited in Blog Settings):
+		$Item->footer( array(
+				'mode'        => 'xml',
+				'block_start' => '<div class="item_footer">',
+				'block_end'   => '</div>',
+				'format'      => 'entityencoded',
+			) );
 	?></description>
 	<content:encoded><![CDATA[<?php
 		// Display images that are linked to this post:
@@ -114,6 +122,14 @@ while( $Item = & mainlist_get_item() )
 		// and then you get half baked code! The URL LINK stays RELATIVE!! :((
 		// TODO: clean solution : work in format_to_output! --- we probably need 'htmlfeed' as 'htmlbody+absolute'
 		echo make_rel_links_abs( $content );
+
+		// Display Item footer text (text can be edited in Blog Settings):
+		$Item->footer( array(
+				'mode'        => 'xml',
+				'block_start' => '<div class="item_footer">',
+				'block_end'   => '</div>',
+				'format'      => 'htmlbody',
+			) );
 	?>]]></content:encoded>
 			<?php
 		}
@@ -162,6 +178,14 @@ while( $Item = & mainlist_get_item() )
 		// and then you get half baked code! The URL LINK stays RELATIVE!! :((
 		// TODO: clean solution : work in format_to_output!
 		echo make_rel_links_abs( $content );
+
+		// Display Item footer text (text can be edited in Blog Settings):
+		$Item->footer( array(
+				'mode'        => 'xml',
+				'block_start' => '<div class="item_footer">',
+				'block_end'   => '</div>',
+				'format'      => 'entityencoded',
+			) );
 	?></description>
 	<content:encoded><![CDATA[<?php
 		// URL link, if the post has one:
@@ -202,6 +226,14 @@ while( $Item = & mainlist_get_item() )
 		// and then you get half baked code! The URL LINK stays RELATIVE!! :((
 		// TODO: clean solution : work in format_to_output! --- we probably need 'htmlfeed' as 'htmlbody+absolute'
 		echo make_rel_links_abs( $content );
+
+		// Display Item footer text (text can be edited in Blog Settings):
+		$Item->footer( array(
+				'mode'        => 'xml',
+				'block_start' => '<div class="item_footer">',
+				'block_end'   => '</div>',
+				'format'      => 'htmlbody',
+			) );
 	?>]]></content:encoded>
 			<?php
 		}

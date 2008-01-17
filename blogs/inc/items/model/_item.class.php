@@ -346,7 +346,7 @@ class Item extends ItemLight
 			param_check_url( 'post_url', $allowed_uri_scheme );
 			$this->set_from_Request( 'url' );
 		}
-		// Note: post_url is not part of the simple form, so this message can be a little bit akward there
+		// Note: post_url is not part of the simple form, so this message can be a little bit awkward there
 		if( $this->status == 'redirected' && empty($this->url) )
 		{
 			param_error( 'post_url', T_('If you want to redirect this post, you must specify an URL! (Expert mode)') );
@@ -425,8 +425,9 @@ class Item extends ItemLight
 			$Plugins_admin = & get_Cache('Plugins_admin');
 			$Plugins_admin->filter_contents( $post_title /* by ref */, $content /* by ref */, $renderers );
 
-			$this->set( 'content', format_to_post( $content ) );
+			// Format raw HTML input to cleaned up and validated HTML:
 			$this->set( 'title', format_to_post( $post_title ) );
+			$this->set( 'content', format_to_post( $content ) );
 		}
 
 		return ! param_errors_detected();
@@ -1705,6 +1706,54 @@ class Item extends ItemLight
 			echo $before.$r.$after;
 		}
 
+	}
+
+
+
+	/**
+	 * Template tag: display footer for the current Item.
+	 *
+	 * @param array
+	 * @return boolean true if something has been displayed
+	 */
+	function footer( $params )
+	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'mode'        => '#',				// Will detect 'single' from $disp automatically
+				'block_start' => '<div class="item_footer">',
+				'block_end'   => '</div>',
+				'format'      => 'htmlbody',
+			), $params );
+
+		if( $params['mode'] == '#' )
+		{
+			global $disp;
+			$params['mode'] = $disp;
+		}
+
+		$this->get_Blog();
+		switch( $params['mode'] )
+		{
+			case 'single':
+				$text = $this->Blog->get_setting( 'single_item_footer_text' );
+				break;
+
+			case 'xml':
+				$text = $this->Blog->get_setting( 'xml_item_footer_text' );
+				break;
+		}
+
+		// $text = preg_replace_callback( '¤\$([a-z]+)\$¤', array( $this, 'replace_callback' ), $text );
+
+		if( empty($text) )
+		{
+			return false;
+		}
+
+		echo format_to_output( $params['block_start'].$text.$params['block_end'], $params['format'] );
+
+		return true;
 	}
 
 
@@ -3260,6 +3309,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.27  2008/01/17 14:38:30  fplanque
+ * Item Footer template tag
+ *
  * Revision 1.26  2008/01/14 07:22:07  fplanque
  * Refactoring
  *

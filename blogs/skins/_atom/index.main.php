@@ -98,6 +98,14 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				// and then you get half baked code! The URL LINK stays RELATIVE!! :((
 				// TODO: clean solution : work in format_to_output!
 				echo make_rel_links_abs( $content );
+
+				// Display Item footer text (text can be edited in Blog Settings):
+				$Item->footer( array(
+						'mode'        => 'xml',
+						'block_start' => '<div class="item_footer">',
+						'block_end'   => '</div>',
+						'format'      => 'htmlbody',
+					) );
 		?>]]></content>
 				<?php
 			}
@@ -144,6 +152,14 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				// and then you get half baked code! The URL LINK stays RELATIVE!! :((
 				// TODO: clean solution : work in format_to_output! --- we probably need 'htmlfeed' as 'htmlbody+absolute'
 				echo make_rel_links_abs( $content );
+
+				// Display Item footer text (text can be edited in Blog Settings):
+				$Item->footer( array(
+						'mode'        => 'xml',
+						'block_start' => '<div class="item_footer">',
+						'block_end'   => '</div>',
+						'format'      => 'htmlbody',
+					) );
 		?>]]></content>
 			<?php
 		}

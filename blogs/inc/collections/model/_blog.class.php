@@ -377,6 +377,14 @@ class Blog extends DataObject
 		{ // Blog footer:
 			$this->set_setting( 'blog_footer_text', get_param( 'blog_footer_text' ) );
 		}
+		if( param( 'single_item_footer_text', 'html', NULL ) !== NULL )
+		{ // Blog footer:
+			$this->set_setting( 'single_item_footer_text', get_param( 'single_item_footer_text' ) );
+		}
+		if( param( 'xml_item_footer_text', 'html', NULL ) !== NULL )
+		{ // Blog footer:
+			$this->set_setting( 'xml_item_footer_text', get_param( 'xml_item_footer_text' ) );
+		}
 
 		if( param( 'blog_notes',   'html', NULL ) !== NULL )
 		{	// HTML notes:
@@ -1836,6 +1844,9 @@ class Blog extends DataObject
 
 	/**
 	 * Template tag: display footer text for the current Blog.
+	 *
+	 * @param array
+	 * @return boolean true if something has been displayed
 	 */
 	function footer_text( $params )
 	{
@@ -1882,6 +1893,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.27  2008/01/17 14:38:30  fplanque
+ * Item Footer template tag
+ *
  * Revision 1.26  2008/01/15 08:19:36  fplanque
  * blog footer text tag
  *
