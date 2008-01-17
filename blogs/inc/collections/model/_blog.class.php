@@ -93,7 +93,7 @@ class Blog extends DataObject
 	var $siteurl;
 	var $stub;     // stub file (can be empty/virtual)
 	var $urlname;  // used to identify blog in URLs
-	var $links_blog_ID = 0;
+	var $links_blog_ID = 0;	// DEPRECATED
 	var $notes;
 	var $keywords;
 	var $allowcomments = 'post_by_post';
@@ -174,7 +174,7 @@ class Blog extends DataObject
 			$this->access_type = $db_row->blog_access_type;
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->urlname = $db_row->blog_urlname;
-			$this->links_blog_ID = $db_row->blog_links_blog_ID;
+			$this->links_blog_ID = $db_row->blog_links_blog_ID; // DEPRECATED
 			$this->notes = $db_row->blog_notes;
 			$this->keywords = $db_row->blog_keywords;
 			$this->allowcomments = $db_row->blog_allowcomments;
@@ -1883,6 +1883,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.29  2008/01/17 20:47:58  fplanque
+ * deprecated linkblog_ID blog param
+ *
  * Revision 1.28  2008/01/17 18:10:09  fplanque
  * deprecated linkblog_ID blog param
  *
