@@ -3,15 +3,15 @@
 # Copyright (C) 2003 François PLANQUE
 # This file is distributed under the same license as the b2evolution package.
 #
-# dAniel hAhler <daniel@thequod.de>, 2003-2005, 2006, 2007.
+# dAniel hAhler <daniel@thequod.de>, 2003-2005, 2006, 2007, 2008.
 msgid ""
 msgstr ""
 "Project-Id-Version: messages\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2008-01-17 00:48+0100\n"
-"PO-Revision-Date: 2007-09-14 01:11+0200\n"
+"PO-Revision-Date: 2008-01-17 01:20+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
-"Language-Team:  <de@li.org>\n"
+"Language-Team:  <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -92,7 +92,7 @@ msgstr "GPL Lizenz"
 # TRANS: Short (alt tag) for "Ascending"
 #: ..\..\..\conf\_icons.php:43 ..\..\..\conf\_icons.php:112
 msgid "A"
-msgstr "Aufst."
+msgstr "A"
 
 # TRANS: short for "Switch to _B_log"
 #: ..\..\..\conf\_icons.php:48
@@ -327,9 +327,8 @@ msgid "Help"
 msgstr "Hilfe"
 
 #: ..\..\..\conf\_icons.php:404
-#, fuzzy
 msgid "Online Manual"
-msgstr "Onlinehilfe"
+msgstr "Onlineanleitung"
 
 #: ..\..\..\conf\_icons.php:409
 #: ..\..\..\inc\comments\model\_comment.class.php:871
@@ -787,7 +786,6 @@ msgid "Default page"
 msgstr "Standardseite"
 
 #: ..\..\..\default.php:79
-#, fuzzy
 msgid "Welcome to b2evolution"
 msgstr "Willkommen zu b2evolution"
 
@@ -796,9 +794,8 @@ msgid "b2evolution is installed and ready but you haven't created any blog on th
 msgstr "b2evolution ist installiert und einsatzfähig, aber es wurde noch kein Blog angelegt."
 
 #: ..\..\..\default.php:91
-#, fuzzy
 msgid "Create a first blog"
-msgstr "Erstelle neue Locale"
+msgstr "Erstelle ein erstes Blog"
 
 #: ..\..\..\default.php:95
 msgid "You have successfully installed b2evolution."
@@ -890,9 +887,8 @@ msgid "Supplied email address is invalid."
 msgstr "Die angegebene E-Mail-Adresse ist ungültig."
 
 #: ..\..\..\htsrv\comment_post.php:159
-#, fuzzy
 msgid "Supplied website address is invalid: "
-msgstr "Die angegebene E-Mail-Adresse ist ungültig."
+msgstr "Die angegebene Website-Adresse ist ungültig."
 
 #: ..\..\..\htsrv\comment_post.php:165
 msgid "Please do not send empty comments."
@@ -1409,9 +1405,8 @@ msgid "Invalid email address."
 msgstr "Ungültige E-Mail-Adresse."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1491
-#, fuzzy
 msgid "Invalid class ID format"
-msgstr "Ungültiges URL Format."
+msgstr "Ungültiges Format der Klassen-ID"
 
 #: ..\..\..\inc\_core\_param.funcs.php:1506
 #, php-format
@@ -1472,9 +1467,9 @@ msgstr "Kategorie-Verzeichnis"
 
 # TRANS: %s is an item title
 #: ..\..\..\inc\_core\_template.funcs.php:223
-#, fuzzy, php-format
+#, php-format
 msgid "Latest comments on %s"
-msgstr "Letzte Kommentare zu "
+msgstr "Letzte Kommentare zu %s"
 
 #: ..\..\..\inc\_core\_template.funcs.php:227
 #: ..\..\..\inc\comments\_comments.ctrl.php:196
@@ -1487,9 +1482,9 @@ msgstr "Letzte Kommentare"
 
 # TRANS: %s is an item title
 #: ..\..\..\inc\_core\_template.funcs.php:235
-#, fuzzy, php-format
+#, php-format
 msgid "Feedback on %s"
-msgstr "Feedback zu "
+msgstr "Feedback zu %s"
 
 #: ..\..\..\inc\_core\_template.funcs.php:240
 #: ..\..\..\skins\_toolbar.inc.php:50
@@ -2459,9 +2454,8 @@ msgid "Content starts with..."
 msgstr "Inhalt beginnt  mit.."
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:126
-#, fuzzy
 msgid "Action"
-msgstr "Aktionen"
+msgstr "Aktion"
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:152
 #: ..\..\..\inc\chapters\views\_chapter_list.view.php:70
@@ -2952,9 +2946,8 @@ msgid "Move category"
 msgstr "Verschiebe Kategorie"
 
 #: ..\..\..\inc\chapters\views\_chapter_move.form.php:60
-#, fuzzy
 msgid "Attached to blog"
-msgstr "Zu den Blogs"
+msgstr "An Blog gebunden"
 
 #: ..\..\..\inc\chapters\views\_chapter_move.form.php:60
 msgid "If you select a new blog, you will be able to choose a position within this blog on the next screen."
@@ -2972,9 +2965,8 @@ msgid "The blog settings have been updated"
 msgstr "Blogeinstellungen wurden aktualisiert"
 
 #: ..\..\..\inc\collections\coll_settings.ctrl.php:135
-#, fuzzy
 msgid "The blog skin has been changed."
-msgstr "Das neue Blog wurde erstellt."
+msgstr "Das Blogskin wurde geändert."
 
 #: ..\..\..\inc\collections\coll_settings.ctrl.php:151
 #: ..\..\..\inc\collections\coll_settings.ctrl.php:156
@@ -2994,9 +2986,8 @@ msgid "The new blog has been created."
 msgstr "Das neue Blog wurde erstellt."
 
 #: ..\..\..\inc\collections\collections.ctrl.php:139
-#, fuzzy
 msgid "Uncategorized"
-msgstr "Kategorien"
+msgstr "Nicht kategorisiert"
 
 #: ..\..\..\inc\collections\collections.ctrl.php:143
 msgid "A default category has been created for this blog."
@@ -3017,9 +3008,8 @@ msgid "Generating static page for blog [%s]"
 msgstr "Generiere statische Seite für Blog [%s]"
 
 #: ..\..\..\inc\collections\collections.ctrl.php:253
-#, fuzzy
 msgid "You haven't defined a source file for this blog!"
-msgstr "Du hast keinen statischen Dateinamen für dieses Blog festgelegt!"
+msgstr "Du hast keine Quelldatei für dieses Blog festgelegt!"
 
 #: ..\..\..\inc\collections\collections.ctrl.php:260
 msgid "You haven't defined a static file for this blog!"
@@ -3091,14 +3081,12 @@ msgstr ""
 #: ..\..\..\inc\collections\model\_blog.class.php:204
 #: ..\..\..\inc\collections\model\_blog.class.php:238
 #: ..\..\..\inc\collections\views\_coll_sel_type.view.php:30
-#, fuzzy
 msgid "Photoblog"
-msgstr "Gehe zu Blogs"
+msgstr "Photoblog"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:211
-#, fuzzy
 msgid "Our blog"
-msgstr "Neues Blog"
+msgstr "Unser Blog"
 
 # TRANS: file group
 #: ..\..\..\inc\collections\model\_blog.class.php:212
@@ -3109,25 +3097,22 @@ msgid "Group"
 msgstr "Gruppe"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:219
-#, fuzzy
 msgid "My weblog"
-msgstr "Neues Weblog"
+msgstr "Mein Weblog"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:241
 #: ..\..\..\inc\collections\views\_coll_sel_type.view.php:35
-#, fuzzy
 msgid "Group blog"
-msgstr "Gruppe"
+msgstr "Gruppenblog"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:245
 msgid "Standard blog"
-msgstr ""
+msgstr "Standardblog"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:290
 #: ..\..\..\inc\collections\model\_blog.class.php:305
-#, fuzzy
 msgid "Invalid category prefix."
-msgstr "Ungültiges Datum"
+msgstr "Ungültiges Kategorienprefix."
 
 #: ..\..\..\inc\collections\model\_blog.class.php:333
 #, php-format
@@ -3135,23 +3120,22 @@ msgid "Items/days per page must be between %d and %d."
 msgstr "Elemente/Tage pro Seite muss zwischen %d und %d liegen."
 
 #: ..\..\..\inc\collections\model\_blog.class.php:346
-#, fuzzy, php-format
+#, php-format
 msgid "Items per feed must be between %d and %d."
-msgstr "Elemente/Tage pro Seite muss zwischen %d und %d liegen."
+msgstr "Elemente pro Feed muss zwischen %d und %d liegen."
 
 #: ..\..\..\inc\collections\model\_blog.class.php:448
-#, fuzzy, php-format
+#, php-format
 msgid "User &laquo;%s&raquo; does not exist!"
-msgstr "Das Verzeichnis &laquo;%s&raquo; existiert nicht."
+msgstr "Benutzer &laquo;%s&raquo; existiert nicht!"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:460
 msgid "You must provide an URL blog name!"
 msgstr "Du musst einen URL Blog-Namen angeben!"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:475
-#, fuzzy
 msgid "This URL name is already in use by another blog. Please choose another name."
-msgstr "Dieser URL Blogname wird schon von einem anderen Blog benutzt. Bitte wähle einen anderen Namen."
+msgstr "Dieser URL-Name wird schon von einem anderen Blog benutzt. Bitte wähle einen anderen Namen."
 
 #: ..\..\..\inc\collections\model\_blog.class.php:490
 #: ..\..\..\inc\collections\model\_blog.class.php:500
@@ -3189,9 +3173,9 @@ msgid "You must provide the media subdirectory."
 msgstr "Du musst das Medienunterverzeichnis angeben."
 
 #: ..\..\..\inc\collections\model\_blog.class.php:579
-#, fuzzy, php-format
+#, php-format
 msgid "Invalid subdirectory &laquo;%s&raquo;."
-msgstr "Das Plugin &laquo;%s&raquo; wurde installiert."
+msgstr "Ungültiges Unterverzeichnis &laquo;%s&raquo;."
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1225
 #, php-format
@@ -3209,24 +3193,20 @@ msgid "The blog's media directory &laquo;%s&raquo; has been created with permiss
 msgstr "Das Blogverzeichnis &laquo;%s&raquo; wurde mit den Berechtigungen %s erstellt."
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1650
-#, fuzzy
 msgid "Deleted post-categories"
-msgstr "%d zugehörige Kategorien"
+msgstr "Eintrags-Kategorien gelöscht"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1657
-#, fuzzy
 msgid "Deleted comments on blog's posts"
-msgstr "Die letzten Kommentare zu allen Einträgen per RSS"
+msgstr "Kommentare zu Blogeinträgen gelöscht"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1665
-#, fuzzy
 msgid "Deleted blog's posts"
-msgstr "Lösche diesen Eintrag"
+msgstr "Blogeinträge gelöscht"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1674
-#, fuzzy
 msgid "Deleted blog's categories"
-msgstr "%d zugehörige Kategorien"
+msgstr "Blogkategorien gelöscht"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1687
 #, php-format
@@ -3243,15 +3223,13 @@ msgid "Deleted blog's static file"
 msgstr "Statische Datei des Blogs gelöscht"
 
 #: ..\..\..\inc\collections\model\_blog.funcs.php:419
-#, fuzzy
 msgid "The requested blog does not exist (any more?)"
-msgstr "Angefordertes Blog existiert nicht!"
+msgstr "Das angeforderte Blog existiert nicht (mehr?)"
 
 # TRANS: "None" select option
 #: ..\..\..\inc\collections\model\_blogcache.class.php:63
-#, fuzzy
 msgid "No blog"
-msgstr "Neues Blog"
+msgstr "Kein Blog"
 
 #: ..\..\..\inc\collections\model\_category.funcs.php:106
 #, php-format
@@ -3265,14 +3243,12 @@ msgstr "Nach jedem neuen Eintrag..."
 
 # TRANS: verb
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:65
-#, fuzzy
 msgid "Ping "
-msgstr "Wartend"
+msgstr "Pinge "
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:75
-#, fuzzy
 msgid "There are no ping plugins activated."
-msgstr "Es sind keine Spam-Karma Plugins aktiviert."
+msgstr "Es sind keine Ping-Plugins aktiviert."
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:89
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:94
@@ -3305,24 +3281,20 @@ msgid "Static file generation"
 msgstr "Generierung einer statischen Datei"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:95
-#, fuzzy
 msgid "Source file"
-msgstr "Keine Quelldateien!"
+msgstr "Quelldatei"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:96
-#, fuzzy
 msgid ".php (stub) file used to generate the static homepage."
-msgstr "Diese .html-Datei wird erzeugt, wenn du eine statische Version der Blog-Hauptseite generierst."
+msgstr ".php (Stub-)Datei zur Generierung der statischen Hauptseite."
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:98
-#, fuzzy
 msgid "Destination file"
-msgstr "Bestimmung"
+msgstr "Zieldatei"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:99
-#, fuzzy
 msgid ".html file that will be created."
-msgstr "Dies ist der Name der Datei, die dir zugesandt wird."
+msgstr ".html Datei, die erstellt wird."
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:103
 msgid "Generate now!"
@@ -3334,9 +3306,8 @@ msgstr "Statische Seite"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:108
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:53
-#, fuzzy
 msgid "Media directory location"
-msgstr "Pfad des Medienverzeichnis"
+msgstr "Medienverzeichnis"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:113
 #: ..\..\..\inc\files\views\_file_permissions.form.php:56
@@ -3394,9 +3365,8 @@ msgid "This is is used in meta tag keywords. NO HTML!"
 msgstr "Dies wird für Meta-Tag Schlüsselwörter (im Kopf der HTML-Datei) verwendet. KEIN HTML!"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:142
-#, fuzzy
 msgid "Blog footer"
-msgstr "Blogs"
+msgstr "Blogfooter"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:143
 #, php-format
@@ -3417,14 +3387,12 @@ msgid "Feedback options"
 msgstr "Feedback Optionen"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:58
-#, fuzzy
 msgid "Allow on all posts"
-msgstr "Immer, bei allen Beiträgen"
+msgstr "Erlaubt bei allen Einträgen"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:58
-#, fuzzy
 msgid "Always allow comments on every post"
-msgstr "Erlaube Kommentare bei jedem erstellten Beitrag"
+msgstr "Erlaube Kommentare bei jedem Eintrag"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:60
 msgid "Can be disabled on a per post basis"
@@ -3443,19 +3411,16 @@ msgid "No comments are allowed in this blog"
 msgstr "In diesem Blog sind Kommentare nicht erlaubt"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:69
-#, fuzzy
 msgid "Always"
-msgstr "Tage"
+msgstr "Immer"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:70
-#, fuzzy
 msgid "Never"
-msgstr "November"
+msgstr "Nie"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:71
-#, fuzzy
 msgid "Ratings"
-msgstr "Zeichenketten"
+msgstr "Bewertungen"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:73
 msgid "Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs."
@@ -3468,14 +3433,12 @@ msgid "Trackbacks"
 msgstr "Trackbacks"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:81
-#, fuzzy
 msgid "This status will be assigned to new comments/trackbacks from non moderators (unless overriden by plugins)."
-msgstr "Dieser Status wird allen neuen Kommentaren/Trackbacks zugeordnet (solange er nicht von Plugins überschrieben wird)"
+msgstr "Dieser Status wird allen neuen Kommentaren/Trackbacks von Nicht-Moderatoren zugewiesen (solange er nicht von Plugins überschrieben wird)"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:99
-#, fuzzy
 msgid "RSS/Atom feeds"
-msgstr "Keine Feeds"
+msgstr "RSS/Atom Feeds"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:101
 msgid "No feeds"
@@ -3498,9 +3461,8 @@ msgid "Full post contents (including after \"&lt;!-- more -->\")"
 msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:106
-#, fuzzy
 msgid "Feed contents"
-msgstr "Angegebener Inhalt"
+msgstr "Feed-Inhalt"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:106
 msgid "How much content do you want to make available in feeds?"
@@ -3511,9 +3473,8 @@ msgid "How many of the latest posts do you want to include in RSS & Atom feeds?"
 msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:107
-#, fuzzy
 msgid "Posts in feeds"
-msgstr "Keine Feeds"
+msgstr "Einträge in Feeds"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:111
 msgid "Allow users to subscribe and receive email notifications for each new post and/or comment."
@@ -3521,18 +3482,16 @@ msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:111
 #: ..\..\..\skins\_toolbar.inc.php:51
-#, fuzzy
 msgid "Email subscriptions"
-msgstr "Blog Abos"
+msgstr "E-Mail Abos"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:116
 msgid "List of public blogs"
 msgstr "Liste der öffentlichen Blogs"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:117
-#, fuzzy
 msgid "Check this if you want this blog to be advertised in the list of all public blogs on this system."
-msgstr "Wähle dies aus, um das Blog in der Liste der öffentlichen Blogs anzuzeigen."
+msgstr "Wähle dies aus, um das Blog in der Liste aller öffentlichen Blogs auf diesem System anzuzeigen."
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:117
 msgid "Include in public blog list"
@@ -13868,131 +13827,3 @@ msgstr "Diese Demo-Vorlage zeigt eine Zusammenfassung der letzten Einträge in al
 msgid "More posts..."
 msgstr "Mehr Einträge..."
 
-#, fuzzy
-#~ msgid "Please enter your login below."
-#~ msgstr "Bitte gib ein Login ein."
-
-#~ msgid "Set cookies for name, email and url"
-#~ msgstr "Setze Cookies für Name, E-Mail und URL"
-
-#~ msgid "The database schema is already up to date. There is nothing to do."
-#~ msgstr "Die Datenbank ist bereits auf dem neuesten Stand. Es gibt nichts zu tun."
-
-#, fuzzy
-#~ msgid "Display blog's tagline"
-#~ msgstr "Zeige öffentliche Blogliste"
-
-#, fuzzy
-#~ msgid "Display list of all posts"
-#~ msgstr "Immer, bei allen Beiträgen"
-
-#, fuzzy
-#~ msgid "Display list of all pages"
-#~ msgstr "Zeige Iconlegende"
-
-#, fuzzy
-#~ msgid "Display this blog's long description."
-#~ msgstr "Lösche diesen Eintrag"
-
-#, fuzzy
-#~ msgid "Meta contents"
-#~ msgstr "Inhalt des Eintrags"
-
-#, fuzzy
-#~ msgid "Blog contents"
-#~ msgstr "Inhalt des Eintrags"
-
-#, fuzzy
-#~ msgid "Blog header"
-#~ msgstr "Blog ID"
-
-#, fuzzy
-#~ msgid "Info pages"
-#~ msgstr "1 Seite"
-
-#~ msgid "Upload files into:"
-#~ msgstr "Hochladen der Dateien nach:"
-
-#, fuzzy
-#~ msgid "Upload with properties"
-#~ msgstr "Editiere Eigenschaften..."
-
-#, fuzzy
-#~ msgid "Allow filtering"
-#~ msgstr "Erlaubte Dateierweiterungen"
-
-#, fuzzy
-#~ msgid "b"
-#~ msgstr "von"
-
-#~ msgid "Cannot edit link!"
-#~ msgstr "Kann Link nicht editieren!"
-
-#~ msgid "Comment info"
-#~ msgstr "Kommentar Information"
-
-#, fuzzy
-#~ msgid "Post permalinks"
-#~ msgstr "Permalink"
-
-#, fuzzy
-#~ msgid "Links will look like: 'stub?title=post-title&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1'"
-#~ msgstr "Empfohlen, falls dein Webserver es unterstützt. Links werden wie 'stub/2003/05/20/beitrag_titel' aussehen, anstelle von 'stub?title=beitrag_title&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1'."
-
-#, fuzzy
-#~ msgid "Links will look like: 'stub?p=123&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1'"
-#~ msgstr "Empfohlen, falls dein Webserver es unterstützt. Links werden wie 'stub/2003/05/20/beitrag_titel' aussehen, anstelle von 'stub?title=beitrag_title&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1'."
-
-#, fuzzy
-#~ msgid "Post URLs"
-#~ msgstr "Einträge"
-
-#, fuzzy
-#~ msgid "Category links"
-#~ msgstr "Kategorien"
-
-#, fuzzy
-#~ msgid "Category links will look like "
-#~ msgstr "Kategorien"
-
-#, fuzzy
-#~ msgid "Archive links"
-#~ msgstr "Archive"
-
-#, fuzzy
-#~ msgid "Archive links will look like "
-#~ msgstr "Archive"
-
-#~ msgid "Allow trackbacks"
-#~ msgstr "Erlaube Trackbacks"
-
-#~ msgid "Allow comments"
-#~ msgstr "Erlaube Kommentare"
-
-#, fuzzy
-#~ msgid "Allow email subscriptions"
-#~ msgstr "Blog Abos"
-
-#~ msgid "XML Feeds (RSS, Atom)"
-#~ msgstr "XML Feeds (RSS, Atom)"
-
-#~ msgid "URL Title"
-#~ msgstr "URL Titel"
-
-#~ msgid "subdirectory &quot;%s&quot; (URL blog name) of %s"
-#~ msgstr "Unterverzeichnis &quot;%s&quot; (URL Blogname) von %s"
-
-#~ msgid "Media library"
-#~ msgstr "Medienbibliothek"
-
-#~ msgid "Static file"
-#~ msgstr "Statische Datei"
-
-#~ msgid "Main category"
-#~ msgstr "Hauptkategorie"
-
-#~ msgid "The blog skin selection has been updated"
-#~ msgstr "Die Blog-Skinauswahl wurde aktualisiert"
-
-#~ msgid "It Works !"
-#~ msgstr "Es funktioniert!"
