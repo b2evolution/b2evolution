@@ -168,7 +168,10 @@ class SafeHtmlChecker
 
 			$this->html_error( T_('Parser error: ').$xml_error_string );
 		}
+
+		return $this->isOK();
 	}
+
 
 	/**
 	 * tag_open(-)
@@ -178,7 +181,7 @@ class SafeHtmlChecker
 	function tag_open($parser, $tag, $attrs)
 	{
 		global $debug;
-	
+
 		// echo "processing tag: $tag <br />\n";
 		$this->last_checked_pos = xml_get_current_byte_index($this->parser);
 
@@ -282,6 +285,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/18 15:53:42  fplanque
+ * Ninja refactoring
+ *
  * Revision 1.2  2007/09/13 02:37:22  fplanque
  * special cases
  *

@@ -51,7 +51,7 @@ $comments_use_autobr = 'opt-out';	// automatically change line breaks to <br />
 # Note: This option requires the PHP XML module. If your PHP installation doesn't have it
 # disable html_checker and use security_checker.
 /*
- * @todo fp>This should be moved to the backoffice. Checbox for each blog. This checkbox should NOT be editable by the blog owner.
+ * @todo fp>This should be moved to the backoffice. This checkbox should NOT be editable by the blog owner.
  * Only the system admin should be adble to edit this. Special "Admin" tab on the blog settings.
  */
 $use_html_checker = 1;

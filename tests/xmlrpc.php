@@ -31,7 +31,7 @@ echo "<p>Target: $target</p>";
 switch( $target )
 {
 	case 'local':
-		$test_user = 'demouser';
+		$test_user = 'admin';
 		$test_pass = $install_password;
 		$client = new xmlrpc_client( $basesubpath.$xmlsrv_subdir.'xmlrpc.php', $basehost, $baseport );
 		break;
@@ -47,7 +47,7 @@ $bloggerAPIappkey = 'testkey';
 	echo '<h2>system.listMethods</h2>';
 	{
 		flush();
-		$client->debug = 1;
+		$client->debug = 0;
 		$message = new xmlrpcmsg( 'system.listMethods' );
 		$result = $client->send($message);
 		$ret = xmlrpc_displayresult( $result );
@@ -203,7 +203,7 @@ $bloggerAPIappkey = 'testkey';
 				new xmlrpcval($test_user),
 				new xmlrpcval($test_pass),
 				new xmlrpcval( array(
-						'title'             => new xmlrpcval($post_text),
+						'title'             => new xmlrpcval('<i>'.$post_text),
 						'description'       => new xmlrpcval($post_text),
 						'categories'        => new xmlrpcval( array(
                         								new xmlrpcval( 'News' ),
@@ -233,12 +233,12 @@ $bloggerAPIappkey = 'testkey';
 				new xmlrpcval( $test_user ),
 				new xmlrpcval( $test_pass ),
 				new xmlrpcval( array(
-						'title'             => new xmlrpcval($post_text),
-						'description'       => new xmlrpcval( $post_text."\n* Edited *" ),
-						'categories'        => new xmlrpcval( array(
-                        								new xmlrpcval( 'News' ),
-																				new xmlrpcval( 'Fun' )
-																		), 'array' ),
+						'title'       => new xmlrpcval( '<i>'.$post_text ),
+						'description' => new xmlrpcval( $post_text."\n* Edited *" ),
+						'categories'  => new xmlrpcval( array(
+                        					new xmlrpcval( 'News' ),
+																	new xmlrpcval( 'Fun' )
+															), 'array' ),
 					), 'struct' ),
 				new xmlrpcval( true, 'boolean' ),		// Published
 			) );
@@ -281,17 +281,17 @@ $bloggerAPIappkey = 'testkey';
 		flush();
 		$post_text = 'XML-RPC b2.newPost : random # '.rand( 1, 10000 );
 		echo 'Post_text : '.$post_text;
-		$client->debug = false;
+		$client->debug = 0;
 		$message = new xmlrpcmsg( 'b2.newPost', array(
-															new xmlrpcval(''),
-															new xmlrpcval(''),
-															new xmlrpcval($test_user),
-															new xmlrpcval($test_pass),
+															new xmlrpcval( '' ),
+															new xmlrpcval( '' ),
+															new xmlrpcval( $test_user ),
+															new xmlrpcval( $test_pass ),
 															new xmlrpcval( "<p>$post_text</p>\n" ),
-															new xmlrpcval(true,"boolean"),		// Published
-															new xmlrpcval( $post_text ),	// TITLE
-															new xmlrpcval(1), // Category
-															new xmlrpcval('') // Date
+															new xmlrpcval( true,"boolean"),		// Published
+															new xmlrpcval( '<i>'.$post_text ),	// TITLE
+															new xmlrpcval( 1 ), // Category
+															new xmlrpcval( '' ) // Date
 														)  );
 		$result = $client->send($message);
 		$ret = xmlrpc_displayresult( $result );
@@ -357,18 +357,18 @@ $bloggerAPIappkey = 'testkey';
 		echo 'Post_text : '.$post_text;
 		$client->debug = 0;
 
-		$content = "<title>$post_text</title>
+		$content = "<title><i>$post_text</title>
 								<p>$post_text</p>\n";
 		$content .= '<category>2,03</category>';
 
 
 		$message = new xmlrpcmsg( 'blogger.newPost', array(
-															new xmlrpcval($bloggerAPIappkey),
-															new xmlrpcval(1),
-															new xmlrpcval($test_user),
-															new xmlrpcval($test_pass),
+															new xmlrpcval( $bloggerAPIappkey ),
+															new xmlrpcval( 1 ),
+															new xmlrpcval( $test_user ),
+															new xmlrpcval( $test_pass ),
 															new xmlrpcval( $content ),
-															new xmlrpcval(true,"boolean")		// published
+															new xmlrpcval( true, 'boolean' )		// published
 														)  );
 		$result = $client->send($message);
 		$ret = xmlrpc_displayresult( $result );
@@ -476,12 +476,12 @@ $bloggerAPIappkey = 'testkey';
 		$post_content = $latest['content']."\n* This has been edited! *";
 
 		$message = new xmlrpcmsg( 'blogger.editPost', array(
-															new xmlrpcval($bloggerAPIappkey),
-															new xmlrpcval($msg_ID),
-															new xmlrpcval($test_user),
-															new xmlrpcval($test_pass),
+															new xmlrpcval( $bloggerAPIappkey),
+															new xmlrpcval( $msg_ID),
+															new xmlrpcval( $test_user),
+															new xmlrpcval( $test_pass),
 															new xmlrpcval( $post_content ),
-															new xmlrpcval(true, 'boolean')		// PUBLISH !!
+															new xmlrpcval( true, 'boolean')		// PUBLISH !!
 														)  );
 		$result = $client->send($message);
 		$ret = xmlrpc_displayresult( $result );

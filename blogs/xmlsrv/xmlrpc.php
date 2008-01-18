@@ -30,16 +30,6 @@ if( ! isset($HTTP_RAW_POST_DATA) )
 $HTTP_RAW_POST_DATA = trim( $HTTP_RAW_POST_DATA );
 
 
-/**
- * Set to TRUE to do HTML sanity checking as in the browser interface, set to
- * FALSE if you trust the editing tool to do this (more features than the
- * browser interface)
-	* @todo fp> have a global setting with 3 options: check|nocheck|userdef => each then has his own setting to define if his tool does the checking or not.
-	* fp> Also, there should be a permission to say if members of a given group can or cannot post insecure content. If they cannot, then they cannot disable the sanity check
-	* fp> note: if allowed unsecure posting, disabling the sanity checker should also be allowed in the html backoffice
- */
-$xmlrpc_htmlchecking = true;
-
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
@@ -84,6 +74,9 @@ $s = new xmlrpc_server( $xmlrpc_procs );
 
 /*
  * $Log$
+ * Revision 1.147  2008/01/18 15:53:42  fplanque
+ * Ninja refactoring
+ *
  * Revision 1.146  2008/01/14 07:22:08  fplanque
  * Refactoring
  *

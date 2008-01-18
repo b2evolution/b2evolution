@@ -357,32 +357,36 @@ class Blog extends DataObject
 			$this->set_from_Request( 'keywords' );
 		}
 
-		if( param( 'blog_tagline',   'html', NULL ) !== NULL )
+		if( param( 'blog_tagline', 'html', NULL ) !== NULL )
 		{	// HTML tagline:
-			$this->set( 'tagline', format_to_post( get_param( 'blog_tagline' ), 0, 0 ) );
+			param_check_html( 'blog_tagline', T_('Invalid tagline') );
+			$this->set( 'tagline', get_param( 'blog_tagline' ) );
 		}
-
-		if( param( 'blog_longdesc',   'html', NULL ) !== NULL )
+		if( param( 'blog_longdesc', 'html', NULL ) !== NULL )
 		{	// HTML long description:
-			$this->set( 'longdesc', format_to_post( get_param( 'blog_longdesc' ), 0, 0 ) );
+			param_check_html( 'blog_longdesc', T_('Invalid long description') );
+			$this->set( 'longdesc', get_param( 'blog_longdesc' ) );
 		}
 
 		if( param( 'blog_footer_text', 'html', NULL ) !== NULL )
 		{ // Blog footer:
+			param_check_html( 'blog_footer_text', T_('Invalid blog footer') );
 			$this->set_setting( 'blog_footer_text', get_param( 'blog_footer_text' ) );
 		}
 		if( param( 'single_item_footer_text', 'html', NULL ) !== NULL )
 		{ // Blog footer:
+			param_check_html( 'single_item_footer_text', T_('Invalid single post footer') );
 			$this->set_setting( 'single_item_footer_text', get_param( 'single_item_footer_text' ) );
 		}
 		if( param( 'xml_item_footer_text', 'html', NULL ) !== NULL )
 		{ // Blog footer:
+			param_check_html( 'xml_item_footer_text', T_('Invalid RSS footer') );
 			$this->set_setting( 'xml_item_footer_text', get_param( 'xml_item_footer_text' ) );
 		}
-
-		if( param( 'blog_notes',   'html', NULL ) !== NULL )
+		if( param( 'blog_notes', 'html', NULL ) !== NULL )
 		{	// HTML notes:
-			$this->set( 'notes', format_to_post( get_param( 'blog_notes' ), 0, 0 ) );
+			param_check_html( 'blog_notes', T_('Invalid Blog Notes') );
+			$this->set( 'notes', get_param( 'blog_notes' ) );
 		}
 
 
@@ -1883,6 +1887,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.30  2008/01/18 15:53:42  fplanque
+ * Ninja refactoring
+ *
  * Revision 1.29  2008/01/17 20:47:58  fplanque
  * deprecated linkblog_ID blog param
  *

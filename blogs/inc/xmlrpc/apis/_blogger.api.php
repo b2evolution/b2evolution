@@ -112,51 +112,16 @@ function blogger_newpost( $m )
 		return xmlrpcs_resperror( 11 ); // User error 11
 	}
 
+
+	$post_date = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
 	// Extract <title> from content
 	$post_title = xmlrpc_getposttitle( $content );
-
 	// cleanup content from extra tags like <category> and <title>:
 	$content = xmlrpc_removepostdata( $content );
 
-	$now = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
 
-	// CHECK and FORMAT content
-	$post_title = format_to_post($post_title,0,0);
-	$content = format_to_post($content,0,0);
-
-	if( $errstring = $Messages->get_string( 'Cannot post, please correct these errors:', '' ) )
-	{
-		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
-	}
-
-	// INSERT NEW POST INTO DB:
-	load_class( 'items/model/_item.class.php' );
-	$edited_Item = & new Item();
-	$edited_Item->set('title', $post_title);
-	$edited_Item->set('content', $content);
-	$edited_Item->set('datestart', $now);
-	$edited_Item->set('main_cat_ID', $main_cat);
-	$edited_Item->set('extra_cat_IDs', $cat_IDs);
-	$edited_Item->set('status', $status);
-	$edited_Item->set('locale', $current_User->locale );
-	$edited_Item->set_creator_User($current_User);
-	$edited_Item->dbinsert();
-
-	if( ! $edited_Item->ID )
-	{ // DB error
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'Error while inserting item: '.$DB->last_error ); // user error 9
-	}
-
-	logIO( "Posted ! ID: $edited_Item->ID");
-
-	logIO( 'Handling notifications...' );
-	// Execute or schedule notifications & pings:
-	$edited_Item->handle_post_processing();
-
-	logIO("All done.");
-
-	logIO( 'OK.' );
-	return new xmlrpcresp(new xmlrpcval($edited_Item->ID));
+	// COMPLETE VALIDATION & INSERT:
+	return xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status );
 }
 
 
@@ -247,41 +212,13 @@ function blogger_editpost($m)
 		return xmlrpcs_resperror( 11 ); // User error 11
 	}
 
-
+	$post_date = NULL;
 	$post_title = xmlrpc_getposttitle($content);
 	$content = xmlrpc_removepostdata($content);
 
-	// CHECK and FORMAT content
-	$post_title = format_to_post($post_title,0,0);
-	$content = format_to_post($content,0,0);
 
-	if( $errstring = $Messages->get_string( 'Cannot update post, please correct these errors:', '' ) )
-	{
-		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
-	}
-
-	// UPDATE POST IN DB:
-	$edited_Item->set( 'title', $post_title );
-	$edited_Item->set( 'content', $content );
-	if( $cat_IDs )
-	{ // update cats, if given:
-		$edited_Item->set( 'main_cat_ID', $main_cat );
-		$edited_Item->set( 'extra_cat_IDs', $cat_IDs );
-	}
-	$edited_Item->set( 'status', $status );
-	$edited_Item->dbupdate();
-
-	if( $DB->error )
-	{ // DB error
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-	}
-
-	logIO( 'Handling notifications...' );
-	// Execute or schedule notifications & pings:
-	$edited_Item->handle_post_processing();
-
-	logIO( 'OK.' );
-	return new xmlrpcresp( new xmlrpcval( 1, 'boolean' ) );
+	// COMPLETE VALIDATION & UPDATE:
+	return xmlrpcs_edit_item( $edited_Item, $post_title, $content, $post_date, $main_cat, $cat_IDs, $status );
 }
 
 
@@ -677,6 +614,9 @@ $xmlrpc_procs["blogger.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/18 15:53:42  fplanque
+ * Ninja refactoring
+ *
  * Revision 1.1  2008/01/14 07:22:07  fplanque
  * Refactoring
  *

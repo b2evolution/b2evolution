@@ -142,7 +142,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		{
 			case 'html':
 				// do nothing
-				if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> as HTML', 'params' );
+				if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> as RAW Unsecure HTML', 'params' );
 				break;
 
 			case 'string':
@@ -1380,171 +1380,6 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $glue = '&a
 
 
 /**
- * Add param(s) at the end of an URL, using either "?" or "&amp;" depending on existing url
- *
- * @param string existing url
- * @param string params to add
- * @param string delimiter to use for more params
- */
-function url_add_param( $url, $param, $glue = '&amp;' )
-{
-	if( empty($param) )
-	{
-		return $url;
-	}
-
-	if( ($anchor_pos = strpos($url, '#')) !== false )
-	{ // There's an "#anchor" in the URL
-		$anchor = substr($url, $anchor_pos);
-		$url = substr($url, 0, $anchor_pos);
-	}
-	else
-	{ // URL without "#anchor"
-		$anchor = '';
-	}
-
-	if( strpos( $url, '?' ) !== false )
-	{ // There are already params in the URL
-		return $url.$glue.$param.$anchor;
-	}
-
-
-	// These are the first params
-	return $url.'?'.$param.$anchor;
-}
-
-
-/**
- * Add a tail (starting with "/") at the end of an URL before any params (starting with "?")
- *
- * @param string existing url
- * @param string tail to add
- */
-function url_add_tail( $url, $tail )
-{
-	$parts = explode( '?', $url );
-	if( substr($parts[0], -1) == '/' )
-	{
-		$parts[0] = substr($parts[0], 0, -1);
-	}
-	if( isset($parts[1]) )
-	{
-		return $parts[0].$tail.'?'.$parts[1];
-	}
-
-	return $parts[0].$tail;
-}
-
-
-/**
- * Check the validity of a given URL
- *
- * Checks allowed URI schemes and URL ban list.
- * URL can be empty.
- *
- * Note: We have a problem when trying to "antispam" a keyword which is already blacklisted
- * If that keyword appears in the URL... then the next page has a bad referer! :/
- *
- * {@internal This function gets tested in misc.funcs.simpletest.php.}}
- *
- * @param string Url to validate
- * @param array Allowed URI schemes (see /conf/_formatting.php)
- * @param boolean Must the URL be absolute?
- * @param boolean Return verbose error message? (Should get only used in the backoffice)
- * @return mixed false (which means OK) or error message
- */
-function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose = false )
-{
-	global $Debuglog;
-
-	if( empty($url) )
-	{ // Empty URL, no problem
-		return false;
-	}
-
-	// Validate URL structure
-	// fp> NOTE: I made this much more laxist than it used to be.
-	// fp> If it turns out I blocked something that was previously allowed, it's a mistake.
-	//
-	if( preg_match( '~^\w+:~', $url ) )
-	{ // there's a scheme and therefor an absolute URL:
-		if( substr($url, 0, 7) == 'mailto:' )
-		{ // mailto:link
-			preg_match( '~^(mailto):(.*?)(\?.*)?$~', $url, $match );
-			if( ! $match )
-			{
-				return $verbose
-					? sprintf( T_('Invalid email link: %s.'), htmlspecialchars($url) )
-					: T_('Invalid email link.');
-			}
-      elseif( ! is_email($match[2]) )
-			{
-				return $verbose
-					? sprintf( T_('Supplied email address (%s) is invalid.'), htmlspecialchars($match[2]) )
-					: T_('Invalid email address.');
-			}
-		}
-		elseif( substr($url, 0, 6) == 'clsid:' )
-		{ // clsid:link
-			if( ! preg_match( '¤^(clsid):([a-fA-F0-9\-]+)$¤', $url, $match) )
-			{
-				return T_('Invalid class ID format');
-			}
-		}
-		elseif( ! preg_match('~^           # start
-			([a-z][a-z0-9+.\-]*)             # scheme
-			://                              # authorize absolute URLs only ( // not present in clsid: -- problem? ; mailto: handled above)
-			(\w+(:\w+)?@)?                   # username or username and password (optional)
-			[a-z0-9]([a-z0-9\-])+            # Don t allow anything too funky like entities
-			\.                               # require at least 1 dot
-			[a-z0-9]([a-z0-9.\-])+           # Don t allow anything too funky like entities
-			(:[0-9]+)?                       # optional port specification
-			~ix', $url, $match) )
-		{ // Cannot validate URL structure
-			$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
-			return $verbose
-				? sprintf( T_('Invalid URL format (%s).'), htmlspecialchars($url) )
-				: T_('Invalid URL format.');
-		}
-
-		$scheme = strtolower($match[1]);
-		if( !in_array( $scheme, $allowed_uri_scheme ) )
-		{ // Scheme not allowed
-			$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
-			return $verbose
-				? sprintf( T_('URI scheme "%s" not allowed.'), htmlspecialchars($scheme) )
-				: T_('URI scheme not allowed.');
-		}
-
-		// Search for blocked URLs:
-		if( $block = antispam_check($url) )
-		{
-			return $verbose
-				? sprintf( T_('URL "%s" not allowed: blacklisted word "%s".'), htmlspecialchars($url), $block )
-				: T_('URL not allowed');
-		}
-	}
-	else
-	{ // URL is relative..
-		if( $absolute )
-		{
-			return $verbose ? sprintf( T_('URL "%s" must be absolute.'), htmlspecialchars($url) ) : T_('URL must be absolute.');
-		}
-
-		$char = substr($url, 0, 1);
-		if( $char != '/' && $char != '#' )
-		{ // must start with a slash or hash (for HTML anchors to the same page)
-			return $verbose
-				? sprintf( T_('URL "%s" must be a full path starting with "/" or an anchor starting with "#".'), htmlspecialchars($url) )
-				: T_('URL must be a full path starting with "/" or an anchor starting with "#".');
-		}
-	}
-
-	return false; // OK
-}
-
-
-/**
  * Checks if a given regular expression is valid.
  *
  * It changes the error_handler and restores it.
@@ -1659,8 +1494,306 @@ else
 }
 
 
+
+
+
+/**
+ * Sets an HTML parameter and checks for sanitized code.
+ *
+ * WARNING: this does *NOT* (necessarilly) make the HTML code safe.
+ * It only checks on it and produces error messages.
+ * It is NOT (necessarily) safe to use the output.
+ *
+ * @param string Variable to set
+ * @param mixed Default value or TRUE if user input required
+ * @param boolean memorize ( see {@link param()} )
+ * @param string error message
+ *
+ * @return string
+ */
+function param_html( $var, $default = '', $memorize = false, $err_msg )
+{
+
+}
+
+
+/**
+ * Checks for sanitized code.
+ *
+ * WARNING: this does *NOT* (necessarilly) make the HTML code safe.
+ * It only checks on it and produces error messages.
+ * It is NOT (necessarily) safe to use the output.
+ *
+ * @param string param name
+ * @param string error message
+ * @return boolean|string
+ */
+function param_check_html( $var, $err_msg = '#', $field_err_msg = '#' )
+{
+	global $Messages;
+
+	$altered_html = check_html_sanity( $GLOBALS[$var], false, false );
+
+ 	if( $altered_html === false )
+	{	// We have errors, do not keep sanitization attemps:
+		if( $err_msg == '#' )
+		{
+			$err_msg = T_('Invalid XHTML.');
+		}
+		if( $field_err_msg == '#' )
+		{
+			$field_err_msg = T_('Invalid XHTML.');
+		}
+
+		param_error( $var, $err_msg, $field_err_msg );
+		return false;
+	}
+
+	// Keep the altered HTML (balanced tags, etc.) - NOT necessarily safe if loose checking has been allowed.
+	$GLOBALS[$var] = $altered_html;
+
+	return $altered_html;
+}
+
+/**
+ * DEPRECATED Stub for plugin compatibility:
+ */
+function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NULL )
+{
+	$ret = check_html_sanity( $content, $autobr, $is_comment, $encoding );
+	if( $ret === false )
+	{	// ERROR
+		return $content;
+	}
+
+	// return aletered content
+	return $ret;
+}
+
+
+/**
+ * Check raw HTML input for different levels of sanity including:
+ * - XHTML validation
+ * - Javascript injection
+ *
+ * Also cleans up the content on some levels:
+ * - trimming
+ * - balancing tags
+ *
+ * WARNING: this does *NOT* (necessarilly) make the HTML code safe.
+ * It only checks on it and produces error messages.
+ * It is NOT (necessarily) safe to use the output.
+ *
+ * @param string The content to format
+ * @param integer Create automated <br /> tags?
+ * @param integer Is this a comment? (Used for SafeHtmlChecker()'s URI scheme, styling restrictions)
+ * @param string Encoding (used for SafeHtmlChecker() only!); defaults to $io_charset
+ * @return boolean|string
+ */
+function check_html_sanity( $content, $autobr = false, $apply_comment_rules = false, $encoding = NULL )
+{
+	global $use_balanceTags, $use_html_checker, $use_security_checker;
+	global $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme;
+	global $comments_allowed_tags, $comments_allowed_attributes, $comments_allowed_uri_scheme;
+	global $io_charset;
+	global $Messages;
+
+	$error = false;
+
+	$content = trim( $content );
+
+	// Replace any & that is not a character or entity reference with &amp;
+	$content = preg_replace( '/&(?!#[0-9]+;|#x[0-9a-fA-F]+;|[a-zA-Z_:][a-zA-Z0-9._:-]*;)/', '&amp;', $content );
+
+	if( $autobr )
+	{ // Auto <br />:
+		// may put brs in the middle of multiline tags...
+		// TODO: this may create "<br />" tags in "<UL>" (outside of <LI>) and make the HTML invalid! -> use autoP pugin?
+		$content = autobrize( $content );
+	}
+
+	if( $use_balanceTags )
+	{ // Auto close open tags:
+		$content = balance_tags( $content );
+	}
+
+	if( $use_html_checker )
+	{ // Check the code:
+		load_class( 'xhtml_validator/_xhtml_validator.class.php' );
+
+		if( empty($encoding) )
+		{
+			$encoding = $io_charset;
+		}
+		if( ! $apply_comment_rules )
+		{	// Normal backoffice content:
+			$checker = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes,
+					$uri_attrs, $allowed_uri_scheme, $encoding );
+		}
+		else
+		{	// Apply more restrictive comment rules
+			$checker = & new SafeHtmlChecker( $comments_allowed_tags, $comments_allowed_attributes,
+					$uri_attrs, $comments_allowed_uri_scheme, $encoding );
+		}
+
+		if( ! $checker->check( $content ) ) // TODO: see if we need to use convert_chars( $content, 'html' )
+		{
+			$error = true;
+		}
+	}
+
+	if( $use_security_checker )
+	{
+		// Security checking:
+		$check = $content;
+		// Open comments or '<![CDATA[' are dangerous
+		$check = str_replace('<!', '<', $check);
+		// # # are delimiters
+		// i modifier at the end means caseless
+		$matches = array();
+		// onclick= etc...
+		if( preg_match ('#\s(on[a-z]+)\s*=#i', $check, $matches)
+			// action=, background=, cite=, classid=, codebase=, data=, href=, longdesc=, profile=, src=
+			// usemap=
+			|| preg_match ('#=["\'\s]*(javascript|vbscript|about):#i', $check, $matches)
+			|| preg_match ('#\<\/?\s*(frame|iframe|applet|object)#i', $check, $matches) )
+		{
+			$Messages->add( T_('Illegal markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$error = true;
+		}
+		// Styling restictions:
+		$matches = array();
+		if( $apply_comment_rules && preg_match ('#\s(style|class|id)\s*=#i', $check, $matches) )
+		{
+			$Messages->add( T_('Unallowed CSS markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$error = true;
+		}
+	}
+
+	if( $error )
+	{
+		return false;
+	}
+
+	// Return sanitized content
+	return $content;
+}
+
+
+/**
+ * Balances Tags of string using a modified stack.
+ *
+ * @param string HTML to be balanced
+ * @return string Balanced HTML
+ */
+function balance_tags( $text )
+{
+	$tagstack = array();
+	$stacksize = 0;
+	$tagqueue = '';
+	$newtext = '';
+
+	# b2 bug fix for comments - in case you REALLY meant to type '< !--'
+	$text = str_replace('< !--', '<    !--', $text);
+
+	# b2 bug fix for LOVE <3 (and other situations with '<' before a number)
+	$text = preg_replace('#<([0-9]{1})#', '&lt;$1', $text);
+
+	while( preg_match('~<(\s*/?\w+)\s*([^/>]*)/?>~', $text, $regex) )
+	{
+		$newtext = $newtext . $tagqueue;
+
+		$i = strpos($text,$regex[0]);
+		$l = strlen($tagqueue) + strlen($regex[0]);
+
+		// clear the shifter
+		$tagqueue = '';
+
+		// Pop or Push
+		if( substr($regex[1],0,1) == '/' )
+		{ // End Tag
+			$tag = strtolower(substr($regex[1],1));
+
+			// if too many closing tags
+			if($stacksize <= 0) {
+				$tag = '';
+				//or close to be safe $tag = '/' . $tag;
+			}
+			// if stacktop value = tag close value then pop
+			else if ($tagstack[$stacksize - 1] == $tag) { // found closing tag
+				$tag = '</' . $tag . '>'; // Close Tag
+				// Pop
+				array_pop ($tagstack);
+				$stacksize--;
+			} else { // closing tag not at top, search for it
+				for ($j=$stacksize-1;$j>=0;$j--) {
+					if ($tagstack[$j] == $tag) {
+					// add tag to tagqueue
+						for ($k=$stacksize-1;$k>=$j;$k--){
+							$tagqueue .= '</' . array_pop ($tagstack) . '>';
+							$stacksize--;
+						}
+						break;
+					}
+				}
+				$tag = '';
+			}
+		}
+		else
+		{ // Begin Tag
+			$tag = strtolower($regex[1]);
+
+			// Tag Cleaning
+
+			// Push if not img or br or hr
+			if($tag != 'br' && $tag != 'img' && $tag != 'hr' && $tag != 'param')
+			{
+				$stacksize = array_push ($tagstack, $tag);
+				$closing = '>';
+			}
+			else
+			{
+				$closing = ' />';
+			}
+			// Attributes
+			// $attributes = $regex[2];
+			$attributes = $regex[2];
+			if($attributes)
+			{
+				$attributes = ' '.$attributes;
+			}
+
+			$tag = '<'.$tag.$attributes.$closing;
+		}
+
+		$newtext .= substr($text,0,$i) . $tag;
+		$text = substr($text,$i+$l);
+	}
+
+	// Clear Tag Queue
+	$newtext = $newtext . $tagqueue;
+
+	// Add Remaining text
+	$newtext .= $text;
+
+	// Empty Stack
+	while($x = array_pop($tagstack)) {
+		$newtext = $newtext . '</' . $x . '>'; // Add remaining tags to close
+	}
+
+	# b2 fix for the bug with HTML comments
+	$newtext = str_replace( '< !--', '<'.'!--', $newtext ); // the concatenation is needed to work around some strange parse error in PHP 4.3.1
+	$newtext = str_replace( '<    !--', '< !--', $newtext );
+
+	return $newtext;
+}
+
+
 /*
  * $Log$
+ * Revision 1.7  2008/01/18 15:53:42  fplanque
+ * Ninja refactoring
+ *
  * Revision 1.6  2007/11/30 23:24:16  fplanque
  * support for clsid again
  *
@@ -1717,54 +1850,5 @@ else
  *
  * Revision 1.28  2007/01/26 00:21:23  blueyed
  * Fixed possible E_NOTICE; TODO
- *
- * Revision 1.27  2006/12/28 18:31:30  fplanque
- * prevent impersonating of blog in multiblog situation
- *
- * Revision 1.26  2006/12/22 00:25:48  blueyed
- * Added $absolute param to url_validate()
- *
- * Revision 1.25  2006/12/18 16:16:12  blueyed
- * Fixed E_NOTICE if we're expecting e.g. "integer" but receive "array"
- *
- * Revision 1.24  2006/11/27 21:10:23  fplanque
- * doc
- *
- * Revision 1.23  2006/11/26 23:33:10  blueyed
- * doc
- *
- * Revision 1.22  2006/11/26 02:30:39  fplanque
- * doc / todo
- *
- * Revision 1.21  2006/11/24 18:27:27  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.20  2006/11/17 00:20:44  blueyed
- * doc
- *
- * Revision 1.19  2006/11/14 17:37:22  blueyed
- * doc
- *
- * Revision 1.18  2006/11/14 00:21:58  blueyed
- * debug info for "relative" urls in validate_url()
- *
- * Revision 1.17  2006/11/09 22:56:57  blueyed
- * todo
- *
- * Revision 1.16  2006/11/02 16:31:53  blueyed
- * MFB
- *
- * Revision 1.15  2006/10/26 09:28:58  blueyed
- * - Made param funcs independent from $Debuglog global
- * - Made url_add_param() respect anchors/fragments
- *
- * Revision 1.14  2006/10/23 21:16:00  blueyed
- * MFB: Fix for encoding in regenerate_url()
- *
- * Revision 1.13  2006/10/17 17:27:07  blueyed
- * Allow "#anchor" as valid URL
- *
- * Revision 1.12  2006/10/14 02:12:01  blueyed
- * Added url_absolute(), make_rel_links_abs() + Tests; Fixed validate_url() and allow relative URLs, which get converted to absolute ones in feeds.
  */
 ?>

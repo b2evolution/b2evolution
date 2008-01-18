@@ -50,78 +50,47 @@ function b2_newpost($m)
 		return xmlrpcs_resperror();
 	}
 
-	$content = $m->getParam(4);
-	$content = $content->scalarval();
-
 	$publish  = $m->getParam(5);
 	$publish = $publish->scalarval();
 	$status = $publish ? 'published' : 'draft';
 
-	$post_title = $m->getParam(6);
-	$post_title = $post_title->scalarval();
+	$main_cat = $m->getParam(7);
+	$main_cat = $main_cat->scalarval();
 
-	$category = $m->getParam(7);
-	$category = $category->scalarval();
-
-	$postdate = $m->getParam(8);
-	$postdate = $postdate->scalarval();
 
 	// CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
-	if( ! $current_User->check_perm( 'cats_post!'.$status, 'edit', false, array($category) ) )
+	if( ! $current_User->check_perm( 'cats_post!'.$status, 'edit', false, array($main_cat) ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 	logIO( 'Permission granted.' );
 
 	// Check if category exists
-	if( get_the_category_by_ID( $category, false ) === false )
+	if( get_the_category_by_ID( $main_cat, false ) === false )
 	{ // Cat does not exist:
 		return xmlrpcs_resperror( 11 );	// User error 11
 	}
+	$cat_IDs = array( $main_cat );
 
-
+	$postdate = $m->getParam(8);
+	$postdate = $postdate->scalarval();
 	if( $postdate != '' )
 	{
-		$now = $postdate;
+		$post_date = $postdate;
 	}
 	else
 	{
-		$now = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
+		$post_date = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
 	}
 
-	// CHECK and FORMAT content
-	$post_title = format_to_post($post_title, 0, 0);
-	$content = format_to_post($content, 0, 0);
+	$post_title = $m->getParam(6);
+	$post_title = $post_title->scalarval();
 
-	if( $errstring = $Messages->get_string( 'Invalid content, please correct these errors:', '' ) )
-	{
-		return new xmlrpcresp(0, $xmlrpcerruser+4, $errstring ); // user error 4
-	}
+ 	$content = $m->getParam(4);
+	$content = $content->scalarval();
 
-	// INSERT NEW POST INTO DB:
-	load_class( 'items/model/_item.class.php' );
-	$edited_Item = & new Item();
-	$edited_Item->set('title', $post_title);
-	$edited_Item->set('content', $content);
-	$edited_Item->set('datestart', $now);
-	$edited_Item->set('main_cat_ID', $category);
-	$edited_Item->set('extra_cat_IDs', array($category) );
-	$edited_Item->set('status', $status);
-	$edited_Item->set('locale', $current_User->locale );
-	$edited_Item->set_creator_User($current_User);
-	$edited_Item->dbinsert();
-
-	if( ! $edited_Item->ID )
-	{ // DB error
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'Error while inserting item: '.$DB->last_error ); // user error 9
-	}
-
-	logIO( 'Handling notifications...' );
-	// Execute or schedule notifications & pings:
-	$edited_Item->handle_post_processing();
-
-	logIO( 'OK.' );
-	return new xmlrpcresp(new xmlrpcval($edited_Item->ID));
+	// COMPLETE VALIDATION & INSERT:
+	return xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status );
 }
 
 
@@ -214,6 +183,9 @@ $xmlrpc_procs["b2.getPostURL"] = array(
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/18 15:53:42  fplanque
+ * Ninja refactoring
+ *
  * Revision 1.1  2008/01/14 07:22:07  fplanque
  * Refactoring
  *

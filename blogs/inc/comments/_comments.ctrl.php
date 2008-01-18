@@ -112,12 +112,12 @@ switch( $action )
 				$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
 			}
 		}
+
+		// Content:
 		param( 'content', 'html' );
 		param( 'post_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 );
-
-		// CHECK and FORMAT content
-		$content = format_to_post( $content, $post_autobr, 0); // We are faking this NOT to be a comment
-		$edited_Comment->set( 'content', $content );
+		param_check_html( 'content', T_('Invalid comment text.') );	// Check this is backoffice content (NOT with comment rules)
+		$edited_Comment->set( 'content', get_param( 'content' ) );
 
 		if( $current_User->check_perm( 'edit_timestamp' ))
 		{ // We use user date
@@ -276,6 +276,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2008/01/18 15:53:42  fplanque
+ * Ninja refactoring
+ *
  * Revision 1.5  2008/01/05 02:28:17  fplanque
  * enhanced blog selector (bloglist_buttons)
  *

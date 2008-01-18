@@ -156,12 +156,6 @@ function & xmlrpcs_login( $m, $login_param, $pass_param )
 {
 	global $xmlrpcs_errcode, $xmlrpcs_errmsg, $xmlrpcerruser;
 
-  /**
-   * This may be needed globally for status permissions in ItemList2, etc..
-	 * @var User
-	 */
-	global $current_User;
-
 	$username = $m->getParam( $login_param );
 	$username = $username->scalarval();
 
@@ -183,6 +177,9 @@ function & xmlrpcs_login( $m, $login_param, $pass_param )
 	}
 
 	logIO( 'Login OK - User: '.$current_User->ID.' - '.$current_User->login );
+
+  // This may be needed globally for status permissions in ItemList2, etc..
+	$GLOBALS['current_User'] = & $current_User;
 
 	return $current_User;
 }
@@ -263,34 +260,56 @@ function & xmlrpcs_get_Item( $m, $postid_param )
 
 
 /**
+ * If no errcode or errmsg given, will use the last one that has been set previously.
  *
  * @param integer
  * @param string
  * @return xmlrpcresp
  */
-function xmlrpcs_resperror( $errcode = NULL )
+function xmlrpcs_resperror( $errcode = NULL, $errmsg = NULL )
 {
-	global $xmlrpcs_errcode, $xmlrpcs_errmsg;
+	global $xmlrpcs_errcode, $xmlrpcs_errmsg, $xmlrpcerruser;
 
-	switch( $errcode )
-	{
-		case 3:
-			$xmlrpcs_errcode = $xmlrpcs_errmsg + 3;
-			$xmlrpcs_errmsg = 'Permission denied.';
-			break;
+	if( !empty($errcode) )
+	{ // Transform into user error code
+		$xmlrpcs_errcode = $xmlrpcerruser + $errcode;
+	}
 
-		case 11:
-			$xmlrpcs_errcode = $xmlrpcs_errmsg + 11;
-			$xmlrpcs_errmsg = 'Requested category not found in requested blog.';
-			break;
+	if( !empty($errmsg) )
+	{	// Custom message
+		$xmlrpcs_errmsg = $errmsg;
+	}
+	else
+	{	// Use a standard messsage
+		switch( $errcode )
+		{
+			case 3:
+				$xmlrpcs_errmsg = 'Permission denied.';
+				break;
 
-		case 12:
-			$xmlrpcs_errcode = $xmlrpcs_errmsg + 12;
-			$xmlrpcs_errmsg = 'No default category found for requested blog.';
-			break;
+			case 11:
+				$xmlrpcs_errmsg = 'Requested category not found in requested blog.';
+				break;
 
-		default:
-			// NULL... will use the last error.
+			case 12:
+				$xmlrpcs_errmsg = 'No default category found for requested blog.';
+				break;
+
+			case 21:
+				$xmlrpcs_errmsg = 'Invalid post title.';
+				break;
+
+			case 22:
+				$xmlrpcs_errmsg = 'Invalid post contents.';
+				break;
+
+			case 99:
+				$xmlrpcs_errmsg = 'Database error.';
+				break;
+
+			default:
+				$xmlrpcs_errmsg = 'Unknown error.';
+		}
 	}
 
 	logIO( 'ERROR: '.$xmlrpcs_errcode.' - '.$xmlrpcs_errmsg );
@@ -298,8 +317,133 @@ function xmlrpcs_resperror( $errcode = NULL )
   return new xmlrpcresp( 0, $xmlrpcs_errcode, $xmlrpcs_errmsg );
 }
 
+
+/**
+ * Create a new Item and return an XML-RPC response
+ *
+ * @param string HTML
+ * @param string HTML
+ * @param string date
+ * @param integer main category
+ * @param array of integers : extra categories
+ * @param string status
+ * @return xmlrpcmsg
+ */
+function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status )
+{
+  /**
+	 * @var User
+	 */
+	global $current_User;
+
+	global $Messages;
+	global $DB;
+
+	// CHECK HTML SANITY:
+	if( ($post_title = check_html_sanity( $post_title )) === false )
+	{
+		return xmlrpcs_resperror( 21, $Messages->get_string( 'Invalid post title, please correct these errors:', '' ) );
+	}
+	if( ($content = check_html_sanity( $content )) === false  )
+	{
+		return xmlrpcs_resperror( 22, $Messages->get_string( 'Invalid post contents, please correct these errors:', '' ) );
+	}
+
+	// INSERT NEW POST INTO DB:
+	load_class( 'items/model/_item.class.php' );
+	$edited_Item = & new Item();
+	$edited_Item->set( 'title', $post_title );
+	$edited_Item->set( 'content', $content );
+	$edited_Item->set( 'datestart', $post_date );
+	$edited_Item->set( 'main_cat_ID', $main_cat );
+	$edited_Item->set( 'extra_cat_IDs', $cat_IDs );
+	$edited_Item->set( 'status', $status);
+	$edited_Item->set( 'locale', $current_User->locale );
+	$edited_Item->set_creator_User( $current_User );
+	$edited_Item->dbinsert();
+	if( empty($edited_Item->ID) )
+	{ // DB error
+		return xmlrpcs_resperror( 99, 'Error while inserting item: '.$DB->last_error );
+	}
+	logIO( 'Posted with ID: '.$edited_Item->ID );
+
+	// Execute or schedule notifications & pings:
+	logIO( 'Handling notifications...' );
+	$edited_Item->handle_post_processing();
+
+ 	logIO( 'OK.' );
+	return new xmlrpcresp(new xmlrpcval($edited_Item->ID));
+}
+
+
+/**
+ * Edit an Item and return an XML-RPC response
+ *
+ * @param Item
+ * @param string HTML
+ * @param string HTML
+ * @param string date
+ * @param integer main category
+ * @param array of integers : extra categories
+ * @param string status
+ * @return xmlrpcmsg
+ */
+function xmlrpcs_edit_item( & $edited_Item, $post_title, $content, $post_date, $main_cat, $cat_IDs, $status )
+{
+  /**
+	 * @var User
+	 */
+	global $current_User;
+
+	global $Messages;
+	global $DB;
+
+	// CHECK HTML SANITY:
+	if( ($post_title = check_html_sanity( $post_title )) === false )
+	{
+		return xmlrpcs_resperror( 21, $Messages->get_string( 'Invalid post title, please correct these errors:', '' ) );
+	}
+	if( ($content = check_html_sanity( $content )) === false  )
+	{
+		return xmlrpcs_resperror( 22, $Messages->get_string( 'Invalid post contents, please correct these errors:', '' ) );
+	}
+
+	// UPDATE POST IN DB:
+	$edited_Item->set( 'title', $post_title );
+	$edited_Item->set( 'content', $content );
+	$edited_Item->set( 'status', $status );
+	if( !empty($post_date) )
+	{
+		$edited_Item->set( 'issue_date', $post_date );
+	}
+	if( !empty($main_cat) )
+	{ // Update cats:
+		$edited_Item->set('main_cat_ID', $main_cat);
+	}
+	if( !empty($cat_IDs) )
+	{ // Extra-Cats:
+		$edited_Item->set('extra_cat_IDs', $cat_IDs);
+	}
+	$edited_Item->dbupdate();
+	if( $DB->error )
+	{ // DB error
+		return xmlrpcs_resperror( 99, 'Error while updating item: '.$DB->last_error );
+	}
+
+	// Execute or schedule notifications & pings:
+	logIO( 'Handling notifications...' );
+	$edited_Item->handle_post_processing();
+
+	logIO( 'OK.' );
+	return new xmlrpcresp( new xmlrpcval( 1, 'boolean' ) );
+}
+
+
 /*
  * $Log$
+ * Revision 1.2  2008/01/18 15:53:42  fplanque
+ * Ninja refactoring
+ *
  * Revision 1.1  2008/01/14 07:22:07  fplanque
  * Refactoring
  *

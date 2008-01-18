@@ -414,20 +414,23 @@ class Item extends ItemLight
 			$renderers = $this->get_renderers_validated();
 		}
 
-		if( ($content = param( 'content', 'html', NULL )) !== NULL )
+		if( param( 'content', 'html', NULL ) !== NULL )
 		{
-			$post_title = param( 'post_title', 'html', NULL );
+			param( 'post_title', 'html', NULL );
 
 			// Do some optional filtering on the content
 			// Typically stuff that will help the content to validate
 			// Useful for code display.
 			// Will probably be used for validation also.
 			$Plugins_admin = & get_Cache('Plugins_admin');
-			$Plugins_admin->filter_contents( $post_title /* by ref */, $content /* by ref */, $renderers );
+			$Plugins_admin->filter_contents( $GLOBALS['post_title'] /* by ref */, $GLOBALS['content'] /* by ref */, $renderers );
 
 			// Format raw HTML input to cleaned up and validated HTML:
-			$this->set( 'title', format_to_post( $post_title ) );
-			$this->set( 'content', format_to_post( $content ) );
+			param_check_html( 'post_title', T_('Invalid title.'), '' );
+			$this->set( 'title', get_param( 'post_title' ) );
+
+			param_check_html( 'content', T_('Invalid content.') );
+			$this->set( 'content', get_param( 'content' ) );
 		}
 
 		return ! param_errors_detected();
@@ -3309,6 +3312,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.28  2008/01/18 15:53:42  fplanque
+ * Ninja refactoring
+ *
  * Revision 1.27  2008/01/17 14:38:30  fplanque
  * Item Footer template tag
  *

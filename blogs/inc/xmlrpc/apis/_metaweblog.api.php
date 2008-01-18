@@ -336,7 +336,7 @@ function mw_newpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
 	global $DB;
-	global $Settings;
+	global $Settings, $Messages;
 
 	// CHECK LOGIN:
   /**
@@ -372,6 +372,7 @@ function mw_newpost($m)
 	{ // error:
 		return $cat_IDs;	// This can be a preformatted error message
 	}
+	$main_cat = $cat_IDs[0];
 
 	// CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
 	if( ! $current_User->check_perm( 'cats_post!'.$status, 'edit', false, $cat_IDs ) )
@@ -380,46 +381,12 @@ function mw_newpost($m)
 	}
 	logIO( 'Permission granted.' );
 
-
-
+	$post_date = _mw_decode_postdate( $contentstruct, true );
 	$post_title = $contentstruct['title'];
-	//	$content = format_to_post($contentstruct['description']);
 	$content = $contentstruct['description'];
 
-	$post_date = _mw_decode_postdate( $contentstruct, true );
-
-	// CHECK and FORMAT content - error occur after this line
-	//$post_title = format_to_post($post_title, 0, 0);
-	//logIO("finished converting post_title ...",$post_title);
-
-	//$content = format_to_post($content, 0, 0);  // 25122004 tag - security !!!
-	//logIO("finished converting content ...".$content); // error occurs before this line
-
-	//	if( $errstring = $Messages->get_string( 'Cannot post, please correct these errors:', '' ) )
-	//	{
-	//		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
-	//	}
-	//logIO("finished checking if errors exists, ready to insert into DB ...");
-
-	// INSERT NEW POST INTO DB:
-	// Tor - comment this out to stop inserts into database
-	load_class( 'items/model/_item.class.php' );
-	$edited_Item = & new Item();
-
-	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $post_date, $cat_IDs[0], $cat_IDs, $status, $current_User->locale );
-
-	if( $DB->error )
-	{	// DB error
-		logIO("user error 9 ...");
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-	}
-
-	logIO( 'Handling notifications...' );
-	// Execute or schedule notifications & pings:
-	$edited_Item->handle_post_processing();
-
-	logIO( 'OK.' );
-	return new xmlrpcresp(new xmlrpcval($post_ID));
+	// COMPLETE VALIDATION & INSERT:
+	return xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status );
 }
 
 
@@ -451,7 +418,6 @@ function mw_editpost( $m )
 	global $DB;
 	global $Settings;
 	global $Messages;
-	global $xmlrpc_htmlchecking;
 
 	// CHECK LOGIN:
   /**
@@ -494,6 +460,7 @@ function mw_editpost( $m )
 		{	// Permission denied
 			return xmlrpcs_resperror( 3 );	// User error 3
 		}
+		$main_cat = NULL;
 	}
 	else
 	{
@@ -502,57 +469,20 @@ function mw_editpost( $m )
 		{	// Permission denied
 			return xmlrpcs_resperror( 3 );	// User error 3
 		}
+		$main_cat = $cat_IDs[0];
 	}
 	logIO( 'Permission granted.' );
 
 
 
 	$post_date = _mw_decode_postdate( $contentstruct, false );
-
-
 	$post_title = $contentstruct['title'];
 	$content = $contentstruct['description'];
-	logIO("finished getting title ...".$post_title);
 
 
-	if( ! empty($xmlrpc_htmlchecking) )
-	{ // CHECK and FORMAT content
-		$post_title = format_to_post($post_title, 0, 0);
-	}
-	logIO("finished converting post_title ...->".$post_title);
-	if( ! empty($xmlrpc_htmlchecking) )
-	{
-		$content = format_to_post($content, 0, 0);  // 25122004 tag - security issue - need to sort !!!
-	}
-	logIO("finished converting content ...".$content);
-	if( $errstring = $Messages->get_string( 'Cannot post, please correct these errors:', '' ) )
-	{
-		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
-	}
-	logIO("finished checking if errors exists, ready to insert into DB ...");
+	// COMPLETE VALIDATION & UPDATE:
+	return xmlrpcs_edit_item( $edited_Item, $post_title, $content, $post_date, $main_cat, $cat_IDs, $status );
 
-	// UPDATE POST IN DB:
-	$edited_Item->set( 'title', $post_title );
-	$edited_Item->set( 'content', $content );
-	$edited_Item->set( 'status', $status );
-	if(  empty($post_date) )
-	{
-		$edited_Item->set( 'issue_date', $post_date );
-	}
-	if( !empty($cat_IDs) )
-	{ // Update cats:
-		$edited_Item->set('main_cat_ID', $cat_IDs[0]);
-
-		if( count($cat_IDs) > 1 )
-		{ // Extra-Cats:
-			$edited_Item->set('extra_cat_IDs', $cat_IDs);
-		}
-	}
-	$edited_Item->dbupdate();
-	if( $DB->error )
-	{	// DB error
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-	}
 
 	/*
 	// Time to perform trackbacks NB NOT WORKING YET
@@ -589,9 +519,6 @@ function mw_editpost( $m )
 
 	}
 	*/
-
-	logIO( 'OK.' );
-	return new xmlrpcresp( new xmlrpcval( 1, 'boolean' ) );
 }
 
 
@@ -905,6 +832,9 @@ $xmlrpc_procs["metaWeblog.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/18 15:53:42  fplanque
+ * Ninja refactoring
+ *
  * Revision 1.1  2008/01/14 07:22:07  fplanque
  * Refactoring
  *
