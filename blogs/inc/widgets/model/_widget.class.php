@@ -551,7 +551,7 @@ class ComponentWidget extends DataObject
 				'orderby' => 'main_cat_ID title',
 				'order' => 'ASC',
 				'unit' => 'posts',
-			) );
+			), false ); // we don't want to memorise these params
 
 		// Run the query:
 		$LinkblogList->query();
@@ -723,6 +723,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2008/01/19 14:17:27  yabs
+ * bugfix : http://forums.b2evolution.net/viewtopic.php?t=13868
+ *
  * Revision 1.31  2008/01/12 18:21:50  blueyed
  *  - use $timestamp_min, $timestamp_max for ItemListLight instances (fixes displaying of posts from the future in coll_post_list widget
  * - typo, todo, fix indent
