@@ -199,7 +199,7 @@ switch( $action )
 		/*
 		 * Registration disabled:
 		 */
-		require $adminskins_path.'login/_reg_disabled.php';
+		require $adminskins_path.'login/_reg_disabled.nain.php';
 
 		exit();
 }
@@ -214,6 +214,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.87  2008/01/19 14:17:00  yabs
+ * bugfix : http://forums.b2evolution.net/viewtopic.php?t=13848
+ *
  * Revision 1.86  2007/06/25 10:58:50  fplanque
  * MODULES (refactored MVC)
  *
