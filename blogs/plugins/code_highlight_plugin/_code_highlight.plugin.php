@@ -495,29 +495,6 @@ div.codeblock.amc_short table {
 	}
 
 
-	/**
-	 * Upgrade stuff for old style code posts
-	 *
-	 * @see Plugin::PluginVersionChanged()
-	 */
-	function PluginVersionChanged()
-	{
-		global $DB, $ItemCache;
-		// find any posts with the previous versions tags
-		$sql = 'select post_id
-							from T_items__item
-						 where post_content like \'%<amcode><pre>%\'';
-		$posts = $DB->get_results( $sql );
-		foreach( $posts as $post )
-		{	// loop through each post and upgrade them to the new versions tags and way of doing things
-			$Item = & $ItemCache->get_by_ID( $post->post_id );
-			$Item->set( 'content', str_replace( array( '<amcode><pre><code>', '</code></pre></amcode>', '[lt]', '[gt]', '[sq]', '[amp]' ),
-									array( '<!-- codeblock --><pre><code>', '</code></pre><!-- /codeblock -->', '&lt;', '&gt;', "'", '&amp;' ), $Item->content ) );
-			$Item->dbupdate();
-		}
-		return true;	// all done
-	}
-
 
 	/**
 	 * Formats codeblock ready for displaying
@@ -588,6 +565,9 @@ div.codeblock.amc_short table {
 
 /**
  * $Log$
+ * Revision 1.11  2008/01/19 16:13:02  yabs
+ * removed obsolete version changed function
+ *
  * Revision 1.10  2007/07/09 19:07:44  fplanque
  * minor
  *
