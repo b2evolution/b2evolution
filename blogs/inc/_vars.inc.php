@@ -226,7 +226,7 @@ $weekday_letter[5] = NT_(' F ');
 $weekday_letter[6] = NT_(' S  ');
 
 // the months
-$month['00'] = '??';	// This can happen when importing junk dates from WordPress
+$month['00'] = '\?\?';	// This can happen when importing junk dates from WordPress
 $month['01'] = NT_('January');
 $month['02'] = NT_('February');
 $month['03'] = NT_('March');
@@ -302,6 +302,9 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
 
 /*
  * $Log$
+ * Revision 1.26  2008/01/19 14:42:38  yabs
+ * bugfix : http://forums.b2evolution.net/viewtopic.php?t=13736
+ *
  * Revision 1.25  2007/12/28 02:07:29  fplanque
  * no message
  *
