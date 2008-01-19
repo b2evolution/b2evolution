@@ -14,6 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $cookie_name, $cookie_email, $cookie_url;
 global $comment_allowed_tags, $comments_use_autobr;
+global $comment_cookies, $comment_allow_msgform;
 
 // Default params:
 $params = array_merge( array(
@@ -141,12 +142,12 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	if( ! is_logged_in() )
 	{ // User is not logged in:
 		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_cookies" tabindex="7"'
-													.' checked="checked" value="1" /> '.T_('Remember me').'</label>'
+													.( $comment_cookies ? ' checked="checked"' : '' ).' value="1" /> '.T_('Remember me').'</label>'
 													.' <span class="note">('.T_('Name, email &amp; website').')</span>';
 		// TODO: If we got info from cookies, Add a link called "Forget me now!" (without posting a comment).
 
 		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_allow_msgform" tabindex="8"'
-													.' checked="checked" value="1" /> '.T_('Allow message form').'</label>'
+													.( $comment_allow_msgform ? ' checked="checked"' : '' ).' value="1" /> '.T_('Allow message form').'</label>'
 													.' <span class="note">('.T_('Allow users to contact you through a message form (your email will <strong>not</strong> be revealed.').')</span>';
 		// TODO: If we have an email in a cookie, Add links called "Add a contact icon to all my previous comments" and "Remove contact icon from all my previous comments".
 	}
@@ -183,6 +184,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/19 14:53:06  yabs
+ * bugfix : checkboxes remember settings after preview
+ *
  * Revision 1.1  2007/12/22 16:41:05  fplanque
  * Modular feedback template.
  *
