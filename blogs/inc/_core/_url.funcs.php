@@ -39,23 +39,21 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * @param string Url to validate
  * @param string
- * @param boolean Must the URL be absolute?
- * @param boolean Return verbose error message? (Should get only used in the backoffice)
+ * @param boolean also do an antispam check on the url
  * @return mixed false (which means OK) or error message
  */
-function validate_url( $url, $context = 'posting', $absolute = false, $verbose = false )
+function validate_url( $url, $context = 'posting', $antispam_check = true )
 {
-	global $Debuglog;
+	global $Debuglog, $debug;
 
 	if( empty($url) )
 	{ // Empty URL, no problem
 		return false;
 	}
 
+	$verbose = $debug || $context != 'commenting';
+
 	// Validate URL structure
-	// fp> NOTE: I made this much more laxist than it used to be.
-	// fp> If it turns out I blocked something that was previously allowed, it's a mistake.
-	//
 	if( preg_match( '~^\w+:~', $url ) )
 	{ // there's a scheme and therefor an absolute URL:
 		if( substr($url, 0, 7) == 'mailto:' )
@@ -112,13 +110,6 @@ function validate_url( $url, $context = 'posting', $absolute = false, $verbose =
 				: T_('URI scheme not allowed.');
 		}
 
-		// Search for blocked URLs:
-		if( $block = antispam_check($url) )
-		{
-			return $verbose
-				? sprintf( T_('URL "%s" not allowed: blacklisted word "%s".'), htmlspecialchars($url), $block )
-				: T_('URL not allowed');
-		}
 	}
 	else
 	{ // URL is relative..
@@ -133,6 +124,17 @@ function validate_url( $url, $context = 'posting', $absolute = false, $verbose =
 			return $verbose
 				? sprintf( T_('URL "%s" must be a full path starting with "/" or an anchor starting with "#".'), htmlspecialchars($url) )
 				: T_('URL must be a full path starting with "/" or an anchor starting with "#".');
+		}
+	}
+
+
+	if( $antispam_check )
+	{	// Search for blocked keywords:
+		if( $block = antispam_check($url) )
+		{
+			return $verbose
+				? sprintf( T_('URL "%s" not allowed: blacklisted word "%s".'), htmlspecialchars($url), $block )
+				: T_('URL not allowed');
 		}
 	}
 
@@ -562,6 +564,9 @@ function disp_url( $url, $max_length = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.7  2008/01/19 18:24:24  fplanque
+ * antispam checking refactored
+ *
  * Revision 1.6  2008/01/19 15:45:28  fplanque
  * refactoring
  *

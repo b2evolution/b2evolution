@@ -108,7 +108,7 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 
 // CHECK and FORMAT content
 // TODO: AutoBR should really be a "comment renderer" (like with Items)
-$comment = format_to_post($comment, $comment_autobr, 1);
+$comment = format_to_post( $comment, $comment_autobr, 1 ); // includes antispam
 
 
 if( ! $User )
@@ -158,10 +158,6 @@ if( ! $User )
 if( empty($comment) )
 { // comment should not be empty!
 	$Messages->add( T_('Please do not send empty comments.'), 'error' );
-}
-elseif( antispam_check( strip_tags($comment) ) )
-{
-	$Messages->add( T_('Supplied comment is invalid.'), 'error' );
 }
 
 // Flood protection was here and SHOULD NOT have moved down!
@@ -374,6 +370,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.119  2008/01/19 18:24:25  fplanque
+ * antispam checking refactored
+ *
  * Revision 1.118  2008/01/19 15:45:29  fplanque
  * refactoring
  *

@@ -143,14 +143,10 @@ if( ! empty($title) )
 }
 $comment .= $excerpt;
 
-$comment = format_to_post( $comment, 1, 1 );
+$comment = format_to_post( $comment, 1, 1 ); // includes antispam
 if( empty($comment) )
 { // comment should not be empty!
 	$Messages->add( T_('Please do not send empty comment'), 'error' );
-}
-elseif( antispam_check( strip_tags($comment) ) )
-{
-	$Messages->add( T_('Supplied comment is invalid'), 'error' );
 }
 
 
@@ -211,6 +207,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.62  2008/01/19 18:24:25  fplanque
+ * antispam checking refactored
+ *
  * Revision 1.61  2008/01/19 15:45:29  fplanque
  * refactoring
  *

@@ -261,15 +261,17 @@ class SafeHtmlChecker
 			{
 				$this->html_error( sprintf( T_('Tag &lt;%s&gt; may not have attribute %s="..."'), '<code>'.$tag.'</code>', '<code>'.$attr.'</code>' ) );
 			}
+
 			if (in_array($attr, $this->uri_attrs))
-			{ // Must this attribute be checked for URIs
+			{ // This attribute must be checked for URIs
 				$matches = array();
 				$value = trim($value);
-				if( $error = validate_url( $value, $this->context, $debug ) )
+				if( $error = validate_url( $value, $this->context, false ) ) // Do not check for spam here, should be done on whole message
 				{
 					$this->html_error( T_('Found invalid URL: ').$error );
 				}
 			}
+
 		}
 		// Set previous, used for checking nesting context rules
 		$this->stack[] = $tag;
@@ -326,6 +328,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.6  2008/01/19 18:24:25  fplanque
+ * antispam checking refactored
+ *
  * Revision 1.5  2008/01/19 15:45:28  fplanque
  * refactoring
  *

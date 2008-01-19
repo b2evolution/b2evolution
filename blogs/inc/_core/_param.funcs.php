@@ -1555,6 +1555,7 @@ function param_check_html( $var, $err_msg = '#', $field_err_msg = '#' )
 	return $altered_html;
 }
 
+
 /**
  * DEPRECATED Stub for plugin compatibility:
  */
@@ -1575,6 +1576,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
  * Check raw HTML input for different levels of sanity including:
  * - XHTML validation
  * - Javascript injection
+ * - antispam
  *
  * Also cleans up the content on some levels:
  * - trimming
@@ -1594,7 +1596,7 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 {
 	global $use_balanceTags;
 	global $io_charset, $use_xhtmlvalidation_for_comments, $comment_allowed_tags;
-	global $posts_allow_css_tweaks;
+	global $posts_allow_css_tweaks, $comments_allow_css_tweaks, $posts_allow_javascript;
 	global $Messages;
 
 	/**
@@ -1629,6 +1631,15 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 
 	// Replace any & that is not a character or entity reference with &amp;
 	$content = preg_replace( '/&(?!#[0-9]+;|#x[0-9a-fA-F]+;|[a-zA-Z_:][a-zA-Z0-9._:-]*;)/', '&amp;', $content );
+
+	// Do an antispam check:
+	if( $block = antispam_check($content) )
+	{
+		$Messages->add( ($context == 'commenting')
+			? T_('Illegal content found (spam?)')
+			: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;'), htmlspecialchars($block) ) );
+		$error = true;
+	}
 
 	if( $autobr )
 	{ // Auto <br />:
@@ -1670,8 +1681,9 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 		$check = str_replace('<!', '<', $check);
 		// # # are delimiters
 		// i modifier at the end means caseless
-		$matches = array();
+
 		// onclick= etc...
+		$matches = array();
 		if( preg_match ('#\s(on[a-z]+)\s*=#i', $check, $matches)
 			// action=, background=, cite=, classid=, codebase=, data=, href=, longdesc=, profile=, src=
 			// usemap=
@@ -1681,6 +1693,7 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 			$Messages->add( T_('Illegal markup found: ').htmlspecialchars($matches[1]), 'error' );
 			$error = true;
 		}
+
 		// Styling restictions:
 		$matches = array();
 		if( ! $allow_css_tweaks
@@ -1814,6 +1827,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.10  2008/01/19 18:24:24  fplanque
+ * antispam checking refactored
+ *
  * Revision 1.9  2008/01/19 15:45:28  fplanque
  * refactoring
  *
