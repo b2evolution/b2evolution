@@ -17,6 +17,7 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 /**
  * @todo fp> This MIGHT be overkill. check...
+ *       dh> It IS overkill! (e.g. creating $Session, $Hit, etc)
  */
 require_once $inc_path .'_main.inc.php';
 
@@ -202,6 +203,9 @@ if( ! $is_cli )
 
 /*
  * $Log$
+ * Revision 1.15  2008/01/19 17:27:06  blueyed
+ * todo
+ *
  * Revision 1.14  2007/06/25 10:58:48  fplanque
  * MODULES (refactored MVC)
  *
