@@ -84,124 +84,127 @@ $comments_allow_css_tweaks = false;
  */
 if( $posts_allow_script_tags )
 {
-	define( 'E_script_tags', 'script noscript' );
+	$E_script_tags = 'script noscript';
 }
 else
 {
-	define( 'E_script_tags', '' );
+	$E_script_tags = '';
+}
+
+if( $use_strict )
+{ // Strict
+	$E_special_pre = 'br span bdo';
+	$E_special = $E_special_pre.' img '.$E_script_tags;
+}
+else
+{ // Transitional
+	$E_special_extra = 'img';
+	$E_special_basic = 'br span bdo';
+	$E_special = $E_special_basic.' '.$E_special_extra.' '.$E_script_tags;
 }
 
 if( $use_strict )
 {
-	define('E_special_pre', 'br span bdo');			// Strict
-	define('E_special', E_special_pre.' img '.E_script_tags);		// Strict
+	$E_fontstyle = 'tt i b big small';				// Strict
 }
 else
 {
-	define('E_special_extra', 'img' );							// Transitional
-	define('E_special_basic', 'br span bdo' );			// Transitional
-	define('E_special', E_special_basic.' '.E_special_extra.' '.E_script_tags );	// Transitional
+	$E_fontstyle_extra = 'big small font';			// Transitional
+	$E_fontstyle_basic = 'tt i b u s strike';	// Transitional
+	$E_fontstyle = $E_fontstyle_basic.' '.$E_fontstyle_extra;	// Transitional
 }
 
 if( $use_strict )
 {
-	define('E_fontstyle', 'tt i b big small');				// Strict
+	$E_phrase = 'em strong dfn code q samp kbd var cite abbr acronym sub sup'; // Strict
 }
 else
 {
-	define('E_fontstyle_extra', 'big small font' );			// Transitional
-	define('E_fontstyle_basic', 'tt i b u s strike' );	// Transitional
-	define('E_fontstyle', E_fontstyle_basic.' '.E_fontstyle_extra );	// Transitional
+	$E_phrase_extra = 'sub sup'; 																							// Transitional
+	$E_phrase_basic = 'em strong dfn code q samp kbd var cite abbr acronym';	// Transitional
+	$E_phrase = $E_phrase_basic.' '.$E_phrase_extra; 													// Transitional
+}
+
+$E_misc_inline = 'ins del';
+$E_misc = $E_misc_inline;
+$E_inline = 'a '.$E_special.' '.$E_fontstyle.' '.$E_phrase;
+$E_Iinline = '#PCDATA '.$E_inline.' '.$E_misc_inline;
+$E_heading = 'h1 h2 h3 h4 h5 h6';
+
+if( $use_strict )
+{
+	$E_list = 'ul ol dl';				// Strict
+}
+else
+{
+	$E_list = 'ul ol dl menu dir';	// Transitional
 }
 
 if( $use_strict )
 {
-	define('E_phrase', 'em strong dfn code q samp kbd var cite abbr acronym sub sup'); // Strict
+	$E_blocktext = 'pre hr blockquote address';			// Strict
 }
 else
 {
-	define('E_phrase_extra', 'sub sup'); 																							// Transitional
-	define('E_phrase_basic', 'em strong dfn code q samp kbd var cite abbr acronym');	// Transitional
-	define('E_phrase', E_phrase_basic.' '.E_phrase_extra ); 													// Transitional
-}
-
-define('E_misc_inline', 'ins del');
-define('E_misc', E_misc_inline);
-define('E_inline', 'a '.E_special.' '.E_fontstyle.' '.E_phrase );
-define('E_Iinline', '#PCDATA '.E_inline.' '.E_misc_inline );
-define('E_heading', 'h1 h2 h3 h4 h5 h6');
-
-if( $use_strict )
-{
-	define('E_list', 'ul ol dl');				// Strict
-}
-else
-{
-	define('E_list', 'ul ol dl menu dir');	// Transitional
-}
-
-if( $use_strict )
-{
-	define('E_blocktext', 'pre hr blockquote address');			// Strict
-}
-else
-{
-	define('E_blocktext', 'pre hr blockquote address center');	// Transitional
+	$E_blocktext = 'pre hr blockquote address center';	// Transitional
 }
 
 if( $posts_allow_iframes )
 {
-	define('E_block', 'p '.E_heading.' div '.E_list.' '.E_blocktext.' fieldset table iframe');
+	$E_block = 'p '.$E_heading.' div '.$E_list.' '.$E_blocktext.' fieldset table iframe';
 }
 else
 {
-	define('E_block', 'p '.E_heading.' div '.E_list.' '.E_blocktext.' fieldset table');
+	$E_block = 'p '.$E_heading.' div '.$E_list.' '.$E_blocktext.' fieldset table';
 }
-
-if( $use_strict ) define('E_Bblock', E_block.' '.E_misc );			// Strict only
-
-if( $posts_allow_objects )
-{
-	define('E_Flow', '#PCDATA '.E_block.' '.E_inline.' '.E_misc.' object' );
-}
-else
-{
-	define('E_Flow', '#PCDATA '.E_block.' '.E_inline.' '.E_misc );
-}
-define('E_a_content', '#PCDATA '.E_special.' '.E_fontstyle.' '.E_phrase.' '.E_misc_inline );
 
 if( $use_strict )
 {
-	define('E_pre_content', '#PCDATA a '.E_fontstyle.' '.E_phrase.' '.E_special_pre.' '.E_misc_inline ); // Strict
+	$E_Bblock = $E_block.' '.$E_misc;			// Strict only
+}
+
+if( $posts_allow_objects )
+{
+	$E_Flow = '#PCDATA '.$E_block.' '.$E_inline.' '.$E_misc.' object';
 }
 else
 {
-	define('E_pre_content', '#PCDATA a '.E_special_basic.' '.E_fontstyle_basic.' '.E_phrase_basic.' '.E_misc_inline ); // Transitional
+	$E_Flow = '#PCDATA '.$E_block.' '.$E_inline.' '.$E_misc ;
+}
+$E_a_content = '#PCDATA '.$E_special.' '.$E_fontstyle.' '.$E_phrase.' '.$E_misc_inline;
+
+if( $use_strict )
+{
+	$E_pre_content = '#PCDATA a '.$E_fontstyle.' '.$E_phrase.' '.$E_special_pre.' '.$E_misc_inline; // Strict
+}
+else
+{
+	$E_pre_content = '#PCDATA a '.$E_special_basic.' '.$E_fontstyle_basic.' '.$E_phrase_basic.' '.$E_misc_inline; // Transitional
 }
 
 // Allowed Attribute classes
-define('A_coreattrs', 'class title'.( $posts_allow_css_tweaks ? ' id style' : '' )
-					.( $posts_allow_javascript ? ' onmouseover onmouseout onclick' : '' )  );
-define('A_i18n', 'lang xml:lang dir');
-define('A_attrs', A_coreattrs.' '.A_i18n);
+$A_coreattrs = 'class title'.( $posts_allow_css_tweaks ? ' id style' : '' )
+					.( $posts_allow_javascript ? ' onmouseover onmouseout onclick' : '' );
+$A_i18n = 'lang xml:lang dir';
+$A_attrs = $A_coreattrs.' '.$A_i18n;
 
-if( !$use_strict ) define('A_TextAlign', 'align');									// Transitional only
+if( !$use_strict ) $A_TextAlign = 'align';									// Transitional only
 
-define('A_cellhalign', 'align char charoff');
-define('A_cellvalign', 'valign');
+$A_cellhalign = 'align char charoff';
+$A_cellvalign = 'valign';
 
 // Array showing what tags are allowed and what their allowed subtags are.
 $allowed_tags = array
 (
-	'body' => E_Flow, // Remember this is not a true body, just a post body
-	'div' => E_Flow,
-	'p' => E_Iinline,
-	'h1' => E_Iinline,
-	'h2' => E_Iinline,
-	'h3' => E_Iinline,
-	'h4' => E_Iinline,
-	'h5' => E_Iinline,
-	'h6' => E_Iinline,
+	'body' => $E_Flow, // Remember this is not a true body, just a post body
+	'div' => $E_Flow,
+	'p' => $E_Iinline,
+	'h1' => $E_Iinline,
+	'h2' => $E_Iinline,
+	'h3' => $E_Iinline,
+	'h4' => $E_Iinline,
+	'h5' => $E_Iinline,
+	'h6' => $E_Iinline,
 	'ul' => 'li',
 	'ol' => 'li',
 );
@@ -217,102 +220,102 @@ if( !$use_strict )
 
 $allowed_tags += array
 (
-	'li' => E_Flow,
+	'li' => $E_Flow,
 	'dl' => 'dt dd',
-	'dt' => E_Iinline,
-	'dd' => E_Flow,
+	'dt' => $E_Iinline,
+	'dd' => $E_Flow,
 );
 
 if( $use_strict )
 {
 	$allowed_tags += array
 	(
-		'address' => E_Iinline,														// Strict
+		'address' => $E_Iinline,														// Strict
 	);
 }
 else
 {
 	$allowed_tags += array
 	(
-		'address' => '#PCDATA '.E_inline.' '.E_misc_inline,		// Transitional
+		'address' => '#PCDATA '.$E_inline.' '.$E_misc_inline,		// Transitional
 	);
 }
 
 $allowed_tags += array
 	(
 		'hr' => '',
-		'pre' => E_pre_content,
+		'pre' => $E_pre_content,
 	);
 
 if( $use_strict )
 {
 	$allowed_tags += array
 	(
-		'blockquote' => E_Bblock,		// Strict
+		'blockquote' => $E_Bblock,		// Strict
 	);
 }
 else
 {
 	$allowed_tags += array
 	(
-		'blockquote' => E_Flow,					// Transitional
-		'center' => E_Flow,					// Transitional only
+		'blockquote' => $E_Flow,					// Transitional
+		'center' => $E_Flow,					// Transitional only
 	);
 }
 
 $allowed_tags += array
 (
-	'ins' => E_Flow,
-	'del' => E_Flow,
-	'a' => E_a_content,
-	'span' => E_Iinline,
-	'bdo' => E_Iinline,
+	'ins' => $E_Flow,
+	'del' => $E_Flow,
+	'a' => $E_a_content,
+	'span' => $E_Iinline,
+	'bdo' => $E_Iinline,
 	'br' => '',
-	'em' => E_Iinline,
-	'strong' => E_Iinline,
-	'dfn' => E_Iinline,
-	'code' => E_Iinline,
-	'samp' => E_Iinline,
-	'kbd' => E_Iinline,
-	'var' => E_Iinline,
-	'cite' => E_Iinline,
-	'abbr' => E_Iinline,
-	'acronym' => E_Iinline,
-	'q' => E_Iinline,
-	'sub' => E_Iinline,
-	'sup' => E_Iinline,
-	'tt' => E_Iinline,
-	'i' => E_Iinline,
-	'b' => E_Iinline,
-	'big' => E_Iinline,
-	'small' => E_Iinline,
+	'em' => $E_Iinline,
+	'strong' => $E_Iinline,
+	'dfn' => $E_Iinline,
+	'code' => $E_Iinline,
+	'samp' => $E_Iinline,
+	'kbd' => $E_Iinline,
+	'var' => $E_Iinline,
+	'cite' => $E_Iinline,
+	'abbr' => $E_Iinline,
+	'acronym' => $E_Iinline,
+	'q' => $E_Iinline,
+	'sub' => $E_Iinline,
+	'sup' => $E_Iinline,
+	'tt' => $E_Iinline,
+	'i' => $E_Iinline,
+	'b' => $E_Iinline,
+	'big' => $E_Iinline,
+	'small' => $E_Iinline,
 );
 
 if( !$use_strict )
 {
 	$allowed_tags += array
 	(
-		'u' => E_Iinline,						// Transitional only
-		's' => E_Iinline,						// Transitional only
-		'strike' => E_Iinline,			// Transitional only
-		'font' => E_Iinline,				// Transitional only
+		'u' => $E_Iinline,						// Transitional only
+		's' => $E_Iinline,						// Transitional only
+		'strike' => $E_Iinline,			// Transitional only
+		'font' => $E_Iinline,				// Transitional only
 	);
 }
 
 $allowed_tags += array
 (
 	'img' => '',
-	'fieldset' => '#PCDATA legend '.E_block.' '.E_inline.' '.E_misc,
-	'legend' => E_Iinline,
+	'fieldset' => '#PCDATA legend '.$E_block.' '.$E_inline.' '.$E_misc,
+	'legend' => $E_Iinline,
 	'table' => 'caption col colgroup thead tfoot tbody tr',
-	'caption' => E_Iinline,
+	'caption' => $E_Iinline,
 	'thead' => 'tr',
 	'tfoot' => 'tr',
 	'tbody' => 'tr',
 	'colgroup' => 'col',
 	'tr' => 'th td',
-	'th' => E_Flow,
-	'td' => E_Flow,
+	'th' => $E_Flow,
+	'td' => $E_Flow,
 );
 
 if( $posts_allow_script_tags )
@@ -320,7 +323,7 @@ if( $posts_allow_script_tags )
 	$allowed_tags += array
 	(
 		'script' => '#PCDATA',
-		'noscript' => E_Flow,
+		'noscript' => $E_Flow,
 	);
 }
 
@@ -329,104 +332,104 @@ if( $use_strict )
 {
 	$allowed_attributes = array
 	(
-		'div' => A_attrs,								// Strict
-		'p' => A_attrs,								// Strict
-		'h1' => A_attrs,								// Strict
-		'h2' => A_attrs,								// Strict
-		'h3' => A_attrs,								// Strict
-		'h4' => A_attrs,								// Strict
-		'h5' => A_attrs,								// Strict
-		'h6' => A_attrs,								// Strict
-		'ul' => A_attrs,	// Strict
-		'ol' => A_attrs,	// Strict
-		'li' => A_attrs,							// Strict
-		'dl' => A_attrs,					// Strict
-		'hr' => A_attrs,															// Strict
-		'pre' => A_attrs.' xml:space',								// Strict
-		'a' => A_attrs.' charset type href hreflang rel rev shape coords',			// Strict
-		'br' => A_coreattrs,				// Strict
-		'img' => A_attrs.' src alt longdesc height width usemap ismap',	// Strict
-		'legend' => A_attrs,							// Strict
-		'table' => A_attrs.' summary width border frame rules cellspacing cellpadding',  // Strict
-		'caption' => A_attrs,						// Strict
-		'tr' => A_attrs.' '.A_cellhalign.' '.A_cellvalign,	// Strict
-		'th' => A_attrs.' abbr axis headers scope rowspan colspan '.A_cellhalign.' '.A_cellvalign,	// Strict
-		'td' => A_attrs.' abbr axis headers scope rowspan colspan '.A_cellhalign.' '.A_cellvalign,	// Strict
+		'div' => $A_attrs,								// Strict
+		'p' => $A_attrs,								// Strict
+		'h1' => $A_attrs,								// Strict
+		'h2' => $A_attrs,								// Strict
+		'h3' => $A_attrs,								// Strict
+		'h4' => $A_attrs,								// Strict
+		'h5' => $A_attrs,								// Strict
+		'h6' => $A_attrs,								// Strict
+		'ul' => $A_attrs,	// Strict
+		'ol' => $A_attrs,	// Strict
+		'li' => $A_attrs,							// Strict
+		'dl' => $A_attrs,					// Strict
+		'hr' => $A_attrs,															// Strict
+		'pre' => $A_attrs.' xml:space',								// Strict
+		'a' => $A_attrs.' charset type href hreflang rel rev shape coords',			// Strict
+		'br' => $A_coreattrs,				// Strict
+		'img' => $A_attrs.' src alt longdesc height width usemap ismap',	// Strict
+		'legend' => $A_attrs,							// Strict
+		'table' => $A_attrs.' summary width border frame rules cellspacing cellpadding',  // Strict
+		'caption' => $A_attrs,						// Strict
+		'tr' => $A_attrs.' '.$A_cellhalign.' '.$A_cellvalign,	// Strict
+		'th' => $A_attrs.' abbr axis headers scope rowspan colspan '.$A_cellhalign.' '.$A_cellvalign,	// Strict
+		'td' => $A_attrs.' abbr axis headers scope rowspan colspan '.$A_cellhalign.' '.$A_cellvalign,	// Strict
 	);
 }
 else
 {
 	$allowed_attributes = array
 	(
-		'div' => A_attrs.' '.A_TextAlign,		// Transitional
-		'p' => A_attrs.' '.A_TextAlign,		// Transitional
-		'h1' => A_attrs.' '.A_TextAlign,		// Transitional
-		'h2' => A_attrs.' '.A_TextAlign,		// Transitional
-		'h3' => A_attrs.' '.A_TextAlign,		// Transitional
-		'h4' => A_attrs.' '.A_TextAlign,		// Transitional
-		'h5' => A_attrs.' '.A_TextAlign,		// Transitional
-		'h6' => A_attrs.' '.A_TextAlign,		// Transitional
-		'ul' => A_attrs.' type compact',	// Transitional
-		'ol' => A_attrs.' type compact start',	// Transitional
-		'menu' => A_attrs.' compact',	// Transitional only
-		'dir' => A_attrs.' compact',	// Transitional only
-		'li' => A_attrs.' type value',	// Transitional
-		'dl' => A_attrs.' compact',	// Transitional
-		'hr' => A_attrs.' align noshade size width',		// Transitional
-		'pre' => A_attrs.' width xml:space',						// Transitional
-		'center' => A_attrs,					// Transitional only
-		'a' => A_attrs.' charset type href hreflang rel rev shape coords target',	// Transitional
-		'br' => A_coreattrs.' clear',	// Transitional
-		'u' => A_attrs,						// Transitional only
-		's' => A_attrs,						// Transitional only
-		'strike' => A_attrs,			// Transitional only
-		'font' => A_coreattrs.' '.A_i18n.' size color face',	// Transitional only
-		'img' => A_attrs.' src alt name longdesc height width usemap ismap align border hspace vspace',	// Transitional
-		'legend' => A_attrs.' align',				// Transitional
-		'table' => A_attrs.' summary width border frame rules cellspacing cellpadding align bgcolor',								// Transitional
-		'caption' => A_attrs.' align',																								// Transitional
-		'tr' => A_attrs.' '.A_cellhalign.' '.A_cellvalign.' bgcolor',																// Transitional
-		'th' => A_attrs.' abbr axis headers scope rowspan colspan '.A_cellhalign.' '.A_cellvalign.' nowrap bgcolor width height',	// Transitional
-		'td' => A_attrs.' abbr axis headers scope rowspan colspan '.A_cellhalign.' '.A_cellvalign.' nowrap bgcolor width height',	// Transitional
+		'div' => $A_attrs.' '.$A_TextAlign,		// Transitional
+		'p' => $A_attrs.' '.$A_TextAlign,		// Transitional
+		'h1' => $A_attrs.' '.$A_TextAlign,		// Transitional
+		'h2' => $A_attrs.' '.$A_TextAlign,		// Transitional
+		'h3' => $A_attrs.' '.$A_TextAlign,		// Transitional
+		'h4' => $A_attrs.' '.$A_TextAlign,		// Transitional
+		'h5' => $A_attrs.' '.$A_TextAlign,		// Transitional
+		'h6' => $A_attrs.' '.$A_TextAlign,		// Transitional
+		'ul' => $A_attrs.' type compact',	// Transitional
+		'ol' => $A_attrs.' type compact start',	// Transitional
+		'menu' => $A_attrs.' compact',	// Transitional only
+		'dir' => $A_attrs.' compact',	// Transitional only
+		'li' => $A_attrs.' type value',	// Transitional
+		'dl' => $A_attrs.' compact',	// Transitional
+		'hr' => $A_attrs.' align noshade size width',		// Transitional
+		'pre' => $A_attrs.' width xml:space',						// Transitional
+		'center' => $A_attrs,					// Transitional only
+		'a' => $A_attrs.' charset type href hreflang rel rev shape coords target',	// Transitional
+		'br' => $A_coreattrs.' clear',	// Transitional
+		'u' => $A_attrs,						// Transitional only
+		's' => $A_attrs,						// Transitional only
+		'strike' => $A_attrs,			// Transitional only
+		'font' => $A_coreattrs.' '.$A_i18n.' size color face',	// Transitional only
+		'img' => $A_attrs.' src alt name longdesc height width usemap ismap align border hspace vspace',	// Transitional
+		'legend' => $A_attrs.' align',				// Transitional
+		'table' => $A_attrs.' summary width border frame rules cellspacing cellpadding align bgcolor',								// Transitional
+		'caption' => $A_attrs.' align',																								// Transitional
+		'tr' => $A_attrs.' '.$A_cellhalign.' '.$A_cellvalign.' bgcolor',																// Transitional
+		'th' => $A_attrs.' abbr axis headers scope rowspan colspan '.$A_cellhalign.' '.$A_cellvalign.' nowrap bgcolor width height',	// Transitional
+		'td' => $A_attrs.' abbr axis headers scope rowspan colspan '.$A_cellhalign.' '.$A_cellvalign.' nowrap bgcolor width height',	// Transitional
 	);
 }
 $allowed_attributes += array
 (
-	'fieldset' => A_attrs,
+	'fieldset' => $A_attrs,
 
-	'ins' => A_attrs.' cite datetime',
-	'del' => A_attrs.' cite datetime',
-	'blockquote' => A_attrs.' cite',
-	'span' => A_attrs,
-	'bdo' => A_coreattrs.' lang xml:lang dir',
-	'dt' => A_attrs,
-	'dd' => A_attrs,
+	'ins' => $A_attrs.' cite datetime',
+	'del' => $A_attrs.' cite datetime',
+	'blockquote' => $A_attrs.' cite',
+	'span' => $A_attrs,
+	'bdo' => $A_coreattrs.' lang xml:lang dir',
+	'dt' => $A_attrs,
+	'dd' => $A_attrs,
 
-	'address' => A_attrs,
+	'address' => $A_attrs,
 
-	'em' => A_attrs,
-	'strong' => A_attrs,
-	'dfn' => A_attrs,
-	'code' => A_attrs,
-	'samp' => A_attrs,
-	'kbd' => A_attrs,
-	'var' => A_attrs,
-	'cite' => A_attrs,
-	'abbr' => A_attrs,
-	'acronym' => A_attrs,
-	'q' => A_attrs.' cite',
-	'sub' => A_attrs,
-	'sup' => A_attrs,
-	'tt' => A_attrs,
-	'i' => A_attrs,
-	'b' => A_attrs,
-	'big' => A_attrs,
-	'small' => A_attrs,
-	'colgroup' => A_attrs.' span width cellhalign cellvalign',
-	'col' => A_attrs.' span width cellhalign cellvalign',
-	'thead' => A_attrs.' '.A_cellhalign.' '.A_cellvalign,
-	'tfoot' => A_attrs.' '.A_cellhalign.' '.A_cellvalign,
-	'tbody' => A_attrs.' '.A_cellhalign.' '.A_cellvalign,
+	'em' => $A_attrs,
+	'strong' => $A_attrs,
+	'dfn' => $A_attrs,
+	'code' => $A_attrs,
+	'samp' => $A_attrs,
+	'kbd' => $A_attrs,
+	'var' => $A_attrs,
+	'cite' => $A_attrs,
+	'abbr' => $A_attrs,
+	'acronym' => $A_attrs,
+	'q' => $A_attrs.' cite',
+	'sub' => $A_attrs,
+	'sup' => $A_attrs,
+	'tt' => $A_attrs,
+	'i' => $A_attrs,
+	'b' => $A_attrs,
+	'big' => $A_attrs,
+	'small' => $A_attrs,
+	'colgroup' => $A_attrs.' span width cellhalign cellvalign',
+	'col' => $A_attrs.' span width cellhalign cellvalign',
+	'thead' => $A_attrs.' '.$A_cellhalign.' '.$A_cellvalign,
+	'tfoot' => $A_attrs.' '.$A_cellhalign.' '.$A_cellvalign,
+	'tbody' => $A_attrs.' '.$A_cellhalign.' '.$A_cellvalign,
 
 );
 
@@ -466,7 +469,7 @@ if( $posts_allow_iframes )
 	);
 	$allowed_attributes += array
 	(
- 		'iframe' => A_attrs.' '.A_TextAlign.' src width height frameborder marginwidth marginheight scrolling',		// Transitional
+ 		'iframe' => $A_attrs.' '.$A_TextAlign.' src width height frameborder marginwidth marginheight scrolling',		// Transitional
 	);
 }
 
@@ -503,29 +506,29 @@ if( $posts_allow_objects )
 $comment_allowed_tags = '<p><ul><ol><li><dl><dt><dd><address><blockquote><ins><del><span><bdo><br><em><strong><dfn><code><samp><kdb><var><cite><abbr><acronym><q><sub><sup><tt><i><b><big><small>';
 
 // Allowed Entity classes
-define('C_E_special_pre', 'br span bdo');
-define('C_E_special', C_E_special_pre);
-define('C_E_fontstyle', 'tt i b big small');
-define('C_E_phrase', 'em strong dfn code q samp kbd var cite abbr acronym sub sup');
-define('C_E_misc_inline', 'ins del');
-define('C_E_misc', C_E_misc_inline);
-define('C_E_inline', 'a '.C_E_special.' '.C_E_fontstyle.' '.C_E_phrase );
-define('C_E_Iinline', '#PCDATA '.C_E_inline.' '.C_E_misc_inline );
-define('C_E_heading', '');
-define('C_E_list', 'ul ol dl');
-define('C_E_blocktext', 'hr blockquote address');
-define('C_E_block', 'p '.C_E_heading.' div '.C_E_list.' '.C_E_blocktext.' table');
-define('C_E_Bblock', C_E_block.' '.C_E_misc );
-define('C_E_Flow', '#PCDATA '.C_E_block.' '.C_E_inline.' '.C_E_misc );
-define('C_E_a_content', '#PCDATA '.C_E_special.' '.C_E_fontstyle.' '.C_E_phrase.' '.C_E_misc_inline );
-define('C_E_pre_content', '#PCDATA a '.C_E_fontstyle.' '.C_E_phrase.' '.C_E_special_pre.' '.C_E_misc_inline );
+$C_E_special_pre = 'br span bdo';
+$C_E_special = $C_E_special_pre;
+$C_E_fontstyle = 'tt i b big small';
+$C_E_phrase = 'em strong dfn code q samp kbd var cite abbr acronym sub sup';
+$C_E_misc_inline = 'ins del';
+$C_E_misc = $C_E_misc_inline;
+$C_E_inline = 'a '.$C_E_special.' '.$C_E_fontstyle.' '.$C_E_phrase;
+$C_E_Iinline = '#PCDATA '.$C_E_inline.' '.$C_E_misc_inline;
+$C_E_heading = '';
+$C_E_list = 'ul ol dl';
+$C_E_blocktext = 'hr blockquote address';
+$C_E_block = 'p '.$C_E_heading.' div '.$C_E_list.' '.$C_E_blocktext.' table';
+$C_E_Bblock = $C_E_block.' '.$C_E_misc;
+$C_E_Flow = '#PCDATA '.$C_E_block.' '.$C_E_inline.' '.$C_E_misc;
+$C_E_a_content = '#PCDATA '.$C_E_special.' '.$C_E_fontstyle.' '.$C_E_phrase.' '.$C_E_misc_inline;
+$C_E_pre_content = '#PCDATA a '.$C_E_fontstyle.' '.$C_E_phrase.' '.$C_E_special_pre.' '.$C_E_misc_inline;
 
 // Allowed Attribute classes
-define('C_A_coreattrs', 'class title'.( $comments_allow_css_tweaks ? ' id style' : '' ) );
-define('C_A_i18n', 'lang xml:lang dir');
-define('C_A_attrs', C_A_coreattrs.' '.C_A_i18n);
-define('C_A_cellhalign', 'align char charoff');
-define('C_A_cellvalign', 'valign');
+$C_A_coreattrs = 'class title'.( $comments_allow_css_tweaks ? ' id style' : '' );
+$C_A_i18n = 'lang xml:lang dir';
+$C_A_attrs = $C_A_coreattrs.' '.$C_A_i18n;
+$C_A_cellhalign = 'align char charoff';
+$C_A_cellvalign = 'valign';
 
 /**
  * Array showing what tags are allowed and what their allowed subtags are.
@@ -533,57 +536,57 @@ define('C_A_cellvalign', 'valign');
  */
 $comments_allowed_tags = array
 (
-	'body' => E_Flow, // Remember this is not a true body, just a comment body
-	'p' => C_E_Iinline,
+	'body' => $E_Flow, // Remember this is not a true body, just a comment body
+	'p' => $C_E_Iinline,
 	'ul' => 'li',
 	'ol' => 'li',
-	'li' => C_E_Flow,
+	'li' => $C_E_Flow,
 	'dl' => 'dt dd',
-	'dt' => C_E_Iinline,
-	'dd' => C_E_Flow,
-	'address' => C_E_Iinline,
+	'dt' => $C_E_Iinline,
+	'dd' => $C_E_Flow,
+	'address' => $C_E_Iinline,
 	'hr' => '',
 );
 if( $use_strict )
 {
 	$comments_allowed_tags += array
 	(
-		'blockquote' => C_E_Bblock,		// XHTML-1.0-Strict
+		'blockquote' => $C_E_Bblock,		// XHTML-1.0-Strict
 	);
 }
 else
 {
 	$comments_allowed_tags += array
 	(
-		'blockquote' => C_E_Flow,				// XHTML-1.0-Transitional
+		'blockquote' => $C_E_Flow,				// XHTML-1.0-Transitional
 	);
 }
 $comments_allowed_tags += array
 (
-	'ins' => C_E_Flow,
-	'del' => C_E_Flow,
-//	'a' => C_E_a_content,  // Allowing this will call for a whole lot of comment spam!!!
-	'span' => C_E_Iinline,
-	'bdo' => C_E_Iinline,
+	'ins' => $C_E_Flow,
+	'del' => $C_E_Flow,
+//	'a' => $C_E_a_content,  // Allowing this will call for a whole lot of comment spam!!!
+	'span' => $C_E_Iinline,
+	'bdo' => $C_E_Iinline,
 	'br' => '',
-	'em' => C_E_Iinline,
-	'strong' => C_E_Iinline,
-	'dfn' => C_E_Iinline,
-	'code' => C_E_Iinline,
-	'samp' => C_E_Iinline,
-	'kbd' => C_E_Iinline,
-	'var' => C_E_Iinline,
-	'cite' => C_E_Iinline,
-	'abbr' => C_E_Iinline,
-	'acronym' => C_E_Iinline,
-	'q' => C_E_Iinline,
-	'sub' => C_E_Iinline,
-	'sup' => C_E_Iinline,
-	'tt' => C_E_Iinline,
-	'i' => C_E_Iinline,
-	'b' => C_E_Iinline,
-	'big' => C_E_Iinline,
-	'small' => C_E_Iinline,
+	'em' => $C_E_Iinline,
+	'strong' => $C_E_Iinline,
+	'dfn' => $C_E_Iinline,
+	'code' => $C_E_Iinline,
+	'samp' => $C_E_Iinline,
+	'kbd' => $C_E_Iinline,
+	'var' => $C_E_Iinline,
+	'cite' => $C_E_Iinline,
+	'abbr' => $C_E_Iinline,
+	'acronym' => $C_E_Iinline,
+	'q' => $C_E_Iinline,
+	'sub' => $C_E_Iinline,
+	'sup' => $C_E_Iinline,
+	'tt' => $C_E_Iinline,
+	'i' => $C_E_Iinline,
+	'b' => $C_E_Iinline,
+	'big' => $C_E_Iinline,
+	'small' => $C_E_Iinline,
 );
 
 
@@ -593,39 +596,39 @@ $comments_allowed_tags += array
  */
 $comments_allowed_attributes = array
 (
-	'p' => C_A_attrs,
-	'ul' => C_A_attrs,
-	'ol' => C_A_attrs,
-	'li' => C_A_attrs,
-	'dl' => C_A_attrs,
-	'dt' => C_A_attrs,
-	'dd' => C_A_attrs,
-	'address' => C_A_attrs,
-	'blockquote' => C_A_attrs.' cite',
-	'ins' => C_A_attrs.' cite datetime',
-	'del' => C_A_attrs.' cite datetime',
-	'a' => C_A_attrs.' charset type href hreflang rel rev shape coords',
-	'span' => C_A_attrs,
-	'bdo' => C_A_coreattrs.' lang xml:lang dir',
-	'br' => C_A_coreattrs,
-	'em' => C_A_attrs,
-	'strong' => C_A_attrs,
-	'dfn' => C_A_attrs,
-	'code' => C_A_attrs,
-	'samp' => C_A_attrs,
-	'kbd' => C_A_attrs,
-	'var' => C_A_attrs,
-	'cite' => C_A_attrs,
-	'abbr' => C_A_attrs,
-	'acronym' => C_A_attrs,
-	'q' => C_A_attrs.' cite',
-	'sub' => C_A_attrs,
-	'sup' => C_A_attrs,
-	'tt' => C_A_attrs,
-	'i' => C_A_attrs,
-	'b' => C_A_attrs,
-	'big' => C_A_attrs,
-	'small' => C_A_attrs,
+	'p' => $C_A_attrs,
+	'ul' => $C_A_attrs,
+	'ol' => $C_A_attrs,
+	'li' => $C_A_attrs,
+	'dl' => $C_A_attrs,
+	'dt' => $C_A_attrs,
+	'dd' => $C_A_attrs,
+	'address' => $C_A_attrs,
+	'blockquote' => $C_A_attrs.' cite',
+	'ins' => $C_A_attrs.' cite datetime',
+	'del' => $C_A_attrs.' cite datetime',
+	'a' => $C_A_attrs.' charset type href hreflang rel rev shape coords',
+	'span' => $C_A_attrs,
+	'bdo' => $C_A_coreattrs.' lang xml:lang dir',
+	'br' => $C_A_coreattrs,
+	'em' => $C_A_attrs,
+	'strong' => $C_A_attrs,
+	'dfn' => $C_A_attrs,
+	'code' => $C_A_attrs,
+	'samp' => $C_A_attrs,
+	'kbd' => $C_A_attrs,
+	'var' => $C_A_attrs,
+	'cite' => $C_A_attrs,
+	'abbr' => $C_A_attrs,
+	'acronym' => $C_A_attrs,
+	'q' => $C_A_attrs.' cite',
+	'sub' => $C_A_attrs,
+	'sup' => $C_A_attrs,
+	'tt' => $C_A_attrs,
+	'i' => $C_A_attrs,
+	'b' => $C_A_attrs,
+	'big' => $C_A_attrs,
+	'small' => $C_A_attrs,
 );
 
 
