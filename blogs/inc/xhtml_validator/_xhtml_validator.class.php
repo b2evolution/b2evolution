@@ -62,20 +62,60 @@ class SafeHtmlChecker
 	 *
 	 * {@internal This gets tested in _libs.misc.simpletest.php}}
 	 *
-	 * @param array
-	 * @param array
-	 * @param array
-	 * @param array
+	 * @param string
 	 * @param string Input encoding to use ('ISO-8859-1', 'UTF-8', 'US-ASCII' or '' for auto-detect)
 	 */
-	function SafeHtmlChecker( & $allowed_tags, & $allowed_attributes, & $uri_attrs, & $allowed_uri_scheme, $encoding = '', $msg_type = 'error' )
+	function SafeHtmlChecker( $context = 'posting', $encoding = NULL, $msg_type = 'error' )
 	{
-		$this->tags = & $allowed_tags;
-		$this->tagattrs = & $allowed_attributes;
-		$this->uri_attrs = & $uri_attrs;
-		$this->allowed_uri_scheme = & $allowed_uri_scheme;
+		global $inc_path;
+
+		require $inc_path.'xhtml_validator/_xhtml_dtd.inc.php';
+
+		$this->context = $context;
+
+		switch( $context )
+		{
+			case 'posting':
+			case 'xmlrpc_posting':
+				$this->tags = & $allowed_tags;
+				$this->tagattrs = & $allowed_attributes;
+				break;
+
+			case 'commenting':
+				$this->tags = & $comments_allowed_tags;
+				$this->tagattrs = & $comments_allowed_attributes;
+				break;
+
+			default:
+				debug_die( 'unknown context: '.$context );
+		}
+
+		// Attributes that need to be checked for a valid URI:
+		$this->uri_attrs = array
+		(
+			'xmlns',
+			'profile',
+			'href',
+			'src',
+			'cite',
+			'classid',
+			'codebase',
+			'data',
+			'archive',
+			'usemap',
+			'longdesc',
+			'action'
+		);
+
+		$this->allowed_uri_scheme = get_allowed_uri_schemes( $context );
+
 		$this->msg_type = $msg_type;
 
+		if( empty($encoding) )
+		{
+			global $io_charset;
+			$encoding = $io_charset;
+		}
 		$encoding = strtoupper($encoding); // we might get 'iso-8859-1' for example
 		$this->encoding = $encoding;
 		if( ! in_array( $encoding, array( 'ISO-8859-1', 'UTF-8', 'US-ASCII' ) ) )
@@ -225,7 +265,7 @@ class SafeHtmlChecker
 			{ // Must this attribute be checked for URIs
 				$matches = array();
 				$value = trim($value);
-				if( $error = validate_url( $value, $this->allowed_uri_scheme, false, $debug ) )
+				if( $error = validate_url( $value, $this->context, $debug ) )
 				{
 					$this->html_error( T_('Found invalid URL: ').$error );
 				}
@@ -286,6 +326,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/19 15:45:28  fplanque
+ * refactoring
+ *
  * Revision 1.4  2008/01/19 10:57:11  fplanque
  * Splitting XHTML checking by group and interface
  *

@@ -167,7 +167,6 @@ class Hit
 	function Hit()
 	{
 		global $Debuglog, $DB;
-		global $comments_allowed_uri_scheme;
 
 		// Get the first IP in the list of REMOTE_ADDR and HTTP_X_FORWARDED_FOR
 		$this->IP = get_ip_list( true );
@@ -255,7 +254,6 @@ class Hit
 	{
 		global $HTTP_REFERER; // might be set by PHP (give highest priority)
 		global $Debuglog;
-		global $comments_allowed_uri_scheme; // used to validate the Referer
 		global $self_referer_list, $blackList, $search_engines;  // used to detect $referer_type
 		global $skins_path;
 		global $Settings;
@@ -329,7 +327,7 @@ class Hit
 
 		// Check if the referer is valid and does not match the antispam blacklist:
 		// NOTE: requests to admin pages should not arrive here, because they should be matched above through $self_referer_list!
-		if( $error = validate_url( $this->referer, $comments_allowed_uri_scheme ) )
+		if( $error = validate_url( $this->referer, 'commenting' ) )
 		{ // This is most probably referer spam!!
 			$Debuglog->add( 'detect_referer(): '.$error.' (SPAM)', 'hit');
 			$this->referer_type = 'spam';
@@ -738,6 +736,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.4  2008/01/19 15:45:28  fplanque
+ * refactoring
+ *
  * Revision 1.3  2007/09/18 00:00:59  fplanque
  * firefox mac specific forms
  *

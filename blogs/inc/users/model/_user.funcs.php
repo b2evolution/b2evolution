@@ -450,7 +450,7 @@ function user_preferredname( $user_ID )
  */
 function profile_check_params( $params, $User = NULL )
 {
-	global $Messages, $Settings, $comments_allowed_uri_scheme;
+	global $Messages, $Settings;
 
 	foreach( $params as $k => $v )
 	{
@@ -498,7 +498,7 @@ function profile_check_params( $params, $User = NULL )
 	// Checking URL:
 	if( isset($params['url']) )
 	{
-		if( $error = validate_url( $params['url'][0], $comments_allowed_uri_scheme ) )
+		if( $error = validate_url( $params['url'][0], 'commenting' ) )
 		{
 			param_error( $params['url'][1], T_('Supplied URL is invalid: ').$error );
 		}
@@ -542,6 +542,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.6  2008/01/19 15:45:28  fplanque
+ * refactoring
+ *
  * Revision 1.5  2008/01/14 07:22:07  fplanque
  * Refactoring
  *

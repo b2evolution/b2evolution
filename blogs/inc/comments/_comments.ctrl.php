@@ -107,7 +107,7 @@ switch( $action )
 			$edited_Comment->set( 'author_url', $newcomment_author_url );
 
 			// CHECK url
-			if( $error = validate_url( $newcomment_author_url, $allowed_uri_scheme ) )
+			if( $error = validate_url( $newcomment_author_url, 'posting' ) )	// Give posting permissions here
 			{
 				$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
 			}
@@ -276,6 +276,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2008/01/19 15:45:28  fplanque
+ * refactoring
+ *
  * Revision 1.6  2008/01/18 15:53:42  fplanque
  * Ninja refactoring
  *

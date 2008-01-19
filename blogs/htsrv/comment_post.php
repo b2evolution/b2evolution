@@ -147,9 +147,9 @@ if( ! $User )
 		$url = '';
 	}
 
-	// Note: as part of the validation we require teh url to be absolute; otherwise we cannot detect bozos typing in
+	// Note: as part of the validation we require the url to be absolute; otherwise we cannot detect bozos typing in
 	// a title for their comment or whatever...
-	if( $error = validate_url( $url, $comments_allowed_uri_scheme, true ) )
+	if( $error = validate_url( $url, 'commenting' ) )
 	{
 		$Messages->add( T_('Supplied website address is invalid: ').$error, 'error' );
 	}
@@ -374,6 +374,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.118  2008/01/19 15:45:29  fplanque
+ * refactoring
+ *
  * Revision 1.117  2008/01/19 10:57:11  fplanque
  * Splitting XHTML checking by group and interface
  *

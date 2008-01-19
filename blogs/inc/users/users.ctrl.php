@@ -286,7 +286,7 @@ if( !$Messages->count('error') )
 			param_check_email( 'edited_user_email', true );
 
 			param( 'edited_user_url', 'string', true );
-			param_check_url( 'edited_user_url', $comments_allowed_uri_scheme );
+			param_check_url( 'edited_user_url', 'commenting' );
 
 			param( 'edited_user_icq', 'string', true );
 			param_check_number( 'edited_user_icq', T_('The ICQ UIN can only be a number, no letters allowed.') );
@@ -831,6 +831,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/19 15:45:29  fplanque
+ * refactoring
+ *
  * Revision 1.4  2008/01/19 10:57:11  fplanque
  * Splitting XHTML checking by group and interface
  *

@@ -107,7 +107,7 @@ function antispam_delete( $string_ID )
  *           - comment/message author email
  *           - comment content
  *           - message (email) content
- *           - validate_url()
+ *           - validate_url
  *           ..and validates all this against the antispam blacklist!
  *           We should rather differentiate here more and make it pluggable!
  *
@@ -325,6 +325,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/19 15:45:28  fplanque
+ * refactoring
+ *
  * Revision 1.4  2008/01/14 07:22:06  fplanque
  * Refactoring
  *

@@ -113,7 +113,7 @@ if( $commented_Item->comment_status != 'open' )
 
 
 // CHECK content
-if( $error = validate_url( $url, $comments_allowed_uri_scheme, /* absolute: */ true ) )
+if( $error = validate_url( $url, 'commenting' ) )
 {
 	$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
 }
@@ -211,6 +211,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.61  2008/01/19 15:45:29  fplanque
+ * refactoring
+ *
  * Revision 1.60  2008/01/19 10:57:11  fplanque
  * Splitting XHTML checking by group and interface
  *

@@ -468,12 +468,12 @@ function param_check_email( $var, $required = false )
 
 /**
  * @param string param name
- * @param string error message
+ * @param string
  * @return boolean true if OK
  */
-function param_check_url( $var, & $uri_scheme )
+function param_check_url( $var, $context )
 {
-	if( $error_detail = validate_url( $GLOBALS[$var], $uri_scheme ) )
+	if( $error_detail = validate_url( $GLOBALS[$var], $context ) )
 	{
 		param_error( $var, sprintf( T_('Supplied URL is invalid. (%s)'), $error_detail ) );
 		return false;
@@ -1593,8 +1593,6 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
 function check_html_sanity( $content, $context = 'posting', $autobr = false, $encoding = NULL )
 {
 	global $use_balanceTags;
-	global $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme;
-	global $comments_allowed_tags, $comments_allowed_attributes, $comments_allowed_uri_scheme;
 	global $io_charset, $use_xhtmlvalidation_for_comments, $comment_allowed_tags;
 	global $posts_allow_css_tweaks;
 	global $Messages;
@@ -1650,30 +1648,9 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 	{ // We want to validate XHTML:
 		load_class( 'xhtml_validator/_xhtml_validator.class.php' );
 
-		if( empty($encoding) )
-		{
-			$encoding = $io_charset;
-		}
-		switch( $context )
-		{
-			case 'posting':
-			case 'xmlrpc_posting':
-				// Normal backoffice content:
-				$checker = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes,
-						$uri_attrs, $allowed_uri_scheme, $encoding );
-				break;
+		$SafeHtmlChecker = & new SafeHtmlChecker( $context, $encoding );
 
-			case 'commenting':
-				// Apply more restrictive comment rules
-				$checker = & new SafeHtmlChecker( $comments_allowed_tags, $comments_allowed_attributes,
-						$uri_attrs, $comments_allowed_uri_scheme, $encoding );
-				break;
-
-			default:
-				debug_die( 'unknown context: '.$context );
-		}
-
-		if( ! $checker->check( $content ) ) // TODO: see if we need to use convert_chars( $content, 'html' )
+		if( ! $SafeHtmlChecker->check( $content ) ) // TODO: see if we need to use convert_chars( $content, 'html' )
 		{
 			$error = true;
 		}
@@ -1837,6 +1814,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.9  2008/01/19 15:45:28  fplanque
+ * refactoring
+ *
  * Revision 1.8  2008/01/19 10:57:11  fplanque
  * Splitting XHTML checking by group and interface
  *

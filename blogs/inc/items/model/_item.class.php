@@ -332,7 +332,7 @@ class Item extends ItemLight
 	 */
 	function load_from_Request( $force_edit_date = false )
 	{
-		global $default_locale, $allowed_uri_scheme, $current_User;
+		global $default_locale, $current_User;
 
 		if( param( 'post_locale', 'string', NULL ) !== NULL ) {
 			$this->set_from_Request( 'locale' );
@@ -343,7 +343,7 @@ class Item extends ItemLight
 		}
 
 		if( param( 'post_url', 'string', NULL ) !== NULL ) {
-			param_check_url( 'post_url', $allowed_uri_scheme );
+			param_check_url( 'post_url', 'posting' );
 			$this->set_from_Request( 'url' );
 		}
 		// Note: post_url is not part of the simple form, so this message can be a little bit awkward there
@@ -3312,6 +3312,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.29  2008/01/19 15:45:28  fplanque
+ * refactoring
+ *
  * Revision 1.28  2008/01/18 15:53:42  fplanque
  * Ninja refactoring
  *

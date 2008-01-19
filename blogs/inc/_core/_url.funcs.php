@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * URL manipulation functions
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -38,12 +38,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * {@internal This function gets tested in misc.funcs.simpletest.php.}}
  *
  * @param string Url to validate
- * @param array Allowed URI schemes (see /conf/_formatting.php)
+ * @param string
  * @param boolean Must the URL be absolute?
  * @param boolean Return verbose error message? (Should get only used in the backoffice)
  * @return mixed false (which means OK) or error message
  */
-function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose = false )
+function validate_url( $url, $context = 'posting', $absolute = false, $verbose = false )
 {
 	global $Debuglog;
 
@@ -81,6 +81,11 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
 				return T_('Invalid class ID format');
 			}
 		}
+		elseif( substr($url, 0, 11) == 'javascript:' )
+		{ // javascript:
+			// Basically there could be anythign here
+			preg_match( '¤^(javascript):¤', $url, $match );
+		}
 		elseif( ! preg_match('~^           # start
 			([a-z][a-z0-9+.\-]*)             # scheme
 			://                              # authorize absolute URLs only ( // not present in clsid: -- problem? ; mailto: handled above)
@@ -98,7 +103,8 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
 		}
 
 		$scheme = strtolower($match[1]);
-		if( !in_array( $scheme, $allowed_uri_scheme ) )
+		$allowed_uri_schemes = get_allowed_uri_schemes( $context );
+		if( !in_array( $scheme, $allowed_uri_schemes ) )
 		{ // Scheme not allowed
 			$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
 			return $verbose
@@ -116,8 +122,8 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
 	}
 	else
 	{ // URL is relative..
-		if( $absolute )
-		{
+		if( $context == 'commenting' )
+		{	// We do not allow relative URLs in comments
 			return $verbose ? sprintf( T_('URL "%s" must be absolute.'), htmlspecialchars($url) ) : T_('URL must be absolute.');
 		}
 
@@ -131,6 +137,47 @@ function validate_url( $url, & $allowed_uri_scheme, $absolute = false, $verbose 
 	}
 
 	return false; // OK
+}
+
+
+/**
+ *
+ * @param string
+ * @return array
+ */
+function get_allowed_uri_schemes( $context = 'posting' )
+{
+	global $posts_allow_javascript, $posts_allow_objects;
+
+	$schemes = array(
+			'http',
+			'https',
+			'ftp',
+			'gopher',
+			'nntp',
+			'news',
+			'mailto',
+			'irc',
+			'aim',
+			'icq'
+		);
+
+	if( $context == 'commenting' )
+	{
+		return $schemes;
+	}
+
+  if( $posts_allow_javascript )
+	{
+		$schemes[] = 'javascript';
+	}
+
+	if( $posts_allow_objects )
+	{
+		$schemes[] = 'clsid';
+	}
+
+	return $schemes;
 }
 
 
@@ -515,6 +562,9 @@ function disp_url( $url, $max_length = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.6  2008/01/19 15:45:28  fplanque
+ * refactoring
+ *
  * Revision 1.5  2008/01/18 15:53:42  fplanque
  * Ninja refactoring
  *
