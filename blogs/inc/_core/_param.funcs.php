@@ -1532,7 +1532,7 @@ function param_check_html( $var, $err_msg = '#', $field_err_msg = '#' )
 {
 	global $Messages;
 
-	$altered_html = check_html_sanity( $GLOBALS[$var], false, false );
+	$altered_html = check_html_sanity( $GLOBALS[$var], 'posting' );
 
  	if( $altered_html === false )
 	{	// We have errors, do not keep sanitization attemps:
@@ -1560,7 +1560,7 @@ function param_check_html( $var, $err_msg = '#', $field_err_msg = '#' )
  */
 function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NULL )
 {
-	$ret = check_html_sanity( $content, $autobr, $is_comment, $encoding );
+	$ret = check_html_sanity( $content, ( $is_comment ? 'commenting' : 'posting' ), $autobr, $encoding );
 	if( $ret === false )
 	{	// ERROR
 		return $content;
@@ -1585,22 +1585,49 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
  * It is NOT (necessarily) safe to use the output.
  *
  * @param string The content to format
+ * @param string
  * @param integer Create automated <br /> tags?
- * @param integer Is this a comment? (Used for SafeHtmlChecker()'s URI scheme, styling restrictions)
  * @param string Encoding (used for SafeHtmlChecker() only!); defaults to $io_charset
  * @return boolean|string
  */
-function check_html_sanity( $content, $autobr = false, $apply_comment_rules = false, $encoding = NULL )
+function check_html_sanity( $content, $context = 'posting', $autobr = false, $encoding = NULL )
 {
-	global $use_balanceTags, $use_html_checker, $use_security_checker;
+	global $use_balanceTags;
 	global $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme;
 	global $comments_allowed_tags, $comments_allowed_attributes, $comments_allowed_uri_scheme;
-	global $io_charset;
+	global $io_charset, $use_xhtmlvalidation_for_comments, $comment_allowed_tags;
+	global $posts_allow_css_tweaks;
 	global $Messages;
 
-	$error = false;
+	/**
+	 * @var User
+	 */
+	global $current_User;
 
-	$content = trim( $content );
+	$Group = & $current_User->get_Group();
+
+	switch( $context )
+	{
+		case 'posting':
+			$xhtmlvalidation = ($Group->perm_xhtmlvalidation == 'always');
+			$allow_css_tweaks = $posts_allow_css_tweaks;
+			break;
+
+		case 'xmlrpc_posting':
+			$xhtmlvalidation = ($Group->perm_xhtmlvalidation_xmlrpc == 'always');
+			$allow_css_tweaks = $posts_allow_css_tweaks;
+			break;
+
+		case 'commenting':
+			$xhtmlvalidation = $use_xhtmlvalidation_for_comments;
+			$allow_css_tweaks = $comments_allow_css_tweaks;
+			break;
+
+		default:
+			debug_die( 'unknown context: '.$context );
+	}
+
+	$error = false;
 
 	// Replace any & that is not a character or entity reference with &amp;
 	$content = preg_replace( '/&(?!#[0-9]+;|#x[0-9a-fA-F]+;|[a-zA-Z_:][a-zA-Z0-9._:-]*;)/', '&amp;', $content );
@@ -1612,28 +1639,38 @@ function check_html_sanity( $content, $autobr = false, $apply_comment_rules = fa
 		$content = autobrize( $content );
 	}
 
+	$content = trim( $content );
+
 	if( $use_balanceTags )
 	{ // Auto close open tags:
 		$content = balance_tags( $content );
 	}
 
-	if( $use_html_checker )
-	{ // Check the code:
+	if( $xhtmlvalidation )
+	{ // We want to validate XHTML:
 		load_class( 'xhtml_validator/_xhtml_validator.class.php' );
 
 		if( empty($encoding) )
 		{
 			$encoding = $io_charset;
 		}
-		if( ! $apply_comment_rules )
-		{	// Normal backoffice content:
-			$checker = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes,
-					$uri_attrs, $allowed_uri_scheme, $encoding );
-		}
-		else
-		{	// Apply more restrictive comment rules
-			$checker = & new SafeHtmlChecker( $comments_allowed_tags, $comments_allowed_attributes,
-					$uri_attrs, $comments_allowed_uri_scheme, $encoding );
+		switch( $context )
+		{
+			case 'posting':
+			case 'xmlrpc_posting':
+				// Normal backoffice content:
+				$checker = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes,
+						$uri_attrs, $allowed_uri_scheme, $encoding );
+				break;
+
+			case 'commenting':
+				// Apply more restrictive comment rules
+				$checker = & new SafeHtmlChecker( $comments_allowed_tags, $comments_allowed_attributes,
+						$uri_attrs, $comments_allowed_uri_scheme, $encoding );
+				break;
+
+			default:
+				debug_die( 'unknown context: '.$context );
 		}
 
 		if( ! $checker->check( $content ) ) // TODO: see if we need to use convert_chars( $content, 'html' )
@@ -1641,9 +1678,15 @@ function check_html_sanity( $content, $autobr = false, $apply_comment_rules = fa
 			$error = true;
 		}
 	}
+	else
+	{	// We do not WANT to validate XHTML, fall back to basic security checking:
 
-	if( $use_security_checker )
-	{
+		if( $context == 'commenting' )
+		{	// DEPRECATED but still...
+			// echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);
+			$content = strip_tags( $content, $comment_allowed_tags );
+		}
+
 		// Security checking:
 		$check = $content;
 		// Open comments or '<![CDATA[' are dangerous
@@ -1663,7 +1706,8 @@ function check_html_sanity( $content, $autobr = false, $apply_comment_rules = fa
 		}
 		// Styling restictions:
 		$matches = array();
-		if( $apply_comment_rules && preg_match ('#\s(style|class|id)\s*=#i', $check, $matches) )
+		if( ! $allow_css_tweaks
+			&& preg_match ('#\s(style|class|id)\s*=#i', $check, $matches) )
 		{
 			$Messages->add( T_('Unallowed CSS markup found: ').htmlspecialchars($matches[1]), 'error' );
 			$error = true;
@@ -1699,7 +1743,7 @@ function balance_tags( $text )
 	# b2 bug fix for LOVE <3 (and other situations with '<' before a number)
 	$text = preg_replace('#<([0-9]{1})#', '&lt;$1', $text);
 
-	while( preg_match('~<(\s*/?\w+)\s*([^/>]*)/?>~', $text, $regex) )
+	while( preg_match('~<(\s*/?\w+)\s*(.*?)/?>~', $text, $regex) )
 	{
 		$newtext = $newtext . $tagqueue;
 
@@ -1715,13 +1759,15 @@ function balance_tags( $text )
 			$tag = strtolower(substr($regex[1],1));
 
 			// if too many closing tags
-			if($stacksize <= 0) {
+			if($stacksize <= 0)
+			{
 				$tag = '';
 				//or close to be safe $tag = '/' . $tag;
 			}
 			// if stacktop value = tag close value then pop
-			else if ($tagstack[$stacksize - 1] == $tag) { // found closing tag
-				$tag = '</' . $tag . '>'; // Close Tag
+			else if ($tagstack[$stacksize - 1] == $tag)
+			{ // found closing tag
+				$tag = '</'.$tag.'>'; // Close Tag
 				// Pop
 				array_pop ($tagstack);
 				$stacksize--;
@@ -1760,7 +1806,7 @@ function balance_tags( $text )
 			$attributes = $regex[2];
 			if($attributes)
 			{
-				$attributes = ' '.$attributes;
+				$attributes = ' '.trim($attributes);
 			}
 
 			$tag = '<'.$tag.$attributes.$closing;
@@ -1791,6 +1837,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.8  2008/01/19 10:57:11  fplanque
+ * Splitting XHTML checking by group and interface
+ *
  * Revision 1.7  2008/01/18 15:53:42  fplanque
  * Ninja refactoring
  *

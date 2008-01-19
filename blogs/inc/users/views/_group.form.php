@@ -68,67 +68,79 @@ $Form->hidden_ctrl();
 $Form->hidden( 'action', 'groupupdate' );
 $Form->hidden( 'grp_ID', $edited_Group->ID );
 
+$perm_none_option = array( 'none', T_('No Access') );
+$perm_view_option = array( 'view', T_('View details') );
+$perm_edit_option = array( 'edit', T_('Edit/delete all') );
+
+
 $Form->begin_fieldset( T_('General') );
+
 	$Form->text( 'edited_grp_name', $edited_Group->name, 50, T_('Name'), '', 50, 'large' );
-$Form->end_fieldset();
 
-$perm_none_option = array( 'none', '<acronym title="'.T_('No Access').'">'.T_('None').'</acronym>' );
-$perm_list_option = array( 'list', '<acronym title="'.T_('View list only').'">'.T_('List').'</acronym>' );
-$perm_view_option = array( 'view', '<acronym title="'.T_('View details').'">'.T_('View').'</acronym>' );
-$perm_add_option = array( 'add',  '<acronym title="'.T_('Add & edit/delete self created').'">'.T_('Add').'</acronym>' );
-$perm_edit_option = array( 'edit', '<acronym title="'.T_('Edit/delete all').'">'.T_('Edit').'</acronym>' );
-$standard_perm_options = array(
-							$perm_none_option,
-							$perm_list_option,
-							$perm_view_option,
-							$perm_add_option,
-							$perm_edit_option
-						);
-
-$Form->begin_fieldset( T_('Permissions for members of this group') );
-
-	if( $edited_Group->ID != 1 )
+ 	if( $edited_Group->ID != 1 )
 	{	// Groups others than #1 can be prevented from editing users
 		$Form->radio( 'edited_grp_perm_admin', $edited_Group->get('perm_admin'),
-				array(  array( 'none', T_('No Access') ),
+				array(  $perm_none_option,
 								array( 'hidden', T_('Hidden') ),
-								array( 'visible', T_('Visible link') )
-							), T_('Access to Admin area') );
+								array( 'visible', T_('Visible link') ) // TODO: this may be obsolete, especially now we have to evobar
+							), T_('Access to Admin area'), false );
 	}
 	else
 	{	// Group #1 always has user management right:
 		$Form->info( T_('Access to Admin area'), T_('Visible link') );
 	}
 
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Blogging permissions') );
+
 	$Form->radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'),
 			array(  array( 'user', T_('User permissions') ),
 							array( 'viewall', T_('View all') ),
 							array( 'editall', T_('Full Access') )
-						), T_('Blogs') );
+						), T_('Blogs'), false );
+
+	$Form->radio( 'perm_xhtmlvalidation', $edited_Group->get('perm_xhtmlvalidation'),
+			array(  array( 'always', T_('Force valid XHTML'), T_('This option will allow for the most effective security checking.') ),
+							array( 'never', T_('Disabled'), T_('Will only perform basic security checking. Only give this permission to trusted users.') )
+						), T_('XHTML validation'), true );
+
+	$Form->radio( 'perm_xhtmlvalidation_xmlrpc', $edited_Group->get('perm_xhtmlvalidation_xmlrpc'),
+			array(  array( 'always', T_('Force valid XHTML'), T_('This option will allow for the most effective security checking.') ),
+							array( 'never', T_('Disabled'), T_('Will only perform basic security checking. Only give this permission to trusted users.') )
+						), T_('XHTML validation on XML-RPC calls'), true );
+
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Additional permissions') );
 
 	$Form->radio( 'edited_grp_perm_stats', $edited_Group->get('perm_stats'),
 			array(  $perm_none_option,
-							array( 'user', T_('User blogs') ), // fp> dirty hack, I'll tie this to blog edit perm for now
-							array( 'view', T_('View all') ),
-							array( 'edit', T_('Full Access') )
-						), T_('Stats') );
-
-	$Form->radio( 'edited_grp_perm_spamblacklist', $edited_Group->get('perm_spamblacklist'),
-			array(  $perm_none_option,
-							array( 'view', T_('View only') ),
-							array( 'edit', T_('Full Access') )
-						), T_('Antispam') );
+							array( 'user', T_('View stats for specific blogs'), T_('Based on each blog\'s edit permissions') ), // fp> dirty hack, I'll tie this to blog edit perm for now
+							array( 'view', T_('View stats for all blogs') ),
+							array( 'edit', T_('Full Access'), T_('Includes deleting/reassigning of stats') )
+						), T_('Stats'), true );
 
 	// fp> todo perm check
 	$filetypes_linkstart = '<a href="?ctrl=filetypes" title="'.T_('Edit locked file types...').'">';
 	$filetypes_linkend = '</a>';
 	$Form->radio( 'edited_grp_perm_files', $edited_Group->get('perm_files'),
 			array(	$perm_none_option,
-							$perm_view_option,
-							array( 'add', T_('Add/Upload') ),
-							array( 'edit', sprintf( T_('Edit %s'), $filetypes_linkstart.get_icon('file_allowed').$filetypes_linkend ) ),
-							array( 'all', sprintf( T_('Edit all, including %s'), $filetypes_linkstart.get_icon('file_not_allowed').$filetypes_linkend ) ),
-						), T_('Files'), false, T_('This setting will further restrict any media file permissions on specific blogs.') );
+							array( 'view', T_('View files for all allowed roots') ),
+							array( 'add', T_('Add/Upload files to allowed roots') ),
+							array( 'edit', sprintf( T_('Edit %sunlocked files'), $filetypes_linkstart.get_icon('file_allowed').$filetypes_linkend ) ),
+							array( 'all', sprintf( T_('Edit all files, including %slocked ones'), $filetypes_linkstart.get_icon('file_not_allowed').$filetypes_linkend ), T_('Needed for editing PHP files in skins.') ),
+						), T_('Files'), true, T_('This setting will further restrict any media file permissions on specific blogs.') );
+
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('System admin permissions') );
+
+	$Form->radio( 'edited_grp_perm_spamblacklist', $edited_Group->get('perm_spamblacklist'),
+			array(  $perm_none_option,
+							array( 'view', T_('View only') ),
+							array( 'edit', T_('Full Access') )
+						), T_('Antispam'), false );
 
 	$Form->checkbox( 'edited_grp_perm_templates', $edited_Group->get('perm_templates'), T_('Skins'), T_('Check to allow access to skin files.') );
 
@@ -166,6 +178,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/19 10:57:10  fplanque
+ * Splitting XHTML checking by group and interface
+ *
  * Revision 1.1  2007/06/25 11:01:50  fplanque
  * MODULES (refactored MVC)
  *

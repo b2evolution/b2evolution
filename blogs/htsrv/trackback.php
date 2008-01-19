@@ -143,7 +143,7 @@ if( ! empty($title) )
 }
 $comment .= $excerpt;
 
-$comment = format_to_post($comment,1,1);
+$comment = format_to_post( $comment, 1, 1 );
 if( empty($comment) )
 { // comment should not be empty!
 	$Messages->add( T_('Please do not send empty comment'), 'error' );
@@ -211,6 +211,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.60  2008/01/19 10:57:11  fplanque
+ * Splitting XHTML checking by group and interface
+ *
  * Revision 1.59  2007/04/26 00:11:14  fplanque
  * (c) 2007
  *

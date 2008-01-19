@@ -20,7 +20,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  *  0 to disable
  *  1 to ensable
  *
- * @todo fp>This should be moved to the backoffice. Checkbox for each blog.
+ * @todo fp>This should be moved to the backoffice.
  *
  * @global integer 0|1
  */
@@ -38,31 +38,13 @@ $use_balanceTags = 1;
  */
 $comments_use_autobr = 'opt-out';	// automatically change line breaks to <br />
 
-
-/*
- * Validity & Security Checking
+/**
+ * Do we want to use XHTML validation for comments?
  *
- * Posts and comments should be checked to see if they contain valid XHTML code
- * and no invalid code (javascript, styles, CSS, etc...)
+ * TODO: use this for anonymous comments only.
  */
+$use_xhtmlvalidation_for_comments = true;
 
-# Html checking will validate posts and comments to a subset of valid XHTML.
-# This will also do much cleaner security checking than the next option.
-# Note: This option requires the PHP XML module. If your PHP installation doesn't have it
-# disable html_checker and use security_checker.
-/*
- * @todo fp>This should be moved to the backoffice. This checkbox should NOT be editable by the blog owner.
- * Only the system admin should be adble to edit this. Special "Admin" tab on the blog settings.
- */
-$use_html_checker = 1;
-# Security checking will check for illegal javascript hacks in posts/comments
-# and for CSS in comments. However, this may be a bit harsh on your posts :]
-/*
- * @todo fp>This should be moved to the backoffice. Checbox for each blog. This checkbox should NOT be editable by the blog owner.
- * Only the system admin should be adble to edit this. Special "Admin" tab on the blog settings.
- */
-$use_security_checker = 0;
-# WARNING: disabling both $use_html_checker and $use_security_checker is suicidal !
 
 // Set this to true if you want to enforce XHTML strict
 /*
@@ -72,7 +54,7 @@ $use_security_checker = 0;
 $use_strict =  false;
 
 # Set this to true to allow id && style as core attributes for posts
-$posts_allow_css_tweaks = false;
+$posts_allow_css_tweaks = true;
 
 # ONLY CHANGE THE FOLLOWING IF YOU KNOW WHAT YOU'RE DOING
 $posts_allow_javascript = false;
@@ -511,8 +493,13 @@ if( $posts_allow_objects )
 
 // DEFINITION of allowed XHTML code for COMMENTS (posted from the public blog pages)
 
-# here is a list of the tags that are allowed in the comments.
-# all tags not in this list will be filtered out anyway before we do any checking
+
+/**
+ * DEPRECATED!!!
+ *
+ * here is a list of the tags that are allowed in the comments.
+ * If XHTML validation is disabled all tags not in this list will be filtered out anyway before we do any checking
+ */
 $comment_allowed_tags = '<p><ul><ol><li><dl><dt><dd><address><blockquote><ins><del><span><bdo><br><em><strong><dfn><code><samp><kdb><var><cite><abbr><acronym><q><sub><sup><tt><i><b><big><small>';
 
 // Allowed Entity classes

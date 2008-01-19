@@ -54,6 +54,18 @@ class Group extends DataObject
 	 */
 	var $blog_post_statuses = array();
 
+	var $perm_admin;
+  var $perm_blogs;
+  var $perm_security;
+  var $perm_xhtmlvalidation = 'always';
+  var $perm_xhtmlvalidation_xmlrpc = 'always';
+  var $perm_spamblacklist;
+  var $perm_templates;
+  var $perm_stats;
+  var $perm_files;
+  var $perm_options;
+  var $perm_users;
+
 
 	/**
 	 * Constructor
@@ -92,6 +104,8 @@ class Group extends DataObject
 			$this->name = $db_row->grp_name;
 			$this->perm_admin = $db_row->grp_perm_admin;
 			$this->perm_blogs = $db_row->grp_perm_blogs;
+			$this->perm_xhtmlvalidation         = $db_row->grp_perm_xhtmlvalidation;
+			$this->perm_xhtmlvalidation_xmlrpc  = $db_row->grp_perm_xhtmlvalidation_xmlrpc;
 			$this->perm_spamblacklist = $db_row->grp_perm_spamblacklist;
 			$this->perm_templates = $db_row->grp_perm_templates;
 			$this->perm_stats = $db_row->grp_perm_stats;
@@ -527,6 +541,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/19 10:57:10  fplanque
+ * Splitting XHTML checking by group and interface
+ *
  * Revision 1.1  2007/06/25 11:01:45  fplanque
  * MODULES (refactored MVC)
  *

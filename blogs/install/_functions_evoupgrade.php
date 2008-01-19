@@ -2047,6 +2047,13 @@ function upgrade_b2evo_tables()
 		REPLACE INTO T_items__type ( ptyp_ID, ptyp_name )
 		VALUES ( 2000, 'Podcast' )" );
 	echo "OK.<br />\n";
+	// 2.4.0
+  echo 'Adding additional group permissions... ';
+	$DB->query( "
+      ALTER TABLE evo20_groups
+      	ADD COLUMN grp_perm_xhtmlvalidation          VARCHAR(10) NOT NULL default 'always' AFTER grp_perm_blogs,
+				ADD COLUMN grp_perm_xhtmlvalidation_xmlrpc   VARCHAR(10) NOT NULL default 'always' AFTER grp_perm_xhtmlvalidation " );
+	echo "OK.<br />\n";
 
 	/*
 	 * ADD UPGRADES HERE.
@@ -2157,6 +2164,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.238  2008/01/19 10:57:10  fplanque
+ * Splitting XHTML checking by group and interface
+ *
  * Revision 1.237  2008/01/14 07:33:32  fplanque
  * Daniel, stop putting the comments in the log! They're more useful in the code!
  *

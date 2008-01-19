@@ -430,7 +430,7 @@ class Log
 	 * @param string the category
 	 * @return string the messages, imploded. Tags stripped.
 	 */
-	function get_string( $head = '', $foot = '', $category = NULL, $implodeBy = ', ' )
+	function get_string( $head = '', $foot = '', $category = NULL, $implodeBy = ', ', $format = 'striptags' )
 	{
 		if( !$this->count( $category ) )
 		{
@@ -448,7 +448,21 @@ class Log
 			$r .= ' '.$foot;
 		}
 
-		return strip_tags( $r );
+		switch( $format )
+		{
+			case 'xmlrpc':
+				$r = strip_tags( $r );	// get rid of <code>
+				$r = str_replace( '&lt;', '<', $r );
+				$r = str_replace( '&gt;', '>', $r );
+				$r = str_replace( '&quot;', '"', $r );
+				break;
+
+			case 'striptags':
+				$r = strip_tags( $r );
+				break;
+		}
+
+		return $r;
 	}
 
 
@@ -634,6 +648,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/19 10:57:11  fplanque
+ * Splitting XHTML checking by group and interface
+ *
  * Revision 1.2  2007/09/23 18:55:17  fplanque
  * attempting to debloat. The Log class is insane.
  *

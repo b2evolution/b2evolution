@@ -340,13 +340,13 @@ function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_ID
 	global $DB;
 
 	// CHECK HTML SANITY:
-	if( ($post_title = check_html_sanity( $post_title )) === false )
+	if( ($post_title = check_html_sanity( $post_title, 'xmlrpc_posting' )) === false )
 	{
 		return xmlrpcs_resperror( 21, $Messages->get_string( 'Invalid post title, please correct these errors:', '' ) );
 	}
-	if( ($content = check_html_sanity( $content )) === false  )
+	if( ($content = check_html_sanity( $content, 'xmlrpc_posting' )) === false  )
 	{
-		return xmlrpcs_resperror( 22, $Messages->get_string( 'Invalid post contents, please correct these errors:', '' ) );
+		return xmlrpcs_resperror( 22, $Messages->get_string( 'Invalid post contents, please correct these errors:'."\n", '', NULL, "  //  \n", 'xmlrpc' ) );
 	}
 
 	// INSERT NEW POST INTO DB:
@@ -399,13 +399,13 @@ function xmlrpcs_edit_item( & $edited_Item, $post_title, $content, $post_date, $
 	global $DB;
 
 	// CHECK HTML SANITY:
-	if( ($post_title = check_html_sanity( $post_title )) === false )
+	if( ($post_title = check_html_sanity( $post_title, 'xmlrpc_posting' )) === false )
 	{
 		return xmlrpcs_resperror( 21, $Messages->get_string( 'Invalid post title, please correct these errors:', '' ) );
 	}
-	if( ($content = check_html_sanity( $content )) === false  )
+	if( ($content = check_html_sanity( $content, 'xmlrpc_posting' )) === false  )
 	{
-		return xmlrpcs_resperror( 22, $Messages->get_string( 'Invalid post contents, please correct these errors:', '' ) );
+		return xmlrpcs_resperror( 22, $Messages->get_string( 'Invalid post contents, please correct these errors:'."\n", '', NULL, "  //  \n", 'xmlrpc' ) );
 	}
 
 	// UPDATE POST IN DB:
@@ -441,6 +441,9 @@ function xmlrpcs_edit_item( & $edited_Item, $post_title, $content, $post_date, $
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/19 10:57:11  fplanque
+ * Splitting XHTML checking by group and interface
+ *
  * Revision 1.2  2008/01/18 15:53:42  fplanque
  * Ninja refactoring
  *

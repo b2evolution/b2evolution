@@ -107,11 +107,6 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 
 
 // CHECK and FORMAT content
-if( ! $use_html_checker )
-{
-	//echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);
-	$comment = strip_tags($comment, $comment_allowed_tags);
-}
 // TODO: AutoBR should really be a "comment renderer" (like with Items)
 $comment = format_to_post($comment, $comment_autobr, 1);
 
@@ -379,6 +374,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.117  2008/01/19 10:57:11  fplanque
+ * Splitting XHTML checking by group and interface
+ *
  * Revision 1.116  2008/01/10 19:59:52  fplanque
  * reduced comment PITA
  *

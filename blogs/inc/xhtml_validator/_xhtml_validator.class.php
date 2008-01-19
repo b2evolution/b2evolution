@@ -68,12 +68,13 @@ class SafeHtmlChecker
 	 * @param array
 	 * @param string Input encoding to use ('ISO-8859-1', 'UTF-8', 'US-ASCII' or '' for auto-detect)
 	 */
-	function SafeHtmlChecker( & $allowed_tags, & $allowed_attributes, & $uri_attrs, & $allowed_uri_scheme, $encoding = '' )
+	function SafeHtmlChecker( & $allowed_tags, & $allowed_attributes, & $uri_attrs, & $allowed_uri_scheme, $encoding = '', $msg_type = 'error' )
 	{
 		$this->tags = & $allowed_tags;
 		$this->tagattrs = & $allowed_attributes;
 		$this->uri_attrs = & $uri_attrs;
 		$this->allowed_uri_scheme = & $allowed_uri_scheme;
+		$this->msg_type = $msg_type;
 
 		$encoding = strtoupper($encoding); // we might get 'iso-8859-1' for example
 		$this->encoding = $encoding;
@@ -218,7 +219,7 @@ class SafeHtmlChecker
 		{
 			if (!isset($this->tagattrs[$tag]) || !in_array($attr, explode(' ', $this->tagattrs[$tag])))
 			{
-				$this->html_error( sprintf( T_('Tag &lt;%s&gt; may not have attribute %s'), '<code>'.$tag.'</code>', '<code>'.$attr.'</code>' ) );
+				$this->html_error( sprintf( T_('Tag &lt;%s&gt; may not have attribute %s="..."'), '<code>'.$tag.'</code>', '<code>'.$attr.'</code>' ) );
 			}
 			if (in_array($attr, $this->uri_attrs))
 			{ // Must this attribute be checked for URIs
@@ -269,7 +270,7 @@ class SafeHtmlChecker
 	{
 		global $Messages;
 		$this->error = true;
-		$Messages->add( $string, 'error' );
+		$Messages->add( $string, $this->msg_type );
 	}
 
 	/**
@@ -285,6 +286,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.4  2008/01/19 10:57:11  fplanque
+ * Splitting XHTML checking by group and interface
+ *
  * Revision 1.3  2008/01/18 15:53:42  fplanque
  * Ninja refactoring
  *

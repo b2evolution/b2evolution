@@ -687,6 +687,8 @@ if( !$Messages->count('error') )
 			$edited_Group->set( 'name', $edited_grp_name );
 
 			$edited_Group->set( 'perm_blogs', param( 'edited_grp_perm_blogs', 'string', true ) );
+			$edited_Group->set( 'perm_xhtmlvalidation', param( 'perm_xhtmlvalidation', 'string', true ) );
+			$edited_Group->set( 'perm_xhtmlvalidation_xmlrpc', param( 'perm_xhtmlvalidation_xmlrpc', 'string', true ) );
 			$edited_Group->set( 'perm_spamblacklist', param( 'edited_grp_perm_spamblacklist', 'string', true ) );
 			$edited_Group->set( 'perm_templates', param( 'edited_grp_perm_templates', 'integer', 0 ) );
 			$edited_Group->set( 'perm_stats', param( 'edited_grp_perm_stats', 'string', true ) );
@@ -829,6 +831,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2008/01/19 10:57:11  fplanque
+ * Splitting XHTML checking by group and interface
+ *
  * Revision 1.3  2007/09/03 23:47:37  blueyed
  * Use singleton Plugins_admin
  *
