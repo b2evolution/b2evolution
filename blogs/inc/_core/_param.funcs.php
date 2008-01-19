@@ -1611,16 +1611,19 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 		case 'posting':
 			$xhtmlvalidation = ($Group->perm_xhtmlvalidation == 'always');
 			$allow_css_tweaks = $posts_allow_css_tweaks;
+			$allow_javascript = $posts_allow_javascript;
 			break;
 
 		case 'xmlrpc_posting':
 			$xhtmlvalidation = ($Group->perm_xhtmlvalidation_xmlrpc == 'always');
 			$allow_css_tweaks = $posts_allow_css_tweaks;
+			$allow_javascript = $posts_allow_javascript;
 			break;
 
 		case 'commenting':
 			$xhtmlvalidation = $use_xhtmlvalidation_for_comments;
 			$allow_css_tweaks = $comments_allow_css_tweaks;
+			$allow_javascript = false;
 			break;
 
 		default:
@@ -1682,24 +1685,27 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 		// # # are delimiters
 		// i modifier at the end means caseless
 
-		// onclick= etc...
-		$matches = array();
-		if( preg_match ('#\s(on[a-z]+)\s*=#i', $check, $matches)
-			// action=, background=, cite=, classid=, codebase=, data=, href=, longdesc=, profile=, src=
-			// usemap=
-			|| preg_match ('#=["\'\s]*(javascript|vbscript|about):#i', $check, $matches)
-			|| preg_match ('#\<\/?\s*(frame|iframe|applet|object)#i', $check, $matches) )
+		// CHECK JAVASCRIPT:
+		if( ! $allow_javascript
+			&& ( preg_match ('#\s(on[a-z]+)\s*=#i', $check, $matches)
+				// action=, background=, cite=, classid=, codebase=, data=, href=, longdesc=, profile=, src=, usemap=
+				|| preg_match ('#=["\'\s]*(javascript|vbscript|about):#i', $check, $matches) ) )
+		{
+			$Messages->add( T_('Illegal javascript markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$error = true;
+		}
+
+		if( preg_match ('#\<\/?\s*(frame|iframe|applet|object)#i', $check, $matches) )
 		{
 			$Messages->add( T_('Illegal markup found: ').htmlspecialchars($matches[1]), 'error' );
 			$error = true;
 		}
 
 		// Styling restictions:
-		$matches = array();
 		if( ! $allow_css_tweaks
 			&& preg_match ('#\s(style|class|id)\s*=#i', $check, $matches) )
 		{
-			$Messages->add( T_('Unallowed CSS markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$Messages->add( T_('Illegal CSS markup found: ').htmlspecialchars($matches[1]), 'error' );
 			$error = true;
 		}
 	}
@@ -1827,6 +1833,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.11  2008/01/19 18:35:08  fplanque
+ * javascript checking config
+ *
  * Revision 1.10  2008/01/19 18:24:24  fplanque
  * antispam checking refactored
  *
