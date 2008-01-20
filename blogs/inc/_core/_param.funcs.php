@@ -471,11 +471,18 @@ function param_check_email( $var, $required = false )
  * @param string
  * @return boolean true if OK
  */
-function param_check_url( $var, $context )
+function param_check_url( $var, $context, $field_err_msg = NULL )
 {
-	if( $error_detail = validate_url( $GLOBALS[$var], $context ) )
+  /**
+	 * @var User
+	 */
+	global $current_User;
+
+	$Group = $current_User->get_Group();
+
+	if( $error_detail = validate_url( $GLOBALS[$var], $context, ! $Group->perm_bypass_antispam ) )
 	{
-		param_error( $var, sprintf( T_('Supplied URL is invalid. (%s)'), $error_detail ) );
+		param_error( $var, sprintf( T_('Supplied URL is invalid. (%s)'), $error_detail ), $field_err_msg );
 		return false;
 	}
 	return true;
@@ -1621,6 +1628,7 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 			$allow_javascript = $Group->perm_xhtml_javascript;
 			$allow_iframes    = $Group->perm_xhtml_iframes;
 			$allow_objects    = $Group->perm_xhtml_objects;
+			$bypass_antispam  = $Group->perm_bypass_antispam;
 			break;
 
 		case 'commenting':
@@ -1629,6 +1637,9 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 			$allow_javascript = false;
 			$allow_iframes    = false;
 			$allow_objects    = false;
+			// fp> I don't know if it makes sense to bypass antispam in commenting context if the user has that kind of permissions.
+			// If so, then we also need to bypass in several other places.
+			$bypass_antispam  = false;
 			break;
 
 		default:
@@ -1640,12 +1651,24 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 	// Replace any & that is not a character or entity reference with &amp;
 	$content = preg_replace( '/&(?!#[0-9]+;|#x[0-9a-fA-F]+;|[a-zA-Z_:][a-zA-Z0-9._:-]*;)/', '&amp;', $content );
 
-	// Do an antispam check:
-	if( $block = antispam_check($content) )
+	// ANTISPAM check:
+	if( ! $bypass_antispam
+		&& $block = antispam_check($content) )
 	{
-		$Messages->add( ($context == 'commenting')
-			? T_('Illegal content found (spam?)')
-			: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;'), htmlspecialchars($block) ) );
+		if( $context == 'xmlrpc_posting' )
+		{
+			$errmsg = ($context == 'commenting')
+				? T_('Illegal content found (spam?)')
+				: sprintf( T_('Illegal content found: blacklisted word "%s"'), $block );
+		}
+		else
+		{
+			$errmsg = ($context == 'commenting')
+				? T_('Illegal content found (spam?)')
+				: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;'), htmlspecialchars($block) );
+		}
+
+		$Messages->add(	$errmsg, 'error' );
 		$error = true;
 	}
 
@@ -1731,8 +1754,11 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 
 	if( $error )
 	{
-		$Messages->add( sprintf( T_('(Note: To get rid of the above validation warnings, you can deactivate unwanted validation rules in your <a %s>Group settings</a>.)'),
+		if( $current_User->check_perm( 'users', 'edit', false ) )
+		{
+			$Messages->add( sprintf( T_('(Note: To get rid of the above validation warnings, you can deactivate unwanted validation rules in your <a %s>Group settings</a>.)'),
 										'href="?ctrl=users&amp;grp_ID='.$Group->ID.'"' ), 'error' );
+		}
 		return false;
 	}
 
@@ -1854,6 +1880,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.13  2008/01/20 18:20:26  fplanque
+ * Antispam per group setting
+ *
  * Revision 1.12  2008/01/20 15:31:12  fplanque
  * configurable validation/security rules
  *
@@ -1907,26 +1936,5 @@ function balance_tags( $text )
  *
  * Revision 1.35  2007/04/26 00:11:08  fplanque
  * (c) 2007
- *
- * Revision 1.34  2007/03/11 19:12:08  blueyed
- * Escape input in verbose validate_url()
- *
- * Revision 1.33  2007/03/02 01:36:51  fplanque
- * small fixes
- *
- * Revision 1.32  2007/02/28 23:33:19  blueyed
- * doc
- *
- * Revision 1.31  2007/02/26 03:41:16  fplanque
- * doc
- *
- * Revision 1.30  2007/02/25 18:29:55  blueyed
- * MFB: Support "S" (ordinal date suffix) in date format (calendar and validator)
- *
- * Revision 1.29  2007/02/12 17:59:52  blueyed
- * $verbose param for validate_url() - not used yet anywhere, but useful IMHO, e.g. in the backoffice.
- *
- * Revision 1.28  2007/01/26 00:21:23  blueyed
- * Fixed possible E_NOTICE; TODO
  */
 ?>

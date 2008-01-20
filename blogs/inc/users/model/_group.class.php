@@ -57,6 +57,7 @@ class Group extends DataObject
 	var $perm_admin;
   var $perm_blogs;
   var $perm_security;
+  var $perm_bypass_antispam = false;
   var $perm_xhtmlvalidation = 'always';
   var $perm_xhtmlvalidation_xmlrpc = 'always';
 	var $perm_xhtml_css_tweaks = false;
@@ -104,22 +105,23 @@ class Group extends DataObject
 		else
 		{
 			// echo 'Instanciating existing group';
-			$this->ID = $db_row->grp_ID;
-			$this->name = $db_row->grp_name;
-			$this->perm_admin = $db_row->grp_perm_admin;
-			$this->perm_blogs = $db_row->grp_perm_blogs;
+			$this->ID                           = $db_row->grp_ID;
+			$this->name                         = $db_row->grp_name;
+			$this->perm_admin                   = $db_row->grp_perm_admin;
+			$this->perm_blogs                   = $db_row->grp_perm_blogs;
+			$this->perm_bypass_antispam         = $db_row->grp_perm_bypass_antispam;
 			$this->perm_xhtmlvalidation         = $db_row->grp_perm_xhtmlvalidation;
 			$this->perm_xhtmlvalidation_xmlrpc  = $db_row->grp_perm_xhtmlvalidation_xmlrpc;
 			$this->perm_xhtml_css_tweaks        = $db_row->grp_perm_xhtml_css_tweaks;
 			$this->perm_xhtml_iframes           = $db_row->grp_perm_xhtml_iframes;
 			$this->perm_xhtml_javascript        = $db_row->grp_perm_xhtml_javascript;
 			$this->perm_xhtml_objects           = $db_row->grp_perm_xhtml_objects;
-			$this->perm_spamblacklist = $db_row->grp_perm_spamblacklist;
-			$this->perm_templates = $db_row->grp_perm_templates;
-			$this->perm_stats = $db_row->grp_perm_stats;
-			$this->perm_files = $db_row->grp_perm_files;
-			$this->perm_options = $db_row->grp_perm_options;
-			$this->perm_users = $db_row->grp_perm_users;
+			$this->perm_spamblacklist           = $db_row->grp_perm_spamblacklist;
+			$this->perm_templates               = $db_row->grp_perm_templates;
+			$this->perm_stats                   = $db_row->grp_perm_stats;
+			$this->perm_files                   = $db_row->grp_perm_files;
+			$this->perm_options                 = $db_row->grp_perm_options;
+			$this->perm_users                   = $db_row->grp_perm_users;
 		}
 	}
 
@@ -549,6 +551,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2008/01/20 18:20:25  fplanque
+ * Antispam per group setting
+ *
  * Revision 1.3  2008/01/20 15:31:12  fplanque
  * configurable validation/security rules
  *

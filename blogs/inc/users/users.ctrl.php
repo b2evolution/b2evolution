@@ -687,6 +687,7 @@ if( !$Messages->count('error') )
 			$edited_Group->set( 'name', $edited_grp_name );
 
 			$edited_Group->set( 'perm_blogs', param( 'edited_grp_perm_blogs', 'string', true ) );
+			$edited_Group->set( 'perm_bypass_antispam', ! param( 'apply_antispam', 'integer', 0 ) );
 			$edited_Group->set( 'perm_xhtmlvalidation', param( 'perm_xhtmlvalidation', 'string', true ) );
 			$edited_Group->set( 'perm_xhtmlvalidation_xmlrpc', param( 'perm_xhtmlvalidation_xmlrpc', 'string', true ) );
 			$edited_Group->set( 'perm_xhtml_css_tweaks', ! param( 'prevent_css_tweaks', 'integer', 0 ) );
@@ -835,6 +836,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2008/01/20 18:20:28  fplanque
+ * Antispam per group setting
+ *
  * Revision 1.6  2008/01/20 15:31:12  fplanque
  * configurable validation/security rules
  *

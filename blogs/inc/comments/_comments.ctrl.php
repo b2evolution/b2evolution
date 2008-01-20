@@ -102,15 +102,12 @@ switch( $action )
 			param( 'newcomment_author', 'string', true );
 			param( 'newcomment_author_email', 'string' );
 			param( 'newcomment_author_url', 'string' );
+			param_check_not_empty( 'newcomment_author', T_('Please enter and author name.'), '' );
 			$edited_Comment->set( 'author', $newcomment_author );
+			param_check_email( 'newcomment_author_email', false );
 			$edited_Comment->set( 'author_email', $newcomment_author_email );
+			param_check_url( 'newcomment_author_url', 'posting', '' ); // Give posting permissions here
 			$edited_Comment->set( 'author_url', $newcomment_author_url );
-
-			// CHECK url
-			if( $error = validate_url( $newcomment_author_url, 'posting' ) )	// Give posting permissions here
-			{
-				$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
-			}
 		}
 
 		// Content:
@@ -276,6 +273,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2008/01/20 18:20:23  fplanque
+ * Antispam per group setting
+ *
  * Revision 1.7  2008/01/19 15:45:28  fplanque
  * refactoring
  *

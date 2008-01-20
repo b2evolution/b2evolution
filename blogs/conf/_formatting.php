@@ -18,7 +18,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  *  0 to disable
  *  1 to ensable
  *
- * @todo fp>This should be moved to the backoffice.
+ * @todo fp>This should be moved to the backoffice. Checkbox in group settings?
  *
  * @global integer 0|1
  */
@@ -31,6 +31,8 @@ $use_balanceTags = 1;
 
 /**
  * Set this to true if you want to enforce XHTML strict
+ *
+ * @todo fp> Should probably be an additional radio option in group permissions.
  */
 $use_strict =  false;
 

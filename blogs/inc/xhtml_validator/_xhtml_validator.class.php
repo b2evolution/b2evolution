@@ -266,7 +266,7 @@ class XHTML_Validator
 			{ // This attribute must be checked for URIs
 				$matches = array();
 				$value = trim($value);
-				if( $error = validate_url( $value, $this->context, false ) ) // Do not check for spam here, should be done on whole message
+				if( $error = validate_url( $value, $this->context, false ) ) //Note: We do not check for spam here, should be done on whole message in check_html_sanity()
 				{
 					$this->html_error( T_('Found invalid URL: ').$error );
 				}
@@ -328,6 +328,9 @@ class XHTML_Validator
 
 /*
  * $Log$
+ * Revision 1.8  2008/01/20 18:20:27  fplanque
+ * Antispam per group setting
+ *
  * Revision 1.7  2008/01/20 15:31:12  fplanque
  * configurable validation/security rules
  *

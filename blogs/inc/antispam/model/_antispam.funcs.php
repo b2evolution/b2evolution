@@ -51,10 +51,16 @@ function antispam_create( $abuse_string, $aspm_source = 'local' )
 
 	// Cut the crap if the string is empty:
 	$abuse_string = trim( $abuse_string );
-	if( empty( $abuse_string ) ) return false;
+	if( empty( $abuse_string ) )
+	{
+		return false;
+	}
 
 	// Check if the string already is in the blacklist:
-	if( antispam_check($abuse_string) ) return false;
+	if( antispam_check($abuse_string) )
+	{
+		return false;
+	}
 
 	// Insert new string into DB:
 	$sql = "INSERT INTO T_antispam( aspm_string, aspm_source )
@@ -121,10 +127,10 @@ function antispam_check( $haystack )
 
 	$Timer->resume( 'antispam_url' ); // resuming to get the total number..
 	$block = $DB->get_var(
-		"SELECT aspm_string
+		'SELECT aspm_string
 		   FROM  T_antispam
-		  WHERE ".$DB->quote($haystack)." LIKE CONCAT('%',aspm_string,'%')
-		  LIMIT 0, 1", 0, 0, 'Check URL against antispam blacklist' );
+		  WHERE '.$DB->quote($haystack).' LIKE CONCAT("%",aspm_string,"%")
+		  LIMIT 0, 1', 0, 0, 'Check URL against antispam blacklist' );
 	if( $block )
 	{
 			$Debuglog->add( 'Spam block: '.$block );
@@ -325,6 +331,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.6  2008/01/20 18:20:22  fplanque
+ * Antispam per group setting
+ *
  * Revision 1.5  2008/01/19 15:45:28  fplanque
  * refactoring
  *

@@ -73,7 +73,7 @@ $perm_view_option = array( 'view', T_('View details') );
 $perm_edit_option = array( 'edit', T_('Edit/delete all') );
 
 
-$Form->begin_fieldset( T_('General') );
+$Form->begin_fieldset( T_('General').get_manual_link('group_properties_general') );
 
 	$Form->text( 'edited_grp_name', $edited_Group->name, 50, T_('Name'), '', 50, 'large' );
 
@@ -92,7 +92,7 @@ $Form->begin_fieldset( T_('General') );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Blogging permissions') );
+$Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group_properties_blogging') );
 
 	$Form->radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'),
 			array(  array( 'user', T_('Depending on each blog\'s permissions') ),
@@ -115,19 +115,22 @@ $Form->begin_fieldset( T_('Blogging permissions') );
 						), T_('XHTML validation on XML-RPC calls'), true );
 
 	$Form->checklist( array(
-			array( 'prevent_css_tweaks', 1, T_('Prevent CSS tweaks'), ! $edited_Group->get('perm_xhtml_css_tweaks'), false,
-								T_('WARNING: if allowed, users can easily deface the site, add hidden text, etc.') ),
-			array( 'prevent_iframes', 1, T_('Prevent iframes'), ! $edited_Group->get('perm_xhtml_iframes'), false,
-								T_('WARNING: if allowed, users may do XSS hacks, steal passwords from other users, etc.') ),
-			array( 'prevent_javascript', 1, T_('Prevent javascript'), ! $edited_Group->get('perm_xhtml_javascript'), false,
-								T_('WARNING: if allowed, users can easily do XSS hacks, steal passwords from other users, etc.') ),
-			array( 'prevent_objects', 1, T_('Prevent objects'), ! $edited_Group->get('perm_xhtml_objects'), false,
-								T_('WARNING: if allowed, users can spread viruses and malware through this blog.') ),
-		), 'xhtml_security', T_('Security filters') );
+						array( 'prevent_css_tweaks', 1, T_('Prevent CSS tweaks'), ! $edited_Group->get('perm_xhtml_css_tweaks'), false,
+											T_('WARNING: if allowed, users can easily deface the site, add hidden text, etc.') ),
+						array( 'prevent_iframes', 1, T_('Prevent iframes'), ! $edited_Group->get('perm_xhtml_iframes'), false,
+											T_('WARNING: if allowed, users may do XSS hacks, steal passwords from other users, etc.') ),
+						array( 'prevent_javascript', 1, T_('Prevent javascript'), ! $edited_Group->get('perm_xhtml_javascript'), false,
+											T_('WARNING: if allowed, users can easily do XSS hacks, steal passwords from other users, etc.') ),
+						array( 'prevent_objects', 1, T_('Prevent objects'), ! $edited_Group->get('perm_xhtml_objects'), false,
+											T_('WARNING: if allowed, users can spread viruses and malware through this blog.') ),
+					), 'xhtml_security', T_('Security filters') );
+
+	$Form->checkbox( 'apply_antispam', ! $edited_Group->get('perm_bypass_antispam'), T_('Antispam filtering'),
+										T_('Inputs from these users will be checked against the antispam blacklist.') );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Additional permissions') );
+$Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_properties_additional_permissions') );
 
 	$Form->radio( 'edited_grp_perm_stats', $edited_Group->get('perm_stats'),
 			array(  $perm_none_option,
@@ -149,7 +152,7 @@ $Form->begin_fieldset( T_('Additional permissions') );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('System admin permissions') );
+$Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_properties_system_permissions') );
 
 	$Form->radio( 'edited_grp_perm_spamblacklist', $edited_Group->get('perm_spamblacklist'),
 			array(  $perm_none_option,
@@ -193,6 +196,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.4  2008/01/20 18:20:25  fplanque
+ * Antispam per group setting
+ *
  * Revision 1.3  2008/01/20 15:31:12  fplanque
  * configurable validation/security rules
  *

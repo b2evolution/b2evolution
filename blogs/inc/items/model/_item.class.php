@@ -334,16 +334,19 @@ class Item extends ItemLight
 	{
 		global $default_locale, $current_User;
 
-		if( param( 'post_locale', 'string', NULL ) !== NULL ) {
+		if( param( 'post_locale', 'string', NULL ) !== NULL )
+		{
 			$this->set_from_Request( 'locale' );
 		}
 
-		if( param( 'item_typ_ID', 'integer', NULL ) !== NULL ) {
+		if( param( 'item_typ_ID', 'integer', NULL ) !== NULL )
+		{
 			$this->set_from_Request( 'ptyp_ID', 'item_typ_ID' );
 		}
 
-		if( param( 'post_url', 'string', NULL ) !== NULL ) {
-			param_check_url( 'post_url', 'posting' );
+		if( param( 'post_url', 'string', NULL ) !== NULL )
+		{
+			param_check_url( 'post_url', 'posting', '' );
 			$this->set_from_Request( 'url' );
 		}
 		// Note: post_url is not part of the simple form, so this message can be a little bit awkward there
@@ -3312,6 +3315,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.30  2008/01/20 18:20:26  fplanque
+ * Antispam per group setting
+ *
  * Revision 1.29  2008/01/19 15:45:28  fplanque
  * refactoring
  *
