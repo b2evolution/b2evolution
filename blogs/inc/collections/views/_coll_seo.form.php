@@ -177,7 +177,7 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 			), T_('Permalink scheme'), true );
 
 	$Form->checkbox( 'canonical_item_urls', $edited_Blog->get_setting( 'canonical_item_urls' ),
-			T_('Make canoncial'), T_('301 redirect to canonical URL') );
+			T_('Make canonical'), T_('301 redirect to canonical URL') );
 
 $Form->end_fieldset();
 
@@ -297,6 +297,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.10  2008/01/20 20:26:03  slamp
+ * typo canoncial -> canonical
+ *
  * Revision 1.9  2008/01/07 02:53:27  fplanque
  * cleaner tag urls
  *

@@ -4406,6 +4406,7 @@ msgstr "Vorschau"
 msgid "An optional prefix to be added to the URLs of the categories"
 msgstr ""
 
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:180
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:232
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:270
 #, fuzzy

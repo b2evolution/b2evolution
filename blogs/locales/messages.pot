@@ -3745,7 +3745,7 @@ msgid "Permalink scheme"
 msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:180
-msgid "Make canoncial"
+msgid "Make canonical"
 msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:180
