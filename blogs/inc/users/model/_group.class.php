@@ -59,6 +59,10 @@ class Group extends DataObject
   var $perm_security;
   var $perm_xhtmlvalidation = 'always';
   var $perm_xhtmlvalidation_xmlrpc = 'always';
+	var $perm_xhtml_css_tweaks = false;
+	var $perm_xhtml_iframes = false;
+	var $perm_xhtml_javascript = false;
+	var $perm_xhtml_objects = false;
   var $perm_spamblacklist;
   var $perm_templates;
   var $perm_stats;
@@ -106,6 +110,10 @@ class Group extends DataObject
 			$this->perm_blogs = $db_row->grp_perm_blogs;
 			$this->perm_xhtmlvalidation         = $db_row->grp_perm_xhtmlvalidation;
 			$this->perm_xhtmlvalidation_xmlrpc  = $db_row->grp_perm_xhtmlvalidation_xmlrpc;
+			$this->perm_xhtml_css_tweaks        = $db_row->grp_perm_xhtml_css_tweaks;
+			$this->perm_xhtml_iframes           = $db_row->grp_perm_xhtml_iframes;
+			$this->perm_xhtml_javascript        = $db_row->grp_perm_xhtml_javascript;
+			$this->perm_xhtml_objects           = $db_row->grp_perm_xhtml_objects;
 			$this->perm_spamblacklist = $db_row->grp_perm_spamblacklist;
 			$this->perm_templates = $db_row->grp_perm_templates;
 			$this->perm_stats = $db_row->grp_perm_stats;
@@ -541,6 +549,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/20 15:31:12  fplanque
+ * configurable validation/security rules
+ *
  * Revision 1.2  2008/01/19 10:57:10  fplanque
  * Splitting XHTML checking by group and interface
  *

@@ -149,7 +149,10 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
  */
 function get_allowed_uri_schemes( $context = 'posting' )
 {
-	global $posts_allow_javascript, $posts_allow_objects;
+  /**
+	 * @var User
+	 */
+	global $current_User;
 
 	$schemes = array(
 			'http',
@@ -169,14 +172,21 @@ function get_allowed_uri_schemes( $context = 'posting' )
 		return $schemes;
 	}
 
-  if( $posts_allow_javascript )
-	{
-		$schemes[] = 'javascript';
-	}
+	if( !empty( $current_User ) )
+	{	// Add additional permissions the current User may have:
 
-	if( $posts_allow_objects )
-	{
-		$schemes[] = 'clsid';
+		$Group = & $current_User->get_Group();
+
+	  if( $Group->perm_xhtml_javascript )
+		{
+			$schemes[] = 'javascript';
+		}
+
+		if( $Group->perm_xhtml_objects )
+		{
+			$schemes[] = 'clsid';
+		}
+
 	}
 
 	return $schemes;
@@ -564,6 +574,9 @@ function disp_url( $url, $max_length = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.8  2008/01/20 15:31:12  fplanque
+ * configurable validation/security rules
+ *
  * Revision 1.7  2008/01/19 18:24:24  fplanque
  * antispam checking refactored
  *

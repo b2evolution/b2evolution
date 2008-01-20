@@ -27,8 +27,12 @@ $schema_queries = array(
 			grp_name varchar(50) NOT NULL default '',
 			grp_perm_admin enum('none','hidden','visible') NOT NULL default 'visible',
 			grp_perm_blogs enum('user','viewall','editall') NOT NULL default 'user',
-			grp_perm_xhtmlvalidation          VARCHAR(10) NOT NULL default 'always',
-			grp_perm_xhtmlvalidation_xmlrpc   VARCHAR(10) NOT NULL default 'always',
+			grp_perm_xhtmlvalidation         VARCHAR(10) NOT NULL default 'always',
+			grp_perm_xhtmlvalidation_xmlrpc  VARCHAR(10) NOT NULL default 'always',
+			grp_perm_xhtml_css_tweaks        TINYINT(1) NOT NULL DEFAULT 0,
+      grp_perm_xhtml_iframes           TINYINT(1) NOT NULL DEFAULT 0,
+      grp_perm_xhtml_javascript        TINYINT(1) NOT NULL DEFAULT 0,
+			grp_perm_xhtml_objects           TINYINT(1) NOT NULL DEFAULT 0,
 			grp_perm_stats enum('none','user','view','edit') NOT NULL default 'none',
 			grp_perm_spamblacklist enum('none','view','edit') NOT NULL default 'none',
 			grp_perm_options enum('none','view','edit') NOT NULL default 'none',
@@ -564,6 +568,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.76  2008/01/20 15:31:12  fplanque
+ * configurable validation/security rules
+ *
  * Revision 1.75  2008/01/19 10:57:10  fplanque
  * Splitting XHTML checking by group and interface
  *

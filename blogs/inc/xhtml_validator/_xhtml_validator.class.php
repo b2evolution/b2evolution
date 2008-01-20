@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the SafeHtmlChecker class.
+ * This file implements the XHTML_Validator class.
  *
  * Checks HTML against a subset of elements to ensure safety and XHTML validation.
  *
@@ -38,13 +38,13 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * SafeHtmlChecker
+ * XHTML_Validator
  *
  * checks HTML against a subset of elements to ensure safety and XHTML validation.
  *
  * @package evocore
  */
-class SafeHtmlChecker
+class XHTML_Validator
 {
 	var $tags;      // Array showing allowed attributes for tags
 	var $tagattrs;  // Array showing URI attributes
@@ -65,7 +65,7 @@ class SafeHtmlChecker
 	 * @param string
 	 * @param string Input encoding to use ('ISO-8859-1', 'UTF-8', 'US-ASCII' or '' for auto-detect)
 	 */
-	function SafeHtmlChecker( $context = 'posting', $encoding = NULL, $msg_type = 'error' )
+	function XHTML_Validator( $context = 'posting', $allow_css_tweaks = false, $allow_iframes = false, $allow_javascript = false, $allow_objects = false, $encoding = NULL, $msg_type = 'error' )
 	{
 		global $inc_path;
 
@@ -328,6 +328,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.7  2008/01/20 15:31:12  fplanque
+ * configurable validation/security rules
+ *
  * Revision 1.6  2008/01/19 18:24:25  fplanque
  * antispam checking refactored
  *

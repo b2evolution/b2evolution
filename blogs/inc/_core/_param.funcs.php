@@ -1595,8 +1595,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
 function check_html_sanity( $content, $context = 'posting', $autobr = false, $encoding = NULL )
 {
 	global $use_balanceTags;
-	global $io_charset, $use_xhtmlvalidation_for_comments, $comment_allowed_tags;
-	global $posts_allow_css_tweaks, $comments_allow_css_tweaks, $posts_allow_javascript;
+	global $io_charset, $use_xhtmlvalidation_for_comments, $comment_allowed_tags, $comments_allow_css_tweaks;
 	global $Messages;
 
 	/**
@@ -1609,21 +1608,27 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 	switch( $context )
 	{
 		case 'posting':
-			$xhtmlvalidation = ($Group->perm_xhtmlvalidation == 'always');
-			$allow_css_tweaks = $posts_allow_css_tweaks;
-			$allow_javascript = $posts_allow_javascript;
-			break;
-
 		case 'xmlrpc_posting':
-			$xhtmlvalidation = ($Group->perm_xhtmlvalidation_xmlrpc == 'always');
-			$allow_css_tweaks = $posts_allow_css_tweaks;
-			$allow_javascript = $posts_allow_javascript;
+			if( $context == 'posting' )
+			{
+				$xhtmlvalidation  = ($Group->perm_xhtmlvalidation == 'always');
+			}
+			else
+			{
+				$xhtmlvalidation  = ($Group->perm_xhtmlvalidation_xmlrpc == 'always');
+			}
+			$allow_css_tweaks = $Group->perm_xhtml_css_tweaks;
+			$allow_javascript = $Group->perm_xhtml_javascript;
+			$allow_iframes    = $Group->perm_xhtml_iframes;
+			$allow_objects    = $Group->perm_xhtml_objects;
 			break;
 
 		case 'commenting':
-			$xhtmlvalidation = $use_xhtmlvalidation_for_comments;
+			$xhtmlvalidation  = $use_xhtmlvalidation_for_comments;
 			$allow_css_tweaks = $comments_allow_css_tweaks;
 			$allow_javascript = false;
+			$allow_iframes    = false;
+			$allow_objects    = false;
 			break;
 
 		default:
@@ -1662,15 +1667,17 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 	{ // We want to validate XHTML:
 		load_class( 'xhtml_validator/_xhtml_validator.class.php' );
 
-		$SafeHtmlChecker = & new SafeHtmlChecker( $context, $encoding );
+		$XHTML_Validator = & new XHTML_Validator( $context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, $encoding );
 
-		if( ! $SafeHtmlChecker->check( $content ) ) // TODO: see if we need to use convert_chars( $content, 'html' )
+		if( ! $XHTML_Validator->check( $content ) ) // TODO: see if we need to use convert_chars( $content, 'html' )
 		{
 			$error = true;
 		}
 	}
 	else
 	{	// We do not WANT to validate XHTML, fall back to basic security checking:
+		// This is only as strong as its regexps can parse xhtml. This is significantly inferior to the XHTML checker above.
+		// The only advantage of this checker is that it can check for a little security without requiring VALID XHTML.
 
 		if( $context == 'commenting' )
 		{	// DEPRECATED but still...
@@ -1685,33 +1692,47 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 		// # # are delimiters
 		// i modifier at the end means caseless
 
+		// CHECK Styling restictions:
+		if( ! $allow_css_tweaks
+			&& preg_match( '#\s((style|class|id)\s*=)#i', $check, $matches) )
+		{
+			$Messages->add( T_('Illegal CSS markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$error = true;
+		}
+
 		// CHECK JAVASCRIPT:
 		if( ! $allow_javascript
-			&& ( preg_match ('#\s(on[a-z]+)\s*=#i', $check, $matches)
+			&& ( preg_match( '¤( < \s* //? \s* (script|noscript) )¤xi', $check, $matches )
+				|| preg_match( '#\s((on[a-z]+)\s*=)#i', $check, $matches )
 				// action=, background=, cite=, classid=, codebase=, data=, href=, longdesc=, profile=, src=, usemap=
-				|| preg_match ('#=["\'\s]*(javascript|vbscript|about):#i', $check, $matches) ) )
+				|| preg_match( '#=["\'\s]*((javascript|vbscript|about):)#i', $check, $matches ) ) )
 		{
 			$Messages->add( T_('Illegal javascript markup found: ').htmlspecialchars($matches[1]), 'error' );
 			$error = true;
 		}
 
-		if( preg_match ('#\<\/?\s*(frame|iframe|applet|object)#i', $check, $matches) )
+		// CHECK IFRAMES:
+		if( ! $allow_iframes
+			&& preg_match( '¤( < \s* //? \s* (frame|iframe) )¤xi', $check, $matches) )
 		{
-			$Messages->add( T_('Illegal markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$Messages->add( T_('Illegal frame markup found: ').htmlspecialchars($matches[1]), 'error' );
 			$error = true;
 		}
 
-		// Styling restictions:
-		if( ! $allow_css_tweaks
-			&& preg_match ('#\s(style|class|id)\s*=#i', $check, $matches) )
+		// CHECK OBJECTS:
+		if( ! $allow_objects
+			&& preg_match( '¤( < \s* //? \s* (applet|object|param|embed) )¤xi', $check, $matches) )
 		{
-			$Messages->add( T_('Illegal CSS markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$Messages->add( T_('Illegal object markup found: ').htmlspecialchars($matches[1]), 'error' );
 			$error = true;
 		}
+
 	}
 
 	if( $error )
 	{
+		$Messages->add( sprintf( T_('(Note: To get rid of the above validation warnings, you can deactivate unwanted validation rules in your <a %s>Group settings</a>.)'),
+										'href="?ctrl=users&amp;grp_ID='.$Group->ID.'"' ), 'error' );
 		return false;
 	}
 
@@ -1833,6 +1854,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.12  2008/01/20 15:31:12  fplanque
+ * configurable validation/security rules
+ *
  * Revision 1.11  2008/01/19 18:35:08  fplanque
  * javascript checking config
  *

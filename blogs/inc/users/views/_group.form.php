@@ -95,20 +95,35 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Blogging permissions') );
 
 	$Form->radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'),
-			array(  array( 'user', T_('User permissions') ),
-							array( 'viewall', T_('View all') ),
+			array(  array( 'user', T_('Depending on each blog\'s permissions') ),
+							array( 'viewall', T_('View all blogs') ),
 							array( 'editall', T_('Full Access') )
 						), T_('Blogs'), false );
 
 	$Form->radio( 'perm_xhtmlvalidation', $edited_Group->get('perm_xhtmlvalidation'),
-			array(  array( 'always', T_('Force valid XHTML'), T_('This option will allow for the most effective security checking.') ),
-							array( 'never', T_('Disabled'), T_('Will only perform basic security checking. Only give this permission to trusted users.') )
+			array(  array( 'always', T_('Force valid XHTML + strong security'),
+											T_('The security filters below will be strongly enforced.') ),
+							array( 'never', T_('Basic security checking'),
+											T_('Security filters below will still be enforced but with potential lesser accuracy.') )
 						), T_('XHTML validation'), true );
 
 	$Form->radio( 'perm_xhtmlvalidation_xmlrpc', $edited_Group->get('perm_xhtmlvalidation_xmlrpc'),
-			array(  array( 'always', T_('Force valid XHTML'), T_('This option will allow for the most effective security checking.') ),
-							array( 'never', T_('Disabled'), T_('Will only perform basic security checking. Only give this permission to trusted users.') )
+			array(  array( 'always', T_('Force valid XHTML + strong security'),
+											T_('The security filters below will be strongly enforced.') ),
+							array( 'never', T_('Basic security checking'),
+											T_('Security filters below will still be enforced but with potential lesser accuracy.') )
 						), T_('XHTML validation on XML-RPC calls'), true );
+
+	$Form->checklist( array(
+			array( 'prevent_css_tweaks', 1, T_('Prevent CSS tweaks'), ! $edited_Group->get('perm_xhtml_css_tweaks'), false,
+								T_('WARNING: if allowed, users can easily deface the site, add hidden text, etc.') ),
+			array( 'prevent_iframes', 1, T_('Prevent iframes'), ! $edited_Group->get('perm_xhtml_iframes'), false,
+								T_('WARNING: if allowed, users may do XSS hacks, steal passwords from other users, etc.') ),
+			array( 'prevent_javascript', 1, T_('Prevent javascript'), ! $edited_Group->get('perm_xhtml_javascript'), false,
+								T_('WARNING: if allowed, users can easily do XSS hacks, steal passwords from other users, etc.') ),
+			array( 'prevent_objects', 1, T_('Prevent objects'), ! $edited_Group->get('perm_xhtml_objects'), false,
+								T_('WARNING: if allowed, users can spread viruses and malware through this blog.') ),
+		), 'xhtml_security', T_('Security filters') );
 
 $Form->end_fieldset();
 
@@ -178,6 +193,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/20 15:31:12  fplanque
+ * configurable validation/security rules
+ *
  * Revision 1.2  2008/01/19 10:57:10  fplanque
  * Splitting XHTML checking by group and interface
  *

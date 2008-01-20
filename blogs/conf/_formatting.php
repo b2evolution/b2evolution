@@ -34,19 +34,6 @@ $use_balanceTags = 1;
  */
 $use_strict =  false;
 
-/**
- * Set this to true to allow id && style as core attributes for posts
- */
-$posts_allow_css_tweaks = true;
-
-# ENABLING THE FOLLOWING IS A POTENTIALLY SERIOUS SECURITY ISSUE!!!
-# ONLY CHANGE THE FOLLOWING IF YOU KNOW WHAT YOU'RE DOING!
-$posts_allow_javascript = false;
-$posts_allow_script_tags = false;
-$posts_allow_iframes = false;
-$posts_allow_objects = false;
-
-
 
 /**
  * Choose formatting options for comments
