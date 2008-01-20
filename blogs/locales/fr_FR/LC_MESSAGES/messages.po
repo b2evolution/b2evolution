@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: b2evolution 2.3\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2008-01-20 16:43+0100\n"
-"PO-Revision-Date: 2008-01-20 16:47+0100\n"
-"Last-Translator: Francois PLANQUE <fplanque.net>\n"
+"PO-Revision-Date: 2008-01-20 21:19+0100\n"
+"Last-Translator: Olivier Daury <http://daury.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -3824,7 +3824,9 @@ msgid "Permalink scheme"
 msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:180
-msgid "Make canoncial"
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:232
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:270
+msgid "Make canonical"
 msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:180
@@ -3920,11 +3922,6 @@ msgstr "Préfixe"
 msgid "An optional prefix to be added to the URLs of the categories"
 msgstr "Un préfixe optionnel à ajouter à l'URL des catégories"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:232
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:270
-msgid "Make canonical"
-msgstr ""
-
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:239
 #: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:34
 #: ..\..\..\inc\_core\_template.funcs.php:189
@@ -3944,9 +3941,8 @@ msgstr "URLs des pages de tags"
 # D:\www\b2cvs20\blogs\inc\collections\views\_coll_urls.form.php:248
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:256
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:262
-#, fuzzy
 msgid "An optional prefix to be added to the URLs of the tag pages"
-msgstr "Un préfixe optionnel à ajouter à l'URL des catégories"
+msgstr "Un préfixe optionnel à ajouter à l'URL des pages de tag"
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:280
 msgid "Other pages"
@@ -4065,9 +4061,8 @@ msgid "Editing comment"
 msgstr "Edition d'un commentaire"
 
 #: ..\..\..\inc\comments\_comments.ctrl.php:119
-#, fuzzy
 msgid "Invalid comment text."
-msgstr "Texte du commentaire"
+msgstr "Texte du commentaire invalide."
 
 #: ..\..\..\inc\comments\_comments.ctrl.php:124
 msgid "Please enter a valid comment date."
@@ -5655,14 +5650,12 @@ msgid "Close settings!"
 msgstr "Fermer les régalges!"
 
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:44
-#, fuzzy
 msgid "See also:"
-msgstr "Sélection d'un blog:"
+msgstr "Voir aussi: "
 
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:52
-#, fuzzy
 msgid "Blog Settings"
-msgstr "Réglages blogs"
+msgstr "Réglages du blog"
 
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:56
 #: ..\..\..\skins\_subs.disp.php:54
@@ -5798,9 +5791,8 @@ msgid "Check to compute recursive size of folders"
 msgstr "Cochez pour calculer récursivement la taille des dossiers"
 
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:84
-#, fuzzy
 msgid "Don't show"
-msgstr "Articles à afficher"
+msgstr "Ne pas afficher"
 
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:86
 msgid "With regular expressions"
@@ -6221,14 +6213,12 @@ msgid "File upload"
 msgstr "Upload de fichier"
 
 #: ..\..\..\inc\files\views\_file_upload.view.php:203
-#, fuzzy
 msgid "Hide advanced upload properties"
-msgstr "Propriétés avancées"
+msgstr "Cache les propriétés avancées d'upload"
 
 #: ..\..\..\inc\files\views\_file_upload.view.php:207
-#, fuzzy
 msgid "Show advanced upload properties"
-msgstr "Propriétés avancées"
+msgstr "Affiche les propriétés avancé d'upload"
 
 #: ..\..\..\inc\files\views\_file_upload.view.php:232
 msgid "Some file uploads failed. Please check the errors below."
@@ -6456,14 +6446,12 @@ msgid "Please enter a valid deadline."
 msgstr "Merci d'entrer une date d'échéance valide."
 
 #: ..\..\..\inc\items\model\_item.class.php:429
-#, fuzzy
 msgid "Invalid title."
-msgstr "Nom de fichier invalide."
+msgstr "Titre invalide."
 
 #: ..\..\..\inc\items\model\_item.class.php:432
-#, fuzzy
 msgid "Invalid content."
-msgstr "Réponse non valide."
+msgstr "Contenu invalide."
 
 #: ..\..\..\inc\items\model\_item.class.php:565
 msgid "Comments are closed for this post."
@@ -8180,9 +8168,8 @@ msgid "Install"
 msgstr "Installer"
 
 #: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:204
-#, fuzzy
 msgid "The above plugins are those already installed into your \"plugins\" directory."
-msgstr "Ce code de plugin est déjà utilisé par un autre plugin."
+msgstr "Les plugins suivants sont ceux déjà installés dans votre répertoire \"plugins\"."
 
 # D:\www\b2cvs20\blogs\inc\plugins\views\_plugin_list_available.view.php:206
 #: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:206
@@ -9220,9 +9207,8 @@ msgid "This version is aging. You may want to check for newer releases on <a %s>
 msgstr "Cette version commence a être agée. Vous devriez vérifier s'il existe un nouvelle version sur <a %s>b2evolution.net</a>."
 
 #: ..\..\..\inc\tools\system.ctrl.php:140
-#, fuzzy
 msgid "You will not be able to upload files/images and b2evolution will not be able to generate thumbnails."
-msgstr "Vous ne serez pas en mesure de générer automatiquement des vignettes pour les images."
+msgstr "Vous ne serez pas en mesure d'uploader des fichiers/images et b2evolution ne pourra pas générer les vignettes."
 
 # D:\www\b2cvs20\blogs\inc\tools\system.ctrl.php:141
 #: ..\..\..\inc\tools\system.ctrl.php:141
@@ -9289,7 +9275,6 @@ msgstr "PHP"
 
 #: ..\..\..\inc\tools\system.ctrl.php:276
 #: ..\..\..\inc\tools\system.ctrl.php:300
-#, fuzzy
 msgid "Unkown"
 msgstr "Inconnu"
 
@@ -9840,9 +9825,8 @@ msgid "Depending on each blog's permissions"
 msgstr "Permissions utilisateur du blog supprimées"
 
 #: ..\..\..\inc\users\views\_group.form.php:99
-#, fuzzy
 msgid "View all blogs"
-msgstr "Voir tout"
+msgstr "Voir tout les blogs"
 
 #: ..\..\..\inc\users\views\_group.form.php:100
 #: ..\..\..\inc\users\views\_group.form.php:136
@@ -9880,9 +9864,8 @@ msgid "Security filters below will still be enforced but with potential lesser a
 msgstr ""
 
 #: ..\..\..\inc\users\views\_group.form.php:108
-#, fuzzy
 msgid "XHTML validation"
-msgstr "Validation email"
+msgstr "Validation XHTML"
 
 # D:\www\b2cvs20\blogs\inc\users\views\_group.form.php:115
 #: ..\..\..\inc\users\views\_group.form.php:115
@@ -9935,14 +9918,12 @@ msgid "Security filters"
 msgstr "RAZ filtres"
 
 #: ..\..\..\inc\users\views\_group.form.php:130
-#, fuzzy
 msgid "Additional permissions"
-msgstr "Editer permissions"
+msgstr "Permissions supplémentaires"
 
 #: ..\..\..\inc\users\views\_group.form.php:134
-#, fuzzy
 msgid "View stats for specific blogs"
-msgstr "Stats pour le Blog:"
+msgstr "Voir les stats pour les blogs spécifiques"
 
 #: ..\..\..\inc\users\views\_group.form.php:134
 #, fuzzy
@@ -9950,9 +9931,8 @@ msgid "Based on each blog's edit permissions"
 msgstr "Permissions utilisateur du blog supprimées"
 
 #: ..\..\..\inc\users\views\_group.form.php:135
-#, fuzzy
 msgid "View stats for all blogs"
-msgstr "Stats pour le Blog:"
+msgstr "Voir les stats pour tous les blogs"
 
 # D:\www\b2cvs20\blogs\inc\users\views\_group.form.php:136
 #: ..\..\..\inc\users\views\_group.form.php:136
@@ -9976,7 +9956,7 @@ msgstr ""
 # D:\www\b2cvs20\blogs\inc\users\views\_group.form.php:145
 #: ..\..\..\inc\users\views\_group.form.php:145
 msgid "Add/Upload files to allowed roots"
-msgstr ""
+msgstr "Ajout/Upload des fichiers vers les racines autorisés"
 
 #: ..\..\..\inc\users\views\_group.form.php:146
 #, fuzzy, php-format
@@ -9984,14 +9964,14 @@ msgid "Edit %sunlocked files"
 msgstr "Modifier les types de fichier verrouillés..."
 
 #: ..\..\..\inc\users\views\_group.form.php:147
-#, fuzzy, php-format
+#, php-format
 msgid "Edit all files, including %slocked ones"
-msgstr "Edit tout, y compris %s"
+msgstr ""
 
 # D:\www\b2cvs20\blogs\inc\users\views\_group.form.php:147
 #: ..\..\..\inc\users\views\_group.form.php:147
 msgid "Needed for editing PHP files in skins."
-msgstr ""
+msgstr "Nécessaire pour éditer les fichiers PHP dans les habillages."
 
 #: ..\..\..\inc\users\views\_group.form.php:148
 msgid "This setting will further restrict any media file permissions on specific blogs."
@@ -10101,9 +10081,8 @@ msgstr "Notifications"
 #: ..\..\..\inc\users\views\_user.form.php:139
 #: ..\..\..\skins\_profile.disp.php:63
 #: ..\..\..\skins\_subs.disp.php:60
-#, fuzzy
 msgid "Check this to receive a notification whenever someone else comments on one of <strong>your</strong> posts."
-msgstr "Cochez pour recevoir une notification à chaque fois que l'un de <strong>vos</strong> articles reçoit un commentaire, trackback, etc."
+msgstr "Cochez ceci pour recevoir une notification à chaque fois que l'un de <strong>vos</strong> articles reçoit un commentaire."
 
 #: ..\..\..\inc\users\views\_user.form.php:156
 #: ..\..\..\skins\_profile.disp.php:67
@@ -10551,14 +10530,13 @@ msgid "Add checkboxes to allow selection of multiple categories."
 msgstr "Ajoute les cases à cocher pour permettre la sélection de plusieurs catégories."
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:103
-#, fuzzy
 msgid "Display blog names"
-msgstr "Afficher le titre du blog"
+msgstr "Affiche les noms du blog"
 
 # D:\www\b2cvs20\blogs\inc\widgets\widgets\_coll_category_list.widget.php:105
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:105
 msgid "Display blog names, if this is an aggregated blog."
-msgstr ""
+msgstr "Affiche les noms des blogs, si c'est un blog aggrégé."
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:231
 msgid "ANY"
@@ -10632,7 +10610,7 @@ msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:86
 msgid "Text to show when hovering over the link"
-msgstr ""
+msgstr "Texte à afficher quand on passe la souris au dessus d'un lien"
 
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:88
 msgid "Read the full comment"
@@ -10873,7 +10851,7 @@ msgstr "HTML libre"
 
 #: ..\..\..\inc\widgets\widgets\_free_html.widget.php:64
 msgid "Custom text/HTML of your choice."
-msgstr ""
+msgstr "Texte/HTML personnel de votre choix."
 
 #: ..\..\..\inc\widgets\widgets\_free_html.widget.php:84
 msgid "Block content"
@@ -11011,9 +10989,9 @@ msgid "Tag &lt;%s&gt; is not allowed within tag &lt;%s&gt;"
 msgstr "La balise &lt;%s&gt; n'est pas autorisée à l'intérieur de la balise &lt;%s&gt;"
 
 #: ..\..\..\inc\xhtml_validator\_xhtml_validator.class.php:262
-#, fuzzy, php-format
+#, php-format
 msgid "Tag &lt;%s&gt; may not have attribute %s=\"...\""
-msgstr "La balise &lt;%s&gt; ne peut pas avoir d'attribut &lt;%s&gt;"
+msgstr "La balise &lt;%s&gt; ne peut pas avoir d'attribut %s=\"...\""
 
 #: ..\..\..\inc\xhtml_validator\_xhtml_validator.class.php:271
 msgid "Found invalid URL: "
@@ -11131,14 +11109,13 @@ msgstr "Le numéro de téléphone est invalide."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1541
 #: ..\..\..\inc\_core\_param.funcs.php:1545
-#, fuzzy
 msgid "Invalid XHTML."
-msgstr "URL invalide"
+msgstr "XHTML invalide."
 
 # D:\www\b2cvs20\blogs\inc\_core\_param.funcs.php:1647
 #: ..\..\..\inc\_core\_param.funcs.php:1647
 msgid "Illegal content found (spam?)"
-msgstr ""
+msgstr "Contenu illégal trouvé (spam?)"
 
 #: ..\..\..\inc\_core\_param.funcs.php:1648
 #, fuzzy, php-format
@@ -11146,9 +11123,8 @@ msgid "Illegal content found: blacklisted word &laquo;%s&raquo;"
 msgstr "Valeur illégale reçue pour le paramètre &laquo;%s&raquo;!"
 
 #: ..\..\..\inc\_core\_param.funcs.php:1699
-#, fuzzy
 msgid "Illegal CSS markup found: "
-msgstr "Marquage incorrect détecté:"
+msgstr "Balise CSS incorrecte détectée: "
 
 #: ..\..\..\inc\_core\_param.funcs.php:1710
 #, fuzzy
@@ -13011,7 +12987,7 @@ msgstr "Afficher du code informatique dans un article."
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:112
 msgid "Display computer code easily.  This plugin renders character entities on the fly, so you can cut-and-paste normal code directly into your posts and it will always look like normal code, even when editing the post (i.e., no preprocessing of the code is required). Include line numbers (customizable starting number).  The best part about the line numbers - visitors can cut-and-paste the code from your post, leaving the line numbers behind! Accepts BBcode tags and does not render smilies.  Colouration of PHP code, plus PHP manual links for PHP functions. Easy to install and easy to use. No hacks. Degrades nicely, if the plugin is off.  Styling completely customizable via your skins CSS file."
-msgstr ""
+msgstr "Affiche le code informatique facilement. Ce plugin effectue un rendu des caractères à la volée, donc vous pouvez copier-coller le code directement dans vos articles et il s'affichera toujours comme du code normal, même si vous édité votre article (c'est à dire qu'il n'y a pas besoin de preparer le code avant de le mettre dans l'article). Inclusion des numéros de lignes (valeur initiale configurable). Les numéros de lignes ne seront pas copiables par les visiteurs. Il accepte les tags BBCode et n'affiche pas les émoticons. Colorisation du code PHP, liens vers le manuel PHP pour les fonctions PHP. Facile à installer et facile à utiliser. Le style est complètement personalisable via les fichiers CSS d'habillage."
 
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:131
 msgid "XHTML strict"
