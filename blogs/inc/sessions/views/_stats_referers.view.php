@@ -31,7 +31,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 
-global $blog, $admin_url, $rsc_url;
+global $blog, $admin_url, $rsc_url, $AdminUI;
 
 ?>
 <h2><?php echo T_('Refered browser hits') ?>:</h2>
@@ -158,7 +158,7 @@ if( count( $res_stats ) )
 	$chart[ 'canvas_bg' ] = array (
 			'width'  => 780,
 			'height' => 350,
-			'color'  => 'efede0'
+			'color'  => $AdminUI->get_color( 'payload_background' )
 		);
 
 	$chart[ 'chart_rect' ] = array (
@@ -303,6 +303,9 @@ if( count( $res_stats ) )
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/21 18:16:33  personman2
+ * Different chart bg colors for each admin skin
+ *
  * Revision 1.2  2008/01/21 09:35:33  fplanque
  * (c) 2008
  *

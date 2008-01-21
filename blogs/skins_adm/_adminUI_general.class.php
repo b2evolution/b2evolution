@@ -1734,10 +1734,27 @@ class AdminUI_general extends Widget
 
 		return $r;
 	}
+	
+	/**
+	 * Get colors for page elements that can't be controlled by CSS (charts)
+	 */
+	function get_color( $what )
+	{
+		switch( $what )
+		{
+			case 'payload_background': 
+				return 'f1f6f8';
+				break;
+		}
+	}
+	
 }
 
 /*
  * $Log$
+ * Revision 1.78  2008/01/21 18:16:54  personman2
+ * Different chart bg colors for each admin skin
+ *
  * Revision 1.77  2008/01/21 16:46:16  fplanque
  * WARN that IE6 is crap!
  *

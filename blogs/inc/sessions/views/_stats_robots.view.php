@@ -31,7 +31,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 
-global $blog, $admin_url, $rsc_url;
+global $blog, $admin_url, $rsc_url, $AdminUI;
 
 echo '<h2>'.T_('Robot hits').'</h2>';
 echo '<p>'.sprintf( T_('This page only includes hits identified as made by <a %s>indexing robots</a> a.k.a. web crawlers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_robot=1&amp;blog='.$blog.'"' ).'</p>';
@@ -81,7 +81,7 @@ if( count($res_hits) )
 	$chart[ 'canvas_bg' ] = array (
 			'width'  => 780,
 			'height' => 400,
-			'color'  => 'efede0'
+			'color'  => $AdminUI->get_color( 'payload_background' )
 		);
 
 	$chart[ 'chart_rect' ] = array (
@@ -275,6 +275,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/21 18:16:33  personman2
+ * Different chart bg colors for each admin skin
+ *
  * Revision 1.2  2008/01/21 09:35:34  fplanque
  * (c) 2008
  *

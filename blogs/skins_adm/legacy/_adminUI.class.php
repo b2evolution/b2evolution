@@ -182,6 +182,20 @@ class AdminUI extends AdminUI_general
 	{
 		return "\n</div>\n";
 	}
+	
+	/**
+	 * Get colors for page elements that can't be controlled by CSS (charts)
+	 */
+	function get_color( $what )
+	{
+		switch( $what )
+		{
+			case 'payload_background': 
+				return 'efede0';
+				break;
+		}
+	}
+	
 }
 
 ?>

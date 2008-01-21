@@ -25,7 +25,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $rsc_url;
+global $blog, $admin_url, $rsc_url, $AdminUI;
 
 echo '<h2>'.T_('XML hits summary').'</h2>';
 echo '<p>'.sprintf( T_('These are hits from <a %s>XML readers</a>. This includes RSS and Atom readers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_rss=1&amp;blog='.$blog.'"' ).'</p>';
@@ -74,7 +74,7 @@ if( count($res_hits) )
 	$chart[ 'canvas_bg' ] = array (
 			'width'  => 780,
 			'height' => 400,
-			'color'  => 'efede0'
+			'color'  => $AdminUI->get_color( 'payload_background' )
 		);
 
 	$chart[ 'chart_rect' ] = array (
@@ -194,6 +194,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/21 18:16:33  personman2
+ * Different chart bg colors for each admin skin
+ *
  * Revision 1.2  2008/01/21 09:35:34  fplanque
  * (c) 2008
  *

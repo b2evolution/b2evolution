@@ -367,5 +367,19 @@ class AdminUI extends AdminUI_general
 				return parent::get_template( $name, $depth );
 		}
 	}
+	
+	/**
+	 * Get colors for page elements that can't be controlled by CSS (charts)
+	 */
+	function get_color( $what )
+	{
+		switch( $what )
+		{
+			case 'payload_background': 
+				return 'f1f6f8';
+				break;
+		}
+	}
+	
 }
 ?>
