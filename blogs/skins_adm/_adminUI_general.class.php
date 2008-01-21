@@ -1718,12 +1718,29 @@ class AdminUI_general extends Widget
 	{
 		global $app_footer_text, $copyright_text;
 
-		return '<div class="footer">'.$app_footer_text.' &ndash; '.$copyright_text."</div>\n\n";
+		global $Hit;
+
+		$r = '';
+
+   	if( $Hit->is_winIE )
+		{
+		 $r .= '<!--[if lt IE 7]>
+<div style="text-align:center; color:#f00; font-weight:bold; margin:1ex;">'.
+			T_('WARNING: Internet Explorer 6 may not able to display this admin skin properly. We strongly recommend you upgrade to IE 7 or Firefox.').'</div>
+<![endif]-->';
+		}
+
+		$r .= '<div class="footer">'.$app_footer_text.' &ndash; '.$copyright_text."</div>\n\n";
+
+		return $r;
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.77  2008/01/21 16:46:16  fplanque
+ * WARN that IE6 is crap!
+ *
  * Revision 1.76  2008/01/21 15:02:01  fplanque
  * fixed evobar
  *

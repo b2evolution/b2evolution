@@ -118,12 +118,23 @@ class AdminUI extends AdminUI_general
 		global $app_footer_text, $copyright_text;
 		global $adminskins_url;
 
+		global $Hit;
 
 		$r = '<div class="footer">';
 
+   	if( $Hit->is_winIE )
+		{
+		 $r .= '<!--[if lt IE 7]>
+<div style="text-align:center; color:#f00; font-weight:bold;">'.
+			T_('WARNING: Internet Explorer 6 may not able to display this admin skin properly. We strongly recommend you upgrade to IE 7 or Firefox.').'</div>
+<![endif]-->';
+		}
+
 		$r .= '<a href="http://b2evolution.net/" class="footer_logo"><img src="'.$adminskins_url.'chicago/rsc/img/b2evolution-footer-logo-blue-bg.gif" alt="Powered by b2evolution" width="142" height="43" longdesc="http://b2evolution.net/" /></a>';
 
-		$r .= '<div class="copyright">'.$app_footer_text.' &ndash; '.$copyright_text."</div></div>\n\n";
+		$r .= '<div class="copyright">';
+
+		$r .= $app_footer_text.' &ndash; '.$copyright_text."</div></div>\n\n";
 
 		return $r;
 	}
