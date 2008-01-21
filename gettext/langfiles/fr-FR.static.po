@@ -7,12 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2007-10-10 11:19+0100\n"
-"Last-Translator: Francois PLANQUE <fplanque.net>\n"
+"PO-Revision-Date: 2008-01-21 20:40+0100\n"
+"Last-Translator: Olivier Daury <http://daury.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: French\n"
+"X-Poedit-Country: FRANCE\n"
+"X-Poedit-SourceCharset: iso-8859-1\n"
 
 #: ../../index.src.html:7
 #: ../../doc/install_new.src.html:7
@@ -307,7 +310,7 @@ msgstr "N'installez <strong>pas</strong> la version actuelle de b2evolution main
 
 #: ../../doc/upgradefrom_b2.src.html:39
 msgid "Follow the instructions incuded in b2evolution 1.x to upgrade from b2/Cafelog."
-msgstr "Suivez les instructions inclues dans b2evolution 1.x pour upgrader depyus b2/Cafelog."
+msgstr "Suivez les instructions inclues dans b2evolution 1.x pour upgrader depuis b2/Cafelog."
 
 #: ../../doc/upgradefrom_b2.src.html:41
 msgid "Come back to the current version of b2evolution and <a %s>upgrade from b2evolution 1.x to the current version</a>."
@@ -319,7 +322,7 @@ msgstr "Faites une copie de sauvegarde de tous vos fichiers b2evolution. Prenez 
 
 #: ../../doc/upgradefrom_b2evo.src.html:36
 msgid "You should also backup your database if you can. This functionality should be provided by your host."
-msgstr "Vous devriez également faire un backup de votre base de données si vous le pouvez. Cette fonctionnalité devrait être proposée par votre hébergeur."
+msgstr "Vous devriez également faire une sauvegarde de votre base de données si vous le pouvez. Cette fonctionnalité devrait être proposée par votre hébergeur."
 
 #: ../../doc/upgradefrom_b2evo.src.html:37
 msgid "Delete <strong>all your existing b2evolution files from your site</strong> before uploading the new ones! Some of the old files may not be compatible with this new version and will cause it to fail! This will also ensure you don't keep unnecessary files on your server after upgrading. Plus, it's better for security."
@@ -339,7 +342,7 @@ msgstr "Consultez le manuel en ligne pour obtenir des <a %s>instructions de mise
 
 #: ../../doc/upgradefrom_b2evo.src.html:47
 msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly."
-msgstr "Il est maintenant temps de réintroduire vos précédentes personnalisations. Nous vous recommandons de vous procurer un outil de type diff/merge tel que <a %s>WinMerge</a>. Ceci vous permettra de comparer aisément vos anciens fichiers (backupés) avec vos nouveaux fichiers (et même des dossiers entiers en une seule opération) afin de reporter les modifications nécessaires."
+msgstr "Il est maintenant temps de réintroduire vos précédentes personnalisations. Nous vous recommandons de vous procurer un outil de type diff/merge tel que <a %s>WinMerge</a>. Ceci vous permettra de comparer aisément vos anciens fichiers (sauvegardés) avec vos nouveaux fichiers (et même des dossiers entiers en une seule opération) afin de reporter les modifications nécessaires."
 
 #: ../../doc/upgradefrom_mt.src.html:7
 #: ../../doc/upgradefrom_mt.src.html:31
