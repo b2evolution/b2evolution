@@ -106,7 +106,6 @@ header('Content-Type: text/html; charset='.$io_charset);
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/evo_distrib_2.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<!-- InstanceBeginEditable name="doctitle" -->
 	<title><?php echo T_('b2evo installer').( $title ? ': '.$title : '' ) ?></title>
 	<!-- InstanceEndEditable -->
@@ -679,6 +678,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.142  2008/01/21 15:00:00  fplanque
+ * let browser autodetect charset (russian utf8!!)
+ *
  * Revision 1.141  2008/01/21 09:35:38  fplanque
  * (c) 2008
  *
