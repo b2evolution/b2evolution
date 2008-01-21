@@ -228,7 +228,6 @@ function install_basic_plugins( $old_db_version = 0 )
 		$Plugins_admin->install( 'autolinks_plugin' );
 		$Plugins_admin->install( 'texturize_plugin' );
 		$Plugins_admin->install( 'smilies_plugin' );
-		$Plugins_admin->install( 'code_highlight_plugin' );
 		$Plugins_admin->install( 'videoplug_plugin' );
 		// SkinTags:
 		$Plugins_admin->install( 'calendar_plugin' );
@@ -528,6 +527,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.45  2008/01/21 17:56:34  fplanque
+ * no more code plugin by default
+ *
  * Revision 1.44  2008/01/21 09:35:38  fplanque
  * (c) 2008
  *
