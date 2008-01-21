@@ -35,7 +35,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $io_charset, $rsc_url, $UserSettings, $Debuglog, $Plugins, $generating_static;
 global $month, $month_abbrev, $weekday, $weekday_abbrev; /* for localized calendar */
-global $debug;
+global $debug, $Hit;
 
 header( 'Content-type: text/html; charset='.$io_charset );
 ?>
@@ -220,6 +220,19 @@ JS;
 		add_headline( $initcheckall_script );
 	}}}
 
+	if( $Hit->is_winIE )
+	{
+		add_headline( '<!--[if lt IE 7]>
+<style type="text/css">
+/* IE: fix extra space */
+div.skin_wrapper_loggedin {
+	margin-top: 0;
+	padding-top: 0;
+}
+</style>
+<![endif]-->' );
+	}
+
 	// CALL PLUGINS NOW:
 	global $Plugins;
 	$Plugins->trigger_event( 'AdminEndHtmlHead', array() );
@@ -231,6 +244,9 @@ JS;
 <?php
 /*
  * $Log$
+ * Revision 1.5  2008/01/21 15:02:01  fplanque
+ * fixed evobar
+ *
  * Revision 1.4  2008/01/21 09:35:43  fplanque
  * (c) 2008
  *

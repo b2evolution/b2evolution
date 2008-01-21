@@ -24,7 +24,8 @@ a:hover {
 	color: #9ae;
 }
 
-div.pageHeader h1 a {
+div.pageHeader h1 a,
+div.pageHeader h1 a:visited {  /* IE6 */
 	color: #fff;
 	text-decoration: none;
 }

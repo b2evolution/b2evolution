@@ -122,7 +122,19 @@ div#evo_toolbar {
 	font-size: 11px;
 	font-family: "Microsoft sans serif", sans-serif, Arial, Helvetica;
 
+	position: fixed;
+	z-index: 99;
+	left: 0px;
+	top: 0px;	
+	height: 21px;
+	width:100%;		/* Safari Windows */
 }
+
+div.skin_wrapper_loggedin {
+	margin-top: 22px;
+	padding-top: 1px;
+}
+
 div#evo_toolbar a {
 	border: 1px solid ThreeDFace;
 	color: ButtonText;

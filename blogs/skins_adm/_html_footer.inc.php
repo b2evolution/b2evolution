@@ -71,11 +71,17 @@ debug_info();
 
 ?>
 
+<!-- End of skin_wrapper -->
+</div>
+
 </body>
 </html>
 <?php
 /*
  * $Log$
+ * Revision 1.5  2008/01/21 15:02:01  fplanque
+ * fixed evobar
+ *
  * Revision 1.4  2008/01/21 09:35:43  fplanque
  * (c) 2008
  *

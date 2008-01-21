@@ -50,10 +50,15 @@ h4 {
 	font-size: 110%;
 }
 
+div.skin_wrapper_anonymous {
+	padding-top: 9px;
+}
+
+
 div#wrapper {
 	background: #e8f2f5 url("img/bg.gif") repeat-y center top;
 	width: 752px;
-	margin: 16px auto;
+	margin: 8px auto 16px;
 	padding: 0;
 }
 

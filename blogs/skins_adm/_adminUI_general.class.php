@@ -436,6 +436,18 @@ class AdminUI_general extends Widget
 
 		require $skins_path.'_toolbar.inc.php';
 
+
+		echo "\n";
+		if( is_logged_in() )
+		{
+			echo '<div id="skin_wrapper" class="skin_wrapper_loggedin">';
+		}
+		else
+		{
+			echo '<div id="skin_wrapper" class="skin_wrapper_anonymous">';
+		}
+		echo "\n<!-- Start of skin_wrapper -->\n";
+
 		echo $this->get_body_top();
 	}
 
@@ -1712,6 +1724,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.76  2008/01/21 15:02:01  fplanque
+ * fixed evobar
+ *
  * Revision 1.75  2008/01/21 09:35:43  fplanque
  * (c) 2008
  *

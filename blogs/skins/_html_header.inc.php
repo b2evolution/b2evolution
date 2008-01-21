@@ -53,4 +53,16 @@ skin_content_header();	// Sets charset!
 // ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
 require $skins_path.'_toolbar.inc.php';
 // ------------------------------- END OF TOOLBAR --------------------------------
+
+echo "\n";
+if( is_logged_in() )
+{
+	echo '<div id="skin_wrapper" class="skin_wrapper_loggedin">';
+}
+else
+{
+	echo '<div id="skin_wrapper" class="skin_wrapper_anonymous">';
+}
+echo "\n";
 ?>
+<!-- Start of skin_wrapper -->
