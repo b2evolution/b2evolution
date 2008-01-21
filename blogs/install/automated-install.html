@@ -28,10 +28,10 @@
 	</ol>
 	<h1>Recommended Auto Install procedure</h1>
 	<h2>1. Place the application files in the destination directory</h2>
-	<p>We recommend you prompt the user for a directory to install b2evolution into. If he provides an empty directory, b2evolution would be installed in his web root. Let's pretend the user chose to instal into www/myblog/ .</p>
+	<p>We recommend you prompt the user for a directory to install b2evolution into. If he provides an empty directory, b2evolution would be installed in his web root. Let's pretend the user chose to install into www/myblog/ .</p>
 	<p>Once the destination directory selected/created, you need to copy all the contents of the /blogs/ directory as provided in the b2evolution package into the destination directory www/myblog/ . <strong>You should not copy the package info files such as the /doc/ directory.</strong></p>
 	<h3>File permissions</h3>
-	<p>You should make sure that the contents of the www/myblog/media/ directory are writable by PHP. This is the place where the user can upload pictures to insert in hos blog posts, etc.</p>
+	<p>You should make sure that the contents of the www/myblog/media/ directory are writable by PHP. This is the place where the user can upload pictures to insert in his blog posts, etc.</p>
 	<h2>2. Create a MySQL database</h2>
 	<p>You will need to provide b2evolution with a database where it will create its own tables.</p>
 	<h2>3. Write the configuration file</h2>
@@ -44,7 +44,7 @@
  'host'          =&gt; 'localhost',    // MySQL Server (typically 'localhost')
  );
 </pre>
-	<p>Then, you should update the user's email address on this line:<br>
+	<p>Then, you should update the user's e-mail address on this line:<br>
 	</p>
 	<pre>$admin_email = 'postmaster@localhost';</pre>
 	<p>and you need to tell b2evolution that the configuration has been done by replacing</p>
