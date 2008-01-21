@@ -7,8 +7,6 @@
  * It is meant to be called by an include in the main.page.php template (or other templates)
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
  * @subpackage basic
@@ -61,6 +59,9 @@ $Item->images( array(
 <?php
 /*
  * $Log$
+ * Revision 1.4  2008/01/21 09:35:43  fplanque
+ * (c) 2008
+ *
  * Revision 1.3  2008/01/17 14:38:33  fplanque
  * Item Footer template tag
  *

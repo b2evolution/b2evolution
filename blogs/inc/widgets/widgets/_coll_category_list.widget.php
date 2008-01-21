@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2008 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * {@internal License choice
@@ -361,6 +361,9 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.9  2008/01/21 09:35:37  fplanque
+ * (c) 2008
+ *
  * Revision 1.8  2008/01/06 17:52:50  fplanque
  * minor/doc
  *

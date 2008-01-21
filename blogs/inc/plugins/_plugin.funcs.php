@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -998,6 +998,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/21 09:35:32  fplanque
+ * (c) 2008
+ *
  * Revision 1.2  2007/09/03 23:45:56  blueyed
  * Use always the array key as value for "select" settings.
  *

@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2005-2007 by Yabba/Scott - {@link http://astonishme.co.uk/contact/}.
  *
  * {@internal License choice
@@ -565,6 +565,9 @@ div.codeblock.amc_short table {
 
 /**
  * $Log$
+ * Revision 1.12  2008/01/21 09:35:41  fplanque
+ * (c) 2008
+ *
  * Revision 1.11  2008/01/19 16:13:02  yabs
  * removed obsolete version changed function
  *

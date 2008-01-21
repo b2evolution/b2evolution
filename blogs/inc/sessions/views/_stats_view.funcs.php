@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -64,6 +64,9 @@ function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/21 09:35:34  fplanque
+ * (c) 2008
+ *
  * Revision 1.1  2007/06/25 11:01:10  fplanque
  * MODULES (refactored MVC)
  *

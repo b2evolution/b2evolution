@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -135,6 +135,9 @@ class GenericCategory extends GenericElement
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/21 09:35:30  fplanque
+ * (c) 2008
+ *
  * Revision 1.1  2007/06/25 11:00:15  fplanque
  * MODULES (refactored MVC)
  *

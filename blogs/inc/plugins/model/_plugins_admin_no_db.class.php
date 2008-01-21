@@ -6,7 +6,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -59,6 +59,9 @@ class Plugins_admin_no_DB extends Plugins_admin
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/21 09:35:32  fplanque
+ * (c) 2008
+ *
  * Revision 1.1  2007/06/25 11:00:50  fplanque
  * MODULES (refactored MVC)
  *

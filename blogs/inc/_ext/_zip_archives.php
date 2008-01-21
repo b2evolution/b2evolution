@@ -12,7 +12,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @author Devin Doucette - darksnoopy@shaw.ca
  *
@@ -708,6 +708,9 @@ class zip_file extends archive
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/21 09:35:25  fplanque
+ * (c) 2008
+ *
  * Revision 1.1  2007/06/25 10:59:12  fplanque
  * MODULES (refactored MVC)
  *

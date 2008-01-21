@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2005-2007 by Yabba/Scott - {@link http://astonishme.co.uk/contact/}.
  *
  * {@internal License choice
@@ -161,6 +161,9 @@ class am_php_highlighter
 
 /**
  * $Log$
+ * Revision 1.8  2008/01/21 09:35:42  fplanque
+ * (c) 2008
+ *
  * Revision 1.7  2007/12/26 17:34:25  fplanque
  * no message
  *

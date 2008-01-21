@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @author fplanque: Francois PLANQUE.
  * @author gorgeb: Bertrand GORGE / EPISTEMA
@@ -400,6 +400,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.44  2008/01/21 09:35:41  fplanque
+ * (c) 2008
+ *
  * Revision 1.43  2007/08/12 19:44:41  blueyed
  * Fixed :yes: smilie
  *

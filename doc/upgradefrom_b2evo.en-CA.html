@@ -17,7 +17,7 @@
 
 	<div class="wrapper1">
 	<div class="wrapper2">
-		<span class="version_top">Version 2.3.0-rc1</span>	
+		<span class="version_top">Version 2.4.0-rc2</span>	
 	
 		<a href="http://b2evolution.net/" target="_blank"><img src="../blogs/rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
 		
@@ -33,19 +33,21 @@
 		<h1>Upgrading from a previous version of b2evolution</h1>
 		<p class="note">Before you begin, please note that some network features of b2evolution require you to agree our simple <a href="http://b2evolution.net/about/terms.html" target="_blank">Terms of service</a>.</p>
 		<ol class="expanded">
-			<li>Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, hacks, third party plugins, etc...</li>
+			<li>Backup all your b2evolution files. Take special care of the files you may have modified, including <strong>/conf</strong>, <strong>/skins</strong>, <strong>/plugins</strong>, your <strong>/media</strong> directory and possibly stubfiles, hacks or custom templates...</li>
 			<li>You should also backup your database if you can. This functionality should be provided by your host.</li>
-			<li>Delete <strong>all your existing b2evolution files from your site</strong> before uploading the new ones! Some of the old files may not be compatible with this new version and will cause it to fail! This will also ensure you don't keep unnecessary files on your server after upgrading. Plus, it's better for security. </li>
-		<li>Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you can't reuse your customized files, including  /conf, skins, blog templates, stubfiles, etc. as they are!<br />
+			<li>If you are upgrading from a version prior to 2.0, we highly recommend you clean up outdated files. To achieve this, delete your b2evolution folders <strong>except /media</strong>. Folders to delete include /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. Depending on your version, you may not have all of these folders on your server. Also, again, make sure you have a backup before deleting.</li>
+			<li>Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you cannot reuse your  /conf files, default skin templates or default plugins as they are.<br />
+				<br />
+				Since your custom skins and custom plugins should be using different names, they will not be overwritten. Same for your media files.<br />
+				<br />
+				The one file you must absolutely restore from your backup (see step 1) though is <code>/blogs/_basic_config.php</code>. You will need to either restore or recreate that file in order to proceed with upgrade.</li>
+			<li>Run the installation/upgrade script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code>/ . Then, simply follow the on screen instructions.<br />
 		<br />
-		That means you will have to customize all these files again. We're sorry but, due to the pace of development and adding of new features, we cannot guarantee that anything will work if you keep older files in place. <strong>However</strong>, since you have backed up all these files in step 1, you can try to partially reuse them once the upgrade process is done. See step 8 below.</li>
-			<li>Run the installation script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code> . Then, simply follow the on screen instructions.<br />
-		<br />
-		The installer will ask you basic configuration settings (unless you have already updated /conf/_config.php before uploading), then allow you to run a database upgrade from any b2evolution version to the new one.</li>
+		The installer/upgrader will  allow you to run a database upgrade from <strong>any</strong> b2evolution version to the new one.</li>
 			<li>Check to make sure the new installation works.</li>
 			<li>Check the online manual for <a href="http://manual.b2evolution.net/Upgrade_from_an_older_version" target="_blank">specific upgrade instructions</a> to your new version of b2evolution.</li>
 			<li>On production servers, it is recommended that you delete the <code>/install</code> subfolder.</li>
-			<li>It's now time to bring back your previous customizations.
+			<li>If you had hacks or other customizations to the core files, your can bring those back now.
 		We recommend you get yourself a diff/merge tool like <a href="http://winmerge.sourceforge.net/" target="_blank">WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.</li>
 			</ol>
 		

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -2539,6 +2539,9 @@ function generate_link_from_params( $link_params )
 
 /*
  * $Log$
+ * Revision 1.20  2008/01/21 09:35:23  fplanque
+ * (c) 2008
+ *
  * Revision 1.19  2008/01/18 15:53:42  fplanque
  * Ninja refactoring
  *

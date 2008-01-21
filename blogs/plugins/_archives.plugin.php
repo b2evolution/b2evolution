@@ -6,7 +6,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -580,6 +580,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.46  2008/01/21 09:35:38  fplanque
+ * (c) 2008
+ *
  * Revision 1.45  2007/11/29 21:52:22  fplanque
  * minor
  *

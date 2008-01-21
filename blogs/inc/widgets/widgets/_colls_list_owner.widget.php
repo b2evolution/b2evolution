@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -82,6 +82,9 @@ class colls_list_owner_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/21 09:35:37  fplanque
+ * (c) 2008
+ *
  * Revision 1.1  2007/06/25 11:02:24  fplanque
  * MODULES (refactored MVC)
  *

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
@@ -2164,6 +2164,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.239  2008/01/21 09:35:38  fplanque
+ * (c) 2008
+ *
  * Revision 1.238  2008/01/19 10:57:10  fplanque
  * Splitting XHTML checking by group and interface
  *

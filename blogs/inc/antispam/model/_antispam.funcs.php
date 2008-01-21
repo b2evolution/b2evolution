@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as
@@ -331,6 +331,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.7  2008/01/21 09:35:25  fplanque
+ * (c) 2008
+ *
  * Revision 1.6  2008/01/20 18:20:22  fplanque
  * Antispam per group setting
  *

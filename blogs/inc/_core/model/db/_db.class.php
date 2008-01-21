@@ -15,7 +15,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004 by Justin Vincent - {@link http://php.justinvincent.com}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -1407,6 +1407,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/21 09:35:24  fplanque
+ * (c) 2008
+ *
  * Revision 1.4  2007/12/28 18:59:26  blueyed
  * - Fix for table_options and trailing semicolon
  * - todo about table_options

@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)1999 by CDI (cdi@thewebmasters.net).
  * Parts of this file are copyright (c)1999-2002 by The SquirrelMail Project Team.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
@@ -734,6 +734,9 @@ class POP3 {
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/21 09:35:25  fplanque
+ * (c) 2008
+ *
  * Revision 1.1  2007/06/25 10:59:08  fplanque
  * MODULES (refactored MVC)
  *

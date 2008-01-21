@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package xmlsrv
  *
@@ -74,6 +74,9 @@ $s = new xmlrpc_server( $xmlrpc_procs );
 
 /*
  * $Log$
+ * Revision 1.148  2008/01/21 09:35:44  fplanque
+ * (c) 2008
+ *
  * Revision 1.147  2008/01/18 15:53:42  fplanque
  * Ninja refactoring
  *

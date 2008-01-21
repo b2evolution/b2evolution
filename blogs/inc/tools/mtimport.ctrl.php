@@ -16,7 +16,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Credits go to the WordPress team (@link http://wordpress.org), where I got the basic
  * import-mt.php script with most of the core functions. Thank you!
@@ -1661,6 +1661,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.4  2008/01/21 09:35:35  fplanque
+ * (c) 2008
+ *
  * Revision 1.3  2007/10/09 01:18:12  fplanque
  * Hari's WordPress importer
  *

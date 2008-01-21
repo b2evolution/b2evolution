@@ -14,7 +14,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
  */
@@ -210,6 +210,9 @@ skin_include( '_item_comment_form.inc.php', array(
 
 /*
  * $Log$
+ * Revision 1.14  2008/01/21 09:35:42  fplanque
+ * (c) 2008
+ *
  * Revision 1.13  2007/12/22 16:41:05  fplanque
  * Modular feedback template.
  *

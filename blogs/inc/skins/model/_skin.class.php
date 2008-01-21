@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -429,6 +429,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2008/01/21 09:35:35  fplanque
+ * (c) 2008
+ *
  * Revision 1.7  2007/12/22 21:02:50  fplanque
  * minor
  *
