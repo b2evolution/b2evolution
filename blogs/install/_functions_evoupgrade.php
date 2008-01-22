@@ -2041,19 +2041,27 @@ function upgrade_b2evo_tables()
 	}
 
 
-	// 2.3.2
-  echo 'Creating PodCast Post Type... ';
-	$DB->query( "
-		REPLACE INTO T_items__type ( ptyp_ID, ptyp_name )
-		VALUES ( 2000, 'Podcast' )" );
-	echo "OK.<br />\n";
-	// 2.4.0
-  echo 'Adding additional group permissions... ';
-	$DB->query( "
-      ALTER TABLE evo20_groups
-      	ADD COLUMN grp_perm_xhtmlvalidation          VARCHAR(10) NOT NULL default 'always' AFTER grp_perm_blogs,
-				ADD COLUMN grp_perm_xhtmlvalidation_xmlrpc   VARCHAR(10) NOT NULL default 'always' AFTER grp_perm_xhtmlvalidation " );
-	echo "OK.<br />\n";
+	if( $old_db_version < 9700 )
+	{	// 2.3.2
+	  echo 'Creating PodCast Post Type... ';
+		$DB->query( "
+			REPLACE INTO T_items__type ( ptyp_ID, ptyp_name )
+			VALUES ( 2000, 'Podcast' )" );
+		echo "OK.<br />\n";
+
+		// 2.4.0
+	  echo 'Adding additional group permissions... ';
+		$DB->query( "
+	      ALTER TABLE T_groups
+					ADD COLUMN grp_perm_bypass_antispam         TINYINT(1)  NOT NULL DEFAULT 0        AFTER grp_perm_blogs,
+					ADD COLUMN grp_perm_xhtmlvalidation         VARCHAR(10) NOT NULL default 'always' AFTER grp_perm_bypass_antispam,
+					ADD COLUMN grp_perm_xhtmlvalidation_xmlrpc  VARCHAR(10) NOT NULL default 'always' AFTER grp_perm_xhtmlvalidation,
+					ADD COLUMN grp_perm_xhtml_css_tweaks        TINYINT(1)  NOT NULL DEFAULT 0        AFTER grp_perm_xhtmlvalidation_xmlrpc,
+      		ADD COLUMN grp_perm_xhtml_iframes           TINYINT(1)  NOT NULL DEFAULT 0        AFTER grp_perm_xhtml_css_tweaks,
+      		ADD COLUMN grp_perm_xhtml_javascript        TINYINT(1)  NOT NULL DEFAULT 0        AFTER grp_perm_xhtml_iframes,
+					ADD COLUMN grp_perm_xhtml_objects           TINYINT(1)  NOT NULL DEFAULT 0        AFTER grp_perm_xhtml_javascript " );
+		echo "OK.<br />\n";
+	}
 
 	/*
 	 * ADD UPGRADES HERE.
@@ -2164,6 +2172,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.240  2008/01/22 16:57:08  fplanque
+ * db upgrade stuff
+ *
  * Revision 1.239  2008/01/21 09:35:38  fplanque
  * (c) 2008
  *
