@@ -1610,12 +1610,11 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 	 */
 	global $current_User;
 
-	$Group = & $current_User->get_Group();
-
 	switch( $context )
 	{
 		case 'posting':
 		case 'xmlrpc_posting':
+			$Group = & $current_User->get_Group();
 			if( $context == 'posting' )
 			{
 				$xhtmlvalidation  = ($Group->perm_xhtmlvalidation == 'always');
@@ -1880,6 +1879,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.15  2008/01/22 14:20:21  fplanque
+ * anonymous comments fix.
+ *
  * Revision 1.14  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *
