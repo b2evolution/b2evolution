@@ -182,7 +182,7 @@ class AdminUI extends AdminUI_general
 	{
 		return "\n</div>\n";
 	}
-	
+
 	/**
 	 * Get colors for page elements that can't be controlled by CSS (charts)
 	 */
@@ -190,12 +190,19 @@ class AdminUI extends AdminUI_general
 	{
 		switch( $what )
 		{
-			case 'payload_background': 
+			case 'payload_background':
 				return 'efede0';
 				break;
 		}
+		debug_die( 'unknown color' );
 	}
-	
+
 }
 
+/*
+ * $Log$
+ * Revision 1.26  2008/01/22 14:31:06  fplanque
+ * minor
+ *
+ */
 ?>

@@ -1734,7 +1734,7 @@ class AdminUI_general extends Widget
 
 		return $r;
 	}
-	
+
 	/**
 	 * Get colors for page elements that can't be controlled by CSS (charts)
 	 */
@@ -1742,16 +1742,20 @@ class AdminUI_general extends Widget
 	{
 		switch( $what )
 		{
-			case 'payload_background': 
+			case 'payload_background':
 				return 'f1f6f8';
 				break;
 		}
+		debug_die( 'unknown color' );
 	}
-	
+
 }
 
 /*
  * $Log$
+ * Revision 1.79  2008/01/22 14:31:06  fplanque
+ * minor
+ *
  * Revision 1.78  2008/01/21 18:16:54  personman2
  * Different chart bg colors for each admin skin
  *
@@ -1875,27 +1879,5 @@ class AdminUI_general extends Widget
  *
  * Revision 1.40  2007/01/14 17:26:11  blueyed
  * Fixed wrong TR around whole HEAD contents
- *
- * Revision 1.39  2006/12/12 19:39:08  fplanque
- * enhanced file links / permissions
- *
- * Revision 1.38  2006/12/12 16:42:23  fplanque
- * border-collapse sucks (firefox)
- *
- * Revision 1.37  2006/12/12 02:53:57  fplanque
- * Activated new item/comments controllers + new editing navigation
- * Some things are unfinished yet. Other things may need more testing.
- *
- * Revision 1.36  2006/12/03 01:58:27  blueyed
- * Renamed $admin_path_seprator to $admin_path_separator and AdminUI_general::pathSeperator to AdminUI::pathSeparator
- *
- * Revision 1.35  2006/11/27 19:14:14  fplanque
- * i18n
- *
- * Revision 1.34  2006/10/23 22:19:03  blueyed
- * Fixed/unified encoding of redirect_to param. Use just rawurlencode() and no funky &amp; replacements
- *
- * Revision 1.33  2006/10/15 21:30:47  blueyed
- * Use url_rel_to_same_host() for redirect_to params.
  */
 ?>
