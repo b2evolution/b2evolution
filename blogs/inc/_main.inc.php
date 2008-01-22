@@ -224,8 +224,9 @@ $localtimenow = $servertimenow + $time_difference;
  * The Hit class
  */
 load_class('sessions/model/_hit.class.php');
-// fp> The following constructor requires this right now, but it should not! this should be loaded later.
+// fp> The following constructor requires these right now:
 load_class('_core/_param.funcs.php');
+load_funcs('_core/_url.funcs.php');
 /**
  * @global Hit The Hit object
  */
@@ -298,7 +299,6 @@ if( empty($generating_static) )
  * Includes:
  */
 $Timer->start('_main.inc:requires');
-load_funcs('_core/_url.funcs.php');
 load_class('_core/model/dataobjects/_dataobjectcache.class.php');
 load_class('generic/model/_genericelement.class.php');
 load_class('generic/model/_genericcache.class.php');
@@ -647,6 +647,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.89  2008/01/22 15:34:46  fplanque
+ * minor
+ *
  * Revision 1.88  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *
