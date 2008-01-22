@@ -434,6 +434,14 @@ function set_working_blog( $new_blog_ID )
 {
 	global $blog, $UserSettings;
 
+	if( $new_blog_ID != (int)$UserSettings->get('selected_blog') )
+	{	// Save the new default blog.
+		// fp> Test case 1: dashboard without a blog param should go to last selected blog
+		// fp> Test case 2: uploading to the default blog may actually upload into another root (sev)
+		$UserSettings->set( 'selected_blog', $blog );
+		$UserSettings->dbupdate();
+	}
+
 	if( $new_blog_ID == $blog )
 	{
 		return false;
@@ -441,18 +449,16 @@ function set_working_blog( $new_blog_ID )
 
 	$blog = $new_blog_ID;
 
-	if( $new_blog_ID != (int)$UserSettings->get('selected_blog') )
-	{
-		$UserSettings->set( 'selected_blog', $blog );
-		$UserSettings->dbupdate();
-	}
-
 	return true;
 }
 
 
 /*
  * $Log$
+ * Revision 1.3  2008/01/22 18:47:32  fplanque
+ * attempt to fix nasty thing about blog memorization.
+ * praying there will be no side effects.
+ *
  * Revision 1.2  2008/01/21 09:35:26  fplanque
  * (c) 2008
  *
