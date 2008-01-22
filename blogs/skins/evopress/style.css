@@ -218,10 +218,6 @@ height: 200px;
 width: 758px;
 }
 
-div.widget_core_coll_title {
-	padding-top: 70px;
-}
-
 .narrowcolumn {
 float: left;
 padding: 0 0 20px 45px;
@@ -545,14 +541,16 @@ margin: 1ex 0;
 
 
 /*
-* Header / bloglist on top:
-*/
+ * Header / bloglist on top:
+ */
 div#header ul {
 float:right;
 list-style-type:none;
+margin: 0;
 padding: 27px 24px;
 }
 div#header li {
+margin: 0;
 display: inline;
 padding: 0 1ex 0 0;
 }
@@ -568,6 +566,12 @@ text-decoration: underline;
 div#header li a.selected {
 text-decoration: underline;
 }
+
+
+div.widget_core_coll_title {
+	padding-top: 70px;
+}
+
 
 /* Top menu */
 div.top_menu ul {
