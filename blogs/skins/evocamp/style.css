@@ -133,7 +133,7 @@ h1 {
 text-align:center;
 font-size:30px;
 line-height:100%;
-padding: 50px 100px 5px;
+padding: 5px;
 margin: 0;
 }
 h1 a,
@@ -619,4 +619,8 @@ text-decoration: underline;
 }
 div#header li a.selected {
 text-decoration: underline;
+}
+
+div.widget_core_coll_title {
+	padding-top: 45px;
 }

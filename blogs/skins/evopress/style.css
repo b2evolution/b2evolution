@@ -218,6 +218,10 @@ height: 200px;
 width: 758px;
 }
 
+div.widget_core_coll_title {
+	padding-top: 70px;
+}
+
 .narrowcolumn {
 float: left;
 padding: 0 0 20px 45px;
@@ -297,7 +301,6 @@ text-align: center;
 
 /*	Begin Headers */
 h1 {
-padding-top: 70px;
 margin: 0;
 }
 
@@ -546,10 +549,8 @@ margin: 1ex 0;
 */
 div#header ul {
 float:right;
-margin: 19px 24px;
-padding: 0;
 list-style-type:none;
-padding: 8px 0;
+padding: 27px 24px;
 }
 div#header li {
 display: inline;
