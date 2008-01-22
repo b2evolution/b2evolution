@@ -32,22 +32,15 @@
 		<h1>Обновление с предыдущей версии b2evolution</h1>
 		<p class="note">Перед началом, пожалуйста обратите внимание на то, что некоторые сетевые особенности b2evolution требуют от вас согласия с <a href="http://b2evolution.net/about/terms.html" target="_blank">Условиями обслуживания</a>.</p>
 		<ol class="expanded">
-			<li>Backup all your b2evolution files. Take special care of the files you may have modified, including <strong>/conf</strong>, <strong>/skins</strong>, <strong>/plugins</strong>, your <strong>/media</strong> directory and possibly stubfiles, hacks or custom templates...</li>
+			<li>Сохраните все ваши файлы b2evolution. Позаботьтесь о файлах, которые вы изменяли, особенно в папках <strong>/conf</strong>, <strong>/skins</strong>, <strong>/plugins</strong>, <strong>/media</strong>, а также о заглушках, плагинах и т.д.</li>
 			<li>Вам также следует сохранить базу данных. Это можно сделать средствами вашего хостинга.</li>
-			<li>If you are upgrading from a version prior to 2.0, we highly recommend you clean up outdated files. To achieve this, delete your b2evolution folders <strong>except /media</strong>. Folders to delete include /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. Depending on your version, you may not have all of these folders on your server. Also, again, make sure you have a backup before deleting.</li>
-			<li>Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you cannot reuse your  /conf files, default skin templates or default plugins as they are.<br />
-				<br />
-				Since your custom skins and custom plugins should be using different names, they will not be overwritten. Same for your media files.<br />
-				<br />
-				The one file you must absolutely restore from your backup (see step 1) though is <code>/blogs/_basic_config.php</code>. You will need to either restore or recreate that file in order to proceed with upgrade.</li>
-			<li>Run the installation/upgrade script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code>/ . Then, simply follow the on screen instructions.<br />
-		<br />
-		The installer/upgrader will  allow you to run a database upgrade from <strong>any</strong> b2evolution version to the new one.</li>
+			<li>Если вы обновляетесь с версии ниже 2.х, мы настоятельно рекоммендуем вам удалить все старые файлы. Для этого удалите все папки b2evolution <strong>кроме /media</strong>. Папки для удаления:  /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. В зависимости от установленной у вас версии, вы можете не найти некоторых из этих папок. Еще раз, пожалуйста, убедитесь что вы сделали резервную копию перед удалением!</li>
+			<li>Загрузите <strong>все новые файлы b2evolution из папки /blogs</strong> на ваш сайт. Еще раз <strong>ВСЕ ФАЙЛЫ</strong>! Это означает что вы НЕ сможете использовать измененные старые файлы из /conf, темы, шаблоны и т.д. как есть!<br /> <br /> Если у ваших личных тем или плагинов другие названия (отличные от тех, которые входят в состав системы), то они не будут утеряны. То же касается и media файлов.<br /> <br /> По крайней мере один файл вы должны скопировать из установленной системы в новую (шаг 1) - это <code>/blogs/_basic_config.php</code>. Вы должны скопировать файл или перенести его содержимое для того чтобы начать процесс обновления.</li>
+			<li>Запустите установочный скрипт на вашем сервере. Он находится в <code>http://yoursite.com/yourblogsfolder/install</code>. Затем, просто следуйте инструкциям установщика.<br /> <br /> Установщик предложит вам обновление с <strong>любой</strong> установленной версии b2evolution до текущей.</li>
 			<li>Проверьте работоспособность новой системы.</li>
 			<li>Прочтите онлайн руководство для <a href="http://manual.b2evolution.net/Upgrade_from_an_older_version" target="_blank">дополнительных возможностей обновления</a> до вашей новой версии b2evolution.</li>
 			<li>После установки мы рекомендуем удалить папку <code>/install</code>.</li>
-			<li>If you had hacks or other customizations to the core files, your can bring those back now.
-		We recommend you get yourself a diff/merge tool like <a href="http://winmerge.sourceforge.net/" target="_blank">WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.</li>
+			<li>Пришло время вернуть ваши старые настройки. Мы рекоммендуем вам использовать <a href="http://winmerge.sourceforge.net/" target="_blank">WinMerge</a>. Программа позволит вам легко сравнивать старые (сохраненные) файлы с новыми (даже целые директории) и сообщит обо всех изменениях.</li>
 			</ol>
 		
 		</div>

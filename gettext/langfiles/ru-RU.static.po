@@ -1,10 +1,10 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: b2evolution 2.3.0-rc1\n"
+"Project-Id-Version: b2evolution 2.4.0-rc2\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-01-08 03:22-0500\n"
+"PO-Revision-Date: 2008-01-21 18:35-0500\n"
 "Last-Translator: Alex <alex@boxter.org>\n"
-"Language-Team: sam2kb <alex@boxter.org>\n"
+"Language-Team: Russian b2evo.org <alex@b2evo.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -170,7 +170,7 @@ msgstr "ВНИМАНИЕ: Эта версия является и продолж
 #: ../../index.src.html:80
 #: ../../doc/install_new.src.html:64
 #: ../../doc/upgradefrom_b2.src.html:52
-#: ../../doc/upgradefrom_b2evo.src.html:61
+#: ../../doc/upgradefrom_b2evo.src.html:63
 #: ../../doc/upgradefrom_mt.src.html:51
 #: ../../doc/upgradefrom_wp.src.html:49
 msgid "Online resources"
@@ -179,7 +179,7 @@ msgstr "Онлайн ресурсы"
 #: ../../index.src.html:80
 #: ../../doc/install_new.src.html:64
 #: ../../doc/upgradefrom_b2.src.html:52
-#: ../../doc/upgradefrom_b2evo.src.html:61
+#: ../../doc/upgradefrom_b2evo.src.html:63
 #: ../../doc/upgradefrom_mt.src.html:51
 #: ../../doc/upgradefrom_wp.src.html:49
 msgid "Official website"
@@ -188,7 +188,7 @@ msgstr "Официальный сайт"
 #: ../../index.src.html:80
 #: ../../doc/install_new.src.html:64
 #: ../../doc/upgradefrom_b2.src.html:52
-#: ../../doc/upgradefrom_b2evo.src.html:61
+#: ../../doc/upgradefrom_b2evo.src.html:63
 #: ../../doc/upgradefrom_mt.src.html:51
 #: ../../doc/upgradefrom_wp.src.html:49
 msgid "Find a host"
@@ -197,7 +197,7 @@ msgstr "Найти хостинг"
 #: ../../index.src.html:80
 #: ../../doc/install_new.src.html:64
 #: ../../doc/upgradefrom_b2.src.html:52
-#: ../../doc/upgradefrom_b2evo.src.html:61
+#: ../../doc/upgradefrom_b2evo.src.html:63
 #: ../../doc/upgradefrom_mt.src.html:51
 #: ../../doc/upgradefrom_wp.src.html:49
 msgid "Manual"
@@ -206,7 +206,7 @@ msgstr "Руководство"
 #: ../../index.src.html:80
 #: ../../doc/install_new.src.html:64
 #: ../../doc/upgradefrom_b2.src.html:52
-#: ../../doc/upgradefrom_b2evo.src.html:61
+#: ../../doc/upgradefrom_b2evo.src.html:63
 #: ../../doc/upgradefrom_mt.src.html:51
 #: ../../doc/upgradefrom_wp.src.html:49
 msgid "Forums"
@@ -215,7 +215,7 @@ msgstr "Форумы"
 #: ../../index.src.html:83
 #: ../../doc/install_new.src.html:67
 #: ../../doc/upgradefrom_b2.src.html:55
-#: ../../doc/upgradefrom_b2evo.src.html:64
+#: ../../doc/upgradefrom_b2evo.src.html:66
 #: ../../doc/upgradefrom_mt.src.html:54
 #: ../../doc/upgradefrom_wp.src.html:52
 msgid "GNU GPL license"
@@ -224,7 +224,7 @@ msgstr "Лицензия GNU GPL"
 #: ../../index.src.html:83
 #: ../../doc/install_new.src.html:67
 #: ../../doc/upgradefrom_b2.src.html:55
-#: ../../doc/upgradefrom_b2evo.src.html:64
+#: ../../doc/upgradefrom_b2evo.src.html:66
 #: ../../doc/upgradefrom_mt.src.html:54
 #: ../../doc/upgradefrom_wp.src.html:52
 msgid "Contact"
@@ -275,12 +275,12 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr "Запустите установочный скрипт на вашем сервере. Он находится в <code>http://yoursite.com/yourfolder/install</code> . Далее следуйте его инструкциям. <br /> <br /> Установщик задаст вам несколько вопросов, создаст необходимые таблицы в базе данных и настроит для вас b2evolution."
 
 #: ../../doc/install_new.src.html:50
-#: ../../doc/upgradefrom_b2evo.src.html:44
+#: ../../doc/upgradefrom_b2evo.src.html:46
 msgid "Check to make sure the new installation works."
 msgstr "Проверьте работоспособность новой системы."
 
 #: ../../doc/install_new.src.html:51
-#: ../../doc/upgradefrom_b2evo.src.html:46
+#: ../../doc/upgradefrom_b2evo.src.html:48
 msgid "On production servers, it is recommended that you delete the <code>/install</code> subfolder."
 msgstr "После установки мы рекомендуем удалить папку <code>/install</code>."
 
@@ -313,31 +313,31 @@ msgid "Come back to the current version of b2evolution and <a %s>upgrade from b2
 msgstr "Вернитесь к текущей версии b2evolution и <a %s>обновитесь с версии 1.х.</a>"
 
 #: ../../doc/upgradefrom_b2evo.src.html:35
-msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, hacks, third party plugins, etc..."
-msgstr "Сохраните все ваши файлы b2evolution. Позаботьтесь о файлах, которые вы изменяли, особенно в папках /conf, skins, а также о заглушках, плагинах и т.д."
+msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including <strong>/conf</strong>, <strong>/skins</strong>, <strong>/plugins</strong>, your <strong>/media</strong> directory and possibly stubfiles, hacks or custom templates..."
+msgstr "Сохраните все ваши файлы b2evolution. Позаботьтесь о файлах, которые вы изменяли, особенно в папках <strong>/conf</strong>, <strong>/skins</strong>, <strong>/plugins</strong>, <strong>/media</strong>, а также о заглушках, плагинах и т.д."
 
 #: ../../doc/upgradefrom_b2evo.src.html:36
 msgid "You should also backup your database if you can. This functionality should be provided by your host."
 msgstr "Вам также следует сохранить базу данных. Это можно сделать средствами вашего хостинга."
 
 #: ../../doc/upgradefrom_b2evo.src.html:37
-msgid "Delete <strong>all your existing b2evolution files from your site</strong> before uploading the new ones! Some of the old files may not be compatible with this new version and will cause it to fail! This will also ensure you don't keep unnecessary files on your server after upgrading. Plus, it's better for security."
-msgstr "Удалите <strong>все существующие файлы b2evolution</strong> с вашего хоста перед загрузкой новых! Некоторые старые файлы могут быть несовместимы с новыми, что приведет к ошибке! Это также будет свидетельствовать о том, что у вас не осталось ненужных файлов на сервере после обновления. К тому же это безопаснее."
+msgid "If you are upgrading from a version prior to 2.0, we highly recommend you clean up outdated files. To achieve this, delete your b2evolution folders <strong>except /media</strong>. Folders to delete include /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. Depending on your version, you may not have all of these folders on your server. Also, again, make sure you have a backup before deleting."
+msgstr "Если вы обновляетесь с версии ниже 2.х, мы настоятельно рекоммендуем вам удалить все старые файлы. Для этого удалите все папки b2evolution <strong>кроме /media</strong>. Папки для удаления:  /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. В зависимости от установленной у вас версии, вы можете не найти некоторых из этих папок. Еще раз, пожалуйста, убедитесь что вы сделали резервную копию перед удалением!"
 
 #: ../../doc/upgradefrom_b2evo.src.html:38
-msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you can't reuse your customized files, including  /conf, skins, blog templates, stubfiles, etc. as they are!<br /> <br /> That means you will have to customize all these files again. We're sorry but, due to the pace of development and adding of new features, we cannot guarantee that anything will work if you keep older files in place. <strong>However</strong>, since you have backed up all these files in step 1, you can try to partially reuse them once the upgrade process is done. See step 8 below."
-msgstr "Загрузите <strong>все новые файлы b2evolution из папки /blogs</strong> на ваш сайт. Еще раз <strong>ВСЕ ФАЙЛЫ</strong>! Это означает что вы НЕ сможете использовать измененные старые файлы из /conf, темы, шаблоны и т.д. как есть!<br /> <br /> Т.е. вам придется настроить все эти файлы заново. Нам очень жаль, но в силу того что мы постоянно улучшаем старые и добавлям новые возможности в b2evolution, мы не можем гарантировать вам работоспособность измененных вами старых файлов. <strong>Несмотря на это</strong>, после того как вы сохранили все эти файлы на шаге 1, вы можете попробывать частично использовать их содержимое, после того как закончите процесс обновления. Смотри шаг 8."
+msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you cannot reuse your  /conf files, default skin templates or default plugins as they are.<br /> <br /> Since your custom skins and custom plugins should be using different names, they will not be overwritten. Same for your media files.<br /> <br /> The one file you must absolutely restore from your backup (see step 1) though is <code>/blogs/_basic_config.php</code>. You will need to either restore or recreate that file in order to proceed with upgrade."
+msgstr "Загрузите <strong>все новые файлы b2evolution из папки /blogs</strong> на ваш сайт. Еще раз <strong>ВСЕ ФАЙЛЫ</strong>! Это означает что вы НЕ сможете использовать измененные старые файлы из /conf, темы, шаблоны и т.д. как есть!<br /> <br /> Если у ваших личных тем или плагинов другие названия (отличные от тех, которые входят в состав системы), то они не будут утеряны. То же касается и media файлов.<br /> <br /> По крайней мере один файл вы должны скопировать из установленной системы в новую (шаг 1) - это <code>/blogs/_basic_config.php</code>. Вы должны скопировать файл или перенести его содержимое для того чтобы начать процесс обновления."
 
-#: ../../doc/upgradefrom_b2evo.src.html:41
-msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you basic configuration settings (unless you have already updated /conf/_config.php before uploading), then allow you to run a database upgrade from any b2evolution version to the new one."
-msgstr "Запустите установочный скрипт на вашем сервере. Он находится в <code>http://yoursite.com/yourblogsfolder/install</code>. Затем, просто следуйте инструкциям установщика.<br /> <br /> Установщик запросит у вас необходимые данные (если вы еще не обновили /conf/_config.php перед загрузкой), затем предложит вам начать обновление базы данных с любой версии b2evolution до текущей."
+#: ../../doc/upgradefrom_b2evo.src.html:43
+msgid "Run the installation/upgrade script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code>/ . Then, simply follow the on screen instructions.<br /> <br /> The installer/upgrader will  allow you to run a database upgrade from <strong>any</strong> b2evolution version to the new one."
+msgstr "Запустите установочный скрипт на вашем сервере. Он находится в <code>http://yoursite.com/yourblogsfolder/install</code>. Затем, просто следуйте инструкциям установщика.<br /> <br /> Установщик предложит вам обновление с <strong>любой</strong> установленной версии b2evolution до текущей."
 
-#: ../../doc/upgradefrom_b2evo.src.html:45
+#: ../../doc/upgradefrom_b2evo.src.html:47
 msgid "Check the online manual for <a %s>specific upgrade instructions</a> to your new version of b2evolution."
 msgstr "Прочтите онлайн руководство для <a %s>дополнительных возможностей обновления</a> до вашей новой версии b2evolution."
 
-#: ../../doc/upgradefrom_b2evo.src.html:47
-msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly."
+#: ../../doc/upgradefrom_b2evo.src.html:49
+msgid "If you had hacks or other customizations to the core files, your can bring those back now. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly."
 msgstr "Пришло время вернуть ваши старые настройки. Мы рекоммендуем вам использовать <a %s>WinMerge</a>. Программа позволит вам легко сравнивать старые (сохраненные) файлы с новыми (даже целые директории) и сообщит обо всех изменениях."
 
 #: ../../doc/upgradefrom_mt.src.html:7
