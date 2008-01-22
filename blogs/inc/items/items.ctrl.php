@@ -548,6 +548,7 @@ switch( $action )
 {
 	case 'new':
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'create':
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_post_statuses', 'edit',
 						array( 'ctrl' => 'items', 'action' => 'new' ), NULL, '',
@@ -751,6 +752,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2008/01/22 16:16:48  fplanque
+ * bugfix
+ *
  * Revision 1.14  2008/01/21 09:35:31  fplanque
  * (c) 2008
  *
