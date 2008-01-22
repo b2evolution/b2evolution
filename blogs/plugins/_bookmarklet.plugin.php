@@ -56,7 +56,7 @@ class bookmarklet_plugin extends Plugin
 	{
 		global $Hit, $admin_url;
 
-		if( $Hit->is_NS4 || $Hit->is_gecko )
+		if( $Hit->is_NS4 || $Hit->is_gecko || $Hit->is_firefox )
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
@@ -89,6 +89,14 @@ class bookmarklet_plugin extends Plugin
 			<?php
 			return true;
 		}
+		else
+		{  // This works in Safari, at least
+			?>
+			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
+			<a href="javascript:Q=window.getSelection();void(window.open('<?php echo $admin_url ?>?ctrl=items&amp;action=new&amp;mode=bookmarklet&amp;content='+escape(Q)+'&amp;post_url='+escape(window.location.href)+'&amp;post_title='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,status=yes'));"><?php echo T_('b2evo bookmarklet') ?></a></p>
+			<?php
+			return true;
+		}
 
 		return false;
 	}
@@ -97,6 +105,9 @@ class bookmarklet_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.21  2008/01/22 00:21:24  personman2
+ * Fixing bookmarklet to work with Safari, Firefox
+ *
  * Revision 1.20  2008/01/21 09:35:39  fplanque
  * (c) 2008
  *
