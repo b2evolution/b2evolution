@@ -68,9 +68,10 @@ skin_include( '_body_header.inc.php' );
 		{	// For each blog post, do everything below up to the closing curly brace "}"
 		?>
 
+			<div id="<?php $Item->anchor_id() ?>" lang="<?php $Item->lang() ?>">
+
 			<?php
 				$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
-				$Item->anchor(); // Anchor for permalinks to refer to.
 			?>
 
 			<h2 class="sectionhead" lang="<?php $Item->lang() ?>">
@@ -84,7 +85,7 @@ skin_include( '_body_header.inc.php' );
 				<?php $Item->title(); ?>
 			</h2>
 
-			<div class="post post<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
+			<div class="post post<?php $Item->status_raw() ?>">
 
 			<?php
 				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
@@ -110,6 +111,8 @@ skin_include( '_body_header.inc.php' );
 				// /skins/_item_feedback.inc.php file into the current skin folder.
 				// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
 			?>
+
+			</div>
 
 			<?php
 			locale_restore_previous();	// Restore previous locale (Blog locale)

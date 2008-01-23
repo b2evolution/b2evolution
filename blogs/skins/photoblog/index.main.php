@@ -62,12 +62,12 @@ skin_include( '_html_header.inc.php' );
 		?>
 		<a href="<?php $Blog->disp( 'mediaidxurl', 'raw' ) ?>"><?php echo T_('Index') ?></a>
 	</div>
-	
+
 	<h1 id="pageTitle"><a href="<?php $Blog->disp( 'url', 'raw' ) ?>"><?php $Blog->disp( 'name', 'htmlbody' ) ?></a></h1>
 
 </div>
 <div class="bPosts">
-	
+
 <!-- =================================== START OF MAIN AREA =================================== -->
 
 	<?php
@@ -136,12 +136,11 @@ skin_include( '_html_header.inc.php' );
 	while( $Item = & mainlist_get_item() )
 	{	// For each blog post, do everything below up to the closing curly brace "}"
 	?>
-	
-	<div class="bPost bPost<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
+
+	<div id="<?php $Item->anchor_id() ?>" class="bPost bPost<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
 
 		<?php
 			$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
-			$Item->anchor(); // Anchor for permalinks to refer to.
 		?>
 
 		<?php

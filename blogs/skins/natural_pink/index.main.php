@@ -21,7 +21,7 @@ skin_init( $disp );
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php' );
-// Note: You can customize the default HTML header by copying the 
+// Note: You can customize the default HTML header by copying the
 // _html_header.inc.php file into the current skin folder.
 // -------------------------------- END OF HEADER --------------------------------
 ?>
@@ -133,11 +133,10 @@ skin_include( '_html_header.inc.php' );
 				'date_format' => '#',
 			) );
 		?>
-		<div class="bPost" lang="<?php $Item->lang() ?>">
+		<div id="<?php $Item->anchor_id() ?>" class="bPost bPost<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
 
 			<?php
 				$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
-				$Item->anchor(); // Anchor for permalinks to refer to.
 			?>
 
 			<div class="bSmallHead">
@@ -215,7 +214,7 @@ skin_include( '_html_header.inc.php' );
 						) );
 				?>
 			</div>
-	
+
 			<?php
 				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 				skin_include( '_item_feedback.inc.php', array(
@@ -226,7 +225,7 @@ skin_include( '_html_header.inc.php' );
 				// /skins/_item_feedback.inc.php file into the current skin folder.
 				// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
 			?>
-	
+
 			<?php
 				locale_restore_previous();	// Restore previous locale (Blog locale)
 			?>
@@ -306,7 +305,7 @@ skin_include( '_body_footer.inc.php' );
 <?php
 // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
 skin_include( '_html_footer.inc.php' );
-// Note: You can customize the default HTML footer by copying the 
+// Note: You can customize the default HTML footer by copying the
 // _html_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------
 ?>

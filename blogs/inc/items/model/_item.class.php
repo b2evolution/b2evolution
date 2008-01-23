@@ -447,11 +447,28 @@ class Item extends ItemLight
 	{
 		global $Settings;
 
-		// In case you have old cafelog permalinks, uncomment the following lines:
-		// $title = preg_replace( '/[^a-zA-Z0-9_\.-]/', '_', $this->title );
-		// echo '<a id="'.$title.'"></a>';
+		echo '<a id="'.$this->get_anchor_id().'"></a>';
+	}
 
-		echo '<a id="item_'.$this->ID.'"></a>';
+
+  /**
+	 * @return string
+	 */
+	function get_anchor_id()
+	{
+		// In case you have old cafelog permalinks, uncomment the following line:
+		// return preg_replace( '/[^a-zA-Z0-9_\.-]/', '_', $this->title );
+
+		return 'item_'.$this->ID;
+	}
+
+
+  /**
+	 * Template tag
+	 */
+	function anchor_id()
+	{
+		echo $this->get_anchor_id();
 	}
 
 
@@ -3315,6 +3332,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.32  2008/01/23 12:51:20  fplanque
+ * posts now have divs with IDs
+ *
  * Revision 1.31  2008/01/21 09:35:31  fplanque
  * (c) 2008
  *

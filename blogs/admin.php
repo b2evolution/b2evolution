@@ -74,7 +74,7 @@ require_once $inc_path.'_async.inc.php';
 $user_selected_blog = (int)$UserSettings->get('selected_blog');
 $BlogCache = & get_Cache( 'BlogCache' );
 if( param( 'blog', 'integer', NULL, true ) === NULL      // We got no explicit blog choice (not even '0' for 'no blog'):
-	|| ($blog != 0 && ! ($Blog = & $BlogCache->get_by_ID( $blog, false, false )) )) // or we requested a nonexistent blog
+	|| ($blog > 0 && ! ($Blog = & $BlogCache->get_by_ID( $blog, false, false )) )) // or we requested a nonexistent blog
 { // Try the memorized blog from the previous action:
 	$blog = $user_selected_blog;
 	if( ! ($Blog = & $BlogCache->get_by_ID( $blog, false, false ) ) )
@@ -225,6 +225,9 @@ $Hit->log();
 
 /*
  * $Log$
+ * Revision 1.28  2008/01/23 12:51:21  fplanque
+ * posts now have divs with IDs
+ *
  * Revision 1.27  2008/01/21 09:35:22  fplanque
  * (c) 2008
  *

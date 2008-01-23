@@ -75,7 +75,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
 	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
-	<!-- InstanceEndEditable --> 
+	<!-- InstanceEndEditable -->
 </head>
 <body>
 <!-- InstanceBeginEditable name="ToolBar" -->
@@ -164,8 +164,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 				) );
 			?>
 
-		<div class="bPost" lang="<?php $Item->lang() ?>">
-			<?php $Item->anchor(); ?>
+		<div id="<?php $Item->anchor_id() ?>" class="bPost bPost<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
+
 			<div class="bSmallHead">
 			<?php
 				$Item->permanent_link( array(
@@ -307,8 +307,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			while( $Item = & $BlogBList->get_item() )
 			{
 				?>
-				<div class="bPostSide" lang="<?php $Item->lang() ?>">
-					<?php $Item->anchor(); ?>
+				<div id="<?php $Item->anchor_id() ?>" class="bPostSide bPostSide<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
+
 					<h4 class="bTitle">
 						<?php
 							$Item->permanent_link( array(
@@ -366,8 +366,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		while( $Item = & $LinkblogList->get_item() )
 		{
 			?>
-			<div class="bPostSide" lang="<?php $Item->lang() ?>">
-				<?php $Item->anchor(); ?>
+			<div id="<?php $Item->anchor_id() ?>" class="bPostSide bPostSide<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
 				<h4 class="bTitle">
 					<?php
 						$Item->permanent_link( array(

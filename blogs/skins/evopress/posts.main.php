@@ -89,11 +89,10 @@ display_if_empty();
 while( $Item = & mainlist_get_item() )
 {	// For each blog post, do everything below up to the closing curly brace "}"
 ?>
-	<div class="post post<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
+	<div id="<?php $Item->anchor_id() ?>" class="post post<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
 
 		<?php
 			$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
-			$Item->anchor(); // Anchor for permalinks to refer to.
 		?>
 
 		<h2><?php $Item->title(); ?></h2>

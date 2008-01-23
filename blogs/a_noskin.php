@@ -129,7 +129,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 </div>
 
 <div class="pageHeaderEnd"></div>
-	  
+
 </div>
 </div>
 
@@ -204,8 +204,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 					'date_format' => '#',
 				) );
 		?>
-		<div class="bPost" lang="<?php $Item->lang() ?>">
-			<?php $Item->anchor(); ?>
+		<div id="<?php $Item->anchor_id() ?>" class="bPost bPost<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
+
 			<div class="bSmallHead">
 			<?php
 				$Item->permanent_link( array(
@@ -466,9 +466,9 @@ header( 'Content-type: text/html; charset='.$io_charset );
 </div>
 <!-- InstanceEndEditable --></div>
 <table cellspacing="3" class="wide">
-  <tr> 
+  <tr>
   <td class="cartouche">Original page design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> </td>
-    
+
 	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="rsc/img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
   </tr>
 </table>

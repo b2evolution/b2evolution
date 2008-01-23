@@ -21,7 +21,7 @@ skin_init( $disp );
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php' );
-// Note: You can customize the default HTML header by copying the 
+// Note: You can customize the default HTML header by copying the
 // _html_header.inc.php file into the current skin folder.
 // -------------------------------- END OF HEADER --------------------------------
 ?>
@@ -137,11 +137,10 @@ skin_include( '_html_header.inc.php' );
 		while( $Item = & mainlist_get_item() )
 		{	// For each blog post, do everything below up to the closing curly brace "}"
 		?>
-		<div class="evo_post" lang="<?php $Item->lang() ?>">
+		<div id="<?php $Item->anchor_id() ?>" class="evo_post evo_post<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
 
 			<?php
 				$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
-				$Item->anchor(); // Anchor for permalinks to refer to.
 			?>
 
 			<?php
@@ -318,7 +317,7 @@ skin_include( '_body_footer.inc.php' );
 <?php
 // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
 skin_include( '_html_footer.inc.php' );
-// Note: You can customize the default HTML footer by copying the 
+// Note: You can customize the default HTML footer by copying the
 // _html_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------
 ?>

@@ -129,9 +129,10 @@ skin_content_header();	// Sets charset!
 				) );
 			?>
 
+			<div id="<?php $Item->anchor_id() ?>" lang="<?php $Item->lang() ?>">
+
 			<?php
 				$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
-				$Item->anchor(); // Anchor for permalinks to refer to.
 			?>
 
 			<h3>
@@ -204,6 +205,9 @@ skin_content_header();	// Sets charset!
 			<?php
 				locale_restore_previous();	// Restore previous locale (Blog locale)
 			?>
+
+			</div>
+
 	<?php } // --------------------------------- END OF POSTS ----------------------------------- ?>
 
 
