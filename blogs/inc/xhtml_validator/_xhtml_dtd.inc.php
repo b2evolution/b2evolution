@@ -418,7 +418,7 @@ if( $allow_objects )
 	);
 	$allowed_attributes += array
 	(
-	  'object' => 'codebase classid id height width align',
+	  'object' => 'codebase classid id height width align type data',
 	  'param' => 'name value',
 	  'embed' => 'src type height width wmode quality bgcolor name align allowScriptAccess pluginspage',
 	);
@@ -560,6 +560,9 @@ $comments_allowed_attributes = array
 
 /*
  * $Log$
+ * Revision 1.2  2008/01/23 16:44:27  fplanque
+ * minor
+ *
  * Revision 1.1  2008/01/21 17:30:31  fplanque
  * missing file
  *

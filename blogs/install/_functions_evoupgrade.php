@@ -2080,6 +2080,14 @@ function upgrade_b2evo_tables()
 	}
 
 
+	echo 'Resetting b2evolution.net polling times... ';
+	$DB->query( "
+		DELETE FROM T_settings
+		WHERE set_name = 'evonet_last_attempt'
+			 OR set_name = 'evonet_last_update'" );
+	echo "OK.<br />\n";
+
+
 	// This has to be at the end because plugin install may fail if the DB schema is not current (matching Plugins class).
 	// Only new default plugins will be installed, based on $old_db_version.
 	// dh> NOTE: if this fails (e.g. fatal error in one of the plugins), it will not get repeated
@@ -2172,6 +2180,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.241  2008/01/23 16:44:27  fplanque
+ * minor
+ *
  * Revision 1.240  2008/01/22 16:57:08  fplanque
  * db upgrade stuff
  *

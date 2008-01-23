@@ -402,7 +402,7 @@ $conf_path = str_replace( '\\', '/', dirname(__FILE__) ).'/';
  *                fp> made [i]nsensitive to case because of Windows URL oddities)
  */
 $basepath = preg_replace( '#/'.$conf_subdir.'$#i', '', $conf_path ).'/';
-//echo $basepath;
+// echo '<br/>basepath='.$basepath;
 
 /**
  * Location of the include folder.
