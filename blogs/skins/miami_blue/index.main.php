@@ -212,7 +212,7 @@ skin_include( '_html_header.inc.php' );
 						) );
 				?>
 			</div>
-			<img src="../../rsc/img/blank.gif" width="1" height="1" />
+			<img src="../../rsc/img/blank.gif" width="1" height="1" alt="" />
 			<?php
 				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 				skin_include( '_item_feedback.inc.php', array(
