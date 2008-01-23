@@ -130,7 +130,7 @@ while( $Item = & $ItemList->get_item() )
 		// We don't switch locales in the backoffice, since we use the user pref anyway
 		// Load item's creator user:
 		$Item->get_creator_User();
-
+		?>
 		<div class="bSmallHead <?php
 		if( $Item->ID == $highlight )
 		{
@@ -400,6 +400,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.13  2008/01/23 17:55:01  fplanque
+ * fix
+ *
  * Revision 1.12  2008/01/23 12:51:20  fplanque
  * posts now have divs with IDs
  *
