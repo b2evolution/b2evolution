@@ -331,7 +331,7 @@ skin_include( '_html_header.inc.php' );
 	</p>
 </div>
 </div>
-
+</div>
 <?php
 // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
 skin_include( '_html_footer.inc.php' );
