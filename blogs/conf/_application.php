@@ -20,7 +20,7 @@ $app_version = '2.4.0-rc2';
 /**
  * Release date
  */
-$app_date = '2008-01-22';
+$app_date = '2008-01-23';
 
 /**
  * This is used to check if the database is up to date.
