@@ -176,9 +176,14 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		// fp> TODO: check what happens if blog folders are disabled
 		if( $current_User->check_perm( 'files', 'view' ) )
 		{
-			// TODO: image integration into posts after upload is broken...
-			echo '<input id="itemform_button_files" type="button" value="'.format_to_output(T_('Files'), 'formvalue').'" class="ActionButton"
-			       onclick="pop_up_window( \''.url_add_param( $Blog->get_filemanager_link(), 'mode=upload' ).'\', \'fileman_upload\', 1000 )" /> ';
+			$fm_url_params = 'mode=upload';
+			if( !empty($edited_Item->ID) )
+			{
+				$fm_url_params .= '&amp;item_ID='.$edited_Item->ID;
+			}
+			echo '<input id="itemform_button_files" type="button" value="'.format_to_output(T_('Files...'), 'formvalue')
+						.'" class="ActionButton" onclick="pop_up_window( \''
+						.url_add_param( $Blog->get_filemanager_link(), $fm_url_params ).'\', \'fileman_upload\', 1000 )" /> ';
 		}
 	}
 
@@ -377,6 +382,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.19  2008/01/28 20:17:45  fplanque
+ * better display of image file linking while in 'upload' mode
+ *
  * Revision 1.18  2008/01/21 09:35:31  fplanque
  * (c) 2008
  *

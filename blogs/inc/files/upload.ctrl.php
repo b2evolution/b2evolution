@@ -368,7 +368,7 @@ if( isset($_FILES) && count( $_FILES ) )
 			$img_tag = format_to_output( $newFile->get_tag(), 'formvalue' );
 			$success_msg .=
 				'<ul>'
-					.'<li>'.T_("Here's the code to display it:").' <input type="text" value="'.$img_tag.'" /></li>'
+					.'<li>'.T_("Here's the code to display it:").' <input type="text" value="'.$img_tag.'" size="60" /></li>'
 					.'<li><a href="#" onclick="if( window.focus && window.opener ){ window.opener.focus(); textarea_wrap_selection( window.opener.document.getElementById(\'itemform_post_content\'), \''.format_to_output( $newFile->get_tag(), 'formvalue' ).'\', \'\', 1, window.opener.document ); } return false;">'.T_('Add the code to your post !').'</a></li>'
 				.'</ul>';
 		}
@@ -429,6 +429,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2008/01/28 20:17:45  fplanque
+ * better display of image file linking while in 'upload' mode
+ *
  * Revision 1.4  2008/01/21 09:35:28  fplanque
  * (c) 2008
  *

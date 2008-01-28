@@ -448,25 +448,24 @@ $Form->begin_form();
 
 			echo ' &mdash; <strong>'.T_('With selected files:').'</strong> ';
 
-			if( $fm_Filelist->get_root_type() == 'collection' || !empty($Blog) )
-			{	// We are browsing files for a collection:
-				// fp> TODO: use current as default but let user choose into which blog he wants to post
-				echo '<input type="submit" name="actionArray[make_posts]" class="ActionButton"
-					value="'.T_('Make posts').'"
-					title="'.T_('Make posts with selected images').'" />';
-			}
-
-
 			if( $mode == 'upload' )
 			{	// We are uploading in a popup opened by an edit screen
 				?>
 				<input class="ActionButton"
 					title="<?php echo T_('Insert IMG tags for selected files'); ?>"
 					name="actionArray[img_tag]"
-					value="img"
+					value="<?php echo T_('Make IMG tags') ?>"
 					type="submit"
 					onclick="insert_tag_for_selected_files(); return false;" />
 				<?php
+			}
+
+			if( $fm_Filelist->get_root_type() == 'collection' || !empty($Blog) )
+			{	// We are browsing files for a collection:
+				// fp> TODO: use current as default but let user choose into which blog he wants to post
+				echo '<input type="submit" name="actionArray[make_posts]" class="ActionButton"
+					value="'.T_('Make posts').'"
+					title="'.T_('Make posts with selected images').'" />';
 			}
 
 
@@ -607,6 +606,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.3  2008/01/28 20:17:44  fplanque
+ * better display of image file linking while in 'upload' mode
+ *
  * Revision 1.2  2008/01/21 09:35:29  fplanque
  * (c) 2008
  *
