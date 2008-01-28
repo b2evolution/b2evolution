@@ -179,7 +179,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 			$fm_url_params = 'mode=upload';
 			if( !empty($edited_Item->ID) )
 			{
-				$fm_url_params .= '&amp;item_ID='.$edited_Item->ID;
+				$fm_url_params .= '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID;
 			}
 			echo '<input id="itemform_button_files" type="button" value="'.format_to_output(T_('Files...'), 'formvalue')
 						.'" class="ActionButton" onclick="pop_up_window( \''
@@ -382,6 +382,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.20  2008/01/28 20:23:19  fplanque
+ * better display of image file linking while in 'upload' mode
+ *
  * Revision 1.19  2008/01/28 20:17:45  fplanque
  * better display of image file linking while in 'upload' mode
  *
