@@ -362,7 +362,7 @@ global $edited_Item;
 						$Form->hiddens_by_key( get_memorized('ctrl') );
 						echo '<div>';
 						echo '<input name="uploadfile[]" type="file" size="10" />';
-						echo '<input class="ActionButton" type="submit" value="'.T_('Upload!').'" />';
+						echo '<input class="ActionButton" type="submit" value="&gt; '.T_('Quick upload!').'" />';
 						echo '</div>';
 					$Form->end_form();
 					echo '</div>';
@@ -382,6 +382,9 @@ global $edited_Item;
 
 /*
  * $Log$
+ * Revision 1.10  2008/02/04 13:57:50  fplanque
+ * wording
+ *
  * Revision 1.9  2008/01/21 09:35:29  fplanque
  * (c) 2008
  *

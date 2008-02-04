@@ -403,7 +403,7 @@ if( $current_User->check_perm( 'files', 'add' ) )
 						'text' => T_('Browse'),
 						'href' => regenerate_url( 'ctrl', 'ctrl=files' ) ),
 					'upload' => array(
-						'text' => T_('Upload multiple'),
+						'text' => T_('Upload'),
 						'href' => regenerate_url( 'ctrl', 'ctrl=upload' ) ),
 				)
 		);
@@ -429,6 +429,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2008/02/04 13:57:50  fplanque
+ * wording
+ *
  * Revision 1.5  2008/01/28 20:17:45  fplanque
  * better display of image file linking while in 'upload' mode
  *
