@@ -21,8 +21,11 @@ $params = array_merge( array(
 		'disp_comment_form'	   =>	true,
 		'form_title_start'     => '<h3>',
 		'form_title_end'       => '</h3>',
-    'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
+		'policy_text'          => '',
+		'textarea_lines'       => 10,
+		'default_text'         => '',
     'preview_start'        => '<div class="bComment" id="comment_preview">',
+    'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
     'preview_end'          => '</div>',
 	), $params );
 
@@ -69,7 +72,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 		{	// Even if we have a blank cookie, let's reset this to remind the bozos what it's for
 			$comment_author_url = 'http://';
 		}
-		$comment_content = '';
+		$comment_content =  $params['default_text'];
 	}
 
 
@@ -109,11 +112,14 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 	if( $Item->can_rate() )
 	{	// Comment rating:
-		$Form->begin_fieldset();
-			echo $Form->begin_field( NULL, T_('Your vote'), true );
-			$Comment->rating_input();
-			echo $Form->end_field();
-		$Form->end_fieldset();
+		echo $Form->begin_field( NULL, T_('Your vote'), true );
+		$Comment->rating_input();
+		echo $Form->end_field();
+	}
+
+	if( !empty($params['policy_text']) )
+	{	// We have a policy text to display
+		$Form->info_field( '', $params['policy_text'] );
 	}
 
 	echo '<div class="comment_toolbars">';
@@ -124,7 +130,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	// Message field:
 	$note = '';
 	// $note = T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags));
-	$Form->textarea( 'p', $comment_content, 10, T_('Comment text'), $note, 40, 'bComment' );
+	$Form->textarea( 'p', $comment_content, $params['textarea_lines'], T_('Comment text'), $note, 40, 'bComment' );
 
 	// set b2evoCanvas for plugins
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "p" );</script>';
@@ -154,11 +160,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 	if( ! empty($comment_options) )
 	{
-		$Form->begin_fieldset();
-			echo $Form->begin_field( NULL, T_('Options'), true );
-			echo implode( '<br />', $comment_options );
-			echo $Form->end_field();
-		$Form->end_fieldset();
+		echo $Form->begin_field( NULL, T_('Options'), true );
+		echo implode( '<br />', $comment_options );
+		echo $Form->end_field();
 	}
 
 	$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
@@ -184,6 +188,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.4  2008/02/05 01:52:37  fplanque
+ * enhanced comment form
+ *
  * Revision 1.3  2008/01/21 09:35:42  fplanque
  * (c) 2008
  *

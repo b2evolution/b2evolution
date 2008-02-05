@@ -195,14 +195,7 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
-skin_include( '_item_comment_form.inc.php', array(
-		'disp_comment_form'	 =>	$params['disp_comment_form'],
-		'form_title_start'   => $params['form_title_start'],
-		'form_title_end'     => $params['form_title_end'],
-    'preview_start'      => $params['preview_start'],
-    'preview_end'        => $params['preview_end'],
-    'comment_template'   => $params['comment_template'],	// The template used for displaying individual comments (including preview)
-	) );
+skin_include( '_item_comment_form.inc.php', $params );
 // Note: You can customize the default item feedback by copying the generic
 // /skins/_item_comment_form.inc.php file into the current skin folder.
 // ---------------------- END OF COMMENT FORM ---------------------
@@ -210,6 +203,9 @@ skin_include( '_item_comment_form.inc.php', array(
 
 /*
  * $Log$
+ * Revision 1.15  2008/02/05 01:52:37  fplanque
+ * enhanced comment form
+ *
  * Revision 1.14  2008/01/21 09:35:42  fplanque
  * (c) 2008
  *
