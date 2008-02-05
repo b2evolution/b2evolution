@@ -386,7 +386,7 @@ else
 {	// We're on the GLOBAL tab...
 
 	$AdminUI->disp_payload_begin();
-	echo '<h2>Select a blog</h2>';
+	echo '<h2>'.T_('Select a blog').'</h2>';
 	// Display blog list VIEW:
 	$AdminUI->disp_view( 'collections/views/_coll_list.view.php' );
 	$AdminUI->disp_payload_end();
@@ -490,6 +490,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2008/02/05 01:51:54  fplanque
+ * minors
+ *
  * Revision 1.21  2008/01/14 07:22:08  fplanque
  * Refactoring
  *

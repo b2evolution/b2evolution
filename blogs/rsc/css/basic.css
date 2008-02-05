@@ -57,6 +57,9 @@ code {
 .clear{
 	clear: both;
 }
+.border {
+	border: 1px solid #000;
+}
 .small {
 	font-size: 84%;
 }
