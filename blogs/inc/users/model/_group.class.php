@@ -276,9 +276,12 @@ class Group extends DataObject
 				switch( $permvalue )
 				{ // Depending on current group permission:
 					case 'all':
-						// All permissions granted
-						$perm = true;
-						break;
+						global $demo_mode;
+						if( ! $demo_mode )
+						{ // All permissions granted
+							$perm = true;
+							break;
+						}
 
 					case 'edit':
 						// User can ask for normal edit perm...
@@ -551,6 +554,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2008/02/06 23:03:15  fplanque
+ * added restriction
+ *
  * Revision 1.5  2008/01/21 09:35:36  fplanque
  * (c) 2008
  *
