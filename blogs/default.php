@@ -46,7 +46,19 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
 	require $skins_path.'_toolbar.inc.php';
 	// ------------------------------- END OF TOOLBAR --------------------------------
+
+	echo "\n";
+	if( is_logged_in() )
+	{
+		echo '<div id="skin_wrapper" class="skin_wrapper_loggedin">';
+	}
+	else
+	{
+		echo '<div id="skin_wrapper" class="skin_wrapper_anonymous">';
+	}
+	echo "\n";
 	?>
+	<!-- Start of skin_wrapper -->
 	<!-- InstanceEndEditable -->
 
 	<div class="wrapper1">
@@ -197,6 +209,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 	<!-- InstanceBeginEditable name="BodyFoot" -->
 	<?php debug_info(); // output debug info if requested ?>
+	<!-- End of skin_wrapper -->
+	</div>
 	<!-- InstanceEndEditable -->
 </body>
 <!-- InstanceEnd --></html>
