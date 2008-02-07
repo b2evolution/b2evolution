@@ -267,7 +267,7 @@ if( function_exists('posix_geteuid') )
 	{
 		$process_user = $process_user['name'];
 	}
-	
+
 	$running_as = sprintf( '%s (uid %s)',
 		($process_user ? $process_user : '?'), ($process_uid ? $process_uid : '?') );
 }
@@ -456,6 +456,7 @@ else
 	}
 }
 
+
 /*
  * XML extension
  */
@@ -472,6 +473,22 @@ else
 	disp_system_check( 'ok' );
 }
 
+
+/*
+ * mbstring extension
+ */
+init_system_check( 'PHP mbstring extension', extension_loaded('mbstring') ?  T_('Loaded') : T_('Not loaded') );
+if( ! extension_loaded('mbstring' ) )
+{
+	disp_system_check( 'warning', T_('b2evolution will not be able to convert character sets and special characters/languages may not be displayed correctly. Enable the mbstring extension in your php.ini file or ask your hosting provider about it.') );
+}
+else
+{
+	disp_system_check( 'ok' );
+}
+
+
+// pre_dump( get_loaded_extensions() );
 
 $block_item_Widget->disp_template_raw( 'block_end' );
 
@@ -490,7 +507,7 @@ $gd_version = $gd_info['GD Version'];
 init_system_check( 'GD Library version', isset($gd_version) ? $gd_version : T_('Not installed') );
 if( ! isset($gd_version) )
 {
-	disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for images.') );
+	disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for images. Enable the gd2 extension in your php.ini file or ask your hosting provider about it.') );
 }
 else
 {
@@ -570,6 +587,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2008/02/07 00:36:28  fplanque
+ * added mbstrings check
+ *
  * Revision 1.8  2008/01/21 09:35:35  fplanque
  * (c) 2008
  *
