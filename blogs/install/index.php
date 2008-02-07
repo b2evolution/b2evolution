@@ -111,7 +111,7 @@ header('Content-Type: text/html; charset='.$io_charset);
 	<!-- InstanceEndEditable -->
 	<link href="../rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
-	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" --> 
+	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" -->
 </head>
 
 <body>
@@ -119,10 +119,10 @@ header('Content-Type: text/html; charset='.$io_charset);
 
 	<div class="wrapper1">
 	<div class="wrapper2">
-		<span class="version_top"><!-- InstanceBeginEditable name="Version" --><?php echo T_('Installer for version ').' '. $app_version ?><!-- InstanceEndEditable --></span>	
-	
+		<span class="version_top"><!-- InstanceBeginEditable name="Version" --><?php echo T_('Installer for version ').' '. $app_version ?><!-- InstanceEndEditable --></span>
+
 		<a href="http://b2evolution.net/" target="_blank"><img src="../rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
-		
+
 		<div class="menu_top"><!-- InstanceBeginEditable name="MenuTop" -->
 			<span class="floatright"><?php echo T_('After install') ?>: <a href="../index.php"><?php echo T_('Blogs') ?></a> &middot;
 			<a href="../admin.php"><?php echo T_('Admin') ?></a>
@@ -131,7 +131,7 @@ header('Content-Type: text/html; charset='.$io_charset);
 		<a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Install menu') ?></a> &middot;
 		<a href="phpinfo.php"><?php echo T_('PHP info') ?></a>
 		<!-- InstanceEndEditable --></div>
-		
+
 		<!-- InstanceBeginEditable name="Main" -->
 		<div class="block1">
 		<div class="block2">
@@ -391,20 +391,37 @@ switch( $action )
 		?>
 		<h1><?php echo T_('How do you want to install b2evolution?') ?></h1>
 
+		<?php
+			$old_db_version = get_db_version();
+		?>
+
 		<form action="index.php" method="get">
 			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
 			<input type="hidden" name="confirmed" value="0" />
+			<input type="hidden" name="installer_version" value="10" />
 
 			<p><?php echo T_('The installation can be done in different ways. Choose one:')?></p>
 
-			<p><input type="radio" name="action" id="newdb" value="newdb" checked="checked" />
+			<p><input type="radio" name="action" id="newdb" value="newdb"
+				<?php if( is_null($old_db_version) )
+					{
+						echo 'checked="checked"';
+					}
+				?>
+				/>
 				<label for="newdb"><?php echo T_('<strong>New Install</strong>: Install b2evolution database tables.')?></label></p>
 			<p style="margin-left: 2em;">
 				<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />
 				<label for="create_sample_contents"><?php echo T_('Also install sample blogs &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.')?></label>
 			</p>
 
-			<p><input type="radio" name="action" id="evoupgrade" value="evoupgrade" />
+			<p><input type="radio" name="action" id="evoupgrade" value="evoupgrade"
+				<?php if( !is_null($old_db_version) && $old_db_version < $new_db_version )
+					{
+						echo 'checked="checked"';
+					}
+				?>
+				/>
 				<label for="evoupgrade"><?php echo T_('<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version. <strong>WARNING:</strong> If you have modified your database, this operation may fail. Make sure you have a backup.') ?></label></p>
 
 			<?php
@@ -483,7 +500,28 @@ to
 		 */
 		require_once dirname(__FILE__).'/_functions_create.php';
 
-		param( 'create_sample_contents', 'integer', 0 );
+ 		if( $old_db_version = get_db_version() )
+ 		{
+			echo '<p><strong>OOPS! It seems b2evolution is already installed!</strong></p>';
+
+			if( $old_db_version < $new_db_version )
+			{
+				echo '<p>Would you like to <a href="?action=evoupgrade">upgrade your existing installation now</a>?</p>';
+			}
+
+			break;
+		}
+
+		$installer_version = param( 'installer_version', 'integer', 0 );
+		if( $installer_version >= 10 )
+		{
+			param( 'create_sample_contents', 'integer', 0 );
+		}
+		else
+		{	// OLD INSTALLER call. Probably an automated script calling.
+			// Let's force the sample contents since they haven't been explicitely disabled
+			$create_sample_contents = 1;
+		}
 
 		echo '<h2>'.T_('Creating b2evolution tables...').'</h2>';
 		flush();
@@ -503,8 +541,13 @@ to
 		echo '<h2>'.T_('Installation successful!').'</h2>';
 
 		echo '<p><strong>';
-		printf( T_('Now you can <a %s>log in</a> with the login "admin" and password "<evo:password>%s</evo:password>".'), 'href="'.$admin_url.'"', $random_password );
+		printf( T_('Now you can <a %s>log in</a> with the following credentials:'), 'href="'.$admin_url.'"' );
 		echo '</strong></p>';
+
+		echo '<table>';
+		echo '<tr><td>Login: &nbsp;</td><td><strong><evo:password>admin</evo:password></strong></td></tr>';
+		printf( '<tr><td>Password: &nbsp;</td><td><strong><evo:password>%s</evo:password></strong></td></tr>', $random_password );
+		echo '</table>';
 
 		echo '<p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>';
 
@@ -651,16 +694,16 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 ?>
 <!-- InstanceEndEditable -->
 	</div>
-		
+
 	<div class="body_fade_out">
-		
+
 	<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->
 			<?php echo T_('Online resources') ?>: <a href="http://b2evolution.net/" target="_blank"><?php echo T_('Official website') ?></a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank"><?php echo T_('Find a host') ?></a> &bull; <a href="http://manual.b2evolution.net/" target="_blank"><?php echo T_('Manual') ?></a> &bull; <a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Forums') ?></a>
 		<!-- InstanceEndEditable --></div>
-	
+
 	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright © 2003-2007 by François Planque & others · <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
 		<!-- InstanceEndEditable --></div>
-		
+
 	</div>
 	</div>
 
@@ -678,6 +721,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.143  2008/02/07 00:35:52  fplanque
+ * cleaned up install
+ *
  * Revision 1.142  2008/01/21 15:00:00  fplanque
  * let browser autodetect charset (russian utf8!!)
  *

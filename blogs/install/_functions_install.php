@@ -30,36 +30,45 @@ function task_end()
 }
 
 
-
-/**
- * check_db_version(-)
- *
- * Note: version number 8000 once meant 0.8.00.0, but I decided to switch to sequential
- * increments of 10 (in case we ever need to introduce intermediate versions for intermediate
- * bug fixes...)
- */
-function check_db_version()
+function get_db_version()
 {
-	global $DB, $old_db_version, $new_db_version;
+	global $DB;
 
-	echo '<p>'.T_('Checking DB schema version...').' ';
+	$DB->halt_on_error = false;
+	$DB->show_errors = false;
+
+	$r = NULL;
 
 	if( db_col_exists( 'T_settings', 'set_name' ) )
 	{ // we have new table format (since 0.9)
-		$old_db_version = $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = "db_version"' );
+		$r = $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = "db_version"' );
 	}
 	else
 	{
-		$old_db_version = $DB->get_var( 'SELECT db_version FROM T_settings' );
+		$r = $DB->get_var( 'SELECT db_version FROM T_settings' );
 	}
 
-	if( empty($old_db_version) ) debug_die( T_('NOT FOUND! This is not a b2evolution database.') );
+	$DB->halt_on_error = true;
+	$DB->show_errors = true;
 
-	echo $old_db_version, ' : ';
+	return $r;
+}
 
-	if( $old_db_version < 8000 ) debug_die( T_('This version is too old!') );
-	if( $old_db_version > $new_db_version ) debug_die( T_('This version is too recent! We cannot downgrade to it!') );
-	echo "OK.<br />\n";
+
+/**
+ * @return boolean Does a given column name exist in DB?
+ */
+function db_col_exists( $table, $col_name )
+{
+	global $DB;
+
+	$col_name = strtolower($col_name);
+
+	foreach( $DB->get_results('SHOW COLUMNS FROM '.$table) as $row )
+		if( strtolower($row->Field) == $col_name )
+			return true;
+
+	return false;
 }
 
 
@@ -527,6 +536,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.46  2008/02/07 00:35:52  fplanque
+ * cleaned up install
+ *
  * Revision 1.45  2008/01/21 17:56:34  fplanque
  * no more code plugin by default
  *

@@ -83,22 +83,6 @@ function db_index_exists( $table, $index_name )
 
 
 /**
- * @return boolean Does a given column name exist in DB?
- */
-function db_col_exists( $table, $col_name )
-{
-	global $DB;
-
-	$col_name = strtolower($col_name);
-
-	foreach( $DB->get_results('SHOW COLUMNS FROM '.$table) as $row )
-		if( strtolower($row->Field) == $col_name )
-			return true;
-
-	return false;
-}
-
-/**
  * @return boolean Does a list of given column names exist in DB?
  */
 function db_cols_exist( $table, $col_names )
@@ -231,8 +215,20 @@ function upgrade_b2evo_tables()
 	load_class('_core/model/db/_upgrade.funcs.php');
 
 
-	// Check DB version:
-	check_db_version();	// MIGHT DIE
+	echo '<p>'.T_('Checking DB schema version...').' ';
+	$old_db_version = get_db_version();
+
+	if( empty($old_db_version) )
+	{
+		echo '<p><strong>OOPS! b2evolution doesn\'t seem to be installed yet.</strong></p>';
+		return;
+	}
+
+	echo $old_db_version, ' : ';
+
+	if( $old_db_version < 8000 ) debug_die( T_('This version is too old!') );
+	if( $old_db_version > $new_db_version ) debug_die( T_('This version is too recent! We cannot downgrade to it!') );
+	echo "OK.<br />\n";
 
 
 	// Try to obtain some serious time to do some serious processing (5 minutes)
@@ -2180,6 +2176,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.242  2008/02/07 00:35:52  fplanque
+ * cleaned up install
+ *
  * Revision 1.241  2008/01/23 16:44:27  fplanque
  * minor
  *
