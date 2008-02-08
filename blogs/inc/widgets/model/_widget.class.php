@@ -397,7 +397,8 @@ class ComponentWidget extends DataObject
 				{
 					return true;
 				}
-				break;
+				// Plugin failed (happens when a plugin has been disabled for example):
+				return false;
 		}
 
 		echo "Widget $this->type : $this->code did not provide a display() method! ";
@@ -723,6 +724,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.34  2008/02/08 22:24:46  fplanque
+ * bugfixes
+ *
  * Revision 1.33  2008/01/21 09:35:36  fplanque
  * (c) 2008
  *

@@ -517,7 +517,7 @@ function CP_getCalendar() {
 			result += '<TD CLASS="'+this.cssPrefix+'cpMonthNavigation" WIDTH="78" COLSPAN="3"><select CLASS="'+this.cssPrefix+'cpMonthNavigation" name="cpMonth" onchange="'+refresh+'('+this.index+',this.options[this.selectedIndex].value-0,'+(year-0)+');">';
 			for( var monthCounter=1; monthCounter<=12; monthCounter++ ) {
 				var selected = (monthCounter==month) ? 'SELECTED' : '';
-				result += '<option value="'+monthCounter+'" '+selected+'>'+this.monthNames[monthCounter-1]+'</option>';
+				result += '<option value="'+monthCounter+'" '+selected+'>'+this.monthNames[monthCounter]+'</option>';
 				}
 			result += '</select></TD>';
 			result += '<TD CLASS="'+this.cssPrefix+'cpMonthNavigation" WIDTH="10">&nbsp;</TD>';

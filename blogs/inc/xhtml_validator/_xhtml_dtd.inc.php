@@ -141,7 +141,14 @@ $A_coreattrs = 'class title'.( $allow_css_tweaks ? ' id style' : '' )
 $A_i18n = 'lang xml:lang dir';
 $A_attrs = $A_coreattrs.' '.$A_i18n;
 
-if( !$use_strict ) $A_TextAlign = 'align';									// Transitional only
+if( !$use_strict )
+{
+	$A_TextAlign = 'align';									// Transitional only
+}
+else
+{
+	$A_TextAlign = '';
+}
 
 $A_cellhalign = 'align char charoff';
 $A_cellvalign = 'valign';
@@ -418,7 +425,7 @@ if( $allow_objects )
 	);
 	$allowed_attributes += array
 	(
-	  'object' => 'codebase classid id height width align type data',
+	  'object' => 'codebase classid id height width align type data wmode',
 	  'param' => 'name value',
 	  'embed' => 'src type height width wmode quality bgcolor name align allowScriptAccess pluginspage',
 	);
@@ -560,6 +567,9 @@ $comments_allowed_attributes = array
 
 /*
  * $Log$
+ * Revision 1.3  2008/02/08 22:24:46  fplanque
+ * bugfixes
+ *
  * Revision 1.2  2008/01/23 16:44:27  fplanque
  * minor
  *

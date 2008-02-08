@@ -464,8 +464,9 @@ class ItemList2 extends ItemListLight
 		$current_Item = $this->get_by_idx(0);
 
 		if( is_null($current_Item) )
-		{
-			debug_die( 'no current item!!!' );
+		{	// This happens if we are on a single post that we do not actually have permission to view
+			$r = NULL;
+			return $r;
 		}
 
 		if( $current_Item->ptyp_ID == 1000 ) // page
@@ -621,6 +622,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.7  2008/02/08 22:24:46  fplanque
+ * bugfixes
+ *
  * Revision 1.6  2008/01/21 09:35:31  fplanque
  * (c) 2008
  *

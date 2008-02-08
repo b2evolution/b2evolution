@@ -269,7 +269,7 @@ function locale_restore_previous()
  */
 function locale_activate( $locale )
 {
-	global $use_l10n, $locales, $current_locale, $current_charset, $weekday, $month;
+	global $use_l10n, $locales, $current_locale, $current_charset, $weekday;
 
 	if( $locale == $current_locale
 			|| empty( $locale )
@@ -965,6 +965,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.6  2008/02/08 22:24:46  fplanque
+ * bugfixes
+ *
  * Revision 1.5  2008/01/21 09:35:32  fplanque
  * (c) 2008
  *
