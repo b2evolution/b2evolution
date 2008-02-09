@@ -113,7 +113,8 @@ switch( $action )
 		// Content:
 		param( 'content', 'html' );
 		param( 'post_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 );
-		param_check_html( 'content', T_('Invalid comment text.') );	// Check this is backoffice content (NOT with comment rules)
+
+		param_check_html( 'content', T_('Invalid comment text.'), '#', $post_autobr );	// Check this is backoffice content (NOT with comment rules)
 		$edited_Comment->set( 'content', get_param( 'content' ) );
 
 		if( $current_User->check_perm( 'edit_timestamp' ))
@@ -273,6 +274,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2008/02/09 16:19:31  fplanque
+ * fixed commenting bugs
+ *
  * Revision 1.9  2008/01/21 09:35:27  fplanque
  * (c) 2008
  *

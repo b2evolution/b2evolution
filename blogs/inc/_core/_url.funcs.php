@@ -92,7 +92,8 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 			\.                               # require at least 1 dot
 			[a-z0-9]([a-z0-9.\-])+           # Don t allow anything too funky like entities
 			(:[0-9]+)?                       # optional port specification
-			~ix', $url, $match) )
+			[^ ]*                            # allow no space
+			$~ix', $url, $match) )
 		{ // Cannot validate URL structure
 			$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
 			return $verbose
@@ -574,6 +575,9 @@ function disp_url( $url, $max_length = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.10  2008/02/09 16:19:31  fplanque
+ * fixed commenting bugs
+ *
  * Revision 1.9  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *

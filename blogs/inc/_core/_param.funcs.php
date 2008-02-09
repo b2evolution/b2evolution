@@ -1535,11 +1535,11 @@ function param_html( $var, $default = '', $memorize = false, $err_msg )
  * @param string error message
  * @return boolean|string
  */
-function param_check_html( $var, $err_msg = '#', $field_err_msg = '#' )
+function param_check_html( $var, $err_msg = '#', $field_err_msg = '#', $autobr = 0 )
 {
 	global $Messages;
 
-	$altered_html = check_html_sanity( $GLOBALS[$var], 'posting' );
+	$altered_html = check_html_sanity( $GLOBALS[$var], 'posting', $autobr );
 
  	if( $altered_html === false )
 	{	// We have errors, do not keep sanitization attemps:
@@ -1879,6 +1879,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.16  2008/02/09 16:19:31  fplanque
+ * fixed commenting bugs
+ *
  * Revision 1.15  2008/01/22 14:20:21  fplanque
  * anonymous comments fix.
  *
