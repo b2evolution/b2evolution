@@ -192,16 +192,16 @@ function item_edit_actions( $Item )
 {
 	global $Blog;
 
+	$r = action_icon( T_('Edit linked files...'), 'folder',
+					url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_item&amp;item_ID='.$Item->ID ), T_('Files') );
+
 	// Display edit button if current user has the rights:
-	$r = $Item->get_edit_link( array(
+	$r .= $Item->get_edit_link( array(
 		'before' => ' ',
 		'after' => ' ',
 		'text' => get_icon( 'edit' ),
 		'title' => '#',
 		'class' => '' ) );
-
-	$r .= action_icon( T_('Edit linked files...'), 'folder',
-					url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_item&amp;item_ID='.$Item->ID ), T_('Files') );
 
 	// Display delete button if current user has the rights:
 	$r .= $Item->get_delete_link( ' ', ' ', get_icon( 'delete' ), '#', '', false );
@@ -240,6 +240,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.8  2008/02/09 20:13:08  fplanque
+ * minor
+ *
  * Revision 1.7  2008/02/09 03:04:01  fplanque
  * usability shortcut
  *
