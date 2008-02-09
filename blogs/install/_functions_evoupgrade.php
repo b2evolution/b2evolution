@@ -2070,7 +2070,19 @@ function upgrade_b2evo_tables()
 	*/
 	echo "OK.<br />\n";
 
-
+	/*
+	echo 'Upgrading blogs table... ';
+	$DB->query( "ALTER TABLE T_items__item
+				ADD COLUMN post_double1   DOUBLE NULL COMMENT 'Custom double value 1' AFTER post_priority,
+				ADD COLUMN post_double2   DOUBLE NULL COMMENT 'Custom double value 2' AFTER post_double1,
+				ADD COLUMN post_double3   DOUBLE NULL COMMENT 'Custom double value 3' AFTER post_double2,
+				ADD COLUMN post_double4   DOUBLE NULL COMMENT 'Custom double value 4' AFTER post_double3,
+				ADD COLUMN post_double5   DOUBLE NULL COMMENT 'Custom double value 5' AFTER post_double4,
+				ADD COLUMN post_varchar1  VARCHAR(255) NULL COMMENT 'Custom varchar value 1' AFTER post_double5,
+				ADD COLUMN post_varchar2  VARCHAR(255) NULL COMMENT 'Custom varchar value 2' AFTER post_varchar1,
+				ADD COLUMN post_varchar3  VARCHAR(255) NULL COMMENT 'Custom varchar value 3' AFTER post_varchar2" );
+	echo "OK.<br />\n";
+	*/
 
 	/*
 	 * ADD UPGRADES HERE.
@@ -2189,6 +2201,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.245  2008/02/09 20:14:14  fplanque
+ * custom fields management
+ *
  * Revision 1.244  2008/02/09 17:36:15  fplanque
  * better handling of order, including approximative comparisons
  *

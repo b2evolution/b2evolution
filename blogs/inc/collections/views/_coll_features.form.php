@@ -107,6 +107,32 @@ $Form->begin_fieldset( T_('RSS/Atom feeds') );
 	$Form->text( 'posts_per_feed', $edited_Blog->get_setting('posts_per_feed'), 4, T_('Posts in feeds'),  T_('How many of the latest posts do you want to include in RSS & Atom feeds?'), 4 );
 $Form->end_fieldset();
 
+
+$Form->begin_fieldset( T_('Custom field names') );
+	$notes = array(
+			T_('Ex: Price'),
+			T_('Ex: Weight'),
+			T_('Ex: Latitude or Length'),
+			T_('Ex: Longitude or Width'),
+			T_('Ex: Altitude or Height'),
+		);
+	for( $i = 1 ; $i <= 5; $i++ )
+	{
+		$Form->text( 'custom_double'.$i, $edited_Blog->get_setting('custom_double'.$i), 20, T_('(numeric)').' double'.$i, $notes[$i-1], 40 );
+	}
+
+	$notes = array(
+			T_('Ex: Color'),
+			T_('Ex: Fabric'),
+			T_('Leave empty if not needed'),
+		);
+	for( $i = 1 ; $i <= 3; $i++ )
+	{
+		$Form->text( 'custom_varchar'.$i, $edited_Blog->get_setting('custom_varchar'.$i), 30, T_('(text)').' varchar'.$i, $notes[$i-1], 60 );
+	}
+$Form->end_fieldset();
+
+
 $Form->begin_fieldset( T_('Subscriptions') );
 	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post and/or comment.') );
 	// TODO: checkbox 'Enable RSS/Atom feeds'
@@ -144,6 +170,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.9  2008/02/09 20:14:14  fplanque
+ * custom fields management
+ *
  * Revision 1.8  2008/01/21 09:35:27  fplanque
  * (c) 2008
  *

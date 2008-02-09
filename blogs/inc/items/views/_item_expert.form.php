@@ -199,30 +199,26 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->begin_fieldset( T_('Advanced properties'), array( 'id' => 'itemform_adv_props' ) );
 
- 	$Form->switch_layout( 'linespan' );
-
-	if( $current_User->check_perm( 'edit_timestamp' ) )
-	{ // ------------------------------------ TIME STAMP -------------------------------------
-
-		echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
-
-		$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), T_('Issue date') );
-		echo ' '; // allow wrapping!
-		$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '' );
-		echo ' '; // allow wrapping!
-		if( $creating )
-		{ // If not checked, create time will be used...
-			$Form->checkbox( 'edit_date', $edit_date, '', T_('Edit') );
+	// CUSTOM FIELDS varchar
+	echo '<table cellspacing="0" class="compose_layout">';
+	for( $i = 1 ; $i <= 3; $i++ )
+	{	// For each custom double field:
+		if( $field_name = $Blog->get_setting('custom_varchar'.$i) )
+		{	// Field has a name: display it:
+			echo '<tr><td width="1%"><label for="item_varchar'.$i.'"><strong>'.$field_name.':</strong></label></td>';
+			echo '<td class="input">';
+			$Form->text_input( 'item_varchar'.$i, $edited_Item->{'varchar'.$i}, 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+			echo '</td><td width="1"><!-- for IE7 --></td></tr>';
 		}
-
-		echo '</div>';
 	}
+	echo '</table>';
 
-
+ 	$Form->switch_layout( 'linespan' );
 	echo '<div id="itemform_urltitle" class="edit_fieldgroup">';
 	$Form->text( 'post_urltitle', $edited_Item->get( 'urltitle' ), 40, T_('URL "filename"'),
 	             T_('("slug" to be used in permalinks)'), $field_maxlength = 50 ) ;
 	echo '</div>';
+	$Form->switch_layout( NULL );
 	?>
 
 	<div id="itemform_tags" class="edit_fieldgroup">
@@ -238,7 +234,6 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	</div>
 
 	<?php
-	$Form->switch_layout( NULL );
 
 	$Form->end_fieldset();
 
@@ -312,6 +307,50 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->end_fieldset();
 
 
+	// ################### PROPERTIES ###################
+
+	$Form->begin_fieldset( T_('Properties'), array( 'id' => 'itemform_extra' ) );
+
+	$Form->checkbox( 'item_featured', $edited_Item->featured, T_('Featured post') );
+
+	if( $current_User->check_perm( 'edit_timestamp' ) )
+	{ // ------------------------------------ TIME STAMP -------------------------------------
+		echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
+
+		$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), T_('Issue date') );
+		echo ' '; // allow wrapping!
+		$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '', 'hh:mm:ss', '' );
+		echo ' '; // allow wrapping!
+		if( $creating )
+		{ // If not checked, create time will be used...
+			$Form->checkbox( 'edit_date', $edit_date, '', T_('Edit') );
+		}
+
+		echo '</div>';
+	}
+
+	echo '<table>';
+
+	echo '<tr><td><strong>'.T_('Order').':</strong></td><td>';
+	$Form->text( 'item_order', $edited_Item->order, 10, '', T_('can be decimal') );
+	echo '</td></tr>';
+
+	// CUSTOM FIELDS double
+	for( $i = 1 ; $i <= 5; $i++ )
+	{	// For each custom double field:
+		if( $field_name = $Blog->get_setting('custom_double'.$i) )
+		{	// Field has a name: display it:
+			echo '<tr><td><strong>'.$field_name.':</strong></td><td>';
+			$Form->text( 'item_double'.$i, $edited_Item->{'double'.$i}, 10, '', T_('can be decimal') );
+			echo '</td></tr>';
+		}
+	}
+
+	echo '</table>';
+
+	$Form->end_fieldset();
+
+
 	// ################### VISIBILITY / SHARING ###################
 
 	$Form->begin_fieldset( T_('Visibility / Sharing'), array( 'id' => 'itemform_visibility' ) );
@@ -319,19 +358,6 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->switch_layout( 'linespan' );
 	visibility_select( $Form, $edited_Item->status );
 	$Form->switch_layout( NULL );
-
-	$Form->end_fieldset();
-
-
-	// ################### Extra ###################
-
-	$Form->begin_fieldset( T_('Extra'), array( 'id' => 'itemform_extra' ) );
-
-	$Form->checkbox( 'item_featured', $edited_Item->featured, T_('Featured post') );
-
-	echo '<br />';
-
-	$Form->text( 'item_order', $edited_Item->order, 10, T_('Order'), T_('5 digits max, inc. decimal') );
 
 	$Form->end_fieldset();
 
@@ -395,6 +421,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.23  2008/02/09 20:14:14  fplanque
+ * custom fields management
+ *
  * Revision 1.22  2008/02/09 17:36:15  fplanque
  * better handling of order, including approximative comparisons
  *

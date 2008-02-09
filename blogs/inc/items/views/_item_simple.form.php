@@ -97,6 +97,16 @@ $Form->hidden( 'renderers_displayed', 1 );
 $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 $Form->hidden( 'item_featured', $edited_Item->featured );
 $Form->hidden( 'item_order', $edited_Item->order );
+// CUSTOM FIELDS double
+for( $i = 1 ; $i <= 5; $i++ )
+{	// For each custom double field:
+	$Form->hidden( 'item_double'.$i, $edited_Item->{'double'.$i} );
+}
+// CUSTOM FIELDS varchar
+for( $i = 1 ; $i <= 3; $i++ )
+{	// For each custom varchar field:
+	$Form->hidden( 'item_varchar'.$i, $edited_Item->{'varchar'.$i} );
+}
 
 // TODO: Form::hidden() do not add, if NULL?!
 
@@ -270,6 +280,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.10  2008/02/09 20:14:14  fplanque
+ * custom fields management
+ *
  * Revision 1.9  2008/02/09 02:56:00  fplanque
  * explicit order by field
  *

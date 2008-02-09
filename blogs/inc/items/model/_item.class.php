@@ -146,6 +146,15 @@ class Item extends ItemLight
 	 */
 	var $featured;
 
+	var $double1;
+	var $double2;
+	var $double3;
+	var $double4;
+	var $double5;
+	var $varchar1;
+	var $varchar2;
+	var $varchar3;
+
 	/**
 	 * Have post processing notifications been handled?
 	 * @var string
@@ -261,6 +270,14 @@ class Item extends ItemLight
 			$this->comment_status = $db_row->post_comment_status;			// Comments status
 			$this->order = $db_row->post_order;
 			$this->featured = $db_row->post_featured;
+			for( $i = 1 ; $i <= 5; $i++ )
+			{
+				$this->{'double'.$i} = $db_row->{'post_double'.$i};
+			}
+			for( $i = 1 ; $i <= 3; $i++ )
+			{
+				$this->{'varchar'.$i} = $db_row->{'post_varchar'.$i};
+			}
 
 			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = $db_row->post_renderers;
@@ -406,8 +423,26 @@ class Item extends ItemLight
 
 		$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
 
-		param( 'item_order', 'float', NULL );
+		param( 'item_order', 'double', NULL );
 		$this->set_from_Request( 'order', 'item_order', true );
+
+		// CUSTOM FIELDS double
+		for( $i = 1 ; $i <= 5; $i++ )
+		{	// For each custom double field:
+			if( param( 'item_double'.$i, 'double', NULL ) !== NULL )
+			{
+				$this->set_from_Request( 'double'.$i, 'item_double'.$i, true );
+			}
+		}
+
+		// CUSTOM FIELDS varchar
+		for( $i = 1 ; $i <= 3; $i++ )
+		{	// For each custom double field:
+			if( param( 'item_varchar'.$i, 'string', NULL ) !== NULL )
+			{
+				$this->set_from_Request( 'varchar'.$i, 'item_varchar'.$i, true );
+			}
+		}
 
 		if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL ) {
 			$this->set_from_Request( 'datedeadline', 'item_deadline', true );
@@ -3353,6 +3388,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.34  2008/02/09 20:14:14  fplanque
+ * custom fields management
+ *
  * Revision 1.33  2008/02/09 02:56:00  fplanque
  * explicit order by field
  *

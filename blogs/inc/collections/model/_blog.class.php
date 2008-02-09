@@ -442,6 +442,19 @@ class Blog extends DataObject
 		}
 
 
+ 		if( param( 'custom_double1', 'string', NULL ) !== NULL )
+		{	// Description:
+			for( $i = 1 ; $i <= 5; $i++ )
+			{
+				$this->set_setting( 'custom_double'.$i, param( 'custom_double'.$i, 'string', NULL ) );
+			}
+			for( $i = 1 ; $i <= 3; $i++ )
+			{
+				$this->set_setting( 'custom_varchar'.$i, param( 'custom_varchar'.$i, 'string', NULL ) );
+			}
+		}
+
+
     /*
 		 * ADVANCED ADMIN SETTINGS
 		 */
@@ -1887,6 +1900,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2008/02/09 20:14:14  fplanque
+ * custom fields management
+ *
  * Revision 1.31  2008/01/21 09:35:26  fplanque
  * (c) 2008
  *

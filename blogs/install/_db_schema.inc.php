@@ -214,8 +214,16 @@ $schema_queries = array(
 			post_commentsexpire         DATETIME DEFAULT NULL,
 			post_renderers              TEXT NOT NULL,
 			post_priority               int(11) unsigned null COMMENT 'Task priority in workflow',
-			post_order                  double NULL,
 			post_featured               tinyint(1) NOT NULL DEFAULT 0,
+			post_order                  DOUBLE NULL,
+			post_double1                DOUBLE NULL COMMENT 'Custom double value 1',
+			post_double2                DOUBLE NULL COMMENT 'Custom double value 2',
+			post_double3                DOUBLE NULL COMMENT 'Custom double value 3',
+			post_double4                DOUBLE NULL COMMENT 'Custom double value 4',
+			post_double5                DOUBLE NULL COMMENT 'Custom double value 5',
+			post_varchar1               VARCHAR(255) NULL COMMENT 'Custom varchar value 1',
+			post_varchar2               VARCHAR(255) NULL COMMENT 'Custom varchar value 2',
+			post_varchar3               VARCHAR(255) NULL COMMENT 'Custom varchar value 3',
 			PRIMARY KEY post_ID( post_ID ),
 			UNIQUE post_urltitle( post_urltitle ),
 			INDEX post_datestart( post_datestart ),
@@ -568,6 +576,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.82  2008/02/09 20:14:14  fplanque
+ * custom fields management
+ *
  * Revision 1.81  2008/02/09 17:36:15  fplanque
  * better handling of order, including approximative comparisons
  *
