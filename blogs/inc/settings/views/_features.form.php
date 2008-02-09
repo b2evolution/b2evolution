@@ -65,11 +65,14 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('After each new post...').get_manual_link('after_each_post_settings') );
-	$Form->radio_input( 'outbound_notifications_mode', $Settings->get('outbound_notifications_mode'), array(
-			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('No notification about your new content will be sent out.'), 'suffix' => '<br />' ),
-			array( 'value'=>'immediate', 'label'=>T_('Immediate'), 'note'=>T_('This is guaranteed to work but may create an annoying delay after each post.'), 'suffix' => '<br />' ),
-			array( 'value'=>'cron', 'label'=>T_('Asynchronous'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up. You could notify news every minute.') ) ),
-								T_('Outbound pings & email notifications') );
+	$Form->radio_input( 'outbound_notifications_mode', $Settings->get('outbound_notifications_mode'),
+		array(
+			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('No notification about your new content will be sent out.') ),
+			array( 'value'=>'immediate', 'label'=>T_('Immediate'), 'note'=>T_('This is guaranteed to work but may create an annoying delay after each post.') ),
+			array( 'value'=>'cron', 'label'=>T_('Asynchronous'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up. You could notify news every minute.') )
+		),
+		T_('Outbound pings & email notifications'),
+		array( 'lines' => true ) );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Blog by email').get_manual_link('blog_by_email') );
@@ -146,19 +149,19 @@ $Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit_logging'
 				'value'=>'off',
 				'label'=>T_('Off'),
 				'note'=>T_('Not recommended! Your database will grow very large!!'),
-				'suffix' => '<br />',
 				'onclick'=>'$("#auto_prune_stats_container").hide();' ),
 			array(
 				'value'=>'page',
 				'label'=>T_('On every page'),
-				'note'=>T_('This is guaranteed to work but uses extra resources with every page displayed.'), 'suffix' => '<br />',
+				'note'=>T_('This is guaranteed to work but uses extra resources with every page displayed.'),
 				'onclick'=>'$("#auto_prune_stats_container").show();' ),
 			array(
 				'value'=>'cron',
 				'label'=>T_('With a scheduled job'),
 				'note'=>T_('Recommended if you have your scheduled jobs properly set up.'), 'onclick'=>'$("#auto_prune_stats_container").show();' ) ),
 		T_('Auto pruning'),
-		array( 'note' => T_('Note: Even if you don\'t log hits, you still need to prune sessions!') ) );
+		array( 'note' => T_('Note: Even if you don\'t log hits, you still need to prune sessions!'),
+		'lines' => true ) );
 
 	echo '<div id="auto_prune_stats_container">';
 	$Form->text_input( 'auto_prune_stats', $Settings->get('auto_prune_stats'), 5, T_('Prune after'), T_('days. How many days of hits & sessions do you want to keep in the database for stats?') );
@@ -188,6 +191,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.4  2008/02/09 20:06:10  blueyed
+ * Use "lines"=true for radio_input() fields, instead of BR-suffix for each option. Fixes display of group note with "auto_prune_stats"
+ *
  * Revision 1.3  2008/01/21 09:35:34  fplanque
  * (c) 2008
  *
