@@ -167,7 +167,6 @@ $schema_queries = array(
 			blog_skin_ID         INT(10) UNSIGNED NOT NULL DEFAULT 1,
 			blog_in_bloglist     TINYINT(1) NOT NULL DEFAULT 1,
 			blog_links_blog_ID   INT(11) NULL DEFAULT NULL,
-			blog_commentsexpire  INT(4) NOT NULL DEFAULT 0,
 			blog_media_location  ENUM( 'default', 'subdir', 'custom', 'none' ) DEFAULT 'default' NOT NULL,
 			blog_media_subdir    VARCHAR( 255 ) NULL,
 			blog_media_fullpath  VARCHAR( 255 ) NULL,
@@ -246,7 +245,7 @@ $schema_queries = array(
 			post_comment_status         ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
 			post_commentsexpire         DATETIME DEFAULT NULL,
 			post_renderers              TEXT NOT NULL,
-			post_priority               int(11) unsigned null,
+			post_priority               int(11) unsigned null COMMENT 'Task priority in workflow',
 			post_order                  float NULL,
 			post_featured               tinyint(1) NOT NULL DEFAULT 0,
 			PRIMARY KEY post_ID( post_ID ),
@@ -601,6 +600,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.79  2008/02/09 02:56:00  fplanque
+ * explicit order by field
+ *
  * Revision 1.78  2008/02/07 00:35:52  fplanque
  * cleaned up install
  *

@@ -137,6 +137,15 @@ class Item extends ItemLight
 	var $datedeadline = '';
 	var $priority;
 
+  /**
+	 * @var float
+	 */
+	var $order;
+  /**
+	 * @var boolean
+	 */
+	var $featured;
+
 	/**
 	 * Have post processing notifications been handled?
 	 * @var string
@@ -250,6 +259,8 @@ class Item extends ItemLight
 			$this->notifications_status = $db_row->post_notifications_status;
 			$this->notifications_ctsk_ID = $db_row->post_notifications_ctsk_ID;
 			$this->comment_status = $db_row->post_comment_status;			// Comments status
+			$this->order = $db_row->post_order;
+			$this->featured = $db_row->post_featured;
 
 			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = $db_row->post_renderers;
@@ -388,9 +399,15 @@ class Item extends ItemLight
 			$this->assign_to( get_param('item_assigned_user_ID') );
 		}
 
-		if( param( 'item_priority', 'integer', NULL ) !== NULL ) {
+		if( param( 'item_priority', 'integer', NULL ) !== NULL )
+		{
 			$this->set_from_Request( 'priority', 'item_priority', true );
 		}
+
+		$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
+
+		param( 'item_order', 'float', NULL );
+		$this->set_from_Request( 'order', 'item_order', true );
 
 		if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL ) {
 			$this->set_from_Request( 'datedeadline', 'item_deadline', true );
@@ -2504,10 +2521,14 @@ class Item extends ItemLight
 				return ( $r1 || $r2 ); // return true if one changed
 
 			case 'wordcount':
-				return $this->set_param( 'wordcount', 'number', $parvalue, false );
+			case 'featured':
+				return $this->set_param( $parname, 'number', $parvalue, false );
 
 			case 'datedeadline':
 				return $this->set_param( 'datedeadline', 'date', $parvalue, true );
+
+			case 'order':
+				return $this->set_param( 'order', 'number', $parvalue, true );
 
 			case 'renderers': // deprecated
 				return $this->set_renderers( $parvalue );
@@ -3332,6 +3353,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.33  2008/02/09 02:56:00  fplanque
+ * explicit order by field
+ *
  * Revision 1.32  2008/01/23 12:51:20  fplanque
  * posts now have divs with IDs
  *

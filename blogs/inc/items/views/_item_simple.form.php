@@ -95,6 +95,8 @@ $Form->hidden( 'item_tags', $item_tags );
 $Form->hidden( 'trackback_url', $trackback_url );
 $Form->hidden( 'renderers_displayed', 1 );
 $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
+$Form->hidden( 'item_featured', $edited_Item->featured );
+$Form->hidden( 'item_order', $edited_Item->order );
 
 // TODO: Form::hidden() do not add, if NULL?!
 
@@ -268,6 +270,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.9  2008/02/09 02:56:00  fplanque
+ * explicit order by field
+ *
  * Revision 1.8  2008/01/28 20:17:45  fplanque
  * better display of image file linking while in 'upload' mode
  *

@@ -139,7 +139,11 @@ while( $Item = & $ItemList->get_item() )
 	 	?>">
 			<?php
 				echo '<div class="bSmallHeadRight">';
-				$Item->locale_flag();
+				If( !empty( $Item->order ) )
+				{
+					echo T_('Order').': '.$Item->order;
+				}
+				$Item->locale_flag(array('class'=>'flagtop'));
 				echo '</div>';
 
 				$Item->issue_date( array(
@@ -400,6 +404,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.14  2008/02/09 02:56:00  fplanque
+ * explicit order by field
+ *
  * Revision 1.13  2008/01/23 17:55:01  fplanque
  * fix
  *

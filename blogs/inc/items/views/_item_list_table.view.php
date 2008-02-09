@@ -165,6 +165,12 @@ $ItemList->cols[] = array(
 						'td' => '@get( \'t_status\' )@',
 				);
 
+$ItemList->cols[] = array(
+						'th' => T_('Ord'),
+						'order' => 'order',
+						'td_class' => 'right',
+						'td' => '$post_order$',
+				);
 
 $ItemList->cols[] = array(
 	'th' => /* TRANS: abbrev for info */ T_('i'),
@@ -229,6 +235,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.6  2008/02/09 02:56:00  fplanque
+ * explicit order by field
+ *
  * Revision 1.5  2008/01/21 09:35:31  fplanque
  * (c) 2008
  *

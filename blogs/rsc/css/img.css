@@ -38,6 +38,11 @@ img.flag {
 	border:1px solid #000;
 }
 
+img.flagtop {
+	vertical-align:top;
+	border:1px solid #000;
+}
+
 div.single_image_zone {
 	overflow: hidden;
 }
@@ -49,14 +54,14 @@ div.multi_image_zone {
 }
 
 div.image_block {
-	/* WARNING: this will screw out backoffice layout (fulltext edit screen) in firefox! 
+	/* WARNING: this will screw out backoffice layout (fulltext edit screen) in firefox!
 		overflow: hidden; */
 	text-align: center;
 }
 
 /* We only float image_blocks when in multiple image zone */
-div.multi_image_zone div.image_block 
-{	
+div.multi_image_zone div.image_block
+{
 	margin: 1ex;
 	float: left;
 }

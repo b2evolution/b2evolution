@@ -1162,7 +1162,7 @@ class Form extends Widget
 	}
 
 
-	/*
+	/**
 	 * EXPERIMENTAL: simpler method of obtaining basic checkboxes
 	 */
 	function checkbox_basic_input( $field_name, $field_checked, $field_label, $field_params = array() )
@@ -2836,6 +2836,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.25  2008/02/09 02:56:00  fplanque
+ * explicit order by field
+ *
  * Revision 1.24  2008/01/21 09:35:24  fplanque
  * (c) 2008
  *

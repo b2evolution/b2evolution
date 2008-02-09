@@ -2059,6 +2059,17 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 	}
 
+
+
+	// 2.5
+	echo 'Upgrading blogs table... ';
+	$query = "ALTER TABLE T_blogs
+						DROP COLUMN blog_commentsexpire";
+	$DB->query( $query );
+	echo "OK.<br />\n";
+
+
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -2176,6 +2187,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.243  2008/02/09 02:56:00  fplanque
+ * explicit order by field
+ *
  * Revision 1.242  2008/02/07 00:35:52  fplanque
  * cleaned up install
  *

@@ -323,6 +323,19 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->end_fieldset();
 
 
+	// ################### Extra ###################
+
+	$Form->begin_fieldset( T_('Extra'), array( 'id' => 'itemform_extra' ) );
+
+	$Form->checkbox( 'item_featured', $edited_Item->featured, T_('Featured post') );
+
+	echo '<br />';
+
+	$Form->text( 'item_order', $edited_Item->order, 10, T_('Order'), T_('decimal') );
+
+	$Form->end_fieldset();
+
+
 	// ################### TEXT RENDERERS ###################
 
 	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
@@ -382,6 +395,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.21  2008/02/09 02:56:00  fplanque
+ * explicit order by field
+ *
  * Revision 1.20  2008/01/28 20:23:19  fplanque
  * better display of image file linking while in 'upload' mode
  *

@@ -84,10 +84,11 @@ $Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear
 
 $Form->begin_fieldset( T_('Content / Posts') );
 	$Form->select_input_array( 'orderby', $edited_Blog->get_setting('orderby'), array(
-												'datestart' => T_('Date issued (Default)'),
+												'datestart'    => T_('Date issued (Default)'),
+												'order'        => T_('Order (as explicitely specified)'),
 												//'datedeadline' => T_('Deadline'),
-												'title'     => T_('Title'),
-												'datecreated' => T_('Date created'),
+												'title'        => T_('Title'),
+												'datecreated'  => T_('Date created'),
 												'datemodified' => T_('Date last modified'),
 												'urltitle'     => T_('URL "filename"'),
 												'priority'     => T_('Priority'),
@@ -122,6 +123,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.5  2008/02/09 02:56:00  fplanque
+ * explicit order by field
+ *
  * Revision 1.4  2008/01/21 09:35:27  fplanque
  * (c) 2008
  *
