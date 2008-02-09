@@ -849,11 +849,7 @@ class Form extends Widget
 		}
 
 		// Prepend format to note
-		if( isset($field_params['note']) )
-		{
-			$field_params['note'] = $field_format.' '.$field_params['note'];
-		}
-		else
+		if( ! isset($field_params['note']) )
 		{
 			$field_params['note'] = $field_format;
 		}
@@ -875,9 +871,12 @@ class Form extends Widget
 	 * @param string label displayed in front of the field
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function time( $field_name, $field_value, $field_label, $field_format = 'hh:mm:ss' )
+	function time( $field_name, $field_value, $field_label, $field_format = 'hh:mm:ss', $note = NULL )
 	{
-		$field_params = array( 'time_format' => $field_format );
+		$field_params = array(
+				'time_format' => $field_format,
+				'note' => $note,
+			);
 
 		return $this->time_input( $field_name, $field_value, $field_label, $field_params );
 	}
@@ -2836,6 +2835,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.26  2008/02/09 20:12:36  fplanque
+ * note control for time field
+ *
  * Revision 1.25  2008/02/09 02:56:00  fplanque
  * explicit order by field
  *
