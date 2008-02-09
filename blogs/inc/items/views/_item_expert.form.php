@@ -331,7 +331,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	echo '<br />';
 
-	$Form->text( 'item_order', $edited_Item->order, 10, T_('Order'), T_('decimal') );
+	$Form->text( 'item_order', $edited_Item->order, 10, T_('Order'), T_('5 digits max, inc. decimal') );
 
 	$Form->end_fieldset();
 
@@ -395,6 +395,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.22  2008/02/09 17:36:15  fplanque
+ * better handling of order, including approximative comparisons
+ *
  * Revision 1.21  2008/02/09 02:56:00  fplanque
  * explicit order by field
  *

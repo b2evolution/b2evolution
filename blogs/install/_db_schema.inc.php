@@ -214,7 +214,7 @@ $schema_queries = array(
 			post_commentsexpire         DATETIME DEFAULT NULL,
 			post_renderers              TEXT NOT NULL,
 			post_priority               int(11) unsigned null COMMENT 'Task priority in workflow',
-			post_order                  float NULL,
+			post_order                  double NULL,
 			post_featured               tinyint(1) NOT NULL DEFAULT 0,
 			PRIMARY KEY post_ID( post_ID ),
 			UNIQUE post_urltitle( post_urltitle ),
@@ -568,6 +568,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.81  2008/02/09 17:36:15  fplanque
+ * better handling of order, including approximative comparisons
+ *
  * Revision 1.80  2008/02/09 03:04:01  fplanque
  * usability shortcut
  *

@@ -541,36 +541,34 @@ class ItemList2 extends ItemListLight
     /*
 		 * Position right after the current element depending on current sorting params
 		 *
-		 * If there are several items on the same issuedatetime for example, we'll then differentite on post ID
+		 * If there are several items on the same issuedatetime for example, we'll then differentiate on post ID
 		 * WARNING: you cannot combine criterias with AND here; you need stuf like a>a0 OR (a=a0 AND b>b0)
 		 */
 		switch( $orderby_array[0] )
 		{
 			case 'datestart':
 				// special var name:
-				$next_Query->WHERE_and( '( '
-																	.$this->Cache->dbprefix.$orderby_array[0]
-																	.$operator
+				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
+																.$operator
+																.$DB->quote($current_Item->issue_date)
+																.' OR ( '
+                                  .$this->Cache->dbprefix.$orderby_array[0]
+																	.' = '
 																	.$DB->quote($current_Item->issue_date)
-																	.' OR ( '
-                                    .$this->Cache->dbprefix.$orderby_array[0]
-																		.' = '
-																		.$DB->quote($current_Item->issue_date)
-																		.' AND '
-																		.$this->Cache->dbIDname
-																		.$operator
-																		.$current_Item->ID
-																	.') )'
-																 );
+																	.' AND '
+																	.$this->Cache->dbIDname
+																	.$operator
+																	.$current_Item->ID
+																.')'
+														 );
 				break;
 
 			case 'title':
 			case 'datecreated':
 			case 'datemodified':
 			case 'urltitle':
-			case 'priority':	// Note: will skip to next priority level
-				$next_Query->WHERE_and( '( '
-																.$this->Cache->dbprefix.$orderby_array[0]
+			case 'priority':
+				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
 																.$operator
 																.$DB->quote($current_Item->{$orderby_array[0]})
 																.' OR ( '
@@ -581,14 +579,30 @@ class ItemList2 extends ItemListLight
 																	.$this->Cache->dbIDname
 																	.$operator
 																	.$current_Item->ID
-																.') )'
+																.')'
+															);
+				break;
+
+			case 'order':
+				// We have to integrate a rounding error margin
+				$comp_order_value = $current_Item->order;
+				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
+																.$operator
+																.( $operator == ' < ' ? $comp_order_value-0.000000001 : $comp_order_value+0.000000001 )
+																.' OR ( '
+                                  .$this->Cache->dbprefix.$orderby_array[0]
+																	.( $operator == ' < ' ? ' <= '.($comp_order_value+0.000000001) : ' >= '.($comp_order_value-0.000000001) )
+																	.' AND '
+																	.$this->Cache->dbIDname
+																	.$operator
+																	.$current_Item->ID
+																.')'
 															);
 				break;
 
 			default:
 				echo 'WARNING: unhandled sorting: '.htmlspecialchars( $orderby_array[0] );
 		}
-
 
 
 		// GET DATA ROWS:
@@ -622,6 +636,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.8  2008/02/09 17:36:15  fplanque
+ * better handling of order, including approximative comparisons
+ *
  * Revision 1.7  2008/02/08 22:24:46  fplanque
  * bugfixes
  *
