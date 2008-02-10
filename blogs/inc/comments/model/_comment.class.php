@@ -995,17 +995,7 @@ class Comment extends DataObject
 
 		echo $params['before'];
 
-		for( $i=1; $i<=5; $i++ )
-		{
-			if( $i <= $this->rating )
-			{
-				echo get_icon( 'star_on', 'imgtag', array( 'class'=>'middle' ) );
-			}
-			else
-			{
-				echo get_icon( 'star_off', 'imgtag', array( 'class'=>'middle' ) );
-			}
-		}
+		star_rating( $this->rating );
 
 		echo $params['after'];
 	}
@@ -1336,6 +1326,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2008/02/10 00:58:56  fplanque
+ * no message
+ *
  * Revision 1.14  2008/01/21 09:35:27  fplanque
  * (c) 2008
  *

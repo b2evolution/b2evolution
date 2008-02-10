@@ -1094,6 +1094,34 @@ class Item extends ItemLight
 
 
 	/**
+	 * Display custom field
+	 */
+	function custom( $params )
+	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => ' ',
+				'after'       => ' ',
+				'format'      => 'htmlbody',
+			), $params );
+
+		if( empty( $params['field'] ) )
+		{
+			return;
+		}
+
+		$r = $this->{$params['field']};
+
+		if( !empty($r) )
+		{
+			echo $params['before'];
+			echo format_to_output( $r, $params['format'] );
+			echo $params['after'];
+		}
+	}
+
+
+	/**
 	 * Template tag
 	 */
 	function more_link( $params = array() )
@@ -1455,7 +1483,8 @@ class Item extends ItemLight
 				'after_image_legend' =>  '</div>',
 				'after_image' =>         '</div>',
 				'after' =>               '</div>',
-				'image_size' =>          'fit-720x500'
+				'image_size' =>          'fit-720x500',
+				'limit' =>               1000,	// Max # of images displayed
 			), $params );
 
 		$FileCache = & get_Cache( 'FileCache' );
@@ -1468,6 +1497,7 @@ class Item extends ItemLight
 		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( 'link_itm_ID = '.$this->ID );
 		$SQL->ORDER_BY( 'link_ID' );
+		$SQL->LIMIT( $params['limit'] );
 
 		$FileList->sql = $SQL->get();
 
@@ -3388,6 +3418,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.35  2008/02/10 00:58:57  fplanque
+ * no message
+ *
  * Revision 1.34  2008/02/09 20:14:14  fplanque
  * custom fields management
  *
