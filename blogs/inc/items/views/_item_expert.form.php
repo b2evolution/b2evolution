@@ -205,7 +205,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	{	// For each custom double field:
 		if( $field_name = $Blog->get_setting('custom_varchar'.$i) )
 		{	// Field has a name: display it:
-			echo '<tr><td width="1%"><label for="item_varchar'.$i.'"><strong>'.$field_name.':</strong></label></td>';
+			echo '<tr><td width="1"><label for="item_varchar'.$i.'"><strong>'.$field_name.':</strong></label></td>';
 			echo '<td class="input">';
 			$Form->text_input( 'item_varchar'.$i, $edited_Item->{'varchar'.$i}, 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 			echo '</td><td width="1"><!-- for IE7 --></td></tr>';
@@ -421,6 +421,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.24  2008/02/10 00:58:00  fplanque
+ * minor
+ *
  * Revision 1.23  2008/02/09 20:14:14  fplanque
  * custom fields management
  *
