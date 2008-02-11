@@ -1112,7 +1112,11 @@ class Item extends ItemLight
 
 		$r = $this->{$params['field']};
 
-		if( !empty($r) )
+		if( !empty( $params['max'] ) && substr($params['field'],0,6) == 'double' && $r == 9999999999 )
+		{
+			echo $params['max'];
+		}
+		elseif( !empty($r) )
 		{
 			echo $params['before'];
 			echo format_to_output( $r, $params['format'] );
@@ -1592,6 +1596,9 @@ class Item extends ItemLight
 									'link_text_zero' => '#',
 									'link_text_one' => '#',
 									'link_text_more' => '#',
+									'link_anchor_zero' => '#',
+									'link_anchor_one' => '#',
+									'link_anchor_more' => '#',
 									'link_title' => '#',
 									'use_popup' => false,
 									'url' => '#',
@@ -1667,13 +1674,25 @@ class Item extends ItemLight
 			$params['url'] = $this->get_single_url( 'auto' );
 		}
 
+		// Anchor position
+		$number = generic_ctp_number( $this->ID, $params['type'], $params['status'] );
+
+		if( $number == 0 )
+			$anchor = $params['link_anchor_zero'];
+		elseif( $number == 1 )
+			$anchor = $params['link_anchor_one'];
+		elseif( $number > 1 )
+			$anchor = $params['link_anchor_more'];
+		if( $anchor == '#' )
+		{
+			$anchor = '#'.$params['type'];
+		}
 
 		echo $params['link_before'];
 
 		if( !empty( $params['url'] ) )
 		{
-			echo '<a href="'.$params['url'];
-			echo '#'.$params['type'].'" ';	// Position on feedback
+			echo '<a href="'.$params['url'].$anchor.'" ';	// Position on feedback
 			echo 'title="'.$params['link_title'].'"';
 			if( $params['use_popup'] )
 			{	// Special URL if we can open a popup (i-e if JS is enabled):
@@ -3418,6 +3437,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.36  2008/02/11 23:44:44  fplanque
+ * more tag params
+ *
  * Revision 1.35  2008/02/10 00:58:57  fplanque
  * no message
  *
