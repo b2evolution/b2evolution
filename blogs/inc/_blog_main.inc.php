@@ -120,6 +120,9 @@ if( $resolve_extra_path )
 		$Debuglog->add( 'Extra path info found! path_string=' . $path_string , 'params' );
 		//echo "path=[$path_string]<br />";
 
+		// Replace encoded ; with regular ; (used for tags)
+		$path_string = str_replace( '%3b', ';', $path_string );
+
 		// Slice the path:
 		$path_split = explode( '/', $path_string, 20 );
 
@@ -514,6 +517,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.94  2008/02/11 23:48:14  fplanque
+ * tag URL decoding fux
+ *
  * Revision 1.93  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *
