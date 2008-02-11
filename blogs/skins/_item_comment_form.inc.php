@@ -97,10 +97,8 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 	if( is_logged_in() )
 	{ // User is logged in:
-		$Form->begin_fieldset();
 		$Form->info_field( T_('User'), '<strong>'.$current_User->get_preferred_name().'</strong>'
 			.' '.get_user_profile_link( ' [', ']', T_('Edit profile') ) );
-		$Form->end_fieldset();
 	}
 	else
 	{ // User is not logged in:
@@ -188,6 +186,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.5  2008/02/11 23:46:35  fplanque
+ * cleanup
+ *
  * Revision 1.4  2008/02/05 01:52:37  fplanque
  * enhanced comment form
  *
