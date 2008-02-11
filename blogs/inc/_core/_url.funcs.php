@@ -88,9 +88,11 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 			([a-z][a-z0-9+.\-]*)             # scheme
 			://                              # authorize absolute URLs only ( // not present in clsid: -- problem? ; mailto: handled above)
 			(\w+(:\w+)?@)?                   # username or username and password (optional)
-			[a-z0-9]([a-z0-9\-])+            # Don t allow anything too funky like entities
-			\.                               # require at least 1 dot
-			[a-z0-9]([a-z0-9.\-])+           # Don t allow anything too funky like entities
+			( localhost |
+					[a-z0-9]([a-z0-9\-])+            # Don t allow anything too funky like entities
+					\.                               # require at least 1 dot
+					[a-z0-9]([a-z0-9.\-])+           # Don t allow anything too funky like entities
+			)
 			(:[0-9]+)?                       # optional port specification
 			[^ ]*                            # allow no space
 			$~ix', $url, $match) )
@@ -575,6 +577,9 @@ function disp_url( $url, $max_length = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.11  2008/02/11 23:43:07  fplanque
+ * support for localhost
+ *
  * Revision 1.10  2008/02/09 16:19:31  fplanque
  * fixed commenting bugs
  *
