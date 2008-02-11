@@ -2277,7 +2277,7 @@ class Plugin
 		if( ! isset( $locales[$req_locale]['messages'] ) )
 		{
 			$this->debug_log( 'No messages file dirname for locale. $locales["'
-											.$req_locale.'"] is '.var_export( @$locales[$req_locale], true ), 'locale' );
+				.$req_locale.'"] is '.var_export( @$locales[$req_locale], true ), 'locale' );
 			$locales[$req_locale]['messages'] = false;
 		}
 
@@ -2884,6 +2884,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.7  2008/02/11 20:53:50  blueyed
+ * fix indent
+ *
  * Revision 1.6  2008/01/21 09:35:32  fplanque
  * (c) 2008
  *
