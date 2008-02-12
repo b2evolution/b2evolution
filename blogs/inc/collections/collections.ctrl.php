@@ -310,7 +310,7 @@ switch( $action )
 				if( ! ($fp = @fopen( $staticfilename, 'w' )) )
 				{ // could not open file
 					$Messages->add( T_('File cannot be written!') );
-					$Messages->add( sprintf( '<p>'.T_('You should check the file permissions for [%s]. See <a %s>online manual on file permissions</a>.').'</p>',$staticfilename, 'href="http://b2evolution.net/man/install/file_permissions.html"' ) );
+					$Messages->add( sprintf( '<p>'.T_('You should check the file permissions for [%s]. See <a %s>online manual on file permissions</a>.').'</p>',$staticfilename, 'href="http://manual.b2evolution.net/Directory_and_file_permissions"' ) );
 				}
 				else
 				{ // file is writable
@@ -453,6 +453,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2008/02/12 17:43:37  waltercruz
+ * Updating a obsolete URL from the old manual to the wiki
+ *
  * Revision 1.8  2008/01/21 09:35:26  fplanque
  * (c) 2008
  *
