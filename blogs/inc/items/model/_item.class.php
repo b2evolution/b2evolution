@@ -1100,9 +1100,12 @@ class Item extends ItemLight
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before'      => ' ',
-				'after'       => ' ',
-				'format'      => 'htmlbody',
+				'before'        => ' ',
+				'after'         => ' ',
+				'format'        => 'htmlbody',
+				'decimals'      => 2,
+				'dec_point'     => '.',
+				'thousands_sep' => ',',
 			), $params );
 
 		if( empty( $params['field'] ) )
@@ -1119,7 +1122,14 @@ class Item extends ItemLight
 		elseif( !empty($r) )
 		{
 			echo $params['before'];
-			echo format_to_output( $r, $params['format'] );
+			if( substr( $params['field'], 0, 6 ) == 'double' )
+			{
+				echo number_format( $r, $params['decimals'], $params['dec_point'], $params['thousands_sep']  );
+			}
+			else
+			{
+				echo format_to_output( $r, $params['format'] );
+			}
 			echo $params['after'];
 		}
 	}
@@ -3437,6 +3447,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.37  2008/02/12 04:59:01  fplanque
+ * more custom field handling
+ *
  * Revision 1.36  2008/02/11 23:44:44  fplanque
  * more tag params
  *

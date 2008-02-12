@@ -643,6 +643,10 @@ function star_rating( $stars )
 		{
 			echo get_icon( 'star_on', 'imgtag', array( 'class'=>'middle' ) );
 		}
+		elseif( $i-.5 <= $stars )
+		{
+			echo get_icon( 'star_half', 'imgtag', array( 'class'=>'middle' ) );
+		}
 		else
 		{
 			echo get_icon( 'star_off', 'imgtag', array( 'class'=>'middle' ) );
@@ -653,6 +657,9 @@ function star_rating( $stars )
 
 /*
  * $Log$
+ * Revision 1.16  2008/02/12 04:59:01  fplanque
+ * more custom field handling
+ *
  * Revision 1.15  2008/02/10 00:58:57  fplanque
  * no message
  *
