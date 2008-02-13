@@ -22,7 +22,7 @@ class quicktags_plugin extends Plugin
 	var $code = 'b2evQTag';
 	var $name = 'Quick Tags';
 	var $priority = 30;
-	var $version = '1.10';
+	var $version = '2.4.1';
 	var $number_of_installs = 1;
 
 	/**
@@ -48,10 +48,7 @@ class quicktags_plugin extends Plugin
 	{
 		global $Hit;
 
-		if( $params['edit_layout'] == 'simple' )
-		{	// This is too complex for simple mode, don't display it:
-			return false;
-		}
+		$simple = ( $params['edit_layout'] == 'simple' );
 
 		if( $Hit->is_lynx )
 		{ // let's deactivate quicktags on Lynx, because they don't work there.
@@ -77,26 +74,12 @@ class quicktags_plugin extends Plugin
 			this.open = open;					// set to -1 if tag does not need to be closed
 		}
 
-		b2evoButtons[b2evoButtons.length] = new b2evoButton(
-				'b2evo_ins'
-				,'ins', ''
-				,'<ins>','</ins>'
-				,''
-				,'<?php echo T_('INSerted') ?>'
-			);
-
-		b2evoButtons[b2evoButtons.length] = new b2evoButton(
-				'b2evo_del'
-				,'del', 'text-decoration:line-through;'
-				,'<del>','</del>'
-				,''
-				,'<?php echo T_('DELeted') ?>'
-			);
-
-		/*
+	<?php
+	if( $simple )
+	{ ?>
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
 				'b2evo_bold'
-				,'b', 'font-weight:bold;'
+				,'bold', 'font-weight:bold;'
 				,'<b>','</b>'
 				,'b'
 				,'<?php echo T_('Bold [Alt-B]') ?>'
@@ -104,12 +87,31 @@ class quicktags_plugin extends Plugin
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
 				'b2evo_italic'
-				,'i', 'font-style:italic;'
+				,'italic', 'font-style:italic;'
 				,'<i>','</i>'
 				,'i'
 				,'<?php echo T_('Italic [Alt-I]') ?>'
 			);
-		*/
+		<?php
+	}
+	else
+	{
+		?>
+		b2evoButtons[b2evoButtons.length] = new b2evoButton(
+				'b2evo_ins'
+				,'ins', ''
+				,'<ins>','</ins>'
+				,'b'
+				,'<?php echo T_('INSerted') ?>'
+			);
+
+		b2evoButtons[b2evoButtons.length] = new b2evoButton(
+				'b2evo_del'
+				,'del', 'text-decoration:line-through;'
+				,'<del>','</del>'
+				,'i'
+				,'<?php echo T_('DELeted') ?>'
+			);
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
 				'b2evo_strong'
@@ -183,9 +185,13 @@ class quicktags_plugin extends Plugin
 				,'<?php echo T_('List Item [Alt-L]') ?>'
 			);
 
+		<?php
+	}
+	?>
+
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
 				'b2evo_img'
-				,'img', 'margin-left:8px;'
+				,'<?php echo ($simple ? 'image' : 'img') ?>', 'margin-left:8px;'
 				,'',''
 				,'g'
 				,'<?php echo T_('IMaGe [Alt-G]') ?>'
@@ -202,13 +208,16 @@ class quicktags_plugin extends Plugin
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
 				'b2evo_more'
-				,'!M', 'margin-left:8px;'
+				,'<?php echo ($simple ? 'more separator' : '!M') ?>', 'margin-left:8px;'
 				,'<!-'+'-more-'+'->',''
 				,'m'
 				,'<?php echo T_('More [Alt-M]') ?>'
 				,-1
 			);
 
+	<?php
+		if( !$simple )
+		{ ?>
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
 				'b2evo_noteaser'
 				,'!NT', ''
@@ -220,12 +229,15 @@ class quicktags_plugin extends Plugin
 
 		b2evoButtons[b2evoButtons.length] = new b2evoButton(
 				'b2evo_next'
-				,'!NP', 'margin-right:8px;'
+				,'!NP', ''
 				,'<!-'+'-nextpage-'+'->',''
 				,'q'
 				,'<?php echo T_('next page [Alt-Q]') ?>'
 				,-1
 			);
+			<?php
+		}
+	?>
 
 		function b2evoShowButton(button, i)
 		{
@@ -306,7 +318,7 @@ class quicktags_plugin extends Plugin
 			{
 				b2evoShowButton(b2evoButtons[i], i);
 			}
-			document.write('<input type="button" id="b2evo_close" class="quicktags" onclick="b2evoCloseAllTags();" title="<?php echo T_('Close all tags') ?>" value="X" />');
+			document.write('<input type="button" id="b2evo_close" class="quicktags" onclick="b2evoCloseAllTags();" title="<?php echo T_('Close all tags') ?>" value="<?php echo ($simple ? 'close all tags' : 'X') ?>" style="margin-left:8px;" />');
 			document.write('</div>');
 		}
 
@@ -408,6 +420,9 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.32  2008/02/13 07:26:23  fplanque
+ * quicktags in simple mode
+ *
  * Revision 1.31  2008/01/21 09:35:41  fplanque
  * (c) 2008
  *
