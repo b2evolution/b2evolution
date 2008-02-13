@@ -24,6 +24,7 @@ echo '<h2><span class="right_icons">'.action_icon( T_('Cancel!'), 'close', regen
 $core_componentwidget_defs = array(
 		'*'.T_('General purpose widgets'),
 			'free_html',
+			'coll_logo',
 		'*'.T_('Different ways of listing the blog contents'),
 			'coll_category_list',
 			'coll_tag_cloud',
@@ -35,7 +36,6 @@ $core_componentwidget_defs = array(
 			'coll_title',
 			'coll_tagline',
 			'coll_longdesc',
-			'coll_logo',
 		'*'.T_('Blog navigation'),
 			'menu_link',
 			'coll_common_links',
@@ -110,6 +110,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.10  2008/02/13 07:37:55  fplanque
+ * renamed Blog Logo widget
+ *
  * Revision 1.9  2008/01/21 09:35:37  fplanque
  * (c) 2008
  *

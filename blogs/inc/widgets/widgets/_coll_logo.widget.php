@@ -51,7 +51,7 @@ class coll_logo_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Blog logo');
+		return T_('Image / Blog logo');
 	}
 
 
@@ -79,7 +79,7 @@ class coll_logo_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Include a logo/image from the blog\'s file root.');
+		return T_('Include an image/logo from the blog\'s file root.');
 	}
 
 
@@ -93,9 +93,9 @@ class coll_logo_Widget extends ComponentWidget
 	{
 		$r = array_merge( array(
 				'logo_file' => array(
-					'label' => T_('Logo filename'),
-					'note' => T_('The logo file must be uploaded to the root of the Blog\'s media dir'),
-					'defaultvalue' => 'logo.gif',
+					'label' => T_('Image filename'),
+					'note' => T_('The image/logo file must be uploaded to the root of the Blog\'s media dir'),
+					'defaultvalue' => 'logo.png',
 					'valid_pattern' => array( 'pattern'=>'¤^[a-z0-9_\-][a-z0-9_.\-]*$¤i',
 																		'error'=>T_('Invalid filename.') ),
 				),
@@ -134,6 +134,9 @@ class coll_logo_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.6  2008/02/13 07:37:55  fplanque
+ * renamed Blog Logo widget
+ *
  * Revision 1.5  2008/01/21 09:35:37  fplanque
  * (c) 2008
  *
