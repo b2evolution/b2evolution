@@ -88,6 +88,11 @@ form.fform fieldset.fieldset fieldset {
 	border:transparent;
 }
 
+div.collection_select,
+div.collection_select form {
+	display: inline;
+}
+
 /* Links and buttons: */
 a {
 	background-color: transparent;

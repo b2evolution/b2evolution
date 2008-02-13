@@ -107,14 +107,14 @@ a:hover {
 }
 
 
-div.collection_select select {
+li.collection_select select {
 	border: 1px solid #9f9f9f;
 	height: 19px;
 	margin: 1px;
 	vertical-align: middle;
 	/* Would need some special IE settings... */
 }
-div.collection_select input {
+li.collection_select input {
 	font-size: 12px;
 	vertical-align: middle;
 	height: 21px;

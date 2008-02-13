@@ -91,6 +91,10 @@ legend {
 	color: #929292;
 }
 
+div.collection_select,
+div.collection_select form {
+	display: inline;
+}
 
 /* Links and buttons: */
 a {

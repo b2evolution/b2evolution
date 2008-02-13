@@ -346,7 +346,6 @@ div.seo_message {
 	line-height: 150%;
 }
 
-div.collection_select {
+li.collection_select {
 	padding: 0 1ex;
-	float: right;
 }

@@ -658,6 +658,22 @@ class AdminUI_general extends Widget
 
 		$r = $template['before'];
 
+		$r .= $title;
+
+		if( !empty($this->coll_list_all_title) )
+		{	// We want to add an "all" button
+			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
+			$r .= '<a href="'.$this->coll_list_all_url
+						.'" class="'.( $blog == 0 ? 'CurrentBlog' : 'OtherBlog' ).'">'
+						.$this->coll_list_all_title.'</a> ';
+			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
+		}
+
+		$r .= $template['buttons_start'];
+		$r .= $buttons;
+		$r .= $template['buttons_end'];
+
+
 		$r .= $template['select_start'];
 		if( $count > $max_buttons )
 		{	// We could not display all blogs as buttons
@@ -673,24 +689,10 @@ class AdminUI_general extends Widget
 				$r .= sprintf( $this->coll_list_onclick, 'this.value' );
 			}
 			$r .= '">'.$select_options.'</select>';
-			$r .= '<input type="submit" value="Go" /></form>';
+			$r .= '<noscript><input type="submit" value="Go" /></noscript></form>';
 		}
 		$r .= $template['select_end'];
 
-		$r .= $title;
-
-		if( !empty($this->coll_list_all_title) )
-		{	// We want to add an "all" button
-			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
-			$r .= '<a href="'.$this->coll_list_all_url
-						.'" class="'.( $blog == 0 ? 'CurrentBlog' : 'OtherBlog' ).'">'
-						.$this->coll_list_all_title.'</a> ';
-			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
-		}
-
-		$r .= $template['buttons_start'];
-		$r .= $buttons;
-		$r .= $template['buttons_end'];
 
 		$r .= $template['after'];
 
@@ -961,16 +963,16 @@ class AdminUI_general extends Widget
 			case 'CollectionList':
 				// Template for a list of Collections (Blogs)
 				return array(
-						'before' => '<div id="coll_list">',
-						'after' => '</div>',
-						'select_start' => '<ul><div class="collection_select">',
-						'select_end' => '</div>',
+						'before' => '<div id="coll_list"><ul>',
+						'after' => '</ul></div>',
 						'buttons_start' => '',
-						'buttons_end' => '</ul>',
+						'buttons_end' => '',
 						'beforeEach' => '<li>',
 						'afterEach' => '</li>',
 						'beforeEachSel' => '<li class="current">',
 						'afterEachSel' => '</li>',
+						'select_start' => '<li class="collection_select">',
+						'select_end' => '</li>',
 					);
 
 
@@ -1744,6 +1746,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.81  2008/02/13 06:56:48  fplanque
+ * moved blog selector to the left
+ *
  * Revision 1.80  2008/01/23 18:28:05  fplanque
  * fixes
  *
