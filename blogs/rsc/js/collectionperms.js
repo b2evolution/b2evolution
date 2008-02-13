@@ -53,25 +53,25 @@ function blogperms_switch_layout( layout )
 {
 	if( layout == 'all' )
 	{
-		$("#userlist_default").show();
-		$("#userlist_wide").show();
+		jQuery("#userlist_default").show();
+		jQuery("#userlist_wide").show();
 	}
 	else if( layout == 'wide' )
 	{
-		$('#userlist_default').hide();
-		$('#userlist_wide').show();
+		jQuery('#userlist_default').hide();
+		jQuery('#userlist_wide').show();
 	}
 	else
 	{
-		$('#userlist_default').show();
-		$('#userlist_wide').hide();
+		jQuery('#userlist_default').show();
+		jQuery('#userlist_wide').hide();
 	}
 
 	// Update form hidden field:
-	$('#blogperm_checkchanges').attr('layout', layout);
+	jQuery('#blogperm_checkchanges').attr('layout', layout);
 
 	// Update $UserSettings through async JS request:
-	$.get( htsrv_url+'async.php', {
+	jQuery.get( htsrv_url+'async.php', {
 			action: 'admin_blogperms_set_layout',
 			layout: layout
 	});

@@ -1906,7 +1906,7 @@ class Form extends Widget
 			$this->append_javascript['textarea_maxlength'.$field_name] = '
 				if( typeof jQuery == "function" )
 				{
-				$("#'.$field_params['id'].'").bind( "keyup", function(event)
+				jQuery("#'.$field_params['id'].'").bind( "keyup", function(event)
 					{
 						if( this.value.length > '.$field_params['maxlength'].' )
 						{
@@ -2835,6 +2835,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.27  2008/02/13 11:33:42  blueyed
+ * Explicitly call jQuery(), not the shortcut ($())
+ *
  * Revision 1.26  2008/02/09 20:12:36  fplanque
  * note control for time field
  *

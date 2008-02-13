@@ -149,16 +149,16 @@ $Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit_logging'
 				'value'=>'off',
 				'label'=>T_('Off'),
 				'note'=>T_('Not recommended! Your database will grow very large!!'),
-				'onclick'=>'$("#auto_prune_stats_container").hide();' ),
+				'onclick'=>'jQuery("#auto_prune_stats_container").hide();' ),
 			array(
 				'value'=>'page',
 				'label'=>T_('On every page'),
 				'note'=>T_('This is guaranteed to work but uses extra resources with every page displayed.'),
-				'onclick'=>'$("#auto_prune_stats_container").show();' ),
+				'onclick'=>'jQuery("#auto_prune_stats_container").show();' ),
 			array(
 				'value'=>'cron',
 				'label'=>T_('With a scheduled job'),
-				'note'=>T_('Recommended if you have your scheduled jobs properly set up.'), 'onclick'=>'$("#auto_prune_stats_container").show();' ) ),
+				'note'=>T_('Recommended if you have your scheduled jobs properly set up.'), 'onclick'=>'jQuery("#auto_prune_stats_container").show();' ) ),
 		T_('Auto pruning'),
 		array( 'note' => T_('Note: Even if you don\'t log hits, you still need to prune sessions!'),
 		'lines' => true ) );
@@ -169,7 +169,7 @@ $Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit_logging'
 
 	if( $Settings->get('auto_prune_stats_mode') == 'off' )
 	{ // hide the "days" input field, if mode set to off:
-		echo '<script type="text/javascript">$("#auto_prune_stats_container").hide();</script>';
+		echo '<script type="text/javascript">jQuery("#auto_prune_stats_container").hide();</script>';
 	}
 
 $Form->end_fieldset();
@@ -191,6 +191,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.5  2008/02/13 11:34:20  blueyed
+ * Explicitly call jQuery(), not the shortcut ($())
+ *
  * Revision 1.4  2008/02/09 20:06:10  blueyed
  * Use "lines"=true for radio_input() fields, instead of BR-suffix for each option. Fixes display of group note with "auto_prune_stats"
  *

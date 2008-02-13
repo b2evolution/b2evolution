@@ -58,11 +58,11 @@ function JS_showhide_class_on_checkbox( $class, $checkbox_id )
 	return '<script type="text/javascript">
     if( document.getElementById("'.$checkbox_id.'").checked )
 		{
- 			$(".'.$class.'").show();
+ 			jQuery(".'.$class.'").show();
 		}
 		else
 		{
- 			$(".'.$class.'").hide();
+ 			jQuery(".'.$class.'").hide();
 		}
 	</script>';
 }
@@ -120,11 +120,11 @@ function JS_showhide_class_on_this( $class )
 {
 	return 'if( this.checked )
 		{
- 			$(".'.$class.'").show();
+ 			jQuery(".'.$class.'").show();
 		}
 		else
 		{
- 			$(".'.$class.'").hide();
+ 			jQuery(".'.$class.'").hide();
 		}';
 }
 
@@ -245,6 +245,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.3  2008/02/13 11:33:53  blueyed
+ * Explicitly call jQuery(), not the shortcut ($())
+ *
  * Revision 1.2  2008/01/21 09:35:30  fplanque
  * (c) 2008
  *

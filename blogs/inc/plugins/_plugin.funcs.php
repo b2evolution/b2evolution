@@ -305,7 +305,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								array(
 									'onclick' => "
 										var oThis = this;
-										\$.get('{$htsrv_url}async.php', {
+										jQuery.get('{$htsrv_url}async.php', {
 												action: 'del_plugin_sett_set',
 												plugin_ID: '{$Obj->ID}',
 												user_ID: '$user_ID',
@@ -315,7 +315,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 											function(r, status) {
 												if( r == 'OK' )
 												{
-													\$(oThis).parents('fieldset:first').remove();
+													jQuery(oThis).parents('fieldset:first').remove();
 												}
 										} );
 										return false;",
@@ -363,14 +363,14 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					5, 1, /* icon/text prio */
 					array('onclick'=> "
 						var oThis = this;
-						\$.get('{$htsrv_url}async.php', {
+						jQuery.get('{$htsrv_url}async.php', {
 								action: 'add_plugin_sett_set',
 								plugin_ID: '{$Obj->ID}',
 								set_type: '$set_type',
 								set_path: '$set_path'
 							},
 							function(r, status) {
-								\$(oThis).parent('div').html(r);
+								jQuery(oThis).parent('div').html(r);
 							}
 						);
 						return false;")
@@ -998,6 +998,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /*
  * $Log$
+ * Revision 1.4  2008/02/13 11:34:06  blueyed
+ * Explicitly call jQuery(), not the shortcut ($())
+ *
  * Revision 1.3  2008/01/21 09:35:32  fplanque
  * (c) 2008
  *

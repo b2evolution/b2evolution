@@ -59,7 +59,7 @@ $page_icon = 'icon_login.gif';
 	// include jquery JS:
 	require_js( '#jquery#' );
 
-	$(function(){
+	jQuery(function(){
 	 alert("Document is ready");
 	});
 	See also http://www.texotela.co.uk/code/jquery/preload/ - might be a good opportunity to take a look at jQuery for you.. :)
@@ -224,6 +224,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.9  2008/02/13 11:34:45  blueyed
+ * Explicitly call jQuery(), not the shortcut ($())
+ *
  * Revision 1.8  2008/01/21 09:35:43  fplanque
  * (c) 2008
  *
