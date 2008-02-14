@@ -99,9 +99,6 @@ elseif( strtoupper($argv[1]) == 'CWD' )
 }
 else
 {
-	/*
-	$dir_root = $argv[1];
-	*/
 	echo_usage();
 	exit(1);
 }
@@ -182,11 +179,30 @@ if( $action == 'extract' )
 	}
 
 	// The locales dir is our working dir:
-	chdir( $dir_root.'locales' );
+#	chdir( $dir_root.'locales' );
 
-	echo 'Extracting T_() and NT_() strings from all .php files below "'.basename($dir_root).'" into "'.basename($dir_root).'/locales/messages.pot".. ';
-	system( 'find ../ -iname "*.php"'
-		.' | xargs xgettext -o '.escapeshellarg($file_pot).' --from-code=iso-8859-15 --no-wrap --add-comments=TRANS --copyright-holder="Francois PLANQUE" --msgid-bugs-address=http://fplanque.net/ --keyword=T_ --keyword=NT_ --keyword=TS_ -F', $return_var );
+	if( isset($argv[3]) )
+	{ // File(s) specified
+		$cmd = '';
+		echo 'Extracting T_() and NT_() strings from given files below "'.basename($dir_root).'" into "'.basename($dir_root).'/locales/messages.pot".. ';
+	}
+	else
+	{
+		echo 'Extracting T_() and NT_() strings from all .php files below "'.basename($dir_root).'" into "'.basename($dir_root).'/locales/messages.pot".. ';
+		$cmd = 'find '.escapeshellarg($dir_root).' -iname "*.php" | xargs ';
+	}
+	$cmd .= 'xgettext -o '.escapeshellarg($file_pot).' --from-code=iso-8859-15 --no-wrap --add-comments=TRANS --copyright-holder="Francois PLANQUE" --msgid-bugs-address=http://fplanque.net/ --keyword=T_ --keyword=NT_ --keyword=TS_ -F';
+
+	// Append filenames, if specified:
+	if( isset($argv[3]) )
+	{
+		for( $i = 3; $i < count($argv); $i++ )
+		{
+			$cmd .= ' '.$argv[$i];
+		}
+	}
+
+	system( $cmd, $return_var );
 	if( $return_var !== 0 )
 	{
 		die("Failed!\n");
@@ -202,10 +218,12 @@ if( $action == 'extract' )
 	$data = file_get_contents( $file_pot );
 	$data = preg_replace( $search, $replace, $data );
 
-	// Convert forward slashes (unix) in paths to backward slashes (windows)
-	$function = ''; // used as callback
+	// Build callback:
+	$function = '';
 	// make paths relative to the .po files (this was used for CORE previously only, but matches also plugins)
-	$function .= '$m[0] = str_replace( " ../", " ../../../", $m[0] );';
+	$function .= '$m[0] = str_replace( " '.$dir_root.'", " ../../../", $m[0] );';
+	// Convert forward slashes (unix) in paths to backward slashes (windows),
+	// because unix tools are more likely to handle windows slashes.
 	$function .= 'return str_replace( "/", "\\\\", $m[0] );';
 
 	$data = preg_replace_callback( '~^#: (.*)$~m', create_function( '$m', $function ), $data );
@@ -322,6 +340,55 @@ if( $action == 'convert' )
 	}
 
 	exit(0);
+}
+
+
+/**
+ * From {@link http://de.php.net/manual/en/function.realpath.php#77203}
+ */
+function rel_path($dest, $root = '')
+{
+ $root = explode(DIRECTORY_SEPARATOR, $root);
+ $dest = explode(DIRECTORY_SEPARATOR, $dest);
+ $path = '.';
+ $fix = '';
+ $diff = 0;
+ for($i = -1; ++$i < max(($rC = count($root)), ($dC = count($dest)));)
+ {
+  if(isset($root[$i]) and isset($dest[$i]))
+  {
+   if($diff)
+   {
+    $path .= DIRECTORY_SEPARATOR. '..';
+    $fix .= DIRECTORY_SEPARATOR. $dest[$i];
+    continue;
+   }
+   if($root[$i] != $dest[$i])
+   {
+    $diff = 1;
+    $path .= DIRECTORY_SEPARATOR. '..';
+    $fix .= DIRECTORY_SEPARATOR. $dest[$i];
+    continue;
+   }
+  }
+  elseif(!isset($root[$i]) and isset($dest[$i]))
+  {
+   for($j = $i-1; ++$j < $dC;)
+   {
+    $fix .= DIRECTORY_SEPARATOR. $dest[$j];
+   }
+   break;
+  }
+  elseif(isset($root[$i]) and !isset($dest[$i]))
+  {
+   for($j = $i-1; ++$j < $rC;)
+   {
+    $fix = DIRECTORY_SEPARATOR. '..'. $fix;
+   }
+   break;
+  }
+ }
+  return $path. $fix;
 }
 
 ?>
