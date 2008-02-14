@@ -115,119 +115,19 @@ if( count($res_hits) )
 	array_unshift( $chart[ 'chart_data' ][ 6 ], 'Referer spam' );
 	array_unshift( $chart[ 'chart_data' ][ 7 ], 'Admin' );
 
-	$chart[ 'canvas_bg' ] = array (
-			'width'  => 780,
-			'height' => 400,
-			'color'  => $AdminUI->get_color( 'payload_background' )
-		);
+	// Include common chart properties:
+	require dirname(__FILE__).'/inc/_bar_chart.inc.php';
 
-	$chart[ 'chart_rect' ] = array (
-			'x'      => 50,
-			'y'      => 50,
-			'width'  => 700,
-			'height' => 250
-		);
+	$chart[ 'series_color' ] = array (
+			'0099ff',
+			'00ccff',
+			'00ffcc',
+			'00ff99',
 
-	$chart[ 'legend_rect' ] = array (
-			'x'      => 50,
-			'y'      => 365,
-			'width'  => 700,
-			'height' => 8,
-			'margin' => 6
-		);
+			'ff00ff',
+			'ff0000',
 
-	$chart[ 'draw_text' ] = array (
-			array (
-					'color'    => '9e9286',
-					'alpha'    => 75,
-					'font'     => "arial",
-					'rotation' => 0,
-					'bold'     => true,
-					'size'     => 42,
-					'x'        => 50,
-					'y'        => 6,
-					'width'    => 700,
-					'height'   => 50,
-					'text'     => 'Browser hits', // Needs UTF-8
-					'h_align'  => "right",
-					'v_align'  => "bottom" ),
-			);
-
-	$chart[ 'chart_bg' ] = array (
-			'positive_color' => "ffffff",
-			// 'negative_color'  =>  string,
-			'positive_alpha' => 20,
-			// 'negative_alpha'  =>  int
-		);
-
-	$chart [ 'legend_bg' ] = array (
-			'bg_color'          =>  "ffffff",
-			'bg_alpha'          =>  20,
-			// 'border_color'      =>  "000000",
-			// 'border_alpha'      =>  100,
-			// 'border_thickness'  =>  1
-		);
-
-	$chart [ 'legend_label' ] = array(
-			// 'layout'  =>  "horizontal",
-			// 'font'    =>  string,
-			// 'bold'    =>  boolean,
-			'size'    =>  10,
-			// 'color'   =>  string,
-			// 'alpha'   =>  int
-		);
-
-	$chart[ 'chart_border' ] = array (
-			'color'=>"000000",
-			'top_thickness'=>1,
-			'bottom_thickness'=>1,
-			'left_thickness'=>1,
-			'right_thickness'=>1
-		);
-
-	$chart[ 'chart_type' ] = 'stacked column';
-
-	// $chart[ 'series_color' ] = array ( "4e627c", "c89341" );
-
-	$chart[ 'series_gap' ] = array ( 'set_gap'=>0, 'bar_gap'=>0 );
-
-
-	$chart[ 'axis_category' ] = array (
-			'font'  =>"arial",
-			'bold'  =>true,
-			'size'  =>11,
-			'color' =>'000000',
-			'alpha' =>75,
-			'orientation' => 'diagonal_up',
-			// 'skip'=>2
-		);
-
-	$chart[ 'axis_value' ] = array (
-			// 'font'   =>"arial",
-			// 'bold'   =>true,
-			'size'   => 11,
-			'color'  => '000000',
-			'alpha'  => 75,
-			'steps'  => 4,
-			'prefix' => "",
-			'suffix' => "",
-			'decimals'=> 0,
-			'separator'=> "",
-			'show_min'=> false );
-
-	$chart [ 'chart_value' ] = array (
-			// 'prefix'         =>  string,
-			// 'suffix'         =>  " views",
-			// 'decimals'       =>  int,
-			// 'separator'      =>  string,
-			'position'       =>  "cursor",
-			'hide_zero'      =>  true,
-			// 'as_percentage'  =>  boolean,
-			'font'           =>  "arial",
-			'bold'           =>  true,
-			'size'           =>  20,
-			'color'          =>  "ffffff",
-			'alpha'          =>  75
+			'999999',
 		);
 
 	echo '<div class="center">';
@@ -256,13 +156,13 @@ if( count($res_hits) )
 	<table class="grouped" cellspacing="0">
 		<tr>
 			<th class="firstcol"><?php echo T_('Date') ?></th>
-			<th><?php echo T_('Refering searches') ?></th>
-			<th><?php echo T_('Referers') ?></th>
-			<th><?php echo T_('Direct accesses') ?></th>
-			<th><?php echo T_('Self referred') ?></th>
-			<th><?php	echo T_('Special referrers') ?></th>
-			<th><?php echo T_('Referer spam') ?></th>
-			<th><?php echo T_('Admin') ?></th>
+			<th style="background-color: #0099ff"><?php echo T_('Refering searches') ?></th>
+			<th style="background-color: #00ccff"><?php echo T_('Referers') ?></th>
+			<th style="background-color: #00ffcc"><?php echo T_('Direct accesses') ?></th>
+			<th style="background-color: #00ff99"><?php echo T_('Self referred') ?></th>
+			<th style="background-color: #ff00ff"><?php	echo T_('Special referrers') ?></th>
+			<th style="background-color: #ff0000"><?php echo T_('Referer spam') ?></th>
+			<th style="background-color: #999999"><?php echo T_('Admin') ?></th>
 			<th class="lastcol"><?php echo T_('Total') ?></th>
 		</tr>
 		<?php
@@ -354,6 +254,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.7  2008/02/14 05:45:37  fplanque
+ * cleaned up stats
+ *
  * Revision 1.6  2008/02/14 02:19:52  fplanque
  * cleaned up stats
  *

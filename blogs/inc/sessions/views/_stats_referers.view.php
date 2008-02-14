@@ -156,118 +156,8 @@ if( count( $res_stats ) )
 		$chart [ 'chart_data' ][ 1 ][ $count ] = stats_hit_count( false );
 	} // End stat loop
 
-	$chart[ 'canvas_bg' ] = array (
-			'width'  => 780,
-			'height' => 350,
-			'color'  => $AdminUI->get_color( 'payload_background' )
-		);
-
-	$chart[ 'chart_rect' ] = array (
-			'x'      => 60,
-			'y'      => 50,
-			'width'  => 250,
-			'height' => 250
-		);
-
-	$chart[ 'legend_rect' ] = array (
-			'x'      => 400,
-			'y'      => 70,
-			'width'  => 340,
-			'height' => 230,
-			'margin' => 6
-		);
-
-	$chart[ 'draw_text' ] = array (
-				array (
-					'color'    => '9e9286',
-					'alpha'    => 75,
-					'font'     => "arial",
-					'rotation' => 0,
-					'bold'     => true,
-					'size'     => 42,
-					'x'        => 50,
-					'y'        => 6,
-					'width'    => 700,
-					'height'   => 50,
-					'text'     => 'Top referers',
-					'h_align'  => "right",
-					'v_align'  => "bottom" ),
-			);
-
-	$chart[ 'chart_bg' ] = array (
-			'positive_color' => "ffffff",
-			// 'negative_color'  =>  string,
-			'positive_alpha' => 20,
-			// 'negative_alpha'  =>  int
-		);
-
-	$chart [ 'legend_bg' ] = array (
-			'bg_color'          =>  "ffffff",
-			'bg_alpha'          =>  20,
-			// 'border_color'      =>  "000000",
-			// 'border_alpha'      =>  100,
-			// 'border_thickness'  =>  1
-		);
-
-	$chart [ 'legend_label' ] = array(
-			// 'layout'  =>  "horizontal",
-			// 'font'    =>  string,
-			// 'bold'    =>  boolean,
-			'size'    =>  15,
-			// 'color'   =>  string,
-			// 'alpha'   =>  int
-		);
-
-	/*$chart[ 'chart_border' ] = array (
-				'color'=>"000000",
-				'top_thickness'=>1,
-				'bottom_thickness'=>1,
-				'left_thickness'=>1,
-				'right_thickness'=>1
-		);*/
-
-	$chart[ 'chart_type' ] = 'pie';
-
-	// $chart[ 'series_color' ] = array ( "4e627c", "c89341" );
-
-	$chart [ 'series_explode' ] =  array ( 15 );
-
-	/*$chart[ 'axis_category' ] = array (
-			'font'  =>"arial",
-			'bold'  =>true,
-			'size'  =>11,
-			'color' =>'000000',
-			'alpha' =>75,
-			'orientation' => 'diagonal_up',
-			// 'skip'=>2
-		 );*/
-
-	/* $chart[ 'axis_value' ] = array (	// 'font'   =>"arial",
-			// 'bold'   =>true,
-			'size'   => 11,
-			'color'  => '000000',
-			'alpha'  => 75,
-			'steps'  => 4,
-			'prefix' => "",
-			'suffix' => "",
-			'decimals'=> 0,
-			'separator'=> "",
-			'show_min'=> false ); */
-
-	$chart[ 'chart_value' ] = array (
-			// 'prefix'         =>  string,
-			// 'suffix'         =>  " views",
-			// 'decimals'       =>  int,
-			// 'separator'      =>  string,
-			'position'       =>  "outside",
-			'hide_zero'      =>  true,
-			'as_percentage'  =>  true,
-			'font'           =>  "arial",
-			'bold'           =>  true,
-			'size'           =>  20,
-			'color'          =>  "000000",
-			'alpha'          =>  75
-		);
+	// Include common chart properties:
+	require dirname(__FILE__).'/inc/_pie_chart.inc.php';
 
 	//pre_dump( $chart );
 	echo '<div class="center">';
@@ -295,7 +185,12 @@ if( count( $res_stats ) )
 				echo '<td class="center">'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'ctrl,action,keyword', 'ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain($row_stats['hit_referer']) ) ) ).'</td>'; // we use hit_referer, because unlike dom_name it includes subdomains (especially 'www.')
 			}
 			?>
-			<td class="right"><?php stats_hit_count() ?></td>
+			<td class="right"<?php
+				if( $count < 8 )
+				{
+					echo ' style="background-color: #'.$chart['series_color'][$count].'"';
+				}
+			?>><?php stats_hit_count() ?></td>
 			<td class="right"><?php stats_hit_percent() ?></td>
 		</tr>
 		<?php
@@ -314,6 +209,9 @@ if( count( $res_stats ) )
 
 /*
  * $Log$
+ * Revision 1.5  2008/02/14 05:45:37  fplanque
+ * cleaned up stats
+ *
  * Revision 1.4  2008/02/14 02:19:52  fplanque
  * cleaned up stats
  *
