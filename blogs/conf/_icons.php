@@ -513,6 +513,11 @@ function get_icon_info($name)
 			'alt'	 => '*',
 			'size' => array( 12, 12 ),
 		);
+		case 'star_half': return array(
+			'file' => 'icons/star_small_half.gif',
+			'alt'	 => '+',
+			'size' => array( 12, 12 ),
+		);
 		case 'star_off': return array(
 			'file' => 'icons/star_small_gray.gif',
 			'alt'	 => '-',
@@ -523,6 +528,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.67  2008/02/14 02:19:50  fplanque
+ * cleaned up stats
+ *
  * Revision 1.66  2008/01/17 17:42:09  fplanque
  * minor
  *

@@ -58,7 +58,9 @@ if( $agnt_robot ) $selected_agnt_types[] = "'robot'";
 if( $agnt_rss ) $selected_agnt_types[] = "'rss'";
 if( $agnt_unknown ) $selected_agnt_types[] = "'unknown'";
 $from = 'T_useragents LEFT JOIN T_hitlog ON agnt_ID = hit_agnt_ID';
-$where_clause =  ' WHERE agnt_type IN ('.implode(',',$selected_agnt_types).')';
+
+// Note: fp> oddly enough the query is faster with the where condition even if all apply
+$where_clause = ' WHERE agnt_type IN ('.implode(',',$selected_agnt_types).')';
 
 if( !empty($blog) )
 {
@@ -73,12 +75,12 @@ $total_hit_count = $DB->get_var( "
 
 
 // Create result set:
-$sql = "SELECT agnt_signature, agnt_type, COUNT( * ) AS hit_count
+$sql = "SELECT agnt_signature, agnt_type, COUNT( hit_ID ) AS hit_count
 					FROM $from"
 			.$where_clause.'
 				 GROUP BY agnt_ID ';
 
-$count_sql = "SELECT COUNT( agnt_ID )
+$count_sql = "SELECT COUNT( DISTINCT agnt_ID )
 					FROM $from"
 			.$where_clause;
 
@@ -151,6 +153,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.3  2008/02/14 02:19:54  fplanque
+ * cleaned up stats
+ *
  * Revision 1.2  2008/01/21 09:35:34  fplanque
  * (c) 2008
  *

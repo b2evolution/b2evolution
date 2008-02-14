@@ -295,15 +295,17 @@ function stats_search_keywords( $ref )
 	{
 		$param_parts = explode( '=', $ref_param );
 		if( $param_parts[0] == 'q'
-				or $param_parts[0] == 'as_q' 		// Google Advanced Search Query
-				or $param_parts[0] == 'query'
-				or $param_parts[0] == 'search'
-				or $param_parts[0] == 'p'
-				or $param_parts[0] == 'kw'
-				or $param_parts[0] == 'qs'
-				or $param_parts[0] == 'r'
-				or $param_parts[0] == 'rdata'				// search.ke.voila.fr
-				or $param_parts[0] == 'su'				// suche.web.de
+				|| $param_parts[0] == 'as_q' 		 // Google Advanced Search Query
+				|| $param_parts[0] == 'query'
+				|| $param_parts[0] == 'search'
+				|| $param_parts[0] == 'p'
+				|| $param_parts[0] == 'kw'
+				|| $param_parts[0] == 'qs'
+				|| $param_parts[0] == 'r'
+				|| $param_parts[0] == 'rdata'			// search.ke.voila.fr
+				|| $param_parts[0] == 'string'		// att.net
+				|| $param_parts[0] == 'su'				// suche.web.de
+				|| $param_parts[0] == 'Gw'				// scroogle.org
 			)
 		{ // found "q" query parameter
 			$q = urldecode($param_parts[1]);
@@ -368,6 +370,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.3  2008/02/14 02:19:52  fplanque
+ * cleaned up stats
+ *
  * Revision 1.2  2008/01/21 09:35:33  fplanque
  * (c) 2008
  *

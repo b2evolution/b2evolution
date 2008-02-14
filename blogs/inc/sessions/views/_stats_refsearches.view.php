@@ -33,9 +33,9 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 global $blog, $admin_url, $rsc_url;
 
-echo '<h2>'.T_('Search browser hits').':</h2>';
+echo '<h2>'.T_('Search browser hits').'</h2>';
 
-echo '<p>'.T_('These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)').'</p>';
+echo '<p class="notes">'.T_('These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)').'</p>';
 
 // Create result set:
 $Results = & new Results( "
@@ -99,7 +99,7 @@ $Results->cols[] = array(
 
 // Remote address (IP):
 $Results->cols[] = array(
-		'th' => '<span title="'.T_('Remote address').'">'.T_('IP').'</span>',
+		'th' => T_('Remote IP'),
 		'order' => 'hit_remote_addr',
 		'td' => '% $GLOBALS[\'Plugins\']->get_trigger_event( \'FilterIpAddress\', $tmp_params = array(\'format\'=>\'htmlbody\', \'data\'=>\'$hit_remote_addr$\') ) %',
 	);
@@ -112,7 +112,7 @@ $Results->display();
 // TOP REFERING SEARCH ENGINES
 ?>
 
-<h3><?php echo T_('Top refering search engines') ?>:</h3>
+<h3><?php echo T_('Top refering search engines') ?></h3>
 
 <?php
 global $res_stats, $row_stats;
@@ -121,12 +121,17 @@ if( count( $res_stats ) )
 {
 	?>
 	<table class="grouped" cellspacing="0">
+		<tr>
+			<th class="firstcol"><?php echo T_('Search engine') ?></th>
+			<th><?php echo T_('Hits') ?></th>
+			<th class="lastcol"><?php echo T_('% of total') ?></th>
+		</tr>
 		<?php
 		$count = 0;
 		foreach( $res_stats as $row_stats )
 		{
 			?>
-			<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
+			<tr class="<?php echo( $count%2 ? 'odd' : 'even') ?>">
 				<td class="firstcol"><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 				<td class="right"><?php stats_hit_count() ?></td>
 				<td class="right"><?php stats_hit_percent() ?></td>
@@ -142,6 +147,9 @@ if( count( $res_stats ) )
 
 /*
  * $Log$
+ * Revision 1.3  2008/02/14 02:19:52  fplanque
+ * cleaned up stats
+ *
  * Revision 1.2  2008/01/21 09:35:34  fplanque
  * (c) 2008
  *

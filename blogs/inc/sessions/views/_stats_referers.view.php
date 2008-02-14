@@ -34,8 +34,8 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 global $blog, $admin_url, $rsc_url, $AdminUI;
 
 ?>
-<h2><?php echo T_('Refered browser hits') ?>:</h2>
-<p><?php echo T_('These are browser hits from external web pages refering to this blog') ?>.</p>
+<h2><?php echo T_('Refered browser hits') ?></h2>
+<p class="notes"><?php echo T_('These are browser hits from external web pages refering to this blog') ?>.</p>
 <?php
 // Create result set:
 $Results = & new Results( "
@@ -96,6 +96,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 	}
 	$Results->cols[] = array(
 			'th' => /* TRANS: Abbrev. for Spam */ T_('S'),
+			'td_class' => 'center',
 			'td' => '%referer_ban_link( #hit_referer# )%', // we use hit_referer, because unlike dom_name it includes more subdomains, especially "www."
 		);
 }
@@ -119,7 +120,7 @@ $Results->cols[] = array(
 
 // Remote address (IP):
 $Results->cols[] = array(
-		'th' => '<span title="'.T_('Remote address').'">'.T_('IP').'</span>',
+		'th' => T_('Remote IP'),
 		'order' => 'hit_remote_addr',
 		'td' => '% $GLOBALS[\'Plugins\']->get_trigger_event( \'FilterIpAddress\', $tmp_params = array(\'format\'=>\'htmlbody\', \'data\'=>\'$hit_remote_addr$\') ) %',
 	);
@@ -275,17 +276,23 @@ if( count( $res_stats ) )
 
 ?>
 <table class="grouped" cellspacing="0">
+	<tr>
+		<th class="firstcol"><?php echo T_('Referer') ?></th>
+		<th><?php echo T_('Spam') ?></th>
+		<th><?php echo T_('Hits') ?></th>
+		<th class="lastcol"><?php echo T_('% of total') ?></th>
+	</tr>
 	<?php
 	$count = 0;
 	foreach( $res_stats as $row_stats )
 	{
 		?>
-		<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
+		<tr class="<?php echo( $count%2 ? 'odd' : 'even') ?>">
 			<td class="firstcol"><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 			<?php
 			if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{ // user can ban:
-				echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'ctrl,action,keyword', 'ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain($row_stats['hit_referer']) ) ) ).'</td>'; // we use hit_referer, because unlike dom_name it includes subdomains (especially 'www.')
+				echo '<td class="center">'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'ctrl,action,keyword', 'ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain($row_stats['hit_referer']) ) ) ).'</td>'; // we use hit_referer, because unlike dom_name it includes subdomains (especially 'www.')
 			}
 			?>
 			<td class="right"><?php stats_hit_count() ?></td>
@@ -295,14 +302,21 @@ if( count( $res_stats ) )
 		$count++;
 	}
 	?>
+	<tr class="total">
+		<td><?php echo T_('Total referers') ?></td>
+		<td>&nbsp;</td>
+		<td class="right"><?php stats_total_hit_count() ?></td>
+		<td>&nbsp;</td>
+	</tr>
 </table>
-<?php } ?>
-<p><?php echo T_('Total referers') ?>: <?php stats_total_hit_count() ?></p>
+<?php }
 
-<?php
 
 /*
  * $Log$
+ * Revision 1.4  2008/02/14 02:19:52  fplanque
+ * cleaned up stats
+ *
  * Revision 1.3  2008/01/21 18:16:33  personman2
  * Different chart bg colors for each admin skin
  *

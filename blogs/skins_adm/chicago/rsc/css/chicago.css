@@ -354,8 +354,11 @@ table.filelist tr.listfooter td {
 table.grouped th,
 table.filelist th {
 	background-color: #CCDCE6;
-	padding: 0;
 	border-color: #9db0bc;
+}
+table.grouped tr.clickable_headers th,
+table.filelist th {
+	padding: 0;
 }
 table.grouped th a.basic_sort_link,
 table.grouped th span,
@@ -394,6 +397,10 @@ table.filelist td {
 table.grouped tr.group td {
 	border-color: #9db0bc;
 	background-color: #C3D5E2;
+}
+table.grouped tr.total td {
+	border-top: 1px solid #9DB0BC;
+	background-color:#CCDCE6;
 }
 
 /*

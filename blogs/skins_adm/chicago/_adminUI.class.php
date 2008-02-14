@@ -211,7 +211,7 @@ class AdminUI extends AdminUI_general
 							                ."\n<thead>\n",
 							'filters_start' => '<tr class="filters"><td colspan="$nb_cols$">',
 							'filters_end' => '</td></tr>',
-							'line_start_head' => '<tr>',  // TODO: fusionner avec colhead_start_first; mettre a jour admin_UI_general; utiliser colspan="$headspan$"
+							'line_start_head' => '<tr class="clickable_headers">',  // TODO: fusionner avec colhead_start_first; mettre a jour admin_UI_general; utiliser colspan="$headspan$"
 							'colhead_start' => '<th $class_attrib$>',
 							'colhead_start_first' => '<th class="firstcol $class$">',
 							'colhead_start_last' => '<th class="lastcol $class$">',
@@ -386,6 +386,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.11  2008/02/14 02:19:55  fplanque
+ * cleaned up stats
+ *
  * Revision 1.10  2008/01/22 14:31:05  fplanque
  * minor
  *

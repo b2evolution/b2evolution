@@ -546,6 +546,15 @@ $locales = array(
 		'messages' => 'sk_SK',
 		'enabled' => 1,
 	),
+	'sl-SI' => array(
+		'name' => NT_('Slovenski (SI)'),
+		'charset' => 'utf-8',
+		'datefmt' => 'd.m.Y',
+		'timefmt' => 'H:i:s',
+		'startofweek' => 1,
+		'messages' => 'sl_SI',
+		'enabled' => 1,
+	),
 	'sv-SE' => array(
 		'name' => NT_('Swedish (SE)'),
 		'charset' => 'iso-8859-1',

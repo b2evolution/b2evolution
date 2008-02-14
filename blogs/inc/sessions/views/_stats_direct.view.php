@@ -35,7 +35,7 @@ global $blog, $admin_url, $rsc_url;
 
 ?>
 <h2><?php echo T_('Direct browser hits') ?></h2>
-<p><?php echo T_('These are browser hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)') ?></p>
+<p class="notes"><?php echo T_('These are browser hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)') ?></p>
 <?php
 // Create result set:
 $Results = & new Results( "
@@ -61,6 +61,7 @@ if( $current_User->check_perm( 'stats', 'edit' ) )
 {
 	$Results->cols[] = array(
 			'th' => /* TRANS: Abbrev. for Delete (stats) */ T_('Del'),
+			'td_class' => 'center',
 			'td' => ' <a href="%regenerate_url( \'action\', \'action=delete&amp;hit_ID=$hit_ID$\')%" title="'
 						 .T_('Delete this hit!').'">'.get_icon('delete').'</a>',
 		);
@@ -85,7 +86,7 @@ $Results->cols[] = array(
 
 // Remote address (IP):
 $Results->cols[] = array(
-		'th' => '<span title="'.T_('Remote address').'">'.T_('IP').'</span>',
+		'th' => T_('Remote IP'),
 		'order' => 'hit_remote_addr',
 		'td' => '% $GLOBALS[\'Plugins\']->get_trigger_event( \'FilterIpAddress\', $tmp_params = array(\'format\'=>\'htmlbody\', \'data\'=>\'$hit_remote_addr$\') ) %',
 	);
@@ -95,6 +96,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.3  2008/02/14 02:19:52  fplanque
+ * cleaned up stats
+ *
  * Revision 1.2  2008/01/21 09:35:33  fplanque
  * (c) 2008
  *

@@ -57,6 +57,8 @@ $self_referer_list = array(
 $blackList = array(
 	// webmails
 	'.mail.yahoo.com/',
+	'//mail.google.com/',
+	'//webmail.aol.com/',
 	// stat services
 	'sitemeter.com/',
 	// aggregators
@@ -81,7 +83,8 @@ $blackList = array(
  * @global array $search_engines
  */
 $search_engines = array(
-	'google.',
+	'//www.google.',
+	'ask.com/web', // q=
 	'.hotbot.',
 	'.altavista.',
 	'.excite.',
@@ -127,6 +130,12 @@ $search_engines = array(
 	'http://www.lmi.fr/',
 	'kartoo.com/',
 	'icq.com/search',
+	'alexa.com/search',
+	'att.net/s/', // string=
+	'blingo.com/search',  //q=
+	'crawler.com/search/',	// q
+	'inbox.com/search/', // q
+	'scroogle.org/', // GW=
 );
 
 

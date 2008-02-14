@@ -30,7 +30,7 @@ global $blog, $admin_url, $AdminUI;
 
 echo '<h2>'.T_('Global hits summary').'</h2>';
 
-echo '<p>'.sprintf( T_('This page includes all recorded hits, split down by <a %s>user agent</a> type.'), ' href="?ctrl=stats&tab=useragents&blog='.$blog.'"' ).'</p>';
+echo '<p class="notes">'.sprintf( T_('This page includes all recorded hits, split down by <a %s>user agent</a> type.'), ' href="?ctrl=stats&tab=useragents&blog='.$blog.'"' ).'</p>';
 
 
 // fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
@@ -317,6 +317,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.6  2008/02/14 02:19:53  fplanque
+ * cleaned up stats
+ *
  * Revision 1.5  2008/01/21 18:16:33  personman2
  * Different chart bg colors for each admin skin
  *

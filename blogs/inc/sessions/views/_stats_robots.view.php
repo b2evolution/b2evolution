@@ -34,8 +34,8 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 global $blog, $admin_url, $rsc_url, $AdminUI;
 
 echo '<h2>'.T_('Robot hits').'</h2>';
-echo '<p>'.sprintf( T_('This page only includes hits identified as made by <a %s>indexing robots</a> a.k.a. web crawlers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_robot=1&amp;blog='.$blog.'"' ).'</p>';
-echo '<p>'. /* TRANS: %s is a filesystem path */ T_('In order to be detected, robots must be listed in %s.').'</p>';
+echo '<p class="notes">'.sprintf( T_('This page only includes hits identified as made by <a %s>indexing robots</a> a.k.a. web crawlers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_robot=1&amp;blog='.$blog.'"' ).'</p>';
+echo '<p class="notes">'.T_('In order to be detected, robots must be listed in /conf/_stats.php.').'</p>';
 
 $sql = "
 	SELECT COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,
@@ -203,8 +203,6 @@ if( count($res_hits) )
 
 // TOP INDEXING ROBOTS
 
-echo '<h2>'.T_('Top Indexing Robots').':</h2>';
-
 // Create result set:
 $sql = "SELECT COUNT(*) AS hit_count, agnt_signature
 					FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
@@ -275,6 +273,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.4  2008/02/14 02:19:53  fplanque
+ * cleaned up stats
+ *
  * Revision 1.3  2008/01/21 18:16:33  personman2
  * Different chart bg colors for each admin skin
  *

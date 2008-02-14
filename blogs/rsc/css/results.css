@@ -100,13 +100,18 @@ table.grouped tfoot td {
 	padding: .5ex;
 	border-bottom: 1px solid #bbb;
 	border-left: 1px solid #bbb;
-	background-color: #ddd;
+	background-color: #d4d4d4;
 }
 table.grouped th {
 	padding: .3ex 1ex;
 }
 table.grouped th img {
 	vertical-align: bottom;
+}
+table.grouped tr.total td {
+	border-top: 1px solid #bbb;
+	font-weight: bold;
+	background-color: #d4d4d4;
 }
 
 /* Table BASIC sort buttons/headers: */
