@@ -1753,7 +1753,7 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 
 	if( $error )
 	{
-		if( $current_User->check_perm( 'users', 'edit', false ) )
+		if( $current_User && $current_User->check_perm( 'users', 'edit', false ) )
 		{
 			$Messages->add( sprintf( T_('(Note: To get rid of the above validation warnings, you can deactivate unwanted validation rules in your <a %s>Group settings</a>.)'),
 										'href="?ctrl=users&amp;grp_ID='.$Group->ID.'"' ), 'error' );
@@ -1879,6 +1879,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.17  2008/02/16 00:21:34  blueyed
+ * Fix fatal error if there are validation errors from not-logged-in users, patch by Travis (LP: #192259)
+ *
  * Revision 1.16  2008/02/09 16:19:31  fplanque
  * fixed commenting bugs
  *
