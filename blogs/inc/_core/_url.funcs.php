@@ -54,7 +54,14 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 	$verbose = $debug || $context != 'commenting';
 
 	// Validate URL structure
-	if( preg_match( '~^\w+:~', $url ) )
+	if( $url[0] == '$' )
+	{	// This is a 'special replace code' URL (used in footers)
+ 		if( ! preg_match( '¤\$([a-z_]+)\$¤', $url ) )
+		{
+			return T_('Invalid URL $code$ format');
+		}
+	}
+	elseif( preg_match( '~^\w+:~', $url ) )
 	{ // there's a scheme and therefor an absolute URL:
 		if( substr($url, 0, 7) == 'mailto:' )
 		{ // mailto:link
@@ -577,6 +584,9 @@ function disp_url( $url, $max_length = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.12  2008/02/18 20:22:40  fplanque
+ * no message
+ *
  * Revision 1.11  2008/02/11 23:43:07  fplanque
  * support for localhost
  *

@@ -1869,16 +1869,17 @@ class Item extends ItemLight
 		$this->get_Blog();
 		switch( $params['mode'] )
 		{
-			case 'single':
-				$text = $this->Blog->get_setting( 'single_item_footer_text' );
-				break;
-
 			case 'xml':
 				$text = $this->Blog->get_setting( 'xml_item_footer_text' );
 				break;
+
+			case 'single':
+			default:
+				$text = $this->Blog->get_setting( 'single_item_footer_text' );
+				break;
 		}
 
-		// $text = preg_replace_callback( '¤\$([a-z]+)\$¤', array( $this, 'replace_callback' ), $text );
+		$text = preg_replace_callback( '¤\$([a-z_]+)\$¤', array( $this, 'replace_callback' ), $text );
 
 		if( empty($text) )
 		{
@@ -3291,6 +3292,24 @@ class Item extends ItemLight
 	}
 
 
+  /**
+	 * Callback user for footer()
+	 */
+	function replace_callback( $matches )
+	{
+		switch( $matches[1] )
+		{
+			case 'item_perm_url':
+				return $this->get_permanent_url();
+
+			case 'item_title':
+				return $this->title;
+
+			default:
+				return $matches[1];
+		}
+	}
+
 	/**
 	 * Get a member param by its name
 	 *
@@ -3447,6 +3466,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.38  2008/02/18 20:22:40  fplanque
+ * no message
+ *
  * Revision 1.37  2008/02/12 04:59:01  fplanque
  * more custom field handling
  *

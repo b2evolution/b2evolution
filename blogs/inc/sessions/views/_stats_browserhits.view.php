@@ -28,7 +28,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $blog, $admin_url, $AdminUI;
 
 
-echo '<h2>'.T_('Browser hits summary').'</h2>';
+echo '<h2>'.T_('Browser hits summary').get_manual_link('browser_hits_summary').'</h2>';
 
 
 echo '<p class="notes">'.sprintf( T_('This page only includes hits identified as made by a <a %s>web browser</a>.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_browser=1&amp;blog='.$blog.'"' ).'</p>';
@@ -67,13 +67,13 @@ if( count($res_hits) )
 	$last_date = 0;
 
 	$col_mapping = array(
-			'search' => 1,
+			'search'  => 1,
 			'referer' => 2,
-			'direct' => 3,
-			'self' => 4,
+			'direct'  => 3,
+			'self'    => 4,
 			'blacklist' => 5,
-			'spam' => 6,
-			'admin' => 7,
+			'spam'    => 6,
+			'admin'   => 7,
 		);
 
 	$chart[ 'chart_data' ][ 0 ] = array();
@@ -254,6 +254,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.8  2008/02/18 20:22:40  fplanque
+ * no message
+ *
  * Revision 1.7  2008/02/14 05:45:37  fplanque
  * cleaned up stats
  *

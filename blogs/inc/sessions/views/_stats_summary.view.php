@@ -28,7 +28,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $blog, $admin_url, $AdminUI;
 
 
-echo '<h2>'.T_('Global hits summary').'</h2>';
+echo '<h2>'.T_('Global hits summary').get_manual_link('global_hits_summary').'</h2>';
 
 echo '<p class="notes">'.sprintf( T_('This page includes all recorded hits, split down by <a %s>user agent</a> type.'), ' href="?ctrl=stats&tab=useragents&blog='.$blog.'"' ).'</p>';
 
@@ -124,18 +124,17 @@ if( count($res_hits) )
 
 	$last_date = 0;
 
-	?>
 
-	<table class="grouped" cellspacing="0">
-		<tr>
-			<th class="firstcol"><?php echo T_('Date') ?></th>
-			<th style="background-color: #ff6600"><?php echo T_('RSS/Atom') ?></th>
-			<th style="background-color: #ff9900"><?php echo T_('Robots') ?></th>
-			<th style="background-color: #ffcc00"><?php echo T_('Browsers') ?></th>
-			<th style="background-color: #cccccc"><?php echo T_('Unknown') ?></th>
-			<th class="lastcol"><?php echo T_('Total') ?></th>
-		</tr>
-		<?php
+	echo '<table class="grouped" cellspacing="0">';
+	echo '<tr>';
+	echo '<th class="firstcol">'.T_('Date').'</th>';
+	echo '<th style="background-color: #ff6600"><a href="?ctrl=stats&amp;tab=summary&amp;tab3=feed&amp;blog='.$blog.'">'.T_('RSS/Atom').'</a></th>';
+	echo '<th style="background-color: #ff9900"><a href="?ctrl=stats&amp;tab=summary&amp;tab3=robot&amp;blog='.$blog.'">'.T_('Robots').'</a></th>';
+	echo '<th style="background-color: #ffcc00"><a href="?ctrl=stats&amp;tab=summary&amp;tab3=browser&amp;blog='.$blog.'">'.T_('Browsers').'</a></th>';
+	echo '<th style="background-color: #cccccc">'.T_('Unknown').'</th>';
+	echo '<th class="lastcol">'.T_('Total').'</th>';
+	echo '</tr>';
+
 		$count = 0;
 		foreach( $res_hits as $row_stats )
 		{
@@ -213,6 +212,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.8  2008/02/18 20:22:40  fplanque
+ * no message
+ *
  * Revision 1.7  2008/02/14 05:45:38  fplanque
  * cleaned up stats
  *

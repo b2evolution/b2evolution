@@ -96,7 +96,7 @@ class CollectionSettings extends AbstractSettings
 
 			'blog_footer_text' => '&copy;$year$ by $owner$',
 			'single_item_footer_text' => '',
-			'xml_item_footer_text' => '<p><small>Blogged with <a href="http://b2evolution.net/">b2evolution</a>.</small></p>',
+			'xml_item_footer_text' => '<p><small><a href="$item_perm_url$">Original post</a> blogged on <a href="http://b2evolution.net/">b2evolution</a>.</small></p>',
 		);
 
 
@@ -132,6 +132,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.15  2008/02/18 20:22:40  fplanque
+ * no message
+ *
  * Revision 1.14  2008/02/05 01:51:54  fplanque
  * minors
  *

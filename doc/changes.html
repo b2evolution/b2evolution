@@ -31,8 +31,13 @@
 			<h1>2.5 series</h1>
 			<h2>2.5.0-beta</h2>
 			<ul>
-				<li>Posts can be explicitely ordered by the use of the order field. This can be set on each post in expert edit mode (in the right column).</li>
-				<li>Post can now have custom fields. Custom fields can be defined for each blog under &quot;Blog Settings &gt; Features&quot;.</li>
+				<li>Post properties
+					<ul>
+						<li>Posts can be explicitely ordered by the use of the order field. This can be set on each post in expert edit mode (in the right column).</li>
+						<li>Post can now have custom fields. Custom fields can be defined for each blog under &quot;Blog Settings &gt; Features&quot;.</li>
+						</ul>
+				</li>
+				<li>Session and Hit logging as well as debug info display are now done systematically at PHP shutdown. Therefore calls to $Hit-&gt;log() and debug_info() are no longer needed within skins. (It doesn't hurt to let them there either.)</li>
 				<li>Added usability shortcuts.</li>
 				<li>TODO: finish featured post</li>
 			</ul>
