@@ -28,7 +28,7 @@ if( $feed_content == 'none' )
 {	// We don't want to provide this feed!
 	global $skins_path;
 	require $skins_path.'_404_not_found.main.php';
-	exit();
+	exit(0);
 }
 
 
@@ -260,8 +260,6 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 	</channel>
 </rss>
 <?php
-	$Hit->log(); // log the hit on this page
-
 	// This is a self contained XML document, make sure there is no additional output:
-	exit();
+	exit(0);
 ?>

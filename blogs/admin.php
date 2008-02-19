@@ -152,7 +152,7 @@ if( ! $admin_skin || ! file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
 if( ! $admin_skin )
 {
 	$Debuglog->display( 'No admin skin available!', '', true, 'skin' );
-	exit();
+	die(1);
 }
 
 $Debuglog->add( 'Using admin skin &laquo;'.$admin_skin.'&raquo;', 'skin' );
@@ -207,7 +207,7 @@ if( ! empty( $_SERVER['PATH_INFO'] ) && $_SERVER['PATH_INFO'] != $_SERVER['PHP_S
 	}
 
 	header_redirect( url_add_param( $admin_url, 'ctrl='.$ctrl.$query_string, '&' ), true );
-	exit;
+	exit(0);
 }
 
 
@@ -220,11 +220,11 @@ if( !isset($ctrl_mappings[$ctrl]) )
 // Call the requested controller:
 require $inc_path.$ctrl_mappings[$ctrl];
 
-// log the hit on this page (according to settings) if the admin_skin hasn't already done so:
-$Hit->log();
-
 /*
  * $Log$
+ * Revision 1.29  2008/02/19 11:11:14  fplanque
+ * no message
+ *
  * Revision 1.28  2008/01/23 12:51:21  fplanque
  * posts now have divs with IDs
  *

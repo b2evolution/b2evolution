@@ -87,17 +87,17 @@ switch( $action )
 
 		$Form = new Form(); // fake Form
 		autoform_display_field( $set_path, $r['set_meta'], $Form, $set_type, $Plugin, NULL, $r['set_node'] );
-		exit;
+		exit(0);
 
 	case 'del_plugin_sett_set':
 		// TODO: may use validation here..
 		echo 'OK';
-		exit;
+		exit(0);
 
 	case 'admin_blogperms_set_layout':
 		// Save blog permission tab layout into user settings. This gets called on JS-toggling.
 		$UserSettings->param_Request( 'layout', 'blogperms_layout', 'string', $debug ? 'all' : 'default' );  // table layout mode
-		exit;
+		exit(0);
 
 }
 
@@ -115,6 +115,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.27  2008/02/19 11:11:16  fplanque
+ * no message
+ *
  * Revision 1.26  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *

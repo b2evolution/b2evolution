@@ -390,11 +390,14 @@ switch( $action )
 		require $adminskins_path.'login/_login_form.main.php';
 }
 
-exit();
+exit(0);
 
 
 /*
  * $Log$
+ * Revision 1.99  2008/02/19 11:11:16  fplanque
+ * no message
+ *
  * Revision 1.98  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *

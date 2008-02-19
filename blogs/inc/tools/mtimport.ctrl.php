@@ -158,7 +158,7 @@ param( 'import_mode', 'string', 'normal' );
 		{ // no valid MTEXPORT defined
 			chooseexportfile();
 			echo '</div></div></body></html>';
-			exit;
+			exit(0);
 		}
 	}
 	else
@@ -1661,6 +1661,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.5  2008/02/19 11:11:19  fplanque
+ * no message
+ *
  * Revision 1.4  2008/01/21 09:35:35  fplanque
  * (c) 2008
  *

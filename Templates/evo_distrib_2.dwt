@@ -4,6 +4,7 @@
 	<!-- TemplateBeginEditable name="doctitle" -->
 	<title>b2evolution</title>
 	<!-- TemplateEndEditable -->
+	<meta name="viewport" content="width = 750" />
 	<link href="../blogs/rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- TemplateBeginEditable name="head" --><!-- TemplateEndEditable -->
 	<!-- TemplateParam name="lang" type="text" value="en-US" passthrough="true" --> 

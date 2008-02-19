@@ -584,7 +584,7 @@ function disp_url( $url, $max_length = NULL )
 
 /* {{{ Revision log:
  * $Log$
- * Revision 1.12  2008/02/18 20:22:40  fplanque
+ * Revision 1.13  2008/02/19 11:11:17  fplanque
  * no message
  *
  * Revision 1.11  2008/02/11 23:43:07  fplanque

@@ -128,9 +128,10 @@ div#evo_toolbar {
 	position: fixed;
 	z-index: 99;
 	left: 0px;
-	top: 0px;	
+	top: 0px;
 	height: 21px;
 	width:100%;		/* Safari Windows */
+	-webkit-text-size-adjust: none; /* iPhone */
 }
 
 div.skin_wrapper_loggedin {

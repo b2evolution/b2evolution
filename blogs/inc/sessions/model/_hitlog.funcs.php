@@ -43,21 +43,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-//get most linked to pages on site
-//select count(hit_uri) as count, hit_uri from T_hitlog group by hit_uri order by count desc
-
-/*if ($refererList)
-{
-	print "referers:<br />";
-	$ar = refererList($refererList,"global");
-	print join("<br />",$ar);
-}
-
-if ($topRefererList)
-{
-	print join("<br />",topRefererList($topRefererList,"global"));
-}
-*/
 
 
 /**
@@ -288,7 +273,7 @@ function stats_search_keywords( $ref )
 	$kwout = '';
 	if( ($pos_question = strpos( $ref, '?' )) == false )
 	{
-		return '['.T_('not a query - no params!').']';
+		return '<span class="note">['.T_('n.a.').']';
 	}
 	$ref_params = explode( '&', substr( $ref, $pos_question+1 ) );
 	foreach( $ref_params as $ref_param )
@@ -323,7 +308,7 @@ function stats_search_keywords( $ref )
 			return htmlentities($kwout);
 		}
 	}
-	return '['.T_('no query string found').']';
+	return '<span class="note">['.T_('n.a.').']</span>';
 }
 
 
@@ -361,15 +346,12 @@ function stats_user_agent( $translate = false )
 }
 
 
-/*
- * stats_title(-)
- *
- * @movedTo _obsolete092.php
- */
-
 
 /*
  * $Log$
+ * Revision 1.4  2008/02/19 11:11:18  fplanque
+ * no message
+ *
  * Revision 1.3  2008/02/14 02:19:52  fplanque
  * cleaned up stats
  *

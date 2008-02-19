@@ -229,8 +229,6 @@ switch( $viewtype )
 		echo '<p class="error">'.sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selected_File->dget('name') ).'</p>';
 		break;
 }
-
-debug_info();
 ?>
 
 </body>
@@ -239,6 +237,9 @@ debug_info();
 <?php
 /*
  * $Log$
+ * Revision 1.18  2008/02/19 11:11:16  fplanque
+ * no message
+ *
  * Revision 1.17  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *

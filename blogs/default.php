@@ -33,6 +33,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<!-- InstanceBeginEditable name="doctitle" -->
 	<title>b2evolution - Default Page</title>
 	<!-- InstanceEndEditable -->
+	<meta name="viewport" content="width = 750" />
 	<link href="rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- InstanceBeginEditable name="head" -->
 	<base href="<?php echo $baseurl ?>" />

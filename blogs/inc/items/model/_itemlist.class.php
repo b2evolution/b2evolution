@@ -155,6 +155,7 @@ class ItemList2 extends ItemListLight
 		$post_title = format_to_post( $post_title );
 		$content = format_to_post( $content );
 
+
 		$this->sql = "SELECT
 			0 AS post_ID,
 			$preview_userid AS post_creator_user_ID,
@@ -181,8 +182,22 @@ class ItemList2 extends ItemListLight
 			".$DB->quote($item_typ_ID)." AS post_ptyp_ID,
 			".$DB->quote($item_st_ID)." AS post_pst_ID,
 			".$DB->quote($item_deadline)." AS post_datedeadline,
-			".$DB->quote($item_priority)." AS post_priority";
+			".$DB->quote($item_priority)." AS post_priority,";
 
+		// CUSTOM FIELDS double
+		for( $i = 1 ; $i <= 5; $i++ )
+		{	// For each custom double field:
+			$this->sql .= $DB->quote(param( 'item_double'.$i, 'double', NULL )).' AS post_double'.$i.",\n";
+		}
+
+		// CUSTOM FIELDS varchar
+		for( $i = 1 ; $i <= 3; $i++ )
+		{	// For each custom double field:
+			$this->sql .= $DB->quote(param( 'item_varchar'.$i, 'string', '' )).' AS post_varchar'.$i.",\n";
+		}
+
+    $this->sql .= $DB->quote(param( 'item_order', 'double', NULL )).' AS post_order'.",\n"
+								.$DB->quote(param( 'item_featured', 'integer', NULL )).' AS post_featured'."\n";
 		$this->total_rows = 1;
 		$this->total_pages = 1;
 		$this->page = 1;
@@ -636,6 +651,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.9  2008/02/19 11:11:17  fplanque
+ * no message
+ *
  * Revision 1.8  2008/02/09 17:36:15  fplanque
  * better handling of order, including approximative comparisons
  *

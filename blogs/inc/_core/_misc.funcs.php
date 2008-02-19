@@ -58,6 +58,50 @@ load_funcs('antispam/model/_antispam.funcs.php');
 load_funcs('files/model/_file.funcs.php');
 
 
+/**
+ * Shutdown function: save HIT and update session!
+ *
+ * This is registered in _main.inc.php with register_shutdown_function()
+ * This is called by PHP at the end of the script.
+ *
+ * NOTE: anything happening here will unfortunately not appear in the debug_log
+ */
+function shutdown()
+{
+  /**
+	 * @var Hit
+	 */
+	global $Hit;
+
+  /**
+	 * @var Session
+	 */
+	global $Session;
+
+	global $Settings;
+
+	// fp> do we need special processing if we are in CLI mode?  probably earlier actually
+	// if( ! $is_cli )
+
+	// Save the current HIT:
+	$Hit->log();
+
+	// Update the SESSION:
+	$Session->dbsave();
+
+	// Auto pruning of old HITS, old SESSIONS and potentially MORE analytics data:
+	if( $Settings->get( 'auto_prune_stats_mode' ) == 'page' )
+	{ // Autopruning is requested
+		load_class('sessions/model/_hitlist.class.php');
+		Hitlist::dbprune(); // will prune once per day, according to Settings
+	}
+
+	// Calling debug_info() here will produce complete data but it will be after </html> hence invalid.
+	// Then again, it's for debug only, so it shouldn't matter that much.
+	debug_info();
+}
+
+
 /***** Formatting functions *****/
 
 /**
@@ -381,12 +425,21 @@ function mysql2localedatetime( $mysqlstring )
 	return mysql2date( locale_datefmt().' '.locale_timefmt(), $mysqlstring );
 }
 
-function mysql2localedatetime_spans( $mysqlstring )
+function mysql2localedatetime_spans( $mysqlstring, $datefmt = NULL, $timefmt = NULL )
 {
+	if( is_null( $datefmt ) )
+	{
+		$datefmt = locale_datefmt();
+	}
+	if( is_null( $timefmt ) )
+	{
+		$timefmt = locale_timefmt();
+	}
+
 	return '<span class="date">'
-					.mysql2date( locale_datefmt(), $mysqlstring )
+					.mysql2date( $datefmt, $mysqlstring )
 					.'</span> <span class="time">'
-					.mysql2date( locale_timefmt(), $mysqlstring )
+					.mysql2date( $timefmt, $mysqlstring )
 					.'</span>';
 }
 
@@ -1228,8 +1281,6 @@ function debug_die( $additional_info = '' )
 			echo $backtrace_cli;
 		else
 			echo $backtrace;
-
-		debug_info();
 	}
 
 	// EXIT:
@@ -1237,7 +1288,8 @@ function debug_die( $additional_info = '' )
 	{ // Attempt to keep the html valid (but it doesn't really matter anyway)
 		echo '</body></html>';
 	}
-	die();
+
+	die(1);	// Error code 1. Note: This will still call the shutdown function.
 }
 
 
@@ -1279,11 +1331,12 @@ function bad_request_die( $additional_info = '' )
 	if( $debug )
 	{
 		echo debug_get_backtrace();
-		debug_info();
 	}
 
 	// Attempt to keep the html valid (but it doesn't really matter anyway)
-	die( '</body></html>' );
+	echo '</body></html>';
+
+	die(2); // Error code 2. Note: this will still call the shutdown function.
 }
 
 
@@ -1295,15 +1348,34 @@ function bad_request_die( $additional_info = '' )
  */
 function debug_info( $force = false )
 {
-	global $debug, $Debuglog, $DB, $obhandler_debug, $Timer, $ReqHost, $ReqPath;
+	global $debug, $debug_done, $Debuglog, $DB, $obhandler_debug, $Timer, $ReqHost, $ReqPath;
 	global $cache_imgsize, $cache_File;
 	global $Session;
 	global $db_config, $tableprefix;
+  /**
+	 * @var Hit
+	 */
+	global $Hit;
 
-	if( ! $debug && ! $force )
-	{ // No debug output:
-		return;
+	if( !$force )
+	{
+		if( !empty($debug_done))
+		{ // Already displayed!
+			return;
+		}
+
+		if( empty($debug) )
+		{ // No debug outpud desired:
+			return;
+		}
+
+		if( $debug < 2 && $Hit->agent_type != 'browser' )
+		{	// Don't display if it's not a browser (very needed for proper RSS display btw)
+			return;
+		}
 	}
+	//Make sure debug output only happens once:
+	$debug_done = true;
 
 	$ReqHostPathQuery = $ReqHost.$ReqPath.( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?'.$_SERVER['QUERY_STRING'] );
 	echo '<div class="debug"><h2>Debug info</h2>';
@@ -2539,6 +2611,9 @@ function generate_link_from_params( $link_params )
 
 /*
  * $Log$
+ * Revision 1.21  2008/02/19 11:11:17  fplanque
+ * no message
+ *
  * Revision 1.20  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *

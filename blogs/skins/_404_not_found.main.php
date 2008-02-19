@@ -20,11 +20,8 @@ header('Content-Type: text/html; charset=iso-8859-1'); // no translation
 	<body>
 		<h1>404 Not Found</h1>
 		<p><a href="<?php echo $baseurl ?>"><?php echo $app_name ?></a> cannot resolve the requested URL.</p>
-		<?php
-			debug_info();
-		?>
 	</body>
 </html>
 <?php
- 	exit;
+ 	exit(0);
 ?>

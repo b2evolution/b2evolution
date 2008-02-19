@@ -69,9 +69,7 @@ if( param( 'optout_cmt_email', 'string', '' ) )
 		}
 
 		$Messages->display();
-
-		debug_info();
-		exit;
+		exit(0);
 	}
 
 	$req_ID = generate_random_key(32);
@@ -97,8 +95,7 @@ if( param( 'optout_cmt_email', 'string', '' ) )
 					.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
 	}
 
-	debug_info();
-	exit;
+	exit(0);
 }
 // END OF BLOCK TO BE MOVED
 // --------------------------------------------------
@@ -263,8 +260,7 @@ if( $Messages->count( 'error' ) )
 { // there were errors: display them and get out of here
 	$Messages->display( T_('Cannot send email, please correct these errors:'),
 	'[<a href="javascript:history.go(-1)">'. T_('Back to email editing') . '</a>]' );
-	debug_info();
-	exit;
+	exit(0);
 }
 
 if( !empty( $Blog ) )
@@ -314,6 +310,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.57  2008/02/19 11:11:16  fplanque
+ * no message
+ *
  * Revision 1.56  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *

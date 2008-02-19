@@ -952,6 +952,19 @@ class AdminUI_general extends Widget
 					);
 
 
+			case 'menu3':
+				// level 3 submenu:
+				return array(
+							'before' => '<div class="menu3">&raquo;',
+							'after' => '</div>',
+							'empty' => '',
+							'beforeEach' => '<span class="option3">',
+							'afterEach'  => '</span>',
+							'beforeEachSel' => '<span class="current">',
+							'afterEachSel' => '</span>',
+						);
+
+
 			case 'block':
 				// an additional payload block, anywhere after the one with the submenu. Used by disp_payload_begin()/disp_payload_end()
 				return array(
@@ -1371,11 +1384,11 @@ class AdminUI_general extends Widget
 			{	// We have permission to view all stats,
 				// we'll assume that we want to view th aggregate stats and not the current blog stats
 				// fp> TODO: it might be useful to have a user pref for [View aggregate stats by default] vs [View current blog stats by default]
-				$default = 'admin.php?ctrl=stats&amp;blog=0';
+				$default = 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0';
 			}
 			else
 			{
-				$default = 'admin.php?ctrl=stats';
+				$default = 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=global';
 			}
 			$this->add_menu_entries(
 					NULL, // root
@@ -1386,10 +1399,22 @@ class AdminUI_general extends Widget
 							'entries' => array(
 								'summary' => array(
 									'text' => T_('Hit summary'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;blog='.$blog ),
-								'browserhits' => array(
-									'text' => T_('Browser hits'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=browserhits&amp;blog='.$blog ),
+									'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$blog,
+									'entries' => array(
+										'global' => array(
+											'text' => T_('Global hits'),
+											'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$blog ),
+										'browser' => array(
+											'text' => T_('Browser hits'),
+											'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=browser&amp;blog='.$blog ),
+										'robot' => array(
+											'text' => T_('Robot hits'),
+											'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=robot&amp;blog='.$blog ),
+										'feed' => array(
+											'text' => T_('RSS/Atom hits'),
+											'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=feed&amp;blog='.$blog ),
+										),
+									),
 								'refsearches' => array(
 									'text' => T_('Search B-hits'),
 									'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;blog='.$blog ),
@@ -1399,12 +1424,6 @@ class AdminUI_general extends Widget
 								'other' => array(
 									'text' => T_('Direct B-hits'),
 									'href' => 'admin.php?ctrl=stats&amp;tab=other&amp;blog='.$blog ),
-								'robots' => array(
-									'text' => T_('Robot hits'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=robots&amp;blog='.$blog ),
-								'syndication' => array(
-									'text' => T_('XML hits'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=syndication&amp;blog='.$blog ),
 								'useragents' => array(
 									'text' => T_('User agents'),
 									'href' => 'admin.php?ctrl=stats&amp;tab=useragents&amp;blog='.$blog ),
@@ -1413,7 +1432,8 @@ class AdminUI_general extends Widget
 									'href' => 'admin.php?ctrl=stats&amp;tab=domains&amp;blog='.$blog ),
 							)
 						),
-					) );
+					)
+				);
 		}
 
 		if( $blog == 0 && $current_User->check_perm( 'stats', 'view' ) )
@@ -1422,8 +1442,23 @@ class AdminUI_general extends Widget
 					'stats',
 					array(
 						'sessions' => array(
-							'text' => T_('Sessions'),
-							'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;blog='.$blog ),
+							'text' => T_('User sessions'),
+							'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0',
+							'entries' => array(
+								'login' => array(
+									'text' => T_('Users'),
+									'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0'
+									),
+								'sessid' => array(
+									'text' => T_('Sessions'),
+									'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;blog=0'
+									),
+								'hits' => array(
+									'text' => T_('Hits'),
+									'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0'
+									),
+								),
+						 	),
 						)
 				);
 		}
@@ -1746,6 +1781,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.82  2008/02/19 11:11:23  fplanque
+ * no message
+ *
  * Revision 1.81  2008/02/13 06:56:48  fplanque
  * moved blog selector to the left
  *

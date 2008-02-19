@@ -230,7 +230,7 @@ load_funcs('_core/_url.funcs.php');
 /**
  * @global Hit The Hit object
  */
-$Hit = & new Hit();
+$Hit = & new Hit(); // This may INSERT a basedomain and a useragent but NOT the HIT itself!
 
 
 /**
@@ -242,10 +242,15 @@ load_class('sessions/model/_session.class.php');
  * The Session object
  * @global Session
  * @todo dh> This needs the same "SET NAMES" MySQL-setup as with Session::dbsave() - see the "TODO" with unserialize() in Session::Session()
- * @todo dh> makes no sense in CLI mode (no cookie); Add isset() checks to
- *           calls on the $Session object, e.g. below?
+ * @todo dh> makes no sense in CLI mode (no cookie); Add isset() checks to calls on the $Session object, e.g. below?
+ *       fp> We might want to use a special session for CLI. And for cron jobs through http as well.
  */
-$Session = & new Session();
+$Session = & new Session(); // IF this can't pull asesion from the DB it will always INSERT a new one!
+
+/**
+ * Handle saving the HIT and updating the SESSION at the end of the page
+ */
+register_shutdown_function( 'shutdown' );
 
 
 /**
@@ -284,7 +289,7 @@ if( empty($generating_static) )
 	{
 		echo $get_return['data'];
 		// Note: we should not use debug_info() here, because the plugin has probably sent a Content-Length header.
-		exit;
+		exit(0);
 	}
 }
 
@@ -575,7 +580,7 @@ else
 			}
 
 			header_redirect( $redirect_to );
-			exit();
+			exit(0);
 		}
 	}
 }
@@ -628,7 +633,7 @@ init_charsets( $current_charset );
 if( $Messages->count( 'login_error' ) )
 {
 	require $htsrv_path.'login.php';
-	exit();
+	exit(0);
 }
 
 $Timer->pause( '_main.inc');
@@ -647,6 +652,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.90  2008/02/19 11:11:16  fplanque
+ * no message
+ *
  * Revision 1.89  2008/01/22 15:34:46  fplanque
  * minor
  *

@@ -63,6 +63,7 @@ div#pageFooter {
 	padding:0;
 	border-top: 1px dotted #000;
 	color: #666;
+	-webkit-text-size-adjust: none; /* iPhone */
 }
 p.baseline {
 	font-size: 70%;
@@ -158,7 +159,7 @@ div.pageHeader div.widget_core_coll_tagline {
 }
 
 
-/* 
+/*
  * Styles for forms
  */
 .bPost, .bPostpublished
@@ -190,7 +191,7 @@ div.separator {
 	margin: 1ex 0 2ex 0;
 }
 
-input.bComment, 
+input.bComment,
 textarea.bComment
 {
 	background-color: #eee;
@@ -209,7 +210,7 @@ select.bComment		/* Used by the profile form */
 
 
 /*
- * Styles for sidebar (right) 
+ * Styles for sidebar (right)
  */
 .bSideItem {
 	font-size: 84%;
@@ -266,7 +267,7 @@ table.bCalendarTable caption {
 }
 table.bCalendarTable {
 	border: solid 1px #ccc;
-	border-collapse: separate; 
+	border-collapse: separate;
 }
 table.bCalendarTable a {
 	color: #f09;

@@ -163,6 +163,8 @@ class Hit
 
 	/**
 	 * Constructor
+	 *
+	 * This may INSERT a basedomain and a useragent but NOT the HIT itself!
 	 */
 	function Hit()
 	{
@@ -171,8 +173,8 @@ class Hit
 		// Get the first IP in the list of REMOTE_ADDR and HTTP_X_FORWARDED_FOR
 		$this->IP = get_ip_list( true );
 
-		// Check the referer and determine referer_type:
-		$this->detect_referer();
+		// Check the REFERER and determine referer_type:
+		$this->detect_referer(); // May EXIT of we are set up to block referer spam.
 
 		// Check if we know the base domain:
 		$this->referer_basedomain = get_base_domain($this->referer);
@@ -216,6 +218,7 @@ class Hit
 			}
 		}
 
+		// User Agent
 		$this->detect_useragent();
 
 
@@ -335,7 +338,7 @@ class Hit
 			if( $Settings->get('antispam_block_spam_referers') )
 			{ // In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
 				require $skins_path.'_403_referer_spam.main.php';	// error & exit
-				exit(); // just in case.
+				exit(0); // just in case.
 				// THIS IS THE END!!
 			}
 
@@ -512,53 +515,65 @@ class Hit
 	 */
 	function log()
 	{
-		global $Settings, $Plugins, $Debuglog, $is_admin_page;
+		global $Plugins;
 
 		if( $this->logged )
-		{	// Already logged
+		{	// Already logged, don't log twice:
 			return false;
 		}
 
 		// Remember we have already attempted to log:
 		$this->logged = true;
 
-		// Auto pruning:
-		// We need to do this now because even if we don't log anything, we stil need to prune old sessions.
-
-		if( $Settings->get( 'auto_prune_stats_mode' ) == 'page' )
-		{ // Autopruning is requested
-			load_class('sessions/model/_hitlist.class.php');
-			Hitlist::dbprune(); // will prune once per day, according to Settings
+		// Check if this hit should be logged:
+		if( ! $this->should_be_logged() )
+		{
+			return false;
 		}
 
-		// Real logging:
+		if( $Plugins->trigger_event_first_true('AppendHitLog', array( 'Hit' => &$this ) ) )
+		{	// Phugin has handled recording
+			return true;
+		}
+
+		// Check if this hit should STILL be logged after plugin call:
+		if( ! $this->should_be_logged() )
+		{
+			return false;
+		}
+
+		// Record the HIT now:
+		$this->record_the_hit();
+
+		return true;
+	}
+
+
+  /**
+	 * Tell if a HIT should be logged:
+	 *
+	 * @return boolean
+	 */
+	function should_be_logged()
+	{
+		global $Settings, $Debuglog, $is_admin_page;
 
 		if( $is_admin_page && ! $Settings->get('log_admin_hits') )
 		{	// We don't want to log admin hits:
+			$Debuglog->add( 'Hit NOT logged, (Admin page logging is disabled)', 'hit' );
 			return false;
 		}
 
 		if( ! $is_admin_page && ! $Settings->get('log_public_hits') )
 		{	// We don't want to log public hits:
+			$Debuglog->add( 'Hit NOT logged, (Public page logging is disabled)', 'hit' );
 			return false;
 		}
 
-		if( $this->ignore || ! $this->is_good_hit() )
-		{ // We don't want to log this hit!
-			$hit_info = 'referer_type: '.var_export($this->referer_type, true)
-				.', agent_type: '.var_export($this->agent_type, true)
-				#.', is'.( $this->is_new_view() ? '' : ' NOT' ).' a new view'
-				.', is'.( $this->ignore ? '' : ' NOT' ).' ignored'
-				.', is'.( $this->is_good_hit() ? '' : ' NOT' ).' a good hit';
-			$Debuglog->add( 'log(): Hit NOT logged, ('.$hit_info.')', 'hit' );
+		if( $this->referer_type == 'spam' && ! $Settings->get('log_spam_hits') )
+		{	// We don't want to log referer spam hits:
+			$Debuglog->add( 'Hit NOT logged, (Referer spam)', 'hit' );
 			return false;
-		}
-
-		if( ! $Plugins->trigger_event_first_true('AppendHitLog', array( 'Hit' => &$this ) ) // No plugin wants to handle recording
-			&& $this->is_good_hit() // A plugin might have changed the referer_type
-		)
-		{ // Record it here:
-			$this->record_the_hit();
 		}
 
 		return true;
@@ -573,11 +588,23 @@ class Hit
 	 */
 	function record_the_hit()
 	{
-		global $DB, $Session, $ReqURI, $Blog, $localtimenow, $Debuglog;
+		global $DB, $Session, $ReqURI, $Blog, $blog, $localtimenow, $Debuglog;
 
-		$Debuglog->add( 'log(): Recording the hit.', 'hit' );
+		$Debuglog->add( 'Recording the hit.', 'hit' );
 
-		$blog_ID = isset($Blog) ? $Blog->ID : NULL;
+		if( !empty($Blog) )
+		{
+			$blog_ID = $Blog->ID;
+		}
+		elseif( !empty( $blog ) )
+		{
+			$blog_ID = $blog;
+		}
+		else
+		{
+			$blog_ID = NULL;
+		}
+
 
 		$hit_uri = substr($ReqURI, 0, 250); // VARCHAR(250) and likely to be longer
 		$hit_referer = substr($this->referer, 0, 250); // VARCHAR(250) and likely to be longer
@@ -645,7 +672,7 @@ class Hit
 
 
 	/**
-	 * Determine if a hit is a new view (not reloaded, (internally) ignored or from a robot).
+	 * Determine if a hit is a new view (not reloaded or from a robot).
 	 *
 	 * 'Reloaded' means: visited before from the same user (in a session) or from same IP/user_agent in the
 	 * last {@link $Settings reloadpage_timeout} seconds.
@@ -659,8 +686,8 @@ class Hit
 	 */
 	function is_new_view()
 	{
-		if( $this->ignore || $this->agent_type == 'robot' )
-		{
+		if( $this->agent_type == 'robot' )
+		{	// Robot requests are not considered as (new) views:
 			return false;
 		}
 
@@ -706,17 +733,6 @@ class Hit
 
 
 	/**
-	 * Is this a good hit? This means "no spam".
-	 *
-	 * @return boolean
-	 */
-	function is_good_hit()
-	{
-		return ( $this->referer_type != 'spam' );
-	}
-
-
-	/**
 	 * Is this a browser reload (F5)?
 	 *
 	 * @return boolean true on reload, false if not.
@@ -736,6 +752,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.6  2008/02/19 11:11:18  fplanque
+ * no message
+ *
  * Revision 1.5  2008/01/21 09:35:33  fplanque
  * (c) 2008
  *

@@ -67,10 +67,6 @@ while( $Item = & mainlist_get_item() )
 
 $Timer->stop( 'display list' );
 
-$Hit->log(); // log the hit on this page
-
-// debug_info(); // output debug info if requested
-
 // This is a self contained XML document, make sure there is no additional output:
-exit();
+exit(0);
 ?>

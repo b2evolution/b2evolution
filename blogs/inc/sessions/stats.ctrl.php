@@ -45,7 +45,8 @@ if( $tab == 'sessions' && (!$perm_view_all || $blog != 0) )
 {	// Sessions tab is not narrowed down to blog level:
 	$tab = 'summary';
 }
-$AdminUI->set_path( 'stats', $tab );
+$tab3 = param( 'tab3', 'string', '', true );
+$AdminUI->set_path( 'stats', $tab, $tab3 );
 $AdminUI->title = T_('View Stats for Blog:');
 
 param( 'action', 'string' );
@@ -133,17 +134,30 @@ $AdminUI->disp_body_top();
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
+echo $AdminUI->get_html_menu( array( 'stats', $tab ), 'menu3' );
 
 switch( $AdminUI->get_path(1) )
 {
 	case 'summary':
 		// Display VIEW:
-		$AdminUI->disp_view( 'sessions/views/_stats_summary.view.php' );
-		break;
+		switch( $tab3 )
+		{
+			case 'browser':
+				$AdminUI->disp_view( 'sessions/views/_stats_browserhits.view.php' );
+				break;
 
-	case 'browserhits':
-		// Display VIEW:
-		$AdminUI->disp_view( 'sessions/views/_stats_browserhits.view.php' );
+			case 'robot':
+				$AdminUI->disp_view( 'sessions/views/_stats_robots.view.php' );
+				break;
+
+			case 'feed':
+				$AdminUI->disp_view( 'sessions/views/_stats_syndication.view.php' );
+				break;
+
+			case 'global':
+			default:
+				$AdminUI->disp_view( 'sessions/views/_stats_summary.view.php' );
+		}
 		break;
 
 	case 'other':
@@ -161,16 +175,6 @@ switch( $AdminUI->get_path(1) )
 		$AdminUI->disp_view( 'sessions/views/_stats_refsearches.view.php' );
 		break;
 
-	case 'robots':
-		// Display VIEW:
-		$AdminUI->disp_view( 'sessions/views/_stats_robots.view.php' );
-		break;
-
-	case 'syndication':
-		// Display VIEW:
-		$AdminUI->disp_view( 'sessions/views/_stats_syndication.view.php' );
-		break;
-
 	case 'useragents':
 		// Display VIEW:
 		$AdminUI->disp_view( 'sessions/views/_stats_useragents.view.php' );
@@ -183,7 +187,20 @@ switch( $AdminUI->get_path(1) )
 
 	case 'sessions':
 		// Display VIEW:
-		$AdminUI->disp_view( 'sessions/views/_stats_sessions.view.php' );
+		switch( $tab3 )
+		{
+			case 'sessid':
+				$AdminUI->disp_view( 'sessions/views/_stats_sessions_list.view.php' );
+				break;
+
+			case 'hits':
+				$AdminUI->disp_view( 'sessions/views/_stats_hit_list.view.php' );
+				break;
+
+			case 'login':
+			default:
+				$AdminUI->disp_view( 'sessions/views/_stats_sessions.view.php' );
+		}
 		break;
 }
 
@@ -195,6 +212,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2008/02/19 11:11:18  fplanque
+ * no message
+ *
  * Revision 1.4  2008/01/21 09:35:32  fplanque
  * (c) 2008
  *

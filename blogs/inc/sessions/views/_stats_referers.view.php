@@ -53,7 +53,7 @@ $Results->title = T_('Refered browser hits');
 // datetime:
 $Results->cols[0] = array(
 		'th' => T_('Date Time'),
-		'order' => 'hit_datetime',
+		'order' => 'hit_ID', // This field is index, much faster than actually sorting on the datetime!
 		'td_class' => 'timestamp',
 		'td' => '%mysql2localedatetime_spans( \'$hit_datetime$\' )%',
 	);
@@ -209,6 +209,9 @@ if( count( $res_stats ) )
 
 /*
  * $Log$
+ * Revision 1.6  2008/02/19 11:11:18  fplanque
+ * no message
+ *
  * Revision 1.5  2008/02/14 05:45:37  fplanque
  * cleaned up stats
  *

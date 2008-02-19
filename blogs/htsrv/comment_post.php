@@ -32,7 +32,6 @@ require_once $inc_path.'_main.inc.php';
 
 header( 'Content-Type: text/html; charset='.$io_charset );
 
-
 // Getting GET or POST parameters:
 param( 'comment_post_ID', 'integer', true ); // required
 param( 'redirect_to', 'string', '' );
@@ -263,13 +262,11 @@ if( $Messages->count('error') )
 	<?php
 	$Messages->display( T_('Cannot post comment, please correct these errors:'),
 	'[<a href="javascript:history.go(-1)">'.T_('Back to comment editing').'</a>]' );
-
-	debug_info();  // output debug info, useful to see what a plugin might have done
 	?>
 	</body>
 	</html>
 	<?php
-	exit();
+	exit(0);
 }
 
 if( $action == 'preview' )
@@ -283,7 +280,7 @@ if( $action == 'preview' )
 
 	header_nocache();
 	header_redirect();
-	exit();
+	exit(0);
 }
 else
 { // delete any preview comment from session data:
@@ -370,6 +367,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.121  2008/02/19 11:11:16  fplanque
+ * no message
+ *
  * Revision 1.120  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *

@@ -63,12 +63,6 @@ if( $this->get_path(0) == 'files'
 	<?php
 }
 
-// log the hit on this page (according to settings)
-global $Hit;
-$Hit->log();
-
-debug_info();
-
 ?>
 
 <!-- End of skin_wrapper -->
@@ -79,6 +73,9 @@ debug_info();
 <?php
 /*
  * $Log$
+ * Revision 1.6  2008/02/19 11:11:23  fplanque
+ * no message
+ *
  * Revision 1.5  2008/01/21 15:02:01  fplanque
  * fixed evobar
  *

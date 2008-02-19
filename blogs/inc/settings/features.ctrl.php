@@ -153,6 +153,7 @@ switch( $action )
 			// Hit & Session logs
 			$Settings->set( 'log_public_hits', param( 'log_public_hits', 'integer', 0 ) );
 			$Settings->set( 'log_admin_hits', param( 'log_admin_hits', 'integer', 0 ) );
+			$Settings->set( 'log_spam_hits', param( 'log_spam_hits', 'integer', 0 ) );
 
 			param( 'auto_prune_stats_mode', 'string', true );
 			$Settings->set( 'auto_prune_stats_mode',  get_param('auto_prune_stats_mode') );
@@ -203,6 +204,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2008/02/19 11:11:19  fplanque
+ * no message
+ *
  * Revision 1.2  2008/01/21 09:35:34  fplanque
  * (c) 2008
  *

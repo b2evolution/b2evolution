@@ -177,7 +177,7 @@ if( $Messages->count('error') )
 	$AdminUI->disp_payload_end();
 
 	$AdminUI->disp_global_footer();
-	exit();
+	exit(0);
 }
 
 
@@ -212,7 +212,7 @@ if( $Messages->count('error') )
 	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 	$AdminUI->disp_body_top();
 	$AdminUI->disp_global_footer();
-	exit();
+	exit(0);
 }
 
 
@@ -429,6 +429,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2008/02/19 11:11:17  fplanque
+ * no message
+ *
  * Revision 1.6  2008/02/04 13:57:50  fplanque
  * wording
  *

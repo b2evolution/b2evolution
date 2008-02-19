@@ -303,11 +303,13 @@ $schema_queries = array(
 		"CREATE TABLE T_sessions (
 			sess_ID        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			sess_key       CHAR(32) NULL,
-			sess_lastseen  DATETIME NOT NULL,
+			sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1,
+			sess_lastseen  DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
 			sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
 			sess_user_ID   INT(10) DEFAULT NULL,
 			sess_data      MEDIUMBLOB DEFAULT NULL,
-			PRIMARY KEY( sess_ID )
+			PRIMARY KEY      ( sess_ID ),
+		  KEY sess_user_ID (sess_user_ID)
 		)" ), // NOTE: sess_lastseen is only relevant/used by Sessions class (+ stats) and results in a quite large index (file size wise)
 		// NOTE: sess_data is (MEDIUM)BLOB because e.g. serialize() does not completely convert binary data to text
 
@@ -404,21 +406,22 @@ $schema_queries = array(
 	'T_hitlog' => array(
 		'Creating table for Hit-Logs',
 		"CREATE TABLE T_hitlog (
-			hit_ID             INT(11) NOT NULL AUTO_INCREMENT,
-			hit_sess_ID        INT UNSIGNED,
-			hit_datetime       DATETIME NOT NULL,
-			hit_uri            VARCHAR(250) DEFAULT NULL,
-			hit_referer_type   ENUM('search','blacklist','spam','referer','direct','self','admin') NOT NULL,
-			hit_referer        VARCHAR(250) DEFAULT NULL,
-			hit_referer_dom_ID INT UNSIGNED DEFAULT NULL,
-			hit_blog_ID        int(11) UNSIGNED NULL DEFAULT NULL,
-			hit_remote_addr    VARCHAR(40) DEFAULT NULL,
-			hit_agnt_ID        INT UNSIGNED NULL,
-			PRIMARY KEY         (hit_ID),
+			hit_ID               INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			hit_sess_ID          INT UNSIGNED,
+			hit_datetime         DATETIME NOT NULL,
+			hit_uri              VARCHAR(250) DEFAULT NULL,
+			hit_referer_type     ENUM('search','blacklist','spam','referer','direct','self','admin') NOT NULL,
+			hit_referer          VARCHAR(250) DEFAULT NULL,
+			hit_referer_dom_ID   INT UNSIGNED DEFAULT NULL,
+			hit_blog_ID          int(11) UNSIGNED NULL DEFAULT NULL,
+			hit_remote_addr      VARCHAR(40) DEFAULT NULL,
+			hit_agnt_ID          INT UNSIGNED NULL,
+			PRIMARY KEY              (hit_ID),
 			INDEX hit_agnt_ID        ( hit_agnt_ID ),
 			INDEX hit_blog_ID        ( hit_blog_ID ),
 			INDEX hit_uri            ( hit_uri ),
-			INDEX hit_referer_dom_ID ( hit_referer_dom_ID )
+			INDEX hit_referer_dom_ID ( hit_referer_dom_ID ),
+			INDEX hit_sess_ID        ( hit_sess_ID )
 		)" ),
 
 	'T_subscriptions' => array(
@@ -571,11 +574,37 @@ $schema_queries = array(
 			PRIMARY KEY (clog_ctsk_ID)
 		)' ),
 
+	'T_track__goal' => array(
+		'Creating goals table',
+		'CREATE TABLE T_track__goal(
+		  goal_ID int(10) unsigned NOT NULL auto_increment,
+		  goal_name varchar(50) default NULL,
+		  goal_key varchar(32) default NULL,
+		  goal_redir_url varchar(255) default NULL,
+		  goal_default_value double default NULL,
+		  PRIMARY KEY (goal_ID),
+		  UNIQUE KEY goal_key (goal_key)
+		)' ),
+
+	'T_track__goalhit ' => array(
+		'Creating goal hits table',
+		'CREATE TABLE T_track__goalhit (
+		  ghit_ID int(10) unsigned NOT NULL auto_increment,
+		  ghit_goal_ID int(10) unsigned NOT NULL,
+		  ghit_hit_ID int(10) unsigned NOT NULL,
+		  ghit_params varchar(2000) default NULL,
+		  PRIMARY KEY  (ghit_ID),
+		  KEY ghit_goal_ID (ghit_goal_ID),
+		  KEY ghit_hit_ID (ghit_hit_ID)
+   )' ),
 );
 
 
 /*
  * $Log$
+ * Revision 1.83  2008/02/19 11:11:19  fplanque
+ * no message
+ *
  * Revision 1.82  2008/02/09 20:14:14  fplanque
  * custom fields management
  *

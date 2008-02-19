@@ -39,6 +39,7 @@ skin_content_header();	// Sets charset!
 	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
  	<link rel="EditURI" type="application/rsd+xml" title="RSD" href="<?php echo $xmlsrv_url; ?>rsd.php?blog=<?php echo $Blog->ID; ?>" />
+	<meta name="viewport" content="width = 750" />
 	<link rel="stylesheet" href="style.css" type="text/css" />
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 	<?php

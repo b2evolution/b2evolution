@@ -56,7 +56,7 @@ function set_upgrade_checkpoint( $version )
 	{ // Max exe time not disabled and we're recahing the end
 		echo 'We are reaching the time limit for this script. Please click <a href="index.php?locale='.$locale.'&amp;action=evoupgrade">continue</a>...';
 		// Dirty temporary solution:
-		exit();
+		exit(0);
 	}
 }
 
@@ -2034,6 +2034,8 @@ function upgrade_b2evo_tables()
 										ADD COLUMN post_featured tinyint(1) NOT NULL DEFAULT 0 AFTER post_order,
 										ADD INDEX post_order( post_order )' );
 		task_end();
+
+		set_upgrade_checkpoint( '9600' );
 	}
 
 
@@ -2057,33 +2059,64 @@ function upgrade_b2evo_tables()
       		ADD COLUMN grp_perm_xhtml_javascript        TINYINT(1)  NOT NULL DEFAULT 0        AFTER grp_perm_xhtml_iframes,
 					ADD COLUMN grp_perm_xhtml_objects           TINYINT(1)  NOT NULL DEFAULT 0        AFTER grp_perm_xhtml_javascript " );
 		echo "OK.<br />\n";
+
+		set_upgrade_checkpoint( '9700' );
 	}
 
 
+	if( $old_db_version < 9800 )
+	{	// 2.5.0
+		echo 'Upgrading blogs table... ';
+		$query = "ALTER TABLE T_blogs
+							DROP COLUMN blog_commentsexpire";
+		$DB->query( $query );
+		echo "OK.<br />\n";
 
-	// 2.5
-	echo 'Upgrading blogs table... ';
-	/*
-	$query = "ALTER TABLE T_blogs
-						DROP COLUMN blog_commentsexpire";
-	$DB->query( $query );
-	*/
-	echo "OK.<br />\n";
+		echo 'Upgrading items table... ';
+		$DB->query( "ALTER TABLE T_items__item
+					CHANGE COLUMN post_order post_order DOUBLE NULL,
+					ADD COLUMN post_double1   DOUBLE NULL COMMENT 'Custom double value 1' AFTER post_priority,
+					ADD COLUMN post_double2   DOUBLE NULL COMMENT 'Custom double value 2' AFTER post_double1,
+					ADD COLUMN post_double3   DOUBLE NULL COMMENT 'Custom double value 3' AFTER post_double2,
+					ADD COLUMN post_double4   DOUBLE NULL COMMENT 'Custom double value 4' AFTER post_double3,
+					ADD COLUMN post_double5   DOUBLE NULL COMMENT 'Custom double value 5' AFTER post_double4,
+					ADD COLUMN post_varchar1  VARCHAR(255) NULL COMMENT 'Custom varchar value 1' AFTER post_double5,
+					ADD COLUMN post_varchar2  VARCHAR(255) NULL COMMENT 'Custom varchar value 2' AFTER post_varchar1,
+					ADD COLUMN post_varchar3  VARCHAR(255) NULL COMMENT 'Custom varchar value 3' AFTER post_varchar2" );
+		echo "OK.<br />\n";
 
-	/*
-	echo 'Upgrading blogs table... ';
-	$DB->query( "ALTER TABLE T_items__item
-				CHANGE COLUMN post_order post_order DOUBLE NULL,
-				ADD COLUMN post_double1   DOUBLE NULL COMMENT 'Custom double value 1' AFTER post_priority,
-				ADD COLUMN post_double2   DOUBLE NULL COMMENT 'Custom double value 2' AFTER post_double1,
-				ADD COLUMN post_double3   DOUBLE NULL COMMENT 'Custom double value 3' AFTER post_double2,
-				ADD COLUMN post_double4   DOUBLE NULL COMMENT 'Custom double value 4' AFTER post_double3,
-				ADD COLUMN post_double5   DOUBLE NULL COMMENT 'Custom double value 5' AFTER post_double4,
-				ADD COLUMN post_varchar1  VARCHAR(255) NULL COMMENT 'Custom varchar value 1' AFTER post_double5,
-				ADD COLUMN post_varchar2  VARCHAR(255) NULL COMMENT 'Custom varchar value 2' AFTER post_varchar1,
-				ADD COLUMN post_varchar3  VARCHAR(255) NULL COMMENT 'Custom varchar value 3' AFTER post_varchar2" );
-	echo "OK.<br />\n";
-	*/
+		echo 'Upgrading hitlog table... ';
+		$query = "ALTER TABLE T_hitlog
+							CHANGE COLUMN hit_ID hit_ID               INT(11) UNSIGNED NOT NULL AUTO_INCREMENT";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+
+		echo 'Upgrading sessions table... ';
+		$DB->query( "ALTER TABLE T_sessions
+					ALTER COLUMN sess_lastseen SET DEFAULT '2000-01-01 00:00:00'?
+					ADD COLUMN sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER sess_key" );
+		echo "OK.<br />\n";
+
+		echo 'Creating goal tracking table... ';
+    $DB->query( "CREATE TABLE T_track__goal(
+            goal_ID       int(10) unsigned NOT NULL auto_increment,
+            goal_name     varchar(50) default NULL,
+            PRIMARY KEY  (goal_ID)
+          )" );
+
+    $DB->query( "CREATE TABLE T_track__goalhit (
+            ghit_ID int(10) unsigned NOT NULL auto_increment,
+            ghit_goal_ID int(10) unsigned NOT NULL,
+            ghit_sess_ID int(10) unsigned NOT NULL,
+            ghit_params varchar(2000) default NULL,
+            PRIMARY KEY  (ghit_ID),
+            KEY ghit_goal_ID (ghit_goal_ID),
+            KEY ghit_sess_ID (ghit_sess_ID)
+         )" );
+		echo "OK.<br />\n";
+
+	}
+
 
 	/*
 	 * ADD UPGRADES HERE.
@@ -2202,6 +2235,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.247  2008/02/19 11:11:20  fplanque
+ * no message
+ *
  * Revision 1.246  2008/02/10 00:58:57  fplanque
  * no message
  *

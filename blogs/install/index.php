@@ -109,6 +109,7 @@ header('Content-Type: text/html; charset='.$io_charset);
 	<!-- InstanceBeginEditable name="doctitle" -->
 	<title><?php echo T_('b2evo installer').( $title ? ': '.$title : '' ) ?></title>
 	<!-- InstanceEndEditable -->
+	<meta name="viewport" content="width = 750" />
 	<link href="../rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
 	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" -->
@@ -709,8 +710,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 
 	<!-- InstanceBeginEditable name="BodyFoot" -->
 	<?php
+		// We need to manually call debug_info since there is no shutdown function registered during the install process.
 		debug_info(); // output debug info if requested
-	// the following comment gets checked in the automatic install script of demo.b2evolution.net:
+		// the following comment gets checked in the automatic install script of demo.b2evolution.net:
 ?>
 <!-- b2evo-install-end -->
 	<!-- InstanceEndEditable -->
@@ -721,6 +723,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.144  2008/02/19 11:11:20  fplanque
+ * no message
+ *
  * Revision 1.143  2008/02/07 00:35:52  fplanque
  * cleaned up install
  *

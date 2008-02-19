@@ -55,7 +55,7 @@ function trackback_response( $error = 0, $error_message = '' )
 	echo "<error>$error</error>\n";
 	echo "<message>$error_message</message>\n";
 	echo "</response>";
-	exit();
+	exit(0);
 }
 
 // statuses allowed for acting on:
@@ -207,6 +207,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.64  2008/02/19 11:11:16  fplanque
+ * no message
+ *
  * Revision 1.63  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *

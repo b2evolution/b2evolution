@@ -24,9 +24,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 					&bull;
 					<a href="'.$baseurl.'">'.T_('Exit to blogs').'</a>';
 	?></p>
-	<?php debug_info(); ?>
 </body>
 </html>
 <?php
-	exit;
+	exit(0);
 ?>

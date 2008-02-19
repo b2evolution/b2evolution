@@ -191,7 +191,7 @@ if( empty($ads_list_path) )
 	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 	$AdminUI->disp_body_top();
 	$AdminUI->disp_global_footer();
-	exit();
+	exit(0);
 }
 
 
@@ -551,7 +551,7 @@ switch( $action )
 		}
 
 		$zipfile->download_file();
-		exit;
+		exit(0);
 		/* EXITED! */
 
 
@@ -1481,6 +1481,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2008/02/19 11:11:17  fplanque
+ * no message
+ *
  * Revision 1.12  2008/02/04 13:57:50  fplanque
  * wording
  *

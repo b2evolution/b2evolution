@@ -61,7 +61,7 @@ if( $is_cli )
 
 				default:
 					echo 'Invalid option "'.$v.'". Use "-h" or "--help" for a list of options.'."\n";
-					exit(1);
+					die(1);
 			}
 		}
 	}
@@ -193,8 +193,6 @@ if( ! $is_cli )
 	echo '<p>This page should refresh automatically in 15 seconds...</p>';
 	echo '<!-- This is invalid HTML but it is SOOOOOO helpful! (Delay will be triggered when we reach that point -->';
 	echo '<meta http-equiv="Refresh" content="15" />';
-
-	debug_info();
 	?>
 	</body>
 	</html>
@@ -203,6 +201,9 @@ if( ! $is_cli )
 
 /*
  * $Log$
+ * Revision 1.16  2008/02/19 11:11:15  fplanque
+ * no message
+ *
  * Revision 1.15  2008/01/19 17:27:06  blueyed
  * todo
  *

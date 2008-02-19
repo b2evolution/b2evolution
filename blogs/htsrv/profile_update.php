@@ -99,8 +99,7 @@ if( $Messages->count('error') )
 	// TODO: dh> these error should get displayed with the profile form itself, or at least there should be a "real HTML page" here (without JS-backlink)
 	$Messages->display( T_('Cannot update profile. Please correct the following errors:'),
 		'[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
-	debug_info();
-	exit;
+	exit(0);
 }
 
 
@@ -146,6 +145,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.53  2008/02/19 11:11:16  fplanque
+ * no message
+ *
  * Revision 1.52  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *

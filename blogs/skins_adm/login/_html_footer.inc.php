@@ -40,13 +40,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	?>
 </p>
 
-<?php debug_info(); ?>
-
 </body>
 </html>
 <?php
 /*
  * $Log$
+ * Revision 1.3  2008/02/19 11:11:24  fplanque
+ * no message
+ *
  * Revision 1.2  2008/01/21 09:35:43  fplanque
  * (c) 2008
  *

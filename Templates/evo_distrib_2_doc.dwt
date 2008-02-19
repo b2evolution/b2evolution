@@ -4,6 +4,7 @@
 	<!-- InstanceBeginEditable name="doctitle" -->
 	<title>b2evolution</title>
 	<!-- InstanceEndEditable -->
+	<meta name="viewport" content="width = 750" />
 	<link href="../blogs/rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- InstanceBeginEditable name="head" --><!-- TemplateBeginEditable name="head" --><!-- TemplateEndEditable --><!-- InstanceEndEditable -->
 	<!-- InstanceParam name="lang" type="text" value="en-US" passthrough="true" --> 
@@ -14,7 +15,7 @@
 
 	<div class="wrapper1">
 	<div class="wrapper2">
-		<span class="version_top"><!-- InstanceBeginEditable name="Version" -->{{{Version}}} 2.4.0-rc2<!-- TemplateBeginEditable name="Version2" --><!-- TemplateEndEditable --><!-- InstanceEndEditable --></span>	
+		<span class="version_top"><!-- InstanceBeginEditable name="Version" -->{{{Version}}} 2.5.0-beta<!-- TemplateBeginEditable name="Version2" --><!-- TemplateEndEditable --><!-- InstanceEndEditable --></span>	
 	
 		<a href="http://b2evolution.net/" target="_blank"><img src="../blogs/rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
 		

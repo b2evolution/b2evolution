@@ -134,7 +134,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 	}
 
 	header( 'Location: '.$redirect_to, true, $status ); // explictly setting the status is required for (fast)cgi
-	exit();
+	exit(0);
 }
 
 
@@ -657,6 +657,9 @@ function star_rating( $stars )
 
 /*
  * $Log$
+ * Revision 1.17  2008/02/19 11:11:17  fplanque
+ * no message
+ *
  * Revision 1.16  2008/02/12 04:59:01  fplanque
  * more custom field handling
  *

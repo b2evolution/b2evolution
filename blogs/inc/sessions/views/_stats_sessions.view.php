@@ -27,33 +27,27 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $blog, $admin_url, $rsc_url;
 
+/**
+ * View funcs
+ */
+require_once dirname(__FILE__).'/_stats_view.funcs.php';
+
 // Create result set:
 $sql = 'SELECT user_login, COUNT( sess_ID ) AS nb_sessions, MAX( sess_lastseen ) AS sess_lastseen
 					FROM T_sessions LEFT JOIN T_users ON sess_user_ID = user_ID
-				 GROUP BY user_login';
+					GROUP BY sess_user_ID';
 
-$count_sql = 'SELECT COUNT( DISTINCT(user_login) )
-								FROM T_sessions LEFT JOIN T_users ON sess_user_ID = user_ID';
+$count_sql = 'SELECT COUNT( DISTINCT(sess_user_ID) )
+								FROM T_sessions';
 
 $Results = & new Results( $sql, 'usess_', '-D', 20, $count_sql );
 
-$Results->title = T_('Latest sessions');
+$Results->title = T_('Recent sessions');
 
-function stat_session_login( $login )
-{
-	if( empty($login) )
-	{
-		return T_('Anonymous');
-	}
-	else
-	{
-		return '<strong>'.$login.'</strong>';
-	}
-}
 $Results->cols[] = array(
 						'th' => T_('User login'),
 						'order' => 'user_login',
-						'td' => '%stat_session_login( #user_login# )%',
+						'td' => '%stat_session_login( #user_login#, true )%',
 					);
 
 $Results->cols[] = array(
@@ -77,7 +71,7 @@ $Results->display();
 
 /*
  * $Log$
- * Revision 1.3  2008/02/18 20:22:40  fplanque
+ * Revision 1.4  2008/02/19 11:11:19  fplanque
  * no message
  *
  * Revision 1.2  2008/01/21 09:35:34  fplanque

@@ -29,6 +29,5 @@ header('Content-Type: text/html; charset=iso-8859-1'); // no translation
 	</body>
 </html>
 <?php
-	debug_info();
-	exit;
+	exit(0);
 ?>

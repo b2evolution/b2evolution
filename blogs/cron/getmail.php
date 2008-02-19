@@ -22,8 +22,7 @@ require_once $inc_path.'_main.inc.php';
 if( !$Settings->get('eblog_enabled') )
 {
 	echo T_('Blog by email feature is not enabled.');
-	debug_info();
-	exit();
+	exit(0);
 }
 
 
@@ -103,7 +102,7 @@ switch ( $Settings->get('eblog_method') )
 		if( !$pop3->connect( $Settings->get('eblog_server_host'), $port ) )
 		{
 			echo T_('Connection failed: ').$pop3->ERROR." <br />\n";
-			exit;
+			exit(0);
 		}
 
 		echo T_('Logging into pop server...'), "<br />\n";
@@ -112,14 +111,14 @@ switch ( $Settings->get('eblog_method') )
 		{
 			echo T_('No mail or Login Failed:'), " $pop3->ERROR <br />\n";
 			$pop3->quit();
-			exit;
+			exit(0);
 		}
 
 		if ( $test_type == 1 )
 		{
 			echo '<br /><br />' . T_('All Tests complete');
 			$pop3->quit();
-			exit;
+			exit(0);
 		}
 
 		// ONLY USE THIS IF YOUR PHP VERSION SUPPORTS IT! (PHP >= 3.0.4)
@@ -133,7 +132,7 @@ switch ( $Settings->get('eblog_method') )
 			{
 				echo $pop3->ERROR, "<br />\n";
 				$pop3->quit();
-				exit;
+				exit(0);
 			}
 
 			echo T_('Processing...'), "<br />\n";
@@ -346,7 +345,7 @@ switch ( $Settings->get('eblog_method') )
 			{
 				echo '<p>', $pop3->ERROR, '</p></div>';
 				$pop3->reset();
-				exit;
+				exit(0);
 			}
 			else
 			{
@@ -369,7 +368,7 @@ switch ( $Settings->get('eblog_method') )
 		$pop3->quit();
 
 		timer_stop($output_debugging_info);
-		exit;
+		exit(0);
 
 	break;
 
@@ -382,7 +381,7 @@ switch ( $Settings->get('eblog_method') )
 		if( ! extension_loaded('imap') )
 		{
 			echo T_('The php_imap extension is not available to php on this server. Please configure a different email retrieval method on the Features tab.');
-			exit;
+			exit(0);
 		}
 
 		echo_message( '&bull; ' . T_('Connecting and authenticating to mail server') );
@@ -404,7 +403,7 @@ switch ( $Settings->get('eblog_method') )
 		{
 			echo '<br /><br />' . T_('All Tests complete');
 			imap_close($mbox);
-			exit();
+			exit(0);
 		}
 
 
@@ -607,7 +606,7 @@ switch ( $Settings->get('eblog_method') )
 			{
 				echo '<p>', $pop3->ERROR, '</p></div>';
 				$pop3->reset();
-				exit;
+				exit(0);
 			}
 			else
 			{

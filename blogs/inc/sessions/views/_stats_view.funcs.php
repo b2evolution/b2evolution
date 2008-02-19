@@ -62,8 +62,29 @@ function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
 }
 
 
+
+function stat_session_login( $login, $link = false )
+{
+	if( empty($login) )
+	{
+		return '<span class="note">'.T_('Anon.').'</span>';
+	}
+	elseif( $link )
+	{
+		return '<strong><a href="?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;user='.$login.'">'.$login.'</a></strong>';
+	}
+	else
+	{
+		return '<strong>'.$login.'</strong>';
+	}
+}
+
+
 /*
  * $Log$
+ * Revision 1.3  2008/02/19 11:11:19  fplanque
+ * no message
+ *
  * Revision 1.2  2008/01/21 09:35:34  fplanque
  * (c) 2008
  *

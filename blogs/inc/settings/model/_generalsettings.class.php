@@ -65,6 +65,7 @@ class GeneralSettings extends AbstractSettings
 
 		'log_public_hits' => '1',
 		'log_admin_hits' => '0',
+		'log_spam_hits' => '0',
 		'auto_prune_stats_mode' => 'page',  // 'page' is the safest mode for average installs (may be "off", "page" or "cron")
 		'auto_prune_stats' => '15',         // days (T_hitlog and T_sessions)
 
@@ -157,6 +158,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.8  2008/02/19 11:11:19  fplanque
+ * no message
+ *
  * Revision 1.7  2008/01/21 09:35:34  fplanque
  * (c) 2008
  *

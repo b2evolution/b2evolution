@@ -280,6 +280,7 @@ margin: 0 auto;
 width: 760px;
 clear: both;
 color: #999;
+-webkit-text-size-adjust: none; /* iPhone */
 }
 
 #footer a {

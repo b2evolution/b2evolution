@@ -14,9 +14,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Trigger plugin event, which could be used e.g. by a google_analytics plugin to add the javascript snippet here:
 $Plugins->trigger_event('SkinEndHtmlBody');
-
-$Hit->log();	// log the hit on this page
-debug_info(); // output debug info if requested
 ?>
 
 <!-- End of skin_wrapper -->

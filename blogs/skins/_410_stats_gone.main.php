@@ -20,11 +20,8 @@ header('Content-Type: text/html; charset=iso-8859-1'); // no translation
 	<body>
 		<h1>410 Gone</h1>
 		<p><?php echo $app_name ?> does no longer publish referer statistics publicly in order not to attract spam robots.</p>
-		<?php
-			debug_info();
-		?>
 	</body>
 </html>
 <?php
- 	exit;		// Note: this is NOT a crash. There should be no dying here!
+ 	exit(0);		// Note: this is NOT a crash. There should be no dying here!
 ?>

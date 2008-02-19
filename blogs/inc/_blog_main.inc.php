@@ -285,13 +285,7 @@ if( $resolve_extra_path )
 param( 'p', 'integer', '', true );              // Specific post number to display
 param( 'title', 'string', '', true );						// urtitle of post to display
 param( 'redir', 'string', 'yes', false );				// Do we allow redirection to canonical URL? (allows to force a 'single post' URL for commenting)
-
 param( 'preview', 'integer', 0, true );         // Is this preview ?
-if( $preview )
-{ // Ignore this hit
-	$Hit->ignore = true;
-}
-
 param( 'stats', 'integer', 0 );									// Deprecated but might still be used by spambots
 param( 'disp', 'string', 'posts', true );
 
@@ -341,6 +335,8 @@ if( $stats || $disp == 'stats' )
 elseif( !empty($preview) )
 {	// Preview
 	$disp = 'single';
+	// Consider this as an admin hit!
+	$Hit->referer_type = 'admin';
 }
 elseif( $disp == 'posts' && !empty($Item) )
 { // We are going to display a single post
@@ -502,9 +498,6 @@ if( !empty( $skin ) )
 			require $ads_current_skin_path.'index.main.php';
 		}
 	}
-
-	// log the hit on this page (in case the skin hasn't already done so)
-	$Hit->log();
 }
 else
 {	// We don't use a skin. Hopefully the caller will do some displaying.
@@ -517,6 +510,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.95  2008/02/19 11:11:16  fplanque
+ * no message
+ *
  * Revision 1.94  2008/02/11 23:48:14  fplanque
  * tag URL decoding fux
  *

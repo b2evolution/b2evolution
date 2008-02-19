@@ -33,6 +33,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <head>
 	<title><?php echo $app_shortname.' &rsaquo; '.$page_title ?></title>
 	<meta name="ROBOTS" content="NOINDEX" />
+	<meta name="viewport" content="width = 600" />
 	<link href="<?php echo $rsc_url ?>css/login.css" rel="stylesheet" type="text/css" />
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 </head>
@@ -59,6 +60,9 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
+ * Revision 1.6  2008/02/19 11:11:24  fplanque
+ * no message
+ *
  * Revision 1.5  2008/01/21 09:35:43  fplanque
  * (c) 2008
  *

@@ -322,6 +322,7 @@ textarea.field_error {
 	padding: 4px 6px 0 6px;
 	height: 18px;
 	font-weight: bold;
+	-webkit-text-size-adjust: none; /* iPhone */
 }
 .fieldset_title .action_icon {
 	font-size: 84%;

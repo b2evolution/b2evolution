@@ -47,7 +47,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 /**
  * A session tracks a given user (not necessarily logged in) while he's navigating the site.
- * A sessions also stores data for the length of the session.
+ * A session also stores data for the length of the session.
  *
  * Sessions are tracked with a cookie containing the session ID.
  * The cookie also contains a random key to prevent sessions hacking.
@@ -97,6 +97,9 @@ class Session
 
 	/**
 	 * Constructor
+	 *
+	 * If valid session cookie received: pull session from DB
+	 * Otherwise, INSERT a session into DB
 	 */
 	function Session()
 	{
@@ -197,11 +200,11 @@ class Session
 
 
 		if( $this->ID )
-		{ // there was a valid session before; update data (lastseen)
+		{ // there was a valid session before; data needs to be updated at page exit (lastseen)
 			$this->_session_needs_save = true;
 		}
 		else
-		{ // create a new session
+		{ // create a new session! :
 			$this->key = generate_random_key(32);
 
 			// We need to INSERT now because we need an ID now! (for the cookie)
@@ -221,8 +224,6 @@ class Session
 			$Debuglog->add( 'ID (generated): '.$this->ID, 'session' );
 			$Debuglog->add( 'Cookie sent.', 'session' );
 		}
-
-		register_shutdown_function( array( & $this, 'dbsave' ) );
 	}
 
 
@@ -406,8 +407,6 @@ class Session
 
 	/**
 	 * Updates session data in database.
-	 *
-	 * Note: The key actually only needs to be updated on a logout.
 	 */
 	function dbsave()
 	{
@@ -415,18 +414,28 @@ class Session
 
 		if( ! $this->_session_needs_save )
 		{	// There have been no changes since the last save.
+			$Debuglog->add( 'Session is up to date and does not need to be saved.', 'session' );
 			return false;
 		}
 
 		$sess_data = empty($this->_data) ? NULL : serialize($this->_data);
-		$DB->query( "
-			UPDATE T_sessions SET
+
+	 	// Note: The key actually only needs to be updated on a logout.
+	 	// Note: we increase the hitcoutn every time. That assumes that there will be no 2 calls for a single hit.
+	 	//       Anyway it is not a big problem if this number is approximate.
+		$sql = "UPDATE T_sessions SET
+				sess_hitcount = sess_hitcount + 1,
+				sess_lastseen = '".date( 'Y-m-d H:i:s', $localtimenow )."',
 				sess_data = ".$DB->quote( $sess_data ).",
 				sess_ipaddress = '".$Hit->IP."',
-				sess_key = ".$DB->quote( $this->key ).",
-				sess_lastseen = '".date( 'Y-m-d H:i:s', $localtimenow )."',
-				sess_user_ID = ".$DB->null( $this->user_ID )."
-			WHERE sess_ID = ".$this->ID, 'Session::dbsave()' );
+				sess_key = ".$DB->quote( $this->key );
+		if( !is_null($this->user_ID) )
+		{	// We do NOT erase existing IDs at logout. We only want to set IDs at login:
+				$sql .= ", sess_user_ID = ".$this->user_ID;
+		}
+		$sql .= "	WHERE sess_ID = ".$this->ID;
+
+		$DB->query( $sql, 'Session::dbsave()' );
 
 		$Debuglog->add( 'Session data saved!', 'session' );
 
@@ -533,6 +542,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.3  2008/02/19 11:11:18  fplanque
+ * no message
+ *
  * Revision 1.2  2008/01/21 09:35:33  fplanque
  * (c) 2008
  *

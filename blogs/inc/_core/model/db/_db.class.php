@@ -413,7 +413,7 @@ class DB
 
 		if( $debug )
 		{ // Force MySQL strict mode
-			//As  Austriaco pointed on the forum (http://forums.b2evolution.net/viewtopic.php?p=68443&sid=4cdc713d2476800d5faf64062f72a988), 
+			//As  Austriaco pointed on the forum (http://forums.b2evolution.net/viewtopic.php?p=68443), 
 			//TRADITIONAL mode is only available to mysql > 5.0.22 . 
 			$mysql_version = $this->get_version();
 			if( version_compare( $mysql_version, '5.0.2' ) > 0 )
@@ -1413,6 +1413,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.7  2008/02/19 11:11:17  fplanque
+ * no message
+ *
  * Revision 1.6  2008/02/15 12:50:40  waltercruz
  * Verifying if MySQL version is greater than 5.0.2 to set the SQL Mode  to TRADITIONAL
  *

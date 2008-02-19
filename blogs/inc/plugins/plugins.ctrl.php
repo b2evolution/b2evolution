@@ -809,8 +809,7 @@ switch( $action )
 		if( $action == 'disp_help_plain' )
 		{ // display it now and exit:
 			readfile($help_file);
-			debug_info();
-			exit();
+			exit(0);
 		}
 
 		$title = sprintf( T_('Help for plugin &laquo;%s&raquo;'), '<a href="admin.php?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$edit_Plugin->ID.'">'.$edit_Plugin->name.'</a>' );
@@ -1040,6 +1039,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2008/02/19 11:11:18  fplanque
+ * no message
+ *
  * Revision 1.5  2008/01/21 09:35:32  fplanque
  * (c) 2008
  *

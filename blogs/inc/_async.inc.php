@@ -47,6 +47,8 @@ if( !empty($set_target) )
 		case 'refdom_filters':	// referring domains
 		case 'uagnt_filters':	// user agents
 		case 'user_filters':
+		case 'sess_filters':
+		case 'hits_filters':
 			// We have a valid value:
 			$Session->set( $set_target, $set_status );
 			break;
@@ -60,6 +62,9 @@ if( !empty($set_target) )
 
 /*
  * $Log$
+ * Revision 1.11  2008/02/19 11:11:16  fplanque
+ * no message
+ *
  * Revision 1.10  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *

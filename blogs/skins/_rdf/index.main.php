@@ -25,7 +25,7 @@ if( $feed_content == 'none' )
 {	// We don't want to provide this feed!
 	global $skins_path;
 	require $skins_path.'_404_not_found.main.php';
-	exit();
+	exit(0);
 }
 
 
@@ -244,8 +244,6 @@ while( $Item = & mainlist_get_item() )
 ?>
 </rdf:RDF>
 <?php
-	$Hit->log(); // log the hit on this page
-
 	// This is a self contained XML document, make sure there is no additional output:
-	exit();
+	exit(0);
 ?>

@@ -349,3 +349,15 @@ div.seo_message {
 li.collection_select {
 	padding: 0 1ex;
 }
+
+div.menu3 {
+	margin-bottom: 1em;
+}
+div.menu3 .option3,
+div.menu3 .current {
+	margin-left: 1em;
+	font-weight: bold;
+}
+div.menu3 .current a {
+	color: #f00;
+}
