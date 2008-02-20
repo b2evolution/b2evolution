@@ -84,7 +84,7 @@ if( param( 'root_and_path', 'string', '', false ) /* not memorized (default) */ 
 else
 {
 	param( 'root', 'string', NULL, true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
-	param( 'path', 'string', '/', true );  // the path relative to the root dir
+	param( 'path', 'string', '', true );  // the path relative to the root dir
 	if( param( 'new_root', 'string', '' )
 		&& $new_root != $root )
 	{ // We have changed root in the select list
@@ -429,6 +429,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2008/02/20 02:48:25  blueyed
+ * Fix default for "path" param, which is "" and not "/". Fixes double slashes in quick-uploaded files.
+ *
  * Revision 1.7  2008/02/19 11:11:17  fplanque
  * no message
  *
