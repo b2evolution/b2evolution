@@ -402,7 +402,7 @@ function swapSection( data )
  * <code>
  * if( typeof b2evo_Callbacks == "object" )
  * { // add a callback, that lets us insert the
- *   b2evo_Callbacks.register_callback( "insert_raw_into_itemform_post_content", function(value) {
+ *   b2evo_Callbacks.register_callback( "wrap_selection_for_itemform_post_content", function(value) {
  *       tinyMCE.execCommand( "mceInsertRawHTML", false, value );
  *       return true;
  *     } );
@@ -414,7 +414,7 @@ function swapSection( data )
  *
  * if( typeof b2evo_Callbacks == 'object' )
  * { // see if there's a callback registered that should handle this:
- *   if( b2evo_Callbacks.trigger_callback("insert_raw_into_"+b2evoCanvas.id, tag) )
+ *   if( b2evo_Callbacks.trigger_callback("wrap_selection_for_"+b2evoCanvas.id, tag) )
  *   {
  *     return;
  *   }
@@ -476,6 +476,9 @@ var b2evo_Callbacks = new b2evo_Callbacks();
 
 /*
  * $Log$
+ * Revision 1.31  2008/02/20 02:08:49  blueyed
+ * doc
+ *
  * Revision 1.30  2007/09/16 22:06:37  fplanque
  * minor
  *
