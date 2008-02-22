@@ -482,7 +482,12 @@ function require_css( $css_file, $relative_to_base = FALSE, $title = NULL, $medi
 
 
 /**
- *
+ * Add a headline, which then gets output in the HTML HEAD section.
+ * If you want to include CSS or JavaScript files, please use
+ * {@link require_css()} and {@link require_js()} instead.
+ * This avoids duplicates and allows caching/concatenating those files
+ * later (not implemented yet)
+ * @param string
  */
 function add_headline($headline)
 {
@@ -492,7 +497,9 @@ function add_headline($headline)
 
 
 /**
- *
+ * Outputs the collected HTML HEAD lines.
+ * @see add_headline()
+ * @return string
  */
 function include_headlines()
 {
@@ -657,6 +664,9 @@ function star_rating( $stars )
 
 /*
  * $Log$
+ * Revision 1.18  2008/02/22 00:39:29  blueyed
+ * doc
+ *
  * Revision 1.17  2008/02/19 11:11:17  fplanque
  * no message
  *
