@@ -128,23 +128,26 @@ function skin_init( $disp )
 						// echo 'SINGLE CAT PAGE';
 						if( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
 						{ // Check if the URL was canonical:
-					    if( !isset( $Chapter ) )
-					    {
+							if( !isset( $Chapter ) )
+							{
 								$ChapterCache = & get_Cache( 'ChapterCache' );
-                /**
+								/**
 								 * @var Chapter
 								 */
 								$Chapter = & $ChapterCache->get_by_ID( $MainList->filters['cat_array'][0], false );
-					    }
-							$canoncical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
-							if( $ReqHost.$ReqURI != $canoncical_url )
-							{
-								// REDIRECT TO THE CANONICAL URL:
-								// fp> TODO: we're going to lose the additional params, it would be better to keep them...
-								// fp> what additional params actually?
-								header_redirect( $canoncical_url, true );
 							}
-					  }
+							if( $Chapter )
+							{
+								$canoncical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
+								if( $ReqHost.$ReqURI != $canoncical_url )
+								{
+									// REDIRECT TO THE CANONICAL URL:
+									// fp> TODO: we're going to lose the additional params, it would be better to keep them...
+									// fp> what additional params actually?
+									header_redirect( $canoncical_url, true );
+								}
+							}
+						}
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'tags', 'posts', 'page' ) ) == array() )
@@ -511,6 +514,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.25  2008/02/25 19:49:04  blueyed
+ * Fix E_FATAL for invalid category ID and "canonical_cat_urls"; fix indenting
+ *
  * Revision 1.24  2008/01/21 09:35:34  fplanque
  * (c) 2008
  *
