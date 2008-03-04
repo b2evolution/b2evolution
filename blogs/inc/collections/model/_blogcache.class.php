@@ -114,18 +114,18 @@ class BlogCache extends DataObjectCache
 		$req_url_wo_proto = substr( $req_url, strpos( $req_url, '://' ) ); // req_url without protocol, so it matches http and https below
 
 		$sql = 'SELECT *
-						  FROM T_blogs
-						 WHERE ( blog_access_type = "absolute"
-									    AND ( '.$DB->quote('http'.$req_url_wo_proto).' LIKE CONCAT( blog_siteurl, "%" )
-								          OR '.$DB->quote('https'.$req_url_wo_proto).' LIKE CONCAT( blog_siteurl, "%" ) ) )
-								OR ( blog_access_type = "subdom"
-											AND '.$DB->quote($req_url_wo_proto).' LIKE CONCAT( "://", blog_urlname, ".'.$basedomain.'/%" ) )';
+			  FROM T_blogs
+			 WHERE ( blog_access_type = "absolute"
+			         AND ( '.$DB->quote('http'.$req_url_wo_proto).' LIKE CONCAT( blog_siteurl, "%" )
+		                 OR '.$DB->quote('https'.$req_url_wo_proto).' LIKE CONCAT( blog_siteurl, "%" ) ) )
+			    OR ( blog_access_type = "subdom"
+			         AND '.$DB->quote($req_url_wo_proto).' LIKE CONCAT( "://", blog_urlname, ".'.$basedomain.'/%" ) )';
 
 		// Match stubs like "http://base/url/STUB?param=1" on $baseurl
 		/*
 		if( preg_match( "#^$baseurl([^/?]+)#", $req_url, $match ) )
 		{
-			$sql .= "\n OR ( blog_access_type = 'stub' AND blog_stub = '".$match[1]."' )";
+			$sql .= "\n OR ( blog_access_type = 'stub' AND blog_stub = ".$DB->quote($match[1])." )";
 		}
 		*/
 
@@ -357,6 +357,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.4  2008/03/04 22:27:43  blueyed
+ * MFB: Fix SQL injection through requested URL (commented out?!); fix indent
+ *
  * Revision 1.3  2008/01/21 09:35:26  fplanque
  * (c) 2008
  *
