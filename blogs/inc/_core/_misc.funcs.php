@@ -1697,7 +1697,7 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  * @param string TITLE text (IMG and A link)
  * @param string icon code for {@link get_icon()}
  * @param string URL where the icon gets linked to (empty to not wrap the icon in a link)
- * @param string word to be displayed after icon
+ * @param string word to be displayed after icon (if no icon gets displayed, $title will be used instead!)
  * @param integer 1-5: weight of the icon. the icon will be displayed only if its weight is >= than the user setting threshold
  *                     Use 5, if it's a required icon - all others could get disabled by the user.
  * @param integer 1-5: weight of the word. the word will be displayed only if its weight is >= than the user setting threshold
@@ -2611,6 +2611,9 @@ function generate_link_from_params( $link_params )
 
 /*
  * $Log$
+ * Revision 1.22  2008/03/06 22:41:19  blueyed
+ * MFB: doc
+ *
  * Revision 1.21  2008/02/19 11:11:17  fplanque
  * no message
  *
