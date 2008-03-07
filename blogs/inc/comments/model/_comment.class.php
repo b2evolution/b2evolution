@@ -556,7 +556,7 @@ class Comment extends DataObject
 		$this->get_Item();
 
 		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
-		{ // If User has no permission to edit comments:
+		{ // If User has permission to edit comments:
 			return false;
 		}
 
@@ -602,7 +602,7 @@ class Comment extends DataObject
 		$this->get_Item();
 
 		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
-		{ // If User has permission to edit comments:
+		{ // If User has no permission to edit comments:
 			return false;
 		}
 
@@ -1326,6 +1326,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2008/03/07 00:54:29  blueyed
+ * doc
+ *
  * Revision 1.15  2008/02/10 00:58:56  fplanque
  * no message
  *
