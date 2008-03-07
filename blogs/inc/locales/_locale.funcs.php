@@ -959,12 +959,15 @@ function init_charsets( $req_io_charset )
 	$Debuglog->add( 'evo_charset: '.$evo_charset, 'locale' );
 	$Debuglog->add( 'io_charset: '.$io_charset, 'locale' );
 
-       return true;
+	return true;
 }
 
 
 /*
  * $Log$
+ * Revision 1.8  2008/03/07 02:04:45  blueyed
+ * fix indent again
+ *
  * Revision 1.7  2008/03/07 00:54:42  blueyed
  * indent
  *
