@@ -115,8 +115,8 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 $CommentList = & new CommentList( NULL, implode(',', $type_list), array('published'), $Item->ID, '', 'ASC' );
 
 $CommentList->display_if_empty( array(
-		'msg_empty' => sprintf( /* TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST... */
-												T_('No %s for this post yet...'), implode( "/", $disp_title) ),
+		'msg_empty' => sprintf( /* TRANS: NO comments/trackbacks/pingbacks/ FOR THIS POST... */
+				T_('No %s for this post yet...'), implode( "/", $disp_title) ),
 	 ) );
 
 while( $Comment = & $CommentList->get_next() )
