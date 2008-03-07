@@ -83,6 +83,8 @@ function db_index_exists( $table, $index_name )
 
 
 /**
+ * @string Table name
+ * @array Column names
  * @return boolean Does a list of given column names exist in DB?
  */
 function db_cols_exist( $table, $col_names )
@@ -2067,34 +2069,32 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 9800 )
 	{	// 2.5.0
 		echo 'Upgrading blogs table... ';
-		$query = "ALTER TABLE T_blogs
-							DROP COLUMN blog_commentsexpire";
-		$DB->query( $query );
+		db_drop_col( 'T_blogs', 'blog_commentsexpire' );
 		echo "OK.<br />\n";
 
 		echo 'Upgrading items table... ';
 		$DB->query( "ALTER TABLE T_items__item
-					CHANGE COLUMN post_order post_order DOUBLE NULL,
-					ADD COLUMN post_double1   DOUBLE NULL COMMENT 'Custom double value 1' AFTER post_priority,
-					ADD COLUMN post_double2   DOUBLE NULL COMMENT 'Custom double value 2' AFTER post_double1,
-					ADD COLUMN post_double3   DOUBLE NULL COMMENT 'Custom double value 3' AFTER post_double2,
-					ADD COLUMN post_double4   DOUBLE NULL COMMENT 'Custom double value 4' AFTER post_double3,
-					ADD COLUMN post_double5   DOUBLE NULL COMMENT 'Custom double value 5' AFTER post_double4,
-					ADD COLUMN post_varchar1  VARCHAR(255) NULL COMMENT 'Custom varchar value 1' AFTER post_double5,
-					ADD COLUMN post_varchar2  VARCHAR(255) NULL COMMENT 'Custom varchar value 2' AFTER post_varchar1,
-					ADD COLUMN post_varchar3  VARCHAR(255) NULL COMMENT 'Custom varchar value 3' AFTER post_varchar2" );
+			CHANGE COLUMN post_order post_order DOUBLE NULL,
+			ADD COLUMN post_double1   DOUBLE NULL COMMENT 'Custom double value 1' AFTER post_priority,
+			ADD COLUMN post_double2   DOUBLE NULL COMMENT 'Custom double value 2' AFTER post_double1,
+			ADD COLUMN post_double3   DOUBLE NULL COMMENT 'Custom double value 3' AFTER post_double2,
+			ADD COLUMN post_double4   DOUBLE NULL COMMENT 'Custom double value 4' AFTER post_double3,
+			ADD COLUMN post_double5   DOUBLE NULL COMMENT 'Custom double value 5' AFTER post_double4,
+			ADD COLUMN post_varchar1  VARCHAR(255) NULL COMMENT 'Custom varchar value 1' AFTER post_double5,
+			ADD COLUMN post_varchar2  VARCHAR(255) NULL COMMENT 'Custom varchar value 2' AFTER post_varchar1,
+			ADD COLUMN post_varchar3  VARCHAR(255) NULL COMMENT 'Custom varchar value 3' AFTER post_varchar2" );
 		echo "OK.<br />\n";
 
 		echo 'Upgrading hitlog table... ';
 		$query = "ALTER TABLE T_hitlog
-							CHANGE COLUMN hit_ID hit_ID               INT(11) UNSIGNED NOT NULL AUTO_INCREMENT";
+			CHANGE COLUMN hit_ID hit_ID               INT(11) UNSIGNED NOT NULL AUTO_INCREMENT";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
 		echo 'Upgrading sessions table... ';
 		$DB->query( "ALTER TABLE T_sessions
-					ALTER COLUMN sess_lastseen SET DEFAULT '2000-01-01 00:00:00'?
-					ADD COLUMN sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER sess_key" );
+			ALTER COLUMN sess_lastseen SET DEFAULT '2000-01-01 00:00:00'?
+			ADD COLUMN sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER sess_key" );
 		echo "OK.<br />\n";
 
 		echo 'Creating goal tracking table... ';
@@ -2235,6 +2235,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.248  2008/03/07 02:00:42  blueyed
+ * doc; indent; use db_drop_col
+ *
  * Revision 1.247  2008/02/19 11:11:20  fplanque
  * no message
  *
