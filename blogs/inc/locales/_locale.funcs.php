@@ -125,7 +125,7 @@ elseif( $use_l10n == 2 )
 		if( !isset( $locales[$req_locale]['messages'] ) )
 		{
 			$Debuglog->add( 'No messages file path for locale. $locales["'
-											.$req_locale.'"] is '.var_export( @$locales[$req_locale], true ), 'locale' );
+					.$req_locale.'"] is '.var_export( @$locales[$req_locale], true ), 'locale' );
 			$locales[$req_locale]['messages'] = false;
 		}
 
@@ -959,12 +959,15 @@ function init_charsets( $req_io_charset )
 	$Debuglog->add( 'evo_charset: '.$evo_charset, 'locale' );
 	$Debuglog->add( 'io_charset: '.$io_charset, 'locale' );
 
-  return true;
+       return true;
 }
 
 
 /*
  * $Log$
+ * Revision 1.7  2008/03/07 00:54:42  blueyed
+ * indent
+ *
  * Revision 1.6  2008/02/08 22:24:46  fplanque
  * bugfixes
  *
