@@ -88,7 +88,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 		}
 		elseif( substr($url, 0, 11) == 'javascript:' )
 		{ // javascript:
-			// Basically there could be anythign here
+			// Basically there could be anything here
 			preg_match( '¤^(javascript):¤', $url, $match );
 		}
 		elseif( ! preg_match('~^           # start
@@ -584,6 +584,9 @@ function disp_url( $url, $max_length = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.14  2008/03/09 02:34:26  blueyed
+ * minor: fix typo in comment
+ *
  * Revision 1.13  2008/02/19 11:11:17  fplanque
  * no message
  *
