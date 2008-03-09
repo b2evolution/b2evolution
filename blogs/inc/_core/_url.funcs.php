@@ -91,35 +91,43 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 			// Basically there could be anything here
 			preg_match( '¤^(javascript):¤', $url, $match );
 		}
-		elseif( ! preg_match('~^           # start
-			([a-z][a-z0-9+.\-]*)             # scheme
-			://                              # authorize absolute URLs only ( // not present in clsid: -- problem? ; mailto: handled above)
-			(\w+(:\w+)?@)?                   # username or username and password (optional)
-			( localhost |
-					[a-z0-9]([a-z0-9\-])+            # Don t allow anything too funky like entities
-					\.                               # require at least 1 dot
-					[a-z0-9]([a-z0-9.\-])+           # Don t allow anything too funky like entities
-			)
-			(:[0-9]+)?                       # optional port specification
-			[^ ]*                            # allow no space
-			$~ix', $url, $match) )
-		{ // Cannot validate URL structure
-			$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
-			return $verbose
-				? sprintf( T_('Invalid URL format (%s).'), htmlspecialchars($url) )
-				: T_('Invalid URL format.');
-		}
+		else
+		{
+			// convert URL to IDN:
+			load_funcs('_ext/idna/_idna_convert.class.php');
+			$IDNA = new Net_IDNA_php4();
+			global $evo_charset;
+			$url = $IDNA->encode( convert_charset($url, 'utf-8', $evo_charset) );
 
-		$scheme = strtolower($match[1]);
-		$allowed_uri_schemes = get_allowed_uri_schemes( $context );
-		if( !in_array( $scheme, $allowed_uri_schemes ) )
-		{ // Scheme not allowed
-			$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
-			return $verbose
-				? sprintf( T_('URI scheme "%s" not allowed.'), htmlspecialchars($scheme) )
-				: T_('URI scheme not allowed.');
-		}
+			if( ! preg_match('~^           # start
+				([a-z][a-z0-9+.\-]*)             # scheme
+				://                              # authorize absolute URLs only ( // not present in clsid: -- problem? ; mailto: handled above)
+				(\w+(:\w+)?@)?                   # username or username and password (optional)
+				( localhost |
+						[a-z0-9]([a-z0-9\-])+            # Don t allow anything too funky like entities
+						\.                               # require at least 1 dot
+						[a-z0-9]([a-z0-9.\-])+           # Don t allow anything too funky like entities
+				)
+				(:[0-9]+)?                       # optional port specification
+				[^ ]*                            # allow no space
+				$~ix', $url, $match) )
+			{ // Cannot validate URL structure
+				$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
+				return $verbose
+					? sprintf( T_('Invalid URL format (%s).'), htmlspecialchars($url) )
+					: T_('Invalid URL format.');
+			}
 
+			$scheme = strtolower($match[1]);
+			$allowed_uri_schemes = get_allowed_uri_schemes( $context );
+			if( !in_array( $scheme, $allowed_uri_schemes ) )
+			{ // Scheme not allowed
+				$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
+				return $verbose
+					? sprintf( T_('URI scheme "%s" not allowed.'), htmlspecialchars($scheme) )
+					: T_('URI scheme not allowed.');
+			}
+		}
 	}
 	else
 	{ // URL is relative..
@@ -584,6 +592,9 @@ function disp_url( $url, $max_length = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.15  2008/03/09 03:31:58  blueyed
+ * validate_url: convert URL to IDN, before checking it (LP: #195702)
+ *
  * Revision 1.14  2008/03/09 02:34:26  blueyed
  * minor: fix typo in comment
  *
