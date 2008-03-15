@@ -46,20 +46,4 @@ $copyright_text ='<span class="nobr">&copy;2001-2002 by Michel V &amp; others</s
 		&ndash;
 		<span class="nobr">&copy;2003-2008 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/dev/authors.html">others</a>.</span>';
 
-
-/**
- * Here you can give credit where credit is due ;)
- * These will appear in the footer of all skins (if the skins are compatible)
- * You can also add site sponsors here.
- *
- * If you can add your own credits without removing the defaults, you'll be very cool :))
- *
- * Note: some plugins may add their own credit at the end of this array.
- * (Not recommended for plugins with potential security weaknesses)
- *
- * @global array of arrays
- */
-$credit_links = array(
-		// array( 'http://example.com/', 'Example' ),
-	);
 ?>

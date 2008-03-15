@@ -2062,6 +2062,9 @@ function upgrade_b2evo_tables()
 					ADD COLUMN grp_perm_xhtml_objects           TINYINT(1)  NOT NULL DEFAULT 0        AFTER grp_perm_xhtml_javascript " );
 		echo "OK.<br />\n";
 
+		$DB->query( 'INSERT INTO T_global__cache( cach_name, cach_cache )
+											VALUES ( \'creds\', \'a:2:{i:0;a:2:{i:0;s:24:"http://b2evolution.net/r";i:1;s:18:"free blog software";}i:1;a:2:{i:0;s:36:"http://b2evolution.net/web-hosting/r";i:1;s:19:"quality web hosting";}}\' )' );
+
 		set_upgrade_checkpoint( '9700' );
 	}
 
@@ -2093,7 +2096,7 @@ function upgrade_b2evo_tables()
 
 		echo 'Upgrading sessions table... ';
 		$DB->query( "ALTER TABLE T_sessions
-			ALTER COLUMN sess_lastseen SET DEFAULT '2000-01-01 00:00:00'?
+			ALTER COLUMN sess_lastseen SET DEFAULT '2000-01-01 00:00:00',
 			ADD COLUMN sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER sess_key" );
 		echo "OK.<br />\n";
 
@@ -2235,6 +2238,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.249  2008/03/15 19:07:26  fplanque
+ * no message
+ *
  * Revision 1.248  2008/03/07 02:00:42  blueyed
  * doc; indent; use db_drop_col
  *

@@ -2597,12 +2597,20 @@ function hash_link_params( $link_array, $force_hash = NULL )
 function generate_link_from_params( $link_params )
 {
 	$url = $link_params[0];
-	$text = $link_params[1];
+	if( empty( $url ) )
+	{
+		return '';
+	}
 
+	$text = $link_params[1];
 	if( is_array($text) )
 	{
 		$text = hash_link_params( $text );
 		$text = $text[0];
+	}
+	if( empty( $text ) )
+	{
+		return '';
 	}
 
 	return '<a href="'.$url.'" target="_blank">'.$text.'</a>';
@@ -2611,6 +2619,9 @@ function generate_link_from_params( $link_params )
 
 /*
  * $Log$
+ * Revision 1.23  2008/03/15 19:07:25  fplanque
+ * no message
+ *
  * Revision 1.22  2008/03/06 22:41:19  blueyed
  * MFB: doc
  *

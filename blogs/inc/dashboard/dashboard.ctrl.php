@@ -421,7 +421,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	$Messages->clear( 'all' );
 	b2evonet_get_updates();
 	// Display info & error messages
-	echo $Messages->display( NULL, NULL, false, 'error', NULL, NULL, 'action_messages' );
+	echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
 
 
 	/**
@@ -490,6 +490,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2008/03/15 19:07:25  fplanque
+ * no message
+ *
  * Revision 1.22  2008/02/05 01:51:54  fplanque
  * minors
  *

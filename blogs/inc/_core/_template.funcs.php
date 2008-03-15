@@ -618,7 +618,10 @@ function display_if_empty( $params = array() )
  */
 function credits( $params = array() )
 {
-	global $credit_links;
+	/**
+	 * @var AbstractSettings
+	 */
+	global $global_Cache;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -630,7 +633,7 @@ function credits( $params = array() )
 			'after_item'  => '#',
 		), $params );
 
-	display_list( $credit_links, $params['list_start'], $params['list_end'], $params['separator'], $params['item_start'], $params['item_end'] );
+	display_list( $global_Cache->get( 'creds' ), $params['list_start'], $params['list_end'], $params['separator'], $params['item_start'], $params['item_end'] );
 }
 
 
@@ -664,6 +667,9 @@ function star_rating( $stars )
 
 /*
  * $Log$
+ * Revision 1.19  2008/03/15 19:07:25  fplanque
+ * no message
+ *
  * Revision 1.18  2008/02/22 00:39:29  blueyed
  * doc
  *

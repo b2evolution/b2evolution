@@ -32,7 +32,10 @@ function b2evonet_get_updates()
 		return false;
 	}
 
-	$Messages->add( T_('Getting updates from ').$evonetsrv_host, 'notes' );
+	if( $debug )
+	{
+		$Messages->add( T_('Getting updates from ').$evonetsrv_host, 'notes' );
+	}
 	$Settings->set( 'evonet_last_attempt', $servertimenow );
 	$Settings->dbupdate();
 
@@ -70,7 +73,20 @@ function b2evonet_get_updates()
 			 * @var AbstractSettings
 			 */
 			global $global_Cache;
+
+			if( isset( $response['creds'] ) )
+			{ // Extract creds into its own var:
+				$creds = $response['creds'];
+				unset( $response['creds'] );
+				if( is_array( $creds ) )
+				{	// Save creds:
+					$global_Cache->set( 'creds', serialize($creds) );
+				}
+			}
+
+			// Save other info:
 			$global_Cache->set( 'evonet_updates', serialize($response) );
+
 			$global_Cache->dbupdate();
 
 			$Settings->set( 'evonet_last_update', $servertimenow );

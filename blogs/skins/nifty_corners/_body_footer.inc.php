@@ -38,7 +38,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		&amp; <?php display_param_link( $fplanque_links ) ?> &bull;
 
 		<?php
-			// Display additional credits (see /conf/):
+			// Display additional credits:
  			// If you can add your own credits without removing the defaults, you'll be very cool :))
 			// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 			credits( array(
