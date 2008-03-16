@@ -154,7 +154,7 @@ div.evo_title_area div.widget_core_coll_tagline {
 }
 
 
-/* 
+/*
  * Styles for content
  */
 table.prevnext_post {
@@ -221,7 +221,7 @@ table.prevnext_post td a:hover {
 
 
 
-input.bComment, 
+input.bComment,
 textarea.bComment
 {
 	background-color: #eee;
@@ -240,7 +240,7 @@ select.bComment		/* Used by the profile form */
 
 
 /*
- * Styles for sidebar (right) 
+ * Styles for sidebar (right)
  */
 .evo_side_item {
 	font-size: 84%;
@@ -278,7 +278,7 @@ input.SearchField
 }
 
 /*
- * Special SideItems: 
+ * Special SideItems:
  */
 .widget_plugin_evo_Calr,
 .widget_core_coll_title,
@@ -289,12 +289,6 @@ input.SearchField
 .widget_core_coll_longdesc {
 	border-bottom: none;
 }
-
-.evo_side_credits {
-	font-size: 84%;
-	margin: 2ex;
-}
-
 
 /* Calendar: */
 table.bCalendarTable caption {

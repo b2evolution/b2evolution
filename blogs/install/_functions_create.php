@@ -208,11 +208,6 @@ function create_default_data()
 		" );
 	echo "OK.<br />\n";
 
-
-	// default creds:
-	$DB->query( 'INSERT INTO T_global__cache( cach_name, cach_cache )
-										VALUES ( \'creds\', \'a:2:{i:0;a:2:{i:0;s:24:"http://b2evolution.net/r";i:1;s:18:"free blog software";}i:1;a:2:{i:0;s:36:"http://b2evolution.net/web-hosting/r";i:1;s:19:"quality web hosting";}}\' )' );
-
 	create_default_settings();
 
 	install_basic_skins();
@@ -654,7 +649,7 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
- * Revision 1.240  2008/03/15 19:07:26  fplanque
+ * Revision 1.241  2008/03/16 14:19:38  fplanque
  * no message
  *
  * Revision 1.239  2008/01/21 09:35:37  fplanque

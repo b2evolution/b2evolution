@@ -74,6 +74,16 @@ function b2evonet_get_updates()
 			 */
 			global $global_Cache;
 
+			if( isset( $response['evo_links'] ) )
+			{ // Extract evo links into its own var:
+				$evo_links = $response['evo_links'];
+				unset( $response['evo_links'] );
+				if( is_array( $evo_links ) )
+				{	// Save creds:
+					$global_Cache->set( 'evo_links', serialize($evo_links) );
+				}
+			}
+
 			if( isset( $response['creds'] ) )
 			{ // Extract creds into its own var:
 				$creds = $response['creds'];

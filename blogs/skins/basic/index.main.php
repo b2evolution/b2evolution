@@ -266,7 +266,17 @@ skin_content_header();	// Sets charset!
 
 	<hr>
 
-	<p align="center"><!-- Please help us promote b2evolution and leave this link on your blog. --><a href="http://b2evolution.net/" title="b2evolution: next generation blog software"><img src="../../rsc/img/powered-by-b2evolution-120t.gif" alt="powered by b2evolution free blog software" title="b2evolution: next generation blog software" width="120" height="32" border="0" /></a></p>
+	<?php
+		// Please help us promote b2evolution and leave this logo on your blog:
+		powered_by( array(
+				'block_start' => '<div align="center">',
+				'block_end'   => '</div>',
+				// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
+				'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
+				'img_width'   => 120,
+				'img_height'  => 32,
+			) );
+	?>
 
 	<?php
 		$Hit->log();  // log the hit on this page

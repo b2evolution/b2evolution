@@ -633,7 +633,14 @@ function credits( $params = array() )
 			'after_item'  => '#',
 		), $params );
 
-	display_list( $global_Cache->get( 'creds' ), $params['list_start'], $params['list_end'], $params['separator'], $params['item_start'], $params['item_end'] );
+
+	$cred_links = $global_Cache->get( 'creds' );
+	if( empty( $cred_links ) )
+	{	// Use basic default:
+		$cred_links = unserialize('a:2:{i:0;a:2:{i:0;s:24:"http://b2evolution.net/r";i:1;s:18:"free blog software";}i:1;a:2:{i:0;s:36:"http://b2evolution.net/web-hosting/r";i:1;s:19:"quality web hosting";}}');
+	}
+
+	display_list( $cred_links, $params['list_start'], $params['list_end'], $params['separator'], $params['item_start'], $params['item_end'] );
 }
 
 
@@ -665,8 +672,54 @@ function star_rating( $stars )
 }
 
 
+/**
+ * Display "powered by b2evolution" logo
+ */
+function powered_by( $params = array() )
+{
+	/**
+	 * @var AbstractSettings
+	 */
+	global $global_Cache;
+
+	global $rsc_url;
+
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'block_start' => '<div class="powered_by">',
+			'block_end'   => '</div>',
+			'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
+			'img_width'   => '',
+			'img_height'  => '',
+		), $params );
+
+	echo $params['block_start'];
+
+	$img_url = str_replace( '$rsc$', $rsc_url, $params['img_url'] );
+
+	$evo_links = $global_Cache->get( 'evo_links' );
+	if( empty( $evo_links ) )
+	{	// Use basic default:
+		$evo_links = unserialize('a:1:{s:0:"";a:1:{i:0;a:3:{i:0;i:100;i:1;s:23:"http://b2evolution.net/";i:2;a:2:{i:0;a:2:{i:0;i:55;i:1;s:36:"powered by b2evolution blog software";}i:1;a:2:{i:0;i:100;i:1;s:29:"powered by free blog software";}}}}}');
+	}
+
+	echo resolve_link_params( $evo_links, NULL, array(
+			'type'        => 'img',
+			'img_url'     => $img_url,
+			'img_width'   => $params['img_width'],
+			'img_height'  => $params['img_height'],
+			'title'       => 'b2evolution: next generation blog software',
+		) );
+
+	echo $params['block_end'];
+}
+
+
 /*
  * $Log$
+ * Revision 1.20  2008/03/16 14:19:38  fplanque
+ * no message
+ *
  * Revision 1.19  2008/03/15 19:07:25  fplanque
  * no message
  *

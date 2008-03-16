@@ -158,3 +158,9 @@ td#prev {
 td#next {
 	text-align:right;
 }
+
+
+div.powered_by {
+	margin: 16px 0;
+	text-align: center;
+}

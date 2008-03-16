@@ -2492,9 +2492,11 @@ function display_param_link( $params )
  * Resolve a link based on params (credits stuff)
  *
  * @param array
+ * @param integer
+ * @param array
  * @return string
  */
-function resolve_link_params( $item, $force_hash = NULL )
+function resolve_link_params( $item, $force_hash = NULL, $params = array() )
 {
 	global $current_locale;
 
@@ -2504,7 +2506,7 @@ function resolve_link_params( $item, $force_hash = NULL )
 	{
 		if( isset( $item[0] ) )
 		{	// Older format, which displays the same thing for all locales:
-			return generate_link_from_params( $item );
+			return generate_link_from_params( $item, $params );
 		}
 		else
 		{	// First get the right locale:
@@ -2519,7 +2521,7 @@ function resolve_link_params( $item, $force_hash = NULL )
 						$loc_item = hash_link_params( $loc_item, $force_hash );
 					}
 
-					return generate_link_from_params( $loc_item );
+					return generate_link_from_params( $loc_item, $params );
 				}
 			}
 			// No match found!
@@ -2593,14 +2595,26 @@ function hash_link_params( $link_array, $force_hash = NULL )
 
 /**
  * Generate a link from params (credits stuff)
+ *
+ * @param array
+ * @param array
  */
-function generate_link_from_params( $link_params )
+function generate_link_from_params( $link_params, $params = array() )
 {
 	$url = $link_params[0];
 	if( empty( $url ) )
 	{
 		return '';
 	}
+
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'type'        => 'link',
+			'img_url'     => '',
+			'img_width'   => '',
+			'img_height'  => '',
+			'title'       => '',
+		), $params );
 
 	$text = $link_params[1];
 	if( is_array($text) )
@@ -2613,13 +2627,20 @@ function generate_link_from_params( $link_params )
 		return '';
 	}
 
+	if( $params['type'] == 'img' )
+	{
+		return '<a href="'.$url.'" target="_blank" title="'.$params['title'].'"><img src="'.$params['img_url'].'" alt="'
+						.$text.'" title="'.$params['title'].'" width="'.$params['img_width'].'" height="'.$params['img_height']
+						.'" border="0" /></a>';
+	}
+
 	return '<a href="'.$url.'" target="_blank">'.$text.'</a>';
 }
 
 
 /*
  * $Log$
- * Revision 1.23  2008/03/15 19:07:25  fplanque
+ * Revision 1.24  2008/03/16 14:19:38  fplanque
  * no message
  *
  * Revision 1.22  2008/03/06 22:41:19  blueyed
