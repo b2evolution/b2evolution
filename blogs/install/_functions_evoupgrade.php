@@ -1913,10 +1913,10 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 9414 )
 	{
 		echo "Renaming tables...";
-		$DB->query( "RENAME TABLE {$tableprefix}item__prerendering TO T_items__prerendering,
-															{$tableprefix}poststatuses TO T_items__status,
-															{$tableprefix}posttypes TO T_items__type,
-															{$tableprefix}posts TO T_items__item" );
+		$DB->query( "RENAME TABLE {$tableprefix}item__prerendering TO T_items__prerendering" );
+		$DB->query( "RENAME TABLE {$tableprefix}poststatuses TO T_items__status" );
+		$DB->query( "RENAME TABLE {$tableprefix}posttypes TO T_items__type" );
+		$DB->query( "RENAME TABLE {$tableprefix}posts TO T_items__item" );
 		echo "OK.<br />\n";
 
 		echo "Creating Tag tables...";
@@ -2235,6 +2235,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.251  2008/03/16 19:40:52  blueyed
+ * Fix renaming of tables, which failed when done in one query (User only has perms on his DB; MySQL 5.0.38-Ubuntu_0ubuntu1.1) (LP: #195612)
+ *
  * Revision 1.250  2008/03/16 14:19:39  fplanque
  * no message
  *
