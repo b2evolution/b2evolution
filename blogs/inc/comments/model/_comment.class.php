@@ -602,7 +602,7 @@ class Comment extends DataObject
 		$this->get_Item();
 
 		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
-		{ // If User has permission to edit comments:
+		{ // If User has no permission to edit comments:
 			return false;
 		}
 
@@ -670,7 +670,7 @@ class Comment extends DataObject
 
 		if( ($this->status == 'deprecated') // Already deprecateded!
 			|| ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
-		{ // If User has permission to edit comments:
+		{ // If User has no permission to edit comments:
 			return false;
 		}
 
@@ -731,7 +731,7 @@ class Comment extends DataObject
 
 		if( ($this->status == 'published') // Already published!
 			|| ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
-		{ // If User has permission to edit comments:
+		{ // If User has no permission to edit comments:
 			return false;
 		}
 
@@ -1326,6 +1326,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2008/03/16 22:39:07  fplanque
+ * doc
+ *
  * Revision 1.17  2008/03/16 13:57:01  fplanque
  * WTF?
  *
