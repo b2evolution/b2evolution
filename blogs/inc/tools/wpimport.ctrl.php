@@ -41,7 +41,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	if ( ! isset ( $_POST['wp_db'] ) ) { ?>
 		<P>Before running this importer, you must ensure that a proper <font color="#00CC00"><strong><em>NEW, EMPTY</em></strong></font> installation of b2evolution 2 exists! <strong><font color="#FF0000">IMPORTANT</font></strong>: This works <strong>only</strong> with WordPress 2.3 and above.</P>
 
-		<p><strong><font color="#FF0000">Warning!!</strong> Your existing b2evolution posts, categories, tags, comments and users (except admin) will be removed if you run this script. Make sure you have a backup before you proceed.</font></p>
+		<p><font color="#FF0000"><strong>Warning!!</strong> Your existing b2evolution posts, categories, tags, comments and users (except admin) will be removed if you run this script. Make sure you have a backup before you proceed.</font></p>
 
 		<FORM action="admin.php?ctrl=wpimport" enctype="multipart/form-data" method="POST" >
 		<h2>DB Settings</h2>
@@ -61,11 +61,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			<td>b2evolution database</td>
 			<td><INPUT type="text" name="b2evo_db" value="<?php echo $db_config['name'] ?>"></td>
 			</tr>
-
+			
+			<tr>
 			<td>b2evolution table prefix</td>
 			<td><INPUT type="text" name="b2evo_prefix" value="<?php echo $tableprefix ?>"></td>
 			</tr>
-			<tr>
 
 			<tr>
 			<td>Database host</td>
@@ -85,7 +85,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			<tr>
 			<td>Default locale for imported posts</td>
 			<td><INPUT type="text" name="locale" value="en-US"></td>
-			</td>
+			</tr>
 
 			<tr>
 			<td></td>
