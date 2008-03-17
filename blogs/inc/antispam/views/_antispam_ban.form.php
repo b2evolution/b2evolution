@@ -134,7 +134,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 				?>
 				<tr class="<?php echo ($count%2 == 1) ? 'odd' : 'even' ?>">
 				<td class="firstcol"><?php echo mysql2date(locale_datefmt().' '.locale_timefmt(), $row_stats['comment_date'] ); ?></td>
-				<td><?php echo $row_stats['comment_author'] ?></a></td>
+				<td><?php echo $row_stats['comment_author'] ?></td>
 				<td><?php disp_url( $row_stats['comment_author_url'], 50 ); ?></td>
 				<td><?php echo $row_stats['comment_author_IP'] ?></td>
 				<td><?php
@@ -209,6 +209,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.5  2008/03/17 09:08:28  afwas
+ * minor
+ *
  * Revision 1.4  2008/01/21 09:35:25  fplanque
  * (c) 2008
  *
