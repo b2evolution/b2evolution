@@ -420,11 +420,10 @@ header( 'Content-type: text/html; charset='.$io_charset );
   </tr>
 </table>
 <!-- InstanceBeginEditable name="Baseline" -->
-</p>
 <?php
 	$Hit->log();  // log the hit on this page
 	debug_info(); // output debug info if requested
 ?>
-<p><!-- Note: don't mess with the template here :/ --><!-- InstanceEndEditable -->
+<p><!-- Note: don't mess with the template here :/ --><!-- InstanceEndEditable --></p>
 </body>
 <!-- InstanceEnd --></html>
