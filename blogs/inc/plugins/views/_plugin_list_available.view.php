@@ -121,8 +121,8 @@ while( $loop_Plugin = & $AvailablePlugins->get_next() )
 
 		$Table->display_col_start();
 	  ?>
-			<strong><a title="<?php echo T_('Display info') ?>" href="<?php echo regenerate_url( 'action,plugin_class', 'action=info&amp;plugin_class='.$loop_Plugin->classname) . '">'
-	    .format_to_output($loop_Plugin->name); ?></a></strong>
+			<strong><a title="<?php echo T_('Display info') ?>" href="<?php echo regenerate_url( 'action,plugin_class', 'action=info&amp;plugin_class='.$loop_Plugin->classname) ?>">
+	    <?php format_to_output($loop_Plugin->name); ?></a></strong>
 		<?php
 		$Table->display_col_end();
 
@@ -212,6 +212,9 @@ echo '</p>';
 
 /*
  * $Log$
+ * Revision 1.4  2008/03/17 08:59:46  afwas
+ * minor
+ *
  * Revision 1.3  2008/01/21 09:35:32  fplanque
  * (c) 2008
  *
