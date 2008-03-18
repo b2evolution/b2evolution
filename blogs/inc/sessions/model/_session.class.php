@@ -158,9 +158,9 @@ class Session
 
 						// Unserialize session data (using an own callback that should provide class definitions):
 						$old_callback = ini_set( 'unserialize_callback_func', 'session_unserialize_callback' );
-						if( $old_callback === false )
+						if( $old_callback === false || $old_callback === null /* disabled, reported with PHP 5.2.5 */ )
 						{ // this can fail, if "ini_set" has been disabled for security reasons.. :/
-							// Brutally load add classes that we might need:
+							// Brutally load all classes that we might need:
  							session_unserialize_load_all_classes();
 						}
 						// TODO: dh> This can fail, if there are special chars in sess_data:
@@ -542,6 +542,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.4  2008/03/18 00:31:40  blueyed
+ * Fix loading of required classes for unserialize, if ini_set() is disabled (ref: http://forums.b2evolution.net//viewtopic.php?p=71333#71333)
+ *
  * Revision 1.3  2008/02/19 11:11:18  fplanque
  * no message
  *
