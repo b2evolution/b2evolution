@@ -1459,6 +1459,10 @@ class AdminUI_general extends Widget
 									),
 								),
 						 	),
+						'goals' => array(
+							'text' => T_('Goals'),
+							'href' => 'admin.php?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0',
+							),
 						)
 				);
 		}
@@ -1781,6 +1785,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.83  2008/03/20 14:20:51  fplanque
+ * no message
+ *
  * Revision 1.82  2008/02/19 11:11:23  fplanque
  * no message
  *

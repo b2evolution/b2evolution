@@ -202,6 +202,12 @@ switch( $AdminUI->get_path(1) )
 				$AdminUI->disp_view( 'sessions/views/_stats_sessions.view.php' );
 		}
 		break;
+
+	case 'goals':
+		// Display VIEW:
+		$AdminUI->disp_view( 'sessions/views/_stats_goalhits.view.php' );
+		break;
+
 }
 
 // End payload block:
@@ -212,6 +218,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2008/03/20 14:20:52  fplanque
+ * no message
+ *
  * Revision 1.5  2008/02/19 11:11:18  fplanque
  * no message
  *
