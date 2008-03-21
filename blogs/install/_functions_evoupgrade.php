@@ -2074,7 +2074,8 @@ function upgrade_b2evo_tables()
 
 		echo 'Upgrading items table... ';
 		$DB->query( "ALTER TABLE T_items__item
-			CHANGE COLUMN post_order post_order DOUBLE NULL,
+			CHANGE COLUMN post_urltitle post_urltitle VARCHAR(210) NULL DEFAULT NULL,
+			CHANGE COLUMN post_order    post_order DOUBLE NULL,
 			ADD COLUMN post_double1   DOUBLE NULL COMMENT 'Custom double value 1' AFTER post_priority,
 			ADD COLUMN post_double2   DOUBLE NULL COMMENT 'Custom double value 2' AFTER post_double1,
 			ADD COLUMN post_double3   DOUBLE NULL COMMENT 'Custom double value 3' AFTER post_double2,
@@ -2235,6 +2236,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.252  2008/03/21 16:07:03  fplanque
+ * longer post slugs
+ *
  * Revision 1.251  2008/03/16 19:40:52  blueyed
  * Fix renaming of tables, which failed when done in one query (User only has perms on his DB; MySQL 5.0.38-Ubuntu_0ubuntu1.1) (LP: #195612)
  *

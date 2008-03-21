@@ -203,7 +203,7 @@ $schema_queries = array(
 			post_content                MEDIUMTEXT NULL,
 			post_excerpt                text NULL,
 			post_title                  text NOT NULL,
-			post_urltitle               VARCHAR(50) NULL DEFAULT NULL,
+			post_urltitle               VARCHAR(210) NULL DEFAULT NULL,
 			post_url                    VARCHAR(255) NULL DEFAULT NULL,
 			post_main_cat_ID            int(11) unsigned NOT NULL,
 			post_notifications_status   ENUM('noreq','todo','started','finished') NOT NULL DEFAULT 'noreq',
@@ -602,6 +602,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.84  2008/03/21 16:07:03  fplanque
+ * longer post slugs
+ *
  * Revision 1.83  2008/02/19 11:11:19  fplanque
  * no message
  *

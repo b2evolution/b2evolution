@@ -95,10 +95,8 @@ function init_MainList( $items_nb_limit )
 /**
  * Validate URL title
  *
- * Using title as a source if url title is empty
- *
- * @todo Use configurable char as seperator (see tracker)
- * @todo dh> Allow/Use more than 40 chars
+ * Using title as a source if url title is empty.
+ * We allow up to 200 chars (which is ridiculously long) for WP import compatibility.
  *
  * @param string url title to validate
  * @param string real title to use as a source if $urltitle is empty (encoded in $evo_charset)
@@ -131,7 +129,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	// Normalize to 40 chars + a number
 	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
-	$urlbase = substr( $matches[1], 0, 40 );
+	$urlbase = substr( $matches[1], 0, 200 );
 	$urltitle = $urlbase;
 	if( ! empty( $matches[4] ) )
 	{
@@ -626,7 +624,7 @@ function visibility_select( & $Form, $post_status )
  * to use a hardcoded link. This tag can be useful for prototyping location independant
  * sites.
  */
-function item_ink_by_urltitle( $params = array() )
+function item_link_by_urltitle( $params = array() )
 {
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -656,6 +654,9 @@ function item_ink_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.8  2008/03/21 16:07:03  fplanque
+ * longer post slugs
+ *
  * Revision 1.7  2008/01/21 09:35:31  fplanque
  * (c) 2008
  *

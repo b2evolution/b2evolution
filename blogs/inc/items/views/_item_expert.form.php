@@ -216,7 +216,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
  	$Form->switch_layout( 'linespan' );
 	echo '<div id="itemform_urltitle" class="edit_fieldgroup">';
 	$Form->text( 'post_urltitle', $edited_Item->get( 'urltitle' ), 40, T_('URL "filename"'),
-	             T_('("slug" to be used in permalinks)'), $field_maxlength = 50 ) ;
+	             T_('("slug" to be used in permalinks)'), $field_maxlength = 210 ) ;
 	echo '</div>';
 	$Form->switch_layout( NULL );
 	?>
@@ -421,6 +421,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.25  2008/03/21 16:07:03  fplanque
+ * longer post slugs
+ *
  * Revision 1.24  2008/02/10 00:58:00  fplanque
  * minor
  *

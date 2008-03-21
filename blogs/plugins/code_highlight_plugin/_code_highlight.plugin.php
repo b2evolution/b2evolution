@@ -210,7 +210,7 @@ class code_highlight_plugin extends Plugin
 	{
 		echo '<div class="edit_toolbar">';
 		echo T_('Code').': ';
-//		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" class="quicktags" onclick="codespan_tag(\'\');" value="'.T_('codespan').'" />';
+		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" class="quicktags" onclick="codespan_tag(\'\');" value="'.T_('codespan').'" />';
 		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" style="margin-left:8px;" class="quicktags" onclick="codeblock_tag(\'\');" value="'.T_('codeblock').'" />';
 		echo '<input type="button" id="codeblock_xml" title="'.T_('Insert XML codeblock').'" class="quicktags" onclick="codeblock_tag(\'xml\');" value="'.T_('XML').'" />';
 		echo '<input type="button" id="codeblock_php" title="'.T_('Insert PHP codeblock').'" class="quicktags" onclick="codeblock_tag(\'php\');" value="'.T_('PHP').'" />';
@@ -262,7 +262,9 @@ class code_highlight_plugin extends Plugin
 								array( $this, 'filter_codeblock_callback' ), $content );
 
 		// Quick and dirty escaping of inline code <codespan> || [codespan]:
-		$content = preg_replace_callback( '#[<\[]codespan[^>\]](.*?)[<\[]/codespan[>\]]#',
+			// fp> please provide example of what the following fix does: it looks weird to me :p
+			// $content = preg_replace_callback( '#[<\[]codespan[^>\]](.*?)[<\[]/codespan[>\]]#',
+		$content = preg_replace_callback( '#[<\[]codespan[>\]](.*?)[<\[]/codespan[>\]]#',
 								array( $this, 'filter_codespan_callback' ), $content );
 
 		return true;
@@ -628,6 +630,9 @@ div.codeblock.amc_short table {
 
 /**
  * $Log$
+ * Revision 1.14  2008/03/21 16:07:02  fplanque
+ * longer post slugs
+ *
  * Revision 1.13  2008/03/21 10:31:17  yabs
  * add ability to render code in comments
  *
