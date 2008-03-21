@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 /**
  * Create a new messages.POT file and update specified .po files.
