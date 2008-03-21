@@ -133,7 +133,7 @@ switch( $action )
 				{ // Commit update to the DB:
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog skin has been changed.')
-										.' <a href="'.$admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
+										.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
 					header_redirect( $edited_Blog->gen_blogurl() );
 				}
 				break;
@@ -228,6 +228,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2008/03/21 10:45:55  yabs
+ * validation
+ *
  * Revision 1.11  2008/01/21 09:35:26  fplanque
  * (c) 2008
  *
