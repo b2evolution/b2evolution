@@ -61,7 +61,10 @@ function skin_init( $disp )
 	 */
 	global $disp_detail;
 
-	$disp_detail = $disp;
+	if( empty($disp_detail) )
+	{
+		$disp_detail = $disp;
+	}
 
 	$Debuglog->add('skin_init: '.$disp, 'skin');
 
@@ -244,6 +247,10 @@ function skin_init( $disp )
 				$robots_index = false;
 			}
 			break;
+
+		case '404':
+			header('HTTP/1.0 404 Not Found');
+			break;
 	}
 }
 
@@ -282,6 +289,7 @@ function skin_include( $template_name, $params = array() )
 
 		// Default display handlers:
 		$disp_handlers = array_merge( array(
+				'disp_404'            => '_404_not_found.disp.php',
 				'disp_arcdir'         => '_arcdir.disp.php',
 				'disp_catdir'         => '_catdir.disp.php',
 				'disp_comments'       => '_comments.disp.php',
@@ -514,6 +522,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.26  2008/03/21 17:41:56  fplanque
+ * custom 404 pages
+ *
  * Revision 1.25  2008/02/25 19:49:04  blueyed
  * Fix E_FATAL for invalid category ID and "canonical_cat_urls"; fix indenting
  *
@@ -577,62 +588,5 @@ function skin_exists( $name, $filename = 'index.main.php' )
  *
  * Revision 1.4  2007/09/11 21:07:09  fplanque
  * minor fixes
- *
- * Revision 1.3  2007/06/30 20:37:50  fplanque
- * fixes
- *
- * Revision 1.2  2007/06/27 02:23:25  fplanque
- * new default template for skins named index.main.php
- *
- * Revision 1.1  2007/06/25 11:01:28  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.24  2007/06/24 18:28:56  fplanque
- * refactored skin install
- *
- * Revision 1.23  2007/06/24 01:05:31  fplanque
- * skin_include() now does all the template magic for skins 2.0.
- * .disp.php templates still need to be cleaned up.
- *
- * Revision 1.22  2007/06/20 21:42:13  fplanque
- * implemented working widget/plugin params
- *
- * Revision 1.21  2007/05/28 15:18:31  fplanque
- * cleanup
- *
- * Revision 1.20  2007/05/07 18:59:45  fplanque
- * renamed skin .page.php files to .tpl.php
- *
- * Revision 1.19  2007/05/07 18:03:28  fplanque
- * cleaned up skin code a little
- *
- * Revision 1.18  2007/04/26 00:11:12  fplanque
- * (c) 2007
- *
- * Revision 1.17  2007/03/18 01:39:54  fplanque
- * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
- * (more to come)
- *
- * Revision 1.16  2007/01/26 04:52:53  fplanque
- * clean comment popups (skins 2.0)
- *
- * Revision 1.15  2007/01/14 01:33:34  fplanque
- * losely restrict to *installed* XML feed skins
- *
- * Revision 1.14  2007/01/08 02:11:56  fplanque
- * Blogs now make use of installed skins
- * next step: make use of widgets inside of skins
- *
- * Revision 1.13  2006/12/04 21:25:18  fplanque
- * removed user skin switching
- *
- * Revision 1.12  2006/11/13 17:00:02  fplanque
- * doc
- *
- * Revision 1.11  2006/10/30 12:57:33  blueyed
- * Fix for XHTML
- *
- * Revision 1.10  2006/10/08 22:59:31  blueyed
- * Added GetProvidedSkins and DisplaySkin hooks. Allow for optimization in Plugins::trigger_event_first_return()
  */
 ?>

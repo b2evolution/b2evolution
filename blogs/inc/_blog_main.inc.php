@@ -66,6 +66,11 @@ if( empty( $Blog ) )
 	// EXIT.
 }
 
+// These will be filled in later, but we init themfor security.
+$disp = 'posts';
+$disp_detail = '';
+
+
 /*
  * _______________________________ Locale / Charset for the Blog _________________________________
  *
@@ -152,8 +157,6 @@ if( $resolve_extra_path )
 		}
 		// pre_dump( $path_elements );
 
-		$path_error = 0;
-
 		// Do we still have extra path info to decode?
 		if( count($path_elements) )
 		{
@@ -234,7 +237,8 @@ if( $resolve_extra_path )
 						}
 						else
 						{	// We did not get a number/year...
-							$path_error = 404;
+							$disp = '404';
+							$disp_detail = '404-malformed_url-missing_year';
 						}
 					}
 				}
@@ -264,15 +268,12 @@ if( $resolve_extra_path )
 				else
 				{	// We did not get anything we can decode...
 					// echo 'neither number nor cat';
-					$path_error = 404;
+					$disp = '404';
+					$disp_detail = '404-malformed_url-bad_char';
 				}
 			}
 		}
 
-		if( $path_error == 404 )
-		{	// The request points to something we won't be able to resolve:
-			require $skins_path.'_404_not_found.main.php'; // error & exit
-		}
 	}
 }
 
@@ -313,7 +314,8 @@ if( !empty($p) || !empty($title) )
 	if( empty( $Item ) )
 	{	// Post doesn't exist! Let's go 404!
 		// fp> TODO: ->viewing_allowed() for draft, private, protected and deprecated...
-		require $skins_path.'_404_not_found.main.php'; // error & exit
+		$disp = '404';
+		$disp_detail = '404-post_not_found';
 	}
 }
 
@@ -403,12 +405,25 @@ if( isset( $skin ) )
 		debug_die( 'The requested skin name is invalid.' );
 	}
 
-	// EXPERIMENTAL:
+	// TODO: access to uninstalled skins for preview only for authorized users only)
+	// TODO: in other cases, load the installed version
+	// TODO: take care about *all* RSS feeds
 	load_class( 'skins/model/_skin.class.php' );
-	$Skin = & new Skin();
+	$Skin = & new Skin( NULL, $skin );
 
+	if( $Skin->type == 'feed' )
+	{	// Check if we actually allow the display of the feed; last chance to revert to 404 displayed in default skin
+		if( $Blog->get_setting('feed_content') == 'none' )
+		{ // We don't want to provide feeds; revert to 404!
+			unset( $skin );
+			unset( $Skin );
+			$disp = '404';
+			$disp_detail = '404-feeds-disabled';
+		}
+	}
 }
-else
+
+if( empty( $skin ) )
 { // Use default skin from the database
 	$SkinCache = & get_cache( 'SkinCache' );
 
@@ -456,6 +471,7 @@ if( !empty( $skin ) )
 		$ads_current_skin_path = $skins_path.$skin.'/';
 
 		$disp_handlers = array(
+				'404'            => '404_not_found.main.php',
 				'arcdir'         => 'arcdir.main.php',
 				'catdir'         => 'catdir.main.php',
 				'comments'       => 'comments.main.php',
@@ -510,6 +526,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.96  2008/03/21 17:41:56  fplanque
+ * custom 404 pages
+ *
  * Revision 1.95  2008/02/19 11:11:16  fplanque
  * no message
  *
@@ -542,136 +561,5 @@ else
  *
  * Revision 1.85  2007/07/13 23:47:36  fplanque
  * New start pages!
- *
- * Revision 1.84  2007/06/27 02:23:24  fplanque
- * new default template for skins named index.main.php
- *
- * Revision 1.83  2007/06/26 02:40:53  fplanque
- * security checks
- *
- * Revision 1.82  2007/06/25 10:58:50  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.81  2007/06/25 01:21:28  fplanque
- * minor / interim
- *
- * Revision 1.80  2007/06/24 01:05:31  fplanque
- * skin_include() now does all the template magic for skins 2.0.
- * .disp.php templates still need to be cleaned up.
- *
- * Revision 1.79  2007/05/28 15:18:30  fplanque
- * cleanup
- *
- * Revision 1.78  2007/05/13 22:02:06  fplanque
- * removed bloated $object_def
- *
- * Revision 1.77  2007/05/08 00:54:31  fplanque
- * public blog list as a widget
- *
- * Revision 1.76  2007/05/07 18:59:45  fplanque
- * renamed skin .page.php files to .tpl.php
- *
- * Revision 1.75  2007/05/02 20:39:27  fplanque
- * meta robots handling
- *
- * Revision 1.74  2007/04/26 00:11:04  fplanque
- * (c) 2007
- *
- * Revision 1.73  2007/03/26 12:59:18  fplanque
- * basic pages support
- *
- * Revision 1.72  2007/03/24 20:41:16  fplanque
- * Refactored a lot of the link junk.
- * Made options blog specific.
- * Some junk still needs to be cleaned out. Will do asap.
- *
- * Revision 1.71  2007/03/18 01:39:54  fplanque
- * renamed _main.php to main.page.php to comply with 2.0 naming scheme.
- * (more to come)
- *
- * Revision 1.70  2007/03/18 00:31:18  fplanque
- * Delegated MainList init to skin *pages* which need it.
- *
- * Revision 1.69  2007/03/12 00:03:47  fplanque
- * And finally: the redirect action :)
- *
- * Revision 1.68  2007/01/28 17:50:54  fplanque
- * started moving towards 2.0 skin structure
- *
- * Revision 1.67  2007/01/26 04:52:53  fplanque
- * clean comment popups (skins 2.0)
- *
- * Revision 1.66  2007/01/23 08:17:49  fplanque
- * another simplification...
- *
- * Revision 1.65  2007/01/23 08:07:16  fplanque
- * Fixed blog URLs including urlnames
- *
- * Revision 1.64  2007/01/09 00:55:16  blueyed
- * fixed typo(s)
- *
- * Revision 1.63  2007/01/08 02:11:55  fplanque
- * Blogs now make use of installed skins
- * next step: make use of widgets inside of skins
- *
- * Revision 1.62  2007/01/07 05:32:11  fplanque
- * added some more DB skin handling (install+uninstall+edit properties ok)
- * still useless though :P
- * next step: discover containers in installed skins
- *
- * Revision 1.61  2006/12/28 18:31:30  fplanque
- * prevent impersonating of blog in multiblog situation
- *
- * Revision 1.60  2006/12/26 00:55:58  fplanque
- * wording
- *
- * Revision 1.59  2006/12/24 00:45:51  fplanque
- * bugfix
- *
- * Revision 1.58  2006/12/18 00:56:16  fplanque
- * non existent blog error handling
- *
- * Revision 1.57  2006/12/14 22:05:18  fplanque
- * doc
- *
- * Revision 1.56  2006/12/14 21:54:52  blueyed
- * todo
- *
- * Revision 1.55  2006/12/14 21:41:15  fplanque
- * Allow different number of items in feeds than on site
- *
- * Revision 1.54  2006/12/14 21:35:05  fplanque
- * block reordering tentative
- *
- * Revision 1.53  2006/12/14 20:57:55  fplanque
- * Hum... this really needed some cleaning up!
- *
- * Revision 1.52  2006/12/05 00:39:56  fplanque
- * fixed some more permalinks/archive links
- *
- * Revision 1.51  2006/12/04 21:25:18  fplanque
- * removed user skin switching
- *
- * Revision 1.50  2006/12/04 18:16:50  fplanque
- * Each blog can now have its own "number of page/days to display" settings
- *
- * Revision 1.49  2006/11/30 22:34:15  fplanque
- * bleh
- *
- * Revision 1.48  2006/11/14 21:56:11  blueyed
- * Debuglog-entry, when redirecting to $canonical_url
- *
- * Revision 1.47  2006/11/11 20:33:14  blueyed
- * Moved BeforeBlogDisplay hook to after $skin has been determined
- *
- * Revision 1.46  2006/10/24 14:03:52  blueyed
- * Type $c param ("Display comments?") to integer
- *
- * Revision 1.45  2006/10/08 22:59:30  blueyed
- * Added GetProvidedSkins and DisplaySkin hooks. Allow for optimization in Plugins::trigger_event_first_return()
- *
- * Revision 1.44  2006/10/04 12:55:24  blueyed
- * - Reload $Blog, if charset has changed for Blog locale
- * - only update DB connection charset, if not forced with $db_config['connection_charset']
  */
 ?>

@@ -49,7 +49,7 @@ class Skin extends DataObject
 	 *
 	 * @param table Database row
 	 */
-	function Skin( $db_row = NULL )
+	function Skin( $db_row = NULL, $skin_folder = NULL, $name = NULL )
 	{
 		// Call parent constructor:
 		parent::DataObject( 'T_skins__skin', 'skin_', 'skin_ID' );
@@ -64,7 +64,7 @@ class Skin extends DataObject
 
 		if( is_null($db_row) )
 		{	// We are creating an object here:
-			$this->type = 'normal';
+			$this->init( $skin_folder, $name );
 		}
 		else
 		{	// Wa are loading an object:
@@ -73,6 +73,19 @@ class Skin extends DataObject
 			$this->folder = $db_row->skin_folder;
 			$this->type = $db_row->skin_type;
 		}
+	}
+
+
+  /**
+	 *
+	 * @param string
+	 * @param string NULL for default  (used by installer; TODO: override with class for Atom ans RSS 2.0)
+	 */
+	function init( $skin_folder, $name = NULL )
+	{
+		$this->set( 'folder', $skin_folder );	// Must be set before name for get_default_name() to work
+		$this->set( 'name', empty( $name ) ? $this->get_default_name() : $name );
+		$this->set( 'type', substr($skin_folder,0,1) == '_' ? 'feed' : 'normal' );
 	}
 
 
@@ -86,9 +99,7 @@ class Skin extends DataObject
 	 */
 	function install( $skin_folder, $name = NULL )
 	{
-		$this->set( 'folder', $skin_folder );	// Must be set before name for get_default_name() to work
-		$this->set( 'name', empty( $name ) ? $this->get_default_name() : $name );
-		$this->set( 'type', substr($skin_folder,0,1) == '_' ? 'feed' : 'normal' );
+		$this->init( $skin_folder, $name );
 
 		// Look for containers in skin file:
 		$this->discover_containers();
@@ -429,6 +440,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2008/03/21 17:41:56  fplanque
+ * custom 404 pages
+ *
  * Revision 1.8  2008/01/21 09:35:35  fplanque
  * (c) 2008
  *
