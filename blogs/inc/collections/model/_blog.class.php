@@ -439,6 +439,7 @@ class Blog extends DataObject
 			$this->set_setting( 'special_noindex',  param( 'special_noindex', 'integer', 0 ) );
 			$this->set_setting( 'title_link_type',  param( 'title_link_type', 'string', '' ) );
 			$this->set_setting( 'permalinks',  param( 'permalinks', 'string', '' ) );
+			$this->set_setting( '404_response',  param( '404_response', 'string', '' ) );
 		}
 
 
@@ -1900,6 +1901,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.33  2008/03/21 19:42:44  fplanque
+ * enhanced 404 handling
+ *
  * Revision 1.32  2008/02/09 20:14:14  fplanque
  * custom fields management
  *

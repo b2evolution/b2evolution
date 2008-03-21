@@ -93,6 +93,7 @@ class CollectionSettings extends AbstractSettings
 			'msgform_noindex' => '1',						// META NOINDEX on Message forms
 			'special_noindex' => '1',						// META NOINDEX on other special pages
 			'title_link_type' => 'permalink',
+			'404_response' => '404',
 
 			'blog_footer_text' => '&copy;$year$ by $owner$',
 			'single_item_footer_text' => '',
@@ -132,6 +133,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.16  2008/03/21 19:42:44  fplanque
+ * enhanced 404 handling
+ *
  * Revision 1.15  2008/02/18 20:22:40  fplanque
  * no message
  *

@@ -47,7 +47,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @todo fp> do NOT allow $redirect_to = NULL. This leads to spaghetti code and unpredictable behavior.
  *
  * @param string URL to redirect to (overrides detection)
- * @param boolean is this a permanent redirect? if true, send a 301; otherwise a 303
+ * @param boolean|integer is this a permanent redirect? if true, send a 301; otherwise a 303 OR response code 301,302,303
  */
 function header_redirect( $redirect_to = NULL, $permanent = false )
 {
@@ -100,7 +100,14 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 	}
 
 
-	$status = $permanent ? 301 : 303;
+	if( is_integer($permanent) )
+	{
+		$status = $permanent;
+	}
+	else
+	{
+		$status = $permanent ? 301 : 303;
+	}
  	$Debuglog->add('Redirecting to '.$redirect_to.' (status '.$status.')');
 
 	// Transfer of Debuglog to next page:
@@ -123,14 +130,22 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 	$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
 
  	// see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-	if( $permanent )
-	{	// This should be a permanent move redirect!
-		header( 'HTTP/1.1 301 Moved Permanently' );
-	}
-	else
-	{	// This should be a "follow up" redirect
-		// Note: Also see http://de3.php.net/manual/en/function.header.php#50588 and the other comments around
-		header( 'HTTP/1.1 303 See Other' );
+	switch( $status )
+	{
+		case 301:
+			// This should be a permanent move redirect!
+			header( 'HTTP/1.1 301 Moved Permanently' );
+			break;
+
+		case 303:
+			// This should be a "follow up" redirect
+			// Note: Also see http://de3.php.net/manual/en/function.header.php#50588 and the other comments around
+			header( 'HTTP/1.1 303 See Other' );
+			break;
+
+		case 302:
+		default:
+			header( 'HTTP/1.1 302 Found' );
 	}
 
 	header( 'Location: '.$redirect_to, true, $status ); // explictly setting the status is required for (fast)cgi
@@ -717,6 +732,9 @@ function powered_by( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.21  2008/03/21 19:42:44  fplanque
+ * enhanced 404 handling
+ *
  * Revision 1.20  2008/03/16 14:19:38  fplanque
  * no message
  *

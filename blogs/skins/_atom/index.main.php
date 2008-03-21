@@ -23,9 +23,8 @@ init_MainList( $Blog->get_setting('posts_per_feed') );
 $feed_content = $Blog->get_setting('feed_content');
 if( $feed_content == 'none' )
 {	// We don't want to provide this feed!
-	global $skins_path;
-	require $skins_path.'_404_not_found.main.php';
-	exit(0);
+	// This will normaly have been detected earlier but just for security:
+	debug_die( 'Feeds are disabled.');
 }
 
 if( $debug)

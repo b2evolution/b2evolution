@@ -286,6 +286,16 @@ $Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
 										T_('META NOINDEX').' - '.T_('WARNING: Letting search engines index contact forms will attract spam.') );
 	$Form->checkbox( 'special_noindex', $edited_Blog->get_setting( 'special_noindex' ), T_('Other special pages'),
 										T_('META NOINDEX').' - '.T_('Pages with no index setting of their own... yet.') );
+	$Form->radio( '404_response', $edited_Blog->get_setting('404_response'),
+		array(
+				array( '200', T_('200 "OK" response') ),
+				array( '301', T_('301 redirect to main page') ),
+				array( '302', T_('302 redirect to main page') ),
+				array( '303', T_('303 redirect to main page') ),
+				array( '404', T_('404 "Not found" response') ),
+				array( '410', T_('410 "Gone" response') ),
+			), T_('404 "Not Found" response'), true );
+
 $Form->end_fieldset();
 
 
@@ -297,6 +307,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.12  2008/03/21 19:42:44  fplanque
+ * enhanced 404 handling
+ *
  * Revision 1.11  2008/01/21 09:35:27  fplanque
  * (c) 2008
  *

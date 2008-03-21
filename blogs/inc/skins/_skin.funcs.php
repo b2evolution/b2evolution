@@ -249,7 +249,10 @@ function skin_init( $disp )
 			break;
 
 		case '404':
-			header('HTTP/1.0 404 Not Found');
+			// We have a 404 unresolved content error
+			// How do we want do deal with it?
+			skin_404_header();
+			// This MAY or MAY not have exited -- will exit on 30x redirect, otherwise will return here.
 			break;
 	}
 }
@@ -369,6 +372,40 @@ function skin_base_tag()
 	}
 
 	base_tag( $base_href, $target );
+}
+
+
+
+/**
+ * Sends the desired HTTP response header in case of a "404".
+ */
+function skin_404_header()
+{
+	global $Blog;
+
+	// We have a 404 unresolved content error
+	// How do we want do deal with it?
+	switch( $resp_code = $Blog->get_setting( '404_response' ) )
+	{
+		case '404':
+			header('HTTP/1.0 404 Not Found');
+			break;
+
+		case '410':
+			header('HTTP/1.0 410 Gone');
+			break;
+
+		case '301':
+		case '302':
+		case '303':
+			// Redirect to home page:
+			header_redirect( $Blog->get('url'), intval($resp_code) );
+			// THIS WILL EXIT!
+			break;
+
+		default:
+			// Will result in a 200 OK
+	}
 }
 
 
@@ -522,6 +559,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.27  2008/03/21 19:42:44  fplanque
+ * enhanced 404 handling
+ *
  * Revision 1.26  2008/03/21 17:41:56  fplanque
  * custom 404 pages
  *

@@ -59,7 +59,7 @@ $BlogCache = & get_Cache( 'BlogCache' );
 /**
  * @var Blog
  */
-$Blog = & $BlogCache->get_by_ID( $blog, false );
+$Blog = & $BlogCache->get_by_ID( $blog, false, false );
 if( empty( $Blog ) )
 {
 	require $skins_path.'_404_blog_not_found.main.php'; // error & exit
@@ -526,6 +526,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.97  2008/03/21 19:42:44  fplanque
+ * enhanced 404 handling
+ *
  * Revision 1.96  2008/03/21 17:41:56  fplanque
  * custom 404 pages
  *
