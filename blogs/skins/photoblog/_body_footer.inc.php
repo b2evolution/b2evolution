@@ -35,10 +35,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		<a href="http://webreference.fr/2006/08/30/rss_atom_xml" title="External - English"><?php echo T_('What is RSS?') ?></a>
 	</p>
 
-</div>
-
-
-<div id="pageFooter">
 
 	<p class="baseline">
 		<?php

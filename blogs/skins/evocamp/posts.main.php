@@ -154,7 +154,7 @@ skin_include( '_body_header.inc.php' );
 						'after'     => '',
 					) );
 			?>
-
+			</p>
 			<?php
 				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 				skin_include( '_item_content.inc.php', array(
