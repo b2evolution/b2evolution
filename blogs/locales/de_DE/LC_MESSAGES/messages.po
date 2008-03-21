@@ -6943,15 +6943,13 @@ msgstr "Dieser Eintrag ist nicht veröffentlicht. Du kannst keinen Kommentar hint
 # TRANS: this is the default text for the extended post "more" link
 #: ..\..\..\inc\items\model\_item.class.php:1068
 #: ..\..\..\skins\evocamp\posts.main.php:163
-#, fuzzy
 msgid "Read more"
-msgstr "Lies mehr!"
+msgstr "Lies mehr"
 
 # TRANS: this is the default text displayed once the more link has been activated
 #: ..\..\..\inc\items\model\_item.class.php:1081
-#, fuzzy
 msgid "Follow up:"
-msgstr "Erlaube HochladenDatei hochladen"
+msgstr "Fortsetzung:"
 
 #: ..\..\..\inc\items\model\_item.class.php:1250
 msgid "Send email to post author"
