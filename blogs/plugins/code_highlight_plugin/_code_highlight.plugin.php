@@ -73,7 +73,7 @@ class code_highlight_plugin extends Plugin
 	var $name = 'Code highlight';
 	var $code = 'evo_code';
 	var $priority = 80;
-	var $version = '1.10-dev';
+	var $version = '2.0';
 	var $author = 'Astonish Me';
 	var $group = 'rendering';
 	var $help_url = 'http://b2evo.astonishme.co.uk/';
@@ -137,7 +137,13 @@ class code_highlight_plugin extends Plugin
 					'label' => $this->T_( 'Display code toolbar' ),
 					'type' => 'checkbox',
 					'defaultvalue' => '1',
-					'note' => $this->T_( 'Check this to display the code toolbar in expert mode (indivdual users can override this).' ),
+					'note' => $this->T_( 'Display code toolbar in expert mode and on comment form (indivdual users can override this).' ),
+				),
+			'render_comments' => array(
+					'label' => $this->T_( 'Render comments' ),
+					'type' => 'checkbox',
+					'defaultvalue' => '0',
+					'note' => $this->T_( 'Render codeblocks in comments.' ),
 				),
 			);
 		return $r;
@@ -161,9 +167,27 @@ class code_highlight_plugin extends Plugin
 					'label' => T_( 'Display code toolbar' ),
 					'defaultvalue' => $this->Settings->get('toolbar_default'),
 					'type' => 'checkbox',
-					'note' => $this->T_( 'Check this to display the code toolbar in expert mode' ),
+					'note' => $this->T_( 'Display the code toolbar' ),
 				),
 			);
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCommentToolbar( & $params )
+	{
+		if( $this->Settings->get( 'render_comments' )
+		&& ( ( is_logged_in() && $this->UserSettings->get( 'display_toolbar' ) )
+			|| ( !is_logged_in() && $this->Settings->get( 'toolbar_default' ) ) ) )
+		{
+			return $this->DisplayCodeToolbar();
+		}
+		return false;
 	}
 
 
@@ -179,15 +203,18 @@ class code_highlight_plugin extends Plugin
 		{	// This is too complex for simple mode, or user doesn't want the toolbar, don't display it:
 			return false;
 		}
+		$this->DisplayCodeToolbar();
+	}
 
+	function DisplayCodeToolbar()
+	{
 		echo '<div class="edit_toolbar">';
 		echo T_('Code').': ';
-		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" class="quicktags" onclick="codespan_tag(\'\');" value="'.T_('codespan').'" />';
+//		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" class="quicktags" onclick="codespan_tag(\'\');" value="'.T_('codespan').'" />';
 		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" style="margin-left:8px;" class="quicktags" onclick="codeblock_tag(\'\');" value="'.T_('codeblock').'" />';
 		echo '<input type="button" id="codeblock_xml" title="'.T_('Insert XML codeblock').'" class="quicktags" onclick="codeblock_tag(\'xml\');" value="'.T_('XML').'" />';
 		echo '<input type="button" id="codeblock_php" title="'.T_('Insert PHP codeblock').'" class="quicktags" onclick="codeblock_tag(\'php\');" value="'.T_('PHP').'" />';
-		// yabs > removed until css class is fully functional
-		//echo '<input type="button" id="codeblock_css" title="'.T_('Insert CSS codeblock').'" class="quicktags" onclick="codeblock_tag(\'css\');" value="'.T_('CSS').'" />';
+		echo '<input type="button" id="codeblock_css" title="'.T_('Insert CSS codeblock').'" class="quicktags" onclick="codeblock_tag(\'css\');" value="'.T_('CSS').'" />';
 		echo '</div>';
 
 		?>
@@ -235,7 +262,7 @@ class code_highlight_plugin extends Plugin
 								array( $this, 'filter_codeblock_callback' ), $content );
 
 		// Quick and dirty escaping of inline code <codespan> || [codespan]:
-		$content = preg_replace_callback( '#[<\[]codespan[>\]](.*?)[<\[]/codespan[>\]]#',
+		$content = preg_replace_callback( '#[<\[]codespan[^>\]](.*?)[<\[]/codespan[>\]]#',
 								array( $this, 'filter_codespan_callback' ), $content );
 
 		return true;
@@ -269,11 +296,47 @@ class code_highlight_plugin extends Plugin
 
 		// 1 - attribs : lang &| line
 		// 2 - codeblock
-		$content = preg_replace_callback( '#\<\!--\s*codeblock([^-]*?)\s*-->\<pre><code>([\s\S]+?)</code>\</pre>\<\!--\s+/codeblock\s*-->#i', array( $this, 'format_to_edit' ), $content );
+		$content = preg_replace_callback( '#<\!--\s*codeblock([^-]*?)\s*--><pre><code>(.+?)</code></pre><\!--\s+/codeblock\s*-->#i', array( $this, 'format_to_edit' ), $content );
 
 		return true;
 	}
 
+
+	function CommentFormSent( & $params )
+	{
+		if( $this->Settings->get( 'render_comments' ) )
+		{	// render code blocks in comment
+			$params['content' ] = & $params['comment'];
+			$this->FilterItemContents( $params );
+			// remove <pre>
+			$params['comment'] = preg_replace( '#(<\!--\s*codeblock[^-]*?\s*-->)<pre><code>(.+?)</code></pre>(<\!--\s+/codeblock\s*-->)#is', '$1<code>$2</code>$3', $params['comment'] );
+		}
+	}
+
+	function BeforeCommentFormInsert( $params )
+	{
+		if( $this->Settings->get( 'render_comments' ) )
+		{	// render code blocks in comment
+			// add <pre> back in so highlighting is done, will be removed by highlighter
+			$params['Comment']->content =  preg_replace( '#(<\!--\s*codeblock[^-]*?\s*-->)<code>(.+?)</code>(<\!--\s+/codeblock\s*-->)#is', '$1<pre><code>$2</code></pre>$3', $params['Comment']->content );
+		}
+	}
+
+
+
+
+	/**
+	 * Render comments if required
+	 *
+	 * @param array mixed $params
+	 */
+	function FilterCommentContent( $params )
+	{
+		if( $this->Settings->get( 'render_comments' ) )
+		{	// render code blocks in comment
+			$this->RenderItemAsHtml( $params );
+		}
+	}
 
 
 	/**
@@ -565,6 +628,9 @@ div.codeblock.amc_short table {
 
 /**
  * $Log$
+ * Revision 1.13  2008/03/21 10:31:17  yabs
+ * add ability to render code in comments
+ *
  * Revision 1.12  2008/01/21 09:35:41  fplanque
  * (c) 2008
  *
