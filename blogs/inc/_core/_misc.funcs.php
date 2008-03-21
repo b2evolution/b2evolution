@@ -203,16 +203,40 @@ function format_to_output( $content, $format = 'htmlbody' )
  * autobrize(-)
  */
 function autobrize($content) {
+	$content = callback_on_non_matching_blocks( $content, '~<code>.+?</code>~is', 'autobrize_callback' );
+	return $content;
+}
+
+/**
+ * Adds <br>'s to non code blocks
+ *
+ * @param string $content
+ * @return string content with <br>'s added
+ */
+function autobrize_callback( $content )
+{
 	$content = preg_replace("/<br>\n/", "\n", $content);
 	$content = preg_replace("/<br \/>\n/", "\n", $content);
 	$content = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />\n", $content);
 	return($content);
-	}
+}
 
 /*
  * unautobrize(-)
  */
 function unautobrize($content)
+{
+	$content = callback_on_non_matching_blocks( $content, '~<code>.+?</code>~is', 'unautobrize_callback' );
+	return $content;
+}
+
+/**
+ * Removes <br>'s from non code blocks
+ *
+ * @param string $content
+ * @return string content with <br>'s removed
+ */
+function unautobrize_callback( $content )
 {
 	$content = preg_replace("/<br>\n/", "\n", $content);   //for PHP versions before 4.0.5
 	$content = preg_replace("/<br \/>\n/", "\n", $content);
@@ -2640,6 +2664,9 @@ function generate_link_from_params( $link_params, $params = array() )
 
 /*
  * $Log$
+ * Revision 1.25  2008/03/21 10:25:09  yabs
+ * modified autobr to respect code blocks
+ *
  * Revision 1.24  2008/03/16 14:19:38  fplanque
  * no message
  *
