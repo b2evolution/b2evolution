@@ -2076,6 +2076,7 @@ function upgrade_b2evo_tables()
 		$DB->query( "ALTER TABLE T_items__item
 			CHANGE COLUMN post_urltitle post_urltitle VARCHAR(210) NULL DEFAULT NULL,
 			CHANGE COLUMN post_order    post_order DOUBLE NULL,
+			ADD COLUMN post_titletag  VARCHAR(255) NULL DEFAULT NULL AFTER post_urltitle,
 			ADD COLUMN post_double1   DOUBLE NULL COMMENT 'Custom double value 1' AFTER post_priority,
 			ADD COLUMN post_double2   DOUBLE NULL COMMENT 'Custom double value 2' AFTER post_double1,
 			ADD COLUMN post_double3   DOUBLE NULL COMMENT 'Custom double value 3' AFTER post_double2,
@@ -2236,6 +2237,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.253  2008/03/22 19:39:28  fplanque
+ * <title> tag support
+ *
  * Revision 1.252  2008/03/21 16:07:03  fplanque
  * longer post slugs
  *

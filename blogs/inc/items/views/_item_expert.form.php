@@ -197,7 +197,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	// ############################ ADVANCED #############################
 
-	$Form->begin_fieldset( T_('Advanced properties'), array( 'id' => 'itemform_adv_props' ) );
+	$Form->begin_fieldset( T_('Advanced properties').get_manual_link('post_advanced_properties_fieldset'), array( 'id' => 'itemform_adv_props' ) );
 
 	// CUSTOM FIELDS varchar
 	echo '<table cellspacing="0" class="compose_layout">';
@@ -206,26 +206,35 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		if( $field_name = $Blog->get_setting('custom_varchar'.$i) )
 		{	// Field has a name: display it:
 			echo '<tr><td width="1"><label for="item_varchar'.$i.'"><strong>'.$field_name.':</strong></label></td>';
-			echo '<td class="input">';
+			echo '<td class="input" width="97%">';
 			$Form->text_input( 'item_varchar'.$i, $edited_Item->{'varchar'.$i}, 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 			echo '</td><td width="1"><!-- for IE7 --></td></tr>';
 		}
 	}
+
+	echo '<tr><td width="1"><label for="titletag" title="'.T_('&quot;slug&quot; to be used in permalinks').'"><strong>'.T_('URL "slug"').':</strong></label></td>';
+	echo '<td class="input" width="97%">';
+	$Form->text_input( 'post_urltitle', $edited_Item->get('urltitle'), 40, '', '', array('maxlength'=>210, 'style'=>'width: 100%;') );
+	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
+
+	echo '<tr><td width="1"><label for="titletag"><strong>'.T_('&lt;title&gt; tag').':</strong></label></td>';
+	echo '<td class="input" width="97%">';
+	$Form->text_input( 'titletag', $edited_Item->get('titletag'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
+
+	echo '<tr><td width="1"><label for="item_tags"><strong>'.T_('Tags').':</strong> <span class="notes">'.T_('sep by ,').'</span></label></label></td>';
+	echo '<td class="input" width="97%">';
+	$Form->text_input( 'item_tags', $item_tags, 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
+
 	echo '</table>';
 
  	$Form->switch_layout( 'linespan' );
 	echo '<div id="itemform_urltitle" class="edit_fieldgroup">';
-	$Form->text( 'post_urltitle', $edited_Item->get( 'urltitle' ), 40, T_('URL "filename"'),
-	             T_('("slug" to be used in permalinks)'), $field_maxlength = 210 ) ;
+
 	echo '</div>';
 	$Form->switch_layout( NULL );
 	?>
-
-	<div id="itemform_tags" class="edit_fieldgroup">
-		<label for="item_tags"><strong><?php echo T_('Tags') ?>:</strong>
-		<span class="notes"><?php echo T_('(Separate by comma (,))') ?></span></label><br />
-		<input type="text" name="item_tags" class="large form_text_input" id="item_tags" value="<?php echo format_to_output( $item_tags, 'formvalue' ); ?>" />
-	</div>
 
 	<div id="itemform_post_excerpt" class="edit_fieldgroup">
 		<label for="post_excerpt"><strong><?php echo T_('Excerpt') ?>:</strong>
@@ -412,6 +421,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.27  2008/03/22 19:39:29  fplanque
+ * <title> tag support
+ *
  * Revision 1.26  2008/03/22 15:20:19  fplanque
  * better issue time control
  *

@@ -111,6 +111,8 @@ class Item extends ItemLight
 
 	var $content;
 
+	var $titletag;
+
 	/**
 	 * Lazy filled, use split_page()
 	 */
@@ -260,6 +262,7 @@ class Item extends ItemLight
 			$this->assigned_user_ID = $db_row->post_assigned_user_ID;
 			$this->status = $db_row->post_status;
 			$this->content = $db_row->post_content;
+			$this->titletag = $db_row->post_titletag;
 			$this->pst_ID = $db_row->post_pst_ID;
 			$this->datedeadline = $db_row->post_datedeadline;
 			$this->priority = $db_row->post_priority;
@@ -407,6 +410,10 @@ class Item extends ItemLight
 
 		if( param( 'post_urltitle', 'string', NULL ) !== NULL ) {
 			$this->set_from_Request( 'urltitle' );
+		}
+
+		if( param( 'titletag', 'string', NULL ) !== NULL ) {
+			$this->set_from_Request( 'titletag', 'titletag' );
 		}
 
 		if( param( 'item_tags', 'string', NULL ) !== NULL ) {
@@ -1301,6 +1308,22 @@ class Item extends ItemLight
 
 		// pre_dump( $this->tags );
 		return $this->tags;
+	}
+
+
+	/**
+	 * Get the title for the <title> tag
+	 *
+	 * If it's not specifically entered, use the regular post title instead
+	 */
+	function get_titletag()
+	{
+		if( empty($this->titletag) )
+		{
+			return $this->title;
+		}
+
+		return $this->titletag;
 	}
 
 
@@ -3473,6 +3496,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.40  2008/03/22 19:39:28  fplanque
+ * <title> tag support
+ *
  * Revision 1.39  2008/03/22 15:20:19  fplanque
  * better issue time control
  *

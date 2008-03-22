@@ -921,7 +921,7 @@ class ItemListLight extends DataObjectList2
 			}
 			else
 			{
-				$title_array[] = $Item->get('title');
+				$title_array[] = $Item->get_titletag();
 			}
 			return $title_array;
 		}
@@ -1513,6 +1513,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.20  2008/03/22 19:39:28  fplanque
+ * <title> tag support
+ *
  * Revision 1.19  2008/01/21 09:35:31  fplanque
  * (c) 2008
  *
