@@ -616,6 +616,32 @@ function visibility_select( & $Form, $post_status )
 }
 
 
+/**
+ * Selection of the issue date
+ */
+function issue_date_control( $Form, $break = false )
+{
+	global $edited_Item, $set_issue_date;
+
+	echo '<label><input type="radio" name="set_issue_date" id="set_issue_date_now" value="now" '
+				.( ($set_issue_date == 'now') ? 'checked="checked"' : '' )
+				.'/><strong>'.T_('Update issue date to NOW').'</strong></label>';
+
+	if( $break )
+	{
+		echo '<br />';
+	}
+
+	echo '<label><input type="radio" name="set_issue_date" id="set_issue_date_to" value="set" '
+				.( ($set_issue_date == 'set') ? 'checked="checked"' : '' )
+				.'/><strong>'.T_('Set to').':</strong></label>';
+	$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), '' );
+	echo ' '; // allow wrapping!
+	$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '', 'hh:mm:ss', '' );
+	echo ' '; // allow wrapping!
+
+}
+
 
 /**
  * Template tag: Link to an item identified by its url title / slug / name
@@ -654,6 +680,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.9  2008/03/22 15:20:19  fplanque
+ * better issue time control
+ *
  * Revision 1.8  2008/03/21 16:07:03  fplanque
  * longer post slugs
  *

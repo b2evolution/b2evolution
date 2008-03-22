@@ -355,12 +355,11 @@ class Item extends ItemLight
 	 *
 	 * This requires the blog (e.g. {@link $blog_ID} or {@link $main_cat_ID} to be set).
 	 *
-	 * @param boolean true to force edit date (as long as perms permit)
 	 * @return boolean true if loaded data seems valid.
 	 */
-	function load_from_Request( $force_edit_date = false )
+	function load_from_Request( $editing = false )
 	{
-		global $default_locale, $current_User;
+		global $default_locale, $current_User, $localtimenow, $set_issue_date;
 
 		if( param( 'post_locale', 'string', NULL ) !== NULL )
 		{
@@ -383,14 +382,22 @@ class Item extends ItemLight
 			param_error( 'post_url', T_('If you want to redirect this post, you must specify an URL! (Expert mode)') );
 		}
 
-		if( ( $force_edit_date || param( 'edit_date', 'integer', 0 ) )
-				&& $current_User->check_perm( 'edit_timestamp' ) )
-		{ // We can use user date:
-			param_date( 'item_issue_date', T_('Please enter a valid issue date.'), $force_edit_date /* required */ );
-			if( strlen(get_param('item_issue_date')) )
-			{ // only set it, if a date was given:
-				param_time( 'item_issue_time' );
-				$this->set( 'issue_date', form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ) ); // TODO: cleanup...
+		if( $current_User->check_perm( 'edit_timestamp' ) )
+		{
+			$set_issue_date = param( 'set_issue_date', 'string', '' );
+
+			if( $set_issue_date == 'set' )
+			{ // We can use user date:
+				param_date( 'item_issue_date', T_('Please enter a valid issue date.'), true );
+				if( strlen(get_param('item_issue_date')) )
+				{ // only set it, if a date was given:
+					param_time( 'item_issue_time' );
+					$this->set( 'issue_date', form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ) ); // TODO: cleanup...
+				}
+			}
+			elseif( $set_issue_date == 'now' && ! $editing )
+			{	// Set date to NOW:
+				$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
 			}
 		}
 
@@ -3466,6 +3473,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.39  2008/03/22 15:20:19  fplanque
+ * better issue time control
+ *
  * Revision 1.38  2008/02/18 20:22:40  fplanque
  * no message
  *

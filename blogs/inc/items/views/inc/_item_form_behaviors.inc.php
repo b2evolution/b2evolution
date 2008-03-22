@@ -60,41 +60,42 @@ global $js_doc_title_prefix;
 		<?php
 	}
 
-	// Add event to check the edit_date checkbox whenever the date is modified:
-	if( $creating )
-	{
-		?>
-		if( edit_date_elt = document.getElementById('edit_date') )
-		{
-			/**
-			 * If user modified date, check the checkbox:
-			 */
-			function evo_check_edit_date()
-			{
-				edit_date_elt.checked = true;
-			}
-
-			if( item_issue_date_elt = document.getElementById('item_issue_date') )
-			{
-				addEvent( item_issue_date_elt, 'change', evo_check_edit_date, false );
-			}
-			if( item_issue_time_elt = document.getElementById('item_issue_time') )
-			{
-				addEvent( item_issue_time_elt, 'change', evo_check_edit_date, false );
-			}
-			if( item_issue_date_button = document.getElementById('anchor_item_issue_date') )
-			{
-				addEvent( item_issue_date_button, 'click', evo_check_edit_date, false );
-			}
-		}
-		<?php
-	}
+	// Add event to check the set radio option whenever the date is modified:
 	?>
+	if( edit_date_elt = document.getElementById('set_issue_date_to') )
+	{
+		/**
+		 * If user modified date, select the appropriate radio:
+		 */
+		function evo_check_edit_date()
+		{
+			edit_date_elt.checked = true;
+		}
+
+		if( item_issue_date_elt = document.getElementById('item_issue_date') )
+		{
+			addEvent( item_issue_date_elt, 'change', evo_check_edit_date, false );
+			addEvent( item_issue_date_elt, 'click', evo_check_edit_date, false );
+		}
+		if( item_issue_time_elt = document.getElementById('item_issue_time') )
+		{
+			addEvent( item_issue_time_elt, 'change', evo_check_edit_date, false );
+			addEvent( item_issue_time_elt, 'click', evo_check_edit_date, false );
+		}
+		if( item_issue_date_button = document.getElementById('anchor_item_issue_date') )
+		{
+			addEvent( item_issue_date_button, 'click', evo_check_edit_date, false );
+		}
+	}
 </script>
 
 <?php
+
 /*
  * $Log$
+ * Revision 1.3  2008/03/22 15:20:19  fplanque
+ * better issue time control
+ *
  * Revision 1.2  2008/01/21 09:35:32  fplanque
  * (c) 2008
  *

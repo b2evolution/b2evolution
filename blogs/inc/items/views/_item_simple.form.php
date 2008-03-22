@@ -44,7 +44,7 @@ global $pagenow;
 
 global $mode, $use_post_url;
 global $use_preview, $post_comment_status, $trackback_url, $item_tags;
-global $edit_date, $bozo_start_modified, $creating;
+global $bozo_start_modified, $creating;
 global $item_title, $item_content;
 global $redirect_to;
 
@@ -197,16 +197,7 @@ for( $i = 1 ; $i <= 3; $i++ )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
 		echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
 		$Form->switch_layout( 'linespan' );
-
-		$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), T_('Issue date') );
-		echo ' '; // allow wrapping!
-		$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '' );
-		echo ' '; // allow wrapping!
-		if( $creating )
-		{ // If not checked, create time will be used...
-			$Form->checkbox( 'edit_date', $edit_date, '', T_('Edit') );
-		}
-
+		issue_date_control( $Form, false );
 		$Form->switch_layout( NULL );
 		echo '</div>';
 	}
@@ -280,6 +271,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.11  2008/03/22 15:20:19  fplanque
+ * better issue time control
+ *
  * Revision 1.10  2008/02/09 20:14:14  fplanque
  * custom fields management
  *

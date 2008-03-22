@@ -151,6 +151,7 @@ switch( $action )
 		break;
 
 	case 'new':
+		$set_issue_date = 'now';
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 		// New post form  (can be a bookmarklet form if mode == bookmarklet )
 
@@ -162,7 +163,7 @@ switch( $action )
 		// We use the request variables to fill the edit form, because we need to be able to pass those values
 		// from tab to tab via javascript when the editor wants to switch views...
 		// Also used by bookmarklet
-		$edited_Item->load_from_Request(); // needs Blog set
+		$edited_Item->load_from_Request( true ); // needs Blog set
 
 		$edited_Item->status = param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
@@ -171,7 +172,7 @@ switch( $action )
 
 
 		param( 'post_extracats', 'array', array() );
-		param( 'edit_date', 'integer', 0 ); // checkbox
+
 		$edited_Item->main_cat_ID = param( 'post_category', 'integer', $Blog->get_default_cat_ID() );
 		if( $edited_Item->main_cat_ID && $allow_cross_posting < 3 && get_catblog($edited_Item->main_cat_ID) != $blog )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
@@ -207,10 +208,9 @@ switch( $action )
 
 		// We use the request variables to fill the edit form, because we need to be able to pass those values
 		// from tab to tab via javascript when the editor wants to switch views...
-		$edited_Item->load_from_Request(); // needs Blog set
+		$edited_Item->load_from_Request( true ); // needs Blog set
 
 		param( 'post_extracats', 'array', array() );
-		param( 'edit_date', 'integer', 0 ); // checkbox
 		$edited_Item->main_cat_ID = param( 'post_category', 'integer', $edited_Item->main_cat_ID );
 		if( $edited_Item->main_cat_ID && $allow_cross_posting < 3 && get_catblog($edited_Item->main_cat_ID) != $blog )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
@@ -244,6 +244,8 @@ switch( $action )
   	$item_tags = implode( ', ', $edited_Item->get_tags() );
   	$trackback_url = '';
 
+  	$set_issue_date = 'set';
+
 		// Page title:
 		$js_doc_title_prefix = T_('Editing post').': ';
 		$AdminUI->title = $js_doc_title_prefix.$edited_Item->dget( 'title', 'htmlhead' );
@@ -276,7 +278,7 @@ switch( $action )
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
 		// Set object params:
-		$edited_Item->load_from_Request();
+		$edited_Item->load_from_Request( false );
 
 		// TODO: fp> Add a radio into blog settings > Features > Post title: () required () optional () none
 		/*
@@ -752,6 +754,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2008/03/22 15:20:20  fplanque
+ * better issue time control
+ *
  * Revision 1.15  2008/01/22 16:16:48  fplanque
  * bugfix
  *
