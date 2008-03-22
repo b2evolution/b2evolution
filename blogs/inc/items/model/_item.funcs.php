@@ -595,22 +595,22 @@ function visibility_select( & $Form, $post_status )
 	$sharing_options = array();
 
 	if( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) )
-		$sharing_options[] = array( 'published', T_('Published (Public)') );
+		$sharing_options[] = array( 'published', T_('Published').' <span class="notes">'.T_('(Public)').'</span>' );
 
 	if( $current_User->check_perm( 'blog_post!protected', 'edit', false, $Blog->ID ) )
-		$sharing_options[] = array( 'protected', T_('Protected (Members only)') );
+		$sharing_options[] = array( 'protected', T_('Protected').' <span class="notes">'.T_('(Members only)').'</span>' );
 
 	if( $current_User->check_perm( 'blog_post!private', 'edit', false, $Blog->ID ) )
-		$sharing_options[] = array( 'private', T_('Private (You only)') );
+		$sharing_options[] = array( 'private', T_('Private').' <span class="notes">'.T_('(You only)').'</span>' );
 
 	if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
-		$sharing_options[] = array( 'draft', T_('Draft (Not published!)') );
+		$sharing_options[] = array( 'draft', T_('Draft').' <span class="notes">'.T_('(Not published!)').'</span>' );
 
 	if( $current_User->check_perm( 'blog_post!deprecated', 'edit', false, $Blog->ID ) )
-		$sharing_options[] = array( 'deprecated', T_('Deprecated (Not published!)') );
+		$sharing_options[] = array( 'deprecated', T_('Deprecated').' <span class="notes">'.T_('(Not published!)').'</span>' );
 
 	if( $current_User->check_perm( 'blog_post!redirected', 'edit', false, $Blog->ID ) )
-		$sharing_options[] = array( 'redirected', T_('Redirected') );
+		$sharing_options[] = array( 'redirected', T_('Redirected').' <span class="notes">'.T_('(301)').'</span>' );
 
 	$Form->radio( 'post_status', $post_status, $sharing_options, '', true );
 }
@@ -680,6 +680,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.10  2008/03/22 19:32:22  fplanque
+ * minor
+ *
  * Revision 1.9  2008/03/22 15:20:19  fplanque
  * better issue time control
  *
