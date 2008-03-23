@@ -2108,9 +2108,9 @@ function upgrade_b2evo_tables()
 
     $DB->query( "CREATE TABLE T_track__goalhit (
             ghit_ID int(10) unsigned NOT NULL auto_increment,
-            ghit_goal_ID int(10) unsigned NOT NULL,
-            ghit_sess_ID int(10) unsigned NOT NULL,
-            ghit_params varchar(2000) default NULL,
+            ghit_goal_ID    int(10) unsigned NOT NULL,
+            ghit_sess_ID    int(10) unsigned NOT NULL,
+            ghit_params     TEXT default NULL,
             PRIMARY KEY  (ghit_ID),
             KEY ghit_goal_ID (ghit_goal_ID),
             KEY ghit_sess_ID (ghit_sess_ID)
@@ -2237,6 +2237,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.254  2008/03/23 23:40:42  fplanque
+ * no message
+ *
  * Revision 1.253  2008/03/22 19:39:28  fplanque
  * <title> tag support
  *

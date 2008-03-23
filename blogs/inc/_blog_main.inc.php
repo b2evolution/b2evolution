@@ -423,7 +423,7 @@ if( isset( $skin ) )
 	}
 }
 
-if( empty( $skin ) )
+if( !isset( $skin ) )	// Note: if $skin is set to '', then we want to do a "no skin" display
 { // Use default skin from the database
 	$SkinCache = & get_cache( 'SkinCache' );
 
@@ -526,6 +526,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.98  2008/03/23 23:40:42  fplanque
+ * no message
+ *
  * Revision 1.97  2008/03/21 19:42:44  fplanque
  * enhanced 404 handling
  *
