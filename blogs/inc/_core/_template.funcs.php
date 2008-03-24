@@ -77,15 +77,12 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 	}
 	// <fp
 
-	/* fp>why do we need this?
-	   dh>because Location: redirects are supposed to be absolute.
-	if( substr($redirect_to, 0, 1) == '/' )
+	// "Location:"-redirects are supposed to be absolute:
+	if( $redirect_to[0] == '/' && $redirect_to[1] != '/' /* skip "//", would need special handling */ )
 	{ // relative URL, prepend current host:
 		global $ReqHost;
-
 		$redirect_to = $ReqHost.$redirect_to;
 	}
-	*/
 
 	if( strpos($redirect_to, $htsrv_url_sensitive) === 0 /* we're going somewhere on $htsrv_url_sensitive */
 	 || strpos($redirect_to, $baseurl) === 0   /* we're going somewhere on $baseurl */ )
@@ -732,6 +729,9 @@ function powered_by( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.22  2008/03/24 03:07:40  blueyed
+ * Enable make-redirects-absolute in header_redirect() again
+ *
  * Revision 1.21  2008/03/21 19:42:44  fplanque
  * enhanced 404 handling
  *
