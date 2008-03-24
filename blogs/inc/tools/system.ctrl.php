@@ -251,6 +251,7 @@ $block_item_Widget->disp_template_raw( 'block_end' );
 $block_item_Widget->title = T_('PHP');
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
+// dh> TODO: fix order.. PHP version is most important, stuff like user/group less so.
 
 /*
  * Note about process user:
@@ -587,6 +588,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2008/03/24 03:12:36  blueyed
+ * Add TODO
+ *
  * Revision 1.9  2008/02/07 00:36:28  fplanque
  * added mbstrings check
  *
