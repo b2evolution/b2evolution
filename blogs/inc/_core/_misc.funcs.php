@@ -65,6 +65,7 @@ load_funcs('files/model/_file.funcs.php');
  * This is called by PHP at the end of the script.
  *
  * NOTE: anything happening here will unfortunately not appear in the debug_log
+ *       dh> Well, it does so for me (PHP 5.2.4).
  */
 function shutdown()
 {
@@ -99,6 +100,10 @@ function shutdown()
 	// Calling debug_info() here will produce complete data but it will be after </html> hence invalid.
 	// Then again, it's for debug only, so it shouldn't matter that much.
 	debug_info();
+
+	// Update the SESSION again, at the very end:
+	// (e.g. "Debugslogs" may have been removed in debug_info())
+	$Session->dbsave();
 }
 
 
@@ -1389,12 +1394,13 @@ function debug_info( $force = false )
 		}
 
 		if( empty($debug) )
-		{ // No debug outpud desired:
+		{ // No debug output desired:
 			return;
 		}
 
-		if( $debug < 2 && $Hit->agent_type != 'browser' )
+		if( $debug < 2 && ( empty($Hit) || $Hit->agent_type != 'browser' ) )
 		{	// Don't display if it's not a browser (very needed for proper RSS display btw)
+			// ($Hit is empty e.g. during install)
 			return;
 		}
 	}
@@ -2664,6 +2670,10 @@ function generate_link_from_params( $link_params, $params = array() )
 
 /*
  * $Log$
+ * Revision 1.26  2008/03/24 03:10:12  blueyed
+ * - shutdown(): update $Session at the very end
+ * - debug_info(): Test if $Hit is defined
+ *
  * Revision 1.25  2008/03/21 10:25:09  yabs
  * modified autobr to respect code blocks
  *
