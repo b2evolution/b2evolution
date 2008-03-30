@@ -573,9 +573,11 @@ class Calendar
 
 
 			$dateendofmonth = mktime(0, 0, 0, $this->month, $daysinmonth, $this->year);
-			// echo date( locale_datefmt(), $dateendofmonth );
+			// echo 'end of month: '.date( 'Y-m-d H:i:s', $dateendofmonth );
 			$calendarblah = get_weekstartend( $dateendofmonth, locale_startofweek() );
 			$calendarlast = $calendarblah['end'];
+			// echo date( ' Y-m-d H:i:s', $calendarlast );
+
 
 
 			// here the offset bug is corrected
@@ -715,7 +717,8 @@ class Calendar
 		echo $this->rowstart;
 
 		if( $this->mode == 'year' )
-		{
+		{	// DISPLAY MONTHS:
+
 			for ($i = 1; $i < 13; $i = $i + 1)
 			{	// For each month:
 				if( isset($monthswithposts[ $i ]) )
@@ -760,7 +763,7 @@ class Calendar
 			}
 		}
 		else // mode == 'month'
-		{	// Display current month:
+		{	// DISPLAY DAYS of current month:
 			$dow = 0;
 			$last_day = -1;
 			$dom_displayed = 0; // days of month displayed
@@ -1141,6 +1144,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.50  2008/03/30 14:56:50  fplanque
+ * DST fix
+ *
  * Revision 1.49  2008/01/21 09:35:41  fplanque
  * (c) 2008
  *

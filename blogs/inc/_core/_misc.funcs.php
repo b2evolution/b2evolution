@@ -617,27 +617,24 @@ function get_start_date_for_week( $year, $week, $startofweek )
 
 
 /**
- * Get start and end day of a week, based on week number and start-of-week
+ * Get start and end day of a week, based on day f the week and start-of-week
  *
  * Used by Calendar
- *
- * fp>> I'd really like someone to comment the magic of that thing...
  *
  * @param date
  * @param integer 0 for Sunday, 1 for Monday
  */
 function get_weekstartend( $date, $startOfWeek )
 {
-	$weekday = date('w', $date);
-	$i = 86400;
-	while( $weekday <> $startOfWeek )
+	while( date('w', $date) <> $startOfWeek )
 	{
-		$weekday = date('w', $date);
-		$date = $date - 86400;
-		$i = 0;
+		// echo '<br />'.date('Y-m-d H:i:s w', $date).' - '.$startOfWeek;
+		// mktime is needed so calculations work for DST enabling. Example: March 30th 2008, start of week 0 sunday
+		$date = mktime( 0, 0, 0, date('m',$date), date('d',$date)-1, date('Y',$date) );
 	}
-	$week['start'] = $date + 86400 - $i;
-	$week['end']   = $date + 604800; // 691199;
+	// echo '<br />'.date('Y-m-d H:i:s w', $date).' = '.$startOfWeek;
+	$week['start'] = $date;
+	$week['end']   = $date + 604800; // 7 days
 
 	// pre_dump( 'weekstartend: ', date( 'Y-m-d', $week['start'] ), date( 'Y-m-d', $week['end'] ) );
 
@@ -2670,6 +2667,9 @@ function generate_link_from_params( $link_params, $params = array() )
 
 /*
  * $Log$
+ * Revision 1.27  2008/03/30 14:56:50  fplanque
+ * DST fix
+ *
  * Revision 1.26  2008/03/24 03:10:12  blueyed
  * - shutdown(): update $Session at the very end
  * - debug_info(): Test if $Hit is defined
