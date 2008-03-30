@@ -84,7 +84,10 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 
 	if( $redirect_to[0] == '/' )
 	{
-		debug_die( '$redirect_to must be an absolute URL' );
+		// TODO: until all calls to header_redirect are cleaned up:
+		global $ReqHost;
+		$redirect_to = $ReqHost.$redirect_to;
+		// debug_die( '$redirect_to must be an absolute URL' );
 	}
 
 	if( strpos($redirect_to, $htsrv_url_sensitive) === 0 /* we're going somewhere on $htsrv_url_sensitive */
@@ -733,8 +736,8 @@ function powered_by( $params = array() )
 
 /*
  * $Log$
- * Revision 1.23  2008/03/30 23:31:35  fplanque
- * cleanup
+ * Revision 1.24  2008/03/30 23:37:22  fplanque
+ * TODO
  *
  * Revision 1.22  2008/03/24 03:07:40  blueyed
  * Enable make-redirects-absolute in header_redirect() again
