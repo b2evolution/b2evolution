@@ -46,7 +46,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * @todo fp> do NOT allow $redirect_to = NULL. This leads to spaghetti code and unpredictable behavior.
  *
- * @param string URL to redirect to (overrides detection)
+ * @param string Destination URL to redirect to
  * @param boolean|integer is this a permanent redirect? if true, send a 301; otherwise a 303 OR response code 301,302,303
  */
 function header_redirect( $redirect_to = NULL, $permanent = false )
@@ -54,7 +54,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 	global $Hit, $baseurl, $Blog, $htsrv_url_sensitive;
 	global $Session, $Debuglog, $Messages;
 
-	// fp> get this out
+	// TODO: fp> get this out to the caller, make a helper func like get_returnto_url()
 	if( empty($redirect_to) )
 	{ // see if there's a redirect_to request param given:
 		$redirect_to = param( 'redirect_to', 'string', '' );
@@ -74,14 +74,17 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 				$redirect_to = $baseurl;
 			}
 		}
+		elseif( $redirect_to[0] == '/' )
+		{ // relative URL, prepend current host:
+			global $ReqHost;
+			$redirect_to = $ReqHost.$redirect_to;
+		}
 	}
 	// <fp
 
-	// "Location:"-redirects are supposed to be absolute:
-	if( $redirect_to[0] == '/' && $redirect_to[1] != '/' /* skip "//", would need special handling */ )
-	{ // relative URL, prepend current host:
-		global $ReqHost;
-		$redirect_to = $ReqHost.$redirect_to;
+	if( $redirect_to[0] == '/' )
+	{
+		debug_die( '$redirect_to must be an absolute URL' );
 	}
 
 	if( strpos($redirect_to, $htsrv_url_sensitive) === 0 /* we're going somewhere on $htsrv_url_sensitive */
@@ -93,10 +96,11 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 		// fp> which views please (important to list in order to remove asap)
 		// dh> sorry, don't remember
 		// TODO: fp> action should actually not be used to trigger views. This should be changed at some point.
+		// TODO: fp> confirm should be normalized to confirmed
 		$redirect_to = preg_replace( '~(?<=\?|&) (login|pwd|confirm(ed)?) = [^&]+ ~x', '', $redirect_to );
 	}
 
-
+	// TODO: fp> change $permanent to $status in the params
 	if( is_integer($permanent) )
 	{
 		$status = $permanent;
@@ -729,6 +733,9 @@ function powered_by( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.23  2008/03/30 23:31:35  fplanque
+ * cleanup
+ *
  * Revision 1.22  2008/03/24 03:07:40  blueyed
  * Enable make-redirects-absolute in header_redirect() again
  *

@@ -164,6 +164,7 @@ div.powered_by {
 	margin: 16px 0;
 	text-align: center;
 }
-div.error_404 {
+div.error_404,
+div.error_additional_content {
 	margin: 1em;
 }
