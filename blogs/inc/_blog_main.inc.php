@@ -66,8 +66,9 @@ if( empty( $Blog ) )
 	// EXIT.
 }
 
-// These will be filled in later, but we init themfor security.
-$disp = 'posts';
+
+// Init $disp
+param( 'disp', 'string', 'posts', true );
 $disp_detail = '';
 
 
@@ -288,7 +289,6 @@ param( 'title', 'string', '', true );						// urtitle of post to display
 param( 'redir', 'string', 'yes', false );				// Do we allow redirection to canonical URL? (allows to force a 'single post' URL for commenting)
 param( 'preview', 'integer', 0, true );         // Is this preview ?
 param( 'stats', 'integer', 0 );									// Deprecated but might still be used by spambots
-param( 'disp', 'string', 'posts', true );
 
 // In case these were not set by the stub:
 if( !isset($timestamp_min) ) $timestamp_min = '';
@@ -526,6 +526,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.99  2008/03/30 23:04:23  fplanque
+ * fix
+ *
  * Revision 1.98  2008/03/23 23:40:42  fplanque
  * no message
  *

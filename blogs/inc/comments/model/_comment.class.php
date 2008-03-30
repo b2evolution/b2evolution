@@ -60,7 +60,7 @@ class Comment extends DataObject
 	 * The ID of the author's user. NULL for anonymous visitors.
 	 * @var integer
 	 */
-	var $author_ID;
+	var $author_user_ID;
 	/**
 	 * Comment type: 'comment', 'linkback', 'trackback' or 'pingback'
 	 * @var string
@@ -1326,6 +1326,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2008/03/30 23:04:23  fplanque
+ * fix
+ *
  * Revision 1.18  2008/03/16 22:39:07  fplanque
  * doc
  *
