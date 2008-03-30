@@ -98,6 +98,7 @@ class ItemList2 extends ItemListLight
 		$post_locale = param( 'post_locale', 'string', $current_User->locale );
 		$content = param( 'content', 'html', true );
 		$post_title = param( 'post_title', 'html', true );
+		$post_titletag = param( 'titletag', 'string', true );
 		$post_excerpt = param( 'post_excerpt', 'string', true );
 		$post_url = param( 'post_url', 'string', '' );
 		$post_category = param( 'post_category', 'integer', true );
@@ -167,6 +168,7 @@ class ItemList2 extends ItemListLight
 			'".$DB->escape($post_locale)."' AS post_locale,
 			'".$DB->escape($content)."' AS post_content,
 			'".$DB->escape($post_title)."' AS post_title,
+			'".$DB->escape($post_titletag)."' AS post_titletag,
 			'".$DB->escape($post_excerpt)."' AS post_excerpt,
 			NULL AS post_urltitle,
 			'".$DB->escape($post_url)."' AS post_url,
@@ -651,6 +653,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.10  2008/03/30 14:17:10  fplanque
+ * fix
+ *
  * Revision 1.9  2008/02/19 11:11:17  fplanque
  * no message
  *
