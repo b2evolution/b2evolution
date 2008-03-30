@@ -1725,9 +1725,10 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  * @param string icon code for {@link get_icon()}
  * @param string URL where the icon gets linked to (empty to not wrap the icon in a link)
  * @param string word to be displayed after icon (if no icon gets displayed, $title will be used instead!)
- * @param integer 1-5: weight of the icon. the icon will be displayed only if its weight is >= than the user setting threshold
- *                     Use 5, if it's a required icon - all others could get disabled by the user.
- * @param integer 1-5: weight of the word. the word will be displayed only if its weight is >= than the user setting threshold
+ * @param integer 1-5: weight of the icon. The icon will be displayed only if its weight is >= than the user setting threshold.
+ *                     Use 5, if it's a required icon - all others could get disabled by the user. (Default: 4)
+ * @param integer 1-5: weight of the word. The word will be displayed only if its weight is >= than the user setting threshold.
+ *                     (Default: 1)
  * @param array Additional attributes to the A tag. The values must be properly encoded for html output (e.g. quotes).
  *        It may also contain these params:
  *         - 'use_js_popup': if true, the link gets opened as JS popup. You must also pass an "id" attribute for this!
@@ -1735,12 +1736,21 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  *         - 'class': defaults to 'action_icon', if not set; use "" to not use it
  * @return string The generated action icon link.
  */
-function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word_weight = 1, $link_attribs = array() )
+function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = null, $word_weight = null, $link_attribs = array() )
 {
 	global $UserSettings;
 
 	$link_attribs['href'] = $url;
 	$link_attribs['title'] = $title;
+
+	if( is_null($icon_weight) )
+	{
+		$icon_weight = 4;
+	}
+	if( is_null($word_weight) )
+	{
+		$word_weight = 1;
+	}
 
 	if( ! isset($link_attribs['class']) )
 	{
@@ -2667,6 +2677,9 @@ function generate_link_from_params( $link_params, $params = array() )
 
 /*
  * $Log$
+ * Revision 1.28  2008/03/30 23:03:40  blueyed
+ * action_icon: doc, provide default for $icon_weight and $word_weight through "null"
+ *
  * Revision 1.27  2008/03/30 14:56:50  fplanque
  * DST fix
  *
