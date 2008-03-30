@@ -54,6 +54,9 @@ function load_funcs( $funcs_path )
 
 /**
  * @todo fp> split into 1 function per case. (typed @return values)
+ * @todo dh> using globals "pollutes" the global namespace. Use some "static" cache?! -
+ *           we seem to use the return value anyway always to assign it to a var in
+ *           the current scope ($FooCache = get_Cache("fooCache").
  *
  * @return DataObjectCache
  */
@@ -148,6 +151,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.6  2008/03/30 21:18:54  blueyed
+ * todo
+ *
  * Revision 1.5  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *

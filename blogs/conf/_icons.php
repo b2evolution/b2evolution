@@ -35,7 +35,7 @@ function get_icon_info($name)
 
 		case 'dropdown': return array(
 			'file' => 'icons/dropdown.gif',
-			'alt'  => '¤',
+			'alt'  => '¤', // TODO: <= ??
 			'size' => array( 11, 8 ),
 		);
 		case 'switch-to-admin': return array(
@@ -528,6 +528,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.68  2008/03/30 21:18:10  blueyed
+ * todo
+ *
  * Revision 1.67  2008/02/14 02:19:50  fplanque
  * cleaned up stats
  *
