@@ -12016,7 +12016,7 @@ msgid ""
 "Are you sure you want to delete your existing %s tables?\n"
 "Do you have a backup?"
 msgstr ""
-"Etes vous sûr de vouloir supprimer vos tables %s existantes?\\n"
+"Etes vous sûr de vouloir supprimer vos tables %s existantes?\n"
 "Avez vous une sauvegarde?"
 
 #: ..\..\..\install\index.php:652
