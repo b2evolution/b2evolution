@@ -167,7 +167,7 @@ class calendar_plugin extends Plugin
 	 */
 	function SkinTag( $params )
 	{
-		global $Settings, $month;
+		global $month;
 		global $Blog, $cat_array, $cat_modifier;
 		global $show_statuses;
 		global $author, $assgn, $status;
@@ -386,7 +386,7 @@ class Calendar
 	 */
 	function Calendar( $m = '', $params = array() )
 	{
-		global $Settings, $localtimenow;
+		global $localtimenow;
 
 		$this->dbtable = 'T_items__item';
 		$this->dbprefix = 'post_';
@@ -527,7 +527,7 @@ class Calendar
 	{
 		global $DB;
 		global $weekday, $weekday_abbrev, $weekday_letter, $month, $month_abbrev;
-		global $Settings;
+		global $time_difference;
 
 		if( $this->mode == 'month' )
 		{
@@ -800,7 +800,7 @@ class Calendar
 				else
 				{ // This day is in this month
 					$dom_displayed++;
-					$calendartoday = (date('Ymd',$i) == date('Ymd', (time() + $Settings->get('time_difference'))));
+					$calendartoday = (date('Ymd',$i) == date('Ymd', (time() + $time_difference)));
 
 					if( isset($daysinmonthwithposts[ date('j', $i) ]) )
 					{
@@ -1144,6 +1144,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.51  2008/03/31 00:27:11  blueyed
+ * Nuke unused  global statements; use global  in loop instead of getter
+ *
  * Revision 1.50  2008/03/30 14:56:50  fplanque
  * DST fix
  *
