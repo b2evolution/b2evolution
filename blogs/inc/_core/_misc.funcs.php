@@ -1736,7 +1736,7 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  *         - 'class': defaults to 'action_icon', if not set; use "" to not use it
  * @return string The generated action icon link.
  */
-function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = null, $word_weight = null, $link_attribs = array() )
+function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $word_weight = NULL, $link_attribs = array() )
 {
 	global $UserSettings;
 
@@ -2677,6 +2677,9 @@ function generate_link_from_params( $link_params, $params = array() )
 
 /*
  * $Log$
+ * Revision 1.29  2008/03/31 21:13:47  fplanque
+ * Reverted übergeekyness
+ *
  * Revision 1.28  2008/03/30 23:03:40  blueyed
  * action_icon: doc, provide default for $icon_weight and $word_weight through "null"
  *

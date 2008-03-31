@@ -179,7 +179,7 @@ global $Hit;
 					echo '</li>';
 				}
 
-				if( $debug && ! is_admin_page() )
+				if( $debug )
 				{
 					echo '<li class="time">';
 					if( !empty($seo_page_type) )
