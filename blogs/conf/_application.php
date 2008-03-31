@@ -19,6 +19,7 @@ $app_version = '2.5.0-beta';
 
 /**
  * Release date
+ * This gets used for freshness checks and extra version information in {@link b2evonet_get_updates()}.
  */
 $app_date = '2008-01-24';
 

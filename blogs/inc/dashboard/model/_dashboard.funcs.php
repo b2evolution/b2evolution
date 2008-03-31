@@ -2,7 +2,7 @@
 /**
  * Get updates from b2evolution.net
  *
- * @return
+ * @return boolean True if there have been updates.
  */
 function b2evonet_get_updates()
 {
