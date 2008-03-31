@@ -110,7 +110,13 @@ if( $blog )
 			echo '</h3>';
 
 			echo '<div class="notes">';
-			if( $Comment->author_url( '', 'Url: <span class="bUrl">', '</span>' ) )
+			$Comment->rating( array(
+					'before'      => '',
+					'after'       => ' &bull; ',
+					'star_class'  => 'top',
+				) );
+			$Comment->date();
+			if( $Comment->author_url( '', ' &bull; Url: <span class="bUrl">', '</span>' ) )
 			{
 				if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 				{ // There is an URL and we have permission to ban...
@@ -118,9 +124,8 @@ if( $blog )
 					echo ' <a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(get_ban_domain($Comment->author_url))
 						.'">'.get_icon( 'ban' ).'</a> ';
 				}
-				echo ' &bull; ';
 			}
-			$Comment->author_email( '', 'Email: <span class="bEmail">', '</span> &bull; ' );
+			$Comment->author_email( '', ' &bull; Email: <span class="bEmail">', '</span> &bull; ' );
 			$Comment->author_ip( 'IP: <span class="bIP">', '</span> &bull; ' );
 			$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No Spam Karma') );
 			echo '</div>';
@@ -490,6 +495,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2008/03/31 00:27:49  fplanque
+ * Enhanced comment moderation
+ *
  * Revision 1.23  2008/03/15 19:07:25  fplanque
  * no message
  *

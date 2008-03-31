@@ -991,11 +991,12 @@ class Comment extends DataObject
 		$params = array_merge( array(
 				'before'      => '<div class="comment_rating">',
 				'after'       => '</div>',
+				'star_class'  => 'middle',
 			), $params );
 
 		echo $params['before'];
 
-		star_rating( $this->rating );
+		star_rating( $this->rating, $params['star_class'] );
 
 		echo $params['after'];
 	}
@@ -1326,6 +1327,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2008/03/31 00:27:49  fplanque
+ * Enhanced comment moderation
+ *
  * Revision 1.19  2008/03/30 23:04:23  fplanque
  * fix
  *

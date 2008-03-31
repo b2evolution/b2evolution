@@ -666,7 +666,7 @@ function credits( $params = array() )
 /**
  * Display rating as 5 stars
  */
-function star_rating( $stars )
+function star_rating( $stars, $class = 'middle' )
 {
 	if( is_null($stars) )
 	{
@@ -677,15 +677,15 @@ function star_rating( $stars )
 	{
 		if( $i <= $stars )
 		{
-			echo get_icon( 'star_on', 'imgtag', array( 'class'=>'middle' ) );
+			echo get_icon( 'star_on', 'imgtag', array( 'class'=>$class ) );
 		}
 		elseif( $i-.5 <= $stars )
 		{
-			echo get_icon( 'star_half', 'imgtag', array( 'class'=>'middle' ) );
+			echo get_icon( 'star_half', 'imgtag', array( 'class'=>$class ) );
 		}
 		else
 		{
-			echo get_icon( 'star_off', 'imgtag', array( 'class'=>'middle' ) );
+			echo get_icon( 'star_off', 'imgtag', array( 'class'=>$class ) );
 		}
 	}
 }
@@ -736,6 +736,9 @@ function powered_by( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.25  2008/03/31 00:27:49  fplanque
+ * Enhanced comment moderation
+ *
  * Revision 1.24  2008/03/30 23:37:22  fplanque
  * TODO
  *
