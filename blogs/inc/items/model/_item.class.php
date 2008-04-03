@@ -358,6 +358,7 @@ class Item extends ItemLight
 	 *
 	 * This requires the blog (e.g. {@link $blog_ID} or {@link $main_cat_ID} to be set).
 	 *
+	 * @param boolean true if we are returning to edit mode (new, switchtab...)
 	 * @return boolean true if loaded data seems valid.
 	 */
 	function load_from_Request( $editing = false )
@@ -389,7 +390,9 @@ class Item extends ItemLight
 		{
 			$set_issue_date = param( 'set_issue_date', 'string', '' );
 
-			if( $set_issue_date == 'set' )
+			// pre_dump( $set_issue_date, $editing );
+
+			if( $editing || $set_issue_date == 'set' )
 			{ // We can use user date:
 				param_date( 'item_issue_date', T_('Please enter a valid issue date.'), true );
 				if( strlen(get_param('item_issue_date')) )
@@ -398,7 +401,7 @@ class Item extends ItemLight
 					$this->set( 'issue_date', form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ) ); // TODO: cleanup...
 				}
 			}
-			elseif( $set_issue_date == 'now' && ! $editing )
+			elseif( $set_issue_date == 'now' )
 			{	// Set date to NOW:
 				$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
 			}
@@ -3496,6 +3499,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.41  2008/04/03 13:39:15  fplanque
+ * fix
+ *
  * Revision 1.40  2008/03/22 19:39:28  fplanque
  * <title> tag support
  *

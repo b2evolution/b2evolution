@@ -84,6 +84,7 @@ $Form->hidden( 'item_typ_ID', $edited_Item->ptyp_ID );
 $Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
 $Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );
 $Form->hidden( 'post_urltitle', $edited_Item->get( 'urltitle' ) );
+$Form->hidden( 'titletag', $edited_Item->get( 'titletag' ) );
 if( $Blog->get_setting( 'use_workflow' ) )
 {	// We want to use workflow properties for this blog:
 	$Form->hidden( 'item_priority', $edited_Item->priority );
@@ -91,7 +92,6 @@ if( $Blog->get_setting( 'use_workflow' ) )
 	$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
 	$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
 }
-$Form->hidden( 'item_tags', $item_tags );
 $Form->hidden( 'trackback_url', $trackback_url );
 $Form->hidden( 'renderers_displayed', 1 );
 $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
@@ -192,6 +192,12 @@ for( $i = 1 ; $i <= 3; $i++ )
 
 	echo '</div>';
 
+	$Form->end_fieldset();
+
+
+	// ############################ ADVANCED #############################
+
+	$Form->begin_fieldset( T_('Meta info').get_manual_link('post_simple_meta_fieldset'), array( 'id' => 'itemform_adv_props' ) );
 
 	if( $current_User->check_perm( 'edit_timestamp' ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
@@ -201,6 +207,13 @@ for( $i = 1 ; $i <= 3; $i++ )
 		$Form->switch_layout( NULL );
 		echo '</div>';
 	}
+
+	echo '<table cellspacing="0" class="compose_layout">';
+	echo '<tr><td width="1"><label for="item_tags"><strong>'.T_('Tags').':</strong> <span class="notes">'.T_('sep by ,').'</span></label></label></td>';
+	echo '<td class="input" width="97%">';
+	$Form->text_input( 'item_tags', $item_tags, 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
+	echo '</table>';
 
 	$Form->end_fieldset();
 
@@ -271,6 +284,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.12  2008/04/03 13:39:15  fplanque
+ * fix
+ *
  * Revision 1.11  2008/03/22 15:20:19  fplanque
  * better issue time control
  *

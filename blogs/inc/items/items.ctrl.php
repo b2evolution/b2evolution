@@ -347,7 +347,7 @@ switch( $action )
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
 		// Set object params:
-		$edited_Item->load_from_Request( true );
+		$edited_Item->load_from_Request( false );
 
 		$Plugins->trigger_event( 'AdminBeforeItemEditUpdate', array( 'Item' => & $edited_Item ) );
 
@@ -754,6 +754,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2008/04/03 13:39:14  fplanque
+ * fix
+ *
  * Revision 1.16  2008/03/22 15:20:20  fplanque
  * better issue time control
  *
