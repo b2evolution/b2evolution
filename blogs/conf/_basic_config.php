@@ -43,7 +43,7 @@ $maintenance_mode = 0;
 /*
 header('HTTP/1.0 503 Service Unavailable');
 echo '<h1>503 Service Unavailable</h1>';
-die( 'The site is temporarily down for maintenance.' );
+die( 'The site is temporarily down for maintenance. Please reload this page in a few minutes.' );
 */
 
 

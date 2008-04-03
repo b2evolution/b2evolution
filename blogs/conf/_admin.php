@@ -98,7 +98,7 @@ $allow_cross_posting = 1;
  *
  * @global string $default_post_status
  */
-$default_post_status = 'published';
+$default_post_status = 'draft';
 
 
 /**
