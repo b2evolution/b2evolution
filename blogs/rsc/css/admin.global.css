@@ -74,11 +74,17 @@ table.compose_layout td {
 	white-space: nowrap;
 	padding: 1px;
 }
+table.compose_layout td.label {
+	white-space: nowrap;
+	width: 1%;
+}
 table.compose_layout td.input {
 	padding: 1px 5px;
+	width: 97%;
 }
 table.compose_layout td.select {
 	padding: 1px 0 1px 5px;
+	width: 97%;
 }
 
 

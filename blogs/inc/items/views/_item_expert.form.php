@@ -153,26 +153,12 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	<?php // ------------------------------- ACTIONS ----------------------------------
 	echo '<div class="edit_actions">';
 
-	if( $use_preview )
-	{ // ---------- PREVIEW ----------
-		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
+	// CALL PLUGINS NOW:
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'expert' ) );
 
-		$Form->button( array( 'button', '', T_('Preview'), '', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
-	}
-
-	// ---------- SAVE ----------
-	$Form->submit( array( '', /* TRANS: This is the value of an input submit button */ T_('Save !'), 'SaveButton' ) );
-
-	// ---------- DELETE ----------
-	if( ! $creating )
-	{ // Editing post
-		// Display delete button if current user has the rights:
-		$edited_Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
-	}
-
+	// ---------- FILES... ----------
 	if( $Settings->get( 'fm_enabled' ) )
-	{ // ---------- UPLOAD ----------
-		// Note: we try to land in the Blog media folder if possible
+	{ // Note: we try to land in the Blog media folder if possible
 		// fp> TODO: check what happens if blog folders are disabled
 		if( $current_User->check_perm( 'files', 'view' ) )
 		{
@@ -187,8 +173,15 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		}
 	}
 
-	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'expert' ) );
+	if( $use_preview )
+	{ // ---------- PREVIEW ----------
+		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
+
+		$Form->button( array( 'button', '', T_('Preview'), '', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
+	}
+
+	// ---------- SAVE ----------
+	$Form->submit( array( '', /* TRANS: This is the value of an input submit button */ T_('Save !'), 'SaveButton' ) );
 
 	echo '</div>';
 
@@ -205,24 +198,24 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	{	// For each custom double field:
 		if( $field_name = $Blog->get_setting('custom_varchar'.$i) )
 		{	// Field has a name: display it:
-			echo '<tr><td width="1"><label for="item_varchar'.$i.'"><strong>'.$field_name.':</strong></label></td>';
+			echo '<tr><td class="label"><label for="item_varchar'.$i.'"><strong>'.$field_name.':</strong></label></td>';
 			echo '<td class="input" width="97%">';
 			$Form->text_input( 'item_varchar'.$i, $edited_Item->{'varchar'.$i}, 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 			echo '</td><td width="1"><!-- for IE7 --></td></tr>';
 		}
 	}
 
-	echo '<tr><td width="1"><label for="titletag" title="'.T_('&quot;slug&quot; to be used in permalinks').'"><strong>'.T_('URL "slug"').':</strong></label></td>';
+	echo '<tr><td class="label"><label for="post_urltitle" title="'.T_('&quot;slug&quot; to be used in permalinks').'"><strong>'.T_('URL "slug"').':</strong></label></td>';
 	echo '<td class="input" width="97%">';
 	$Form->text_input( 'post_urltitle', $edited_Item->get('urltitle'), 40, '', '', array('maxlength'=>210, 'style'=>'width: 100%;') );
 	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
 
-	echo '<tr><td width="1"><label for="titletag"><strong>'.T_('&lt;title&gt; tag').':</strong></label></td>';
+	echo '<tr><td class="label"><label for="titletag"><strong>'.T_('&lt;title&gt; tag').':</strong></label></td>';
 	echo '<td class="input" width="97%">';
 	$Form->text_input( 'titletag', $edited_Item->get('titletag'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
 
-	echo '<tr><td width="1"><label for="item_tags"><strong>'.T_('Tags').':</strong> <span class="notes">'.T_('sep by ,').'</span></label></label></td>';
+	echo '<tr><td class="label"><label for="item_tags"><strong>'.T_('Tags').':</strong> <span class="notes">'.T_('sep by ,').'</span></label></label></td>';
 	echo '<td class="input" width="97%">';
 	$Form->text_input( 'item_tags', $item_tags, 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
@@ -421,6 +414,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.28  2008/04/03 15:54:19  fplanque
+ * enhanced edit layout
+ *
  * Revision 1.27  2008/03/22 19:39:29  fplanque
  * <title> tag support
  *

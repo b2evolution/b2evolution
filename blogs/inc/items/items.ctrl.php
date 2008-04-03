@@ -592,7 +592,25 @@ switch( $action )
 							),
 					)
 			);
-		$AdminUI->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('cancel'), 4, 1 );
+
+		switch( $action )
+		{
+			case 'edit':
+			case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
+			case 'update': // on error
+				if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $edited_Item->blog_ID ) )
+				{ // User has no right to delete this post
+					break;
+				}
+				$AdminUI->global_icon( T_('Delete this post'), 'delete', '?ctrl=items&amp;action=delete&amp;post_ID='.$edited_Item->ID,
+						 T_('delete'), 4, 3, array(
+						 		'onclick' => 'return confirm(\''.TS_('You are about to delete this post!\\nThis cannot be undone!').'\')',
+						 		'style' => 'margin-right: 3ex;',	// Avoid misclicks by all means!
+						 ) );
+				break;
+		}
+
+		$AdminUI->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('cancel'), 4, 2 );
 
 		break;
 
@@ -757,6 +775,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2008/04/03 15:54:20  fplanque
+ * enhanced edit layout
+ *
  * Revision 1.18  2008/04/03 14:54:34  fplanque
  * date fixes
  *

@@ -122,11 +122,10 @@ for( $i = 1 ; $i <= 3; $i++ )
 	$Form->switch_layout( 'none' );
 
 	echo '<table cellspacing="0" class="compose_layout"><tr>';
-	echo '<td width="1%"><strong>'.T_('Title').':</strong></td>';
+	echo '<td class"label"><strong>'.T_('Title').':</strong></td>';
 	echo '<td class="input">';
 	$Form->text_input( 'post_title', $item_title, 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-	echo '</td>';
-	echo '</tr></table>';
+	echo '</td><td width="1"><!-- for IE7 --></td></tr></table>';
 
 	$Form->switch_layout( NULL );
 
@@ -153,26 +152,12 @@ for( $i = 1 ; $i <= 3; $i++ )
 	<?php // ------------------------------- ACTIONS ----------------------------------
 	echo '<div class="edit_actions">';
 
-	if( $use_preview )
-	{ // ---------- PREVIEW ----------
-		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
+	// CALL PLUGINS NOW:
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'simple' ) );
 
-		$Form->button( array( 'button', '', T_('Preview'), '', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
-	}
-
-	// ---------- SAVE ----------
-	$Form->submit( array( '', /* TRANS: This is the value of an input submit button */ T_('Save !'), 'SaveButton' ) );
-
-	// ---------- DELETE ----------
-	if( ! $creating )
-	{ // Editing post
-		// Display delete button if current user has the rights:
-		$edited_Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
-	}
-
+	// ---------- FILES ----------
 	if( $Settings->get( 'fm_enabled' ) )
-	{ // ---------- UPLOAD ----------
-		// Note: we try to land in the Blog media folder if possible
+	{ // Note: we try to land in the Blog media folder if possible
 		// fp> TODO: check what happens if blog folders are disabled
 		if( $current_User->check_perm( 'files', 'view' ) )
 		{
@@ -187,8 +172,15 @@ for( $i = 1 ; $i <= 3; $i++ )
 		}
 	}
 
-	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'simple' ) );
+	if( $use_preview )
+	{ // ---------- PREVIEW ----------
+		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
+
+		$Form->button( array( 'button', '', T_('Preview'), '', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
+	}
+
+	// ---------- SAVE ----------
+	$Form->submit( array( '', /* TRANS: This is the value of an input submit button */ T_('Save !'), 'SaveButton' ) );
 
 	echo '</div>';
 
@@ -209,8 +201,8 @@ for( $i = 1 ; $i <= 3; $i++ )
 	}
 
 	echo '<table cellspacing="0" class="compose_layout">';
-	echo '<tr><td width="1"><label for="item_tags"><strong>'.T_('Tags').':</strong> <span class="notes">'.T_('sep by ,').'</span></label></label></td>';
-	echo '<td class="input" width="97%">';
+	echo '<tr><td class="label"><label for="item_tags">'.T_('Tags').':</strong> <span class="notes">'.T_('sep by ,').'</span></label></label></td>';
+	echo '<td class="input">';
 	$Form->text_input( 'item_tags', $item_tags, 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
 	echo '</table>';
@@ -284,6 +276,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.13  2008/04/03 15:54:19  fplanque
+ * enhanced edit layout
+ *
  * Revision 1.12  2008/04/03 13:39:15  fplanque
  * fix
  *
