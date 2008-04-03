@@ -342,15 +342,19 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_', $req_b
  *
  * @todo Allow to use a dropdown (select) to switch between blogs ( CSS / JS onchange - no submit.. )
  *
- * @param boolean
+ * @param Form
  * @param boolean true: use form fields, false: display only
  */
-function cat_select( $display_info = true, $form_fields = true )
+function cat_select( $Form, $form_fields = true )
 {
 	global $allow_cross_posting, $cache_categories,
 					$blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
+	global $cat_sel_total_count;
 
-	$r = '<div class="extracats"><div>';
+	$Form->begin_fieldset( T_('Categories').get_manual_link('item_categories_fieldset'), array( 'class'=>'extracats', 'id' => 'itemform_categories' ) );
+
+	$cat_sel_total_count = 0;
+	$r ='';
 
 	$cat_select_form_fields = $form_fields;
 
@@ -398,35 +402,18 @@ function cat_select( $display_info = true, $form_fields = true )
 		$r .= '<p class="extracatnote"><a href="admin.php?ctrl=chapters&amp;action=new&amp;blog='.$blog.'">'.T_('Add a new category').' &raquo;</a></p>';
 	}
 
-	if( $display_info )
-	{
-		$r .= '<p class="extracatnote">'
-				.T_('Select main category in target blog and optionally check additional categories')
-				.'</p>';
-
-		$r .= '<p class="extracatnote">';
-		if( $allow_cross_posting >= 3 )
-		{
-			$r .= T_('Note: Moving posts across blogs is enabled. Use with caution.');
-		}
-		elseif( $allow_cross_posting >= 2 )
-		{
-			$r .= T_('Note: Cross posting among multiple blogs is enabled.');
-		}
-		elseif( $allow_cross_posting )
-		{
-			$r .= T_('Note: Cross posting among multiple blogs is currently disabled.');
-		}
-		else
-		{
-			$r .= T_('Note: Cross posting among multiple categories is currently disabled.');
-		}
-		$r .= '</p>';
+	if( $cat_sel_total_count > 10 )	// Check in IE for adjusting threshhold. IE lines are FAT
+	{	// display within a div of constrained height
+  	echo '<div class="extracats"><div>';
+		echo $r;
+		echo '</div></div>';
+	}
+	else
+	{	// Plain display
+		echo $r;
 	}
 
-	$r .= '</div></div>';
-
-	return $r;
+	$Form->end_fieldset();
 }
 
 /**
@@ -460,6 +447,10 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 { // callback to display sublist element
 	global $current_blog_ID, $blog, $post_extracats, $edited_Item;
 	global $creating, $allow_cross_posting, $cat_select_level, $cat_select_form_fields;
+	global $cat_sel_total_count;
+
+	$cat_sel_total_count = $total_count;
+
 	$this_cat = get_the_category_by_ID( $cat_ID );
 	$r = "\n".'<tr class="'.( $total_count%2 ? 'odd' : 'even' ).'">';
 
@@ -682,6 +673,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.12  2008/04/03 19:33:27  fplanque
+ * category selector will be smaller if less than 11 cats
+ *
  * Revision 1.11  2008/04/03 14:54:34  fplanque
  * date fixes
  *

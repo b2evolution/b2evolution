@@ -302,11 +302,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	<?php
 	// ################### CATEGORIES ###################
 
-	$Form->begin_fieldset( T_('Categories'), array( 'class'=>'extracats', 'id' => 'itemform_categories' ) );
-
-	echo cat_select();
-
-	$Form->end_fieldset();
+	cat_select( $Form );
 
 
 	// ################### PROPERTIES ###################
@@ -414,6 +410,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.29  2008/04/03 19:33:27  fplanque
+ * category selector will be smaller if less than 11 cats
+ *
  * Revision 1.28  2008/04/03 15:54:19  fplanque
  * enhanced edit layout
  *
