@@ -184,7 +184,7 @@ if( $current_User->check_perm( 'files', 'view' ) )
 			$r = $current_File->get_linkedit_link( $edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title ).' ';
 		}
 
-		if( $current_User->check_perm( 'item', 'edit', false, $edited_Item ) )
+		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	  {	// Check that we have permission to edit item:
 			$r .= action_icon( T_('Delete this link!'), 'unlink',
 			                  regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=unlink" ) );
@@ -200,7 +200,7 @@ if( $current_User->check_perm( 'files', 'view' ) )
 }
 
 if( $current_User->check_perm( 'files', 'view' )
-	&& $current_User->check_perm( 'item', 'edit', false, $edited_Item ) )
+	&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 {	// Check that we have permission to edit item:
 	$Results->global_icon( T_('Link a file...'), 'link', url_add_param( $Blog->get_filemanager_link(),
 													'fm_mode=link_item&amp;item_ID='.$edited_Item->ID ), T_('Link files'), 3, 4 );
@@ -210,6 +210,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.3  2008/04/03 22:03:09  fplanque
+ * added "save & edit" and "publish now" buttons to edit screen.
+ *
  * Revision 1.2  2008/01/21 09:35:32  fplanque
  * (c) 2008
  *

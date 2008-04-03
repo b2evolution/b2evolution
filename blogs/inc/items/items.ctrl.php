@@ -103,6 +103,10 @@ switch( $action )
 
 		// Where are we going to redirect to?
 		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
+
+		// What form buttton has been pressed?
+		param( 'save', 'string', '' );
+		$exit_after_save = ( $save != T_('Save & edit') );
 		break;
 
 	case 'new':
@@ -133,6 +137,10 @@ switch( $action )
 
 			// Where are we going to redirect to?
 			param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID, '&' ) );
+
+			// What form buttton has been pressed?
+			param( 'save', 'string', '' );
+			$exit_after_save = ( $save != T_('Save & edit') );
 		}
 		break;
 
@@ -202,7 +210,7 @@ switch( $action )
 		// This is somewhat in between new and edit...
 
 		// Check permission based on DB status:
-		$current_User->check_perm( 'item_post!'.$edited_Item->get( 'status' ), 'edit', true, $edited_Item );
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		$edited_Item->status = param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
@@ -238,8 +246,7 @@ switch( $action )
 
 	case 'edit':
 		// Check permission:
-		$edited_Item->status = $edited_Item->get( 'status' );
-		$current_User->check_perm( 'item_post!'.$edited_Item->status, 'edit', true, $edited_Item );
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p );
@@ -261,9 +268,17 @@ switch( $action )
 
 	case 'create':
 		// We need early decoding of these in order to check permissions:
-		param( 'post_status', 'string', 'published' );
 		param( 'post_category', 'integer', true );
 		param( 'post_extracats', 'array', array() );
+		if( $save == T_('Publish NOW !') )
+		{
+			$post_status = 'published';
+			$set_issue_date = 'now';
+		}
+		else
+		{
+			param( 'post_status', 'string', 'published' );
+		}
 		// make sure main cat is in extracat list and there are no duplicates
 		$post_extracats[] = $post_category;
 		$post_extracats = array_unique( $post_extracats );
@@ -282,14 +297,6 @@ switch( $action )
 
 		// Set object params:
 		$edited_Item->load_from_Request( false );
-
-		// TODO: fp> Add a radio into blog settings > Features > Post title: () required () optional () none
-		/*
-		if( empty($edited_Item->title) )
-		{ // post_title is "TEXT NOT NULL" and a title makes sense anyway
-			$Messages->add( T_('Please give a title.') );
-		}
-		*/
 
 		$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $edited_Item ) );
 
@@ -319,10 +326,16 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing();
+		$edited_Item->handle_post_processing( $exit_after_save );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
+		if( ! $exit_after_save )
+		{	// We want to continue editing...
+			$tab_switch_params = 'p='.$edited_Item->ID;
+			$action = 'edit';	// It's basically as if we had updated
+			break;
+		}
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to );
 		// Switch to list mode:
@@ -333,9 +346,17 @@ switch( $action )
 
 	case 'update':
 		// We need early decoding of these in order to check permissions:
-		param( 'post_status', 'string', 'published' );
 		param( 'post_category', 'integer', true );
 		param( 'post_extracats', 'array', array() );
+		if( $save == T_('Publish NOW !') )
+		{
+			$post_status = 'published';
+			$set_issue_date = 'now';
+		}
+		else
+		{
+			param( 'post_status', 'string', 'published' );
+		}
 		// make sure main cat is in extracat list and there are no duplicates
 		$post_extracats[] = $post_category;
 		$post_extracats = array_unique( $post_extracats );
@@ -354,10 +375,11 @@ switch( $action )
 
 		$Plugins->trigger_event( 'AdminBeforeItemEditUpdate', array( 'Item' => & $edited_Item ) );
 
+ 		// Params we need for tab switching (in case of error or if we save&edit)
+		$tab_switch_params = 'p='.$edited_Item->ID;
+
 		if( $Messages->count('error') )
 		{	// There have been some validation errors:
-			// Params we need for tab switching:
-			$tab_switch_params = 'p='.$post_ID;
 			break;
 		}
 
@@ -380,9 +402,14 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing();
+		$edited_Item->handle_post_processing( $exit_after_save );
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
+
+		if( ! $exit_after_save )
+		{	// We want to continue editing...
+			break;
+		}
 
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to );
@@ -487,7 +514,7 @@ switch( $action )
  		// Delete a link:
 
 		// Check permission:
-		$current_User->check_perm( 'item', 'edit', true, $edited_Item );
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		// Unlink File from Item:
 		$msg = sprintf( T_('Link has been deleted from &laquo;%s&raquo;.'), $edited_Link->Item->dget('title') );
@@ -775,6 +802,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2008/04/03 22:03:11  fplanque
+ * added "save & edit" and "publish now" buttons to edit screen.
+ *
  * Revision 1.19  2008/04/03 15:54:20  fplanque
  * enhanced edit layout
  *

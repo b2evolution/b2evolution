@@ -53,7 +53,7 @@ $Results->title = sprintf( T_('Files linked to &laquo;%s&raquo;'),
 				'<a href="?ctrl=items&amp;blog='.$edited_Item->blog_ID.'&amp;p='.$edited_Item->ID.'" title="'
 				.T_('View this post...').'">'.$edited_Item->dget('title').'</a>' );
 
-if( $current_User->check_perm( 'item_post!'.$edited_Item->status, 'edit', false, $edited_Item ) )
+if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 { // User has permission to edit this post
 	$Results->global_icon( T_('Edit this post...'), 'edit', '?ctrl=items&amp;action=edit&amp;p='.$edited_Item->ID, T_('Edit') );
 }
@@ -120,7 +120,7 @@ function file_actions( $link_ID )
 
 	$r = $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title );
 
-	if( $current_User->check_perm( 'item', 'edit', false, $edited_Item ) )
+	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	{	// Check that we have permission to edit item:
 		$r .= action_icon( T_('Delete this link!'), 'unlink',
                       regenerate_url( 'action', 'link_ID='.$link_ID.'&amp;action=unlink') );
@@ -137,7 +137,7 @@ $Results->cols[] = array(
 
 $Results->display();
 
-if( $current_User->check_perm( 'item', 'edit', false, $edited_Item ) )
+if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 {	// Check that we have permission to edit item:
 	printf( '<p>'.T_('Click on link %s icons below to link additional files to this item.').'</p>', get_icon( 'link', 'imgtag', array('class'=>'top') ) );
 }
@@ -147,6 +147,9 @@ $Form->end_form( );
 
 /*
  * $Log$
+ * Revision 1.4  2008/04/03 22:03:08  fplanque
+ * added "save & edit" and "publish now" buttons to edit screen.
+ *
  * Revision 1.3  2008/01/21 09:35:29  fplanque
  * (c) 2008
  *

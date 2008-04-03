@@ -181,7 +181,14 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	}
 
 	// ---------- SAVE ----------
-	$Form->submit( array( '', /* TRANS: This is the value of an input submit button */ T_('Save !'), 'SaveButton' ) );
+	$Form->submit( array( 'save', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton' ) );
+	$Form->submit( array( '', /* TRANS: This is the value of an input submit button */ T_('Save'), 'SaveButton' ) );
+	if( $edited_Item->status == 'draft'
+			&& $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID )	// TODO: if we actually set the primary cat to another blog, we may still get an ugly perm die
+			&& $current_User->check_perm( 'edit_timestamp', 'edit', false ) )
+	{	// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
+		$Form->submit( array( 'save', /* TRANS: This is the value of an input submit button */ T_('Publish NOW !'), 'SaveButton' ) );
+	}
 
 	echo '</div>';
 
@@ -410,6 +417,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.30  2008/04/03 22:03:09  fplanque
+ * added "save & edit" and "publish now" buttons to edit screen.
+ *
  * Revision 1.29  2008/04/03 19:33:27  fplanque
  * category selector will be smaller if less than 11 cats
  *

@@ -472,6 +472,7 @@ div.edit_actions input {
 div.edit_actions input.SaveButton {
 	font-weight: bold;
 }
+div.edit_actions input.SaveEditButton:hover,
 div.edit_actions input.SaveButton:hover {
 	color: #c00;
 }

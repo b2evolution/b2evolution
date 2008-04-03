@@ -550,15 +550,12 @@ class User extends DataObject
 			case 'blog_cats':
 			case 'blog_genstatic':
 				// Blog permission to edit its properties...
-
 				if( $this->check_perm_blogowner( $perm_target_ID ) )
 				{	// Owner can do *almost* anything:
 					$perm = true;
 					break;
 				}
-
 				/* continue */
-
 			case 'blog_admin': // This is what the owner does not have access to!
 
 				// Group may grant VIEW access, FULL access:
@@ -579,6 +576,13 @@ class User extends DataObject
 				}
 				break;
 
+			case 'item_post!CURSTATUS':
+        /**
+				 * @var Item
+				 */
+				$Item = & $perm_target;
+				// Change the permname to one of the following:
+				$permname = 'item_post!'.$Item->status;
 			case 'item_post!published':
 			case 'item_post!protected':
 			case 'item_post!private':
@@ -642,28 +646,6 @@ class User extends DataObject
 				// fp> TODO: merge below
 				$perm = ($this->level >= 5);
 				break;
-
-			case 'item':
-				// This is a high level perm...
-				if( !is_a( $perm_target, 'Item' ) )
-				{
-					debug_die( 'No item provided to permission item:'.$permlevel );
-				}
-
-				switch( $permlevel )
-				{
-					case 'edit':
-         		$post_status = $perm_target->get( 'status' );
-         		$blog = $perm_target->blog_ID;
-         		// Call lower level:
-						$perm = $this->check_perm( 'blog_post_statuses', $post_status, false, $blog );
-						break;
-
-					default:
-						debug_die( 'Unhandled permission item:'.$permlevel );
-				}
-				break;
-
 
 			default:
 				// Other global permissions (see if the group can handle them), includes:
@@ -1344,6 +1326,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2008/04/03 22:03:10  fplanque
+ * added "save & edit" and "publish now" buttons to edit screen.
+ *
  * Revision 1.8  2008/01/21 09:35:36  fplanque
  * (c) 2008
  *

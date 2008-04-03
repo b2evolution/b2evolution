@@ -260,7 +260,7 @@ $Form->begin_form();
 
 			/***************  Link ("chain") icon:  **************/
 
-			if( isset($edited_Item) && $current_User->check_perm( 'item', 'edit', false, $edited_Item ) )
+			if( isset($edited_Item) && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 			{	// Offer option to link the file to an Item (or anything else):
 				echo action_icon( T_('Link this file!'), 'link', regenerate_url( 'fm_selected', 'action=link&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
 				echo ' ';
@@ -606,6 +606,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.4  2008/04/03 22:03:08  fplanque
+ * added "save & edit" and "publish now" buttons to edit screen.
+ *
  * Revision 1.3  2008/01/28 20:17:44  fplanque
  * better display of image file linking while in 'upload' mode
  *

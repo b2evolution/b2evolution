@@ -910,7 +910,7 @@ switch( $action )
 			$edit_File = & $selected_Filelist->get_by_idx(0);
 
 			// check item EDIT permissions:
-			$current_User->check_perm( 'item', 'edit', true, $edited_Item );
+			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 			$DB->begin();
 
@@ -958,7 +958,7 @@ switch( $action )
 		$edited_Item = & $edited_Link->Item;
 
 		// Check that we have permission to edit item:
-		$current_User->check_perm( 'item', 'edit', true, $edited_Item );
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		// Delete from DB:
 		$msg = sprintf( T_('Link from &laquo;%s&raquo; deleted.'), $edited_Link->Item->dget('title') );
@@ -1481,6 +1481,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2008/04/03 22:03:10  fplanque
+ * added "save & edit" and "publish now" buttons to edit screen.
+ *
  * Revision 1.13  2008/02/19 11:11:17  fplanque
  * no message
  *

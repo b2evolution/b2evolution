@@ -2031,7 +2031,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( ! $current_User->check_perm( 'item_post!'.$this->status, 'edit', false, $this ) )
+		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
 		{ // User has no right to edit this post
 			return false;
 		}
@@ -2144,7 +2144,7 @@ class Item extends ItemLight
 
 		if( ! is_logged_in() ) return false;
 
-		if( ($this->status == 'deprecated') // Already deprecateded!
+		if( ($this->status == 'deprecated') // Already deprecated!
 			|| ! ($current_User->check_perm( 'item_post!deprecated', 'edit', false, $this )) )
 		{ // User has no right to deprecated this post:
 			return false;
@@ -3092,8 +3092,10 @@ class Item extends ItemLight
 	 * Execute or schedule post(=after) processing tasks
 	 *
 	 * Includes notifications & pings
+	 *
+	 * @param boolean give more info messages (we want to avoid that when we save & continue editing)
 	 */
-	function handle_post_processing()
+	function handle_post_processing( $verbose = true )
 	{
 		global $Settings, $Messages;
 
@@ -3106,7 +3108,10 @@ class Item extends ItemLight
 
 		if( $this->notifications_status == 'finished' )
 		{ // pings have been done before
-			$Messages->add( T_('Post had already pinged: skipping notifications...'), 'note' );
+			if( $verbose )
+			{
+				$Messages->add( T_('Post had already pinged: skipping notifications...'), 'note' );
+			}
 			return false;
 		}
 
@@ -3114,24 +3119,27 @@ class Item extends ItemLight
 		{ // pings have been done before
 
 			// TODO: Check if issue_date has changed and reschedule
-
-			$Messages->add( T_('Post processing already pending...'), 'note' );
+			if( $verbose )
+			{
+				$Messages->add( T_('Post processing already pending...'), 'note' );
+			}
 			return false;
 		}
 
 		if( $this->status != 'published' )
 		{
-
 			// TODO: discard any notification that may be pending!
-
-			$Messages->add( T_('Post not publicly published: skipping notifications...'), 'note' );
+			if( $verbose )
+			{
+				$Messages->add( T_('Post not publicly published: skipping notifications...'), 'note' );
+			}
 			return false;
 		}
 
 		if( $notifications_mode == 'immediate' )
 		{	// We want to do the post processing immediately:
 			// send outbound pings:
-			$this->send_outbound_pings();
+			$this->send_outbound_pings( $verbose );
 
 			// Send email notifications now!
 			$this->send_email_notifications( false );
@@ -3286,8 +3294,10 @@ class Item extends ItemLight
 
   /**
 	 * Send outbound pings for a post
+	 *
+	 * @param boolean give more info messages (we want to avoid that when we save & continue editing)
 	 */
-	function send_outbound_pings()
+	function send_outbound_pings( $verbose = true )
 	{
 		global $Plugins, $baseurl, $Messages;
 
@@ -3299,7 +3309,10 @@ class Item extends ItemLight
 		if( preg_match( '#^http://localhost[/:]#', $baseurl)
 			|| preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) /* domain ending in ".local" */  )
 		{
-			$Messages->add( T_('Skipping pings (Running on localhost).'), 'note' );
+			if( $verbose )
+			{
+				$Messages->add( T_('Skipping pings (Running on localhost).'), 'note' );
+			}
 		}
 		else foreach( $ping_plugins as $plugin_code )
 		{
@@ -3499,6 +3512,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.42  2008/04/03 22:03:09  fplanque
+ * added "save & edit" and "publish now" buttons to edit screen.
+ *
  * Revision 1.41  2008/04/03 13:39:15  fplanque
  * fix
  *

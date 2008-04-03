@@ -108,6 +108,12 @@ $Form->begin_fieldset( T_('RSS/Atom feeds') );
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('Multiple authors') );
+	$Form->checkbox( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ), T_('Use advanced perms'), T_('This will turn on the advanced User and Group permissions tabs for this blog.') );
+	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
+$Form->end_fieldset();
+
+
 $Form->begin_fieldset( T_('Custom field names') );
 	$notes = array(
 			T_('Ex: Price'),
@@ -157,11 +163,6 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 
 }
 
-$Form->begin_fieldset( T_('Multiple authors') );
-	$Form->checkbox( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ), T_('Use advanced perms'), T_('This will turn on the advanced User and Group permissions tabs for this blog.') );
-	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
-$Form->end_fieldset();
-
 
 $Form->end_form( array(
 	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
@@ -170,6 +171,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.10  2008/04/03 22:03:06  fplanque
+ * added "save & edit" and "publish now" buttons to edit screen.
+ *
  * Revision 1.9  2008/02/09 20:14:14  fplanque
  * custom fields management
  *

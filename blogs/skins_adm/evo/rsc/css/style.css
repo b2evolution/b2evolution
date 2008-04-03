@@ -207,6 +207,7 @@ input.SaveButton:hover,
 input.DeleteButton:hover,
 input.ResetButton:hover,
 div.edit_actions input.SaveButton:hover,
+div.edit_actions input.SaveEditButton:hover,
 div.edit_actions input.DeleteButton:hover {
 	color: #c00;
 	border: 1px solid #c00;
