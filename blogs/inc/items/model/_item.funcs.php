@@ -618,6 +618,8 @@ function visibility_select( & $Form, $post_status )
 
 /**
  * Selection of the issue date
+ *
+ * @param Form
  */
 function issue_date_control( $Form, $break = false )
 {
@@ -680,6 +682,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.11  2008/04/03 14:54:34  fplanque
+ * date fixes
+ *
  * Revision 1.10  2008/03/22 19:32:22  fplanque
  * minor
  *

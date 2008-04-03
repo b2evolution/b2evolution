@@ -63,12 +63,12 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	require_js( 'date.js');
 
 	$tmp_month = $month;
-	unset( $tmp_month[0] );	// Remove junk value taht is only used for WP compatibility
+	array_shift( $tmp_month );	// Remove junk value that is only used for WP compatibility
 	$date_overrides_script = "
 	<script type=\"text/javascript\">
 		// Override vars used by date.js (and calendarpopup.js, if present)
-		var MONTH_NAMES=new Array( '".implode("','", array_map('T_',$tmp_month))."','".implode("','", array_map('trim', array_map( 'T_', $month_abbrev ))) . "' );
-		var DAY_NAMES=new Array('" . implode("','", array_map('T_', $weekday)) . "','" . implode("','", array_map('T_',$weekday_abbrev)) . "');
+		var MONTH_NAMES = new Array( '".implode("','", array_map('T_',$tmp_month))."','".implode("','", array_map('trim', array_map( 'T_', $month_abbrev ))) . "' );
+		var DAY_NAMES = new Array('" . implode("','", array_map('T_', $weekday)) . "','" . implode("','", array_map('T_',$weekday_abbrev)) . "');
 	</script>";
 	add_headline( $date_overrides_script );
 
@@ -246,6 +246,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.7  2008/04/03 14:54:34  fplanque
+ * date fixes
+ *
  * Revision 1.6  2008/02/08 22:24:46  fplanque
  * bugfixes
  *

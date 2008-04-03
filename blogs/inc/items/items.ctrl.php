@@ -152,6 +152,9 @@ switch( $action )
 
 	case 'new':
 		$set_issue_date = 'now';
+		$item_issue_date = date( locale_datefmt(), $localtimenow );
+		$item_issue_time = date( 'H:i:s', $localtimenow );
+		// pre_dump( $item_issue_date, $item_issue_time );
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 		// New post form  (can be a bookmarklet form if mode == bookmarklet )
 
@@ -754,6 +757,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2008/04/03 14:54:34  fplanque
+ * date fixes
+ *
  * Revision 1.17  2008/04/03 13:39:14  fplanque
  * fix
  *
