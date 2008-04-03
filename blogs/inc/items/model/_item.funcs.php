@@ -382,6 +382,8 @@ function cat_select( $Form, $form_fields = true )
 				continue;
 
 			$r .= '<tr class="group"><td colspan="3">'.$l_Blog->dget('name')."</td></tr>\n";
+			$cat_sel_total_count++; // the header uses 1 line
+
 			$current_blog_ID = $l_Blog->ID;	// Global needed in callbacks
 			$r .= cat_children( $cache_categories, $l_Blog->ID, NULL, 'cat_select_before_first',
 										'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
@@ -449,7 +451,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	global $creating, $allow_cross_posting, $cat_select_level, $cat_select_form_fields;
 	global $cat_sel_total_count;
 
-	$cat_sel_total_count = $total_count;
+	$cat_sel_total_count++;
 
 	$this_cat = get_the_category_by_ID( $cat_ID );
 	$r = "\n".'<tr class="'.( $total_count%2 ? 'odd' : 'even' ).'">';
@@ -673,6 +675,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.13  2008/04/03 19:37:37  fplanque
+ * category selector will be smaller if less than 11 cats
+ *
  * Revision 1.12  2008/04/03 19:33:27  fplanque
  * category selector will be smaller if less than 11 cats
  *
