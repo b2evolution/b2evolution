@@ -70,8 +70,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 <link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 <!-- InstanceBeginEditable name="head" -->
 	<?php skin_base_tag(); /* You're not using any skin here but this won't hurt. However it will be very helpful to have this here when you make the switch to a skin! */ ?>
-	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
-	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
+	<?php skin_description_tag(); ?>
+	<?php skin_keywords_tag(); ?>
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
 	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />

@@ -375,6 +375,47 @@ function skin_base_tag()
 }
 
 
+/**
+ * Template tag
+ */
+function skin_description_tag()
+{
+	global $Blog;
+
+	$r = '';
+
+	if( is_default_page() && !empty($Blog) )
+	{
+		$r = $Blog->get('shortdesc');
+	}
+
+	if( !empty($r) )
+	{
+		echo '<meta name="description" content="'.format_to_output( $r, 'htmlattr' )."\" />\n";
+	}
+}
+
+
+/**
+ * Template tag
+ */
+function skin_keywords_tag()
+{
+	global $Blog;
+
+	$r = '';
+
+	if( is_default_page() && !empty($Blog) )
+	{
+		$r = $Blog->get('keywords');
+	}
+
+	if( !empty($r) )
+	{
+		echo '<meta name="keywords" content="'.format_to_output( $r, 'htmlattr' )."\" />\n";
+	}
+}
+
 
 /**
  * Sends the desired HTTP response header in case of a "404".
@@ -559,6 +600,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.28  2008/04/04 23:56:02  fplanque
+ * avoid duplicate content in meta tags
+ *
  * Revision 1.27  2008/03/21 19:42:44  fplanque
  * enhanced 404 handling
  *

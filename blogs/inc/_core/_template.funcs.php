@@ -334,7 +334,7 @@ function base_tag( $url, $target = NULL )
 	{
 		echo ' target="'.$target.'"';
 	}
-	echo ' />';
+	echo "\" />\n";
 }
 
 
@@ -744,6 +744,9 @@ function powered_by( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.27  2008/04/04 23:56:02  fplanque
+ * avoid duplicate content in meta tags
+ *
  * Revision 1.26  2008/04/04 16:02:14  fplanque
  * uncool feature about limiting credits
  *

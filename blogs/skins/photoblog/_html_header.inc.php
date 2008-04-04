@@ -35,8 +35,8 @@ skin_content_header();	// Sets charset!
 		) );
 		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?></title>
-	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
-	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
+	<?php skin_description_tag(); ?>
+	<?php skin_keywords_tag(); ?>
 	<?php robots_tag(); ?>
 	<meta name="generator" content="b2evolution <?php app_version(); ?>" /> <!-- Please leave this for stats -->
 	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
