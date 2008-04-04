@@ -49,7 +49,7 @@ global $Settings;
 global $pagenow;
 
 
-global $mode, $use_post_url;
+global $mode;
 global $use_preview, $post_comment_status, $trackback_url, $item_tags;
 global $bozo_start_modified, $creating;
 global $item_title, $item_content;
@@ -106,20 +106,10 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	echo '</td></tr></table>';
 
 	echo '<table cellspacing="0" class="compose_layout"><tr>';
-	if( $use_post_url )
-	{
-		echo '<td width="1%"><strong>'.T_('Link to url').':</strong></td>';
-		echo '<td class="input">';
-		$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-		echo '</td>';
-	}
-	else
-	{
-		echo '<td>';
-		$Form->hidden( 'post_url', '' );
-		echo '</td>';
-	}
-
+	echo '<td width="1%"><strong>'.T_('Link to url').':</strong></td>';
+	echo '<td class="input">';
+	$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+	echo '</td>';
 	echo '<td width="1%">&nbsp;&nbsp;<strong>'.T_('Type').':</strong></td>';
 	echo '<td width="1%" class="select">';
 	$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
@@ -417,6 +407,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.31  2008/04/04 17:02:23  fplanque
+ * cleanup of global settings
+ *
  * Revision 1.30  2008/04/03 22:03:09  fplanque
  * added "save & edit" and "publish now" buttons to edit screen.
  *

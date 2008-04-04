@@ -104,7 +104,7 @@ switch( $action )
 			}
 		}
 
-		if( $report && $report_abuse )
+		if( $report )
 		{ // Report this keyword as abuse:
 			antispam_report_abuse( $keyword );
 		}
@@ -178,6 +178,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2008/04/04 17:02:24  fplanque
+ * cleanup of global settings
+ *
  * Revision 1.3  2008/01/21 09:35:25  fplanque
  * (c) 2008
  *

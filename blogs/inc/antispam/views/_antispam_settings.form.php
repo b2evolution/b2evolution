@@ -58,9 +58,12 @@ $Form->begin_fieldset( T_('Comments/Feedback') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset(); // TODO: needs legend title ("Misc"?)
+$Form->begin_fieldset( T_('Misc') );
 	$Form->checkbox( 'antispam_block_spam_referers', $Settings->get('antispam_block_spam_referers'),
 		T_('Block spam referers'), T_('If a referrer has been detected as spam, should we block the request with a "403 Forbidden" page?') );
+	$Form->checkbox( 'antispam_report_to_central', $Settings->get('antispam_report_to_central'),
+		T_('Report to central blacklist'), T_('When banning a keyword, offer an option to report to the central blacklist.')
+		.' [<a href="http://b2evolution.net/about/terms.html">'.T_('Terms of service').'</a>]' );
 $Form->end_fieldset();
 
 
@@ -94,6 +97,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.3  2008/04/04 17:02:21  fplanque
+ * cleanup of global settings
+ *
  * Revision 1.2  2008/01/21 09:35:25  fplanque
  * (c) 2008
  *

@@ -361,10 +361,7 @@ ALTER TABLE `T_files` CHANGE `file_path` `file_path` VARCHAR( 255 ) CHARACTER SE
  */
 function create_relations()
 {
-	global $DB, $db_use_fkeys;
-
-	if( !$db_use_fkeys )
-		return false;
+	global $DB;
 
 	echo 'Creating relations... ';
 
@@ -536,6 +533,9 @@ function create_relations()
 
 /*
  * $Log$
+ * Revision 1.47  2008/04/04 17:02:22  fplanque
+ * cleanup of global settings
+ *
  * Revision 1.46  2008/02/07 00:35:52  fplanque
  * cleaned up install
  *

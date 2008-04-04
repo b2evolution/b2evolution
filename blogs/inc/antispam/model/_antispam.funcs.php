@@ -153,7 +153,13 @@ function antispam_check( $haystack )
 function antispam_report_abuse( $abuse_string )
 {
 	global $debug, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri, $antispam_test_for_real;
-	global $baseurl, $Messages;
+	global $baseurl, $Messages, $Settings;
+
+	if( ! $Settings->get('antispam_report_to_central') )
+	{
+		$Messages->add( 'Reporting is disabled.', 'error' );  // NO TRANS necessary
+		return;
+	}
 
 	if( preg_match( '#^http://localhost[/:]#', $baseurl) && ( $antispamsrv_host != 'localhost' ) && empty( $antispam_test_for_real )  )
 	{ // Local install can only report to local test server
@@ -331,6 +337,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.8  2008/04/04 17:02:21  fplanque
+ * cleanup of global settings
+ *
  * Revision 1.7  2008/01/21 09:35:25  fplanque
  * (c) 2008
  *

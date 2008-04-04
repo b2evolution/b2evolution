@@ -90,18 +90,6 @@ $allow_cross_posting = 1;
 
 
 /**
- * Default status for new posts:
- *
- * Possible values: 'published', 'deprecated', 'protected', 'private', 'draft', 'redirected'
- *
- * @todo fp>This should be moved to the backoffice. Select list for each blog.
- *
- * @global string $default_post_status
- */
-$default_post_status = 'draft';
-
-
-/**
  * set this to 1 if you want to use the 'preview' function
  *
  * @todo fp>This should be moved to the backoffice. Checbox for each blog (features). Useful when a blog has no public skin. (Tracker)
@@ -109,24 +97,4 @@ $default_post_status = 'draft';
  * @global boolean $use_preview
  */
 $use_preview = 1;
-
-
-/**
- * Do you want to be able to link each post to an URL ?
- *
- * @todo fp>This should be moved to the backoffice. Checbox for each blog (features).
- *
- * @global boolean $use_post_url
- */
-$use_post_url = 1;  // 1 to enable, 0 to disable
-
-
-/**
- * When banning, do you want to be able to report abuse to the
- * centralized ban list at b2evolution.net?
- *
- * @global boolean $report_abuse
- */
-$report_abuse = 1;
-
 ?>

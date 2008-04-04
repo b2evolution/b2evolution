@@ -1142,11 +1142,10 @@ class Blog extends DataObject
 		 * @var User
 		 */
 		global $current_User;
-		global $default_post_status;
 
 		if( empty( $status ) )
 		{
-			$status = $default_post_status;
+			$status = 'draft';
 		}
 		if( ! $current_User->check_perm( 'blog_post!'.$status, 'edit', false, $this->ID ) )
 		{ // We need to find another one:
@@ -1904,6 +1903,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.35  2008/04/04 17:02:22  fplanque
+ * cleanup of global settings
+ *
  * Revision 1.34  2008/04/04 16:02:10  fplanque
  * uncool feature about limiting credits
  *

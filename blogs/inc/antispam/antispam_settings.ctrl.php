@@ -76,6 +76,9 @@ switch( $action )
 			param( 'antispam_block_spam_referers', 'integer', 0 );
 			$Settings->set( 'antispam_block_spam_referers', $antispam_block_spam_referers );
 
+			param( 'antispam_report_to_central', 'integer', 0 );
+			$Settings->set( 'antispam_report_to_central', $antispam_report_to_central );
+
 			$changed_weight = false;
 			param( 'antispam_plugin_spam_weight', 'array', array() );
 			foreach( $antispam_plugin_spam_weight as $l_plugin_ID => $l_weight )
@@ -140,6 +143,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2008/04/04 17:02:24  fplanque
+ * cleanup of global settings
+ *
  * Revision 1.3  2008/01/21 09:35:25  fplanque
  * (c) 2008
  *

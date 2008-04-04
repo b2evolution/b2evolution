@@ -42,7 +42,7 @@ global $Settings;
 
 global $pagenow;
 
-global $mode, $use_post_url;
+global $mode;
 global $use_preview, $post_comment_status, $trackback_url, $item_tags;
 global $bozo_start_modified, $creating;
 global $item_title, $item_content;
@@ -280,6 +280,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.16  2008/04/04 17:02:23  fplanque
+ * cleanup of global settings
+ *
  * Revision 1.15  2008/04/03 22:03:09  fplanque
  * added "save & edit" and "publish now" buttons to edit screen.
  *

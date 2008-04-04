@@ -22,7 +22,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $keyword, $report_abuse;
+global $Settings;
+global $keyword;
 
 global $row_stats;	// for hit functions
 
@@ -175,7 +176,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 		</p>
 
 		<?php
-		if( $report_abuse )
+		if( $Settings->get('antispam_report_to_central') )
 		{
 			?>
 			<p>
@@ -209,6 +210,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.6  2008/04/04 17:02:21  fplanque
+ * cleanup of global settings
+ *
  * Revision 1.5  2008/03/17 09:08:28  afwas
  * minor
  *

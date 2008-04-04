@@ -57,6 +57,7 @@ class GeneralSettings extends AbstractSettings
 		'antispam_threshold_publish' => '-90',
 		'antispam_threshold_delete' => '100', // do not delete by default!
 		'antispam_block_spam_referers' => '0',	// By default, let spam referers go in silently (just don't log them). This is in case the blacklist is too paranoid (social media, etc.)
+		'antispam_report_to_central' => '1',
 
 		'evonet_last_update' => '1196000000',		// just around the time we implemented this ;)
 		'evonet_last_attempt' => '1196000000',		// just around the time we implemented this ;)
@@ -158,6 +159,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.9  2008/04/04 17:02:22  fplanque
+ * cleanup of global settings
+ *
  * Revision 1.8  2008/02/19 11:11:19  fplanque
  * no message
  *
