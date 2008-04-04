@@ -387,6 +387,9 @@ class Blog extends DataObject
 		{	// HTML notes:
 			param_check_html( 'blog_notes', T_('Invalid Blog Notes') );
 			$this->set( 'notes', get_param( 'blog_notes' ) );
+
+			param_integer_range( 'max_footer_credits', 0, 3, T_('Max credits must be between %d and %d.') );
+			$this->set_setting( 'max_footer_credits', get_param( 'max_footer_credits' ) );
 		}
 
 
@@ -1901,6 +1904,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.34  2008/04/04 16:02:10  fplanque
+ * uncool feature about limiting credits
+ *
  * Revision 1.33  2008/03/21 19:42:44  fplanque
  * enhanced 404 handling
  *

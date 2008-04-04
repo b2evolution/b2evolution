@@ -2485,11 +2485,17 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = ' &amp; ' )
  * @param string
  */
 function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_separator = '',
-												$item_start = '<li>', $item_end = '</li>', $force_hash = NULL )
+												$item_start = '<li>', $item_end = '</li>', $force_hash = NULL, $max_items = NULL )
 {
+	if( !is_null($max_items) && $max_items < 1 )
+	{
+		return;
+	}
+
 	if( !empty( $items ) )
 	{
 		echo $list_start;
+		$count = 0;
 		$first = true;
 
 		foreach( $items as $item )
@@ -2501,15 +2507,17 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 				continue;
 			}
 
-			if( $first )
-			{
-				$first = false;
-			}
-			else
+			$count++;
+			if( $count>1 )
 			{
 				echo $item_separator;
 			}
 			echo $item_start.$link.$item_end;
+
+			if( $count >= $max_items )
+			{
+				break;
+			}
 		}
 		echo $list_end;
 	}
@@ -2677,6 +2685,9 @@ function generate_link_from_params( $link_params, $params = array() )
 
 /*
  * $Log$
+ * Revision 1.30  2008/04/04 16:02:13  fplanque
+ * uncool feature about limiting credits
+ *
  * Revision 1.29  2008/03/31 21:13:47  fplanque
  * Reverted übergeekyness
  *

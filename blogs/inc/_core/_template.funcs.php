@@ -633,7 +633,12 @@ function display_if_empty( $params = array() )
 
 
 /**
- * Template tag
+ * Template tag for credits
+ *
+ * Note: You can limit (and even disable) the number of links being displayed here though the Admin interface:
+ * Blog Settings > Advanced > Software credits
+ *
+ * @param array
  */
 function credits( $params = array() )
 {
@@ -641,6 +646,7 @@ function credits( $params = array() )
 	 * @var AbstractSettings
 	 */
 	global $global_Cache;
+	global $Blog;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -659,7 +665,9 @@ function credits( $params = array() )
 		$cred_links = unserialize('a:2:{i:0;a:2:{i:0;s:24:"http://b2evolution.net/r";i:1;s:18:"free blog software";}i:1;a:2:{i:0;s:36:"http://b2evolution.net/web-hosting/r";i:1;s:19:"quality web hosting";}}');
 	}
 
-	display_list( $cred_links, $params['list_start'], $params['list_end'], $params['separator'], $params['item_start'], $params['item_end'] );
+ 	$max_credits = (empty($Blog) ? NULL : $Blog->get_setting( 'max_footer_credits' ));
+
+	display_list( $cred_links, $params['list_start'], $params['list_end'], $params['separator'], $params['item_start'], $params['item_end'], NULL, $max_credits );
 }
 
 
@@ -736,6 +744,9 @@ function powered_by( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.26  2008/04/04 16:02:14  fplanque
+ * uncool feature about limiting credits
+ *
  * Revision 1.25  2008/03/31 00:27:49  fplanque
  * Enhanced comment moderation
  *

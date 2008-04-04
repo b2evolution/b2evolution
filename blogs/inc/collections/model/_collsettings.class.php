@@ -98,6 +98,7 @@ class CollectionSettings extends AbstractSettings
 			'blog_footer_text' => '&copy;$year$ by $owner$',
 			'single_item_footer_text' => '',
 			'xml_item_footer_text' => '<p><small><a href="$item_perm_url$">Original post</a> blogged on <a href="http://b2evolution.net/">b2evolution</a>.</small></p>',
+			'max_footer_credits' => 3,
 		);
 
 
@@ -133,6 +134,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.17  2008/04/04 16:02:10  fplanque
+ * uncool feature about limiting credits
+ *
  * Revision 1.16  2008/03/21 19:42:44  fplanque
  * enhanced 404 handling
  *
