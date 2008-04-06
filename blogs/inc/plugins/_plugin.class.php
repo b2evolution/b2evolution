@@ -710,7 +710,7 @@ class Plugin
 
 	/**
 	 * Event handler: Gets invoked in /admin.php for every backoffice page after
-	 *                the menu structure is build. You could use the {@link $AdminUI} object
+	 *                the menu structure is built. You could use the {@link $AdminUI} object
 	 *                to modify it.
 	 *
 	 * This is the hook to register menu entries. See {@link register_menu_entry()}.
@@ -2884,6 +2884,15 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.8  2008/04/06 19:19:30  fplanque
+ * Started moving some intelligence to the Modules.
+ * 1) Moved menu structure out of the AdminUI class.
+ * It is part of the app structure, not the UI. Up to this point at least.
+ * Note: individual Admin skins can still override the whole menu.
+ * 2) Moved DB schema to the modules. This will be reused outside
+ * of install for integrity checks and backup.
+ * 3) cleaned up config files
+ *
  * Revision 1.7  2008/02/11 20:53:50  blueyed
  * fix indent
  *

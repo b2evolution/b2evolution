@@ -1,10 +1,33 @@
 <?php
 /**
- * This file holds the b2evo database scheme.
+ * This is the install file for the core modules
+ *
+ * This file is part of the evoCore framework - {@link http://evocore.net/}
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * {@internal License choice
+ * - If you have received this file as part of a package, please find the license.txt file in
+ *   the same folder or the closest folder above for complete license terms.
+ * - If you have received this file individually (e-g: from http://evocms.cvs.sourceforge.net/)
+ *   then you must choose one of the following licenses before using the file:
+ *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
+ *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
+ * }}
+ *
+ * {@internal Open Source relicensing agreement:
+ * }}
+ *
+ * @package evocore
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: Francois PLANQUE.
  *
  * @version $Id$
  */
-if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+
 
 /**
  * The b2evo database scheme.
@@ -13,13 +36,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * to this scheme.
  *
  * Please see {@link db_delta()} for things to take care of.
- *
- * @global array
  */
-global $schema_queries;
-
 $schema_queries = array(
-
 	'T_groups' => array(
 		'Creating table for Groups',
 		"CREATE TABLE T_groups (
@@ -250,23 +268,23 @@ $schema_queries = array(
 	'T_comments' => array(	// Note: pingbacks no longer supported, but previous pingbacks are to be preserved in the DB
 		'Creating table for Comments',
 		"CREATE TABLE T_comments (
-			comment_ID        int(11) unsigned NOT NULL auto_increment,
-			comment_post_ID   int(11) unsigned NOT NULL default '0',
-			comment_type enum('comment','linkback','trackback','pingback') NOT NULL default 'comment',
-			comment_status ENUM('published','deprecated','protected','private','draft','redirected') DEFAULT 'published' NOT NULL,
-			comment_author_ID int unsigned NULL default NULL,
-			comment_author varchar(100) NULL,
-			comment_author_email varchar(255) NULL,
-			comment_author_url varchar(255) NULL,
-			comment_author_IP  varchar(23) NOT NULL default '',
-			comment_date       datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
-			comment_content    text NOT NULL,
-			comment_rating     TINYINT(1) NULL DEFAULT NULL,
-			comment_featured   TINYINT(1) NOT NULL DEFAULT 0,
-			comment_nofollow   TINYINT(1) NOT NULL DEFAULT 1,
-			comment_karma      INT(11) NOT NULL default '0',
-			comment_spam_karma TINYINT NULL,
-			comment_allow_msgform TINYINT NOT NULL DEFAULT '0',
+			comment_ID            int(11) unsigned NOT NULL auto_increment,
+			comment_post_ID       int(11) unsigned NOT NULL default '0',
+			comment_type          enum('comment','linkback','trackback','pingback') NOT NULL default 'comment',
+			comment_status        ENUM('published','deprecated','protected','private','draft','redirected') DEFAULT 'published' NOT NULL,
+			comment_author_ID     int unsigned NULL default NULL,
+			comment_author        varchar(100) NULL,
+			comment_author_email  varchar(255) NULL,
+			comment_author_url    varchar(255) NULL,
+			comment_author_IP     varchar(23) NOT NULL default '',
+			comment_date          datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
+			comment_content       text NOT NULL,
+			comment_rating        TINYINT(1) NULL DEFAULT NULL,
+			comment_featured      TINYINT(1) NOT NULL DEFAULT 0,
+			comment_nofollow      TINYINT(1) NOT NULL DEFAULT 1,
+			comment_karma         INT(11) NOT NULL DEFAULT 0,
+			comment_spam_karma    TINYINT NULL,
+			comment_allow_msgform TINYINT NOT NULL DEFAULT 0,
 			PRIMARY KEY comment_ID (comment_ID),
 			KEY comment_post_ID (comment_post_ID),
 			KEY comment_date (comment_date),
@@ -298,21 +316,6 @@ $schema_queries = array(
 			PRIMARY KEY aspm_ID (aspm_ID),
 			UNIQUE aspm_string (aspm_string)
 		)" ),
-
-	'T_sessions' => array(
-		'Creating table for active sessions',
-		"CREATE TABLE T_sessions (
-			sess_ID        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			sess_key       CHAR(32) NULL,
-			sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1,
-			sess_lastseen  DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
-			sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
-			sess_user_ID   INT(10) DEFAULT NULL,
-			sess_data      MEDIUMBLOB DEFAULT NULL,
-			PRIMARY KEY      ( sess_ID ),
-		  KEY sess_user_ID (sess_user_ID)
-		)" ), // NOTE: sess_lastseen is only relevant/used by Sessions class (+ stats) and results in a quite large index (file size wise)
-		// NOTE: sess_data is (MEDIUM)BLOB because e.g. serialize() does not completely convert binary data to text
 
 	'T_usersettings' => array(
 		'Creating user settings table',
@@ -402,27 +405,6 @@ $schema_queries = array(
 			agnt_type      ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL ,
 			PRIMARY KEY (agnt_ID),
 			INDEX agnt_type ( agnt_type )
-		)" ),
-
-	'T_hitlog' => array(
-		'Creating table for Hit-Logs',
-		"CREATE TABLE T_hitlog (
-			hit_ID               INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			hit_sess_ID          INT UNSIGNED,
-			hit_datetime         DATETIME NOT NULL,
-			hit_uri              VARCHAR(250) DEFAULT NULL,
-			hit_referer_type     ENUM('search','blacklist','spam','referer','direct','self','admin') NOT NULL,
-			hit_referer          VARCHAR(250) DEFAULT NULL,
-			hit_referer_dom_ID   INT UNSIGNED DEFAULT NULL,
-			hit_blog_ID          int(11) UNSIGNED NULL DEFAULT NULL,
-			hit_remote_addr      VARCHAR(40) DEFAULT NULL,
-			hit_agnt_ID          INT UNSIGNED NULL,
-			PRIMARY KEY              (hit_ID),
-			INDEX hit_agnt_ID        ( hit_agnt_ID ),
-			INDEX hit_blog_ID        ( hit_blog_ID ),
-			INDEX hit_uri            ( hit_uri ),
-			INDEX hit_referer_dom_ID ( hit_referer_dom_ID ),
-			INDEX hit_sess_ID        ( hit_sess_ID )
 		)" ),
 
 	'T_subscriptions' => array(
@@ -574,35 +556,20 @@ $schema_queries = array(
 			clog_messages             text,
 			PRIMARY KEY (clog_ctsk_ID)
 		)' ),
-
-	'T_track__goal' => array(
-		'Creating goals table',
-		'CREATE TABLE T_track__goal(
-		  goal_ID int(10) unsigned NOT NULL auto_increment,
-		  goal_name varchar(50) default NULL,
-		  goal_key varchar(32) default NULL,
-		  goal_redir_url varchar(255) default NULL,
-		  goal_default_value double default NULL,
-		  PRIMARY KEY (goal_ID),
-		  UNIQUE KEY goal_key (goal_key)
-		)' ),
-
-	'T_track__goalhit ' => array(
-		'Creating goal hits table',
-		'CREATE TABLE T_track__goalhit (
-		  ghit_ID int(10) unsigned NOT NULL auto_increment,
-		  ghit_goal_ID    int(10) unsigned NOT NULL,
-		  ghit_hit_ID     int(10) unsigned NOT NULL,
-		  ghit_params     TEXT default NULL,
-		  PRIMARY KEY  (ghit_ID),
-		  KEY ghit_goal_ID (ghit_goal_ID),
-		  KEY ghit_hit_ID (ghit_hit_ID)
-   )' ),
 );
 
 
 /*
  * $Log$
+ * Revision 1.1  2008/04/06 19:19:29  fplanque
+ * Started moving some intelligence to the Modules.
+ * 1) Moved menu structure out of the AdminUI class.
+ * It is part of the app structure, not the UI. Up to this point at least.
+ * Note: individual Admin skins can still override the whole menu.
+ * 2) Moved DB schema to the modules. This will be reused outside
+ * of install for integrity checks and backup.
+ * 3) cleaned up config files
+ *
  * Revision 1.86  2008/03/23 23:40:42  fplanque
  * no message
  *
@@ -663,101 +630,5 @@ $schema_queries = array(
  *
  * Revision 1.67  2007/09/19 02:54:16  fplanque
  * bullet proof upgrade
- *
- * Revision 1.66  2007/06/26 02:43:16  fplanque
- * cleanup
- *
- * Revision 1.65  2007/06/25 11:02:29  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.64  2007/06/03 02:54:18  fplanque
- * Stuff for permission maniacs (admin part only, actual perms checks to be implemented)
- * Newbies will not see this complexity since advanced perms are now disabled by default.
- *
- * Revision 1.63  2007/05/31 03:02:23  fplanque
- * Advanced perms now disabled by default (simpler interface).
- * Except when upgrading.
- * Enable advanced perms in blog settings -> features
- *
- * Revision 1.62  2007/05/29 01:17:20  fplanque
- * advanced admin blog settings are now restricted by a special permission
- *
- * Revision 1.61  2007/05/14 02:47:23  fplanque
- * (not so) basic Tags framework
- *
- * Revision 1.60  2007/05/13 22:03:21  fplanque
- * basic excerpt support
- *
- * Revision 1.59  2007/05/08 00:54:31  fplanque
- * public blog list as a widget
- *
- * Revision 1.58  2007/05/04 21:23:17  fplanque
- * no message
- *
- * Revision 1.57  2007/04/27 09:11:37  fplanque
- * saving "spam" referers again (instead of buggy empty referers)
- *
- * Revision 1.56  2007/04/26 00:11:09  fplanque
- * (c) 2007
- *
- * Revision 1.55  2007/03/25 15:18:57  fplanque
- * cleanup
- *
- * Revision 1.54  2007/03/20 09:53:26  fplanque
- * Letting boggers view their own stats.
- * + Letthing admins view the aggregate by default.
- *
- * Revision 1.53  2007/03/11 22:48:19  fplanque
- * handling of permission to redirect posts
- *
- * Revision 1.52  2007/02/13 00:38:11  blueyed
- * Changed DB fields for 1.10.0: sess_data to MEDIUMTEXT (serialize() does not completely convert the binary data to text); post_content and itpr_content_prerendered to MEDIUMTEXT
- *
- * Revision 1.51  2007/02/03 19:05:36  fplanque
- * allow longer posts
- *
- * Revision 1.50  2007/01/23 04:19:50  fplanque
- * handling of blog owners
- *
- * Revision 1.49  2007/01/15 20:54:57  fplanque
- * minor fix
- *
- * Revision 1.48  2007/01/08 23:45:48  fplanque
- * A little less rough widget manager...
- * (can handle multiple instances of same widget and remembers order)
- *
- * Revision 1.47  2007/01/08 21:53:51  fplanque
- * typo
- *
- * Revision 1.46  2007/01/08 02:11:56  fplanque
- * Blogs now make use of installed skins
- * next step: make use of widgets inside of skins
- *
- * Revision 1.45  2007/01/07 23:38:20  fplanque
- * discovery of skin containers
- *
- * Revision 1.44  2006/12/29 01:10:06  fplanque
- * basic skin registering
- *
- * Revision 1.43  2006/12/07 20:03:33  fplanque
- * Woohoo! File editing... means all skin editing.
- *
- * Revision 1.42  2006/12/07 16:06:24  fplanque
- * prepared new file editing permission
- *
- * Revision 1.41  2006/12/04 21:25:18  fplanque
- * removed user skin switching
- *
- * Revision 1.40  2006/11/30 22:34:16  fplanque
- * bleh
- *
- * Revision 1.39  2006/11/05 20:13:57  fplanque
- * minor
- *
- * Revision 1.38  2006/10/05 02:42:22  blueyed
- * Remove index hit_datetime, because its slow on INSERT (e.g. 1s)
- *
- * Revision 1.37  2006/10/01 22:11:42  blueyed
- * Ping services as plugins.
  */
 ?>

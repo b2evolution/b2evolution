@@ -1329,361 +1329,25 @@ class AdminUI_general extends Widget
 	 *
 	 * Do this as late as possible. Especially after determining the blog ID we work on.
 	 * This allows to check for proper permissions and build correct cross navigation links.
+	 *
+	 * Note: The menu structure is determined by the modules and the plugins.
+	 * Individual Admin skins can still override the whole menu. In a cumbersome way though.
 	 */
 	function init_menus()
 	{
 		global $Plugins;
-		global $blog, $loc_transinfo, $ctrl;
-		global $Settings;
-    /**
-		 * @var User
-		 */
-		global $current_User;
-		global $Blog;
 
 		if( !empty($this->_menus) )
 		{	// Already initialized!
 			return;
 		}
 
+    // Let the modules construct the menu:
+    // Part 1:
+		modules_call_method( 'build_menu_1' );
 
-		$this->add_menu_entries(
-				NULL, // root
-				array(
-					'dashboard' => array(
-						'text' => T_('Dashboard'),
-						'href' => 'admin.php?ctrl=dashboard&amp;blog='.$blog,
-						'style' => 'font-weight: bold;'
-						),
-
-					'items' => array(
-						'text' => T_('Posts / Comments'),
-						'href' => 'admin.php?ctrl=items&amp;blog='.$blog.'&amp;filter=restore',
-						// Controller may add subtabs
-						),
-					) );
-
-
-		if( $Settings->get( 'fm_enabled' ) && $current_User->check_perm( 'files', 'view' ) )
-		{	// FM enabled and permission to view files:
-			$this->add_menu_entries( NULL, array(
-						'files' => array(
-							'text' => T_('Files'),
-							'title' => T_('File management'),
-							'href' => 'admin.php?ctrl=files',
-							// Controller may add subtabs
-						),
-					) );
-
-		}
-
-
-		if( $current_User->check_perm( 'stats', 'list' ) )
-		{	// Permission to view stats for user's blogs:
-			if( $current_User->check_perm( 'stats', 'view' ) )
-			{	// We have permission to view all stats,
-				// we'll assume that we want to view th aggregate stats and not the current blog stats
-				// fp> TODO: it might be useful to have a user pref for [View aggregate stats by default] vs [View current blog stats by default]
-				$default = 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0';
-			}
-			else
-			{
-				$default = 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=global';
-			}
-			$this->add_menu_entries(
-					NULL, // root
-					array(
-						'stats' => array(
-							'text' => T_('Stats'),
-							'href' => $default,
-							'entries' => array(
-								'summary' => array(
-									'text' => T_('Hit summary'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$blog,
-									'entries' => array(
-										'global' => array(
-											'text' => T_('Global hits'),
-											'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$blog ),
-										'browser' => array(
-											'text' => T_('Browser hits'),
-											'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=browser&amp;blog='.$blog ),
-										'robot' => array(
-											'text' => T_('Robot hits'),
-											'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=robot&amp;blog='.$blog ),
-										'feed' => array(
-											'text' => T_('RSS/Atom hits'),
-											'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=feed&amp;blog='.$blog ),
-										),
-									),
-								'refsearches' => array(
-									'text' => T_('Search B-hits'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;blog='.$blog ),
-								'referers' => array(
-									'text' => T_('Referered B-hits'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=referers&amp;blog='.$blog ),
-								'other' => array(
-									'text' => T_('Direct B-hits'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=other&amp;blog='.$blog ),
-								'useragents' => array(
-									'text' => T_('User agents'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=useragents&amp;blog='.$blog ),
-								'domains' => array(
-									'text' => T_('Referring domains'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=domains&amp;blog='.$blog ),
-							)
-						),
-					)
-				);
-		}
-
-		if( $blog == 0 && $current_User->check_perm( 'stats', 'view' ) )
-		{	// Viewing aggregate + Permission to view stats for ALL blogs:
-			$this->add_menu_entries(
-					'stats',
-					array(
-						'sessions' => array(
-							'text' => T_('User sessions'),
-							'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0',
-							'entries' => array(
-								'login' => array(
-									'text' => T_('Users'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0'
-									),
-								'sessid' => array(
-									'text' => T_('Sessions'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;blog=0'
-									),
-								'hits' => array(
-									'text' => T_('Hits'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0'
-									),
-								),
-						 	),
-						'goals' => array(
-							'text' => T_('Goals'),
-							'href' => 'admin.php?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0',
-							),
-						)
-				);
-		}
-
-
-		// BLOG SETTINGS:
-		if( $ctrl == 'collections' )
-		{ // We are viewing the blog list, nothing fancy involved:
-			$this->add_menu_entries(
-					NULL, // root
-					array(
-						'blogs' => array(
-							'text' => T_('Blog settings'),
-							'href' => 'admin.php?ctrl=collections',
-						),
-					) );
-		}
-		else
-		{	// We're on any other page, we may have a direct destination
-		  // + we have subtabs (fp > maybe the subtabs should go into the controller as for _items ?)
-
-			// What perms do we have?
-			$coll_settings_perm = $current_User->check_perm( 'blog_properties', 'any', false, $blog );
-			$coll_chapters_perm = $current_User->check_perm( 'blog_cats', '', false, $blog );
-
-			// Determine default page based on permissions:
-			if( $coll_settings_perm )
-			{	// Default: show General Blog Settings
-				$default_page = 'admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog;
-			}
-			elseif( $coll_chapters_perm )
-			{	// Default: show categories
-				$default_page = 'admin.php?ctrl=chapters&amp;blog='.$blog;
-			}
-			else
-			{	// Default: Show list of blogs
-				$default_page = 'admin.php?ctrl=collections';
-			}
-
-			$this->add_menu_entries(
-					NULL, // root
-					array(
-						'blogs' => array(
-							'text' => T_('Blog settings'),
-							'href' => $default_page,
-							),
-						) );
-
-			if( $coll_settings_perm )
-			{
-				$this->add_menu_entries( 'blogs',	array(
-							'general' => array(
-								'text' => T_('General'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog, ),
-							'features' => array(
-								'text' => T_('Features'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog, ),
-							'skin' => array(
-								'text' => T_('Skin'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog, ),
-							'widgets' => array(
-								'text' => T_('Widgets'),
-								'href' => 'admin.php?ctrl=widgets&amp;blog='.$blog, ),
-						) );
-			}
-
-			if( $coll_chapters_perm )
-			{
-				$this->add_menu_entries( 'blogs',	array(
-							'chapters' => array(
-								'text' => T_('Categories'),
-								'href' => 'admin.php?ctrl=chapters&amp;blog='.$blog ),
-						) );
-			}
-
-			if( $coll_settings_perm )
-			{
-				$this->add_menu_entries( 'blogs',	array(
-							'urls' => array(
-								'text' => T_('URLs'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=urls&amp;blog='.$blog, ),
-							'seo' => array(
-								'text' => T_('SEO'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=seo&amp;blog='.$blog, ),
-							'advanced' => array(
-								'text' => T_('Advanced'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog, ),
-						) );
-
-				if( $Blog && $Blog->advanced_perms )
-				{
-					$this->add_menu_entries( 'blogs',	array(
-								'perm' => array(
-									'text' => T_('User perms'), // keep label short
-									'href' => 'admin.php?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog, ),
-								'permgroup' => array(
-									'text' => T_('Group perms'), // keep label short
-									'href' => 'admin.php?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog, ),
-							) );
-				}
-			}
-		}
-
-
-		if( $current_User->check_perm( 'options', 'view' ) )
-		{	// Permission to view settings:
-			$this->add_menu_entries( NULL, array(
-						'options' => array(
-							'text' => T_('Global settings'),
-							'href' => 'admin.php?ctrl=settings',
-							'entries' => array(
-								'general' => array(
-									'text' => T_('General'),
-									'href' => 'admin.php?ctrl=settings' ),
-								'features' => array(
-									'text' => T_('Features'),
-									'href' => 'admin.php?ctrl=features' ),
-								'skins' => array(
-									'text' => T_('Skins install'),
-									'href' => 'admin.php?ctrl=skins'),
-								'plugins' => array(
-									'text' => T_('Plugins install'),
-									'href' => 'admin.php?ctrl=plugins'),
-								'antispam' => array(
-									'text' => T_('Antispam'),
-									'href' => 'admin.php?ctrl=set_antispam'),
-								'regional' => array(
-									'text' => T_('Regional'),
-									'href' => 'admin.php?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
-								'files' => array(
-									'text' => T_('Files'),
-									'href' => 'admin.php?ctrl=fileset' ),
-								'filetypes' => array(
-									'text' => T_('File types'),
-									'href' => 'admin.php?ctrl=filetypes' ),
-								'types' => array(
-									'text' => T_('Post types'),
-									'title' => T_('Post types management'),
-									'href' => 'admin.php?ctrl=itemtypes'),
-								'statuses' => array(
-									'text' => T_('Post statuses'),
-									'title' => T_('Post statuses management'),
-									'href' => 'admin.php?ctrl=itemstatuses'),
-							)
-						),
-					) );
-		}
-
-
-		if( $current_User->check_perm( 'users', 'view' ) )
-		{	// Permission to view users:
-			$this->add_menu_entries( NULL, array(
-						'users' => array(
-						'text' => T_('Users'),
-						'title' => T_('User management'),
-						'href' => 'admin.php?ctrl=users',
-					),
-				) );
-		}
-		else
-		{	// Only perm to view his own profile:
-			$this->add_menu_entries( NULL, array(
-						'users' => array(
-						'text' => T_('My profile'),
-						'title' => T_('User profile'),
-						'href' => 'admin.php?ctrl=users',
-					),
-				) );
-		}
-
-
-		if( $current_User->check_perm( 'options', 'view' ) )
-		{	// Permission to view settings:
-			// FP> This assumes that we don't let regular users access the tools, including plugin tools.
-				$this->add_menu_entries( NULL, array(
-						'tools' => array(
-							'text' => T_('Tools'),
-							'href' => 'admin.php?ctrl=crontab',
-							'entries' =>  array(
-								'cron' => array(
-									'text' => T_('Scheduler'),
-									'href' => 'admin.php?ctrl=crontab' ),
-								'system' => array(
-									'text' => T_('System'),
-									'href' => 'admin.php?ctrl=system' ),
-									),
-								),
-							) );
-
-				if( $current_User->check_perm( 'spamblacklist', 'view' ) )
-				{	// Permission to view antispam:
-					$this->add_menu_entries( 'tools', array(
-									'antispam' => array(
-										'text' => T_('Antispam'),
-										'href' => 'admin.php?ctrl=antispam'	),
-									) );
-				}
-
-				$this->add_menu_entries( 'tools', array(
-							'' => array(	// fp> '' is dirty
-								'text' => T_('Misc'),
-								'href' => 'admin.php?ctrl=tools' ),
-						) );
-		}
-		elseif( $current_User->check_perm( 'spamblacklist', 'view' ) )
-		{	// Permission to view antispam but NOT tools:
-			// Give it it's own tab:
-			$this->add_menu_entries( NULL, array(
-						'tools' => array(
-							'text' => T_('Tools'),
-							'href' => 'admin.php?ctrl=antispam',
-							'entries' =>  array(
-								'antispam' => array(
-									'text' => T_('Antispam'),
-									'href' => 'admin.php?ctrl=antispam'	),
-								),
-						),
-					) );
-		}
-
-
+    // Part 2:
+		modules_call_method( 'build_menu_2' );
 
 		// Call AdminAfterMenuInit to notify Plugins that the menu is initialized
 		// E.g. the livehits_plugin and weather_plugin use it for adding a menu entry.
@@ -1785,6 +1449,15 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.84  2008/04/06 19:19:30  fplanque
+ * Started moving some intelligence to the Modules.
+ * 1) Moved menu structure out of the AdminUI class.
+ * It is part of the app structure, not the UI. Up to this point at least.
+ * Note: individual Admin skins can still override the whole menu.
+ * 2) Moved DB schema to the modules. This will be reused outside
+ * of install for integrity checks and backup.
+ * 3) cleaned up config files
+ *
  * Revision 1.83  2008/03/20 14:20:51  fplanque
  * no message
  *
@@ -1854,74 +1527,5 @@ class AdminUI_general extends Widget
  *
  * Revision 1.61  2007/07/09 21:24:11  fplanque
  * cleanup of admin page top
- *
- * Revision 1.60  2007/06/25 11:02:33  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.59  2007/06/24 22:35:57  fplanque
- * cleanup
- *
- * Revision 1.58  2007/06/24 15:43:34  personman2
- * Reworking the process for a skin or plugin to add js and css files to a blog display.  Removed the custom header for nifty_corners.
- *
- * Revision 1.57  2007/06/20 19:13:42  blueyed
- * fixed doc
- *
- * Revision 1.56  2007/06/20 19:13:13  blueyed
- * doc
- *
- * Revision 1.55  2007/06/19 22:36:39  blueyed
- * doc
- *
- * Revision 1.54  2007/06/18 21:13:10  fplanque
- * minor
- *
- * Revision 1.53  2007/06/14 18:39:04  blueyed
- * Fixed E_NOTICE if there is no Blog available
- *
- * Revision 1.52  2007/05/31 03:02:24  fplanque
- * Advanced perms now disabled by default (simpler interface).
- * Except when upgrading.
- * Enable advanced perms in blog settings -> features
- *
- * Revision 1.51  2007/05/29 01:17:19  fplanque
- * advanced admin blog settings are now restricted by a special permission
- *
- * Revision 1.50  2007/05/14 02:51:18  fplanque
- * cleanup.
- *
- * Revision 1.49  2007/05/09 01:00:25  fplanque
- * optimized querying for blog lists
- *
- * Revision 1.48  2007/05/07 18:59:47  fplanque
- * renamed skin .page.php files to .tpl.php
- *
- * Revision 1.47  2007/04/26 00:11:03  fplanque
- * (c) 2007
- *
- * Revision 1.46  2007/03/20 09:53:26  fplanque
- * Letting boggers view their own stats.
- * + Letthing admins view the aggregate by default.
- *
- * Revision 1.45  2007/03/07 04:52:00  fplanque
- * Check perms while building the menu:
- * so much easier and so much more flexible
- *
- * Revision 1.44  2007/03/07 02:37:15  fplanque
- * OMG I decided that pregenerating the menus was getting to much of a PITA!
- * It's a zillion problems with the permissions.
- * This will be simplified a lot. Enough of these crazy stuff.
- *
- * Revision 1.43  2007/03/04 20:14:16  fplanque
- * GMT date now in system checks
- *
- * Revision 1.42  2007/03/04 05:24:53  fplanque
- * some progress on the toolbar menu
- *
- * Revision 1.41  2007/01/14 22:06:48  fplanque
- * support for customized 'no results' messages
- *
- * Revision 1.40  2007/01/14 17:26:11  blueyed
- * Fixed wrong TR around whole HEAD contents
  */
 ?>

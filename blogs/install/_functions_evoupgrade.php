@@ -213,7 +213,9 @@ function upgrade_b2evo_tables()
 	// new DB-delta functionality
 	global $schema_queries, $inc_path;
 
-	require_once dirname(__FILE__).'/_db_schema.inc.php';
+	// Load DB schema from modules
+	load_db_schema();
+
 	load_class('_core/model/db/_upgrade.funcs.php');
 
 
@@ -1336,7 +1338,7 @@ function upgrade_b2evo_tables()
 										CHANGE COLUMN comment_author_email comment_author_email varchar(255) NULL,
 										CHANGE COLUMN comment_author_url comment_author_url varchar(255) NULL,
 										ADD COLUMN comment_spam_karma TINYINT NULL AFTER comment_karma,
-										ADD COLUMN comment_allow_msgform TINYINT NOT NULL DEFAULT \'0\' AFTER comment_spam_karma' );
+										ADD COLUMN comment_allow_msgform TINYINT NOT NULL DEFAULT 0 AFTER comment_spam_karma' );
 		task_end();
 
 		set_upgrade_checkpoint( '9195' );
@@ -2237,6 +2239,15 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.255  2008/04/06 19:19:30  fplanque
+ * Started moving some intelligence to the Modules.
+ * 1) Moved menu structure out of the AdminUI class.
+ * It is part of the app structure, not the UI. Up to this point at least.
+ * Note: individual Admin skins can still override the whole menu.
+ * 2) Moved DB schema to the modules. This will be reused outside
+ * of install for integrity checks and backup.
+ * 3) cleaned up config files
+ *
  * Revision 1.254  2008/03/23 23:40:42  fplanque
  * no message
  *

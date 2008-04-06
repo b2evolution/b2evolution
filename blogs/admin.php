@@ -174,7 +174,7 @@ $AdminUI = & new AdminUI();
  */
 
 // Get requested controller and memorize it:
-param( 'ctrl', '/^[a-z0-9_]+$/', $default_ctrl, true );
+param( 'ctrl', '/^[a-z0-9_]+$/', 'dashboard', true );
 
 
 // Redirect old-style URLs (e.g. /admin/plugins.php), if they come here because the webserver maps "/admin/" to "/admin.php"
@@ -222,6 +222,15 @@ require $inc_path.$ctrl_mappings[$ctrl];
 
 /*
  * $Log$
+ * Revision 1.30  2008/04/06 19:19:31  fplanque
+ * Started moving some intelligence to the Modules.
+ * 1) Moved menu structure out of the AdminUI class.
+ * It is part of the app structure, not the UI. Up to this point at least.
+ * Note: individual Admin skins can still override the whole menu.
+ * 2) Moved DB schema to the modules. This will be reused outside
+ * of install for integrity checks and backup.
+ * 3) cleaned up config files
+ *
  * Revision 1.29  2008/02/19 11:11:14  fplanque
  * no message
  *

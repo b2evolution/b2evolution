@@ -10,59 +10,6 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 
 /**
- * Default controller to use.
- *
- * This determines the default page when you access the admin.
- */
-$default_ctrl = 'dashboard';
-
-
-/**
- * Controller mappings.
- *
- * For each controller name, we associate a controller file to be found in /inc/ .
- * The advantage of this indirection is that it is easy to reorganize the controllers into
- * subdirectories by modules. It is also easy to deactivate some controllers if you don't
- * want to provide this functionality on a given installation.
- *
- * Note: while the controller mappings might more or less follow the menu structure, we do not merge
- * the two tables since we could, at any time, decide to make a skin with a different menu structure.
- * The controllers however would most likely remain the same.
- *
- * @global array
- */
-$ctrl_mappings = array(
-		'antispam'     => 'antispam/antispam_list.ctrl.php',
-		'chapters'     => 'chapters/chapters.ctrl.php',
-		'collections'  => 'collections/collections.ctrl.php',
-		'coll_settings'=> 'collections/coll_settings.ctrl.php',
-		'comments'     => 'comments/_comments.ctrl.php',
-		'crontab'      => 'cron/cronjobs.ctrl.php',
-		'dashboard'    => 'dashboard/dashboard.ctrl.php',
-		'features'     => 'settings/features.ctrl.php',
-		'files'        => 'files/files.ctrl.php',
-		'fileset'      => 'files/file_settings.ctrl.php',
-		'filetypes'    => 'files/file_types.ctrl.php',
-		'items'        => 'items/items.ctrl.php',
-		'itemstatuses' => 'items/item_statuses.ctrl.php',
-		'itemtypes'    => 'items/item_types.ctrl.php',
-		'locales'      => 'locales/locales.ctrl.php',
-		'mtimport'     => 'tools/mtimport.ctrl.php',
-		'plugins'      => 'plugins/plugins.ctrl.php',
-		'settings'     => 'settings/settings.ctrl.php',
-		'set_antispam' => 'antispam/antispam_settings.ctrl.php',
-		'skins'        => 'skins/skins.ctrl.php',
-		'stats'        => 'sessions/stats.ctrl.php',
-		'system'       => 'tools/system.ctrl.php',
-		'tools'        => 'tools/tools.ctrl.php',
-		'users'        => 'users/users.ctrl.php',
-		'upload'       => 'files/upload.ctrl.php',
-		'widgets'      => 'widgets/widgets.ctrl.php',
-		'wpimport'     => 'tools/wpimport.ctrl.php',
-	);
-
-
-/**
  * Cross posting
  *
  * Possible values:

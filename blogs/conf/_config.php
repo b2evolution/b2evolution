@@ -2,7 +2,7 @@
 /**
  * This is b2evolution's main config file, which just includes all the other
  * config files.
- * 
+ *
  * This file should not be edited. You should edit the sub files instead.
  *
  * See {@link _basic_config.php} for the basic settings.
@@ -33,8 +33,23 @@ if( file_exists(dirname(__FILE__).'/_overrides_TEST.php') )
 	include_once dirname(__FILE__).'/_overrides_TEST.php';	// FOR TESTING / DEVELOPMENT OVERRIDES
 }
 
+// Load modules:
+foreach( $modules as $module )
+{
+	require_once $inc_path.$module.'/_'.$module.'.init.php';
+}
+
 /*
  * $Log$
+ * Revision 1.52  2008/04/06 19:19:30  fplanque
+ * Started moving some intelligence to the Modules.
+ * 1) Moved menu structure out of the AdminUI class.
+ * It is part of the app structure, not the UI. Up to this point at least.
+ * Note: individual Admin skins can still override the whole menu.
+ * 2) Moved DB schema to the modules. This will be reused outside
+ * of install for integrity checks and backup.
+ * 3) cleaned up config files
+ *
  * Revision 1.51  2006/11/26 01:42:08  fplanque
  * doc
  *

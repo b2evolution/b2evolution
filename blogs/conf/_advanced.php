@@ -196,56 +196,6 @@ $db_config['halt_on_error'] = true;
 
 
 /**
- * Aliases for table names:
- *
- * (You should not need to change them.
- *  If you want to have multiple b2evo installations in a single database you should
- *  change {@link $tableprefix} in _basic_config.php)
- */
-$db_config['aliases'] = array(
-		'T_antispam'            => $tableprefix.'antispam',
-		'T_basedomains'         => $tableprefix.'basedomains',
-		'T_blogs'               => $tableprefix.'blogs',
-		'T_categories'          => $tableprefix.'categories',
-		'T_coll_group_perms'    => $tableprefix.'bloggroups',
-		'T_coll_user_perms'     => $tableprefix.'blogusers',
-		'T_coll_settings'       => $tableprefix.'coll_settings',
-		'T_comments'            => $tableprefix.'comments',
-		'T_cron__log'           => $tableprefix.'cron__log',
-		'T_cron__task'          => $tableprefix.'cron__task',
-		'T_files'               => $tableprefix.'files',
-		'T_filetypes'           => $tableprefix.'filetypes',
-		'T_groups'              => $tableprefix.'groups',
-		'T_global__cache'       => $tableprefix.'global__cache',
-		'T_hitlog'              => $tableprefix.'hitlog',
-		'T_items__item'         => $tableprefix.'items__item',
-		'T_items__itemtag'      => $tableprefix.'items__itemtag',
-		'T_items__prerendering' => $tableprefix.'items__prerendering',
-		'T_items__status'       => $tableprefix.'items__status',
-		'T_items__tag'          => $tableprefix.'items__tag',
-		'T_items__type'         => $tableprefix.'items__type',
-		'T_links'               => $tableprefix.'links',
-		'T_locales'             => $tableprefix.'locales',
-		'T_plugins'             => $tableprefix.'plugins',
-		'T_pluginevents'        => $tableprefix.'pluginevents',
-		'T_pluginsettings'      => $tableprefix.'pluginsettings',
-		'T_pluginusersettings'  => $tableprefix.'pluginusersettings',
-		'T_postcats'            => $tableprefix.'postcats',
-		'T_sessions'            => $tableprefix.'sessions',
-		'T_settings'            => $tableprefix.'settings',
-		'T_skins__container'    => $tableprefix.'skins__container',
-		'T_skins__skin'         => $tableprefix.'skins__skin',
-		'T_track__goal'         => $tableprefix.'track__goal',
-		'T_track__goalhit'      => $tableprefix.'track__goalhit',
-		'T_subscriptions'       => $tableprefix.'subscriptions',
-		'T_users'               => $tableprefix.'users',
-		'T_useragents'          => $tableprefix.'useragents',
-		'T_usersettings'        => $tableprefix.'usersettings',
-		'T_widget'              => $tableprefix.'widget',
-	);
-
-
-/**
  * CREATE TABLE options.
  *
  * Edit those if you have control over you MySQL server and want a more professional

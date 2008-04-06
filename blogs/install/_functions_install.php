@@ -531,8 +531,39 @@ function create_relations()
 }
 
 
+/**
+ * Loads the b2evo database scheme.
+ *
+ * This gets updated through {@link db_delta()} which generates the queries needed to get
+ * to this scheme.
+ *
+ * Please see {@link db_delta()} for things to take care of.
+ */
+function load_db_schema()
+{
+	global $schema_queries;
+	global $modules, $inc_path;
+
+	// Load modules:
+	foreach( $modules as $module )
+	{
+		require_once $inc_path.$module.'/model/_'.$module.'.install.php';
+	}
+
+}
+
+
 /*
  * $Log$
+ * Revision 1.48  2008/04/06 19:19:30  fplanque
+ * Started moving some intelligence to the Modules.
+ * 1) Moved menu structure out of the AdminUI class.
+ * It is part of the app structure, not the UI. Up to this point at least.
+ * Note: individual Admin skins can still override the whole menu.
+ * 2) Moved DB schema to the modules. This will be reused outside
+ * of install for integrity checks and backup.
+ * 3) cleaned up config files
+ *
  * Revision 1.47  2008/04/04 17:02:22  fplanque
  * cleanup of global settings
  *

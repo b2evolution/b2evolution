@@ -2683,8 +2683,32 @@ function generate_link_from_params( $link_params, $params = array() )
 }
 
 
+/**
+ * Call a method for all modules in a row
+ */
+function modules_call_method( $method_name )
+{
+	global $modules;
+
+	foreach( $modules as $module )
+	{
+		$Module = & $GLOBALS[$module.'_Module'];
+		$Module->{$method_name}();
+	}
+}
+
+
 /*
  * $Log$
+ * Revision 1.31  2008/04/06 19:19:29  fplanque
+ * Started moving some intelligence to the Modules.
+ * 1) Moved menu structure out of the AdminUI class.
+ * It is part of the app structure, not the UI. Up to this point at least.
+ * Note: individual Admin skins can still override the whole menu.
+ * 2) Moved DB schema to the modules. This will be reused outside
+ * of install for integrity checks and backup.
+ * 3) cleaned up config files
+ *
  * Revision 1.30  2008/04/04 16:02:13  fplanque
  * uncool feature about limiting credits
  *

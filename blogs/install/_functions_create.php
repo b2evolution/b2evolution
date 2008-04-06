@@ -51,7 +51,9 @@ function create_tables()
 {
 	global $inc_path;
 
-	require_once dirname(__FILE__).'/_db_schema.inc.php';
+	// Load DB schema from modules
+	load_db_schema();
+
 	load_class('_core/model/db/_upgrade.funcs.php');
 
 	// Alter DB to match DB schema:
@@ -649,6 +651,15 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.242  2008/04/06 19:19:30  fplanque
+ * Started moving some intelligence to the Modules.
+ * 1) Moved menu structure out of the AdminUI class.
+ * It is part of the app structure, not the UI. Up to this point at least.
+ * Note: individual Admin skins can still override the whole menu.
+ * 2) Moved DB schema to the modules. This will be reused outside
+ * of install for integrity checks and backup.
+ * 3) cleaned up config files
+ *
  * Revision 1.241  2008/03/16 14:19:38  fplanque
  * no message
  *
