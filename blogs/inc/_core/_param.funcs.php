@@ -1601,7 +1601,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
  */
 function check_html_sanity( $content, $context = 'posting', $autobr = false, $encoding = NULL )
 {
-	global $use_balanceTags;
+	global $use_balanceTags, $admin_url;
 	global $io_charset, $use_xhtmlvalidation_for_comments, $comment_allowed_tags, $comments_allow_css_tweaks;
 	global $Messages;
 
@@ -1758,7 +1758,7 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 				&& $current_User->check_perm( 'users', 'edit', false ) )
 		{
 			$Messages->add( sprintf( T_('(Note: To get rid of the above validation warnings, you can deactivate unwanted validation rules in your <a %s>Group settings</a>.)'),
-										'href="?ctrl=users&amp;grp_ID='.$Group->ID.'"' ), 'error' );
+										'href="'.$admin_url.'?ctrl=users&amp;grp_ID='.$Group->ID.'"' ), 'error' );
 		}
 		return false;
 	}
@@ -1881,6 +1881,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.19  2008/04/09 14:50:35  fplanque
+ * bugfix
+ *
  * Revision 1.18  2008/03/16 14:19:38  fplanque
  * no message
  *
