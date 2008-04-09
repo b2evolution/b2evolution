@@ -73,6 +73,8 @@ function b2evonet_get_updates()
 									new xmlrpcval( $app_version, 'string'),	  	// Version number
 									new xmlrpcval( $app_date, 'string'),		    // Version number
 									new xmlrpcval( array(
+													'this_update' => new xmlrpcval( $servertimenow, 'string'),
+													'last_update' => new xmlrpcval( $servertime_last_update, 'string'),
 													'db_version' => new xmlrpcval( $DB->get_version(), 'string'),
 													// TODO: UTF8 support (we'd like to make this teh default if supported widely enough)
 													'php_version' => new xmlrpcval( PHP_VERSION, 'string'),
@@ -141,6 +143,9 @@ function b2evonet_get_updates()
 
 /*
  * $Log$
+ * Revision 1.10  2008/04/09 17:15:33  fplanque
+ * date stuff
+ *
  * Revision 1.9  2008/04/09 15:37:41  fplanque
  * doc
  *
