@@ -3299,15 +3299,16 @@ class Item extends ItemLight
 	 */
 	function send_outbound_pings( $verbose = true )
 	{
-		global $Plugins, $baseurl, $Messages;
+		global $Plugins, $baseurl, $Messages, $evonetsrv_host;
 
 		load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
 		$this->load_Blog();
 		$ping_plugins = array_unique(explode(',', $this->Blog->get_setting('ping_plugins')));
 
-		if( preg_match( '#^http://localhost[/:]#', $baseurl)
-			|| preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) /* domain ending in ".local" */  )
+		if( (preg_match( '#^http://localhost[/:]#', $baseurl)
+				|| preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) /* domain ending in ".local" */
+			&& $evonetsrv_host != 'localhost' )	// OK if we are pinging locally anyway ;)
 		{
 			if( $verbose )
 			{
@@ -3512,6 +3513,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.43  2008/04/09 15:28:25  fplanque
+ * debug stuff
+ *
  * Revision 1.42  2008/04/03 22:03:09  fplanque
  * added "save & edit" and "publish now" buttons to edit screen.
  *
