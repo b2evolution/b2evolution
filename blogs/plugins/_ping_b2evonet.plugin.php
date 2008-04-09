@@ -48,7 +48,7 @@ class ping_b2evonet_plugin extends Plugin
 	 */
 	var $code = 'ping_b2evonet';
 	var $priority = 50;
-	var $version = '1.9-dev';
+	var $version = '2.0';
 	var $author = 'The b2evo Group';
 
 	/*
@@ -58,7 +58,7 @@ class ping_b2evonet_plugin extends Plugin
 	var $group = 'ping';
 	var $number_of_installs = 1;
 
-	
+
 	/**
 	 * Init
 	 */
@@ -74,22 +74,22 @@ class ping_b2evonet_plugin extends Plugin
 
 
 	/**
-	 * Ping the pingomatic RPC service.
+	 * Ping the b2evonet RPC service.
 	 */
 	function ItemSendPing( & $params )
 	{
 		global $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
-		global $debug;
+		global $debug, $baseurl, $instance_name;
 
 		$item_Blog = $params['Item']->get_Blog();
 
 		$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
-		$client->debug = ( $debug == 2 ); 
+		$client->debug = ( $debug == 2 );
 
 		$message = new xmlrpcmsg( 'b2evo.ping', array(
-				new xmlrpcval('id') ,			// Reserved
-				new xmlrpcval('user'),		// Reserved
-				new xmlrpcval('pass'),		// Reserved
+				new xmlrpcval($item_Blog->ID),    // id
+				new xmlrpcval($baseurl),		      // user -- is this unique enough?
+				new xmlrpcval($instance_name),		// pass -- fp> TODO: do we actually want randomly generated instance names?
 				new xmlrpcval($item_Blog->dget('name', 'xml')),
 				new xmlrpcval($item_Blog->dget('url', 'xml')),
 				new xmlrpcval($item_Blog->dget('locale', 'xml')),
@@ -107,6 +107,9 @@ class ping_b2evonet_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.8  2008/04/09 15:33:36  fplanque
+ * ping antispam - part 1
+ *
  * Revision 1.7  2008/01/21 09:35:41  fplanque
  * (c) 2008
  *
