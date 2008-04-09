@@ -6,7 +6,7 @@
  */
 function b2evonet_get_updates()
 {
-	global $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow;
+	global $DB, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow;
 	global $Messages, $Settings, $baseurl, $instance_name, $app_name, $app_version, $app_date;
 
 	$update_every = 3600*12; // 12 hours
@@ -42,7 +42,7 @@ function b2evonet_get_updates()
 	// Construct XML-RPC client:
 	load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port );
-	//$client->debug = $debug;
+	// $client->debug = $debug;
 
 	// Construct XML-RPC message:
 	$message = new xmlrpcmsg(
@@ -54,8 +54,15 @@ function b2evonet_get_updates()
 									new xmlrpcval( $app_version, 'string'),	  	// Version number
 									new xmlrpcval( $app_date, 'string'),		    // Version number
 									new xmlrpcval( array(
-													'test1' => new xmlrpcval( $app_name, 'string'),
-													'test2' => new xmlrpcval( $app_date, 'string'),
+													'db_version' => new xmlrpcval( $DB->get_version(), 'string'),
+													// TODO: UTF8 support (we'd like to make this teh default if supported widely enough)
+													'php_version' => new xmlrpcval( PHP_VERSION, 'string'),
+													// TODO: php user & group (we'd like to standardize security best practices... on suphp?)
+													// TODO: upload_max_filesize ?
+													// TODO: memory limit (how much room does b2evo have to move on a typical server?)
+													'php_xml' => new xmlrpcval( extension_loaded('xml') ? 1 : 0, 'int' ),
+													'php_mbstring' => new xmlrpcval( extension_loaded('mbstring') ? 1 : 0, 'int' ),
+													// TODO: GD version?
 												), 'struct' ),
 								)
 							);
