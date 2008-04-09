@@ -1,5 +1,24 @@
 <?php
 /**
+ * This file implements the support functions for the dashboard.
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ *
+ * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * {@internal Open Source relicensing agreement:
+ * }}
+ *
+ * @package admin
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: Francois PLANQUE.
+ *
+ * @version $Id$
+ */
+
+ /**
  * Get updates from b2evolution.net
  *
  * @return boolean True if there have been updates.
@@ -120,5 +139,10 @@ function b2evonet_get_updates()
 	return false;
 }
 
-
+/*
+ * $Log$
+ * Revision 1.9  2008/04/09 15:37:41  fplanque
+ * doc
+ *
+ */
 ?>
