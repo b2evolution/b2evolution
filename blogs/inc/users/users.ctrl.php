@@ -687,13 +687,13 @@ if( !$Messages->count('error') )
 			$edited_Group->set( 'name', $edited_grp_name );
 
 			$edited_Group->set( 'perm_blogs', param( 'edited_grp_perm_blogs', 'string', true ) );
-			$edited_Group->set( 'perm_bypass_antispam', ! param( 'apply_antispam', 'integer', 0 ) );
+			$edited_Group->set( 'perm_bypass_antispam', param( 'apply_antispam', 'integer', 0 ) ? 0 : 1 );
 			$edited_Group->set( 'perm_xhtmlvalidation', param( 'perm_xhtmlvalidation', 'string', true ) );
 			$edited_Group->set( 'perm_xhtmlvalidation_xmlrpc', param( 'perm_xhtmlvalidation_xmlrpc', 'string', true ) );
-			$edited_Group->set( 'perm_xhtml_css_tweaks', ! param( 'prevent_css_tweaks', 'integer', 0 ) );
-			$edited_Group->set( 'perm_xhtml_iframes', ! param( 'prevent_iframes', 'integer', 0 ) );
-			$edited_Group->set( 'perm_xhtml_javascript', ! param( 'prevent_javascript', 'integer', 0 ) );
-			$edited_Group->set( 'perm_xhtml_objects', ! param( 'prevent_objects', 'integer', 0 ) );
+			$edited_Group->set( 'perm_xhtml_css_tweaks', param( 'prevent_css_tweaks', 'integer', 0 ) ? 0 : 1 );
+			$edited_Group->set( 'perm_xhtml_iframes', param( 'prevent_iframes', 'integer', 0 ) ? 0 : 1 );
+			$edited_Group->set( 'perm_xhtml_javascript', param( 'prevent_javascript', 'integer', 0 ) ? 0 : 1 );
+			$edited_Group->set( 'perm_xhtml_objects', param( 'prevent_objects', 'integer', 0 ) ? 0 : 1 );
 			$edited_Group->set( 'perm_spamblacklist', param( 'edited_grp_perm_spamblacklist', 'string', true ) );
 			$edited_Group->set( 'perm_templates', param( 'edited_grp_perm_templates', 'integer', 0 ) );
 			$edited_Group->set( 'perm_stats', param( 'edited_grp_perm_stats', 'string', true ) );
@@ -836,6 +836,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2008/04/12 19:56:56  fplanque
+ * bugfix
+ *
  * Revision 1.8  2008/01/21 09:35:35  fplanque
  * (c) 2008
  *

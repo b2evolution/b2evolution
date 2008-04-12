@@ -46,25 +46,27 @@ function _mw_decode_postdate( $contentstruct, $now_if_empty = true )
 
 
 /**
+ * Get IDs for requested categories
  *
  * @param array struct
  * @param integer blog ID
  * @param boolean Return empty array (instead of error), if no cats given in struct?
  * @return array|xmlrpcresp A list of category IDs or xmlrpcresp in case of error.
  */
-function _mw_get_cat_IDs($contentstruct, $blog_ID, $empty_struct_ok = false)
+function _mw_get_cat_IDs( $contentstruct, $blog_ID, $empty_struct_ok = false )
 {
 	global $DB, $xmlrpcerruser;
 
+	$categories = array();
 	if( isset($contentstruct['categories']) )
 	{
-		$categories = $contentstruct['categories'];
+		foreach( $contentstruct['categories'] as $l_catname )
+		{
+			$categories[] = trim(strip_tags($l_catname));
+		}
 	}
-	else
-	{
-		$categories = array();
-	}
-	logIO("finished getting contentstruct categories...".implode( ', ', $categories ) );
+
+	logIO( 'finished getting categories...'.implode( ', ', $categories ) );
 
 	if( $empty_struct_ok && empty($categories) )
 	{
@@ -367,7 +369,7 @@ function mw_newpost($m)
 	logIO( 'Decoded xcontent' );
 
 	// Categories:
-	$cat_IDs = _mw_get_cat_IDs($contentstruct, $Blog->ID );
+	$cat_IDs = _mw_get_cat_IDs( $contentstruct, $Blog->ID );
 	if( ! is_array($cat_IDs) )
 	{ // error:
 		return $cat_IDs;	// This can be a preformatted error message
@@ -832,6 +834,9 @@ $xmlrpc_procs["metaWeblog.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.3  2008/04/12 19:58:03  fplanque
+ * bugfix
+ *
  * Revision 1.2  2008/01/18 15:53:42  fplanque
  * Ninja refactoring
  *
