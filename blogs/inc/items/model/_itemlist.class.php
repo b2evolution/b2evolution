@@ -581,6 +581,7 @@ class ItemList2 extends ItemListLight
 				break;
 
 			case 'title':
+			case 'ptyp_ID':
 			case 'datecreated':
 			case 'datemodified':
 			case 'urltitle':
@@ -653,6 +654,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.11  2008/04/12 21:40:16  afwas
+ * Minor: Added ptyp_ID as post order query option in single post display (get_prevnext_Item())
+ *
  * Revision 1.10  2008/03/30 14:17:10  fplanque
  * fix
  *
