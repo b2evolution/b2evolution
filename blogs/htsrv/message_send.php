@@ -213,7 +213,7 @@ elseif( ! empty( $comment_id ) )
 	}
 
 	$recipient_name = trim($Comment->get_author_name());
-	$recipient_address =  $recipient_name.' <'.$Comment->get_author_email().'>';
+	$recipient_address = "=?$evo_charset?B?".base64_encode($recipient_name)."?=".' <'.$Comment->get_author_email().'>';
 
 	// We don't know the recipient's language - Change the locale so the email is in the blog's language:
 	locale_temp_switch($Blog->locale);
@@ -280,7 +280,7 @@ else
 }
 
 // Send mail
-$success_mail = send_mail( $recipient_address, $subject, $message, "$sender_name <$sender_address>" );
+$success_mail = send_mail( $recipient_address, $subject, $message, "=?$evo_charset?B?".base64_encode($sender_name)."?= <$sender_address>" );
 
 
 // Plugins should cleanup their temporary data here:
@@ -310,6 +310,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.58  2008/04/12 20:13:57  fplanque
+ * base64 mail headers
+ *
  * Revision 1.57  2008/02/19 11:11:16  fplanque
  * no message
  *
