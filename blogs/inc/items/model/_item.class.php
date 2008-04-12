@@ -1899,6 +1899,8 @@ class Item extends ItemLight
 			$params['mode'] = $disp;
 		}
 
+		// pre_dump( $params['mode'] );
+
 		$this->get_Blog();
 		switch( $params['mode'] )
 		{
@@ -1907,9 +1909,12 @@ class Item extends ItemLight
 				break;
 
 			case 'single':
-			default:
 				$text = $this->Blog->get_setting( 'single_item_footer_text' );
 				break;
+
+			default:
+				// Do NOT display!
+				$text = '';
 		}
 
 		$text = preg_replace_callback( '¤\$([a-z_]+)\$¤', array( $this, 'replace_callback' ), $text );
@@ -3513,6 +3518,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.44  2008/04/12 19:34:21  fplanque
+ * bugfix
+ *
  * Revision 1.43  2008/04/09 15:28:25  fplanque
  * debug stuff
  *
