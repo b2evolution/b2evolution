@@ -342,14 +342,25 @@ class Item extends ItemLight
 				'before'      => ' ',
 				'after'       => ' ',
 				'format'      => 'htmlbody',
+				'link_to'			=> 'userpage',
 			), $params );
 
 		// Load User
 		$this->get_creator_User();
 
-		echo $params['before'];
-		echo $this->creator_User->preferred_name( $params['format'], false );
-		echo $params['after'];
+		$r = $this->creator_User->dget( 'preferredname', $params['format'] );
+
+		if( $params['link_to'] == 'userpage' )
+		{
+			$url = $this->creator_User->get_userpage_url( NULL );
+
+			if( !empty($url) )
+			{
+				$r = '<a href="'.$url.'">'.$r.'</a>';
+			}
+		}
+
+		echo $params['before'].$r.$params['after'];
 	}
 
 
@@ -1378,16 +1389,6 @@ class Item extends ItemLight
 				'form_url'    => '#current_blog#',
 			), $params );
 
-		$this->get_creator_User();
-
-		if( empty($this->creator_User->email) )
-		{ // We have no email for this Author :(
-			return false;
-		}
-		if( empty($this->creator_User->allow_msgform) )
-		{
-			return false;
-		}
 
 		if( $params['form_url'] == '#current_blog#' )
 		{	// Get
@@ -1395,8 +1396,13 @@ class Item extends ItemLight
 			$params['form_url'] = $Blog->get('msgformurl');
 		}
 
-		$params['form_url'] = url_add_param( $params['form_url'], 'recipient_id='.$this->creator_User->ID.'&amp;post_id='.$this->ID
-			.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $params['form_url'])) );
+		$this->get_creator_User();
+		$params['form_url'] = $this->creator_User->get_msgform_url( url_add_param( $params['form_url'], 'post_id='.$this->ID ) );
+
+		if( empty( $params['form_url'] ) )
+		{
+			return false;
+		}
 
 		if( $params['title'] == '#' ) $params['title'] = T_('Send email to post author');
 		if( $params['text'] == '#' ) $params['text'] = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $params['title'] ) );
@@ -3518,6 +3524,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.47  2008/04/13 23:38:53  fplanque
+ * Basic public user profiles
+ *
  * Revision 1.46  2008/04/13 22:07:59  fplanque
  * email fixes
  *

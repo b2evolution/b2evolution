@@ -166,7 +166,13 @@ skin_include( '_html_header.inc.php' );
 					) );
 
 				$Item->issue_time( array(
+						'after'       => '',
 						'time_format' => 'H:i',
+					) );
+
+				$Item->author( array(
+						'before'    => ', '.T_('by').' ',
+						'after'     => '',
 					) );
 
 				$Item->categories( array(

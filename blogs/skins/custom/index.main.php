@@ -174,8 +174,8 @@ skin_include( '_html_header.inc.php' );
 					));
 
 				$Item->author( array(
-						'before'    => ', '.T_('by').' <strong>',
-						'after'     => '</strong>',
+						'before'    => ', '.T_('by').' ',
+						'after'     => '',
 					) );
 
 				$Item->msgform_link();

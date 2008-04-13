@@ -131,6 +131,11 @@ while( $Item = & mainlist_get_item() )
 						) );
 				?>
 				<?php
+					$Item->author( array(
+							'before'      => T_('by '),
+						) );
+				?>
+				<?php
 					$Item->categories( array(
 						'before'          => ' '.T_('and is filed under').' ',
 						'after'           => '.',

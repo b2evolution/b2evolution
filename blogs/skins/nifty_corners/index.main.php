@@ -186,11 +186,16 @@ skin_include( '_html_header.inc.php' );
 
 				$Item->issue_time( array(
 						'before'    => ' ',
-						'after'     => ', ',
+						'after'     => '',
+					) );
+
+				$Item->author( array(
+						'before'    => ' '.T_('by').' ',
+						'after'     => '',
 					) );
 
 				$Item->categories( array(
-					'before'          => T_('Categories').': ',
+					'before'          => ', '.T_('Categories').': ',
 					'after'           => ' ',
 					'include_main'    => true,
 					'include_other'   => true,

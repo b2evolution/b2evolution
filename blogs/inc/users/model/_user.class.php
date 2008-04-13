@@ -346,6 +346,50 @@ class User extends DataObject
 	}
 
 
+  /**
+	 * Get message form url
+	 */
+	function get_msgform_url( $formurl )
+	{
+		global $ReqURI;
+
+		if( empty($this->email) )
+		{ // We have no email for this Author :(
+			return NULL;
+		}
+		if( empty($this->allow_msgform) )
+		{
+			return NULL;
+		}
+
+		return url_add_param( $formurl, 'recipient_id='.$this->ID.'&amp;redirect_to='.rawurlencode($ReqURI) );
+	}
+
+
+  /**
+	 * Get user page url
+	 */
+	function get_userpage_url( $blogurl = NULL )
+	{
+		if( empty($blogurl) )
+		{
+	    /**
+			 * @var Blog
+			 */
+			global $Blog;
+
+			if( empty($Blog) )
+			{
+				return NULL;
+			}
+
+			$blogurl = $Blog->gen_blogurl();
+		}
+
+		return url_add_param( $blogurl, 'disp=user&amp;user_ID='.$this->ID );
+	}
+
+
 	/**
 	 * Set param value
 	 *
@@ -1326,6 +1370,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2008/04/13 23:38:53  fplanque
+ * Basic public user profiles
+ *
  * Revision 1.10  2008/04/13 15:15:59  fplanque
  * attempt to fix email headers for non latin charsets
  *

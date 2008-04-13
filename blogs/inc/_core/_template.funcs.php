@@ -290,6 +290,11 @@ function request_title( $params = array() )
 			}
 			break;
 
+		case 'user':
+			// We are requesting the message form:
+			$r[] = T_('User');
+			break;
+
 		default:
 			if( isset( $MainList ) )
 			{
@@ -744,6 +749,9 @@ function powered_by( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.28  2008/04/13 23:38:53  fplanque
+ * Basic public user profiles
+ *
  * Revision 1.27  2008/04/04 23:56:02  fplanque
  * avoid duplicate content in meta tags
  *

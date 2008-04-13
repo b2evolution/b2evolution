@@ -350,7 +350,7 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
  */
 function get_user_profile_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $current_User, $Blog, $is_admin_page, $admin_url;
+	global $current_User, $Blog, $is_admin_page, $admin_url, $ReqURI;
 
 	if( ! is_logged_in() )
 	{
@@ -373,7 +373,7 @@ function get_user_profile_link( $before = '', $after = '', $link_text = '', $lin
 	}
 	else
 	{
-		$url = url_add_param( $Blog->gen_blogurl(), 'disp=profile&amp;redirect_to='.rawurlencode( url_rel_to_same_host(regenerate_url('','','','&'), $Blog->gen_blogurl()) ) );
+		$url = url_add_param( $Blog->gen_blogurl(), 'disp=profile&amp;redirect_to='.rawurlencode($ReqURI) );
 	}
 
 	$r = $before
@@ -542,6 +542,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.8  2008/04/13 23:38:53  fplanque
+ * Basic public user profiles
+ *
  * Revision 1.7  2008/01/21 09:35:36  fplanque
  * (c) 2008
  *

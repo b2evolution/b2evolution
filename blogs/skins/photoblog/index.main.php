@@ -214,6 +214,13 @@ skin_include( '_html_header.inc.php' );
 
 			<div class="bSmallPrint">
 			<?php
+				$Item->author( array(
+						'before'    => T_('By').' ',
+						'after'     => ' &bull; ',
+					) );
+			?>
+
+			<?php
 				$Item->categories( array(
 					'before'          => T_('Albums').': ',
 					'after'           => ' ',
