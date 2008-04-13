@@ -1150,16 +1150,19 @@ class Comment extends DataObject
 		// fp>If the subscriber has permission to moderate the comments, he SHOULD receive the email address.
 		if( $this->get_author_User() )
 		{ // Comment from a registered user:
-			$mail_from = '"'.$this->author_User->get('preferredname').'" <'.$this->author_User->get('email').'>';
+			$mail_from = $this->author_User->get('email');
+			$mail_from_name = $this->author_User->get('preferredname');
 		}
 		elseif( ! empty( $this->author_email ) )
 		{ // non-member, but with email address:
-			$mail_from = "\"$this->author\" <$this->author_email>";
+			$mail_from = $this->author_email;
+			$mail_from_name = $this->author;
 		}
 		else
 		{ // Fallback (we have no email address):  fp>TODO: or the subscriber is not allowed to view it.
 			global $notify_from;
 			$mail_from = $notify_from;
+			$mail_from_name = NULL;
 		}
 
 		// Send emails:
@@ -1209,10 +1212,18 @@ class Comment extends DataObject
 					}
 			}
 
-			$notify_message .=
+			$notify_message =
 				T_('Comment').': '.str_replace('&amp;', '&', $this->get_permanent_url())."\n"
 				// TODO: fp> We MAY want to force a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
-				.$this->get('content')."\n\n"
+				.$notify_message;
+
+			if( !empty( $this->rating ) )
+			{
+				$notify_message .= T_('Rating').": $this->rating\n";
+			}
+
+			$notify_message .= $this->get('content')
+				."\n\n-- \n"
 				.T_('Edit/Delete').': '.$admin_url.'?ctrl=items&blog='.$edited_Blog->ID.'&p='.$edited_Item->ID.'&c=1#c'.$this->ID."\n\n"
 				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->gen_blogurl(), 'disp=subs' ) )."\n";
 
@@ -1228,7 +1239,7 @@ class Comment extends DataObject
 				$Debuglog->add( $mail_dump, 'notification' );
 			}
 
-			send_mail( $notify_email, NULL, $subject, $notify_message, $mail_from );
+			send_mail( $notify_email, NULL, $subject, $notify_message, $mail_from, $mail_from_name );
 
 			locale_restore_previous();
 		}
@@ -1327,6 +1338,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2008/04/13 22:07:59  fplanque
+ * email fixes
+ *
  * Revision 1.21  2008/04/13 15:15:59  fplanque
  * attempt to fix email headers for non latin charsets
  *

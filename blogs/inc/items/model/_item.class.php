@@ -3242,7 +3242,6 @@ class Item extends ItemLight
 		 * We have a list of email addresses to notify:
 		 */
 		$this->get_creator_User();
-		$mail_from = '"'.$this->creator_User->get('preferredname').'" <'.$this->creator_User->get('email').'>';
 
 		// Send emails:
 		$cache_by_locale = array();
@@ -3290,7 +3289,8 @@ class Item extends ItemLight
 				echo "<p>Sending notification to $notify_email:<pre>$cache_by_locale[$notify_locale]['message']</pre>";
 			}
 
-			send_mail( $notify_email, NULL, $cache_by_locale[$notify_locale]['subject'], $cache_by_locale[$notify_locale]['message'], $mail_from );
+			send_mail( $notify_email, NULL, $cache_by_locale[$notify_locale]['subject'], $cache_by_locale[$notify_locale]['message'],
+									$this->creator_User->get('email'), $this->creator_User->get('preferredname') );
 		}
 
 		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
@@ -3518,6 +3518,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.46  2008/04/13 22:07:59  fplanque
+ * email fixes
+ *
  * Revision 1.45  2008/04/13 15:15:59  fplanque
  * attempt to fix email headers for non latin charsets
  *
