@@ -163,7 +163,7 @@ switch( $action )
 							."\n"
 							.T_('Edit user').': '.$admin_url.'?ctrl=users&user_ID='.$new_User->ID."\n";
 
-		send_mail( $AdminUser->get( 'email' ), T_('New user registration on your blog'), $message, $notify_from ); // ok, if this may fail..
+		send_mail( $AdminUser->get( 'email' ), NULL, T_('New user registration on your blog'), $message, $notify_from ); // ok, if this may fail..
 
 		locale_restore_previous();
 
@@ -214,6 +214,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.91  2008/04/13 15:15:59  fplanque
+ * attempt to fix email headers for non latin charsets
+ *
  * Revision 1.90  2008/02/19 11:11:16  fplanque
  * no message
  *

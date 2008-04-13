@@ -1228,7 +1228,7 @@ class Comment extends DataObject
 				$Debuglog->add( $mail_dump, 'notification' );
 			}
 
-			send_mail( $notify_email, $subject, $notify_message, $mail_from );
+			send_mail( $notify_email, NULL, $subject, $notify_message, $mail_from );
 
 			locale_restore_previous();
 		}
@@ -1327,6 +1327,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2008/04/13 15:15:59  fplanque
+ * attempt to fix email headers for non latin charsets
+ *
  * Revision 1.20  2008/03/31 00:27:49  fplanque
  * Enhanced comment moderation
  *

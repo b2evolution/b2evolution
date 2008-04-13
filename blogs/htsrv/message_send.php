@@ -83,7 +83,7 @@ if( param( 'optout_cmt_email', 'string', '' ) )
 		."\n\n"
 		.T_('If it was not you that requested this, simply ignore this mail.');
 
-	if( send_mail( $optout_cmt_email, T_('Confirm opt-out for emails through message form'), $message ) )
+	if( send_mail( $optout_cmt_email, NULL, T_('Confirm opt-out for emails through message form'), $message ) )
 	{
 		echo T_('An email has been sent to you, with a link to confirm your request not to receive emails through the comments you have made on this blog.');
 		$Session->set( 'core.msgform.optout_cmt_email', $optout_cmt_email );
@@ -184,7 +184,7 @@ if( ! empty( $recipient_id ) )
 	}
 
 	$recipient_name = trim($recipient_User->get('preferredname'));
-	$recipient_address =  $recipient_name.' <'.$recipient_User->get('email').'>';
+	$recipient_address = $recipient_User->get('email');
 
 	// Change the locale so the email is in the recipients language
 	locale_temp_switch($recipient_User->locale);
@@ -213,7 +213,7 @@ elseif( ! empty( $comment_id ) )
 	}
 
 	$recipient_name = trim($Comment->get_author_name());
-	$recipient_address = "=?$evo_charset?B?".base64_encode($recipient_name)."?=".' <'.$Comment->get_author_email().'>';
+	$recipient_address = $Comment->get_author_email();
 
 	// We don't know the recipient's language - Change the locale so the email is in the blog's language:
 	locale_temp_switch($Blog->locale);
@@ -280,7 +280,7 @@ else
 }
 
 // Send mail
-$success_mail = send_mail( $recipient_address, $subject, $message, "=?$evo_charset?B?".base64_encode($sender_name)."?= <$sender_address>" );
+$success_mail = send_mail( $recipient_address, $recipient_name, $subject, $message, $sender_address, $sender_name );
 
 
 // Plugins should cleanup their temporary data here:
@@ -310,8 +310,8 @@ header_redirect(); // exits!
 
 /*
  * $Log$
- * Revision 1.58  2008/04/12 20:13:57  fplanque
- * base64 mail headers
+ * Revision 1.59  2008/04/13 15:15:59  fplanque
+ * attempt to fix email headers for non latin charsets
  *
  * Revision 1.57  2008/02/19 11:11:16  fplanque
  * no message

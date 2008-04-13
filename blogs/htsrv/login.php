@@ -120,7 +120,7 @@ switch( $action )
 				."\n\n"
 				.T_('If it was not you that requested this password change, simply ignore this mail.');
 
-			if( ! send_mail( $ForgetfulUser->email, sprintf( T_('Password change request for %s'), $ForgetfulUser->login ), $message, $notify_from ) )
+			if( ! send_mail( $ForgetfulUser->email, NULL, sprintf( T_('Password change request for %s'), $ForgetfulUser->login ), $message, $notify_from ) )
 			{
 				$Messages->add( T_('Sorry, the email with the link to reset your password could not be sent.')
 					.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
@@ -395,6 +395,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.100  2008/04/13 15:15:59  fplanque
+ * attempt to fix email headers for non latin charsets
+ *
  * Revision 1.99  2008/02/19 11:11:16  fplanque
  * no message
  *

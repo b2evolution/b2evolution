@@ -1103,7 +1103,7 @@ class User extends DataObject
 			.T_('Please note:')
 			.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).');
 
-		$r = send_mail( $this->email, sprintf( T_('Validate your email address for "%s"'), $this->login ), $message );
+		$r = send_mail( $this->email, NULL, sprintf( T_('Validate your email address for "%s"'), $this->login ), $message );
 
 		if( $r )
 		{ // save request_id into Session
@@ -1326,6 +1326,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2008/04/13 15:15:59  fplanque
+ * attempt to fix email headers for non latin charsets
+ *
  * Revision 1.9  2008/04/03 22:03:10  fplanque
  * added "save & edit" and "publish now" buttons to edit screen.
  *

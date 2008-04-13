@@ -1581,27 +1581,33 @@ function debug_info( $force = false )
  *
  * @todo Unit testing with "nice addresses" This gets broken over and over again.
  *
- * @param string Recipient, either email only or in "Name <example@example.com>" format (RFC2822).
- *               Can be multiple comma-separated addresses.
+ * @param string Recipient email address. (Caould be multiple comma-separated addresses.)
+ * @param string Recipient name. (Only use if sending to a single address)
  * @param string Subject of the mail
  * @param string The message text
  * @param string From address, being added to headers (we'll prevent injections);
  *               see {@link http://securephp.damonkohler.com/index.php/Email_Injection}.
- *               Might be just an email address or of the same form as {@link $to}.
- *               {@link $notify_from} gets used as default (if NULL).
+ *               Defaults to {@link $notify_from} if NULL.
+ * @param string From name.
  * @param array Additional headers ( headername => value ). Take care of injection!
  * @return boolean True if mail could be sent (not necessarily delivered!), false if not - (return value of {@link mail()})
  */
-function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
+function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array() )
 {
 	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $notify_from;
 
 	$NL = "\n";
 
-	if( is_windows() )
+	if( ! is_windows() )
 	{	// fplanque: Windows XP, Apache 1.3, PHP 4.4, MS SMTP : will not accept "nice" addresses.
-		$to = preg_replace( '/^.*?<(.+?)>$/', '$1', $to );
-		$from = preg_replace( '/^.*?<(.+?)>$/', '$1', $from );
+		if( !empty( $from_name ) )
+		{
+			$to = "=?$evo_charset?B?".base64_encode( $from_name )."?=".' <'.$from.'>';
+		}
+		if( !empty( $to_name ) )
+		{
+			$from = "=?$evo_charset?B?".base64_encode( $to_name )."?=".' <'.$to.'>';
+		}
 	}
 
 	// echo 'sending email to: ['.htmlspecialchars($to).'] from ['.htmlspecialchars($from).']';
@@ -1654,10 +1660,14 @@ function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
 		$headerstring .= $lKey.': '.$lValue.$NL;
 	}
 
+	// sam2k way that doe snot require mbstring:
+	$subject = "=?$evo_charset?B?".base64_encode($subject)."?=";
+	/* blueyed way that requires mbstring
 	if( function_exists('mb_encode_mimeheader') )
 	{ // encode subject
 		$subject = mb_encode_mimeheader( $subject, mb_internal_encoding(), 'B', $NL );
 	}
+	*/
 
 	$message = str_replace( array( "\r\n", "\r" ), $NL, $message );
 
@@ -2700,6 +2710,9 @@ function modules_call_method( $method_name )
 
 /*
  * $Log$
+ * Revision 1.32  2008/04/13 15:15:59  fplanque
+ * attempt to fix email headers for non latin charsets
+ *
  * Revision 1.31  2008/04/06 19:19:29  fplanque
  * Started moving some intelligence to the Modules.
  * 1) Moved menu structure out of the AdminUI class.

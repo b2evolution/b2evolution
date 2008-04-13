@@ -3290,7 +3290,7 @@ class Item extends ItemLight
 				echo "<p>Sending notification to $notify_email:<pre>$cache_by_locale[$notify_locale]['message']</pre>";
 			}
 
-			send_mail( $notify_email, $cache_by_locale[$notify_locale]['subject'], $cache_by_locale[$notify_locale]['message'], $mail_from );
+			send_mail( $notify_email, NULL, $cache_by_locale[$notify_locale]['subject'], $cache_by_locale[$notify_locale]['message'], $mail_from );
 		}
 
 		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
@@ -3518,6 +3518,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.45  2008/04/13 15:15:59  fplanque
+ * attempt to fix email headers for non latin charsets
+ *
  * Revision 1.44  2008/04/12 19:34:21  fplanque
  * bugfix
  *
