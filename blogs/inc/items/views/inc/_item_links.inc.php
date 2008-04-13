@@ -43,14 +43,12 @@ $SQL = & new SQL();
 
 $SQL->SELECT( 'link_ID, link_ltype_ID, file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
 $SQL->FROM( 'T_links LEFT JOIN T_files ON link_file_ID = file_ID' );
-$order_fields = array( 'file_path' );
-
-
 $SQL->WHERE( 'link_itm_ID = '.$edited_Item->ID );
+$SQL->ORDER_BY( 'link_ID' );
 
 $Results = & new Results( $SQL->get(), 'link_' );
 
-$Results->title = T_('This post is linked to...');
+$Results->title = T_('Attachments');
 
 /*
  * TYPE
@@ -61,35 +59,12 @@ function display_type( & $row )
 	{
 		return T_('File');
 	}
-	// >ONgsb:
-	elseif( !empty($row->pos_ID) )
-	{
-		return T_('Position');
-	}
-	elseif( !empty($row->cont_ID) )
-	{
-		return T_('Contact');
-	}
-	elseif( !empty($row->etab_ID) )
-	{
-		return T_('Establishment');
-	}
-	elseif( !empty($row->firm_ID) )
-	{
-		return T_('Firm');
-	}
-	elseif( !empty($row->itm_ID) )
-	{
-		return T_('Item');
-	}
-	// <ONgsb
 
 	return '?';
 }
 $Results->cols[] = array(
 						'th' => T_('Type'),
 						'th_class' => 'shrinkwrap',
-						'order' => implode( ', ', $order_fields ),
 						'td_class' => 'shrinkwrap',
 						'td' => '%display_type( {row} )%',
 					);
@@ -210,6 +185,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.4  2008/04/13 20:40:07  fplanque
+ * enhanced handlign of files attached to items
+ *
  * Revision 1.3  2008/04/03 22:03:09  fplanque
  * added "save & edit" and "publish now" buttons to edit screen.
  *

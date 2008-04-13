@@ -52,6 +52,14 @@ $AdminUI->set_path( 'items' );	// Sublevel may be attached below
  */
 switch( $action )
 {
+	case 'edit_links':
+		param( 'item_ID', 'integer', true, true );
+		$ItemCache = & get_Cache( 'ItemCache' );
+		$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+		// Load the blog we're in:
+		$Blog = & $edited_Item->get_Blog();
+		break;
+
 	case 'unlink':
 	  param( 'link_ID', 'integer', true );
 		$LinkCache = & get_Cache( 'LinkCache' );
@@ -68,7 +76,19 @@ switch( $action )
 			$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
 			unset( $edited_Link );
 			unset( $link_ID );
-			$action = 'nil';
+			if( $mode == 'iframe' )
+			{
+				$action = 'edit_links';
+				param( 'item_ID', 'integer', true, true );
+				$ItemCache = & get_Cache( 'ItemCache' );
+				$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+				// Load the blog we're in:
+				$Blog = & $edited_Item->get_Blog();
+			}
+			else
+			{
+				$action = 'nil';
+			}
 		}
 		break;
 
@@ -140,7 +160,7 @@ switch( $action )
 
 			// What form buttton has been pressed?
 			param( 'save', 'string', '' );
-			$exit_after_save = ( $save != T_('Save & edit') );
+			$exit_after_save = ( $save != T_('Save & edit') && $save != T_('Save & start attaching files') );
 		}
 		break;
 
@@ -510,6 +530,14 @@ switch( $action )
 		break;
 
 
+	case 'edit_links':
+		// Display attachment list
+
+		// Check permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		break;
+
+
 	case 'unlink':
  		// Delete a link:
 
@@ -523,11 +551,18 @@ switch( $action )
 		$Messages->add( $msg, 'success' );
 
 		// go on to view:
-		$p = $edited_Item->ID;
-		init_list_mode();
-		$action = 'view';
+		//$p = $edited_Item->ID;
+		//init_list_mode();
+		//$action = 'view';
 		// REDIRECT / EXIT
- 		header_redirect( regenerate_url( '', 'p='.$edited_Item->ID, '', '&' ) );
+		if( $mode == 'iframe' )
+		{
+	 		header_redirect( regenerate_url( '', 'action=edit_links&mode=iframe&item_ID='.$edited_Item->ID, '', '&' ) );
+		}
+		else
+		{
+	 		header_redirect( regenerate_url( '', 'p='.$edited_Item->ID, '', '&' ) );
+		}
 		break;
 
 
@@ -661,6 +696,12 @@ switch( $action )
 		attach_browse_tabs();
 
 		break;
+
+	case 'edit_links':
+		// Embedded iframe:
+		$tab = '';
+		$mode = 'iframe';
+		break;
 }
 
 if( !empty($tab) )
@@ -736,6 +777,11 @@ switch( $action )
 
 		break;
 
+	case 'edit_links':
+		// View attachments
+		$AdminUI->disp_view( 'items/views/_item_links.view.php' );
+		break;
+
 	case 'list':
 	default:
 		// Begin payload block:
@@ -799,9 +845,11 @@ switch( $action )
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
-
 /*
  * $Log$
+ * Revision 1.21  2008/04/13 20:40:08  fplanque
+ * enhanced handlign of files attached to items
+ *
  * Revision 1.20  2008/04/03 22:03:11  fplanque
  * added "save & edit" and "publish now" buttons to edit screen.
  *

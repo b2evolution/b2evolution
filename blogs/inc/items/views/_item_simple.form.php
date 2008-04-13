@@ -195,6 +195,11 @@ for( $i = 1 ; $i <= 3; $i++ )
 	$Form->end_fieldset();
 
 
+	// ####################### ATTACHMENTS/LINKS #########################
+
+	attachment_iframe( $Form, $creating, $edited_Item, $Blog );
+
+
 	// ############################ ADVANCED #############################
 
 	$Form->begin_fieldset( T_('Meta info').get_manual_link('post_simple_meta_fieldset'), array( 'id' => 'itemform_adv_props' ) );
@@ -280,6 +285,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.17  2008/04/13 20:40:07  fplanque
+ * enhanced handlign of files attached to items
+ *
  * Revision 1.16  2008/04/04 17:02:23  fplanque
  * cleanup of global settings
  *

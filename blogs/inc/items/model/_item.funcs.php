@@ -338,6 +338,44 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_', $req_b
 
 
 /**
+ * Compose screen: display attachment iframe
+ */
+function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
+{
+	global $admin_url;
+	global $current_User;
+
+	if( $creating )
+	{	// Creating new post
+		$fieldset_title = T_('Attachments');
+		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks' ) );
+
+		echo '<table cellspacing="0" cellpadding="0"><tr><td>';
+   	$Form->submit( array( 'save', /* TRANS: This is the value of an input submit button */ T_('Save & start attaching files'), 'SaveEditButton' ) );
+		echo '</td></tr></table>';
+
+		$Form->end_fieldset();
+	}
+	else
+	{ // Editing post
+		$fieldset_title = T_('Attachments');
+		if( $current_User->check_perm( 'files', 'view' )
+			&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+		{	// Check that we have permission to edit item:
+			$fieldset_title .= ' - <a href="'.url_add_param( $Blog->get_filemanager_link(),
+								'fm_mode=link_item&amp;item_ID='.$edited_Item->ID ).'">'.T_('Attach files').'</a>';
+		}
+
+		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_links' ) );
+
+		echo '<iframe src="'.$admin_url.'?ctrl=items&amp;action=edit_links&amp;mode=iframe&amp;item_ID='.$edited_Item->ID
+					.'" name="attachmentframe" width="100%" marginwidth="0" height="160" marginheight="0" align="top" scrolling="auto" frameborder="0" id="attachmentframe"></iframe>';
+
+		$Form->end_fieldset();
+	}
+}
+
+/**
  * Allow recursive category selection.
  *
  * @todo Allow to use a dropdown (select) to switch between blogs ( CSS / JS onchange - no submit.. )
@@ -675,6 +713,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.14  2008/04/13 20:40:06  fplanque
+ * enhanced handlign of files attached to items
+ *
  * Revision 1.13  2008/04/03 19:37:37  fplanque
  * category selector will be smaller if less than 11 cats
  *

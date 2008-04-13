@@ -25,25 +25,27 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-/**
- * Icon Legend
- */
-global $IconLegend;
-if( isset($IconLegend) )
-{ // Display icon legend, if activated by user
-	$IconLegend->display_legend();
+if( $mode != 'iframe' )
+{
+	/**
+	 * Icon Legend
+	 */
+	global $IconLegend;
+	if( isset($IconLegend) )
+	{ // Display icon legend, if activated by user
+		$IconLegend->display_legend();
+	}
+
+	echo $this->get_footer_contents();
+
+	// CALL PLUGINS NOW:
+	global $Plugins;
+	$Plugins->trigger_event( 'AdminAfterPageFooter', array() );
+
+
+	// Close open divs, etc...
+	echo $this->get_body_bottom();
 }
-
-echo $this->get_footer_contents();
-
-// CALL PLUGINS NOW:
-global $Plugins;
-$Plugins->trigger_event( 'AdminAfterPageFooter', array() );
-
-
-// Close open divs, etc...
-echo $this->get_body_bottom();
-
 
 if( $this->get_path(0) == 'files'
 	|| $this->get_path_range(0,1) == array( 'blogs', 'perm' )
@@ -73,6 +75,9 @@ if( $this->get_path(0) == 'files'
 <?php
 /*
  * $Log$
+ * Revision 1.7  2008/04/13 20:40:06  fplanque
+ * enhanced handlign of files attached to items
+ *
  * Revision 1.6  2008/02/19 11:11:23  fplanque
  * no message
  *

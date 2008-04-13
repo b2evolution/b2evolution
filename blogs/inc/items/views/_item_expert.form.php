@@ -49,7 +49,7 @@ global $Settings;
 global $pagenow;
 
 
-global $mode;
+global $mode, $admin_url;
 global $use_preview, $post_comment_status, $trackback_url, $item_tags;
 global $bozo_start_modified, $creating;
 global $item_title, $item_content;
@@ -185,6 +185,11 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->end_fieldset();
 
 
+	// ####################### ATTACHMENTS/LINKS #########################
+
+	attachment_iframe( $Form, $creating, $edited_Item, $Blog );
+
+
 	// ############################ ADVANCED #############################
 
 	$Form->begin_fieldset( T_('Advanced properties').get_manual_link('post_advanced_properties_fieldset'), array( 'id' => 'itemform_adv_props' ) );
@@ -290,6 +295,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	// ####################### PLUGIN FIELDSETS #########################
 
 	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
+
 	?>
 
 </div>
@@ -389,17 +395,6 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 $Form->end_form();
 
 
-
-// ####################### LINKS #########################
-
-if( ! $creating )
-{ // Editing post
-
-	require dirname(__FILE__).'/inc/_item_links.inc.php';
-
-}
-
-
 // ####################### JS BEHAVIORS #########################
 
 require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
@@ -407,6 +402,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.32  2008/04/13 20:40:07  fplanque
+ * enhanced handlign of files attached to items
+ *
  * Revision 1.31  2008/04/04 17:02:23  fplanque
  * cleanup of global settings
  *

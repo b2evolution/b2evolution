@@ -75,7 +75,8 @@ function file_type( & $row )
 	return $current_File->get_preview_thumb( 'fulltype' );
 }
 $Results->cols[] = array(
-						'th' => T_('Icon/Type'),
+						'th' => T_('File'),
+						'order' => 'link_ID',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
 						'td' => '%file_type( {row} )%',
@@ -118,7 +119,8 @@ function file_actions( $link_ID )
 
 	$title = T_('Locate this file!');
 
-	$r = $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title );
+	$r = $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID,
+					get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title );
 
 	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	{	// Check that we have permission to edit item:
@@ -147,6 +149,9 @@ $Form->end_form( );
 
 /*
  * $Log$
+ * Revision 1.5  2008/04/13 20:40:06  fplanque
+ * enhanced handlign of files attached to items
+ *
  * Revision 1.4  2008/04/03 22:03:08  fplanque
  * added "save & edit" and "publish now" buttons to edit screen.
  *

@@ -1407,7 +1407,7 @@ class File extends DataObject
 	 * @param string page url for the edit action
 	 */
 	function get_linkedit_link( $link_itm_ID = NULL, $text = NULL, $title = NULL, $no_access_text = NULL,
-											$actionurl = 'admin.php?ctrl=files' )
+											$actionurl = 'admin.php?ctrl=files', $target = '' )
 	{
 		if( is_null( $text ) )
 		{	// Use file root+relpath+name by default
@@ -1443,7 +1443,12 @@ class File extends DataObject
 
 		$url = url_add_param( $actionurl, $url_params );
 
-		return '<a href="'.$url.'" title="'.$title.'">'.$text.'</a>';
+		if( !empty($target) )
+		{
+			$target = ' target="'.$target.'"';
+		}
+
+		return '<a href="'.$url.'" title="'.$title.'"'.$target.'>'.$text.'</a>';
 	}
 
 
@@ -1769,6 +1774,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2008/04/13 20:40:06  fplanque
+ * enhanced handlign of files attached to items
+ *
  * Revision 1.4  2008/01/21 09:35:28  fplanque
  * (c) 2008
  *

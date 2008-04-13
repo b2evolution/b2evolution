@@ -89,6 +89,31 @@ table.compose_layout td.select {
 
 
 /*
+ * Attachments / links
+ */
+fieldset#itemform_createlinks {
+	height: 80px;
+	background-color: #F1F6F8;
+	padding: 0;
+}
+fieldset#itemform_createlinks table {
+	width: 100%;
+	height: 100%;
+}
+fieldset#itemform_createlinks td {
+	text-align: center;
+	vertical-align: middle;
+}
+fieldset#itemform_links {
+	padding: 0;
+}
+div#iframe_wrapper {
+	background-color: #F1F6F8;
+	height: 160px;
+}
+
+
+/*
  * Categories selection table:
  */
 table.catselect {

@@ -14,6 +14,9 @@ table.grouped {
 	width: 100%;
 	/* clear:both; */
 }
+div.compact_results table.grouped {
+	margin: 0 auto;
+}
 
 /* Table Filters: */
 table.grouped tr.filters td {
