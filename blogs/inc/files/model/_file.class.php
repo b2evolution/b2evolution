@@ -1434,6 +1434,23 @@ class File extends DataObject
 			$no_access_text = $text;
 		}
 
+		$url = $this->get_linkedit_url( $link_itm_ID, $actionurl );
+
+		if( !empty($target) )
+		{
+			$target = ' target="'.$target.'"';
+		}
+
+		return '<a href="'.$url.'" title="'.$title.'"'.$target.'>'.$text.'</a>';
+	}
+
+
+  /**
+	 * @param integer ID of item to link to => will open the FM in link mode
+	 * @return string
+	 */
+	function get_linkedit_url( $link_itm_ID = NULL, $actionurl = 'admin.php?ctrl=files' )
+	{
 		if( $this->is_dir() )
 		{
 			$rdfp_path = $this->_rdfp_rel_path;
@@ -1452,12 +1469,7 @@ class File extends DataObject
 
 		$url = url_add_param( $actionurl, $url_params );
 
-		if( !empty($target) )
-		{
-			$target = ' target="'.$target.'"';
-		}
-
-		return '<a href="'.$url.'" title="'.$title.'"'.$target.'>'.$text.'</a>';
+		return $url;
 	}
 
 
@@ -1783,6 +1795,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2008/04/14 19:50:51  fplanque
+ * enhanced attachments handling in post edit mode
+ *
  * Revision 1.6  2008/04/14 17:52:07  fplanque
  * link images to original by default
  *

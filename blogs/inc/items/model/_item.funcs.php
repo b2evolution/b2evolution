@@ -344,6 +344,7 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 {
 	global $admin_url;
 	global $current_User;
+	global $Settings;
 
 	if( $creating )
 	{	// Creating new post
@@ -358,12 +359,20 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 	}
 	else
 	{ // Editing post
-		$fieldset_title = T_('Attachments');
-		if( $current_User->check_perm( 'files', 'view' )
+		$fieldset_title = T_('Attachments').get_manual_link('post_attachments_fieldset');
+
+		$fieldset_title .= ' - <a href="'.$admin_url.'?ctrl=items&amp;action=edit_links&amp;mode=iframe&amp;item_ID='.$edited_Item->ID
+					.'" target="attachmentframe">'.get_icon( 'refresh', 'imgtag' ).' '.T_('Refresh').'</a>';
+
+		if( $Settings->get( 'fm_enabled' )
+			&& $current_User->check_perm( 'files', 'view' )
 			&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 		{	// Check that we have permission to edit item:
+
 			$fieldset_title .= ' - <a href="'.url_add_param( $Blog->get_filemanager_link(),
-								'fm_mode=link_item&amp;item_ID='.$edited_Item->ID ).'">'.T_('Attach files').'</a>';
+						'fm_mode=link_item&amp;item_ID='.$edited_Item->ID ).'" onclick="return pop_up_window( \''
+						.url_add_param( $Blog->get_filemanager_link(), 'mode=upload&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID ).'\', \'fileman_upload\', 1000 )">'
+						.get_icon( 'folder', 'imgtag' ).' '.T_('Attach files (popup)').'</a>';
 		}
 
 		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_links' ) );
@@ -713,6 +722,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.16  2008/04/14 19:50:51  fplanque
+ * enhanced attachments handling in post edit mode
+ *
  * Revision 1.15  2008/04/14 16:24:39  fplanque
  * use ActionArray[] to make action handlign more robust
  *

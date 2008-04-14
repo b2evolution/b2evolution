@@ -142,7 +142,10 @@ if( $current_User->check_perm( 'files', 'view' ) )
 		if( isset($current_File) )
 		{
 			$title = T_('Locate this file!');
-			$r = $current_File->get_linkedit_link( $edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title, NULL, 'admin.php?ctrl=files', '_parent' ).' ';
+			$url = $current_File->get_linkedit_url( $edited_Item->ID );
+			$r = '<a href="'.$url.'" onclick="return pop_up_window( \''
+						.url_add_param( $url, 'mode=upload' ).'\', \'fileman_upload\', 1000 )" target="_parent" title="'.$title.'">'
+						.get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ).'</a> ';
 		}
 
 		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
@@ -164,6 +167,9 @@ $Results->display( $AdminUI->get_template( 'compact_results' ) );
 
 /*
  * $Log$
+ * Revision 1.2  2008/04/14 19:50:51  fplanque
+ * enhanced attachments handling in post edit mode
+ *
  * Revision 1.1  2008/04/13 22:28:01  fplanque
  * enhanced handlign of files attached to items
  *

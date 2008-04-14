@@ -434,14 +434,14 @@ class AdminUI_general extends Widget
 		// #body_win and .body_firefox (for example) can be used to customize CSS per plaform/browser
 		echo '<body id="body_'.$Hit->agent_platform.'" class="body_'.$Hit->agent_name.'">'."\n";
 
-		if( $mode == 'iframe' )
+		if( !empty( $mode ) )
 		{
-			echo '<div id="iframe_wrapper">';
+			$mode = preg_replace( '¤[^a-z]¤', '', $mode );	// sanitize
+			echo '<div id="'.$mode.'_wrapper">';
 			return;
 		}
 
 		require $skins_path.'_toolbar.inc.php';
-
 
 		echo "\n";
 		if( is_logged_in() )
@@ -1540,6 +1540,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.86  2008/04/14 19:50:51  fplanque
+ * enhanced attachments handling in post edit mode
+ *
  * Revision 1.85  2008/04/13 20:40:05  fplanque
  * enhanced handlign of files attached to items
  *

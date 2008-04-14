@@ -83,11 +83,14 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_body_top()
 	{
-		global $Messages;
+		global $Messages, $mode;
 
 		$r = '<div class="wrapper">';
 
-		$r .= $this->get_page_head();
+		if( empty($mode) )
+		{
+			$r .= $this->get_page_head();
+		}
 
 		$r .= $this->get_bloglist_buttons();
 
@@ -386,6 +389,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.12  2008/04/14 19:50:51  fplanque
+ * enhanced attachments handling in post edit mode
+ *
  * Revision 1.11  2008/02/14 02:19:55  fplanque
  * cleaned up stats
  *

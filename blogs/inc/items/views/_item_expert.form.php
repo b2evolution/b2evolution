@@ -146,6 +146,8 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'expert' ) );
 
 	// ---------- FILES... ----------
+	/* Deprecated by "Attach files (popup)"
+
 	if( $Settings->get( 'fm_enabled' ) )
 	{ // Note: we try to land in the Blog media folder if possible
 		// fp> TODO: check what happens if blog folders are disabled
@@ -161,6 +163,8 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 						.url_add_param( $Blog->get_filemanager_link(), $fm_url_params ).'\', \'fileman_upload\', 1000 )" /> ';
 		}
 	}
+
+	*/
 
 	if( $use_preview )
 	{ // ---------- PREVIEW ----------
@@ -402,6 +406,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.34  2008/04/14 19:50:51  fplanque
+ * enhanced attachments handling in post edit mode
+ *
  * Revision 1.33  2008/04/14 16:24:39  fplanque
  * use ActionArray[] to make action handlign more robust
  *

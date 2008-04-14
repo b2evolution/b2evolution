@@ -34,121 +34,130 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Item;
 
+global $mode;
 
-$Form = & new Form( NULL, 'fm_links', 'post', 'fieldset' );
+if( $mode != 'upload' )
+{	// If not opearting in a popup opened from post edit screen:
 
-
-$Form->begin_form( 'fform' );
-
-$Form->hidden_ctrl();
-
-
-$Results = & new Results(
-					'SELECT link_ID, link_ltype_ID, T_files.*
-						 FROM T_links INNER JOIN T_files ON link_file_ID = file_ID
-						WHERE link_itm_ID = '.$edited_Item->ID,
-					'link_' );
-
-$Results->title = sprintf( T_('Files linked to &laquo;%s&raquo;'),
-				'<a href="?ctrl=items&amp;blog='.$edited_Item->blog_ID.'&amp;p='.$edited_Item->ID.'" title="'
-				.T_('View this post...').'">'.$edited_Item->dget('title').'</a>' );
-
-if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
-{ // User has permission to edit this post
-	$Results->global_icon( T_('Edit this post...'), 'edit', '?ctrl=items&amp;action=edit&amp;p='.$edited_Item->ID, T_('Edit') );
-}
-
-// Close link mode and continue in File Manager (remember the Item_ID though):
-$Results->global_icon( T_('Quit link mode!'), 'close', regenerate_url( 'fm_mode' ) );
+	$Form = & new Form( NULL, 'fm_links', 'post', 'fieldset' );
 
 
-// TYPE COLUMN:
-function file_type( & $row )
-{
-	global $current_File;
+	$Form->begin_form( 'fform' );
 
-	// Instantiate a File object for this line:
-	$current_File = new File( $row->file_root_type, $row->file_root_ID, $row->file_path ); // COPY (FUNC) needed for following columns
-	// Flow meta data into File object:
-	$current_File->load_meta( false, $row );
-
-	return $current_File->get_preview_thumb( 'fulltype' );
-}
-$Results->cols[] = array(
-						'th' => T_('File'),
-						'order' => 'link_ID',
-						'th_class' => 'shrinkwrap',
-						'td_class' => 'shrinkwrap',
-						'td' => '%file_type( {row} )%',
-					);
+	$Form->hidden_ctrl();
 
 
-// PATH COLUMN:
-function file_path()
-{
-	/**
-	 * @global File
-	 */
-	global $current_File;
-	global $edited_Item;
+	$Results = & new Results(
+						'SELECT link_ID, link_ltype_ID, T_files.*
+							 FROM T_links INNER JOIN T_files ON link_file_ID = file_ID
+							WHERE link_itm_ID = '.$edited_Item->ID,
+						'link_' );
 
-	// File relative path & name:
-	return $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID );
-}
-$Results->cols[] = array(
-						'th' => T_('Path'),
-						'order' => 'file_path',
-						'td_class' => 'left',
-						'td' => '%file_path()%',
-					);
-
-
-// TITLE COLUMN:
-$Results->cols[] = array(
-						'th' => T_('Title'),
-						'order' => 'file_title',
-						'td_class' => 'left',
-						'td' => '$file_title$',
-					);
-
-
-// ACTIONS COLUMN:
-function file_actions( $link_ID )
-{
-	global $current_File, $edited_Item, $current_User;
-
-	$title = T_('Locate this file!');
-
-	$r = $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID,
-					get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title );
+	$Results->title = sprintf( T_('Files linked to &laquo;%s&raquo;'),
+					'<a href="?ctrl=items&amp;blog='.$edited_Item->blog_ID.'&amp;p='.$edited_Item->ID.'" title="'
+					.T_('View this post...').'">'.$edited_Item->dget('title').'</a>' );
 
 	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
-	{	// Check that we have permission to edit item:
-		$r .= action_icon( T_('Delete this link!'), 'unlink',
-                      regenerate_url( 'action', 'link_ID='.$link_ID.'&amp;action=unlink') );
+	{ // User has permission to edit this post
+		$Results->global_icon( T_('Edit this post...'), 'edit', '?ctrl=items&amp;action=edit&amp;p='.$edited_Item->ID, T_('Edit') );
 	}
 
-	return $r;
-}
-$Results->cols[] = array(
-						'th' => T_('Actions'),
-						'th_class' => 'shrinkwrap',
-						'td_class' => 'shrinkwrap',
-						'td' => '%file_actions( #link_ID# )%',
-					);
+	// Close link mode and continue in File Manager (remember the Item_ID though):
+	$Results->global_icon( T_('Quit link mode!'), 'close', regenerate_url( 'fm_mode' ) );
 
-$Results->display();
+
+	// TYPE COLUMN:
+	function file_type( & $row )
+	{
+		global $current_File;
+
+		// Instantiate a File object for this line:
+		$current_File = new File( $row->file_root_type, $row->file_root_ID, $row->file_path ); // COPY (FUNC) needed for following columns
+		// Flow meta data into File object:
+		$current_File->load_meta( false, $row );
+
+		return $current_File->get_preview_thumb( 'fulltype' );
+	}
+	$Results->cols[] = array(
+							'th' => T_('File'),
+							'order' => 'link_ID',
+							'th_class' => 'shrinkwrap',
+							'td_class' => 'shrinkwrap',
+							'td' => '%file_type( {row} )%',
+						);
+
+
+	// PATH COLUMN:
+	function file_path()
+	{
+		/**
+		 * @global File
+		 */
+		global $current_File;
+		global $edited_Item;
+
+		// File relative path & name:
+		return $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID );
+	}
+	$Results->cols[] = array(
+							'th' => T_('Path'),
+							'order' => 'file_path',
+							'td_class' => 'left',
+							'td' => '%file_path()%',
+						);
+
+
+	// TITLE COLUMN:
+	$Results->cols[] = array(
+							'th' => T_('Title'),
+							'order' => 'file_title',
+							'td_class' => 'left',
+							'td' => '$file_title$',
+						);
+
+
+	// ACTIONS COLUMN:
+	function file_actions( $link_ID )
+	{
+		global $current_File, $edited_Item, $current_User;
+
+		$title = T_('Locate this file!');
+
+		$r = $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID,
+						get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title );
+
+		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+		{	// Check that we have permission to edit item:
+			$r .= action_icon( T_('Delete this link!'), 'unlink',
+	                      regenerate_url( 'action', 'link_ID='.$link_ID.'&amp;action=unlink') );
+		}
+
+		return $r;
+	}
+	$Results->cols[] = array(
+							'th' => T_('Actions'),
+							'th_class' => 'shrinkwrap',
+							'td_class' => 'shrinkwrap',
+							'td' => '%file_actions( #link_ID# )%',
+						);
+
+	$Results->display();
+
+	$Form->end_form( );
+}
 
 if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 {	// Check that we have permission to edit item:
-	printf( '<p>'.T_('Click on link %s icons below to link additional files to this item.').'</p>', get_icon( 'link', 'imgtag', array('class'=>'top') ) );
+	printf( '<p>'.T_('Click on link %s icons below to link additional files to this post.').'</p>', get_icon( 'link', 'imgtag', array('class'=>'top') ) );
 }
 
-$Form->end_form( );
 
 
 /*
  * $Log$
+ * Revision 1.6  2008/04/14 19:50:51  fplanque
+ * enhanced attachments handling in post edit mode
+ *
  * Revision 1.5  2008/04/13 20:40:06  fplanque
  * enhanced handlign of files attached to items
  *

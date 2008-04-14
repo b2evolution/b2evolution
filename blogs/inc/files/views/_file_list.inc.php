@@ -262,7 +262,16 @@ $Form->begin_form();
 
 			if( isset($edited_Item) && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 			{	// Offer option to link the file to an Item (or anything else):
-				echo action_icon( T_('Link this file!'), 'link', regenerate_url( 'fm_selected', 'action=link&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
+				$link_attribs = array();
+				$link_action = 'link';
+				if( $mode == 'upload' )
+				{	// We want the action to happen in the post attachments iframe:
+					$link_attribs['target'] = 'attachmentframe';	// TODO: fp> if multiple posts are opened for edit, frames should get unique names
+					$link_action = 'link_inpost';
+				}
+				echo action_icon( T_('Link this file!'), 'link',
+							regenerate_url( 'fm_selected', 'action='.$link_action.'&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ),
+							NULL, NULL, NULL, $link_attribs );
 				echo ' ';
 			}
 
@@ -448,7 +457,7 @@ $Form->begin_form();
 
 			$field_options = array();
 
-			if( $fm_Filelist->get_root_type() == 'collection' || !empty($Blog) )
+			if( $mode != 'upload' && ($fm_Filelist->get_root_type() == 'collection' || !empty($Blog)) )
 			{	// We are browsing files for a collection:
 				// fp> TODO: use current as default but let user choose into which blog he wants to post
 				$field_options['make_post'] = T_('Make one post (including all images)');
@@ -582,6 +591,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.7  2008/04/14 19:50:51  fplanque
+ * enhanced attachments handling in post edit mode
+ *
  * Revision 1.6  2008/04/14 17:39:54  fplanque
  * create 1 post with all images attached
  *

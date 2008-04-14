@@ -956,6 +956,7 @@ switch( $action )
 
 
 	case 'link':
+	case 'link_inpost':	// In the context of a post
 		// TODO: We don't need the Filelist, move UP!
 		// Link File to Item (or other object if extended below):
 
@@ -1000,7 +1001,14 @@ switch( $action )
 		}
 
 		// REDIRECT / EXIT
- 		header_redirect( regenerate_url( '', '', '', '&' ) );
+		if( $action == 'link_inpost' )
+		{
+ 			header_redirect( $admin_url.'?ctrl=items&action=edit_links&mode=iframe&item_ID='.$edited_Item->ID );
+		}
+		else
+		{
+ 			header_redirect( regenerate_url( '', '', '', '&' ) );
+		}
 		break;
 
 
@@ -1544,6 +1552,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2008/04/14 19:50:51  fplanque
+ * enhanced attachments handling in post edit mode
+ *
  * Revision 1.16  2008/04/14 17:39:55  fplanque
  * create 1 post with all images attached
  *
@@ -1585,85 +1596,5 @@ $AdminUI->disp_global_footer();
  *
  * Revision 1.3  2007/09/26 21:53:24  fplanque
  * file manager / file linking enhancements
- *
- * Revision 1.2  2007/06/26 02:19:47  fplanque
- * fix
- *
- * Revision 1.1  2007/06/25 10:59:52  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.59  2007/06/16 19:40:18  blueyed
- * Added handling of $zipfile->error
- *
- * Revision 1.58  2007/04/26 00:11:13  fplanque
- * (c) 2007
- *
- * Revision 1.57  2007/03/20 07:39:08  fplanque
- * filemanager fixes, including the chmod octal stuff
- *
- * Revision 1.56  2007/03/07 04:50:04  fplanque
- * fixed perm checks
- *
- * Revision 1.55  2007/01/25 05:09:06  fplanque
- * i18n update
- *
- * Revision 1.54  2007/01/25 03:17:00  fplanque
- * visual cleanup for average users
- * geeky stuff preserved as options
- *
- * Revision 1.53  2007/01/25 02:41:10  fplanque
- * refactoring / decrap
- *
- * Revision 1.52  2007/01/24 13:44:56  fplanque
- * cleaned up upload
- *
- * Revision 1.51  2007/01/24 06:31:41  fplanque
- * decrap refactoring
- *
- * Revision 1.50  2007/01/24 05:57:55  fplanque
- * cleanup / settings
- *
- * Revision 1.49  2007/01/24 03:45:29  fplanque
- * decrap / removed a lot of bloat...
- *
- * Revision 1.48  2007/01/24 02:35:42  fplanque
- * refactoring
- *
- * Revision 1.47  2007/01/24 01:40:15  fplanque
- * Upload tab now stays in context
- *
- * Revision 1.46  2007/01/07 05:28:15  fplanque
- * i18n wording
- *
- * Revision 1.45  2006/12/24 00:52:57  fplanque
- * Make posts with images - Proof of concept
- *
- * Revision 1.44  2006/12/23 22:53:11  fplanque
- * extra security
- *
- * Revision 1.43  2006/12/22 01:09:30  fplanque
- * cleanup
- *
- * Revision 1.42  2006/12/22 00:58:02  fplanque
- * fix
- *
- * Revision 1.40  2006/12/22 00:50:33  fplanque
- * improved path cleaning
- *
- * Revision 1.39  2006/12/12 19:39:07  fplanque
- * enhanced file links / permissions
- *
- * Revision 1.38  2006/12/07 23:13:10  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.37  2006/12/07 20:03:32  fplanque
- * Woohoo! File editing... means all skin editing.
- *
- * Revision 1.36  2006/12/07 15:23:42  fplanque
- * filemanager enhanced, refactored, extended to skins directory
- *
- * Revision 1.35  2006/11/24 18:27:23  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

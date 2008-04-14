@@ -258,15 +258,15 @@ while( $Item = & $ItemList->get_item() )
 
 			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="ActionButton">'.T_('View...').'</a>';
 
-			echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_item&amp;item_ID='.$Item->ID )
-							.'" class="ActionButton">'.T_('Files...').'</a>';
-
 			// Display edit button if current user has the rights:
 			$Item->edit_link( array( // Link to backoffice for editing
 					'before'    => ' ',
 					'after'     => ' ',
 					'class'     => 'ActionButton'
 				) );
+
+			echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_item&amp;item_ID='.$Item->ID )
+							.'" class="ActionButton">'.get_icon( 'folder', 'imgtag' ).' '.T_('Files...').'</a>';
 
 			// Display publish NOW button if current user has the rights:
 			$Item->publish_link( ' ', ' ', '#', '#', 'PublishButton');
@@ -404,6 +404,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.15  2008/04/14 19:50:51  fplanque
+ * enhanced attachments handling in post edit mode
+ *
  * Revision 1.14  2008/02/09 02:56:00  fplanque
  * explicit order by field
  *
