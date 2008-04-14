@@ -1537,6 +1537,7 @@ class Item extends ItemLight
 				'after_image' =>         '</div>',
 				'after' =>               '</div>',
 				'image_size' =>          'fit-720x500',
+				'image_link_to' =>       'original',
 				'limit' =>               1000,	// Max # of images displayed
 			), $params );
 
@@ -1569,7 +1570,7 @@ class Item extends ItemLight
 				continue;
 			}
 			// Generate the IMG tag with all the alt, title and desc if available
-			$r .= $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'] );
+			$r .= $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $params['image_link_to'] );
 		}
 
 		if( !empty($r) )
@@ -3524,6 +3525,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.48  2008/04/14 17:52:07  fplanque
+ * link images to original by default
+ *
  * Revision 1.47  2008/04/13 23:38:53  fplanque
  * Basic public user profiles
  *

@@ -926,7 +926,8 @@ class File extends DataObject
 	                  $before_image_legend = '<div class="image_legend">',
 	                  $after_image_legend = '</div>',
 	                  $after_image = '</div>',
-	                  $size_name = 'original' )
+	                  $size_name = 'original',
+	                  $image_link_to = 'original' )
 	{
 		if( $this->is_dir() )
 		{	// We can't reference a directory
@@ -940,18 +941,26 @@ class File extends DataObject
 			$r = $before_image;
 			if( $size_name == 'original' )
 			{
-					$r .= '<img src="'.$this->get_url().'" '
+					$img = '<img src="'.$this->get_url().'" '
 								.'alt="'.$this->dget('alt', 'htmlattr').'" '
 								.'title="'.$this->dget('title', 'htmlattr').'" '
 								.$this->get_image_size( 'string' ).' />';
 			}
 			else
 			{
-					$r .= '<img src="'.$this->get_thumb_url( $size_name ).'" '
+					$img = '<img src="'.$this->get_thumb_url( $size_name ).'" '
 								.'alt="'.$this->dget('alt', 'htmlattr').'" '
 								.'title="'.$this->dget('title', 'htmlattr').'" />';
 					// TODO: size
 			}
+
+			if( $image_link_to == 'original' )
+			{
+				$img = '<a href="'.$this->get_url().'">'.$img.'</a>';
+			}
+
+			$r .= $img;
+
 			$desc = $this->dget('desc');
 			if( !empty($desc) and !is_null($before_image_legend) )
 			{
@@ -1774,6 +1783,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2008/04/14 17:52:07  fplanque
+ * link images to original by default
+ *
  * Revision 1.5  2008/04/13 20:40:06  fplanque
  * enhanced handlign of files attached to items
  *
