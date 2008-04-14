@@ -53,6 +53,8 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 
 	$verbose = $debug || $context != 'commenting';
 
+	$allowed_uri_schemes = get_allowed_uri_schemes( $context );
+
 	// Validate URL structure
 	if( $url[0] == '$' )
 	{	// This is a 'special replace code' URL (used in footers)
@@ -65,6 +67,15 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 	{ // there's a scheme and therefor an absolute URL:
 		if( substr($url, 0, 7) == 'mailto:' )
 		{ // mailto:link
+			if( ! in_array( 'mailto', $allowed_uri_schemes ) )
+			{ // Scheme not allowed
+				$scheme = 'mailto:';
+				$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
+				return $verbose
+					? sprintf( T_('URI scheme "%s" not allowed.'), htmlspecialchars($scheme) )
+					: T_('URI scheme not allowed.');
+			}
+
 			preg_match( '~^(mailto):(.*?)(\?.*)?$~', $url, $match );
 			if( ! $match )
 			{
@@ -81,6 +92,15 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 		}
 		elseif( substr($url, 0, 6) == 'clsid:' )
 		{ // clsid:link
+			if( ! in_array( 'clsid', $allowed_uri_schemes ) )
+			{ // Scheme not allowed
+				$scheme = 'clsid:';
+				$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
+				return $verbose
+					? sprintf( T_('URI scheme "%s" not allowed.'), htmlspecialchars($scheme) )
+					: T_('URI scheme not allowed.');
+			}
+
 			if( ! preg_match( '¤^(clsid):([a-fA-F0-9\-]+)$¤', $url, $match) )
 			{
 				return T_('Invalid class ID format');
@@ -89,6 +109,15 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 		elseif( substr($url, 0, 11) == 'javascript:' )
 		{ // javascript:
 			// Basically there could be anything here
+			if( ! in_array( 'javascript', $allowed_uri_schemes ) )
+			{ // Scheme not allowed
+				$scheme = 'javascript:';
+				$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
+				return $verbose
+					? sprintf( T_('URI scheme "%s" not allowed.'), htmlspecialchars($scheme) )
+					: T_('URI scheme not allowed.');
+			}
+
 			preg_match( '¤^(javascript):¤', $url, $match );
 		}
 		else
@@ -104,7 +133,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 				://                              # authorize absolute URLs only ( // not present in clsid: -- problem? ; mailto: handled above)
 				(\w+(:\w+)?@)?                   # username or username and password (optional)
 				( localhost |
-						[a-z0-9]([a-z0-9\-])+            # Don t allow anything too funky like entities
+						[a-z0-9]([a-z0-9\-])*            # Don t allow anything too funky like entities
 						\.                               # require at least 1 dot
 						[a-z0-9]([a-z0-9.\-])+           # Don t allow anything too funky like entities
 				)
@@ -119,8 +148,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 			}
 
 			$scheme = strtolower($match[1]);
-			$allowed_uri_schemes = get_allowed_uri_schemes( $context );
-			if( !in_array( $scheme, $allowed_uri_schemes ) )
+			if( ! in_array( $scheme, $allowed_uri_schemes ) )
 			{ // Scheme not allowed
 				$Debuglog->add( 'URI scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
 				return $verbose
@@ -592,6 +620,9 @@ function disp_url( $url, $max_length = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.16  2008/04/14 16:01:36  fplanque
+ * url validation fix
+ *
  * Revision 1.15  2008/03/09 03:31:58  blueyed
  * validate_url: convert URL to IDN, before checking it (LP: #195702)
  *
