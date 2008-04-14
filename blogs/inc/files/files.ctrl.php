@@ -724,6 +724,7 @@ switch( $action )
 		break;
 
 
+	case 'make_post':
 	case 'make_posts':
 		// TODO: We don't need the Filelist, move UP!
 		// Make posts with selected images:
@@ -764,59 +765,117 @@ switch( $action )
 		// make sure we have loaded metas for all files in selection!
 		$selected_Filelist->load_meta();
 
-		// Ready to create posts:
+		// Ready to create post(s):
 		load_class('items/model/_item.class.php');
-		while( $l_File = & $selected_Filelist->get_next() )
+
+		switch( $action )
 		{
-			if( ! $l_File->is_image() )
-			{
-				$Messages->add( sprintf( T_('Cannot post &laquo;%s&raquo; because it is not an image.'), $l_File->dget('name') ), 'error' );
-				continue;
-			}
+			case 'make_post':
+				// SINGLE POST:
+				// Create a post:
+				$edited_Item = & new Item();
+				$edited_Item->blog_ID = $blog;
+				$edited_Item->set( 'status', $item_status );
+				$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
 
-			// Create a post:
-			$edited_Item = & new Item();
+				$l_File = & $selected_Filelist->get_next();
 
-			$edited_Item->blog_ID = $blog;
+				$title = $l_File->get('title');
+				if( empty($title) )
+				{
+					$title = $l_File->get('name');
+				}
+				$edited_Item->set( 'title', $title );
 
-			$edited_Item->set( 'status', $item_status );
+				$DB->begin();
 
-			$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
+				// INSERT NEW POST INTO DB:
+				$edited_Item->dbinsert();
 
-			$title = $l_File->get('title');
-			if( empty($title) )
-			{
-				$title = $l_File->get('name');
-			}
-			$edited_Item->set( 'title', $title );
+				do
+				{	// LOOP Through images:
+					if( ! $l_File->is_image() )
+					{
+						$Messages->add( sprintf( T_('Cannot post &laquo;%s&raquo; because it is not an image.'), $l_File->dget('name') ), 'error' );
+						continue;
+					}
 
-			$DB->begin();
+					// echo '<br>file meta: '.$l_File->meta;
+					if(	$l_File->meta == 'notfound' )
+					{	// That file has no meta data yet, create it now!
+						$l_File->dbsave();
+					}
 
-			// INSERT NEW POST INTO DB:
-			$edited_Item->dbinsert();
+					// Let's make the link!
+					$edited_Link = & new Link();
+					$edited_Link->set( 'itm_ID', $edited_Item->ID );
+					$edited_Link->set( 'file_ID', $l_File->ID );
+					$edited_Link->dbinsert();
 
-			// echo '<br>file meta: '.$l_File->meta;
-			if(	$l_File->meta == 'notfound' )
-			{	// That file has no meta data yet, create it now!
-				$l_File->dbsave();
-			}
+					$Messages->add( sprintf( T_('&laquo;%s&raquo; has been attached.'), $l_File->dget('name') ), 'success' );
 
-			// Let's make the link!
-			$edited_Link = & new Link();
-			$edited_Link->set( 'itm_ID', $edited_Item->ID );
-			$edited_Link->set( 'file_ID', $l_File->ID );
-			$edited_Link->dbinsert();
+				} while( $l_File = & $selected_Filelist->get_next() );
 
-			$DB->commit();
+				$DB->commit();
 
-			$Messages->add( sprintf( T_('&laquo;%s&raquo; has been posted.'), $l_File->dget('name') ), 'success' );
+				header_redirect( 'admin.php?ctrl=items&action=edit&p='.$edited_Item->ID );	// Will save $Messages
+				break;
+
+			case 'make_posts':
+				// MULTIPLE POST (1 per image):
+				while( $l_File = & $selected_Filelist->get_next() )
+				{
+					if( ! $l_File->is_image() )
+					{
+						$Messages->add( sprintf( T_('Cannot post &laquo;%s&raquo; because it is not an image.'), $l_File->dget('name') ), 'error' );
+						continue;
+					}
+
+					// Create a post:
+					$edited_Item = & new Item();
+
+					$edited_Item->blog_ID = $blog;
+
+					$edited_Item->set( 'status', $item_status );
+
+					$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
+
+					$title = $l_File->get('title');
+					if( empty($title) )
+					{
+						$title = $l_File->get('name');
+					}
+					$edited_Item->set( 'title', $title );
+
+					$DB->begin();
+
+					// INSERT NEW POST INTO DB:
+					$edited_Item->dbinsert();
+
+					// echo '<br>file meta: '.$l_File->meta;
+					if(	$l_File->meta == 'notfound' )
+					{	// That file has no meta data yet, create it now!
+						$l_File->dbsave();
+					}
+
+					// Let's make the link!
+					$edited_Link = & new Link();
+					$edited_Link->set( 'itm_ID', $edited_Item->ID );
+					$edited_Link->set( 'file_ID', $l_File->ID );
+					$edited_Link->dbinsert();
+
+					$DB->commit();
+
+					$Messages->add( sprintf( T_('&laquo;%s&raquo; has been posted.'), $l_File->dget('name') ), 'success' );
+
+					// Note: we redirect without restoring filter. This should allow to see the new files.
+					// &filter=restore
+					header_redirect( 'admin.php?ctrl=items&blog='.$blog );	// Will save $Messages
+				}
+				break;
 		}
 
-		// Note: we redirect without restoring filter. This should allow to see the new files.
-		// &filter=restore
-		header_redirect( 'admin.php?ctrl=items&blog='.$blog );	// Will save $Messages
-
-		// Note: we have EXITED here. In case we remove the redir, we need this:
+		// Note: we should have EXITED here. In case we don't (error, or sth...)
 
 		// Reset stuff so it doesn't interfere with upcomming display
 		unset( $edited_Item );
@@ -1485,6 +1544,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2008/04/14 17:39:55  fplanque
+ * create 1 post with all images attached
+ *
  * Revision 1.15  2008/04/14 17:03:53  fplanque
  * "with selected files" cleanup
  *

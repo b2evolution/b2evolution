@@ -451,6 +451,7 @@ $Form->begin_form();
 			if( $fm_Filelist->get_root_type() == 'collection' || !empty($Blog) )
 			{	// We are browsing files for a collection:
 				// fp> TODO: use current as default but let user choose into which blog he wants to post
+				$field_options['make_post'] = T_('Make one post (including all images)');
 				$field_options['make_posts'] = T_('Make multiple posts (1 per image)');
 			}
 
@@ -581,6 +582,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.6  2008/04/14 17:39:54  fplanque
+ * create 1 post with all images attached
+ *
  * Revision 1.5  2008/04/14 17:03:52  fplanque
  * "with selected files" cleanup
  *
