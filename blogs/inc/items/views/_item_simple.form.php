@@ -66,7 +66,6 @@ if( !empty( $bozo_start_modified ) )
 $Form->begin_form( '', '', $params );
 
 $Form->hidden( 'ctrl', 'items' );
-$Form->hidden( 'action', $creating ? 'create' : 'update' );
 $Form->hidden( 'blog', $Blog->ID );
 if( isset( $mode ) )   $Form->hidden( 'mode', $mode ); // used by bookmarklet
 if( isset( $edited_Item ) )   $Form->hidden( 'post_ID', $edited_Item->ID );
@@ -180,13 +179,14 @@ for( $i = 1 ; $i <= 3; $i++ )
 	}
 
 	// ---------- SAVE ----------
-	$Form->submit( array( 'save', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton' ) );
-	$Form->submit( array( 'save', /* TRANS: This is the value of an input submit button */ T_('Save'), 'SaveButton' ) );
+	$next_action = ($creating ? 'create' : 'update');
+	$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton' ) );
+	$Form->submit( array( 'actionArray['.$next_action.']', /* TRANS: This is the value of an input submit button */ T_('Save'), 'SaveButton' ) );
 	if( $edited_Item->status == 'draft'
 			&& $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID )	// TODO: if we actually set the primary cat to another blog, we may still get an ugly perm die
 			&& $current_User->check_perm( 'edit_timestamp', 'edit', false ) )
 	{	// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
-		$Form->submit( array( 'save', /* TRANS: This is the value of an input submit button */ T_('Publish NOW !'), 'SaveButton' ) );
+		$Form->submit( array( 'actionArray['.$next_action.'_publish]', /* TRANS: This is the value of an input submit button */ T_('Publish NOW !'), 'SaveButton' ) );
 	}
 
 
@@ -285,6 +285,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.18  2008/04/14 16:24:39  fplanque
+ * use ActionArray[] to make action handlign more robust
+ *
  * Revision 1.17  2008/04/13 20:40:07  fplanque
  * enhanced handlign of files attached to items
  *

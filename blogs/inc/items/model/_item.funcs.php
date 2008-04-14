@@ -351,7 +351,7 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks' ) );
 
 		echo '<table cellspacing="0" cellpadding="0"><tr><td>';
-   	$Form->submit( array( 'save', /* TRANS: This is the value of an input submit button */ T_('Save & start attaching files'), 'SaveEditButton' ) );
+   	$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & start attaching files'), 'SaveEditButton' ) );
 		echo '</td></tr></table>';
 
 		$Form->end_fieldset();
@@ -713,6 +713,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.15  2008/04/14 16:24:39  fplanque
+ * use ActionArray[] to make action handlign more robust
+ *
  * Revision 1.14  2008/04/13 20:40:06  fplanque
  * enhanced handlign of files attached to items
  *

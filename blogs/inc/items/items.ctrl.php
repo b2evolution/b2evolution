@@ -40,7 +40,7 @@ global $current_User;
  */
 global $Blog;
 
-param( 'action', 'string', 'list' );
+$action = param_action( 'list' );
 
 $AdminUI->set_path( 'items' );	// Sublevel may be attached below
 
@@ -106,7 +106,9 @@ switch( $action )
 		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
 		break;
 
+	case 'update_edit':
 	case 'update':
+	case 'update_publish':
 	case 'publish':
 	case 'deprecate':
 	case 'delete':
@@ -126,12 +128,14 @@ switch( $action )
 
 		// What form buttton has been pressed?
 		param( 'save', 'string', '' );
-		$exit_after_save = ( $save != T_('Save & edit') );
+		$exit_after_save = ( $action != 'update_edit' );
 		break;
 
 	case 'new':
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'create_edit':
 	case 'create':
+	case 'create_publish':
 	case 'list':
 		if( $action == 'list' )
 		{	// We only need view permission
@@ -160,7 +164,7 @@ switch( $action )
 
 			// What form buttton has been pressed?
 			param( 'save', 'string', '' );
-			$exit_after_save = ( $save != T_('Save & edit') && $save != T_('Save & start attaching files') );
+			$exit_after_save = ( $action != 'create_edit' );
 		}
 		break;
 
@@ -286,11 +290,13 @@ switch( $action )
 		break;
 
 
+	case 'create_edit':
 	case 'create':
+	case 'create_publish':
 		// We need early decoding of these in order to check permissions:
 		param( 'post_category', 'integer', true );
 		param( 'post_extracats', 'array', array() );
-		if( $save == T_('Publish NOW !') )
+		if( $action == 'create_publish' )
 		{
 			$post_status = 'published';
 			$set_issue_date = 'now';
@@ -364,11 +370,13 @@ switch( $action )
 		break;
 
 
+	case 'update_edit':
 	case 'update':
+	case 'update_publish':
 		// We need early decoding of these in order to check permissions:
 		param( 'post_category', 'integer', true );
 		param( 'post_extracats', 'array', array() );
-		if( $save == T_('Publish NOW !') )
+		if( $action == 'update_publish' )
 		{
 			$post_status = 'published';
 			$set_issue_date = 'now';
@@ -615,7 +623,9 @@ switch( $action )
 {
 	case 'new':
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'create_edit':
 	case 'create':
+	case 'create_publish':
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_post_statuses', 'edit',
 						array( 'ctrl' => 'items', 'action' => 'new' ), NULL, '',
@@ -633,7 +643,9 @@ switch( $action )
 
 	case 'edit':
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'update_edit':
 	case 'update': // on error
+	case 'update_publish': // on error
 		// Get tab ("simple" or "expert") from Request or UserSettings:
 		$tab = $UserSettings->param_Request( 'tab', 'pref_edit_tab', 'string', NULL, true /* memorize */ );
 
@@ -659,7 +671,9 @@ switch( $action )
 		{
 			case 'edit':
 			case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
+			case 'update_edit':
 			case 'update': // on error
+			case 'update_publish': // on error
 				if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $edited_Item->blog_ID ) )
 				{ // User has no right to delete this post
 					break;
@@ -729,9 +743,13 @@ switch( $action )
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
 		$bozo_start_modified = true;	// We want to start with a form being already modified
 	case 'new':
+	case 'create_edit':
 	case 'create':
+	case 'create_publish':
 	case 'edit':
+	case 'update_edit':
 	case 'update':	// on error
+	case 'update_publish':	// on error
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
@@ -847,6 +865,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2008/04/14 16:24:39  fplanque
+ * use ActionArray[] to make action handlign more robust
+ *
  * Revision 1.21  2008/04/13 20:40:08  fplanque
  * enhanced handlign of files attached to items
  *
