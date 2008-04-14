@@ -446,11 +446,47 @@ $Form->begin_form();
 			<?php
 			echo $Form->check_all();
 
-			echo ' &mdash; <strong>'.T_('With selected files:').'</strong> ';
+			$field_options = array();
+
+			if( $fm_Filelist->get_root_type() == 'collection' || !empty($Blog) )
+			{	// We are browsing files for a collection:
+				// fp> TODO: use current as default but let user choose into which blog he wants to post
+				$field_options['make_posts'] = T_('Make multiple posts (1 per image)');
+			}
+
+			if( $current_User->check_perm( 'files', 'edit' ) )
+			{ // User can edit:
+				$field_options['rename'] = T_('Rename files...');
+				$field_options['delete'] = T_('Delete files...');
+				// NOTE: No delete confirmation by javascript, we need to check DB integrity!
+			}
+
+			// BROKEN ?
+			$field_options['download'] = T_('Download files as ZIP archive...');
+
+			/* Not fully functional:
+			$field_options['file_copy'] = T_('Copy the selected files...');
+			$field_options['file_move'] = T_('Move the selected files...');
+
+			// This is too geeky! Default perms radio options and unchecked radio groups! NO WAY!
+			// If you want this feature to be usable by average users you must only have one line per file OR one file for all. You can't mix both.
+			// The only way to have both is to have 2 spearate forms: 1 titled "change perms for all files simultaneously"-> submit  and another 1 title "change perms for each file individually" -> another submit
+			// POST PHOENIX
+			// fplanque>> second thought: changing perms for multiple files at once is useful. BUT assigning different perms to several files with ONE form is trying to solve a problem that not even geeks can face once in a lifetime.
+			// This has to be simplified to ONE single set of permissions for all selected files. (If you need different perms, click again)
+			$field_options['file_perms'] = T_('Change permissions for the selected files...');
+			*/
+
+			$Form->switch_layout( 'none' );
+			$Form->select_input_array( 'group_action', $action, $field_options, ' &mdash; <strong>'.T_('With selected files').'</strong>' );
+			$Form->submit_input( array( 'name'=>'actionArray[group_action]', 'value'=>T_('Go!') ) );
+			$Form->switch_layout( NULL );
+
 
 			if( $mode == 'upload' )
 			{	// We are uploading in a popup opened by an edit screen
 				?>
+				&mdash;
 				<input class="ActionButton"
 					title="<?php echo T_('Insert IMG tags for selected files'); ?>"
 					name="actionArray[img_tag]"
@@ -459,68 +495,7 @@ $Form->begin_form();
 					onclick="insert_tag_for_selected_files(); return false;" />
 				<?php
 			}
-
-			if( $fm_Filelist->get_root_type() == 'collection' || !empty($Blog) )
-			{	// We are browsing files for a collection:
-				// fp> TODO: use current as default but let user choose into which blog he wants to post
-				echo '<input type="submit" name="actionArray[make_posts]" class="ActionButton"
-					value="'.T_('Make posts').'"
-					title="'.T_('Make posts with selected images').'" />';
-			}
-
-
-			if( $current_User->check_perm( 'files', 'edit' ) )
-			{ // User can edit:
-				?>
-				<input class="ActionButton" type="image" name="actionArray[rename]"
-					title="<?php echo T_('Rename the selected files...'); ?>"
-					src="<?php echo get_icon( 'file_rename', 'url' ); ?>"
-					onclick="return check_if_selected_files();" />
-
-				<input class="DeleteButton" type="image" name="actionArray[delete]"
-					title="<?php echo T_('Delete the selected files...') ?>"
-					src="<?php echo get_icon( 'file_delete', 'url' ) ?>"
-					onclick="return check_if_selected_files();" />
-				<?php
-				// NOTE: No delete confirmation by javascript, we need to check DB integrity!
-
-			}
-
-
-			/* BROKEN:
-			<input class="ActionButton"
-				title="<?php echo T_('Download the selected files as archive...') ?>"
-				name="actionArray[download]"
-				value="download"
-				type="image"
-				src="<?php echo get_icon( 'download', 'url' ) ?>"
-				onclick="return check_if_selected_files();" />
-			*/
-
-			/* Not fully functional:
-			<input class="ActionButton" type="image" name="actionArray[file_copy]"
-				title="<?php echo T_('Copy the selected files'); ?>"
-				onclick="return check_if_selected_files();"
-				src="<?php echo get_icon( 'file_copy', 'url' ); ?>" />
-
-			<input class="ActionButton" type="image" name="actionArray[file_move]"
-				title="<?php echo T_('Move the selected files'); ?>"
-				onclick="return check_if_selected_files();"
-				src="<?php echo get_icon( 'file_move', 'url' ); ?>" />
-
-			// This is too geeky! Default perms radio options and unchecked radio groups! NO WAY!
-			// If you want this feature to be usable by average users you must only have one line per file OR one file for all. You can't mix both.
-			// The only way to have both is to have 2 spearate forms: 1 titled "change perms for all files simultaneously"-> submit  and another 1 title "change perms for each file individually" -> another submit
-			// POST PHOENIX
-			// fplanque>> second thought: changing perms for multiple files at once is useful. BUT assigning different perms to several files with ONE form is trying to solve a problem that not even geeks can face once in a lifetime.
-			// This has to be simplified to ONE single set of permissions for all selected files. (If you need different perms, click again)
-				<input class="ActionButton" type="image" name="actionArray[edit_perms]"
-				onclick="return check_if_selected_files();"
-				title="<?php echo T_('Change permissions for the selected files'); ?>"
-				src="<?php echo get_icon( 'file_perms', 'url' ); ?>" />
-			*/
 			?>
-
 			</td>
 		</tr>
 		<?php
@@ -606,6 +581,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.5  2008/04/14 17:03:52  fplanque
+ * "with selected files" cleanup
+ *
  * Revision 1.4  2008/04/03 22:03:08  fplanque
  * added "save & edit" and "publish now" buttons to edit screen.
  *

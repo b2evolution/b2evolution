@@ -96,6 +96,10 @@ else
 $fm_mode = param( 'fm_mode', 'string', NULL, true );
 
 $action = param_action();
+if( $action == 'group_action' )
+{ // Get the real action from the select:
+	$action = param( 'group_action', 'string', '' );
+}
 
 if( !empty($action) && $fm_mode != 'link_item' )
 {	// The only mode which can tolerate simultaneous actions at this time is link_item
@@ -1481,6 +1485,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2008/04/14 17:03:53  fplanque
+ * "with selected files" cleanup
+ *
  * Revision 1.14  2008/04/03 22:03:10  fplanque
  * added "save & edit" and "publish now" buttons to edit screen.
  *
