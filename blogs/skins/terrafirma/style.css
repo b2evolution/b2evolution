@@ -36,25 +36,36 @@
 	background-position: 0 top;
 }
 
-div.PageTop {
-	background: #46461F;
-	color: #ffffff;
-	padding: 0 20px 0 5px;
-	font-family:Tahoma, Georgia, Arial, Verdana, Serif;
-	text-transform:uppercase;
-	margin-bottom: 20px;
-}
-div.PageTop ul {
-	margin: 0 1px;
-	padding: 0;
+
+/*
+ * Header / bloglist on top:
+ */
+div#splash ul {
+	float:right;
+	margin: 0;
 	list-style-type:none;
-	padding: .5ex 0;
+	padding: 8px 5px;
 }
-div.PageTop ul li {
-	border-right: 1px solid;
+div#splash li {
+	background:#FFFFFF url(img/a18.gif) repeat-x scroll center -1px;
+	border: 1px solid #4D4D24;
 	display: inline;
-	padding: .5ex 1em;
+	padding: 2px 1ex;
+	margin-left: 5px;
 }
+div#splash li a {
+	font-weight: bold;
+	color: #7C7C6A;
+}
+div#splash li a:hover {
+	color: #46461F;
+	text-decoration: underline;
+}
+div#splash li a.selected {
+	color: #000;
+}
+
+
 
 a
 {
