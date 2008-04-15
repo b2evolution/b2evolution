@@ -198,6 +198,9 @@ function install_basic_skins()
 	$Skin = new Skin();
 	$Skin->install( 'nifty_corners' );
 
+	$Skin = new Skin();
+	$Skin->install( 'terrafirma' );
+
 
 	$Skin = new Skin();
 	$Skin->install( '_atom', 'Atom' );
@@ -555,6 +558,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.49  2008/04/15 20:30:48  fplanque
+ * terrafirma minor
+ *
  * Revision 1.48  2008/04/06 19:19:30  fplanque
  * Started moving some intelligence to the Modules.
  * 1) Moved menu structure out of the AdminUI class.
