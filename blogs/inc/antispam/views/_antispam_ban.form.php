@@ -150,7 +150,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 					echo $comment_content;
 				}
 				?></td>
-				<td><?php echo action_icon( T_('Edit...'), 'edit', '?ctrl=comments&action=edit&comment_ID='.$row_stats['comment_ID'] ) ?></td>
+				<td><?php echo action_icon( T_('Edit...'), 'edit', '?ctrl=comments&amp;action=edit&amp;comment_ID='.$row_stats['comment_ID'] ) ?></td>
 				</tr>
 				<?php
 			$count++;
@@ -210,6 +210,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.7  2008/04/15 21:53:30  fplanque
+ * minor
+ *
  * Revision 1.6  2008/04/04 17:02:21  fplanque
  * cleanup of global settings
  *

@@ -35,7 +35,7 @@ global $comments_use_autobr, $mode, $month, $tab, $redirect_to;
 
 $Form = & new Form( NULL, 'comment_checkchanges', 'post' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('cancel'), 4, 1 );
+$Form->global_icon( T_('Cancel editing!'), 'close', str_replace( '&', '&amp;', $redirect_to), T_('cancel'), 4, 1 );
 
 $Form->begin_form( 'eform' );
 
@@ -253,6 +253,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.4  2008/04/15 21:53:31  fplanque
+ * minor
+ *
  * Revision 1.3  2008/01/21 09:35:27  fplanque
  * (c) 2008
  *

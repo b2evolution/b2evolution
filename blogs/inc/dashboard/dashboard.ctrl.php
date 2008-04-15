@@ -336,7 +336,7 @@ if( $blog )
  		echo '<li>Browse:<ul>';
 		echo '<li><a href="admin.php?ctrl=items&tab=full&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (full)').' &raquo;</a></li>';
 		echo '<li><a href="admin.php?ctrl=items&tab=list&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (list)').' &raquo;</a></li>';
-		echo '<li><a href="admin.php?ctrl=comments&blog='.$Blog->ID.'">'.T_('Comments').' &raquo;</a></li>';
+		echo '<li><a href="admin.php?ctrl=comments&amp;blog='.$Blog->ID.'">'.T_('Comments').' &raquo;</a></li>';
 		echo '</ul></li>';
 
 		if( $current_User->check_perm( 'blog_cats', '', false, $Blog->ID ) )
@@ -495,6 +495,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2008/04/15 21:53:31  fplanque
+ * minor
+ *
  * Revision 1.24  2008/03/31 00:27:49  fplanque
  * Enhanced comment moderation
  *
