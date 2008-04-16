@@ -1571,6 +1571,58 @@ function debug_info( $force = false )
 
 
 /**
+ * Prevent email header injection.
+ */
+function mail_sanitize_header_string( $header_str, $close_brace = false )
+{
+	// Prevent injection! (remove everything after (and including) \n or \r)
+	$header_str = preg_replace( '~(\r|\n).*$~s', '', trim($header_str) );
+
+	if( $close_brace && strpos( $header_str, '<' ) !== false && strpos( $header_str, '>' ) === false )
+	{ // We have probably stripped the '>' at the end!
+		$header_str .= '>';
+	}
+
+	return $header_str;
+}
+
+/**
+ * Encode to RFC 1342 "Representation of Non-ASCII Text in Internet Message Headers"
+ *
+ * @param string
+ * @param string 'Q' for Quoted printable, 'B' for base64
+ */
+function mail_encode_header_string( $header_str, $mode = 'Q' )
+{
+	global $evo_charset;
+
+	/* blueyed way that requires mbstring  (did not work for Alex RU)
+	if( function_exists('mb_encode_mimeheader') )
+	{ // encode subject
+		$subject = mb_encode_mimeheader( $subject, mb_internal_encoding(), 'B', $NL );
+	}
+	*/
+
+	if( preg_match( '¤[^a-z0-9!*+\-/ ]¤i', $header_str ) )
+	{	// If the string actually needs some encoding
+		if( $mode == 'Q' )
+		{	// Quoted printable is best for reading with old/text terminal mail reading/debugging stuff:
+			$header_str = preg_replace( '¤([^a-z0-9!*+\-/ ])¤ie', 'sprintf("=%02x", ord(StripSlashes("\\1")))', $header_str );
+			$header_str = str_replace( ' ', '_', $header_str );
+
+			$header_str = "=?$evo_charset?Q?".$header_str."?=";
+		}
+		else
+		{ // Base 64 -- Alex RU way:
+			$header_str = "=?$evo_charset?B?".base64_encode( $header_str )."?=";
+		}
+	}
+
+	return $header_str;
+}
+
+
+/**
  * Sends a mail, wrapping PHP's mail() function.
  *
  * {@link $current_locale} will be used to set the charset.
@@ -1598,61 +1650,52 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	$NL = "\n";
 
-	if( ! is_windows() )
-	{	// fplanque: Windows XP, Apache 1.3, PHP 4.4, MS SMTP : will not accept "nice" addresses.
-		if( !empty( $from_name ) )
-		{
-			$to = "=?$evo_charset?B?".base64_encode( $from_name )."?=".' <'.$from.'>';
-		}
-		if( !empty( $to_name ) )
-		{
-			$from = "=?$evo_charset?B?".base64_encode( $to_name )."?=".' <'.$to.'>';
-		}
-	}
-
-	// echo 'sending email to: ['.htmlspecialchars($to).'] from ['.htmlspecialchars($from).']';
-
 	if( !is_array( $headers ) )
 	{ // Make sure $headers is an array
 		$headers = array( $headers );
 	}
 
-	// Specify charset and content-type of email
-	$headers['Content-Type'] = 'text/plain; charset='.$current_charset;
-	$headers['X-Mailer'] = $app_name.' '.$app_version.' - PHP/'.phpversion();
-	$headers['X-Remote-Addr'] = implode( ',', get_ip_list() );
-
-	// -- Build headers ----
 	if( empty($from) )
 	{
 		$from = $notify_from;
 	}
-	else
-	{
-		$from = trim($from);
-	}
 
-	if( ! empty($from) )
-	{ // From has to go into headers
-		$from_save = preg_replace( '~(\r|\n).*$~s', '', $from ); // Prevent injection! (remove everything after (and including) \n or \r)
-
-		if( $from != $from_save )
+	if( ! is_windows() )
+	{	// fplanque: Windows XP, Apache 1.3, PHP 4.4, MS SMTP : will not accept "nice" addresses.
+		if( !empty( $from_name ) )
 		{
-			if( strpos( $from_save, '<' ) !== false && !strpos( $from_save, '>' ) )
-			{ // We have probably stripped the '>' at the end!
-				$from_save .= '>';
-			}
-
-			// Add X-b2evo notification mail header about this
-			$headers['X-b2evo'] = 'Fixed email header injection (From)';
-			$Debuglog->add( 'Detected email injection! Fixed &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($from_save).'&raquo;.', 'security' );
-
-			$from = $from_save;
+			$to = mail_encode_header_string($to).' <'.$from.'>';
 		}
-
-		$headers['From'] = $from;
+		if( !empty( $to_name ) )
+		{
+			$from = mail_encode_header_string($from).' <'.$to.'>';
+		}
 	}
 
+	$from = mail_sanitize_header_string( $from, true );
+	// From has to go into headers
+	$headers['From'] = $from;
+
+	// echo 'sending email to: ['.htmlspecialchars($to).'] from ['.htmlspecialchars($from).']';
+
+	// sam2k way that doe snot require mbstring:
+	$subject = mail_encode_header_string($subject);
+
+	$message = str_replace( array( "\r\n", "\r" ), $NL, $message );
+
+	// Convert encoding of message (from internal encoding to the one of the message):
+	// fp> why do we actually convert to $current_charset?
+	$message = convert_charset( $message, $current_charset, $evo_charset );
+	// Specify charset and content-type of email
+	$headers['Content-Type'] = 'text/plain; charset='.$current_charset;
+
+
+	// ADDITIONAL HEADERS:
+	$headers['X-Mailer'] = 'b2evolution '.$app_version.' - PHP/'.phpversion();
+	$headers['X-Remote-Addr'] = implode( ',', get_ip_list() );
+
+
+	// COMPACT HEADERS:
 	$headerstring = '';
 	reset( $headers );
 	while( list( $lKey, $lValue ) = each( $headers ) )
@@ -1660,20 +1703,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		$headerstring .= $lKey.': '.$lValue.$NL;
 	}
 
-	// sam2k way that doe snot require mbstring:
-	$subject = "=?$evo_charset?B?".base64_encode($subject)."?=";
-	/* blueyed way that requires mbstring
-	if( function_exists('mb_encode_mimeheader') )
-	{ // encode subject
-		$subject = mb_encode_mimeheader( $subject, mb_internal_encoding(), 'B', $NL );
-	}
-	*/
-
-	$message = str_replace( array( "\r\n", "\r" ), $NL, $message );
-
-	// Convert encoding of message (from internal encoding to the one of the message):
-	$message = convert_charset( $message, $current_charset, $evo_charset );
-
+	// SEND MESSAGE:
 	if( $debug > 1 )
 	{	// We agree to die for debugging...
 		if( ! mail( $to, $subject, $message, $headerstring ) )
@@ -2710,6 +2740,9 @@ function modules_call_method( $method_name )
 
 /*
  * $Log$
+ * Revision 1.33  2008/04/16 13:47:55  fplanque
+ * better encoding of emails
+ *
  * Revision 1.32  2008/04/13 15:15:59  fplanque
  * attempt to fix email headers for non latin charsets
  *
