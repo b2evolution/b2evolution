@@ -1662,13 +1662,13 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	if( ! is_windows() )
 	{	// fplanque: Windows XP, Apache 1.3, PHP 4.4, MS SMTP : will not accept "nice" addresses.
-		if( !empty( $from_name ) )
-		{
-			$to = mail_encode_header_string($to).' <'.$from.'>';
-		}
 		if( !empty( $to_name ) )
 		{
-			$from = mail_encode_header_string($from).' <'.$to.'>';
+			$to = '"'.mail_encode_header_string($to).'" <'.$to_name.'>';
+		}
+		if( !empty( $from_name ) )
+		{
+			$from = '"'.mail_encode_header_string($from).'" <'.$from_name.'>';
 		}
 	}
 
@@ -2740,6 +2740,9 @@ function modules_call_method( $method_name )
 
 /*
  * $Log$
+ * Revision 1.34  2008/04/16 13:59:47  fplanque
+ * oops
+ *
  * Revision 1.33  2008/04/16 13:47:55  fplanque
  * better encoding of emails
  *
