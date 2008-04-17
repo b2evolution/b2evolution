@@ -382,7 +382,7 @@ function param_check_not_empty( $var, $err_msg, $field_err_msg = NULL )
 
 
 /**
- * Checks if the param is a decimal number (no float, e.g. 3.14).
+ * Checks if the param is an integer (no float, e.g. 3.14).
  *
  * @param string param name
  * @param string error message
@@ -396,6 +396,29 @@ function param_check_number( $var, $err_msg, $required = false )
 	}
 
 	if( ! preg_match( '#^[0-9]+$#', $GLOBALS[$var] ) )
+	{
+		param_error( $var, $err_msg );
+		return false;
+	}
+	return true;
+}
+
+
+/**
+ * Checks if the param is a decimal number
+ *
+ * @param string param name
+ * @param string error message
+ * @return boolean true if OK
+ */
+function param_check_decimal( $var, $err_msg, $required = false )
+{
+	if( empty( $GLOBALS[$var] ) && ! $required )
+	{ // empty is OK:
+		return true;
+	}
+
+	if( ! preg_match( '#^[0-9]*(\.[0-9]+)$#', $GLOBALS[$var] ) )
 	{
 		param_error( $var, $err_msg );
 		return false;
@@ -1881,6 +1904,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.20  2008/04/17 11:53:16  fplanque
+ * Goal editing
+ *
  * Revision 1.19  2008/04/09 14:50:35  fplanque
  * bugfix
  *

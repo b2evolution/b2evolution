@@ -57,6 +57,7 @@ $db_config['aliases']['T_track__goalhit'] = $tableprefix.'track__goalhit';
  * @global array
  */
 $ctrl_mappings['stats'] = 'sessions/stats.ctrl.php';
+$ctrl_mappings['goals'] = 'sessions/goals.ctrl.php';
 
 
 /**
@@ -164,6 +165,16 @@ class sessions_Module
 						'goals' => array(
 							'text' => T_('Goals'),
 							'href' => 'admin.php?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0',
+							'entries' => array(
+								'hits' => array(
+									'text' => T_('Goal hits'),
+									'href' => 'admin.php?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0'
+									),
+								'goals' => array(
+									'text' => T_('Goals'),
+									'href' => 'admin.php?ctrl=goals'
+									),
+								),
 							),
 						)
 				);
@@ -184,6 +195,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.2  2008/04/17 11:53:18  fplanque
+ * Goal editing
+ *
  * Revision 1.1  2008/04/06 19:19:30  fplanque
  * Started moving some intelligence to the Modules.
  * 1) Moved menu structure out of the AdminUI class.

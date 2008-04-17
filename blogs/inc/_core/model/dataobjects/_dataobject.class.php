@@ -113,7 +113,7 @@ class DataObject
 	 * @access protected
 	 * @param string Name of parameter
 	 * @param string DB field type ('string', 'number', 'date' )
-	 * @param mixed Pointer to value of parameter - dh> pointer? So it should be a reference? Would make sense IMHO anyway.. fp> I just wonder why it's not already a reference... :@ 
+	 * @param mixed Pointer to value of parameter - dh> pointer? So it should be a reference? Would make sense IMHO anyway.. fp> I just wonder why it's not already a reference... :@
 	 */
 	function dbchange( $dbfieldname, $dbfieldtype, $valuepointer ) // TODO: dh> value by reference? see above..
 	{
@@ -411,9 +411,10 @@ class DataObject
 	{
 		global $Messages;
 
-		// No restrictions, ask for confirmation:
-		echo '<div class="panelinfo">';
-		echo '<h2>'.$confirm_title.'</h2>';
+		$block_item_Widget = & new Widget( 'block_item' );
+
+		$block_item_Widget->title = $confirm_title;
+		$block_item_Widget->disp_template_replaced( 'block_start' );
 
 		$this->check_relations( 'delete_cascades' );
 
@@ -423,7 +424,8 @@ class DataObject
 			$Messages->display( '', '', true, 'restrict', NULL, NULL, NULL );
 		}
 
-		echo '<h3>'.T_('THIS CANNOT BE UNDONE!').'</h3>';
+		echo '<p class="warning">'.$confirm_title.'</p>';
+		echo '<p class="warning">'.T_('THIS CANNOT BE UNDONE!').'</p>';
 
 		$Form = & new Form( '', 'form_confirm', 'get', '' );
 
@@ -445,7 +447,7 @@ class DataObject
 			$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
 		$Form->end_form();
 
-		echo '</div>';
+		$block_item_Widget->disp_template_replaced( 'block_end' );
 		return true;
 	}
 
@@ -653,6 +655,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2008/04/17 11:53:17  fplanque
+ * Goal editing
+ *
  * Revision 1.2  2008/01/21 09:35:24  fplanque
  * (c) 2008
  *

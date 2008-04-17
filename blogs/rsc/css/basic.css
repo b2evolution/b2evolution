@@ -258,7 +258,8 @@ div.error {
 }
 
 p.error,
-span.error {
+span.error,
+p.warning {
 	color: #e00;
 	font-weight:bold;
 }
@@ -276,8 +277,43 @@ div.skin_error {
 	margin: 1em;
 }
 
+
+div.debug_container {
+	border: 1px solid #f00;
+	margin: 0;
+	padding: 0;
+}
+div.debug_container_name {
+	margin: 0;
+	padding: 0;
+	background-color: #fdd;
+	color: #f00;
+	font-size: 7pt;
+	text-align: left;
+	font-weight: normal;
+}
+span.debug_container_action {
+	float: right;
+}
+
+div.debug_widget {
+	border: 1px solid #00f800;
+	margin: 0;
+	padding: 0;
+}
+div.debug_widget_name {
+	margin: 0;
+	padding: 0;
+	background-color: #efe;
+	color: #00f800;
+	font-size: 7pt;
+	text-align: left;
+	font-weight: normal;
+}
+
+
 /*
- * Debug output formatting:
+ * Bottom of page Debug output formatting:
  */
 div.debug {
 	border: 2px solid #000;

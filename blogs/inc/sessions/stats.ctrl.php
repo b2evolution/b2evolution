@@ -198,14 +198,18 @@ switch( $AdminUI->get_path(1) )
 				break;
 
 			case 'login':
-			default:
 				$AdminUI->disp_view( 'sessions/views/_stats_sessions.view.php' );
 		}
 		break;
 
 	case 'goals':
 		// Display VIEW:
-		$AdminUI->disp_view( 'sessions/views/_stats_goalhits.view.php' );
+		switch( $tab3 )
+		{
+			case 'hits':
+				$AdminUI->disp_view( 'sessions/views/_stats_goalhits.view.php' );
+				break;
+		}
 		break;
 
 }
@@ -218,6 +222,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2008/04/17 11:53:19  fplanque
+ * Goal editing
+ *
  * Revision 1.6  2008/03/20 14:20:52  fplanque
  * no message
  *

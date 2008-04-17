@@ -94,6 +94,10 @@ function & get_Cache( $objectName )
 			$Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
 			return $FiletypeCache;
 
+		case 'GoalCache';
+			$GoalCache = new DataObjectCache( 'Goal', false, 'T_track__goal', 'goal_', 'goal_ID' ); // COPY (FUNC)
+			return $GoalCache;
+
 		case 'GroupCache':
 			$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'\', T_(\'No group\') )' );
 			return $GroupCache;
@@ -148,6 +152,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.8  2008/04/17 11:53:16  fplanque
+ * Goal editing
+ *
  * Revision 1.7  2008/03/31 21:13:47  fplanque
  * Reverted übergeekyness
  *
