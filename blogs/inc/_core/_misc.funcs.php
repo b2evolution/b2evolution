@@ -1664,11 +1664,11 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	{	// fplanque: Windows XP, Apache 1.3, PHP 4.4, MS SMTP : will not accept "nice" addresses.
 		if( !empty( $to_name ) )
 		{
-			$to = '"'.mail_encode_header_string($to).'" <'.$to_name.'>';
+			$to = '"'.mail_encode_header_string($to_name).'" <'.$to.'>';
 		}
 		if( !empty( $from_name ) )
 		{
-			$from = '"'.mail_encode_header_string($from).'" <'.$from_name.'>';
+			$from = '"'.mail_encode_header_string($from_name).'" <'.$from.'>';
 		}
 	}
 
@@ -2554,7 +2554,7 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 			}
 			echo $item_start.$link.$item_end;
 
-			if( $count >= $max_items )
+			if( !is_null($max_items) && $count >= $max_items )
 			{
 				break;
 			}
@@ -2598,9 +2598,9 @@ function resolve_link_params( $item, $force_hash = NULL, $params = array() )
 			// echo $current_locale;
 			foreach( $item as $l_locale => $loc_item )
 			{
-				if( $l_locale == substr( $current_locale, 0, strlen( $l_locale) ) )
+				if( $l_locale == substr( $current_locale, 0, strlen($l_locale) ) )
 				{	// We found a matching locale:
-
+					//echo "[$l_locale/$current_locale]";
 					if( is_array( $loc_item[0] ) )
 					{	// Randomize:
 						$loc_item = hash_link_params( $loc_item, $force_hash );
@@ -2740,6 +2740,9 @@ function modules_call_method( $method_name )
 
 /*
  * $Log$
+ * Revision 1.35  2008/04/17 11:50:21  fplanque
+ * I feel stupid :P
+ *
  * Revision 1.34  2008/04/16 13:59:47  fplanque
  * oops
  *
