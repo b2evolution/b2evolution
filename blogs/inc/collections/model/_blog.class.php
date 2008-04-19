@@ -292,6 +292,26 @@ class Blog extends DataObject
 			$this->set_setting( 'category_prefix', $category_prefix);
 		}
 
+		if( param( 'atom_redirect', 'string', NULL) !== NULL )
+		{
+			$atom_redirect = get_param( 'atom_redirect' );
+			if( ! preg_match( '|^([A-Za-z0-9\-_]+(/[A-Za-z0-9\-_]+)*)?$|', $atom_redirect) )
+			{
+				param_error( 'atom_redirect', T_('Invalid feedburner.') );
+			}
+			$this->set_setting( 'atom_redirect', $atom_redirect);
+		}
+
+		if( param( 'rss2_redirect', 'string', NULL) !== NULL )
+		{
+			$rss2_redirect = get_param( 'rss2_redirect' );
+			if( ! preg_match( '|^([A-Za-z0-9\-_]+(/[A-Za-z0-9\-_]+)*)?$|', $rss2_redirect) )
+			{
+				param_error( 'rss2_redirect', T_('Invalid feedburner.') );
+			}
+			$this->set_setting( 'rss2_redirect', $rss2_redirect);
+		}
+
 		if( param( 'tag_links',   'string', NULL ) !== NULL )
 		{ // Tag page link type:
 			$this->set_setting( 'tag_links', get_param( 'tag_links' ) );
@@ -1903,6 +1923,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2008/04/19 15:11:42  waltercruz
+ * Feednurner
+ *
  * Revision 1.35  2008/04/04 17:02:22  fplanque
  * cleanup of global settings
  *

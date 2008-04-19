@@ -470,6 +470,7 @@ if( !empty( $skin ) )
 		// Path for the current skin:
 		$ads_current_skin_path = $skins_path.$skin.'/';
 
+
 		$disp_handlers = array(
 				'404'            => '404_not_found.main.php',
 				'arcdir'         => 'arcdir.main.php',
@@ -488,6 +489,7 @@ if( !empty( $skin ) )
 
 		if( !empty($disp_handlers[$disp]) )
 		{
+
 			if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[$disp] ) )
 			{	// The skin has a customized page handler for this display:
 				require $disp_handler;
@@ -505,7 +507,31 @@ if( !empty( $skin ) )
 				require $disp_handler;
 			}
 			else
-			{	// Use the default handler from the skins dir:
+			{	// Verify if the tempskin is redirected to feendurner, othervise, use the default handler from the skins dir:
+				if ($skin == '_atom')
+				{
+					$atom_redirect = $Blog->get_setting('atom_redirect');
+					if (!empty($atom_redirect))
+					{
+						if (!preg_match("/feedburner|feedvalidator/i", $_SERVER['HTTP_USER_AGENT']))
+						{
+							header_redirect("http://feeds.feedburner.com/" . $atom_redirect);
+							exit();
+						}
+					}
+				}
+				if ($skin == '_rss2')
+				{
+					$rss2_redirect = $Blog->get_setting('rss2_redirect');
+					if (!empty($rss2_redirect))
+					{
+						if (!preg_match("/feedburner|feedvalidator/i", $_SERVER['HTTP_USER_AGENT']))
+						{
+							header_redirect("http://feeds.feedburner.com/" . $rss2_redirect);
+							exit();
+						}
+					}
+				}
 				require $ads_current_skin_path.'index.main.php';
 			}
 		}
@@ -526,6 +552,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.100  2008/04/19 15:11:42  waltercruz
+ * Feednurner
+ *
  * Revision 1.99  2008/03/30 23:04:23  fplanque
  * fix
  *
