@@ -90,6 +90,15 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Blogs to aggregate'), T_('List blog IDs separated by ,'), 255 );
 	$Form->end_fieldset();
 
+	$Form->begin_fieldset( T_('Feedburner'));
+		$Form->text_input( 'atom_redirect', $edited_Blog->get_setting( 'atom_redirect' ), 25, T_('Atom'),
+												T_('Your Feedburner atom feed'),
+												array( 'input_prefix' => "<code>http://feeds.feedburner.com/</code>", 'maxlength' => 255 ) );
+		$Form->text_input( 'rss2_redirect', $edited_Blog->get_setting( 'rss2_redirect' ), 25, T_('RSS2'),
+												T_('Your Feedburner rss2 feed'),
+												array( 'input_prefix' => "<code>http://feeds.feedburner.com/</code>", 'maxlength' => 255 ) );
+	$Form->end_fieldset();
+
 
 	$Form->begin_fieldset( T_('Static file generation').' ['.T_('Admin').']' );
 		$Form->text_input( 'source_file', $edited_Blog->get_setting( 'source_file' ), 25, T_('Source file'),
@@ -168,6 +177,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.10  2008/04/19 15:14:35  waltercruz
+ * Feedburner
+ *
  * Revision 1.9  2008/04/04 16:02:12  fplanque
  * uncool feature about limiting credits
  *

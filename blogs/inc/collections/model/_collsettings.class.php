@@ -99,6 +99,8 @@ class CollectionSettings extends AbstractSettings
 			'single_item_footer_text' => '',
 			'xml_item_footer_text' => '<p><small><a href="$item_perm_url$">Original post</a> blogged on <a href="http://b2evolution.net/">b2evolution</a>.</small></p>',
 			'max_footer_credits' => 3,
+			'atom_redirect' =>'',
+			'rss2_redirect'=>'',
 		);
 
 
@@ -134,6 +136,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.18  2008/04/19 15:14:35  waltercruz
+ * Feedburner
+ *
  * Revision 1.17  2008/04/04 16:02:10  fplanque
  * uncool feature about limiting credits
  *
