@@ -31,12 +31,12 @@ $count_sql = 'SELECT COUNT(goal_ID)
 								FROM T_track__goal';
 
 if( !empty($final) )
-{	// We want to filter on the session ID:
+{	// We want to filter on final goals only:
 	$sql .= ' WHERE goal_redir_url IS NULL';
 	$count_sql .= ' WHERE goal_redir_url IS NULL';
 }
 
-$Results = & new Results( $sql, 'goals_', '--A', 20, $count_sql );
+$Results = & new Results( $sql, 'goals_', '-A', 20, $count_sql );
 
 $Results->title = T_('Goals');
 
@@ -116,6 +116,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.2  2008/04/24 01:56:08  fplanque
+ * Goal hit summary
+ *
  * Revision 1.1  2008/04/17 11:53:22  fplanque
  * Goal editing
  *

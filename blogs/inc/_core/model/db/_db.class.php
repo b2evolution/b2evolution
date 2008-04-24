@@ -413,8 +413,8 @@ class DB
 
 		if( $debug )
 		{ // Force MySQL strict mode
-			//As  Austriaco pointed on the forum (http://forums.b2evolution.net/viewtopic.php?p=68443), 
-			//TRADITIONAL mode is only available to mysql > 5.0.22 . 
+			//As  Austriaco pointed on the forum (http://forums.b2evolution.net/viewtopic.php?p=68443),
+			//TRADITIONAL mode is only available to mysql > 5.0.22 .
 			$mysql_version = $this->get_version();
 			if( version_compare( $mysql_version, '5.0.2' ) > 0 )
 			{
@@ -874,7 +874,7 @@ class DB
 	/**
 	 * Get one row from the DB - see docs for more detail
 	 *
-	 * @return array|object
+	 * @return mixed
 	 */
 	function get_row( $query = NULL, $output = OBJECT, $y = 0, $title = '' )
 	{
@@ -967,7 +967,7 @@ class DB
 	/**
 	 * Return the the query as a result set - see docs for more details
 	 *
-	 * @return array
+	 * @return mixed
 	 */
 	function get_results( $query = NULL, $output = OBJECT, $title = '' )
 	{
@@ -1413,6 +1413,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.8  2008/04/24 01:56:08  fplanque
+ * Goal hit summary
+ *
  * Revision 1.7  2008/02/19 11:11:17  fplanque
  * no message
  *

@@ -174,6 +174,10 @@ class sessions_Module
 									'text' => T_('Goals'),
 									'href' => 'admin.php?ctrl=goals'
 									),
+								'stats' => array(
+									'text' => T_('Stats'),
+									'href' => 'admin.php?ctrl=goals&amp;tab3=stats'
+									),
 								),
 							),
 						)
@@ -195,6 +199,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.3  2008/04/24 01:56:08  fplanque
+ * Goal hit summary
+ *
  * Revision 1.2  2008/04/17 11:53:18  fplanque
  * Goal editing
  *

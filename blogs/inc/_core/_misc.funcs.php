@@ -567,6 +567,19 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 
 
 /**
+ * Add given # of days to a timestamp
+ *
+ * @param integer timestamp
+ * @param integer days
+ * @return integer timestamp
+ */
+function date_add_days( $timestamp, $days )
+{
+	return mktime( date('H',$timestamp), date('m',$timestamp), date('s',$timestamp),
+								date('m',$timestamp), date('d',$timestamp)+$days, date('Y',$timestamp)  );
+}
+
+/**
  * Format dates into a string in a way similar to sprintf()
  */
 function date_sprintf( $string, $timestamp )
@@ -2740,6 +2753,9 @@ function modules_call_method( $method_name )
 
 /*
  * $Log$
+ * Revision 1.36  2008/04/24 01:56:07  fplanque
+ * Goal hit summary
+ *
  * Revision 1.35  2008/04/17 11:50:21  fplanque
  * I feel stupid :P
  *

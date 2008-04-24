@@ -197,11 +197,20 @@ switch( $action )
 
 
 	default:
-			// No specific request, list all file types:
-			// Cleanup context:
-			forget_param( 'goal_ID' );
-			// Display file types list:
-			$AdminUI->disp_view( 'sessions/views/_stats_goals.view.php' );
+		// No specific request, list all file types:
+		switch( $tab3 )
+		{
+			case 'goals':
+				// Cleanup context:
+				forget_param( 'goal_ID' );
+				// Display goals list:
+				$AdminUI->disp_view( 'sessions/views/_stats_goals.view.php' );
+				break;
+
+			case 'stats':
+				$AdminUI->disp_view( 'sessions/views/_goal_hitsummary.view.php' );
+				break;
+		}
 
 }
 
@@ -212,6 +221,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2008/04/24 01:56:08  fplanque
+ * Goal hit summary
+ *
  * Revision 1.1  2008/04/17 11:53:18  fplanque
  * Goal editing
  *

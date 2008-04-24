@@ -267,13 +267,22 @@ class Table extends Widget
 
 
 	/**
+	 * URL param names
+	 */
+	var $param_prefix;
+
+
+	/**
 	 * Constructor
 	 *
 	 * @param string template name to get from $AdminUI
+	 * @param string prefix to differentiate page/order/filter params
 	 */
-	function Table( $ui_template = NULL )
+	function Table( $ui_template = NULL, $param_prefix = '' )
 	{
 		parent::Widget( $ui_template );
+
+		$this->param_prefix = $param_prefix;
 
 		$this->no_results_text = T_('No results.');
 	}
@@ -340,6 +349,158 @@ class Table extends Widget
 
 
 	/**
+	 * Display options area
+	 *
+	 * @param string name of the option ( ma_colselect, tsk_filter....)
+	 * @param string area name ( colselect_area, filter_area )
+	 * @param string option title
+	 * @param string submit button title
+	 * @param string default folde state when is empty in the session
+	 *
+	 */
+	function display_option_area( $option_name, $area_name, $option_title, $submit_title, $default_folde_state = 'expanded' )
+	{
+		global $debug, $Session;
+
+		// Do we already have a form?
+		$create_new_form = ! isset( $this->Form );
+
+		echo $this->replace_vars( $this->params['filters_start'] );
+
+		$fold_state = $Session->get( $option_name );
+
+		if( empty( $fold_state ) )
+		{
+			$fold_state = $default_folde_state;
+		}
+
+		//__________________________________  Toogle link _______________________________________
+
+		if( $fold_state == 'collapsed' )
+		{
+			echo '<a class="filters_title" href="'.regenerate_url( '', 'expand='.$option_name ).'"
+								onclick="return toggle_filter_area(\''.$option_name.'\');" >'
+						.get_icon( 'expand', 'imgtag', array( 'id' => 'clickimg_'.$option_name ) );
+		}
+		else
+		{
+			echo '<a class="filters_title" href="'.regenerate_url( '', 'collapse='.$option_name ).'"
+								onclick="return toggle_filter_area(\''.$option_name.'\');" >'
+						.get_icon( 'collapse', 'imgtag', array( 'id' => 'clickimg_'.$option_name ) );
+		}
+		echo $option_title.'</a>:';
+
+		//_____________________________ Filters preset ___________________________________________
+
+		if( !empty( $this->{$area_name}['presets'] ) )
+		{ // We have preset filters
+			$r = array();
+			// Loop on all preset filters:
+			foreach( $this->{$area_name}['presets'] as $key => $preset )
+			{
+				if( method_exists( $this, 'is_filtered' ) && !$this->is_filtered()
+							&& get_param( $this->param_prefix.'filter_preset' ) == $key )
+				{ // The list is not filtered and the filter preset is selected, so no link on:
+					$r[] = '['.$preset[0].']';
+				}
+				else
+				{	// Display preset filter link:
+					$r[] = '[<a href="'.$preset[1].'">'.$preset[0].'</a>]';
+				}
+			}
+
+			echo ' '.implode( ' ', $r );
+		}
+
+		//_________________________________________________________________________________________
+
+		if( $debug > 1 )
+		{
+			echo ' <span class="notes">('.$option_name.':'.$fold_state.')</span>';
+			echo ' <span id="asyncResponse"></span>';
+		}
+
+		// Begining of the div:
+		echo '<div id="clickdiv_'.$option_name.'"';
+		if( $fold_state == 'collapsed' )
+		{
+			echo ' style="display:none;"';
+		}
+		echo '>';
+
+		//_____________________________ Form and callback _________________________________________
+
+		if( !empty($this->{$area_name}['callback']) )
+		{	// We want to display filtering form fields:
+
+			if( $create_new_form )
+			{	// We do not already have a form surrounding the whole results list:
+
+				if( !empty( $this->{$area_name}['url_ignore'] ) )
+				{
+					$ignore = $this->{$area_name}['url_ignore'];
+				}
+				else
+				{
+					$ignore = $this->page_param;
+				}
+
+				$this->Form = new Form( regenerate_url( $ignore ), $this->param_prefix.'form_search', 'post', 'blockspan' ); // COPY!!
+
+				$this->Form->begin_form( '' );
+			}
+
+			$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
+			$this->Form->submit( array( $submit_name, $submit_title, 'filter' ) );
+
+			$func = $this->{$area_name}['callback'];
+			$func( $this->Form );
+
+			if( $create_new_form )
+			{	// We do not already have a form surrounding the whole result list:
+				$this->Form->end_form( '' );
+			}
+		}
+
+		echo '</div>';
+
+		echo $this->params['filters_end'];
+	}
+
+
+	/**
+	 * Display the column selection
+	 */
+	function display_colselect()
+	{
+		if( empty( $this->colselect_area ) )
+		{	// We don't want to display a col selection section:
+			return;
+		}
+
+		$option_name = $this->param_prefix.'colselect';
+
+		$this->display_option_area( $option_name, 'colselect_area', T_('Columns'), T_('Apply'), 'collapsed');
+	}
+
+
+	/**
+	 * Display the filtering form
+	 */
+	function display_filters()
+	{
+		if( empty( $this->filter_area ) )
+		{	// We don't want to display a filters section:
+			return;
+		}
+
+		$option_name = $this->param_prefix.'filters';
+
+		$this->display_option_area( $option_name, 'filter_area', T_('Filters'), T_('Filter list'), 'expanded' );
+	}
+
+
+	/**
 	 * Display list/table start.
 	 *
 	 * Typically outputs UL or TABLE tags.
@@ -381,8 +542,6 @@ class Table extends Widget
 	 *
 	 * This includes list head/title and column headers.
 	 * EXPERIMENTAL: also dispays <tfoot>
-	 *
-	 * @access protected
 	 */
 	function display_head()
 	{
@@ -395,6 +554,15 @@ class Table extends Widget
 			echo $this->replace_vars( $this->params['head_title'] );
 		}
 
+
+		// DISPLAY COL SELECTION
+		$this->display_colselect();
+
+
+		// DISPLAY FILTERS:
+		$this->display_filters();
+
+
 		// DISPLAY COLUMN HEADERS:
 		$this->display_col_headers();
 
@@ -406,6 +574,7 @@ class Table extends Widget
 		echo $this->params['tfoot_start'];
 		echo $this->params['tfoot_end'];
 	}
+
 
 
 	/**
@@ -825,6 +994,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.7  2008/04/24 01:56:08  fplanque
+ * Goal hit summary
+ *
  * Revision 1.6  2008/01/21 09:35:24  fplanque
  * (c) 2008
  *
