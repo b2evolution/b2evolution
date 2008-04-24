@@ -311,6 +311,8 @@ class ComponentWidget extends DataObject
 	 */
 	function init_display( $params )
 	{
+		global $admin_url;
+
 		// Generate widget defaults array:
 		$widget_defaults = array();
 		$defs = $this->get_param_definitions( array() );
@@ -361,6 +363,13 @@ class ComponentWidget extends DataObject
 					'tag_cloud_start' => '<p class="tag_cloud">',
 					'tag_cloud_end' => '</p>',
 				), $widget_defaults, $params, $this->param_array );
+
+		if( false )
+		{	// DEBUG:
+			$params['block_start'] = '<div class="debug_widget"><div class="debug_widget_name"><span class="debug_container_action"><a href="'
+						.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'.$params[ 'widget_name' ].'</div><div class="$wi_class$">';
+			$params['block_end'] = '</div></div>';
+		}
 
 		// Customize params to the current widget:
 		// add additional css classes if required
@@ -724,6 +733,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.35  2008/04/24 02:01:04  fplanque
+ * experimental
+ *
  * Revision 1.34  2008/02/08 22:24:46  fplanque
  * bugfixes
  *

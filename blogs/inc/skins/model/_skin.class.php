@@ -162,8 +162,14 @@ class Skin extends DataObject
 		 * @var Blog
 		 */
 		global $Blog;
+		global $admin_url, $rsc_url;
 
-		// echo '<div>Debug: container: '.$sco_name.'</div>';
+		if( false )
+		{	// DEBUG:
+			echo '<div class="debug_container">';
+			echo '<div class="debug_container_name"><span class="debug_container_action"><a href="'
+						.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'">Edit</a></span>'.$sco_name.'</div>';
+		}
 
     /**
 		 * @var WidgetCache
@@ -178,6 +184,12 @@ class Skin extends DataObject
 				// Let the Widget display itself (with contextual params):
 				$ComponentWidget->display( $params );
 			}
+		}
+
+		if( false )
+		{	// DEBUG:
+			echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear">';
+			echo '</div>';
 		}
 	}
 
@@ -440,6 +452,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2008/04/24 02:01:04  fplanque
+ * experimental
+ *
  * Revision 1.9  2008/03/21 17:41:56  fplanque
  * custom 404 pages
  *
