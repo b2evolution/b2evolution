@@ -125,7 +125,7 @@ $Form->begin_form( 'fform' );
 	}
 	$pwd_note .= '">'.T_('Lost password ?').'</a>';
 
-	$Form->password_input( 'pwd', '', 16, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 50, 'class' => 'input_text' ) );
+	$Form->password_input( 'pwd', '', 16, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 70, 'class' => 'input_text' ) );
 
 
 
@@ -224,6 +224,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.10  2008/04/24 02:01:22  fplanque
+ * opera fix
+ *
  * Revision 1.9  2008/02/13 11:34:45  blueyed
  * Explicitly call jQuery(), not the shortcut ($())
  *
