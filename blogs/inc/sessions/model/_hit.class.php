@@ -351,11 +351,15 @@ class Hit
 		{
 			if( stristr($this->referer, $lSearchEngine) )
 			{
-				$Debuglog->add( 'detect_referer(): search engine ('.$lSearchEngine.')', 'hit' );
-				$this->referer_type = 'search';
-				return;
+				if ( ! preg_match('#reader/view/$#',$this->referer)) //not treat google reader as a search engine
+				{
+					$Debuglog->add( 'detect_referer(): search engine ('.$lSearchEngine.')', 'hit' );
+					$this->referer_type = 'search';
+					return;
+				}
 			}
 		}
+
 
 		$this->referer_type = 'referer';
 	}
@@ -752,6 +756,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.7  2008/04/25 02:54:06  waltercruz
+ * google reader is not a search engine
+ *
  * Revision 1.6  2008/02/19 11:11:18  fplanque
  * no message
  *
