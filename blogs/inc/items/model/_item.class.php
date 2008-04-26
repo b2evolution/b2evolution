@@ -994,6 +994,21 @@ class Item extends ItemLight
 
 
 	/**
+	 * DEPRECATED
+	 */
+	function content()
+	{
+		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+		skin_include( '_item_content.inc.php', array(
+				'image_size'	=>	'fit-400x320',
+			) );
+		// Note: You can customize the default item feedback by copying the generic
+		// /skins/_item_feedback.inc.php file into the current skin folder.
+		// -------------------------- END OF POST CONTENT -------------------------
+	}
+
+
+	/**
 	 * Display content teaser of item (will stop at "<!-- more -->"
 	 */
 	function content_extension( $params )
@@ -3525,6 +3540,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.49  2008/04/26 22:20:45  fplanque
+ * Improved compatibility with older skins.
+ *
  * Revision 1.48  2008/04/14 17:52:07  fplanque
  * link images to original by default
  *

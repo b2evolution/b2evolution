@@ -1845,8 +1845,10 @@ class Blog extends DataObject
 
 	/**
 	 * Template tag: display a link leading to the contact form for the owner of the current Blog.
+	 *
+	 * @param array (empty default array is provided for compatibility with v 1.10)
 	 */
-	function contact_link( $params )
+	function contact_link( $params = array() )
 	{
 		$this->get_owner_User();
 		if( ! $this->owner_User->allow_msgform )
@@ -1923,6 +1925,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.37  2008/04/26 22:20:44  fplanque
+ * Improved compatibility with older skins.
+ *
  * Revision 1.36  2008/04/19 15:11:42  waltercruz
  * Feednurner
  *

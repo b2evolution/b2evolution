@@ -747,8 +747,31 @@ function powered_by( $params = array() )
 }
 
 
+
+/**
+ * DEPRECATED
+ */
+function bloginfo( $what )
+{
+	global $Blog;
+	$Blog->disp( $what );
+}
+
+/**
+ * DEPRECATED
+ */
+function link_pages()
+{
+	echo '<!-- link_page() is DEPRECATED -->';
+}
+
+
+
 /*
  * $Log$
+ * Revision 1.29  2008/04/26 22:20:44  fplanque
+ * Improved compatibility with older skins.
+ *
  * Revision 1.28  2008/04/13 23:38:53  fplanque
  * Basic public user profiles
  *

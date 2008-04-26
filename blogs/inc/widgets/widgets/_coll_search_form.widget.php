@@ -89,7 +89,7 @@ class coll_search_form_Widget extends ComponentWidget
 		echo '<input type="radio" name="sentence" value="OR" id="sentOR" '.( $sentence=='OR' ? 'checked="checked" ' : '' ).'/><label for="sentOR">'.T_('Some Word').'</label><br />';
 		echo '<input type="radio" name="sentence" value="sentence" id="sentence" '.( $sentence=='sentence' ? 'checked="checked" ' : '' ).'/><label for="sentence">'.T_('Entire phrase').'</label>';
 		echo '</p>';
-		echo '<input type="submit" name="submit" class="submit" value="'.T_('Search').'" />';
+		echo '<input type="submit" name="submit" class="submit" value="'.T_('Search').'" class="search_submit" />';
 		echo '</form>';
 
 		echo $this->disp_params['block_end'];
@@ -101,6 +101,9 @@ class coll_search_form_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2008/04/26 22:20:45  fplanque
+ * Improved compatibility with older skins.
+ *
  * Revision 1.2  2008/01/21 09:35:37  fplanque
  * (c) 2008
  *

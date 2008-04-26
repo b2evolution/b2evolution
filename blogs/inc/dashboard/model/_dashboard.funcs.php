@@ -79,25 +79,26 @@ function b2evonet_get_updates()
 									new xmlrpcval( $app_version, 'string'),	  	// Version number
 									new xmlrpcval( $app_date, 'string'),		    // Version number
 									new xmlrpcval( array(
-											'this_update' => new xmlrpcval( $servertimenow, 'string'),
-											'last_update' => new xmlrpcval( $servertime_last_update, 'string'),
+											'this_update' => new xmlrpcval( $servertimenow, 'string' ),
+											'last_update' => new xmlrpcval( $servertime_last_update, 'string' ),
 											'db_version' => new xmlrpcval( $DB->get_version(), 'string'),	// If a version >95% we make it the new default.
 											'db_utf8' => new xmlrpcval( system_check_db_utf8() ? 1 : 0, 'int' ),	// if support >95%, we'll make it the default
-											'php_version' => new xmlrpcval( PHP_VERSION, 'string'),
+											'evo_charset' => new xmlrpcval( $evo_charset, 'string' ),
+											'php_version' => new xmlrpcval( PHP_VERSION, 'string' ),
 											'php_xml' => new xmlrpcval( extension_loaded('xml') ? 1 : 0, 'int' ),
 											'php_mbstring' => new xmlrpcval( extension_loaded('mbstring') ? 1 : 0, 'int' ),
 											'php_memory' => new xmlrpcval( system_check_memory_limit(), 'int'), // how much room does b2evo have to move on a typical server?
-											'php_upload_max' => new xmlrpcval( system_check_upload_max_filesize(), 'int'),
-											'php_post_max' => new xmlrpcval( system_check_post_max_size(), 'int'),
-											'mediadir_status' => new xmlrpcval( $mediadir_status, 'string'), // If error, then the host is potentially borked
+											'php_upload_max' => new xmlrpcval( system_check_upload_max_filesize(), 'int' ),
+											'php_post_max' => new xmlrpcval( system_check_post_max_size(), 'int' ),
+											'mediadir_status' => new xmlrpcval( $mediadir_status, 'string' ), // If error, then the host is potentially borked
 											'install_removed' => new xmlrpcval( system_check_install_removed() ? 1 : 0, 'int' ), // How many people do go through this extra measure?
 											// How many "low security" hosts still active?; we'd like to standardize security best practices... on suphp?
-											'php_uid' => new xmlrpcval( $uid, 'int'),
-											'php_uname' => new xmlrpcval( $uname, 'string'),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
-											'php_gid' => new xmlrpcval( $gid, 'int'),
-											'php_gname' => new xmlrpcval( $gname, 'string'),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
+											'php_uid' => new xmlrpcval( $uid, 'int' ),
+											'php_uname' => new xmlrpcval( $uname, 'string' ),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
+											'php_gid' => new xmlrpcval( $gid, 'int' ),
+											'php_gname' => new xmlrpcval( $gname, 'string' ),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
 											'php_reg_globals' => new xmlrpcval( ini_get('register_globals') ? 1 : 0, 'int' ), // if <5% we may actually refuse to run future version on this
-											'gd_version' => new xmlrpcval( system_check_gd_version(), 'string'),
+											'gd_version' => new xmlrpcval( system_check_gd_version(), 'string' ),
 										), 'struct' ),
 								)
 							);
@@ -157,6 +158,9 @@ function b2evonet_get_updates()
 
 /*
  * $Log$
+ * Revision 1.12  2008/04/26 22:20:45  fplanque
+ * Improved compatibility with older skins.
+ *
  * Revision 1.11  2008/04/24 22:05:59  fplanque
  * factorized system checks
  *

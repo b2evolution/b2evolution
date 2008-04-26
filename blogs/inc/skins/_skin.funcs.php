@@ -255,6 +255,10 @@ function skin_init( $disp )
 			// This MAY or MAY not have exited -- will exit on 30x redirect, otherwise will return here.
 			break;
 	}
+
+	// dummy var for backward compatibility with versions < 2.4.1 -- prevents "Undefined variable"
+	Global $global_Cache, $credit_links;
+	$credit_links = $global_Cache->get( 'creds' );
 }
 
 
@@ -601,6 +605,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.30  2008/04/26 22:20:45  fplanque
+ * Improved compatibility with older skins.
+ *
  * Revision 1.29  2008/04/13 23:38:53  fplanque
  * Basic public user profiles
  *
